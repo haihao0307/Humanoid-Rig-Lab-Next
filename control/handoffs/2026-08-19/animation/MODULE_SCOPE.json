@@ -1,0 +1,36 @@
+{
+  "type": "HumanoidRigModuleWorkspace",
+  "baselineVersion": "0.5.0",
+  "schemaVersion": 5,
+  "module": "animation",
+  "title": "动画系统",
+  "branch": "work/animation",
+  "goal": "建立时间轴、关键帧、局部四元数轨道、插值、循环、片段、事件和 PoseSnapshot 引用协议。",
+  "writablePaths": [
+    "src/modules/animation/**",
+    "assets/animations/**",
+    "tests/animation*.mjs",
+    "legacy/v8/src/animation-*.js",
+    "legacy/v8/tests/animation*.mjs",
+    "control/active-tasks/animation.md",
+    "control/module-status/animation.json"
+  ],
+  "readOnlySharedPaths": [
+    "src/state-schema.js",
+    "src/project-hub.js",
+    "src/studio.js",
+    "src/default-state.js",
+    "src/module-registry.js",
+    "workers/project-hub.shared.js",
+    "legacy/v8/src/main.js",
+    "legacy/v8/src/three-view.js",
+    "package.json",
+    ".github/workflows/**"
+  ],
+  "requiredOutput": [
+    "animation-patch-v001.zip",
+    "HANDOFF.md",
+    "changed-files.txt",
+    "test-results.txt"
+  ]
+}

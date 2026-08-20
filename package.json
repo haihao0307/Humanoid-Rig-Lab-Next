@@ -1,0 +1,20 @@
+{
+  "name": "humanoid-rig-lab-next",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "description": "WebGPU and Three.js four-module humanoid production platform with audited rig proportions, native pre-bound skinning, image pose reconstruction, local-quaternion animation, and multi-window synchronization",
+  "scripts": {
+    "start": "node server.mjs",
+    "serve": "node server.mjs",
+    "test": "node tests/validate.mjs && node tests/module-patches.mjs && node tests/integration-v002.mjs && npm run test:animation && npm --prefix legacy/v8 test",
+    "check": "node tests/validate.mjs && node tests/module-patches.mjs && node tests/integration-v002.mjs && npm run test:animation && npm --prefix legacy/v8 test",
+    "test:animation": "node tests/animation-assets.mjs && node tests/animation-bake.mjs && node tests/animation-editing.mjs && node tests/animation-model.mjs && node tests/animation-performance.mjs && node tests/animation-runtime.mjs && node tests/animation-workspace.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  }
+}

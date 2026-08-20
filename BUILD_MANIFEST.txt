@@ -1,0 +1,38 @@
+Humanoid Rig Lab Next
+Build ID: four-module-v002-20260819
+Project version: 0.5.0
+Embedded editor: V8.4 / 0.8.4
+Project schema: 5
+Rig export schema: 6
+Three.js: 0.185.1
+Date: 2026-08-19
+
+Merged module versions
+- Proportion: rig@0.4.0, module revision 3, V002 role and joint-axis audit
+- Skin: skin@0.5.1, module revision 3, native pre-bound single SkinnedMesh
+- Pose: pose@0.4.0, module revision 3, image pose and canonical PoseSnapshot
+- Animation: anim@0.4.0, module revision 4, local quaternion runtime, clips, layers, graph and bake
+- Integration: module revision 2
+
+Shared integration added by the mother project
+- Build identity manifest and launcher build-ID verification
+- Canonical local-quaternion PoseSnapshot is the primary V8 viewport bridge
+- Legacy V8 world-position pose remains available as a compatibility fallback
+- Shared transient message bus for motion transport anchors and scrub previews
+- Module scope files archived under control/module-scopes
+- Baseline state migration to the current module versions and revisions
+
+Skin runtime
+- Build marker: skin-v002-single-surface-guard
+- Asset: legacy/v8/assets/smpl/smpl-male-surface-skinned.glb
+- SHA-256: 736cb39c828203eae72f5e5d094f1623c0a4465a31b484737a6e8df02a7ec899
+- Native JOINTS_0, WEIGHTS_0 and 24 inverse bind matrices
+
+Validation command
+- npm test
+
+Remaining production boundaries
+- The transitional skin weights still require licensed professional weights and pose corrective shapes.
+- MediaPipe model provenance and redistribution terms require final publication review.
+- Full simulationRig external solver integration and final SkinnedMesh plus animation GLB export remain cross-module follow-up work.
+- Desktop Chrome or Edge visual and interaction acceptance remains required.

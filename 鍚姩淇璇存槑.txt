@@ -1,0 +1,17 @@
+Humanoid Rig Lab Next V0.5.0 启动与兼容说明
+
+start.bat 使用 ASCII 文件名并调用 launcher.ps1。
+
+launcher.ps1 会：
+1. 检查 Node.js 18 或更高版本。
+2. 检查本地 Three.js 0.185.1 运行库。
+3. 缺少运行库时尝试 npm install。
+4. 启动 Node 本地服务器。
+5. Node 不可用时尝试 PowerShell 静态服务器。
+6. 自动选择 4173 到 4190 之间的可用端口。
+
+V0.5.0 注意事项：
+1. 比例工作台以三维视口为主。
+2. Three.js 运行库缺失时，页面会明确提示三维启动失败。
+3. 2D 后备层不会继续占据正式工作区。
+4. 诊断信息写入 launcher.log 和 startup-diagnostics.txt。

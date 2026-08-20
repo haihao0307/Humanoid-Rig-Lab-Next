@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-store">
+  <title>人物蒙皮 V002 构建验证</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, "Microsoft YaHei", system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #080d18; color: #e8eef8; display: grid; place-items: center; padding: 28px; }
+    main { width: min(860px, 100%); background: #101827; border: 1px solid #263751; border-radius: 18px; padding: 26px; box-shadow: 0 24px 80px rgba(0,0,0,.42); }
+    h1 { margin: 0 0 8px; font-size: 24px; }
+    .lead { margin: 0 0 22px; color: #aebbd0; line-height: 1.7; }
+    .status { border-radius: 14px; padding: 16px; margin: 16px 0; border: 1px solid #3b4d67; background: #0b1320; }
+    .status[data-state="pass"] { border-color: #2f9e70; background: #0b201b; }
+    .status[data-state="fail"] { border-color: #d65a65; background: #271116; }
+    .status strong { display: block; font-size: 18px; margin-bottom: 7px; }
+    dl { display: grid; grid-template-columns: 190px 1fr; gap: 10px 16px; margin: 22px 0; }
+    dt { color: #91a4bd; }
+    dd { margin: 0; overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+    button, a { appearance: none; border: 0; border-radius: 10px; padding: 11px 16px; font-weight: 700; cursor: pointer; text-decoration: none; }
+    button { background: #f4b942; color: #15100a; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    a { background: #263751; color: #e8eef8; }
+    code { color: #72d8ad; }
+    .note { color: #aebbd0; line-height: 1.7; font-size: 14px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>人物蒙皮 V002 构建验证</h1>
+  <p class="lead">此页面先核对当前端口实际服务的工作包，再允许进入人物编辑器。这样可以避开 4173 端口仍指向旧工程的情况。</p>
+  <section id="status" class="status" data-state="loading">
+    <strong id="status-title">正在核对工作包</strong>
+    <span id="status-detail">读取构建清单和运行时代码标记。</span>
+  </section>
+  <dl>
+    <dt>当前地址</dt><dd id="origin"></dd>
+    <dt>期望构建</dt><dd id="expected">skin-v002-single-surface-guard</dd>
+    <dt>实际构建</dt><dd id="actual">读取中</dd>
+    <dt>补丁编号</dt><dd id="patch">读取中</dd>
+    <dt>兼容 Rig</dt><dd id="rig">读取中</dd>
+    <dt>运行时代码标记</dt><dd id="runtime">读取中</dd>
+    <dt>预绑定资产</dt><dd id="asset">读取中</dd>
+  </dl>
+  <div class="actions">
+    <button id="open-editor" disabled>打开 V002 人物编辑器</button>
+    <button id="recheck">重新核对</button>
+    <a href="skin-build.json" target="_blank" rel="noreferrer">查看构建清单</a>
+  </div>
+  <p class="note">进入编辑器后，左上状态卡必须显示 <code>SKIN V002 唯一预绑定表皮已就绪</code>。状态卡仍显示“标准人物表皮”或“基础人体外形”时，当前端口仍在提供历史版本。</p>
+</main>
+<script type="module">
+  const EXPECTED = 'skin-v002-single-surface-guard';
+  const elements = Object.fromEntries([...document.querySelectorAll('[id]')].map((node) => [node.id, node]));
+  elements.origin.textContent = location.origin;
+
+  function setStatus(state, title, detail) {
+    elements.status.dataset.state = state;
+    elements['status-title'].textContent = title;
+    elements['status-detail'].textContent = detail;
+  }
+
+  async function verify() {
+    elements['open-editor'].disabled = true;
+    setStatus('loading', '正在核对工作包', '所有请求都使用 no-store 和时间戳，避免浏览器缓存干扰。');
+    const cacheBust = Date.now();
+    try {
+      const manifestResponse = await fetch(`skin-build.json?ts=${cacheBust}`, { cache: 'no-store' });
+      if (!manifestResponse.ok) throw new Error(`构建清单 HTTP ${manifestResponse.status}`);
+      const manifest = await manifestResponse.json();
+      elements.actual.textContent = manifest.buildId ?? '缺失';
+      elements.patch.textContent = manifest.patchId ?? '缺失';
+      elements.rig.textContent = manifest.compatibleRigVersion ?? '缺失';
+      elements.asset.textContent = `${manifest.assetPath} · ${manifest.assetSha256}`;
+
+      const runtimeResponse = await fetch(`${manifest.runtimeSourcePath}?ts=${cacheBust}`, { cache: 'no-store' });
+      if (!runtimeResponse.ok) throw new Error(`运行时代码 HTTP ${runtimeResponse.status}`);
+      const runtimeSource = await runtimeResponse.text();
+      const runtimeOk = runtimeSource.includes(manifest.runtimeMarker) && runtimeSource.includes('SKIN V002 唯一预绑定表皮已就绪');
+      elements.runtime.textContent = runtimeOk ? '通过' : '未发现 V002 标记';
+
+      const manifestOk = manifest.buildId === EXPECTED;
+      if (!manifestOk || !runtimeOk) {
+        throw new Error('当前端口提供的文件与 V002 不一致');
+      }
+
+      elements['open-editor'].disabled = false;
+      elements['open-editor'].onclick = () => {
+        const separator = manifest.editorPath.includes('?') ? '&' : '?';
+        location.href = `${manifest.editorPath}${separator}verifiedBuild=${encodeURIComponent(manifest.buildId)}&ts=${Date.now()}`;
+      };
+      setStatus('pass', '已确认当前端口属于 SKIN V002', '可以进入编辑器检查唯一表皮、肩部、髋部和关节变形。');
+    } catch (error) {
+      elements.runtime.textContent = elements.runtime.textContent === '读取中' ? '核对失败' : elements.runtime.textContent;
+      setStatus('fail', '当前端口未通过 V002 核对', error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  elements.recheck.addEventListener('click', verify);
+  verify();
+</script>
+</body>
+</html>

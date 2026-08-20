@@ -1,0 +1,1295 @@
+{
+  "schemaVersion": 6,
+  "name": "SMPL-Compatible Adult Humanoid 3D Proportion Rig",
+  "unit": "meter",
+  "dimensionsLocked": true,
+  "bindPose": "A",
+  "coordinateSystem": {
+    "handedness": "right",
+    "upAxis": "+Y",
+    "forwardAxis": "+Z",
+    "rightAxis": "+X"
+  },
+  "standard": {
+    "family": "SMPL",
+    "topology": "SMPL male sample body",
+    "jointLayout": "SMPL 24",
+    "surfaceAsset": "assets/smpl/smpl-male-surface.glb",
+    "surfaceVertexCount": 27578,
+    "surfaceTriangleCount": 55152,
+    "license": "CC BY 4.0",
+    "attribution": "Meshcapade / Max Planck Institute for Intelligent Systems",
+    "fittingMethod": "SMPL 24 hierarchy fitted to the distributed CC BY sample surface"
+  },
+  "surface": {
+    "enabled": true,
+    "asset": "assets/smpl/smpl-male-surface.glb",
+    "source": "SMPL male sample body",
+    "license": "CC BY 4.0",
+    "bindPose": "A",
+    "groundOffset": 0.006509,
+    "weighting": "region-isolated adjacency-smoothed four-influence CPU dual-quaternion weights with exact bind-pose protection"
+  },
+  "anthropometry": {
+    "profile": "smpl-male-surface-fit-1796-v3",
+    "label": "SMPL 男性示例体 · 1.796 m",
+    "referenceStature": 1.795672,
+    "surfaceBounds": {
+      "min": [
+        -0.478589,
+        -0.006509,
+        -0.128986
+      ],
+      "max": [
+        0.48098,
+        1.789163,
+        0.212537
+      ]
+    },
+    "shoulderJointWidth": 0.42,
+    "hipJointWidth": 0.2,
+    "hipJointHeight": 0.925,
+    "kneeJointHeight": 0.5,
+    "ankleJointHeight": 0.1,
+    "segments": {
+      "clavicleToShoulder": 0.128647,
+      "upperArm": 0.277218,
+      "forearm": 0.241402,
+      "wristToHandJoint": 0.070774,
+      "thigh": 0.425348,
+      "shank": 0.403133,
+      "ankleToFootJoint": 0.139158,
+      "pelvisToSpine3": 0.410239,
+      "spine3ToNeck": 0.155464,
+      "neckToHead": 0.154353
+    },
+    "ratios": {
+      "upperArmToForearm": 1.1484,
+      "thighToShank": 1.0551
+    }
+  },
+  "biomechanics": {
+    "enabled": true,
+    "profile": "adult-normal-rom-v1",
+    "label": "成人正常活动范围",
+    "hardLimits": true,
+    "limits": {
+      "shoulder": {
+        "extension": 55,
+        "flexion": 170,
+        "adduction": 35,
+        "abduction": 95
+      },
+      "elbow": {
+        "hyperextension": 5,
+        "flexion": 145
+      },
+      "wrist": {
+        "flexion": 80,
+        "extension": 70,
+        "radialDeviation": 20,
+        "ulnarDeviation": 30
+      },
+      "hip": {
+        "extension": 18,
+        "flexion": 130,
+        "adduction": 30,
+        "abduction": 50
+      },
+      "knee": {
+        "hyperextension": 2,
+        "flexion": 140
+      },
+      "ankle": {
+        "plantarFlexion": 55,
+        "dorsiflexion": 15,
+        "yaw": 20
+      },
+      "toes": {
+        "flexion": 35,
+        "extension": 45
+      },
+      "lumbar": {
+        "cone": 22
+      },
+      "thoracic": {
+        "cone": 18
+      },
+      "neckBase": {
+        "cone": 45
+      },
+      "head": {
+        "cone": 60
+      },
+      "clavicle": {
+        "cone": 35
+      }
+    }
+  },
+  "physics": {
+    "enabled": true,
+    "gravityEnabled": false,
+    "groundEnabled": true,
+    "anatomyEnabled": true,
+    "poseStiffness": 0.2,
+    "damping": 0.92,
+    "solverIterations": 64
+  },
+  "pose": "A",
+  "createdAt": "2026-08-19T03:44:30.736Z",
+  "updatedAt": "2026-08-19T03:44:30.739Z",
+  "joints": [
+    {
+      "id": "root",
+      "label": "全身根控制",
+      "parentId": null,
+      "side": "center",
+      "category": "root",
+      "localPosition": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "bindWorldPosition": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "poseWorldPosition": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "boneLength": 0,
+      "lengthLocked": false,
+      "physicalBone": false,
+      "visualBone": false,
+      "visualJoint": false,
+      "isControl": true,
+      "followJointId": "hips",
+      "controlOffset": {
+        "x": 0,
+        "y": -0.925,
+        "z": -0.016
+      },
+      "jointType": "control",
+      "limitLabel": "全身控制节点",
+      "standard": {
+        "family": "editor-helper",
+        "index": null,
+        "name": "global_control",
+        "helper": true
+      },
+      "pinned": false,
+      "jointRadius": 0.022,
+      "boneRadius": 0.012
+    },
+    {
+      "id": "hips",
+      "label": "骨盆中心",
+      "parentId": "root",
+      "side": "center",
+      "category": "torso",
+      "localPosition": {
+        "x": 0,
+        "y": 0.925,
+        "z": 0.016
+      },
+      "bindWorldPosition": {
+        "x": 0,
+        "y": 0.925,
+        "z": 0.016
+      },
+      "poseWorldPosition": {
+        "x": 0,
+        "y": 0.925,
+        "z": 0.016
+      },
+      "boneLength": 0,
+      "lengthLocked": false,
+      "physicalBone": false,
+      "visualBone": false,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "pelvis",
+      "limitLabel": "SMPL 骨盆根节点与刚性髋距",
+      "standard": {
+        "family": "SMPL",
+        "index": 0,
+        "name": "pelvis",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.044,
+      "boneRadius": 0.024
+    },
+    {
+      "id": "spine",
+      "label": "腰椎",
+      "parentId": "hips",
+      "side": "center",
+      "category": "torso",
+      "localPosition": {
+        "x": 0,
+        "y": 0.13,
+        "z": 0.024
+      },
+      "bindWorldPosition": {
+        "x": 0,
+        "y": 1.055,
+        "z": 0.04
+      },
+      "poseWorldPosition": {
+        "x": 0,
+        "y": 1.055,
+        "z": 0.04
+      },
+      "boneLength": 0.132197,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "spine",
+      "limitLabel": "腰椎分段弯曲 ≤ 22°",
+      "standard": {
+        "family": "SMPL",
+        "index": 3,
+        "name": "spine1",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.032,
+      "boneRadius": 0.022
+    },
+    {
+      "id": "chest",
+      "label": "胸椎",
+      "parentId": "spine",
+      "side": "center",
+      "category": "torso",
+      "localPosition": {
+        "x": 0,
+        "y": 0.135,
+        "z": -0.019
+      },
+      "bindWorldPosition": {
+        "x": 0,
+        "y": 1.19,
+        "z": 0.021
+      },
+      "poseWorldPosition": {
+        "x": 0,
+        "y": 1.19,
+        "z": 0.021
+      },
+      "boneLength": 0.13633,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "spine",
+      "limitLabel": "胸椎分段弯曲 ≤ 18°",
+      "standard": {
+        "family": "SMPL",
+        "index": 6,
+        "name": "spine2",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.035,
+      "boneRadius": 0.023
+    },
+    {
+      "id": "upperChest",
+      "label": "上胸",
+      "parentId": "chest",
+      "side": "center",
+      "category": "torso",
+      "localPosition": {
+        "x": 0,
+        "y": 0.145,
+        "z": -0.019
+      },
+      "bindWorldPosition": {
+        "x": 0,
+        "y": 1.335,
+        "z": 0.002
+      },
+      "poseWorldPosition": {
+        "x": 0,
+        "y": 1.335,
+        "z": 0.002
+      },
+      "boneLength": 0.14624,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "spine",
+      "limitLabel": "上胸分段弯曲 ≤ 18°",
+      "standard": {
+        "family": "SMPL",
+        "index": 9,
+        "name": "spine3",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.038,
+      "boneRadius": 0.024
+    },
+    {
+      "id": "neck",
+      "label": "颈根",
+      "parentId": "upperChest",
+      "side": "center",
+      "category": "head",
+      "localPosition": {
+        "x": 0,
+        "y": 0.155,
+        "z": -0.012
+      },
+      "bindWorldPosition": {
+        "x": 0,
+        "y": 1.49,
+        "z": -0.01
+      },
+      "poseWorldPosition": {
+        "x": 0,
+        "y": 1.49,
+        "z": -0.01
+      },
+      "boneLength": 0.155464,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "neck",
+      "limitLabel": "颈部综合摆动 ≤ 45°",
+      "standard": {
+        "family": "SMPL",
+        "index": 12,
+        "name": "neck",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.028,
+      "boneRadius": 0.018
+    },
+    {
+      "id": "head",
+      "label": "头部中心",
+      "parentId": "neck",
+      "side": "center",
+      "category": "head",
+      "localPosition": {
+        "x": 0,
+        "y": 0.14,
+        "z": 0.065
+      },
+      "bindWorldPosition": {
+        "x": 0,
+        "y": 1.63,
+        "z": 0.055
+      },
+      "poseWorldPosition": {
+        "x": 0,
+        "y": 1.63,
+        "z": 0.055
+      },
+      "boneLength": 0.154353,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "neck",
+      "limitLabel": "头部综合摆动 ≤ 60°",
+      "standard": {
+        "family": "SMPL",
+        "index": 15,
+        "name": "head",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.047,
+      "boneRadius": 0.02
+    },
+    {
+      "id": "headTop",
+      "label": "头顶辅助点",
+      "parentId": "head",
+      "side": "center",
+      "category": "head",
+      "localPosition": {
+        "x": 0,
+        "y": 0.165672,
+        "z": -0.01
+      },
+      "bindWorldPosition": {
+        "x": 0,
+        "y": 1.795672,
+        "z": 0.045
+      },
+      "poseWorldPosition": {
+        "x": 0,
+        "y": 1.795672,
+        "z": 0.045
+      },
+      "boneLength": 0.165974,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "endpoint",
+      "limitLabel": "表皮顶部辅助点",
+      "standard": {
+        "family": "editor-helper",
+        "index": null,
+        "name": "head_top_helper",
+        "helper": true
+      },
+      "pinned": false,
+      "jointRadius": 0.02,
+      "boneRadius": 0.012
+    },
+    {
+      "id": "leftShoulder",
+      "label": "左锁骨控制点",
+      "parentId": "upperChest",
+      "side": "left",
+      "category": "arm",
+      "localPosition": {
+        "x": -0.1,
+        "y": 0.07,
+        "z": -0.007
+      },
+      "bindWorldPosition": {
+        "x": -0.1,
+        "y": 1.405,
+        "z": -0.005
+      },
+      "poseWorldPosition": {
+        "x": -0.1,
+        "y": 1.405,
+        "z": -0.005
+      },
+      "boneLength": 0.122266,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": false,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "clavicle",
+      "limitLabel": "锁骨摆动 ≤ 35°",
+      "standard": {
+        "family": "SMPL",
+        "index": 13,
+        "name": "left_collar",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.018,
+      "boneRadius": 0.015
+    },
+    {
+      "id": "leftUpperArm",
+      "label": "左肩关节",
+      "parentId": "leftShoulder",
+      "side": "left",
+      "category": "arm",
+      "localPosition": {
+        "x": -0.11,
+        "y": -0.065,
+        "z": -0.015
+      },
+      "bindWorldPosition": {
+        "x": -0.21,
+        "y": 1.34,
+        "z": -0.02
+      },
+      "poseWorldPosition": {
+        "x": -0.21,
+        "y": 1.34,
+        "z": -0.02
+      },
+      "boneLength": 0.128647,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "ball",
+      "limitLabel": "肩球窝关节：屈曲 170°，伸展 55°",
+      "standard": {
+        "family": "SMPL",
+        "index": 16,
+        "name": "left_shoulder",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.034,
+      "boneRadius": 0.017
+    },
+    {
+      "id": "leftLowerArm",
+      "label": "左肘",
+      "parentId": "leftUpperArm",
+      "side": "left",
+      "category": "arm",
+      "localPosition": {
+        "x": -0.14,
+        "y": -0.235,
+        "z": 0.045
+      },
+      "bindWorldPosition": {
+        "x": -0.35,
+        "y": 1.105,
+        "z": 0.025
+      },
+      "poseWorldPosition": {
+        "x": -0.35,
+        "y": 1.105,
+        "z": 0.025
+      },
+      "boneLength": 0.277218,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "hinge",
+      "limitLabel": "肘铰链：伸展 5°，屈曲 145°",
+      "standard": {
+        "family": "SMPL",
+        "index": 18,
+        "name": "left_elbow",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.027,
+      "boneRadius": 0.015
+    },
+    {
+      "id": "leftHand",
+      "label": "左腕",
+      "parentId": "leftLowerArm",
+      "side": "left",
+      "category": "arm",
+      "localPosition": {
+        "x": -0.085,
+        "y": -0.205,
+        "z": 0.095
+      },
+      "bindWorldPosition": {
+        "x": -0.435,
+        "y": 0.9,
+        "z": 0.12
+      },
+      "poseWorldPosition": {
+        "x": -0.435,
+        "y": 0.9,
+        "z": 0.12
+      },
+      "boneLength": 0.241402,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "wrist",
+      "limitLabel": "腕：屈曲 80°，伸展 70°，桡偏 20°，尺偏 30°",
+      "standard": {
+        "family": "SMPL",
+        "index": 20,
+        "name": "left_wrist",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.025,
+      "boneRadius": 0.013
+    },
+    {
+      "id": "leftHandEnd",
+      "label": "左手中心",
+      "parentId": "leftHand",
+      "side": "left",
+      "category": "arm",
+      "localPosition": {
+        "x": -0.028,
+        "y": -0.06,
+        "z": 0.025
+      },
+      "bindWorldPosition": {
+        "x": -0.463,
+        "y": 0.84,
+        "z": 0.145
+      },
+      "poseWorldPosition": {
+        "x": -0.463,
+        "y": 0.84,
+        "z": 0.145
+      },
+      "boneLength": 0.070774,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "endpoint",
+      "limitLabel": "SMPL 手部节点",
+      "standard": {
+        "family": "SMPL",
+        "index": 22,
+        "name": "left_hand",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.02,
+      "boneRadius": 0.011
+    },
+    {
+      "id": "rightShoulder",
+      "label": "右锁骨控制点",
+      "parentId": "upperChest",
+      "side": "right",
+      "category": "arm",
+      "localPosition": {
+        "x": 0.1,
+        "y": 0.07,
+        "z": -0.007
+      },
+      "bindWorldPosition": {
+        "x": 0.1,
+        "y": 1.405,
+        "z": -0.005
+      },
+      "poseWorldPosition": {
+        "x": 0.1,
+        "y": 1.405,
+        "z": -0.005
+      },
+      "boneLength": 0.122266,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": false,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "clavicle",
+      "limitLabel": "锁骨摆动 ≤ 35°",
+      "standard": {
+        "family": "SMPL",
+        "index": 14,
+        "name": "right_collar",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.018,
+      "boneRadius": 0.015
+    },
+    {
+      "id": "rightUpperArm",
+      "label": "右肩关节",
+      "parentId": "rightShoulder",
+      "side": "right",
+      "category": "arm",
+      "localPosition": {
+        "x": 0.11,
+        "y": -0.065,
+        "z": -0.015
+      },
+      "bindWorldPosition": {
+        "x": 0.21,
+        "y": 1.34,
+        "z": -0.02
+      },
+      "poseWorldPosition": {
+        "x": 0.21,
+        "y": 1.34,
+        "z": -0.02
+      },
+      "boneLength": 0.128647,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "ball",
+      "limitLabel": "肩球窝关节：屈曲 170°，伸展 55°",
+      "standard": {
+        "family": "SMPL",
+        "index": 17,
+        "name": "right_shoulder",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.034,
+      "boneRadius": 0.017
+    },
+    {
+      "id": "rightLowerArm",
+      "label": "右肘",
+      "parentId": "rightUpperArm",
+      "side": "right",
+      "category": "arm",
+      "localPosition": {
+        "x": 0.14,
+        "y": -0.235,
+        "z": 0.045
+      },
+      "bindWorldPosition": {
+        "x": 0.35,
+        "y": 1.105,
+        "z": 0.025
+      },
+      "poseWorldPosition": {
+        "x": 0.35,
+        "y": 1.105,
+        "z": 0.025
+      },
+      "boneLength": 0.277218,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "hinge",
+      "limitLabel": "肘铰链：伸展 5°，屈曲 145°",
+      "standard": {
+        "family": "SMPL",
+        "index": 19,
+        "name": "right_elbow",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.027,
+      "boneRadius": 0.015
+    },
+    {
+      "id": "rightHand",
+      "label": "右腕",
+      "parentId": "rightLowerArm",
+      "side": "right",
+      "category": "arm",
+      "localPosition": {
+        "x": 0.085,
+        "y": -0.205,
+        "z": 0.095
+      },
+      "bindWorldPosition": {
+        "x": 0.435,
+        "y": 0.9,
+        "z": 0.12
+      },
+      "poseWorldPosition": {
+        "x": 0.435,
+        "y": 0.9,
+        "z": 0.12
+      },
+      "boneLength": 0.241402,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "wrist",
+      "limitLabel": "腕：屈曲 80°，伸展 70°，桡偏 20°，尺偏 30°",
+      "standard": {
+        "family": "SMPL",
+        "index": 21,
+        "name": "right_wrist",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.025,
+      "boneRadius": 0.013
+    },
+    {
+      "id": "rightHandEnd",
+      "label": "右手中心",
+      "parentId": "rightHand",
+      "side": "right",
+      "category": "arm",
+      "localPosition": {
+        "x": 0.028,
+        "y": -0.06,
+        "z": 0.025
+      },
+      "bindWorldPosition": {
+        "x": 0.463,
+        "y": 0.84,
+        "z": 0.145
+      },
+      "poseWorldPosition": {
+        "x": 0.463,
+        "y": 0.84,
+        "z": 0.145
+      },
+      "boneLength": 0.070774,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "endpoint",
+      "limitLabel": "SMPL 手部节点",
+      "standard": {
+        "family": "SMPL",
+        "index": 23,
+        "name": "right_hand",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.02,
+      "boneRadius": 0.011
+    },
+    {
+      "id": "leftUpperLeg",
+      "label": "左髋关节",
+      "parentId": "hips",
+      "side": "left",
+      "category": "leg",
+      "localPosition": {
+        "x": -0.1,
+        "y": 0,
+        "z": 0
+      },
+      "bindWorldPosition": {
+        "x": -0.1,
+        "y": 0.925,
+        "z": 0.016
+      },
+      "poseWorldPosition": {
+        "x": -0.1,
+        "y": 0.925,
+        "z": 0.016
+      },
+      "boneLength": 0.1,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": false,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "ball",
+      "limitLabel": "髋球窝关节：屈曲 130°，伸展 18°",
+      "standard": {
+        "family": "SMPL",
+        "index": 1,
+        "name": "left_hip",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.036,
+      "boneRadius": 0.021
+    },
+    {
+      "id": "leftLowerLeg",
+      "label": "左膝",
+      "parentId": "leftUpperLeg",
+      "side": "left",
+      "category": "leg",
+      "localPosition": {
+        "x": -0.01,
+        "y": -0.425,
+        "z": -0.014
+      },
+      "bindWorldPosition": {
+        "x": -0.11,
+        "y": 0.5,
+        "z": 0.002
+      },
+      "poseWorldPosition": {
+        "x": -0.11,
+        "y": 0.5,
+        "z": 0.002
+      },
+      "boneLength": 0.425348,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "hinge",
+      "limitLabel": "膝铰链：伸展 2°，屈曲 140°",
+      "standard": {
+        "family": "SMPL",
+        "index": 4,
+        "name": "left_knee",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.032,
+      "boneRadius": 0.02
+    },
+    {
+      "id": "leftFoot",
+      "label": "左踝",
+      "parentId": "leftLowerLeg",
+      "side": "left",
+      "category": "leg",
+      "localPosition": {
+        "x": -0.05,
+        "y": -0.4,
+        "z": -0.004
+      },
+      "bindWorldPosition": {
+        "x": -0.16,
+        "y": 0.1,
+        "z": -0.002
+      },
+      "poseWorldPosition": {
+        "x": -0.16,
+        "y": 0.1,
+        "z": -0.002
+      },
+      "boneLength": 0.403133,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "ankle",
+      "limitLabel": "踝：背屈 15°，跖屈 55°，侧偏 20°",
+      "standard": {
+        "family": "SMPL",
+        "index": 7,
+        "name": "left_ankle",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.027,
+      "boneRadius": 0.017
+    },
+    {
+      "id": "leftToes",
+      "label": "左前脚掌",
+      "parentId": "leftFoot",
+      "side": "left",
+      "category": "leg",
+      "localPosition": {
+        "x": -0.016,
+        "y": -0.065,
+        "z": 0.122
+      },
+      "bindWorldPosition": {
+        "x": -0.176,
+        "y": 0.035,
+        "z": 0.12
+      },
+      "poseWorldPosition": {
+        "x": -0.176,
+        "y": 0.035,
+        "z": 0.12
+      },
+      "boneLength": 0.139158,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "toe",
+      "limitLabel": "SMPL 足部节点；前脚掌屈曲 35°，伸展 45°",
+      "standard": {
+        "family": "SMPL",
+        "index": 10,
+        "name": "left_foot",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.023,
+      "boneRadius": 0.013
+    },
+    {
+      "id": "leftToesEnd",
+      "label": "左脚趾末端",
+      "parentId": "leftToes",
+      "side": "left",
+      "category": "leg",
+      "localPosition": {
+        "x": 0,
+        "y": -0.015,
+        "z": 0.075
+      },
+      "bindWorldPosition": {
+        "x": -0.176,
+        "y": 0.02,
+        "z": 0.195
+      },
+      "poseWorldPosition": {
+        "x": -0.176,
+        "y": 0.02,
+        "z": 0.195
+      },
+      "boneLength": 0.076485,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "endpoint",
+      "limitLabel": "脚趾表皮辅助点",
+      "standard": {
+        "family": "editor-helper",
+        "index": null,
+        "name": "left_toe_tip_helper",
+        "helper": true
+      },
+      "pinned": false,
+      "jointRadius": 0.018,
+      "boneRadius": 0.01
+    },
+    {
+      "id": "rightUpperLeg",
+      "label": "右髋关节",
+      "parentId": "hips",
+      "side": "right",
+      "category": "leg",
+      "localPosition": {
+        "x": 0.1,
+        "y": 0,
+        "z": 0
+      },
+      "bindWorldPosition": {
+        "x": 0.1,
+        "y": 0.925,
+        "z": 0.016
+      },
+      "poseWorldPosition": {
+        "x": 0.1,
+        "y": 0.925,
+        "z": 0.016
+      },
+      "boneLength": 0.1,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": false,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "ball",
+      "limitLabel": "髋球窝关节：屈曲 130°，伸展 18°",
+      "standard": {
+        "family": "SMPL",
+        "index": 2,
+        "name": "right_hip",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.036,
+      "boneRadius": 0.021
+    },
+    {
+      "id": "rightLowerLeg",
+      "label": "右膝",
+      "parentId": "rightUpperLeg",
+      "side": "right",
+      "category": "leg",
+      "localPosition": {
+        "x": 0.01,
+        "y": -0.425,
+        "z": -0.014
+      },
+      "bindWorldPosition": {
+        "x": 0.11,
+        "y": 0.5,
+        "z": 0.002
+      },
+      "poseWorldPosition": {
+        "x": 0.11,
+        "y": 0.5,
+        "z": 0.002
+      },
+      "boneLength": 0.425348,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "hinge",
+      "limitLabel": "膝铰链：伸展 2°，屈曲 140°",
+      "standard": {
+        "family": "SMPL",
+        "index": 5,
+        "name": "right_knee",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.032,
+      "boneRadius": 0.02
+    },
+    {
+      "id": "rightFoot",
+      "label": "右踝",
+      "parentId": "rightLowerLeg",
+      "side": "right",
+      "category": "leg",
+      "localPosition": {
+        "x": 0.05,
+        "y": -0.4,
+        "z": -0.004
+      },
+      "bindWorldPosition": {
+        "x": 0.16,
+        "y": 0.1,
+        "z": -0.002
+      },
+      "poseWorldPosition": {
+        "x": 0.16,
+        "y": 0.1,
+        "z": -0.002
+      },
+      "boneLength": 0.403133,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "ankle",
+      "limitLabel": "踝：背屈 15°，跖屈 55°，侧偏 20°",
+      "standard": {
+        "family": "SMPL",
+        "index": 8,
+        "name": "right_ankle",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.027,
+      "boneRadius": 0.017
+    },
+    {
+      "id": "rightToes",
+      "label": "右前脚掌",
+      "parentId": "rightFoot",
+      "side": "right",
+      "category": "leg",
+      "localPosition": {
+        "x": 0.016,
+        "y": -0.065,
+        "z": 0.122
+      },
+      "bindWorldPosition": {
+        "x": 0.176,
+        "y": 0.035,
+        "z": 0.12
+      },
+      "poseWorldPosition": {
+        "x": 0.176,
+        "y": 0.035,
+        "z": 0.12
+      },
+      "boneLength": 0.139158,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "toe",
+      "limitLabel": "SMPL 足部节点；前脚掌屈曲 35°，伸展 45°",
+      "standard": {
+        "family": "SMPL",
+        "index": 11,
+        "name": "right_foot",
+        "helper": false
+      },
+      "pinned": false,
+      "jointRadius": 0.023,
+      "boneRadius": 0.013
+    },
+    {
+      "id": "rightToesEnd",
+      "label": "右脚趾末端",
+      "parentId": "rightToes",
+      "side": "right",
+      "category": "leg",
+      "localPosition": {
+        "x": 0,
+        "y": -0.015,
+        "z": 0.075
+      },
+      "bindWorldPosition": {
+        "x": 0.176,
+        "y": 0.02,
+        "z": 0.195
+      },
+      "poseWorldPosition": {
+        "x": 0.176,
+        "y": 0.02,
+        "z": 0.195
+      },
+      "boneLength": 0.076485,
+      "lengthLocked": true,
+      "physicalBone": true,
+      "visualBone": true,
+      "visualJoint": true,
+      "isControl": false,
+      "followJointId": null,
+      "controlOffset": null,
+      "jointType": "endpoint",
+      "limitLabel": "脚趾表皮辅助点",
+      "standard": {
+        "family": "editor-helper",
+        "index": null,
+        "name": "right_toe_tip_helper",
+        "helper": true
+      },
+      "pinned": false,
+      "jointRadius": 0.018,
+      "boneRadius": 0.01
+    }
+  ]
+}

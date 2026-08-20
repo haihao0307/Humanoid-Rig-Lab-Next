@@ -1,0 +1,257 @@
+{
+  "schema": "humanoid_rig/motion_clip@1.0",
+  "project_id": "humanoid-rig-lab-next",
+  "subject_id": "default-character",
+  "clip_id": "head-nod",
+  "name": "Head Nod",
+  "clip_revision": 1,
+  "skeleton_profile": "rig@0.4.0",
+  "source_proportion_revision": 0,
+  "duration": 1.8,
+  "sample_rate_hint": 30,
+  "loop_mode": "once",
+  "root_motion_mode": "in_place",
+  "root_joint_id": "hips",
+  "tracks": [
+    {
+      "track_id": "neck:rotation",
+      "joint_id": "neck",
+      "channel": "rotation",
+      "space": "local",
+      "interpolation": "slerp",
+      "keyframe_ids": [
+        "neck-rotation-1",
+        "neck-rotation-2",
+        "neck-rotation-3",
+        "neck-rotation-4",
+        "neck-rotation-5",
+        "neck-rotation-6"
+      ],
+      "times": [
+        0,
+        0.35,
+        0.7,
+        1.05,
+        1.4,
+        1.8
+      ],
+      "values": [
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0.08715574274765817,
+          0,
+          0,
+          0.9961946980917455
+        ],
+        [
+          -0.06104853953485687,
+          0,
+          0,
+          0.9981347984218669
+        ],
+        [
+          0.07845909572784494,
+          0,
+          0,
+          0.996917333733128
+        ],
+        [
+          -0.03489949670250097,
+          0,
+          0,
+          0.9993908270190957
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "source_snapshot_ids": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "track_id": "head:rotation",
+      "joint_id": "head",
+      "channel": "rotation",
+      "space": "local",
+      "interpolation": "slerp",
+      "keyframe_ids": [
+        "head-rotation-1",
+        "head-rotation-2",
+        "head-rotation-3",
+        "head-rotation-4",
+        "head-rotation-5",
+        "head-rotation-6"
+      ],
+      "times": [
+        0,
+        0.35,
+        0.7,
+        1.05,
+        1.4,
+        1.8
+      ],
+      "values": [
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0.1305261922200516,
+          0,
+          0,
+          0.9914448613738105
+        ],
+        [
+          -0.09584575252022398,
+          0,
+          0,
+          0.9953961983671789
+        ],
+        [
+          0.11320321376790674,
+          0,
+          0,
+          0.9935718556765876
+        ],
+        [
+          -0.05233595624294383,
+          0,
+          0,
+          0.9986295347545737
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "source_snapshot_ids": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "track_id": "upperChest:rotation",
+      "joint_id": "upperChest",
+      "channel": "rotation",
+      "space": "local",
+      "interpolation": "slerp",
+      "keyframe_ids": [
+        "upperChest-rotation-1",
+        "upperChest-rotation-2",
+        "upperChest-rotation-3",
+        "upperChest-rotation-4"
+      ],
+      "times": [
+        0,
+        0.7,
+        1.4,
+        1.8
+      ],
+      "values": [
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          -0.01745240643728351,
+          0,
+          0,
+          0.9998476951563913
+        ],
+        [
+          0.008726535498373935,
+          0,
+          0,
+          0.9999619230641713
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "source_snapshot_ids": [
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ],
+  "events": [
+    {
+      "event_id": "event-gesture_start-0",
+      "time": 0,
+      "type": "gesture_start",
+      "payload": null
+    },
+    {
+      "event_id": "event-nod_down-0-35",
+      "time": 0.35,
+      "type": "nod_down",
+      "payload": null
+    },
+    {
+      "event_id": "event-nod_up-0-7",
+      "time": 0.7,
+      "type": "nod_up",
+      "payload": null
+    },
+    {
+      "event_id": "event-gesture_end-1-8",
+      "time": 1.8,
+      "type": "gesture_end",
+      "payload": null
+    }
+  ],
+  "contacts": [],
+  "pose_snapshot_keys": [],
+  "pose_snapshot_refs": [],
+  "retarget_policy": {
+    "mode": "local_rotation",
+    "scaleRootMotionByHeight": true,
+    "preserveContacts": true,
+    "clampJointLimits": true,
+    "axisProfile": "smpl24_controls28@1",
+    "mapping": {}
+  },
+  "quality": {
+    "validated": true,
+    "maxBoneLengthError": 0,
+    "maxContactError": null,
+    "maxJointAngularVelocity": null,
+    "warnings": []
+  },
+  "metadata": {
+    "workspaceAlias": "AnimationClip",
+    "motionClipExport": "humanoid_rig/motion_clip@1.0",
+    "sourceBodyHeight": 1.795672,
+    "status": "validated-demo",
+    "category": "gesture"
+  }
+}

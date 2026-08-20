@@ -1,0 +1,42 @@
+Humanoid Rig Lab V8.4 3D Proportion Viewport
+Version: 0.8.4
+Parent platform: Humanoid Rig Lab Next 0.5.0
+Rig schema: 6
+Three.js: 0.185.1
+
+Core modules
+- src/main.js
+- src/body-profile.js
+- src/skeleton-presets.js
+- src/skeleton-model.js
+- src/physics-rig.js
+- src/biomechanics.js
+- src/three-view.js
+- src/svg-view.js
+- src/smpl-skin.js
+
+BodyProfile support
+- profile smpl-male-surface-fit-1796-v3
+- exact requested height
+- exact shoulder center width
+- exact hip center width
+- upper arm and forearm lengths
+- wrist-to-hand control length
+- thigh and lower-leg lengths
+- reference rebuild on every dimension change
+- skin rebind boundary
+
+Shoulder semantics
+- hidden SMPL collar control joint
+- one visible shoulder joint per side
+- clavicle segment remains visible
+
+Host bridge
+- HRL_HOST_STATE
+- HRL_PREVIEW_BODY_PROFILE
+- HRL_PROFILE_STATUS
+- HRL_RENDERER_STATUS
+- HRL_POSE_COMMIT
+
+Validation
+- npm test

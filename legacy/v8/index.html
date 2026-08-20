@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="WebGPU 与 Three.js SMPL 标准骨架、人体表皮与全身物理编辑器" />
+    <title>Humanoid Rig Lab V8.4 · 三维比例与绑定骨架</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <h1>Humanoid Rig Lab</h1>
+            <p>V8.4 · SMPL 24 标准 · 三维比例实时反馈 · 固定骨长</p>
+          </div>
+        </div>
+
+        <div class="toolbar" aria-label="编辑工具栏">
+          <div class="toolbar-group">
+            <button id="undo-button" class="tool-button" type="button" disabled title="撤销 Ctrl+Z">撤销</button>
+            <button id="redo-button" class="tool-button" type="button" disabled title="重做 Ctrl+Y">重做</button>
+          </div>
+
+          <div class="toolbar-group view-toolbar" aria-label="视角">
+            <button class="tool-button is-active" type="button" data-view="front">正面</button>
+            <button class="tool-button" type="button" data-view="side">侧面</button>
+            <button class="tool-button" type="button" data-view="top">顶部</button>
+            <button class="tool-button" type="button" data-view="perspective">透视</button>
+          </div>
+
+          <div class="toolbar-group" aria-label="姿势工具">
+            <button id="reset-pose-button" class="tool-button" type="button">恢复绑定姿势</button>
+            <button id="pose-a-button" class="tool-button" type="button">A 姿势</button>
+            <button id="pose-t-button" class="tool-button" type="button">T 姿势</button>
+            <button id="freeze-button" class="tool-button" type="button">停止运动</button>
+          </div>
+
+          <div class="toolbar-group display-mode-toolbar" aria-label="人物显示模式">
+            <span class="toolbar-caption">显示</span>
+            <button class="tool-button display-mode-button" type="button" data-display-mode="skin" aria-pressed="false">表皮</button>
+            <button class="tool-button display-mode-button" type="button" data-display-mode="skeleton" aria-pressed="false">骨架</button>
+            <button class="tool-button display-mode-button is-active" type="button" data-display-mode="both" aria-pressed="true">同时</button>
+            <button id="surface-reload-toolbar-button" class="tool-button" type="button">重建表皮</button>
+          </div>
+
+          <div class="toolbar-group toolbar-actions">
+            <button id="data-button" class="tool-button" type="button">姿势数据</button>
+            <button id="json-button" class="tool-button" type="button">输入姿势 JSON</button>
+            <button id="save-button" class="tool-button" type="button">本地保存</button>
+            <label id="import-label" class="tool-button file-button" for="import-input" role="button" tabindex="0">导入姿势 JSON</label>
+            <input id="import-input" class="visually-hidden" type="file" accept="application/json,.json" />
+            <button id="export-button" class="primary-button" type="button">导出骨架与姿势</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar sidebar-left" aria-label="骨骼层级与物理选项">
+          <section class="panel-section summary-section">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">RIG STATUS</span>
+                <h2>骨骼状态</h2>
+              </div>
+              <span id="pose-name" class="pose-badge">A</span>
+            </div>
+
+            <div class="metric-grid">
+              <div class="metric-card"><span>关节数量</span><strong id="joint-count">0</strong></div>
+              <div class="metric-card"><span>绑定身高</span><strong id="rig-height">0 m</strong></div>
+              <div class="metric-card"><span>最大骨长误差</span><strong id="length-error">0 mm</strong></div>
+              <div class="metric-card"><span>关节越界</span><strong id="joint-limit-error">0°</strong></div>
+              <div class="metric-card"><span>比例配置</span><strong id="proportion-profile">SMPL 1.796 m</strong></div>
+              <div class="metric-card"><span>物理状态</span><strong id="physics-state">准备中</strong></div>
+            </div>
+
+            <div class="locked-rig-note">
+              <strong>SMPL 标准比例与尺寸锁定</strong>
+              <span>初始关节链映射 SMPL 24 关节顺序，并贴合 Meshcapade 公开的 CC BY 4.0 示例人体表面。骨盆控制杆隐藏，绑定尺寸保持只读。</span>
+            </div>
+          </section>
+
+          <section class="panel-section hierarchy-section">
+            <div class="section-heading compact">
+              <div><span class="eyebrow">HIERARCHY</span><h2>关节层级</h2></div>
+            </div>
+            <label class="search-field">
+              <span aria-hidden="true">⌕</span>
+              <input id="joint-search" type="search" placeholder="搜索关节名称或 ID" />
+            </label>
+            <div id="joint-list" class="joint-list" role="tree"></div>
+          </section>
+
+          <section class="panel-section options-section physics-options-section">
+            <div class="section-heading compact">
+              <div><span class="eyebrow">PHYSICS</span><h2>全身物理</h2></div>
+            </div>
+
+            <div class="anatomy-lock-note">
+              <strong>人体关节限制 · 强制开启</strong>
+              <span>肩髋球窝、肘膝铰链、脊柱颈部锥形限制，以及腕踝脚趾活动范围。</span>
+            </div>
+
+            <label class="toggle-row">
+              <span><strong>约束求解</strong><small>固定每一段骨骼的长度</small></span>
+              <input id="physics-toggle" type="checkbox" checked />
+            </label>
+            <label class="toggle-row">
+              <span><strong>重力</strong><small>松手后让骨架产生下坠</small></span>
+              <input id="gravity-toggle" type="checkbox" />
+            </label>
+            <label class="toggle-row">
+              <span><strong>地面碰撞</strong><small>关节不会穿过 Y=0 地面</small></span>
+              <input id="ground-toggle" type="checkbox" checked />
+            </label>
+
+            <label class="range-row" for="pose-stiffness">
+              <span><strong>全身联动</strong><small>提高后，拖动会更明显地传递到躯干和四肢</small></span>
+              <span class="range-control"><input id="pose-stiffness" type="range" min="0" max="0.8" step="0.01" value="0.20" /><output id="pose-stiffness-value">0.20</output></span>
+            </label>
+
+            <label class="range-row" for="damping-range">
+              <span><strong>运动阻尼</strong><small>越高松手后越快稳定</small></span>
+              <span class="range-control"><input id="damping-range" type="range" min="0.75" max="0.995" step="0.005" value="0.92" /><output id="damping-value">0.92</output></span>
+            </label>
+
+            <label class="select-row" for="solver-select">
+              <span><strong>求解精度</strong><small>高精度可进一步降低骨长误差</small></span>
+              <select id="solver-select">
+                <option value="16">快速</option>
+                <option value="40">标准</option>
+                <option value="64" selected>高精度</option>
+                <option value="96">极高精度</option>
+              </select>
+            </label>
+
+            <button id="clear-pins-button" class="tool-button full-width-button" type="button">取消全部固定关节</button>
+          </section>
+
+          <section class="panel-section display-options-section">
+            <div class="section-heading compact">
+              <div><span class="eyebrow">DISPLAY</span><h2>显示选项</h2></div>
+            </div>
+            <div class="surface-display-card human-surface-card">
+              <strong>人体表皮交互层</strong>
+              <small>场景中只创建精细 SMPL 人体网格。该网格同时承担显示、鼠标拾取与姿势变形，不再创建黄色程序化人体代理。</small>
+              <div class="display-mode-segmented" role="group" aria-label="选择人物显示模式">
+                <button class="display-mode-choice" type="button" data-display-mode="skin" aria-pressed="false"><span>表皮</span><small>只看人体</small></button>
+                <button class="display-mode-choice" type="button" data-display-mode="skeleton" aria-pressed="false"><span>骨架</span><small>只看骨骼</small></button>
+                <button class="display-mode-choice is-active" type="button" data-display-mode="both" aria-pressed="true"><span>同时</span><small>编辑推荐</small></button>
+              </div>
+            </div>
+            <label class="select-row" for="surface-source">
+              <span><strong>表皮来源</strong><small>固定为唯一精细人体网格</small></span>
+              <select id="surface-source" disabled><option value="detail" selected>精细 SMPL 表皮 · 唯一</option></select>
+            </label>
+            <label class="toggle-row">
+              <span><strong>显示人物表皮</strong><small>表皮包含可直接拖动的人体部位</small></span>
+              <input id="skin-toggle" type="checkbox" checked />
+            </label>
+            <label class="toggle-row">
+              <span><strong>显示骨架</strong><small>关闭后仍可直接拖动表皮</small></span>
+              <input id="skeleton-toggle" type="checkbox" checked />
+            </label>
+            <label class="toggle-row">
+              <span><strong>骨架透视</strong><small>让关节与骨杆始终显示在表皮前方</small></span>
+              <input id="skeleton-xray-toggle" type="checkbox" checked />
+            </label>
+            <label class="range-row" for="skin-opacity">
+              <span><strong>表皮透明度</strong><small>半透明时更便于选中内部关节</small></span>
+              <span class="range-control"><input id="skin-opacity" type="range" min="0.2" max="1" step="0.02" value="1" /><output id="skin-opacity-value">1.00</output></span>
+            </label>
+            <label class="select-row" for="skin-mode">
+              <span><strong>表皮模式</strong><small>实体适合观察人物，线框适合检查变形</small></span>
+              <select id="skin-mode"><option value="solid" selected>实体</option><option value="translucent">半透明</option><option value="wireframe">线框</option></select>
+            </label>
+            <label class="toggle-row">
+              <span><strong>显示地面网格</strong><small>用于判断人物位置</small></span>
+              <input id="grid-toggle" type="checkbox" checked />
+            </label>
+            <label class="toggle-row">
+              <span><strong>显示坐标轴</strong><small>X 红色，Y 绿色，Z 蓝色</small></span>
+              <input id="axes-toggle" type="checkbox" checked />
+            </label>
+            <label class="select-row" for="space-select">
+              <span><strong>移动坐标系</strong><small>控制三维移动手柄方向</small></span>
+              <select id="space-select"><option value="world" selected>世界</option><option value="local">局部</option></select>
+            </label>
+          </section>
+        </aside>
+
+        <section id="viewport-shell" class="viewport-shell" aria-label="骨骼物理交互视口">
+          <div id="fallback-layer" class="viewport-layer viewport-fallback"></div>
+          <div id="three-layer" class="viewport-layer viewport-three" hidden></div>
+          <div id="renderer-state" class="renderer-state" data-backend="loading">2D 物理模式 · 正在加载 3D</div>
+          <div id="surface-state" class="surface-state" data-state="loading" role="status" aria-live="polite">
+            <span class="surface-state-dot" aria-hidden="true"></span>
+            <span class="surface-state-copy"><strong>唯一精细表皮准备中</strong><small>加载期间保持骨架可见，不创建任何第二人体层</small></span>
+            <button id="surface-retry-button" class="surface-retry-button" type="button">重新加载</button>
+          </div>
+          <div class="constraint-lock-badge"><span></span>骨长已锁定</div>
+          <div id="selection-label" class="selection-label" hidden></div>
+
+          <div class="viewport-help">
+            <span>表皮和骨架可单独显示，也可以同时显示</span>
+            <span>可以直接悬停、点击和拖动人物表皮</span>
+            <span>点击精细表皮三角形会通过蒙皮权重映射到对应关节</span>
+            <span>拖动空白旋转，滚轮缩放</span>
+          </div>
+
+          <div id="drop-overlay" class="drop-overlay" hidden>
+            <strong>松开以导入姿势 JSON</strong>
+            <span>只读取姿势坐标与固定状态，模型尺寸保持不变</span>
+          </div>
+
+          <div id="error-panel" class="error-panel compact-error" hidden>
+            <strong>三维视图暂未启动</strong>
+            <p></p>
+            <small>二维视图仍支持关节拖动、骨杆拖动、固定骨长物理与姿势 JSON 导入。</small>
+            <button id="retry-renderer-button" class="small-button" type="button">重新加载三维视图</button>
+          </div>
+        </section>
+
+        <aside class="sidebar sidebar-right" aria-label="关节属性">
+          <section class="panel-section inspector-section">
+            <div class="section-heading"><div><span class="eyebrow">INSPECTOR</span><h2>关节属性</h2></div></div>
+
+            <div id="inspector-empty" class="inspector-empty">
+              <div class="empty-orbit" aria-hidden="true"><span></span></div>
+              <strong>选择一个关节或骨杆</strong>
+              <p>拖动后，其余关节会在固定骨长约束下跟随。</p>
+            </div>
+
+            <div id="inspector-content" hidden>
+              <div class="selected-heading">
+                <div><strong id="selected-label">骨盆</strong><code id="selected-id">hips</code></div>
+                <span id="selected-side" class="side-badge" data-side="center">中轴</span>
+              </div>
+
+              <fieldset class="inspector-group locked-group">
+                <legend>绑定数据 · 只读</legend>
+                <p>这些数据决定模型尺寸，姿势编辑不会修改。</p>
+                <div class="readout-row"><span>父级关节</span><code id="selected-parent">root</code></div>
+                <div class="readout-row"><span>标准映射</span><strong id="selected-standard-name">SMPL pelvis</strong></div>
+                <div class="readout-row"><span>SMPL 索引</span><strong id="selected-standard-index">0</strong></div>
+                <div class="vector-grid readonly-vector">
+                  <label><span class="axis axis-x">X</span><input id="bind-local-x" type="number" readonly /></label>
+                  <label><span class="axis axis-y">Y</span><input id="bind-local-y" type="number" readonly /></label>
+                  <label><span class="axis axis-z">Z</span><input id="bind-local-z" type="number" readonly /></label>
+                </div>
+                <div class="readout-row"><span>固定骨长</span><strong id="selected-bone-length">0 m</strong></div>
+              </fieldset>
+
+              <fieldset class="inspector-group">
+                <legend>当前姿势世界位置</legend>
+                <p>输入目标位置时，全身物理会重新求解，骨长保持不变。</p>
+                <div class="vector-grid">
+                  <label><span class="axis axis-x">X</span><input id="pose-world-x" type="number" step="0.001" inputmode="decimal" /></label>
+                  <label><span class="axis axis-y">Y</span><input id="pose-world-y" type="number" step="0.001" inputmode="decimal" /></label>
+                  <label><span class="axis axis-z">Z</span><input id="pose-world-z" type="number" step="0.001" inputmode="decimal" /></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="inspector-group anatomy-inspector-group">
+                <legend>人体关节逻辑</legend>
+                <div class="readout-row"><span>关节类型</span><strong id="selected-joint-type">受限关节</strong></div>
+                <div class="readout-row stacked-readout"><span>活动范围</span><strong id="selected-joint-range">由相邻骨段控制</strong></div>
+                <div class="readout-row stacked-readout"><span>当前角度</span><strong id="selected-joint-angle">0°</strong></div>
+                <div class="readout-row"><span>限制状态</span><strong id="selected-limit-state" data-ok="true">范围内</strong></div>
+              </fieldset>
+
+              <fieldset class="inspector-group">
+                <legend>物理状态</legend>
+                <div class="readout-row"><span>固定状态</span><strong id="selected-pin-state">自由</strong></div>
+                <div class="readout-row"><span>当前速度</span><strong><span id="selected-speed">0</span> m/s</strong></div>
+                <div class="readout-row"><span>骨长误差</span><strong><span id="selected-length-error">0</span> mm</strong></div>
+              </fieldset>
+
+              <div class="inspector-actions">
+                <button id="pin-joint-button" class="tool-button" type="button">固定此关节</button>
+                <button id="return-joint-button" class="tool-button" type="button">拉回绑定位置</button>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="status-bar">
+        <span id="status-message">正在准备固定骨长物理骨架</span>
+        <span id="status-selection">未选择关节</span>
+        <span>渲染后端：<strong id="status-backend">2D 物理模式</strong></span>
+      </footer>
+    </div>
+
+    <div id="data-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="data-modal-title">
+      <div class="modal-card">
+        <header class="modal-header">
+          <div>
+            <span class="eyebrow">LOCKED RIG + LIVE POSE</span>
+            <h2 id="data-modal-title">绑定尺寸与当前姿势</h2>
+            <p>绑定局部坐标和骨长只读。当前姿势世界坐标可以输入，应用后会同时执行固定骨长、刚性骨盆和人体关节活动范围约束。</p>
+          </div>
+          <button id="modal-close" class="icon-button" type="button" aria-label="关闭">×</button>
+        </header>
+
+        <div class="modal-toolbar-row">
+          <div class="modal-tabs" role="tablist" aria-label="数据查看方式">
+            <button id="table-tab" class="modal-tab is-active" type="button" role="tab" aria-selected="true" data-modal-tab="table">数据表</button>
+            <button id="json-tab" class="modal-tab" type="button" role="tab" aria-selected="false" data-modal-tab="json">姿势 JSON</button>
+          </div>
+          <div class="modal-actions">
+            <button id="copy-json-button" class="tool-button" type="button">复制姿势 JSON</button>
+            <button id="export-csv-button" class="tool-button" type="button">导出数据 CSV</button>
+          </div>
+        </div>
+
+        <section id="table-panel" class="modal-panel is-active" data-modal-panel="table">
+          <div class="data-table-wrap">
+            <table class="data-table editable-table physics-data-table">
+              <thead>
+                <tr>
+                  <th rowspan="2">名称与 ID</th>
+                  <th rowspan="2">父级</th>
+                  <th colspan="3">绑定局部位置，只读</th>
+                  <th rowspan="2">固定骨长</th>
+                  <th colspan="3">当前姿势世界位置，可输入</th>
+                  <th rowspan="2">固定</th>
+                </tr>
+                <tr><th>X</th><th>Y</th><th>Z</th><th>X</th><th>Y</th><th>Z</th></tr>
+              </thead>
+              <tbody id="data-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="json-panel" class="modal-panel json-panel" data-modal-panel="json" hidden>
+          <div class="json-editor-intro">
+            <p>这里只应用 poseWorldPosition 与 pinned。导入姿势会自动投影到当前成人比例与人体关节活动范围。</p>
+            <div class="json-editor-actions">
+              <button id="format-json-button" class="tool-button" type="button">格式化</button>
+              <button id="reset-json-text-button" class="tool-button" type="button">恢复当前姿势</button>
+              <button id="apply-json-button" class="primary-button" type="button">应用姿势 JSON</button>
+            </div>
+          </div>
+          <textarea id="json-editor" spellcheck="false" aria-label="姿势 JSON 编辑器"></textarea>
+          <div id="json-error" class="json-error" hidden></div>
+        </section>
+      </div>
+    </div>
+
+    <div id="toast-layer" class="toast-layer" aria-live="polite"></div>
+
+    <script>
+      (() => {
+        if (window.location.protocol !== 'file:') {
+          const moduleScript = document.createElement('script');
+          moduleScript.type = 'module';
+          moduleScript.src = './src/main.js?v=8.0.0';
+          document.body.append(moduleScript);
+          return;
+        }
+
+        const overlay = document.createElement('div');
+        overlay.className = 'local-file-warning';
+        overlay.innerHTML = `
+          <div class="local-file-warning-card">
+            <div class="local-file-warning-mark">!</div>
+            <h2>请通过启动文件打开编辑器</h2>
+            <p>直接双击 <code>index.html</code> 会阻止 JavaScript 模块和 WebGPU 正常加载。</p>
+            <ol>
+              <li>关闭当前页面。</li>
+              <li>回到项目文件夹，双击 <code>打开编辑器.bat</code>。</li>
+              <li>保持命令窗口开启，地址栏应显示 <code>http://127.0.0.1:4173/</code>。</li>
+            </ol>
+            <button id="try-local-server" type="button">尝试打开本地编辑器</button>
+            <small>正常启动后会显示 V8.4 三维人物视口，并提供“表皮 / 骨架 / 同时”显示开关。</small>
+          </div>`;
+        document.body.append(overlay);
+        document.querySelector('#try-local-server')?.addEventListener('click', () => {
+          window.location.href = 'http://127.0.0.1:4173/?build=v8.4-3d-proportion';
+        });
+      })();
+    </script>
+  </body>
+</html>

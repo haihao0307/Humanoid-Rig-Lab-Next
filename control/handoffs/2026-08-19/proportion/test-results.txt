@@ -1,0 +1,88 @@
+Humanoid Rig Lab Next proportion-patch-v002 test results
+Date: 2026-08-19
+Baseline: Humanoid Rig Lab Next 0.5.0 + proportion-patch-v001
+Command: npm test
+Result: PASS
+Failures: 0
+
+Scope audit
+-----------
+Changed writable source/control paths: 8
+Out-of-scope source changes: 0
+Shared read-only changes: 0
+
+Current rig audit
+-----------------
+Active rig: rig@0.4.0
+RigDefinition schemaVersion: 6
+ProjectState schemaVersion: 5
+Total nodes: 28
+SMPL deform joints: 24
+Control nodes: 1
+Measurement markers: 3
+Visible joints: 22
+Hidden joints: 6
+Joint axis entries: 28 / 28
+Axis contract complete: true
+Axis contract orthonormal: true
+Axis contract runtime applied: false
+
+New compatibility checks
+------------------------
+PASS exact role counts: 24 deform, 1 control, 3 marker
+PASS exact hidden nodes: root, headTop, leftShoulder, rightShoulder, leftToesEnd, rightToesEnd
+PASS hidden head-top and toe-end marker visuals
+PASS visible clavicle bone segments with hidden clavicle handles
+PASS fixed current 28 IDs, ordering, parents, and SMPL indices
+PASS complete bind-axis contract for all 28 nodes
+PASS orthonormal twist, bend, and side axes for all 28 nodes
+PASS BodyProfile rebuild regenerates the axis contract
+PASS all 256 boundary profiles preserve role counts and valid axes
+PASS all 64 deterministic mixed profiles preserve role counts and valid axes
+PASS shoulder-width changes update shoulder-axis data
+PASS rig@0.5.0 blueprint has 8 unique twist deform nodes
+PASS rig@0.5.0 blueprint has 12 unique controls
+PASS rig@0.5.0 blueprint has 6 unique contact markers
+PASS all rig@0.5.0 parent IDs remain in the current hierarchy
+PASS twist nodes use derived swing-twist drivers and segment midpoint placement
+PASS rig@0.6.0 blueprint has 30 ordered finger joints
+PASS rig@0.6.0 blueprint has leftEye, rightEye, and jaw
+PASS no planned node ID collides with a current rig@0.4.0 ID
+
+Full npm test output
+--------------------
+
+> humanoid-rig-lab-next@0.5.0 test
+> node tests/validate.mjs && node tests/module-patches.mjs && npm --prefix legacy/v8 test
+
+PASS Humanoid Rig Lab Next 0.5.0
+PASS 44 required files
+PASS V0.5 schema, module state, and migration contract
+PASS primary 3D proportion stage and explicit 2D fallback separation
+PASS live body-profile bridge and exact 3D dimension feedback contract
+PASS module-scoped synchronization and rig-rule exchange contract
+PASS hidden clavicle controls and visible shoulder-joint semantics
+PASS JavaScript syntax checks
+PASS SMPL GLB asset 1435300 bytes
+PASS GitHub Pages workflow contract
+PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
+PASS legacy surface-source fields are forced onto the single detailed surface
+PASS schema v1 project migration to schema v5
+
+> humanoid-rig-lab-anatomical-surface@0.8.4 test
+> node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs
+
+V8.4 SMPL 24 mapping, 28-node role taxonomy, hidden measurement markers, complete bind-axis contract, production blueprint, and fixed segment data validation passed.
+V8.4 live 3D body-profile rebuild, immutable reference bind with zero world drift, fixed joint topology and role counts, 28-entry bind-axis regeneration, 256 boundary profiles, 64 deterministic mixed profiles, hidden helper markers, and rebind checks passed.
+V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.
+V8.4 local GLB surface parser, topology, bounds, and checksum validation passed.
+V8.4 dual-quaternion deformation, regional weighting, bind-pose protection, and four-influence normalization checks passed.
+T-pose mesh quality passed: max displacement 0.6531 m, max edge stretch 5.632x, max shoulder stretch 1.645x.
+V8.4 single detailed mesh, direct weighted picking, smoothed regional DQS, and bind-pose protection passed in 150.3 ms.
+V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.
+
+Visual automation note
+----------------------
+The container completed static, data, solver, GLB, surface, and integration tests.
+Headless Chromium did not complete a stable WebGPU/EGL visual launch in this environment.
+Windows Chrome or Edge visual acceptance remains required for the viewport and control panel.

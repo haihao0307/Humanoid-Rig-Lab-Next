@@ -1,0 +1,41 @@
+# animation-patch-v002 修改文件清单
+
+比较基线：animation-workspace-v0.5.0-anim-v001-complete
+目标版本：anim@0.4.0
+文件总数：28
+越界文件：0
+
+MODIFIED	HANDOFF.md	17685 bytes	sha256:2ceed76859f0b5fcea230b41947088cac9951f9ca4a1543b9363244542053c53
+MODIFIED	assets/animations/README.md	1521 bytes	sha256:89815a8a6a28b9c62b2201a28acf1514436f12bf8997a20da60fc0fade90319c
+ADDED	assets/animations/basic-animation-session.json	95774 bytes	sha256:2b82993f9bca366ce053fcc92e6ebef995f8690ba6777c65c3cf67105ff1ec8f
+ADDED	assets/animations/head-nod.motion.json	4817 bytes	sha256:297088d71438fec582596936104c3cad8cf09cb75076b1772be96f00af05630e
+ADDED	assets/animations/idle-breathe.motion.json	6064 bytes	sha256:e22029315e618b0141604a5abf5628ee716fba207143c3603da30a278f3cd2f7
+ADDED	assets/animations/squat.motion.json	12518 bytes	sha256:b65a410b8c62485d9440e916a11d15dccfe790996bd40a5ff05a43432c11b6bf
+ADDED	assets/animations/walk-forward.motion.json	17012 bytes	sha256:40012644329ca60b5eb9e240fc25359e9855d44464d8ee8ea2e2f9b4b5159050
+ADDED	assets/animations/walk-in-place.motion.json	16996 bytes	sha256:29d27bc88c9ce03a08f1be32a559a2542cfe34f55fb28f3a1f6f53a6cc3f2076
+MODIFIED	assets/animations/wave-right.motion.json	5441 bytes	sha256:71efd72c2a355264a89f627b2ad2d8565af72af7f0f1e4e86ca4f6cb3988f6b2
+MODIFIED	changed-files.txt	交付清单自身
+MODIFIED	control/active-tasks/animation.md	4236 bytes	sha256:a9cecbf8df08afce49032ae67155f928c68c368f0cc574a7eba2a0e75c5d2489
+MODIFIED	control/module-status/animation.json	996 bytes	sha256:ae1ca6e3e874c273d220517ef52cb90c5d5bb1b6ca0578b214acb4117ac1fd33
+ADDED	src/modules/animation/bake.js	6448 bytes	sha256:865c258dbf7c4296a1617abe4e0546e8e70f6e9db8f6d72e73da7f04cc8ed263
+ADDED	src/modules/animation/glb.js	8036 bytes	sha256:53b6f463c46a86ffdc631aac4a0088da8a26068748a82456d8a72b0f964578a0
+ADDED	src/modules/animation/graph.js	4440 bytes	sha256:f1b9662aa2b35e36051ed8734f6e5dfc809b55b01e8005773deaf27daa6fcd69
+MODIFIED	src/modules/animation/index.js	41963 bytes	sha256:ed4ef61bf3ed3053bc1668cd5f3546a38325313a212209a81234fddecdac155c
+MODIFIED	src/modules/animation/model.js	74189 bytes	sha256:097b226fea46f1fe8a8c4387fe7d95c797bfe14911f27ed9c6253a10d23f6cb3
+ADDED	src/modules/animation/presets.js	14421 bytes	sha256:8602fa4756353a7d60e82dfed391ef77432490b2d9243fd9e5c424ba8cdf9d03
+MODIFIED	src/modules/animation/quaternion.js	8334 bytes	sha256:c4cb5696b6042f2c101502941147d29bbc171ad580e9331d0d8ba831c1f2f3ef
+ADDED	src/modules/animation/runtime.js	43408 bytes	sha256:6d3e5982679c01d75d83209ad4f138c6ad8b69b457ca444d46ce06825054941a
+MODIFIED	test-results.txt	12046 bytes	sha256:10c6767f8b15b146fbd38ed97c91b569efd2bd80d9157030c84132496a9bd43d
+ADDED	tests/animation-assets.mjs	2202 bytes	sha256:b99edb2eebe337a9f2e1db133856a8b636e637950b8f2fba38b5af86da0efe33
+ADDED	tests/animation-bake.mjs	3424 bytes	sha256:4109f4b9bae933da69d5f10fe2644f1863cfbc59eab9aa1c45d81897aad453c6
+ADDED	tests/animation-editing.mjs	6225 bytes	sha256:d25efba1fc8c0ff18092f95f2746383314fde53fefb85c3df9e8a4e42e1cf89b
+MODIFIED	tests/animation-model.mjs	11197 bytes	sha256:1671800b61ab42c5a1a099cc081fa6d1483e1278117e5b27642fac1ab025e015
+ADDED	tests/animation-performance.mjs	1728 bytes	sha256:cc3717a28d1d69727c5a4a617ff07cfe7b6ae6565873c717297829162bf6ca44
+ADDED	tests/animation-runtime.mjs	8868 bytes	sha256:7dd94fcaa65b19d356833f12d1ef0d5d4658e447fd32f167d004b7a1f2f528bd
+MODIFIED	tests/animation-workspace.mjs	3631 bytes	sha256:4136510119d2a2046567973732edde3ece026aad81df3c5c66f2e7c761fb0dcb
+
+## MODULE_SCOPE 审计
+
+全部产品代码、动画资产、动画测试和模块状态文件均位于 writablePaths。
+根目录 HANDOFF.md、changed-files.txt 和 test-results.txt 为 MODULE_TASK 要求的交付记录。
+骨骼比例、骨骼层级、蒙皮权重、inverseBindMatrices、共享状态核心和 V8 主入口未修改。

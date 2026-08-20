@@ -1,0 +1,18 @@
+{
+  "name": "humanoid-rig-lab-anatomical-surface",
+  "version": "0.8.4",
+  "private": true,
+  "type": "module",
+  "description": "WebGPU and Three.js SMPL-compatible humanoid rig with live 3D body-profile preview, hidden clavicle controls, fixed bone lengths, and joint limits",
+  "scripts": {
+    "start": "node server.mjs",
+    "setup": "npm install --no-audit --no-fund",
+    "test": "node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

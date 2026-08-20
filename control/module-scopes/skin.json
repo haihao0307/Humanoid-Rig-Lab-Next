@@ -1,0 +1,38 @@
+{
+  "type": "HumanoidRigModuleWorkspace",
+  "baselineVersion": "0.5.0",
+  "schemaVersion": 5,
+  "module": "skin",
+  "title": "人物蒙皮",
+  "branch": "work/skin",
+  "goal": "把参考静态人体逐步迁移到预绑定 GLB、原生 skinIndex、skinWeight、inverseBindMatrices 和单一 SkinnedMesh 管线，保证骨架与表皮绑定一致。",
+  "writablePaths": [
+    "src/modules/skin/**",
+    "legacy/v8/src/smpl-skin.js",
+    "legacy/v8/src/glb-geometry.js",
+    "legacy/v8/assets/smpl/**",
+    "legacy/v8/tests/glb-asset.mjs",
+    "legacy/v8/tests/surface-cpu.mjs",
+    "legacy/v8/tests/surface-layer-integration.mjs",
+    "control/active-tasks/skin.md",
+    "control/module-status/skin.json"
+  ],
+  "readOnlySharedPaths": [
+    "src/state-schema.js",
+    "src/project-hub.js",
+    "src/studio.js",
+    "src/default-state.js",
+    "src/module-registry.js",
+    "workers/project-hub.shared.js",
+    "legacy/v8/src/main.js",
+    "legacy/v8/src/three-view.js",
+    "package.json",
+    ".github/workflows/**"
+  ],
+  "requiredOutput": [
+    "skin-patch-v001.zip",
+    "HANDOFF.md",
+    "changed-files.txt",
+    "test-results.txt"
+  ]
+}

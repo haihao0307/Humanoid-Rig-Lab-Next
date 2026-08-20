@@ -1,0 +1,35 @@
+{
+  "type": "HumanoidRigModuleWorkspace",
+  "baselineVersion": "0.5.0",
+  "schemaVersion": 5,
+  "module": "pose",
+  "title": "动作与物理",
+  "branch": "work/pose",
+  "goal": "复核固定骨长、刚性骨盆、脚部固定、人体活动范围和全身联动，并把姿势输出统一为局部四元数、IK 目标、固定点和约束数据。",
+  "writablePaths": [
+    "src/modules/pose/**",
+    "legacy/v8/src/physics-rig.js",
+    "legacy/v8/src/biomechanics.js",
+    "legacy/v8/tests/physics-rig.mjs",
+    "control/active-tasks/pose.md",
+    "control/module-status/pose.json"
+  ],
+  "readOnlySharedPaths": [
+    "src/state-schema.js",
+    "src/project-hub.js",
+    "src/studio.js",
+    "src/default-state.js",
+    "src/module-registry.js",
+    "workers/project-hub.shared.js",
+    "legacy/v8/src/main.js",
+    "legacy/v8/src/three-view.js",
+    "package.json",
+    ".github/workflows/**"
+  ],
+  "requiredOutput": [
+    "pose-patch-v001.zip",
+    "HANDOFF.md",
+    "changed-files.txt",
+    "test-results.txt"
+  ]
+}

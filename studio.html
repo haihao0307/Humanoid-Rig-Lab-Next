@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Humanoid Rig Lab Next · 工作台</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="studio-page">
+  <div class="studio-shell">
+    <header class="topbar studio-topbar">
+      <a class="brand compact" href="./index.html">
+        <span class="brand-mark"><i></i><i></i></span>
+        <span><strong>Humanoid Rig Lab Next</strong><small id="moduleSubtitle">模块工作台</small></span>
+      </a>
+      <div id="moduleTabs" class="module-tabs"></div>
+      <div class="top-actions">
+        <span class="sync-pill" id="syncPill"><span></span><b>连接中</b></span>
+        <button class="button ghost" id="openDashboardButton" type="button">项目总控</button>
+        <button class="button primary" id="publishButton" type="button">发布到集成预览</button>
+      </div>
+    </header>
+
+    <main class="studio-layout">
+      <aside class="studio-sidebar panel">
+        <div class="module-identity">
+          <div class="eyebrow" id="moduleEyebrow">MODULE</div>
+          <h1 id="moduleTitle">工作台</h1>
+          <p id="moduleDescription"></p>
+          <div class="module-meta">
+            <span>分支建议 <b id="branchName">work/module</b></span>
+            <span>模块版本 <b id="moduleVersion">rig@0.4.0</b></span>
+            <span>骨架依赖 <b id="rigCompatibility">rig@0.2.0</b></span>
+          </div>
+        </div>
+        <div id="moduleControls" class="module-controls"></div>
+      </aside>
+
+      <section class="studio-stage">
+        <div class="stage-toolbar">
+          <div class="stage-title">
+            <span class="stage-dot"></span>
+            <strong id="stageStatus">实时协作预览</strong>
+            <small id="stageRevision">revision 1</small>
+          </div>
+          <div class="segmented" id="displayModes">
+            <button data-mode="skin" type="button">表皮</button>
+            <button data-mode="skeleton" type="button">骨架</button>
+            <button data-mode="both" type="button" class="active">同时</button>
+          </div>
+          <div class="stage-actions">
+            <button class="icon-text-button" id="resetViewButton" type="button">恢复本模块</button>
+            <label class="icon-text-button import-module-label">导入模块数据<input id="importModuleInput" type="file" accept="application/json,.json" hidden></label>
+            <button class="icon-text-button" id="exportModuleButton" type="button">导出模块数据</button>
+          </div>
+        </div>
+
+        <div id="standardStage" class="standard-stage" hidden>
+          <canvas id="studioPreview" aria-label="轻量人物后备预览"></canvas>
+        </div>
+
+        <div id="legacyStage" class="legacy-stage unified-human-stage">
+          <iframe id="legacyFrame" title="统一人物表皮与骨架实时视口" loading="eager"></iframe>
+          <div class="stage-overlay top-left">
+            <span id="interactionHint">正在连接统一人物表皮视口</span>
+          </div>
+          <div class="stage-overlay bottom-left" id="stageMetrics"></div>
+          <div class="stage-overlay bottom-right"><span id="viewportModeHint">所有模块显示同一套人物表皮与骨架</span></div>
+          <div class="legacy-note" id="legacyNote">V8.4 统一三维人物视口 · 比例模块直接驱动绑定骨架</div>
+        </div>
+      </section>
+
+      <aside class="inspector panel">
+        <header class="inspector-header">
+          <div class="eyebrow">INSPECTOR</div>
+          <h2>模块反馈与进度</h2>
+        </header>
+        <div id="moduleInspector"></div>
+      </aside>
+    </main>
+  </div>
+
+  <dialog id="publishDialog" class="review-dialog compact-dialog">
+    <form method="dialog" id="publishForm">
+      <header><div><div class="eyebrow">PUBLISH</div><h2>发布模块快照</h2></div><button value="cancel" class="dialog-close">×</button></header>
+      <p>发布会更新模块版本、状态和综合预览记录。当前工作数据仍保留在浏览器中。</p>
+      <label>新版本<input id="publishVersion" type="text" required></label>
+      <label>发布说明<textarea id="publishNotes" rows="5" placeholder="说明完成内容、已知限制和集成注意事项。"></textarea></label>
+      <footer><button value="cancel" class="button ghost">取消</button><button id="confirmPublishButton" value="default" class="button primary">确认发布</button></footer>
+    </form>
+  </dialog>
+
+  <script type="module" src="./src/studio.js"></script>
+</body>
+</html>

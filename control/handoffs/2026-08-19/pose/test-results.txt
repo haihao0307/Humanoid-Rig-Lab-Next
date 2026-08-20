@@ -1,0 +1,189 @@
+Humanoid Rig Lab Next pose-patch-v002 test results
+Generated: 2026-08-19
+
+============================================================
+1. BASELINE BEFORE IMAGE-POSE CHANGES
+============================================================
+> humanoid-rig-lab-next@0.5.0 test
+> node tests/validate.mjs && node tests/module-patches.mjs && npm --prefix legacy/v8 test
+
+PASS Humanoid Rig Lab Next 0.5.0
+PASS 44 required files
+PASS V0.5 schema, module state, and migration contract
+PASS primary 3D proportion stage and explicit 2D fallback separation
+PASS live body-profile bridge and exact 3D dimension feedback contract
+PASS module-scoped synchronization and rig-rule exchange contract
+PASS hidden clavicle controls and visible shoulder-joint semantics
+PASS JavaScript syntax checks
+PASS SMPL GLB asset 1435300 bytes
+PASS GitHub Pages workflow contract
+PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
+PASS legacy surface-source fields are forced onto the single detailed surface
+PASS schema v1 project migration to schema v5
+
+> humanoid-rig-lab-anatomical-surface@0.8.4 test
+> node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs
+
+V8.4 SMPL 24 mapping, fitted anatomical joints, and fixed segment data validation passed.
+V8.4 live 3D body-profile rebuild, exact requested dimensions, hidden clavicle controls, and rebind boundary checks passed.
+V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.
+V8.4 local GLB surface parser, topology, bounds, and checksum validation passed.
+V8.4 dual-quaternion deformation, regional weighting, bind-pose protection, and four-influence normalization checks passed.
+T-pose mesh quality passed: max displacement 0.6531 m, max edge stretch 5.632x, max shoulder stretch 1.645x.
+V8.4 single detailed mesh, direct weighted picking, smoothed regional DQS, and bind-pose protection passed in 139.4 ms.
+V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.
+
+Baseline result: PASS
+
+============================================================
+2. CLEAN CUMULATIVE PATCH VERIFICATION
+============================================================
+The cumulative v002 files were copied onto a fresh extraction of
+pose-workspace-v0.5.0.zip before running this test.
+
+> humanoid-rig-lab-next@0.5.0 test
+> node tests/validate.mjs && node tests/module-patches.mjs && npm --prefix legacy/v8 test
+
+PASS Humanoid Rig Lab Next 0.5.0
+PASS 44 required files
+PASS V0.5 schema, module state, and migration contract
+PASS primary 3D proportion stage and explicit 2D fallback separation
+PASS live body-profile bridge and exact 3D dimension feedback contract
+PASS module-scoped synchronization and rig-rule exchange contract
+PASS hidden clavicle controls and visible shoulder-joint semantics
+PASS JavaScript syntax checks
+PASS SMPL GLB asset 1435300 bytes
+PASS GitHub Pages workflow contract
+PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
+PASS legacy surface-source fields are forced onto the single detailed surface
+PASS schema v1 project migration to schema v5
+
+> humanoid-rig-lab-anatomical-surface@0.8.4 test
+> node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs
+
+V8.4 SMPL 24 mapping, fitted anatomical joints, and fixed segment data validation passed.
+V8.4 live 3D body-profile rebuild, exact requested dimensions, hidden clavicle controls, and rebind boundary checks passed.
+V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.
+V8.4 local GLB surface parser, topology, bounds, and checksum validation passed.
+V8.4 dual-quaternion deformation, regional weighting, bind-pose protection, and four-influence normalization checks passed.
+T-pose mesh quality passed: max displacement 0.6531 m, max edge stretch 5.632x, max shoulder stretch 1.645x.
+V8.4 single detailed mesh, direct weighted picking, smoothed regional DQS, and bind-pose protection passed in 142.0 ms.
+V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.
+
+Clean cumulative verification result: PASS
+
+============================================================
+3. DETERMINISTIC SINGLE-IMAGE POSE SCENARIO
+============================================================
+Scenario: left hand raised, left arm moved forward/outward, right foot stepping,
+left foot used as the primary support. The observation contains 33 normalized
+landmarks and 33 world landmarks and is retargeted to a different body profile.
+
+Compatible rig: rig@0.4.0
+Legacy 3D bridge joint count: 28
+Local quaternion joint count: 26
+Persistent image IK target count: 15
+Maximum bone error: 0.000000000648221 m
+Rigid pelvis error: 0.000000029314932 m
+Maximum joint-limit violation: 0.000000528209 degrees
+Mean target direction error after anatomical constraints: 1.750512148 degrees
+Maximum target direction error after anatomical constraints: 13.971476507 degrees
+Normal support contact: leftFoot
+Mirrored support contact: rightFoot
+Normal raised side: leftHand
+Mirrored raised side: rightHand
+Bind definition unchanged: PASS
+All root and local quaternions normalized: PASS
+PoseSnapshot import into a fresh PhysicsRig: PASS
+
+Image-only depth fallback:
+usesWorldLandmarks = false
+manualReviewRequired = true
+warningCodes = WORLD_LANDMARKS_UNAVAILABLE_USING_IMAGE_DEPTH
+
+Full machine-readable measurements are in pose-image-metrics-v002.json.
+
+============================================================
+4. STORAGE AND CONTRACT TESTS
+============================================================
+Pose Landmarker result normalization with 33 landmarks: PASS
+Missing-person result rejection: PASS
+Image pose asset creation and library normalization: PASS
+Source image save/load/delete memory fallback: PASS
+Canonical PoseSnapshot plus legacy 3D view bridge export: PASS
+Pinned-joint timestamp synchronization: PASS
+Stale canonical snapshot protection: PASS
+
+============================================================
+5. HTTP STATIC DELIVERY CHECK
+============================================================
+端口 4173 已被占用，尝试端口 4174。
+端口 4174 已被占用，尝试端口 4175。
+
+Humanoid Rig Lab Next 已启动
+http://127.0.0.1:4175/
+
+请保持此命令窗口开启。按 Ctrl+C 可以停止服务器。
+
+200 8445 /index.html
+200 26828 /src/modules/pose/image-pose-controller.js
+200 8833 /src/modules/pose/image-pose-estimator.js
+200 26566 /src/modules/pose/image-pose-retarget.js
+200 3020 /src/modules/pose/image-pose-store.js
+
+HTTP static delivery result: PASS
+
+============================================================
+6. MODULE SCOPE AUDIT
+============================================================
+Humanoid Rig Lab Next pose-patch-v002 changed files
+
+Cumulative writable files relative to pose-workspace-v0.5.0:
+M  control/active-tasks/pose.md
+M  control/module-status/pose.json
+M  legacy/v8/src/biomechanics.js
+M  legacy/v8/src/physics-rig.js
+M  legacy/v8/tests/physics-rig.mjs
+A  src/modules/pose/image-pose-controller.js
+A  src/modules/pose/image-pose-estimator.js
+A  src/modules/pose/image-pose-retarget.js
+A  src/modules/pose/image-pose-store.js
+M  src/modules/pose/index.js
+A  src/modules/pose/pose-contract.js
+Total cumulative writable files: 11
+
+Files changed in the image-pose v002 round relative to pose-patch-v001:
+M  control/active-tasks/pose.md
+M  control/module-status/pose.json
+M  legacy/v8/tests/physics-rig.mjs
+A  src/modules/pose/image-pose-controller.js
+A  src/modules/pose/image-pose-estimator.js
+A  src/modules/pose/image-pose-retarget.js
+A  src/modules/pose/image-pose-store.js
+M  src/modules/pose/index.js
+M  src/modules/pose/pose-contract.js
+Total v002-round writable files: 9
+
+MODULE_SCOPE violations: 0
+Read-only shared files changed in v002 round: 0
+
+Scope audit result: PASS
+
+============================================================
+7. ENVIRONMENT LIMITATION
+============================================================
+The build environment could not resolve external CDN/model hosts, so live model
+download and a real-photo browser inference were not executed here. The model
+adapter, 33-landmark normalization, retargeting, persistence, contracts and UI
+static delivery were tested deterministically. A networked Chrome or Safari
+acceptance run remains required and is documented in HANDOFF.md.
+
+============================================================
+8. FINAL PATCH ARCHIVE APPLICATION
+============================================================
+pose-patch-v002.zip was extracted over a fresh copy of pose-workspace-v0.5.0.
+The complete npm test command passed after archive application.
+Every file in the patch staging directory matched the extracted file by SHA256.
+Patch payload hash mismatches: 0
+Final archive application result: PASS
+

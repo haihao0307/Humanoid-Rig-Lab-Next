@@ -1,0 +1,37 @@
+name: Validate Humanoid Rig Lab Next
+
+on:
+  push:
+    branches: [main, integration, 'work/**']
+  pull_request:
+    branches: [main, integration]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run static and data validation
+        run: npm test
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: humanoid-rig-validation-${{ github.run_number }}
+          path: |
+            control/
+            docs/
+            BUILD_MANIFEST.txt
+          retention-days: 30

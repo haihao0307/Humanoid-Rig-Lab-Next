@@ -1,0 +1,165 @@
+Humanoid Rig Lab Next 人物蒙皮 V002 测试记录
+================================================
+
+Build: skin-v002-single-surface-guard
+Patch: skin-patch-v002
+Module: skin@0.5.1
+Compatible rig: rig@0.4.0
+Date UTC: 2026-08-19T10:11:47Z
+Node: v22.16.0
+Platform: Linux 6.18.35 x86_64
+
+A. 未修改 V001 参考副本 npm test
+----------------------------------
+
+> humanoid-rig-lab-next@0.5.0 test
+> node tests/validate.mjs && node tests/module-patches.mjs && npm --prefix legacy/v8 test
+
+PASS Humanoid Rig Lab Next 0.5.0
+PASS 44 required files
+PASS V0.5 schema, module state, and migration contract
+PASS primary 3D proportion stage and explicit 2D fallback separation
+PASS live body-profile bridge and exact 3D dimension feedback contract
+PASS module-scoped synchronization and rig-rule exchange contract
+PASS hidden clavicle controls and visible shoulder-joint semantics
+PASS JavaScript syntax checks
+PASS SMPL GLB asset 1435300 bytes
+PASS GitHub Pages workflow contract
+PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
+PASS legacy surface-source fields are forced onto the single detailed surface
+PASS schema v1 project migration to schema v5
+
+> humanoid-rig-lab-anatomical-surface@0.8.4 test
+> node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs
+
+V8.4 SMPL 24 mapping, fitted anatomical joints, and fixed segment data validation passed.
+V8.4 live 3D body-profile rebuild, exact requested dimensions, hidden clavicle controls, and rebind boundary checks passed.
+V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.
+V8.4 native skinned GLB topology, JOINTS_0, WEIGHTS_0, inverse-bind matrices, and checksums passed.
+V8.4 native LBS sampling, transitional weight regression, bind-pose protection, and four-influence normalization passed.
+T-pose native LBS quality passed: max displacement 0.6521 m, max edge stretch 5.006x, max shoulder stretch 1.673x.
+V8.4 single native SkinnedMesh, direct weighted picking, inverse-bind matrices, and material-state regression passed in 233.2 ms.
+V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.
+
+B. V002 最终工作目录 npm test
+-------------------------------
+
+> humanoid-rig-lab-next@0.5.0 test
+> node tests/validate.mjs && node tests/module-patches.mjs && npm --prefix legacy/v8 test
+
+PASS Humanoid Rig Lab Next 0.5.0
+PASS 44 required files
+PASS V0.5 schema, module state, and migration contract
+PASS primary 3D proportion stage and explicit 2D fallback separation
+PASS live body-profile bridge and exact 3D dimension feedback contract
+PASS module-scoped synchronization and rig-rule exchange contract
+PASS hidden clavicle controls and visible shoulder-joint semantics
+PASS JavaScript syntax checks
+PASS SMPL GLB asset 1435300 bytes
+PASS GitHub Pages workflow contract
+PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
+PASS legacy surface-source fields are forced onto the single detailed surface
+PASS schema v1 project migration to schema v5
+
+> humanoid-rig-lab-anatomical-surface@0.8.4 test
+> node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs
+
+V8.4 SMPL 24 mapping, fitted anatomical joints, and fixed segment data validation passed.
+V8.4 live 3D body-profile rebuild, exact requested dimensions, hidden clavicle controls, and rebind boundary checks passed.
+V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.
+V8.4 native skinned GLB topology, JOINTS_0, WEIGHTS_0, inverse-bind matrices, and checksums passed.
+V8.4 native LBS sampling, transitional weight regression, bind-pose protection, and four-influence normalization passed.
+T-pose native LBS quality passed: max displacement 0.6521 m, max edge stretch 5.006x, max shoulder stretch 1.673x.
+V8.4 SKIN V002 scene-wide single-surface guard, native SkinnedMesh, direct weighted picking, inverse-bind matrices, and material-state regression passed in 514.7 ms.
+V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.
+
+C. 专用端口 HTTP 与构建标记检查
+--------------------------------
+SKIN V002 dedicated HTTP check
+PID: 3407
+/src/modules/skin/skin-build.json  HTTP 200  770 bytes
+/src/modules/skin/verify.html  HTTP 200  5958 bytes
+/legacy/v8/index.html?skinBuild=skin-v002-single-surface-guard  HTTP 200  23147 bytes
+/legacy/v8/src/smpl-skin.js  HTTP 200  53441 bytes
+/legacy/v8/assets/smpl/smpl-male-surface-skinned.glb  HTTP 200  2104780 bytes
+Manifest buildId:
+skin-v002-single-surface-guard
+Runtime markers:
+  buildId: 'skin-v002-single-surface-guard',
+      'SKIN V002 唯一预绑定表皮已就绪',
+
+D. MODULE_SCOPE 范围检查
+------------------------
+MODULE_SCOPE V002 check
+Changed files: 17
+M HANDOFF.md
+M changed-files.txt
+M control/active-tasks/skin.md
+M control/module-status/skin.json
+M legacy/v8/src/smpl-skin.js
+M legacy/v8/tests/surface-layer-integration.mjs
+A src/modules/skin/OPEN_SKIN_V002.bat
+A src/modules/skin/README_V002.md
+A src/modules/skin/STOP_SKIN_V002.bat
+M src/modules/skin/index.js
+A src/modules/skin/open-skin-v002.ps1
+A src/modules/skin/skin-build.json
+A src/modules/skin/stop-skin-v002.ps1
+A src/modules/skin/verify.html
+A src/modules/skin/停止人物蒙皮V002.bat
+A src/modules/skin/打开人物蒙皮V002.bat
+M test-results.txt
+Out-of-scope changes: 0
+PASS only writable skin paths and required output files changed
+
+E. 关键结论
+-----------
+PASS 预绑定 GLB 为 2,104,780 bytes。
+PASS GLB SHA-256 为 736cb39c828203eae72f5e5d094f1623c0a4465a31b484737a6e8df02a7ec899。
+PASS 场景加载前的历史程序化人体被移除。
+PASS 延迟挂载的重复人体在 160 ms 持续审计中被移除。
+PASS 重新创建蒙皮层后场景仍保留一个当前所有者 SkinnedMesh。
+PASS 旧蒙皮层诊断不会删除新所有者。
+PASS 关节球、骨杆、操作轴和显式衣服附属 Mesh 得到保留。
+PASS 直接三角面拾取只使用唯一 SkinnedMesh。
+PASS 骨骼层级、骨骼 ID、绑定局部位置和绑定骨长没有修改。
+PASS 自动测试失败数为 0。
+
+F. 仍需实机完成
+---------------
+Windows WebGPU 正面、侧面、背面、A 姿势和 T 姿势视觉截图。
+肩峰、锁骨、腋下、胯部、肘窝、膝窝、腕踝和躯干扭转检查。
+专业权重和姿势修正形变接入前，当前资产维持 experimental-transitional。
+
+G. 补丁应用到全新 V001 副本
+-----------------------------
+Patch file comparison: PASS
+
+> humanoid-rig-lab-next@0.5.0 test
+> node tests/validate.mjs && node tests/module-patches.mjs && npm --prefix legacy/v8 test
+
+PASS Humanoid Rig Lab Next 0.5.0
+PASS 44 required files
+PASS V0.5 schema, module state, and migration contract
+PASS primary 3D proportion stage and explicit 2D fallback separation
+PASS live body-profile bridge and exact 3D dimension feedback contract
+PASS module-scoped synchronization and rig-rule exchange contract
+PASS hidden clavicle controls and visible shoulder-joint semantics
+PASS JavaScript syntax checks
+PASS SMPL GLB asset 1435300 bytes
+PASS GitHub Pages workflow contract
+PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
+PASS legacy surface-source fields are forced onto the single detailed surface
+PASS schema v1 project migration to schema v5
+
+> humanoid-rig-lab-anatomical-surface@0.8.4 test
+> node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs
+
+V8.4 SMPL 24 mapping, fitted anatomical joints, and fixed segment data validation passed.
+V8.4 live 3D body-profile rebuild, exact requested dimensions, hidden clavicle controls, and rebind boundary checks passed.
+V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.
+V8.4 native skinned GLB topology, JOINTS_0, WEIGHTS_0, inverse-bind matrices, and checksums passed.
+V8.4 native LBS sampling, transitional weight regression, bind-pose protection, and four-influence normalization passed.
+T-pose native LBS quality passed: max displacement 0.6521 m, max edge stretch 5.006x, max shoulder stretch 1.673x.
+V8.4 SKIN V002 scene-wide single-surface guard, native SkinnedMesh, direct weighted picking, inverse-bind matrices, and material-state regression passed in 530.7 ms.
+V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.

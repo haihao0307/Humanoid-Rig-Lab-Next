@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Humanoid Rig Lab Next · 项目总控</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="dashboard-page">
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="返回项目总控">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i></span>
+        <span>
+          <strong>Humanoid Rig Lab Next</strong>
+          <small>人物骨架、蒙皮、动作与动画协作平台</small>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="主导航">
+        <a class="active" href="./index.html">项目总控</a>
+        <a href="./studio.html?module=integration">综合预览</a>
+        <a href="./legacy/v8/index.html" target="_blank" rel="noopener">V8.4 三维比例人物编辑器</a>
+        <a href="./docs/PROJECT_SPEC_FULL.md" target="_blank" rel="noopener">项目文档</a>
+      </nav>
+      <div class="top-actions">
+        <span class="sync-pill" id="syncPill"><span></span><b>连接中</b></span>
+        <button class="button ghost" id="openAllButton" type="button">打开四个工作台</button>
+        <button class="button primary" id="reviewButton" type="button">提交审查记录</button>
+      </div>
+    </header>
+
+    <main class="dashboard-layout">
+      <aside class="project-sidebar panel">
+        <section class="project-summary">
+          <div class="eyebrow">PROJECT</div>
+          <h1 id="projectName">Humanoid Rig Lab Next</h1>
+          <p>一个网站统一承载四条人物生产线。所有窗口共享项目状态，稳定版本和实验状态分开保存。</p>
+          <div class="summary-grid">
+            <div><span>项目版本</span><strong id="buildVersion">0.5.0</strong></div>
+            <div><span>数据修订</span><strong id="revisionValue">1</strong></div>
+            <div><span>在线窗口</span><strong id="windowCount">1</strong></div>
+            <div><span>同步方式</span><strong id="transportValue">本地</strong></div>
+          </div>
+        </section>
+
+        <section class="version-stack">
+          <div class="section-heading"><span>当前组合版本</span><small>ACTIVE BUILD</small></div>
+          <div id="versionList" class="version-list"></div>
+        </section>
+
+        <section class="side-actions">
+          <div class="section-heading"><span>项目数据</span><small>PROJECT DATA</small></div>
+          <button class="side-button" id="exportProjectButton" type="button"><span>导出项目 JSON</span><small>保存全部模块状态</small></button>
+          <label class="side-button file-button"><span>导入项目 JSON</span><small>恢复或迁移项目</small><input id="importProjectInput" type="file" accept="application/json,.json"></label>
+          <button class="side-button danger" id="resetProjectButton" type="button"><span>重置本地项目</span><small>恢复 V0.4 默认状态</small></button>
+        </section>
+
+        <section class="collaboration-card">
+          <div class="section-heading"><span>协作原则</span><small>CONTROL RULES</small></div>
+          <p>比例拥有绑定骨架。蒙皮拥有网格和权重。动作拥有单帧姿势与物理。动画拥有时间轴与片段。</p>
+          <a href="./docs/MODULE_BOUNDARIES.md" target="_blank" rel="noopener">查看模块边界</a>
+        </section>
+      </aside>
+
+      <section class="dashboard-content">
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow">CONTROL CENTER</div>
+            <h2>四个板块并行开发，总控页面统一审查</h2>
+            <p>模块可以分别开窗。参数、进度、选择和发布状态会在同源窗口之间同步。</p>
+          </div>
+          <div class="heading-status">
+            <span id="lastUpdate">尚未更新</span>
+            <strong id="overallProgress">0%</strong>
+          </div>
+        </div>
+
+        <section id="moduleGrid" class="module-grid" aria-label="项目模块"></section>
+
+        <section class="dashboard-lower-grid">
+          <article class="panel integration-panel">
+            <header class="panel-header">
+              <div>
+                <div class="eyebrow">INTEGRATION PREVIEW</div>
+                <h3>统一人物实时反馈</h3>
+              </div>
+              <div class="segmented" id="dashboardDisplayModes">
+                <button data-mode="skin" type="button">表皮</button>
+                <button data-mode="skeleton" type="button">骨架</button>
+                <button data-mode="both" type="button" class="active">同时</button>
+              </div>
+            </header>
+            <div class="preview-frame">
+              <canvas id="dashboardPreview" aria-label="统一人物预览"></canvas>
+              <div class="preview-badges">
+                <span id="previewPoseName">A Pose</span>
+                <span id="previewBackend">协作预览</span>
+              </div>
+              <a class="preview-launch" href="./studio.html?module=integration">进入综合预览</a>
+            </div>
+            <footer class="compatibility-strip" id="compatibilityStrip"></footer>
+          </article>
+
+          <article class="panel activity-panel">
+            <header class="panel-header">
+              <div>
+                <div class="eyebrow">ACTIVITY</div>
+                <h3>最近操作与审查</h3>
+              </div>
+              <button class="text-button" id="clearActivityButton" type="button">清理显示</button>
+            </header>
+            <div id="activityList" class="activity-list"></div>
+          </article>
+        </section>
+
+        <section class="panel build-panel">
+          <header class="panel-header">
+            <div>
+              <div class="eyebrow">DELIVERY PIPELINE</div>
+              <h3>当前无 Codex 时的交付链路</h3>
+            </div>
+            <span class="build-channel">LOCAL REVIEW → GITHUB</span>
+          </header>
+          <div class="pipeline">
+            <div class="pipeline-step done"><b>1</b><span><strong>我直接开发</strong><small>在当前会话生成完整项目文件</small></span></div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step active"><b>2</b><span><strong>你本地审查</strong><small>打开网站，截图并给出反馈</small></span></div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step"><b>3</b><span><strong>批准后同步</strong><small>上传到 GitHub 母仓库</small></span></div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step"><b>4</b><span><strong>自动发布</strong><small>Actions 测试并部署 Pages</small></span></div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="reviewDialog" class="review-dialog">
+    <form method="dialog" id="reviewForm">
+      <header>
+        <div><div class="eyebrow">REVIEW</div><h2>记录本轮审查意见</h2></div>
+        <button value="cancel" class="dialog-close" aria-label="关闭">×</button>
+      </header>
+      <label>审查模块<select id="reviewModule"><option value="integration">综合预览</option><option value="proportion">骨骼比例</option><option value="skin">人物蒙皮</option><option value="pose">动作与物理</option><option value="animation">动画系统</option></select></label>
+      <label>审查结论<select id="reviewVerdict"><option value="needs-changes">需要修改</option><option value="approved">通过</option><option value="blocked">阻塞</option><option value="note">仅记录</option></select></label>
+      <label>问题与要求<textarea id="reviewText" rows="7" placeholder="描述看到的问题、期望效果、复现步骤或下一步要求。"></textarea></label>
+      <label class="checkbox-row"><input id="reviewIncludeState" type="checkbox" checked>在审查文件中附带当前项目状态和版本信息</label>
+      <footer>
+        <button value="cancel" class="button ghost">取消</button>
+        <button id="saveReviewButton" value="default" class="button primary">保存并导出审查包</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script type="module" src="./src/dashboard.js"></script>
+</body>
+</html>

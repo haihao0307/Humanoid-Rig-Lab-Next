@@ -1,0 +1,225 @@
+# 动画系统 v002 测试结果
+
+工作包基线：Humanoid Rig Lab Next 0.5.0
+补丁基线：animation-workspace-v0.5.0-anim-v001-complete
+模块版本：anim@0.4.0
+兼容骨架：rig@0.4.0
+动画专项断言：221 项，失败 0 项
+范围审计：25 个产品文件，3 个根目录交付文件，越界 0 项
+
+## 修改前基线 npm test
+
+> humanoid-rig-lab-next@0.5.0 test
+> node tests/validate.mjs && node tests/module-patches.mjs && npm --prefix legacy/v8 test
+
+PASS Humanoid Rig Lab Next 0.5.0
+PASS 44 required files
+PASS V0.5 schema, module state, and migration contract
+PASS primary 3D proportion stage and explicit 2D fallback separation
+PASS live body-profile bridge and exact 3D dimension feedback contract
+PASS module-scoped synchronization and rig-rule exchange contract
+PASS hidden clavicle controls and visible shoulder-joint semantics
+PASS JavaScript syntax checks
+PASS SMPL GLB asset 1435300 bytes
+PASS GitHub Pages workflow contract
+PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
+PASS legacy surface-source fields are forced onto the single detailed surface
+PASS schema v1 project migration to schema v5
+
+> humanoid-rig-lab-anatomical-surface@0.8.4 test
+> node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs
+
+V8.4 SMPL 24 mapping, fitted anatomical joints, and fixed segment data validation passed.
+V8.4 live 3D body-profile rebuild, exact requested dimensions, hidden clavicle controls, and rebind boundary checks passed.
+V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.
+V8.4 local GLB surface parser, topology, bounds, and checksum validation passed.
+V8.4 dual-quaternion deformation, regional weighting, bind-pose protection, and four-influence normalization checks passed.
+T-pose mesh quality passed: max displacement 0.6531 m, max edge stretch 5.632x, max shoulder stretch 1.645x.
+V8.4 single detailed mesh, direct weighted picking, smoothed regional DQS, and bind-pose protection passed in 143.0 ms.
+V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.
+
+## 修改前动画专项基线
+PASS animation model, local quaternion interpolation, timeline looping, PoseSnapshot references, event sampling, and MotionClip round-trip
+PASS animation workspace UI contract, module boundaries, transport loop, and normalized export
+
+## v002 最终工作区验证
+# animation v002 final workspace validation
+UTC 2026-08-19T09:10:34Z
+
+## Syntax
+> node --check src/modules/animation/bake.js
+> node --check src/modules/animation/glb.js
+> node --check src/modules/animation/graph.js
+> node --check src/modules/animation/index.js
+> node --check src/modules/animation/model.js
+> node --check src/modules/animation/presets.js
+> node --check src/modules/animation/quaternion.js
+> node --check src/modules/animation/runtime.js
+
+## Animation suites
+> node tests/animation-assets.mjs
+PASS six reusable MotionClip assets, animation-session asset, contacts, root-motion modes, and asset documentation
+> node tests/animation-bake.mjs
+PASS finalPose and desiredPose baking, compression, MotionClip export, and standard glTF 2.0 skeleton animation GLB generation
+> node tests/animation-editing.mjs
+PASS animation keyframe editing, copy, move, delete, time scaling, compression, mirroring, contacts, events, local PoseSnapshot interpolation, layers, and MotionClip round-trip
+> node tests/animation-model.mjs
+PASS animation session 0.4, local quaternion tracks, editing, loops, events, contacts, layers, PoseSnapshot references, and MotionClip round-trip
+> node tests/animation-performance.mjs
+PASS performance: 20000 clip samples 389.20 ms, average 0.0195 ms
+PASS performance: 1000 full runtime frames 2973.79 ms, average 2.9738 ms
+> node tests/animation-runtime.mjs
+PASS 28-joint dual-rig runtime, three target proportions, fixed bone lengths, root scaling, contacts, layers, graph transitions, physics modes, event cycles, and local-pose recording
+> node tests/animation-workspace.mjs
+PASS animation workspace UI, actual 3D host bridge, module boundaries, publish contract, runtime modes, layers, state machine, retarget, bake, and GLB controls
+
+## Full project regression
+
+> humanoid-rig-lab-next@0.5.0 test
+> node tests/validate.mjs && node tests/module-patches.mjs && npm --prefix legacy/v8 test
+
+PASS Humanoid Rig Lab Next 0.5.0
+PASS 44 required files
+PASS V0.5 schema, module state, and migration contract
+PASS primary 3D proportion stage and explicit 2D fallback separation
+PASS live body-profile bridge and exact 3D dimension feedback contract
+PASS module-scoped synchronization and rig-rule exchange contract
+PASS hidden clavicle controls and visible shoulder-joint semantics
+PASS JavaScript syntax checks
+PASS SMPL GLB asset 1435300 bytes
+PASS GitHub Pages workflow contract
+PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
+PASS legacy surface-source fields are forced onto the single detailed surface
+PASS schema v1 project migration to schema v5
+
+> humanoid-rig-lab-anatomical-surface@0.8.4 test
+> node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs
+
+V8.4 SMPL 24 mapping, fitted anatomical joints, and fixed segment data validation passed.
+V8.4 live 3D body-profile rebuild, exact requested dimensions, hidden clavicle controls, and rebind boundary checks passed.
+V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.
+V8.4 local GLB surface parser, topology, bounds, and checksum validation passed.
+V8.4 dual-quaternion deformation, regional weighting, bind-pose protection, and four-influence normalization checks passed.
+T-pose mesh quality passed: max displacement 0.6531 m, max edge stretch 5.632x, max shoulder stretch 1.645x.
+V8.4 single detailed mesh, direct weighted picking, smoothed regional DQS, and bind-pose protection passed in 157.0 ms.
+V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.
+
+## Read-only shared file hashes
+./.github/workflows/pages.yml: OK
+./.github/workflows/validate.yml: OK
+./legacy/v8/src/main.js: OK
+./legacy/v8/src/three-view.js: OK
+./package.json: OK
+./src/default-state.js: OK
+./src/module-registry.js: OK
+./src/project-hub.js: OK
+./src/state-schema.js: OK
+./src/studio.js: OK
+./workers/project-hub.shared.js: OK
+
+## HTTP resource checks
+200 /
+200 /studio.html
+200 /studio.html?module=animation
+200 /src/modules/animation/index.js
+200 /src/modules/animation/model.js
+200 /src/modules/animation/quaternion.js
+200 /src/modules/animation/presets.js
+200 /src/modules/animation/runtime.js
+200 /src/modules/animation/graph.js
+200 /src/modules/animation/bake.js
+200 /src/modules/animation/glb.js
+200 /assets/animations/basic-animation-session.json
+200 /assets/animations/idle-breathe.motion.json
+200 /assets/animations/wave-right.motion.json
+200 /assets/animations/head-nod.motion.json
+200 /assets/animations/squat.motion.json
+200 /assets/animations/walk-in-place.motion.json
+200 /assets/animations/walk-forward.motion.json
+
+## Browser automation result
+Chromium page-level DOM and screenshot commands timed out before producing a usable result.
+Observed diagnostics: D-Bus connection failures and zygote termination errors.
+Desktop Chrome or Edge visual verification remains required.
+
+## Scope audit
+changed files: 28
+violations: 0
+
+## v002 补丁覆盖全新 v001 基线后的重放验证
+# animation-patch-v002 candidate replay on fresh v001 baseline
+UTC 2026-08-19T09:12:51Z
+
+## Syntax
+> node --check src/modules/animation/bake.js
+> node --check src/modules/animation/glb.js
+> node --check src/modules/animation/graph.js
+> node --check src/modules/animation/index.js
+> node --check src/modules/animation/model.js
+> node --check src/modules/animation/presets.js
+> node --check src/modules/animation/quaternion.js
+> node --check src/modules/animation/runtime.js
+
+## Animation suites
+> node tests/animation-assets.mjs
+PASS six reusable MotionClip assets, animation-session asset, contacts, root-motion modes, and asset documentation
+> node tests/animation-bake.mjs
+PASS finalPose and desiredPose baking, compression, MotionClip export, and standard glTF 2.0 skeleton animation GLB generation
+> node tests/animation-editing.mjs
+PASS animation keyframe editing, copy, move, delete, time scaling, compression, mirroring, contacts, events, local PoseSnapshot interpolation, layers, and MotionClip round-trip
+> node tests/animation-model.mjs
+PASS animation session 0.4, local quaternion tracks, editing, loops, events, contacts, layers, PoseSnapshot references, and MotionClip round-trip
+> node tests/animation-performance.mjs
+PASS performance: 20000 clip samples 377.83 ms, average 0.0189 ms
+PASS performance: 1000 full runtime frames 2974.60 ms, average 2.9746 ms
+> node tests/animation-runtime.mjs
+PASS 28-joint dual-rig runtime, three target proportions, fixed bone lengths, root scaling, contacts, layers, graph transitions, physics modes, event cycles, and local-pose recording
+> node tests/animation-workspace.mjs
+PASS animation workspace UI, actual 3D host bridge, module boundaries, publish contract, runtime modes, layers, state machine, retarget, bake, and GLB controls
+
+## Full npm test
+
+> humanoid-rig-lab-next@0.5.0 test
+> node tests/validate.mjs && node tests/module-patches.mjs && npm --prefix legacy/v8 test
+
+PASS Humanoid Rig Lab Next 0.5.0
+PASS 44 required files
+PASS V0.5 schema, module state, and migration contract
+PASS primary 3D proportion stage and explicit 2D fallback separation
+PASS live body-profile bridge and exact 3D dimension feedback contract
+PASS module-scoped synchronization and rig-rule exchange contract
+PASS hidden clavicle controls and visible shoulder-joint semantics
+PASS JavaScript syntax checks
+PASS SMPL GLB asset 1435300 bytes
+PASS GitHub Pages workflow contract
+PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
+PASS legacy surface-source fields are forced onto the single detailed surface
+PASS schema v1 project migration to schema v5
+
+> humanoid-rig-lab-anatomical-surface@0.8.4 test
+> node tests/validate-data.mjs && node tests/body-profile.mjs && node tests/physics-rig.mjs && node tests/glb-asset.mjs && node tests/surface-cpu.mjs && node tests/surface-layer-integration.mjs && node tests/static-check.mjs
+
+V8.4 SMPL 24 mapping, fitted anatomical joints, and fixed segment data validation passed.
+V8.4 live 3D body-profile rebuild, exact requested dimensions, hidden clavicle controls, and rebind boundary checks passed.
+V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.
+V8.4 local GLB surface parser, topology, bounds, and checksum validation passed.
+V8.4 dual-quaternion deformation, regional weighting, bind-pose protection, and four-influence normalization checks passed.
+T-pose mesh quality passed: max displacement 0.6531 m, max edge stretch 5.632x, max shoulder stretch 1.645x.
+V8.4 single detailed mesh, direct weighted picking, smoothed regional DQS, and bind-pose protection passed in 147.9 ms.
+V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.
+
+## Read-only shared file hashes after patch replay
+./.github/workflows/pages.yml: OK
+./.github/workflows/validate.yml: OK
+./legacy/v8/src/main.js: OK
+./legacy/v8/src/three-view.js: OK
+./package.json: OK
+./src/default-state.js: OK
+./src/module-registry.js: OK
+./src/project-hub.js: OK
+./src/state-schema.js: OK
+./src/studio.js: OK
+./workers/project-hub.shared.js: OK
+
+## Patch product file equality with source workspace
+PASS 25 product files are byte-identical after candidate patch extraction

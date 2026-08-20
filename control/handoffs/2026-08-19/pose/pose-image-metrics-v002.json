@@ -1,0 +1,92 @@
+{
+  "generatedAt": "2026-08-19T09:01:31.535Z",
+  "scenario": "deterministic 33-landmark observation derived from a left-hand-raised and right-foot-stepping source pose",
+  "targetRig": "rig@0.4.0",
+  "targetBodyProfile": {
+    "height": 1.95,
+    "shoulderWidth": 0.46,
+    "hipWidth": 0.25,
+    "upperArmLength": 0.31,
+    "forearmLength": 0.27,
+    "thighLength": 0.47,
+    "lowerLegLength": 0.44
+  },
+  "normal": {
+    "quality": {
+      "overallConfidence": 0.99,
+      "lowConfidenceIndices": [],
+      "usesWorldLandmarks": true,
+      "meanDirectionErrorDegrees": 1.7505121480837136,
+      "maxDirectionErrorDegrees": 13.971476507308273,
+      "maxBoneErrorM": 6.482207826064013e-10,
+      "rigidPelvisErrorM": 2.931493225943882e-8,
+      "maxJointLimitViolationDegrees": 5.282085822729734e-7,
+      "inferredFootContacts": [
+        "leftFoot"
+      ],
+      "warningCodes": [],
+      "manualReviewRequired": false
+    },
+    "contacts": [
+      {
+        "type": "foot_contact",
+        "jointId": "leftFoot",
+        "active": true,
+        "confidence": 0.9899999999999999,
+        "source": "image_ground_inference"
+      }
+    ],
+    "localQuaternionCount": 26,
+    "ikTargetCount": 15,
+    "legacyJointCount": 28,
+    "leftHandY": 1.496831,
+    "rightHandY": 1.038906
+  },
+  "mirrored": {
+    "quality": {
+      "overallConfidence": 0.99,
+      "lowConfidenceIndices": [],
+      "usesWorldLandmarks": true,
+      "meanDirectionErrorDegrees": 1.750524124023592,
+      "maxDirectionErrorDegrees": 13.971537165967439,
+      "maxBoneErrorM": 6.981169531350417e-10,
+      "rigidPelvisErrorM": 2.9283385910572335e-8,
+      "maxJointLimitViolationDegrees": 5.119479129759838e-7,
+      "inferredFootContacts": [
+        "rightFoot"
+      ],
+      "warningCodes": [],
+      "manualReviewRequired": false
+    },
+    "contacts": [
+      {
+        "type": "foot_contact",
+        "jointId": "rightFoot",
+        "active": true,
+        "confidence": 0.9899999999999999,
+        "source": "image_ground_inference"
+      }
+    ],
+    "rightHandY": 1.496832,
+    "leftHandY": 1.038906
+  },
+  "imageOnlyFallback": {
+    "quality": {
+      "overallConfidence": 0.99,
+      "lowConfidenceIndices": [],
+      "usesWorldLandmarks": false,
+      "meanDirectionErrorDegrees": 1.7384572536371288,
+      "maxDirectionErrorDegrees": 13.386187153956406,
+      "maxBoneErrorM": 7.457595374571468e-10,
+      "rigidPelvisErrorM": 3.367009382415631e-8,
+      "maxJointLimitViolationDegrees": 6.109076421513645e-7,
+      "inferredFootContacts": [
+        "leftFoot"
+      ],
+      "warningCodes": [
+        "WORLD_LANDMARKS_UNAVAILABLE_USING_IMAGE_DEPTH"
+      ],
+      "manualReviewRequired": true
+    }
+  }
+}
