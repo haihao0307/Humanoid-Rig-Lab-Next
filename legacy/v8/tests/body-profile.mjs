@@ -29,7 +29,7 @@ for (const [key, value] of Object.entries(REFERENCE_BODY_PROFILE)) {
   if (typeof value === 'number') assertMetric(referenceMetrics[key], value, `reference ${key}`);
 }
 assertMetric(calculateRigHeight(reference), REFERENCE_BODY_PROFILE.height, 'reference rig height');
-assert.equal(reference.schemaVersion, 6);
+assert.equal(reference.schemaVersion, 7);
 assert.equal(reference.profilePreview.requiresSkinRebind, false);
 assert.equal(reference.joints.find((joint) => joint.id === 'leftShoulder').visualJoint, false);
 assert.equal(reference.joints.find((joint) => joint.id === 'rightShoulder').visualJoint, false);
@@ -43,7 +43,7 @@ const referenceRigSummary = summarizeRigDefinition(reference);
 assert.equal(referenceRigSummary.countMatchesProfile, true);
 assert.equal(referenceRigSummary.axisAudit.complete, true);
 assert.equal(referenceRigSummary.axisAudit.orthonormal, true);
-assert.equal(referenceRigSummary.counts.visibleJoints, 22);
+assert.equal(referenceRigSummary.counts.visibleJoints, 83);
 assert.equal(JSON.stringify(base.joints.map((joint) => [joint.id, joint.parentId, joint.localPosition])), baseBind, 'Profile application mutated the source definition.');
 
 assert.deepEqual(reference.joints.map((joint) => [joint.id, joint.parentId]), baseTopology, 'Reference rebuild changed fixed joint IDs or parent topology.');
@@ -196,4 +196,4 @@ for (let index = 0; index < 64; index += 1) {
 }
 
 assert.equal(JSON.stringify(base.joints.map((joint) => [joint.id, joint.parentId, joint.localPosition])), baseBind, 'Profile regression tests mutated the immutable source definition.');
-console.log('V8.4 live 3D body-profile rebuild, immutable reference bind with zero world drift, fixed joint topology and role counts, 28-entry bind-axis regeneration, 256 boundary profiles, 64 deterministic mixed profiles, hidden helper markers, and rebind checks passed.');
+console.log('V8.5 live 3D body-profile rebuild, immutable reference bind with zero world drift, fixed 89-node topology and role counts, 89-entry bind-axis regeneration, 256 boundary profiles, 64 deterministic mixed profiles, hidden helper markers, and rebind checks passed.');

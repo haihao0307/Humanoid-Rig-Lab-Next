@@ -1,0 +1,53 @@
+export interface CharacterIdentityReference {
+  identity_id: string | null;
+  revision: number;
+  tags: string[];
+}
+
+export interface BodyShapeReference {
+  profile_id: string | null;
+  revision: number;
+}
+
+export interface FaceIdentityReference {
+  face_id: string | null;
+  revision: number;
+}
+
+export interface ClothingAttachmentReference {
+  clothing_id: string;
+  revision: number;
+}
+
+export interface HairReference {
+  hair_id: string | null;
+  revision: number;
+}
+
+export interface AccessoryAttachmentReference {
+  accessory_id: string;
+  revision: number;
+}
+
+export interface CharacterProfile {
+  character_id: string;
+  name: string;
+  version: number;
+  identity: CharacterIdentityReference;
+  body_shape: BodyShapeReference;
+  face_identity: FaceIdentityReference;
+  clothing_attachments: ClothingAttachmentReference[];
+  hair: HairReference;
+  accessory_attachments: AccessoryAttachmentReference[];
+  proportion_revision: number;
+  body_shape_revision: number;
+  skin_revision: number;
+  face_revision: number;
+  clothing_revision: number;
+  hair_revision: number;
+  accessory_revision: number;
+  pose_revision: number;
+  animation_revision: number;
+}
+
+export * from './character-profile.js';

@@ -34,7 +34,7 @@ for (const pose of ['A', 'T']) {
   const definition = normalizeSkeletonDefinition(createStandardHumanoidPreset(pose));
   definitions.set(pose, definition);
 
-  assert.equal(definition.schemaVersion, 6);
+  assert.equal(definition.schemaVersion, 7);
   assert.equal(definition.pose, pose);
   assert.equal(definition.unit, 'meter');
   assert.equal(definition.dimensionsLocked, true);
@@ -50,29 +50,39 @@ for (const pose of ['A', 'T']) {
   assert.equal(definition.physics.anatomyEnabled, true);
   assert.equal(definition.biomechanics.enabled, true);
   assert.equal(definition.biomechanics.hardLimits, true);
-  assert.equal(definition.joints.length, 28);
-  assert.equal(definition.joints.filter((joint) => !joint.isControl).length, 27);
+  assert.equal(definition.joints.length, 89);
+  assert.equal(definition.joints.filter((joint) => !joint.isControl).length, 76);
   assert.equal(definition.rigProfile.id, CURRENT_RIG_PROFILE.id);
+  assert.equal(definition.rigProfile.nativeRig, 'rig@0.6.0');
   assert.equal(definition.rigProfile.compatibleRig, 'rig@0.4.0');
   assert.equal(definition.rigProfile.topologyPolicy, 'append-only');
-  assert.deepEqual(definition.rigProfile.roleIds.control, ['root']);
-  assert.deepEqual(definition.rigProfile.roleIds.marker, ['headTop', 'leftToesEnd', 'rightToesEnd']);
+  assert.deepEqual(definition.rigProfile.roleIds.control, [
+    'root',
+    ...PRODUCTION_RIG_BLUEPRINT.bodyProduction.additiveControls,
+  ]);
+  assert.deepEqual(definition.rigProfile.roleIds.marker, [
+    'headTop',
+    'leftToesEnd',
+    'rightToesEnd',
+    ...PRODUCTION_RIG_BLUEPRINT.bodyProduction.additiveContactMarkers,
+  ]);
+  assert.deepEqual(definition.rigProfile.roleIds.corrective, ['leftScapulaCorrective', 'rightScapulaCorrective']);
   assert.deepEqual(definition.rigProfile.roleIds.hiddenDeform, ['leftShoulder', 'rightShoulder']);
   assert.equal(definition.rigProfile.visibilityPolicy.clavicleBonesVisibleWithJointHandlesHidden, true);
 
   const rigSummary = summarizeRigDefinition(definition);
   assert.equal(rigSummary.countMatchesProfile, true);
   assert.deepEqual(rigSummary.counts, {
-    total: 28,
-    deform: 24,
-    control: 1,
-    marker: 3,
-    corrective: 0,
+    total: 89,
+    deform: 65,
+    control: 13,
+    marker: 9,
+    corrective: 2,
     socket: 0,
-    visibleJoints: 22,
-    visibleBones: 21,
-    physicalBones: 26,
-    deformInfluences: 24,
+    visibleJoints: 83,
+    visibleBones: 64,
+    physicalBones: 57,
+    deformInfluences: 67,
   });
   assert.deepEqual(rigSummary.hiddenJointIds, [
     'root',
@@ -84,18 +94,22 @@ for (const pose of ['A', 'T']) {
   ]);
   assert.equal(rigSummary.axisAudit.complete, true);
   assert.equal(rigSummary.axisAudit.orthonormal, true);
-  assert.equal(rigSummary.axisAudit.requiredEntryCount, 28);
-  assert.equal(rigSummary.axisAudit.presentEntryCount, 28);
+  assert.equal(rigSummary.axisAudit.requiredEntryCount, 89);
+  assert.equal(rigSummary.axisAudit.presentEntryCount, 89);
   assert.equal(rigSummary.axisAudit.runtimeApplied, false);
 
   const capability = buildRigCapabilityReport(rigSummary);
-  assert.equal(capability.current.totalNodes, 28);
-  assert.equal(capability.current.deformJoints, 24);
+  assert.equal(capability.current.totalNodes, 89);
+  assert.equal(capability.current.deformJoints, 65);
   assert.equal(capability.capability.proportionReconstruction, 'ready');
-  assert.equal(capability.capability.basicBodyPose, 'ready-for-adapter');
-  assert.equal(capability.capability.detailedBodyMotion, 'limited-no-twist-joints');
-  assert.equal(capability.capability.handPerformance, 'not-covered');
-  assert.equal(PRODUCTION_RIG_BLUEPRINT.schema, 'humanoid_rig/production_rig_blueprint@1.1');
+  assert.equal(capability.capability.basicBodyPose, 'ready');
+  assert.equal(capability.capability.detailedBodyMotion, 'ready');
+  assert.equal(capability.capability.footGrounding, 'ready-controls-and-contacts');
+  assert.equal(capability.capability.handPerformance, 'ready');
+  assert.equal(capability.capability.facePerformance, 'ready');
+  assert.equal(capability.capability.legacyClipCompatibility, 'ready-append-only');
+  assert.deepEqual(capability.missing, []);
+  assert.equal(PRODUCTION_RIG_BLUEPRINT.schema, 'humanoid_rig/production_rig_blueprint@2.0');
   assert.equal(PRODUCTION_RIG_BLUEPRINT.bodyProduction.deformJointTarget, 32);
   assert.equal(PRODUCTION_RIG_BLUEPRINT.bodyProduction.additiveDeformJoints.length, 8);
   assert.equal(PRODUCTION_RIG_BLUEPRINT.bodyProduction.additiveControls.length, 12);
@@ -108,14 +122,28 @@ for (const pose of ['A', 'T']) {
 
   const byId = new Map(definition.joints.map((joint) => [joint.id, joint]));
   const currentIds = new Set(byId.keys());
+  const compatibilityCoreIds = new Set(definition.joints.slice(0, 28).map((joint) => joint.id));
   const productionNodes = PRODUCTION_RIG_BLUEPRINT.bodyProduction.nodeDefinitions;
   const productionIds = productionNodes.map((node) => node.id);
   assert.equal(new Set(productionIds).size, productionIds.length, 'Production node IDs must be unique.');
+  const availableProductionParents = new Set(compatibilityCoreIds);
   for (const node of productionNodes) {
-    assert.equal(currentIds.has(node.id), false, `Production node collides with current ID ${node.id}.`);
-    assert.ok(currentIds.has(node.parentId), `Production parent ${node.parentId} must remain in the current hierarchy.`);
+    const activeNode = byId.get(node.id);
+    assert.ok(activeNode, `Active rig is missing production node ${node.id}.`);
+    assert.ok(availableProductionParents.has(node.parentId), `Production parent ${node.parentId} must exist before ${node.id}.`);
     assert.ok(['deform', 'control', 'marker'].includes(node.role));
     assert.ok(node.placement && typeof node.placement.mode === 'string');
+    assert.equal(activeNode.parentId, node.parentId);
+    assert.equal(activeNode.role, node.role);
+    assert.equal(activeNode.rigTier, node.rigTier);
+    availableProductionParents.add(node.id);
+  }
+  for (const node of PRODUCTION_RIG_BLUEPRINT.bodyProduction.optionalCorrectiveNodeDefinitions) {
+    const activeNode = byId.get(node.id);
+    assert.ok(activeNode, `Active rig is missing corrective node ${node.id}.`);
+    assert.equal(activeNode.parentId, node.parentId);
+    assert.equal(activeNode.role, 'corrective');
+    availableProductionParents.add(node.id);
   }
   for (const twistId of PRODUCTION_RIG_BLUEPRINT.bodyProduction.additiveDeformJoints) {
     const node = productionNodes.find((item) => item.id === twistId);
@@ -130,12 +158,16 @@ for (const pose of ['A', 'T']) {
   const performanceNodes = PRODUCTION_RIG_BLUEPRINT.fullPerformance.nodeDefinitions;
   const performanceIds = performanceNodes.map((node) => node.id);
   assert.equal(new Set(performanceIds).size, performanceIds.length, 'Performance node IDs must be unique.');
-  assert.equal(performanceIds.filter((id) => /(?:Thumb|Index|Middle|Ring|Little)[123]$/.test(id)).length, 30);
+  assert.equal(performanceIds.filter((id) => /^(?:left|right)(?:Thumb(?:Metacarpal|Proximal|Distal)|(?:Index|Middle|Ring|Little)(?:Proximal|Intermediate|Distal))$/.test(id)).length, 30);
   assert.deepEqual(performanceIds.slice(-3), ['leftEye', 'rightEye', 'jaw']);
-  const availablePerformanceParents = new Set([...currentIds]);
+  const availablePerformanceParents = new Set(availableProductionParents);
   for (const node of performanceNodes) {
-    assert.equal(currentIds.has(node.id), false, `Performance node collides with current ID ${node.id}.`);
+    const activeNode = byId.get(node.id);
+    assert.ok(activeNode, `Active rig is missing performance node ${node.id}.`);
     assert.ok(availablePerformanceParents.has(node.parentId), `Performance parent ${node.parentId} must already exist before ${node.id}.`);
+    assert.equal(activeNode.parentId, node.parentId);
+    assert.equal(activeNode.role, node.role);
+    assert.equal(activeNode.retargetSemantic, node.retargetSemantic);
     availablePerformanceParents.add(node.id);
   }
   assert.equal(byId.size, definition.joints.length, 'Joint IDs must be unique.');
@@ -175,7 +207,7 @@ for (const pose of ['A', 'T']) {
   assert.equal(standardJoints.length, 24, 'SMPL mapping must contain exactly 24 joints.');
   const smplIndices = standardJoints.map((joint) => joint.standard.index).sort((a, b) => a - b);
   assert.deepEqual(smplIndices, Array.from({ length: 24 }, (_, index) => index));
-  assert.equal(definition.joints.filter((joint) => joint.standard?.helper).length, 4);
+  assert.equal(definition.joints.filter((joint) => joint.standard?.helper).length, 22);
 
   const rest = computeRestWorldPositions(definition);
   const currentPose = computePoseWorldPositions(definition);
@@ -244,4 +276,4 @@ for (const joint of aDefinition.joints) {
   close(getBoneLength(aDefinition, joint.id), getBoneLength(tDefinition, joint.id), 1e-12, `${joint.id} pose-independent length`);
 }
 
-console.log('V8.4 SMPL 24 mapping, 28-node role taxonomy, hidden measurement markers, complete bind-axis contract, production blueprint, and fixed segment data validation passed.');
+console.log('V8.5 SMPL-compatible 89-node performance rig, role taxonomy, VRM finger chains, retarget chains, complete bind-axis contract, and fixed segment validation passed.');

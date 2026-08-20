@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Character Generator · Humanoid Rig Lab Next</title>
+  <link rel="stylesheet" href="./apps/character-generator/character-generator.css">
+</head>
+<body>
+  <header class="generator-topbar">
+    <a class="generator-brand" href="./index.html">
+      <span class="generator-mark">HRL</span>
+      <span><strong>Character Generator</strong><small>Image → Character Data</small></span>
+    </a>
+    <nav>
+      <a href="./index.html">项目总控</a>
+      <a href="./studio.html?module=proportion">HRL-M01 比例</a>
+      <a href="./studio.html?module=pose">HRL-M03 姿势</a>
+    </nav>
+    <div class="generator-sync" id="generatorSync">正在连接项目状态</div>
+  </header>
+
+  <main class="generator-shell">
+    <section class="generator-hero">
+      <div>
+        <span class="generator-kicker">CHARACTER DATA ORCHESTRATOR</span>
+        <h1>从一张人物图片，建立可继续编辑的 Character 数据</h1>
+        <p>第一阶段生成结构化人物入口，不承诺一次得到最终真人。比例和姿势分别复用 HRL-M01、HRL-M03，其他系统生成可追踪的初始版本。</p>
+      </div>
+      <ol class="generator-flow" aria-label="生成流程">
+        <li class="active"><b>01</b><span>图片输入</span></li>
+        <li><b>02</b><span>Image Analysis</span></li>
+        <li><b>03</b><span>模块数据</span></li>
+        <li><b>04</b><span>CharacterProfile</span></li>
+      </ol>
+    </section>
+
+    <section class="generator-grid">
+      <article class="generator-panel input-panel">
+        <header><span>01</span><div><small>INPUT</small><h2>上传人物图片</h2></div></header>
+        <label class="drop-zone" id="characterDropZone">
+          <input id="characterImageInput" type="file" accept="image/png,image/jpeg,image/webp,image/avif">
+          <span class="drop-icon">＋</span>
+          <strong>选择全身人物图片</strong>
+          <small>建议人物完整、无遮挡、光线清晰；图片二进制不会写入 ProjectState。</small>
+        </label>
+        <div class="image-preview-wrap" id="imagePreviewWrap" hidden>
+          <img id="characterImagePreview" alt="待分析人物图片">
+          <div><strong id="sourceImageName">—</strong><small id="sourceImageMeta">—</small></div>
+        </div>
+        <label class="field-row"><span>人物名称</span><input id="characterNameInput" value="Generated Character" maxlength="80"></label>
+        <button class="action-button primary" id="analyzeCharacterButton" disabled>分析图片</button>
+        <p class="generator-status" id="generatorStatus">请选择一张图片。</p>
+      </article>
+
+      <article class="generator-panel result-panel">
+        <header><span>02</span><div><small>ANALYSIS</small><h2>分析结果</h2></div></header>
+        <div class="empty-result" id="emptyAnalysisResult">完成 Image Analysis 后，这里会显示模块输出和置信度。</div>
+        <div id="analysisResult" hidden>
+          <div class="adapter-strip">
+            <span><b>HRL-M01</b> ProportionProfile</span>
+            <span><b>HRL-M03</b> PoseSnapshot</span>
+            <span><b>Core</b> CharacterProfile</span>
+          </div>
+          <div class="confidence-grid" id="confidenceGrid"></div>
+          <div class="output-list" id="outputList"></div>
+          <details class="raw-details"><summary>查看分析 JSON</summary><pre id="analysisJson"></pre></details>
+        </div>
+      </article>
+
+      <article class="generator-panel action-panel">
+        <header><span>03</span><div><small>GENERATE</small><h2>生成与保存</h2></div></header>
+        <div class="generation-summary" id="generationSummary">
+          <strong>尚未生成 Character</strong>
+          <p>分析完成后，可以一次写入各模块数据和 Character Core 引用。</p>
+        </div>
+        <button class="action-button primary" id="generateCharacterButton" disabled>生成 Character</button>
+        <button class="action-button" id="saveCharacterVersionButton" disabled>保存新版本</button>
+        <div class="saved-character" id="savedCharacter" hidden>
+          <div><span>Character ID</span><b id="savedCharacterId">—</b></div>
+          <div><span>Character 版本</span><b id="savedCharacterVersion">—</b></div>
+          <div><span>Generator 版本</span><b id="savedGeneratorVersion">—</b></div>
+          <div><span>状态</span><b id="savedGeneratorStatus">—</b></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="generator-boundary">
+      <div><small>PHASE 1 BOUNDARY</small><strong>结构化人物数据，不是最终真人重建</strong></div>
+      <ul>
+        <li>比例来自单图相对尺寸，绝对身高沿用当前 HRL-M01 基准。</li>
+        <li>Face、BodyShape 和 Clothing 是可继续编辑的第一版参数。</li>
+        <li>PoseSnapshot 由已有 HRL-M03 固定骨长重定向链路生成。</li>
+      </ul>
+    </section>
+  </main>
+
+  <script type="module" src="./apps/character-generator/page.js"></script>
+</body>
+</html>

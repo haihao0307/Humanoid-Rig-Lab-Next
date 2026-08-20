@@ -1,9 +1,9 @@
 Humanoid Rig Lab Next
 Build ID: four-module-v002-20260819
 Project version: 0.5.0
-Embedded editor: V8.4 / 0.8.4
-Project schema: 5
-Rig export schema: 6
+Embedded editor: V8.5 / 0.8.5
+Project schema: 11
+Rig export schema: 7
 Three.js: 0.185.1
 Date: 2026-08-19
 
@@ -12,7 +12,14 @@ Merged module versions
 - Skin: skin@0.5.1, module revision 3, native pre-bound single SkinnedMesh
 - Pose: pose@0.4.0, module revision 3, image pose and canonical PoseSnapshot
 - Animation: anim@0.4.0, module revision 4, local quaternion runtime, clips, layers, graph and bake
+- Clothing: clothing@0.1.0, module revision 1, static simulationRig-following Character attachments
 - Integration: module revision 2
+- Character Core: character@0.6.4, profile contract @1.4, state/operation-event contracts @1.0
+- BodyShape: body_shape_profile@1.0, body_shape_state@1.0, Skin regional displacement runtime
+- Face Identity: face_profile@1.0, face_state@1.0, runtime descriptor @1.0
+- Clothing System: clothing_profile@1.0, clothing_state@1.0, static follow runtime descriptor @1.0
+- Appearance System: appearance@0.1.0, Hair/Accessory profile contracts @1.0, static simulationRig attachments
+- Character Generator: character-generator@0.1.0, HRL-M01/HRL-M03 orchestration and image-to-character session @1.0
 
 Shared integration added by the mother project
 - Build identity manifest and launcher build-ID verification
@@ -21,12 +28,21 @@ Shared integration added by the mother project
 - Shared transient message bus for motion transport anchors and scrub previews
 - Module scope files archived under control/module-scopes
 - Baseline state migration to the current module versions and revisions
+- Reference-only CharacterProfile with optimistic Character revision and OperationEvent history
+- Versioned BodyShape parameters with Skin-only regional vertex response
+- Versioned Face Identity parameters with Character reference and FLAME/3DMM/AI adapter boundary
+- Character clothing attachments with independent meshes, simulationRig follow, add/remove and version restore
+- Character hair selection and accessory attachments with independent revision, save and restore
+- Image-to-Character data generation with metadata-only image persistence and deterministic reload
+- Append-only performance89 topology: 28 core + 28 body-production + 33 hand/face nodes
+- Layered rig visualization, IK/contact controls, 18 retarget chains and local-quaternion V8 payloads
 
 Skin runtime
 - Build marker: skin-v002-single-surface-guard
 - Asset: legacy/v8/assets/smpl/smpl-male-surface-skinned.glb
 - SHA-256: 736cb39c828203eae72f5e5d094f1623c0a4465a31b484737a6e8df02a7ec899
 - Native JOINTS_0, WEIGHTS_0 and 24 inverse bind matrices
+- The new twist, finger, face and corrective joints are not yet included in this 24-bone skin palette
 
 Validation command
 - npm test

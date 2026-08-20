@@ -99,7 +99,7 @@ export function inspectPoseContract(state) {
   return {
     status: 'preview-only',
     statusLabel: '二维预览模式',
-    detail: '尚未收到 V8.4 三维姿势数据',
+    detail: '尚未收到 V8.5 三维姿势数据',
     validation: secondaryValidation.valid ? secondaryValidation : payloadValidation,
     canonicalSnapshot: secondaryValidation.valid ? secondarySnapshot : null,
     legacyWorldPose: null,

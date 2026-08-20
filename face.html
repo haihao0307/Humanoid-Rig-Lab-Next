@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Humanoid Rig Lab Next · Face Identity</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./face.css">
+</head>
+<body class="face-page">
+  <div class="app-shell">
+    <header class="topbar face-topbar">
+      <a class="brand" href="./index.html" aria-label="返回项目总控">
+        <span class="brand-mark face-brand-mark" aria-hidden="true"><i></i><i></i></span>
+        <span>
+          <strong>Face Identity</strong>
+          <small>独立人脸数据与版本入口</small>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="Face 页面导航">
+        <a href="./index.html">项目总控</a>
+        <a class="active" href="./face.html">人脸参数</a>
+        <a href="./studio.html?module=integration">综合预览</a>
+      </nav>
+      <div class="top-actions">
+        <span class="sync-pill" id="faceSyncPill"><span></span><b>连接中</b></span>
+        <button class="button ghost" id="newFaceButton" type="button">新建人脸</button>
+        <button class="button primary" id="saveFaceButton" type="button">保存新版本</button>
+      </div>
+    </header>
+
+    <main class="face-layout">
+      <aside class="face-controls panel">
+        <section class="face-meta-card">
+          <div class="eyebrow">FACE PROFILE</div>
+          <h1 id="faceTitle">face_001</h1>
+          <div class="face-meta-grid">
+            <span>当前版本<strong id="faceVersion">1</strong></span>
+            <span>状态<strong id="faceDirty">已保存</strong></span>
+            <span>Face 修订<strong id="faceStateRevision">1</strong></span>
+            <span>Character 引用<strong id="characterFaceRevision">v1</strong></span>
+          </div>
+        </section>
+
+        <section class="face-version-card">
+          <label for="faceVersionSelect">历史版本</label>
+          <div class="face-version-row">
+            <select id="faceVersionSelect" aria-label="选择人脸历史版本"></select>
+            <button class="button ghost" id="previewFaceVersionButton" type="button">查看</button>
+            <button class="button ghost" id="restoreFaceVersionButton" type="button">恢复</button>
+          </div>
+          <button class="text-button face-current-button" id="showCurrentFaceButton" type="button">返回当前编辑版本</button>
+        </section>
+
+        <form id="faceParameterForm" class="face-parameter-form">
+          <fieldset>
+            <legend>身份参数</legend>
+            <label class="face-number-control">
+              <span>年龄 <output id="ageValue">30</output></span>
+              <input id="faceAge" name="age" type="range" min="0" max="120" step="1" value="30">
+            </label>
+            <label class="face-select-control">
+              <span>默认表情</span>
+              <select id="faceExpression" name="default_expression">
+                <option value="neutral">Neutral</option>
+                <option value="smile">Smile</option>
+                <option value="frown">Frown</option>
+                <option value="surprise">Surprise</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>脸型 Face Shape</legend>
+            <div id="faceShapeControls" class="parameter-list"></div>
+          </fieldset>
+          <fieldset>
+            <legend>眼睛 Eye Shape</legend>
+            <div id="eyeShapeControls" class="parameter-list"></div>
+          </fieldset>
+          <fieldset>
+            <legend>鼻子 Nose Shape</legend>
+            <div id="noseShapeControls" class="parameter-list"></div>
+          </fieldset>
+          <fieldset>
+            <legend>嘴部 Mouth Shape</legend>
+            <div id="mouthShapeControls" class="parameter-list"></div>
+          </fieldset>
+        </form>
+      </aside>
+
+      <section class="face-workspace">
+        <header class="face-page-heading">
+          <div>
+            <div class="eyebrow">IDENTITY DATA LAYER</div>
+            <h2>Face 参数编辑器</h2>
+            <p>这里只管理人脸身份参数与版本引用。FLAME、3DMM 和 AI 重建以后通过适配器接入。</p>
+          </div>
+          <span id="faceModeBadge" class="face-mode-badge">CURRENT</span>
+        </header>
+
+        <div class="face-preview-grid">
+          <article class="panel face-preview-card">
+            <div class="face-stage" id="faceStage" aria-label="Face 参数示意预览">
+              <div class="face-silhouette" id="faceSilhouette">
+                <div class="face-brow face-brow-left"></div>
+                <div class="face-brow face-brow-right"></div>
+                <div class="face-eye face-eye-left"><i></i></div>
+                <div class="face-eye face-eye-right"><i></i></div>
+                <div class="face-nose"></div>
+                <div class="face-mouth"><i></i></div>
+              </div>
+              <div class="face-stage-caption">
+                <strong>参数示意</strong>
+                <span>不是网格、蒙皮或 AI 生成结果</span>
+              </div>
+            </div>
+          </article>
+
+          <aside class="face-inspector">
+            <article class="panel face-contract-card">
+              <div class="eyebrow">BOUNDARY</div>
+              <h3>模块边界</h3>
+              <ul>
+                <li><b>写入</b><span>Face Identity descriptor</span></li>
+                <li><b>只引用</b><span>Character Core revision</span></li>
+                <li><b>保持不变</b><span>Skin / Rig / Pose / Animation</span></li>
+              </ul>
+            </article>
+            <article class="panel face-adapter-card">
+              <div class="eyebrow">FUTURE ADAPTERS</div>
+              <h3>后端接口</h3>
+              <div id="faceBackendList" class="face-backend-list"></div>
+            </article>
+          </aside>
+        </div>
+
+        <section class="panel face-data-card">
+          <header>
+            <div>
+              <div class="eyebrow">CANONICAL PAYLOAD</div>
+              <h3>Face Runtime Descriptor</h3>
+            </div>
+            <span id="faceStatusMessage" role="status">准备就绪</span>
+          </header>
+          <pre id="faceDescriptor"></pre>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./src/face-editor-page.js"></script>
+</body>
+</html>

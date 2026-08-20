@@ -3,6 +3,7 @@ import {
   cloneValue,
   createStandardHumanoidPreset,
   normalizeSkeletonDefinition,
+  summarizeRigDefinition,
 } from './skeleton-presets.js';
 import {
   applyBodyProfileToDefinition,
@@ -28,8 +29,8 @@ import { PhysicsRig } from './physics-rig.js';
 import { SvgSkeletonView } from './svg-view.js';
 import { createThreeSkeletonView } from './three-view.js';
 
-const STORAGE_KEY = 'humanoid-skeleton-editor:v8.4-3d-proportion';
-const LEGACY_KEYS = ['humanoid-skeleton-editor:v8.3-anatomical-fit', 'humanoid-skeleton-editor:v8.2-unified-surface', 'humanoid-skeleton-editor:v8.1-single-surface', 'humanoid-skeleton-editor:v8-human-surface', 'humanoid-skeleton-editor:v7.2-surface-fixed', 'humanoid-skeleton-editor:v7.1-smpl-interaction', 'humanoid-skeleton-editor:v6-biomechanics', 'humanoid-skeleton-editor:v5-fixed-physics', 'humanoid-skeleton-editor:v2', 'humanoid-skeleton-editor:v1'];
+const STORAGE_KEY = 'humanoid-skeleton-editor:v8.5-performance-rig';
+const LEGACY_KEYS = ['humanoid-skeleton-editor:v8.4-3d-proportion', 'humanoid-skeleton-editor:v8.3-anatomical-fit', 'humanoid-skeleton-editor:v8.2-unified-surface', 'humanoid-skeleton-editor:v8.1-single-surface', 'humanoid-skeleton-editor:v8-human-surface', 'humanoid-skeleton-editor:v7.2-surface-fixed', 'humanoid-skeleton-editor:v7.1-smpl-interaction', 'humanoid-skeleton-editor:v6-biomechanics', 'humanoid-skeleton-editor:v5-fixed-physics', 'humanoid-skeleton-editor:v2', 'humanoid-skeleton-editor:v1'];
 const HISTORY_LIMIT = 100;
 const THREE_VERSION = '0.185.1';
 const HOST_PROTOCOL = 'humanoid-rig-lab-next:viewport';
@@ -64,6 +65,8 @@ const dom = {
   jointSearch: document.querySelector('#joint-search'),
   poseName: document.querySelector('#pose-name'),
   jointCount: document.querySelector('#joint-count'),
+  deformCount: document.querySelector('#deform-count'),
+  helperCount: document.querySelector('#helper-count'),
   rigHeight: document.querySelector('#rig-height'),
   lengthError: document.querySelector('#length-error'),
   jointLimitError: document.querySelector('#joint-limit-error'),
@@ -81,6 +84,7 @@ const dom = {
   skinToggle: document.querySelector('#skin-toggle'),
   skeletonToggle: document.querySelector('#skeleton-toggle'),
   skeletonXrayToggle: document.querySelector('#skeleton-xray-toggle'),
+  skeletonDetail: document.querySelector('#skeleton-detail'),
   skinOpacity: document.querySelector('#skin-opacity'),
   skinOpacityValue: document.querySelector('#skin-opacity-value'),
   skinMode: document.querySelector('#skin-mode'),
@@ -313,6 +317,10 @@ function setupUiEvents() {
   dom.surfaceReloadToolbarButton?.addEventListener('click', reloadSurfaceLayer);
   dom.skeletonXrayToggle.addEventListener('change', () => {
     threeView?.setSkeletonXray(dom.skeletonXrayToggle.checked);
+  });
+  dom.skeletonDetail?.addEventListener('change', () => {
+    threeView?.setSkeletonDetail(dom.skeletonDetail.value);
+    dom.statusMessage.textContent = `骨架细节已切换为${dom.skeletonDetail.selectedOptions[0]?.textContent ?? '完整表现层'}`;
   });
   dom.skinOpacity.addEventListener('input', () => {
     const value = Number(dom.skinOpacity.value);
@@ -731,9 +739,10 @@ function renderJointList() {
   dom.jointList.replaceChildren();
   const depths = getJointDepths(definition);
   const matches = definition.joints.filter((joint) => {
-    if (joint.isControl) return false;
     if (!query) return true;
-    return joint.id.toLowerCase().includes(query) || joint.label.toLowerCase().includes(query);
+    return joint.id.toLowerCase().includes(query)
+      || joint.label.toLowerCase().includes(query)
+      || String(joint.role ?? '').toLowerCase().includes(query);
   });
 
   if (!matches.length) {
@@ -752,6 +761,8 @@ function renderJointList() {
     row.classList.toggle('is-pinned', Boolean(joint.pinned));
     row.style.setProperty('--depth', query ? 0 : depths.get(joint.id) ?? 0);
     row.dataset.jointId = joint.id;
+    row.dataset.role = joint.role ?? 'deform';
+    row.dataset.tier = joint.rigTier ?? 'core';
     row.setAttribute('role', 'treeitem');
     row.setAttribute('aria-selected', joint.id === selectedJointId ? 'true' : 'false');
 
@@ -767,13 +778,24 @@ function renderJointList() {
     id.textContent = joint.id;
     text.append(label, id);
 
+    const role = document.createElement('span');
+    role.className = 'joint-role-badge';
+    role.dataset.role = joint.role ?? 'deform';
+    role.textContent = ({
+      deform: joint.visualShape === 'twist' ? '扭转' : '变形',
+      control: '控制',
+      marker: '标记',
+      corrective: '校正',
+      socket: '挂点',
+    })[joint.role] ?? '节点';
+
     const length = document.createElement('span');
     length.className = 'joint-row-length';
     length.textContent = joint.parentId && joint.physicalBone !== false
       ? `${formatNumber(getBoneLength(definition, joint.id), 3)} m`
-      : '无骨杆';
+      : joint.isControl ? '目标' : '派生';
 
-    row.append(marker, text, length);
+    row.append(marker, text, role, length);
     row.addEventListener('click', () => selectJoint(joint.id));
     dom.jointList.append(row);
   }
@@ -783,10 +805,12 @@ function updateSummary() {
   const maxErrorMm = physicsRig ? physicsRig.getMaxBoneError() * 1000 : 0;
   const maxJointViolation = physicsRig ? physicsRig.getMaxJointLimitViolation() : 0;
   const options = physicsRig?.getOptions();
-  const anatomicalCount = definition.joints.filter((joint) => !joint.isControl).length;
+  const rigSummary = summarizeRigDefinition(definition);
   const profile = definition.anthropometry;
   dom.poseName.textContent = definition.pose || 'CUSTOM';
-  dom.jointCount.textContent = String(anatomicalCount);
+  dom.jointCount.textContent = String(rigSummary.counts.total);
+  dom.deformCount.textContent = String(rigSummary.counts.deform + rigSummary.counts.corrective);
+  dom.helperCount.textContent = `${rigSummary.counts.control} / ${rigSummary.counts.marker}`;
   dom.rigHeight.textContent = `${formatNumber(calculateRigHeight(definition), 3)} m`;
   dom.lengthError.textContent = maxErrorMm < 0.00001
     ? '< 0.00001 mm'
@@ -949,6 +973,7 @@ async function loadThreeRenderer() {
       setDisplayMode(currentDisplayMode, { quiet: true });
       threeView.setSkinSource(currentSurfaceSource);
       threeView.setSkeletonXray(dom.skeletonXrayToggle.checked);
+      threeView.setSkeletonDetail(dom.skeletonDetail?.value ?? 'performance');
       threeView.setSkinOpacity(Number(dom.skinOpacity.value));
       threeView.setSkinMode(dom.skinMode.value);
       threeView.setGridVisible(dom.gridToggle.checked);
@@ -1553,9 +1578,9 @@ function notifyHostPose(reason = '更新人物姿势') {
   let poseSnapshot = null;
   try {
     poseSnapshot = physicsRig.buildPoseSnapshot({
-      compatibleRig: definition.rigVersion || 'rig@0.4.0',
+      compatibleRig: definition.rigProfile?.compatibleRig || definition.rigVersion || 'rig@0.4.0',
       name: payload.pose || definition.pose || 'CUSTOM',
-      source: 'embedded-v8.4',
+      source: 'embedded-v8.5',
     });
     poseSnapshot.updatedAt = payload.updatedAt;
     poseSnapshot.sourceLegacyUpdatedAt = payload.updatedAt;
@@ -1600,6 +1625,8 @@ function applyHostState(hostState, hostRevision) {
     if (hostState.bodyProfile) {
       applyHostBodyProfile(hostState.bodyProfile, { preview: false, preservePose: true });
     }
+    if (hostState.bodyShape) threeView?.setBodyShape(hostState.bodyShape);
+    if (hostState.clothing) threeView?.setClothingProfile(hostState.clothing);
     const display = hostState.display || {};
     const nextMode = ['skin', 'skeleton', 'both'].includes(display.mode) ? display.mode : currentDisplayMode;
     setDisplayMode(nextMode, { quiet: true });
@@ -1640,7 +1667,11 @@ function applyHostState(hostState, hostRevision) {
     const poseApplied = applyHostPose(hostState.pose);
     if (!poseApplied) {
       const requestedPose = String(hostState.pose?.name || '').toUpperCase();
-      const preset = requestedPose.startsWith('T') ? 'T' : requestedPose.startsWith('A') ? 'A' : null;
+      const preset = ['T', 'T POSE', 'T-POSE', 'TPOSE'].includes(requestedPose)
+        ? 'T'
+        : ['A', 'A POSE', 'A-POSE', 'APOSE'].includes(requestedPose)
+          ? 'A'
+          : null;
       if (preset && definition.pose !== preset) {
         applyPosePresetToDefinition(definition, preset);
         physicsRig.resetFromDefinitionPose({ project: true });

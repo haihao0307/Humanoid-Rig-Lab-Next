@@ -292,7 +292,7 @@ function createSyntheticImageObservation(rig) {
       item.pinned = true;
     }
   }
-  assert.equal(applyPosePayload(definition, payload), 28);
+  assert.equal(applyPosePayload(definition, payload), 89);
   rig.resetFromDefinitionPose({ project: true });
   assertSolved(rig, 'Reconciled imported pose');
   assert.equal(definition.joints.find((joint) => joint.id === 'leftLowerArm').pinned, true);
@@ -307,7 +307,7 @@ function createSyntheticImageObservation(rig) {
   rig.moveJointTo('rightHand', { x: hand.x + 0.25, y: hand.y + 0.15, z: hand.z + 0.1 });
   const exported = buildExportPayload(definition);
   assert.equal(exported.dimensionsLocked, true);
-  assert.equal(exported.schemaVersion, 6);
+  assert.equal(exported.schemaVersion, 7);
   assert.ok(exported.joints.every((joint) => 'localPosition' in joint));
   assert.ok(exported.joints.every((joint) => 'poseWorldPosition' in joint));
   assert.equal(exported.joints.find((joint) => joint.id === 'hips').lengthLocked, false);
@@ -666,7 +666,7 @@ function createSyntheticImageObservation(rig) {
   assert.equal(candidate.schema, 'humanoid_rig/image_pose_candidate@1.0');
   assert.equal(candidate.compatibleRig, 'rig@0.4.0');
   assert.equal(candidate.legacyWorldPose.type, 'humanoid-pose');
-  assert.equal(candidate.legacyWorldPose.joints.length, 28);
+  assert.equal(candidate.legacyWorldPose.joints.length, 89);
   assert.deepEqual(validatePoseSnapshot(candidate.poseSnapshot), { valid: true, errors: [] });
   assert.ok(Object.keys(candidate.poseSnapshot.localRotations).length >= 24);
   assert.ok(candidate.poseSnapshot.ikTargets.length >= 12);
@@ -867,4 +867,4 @@ function createSyntheticImageObservation(rig) {
   assert.equal(await loadImagePoseSource(storageId), null);
 }
 
-console.log('V8.4 fixed dimensions, whole-body propagation, and anatomical ROM checks passed.');
+console.log('V8.5 fixed dimensions, 89-node whole-body propagation, lightweight finger chains, and anatomical ROM checks passed.');

@@ -6,8 +6,8 @@ export const MODULE_CONFIG = Object.freeze({
   },
   skin: {
     title: '人物蒙皮', subtitle: '网格、材质与骨架绑定', eyebrow: 'SKIN MODULE', branch: 'work/skin',
-    description: '负责人体网格、材质、蒙皮索引、蒙皮权重、绑定矩阵、Morph Target 和表皮拾取。骨长和骨骼层级在这里保持只读。',
-    writable: ['SkinAsset', 'SkinBinding', 'Materials', 'MorphTargets'], readonly: ['RigDefinition', 'BoneLengths', 'AnimationTimeline'],
+    description: '负责人体网格、材质、蒙皮索引、蒙皮权重、绑定矩阵、Morph Target、BodyShape 表皮响应和表皮拾取。骨长和骨骼层级在这里保持只读。',
+    writable: ['SkinAsset', 'SkinBinding', 'Materials', 'MorphTargets', 'BodyShapeSkinResponse'], readonly: ['RigDefinition', 'BoneLengths', 'AnimationTimeline'],
   },
   pose: {
     title: '动作与物理', subtitle: '单帧姿势、IK 与全身约束', eyebrow: 'POSE MODULE', branch: 'work/pose',
@@ -19,20 +19,26 @@ export const MODULE_CONFIG = Object.freeze({
     description: '负责时间轴、关键帧、动画片段、循环、插值、状态切换和动作重定向。单帧姿势来自动作模块。',
     writable: ['AnimationClip', 'AnimationGraph', 'Transitions', 'RetargetMap'], readonly: ['BoneLengths', 'SkinWeights', 'BindPose'],
   },
+  clothing: {
+    title: '人物服装', subtitle: 'Character 附件与静态跟随', eyebrow: 'CLOTHING MODULE', branch: 'work/clothing',
+    description: '负责上衣、裤子和鞋的独立资产、材质、尺码、版本与 simulationRig 静态跟随。服装作为 Character 附件存在，不属于 Skin。',
+    writable: ['ClothingProfile', 'ClothingAsset', 'ClothingMesh', 'Material', 'SizeProfile'], readonly: ['BodySkin', 'RigDefinition', 'PoseSnapshot', 'AnimationClip'],
+  },
   integration: {
     title: '综合预览', subtitle: '四个模块组合验收', eyebrow: 'INTEGRATION', branch: 'integration',
-    description: '组合当前骨架、蒙皮、动作和动画版本，检查兼容性、视觉结果和发布条件。V8.4 统一三维比例与人物视口会直接嵌入每个工作台。',
-    writable: ['ActiveVersions', 'ReviewRecords', 'ReleaseCandidate'], readonly: ['ModuleInternals'],
+    description: '组合当前骨架、蒙皮、动作和动画版本，检查兼容性、视觉结果和发布条件。V8.5 统一三维比例与 89 节点人物视口会直接嵌入每个工作台。',
+    writable: ['ActiveVersions', 'CharacterCore', 'BodyShapeState', 'FaceIdentity', 'FaceState', 'ReviewRecords', 'ReleaseCandidate'], readonly: ['ModuleInternals'],
   },
 });
 
-export const MODULE_ORDER = Object.freeze(['proportion', 'skin', 'pose', 'animation', 'integration']);
+export const MODULE_ORDER = Object.freeze(['proportion', 'skin', 'pose', 'animation', 'clothing', 'integration']);
 
 const LOADERS = {
   proportion: () => import('./modules/proportion/index.js'),
   skin: () => import('./modules/skin/index.js'),
   pose: () => import('./modules/pose/index.js'),
   animation: () => import('./modules/animation/index.js'),
+  clothing: () => import('./modules/clothing/index.js'),
   integration: () => import('./modules/integration/index.js'),
 };
 

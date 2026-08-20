@@ -1,5 +1,11 @@
 import { computePoseWorldPositions, computeRestWorldPositions } from './skeleton-model.js';
 import { loadGlbSkin } from './glb-geometry.js';
+import {
+  bodyShapeProfileKey,
+  createSkinShapeResponse,
+  deformSkinPositions,
+  normalizeBodyShapeProfile,
+} from '../../../packages/body-shape/index.js';
 
 const EPSILON = 1e-8;
 const REST_EPSILON = 1e-7;
@@ -130,7 +136,11 @@ class NativeSmplSkinnedSurfaceLayer {
     this.inverseBindMatrices = null;
     this.skinMatrices = null;
     this.restPositions = null;
+    this.shapedRestPositions = null;
     this.restNormals = null;
+    this.bodyShapeProfile = normalizeBodyShapeProfile();
+    this.bodyShapeResponse = createSkinShapeResponse(this.bodyShapeProfile);
+    this.lastBodyShapeKey = '';
     this.lastSourceValues = null;
     this.detailPromise = null;
     this.surfaceOwnerToken = '';
@@ -216,6 +226,7 @@ class NativeSmplSkinnedSurfaceLayer {
     this.mesh.userData.humanoidSurfaceRole = 'primary-render-surface';
     this.mesh.userData.skinBuildId = SKIN_RUNTIME_BUILD.buildId;
     this.mesh.userData.surfaceOwnerToken = this.surfaceOwnerToken;
+    this.applyBodyShapeToGeometry({ force: true });
 
     this.buildNativeSkeleton(meshData.skin);
     for (const rootBone of this.rootBones) this.mesh.add(rootBone);
@@ -569,16 +580,42 @@ class NativeSmplSkinnedSurfaceLayer {
   }
 
   sampleDeformedPositions() {
-    if (!this.skinMatrices) return new Float32Array(this.restPositions ?? 0);
-    const output = new Float32Array(this.restPositions.length);
+    const sourcePositions = this.shapedRestPositions ?? this.restPositions;
+    if (!this.skinMatrices) return new Float32Array(sourcePositions ?? 0);
+    const output = new Float32Array(sourcePositions.length);
     deformSurfaceLbs(
-      this.restPositions,
+      sourcePositions,
       output,
       this.skinIndices,
       this.skinWeights,
       this.skinMatrices,
     );
     return output;
+  }
+
+  setBodyShape(profileInput = {}) {
+    this.bodyShapeProfile = normalizeBodyShapeProfile(profileInput);
+    this.bodyShapeResponse = createSkinShapeResponse(this.bodyShapeProfile);
+    this.applyBodyShapeToGeometry();
+    return structuredClone(this.bodyShapeResponse);
+  }
+
+  applyBodyShapeToGeometry({ force = false } = {}) {
+    if (!this.restPositions || !this.mesh?.geometry?.attributes?.position) return false;
+    const key = bodyShapeProfileKey(this.bodyShapeProfile);
+    this.mesh.userData.bodyShapeId = this.bodyShapeProfile.body_shape_id;
+    this.mesh.userData.bodyShapeRevision = this.bodyShapeProfile.version;
+    this.mesh.userData.bodyShapeMethod = this.bodyShapeResponse.method;
+    if (!force && key === this.lastBodyShapeKey) return false;
+    this.shapedRestPositions = deformSkinPositions(this.restPositions, this.bodyShapeProfile);
+    const position = this.mesh.geometry.attributes.position;
+    position.array.set(this.shapedRestPositions);
+    position.needsUpdate = true;
+    this.mesh.geometry.computeVertexNormals();
+    this.mesh.geometry.computeBoundingBox();
+    this.mesh.geometry.computeBoundingSphere();
+    this.lastBodyShapeKey = key;
+    return true;
   }
 
   setVisible(visible) {
@@ -742,6 +779,8 @@ class NativeSmplSkinnedSurfaceLayer {
       pickSource: 'detailed-smpl-skinned-mesh',
       pickable,
       deformation: 'native Three.js SkinnedMesh GPU linear blend skinning',
+      bodyShape: structuredClone(this.bodyShapeResponse),
+      bodyShapeAppliedToSkinOnly: true,
       bindPoseProtected: Boolean(this.mesh?.userData?.bindPoseProtected),
       referenceBindingMismatch: Boolean(this.lastCompatibilityMismatch),
       assetWeightStatus: this.mesh?.userData?.assetWeightStatus ?? 'unknown',
@@ -774,6 +813,8 @@ class NativeSmplSkinnedSurfaceLayer {
     this.skinWeights = null;
     this.inverseBindMatrices = null;
     this.skinMatrices = null;
+    this.restPositions = null;
+    this.shapedRestPositions = null;
   }
 }
 

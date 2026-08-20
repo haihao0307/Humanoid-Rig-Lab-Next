@@ -25,6 +25,7 @@ import {
   normalizeClip,
   removeNearestPoseSnapshotKey,
   replaceClip,
+  resolveTransportPlaybackStart,
   sampleAnimationClip,
   samplePoseSnapshotClip,
   serializeMotionClip,
@@ -127,7 +128,7 @@ export function renderControls(context, state) {
       ${rangeControl('breathingWeight', '呼吸层权重', 0, 1, .01, breathingLayer?.weight ?? .35, '')}
       <div class="control-button-grid"><button class="control-button" data-graph-action="idle">站立</button><button class="control-button" data-graph-action="walk">行走</button></div>
       <div class="control-button-grid"><button class="control-button" data-graph-action="wave">挥手过渡</button><button class="control-button" data-graph-action="squat">下蹲过渡</button></div>
-      <p class="control-note" id="animationGraphStatus">当前状态：${escapeHtml(animation.graph.activeStateId)}${animation.graph.transition ? `，过渡 ${escapeHtml(animation.graph.transition.fromStateId)} → ${escapeHtml(animation.graph.transition.toStateId)}` : ''}</p>`) +
+      <p class="control-note" id="animationGraphStatus">${escapeHtml(graphStatusText(animation))}</p>`) +
     controlSection('关键帧制作与资产处理', `
       <div class="control-button-grid"><button class="control-button" id="capturePoseKey">记录当前三维姿势</button><button class="control-button" id="removeNearestPoseKey">删除最近姿势键</button></div>
       <div class="control-button-grid"><button class="control-button" id="addAnimationEvent">加入事件标记</button><button class="control-button" id="addFootContact">加入左脚接触</button></div>
@@ -210,10 +211,11 @@ function bindClipAndTransportControls(context) {
   document.querySelector('#playAnimation')?.addEventListener('click', () => {
     const now = Date.now();
     const current = normalizeForState(context.getState());
-    const raw = computeTransportRawTime(current, now);
-    const display = computeTransportTime(current, now);
     const nextPlaying = !current.transport.playing;
-    if (nextPlaying) resetRuntimeCache({ preserveEventTime: true });
+    const start = resolveTransportPlaybackStart(current, now);
+    const raw = start.rawTime;
+    const display = start.time;
+    if (nextPlaying) resetRuntimeCache({ preserveEventTime: !start.restarted });
     transactionAnimation(context, `${nextPlaying ? '播放' : '暂停'}动画片段`, (next) => setTransport(next, {
       playing: nextPlaying,
       time: display,
@@ -748,8 +750,13 @@ function syncAnimationControlsDom(context, animation, activeClip) {
   if (status) status.textContent = runtimeStatus(activeClip, computeTransportTime(animation));
   const graphStatus = root.querySelector('#animationGraphStatus');
   if (graphStatus) {
-    graphStatus.textContent = `当前状态：${animation.graph.activeStateId}${animation.graph.transition ? `，过渡 ${animation.graph.transition.fromStateId} → ${animation.graph.transition.toStateId}` : ''}`;
+    graphStatus.textContent = graphStatusText(animation);
   }
+}
+
+function graphStatusText(animation) {
+  if (animation.graph.controlMode !== 'graph') return `手动片段预览：${getActiveClip(animation).name}`;
+  return `状态机：${animation.graph.activeStateId}${animation.graph.transition ? `，过渡 ${animation.graph.transition.fromStateId} → ${animation.graph.transition.toStateId}` : ''}`;
 }
 
 function syncSelectControl(root, selector, activeElement, value) {

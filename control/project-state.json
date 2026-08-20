@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 11,
   "projectId": "humanoid-rig-lab-next",
   "projectName": "Humanoid Rig Lab Next",
   "revision": 1,
@@ -9,6 +9,7 @@
     "skin": 3,
     "pose": 3,
     "animation": 4,
+    "clothing": 1,
     "integration": 2
   },
   "moduleUpdatedAt": {
@@ -16,6 +17,7 @@
     "skin": "2026-08-19T11:01:21.066Z",
     "pose": "2026-08-19T11:01:21.066Z",
     "animation": "2026-08-19T11:01:21.066Z",
+    "clothing": "2026-08-19T11:01:21.066Z",
     "integration": "2026-08-19T11:01:21.066Z"
   },
   "build": {
@@ -29,7 +31,10 @@
       "proportion": 2,
       "skin": 2,
       "pose": 2,
-      "animation": 2
+      "animation": 2,
+      "clothing": 1,
+      "appearance": 1,
+      "generator": 1
     }
   },
   "activeVersions": {
@@ -37,7 +42,10 @@
     "skin": "skin@0.5.1",
     "pose": "pose@0.4.0",
     "animation": "anim@0.4.0",
-    "character": "character@0.5.0"
+    "clothing": "clothing@0.1.0",
+    "appearance": "appearance@0.1.0",
+    "generator": "character-generator@0.1.0",
+    "character": "character@0.6.4"
   },
   "modules": {
     "proportion": {
@@ -117,6 +125,23 @@
         "视觉点击验收需在普通桌面 Chrome 或 Edge 完成"
       ],
       "color": "#c6a6ff"
+    },
+    "clothing": {
+      "id": "clothing",
+      "title": "人物服装",
+      "shortTitle": "服装",
+      "status": "developing",
+      "statusLabel": "静态服装阶段",
+      "progress": 35,
+      "version": "clothing@0.1.0",
+      "compatibleRig": "rig@0.4.0",
+      "currentTask": "验证上衣、裤子和鞋的 simulationRig 静态跟随、Character 附件引用与版本恢复",
+      "completed": 7,
+      "total": 20,
+      "passed": 0,
+      "failed": 0,
+      "blockers": ["布料动力学与身体碰撞属于后续阶段，当前只实现静态跟随"],
+      "color": "#d9a56f"
     }
   },
   "character": {
@@ -4003,6 +4028,317 @@
       }
     }
   },
+  "characterCore": {
+    "schema": "humanoid_rig/character_state@1.0",
+    "revision": 1,
+    "updated_at": "2026-08-19T11:01:21.066Z",
+    "active_character_id": "character_001",
+    "profiles": {
+      "character_001": {
+        "character_id": "character_001",
+        "name": "Default Character",
+        "version": 1,
+        "identity": {
+          "identity_id": null,
+          "revision": 0,
+          "tags": []
+        },
+        "body_shape": {
+          "profile_id": "body_shape_001",
+          "revision": 1
+        },
+        "face_identity": {
+          "face_id": "face_001",
+          "revision": 1
+        },
+        "clothing_attachments": [],
+        "hair": {
+          "hair_id": null,
+          "revision": 0
+        },
+        "accessory_attachments": [],
+        "proportion_revision": 3,
+        "body_shape_revision": 1,
+        "skin_revision": 3,
+        "face_revision": 1,
+        "clothing_revision": 1,
+        "hair_revision": 0,
+        "accessory_revision": 1,
+        "pose_revision": 3,
+        "animation_revision": 4
+      }
+    },
+    "versions": {
+      "character_001": [
+        {
+          "schema": "humanoid_rig/character_version@1.0",
+          "character_id": "character_001",
+          "version": 1,
+          "saved_at": "2026-08-19T11:01:21.066Z",
+          "module_revisions": {
+            "proportion_revision": 3,
+            "body_shape_revision": 1,
+            "skin_revision": 3,
+            "face_revision": 1,
+            "clothing_revision": 1,
+            "hair_revision": 0,
+            "accessory_revision": 1,
+            "pose_revision": 3,
+            "animation_revision": 4
+          },
+          "profile": {
+            "character_id": "character_001",
+            "name": "Default Character",
+            "version": 1,
+            "identity": {
+              "identity_id": null,
+              "revision": 0,
+              "tags": []
+            },
+            "body_shape": {
+              "profile_id": "body_shape_001",
+              "revision": 1
+            },
+            "face_identity": {
+              "face_id": "face_001",
+              "revision": 1
+            },
+            "clothing_attachments": [],
+            "hair": {
+              "hair_id": null,
+              "revision": 0
+            },
+            "accessory_attachments": [],
+            "proportion_revision": 3,
+            "body_shape_revision": 1,
+            "skin_revision": 3,
+            "face_revision": 1,
+            "clothing_revision": 1,
+            "hair_revision": 0,
+            "accessory_revision": 1,
+            "pose_revision": 3,
+            "animation_revision": 4
+          }
+        }
+      ]
+    }
+  },
+  "bodyShape": {
+    "schema": "humanoid_rig/body_shape_state@1.0",
+    "revision": 1,
+    "updated_at": "2026-08-19T11:01:21.066Z",
+    "active_profile_id": "body_shape_001",
+    "dirty": false,
+    "profiles": {
+      "body_shape_001": {
+        "body_shape_id": "body_shape_001",
+        "name": "Neutral Body Shape",
+        "version": 1,
+        "muscle": 0.5,
+        "fat": 0.5,
+        "shoulder_volume": 0.5,
+        "chest_volume": 0.5,
+        "waist_volume": 0.5,
+        "hip_volume": 0.5,
+        "arm_volume": 0.5,
+        "leg_volume": 0.5
+      }
+    },
+    "versions": {
+      "body_shape_001": [
+        {
+          "body_shape_id": "body_shape_001",
+          "name": "Neutral Body Shape",
+          "version": 1,
+          "muscle": 0.5,
+          "fat": 0.5,
+          "shoulder_volume": 0.5,
+          "chest_volume": 0.5,
+          "waist_volume": 0.5,
+          "hip_volume": 0.5,
+          "arm_volume": 0.5,
+          "leg_volume": 0.5
+        }
+      ]
+    },
+    "skin_response": {
+      "schema": "humanoid_rig/body_shape_skin_response@1.0",
+      "body_shape_id": "body_shape_001",
+      "body_shape_revision": 1,
+      "target": "skin.vertex_positions",
+      "method": "regional-radial-displacement-v1",
+      "preserves": ["rig", "bone_lengths", "hierarchy", "pose", "animation_tracks", "vertex_y"],
+      "writes": ["skin.vertex_positions", "skin.vertex_normals", "skin.bounds"],
+      "influences": {
+        "muscle": 0,
+        "fat": 0,
+        "shoulder_volume": 0,
+        "chest_volume": 0,
+        "waist_volume": 0,
+        "hip_volume": 0,
+        "arm_volume": 0,
+        "leg_volume": 0
+      },
+      "radial_scales": {
+        "global_x": 1,
+        "global_z": 1,
+        "shoulder": 1,
+        "chest": 1,
+        "waist": 1,
+        "hip": 1,
+        "arm": 1,
+        "leg": 1
+      }
+    }
+  },
+  "faceSystem": {
+    "schema": "humanoid_rig/face_state@1.0",
+    "revision": 1,
+    "updated_at": "2026-08-19T11:01:21.066Z",
+    "active_face_id": "face_001",
+    "dirty": false,
+    "profiles": {
+      "face_001": {
+        "face_id": "face_001",
+        "version": 1,
+        "age": 30,
+        "face_shape": { "width": 0.5, "height": 0.5, "jaw_width": 0.5, "cheekbone": 0.5 },
+        "eye_shape": { "size": 0.5, "spacing": 0.5, "tilt": 0.5 },
+        "nose_shape": { "width": 0.5, "length": 0.5, "bridge_height": 0.5 },
+        "mouth_shape": { "width": 0.5, "fullness": 0.5, "corner_curve": 0.5 },
+        "expression_profile": {
+          "profile_id": "expression_neutral",
+          "revision": 1,
+          "default_expression": "neutral"
+        }
+      }
+    },
+    "versions": {
+      "face_001": [
+        {
+          "face_id": "face_001",
+          "version": 1,
+          "age": 30,
+          "face_shape": { "width": 0.5, "height": 0.5, "jaw_width": 0.5, "cheekbone": 0.5 },
+          "eye_shape": { "size": 0.5, "spacing": 0.5, "tilt": 0.5 },
+          "nose_shape": { "width": 0.5, "length": 0.5, "bridge_height": 0.5 },
+          "mouth_shape": { "width": 0.5, "fullness": 0.5, "corner_curve": 0.5 },
+          "expression_profile": {
+            "profile_id": "expression_neutral",
+            "revision": 1,
+            "default_expression": "neutral"
+          }
+        }
+      ]
+    },
+    "runtime_descriptor": {
+      "schema": "humanoid_rig/face_runtime_descriptor@1.0",
+      "face_id": "face_001",
+      "face_revision": 1,
+      "source": "face-identity-parameters",
+      "canonical_parameters": {
+        "age": 30,
+        "face_shape": { "width": 0.5, "height": 0.5, "jaw_width": 0.5, "cheekbone": 0.5 },
+        "eye_shape": { "size": 0.5, "spacing": 0.5, "tilt": 0.5 },
+        "nose_shape": { "width": 0.5, "length": 0.5, "bridge_height": 0.5 },
+        "mouth_shape": { "width": 0.5, "fullness": 0.5, "corner_curve": 0.5 },
+        "expression_profile": {
+          "profile_id": "expression_neutral",
+          "revision": 1,
+          "default_expression": "neutral"
+        }
+      },
+      "backend_interfaces": [
+        { "backend": "FLAME", "status": "adapter-ready", "expected_output": "FLAME shape and expression coefficients" },
+        { "backend": "3DMM", "status": "adapter-ready", "expected_output": "3DMM identity and expression coefficients" },
+        { "backend": "AI_FACE_RECONSTRUCTION", "status": "adapter-ready", "expected_output": "reconstruction result reference" }
+      ],
+      "writes": ["face.identity_descriptor"],
+      "preserves": ["skin", "rig", "bone_lengths", "hierarchy", "pose", "animation_tracks"]
+    }
+  },
+  "clothingSystem": {
+    "schema": "humanoid_rig/clothing_state@1.0",
+    "revision": 1,
+    "updated_at": "2026-08-19T11:01:21.066Z",
+    "active_profile_id": "clothing_profile_001",
+    "dirty": false,
+    "profiles": {
+      "clothing_profile_001": {
+        "clothing_profile_id": "clothing_profile_001",
+        "character_id": "character_001",
+        "version": 1,
+        "assets": []
+      }
+    },
+    "versions": {
+      "clothing_profile_001": [
+        {
+          "clothing_profile_id": "clothing_profile_001",
+          "character_id": "character_001",
+          "version": 1,
+          "assets": []
+        }
+      ]
+    },
+    "runtime_descriptor": {
+      "schema": "humanoid_rig/clothing_runtime_descriptor@1.0",
+      "clothing_profile_id": "clothing_profile_001",
+      "clothing_revision": 1,
+      "phase": "static-clothing",
+      "render_stack": ["character", "body_skin", "clothing_mesh"],
+      "binding": "simulationRig",
+      "assets": [],
+      "reads": ["character.reference", "body_skin.bounds", "simulationRig.transforms"],
+      "writes": ["clothing.mesh.transforms", "clothing.mesh.material"],
+      "preserves": ["body_skin", "body_vertices", "skin_weights", "rig", "bone_lengths", "hierarchy", "pose", "animation_tracks"]
+    }
+  },
+  "appearanceSystem": {
+    "schema": "humanoid_rig/appearance_state@1.0",
+    "revision": 1,
+    "updated_at": "2026-08-19T11:01:21.066Z",
+    "character_id": "character_001",
+    "version": 1,
+    "dirty": false,
+    "active_hair_id": null,
+    "hair_profiles": {},
+    "accessories": {},
+    "versions": [
+      {
+        "schema": "humanoid_rig/appearance_version@1.0",
+        "character_id": "character_001",
+        "version": 1,
+        "saved_at": "2026-08-19T11:01:21.066Z",
+        "active_hair_id": null,
+        "hair_profiles": {},
+        "accessories": {}
+      }
+    ],
+    "runtime_descriptor": {
+      "schema": "humanoid_rig/appearance_runtime_descriptor@1.0",
+      "character_id": "character_001",
+      "appearance_version": 1,
+      "phase": "static-attachments",
+      "render_stack": ["character", "body_skin", "clothing_mesh", "appearance_attachments"],
+      "binding": "simulationRig",
+      "hair": null,
+      "accessories": [],
+      "simulation": { "hair": false, "cloth": false, "gpu_hair": false },
+      "reads": ["character.reference", "simulationRig.transforms"],
+      "writes": ["appearance.mesh.transforms", "appearance.mesh.material"],
+      "preserves": ["body_skin", "body_vertices", "skin_weights", "clothing", "rig", "bone_lengths", "hierarchy", "pose", "animation_tracks"]
+    }
+  },
+  "characterGenerator": {
+    "schema": "humanoid_rig/character_generator_state@1.0",
+    "revision": 1,
+    "updated_at": "2026-08-19T11:01:21.066Z",
+    "active_session_id": null,
+    "sessions": {},
+    "versions": {}
+  },
+  "operationEvents": [],
   "collaboration": {
     "onlineWindows": 1,
     "lastWriter": "initial-state",
@@ -4011,6 +4347,7 @@
       "skin": null,
       "pose": null,
       "animation": null,
+      "clothing": null,
       "integration": null
     },
     "lock": null

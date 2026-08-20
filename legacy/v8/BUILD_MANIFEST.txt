@@ -1,7 +1,7 @@
-Humanoid Rig Lab V8.4 3D Proportion Viewport
-Version: 0.8.4
+Humanoid Rig Lab V8.5 Full Performance Viewport
+Version: 0.8.5
 Parent platform: Humanoid Rig Lab Next 0.5.0
-Rig schema: 6
+Rig schema: 7
 Three.js: 0.185.1
 
 Core modules
@@ -14,6 +14,15 @@ Core modules
 - src/three-view.js
 - src/svg-view.js
 - src/smpl-skin.js
+
+Performance rig
+- performance89@1 / native rig@0.6.0 / compatibility base rig@0.4.0
+- 28 core nodes preserved in place
+- 8 twist joints, 12 production controls, 6 contact markers, 2 shoulder correctives
+- 30 VRM-compatible finger joints, 2 eyes and 1 jaw
+- 18 semantic retarget chains
+- core / production / performance viewport detail modes
+- SMPL surface remains bound to the original 24-bone palette
 
 BodyProfile support
 - profile smpl-male-surface-fit-1796-v3
@@ -34,6 +43,7 @@ Shoulder semantics
 Host bridge
 - HRL_HOST_STATE
 - HRL_PREVIEW_BODY_PROFILE
+- HRL_ANIMATION_FRAME
 - HRL_PROFILE_STATUS
 - HRL_RENDERER_STATUS
 - HRL_POSE_COMMIT

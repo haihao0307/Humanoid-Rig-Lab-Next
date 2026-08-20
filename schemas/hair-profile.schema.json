@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/hair_profile@1.0",
+  "title": "Humanoid Rig Lab HairProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["hair_id", "revision", "name", "style", "rig_profile", "material", "transform"],
+  "properties": {
+    "hair_id": { "$ref": "#/$defs/id" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "style": { "enum": ["short", "long", "ponytail"] },
+    "rig_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "attachment_points"],
+      "properties": {
+        "target": { "const": "simulationRig" },
+        "attachment_points": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "material": { "$ref": "#/$defs/material" },
+    "transform": { "$ref": "#/$defs/transform" }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "unit": { "type": "number", "minimum": 0, "maximum": 1 },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_color", "roughness", "metalness", "opacity"],
+      "properties": {
+        "base_color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "roughness": { "$ref": "#/$defs/unit" },
+        "metalness": { "$ref": "#/$defs/unit" },
+        "opacity": { "$ref": "#/$defs/unit" }
+      }
+    },
+    "transform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["offset", "rotation", "scale"],
+      "properties": {
+        "offset": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+        "rotation": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "number" } },
+        "scale": { "type": "number", "minimum": 0.25, "maximum": 4 }
+      }
+    }
+  }
+}

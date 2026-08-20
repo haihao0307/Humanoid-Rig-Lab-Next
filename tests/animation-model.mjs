@@ -17,11 +17,13 @@ import {
   moveTrackKeyframes,
   normalizeAnimationState,
   removeNearestPoseSnapshotKey,
+  resolveTransportPlaybackStart,
   resolveClipPhase,
   resolveClipTime,
   sampleAnimationClip,
   samplePoseSnapshotClip,
   serializeMotionClip,
+  setActiveClip,
   setAnimationLayer,
   setTransport,
   upsertTrackKeyframe,
@@ -267,6 +269,29 @@ assert.equal(computeTransportTime(transportState, 2000), 0.25);
 transportState = setTransport(transportState, { playing: false }, 2250);
 assert.equal(transportState.transport.playing, false);
 assert.equal(transportState.playing, false);
+
+let oneShot = setActiveClip(migrated, 'squat');
+assert.equal(oneShot.graph.controlMode, 'clip');
+assert.equal(oneShot.graph.activeStateId, 'idle', 'manual clip selection must not overwrite the state-machine state');
+assert.equal(oneShot.transport.loop, false);
+oneShot = setTransport(oneShot, {
+  playing: false,
+  time: getActiveClip(oneShot).duration,
+  anchorRawTime: getActiveClip(oneShot).duration,
+});
+assert.deepEqual(resolveTransportPlaybackStart(oneShot), { time: 0, rawTime: 0, restarted: true });
+oneShot = setTransport(oneShot, {
+  speed: -1,
+  time: 0,
+  anchorRawTime: 0,
+});
+assert.deepEqual(resolveTransportPlaybackStart(oneShot), {
+  time: getActiveClip(oneShot).duration,
+  rawTime: getActiveClip(oneShot).duration,
+  restarted: true,
+});
+const zeroSpeed = setTransport(oneShot, { speed: 0, time: 0.4, anchorRawTime: 0.4 });
+assert.equal(zeroSpeed.transport.speed, 0, 'the visible zero-speed control value must not normalize back to 1');
 
 const layered = setAnimationLayer(migrated, 'upper-body', { enabled: true, weight: 0.75, clipId: 'wave' });
 assert.equal(layered.layers.find((layer) => layer.layerId === 'upper-body').weight, 0.75);

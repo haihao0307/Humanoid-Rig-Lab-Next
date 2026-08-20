@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/character_profile@1.4",
+  "title": "Humanoid Rig Lab CharacterProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "character_id",
+    "name",
+    "version",
+    "identity",
+    "body_shape",
+    "face_identity",
+    "clothing_attachments",
+    "hair",
+    "accessory_attachments",
+    "proportion_revision",
+    "body_shape_revision",
+    "skin_revision",
+    "face_revision",
+    "clothing_revision",
+    "hair_revision",
+    "accessory_revision",
+    "pose_revision",
+    "animation_revision"
+  ],
+  "properties": {
+    "character_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "integer", "minimum": 1 },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity_id", "revision", "tags"],
+      "properties": {
+        "identity_id": { "type": ["string", "null"] },
+        "revision": { "type": "integer", "minimum": 0 },
+        "tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "body_shape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile_id", "revision"],
+      "properties": {
+        "profile_id": { "type": ["string", "null"] },
+        "revision": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "face_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["face_id", "revision"],
+      "properties": {
+        "face_id": { "type": ["string", "null"] },
+        "revision": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "clothing_attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["clothing_id", "revision"],
+        "properties": {
+          "clothing_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+          },
+          "revision": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "hair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hair_id", "revision"],
+      "properties": {
+        "hair_id": {
+          "type": ["string", "null"],
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "revision": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "accessory_attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["accessory_id", "revision"],
+        "properties": {
+          "accessory_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+          },
+          "revision": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "proportion_revision": { "$ref": "#/$defs/revision" },
+    "body_shape_revision": { "$ref": "#/$defs/revision" },
+    "skin_revision": { "$ref": "#/$defs/revision" },
+    "face_revision": { "$ref": "#/$defs/revision" },
+    "clothing_revision": { "$ref": "#/$defs/revision" },
+    "hair_revision": { "$ref": "#/$defs/revision" },
+    "accessory_revision": { "$ref": "#/$defs/revision" },
+    "pose_revision": { "$ref": "#/$defs/revision" },
+    "animation_revision": { "$ref": "#/$defs/revision" }
+  },
+  "$defs": {
+    "revision": { "type": "integer", "minimum": 0 }
+  }
+}

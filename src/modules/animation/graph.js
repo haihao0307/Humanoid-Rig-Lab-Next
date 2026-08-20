@@ -23,6 +23,7 @@ export function evaluateAnimationGraph(animationInput, {
     consumedTriggers: [],
   };
   if (!activeState) return result;
+  if (graph.controlMode !== 'graph') return result;
 
   if (graph.transition) {
     const elapsed = Math.max(0, Number(nowMs) - graph.transition.startedAt) / 1000;

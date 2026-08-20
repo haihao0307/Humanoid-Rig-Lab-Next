@@ -49,7 +49,10 @@ const [
   readFile(new URL('assets/smpl/ATTRIBUTION.md', root), 'utf8'),
 ]);
 
-assert.match(html, /SMPL 24 标准/);
+assert.match(html, /SMPL 核心兼容 · 全表现层已展开/);
+assert.match(html, /89 节点全表现架构/);
+assert.match(html, /id="skeleton-detail"/);
+assert.match(html, /class="rig-visual-legend"/);
 assert.match(html, /Meshcapade 公开的 CC BY 4\.0/);
 assert.match(html, /id="import-input"/);
 assert.match(html, /导入姿势 JSON/);
@@ -82,7 +85,7 @@ assert.doesNotMatch(html, /<input[^>]+id="selected-bone-length"/);
 assert.match(html, /window\.location\.protocol !== 'file:'/);
 assert.doesNotMatch(html, /type="importmap"/);
 
-assert.match(main, /humanoid-skeleton-editor:v8\.4-3d-proportion/);
+assert.match(main, /humanoid-skeleton-editor:v8\.5-performance-rig/);
 assert.match(main, /HOST_PROTOCOL = 'humanoid-rig-lab-next:viewport'/);
 assert.match(main, /HRL_EMBED_READY/);
 assert.match(main, /HRL_HOST_STATE/);
@@ -124,6 +127,11 @@ assert.match(threeView, /visualJoint !== false/);
 assert.match(threeView, /startFreeDrag/);
 assert.match(threeView, /getPickTargets/);
 assert.match(threeView, /resolvePick/);
+assert.match(threeView, /setSkeletonDetail\(mode\)/);
+assert.match(threeView, /jointTwist/);
+assert.match(threeView, /jointControl/);
+assert.match(threeView, /jointCorrective/);
+assert.match(threeView, /selectionHalo/);
 
 assert.match(skinSource, /from '\.\/glb-geometry\.js'/);
 assert.doesNotMatch(skinSource, /new this\.THREE\.SkinnedMesh/);
@@ -187,7 +195,7 @@ assert.match(runtimeInstaller, /cdn\.jsdelivr\.net/);
 assert.match(runtimeInstaller, /unpkg\.com/);
 assert.match(runtimeInstaller, /three\.webgpu\.js/);
 assert.match(runtimeInstaller, /three\.core\.js/);
-assert.match(packageText, /"version": "0\.8\.4"/);
+assert.match(packageText, /"version": "0\.8\.5"/);
 assert.match(packageText, /"three": "0\.185\.1"/);
 assert.match(nodeServer, /'\.glb', 'model\/gltf-binary'/);
 assert.match(powershellServer, /'\.glb'\s*=\s*'model\/gltf-binary'/);
@@ -227,7 +235,7 @@ assert.equal(JSON.stringify(definition.joints.map((joint) => [
 ])), bindCanonical);
 
 const exported = buildExportPayload(definition);
-assert.equal(exported.schemaVersion, 6);
+assert.equal(exported.schemaVersion, 7);
 assert.equal(exported.standard.jointLayout, 'SMPL 24');
 assert.equal(exported.surface.asset, 'assets/smpl/smpl-male-surface.glb');
 assert.equal(exported.joints.filter((joint) => joint.standard?.family === 'SMPL').length, 24);
@@ -243,4 +251,4 @@ for (const joint of newDefinition.joints) {
 }
 assert.notEqual(canonicalDefinition(newDefinition), canonicalDefinition(createStandardHumanoidPreset('A')));
 
-console.log('V8.4 single detailed surface, anatomical fit, host bridge, direct body picking, launchers, and integration checks passed.');
+console.log('V8.5 89-node performance rig, layered skeleton visuals, single detailed surface, anatomical fit, host bridge, launchers, and integration checks passed.');

@@ -4,29 +4,36 @@
   "project": "Humanoid Rig Lab Next",
   "version": "0.5.0",
   "date": "2026-08-19",
-  "projectSchema": 5,
-  "rigExportSchema": 6,
+  "projectSchema": 11,
+  "rigExportSchema": 7,
   "threeVersion": "0.185.1",
-  "embeddedEditor": "V8.4 / 0.8.4",
+  "embeddedEditor": "V8.5 / 0.8.5",
   "activeVersions": {
     "rig": "rig@0.4.0",
     "skin": "skin@0.5.1",
     "pose": "pose@0.4.0",
     "animation": "anim@0.4.0",
-    "character": "character@0.5.0"
+    "clothing": "clothing@0.1.0",
+    "appearance": "appearance@0.1.0",
+    "generator": "character-generator@0.1.0",
+    "character": "character@0.6.4"
   },
   "moduleRevisions": {
     "proportion": 3,
     "skin": 3,
     "pose": 3,
     "animation": 4,
+    "clothing": 1,
     "integration": 2
   },
   "moduleDeliveries": {
     "proportion": "v002",
     "skin": "v002",
     "pose": "v002",
-    "animation": "v002-complete"
+    "animation": "v002-complete",
+    "clothing": "static-v1",
+    "appearance": "static-attachments-v1",
+    "generator": "image-to-character-phase-1"
   },
   "skinRuntime": {
     "buildId": "skin-v002-single-surface-guard",
@@ -39,5 +46,49 @@
     "viewportPriority": "local-quaternion-pose-snapshot",
     "legacyFallback": "v8-world-position@1"
   },
-  "transientBus": "humanoid_rig/transient_bus@1.0"
+  "transientBus": "humanoid_rig/transient_bus@1.0",
+  "characterCore": {
+    "profileSchema": "humanoid_rig/character_profile@1.4",
+    "stateSchema": "humanoid_rig/character_state@1.0",
+    "operationEventSchema": "humanoid_rig/operation_event@1.0"
+  },
+  "bodyShape": {
+    "profileSchema": "humanoid_rig/body_shape_profile@1.0",
+    "stateSchema": "humanoid_rig/body_shape_state@1.0",
+    "skinResponseSchema": "humanoid_rig/body_shape_skin_response@1.0",
+    "runtime": "regional-radial-displacement-v1"
+  },
+  "faceSystem": {
+    "profileSchema": "humanoid_rig/face_profile@1.0",
+    "stateSchema": "humanoid_rig/face_state@1.0",
+    "runtimeDescriptorSchema": "humanoid_rig/face_runtime_descriptor@1.0",
+    "futureAdapters": ["FLAME", "3DMM", "AI_FACE_RECONSTRUCTION"]
+  },
+  "clothingSystem": {
+    "profileSchema": "humanoid_rig/clothing_profile@1.0",
+    "stateSchema": "humanoid_rig/clothing_state@1.0",
+    "runtimeDescriptorSchema": "humanoid_rig/clothing_runtime_descriptor@1.0",
+    "binding": "simulationRig",
+    "phase": "static-clothing",
+    "types": ["top", "pants", "shoes"]
+  },
+  "appearanceSystem": {
+    "hairProfileSchema": "humanoid_rig/hair_profile@1.0",
+    "accessoryProfileSchema": "humanoid_rig/accessory_profile@1.0",
+    "stateSchema": "humanoid_rig/appearance_state@1.0",
+    "runtimeDescriptorSchema": "humanoid_rig/appearance_runtime_descriptor@1.0",
+    "binding": "simulationRig",
+    "phase": "static-attachments",
+    "hairStyles": ["short", "long", "ponytail"],
+    "accessoryTypes": ["hat", "glasses", "ornament"],
+    "simulation": { "hair": false, "cloth": false, "gpuHair": false }
+  },
+  "characterGenerator": {
+    "analysisSchema": "humanoid_rig/character_image_analysis@1.0",
+    "sessionSchema": "humanoid_rig/character_generator_session@1.0",
+    "stateSchema": "humanoid_rig/character_generator_state@1.0",
+    "version": "character-generator@0.1.0",
+    "adapters": ["HRL-M01", "HRL-M03", "Character Core"],
+    "phase": "image-to-character-data"
+  }
 }

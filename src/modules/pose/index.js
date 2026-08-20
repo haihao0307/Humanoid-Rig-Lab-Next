@@ -37,11 +37,11 @@ export function renderControls(context, state) {
       ${toggleControl('rightFootPin', '固定右脚', pinned.includes('rightFoot'))}
       ${toggleControl('jointLimits', '人体关节限制', physics.jointLimits)}
       ${toggleControl('groundEnabled', '地面碰撞', physics.groundEnabled)}
-      <p class="control-note">脚部固定会同步写入现有 V8.4 世界坐标姿势。全身联动、阻尼、关节限制和地面碰撞已经进入共享动作状态，嵌入式求解器参数桥接仍需总控接线。</p>`) +
+      <p class="control-note">脚部固定会同步写入现有 V8.5 世界坐标和局部四元数姿势。全身联动、阻尼、关节限制和地面碰撞已经进入共享动作状态。</p>`) +
     controlSection('姿势数据协议', `
       <div class="toggle-row"><span>当前输出</span><b style="font-size:9px">${escapeHtml(contract.statusLabel)}</b></div>
       <p class="control-note">${escapeHtml(contract.detail)}</p>`) +
-    controlSection('操作说明', `<p class="control-note">在中央统一三维人物上直接拖动表皮、关节或骨杆。松开鼠标后，动作模块 revision 会独立增加，并同步到其他工作台。</p><div class="control-button-grid"><button class="control-button" id="openLegacyPose">打开 V8.4 全屏物理编辑器</button><button class="control-button" id="exportPose">导出当前动作</button></div>`);
+    controlSection('操作说明', `<p class="control-note">在中央统一三维人物上直接拖动表皮、关节或骨杆。松开鼠标后，动作模块 revision 会独立增加，并同步到其他工作台。</p><div class="control-button-grid"><button class="control-button" id="openLegacyPose">打开 V8.5 全屏物理编辑器</button><button class="control-button" id="exportPose">导出当前动作</button></div>`);
 
   document.querySelectorAll('[data-pose]').forEach((button) => button.addEventListener('click', () => {
     const preset = posePreset(button.dataset.pose);
@@ -138,7 +138,7 @@ export function publishData(state, version) {
   if (contract.status !== 'canonical') {
     state.modules.pose.status = 'developing';
     state.modules.pose.statusLabel = '桥接待完成';
-    state.modules.pose.currentTask = '将 V8.4 局部四元数 PoseSnapshot 接入主平台 v8Payload 与物理参数桥接';
+    state.modules.pose.currentTask = '验收 V8.5 的 89 节点局部四元数姿势与物理参数桥接';
     state.modules.pose.blockers = [...new Set([
       ...(state.modules.pose.blockers ?? []),
       '主平台仍接收旧版世界坐标姿势，需由总控窗口修改只读桥接文件',

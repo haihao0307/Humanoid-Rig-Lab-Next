@@ -1,3 +1,11 @@
+import {
+  BODY_PRODUCTION_NODE_DEFINITIONS,
+  FULL_PERFORMANCE_NODE_DEFINITIONS,
+  HUMANOID_RETARGET_CHAINS,
+  OPTIONAL_BODY_CORRECTIVE_NODE_DEFINITIONS,
+  PRODUCTION_RIG_BLUEPRINT,
+} from '../../../src/modules/proportion/rig-system.js';
+
 const STANDARD_STATURE = 1.795672;
 
 const SMPL_SOURCE = Object.freeze({
@@ -43,7 +51,7 @@ export const JOINT_EXPORT_POLICIES = Object.freeze({
   OPTIONAL: 'optional',
 });
 
-export const CURRENT_RIG_PROFILE = deepFreeze({
+export const COMPATIBILITY_CORE_RIG_PROFILE = deepFreeze({
   id: 'smpl24-controls28@1',
   compatibleRig: 'rig@0.4.0',
   maturity: 'compatibility-core',
@@ -80,9 +88,52 @@ export const CURRENT_RIG_PROFILE = deepFreeze({
   },
 });
 
+export const CURRENT_RIG_PROFILE = deepFreeze({
+  id: 'performance89@1',
+  nativeRig: 'rig@0.6.0',
+  compatibleRig: 'rig@0.4.0',
+  compatibilityBase: COMPATIBILITY_CORE_RIG_PROFILE.id,
+  maturity: 'full-performance-editor',
+  roleSchema: 'humanoid_rig/joint_roles@1.0',
+  axisSchema: 'humanoid_rig/joint_axes@1.0',
+  topologyPolicy: 'append-only',
+  localAxisStatus: 'declared-runtime-ready',
+  twistDataStatus: 'derived-position-and-animation-track-ready',
+  productionReady: true,
+  skinBindingStatus: 'core-smpl24-bound; additive deformation weights pending',
+  expectedCounts: {
+    total: 89,
+    deform: 65,
+    control: 13,
+    marker: 9,
+    corrective: 2,
+    socket: 0,
+  },
+  roleIds: {
+    control: ['root', ...PRODUCTION_RIG_BLUEPRINT.bodyProduction.additiveControls],
+    marker: ['headTop', 'leftToesEnd', 'rightToesEnd', ...PRODUCTION_RIG_BLUEPRINT.bodyProduction.additiveContactMarkers],
+    corrective: [...PRODUCTION_RIG_BLUEPRINT.bodyProduction.optionalCorrectiveJoints],
+    hiddenDeform: ['leftShoulder', 'rightShoulder'],
+  },
+  visibilityPolicy: {
+    defaultHiddenJointIds: ['root', 'headTop', 'leftShoulder', 'rightShoulder', 'leftToesEnd', 'rightToesEnd'],
+    detailModes: ['core', 'production', 'performance'],
+    defaultDetailMode: 'performance',
+    clavicleBonesVisibleWithJointHandlesHidden: true,
+  },
+  retargeting: {
+    schema: 'humanoid_rig/retarget_chains@1.0',
+    strategy: 'chain-based-with-optional-joints',
+    chains: HUMANOID_RETARGET_CHAINS,
+    ikGoals: PRODUCTION_RIG_BLUEPRINT.ikGoals,
+  },
+});
+
 const DEFAULT_META = {
-  schemaVersion: 6,
-  name: 'SMPL-Compatible Adult Humanoid 3D Proportion Rig',
+  schemaVersion: 7,
+  name: 'SMPL-Compatible Full Performance Humanoid Rig',
+  rigVersion: CURRENT_RIG_PROFILE.nativeRig,
+  compatibilityBase: CURRENT_RIG_PROFILE.compatibleRig,
   unit: 'meter',
   dimensionsLocked: true,
   rigProfile: cloneValue(CURRENT_RIG_PROFILE),
@@ -195,17 +246,22 @@ const joint = (
     standardIndex = null,
     standardName = null,
     standardHelper = false,
+    standardFamily = null,
     role = null,
+    rigTier = 'core',
+    visualShape = 'joint',
     visibilityLayer = null,
     deformInfluence = null,
     solverParticipation = null,
     collisionRole = null,
     retargetSemantic = null,
     exportPolicy = null,
+    placement = null,
+    driver = null,
   } = {},
 ) => {
   const standard = {
-    family: standardHelper ? 'editor-helper' : 'SMPL',
+    family: standardFamily ?? (standardHelper ? 'editor-helper' : 'SMPL'),
     index: Number.isInteger(standardIndex) ? standardIndex : null,
     name: standardName ?? id,
     helper: Boolean(standardHelper),
@@ -230,6 +286,8 @@ const joint = (
     jointType,
     limitLabel,
     role: resolvedRole,
+    rigTier,
+    visualShape,
     visibilityLayer: visibilityLayer ?? inferVisibilityLayer(resolvedRole, visualJoint),
     deformInfluence: deformInfluence == null
       ? resolvedRole === JOINT_ROLES.DEFORM || resolvedRole === JOINT_ROLES.CORRECTIVE
@@ -238,6 +296,8 @@ const joint = (
     collisionRole: collisionRole ?? inferCollisionRole(id, category, resolvedRole),
     retargetSemantic: retargetSemantic ?? standard.name,
     exportPolicy: exportPolicy ?? inferExportPolicy(resolvedRole),
+    placement: placement ? cloneValue(placement) : null,
+    driver: driver ? cloneValue(driver) : null,
     standard,
   };
 };
@@ -250,7 +310,7 @@ const joint = (
 export function createStandardHumanoidPreset(pose = 'A') {
   const normalizedPose = String(pose).toUpperCase() === 'T' ? 'T' : 'A';
 
-  const joints = [
+  const coreJoints = [
     joint('root', '全身根控制', null, [0, 0, 0], {
       category: 'root',
       jointRadius: 0.022,
@@ -547,6 +607,11 @@ export function createStandardHumanoidPreset(pose = 'A') {
     }),
   ];
 
+  const joints = [
+    ...coreJoints,
+    ...createPerformanceExtensionJoints(coreJoints),
+  ];
+
   const definition = {
     ...cloneValue(DEFAULT_META),
     pose: normalizedPose,
@@ -559,6 +624,169 @@ export function createStandardHumanoidPreset(pose = 'A') {
 
   applyPosePresetToDefinition(definition, normalizedPose);
   return definition;
+}
+
+function createPerformanceExtensionJoints(coreJoints) {
+  const allJoints = [...coreJoints];
+  const byId = new Map(allJoints.map((item) => [item.id, item]));
+  const world = calculateWorldFromLocals(allJoints);
+  const specifications = [
+    ...BODY_PRODUCTION_NODE_DEFINITIONS,
+    ...OPTIONAL_BODY_CORRECTIVE_NODE_DEFINITIONS,
+    ...FULL_PERFORMANCE_NODE_DEFINITIONS,
+  ];
+  const extensions = [];
+
+  for (const spec of specifications) {
+    const localPosition = resolveExtensionLocalPosition(spec, byId, world);
+    const isControl = spec.role === JOINT_ROLES.CONTROL || spec.isControl === true;
+    const isMarker = spec.role === JOINT_ROLES.MARKER;
+    const isFinger = spec.category === 'hand';
+    const isFace = spec.category === 'face';
+    const isTwist = spec.visualShape === 'twist';
+    const isCorrective = spec.role === JOINT_ROLES.CORRECTIVE;
+    const item = joint(spec.id, spec.label ?? spec.id, spec.parentId, localPosition, {
+      side: spec.side ?? 'center',
+      category: spec.category ?? 'body',
+      jointRadius: isControl ? 0.030 : isMarker ? 0.013 : isFinger ? 0.010 : isFace ? 0.014 : 0.015,
+      boneRadius: isFinger ? 0.0055 : isFace ? 0.0065 : isTwist || isCorrective ? 0.0075 : 0.010,
+      visualJoint: true,
+      visualBone: !isControl && !isMarker,
+      physicalBone: spec.physicalBone !== false,
+      isControl,
+      followJointId: spec.followJointId ?? null,
+      controlOffset: spec.controlOffset ?? null,
+      jointType: extensionJointType(spec),
+      limitLabel: extensionLimitLabel(spec),
+      standardFamily: isControl || isMarker ? 'editor-helper' : 'HumanoidExtension',
+      standardHelper: isControl || isMarker,
+      standardName: spec.retargetSemantic ?? spec.id,
+      role: spec.role,
+      rigTier: spec.rigTier ?? 'full-performance',
+      visualShape: spec.visualShape ?? 'joint',
+      visibilityLayer: spec.visibilityLayer,
+      deformInfluence: spec.deformInfluence,
+      solverParticipation: spec.solverParticipation,
+      collisionRole: spec.collisionRole,
+      retargetSemantic: spec.retargetSemantic ?? spec.id,
+      exportPolicy: spec.exportPolicy,
+      placement: spec.placement,
+      driver: spec.driver,
+    });
+    extensions.push(item);
+    allJoints.push(item);
+    byId.set(item.id, item);
+    const parentPoint = item.parentId ? world.get(item.parentId) : [0, 0, 0];
+    world.set(item.id, [
+      (parentPoint?.[0] ?? 0) + item.localPosition[0],
+      (parentPoint?.[1] ?? 0) + item.localPosition[1],
+      (parentPoint?.[2] ?? 0) + item.localPosition[2],
+    ]);
+  }
+
+  return extensions;
+}
+
+function resolveExtensionLocalPosition(spec, byId, world) {
+  const parentPoint = world.get(spec.parentId) ?? [0, 0, 0];
+  const placement = spec.placement ?? {};
+
+  if (placement.mode === 'segment-fraction' || placement.mode === 'shoulder-girdle-blend') {
+    const start = world.get(placement.startJointId ?? placement.sourceJointId ?? spec.parentId) ?? parentPoint;
+    const end = world.get(placement.endJointId) ?? start;
+    const fraction = clampNumber(placement.fraction, 0, 1, 0.5);
+    return subtract3(lerp3(start, end, fraction), parentPoint);
+  }
+
+  if (placement.mode === 'hand-ray-root' || placement.mode === 'finger-chain-segment') {
+    return resolveFingerLocalPosition(spec, byId);
+  }
+
+  if (placement.mode === 'surface-anatomical-landmark') {
+    const landmarkOffsets = {
+      'left-eye-center': [-0.031, 0.035, 0.083],
+      'right-eye-center': [0.031, 0.035, 0.083],
+      'jaw-hinge-center': [0, -0.058, 0.066],
+    };
+    return [...(landmarkOffsets[placement.landmark] ?? [0, 0, 0.04])];
+  }
+
+  const sourcePoint = world.get(placement.sourceJointId ?? spec.followJointId ?? spec.parentId) ?? parentPoint;
+  const offset = normalizePositionOrNull(placement.offset ?? spec.controlOffset) ?? [0, 0, 0];
+  return subtract3(add3(sourcePoint, offset), parentPoint);
+}
+
+function resolveFingerLocalPosition(spec, byId) {
+  const placement = spec.placement ?? {};
+  const side = placement.side === 'right' ? 'right' : 'left';
+  const sign = side === 'left' ? -1 : 1;
+  const finger = placement.finger ?? 'middle';
+  const segment = Number(placement.segment) || 0;
+  const length = Math.max(0.008, Number(placement.length) || 0.025);
+
+  if (segment === 0) {
+    const palm = byId.get(`${side}HandEnd`)?.localPosition ?? [sign * 0.028, -0.060, 0.025];
+    const spread = {
+      thumb: [sign * 0.024, 0.008, 0.020],
+      index: [sign * 0.008, -0.002, 0.019],
+      middle: [0, -0.006, 0.008],
+      ring: [-sign * 0.004, -0.008, -0.004],
+      little: [-sign * 0.009, -0.010, -0.015],
+    }[finger] ?? [0, 0, 0];
+    return [
+      palm[0] * 0.86 + spread[0],
+      palm[1] * 0.86 + spread[1],
+      palm[2] * 0.86 + spread[2],
+    ];
+  }
+
+  const direction = {
+    thumb: [sign * 0.58, -0.64, 0.50],
+    index: [sign * 0.31, -0.86, 0.40],
+    middle: [sign * 0.27, -0.89, 0.36],
+    ring: [sign * 0.23, -0.91, 0.34],
+    little: [sign * 0.18, -0.93, 0.31],
+  }[finger] ?? [sign * 0.25, -0.90, 0.35];
+  const normalized = normalize3(direction);
+  return normalized.map((value) => value * length);
+}
+
+function extensionJointType(spec) {
+  if (spec.role === JOINT_ROLES.CONTROL) return 'control';
+  if (spec.role === JOINT_ROLES.MARKER) return 'marker';
+  if (spec.visualShape === 'twist') return 'twist';
+  if (spec.role === JOINT_ROLES.CORRECTIVE) return 'corrective';
+  if (spec.category === 'hand') return /Thumb/.test(spec.id) ? 'thumb' : 'finger-hinge';
+  if (spec.id === 'jaw') return 'jaw-hinge';
+  if (/Eye$/.test(spec.id)) return 'eye-ball';
+  return 'free';
+}
+
+function extensionLimitLabel(spec) {
+  if (spec.role === JOINT_ROLES.CONTROL) return '动画控制器，不参与蒙皮骨长约束';
+  if (spec.role === JOINT_ROLES.MARKER) return '接触与抓握测量点';
+  if (spec.visualShape === 'twist') return '沿骨段轴向分配旋转';
+  if (spec.role === JOINT_ROLES.CORRECTIVE) return '肩带联动校正';
+  if (spec.category === 'hand') return '手指屈伸与张合关节';
+  if (spec.id === 'jaw') return '下颌开合关节';
+  if (/Eye$/.test(spec.id)) return '眼球视线关节';
+  return '扩展表现关节';
+}
+
+function add3(left, right) {
+  return [left[0] + right[0], left[1] + right[1], left[2] + right[2]];
+}
+
+function subtract3(left, right) {
+  return [left[0] - right[0], left[1] - right[1], left[2] - right[2]];
+}
+
+function lerp3(start, end, amount) {
+  return [
+    start[0] + (end[0] - start[0]) * amount,
+    start[1] + (end[1] - start[1]) * amount,
+    start[2] + (end[2] - start[2]) * amount,
+  ];
 }
 
 export function applyPosePresetToDefinition(definition, pose = 'A') {
@@ -577,9 +805,80 @@ export function applyPosePresetToDefinition(definition, pose = 'A') {
     poseArmChain(definition, 'right', [1, 0, 0]);
   }
 
+  synchronizeAuxiliaryPresetPose(definition);
+
   definition.pose = normalizedPose;
   definition.updatedAt = new Date().toISOString();
   return definition;
+}
+
+function synchronizeAuxiliaryPresetPose(definition) {
+  const byId = new Map(definition.joints.map((item) => [item.id, item]));
+  const getPose = (id) => byId.get(id)?.poseWorldPosition ?? [0, 0, 0];
+  const handRotations = new Map();
+  for (const side of ['left', 'right']) {
+    const wrist = getPose(`${side}Hand`);
+    const palm = getPose(`${side}HandEnd`);
+    const bindDirection = byId.get(`${side}HandEnd`)?.localPosition ?? [side === 'left' ? -1 : 1, 0, 0];
+    handRotations.set(side, rotationBetween3(bindDirection, subtract3(palm, wrist)));
+  }
+
+  for (const item of definition.joints) {
+    if (item.rigTier === 'core') continue;
+    const placement = item.placement ?? {};
+    if (placement.mode === 'segment-fraction' || placement.mode === 'shoulder-girdle-blend') {
+      const start = getPose(placement.startJointId ?? placement.sourceJointId ?? item.parentId);
+      const end = getPose(placement.endJointId);
+      item.poseWorldPosition = lerp3(start, end, clampNumber(placement.fraction, 0, 1, 0.5));
+      continue;
+    }
+    if (item.category === 'hand') {
+      const parent = getPose(item.parentId);
+      const rotation = handRotations.get(item.side);
+      item.poseWorldPosition = add3(parent, rotate3(item.localPosition, rotation));
+      continue;
+    }
+    if (item.followJointId) {
+      item.poseWorldPosition = add3(getPose(item.followJointId), item.controlOffset ?? [0, 0, 0]);
+      continue;
+    }
+    item.poseWorldPosition = add3(getPose(item.parentId), item.localPosition);
+  }
+}
+
+function rotationBetween3(fromValue, toValue) {
+  const from = normalize3(fromValue);
+  const to = normalize3(toValue);
+  const dot = Math.max(-1, Math.min(1, from[0] * to[0] + from[1] * to[1] + from[2] * to[2]));
+  const axis = cross3(from, to);
+  const axisLength = Math.hypot(...axis);
+  if (axisLength < 1e-8) {
+    if (dot > 0) return { axis: [1, 0, 0], angle: 0 };
+    const fallback = Math.abs(from[0]) < 0.8 ? cross3(from, [1, 0, 0]) : cross3(from, [0, 1, 0]);
+    return { axis: normalize3(fallback), angle: Math.PI };
+  }
+  return { axis: axis.map((value) => value / axisLength), angle: Math.acos(dot) };
+}
+
+function rotate3(vector, rotation) {
+  if (!rotation || Math.abs(rotation.angle) < 1e-10) return [...vector];
+  const [x, y, z] = rotation.axis;
+  const cosine = Math.cos(rotation.angle);
+  const sine = Math.sin(rotation.angle);
+  const dot = vector[0] * x + vector[1] * y + vector[2] * z;
+  return [
+    vector[0] * cosine + (y * vector[2] - z * vector[1]) * sine + x * dot * (1 - cosine),
+    vector[1] * cosine + (z * vector[0] - x * vector[2]) * sine + y * dot * (1 - cosine),
+    vector[2] * cosine + (x * vector[1] - y * vector[0]) * sine + z * dot * (1 - cosine),
+  ];
+}
+
+function cross3(left, right) {
+  return [
+    left[1] * right[2] - left[2] * right[1],
+    left[2] * right[0] - left[0] * right[2],
+    left[0] * right[1] - left[1] * right[0],
+  ];
 }
 
 function poseArmChain(definition, side, direction) {
@@ -613,7 +912,7 @@ function poseArmChain(definition, side, direction) {
   }
 }
 
-export const MIRROR_PAIRS = Object.freeze({
+const CORE_MIRROR_PAIRS = {
   leftShoulder: 'rightShoulder',
   rightShoulder: 'leftShoulder',
   leftUpperArm: 'rightUpperArm',
@@ -634,6 +933,24 @@ export const MIRROR_PAIRS = Object.freeze({
   rightToes: 'leftToes',
   leftToesEnd: 'rightToesEnd',
   rightToesEnd: 'leftToesEnd',
+};
+
+const EXTENSION_MIRROR_PAIRS = Object.fromEntries([
+  ...BODY_PRODUCTION_NODE_DEFINITIONS,
+  ...OPTIONAL_BODY_CORRECTIVE_NODE_DEFINITIONS,
+  ...FULL_PERFORMANCE_NODE_DEFINITIONS,
+]
+  .filter((item) => item.side === 'left' || item.side === 'right')
+  .map((item) => [
+    item.id,
+    item.side === 'left'
+      ? item.id.replace(/^left/, 'right')
+      : item.id.replace(/^right/, 'left'),
+  ]));
+
+export const MIRROR_PAIRS = Object.freeze({
+  ...CORE_MIRROR_PAIRS,
+  ...EXTENSION_MIRROR_PAIRS,
 });
 
 export function cloneValue(value) {
@@ -699,6 +1016,8 @@ export function normalizeSkeletonDefinition(input) {
       jointType: String(item.jointType ?? 'free'),
       limitLabel: String(item.limitLabel ?? '自由关节'),
       role,
+      rigTier: normalizeEnum(item.rigTier, ['core', 'body-production', 'full-performance'], 'core'),
+      visualShape: String(item.visualShape ?? 'joint'),
       visibilityLayer: normalizeEnum(
         item.visibilityLayer,
         Object.values(JOINT_VISIBILITY_LAYERS),
@@ -719,6 +1038,12 @@ export function normalizeSkeletonDefinition(input) {
         Object.values(JOINT_EXPORT_POLICIES),
         inferExportPolicy(role),
       ),
+      placement: item.placement && typeof item.placement === 'object'
+        ? cloneValue(item.placement)
+        : null,
+      driver: item.driver && typeof item.driver === 'object'
+        ? cloneValue(item.driver)
+        : null,
       standard,
       pinned: Boolean(item.pinned),
       _rawPose: item.poseWorldPosition ?? item.worldPosition ?? null,
@@ -752,7 +1077,7 @@ export function normalizeSkeletonDefinition(input) {
   return {
     ...cloneValue(DEFAULT_META),
     ...cloneValue(input),
-    schemaVersion: 6,
+    schemaVersion: 7,
     name: String(input.name ?? DEFAULT_META.name),
     pose: String(input.pose ?? 'CUSTOM').toUpperCase(),
     unit: 'meter',

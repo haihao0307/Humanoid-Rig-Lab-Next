@@ -8,7 +8,7 @@ Humanoid Rig Lab Next 是一个基于 WebGPU、Three.js 和多窗口共享状态
 four-module-v002-20260819
 ```
 
-内置三维编辑器为 `V8.4 / 0.8.4`，Three.js 锁定为 `0.185.1`。
+内置三维编辑器为 `V8.5 / 0.8.5`，采用追加式 89 节点全表现骨架；Three.js 锁定为 `0.185.1`。
 
 ## 2026 年 8 月 19 日四板块 V002 合并结果
 
@@ -17,7 +17,8 @@ four-module-v002-20260819
 人物蒙皮   skin@0.5.1   moduleRevision 3
 动作物理   pose@0.4.0   moduleRevision 3
 动画系统   anim@0.4.0   moduleRevision 4
-综合整合   character@0.5.0 / integration revision 2
+人物服装   clothing@0.1.0 moduleRevision 1
+综合整合   character@0.6.4 / Character Core + BodyShape + Face Identity + Clothing + Appearance + integration revision 2
 ```
 
 本构建已完成以下纵向链路：
@@ -28,18 +29,42 @@ RigDefinition 与关节轴审计
 → 局部四元数 PoseSnapshot
 → 固定骨长 PhysicsRig
 → AnimationSession、MotionClip、分层混合与烘焙
-→ V8.4 骨架、表皮和综合工作台预览
+→ V8.5 分层骨架、表皮和综合工作台预览
 ```
 
 共享层同时加入构建身份核验、PoseSnapshot 直连、旧世界坐标兼容回退，以及不产生 ProjectState revision 的动画临时消息总线。
+
+## Character Core
+
+`packages/character-core/` 是人物系统的最高级数据入口。它保存人物身份、体型、人脸、服装、当前发型与饰品附件引用，以及 Proportion、BodyShape、Skin、Face、Clothing、Hair、Accessory、Pose 和 Animation revision；骨骼、骨长、父子关系和动画轨道仍由原模块独占。ProjectState schema 11 通过 `characterCore`、乐观 revision 和 `OperationEvent` 支持多窗口保存与同步。
+
+## BodyShape 身体形态
+
+`packages/body-shape/` 管理肌肉、脂肪及肩、胸、腰、髋、手臂、腿部体积参数。第一阶段运行时从不可变原始表皮顶点生成区域径向形变，并更新现有 SkinnedMesh 的顶点、法线和包围盒；它不调用 Proportion engine，也不修改 Rig、骨长、父子层级、Pose 或 Animation。保存和恢复 BodyShape 版本后，CharacterProfile 的 `body_shape_revision` 会同步更新。
+
+## Face Identity 人脸系统
+
+`packages/face-system/` 管理年龄、脸型、眼睛、鼻子、嘴部和表情配置的独立身份数据。FaceState 保存草稿与历史版本，Character Core 只通过 `face_identity` 和 `face_revision` 引用已保存版本。当前运行时只生成规范描述符和 FLAME、3DMM、AI Face Reconstruction 适配器接口，不生成复杂模型，也不读取或修改 Skin、Rig、Pose、Animation。
+
+## Clothing System 服装系统
+
+`packages/clothing-system/` 独立管理上衣、裤子和鞋。服装通过 CharacterProfile 的 `clothing_attachments` 引用，不属于 Skin。第一阶段使用独立 Clothing Mesh 和 `static-follow` 运行时读取 simulationRig 关节变换；动作播放时更新服装变换，但不修改 Body Skin、身体顶点、蒙皮权重、Rig、Pose 或 Animation。
+
+## Appearance System 外观系统
+
+`packages/appearance-system/` 管理短发、长发、马尾，以及帽子、眼镜和饰品。CharacterProfile 通过单一 `hair` 槽位和可并存的 `accessory_attachments` 引用外观资源；AppearanceState 提供添加、切换、保存和历史恢复。第一阶段只读取 simulationRig 绑定点并更新独立 Appearance Mesh 变换，明确不包含毛发模拟、布料或 GPU Hair，也不修改 Skin、Clothing、Rig、Pose 或 Animation。
+
+## Character Generator 人物生成入口
+
+`character.html` 与 `apps/character-generator/` 将单张人物图片编排成 Character 数据。图片先由现有 HRL-M03 图片姿势识别生成 33 点 PoseObservation，再分别复用 HRL-M01 比例规范化、BodyShape、Face Identity、Clothing 和 PoseSnapshot 契约，最后由 Character Core 保存引用。第一阶段不宣称生成最终真人，不复制现有模块算法，也不把图片二进制写入 ProjectState；只保存图片哈希、分析元数据、模块输出和版本会话，以支持多窗口同步及重载一致性。
 
 ## 四个模块
 
 ### 骨骼比例
 
-比例工作台继续使用 28 个编辑器控制节点和 SMPL 24 映射。V002 新增关节角色分类、绑定轴契约、辅助标记审计，以及 `rig@0.5.0` 和 `rig@0.6.0` 的追加式升级蓝图。
+比例工作台现在使用 `performance89@1`：保留原 28 节点和 SMPL 24 映射，再追加 8 个肢体扭转、12 个制作控制、6 个接触标记、2 个肩胛校正、30 个 VRM 手指和 3 个面部关节。完整说明见 `docs/PERFORMANCE_RIG_ARCHITECTURE.md`。
 
-当前八项比例参数继续直接驱动 V8.4 三维绑定骨架：
+当前八项比例参数继续直接驱动 V8.5 三维绑定骨架：
 
 ```text
 人物身高
@@ -117,6 +142,12 @@ finalPose 与 desiredPose 烘焙
 index.html
 项目总控、版本、模块状态、活动记录和审查入口
 
+character.html
+图片上传、HRL-M01/HRL-M03 分析、Character 生成、版本保存与重载
+
+face.html
+Face Identity 参数、版本历史、Character 引用与未来后端接口
+
 studio.html?module=proportion
 三维骨骼比例与骨架系统审计
 
@@ -129,11 +160,14 @@ studio.html?module=pose
 studio.html?module=animation
 动画片段、时间轴、分层混合、状态机、重定向、烘焙和导出
 
+studio.html?module=clothing
+Character 服装附件、上衣/裤子/鞋添加删除、simulationRig 跟随与版本恢复
+
 studio.html?module=integration
 当前 Rig、Skin、Pose 和 Animation 组合验收
 
 legacy/v8/index.html
-V8.4 全屏三维骨架、单一 SkinnedMesh 和人体物理编辑器
+V8.5 89 节点分层骨架、单一 SkinnedMesh 和人体物理编辑器
 ```
 
 ## 本地启动
@@ -183,10 +217,10 @@ humanoid_rig/transient_bus@1.0
 ```text
 母平台 buildVersion      0.5.0
 构建 ID                  four-module-v002-20260819
-ProjectState schema      5
-绑定骨架导出 schema      6
+ProjectState schema      9
+绑定骨架导出 schema      7
 PoseSnapshot             humanoid_rig/pose_snapshot@1.0
-内置编辑器               V8.4 / 0.8.4
+内置编辑器               V8.5 / 0.8.5
 Three.js                 0.185.1
 ```
 
@@ -208,7 +242,7 @@ npm test
 当前测试覆盖：
 
 ```text
-ProjectState schema 5、旧项目迁移和四模块版本升级
+ProjectState schema 11、旧项目迁移、原四模块、Clothing、Appearance 与 Character Generator 版本升级
 模块 Patch 并行合并与过期 Patch 拒绝
 比例参数、关节角色、绑定轴、隐藏锁骨和升级蓝图
 原生预绑定 GLB、JOINTS_0、WEIGHTS_0 和逆绑定矩阵
@@ -218,6 +252,10 @@ ProjectState schema 5、旧项目迁移和四模块版本升级
 动画轨道、关键帧、事件、接触、层、状态机和重定向
 动画运行时、性能、烘焙、MotionClip 和 GLB 导出
 构建身份、启动器、共享临时消息和本地 HTTP 资源
+Face Identity 创建、参数编辑、保存、加载、恢复、Character 引用与模块隔离
+Clothing 添加、删除、保存、恢复、simulationRig 动作跟随与 Body Skin 隔离
+Hair 添加与短发/长发/马尾切换、Accessory 添加、Appearance 保存恢复与 simulationRig 静态绑定
+图片分析生成 Proportion、BodyShape、Face、Clothing、Pose 与 Character，保存后序列化重载一致
 ```
 
 完整结果见 `VALIDATION.md` 和 `docs/FOUR_MODULE_V002_MERGE_REPORT_2026-08-19.md`。
@@ -228,7 +266,8 @@ ProjectState schema 5、旧项目迁移和四模块版本升级
 2. MediaPipe 运行库和 Pose Landmarker 模型在首次图片分析时按需下载，发布前需要完成来源、再分发条款、隐私披露和离线策略审查。
 3. 动画系统已经生成 `simulationRig` 交接帧，全身物理模式仍需动作模块开放外部求解器接口。
 4. 当前能够导出标准骨架动画 GLB，最终 SkinnedMesh 与动画合并导出仍需蒙皮运行时和动画导出器联合验证。
-5. 自动测试与本地 HTTP 冒烟检查已经通过。Windows Chrome 或 Edge 的 WebGPU 画面、鼠标交互、肩髋变形和多窗口长时间运行仍属于发布前人工验收项。
+5. 新增的扭转、手指、眼睛、下颌和肩胛节点已进入骨架、姿势、动画和导出拓扑；当前 SMPL 表皮仍绑定原 24 骨，精细表面形变需要后续重新绑定权重。
+6. 自动测试与本地 HTTP 冒烟检查已经通过。Windows Chrome 或 Edge 的 WebGPU 画面、鼠标交互、肩髋变形和多窗口长时间运行仍属于发布前人工验收项。
 
 ## 四对话协作与交接记录
 

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/body_shape_profile@1.0",
+  "title": "Humanoid Rig Lab BodyShapeProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "body_shape_id",
+    "name",
+    "version",
+    "muscle",
+    "fat",
+    "shoulder_volume",
+    "chest_volume",
+    "waist_volume",
+    "hip_volume",
+    "arm_volume",
+    "leg_volume"
+  ],
+  "properties": {
+    "body_shape_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "integer", "minimum": 1 },
+    "muscle": { "$ref": "#/$defs/parameter" },
+    "fat": { "$ref": "#/$defs/parameter" },
+    "shoulder_volume": { "$ref": "#/$defs/parameter" },
+    "chest_volume": { "$ref": "#/$defs/parameter" },
+    "waist_volume": { "$ref": "#/$defs/parameter" },
+    "hip_volume": { "$ref": "#/$defs/parameter" },
+    "arm_volume": { "$ref": "#/$defs/parameter" },
+    "leg_volume": { "$ref": "#/$defs/parameter" }
+  },
+  "$defs": {
+    "parameter": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}

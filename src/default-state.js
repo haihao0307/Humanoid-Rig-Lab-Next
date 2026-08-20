@@ -1,15 +1,25 @@
+import { createCharacterProfile, createCharacterState } from '../packages/character-core/index.js';
+import { createBodyShapeProfile, createBodyShapeState } from '../packages/body-shape/index.js';
+import { createFaceIdentity, createFaceState } from '../packages/face-system/index.js';
+import { createClothingProfile, createClothingState } from '../packages/clothing-system/index.js';
+import { createAppearanceState, getAppearanceCharacterReferences } from '../packages/appearance-system/index.js';
+import { createCharacterGeneratorState } from '../apps/character-generator/character-generator.js';
+
 export const BUILD_VERSION = '0.5.0';
 export const BUILD_ID = 'four-module-v002-20260819';
 export const BUILD_DATE = '2026-08-19';
-export const SCHEMA_VERSION = 5;
-export const MODULE_IDS = Object.freeze(['proportion', 'skin', 'pose', 'animation', 'integration']);
-export const MODULE_BASE_REVISIONS = Object.freeze({ proportion: 3, skin: 3, pose: 3, animation: 4, integration: 2 });
+export const SCHEMA_VERSION = 11;
+export const MODULE_IDS = Object.freeze(['proportion', 'skin', 'pose', 'animation', 'clothing', 'integration']);
+export const MODULE_BASE_REVISIONS = Object.freeze({ proportion: 3, skin: 3, pose: 3, animation: 4, clothing: 1, integration: 2 });
 export const ACTIVE_VERSIONS = Object.freeze({
   rig: 'rig@0.4.0',
   skin: 'skin@0.5.1',
   pose: 'pose@0.4.0',
   animation: 'anim@0.4.0',
-  character: 'character@0.5.0',
+  clothing: 'clothing@0.1.0',
+  appearance: 'appearance@0.1.0',
+  generator: 'character-generator@0.1.0',
+  character: 'character@0.6.4',
 });
 
 const JOINTS = {
@@ -71,6 +81,13 @@ const MODULES = {
       '带最终 SkinnedMesh 的 GLB 合并需要蒙皮运行时与导出器联调',
       '视觉点击验收需在普通桌面 Chrome 或 Edge 完成'
     ], color: '#c6a6ff'
+  },
+  clothing: {
+    id: 'clothing', title: '人物服装', shortTitle: '服装', status: 'developing', statusLabel: '静态服装阶段',
+    progress: 35, version: 'clothing@0.1.0', compatibleRig: 'rig@0.4.0',
+    currentTask: '验证上衣、裤子和鞋的 simulationRig 静态跟随、Character 附件引用与版本恢复',
+    completed: 7, total: 20, passed: 0, failed: 0,
+    blockers: ['布料动力学与身体碰撞属于后续阶段，当前只实现静态跟随'], color: '#d9a56f'
   }
 };
 
@@ -78,6 +95,40 @@ export function createDefaultState() {
   const now = new Date().toISOString();
   const moduleRevisions = Object.fromEntries(MODULE_IDS.map((id) => [id, MODULE_BASE_REVISIONS[id] ?? 1]));
   const moduleUpdatedAt = Object.fromEntries(MODULE_IDS.map((id) => [id, now]));
+  const defaultBodyShapeProfile = createBodyShapeProfile({
+    body_shape_id: 'body_shape_001',
+    name: 'Neutral Body Shape',
+  });
+  const defaultFaceIdentity = createFaceIdentity({
+    face_id: 'face_001',
+    age: 30,
+  });
+  const defaultClothingProfile = createClothingProfile({
+    clothing_profile_id: 'clothing_profile_001',
+    character_id: 'character_001',
+    assets: [],
+  });
+  const defaultAppearanceState = createAppearanceState({
+    character_id: 'character_001',
+    hair_profiles: [],
+    accessories: [],
+  });
+  const defaultAppearanceReferences = getAppearanceCharacterReferences(defaultAppearanceState);
+  const defaultCharacterProfile = createCharacterProfile({
+    character_id: 'character_001',
+    name: 'Default Character',
+    identity: { identity_id: null, revision: 0, tags: [] },
+    body_shape: { profile_id: defaultBodyShapeProfile.body_shape_id, revision: defaultBodyShapeProfile.version },
+    body_shape_revision: defaultBodyShapeProfile.version,
+    face_identity: { face_id: defaultFaceIdentity.face_id, revision: defaultFaceIdentity.version },
+    face_revision: defaultFaceIdentity.version,
+    clothing_attachments: [],
+    clothing_revision: defaultClothingProfile.version,
+    hair: defaultAppearanceReferences.hair,
+    accessory_attachments: defaultAppearanceReferences.accessory_attachments,
+    hair_revision: defaultAppearanceReferences.hair_revision,
+    accessory_revision: defaultAppearanceReferences.accessory_revision,
+  }, moduleRevisions);
   return {
     schemaVersion: SCHEMA_VERSION,
     projectId: 'humanoid-rig-lab-next',
@@ -93,7 +144,7 @@ export function createDefaultState() {
       channel: 'four-module-merged-review',
       source: 'four module v002 integration',
       commit: 'not-synced',
-      modules: { proportion: 2, skin: 2, pose: 2, animation: 2 }
+      modules: { proportion: 2, skin: 2, pose: 2, animation: 2, clothing: 1, appearance: 1, generator: 1 }
     },
     activeVersions: structuredClone(ACTIVE_VERSIONS),
     modules: structuredClone(MODULES),
@@ -136,6 +187,18 @@ export function createDefaultState() {
         keyframes: []
       }
     },
+    characterCore: createCharacterState({
+      profiles: [defaultCharacterProfile],
+      active_character_id: defaultCharacterProfile.character_id,
+      revision: 1,
+      updated_at: now,
+    }),
+    bodyShape: createBodyShapeState(defaultBodyShapeProfile),
+    faceSystem: createFaceState(defaultFaceIdentity),
+    clothingSystem: createClothingState(defaultClothingProfile),
+    appearanceSystem: defaultAppearanceState,
+    characterGenerator: createCharacterGeneratorState(),
+    operationEvents: [],
     collaboration: {
       onlineWindows: 1,
       lastWriter: 'initial-state',

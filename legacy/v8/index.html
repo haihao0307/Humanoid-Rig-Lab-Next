@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
     <meta name="description" content="WebGPU 与 Three.js SMPL 标准骨架、人体表皮与全身物理编辑器" />
-    <title>Humanoid Rig Lab V8.4 · 三维比例与绑定骨架</title>
+    <title>Humanoid Rig Lab V8.5 · 全表现骨架</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -15,7 +15,7 @@
           <span class="brand-mark" aria-hidden="true"></span>
           <div>
             <h1>Humanoid Rig Lab</h1>
-            <p>V8.4 · SMPL 24 标准 · 三维比例实时反馈 · 固定骨长</p>
+            <p>V8.5 · 89 节点全表现架构 · VRM 手指语义 · IK 与接触层</p>
           </div>
         </div>
 
@@ -70,7 +70,9 @@
             </div>
 
             <div class="metric-grid">
-              <div class="metric-card"><span>关节数量</span><strong id="joint-count">0</strong></div>
+              <div class="metric-card"><span>总节点</span><strong id="joint-count">0</strong></div>
+              <div class="metric-card"><span>变形关节</span><strong id="deform-count">0</strong></div>
+              <div class="metric-card"><span>控制 / 标记</span><strong id="helper-count">0</strong></div>
               <div class="metric-card"><span>绑定身高</span><strong id="rig-height">0 m</strong></div>
               <div class="metric-card"><span>最大骨长误差</span><strong id="length-error">0 mm</strong></div>
               <div class="metric-card"><span>关节越界</span><strong id="joint-limit-error">0°</strong></div>
@@ -79,8 +81,9 @@
             </div>
 
             <div class="locked-rig-note">
-              <strong>SMPL 标准比例与尺寸锁定</strong>
-              <span>初始关节链映射 SMPL 24 关节顺序，并贴合 Meshcapade 公开的 CC BY 4.0 示例人体表面。骨盆控制杆隐藏，绑定尺寸保持只读。</span>
+              <strong>SMPL 核心兼容 · 全表现层已展开</strong>
+              <span>前 28 个节点保持原顺序与父子关系；其后追加扭转、肩胛校正、IK、接触、VRM 手指、眼睛和下颌。现有 SMPL 24 蒙皮与旧动作继续兼容。</span>
+              <span>核心映射依据 Meshcapade 公开的 CC BY 4.0 数据；扩展层采用独立的开放人形语义。</span>
             </div>
           </section>
 
@@ -170,6 +173,10 @@
               <span><strong>骨架透视</strong><small>让关节与骨杆始终显示在表皮前方</small></span>
               <input id="skeleton-xray-toggle" type="checkbox" checked />
             </label>
+            <label class="select-row" for="skeleton-detail">
+              <span><strong>骨架细节</strong><small>按任务切换稳定核心、制作控制或完整手指面部层</small></span>
+              <select id="skeleton-detail"><option value="core">核心 28</option><option value="production">身体制作 56</option><option value="performance" selected>完整表现 89</option></select>
+            </label>
             <label class="range-row" for="skin-opacity">
               <span><strong>表皮透明度</strong><small>半透明时更便于选中内部关节</small></span>
               <span class="range-control"><input id="skin-opacity" type="range" min="0.2" max="1" step="0.02" value="1" /><output id="skin-opacity-value">1.00</output></span>
@@ -204,6 +211,14 @@
           </div>
           <div class="constraint-lock-badge"><span></span>骨长已锁定</div>
           <div id="selection-label" class="selection-label" hidden></div>
+
+          <div class="rig-visual-legend" aria-label="骨架颜色图例">
+            <span data-rig-role="left">左侧链</span>
+            <span data-rig-role="right">右侧链</span>
+            <span data-rig-role="twist">扭转 / 校正</span>
+            <span data-rig-role="control">IK 控制</span>
+            <span data-rig-role="marker">接触标记</span>
+          </div>
 
           <div class="viewport-help">
             <span>表皮和骨架可单独显示，也可以同时显示</span>
@@ -359,7 +374,7 @@
         if (window.location.protocol !== 'file:') {
           const moduleScript = document.createElement('script');
           moduleScript.type = 'module';
-          moduleScript.src = './src/main.js?v=8.0.0';
+          moduleScript.src = './src/main.js?v=8.5.0';
           document.body.append(moduleScript);
           return;
         }
@@ -377,11 +392,11 @@
               <li>保持命令窗口开启，地址栏应显示 <code>http://127.0.0.1:4173/</code>。</li>
             </ol>
             <button id="try-local-server" type="button">尝试打开本地编辑器</button>
-            <small>正常启动后会显示 V8.4 三维人物视口，并提供“表皮 / 骨架 / 同时”显示开关。</small>
+            <small>正常启动后会显示 V8.5 全表现三维人物视口，并提供三档骨架细节与角色配色。</small>
           </div>`;
         document.body.append(overlay);
         document.querySelector('#try-local-server')?.addEventListener('click', () => {
-          window.location.href = 'http://127.0.0.1:4173/?build=v8.4-3d-proportion';
+          window.location.href = 'http://127.0.0.1:4173/?build=v8.5-performance-rig';
         });
       })();
     </script>

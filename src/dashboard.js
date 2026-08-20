@@ -5,7 +5,7 @@ import { HumanoidPreview } from './humanoid-preview.js';
 const hub = new ProjectHubClient({ module: 'dashboard', title: '项目总控' });
 const preview = new HumanoidPreview(document.querySelector('#dashboardPreview'));
 const moduleOrder = ['proportion', 'skin', 'pose', 'animation'];
-const moduleIcons = { proportion: 'R', skin: 'S', pose: 'P', animation: 'A', system: '•', integration: 'I' };
+const moduleIcons = { proportion: 'R', skin: 'S', pose: 'P', animation: 'A', clothing: 'C', system: '•', integration: 'I' };
 let currentState = hub.getState();
 let visibleActivity = true;
 
@@ -74,7 +74,7 @@ function moduleCard(module, moduleRevision) {
 }
 
 function renderVersions(state) {
-  const labels = { rig: '骨架', skin: '蒙皮', pose: '动作', animation: '动画', character: '人物组合' };
+  const labels = { rig: '骨架', skin: '蒙皮', pose: '动作', animation: '动画', clothing: '服装', appearance: '外观', generator: '人物生成', character: '人物组合' };
   elements.versionList.innerHTML = Object.entries(state.activeVersions)
     .map(([key, value]) => `<div class="version-item"><span>${labels[key] || key}</span><code>${escapeHtml(value)}</code></div>`)
     .join('');
@@ -212,7 +212,9 @@ document.querySelector('#importProjectInput').addEventListener('change', async (
   if (!file) return;
   try {
     const state = await readJsonFile(file);
-    if (![1, 2, 3].includes(Number(state?.schemaVersion)) || !state?.projectId) throw new Error('项目 JSON 格式不正确');
+    if (!Number.isInteger(Number(state?.schemaVersion)) || Number(state.schemaVersion) < 1 || Number(state.schemaVersion) > SCHEMA_VERSION || !state?.projectId) {
+      throw new Error('项目 JSON 格式不正确');
+    }
     hub.replaceState(state, `导入项目文件 ${file.name}`);
   } catch (error) {
     alert(`导入失败：${error.message}`);

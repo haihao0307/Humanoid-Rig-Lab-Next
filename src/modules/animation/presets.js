@@ -217,6 +217,7 @@ export function createDefaultAnimationGraph() {
   return {
     schema: 'humanoid_rig/animation_graph@0.1',
     graphId: 'humanoid-basic-locomotion',
+    controlMode: 'clip',
     entryStateId: 'idle',
     activeStateId: 'idle',
     parameters: {

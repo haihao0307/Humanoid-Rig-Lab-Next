@@ -86,7 +86,7 @@ const migrated = normalizeProjectState({
     display: { ...base.character.display, mode: 'invalid' },
   },
 });
-assert.equal(migrated.schemaVersion, 5);
+assert.equal(migrated.schemaVersion, 11);
 assert.equal(migrated.build.version, '0.5.0');
 assert.equal(migrated.build.id, BUILD_ID);
 assert.equal(migrated.character.skin.source, 'detail');
@@ -101,4 +101,4 @@ assert.equal(migrated.moduleRevisions.animation, MODULE_BASE_REVISIONS.animation
 
 console.log('PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules');
 console.log('PASS legacy surface-source fields are forced onto the single detailed surface');
-console.log('PASS schema v1 project migration to schema v5');
+console.log('PASS schema v1 project migration to schema v11');

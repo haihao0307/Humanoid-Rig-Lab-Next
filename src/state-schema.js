@@ -8,6 +8,12 @@ import {
   createDefaultState,
 } from './default-state.js';
 import { bodyProfileRequiresSkinRebind } from '../legacy/v8/src/body-profile.js';
+import { normalizeCharacterState } from '../packages/character-core/index.js';
+import { normalizeBodyShapeState } from '../packages/body-shape/index.js';
+import { normalizeFaceState } from '../packages/face-system/index.js';
+import { clothingAttachmentReferences, normalizeClothingState } from '../packages/clothing-system/index.js';
+import { getAppearanceCharacterReferences, normalizeAppearanceState } from '../packages/appearance-system/index.js';
+import { normalizeCharacterGeneratorState } from '../apps/character-generator/character-generator.js';
 
 const MODULE_SET = new Set(MODULE_IDS);
 const SURFACE_SOURCES = new Set(['detail']);
@@ -101,6 +107,26 @@ export function normalizeProjectState(input) {
     ? null
     : String(state.character.pose.imagePoseAssetId);
   state.character.animation.keyframes = Array.isArray(state.character.animation.keyframes) ? state.character.animation.keyframes : [];
+  state.bodyShape = normalizeBodyShapeState(state.bodyShape, {
+    fallbackProfile: defaults.bodyShape.profiles.body_shape_001,
+  });
+  state.faceSystem = normalizeFaceState(state.faceSystem, {
+    fallbackProfile: defaults.faceSystem.profiles.face_001,
+  });
+  state.clothingSystem = normalizeClothingState(state.clothingSystem, {
+    fallbackProfile: defaults.clothingSystem.profiles.clothing_profile_001,
+  });
+  state.appearanceSystem = normalizeAppearanceState(state.appearanceSystem, {
+    fallbackCharacterId: defaults.appearanceSystem.character_id,
+  });
+  state.characterGenerator = normalizeCharacterGeneratorState(state.characterGenerator);
+  state.characterCore = normalizeCharacterState(state.characterCore, {
+    fallbackProfile: defaults.characterCore.profiles.character_001,
+  });
+  reconcileFaceReference(state, source);
+  reconcileClothingReferences(state, source);
+  reconcileAppearanceReferences(state, source);
+  state.operationEvents = uniqueOperationEvents(Array.isArray(state.operationEvents) ? state.operationEvents : []).slice(0, 200);
   state.activity = uniqueById(Array.isArray(state.activity) ? state.activity : []).slice(0, 100);
   state.reviews = uniqueById(Array.isArray(state.reviews) ? state.reviews : []).slice(0, 100);
   state.collaboration = mergeDefaults(defaults.collaboration, state.collaboration || {});
@@ -135,10 +161,22 @@ export function createModulePatch(nextState, module, activityEntry = null) {
   } else if (id === 'animation') {
     patch.animation = structuredClone(state.character.animation);
     patch.activeVersion = state.activeVersions.animation;
+  } else if (id === 'clothing') {
+    patch.clothingSystem = structuredClone(state.clothingSystem);
+    patch.characterCore = structuredClone(state.characterCore);
+    patch.operationEvents = structuredClone(state.operationEvents);
+    patch.activeVersion = state.activeVersions.clothing;
   } else {
     patch.activeVersions = structuredClone(state.activeVersions);
     patch.display = structuredClone(state.character.display);
     patch.reviews = structuredClone(state.reviews);
+    patch.characterCore = structuredClone(state.characterCore);
+    patch.bodyShape = structuredClone(state.bodyShape);
+    patch.faceSystem = structuredClone(state.faceSystem);
+    patch.clothingSystem = structuredClone(state.clothingSystem);
+    patch.appearanceSystem = structuredClone(state.appearanceSystem);
+    patch.characterGenerator = structuredClone(state.characterGenerator);
+    patch.operationEvents = structuredClone(state.operationEvents);
   }
   return patch;
 }
@@ -171,10 +209,64 @@ export function applyModulePatch(currentState, incomingPatch) {
   } else if (id === 'animation') {
     if (patch.animation) state.character.animation = mergeDefaults(state.character.animation, patch.animation);
     if (patch.activeVersion) state.activeVersions.animation = String(patch.activeVersion);
+  } else if (id === 'clothing') {
+    if (patch.clothingSystem) {
+      const incomingClothingSystem = normalizeClothingState(patch.clothingSystem, {
+        fallbackProfile: state.clothingSystem.profiles.clothing_profile_001,
+      });
+      if (incomingClothingSystem.revision >= state.clothingSystem.revision) state.clothingSystem = incomingClothingSystem;
+    }
+    if (patch.characterCore) {
+      const incomingCharacterCore = normalizeCharacterState(patch.characterCore, {
+        fallbackProfile: state.characterCore.profiles.character_001,
+      });
+      if (incomingCharacterCore.revision >= state.characterCore.revision) state.characterCore = incomingCharacterCore;
+    }
+    if (Array.isArray(patch.operationEvents)) {
+      state.operationEvents = uniqueOperationEvents([...patch.operationEvents, ...state.operationEvents]).slice(0, 200);
+    }
+    if (patch.activeVersion) state.activeVersions.clothing = String(patch.activeVersion);
   } else {
     if (patch.activeVersions) state.activeVersions = mergeDefaults(state.activeVersions, patch.activeVersions);
     if (patch.display) state.character.display = mergeDefaults(state.character.display, patch.display);
     if (Array.isArray(patch.reviews)) state.reviews = uniqueById([...patch.reviews, ...state.reviews]).slice(0, 100);
+    if (patch.characterCore) {
+      const incomingCharacterCore = normalizeCharacterState(patch.characterCore, {
+        fallbackProfile: state.characterCore.profiles.character_001,
+      });
+      if (incomingCharacterCore.revision >= state.characterCore.revision) state.characterCore = incomingCharacterCore;
+    }
+    if (patch.bodyShape) {
+      const incomingBodyShape = normalizeBodyShapeState(patch.bodyShape, {
+        fallbackProfile: state.bodyShape.profiles.body_shape_001,
+      });
+      if (incomingBodyShape.revision >= state.bodyShape.revision) state.bodyShape = incomingBodyShape;
+    }
+    if (patch.faceSystem) {
+      const incomingFaceSystem = normalizeFaceState(patch.faceSystem, {
+        fallbackProfile: state.faceSystem.profiles.face_001,
+      });
+      if (incomingFaceSystem.revision >= state.faceSystem.revision) state.faceSystem = incomingFaceSystem;
+    }
+    if (patch.clothingSystem) {
+      const incomingClothingSystem = normalizeClothingState(patch.clothingSystem, {
+        fallbackProfile: state.clothingSystem.profiles.clothing_profile_001,
+      });
+      if (incomingClothingSystem.revision >= state.clothingSystem.revision) state.clothingSystem = incomingClothingSystem;
+    }
+    if (patch.appearanceSystem) {
+      const incomingAppearanceSystem = normalizeAppearanceState(patch.appearanceSystem, {
+        fallbackCharacterId: state.characterCore.active_character_id,
+      });
+      if (incomingAppearanceSystem.revision >= state.appearanceSystem.revision) state.appearanceSystem = incomingAppearanceSystem;
+    }
+    if (patch.characterGenerator) {
+      const incomingGenerator = normalizeCharacterGeneratorState(patch.characterGenerator);
+      if (incomingGenerator.revision >= state.characterGenerator.revision) state.characterGenerator = incomingGenerator;
+    }
+    if (Array.isArray(patch.operationEvents)) {
+      state.operationEvents = uniqueOperationEvents([...patch.operationEvents, ...state.operationEvents]).slice(0, 200);
+    }
   }
 
   const now = validIso(patch.moduleUpdatedAt) ? patch.moduleUpdatedAt : new Date().toISOString();
@@ -238,6 +330,82 @@ function uniqueById(items) {
     seen.add(id);
     return true;
   });
+}
+
+function uniqueOperationEvents(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const id = item?.event_id;
+    if (!id || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
+function reconcileFaceReference(state, source) {
+  const activeFace = state.faceSystem.profiles[state.faceSystem.active_face_id];
+  const activeCharacter = state.characterCore.profiles[state.characterCore.active_character_id];
+  if (!activeFace || !activeCharacter) return;
+
+  const sourceCharacterState = isPlainObject(source.characterCore) ? source.characterCore : {};
+  const sourceCharacterId = String(
+    sourceCharacterState.active_character_id || state.characterCore.active_character_id || '',
+  );
+  const sourceCharacter = isPlainObject(sourceCharacterState.profiles?.[sourceCharacterId])
+    ? sourceCharacterState.profiles[sourceCharacterId]
+    : null;
+  const migratedWithoutFaceSystem = !isPlainObject(source.faceSystem);
+  const referencedFaceId = activeCharacter.face_identity?.face_id;
+  const referencedFaceVersions = state.faceSystem.versions[referencedFaceId] || [];
+  const missingReference = !referencedFaceId
+    || !state.faceSystem.profiles[referencedFaceId]
+    || !referencedFaceVersions.some((profile) => profile.version === activeCharacter.face_identity.revision);
+  const legacyCharacterWithoutFaceReference = migratedWithoutFaceSystem
+    && !isPlainObject(sourceCharacter?.face_identity);
+  if (!missingReference && !legacyCharacterWithoutFaceReference) return;
+
+  activeCharacter.face_identity = {
+    face_id: activeFace.face_id,
+    revision: activeFace.version,
+  };
+  activeCharacter.face_revision = activeFace.version;
+}
+
+function reconcileClothingReferences(state, source) {
+  const activeProfile = state.clothingSystem.profiles[state.clothingSystem.active_profile_id];
+  const activeCharacter = state.characterCore.profiles[state.characterCore.active_character_id];
+  if (!activeProfile || !activeCharacter) return;
+  const sourceCharacterState = isPlainObject(source.characterCore) ? source.characterCore : {};
+  const sourceCharacterId = String(
+    sourceCharacterState.active_character_id || state.characterCore.active_character_id || '',
+  );
+  const sourceCharacter = isPlainObject(sourceCharacterState.profiles?.[sourceCharacterId])
+    ? sourceCharacterState.profiles[sourceCharacterId]
+    : null;
+  if (isPlainObject(source.clothingSystem) && Array.isArray(sourceCharacter?.clothing_attachments)) return;
+  activeCharacter.clothing_attachments = clothingAttachmentReferences(activeProfile);
+  activeCharacter.clothing_revision = activeProfile.version;
+}
+
+function reconcileAppearanceReferences(state, source) {
+  const activeCharacter = state.characterCore.profiles[state.characterCore.active_character_id];
+  if (!activeCharacter) return;
+  const sourceCharacterState = isPlainObject(source.characterCore) ? source.characterCore : {};
+  const sourceCharacterId = String(
+    sourceCharacterState.active_character_id || state.characterCore.active_character_id || '',
+  );
+  const sourceCharacter = isPlainObject(sourceCharacterState.profiles?.[sourceCharacterId])
+    ? sourceCharacterState.profiles[sourceCharacterId]
+    : null;
+  const hasAppearanceReferences = isPlainObject(source.appearanceSystem)
+    && isPlainObject(sourceCharacter?.hair)
+    && Array.isArray(sourceCharacter?.accessory_attachments);
+  if (hasAppearanceReferences) return;
+  const references = getAppearanceCharacterReferences(state.appearanceSystem);
+  activeCharacter.hair = references.hair;
+  activeCharacter.accessory_attachments = references.accessory_attachments;
+  activeCharacter.hair_revision = references.hair_revision;
+  activeCharacter.accessory_revision = references.accessory_revision;
 }
 
 function isPlainObject(value) {

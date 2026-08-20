@@ -5,6 +5,7 @@ import * as workspace from '../src/modules/animation/index.js';
 
 const source = await readFile(new URL('../src/modules/animation/index.js', import.meta.url), 'utf8');
 const studio = await readFile(new URL('../src/studio.js', import.meta.url), 'utf8');
+const legacyMain = await readFile(new URL('../legacy/v8/src/main.js', import.meta.url), 'utf8');
 const model = await readFile(new URL('../src/modules/animation/model.js', import.meta.url), 'utf8');
 const runtime = await readFile(new URL('../src/modules/animation/runtime.js', import.meta.url), 'utf8');
 const bake = await readFile(new URL('../src/modules/animation/bake.js', import.meta.url), 'utf8');
@@ -27,10 +28,17 @@ assert.doesNotMatch(source, /type:\s*['"]HRL_HOST_STATE['"][\s\S]*postPosePrevie
 assert.match(source, /animationControlsMounted/);
 assert.match(source, /syncAnimationControlsDom/);
 assert.match(source, /animationTimelineMarkers/);
+assert.match(source, /resolveTransportPlaybackStart/);
+assert.match(source, /preserveEventTime: !start\.restarted/);
 assert.match(studio, /moduleId === 'animation'/);
 assert.match(studio, /postStateToLegacy\(state\);\s*workspace\.renderControls\(context, state\);/s);
-assert.match(studio, /animationIsPlaying/);
-assert.match(studio, /pose:\s*animationIsPlaying\s*\?/s);
+assert.match(studio, /animationOwnsPose/);
+assert.match(studio, /hasActiveAnimationPreview/);
+assert.match(studio, /pose:\s*animationOwnsPose\s*\?/s);
+assert.match(studio, /currentPoseLabel/);
+assert.match(studio, /name:\s*['"]Clip Preview['"]/);
+assert.doesNotMatch(legacyMain, /requestedPose\.startsWith\(['"]A['"]\)/);
+assert.match(legacyMain, /\['A', 'A POSE', 'A-POSE', 'APOSE'\]\.includes\(requestedPose\)/);
 assert.doesNotMatch(source, /character\.bodyProfile\s*=/);
 assert.doesNotMatch(source, /character\.skin\s*=/);
 assert.doesNotMatch(source, /character\.pose\s*=/);

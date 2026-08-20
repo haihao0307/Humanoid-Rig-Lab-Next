@@ -124,6 +124,7 @@ function renderDisplayMode(state) {
 
 function renderInspector(state) {
   const module = moduleId === 'integration' ? null : state.modules[moduleId];
+  const poseLabel = currentPoseLabel(state);
   const reviews = (state.reviews || []).filter((review) => review.module === moduleId || moduleId === 'integration').slice(0, 4);
   const writable = config.writable.map((item) => `<div class="task-item"><i></i><span>${escapeHtml(item)}</span></div>`).join('');
   const blockers = module?.blockers?.length
@@ -139,7 +140,7 @@ function renderInspector(state) {
         <div><span>模块修订</span><b>m${moduleRevision}</b></div>
         <div><span>模块更新时间</span><b>${new Date(moduleTime).toLocaleTimeString('zh-CN')}</b></div>
         <div><span>同步方式</span><b>${escapeHtml(hub.transport)}</b></div>
-        <div><span>当前姿势</span><b>${escapeHtml(state.character.pose.name)}</b></div>
+        <div><span>当前姿势</span><b>${escapeHtml(poseLabel)}</b></div>
         <div><span>显示模式</span><b>${escapeHtml(getViewportDisplay(state).mode)}</b></div>
         <div><span>三维渲染</span><b>${escapeHtml(legacyRendererState?.backend || (legacyReady ? '正在初始化' : '连接中'))}</b></div>
         <div><span>表皮来源</span><b>${escapeHtml(state.character.skin.source)}</b></div>
@@ -150,6 +151,16 @@ function renderInspector(state) {
     <section class="inspector-card"><h3>本模块拥有的数据</h3><div class="task-list">${writable}</div></section>
     <section class="inspector-card"><h3>阻塞问题</h3><div class="blocker-list">${blockers}</div></section>
     <section class="inspector-card"><h3>最近审查</h3><div class="review-list">${reviews.length ? reviews.map((review) => `<div class="review-item"><p>${escapeHtml(review.text)}</p><small>${escapeHtml(review.verdict)} · ${new Date(review.createdAt).toLocaleString('zh-CN')}</small></div>`).join('') : '<p>当前模块尚无审查记录。</p>'}</div></section>`;
+}
+
+function currentPoseLabel(state) {
+  if (moduleId !== 'animation') return state.character.pose.name;
+  const animation = state.character?.animation;
+  const clips = Array.isArray(animation?.clips) ? animation.clips : [];
+  const activeId = String(animation?.activeClipId || animation?.clip || '');
+  const clip = clips.find((item) => item?.clipId === activeId) || null;
+  if (!clip) return state.character.pose.name;
+  return `${clip.name} · ${animation.transport?.playing ? '播放中' : '当前帧'}`;
 }
 
 function render(state, detail = {}) {
@@ -163,7 +174,7 @@ function render(state, detail = {}) {
   elements.stageRevision.textContent = `global r${state.revision} · module m${moduleRevision}`;
   const measuredHeight = Number(legacyProfileMetrics?.height || state.character.bodyProfile.height);
   const measuredShoulder = Number(legacyProfileMetrics?.shoulderWidth || state.character.bodyProfile.shoulderWidth);
-  elements.stageMetrics.innerHTML = `<span>三维身高 ${measuredHeight.toFixed(3)} m</span><span>肩宽 ${measuredShoulder.toFixed(3)} m</span><span>姿势 ${escapeHtml(state.character.pose.name)}</span><span>视口 ${escapeHtml(getViewportDisplay(state).mode)}</span>`;
+  elements.stageMetrics.innerHTML = `<span>三维身高 ${measuredHeight.toFixed(3)} m</span><span>肩宽 ${measuredShoulder.toFixed(3)} m</span><span>姿势 ${escapeHtml(currentPoseLabel(state))}</span><span>视口 ${escapeHtml(getViewportDisplay(state).mode)}</span>`;
   renderDisplayMode(state);
   if (!legacyVisible && !pendingPose) preview.setState(state);
   renderInspector(state);
@@ -174,8 +185,9 @@ function render(state, detail = {}) {
     refreshLegacySource(state);
     if (moduleId === 'animation') {
       // The animation workspace owns the embedded pose while it previews a clip.
-      // While playing, postStateToLegacy sends only static display/profile data;
-      // the pose itself travels through the lightweight animation-frame channel.
+      // For clips with preview data, postStateToLegacy sends only static
+      // display/profile data; every paused or playing pose travels through the
+      // lightweight animation-frame channel.
       postStateToLegacy(state);
       workspace.renderControls(context, state);
     } else {
@@ -227,8 +239,7 @@ function hideLegacy() {
 
 function postStateToLegacy(state = currentState) {
   if (!legacyVisible || !elements.legacyFrame.contentWindow) return;
-  const animationIsPlaying = moduleId === 'animation'
-    && Boolean(state.character.animation?.transport?.playing);
+  const animationOwnsPose = moduleId === 'animation' && hasActiveAnimationPreview(state);
   elements.legacyFrame.contentWindow.postMessage({
     protocol: HOST_PROTOCOL,
     type: 'HRL_HOST_STATE',
@@ -237,8 +248,8 @@ function postStateToLegacy(state = currentState) {
     state: {
       display: structuredClone(getViewportDisplay(state)),
       skin: structuredClone(state.character.skin),
-      pose: animationIsPlaying
-        ? { name: 'Animation Preview', poseSnapshot: null, v8Payload: null }
+      pose: animationOwnsPose
+        ? { name: 'Clip Preview', poseSnapshot: null, v8Payload: null }
         : {
           name: state.character.pose.name,
           poseSnapshot: state.character.pose.poseSnapshot || null,
@@ -247,8 +258,25 @@ function postStateToLegacy(state = currentState) {
         },
       physics: structuredClone(state.character.physics),
       bodyProfile: structuredClone(state.character.bodyProfile),
+      bodyShape: structuredClone(
+        state.bodyShape?.profiles?.[state.bodyShape?.active_profile_id] || null,
+      ),
+      clothing: structuredClone(
+        state.clothingSystem?.profiles?.[state.clothingSystem?.active_profile_id] || null,
+      ),
     },
   }, window.location.origin);
+}
+
+function hasActiveAnimationPreview(state) {
+  const animation = state.character?.animation;
+  const clips = Array.isArray(animation?.clips) ? animation.clips : [];
+  const activeId = String(animation?.activeClipId || animation?.clip || '');
+  const clip = clips.find((item) => item?.clipId === activeId) || clips[0] || null;
+  if (!clip) return false;
+  const hasTrackKeys = Array.isArray(clip.tracks)
+    && clip.tracks.some((track) => Array.isArray(track?.keyframes) && track.keyframes.length > 0);
+  return hasTrackKeys || (Array.isArray(clip.poseKeys) && clip.poseKeys.length > 0);
 }
 
 function handleLegacyMessage(event) {

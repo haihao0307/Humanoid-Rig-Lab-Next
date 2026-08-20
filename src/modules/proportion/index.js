@@ -14,8 +14,8 @@ import {
   toggleControl,
 } from '../../workspace-common.js';
 
-const CORE_RIG_SUMMARY = summarizeRigDefinition(createStandardHumanoidPreset('A'));
-const CORE_RIG_CAPABILITY = buildRigCapabilityReport(CORE_RIG_SUMMARY);
+const ACTIVE_RIG_SUMMARY = summarizeRigDefinition(createStandardHumanoidPreset('A'));
+const ACTIVE_RIG_CAPABILITY = buildRigCapabilityReport(ACTIVE_RIG_SUMMARY);
 
 const PROFILE_PRESETS = Object.freeze({
   'smpl-male-surface-fit-1796-v3': {
@@ -122,19 +122,18 @@ export function renderControls(context, state) {
       </div>`) +
     controlSection('骨架系统能力', `
       <div class="metric-list compact-metrics">
-        <div><span>稳定变形关节</span><b>${CORE_RIG_SUMMARY.counts.deform}</b></div>
-        <div><span>编辑控制节点</span><b>${CORE_RIG_SUMMARY.counts.control}</b></div>
-        <div><span>测量标记</span><b>${CORE_RIG_SUMMARY.counts.marker}</b></div>
-        <div><span>默认可见关节</span><b>${CORE_RIG_SUMMARY.counts.visibleJoints}</b></div>
-        <div><span>隐藏节点</span><b>${CORE_RIG_SUMMARY.hiddenJointIds.length}</b></div>
-        <div><span>关节轴契约</span><b class="${CORE_RIG_SUMMARY.axisAudit.complete && CORE_RIG_SUMMARY.axisAudit.orthonormal ? 'success-text' : 'warning-text'}">${CORE_RIG_SUMMARY.axisAudit.presentEntryCount}/${CORE_RIG_SUMMARY.axisAudit.requiredEntryCount}</b></div>
-        <div><span>基础身体动作</span><b class="success-text">可接入轴适配器</b></div>
-        <div><span>精细肢体扭转</span><b class="warning-text">等待 8 个扭转骨</b></div>
-        <div><span>手指与面部</span><b class="warning-text">尚未覆盖</b></div>
-        <div><span>身体生产版目标</span><b>${PRODUCTION_RIG_BLUEPRINT.bodyProduction.deformJointTarget} 变形关节</b></div>
-        <div><span>完整表现版目标</span><b>${PRODUCTION_RIG_BLUEPRINT.fullPerformance.deformJointTarget} 变形关节</b></div>
+        <div><span>完整节点</span><b>${ACTIVE_RIG_SUMMARY.counts.total}</b></div>
+        <div><span>变形 / 校正关节</span><b>${ACTIVE_RIG_SUMMARY.counts.deform} / ${ACTIVE_RIG_SUMMARY.counts.corrective}</b></div>
+        <div><span>IK 与编辑控制</span><b>${ACTIVE_RIG_SUMMARY.counts.control}</b></div>
+        <div><span>接触与测量标记</span><b>${ACTIVE_RIG_SUMMARY.counts.marker}</b></div>
+        <div><span>扭转分配骨</span><b class="success-text">${PRODUCTION_RIG_BLUEPRINT.bodyProduction.additiveDeformJoints.length} 已启用</b></div>
+        <div><span>VRM 手指关节</span><b class="success-text">${PRODUCTION_RIG_BLUEPRINT.fullPerformance.additiveFingerJointCount} 已启用</b></div>
+        <div><span>眼睛与下颌</span><b class="success-text">3 已启用</b></div>
+        <div><span>重定向链</span><b>${Object.keys(PRODUCTION_RIG_BLUEPRINT.fullPerformance.retargetChains).length}</b></div>
+        <div><span>关节轴契约</span><b class="${ACTIVE_RIG_SUMMARY.axisAudit.complete && ACTIVE_RIG_SUMMARY.axisAudit.orthonormal ? 'success-text' : 'warning-text'}">${ACTIVE_RIG_SUMMARY.axisAudit.presentEntryCount}/${ACTIVE_RIG_SUMMARY.axisAudit.requiredEntryCount}</b></div>
+        <div><span>原 SMPL 动作兼容</span><b class="success-text">追加式通过</b></div>
       </div>
-      <p class="control-note">当前活动骨架继续使用 rig@0.4.0，并保持原有 24 个 SMPL ID 与 28 节点拓扑。头顶和脚趾末端只作为测量标记，默认不出现在主骨架视图。新增扭转骨、IK、手指和面部节点需在蒙皮、动作和动画板块完成兼容后再启用。</p>
+      <p class="control-note">活动视口使用 ${ACTIVE_RIG_CAPABILITY.current.nativeRig} 的 89 节点表现架构。前 28 个节点保持 rig@0.4.0 的 ID、顺序和父子关系；现有 SMPL 表皮仍绑定原 24 骨调色板，新增扭转、手指和面部骨已进入编辑、姿势与动画拓扑，后续精细蒙皮资产可直接追加权重。</p>
       <div class="control-button-grid"><button class="control-button" id="exportRigAudit">导出当前骨架审计</button><button class="control-button" id="exportRigBlueprint">导出升级清单</button></div>`) +
     controlSection('绑定数据规则', `
       ${toggleControl('lockBoneIds', '锁定骨骼 ID', rules.lockBoneIds, '防止模块间骨骼映射失效')}
@@ -207,8 +206,8 @@ export function renderControls(context, state) {
     {
       generatedAt: new Date().toISOString(),
       activeRig: state.activeVersions.rig,
-      summary: CORE_RIG_SUMMARY,
-      capability: CORE_RIG_CAPABILITY,
+      summary: ACTIVE_RIG_SUMMARY,
+      capability: ACTIVE_RIG_CAPABILITY,
     },
   ));
 
@@ -264,7 +263,7 @@ export function exportData(state) {
   return {
     bodyProfile: structuredClone(state.character.bodyProfile),
     rigRules: structuredClone(state.character.rigRules),
-    rigSystemAudit: structuredClone(CORE_RIG_CAPABILITY),
+    rigSystemAudit: structuredClone(ACTIVE_RIG_CAPABILITY),
     productionRigBlueprint: structuredClone(PRODUCTION_RIG_BLUEPRINT),
   };
 }

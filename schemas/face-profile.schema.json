@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/face_profile@1.0",
+  "title": "Humanoid Rig Lab FaceIdentity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["face_id", "version", "age", "face_shape", "eye_shape", "nose_shape", "mouth_shape", "expression_profile"],
+  "properties": {
+    "face_id": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "age": { "type": "integer", "minimum": 0, "maximum": 120 },
+    "face_shape": { "$ref": "#/$defs/faceShape" },
+    "eye_shape": { "$ref": "#/$defs/eyeShape" },
+    "nose_shape": { "$ref": "#/$defs/noseShape" },
+    "mouth_shape": { "$ref": "#/$defs/mouthShape" },
+    "expression_profile": { "$ref": "#/$defs/expressionProfile" }
+  },
+  "$defs": {
+    "parameter": { "type": "number", "minimum": 0, "maximum": 1 },
+    "faceShape": {
+      "type": "object", "additionalProperties": false,
+      "required": ["width", "height", "jaw_width", "cheekbone"],
+      "properties": {
+        "width": { "$ref": "#/$defs/parameter" }, "height": { "$ref": "#/$defs/parameter" },
+        "jaw_width": { "$ref": "#/$defs/parameter" }, "cheekbone": { "$ref": "#/$defs/parameter" }
+      }
+    },
+    "eyeShape": {
+      "type": "object", "additionalProperties": false,
+      "required": ["size", "spacing", "tilt"],
+      "properties": {
+        "size": { "$ref": "#/$defs/parameter" }, "spacing": { "$ref": "#/$defs/parameter" },
+        "tilt": { "$ref": "#/$defs/parameter" }
+      }
+    },
+    "noseShape": {
+      "type": "object", "additionalProperties": false,
+      "required": ["width", "length", "bridge_height"],
+      "properties": {
+        "width": { "$ref": "#/$defs/parameter" }, "length": { "$ref": "#/$defs/parameter" },
+        "bridge_height": { "$ref": "#/$defs/parameter" }
+      }
+    },
+    "mouthShape": {
+      "type": "object", "additionalProperties": false,
+      "required": ["width", "fullness", "corner_curve"],
+      "properties": {
+        "width": { "$ref": "#/$defs/parameter" }, "fullness": { "$ref": "#/$defs/parameter" },
+        "corner_curve": { "$ref": "#/$defs/parameter" }
+      }
+    },
+    "expressionProfile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["profile_id", "revision", "default_expression"],
+      "properties": {
+        "profile_id": { "type": "string", "minLength": 1 },
+        "revision": { "type": "integer", "minimum": 0 },
+        "default_expression": { "enum": ["neutral", "smile", "frown", "surprise"] }
+      }
+    }
+  }
+}

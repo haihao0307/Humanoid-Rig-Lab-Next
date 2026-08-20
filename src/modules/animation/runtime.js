@@ -594,14 +594,26 @@ export function buildV8PosePayload(fkInput, {
   updatedAt = new Date().toISOString(),
 } = {}) {
   const fk = fkInput;
+  const localRotations = {};
+  for (const joint of fk.rig.joints) {
+    const worldRotation = normalizeQuaternion(fk.rotations.get(joint.id) || IDENTITY);
+    const parentWorldRotation = joint.parentId
+      ? normalizeQuaternion(fk.rotations.get(joint.parentId) || IDENTITY)
+      : IDENTITY;
+    localRotations[joint.id] = normalizeQuaternion(
+      multiplyQuaternions(conjugateQuaternion(parentWorldRotation), worldRotation),
+    );
+  }
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     type: 'humanoid-pose',
     rigName: fk.rig.definition.name,
     pose: 'CUSTOM',
     unit: 'meter',
     updatedAt,
     poseName,
+    rootJointId: 'root',
+    localRotations,
     joints: fk.rig.joints.map((joint) => {
       const position = fk.positions.get(joint.id) || ZERO;
       return {
@@ -632,7 +644,34 @@ export function deriveLocalPoseFromV8Payload(payloadInput, rigContextInput = nul
   if (!hipsJoint || !observedHips) return null;
 
   const pose = createIdentityAnimationPose({ compatibleRig: rig.rigVersion });
-  pose.root.position = subtractVectors(observedHips, hipsJoint.localPosition);
+  pose.root.position = observed.has('root')
+    ? [...observed.get('root')]
+    : subtractVectors(observedHips, hipsJoint.localPosition);
+
+  const encodedLocalRotations = new Map();
+  if (payload.localRotations && typeof payload.localRotations === 'object') {
+    for (const [jointId, value] of Object.entries(payload.localRotations)) {
+      const rotation = readPayloadQuaternion(value);
+      if (rotation) encodedLocalRotations.set(jointId, rotation);
+    }
+  }
+  if (encodedLocalRotations.size) {
+    for (const joint of rig.joints) {
+      const localRotation = encodedLocalRotations.get(joint.id);
+      if (!localRotation) continue;
+      if (joint.id === 'root') pose.joints.root = { rotation: localRotation };
+      else if (joint.id === 'hips') pose.root.rotation = localRotation;
+      else pose.joints[joint.id] = { rotation: localRotation };
+    }
+    pose.metadata = {
+      source: `v8-local-quaternion@${Number(payload.schemaVersion) || 2}`,
+      observedJointCount: observed.size,
+      encodedRotationCount: encodedLocalRotations.size,
+      approximation: 'none',
+    };
+    return pose;
+  }
+
   pose.root.rotation = [...IDENTITY];
   const worldRotations = new Map([['root', [...IDENTITY]]]);
 
@@ -1090,6 +1129,13 @@ function distance(a, b) {
 
 function vector3(value, fallback = ZERO) {
   return [finite(value?.[0], fallback[0]), finite(value?.[1], fallback[1]), finite(value?.[2], fallback[2])];
+}
+
+function readPayloadQuaternion(value) {
+  if ((!Array.isArray(value) && !ArrayBuffer.isView(value)) || value.length < 4) return null;
+  const rotation = Array.from(value).slice(0, 4).map(Number);
+  if (!rotation.every(Number.isFinite)) return null;
+  return normalizeQuaternion(rotation);
 }
 
 function finite(value, fallback) {

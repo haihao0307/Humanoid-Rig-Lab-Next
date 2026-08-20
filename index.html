@@ -19,8 +19,10 @@
       </a>
       <nav class="topnav" aria-label="主导航">
         <a class="active" href="./index.html">项目总控</a>
+        <a href="./character.html">人物生成</a>
+        <a href="./face.html">人脸参数</a>
         <a href="./studio.html?module=integration">综合预览</a>
-        <a href="./legacy/v8/index.html" target="_blank" rel="noopener">V8.4 三维比例人物编辑器</a>
+        <a href="./legacy/v8/index.html" target="_blank" rel="noopener">V8.5 全表现骨架编辑器</a>
         <a href="./docs/PROJECT_SPEC_FULL.md" target="_blank" rel="noopener">项目文档</a>
       </nav>
       <div class="top-actions">
@@ -142,7 +144,7 @@
         <div><div class="eyebrow">REVIEW</div><h2>记录本轮审查意见</h2></div>
         <button value="cancel" class="dialog-close" aria-label="关闭">×</button>
       </header>
-      <label>审查模块<select id="reviewModule"><option value="integration">综合预览</option><option value="proportion">骨骼比例</option><option value="skin">人物蒙皮</option><option value="pose">动作与物理</option><option value="animation">动画系统</option></select></label>
+      <label>审查模块<select id="reviewModule"><option value="integration">综合预览</option><option value="proportion">骨骼比例</option><option value="skin">人物蒙皮</option><option value="pose">动作与物理</option><option value="animation">动画系统</option><option value="clothing">人物服装</option></select></label>
       <label>审查结论<select id="reviewVerdict"><option value="needs-changes">需要修改</option><option value="approved">通过</option><option value="blocked">阻塞</option><option value="note">仅记录</option></select></label>
       <label>问题与要求<textarea id="reviewText" rows="7" placeholder="描述看到的问题、期望效果、复现步骤或下一步要求。"></textarea></label>
       <label class="checkbox-row"><input id="reviewIncludeState" type="checkbox" checked>在审查文件中附带当前项目状态和版本信息</label>

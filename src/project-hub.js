@@ -5,10 +5,27 @@ import {
   normalizeModuleId,
   normalizeProjectState,
 } from './state-schema.js';
+import { CharacterManager, appendOperationEvent } from '../packages/character-core/index.js';
+import { BodyShapeEditor, getActiveBodyShapeProfile } from '../packages/body-shape/index.js';
+import { FaceEditor, getActiveFaceIdentity } from '../packages/face-system/index.js';
+import {
+  ClothingManager,
+  clothingAttachmentReferences,
+  getActiveClothingProfile,
+} from '../packages/clothing-system/index.js';
+import {
+  AppearanceManager,
+  getAppearanceCharacterReferences,
+} from '../packages/appearance-system/index.js';
 
-const STORAGE_KEY = 'humanoid-rig-lab-next:project-state:v5';
-const LEGACY_STORAGE_KEYS = ['humanoid-rig-lab-next:project-state:v4', 'humanoid-rig-lab-next:project-state:v3', 'humanoid-rig-lab-next:project-state:v2', 'humanoid-rig-lab-next:project-state:v1'];
-const CHANNEL_NAME = 'humanoid-rig-lab-next:project-hub:v5';
+const STORAGE_KEY = 'humanoid-rig-lab-next:project-state:v11';
+const LEGACY_STORAGE_KEYS = ['humanoid-rig-lab-next:project-state:v10', 'humanoid-rig-lab-next:project-state:v9', 'humanoid-rig-lab-next:project-state:v8', 'humanoid-rig-lab-next:project-state:v7', 'humanoid-rig-lab-next:project-state:v6', 'humanoid-rig-lab-next:project-state:v5', 'humanoid-rig-lab-next:project-state:v4', 'humanoid-rig-lab-next:project-state:v3', 'humanoid-rig-lab-next:project-state:v2', 'humanoid-rig-lab-next:project-state:v1'];
+const CHANNEL_NAME = 'humanoid-rig-lab-next:project-hub:v11';
+const characterManager = new CharacterManager();
+const bodyShapeEditor = new BodyShapeEditor();
+const faceEditor = new FaceEditor();
+const clothingManager = new ClothingManager();
+const appearanceManager = new AppearanceManager();
 
 function safeClone(value) {
   return structuredClone(value);
@@ -70,7 +87,7 @@ export class ProjectHubClient extends EventTarget {
     if ('SharedWorker' in window && location.protocol !== 'file:') {
       try {
         this.worker = new SharedWorker('./workers/project-hub.shared.js?build=four-module-v002-20260819', {
-          name: 'humanoid-rig-lab-next-project-hub-v5',
+          name: 'humanoid-rig-lab-next-project-hub-v11',
           type: 'module',
         });
         this.worker.port.start();
@@ -198,6 +215,447 @@ export class ProjectHubClient extends EventTarget {
     return Number(this.state.moduleRevisions?.[normalizeModuleId(module)] || 1);
   }
 
+  getCharacter(characterId = this.state.characterCore?.active_character_id, options = {}) {
+    return characterManager.load(this.state.characterCore, characterId, options);
+  }
+
+  createCharacter(profile, { expected_revision = this.state.characterCore?.revision, ...options } = {}) {
+    const result = characterManager.create(this.state.characterCore, profile, {
+      ...options,
+      expected_revision,
+      module_revisions: this.state.moduleRevisions,
+      actor: options.actor || `character:${this.clientId.slice(0, 8)}`,
+    });
+    return this.#commitCharacterOperation(result, `创建人物 ${result.profile.name}`);
+  }
+
+  saveCharacter(profile, { expected_revision = this.state.characterCore?.revision, ...options } = {}) {
+    const result = characterManager.save(this.state.characterCore, profile, {
+      ...options,
+      expected_revision,
+      actor: options.actor || `character:${this.clientId.slice(0, 8)}`,
+    });
+    return this.#commitCharacterOperation(result, `保存人物 ${result.profile.name} v${result.profile.version}`);
+  }
+
+  updateCharacterReferences(characterId, references, {
+    expected_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const result = characterManager.updateReferences(this.state.characterCore, characterId, references, {
+      ...options,
+      expected_revision,
+      actor: options.actor || `character:${this.clientId.slice(0, 8)}`,
+    });
+    return this.#commitCharacterOperation(result, `更新人物 ${result.profile.name} 的模块版本引用`);
+  }
+
+  getBodyShape({ version = null } = {}) {
+    return bodyShapeEditor.loadVersion(this.state.bodyShape, version);
+  }
+
+  updateBodyShape(parameters, { expected_revision = this.state.bodyShape?.revision, ...options } = {}) {
+    const bodyShape = bodyShapeEditor.update(this.state.bodyShape, parameters, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitBodyShapeState(bodyShape, '修改身体形态参数', { syncCharacter: false });
+  }
+
+  saveBodyShapeVersion({
+    expected_revision = this.state.bodyShape?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const bodyShape = bodyShapeEditor.saveVersion(this.state.bodyShape, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitBodyShapeState(bodyShape, '保存身体形态版本', {
+      syncCharacter: true,
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  restoreBodyShapeVersion(version, {
+    expected_revision = this.state.bodyShape?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const bodyShape = bodyShapeEditor.restoreVersion(this.state.bodyShape, version, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitBodyShapeState(bodyShape, `恢复身体形态版本 ${version}`, {
+      syncCharacter: true,
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  getFace({ version = null, face_id = null } = {}) {
+    return faceEditor.loadVersion(this.state.faceSystem, version, { face_id });
+  }
+
+  createFaceIdentity(profile, {
+    expected_revision = this.state.faceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const faceSystem = faceEditor.create(this.state.faceSystem, profile, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitFaceSystem(faceSystem, `创建 Face Identity ${profile.face_id}`, {
+      syncCharacter: true,
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  updateFaceIdentity(patch, { expected_revision = this.state.faceSystem?.revision, ...options } = {}) {
+    const faceSystem = faceEditor.update(this.state.faceSystem, patch, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitFaceSystem(faceSystem, '修改 Face Identity 参数', { syncCharacter: false });
+  }
+
+  saveFaceVersion({
+    expected_revision = this.state.faceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const faceSystem = faceEditor.saveVersion(this.state.faceSystem, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitFaceSystem(faceSystem, '保存 Face Identity 版本', {
+      syncCharacter: true,
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  restoreFaceVersion(version, {
+    expected_revision = this.state.faceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const faceSystem = faceEditor.restoreVersion(this.state.faceSystem, version, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitFaceSystem(faceSystem, `恢复 Face Identity 版本 ${version}`, {
+      syncCharacter: true,
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  getClothing({ version = null } = {}) {
+    return clothingManager.loadVersion(this.state.clothingSystem, version);
+  }
+
+  addClothingAsset(asset, {
+    expected_revision = this.state.clothingSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const clothingSystem = clothingManager.add(this.state.clothingSystem, asset, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitClothingSystem(clothingSystem, `添加服装 ${asset.clothing_id}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  removeClothingAsset(clothingId, {
+    expected_revision = this.state.clothingSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const clothingSystem = clothingManager.remove(this.state.clothingSystem, clothingId, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitClothingSystem(clothingSystem, `删除服装 ${clothingId}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  saveClothingVersion({
+    expected_revision = this.state.clothingSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const clothingSystem = clothingManager.saveVersion(this.state.clothingSystem, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitClothingSystem(clothingSystem, '保存服装版本', {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  restoreClothingVersion(version, {
+    expected_revision = this.state.clothingSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const clothingSystem = clothingManager.restoreVersion(this.state.clothingSystem, version, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitClothingSystem(clothingSystem, `恢复服装版本 ${version}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  getAppearance({ version = null } = {}) {
+    return appearanceManager.loadVersion(this.state.appearanceSystem, version);
+  }
+
+  addHair(profile, {
+    expected_revision = this.state.appearanceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const appearanceSystem = appearanceManager.addHair(this.state.appearanceSystem, profile, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitAppearanceSystem(appearanceSystem, `添加发型 ${profile.hair_id}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  switchHair(hairId, {
+    expected_revision = this.state.appearanceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const appearanceSystem = appearanceManager.switchHair(this.state.appearanceSystem, hairId, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitAppearanceSystem(appearanceSystem, `切换发型 ${hairId}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  addAccessory(profile, {
+    expected_revision = this.state.appearanceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const appearanceSystem = appearanceManager.addAccessory(this.state.appearanceSystem, profile, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitAppearanceSystem(appearanceSystem, `添加附件 ${profile.accessory_id}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  removeAccessory(accessoryId, {
+    expected_revision = this.state.appearanceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const appearanceSystem = appearanceManager.removeAccessory(this.state.appearanceSystem, accessoryId, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitAppearanceSystem(appearanceSystem, `删除附件 ${accessoryId}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  saveAppearanceVersion({
+    expected_revision = this.state.appearanceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const appearanceSystem = appearanceManager.saveVersion(this.state.appearanceSystem, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitAppearanceSystem(appearanceSystem, '保存 Appearance 版本', {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  restoreAppearanceVersion(version, {
+    expected_revision = this.state.appearanceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const appearanceSystem = appearanceManager.restoreVersion(this.state.appearanceSystem, version, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitAppearanceSystem(appearanceSystem, `恢复 Appearance 版本 ${version}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  #commitCharacterOperation(result, summary) {
+    const state = this.transaction((next) => {
+      next.characterCore = structuredClone(result.state);
+      next.operationEvents = appendOperationEvent(next.operationEvents, result.event);
+    }, { module: 'integration', summary });
+    return {
+      state,
+      profile: structuredClone(result.profile),
+      event: structuredClone(result.event),
+    };
+  }
+
+  #commitBodyShapeState(bodyShape, summary, {
+    syncCharacter = false,
+    expectedCharacterRevision = this.state.characterCore?.revision,
+    actor = null,
+  } = {}) {
+    const bodyShapeProfile = getActiveBodyShapeProfile(bodyShape);
+    const characterId = this.state.characterCore?.active_character_id;
+    const characterResult = syncCharacter && characterId
+      ? characterManager.save(this.state.characterCore, {
+          character_id: characterId,
+          body_shape: {
+            profile_id: bodyShapeProfile.body_shape_id,
+            revision: bodyShapeProfile.version,
+          },
+          body_shape_revision: bodyShapeProfile.version,
+        }, {
+          expected_revision: expectedCharacterRevision,
+          actor: actor || `body-shape:${this.clientId.slice(0, 8)}`,
+        })
+      : null;
+    const state = this.transaction((next) => {
+      next.bodyShape = structuredClone(bodyShape);
+      if (characterResult) {
+        next.characterCore = structuredClone(characterResult.state);
+        next.operationEvents = appendOperationEvent(next.operationEvents, characterResult.event);
+      }
+    }, { module: 'integration', summary });
+    return {
+      state,
+      bodyShape: structuredClone(bodyShape),
+      profile: bodyShapeProfile,
+      character: characterResult ? structuredClone(characterResult.profile) : null,
+      event: characterResult ? structuredClone(characterResult.event) : null,
+    };
+  }
+
+  #commitFaceSystem(faceSystem, summary, {
+    syncCharacter = false,
+    expectedCharacterRevision = this.state.characterCore?.revision,
+    actor = null,
+  } = {}) {
+    const faceIdentity = getActiveFaceIdentity(faceSystem);
+    const characterId = this.state.characterCore?.active_character_id;
+    const characterResult = syncCharacter && characterId
+      ? characterManager.save(this.state.characterCore, {
+          character_id: characterId,
+          face_identity: { face_id: faceIdentity.face_id, revision: faceIdentity.version },
+          face_revision: faceIdentity.version,
+        }, {
+          expected_revision: expectedCharacterRevision,
+          actor: actor || `face-system:${this.clientId.slice(0, 8)}`,
+        })
+      : null;
+    const state = this.transaction((next) => {
+      next.faceSystem = structuredClone(faceSystem);
+      if (characterResult) {
+        next.characterCore = structuredClone(characterResult.state);
+        next.operationEvents = appendOperationEvent(next.operationEvents, characterResult.event);
+      }
+    }, { module: 'integration', summary });
+    return {
+      state,
+      faceSystem: structuredClone(faceSystem),
+      profile: faceIdentity,
+      character: characterResult ? structuredClone(characterResult.profile) : null,
+      event: characterResult ? structuredClone(characterResult.event) : null,
+    };
+  }
+
+  #commitClothingSystem(clothingSystem, summary, {
+    expectedCharacterRevision = this.state.characterCore?.revision,
+    actor = null,
+  } = {}) {
+    const clothingProfile = getActiveClothingProfile(clothingSystem);
+    const characterId = this.state.characterCore?.active_character_id;
+    const characterResult = characterId
+      ? characterManager.save(this.state.characterCore, {
+          character_id: characterId,
+          clothing_attachments: clothingAttachmentReferences(clothingProfile),
+          clothing_revision: clothingProfile.version,
+        }, {
+          expected_revision: expectedCharacterRevision,
+          actor: actor || `clothing-system:${this.clientId.slice(0, 8)}`,
+        })
+      : null;
+    const state = this.transaction((next) => {
+      next.clothingSystem = structuredClone(clothingSystem);
+      if (characterResult) {
+        next.characterCore = structuredClone(characterResult.state);
+        next.operationEvents = appendOperationEvent(next.operationEvents, characterResult.event);
+      }
+    }, { module: 'clothing', summary });
+    return {
+      state,
+      clothingSystem: structuredClone(clothingSystem),
+      profile: clothingProfile,
+      character: characterResult ? structuredClone(characterResult.profile) : null,
+      event: characterResult ? structuredClone(characterResult.event) : null,
+    };
+  }
+
+  #commitAppearanceSystem(appearanceSystem, summary, {
+    expectedCharacterRevision = this.state.characterCore?.revision,
+    actor = null,
+  } = {}) {
+    const references = getAppearanceCharacterReferences(appearanceSystem);
+    const characterId = this.state.characterCore?.active_character_id;
+    const characterResult = characterId
+      ? characterManager.save(this.state.characterCore, {
+          character_id: characterId,
+          ...references,
+        }, {
+          expected_revision: expectedCharacterRevision,
+          actor: actor || `appearance-system:${this.clientId.slice(0, 8)}`,
+        })
+      : null;
+    const state = this.transaction((next) => {
+      next.appearanceSystem = structuredClone(appearanceSystem);
+      if (characterResult) {
+        next.characterCore = structuredClone(characterResult.state);
+        next.operationEvents = appendOperationEvent(next.operationEvents, characterResult.event);
+      }
+    }, { module: 'integration', summary });
+    return {
+      state,
+      appearanceSystem: structuredClone(appearanceSystem),
+      appearance: appearanceManager.loadVersion(appearanceSystem),
+      character: characterResult ? structuredClone(characterResult.profile) : null,
+      event: characterResult ? structuredClone(characterResult.event) : null,
+    };
+  }
+
   subscribe(callback) {
     const handler = (event) => callback(event.detail.state, event.detail);
     this.addEventListener('statechange', handler);
@@ -265,17 +723,25 @@ export class ProjectHubClient extends EventTarget {
     return this.getState();
   }
 
-  replaceState(nextState, summary = '导入项目状态') {
+  replaceState(nextState, summary = '导入项目状态', { changedModules = MODULE_IDS } = {}) {
     const normalized = normalizeProjectState(nextState);
     const now = new Date().toISOString();
     normalized.revision = Math.max(Number(this.state.revision || 0) + 1, Number(normalized.revision || 0) + 1);
+    const changed = new Set((Array.isArray(changedModules) ? changedModules : MODULE_IDS).map(normalizeModuleId));
     normalized.updatedAt = now;
     for (const id of MODULE_IDS) {
-      normalized.moduleRevisions[id] = Math.max(
-        Number(this.state.moduleRevisions?.[id] || 1) + 1,
-        Number(normalized.moduleRevisions?.[id] || 1),
-      );
-      normalized.moduleUpdatedAt[id] = now;
+      if (changed.has(id)) {
+        normalized.moduleRevisions[id] = Math.max(
+          Number(this.state.moduleRevisions?.[id] || 1) + 1,
+          Number(normalized.moduleRevisions?.[id] || 1),
+        );
+        normalized.moduleUpdatedAt[id] = now;
+      } else {
+        normalized.moduleRevisions[id] = Math.max(
+          Number(this.state.moduleRevisions?.[id] || 1),
+          Number(normalized.moduleRevisions?.[id] || 1),
+        );
+      }
     }
     const entry = createActivity('integration', summary);
     appendActivity(normalized, entry);
@@ -306,7 +772,11 @@ export class ProjectHubClient extends EventTarget {
         state.character.pose = safeClone(data.pose || data);
         if (data.physics) state.character.physics = { ...state.character.physics, ...data.physics };
       } else if (module === 'animation') state.character.animation = safeClone(data.animation || data);
-      else if (data.activeVersions) state.activeVersions = { ...state.activeVersions, ...data.activeVersions };
+      else if (module === 'clothing') state.clothingSystem = safeClone(data.clothingSystem || data);
+      else {
+        if (data.appearanceSystem) state.appearanceSystem = safeClone(data.appearanceSystem);
+        if (data.activeVersions) state.activeVersions = { ...state.activeVersions, ...data.activeVersions };
+      }
     }, { module, summary: `导入 ${module} 模块更新包` });
   }
 

@@ -116,6 +116,8 @@ export class PhysicsRig {
         length: getBoneLength(definition, joint.id),
         type: 'bone',
         jointId: joint.id,
+        oneWayFromParent: joint.rigTier === 'full-performance'
+          && definition.joints[a]?.rigTier === 'core',
         fallbackDirection: normalizedDirection(bindA, bindB),
       });
     }
@@ -411,7 +413,9 @@ export class PhysicsRig {
       dz /= measuredLength;
     }
 
-    const weightA = massMode === 'equal'
+    const weightA = constraint.oneWayFromParent && massMode === 'dynamic'
+      ? 0
+      : massMode === 'equal'
       ? (this.isPinnedAndNotDragged(constraint.a) ? 0 : 1)
       : this.getEffectiveInverseMass(constraint.a);
     const weightB = massMode === 'equal'
@@ -724,10 +728,10 @@ export class PhysicsRig {
    * conversion error is reported explicitly.
    */
   buildPoseSnapshot({
-    compatibleRig = this.definition?.rigVersion ?? 'rig@0.4.0',
+    compatibleRig = this.definition?.rigProfile?.compatibleRig ?? this.definition?.rigVersion ?? 'rig@0.4.0',
     name = this.definition?.pose ?? 'CUSTOM',
     includeWorldPositions = false,
-    source = 'physics-rig-v8.4',
+    source = 'physics-rig-v8.5',
   } = {}) {
     if (!this.definition) {
       throw new Error('Cannot build a pose snapshot without a rig definition.');
@@ -1058,6 +1062,60 @@ export class PhysicsRig {
       setArrayPoint(this.positions, index, point);
       setArrayPoint(this.previous, index, point);
     }
+    this.syncDerivedNodes();
+  }
+
+  /** Twist, corrective, contact, and face helpers are derived from live anatomical joints. */
+  syncDerivedNodes() {
+    for (let index = 0; index < this.definition.joints.length; index += 1) {
+      const joint = this.definition.joints[index];
+      if (joint?.isControl || !['derived', 'passive-endpoint'].includes(joint?.solverParticipation)) {
+        continue;
+      }
+      const placement = joint.placement ?? {};
+      let point = null;
+      if (placement.mode === 'segment-fraction' || placement.mode === 'shoulder-girdle-blend') {
+        const startIndex = this.indexById.get(placement.startJointId ?? placement.sourceJointId ?? joint.parentId);
+        const endIndex = this.indexById.get(placement.endJointId);
+        if (startIndex != null && endIndex != null) {
+          const start = this.getPointByIndex(startIndex);
+          const end = this.getPointByIndex(endIndex);
+          const fraction = clamp(Number(placement.fraction) || 0.5, 0, 1);
+          point = {
+            x: start.x + (end.x - start.x) * fraction,
+            y: start.y + (end.y - start.y) * fraction,
+            z: start.z + (end.z - start.z) * fraction,
+          };
+        }
+      }
+      if (!point && joint.followJointId) {
+        const sourceIndex = this.indexById.get(joint.followJointId);
+        if (sourceIndex != null) {
+          const source = this.getPointByIndex(sourceIndex);
+          const offset = Array.isArray(joint.controlOffset) ? joint.controlOffset : [0, 0, 0];
+          point = {
+            x: source.x + (Number(offset[0]) || 0),
+            y: source.y + (Number(offset[1]) || 0),
+            z: source.z + (Number(offset[2]) || 0),
+          };
+        }
+      }
+      if (!point && joint.parentId) {
+        const parentIndex = this.indexById.get(joint.parentId);
+        if (parentIndex != null) {
+          const parent = this.getPointByIndex(parentIndex);
+          point = {
+            x: parent.x + (Number(joint.localPosition?.[0]) || 0),
+            y: parent.y + (Number(joint.localPosition?.[1]) || 0),
+            z: parent.z + (Number(joint.localPosition?.[2]) || 0),
+          };
+        }
+      }
+      if (point) {
+        setArrayPoint(this.positions, index, point);
+        setArrayPoint(this.previous, index, point);
+      }
+    }
   }
 
   getDragTargetError() {
@@ -1165,7 +1223,14 @@ export class PhysicsRig {
 
     for (const joint of joints) {
       const parent = joint.parentId ? byId.get(joint.parentId) : null;
-      if (!parent || joint.physicalBone === false || joint.isControl || parent.isControl) {
+      if (
+        !parent
+        || joint.rigTier !== 'core'
+        || parent.rigTier !== 'core'
+        || joint.physicalBone === false
+        || joint.isControl
+        || parent.isControl
+      ) {
         continue;
       }
       const list = childrenByParent.get(joint.parentId) ?? [];
@@ -1213,6 +1278,9 @@ export class PhysicsRig {
       const grandparent = parent?.parentId ? byId.get(parent.parentId) : null;
       if (
         grandparent
+        && child.rigTier === 'core'
+        && parent.rigTier === 'core'
+        && grandparent.rigTier === 'core'
         && child.physicalBone !== false
         && parent.physicalBone !== false
         && !child.isControl
@@ -1627,6 +1695,9 @@ function inverseMassForJoint(joint) {
   if (joint.isControl) {
     return 0;
   }
+  if (['derived', 'passive-endpoint', 'none'].includes(joint.solverParticipation)) {
+    return 0;
+  }
   if (joint.category === 'root') {
     return 0.24;
   }
@@ -1644,6 +1715,12 @@ function inverseMassForJoint(joint) {
   }
   if (joint.category === 'arm') {
     return /Hand/.test(joint.id) ? 1 : 0.84;
+  }
+  // Fingers should follow wrist motion as lightweight articulated chains.
+  // Giving them a higher inverse mass prevents five child chains from
+  // artificially anchoring the hand during whole-body posing.
+  if (joint.category === 'hand') {
+    return 4;
   }
   return 0.72;
 }

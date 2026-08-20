@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/character_generator_session@1.0",
+  "title": "Humanoid Rig Lab Character Generator Session",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "session_id",
+    "version",
+    "status",
+    "character_id",
+    "source_image",
+    "analysis",
+    "outputs",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "schema": { "const": "humanoid_rig/character_generator_session@1.0" },
+    "session_id": { "$ref": "#/$defs/identifier" },
+    "version": { "type": "integer", "minimum": 1 },
+    "status": { "enum": ["generated", "saved"] },
+    "character_id": { "$ref": "#/$defs/identifier" },
+    "source_image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_name", "mime_type", "byte_length", "width", "height", "content_hash", "binary_storage"],
+      "properties": {
+        "file_name": { "type": "string", "minLength": 1 },
+        "mime_type": { "type": "string", "minLength": 1 },
+        "byte_length": { "type": "number", "minimum": 0 },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 },
+        "content_hash": { "type": "string", "pattern": "^[a-f0-9]{16,128}$" },
+        "binary_storage": { "const": "not-in-project-state" }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "required": ["schema", "analysis_id", "adapters", "confidence", "warnings", "created_at"],
+      "properties": {
+        "schema": { "const": "humanoid_rig/character_image_analysis@1.0" },
+        "analysis_id": { "$ref": "#/$defs/identifier" },
+        "adapters": {
+          "type": "object",
+          "required": ["proportion", "pose"],
+          "properties": {
+            "proportion": { "$ref": "#/$defs/adapter" },
+            "pose": { "$ref": "#/$defs/adapter" }
+          }
+        },
+        "confidence": {
+          "type": "object",
+          "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 }
+        },
+        "warnings": { "type": "array", "items": { "type": "string" } },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proportion_profile",
+        "body_shape",
+        "face_identity",
+        "clothing_profile",
+        "pose_snapshot",
+        "image_pose_asset",
+        "legacy_world_pose",
+        "character_profile"
+      ],
+      "properties": {
+        "proportion_profile": {
+          "type": "object",
+          "required": ["schema", "proportion_profile_id", "revision", "source_module", "body_profile"],
+          "properties": {
+            "schema": { "const": "humanoid_rig/proportion_profile@1.0" },
+            "proportion_profile_id": { "$ref": "#/$defs/identifier" },
+            "revision": { "type": "integer", "minimum": 1 },
+            "source_module": { "const": "HRL-M01" },
+            "body_profile": { "type": "object" }
+          }
+        },
+        "body_shape": { "$ref": "body-shape-profile.schema.json" },
+        "face_identity": { "$ref": "face-profile.schema.json" },
+        "clothing_profile": { "$ref": "clothing-profile.schema.json" },
+        "pose_snapshot": {
+          "type": "object",
+          "required": ["schema"],
+          "properties": { "schema": { "const": "humanoid_rig/pose_snapshot@1.0" } }
+        },
+        "image_pose_asset": { "type": "object" },
+        "legacy_world_pose": { "type": "object" },
+        "character_profile": { "$ref": "character-profile.schema.json" }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "adapter": {
+      "type": "object",
+      "required": ["id", "contract", "output"],
+      "properties": {
+        "id": { "enum": ["HRL-M01", "HRL-M03"] },
+        "contract": { "type": "string", "minLength": 1 },
+        "output": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

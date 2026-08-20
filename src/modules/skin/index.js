@@ -1,9 +1,21 @@
 import { bindToggle, controlSection, rangeControl, toggleControl } from '../../workspace-common.js';
 
 const SKIN_BUILD_ID = 'skin-v002-single-surface-guard';
+const BODY_SHAPE_CONTROLS = Object.freeze([
+  ['muscle', '肌肉量'],
+  ['fat', '脂肪量'],
+  ['shoulder_volume', '肩部体积'],
+  ['chest_volume', '胸部体积'],
+  ['waist_volume', '腰部体积'],
+  ['hip_volume', '髋部体积'],
+  ['arm_volume', '手臂体积'],
+  ['leg_volume', '腿部体积'],
+]);
 
 export function renderControls(context, state) {
   const display = state.character.display;
+  const bodyShapeState = state.bodyShape;
+  const bodyShape = bodyShapeState?.profiles?.[bodyShapeState.active_profile_id] || {};
   context.elements.moduleControls.innerHTML =
     controlSection('表皮显示', `
       ${toggleControl('skinVisibleToggle', '显示人物表皮', display.skinVisible)}
@@ -17,6 +29,11 @@ export function renderControls(context, state) {
       <div class="toggle-row"><span>全场景重复表皮守卫</span><b style="font-size:9px;color:#63dda5">已启用</b></div>
       <p class="control-note">同一个预绑定 GLB 同时承担显示、三角面拾取和 GPU 蒙皮变形。运行时会扫描整个 Three.js 场景并移除历史程序化人体、旧静态人体和隐藏拾取壳。</p>
       <div class="control-button-grid"><button class="control-button" id="verifySkinBuild">先验证 V002 构建</button><button class="control-button" id="openLegacySkin">打开统一人物视口</button><button class="control-button" id="reloadSurface">重新加载预绑定表皮</button></div>`) +
+    controlSection('BodyShape 身体形态', `
+      <div class="toggle-row"><span>当前版本</span><b style="font-size:9px;color:#63dda5">v${Number(bodyShape.version || 1)}${bodyShapeState?.dirty ? ' · 草稿' : ''}</b></div>
+      ${BODY_SHAPE_CONTROLS.map(([key, label]) => rangeControl(`bodyShape_${key}`, label, 0, 1, .01, Number(bodyShape[key] ?? .5).toFixed(2), '')).join('')}
+      <p class="control-note">这些参数只改变表皮肉体体积，不修改骨架比例、骨长、父子层级、姿势或动画轨道。</p>
+      <div class="control-button-grid"><button class="control-button" id="saveBodyShapeVersion">保存形态版本</button><button class="control-button" id="restoreBodyShapeVersion">恢复上一版本</button></div>`) +
     controlSection('绑定质量', `
       <div class="toggle-row"><span>原生顶点通道</span><b style="font-size:9px;color:#63dda5">JOINTS_0 / WEIGHTS_0</b></div>
       <div class="toggle-row"><span>逆绑定矩阵</span><b style="font-size:9px;color:#63dda5">24 × MAT4</b></div>
@@ -27,6 +44,30 @@ export function renderControls(context, state) {
 
   const surfaceMode = document.querySelector('#surfaceMode');
   if (surfaceMode) surfaceMode.value = display.surfaceMode || 'solid';
+
+  for (const [key, label] of BODY_SHAPE_CONTROLS) {
+    const input = document.querySelector(`#bodyShape_${key}`);
+    const output = document.querySelector(`#bodyShape_${key}Output`);
+    input?.addEventListener('input', () => { if (output) output.value = Number(input.value).toFixed(2); });
+    input?.addEventListener('change', () => {
+      context.hub.updateBodyShape({ [key]: Number(input.value) });
+      if (output) output.value = Number(input.value).toFixed(2);
+    });
+  }
+
+  document.querySelector('#saveBodyShapeVersion')?.addEventListener('click', () => {
+    context.hub.saveBodyShapeVersion();
+  });
+  document.querySelector('#restoreBodyShapeVersion')?.addEventListener('click', () => {
+    const current = context.getState().bodyShape;
+    const active = current?.profiles?.[current.active_profile_id];
+    const versions = current?.versions?.[current.active_profile_id] || [];
+    const candidates = versions.filter((item) => current.dirty
+      ? item.version <= Number(active?.version || 1)
+      : item.version < Number(active?.version || 1));
+    const previous = candidates.at(-1);
+    if (previous) context.hub.restoreBodyShapeVersion(previous.version);
+  });
 
   bindToggle('skinVisibleToggle', (value) => context.hub.transaction((next) => {
     next.character.display.skinVisible = value;
@@ -71,7 +112,12 @@ function syncDisplayMode(state) {
 }
 
 export function exportData(state) {
-  return { display: structuredClone(state.character.display), skin: structuredClone(state.character.skin) };
+  return {
+    display: structuredClone(state.character.display),
+    skin: structuredClone(state.character.skin),
+    bodyShape: structuredClone(state.bodyShape),
+    skinShapeResponse: structuredClone(state.bodyShape?.skin_response || null),
+  };
 }
 
 export function resetData(state, defaults) {

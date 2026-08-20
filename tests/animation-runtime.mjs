@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {
   getActiveClip,
   normalizeAnimationState,
+  setActiveClip,
   setAnimationLayer,
   setGraphParameter,
 } from '../src/modules/animation/model.js';
@@ -75,9 +76,11 @@ for (const profile of profiles) {
         bodyProfile: profile.value,
         rigVersion: 'rig@0.4.0',
       });
-      assert.equal(frame.v8Payload.joints.length, 28, `${profile.name}/${clipId} joint count`);
-      assert.equal(frame.animationRig.fk.positions.size, 28);
-      assert.equal(frame.simulationRig.fk.positions.size, 28);
+      assert.equal(frame.v8Payload.schemaVersion, 2);
+      assert.equal(frame.v8Payload.joints.length, 89, `${profile.name}/${clipId} joint count`);
+      assert.equal(Object.keys(frame.v8Payload.localRotations).length, 89);
+      assert.equal(frame.animationRig.fk.positions.size, 89);
+      assert.equal(frame.simulationRig.fk.positions.size, 89);
       assert.ok(frame.v8Payload.joints.every((joint) => Object.values(joint.poseWorldPosition).every(Number.isFinite)));
       assert.ok(frame.diagnostics.maxBoneLengthError < 1e-9, `${profile.name}/${clipId} bone error ${frame.diagnostics.maxBoneLengthError}`);
     }
@@ -168,6 +171,7 @@ assert.equal(mixed.diagnostics.layers.length, 3);
 
 let graphAnimation = normalizeAnimationState({});
 graphAnimation = setGraphParameter(graphAnimation, 'wave', true);
+assert.equal(graphAnimation.graph.controlMode, 'graph');
 let graphResult = evaluateAnimationGraph(graphAnimation, { nowMs: 1000, consumeTriggers: true });
 assert.equal(graphResult.changed, true);
 assert.equal(graphResult.startedTransition.toStateId, 'wave');
@@ -175,6 +179,11 @@ assert.equal(graphResult.animation.activeClipId, 'wave');
 assert.equal(graphResult.animation.graph.parameters.wave, false);
 graphResult = evaluateAnimationGraph(graphResult.animation, { nowMs: 1400, consumeTriggers: true });
 assert.equal(graphResult.completedTransition.toStateId, 'wave');
+
+const manualWave = setActiveClip(normalizeAnimationState({}), 'wave');
+const manualGraphResult = evaluateAnimationGraph(manualWave, { nowMs: 5000, consumeTriggers: true });
+assert.equal(manualGraphResult.changed, false, 'manual clip preview must not be consumed by graph transitions');
+assert.equal(manualGraphResult.animation.activeClipId, 'wave');
 
 const waveClip = base.clips.find((clip) => clip.clipId === 'wave');
 const waveEvents = collectAnimationEvents(waveClip, 0, 3.3);
@@ -196,6 +205,11 @@ assert.equal(retargeted.compatibleRig, 'rig@0.4.0');
 assert.ok(retargeted.tracks.find((track) => track.channel === 'position').keyframes.at(-1).value[2] > 0.72);
 
 const roundTripPayload = buildV8PosePayload(standardWave.fk);
+assert.equal(roundTripPayload.schemaVersion, 2);
+assert.equal(Object.keys(roundTripPayload.localRotations).length, 89);
+assert.ok(Object.values(roundTripPayload.localRotations).every((rotation) => (
+  Math.abs(Math.hypot(...rotation) - 1) < 1e-10
+)));
 const derived = deriveLocalPoseFromV8Payload(roundTripPayload, createRigContext(profiles[0].value));
 const rebuilt = forwardKinematics(derived, createRigContext(profiles[0].value));
 assert.ok(measureBoneLengthError(rebuilt) < 1e-9);
@@ -206,7 +220,14 @@ for (const joint of roundTripPayload.joints) {
 }
 assert.ok(maxRoundTripError < 1e-8, `world to local recording round trip ${maxRoundTripError}`);
 
-console.log('PASS 28-joint dual-rig runtime, three target proportions, fixed bone lengths, root scaling, contacts, layers, graph transitions, physics modes, event cycles, and local-pose recording');
+const legacyWorldOnlyPayload = structuredClone(roundTripPayload);
+legacyWorldOnlyPayload.schemaVersion = 1;
+delete legacyWorldOnlyPayload.localRotations;
+const legacyDerived = deriveLocalPoseFromV8Payload(legacyWorldOnlyPayload, createRigContext(profiles[0].value));
+assert.ok(legacyDerived, 'Schema 1 world-position payload should retain its compatibility fallback.');
+assert.equal(legacyDerived.metadata.approximation, 'single-child-orientation');
+
+console.log('PASS 89-node dual-rig runtime, three target proportions, fixed bone lengths, root scaling, contacts, layers, graph transitions, physics modes, event cycles, and local-pose recording');
 
 function distance(a, b) {
   return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);

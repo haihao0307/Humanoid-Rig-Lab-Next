@@ -1,6 +1,6 @@
 # Humanoid Rig Lab Next 四板块 V002 验证记录
 
-验证日期：2026 年 8 月 19 日
+验证日期：2026 年 8 月 20 日
 项目版本：`0.5.0`
 构建 ID：`four-module-v002-20260819`
 
@@ -14,8 +14,8 @@ npm test
 
 ```text
 PASS Humanoid Rig Lab Next 0.5.0 build four-module-v002-20260819
-PASS 53 required files
-PASS V0.5 schema, module state, and migration contract
+PASS 104 required files
+PASS schema v11, Character Core, BodyShape, Face Identity, Clothing System, Appearance System, Character Generator, module state, and migration contract
 PASS primary 3D proportion stage and explicit 2D fallback separation
 PASS live body-profile bridge and exact 3D dimension feedback contract
 PASS module-scoped synchronization and rig-rule exchange contract
@@ -26,13 +26,30 @@ PASS pre-bound single-surface GLB 2104780 bytes
 PASS GitHub Pages workflow contract
 PASS module-scoped patches merge simultaneous four-window edits without overwriting unrelated modules
 PASS legacy surface-source fields are forced onto the single detailed surface
-PASS schema v1 project migration to schema v5
+PASS schema v1 project migration to schema v11
+PASS Character create, save, current load, historical load, optimistic revision and write guard
+PASS BodyShape parameter editing, versioning, Skin response and four-module isolation
+PASS Face Identity create, parameter editing, save, load, restore and Character reference
+PASS Face Runtime adapter boundary preserves Skin, Rig, Pose and Animation
+PASS Clothing add, remove, save, load, and historical restore
+PASS static Clothing Mesh follows real animation simulationRig transforms
+PASS Character clothing attachment references and schema v8 to v11 migration
+PASS independent Clothing patch and visual layer preserve Body Skin and the original four modules
+PASS Hair add and short, long, ponytail switching
+PASS hat, glasses, and ornament attachment management
+PASS Appearance save, load, restore, revision conflict, and Character references
+PASS static Appearance attachments follow simulationRig without changing existing modules
+PASS image observation creates Proportion, BodyShape, Face, Clothing, and Pose data through HRL-M01/HRL-M03 adapters
+PASS generated Character references existing module versions without mutating Rig, Skin, or Animation data
+PASS Character Generator save, historical load, serialized reload, and schema v10 to v11 migration
+PASS character.html upload, analysis, generation, and version-save entry contract
 PASS integrated build four-module-v002-20260819
 PASS baseline-state migration to all four V002 module versions
 PASS animation local-quaternion PoseSnapshot applied through fixed-length PhysicsRig
 PASS native pre-bound single-surface asset hash and binding metadata
 PASS shared transient transport and scrub message infrastructure
 PASS archived module scopes and build identity contract
+PASS full animation and V8.5 legacy regression suites
 ```
 
 自动测试失败数为 0。
@@ -178,9 +195,9 @@ MotionClip JSON 往返
 验证内容：
 
 ```text
-ProjectState schema 5
-旧 schema 1 至 4 自动迁移
-四模块最低 moduleRevision 自动升级
+ProjectState schema 11
+旧 schema 1 至 10 自动迁移
+四个原模块与 Clothing 最低 moduleRevision 自动升级
 不同模块的并行 Patch 保留各自切片
 过期 Patch 拒绝
 SharedWorker、BroadcastChannel 和 localStorage 回退契约
@@ -201,6 +218,9 @@ launcher.ps1 构建 ID 核验
 /studio.html?module=skin
 /studio.html?module=pose
 /studio.html?module=animation
+/studio.html?module=clothing
+/character.html
+/apps/character-generator/page.js
 /legacy/v8/index.html?embed=1&build=four-module-v002-20260819&skinBuild=skin-v002-single-surface-guard
 /legacy/v8/assets/smpl/smpl-male-surface-skinned.glb
 /legacy/v8/assets/smpl/SKIN_BINDING_METADATA.json

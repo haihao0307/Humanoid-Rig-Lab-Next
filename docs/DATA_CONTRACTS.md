@@ -1,6 +1,6 @@
 # Humanoid Rig Lab Next 共享数据协议
 
-当前项目协议版本：`schemaVersion: 5`
+当前项目协议版本：`schemaVersion: 11`
 当前合并构建：`four-module-v002-20260819`
 
 ## 1. ProjectState
@@ -9,7 +9,7 @@ ProjectState 是多窗口共享的结构化项目状态。SharedWorker 在同源
 
 ```json
 {
-  "schemaVersion": 5,
+  "schemaVersion": 11,
   "projectId": "humanoid-rig-lab-next",
   "revision": 12,
   "buildId": "four-module-v002-20260819",
@@ -18,6 +18,7 @@ ProjectState 是多窗口共享的结构化项目状态。SharedWorker 在同源
     "skin": 3,
     "pose": 3,
     "animation": 4,
+    "clothing": 1,
     "integration": 2
   },
   "moduleUpdatedAt": {},
@@ -26,10 +27,20 @@ ProjectState 是多窗口共享的结构化项目状态。SharedWorker 在同源
     "skin": "skin@0.5.1",
     "pose": "pose@0.4.0",
     "animation": "anim@0.4.0",
-    "character": "character@0.5.0"
+    "clothing": "clothing@0.1.0",
+    "appearance": "appearance@0.1.0",
+    "generator": "character-generator@0.1.0",
+    "character": "character@0.6.4"
   },
   "modules": {},
   "character": {},
+  "characterCore": {},
+  "bodyShape": {},
+  "faceSystem": {},
+  "clothingSystem": {},
+  "appearanceSystem": {},
+  "characterGenerator": {},
+  "operationEvents": [],
   "activity": [],
   "reviews": []
 }
@@ -37,7 +48,7 @@ ProjectState 是多窗口共享的结构化项目状态。SharedWorker 在同源
 
 `revision` 记录项目整体正式变更。`moduleRevisions` 记录各模块自己的修改节奏。每个工作台只提交本模块拥有的数据切片，其他模块在接近同时产生的变化会被保留。
 
-当前 schema 迁移会补齐今日四个模块的最低 revision、活动版本、构建身份和新增字段。旧项目内容继续保留，版本字段不会回退到历史模块版本。
+当前 schema 迁移会补齐四个原模块与 Clothing 的最低 revision，以及 Appearance、Character Generator 状态、活动版本、构建身份和新增字段。旧项目内容继续保留，版本字段不会回退到历史模块版本。
 
 ## 2. ModulePatch
 
@@ -385,14 +396,17 @@ BUILD_MANIFEST.json
   "schema": "humanoid_rig/build_manifest@1.0",
   "id": "four-module-v002-20260819",
   "version": "0.5.0",
-  "projectSchema": 5,
-  "rigExportSchema": 6,
+  "projectSchema": 11,
+  "rigExportSchema": 7,
   "activeVersions": {},
   "moduleRevisions": {},
   "moduleDeliveries": {},
   "skinRuntime": {},
   "poseContract": {},
-  "transientBus": "humanoid_rig/transient_bus@1.0"
+  "transientBus": "humanoid_rig/transient_bus@1.0",
+  "characterCore": {},
+  "clothingSystem": {},
+  "characterGenerator": {}
 }
 ```
 
@@ -400,9 +414,15 @@ Windows 启动器在复用已有 HTTP 端口前请求该文件并核对 `id`。�
 
 ## 12. 兼容与迁移
 
-V0.5.0 可以读取旧项目状态键：
+schemaVersion 11 可以读取旧项目状态键：
 
 ```text
+project-state:v10
+project-state:v9
+project-state:v8
+project-state:v7
+project-state:v6
+project-state:v5
 project-state:v4
 project-state:v3
 project-state:v2
@@ -412,15 +432,21 @@ project-state:v1
 迁移会补齐：
 
 ```text
-schemaVersion 5
+schemaVersion 11
 当前 buildId
 BodyProfile 新字段
 RigRules
-五个模块 revision
+六个模块 revision
 今日活动模块版本
 原生预绑定蒙皮字段
 标准 poseSnapshot 与图片动作字段
 动画会话与关键帧数组
+CharacterProfile、CharacterState 与 OperationEvent
+BodyShapeProfile、BodyShapeState 与 SkinShapeResponse
+FaceIdentity、FaceState 与 Face Runtime Descriptor
+ClothingProfile、ClothingState 与 simulationRig 静态跟随描述符
+HairProfile、AccessoryProfile、AppearanceState 与静态附件描述符
+CharacterImageAnalysis、CharacterGeneratorSession 与 CharacterGeneratorState
 ```
 
 任何迁移都必须保持以下不变量：
@@ -432,3 +458,171 @@ RigRules
 未知历史字段不会静默写入绑定层
 其他模块的数据切片不会被单模块 Patch 删除
 ```
+
+## 13. Character Core
+
+Character Core 是四模块之上的引用层，不是第五个几何或动画编辑模块。权威结构位于 `packages/character-core/`，JSON 校验规则位于 `schemas/character-profile.schema.json`。
+
+```json
+{
+  "character_id": "character_001",
+  "name": "Default Character",
+  "version": 1,
+  "identity": { "identity_id": null, "revision": 0, "tags": [] },
+  "body_shape": { "profile_id": "body_shape_001", "revision": 1 },
+  "face_identity": { "face_id": "face_001", "revision": 1 },
+  "clothing_attachments": [],
+  "hair": { "hair_id": null, "revision": 0 },
+  "accessory_attachments": [],
+  "proportion_revision": 3,
+  "body_shape_revision": 1,
+  "skin_revision": 3,
+  "face_revision": 1,
+  "clothing_revision": 1,
+  "hair_revision": 0,
+  "accessory_revision": 1,
+  "pose_revision": 3,
+  "animation_revision": 4
+}
+```
+
+保存人物时必须提交当前 `characterCore.revision` 作为 `expected_revision`。成功保存会增加 CharacterState revision 和 CharacterProfile version，并生成 `humanoid_rig/operation_event@1.0`；旧 revision 会被拒绝，避免多窗口静默覆盖。CharacterProfile 只允许上述引用和人物自有元数据，不允许出现骨骼、骨长、父子关系、绑定姿势、动画轨道或关键帧。
+
+## 14. BodyShape
+
+BodyShapeProfile 使用 `humanoid_rig/body_shape_profile@1.0`，八个参数均限制在 `0..1`：
+
+```json
+{
+  "body_shape_id": "body_shape_001",
+  "name": "Neutral Body Shape",
+  "version": 1,
+  "muscle": 0.5,
+  "fat": 0.5,
+  "shoulder_volume": 0.5,
+  "chest_volume": 0.5,
+  "waist_volume": 0.5,
+  "hip_volume": 0.5,
+  "arm_volume": 0.5,
+  "leg_volume": 0.5
+}
+```
+
+BodyShapeState 保存当前草稿、已发布版本和 `SkinShapeResponse`。参数更新只从原始表皮顶点重新计算区域体积，不修改 RigDefinition、BoneLengths、Hierarchy、PoseSnapshot 或 AnimationClip。保存或恢复版本时，CharacterProfile 的 `body_shape.profile_id`、`body_shape.revision` 与 `body_shape_revision` 必须一致。
+
+## 15. Face Identity
+
+FaceIdentity 使用 `humanoid_rig/face_profile@1.0`，数据由 `packages/face-system/` 独立维护：
+
+```json
+{
+  "face_id": "face_001",
+  "version": 1,
+  "age": 30,
+  "face_shape": { "width": 0.5, "height": 0.5, "jaw_width": 0.5, "cheekbone": 0.5 },
+  "eye_shape": { "size": 0.5, "spacing": 0.5, "tilt": 0.5 },
+  "nose_shape": { "width": 0.5, "length": 0.5, "bridge_height": 0.5 },
+  "mouth_shape": { "width": 0.5, "fullness": 0.5, "corner_curve": 0.5 },
+  "expression_profile": {
+    "profile_id": "expression_neutral",
+    "revision": 1,
+    "default_expression": "neutral"
+  }
+}
+```
+
+FaceState 使用独立 revision 保存当前草稿、历史版本和规范运行时描述符。参数值本身不进入 CharacterProfile；保存、创建或恢复 Face 版本时，只同步 `face_identity.face_id`、`face_identity.revision` 与 `face_revision`。运行时适配器目前预留 FLAME、3DMM 和 AI Face Reconstruction，唯一可写目标是 `face.identity_descriptor`，Skin、Rig、骨长、层级、Pose 与 Animation 继续保持只读。
+
+## 16. Clothing System
+
+ClothingProfile 使用 `humanoid_rig/clothing_profile@1.0`，并通过 `clothingSystem` 独立于 Skin 保存：
+
+```json
+{
+  "clothing_profile_id": "clothing_profile_001",
+  "character_id": "character_001",
+  "version": 2,
+  "assets": [
+    {
+      "clothing_id": "top_001",
+      "revision": 1,
+      "type": "top",
+      "rig_profile": {
+        "target": "simulationRig",
+        "rig_revision": "rig@0.4.0",
+        "attachment_points": ["spine", "chest", "upperChest", "leftUpperArm", "rightUpperArm"]
+      },
+      "material": { "base_color": "#526d9e", "roughness": 0.78, "metalness": 0.02, "opacity": 1 },
+      "physics_profile": { "mode": "static-follow", "enabled": false, "collision": "none" },
+      "size_profile": { "size": "M", "scale": 1, "body_shape_revision": 1 }
+    }
+  ]
+}
+```
+
+第一阶段只支持 `top`、`pants`、`shoes`。Clothing Runtime 读取 simulationRig 的关节位置和旋转，更新独立 Clothing Mesh；渲染顺序是 `Character → Body Skin → Clothing Mesh`。它不得修改 Body Skin、身体顶点、SkinWeights、RigDefinition、PoseSnapshot 或 AnimationClip。
+
+CharacterProfile 不内嵌服装材质或网格，只保存附件引用：
+
+```json
+{
+  "clothing_attachments": [{ "clothing_id": "top_001", "revision": 1 }],
+  "clothing_revision": 2
+}
+```
+
+添加、删除、保存和恢复服装时，ClothingState、Character 附件引用和 OperationEvent 通过 `clothing` ModulePatch 同步。
+
+## 17. Appearance System
+
+Appearance System 使用独立的 HairProfile、AccessoryProfile 和 AppearanceState。Hair 是单选槽位，支持 `short`、`long`、`ponytail`；Accessory 可并存，支持 `hat`、`glasses`、`ornament`。
+
+```json
+{
+  "character_id": "character_001",
+  "version": 2,
+  "active_hair_id": "hair_long_001",
+  "hair_profiles": {
+    "hair_long_001": {
+      "hair_id": "hair_long_001",
+      "revision": 1,
+      "name": "Long Hair",
+      "style": "long",
+      "rig_profile": {
+        "target": "simulationRig",
+        "attachment_points": ["head", "headTop", "neck", "upperChest"]
+      },
+      "material": { "base_color": "#2b211d", "roughness": 0.72, "metalness": 0, "opacity": 1 },
+      "transform": { "offset": [0, 0, 0], "rotation": [0, 0, 0, 1], "scale": 1 }
+    }
+  },
+  "accessories": {
+    "glasses_001": {
+      "accessory_id": "glasses_001",
+      "revision": 1,
+      "name": "Glasses",
+      "type": "glasses",
+      "rig_profile": { "target": "simulationRig", "attachment_point": "head" },
+      "material": { "base_color": "#8b96a5", "roughness": 0.55, "metalness": 0.15, "opacity": 1 },
+      "transform": { "offset": [0, 0, 0], "rotation": [0, 0, 0, 1], "scale": 1 }
+    }
+  }
+}
+```
+
+第一阶段只生成 `static-attachments` 描述符和 simulationRig 绑定帧。毛发模拟、布料和 GPU Hair 均明确关闭。CharacterProfile 不内嵌外观网格或材质，只保存当前 `hair`、`accessory_attachments`、`hair_revision` 和 `accessory_revision`。添加发型、切换发型、添加附件、保存或恢复 Appearance 时，AppearanceState 与 Character 引用通过 integration Patch 原子同步。
+
+## 18. Character Generator
+
+Character Generator 使用 `humanoid_rig/character_image_analysis@1.0`、`humanoid_rig/character_generator_session@1.0` 和 `humanoid_rig/character_generator_state@1.0`。入口是 `character.html`，编排链路如下：
+
+```text
+图片文件
+→ HRL-M03 PoseObservation
+→ HRL-M01 ProportionProfile
+→ BodyShapeProfile + FaceIdentity + ClothingProfile + PoseSnapshot
+→ CharacterProfile 引用
+→ CharacterGeneratorSession 版本历史
+```
+
+Generator 只负责编排既有模块接口：比例通过 `normalizeBodyProfile`，姿势通过 `retargetPoseObservation`，人物保存通过 CharacterManager。它不复制 Rig、Skin、Pose 或 Character Core 的实现。ProjectState 只保存文件名、MIME、尺寸、字节数和 SHA-256 内容哈希；图片二进制由 `binary_storage: not-in-project-state` 明确排除。重新加载时以会话中已保存的模块输出和 CharacterProfile 恢复相同结果。

@@ -1,5 +1,6 @@
 import { calculateBounds, computePoseWorldPositions, topologyKey } from './skeleton-model.js';
 import { createSmplSkinLayer } from './smpl-skin.js';
+import { createStaticClothingLayer } from './clothing-layer.js';
 
 const EPSILON = 1e-7;
 
@@ -26,12 +27,16 @@ class ThreeSkeletonView {
     this.showGrid = true;
     this.showAxes = true;
     this.showSkeleton = true;
+    this.skeletonDetail = 'performance';
     this.skeletonXray = true;
     this.skinVisible = true;
     this.skinOpacity = 1;
     this.skinMode = 'solid';
     this.skinSource = 'detail';
+    this.bodyShapeProfile = null;
     this.skinLayer = null;
+    this.clothingProfile = null;
+    this.clothingLayer = null;
     this.skinLoadPromise = null;
     this.skinLoadGeneration = 0;
     this.disposed = false;
@@ -77,7 +82,8 @@ class ThreeSkeletonView {
   async init() {
     const THREE = this.THREE;
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x0b1020);
+    this.scene.background = new THREE.Color(0x070b16);
+    this.scene.fog = new THREE.FogExp2(0x070b16, 0.035);
 
     this.camera = new THREE.PerspectiveCamera(38, 1, 0.01, 100);
 
@@ -104,7 +110,7 @@ class ThreeSkeletonView {
     rimLight.position.set(-3.1, 2.1, -2.6);
     this.scene.add(rimLight);
 
-    this.gridHelper = new THREE.GridHelper(4, 40, 0x3c516f, 0x1d2a3e);
+    this.gridHelper = new THREE.GridHelper(4, 40, 0x385677, 0x17243a);
     this.gridHelper.position.y = 0;
     this.scene.add(this.gridHelper);
 
@@ -112,49 +118,80 @@ class ThreeSkeletonView {
     this.axesHelper.position.set(-1.55, 0.003, 1.55);
     this.scene.add(this.axesHelper);
 
-    this.sphereGeometry = new THREE.SphereGeometry(1, 22, 16);
-    this.cylinderGeometry = new THREE.CylinderGeometry(1, 1, 1, 14, 1, false);
+    this.jointGeometries = {
+      joint: new THREE.SphereGeometry(1, 22, 16),
+      articulation: new THREE.SphereGeometry(1, 16, 12),
+      face: new THREE.IcosahedronGeometry(1, 1),
+      twist: new THREE.TorusGeometry(0.72, 0.25, 8, 20),
+      control: new THREE.OctahedronGeometry(1, 0),
+      pole: new THREE.TetrahedronGeometry(1, 0),
+      'foot-roll': new THREE.TorusGeometry(0.78, 0.20, 8, 24),
+      contact: new THREE.OctahedronGeometry(1, 0),
+      corrective: new THREE.IcosahedronGeometry(1, 0),
+    };
+    this.cylinderGeometry = new THREE.CylinderGeometry(0.70, 1, 1, 14, 1, false);
 
     this.materials = {
-      joint: new THREE.MeshStandardMaterial({
-        color: 0xd5dde8,
-        roughness: 0.34,
-        metalness: 0.05,
-      }),
+      jointCenter: rigMaterial(THREE, 0xe8f1ff, 0x18314e, 0.18),
+      jointLeft: rigMaterial(THREE, 0x59d5ff, 0x075985, 0.34),
+      jointRight: rigMaterial(THREE, 0xff7bb8, 0x7a164c, 0.30),
+      jointExtension: rigMaterial(THREE, 0x9ee7ff, 0x0b526c, 0.25),
+      jointFace: rigMaterial(THREE, 0xffd166, 0x7c4a00, 0.28),
+      jointTwist: rigMaterial(THREE, 0xb69cff, 0x4c2b8f, 0.42),
+      jointCorrective: rigMaterial(THREE, 0xd98cff, 0x641b82, 0.40),
+      jointControl: rigMaterial(THREE, 0xffcf5a, 0x875000, 0.46),
+      jointMarker: rigMaterial(THREE, 0x59f0c2, 0x0b7258, 0.42),
       jointHover: new THREE.MeshStandardMaterial({
-        color: 0x67d5ff,
-        emissive: 0x0b5f7d,
-        emissiveIntensity: 0.72,
+        color: 0xffffff,
+        emissive: 0x16b8ff,
+        emissiveIntensity: 0.82,
         roughness: 0.26,
         metalness: 0.04,
       }),
       jointSelected: new THREE.MeshStandardMaterial({
-        color: 0xffc347,
-        emissive: 0x8a4a00,
-        emissiveIntensity: 0.66,
+        color: 0xffe29a,
+        emissive: 0xff8a00,
+        emissiveIntensity: 0.78,
         roughness: 0.24,
         metalness: 0.06,
       }),
-      bone: new THREE.MeshStandardMaterial({
-        color: 0x718198,
-        roughness: 0.42,
-        metalness: 0.06,
-      }),
+      boneCenter: rigMaterial(THREE, 0x8ca3bd, 0x13243b, 0.08),
+      boneLeft: rigMaterial(THREE, 0x248fba, 0x063c58, 0.18),
+      boneRight: rigMaterial(THREE, 0xbc477d, 0x54102f, 0.16),
+      boneExtension: rigMaterial(THREE, 0x4bafca, 0x073e50, 0.17),
+      boneFace: rigMaterial(THREE, 0xc58b2d, 0x5e3500, 0.18),
+      boneTwist: rigMaterial(THREE, 0x7655c9, 0x32196f, 0.28),
+      boneCorrective: rigMaterial(THREE, 0x9d4ec0, 0x451259, 0.26),
       boneHover: new THREE.MeshStandardMaterial({
-        color: 0x4cc9f0,
-        emissive: 0x075c75,
-        emissiveIntensity: 0.55,
+        color: 0xb7edff,
+        emissive: 0x087ea6,
+        emissiveIntensity: 0.66,
         roughness: 0.31,
         metalness: 0.05,
       }),
       boneSelected: new THREE.MeshStandardMaterial({
-        color: 0xf2a928,
-        emissive: 0x743d00,
-        emissiveIntensity: 0.48,
+        color: 0xffc857,
+        emissive: 0x8f4b00,
+        emissiveIntensity: 0.62,
         roughness: 0.28,
         metalness: 0.06,
       }),
     };
+
+    this.selectionHalo = new THREE.Mesh(
+      new THREE.TorusGeometry(1, 0.08, 8, 40),
+      new THREE.MeshBasicMaterial({
+        color: 0xffc857,
+        transparent: true,
+        opacity: 0.92,
+        depthTest: false,
+        depthWrite: false,
+      }),
+    );
+    this.selectionHalo.name = 'RigSelectionHalo';
+    this.selectionHalo.renderOrder = 18;
+    this.selectionHalo.visible = false;
+    this.scene.add(this.selectionHalo);
 
     this.createGizmo();
     this.bindEvents();
@@ -206,6 +243,7 @@ class ThreeSkeletonView {
     } else {
       this.ensureSkinLayer();
     }
+    this.ensureClothingLayer();
   }
 
   setView(viewType) {
@@ -261,12 +299,23 @@ class ThreeSkeletonView {
     this.updateGizmo();
   }
 
+  setSkeletonDetail(mode) {
+    this.skeletonDetail = ['core', 'production', 'performance'].includes(mode)
+      ? mode
+      : 'performance';
+    this.syncSkeletonFromDefinition();
+  }
+
   setSkeletonXray(enabled) {
     this.skeletonXray = Boolean(enabled);
     for (const material of Object.values(this.materials ?? {})) {
       material.depthTest = !this.skeletonXray;
       material.depthWrite = !this.skeletonXray;
       material.needsUpdate = true;
+    }
+    if (this.selectionHalo?.material) {
+      this.selectionHalo.material.depthTest = false;
+      this.selectionHalo.material.depthWrite = false;
     }
   }
 
@@ -290,6 +339,28 @@ class ThreeSkeletonView {
   setSkinSource(source) {
     this.skinSource = 'detail';
     this.skinLayer?.setSource?.('detail');
+  }
+
+  setBodyShape(profile) {
+    this.bodyShapeProfile = profile ? structuredClone(profile) : null;
+    return this.skinLayer?.setBodyShape?.(this.bodyShapeProfile || {});
+  }
+
+  setClothingProfile(profile) {
+    this.clothingProfile = profile ? structuredClone(profile) : null;
+    const layer = this.ensureClothingLayer();
+    layer?.setProfile(this.clothingProfile || {});
+    if (this.definition) layer?.refresh(this.definition);
+    return layer?.getDiagnostics?.() || null;
+  }
+
+  ensureClothingLayer() {
+    if (!this.scene || this.disposed) return null;
+    if (!this.clothingLayer) {
+      this.clothingLayer = createStaticClothingLayer(this.THREE, this.scene);
+      this.clothingLayer.setProfile(this.clothingProfile || {});
+    }
+    return this.clothingLayer;
   }
 
   ensureSkinLayer({ force = false } = {}) {
@@ -323,6 +394,7 @@ class ThreeSkeletonView {
       this.skinLayer.setVisible(this.skinVisible);
       this.skinLayer.setOpacity(this.skinOpacity);
       this.skinLayer.setMode(this.skinMode);
+      this.skinLayer.setBodyShape?.(this.bodyShapeProfile || {});
       this.skinLayer.refresh(this.definition, {
         selectedJointId: this.selectedJointId,
         hoveredJointId: this.hoveredJointId,
@@ -359,13 +431,43 @@ class ThreeSkeletonView {
       requestedOpacity: this.skinOpacity,
       requestedMode: this.skinMode,
       requestedSource: this.skinSource,
+      requestedBodyShape: this.bodyShapeProfile ? structuredClone(this.bodyShapeProfile) : null,
       loading: Boolean(this.skinLoadPromise),
       layer: this.skinLayer?.getDiagnostics?.() ?? null,
+      clothing: this.clothingLayer?.getDiagnostics?.() ?? null,
     };
   }
 
   setSpace(space) {
     this.space = space === 'local' ? 'local' : 'world';
+  }
+
+  baseJointMaterial(joint) {
+    if (joint.role === 'control') return this.materials.jointControl;
+    if (joint.role === 'marker') return this.materials.jointMarker;
+    if (joint.role === 'corrective') return this.materials.jointCorrective;
+    if (joint.visualShape === 'twist') return this.materials.jointTwist;
+    if (joint.category === 'face') return this.materials.jointFace;
+    if (joint.rigTier === 'full-performance') return this.materials.jointExtension;
+    if (joint.side === 'left') return this.materials.jointLeft;
+    if (joint.side === 'right') return this.materials.jointRight;
+    return this.materials.jointCenter;
+  }
+
+  baseBoneMaterial(joint) {
+    if (joint.role === 'corrective') return this.materials.boneCorrective;
+    if (joint.visualShape === 'twist') return this.materials.boneTwist;
+    if (joint.category === 'face') return this.materials.boneFace;
+    if (joint.rigTier === 'full-performance') return this.materials.boneExtension;
+    if (joint.side === 'left') return this.materials.boneLeft;
+    if (joint.side === 'right') return this.materials.boneRight;
+    return this.materials.boneCenter;
+  }
+
+  detailAllows(joint) {
+    if (this.skeletonDetail === 'core') return (joint.rigTier ?? 'core') === 'core';
+    if (this.skeletonDetail === 'production') return joint.rigTier !== 'full-performance';
+    return true;
   }
 
   buildSkeleton() {
@@ -399,10 +501,14 @@ class ThreeSkeletonView {
       this.bonesById.set(jointDefinition.id, bone);
 
       if (jointDefinition.visualJoint !== false) {
-        const sphere = new THREE.Mesh(this.sphereGeometry, this.materials.joint);
+        const geometry = this.jointGeometries[jointDefinition.visualShape]
+          ?? this.jointGeometries.joint;
+        const sphere = new THREE.Mesh(geometry, this.baseJointMaterial(jointDefinition));
         sphere.name = `${jointDefinition.id}_joint_visual`;
         sphere.userData.kind = 'joint';
         sphere.userData.jointId = jointDefinition.id;
+        sphere.userData.rigTier = jointDefinition.rigTier ?? 'core';
+        sphere.userData.role = jointDefinition.role ?? 'deform';
         sphere.renderOrder = 4;
         bone.add(sphere);
         this.jointMeshesById.set(jointDefinition.id, sphere);
@@ -426,10 +532,12 @@ class ThreeSkeletonView {
       if (!jointDefinition.parentId || jointDefinition.visualBone === false) {
         continue;
       }
-      const cylinder = new THREE.Mesh(this.cylinderGeometry, this.materials.bone);
+      const cylinder = new THREE.Mesh(this.cylinderGeometry, this.baseBoneMaterial(jointDefinition));
       cylinder.name = `${jointDefinition.id}_bone_visual`;
       cylinder.userData.kind = 'bone';
       cylinder.userData.jointId = jointDefinition.id;
+      cylinder.userData.rigTier = jointDefinition.rigTier ?? 'core';
+      cylinder.userData.role = jointDefinition.role ?? 'deform';
       cylinder.renderOrder = 2;
       this.boneVisualGroup.add(cylinder);
       this.boneMeshesById.set(jointDefinition.id, cylinder);
@@ -470,6 +578,7 @@ class ThreeSkeletonView {
     for (const jointDefinition of this.definition.joints) {
       const sphere = this.jointMeshesById.get(jointDefinition.id);
       if (sphere) {
+        sphere.visible = this.detailAllows(jointDefinition);
         const selected = jointDefinition.id === this.selectedJointId;
         const hovered = jointDefinition.id === this.hoveredJointId && this.hoveredKind === 'joint';
         const scaleFactor = selected ? 1.12 : hovered ? 1.22 : 1;
@@ -478,7 +587,7 @@ class ThreeSkeletonView {
           ? this.materials.jointSelected
           : hovered
             ? this.materials.jointHover
-            : this.materials.joint;
+            : this.baseJointMaterial(jointDefinition);
       }
 
       if (!jointDefinition.parentId) {
@@ -496,7 +605,7 @@ class ThreeSkeletonView {
       childBone.getWorldPosition(this.tempB);
       this.tempC.subVectors(this.tempB, this.tempA);
       const length = this.tempC.length();
-      cylinder.visible = length > EPSILON;
+      cylinder.visible = this.detailAllows(jointDefinition) && length > EPSILON;
       if (!cylinder.visible) {
         continue;
       }
@@ -515,10 +624,31 @@ class ThreeSkeletonView {
         ? this.materials.boneSelected
         : hovered
           ? this.materials.boneHover
-          : this.materials.bone;
+          : this.baseBoneMaterial(jointDefinition);
     }
 
+    this.updateSelectionHalo();
     this.updateGizmo();
+    this.clothingLayer?.refresh(this.definition, poseWorld);
+  }
+
+  updateSelectionHalo() {
+    if (!this.selectionHalo || !this.selectedJointId || !this.showSkeleton) {
+      if (this.selectionHalo) this.selectionHalo.visible = false;
+      return;
+    }
+    const definition = this.definition.joints.find((item) => item.id === this.selectedJointId);
+    const bone = this.bonesById.get(this.selectedJointId);
+    if (!definition || !bone || !this.detailAllows(definition)) {
+      this.selectionHalo.visible = false;
+      return;
+    }
+    bone.getWorldPosition(this.tempD);
+    this.selectionHalo.position.copy(this.tempD);
+    this.selectionHalo.quaternion.copy(this.camera.quaternion);
+    const radius = Math.max(0.032, Number(definition.jointRadius) * 1.65);
+    this.selectionHalo.scale.setScalar(radius);
+    this.selectionHalo.visible = true;
   }
 
   createGizmo() {
@@ -989,6 +1119,7 @@ class ThreeSkeletonView {
     if (!this.renderer || !this.scene || !this.camera) {
       return;
     }
+    this.updateSelectionHalo();
     this.updateGizmo();
     this.renderer.render(this.scene, this.camera);
   }
@@ -1004,6 +1135,8 @@ class ThreeSkeletonView {
     this.skinLoadGeneration += 1;
     this.skinLayer?.dispose?.();
     this.skinLayer = null;
+    this.clothingLayer?.dispose?.();
+    this.clothingLayer = null;
     this.resizeObserver?.disconnect();
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
@@ -1019,12 +1152,26 @@ class ThreeSkeletonView {
       canvas.remove();
     }
 
-    this.sphereGeometry?.dispose?.();
+    for (const geometry of Object.values(this.jointGeometries ?? {})) {
+      geometry.dispose?.();
+    }
     this.cylinderGeometry?.dispose?.();
+    this.selectionHalo?.geometry?.dispose?.();
+    this.selectionHalo?.material?.dispose?.();
     for (const material of Object.values(this.materials ?? {})) {
       material.dispose?.();
     }
   }
+}
+
+function rigMaterial(THREE, color, emissive, emissiveIntensity) {
+  return new THREE.MeshStandardMaterial({
+    color,
+    emissive,
+    emissiveIntensity,
+    roughness: 0.31,
+    metalness: 0.08,
+  });
 }
 
 function detectBackendName(renderer) {

@@ -6,13 +6,13 @@ export function renderControls(context, state) {
   context.elements.moduleControls.innerHTML =
     controlSection('预览来源', `
       <div class="control-button-grid"><button class="control-button active" id="unifiedPreviewButton">统一三维人物</button><button class="control-button" id="fallbackPreviewButton">轻量后备预览</button></div>
-      <p class="control-note">所有模块默认使用同一个 V8.4 统一三维人物视口。轻量预览只在三维运行库故障时使用。</p>`) +
+      <p class="control-note">所有模块默认使用同一个 V8.5 统一三维人物视口。轻量预览只在三维运行库故障时使用。</p>`) +
     controlSection('兼容组合', `
       <div class="toggle-row"><span>骨架</span><b style="font-size:9px">${escapeHtml(state.activeVersions.rig)}</b></div>
       <div class="toggle-row"><span>蒙皮</span><b style="font-size:9px">${escapeHtml(state.activeVersions.skin)}</b></div>
       <div class="toggle-row"><span>动作</span><b style="font-size:9px">${escapeHtml(state.activeVersions.pose)}</b></div>
       <div class="toggle-row"><span>动画</span><b style="font-size:9px">${escapeHtml(state.activeVersions.animation)}</b></div>`) +
-    controlSection('集成操作', `<div class="control-button-grid"><button class="control-button" id="exportReviewSnapshot">导出集成快照</button><button class="control-button" id="openLegacyWindow">全屏打开 V8.4</button></div>`);
+    controlSection('集成操作', `<div class="control-button-grid"><button class="control-button" id="exportReviewSnapshot">导出集成快照</button><button class="control-button" id="openLegacyWindow">全屏打开 V8.5</button></div>`);
 
   document.querySelector('#unifiedPreviewButton')?.addEventListener('click', () => context.showLegacy({ surfaceSource: 'detail' }));
   document.querySelector('#fallbackPreviewButton')?.addEventListener('click', context.hideLegacy);

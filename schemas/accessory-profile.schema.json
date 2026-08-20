@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/accessory_profile@1.0",
+  "title": "Humanoid Rig Lab AccessoryProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["accessory_id", "revision", "name", "type", "rig_profile", "material", "transform"],
+  "properties": {
+    "accessory_id": { "$ref": "#/$defs/id" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "type": { "enum": ["hat", "glasses", "ornament"] },
+    "rig_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "attachment_point"],
+      "properties": {
+        "target": { "const": "simulationRig" },
+        "attachment_point": { "$ref": "#/$defs/id" }
+      }
+    },
+    "material": { "$ref": "#/$defs/material" },
+    "transform": { "$ref": "#/$defs/transform" }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "unit": { "type": "number", "minimum": 0, "maximum": 1 },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_color", "roughness", "metalness", "opacity"],
+      "properties": {
+        "base_color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "roughness": { "$ref": "#/$defs/unit" },
+        "metalness": { "$ref": "#/$defs/unit" },
+        "opacity": { "$ref": "#/$defs/unit" }
+      }
+    },
+    "transform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["offset", "rotation", "scale"],
+      "properties": {
+        "offset": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+        "rotation": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "number" } },
+        "scale": { "type": "number", "minimum": 0.1, "maximum": 8 }
+      }
+    }
+  }
+}

@@ -27,6 +27,7 @@ const ROOT_JOINT_IDS = new Set(['root', 'hips', 'pelvis']);
 const STABLE_JOINT_ID = /^[A-Za-z][A-Za-z0-9_-]*$/;
 const TIME_EPSILON = 0.0005;
 const BLEND_MODES = new Set(['override', 'additive']);
+const GRAPH_CONTROL_MODES = new Set(['clip', 'graph']);
 const CONTACT_MODES = new Set(['world_lock', 'position', 'orientation']);
 const MIRROR_JOINTS = Object.freeze({
   leftShoulder: 'rightShoulder', rightShoulder: 'leftShoulder',
@@ -167,12 +168,13 @@ export function normalizeAnimationState(input, {
   const rawTime = rawTransport.time ?? source.time;
   const rawSpeed = rawTransport.speed ?? source.speed;
   const rawLoop = rawTransport.loop ?? source.loop;
+  const loopEnabled = rawLoop == null ? selectedClip.loopMode !== 'once' : rawLoop !== false;
   const transport = {
     playing: Boolean(rawPlaying),
-    time: resolveClipTime(rawTime, selectedClip.duration, rawLoop === false ? 'once' : selectedClip.loopMode),
+    time: resolveClipTime(rawTime, selectedClip.duration, loopEnabled ? selectedClip.loopMode : 'once'),
     rawTime: finiteNumber(rawTransport.rawTime, Number(rawTime || 0)),
-    speed: clampFinite(rawSpeed, -4, 4, 1) || 1,
-    loop: rawLoop !== false,
+    speed: clampFinite(rawSpeed, -4, 4, 1),
+    loop: loopEnabled,
     loopStart: clampFinite(rawTransport.loopStart, 0, selectedClip.duration, 0),
     loopEnd: clampFinite(rawTransport.loopEnd, 0, selectedClip.duration, selectedClip.duration),
     anchorTime: clampFinite(rawTransport.anchorTime, 0, selectedClip.duration, Number(rawTime || 0)),
@@ -294,18 +296,25 @@ export function setActiveClip(animationState, clipId) {
   const clip = animation.clips.find((item) => item.clipId === nextId);
   animation.transport.playing = false;
   animation.transport.time = 0;
+  animation.transport.rawTime = 0;
   animation.transport.anchorTime = 0;
   animation.transport.anchorRawTime = 0;
   animation.transport.anchorIssuedAt = 0;
   animation.transport.loopStart = 0;
   animation.transport.loopEnd = clip.duration;
   animation.transport.loop = clip.loopMode !== 'once';
-  const graphState = animation.graph?.states?.find((state) => state.clipId === nextId);
-  if (graphState) {
-    animation.graph.activeStateId = graphState.stateId;
-    animation.graph.transition = null;
-    animation.graph.stateStartedAt = 0;
+  if (animation.selection) {
+    animation.selection.clipId = nextId;
+    animation.selection.jointId = null;
+    animation.selection.trackId = null;
+    animation.selection.keyframeIds = [];
+    animation.selection.eventId = null;
   }
+  // Direct clip selection is an editor preview operation. Keep the state
+  // machine's last state independent so it cannot silently transition a
+  // manually selected one-shot clip back to its entry state.
+  animation.graph.controlMode = 'clip';
+  animation.graph.transition = null;
   return syncLegacyAnimationFields(animation);
 }
 
@@ -736,6 +745,26 @@ export function setAnimationLayer(animationInput, layerId, patch = {}) {
 
 export function setGraphParameter(animationInput, parameter, value) {
   const animation = normalizeAnimationState(animationInput);
+  if (animation.graph.controlMode !== 'graph') {
+    const activeState = animation.graph.states.find((state) => state.stateId === animation.graph.activeStateId)
+      || animation.graph.states[0]
+      || null;
+    const activeClip = animation.clips.find((clip) => clip.clipId === activeState?.clipId) || null;
+    animation.graph.controlMode = 'graph';
+    animation.graph.transition = null;
+    if (activeClip) {
+      animation.activeClipId = activeClip.clipId;
+      animation.transport.playing = false;
+      animation.transport.time = 0;
+      animation.transport.rawTime = 0;
+      animation.transport.anchorTime = 0;
+      animation.transport.anchorRawTime = 0;
+      animation.transport.anchorIssuedAt = 0;
+      animation.transport.loopStart = 0;
+      animation.transport.loopEnd = activeClip.duration;
+      animation.transport.loop = activeState?.loop !== false && activeClip.loopMode !== 'once';
+    }
+  }
   animation.graph.parameters[String(parameter)] = clone(value);
   return syncLegacyAnimationFields(animation);
 }
@@ -747,6 +776,7 @@ export function beginGraphTransition(animationInput, toStateId, {
   toTime = 0,
 } = {}) {
   const animation = normalizeAnimationState(animationInput);
+  animation.graph.controlMode = 'graph';
   const target = animation.graph.states.find((state) => state.stateId === String(toStateId));
   if (!target || target.stateId === animation.graph.activeStateId) return animation;
   animation.graph.transition = {
@@ -1037,6 +1067,23 @@ export function computeTransportTime(animationInput, nowMs = Date.now()) {
   return resolveTransportTime(raw, clip, animation.transport);
 }
 
+export function resolveTransportPlaybackStart(animationInput, nowMs = Date.now()) {
+  const animation = isNormalizedAnimationState(animationInput)
+    ? animationInput
+    : normalizeAnimationState(animationInput);
+  const transport = animation.transport;
+  const rawTime = computeTransportRawTime(animation, nowMs);
+  const time = computeTransportTime(animation, nowMs);
+  if (transport.playing || transport.loop) return { time, rawTime, restarted: false };
+  if (transport.speed >= 0 && time >= transport.loopEnd - TIME_EPSILON) {
+    return { time: transport.loopStart, rawTime: transport.loopStart, restarted: true };
+  }
+  if (transport.speed < 0 && time <= transport.loopStart + TIME_EPSILON) {
+    return { time: transport.loopEnd, rawTime: transport.loopEnd, restarted: true };
+  }
+  return { time, rawTime, restarted: false };
+}
+
 export function setTransport(animationInput, patch = {}, nowMs = Date.now()) {
   const animation = normalizeAnimationState(animationInput);
   const clip = getActiveClip(animation);
@@ -1046,7 +1093,7 @@ export function setTransport(animationInput, patch = {}, nowMs = Date.now()) {
     ...animation.transport,
     ...clone(patch),
   };
-  animation.transport.speed = clampFinite(animation.transport.speed, -4, 4, 1) || 1;
+  animation.transport.speed = clampFinite(animation.transport.speed, -4, 4, 1);
   animation.transport.loop = animation.transport.loop !== false;
   animation.transport.loopStart = clampFinite(animation.transport.loopStart, 0, clip.duration, 0);
   animation.transport.loopEnd = clampFinite(animation.transport.loopEnd, 0, clip.duration, clip.duration);
@@ -1626,6 +1673,9 @@ function normalizeAnimationGraph(input, clips) {
   return {
     schema: ANIMATION_GRAPH_SCHEMA,
     graphId: String(source.graphId || source.graph_id || 'humanoid-basic-locomotion'),
+    controlMode: GRAPH_CONTROL_MODES.has(source.controlMode || source.control_mode)
+      ? (source.controlMode || source.control_mode)
+      : 'clip',
     entryStateId,
     activeStateId,
     parameters: isPlainObject(source.parameters) ? clone(source.parameters) : {},
