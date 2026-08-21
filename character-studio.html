@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Humanoid Rig Lab Next Character Studio 统一人物编辑器壳层">
+  <title>Humanoid Rig Lab Next · Character Studio</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./apps/character-studio/character-studio.css">
+</head>
+<body class="character-studio-page">
+  <div id="characterStudioApp" class="character-studio-app" data-character-studio-app>
+    <header class="character-studio-topbar">
+      <a class="brand compact" href="./index.html" aria-label="返回项目总控">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i></span>
+        <span>
+          <strong>Humanoid Rig Lab Next</strong>
+          <small>Character Studio · 统一人物编辑器</small>
+        </span>
+      </a>
+
+      <div class="character-studio-heading">
+        <span class="eyebrow">CHARACTER STUDIO SHELL</span>
+        <h1>Character Studio</h1>
+        <span id="characterStudioBuild" class="character-studio-build">build four-module-v002-20260819</span>
+      </div>
+
+      <div class="character-studio-top-actions">
+        <span id="characterStudioSync" class="character-studio-sync" role="status"><i></i><b>连接中</b></span>
+        <a class="button ghost" href="./studio.html?module=integration">综合预览</a>
+        <a class="button primary" href="./index.html">项目总控</a>
+      </div>
+    </header>
+
+    <main id="characterStudioLayout" class="character-studio-layout" aria-label="Character Studio 三栏布局">
+      <aside id="leftPanelHost" class="character-studio-panel character-studio-left-panel" aria-label="Character 编辑面板容器"></aside>
+
+      <section id="characterViewportHost" class="character-studio-viewport-panel" aria-label="Three.js 人物视口">
+        <header class="character-studio-viewport-header">
+          <div>
+            <span class="eyebrow">VIEWPORT</span>
+            <h2>Character Viewport</h2>
+            <p id="viewportRuntimeStatus">正在连接 simulationRig 人物视口</p>
+          </div>
+          <div id="displayModeToolbar" class="character-studio-display-toolbar" aria-label="人物显示模式"></div>
+        </header>
+
+        <div id="characterViewportStage" class="character-studio-viewport-stage">
+          <iframe
+            id="characterStudioViewportFrame"
+            title="Character Studio simulationRig 人物视口"
+            loading="eager"
+            allow="fullscreen"
+          ></iframe>
+          <div id="viewportLayerStatus" class="character-studio-layer-status" aria-label="视口层挂载状态">
+            <span data-viewport-layer-slot="simulationRig" data-layer-source="finalPose">simulationRig · finalPose</span>
+            <span data-viewport-layer-slot="skin" data-layer-source="Skin">Skin · 单一预绑定表皮</span>
+            <span data-viewport-layer-slot="clothing" data-layer-source="simulationRig">Clothing · simulationRig</span>
+            <span data-viewport-layer-slot="hair" data-layer-source="simulationRig">Hair · 挂载槽位</span>
+            <span data-viewport-layer-slot="accessory" data-layer-source="simulationRig">Accessory · 挂载槽位</span>
+          </div>
+          <div class="character-studio-viewport-badge">Three.js · WebGPU 优先 / WebGL 2 回退</div>
+        </div>
+
+        <footer class="character-studio-viewport-footer">
+          <div class="character-studio-camera-hint">
+            <span>旋转：拖动空白</span>
+            <span>缩放：滚轮</span>
+            <span>平移：中键 / 右键</span>
+          </div>
+          <button id="resetViewportButton" class="button ghost" type="button">重置视角</button>
+        </footer>
+      </section>
+
+      <aside id="rightPanelHost" class="character-studio-panel character-studio-right-panel" aria-label="Character 数据与版本信息容器"></aside>
+    </main>
+  </div>
+
+  <script type="module" src="./apps/character-studio/index.js"></script>
+</body>
+</html>
