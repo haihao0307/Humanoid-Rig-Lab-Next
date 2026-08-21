@@ -54,6 +54,71 @@ const SMPL_JOINT_IDS = Object.freeze([
   'leftHandEnd', 'rightHandEnd',
 ]);
 
+const RUNTIME_WEIGHT_PROFILE = 'anatomical-extended-deform-v3';
+const POSE_CORRECTIVE_PROFILE = 'sparse-anatomical-pose-corrective-v1';
+
+const POSE_CORRECTIVE_SPECS = Object.freeze([
+  {
+    id: 'leftShoulderVolume', category: 'shoulder', parentId: 'upperChest', driverId: 'leftUpperArm',
+    jointId: 'leftUpperArm', childId: 'leftLowerArm', startAngle: 0.20, fullAngle: 1.25,
+    parentSpan: 0.13, childSpan: 0.18, radius: 0.19, radialGain: 0.060,
+  },
+  {
+    id: 'rightShoulderVolume', category: 'shoulder', parentId: 'upperChest', driverId: 'rightUpperArm',
+    jointId: 'rightUpperArm', childId: 'rightLowerArm', startAngle: 0.20, fullAngle: 1.25,
+    parentSpan: 0.13, childSpan: 0.18, radius: 0.19, radialGain: 0.060,
+  },
+  {
+    id: 'leftElbowVolume', category: 'elbow', parentId: 'leftUpperArm', driverId: 'leftLowerArm',
+    jointId: 'leftLowerArm', childId: 'leftHand', startAngle: 0.32, fullAngle: 1.75,
+    parentSpan: 0.12, childSpan: 0.13, radius: 0.105, radialGain: 0.095,
+  },
+  {
+    id: 'rightElbowVolume', category: 'elbow', parentId: 'rightUpperArm', driverId: 'rightLowerArm',
+    jointId: 'rightLowerArm', childId: 'rightHand', startAngle: 0.32, fullAngle: 1.75,
+    parentSpan: 0.12, childSpan: 0.13, radius: 0.105, radialGain: 0.095,
+  },
+  {
+    id: 'leftHipVolume', category: 'hip', parentId: 'hips', driverId: 'leftUpperLeg',
+    jointId: 'leftUpperLeg', childId: 'leftLowerLeg', startAngle: 0.24, fullAngle: 1.30,
+    parentSpan: 0.14, childSpan: 0.20, radius: 0.205, radialGain: 0.060,
+  },
+  {
+    id: 'rightHipVolume', category: 'hip', parentId: 'hips', driverId: 'rightUpperLeg',
+    jointId: 'rightUpperLeg', childId: 'rightLowerLeg', startAngle: 0.24, fullAngle: 1.30,
+    parentSpan: 0.14, childSpan: 0.20, radius: 0.205, radialGain: 0.060,
+  },
+  {
+    id: 'leftKneeVolume', category: 'knee', parentId: 'leftUpperLeg', driverId: 'leftLowerLeg',
+    jointId: 'leftLowerLeg', childId: 'leftFoot', startAngle: 0.28, fullAngle: 1.80,
+    parentSpan: 0.16, childSpan: 0.16, radius: 0.125, radialGain: 0.090,
+  },
+  {
+    id: 'rightKneeVolume', category: 'knee', parentId: 'rightUpperLeg', driverId: 'rightLowerLeg',
+    jointId: 'rightLowerLeg', childId: 'rightFoot', startAngle: 0.28, fullAngle: 1.80,
+    parentSpan: 0.16, childSpan: 0.16, radius: 0.125, radialGain: 0.090,
+  },
+]);
+
+const TWIST_WEIGHT_SPECS = Object.freeze([
+  { id: 'leftUpperArmTwist', sourceId: 'leftUpperArm', endId: 'leftLowerArm', radius: 0.105 },
+  { id: 'rightUpperArmTwist', sourceId: 'rightUpperArm', endId: 'rightLowerArm', radius: 0.105 },
+  { id: 'leftForearmTwist', sourceId: 'leftLowerArm', endId: 'leftHand', radius: 0.078 },
+  { id: 'rightForearmTwist', sourceId: 'rightLowerArm', endId: 'rightHand', radius: 0.078 },
+  { id: 'leftThighTwist', sourceId: 'leftUpperLeg', endId: 'leftLowerLeg', radius: 0.155 },
+  { id: 'rightThighTwist', sourceId: 'rightUpperLeg', endId: 'rightLowerLeg', radius: 0.155 },
+  { id: 'leftCalfTwist', sourceId: 'leftLowerLeg', endId: 'leftFoot', radius: 0.120 },
+  { id: 'rightCalfTwist', sourceId: 'rightLowerLeg', endId: 'rightFoot', radius: 0.120 },
+]);
+
+const FINGER_WEIGHT_CHAINS = Object.freeze([
+  ['ThumbMetacarpal', 'ThumbProximal', 'ThumbDistal'],
+  ['IndexProximal', 'IndexIntermediate', 'IndexDistal'],
+  ['MiddleProximal', 'MiddleIntermediate', 'MiddleDistal'],
+  ['RingProximal', 'RingIntermediate', 'RingDistal'],
+  ['LittleProximal', 'LittleIntermediate', 'LittleDistal'],
+]);
+
 const PRIMARY_CHILD = Object.freeze({
   hips: 'spine',
   spine: 'chest',
@@ -121,11 +186,15 @@ class NativeSmplSkinnedSurfaceLayer {
     this.lastDefinition = null;
     this.lastSurfaceState = null;
     this.lastCompatibilityMismatch = null;
+    this.assetJointIds = [];
+    this.assetJointCount = 0;
     this.jointIds = [];
     this.orderedJointIds = [];
     this.boneIndexById = new Map();
     this.bonesById = new Map();
     this.parentIdById = new Map();
+    this.primaryChildById = new Map();
+    this.runtimeDeformMetaById = new Map();
     this.assetRestPoints = new Map();
     this.bindLocalPositions = new Map();
     this.bindLocalQuaternions = new Map();
@@ -135,13 +204,18 @@ class NativeSmplSkinnedSurfaceLayer {
     this.skinWeights = null;
     this.inverseBindMatrices = null;
     this.skinMatrices = null;
+    this.dualQuaternions = null;
     this.restPositions = null;
     this.shapedRestPositions = null;
+    this.poseCorrectedRestPositions = null;
     this.restNormals = null;
     this.bodyShapeProfile = normalizeBodyShapeProfile();
     this.bodyShapeResponse = createSkinShapeResponse(this.bodyShapeProfile);
     this.lastBodyShapeKey = '';
     this.runtimeWeightStats = null;
+    this.runtimeSkeletonStats = null;
+    this.poseCorrectiveFields = [];
+    this.poseCorrectiveStats = createInactivePoseCorrectiveStats();
     this.lastSourceValues = null;
     this.detailPromise = null;
     this.surfaceOwnerToken = '';
@@ -221,7 +295,7 @@ class NativeSmplSkinnedSurfaceLayer {
     this.mesh.receiveShadow = false;
     this.mesh.frustumCulled = false;
     this.mesh.renderOrder = 0;
-    this.mesh.userData.surfaceEngine = 'native GLB SkinnedMesh with JOINTS_0, WEIGHTS_0 and inverseBindMatrices';
+    this.mesh.userData.surfaceEngine = 'native GLB SkinnedMesh with append-only extended runtime deform palette';
     this.mesh.userData.surfacePickSource = 'detailed-smpl-skinned-mesh';
     this.mesh.userData.assetWeightStatus = meshData.skin.extras?.weightStatus ?? 'unknown';
     this.mesh.userData.humanoidSurfaceRole = 'primary-render-surface';
@@ -233,6 +307,8 @@ class NativeSmplSkinnedSurfaceLayer {
     for (const rootBone of this.rootBones) this.mesh.add(rootBone);
     this.group.add(this.mesh);
     this.group.updateMatrixWorld(true);
+    this.appendRuntimeDeformSkeleton(definition);
+    this.group.updateMatrixWorld(true);
     const runtimeBindPoints = new Map(this.jointIds.map((id) => [
       id,
       this.bonesById.get(id).getWorldPosition(new this.THREE.Vector3()),
@@ -242,15 +318,24 @@ class NativeSmplSkinnedSurfaceLayer {
       runtimeBindPoints,
       this.boneIndexById,
     );
+    this.poseCorrectiveFields = buildPoseCorrectiveFields(
+      this.shapedRestPositions ?? this.restPositions,
+      runtimeBindPoints,
+    );
+    this.poseCorrectedRestPositions = new Float32Array(this.restPositions.length);
     this.mesh.userData.runtimeWeightProfile = this.runtimeWeightStats.profile;
     this.mesh.userData.runtimeWeightStats = structuredClone(this.runtimeWeightStats);
     this.auditSceneSurfaces({ purge: true, phase: 'native-surface-attached' });
 
     const boneInverses = [];
-    for (let index = 0; index < this.jointIds.length; index += 1) {
+    for (let index = 0; index < this.assetJointCount; index += 1) {
       const matrix = new this.THREE.Matrix4();
       matrix.fromArray(this.inverseBindMatrices, index * 16);
       boneInverses.push(matrix);
+    }
+    for (let index = this.assetJointCount; index < this.jointIds.length; index += 1) {
+      const bone = this.bonesById.get(this.jointIds[index]);
+      boneInverses.push(bone.matrixWorld.clone().invert());
     }
     this.skeleton = new this.THREE.Skeleton(
       this.jointIds.map((id) => this.bonesById.get(id)),
@@ -262,6 +347,7 @@ class NativeSmplSkinnedSurfaceLayer {
 
     this.captureBindState();
     this.skinMatrices = new Float32Array(this.jointIds.length * 16);
+    this.dualQuaternions = new Float32Array(this.jointIds.length * 8);
     this.lastSourceValues = new Float64Array(this.jointIds.length * 6);
     this.lastSourceValues.fill(Number.NaN);
     this.weightsReady = true;
@@ -387,10 +473,14 @@ class NativeSmplSkinnedSurfaceLayer {
   }
 
   buildNativeSkeleton(skin) {
-    this.jointIds = [...skin.jointIds];
+    this.assetJointIds = [...skin.jointIds];
+    this.assetJointCount = this.assetJointIds.length;
+    this.jointIds = [...this.assetJointIds];
     this.boneIndexById.clear();
     this.bonesById.clear();
     this.parentIdById.clear();
+    this.primaryChildById.clear();
+    this.runtimeDeformMetaById.clear();
 
     for (const joint of skin.joints) {
       const bone = new this.THREE.Bone();
@@ -413,6 +503,88 @@ class NativeSmplSkinnedSurfaceLayer {
       throw new Error('预绑定 GLB 必须使用 hips 作为唯一蒙皮根骨。');
     }
     this.orderedJointIds = orderJointIds(this.jointIds, this.parentIdById);
+    this.rebuildPrimaryChildMap();
+  }
+
+  appendRuntimeDeformSkeleton(definition) {
+    const definitionJoints = Array.isArray(definition?.joints) ? definition.joints : [];
+    const definitionRestPoints = computeRestWorldPositions(definition);
+    const appendable = definitionJoints.filter((joint) => (
+      joint?.deformInfluence === true
+      && !this.bonesById.has(joint.id)
+    ));
+
+    const appendedIds = [];
+    for (const joint of appendable) {
+      const parent = this.bonesById.get(joint.parentId);
+      if (!parent) {
+        throw new Error(`运行时蒙皮扩展骨 ${joint.id} 缺少可变形父骨 ${joint.parentId}。`);
+      }
+      const bone = new this.THREE.Bone();
+      bone.name = joint.id;
+      bone.userData.jointId = joint.id;
+      bone.userData.runtimeExtendedDeform = true;
+      bone.userData.deformRole = joint.role ?? 'deform';
+      parent.updateMatrixWorld(true);
+      const desiredWorldPoint = definitionRestPoints.get(joint.id);
+      const parentWorldPoint = parent.getWorldPosition(new this.THREE.Vector3());
+      const parentWorldRotation = parent.getWorldQuaternion(new this.THREE.Quaternion()).invert();
+      if (desiredWorldPoint) {
+        bone.position.set(
+          desiredWorldPoint.x - parentWorldPoint.x,
+          desiredWorldPoint.y - parentWorldPoint.y,
+          desiredWorldPoint.z - parentWorldPoint.z,
+        ).applyQuaternion(parentWorldRotation);
+      } else {
+        bone.position.fromArray(joint.localPosition ?? [0, 0, 0]);
+      }
+      bone.quaternion.set(0, 0, 0, 1);
+      bone.scale.set(1, 1, 1);
+      parent.add(bone);
+      bone.updateMatrixWorld(true);
+
+      const jointIndex = this.jointIds.length;
+      this.jointIds.push(joint.id);
+      appendedIds.push(joint.id);
+      this.bonesById.set(joint.id, bone);
+      this.boneIndexById.set(joint.id, jointIndex);
+      this.parentIdById.set(joint.id, joint.parentId);
+      this.runtimeDeformMetaById.set(joint.id, {
+        category: joint.category ?? 'body',
+        role: joint.role ?? 'deform',
+        visualShape: joint.visualShape ?? 'joint',
+        side: joint.side ?? 'center',
+      });
+    }
+
+    this.orderedJointIds = orderJointIds(this.jointIds, this.parentIdById);
+    this.rebuildPrimaryChildMap();
+    const appendedJoints = appendable.filter((joint) => appendedIds.includes(joint.id));
+    this.runtimeSkeletonStats = {
+      profile: 'smpl24-append-only-deform67@1',
+      assetJointCount: this.assetJointCount,
+      runtimeJointCount: this.jointIds.length,
+      appendedJointCount: appendedIds.length,
+      twistJointCount: appendedJoints.filter((joint) => joint.visualShape === 'twist').length,
+      correctiveJointCount: appendedJoints.filter((joint) => joint.role === 'corrective').length,
+      fingerJointCount: appendedJoints.filter((joint) => joint.category === 'hand').length,
+      faceJointCount: appendedJoints.filter((joint) => joint.category === 'face').length,
+      appendedJointIds: [...appendedIds],
+      compatibility: 'original SMPL 24 order and inverse bind matrices preserved',
+    };
+    if (this.jointIds.length > 255) {
+      throw new Error(`运行时蒙皮骨数量 ${this.jointIds.length} 超出 Uint8/Uint16 兼容预算。`);
+    }
+  }
+
+  rebuildPrimaryChildMap() {
+    this.primaryChildById.clear();
+    for (const id of this.jointIds) {
+      const parentId = this.parentIdById.get(id);
+      if (parentId && !this.primaryChildById.has(parentId)) {
+        this.primaryChildById.set(parentId, id);
+      }
+    }
   }
 
   captureBindState() {
@@ -472,10 +644,12 @@ class NativeSmplSkinnedSurfaceLayer {
     const restPose = isRestPose(sourceRest, pose, this.jointIds, REST_EPSILON);
     if (restPose) this.resetBonesToBind(sourceLocalPositions);
     else this.applyPoseDeltas(sourceRest, pose, sourceLocalPositions);
+    this.applyPoseCorrectives(sourceRest, pose, restPose);
 
     this.mesh.updateMatrixWorld(true);
     this.skeleton.update();
     this.cacheSkinMatrices();
+    skinMatricesToDualQuaternions(this.skinMatrices, this.dualQuaternions);
     this.mesh.userData.bindPoseProtected = restPose;
     this.mesh.userData.referenceBindingMismatch = compatibilityMismatch;
     this.lastCompatibilityMismatch = compatibilityMismatch;
@@ -485,7 +659,10 @@ class NativeSmplSkinnedSurfaceLayer {
   resetBonesToBind(sourceLocalPositions = this.bindLocalPositions) {
     for (const id of this.jointIds) {
       const bone = this.bonesById.get(id);
-      bone.position.copy(sourceLocalPositions.get(id) ?? this.bindLocalPositions.get(id));
+      const runtimePosition = this.boneIndexById.get(id) < this.assetJointCount
+        ? sourceLocalPositions.get(id)
+        : this.bindLocalPositions.get(id);
+      bone.position.copy(runtimePosition ?? this.bindLocalPositions.get(id));
       bone.quaternion.copy(this.bindLocalQuaternions.get(id));
       bone.scale.copy(this.bindLocalScales.get(id));
     }
@@ -509,7 +686,10 @@ class NativeSmplSkinnedSurfaceLayer {
         local.copy(desired);
       }
       const bone = this.bonesById.get(id);
-      bone.position.copy(sourceLocalPositions.get(id) ?? this.bindLocalPositions.get(id));
+      const runtimePosition = this.boneIndexById.get(id) < this.assetJointCount
+        ? sourceLocalPositions.get(id)
+        : this.bindLocalPositions.get(id);
+      bone.position.copy(runtimePosition ?? this.bindLocalPositions.get(id));
       bone.quaternion.copy(local);
       bone.scale.copy(this.bindLocalScales.get(id));
     }
@@ -530,6 +710,22 @@ class NativeSmplSkinnedSurfaceLayer {
 
   calculateJointDeltaRotation(id, restPoints, posePoints) {
     const THREE = this.THREE;
+    const runtimeMeta = this.runtimeDeformMetaById.get(id);
+    if (runtimeMeta?.visualShape === 'twist') {
+      const sourceId = this.parentIdById.get(id);
+      return sourceId
+        ? this.calculateJointDeltaRotation(sourceId, restPoints, posePoints)
+        : new THREE.Quaternion();
+    }
+    if (runtimeMeta?.role === 'corrective') {
+      const upperArmId = runtimeMeta.side === 'right' ? 'rightUpperArm' : 'leftUpperArm';
+      const torsoDelta = this.calculateJointDeltaRotation('upperChest', restPoints, posePoints);
+      const armDelta = this.calculateJointDeltaRotation(upperArmId, restPoints, posePoints);
+      return blendQuaternionsNormalized(THREE, torsoDelta, armDelta, 0.15);
+    }
+    if (runtimeMeta?.category === 'hand') {
+      return this.calculateFingerDeltaRotation(id, runtimeMeta.side, restPoints, posePoints);
+    }
     if (id === 'hips') {
       return bodyFrameRotation(
         THREE, restPoints, posePoints,
@@ -545,7 +741,7 @@ class NativeSmplSkinnedSurfaceLayer {
 
     const restPoint = restPoints.get(id);
     const currentPoint = posePoints.get(id);
-    const childId = PRIMARY_CHILD[id];
+    const childId = PRIMARY_CHILD[id] ?? this.primaryChildById.get(id);
     if (childId && restPoint && currentPoint) {
       const restChild = restPoints.get(childId);
       const currentChild = posePoints.get(childId);
@@ -563,7 +759,7 @@ class NativeSmplSkinnedSurfaceLayer {
       }
     }
 
-    const parentId = PARENT_FALLBACK[id];
+    const parentId = PARENT_FALLBACK[id] ?? this.parentIdById.get(id);
     if (parentId && restPoint && currentPoint) {
       const restParent = restPoints.get(parentId);
       const currentParent = posePoints.get(parentId);
@@ -583,6 +779,53 @@ class NativeSmplSkinnedSurfaceLayer {
     return new THREE.Quaternion();
   }
 
+  calculateFingerDeltaRotation(id, side, restPoints, posePoints) {
+    const THREE = this.THREE;
+    const handId = side === 'right' ? 'rightHand' : 'leftHand';
+    const handDelta = this.calculateJointDeltaRotation(handId, restPoints, posePoints).normalize();
+    const restPoint = restPoints.get(id);
+    const currentPoint = posePoints.get(id);
+    if (!restPoint || !currentPoint) return handDelta;
+
+    const childId = this.primaryChildById.get(id);
+    const parentId = this.parentIdById.get(id);
+    const restReference = childId ? restPoints.get(childId) : restPoints.get(parentId);
+    const currentReference = childId ? posePoints.get(childId) : posePoints.get(parentId);
+    if (!restReference || !currentReference) return handDelta;
+
+    const restDirection = childId
+      ? new THREE.Vector3(
+        restReference.x - restPoint.x,
+        restReference.y - restPoint.y,
+        restReference.z - restPoint.z,
+      )
+      : new THREE.Vector3(
+        restPoint.x - restReference.x,
+        restPoint.y - restReference.y,
+        restPoint.z - restReference.z,
+      );
+    const currentDirection = childId
+      ? new THREE.Vector3(
+        currentReference.x - currentPoint.x,
+        currentReference.y - currentPoint.y,
+        currentReference.z - currentPoint.z,
+      )
+      : new THREE.Vector3(
+        currentPoint.x - currentReference.x,
+        currentPoint.y - currentReference.y,
+        currentPoint.z - currentReference.z,
+      );
+    if (restDirection.lengthSq() <= EPSILON || currentDirection.lengthSq() <= EPSILON) return handDelta;
+
+    const inverseHandDelta = handDelta.clone().invert();
+    currentDirection.applyQuaternion(inverseHandDelta).normalize();
+    const relativeSwing = new THREE.Quaternion().setFromUnitVectors(
+      restDirection.normalize(),
+      currentDirection,
+    );
+    return handDelta.multiply(relativeSwing).normalize();
+  }
+
   cacheSkinMatrices() {
     for (let index = 0; index < this.jointIds.length; index += 1) {
       const bone = this.bonesById.get(this.jointIds[index]);
@@ -591,10 +834,62 @@ class NativeSmplSkinnedSurfaceLayer {
     }
   }
 
-  sampleDeformedPositions() {
-    const sourcePositions = this.shapedRestPositions ?? this.restPositions;
+  applyPoseCorrectives(sourceRest, posePoints, restPose = false) {
+    const basePositions = this.shapedRestPositions ?? this.restPositions;
+    const outputPositions = this.poseCorrectedRestPositions ?? new Float32Array(basePositions.length);
+    this.poseCorrectedRestPositions = outputPositions;
+    const activations = new Map();
+    for (const spec of POSE_CORRECTIVE_SPECS) {
+      if (restPose) {
+        activations.set(spec.id, 0);
+        continue;
+      }
+      const parentDelta = this.calculateJointDeltaRotation(spec.parentId, sourceRest, posePoints);
+      const driverDelta = this.calculateJointDeltaRotation(spec.driverId, sourceRest, posePoints);
+      const angle = relativeQuaternionAngle(parentDelta, driverDelta);
+      activations.set(
+        spec.id,
+        smoothstep01((angle - spec.startAngle) / Math.max(EPSILON, spec.fullAngle - spec.startAngle)),
+      );
+    }
+    this.poseCorrectiveStats = applyPoseCorrectiveFields(
+      basePositions,
+      outputPositions,
+      this.poseCorrectiveFields,
+      activations,
+    );
+    const position = this.mesh?.geometry?.attributes?.position;
+    if (position?.array) {
+      position.array.set(outputPositions);
+      position.needsUpdate = true;
+    }
+    if (this.mesh) {
+      this.mesh.userData.poseCorrectiveProfile = POSE_CORRECTIVE_PROFILE;
+      this.mesh.userData.poseCorrectiveStats = structuredClone(this.poseCorrectiveStats);
+    }
+    return this.poseCorrectiveStats;
+  }
+
+  sampleDeformedPositions(options = {}) {
+    const method = typeof options === 'string' ? options : options.method ?? 'final';
+    const sourcePositions = this.poseCorrectedRestPositions
+      ?? this.shapedRestPositions
+      ?? this.restPositions;
     if (!this.skinMatrices) return new Float32Array(sourcePositions ?? 0);
     const output = new Float32Array(sourcePositions.length);
+    if (method === 'dqs-reference') {
+      const outputNormals = new Float32Array(sourcePositions.length);
+      deformSurfaceDqs(
+        sourcePositions,
+        this.restNormals,
+        output,
+        outputNormals,
+        this.skinIndices,
+        this.skinWeights,
+        this.dualQuaternions,
+      );
+      return output;
+    }
     deformSurfaceLbs(
       sourcePositions,
       output,
@@ -609,6 +904,9 @@ class NativeSmplSkinnedSurfaceLayer {
     this.bodyShapeProfile = normalizeBodyShapeProfile(profileInput);
     this.bodyShapeResponse = createSkinShapeResponse(this.bodyShapeProfile);
     this.applyBodyShapeToGeometry();
+    if (this.lastDefinition && this.weightsReady) {
+      this.refresh(this.lastDefinition, null, { force: true });
+    }
     return structuredClone(this.bodyShapeResponse);
   }
 
@@ -620,6 +918,12 @@ class NativeSmplSkinnedSurfaceLayer {
     this.mesh.userData.bodyShapeMethod = this.bodyShapeResponse.method;
     if (!force && key === this.lastBodyShapeKey) return false;
     this.shapedRestPositions = deformSkinPositions(this.restPositions, this.bodyShapeProfile);
+    if (this.assetRestPoints.size && this.poseCorrectiveFields.length) {
+      this.poseCorrectiveFields = buildPoseCorrectiveFields(
+        this.shapedRestPositions,
+        this.assetRestPoints,
+      );
+    }
     const position = this.mesh.geometry.attributes.position;
     position.array.set(this.shapedRestPositions);
     position.needsUpdate = true;
@@ -785,12 +1089,21 @@ class NativeSmplSkinnedSurfaceLayer {
       weightsReady: this.weightsReady,
       nativeSkinAttributes: Boolean(geometry?.attributes?.skinIndex && geometry?.attributes?.skinWeight),
       inverseBindMatrices: Boolean(this.skeleton?.boneInverses?.length === this.jointIds.length),
+      assetJointCount: this.assetJointCount,
       jointCount: this.jointIds.length,
+      runtimeSkeletonProfile: this.runtimeSkeletonStats?.profile ?? null,
+      runtimeSkeletonStats: this.runtimeSkeletonStats ? structuredClone(this.runtimeSkeletonStats) : null,
       vertexCount: position?.count ?? 0,
       triangleCount: geometry?.index ? Math.floor(geometry.index.count / 3) : 0,
       pickSource: 'detailed-smpl-skinned-mesh',
       pickable,
-      deformation: 'native Three.js SkinnedMesh GPU linear blend skinning',
+      deformation: `native Three.js SkinnedMesh GPU LBS + ${POSE_CORRECTIVE_PROFILE}`,
+      renderDeformationMode: 'gpu-lbs-with-sparse-pose-correctives',
+      dqsReferenceMode: 'cpu-quality-reference',
+      dqsReferenceAvailable: Boolean(this.dualQuaternions?.length),
+      poseCorrectiveProfile: POSE_CORRECTIVE_PROFILE,
+      poseCorrectiveFieldCount: this.poseCorrectiveFields.length,
+      poseCorrectiveStats: structuredClone(this.poseCorrectiveStats),
       bodyShape: structuredClone(this.bodyShapeResponse),
       bodyShapeAppliedToSkinOnly: true,
       bindPoseProtected: Boolean(this.mesh?.userData?.bindPoseProtected),
@@ -954,7 +1267,7 @@ function createNativeThreeGeometry(THREE, meshData) {
   }
   if (sourceUv) geometry.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(sourceUv.array), 2));
   geometry.setAttribute('skinIndex', new THREE.BufferAttribute(
-    new sourceSkinIndex.array.constructor(sourceSkinIndex.array),
+    new Uint16Array(sourceSkinIndex.array),
     4,
     false,
   ));
@@ -1142,6 +1455,20 @@ function rebuildArticulationStableWeights(
     passes: smoothingPasses,
     alpha: smoothingAlpha,
   });
+  const anatomicalGuardStats = enforceAnatomicalWeightGuards(
+    geometry,
+    boneIndexById,
+    chains,
+    indices,
+    weights,
+  );
+  const extendedDeformStats = applyExtendedDeformWeights(
+    geometry,
+    bindPoints,
+    boneIndexById,
+    indices,
+    weights,
+  );
   skinIndex.needsUpdate = true;
   skinWeight.needsUpdate = true;
 
@@ -1150,11 +1477,13 @@ function rebuildArticulationStableWeights(
     weights,
     [...boneIndexById.entries()].sort((left, right) => left[1] - right[1]).map(([id]) => id),
     {
-      profile: 'articulation-stable-segment-v1',
+      profile: RUNTIME_WEIGHT_PROFILE,
       vertexCount,
       fallbackVertexCount,
       smoothingPasses,
       smoothingAlpha,
+      ...anatomicalGuardStats,
+      ...extendedDeformStats,
     },
   );
 }
@@ -1248,6 +1577,166 @@ function stabilizeArmWeights(target, touched, x, y, bindPoints, boneIndexById) {
   addWeightNumeric(target, touched, handIndex, sourceTotal * armGate * elbowBlend * wristBlend);
 }
 
+/**
+ * Topology smoothing is useful at joints, but it also diffuses weights back
+ * into the middle of long limb segments. That diffusion is what makes a bent
+ * arm or leg look like a soft hose. Re-apply continuous anatomical fields
+ * after smoothing, then pull segment interiors toward their spanning bone.
+ * The transition bands remain blended; only the volume-preserving cores are
+ * made deliberately rigid.
+ */
+function enforceAnatomicalWeightGuards(
+  geometry,
+  boneIndexById,
+  chains,
+  skinIndices,
+  skinWeights,
+) {
+  const position = geometry?.attributes?.position;
+  const jointCount = boneIndexById.size;
+  if (!position?.array || !jointCount) {
+    return { guardedVertexCount: 0, rigidCoreVertexCount: 0 };
+  }
+
+  const influence = new Float64Array(jointCount);
+  const touched = new Uint8Array(jointCount);
+  let guardedVertexCount = 0;
+  let rigidCoreVertexCount = 0;
+  let ankleGuardVertexCount = 0;
+
+  for (let vertexIndex = 0; vertexIndex < position.count; vertexIndex += 1) {
+    influence.fill(0);
+    touched.fill(0);
+    const sparseOffset = vertexIndex * 4;
+    for (let slot = 0; slot < 4; slot += 1) {
+      const weight = skinWeights[sparseOffset + slot];
+      if (weight <= 0) continue;
+      const jointIndex = skinIndices[sparseOffset + slot];
+      influence[jointIndex] += weight;
+      touched[jointIndex] = 1;
+    }
+
+    const positionOffset = vertexIndex * 3;
+    const x = position.array[positionOffset];
+    const y = position.array[positionOffset + 1];
+    const z = position.array[positionOffset + 2];
+    const rigidCoreApplied = reinforceRigidSegmentCore(
+      influence,
+      touched,
+      x,
+      y,
+      z,
+      chains,
+    );
+    const ankleGuardApplied = projectAnkleWeightField(
+      influence,
+      touched,
+      x,
+      y,
+      boneIndexById,
+    );
+    if (rigidCoreApplied) rigidCoreVertexCount += 1;
+    if (ankleGuardApplied) ankleGuardVertexCount += 1;
+    if (rigidCoreApplied || ankleGuardApplied) {
+      guardedVertexCount += 1;
+    }
+    writeFourStrongestInfluences(
+      influence,
+      touched,
+      skinIndices,
+      skinWeights,
+      vertexIndex,
+      skinIndices[sparseOffset] ?? 0,
+    );
+  }
+
+  return { guardedVertexCount, rigidCoreVertexCount, ankleGuardVertexCount };
+}
+
+function projectAnkleWeightField(target, touched, x, y, boneIndexById) {
+  const gate = smoothstep(0.09, 0.14, y) * (1 - smoothstep(0.24, 0.30, y));
+  if (gate <= 1e-5 || Math.abs(x) > 0.22) return false;
+
+  const side = x < 0 ? 'left' : 'right';
+  const lowerLegIndex = boneIndexById.get(`${side}LowerLeg`);
+  const footIndex = boneIndexById.get(`${side}Foot`);
+  if (!Number.isInteger(lowerLegIndex) || !Number.isInteger(footIndex)) return false;
+
+  const lowerLegWeight = smoothstep(0.105, 0.245, y);
+  blendInfluenceTowardPair(
+    target,
+    touched,
+    footIndex,
+    lowerLegIndex,
+    lowerLegWeight,
+    gate * 0.93,
+  );
+  return true;
+}
+
+function reinforceRigidSegmentCore(target, touched, x, y, z, chains) {
+  let best = null;
+  for (const candidate of selectWeightCandidates(x, y, z, chains)) {
+    const result = evaluateChainNumeric(x, y, z, candidate.chain);
+    result.score *= candidate.multiplier;
+    if (!best || result.score > best.score) best = result;
+  }
+  if (!best || best.normalizedDistance > 1.75) return false;
+
+  const { chain, segmentIndex, t, normalizedDistance } = best;
+  if (chain.name === 'torso') return false;
+  if (chain.name.endsWith('Arm') && segmentIndex === 0) return false;
+
+  const distanceGate = 1 - smoothstep(1.05, 1.75, normalizedDistance);
+  let coreGate = smoothstep(0.14, 0.30, t) * (1 - smoothstep(0.66, 0.84, t));
+  let strength = coreGate * distanceGate * 0.90;
+
+  // The terminal arm segment represents the complete palm and fingers in the
+  // transitional 24-joint asset. Keep it on the hand joint so the hand-end
+  // marker cannot pull individual finger vertices in different directions.
+  if (chain.name.endsWith('Arm') && segmentIndex === chain.indices.length - 2) {
+    strength = distanceGate * 0.985;
+  }
+
+  // The foot-to-toe segment needs a small distal blend for toe-off, but the
+  // heel and mid-foot must remain rigid under step and squat poses.
+  if (chain.name.endsWith('Leg') && segmentIndex === chain.indices.length - 2) {
+    coreGate = 1 - smoothstep(0.62, 0.86, t);
+    strength = coreGate * distanceGate * 0.94;
+  }
+
+  if (chain.name.endsWith('Arm')) {
+    strength *= 1 - smoothstep(1.08, 1.28, y);
+  }
+  if (chain.name.endsWith('Leg') && segmentIndex === 0) {
+    strength *= 1 - smoothstep(0.54, 0.76, y);
+  }
+
+  if (strength <= 1e-5) return false;
+  blendInfluenceTowardJoint(target, touched, chain.indices[segmentIndex], strength);
+  return true;
+}
+
+function blendInfluenceTowardJoint(target, touched, jointIndex, strength) {
+  if (!Number.isInteger(jointIndex)) return;
+  const clampedStrength = clamp(strength, 0, 0.995);
+  const retain = 1 - clampedStrength;
+  for (let index = 0; index < target.length; index += 1) target[index] *= retain;
+  target[jointIndex] += clampedStrength;
+  touched[jointIndex] = 1;
+}
+
+function blendInfluenceTowardPair(target, touched, firstIndex, secondIndex, secondWeight, strength) {
+  const clampedStrength = clamp(strength, 0, 0.995);
+  const retain = 1 - clampedStrength;
+  const clampedSecondWeight = clamp(secondWeight, 0, 1);
+  for (let index = 0; index < target.length; index += 1) target[index] *= retain;
+  target[firstIndex] += clampedStrength * (1 - clampedSecondWeight);
+  target[secondIndex] += clampedStrength * clampedSecondWeight;
+  touched[firstIndex] = 1;
+  touched[secondIndex] = 1;
+}
+
 function stabilizeHipWeights(target, touched, x, y, boneIndexById) {
   const absX = Math.abs(x);
   if (y > 0.95 && absX > 0.20) return;
@@ -1280,6 +1769,363 @@ function stabilizeHipWeights(target, touched, x, y, boneIndexById) {
   for (let index = 0; index < target.length; index += 1) target[index] *= sourceScale;
   addWeightNumeric(target, touched, hipsIndex, sourceTotal * pelvisGate * (1 - upperLegBlend));
   addWeightNumeric(target, touched, upperLegIndex, sourceTotal * pelvisGate * upperLegBlend);
+}
+
+/**
+ * Expands the live 24-joint preview weights onto append-only runtime deform
+ * bones. The source GLB and its original inverse bind matrices remain intact.
+ * Face joints enter the palette for protocol stability, but intentionally keep
+ * zero generated influence until a landmark-authored face skin is available.
+ */
+function applyExtendedDeformWeights(
+  geometry,
+  bindPoints,
+  boneIndexById,
+  skinIndices,
+  skinWeights,
+) {
+  const position = geometry?.attributes?.position;
+  const jointCount = boneIndexById.size;
+  if (!position?.array || jointCount <= SMPL_JOINT_IDS.length) {
+    return {
+      extendedWeightingApplied: false,
+      twistWeightedVertexCount: 0,
+      scapulaWeightedVertexCount: 0,
+      fingerWeightedVertexCount: 0,
+      generatedFaceWeightVertexCount: 0,
+    };
+  }
+
+  const twistFields = createTwistWeightFields(bindPoints, boneIndexById);
+  const scapulaFields = createScapulaWeightFields(bindPoints, boneIndexById);
+  const fingerFields = createFingerWeightFields(bindPoints, boneIndexById);
+  const influence = new Float64Array(jointCount);
+  const touched = new Uint8Array(jointCount);
+  let twistWeightedVertexCount = 0;
+  let scapulaWeightedVertexCount = 0;
+  let fingerWeightedVertexCount = 0;
+
+  for (let vertexIndex = 0; vertexIndex < position.count; vertexIndex += 1) {
+    influence.fill(0);
+    touched.fill(0);
+    const sparseOffset = vertexIndex * 4;
+    for (let slot = 0; slot < 4; slot += 1) {
+      const weight = skinWeights[sparseOffset + slot];
+      if (weight <= 0) continue;
+      const jointIndex = skinIndices[sparseOffset + slot];
+      influence[jointIndex] += weight;
+      touched[jointIndex] = 1;
+    }
+
+    const positionOffset = vertexIndex * 3;
+    const x = position.array[positionOffset];
+    const y = position.array[positionOffset + 1];
+    const z = position.array[positionOffset + 2];
+    if (applyTwistWeightFields(influence, touched, x, y, z, twistFields)) {
+      twistWeightedVertexCount += 1;
+    }
+    if (applyScapulaWeightFields(influence, touched, x, y, z, scapulaFields)) {
+      scapulaWeightedVertexCount += 1;
+    }
+    if (applyFingerWeightFields(influence, touched, x, y, z, fingerFields)) {
+      fingerWeightedVertexCount += 1;
+    }
+
+    writeFourStrongestInfluences(
+      influence,
+      touched,
+      skinIndices,
+      skinWeights,
+      vertexIndex,
+      skinIndices[sparseOffset] ?? 0,
+    );
+  }
+
+  const mirroredVertexCount = mirrorRuntimeWeightsLeftToRight(
+    position,
+    skinIndices,
+    skinWeights,
+    boneIndexById,
+  );
+  const weightedJointIds = collectWeightedJointIds(skinIndices, skinWeights, boneIndexById);
+  const weightedTwistJointCount = twistFields.filter((field) => weightedJointIds.has(field.id)).length;
+  const weightedScapulaJointCount = scapulaFields.filter((field) => weightedJointIds.has(field.id)).length;
+  const fingerJointIds = fingerFields.flatMap((field) => field.chains.flatMap((chain) => chain.ids));
+  const weightedFingerJointIds = [...new Set(
+    fingerJointIds.filter((id) => weightedJointIds.has(id)),
+  )];
+  const weightedFingerJointCount = weightedFingerJointIds.length;
+
+  return {
+    extendedWeightingApplied: true,
+    twistWeightedVertexCount,
+    scapulaWeightedVertexCount,
+    fingerWeightedVertexCount,
+    mirroredVertexCount,
+    generatedFaceWeightVertexCount: 0,
+    weightedTwistJointCount,
+    weightedScapulaJointCount,
+    weightedFingerJointCount,
+    weightedFingerJointIds,
+    weightedRuntimeJointCount: weightedJointIds.size,
+    generatedWeightPolicy: 'twist + scapula corrective + fingers; face palette only',
+  };
+}
+
+function mirrorRuntimeWeightsLeftToRight(position, skinIndices, skinWeights, boneIndexById) {
+  const cellSize = 0.0035;
+  const maximumPairDistanceSq = 0.0055 ** 2;
+  const buckets = new Map();
+  const keyFor = (x, y, z) => (
+    `${Math.round(Math.abs(x) / cellSize)}:${Math.round(y / cellSize)}:${Math.round(z / cellSize)}`
+  );
+  for (let vertexIndex = 0; vertexIndex < position.count; vertexIndex += 1) {
+    const offset = vertexIndex * 3;
+    const x = position.array[offset];
+    if (x <= 0.002) continue;
+    const key = keyFor(x, position.array[offset + 1], position.array[offset + 2]);
+    const bucket = buckets.get(key) ?? [];
+    bucket.push(vertexIndex);
+    buckets.set(key, bucket);
+  }
+
+  const idByIndex = [...boneIndexById.entries()].reduce((result, [id, index]) => {
+    result[index] = id;
+    return result;
+  }, []);
+  const mirroredIndexByIndex = idByIndex.map((id, index) => {
+    if (!id?.startsWith('left')) return index;
+    return boneIndexById.get(`right${id.slice(4)}`) ?? index;
+  });
+  let mirroredVertexCount = 0;
+
+  for (let leftVertex = 0; leftVertex < position.count; leftVertex += 1) {
+    const positionOffset = leftVertex * 3;
+    const x = position.array[positionOffset];
+    const y = position.array[positionOffset + 1];
+    if (x >= -0.35 || y < 0.72 || y > 1.00) continue;
+    const absoluteXCell = Math.round(Math.abs(x) / cellSize);
+    const yCell = Math.round(y / cellSize);
+    const zCell = Math.round(position.array[positionOffset + 2] / cellSize);
+    let bestVertex = -1;
+    let bestDistanceSq = maximumPairDistanceSq;
+    for (let dx = -1; dx <= 1; dx += 1) {
+      for (let dy = -1; dy <= 1; dy += 1) {
+        for (let dz = -1; dz <= 1; dz += 1) {
+          const candidates = buckets.get(`${absoluteXCell + dx}:${yCell + dy}:${zCell + dz}`) ?? [];
+          for (const rightVertex of candidates) {
+            const rightOffset = rightVertex * 3;
+            const distanceSq = (
+              (Math.abs(x) - position.array[rightOffset]) ** 2
+              + (y - position.array[rightOffset + 1]) ** 2
+              + (position.array[positionOffset + 2] - position.array[rightOffset + 2]) ** 2
+            );
+            if (distanceSq < bestDistanceSq) {
+              bestDistanceSq = distanceSq;
+              bestVertex = rightVertex;
+            }
+          }
+        }
+      }
+    }
+    if (bestVertex < 0) continue;
+    const sourceOffset = leftVertex * 4;
+    const targetOffset = bestVertex * 4;
+    for (let slot = 0; slot < 4; slot += 1) {
+      skinIndices[targetOffset + slot] = mirroredIndexByIndex[skinIndices[sourceOffset + slot]];
+      skinWeights[targetOffset + slot] = skinWeights[sourceOffset + slot];
+    }
+    mirroredVertexCount += 1;
+  }
+  return mirroredVertexCount;
+}
+
+function createTwistWeightFields(bindPoints, boneIndexById) {
+  return TWIST_WEIGHT_SPECS.map((spec) => ({
+    ...spec,
+    start: pointArrayOrNull(bindPoints.get(spec.sourceId)),
+    end: pointArrayOrNull(bindPoints.get(spec.endId)),
+    sourceIndex: boneIndexById.get(spec.sourceId),
+    twistIndex: boneIndexById.get(spec.id),
+  })).filter((field) => (
+    field.start
+    && field.end
+    && Number.isInteger(field.sourceIndex)
+    && Number.isInteger(field.twistIndex)
+  ));
+}
+
+function applyTwistWeightFields(target, touched, x, y, z, fields) {
+  let applied = false;
+  for (const field of fields) {
+    const sourceWeight = target[field.sourceIndex];
+    if (sourceWeight <= 0.04) continue;
+    const projection = projectPointToSegmentNumeric(x, y, z, field.start, field.end, field.radius);
+    if (projection.normalizedDistance >= 1.45) continue;
+    const longitudinalGate = smoothstep(0.16, 0.40, projection.t)
+      * (1 - smoothstep(0.88, 0.99, projection.t));
+    const radialGate = 1 - smoothstep(0.72, 1.45, projection.normalizedDistance);
+    const transfer = sourceWeight * longitudinalGate * radialGate * 0.44;
+    if (transfer <= 0.002) continue;
+    target[field.sourceIndex] -= transfer;
+    target[field.twistIndex] += transfer;
+    touched[field.twistIndex] = 1;
+    applied = true;
+  }
+  return applied;
+}
+
+function createScapulaWeightFields(bindPoints, boneIndexById) {
+  return ['left', 'right'].map((side) => {
+    const id = `${side}ScapulaCorrective`;
+    return {
+      id,
+      side,
+      point: pointArrayOrNull(bindPoints.get(id)),
+      targetIndex: boneIndexById.get(id),
+      sourceIndices: ['upperChest', `${side}Shoulder`, `${side}UpperArm`]
+        .map((sourceId) => boneIndexById.get(sourceId))
+        .filter(Number.isInteger),
+    };
+  }).filter((field) => field.point && Number.isInteger(field.targetIndex) && field.sourceIndices.length);
+}
+
+function applyScapulaWeightFields(target, touched, x, y, z, fields) {
+  const side = x < 0 ? 'left' : 'right';
+  const field = fields.find((candidate) => candidate.side === side);
+  if (!field) return false;
+  const distance = Math.hypot(x - field.point[0], y - field.point[1], z - field.point[2]);
+  const radialGate = 1 - smoothstep(0.105, 0.225, distance);
+  const heightGate = smoothstep(field.point[1] - 0.13, field.point[1] - 0.04, y)
+    * (1 - smoothstep(field.point[1] + 0.035, field.point[1] + 0.095, y));
+  const gate = radialGate * heightGate;
+  if (gate <= 0.015) return false;
+
+  let sourceWeight = 0;
+  for (const sourceIndex of field.sourceIndices) sourceWeight += target[sourceIndex];
+  const transfer = sourceWeight * gate * 0.050;
+  if (transfer <= 0.002 || sourceWeight <= EPSILON) return false;
+  const retain = 1 - transfer / sourceWeight;
+  for (const sourceIndex of field.sourceIndices) target[sourceIndex] *= retain;
+  target[field.targetIndex] += transfer;
+  touched[field.targetIndex] = 1;
+  return true;
+}
+
+function createFingerWeightFields(bindPoints, boneIndexById) {
+  return ['left', 'right'].map((side) => ({
+    side,
+    handIndex: boneIndexById.get(`${side}Hand`),
+    handEndIndex: boneIndexById.get(`${side}HandEnd`),
+    chains: FINGER_WEIGHT_CHAINS.map((suffixes) => {
+      const ids = suffixes.map((suffix) => `${side}${suffix}`);
+      const points = ids.map((id) => pointArrayOrNull(bindPoints.get(id)));
+      const indices = ids.map((id) => boneIndexById.get(id));
+      if (!points.every(Boolean) || !indices.every(Number.isInteger)) return null;
+      const last = points[2];
+      const before = points[1];
+      // The procedural performance rig stops at the distal joint centre while
+      // the real mesh continues to the fingertip. Extend the terminal ray far
+      // enough to cover that surface volume without adding a fake endpoint
+      // bone to the public rig contract.
+      const terminalScale = 2.60;
+      const terminal = [
+        last[0] + (last[0] - before[0]) * terminalScale,
+        last[1] + (last[1] - before[1]) * terminalScale,
+        last[2] + (last[2] - before[2]) * terminalScale,
+      ];
+      return {
+        name: `${side}${suffixes[0]}`,
+        finger: suffixes[0].replace(/(Metacarpal|Proximal)$/, '').toLowerCase(),
+        ids,
+        indices: [...indices, indices[2]],
+        points: [...points, terminal],
+        radii: [0.022, 0.021, 0.019],
+      };
+    }).filter(Boolean),
+  })).filter((field) => Number.isInteger(field.handIndex) && field.chains.length === 5);
+}
+
+function applyFingerWeightFields(target, touched, x, y, z, fields) {
+  const side = x < 0 ? 'left' : 'right';
+  const field = fields.find((candidate) => candidate.side === side);
+  if (!field) return false;
+  const handWeight = target[field.handIndex] ?? 0;
+  const handEndWeight = Number.isInteger(field.handEndIndex) ? target[field.handEndIndex] ?? 0 : 0;
+  const sourceWeight = handWeight + handEndWeight;
+  if (sourceWeight < 0.24) return false;
+
+  const candidates = [];
+  for (const chain of field.chains) {
+    const result = evaluateChainNumeric(x, y, z, chain);
+    const distalGate = smoothstep(0.014, 0.060, chain.points[0][1] - y);
+    result.selectionDistance = result.normalizedDistance;
+    if (chain.finger === 'index') result.selectionDistance *= 1 - distalGate * 0.24;
+    if (chain.finger === 'thumb') result.selectionDistance *= 1 + distalGate * 0.34;
+    if (result.normalizedDistance < 1.45) candidates.push(result);
+  }
+  candidates.sort((left, right) => left.selectionDistance - right.selectionDistance);
+  const best = candidates[0];
+  if (!best || best.normalizedDistance >= 1.45) return false;
+  const radialGate = 1 - smoothstep(0.52, 1.45, best.normalizedDistance);
+  const palmRootGate = best.segmentIndex === 0
+    ? smoothstep(0.16, 0.58, best.t)
+    : 1;
+  const transfer = sourceWeight * radialGate * palmRootGate * 0.70;
+  if (transfer <= 0.003) return false;
+
+  const retain = 1 - transfer / sourceWeight;
+  target[field.handIndex] *= retain;
+  if (Number.isInteger(field.handEndIndex)) target[field.handEndIndex] *= retain;
+  const currentIndex = best.chain.indices[best.segmentIndex];
+  const nextIndex = best.chain.indices[best.segmentIndex + 1];
+  // Joint centres sit inside the finger volume, so the surface reaches the
+  // next phalanx before a centre-line projection reaches t=1. Move the blend
+  // band inward to ensure distal surface rings follow the distal bone.
+  const nextWeight = best.segmentIndex >= best.chain.indices.length - 2
+    ? 0
+    : smoothstep(0.10, 0.62, best.t);
+  addWeightNumeric(target, touched, currentIndex, transfer * (1 - nextWeight));
+  addWeightNumeric(target, touched, nextIndex, transfer * nextWeight);
+  return true;
+}
+
+function projectPointToSegmentNumeric(x, y, z, start, end, radius) {
+  const abx = end[0] - start[0];
+  const aby = end[1] - start[1];
+  const abz = end[2] - start[2];
+  const apx = x - start[0];
+  const apy = y - start[1];
+  const apz = z - start[2];
+  const lengthSq = abx * abx + aby * aby + abz * abz;
+  const t = lengthSq > EPSILON
+    ? clamp((apx * abx + apy * aby + apz * abz) / lengthSq, 0, 1)
+    : 0;
+  const dx = apx - abx * t;
+  const dy = apy - aby * t;
+  const dz = apz - abz * t;
+  return {
+    t,
+    normalizedDistance: Math.hypot(dx, dy, dz) / Math.max(EPSILON, radius),
+  };
+}
+
+function pointArrayOrNull(point) {
+  return point ? [point.x, point.y, point.z] : null;
+}
+
+function collectWeightedJointIds(skinIndices, skinWeights, boneIndexById) {
+  const idByIndex = [...boneIndexById.entries()].reduce((result, [id, index]) => {
+    result[index] = id;
+    return result;
+  }, []);
+  const result = new Set();
+  for (let offset = 0; offset < skinWeights.length; offset += 1) {
+    if (skinWeights[offset] <= 1e-4) continue;
+    const id = idByIndex[skinIndices[offset]];
+    if (id) result.add(id);
+  }
+  return result;
 }
 
 function summarizeRuntimeWeights(indices, weights, jointIds, base) {
@@ -1461,7 +2307,13 @@ function evaluateChainNumeric(x, y, z, chain) {
     }
   }
   const score = Math.exp(-0.5 * bestNormalizedDistance * bestNormalizedDistance) * (0.75 + bestRadius);
-  return { chain, score, segmentIndex: bestSegment, t: bestT };
+  return {
+    chain,
+    score,
+    segmentIndex: bestSegment,
+    t: bestT,
+    normalizedDistance: bestNormalizedDistance,
+  };
 }
 
 function addChainInfluencesNumeric(target, touched, result) {
@@ -1602,6 +2454,224 @@ function writeFourStrongestInfluences(influence, touched, skinIndices, skinWeigh
   }
 }
 
+function createInactivePoseCorrectiveStats() {
+  return {
+    profile: POSE_CORRECTIVE_PROFILE,
+    fieldCount: 0,
+    activeRegionCount: 0,
+    activeRegionIds: [],
+    activeCategories: [],
+    correctedVertexCount: 0,
+    correctionSampleCount: 0,
+    maximumActivation: 0,
+    maximumInputDisplacement: 0,
+    outwardCorrectionSampleCount: 0,
+  };
+}
+
+/**
+ * Creates sparse, bind-space volume fields around the major articulation
+ * centres. The fields are renderer-agnostic: WebGPU and WebGL both consume the
+ * corrected POSITION attribute before Three.js performs its native GPU LBS.
+ */
+function buildPoseCorrectiveFields(basePositions, bindPoints, specs = POSE_CORRECTIVE_SPECS) {
+  if (!basePositions?.length || !bindPoints?.size) return [];
+  const fields = [];
+  const vertexCount = basePositions.length / 3;
+  for (const spec of specs) {
+    const joint = bindPoints.get(spec.jointId);
+    const child = bindPoints.get(spec.childId);
+    if (!joint || !child) continue;
+    const axisX0 = child.x - joint.x;
+    const axisY0 = child.y - joint.y;
+    const axisZ0 = child.z - joint.z;
+    const axisLength = Math.hypot(axisX0, axisY0, axisZ0);
+    if (axisLength <= EPSILON) continue;
+    const axisX = axisX0 / axisLength;
+    const axisY = axisY0 / axisLength;
+    const axisZ = axisZ0 / axisLength;
+    const indices = [];
+    const deltas = [];
+    let maximumFieldDisplacement = 0;
+
+    for (let vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 1) {
+      const offset = vertexIndex * 3;
+      const dx = basePositions[offset] - joint.x;
+      const dy = basePositions[offset + 1] - joint.y;
+      const dz = basePositions[offset + 2] - joint.z;
+      const longitudinal = dx * axisX + dy * axisY + dz * axisZ;
+      if (longitudinal < -spec.parentSpan || longitudinal > spec.childSpan) continue;
+      const radialX = dx - axisX * longitudinal;
+      const radialY = dy - axisY * longitudinal;
+      const radialZ = dz - axisZ * longitudinal;
+      const radialDistance = Math.hypot(radialX, radialY, radialZ);
+      if (radialDistance <= EPSILON || radialDistance >= spec.radius) continue;
+
+      const axialRatio = longitudinal < 0
+        ? Math.abs(longitudinal) / Math.max(EPSILON, spec.parentSpan)
+        : longitudinal / Math.max(EPSILON, spec.childSpan);
+      const axialEnvelope = 1 - smoothstep01(axialRatio);
+      const radialEnvelope = smoothstep01(
+        (spec.radius - radialDistance) / Math.max(EPSILON, spec.radius * 0.38),
+      );
+      const scale = spec.radialGain * axialEnvelope * radialEnvelope;
+      if (scale <= 1e-5) continue;
+      const correctionX = radialX * scale;
+      const correctionY = radialY * scale;
+      const correctionZ = radialZ * scale;
+      maximumFieldDisplacement = Math.max(
+        maximumFieldDisplacement,
+        Math.hypot(correctionX, correctionY, correctionZ),
+      );
+      indices.push(vertexIndex);
+      deltas.push(correctionX, correctionY, correctionZ);
+    }
+    fields.push({
+      id: spec.id,
+      category: spec.category,
+      indices: Uint32Array.from(indices),
+      deltas: Float32Array.from(deltas),
+      maximumFieldDisplacement,
+    });
+  }
+  return fields;
+}
+
+function applyPoseCorrectiveFields(basePositions, outputPositions, fields, activations) {
+  outputPositions.set(basePositions);
+  const corrected = new Uint8Array(basePositions.length / 3);
+  const activeRegionIds = [];
+  const activeCategories = new Set();
+  let correctionSampleCount = 0;
+  let maximumActivation = 0;
+  for (const field of fields) {
+    const activation = clamp(Number(activations.get(field.id)) || 0, 0, 1);
+    maximumActivation = Math.max(maximumActivation, activation);
+    if (activation <= 1e-4) continue;
+    activeRegionIds.push(field.id);
+    activeCategories.add(field.category);
+    correctionSampleCount += field.indices.length;
+    for (let sampleIndex = 0; sampleIndex < field.indices.length; sampleIndex += 1) {
+      const vertexIndex = field.indices[sampleIndex];
+      const positionOffset = vertexIndex * 3;
+      const deltaOffset = sampleIndex * 3;
+      outputPositions[positionOffset] += field.deltas[deltaOffset] * activation;
+      outputPositions[positionOffset + 1] += field.deltas[deltaOffset + 1] * activation;
+      outputPositions[positionOffset + 2] += field.deltas[deltaOffset + 2] * activation;
+      corrected[vertexIndex] = 1;
+    }
+  }
+
+  let correctedVertexCount = 0;
+  let maximumInputDisplacement = 0;
+  for (let vertexIndex = 0; vertexIndex < corrected.length; vertexIndex += 1) {
+    if (!corrected[vertexIndex]) continue;
+    correctedVertexCount += 1;
+    const offset = vertexIndex * 3;
+    maximumInputDisplacement = Math.max(
+      maximumInputDisplacement,
+      Math.hypot(
+        outputPositions[offset] - basePositions[offset],
+        outputPositions[offset + 1] - basePositions[offset + 1],
+        outputPositions[offset + 2] - basePositions[offset + 2],
+      ),
+    );
+  }
+  return {
+    profile: POSE_CORRECTIVE_PROFILE,
+    fieldCount: fields.length,
+    activeRegionCount: activeRegionIds.length,
+    activeRegionIds,
+    activeCategories: [...activeCategories],
+    correctedVertexCount,
+    correctionSampleCount,
+    maximumActivation,
+    maximumInputDisplacement,
+    outwardCorrectionSampleCount: correctionSampleCount,
+  };
+}
+
+function relativeQuaternionAngle(parent, child) {
+  const relative = parent.clone().invert().multiply(child).normalize();
+  return 2 * Math.acos(clamp(Math.abs(relative.w), 0, 1));
+}
+
+function smoothstep01(value) {
+  const t = clamp(Number(value) || 0, 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function skinMatricesToDualQuaternions(skinMatrices, output = new Float32Array((skinMatrices?.length ?? 0) / 2)) {
+  const jointCount = Math.floor((skinMatrices?.length ?? 0) / 16);
+  if (output.length !== jointCount * 8) {
+    throw new Error(`Dual quaternion buffer must contain ${jointCount * 8} values.`);
+  }
+  for (let jointIndex = 0; jointIndex < jointCount; jointIndex += 1) {
+    const matrixOffset = jointIndex * 16;
+    const outputOffset = jointIndex * 8;
+    const [qx, qy, qz, qw] = matrixElementsToQuaternion(skinMatrices, matrixOffset);
+    const dual = translationTimesQuaternion(
+      skinMatrices[matrixOffset + 12],
+      skinMatrices[matrixOffset + 13],
+      skinMatrices[matrixOffset + 14],
+      qx, qy, qz, qw,
+    );
+    output[outputOffset] = qx;
+    output[outputOffset + 1] = qy;
+    output[outputOffset + 2] = qz;
+    output[outputOffset + 3] = qw;
+    output[outputOffset + 4] = dual[0];
+    output[outputOffset + 5] = dual[1];
+    output[outputOffset + 6] = dual[2];
+    output[outputOffset + 7] = dual[3];
+  }
+  return output;
+}
+
+function matrixElementsToQuaternion(elements, offset = 0) {
+  const scaleX = Math.hypot(elements[offset], elements[offset + 1], elements[offset + 2]) || 1;
+  const scaleY = Math.hypot(elements[offset + 4], elements[offset + 5], elements[offset + 6]) || 1;
+  const scaleZ = Math.hypot(elements[offset + 8], elements[offset + 9], elements[offset + 10]) || 1;
+  const m11 = elements[offset] / scaleX;
+  const m21 = elements[offset + 1] / scaleX;
+  const m31 = elements[offset + 2] / scaleX;
+  const m12 = elements[offset + 4] / scaleY;
+  const m22 = elements[offset + 5] / scaleY;
+  const m32 = elements[offset + 6] / scaleY;
+  const m13 = elements[offset + 8] / scaleZ;
+  const m23 = elements[offset + 9] / scaleZ;
+  const m33 = elements[offset + 10] / scaleZ;
+  let x; let y; let z; let w;
+  const trace = m11 + m22 + m33;
+  if (trace > 0) {
+    const s = 0.5 / Math.sqrt(trace + 1);
+    w = 0.25 / s;
+    x = (m32 - m23) * s;
+    y = (m13 - m31) * s;
+    z = (m21 - m12) * s;
+  } else if (m11 > m22 && m11 > m33) {
+    const s = 2 * Math.sqrt(Math.max(EPSILON, 1 + m11 - m22 - m33));
+    w = (m32 - m23) / s;
+    x = 0.25 * s;
+    y = (m12 + m21) / s;
+    z = (m13 + m31) / s;
+  } else if (m22 > m33) {
+    const s = 2 * Math.sqrt(Math.max(EPSILON, 1 + m22 - m11 - m33));
+    w = (m13 - m31) / s;
+    x = (m12 + m21) / s;
+    y = 0.25 * s;
+    z = (m23 + m32) / s;
+  } else {
+    const s = 2 * Math.sqrt(Math.max(EPSILON, 1 + m33 - m11 - m22));
+    w = (m21 - m12) / s;
+    x = (m13 + m31) / s;
+    y = (m23 + m32) / s;
+    z = 0.25 * s;
+  }
+  const length = Math.hypot(x, y, z, w) || 1;
+  return [x / length, y / length, z / length, w / length];
+}
+
 /** Dual quaternion deformation keeps shoulder and hip volume better than LBS. */
 function deformSurfaceDqs(
   restPositions,
@@ -1720,6 +2790,18 @@ function bodyFrameRotation(THREE, restPoints, posePoints, leftId, rightId, origi
   return currentQuaternion.multiply(restQuaternion.invert()).normalize();
 }
 
+function blendQuaternionsNormalized(THREE, first, second, amount) {
+  const t = clamp(amount, 0, 1);
+  const dot = first.x * second.x + first.y * second.y + first.z * second.z + first.w * second.w;
+  const sign = dot < 0 ? -1 : 1;
+  return new THREE.Quaternion(
+    first.x + (second.x * sign - first.x) * t,
+    first.y + (second.y * sign - first.y) * t,
+    first.z + (second.z * sign - first.z) * t,
+    first.w + (second.w * sign - first.w) * t,
+  ).normalize();
+}
+
 function makeBodyBasis(THREE, points, leftId, rightId, originId, upId) {
   const left = points.get(leftId);
   const rightPoint = points.get(rightId);
@@ -1765,6 +2847,14 @@ function clamp(value, min, max) {
 
 export const __surfaceTestUtils = Object.freeze({
   rebuildArticulationStableWeights,
+  applyExtendedDeformWeights,
+  enforceAnatomicalWeightGuards,
+  reinforceRigidSegmentCore,
+  buildPoseCorrectiveFields,
+  applyPoseCorrectiveFields,
+  skinMatricesToDualQuaternions,
+  matrixElementsToQuaternion,
+  relativeQuaternionAngle,
   deformSurfaceLbs,
   deformSurfaceDqs,
   writeFourStrongestInfluences,

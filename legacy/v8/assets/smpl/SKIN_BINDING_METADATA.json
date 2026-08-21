@@ -48,5 +48,28 @@
     "status": "experimental-transitional",
     "productionReady": false,
     "replacementRequirement": "Replace with licensed professional weights and pose corrective shapes before production release."
+  },
+  "runtimeExpansion": {
+    "profile": "smpl24-append-only-deform67@1",
+    "weightProfile": "anatomical-extended-deform-v3",
+    "runtimeJointCount": 67,
+    "appendedJointCount": 43,
+    "originalAssetUnmodified": true,
+    "maximumInfluences": 4,
+    "generatedWeights": {
+      "twistJoints": 8,
+      "scapulaCorrectiveJoints": 2,
+      "fingerJoints": 30,
+      "faceJoints": 0
+    },
+    "poseCorrectives": {
+      "profile": "sparse-anatomical-pose-corrective-v1",
+      "renderPath": "gpu-lbs-input-correction",
+      "regions": ["leftShoulder", "rightShoulder", "leftElbow", "rightElbow", "leftHip", "rightHip", "leftKnee", "rightKnee"],
+      "dqsReference": "cpu-quality-reference",
+      "rendererCompatibility": ["WebGPU", "WebGL2"]
+    },
+    "status": "runtime-preview",
+    "productionReady": false
   }
 }

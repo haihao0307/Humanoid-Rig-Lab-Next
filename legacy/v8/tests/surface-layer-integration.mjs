@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { createSmplSkinLayer, SKIN_RUNTIME_BUILD } from '../src/smpl-skin.js';
+import { createSmplSkinLayer, SKIN_RUNTIME_BUILD, __surfaceTestUtils } from '../src/smpl-skin.js';
 import { applyBodyProfileToDefinition } from '../src/body-profile.js';
 import { createStandardHumanoidPreset, normalizeSkeletonDefinition } from '../src/skeleton-presets.js';
+
+const { deformSurfaceLbs } = __surfaceTestUtils;
 
 const assetPath = new URL('../assets/smpl/smpl-male-surface-skinned.glb', import.meta.url);
 globalThis.fetch = async () => {
@@ -37,6 +39,18 @@ class V3 {
     this.x += (target.x - this.x) * alpha;
     this.y += (target.y - this.y) * alpha;
     this.z += (target.z - this.z) * alpha;
+    return this;
+  }
+  applyQuaternion(q) {
+    const x = this.x, y = this.y, z = this.z;
+    const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+    const ix = qw * x + qy * z - qz * y;
+    const iy = qw * y + qz * x - qx * z;
+    const iz = qw * z + qx * y - qy * x;
+    const iw = -qx * x - qy * y - qz * z;
+    this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+    this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+    this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
     return this;
   }
 }
@@ -204,6 +218,36 @@ class M4 {
     te[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
     te[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
     te[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+    return this;
+  }
+  invert() {
+    const augmented = Array.from({ length: 4 }, (_, row) => (
+      Array.from({ length: 8 }, (_, column) => (
+        column < 4 ? this.elements[column * 4 + row] : Number(column - 4 === row)
+      ))
+    ));
+    for (let column = 0; column < 4; column += 1) {
+      let pivotRow = column;
+      for (let row = column + 1; row < 4; row += 1) {
+        if (Math.abs(augmented[row][column]) > Math.abs(augmented[pivotRow][column])) pivotRow = row;
+      }
+      if (Math.abs(augmented[pivotRow][column]) < 1e-12) return this.identity();
+      [augmented[column], augmented[pivotRow]] = [augmented[pivotRow], augmented[column]];
+      const pivot = augmented[column][column];
+      for (let valueIndex = 0; valueIndex < 8; valueIndex += 1) augmented[column][valueIndex] /= pivot;
+      for (let row = 0; row < 4; row += 1) {
+        if (row === column) continue;
+        const factor = augmented[row][column];
+        for (let valueIndex = 0; valueIndex < 8; valueIndex += 1) {
+          augmented[row][valueIndex] -= factor * augmented[column][valueIndex];
+        }
+      }
+    }
+    for (let row = 0; row < 4; row += 1) {
+      for (let column = 0; column < 4; column += 1) {
+        this.elements[column * 4 + row] = augmented[row][column + 4];
+      }
+    }
     return this;
   }
   decompose(position, quaternion, scale) {
@@ -422,7 +466,16 @@ assert.equal(diagnostics.meshVisible, true);
 assert.equal(diagnostics.weightsReady, true);
 assert.equal(diagnostics.nativeSkinAttributes, true);
 assert.equal(diagnostics.inverseBindMatrices, true);
-assert.equal(diagnostics.jointCount, 24);
+assert.equal(diagnostics.assetJointCount, 24);
+assert.equal(diagnostics.jointCount, 67);
+assert.equal(diagnostics.runtimeSkeletonProfile, 'smpl24-append-only-deform67@1');
+assert.equal(diagnostics.runtimeSkeletonStats.assetJointCount, 24);
+assert.equal(diagnostics.runtimeSkeletonStats.runtimeJointCount, 67);
+assert.equal(diagnostics.runtimeSkeletonStats.appendedJointCount, 43);
+assert.equal(diagnostics.runtimeSkeletonStats.twistJointCount, 8);
+assert.equal(diagnostics.runtimeSkeletonStats.correctiveJointCount, 2);
+assert.equal(diagnostics.runtimeSkeletonStats.fingerJointCount, 30);
+assert.equal(diagnostics.runtimeSkeletonStats.faceJointCount, 3);
 assert.equal(diagnostics.attachedToScene, true);
 assert.equal(diagnostics.singleVisibleSurface, true);
 assert.equal(diagnostics.renderableSurfaceCount, 1);
@@ -438,14 +491,54 @@ assert.equal(diagnostics.vertexCount, 27_578);
 assert.equal(diagnostics.triangleCount, 55_152);
 assert.equal(diagnostics.bindPoseProtected, true);
 assert.equal(diagnostics.assetWeightStatus, 'experimental-transitional');
-assert.equal(diagnostics.runtimeWeightProfile, 'articulation-stable-segment-v1');
-assert.ok(diagnostics.runtimeWeightStats.meanDominantWeight > 0.80);
+assert.equal(diagnostics.runtimeWeightProfile, 'anatomical-extended-deform-v3');
+assert.equal(diagnostics.runtimeWeightStats.extendedWeightingApplied, true);
+assert.equal(diagnostics.runtimeWeightStats.weightedTwistJointCount, 8);
+assert.equal(diagnostics.runtimeWeightStats.weightedScapulaJointCount, 2);
+assert.equal(
+  diagnostics.runtimeWeightStats.weightedFingerJointCount,
+  30,
+  JSON.stringify(diagnostics.runtimeWeightStats.weightedFingerJointIds),
+);
+assert.equal(diagnostics.runtimeWeightStats.generatedFaceWeightVertexCount, 0);
+assert.ok(diagnostics.runtimeWeightStats.twistWeightedVertexCount > 1_000);
+assert.ok(diagnostics.runtimeWeightStats.scapulaWeightedVertexCount > 100);
+assert.ok(diagnostics.runtimeWeightStats.fingerWeightedVertexCount > 200);
+assert.ok(diagnostics.runtimeWeightStats.mirroredVertexCount > 200);
+assert.ok(diagnostics.runtimeWeightStats.meanDominantWeight > 0.68);
+assert.ok(
+  diagnostics.runtimeWeightStats.guardedVertexCount > 9_000,
+  JSON.stringify(diagnostics.runtimeWeightStats),
+);
+assert.ok(
+  diagnostics.runtimeWeightStats.rigidCoreVertexCount > 9_000,
+  JSON.stringify(diagnostics.runtimeWeightStats),
+);
+assert.ok(
+  diagnostics.runtimeWeightStats.ankleGuardVertexCount > 700,
+  JSON.stringify(diagnostics.runtimeWeightStats),
+);
 assert.ok(diagnostics.runtimeWeightStats.dominantCounts.leftUpperLeg > 400);
 assert.ok(diagnostics.runtimeWeightStats.dominantCounts.rightUpperLeg > 400);
 assert.equal(diagnostics.runtimeWeightStats.dominantCounts.leftHandEnd, 0);
 assert.equal(diagnostics.runtimeWeightStats.dominantCounts.rightHandEnd, 0);
+assert.equal(diagnostics.runtimeWeightStats.dominantCounts.leftEye, 0);
+assert.equal(diagnostics.runtimeWeightStats.dominantCounts.rightEye, 0);
+assert.equal(diagnostics.runtimeWeightStats.dominantCounts.jaw, 0);
 assert.ok(Math.abs(diagnostics.runtimeWeightStats.minimumWeightSum - 1) < 1e-5);
 assert.ok(Math.abs(diagnostics.runtimeWeightStats.maximumWeightSum - 1) < 1e-5);
+assert.equal(diagnostics.renderDeformationMode, 'gpu-lbs-with-sparse-pose-correctives');
+assert.equal(diagnostics.dqsReferenceMode, 'cpu-quality-reference');
+assert.equal(diagnostics.dqsReferenceAvailable, true);
+assert.equal(diagnostics.poseCorrectiveProfile, 'sparse-anatomical-pose-corrective-v1');
+assert.equal(diagnostics.poseCorrectiveFieldCount, 8);
+assert.equal(diagnostics.poseCorrectiveStats.activeRegionCount, 0);
+assert.equal(diagnostics.poseCorrectiveStats.correctedVertexCount, 0);
+assert.ok(maximumArrayValue(layer.skinIndices) < 67);
+assert.equal(layer.mesh.geometry.attributes.skinIndex.array instanceof Uint16Array, true);
+for (const id of ['leftUpperArmTwist', 'rightScapulaCorrective', 'leftIndexDistal', 'rightLittleDistal']) {
+  assert.ok(layer.bonesById.get(id)?.isBone, `Extended runtime deform bone ${id} was not created.`);
+}
 assert.equal(states[0]?.state, 'loading');
 assert.equal(states.at(-1)?.state, 'ready');
 assert.match(states.at(-1)?.label ?? '', /SKIN V002/);
@@ -540,12 +633,62 @@ layer.refresh(tDefinition, null, { force: true });
 assert.equal(layer.getDiagnostics().bindPoseProtected, false);
 
 const gpuPositionAttribute = targets[0].geometry.attributes.position.array;
-assert.deepEqual(
-  Array.from(gpuPositionAttribute),
-  Array.from(layer.restPositions),
-  'Native GPU skinning must not rewrite the bind POSITION buffer on the CPU.',
+const tCorrectiveDiagnostics = layer.getDiagnostics().poseCorrectiveStats;
+let maximumCorrectiveInputDisplacement = 0;
+for (let index = 0; index < gpuPositionAttribute.length; index += 3) {
+  maximumCorrectiveInputDisplacement = Math.max(
+    maximumCorrectiveInputDisplacement,
+    Math.hypot(
+      gpuPositionAttribute[index] - layer.restPositions[index],
+      gpuPositionAttribute[index + 1] - layer.restPositions[index + 1],
+      gpuPositionAttribute[index + 2] - layer.restPositions[index + 2],
+    ),
+  );
+}
+assert.ok(
+  tCorrectiveDiagnostics.activeCategories.includes('shoulder'),
+  JSON.stringify(tCorrectiveDiagnostics),
+);
+assert.ok(tCorrectiveDiagnostics.correctedVertexCount > 100);
+assert.ok(maximumCorrectiveInputDisplacement > 0.0001);
+assert.ok(
+  maximumCorrectiveInputDisplacement < 0.025,
+  `Pose corrective input moved a bind vertex ${maximumCorrectiveInputDisplacement.toFixed(4)} m.`,
 );
 const deformed = layer.sampleDeformedPositions();
+const dqsReference = layer.sampleDeformedPositions({ method: 'dqs-reference' });
+let maximumDqsReferenceDelta = 0;
+let dqsNonFiniteCount = 0;
+for (let index = 0; index < dqsReference.length; index += 3) {
+  if (!Number.isFinite(dqsReference[index] + dqsReference[index + 1] + dqsReference[index + 2])) {
+    dqsNonFiniteCount += 1;
+  }
+  maximumDqsReferenceDelta = Math.max(
+    maximumDqsReferenceDelta,
+    Math.hypot(
+      dqsReference[index] - deformed[index],
+      dqsReference[index + 1] - deformed[index + 1],
+      dqsReference[index + 2] - deformed[index + 2],
+    ),
+  );
+}
+assert.equal(dqsNonFiniteCount, 0);
+assert.ok(maximumDqsReferenceDelta < 0.35, `DQS reference diverged ${maximumDqsReferenceDelta.toFixed(4)} m from final LBS.`);
+const uncorrectedT = new Float32Array(layer.restPositions.length);
+deformSurfaceLbs(
+  layer.shapedRestPositions ?? layer.restPositions,
+  uncorrectedT,
+  layer.skinIndices,
+  layer.skinWeights,
+  layer.skinMatrices,
+);
+const leftShoulderField = layer.poseCorrectiveFields.find((field) => field.id === 'leftShoulderVolume');
+const uncorrectedShoulderRadius = regionRmsRadius(uncorrectedT, leftShoulderField.indices);
+const correctedShoulderRadius = regionRmsRadius(deformed, leftShoulderField.indices);
+assert.ok(
+  correctedShoulderRadius > uncorrectedShoulderRadius,
+  `Shoulder corrective did not preserve outward volume: ${uncorrectedShoulderRadius} -> ${correctedShoulderRadius}.`,
+);
 const rest = layer.restPositions;
 const triangleIndex = targets[0].geometry.index?.array;
 let maxDisplacement = 0;
@@ -620,11 +763,15 @@ if (triangleIndex) {
 assert.equal(nonFiniteCount, 0);
 assert.ok(maxDisplacement < 0.75, `T pose moved a surface vertex too far: ${maxDisplacement.toFixed(4)} m.`);
 assert.ok(
-  maxEdgeStretch < 1.5,
-  `T pose edge stretch exceeded the limit: ${maxEdgeStretch.toFixed(3)}x; ${JSON.stringify(maxEdge)}.`,
+  maxEdgeStretch < 1.45,
+  `T pose edge stretch exceeded the limit: ${maxEdgeStretch.toFixed(3)}x; ${JSON.stringify(maxEdge)}; `
+    + `matrices=${JSON.stringify([20, 21, 50, 56].map((jointIndex) => ({
+      jointIndex,
+      matrix: Array.from(layer.skinMatrices.slice(jointIndex * 16, jointIndex * 16 + 16)),
+    })))}.`,
 );
 assert.ok(
-  maxShoulderEdgeStretch < 1.5,
+  maxShoulderEdgeStretch < 1.45,
   `T pose shoulder stretch exceeded the limit: ${maxShoulderEdgeStretch.toFixed(3)}x; ${JSON.stringify(maxShoulderEdge)}; `
     + `edgeWeights=${JSON.stringify([maxShoulderEdge?.a, maxShoulderEdge?.b].map((vertexIndex) => {
       const offset = vertexIndex * 4;
@@ -638,6 +785,12 @@ assert.ok(
 const stepDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('STEP'));
 layer.refresh(stepDefinition, null, { force: true });
 const stepDeformed = layer.sampleDeformedPositions();
+const stepCorrectiveDiagnostics = layer.getDiagnostics().poseCorrectiveStats;
+assert.ok(
+  stepCorrectiveDiagnostics.activeCategories.includes('hip')
+    || stepCorrectiveDiagnostics.activeCategories.includes('knee'),
+  JSON.stringify(stepCorrectiveDiagnostics),
+);
 let maxStepEdgeStretch = 0;
 let maxStepEdge = null;
 if (triangleIndex) {
@@ -680,9 +833,44 @@ if (triangleIndex) {
   }
 }
 assert.ok(
-  maxStepEdgeStretch < 1.65,
+  maxStepEdgeStretch < 1.60,
   `STEP pose edge stretch exceeded the limit: ${maxStepEdgeStretch.toFixed(3)}x; ${JSON.stringify(maxStepEdge)}.`,
 );
+
+const articulatedFingerDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('A'));
+const articulatedFingerById = new Map(
+  articulatedFingerDefinition.joints.map((joint) => [joint.id, joint]),
+);
+articulatedFingerById.get('leftIndexIntermediate').poseWorldPosition[2] += 0.020;
+articulatedFingerById.get('leftIndexDistal').poseWorldPosition[2] += 0.036;
+layer.refresh(articulatedFingerDefinition, null, { force: true });
+const leftHandIndex = layer.boneIndexById.get('leftHand');
+const leftIndexProximalIndex = layer.boneIndexById.get('leftIndexProximal');
+let fingerMatrixDelta = 0;
+for (let component = 0; component < 16; component += 1) {
+  fingerMatrixDelta = Math.max(
+    fingerMatrixDelta,
+    Math.abs(
+      layer.skinMatrices[leftHandIndex * 16 + component]
+      - layer.skinMatrices[leftIndexProximalIndex * 16 + component]
+    ),
+  );
+}
+assert.ok(fingerMatrixDelta > 0.01, 'Finger articulation did not diverge from the parent hand matrix.');
+const articulatedFingerSurface = layer.sampleDeformedPositions();
+let fingerSurfaceResponse = 0;
+for (let offset = 0; offset < rest.length; offset += 3) {
+  if (rest[offset] > -0.35 || rest[offset + 1] < 0.72 || rest[offset + 1] > 1.00) continue;
+  fingerSurfaceResponse = Math.max(
+    fingerSurfaceResponse,
+    Math.hypot(
+      articulatedFingerSurface[offset] - rest[offset],
+      articulatedFingerSurface[offset + 1] - rest[offset + 1],
+      articulatedFingerSurface[offset + 2] - rest[offset + 2],
+    ),
+  );
+}
+assert.ok(fingerSurfaceResponse > 0.001, 'Extended finger weights did not deform the left-hand surface.');
 
 const mismatchDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('A'));
 mismatchDefinition.profilePreview = { requiresSkinRebind: true };
@@ -710,11 +898,54 @@ replacementLayer.dispose();
 layer.dispose();
 
 console.log(
-  `T-pose native LBS quality passed: max displacement ${maxDisplacement.toFixed(4)} m, `
+  `T-pose anatomical-extended-deform LBS quality passed: max displacement ${maxDisplacement.toFixed(4)} m, `
   + `max edge stretch ${maxEdgeStretch.toFixed(3)}x at ${JSON.stringify(maxEdge)}, `
   + `max shoulder stretch ${maxShoulderEdgeStretch.toFixed(3)}x.`,
 );
-console.log(`STEP-pose native LBS quality passed: max edge stretch ${maxStepEdgeStretch.toFixed(3)}x at ${JSON.stringify(maxStepEdge)}.`);
+console.log(`STEP-pose anatomical-extended-deform LBS quality passed: max edge stretch ${maxStepEdgeStretch.toFixed(3)}x at ${JSON.stringify(maxStepEdge)}.`);
+console.log(
+  `Extended runtime deform palette passed: ${diagnostics.assetJointCount} asset joints -> ${diagnostics.jointCount} runtime joints; `
+  + `${diagnostics.runtimeWeightStats.twistWeightedVertexCount} twist, `
+  + `${diagnostics.runtimeWeightStats.scapulaWeightedVertexCount} scapula, `
+  + `${diagnostics.runtimeWeightStats.fingerWeightedVertexCount} finger-weighted vertices; `
+  + `finger response ${fingerSurfaceResponse.toFixed(4)} m.`,
+);
+console.log(
+  `Pose corrective and DQS reference passed: shoulder RMS radius ${uncorrectedShoulderRadius.toFixed(5)} -> `
+  + `${correctedShoulderRadius.toFixed(5)} m; max input correction ${maximumCorrectiveInputDisplacement.toFixed(5)} m; `
+  + `max DQS/LBS reference delta ${maximumDqsReferenceDelta.toFixed(5)} m.`,
+);
 
 const elapsed = performance.now() - start;
 console.log(`V8.4 SKIN V002 scene-wide single-surface guard, native SkinnedMesh, direct weighted picking, inverse-bind matrices, and material-state regression passed in ${elapsed.toFixed(1)} ms.`);
+
+function maximumArrayValue(values) {
+  let maximum = -Infinity;
+  for (const value of values ?? []) maximum = Math.max(maximum, value);
+  return maximum;
+}
+
+function regionRmsRadius(positions, indices) {
+  let centreX = 0;
+  let centreY = 0;
+  let centreZ = 0;
+  for (const vertexIndex of indices) {
+    const offset = vertexIndex * 3;
+    centreX += positions[offset];
+    centreY += positions[offset + 1];
+    centreZ += positions[offset + 2];
+  }
+  const count = Math.max(1, indices.length);
+  centreX /= count;
+  centreY /= count;
+  centreZ /= count;
+  let squaredDistance = 0;
+  for (const vertexIndex of indices) {
+    const offset = vertexIndex * 3;
+    const dx = positions[offset] - centreX;
+    const dy = positions[offset + 1] - centreY;
+    const dz = positions[offset + 2] - centreZ;
+    squaredDistance += dx * dx + dy * dy + dz * dz;
+  }
+  return Math.sqrt(squaredDistance / count);
+}

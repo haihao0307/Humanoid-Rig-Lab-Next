@@ -37,7 +37,7 @@ HRL_HOST_ACK
 
 ## 比例与表皮
 
-八项 BodyProfile 参数从不可变参考绑定重新生成骨架。自定义比例会标记 `requiresSkinRebind: true`。场景使用唯一预绑定 SMPL 人体网格；正式生产仍需要与目标骨架匹配的专业 SkinBinding 和肩髋姿势修正形变。
+八项 BodyProfile 参数从不可变参考绑定重新生成骨架。自定义比例会标记 `requiresSkinRebind: true`。场景使用唯一预绑定 SMPL 人体网格；源资产保持 24 关节绑定，运行时追加为 67 关节调色板，并在 GPU 线性蒙皮输入端应用肩、肘、髋、膝稀疏姿势修正。CPU DQS 仅作为质量参考；正式生产仍需要与目标骨架匹配的专业 SkinBinding 和雕刻级姿势修正形变。
 
 ## 启动
 

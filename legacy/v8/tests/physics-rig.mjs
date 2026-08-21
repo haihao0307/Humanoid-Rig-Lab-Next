@@ -550,6 +550,24 @@ function createSyntheticImageObservation(rig) {
     /localRotations\.leftHand must be a normalized quaternion/,
   );
 
+  const fullConventionDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('A'));
+  const fullConventionBind = bindSnapshot(fullConventionDefinition);
+  const fullConventionRig = new PhysicsRig(fullConventionDefinition, {
+    solverIterations: 64,
+    exactMaxPasses: 960,
+    exactTolerance: 1e-8,
+    groundEnabled: true,
+    gravityEnabled: false,
+  });
+  const fullConventionSnapshot = structuredClone(committed);
+  fullConventionSnapshot.rotationConvention = 'incoming_bone_bind_delta_full_quaternion';
+  assert.ok(fullConventionRig.applyPoseSnapshot(fullConventionSnapshot, { project: false }) >= 24);
+  assertBindUnchanged(
+    fullConventionDefinition,
+    fullConventionBind,
+    'Full-quaternion PoseSnapshot import changed bind dimensions.',
+  );
+
   const targetDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('A'));
   const targetBind = bindSnapshot(targetDefinition);
   const targetRig = new PhysicsRig(targetDefinition, {

@@ -8,6 +8,9 @@ const {
   selectWeightCandidates,
   isRestPose,
   translationTimesQuaternion,
+  skinMatricesToDualQuaternions,
+  buildPoseCorrectiveFields,
+  applyPoseCorrectiveFields,
 } = __surfaceTestUtils;
 
 {
@@ -90,6 +93,80 @@ const {
 }
 
 {
+  const restPositions = new Float32Array([1, 0, 0]);
+  const restNormals = new Float32Array([1, 0, 0]);
+  const skinIndices = new Uint16Array([0, 0, 0, 0]);
+  const skinWeights = new Float32Array([1, 0, 0, 0]);
+  const skinMatrices = new Float32Array([
+    0, 1, 0, 0,
+    -1, 0, 0, 0,
+    0, 0, 1, 0,
+    0.5, 0.25, 0, 1,
+  ]);
+  const dualQuaternions = skinMatricesToDualQuaternions(skinMatrices);
+  const lbsPositions = new Float32Array(3);
+  const dqsPositions = new Float32Array(3);
+  const dqsNormals = new Float32Array(3);
+  deformSurfaceLbs(restPositions, lbsPositions, skinIndices, skinWeights, skinMatrices);
+  deformSurfaceDqs(
+    restPositions,
+    restNormals,
+    dqsPositions,
+    dqsNormals,
+    skinIndices,
+    skinWeights,
+    dualQuaternions,
+  );
+  assert.deepEqual([...lbsPositions].map((value) => Number(value.toFixed(6))), [0.5, 1.25, 0]);
+  assert.deepEqual(
+    [...dqsPositions].map((value) => Number(value.toFixed(6))),
+    [...lbsPositions].map((value) => Number(value.toFixed(6))),
+  );
+}
+
+{
+  const basePositions = new Float32Array([
+    0.5, 0, 0,
+    -0.5, 0, 0,
+    0, 0, 0.5,
+    1.2, 0, 0,
+  ]);
+  const bindPoints = new Map([
+    ['joint', { x: 0, y: 0, z: 0 }],
+    ['child', { x: 0, y: 1, z: 0 }],
+  ]);
+  const fields = buildPoseCorrectiveFields(basePositions, bindPoints, [{
+    id: 'volume', category: 'test', jointId: 'joint', childId: 'child',
+    parentSpan: 1, childSpan: 1, radius: 1, radialGain: 0.2,
+  }]);
+  assert.equal(fields.length, 1);
+  assert.equal(fields[0].indices.length, 3);
+  const inactive = new Float32Array(basePositions.length);
+  const inactiveStats = applyPoseCorrectiveFields(
+    basePositions,
+    inactive,
+    fields,
+    new Map([['volume', 0]]),
+  );
+  assert.deepEqual([...inactive], [...basePositions]);
+  assert.equal(inactiveStats.correctedVertexCount, 0);
+  const active = new Float32Array(basePositions.length);
+  const activeStats = applyPoseCorrectiveFields(
+    basePositions,
+    active,
+    fields,
+    new Map([['volume', 1]]),
+  );
+  assert.ok(active[0] > basePositions[0]);
+  assert.ok(active[3] < basePositions[3]);
+  assert.ok(active[8] > basePositions[8]);
+  assert.equal(active[9], basePositions[9]);
+  assert.equal(activeStats.activeRegionCount, 1);
+  assert.equal(activeStats.correctedVertexCount, 3);
+  assert.equal(activeStats.outwardCorrectionSampleCount, 3);
+}
+
+{
   const chains = ['torso', 'leftArm', 'rightArm', 'leftLeg', 'rightLeg'].map((name) => ({ name }));
   const chest = selectWeightCandidates(0.05, 1.30, 0, chains).map((item) => item.chain.name);
   assert.ok(chest.includes('torso'));
@@ -109,4 +186,4 @@ const {
   assert.equal(isRestPose(rest, changed, ['hips', 'head']), false);
 }
 
-console.log('V8.4 native LBS sampling, transitional weight regression, bind-pose protection, and four-influence normalization passed.');
+console.log('V8.5 native LBS, DQS reference conversion, sparse pose correctives, bind-pose protection, and four-influence normalization passed.');

@@ -59,7 +59,7 @@ const MODULES = {
     progress: 84, version: 'skin@0.5.1', compatibleRig: 'rig@0.4.0',
     currentTask: '使用 V002 构建验证入口复核全场景唯一 SkinnedMesh、肩髋权重与材质模式', completed: 17, total: 20, passed: 41, failed: 0,
     blockers: [
-      '正式 SMPL 或等效专业权重与姿势修正形变仍待许可资产',
+      '运行时稀疏姿势修正已接入；正式 SMPL 或等效专业权重与雕刻级修正形变仍待许可资产',
       'Windows WebGPU 实机视觉验收需要使用 V002 专用入口完成'
     ], color: '#ff9f68'
   },

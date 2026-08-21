@@ -11,6 +11,11 @@ const LENGTH_TOLERANCE = 1e-8;
 const GROUND_TOLERANCE = 1e-8;
 const POSE_SNAPSHOT_SCHEMA = 'humanoid_rig/pose_snapshot@1.0';
 const POSE_ROTATION_CONVENTION = 'incoming_bone_bind_delta_zero_twist';
+const POSE_ROTATION_CONVENTION_FULL = 'incoming_bone_bind_delta_full_quaternion';
+const SUPPORTED_POSE_ROTATION_CONVENTIONS = new Set([
+  POSE_ROTATION_CONVENTION,
+  POSE_ROTATION_CONVENTION_FULL,
+]);
 const DEFAULT_OPTIONS = Object.freeze({
   enabled: true,
   paused: false,
@@ -1348,8 +1353,8 @@ function assertSupportedPoseSnapshot(snapshot, indexById, definition) {
   if (snapshot.type !== 'PoseSnapshot') errors.push('type must be PoseSnapshot');
   if (snapshot.schema !== POSE_SNAPSHOT_SCHEMA) errors.push(`schema must be ${POSE_SNAPSHOT_SCHEMA}`);
   if (snapshot.rotationSpace !== 'local') errors.push('rotationSpace must be local');
-  if (snapshot.rotationConvention !== POSE_ROTATION_CONVENTION) {
-    errors.push(`rotationConvention must be ${POSE_ROTATION_CONVENTION}`);
+  if (!SUPPORTED_POSE_ROTATION_CONVENTIONS.has(snapshot.rotationConvention)) {
+    errors.push(`rotationConvention must be one of ${[...SUPPORTED_POSE_ROTATION_CONVENTIONS].join(', ')}`);
   }
 
   const rootJointId = String(snapshot.rootJointId ?? '');

@@ -735,7 +735,10 @@ function resolveFingerLocalPosition(spec, byId) {
   if (segment === 0) {
     const palm = byId.get(`${side}HandEnd`)?.localPosition ?? [sign * 0.028, -0.060, 0.025];
     const spread = {
-      thumb: [sign * 0.024, 0.008, 0.020],
+      // Keep the thumb root inside the real SMPL hand volume. The previous
+      // lateral offset placed both thumb chains beyond the mesh silhouette,
+      // so no valid skin vertex could ever receive proximal/distal weights.
+      thumb: [0, 0.012, 0.020],
       index: [sign * 0.008, -0.002, 0.019],
       middle: [0, -0.006, 0.008],
       ring: [-sign * 0.004, -0.008, -0.004],
@@ -749,12 +752,12 @@ function resolveFingerLocalPosition(spec, byId) {
   }
 
   const direction = {
-    thumb: [sign * 0.58, -0.64, 0.50],
-    index: [sign * 0.31, -0.86, 0.40],
-    middle: [sign * 0.27, -0.89, 0.36],
-    ring: [sign * 0.23, -0.91, 0.34],
-    little: [sign * 0.18, -0.93, 0.31],
-  }[finger] ?? [sign * 0.25, -0.90, 0.35];
+    thumb: [sign * 0.08, -0.72, 0.69],
+    index: [sign * 0.08, -0.91, 0.41],
+    middle: [sign * 0.06, -0.93, 0.36],
+    ring: [sign * 0.05, -0.94, 0.34],
+    little: [sign * 0.04, -0.95, 0.31],
+  }[finger] ?? [sign * 0.06, -0.93, 0.35];
   const normalized = normalize3(direction);
   return normalized.map((value) => value * length);
 }

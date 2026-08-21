@@ -11,6 +11,10 @@
 - 新增 `humanoid_rig/character_profile_export@1.0`，包含 schema、版本、模块引用和资源摘要。
 - 新增四窗口 Character 同步、刷新恢复和现有模块隔离测试。
 - 动画逐帧采样与时间轴预览保持临时态，不创建高频 revision；普通 JSON 消息继续拒绝二进制和内联 base64。
+- V8 表皮运行时在唯一原生 `SkinnedMesh` 上追加 67 关节变形调色板，并保留源 GLB 的 24 关节绑定兼容性。
+- 正式显示路径增加肩、肘、髋、膝八区稀疏姿势修正，在 GPU 线性蒙皮输入端补偿关节弯曲时的体积损失。
+- CPU 双四元数蒙皮作为质量参考接入回归测试，不替换 WebGPU/WebGL2 的正式渲染路径。
+- 增加姿势修正零激活、区域隔离、肩部体积保持、极端 T/Step 姿势和 DQS/LBS 有界差异测试。
 
 ## 0.5.0 four-module V002 integration · 2026-08-19
 
