@@ -58,6 +58,12 @@ RigDefinition 与关节轴审计
 
 `character.html` 与 `apps/character-generator/` 将单张人物图片编排成 Character 数据。图片先由现有 HRL-M03 图片姿势识别生成 33 点 PoseObservation，再分别复用 HRL-M01 比例规范化、BodyShape、Face Identity、Clothing 和 PoseSnapshot 契约，最后由 Character Core 保存引用。第一阶段不宣称生成最终真人，不复制现有模块算法，也不把图片二进制写入 ProjectState；只保存图片哈希、分析元数据、模块输出和版本会话，以支持多窗口同步及重载一致性。
 
+## Character Studio 状态闭环
+
+`apps/character-studio/` 提供 Character Studio 的统一 session/store 接口：创建、加载、保存、历史恢复、CharacterProfile 导出、状态订阅和资源保存。正式人物修改统一经过 CharacterManager、OperationEvent、integration ModulePatch 和 ProjectState revision；`character-studio`、`main-editor`、`animation-editor`、`data-inspector` 四类窗口读取同一 Character 状态。
+
+结构化项目快照、事件和资源索引写入 IndexedDB；大文件优先写入 OPFS，OPFS 不可用时回退到 IndexedDB Blob。普通 ProjectState 和窗口消息拒绝二进制或内联 base64，只传播资源引用。完整接入说明见 `docs/CHARACTER_STUDIO_STATE_FLOW.md`。
+
 ## 四个模块
 
 ### 骨骼比例
@@ -256,6 +262,8 @@ Face Identity 创建、参数编辑、保存、加载、恢复、Character 引�
 Clothing 添加、删除、保存、恢复、simulationRig 动作跟随与 Body Skin 隔离
 Hair 添加与短发/长发/马尾切换、Accessory 添加、Appearance 保存恢复与 simulationRig 静态绑定
 图片分析生成 Proportion、BodyShape、Face、Clothing、Pose 与 Character，保存后序列化重载一致
+Character Studio 创建、加载、保存、历史恢复、稳定导出、IndexedDB 刷新恢复与 OPFS 资源边界
+character-studio、main-editor、animation-editor、data-inspector 四窗口 Character 状态同步
 ```
 
 完整结果见 `VALIDATION.md` 和 `docs/FOUR_MODULE_V002_MERGE_REPORT_2026-08-19.md`。
