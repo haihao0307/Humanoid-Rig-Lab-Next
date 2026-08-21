@@ -1,6 +1,6 @@
-# Humanoid Rig Lab Next 四板块 V002 验证记录
+# Humanoid Rig Lab Next 四板块 V002 / Character Studio v1 验证记录
 
-验证日期：2026 年 8 月 20 日
+验证日期：2026 年 8 月 21 日
 项目版本：`0.5.0`
 构建 ID：`four-module-v002-20260819`
 
@@ -14,7 +14,7 @@ npm test
 
 ```text
 PASS Humanoid Rig Lab Next 0.5.0 build four-module-v002-20260819
-PASS 113 required files
+PASS 131 required files
 PASS schema v11, Character Core, BodyShape, Face Identity, Clothing System, Appearance System, Character Generator, Character Studio, module state, and migration contract
 PASS primary 3D proportion stage and explicit 2D fallback separation
 PASS live body-profile bridge and exact 3D dimension feedback contract
@@ -48,6 +48,12 @@ PASS IndexedDB snapshot contract, OPFS resource path, binary-message guard, and 
 PASS stable CharacterProfile export with schemas, module revisions, appearance revision, and resource summary
 PASS character-studio, main-editor, animation-editor, and data-inspector share Character state
 PASS delayed IndexedDB-style writes cannot move the current persisted revision backwards
+PASS Character Studio v1 page exposes the three-column shell and one simulationRig viewport
+PASS Character Studio v1 composes all nine panels and four synchronized window roles
+PASS shell, panels, persistence session, clothing, appearance, and viewport reuse one Character state path
+PASS panels route formal edits through ProjectHub, Character Core references, revisions, and OperationEvents
+PASS animation ticks stay transient and binary resources stay outside ordinary JSON messages
+PASS Character Studio v1 manifest, export schema, and performance guards are stable
 PASS integrated build four-module-v002-20260819
 PASS baseline-state migration to all four V002 module versions
 PASS animation local-quaternion PoseSnapshot applied through fixed-length PhysicsRig
@@ -228,6 +234,11 @@ ProjectState 和导出 JSON 拒绝二进制及内联 base64
 character-studio、main-editor、animation-editor、data-inspector 四角色同步
 并发延迟写入不能让持久化 current revision 回退
 原 Proportion、Skin、Pose、Animation 和模块状态切片保持不变
+三栏页面、九个人物面板和项目总控入口完整
+Shell、Panels、Session 共用一个 ProjectHubClient
+页面只创建一个 simulationRig 人物视口
+正式面板操作通过 ProjectHub 和 Character Core 引用写入
+动画逐帧采样与时间轴预览不产生高频 revision
 ```
 
 ## 6. 本地 HTTP 冒烟检查
@@ -271,4 +282,4 @@ character-studio、main-editor、animation-editor、data-inspector 四角色同�
 
 ## 8. 当前结论
 
-四个 V002 模块已经在同一母项目中通过代码、数据、边界、自动测试和 HTTP 资源回归。过渡性蒙皮质量、第三方图片模型发布审查、外部全身物理解算、最终人物动画 GLB 合并导出和桌面浏览器视觉验收继续保留为下一轮工作。
+四个 V002 模块与 Character Studio v1 已经在同一母项目中通过代码、数据、边界和自动测试；历史 HTTP 资源回归继续有效。本轮遵循项目规则未代替用户执行桌面浏览器视觉操作。过渡性蒙皮质量、第三方图片模型发布审查、外部全身物理解算、最终人物动画 GLB 合并导出和桌面浏览器视觉验收继续保留为下一轮工作。

@@ -38,6 +38,7 @@ const created = await sessions[0].createCharacter({
 for (const session of sessions) {
   assert.equal(session.getSnapshot().active_character_id, 'character_shared');
   assert.equal(session.getSnapshot().character_profile.version, 1);
+  assert.equal(session.getSnapshot().character_revision, created.event.revision);
   assert.equal(session.getSnapshot().character_state_revision, created.event.revision);
 }
 

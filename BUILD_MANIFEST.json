@@ -92,12 +92,26 @@
     "phase": "image-to-character-data"
   },
   "characterStudio": {
+    "version": "character-studio@1.0.0",
+    "integrationDate": "2026-08-21",
+    "sourceBranches": ["feature/character-studio-shell", "feature/character-studio-panels", "feature/character-studio-state"],
+    "page": "character-studio.html",
+    "layout": ["panels", "viewport", "state-and-version"],
+    "stateCenter": "ProjectState via one ProjectHubClient",
+    "viewportSource": "simulationRig",
+    "panels": ["identity", "bodyShape", "face", "clothing", "hair", "accessory", "proportion", "pose", "animation"],
     "sessionSchema": "humanoid_rig/character_studio_session@1.0",
     "exportSchema": "humanoid_rig/character_profile_export@1.0",
     "persistence": {
       "structuredData": "IndexedDB",
       "largeResources": "OPFS",
       "binaryFallback": "IndexedDB Blob"
+    },
+    "performanceGuards": {
+      "singleCharacterStateCenter": true,
+      "singleViewportInstance": true,
+      "binaryMessages": false,
+      "transientPreviewRevision": false
     },
     "windowRoles": ["character-studio", "main-editor", "animation-editor", "data-inspector"]
   }

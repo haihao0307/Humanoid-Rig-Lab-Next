@@ -58,9 +58,11 @@ RigDefinition 与关节轴审计
 
 `character.html` 与 `apps/character-generator/` 将单张人物图片编排成 Character 数据。图片先由现有 HRL-M03 图片姿势识别生成 33 点 PoseObservation，再分别复用 HRL-M01 比例规范化、BodyShape、Face Identity、Clothing 和 PoseSnapshot 契约，最后由 Character Core 保存引用。第一阶段不宣称生成最终真人，不复制现有模块算法，也不把图片二进制写入 ProjectState；只保存图片哈希、分析元数据、模块输出和版本会话，以支持多窗口同步及重载一致性。
 
-## Character Studio 状态闭环
+## Character Studio v1
 
-`apps/character-studio/` 提供 Character Studio 的统一 session/store 接口：创建、加载、保存、历史恢复、CharacterProfile 导出、状态订阅和资源保存。正式人物修改统一经过 CharacterManager、OperationEvent、integration ModulePatch 和 ProjectState revision；`character-studio`、`main-editor`、`animation-editor`、`data-inspector` 四类窗口读取同一 Character 状态。
+`character-studio.html` 与 `apps/character-studio/` 组成 Character Studio v1：左侧九个人物编辑面板，中间唯一的 Three.js / simulationRig 人物视口，右侧 CharacterProfile、独立模块 revision、资源引用和导出摘要。页面只创建一个 ProjectHubClient，并把同一实例交给 shell、panels 和 session，避免第二套人物状态与重复人物实例。
+
+正式人物修改统一执行 `Panel → Character Core / 模块接口 → ProjectState → Revision → OperationEvent → 保存 → 广播`。创建、加载、保存、历史恢复、CharacterProfile 导出、状态订阅和资源保存均由统一 session/store 提供；`character-studio`、`main-editor`、`animation-editor`、`data-inspector` 四类窗口读取同一 Character 状态。动画逐帧采样和时间轴预览使用临时消息，不增加 ProjectState revision。
 
 结构化项目快照、事件和资源索引写入 IndexedDB；大文件优先写入 OPFS，OPFS 不可用时回退到 IndexedDB Blob。普通 ProjectState 和窗口消息拒绝二进制或内联 base64，只传播资源引用。完整接入说明见 `docs/CHARACTER_STUDIO_STATE_FLOW.md`。
 
@@ -151,6 +153,9 @@ index.html
 character.html
 图片上传、HRL-M01/HRL-M03 分析、Character 生成、版本保存与重载
 
+character-studio.html
+三栏 Character Studio v1、九个人物面板、simulationRig 视口、状态版本与 CharacterProfile 导出
+
 face.html
 Face Identity 参数、版本历史、Character 引用与未来后端接口
 
@@ -223,7 +228,7 @@ humanoid_rig/transient_bus@1.0
 ```text
 母平台 buildVersion      0.5.0
 构建 ID                  four-module-v002-20260819
-ProjectState schema      9
+ProjectState schema      11
 绑定骨架导出 schema      7
 PoseSnapshot             humanoid_rig/pose_snapshot@1.0
 内置编辑器               V8.5 / 0.8.5
@@ -264,9 +269,10 @@ Hair 添加与短发/长发/马尾切换、Accessory 添加、Appearance 保存�
 图片分析生成 Proportion、BodyShape、Face、Clothing、Pose 与 Character，保存后序列化重载一致
 Character Studio 创建、加载、保存、历史恢复、稳定导出、IndexedDB 刷新恢复与 OPFS 资源边界
 character-studio、main-editor、animation-editor、data-inspector 四窗口 Character 状态同步
+Character Studio 三栏装配、九面板、单一状态中心、单一视口与动画临时预览性能边界
 ```
 
-完整结果见 `VALIDATION.md` 和 `docs/FOUR_MODULE_V002_MERGE_REPORT_2026-08-19.md`。
+完整结果见 `VALIDATION.md`、`docs/FOUR_MODULE_V002_MERGE_REPORT_2026-08-19.md` 和 `docs/CHARACTER_STUDIO_V1_MERGE_REPORT_2026-08-21.md`。
 
 ## 当前生产边界
 

@@ -143,6 +143,13 @@ class MemoryHub {
     return this.#commitAppearance(system);
   }
 
+  removeHair(id) {
+    const system = appearanceManager.removeHair(this.state.appearanceSystem, id, {
+      expected_revision: this.state.appearanceSystem.revision,
+    });
+    return this.#commitAppearance(system);
+  }
+
   addAccessory(profile) {
     const system = appearanceManager.addAccessory(this.state.appearanceSystem, profile, {
       expected_revision: this.state.appearanceSystem.revision,

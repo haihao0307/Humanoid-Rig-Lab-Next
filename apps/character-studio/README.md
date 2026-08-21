@@ -1,6 +1,6 @@
-# Character Studio Panels
+# Character Studio v1
 
-This folder contains the left-column Character Studio editor only. It does not create a page shell or a Three.js viewport.
+This folder contains the Character Studio v1 page runtime: the three-column shell, nine left-column panels, the single simulationRig viewport host, the right-column revision/export summary, the shared session, and persistence adapters.
 
 Mount it from the Shell entry after the Shell has created its existing `ProjectHubClient`:
 
@@ -14,4 +14,4 @@ const characterSidebar = mountCharacterStudioSidebar({
 });
 ```
 
-The Shell only needs to provide one element with `data-character-studio-sidebar` and the shared ProjectHub-compatible client. The sidebar subscribes to ProjectState changes and writes through existing Character Core and module actions.
+The page entry creates one ProjectHub-compatible client and passes that same instance to the sidebar and Character Studio session. The sidebar subscribes to ProjectState changes and writes through existing Character Core and module actions; it does not create an independent Character state.

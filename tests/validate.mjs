@@ -35,7 +35,8 @@ const legacyFiles = [
   'legacy/v8/sample-standard-humanoid-a.json',
 ];
 const required = [
-  'index.html', 'studio.html', 'face.html', 'character.html', 'styles.css', 'face.css', 'server.mjs',
+  'index.html', 'studio.html', 'face.html', 'character.html', 'character-studio.html',
+  'styles.css', 'face.css', 'server.mjs',
   'start.bat', 'START_HERE.cmd', 'launcher.ps1', 'server-windows.ps1', 'DIAGNOSE_STARTUP.bat',
   'src/default-state.js', 'src/state-schema.js', 'src/module-registry.js', 'src/workspace-common.js',
   'src/project-hub.js', 'src/humanoid-preview.js', 'src/dashboard.js', 'src/studio.js', 'src/face-editor-page.js',
@@ -73,12 +74,29 @@ const required = [
   'apps/character-studio/character-studio-session.js',
   'apps/character-studio/character-studio-persistence.js',
   'apps/character-studio/character-profile-export.js',
+  'apps/character-studio/character-studio-controller.js',
+  'apps/character-studio/character-studio.css',
+  'apps/character-studio/components/character-studio-sidebar.js',
+  'apps/character-studio/components/panel-component.js',
+  'apps/character-studio/panels/index.js',
+  'apps/character-studio/panels/identity-panel.js',
+  'apps/character-studio/panels/body-shape-panel.js',
+  'apps/character-studio/panels/face-panel.js',
+  'apps/character-studio/panels/clothing-panel.js',
+  'apps/character-studio/panels/hair-panel.js',
+  'apps/character-studio/panels/accessory-panel.js',
+  'apps/character-studio/panels/proportion-panel.js',
+  'apps/character-studio/panels/pose-panel.js',
+  'apps/character-studio/panels/animation-panel.js',
   'apps/character-studio/index.js',
   'schemas/character-profile-export.schema.json',
   'tests/helpers/character-studio-test-hub.mjs',
+  'tests/character-studio-panels.mjs',
   'tests/integration/character-studio-state.mjs',
+  'tests/integration/character-studio-v1.mjs',
   'tests/multi-window/character-studio-sync.mjs',
   'docs/CHARACTER_STUDIO_STATE_FLOW.md',
+  'docs/CHARACTER_STUDIO_V1_MERGE_REPORT_2026-08-21.md',
   'docs/FOUR_MODULE_COLLABORATION.md', 'docs/CHAT_WINDOW_START_PROMPTS.md',
   'docs/GITHUB_BRANCH_WORKFLOW.md', 'control/handoffs/HANDOFF_TEMPLATE.md',
   'PREPARE_BRANCHES.cmd', 'scripts/prepare-module-branches.ps1', '.github/PULL_REQUEST_TEMPLATE.md',
@@ -100,6 +118,7 @@ assert.match(packageJson.scripts.test, /clothing-system/);
 assert.match(packageJson.scripts.test, /appearance-system/);
 assert.match(packageJson.scripts.test, /character-generator/);
 assert.match(packageJson.scripts.test, /test:character-studio/);
+assert.match(packageJson.scripts['test:character-studio'], /character-studio-v1/);
 assert.match(packageJson.scripts.test, /integration-v002/);
 assert.match(packageJson.scripts.test, /test:animation/);
 assert.match(packageJson.scripts.test, /legacy\/v8/);
@@ -119,6 +138,10 @@ assert.match(launcherScript, /BUILD_MANIFEST\.json/);
 assert.match(launcherScript, new RegExp(BUILD_ID));
 
 const buildManifest = JSON.parse(await readFile(join(root, 'BUILD_MANIFEST.json'), 'utf8'));
+assert.equal(buildManifest.characterStudio.version, 'character-studio@1.0.0');
+assert.equal(buildManifest.characterStudio.page, 'character-studio.html');
+assert.equal(buildManifest.characterStudio.stateCenter, 'ProjectState via one ProjectHubClient');
+assert.equal(buildManifest.characterStudio.viewportSource, 'simulationRig');
 assert.equal(buildManifest.characterStudio.sessionSchema, 'humanoid_rig/character_studio_session@1.0');
 assert.equal(buildManifest.characterStudio.exportSchema, 'humanoid_rig/character_profile_export@1.0');
 assert.equal(buildManifest.characterStudio.persistence.structuredData, 'IndexedDB');

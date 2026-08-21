@@ -2,6 +2,12 @@
 
 Character Studio 的状态层位于 `apps/character-studio/`。它不拥有人物几何、骨骼、蒙皮、姿势或动画数据，只编排现有 Character Core、ProjectState、持久化和多窗口同步接口。
 
+## Character Studio v1 页面组合
+
+`character-studio.html` 是唯一页面入口：左栏挂载 Identity、BodyShape、Face、Clothing、Hair、Accessory、Proportion、Pose、Animation 九个面板；中栏只创建一个读取 `simulationRig` 最终姿势的人物视口；右栏只读展示 CharacterProfile、各模块 revision、资源引用和导出入口。
+
+页面级 `CharacterStudioApp` 只创建一个 `ProjectHubClient`，并把它同时交给 panels 与 session。视口、摄像机和 GPU 对象保持窗口私有，Character 数据仍以 ProjectState 为唯一事实来源。
+
 ## 统一入口
 
 ```js
@@ -39,9 +45,9 @@ close
 创建、切换活动人物、保存和历史恢复都调用 ProjectHub 的 Character 接口：
 
 ```text
-Character Studio Session
+Panel / Character Studio Session
 → ProjectHubClient
-→ CharacterManager
+→ Character Core 或现有模块接口
 → CharacterState revision
 → OperationEvent
 → integration ModulePatch
@@ -96,7 +102,7 @@ Schema 位于 `schemas/character-profile-export.schema.json`。
 
 ## Shell / Panels 对接
 
-Shell 只需在窗口启动时创建一个 session，并在关闭前调用 `flush()`。Panels 通过 `subscribeCharacterState()` 读取快照，并把正式修改交给 session 方法；不要直接改写快照。
+Shell 只需在窗口启动时创建一个 ProjectHubClient 和一个 session，并在关闭前调用 `flush()`。Panels 读取同一个 hub 的快照，并把正式修改交给现有模块接口或 session 方法；不要直接改写快照，也不要建立第二套 CharacterManager。
 
 页面下载按钮可以对 `exportCharacterProfile()` 的返回值执行 `JSON.stringify` 或调用 `serializeCharacterProfileExport()`。资源面板把 Blob 交给 `saveResource()`，只把返回的引用元数据交给具体人物模块保存。
 

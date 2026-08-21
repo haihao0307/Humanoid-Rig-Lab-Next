@@ -34,6 +34,7 @@ export function createCharacterProfileExport({
     },
     version: {
       character_profile: profile.version,
+      character_revision: nonNegativeInteger(projectState.characterCore?.revision),
       character_state_revision: nonNegativeInteger(projectState.characterCore?.revision),
       project_revision: nonNegativeInteger(projectState.revision),
     },

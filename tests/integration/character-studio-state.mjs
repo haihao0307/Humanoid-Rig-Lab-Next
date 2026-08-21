@@ -67,6 +67,7 @@ const exported = await session.exportCharacterProfile('character_studio_test', {
 assert.equal(exported.schema, CHARACTER_PROFILE_EXPORT_SCHEMA);
 assert.equal(exported.schemas.character_profile, 'humanoid_rig/character_profile@1.4');
 assert.equal(exported.character_profile.version, 2);
+assert.equal(exported.version.character_revision, hub.getState().characterCore.revision);
 assert.equal(exported.module_references.appearance.revision, hub.getState().appearanceSystem.revision);
 assert.equal(exported.resource_references.binary_payloads_included, false);
 assert.ok(exported.resource_references.items.some((item) => item.asset_id === 'portrait-source-001'));

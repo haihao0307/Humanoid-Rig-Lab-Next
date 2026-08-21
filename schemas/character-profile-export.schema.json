@@ -44,9 +44,10 @@
     "version": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["character_profile", "character_state_revision", "project_revision"],
+      "required": ["character_profile", "character_revision", "character_state_revision", "project_revision"],
       "properties": {
         "character_profile": { "type": "integer", "minimum": 1 },
+        "character_revision": { "$ref": "#/$defs/revision" },
         "character_state_revision": { "$ref": "#/$defs/revision" },
         "project_revision": { "$ref": "#/$defs/revision" }
       }

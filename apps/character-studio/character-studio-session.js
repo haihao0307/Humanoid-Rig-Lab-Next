@@ -185,6 +185,7 @@ export function createCharacterStudioStateSnapshot(projectState, role = 'charact
     role: normalizeWindowRole(role),
     project_id: String(projectState.projectId || ''),
     project_revision: Number(projectState.revision || 0),
+    character_revision: Number(projectState.characterCore?.revision || 0),
     character_state_revision: Number(projectState.characterCore?.revision || 0),
     active_character_id: characterId,
     character_profile: profile ? structuredClone(profile) : null,

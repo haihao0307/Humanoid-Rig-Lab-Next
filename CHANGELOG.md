@@ -1,12 +1,16 @@
 # Changelog
 
-## Unreleased · Character Studio state
+## Unreleased · Character Studio v1 integration · 2026-08-21
 
+- 合并 `feature/character-studio-shell`、`feature/character-studio-panels` 和 `feature/character-studio-state`，形成 Character Studio v1。
+- `character-studio.html` 提供左侧九面板、中间唯一 simulationRig 人物视口、右侧 Character 状态与版本的三栏工作台。
+- Shell、Panels 和 Session 复用同一个 ProjectHubClient；面板正式修改只通过模块接口和 Character Core 引用进入 ProjectState。
 - 新增 Character Studio session/store，统一创建、加载、保存、历史恢复、导出和状态订阅。
 - Character 加载和恢复进入 CharacterState revision、OperationEvent、integration ModulePatch 和 ProjectState revision 正式链路。
 - 新增 IndexedDB 项目快照、事件和资源索引，资源二进制优先进入 OPFS，普通消息拒绝 Blob、ArrayBuffer 和内联 base64。
 - 新增 `humanoid_rig/character_profile_export@1.0`，包含 schema、版本、模块引用和资源摘要。
 - 新增四窗口 Character 同步、刷新恢复和现有模块隔离测试。
+- 动画逐帧采样与时间轴预览保持临时态，不创建高频 revision；普通 JSON 消息继续拒绝二进制和内联 base64。
 
 ## 0.5.0 four-module V002 integration · 2026-08-19
 

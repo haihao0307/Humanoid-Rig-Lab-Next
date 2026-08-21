@@ -469,6 +469,7 @@ body.character-studio-page {
   height: 100%;
   min-width: 280px;
   overflow: auto;
+  padding: 0;
   color: var(--text, #eaf2ff);
   background: var(--panel-solid, #0b1525);
   border-right: 1px solid var(--line, rgba(145, 180, 220, .18));
@@ -506,3 +507,18 @@ body.character-studio-page {
 .character-studio-actions button:first-child { border-color: rgba(88, 199, 255, .55); }
 .character-studio-status { margin: 0; padding: 13px 16px 18px; color: var(--muted, #8294ad); font-size: 9px; }
 .character-studio-status[data-error="true"] { color: #ff9b9b; }
+
+.character-studio-export-button {
+  min-height: 34px;
+  margin-top: 4px;
+  border: 1px solid rgba(101, 201, 255, 0.55);
+  border-radius: 7px;
+  background: rgba(36, 92, 132, 0.38);
+  color: var(--character-studio-text);
+  cursor: pointer;
+  font: 10px/1.2 inherit;
+}
+
+.character-studio-export-button:hover {
+  background: rgba(45, 112, 158, 0.56);
+}

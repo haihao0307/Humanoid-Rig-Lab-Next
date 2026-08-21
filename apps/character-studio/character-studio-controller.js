@@ -1,8 +1,4 @@
 import {
-  CharacterManager,
-  appendOperationEvent,
-} from '../../packages/character-core/index.js';
-import {
   DEFAULT_BODY_SHAPE_PARAMETERS,
   getActiveBodyShapeProfile,
   normalizeBodyShapeState,
@@ -16,11 +12,7 @@ import {
   getActiveClothingProfile,
   normalizeClothingState,
 } from '../../packages/clothing-system/index.js';
-import {
-  AppearanceManager,
-  getAppearanceCharacterReferences,
-  normalizeAppearanceState,
-} from '../../packages/appearance-system/index.js';
+import { normalizeAppearanceState } from '../../packages/appearance-system/index.js';
 import { createDefaultState } from '../../src/default-state.js';
 import { posePreset } from '../../src/modules/pose/index.js';
 import {
@@ -39,8 +31,6 @@ import {
   findHairCatalogItem,
 } from './catalogs.js';
 
-const characterManager = new CharacterManager();
-const appearanceManager = new AppearanceManager();
 const PROPORTION_FIELDS = Object.freeze([
   'height', 'shoulderWidth', 'hipWidth', 'upperArmLength', 'forearmLength',
   'handControlLength', 'thighLength', 'lowerLegLength',
@@ -279,27 +269,7 @@ export class CharacterStudioController {
   }
 
   #removeHair(hairId) {
-    const state = this.hub.getState();
-    const appearanceSystem = appearanceManager.removeHair(state.appearanceSystem, hairId, {
-      expected_revision: state.appearanceSystem.revision,
-    });
-    const characterId = state.characterCore.active_character_id;
-    const characterResult = characterId
-      ? characterManager.save(state.characterCore, {
-          character_id: characterId,
-          ...getAppearanceCharacterReferences(appearanceSystem),
-        }, {
-          expected_revision: state.characterCore.revision,
-          actor: 'character-studio:appearance',
-        })
-      : null;
-    return this.hub.transaction((next) => {
-      next.appearanceSystem = structuredClone(appearanceSystem);
-      if (characterResult) {
-        next.characterCore = structuredClone(characterResult.state);
-        next.operationEvents = appendOperationEvent(next.operationEvents, characterResult.event);
-      }
-    }, { module: 'integration', summary: `Character Studio 移除发型 ${hairId}` });
+    return this.hub.removeHair(hairId);
   }
 }
 

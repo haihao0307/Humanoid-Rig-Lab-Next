@@ -20,7 +20,7 @@ Merged module versions
 - Clothing System: clothing_profile@1.0, clothing_state@1.0, static follow runtime descriptor @1.0
 - Appearance System: appearance@0.1.0, Hair/Accessory profile contracts @1.0, static simulationRig attachments
 - Character Generator: character-generator@0.1.0, HRL-M01/HRL-M03 orchestration and image-to-character session @1.0
-- Character Studio: session @1.0, CharacterProfile export @1.0, IndexedDB snapshots and OPFS resources
+- Character Studio: character-studio@1.0.0, three-column shell, nine panels, one ProjectHub/session, one simulationRig viewport, session/export @1.0, IndexedDB snapshots and OPFS resources
 
 Shared integration added by the mother project
 - Build identity manifest and launcher build-ID verification
@@ -37,6 +37,7 @@ Shared integration added by the mother project
 - Image-to-Character data generation with metadata-only image persistence and deterministic reload
 - Character Studio create/load/save/restore flow through ProjectState revisions and OperationEvents
 - Four-role Character sharing with IndexedDB refresh restore and reference-only resource messages
+- Character Studio panel edits route through the shared ProjectHub; animation ticks and scrub previews do not create revisions
 - Append-only performance89 topology: 28 core + 28 body-production + 33 hand/face nodes
 - Layered rig visualization, IK/contact controls, 18 retarget chains and local-quaternion V8 payloads
 

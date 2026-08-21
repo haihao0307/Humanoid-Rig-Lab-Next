@@ -497,6 +497,21 @@ export class ProjectHubClient extends EventTarget {
     });
   }
 
+  removeHair(hairId, {
+    expected_revision = this.state.appearanceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const appearanceSystem = appearanceManager.removeHair(this.state.appearanceSystem, hairId, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitAppearanceSystem(appearanceSystem, `删除发型 ${hairId}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
   addAccessory(profile, {
     expected_revision = this.state.appearanceSystem?.revision,
     expected_character_revision = this.state.characterCore?.revision,

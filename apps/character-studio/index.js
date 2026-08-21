@@ -10,6 +10,16 @@ import {
 } from '../../src/modules/animation/runtime.js';
 import { followAppearanceAttachments, createAppearanceRuntimeDescriptor } from '../../packages/appearance-system/index.js';
 import { followSimulationRig } from '../../packages/clothing-system/index.js';
+import { mountCharacterStudioSidebar } from './components/character-studio-sidebar.js';
+import {
+  IndexedDbCharacterStudioPersistence,
+  MemoryCharacterStudioPersistence,
+} from './character-studio-persistence.js';
+import {
+  CharacterStudioSession,
+  CHARACTER_STUDIO_WINDOW_ROLES,
+} from './character-studio-session.js';
+import { serializeCharacterProfileExport } from './character-profile-export.js';
 
 const HOST_PROTOCOL = 'humanoid-rig-lab-next:viewport';
 const CHARACTER_STUDIO_HOST_MODULE = 'character-studio';
@@ -132,8 +142,9 @@ export class LeftPanelHost {
 }
 
 export class RightPanelHost {
-  constructor(host) {
+  constructor(host, { onExport = null } = {}) {
     this.host = host;
+    this.onExport = onExport;
     this.renderShell();
   }
 
@@ -166,7 +177,7 @@ export class RightPanelHost {
     return slot;
   }
 
-  renderSummary(state, runtime) {
+  renderSummary(state, runtime, sessionSnapshot = null) {
     const profile = runtime.characterProfile;
     const moduleRevisions = state.moduleRevisions || {};
     const activeVersions = state.activeVersions || {};
@@ -185,10 +196,15 @@ export class RightPanelHost {
     this.mount('revisionSummary', htmlNode(`
       <div class="character-studio-revision-list">
         ${revisionRow('Project', `r${Number(state.revision || 1)}`)}
-        ${revisionRow('Rig', `${activeVersions.rig || 'rig@0.4.0'} · m${Number(moduleRevisions.proportion || 0)}`)}
-        ${revisionRow('Skin', `${activeVersions.skin || 'skin@0.5.1'} · m${Number(moduleRevisions.skin || 0)}`)}
-        ${revisionRow('Pose / Animation', `${activeVersions.pose || 'pose@0.4.0'} / ${activeVersions.animation || 'anim@0.4.0'}`)}
-        ${revisionRow('Character', `${activeVersions.character || 'character@0.6.4'} · v${Number(profile?.version || 1)}`)}
+        ${revisionRow('Character', `r${Number(state.characterCore?.revision || 0)}`)}
+        ${revisionRow('BodyShape', `r${Number(profile?.body_shape_revision || 0)}`)}
+        ${revisionRow('Face', `r${Number(profile?.face_revision || 0)}`)}
+        ${revisionRow('Clothing', `r${Number(profile?.clothing_revision || 0)}`)}
+        ${revisionRow('Appearance', `r${Number(state.appearanceSystem?.revision || 0)}`)}
+        ${revisionRow('Proportion', `r${Number(profile?.proportion_revision || 0)} · ${activeVersions.rig || 'rig@0.4.0'} · m${Number(moduleRevisions.proportion || 0)}`)}
+        ${revisionRow('Skin', `r${Number(profile?.skin_revision || 0)} · ${activeVersions.skin || 'skin@0.5.1'} · m${Number(moduleRevisions.skin || 0)}`)}
+        ${revisionRow('Pose', `r${Number(profile?.pose_revision || 0)} · ${activeVersions.pose || 'pose@0.4.0'}`)}
+        ${revisionRow('Animation', `r${Number(profile?.animation_revision || 0)} · ${activeVersions.animation || 'anim@0.4.0'}`)}
       </div>`));
 
     this.mount('activeReferences', htmlNode(`
@@ -204,9 +220,13 @@ export class RightPanelHost {
       <div class="character-studio-data-card">
         ${dataRow('Viewport pose', 'finalPose → simulationRig')}
         ${dataRow('Render stack', 'Character → Skin → Clothing → Appearance')}
+        ${dataRow('Saved revision', `r${Number(sessionSnapshot?.project_revision || state.revision || 0)}`)}
+        ${dataRow('Profile schema', profile?.schema || 'humanoid_rig/character_profile@1.4')}
         ${dataRow('Build', BUILD_ID)}
-        <span class="character-studio-slot-note">Export action is reserved for the future Character Core / asset pipeline.</span>
+        <button class="character-studio-export-button" data-character-studio-export type="button">导出 CharacterProfile JSON</button>
+        <span class="character-studio-slot-note">只包含版本、模块引用与资源摘要，不包含二进制资源。</span>
       </div>`));
+    this.host.querySelector('[data-character-studio-export]')?.addEventListener('click', () => this.onExport?.());
   }
 }
 
@@ -425,8 +445,16 @@ export class CharacterStudioApp {
   constructor(root) {
     this.root = root;
     this.layout = new CharacterStudioLayout(root);
-    this.leftPanel = new LeftPanelHost(this.layout.leftPanel);
-    this.rightPanel = new RightPanelHost(this.layout.rightPanel);
+    this.hub = new ProjectHubClient({ module: CHARACTER_STUDIO_HOST_MODULE, title: 'Character Studio' });
+    this.session = createCharacterStudioSession({
+      role: CHARACTER_STUDIO_HOST_MODULE,
+      title: 'Humanoid Rig Lab Next · Character Studio',
+      hub: this.hub,
+    });
+    this.sidebar = null;
+    this.rightPanel = new RightPanelHost(this.layout.rightPanel, {
+      onExport: () => this.exportActiveCharacter(),
+    });
     this.displayToolbar = new DisplayModeToolbar(
       required(root, '#displayModeToolbar'),
       (mode) => {
@@ -435,7 +463,6 @@ export class CharacterStudioApp {
       },
     );
     this.viewport = new CharacterViewportHost(this.layout.viewport);
-    this.hub = new ProjectHubClient({ module: 'integration', title: 'Character Studio' });
     this.currentState = null;
     this.currentRuntime = null;
     this.previousFinalPose = null;
@@ -445,7 +472,14 @@ export class CharacterStudioApp {
     this.lastAnimationFrameAt = 0;
   }
 
-  start() {
+  async start() {
+    await this.session.initialize();
+    this.layout.leftPanel.classList.add('character-studio-sidebar');
+    this.sidebar = mountCharacterStudioSidebar({
+      root: this.layout.leftPanel,
+      hub: this.hub,
+      onError: (error) => this.reportError(error),
+    });
     this.layout.setSync(this.hub.connected, this.hub.transport);
     this.unsubscribeState = this.hub.subscribe((state, detail) => this.render(state, detail));
     this.unsubscribeMotion = this.hub.subscribeTransient('motion.scrub.preview', (payload) => {
@@ -454,6 +488,7 @@ export class CharacterStudioApp {
       animation.transport = { ...(animation.transport || {}), time: Number(payload?.time || 0), rawTime: Number(payload?.time || 0), playing: false };
       this.render(this.currentState, { source: 'motion.scrub.preview' }, animation);
     });
+    return this;
   }
 
   render(state, detail = {}, animationOverride = null) {
@@ -461,7 +496,7 @@ export class CharacterStudioApp {
     this.layout.setBuild(state.build);
     const runtime = this.buildRuntime(state, animationOverride);
     this.currentRuntime = runtime;
-    this.rightPanel.renderSummary(state, runtime);
+    this.rightPanel.renderSummary(state, runtime, this.session.getSnapshot());
     this.viewport.render(state, runtime, this.displayToolbar.getMode());
     this.layout.setSync(this.hub.connected, this.hub.transport);
     this.scheduleAnimationTick(state, runtime, detail);
@@ -519,10 +554,37 @@ export class CharacterStudioApp {
     this.animationTick = window.requestAnimationFrame(tick);
   }
 
-  dispose() {
+  async exportActiveCharacter() {
+    try {
+      const exportDocument = await this.session.exportCharacterProfile();
+      const serialized = serializeCharacterProfileExport(exportDocument);
+      const blob = new Blob([serialized], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `${exportDocument.character_profile.character_id}-character-profile-v${exportDocument.character_profile.version}.json`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      return exportDocument;
+    } catch (error) {
+      this.reportError(error);
+      throw error;
+    }
+  }
+
+  reportError(error) {
+    const message = error?.message || String(error);
+    const status = this.root.querySelector('#viewportRuntimeStatus');
+    if (status) status.textContent = `Character Studio 错误：${message}`;
+    console.error(error);
+  }
+
+  async dispose() {
     this.unsubscribeState?.();
     this.unsubscribeMotion?.();
+    this.sidebar?.destroy();
     if (this.animationTick) window.cancelAnimationFrame(this.animationTick);
+    await this.session.close();
   }
 }
 
@@ -603,10 +665,12 @@ function escapeHtml(value) {
   }[character]));
 }
 
-const characterStudioRoot = document.querySelector('[data-character-studio-app]');
+const characterStudioRoot = typeof document === 'undefined'
+  ? null
+  : document.querySelector('[data-character-studio-app]');
 if (characterStudioRoot) {
   const characterStudioApp = new CharacterStudioApp(characterStudioRoot);
-  characterStudioApp.start();
+  characterStudioApp.start().catch((error) => characterStudioApp.reportError(error));
   window.__characterStudio = characterStudioApp;
 }
 export {
@@ -620,14 +684,6 @@ export {
   renderCharacterStudioSidebar,
 } from './components/character-studio-sidebar.js';
 export * from './panels/index.js';
-import {
-  IndexedDbCharacterStudioPersistence,
-  MemoryCharacterStudioPersistence,
-} from './character-studio-persistence.js';
-import {
-  CharacterStudioSession,
-  CHARACTER_STUDIO_WINDOW_ROLES,
-} from './character-studio-session.js';
 
 export * from './character-studio-session.js';
 export * from './character-studio-persistence.js';

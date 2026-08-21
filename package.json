@@ -9,7 +9,7 @@
     "serve": "node server.mjs",
     "test": "node tests/validate.mjs && node tests/module-patches.mjs && node tests/character-core.mjs && node tests/body-shape.mjs && node tests/face-system.mjs && node tests/clothing-system.mjs && node tests/appearance-system.mjs && node tests/character-generator.mjs && npm run test:character-studio && node tests/integration-v002.mjs && npm run test:animation && npm --prefix legacy/v8 test",
     "check": "node tests/validate.mjs && node tests/module-patches.mjs && node tests/character-core.mjs && node tests/body-shape.mjs && node tests/face-system.mjs && node tests/clothing-system.mjs && node tests/appearance-system.mjs && node tests/character-generator.mjs && npm run test:character-studio && node tests/integration-v002.mjs && npm run test:animation && npm --prefix legacy/v8 test",
-    "test:character-studio": "node tests/character-studio-panels.mjs && node tests/integration/character-studio-state.mjs && node tests/multi-window/character-studio-sync.mjs",
+    "test:character-studio": "node tests/character-studio-panels.mjs && node tests/integration/character-studio-state.mjs && node tests/multi-window/character-studio-sync.mjs && node tests/integration/character-studio-v1.mjs",
     "test:animation": "node tests/animation-assets.mjs && node tests/animation-bake.mjs && node tests/animation-editing.mjs && node tests/animation-model.mjs && node tests/animation-performance.mjs && node tests/animation-runtime.mjs && node tests/animation-workspace.mjs"
   },
   "engines": {
