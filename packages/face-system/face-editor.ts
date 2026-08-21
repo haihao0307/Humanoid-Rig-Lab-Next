@@ -13,6 +13,7 @@ export interface FaceState {
   versions: Record<string, FaceIdentity[]>;
   runtime_descriptor: FaceRuntimeDescriptor;
   expression: FaceExpressionState;
+  expression_versions: FaceExpressionState[];
   expression_runtime_descriptor: FaceExpressionRuntimeDescriptor;
 }
 

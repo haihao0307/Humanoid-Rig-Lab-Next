@@ -7,6 +7,7 @@ import { createFaceRuntimeDescriptor } from './face-runtime.js';
 import {
   createFaceExpressionState,
   mirrorFaceExpression,
+  mirrorFaceExpressionPair,
   updateFaceExpression,
   normalizeFaceExpression,
 } from './face-expression.js';
@@ -41,6 +42,7 @@ export function createFaceState(profileInput = {}, expressionInput = {}) {
     versions: { [profile.face_id]: [structuredClone(profile)] },
     runtime_descriptor: createFaceRuntimeDescriptor(profile),
     expression,
+    expression_versions: [structuredClone(expression)],
     expression_runtime_descriptor: createFaceExpressionRuntimeDescriptor(expression),
   };
 }
@@ -72,6 +74,7 @@ export function normalizeFaceState(input, { fallbackProfile = {} } = {}) {
   }
   const active = profiles[activeId];
   const expression = normalizeFaceExpression(source.expression);
+  const expressionVersions = normalizeExpressionVersions(source.expression_versions, expression);
   return {
     schema: FACE_STATE_SCHEMA,
     revision: nonNegativeInteger(source.revision, 1),
@@ -82,6 +85,7 @@ export function normalizeFaceState(input, { fallbackProfile = {} } = {}) {
     versions,
     runtime_descriptor: createFaceRuntimeDescriptor(active),
     expression,
+    expression_versions: expressionVersions,
     expression_runtime_descriptor: createFaceExpressionRuntimeDescriptor(expression),
   };
 }
@@ -127,10 +131,38 @@ export class FaceEditor {
     return commitExpression(state, expression, true, options.at);
   }
 
+  mirrorExpressionPair(stateInput, pair, options = {}) {
+    const state = normalizeFaceState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    const expression = updateFaceExpression(state.expression, mirrorFaceExpressionPair(state.expression, pair));
+    return commitExpression(state, expression, true, options.at);
+  }
+
   saveExpressionVersion(stateInput, options = {}) {
     const state = normalizeFaceState(stateInput);
     assertExpectedRevision(state, options.expected_revision);
-    return commitExpression(state, normalizeFaceExpression(state.expression), false, options.at);
+    const next = commitExpression(state, normalizeFaceExpression(state.expression), false, options.at);
+    next.expression_versions = appendExpressionVersion(next.expression_versions, next.expression);
+    return next;
+  }
+
+  restoreExpressionVersion(stateInput, expressionRevision, options = {}) {
+    const state = normalizeFaceState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    const snapshot = (state.expression_versions || [])
+      .find((item) => item.expressionRevision === Number(expressionRevision));
+    if (!snapshot) throw new Error(`Face Expression revision ${expressionRevision} does not exist.`);
+    const expression = updateFaceExpression(state.expression, { channels: snapshot.channels });
+    return commitExpression(state, expression, true, options.at);
+  }
+
+  loadExpressionVersion(stateInput, expressionRevision = null) {
+    const state = normalizeFaceState(stateInput);
+    if (expressionRevision == null) return structuredClone(state.expression);
+    const snapshot = (state.expression_versions || [])
+      .find((item) => item.expressionRevision === Number(expressionRevision));
+    if (!snapshot) throw new Error(`Face Expression revision ${expressionRevision} does not exist.`);
+    return structuredClone(snapshot);
   }
 
   saveVersion(stateInput, options = {}) {
@@ -197,6 +229,10 @@ function commitExpression(state, expression, dirty, at) {
   return next;
 }
 
+function appendExpressionVersion(versions, expression) {
+  return dedupeExpressionVersions([...(Array.isArray(versions) ? versions : []), structuredClone(expression)]);
+}
+
 function activeProfile(state) {
   const profile = state.profiles[state.active_face_id];
   if (!profile) throw new Error('Face state has no active identity.');
@@ -213,6 +249,23 @@ function dedupeVersions(items) {
   const byVersion = new Map();
   for (const item of items) byVersion.set(item.version, item);
   return [...byVersion.values()].sort((left, right) => left.version - right.version).slice(-100);
+}
+
+function normalizeExpressionVersions(input, fallback) {
+  const snapshots = Array.isArray(input)
+    ? input.map((item) => {
+        try { return normalizeFaceExpression(item); } catch (_) { return null; }
+      }).filter(Boolean)
+    : [];
+  return dedupeExpressionVersions(snapshots.length ? snapshots : [fallback]);
+}
+
+function dedupeExpressionVersions(items) {
+  const byRevision = new Map();
+  for (const item of items) byRevision.set(item.expressionRevision, structuredClone(item));
+  return [...byRevision.values()]
+    .sort((left, right) => left.expressionRevision - right.expressionRevision)
+    .slice(-100);
 }
 
 function nonNegativeInteger(value, fallback) {

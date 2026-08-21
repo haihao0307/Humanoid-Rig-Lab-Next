@@ -4,3 +4,4 @@ export * from './face-editor.ts';
 export * from './face-expression.ts';
 export * from './face-runtime-descriptor.ts';
 export * from './face-analysis-adapter.ts';
+export * from './face-animation-layer.ts';

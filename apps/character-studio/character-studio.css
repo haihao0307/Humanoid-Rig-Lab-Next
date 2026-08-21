@@ -471,7 +471,7 @@ body.character-studio-page {
 
 .character-studio-expression-control {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr) 30px;
+  grid-template-columns: minmax(58px, auto) minmax(0, 1fr) 30px 24px;
   align-items: center;
   gap: 6px;
   color: var(--character-studio-muted);
@@ -487,6 +487,31 @@ body.character-studio-page {
   color: #dceaff;
   font: 10px ui-monospace, SFMono-Regular, Consolas, monospace;
   text-align: right;
+}
+
+.character-studio-expression-mirror {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(197, 162, 255, 0.3);
+  border-radius: 5px;
+  background: rgba(46, 31, 75, 0.56);
+  color: #d8baff;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.character-studio-expression-mirror:hover {
+  border-color: rgba(197, 162, 255, 0.78);
+  background: rgba(75, 51, 113, 0.78);
+}
+
+.character-studio-expression-mirror-placeholder {
+  width: 22px;
+  height: 22px;
 }
 
 .character-studio-face-expression-status {

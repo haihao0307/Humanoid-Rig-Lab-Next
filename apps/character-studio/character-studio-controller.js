@@ -88,6 +88,10 @@ export class CharacterStudioController {
     return this.hub.mirrorFaceExpression();
   }
 
+  mirrorFaceExpressionPair(pair) {
+    return this.hub.mirrorFaceExpressionPair(pair);
+  }
+
   resetFaceExpression() {
     return this.applyFaceExpression(Object.fromEntries(FACE_EXPRESSION_CHANNELS.map((channel) => [channel, 0])));
   }

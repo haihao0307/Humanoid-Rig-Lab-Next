@@ -1,6 +1,8 @@
 import {
   EYE_SHAPE_FIELDS,
+  FACE_EXPRESSION_CHANNEL_DEFINITIONS,
   FACE_EXPRESSION_CHANNELS,
+  FACE_EXPRESSION_MIRROR_PAIRS,
   FACE_SHAPE_FIELDS,
   MOUTH_SHAPE_FIELDS,
   NOSE_SHAPE_FIELDS,
@@ -23,13 +25,10 @@ const GROUPS = Object.freeze([
   ['mouth_shape', '嘴部', MOUTH_SHAPE_FIELDS],
 ]);
 
-const EXPRESSION_LABELS = Object.freeze({
-  eyeBlinkLeft: 'Blink L', eyeBlinkRight: 'Blink R', eyeWideLeft: 'Wide L', eyeWideRight: 'Wide R',
-  browDownLeft: 'Brow Down L', browDownRight: 'Brow Down R', browInnerUp: 'Brow Raise',
-  mouthSmileLeft: 'Smile L', mouthSmileRight: 'Smile R', mouthFrownLeft: 'Frown L', mouthFrownRight: 'Frown R',
-  jawOpen: 'Jaw Open', jawLeft: 'Jaw Left', jawRight: 'Jaw Right',
-  cheekPuff: 'Cheek Puff', cheekSquintLeft: 'Squint L', cheekSquintRight: 'Squint R',
-});
+const EXPRESSION_LABELS = new Map(FACE_EXPRESSION_CHANNEL_DEFINITIONS.map(({ channel, label }) => [channel, label]));
+const EXPRESSION_PAIR_BY_CHANNEL = new Map(
+  FACE_EXPRESSION_MIRROR_PAIRS.flatMap((pair) => pair.map((channel) => [channel, pair])),
+);
 
 export class FacePanel extends CharacterStudioPanel {
   constructor() { super('face', 'Face'); }
@@ -53,7 +52,7 @@ export class FacePanel extends CharacterStudioPanel {
     controls.push(`<div class="character-studio-face-expression-panel">
       ${FACE_EXPRESSION_CHANNELS.map((channel) => expressionControl(
         channel,
-        EXPRESSION_LABELS[channel] || channel,
+        EXPRESSION_LABELS.get(channel) || channel,
         expression?.channels?.[channel],
       )).join('')}
       <button class="character-studio-face-mirror" type="button" data-face-expression-mirror>镜像表情</button>
@@ -83,14 +82,23 @@ export class FacePanel extends CharacterStudioPanel {
     section?.querySelector?.('[data-face-expression-mirror]')?.addEventListener('click', () => (
       context.run(() => controller.mirrorFaceExpression())
     ));
+    section?.querySelectorAll?.('[data-face-expression-mirror-pair]').forEach((button) => {
+      button.addEventListener('click', () => context.run(() => controller.mirrorFaceExpressionPair(
+        button.dataset.faceExpressionMirrorPair.split(','),
+      )));
+    });
   }
 }
 
 function expressionControl(channel, label, value) {
   const normalized = Math.min(1, Math.max(0, Number(value) || 0));
+  const pair = EXPRESSION_PAIR_BY_CHANNEL.get(channel);
+  const mirror = pair
+    ? `<button class="character-studio-expression-mirror" type="button" data-face-expression-mirror-pair="${pair.join(',')}" aria-label="镜像 ${label}" title="镜像左右参数">↔</button>`
+    : '<span class="character-studio-expression-mirror-placeholder" aria-hidden="true"></span>';
   return `<label class="character-studio-expression-control">
     <span>${label}</span>
     <input type="range" min="0" max="1" step="0.01" value="${normalized}" data-expression-channel="${channel}" aria-label="${label}">
-    <output>${normalized.toFixed(2)}</output>
+    <output>${normalized.toFixed(2)}</output>${mirror}
   </label>`;
 }

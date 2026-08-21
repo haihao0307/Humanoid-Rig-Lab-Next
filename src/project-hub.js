@@ -371,8 +371,10 @@ export class ProjectHubClient extends EventTarget {
     return this.#commitFaceSystem(faceSystem, '修改 Face Identity 参数', { syncCharacter: false });
   }
 
-  getFaceExpression() {
-    return getActiveFaceExpression(this.state.faceSystem);
+  getFaceExpression({ version = null } = {}) {
+    return version == null
+      ? getActiveFaceExpression(this.state.faceSystem)
+      : faceEditor.loadExpressionVersion(this.state.faceSystem, version);
   }
 
   updateFaceExpression(patch, { expected_revision = this.state.faceSystem?.revision, ...options } = {}) {
@@ -391,6 +393,14 @@ export class ProjectHubClient extends EventTarget {
     return this.#commitFaceSystem(faceSystem, '镜像 Face Expression 参数', { syncCharacter: false });
   }
 
+  mirrorFaceExpressionPair(pair, { expected_revision = this.state.faceSystem?.revision, ...options } = {}) {
+    const faceSystem = faceEditor.mirrorExpressionPair(this.state.faceSystem, pair, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitFaceSystem(faceSystem, '镜像 Face Expression 单组参数', { syncCharacter: false });
+  }
+
   saveFaceExpressionVersion({
     expected_revision = this.state.faceSystem?.revision,
     expected_character_revision = this.state.characterCore?.revision,
@@ -401,6 +411,22 @@ export class ProjectHubClient extends EventTarget {
       expected_revision,
     });
     return this.#commitFaceSystem(faceSystem, '保存 Face Expression 版本', {
+      syncCharacter: true,
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  restoreFaceExpressionVersion(version, {
+    expected_revision = this.state.faceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const faceSystem = faceEditor.restoreExpressionVersion(this.state.faceSystem, version, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitFaceSystem(faceSystem, `恢复 Face Expression 版本 ${version}`, {
       syncCharacter: true,
       expectedCharacterRevision: expected_character_revision,
       actor: options.actor,

@@ -561,7 +561,9 @@ Face Expression 使用独立协议 `humanoid_rig/face_expression@1.0`，定义�
 }
 ```
 
-实际状态包含完整 17 个 channel，全部限制在 `0..1`。Face System 提供归一化、校验和左右镜像；当前 `face_runtime_descriptor` 仅声明 `interface-only`，`meshReference`、`morphTargets` 与 `correctiveTargets` 保持空值，供未来 Morph Target、Vertex Corrective 和 Shader Corrective 接入。保存到 CharacterProfile 时只增加可选的 `expression_revision` 与 `expression_runtime_descriptor` 引用，旧 CharacterProfile 缺少这些字段时按 neutral expression 兼容加载。
+实际状态包含完整的 Face Semantic Channel Layer：Eye、Brow、Mouth、Jaw、Cheek 共 40 个语义 channel，全部限制在 `0..1`；左右 channel 通过协议中的 mirror pair 独立控制或交换，中心语义参数保持不变。Face System 提供归一化、校验、整组/单组镜像与 `expression_versions` 保存恢复；旧 FaceState 缺少历史字段时自动以当前 neutral expression 建立兼容基线。当前 `face_runtime_descriptor` 仅声明 `interface-only`，`meshReference`、`morphTargets` 与 `correctiveTargets` 保持空值，供未来 Morph Target、Vertex Corrective 和 Shader Corrective 接入。保存到 CharacterProfile 时只增加可选的 `expression_revision` 与 `expression_runtime_descriptor` 引用，旧 CharacterProfile 缺少这些字段时按 neutral expression 兼容加载。
+
+Face Animation Layer 是由现有 `faceSystem.expression` 派生的运行时层，不是第二套状态中心。`packages/face-system/face-animation-layer.js` 提供 `createFaceAnimationLayer()` 与 `composeFaceAnimationLayers()`，以 `body-animation → face-expression-animation` 的顺序描述叠加关系；它只引用 `character.animation`，不修改 Body Animation、AnimationClip 或 PoseSnapshot 协议。
 
 ## 16. Clothing System
 

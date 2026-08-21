@@ -20,6 +20,10 @@ import {
   CHARACTER_STUDIO_WINDOW_ROLES,
 } from './character-studio-session.js';
 import { serializeCharacterProfileExport } from './character-profile-export.js';
+import {
+  createFaceAnimationLayer,
+  FACE_EXPRESSION_CHANNEL_DEFINITIONS,
+} from '../../packages/face-system/index.js';
 
 const HOST_PROTOCOL = 'humanoid-rig-lab-next:viewport';
 const CHARACTER_STUDIO_HOST_MODULE = 'character-studio';
@@ -203,7 +207,7 @@ export class RightPanelHost {
       <div class="character-studio-data-card character-studio-expression-summary">
         ${dataRow('Schema', expression.schema || 'humanoid_rig/face_expression@1.0')}
         ${dataRow('Expression Revision', `r${Number(expression.expressionRevision || 0)}`)}
-        ${dataRow('Active Channels', `${activeExpressionChannels.length} / ${Object.keys(expression.channels || {}).length || 17}`)}
+        ${dataRow('Active Channels', `${activeExpressionChannels.length} / ${Object.keys(expression.channels || {}).length || FACE_EXPRESSION_CHANNEL_DEFINITIONS.length}`)}
         <span class="character-studio-slot-note">${escapeHtml(activeExpressionChannels.join(' · ') || 'neutral')}</span>
       </div>`));
 
@@ -238,6 +242,7 @@ export class RightPanelHost {
         ${dataRow('Saved revision', `r${Number(sessionSnapshot?.project_revision || state.revision || 0)}`)}
         ${dataRow('Profile schema', profile?.schema || 'humanoid_rig/character_profile@1.4')}
         ${dataRow('Face Runtime', expressionDescriptor?.deformationMode || 'interface-only')}
+        ${dataRow('Animation Layer', runtime.faceAnimationLayer?.layerType || 'face-expression')}
         ${dataRow('Build', BUILD_ID)}
         <button class="character-studio-export-button" data-character-studio-export type="button">导出 CharacterProfile JSON</button>
         <span class="character-studio-slot-note">只包含版本、模块引用与资源摘要，不包含二进制资源。</span>
@@ -360,6 +365,11 @@ export class CharacterViewportHost {
         state: structuredClone(state.appearanceSystem || {}),
         runtimeDescriptor: structuredClone(runtime.appearanceDescriptor),
         attachmentFrame: structuredClone(runtime.appearanceFrame),
+      },
+      face: {
+        expression: structuredClone(runtime.faceExpression),
+        runtimeDescriptor: structuredClone(runtime.faceExpressionDescriptor),
+        animationLayer: structuredClone(runtime.faceAnimationLayer),
       },
       clothingFrame: structuredClone(runtime.clothingFrame),
       simulationRig: structuredClone(runtime.frame.simulationRig),
@@ -548,6 +558,9 @@ export class CharacterStudioApp {
     const characterProfile = state.characterCore?.profiles?.[characterId] || null;
     const faceExpression = state.faceSystem?.expression || null;
     const faceExpressionDescriptor = state.faceSystem?.expression_runtime_descriptor || null;
+    const faceAnimationLayer = createFaceAnimationLayer(faceExpression || {}, {
+      bodyAnimationReference: 'character.animation',
+    });
 
     return {
       animation,
@@ -560,6 +573,7 @@ export class CharacterStudioApp {
       characterProfile,
       faceExpression,
       faceExpressionDescriptor,
+      faceAnimationLayer,
     };
   }
 
