@@ -146,6 +146,17 @@ export class AppearanceManager {
     return finishMutation(next);
   }
 
+  removeHair(stateInput, hairId, options = {}) {
+    const state = normalizeAppearanceState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    const id = String(hairId || state.active_hair_id || '');
+    if (!state.hair_profiles[id]) throw new Error(`HairProfile ${id} does not exist.`);
+    const next = beginMutation(state, options.at);
+    delete next.hair_profiles[id];
+    if (next.active_hair_id === id) next.active_hair_id = Object.keys(next.hair_profiles)[0] || null;
+    return finishMutation(next);
+  }
+
   addAccessory(stateInput, profileInput, options = {}) {
     const state = normalizeAppearanceState(stateInput);
     assertExpectedRevision(state, options.expected_revision);
