@@ -13,6 +13,26 @@ import {
   createDefaultAnimationLayers,
   createWaveRightPreset,
 } from './presets.js';
+import {
+  mirrorSemanticMotionChannels,
+  normalizeAnimationAssetMetadata,
+  normalizeSemanticMotionChannels,
+  validateAnimationAssetMetadata,
+  validateSemanticMotionChannels,
+} from './asset-metadata.js';
+
+export {
+  ANIMATION_ASSET_CATEGORIES,
+  ANIMATION_ASSET_METADATA_SCHEMA,
+  SEMANTIC_MOTION_CHANNELS,
+  inferSemanticMotionChannels,
+  mapSemanticMotionValues,
+  normalizeAnimationAssetMetadata,
+  normalizeSemanticMotionChannels,
+  resolveSemanticMotionChannel,
+  validateAnimationAssetMetadata,
+  validateSemanticMotionChannels,
+} from './asset-metadata.js';
 
 export const ANIMATION_SESSION_SCHEMA = 'humanoid_rig/animation_session@0.4';
 export const ANIMATION_CLIP_SCHEMA = 'humanoid_rig/animation_clip@0.4';
@@ -58,10 +78,12 @@ export function isNormalizedAnimationClip(value) {
   return Boolean(value)
     && value.schema === ANIMATION_CLIP_SCHEMA
     && Array.isArray(value.tracks)
+    && Array.isArray(value.semanticChannels)
     && Array.isArray(value.poseKeys)
     && Array.isArray(value.poseSnapshots)
     && Array.isArray(value.events)
     && Array.isArray(value.contacts)
+    && isPlainObject(value.assetMetadata)
     && isPlainObject(value.retargetPolicy)
     && isPlainObject(value.quality);
 }
@@ -77,8 +99,10 @@ export function createEmptyClip({
   rootJointId = 'hips',
   metadata = {},
   retargetPolicy = {},
+  assetMetadata = {},
+  semanticChannels = [],
 } = {}) {
-  return {
+  const clip = {
     schema: ANIMATION_CLIP_SCHEMA,
     type: 'AnimationClip',
     clipId: sanitizeId(clipId, 'custom'),
@@ -92,6 +116,7 @@ export function createEmptyClip({
     rootMotionMode: ROOT_MOTION_MODES.has(rootMotionMode) ? rootMotionMode : 'in_place',
     rootJointId: sanitizeId(rootJointId, 'hips'),
     tracks: [],
+    semanticChannels: [],
     poseKeys: [],
     poseSnapshots: [],
     events: [],
@@ -110,6 +135,7 @@ export function createEmptyClip({
       ...clone(metadata),
     },
   };
+  return refreshClipAssetDescriptors(clip, { assetMetadata, semanticChannels });
 }
 
 export function createBuiltInClips({ compatibleRig = 'rig@0.4.0' } = {}) {
@@ -261,7 +287,10 @@ export function normalizeClip(input, { compatibleRig = 'rig@0.4.0' } = {}) {
     : [];
   clip.retargetPolicy = normalizeRetargetPolicy(source.retargetPolicy || source.retarget_policy || clip.retargetPolicy);
   clip.quality = normalizeQuality(source.quality);
-  return clip;
+  return refreshClipAssetDescriptors(clip, {
+    assetMetadata: source.assetMetadata || source.asset_metadata,
+    semanticChannels: source.semanticChannels || source.semantic_channels,
+  });
 }
 
 export function getActiveClip(animationState) {
@@ -337,13 +366,14 @@ export function addClip(animationState, clipInput) {
 export function clearClipContent(clipInput) {
   const clip = normalizeClip(clipInput);
   clip.tracks = [];
+  clip.semanticChannels = [];
   clip.poseKeys = [];
   clip.poseSnapshots = [];
   clip.events = [];
   clip.contacts = [];
   clip.clipRevision += 1;
   clip.metadata = { ...clip.metadata, status: 'editable-draft' };
-  return clip;
+  return refreshClipAssetDescriptors(clip, { semanticChannels: [] });
 }
 
 export function upsertTrackKeyframe(clipInput, {
@@ -392,7 +422,7 @@ export function upsertTrackKeyframe(clipInput, {
     track.keyframes = track.keyframes.map((item, index) => ({ ...item, value: continuous[index] }));
   }
   clip.clipRevision += 1;
-  return clip;
+  return refreshClipAssetDescriptors(clip);
 }
 
 export function createPoseSnapshotReference(pose, {
@@ -551,7 +581,7 @@ export function addClipContact(clipInput, contactInput = {}) {
   else clip.contacts.push(contact);
   clip.contacts.sort(byContactTimeThenId);
   clip.clipRevision += 1;
-  return clip;
+  return refreshClipAssetDescriptors(clip);
 }
 
 export function removeClipContact(clipInput, contactId) {
@@ -559,7 +589,7 @@ export function removeClipContact(clipInput, contactId) {
   const before = clip.contacts.length;
   clip.contacts = clip.contacts.filter((contact) => contact.id !== String(contactId));
   if (clip.contacts.length !== before) clip.clipRevision += 1;
-  return clip;
+  return refreshClipAssetDescriptors(clip);
 }
 
 export function moveTrackKeyframes(clipInput, {
@@ -579,7 +609,7 @@ export function moveTrackKeyframes(clipInput, {
   track.keyframes = [...deduped.values()].sort(byTimeThenId);
   if (track.channel === 'rotation') applyTrackContinuity(track);
   clip.clipRevision += 1;
-  return clip;
+  return refreshClipAssetDescriptors(clip);
 }
 
 export function copyTrackKeyframes(clipInput, {
@@ -601,7 +631,7 @@ export function copyTrackKeyframes(clipInput, {
   track.keyframes = [...deduped.values()].sort(byTimeThenId);
   if (track.channel === 'rotation') applyTrackContinuity(track);
   clip.clipRevision += 1;
-  return clip;
+  return refreshClipAssetDescriptors(clip);
 }
 
 export function deleteTrackKeyframes(clipInput, {
@@ -616,7 +646,7 @@ export function deleteTrackKeyframes(clipInput, {
   track.keyframes = track.keyframes.filter((key) => !ids.has(key.id));
   clip.tracks = clip.tracks.filter((item) => item.keyframes.length > 0);
   if (track.keyframes.length !== before) clip.clipRevision += 1;
-  return clip;
+  return refreshClipAssetDescriptors(clip);
 }
 
 export function scaleClipTimeRange(clipInput, {
@@ -650,7 +680,7 @@ export function scaleClipTimeRange(clipInput, {
   maximum = Math.max(maximum, ...clip.poseKeys.map((key) => key.time), ...clip.events.map((event) => event.time), ...clip.contacts.map((contact) => contact.end));
   clip.duration = Math.max(0.01, maximum);
   clip.clipRevision += 1;
-  return normalizeClip(clip);
+  return normalizeClip(refreshClipAssetDescriptors(clip));
 }
 
 export function mirrorAnimationClip(clipInput, {
@@ -688,6 +718,7 @@ export function mirrorAnimationClip(clipInput, {
     jointId: MIRROR_JOINTS[contact.jointId] || contact.jointId,
     groundNormal: [-contact.groundNormal[0], contact.groundNormal[1], contact.groundNormal[2]],
   }));
+  mirrored.semanticChannels = mirrorSemanticMotionChannels(clip.semanticChannels);
   mirrored.poseKeys = [];
   mirrored.poseSnapshots = [];
   mirrored.metadata = { ...mirrored.metadata, mirroredFrom: clip.clipId };
@@ -728,7 +759,7 @@ export function compressAnimationClip(clipInput, {
   }
   clip.clipRevision += 1;
   clip.metadata = { ...clip.metadata, compression: { removed, quaternionToleranceDegrees, positionToleranceMeters } };
-  return clip;
+  return refreshClipAssetDescriptors(clip);
 }
 
 export function setAnimationLayer(animationInput, layerId, patch = {}) {
@@ -810,6 +841,13 @@ export function validateAnimationClip(input) {
   const poseSnapshots = Array.isArray(source.poseSnapshots) ? source.poseSnapshots : [];
   const events = Array.isArray(source.events) ? source.events : [];
   const contacts = Array.isArray(source.contacts) ? source.contacts : [];
+  const semanticChannels = normalizeSemanticMotionChannels(
+    source.semanticChannels || source.semantic_channels,
+    { clip: source },
+  );
+  const assetMetadata = source.assetMetadata || source.asset_metadata || normalizeAnimationAssetMetadata({}, {
+    clip: { ...source, semanticChannels },
+  });
 
   if (!source.clipId || !STABLE_JOINT_ID.test(String(source.clipId))) errors.push('CLIP_ID_INVALID');
   if (!Number.isFinite(duration) || duration <= 0) errors.push('DURATION_INVALID');
@@ -919,6 +957,13 @@ export function validateAnimationClip(input) {
     if (contact?.mode && !CONTACT_MODES.has(contact.mode)) errors.push(`CONTACT_MODE_INVALID:${id || 'empty'}`);
   }
 
+  const metadataReport = validateAnimationAssetMetadata(assetMetadata, { clip: source });
+  errors.push(...metadataReport.errors);
+  warnings.push(...metadataReport.warnings);
+  const semanticReport = validateSemanticMotionChannels(semanticChannels, { clip: source });
+  errors.push(...semanticReport.errors);
+  warnings.push(...semanticReport.warnings);
+
   if (!tracks.length && !poseKeys.length) warnings.push('CLIP_HAS_NO_KEYS');
   return {
     valid: errors.length === 0,
@@ -931,6 +976,7 @@ export function validateAnimationClip(input) {
       poseSnapshots: poseSnapshots.length,
       events: events.length,
       contacts: contacts.length,
+      semanticChannels: semanticChannels.length,
     },
   };
 }
@@ -1155,6 +1201,8 @@ export function serializeMotionClip(clipInput, {
     loop_mode: clip.loopMode,
     root_motion_mode: clip.rootMotionMode,
     root_joint_id: clip.rootJointId,
+    asset_metadata: clone(clip.assetMetadata),
+    semantic_channels: clip.semanticChannels.map((channel) => clone(channel)),
     tracks: clip.tracks.map((track) => ({
       track_id: track.trackId,
       joint_id: track.jointId,
@@ -1229,6 +1277,8 @@ export function importMotionClip(asset) {
     loopMode: asset.loop_mode,
     rootMotionMode: asset.root_motion_mode,
     rootJointId: asset.root_joint_id,
+    assetMetadata: asset.asset_metadata,
+    semanticChannels: asset.semantic_channels,
     tracks,
     events: Array.isArray(asset.events) ? asset.events.map((event) => ({
       id: event.event_id,
@@ -1566,6 +1616,15 @@ function extractLocalQuaternionPose(source) {
     },
     joints,
   };
+}
+
+function refreshClipAssetDescriptors(clip, {
+  assetMetadata = clip.assetMetadata,
+  semanticChannels = clip.semanticChannels,
+} = {}) {
+  clip.semanticChannels = normalizeSemanticMotionChannels(semanticChannels, { clip });
+  clip.assetMetadata = normalizeAnimationAssetMetadata(assetMetadata, { clip });
+  return clip;
 }
 
 function normalizeRetargetPolicy(input) {

@@ -1,10 +1,19 @@
 import assert from 'node:assert/strict';
 import {
+  ANIMATION_ASSET_CATEGORIES,
   getActiveClip,
+  importMotionClip,
+  normalizeClip,
   normalizeAnimationState,
+  resolveSemanticMotionChannel,
+  sampleAnimationClip,
+  serializeMotionClip,
   setActiveClip,
   setAnimationLayer,
   setGraphParameter,
+  validateAnimationAssetMetadata,
+  validateAnimationClip,
+  validateSemanticMotionChannels,
 } from '../src/modules/animation/model.js';
 import {
   buildV8PosePayload,
@@ -70,6 +79,66 @@ const base = normalizeAnimationState({}, {
   targetProportionRevision: 7,
 });
 const playableIds = ['idle-breathe', 'wave', 'head-nod', 'squat', 'walk-in-place', 'walk-forward'];
+
+assert.deepEqual(ANIMATION_ASSET_CATEGORIES, [
+  'idle', 'locomotion', 'jump', 'gesture', 'combat', 'interaction',
+]);
+const assetWaveClip = base.clips.find((clip) => clip.clipId === 'wave');
+assert.equal(assetWaveClip.assetMetadata.type, 'AnimationAssetMetadata');
+assert.equal(assetWaveClip.assetMetadata.category, 'gesture');
+assert.equal(assetWaveClip.assetMetadata.compatibleRig, assetWaveClip.compatibleRig);
+assert.ok(assetWaveClip.assetMetadata.requiredChains.includes('right_arm'));
+const metadataClip = normalizeClip({
+  ...structuredClone(assetWaveClip),
+  assetMetadata: {
+    ...structuredClone(assetWaveClip.assetMetadata),
+    tags: ['mixamo-style', 'upper-body'],
+    mirrorSupport: true,
+  },
+});
+const savedMetadataClip = importMotionClip(serializeMotionClip(metadataClip));
+assert.deepEqual(savedMetadataClip.assetMetadata, metadataClip.assetMetadata, 'AnimationAssetMetadata must survive MotionClip save/import');
+assert.deepEqual(savedMetadataClip.semanticChannels, metadataClip.semanticChannels, 'semantic channels must survive MotionClip save/import');
+assert.deepEqual(savedMetadataClip.assetMetadata.tags, ['mixamo-style', 'upper-body']);
+assert.equal(validateAnimationAssetMetadata(savedMetadataClip.assetMetadata, { clip: savedMetadataClip }).valid, true);
+assert.equal(validateAnimationClip(savedMetadataClip).valid, true);
+assert.equal(validateAnimationAssetMetadata({
+  ...savedMetadataClip.assetMetadata,
+  category: 'dance',
+}).valid, false, 'unsupported asset categories must be rejected');
+
+const rightArmSemantic = resolveSemanticMotionChannel('rightArmSwing', { clip: assetWaveClip });
+assert.equal(rightArmSemantic.joints.upper, 'rightUpperArm');
+assert.equal(rightArmSemantic.joints.lower, 'rightLowerArm');
+assert.equal(rightArmSemantic.joints.hand, 'rightHand');
+assert.deepEqual(
+  rightArmSemantic.tracks.map((track) => track.trackId),
+  ['rightUpperArm:rotation', 'rightLowerArm:rotation', 'rightHand:rotation'],
+);
+const mappedRightArmSemantic = resolveSemanticMotionChannel('rightArmSwing', {
+  jointMap: { rightUpperArm: 'mixamoRightArm', rightLowerArm: 'mixamoRightForeArm' },
+});
+assert.equal(mappedRightArmSemantic.joints.upper, 'mixamoRightArm');
+assert.equal(mappedRightArmSemantic.joints.lower, 'mixamoRightForeArm');
+const walkAssetClip = base.clips.find((clip) => clip.clipId === 'walk-forward');
+const footContactSemantic = resolveSemanticMotionChannel('footContact', { clip: walkAssetClip });
+assert.deepEqual(footContactSemantic.jointIds, ['leftFoot', 'rightFoot']);
+assert.equal(footContactSemantic.contacts.length, 2);
+assert.equal(resolveSemanticMotionChannel('bodyLean').joints.lower, 'spine');
+assert.equal(validateSemanticMotionChannels(assetWaveClip.semanticChannels, { clip: assetWaveClip }).valid, true);
+assert.equal(validateSemanticMotionChannels([{ channelId: 'unknown-motion', semantic: 'unknownMotion' }]).valid, false);
+
+const legacyRotationClip = structuredClone(assetWaveClip);
+delete legacyRotationClip.assetMetadata;
+delete legacyRotationClip.semanticChannels;
+const legacyRotationTracks = structuredClone(legacyRotationClip.tracks);
+const normalizedLegacyRotationClip = normalizeClip(legacyRotationClip);
+assert.deepEqual(normalizedLegacyRotationClip.tracks, legacyRotationTracks, 'legacy rotationTrack data must remain byte-for-byte equivalent after normalization');
+assert.deepEqual(
+  sampleAnimationClip(normalizedLegacyRotationClip, 0.8),
+  sampleAnimationClip(assetWaveClip, 0.8),
+  'semantic metadata must not alter legacy rotationTrack sampling',
+);
 
 for (const profile of profiles) {
   for (const clipId of playableIds) {
@@ -339,7 +408,7 @@ const legacyDerived = deriveLocalPoseFromV8Payload(legacyWorldOnlyPayload, creat
 assert.ok(legacyDerived, 'Schema 1 world-position payload should retain its compatibility fallback.');
 assert.equal(legacyDerived.metadata.approximation, 'single-child-orientation');
 
-console.log('PASS 89-node dual-rig runtime, three target proportions, fixed bone lengths, root scaling, contacts, layers, graph transitions, physics modes, event cycles, and local-pose recording');
+console.log('PASS AnimationAssetMetadata, semantic motion channels, legacy rotationTrack compatibility, 89-node dual-rig runtime, three target proportions, fixed bone lengths, contacts, layers, graph transitions, and local-pose recording');
 
 function distance(a, b) {
   return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
