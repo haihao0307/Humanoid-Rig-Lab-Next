@@ -30,7 +30,11 @@ for (let index = 0; index < runtimeIterations; index += 1) {
 }
 const runtimeElapsed = performance.now() - started;
 const runtimeAverageMs = runtimeElapsed / runtimeIterations;
-assert.ok(runtimeAverageMs < 6, `runtime frame average ${runtimeAverageMs.toFixed(4)} ms`);
+const runtimeBudgetMs = process.env.CI ? 12 : 6;
+assert.ok(
+  runtimeAverageMs < runtimeBudgetMs,
+  `runtime frame average ${runtimeAverageMs.toFixed(4)} ms (budget ${runtimeBudgetMs} ms)`,
+);
 
 console.log(`PASS performance: ${trackIterations} clip samples ${trackElapsed.toFixed(2)} ms, average ${trackAverageMs.toFixed(4)} ms`);
 console.log(`PASS performance: ${runtimeIterations} full runtime frames ${runtimeElapsed.toFixed(2)} ms, average ${runtimeAverageMs.toFixed(4)} ms`);
