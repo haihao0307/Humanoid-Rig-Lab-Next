@@ -211,12 +211,42 @@ export class ProjectHubClient extends EventTarget {
     return safeClone(this.state);
   }
 
+  restorePersistedState(nextState, { source = 'indexeddb', broadcast = true } = {}) {
+    const normalized = normalizeProjectState(nextState);
+    if (normalized.projectId !== this.state.projectId) {
+      throw new Error(`Cannot restore project ${normalized.projectId} into ${this.state.projectId}.`);
+    }
+    const incomingRevision = Number(normalized.revision || 0);
+    const localRevision = Number(this.state.revision || 0);
+    const incomingTime = Date.parse(normalized.updatedAt || 0) || 0;
+    const localTime = Date.parse(this.state.updatedAt || 0) || 0;
+    if (incomingRevision < localRevision || (incomingRevision === localRevision && incomingTime < localTime)) {
+      return false;
+    }
+    this.state = normalized;
+    saveLocalState(this.state);
+    if (broadcast) this.#sendState();
+    this.dispatchEvent(new CustomEvent('statechange', {
+      detail: { state: this.getState(), source },
+    }));
+    return true;
+  }
+
   getModuleRevision(module = this.module) {
     return Number(this.state.moduleRevisions?.[normalizeModuleId(module)] || 1);
   }
 
   getCharacter(characterId = this.state.characterCore?.active_character_id, options = {}) {
     return characterManager.load(this.state.characterCore, characterId, options);
+  }
+
+  loadCharacter(characterId, { expected_revision = this.state.characterCore?.revision, ...options } = {}) {
+    const result = characterManager.activate(this.state.characterCore, characterId, {
+      ...options,
+      expected_revision,
+      actor: options.actor || `character:${this.clientId.slice(0, 8)}`,
+    });
+    return this.#commitCharacterOperation(result, `加载人物 ${result.profile.name}`);
   }
 
   createCharacter(profile, { expected_revision = this.state.characterCore?.revision, ...options } = {}) {
@@ -236,6 +266,21 @@ export class ProjectHubClient extends EventTarget {
       actor: options.actor || `character:${this.clientId.slice(0, 8)}`,
     });
     return this.#commitCharacterOperation(result, `保存人物 ${result.profile.name} v${result.profile.version}`);
+  }
+
+  restoreCharacter(characterId, version, {
+    expected_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const result = characterManager.restore(this.state.characterCore, characterId, version, {
+      ...options,
+      expected_revision,
+      actor: options.actor || `character:${this.clientId.slice(0, 8)}`,
+    });
+    return this.#commitCharacterOperation(
+      result,
+      `恢复人物 ${result.profile.name} 到历史版本 ${version}，生成 v${result.profile.version}`,
+    );
   }
 
   updateCharacterReferences(characterId, references, {

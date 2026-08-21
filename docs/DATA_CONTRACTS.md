@@ -626,3 +626,18 @@ Character Generator 使用 `humanoid_rig/character_image_analysis@1.0`、`humano
 ```
 
 Generator 只负责编排既有模块接口：比例通过 `normalizeBodyProfile`，姿势通过 `retargetPoseObservation`，人物保存通过 CharacterManager。它不复制 Rig、Skin、Pose 或 Character Core 的实现。ProjectState 只保存文件名、MIME、尺寸、字节数和 SHA-256 内容哈希；图片二进制由 `binary_storage: not-in-project-state` 明确排除。重新加载时以会话中已保存的模块输出和 CharacterProfile 恢复相同结果。
+
+## 19. Character Studio Session 与导出
+
+Character Studio 使用 `humanoid_rig/character_studio_session@1.0` 观察 Character Core，并把创建、活动人物切换、保存和历史恢复提交为 CharacterManager 操作。对应 OperationEvent 为：
+
+```text
+character.create
+character.load
+character.save
+character.restore
+```
+
+结构化 ProjectState 快照、事件和资源索引写入 IndexedDB。大文件优先写入 OPFS，回退为 IndexedDB Blob；ProjectState、ModulePatch、OperationEvent 和导出 JSON 不得包含 Blob、ArrayBuffer、TypedArray、data URL 或内联 base64。
+
+CharacterProfile 导出使用 `humanoid_rig/character_profile_export@1.0`。导出包含 CharacterProfile @1.4、项目/人物版本、八类模块引用、AppearanceState revision 和资源引用摘要，不包含二进制资源。

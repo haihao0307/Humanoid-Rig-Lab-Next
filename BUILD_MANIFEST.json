@@ -90,5 +90,15 @@
     "version": "character-generator@0.1.0",
     "adapters": ["HRL-M01", "HRL-M03", "Character Core"],
     "phase": "image-to-character-data"
+  },
+  "characterStudio": {
+    "sessionSchema": "humanoid_rig/character_studio_session@1.0",
+    "exportSchema": "humanoid_rig/character_profile_export@1.0",
+    "persistence": {
+      "structuredData": "IndexedDB",
+      "largeResources": "OPFS",
+      "binaryFallback": "IndexedDB Blob"
+    },
+    "windowRoles": ["character-studio", "main-editor", "animation-editor", "data-inspector"]
   }
 }

@@ -14,8 +14,8 @@ npm test
 
 ```text
 PASS Humanoid Rig Lab Next 0.5.0 build four-module-v002-20260819
-PASS 104 required files
-PASS schema v11, Character Core, BodyShape, Face Identity, Clothing System, Appearance System, Character Generator, module state, and migration contract
+PASS 113 required files
+PASS schema v11, Character Core, BodyShape, Face Identity, Clothing System, Appearance System, Character Generator, Character Studio, module state, and migration contract
 PASS primary 3D proportion stage and explicit 2D fallback separation
 PASS live body-profile bridge and exact 3D dimension feedback contract
 PASS module-scoped synchronization and rig-rule exchange contract
@@ -43,6 +43,11 @@ PASS image observation creates Proportion, BodyShape, Face, Clothing, and Pose d
 PASS generated Character references existing module versions without mutating Rig, Skin, or Animation data
 PASS Character Generator save, historical load, serialized reload, and schema v10 to v11 migration
 PASS character.html upload, analysis, generation, and version-save entry contract
+PASS Character Studio create, load, save, historical restore, revision, and OperationEvent flow
+PASS IndexedDB snapshot contract, OPFS resource path, binary-message guard, and refresh restore
+PASS stable CharacterProfile export with schemas, module revisions, appearance revision, and resource summary
+PASS character-studio, main-editor, animation-editor, and data-inspector share Character state
+PASS delayed IndexedDB-style writes cannot move the current persisted revision backwards
 PASS integrated build four-module-v002-20260819
 PASS baseline-state migration to all four V002 module versions
 PASS animation local-quaternion PoseSnapshot applied through fixed-length PhysicsRig
@@ -206,6 +211,23 @@ humanoid_rig/transient_bus@1.0
 BUILD_MANIFEST.json 构建身份
 launcher.ps1 构建 ID 核验
 四个 MODULE_SCOPE 归档路径
+```
+
+### 5.1 Character Studio 状态闭环
+
+验证内容：
+
+```text
+创建人物、切换活动人物、保存人物和历史恢复
+CharacterState revision、OperationEvent、integration ModulePatch、ProjectState revision 连续增长
+CharacterProfile export @1.0 的 schema、版本、模块引用和资源摘要
+IndexedDB projects、snapshots、events、resources、resourceBlobs 存储契约
+刷新后从较新的持久化快照恢复
+大文件优先 OPFS，回退 IndexedDB Blob
+ProjectState 和导出 JSON 拒绝二进制及内联 base64
+character-studio、main-editor、animation-editor、data-inspector 四角色同步
+并发延迟写入不能让持久化 current revision 回退
+原 Proportion、Skin、Pose、Animation 和模块状态切片保持不变
 ```
 
 ## 6. 本地 HTTP 冒烟检查

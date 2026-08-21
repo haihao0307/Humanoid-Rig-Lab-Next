@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/character_profile_export@1.0",
+  "title": "Humanoid Rig Lab CharacterProfile Export",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "exported_at",
+    "project",
+    "schemas",
+    "version",
+    "character_profile",
+    "module_references",
+    "resource_references"
+  ],
+  "properties": {
+    "schema": { "const": "humanoid_rig/character_profile_export@1.0" },
+    "schema_version": { "const": 1 },
+    "exported_at": { "type": "string", "format": "date-time" },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project_id", "project_revision", "project_schema_version", "build_id", "build_version"],
+      "properties": {
+        "project_id": { "type": "string", "minLength": 1 },
+        "project_revision": { "$ref": "#/$defs/revision" },
+        "project_schema_version": { "$ref": "#/$defs/revision" },
+        "build_id": { "type": "string" },
+        "build_version": { "type": "string" }
+      }
+    },
+    "schemas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["export", "character_profile", "project_state"],
+      "properties": {
+        "export": { "const": "humanoid_rig/character_profile_export@1.0" },
+        "character_profile": { "const": "humanoid_rig/character_profile@1.4" },
+        "project_state": { "type": "string", "minLength": 1 }
+      }
+    },
+    "version": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["character_profile", "character_state_revision", "project_revision"],
+      "properties": {
+        "character_profile": { "type": "integer", "minimum": 1 },
+        "character_state_revision": { "$ref": "#/$defs/revision" },
+        "project_revision": { "$ref": "#/$defs/revision" }
+      }
+    },
+    "character_profile": { "$ref": "character-profile.schema.json" },
+    "module_references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proportion", "body_shape", "skin", "face", "clothing", "appearance", "pose", "animation"],
+      "properties": {
+        "proportion": { "$ref": "#/$defs/versionedModule" },
+        "body_shape": { "$ref": "#/$defs/profileModule" },
+        "skin": { "$ref": "#/$defs/versionedModule" },
+        "face": { "$ref": "#/$defs/faceModule" },
+        "clothing": { "$ref": "#/$defs/statefulVersionedModule" },
+        "appearance": { "$ref": "#/$defs/appearanceModule" },
+        "pose": { "$ref": "#/$defs/versionedModule" },
+        "animation": { "$ref": "#/$defs/versionedModule" }
+      }
+    },
+    "resource_references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "binary_payloads_included", "items"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "binary_payloads_included": { "const": false },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/resourceReference" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "revision": { "type": "integer", "minimum": 0 },
+    "versionedModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "version"],
+      "properties": {
+        "revision": { "$ref": "#/$defs/revision" },
+        "version": { "type": "string" }
+      }
+    },
+    "statefulVersionedModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "version", "state_revision"],
+      "properties": {
+        "revision": { "$ref": "#/$defs/revision" },
+        "version": { "type": "string" },
+        "state_revision": { "$ref": "#/$defs/revision" }
+      }
+    },
+    "profileModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "profile_id", "state_revision"],
+      "properties": {
+        "revision": { "$ref": "#/$defs/revision" },
+        "profile_id": { "type": ["string", "null"] },
+        "state_revision": { "$ref": "#/$defs/revision" }
+      }
+    },
+    "faceModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "face_id", "state_revision"],
+      "properties": {
+        "revision": { "$ref": "#/$defs/revision" },
+        "face_id": { "type": ["string", "null"] },
+        "state_revision": { "$ref": "#/$defs/revision" }
+      }
+    },
+    "appearanceModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "version", "hair_revision", "accessory_revision"],
+      "properties": {
+        "revision": { "$ref": "#/$defs/revision" },
+        "version": { "type": "string" },
+        "hair_revision": { "$ref": "#/$defs/revision" },
+        "accessory_revision": { "$ref": "#/$defs/revision" }
+      }
+    },
+    "resourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id", "kind", "revision", "storage", "uri", "opfs_path", "content_hash", "byte_length", "mime_type", "file_name"],
+      "properties": {
+        "asset_id": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "minLength": 1 },
+        "revision": { "type": ["integer", "null"], "minimum": 0 },
+        "storage": { "type": ["string", "null"] },
+        "uri": { "type": ["string", "null"] },
+        "opfs_path": { "type": ["string", "null"] },
+        "content_hash": { "type": ["string", "null"] },
+        "byte_length": { "type": ["integer", "null"], "minimum": 0 },
+        "mime_type": { "type": ["string", "null"] },
+        "file_name": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

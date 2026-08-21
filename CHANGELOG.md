@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased · Character Studio state
+
+- 新增 Character Studio session/store，统一创建、加载、保存、历史恢复、导出和状态订阅。
+- Character 加载和恢复进入 CharacterState revision、OperationEvent、integration ModulePatch 和 ProjectState revision 正式链路。
+- 新增 IndexedDB 项目快照、事件和资源索引，资源二进制优先进入 OPFS，普通消息拒绝 Blob、ArrayBuffer 和内联 base64。
+- 新增 `humanoid_rig/character_profile_export@1.0`，包含 schema、版本、模块引用和资源摘要。
+- 新增四窗口 Character 同步、刷新恢复和现有模块隔离测试。
+
 ## 0.5.0 four-module V002 integration · 2026-08-19
 
 ### 四模块交付

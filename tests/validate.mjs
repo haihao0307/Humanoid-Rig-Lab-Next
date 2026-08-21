@@ -70,6 +70,15 @@ const required = [
   'apps/character-generator/index.js', 'apps/character-generator/page.js',
   'apps/character-generator/character-generator.css',
   'schemas/character-generator-session.schema.json', 'tests/character-generator.mjs',
+  'apps/character-studio/character-studio-session.js',
+  'apps/character-studio/character-studio-persistence.js',
+  'apps/character-studio/character-profile-export.js',
+  'apps/character-studio/index.js',
+  'schemas/character-profile-export.schema.json',
+  'tests/helpers/character-studio-test-hub.mjs',
+  'tests/integration/character-studio-state.mjs',
+  'tests/multi-window/character-studio-sync.mjs',
+  'docs/CHARACTER_STUDIO_STATE_FLOW.md',
   'docs/FOUR_MODULE_COLLABORATION.md', 'docs/CHAT_WINDOW_START_PROMPTS.md',
   'docs/GITHUB_BRANCH_WORKFLOW.md', 'control/handoffs/HANDOFF_TEMPLATE.md',
   'PREPARE_BRANCHES.cmd', 'scripts/prepare-module-branches.ps1', '.github/PULL_REQUEST_TEMPLATE.md',
@@ -90,6 +99,7 @@ assert.match(packageJson.scripts.test, /face-system/);
 assert.match(packageJson.scripts.test, /clothing-system/);
 assert.match(packageJson.scripts.test, /appearance-system/);
 assert.match(packageJson.scripts.test, /character-generator/);
+assert.match(packageJson.scripts.test, /test:character-studio/);
 assert.match(packageJson.scripts.test, /integration-v002/);
 assert.match(packageJson.scripts.test, /test:animation/);
 assert.match(packageJson.scripts.test, /legacy\/v8/);
@@ -107,6 +117,15 @@ assert.match(launcherScript, /install --no-audit --no-fund/);
 assert.match(launcherScript, /three\.webgpu\.js/);
 assert.match(launcherScript, /BUILD_MANIFEST\.json/);
 assert.match(launcherScript, new RegExp(BUILD_ID));
+
+const buildManifest = JSON.parse(await readFile(join(root, 'BUILD_MANIFEST.json'), 'utf8'));
+assert.equal(buildManifest.characterStudio.sessionSchema, 'humanoid_rig/character_studio_session@1.0');
+assert.equal(buildManifest.characterStudio.exportSchema, 'humanoid_rig/character_profile_export@1.0');
+assert.equal(buildManifest.characterStudio.persistence.structuredData, 'IndexedDB');
+assert.equal(buildManifest.characterStudio.persistence.largeResources, 'OPFS');
+assert.deepEqual(buildManifest.characterStudio.windowRoles, [
+  'character-studio', 'main-editor', 'animation-editor', 'data-inspector',
+]);
 
 const branchLauncher = await readFile(join(root, 'PREPARE_BRANCHES.cmd'), 'utf8');
 assert.match(branchLauncher, /prepare-module-branches\.ps1/i);
@@ -421,7 +440,7 @@ assert.ok(entries.includes('legacy'));
 
 console.log(`PASS Humanoid Rig Lab Next ${BUILD_VERSION} build ${BUILD_ID}`);
 console.log(`PASS ${required.length} required files`);
-console.log('PASS schema v11, Character Core, BodyShape, Face Identity, Clothing, Appearance, Character Generator, module state, and migration contract');
+console.log('PASS schema v11, Character Core, BodyShape, Face Identity, Clothing, Appearance, Character Generator, Character Studio, module state, and migration contract');
 console.log('PASS primary 3D proportion stage and explicit 2D fallback separation');
 console.log('PASS live body-profile bridge and exact 3D dimension feedback contract');
 console.log('PASS module-scoped synchronization and rig-rule exchange contract');

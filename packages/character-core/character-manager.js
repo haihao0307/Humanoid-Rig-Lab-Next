@@ -64,6 +64,57 @@ export class CharacterManager {
     });
   }
 
+  activate(stateInput, characterId, options = {}) {
+    const state = normalizeCharacterState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    const id = String(characterId || '').trim();
+    const profile = state.profiles[id];
+    if (!profile) throw new Error(`Character ${id || '(missing id)'} does not exist.`);
+    const now = operationTime(options.at);
+    const next = structuredClone(state);
+    next.revision += 1;
+    next.updated_at = now;
+    next.active_character_id = id;
+    return buildResult(state, next, profile, 'character.load', options, {
+      active_character_id: id,
+      profile_version: profile.version,
+    });
+  }
+
+  restore(stateInput, characterId, version, options = {}) {
+    const state = normalizeCharacterState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    const id = String(characterId || state.active_character_id || '').trim();
+    const current = state.profiles[id];
+    if (!current) throw new Error(`Character ${id || '(missing id)'} does not exist.`);
+    const restoredVersion = Number(version);
+    const snapshot = (state.versions[id] || []).find((item) => item.version === restoredVersion);
+    if (!snapshot) throw new Error(`Character ${id} version ${version} does not exist.`);
+    const nextProfileVersion = Math.max(
+      current.version,
+      ...(state.versions[id] || []).map((item) => Number(item.version) || 0),
+    ) + 1;
+    const profile = createCharacterProfile({
+      ...snapshot.profile,
+      character_id: id,
+      version: nextProfileVersion,
+    });
+    const now = operationTime(options.at);
+    const next = structuredClone(state);
+    next.revision += 1;
+    next.updated_at = now;
+    next.active_character_id = id;
+    next.profiles[id] = profile;
+    next.versions[id] = [
+      ...(next.versions[id] || []),
+      createCharacterVersion(profile, now),
+    ].slice(-100);
+    return buildResult(state, next, profile, 'character.restore', options, {
+      restored_from_version: restoredVersion,
+      replaced_profile_version: current.version,
+    });
+  }
+
   updateReferences(state, characterId, references, options = {}) {
     const allowed = new Set(CHARACTER_REVISION_FIELDS);
     for (const key of Object.keys(references || {})) {
