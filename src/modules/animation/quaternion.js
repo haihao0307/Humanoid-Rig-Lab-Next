@@ -145,6 +145,33 @@ export function quaternionFromAxisAngle(axis, angleRadians) {
   ]);
 }
 
+/**
+ * Builds a local joint rotation from the rig's anatomical axis contract.
+ * Channels are radians and are composed in bend/twist/side order by default.
+ * This keeps authored motion independent from mirrored bind-space XYZ signs.
+ */
+export function quaternionFromAnatomicalChannels(axisEntry, channels = {}, order = 'BTS') {
+  const axes = {
+    T: normalizeVector3(axisEntry?.twistAxisLocal, [0, 1, 0]),
+    B: normalizeVector3(axisEntry?.bendAxisLocal, [1, 0, 0]),
+    S: normalizeVector3(axisEntry?.sideAxisLocal, [0, 0, 1]),
+  };
+  const angles = {
+    T: finite(channels?.twist, 0),
+    B: finite(channels?.bend, 0),
+    S: finite(channels?.side, 0),
+  };
+  let result = [...IDENTITY];
+  for (const channel of String(order || 'BTS').toUpperCase()) {
+    if (!axes[channel]) continue;
+    result = multiplyQuaternions(
+      result,
+      quaternionFromAxisAngle(axes[channel], angles[channel]),
+    );
+  }
+  return normalizeQuaternion(result);
+}
+
 export function quaternionFromEuler(xRadians = 0, yRadians = 0, zRadians = 0, order = 'XYZ') {
   let x = xRadians;
   let y = yRadians;

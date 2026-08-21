@@ -613,6 +613,15 @@ body.character-studio-page {
 .character-studio-actions button,
 .character-studio-transport button { min-height: 31px; color: inherit; background: rgba(48, 87, 128, .2); border: 1px solid var(--line, rgba(145, 180, 220, .18)); border-radius: 8px; font-size: 10px; cursor: pointer; }
 .character-studio-actions button:first-child { border-color: rgba(88, 199, 255, .55); }
+.character-studio-animation-library { display: grid; gap: 8px; }
+.character-studio-animation-group { display: grid; gap: 5px; padding: 8px; border: 1px solid var(--line, rgba(145, 180, 220, .18)); border-radius: 7px; background: rgba(4, 11, 20, .42); }
+.character-studio-animation-group > b { color: var(--muted, #8294ad); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+.character-studio-animation-group > div { display: flex; flex-wrap: wrap; gap: 5px; }
+.character-studio-animation-group button,
+.character-studio-animation-mirror { min-height: 27px; padding: 5px 8px; color: inherit; background: rgba(48, 87, 128, .2); border: 1px solid var(--line, rgba(145, 180, 220, .18)); border-radius: 6px; font-size: 9px; cursor: pointer; }
+.character-studio-animation-group button[aria-current="true"] { border-color: rgba(88, 199, 255, .72); background: rgba(32, 115, 160, .34); color: #ccefff; }
+.character-studio-animation-group small { color: var(--muted, #8294ad); font-size: 9px; }
+.character-studio-animation-mirror { width: 100%; margin-top: 7px; border-color: rgba(113, 221, 190, .42); }
 .character-studio-status { margin: 0; padding: 13px 16px 18px; color: var(--muted, #8294ad); font-size: 9px; }
 .character-studio-status[data-error="true"] { color: #ff9b9b; }
 

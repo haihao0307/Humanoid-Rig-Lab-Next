@@ -56,6 +56,13 @@ const SMPL_JOINT_IDS = Object.freeze([
 
 const RUNTIME_WEIGHT_PROFILE = 'anatomical-extended-deform-v3';
 const POSE_CORRECTIVE_PROFILE = 'sparse-anatomical-pose-corrective-v1';
+export const POSE_CORRECTIVE_CHANNELS = Object.freeze([
+  'shoulderRaise',
+  'shoulderTwist',
+  'hipTwist',
+  'elbowFlex',
+  'kneeFlex',
+]);
 
 const POSE_CORRECTIVE_SPECS = Object.freeze([
   {
@@ -2591,6 +2598,65 @@ function applyPoseCorrectiveFields(basePositions, outputPositions, fields, activ
   };
 }
 
+/**
+ * Public, renderer-independent pose-corrective entry point. Each evaluation
+ * starts from restPositions, then produces the POSITION input consumed by the
+ * existing Three.js GPU LBS path. JOINTS_0, WEIGHTS_0 and bind matrices remain
+ * untouched, so repeated frames cannot accumulate vertex deformation.
+ */
+export function applyPoseCorrective(restPositions, outputPositions, {
+  analysis = {},
+  restPoints = null,
+  fields = null,
+} = {}) {
+  if (!restPositions || !outputPositions || restPositions.length !== outputPositions.length) {
+    throw new Error('Pose corrective requires equal-length rest and output position buffers.');
+  }
+  if (restPositions === outputPositions) {
+    throw new Error('Pose corrective output must not alias restPositions.');
+  }
+
+  const normalized = normalizePoseCorrectiveAnalysis(analysis);
+  const resolvedFields = fields ?? buildPoseCorrectiveFields(restPositions, restPoints);
+  const activations = new Map();
+  for (const spec of POSE_CORRECTIVE_SPECS) {
+    const side = spec.id.startsWith('left') ? 'left' : 'right';
+    const activation = spec.category === 'shoulder'
+      ? Math.max(normalized.shoulderRaise[side], Math.abs(normalized.shoulderTwist[side]))
+      : spec.category === 'hip'
+        ? Math.abs(normalized.hipTwist[side])
+        : spec.category === 'elbow'
+          ? normalized.elbowFlex[side]
+          : normalized.kneeFlex[side];
+    activations.set(spec.id, activation);
+  }
+
+  const result = applyPoseCorrectiveFields(restPositions, outputPositions, resolvedFields, activations);
+  const activeChannels = POSE_CORRECTIVE_CHANNELS.filter((channel) => (
+    Math.max(Math.abs(normalized[channel].left), Math.abs(normalized[channel].right)) > 1e-6
+  ));
+  return {
+    ...result,
+    nonAccumulating: true,
+    gpuLbsPreserved: true,
+    activeChannels,
+    channelMaxOffsetM: Object.fromEntries(POSE_CORRECTIVE_CHANNELS.map((channel) => [
+      channel,
+      activeChannels.includes(channel) ? result.maximumInputDisplacement : 0,
+    ])),
+  };
+}
+
+function normalizePoseCorrectiveAnalysis(input) {
+  return Object.fromEntries(POSE_CORRECTIVE_CHANNELS.map((channel) => {
+    const value = input?.[channel];
+    return [channel, {
+      left: clamp(Number(value?.left) || 0, -1, 1),
+      right: clamp(Number(value?.right) || 0, -1, 1),
+    }];
+  }));
+}
+
 function relativeQuaternionAngle(parent, child) {
   const relative = parent.clone().invert().multiply(child).normalize();
   return 2 * Math.acos(clamp(Math.abs(relative.w), 0, 1));
@@ -2601,7 +2667,7 @@ function smoothstep01(value) {
   return t * t * (3 - 2 * t);
 }
 
-function skinMatricesToDualQuaternions(skinMatrices, output = new Float32Array((skinMatrices?.length ?? 0) / 2)) {
+export function skinMatricesToDualQuaternions(skinMatrices, output = new Float32Array((skinMatrices?.length ?? 0) / 2)) {
   const jointCount = Math.floor((skinMatrices?.length ?? 0) / 16);
   if (output.length !== jointCount * 8) {
     throw new Error(`Dual quaternion buffer must contain ${jointCount * 8} values.`);
@@ -2673,7 +2739,7 @@ function matrixElementsToQuaternion(elements, offset = 0) {
 }
 
 /** Dual quaternion deformation keeps shoulder and hip volume better than LBS. */
-function deformSurfaceDqs(
+export function deformSurfaceDqs(
   restPositions,
   restNormals,
   outputPositions,
@@ -2852,6 +2918,7 @@ export const __surfaceTestUtils = Object.freeze({
   reinforceRigidSegmentCore,
   buildPoseCorrectiveFields,
   applyPoseCorrectiveFields,
+  applyPoseCorrective,
   skinMatricesToDualQuaternions,
   matrixElementsToQuaternion,
   relativeQuaternionAngle,

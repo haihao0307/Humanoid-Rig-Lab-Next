@@ -3,6 +3,7 @@ import {
   ANIMATION_ASSET_CATEGORIES,
   getActiveClip,
   importMotionClip,
+  mirrorAnimationClip,
   normalizeClip,
   normalizeAnimationState,
   resolveSemanticMotionChannel,
@@ -18,6 +19,7 @@ import {
 import {
   buildV8PosePayload,
   collectAnimationEvents,
+  createAnatomicalJointRotation,
   createIdentityAnimationPose,
   createRigContext,
   deriveLocalPoseFromV8Payload,
@@ -25,6 +27,7 @@ import {
   forwardKinematics,
   measureBoneLengthError,
   retargetAnimationClip,
+  resolveAnatomicalRotation,
   sampleAnimationRuntime,
 } from '../src/modules/animation/runtime.js';
 import { evaluateAnimationGraph } from '../src/modules/animation/graph.js';
@@ -79,6 +82,68 @@ const base = normalizeAnimationState({}, {
   targetProportionRevision: 7,
 });
 const playableIds = ['idle-breathe', 'wave', 'head-nod', 'squat', 'walk-in-place', 'walk-forward'];
+const standardRig = createRigContext(profiles[0].value, { rigVersion: 'rig@0.4.0' });
+assert.equal(standardRig.jointAxes.schema, 'humanoid_rig/joint_axes@1.0');
+assert.equal(standardRig.jointAxisMap.size, 89);
+assert.ok(Math.abs(Math.hypot(...createAnatomicalJointRotation(
+  standardRig,
+  'rightUpperArm',
+  { bend: 20 * Math.PI / 180, side: 5 * Math.PI / 180 },
+)) - 1) < 1e-10);
+const anatomicalAngle = 0.4;
+for (const channel of ['twist', 'bend', 'side']) {
+  const quaternion = resolveAnatomicalRotation(
+    standardRig,
+    'leftUpperArm',
+    channel === 'twist' ? anatomicalAngle : 0,
+    channel === 'bend' ? anatomicalAngle : 0,
+    channel === 'side' ? anatomicalAngle : 0,
+  );
+  const axis = standardRig.jointAxes.entries.leftUpperArm[`${channel}AxisLocal`];
+  const sine = Math.sin(anatomicalAngle / 2);
+  assert.ok(Math.abs(quaternion[0] - axis[0] * sine) < 1e-9, `${channel} X axis conversion failed.`);
+  assert.ok(Math.abs(quaternion[1] - axis[1] * sine) < 1e-9, `${channel} Y axis conversion failed.`);
+  assert.ok(Math.abs(quaternion[2] - axis[2] * sine) < 1e-9, `${channel} Z axis conversion failed.`);
+  assert.ok(Math.abs(quaternion[3] - Math.cos(anatomicalAngle / 2)) < 1e-9, `${channel} angle conversion failed.`);
+}
+const leftArmAxes = standardRig.jointAxes.entries.leftUpperArm;
+const rightArmAxes = standardRig.jointAxes.entries.rightUpperArm;
+assert.deepEqual(rightArmAxes.twistAxisLocal, [-leftArmAxes.twistAxisLocal[0], leftArmAxes.twistAxisLocal[1], leftArmAxes.twistAxisLocal[2]]);
+assert.deepEqual(rightArmAxes.bendAxisLocal, [leftArmAxes.bendAxisLocal[0], -leftArmAxes.bendAxisLocal[1], leftArmAxes.bendAxisLocal[2]]);
+assert.deepEqual(rightArmAxes.sideAxisLocal, [-leftArmAxes.sideAxisLocal[0], leftArmAxes.sideAxisLocal[1], leftArmAxes.sideAxisLocal[2]]);
+
+// Final-regression guard: the animation rig receives the existing bind-local
+// joint-axis contract through its canonical V8 definition. Every sampled axis
+// must remain a right-handed orthonormal basis.
+const jointAxisContext = createRigContext(profiles[0].value, { rigVersion: 'rig@0.4.0' });
+const runtimeJointAxes = jointAxisContext.jointAxes;
+assert.ok(
+  runtimeJointAxes,
+  'createRigContext() must expose jointAxes directly to Animation Runtime.',
+);
+assert.equal(runtimeJointAxes.schema, 'humanoid_rig/joint_axes@1.0');
+assert.equal(runtimeJointAxes.space, 'joint-local-at-bind');
+for (const jointId of [
+  'leftUpperArm',
+  'rightUpperArm',
+  'leftLowerArm',
+  'rightLowerArm',
+  'leftUpperLeg',
+  'rightUpperLeg',
+  'leftLowerLeg',
+  'rightLowerLeg',
+]) {
+  const axes = runtimeJointAxes.entries[jointId];
+  assert.ok(axes, `Animation rig is missing jointAxes for ${jointId}.`);
+  const { twistAxisLocal: twist, bendAxisLocal: bend, sideAxisLocal: side } = axes;
+  for (const axis of [twist, bend, side]) {
+    assert.ok(Math.abs(Math.hypot(...axis) - 1) < 1e-6, `${jointId} contains a non-unit axis.`);
+  }
+  assert.ok(Math.abs(dot(twist, bend)) < 1e-6, `${jointId} twist/bend axes are not orthogonal.`);
+  assert.ok(Math.abs(dot(twist, side)) < 1e-6, `${jointId} twist/side axes are not orthogonal.`);
+  assert.ok(Math.abs(dot(bend, side)) < 1e-6, `${jointId} bend/side axes are not orthogonal.`);
+  assert.ok(dot(cross(twist, bend), side) > 0.999999, `${jointId} axes are not right-handed.`);
+}
 
 assert.deepEqual(ANIMATION_ASSET_CATEGORIES, [
   'idle', 'locomotion', 'jump', 'gesture', 'combat', 'interaction',
@@ -138,6 +203,58 @@ assert.deepEqual(
   sampleAnimationClip(normalizedLegacyRotationClip, 0.8),
   sampleAnimationClip(assetWaveClip, 0.8),
   'semantic metadata must not alter legacy rotationTrack sampling',
+);
+const legacyPlayableAnimation = {
+  ...base,
+  activeClipId: normalizedLegacyRotationClip.clipId,
+  clips: base.clips.map((clip) => (
+    clip.clipId === normalizedLegacyRotationClip.clipId
+      ? normalizedLegacyRotationClip
+      : clip
+  )),
+};
+const legacyRuntimeFrame = sampleAnimationRuntime(legacyPlayableAnimation, {
+  rawTime: 0.8,
+  bodyProfile: profiles[0].value,
+  rigVersion: 'rig@0.4.0',
+});
+const currentRuntimeFrame = sampleAnimationRuntime({ ...base, activeClipId: assetWaveClip.clipId }, {
+  rawTime: 0.8,
+  bodyProfile: profiles[0].value,
+  rigVersion: 'rig@0.4.0',
+});
+assert.deepEqual(
+  legacyRuntimeFrame.finalPose,
+  currentRuntimeFrame.finalPose,
+  'Legacy AnimationClip rotation tracks no longer produce the same runtime pose.',
+);
+
+const mirroredWaveClip = mirrorAnimationClip(assetWaveClip, {
+  clipId: 'wave-left-regression',
+  name: 'Wave Left Regression',
+});
+assert.equal(mirroredWaveClip.metadata.mirroredFrom, assetWaveClip.clipId);
+assert.deepEqual(
+  mirroredWaveClip.tracks.map((track) => track.jointId),
+  ['leftUpperArm', 'leftLowerArm', 'leftHand'],
+);
+assert.equal(mirroredWaveClip.semanticChannels[0].semantic, 'leftArmSwing');
+const mirroredWaveFrame = sampleAnimationRuntime({
+  ...base,
+  activeClipId: mirroredWaveClip.clipId,
+  clips: [...base.clips, mirroredWaveClip],
+}, {
+  rawTime: 0.65,
+  bodyProfile: profiles[0].value,
+});
+assert.ok(
+  mirroredWaveFrame.fk.positions.get('leftHand')[1]
+    > mirroredWaveFrame.fk.positions.get('leftUpperArm')[1] + 0.35,
+  'Mirrored wave did not transfer the raised-hand motion to the left arm.',
+);
+assert.ok(
+  distance(mirroredWaveFrame.fk.positions.get('rightHand'), restPointFromContext(jointAxisContext, 'rightHand')) < 1e-10,
+  'Mirrored wave changed the untouched right arm.',
 );
 
 for (const profile of profiles) {
@@ -244,6 +361,46 @@ assert.deepEqual(
   longArmWave.finalPose.joints.rightUpperArm.rotation,
   'the source local quaternion remains reusable across compatible proportions',
 );
+assert.equal(standardWave.diagnostics.jointAxesSchema, 'humanoid_rig/joint_axes@1.0');
+assert.equal(standardWave.diagnostics.jointAxesEntryCount, 89);
+assert.equal(standardWave.diagnostics.incomingRotationPreservesTwist, true);
+assert.ok(
+  standardHand[1] > standardWave.fk.positions.get('rightShoulder')[1] + 0.2,
+  'Right-hand wave must raise the hand above the shoulder.',
+);
+assert.ok(
+  distance(standardWave.fk.positions.get('leftHand'), standardRig.restPositions.get('leftHand')) < 1e-10,
+  'Right-hand wave unexpectedly moved the left arm.',
+);
+
+const nodDownFrame = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: 'head-nod' }), {
+  rawTime: 0.35,
+  bodyProfile: profiles[0].value,
+});
+assert.ok(nodDownFrame.fk.positions.get('headTop')[2] > standardRig.restPositions.get('headTop')[2] + 0.05);
+assert.ok(nodDownFrame.fk.positions.get('headTop')[1] < standardRig.restPositions.get('headTop')[1] - 0.01);
+
+const squatDown = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: 'squat' }), {
+  rawTime: 1.05,
+  bodyProfile: profiles[0].value,
+});
+assert.ok(squatDown.fk.positions.get('leftLowerLeg')[2] > squatDown.fk.positions.get('leftUpperLeg')[2] + 0.2);
+assert.ok(squatDown.fk.positions.get('rightLowerLeg')[2] > squatDown.fk.positions.get('rightUpperLeg')[2] + 0.2);
+assert.ok(squatDown.fk.positions.get('leftHand')[2] > standardRig.restPositions.get('leftHand')[2] + 0.08);
+assert.ok(squatDown.fk.positions.get('rightHand')[2] > standardRig.restPositions.get('rightHand')[2] + 0.08);
+
+const walkFirstHalf = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: 'walk-in-place' }), {
+  rawTime: 0,
+  bodyProfile: profiles[0].value,
+});
+const walkSecondHalf = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: 'walk-in-place' }), {
+  rawTime: 0.6,
+  bodyProfile: profiles[0].value,
+});
+assert.ok(walkFirstHalf.fk.positions.get('leftLowerLeg')[2] > walkFirstHalf.fk.positions.get('rightLowerLeg')[2] + 0.2);
+assert.ok(walkFirstHalf.fk.positions.get('rightHand')[2] > walkFirstHalf.fk.positions.get('leftHand')[2] + 0.2);
+assert.ok(walkSecondHalf.fk.positions.get('rightLowerLeg')[2] > walkSecondHalf.fk.positions.get('leftLowerLeg')[2] + 0.2);
+assert.ok(walkSecondHalf.fk.positions.get('leftHand')[2] > walkSecondHalf.fk.positions.get('rightHand')[2] + 0.2);
 
 const shortWalk = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: 'walk-forward' }), {
   rawTime: 1.8,
@@ -310,6 +467,18 @@ assert.ok(quaternionAngularDistance(
 ) > 0.1);
 assert.equal(mixed.diagnostics.layers.length, 3);
 
+const zeroWeightBase = setAnimationLayer(
+  normalizeAnimationState({ ...base, activeClipId: 'wave' }),
+  'base',
+  { weight: 0 },
+);
+const zeroWeightFrame = sampleAnimationRuntime(zeroWeightBase, { rawTime: 0.8, bodyProfile: profiles[0].value });
+assert.ok(quaternionAngularDistance(
+  zeroWeightFrame.finalPose.joints.rightUpperArm.rotation,
+  [0, 0, 0, 1],
+) < 1e-10, 'base blend weight 0 must preview the rest pose');
+assert.equal(zeroWeightFrame.diagnostics.layers[0].weight, 0);
+
 let graphAnimation = normalizeAnimationState({});
 graphAnimation = setGraphParameter(graphAnimation, 'wave', true);
 assert.equal(graphAnimation.graph.controlMode, 'graph');
@@ -351,7 +520,7 @@ assert.equal(Object.keys(roundTripPayload.localRotations).length, 89);
 assert.ok(Object.keys(roundTripPayload.incomingBoneLocalRotations).length >= 50);
 assert.equal(
   roundTripPayload.rotationConventions.incomingBoneLocalRotations,
-  'incoming_bone_bind_delta_zero_twist',
+  'incoming_bone_bind_delta_full_quaternion',
 );
 const incomingChildren = new Map();
 for (const joint of standardWave.fk.rig.joints) {
@@ -381,13 +550,26 @@ const rebuildIncoming = (parentId) => {
 };
 rebuildIncoming('hips');
 let maximumIncomingAdapterError = 0;
+let maximumIncomingOrientationError = 0;
 for (const [jointId, position] of incomingPositions) {
   maximumIncomingAdapterError = Math.max(
     maximumIncomingAdapterError,
     distance(position, standardWave.fk.positions.get(jointId)),
   );
 }
+for (const [parentId, children] of incomingChildren) {
+  for (const child of children) {
+    maximumIncomingOrientationError = Math.max(
+      maximumIncomingOrientationError,
+      quaternionAngularDistance(
+        incomingWorldRotations.get(child.id),
+        standardWave.fk.rotations.get(parentId),
+      ),
+    );
+  }
+}
 assert.ok(maximumIncomingAdapterError < 1e-8, `incoming-bone adapter error ${maximumIncomingAdapterError}`);
+assert.ok(maximumIncomingOrientationError < 1e-7, `incoming-bone orientation error ${maximumIncomingOrientationError}`);
 assert.ok(Object.values(roundTripPayload.localRotations).every((rotation) => (
   Math.abs(Math.hypot(...rotation) - 1) < 1e-10
 )));
@@ -412,4 +594,20 @@ console.log('PASS AnimationAssetMetadata, semantic motion channels, legacy rotat
 
 function distance(a, b) {
   return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+}
+
+function dot(a, b) {
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+function cross(a, b) {
+  return [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+}
+
+function restPointFromContext(context, jointId) {
+  return context.restPositions.get(jointId);
 }

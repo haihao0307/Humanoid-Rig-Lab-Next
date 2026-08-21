@@ -13,11 +13,13 @@ import {
 import { normalizeProjectState } from '../src/state-schema.js';
 import { normalizeAnimationState } from '../src/modules/animation/model.js';
 import { sampleAnimationRuntime } from '../src/modules/animation/runtime.js';
+import { POSE_SNAPSHOT_SCHEMA } from '../src/modules/pose/pose-contract.js';
 import { PhysicsRig } from '../legacy/v8/src/physics-rig.js';
 import { createStandardHumanoidPreset } from '../legacy/v8/src/skeleton-presets.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const state = createDefaultState();
+const projectStateRegressionSignature = JSON.stringify(state);
 assert.equal(state.build.id, BUILD_ID);
 assert.deepEqual(state.activeVersions, ACTIVE_VERSIONS);
 assert.deepEqual(state.moduleRevisions, MODULE_BASE_REVISIONS);
@@ -70,7 +72,7 @@ assert.ok(runtimeFrame.diagnostics.simulationRigBoneLengthError < 1e-8);
 
 const timestamp = new Date().toISOString();
 const snapshot = {
-  schema: 'humanoid_rig/pose_snapshot@1.0',
+  schema: POSE_SNAPSHOT_SCHEMA,
   schemaVersion: 1,
   type: 'PoseSnapshot',
   compatibleRig: state.activeVersions.rig,
@@ -89,6 +91,7 @@ const snapshot = {
   pinnedJoints: {},
   updatedAt: timestamp,
 };
+assert.equal(POSE_SNAPSHOT_SCHEMA, 'humanoid_rig/pose_snapshot@1.0');
 const definition = createStandardHumanoidPreset('A');
 const physicsRig = new PhysicsRig(definition);
 const bindSignature = definition.joints.map((joint) => `${joint.id}|${joint.parentId}|${JSON.stringify(joint.localPosition)}`).join('\n');
@@ -137,6 +140,11 @@ const buildManifest = JSON.parse(await readFile(join(root, 'BUILD_MANIFEST.json'
 assert.equal(buildManifest.id, BUILD_ID);
 assert.deepEqual(buildManifest.activeVersions, ACTIVE_VERSIONS);
 assert.deepEqual(buildManifest.moduleRevisions, MODULE_BASE_REVISIONS);
+assert.equal(
+  JSON.stringify(state),
+  projectStateRegressionSignature,
+  'Animation sampling, PoseSnapshot application, or asset validation mutated ProjectState.',
+);
 
 console.log(`PASS integrated build ${BUILD_ID}`);
 console.log('PASS baseline-state migration to all four V002 module versions');

@@ -30,6 +30,10 @@ import {
   CHARACTER_STUDIO_PANELS,
   renderCharacterStudioSidebar,
 } from '../apps/character-studio/components/character-studio-sidebar.js';
+import {
+  ANIMATION_LIBRARY_CATEGORIES,
+  buildAnimationLibrary,
+} from '../apps/character-studio/animation-library.js';
 
 const characterManager = new CharacterManager();
 const bodyShapeEditor = new BodyShapeEditor();
@@ -225,6 +229,19 @@ assert.deepEqual(CHARACTER_STUDIO_PANELS.map((panel) => panel.title), [
 for (const panel of CHARACTER_STUDIO_PANELS) {
   assert.match(markup, new RegExp(`data-character-section="${panel.id}"`));
 }
+assert.deepEqual(ANIMATION_LIBRARY_CATEGORIES.map((category) => category.label), [
+  'Idle', 'Walk', 'Run', 'Jump', 'Gesture', 'Combat',
+]);
+assert.match(markup, /data-animation-library-clip="idle-breathe"/);
+assert.match(markup, /data-animation-speed|data-field="speed"/);
+assert.match(markup, /data-field="trimStart"/);
+assert.match(markup, /data-field="trimEnd"/);
+assert.match(markup, /data-field="blendWeight"/);
+assert.match(markup, /data-animation-mirror/);
+const initialLibrary = buildAnimationLibrary(snapshot.animation.clips);
+assert.ok(initialLibrary.idle.some((clip) => clip.clipId === 'idle-breathe'));
+assert.ok(initialLibrary.walk.some((clip) => clip.clipId === 'walk-forward'));
+assert.ok(initialLibrary.gesture.some((clip) => clip.clipId === 'wave'));
 
 controller.applyIdentity({ name: 'Studio Character', identityId: 'identity_studio', tags: 'hero, editable' });
 snapshot = controller.snapshot();
@@ -296,6 +313,19 @@ assert.deepEqual(hub.getState().character.bodyProfile, proportionBeforePose, 'Po
 const bindingBeforeAnimation = structuredClone(hub.getState().character.skin);
 controller.selectAnimationClip('wave');
 assert.equal(controller.snapshot().activeClip.clipId, 'wave');
+controller.configureAnimationPreview({ clipId: 'walk-forward', speed: 1.25, trimStart: 0.1, trimEnd: 0.9, blendWeight: 0.65 }, 900);
+snapshot = controller.snapshot();
+assert.equal(snapshot.activeClip.clipId, 'walk-forward');
+assert.equal(snapshot.animation.graph.controlMode, 'clip', 'Library selection must not fall back through the animation graph');
+assert.equal(snapshot.animation.transport.speed, 1.25);
+assert.equal(snapshot.animation.transport.loopStart, 0.1);
+assert.equal(snapshot.animation.transport.loopEnd, 0.9);
+assert.equal(snapshot.animation.layers.find((layer) => layer.layerId === 'base').weight, 0.65);
+const mirroredClipId = controller.mirrorActiveAnimation();
+snapshot = controller.snapshot();
+assert.equal(snapshot.activeClip.clipId, mirroredClipId);
+assert.equal(snapshot.activeClip.metadata.mirroredFrom, 'walk-forward');
+controller.selectAnimationClip('wave');
 controller.playAnimation(1_000);
 assert.equal(controller.snapshot().animation.transport.playing, true);
 controller.pauseAnimation(1_500);

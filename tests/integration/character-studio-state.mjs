@@ -11,6 +11,7 @@ import {
   serializeCharacterProfileExport,
 } from '../../apps/character-studio/index.js';
 import { createDefaultState } from '../../src/default-state.js';
+import { CHARACTER_PROFILE_SCHEMA } from '../../packages/character-core/index.js';
 import { CharacterStudioTestNetwork } from '../helpers/character-studio-test-hub.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -65,7 +66,7 @@ const exported = await session.exportCharacterProfile('character_studio_test', {
   exportedAt: '2026-08-21T02:05:00.000Z',
 });
 assert.equal(exported.schema, CHARACTER_PROFILE_EXPORT_SCHEMA);
-assert.equal(exported.schemas.character_profile, 'humanoid_rig/character_profile@1.4');
+assert.equal(exported.schemas.character_profile, CHARACTER_PROFILE_SCHEMA);
 assert.equal(exported.character_profile.version, 2);
 assert.equal(exported.version.character_revision, hub.getState().characterCore.revision);
 assert.equal(exported.module_references.appearance.revision, hub.getState().appearanceSystem.revision);

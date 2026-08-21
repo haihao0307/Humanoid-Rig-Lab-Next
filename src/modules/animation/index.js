@@ -987,13 +987,21 @@ function buildAnimationPoseSnapshot(localPose, state, v8Payload) {
     source: 'animation-runtime-v0.4',
     sourceRepresentation: 'local_quaternion_animation',
     rotationSpace: 'local',
-    rotationConvention: 'incoming_bone_bind_delta_zero_twist',
+    rotationConvention: v8Payload?.rotationConventions?.incomingBoneLocalRotations
+      ?? 'incoming_bone_bind_delta_full_quaternion',
     rootJointId: 'hips',
     rootTranslation: [...localPose.root.position],
     rootRotation: [...localPose.root.rotation],
     localRotations: structuredClone(v8Payload?.incomingBoneLocalRotations ?? {}),
     ikTargets: [],
     pinnedJoints: {},
+    diagnostics: {
+      rotationDataCompleteness: 'full_quaternion',
+      twistDataAvailable: true,
+      jointAxisAdapterRequiredForStandardAnimation: false,
+      lossyRotationConversion: false,
+      warningCodes: [],
+    },
     updatedAt,
     sourceLegacyUpdatedAt: updatedAt,
   };

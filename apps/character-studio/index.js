@@ -24,6 +24,7 @@ import {
   createFaceAnimationLayer,
   FACE_EXPRESSION_CHANNEL_DEFINITIONS,
 } from '../../packages/face-system/index.js';
+import { CHARACTER_PROFILE_SCHEMA } from '../../packages/character-core/index.js';
 
 const HOST_PROTOCOL = 'humanoid-rig-lab-next:viewport';
 const CHARACTER_STUDIO_HOST_MODULE = 'character-studio';
@@ -240,7 +241,7 @@ export class RightPanelHost {
         ${dataRow('Viewport pose', 'finalPose → simulationRig')}
         ${dataRow('Render stack', 'Character → Skin → Clothing → Appearance')}
         ${dataRow('Saved revision', `r${Number(sessionSnapshot?.project_revision || state.revision || 0)}`)}
-        ${dataRow('Profile schema', profile?.schema || 'humanoid_rig/character_profile@1.4')}
+        ${dataRow('Profile schema', profile?.schema || CHARACTER_PROFILE_SCHEMA)}
         ${dataRow('Face Runtime', expressionDescriptor?.deformationMode || 'interface-only')}
         ${dataRow('Animation Layer', runtime.faceAnimationLayer?.layerType || 'face-expression')}
         ${dataRow('Build', BUILD_ID)}

@@ -12,6 +12,134 @@
   "loop_mode": "repeat",
   "root_motion_mode": "root_motion",
   "root_joint_id": "hips",
+  "asset_metadata": {
+    "schema": "humanoid_rig/animation_asset_metadata@1.0",
+    "type": "AnimationAssetMetadata",
+    "clipId": "walk-forward",
+    "name": "Walk Forward",
+    "category": "locomotion",
+    "tags": [],
+    "compatibleRig": "rig@0.4.0",
+    "requiredChains": [
+      "left_arm",
+      "right_arm",
+      "left_leg",
+      "right_leg",
+      "root",
+      "spine"
+    ],
+    "contacts": [
+      {
+        "id": "contact-leftFoot-0",
+        "jointId": "leftFoot",
+        "start": 0,
+        "end": 0.52,
+        "mode": "world_lock",
+        "positionWeight": 1,
+        "rotationWeight": 0.65,
+        "groundNormal": [
+          0,
+          1,
+          0
+        ],
+        "metadata": {}
+      },
+      {
+        "id": "contact-rightFoot-0-6",
+        "jointId": "rightFoot",
+        "start": 0.6,
+        "end": 1.12,
+        "mode": "world_lock",
+        "positionWeight": 1,
+        "rotationWeight": 0.65,
+        "groundNormal": [
+          0,
+          1,
+          0
+        ],
+        "metadata": {}
+      }
+    ],
+    "rootMotion": {
+      "mode": "root_motion",
+      "rootJointId": "hips",
+      "enabled": true
+    },
+    "mirrorSupport": true,
+    "retargetPolicy": {
+      "mode": "local_rotation",
+      "scaleRootMotionByHeight": true,
+      "preserveContacts": true,
+      "clampJointLimits": true,
+      "axisProfile": "smpl24_controls28@1",
+      "mapping": {}
+    },
+    "quality": {
+      "validated": true,
+      "maxBoneLengthError": 0,
+      "maxContactError": null,
+      "maxJointAngularVelocity": null,
+      "warnings": []
+    }
+  },
+  "semantic_channels": [
+    {
+      "channelId": "leftArmSwing",
+      "semantic": "leftArmSwing",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    },
+    {
+      "channelId": "rightArmSwing",
+      "semantic": "rightArmSwing",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    },
+    {
+      "channelId": "leftLegStep",
+      "semantic": "leftLegStep",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    },
+    {
+      "channelId": "rightLegStep",
+      "semantic": "rightLegStep",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    },
+    {
+      "channelId": "footContact",
+      "semantic": "footContact",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    },
+    {
+      "channelId": "bodyLean",
+      "semantic": "bodyLean",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    },
+    {
+      "channelId": "breathing",
+      "semantic": "breathing",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    }
+  ],
   "tracks": [
     {
       "track_id": "hips:position",

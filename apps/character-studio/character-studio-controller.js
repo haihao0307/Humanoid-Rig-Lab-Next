@@ -17,10 +17,13 @@ import { normalizeAppearanceState } from '../../packages/appearance-system/index
 import { createDefaultState } from '../../src/default-state.js';
 import { posePreset } from '../../src/modules/pose/index.js';
 import {
+  addClip,
   getActiveClip,
+  mirrorAnimationClip,
   normalizeAnimationState,
   resolveTransportPlaybackStart,
   setActiveClip,
+  setAnimationLayer,
   setTransport,
 } from '../../src/modules/animation/model.js';
 import {
@@ -234,6 +237,44 @@ export class CharacterStudioController {
     return this.#syncModuleReference('animation', 'animation_revision');
   }
 
+  configureAnimationPreview({ clipId, speed = 1, trimStart = 0, trimEnd = null, blendWeight = 1 } = {}, nowMs = Date.now()) {
+    this.#mutateAnimation(`Character Studio 配置动画 ${clipId || ''}`.trim(), (animationInput) => {
+      let animation = clipId ? setActiveClip(animationInput, clipId) : animationInput;
+      const clip = getActiveClip(animation);
+      const start = finiteInRange(trimStart, 0, clip.duration, 'trimStart');
+      const end = finiteInRange(trimEnd ?? clip.duration, 0, clip.duration, 'trimEnd');
+      if (end <= start) throw new RangeError('trimEnd must be greater than trimStart.');
+      const playbackSpeed = finiteInRange(speed, -4, 4, 'speed');
+      const weight = finiteInRange(blendWeight, 0, 1, 'blendWeight');
+      animation = setTransport(animation, {
+        playing: false,
+        speed: playbackSpeed,
+        time: start,
+        anchorTime: start,
+        anchorRawTime: start,
+        loopStart: start,
+        loopEnd: end,
+      }, nowMs);
+      return setAnimationLayer(animation, 'base', { weight });
+    });
+    return this.#syncModuleReference('animation', 'animation_revision');
+  }
+
+  mirrorActiveAnimation() {
+    let mirroredClipId = null;
+    this.#mutateAnimation('Character Studio 镜像当前动画', (animation) => {
+      const source = getActiveClip(animation);
+      if (source.assetMetadata?.mirrorSupport === false) {
+        throw new Error(`${source.name} does not support mirroring.`);
+      }
+      const next = addClip(animation, mirrorAnimationClip(source));
+      mirroredClipId = next.activeClipId;
+      return next;
+    });
+    this.#syncModuleReference('animation', 'animation_revision');
+    return mirroredClipId;
+  }
+
   playAnimation(nowMs = Date.now()) {
     this.#mutateAnimation('Character Studio 播放动画', (animation) => {
       const start = resolveTransportPlaybackStart(animation, nowMs);
@@ -353,6 +394,14 @@ function pickFinite(input, keys) {
     result[key] = value;
   }
   return result;
+}
+
+function finiteInRange(value, minimum, maximum, name) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number < minimum || number > maximum) {
+    throw new RangeError(`${name} must be between ${minimum} and ${maximum}.`);
+  }
+  return number;
 }
 
 function normalizeTags(value) {

@@ -12,6 +12,70 @@
   "loop_mode": "once",
   "root_motion_mode": "in_place",
   "root_joint_id": "hips",
+  "asset_metadata": {
+    "schema": "humanoid_rig/animation_asset_metadata@1.0",
+    "type": "AnimationAssetMetadata",
+    "clipId": "head-nod",
+    "name": "Head Nod",
+    "category": "gesture",
+    "tags": [],
+    "compatibleRig": "rig@0.4.0",
+    "requiredChains": [
+      "root",
+      "spine",
+      "head",
+      "left_arm",
+      "right_arm"
+    ],
+    "contacts": [],
+    "rootMotion": {
+      "mode": "in_place",
+      "rootJointId": "hips",
+      "enabled": false
+    },
+    "mirrorSupport": true,
+    "retargetPolicy": {
+      "mode": "local_rotation",
+      "scaleRootMotionByHeight": true,
+      "preserveContacts": true,
+      "clampJointLimits": true,
+      "axisProfile": "smpl24_controls28@1",
+      "mapping": {}
+    },
+    "quality": {
+      "validated": true,
+      "maxBoneLengthError": 0,
+      "maxContactError": null,
+      "maxJointAngularVelocity": null,
+      "warnings": []
+    }
+  },
+  "semantic_channels": [
+    {
+      "channelId": "bodyLean",
+      "semantic": "bodyLean",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    },
+    {
+      "channelId": "headGesture",
+      "semantic": "headGesture",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    },
+    {
+      "channelId": "breathing",
+      "semantic": "breathing",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    }
+  ],
   "tracks": [
     {
       "track_id": "neck:rotation",

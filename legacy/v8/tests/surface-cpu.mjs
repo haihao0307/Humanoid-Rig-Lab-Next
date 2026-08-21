@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { __surfaceTestUtils } from '../src/smpl-skin.js';
+import { EXPERIMENTAL_DQS_RENDERER, ExperimentalDqsRenderer } from '../src/experimental-dqs-renderer.js';
 
 const {
   deformSurfaceLbs,
@@ -121,6 +122,26 @@ const {
   assert.deepEqual(
     [...dqsPositions].map((value) => Number(value.toFixed(6))),
     [...lbsPositions].map((value) => Number(value.toFixed(6))),
+  );
+  assert.equal(EXPERIMENTAL_DQS_RENDERER.defaultRenderer, false);
+  assert.equal(EXPERIMENTAL_DQS_RENDERER.defaultSkinningMode, 'lbs');
+  assert.throws(() => new ExperimentalDqsRenderer().deform({
+    restPositions,
+    restNormals,
+    skinIndices,
+    skinWeights,
+    boneTransforms: skinMatrices,
+  }), /explicitly enabled/);
+  const experimental = new ExperimentalDqsRenderer({ enabled: true }).deform({
+    restPositions,
+    restNormals,
+    skinIndices,
+    skinWeights,
+    boneTransforms: skinMatrices,
+  });
+  assert.deepEqual(
+    [...experimental.positions].map((value) => Number(value.toFixed(6))),
+    [...dqsPositions].map((value) => Number(value.toFixed(6))),
   );
 }
 

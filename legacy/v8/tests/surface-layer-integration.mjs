@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { createSmplSkinLayer, SKIN_RUNTIME_BUILD, __surfaceTestUtils } from '../src/smpl-skin.js';
+import { applyPoseCorrective, createSmplSkinLayer, SKIN_RUNTIME_BUILD, __surfaceTestUtils } from '../src/smpl-skin.js';
+import { computeRestWorldPositions } from '../src/skeleton-model.js';
 import { applyBodyProfileToDefinition } from '../src/body-profile.js';
 import { createStandardHumanoidPreset, normalizeSkeletonDefinition } from '../src/skeleton-presets.js';
 
@@ -674,6 +675,22 @@ for (let index = 0; index < dqsReference.length; index += 3) {
 }
 assert.equal(dqsNonFiniteCount, 0);
 assert.ok(maximumDqsReferenceDelta < 0.35, `DQS reference diverged ${maximumDqsReferenceDelta.toFixed(4)} m from final LBS.`);
+const correctiveRestPoints = computeRestWorldPositions(normalizeSkeletonDefinition(createStandardHumanoidPreset('A')));
+for (const channel of ['shoulderRaise', 'shoulderTwist', 'hipTwist', 'elbowFlex', 'kneeFlex']) {
+  const first = new Float32Array(layer.restPositions.length);
+  const second = new Float32Array(layer.restPositions.length);
+  const analysis = { [channel]: { left: 1, right: 0 } };
+  const firstResult = applyPoseCorrective(layer.restPositions, first, { analysis, restPoints: correctiveRestPoints });
+  const secondResult = applyPoseCorrective(layer.restPositions, second, { analysis, restPoints: correctiveRestPoints });
+  assert.ok(firstResult.activeChannels.includes(channel), `${channel} was not reported as active.`);
+  assert.ok(firstResult.correctedVertexCount > 0, `${channel} did not correct any vertices.`);
+  assert.ok(firstResult.channelMaxOffsetM[channel] > 0, `${channel} produced no measurable offset.`);
+  assert.deepEqual(second, first, `${channel} accumulated between identical evaluations.`);
+  assert.equal(secondResult.nonAccumulating, true);
+}
+const restoredCorrective = new Float32Array(layer.restPositions.length);
+applyPoseCorrective(layer.restPositions, restoredCorrective, { restPoints: correctiveRestPoints });
+assert.deepEqual(restoredCorrective, layer.restPositions, 'Bind pose did not restore the rest vertex buffer.');
 const uncorrectedT = new Float32Array(layer.restPositions.length);
 deformSurfaceLbs(
   layer.shapedRestPositions ?? layer.restPositions,

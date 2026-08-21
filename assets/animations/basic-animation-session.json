@@ -293,6 +293,40 @@
           ]
         }
       ],
+      "semanticChannels": [
+        {
+          "channelId": "leftArmSwing",
+          "semantic": "leftArmSwing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "rightArmSwing",
+          "semantic": "rightArmSwing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "bodyLean",
+          "semantic": "bodyLean",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "breathing",
+          "semantic": "breathing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        }
+      ],
       "poseKeys": [],
       "poseSnapshots": [],
       "events": [
@@ -338,6 +372,43 @@
         "status": "validated-demo",
         "category": "idle",
         "additiveFriendly": true
+      },
+      "assetMetadata": {
+        "schema": "humanoid_rig/animation_asset_metadata@1.0",
+        "type": "AnimationAssetMetadata",
+        "clipId": "idle-breathe",
+        "name": "Idle Breathe",
+        "category": "idle",
+        "tags": [],
+        "compatibleRig": "rig@0.4.0",
+        "requiredChains": [
+          "left_arm",
+          "right_arm",
+          "root",
+          "spine"
+        ],
+        "contacts": [],
+        "rootMotion": {
+          "mode": "in_place",
+          "rootJointId": "hips",
+          "enabled": false
+        },
+        "mirrorSupport": true,
+        "retargetPolicy": {
+          "mode": "local_rotation",
+          "scaleRootMotionByHeight": true,
+          "preserveContacts": true,
+          "clampJointLimits": true,
+          "axisProfile": "smpl24_controls28@1",
+          "mapping": {}
+        },
+        "quality": {
+          "validated": true,
+          "maxBoneLengthError": 0,
+          "maxContactError": null,
+          "maxJointAngularVelocity": null,
+          "warnings": []
+        }
       }
     },
     {
@@ -580,6 +651,16 @@
           ]
         }
       ],
+      "semanticChannels": [
+        {
+          "channelId": "rightArmSwing",
+          "semantic": "rightArmSwing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        }
+      ],
       "poseKeys": [],
       "poseSnapshots": [],
       "events": [
@@ -642,6 +723,40 @@
           "lateralConvention": "left-joints-negative-X/right-joints-positive-X"
         },
         "authoringMethod": "directed-bone-chain"
+      },
+      "assetMetadata": {
+        "schema": "humanoid_rig/animation_asset_metadata@1.0",
+        "type": "AnimationAssetMetadata",
+        "clipId": "wave",
+        "name": "Right Hand Wave",
+        "category": "gesture",
+        "tags": [],
+        "compatibleRig": "rig@0.4.0",
+        "requiredChains": [
+          "right_arm"
+        ],
+        "contacts": [],
+        "rootMotion": {
+          "mode": "in_place",
+          "rootJointId": "hips",
+          "enabled": false
+        },
+        "mirrorSupport": true,
+        "retargetPolicy": {
+          "mode": "local_rotation",
+          "scaleRootMotionByHeight": true,
+          "preserveContacts": true,
+          "clampJointLimits": true,
+          "axisProfile": "smpl24_controls28@1",
+          "mapping": {}
+        },
+        "quality": {
+          "validated": true,
+          "maxBoneLengthError": 0,
+          "maxContactError": null,
+          "maxJointAngularVelocity": null,
+          "warnings": []
+        }
       }
     },
     {
@@ -862,6 +977,32 @@
           ]
         }
       ],
+      "semanticChannels": [
+        {
+          "channelId": "bodyLean",
+          "semantic": "bodyLean",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "headGesture",
+          "semantic": "headGesture",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "breathing",
+          "semantic": "breathing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        }
+      ],
       "poseKeys": [],
       "poseSnapshots": [],
       "events": [
@@ -912,6 +1053,44 @@
         "sourceBodyHeight": 1.795672,
         "status": "validated-demo",
         "category": "gesture"
+      },
+      "assetMetadata": {
+        "schema": "humanoid_rig/animation_asset_metadata@1.0",
+        "type": "AnimationAssetMetadata",
+        "clipId": "head-nod",
+        "name": "Head Nod",
+        "category": "gesture",
+        "tags": [],
+        "compatibleRig": "rig@0.4.0",
+        "requiredChains": [
+          "root",
+          "spine",
+          "head",
+          "left_arm",
+          "right_arm"
+        ],
+        "contacts": [],
+        "rootMotion": {
+          "mode": "in_place",
+          "rootJointId": "hips",
+          "enabled": false
+        },
+        "mirrorSupport": true,
+        "retargetPolicy": {
+          "mode": "local_rotation",
+          "scaleRootMotionByHeight": true,
+          "preserveContacts": true,
+          "clampJointLimits": true,
+          "axisProfile": "smpl24_controls28@1",
+          "mapping": {}
+        },
+        "quality": {
+          "validated": true,
+          "maxBoneLengthError": 0,
+          "maxContactError": null,
+          "maxJointAngularVelocity": null,
+          "warnings": []
+        }
       }
     },
     {
@@ -1667,6 +1846,64 @@
           ]
         }
       ],
+      "semanticChannels": [
+        {
+          "channelId": "leftArmSwing",
+          "semantic": "leftArmSwing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "rightArmSwing",
+          "semantic": "rightArmSwing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "leftLegStep",
+          "semantic": "leftLegStep",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "rightLegStep",
+          "semantic": "rightLegStep",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "footContact",
+          "semantic": "footContact",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "bodyLean",
+          "semantic": "bodyLean",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "breathing",
+          "semantic": "breathing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        }
+      ],
       "poseKeys": [],
       "poseSnapshots": [],
       "events": [
@@ -1773,6 +2010,76 @@
           "lateralConvention": "left-joints-negative-X/right-joints-positive-X"
         },
         "authoringMethod": "directed-bone-chain"
+      },
+      "assetMetadata": {
+        "schema": "humanoid_rig/animation_asset_metadata@1.0",
+        "type": "AnimationAssetMetadata",
+        "clipId": "squat",
+        "name": "Squat And Stand",
+        "category": "locomotion",
+        "tags": [],
+        "compatibleRig": "rig@0.4.0",
+        "requiredChains": [
+          "left_arm",
+          "right_arm",
+          "left_leg",
+          "right_leg",
+          "root",
+          "spine"
+        ],
+        "contacts": [
+          {
+            "id": "contact-leftFoot-0",
+            "jointId": "leftFoot",
+            "start": 0,
+            "end": 2.5,
+            "mode": "world_lock",
+            "positionWeight": 1,
+            "rotationWeight": 0.65,
+            "groundNormal": [
+              0,
+              1,
+              0
+            ],
+            "metadata": {}
+          },
+          {
+            "id": "contact-rightFoot-0",
+            "jointId": "rightFoot",
+            "start": 0,
+            "end": 2.5,
+            "mode": "world_lock",
+            "positionWeight": 1,
+            "rotationWeight": 0.65,
+            "groundNormal": [
+              0,
+              1,
+              0
+            ],
+            "metadata": {}
+          }
+        ],
+        "rootMotion": {
+          "mode": "in_place",
+          "rootJointId": "hips",
+          "enabled": false
+        },
+        "mirrorSupport": true,
+        "retargetPolicy": {
+          "mode": "local_rotation",
+          "scaleRootMotionByHeight": true,
+          "preserveContacts": true,
+          "clampJointLimits": true,
+          "axisProfile": "smpl24_controls28@1",
+          "mapping": {}
+        },
+        "quality": {
+          "validated": true,
+          "maxBoneLengthError": 0,
+          "maxContactError": null,
+          "maxJointAngularVelocity": null,
+          "warnings": []
+        }
       }
     },
     {
@@ -2617,6 +2924,64 @@
           ]
         }
       ],
+      "semanticChannels": [
+        {
+          "channelId": "leftArmSwing",
+          "semantic": "leftArmSwing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "rightArmSwing",
+          "semantic": "rightArmSwing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "leftLegStep",
+          "semantic": "leftLegStep",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "rightLegStep",
+          "semantic": "rightLegStep",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "footContact",
+          "semantic": "footContact",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "bodyLean",
+          "semantic": "bodyLean",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "breathing",
+          "semantic": "breathing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        }
+      ],
       "poseKeys": [],
       "poseSnapshots": [],
       "events": [
@@ -2754,6 +3119,76 @@
           "lateralConvention": "left-joints-negative-X/right-joints-positive-X"
         },
         "authoringMethod": "directed-bone-chain"
+      },
+      "assetMetadata": {
+        "schema": "humanoid_rig/animation_asset_metadata@1.0",
+        "type": "AnimationAssetMetadata",
+        "clipId": "walk-in-place",
+        "name": "Walk In Place",
+        "category": "locomotion",
+        "tags": [],
+        "compatibleRig": "rig@0.4.0",
+        "requiredChains": [
+          "left_arm",
+          "right_arm",
+          "left_leg",
+          "right_leg",
+          "root",
+          "spine"
+        ],
+        "contacts": [
+          {
+            "id": "contact-leftFoot-0",
+            "jointId": "leftFoot",
+            "start": 0,
+            "end": 0.52,
+            "mode": "world_lock",
+            "positionWeight": 1,
+            "rotationWeight": 0.65,
+            "groundNormal": [
+              0,
+              1,
+              0
+            ],
+            "metadata": {}
+          },
+          {
+            "id": "contact-rightFoot-0-6",
+            "jointId": "rightFoot",
+            "start": 0.6,
+            "end": 1.12,
+            "mode": "world_lock",
+            "positionWeight": 1,
+            "rotationWeight": 0.65,
+            "groundNormal": [
+              0,
+              1,
+              0
+            ],
+            "metadata": {}
+          }
+        ],
+        "rootMotion": {
+          "mode": "in_place",
+          "rootJointId": "hips",
+          "enabled": false
+        },
+        "mirrorSupport": true,
+        "retargetPolicy": {
+          "mode": "local_rotation",
+          "scaleRootMotionByHeight": true,
+          "preserveContacts": true,
+          "clampJointLimits": true,
+          "axisProfile": "smpl24_controls28@1",
+          "mapping": {}
+        },
+        "quality": {
+          "validated": true,
+          "maxBoneLengthError": 0,
+          "maxContactError": null,
+          "maxJointAngularVelocity": null,
+          "warnings": []
+        }
       }
     },
     {
@@ -3598,6 +4033,64 @@
           ]
         }
       ],
+      "semanticChannels": [
+        {
+          "channelId": "leftArmSwing",
+          "semantic": "leftArmSwing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "rightArmSwing",
+          "semantic": "rightArmSwing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "leftLegStep",
+          "semantic": "leftLegStep",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "rightLegStep",
+          "semantic": "rightLegStep",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "footContact",
+          "semantic": "footContact",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "bodyLean",
+          "semantic": "bodyLean",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        },
+        {
+          "channelId": "breathing",
+          "semantic": "breathing",
+          "required": true,
+          "metadata": {
+            "derived": true
+          }
+        }
+      ],
       "poseKeys": [],
       "poseSnapshots": [],
       "events": [
@@ -3735,6 +4228,76 @@
           "lateralConvention": "left-joints-negative-X/right-joints-positive-X"
         },
         "authoringMethod": "directed-bone-chain"
+      },
+      "assetMetadata": {
+        "schema": "humanoid_rig/animation_asset_metadata@1.0",
+        "type": "AnimationAssetMetadata",
+        "clipId": "walk-forward",
+        "name": "Walk Forward",
+        "category": "locomotion",
+        "tags": [],
+        "compatibleRig": "rig@0.4.0",
+        "requiredChains": [
+          "left_arm",
+          "right_arm",
+          "left_leg",
+          "right_leg",
+          "root",
+          "spine"
+        ],
+        "contacts": [
+          {
+            "id": "contact-leftFoot-0",
+            "jointId": "leftFoot",
+            "start": 0,
+            "end": 0.52,
+            "mode": "world_lock",
+            "positionWeight": 1,
+            "rotationWeight": 0.65,
+            "groundNormal": [
+              0,
+              1,
+              0
+            ],
+            "metadata": {}
+          },
+          {
+            "id": "contact-rightFoot-0-6",
+            "jointId": "rightFoot",
+            "start": 0.6,
+            "end": 1.12,
+            "mode": "world_lock",
+            "positionWeight": 1,
+            "rotationWeight": 0.65,
+            "groundNormal": [
+              0,
+              1,
+              0
+            ],
+            "metadata": {}
+          }
+        ],
+        "rootMotion": {
+          "mode": "root_motion",
+          "rootJointId": "hips",
+          "enabled": true
+        },
+        "mirrorSupport": true,
+        "retargetPolicy": {
+          "mode": "local_rotation",
+          "scaleRootMotionByHeight": true,
+          "preserveContacts": true,
+          "clampJointLimits": true,
+          "axisProfile": "smpl24_controls28@1",
+          "mapping": {}
+        },
+        "quality": {
+          "validated": true,
+          "maxBoneLengthError": 0,
+          "maxContactError": null,
+          "maxJointAngularVelocity": null,
+          "warnings": []
+        }
       }
     },
     {
@@ -3751,6 +4314,7 @@
       "rootMotionMode": "in_place",
       "rootJointId": "hips",
       "tracks": [],
+      "semanticChannels": [],
       "poseKeys": [],
       "poseSnapshots": [],
       "events": [],
@@ -3776,6 +4340,38 @@
         "sourceBodyHeight": 1.795672,
         "status": "editable-draft",
         "category": "custom"
+      },
+      "assetMetadata": {
+        "schema": "humanoid_rig/animation_asset_metadata@1.0",
+        "type": "AnimationAssetMetadata",
+        "clipId": "custom",
+        "name": "Custom Draft",
+        "category": "interaction",
+        "tags": [],
+        "compatibleRig": "rig@0.4.0",
+        "requiredChains": [],
+        "contacts": [],
+        "rootMotion": {
+          "mode": "in_place",
+          "rootJointId": "hips",
+          "enabled": false
+        },
+        "mirrorSupport": true,
+        "retargetPolicy": {
+          "mode": "local_rotation",
+          "scaleRootMotionByHeight": true,
+          "preserveContacts": true,
+          "clampJointLimits": true,
+          "axisProfile": "smpl24_controls28@1",
+          "mapping": {}
+        },
+        "quality": {
+          "validated": true,
+          "maxBoneLengthError": 0,
+          "maxContactError": null,
+          "maxJointAngularVelocity": null,
+          "warnings": []
+        }
       }
     }
   ],
@@ -4003,7 +4599,7 @@
   "retarget": {
     "enabled": true,
     "targetRig": "rig@0.4.0",
-    "targetProportionRevision": 1,
+    "targetProportionRevision": 0,
     "scaleRootMotionByHeight": true,
     "preserveContacts": true,
     "clampJointLimits": true,

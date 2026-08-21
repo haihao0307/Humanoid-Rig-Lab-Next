@@ -12,6 +12,50 @@
   "loop_mode": "repeat",
   "root_motion_mode": "in_place",
   "root_joint_id": "hips",
+  "asset_metadata": {
+    "schema": "humanoid_rig/animation_asset_metadata@1.0",
+    "type": "AnimationAssetMetadata",
+    "clipId": "wave",
+    "name": "Right Hand Wave",
+    "category": "gesture",
+    "tags": [],
+    "compatibleRig": "rig@0.4.0",
+    "requiredChains": [
+      "right_arm"
+    ],
+    "contacts": [],
+    "rootMotion": {
+      "mode": "in_place",
+      "rootJointId": "hips",
+      "enabled": false
+    },
+    "mirrorSupport": true,
+    "retargetPolicy": {
+      "mode": "local_rotation",
+      "scaleRootMotionByHeight": true,
+      "preserveContacts": true,
+      "clampJointLimits": true,
+      "axisProfile": "smpl24_controls28@1",
+      "mapping": {}
+    },
+    "quality": {
+      "validated": true,
+      "maxBoneLengthError": 0,
+      "maxContactError": null,
+      "maxJointAngularVelocity": null,
+      "warnings": []
+    }
+  },
+  "semantic_channels": [
+    {
+      "channelId": "rightArmSwing",
+      "semantic": "rightArmSwing",
+      "required": true,
+      "metadata": {
+        "derived": true
+      }
+    }
+  ],
   "tracks": [
     {
       "track_id": "rightUpperArm:rotation",

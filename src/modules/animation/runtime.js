@@ -31,6 +31,7 @@ import {
   normalizeQuaternion,
   normalizeVector3,
   quaternionAngularDistance,
+  quaternionFromAnatomicalChannels,
   quaternionFromTo,
   rotateVectorByQuaternion,
   scaleVector,
@@ -41,6 +42,8 @@ import {
 
 export const ANIMATION_POSE_SCHEMA = 'humanoid_rig/animation_pose@0.2';
 export const ANIMATION_RUNTIME_FRAME_SCHEMA = 'humanoid_rig/animation_runtime_frame@0.2';
+export const INCOMING_ROTATION_CONVENTION_FULL = 'incoming_bone_bind_delta_full_quaternion';
+export const INCOMING_ROTATION_CONVENTION_ZERO_TWIST = 'incoming_bone_bind_delta_zero_twist';
 
 const IDENTITY = Object.freeze([0, 0, 0, 1]);
 const ZERO = Object.freeze([0, 0, 0]);
@@ -124,6 +127,10 @@ export function createRigContext(bodyProfile = {}, {
     if (!joint.parentId || joint.physicalBone === false) continue;
     boneLengths.set(joint.id, getBoneLength(definition, joint.id));
   }
+  const jointAxes = structuredClone(definition.jointAxes ?? {
+    schema: 'humanoid_rig/joint_axes@1.0',
+    entries: {},
+  });
   const context = {
     rigVersion: String(rigVersion),
     bodyProfile: normalizedProfile,
@@ -134,12 +141,40 @@ export function createRigContext(bodyProfile = {}, {
     children,
     restPositions,
     boneLengths,
+    jointAxes,
+    jointAxisMap: new Map(Object.entries(jointAxes.entries ?? {})),
   };
   RIG_CONTEXT_CACHE.set(cacheKey, context);
   while (RIG_CONTEXT_CACHE.size > MAX_RIG_CONTEXT_CACHE) {
     RIG_CONTEXT_CACHE.delete(RIG_CONTEXT_CACHE.keys().next().value);
   }
   return context;
+}
+
+/** Resolves twist/bend/side channels against the active bind-local joint-axis contract. */
+export function resolveAnatomicalRotation(rigContextInput, jointId, twist = 0, bend = 0, side = 0, {
+  order = 'BTS',
+} = {}) {
+  const rig = rigContextInput?.jointMap
+    ? rigContextInput
+    : createRigContext(rigContextInput?.bodyProfile || {});
+  const axisEntry = rig.jointAxisMap?.get(String(jointId));
+  if (!axisEntry) {
+    throw new Error(`Missing jointAxes entry for ${String(jointId)}.`);
+  }
+  return quaternionFromAnatomicalChannels(axisEntry, { twist, bend, side }, order);
+}
+
+/** Object-channel convenience wrapper retained for runtime callers and tests. */
+export function createAnatomicalJointRotation(rigContextInput, jointId, channels = {}, options = {}) {
+  return resolveAnatomicalRotation(
+    rigContextInput,
+    jointId,
+    Number(channels.twist) || 0,
+    Number(channels.bend) || 0,
+    Number(channels.side) || 0,
+    options,
+  );
 }
 
 export function clearAnimationRigContextCache() {
@@ -322,6 +357,13 @@ export function sampleAnimationLayers(animationInput, rawTime, {
     }
   }
 
+  const baseLayer = animation.layers?.find((layer) => layer.layerId === 'base');
+  const baseWeight = clamp(Number(baseLayer?.weight ?? 1), 0, 1);
+  if (baseWeight < 1 - EPSILON) {
+    basePose = blendAnimationPoses(createIdentityAnimationPose({ compatibleRig: activeClip.compatibleRig }), basePose, baseWeight);
+  }
+  diagnostics[0].weight = baseWeight;
+
   for (const layer of animation.layers || []) {
     if (layer.layerId === 'base' || !layer.enabled || layer.weight <= EPSILON || !layer.clipId) continue;
     const clip = clips.get(layer.clipId);
@@ -395,10 +437,10 @@ export function forwardKinematics(poseInput, rigContextInput) {
 }
 
 /**
- * Converts the animation runtime's conventional outgoing-bone rotations to
- * the position solver's incoming-bone PoseSnapshot convention. This adapter
- * deliberately lives at the module boundary so existing clips and Three.js
- * joint semantics remain unchanged.
+ * Converts outgoing-joint rotations to the incoming-bone PoseSnapshot
+ * convention used by the V8 bridge. When FK orientations are available this
+ * preserves the complete quaternion, including axial twist. The directional
+ * fallback remains for legacy world-position-only payloads.
  */
 export function buildIncomingBoneLocalRotations(fkInput, {
   rootJointId = 'hips',
@@ -428,17 +470,26 @@ export function buildIncomingBoneLocalRotations(fkInput, {
     for (const child of children.get(parentId) ?? []) {
       const childPosition = fk.positions.get(child.id);
       if (!childPosition) continue;
-      const desiredWorld = subtractVectors(childPosition, parentPosition);
-      const desiredParentLocal = rotateVectorByQuaternion(
-        desiredWorld,
-        conjugateQuaternion(parentRotation),
-      );
-      const childLocalRotation = quaternionFromTo(child.localPosition, desiredParentLocal);
+      const sourceParentWorldRotation = fk.rotations?.get(parentId);
+      let childLocalRotation;
+      let childWorldRotation;
+      if (sourceParentWorldRotation) {
+        childWorldRotation = normalizeQuaternion(sourceParentWorldRotation);
+        childLocalRotation = multiplyQuaternions(
+          conjugateQuaternion(parentRotation),
+          childWorldRotation,
+        );
+      } else {
+        const desiredWorld = subtractVectors(childPosition, parentPosition);
+        const desiredParentLocal = rotateVectorByQuaternion(
+          desiredWorld,
+          conjugateQuaternion(parentRotation),
+        );
+        childLocalRotation = quaternionFromTo(child.localPosition, desiredParentLocal);
+        childWorldRotation = multiplyQuaternions(parentRotation, childLocalRotation);
+      }
       localRotations[child.id] = normalizeQuaternion(childLocalRotation);
-      worldRotations.set(
-        child.id,
-        multiplyQuaternions(parentRotation, childLocalRotation),
-      );
+      worldRotations.set(child.id, normalizeQuaternion(childWorldRotation));
       visit(child.id);
     }
   };
@@ -643,6 +694,10 @@ export function sampleAnimationRuntime(animationInput, {
       runtimeMode: animation.runtime.mode,
       previewSource: animation.runtime.previewSource,
       fullPhysicsRequiresPoseSolver: animation.runtime.mode === 'full_physics',
+      jointAxesSchema: rig.jointAxes?.schema ?? null,
+      jointAxesEntryCount: rig.jointAxisMap?.size ?? 0,
+      incomingRotationConvention: INCOMING_ROTATION_CONVENTION_FULL,
+      incomingRotationPreservesTwist: true,
     },
   };
 }
@@ -680,7 +735,7 @@ export function buildV8PosePayload(fkInput, {
     incomingBoneLocalRotations,
     rotationConventions: {
       localRotations: 'outgoing_bone_parent_rotation',
-      incomingBoneLocalRotations: 'incoming_bone_bind_delta_zero_twist',
+      incomingBoneLocalRotations: INCOMING_ROTATION_CONVENTION_FULL,
     },
     joints: fk.rig.joints.map((joint) => {
       const position = fk.positions.get(joint.id) || ZERO;
