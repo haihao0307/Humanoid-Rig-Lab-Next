@@ -1609,7 +1609,7 @@ function handleHostMessage(event) {
 }
 
 function applyAnimationFrame(poseState) {
-  if (HOST_MODULE !== 'animation') return;
+  if (HOST_MODULE !== 'animation' && HOST_MODULE !== 'character-studio') return;
   hostApplyingState = true;
   try {
     applyHostPose(poseState, { animationFrame: true });

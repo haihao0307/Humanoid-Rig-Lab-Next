@@ -477,7 +477,13 @@ export function applyFootContactLocks(poseInput, clipInput, rawTime, rigContextI
     const plantFk = forwardKinematics(plantPose, rig);
     const target = plantFk.positions.get(contact.jointId);
     if (!target) continue;
-    targets.push({ contact, chain, target: [...target], plantPose });
+    targets.push({
+      contact,
+      chain,
+      target: [...target],
+      plantPose,
+      rotationReferenceWorld: normalizeQuaternion(plantFk.rotations.get(contact.jointId) || IDENTITY),
+    });
   }
 
   // Translate the root just enough to keep every active two-bone leg target
@@ -516,7 +522,7 @@ export function applyFootContactLocks(poseInput, clipInput, rawTime, rigContextI
   for (let iteration = 0; iteration < 2; iteration += 1) {
     for (const item of targets) {
       const solved = solveTwoBoneLeg(pose, rig, item.chain, item.target, {
-        rotationReference: item.plantPose.joints[item.contact.jointId]?.rotation || IDENTITY,
+        rotationReferenceWorld: item.rotationReferenceWorld,
         rotationWeight: item.contact.rotationWeight,
       });
       pose = solved.pose;
@@ -1041,7 +1047,7 @@ export function diagnoseRetargetCompatibility(clipInput, rigContextInput, {
 }
 
 function solveTwoBoneLeg(poseInput, rig, chain, target, {
-  rotationReference = IDENTITY,
+  rotationReferenceWorld = IDENTITY,
   rotationWeight = 0.65,
 } = {}) {
   let pose = normalizeAnimationPose(poseInput);
@@ -1077,9 +1083,18 @@ function solveTwoBoneLeg(poseInput, rig, chain, target, {
   pose = orientJointChild(pose, rig, chain.hip, chain.knee, targetKnee);
   fk = forwardKinematics(pose, rig);
   pose = orientJointChild(pose, rig, chain.knee, chain.ankle, clampedTarget);
+  fk = forwardKinematics(pose, rig);
+  const ankleJoint = rig.jointMap.get(chain.ankle);
+  const ankleParentWorld = ankleJoint?.parentId
+    ? fk.rotations.get(ankleJoint.parentId) || IDENTITY
+    : IDENTITY;
+  const rotationReferenceLocal = multiplyQuaternions(
+    conjugateQuaternion(ankleParentWorld),
+    normalizeQuaternion(rotationReferenceWorld),
+  );
   const currentFootRotation = pose.joints[chain.ankle]?.rotation || IDENTITY;
   pose.joints[chain.ankle] = {
-    rotation: slerpQuaternion(currentFootRotation, rotationReference, clamp(rotationWeight, 0, 1)),
+    rotation: slerpQuaternion(currentFootRotation, rotationReferenceLocal, clamp(rotationWeight, 0, 1)),
   };
   return { pose, clamped: Math.abs(rawDistance - solvedDistance) > 1e-5 };
 }

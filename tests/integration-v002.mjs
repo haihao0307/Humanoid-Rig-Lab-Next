@@ -85,9 +85,7 @@ const snapshot = {
   rootJointId: 'hips',
   rootTranslation: [...runtimeFrame.finalPose.root.position],
   rootRotation: [...runtimeFrame.finalPose.root.rotation],
-  localRotations: Object.fromEntries(
-    Object.entries(runtimeFrame.finalPose.joints).map(([jointId, value]) => [jointId, [...value.rotation]]),
-  ),
+  localRotations: structuredClone(runtimeFrame.v8Payload.incomingBoneLocalRotations),
   pinnedJoints: {},
   updatedAt: timestamp,
 };

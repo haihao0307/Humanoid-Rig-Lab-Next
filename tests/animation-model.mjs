@@ -78,7 +78,7 @@ const wave = createWaveRightClip({ compatibleRig: 'rig@0.4.0' });
 const waveReport = validateAnimationClip(wave);
 assert.equal(waveReport.valid, true, waveReport.errors.join(', '));
 assert.equal(waveReport.stats.tracks, 3);
-assert.equal(waveReport.stats.keyframes, 16);
+assert.equal(waveReport.stats.keyframes, 18);
 assert.equal(wave.events.length, 4);
 assert.ok(wave.tracks.every((track) => track.space === 'local'));
 assert.ok(wave.tracks.every((track) => track.interpolation === 'slerp'));

@@ -1,4 +1,5 @@
 import { ensureQuaternionContinuity, quaternionFromEuler } from './quaternion.js';
+import { ANATOMICAL_MOTION_BASIS, solveDirectedLocalRotations } from './anatomical-motion.js';
 
 const INTERNAL_CLIP_SCHEMA = 'humanoid_rig/animation_clip@0.4';
 
@@ -60,6 +61,30 @@ export function createIdleBreathePreset({ compatibleRig = 'rig@0.4.0' } = {}) {
 }
 
 export function createWaveRightPreset({ compatibleRig = 'rig@0.4.0' } = {}) {
+  const waveFrames = [
+    [0, solveDirectedLocalRotations()],
+    [0.35, solveDirectedLocalRotations({
+      rightUpperArm: [0.52, 0.72, 0.08],
+      rightLowerArm: [0.12, 0.98, 0.14],
+      rightHand: [0.04, 0.99, 0.10],
+    })],
+    [0.65, solveDirectedLocalRotations({
+      rightUpperArm: [0.52, 0.72, 0.08],
+      rightLowerArm: [-0.18, 0.97, 0.14],
+      rightHand: [-0.25, 0.95, 0.18],
+    })],
+    [0.95, solveDirectedLocalRotations({
+      rightUpperArm: [0.52, 0.72, 0.08],
+      rightLowerArm: [0.32, 0.93, 0.16],
+      rightHand: [0.42, 0.88, 0.20],
+    })],
+    [1.25, solveDirectedLocalRotations({
+      rightUpperArm: [0.52, 0.72, 0.08],
+      rightLowerArm: [-0.18, 0.97, 0.14],
+      rightHand: [-0.25, 0.95, 0.18],
+    })],
+    [1.6, solveDirectedLocalRotations()],
+  ];
   return createClip({
     clipId: 'wave',
     name: 'Right Hand Wave',
@@ -67,39 +92,20 @@ export function createWaveRightPreset({ compatibleRig = 'rig@0.4.0' } = {}) {
     compatibleRig,
     loopMode: 'repeat',
     tracks: [
-      rotationTrack('rightUpperArm', [
-        [0, [0, 0, 0, 1]],
-        [0.35, [0.1502, 0.0501, -0.3505, 0.9234]],
-        [1.25, [0.1502, 0.0501, -0.3505, 0.9234]],
-        [1.6, [0, 0, 0, 1]],
-      ]),
-      rotationTrack('rightLowerArm', [
-        [0, [0, 0, 0, 1]],
-        [0.35, [0.1002, 0.0200, 0.3807, 0.9189]],
-        [0.65, [0.1187, 0.1978, 0.3462, 0.9094]],
-        [0.95, [0.1187, -0.1978, 0.3462, 0.9094]],
-        [1.25, [0.1187, 0.1978, 0.3462, 0.9094]],
-        [1.6, [0, 0, 0, 1]],
-      ]),
-      rotationTrack('rightHand', [
-        [0, [0, 0, 0, 1]],
-        [0.35, [0.0200, 0.1202, 0.0200, 0.9924]],
-        [0.65, [0.0200, 0.2601, 0.0200, 0.9651]],
-        [0.95, [0.0200, -0.2601, 0.0200, 0.9651]],
-        [1.25, [0.0200, 0.2601, 0.0200, 0.9651]],
-        [1.6, [0, 0, 0, 1]],
-      ]),
+      ...directedRotationTracks(waveFrames, ['rightUpperArm', 'rightLowerArm', 'rightHand']),
     ],
     events: [
       event('gesture_start', 0.35),
-      event('marker', 0.65, { label: 'wave_left' }),
-      event('marker', 0.95, { label: 'wave_right' }),
+      event('marker', 0.65, { label: 'wave_inward' }),
+      event('marker', 0.95, { label: 'wave_outward' }),
       event('gesture_end', 1.6),
     ],
     metadata: {
       status: 'validated-demo',
       category: 'gesture',
       authoritativeChannels: 'local-quaternion',
+      authoringBasis: ANATOMICAL_MOTION_BASIS,
+      authoringMethod: 'directed-bone-chain',
       sourceBodyHeight: 1.795672,
     },
   });
@@ -126,6 +132,30 @@ export function createSquatPreset({ compatibleRig = 'rig@0.4.0' } = {}) {
   const down = 1.05;
   const hold = 1.45;
   const end = 2.5;
+  const bottomRotations = solveDirectedLocalRotations({
+    leftUpperLeg: [-0.03, -0.64, 0.77],
+    leftLowerLeg: [-0.02, -0.72, -0.69],
+    leftFoot: [0, -0.05, 1],
+    rightUpperLeg: [0.03, -0.64, 0.77],
+    rightLowerLeg: [0.02, -0.72, -0.69],
+    rightFoot: [0, -0.05, 1],
+    leftUpperArm: [-0.15, -0.05, 0.99],
+    leftLowerArm: [-0.08, -0.12, 0.99],
+    rightUpperArm: [0.15, -0.05, 0.99],
+    rightLowerArm: [0.08, -0.12, 0.99],
+  }, {
+    localRotations: {
+      hips: q(8, 0, 0),
+      spine: q(4, 0, 0),
+      chest: q(2, 0, 0),
+    },
+  });
+  const squatFrames = [
+    [0, solveDirectedLocalRotations()],
+    [down, bottomRotations],
+    [hold, bottomRotations],
+    [end, solveDirectedLocalRotations()],
+  ];
   return createClip({
     clipId: 'squat',
     name: 'Squat And Stand',
@@ -134,17 +164,14 @@ export function createSquatPreset({ compatibleRig = 'rig@0.4.0' } = {}) {
     loopMode: 'once',
     rootMotionMode: 'in_place',
     tracks: [
-      positionTrack('hips', [[0, [0, 0, 0]], [down, [0, -0.31, 0.035]], [hold, [0, -0.31, 0.035]], [end, [0, 0, 0]]]),
-      rotationTrack('hips', [[0, q(0, 0, 0)], [down, q(-10, 0, 0)], [hold, q(-10, 0, 0)], [end, q(0, 0, 0)]]),
-      rotationTrack('spine', [[0, q(0, 0, 0)], [down, q(7, 0, 0)], [hold, q(7, 0, 0)], [end, q(0, 0, 0)]]),
-      rotationTrack('leftUpperLeg', [[0, q(0, 0, 0)], [down, q(-53, 0, -2)], [hold, q(-53, 0, -2)], [end, q(0, 0, 0)]]),
-      rotationTrack('rightUpperLeg', [[0, q(0, 0, 0)], [down, q(-53, 0, 2)], [hold, q(-53, 0, 2)], [end, q(0, 0, 0)]]),
-      rotationTrack('leftLowerLeg', [[0, q(0, 0, 0)], [down, q(96, 0, 0)], [hold, q(96, 0, 0)], [end, q(0, 0, 0)]]),
-      rotationTrack('rightLowerLeg', [[0, q(0, 0, 0)], [down, q(96, 0, 0)], [hold, q(96, 0, 0)], [end, q(0, 0, 0)]]),
-      rotationTrack('leftFoot', [[0, q(0, 0, 0)], [down, q(-34, 0, 0)], [hold, q(-34, 0, 0)], [end, q(0, 0, 0)]]),
-      rotationTrack('rightFoot', [[0, q(0, 0, 0)], [down, q(-34, 0, 0)], [hold, q(-34, 0, 0)], [end, q(0, 0, 0)]]),
-      rotationTrack('leftUpperArm', [[0, q(0, 0, 0)], [down, q(18, 0, -5)], [hold, q(18, 0, -5)], [end, q(0, 0, 0)]]),
-      rotationTrack('rightUpperArm', [[0, q(0, 0, 0)], [down, q(18, 0, 5)], [hold, q(18, 0, 5)], [end, q(0, 0, 0)]]),
+      positionTrack('hips', [[0, [0, 0, 0]], [down, [0, -0.28, 0.03]], [hold, [0, -0.28, 0.03]], [end, [0, 0, 0]]]),
+      ...directedRotationTracks(squatFrames, [
+        'hips', 'spine', 'chest',
+        'leftUpperLeg', 'leftLowerLeg', 'leftFoot',
+        'rightUpperLeg', 'rightLowerLeg', 'rightFoot',
+        'leftUpperArm', 'leftLowerArm',
+        'rightUpperArm', 'rightLowerArm',
+      ]),
     ],
     events: [
       event('foot_plant', 0, { jointId: 'leftFoot', side: 'left' }),
@@ -157,7 +184,13 @@ export function createSquatPreset({ compatibleRig = 'rig@0.4.0' } = {}) {
       contact('leftFoot', 0, end),
       contact('rightFoot', 0, end),
     ],
-    metadata: { status: 'validated-demo', category: 'locomotion', sourceBodyHeight: 1.795672 },
+    metadata: {
+      status: 'validated-demo',
+      category: 'locomotion',
+      sourceBodyHeight: 1.795672,
+      authoringBasis: ANATOMICAL_MOTION_BASIS,
+      authoringMethod: 'directed-bone-chain',
+    },
   });
 }
 
@@ -167,20 +200,54 @@ export function createWalkPreset({ compatibleRig = 'rig@0.4.0', rootMotion = fal
   const name = rootMotion ? 'Walk Forward' : 'Walk In Place';
   const rootDistance = rootMotion ? 0.72 : 0;
   const times = [0, 0.3, 0.6, 0.9, 1.2];
+  const walkBaseRotations = [
+    { hips: q(0, 1.5, 0), spine: q(1.5, -2, 0) },
+    { hips: q(0, 0, 0), spine: q(1, 0, 0) },
+    { hips: q(0, -1.5, 0), spine: q(1.5, 2, 0) },
+    { hips: q(0, 0, 0), spine: q(1, 0, 0) },
+    { hips: q(0, 1.5, 0), spine: q(1.5, -2, 0) },
+  ];
+  const walkArmDirections = [
+    {
+      leftUpperArm: [-0.22, -0.88, -0.42], leftLowerArm: [-0.12, -0.94, -0.32],
+      rightUpperArm: [0.22, -0.88, 0.42], rightLowerArm: [0.12, -0.94, 0.32],
+    },
+    {
+      leftUpperArm: [-0.25, -0.97, 0], leftLowerArm: [-0.18, -0.98, 0.04],
+      rightUpperArm: [0.25, -0.97, 0], rightLowerArm: [0.18, -0.98, 0.04],
+    },
+    {
+      leftUpperArm: [-0.22, -0.88, 0.42], leftLowerArm: [-0.12, -0.94, 0.32],
+      rightUpperArm: [0.22, -0.88, -0.42], rightLowerArm: [0.12, -0.94, -0.32],
+    },
+    {
+      leftUpperArm: [-0.25, -0.97, 0], leftLowerArm: [-0.18, -0.98, 0.04],
+      rightUpperArm: [0.25, -0.97, 0], rightLowerArm: [0.18, -0.98, 0.04],
+    },
+    {
+      leftUpperArm: [-0.22, -0.88, -0.42], leftLowerArm: [-0.12, -0.94, -0.32],
+      rightUpperArm: [0.22, -0.88, 0.42], rightLowerArm: [0.12, -0.94, 0.32],
+    },
+  ];
+  const walkArmFrames = times.map((time, index) => [
+    time,
+    solveDirectedLocalRotations(walkArmDirections[index], {
+      localRotations: walkBaseRotations[index],
+    }),
+  ]);
   const tracks = [
     positionTrack('hips', times.map((time, index) => [time, [0, index % 2 ? 0.018 : 0, rootDistance * time / duration]])),
-    rotationTrack('hips', [[0, q(0, 1.5, 0)], [0.3, q(0, 0, 0)], [0.6, q(0, -1.5, 0)], [0.9, q(0, 0, 0)], [1.2, q(0, 1.5, 0)]]),
-    rotationTrack('spine', [[0, q(1.5, -2, 0)], [0.3, q(1, 0, 0)], [0.6, q(1.5, 2, 0)], [0.9, q(1, 0, 0)], [1.2, q(1.5, -2, 0)]]),
+    rotationTrack('hips', times.map((time, index) => [time, walkBaseRotations[index].hips])),
+    rotationTrack('spine', times.map((time, index) => [time, walkBaseRotations[index].spine])),
     rotationTrack('leftUpperLeg', [[0, q(-25, 0, 0)], [0.3, q(0, 0, 0)], [0.6, q(25, 0, 0)], [0.9, q(5, 0, 0)], [1.2, q(-25, 0, 0)]]),
     rotationTrack('rightUpperLeg', [[0, q(25, 0, 0)], [0.3, q(5, 0, 0)], [0.6, q(-25, 0, 0)], [0.9, q(0, 0, 0)], [1.2, q(25, 0, 0)]]),
     rotationTrack('leftLowerLeg', [[0, q(8, 0, 0)], [0.3, q(45, 0, 0)], [0.6, q(5, 0, 0)], [0.9, q(15, 0, 0)], [1.2, q(8, 0, 0)]]),
     rotationTrack('rightLowerLeg', [[0, q(5, 0, 0)], [0.3, q(15, 0, 0)], [0.6, q(8, 0, 0)], [0.9, q(45, 0, 0)], [1.2, q(5, 0, 0)]]),
     rotationTrack('leftFoot', [[0, q(8, 0, 0)], [0.3, q(-10, 0, 0)], [0.6, q(-6, 0, 0)], [0.9, q(10, 0, 0)], [1.2, q(8, 0, 0)]]),
     rotationTrack('rightFoot', [[0, q(-6, 0, 0)], [0.3, q(10, 0, 0)], [0.6, q(8, 0, 0)], [0.9, q(-10, 0, 0)], [1.2, q(-6, 0, 0)]]),
-    rotationTrack('leftUpperArm', [[0, q(20, 0, -2)], [0.3, q(0, 0, 0)], [0.6, q(-20, 0, -2)], [0.9, q(0, 0, 0)], [1.2, q(20, 0, -2)]]),
-    rotationTrack('rightUpperArm', [[0, q(-20, 0, 2)], [0.3, q(0, 0, 0)], [0.6, q(20, 0, 2)], [0.9, q(0, 0, 0)], [1.2, q(-20, 0, 2)]]),
-    rotationTrack('leftLowerArm', [[0, q(18, 0, 0)], [0.6, q(4, 0, 0)], [1.2, q(18, 0, 0)]]),
-    rotationTrack('rightLowerArm', [[0, q(4, 0, 0)], [0.6, q(18, 0, 0)], [1.2, q(4, 0, 0)]]),
+    ...directedRotationTracks(walkArmFrames, [
+      'leftUpperArm', 'leftLowerArm', 'rightUpperArm', 'rightLowerArm',
+    ]),
   ];
   return createClip({
     clipId,
@@ -209,6 +276,8 @@ export function createWalkPreset({ compatibleRig = 'rig@0.4.0', rootMotion = fal
       category: 'locomotion',
       sourceBodyHeight: 1.795672,
       strideLength: rootDistance,
+      authoringBasis: ANATOMICAL_MOTION_BASIS,
+      authoringMethod: 'directed-bone-chain',
     },
   });
 }
@@ -349,6 +418,13 @@ function rotationTrack(jointId, entries) {
       sourceSnapshotId: null,
     })),
   };
+}
+
+function directedRotationTracks(frames, jointIds) {
+  return jointIds.map((jointId) => rotationTrack(
+    jointId,
+    frames.map(([time, rotations]) => [time, rotations[jointId] || [0, 0, 0, 1]]),
+  ));
 }
 
 function positionTrack(jointId, entries) {

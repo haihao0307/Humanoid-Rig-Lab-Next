@@ -92,6 +92,73 @@ for (const profile of profiles) {
   }
 }
 
+const standardRestFk = forwardKinematics(createIdentityAnimationPose(), createRigContext(profiles[0].value));
+const restPoint = (jointId) => standardRestFk.positions.get(jointId);
+const sampledPoint = (clipId, rawTime, jointId) => sampleAnimationRuntime(
+  normalizeAnimationState({ ...base, activeClipId: clipId }),
+  { rawTime, bodyProfile: profiles[0].value },
+).fk.positions.get(jointId);
+
+const waveRaised = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: 'wave' }), {
+  rawTime: 0.65,
+  bodyProfile: profiles[0].value,
+});
+const waveOutward = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: 'wave' }), {
+  rawTime: 0.95,
+  bodyProfile: profiles[0].value,
+});
+assert.ok(
+  waveRaised.fk.positions.get('rightHand')[1] > waveRaised.fk.positions.get('rightUpperArm')[1] + 0.35,
+  'right-hand wave must raise the hand above the shoulder instead of driving it downward',
+);
+assert.ok(
+  waveOutward.fk.positions.get('rightHand')[0] > waveRaised.fk.positions.get('rightHand')[0] + 0.08,
+  'right-hand wave must contain a visible inward/outward lateral sweep',
+);
+assert.ok(
+  distance(waveRaised.fk.positions.get('leftHand'), restPoint('leftHand')) < 1e-10,
+  'right-hand wave must not move the opposite arm',
+);
+
+const nodDown = sampledPoint('head-nod', 0.35, 'headTop');
+const nodUp = sampledPoint('head-nod', 0.70, 'headTop');
+assert.ok(nodDown[2] > restPoint('headTop')[2] + 0.06, 'nod-down must move the head toward +Z forward');
+assert.ok(nodUp[2] < restPoint('headTop')[2] - 0.06, 'nod-up rebound must move opposite the forward nod');
+
+const squatBottom = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: 'squat' }), {
+  rawTime: 1.05,
+  bodyProfile: profiles[0].value,
+});
+assert.ok(squatBottom.fk.positions.get('hips')[1] < restPoint('hips')[1] - 0.24, 'squat must lower the pelvis');
+assert.ok(squatBottom.fk.positions.get('headTop')[2] > restPoint('headTop')[2] + 0.12, 'squat torso must incline toward +Z forward');
+assert.ok(squatBottom.fk.positions.get('leftLowerLeg')[2] > restPoint('leftLowerLeg')[2] + 0.22, 'left knee must bend forward');
+assert.ok(squatBottom.fk.positions.get('rightLowerLeg')[2] > restPoint('rightLowerLeg')[2] + 0.22, 'right knee must bend forward');
+assert.ok(squatBottom.fk.positions.get('leftHand')[2] > restPoint('leftHand')[2] + 0.35, 'squat left arm must counterbalance forward');
+assert.ok(squatBottom.fk.positions.get('rightHand')[2] > restPoint('rightHand')[2] + 0.35, 'squat right arm must counterbalance forward');
+assert.ok(distance(squatBottom.fk.positions.get('leftFoot'), restPoint('leftFoot')) < 0.01, 'left support foot must remain planted');
+assert.ok(distance(squatBottom.fk.positions.get('rightFoot'), restPoint('rightFoot')) < 0.01, 'right support foot must remain planted');
+assert.ok(distance(squatBottom.fk.positions.get('leftToesEnd'), restPoint('leftToesEnd')) < 0.08, 'left planted foot orientation must not reverse');
+assert.ok(distance(squatBottom.fk.positions.get('rightToesEnd'), restPoint('rightToesEnd')) < 0.08, 'right planted foot orientation must not reverse');
+
+for (const clipId of ['walk-in-place', 'walk-forward']) {
+  const firstStride = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: clipId }), {
+    rawTime: 0,
+    bodyProfile: profiles[0].value,
+  });
+  const oppositeStride = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: clipId }), {
+    rawTime: 0.6,
+    bodyProfile: profiles[0].value,
+  });
+  assert.ok(firstStride.fk.positions.get('leftFoot')[2] > firstStride.fk.positions.get('rightFoot')[2] + 0.5, `${clipId} left-leading phase`);
+  assert.ok(oppositeStride.fk.positions.get('rightFoot')[2] > oppositeStride.fk.positions.get('leftFoot')[2] + 0.5, `${clipId} right-leading phase`);
+  assert.ok(firstStride.fk.positions.get('rightHand')[2] > firstStride.fk.positions.get('leftHand')[2] + 0.3, `${clipId} counter-swing at left lead`);
+  assert.ok(oppositeStride.fk.positions.get('leftHand')[2] > oppositeStride.fk.positions.get('rightHand')[2] + 0.3, `${clipId} counter-swing at right lead`);
+  for (const frame of [firstStride, oppositeStride]) {
+    assert.ok(frame.fk.positions.get('leftHand')[0] < 0, `${clipId} left arm must remain on the left chain`);
+    assert.ok(frame.fk.positions.get('rightHand')[0] > 0, `${clipId} right arm must remain on the right chain`);
+  }
+}
+
 const standardWave = sampleAnimationRuntime(normalizeAnimationState({ ...base, activeClipId: 'wave' }), {
   rawTime: 0.8,
   bodyProfile: profiles[0].value,

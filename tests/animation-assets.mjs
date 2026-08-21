@@ -3,6 +3,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { importMotionClip, normalizeAnimationState, validateAnimationClip } from '../src/modules/animation/model.js';
 
 const root = new URL('../assets/animations/', import.meta.url);
+const builtIns = normalizeAnimationState({});
 const files = (await readdir(root)).filter((name) => name.endsWith('.motion.json')).sort();
 const expected = [
   'head-nod.motion.json',
@@ -23,6 +24,11 @@ for (const file of files) {
   assert.equal(clip.compatibleRig, 'rig@0.4.0');
   assert.ok(clip.tracks.length > 0);
   assert.ok(clip.tracks.every((track) => track.channel === 'rotation' || track.jointId === clip.rootJointId));
+  const builtIn = builtIns.clips.find((item) => item.clipId === clip.clipId);
+  assert.ok(builtIn, `${file}: matching built-in clip`);
+  assert.deepEqual(clip.tracks, builtIn.tracks, `${file}: reusable asset tracks must match the built-in action`);
+  assert.deepEqual(clip.events, builtIn.events, `${file}: reusable asset events must match the built-in action`);
+  assert.deepEqual(clip.contacts, builtIn.contacts, `${file}: reusable asset contacts must match the built-in action`);
 }
 
 const session = JSON.parse(await readFile(new URL('basic-animation-session.json', root), 'utf8'));
