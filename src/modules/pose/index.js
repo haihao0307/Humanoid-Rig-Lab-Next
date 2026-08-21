@@ -99,7 +99,7 @@ function updatePin(context, joint, pinned) {
   }, { module: 'pose', summary: `${pinned ? '固定' : '释放'} ${canonicalJoint}` });
 }
 
-function posePreset(name) {
+export function posePreset(name) {
   const joints = structuredClone(createDefaultState().character.pose.joints);
   if (name === 't') {
     joints.leftElbow = { x: -.31, y: .79 }; joints.leftWrist = { x: -.43, y: .79 }; joints.leftHand = { x: -.47, y: .79 };
