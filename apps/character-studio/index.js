@@ -72,6 +72,7 @@ const LEFT_PANEL_SLOTS = Object.freeze([
 
 const RIGHT_PANEL_SLOTS = Object.freeze([
   ['characterProfile', 'CharacterProfile', 'Character Core profile 只读摘要'],
+  ['expressionState', 'Expression State', 'Face Expression 当前状态只读摘要'],
   ['revisionSummary', 'Revision Summary', '模块 revision 与构建版本摘要'],
   ['activeReferences', 'Active References', 'Skin / Clothing / Hair / Accessory 引用'],
   ['exportSummary', 'Export Summary', '导出入口与后续集成摘要'],
@@ -179,6 +180,8 @@ export class RightPanelHost {
 
   renderSummary(state, runtime, sessionSnapshot = null) {
     const profile = runtime.characterProfile;
+    const expression = runtime.faceExpression || { schema: 'humanoid_rig/face_expression@1.0', expressionRevision: 0, channels: {} };
+    const expressionDescriptor = runtime.faceExpressionDescriptor;
     const moduleRevisions = state.moduleRevisions || {};
     const activeVersions = state.activeVersions || {};
     const clothing = runtime.clothingProfile;
@@ -193,6 +196,17 @@ export class RightPanelHost {
         ${dataRow('Source', 'Character Core')}
       </div>`));
 
+    const activeExpressionChannels = Object.entries(expression.channels || {})
+      .filter(([, value]) => Number(value) > 0.0001)
+      .map(([channel, value]) => `${channel}=${Number(value).toFixed(2)}`);
+    this.mount('expressionState', htmlNode(`
+      <div class="character-studio-data-card character-studio-expression-summary">
+        ${dataRow('Schema', expression.schema || 'humanoid_rig/face_expression@1.0')}
+        ${dataRow('Expression Revision', `r${Number(expression.expressionRevision || 0)}`)}
+        ${dataRow('Active Channels', `${activeExpressionChannels.length} / ${Object.keys(expression.channels || {}).length || 17}`)}
+        <span class="character-studio-slot-note">${escapeHtml(activeExpressionChannels.join(' · ') || 'neutral')}</span>
+      </div>`));
+
     this.mount('revisionSummary', htmlNode(`
       <div class="character-studio-revision-list">
         ${revisionRow('Project', `r${Number(state.revision || 1)}`)}
@@ -205,6 +219,7 @@ export class RightPanelHost {
         ${revisionRow('Skin', `r${Number(profile?.skin_revision || 0)} · ${activeVersions.skin || 'skin@0.5.1'} · m${Number(moduleRevisions.skin || 0)}`)}
         ${revisionRow('Pose', `r${Number(profile?.pose_revision || 0)} · ${activeVersions.pose || 'pose@0.4.0'}`)}
         ${revisionRow('Animation', `r${Number(profile?.animation_revision || 0)} · ${activeVersions.animation || 'anim@0.4.0'}`)}
+        ${revisionRow('Expression', `r${Number(expression.expressionRevision || 0)} · ${expressionDescriptor?.deformationMode || 'interface-only'}`)}
       </div>`));
 
     this.mount('activeReferences', htmlNode(`
@@ -222,6 +237,7 @@ export class RightPanelHost {
         ${dataRow('Render stack', 'Character → Skin → Clothing → Appearance')}
         ${dataRow('Saved revision', `r${Number(sessionSnapshot?.project_revision || state.revision || 0)}`)}
         ${dataRow('Profile schema', profile?.schema || 'humanoid_rig/character_profile@1.4')}
+        ${dataRow('Face Runtime', expressionDescriptor?.deformationMode || 'interface-only')}
         ${dataRow('Build', BUILD_ID)}
         <button class="character-studio-export-button" data-character-studio-export type="button">导出 CharacterProfile JSON</button>
         <span class="character-studio-slot-note">只包含版本、模块引用与资源摘要，不包含二进制资源。</span>
@@ -530,6 +546,8 @@ export class CharacterStudioApp {
     const appearanceFrame = followAppearanceAttachments(appearanceState, frame.simulationRig);
     const characterId = state.characterCore?.active_character_id || 'character_001';
     const characterProfile = state.characterCore?.profiles?.[characterId] || null;
+    const faceExpression = state.faceSystem?.expression || null;
+    const faceExpressionDescriptor = state.faceSystem?.expression_runtime_descriptor || null;
 
     return {
       animation,
@@ -540,6 +558,8 @@ export class CharacterStudioApp {
       appearanceDescriptor,
       appearanceFrame,
       characterProfile,
+      faceExpression,
+      faceExpressionDescriptor,
     };
   }
 

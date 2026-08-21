@@ -1,10 +1,11 @@
-export const CHARACTER_PROFILE_SCHEMA = 'humanoid_rig/character_profile@1.4';
+export const CHARACTER_PROFILE_SCHEMA = 'humanoid_rig/character_profile@1.5';
 
 export const CHARACTER_REVISION_FIELDS = Object.freeze([
   'proportion_revision',
   'body_shape_revision',
   'skin_revision',
   'face_revision',
+  'expression_revision',
   'clothing_revision',
   'hair_revision',
   'accessory_revision',
@@ -19,6 +20,7 @@ const PROFILE_FIELDS = new Set([
   'identity',
   'body_shape',
   'face_identity',
+  'expression_revision', 'expression_runtime_descriptor',
   'clothing_attachments',
   'hair',
   'accessory_attachments',
@@ -52,6 +54,7 @@ export function createCharacterProfile(input = {}, moduleRevisions = {}) {
     input.face_revision,
     input.face_identity?.revision ?? moduleRevisions.face,
   );
+  const expressionRevision = revision(input.expression_revision, moduleRevisions.expression);
   faceIdentity.revision = faceRevision;
   const clothingAttachments = normalizeClothingAttachments(input.clothing_attachments);
   const hair = normalizeHairReference(input.hair);
@@ -65,6 +68,8 @@ export function createCharacterProfile(input = {}, moduleRevisions = {}) {
     identity: normalizeIdentity(input.identity),
     body_shape: bodyShape,
     face_identity: faceIdentity,
+    expression_revision: expressionRevision,
+    expression_runtime_descriptor: normalizeExpressionRuntimeDescriptor(input.expression_runtime_descriptor),
     clothing_attachments: clothingAttachments,
     hair,
     accessory_attachments: accessoryAttachments,
@@ -139,6 +144,14 @@ export function assertCharacterProfileInput(input, { partial = true } = {}) {
     if (!isPlainObject(input.face_identity)) throw new TypeError('face_identity must be a reference object.');
     assertAllowedKeys(input.face_identity, FACE_IDENTITY_FIELDS, 'face_identity');
   }
+  if ('expression_revision' in input && (!Number.isInteger(Number(input.expression_revision)) || Number(input.expression_revision) < 0)) {
+    throw new TypeError('expression_revision must be a non-negative integer reference.');
+  }
+  if ('expression_runtime_descriptor' in input
+    && input.expression_runtime_descriptor !== null
+    && !isPlainObject(input.expression_runtime_descriptor)) {
+    throw new TypeError('expression_runtime_descriptor must be an object or null.');
+  }
   if ('clothing_attachments' in input) {
     if (!Array.isArray(input.clothing_attachments)) throw new TypeError('clothing_attachments must be an array of references.');
     for (const [index, attachment] of input.clothing_attachments.entries()) {
@@ -211,6 +224,11 @@ function normalizeFaceIdentityReference(value) {
     face_id: nullableString(source.face_id),
     revision: revision(source.revision, 0),
   };
+}
+
+function normalizeExpressionRuntimeDescriptor(value) {
+  if (!isPlainObject(value)) return null;
+  return structuredClone(value);
 }
 
 function normalizeClothingAttachments(value) {

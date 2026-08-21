@@ -7,7 +7,11 @@ import {
 } from './state-schema.js';
 import { CharacterManager, appendOperationEvent } from '../packages/character-core/index.js';
 import { BodyShapeEditor, getActiveBodyShapeProfile } from '../packages/body-shape/index.js';
-import { FaceEditor, getActiveFaceIdentity } from '../packages/face-system/index.js';
+import {
+  FaceEditor,
+  getActiveFaceExpression,
+  getActiveFaceIdentity,
+} from '../packages/face-system/index.js';
 import {
   ClothingManager,
   clothingAttachmentReferences,
@@ -367,6 +371,42 @@ export class ProjectHubClient extends EventTarget {
     return this.#commitFaceSystem(faceSystem, '修改 Face Identity 参数', { syncCharacter: false });
   }
 
+  getFaceExpression() {
+    return getActiveFaceExpression(this.state.faceSystem);
+  }
+
+  updateFaceExpression(patch, { expected_revision = this.state.faceSystem?.revision, ...options } = {}) {
+    const faceSystem = faceEditor.updateExpression(this.state.faceSystem, patch, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitFaceSystem(faceSystem, '修改 Face Expression 参数', { syncCharacter: false });
+  }
+
+  mirrorFaceExpression({ expected_revision = this.state.faceSystem?.revision, ...options } = {}) {
+    const faceSystem = faceEditor.mirrorExpression(this.state.faceSystem, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitFaceSystem(faceSystem, '镜像 Face Expression 参数', { syncCharacter: false });
+  }
+
+  saveFaceExpressionVersion({
+    expected_revision = this.state.faceSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const faceSystem = faceEditor.saveExpressionVersion(this.state.faceSystem, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitFaceSystem(faceSystem, '保存 Face Expression 版本', {
+      syncCharacter: true,
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
   saveFaceVersion({
     expected_revision = this.state.faceSystem?.revision,
     expected_character_revision = this.state.characterCore?.revision,
@@ -626,12 +666,15 @@ export class ProjectHubClient extends EventTarget {
     actor = null,
   } = {}) {
     const faceIdentity = getActiveFaceIdentity(faceSystem);
+    const faceExpression = getActiveFaceExpression(faceSystem);
     const characterId = this.state.characterCore?.active_character_id;
     const characterResult = syncCharacter && characterId
       ? characterManager.save(this.state.characterCore, {
           character_id: characterId,
           face_identity: { face_id: faceIdentity.face_id, revision: faceIdentity.version },
           face_revision: faceIdentity.version,
+          expression_revision: faceExpression.expressionRevision,
+          expression_runtime_descriptor: faceSystem.expression_runtime_descriptor,
         }, {
           expected_revision: expectedCharacterRevision,
           actor: actor || `face-system:${this.clientId.slice(0, 8)}`,

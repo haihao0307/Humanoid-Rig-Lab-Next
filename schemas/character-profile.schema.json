@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "humanoid_rig/character_profile@1.4",
+  "$id": "humanoid_rig/character_profile@1.5",
   "title": "Humanoid Rig Lab CharacterProfile",
   "type": "object",
   "additionalProperties": false,
@@ -112,6 +112,13 @@
     "body_shape_revision": { "$ref": "#/$defs/revision" },
     "skin_revision": { "$ref": "#/$defs/revision" },
     "face_revision": { "$ref": "#/$defs/revision" },
+    "expression_revision": { "$ref": "#/$defs/revision" },
+    "expression_runtime_descriptor": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/expressionRuntimeDescriptor" }
+      ]
+    },
     "clothing_revision": { "$ref": "#/$defs/revision" },
     "hair_revision": { "$ref": "#/$defs/revision" },
     "accessory_revision": { "$ref": "#/$defs/revision" },
@@ -119,6 +126,39 @@
     "animation_revision": { "$ref": "#/$defs/revision" }
   },
   "$defs": {
-    "revision": { "type": "integer", "minimum": 0 }
+    "revision": { "type": "integer", "minimum": 0 },
+    "expressionRuntimeDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expressionSchema", "channels", "deformationMode", "meshReference", "morphTargets", "correctiveTargets"],
+      "properties": {
+        "expressionSchema": { "const": "humanoid_rig/face_expression@1.0" },
+        "channels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "eyeBlinkLeft", "eyeBlinkRight", "eyeWideLeft", "eyeWideRight",
+            "browDownLeft", "browDownRight", "browInnerUp",
+            "mouthSmileLeft", "mouthSmileRight", "mouthFrownLeft", "mouthFrownRight",
+            "jawOpen", "jawLeft", "jawRight", "cheekPuff", "cheekSquintLeft", "cheekSquintRight"
+          ],
+          "properties": {
+            "eyeBlinkLeft": { "$ref": "#/$defs/parameter" }, "eyeBlinkRight": { "$ref": "#/$defs/parameter" },
+            "eyeWideLeft": { "$ref": "#/$defs/parameter" }, "eyeWideRight": { "$ref": "#/$defs/parameter" },
+            "browDownLeft": { "$ref": "#/$defs/parameter" }, "browDownRight": { "$ref": "#/$defs/parameter" },
+            "browInnerUp": { "$ref": "#/$defs/parameter" },
+            "mouthSmileLeft": { "$ref": "#/$defs/parameter" }, "mouthSmileRight": { "$ref": "#/$defs/parameter" },
+            "mouthFrownLeft": { "$ref": "#/$defs/parameter" }, "mouthFrownRight": { "$ref": "#/$defs/parameter" },
+            "jawOpen": { "$ref": "#/$defs/parameter" }, "jawLeft": { "$ref": "#/$defs/parameter" }, "jawRight": { "$ref": "#/$defs/parameter" },
+            "cheekPuff": { "$ref": "#/$defs/parameter" }, "cheekSquintLeft": { "$ref": "#/$defs/parameter" }, "cheekSquintRight": { "$ref": "#/$defs/parameter" }
+          }
+        },
+        "deformationMode": { "enum": ["interface-only", "morph-target", "vertex-corrective", "shader-corrective"] },
+        "meshReference": { "type": ["object", "string", "null"] },
+        "morphTargets": { "type": "array" },
+        "correctiveTargets": { "type": "array" }
+      }
+    },
+    "parameter": { "type": "number", "minimum": 0, "maximum": 1 }
   }
 }

@@ -1,5 +1,6 @@
 import {
   EYE_SHAPE_FIELDS,
+  FACE_EXPRESSION_CHANNELS,
   FACE_SHAPE_FIELDS,
   MOUTH_SHAPE_FIELDS,
   NOSE_SHAPE_FIELDS,
@@ -22,11 +23,20 @@ const GROUPS = Object.freeze([
   ['mouth_shape', '嘴部', MOUTH_SHAPE_FIELDS],
 ]);
 
+const EXPRESSION_LABELS = Object.freeze({
+  eyeBlinkLeft: 'Blink L', eyeBlinkRight: 'Blink R', eyeWideLeft: 'Wide L', eyeWideRight: 'Wide R',
+  browDownLeft: 'Brow Down L', browDownRight: 'Brow Down R', browInnerUp: 'Brow Raise',
+  mouthSmileLeft: 'Smile L', mouthSmileRight: 'Smile R', mouthFrownLeft: 'Frown L', mouthFrownRight: 'Frown R',
+  jawOpen: 'Jaw Open', jawLeft: 'Jaw Left', jawRight: 'Jaw Right',
+  cheekPuff: 'Cheek Puff', cheekSquintLeft: 'Squint L', cheekSquintRight: 'Squint R',
+});
+
 export class FacePanel extends CharacterStudioPanel {
   constructor() { super('face', 'Face'); }
 
   render(snapshot) {
     const face = snapshot.face;
+    const expression = snapshot.faceExpression;
     const controls = [numberField('age', '年龄', face.age, { min: 0, max: 120, step: 1 })];
     for (const [group, label, fields] of GROUPS) {
       controls.push(`<h4>${label}</h4>`);
@@ -38,6 +48,17 @@ export class FacePanel extends CharacterStudioPanel {
       { value: 'neutral', label: 'Neutral' }, { value: 'smile', label: 'Smile' },
       { value: 'frown', label: 'Frown' }, { value: 'surprise', label: 'Surprise' },
     ]));
+    controls.push('<h4>Expression Channels</h4>');
+    controls.push('<p class="character-studio-face-expression-note">Expression State → Face Runtime → Morph / Corrective Layer</p>');
+    controls.push(`<div class="character-studio-face-expression-panel">
+      ${FACE_EXPRESSION_CHANNELS.map((channel) => expressionControl(
+        channel,
+        EXPRESSION_LABELS[channel] || channel,
+        expression?.channels?.[channel],
+      )).join('')}
+      <button class="character-studio-face-mirror" type="button" data-face-expression-mirror>镜像表情</button>
+      <div class="character-studio-face-expression-status">Expression r${Number(expression?.expressionRevision || 1)}</div>
+    </div>`);
     return panelShell({ id: this.id, title: this.title, current: `${face.face_id} · v${face.version}`, body: controls.join('') });
   }
 
@@ -50,9 +71,26 @@ export class FacePanel extends CharacterStudioPanel {
           patch[group] = Object.fromEntries(fields.map((field) => [field, fieldNumber(section, `${group}.${field}`)]));
         }
         patch.expression_profile = { default_expression: fieldValue(section, 'expression') };
-        return controller.applyFace(patch);
+        controller.applyFace(patch);
+        const channels = Object.fromEntries(FACE_EXPRESSION_CHANNELS.map((channel) => [
+          channel,
+          Number(section.querySelector(`[data-expression-channel="${channel}"]`)?.value || 0),
+        ]));
+        return controller.applyFaceExpression(channels);
       },
       reset: () => controller.resetFace(),
     }, context);
+    section?.querySelector?.('[data-face-expression-mirror]')?.addEventListener('click', () => (
+      context.run(() => controller.mirrorFaceExpression())
+    ));
   }
+}
+
+function expressionControl(channel, label, value) {
+  const normalized = Math.min(1, Math.max(0, Number(value) || 0));
+  return `<label class="character-studio-expression-control">
+    <span>${label}</span>
+    <input type="range" min="0" max="1" step="0.01" value="${normalized}" data-expression-channel="${channel}" aria-label="${label}">
+    <output>${normalized.toFixed(2)}</output>
+  </label>`;
 }

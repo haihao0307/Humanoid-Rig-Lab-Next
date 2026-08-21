@@ -4,6 +4,7 @@ import {
   normalizeBodyShapeState,
 } from '../../packages/body-shape/index.js';
 import {
+  FACE_EXPRESSION_CHANNELS,
   createFaceIdentity,
   getActiveFaceIdentity,
   normalizeFaceState,
@@ -79,10 +80,22 @@ export class CharacterStudioController {
     return this.hub.saveFaceVersion();
   }
 
+  applyFaceExpression(channels) {
+    return this.hub.updateFaceExpression({ channels: pickFinite(channels, FACE_EXPRESSION_CHANNELS) });
+  }
+
+  mirrorFaceExpression() {
+    return this.hub.mirrorFaceExpression();
+  }
+
+  resetFaceExpression() {
+    return this.applyFaceExpression(Object.fromEntries(FACE_EXPRESSION_CHANNELS.map((channel) => [channel, 0])));
+  }
+
   resetFace() {
     const current = this.hub.getFace();
     const defaults = createFaceIdentity({ face_id: current.face_id });
-    return this.applyFace({
+    this.applyFace({
       age: defaults.age,
       face_shape: defaults.face_shape,
       eye_shape: defaults.eye_shape,
@@ -90,6 +103,7 @@ export class CharacterStudioController {
       mouth_shape: defaults.mouth_shape,
       expression_profile: defaults.expression_profile,
     });
+    return this.resetFaceExpression();
   }
 
   applyClothing(selection = {}) {
@@ -281,6 +295,7 @@ export function buildCharacterStudioSnapshot(state) {
   const faceState = normalizeFaceState(state.faceSystem);
   const face = faceState.profiles[profile.face_identity.face_id]
     || getActiveFaceIdentity(faceState);
+  const faceExpression = faceState.expression;
   const clothingState = normalizeClothingState(state.clothingSystem);
   const clothingProfile = getActiveClothingProfile(clothingState);
   const clothingById = new Map(clothingProfile.assets.map((asset) => [asset.clothing_id, asset]));
@@ -298,6 +313,7 @@ export function buildCharacterStudioSnapshot(state) {
     profile,
     bodyShape,
     face,
+    faceExpression,
     clothing,
     clothingProfile,
     hair,

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/face_expression@1.0",
+  "title": "Humanoid Rig Lab FaceExpressionState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "expressionRevision", "channels"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/face_expression@1.0" },
+    "expressionRevision": { "type": "integer", "minimum": 1 },
+    "channels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eyeBlinkLeft", "eyeBlinkRight", "eyeWideLeft", "eyeWideRight",
+        "browDownLeft", "browDownRight", "browInnerUp",
+        "mouthSmileLeft", "mouthSmileRight", "mouthFrownLeft", "mouthFrownRight",
+        "jawOpen", "jawLeft", "jawRight",
+        "cheekPuff", "cheekSquintLeft", "cheekSquintRight"
+      ],
+      "properties": {
+        "eyeBlinkLeft": { "$ref": "#/$defs/channel" },
+        "eyeBlinkRight": { "$ref": "#/$defs/channel" },
+        "eyeWideLeft": { "$ref": "#/$defs/channel" },
+        "eyeWideRight": { "$ref": "#/$defs/channel" },
+        "browDownLeft": { "$ref": "#/$defs/channel" },
+        "browDownRight": { "$ref": "#/$defs/channel" },
+        "browInnerUp": { "$ref": "#/$defs/channel" },
+        "mouthSmileLeft": { "$ref": "#/$defs/channel" },
+        "mouthSmileRight": { "$ref": "#/$defs/channel" },
+        "mouthFrownLeft": { "$ref": "#/$defs/channel" },
+        "mouthFrownRight": { "$ref": "#/$defs/channel" },
+        "jawOpen": { "$ref": "#/$defs/channel" },
+        "jawLeft": { "$ref": "#/$defs/channel" },
+        "jawRight": { "$ref": "#/$defs/channel" },
+        "cheekPuff": { "$ref": "#/$defs/channel" },
+        "cheekSquintLeft": { "$ref": "#/$defs/channel" },
+        "cheekSquintRight": { "$ref": "#/$defs/channel" }
+      }
+    }
+  },
+  "$defs": {
+    "channel": { "type": "number", "minimum": 0, "maximum": 1 }
+  },
+  "x-mirror-pairs": [
+    ["eyeBlinkLeft", "eyeBlinkRight"],
+    ["eyeWideLeft", "eyeWideRight"],
+    ["browDownLeft", "browDownRight"],
+    ["mouthSmileLeft", "mouthSmileRight"],
+    ["mouthFrownLeft", "mouthFrownRight"],
+    ["jawLeft", "jawRight"],
+    ["cheekSquintLeft", "cheekSquintRight"]
+  ]
+}

@@ -471,6 +471,15 @@ Character Core 是四模块之上的引用层，不是第五个几何或动画�
   "identity": { "identity_id": null, "revision": 0, "tags": [] },
   "body_shape": { "profile_id": "body_shape_001", "revision": 1 },
   "face_identity": { "face_id": "face_001", "revision": 1 },
+  "expression_revision": 1,
+  "expression_runtime_descriptor": {
+    "expressionSchema": "humanoid_rig/face_expression@1.0",
+    "channels": {},
+    "deformationMode": "interface-only",
+    "meshReference": null,
+    "morphTargets": [],
+    "correctiveTargets": []
+  },
   "clothing_attachments": [],
   "hair": { "hair_id": null, "revision": 0 },
   "accessory_attachments": [],
@@ -531,7 +540,28 @@ FaceIdentity 使用 `humanoid_rig/face_profile@1.0`，数据由 `packages/face-s
 }
 ```
 
-FaceState 使用独立 revision 保存当前草稿、历史版本和规范运行时描述符。参数值本身不进入 CharacterProfile；保存、创建或恢复 Face 版本时，只同步 `face_identity.face_id`、`face_identity.revision` 与 `face_revision`。运行时适配器目前预留 FLAME、3DMM 和 AI Face Reconstruction，唯一可写目标是 `face.identity_descriptor`，Skin、Rig、骨长、层级、Pose 与 Animation 继续保持只读。
+FaceState 使用独立 revision 保存当前草稿、历史版本和规范运行时描述符。Face Identity 参数本身不进入 CharacterProfile；保存、创建或恢复 Face Identity 版本时，同步 `face_identity.face_id`、`face_identity.revision` 与 `face_revision`。Skin、Rig、骨长、层级、Pose 与 Animation 继续保持只读。
+
+## 15.1 Face Expression
+
+Face Expression 使用独立协议 `humanoid_rig/face_expression@1.0`，定义于 `schemas/face-expression.schema.json`。它属于现有 `faceSystem` 切片，不新增 ProjectState 顶层状态中心：
+
+```json
+{
+  "schema": "humanoid_rig/face_expression@1.0",
+  "expressionRevision": 1,
+  "channels": {
+    "eyeBlinkLeft": 0,
+    "eyeBlinkRight": 0,
+    "browInnerUp": 0,
+    "mouthSmileLeft": 0,
+    "mouthSmileRight": 0,
+    "jawOpen": 0
+  }
+}
+```
+
+实际状态包含完整 17 个 channel，全部限制在 `0..1`。Face System 提供归一化、校验和左右镜像；当前 `face_runtime_descriptor` 仅声明 `interface-only`，`meshReference`、`morphTargets` 与 `correctiveTargets` 保持空值，供未来 Morph Target、Vertex Corrective 和 Shader Corrective 接入。保存到 CharacterProfile 时只增加可选的 `expression_revision` 与 `expression_runtime_descriptor` 引用，旧 CharacterProfile 缺少这些字段时按 neutral expression 兼容加载。
 
 ## 16. Clothing System
 

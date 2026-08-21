@@ -362,13 +362,23 @@ function reconcileFaceReference(state, source) {
     || !referencedFaceVersions.some((profile) => profile.version === activeCharacter.face_identity.revision);
   const legacyCharacterWithoutFaceReference = migratedWithoutFaceSystem
     && !isPlainObject(sourceCharacter?.face_identity);
-  if (!missingReference && !legacyCharacterWithoutFaceReference) return;
+  const missingExpressionReference = !Number.isInteger(activeCharacter.expression_revision)
+    || !isPlainObject(activeCharacter.expression_runtime_descriptor);
+  const migrateExpressionReference = missingExpressionReference
+    && (migratedWithoutFaceSystem || legacyCharacterWithoutFaceReference);
+  if (!missingReference && !legacyCharacterWithoutFaceReference && !migrateExpressionReference) return;
 
-  activeCharacter.face_identity = {
-    face_id: activeFace.face_id,
-    revision: activeFace.version,
-  };
-  activeCharacter.face_revision = activeFace.version;
+  if (missingReference || legacyCharacterWithoutFaceReference) {
+    activeCharacter.face_identity = {
+      face_id: activeFace.face_id,
+      revision: activeFace.version,
+    };
+    activeCharacter.face_revision = activeFace.version;
+  }
+  if (migrateExpressionReference) {
+    activeCharacter.expression_revision = state.faceSystem.expression.expressionRevision;
+    activeCharacter.expression_runtime_descriptor = structuredClone(state.faceSystem.expression_runtime_descriptor);
+  }
 }
 
 function reconcileClothingReferences(state, source) {

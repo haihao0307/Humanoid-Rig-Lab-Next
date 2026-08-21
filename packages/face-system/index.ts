@@ -1,3 +1,6 @@
 export * from './face-profile.ts';
 export * from './face-runtime.ts';
 export * from './face-editor.ts';
+export * from './face-expression.ts';
+export * from './face-runtime-descriptor.ts';
+export * from './face-analysis-adapter.ts';

@@ -103,6 +103,7 @@ export function createDefaultState() {
     face_id: 'face_001',
     age: 30,
   });
+  const defaultFaceState = createFaceState(defaultFaceIdentity);
   const defaultClothingProfile = createClothingProfile({
     clothing_profile_id: 'clothing_profile_001',
     character_id: 'character_001',
@@ -122,6 +123,8 @@ export function createDefaultState() {
     body_shape_revision: defaultBodyShapeProfile.version,
     face_identity: { face_id: defaultFaceIdentity.face_id, revision: defaultFaceIdentity.version },
     face_revision: defaultFaceIdentity.version,
+    expression_revision: defaultFaceState.expression.expressionRevision,
+    expression_runtime_descriptor: defaultFaceState.expression_runtime_descriptor,
     clothing_attachments: [],
     clothing_revision: defaultClothingProfile.version,
     hair: defaultAppearanceReferences.hair,
@@ -194,7 +197,7 @@ export function createDefaultState() {
       updated_at: now,
     }),
     bodyShape: createBodyShapeState(defaultBodyShapeProfile),
-    faceSystem: createFaceState(defaultFaceIdentity),
+    faceSystem: defaultFaceState,
     clothingSystem: createClothingState(defaultClothingProfile),
     appearanceSystem: defaultAppearanceState,
     characterGenerator: createCharacterGeneratorState(),

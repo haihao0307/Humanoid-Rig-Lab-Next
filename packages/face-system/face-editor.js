@@ -4,6 +4,13 @@ import {
   mergeFaceIdentity,
 } from './face-profile.js';
 import { createFaceRuntimeDescriptor } from './face-runtime.js';
+import {
+  createFaceExpressionState,
+  mirrorFaceExpression,
+  updateFaceExpression,
+  normalizeFaceExpression,
+} from './face-expression.js';
+import { createFaceExpressionRuntimeDescriptor } from './face-runtime-descriptor.js';
 
 export const FACE_STATE_SCHEMA = 'humanoid_rig/face_state@1.0';
 
@@ -16,8 +23,13 @@ export class FaceRevisionConflictError extends Error {
   }
 }
 
-export function createFaceState(profileInput = {}) {
-  const profile = createFaceIdentity(profileInput);
+export function createFaceState(profileInput = {}, expressionInput = {}) {
+  const identityInput = isPlainObject(profileInput) ? { ...profileInput } : {};
+  delete identityInput.expression;
+  const profile = createFaceIdentity(identityInput);
+  const expression = createFaceExpressionState(
+    isPlainObject(profileInput.expression) ? profileInput.expression : expressionInput,
+  );
   const now = new Date().toISOString();
   return {
     schema: FACE_STATE_SCHEMA,
@@ -28,6 +40,8 @@ export function createFaceState(profileInput = {}) {
     profiles: { [profile.face_id]: profile },
     versions: { [profile.face_id]: [structuredClone(profile)] },
     runtime_descriptor: createFaceRuntimeDescriptor(profile),
+    expression,
+    expression_runtime_descriptor: createFaceExpressionRuntimeDescriptor(expression),
   };
 }
 
@@ -57,6 +71,7 @@ export function normalizeFaceState(input, { fallbackProfile = {} } = {}) {
     versions[profile.face_id] = dedupeVersions(snapshots.length ? snapshots : [structuredClone(profile)]);
   }
   const active = profiles[activeId];
+  const expression = normalizeFaceExpression(source.expression);
   return {
     schema: FACE_STATE_SCHEMA,
     revision: nonNegativeInteger(source.revision, 1),
@@ -66,6 +81,8 @@ export function normalizeFaceState(input, { fallbackProfile = {} } = {}) {
     profiles,
     versions,
     runtime_descriptor: createFaceRuntimeDescriptor(active),
+    expression,
+    expression_runtime_descriptor: createFaceExpressionRuntimeDescriptor(expression),
   };
 }
 
@@ -94,6 +111,26 @@ export class FaceEditor {
     if (patch.face_id && patch.face_id !== current.face_id) throw new Error('Cannot rename the active face_id.');
     const profile = mergeFaceIdentity(current, { ...patch, face_id: current.face_id, version: current.version });
     return commit(state, profile, true, options.at);
+  }
+
+  updateExpression(stateInput, patch, options = {}) {
+    const state = normalizeFaceState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    const expression = updateFaceExpression(state.expression, patch);
+    return commitExpression(state, expression, true, options.at);
+  }
+
+  mirrorExpression(stateInput, options = {}) {
+    const state = normalizeFaceState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    const expression = updateFaceExpression(state.expression, mirrorFaceExpression(state.expression));
+    return commitExpression(state, expression, true, options.at);
+  }
+
+  saveExpressionVersion(stateInput, options = {}) {
+    const state = normalizeFaceState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    return commitExpression(state, normalizeFaceExpression(state.expression), false, options.at);
   }
 
   saveVersion(stateInput, options = {}) {
@@ -135,6 +172,10 @@ export function getActiveFaceIdentity(stateInput) {
   return structuredClone(activeProfile(normalizeFaceState(stateInput)));
 }
 
+export function getActiveFaceExpression(stateInput) {
+  return structuredClone(normalizeFaceState(stateInput).expression);
+}
+
 function commit(state, profile, dirty, at) {
   const next = structuredClone(state);
   next.revision += 1;
@@ -143,6 +184,16 @@ function commit(state, profile, dirty, at) {
   next.dirty = dirty;
   next.profiles[profile.face_id] = profile;
   next.runtime_descriptor = createFaceRuntimeDescriptor(profile);
+  return next;
+}
+
+function commitExpression(state, expression, dirty, at) {
+  const next = structuredClone(state);
+  next.revision += 1;
+  next.updated_at = operationTime(at);
+  next.dirty = dirty;
+  next.expression = normalizeFaceExpression(expression);
+  next.expression_runtime_descriptor = createFaceExpressionRuntimeDescriptor(next.expression);
   return next;
 }
 
