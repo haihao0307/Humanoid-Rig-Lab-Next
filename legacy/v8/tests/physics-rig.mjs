@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {
+  applyPosePresetToDefinition,
   createStandardHumanoidPreset,
   normalizeSkeletonDefinition,
 } from '../src/skeleton-presets.js';
@@ -9,6 +10,7 @@ import {
   buildPosePayload,
   calculateRigHeight,
   computePoseWorldPositions,
+  computeRestWorldPositions,
   getBoneLength,
   vectorDistance,
 } from '../src/skeleton-model.js';
@@ -90,6 +92,15 @@ function assertBindUnchanged(definition, snapshot, message) {
   assert.equal(bindSnapshot(definition), snapshot, message);
 }
 
+function assertPointOffset(actual, source, expected, tolerance, message) {
+  assert.ok(
+    Math.abs((actual.x - source.x) - expected[0]) < tolerance
+      && Math.abs((actual.y - source.y) - expected[1]) < tolerance
+      && Math.abs((actual.z - source.z) - expected[2]) < tolerance,
+    message,
+  );
+}
+
 const MEDIAPIPE_RIG_MAP = Object.freeze({
   0: 'head', 1: 'head', 2: 'head', 3: 'head', 4: 'head', 5: 'head', 6: 'head',
   7: 'head', 8: 'head', 9: 'head', 10: 'head',
@@ -164,6 +175,157 @@ function createSyntheticImageObservation(rig) {
     inferenceMs: 1,
     createdAt: '2026-08-19T00:00:00.000Z',
   };
+}
+
+// Static A/T presets explicitly pose the torso and complete shoulder girdle.
+// A Pose is no longer an implicit alias for bind coordinates, and T Pose does
+// not achieve horizontal arms by rotating only the upper-arm descendants.
+{
+  const aDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('A'));
+  const aBind = bindSnapshot(aDefinition);
+  const aRest = computeRestWorldPositions(aDefinition);
+  const aPose = computePoseWorldPositions(aDefinition);
+  for (const joint of aDefinition.joints) {
+    assert.ok(
+      pointMovement(aRest.get(joint.id), aPose.get(joint.id)) < 1e-10,
+      `Protected A bind pose drifted at ${joint.id}.`,
+    );
+  }
+  const aRig = new PhysicsRig(aDefinition, {
+    solverIterations: 96,
+    exactMaxPasses: 960,
+    exactTolerance: 1e-8,
+    groundEnabled: true,
+    gravityEnabled: false,
+  });
+  assertSolved(aRig, 'Explicit A Pose shoulder chain');
+  assertBindUnchanged(aDefinition, aBind, 'A Pose changed immutable bind dimensions.');
+
+  const tDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('T'));
+  const tBind = bindSnapshot(tDefinition);
+  const tRig = new PhysicsRig(tDefinition, {
+    solverIterations: 96,
+    exactMaxPasses: 960,
+    exactTolerance: 1e-8,
+    groundEnabled: true,
+    gravityEnabled: false,
+  });
+  for (const jointId of [
+    'hips',
+    'spine',
+    'chest',
+    'upperChest',
+    'leftShoulder',
+    'leftScapulaCorrective',
+    'leftUpperArm',
+    'leftLowerArm',
+    'leftHand',
+  ]) {
+    assert.ok(
+      pointMovement(aRig.getPoint(jointId), tRig.getPoint(jointId)) > 0.004,
+      `T Pose did not include ${jointId}.`,
+    );
+  }
+  assert.ok(
+    Math.abs(tRig.getPoint('leftLowerArm').y - tRig.getPoint('leftHand').y) < 5e-5,
+    'T Pose forearm is not horizontal.',
+  );
+  assertSolved(tRig, 'Complete T Pose torso and shoulder chain');
+  assertBindUnchanged(tDefinition, tBind, 'T Pose changed immutable bind dimensions.');
+
+  const beforeRestore = computePoseWorldPositions(tDefinition);
+  applyPosePresetToDefinition(tDefinition, 'A');
+  const restoredA = computePoseWorldPositions(tDefinition);
+  for (const jointId of [
+    'spine',
+    'chest',
+    'upperChest',
+    'leftShoulder',
+    'leftScapulaCorrective',
+    'leftUpperArm',
+    'leftLowerArm',
+    'leftHand',
+    'leftHandEnd',
+  ]) {
+    assert.ok(
+      pointMovement(beforeRestore.get(jointId), restoredA.get(jointId)) > 0.004,
+      `Restoring A Pose did not update ${jointId}.`,
+    );
+    assert.ok(
+      pointMovement(aPose.get(jointId), restoredA.get(jointId)) < 1e-10,
+      `Restoring A Pose did not return ${jointId} to its protected bind position.`,
+    );
+  }
+}
+
+// Reach is generated from a hand target and elbow pole after compensating the
+// spine and shoulder girdle. The helper controls expose the solved targets.
+{
+  const base = createRig({ solverIterations: 96 });
+  const definition = normalizeSkeletonDefinition(createStandardHumanoidPreset('REACH_LEFT'));
+  const immutableBind = bindSnapshot(definition);
+  const rig = new PhysicsRig(definition, {
+    solverIterations: 96,
+    exactMaxPasses: 960,
+    exactTolerance: 1e-8,
+    groundEnabled: true,
+    gravityEnabled: false,
+  });
+
+  assert.ok(pointMovement(base.rig.getPoint('leftHandEnd'), rig.getPoint('leftHandEnd')) > 0.70);
+  assert.ok(pointMovement(base.rig.getPoint('leftLowerArm'), rig.getPoint('leftLowerArm')) > 0.35);
+  assert.ok(pointMovement(base.rig.getPoint('leftUpperArm'), rig.getPoint('leftUpperArm')) > 0.10);
+  assert.ok(pointMovement(base.rig.getPoint('leftScapulaCorrective'), rig.getPoint('leftScapulaCorrective')) > 0.08);
+  assert.ok(pointMovement(base.rig.getPoint('upperChest'), rig.getPoint('upperChest')) > 0.02);
+  assert.ok(pointMovement(base.rig.getPoint('spine'), rig.getPoint('spine')) > 0.003);
+  assert.ok(vectorDistance(rig.getPoint('leftHandIK'), rig.getPoint('leftHandEnd')) < 1e-10);
+  assertPointOffset(
+    rig.getPoint('leftElbowPole'),
+    rig.getPoint('leftLowerArm'),
+    [-0.05, 0.02, 0.26],
+    1e-10,
+    'Reach elbow pole did not follow the solved elbow.',
+  );
+  assertSolved(rig, 'Reach hand-target chain');
+  assertBindUnchanged(definition, immutableBind, 'Reach changed immutable bind dimensions.');
+}
+
+// Step solves the foot target through ankle, knee and hip after moving the
+// pelvis, then counterbalances the resulting lower-body pose through the spine.
+{
+  const base = createRig({ solverIterations: 96 });
+  const definition = normalizeSkeletonDefinition(createStandardHumanoidPreset('STEP'));
+  const immutableBind = bindSnapshot(definition);
+  const rig = new PhysicsRig(definition, {
+    solverIterations: 96,
+    exactMaxPasses: 960,
+    exactTolerance: 1e-8,
+    groundEnabled: true,
+    gravityEnabled: false,
+  });
+
+  assert.ok(pointMovement(base.rig.getPoint('leftFoot'), rig.getPoint('leftFoot')) > 0.30);
+  assert.ok(pointMovement(base.rig.getPoint('leftLowerLeg'), rig.getPoint('leftLowerLeg')) > 0.15);
+  assert.ok(pointMovement(base.rig.getPoint('leftUpperLeg'), rig.getPoint('leftUpperLeg')) > 0.015);
+  assert.ok(pointMovement(base.rig.getPoint('hips'), rig.getPoint('hips')) > 0.015);
+  assert.ok(pointMovement(base.rig.getPoint('spine'), rig.getPoint('spine')) > 0.015);
+  assert.ok(Math.abs(rig.getPoint('leftFoot').z - rig.getPoint('rightFoot').z) > 0.25);
+  assertPointOffset(
+    rig.getPoint('leftFootIK'),
+    rig.getPoint('leftFoot'),
+    [0, -0.075, 0.04],
+    1e-10,
+    'Step foot IK control did not follow the solved ankle.',
+  );
+  assertPointOffset(
+    rig.getPoint('leftKneePole'),
+    rig.getPoint('leftLowerLeg'),
+    [-0.035, 0.02, 0.32],
+    1e-10,
+    'Step knee pole did not follow the solved knee.',
+  );
+  assertSolved(rig, 'Step foot-target and pelvis chain');
+  assertBindUnchanged(definition, immutableBind, 'Step changed immutable bind dimensions.');
 }
 
 // Joint dragging propagates through the body while dimensions, pelvis width,

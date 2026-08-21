@@ -792,6 +792,14 @@ function subtract3(left, right) {
   return [left[0] - right[0], left[1] - right[1], left[2] - right[2]];
 }
 
+function scale3(value, amount) {
+  return [value[0] * amount, value[1] * amount, value[2] * amount];
+}
+
+function dot3(left, right) {
+  return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
 function lerp3(start, end, amount) {
   return [
     start[0] + (end[0] - start[0]) * amount,
@@ -809,32 +817,14 @@ export function applyPosePresetToDefinition(definition, pose = 'A') {
     jointItem.poseWorldPosition = [...point];
   }
 
-  // The distributed sample mesh is already in its fitted A pose. T pose only
-  // rotates each arm chain while preserving every bind segment length.
   if (normalizedPose === 'T') {
-    poseArmChain(definition, 'left', [-1, 0, 0]);
-    poseArmChain(definition, 'right', [1, 0, 0]);
+    applyTPose(definition);
   } else if (normalizedPose === 'REACH_LEFT') {
-    poseArmChain(definition, 'left', [-0.92, 0.18, 0.34]);
+    applyReachPose(definition);
   } else if (normalizedPose === 'STEP') {
-    poseChainWithDirections(definition, [
-      'leftUpperLeg', 'leftLowerLeg', 'leftFoot', 'leftToes', 'leftToesEnd',
-    ], [
-      [0, -0.91, 0.42],
-      [0, -0.96, 0.28],
-      [0, -0.08, 1],
-      [0, 0, 1],
-    ]);
-    poseChainWithDirections(definition, [
-      'rightUpperLeg', 'rightLowerLeg', 'rightFoot', 'rightToes', 'rightToesEnd',
-    ], [
-      [0, -0.98, -0.18],
-      [0, -0.97, -0.24],
-      [0, -0.08, 1],
-      [0, 0, 1],
-    ]);
-    poseArmChain(definition, 'left', [-0.55, -0.70, -0.46]);
-    poseArmChain(definition, 'right', [0.55, -0.70, 0.46]);
+    applyStepPose(definition);
+  } else {
+    applyAPose(definition);
   }
 
   synchronizeAuxiliaryPresetPose(definition);
@@ -842,6 +832,251 @@ export function applyPosePresetToDefinition(definition, pose = 'A') {
   definition.pose = normalizedPose;
   definition.updatedAt = new Date().toISOString();
   return definition;
+}
+
+/**
+ * The fitted surface uses an A-shaped bind pose, but a pose preset still has
+ * to describe the complete anatomical chain.  Keeping this explicit prevents
+ * A Pose from becoming a no-op whenever bind data or body proportions change.
+ */
+function applyAPose(definition) {
+  // A is the protected SMPL bind pose. Rebuild every link explicitly from
+  // immutable local offsets so switching back from any other preset restores
+  // the complete torso, scapula/clavicle driver, arm, forearm, and hand chain.
+  poseChainFromBind(definition, ['hips', 'spine', 'chest', 'upperChest']);
+  poseChainFromBind(definition, ['upperChest', 'neck', 'head', 'headTop']);
+  for (const side of ['left', 'right']) {
+    poseChainFromBind(definition, [
+      'upperChest', `${side}Shoulder`, `${side}UpperArm`,
+    ]);
+    poseChainFromBind(definition, [
+      `${side}UpperArm`, `${side}LowerArm`, `${side}Hand`, `${side}HandEnd`,
+    ]);
+  }
+}
+
+function applyTPose(definition) {
+  translatePelvisAndAttachedLegs(definition, [0, 0.005, 0]);
+  poseChainFromBind(definition, ['hips', 'spine', 'chest', 'upperChest']);
+  poseChainFromBind(definition, ['upperChest', 'neck', 'head', 'headTop']);
+
+  // Keep the historical hand span while making both clavicle and shoulder
+  // links participate. The two X components still sum to the fitted 0.210 m.
+  for (const side of ['left', 'right']) {
+    const sign = side === 'left' ? -1 : 1;
+    const clavicleLength = jointSegmentLength(definition, `${side}Shoulder`);
+    const shoulderLength = jointSegmentLength(definition, `${side}UpperArm`);
+    poseShoulderGirdle(
+      definition,
+      side,
+      vectorWithSignedY(clavicleLength, sign * 0.105, 0.012, 1),
+      vectorWithSignedY(shoulderLength, sign * 0.105, -0.015, -1),
+    );
+    poseArmFromShoulder(definition, side, [
+      [sign, 0, 0],
+      [sign, 0, 0],
+      [sign, 0, 0],
+    ]);
+  }
+}
+
+function applyReachPose(definition) {
+  poseTorsoChain(definition, [
+    [-0.025, 0.998, 0.055],
+    [-0.045, 0.995, 0.090],
+    [-0.060, 0.992, 0.110],
+  ]);
+  poseChainFromBind(definition, ['upperChest', 'neck', 'head', 'headTop']);
+
+  // The opposite shoulder remains attached to the compensated upper chest.
+  poseShoulderGirdle(definition, 'right', [0.82, 0.57, 0.05], [0.85, -0.50, 0.16]);
+  poseArmFromShoulder(definition, 'right', [
+    [0.50, -0.84, 0.20],
+    [0.47, -0.85, 0.24],
+    [0.40, -0.84, 0.36],
+  ]);
+
+  poseShoulderGirdle(definition, 'left', [-0.72, 0.55, 0.42], [-0.83, 0.16, 0.54]);
+  const byId = new Map(definition.joints.map((item) => [item.id, item]));
+  const shoulder = byId.get('leftUpperArm')?.poseWorldPosition;
+  if (!shoulder) return;
+  const reachDirection = normalize3([-0.80, 0.24, 0.55]);
+  const armLength = jointSegmentLength(definition, 'leftLowerArm')
+    + jointSegmentLength(definition, 'leftHand')
+    + jointSegmentLength(definition, 'leftHandEnd');
+  const handTarget = add3(shoulder, scale3(reachDirection, armLength * 0.94));
+  const handLength = jointSegmentLength(definition, 'leftHandEnd');
+  const wristTarget = subtract3(handTarget, scale3(reachDirection, handLength));
+  const elbowPole = add3(shoulder, [-0.20, -0.08, 0.48]);
+  solveTwoBoneIK(definition, {
+    rootId: 'leftUpperArm',
+    midId: 'leftLowerArm',
+    endId: 'leftHand',
+    target: wristTarget,
+    poleTarget: elbowPole,
+  });
+  byId.get('leftHandEnd').poseWorldPosition = [...handTarget];
+}
+
+function applyStepPose(definition) {
+  translatePelvisAndAttachedLegs(definition, [0, 0.010, 0.020]);
+  poseTorsoChain(definition, [
+    [0, 0.990, 0.140],
+    [0, 0.994, -0.110],
+    [0, 0.995, -0.100],
+  ]);
+  poseChainFromBind(definition, ['upperChest', 'neck', 'head', 'headTop']);
+
+  poseChainFromBind(definition, ['upperChest', 'leftShoulder', 'leftUpperArm']);
+  poseChainFromBind(definition, ['upperChest', 'rightShoulder', 'rightUpperArm']);
+  poseArmFromShoulder(definition, 'left', [
+    [-0.55, -0.70, -0.46],
+    [-0.55, -0.70, -0.46],
+    [-0.55, -0.70, -0.46],
+  ]);
+  poseArmFromShoulder(definition, 'right', [
+    [0.55, -0.70, 0.46],
+    [0.55, -0.70, 0.46],
+    [0.55, -0.70, 0.46],
+  ]);
+
+  const byId = new Map(definition.joints.map((item) => [item.id, item]));
+  const legPlans = {
+    left: {
+      thighDirection: [0, -0.91, 0.42],
+      shinDirection: [0, -0.96, 0.28],
+    },
+    right: {
+      thighDirection: [0, -0.98, -0.18],
+      shinDirection: [0, -0.97, -0.24],
+    },
+  };
+  for (const [side, plan] of Object.entries(legPlans)) {
+    const hip = byId.get(`${side}UpperLeg`)?.poseWorldPosition;
+    if (!hip) continue;
+    const kneeHint = add3(
+      hip,
+      scale3(normalize3(plan.thighDirection), jointSegmentLength(definition, `${side}LowerLeg`)),
+    );
+    const ankleTarget = add3(
+      kneeHint,
+      scale3(normalize3(plan.shinDirection), jointSegmentLength(definition, `${side}Foot`)),
+    );
+    solveTwoBoneIK(definition, {
+      rootId: `${side}UpperLeg`,
+      midId: `${side}LowerLeg`,
+      endId: `${side}Foot`,
+      target: ankleTarget,
+      poleTarget: kneeHint,
+    });
+  }
+  poseChainWithDirections(definition, ['leftFoot', 'leftToes', 'leftToesEnd'], [
+    [0, -0.12, 0.99],
+    [0, -0.16, 0.99],
+  ]);
+  poseChainWithDirections(definition, ['rightFoot', 'rightToes', 'rightToesEnd'], [
+    [0, -0.08, 1],
+    [0, -0.12, 1],
+  ]);
+}
+
+function poseTorsoChain(definition, directions) {
+  poseChainWithDirections(definition, ['hips', 'spine', 'chest', 'upperChest'], directions);
+}
+
+function poseChainFromBind(definition, ids) {
+  const byId = new Map(definition.joints.map((item) => [item.id, item]));
+  poseChainWithDirections(
+    definition,
+    ids,
+    ids.slice(1).map((id) => byId.get(id)?.localPosition),
+  );
+}
+
+function poseShoulderGirdle(definition, side, clavicleDirection, shoulderDirection) {
+  poseChainWithDirections(definition, [
+    'upperChest', `${side}Shoulder`, `${side}UpperArm`,
+  ], [clavicleDirection, shoulderDirection]);
+}
+
+function poseArmFromShoulder(definition, side, directions) {
+  poseChainWithDirections(definition, [
+    `${side}UpperArm`, `${side}LowerArm`, `${side}Hand`, `${side}HandEnd`,
+  ], directions);
+}
+
+function translatePelvisAndAttachedLegs(definition, translation) {
+  const byId = new Map(definition.joints.map((item) => [item.id, item]));
+  const hips = byId.get('hips');
+  if (!hips) return;
+  hips.poseWorldPosition = add3(hips.poseWorldPosition, translation);
+  for (const side of ['left', 'right']) {
+    const upperLeg = byId.get(`${side}UpperLeg`);
+    if (!upperLeg) continue;
+    upperLeg.poseWorldPosition = add3(hips.poseWorldPosition, upperLeg.localPosition);
+    poseChainWithDirections(definition, [
+      `${side}UpperLeg`, `${side}LowerLeg`, `${side}Foot`, `${side}Toes`, `${side}ToesEnd`,
+    ], [
+      byId.get(`${side}LowerLeg`)?.localPosition,
+      byId.get(`${side}Foot`)?.localPosition,
+      byId.get(`${side}Toes`)?.localPosition,
+      byId.get(`${side}ToesEnd`)?.localPosition,
+    ]);
+  }
+}
+
+function solveTwoBoneIK(definition, {
+  rootId,
+  midId,
+  endId,
+  target,
+  poleTarget,
+}) {
+  const byId = new Map(definition.joints.map((item) => [item.id, item]));
+  const root = byId.get(rootId)?.poseWorldPosition;
+  const midJoint = byId.get(midId);
+  const endJoint = byId.get(endId);
+  if (!root || !midJoint || !endJoint) return false;
+
+  const firstLength = jointSegmentLength(definition, midId);
+  const secondLength = jointSegmentLength(definition, endId);
+  const targetVector = subtract3(target, root);
+  const requestedDistance = Math.hypot(...targetVector);
+  const targetDirection = normalize3(targetVector);
+  const minimumDistance = Math.abs(firstLength - secondLength) + 1e-7;
+  const maximumDistance = firstLength + secondLength - 1e-7;
+  const solvedDistance = Math.min(maximumDistance, Math.max(minimumDistance, requestedDistance));
+  const solvedEnd = add3(root, scale3(targetDirection, solvedDistance));
+
+  const poleVector = subtract3(poleTarget, root);
+  const projectedPole = subtract3(poleVector, scale3(targetDirection, dot3(poleVector, targetDirection)));
+  let poleDirection = normalize3(projectedPole);
+  if (Math.hypot(...poleDirection) < 1e-8) {
+    poleDirection = normalize3(cross3(targetDirection, [0, 1, 0]));
+  }
+  if (Math.hypot(...poleDirection) < 1e-8) {
+    poleDirection = normalize3(cross3(targetDirection, [0, 0, 1]));
+  }
+
+  const along = (firstLength * firstLength + solvedDistance * solvedDistance - secondLength * secondLength)
+    / (2 * solvedDistance);
+  const bend = Math.sqrt(Math.max(0, firstLength * firstLength - along * along));
+  midJoint.poseWorldPosition = add3(
+    add3(root, scale3(targetDirection, along)),
+    scale3(poleDirection, bend),
+  );
+  endJoint.poseWorldPosition = solvedEnd;
+  return true;
+}
+
+function jointSegmentLength(definition, jointId) {
+  const item = definition.joints.find((jointItem) => jointItem.id === jointId);
+  return item ? Math.hypot(...item.localPosition) : 0;
+}
+
+function vectorWithSignedY(length, x, z, ySign) {
+  const y = Math.sqrt(Math.max(0, length * length - x * x - z * z));
+  return [x, y * Math.sign(ySign || 1), z];
 }
 
 function synchronizeAuxiliaryPresetPose(definition) {
