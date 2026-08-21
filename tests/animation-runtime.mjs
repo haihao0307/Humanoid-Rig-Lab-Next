@@ -19,7 +19,12 @@ import {
   sampleAnimationRuntime,
 } from '../src/modules/animation/runtime.js';
 import { evaluateAnimationGraph } from '../src/modules/animation/graph.js';
-import { quaternionAngularDistance } from '../src/modules/animation/quaternion.js';
+import {
+  addVectors,
+  multiplyQuaternions,
+  quaternionAngularDistance,
+  rotateVectorByQuaternion,
+} from '../src/modules/animation/quaternion.js';
 
 const profiles = [
   {
@@ -207,6 +212,46 @@ assert.ok(retargeted.tracks.find((track) => track.channel === 'position').keyfra
 const roundTripPayload = buildV8PosePayload(standardWave.fk);
 assert.equal(roundTripPayload.schemaVersion, 2);
 assert.equal(Object.keys(roundTripPayload.localRotations).length, 89);
+assert.ok(Object.keys(roundTripPayload.incomingBoneLocalRotations).length >= 50);
+assert.equal(
+  roundTripPayload.rotationConventions.incomingBoneLocalRotations,
+  'incoming_bone_bind_delta_zero_twist',
+);
+const incomingChildren = new Map();
+for (const joint of standardWave.fk.rig.joints) {
+  if (!joint.parentId || !joint.physicalBone || joint.isControl) continue;
+  const list = incomingChildren.get(joint.parentId) ?? [];
+  list.push(joint);
+  incomingChildren.set(joint.parentId, list);
+}
+const incomingPositions = new Map([['hips', standardWave.fk.positions.get('hips')]]);
+const incomingWorldRotations = new Map([['hips', standardWave.fk.rotations.get('hips')]]);
+const rebuildIncoming = (parentId) => {
+  for (const child of incomingChildren.get(parentId) ?? []) {
+    const worldRotation = multiplyQuaternions(
+      incomingWorldRotations.get(parentId),
+      roundTripPayload.incomingBoneLocalRotations[child.id],
+    );
+    incomingWorldRotations.set(child.id, worldRotation);
+    incomingPositions.set(
+      child.id,
+      addVectors(
+        incomingPositions.get(parentId),
+        rotateVectorByQuaternion(child.localPosition, worldRotation),
+      ),
+    );
+    rebuildIncoming(child.id);
+  }
+};
+rebuildIncoming('hips');
+let maximumIncomingAdapterError = 0;
+for (const [jointId, position] of incomingPositions) {
+  maximumIncomingAdapterError = Math.max(
+    maximumIncomingAdapterError,
+    distance(position, standardWave.fk.positions.get(jointId)),
+  );
+}
+assert.ok(maximumIncomingAdapterError < 1e-8, `incoming-bone adapter error ${maximumIncomingAdapterError}`);
 assert.ok(Object.values(roundTripPayload.localRotations).every((rotation) => (
   Math.abs(Math.hypot(...rotation) - 1) < 1e-10
 )));

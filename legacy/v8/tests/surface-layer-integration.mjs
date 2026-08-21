@@ -438,6 +438,14 @@ assert.equal(diagnostics.vertexCount, 27_578);
 assert.equal(diagnostics.triangleCount, 55_152);
 assert.equal(diagnostics.bindPoseProtected, true);
 assert.equal(diagnostics.assetWeightStatus, 'experimental-transitional');
+assert.equal(diagnostics.runtimeWeightProfile, 'articulation-stable-segment-v1');
+assert.ok(diagnostics.runtimeWeightStats.meanDominantWeight > 0.80);
+assert.ok(diagnostics.runtimeWeightStats.dominantCounts.leftUpperLeg > 400);
+assert.ok(diagnostics.runtimeWeightStats.dominantCounts.rightUpperLeg > 400);
+assert.equal(diagnostics.runtimeWeightStats.dominantCounts.leftHandEnd, 0);
+assert.equal(diagnostics.runtimeWeightStats.dominantCounts.rightHandEnd, 0);
+assert.ok(Math.abs(diagnostics.runtimeWeightStats.minimumWeightSum - 1) < 1e-5);
+assert.ok(Math.abs(diagnostics.runtimeWeightStats.maximumWeightSum - 1) < 1e-5);
 assert.equal(states[0]?.state, 'loading');
 assert.equal(states.at(-1)?.state, 'ready');
 assert.match(states.at(-1)?.label ?? '', /SKIN V002/);
@@ -542,7 +550,9 @@ const rest = layer.restPositions;
 const triangleIndex = targets[0].geometry.index?.array;
 let maxDisplacement = 0;
 let maxEdgeStretch = 0;
+let maxEdge = null;
 let maxShoulderEdgeStretch = 0;
+let maxShoulderEdge = null;
 let nonFiniteCount = 0;
 for (let index = 0; index < deformed.length; index += 3) {
   const displacement = Math.hypot(
@@ -566,21 +576,113 @@ if (triangleIndex) {
       if (before < 1e-5) continue;
       const after = edgeLength(deformed, a, b);
       const ratio = after / before;
-      maxEdgeStretch = Math.max(maxEdgeStretch, ratio);
+      if (ratio > maxEdgeStretch) {
+        maxEdgeStretch = ratio;
+        const ao = a * 3;
+        const bo = b * 3;
+        maxEdge = {
+          a,
+          b,
+          ratio,
+          before,
+          after,
+          mid: [
+            (rest[ao] + rest[bo]) * 0.5,
+            (rest[ao + 1] + rest[bo + 1]) * 0.5,
+            (rest[ao + 2] + rest[bo + 2]) * 0.5,
+          ],
+          weights: [a, b].map((vertexIndex) => {
+            const offset = vertexIndex * 4;
+            return Array.from({ length: 4 }, (_, slot) => ({
+              jointIndex: targets[0].geometry.attributes.skinIndex.array[offset + slot],
+              weight: targets[0].geometry.attributes.skinWeight.array[offset + slot],
+            }));
+          }),
+          endpoints: [a, b].map((vertexIndex) => {
+            const offset = vertexIndex * 3;
+            return [rest[offset], rest[offset + 1], rest[offset + 2]];
+          }),
+        };
+      }
       const ao = a * 3;
       const bo = b * 3;
       const midX = (rest[ao] + rest[bo]) * 0.5;
       const midY = (rest[ao + 1] + rest[bo + 1]) * 0.5;
       if (midY >= 1.18 && midY <= 1.48 && Math.abs(midX) >= 0.12 && Math.abs(midX) <= 0.36) {
-        maxShoulderEdgeStretch = Math.max(maxShoulderEdgeStretch, ratio);
+        if (ratio > maxShoulderEdgeStretch) {
+          maxShoulderEdgeStretch = ratio;
+          maxShoulderEdge = { a, b, midX, midY, before, after };
+        }
       }
     }
   }
 }
 assert.equal(nonFiniteCount, 0);
 assert.ok(maxDisplacement < 0.75, `T pose moved a surface vertex too far: ${maxDisplacement.toFixed(4)} m.`);
-assert.ok(maxEdgeStretch < 6.2, `T pose edge stretch exceeded the limit: ${maxEdgeStretch.toFixed(3)}x.`);
-assert.ok(maxShoulderEdgeStretch < 1.8, `T pose shoulder stretch exceeded the limit: ${maxShoulderEdgeStretch.toFixed(3)}x.`);
+assert.ok(
+  maxEdgeStretch < 1.5,
+  `T pose edge stretch exceeded the limit: ${maxEdgeStretch.toFixed(3)}x; ${JSON.stringify(maxEdge)}.`,
+);
+assert.ok(
+  maxShoulderEdgeStretch < 1.5,
+  `T pose shoulder stretch exceeded the limit: ${maxShoulderEdgeStretch.toFixed(3)}x; ${JSON.stringify(maxShoulderEdge)}; `
+    + `edgeWeights=${JSON.stringify([maxShoulderEdge?.a, maxShoulderEdge?.b].map((vertexIndex) => {
+      const offset = vertexIndex * 4;
+      return Array.from({ length: 4 }, (_, slot) => ({
+        jointIndex: targets[0].geometry.attributes.skinIndex.array[offset + slot],
+        weight: targets[0].geometry.attributes.skinWeight.array[offset + slot],
+      }));
+    }))}; weights=${JSON.stringify(layer.getDiagnostics().runtimeWeightStats)}.`,
+);
+
+const stepDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('STEP'));
+layer.refresh(stepDefinition, null, { force: true });
+const stepDeformed = layer.sampleDeformedPositions();
+let maxStepEdgeStretch = 0;
+let maxStepEdge = null;
+if (triangleIndex) {
+  for (let index = 0; index < triangleIndex.length; index += 3) {
+    const ids = [triangleIndex[index], triangleIndex[index + 1], triangleIndex[index + 2]];
+    for (const [a, b] of [[ids[0], ids[1]], [ids[1], ids[2]], [ids[2], ids[0]]]) {
+      const before = edgeLength(rest, a, b);
+      if (before < 0.005) continue;
+      const after = edgeLength(stepDeformed, a, b);
+      const ratio = after / before;
+      if (ratio > maxStepEdgeStretch) {
+        const ao = a * 3;
+        const bo = b * 3;
+        maxStepEdgeStretch = ratio;
+        maxStepEdge = {
+          a,
+          b,
+          ratio,
+          before,
+          after,
+          mid: [
+            (rest[ao] + rest[bo]) * 0.5,
+            (rest[ao + 1] + rest[bo + 1]) * 0.5,
+            (rest[ao + 2] + rest[bo + 2]) * 0.5,
+          ],
+          weights: [a, b].map((vertexIndex) => {
+            const offset = vertexIndex * 4;
+            return Array.from({ length: 4 }, (_, slot) => ({
+              jointIndex: targets[0].geometry.attributes.skinIndex.array[offset + slot],
+              weight: targets[0].geometry.attributes.skinWeight.array[offset + slot],
+            }));
+          }),
+          endpoints: [a, b].map((vertexIndex) => {
+            const offset = vertexIndex * 3;
+            return [rest[offset], rest[offset + 1], rest[offset + 2]];
+          }),
+        };
+      }
+    }
+  }
+}
+assert.ok(
+  maxStepEdgeStretch < 1.65,
+  `STEP pose edge stretch exceeded the limit: ${maxStepEdgeStretch.toFixed(3)}x; ${JSON.stringify(maxStepEdge)}.`,
+);
 
 const mismatchDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('A'));
 mismatchDefinition.profilePreview = { requiresSkinRebind: true };
@@ -609,9 +711,10 @@ layer.dispose();
 
 console.log(
   `T-pose native LBS quality passed: max displacement ${maxDisplacement.toFixed(4)} m, `
-  + `max edge stretch ${maxEdgeStretch.toFixed(3)}x, `
+  + `max edge stretch ${maxEdgeStretch.toFixed(3)}x at ${JSON.stringify(maxEdge)}, `
   + `max shoulder stretch ${maxShoulderEdgeStretch.toFixed(3)}x.`,
 );
+console.log(`STEP-pose native LBS quality passed: max edge stretch ${maxStepEdgeStretch.toFixed(3)}x at ${JSON.stringify(maxStepEdge)}.`);
 
 const elapsed = performance.now() - start;
 console.log(`V8.4 SKIN V002 scene-wide single-surface guard, native SkinnedMesh, direct weighted picking, inverse-bind matrices, and material-state regression passed in ${elapsed.toFixed(1)} ms.`);

@@ -2,6 +2,7 @@ import {
   applyPosePresetToDefinition,
   cloneValue,
   createStandardHumanoidPreset,
+  normalizePosePresetId,
   normalizeSkeletonDefinition,
   summarizeRigDefinition,
 } from './skeleton-presets.js';
@@ -1666,12 +1667,8 @@ function applyHostState(hostState, hostRevision) {
 
     const poseApplied = applyHostPose(hostState.pose);
     if (!poseApplied) {
-      const requestedPose = String(hostState.pose?.name || '').toUpperCase();
-      const preset = ['T', 'T POSE', 'T-POSE', 'TPOSE'].includes(requestedPose)
-        ? 'T'
-        : ['A', 'A POSE', 'A-POSE', 'APOSE'].includes(requestedPose)
-          ? 'A'
-          : null;
+      const requestedPose = String(hostState.pose?.name || '').trim();
+      const preset = requestedPose ? normalizePosePresetId(requestedPose) : null;
       if (preset && definition.pose !== preset) {
         applyPosePresetToDefinition(definition, preset);
         physicsRig.resetFromDefinitionPose({ project: true });

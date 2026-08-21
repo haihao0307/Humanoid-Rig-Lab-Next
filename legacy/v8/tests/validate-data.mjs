@@ -6,7 +6,9 @@ import {
   JOINT_SOLVER_PARTICIPATION,
   JOINT_VISIBILITY_LAYERS,
   MIRROR_PAIRS,
+  applyPosePresetToDefinition,
   createStandardHumanoidPreset,
+  normalizePosePresetId,
   normalizeSkeletonDefinition,
   summarizeRigDefinition,
 } from '../src/skeleton-presets.js';
@@ -232,6 +234,40 @@ for (const pose of ['A', 'T']) {
     close(source.localPosition[2], target.localPosition[2], EPSILON, `${sourceId}/${targetId} mirrored Z`);
   }
 }
+
+assert.equal(normalizePosePresetId('Reach Left'), 'REACH_LEFT');
+assert.equal(normalizePosePresetId('向左伸手'), 'REACH_LEFT');
+assert.equal(normalizePosePresetId('Step Pose'), 'STEP');
+assert.equal(normalizePosePresetId('迈步姿势'), 'STEP');
+
+const reachDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('Reach Left'));
+const reachPose = computePoseWorldPositions(reachDefinition);
+const aPoseForPresets = computePoseWorldPositions(definitions.get('A'));
+assert.equal(reachDefinition.pose, 'REACH_LEFT');
+assert.ok(
+  vectorDistance(reachPose.get('leftHandEnd'), aPoseForPresets.get('leftHandEnd')) > 0.20,
+  'Reach Left must visibly move the left hand.',
+);
+
+const stepDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('Step Pose'));
+const stepPose = computePoseWorldPositions(stepDefinition);
+assert.equal(stepDefinition.pose, 'STEP');
+assert.ok(
+  Math.abs(stepPose.get('leftFoot').z - stepPose.get('rightFoot').z) > 0.15,
+  'Step Pose must separate the feet in depth.',
+);
+for (const joint of stepDefinition.joints) {
+  if (!joint.parentId || joint.physicalBone === false) continue;
+  close(
+    vectorDistance(stepPose.get(joint.parentId), stepPose.get(joint.id)),
+    getBoneLength(stepDefinition, joint.id),
+    EPSILON,
+    `STEP ${joint.id} fixed length`,
+  );
+}
+
+applyPosePresetToDefinition(stepDefinition, 'A Pose');
+assert.equal(stepDefinition.pose, 'A');
 
 const aDefinition = definitions.get('A');
 const tDefinition = definitions.get('T');

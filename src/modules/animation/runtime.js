@@ -110,6 +110,7 @@ export function createRigContext(bodyProfile = {}, {
     parentId: joint.parentId,
     localPosition: joint.localPosition.map(Number),
     physicalBone: joint.physicalBone !== false,
+    isControl: Boolean(joint.isControl),
   }));
   const jointMap = new Map(joints.map((joint) => [joint.id, joint]));
   const children = new Map(joints.map((joint) => [joint.id, []]));
@@ -393,6 +394,58 @@ export function forwardKinematics(poseInput, rigContextInput) {
   return { positions, rotations, rig };
 }
 
+/**
+ * Converts the animation runtime's conventional outgoing-bone rotations to
+ * the position solver's incoming-bone PoseSnapshot convention. This adapter
+ * deliberately lives at the module boundary so existing clips and Three.js
+ * joint semantics remain unchanged.
+ */
+export function buildIncomingBoneLocalRotations(fkInput, {
+  rootJointId = 'hips',
+  rootRotation = null,
+} = {}) {
+  const fk = fkInput;
+  const rig = fk?.rig;
+  if (!rig?.joints || !fk?.positions) return {};
+
+  const children = new Map();
+  for (const joint of rig.joints) {
+    if (!joint.parentId || !joint.physicalBone || joint.isControl) continue;
+    const list = children.get(joint.parentId) ?? [];
+    list.push(joint);
+    children.set(joint.parentId, list);
+  }
+
+  const localRotations = {};
+  const worldRotations = new Map([[
+    rootJointId,
+    normalizeQuaternion(rootRotation || fk.rotations.get(rootJointId) || IDENTITY),
+  ]]);
+  const visit = (parentId) => {
+    const parentPosition = fk.positions.get(parentId);
+    const parentRotation = worldRotations.get(parentId) || IDENTITY;
+    if (!parentPosition) return;
+    for (const child of children.get(parentId) ?? []) {
+      const childPosition = fk.positions.get(child.id);
+      if (!childPosition) continue;
+      const desiredWorld = subtractVectors(childPosition, parentPosition);
+      const desiredParentLocal = rotateVectorByQuaternion(
+        desiredWorld,
+        conjugateQuaternion(parentRotation),
+      );
+      const childLocalRotation = quaternionFromTo(child.localPosition, desiredParentLocal);
+      localRotations[child.id] = normalizeQuaternion(childLocalRotation);
+      worldRotations.set(
+        child.id,
+        multiplyQuaternions(parentRotation, childLocalRotation),
+      );
+      visit(child.id);
+    }
+  };
+  visit(rootJointId);
+  return localRotations;
+}
+
 export function getActiveClipContacts(clipInput, rawTime) {
   const clip = isNormalizedAnimationClip(clipInput) ? clipInput : normalizeClip(clipInput);
   const phase = resolveClipPhase(rawTime, clip.duration, clip.loopMode);
@@ -604,6 +657,10 @@ export function buildV8PosePayload(fkInput, {
       multiplyQuaternions(conjugateQuaternion(parentWorldRotation), worldRotation),
     );
   }
+  const incomingBoneLocalRotations = buildIncomingBoneLocalRotations(fk, {
+    rootJointId: 'hips',
+    rootRotation: fk.rotations.get('hips') || IDENTITY,
+  });
   return {
     schemaVersion: 2,
     type: 'humanoid-pose',
@@ -614,6 +671,11 @@ export function buildV8PosePayload(fkInput, {
     poseName,
     rootJointId: 'root',
     localRotations,
+    incomingBoneLocalRotations,
+    rotationConventions: {
+      localRotations: 'outgoing_bone_parent_rotation',
+      incomingBoneLocalRotations: 'incoming_bone_bind_delta_zero_twist',
+    },
     joints: fk.rig.joints.map((joint) => {
       const position = fk.positions.get(joint.id) || ZERO;
       return {

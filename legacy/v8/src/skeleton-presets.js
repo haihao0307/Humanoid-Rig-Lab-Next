@@ -307,8 +307,16 @@ const joint = (
  * sample surface. The local bind data is an A pose and stays read-only.
  * Three editor-only endpoints preserve the existing interaction solver.
  */
+export function normalizePosePresetId(pose = 'A') {
+  const normalized = String(pose).trim().toUpperCase().replace(/[\s_-]+/g, ' ');
+  if (['T', 'T POSE', 'T姿势'].includes(normalized)) return 'T';
+  if (['REACH', 'REACH LEFT', 'LEFT REACH', '向左伸手'].includes(normalized)) return 'REACH_LEFT';
+  if (['STEP', 'STEP POSE', 'WALK STEP', '迈步姿势'].includes(normalized)) return 'STEP';
+  return 'A';
+}
+
 export function createStandardHumanoidPreset(pose = 'A') {
-  const normalizedPose = String(pose).toUpperCase() === 'T' ? 'T' : 'A';
+  const normalizedPose = normalizePosePresetId(pose);
 
   const coreJoints = [
     joint('root', '全身根控制', null, [0, 0, 0], {
@@ -790,7 +798,7 @@ function lerp3(start, end, amount) {
 }
 
 export function applyPosePresetToDefinition(definition, pose = 'A') {
-  const normalizedPose = String(pose).toUpperCase() === 'T' ? 'T' : 'A';
+  const normalizedPose = normalizePosePresetId(pose);
   const restWorld = calculateWorldFromLocals(definition.joints);
 
   for (const jointItem of definition.joints) {
@@ -803,6 +811,27 @@ export function applyPosePresetToDefinition(definition, pose = 'A') {
   if (normalizedPose === 'T') {
     poseArmChain(definition, 'left', [-1, 0, 0]);
     poseArmChain(definition, 'right', [1, 0, 0]);
+  } else if (normalizedPose === 'REACH_LEFT') {
+    poseArmChain(definition, 'left', [-0.92, 0.18, 0.34]);
+  } else if (normalizedPose === 'STEP') {
+    poseChainWithDirections(definition, [
+      'leftUpperLeg', 'leftLowerLeg', 'leftFoot', 'leftToes', 'leftToesEnd',
+    ], [
+      [0, -0.91, 0.42],
+      [0, -0.96, 0.28],
+      [0, -0.08, 1],
+      [0, 0, 1],
+    ]);
+    poseChainWithDirections(definition, [
+      'rightUpperLeg', 'rightLowerLeg', 'rightFoot', 'rightToes', 'rightToesEnd',
+    ], [
+      [0, -0.98, -0.18],
+      [0, -0.97, -0.24],
+      [0, -0.08, 1],
+      [0, 0, 1],
+    ]);
+    poseArmChain(definition, 'left', [-0.55, -0.70, -0.46]);
+    poseArmChain(definition, 'right', [0.55, -0.70, 0.46]);
   }
 
   synchronizeAuxiliaryPresetPose(definition);
@@ -907,6 +936,25 @@ function poseArmChain(definition, side, direction) {
       parentPosition[0] + normalized[0] * length,
       parentPosition[1] + normalized[1] * length,
       parentPosition[2] + normalized[2] * length,
+    ];
+    parentPosition = [...current.poseWorldPosition];
+  }
+}
+
+function poseChainWithDirections(definition, ids, directions) {
+  const byId = new Map(definition.joints.map((item) => [item.id, item]));
+  const anchor = byId.get(ids[0]);
+  if (!anchor) return;
+  let parentPosition = [...anchor.poseWorldPosition];
+  for (let index = 1; index < ids.length; index += 1) {
+    const current = byId.get(ids[index]);
+    if (!current) continue;
+    const direction = normalize3(directions[index - 1] ?? directions.at(-1) ?? [0, -1, 0]);
+    const length = Math.hypot(...current.localPosition);
+    current.poseWorldPosition = [
+      parentPosition[0] + direction[0] * length,
+      parentPosition[1] + direction[1] * length,
+      parentPosition[2] + direction[2] * length,
     ];
     parentPosition = [...current.poseWorldPosition];
   }

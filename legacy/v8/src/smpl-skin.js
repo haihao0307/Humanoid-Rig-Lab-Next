@@ -141,6 +141,7 @@ class NativeSmplSkinnedSurfaceLayer {
     this.bodyShapeProfile = normalizeBodyShapeProfile();
     this.bodyShapeResponse = createSkinShapeResponse(this.bodyShapeProfile);
     this.lastBodyShapeKey = '';
+    this.runtimeWeightStats = null;
     this.lastSourceValues = null;
     this.detailPromise = null;
     this.surfaceOwnerToken = '';
@@ -232,6 +233,17 @@ class NativeSmplSkinnedSurfaceLayer {
     for (const rootBone of this.rootBones) this.mesh.add(rootBone);
     this.group.add(this.mesh);
     this.group.updateMatrixWorld(true);
+    const runtimeBindPoints = new Map(this.jointIds.map((id) => [
+      id,
+      this.bonesById.get(id).getWorldPosition(new this.THREE.Vector3()),
+    ]));
+    this.runtimeWeightStats = rebuildArticulationStableWeights(
+      geometry,
+      runtimeBindPoints,
+      this.boneIndexById,
+    );
+    this.mesh.userData.runtimeWeightProfile = this.runtimeWeightStats.profile;
+    this.mesh.userData.runtimeWeightStats = structuredClone(this.runtimeWeightStats);
     this.auditSceneSurfaces({ purge: true, phase: 'native-surface-attached' });
 
     const boneInverses = [];
@@ -784,6 +796,8 @@ class NativeSmplSkinnedSurfaceLayer {
       bindPoseProtected: Boolean(this.mesh?.userData?.bindPoseProtected),
       referenceBindingMismatch: Boolean(this.lastCompatibilityMismatch),
       assetWeightStatus: this.mesh?.userData?.assetWeightStatus ?? 'unknown',
+      runtimeWeightProfile: this.mesh?.userData?.runtimeWeightProfile ?? null,
+      runtimeWeightStats: this.runtimeWeightStats ? structuredClone(this.runtimeWeightStats) : null,
       assetUrl: SMPL_SKINNED_ASSET_URL,
       assetSha256: SKIN_RUNTIME_BUILD.assetSha256,
       continuousSceneGuard: Boolean(this.sceneAuditTimer),
@@ -1052,6 +1066,253 @@ function deformSurfaceLbs(restPositions, outputPositions, skinIndices, skinWeigh
   }
   return outputPositions;
 }
+
+/**
+ * Replaces the asset's transitional full-segment interpolation at runtime.
+ *
+ * A limb vertex should be driven primarily by the bone spanning that segment;
+ * it should only blend to the next bone in a narrow band around the joint.
+ * Blending linearly from one joint to the next across an entire upper arm or
+ * thigh makes the surface behave like a soft hose. The source GLB is preserved
+ * on disk, while the live BufferAttributes receive a deterministic, topology-
+ * smoothed articulation profile suitable for editing and animation preview.
+ */
+function rebuildArticulationStableWeights(
+  geometry,
+  bindPoints,
+  boneIndexById,
+  { smoothingPasses = 4, smoothingAlpha = 0.18 } = {},
+) {
+  const position = geometry?.attributes?.position;
+  const skinIndex = geometry?.attributes?.skinIndex;
+  const skinWeight = geometry?.attributes?.skinWeight;
+  if (!position?.array || !skinIndex?.array || !skinWeight?.array) {
+    return { profile: 'asset-fallback', vertexCount: 0, smoothingPasses: 0 };
+  }
+
+  const chains = createWeightChains(bindPoints, boneIndexById);
+  const jointCount = boneIndexById.size;
+  const indices = skinIndex.array;
+  const weights = skinWeight.array;
+  const nextIndices = new Uint16Array(indices.length);
+  const nextWeights = new Float32Array(weights.length);
+  const influence = new Float64Array(jointCount);
+  const touched = new Uint8Array(jointCount);
+  const vertexCount = position.count;
+  let fallbackVertexCount = 0;
+
+  for (let vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 1) {
+    influence.fill(0);
+    touched.fill(0);
+    const offset = vertexIndex * 3;
+    const x = position.array[offset];
+    const y = position.array[offset + 1];
+    const z = position.array[offset + 2];
+    const candidates = selectWeightCandidates(x, y, z, chains);
+
+    for (const candidate of candidates) {
+      const result = evaluateChainNumeric(x, y, z, candidate.chain);
+      result.score *= candidate.multiplier;
+      addStableSegmentInfluences(influence, touched, result);
+    }
+
+    stabilizeArmWeights(influence, touched, x, y, bindPoints, boneIndexById);
+    stabilizeHipWeights(influence, touched, x, y, boneIndexById);
+
+    let fallbackIndex = indices[vertexIndex * 4] ?? 0;
+    if (!hasTouched(touched)) {
+      fallbackVertexCount += 1;
+      fallbackIndex = boneIndexById.get(fallbackJointForVertex(x, y, z)) ?? fallbackIndex;
+      influence[fallbackIndex] = 1;
+      touched[fallbackIndex] = 1;
+    }
+    writeFourStrongestInfluences(
+      influence,
+      touched,
+      nextIndices,
+      nextWeights,
+      vertexIndex,
+      fallbackIndex,
+    );
+  }
+
+  indices.set(nextIndices);
+  weights.set(nextWeights);
+  smoothSkinWeights(geometry, indices, weights, jointCount, {
+    passes: smoothingPasses,
+    alpha: smoothingAlpha,
+  });
+  skinIndex.needsUpdate = true;
+  skinWeight.needsUpdate = true;
+
+  return summarizeRuntimeWeights(
+    indices,
+    weights,
+    [...boneIndexById.entries()].sort((left, right) => left[1] - right[1]).map(([id]) => id),
+    {
+      profile: 'articulation-stable-segment-v1',
+      vertexCount,
+      fallbackVertexCount,
+      smoothingPasses,
+      smoothingAlpha,
+    },
+  );
+}
+
+function addStableSegmentInfluences(target, touched, result) {
+  const { chain, segmentIndex, t, score } = result;
+  const currentIndex = chain.indices[segmentIndex];
+  const nextIndex = chain.indices[segmentIndex + 1];
+  const previousIndex = chain.indices[segmentIndex - 1];
+
+  // This 24-joint preview asset has one palm joint plus a hand-end marker, not
+  // independently skinned finger joints. Treat the terminal hand volume as a
+  // rigid palm until a real finger-weight asset is supplied; blending it to a
+  // marker twists neighbouring finger vertices in opposite directions.
+  if (chain.name.endsWith('Arm') && segmentIndex === chain.indices.length - 2) {
+    addWeightNumeric(target, touched, currentIndex, score);
+    return;
+  }
+
+  // Keep the middle of a bone segment rigid. Only the last quarter transitions
+  // to the next bone; a smaller proximal band blends back to the parent.
+  const distalBlend = smoothstep(0.72, 0.96, t);
+  const proximalBlend = Number.isInteger(previousIndex)
+    ? (1 - smoothstep(0.02, 0.20, t)) * 0.32
+    : 0;
+  const currentWeight = Math.max(0, 1 - distalBlend) * (1 - proximalBlend);
+
+  addWeightNumeric(target, touched, currentIndex, score * currentWeight);
+  addWeightNumeric(target, touched, nextIndex, score * distalBlend);
+  addWeightNumeric(target, touched, previousIndex, score * proximalBlend);
+}
+
+/**
+ * The GLB's 24-joint shoulder has a very short clavicle segment. Selecting the
+ * closest segment in 3D makes neighbouring front/back vertices jump between
+ * clavicle and upper-arm transforms. Use a lateral deltoid blend instead so a
+ * topology edge cannot straddle two unrelated rotations. The clavicle remains
+ * available to the rig, but the visible shoulder volume transitions directly
+ * from upper chest to upper arm.
+ */
+function stabilizeArmWeights(target, touched, x, y, bindPoints, boneIndexById) {
+  const absX = Math.abs(x);
+  const side = x < 0 ? 'left' : 'right';
+  const elbowPoint = bindPoints.get(`${side}LowerArm`);
+  const wristPoint = bindPoints.get(`${side}Hand`);
+  if (!elbowPoint || !wristPoint || y < 0.68 || y > 1.53) return;
+  const armBoundary = armBoundaryAtHeight(y);
+  let armGate = smoothstep(armBoundary - 0.08, armBoundary + 0.08, absX);
+  if (y < 0.82) armGate *= smoothstep(0.28, 0.36, absX);
+  if (armGate <= 1e-6) return;
+
+  const upperChestIndex = boneIndexById.get('upperChest');
+  const upperArmIndex = boneIndexById.get(`${side}UpperArm`);
+  const lowerArmIndex = boneIndexById.get(`${side}LowerArm`);
+  const handIndex = boneIndexById.get(`${side}Hand`);
+  if (
+    !Number.isInteger(upperChestIndex)
+    || !Number.isInteger(upperArmIndex)
+    || !Number.isInteger(lowerArmIndex)
+    || !Number.isInteger(handIndex)
+  ) return;
+
+  const elbowX = Math.abs(elbowPoint.x);
+  const wristX = Math.abs(wristPoint.x);
+  const shoulderBlend = smoothstep(0.135, 0.265, absX);
+  const elbowBlend = smoothstep(elbowX - 0.10, elbowX + 0.045, absX);
+  let wristBlend = smoothstep(wristX - 0.075, wristX + 0.02, absX);
+  if (y < wristPoint.y - 0.035) {
+    wristBlend = Math.max(wristBlend, smoothstep(wristX - 0.115, wristX - 0.02, absX));
+  }
+
+  let sourceTotal = 0;
+  for (let index = 0; index < target.length; index += 1) sourceTotal += target[index];
+  if (sourceTotal <= EPSILON) sourceTotal = 1;
+  const sourceScale = 1 - armGate;
+  for (let index = 0; index < target.length; index += 1) target[index] *= sourceScale;
+
+  addWeightNumeric(target, touched, upperChestIndex, sourceTotal * armGate * (1 - shoulderBlend));
+  addWeightNumeric(
+    target,
+    touched,
+    upperArmIndex,
+    sourceTotal * armGate * shoulderBlend * (1 - elbowBlend),
+  );
+  addWeightNumeric(
+    target,
+    touched,
+    lowerArmIndex,
+    sourceTotal * armGate * elbowBlend * (1 - wristBlend),
+  );
+  addWeightNumeric(target, touched, handIndex, sourceTotal * armGate * elbowBlend * wristBlend);
+}
+
+function stabilizeHipWeights(target, touched, x, y, boneIndexById) {
+  const absX = Math.abs(x);
+  if (y > 0.95 && absX > 0.20) return;
+  const pelvisGate = smoothstep(0.50, 0.60, y)
+    * (1 - smoothstep(1.16, 1.24, y))
+    * (1 - smoothstep(0.24, 0.30, absX));
+  if (pelvisGate <= 1e-6) return;
+
+  const side = x < 0 ? 'left' : 'right';
+  const hipsIndex = boneIndexById.get('hips');
+  const upperLegIndex = boneIndexById.get(`${side}UpperLeg`);
+  if (!Number.isInteger(hipsIndex) || !Number.isInteger(upperLegIndex)) return;
+
+  // Use one smooth radial field around the crotch instead of independent X/Y
+  // thresholds. Adjacent vertices then cannot jump from pelvis to thigh when
+  // both coordinates change across a diagonal triangle edge.
+  const downward = Math.max(0, (0.86 - y) / 0.24);
+  const lateralScale = 0.11 + smoothstep(0.86, 1.04, y) * 0.08;
+  const lateral = absX / lateralScale;
+  const centerWidth = smoothstep(0.68, 0.82, y) * 0.04;
+  const centerLegFade = centerWidth > EPSILON ? smoothstep(0.002, centerWidth, absX) : 1;
+  const upperLegBlend = smoothstep(0.05, 1.30, Math.hypot(downward, lateral))
+    * (1 - smoothstep(1.02, 1.20, y))
+    * centerLegFade;
+
+  let sourceTotal = 0;
+  for (let index = 0; index < target.length; index += 1) sourceTotal += target[index];
+  if (sourceTotal <= EPSILON) sourceTotal = 1;
+  const sourceScale = 1 - pelvisGate;
+  for (let index = 0; index < target.length; index += 1) target[index] *= sourceScale;
+  addWeightNumeric(target, touched, hipsIndex, sourceTotal * pelvisGate * (1 - upperLegBlend));
+  addWeightNumeric(target, touched, upperLegIndex, sourceTotal * pelvisGate * upperLegBlend);
+}
+
+function summarizeRuntimeWeights(indices, weights, jointIds, base) {
+  const dominantCounts = Object.fromEntries(jointIds.map((id) => [id, 0]));
+  let dominantWeightSum = 0;
+  let minimumWeightSum = Infinity;
+  let maximumWeightSum = -Infinity;
+  const vertexCount = weights.length / 4;
+  for (let vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 1) {
+    const offset = vertexIndex * 4;
+    let dominantSlot = 0;
+    let sum = 0;
+    for (let slot = 0; slot < 4; slot += 1) {
+      const weight = weights[offset + slot];
+      sum += weight;
+      if (weight > weights[offset + dominantSlot]) dominantSlot = slot;
+    }
+    minimumWeightSum = Math.min(minimumWeightSum, sum);
+    maximumWeightSum = Math.max(maximumWeightSum, sum);
+    dominantWeightSum += weights[offset + dominantSlot];
+    const id = jointIds[indices[offset + dominantSlot]];
+    if (id) dominantCounts[id] += 1;
+  }
+  return {
+    ...base,
+    maximumInfluences: 4,
+    meanDominantWeight: vertexCount ? dominantWeightSum / vertexCount : 0,
+    minimumWeightSum: Number.isFinite(minimumWeightSum) ? minimumWeightSum : 0,
+    maximumWeightSum: Number.isFinite(maximumWeightSum) ? maximumWeightSum : 0,
+    dominantCounts,
+  };
+}
+
 function createWeightChains(points, boneIndexById) {
   const pointArray = (ids) => ids.map((id) => {
     const point = points.get(id);
@@ -1100,6 +1361,14 @@ function selectWeightCandidates(x, y, z, chains) {
     if (absX < 0.025 && shoulderTransition < 0.05) {
       pushCandidate(candidates, byName.get(side === 'left' ? 'rightArm' : 'leftArm'), 0.002);
     }
+  }
+
+  // The A-pose hands overlap the pelvis vertically but are far outside the
+  // torso corridor. Never let a tiny torso Gaussian survive normalization and
+  // give a finger vertex a hips influence.
+  if (absX > 0.32 && y >= 0.70 && y <= 0.98) {
+    candidates.length = 0;
+    pushCandidate(candidates, byName.get(`${side}Arm`), 1);
   }
 
   // Lower-body candidates are limited to the pelvis and leg corridor.
@@ -1495,6 +1764,7 @@ function clamp(value, min, max) {
 
 
 export const __surfaceTestUtils = Object.freeze({
+  rebuildArticulationStableWeights,
   deformSurfaceLbs,
   deformSurfaceDqs,
   writeFourStrongestInfluences,

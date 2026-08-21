@@ -991,9 +991,7 @@ function buildAnimationPoseSnapshot(localPose, state, v8Payload) {
     rootJointId: 'hips',
     rootTranslation: [...localPose.root.position],
     rootRotation: [...localPose.root.rotation],
-    localRotations: Object.fromEntries(
-      Object.entries(localPose.joints).map(([jointId, value]) => [jointId, [...value.rotation]]),
-    ),
+    localRotations: structuredClone(v8Payload?.incomingBoneLocalRotations ?? {}),
     ikTargets: [],
     pinnedJoints: {},
     updatedAt,
