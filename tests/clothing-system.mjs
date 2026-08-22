@@ -5,7 +5,9 @@ import { fileURLToPath } from 'node:url';
 
 import {
   ClothingManager,
+  ClothingRuntime,
   ClothingRevisionConflictError,
+  clothingAttachmentReferences,
   createClothingProfile,
   createClothingRuntimeDescriptor,
   createClothingState,
@@ -87,6 +89,17 @@ assert.throws(() => manager.add(restored, { clothing_id: 'bad', type: 'top', bod
 const descriptor = createClothingRuntimeDescriptor(restored.profiles.clothing_test);
 assert.deepEqual(descriptor.render_stack, ['character', 'body_skin', 'clothing_mesh']);
 assert.equal(descriptor.binding, 'simulationRig');
+assert.deepEqual(descriptor.runtime_chain, [
+  'asset', 'profile', 'reference', 'attachment', 'simulationRig', 'render',
+]);
+assert.equal(descriptor.profile_reference.clothing_profile_id, 'clothing_test');
+assert.equal(descriptor.assets[0].asset_reference.clothing_id, 'top_test');
+assert.equal(descriptor.assets[0].attachment.target, 'simulationRig');
+assert.deepEqual(clothingAttachmentReferences(restored.profiles.clothing_test), [
+  { clothing_id: 'top_test', revision: 1 },
+  { clothing_id: 'pants_test', revision: 1 },
+  { clothing_id: 'shoes_test', revision: 1 },
+]);
 assert.deepEqual(descriptor.writes, ['clothing.mesh.transforms', 'clothing.mesh.material']);
 for (const preserved of ['body_skin', 'body_vertices', 'skin_weights', 'rig', 'pose', 'animation_tracks']) {
   assert.ok(descriptor.preserves.includes(preserved));
@@ -118,6 +131,29 @@ assert.equal(followA.source, 'simulationRig');
 assert.equal(followA.static_clothing, true);
 assert.notDeepEqual(topA.joint_transforms.rightUpperArm.rotation, topB.joint_transforms.rightUpperArm.rotation);
 assert.deepEqual(project.character, bodyBefore);
+
+const rendererFrames = [];
+const runtime = new ClothingRuntime(restored.profiles.clothing_test, {
+  renderer: {
+    id: 'clothing-test-renderer',
+    applyClothingFrame(frame) { rendererFrames.push(frame); },
+  },
+});
+const delivered = runtime.update(frameA.simulationRig);
+assert.equal(delivered.render_status.status, 'ready');
+assert.ok(delivered.asset_frames.every((item) => item.status === 'ready'));
+assert.ok(delivered.render_commands.every((item) => item.visible === true));
+assert.equal(delivered.render_delivery.delivered, true);
+assert.equal(delivered.render_delivery.renderer, 'clothing-test-renderer');
+assert.equal(rendererFrames.length, 1);
+const waiting = new ClothingRuntime(restored.profiles.clothing_test).update({
+  rigVersion: 'rig@0.4.0',
+  positions: {},
+  rotations: {},
+});
+assert.equal(waiting.render_status.status, 'waiting-for-rig');
+assert.ok(waiting.asset_frames.every((item) => item.status === 'waiting-for-rig'));
+assert.ok(waiting.render_commands.every((item) => item.visible === false));
 
 assert.equal(project.schemaVersion, 11);
 assert.equal(project.clothingSystem.schema, 'humanoid_rig/clothing_state@1.0');
