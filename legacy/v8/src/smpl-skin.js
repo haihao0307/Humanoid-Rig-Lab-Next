@@ -64,6 +64,41 @@ export const POSE_CORRECTIVE_CHANNELS = Object.freeze([
   'kneeFlex',
 ]);
 
+/**
+ * Stable description of the live surface-deformation path. The default path
+ * remains Three.js GPU LBS; DQS is deliberately kept as an opt-in CPU quality
+ * reference. Every corrective evaluation starts from the immutable rest
+ * buffer (or its current body-shape result), never from the previous frame.
+ */
+export const SKIN_DEFORMATION_PIPELINE = Object.freeze({
+  schema: 'humanoid_rig/skin_deformation_pipeline@1.0',
+  source: 'restPositions',
+  stages: Object.freeze([
+    'restPositions',
+    'body-shape-rest',
+    'pose-analysis',
+    'pose-corrective-offset',
+    'three-gpu-lbs',
+  ]),
+  correctiveRegions: Object.freeze(['shoulder', 'hip', 'elbow', 'knee']),
+  correctiveProfile: POSE_CORRECTIVE_PROFILE,
+  defaultRenderer: 'three-gpu-lbs',
+  experimentalRenderer: 'cpu-dqs-reference',
+  nonAccumulating: true,
+  sourceAsset: Object.freeze({
+    profile: 'smpl24',
+    jointCount: 24,
+    authoredFingerWeights: false,
+    authoredTwistWeights: false,
+    authoredScapulaWeights: false,
+  }),
+  runtimeWeightExtension: Object.freeze({
+    profile: RUNTIME_WEIGHT_PROFILE,
+    mode: 'procedural-preview',
+    productionAuthoredWeights: false,
+  }),
+});
+
 const POSE_CORRECTIVE_SPECS = Object.freeze([
   {
     id: 'leftShoulderVolume', category: 'shoulder', parentId: 'upperChest', driverId: 'leftUpperArm',
@@ -1105,6 +1140,7 @@ class NativeSmplSkinnedSurfaceLayer {
       pickSource: 'detailed-smpl-skinned-mesh',
       pickable,
       deformation: `native Three.js SkinnedMesh GPU LBS + ${POSE_CORRECTIVE_PROFILE}`,
+      deformationPipeline: structuredClone(SKIN_DEFORMATION_PIPELINE),
       renderDeformationMode: 'gpu-lbs-with-sparse-pose-correctives',
       dqsReferenceMode: 'cpu-quality-reference',
       dqsReferenceAvailable: Boolean(this.dualQuaternions?.length),

@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { applyPoseCorrective, createSmplSkinLayer, SKIN_RUNTIME_BUILD, __surfaceTestUtils } from '../src/smpl-skin.js';
+import {
+  applyPoseCorrective,
+  createSmplSkinLayer,
+  SKIN_DEFORMATION_PIPELINE,
+  SKIN_RUNTIME_BUILD,
+  __surfaceTestUtils,
+} from '../src/smpl-skin.js';
 import { computeRestWorldPositions } from '../src/skeleton-model.js';
 import { applyBodyProfileToDefinition } from '../src/body-profile.js';
 import { createStandardHumanoidPreset, normalizeSkeletonDefinition } from '../src/skeleton-presets.js';
@@ -531,6 +537,22 @@ assert.ok(Math.abs(diagnostics.runtimeWeightStats.maximumWeightSum - 1) < 1e-5);
 assert.equal(diagnostics.renderDeformationMode, 'gpu-lbs-with-sparse-pose-correctives');
 assert.equal(diagnostics.dqsReferenceMode, 'cpu-quality-reference');
 assert.equal(diagnostics.dqsReferenceAvailable, true);
+assert.deepEqual(diagnostics.deformationPipeline.stages, [
+  'restPositions',
+  'body-shape-rest',
+  'pose-analysis',
+  'pose-corrective-offset',
+  'three-gpu-lbs',
+]);
+assert.equal(diagnostics.deformationPipeline.defaultRenderer, 'three-gpu-lbs');
+assert.equal(diagnostics.deformationPipeline.experimentalRenderer, 'cpu-dqs-reference');
+assert.equal(diagnostics.deformationPipeline.nonAccumulating, true);
+assert.equal(diagnostics.deformationPipeline.sourceAsset.jointCount, 24);
+assert.equal(diagnostics.deformationPipeline.sourceAsset.authoredFingerWeights, false);
+assert.equal(diagnostics.deformationPipeline.sourceAsset.authoredTwistWeights, false);
+assert.equal(diagnostics.deformationPipeline.sourceAsset.authoredScapulaWeights, false);
+assert.equal(diagnostics.deformationPipeline.runtimeWeightExtension.productionAuthoredWeights, false);
+assert.deepEqual(diagnostics.deformationPipeline, SKIN_DEFORMATION_PIPELINE);
 assert.equal(diagnostics.poseCorrectiveProfile, 'sparse-anatomical-pose-corrective-v1');
 assert.equal(diagnostics.poseCorrectiveFieldCount, 8);
 assert.equal(diagnostics.poseCorrectiveStats.activeRegionCount, 0);
