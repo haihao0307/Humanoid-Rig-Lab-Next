@@ -46,6 +46,7 @@ export class CharacterManager {
       identity: { ...existing.identity, ...(profilePatch.identity || {}) },
       body_shape: { ...existing.body_shape, ...(profilePatch.body_shape || {}) },
       face_identity: { ...existing.face_identity, ...(profilePatch.face_identity || {}) },
+      clothing_references: { ...existing.clothing_references, ...(profilePatch.clothing_references || {}) },
       hair: { ...existing.hair, ...(profilePatch.hair || {}) },
       version: existing.version + 1,
     });

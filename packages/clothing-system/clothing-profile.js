@@ -1,11 +1,12 @@
-import { createClothingAsset } from './clothing-asset.js';
+import { createLegacyClothingAsset } from './clothing-asset.js';
+import { createClothingReference, createEmptyClothingReferences } from './clothing-reference.js';
 
 export const CLOTHING_PROFILE_SCHEMA = 'humanoid_rig/clothing_profile@1.0';
 const PROFILE_FIELDS = new Set(['clothing_profile_id', 'character_id', 'version', 'assets']);
 
 export function createClothingProfile(input = {}) {
   assertClothingProfileInput(input, { partial: true });
-  const assets = (Array.isArray(input.assets) ? input.assets : []).map(createClothingAsset);
+  const assets = (Array.isArray(input.assets) ? input.assets : []).map(createLegacyClothingAsset);
   assertUniqueAssets(assets);
   const profile = {
     clothing_profile_id: stringOr(input.clothing_profile_id, 'clothing_profile_001'),
@@ -43,6 +44,19 @@ export function assertClothingProfileInput(input, { partial = true } = {}) {
 export function clothingAttachmentReferences(profileInput) {
   const profile = createClothingProfile(profileInput);
   return profile.assets.map((asset) => ({ clothing_id: asset.clothing_id, revision: asset.revision }));
+}
+
+export function clothingSlotReferences(profileInput) {
+  const profile = createClothingProfile(profileInput);
+  const references = createEmptyClothingReferences();
+  for (const asset of profile.assets) {
+    const slot = asset.type === 'top' ? 'upper' : asset.type === 'pants' ? 'lower' : 'shoes';
+    references[slot] = createClothingReference({
+      clothingId: asset.clothing_id,
+      revision: asset.revision,
+    });
+  }
+  return references;
 }
 
 function assertUniqueAssets(assets) {

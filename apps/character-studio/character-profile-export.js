@@ -91,6 +91,14 @@ export function collectCharacterResourceReferences(projectState, profile, persis
     kind: 'clothing-attachment',
     revision: attachment.revision,
   });
+  for (const [slot, reference] of Object.entries(profile.clothing_references || {})) {
+    if (!reference) continue;
+    add({
+      asset_id: reference.clothingId,
+      kind: `clothing-${slot}`,
+      revision: reference.revision,
+    });
+  }
   if (profile.hair.hair_id) add({
     asset_id: profile.hair.hair_id,
     kind: 'hair-attachment',

@@ -21,6 +21,19 @@ export interface ClothingAttachmentReference {
   revision: number;
 }
 
+export interface ClothingReference {
+  clothingId: string;
+  definitionId: string | null;
+  revision: number;
+}
+
+export interface CharacterClothingReferences {
+  upper: ClothingReference | null;
+  lower: ClothingReference | null;
+  shoes: ClothingReference | null;
+  accessory: ClothingReference | null;
+}
+
 export interface HairReference {
   hair_id: string | null;
   revision: number;
@@ -39,6 +52,7 @@ export interface CharacterProfile {
   body_shape: BodyShapeReference;
   face_identity: FaceIdentityReference;
   clothing_attachments: ClothingAttachmentReference[];
+  clothing_references: CharacterClothingReferences;
   hair: HairReference;
   accessory_attachments: AccessoryAttachmentReference[];
   proportion_revision: number;

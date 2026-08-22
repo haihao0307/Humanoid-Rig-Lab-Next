@@ -1,3 +1,97 @@
+export const CLOTHING_ASSET_SCHEMA = 'humanoid_rig/clothing_asset@1.0';
+
+export const CLOTHING_CATEGORIES = Object.freeze([
+  'upper_body',
+  'lower_body',
+  'shoes',
+  'head',
+  'accessory',
+]);
+
+export const CLOTHING_LAYERS = Object.freeze([
+  'underwear',
+  'base',
+  'outer',
+  'armor',
+]);
+
+const CORE_ASSET_FIELDS = new Set([
+  'clothingId',
+  'name',
+  'category',
+  'assetReference',
+  'meshReference',
+  'materialReference',
+  'compatibleRig',
+  'compatibleBody',
+  'attachmentPoints',
+  'layer',
+  'metadata',
+]);
+const RESOURCE_REFERENCE_FIELDS = new Set(['assetId', 'revision', 'uri']);
+const COMPATIBLE_RIG_FIELDS = new Set(['target', 'versions']);
+const COMPATIBLE_BODY_FIELDS = new Set(['profileIds', 'minimumRevision']);
+
+export function createClothingAsset(input = {}) {
+  const source = isLegacyClothingAssetInput(input) ? migrateLegacyAssetInput(input) : input;
+  assertClothingAssetInput(source, { partial: true });
+  const clothingId = stringOr(source.clothingId, 'clothing_001');
+  const asset = {
+    clothingId,
+    name: stringOr(source.name, clothingId),
+    category: categoryOr(source.category, 'upper_body'),
+    assetReference: normalizeResourceReference(source.assetReference, clothingId),
+    meshReference: normalizeResourceReference(source.meshReference, `${clothingId}.mesh`),
+    materialReference: normalizeResourceReference(source.materialReference, `${clothingId}.material`),
+    compatibleRig: normalizeCompatibleRig(source.compatibleRig),
+    compatibleBody: normalizeCompatibleBody(source.compatibleBody),
+    attachmentPoints: uniqueStrings(source.attachmentPoints, []),
+    layer: layerOr(source.layer, 'base'),
+    metadata: normalizeMetadata(source.metadata),
+  };
+  assertClothingAsset(asset);
+  return structuredClone(asset);
+}
+
+export function normalizeClothingAsset(input = {}) {
+  return createClothingAsset(input);
+}
+
+export function assertClothingAsset(asset) {
+  assertClothingAssetInput(asset, { partial: false });
+  assertIdentifier(asset.clothingId, 'clothingId');
+  return true;
+}
+
+export function assertClothingAssetInput(input, { partial = true } = {}) {
+  if (!isPlainObject(input)) throw new TypeError('ClothingAsset must be an object.');
+  assertAllowedKeys(input, CORE_ASSET_FIELDS, 'ClothingAsset');
+  if (!partial) {
+    for (const key of CORE_ASSET_FIELDS) if (!(key in input)) throw new TypeError(`ClothingAsset is missing ${key}.`);
+  }
+  if ('clothingId' in input) assertIdentifier(input.clothingId, 'clothingId');
+  if ('name' in input && !String(input.name || '').trim()) throw new TypeError('ClothingAsset name is required.');
+  if ('category' in input && !CLOTHING_CATEGORIES.includes(String(input.category))) {
+    throw new TypeError(`ClothingAsset category must be one of: ${CLOTHING_CATEGORIES.join(', ')}.`);
+  }
+  if ('layer' in input && !CLOTHING_LAYERS.includes(String(input.layer))) {
+    throw new TypeError(`ClothingAsset layer must be one of: ${CLOTHING_LAYERS.join(', ')}.`);
+  }
+  validateResourceReference(input.assetReference, 'assetReference');
+  validateResourceReference(input.meshReference, 'meshReference');
+  validateResourceReference(input.materialReference, 'materialReference');
+  validateCompatibleRig(input.compatibleRig);
+  validateCompatibleBody(input.compatibleBody);
+  if ('attachmentPoints' in input && !Array.isArray(input.attachmentPoints)) {
+    throw new TypeError('ClothingAsset attachmentPoints must be an array.');
+  }
+  if (Array.isArray(input.attachmentPoints)) {
+    input.attachmentPoints.forEach((point, index) => assertIdentifier(point, `attachmentPoints[${index}]`));
+  }
+  if ('metadata' in input) assertJsonSafeMetadata(input.metadata, 'ClothingAsset.metadata');
+  return true;
+}
+
 export const CLOTHING_TYPES = Object.freeze({
   TOP: 'top',
   PANTS: 'pants',
@@ -28,8 +122,8 @@ const PHYSICS_PROFILE_FIELDS = new Set(['mode', 'enabled', 'collision']);
 const SIZE_PROFILE_FIELDS = new Set(['size', 'scale', 'body_shape_revision']);
 const SIZE_SET = new Set(['XS', 'S', 'M', 'L', 'XL', 'custom']);
 
-export function createClothingAsset(input = {}) {
-  assertClothingAssetInput(input, { partial: true });
+export function createLegacyClothingAsset(input = {}) {
+  assertLegacyClothingAssetInput(input, { partial: true });
   const type = normalizeType(input.type);
   const preset = CLOTHING_TYPE_PRESETS[type];
   const asset = {
@@ -41,27 +135,27 @@ export function createClothingAsset(input = {}) {
     physics_profile: normalizePhysicsProfile(input.physics_profile),
     size_profile: normalizeSizeProfile(input.size_profile),
   };
-  assertClothingAsset(asset);
+  assertLegacyClothingAsset(asset);
   return structuredClone(asset);
 }
 
-export function normalizeClothingAsset(input = {}) {
-  return createClothingAsset(input);
+export function normalizeLegacyClothingAsset(input = {}) {
+  return createLegacyClothingAsset(input);
 }
 
-export function assertClothingAsset(asset) {
-  assertClothingAssetInput(asset, { partial: false });
+export function assertLegacyClothingAsset(asset) {
+  assertLegacyClothingAssetInput(asset, { partial: false });
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(asset.clothing_id)) {
     throw new TypeError('clothing_id must use letters, numbers, dot, underscore, or hyphen.');
   }
   return true;
 }
 
-export function assertClothingAssetInput(input, { partial = true } = {}) {
-  if (!isPlainObject(input)) throw new TypeError('ClothingAsset must be an object.');
-  assertAllowedKeys(input, TOP_LEVEL_FIELDS, 'ClothingAsset');
+export function assertLegacyClothingAssetInput(input, { partial = true } = {}) {
+  if (!isPlainObject(input)) throw new TypeError('LegacyClothingAsset must be an object.');
+  assertAllowedKeys(input, TOP_LEVEL_FIELDS, 'LegacyClothingAsset');
   if (!partial) {
-    for (const key of TOP_LEVEL_FIELDS) if (!(key in input)) throw new TypeError(`ClothingAsset is missing ${key}.`);
+    for (const key of TOP_LEVEL_FIELDS) if (!(key in input)) throw new TypeError(`LegacyClothingAsset is missing ${key}.`);
   }
   if ('type' in input && !Object.values(CLOTHING_TYPES).includes(String(input.type))) {
     throw new TypeError('ClothingAsset type must be top, pants, or shoes.');
@@ -167,6 +261,147 @@ function normalizeType(value) {
   return Object.values(CLOTHING_TYPES).includes(String(value)) ? String(value) : CLOTHING_TYPES.TOP;
 }
 
+function migrateLegacyAssetInput(input) {
+  const type = normalizeType(input.type);
+  const clothingId = stringOr(input.clothing_id, `${type}_001`);
+  return {
+    clothingId,
+    name: clothingId,
+    category: legacyTypeToCategory(type),
+    assetReference: { assetId: clothingId, revision: positiveInteger(input.revision, 1), uri: null },
+    meshReference: { assetId: `${clothingId}.mesh`, revision: positiveInteger(input.revision, 1), uri: null },
+    materialReference: { assetId: `${clothingId}.material`, revision: positiveInteger(input.revision, 1), uri: null },
+    compatibleRig: {
+      target: 'simulationRig',
+      versions: [stringOr(input.rig_profile?.rig_revision, 'rig@0.4.0')],
+    },
+    compatibleBody: {
+      profileIds: [],
+      minimumRevision: nonNegativeInteger(input.size_profile?.body_shape_revision, 0),
+    },
+    attachmentPoints: uniqueStrings(input.rig_profile?.attachment_points, CLOTHING_TYPE_PRESETS[type].attachment_points),
+    layer: 'base',
+    metadata: {
+      legacyType: type,
+      previewMaterial: normalizeMaterial(input.material, CLOTHING_TYPE_PRESETS[type]),
+      sizeProfile: normalizeSizeProfile(input.size_profile),
+      physicsMode: 'static-follow',
+    },
+  };
+}
+
+function isLegacyClothingAssetInput(input) {
+  return isPlainObject(input) && ('clothing_id' in input || 'type' in input || 'rig_profile' in input);
+}
+
+function legacyTypeToCategory(type) {
+  if (type === CLOTHING_TYPES.PANTS) return 'lower_body';
+  if (type === CLOTHING_TYPES.SHOES) return 'shoes';
+  return 'upper_body';
+}
+
+function normalizeResourceReference(value, fallbackAssetId) {
+  const source = isPlainObject(value) ? value : {};
+  return {
+    assetId: stringOr(source.assetId, fallbackAssetId),
+    revision: positiveInteger(source.revision, 1),
+    uri: nullableString(source.uri),
+  };
+}
+
+function normalizeCompatibleRig(value) {
+  const source = isPlainObject(value) ? value : {};
+  return {
+    target: 'simulationRig',
+    versions: uniqueStrings(source.versions, []),
+  };
+}
+
+function normalizeCompatibleBody(value) {
+  const source = isPlainObject(value) ? value : {};
+  return {
+    profileIds: uniqueStrings(source.profileIds, []),
+    minimumRevision: nonNegativeInteger(source.minimumRevision, 0),
+  };
+}
+
+function normalizeMetadata(value) {
+  const source = isPlainObject(value) ? value : {};
+  assertJsonSafeMetadata(source, 'ClothingAsset.metadata');
+  return structuredClone(source);
+}
+
+function validateResourceReference(value, label) {
+  if (value === undefined) return;
+  if (!isPlainObject(value)) throw new TypeError(`ClothingAsset ${label} must be an object.`);
+  assertAllowedKeys(value, RESOURCE_REFERENCE_FIELDS, `ClothingAsset.${label}`);
+  if ('assetId' in value) assertIdentifier(value.assetId, `${label}.assetId`);
+  if ('revision' in value && (!Number.isInteger(Number(value.revision)) || Number(value.revision) < 1)) {
+    throw new TypeError(`${label}.revision must be a positive integer.`);
+  }
+  if ('uri' in value && value.uri !== null && typeof value.uri !== 'string') {
+    throw new TypeError(`${label}.uri must be a string or null.`);
+  }
+}
+
+function validateCompatibleRig(value) {
+  if (value === undefined) return;
+  if (!isPlainObject(value)) throw new TypeError('compatibleRig must be an object.');
+  assertAllowedKeys(value, COMPATIBLE_RIG_FIELDS, 'compatibleRig');
+  if ('target' in value && value.target !== 'simulationRig') throw new TypeError('compatibleRig.target must be simulationRig.');
+  if ('versions' in value && !Array.isArray(value.versions)) throw new TypeError('compatibleRig.versions must be an array.');
+  if (Array.isArray(value.versions) && value.versions.some((version) => !String(version || '').trim())) {
+    throw new TypeError('compatibleRig.versions must contain non-empty strings.');
+  }
+}
+
+function validateCompatibleBody(value) {
+  if (value === undefined) return;
+  if (!isPlainObject(value)) throw new TypeError('compatibleBody must be an object.');
+  assertAllowedKeys(value, COMPATIBLE_BODY_FIELDS, 'compatibleBody');
+  if ('profileIds' in value && !Array.isArray(value.profileIds)) throw new TypeError('compatibleBody.profileIds must be an array.');
+  if (Array.isArray(value.profileIds)) {
+    value.profileIds.forEach((profileId, index) => assertIdentifier(profileId, `compatibleBody.profileIds[${index}]`));
+  }
+  if ('minimumRevision' in value && (!Number.isInteger(Number(value.minimumRevision)) || Number(value.minimumRevision) < 0)) {
+    throw new TypeError('compatibleBody.minimumRevision must be a non-negative integer.');
+  }
+}
+
+function assertJsonSafeMetadata(value, path, seen = new Set()) {
+  if (value == null || ['string', 'boolean'].includes(typeof value)) return true;
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) throw new TypeError(`${path} must contain finite numbers only.`);
+    return true;
+  }
+  if (typeof value !== 'object' || ArrayBuffer.isView(value) || value instanceof ArrayBuffer) {
+    throw new TypeError(`${path} must contain JSON-safe values only.`);
+  }
+  if (seen.has(value)) throw new TypeError(`${path} must not contain circular references.`);
+  seen.add(value);
+  if (Array.isArray(value)) value.forEach((item, index) => assertJsonSafeMetadata(item, `${path}[${index}]`, seen));
+  else {
+    if (!isPlainObject(value)) throw new TypeError(`${path} must contain plain objects only.`);
+    for (const [key, child] of Object.entries(value)) assertJsonSafeMetadata(child, `${path}.${key}`, seen);
+  }
+  seen.delete(value);
+  return true;
+}
+
+function assertIdentifier(value, label) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(String(value || ''))) {
+    throw new TypeError(`${label} must use letters, numbers, dot, underscore, or hyphen.`);
+  }
+}
+
+function categoryOr(value, fallback) {
+  return CLOTHING_CATEGORIES.includes(String(value)) ? String(value) : fallback;
+}
+
+function layerOr(value, fallback) {
+  return CLOTHING_LAYERS.includes(String(value)) ? String(value) : fallback;
+}
+
 function assertAllowedKeys(value, allowed, label) {
   for (const key of Object.keys(value)) if (!allowed.has(key)) throw new TypeError(`${label}.${key} is not part of the Clothing contract.`);
 }
@@ -198,5 +433,9 @@ function nonNegativeInteger(value, fallback) {
 function stringOr(value, fallback) {
   const result = String(value ?? '').trim();
   return result || fallback;
+}
+function nullableString(value) {
+  const result = value == null ? '' : String(value).trim();
+  return result || null;
 }
 function isPlainObject(value) { return Boolean(value) && typeof value === 'object' && !Array.isArray(value); }

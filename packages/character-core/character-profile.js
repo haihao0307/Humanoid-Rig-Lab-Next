@@ -1,4 +1,4 @@
-export const CHARACTER_PROFILE_SCHEMA = 'humanoid_rig/character_profile@1.5';
+export const CHARACTER_PROFILE_SCHEMA = 'humanoid_rig/character_profile@1.6';
 
 export const CHARACTER_REVISION_FIELDS = Object.freeze([
   'proportion_revision',
@@ -22,6 +22,7 @@ const PROFILE_FIELDS = new Set([
   'face_identity',
   'expression_revision', 'expression_runtime_descriptor',
   'clothing_attachments',
+  'clothing_references',
   'hair',
   'accessory_attachments',
   ...CHARACTER_REVISION_FIELDS,
@@ -30,6 +31,8 @@ const IDENTITY_FIELDS = new Set(['identity_id', 'revision', 'tags']);
 const BODY_SHAPE_FIELDS = new Set(['profile_id', 'revision']);
 const FACE_IDENTITY_FIELDS = new Set(['face_id', 'revision']);
 const CLOTHING_ATTACHMENT_FIELDS = new Set(['clothing_id', 'revision']);
+const CLOTHING_REFERENCE_FIELDS = new Set(['clothingId', 'definitionId', 'revision']);
+const CLOTHING_REFERENCE_SLOTS = Object.freeze(['upper', 'lower', 'shoes', 'accessory']);
 const HAIR_REFERENCE_FIELDS = new Set(['hair_id', 'revision']);
 const ACCESSORY_ATTACHMENT_FIELDS = new Set(['accessory_id', 'revision']);
 const FORBIDDEN_KEYS = new Set([
@@ -57,6 +60,7 @@ export function createCharacterProfile(input = {}, moduleRevisions = {}) {
   const expressionRevision = revision(input.expression_revision, moduleRevisions.expression);
   faceIdentity.revision = faceRevision;
   const clothingAttachments = normalizeClothingAttachments(input.clothing_attachments);
+  const clothingReferences = normalizeClothingReferences(input.clothing_references);
   const hair = normalizeHairReference(input.hair);
   const hairRevision = revision(input.hair_revision, input.hair?.revision ?? moduleRevisions.hair);
   hair.revision = hair.hair_id ? Math.max(1, hairRevision) : 0;
@@ -71,6 +75,7 @@ export function createCharacterProfile(input = {}, moduleRevisions = {}) {
     expression_revision: expressionRevision,
     expression_runtime_descriptor: normalizeExpressionRuntimeDescriptor(input.expression_runtime_descriptor),
     clothing_attachments: clothingAttachments,
+    clothing_references: clothingReferences,
     hair,
     accessory_attachments: accessoryAttachments,
     proportion_revision: revision(input.proportion_revision, moduleRevisions.proportion),
@@ -114,6 +119,7 @@ export function assertCharacterProfile(profile) {
   if (new Set(profile.clothing_attachments.map((item) => item.clothing_id)).size !== profile.clothing_attachments.length) {
     throw new TypeError('clothing_attachments must not contain duplicate clothing_id values.');
   }
+  assertClothingReferences(profile.clothing_references);
   if (profile.hair.revision !== profile.hair_revision) {
     throw new TypeError('hair.revision must match hair_revision.');
   }
@@ -163,6 +169,7 @@ export function assertCharacterProfileInput(input, { partial = true } = {}) {
       }
     }
   }
+  if ('clothing_references' in input) assertClothingReferences(input.clothing_references, { partial });
   if ('hair' in input) {
     if (!isPlainObject(input.hair)) throw new TypeError('hair must be a reference object.');
     assertAllowedKeys(input.hair, HAIR_REFERENCE_FIELDS, 'hair');
@@ -237,6 +244,55 @@ function normalizeClothingAttachments(value) {
     clothing_id: String(item.clothing_id).trim(),
     revision: Math.max(1, Number(item.revision) || 1),
   }));
+}
+
+function normalizeClothingReferences(value) {
+  const source = isPlainObject(value) ? value : {};
+  for (const key of Object.keys(source)) {
+    if (!CLOTHING_REFERENCE_SLOTS.includes(key)) {
+      throw new TypeError(`clothing_references.${key} is not a supported clothing slot.`);
+    }
+  }
+  const result = { upper: null, lower: null, shoes: null, accessory: null };
+  for (const slot of CLOTHING_REFERENCE_SLOTS) {
+    if (source[slot] == null) continue;
+    result[slot] = {
+      clothingId: String(source[slot].clothingId || '').trim(),
+      definitionId: nullableString(source[slot].definitionId),
+      revision: Math.max(1, Number(source[slot].revision) || 1),
+    };
+  }
+  return result;
+}
+
+function assertClothingReferences(value, { partial = false } = {}) {
+  if (!isPlainObject(value)) throw new TypeError('clothing_references must be an object.');
+  for (const key of Object.keys(value)) {
+    if (!CLOTHING_REFERENCE_SLOTS.includes(key)) {
+      throw new TypeError(`clothing_references.${key} is not a supported clothing slot.`);
+    }
+  }
+  for (const slot of CLOTHING_REFERENCE_SLOTS) {
+    if (!(slot in value)) {
+      if (partial) continue;
+      throw new TypeError(`clothing_references is missing ${slot}.`);
+    }
+    const reference = value[slot];
+    if (reference == null) continue;
+    if (!isPlainObject(reference)) throw new TypeError(`clothing_references.${slot} must be a reference object or null.`);
+    assertAllowedKeys(reference, CLOTHING_REFERENCE_FIELDS, `clothing_references.${slot}`);
+    if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(String(reference.clothingId || ''))) {
+      throw new TypeError(`clothing_references.${slot}.clothingId must be a valid id.`);
+    }
+    if (reference.definitionId !== null
+      && !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(String(reference.definitionId || ''))) {
+      throw new TypeError(`clothing_references.${slot}.definitionId must be a valid id or null.`);
+    }
+    if (!Number.isInteger(Number(reference.revision)) || Number(reference.revision) < 1) {
+      throw new TypeError(`clothing_references.${slot}.revision must be a positive integer reference.`);
+    }
+  }
+  return true;
 }
 
 function normalizeHairReference(value) {

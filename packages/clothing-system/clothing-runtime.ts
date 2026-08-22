@@ -1,5 +1,5 @@
 import type { ClothingProfile } from './clothing-profile.ts';
-import type { ClothingAsset } from './clothing-asset.ts';
+import type { LegacyClothingAsset } from './clothing-asset.ts';
 
 export interface ClothingAssetReference {
   schema: 'humanoid_rig/clothing_asset_reference@1.0';
@@ -34,7 +34,7 @@ export interface ClothingRuntimeAssetDescriptor {
   type: string;
   attachment_points: string[];
   physics_mode: 'static-follow';
-  asset: ClothingAsset;
+  asset: LegacyClothingAsset;
   asset_reference: ClothingAssetReference;
   attachment: ClothingAttachmentDescriptor;
   render: ClothingRenderInstanceDescriptor;
