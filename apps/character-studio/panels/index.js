@@ -2,6 +2,7 @@ export { IdentityPanel } from './identity-panel.js';
 export { BodyShapePanel } from './body-shape-panel.js';
 export { FacePanel } from './face-panel.js';
 export { ClothingPanel } from './clothing-panel.js';
+export { ClothingParametersPanel } from './clothing-parameters-panel.js';
 export { HairPanel } from './hair-panel.js';
 export { AccessoryPanel } from './accessory-panel.js';
 export { ProportionPanel } from './proportion-panel.js';

@@ -707,3 +707,258 @@ body.character-studio-page {
 .character-studio-export-button:hover {
   background: rgba(45, 112, 158, 0.56);
 }
+
+.character-studio-clothing-workbench,
+.character-studio-clothing-library,
+.character-studio-clothing-equipped {
+  display: grid;
+  gap: 9px;
+}
+
+.character-studio-clothing-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.character-studio-clothing-heading span {
+  display: grid;
+  gap: 3px;
+  font-size: 10px;
+}
+
+.character-studio-clothing-heading small,
+.character-studio-clothing-empty {
+  margin: 0;
+  color: var(--muted, #8294ad);
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.character-studio-clothing-heading button,
+.character-studio-clothing-library-item button,
+.character-studio-clothing-replace-row button,
+.character-studio-clothing-current,
+.character-studio-clothing-apply {
+  border: 1px solid var(--line, rgba(145, 180, 220, .18));
+  border-radius: 6px;
+  background: rgba(48, 87, 128, .2);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.character-studio-clothing-heading button {
+  flex: 0 0 auto;
+  padding: 5px 7px;
+  font-size: 8px;
+}
+
+.character-studio-clothing-category {
+  overflow: hidden;
+  border: 1px solid var(--line, rgba(145, 180, 220, .18));
+  border-radius: 8px;
+  background: rgba(4, 11, 20, .42);
+}
+
+.character-studio-clothing-category > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line, rgba(145, 180, 220, .18));
+  font-size: 9px;
+}
+
+.character-studio-clothing-category > header small {
+  color: var(--muted, #8294ad);
+  font-size: 7px;
+}
+
+.character-studio-clothing-category > div {
+  display: grid;
+}
+
+.character-studio-clothing-library-item {
+  display: grid;
+  grid-template-columns: 11px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(145, 180, 220, .09);
+}
+
+.character-studio-clothing-library-item:last-child { border-bottom: 0; }
+.character-studio-clothing-library-item[data-active="true"] { background: rgba(40, 112, 151, .16); }
+
+.character-studio-clothing-library-item > i,
+.character-studio-clothing-current > i {
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(255, 255, 255, .28);
+  border-radius: 50%;
+  background: var(--clothing-swatch);
+}
+
+.character-studio-clothing-library-item > span,
+.character-studio-clothing-current > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  font-size: 9px;
+}
+
+.character-studio-clothing-library-item small,
+.character-studio-clothing-current small {
+  overflow: hidden;
+  color: var(--muted, #8294ad);
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.character-studio-clothing-library-item button {
+  min-width: 34px;
+  padding: 4px 5px;
+  border-color: rgba(88, 199, 255, .35);
+  font-size: 8px;
+}
+
+.character-studio-clothing-equipped { margin-top: 3px; }
+.character-studio-clothing-equipped h4 { margin-bottom: 0; }
+
+.character-studio-clothing-equipped-item {
+  display: grid;
+  gap: 6px;
+  padding: 7px;
+  border: 1px solid var(--line, rgba(145, 180, 220, .18));
+  border-radius: 8px;
+}
+
+.character-studio-clothing-current {
+  display: grid;
+  grid-template-columns: 11px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  padding: 6px;
+  text-align: left;
+}
+
+.character-studio-clothing-replace-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 5px;
+}
+
+.character-studio-clothing-replace-row select,
+.character-studio-clothing-replace-row button {
+  min-width: 0;
+  padding: 5px;
+  color: inherit;
+  background: rgba(4, 11, 20, .72);
+  border: 1px solid var(--line, rgba(145, 180, 220, .18));
+  border-radius: 6px;
+  font-size: 8px;
+}
+
+.character-studio-clothing-parameters {
+  display: grid;
+  gap: 10px;
+}
+
+.character-studio-clothing-parameter-heading,
+.character-studio-clothing-parameter-empty {
+  display: grid;
+  gap: 4px;
+}
+
+.character-studio-clothing-parameter-heading > b,
+.character-studio-clothing-parameter-empty > b { font-size: 12px; }
+.character-studio-clothing-parameter-heading > small,
+.character-studio-clothing-parameter-empty p { margin: 0; color: var(--character-studio-muted); font-size: 8px; line-height: 1.45; }
+
+.character-studio-clothing-parameter-select,
+.character-studio-clothing-control,
+.character-studio-clothing-color {
+  display: grid;
+  grid-template-columns: minmax(72px, .85fr) minmax(100px, 1.15fr);
+  align-items: center;
+  gap: 8px;
+  color: var(--character-studio-muted);
+  font-size: 9px;
+}
+
+.character-studio-clothing-parameter-select select,
+.character-studio-clothing-control select,
+.character-studio-clothing-control input,
+.character-studio-clothing-offset input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 6px;
+  border: 1px solid var(--character-studio-line);
+  border-radius: 6px;
+  background: rgba(4, 11, 20, .72);
+  color: var(--character-studio-text);
+  font: inherit;
+}
+
+.character-studio-clothing-color input {
+  width: 100%;
+  min-height: 28px;
+  padding: 2px;
+  border: 1px solid var(--character-studio-line);
+  border-radius: 6px;
+  background: rgba(4, 11, 20, .72);
+}
+
+.character-studio-clothing-parameter-group {
+  display: grid;
+  gap: 7px;
+  padding: 9px;
+  border: 1px solid var(--character-studio-line);
+  border-radius: 8px;
+  background: rgba(4, 11, 20, .34);
+}
+
+.character-studio-clothing-parameter-group h4 {
+  margin: 0 0 2px;
+  color: #c4d8ec;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.character-studio-clothing-offset {
+  display: grid;
+  gap: 5px;
+  color: var(--character-studio-muted);
+  font-size: 9px;
+}
+
+.character-studio-clothing-offset > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.character-studio-clothing-offset label { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 3px; }
+
+.character-studio-clothing-simulation-interface dl { display: grid; gap: 5px; margin: 0; }
+.character-studio-clothing-simulation-interface dl > div { display: flex; justify-content: space-between; gap: 8px; font-size: 8px; }
+.character-studio-clothing-simulation-interface dt { color: var(--character-studio-muted); }
+.character-studio-clothing-simulation-interface dd { margin: 0; color: #c4d8ec; text-align: right; }
+.character-studio-clothing-simulation-interface > small { color: var(--character-studio-muted); font-size: 8px; line-height: 1.45; }
+
+.character-studio-clothing-apply {
+  min-height: 34px;
+  border-color: rgba(88, 199, 255, .55);
+  background: rgba(36, 92, 132, .38);
+  font-size: 10px;
+}
+
+.character-studio-clothing-parameter-status {
+  margin: 0;
+  color: var(--character-studio-muted);
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.character-studio-clothing-parameter-status[data-error="true"] { color: #ff9b9b; }

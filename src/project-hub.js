@@ -484,6 +484,36 @@ export class ProjectHubClient extends EventTarget {
     });
   }
 
+  updateClothingAsset(clothingId, patch, {
+    expected_revision = this.state.clothingSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const clothingSystem = clothingManager.update(this.state.clothingSystem, clothingId, patch, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitClothingSystem(clothingSystem, `更新服装 ${clothingId}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
+  replaceClothingAsset(clothingId, replacement, {
+    expected_revision = this.state.clothingSystem?.revision,
+    expected_character_revision = this.state.characterCore?.revision,
+    ...options
+  } = {}) {
+    const clothingSystem = clothingManager.replace(this.state.clothingSystem, clothingId, replacement, {
+      ...options,
+      expected_revision,
+    });
+    return this.#commitClothingSystem(clothingSystem, `替换服装 ${clothingId} → ${replacement.clothing_id}`, {
+      expectedCharacterRevision: expected_character_revision,
+      actor: options.actor,
+    });
+  }
+
   removeClothingAsset(clothingId, {
     expected_revision = this.state.clothingSystem?.revision,
     expected_character_revision = this.state.characterCore?.revision,

@@ -39,6 +39,7 @@ const PROPORTION_FIELDS = Object.freeze([
   'height', 'shoulderWidth', 'hipWidth', 'upperArmLength', 'forearmLength',
   'handControlLength', 'thighLength', 'lowerLegLength',
 ]);
+const CLOTHING_SIZES = new Set(['XS', 'S', 'M', 'L', 'XL', 'custom']);
 
 export class CharacterStudioController {
   constructor(hub) {
@@ -127,11 +128,7 @@ export class CharacterStudioController {
       if (desiredId && !this.hub.getClothing().assets.some((asset) => asset.clothing_id === desiredId)) {
         const catalogItem = findClothingCatalogItem(desiredId);
         if (!catalogItem || catalogItem.type !== type) throw new Error(`Unsupported ${type} clothing selection ${desiredId}.`);
-        this.hub.addClothingAsset({
-          clothing_id: catalogItem.id,
-          type: catalogItem.type,
-          material: { base_color: catalogItem.color },
-        });
+        this.hub.addClothingAsset(clothingAssetFromCatalog(catalogItem, this.hub.getState()));
         changed = true;
       }
     }
@@ -140,6 +137,78 @@ export class CharacterStudioController {
 
   resetClothing() {
     return this.applyClothing({ top: '', pants: '', shoes: '' });
+  }
+
+  addClothing(clothingId) {
+    const item = findClothingCatalogItem(clothingId);
+    if (!item) throw new Error(`Unsupported clothing selection ${clothingId}.`);
+    if (this.hub.getClothing().assets.some((asset) => asset.clothing_id === item.id)) return this.hub.getState();
+    this.hub.addClothingAsset(clothingAssetFromCatalog(item, this.hub.getState()));
+    return this.hub.saveClothingVersion();
+  }
+
+  removeClothing(clothingId) {
+    const id = String(clothingId || '');
+    if (!this.hub.getClothing().assets.some((asset) => asset.clothing_id === id)) return this.hub.getState();
+    this.hub.removeClothingAsset(id);
+    return this.hub.saveClothingVersion();
+  }
+
+  replaceClothing(clothingId, replacementId) {
+    const current = this.hub.getClothing().assets.find((asset) => asset.clothing_id === String(clothingId || ''));
+    if (!current) throw new Error(`ClothingAsset ${clothingId} does not exist.`);
+    const replacement = findClothingCatalogItem(replacementId);
+    if (!replacement || replacement.type !== current.type) {
+      throw new Error(`Replacement ${replacementId} must be a ${current.type} clothing asset.`);
+    }
+    if (replacement.id === current.clothing_id) return this.hub.getState();
+    this.hub.replaceClothingAsset(current.clothing_id, {
+      clothing_id: replacement.id,
+      type: replacement.type,
+      material: { base_color: replacement.color },
+    });
+    return this.hub.saveClothingVersion();
+  }
+
+  applyClothingParameters(clothingId, parameters = {}) {
+    const current = this.hub.getClothing().assets.find((asset) => asset.clothing_id === String(clothingId || ''));
+    if (!current) throw new Error(`ClothingAsset ${clothingId} does not exist.`);
+    const size = String(parameters.size || current.size_profile.size);
+    if (!CLOTHING_SIZES.has(size)) throw new TypeError(`Unsupported clothing size ${size}.`);
+    this.hub.updateClothingAsset(current.clothing_id, {
+      size_profile: {
+        size,
+        scale: finiteInRange(parameters.scale ?? current.size_profile.scale, 0.5, 2, 'scale'),
+        length: finiteInRange(parameters.length ?? current.size_profile.length, 0.5, 2, 'length'),
+        offset: {
+          x: finiteInRange(parameters.offsetX ?? current.size_profile.offset?.x, -1, 1, 'offsetX'),
+          y: finiteInRange(parameters.offsetY ?? current.size_profile.offset?.y, -1, 1, 'offsetY'),
+          z: finiteInRange(parameters.offsetZ ?? current.size_profile.offset?.z, -1, 1, 'offsetZ'),
+        },
+      },
+      render_profile: {
+        layer: integerInRange(parameters.layer ?? current.render_profile.layer, 0, 31, 'layer'),
+      },
+      material: {
+        base_color: normalizeHexColor(parameters.baseColor, current.material.base_color),
+        roughness: finiteInRange(parameters.roughness ?? current.material.roughness, 0, 1, 'roughness'),
+        metalness: finiteInRange(parameters.metalness ?? current.material.metalness, 0, 1, 'metalness'),
+        opacity: finiteInRange(parameters.opacity ?? current.material.opacity, 0, 1, 'opacity'),
+      },
+    });
+    return this.hub.saveClothingVersion();
+  }
+
+  addClothingAccessory(type) {
+    const requested = String(type || '');
+    const currentTypes = new Set(this.snapshot().accessories.map((item) => item.type));
+    currentTypes.add(requested);
+    return this.applyAccessories([...currentTypes]);
+  }
+
+  removeClothingAccessory(type) {
+    const requested = String(type || '');
+    return this.applyAccessories(this.snapshot().accessories.map((item) => item.type).filter((item) => item !== requested));
   }
 
   applyHair(styleOrId) {
@@ -402,6 +471,32 @@ function finiteInRange(value, minimum, maximum, name) {
     throw new RangeError(`${name} must be between ${minimum} and ${maximum}.`);
   }
   return number;
+}
+
+function integerInRange(value, minimum, maximum, name) {
+  const number = Number(value);
+  if (!Number.isInteger(number) || number < minimum || number > maximum) {
+    throw new RangeError(`${name} must be an integer between ${minimum} and ${maximum}.`);
+  }
+  return number;
+}
+
+function normalizeHexColor(value, fallback) {
+  const color = String(value || '').trim();
+  return /^#[0-9a-fA-F]{6}$/.test(color) ? color.toLowerCase() : fallback;
+}
+
+function clothingAssetFromCatalog(item, state) {
+  const characterId = state.characterCore?.active_character_id;
+  const bodyShapeRevision = state.characterCore?.profiles?.[characterId]?.body_shape_revision || 0;
+  return {
+    clothing_id: item.id,
+    type: item.type,
+    rig_profile: { rig_revision: state.activeVersions?.rig || 'rig@0.4.0' },
+    material: { base_color: item.color },
+    size_profile: { size: 'M', scale: 1, length: 1, offset: { x: 0, y: 0, z: 0 }, body_shape_revision: bodyShapeRevision },
+    render_profile: { layer: 1 },
+  };
 }
 
 function normalizeTags(value) {

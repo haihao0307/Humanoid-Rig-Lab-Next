@@ -11,6 +11,8 @@ import {
 import { followAppearanceAttachments, createAppearanceRuntimeDescriptor } from '../../packages/appearance-system/index.js';
 import { followSimulationRig } from '../../packages/clothing-system/index.js';
 import { mountCharacterStudioSidebar } from './components/character-studio-sidebar.js';
+import { CharacterStudioController } from './character-studio-controller.js';
+import { ClothingParametersPanel } from './panels/clothing-parameters-panel.js';
 import {
   IndexedDbCharacterStudioPersistence,
   MemoryCharacterStudioPersistence,
@@ -78,6 +80,7 @@ const LEFT_PANEL_SLOTS = Object.freeze([
 
 const RIGHT_PANEL_SLOTS = Object.freeze([
   ['characterProfile', 'CharacterProfile', 'Character Core profile 只读摘要'],
+  ['clothingParameters', 'Clothing Parameters', '选中 ClothingAsset 的 Fit / Layer / Material 参数'],
   ['expressionState', 'Expression State', 'Face Expression 当前状态只读摘要'],
   ['revisionSummary', 'Revision Summary', '模块 revision 与构建版本摘要'],
   ['activeReferences', 'Active References', 'Skin / Clothing / Hair / Accessory 引用'],
@@ -160,10 +163,10 @@ export class RightPanelHost {
       <div class="character-studio-panel-heading">
         <div>
           <span class="eyebrow">CHARACTER DATA</span>
-          <h2>Character 数据</h2>
-          <p>profile、revision、引用和导出摘要。</p>
+          <h2>Character 数据与参数</h2>
+          <p>Clothing 参数、profile、revision、引用和导出摘要。</p>
         </div>
-        <span class="character-studio-panel-tag">READ ONLY</span>
+        <span class="character-studio-panel-tag">DATA + EDIT</span>
       </div>
       ${RIGHT_PANEL_SLOTS.map(([id, label, note]) => `
         <section class="character-studio-section" data-panel-section="${id}">
@@ -437,6 +440,8 @@ export class CharacterViewportHost {
 
   updateLayerStatus(state, runtime) {
     const clothingCount = runtime.clothingFrame?.asset_frames?.length || runtime.clothingProfile?.assets?.length || 0;
+    this.stage.dataset.clothingPreviewCount = String(clothingCount);
+    this.stage.dataset.clothingPreviewRevision = String(runtime.clothingProfile?.version || 0);
     const hair = runtime.appearanceFrame?.hair;
     const accessoryCount = runtime.appearanceFrame?.accessories?.length || 0;
     const statuses = {
@@ -498,6 +503,7 @@ export class CharacterStudioApp {
     this.root = root;
     this.layout = new CharacterStudioLayout(root);
     this.hub = new ProjectHubClient({ module: CHARACTER_STUDIO_HOST_MODULE, title: 'Character Studio' });
+    this.controller = new CharacterStudioController(this.hub);
     this.session = createCharacterStudioSession({
       role: CHARACTER_STUDIO_HOST_MODULE,
       title: 'Humanoid Rig Lab Next · Character Studio',
@@ -506,6 +512,9 @@ export class CharacterStudioApp {
     this.sidebar = null;
     this.rightPanel = new RightPanelHost(this.layout.rightPanel, {
       onExport: () => this.exportActiveCharacter(),
+    });
+    this.clothingParametersPanel = new ClothingParametersPanel(this.controller, {
+      onError: (error) => this.reportError(error),
     });
     this.displayToolbar = new DisplayModeToolbar(
       required(root, '#displayModeToolbar'),
@@ -523,6 +532,8 @@ export class CharacterStudioApp {
     this.unsubscribeMotion = null;
     this.animationTick = 0;
     this.lastAnimationFrameAt = 0;
+    this.handleClothingSelection = (event) => this.clothingParametersPanel.select(event.detail?.clothingId);
+    this.root.addEventListener('character-studio:clothing-select', this.handleClothingSelection);
   }
 
   async start() {
@@ -531,6 +542,7 @@ export class CharacterStudioApp {
     this.sidebar = mountCharacterStudioSidebar({
       root: this.layout.leftPanel,
       hub: this.hub,
+      controller: this.controller,
       onError: (error) => this.reportError(error),
     });
     this.layout.setSync(this.hub.connected, this.hub.transport);
@@ -549,8 +561,11 @@ export class CharacterStudioApp {
     this.layout.setBuild(state.build);
     const runtime = this.buildRuntime(state, animationOverride);
     this.currentRuntime = runtime;
+    const snapshot = this.controller.snapshot(state);
     this.facePreviewPanel.render(state, runtime);
     this.rightPanel.renderSummary(state, runtime, this.session.getSnapshot());
+    this.rightPanel.mount('clothingParameters', this.clothingParametersPanel.element);
+    this.clothingParametersPanel.render(snapshot, runtime);
     this.viewport.render(state, runtime, this.displayToolbar.getMode());
     this.layout.setSync(this.hub.connected, this.hub.transport);
     this.scheduleAnimationTick(state, runtime, detail);
@@ -648,6 +663,7 @@ export class CharacterStudioApp {
     this.unsubscribeState?.();
     this.unsubscribeMotion?.();
     this.sidebar?.destroy();
+    this.root.removeEventListener('character-studio:clothing-select', this.handleClothingSelection);
     if (this.animationTick) window.cancelAnimationFrame(this.animationTick);
     await this.session.close();
   }
