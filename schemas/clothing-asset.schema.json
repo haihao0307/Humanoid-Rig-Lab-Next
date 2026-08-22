@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/clothing_asset@1.0",
+  "title": "Humanoid Rig Lab ClothingAsset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "clothingId",
+    "name",
+    "category",
+    "assetReference",
+    "meshReference",
+    "materialReference",
+    "compatibleRig",
+    "compatibleBody",
+    "attachmentPoints",
+    "layer",
+    "metadata"
+  ],
+  "properties": {
+    "clothingId": { "$ref": "#/$defs/identifier" },
+    "name": { "type": "string", "minLength": 1 },
+    "category": { "enum": ["upper_body", "lower_body", "shoes", "head", "accessory"] },
+    "assetReference": { "$ref": "#/$defs/resourceReference" },
+    "meshReference": { "$ref": "#/$defs/resourceReference" },
+    "materialReference": { "$ref": "#/$defs/resourceReference" },
+    "compatibleRig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "versions"],
+      "properties": {
+        "target": { "const": "simulationRig" },
+        "versions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "compatibleBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profileIds", "minimumRevision"],
+      "properties": {
+        "profileIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "minimumRevision": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "attachmentPoints": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/identifier" }
+    },
+    "layer": { "enum": ["underwear", "base", "outer", "armor"] },
+    "metadata": { "type": "object" }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "resourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assetId", "revision", "uri"],
+      "properties": {
+        "assetId": { "$ref": "#/$defs/identifier" },
+        "revision": { "type": "integer", "minimum": 1 },
+        "uri": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

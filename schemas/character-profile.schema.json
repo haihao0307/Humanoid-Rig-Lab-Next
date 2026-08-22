@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "humanoid_rig/character_profile@1.5",
+  "$id": "humanoid_rig/character_profile@1.6",
   "title": "Humanoid Rig Lab CharacterProfile",
   "type": "object",
   "additionalProperties": false,
@@ -12,6 +12,7 @@
     "body_shape",
     "face_identity",
     "clothing_attachments",
+    "clothing_references",
     "hair",
     "accessory_attachments",
     "proportion_revision",
@@ -80,6 +81,17 @@
         }
       }
     },
+    "clothing_references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["upper", "lower", "shoes", "accessory"],
+      "properties": {
+        "upper": { "$ref": "#/$defs/nullableClothingReference" },
+        "lower": { "$ref": "#/$defs/nullableClothingReference" },
+        "shoes": { "$ref": "#/$defs/nullableClothingReference" },
+        "accessory": { "$ref": "#/$defs/nullableClothingReference" }
+      }
+    },
     "hair": {
       "type": "object",
       "additionalProperties": false,
@@ -127,6 +139,28 @@
   },
   "$defs": {
     "revision": { "type": "integer", "minimum": 0 },
+    "nullableClothingReference": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["clothingId", "definitionId", "revision"],
+          "properties": {
+            "clothingId": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+            },
+            "definitionId": {
+              "type": ["string", "null"],
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+            },
+            "revision": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ]
+    },
     "expressionRuntimeDescriptor": {
       "type": "object",
       "additionalProperties": false,

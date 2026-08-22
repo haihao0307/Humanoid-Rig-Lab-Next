@@ -48,7 +48,7 @@
   },
   "transientBus": "humanoid_rig/transient_bus@1.0",
   "characterCore": {
-    "profileSchema": "humanoid_rig/character_profile@1.5",
+    "profileSchema": "humanoid_rig/character_profile@1.6",
     "stateSchema": "humanoid_rig/character_state@1.0",
     "operationEventSchema": "humanoid_rig/operation_event@1.0"
   },
@@ -65,12 +65,16 @@
     "futureAdapters": ["FLAME", "3DMM", "AI_FACE_RECONSTRUCTION"]
   },
   "clothingSystem": {
+    "assetSchema": "humanoid_rig/clothing_asset@1.0",
     "profileSchema": "humanoid_rig/clothing_profile@1.0",
     "stateSchema": "humanoid_rig/clothing_state@1.0",
     "runtimeDescriptorSchema": "humanoid_rig/clothing_runtime_descriptor@1.0",
     "binding": "simulationRig",
     "phase": "static-clothing",
-    "types": ["top", "pants", "shoes"]
+    "types": ["top", "pants", "shoes"],
+    "assetCategories": ["upper_body", "lower_body", "shoes", "head", "accessory"],
+    "layers": ["underwear", "base", "outer", "armor"],
+    "characterReferenceSlots": ["upper", "lower", "shoes", "accessory"]
   },
   "appearanceSystem": {
     "hairProfileSchema": "humanoid_rig/hair_profile@1.0",

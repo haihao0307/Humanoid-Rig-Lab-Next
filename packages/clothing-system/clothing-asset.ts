@@ -1,6 +1,29 @@
-export type ClothingType = 'top' | 'pants' | 'shoes';
+export type ClothingCategory = 'upper_body' | 'lower_body' | 'shoes' | 'head' | 'accessory';
+export type ClothingLayer = 'underwear' | 'base' | 'outer' | 'armor';
+
+export interface ClothingResourceReference {
+  assetId: string;
+  revision: number;
+  uri: string | null;
+}
 
 export interface ClothingAsset {
+  clothingId: string;
+  name: string;
+  category: ClothingCategory;
+  assetReference: ClothingResourceReference;
+  meshReference: ClothingResourceReference;
+  materialReference: ClothingResourceReference;
+  compatibleRig: { target: 'simulationRig'; versions: string[] };
+  compatibleBody: { profileIds: string[]; minimumRevision: number };
+  attachmentPoints: string[];
+  layer: ClothingLayer;
+  metadata: Record<string, unknown>;
+}
+
+export type ClothingType = 'top' | 'pants' | 'shoes';
+
+export interface LegacyClothingAsset {
   clothing_id: string;
   revision: number;
   type: ClothingType;

@@ -432,6 +432,7 @@ function createPersistedCharacterSummary(state) {
     state.character?.skin?.bindingMetadata,
     state.character?.pose?.imagePoseAssetId,
     ...profile.clothing_attachments.map((item) => item.clothing_id),
+    ...Object.values(profile.clothing_references || {}).map((item) => item?.clothingId),
     profile.hair?.hair_id,
     ...profile.accessory_attachments.map((item) => item.accessory_id),
   ].filter(Boolean).map(String);

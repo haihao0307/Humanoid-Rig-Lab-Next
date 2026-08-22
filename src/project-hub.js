@@ -15,6 +15,7 @@ import {
 import {
   ClothingManager,
   clothingAttachmentReferences,
+  clothingSlotReferences,
   getActiveClothingProfile,
 } from '../packages/clothing-system/index.js';
 import {
@@ -732,6 +733,7 @@ export class ProjectHubClient extends EventTarget {
       ? characterManager.save(this.state.characterCore, {
           character_id: characterId,
           clothing_attachments: clothingAttachmentReferences(clothingProfile),
+          clothing_references: clothingSlotReferences(clothingProfile),
           clothing_revision: clothingProfile.version,
         }, {
           expected_revision: expectedCharacterRevision,

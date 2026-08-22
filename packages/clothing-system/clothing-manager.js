@@ -1,4 +1,4 @@
-import { createClothingAsset } from './clothing-asset.js';
+import { createLegacyClothingAsset } from './clothing-asset.js';
 import { createClothingProfile } from './clothing-profile.js';
 import { createClothingRuntimeDescriptor } from './clothing-runtime.js';
 
@@ -72,7 +72,7 @@ export class ClothingManager {
     const state = normalizeClothingState(stateInput);
     assertExpectedRevision(state, options.expected_revision);
     const current = activeProfile(state);
-    const asset = createClothingAsset({ ...assetInput, revision: 1 });
+    const asset = createLegacyClothingAsset({ ...assetInput, revision: 1 });
     if (current.assets.some((item) => item.clothing_id === asset.clothing_id)) {
       throw new Error(`ClothingAsset ${asset.clothing_id} already exists.`);
     }
