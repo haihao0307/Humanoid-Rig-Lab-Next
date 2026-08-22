@@ -8,6 +8,8 @@ class StaticClothingLayer {
     this.scene = scene;
     this.profile = null;
     this.profileKey = '';
+    this.runtimeFrame = null;
+    this.runtimeAssetFrames = new Map();
     this.entries = new Map();
     this.group = new THREE.Group();
     this.group.name = 'CharacterClothingAttachmentLayer';
@@ -29,6 +31,14 @@ class StaticClothingLayer {
     this.profileKey = key;
     this.rebuild();
     return true;
+  }
+
+  setRuntimeFrame(frameInput) {
+    this.runtimeFrame = frameInput && typeof frameInput === 'object' ? structuredClone(frameInput) : null;
+    this.runtimeAssetFrames = new Map((this.runtimeFrame?.asset_frames || [])
+      .filter((frame) => frame?.clothing_id)
+      .map((frame) => [String(frame.clothing_id), frame]));
+    return this.runtimeAssetFrames.size;
   }
 
   rebuild() {
@@ -80,10 +90,16 @@ class StaticClothingLayer {
     if (!definition || this.entries.size === 0) return;
     const poseWorld = poseWorldInput || worldPositions(definition);
     for (const entry of this.entries.values()) {
-      const scale = Number(entry.asset.size_profile?.scale || 1);
-      const length = Number(entry.asset.size_profile?.length || 1);
-      const offset = entry.asset.size_profile?.offset || {};
-      entry.group.position.set(Number(offset.x || 0), Number(offset.y || 0), Number(offset.z || 0));
+      const runtimeAssetFrame = this.runtimeAssetFrames.get(entry.asset.clothing_id);
+      const runtimeTransform = runtimeAssetFrame?.render_transform;
+      const scale = Number(runtimeTransform?.scale?.[0] || entry.asset.size_profile?.scale || 1);
+      const length = Number(runtimeTransform?.scale?.[1] || entry.asset.size_profile?.length || 1);
+      const offset = runtimeTransform?.translation || entry.asset.size_profile?.offset || {};
+      entry.group.position.set(
+        Number(Array.isArray(offset) ? offset[0] : offset.x || 0),
+        Number(Array.isArray(offset) ? offset[1] : offset.y || 0),
+        Number(Array.isArray(offset) ? offset[2] : offset.z || 0),
+      );
       if (entry.asset.type === 'top') this.updateTop(entry, poseWorld, scale, length);
       else if (entry.asset.type === 'pants') this.updatePants(entry, poseWorld, scale, length);
       else this.updateShoes(entry, poseWorld, scale, length);
@@ -156,6 +172,8 @@ class StaticClothingLayer {
       independentFromSkin: true,
       binding: 'simulationRig',
       phase: 'static-clothing',
+      runtimeFrameSchema: this.runtimeFrame?.schema || null,
+      runtimeFitApplied: this.runtimeAssetFrames.size > 0,
       profileId: this.profile?.clothing_profile_id || null,
       assets: [...this.entries.keys()],
     };

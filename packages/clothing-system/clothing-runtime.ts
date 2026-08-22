@@ -1,5 +1,5 @@
 import type { ClothingProfile } from './clothing-profile.ts';
-import type { LegacyClothingAsset } from './clothing-asset.ts';
+import type { ClothingAsset, LegacyClothingAsset } from './clothing-asset.ts';
 
 export interface ClothingAssetReference {
   schema: 'humanoid_rig/clothing_asset_reference@1.0';
@@ -48,10 +48,46 @@ export interface ClothingRuntimeAssetDescriptor {
     collisionGroup: string | null;
     materialProperties: { density: number; friction: number; damping: number };
   };
-  asset: LegacyClothingAsset;
+  asset: ClothingAsset | LegacyClothingAsset;
+  definition?: {
+    definitionId: string;
+    clothingId: string;
+    attachmentBones: string[];
+    bindingTarget: 'simulationRig';
+    metadata: Record<string, unknown>;
+  };
+  clothing_reference?: {
+    clothingId: string;
+    definitionId: string | null;
+    revision: number;
+  };
   asset_reference: ClothingAssetReference;
   attachment: ClothingAttachmentDescriptor;
   render: ClothingRenderInstanceDescriptor;
+}
+
+export interface ClothingAttachmentTransform {
+  schema: 'humanoid_rig/clothing_attachment_transform@1.0';
+  translation: [number, number, number];
+  rotation: [number, number, number, number];
+  scale: [number, number, number];
+}
+
+export interface ClothingCharacterFit {
+  schema: 'humanoid_rig/clothing_character_fit@1.0';
+  body_shape_revision: number;
+  proportion_revision: number;
+  scale: {
+    height: number;
+    shoulder: number;
+    chest: number;
+    waist: number;
+    hip: number;
+    limb: number;
+    depth: number;
+  };
+  offset: { x: number; y: number; z: number };
+  attachment_mode: 'recompute-from-simulationRig';
 }
 
 export interface ClothingRuntimeDescriptor {

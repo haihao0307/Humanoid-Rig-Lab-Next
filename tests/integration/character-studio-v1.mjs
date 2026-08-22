@@ -47,7 +47,8 @@ assert.equal((appClass.match(/new ProjectHubClient\s*\(/g) || []).length, 1, 'Th
 assert.equal((appClass.match(/new CharacterViewportHost\s*\(/g) || []).length, 1, 'The page app must create one viewport host.');
 assert.match(appClass, /createCharacterStudioSession\(\{[\s\S]*?hub:\s*this\.hub/);
 assert.match(appClass, /mountCharacterStudioSidebar\(\{[\s\S]*?hub:\s*this\.hub/);
-assert.match(appClass, /followSimulationRig\(clothingProfile, frame\.simulationRig\)/);
+assert.match(appClass, /createClothingCharacterFit\(\{/);
+assert.match(appClass, /followSimulationRig\(clothingProfile, frame\.simulationRig, \{ characterFit: clothingFit \}\)/);
 assert.match(appClass, /followAppearanceAttachments\(appearanceState, frame\.simulationRig\)/);
 console.log('PASS shell, panels, persistence session, clothing, appearance, and viewport reuse one Character state path');
 

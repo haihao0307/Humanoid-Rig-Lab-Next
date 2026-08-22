@@ -37,6 +37,7 @@ class ThreeSkeletonView {
     this.skinLayer = null;
     this.clothingProfile = null;
     this.clothingLayer = null;
+    this.clothingFrame = null;
     this.skinLoadPromise = null;
     this.skinLoadGeneration = 0;
     this.disposed = false;
@@ -354,11 +355,20 @@ class ThreeSkeletonView {
     return layer?.getDiagnostics?.() || null;
   }
 
+  setClothingFrame(frame) {
+    this.clothingFrame = frame ? structuredClone(frame) : null;
+    const layer = this.ensureClothingLayer();
+    layer?.setRuntimeFrame(this.clothingFrame);
+    if (this.definition) layer?.refresh(this.definition);
+    return layer?.getDiagnostics?.() || null;
+  }
+
   ensureClothingLayer() {
     if (!this.scene || this.disposed) return null;
     if (!this.clothingLayer) {
       this.clothingLayer = createStaticClothingLayer(this.THREE, this.scene);
       this.clothingLayer.setProfile(this.clothingProfile || {});
+      this.clothingLayer.setRuntimeFrame(this.clothingFrame);
     }
     return this.clothingLayer;
   }

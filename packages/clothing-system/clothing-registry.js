@@ -25,6 +25,10 @@ export class ClothingRegistry {
     return asset ? structuredClone(asset) : null;
   }
 
+  loadAsset(clothingId) {
+    return this.getAsset(clothingId);
+  }
+
   removeAsset(clothingId) {
     const id = String(clothingId || '').trim();
     if (!this.#assets.has(id)) return false;

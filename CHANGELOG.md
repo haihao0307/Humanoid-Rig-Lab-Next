@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased · Clothing System Merge V001 · 2026-08-22
+
+- 按 Core → Runtime → Studio 顺序整合 `feature/clothing-core-v001`、`feature/clothing-runtime-v001` 和 `feature/clothing-studio-v001`。
+- Clothing Registry、Definition 与 CharacterProfile reference 接入同一运行链，旧 `ClothingProfile.assets` 继续通过显式兼容适配器加载。
+- Clothing Runtime 增加 attach、detach、pose follow、transform update 与 Character fit 接口；所有附件继续只读取 `simulationRig`。
+- BodyShape 与 Proportion 变化生成可重复的 fit transform，并通过 Character Studio host frame 到达独立 V8 Clothing Layer。
+- Character Studio Clothing workbench 提供 Upper Body、Lower Body、Shoes 与 Accessory 分类，以及 Size、Length、Offset、Layer、Material 参数。
+- Cloth Simulation 仅保留 `physicsMode`、`collisionGroup`、`materialProperties` 数据接口，V001 不启用布料模拟。
+- 新增 Clothing 端到端测试，覆盖注册、引用保存恢复、动作跟随、重新适配、删除和旧数据兼容。
+
 ## Unreleased · Character Studio v1 integration · 2026-08-21
 
 - 合并 `feature/character-studio-shell`、`feature/character-studio-panels` 和 `feature/character-studio-state`，形成 Character Studio v1。

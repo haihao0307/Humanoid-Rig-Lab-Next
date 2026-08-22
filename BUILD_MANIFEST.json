@@ -69,8 +69,16 @@
     "profileSchema": "humanoid_rig/clothing_profile@1.0",
     "stateSchema": "humanoid_rig/clothing_state@1.0",
     "runtimeDescriptorSchema": "humanoid_rig/clothing_runtime_descriptor@1.0",
+    "characterFitSchema": "humanoid_rig/clothing_character_fit@1.0",
     "binding": "simulationRig",
     "phase": "static-clothing",
+    "sourceBranches": ["feature/clothing-core-v001", "feature/clothing-runtime-v001", "feature/clothing-studio-v001"],
+    "runtimeChain": ["asset", "profile", "reference", "attachment", "simulationRig", "render"],
+    "runtimeApis": ["attachClothing", "detachClothing", "updateClothingPose", "updateClothingTransform", "fitClothingToCharacter"],
+    "futureSimulation": {
+      "active": false,
+      "fields": ["physicsMode", "collisionGroup", "materialProperties"]
+    },
     "types": ["top", "pants", "shoes"],
     "assetCategories": ["upper_body", "lower_body", "shoes", "head", "accessory"],
     "layers": ["underwear", "base", "outer", "armor"],

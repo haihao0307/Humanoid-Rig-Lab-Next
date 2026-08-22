@@ -1628,6 +1628,7 @@ function applyHostState(hostState, hostRevision) {
     }
     if (hostState.bodyShape) threeView?.setBodyShape(hostState.bodyShape);
     if (hostState.clothing) threeView?.setClothingProfile(hostState.clothing);
+    if (hostState.clothingFrame) threeView?.setClothingFrame(hostState.clothingFrame);
     const display = hostState.display || {};
     const nextMode = ['skin', 'skeleton', 'both'].includes(display.mode) ? display.mode : currentDisplayMode;
     setDisplayMode(nextMode, { quiet: true });

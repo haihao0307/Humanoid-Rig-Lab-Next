@@ -9,7 +9,10 @@ import {
   sampleAnimationRuntime,
 } from '../../src/modules/animation/runtime.js';
 import { followAppearanceAttachments, createAppearanceRuntimeDescriptor } from '../../packages/appearance-system/index.js';
-import { followSimulationRig } from '../../packages/clothing-system/index.js';
+import {
+  createClothingCharacterFit,
+  followSimulationRig,
+} from '../../packages/clothing-system/index.js';
 import { mountCharacterStudioSidebar } from './components/character-studio-sidebar.js';
 import { CharacterStudioController } from './character-studio-controller.js';
 import { ClothingParametersPanel } from './panels/clothing-parameters-panel.js';
@@ -594,7 +597,15 @@ export class CharacterStudioApp {
     const bodyShapeProfile = state.bodyShape?.profiles?.[state.bodyShape?.active_profile_id] || null;
     const clothingProfile = state.clothingSystem?.profiles?.[state.clothingSystem?.active_profile_id] || null;
     const appearanceState = state.appearanceSystem || {};
-    const clothingFrame = clothingProfile ? followSimulationRig(clothingProfile, frame.simulationRig) : null;
+    const clothingFit = createClothingCharacterFit({
+      bodyShape: bodyShapeProfile || {},
+      bodyProfile,
+      bodyShapeRevision: bodyShapeProfile?.version,
+      proportionRevision: state.moduleRevisions?.proportion,
+    });
+    const clothingFrame = clothingProfile
+      ? followSimulationRig(clothingProfile, frame.simulationRig, { characterFit: clothingFit })
+      : null;
     const appearanceDescriptor = createAppearanceRuntimeDescriptor(appearanceState);
     const appearanceFrame = followAppearanceAttachments(appearanceState, frame.simulationRig);
     const characterId = state.characterCore?.active_character_id || 'character_001';
@@ -612,6 +623,7 @@ export class CharacterStudioApp {
       frame,
       bodyShapeProfile,
       clothingProfile,
+      clothingFit,
       clothingFrame,
       appearanceDescriptor,
       appearanceFrame,
