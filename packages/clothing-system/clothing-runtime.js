@@ -82,6 +82,7 @@ export function followSimulationRig(profileInput, simulationRigInput) {
     visible: assetFrame.render.visible,
     material: structuredClone(assetFrame.render.material),
     size_profile: structuredClone(assetFrame.render.size_profile),
+    render_profile: structuredClone(assetFrame.render.render_profile),
     joint_transforms: structuredClone(assetFrame.joint_transforms),
   }));
   const readyCount = assetFrames.filter((item) => item.status === 'ready').length;
@@ -169,7 +170,13 @@ function createClothingRuntimeAsset(asset) {
     asset_revision: asset.revision,
     type: asset.type,
     attachment_points: [...asset.rig_profile.attachment_points],
-    physics_mode: asset.physics_profile.mode,
+    physics_mode: asset.physics_profile.physicsMode,
+    simulation_interface: {
+      active: false,
+      physicsMode: asset.physics_profile.physicsMode,
+      collisionGroup: asset.physics_profile.collisionGroup,
+      materialProperties: structuredClone(asset.physics_profile.materialProperties),
+    },
     asset: structuredClone(asset),
     asset_reference: assetReference,
     attachment,
@@ -178,10 +185,12 @@ function createClothingRuntimeAsset(asset) {
       render_id: `clothing:${asset.clothing_id}`,
       role: 'clothing',
       layer: 'clothing_mesh',
+      layer_index: asset.render_profile.layer,
       visible: true,
       status: 'unresolved',
       material: structuredClone(asset.material),
       size_profile: structuredClone(asset.size_profile),
+      render_profile: structuredClone(asset.render_profile),
     },
   };
 }

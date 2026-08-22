@@ -91,6 +91,51 @@ export class ClothingManager {
     }), true, options.at);
   }
 
+  update(stateInput, clothingId, patch = {}, options = {}) {
+    const state = normalizeClothingState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    const current = activeProfile(state);
+    const id = String(clothingId || '');
+    const currentAsset = current.assets.find((item) => item.clothing_id === id);
+    if (!currentAsset) throw new Error(`ClothingAsset ${id} does not exist.`);
+    const asset = createLegacyClothingAsset(mergeAssetInput(currentAsset, patch, {
+      clothing_id: currentAsset.clothing_id,
+      type: currentAsset.type,
+      revision: currentAsset.revision + 1,
+    }));
+    return commit(state, createClothingProfile({
+      ...current,
+      assets: current.assets.map((item) => item.clothing_id === id ? asset : item),
+    }), true, options.at);
+  }
+
+  replace(stateInput, clothingId, replacementInput = {}, options = {}) {
+    const state = normalizeClothingState(stateInput);
+    assertExpectedRevision(state, options.expected_revision);
+    const current = activeProfile(state);
+    const id = String(clothingId || '');
+    const currentAsset = current.assets.find((item) => item.clothing_id === id);
+    if (!currentAsset) throw new Error(`ClothingAsset ${id} does not exist.`);
+    const replacementId = String(replacementInput?.clothing_id || '').trim();
+    if (!replacementId) throw new TypeError('Replacement clothing_id is required.');
+    if (replacementId === id) return structuredClone(state);
+    if (current.assets.some((item) => item.clothing_id === replacementId)) {
+      throw new Error(`ClothingAsset ${replacementId} already exists.`);
+    }
+    if (replacementInput?.type != null && String(replacementInput.type) !== currentAsset.type) {
+      throw new TypeError('Replacement ClothingAsset must stay in the same clothing type.');
+    }
+    const asset = createLegacyClothingAsset(mergeAssetInput(currentAsset, replacementInput, {
+      clothing_id: replacementId,
+      type: currentAsset.type,
+      revision: 1,
+    }));
+    return commit(state, createClothingProfile({
+      ...current,
+      assets: current.assets.map((item) => item.clothing_id === id ? asset : item),
+    }), true, options.at);
+  }
+
   saveVersion(stateInput, options = {}) {
     const state = normalizeClothingState(stateInput);
     assertExpectedRevision(state, options.expected_revision);
@@ -149,6 +194,33 @@ function activeProfile(state) {
   const profile = state.profiles[state.active_profile_id];
   if (!profile) throw new Error('Clothing state has no active profile.');
   return profile;
+}
+function mergeAssetInput(current, patch, identity) {
+  const source = isPlainObject(patch) ? patch : {};
+  return {
+    ...structuredClone(current),
+    ...structuredClone(source),
+    ...identity,
+    rig_profile: { ...structuredClone(current.rig_profile), ...structuredClone(source.rig_profile || {}) },
+    material: { ...structuredClone(current.material), ...structuredClone(source.material || {}) },
+    physics_profile: {
+      ...structuredClone(current.physics_profile),
+      ...structuredClone(source.physics_profile || {}),
+      materialProperties: {
+        ...structuredClone(current.physics_profile?.materialProperties || {}),
+        ...structuredClone(source.physics_profile?.materialProperties || {}),
+      },
+    },
+    size_profile: {
+      ...structuredClone(current.size_profile),
+      ...structuredClone(source.size_profile || {}),
+      offset: {
+        ...structuredClone(current.size_profile?.offset || {}),
+        ...structuredClone(source.size_profile?.offset || {}),
+      },
+    },
+    render_profile: { ...structuredClone(current.render_profile), ...structuredClone(source.render_profile || {}) },
+  };
 }
 function assertExpectedRevision(state, expected) {
   if (expected == null) return;

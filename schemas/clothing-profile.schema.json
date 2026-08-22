@@ -65,7 +65,18 @@
           "properties": {
             "mode": { "const": "static-follow" },
             "enabled": { "const": false },
-            "collision": { "enum": ["none", "body-readonly"] }
+            "collision": { "enum": ["none", "body-readonly"] },
+            "physicsMode": { "enum": ["static-follow", "cloth-simulation"] },
+            "collisionGroup": { "type": ["string", "null"], "minLength": 1 },
+            "materialProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "density": { "type": "number", "minimum": 0.01, "maximum": 10 },
+                "friction": { "$ref": "#/$defs/unit" },
+                "damping": { "$ref": "#/$defs/unit" }
+              }
+            }
           }
         },
         "size_profile": {
@@ -75,7 +86,24 @@
           "properties": {
             "size": { "enum": ["XS", "S", "M", "L", "XL", "custom"] },
             "scale": { "type": "number", "minimum": 0.5, "maximum": 2 },
+            "length": { "type": "number", "minimum": 0.5, "maximum": 2 },
+            "offset": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "x": { "type": "number", "minimum": -1, "maximum": 1 },
+                "y": { "type": "number", "minimum": -1, "maximum": 1 },
+                "z": { "type": "number", "minimum": -1, "maximum": 1 }
+              }
+            },
             "body_shape_revision": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "render_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "layer": { "type": "integer", "minimum": 0, "maximum": 31 }
           }
         }
       }

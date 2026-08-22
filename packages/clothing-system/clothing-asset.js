@@ -114,13 +114,19 @@ export const CLOTHING_TYPE_PRESETS = Object.freeze({
 });
 
 const TOP_LEVEL_FIELDS = new Set([
-  'clothing_id', 'revision', 'type', 'rig_profile', 'material', 'physics_profile', 'size_profile',
+  'clothing_id', 'revision', 'type', 'rig_profile', 'material', 'physics_profile', 'size_profile', 'render_profile',
 ]);
 const RIG_PROFILE_FIELDS = new Set(['target', 'rig_revision', 'attachment_points']);
 const MATERIAL_FIELDS = new Set(['base_color', 'roughness', 'metalness', 'opacity']);
-const PHYSICS_PROFILE_FIELDS = new Set(['mode', 'enabled', 'collision']);
-const SIZE_PROFILE_FIELDS = new Set(['size', 'scale', 'body_shape_revision']);
+const PHYSICS_PROFILE_FIELDS = new Set([
+  'mode', 'enabled', 'collision', 'physicsMode', 'collisionGroup', 'materialProperties',
+]);
+const MATERIAL_PROPERTIES_FIELDS = new Set(['density', 'friction', 'damping']);
+const SIZE_PROFILE_FIELDS = new Set(['size', 'scale', 'length', 'offset', 'body_shape_revision']);
+const OFFSET_FIELDS = new Set(['x', 'y', 'z']);
+const RENDER_PROFILE_FIELDS = new Set(['layer']);
 const SIZE_SET = new Set(['XS', 'S', 'M', 'L', 'XL', 'custom']);
+const PHYSICS_MODE_SET = new Set(['static-follow', 'cloth-simulation']);
 
 export function createLegacyClothingAsset(input = {}) {
   assertLegacyClothingAssetInput(input, { partial: true });
@@ -134,6 +140,7 @@ export function createLegacyClothingAsset(input = {}) {
     material: normalizeMaterial(input.material, preset),
     physics_profile: normalizePhysicsProfile(input.physics_profile),
     size_profile: normalizeSizeProfile(input.size_profile),
+    render_profile: normalizeRenderProfile(input.render_profile),
   };
   assertLegacyClothingAsset(asset);
   return structuredClone(asset);
@@ -167,6 +174,7 @@ export function assertLegacyClothingAssetInput(input, { partial = true } = {}) {
   validateMaterial(input.material);
   validatePhysicsProfile(input.physics_profile);
   validateSizeProfile(input.size_profile);
+  validateRenderProfile(input.render_profile);
   return true;
 }
 
@@ -195,6 +203,9 @@ function normalizePhysicsProfile(value) {
     mode: 'static-follow',
     enabled: false,
     collision: source.collision === 'body-readonly' ? 'body-readonly' : 'none',
+    physicsMode: PHYSICS_MODE_SET.has(String(source.physicsMode)) ? String(source.physicsMode) : 'static-follow',
+    collisionGroup: nullableString(source.collisionGroup),
+    materialProperties: normalizeMaterialProperties(source.materialProperties),
   };
 }
 
@@ -203,7 +214,32 @@ function normalizeSizeProfile(value) {
   return {
     size: SIZE_SET.has(String(source.size)) ? String(source.size) : 'M',
     scale: range(source.scale, 0.5, 2, 1),
+    length: range(source.length, 0.5, 2, 1),
+    offset: normalizeOffset(source.offset),
     body_shape_revision: nonNegativeInteger(source.body_shape_revision, 0),
+  };
+}
+
+function normalizeRenderProfile(value) {
+  const source = isPlainObject(value) ? value : {};
+  return { layer: integerInRange(source.layer, 0, 31, 1) };
+}
+
+function normalizeOffset(value) {
+  const source = isPlainObject(value) ? value : {};
+  return {
+    x: range(source.x, -1, 1, 0),
+    y: range(source.y, -1, 1, 0),
+    z: range(source.z, -1, 1, 0),
+  };
+}
+
+function normalizeMaterialProperties(value) {
+  const source = isPlainObject(value) ? value : {};
+  return {
+    density: range(source.density, 0.01, 10, 1),
+    friction: unit(source.friction, 0.5),
+    damping: unit(source.damping, 0.5),
   };
 }
 
@@ -242,6 +278,13 @@ function validatePhysicsProfile(value) {
   if ('collision' in value && !['none', 'body-readonly'].includes(value.collision)) {
     throw new TypeError('physics_profile.collision must be none or body-readonly.');
   }
+  if ('physicsMode' in value && !PHYSICS_MODE_SET.has(String(value.physicsMode))) {
+    throw new TypeError('physics_profile.physicsMode must be static-follow or cloth-simulation.');
+  }
+  if ('collisionGroup' in value && value.collisionGroup !== null && !String(value.collisionGroup).trim()) {
+    throw new TypeError('physics_profile.collisionGroup must be null or a non-empty string.');
+  }
+  if ('materialProperties' in value) validateMaterialProperties(value.materialProperties);
 }
 
 function validateSizeProfile(value) {
@@ -252,8 +295,44 @@ function validateSizeProfile(value) {
   if ('scale' in value && (!Number.isFinite(Number(value.scale)) || Number(value.scale) < 0.5 || Number(value.scale) > 2)) {
     throw new RangeError('size_profile.scale must be between 0.5 and 2.');
   }
+  if ('length' in value && (!Number.isFinite(Number(value.length)) || Number(value.length) < 0.5 || Number(value.length) > 2)) {
+    throw new RangeError('size_profile.length must be between 0.5 and 2.');
+  }
+  if ('offset' in value) validateOffset(value.offset);
   if ('body_shape_revision' in value && (!Number.isInteger(Number(value.body_shape_revision)) || Number(value.body_shape_revision) < 0)) {
     throw new RangeError('size_profile.body_shape_revision must be a non-negative integer reference.');
+  }
+}
+
+function validateRenderProfile(value) {
+  if (value === undefined) return;
+  if (!isPlainObject(value)) throw new TypeError('render_profile must be an object.');
+  assertAllowedKeys(value, RENDER_PROFILE_FIELDS, 'render_profile');
+  if ('layer' in value && (!Number.isInteger(Number(value.layer)) || Number(value.layer) < 0 || Number(value.layer) > 31)) {
+    throw new RangeError('render_profile.layer must be an integer between 0 and 31.');
+  }
+}
+
+function validateOffset(value) {
+  if (!isPlainObject(value)) throw new TypeError('size_profile.offset must be an object.');
+  assertAllowedKeys(value, OFFSET_FIELDS, 'size_profile.offset');
+  for (const key of OFFSET_FIELDS) {
+    if (key in value && (!Number.isFinite(Number(value[key])) || Number(value[key]) < -1 || Number(value[key]) > 1)) {
+      throw new RangeError(`size_profile.offset.${key} must be between -1 and 1.`);
+    }
+  }
+}
+
+function validateMaterialProperties(value) {
+  if (!isPlainObject(value)) throw new TypeError('physics_profile.materialProperties must be an object.');
+  assertAllowedKeys(value, MATERIAL_PROPERTIES_FIELDS, 'physics_profile.materialProperties');
+  if ('density' in value && (!Number.isFinite(Number(value.density)) || Number(value.density) < 0.01 || Number(value.density) > 10)) {
+    throw new RangeError('physics_profile.materialProperties.density must be between 0.01 and 10.');
+  }
+  for (const key of ['friction', 'damping']) {
+    if (key in value && (!Number.isFinite(Number(value[key])) || Number(value[key]) < 0 || Number(value[key]) > 1)) {
+      throw new RangeError(`physics_profile.materialProperties.${key} must be between 0 and 1.`);
+    }
   }
 }
 
@@ -430,12 +509,16 @@ function nonNegativeInteger(value, fallback) {
   const number = Number(value);
   return Number.isInteger(number) && number >= 0 ? number : fallback;
 }
+function integerInRange(value, min, max, fallback) {
+  const number = Number(value);
+  return Number.isInteger(number) && number >= min && number <= max ? number : fallback;
+}
+function nullableString(value) {
+  const result = String(value ?? '').trim();
+  return result || null;
+}
 function stringOr(value, fallback) {
   const result = String(value ?? '').trim();
   return result || fallback;
-}
-function nullableString(value) {
-  const result = value == null ? '' : String(value).trim();
-  return result || null;
 }
 function isPlainObject(value) { return Boolean(value) && typeof value === 'object' && !Array.isArray(value); }

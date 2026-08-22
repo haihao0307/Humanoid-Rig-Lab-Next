@@ -22,10 +22,18 @@ export interface ClothingRenderInstanceDescriptor {
   render_id: string;
   role: 'clothing';
   layer: 'clothing_mesh';
+  layer_index: number;
   visible: boolean;
   status: 'unresolved' | 'ready' | 'waiting-for-rig';
   material: { base_color: string; roughness: number; metalness: number; opacity: number };
-  size_profile: { size: string; scale: number; body_shape_revision: number };
+  size_profile: {
+    size: string;
+    scale: number;
+    length: number;
+    offset: { x: number; y: number; z: number };
+    body_shape_revision: number;
+  };
+  render_profile: { layer: number };
 }
 
 export interface ClothingRuntimeAssetDescriptor {
@@ -33,7 +41,13 @@ export interface ClothingRuntimeAssetDescriptor {
   asset_revision: number;
   type: string;
   attachment_points: string[];
-  physics_mode: 'static-follow';
+  physics_mode: 'static-follow' | 'cloth-simulation';
+  simulation_interface: {
+    active: false;
+    physicsMode: 'static-follow' | 'cloth-simulation';
+    collisionGroup: string | null;
+    materialProperties: { density: number; friction: number; damping: number };
+  };
   asset: LegacyClothingAsset;
   asset_reference: ClothingAssetReference;
   attachment: ClothingAttachmentDescriptor;

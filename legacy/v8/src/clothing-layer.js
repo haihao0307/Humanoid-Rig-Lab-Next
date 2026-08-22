@@ -68,7 +68,7 @@ class StaticClothingLayer {
     for (const mesh of meshes) {
       mesh.castShadow = true;
       mesh.receiveShadow = true;
-      mesh.renderOrder = 1;
+      mesh.renderOrder = 1 + Number(asset.render_profile?.layer || 0);
       mesh.userData.kind = 'clothing';
       mesh.userData.clothingId = asset.clothing_id;
       group.add(mesh);
@@ -81,24 +81,27 @@ class StaticClothingLayer {
     const poseWorld = poseWorldInput || worldPositions(definition);
     for (const entry of this.entries.values()) {
       const scale = Number(entry.asset.size_profile?.scale || 1);
-      if (entry.asset.type === 'top') this.updateTop(entry, poseWorld, scale);
-      else if (entry.asset.type === 'pants') this.updatePants(entry, poseWorld, scale);
-      else this.updateShoes(entry, poseWorld, scale);
+      const length = Number(entry.asset.size_profile?.length || 1);
+      const offset = entry.asset.size_profile?.offset || {};
+      entry.group.position.set(Number(offset.x || 0), Number(offset.y || 0), Number(offset.z || 0));
+      if (entry.asset.type === 'top') this.updateTop(entry, poseWorld, scale, length);
+      else if (entry.asset.type === 'pants') this.updatePants(entry, poseWorld, scale, length);
+      else this.updateShoes(entry, poseWorld, scale, length);
     }
     this.group.updateMatrixWorld(true);
   }
 
-  updateTop(entry, points, scale) {
+  updateTop(entry, points, scale, length) {
     const top = point(points, 'upperChest') || point(points, 'chest') || point(points, 'spine');
     const bottom = point(points, 'hips');
     if (!top || !bottom) return;
     const left = point(points, 'leftShoulder') || point(points, 'leftUpperArm');
     const right = point(points, 'rightShoulder') || point(points, 'rightUpperArm');
     const shoulderWidth = left && right ? distance(left, right) : .42;
-    this.alignCylinder(entry.meshes[0], bottom, top, shoulderWidth * .63 * scale, shoulderWidth * .34 * scale, 1.02);
+    this.alignCylinder(entry.meshes[0], bottom, top, shoulderWidth * .63 * scale, shoulderWidth * .34 * scale, 1.02 * length);
   }
 
-  updatePants(entry, points, scale) {
+  updatePants(entry, points, scale, length) {
     const pairs = [
       ['leftUpperLeg', 'leftLowerLeg'],
       ['leftLowerLeg', 'leftFoot'],
@@ -110,17 +113,17 @@ class StaticClothingLayer {
       const end = point(points, endId);
       if (!start || !end) return;
       const radius = (index % 2 === 0 ? .105 : .085) * scale;
-      this.alignCylinder(entry.meshes[index], start, end, radius, radius * .82, .96);
+      this.alignCylinder(entry.meshes[index], start, end, radius, radius * .82, .96 * length);
     });
   }
 
-  updateShoes(entry, points, scale) {
+  updateShoes(entry, points, scale, length) {
     [['leftFoot', 'leftToes'], ['rightFoot', 'rightToes']].forEach(([footId, toeId], index) => {
       const foot = point(points, footId);
       const toe = point(points, toeId) || point(points, `${toeId}End`);
       if (!foot) return;
       const end = toe || { x: foot.x, y: foot.y, z: foot.z + .2 };
-      this.alignBoxAlongZ(entry.meshes[index], foot, end, scale);
+      this.alignBoxAlongZ(entry.meshes[index], foot, end, scale, length);
     });
   }
 
@@ -135,11 +138,11 @@ class StaticClothingLayer {
     mesh.visible = true;
   }
 
-  alignBoxAlongZ(mesh, start, end, scale) {
+  alignBoxAlongZ(mesh, start, end, scale, lengthFactor = 1) {
     this.tempA.set(start.x, start.y, start.z);
     this.tempB.set(end.x, end.y, end.z);
     this.tempDirection.subVectors(this.tempB, this.tempA);
-    const length = Math.max(.16, this.tempDirection.length() + .09) * scale;
+    const length = Math.max(.16, this.tempDirection.length() + .09) * scale * lengthFactor;
     mesh.position.copy(this.tempA).add(this.tempB).multiplyScalar(.5);
     mesh.position.y += .01;
     mesh.quaternion.setFromUnitVectors(this.zAxis, this.tempDirection.lengthSq() > 1e-8 ? this.tempDirection.normalize() : this.zAxis);
