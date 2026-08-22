@@ -22,6 +22,7 @@ import {
 import { serializeCharacterProfileExport } from './character-profile-export.js';
 import {
   createFaceAnimationLayer,
+  createFacePreviewFrame,
   FACE_EXPRESSION_CHANNEL_DEFINITIONS,
 } from '../../packages/face-system/index.js';
 import { CHARACTER_PROFILE_SCHEMA } from '../../packages/character-core/index.js';
@@ -244,11 +245,34 @@ export class RightPanelHost {
         ${dataRow('Profile schema', profile?.schema || CHARACTER_PROFILE_SCHEMA)}
         ${dataRow('Face Runtime', expressionDescriptor?.deformationMode || 'interface-only')}
         ${dataRow('Animation Layer', runtime.faceAnimationLayer?.layerType || 'face-expression')}
+        ${dataRow('Face Preview', runtime.facePreviewFrame?.schema || 'preview surface')}
         ${dataRow('Build', BUILD_ID)}
         <button class="character-studio-export-button" data-character-studio-export type="button">导出 CharacterProfile JSON</button>
         <span class="character-studio-slot-note">只包含版本、模块引用与资源摘要，不包含二进制资源。</span>
       </div>`));
     this.host.querySelector('[data-character-studio-export]')?.addEventListener('click', () => this.onExport?.());
+  }
+}
+
+export class FacePreviewPanel {
+  constructor(root) {
+    this.root = root;
+  }
+
+  render(state, runtime) {
+    const canvas = this.root?.querySelector?.('[data-face-preview-canvas]');
+    const status = this.root?.querySelector?.('[data-face-preview-status]');
+    if (!canvas) return;
+    const faceSystem = state?.faceSystem || {};
+    const profile = faceSystem.profiles?.[faceSystem.active_face_id] || {};
+    const frame = runtime?.facePreviewFrame || createFacePreviewFrame(runtime?.faceExpression || {}, profile);
+    drawFacePreview(canvas, frame);
+    const active = Object.values(frame.morphWeights || {}).filter((value) => Number(value) > 0.0001).length;
+    if (status) {
+      status.textContent = active
+        ? `${active} active morph inputs · r${frame.expressionRevision}`
+        : `neutral · r${frame.expressionRevision} · preview surface`;
+    }
   }
 }
 
@@ -371,6 +395,7 @@ export class CharacterViewportHost {
         expression: structuredClone(runtime.faceExpression),
         runtimeDescriptor: structuredClone(runtime.faceExpressionDescriptor),
         animationLayer: structuredClone(runtime.faceAnimationLayer),
+        previewFrame: structuredClone(runtime.facePreviewFrame),
       },
       clothingFrame: structuredClone(runtime.clothingFrame),
       simulationRig: structuredClone(runtime.frame.simulationRig),
@@ -490,6 +515,7 @@ export class CharacterStudioApp {
       },
     );
     this.viewport = new CharacterViewportHost(this.layout.viewport);
+    this.facePreviewPanel = new FacePreviewPanel(this.layout.leftPanel);
     this.currentState = null;
     this.currentRuntime = null;
     this.previousFinalPose = null;
@@ -523,6 +549,7 @@ export class CharacterStudioApp {
     this.layout.setBuild(state.build);
     const runtime = this.buildRuntime(state, animationOverride);
     this.currentRuntime = runtime;
+    this.facePreviewPanel.render(state, runtime);
     this.rightPanel.renderSummary(state, runtime, this.session.getSnapshot());
     this.viewport.render(state, runtime, this.displayToolbar.getMode());
     this.layout.setSync(this.hub.connected, this.hub.transport);
@@ -562,6 +589,8 @@ export class CharacterStudioApp {
     const faceAnimationLayer = createFaceAnimationLayer(faceExpression || {}, {
       bodyAnimationReference: 'character.animation',
     });
+    const faceIdentity = state.faceSystem?.profiles?.[state.faceSystem?.active_face_id] || {};
+    const facePreviewFrame = createFacePreviewFrame(faceExpression || {}, faceIdentity);
 
     return {
       animation,
@@ -575,6 +604,7 @@ export class CharacterStudioApp {
       faceExpression,
       faceExpressionDescriptor,
       faceAnimationLayer,
+      facePreviewFrame,
     };
   }
 
@@ -656,6 +686,190 @@ function createSimulationPoseSnapshot(frame, state) {
     updatedAt,
     sourceLegacyUpdatedAt: updatedAt,
   };
+}
+
+function drawFacePreview(canvas, frame) {
+  if (!canvas || !frame) return;
+  const context = canvas.getContext('2d');
+  if (!context) return;
+  const width = canvas.width;
+  const height = canvas.height;
+  const surface = frame.surface;
+  const profile = frame.profile;
+  const leftEye = frame.eyes.left;
+  const rightEye = frame.eyes.right;
+
+  context.clearRect(0, 0, width, height);
+  const background = context.createLinearGradient(0, 0, 0, height);
+  background.addColorStop(0, '#081629');
+  background.addColorStop(1, '#030914');
+  context.fillStyle = background;
+  context.fillRect(0, 0, width, height);
+
+  context.save();
+  context.globalAlpha = 0.2;
+  context.strokeStyle = '#6696c7';
+  context.lineWidth = 1;
+  for (let x = 20; x < width; x += 32) {
+    context.beginPath();
+    context.moveTo(x, 0);
+    context.lineTo(x, height);
+    context.stroke();
+  }
+  for (let y = 18; y < height; y += 32) {
+    context.beginPath();
+    context.moveTo(0, y);
+    context.lineTo(width, y);
+    context.stroke();
+  }
+  context.restore();
+
+  context.save();
+  context.translate(width / 2, height / 2 + 4);
+  context.scale(0.86 * surface.faceScaleX, 0.86 * surface.faceScaleY);
+
+  const faceWidth = 88 + (Number(profile.face_shape.width) - 0.5) * 18;
+  const jawWidth = faceWidth * (0.68 + Number(profile.face_shape.jaw_width) * 0.18);
+  const jawBottom = 112 + surface.jawDrop * 80;
+  const faceGradient = context.createLinearGradient(0, -112, 0, jawBottom);
+  faceGradient.addColorStop(0, '#f4c7aa');
+  faceGradient.addColorStop(0.65, '#e7a98d');
+  faceGradient.addColorStop(1, '#c77c6f');
+
+  context.fillStyle = '#b56e67';
+  context.beginPath();
+  context.ellipse(-faceWidth - 4, 4, 12, 28, 0, 0, Math.PI * 2);
+  context.ellipse(faceWidth + 4, 4, 12, 28, 0, 0, Math.PI * 2);
+  context.fill();
+
+  context.beginPath();
+  context.moveTo(-faceWidth, -28);
+  context.bezierCurveTo(-faceWidth, -84, -faceWidth * 0.66, -112, 0, -116);
+  context.bezierCurveTo(faceWidth * 0.66, -112, faceWidth, -84, faceWidth, -28);
+  context.bezierCurveTo(faceWidth, 34, jawWidth, 90, 0, jawBottom);
+  context.bezierCurveTo(-jawWidth, 90, -faceWidth, 34, -faceWidth, -28);
+  context.closePath();
+  context.fillStyle = faceGradient;
+  context.fill();
+  context.strokeStyle = 'rgba(255, 219, 198, 0.62)';
+  context.lineWidth = 2;
+  context.stroke();
+
+  drawPreviewCheek(context, -54, 24, surface.cheekPuffLeft);
+  drawPreviewCheek(context, 54, 24, surface.cheekPuffRight);
+  drawPreviewBrow(context, -36, -60, frame.brows.left, -1);
+  drawPreviewBrow(context, 36, -60, frame.brows.right, 1);
+
+  const eyeSpacing = 34 + (Number(profile.eye_shape.spacing) - 0.5) * 10;
+  const eyeSize = 20 + Number(profile.eye_shape.size) * 9;
+  const eyeTilt = (Number(profile.eye_shape.tilt) - 0.5) * 0.22;
+  drawPreviewEye(context, -eyeSpacing, -28, eyeSize, leftEye, eyeTilt, -1);
+  drawPreviewEye(context, eyeSpacing, -28, eyeSize, rightEye, eyeTilt, 1);
+
+  context.strokeStyle = 'rgba(130, 74, 67, 0.7)';
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(0, -18);
+  context.quadraticCurveTo(-5, 5, 0, 20);
+  context.quadraticCurveTo(7, 25, 11, 19);
+  context.stroke();
+
+  drawPreviewMouth(context, frame.mouth, profile.mouth_shape, surface.jawShift, surface.jawDrop);
+  context.restore();
+
+  context.fillStyle = 'rgba(215, 235, 255, 0.76)';
+  context.font = '10px ui-monospace, SFMono-Regular, Consolas, monospace';
+  context.fillText(`FACE SURFACE  ·  r${frame.expressionRevision}`, 12, 20);
+}
+
+function drawPreviewCheek(context, x, y, puff) {
+  if (puff <= 0.01) return;
+  context.save();
+  context.globalAlpha = 0.12 + puff * 0.18;
+  context.fillStyle = '#fff0d5';
+  context.beginPath();
+  context.ellipse(x, y, 19 + puff * 12, 14 + puff * 7, 0, 0, Math.PI * 2);
+  context.fill();
+  context.restore();
+}
+
+function drawPreviewEye(context, x, y, size, eye, tilt, side) {
+  context.save();
+  context.translate(x, y);
+  context.rotate(tilt * side);
+  const openness = Math.max(0.08, eye.openness);
+  const eyeHeight = 3 + openness * 9;
+  const eyeWidth = size + eye.wide * 5;
+  context.fillStyle = '#fff6e9';
+  context.beginPath();
+  context.ellipse(0, 0, eyeWidth, eyeHeight, 0, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = '#3b6572';
+  context.beginPath();
+  context.ellipse(side * 2, 0, 4.5 + eye.squint * 1.5, 4.5 + eye.squint, 0, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = '#0b1722';
+  context.beginPath();
+  context.ellipse(side * 2, 0, 2, 3, 0, 0, Math.PI * 2);
+  context.fill();
+  context.strokeStyle = '#7c4d54';
+  context.lineWidth = 2.2 + eye.closure * 1.2;
+  context.beginPath();
+  context.moveTo(-eyeWidth, -eyeHeight * (0.65 + eye.closure * 0.25));
+  context.quadraticCurveTo(0, -eyeHeight * (1.1 - eye.closure * 0.7), eyeWidth, -eyeHeight * (0.65 + eye.closure * 0.25));
+  context.stroke();
+  context.restore();
+}
+
+function drawPreviewBrow(context, x, y, brow, side) {
+  const raise = brow.raise * 10 - brow.down * 6;
+  const angry = brow.angry * 7 + brow.inner * 3;
+  context.save();
+  context.translate(x, y - raise);
+  context.strokeStyle = '#6e3f3e';
+  context.lineWidth = 5;
+  context.lineCap = 'round';
+  context.beginPath();
+  context.moveTo(-20, side < 0 ? angry : -angry);
+  context.quadraticCurveTo(0, -4 - brow.raise * 4, 20, side < 0 ? -angry : angry);
+  context.stroke();
+  context.restore();
+}
+
+function drawPreviewMouth(context, mouth, shape, jawShift, jawDrop) {
+  const smile = mouth.smile;
+  const frown = mouth.frown;
+  const pucker = mouth.pucker;
+  const open = mouth.open;
+  const width = 24 + Number(shape.width) * 27 + smile * 8 - pucker * 11;
+  const y = 45 + jawDrop * 40;
+  const cornerOffset = (smile - frown) * 12;
+  const centerX = jawShift * 36 + mouth.shift * 34;
+
+  context.save();
+  context.translate(centerX, y);
+  context.strokeStyle = '#863f4d';
+  context.lineWidth = 3;
+  context.lineCap = 'round';
+  context.beginPath();
+  context.moveTo(-width, cornerOffset);
+  context.quadraticCurveTo(0, -open * 14 + (frown - smile) * 4, width, -cornerOffset);
+  context.stroke();
+
+  if (open > 0.04 || pucker > 0.04) {
+    context.fillStyle = '#521f37';
+    context.beginPath();
+    context.ellipse(0, open * 5, Math.max(5, width - pucker * 15), 2 + open * 11 + pucker * 4, 0, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  context.strokeStyle = '#d8787f';
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(-width, cornerOffset);
+  context.quadraticCurveTo(0, -open * 10 + (frown - smile) * 2, width, -cornerOffset);
+  context.stroke();
+  context.restore();
 }
 
 function slotMarkup(id, label, note) {

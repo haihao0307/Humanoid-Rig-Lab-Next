@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/face_preview_frame@1.0",
+  "title": "Humanoid Rig Lab FacePreviewFrame",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "expressionRevision", "source", "runtimeDescriptor", "profile", "surface", "eyes", "brows", "mouth", "morphWeights", "correctiveWeights"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/face_preview_frame@1.0" },
+    "expressionRevision": { "type": "integer", "minimum": 1 },
+    "source": { "const": "face-system-expression-runtime" },
+    "runtimeDescriptor": {
+      "type": "object",
+      "required": ["expressionSchema", "channels", "deformationMode"],
+      "properties": {
+        "expressionSchema": { "const": "humanoid_rig/face_expression@1.0" },
+        "channels": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameter" } },
+        "deformationMode": { "enum": ["interface-only", "morph-target", "vertex-corrective", "shader-corrective"] }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "required": ["face_id", "face_shape", "eye_shape", "mouth_shape"],
+      "properties": {
+        "face_id": { "type": "string" },
+        "face_shape": { "$ref": "#/$defs/faceShape" },
+        "eye_shape": { "$ref": "#/$defs/eyeShape" },
+        "mouth_shape": { "$ref": "#/$defs/mouthShape" }
+      }
+    },
+    "surface": {
+      "type": "object",
+      "required": ["faceScaleX", "faceScaleY", "jawDrop", "jawShift", "cheekPuffLeft", "cheekPuffRight"],
+      "properties": {
+        "faceScaleX": { "$ref": "#/$defs/scale" },
+        "faceScaleY": { "$ref": "#/$defs/scale" },
+        "jawDrop": { "$ref": "#/$defs/parameter" },
+        "jawShift": { "type": "number", "minimum": -1, "maximum": 1 },
+        "cheekPuffLeft": { "$ref": "#/$defs/parameter" },
+        "cheekPuffRight": { "$ref": "#/$defs/parameter" }
+      }
+    },
+    "eyes": { "$ref": "#/$defs/sideValues" },
+    "brows": { "$ref": "#/$defs/sideValues" },
+    "mouth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smile", "frown", "open", "pucker", "tightener", "shift"],
+      "properties": {
+        "smile": { "$ref": "#/$defs/parameter" },
+        "frown": { "$ref": "#/$defs/parameter" },
+        "open": { "$ref": "#/$defs/parameter" },
+        "pucker": { "$ref": "#/$defs/parameter" },
+        "tightener": { "$ref": "#/$defs/parameter" },
+        "shift": { "type": "number", "minimum": -1, "maximum": 1 }
+      }
+    },
+    "morphWeights": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameter" } },
+    "correctiveWeights": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameter" } }
+  },
+  "$defs": {
+    "parameter": { "type": "number", "minimum": 0, "maximum": 1 },
+    "scale": { "type": "number", "exclusiveMinimum": 0, "maximum": 2 },
+    "sideValues": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "right"],
+      "properties": {
+        "left": { "$ref": "#/$defs/sideValue" },
+        "right": { "$ref": "#/$defs/sideValue" }
+      }
+    },
+    "sideValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["closure", "openness", "squint", "wide"],
+      "properties": {
+        "closure": { "$ref": "#/$defs/parameter" },
+        "openness": { "$ref": "#/$defs/parameter" },
+        "squint": { "$ref": "#/$defs/parameter" },
+        "wide": { "$ref": "#/$defs/parameter" }
+      }
+    },
+    "faceShape": {
+      "type": "object",
+      "required": ["width", "height", "jaw_width", "cheekbone"],
+      "properties": {
+        "width": { "$ref": "#/$defs/parameter" },
+        "height": { "$ref": "#/$defs/parameter" },
+        "jaw_width": { "$ref": "#/$defs/parameter" },
+        "cheekbone": { "$ref": "#/$defs/parameter" }
+      }
+    },
+    "eyeShape": {
+      "type": "object",
+      "required": ["size", "spacing", "tilt"],
+      "properties": {
+        "size": { "$ref": "#/$defs/parameter" },
+        "spacing": { "$ref": "#/$defs/parameter" },
+        "tilt": { "$ref": "#/$defs/parameter" }
+      }
+    },
+    "mouthShape": {
+      "type": "object",
+      "required": ["width", "fullness", "corner_curve"],
+      "properties": {
+        "width": { "$ref": "#/$defs/parameter" },
+        "fullness": { "$ref": "#/$defs/parameter" },
+        "corner_curve": { "$ref": "#/$defs/parameter" }
+      }
+    }
+  }
+}

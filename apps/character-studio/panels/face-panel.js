@@ -47,6 +47,17 @@ export class FacePanel extends CharacterStudioPanel {
       { value: 'neutral', label: 'Neutral' }, { value: 'smile', label: 'Smile' },
       { value: 'frown', label: 'Frown' }, { value: 'surprise', label: 'Surprise' },
     ]));
+    controls.push(`<section class="character-studio-face-preview-panel" data-character-face-preview>
+      <div class="character-studio-face-preview-heading">
+        <div><span class="eyebrow">FACE PREVIEW</span><h3>Independent Face Preview</h3></div>
+        <span class="character-studio-face-preview-tag">SKIN SURFACE</span>
+      </div>
+      <div class="character-studio-face-preview-stage">
+        <canvas width="360" height="260" data-face-preview-canvas aria-label="Face skin deformation preview"></canvas>
+        <span class="character-studio-face-preview-bridge">Expression State → Face Runtime → Preview Surface</span>
+      </div>
+      <div class="character-studio-face-preview-status" data-face-preview-status>neutral · preview surface</div>
+    </section>`);
     controls.push('<h4>Expression Channels</h4>');
     controls.push('<p class="character-studio-face-expression-note">Expression State → Face Runtime → Morph / Corrective Layer</p>');
     controls.push(`<div class="character-studio-face-expression-panel">

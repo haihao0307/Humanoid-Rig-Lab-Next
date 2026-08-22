@@ -8,11 +8,17 @@ import {
   FACE_EXPRESSION_CHANNEL_DEFINITIONS,
   FACE_EXPRESSION_MIRROR_PAIRS,
   FACE_EXPRESSION_SCHEMA,
+  FACE_FEATURE_DESCRIPTOR_SCHEMA,
+  FACE_IMAGE_ANALYSIS_ADAPTER_SCHEMA,
   FaceEditor,
   createFaceAnalysisAdapter,
   createFaceAnimationLayer,
+  createFaceFeatureDescriptor,
+  createFaceImageAnalysisAdapter,
+  createFaceImageInput,
   createFaceExpressionRuntimeDescriptor,
   createFaceExpressionState,
+  createFacePreviewFrame,
   createFaceState,
   composeFaceAnimationLayers,
   imageAnalysisResultToExpressionState,
@@ -21,6 +27,7 @@ import {
   normalizeFaceExpression,
   validateFaceExpression,
   validateFaceAnimationLayer,
+  validateFaceFeatureDescriptor,
   validateFaceExpressionRuntimeDescriptor,
 } from '../packages/face-system/index.js';
 import { CharacterManager } from '../packages/character-core/index.js';
@@ -111,6 +118,40 @@ const adapter = createFaceAnalysisAdapter({
 assert.equal(adapter.schema, 'humanoid_rig/face_analysis_adapter@1.0');
 assert.equal(imageAnalysisResultToExpressionState({ eyeBlinkLeft: 0.2 }).channels.eyeBlinkLeft, 0.2);
 assert.equal(adapter.toExpressionState({ mouthSmileLeft: 0.5 }).channels.mouthSmileLeft, 0.5);
+assert.equal(adapter.toFaceFeatureDescriptor({ channels: { mouthSmileLeft: 0.5 } }).expression.channels.mouthSmileLeft, 0.5);
+
+const imageInput = createFaceImageInput({
+  reference: 'portrait.png',
+  mediaType: 'image/png',
+  width: 1024,
+  height: 1280,
+});
+assert.equal(imageInput.schema, 'humanoid_rig/face_image_input@1.0');
+const featureDescriptor = createFaceFeatureDescriptor({
+  source: imageInput,
+  face_shape: { width: 0.7, height: 0.6, jaw_width: 0.55, cheekbone: 0.65 },
+  eye_shape: { size: 0.58, spacing: 0.42, tilt: 0.52 },
+  mouth_shape: { width: 0.62, fullness: 0.57, corner_curve: 0.5 },
+  expression: { channels: { eyeBlinkLeft: 0.2, mouthSmileLeft: 0.5, mouthOpen: 0.4 } },
+});
+assert.equal(featureDescriptor.schema, FACE_FEATURE_DESCRIPTOR_SCHEMA);
+assert.equal(featureDescriptor.source.reference, 'portrait.png');
+assert.equal(featureDescriptor.face_shape.width, 0.7);
+assert.equal(featureDescriptor.expression.channels.eyeBlinkLeft, 0.2);
+assert.equal(validateFaceFeatureDescriptor(featureDescriptor), true);
+const imageAdapter = createFaceImageAnalysisAdapter({
+  analyze: async () => ({ face_shape: { width: 0.6 } }),
+});
+assert.equal(imageAdapter.schema, FACE_IMAGE_ANALYSIS_ADAPTER_SCHEMA);
+assert.equal(imageAdapter.toFaceFeatureDescriptor({}).schema, FACE_FEATURE_DESCRIPTOR_SCHEMA);
+
+const neutralPreview = createFacePreviewFrame(defaultExpression);
+const expressivePreview = createFacePreviewFrame(featureDescriptor.expression, featureDescriptor);
+assert.equal(expressivePreview.schema, 'humanoid_rig/face_preview_frame@1.0');
+assert.equal(expressivePreview.morphWeights.eyeBlinkLeft, 0.2);
+assert.ok(expressivePreview.eyes.left.openness < neutralPreview.eyes.left.openness);
+assert.ok(expressivePreview.mouth.open > neutralPreview.mouth.open);
+assert.ok(expressivePreview.correctiveWeights.smileOpen >= 0);
 
 const animationLayer = createFaceAnimationLayer(asymmetric, {
   bodyAnimationReference: 'character.animation',
@@ -192,6 +233,9 @@ assert.ok(schema.properties.channels.required.includes('jawOpen'));
 assert.ok(schema.properties.channels.required.includes('eyeClosureLeft'));
 assert.ok(schema.properties.channels.required.includes('mouthPuckerRight'));
 assert.ok(schema['x-mirror-pairs'].some(([left, right]) => left === 'cheekPuffLeft' && right === 'cheekPuffRight'));
+const featureSchema = JSON.parse(await readFile(join(root, 'schemas/face-feature-descriptor.schema.json'), 'utf8'));
+assert.equal(featureSchema.properties.expression.$ref, 'face-expression.schema.json');
+assert.ok(featureSchema.properties.face_shape.required.includes('jaw_width'));
 const characterSchema = JSON.parse(await readFile(join(root, 'schemas/character-profile.schema.json'), 'utf8'));
 assert.ok(characterSchema.properties.expression_revision);
 assert.ok(characterSchema.properties.expression_runtime_descriptor);
@@ -202,6 +246,9 @@ assert.match(facePanelSource, /applyFaceExpression/);
 assert.match(facePanelSource, /data-expression-channel/);
 assert.match(facePanelSource, /data-face-expression-mirror-pair/);
 assert.match(studioSource, /faceAnimationLayer/);
+assert.match(studioSource, /class FacePreviewPanel/);
+assert.match(studioSource, /drawFacePreview/);
+assert.match(studioSource, /createFacePreviewFrame/);
 assert.match(studioSource, /expressionState/);
 
 console.log('PASS FaceExpressionState default creation, semantic channels, validation, and mirror');

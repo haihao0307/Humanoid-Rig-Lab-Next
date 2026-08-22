@@ -416,6 +416,74 @@ body.character-studio-page {
   flex: 0 0 auto;
 }
 
+.character-studio-face-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.character-studio-face-preview-panel {
+  display: grid;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid rgba(121, 168, 220, 0.22);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(14, 29, 49, 0.82), rgba(6, 14, 26, 0.86));
+}
+
+.character-studio-face-preview-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.character-studio-face-preview-heading h3 {
+  margin: 3px 0 0;
+  color: var(--character-studio-text);
+  font-size: 12px;
+}
+
+.character-studio-face-preview-tag {
+  padding: 4px 5px;
+  border: 1px solid rgba(114, 226, 176, 0.35);
+  border-radius: 4px;
+  color: #bcefd8;
+  font: 8px ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: nowrap;
+}
+
+.character-studio-face-preview-stage {
+  position: relative;
+  min-height: 188px;
+  overflow: hidden;
+  border: 1px solid rgba(121, 168, 220, 0.18);
+  border-radius: 6px;
+  background: #030914;
+}
+
+.character-studio-face-preview-stage canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 188px;
+}
+
+.character-studio-face-preview-bridge {
+  position: absolute;
+  right: 7px;
+  bottom: 6px;
+  padding: 4px 5px;
+  border-radius: 4px;
+  background: rgba(3, 9, 18, 0.74);
+  color: #9eb9d8;
+  font: 8px ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.character-studio-face-preview-status {
+  color: #bcefd8;
+  font: 9px ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
 .character-studio-face-expression-panel {
   display: grid;
   gap: 10px;

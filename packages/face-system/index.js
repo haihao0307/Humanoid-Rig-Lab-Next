@@ -5,3 +5,5 @@ export * from './face-expression.js';
 export * from './face-runtime-descriptor.js';
 export * from './face-analysis-adapter.js';
 export * from './face-animation-layer.js';
+export * from './face-feature-descriptor.js';
+export * from './face-preview.js';

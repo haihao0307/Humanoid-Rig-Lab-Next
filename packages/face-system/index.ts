@@ -5,3 +5,5 @@ export * from './face-expression.ts';
 export * from './face-runtime-descriptor.ts';
 export * from './face-analysis-adapter.ts';
 export * from './face-animation-layer.ts';
+export * from './face-feature-descriptor.ts';
+export * from './face-preview.ts';
