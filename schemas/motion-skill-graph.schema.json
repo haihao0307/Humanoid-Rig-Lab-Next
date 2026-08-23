@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanoid-rig-lab-next.local/schemas/motion-skill-graph.schema.json",
+  "title": "MotionSkillGraph",
+  "type": "object",
+  "required": ["schema", "graphId", "nodes", "edges", "parallelGroups", "warnings", "metadata"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/motion_skill_graph@1.0" },
+    "graphId": { "type": "string" },
+    "planId": { "type": ["string", "null"] },
+    "status": { "enum": ["pending", "running", "completed", "failed", "cancelled"] },
+    "nodes": { "type": "array", "items": { "type": "object", "required": ["nodeId", "skillId", "status", "dependencies"], "additionalProperties": true } },
+    "edges": { "type": "array", "items": { "type": "object", "required": ["fromNodeId", "toNodeId"], "additionalProperties": true } },
+    "parallelGroups": { "type": "array", "items": { "type": "object", "required": ["groupId", "nodeIds"], "additionalProperties": true } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "metadata": { "type": "object", "additionalProperties": true }
+  },
+  "additionalProperties": true
+}

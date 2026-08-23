@@ -95,6 +95,7 @@ export function renderControls(context, state) {
   const breathingLayer = animation.layers.find((layer) => layer.layerId === 'breathing-additive');
 
   context.elements.moduleControls.innerHTML =
+    renderTextMotionPanel(state) +
     controlSection('动画片段与播放', `
       <div class="control-row"><label for="clipSelect">当前片段</label><select id="clipSelect">${clipOptions}</select></div>
       <div class="control-button-grid"><button class="control-button" id="playAnimation">${animation.transport.playing ? '暂停' : '播放'}</button><button class="control-button" id="stopAnimation">停止</button></div>
@@ -153,8 +154,7 @@ export function renderControls(context, state) {
         <div><span>片段校验</span><b class="${validation.valid ? 'success-text' : 'warning-text'}">${validation.valid ? '通过' : `${validation.errors.length} 项错误`}</b></div>
         <div><span>原始播放时间</span><b>${Number(rawTime).toFixed(3)} s</b></div>
       </div>
-      <p class="control-note">${escapeHtml(validation.errors[0] || validation.warnings[0] || '局部旋转、根节点通道、事件、接触和 PoseSnapshot 引用均通过协议检查。')}</p>`) +
-    renderTextMotionPanel(state);
+      <p class="control-note">${escapeHtml(validation.errors[0] || validation.warnings[0] || '局部旋转、根节点通道、事件、接触和 PoseSnapshot 引用均通过协议检查。')}</p>`);
 
   setSelectValue('#clipSelect', activeClip.clipId);
   setSelectValue('#clipLoopMode', activeClip.loopMode);
@@ -168,6 +168,7 @@ export function renderControls(context, state) {
   bindEditingAndAssetControls(context);
   bindTextMotionPanel(context, {
     onPreview: (result) => previewGeneratedTextMotion(context, result),
+    onExecutionFrame: (result, elapsed) => previewGeneratedTextMotionFrame(context, result, elapsed),
     onStop: () => {
       resetRuntimeCache();
       context.hub.publishTransient('motion.text.preview.stop', {}, {
@@ -970,10 +971,8 @@ function previewAtTime(context, animationInput, time, {
 
 function previewGeneratedTextMotion(context, result) {
   if (!result?.clip) return;
-  const state = context.getState();
-  const animation = replaceClip(normalizeForState(state), result.clip);
   resetRuntimeCache({ preserveEventTime: true });
-  previewAtTime(context, animation, 0, { rawTime: 0, deltaTime: 1 / 30 });
+  previewGeneratedTextMotionFrame(context, result, 0);
   context.hub.publishTransient('motion.text.preview', {
     clipId: result.clip.clipId,
     intentId: result.intent?.intentId || null,
@@ -983,6 +982,23 @@ function previewGeneratedTextMotion(context, result) {
     resource: `motion_clip:${result.clip.clipId}`,
     syncGroup: 'animation-editor-default',
   });
+}
+
+function previewGeneratedTextMotionFrame(context, result, elapsed = 0) {
+  if (!result?.clip) return;
+  const rawTime = Math.max(0, Number(elapsed) || 0);
+  const state = context.getState();
+  let animation = replaceClip(normalizeForState(state), result.clip);
+  // Reuse the existing AnimationTransport and runtime preview path without
+  // committing transient execution progress into the AnimationSession.
+  animation = setTransport(animation, {
+    playing: false,
+    time: rawTime,
+    rawTime,
+    anchorTime: rawTime,
+    anchorRawTime: rawTime,
+  });
+  previewAtTime(context, animation, rawTime, { rawTime, deltaTime: 1 / 30 });
 }
 
 function postPosePreview(context, v8Payload, localPose = null) {

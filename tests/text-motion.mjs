@@ -22,11 +22,15 @@ import { commitTextMotion } from '../src/modules/animation/text-motion/executor.
 
 const registry = createDefaultMotionSkillRegistry();
 assert.equal(registry.validate().valid, true);
-assert.equal(DEMO_MOTION_COMMANDS.length, 4);
-assert.deepEqual(registry.list().map((skill) => skill.skillId), [
+assert.equal(DEMO_MOTION_COMMANDS.length, 5);
+const registeredSkillIds = registry.list().map((skill) => skill.skillId);
+for (const skillId of [
   'idle', 'walk', 'walk_backward', 'stop', 'turn', 'look', 'reach', 'point',
   'wave', 'salute', 'squat', 'crouch', 'bend', 'inspect', 'sit', 'stand_up',
-]);
+  'salute_right', 'salute_left', 'look_at', 'turn_to', 'recover',
+]) {
+  assert.ok(registeredSkillIds.includes(skillId), `registry should retain ${skillId}`);
+}
 
 const chinese = parseMotionText('向前走三步后敬礼');
 assert.equal(chinese.schema, 'humanoid_rig/motion_intent@1.0');

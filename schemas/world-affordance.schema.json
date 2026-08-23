@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanoid-rig-lab-next.local/schemas/world-affordance.schema.json",
+  "title": "WorldAffordance",
+  "type": "object",
+  "required": ["schema", "objectId", "objectType", "transform", "standingZones", "inspectPoints", "reachPoints", "graspPoints", "placePoints", "pushPoints", "pullPoints", "climbPoints", "seatPoints", "lookPoints", "accessRules", "metadata"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/world_affordance@1.0" },
+    "objectId": { "type": "string" },
+    "objectType": { "type": "string" },
+    "transform": { "type": "object", "required": ["position", "rotation"], "additionalProperties": true },
+    "bounds": { "type": ["object", "null"], "additionalProperties": true },
+    "standingZones": { "$ref": "#/$defs/points" },
+    "inspectPoints": { "$ref": "#/$defs/points" },
+    "reachPoints": { "$ref": "#/$defs/points" },
+    "graspPoints": { "$ref": "#/$defs/points" },
+    "placePoints": { "$ref": "#/$defs/points" },
+    "pushPoints": { "$ref": "#/$defs/points" },
+    "pullPoints": { "$ref": "#/$defs/points" },
+    "climbPoints": { "$ref": "#/$defs/points" },
+    "seatPoints": { "$ref": "#/$defs/points" },
+    "lookPoints": { "$ref": "#/$defs/points" },
+    "accessRules": { "type": "array", "items": {} },
+    "metadata": { "type": "object", "additionalProperties": true }
+  },
+  "$defs": {
+    "points": { "type": "array", "items": { "type": "object", "required": ["id", "position"], "additionalProperties": true } }
+  },
+  "additionalProperties": true
+}

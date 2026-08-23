@@ -22,6 +22,9 @@
     "schema": { "const": "humanoid_rig/action_plan@1.0" },
     "planId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
     "sourceIntentId": { "type": "string" },
+    "actorContextRef": { "type": ["string", "null"] },
+    "worldContextRef": { "type": ["string", "null"] },
+    "styleHints": { "type": "object", "additionalProperties": true },
     "status": { "enum": ["ready", "unsupported", "empty"] },
     "coordinateSystem": {
       "type": "object",
@@ -68,14 +71,49 @@
         "additionalProperties": true
       }
     },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["nodeId", "skillId", "parameters", "dependencies", "preconditions", "successConditions", "failurePolicy", "layer", "goalRequests"],
+        "properties": {
+          "nodeId": { "type": "string" },
+          "skillId": { "type": "string" },
+          "parameters": { "type": "object", "additionalProperties": true },
+          "dependencies": { "type": "array", "items": { "type": "string" } },
+          "parallelGroup": { "type": ["string", "null"] },
+          "preconditions": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+          "successConditions": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+          "failurePolicy": { "type": "string" },
+          "timeout": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+          "layer": { "type": "string" },
+          "priority": { "type": "number" },
+          "requiredChains": { "type": "array", "items": { "type": "string" } },
+          "requiredCapabilities": { "type": "array", "items": { "type": "string" } },
+          "goalRequests": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+          "metadata": { "type": "object", "additionalProperties": true }
+        },
+        "additionalProperties": true
+      }
+    },
+    "edges": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "semanticRequiredSkills": { "type": "array", "items": { "type": "string" } },
     "requiredSkills": { "type": "array", "items": { "type": "string" } },
     "requiredChains": { "type": "array", "items": { "type": "string" } },
+    "requiredAffordances": { "type": "array", "items": { "type": "string" } },
+    "requiredCapabilities": { "type": "array", "items": { "type": "string" } },
+    "preconditions": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "successConditions": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "failurePolicies": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
     "estimatedDuration": { "type": "number", "minimum": 0 },
+    "estimatedDistance": { "type": "number", "minimum": 0 },
     "rootMotionPolicy": { "enum": ["in_place", "root_motion"] },
     "contactPolicy": { "enum": ["preserve", "ignore", "generate"] },
     "unresolvedTargets": { "type": "array", "items": { "type": "string" } },
     "warnings": { "type": "array", "items": { "type": "string" } },
-    "missingSkills": { "type": "array", "items": { "type": "string" } }
+    "missingSkills": { "type": "array", "items": { "type": "string" } },
+    "missingAffordances": { "type": "array", "items": { "type": "string" } },
+    "requiresSolverCapabilities": { "type": "array", "items": { "type": "string" } }
   },
   "additionalProperties": true
 }

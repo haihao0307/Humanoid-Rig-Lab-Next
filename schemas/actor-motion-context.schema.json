@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanoid-rig-lab-next.local/schemas/actor-motion-context.schema.json",
+  "title": "ActorMotionContext",
+  "type": "object",
+  "required": ["schema", "actorId", "characterId", "identity", "occupation", "dominantSide", "equipment", "currentPosture", "currentMotion", "currentPosition", "currentFacing", "fatigue", "alertness", "carriedObjects", "availableSkills", "disabledSkills", "bodyProfileReference", "metadata"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/actor_motion_context@1.0" },
+    "actorId": { "type": "string" },
+    "characterId": { "type": "string" },
+    "identity": { "type": "object", "additionalProperties": true },
+    "occupation": { "type": "object", "required": ["id", "label"], "additionalProperties": true },
+    "rank": { "type": ["string", "null"] },
+    "dominantSide": { "enum": ["left", "right"] },
+    "equipment": { "type": "array", "items": { "type": "object", "required": ["id", "type"], "additionalProperties": true } },
+    "currentPosture": { "type": "string" },
+    "currentMotion": { "type": "string" },
+    "currentPosition": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+    "currentFacing": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+    "fatigue": { "type": "number", "minimum": 0, "maximum": 1 },
+    "injury": { "type": ["object", "null"], "additionalProperties": true },
+    "alertness": { "type": "number", "minimum": 0, "maximum": 1 },
+    "carriedObjects": { "type": "array", "items": { "type": "string" } },
+    "availableSkills": { "type": "array", "items": { "type": "string" } },
+    "disabledSkills": { "type": "array", "items": { "type": "string" } },
+    "bodyProfileReference": { "type": "object", "required": ["compatibleRig", "proportionRevision"], "additionalProperties": true },
+    "metadata": { "type": "object", "additionalProperties": true }
+  },
+  "additionalProperties": true
+}

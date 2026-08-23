@@ -14,10 +14,21 @@ export function createMotionIntent(input = {}) {
     sourceText: '',
     language: 'unknown',
     actor: null,
+    actorContextRef: null,
+    occupationHint: null,
+    taskType: null,
     actions: [],
+    targets: [],
+    spatialRelations: [],
     sequenceRelations: [],
     parallelRelations: [],
+    conditions: [],
     constraints: {},
+    styleHints: [],
+    equipmentHints: [],
+    safetyHints: [],
+    confidenceByField: {},
+    unresolvedTokens: [],
     confidence: 0,
     warnings: [],
     ...input,
@@ -32,6 +43,12 @@ export function normalizeMotionIntent(input = {}) {
     : [];
   const sequenceRelations = uniqueRelations(source.sequenceRelations || source.sequence_relations);
   const parallelRelations = uniqueParallelRelations(source.parallelRelations || source.parallel_relations);
+  const targets = normalizeTargets(source.targets);
+  const spatialRelations = normalizeObjectArray(source.spatialRelations || source.spatial_relations);
+  const conditions = normalizeObjectArray(source.conditions);
+  const styleHints = normalizeObjectArray(source.styleHints || source.style_hints);
+  const equipmentHints = normalizeObjectArray(source.equipmentHints || source.equipment_hints);
+  const safetyHints = normalizeStringOrObjectArray(source.safetyHints || source.safety_hints);
   const content = {
     sourceText,
     language: normalizeLanguage(source.language),
@@ -51,6 +68,13 @@ export function normalizeMotionIntent(input = {}) {
     sourceText,
     language: content.language,
     actor: content.actor,
+    actorContextRef: source.actorContextRef == null && source.actor_context_ref == null
+      ? null
+      : String(source.actorContextRef || source.actor_context_ref),
+    occupationHint: source.occupationHint == null && source.occupation_hint == null
+      ? null
+      : String(source.occupationHint || source.occupation_hint),
+    taskType: source.taskType == null && source.task_type == null ? null : String(source.taskType || source.task_type),
     actions,
     direction: normalizeNullableDirection(source.direction),
     side: normalizeNullableSide(source.side),
@@ -63,7 +87,17 @@ export function normalizeMotionIntent(input = {}) {
     repeatCount: nullablePositiveInteger(source.repeatCount),
     sequenceRelations,
     parallelRelations,
+    targets,
+    spatialRelations,
+    conditions,
     constraints: content.constraints,
+    styleHints,
+    equipmentHints,
+    safetyHints,
+    confidenceByField: isPlainObject(source.confidenceByField || source.confidence_by_field)
+      ? structuredClone(source.confidenceByField || source.confidence_by_field)
+      : {},
+    unresolvedTokens: uniqueStrings(source.unresolvedTokens || source.unresolved_tokens),
     confidence: clamp(Number(source.confidence), 0, 1, actions.length ? 0.85 : 0),
     warnings: uniqueStrings(source.warnings),
     status,
@@ -85,6 +119,8 @@ export function validateMotionIntent(input) {
     if (action.durationSeconds != null && action.durationSeconds <= 0) errors.push(`MOTION_INTENT_DURATION_INVALID:${action.actionId}`);
     if (action.angleDegrees != null && Math.abs(action.angleDegrees) > 360) errors.push(`MOTION_INTENT_ANGLE_INVALID:${action.actionId}`);
   }
+  if (!Array.isArray(intent.targets)) errors.push('MOTION_INTENT_TARGETS_INVALID');
+  if (!Array.isArray(intent.conditions)) errors.push('MOTION_INTENT_CONDITIONS_INVALID');
   return { valid: errors.length === 0, errors: uniqueStrings(errors), warnings: intent.warnings };
 }
 
@@ -118,6 +154,9 @@ function normalizeAction(input, index) {
     direction: normalizeNullableDirection(source.direction),
     side: normalizeNullableSide(source.side),
     target: source.target == null ? null : String(source.target),
+    targetType: source.targetType == null && source.target_type == null
+      ? null
+      : String(source.targetType || source.target_type),
     distanceMeters: nullableNonNegative(source.distanceMeters ?? source.distance_meters),
     stepCount: nullablePositiveInteger(source.stepCount ?? source.step_count),
     durationSeconds: nullablePositive(source.durationSeconds ?? source.duration_seconds),
@@ -153,6 +192,34 @@ function uniqueParallelRelations(input) {
     seen.add(relation.groupId);
     return true;
   });
+}
+
+function normalizeTargets(input) {
+  const seen = new Set();
+  return normalizeObjectArray(input).map((target) => ({
+    ...target,
+    name: String(target.name || target.target || target.objectId || target.object_id || '').trim(),
+    type: String(target.type || target.objectType || target.object_type || 'generic').trim(),
+    actionIds: uniqueStrings(target.actionIds || target.action_ids),
+  })).filter((target) => {
+    if (!target.name) return false;
+    const key = `${target.type}:${target.name}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function normalizeObjectArray(input) {
+  return (Array.isArray(input) ? input : []).map((value) => (
+    isPlainObject(value) ? structuredClone(value) : {}
+  )).filter((value) => Object.keys(value).length > 0);
+}
+
+function normalizeStringOrObjectArray(input) {
+  return (Array.isArray(input) ? input : []).map((value) => (
+    isPlainObject(value) ? structuredClone(value) : String(value)
+  ));
 }
 
 function normalizeLanguage(value) {
