@@ -188,6 +188,14 @@ assert.equal(mappedRightArmSemantic.joints.lower, 'mixamoRightForeArm');
 const walkAssetClip = base.clips.find((clip) => clip.clipId === 'walk-forward');
 const footContactSemantic = resolveSemanticMotionChannel('footContact', { clip: walkAssetClip });
 assert.deepEqual(footContactSemantic.jointIds, ['leftFoot', 'rightFoot']);
+assert.equal(walkAssetClip.metadata.authoringMethod, 'canonical-phase-mirrored-directed-leg-chain');
+assert.deepEqual(walkAssetClip.metadata.gait.rootMotionAxis, '+Z');
+assert.ok(
+  walkAssetClip.tracks
+    .filter((track) => ['leftUpperLeg', 'rightUpperLeg', 'leftLowerLeg', 'rightLowerLeg'].includes(track.jointId))
+    .every((track) => track.keyframes.length >= 10),
+  'walk lower-body tracks must retain the full canonical gait phase set',
+);
 assert.equal(footContactSemantic.contacts.length, 2);
 assert.equal(resolveSemanticMotionChannel('bodyLean').joints.lower, 'spine');
 assert.equal(validateSemanticMotionChannels(assetWaveClip.semanticChannels, { clip: assetWaveClip }).valid, true);

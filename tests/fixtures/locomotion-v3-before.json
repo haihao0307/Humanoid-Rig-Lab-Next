@@ -1,0 +1,44 @@
+{
+  "schema": "humanoid_rig/locomotion_baseline@1.0",
+  "capturedFrom": "fix/locomotion-end-to-end-v3",
+  "clipId": "walk-forward",
+  "sampleCount": 121,
+  "layers": {
+    "A_sampleClip": "manual rotation tracks for lower body; directed arm tracks",
+    "B_animationFk": "Animation Runtime forward kinematics",
+    "C_incomingBoneLocalRotations": "buildIncomingBoneLocalRotations",
+    "D_v8Payload": "buildV8PosePayload world positions",
+    "E_poseSnapshot": "buildAnimationPoseSnapshot localRotations",
+    "F_physicsRig": "PhysicsRig.applyPoseSnapshot without projection"
+  },
+  "metrics": {
+    "leftLegAngularRange": 0.4398973577,
+    "rightLegAngularRange": 0.4398973577,
+    "leftLowerLegAngularRange": 0.5574620337,
+    "rightLowerLegAngularRange": 0.5574620337,
+    "leftFootTravel": 1.4257358728,
+    "rightFootTravel": 1.4257358728,
+    "leftSwingClearance": 0.0511145390,
+    "rightSwingClearance": 0.0511145390,
+    "leftSupportDrift": 4.7102773761e-16,
+    "rightSupportDrift": 3.6082248310e-16,
+    "phaseOpposition": 0.9599496838,
+    "rootForwardDistance": 0.72,
+    "rootBackwardFrameCount": 0,
+    "leftKneeFlexionRange": 0.5553726944,
+    "rightKneeFlexionRange": 0.5553726944,
+    "leftFootForwardDotMinimum": 0.5256974293,
+    "rightFootForwardDotMinimum": 0.5256974293,
+    "maxAnimationToFinalPositionAdjustment": 0.4744754107,
+    "maxFinalToPayloadPositionError": 0,
+    "maxPayloadToPhysicsPositionError": 0,
+    "maxIncomingToSnapshotRotationError": 5.1619136559e-8,
+    "maxRawToFinalRotationChange": 1.2563966642,
+    "incomingIdentityCount": 244
+  },
+  "observations": [
+    "The V8 payload and PhysicsRig positions already match exactly for the sampled frames.",
+    "The previous animation-to-payload metric mixed in foot-contact correction and overstated bridge loss.",
+    "The largest change is foot-lock correction during support, indicating that the authored lower-body tracks do not keep the planted ankle near its contact target."
+  ]
+}

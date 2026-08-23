@@ -218,53 +218,42 @@ export function createWalkPreset({ compatibleRig = 'rig@0.4.0', rootMotion = fal
   const clipId = rootMotion ? 'walk-forward' : 'walk-in-place';
   const name = rootMotion ? 'Walk Forward' : 'Walk In Place';
   const rootDistance = rootMotion ? 0.72 : 0;
-  const times = [0, 0.3, 0.6, 0.9, 1.2];
-  const walkBaseRotations = [
-    mapSemanticMotionValues('bodyLean', { root: q(0, 1.5, 0), lower: q(1.5, -2, 0) }),
-    mapSemanticMotionValues('bodyLean', { root: q(0, 0, 0), lower: q(1, 0, 0) }),
-    mapSemanticMotionValues('bodyLean', { root: q(0, -1.5, 0), lower: q(1.5, 2, 0) }),
-    mapSemanticMotionValues('bodyLean', { root: q(0, 0, 0), lower: q(1, 0, 0) }),
-    mapSemanticMotionValues('bodyLean', { root: q(0, 1.5, 0), lower: q(1.5, -2, 0) }),
-  ];
-  const walkArmDirections = [
-    {
-      ...mapSemanticMotionValues('leftArmSwing', { upper: [-0.22, -0.88, -0.42], lower: [-0.12, -0.94, -0.32] }),
-      ...mapSemanticMotionValues('rightArmSwing', { upper: [0.22, -0.88, 0.42], lower: [0.12, -0.94, 0.32] }),
-    },
-    {
-      ...mapSemanticMotionValues('leftArmSwing', { upper: [-0.25, -0.97, 0], lower: [-0.18, -0.98, 0.04] }),
-      ...mapSemanticMotionValues('rightArmSwing', { upper: [0.25, -0.97, 0], lower: [0.18, -0.98, 0.04] }),
-    },
-    {
-      ...mapSemanticMotionValues('leftArmSwing', { upper: [-0.22, -0.88, 0.42], lower: [-0.12, -0.94, 0.32] }),
-      ...mapSemanticMotionValues('rightArmSwing', { upper: [0.22, -0.88, -0.42], lower: [0.12, -0.94, -0.32] }),
-    },
-    {
-      ...mapSemanticMotionValues('leftArmSwing', { upper: [-0.25, -0.97, 0], lower: [-0.18, -0.98, 0.04] }),
-      ...mapSemanticMotionValues('rightArmSwing', { upper: [0.25, -0.97, 0], lower: [0.18, -0.98, 0.04] }),
-    },
-    {
-      ...mapSemanticMotionValues('leftArmSwing', { upper: [-0.22, -0.88, -0.42], lower: [-0.12, -0.94, -0.32] }),
-      ...mapSemanticMotionValues('rightArmSwing', { upper: [0.22, -0.88, 0.42], lower: [0.12, -0.94, 0.32] }),
-    },
-  ];
-  const walkArmFrames = times.map((time, index) => [
-    time,
-    solveDirectedLocalRotations(walkArmDirections[index], {
-      localRotations: walkBaseRotations[index],
-    }),
-  ]);
+  const times = [0, 0.15, 0.3, 0.45, 0.52, 0.6, 0.75, 0.9, 1.05, 1.12, 1.2];
+  const walkFrames = times.map((time) => {
+    const phase = time / duration;
+    const rootPosition = [0, walkPelvisBob(phase), rootDistance * phase];
+    const bodyRotations = mapSemanticMotionValues('bodyLean', {
+      root: q(0, 1.5 * Math.cos(Math.PI * 2 * phase), 0),
+      lower: q(1.25, -2 * Math.cos(Math.PI * 2 * phase), 0),
+    });
+    const directions = {
+      ...mapSemanticMotionValues('leftLegStep', createCanonicalWalkLegDirections({
+        side: 'left',
+        phase,
+        rootPosition,
+        rootDistance,
+      })),
+      ...mapSemanticMotionValues('rightLegStep', createCanonicalWalkLegDirections({
+        side: 'right',
+        phase,
+        rootPosition,
+        rootDistance,
+      })),
+      ...createCanonicalWalkArmDirections(phase),
+    };
+    return [
+      time,
+      rootPosition,
+      solveDirectedLocalRotations(directions, { localRotations: bodyRotations }),
+    ];
+  });
   const tracks = [
-    positionTrack(MOTION.body.root, times.map((time, index) => [time, [0, index % 2 ? 0.018 : 0, rootDistance * time / duration]])),
-    rotationTrack(MOTION.body.root, times.map((time, index) => [time, walkBaseRotations[index][MOTION.body.root]])),
-    rotationTrack(MOTION.body.lower, times.map((time, index) => [time, walkBaseRotations[index][MOTION.body.lower]])),
-    rotationTrack(MOTION.leftLeg.upper, [[0, q(-25, 0, 0)], [0.3, q(0, 0, 0)], [0.6, q(25, 0, 0)], [0.9, q(5, 0, 0)], [1.2, q(-25, 0, 0)]]),
-    rotationTrack(MOTION.rightLeg.upper, [[0, q(25, 0, 0)], [0.3, q(5, 0, 0)], [0.6, q(-25, 0, 0)], [0.9, q(0, 0, 0)], [1.2, q(25, 0, 0)]]),
-    rotationTrack(MOTION.leftLeg.lower, [[0, q(8, 0, 0)], [0.3, q(45, 0, 0)], [0.6, q(5, 0, 0)], [0.9, q(15, 0, 0)], [1.2, q(8, 0, 0)]]),
-    rotationTrack(MOTION.rightLeg.lower, [[0, q(5, 0, 0)], [0.3, q(15, 0, 0)], [0.6, q(8, 0, 0)], [0.9, q(45, 0, 0)], [1.2, q(5, 0, 0)]]),
-    rotationTrack(MOTION.leftLeg.foot, [[0, q(8, 0, 0)], [0.3, q(-10, 0, 0)], [0.6, q(-6, 0, 0)], [0.9, q(10, 0, 0)], [1.2, q(8, 0, 0)]]),
-    rotationTrack(MOTION.rightLeg.foot, [[0, q(-6, 0, 0)], [0.3, q(10, 0, 0)], [0.6, q(8, 0, 0)], [0.9, q(-10, 0, 0)], [1.2, q(-6, 0, 0)]]),
-    ...directedRotationTracks(walkArmFrames, [
+    positionTrack(MOTION.body.root, walkFrames.map(([time, position]) => [time, position])),
+    rotationTrack(MOTION.body.root, walkFrames.map(([time, , rotations]) => [time, rotations[MOTION.body.root]])),
+    rotationTrack(MOTION.body.lower, walkFrames.map(([time, , rotations]) => [time, rotations[MOTION.body.lower]])),
+    ...directedRotationTracks(walkFrames.map(([time, , rotations]) => [time, rotations]), [
+      MOTION.leftLeg.upper, MOTION.leftLeg.lower, MOTION.leftLeg.foot, MOTION.leftLeg.toes,
+      MOTION.rightLeg.upper, MOTION.rightLeg.lower, MOTION.rightLeg.foot, MOTION.rightLeg.toes,
       MOTION.leftArm.upper, MOTION.leftArm.lower, MOTION.rightArm.upper, MOTION.rightArm.lower,
     ]),
   ];
@@ -296,9 +285,148 @@ export function createWalkPreset({ compatibleRig = 'rig@0.4.0', rootMotion = fal
       sourceBodyHeight: 1.795672,
       strideLength: rootDistance,
       authoringBasis: ANATOMICAL_MOTION_BASIS,
-      authoringMethod: 'directed-bone-chain',
+      authoringMethod: 'canonical-phase-mirrored-directed-leg-chain',
+      gait: {
+        phases: ['heel_strike', 'loading', 'mid_stance', 'toe_off', 'early_swing', 'mid_swing', 'late_swing'],
+        supportContactEnd: 0.52,
+        mirroredPhaseOffset: 0.6,
+        footTrajectory: 'two-bone-target-with-swing-clearance',
+        rootMotionAxis: '+Z',
+      },
     },
   });
+}
+
+const WALK_CONTACT_END_PHASE = 0.52 / 1.2;
+const WALK_STEP_LEAD = 0.30;
+const WALK_ANKLE_X = 0.16;
+const WALK_ANKLE_Y = 0.15;
+const WALK_SWING_BACK = 0.40;
+const WALK_IN_PLACE_SWING_BACK = 0.70;
+const WALK_SWING_CLEARANCE = 0.075;
+const WALK_UPPER_LEG_LENGTH = Math.hypot(0.01, 0.425, 0.014);
+const WALK_LOWER_LEG_LENGTH = Math.hypot(0.05, 0.4, 0.004);
+
+function createCanonicalWalkLegDirections({ side, phase, rootPosition, rootDistance }) {
+  const sideSign = side === 'right' ? 1 : -1;
+  const phaseOffset = side === 'right' ? 0.5 : 0;
+  const cycle = phase >= 1 - 1e-8 ? 1 : 0;
+  const normalizedPhase = phase - cycle;
+  const sidePhase = wrapUnit(normalizedPhase - phaseOffset);
+  const rawProgress = sidePhase <= WALK_CONTACT_END_PHASE
+    ? 0
+    : clampNumber((sidePhase - WALK_CONTACT_END_PHASE) / (1 - WALK_CONTACT_END_PHASE), 0, 1);
+  const progress = smoothstep(rawProgress);
+  const swingArc = walkSwingArc(rawProgress);
+  const contactAdvance = rootDistance;
+  const contactBase = WALK_STEP_LEAD + phaseOffset * contactAdvance + cycle * contactAdvance;
+  const segmentStart = contactBase - (normalizedPhase < phaseOffset ? contactAdvance : 0);
+  const target = [
+    sideSign * WALK_ANKLE_X,
+    WALK_ANKLE_Y + WALK_SWING_CLEARANCE * Math.sin(Math.PI * progress),
+    segmentStart + contactAdvance * progress
+      - (contactAdvance > 0 ? WALK_SWING_BACK : WALK_IN_PLACE_SWING_BACK) * swingArc,
+  ];
+  const hip = [
+    sideSign * 0.1,
+    0.925 + rootPosition[1],
+    rootPosition[2] + 0.016,
+  ];
+  const knee = solveCanonicalWalkKnee(hip, target, sideSign);
+  const upper = normalizeVector(subtractVector(knee, hip));
+  const lower = normalizeVector(subtractVector(target, knee));
+  const foot = normalizeVector([sideSign * 0.13, -0.53, 1]);
+  const toes = normalizeVector([0, -0.05, 1]);
+  return { upper, lower, foot, toes };
+}
+
+function solveCanonicalWalkKnee(hip, ankle, sideSign) {
+  const toAnkle = subtractVector(ankle, hip);
+  const rawDistance = vectorLength(toAnkle);
+  const maximum = WALK_UPPER_LEG_LENGTH + WALK_LOWER_LEG_LENGTH - 1e-5;
+  const minimum = Math.abs(WALK_UPPER_LEG_LENGTH - WALK_LOWER_LEG_LENGTH) + 1e-5;
+  const solvedDistance = clampNumber(rawDistance, minimum, maximum);
+  const direction = normalizeVector(toAnkle);
+  const projected = subtractVector([0, 0, 1], scaleVector(direction, dotVector([0, 0, 1], direction)));
+  const fallback = normalizeVector(crossVector([sideSign, 0, 0], direction));
+  const bendDirection = vectorLength(projected) > 1e-5 ? normalizeVector(projected) : fallback;
+  const along = (WALK_UPPER_LEG_LENGTH ** 2 - WALK_LOWER_LEG_LENGTH ** 2 + solvedDistance ** 2)
+    / (2 * solvedDistance);
+  const perpendicular = Math.sqrt(Math.max(0, WALK_UPPER_LEG_LENGTH ** 2 - along ** 2));
+  return addVector(
+    addVector(hip, scaleVector(direction, along)),
+    scaleVector(bendDirection, perpendicular),
+  );
+}
+
+function createCanonicalWalkArmDirections(phase) {
+  const swing = -0.42 * Math.cos(Math.PI * 2 * phase);
+  return {
+    ...mapSemanticMotionValues('leftArmSwing', {
+      upper: [-0.23, -0.90, swing],
+      lower: [-0.12, -0.95, swing * 0.76],
+    }),
+    ...mapSemanticMotionValues('rightArmSwing', {
+      upper: [0.23, -0.90, -swing],
+      lower: [0.12, -0.95, -swing * 0.76],
+    }),
+  };
+}
+
+function walkPelvisBob(phase) {
+  return 0.014 * Math.sin(Math.PI * 2 * phase);
+}
+
+function wrapUnit(value) {
+  const wrapped = value % 1;
+  return wrapped < 0 ? wrapped + 1 : wrapped;
+}
+
+function smoothstep(value) {
+  const t = clampNumber(value, 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function walkSwingArc(progress) {
+  if (progress <= 0 || progress >= 1) return 0;
+  return Math.sin(Math.PI * smoothstep(Math.sqrt(progress)));
+}
+
+function subtractVector(a, b) {
+  return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+}
+
+function addVector(a, b) {
+  return [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+}
+
+function scaleVector(value, scale) {
+  return [value[0] * scale, value[1] * scale, value[2] * scale];
+}
+
+function dotVector(a, b) {
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+function crossVector(a, b) {
+  return [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+}
+
+function vectorLength(value) {
+  return Math.hypot(value[0], value[1], value[2]);
+}
+
+function normalizeVector(value) {
+  const length = vectorLength(value);
+  return length > 1e-8 ? scaleVector(value, 1 / length) : [0, -1, 0];
+}
+
+function clampNumber(value, min, max) {
+  return Math.min(max, Math.max(min, Number(value) || 0));
 }
 
 export function createDefaultAnimationGraph() {
