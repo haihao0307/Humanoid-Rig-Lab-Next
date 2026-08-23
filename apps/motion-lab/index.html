@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Humanoid Motion Lab V3</title>
+  <link rel="stylesheet" href="./motion-lab.css">
+</head>
+<body>
+  <aside class="controls">
+    <p class="eyebrow">HUMAN MOTION / DEV TOOL</p>
+    <h1>Motion Lab V3</h1>
+    <p class="summary">本地 WholeBodyMotionSolver 验证页，不连接 ProjectState 或 SharedWorker。</p>
+    <section>
+      <h2>动作</h2>
+      <div class="button-grid" id="actions">
+        <button data-action="idle">Idle</button>
+        <button data-action="walk-forward">Walk Forward</button>
+        <button data-action="walk-backward">Walk Backward</button>
+        <button data-action="turn-left">Turn Left</button>
+        <button data-action="turn-right">Turn Right</button>
+        <button data-action="stop">Stop</button>
+        <button data-action="reach-left">Reach Left</button>
+        <button data-action="reach-right">Reach Right</button>
+        <button data-action="look-left">Look Left</button>
+        <button data-action="look-right">Look Right</button>
+      </div>
+    </section>
+    <section>
+      <h2>参数</h2>
+      <label>速度 <output id="speed-value">0.75</output><input id="speed" type="range" min="0" max="1.6" step="0.05" value="0.75"></label>
+      <label>方向角 <output id="direction-value">0°</output><input id="direction" type="range" min="-180" max="180" step="5" value="0"></label>
+      <label>目标 X <output id="target-x-value">0.55</output><input id="target-x" type="range" min="-0.9" max="0.9" step="0.05" value="0.55"></label>
+      <label>目标 Y <output id="target-y-value">1.20</output><input id="target-y" type="range" min="0.45" max="2.0" step="0.05" value="1.20"></label>
+      <label>目标 Z <output id="target-z-value">0.50</output><input id="target-z" type="range" min="-0.5" max="1.2" step="0.05" value="0.50"></label>
+      <label>步幅 <output id="stride-value">1.00</output><input id="stride" type="range" min="0.6" max="1.4" step="0.05" value="1"></label>
+      <label>步宽 <output id="width-value">0.19</output><input id="width" type="range" min="0.12" max="0.30" step="0.01" value="0.19"></label>
+      <label>能量 <output id="energy-value">0.60</output><input id="energy" type="range" min="0" max="1" step="0.05" value="0.6"></label>
+    </section>
+  </aside>
+  <main>
+    <div class="status"><span class="dot"></span><span id="mode">idle</span><span id="goal-id">goal_maintain_pose</span></div>
+    <canvas id="viewport"></canvas>
+    <div class="legend"><span>● COM</span><span>◆ Contact</span><span>— Support polygon</span></div>
+  </main>
+  <aside class="diagnostics">
+    <p class="eyebrow">SOLVER FRAME</p>
+    <h2>实时诊断</h2>
+    <pre id="diagnostics"></pre>
+    <h2>当前 Goal</h2>
+    <pre id="goal"></pre>
+  </aside>
+  <script type="module" src="./motion-lab.js"></script>
+</body>
+</html>

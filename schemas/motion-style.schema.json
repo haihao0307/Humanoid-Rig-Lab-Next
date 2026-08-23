@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/motion_style@1.0",
+  "title": "MotionStyle",
+  "type": "object",
+  "required": ["schema", "energy", "precision", "stiffness", "amplitude", "tempo", "weight", "fatigue", "alertness"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/motion_style@1.0" },
+    "energy": { "$ref": "#/$defs/unit" },
+    "precision": { "$ref": "#/$defs/unit" },
+    "stiffness": { "$ref": "#/$defs/unit" },
+    "amplitude": { "$ref": "#/$defs/unit" },
+    "tempo": { "type": "number", "minimum": 0.25, "maximum": 2 },
+    "weight": { "$ref": "#/$defs/unit" },
+    "fatigue": { "$ref": "#/$defs/unit" },
+    "alertness": { "$ref": "#/$defs/unit" }
+  },
+  "$defs": {
+    "unit": { "type": "number", "minimum": 0, "maximum": 1 }
+  },
+  "additionalProperties": false
+}

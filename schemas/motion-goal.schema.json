@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/motion_goal@1.0",
+  "title": "MotionGoal",
+  "type": "object",
+  "required": ["schema", "goalId", "goalRevision", "compatibleRig", "source", "createdAt", "root", "orientation", "endEffectors", "contacts", "balance", "posture", "timing", "style", "constraints", "priorities", "metadata"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/motion_goal@1.0" },
+    "goalId": { "type": "string", "minLength": 1 },
+    "goalRevision": { "type": "integer", "minimum": 1 },
+    "compatibleRig": { "type": "string", "minLength": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "space": { "enum": ["world", "character"] },
+    "root": {
+      "type": "object",
+      "required": ["mode", "targetPosition", "targetRotation"],
+      "properties": {
+        "mode": { "enum": ["maintain", "position", "trajectory"] },
+        "targetPosition": { "$ref": "#/$defs/nullableVector3" },
+        "targetRotation": { "$ref": "#/$defs/nullableQuaternion" }
+      },
+      "additionalProperties": false
+    },
+    "orientation": {
+      "type": "object",
+      "required": ["forward", "up"],
+      "properties": {
+        "forward": { "$ref": "#/$defs/vector3" },
+        "up": { "$ref": "#/$defs/vector3" }
+      },
+      "additionalProperties": false
+    },
+    "trajectory": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["points"],
+          "properties": {
+            "points": { "type": "array", "items": { "$ref": "#/$defs/vector3" } },
+            "loop": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "endEffectors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "jointId", "targetPosition", "targetRotation", "positionWeight", "rotationWeight", "poleTarget", "priority"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "jointId": { "type": "string", "minLength": 1 },
+          "targetPosition": { "$ref": "#/$defs/vector3" },
+          "targetRotation": { "$ref": "#/$defs/nullableQuaternion" },
+          "positionWeight": { "$ref": "#/$defs/unit" },
+          "rotationWeight": { "$ref": "#/$defs/unit" },
+          "poleTarget": { "$ref": "#/$defs/nullableVector3" },
+          "priority": { "type": "number" },
+          "shoulderParticipation": { "$ref": "#/$defs/unit" },
+          "spineParticipation": { "$ref": "#/$defs/unit" },
+          "groundNormal": { "$ref": "#/$defs/nullableVector3" },
+          "contactPhase": { "$ref": "#/$defs/unit" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "contacts": { "type": "array", "items": { "$ref": "motion-contact.schema.json" } },
+    "gaze": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["targetPosition", "headWeight", "neckWeight", "chestWeight", "eyeWeight", "priority"],
+          "properties": {
+            "targetPosition": { "$ref": "#/$defs/vector3" },
+            "headWeight": { "$ref": "#/$defs/unit" },
+            "neckWeight": { "$ref": "#/$defs/unit" },
+            "chestWeight": { "$ref": "#/$defs/unit" },
+            "eyeWeight": { "$ref": "#/$defs/unit" },
+            "priority": { "type": "number" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "balance": {
+      "type": "object",
+      "required": ["enabled", "mode", "centerOfMassTarget", "supportMargin", "priority"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "mode": { "enum": ["double_support", "left_support", "right_support", "hand_support", "seated", "airborne"] },
+        "centerOfMassTarget": { "$ref": "#/$defs/nullableVector3" },
+        "supportMargin": { "type": "number", "minimum": 0 },
+        "priority": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "posture": {
+      "type": "object",
+      "required": ["pelvisHeight", "torsoLean", "spineTwist", "symmetryWeight"],
+      "properties": {
+        "pelvisHeight": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+        "torsoLean": { "type": "number" },
+        "spineTwist": { "type": "number" },
+        "symmetryWeight": { "$ref": "#/$defs/unit" }
+      },
+      "additionalProperties": false
+    },
+    "timing": {
+      "type": "object",
+      "required": ["duration", "elapsed", "phase"],
+      "properties": {
+        "duration": { "type": "number", "exclusiveMinimum": 0 },
+        "elapsed": { "type": "number", "minimum": 0 },
+        "phase": { "$ref": "#/$defs/unit" }
+      },
+      "additionalProperties": false
+    },
+    "style": { "$ref": "motion-style.schema.json" },
+    "constraints": {
+      "type": "object",
+      "required": ["fixedBoneLengths", "jointLimits", "groundContact", "selfCollision"],
+      "properties": {
+        "fixedBoneLengths": { "const": true },
+        "jointLimits": { "type": "boolean" },
+        "groundContact": { "type": "boolean" },
+        "selfCollision": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "priorities": {
+      "type": "object",
+      "required": ["contact", "balance", "endEffector", "gaze", "posture"],
+      "properties": {
+        "contact": { "type": "number" },
+        "balance": { "type": "number" },
+        "endEffector": { "type": "number" },
+        "gaze": { "type": "number" },
+        "posture": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "metadata": { "type": "object" }
+  },
+  "$defs": {
+    "unit": { "type": "number", "minimum": 0, "maximum": 1 },
+    "vector3": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+    "quaternion": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+    "nullableVector3": { "anyOf": [{ "$ref": "#/$defs/vector3" }, { "type": "null" }] },
+    "nullableQuaternion": { "anyOf": [{ "$ref": "#/$defs/quaternion" }, { "type": "null" }] }
+  },
+  "additionalProperties": false
+}

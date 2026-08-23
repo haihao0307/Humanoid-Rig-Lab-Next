@@ -1,0 +1,23 @@
+/** Approximate segment masses. Values are relative and normalized by the COM estimator. */
+export const HUMAN_SEGMENT_MASS_WEIGHTS = Object.freeze({
+  hips: 0.18,
+  spine: 0.10,
+  chest: 0.13,
+  upperChest: 0.09,
+  neck: 0.02,
+  head: 0.08,
+  leftShoulder: 0.015,
+  rightShoulder: 0.015,
+  leftUpperArm: 0.028,
+  rightUpperArm: 0.028,
+  leftLowerArm: 0.018,
+  rightLowerArm: 0.018,
+  leftHand: 0.008,
+  rightHand: 0.008,
+  leftUpperLeg: 0.085,
+  rightUpperLeg: 0.085,
+  leftLowerLeg: 0.045,
+  rightLowerLeg: 0.045,
+  leftFoot: 0.014,
+  rightFoot: 0.014,
+});

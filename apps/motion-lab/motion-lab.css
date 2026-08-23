@@ -1,0 +1,25 @@
+:root { color-scheme: dark; font: 14px/1.45 Inter, ui-sans-serif, system-ui, sans-serif; background: #020711; color: #e7f0ff; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; display: grid; grid-template-columns: 300px minmax(480px, 1fr) 330px; overflow: hidden; }
+aside { height: 100vh; overflow: auto; padding: 24px; background: #07111f; border-color: #1b2c42; }
+.controls { border-right: 1px solid #1b2c42; }
+.diagnostics { border-left: 1px solid #1b2c42; }
+h1 { margin: 4px 0 6px; font-size: 25px; }
+h2 { margin: 18px 0 10px; font-size: 15px; }
+.eyebrow { margin: 0; color: #6f91b9; font-size: 11px; font-weight: 800; letter-spacing: .16em; }
+.summary { color: #92a7c2; }
+section { padding-top: 4px; border-top: 1px solid #13253a; }
+.button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+button { min-height: 38px; border: 1px solid #25405f; border-radius: 8px; background: #0c1a2b; color: #dceaff; cursor: pointer; }
+button:hover, button.active { background: #123659; border-color: #48b8ff; }
+label { display: grid; grid-template-columns: 1fr auto; gap: 5px 10px; margin: 12px 0; color: #b9cae0; }
+input { grid-column: 1 / -1; accent-color: #42c5ff; }
+output { color: #58d5ff; font-variant-numeric: tabular-nums; }
+main { position: relative; min-width: 0; background: radial-gradient(circle at 50% 45%, #08172b, #020711 70%); }
+canvas { display: block; width: 100%; height: 100vh; }
+.status, .legend { position: absolute; z-index: 2; display: flex; gap: 12px; padding: 8px 12px; border: 1px solid #1d3957; border-radius: 999px; background: #07111fd9; color: #a9bdd5; }
+.status { top: 16px; left: 16px; }
+.legend { bottom: 16px; left: 50%; transform: translateX(-50%); }
+.dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: #54e5ae; box-shadow: 0 0 12px #54e5ae; }
+pre { max-height: 36vh; overflow: auto; padding: 12px; border: 1px solid #19314c; border-radius: 8px; background: #030a14; color: #8dd7ff; font: 11px/1.5 ui-monospace, monospace; white-space: pre-wrap; }
+@media (max-width: 1000px) { body { grid-template-columns: 260px 1fr; } .diagnostics { display: none; } }
