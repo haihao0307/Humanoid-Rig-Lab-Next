@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanoid-rig-lab-next.local/schemas/motion-skill.schema.json",
+  "title": "MotionSkill",
+  "type": "object",
+  "required": [
+    "skillId",
+    "aliases",
+    "mode",
+    "requiredChains",
+    "parameters",
+    "compiler",
+    "defaultDuration",
+    "mirrorSupport",
+    "contactPolicy",
+    "rootMotionPolicy"
+  ],
+  "properties": {
+    "skillId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
+    "aliases": { "type": "array", "items": { "type": "string" } },
+    "mode": { "enum": ["clip", "procedural_pose", "procedural_motion", "composite"] },
+    "requiredChains": { "type": "array", "items": { "type": "string" } },
+    "parameters": { "type": "object", "additionalProperties": true },
+    "compiler": { "type": "string" },
+    "defaultDuration": { "type": "number", "exclusiveMinimum": 0 },
+    "mirrorSupport": { "type": "boolean" },
+    "contactPolicy": { "enum": ["preserve", "ignore", "generate"] },
+    "rootMotionPolicy": { "enum": ["in_place", "root_motion"] },
+    "sourceClipId": { "type": ["string", "null"] },
+    "layer": { "type": "string" }
+  },
+  "additionalProperties": true
+}

@@ -49,6 +49,11 @@ import {
 import { evaluateAnimationGraph } from './graph.js';
 import { bakeAnimationSessionToMotionClip } from './bake.js';
 import { exportAnimationSkeletonGlb } from './glb.js';
+import {
+  bindTextMotionPanel,
+  renderTextMotionPanel,
+  syncTextMotionPanelDom,
+} from './text-motion/panel.js';
 
 const HOST_PROTOCOL = 'humanoid-rig-lab-next:viewport';
 const MODULE_VERSION = 'anim@0.4.0';
@@ -75,6 +80,7 @@ export function renderControls(context, state) {
     && controlsRoot.querySelector('#clipSelect');
   if (controlsMounted) {
     syncAnimationControlsDom(context, animation, activeClip);
+    syncTextMotionPanelDom(context, animation);
     syncPlaybackLoop(context, animation);
     queueMicrotask(() => previewAtTime(context, animation, currentTime, { rawTime }));
     return;
@@ -147,7 +153,8 @@ export function renderControls(context, state) {
         <div><span>片段校验</span><b class="${validation.valid ? 'success-text' : 'warning-text'}">${validation.valid ? '通过' : `${validation.errors.length} 项错误`}</b></div>
         <div><span>原始播放时间</span><b>${Number(rawTime).toFixed(3)} s</b></div>
       </div>
-      <p class="control-note">${escapeHtml(validation.errors[0] || validation.warnings[0] || '局部旋转、根节点通道、事件、接触和 PoseSnapshot 引用均通过协议检查。')}</p>`);
+      <p class="control-note">${escapeHtml(validation.errors[0] || validation.warnings[0] || '局部旋转、根节点通道、事件、接触和 PoseSnapshot 引用均通过协议检查。')}</p>`) +
+    renderTextMotionPanel(state);
 
   setSelectValue('#clipSelect', activeClip.clipId);
   setSelectValue('#clipLoopMode', activeClip.loopMode);
@@ -159,6 +166,16 @@ export function renderControls(context, state) {
   bindRuntimeControls(context);
   bindLayerAndGraphControls(context);
   bindEditingAndAssetControls(context);
+  bindTextMotionPanel(context, {
+    onPreview: (result) => previewGeneratedTextMotion(context, result),
+    onStop: () => {
+      resetRuntimeCache();
+      context.hub.publishTransient('motion.text.preview.stop', {}, {
+        resource: 'motion:text-preview',
+        syncGroup: 'animation-editor-default',
+      });
+    },
+  });
   controlsRoot.dataset.animationControlsMounted = 'true';
   const clipSelect = controlsRoot.querySelector('#clipSelect');
   if (clipSelect) clipSelect.dataset.optionsKey = animationClipOptionsKey(animation);
@@ -752,6 +769,7 @@ function syncAnimationControlsDom(context, animation, activeClip) {
   if (graphStatus) {
     graphStatus.textContent = graphStatusText(animation);
   }
+  syncTextMotionPanelDom(context, animation);
 }
 
 function graphStatusText(animation) {
@@ -948,6 +966,23 @@ function previewAtTime(context, animationInput, time, {
     return;
   }
   if (status) status.textContent = runtimeStatus(clip, time);
+}
+
+function previewGeneratedTextMotion(context, result) {
+  if (!result?.clip) return;
+  const state = context.getState();
+  const animation = replaceClip(normalizeForState(state), result.clip);
+  resetRuntimeCache({ preserveEventTime: true });
+  previewAtTime(context, animation, 0, { rawTime: 0, deltaTime: 1 / 30 });
+  context.hub.publishTransient('motion.text.preview', {
+    clipId: result.clip.clipId,
+    intentId: result.intent?.intentId || null,
+    planId: result.plan?.planId || null,
+    status: result.status,
+  }, {
+    resource: `motion_clip:${result.clip.clipId}`,
+    syncGroup: 'animation-editor-default',
+  });
 }
 
 function postPosePreview(context, v8Payload, localPose = null) {
