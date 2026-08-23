@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanoid-rig-lab-next.local/schemas/action-plan.schema.json",
+  "title": "ActionPlan",
+  "type": "object",
+  "required": [
+    "schema",
+    "planId",
+    "sourceIntentId",
+    "coordinateSystem",
+    "steps",
+    "parallelGroups",
+    "requiredSkills",
+    "requiredChains",
+    "estimatedDuration",
+    "rootMotionPolicy",
+    "contactPolicy",
+    "unresolvedTargets",
+    "warnings"
+  ],
+  "properties": {
+    "schema": { "const": "humanoid_rig/action_plan@1.0" },
+    "planId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
+    "sourceIntentId": { "type": "string" },
+    "status": { "enum": ["ready", "unsupported", "empty"] },
+    "coordinateSystem": {
+      "type": "object",
+      "required": ["handedness", "upAxis", "forwardAxis", "rightAxis"],
+      "properties": {
+        "handedness": { "const": "right" },
+        "upAxis": { "const": "+Y" },
+        "forwardAxis": { "const": "+Z" },
+        "rightAxis": { "const": "+X" }
+      },
+      "additionalProperties": false
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stepId", "skillId", "mode", "parameters", "startAfter", "blendIn", "blendOut", "layer", "requiredChains"],
+        "properties": {
+          "stepId": { "type": "string" },
+          "actionId": { "type": ["string", "null"] },
+          "skillId": { "type": "string" },
+          "mode": { "enum": ["clip", "procedural_pose", "procedural_motion", "composite"] },
+          "parameters": { "type": "object", "additionalProperties": true },
+          "startAfter": { "type": "array", "items": { "type": "string" } },
+          "startTime": { "type": "number", "minimum": 0 },
+          "duration": { "type": "number", "exclusiveMinimum": 0 },
+          "blendIn": { "type": "number", "minimum": 0 },
+          "blendOut": { "type": "number", "minimum": 0 },
+          "layer": { "type": "string" },
+          "requiredChains": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "parallelGroups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["groupId", "actionIds"],
+        "properties": {
+          "groupId": { "type": "string" },
+          "actionIds": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "requiredSkills": { "type": "array", "items": { "type": "string" } },
+    "requiredChains": { "type": "array", "items": { "type": "string" } },
+    "estimatedDuration": { "type": "number", "minimum": 0 },
+    "rootMotionPolicy": { "enum": ["in_place", "root_motion"] },
+    "contactPolicy": { "enum": ["preserve", "ignore", "generate"] },
+    "unresolvedTargets": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "missingSkills": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}
