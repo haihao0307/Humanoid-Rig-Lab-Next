@@ -1,0 +1,35 @@
+{
+  "schema": "humanoid_rig/locomotion_diagnostic@1.0",
+  "clipId": "walk-forward",
+  "sampleCount": 121,
+  "phaseOppositionSignal": "left/right foot forward position relative to translating root",
+  "metrics": {
+    "leftLegAngularRange": 0.6292003298,
+    "rightLegAngularRange": 0.5596422227,
+    "leftLowerLegAngularRange": 1.0829411245,
+    "rightLowerLegAngularRange": 0.9552315243,
+    "leftFootTravel": 1.2930585482,
+    "rightFootTravel": 1.2941047250,
+    "leftSwingClearance": 0.0721631131,
+    "rightSwingClearance": 0.0721631131,
+    "phaseOpposition": 0.7835277946,
+    "maxSimultaneousContacts": 1,
+    "rootForwardDistance": 0.72,
+    "rootBackwardFrameCount": 0,
+    "leftKneeFlexionRange": 1.1557532505,
+    "rightKneeFlexionRange": 1.0269511417,
+    "leftFootForwardDotMinimum": 0.8757497916,
+    "rightFootForwardDotMinimum": 0.8747367016,
+    "maxAnimationToFinalPositionAdjustment": 0.0219000927,
+    "maxFinalToPayloadPositionError": 0,
+    "maxPayloadToPhysicsPositionError": 0,
+    "maxPayloadToDefinitionPositionError": 0,
+    "maxIncomingToSnapshotRotationError": 4.2146848511e-8,
+    "maxRawToFinalRotationChange": 0.1032009394
+  },
+  "checkpointCount": 9,
+  "notes": [
+    "The authored lower-body FK now tracks the planted foot closely, so the runtime contact layer makes only a small correction.",
+    "The V8 PoseSnapshot bridge and the definition consumed by three-view/smpl-skin remain numerically identical to final FK for all sampled leg joints."
+  ]
+}

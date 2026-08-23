@@ -968,7 +968,7 @@ function postPosePreview(context, v8Payload, localPose = null) {
   }, window.location.origin);
 }
 
-function buildAnimationPoseSnapshot(localPose, state, v8Payload) {
+export function buildAnimationPoseSnapshot(localPose, state, v8Payload) {
   const updatedAt = v8Payload?.updatedAt || new Date().toISOString();
   return {
     schema: 'humanoid_rig/pose_snapshot@1.0',
