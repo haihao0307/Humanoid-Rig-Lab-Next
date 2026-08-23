@@ -122,6 +122,8 @@ humanoid_rig/pose_snapshot@1.0
 
 三维视口优先读取稳定关节 ID 对应的局部四元数、根节点变换、IK 目标、固定点和约束。旧 V8 世界坐标载荷继续作为兼容回退。
 
+Human Motion Canonical Foundation V3 将 Pose 与 Animation 的正式事实链统一为 `outgoing joint-local rotation → shared FK → incoming bone bind delta → PoseSnapshot → PhysicsRig`。A Pose、T Pose、Reach 和 Step 不再以二维/世界坐标作为三维姿势权威；旧世界坐标读取仍保留并明确标记为有损。坐标、旋转语义、Core/Performance 边界及后续 Motion Solver 公共接口见 `docs/HUMAN_MOTION_CANONICAL_FOUNDATION_V3.md`。
+
 ### 动画系统
 
 动画模块已经从关键帧草案扩展为可运行的纵向闭环，包含：

@@ -49,6 +49,7 @@ import {
 import { evaluateAnimationGraph } from './graph.js';
 import { bakeAnimationSessionToMotionClip } from './bake.js';
 import { exportAnimationSkeletonGlb } from './glb.js';
+import { buildCanonicalPoseSnapshot } from '../../human-motion/kinematic-contract.js';
 import {
   bindTextMotionPanel,
   renderTextMotionPanel,
@@ -1005,41 +1006,18 @@ function postPosePreview(context, v8Payload, localPose = null) {
 
 export function buildAnimationPoseSnapshot(localPose, state, v8Payload) {
   const updatedAt = v8Payload?.updatedAt || new Date().toISOString();
-  return {
-    schema: 'humanoid_rig/pose_snapshot@1.0',
-    schemaVersion: 1,
-    type: 'PoseSnapshot',
-    compatibleRig: state.activeVersions.rig,
-    solverVersion: 'animation-runtime@0.4.0',
+  const rig = createRigContext(state?.character?.bodyProfile || {}, {
+    rigVersion: state?.activeVersions?.rig || localPose?.compatibleRig || 'rig@0.4.0',
+  });
+  const snapshot = buildCanonicalPoseSnapshot(localPose, rig, {
     name: 'Animation Preview',
-    unit: 'meter',
-    coordinateSystem: {
-      handedness: 'right',
-      upAxis: '+Y',
-      forwardAxis: '+Z',
-      rightAxis: '+X',
-    },
+    solverVersion: 'animation-runtime@0.4.0',
     source: 'animation-runtime-v0.4',
-    sourceRepresentation: 'local_quaternion_animation',
-    rotationSpace: 'local',
-    rotationConvention: v8Payload?.rotationConventions?.incomingBoneLocalRotations
-      ?? 'incoming_bone_bind_delta_full_quaternion',
-    rootJointId: 'hips',
-    rootTranslation: [...localPose.root.position],
-    rootRotation: [...localPose.root.rotation],
-    localRotations: structuredClone(v8Payload?.incomingBoneLocalRotations ?? {}),
-    ikTargets: [],
-    pinnedJoints: {},
-    diagnostics: {
-      rotationDataCompleteness: 'full_quaternion',
-      twistDataAvailable: true,
-      jointAxisAdapterRequiredForStandardAnimation: false,
-      lossyRotationConversion: false,
-      warningCodes: [],
-    },
+    sourceRepresentation: 'outgoing_local_quaternion_fk',
     updatedAt,
-    sourceLegacyUpdatedAt: updatedAt,
-  };
+  });
+  snapshot.sourceLegacyUpdatedAt = updatedAt;
+  return snapshot;
 }
 
 function resetRuntimeCache({ preserveEventTime = false } = {}) {

@@ -9,6 +9,7 @@ import {
 } from '../../workspace-common.js';
 import { downloadJson } from '../../project-hub.js';
 import { renderImagePosePanel } from './image-pose-controller.js';
+import { createCanonicalPosePreset } from '../../human-motion/canonical-pose-builder.js';
 import {
   buildPoseModuleData,
   buildStandalonePoseExport,
@@ -45,15 +46,17 @@ export function renderControls(context, state) {
 
   document.querySelectorAll('[data-pose]').forEach((button) => button.addEventListener('click', () => {
     const preset = posePreset(button.dataset.pose);
+    const current = context.getState();
+    const canonical = buildCanonicalPresetForState(button.dataset.pose, current);
     context.hub.transaction((next) => {
       next.character.pose.joints = preset.joints;
-      next.character.pose.name = preset.label;
-      next.character.pose.v8Payload = null;
-      next.character.pose.poseSnapshot = null;
+      next.character.pose.name = canonical.name;
+      next.character.pose.v8Payload = structuredClone(canonical.v8Payload);
+      next.character.pose.poseSnapshot = structuredClone(canonical.poseSnapshot);
       next.character.pose.imagePoseAssetId = null;
       next.modules.pose.status = 'developing';
       next.modules.pose.statusLabel = '功能开发';
-    }, { module: 'pose', summary: `应用动作预设 ${preset.label}` });
+    }, { module: 'pose', summary: `应用 canonical 动作预设 ${canonical.name}` });
   }));
 
   bindNumericRange({ id: 'bodyCouplingControl', hub: context.hub, path: 'character.physics.bodyCoupling', module: 'pose', label: '全身联动' });
@@ -114,6 +117,14 @@ export function posePreset(name) {
     joints.leftElbow = { x: -.22, y: .64 }; joints.rightElbow = { x: .29, y: .71 };
   }
   return { joints, label: name === 'a' ? 'A Pose' : name === 't' ? 'T Pose' : name === 'reach' ? 'Reach Left' : 'Step Pose' };
+}
+
+export function buildCanonicalPresetForState(name, state) {
+  return createCanonicalPosePreset(name, {
+    bodyProfile: state?.character?.bodyProfile || {},
+    rigVersion: state?.activeVersions?.rig || 'rig@0.4.0',
+    pinnedJoints: normalizePinnedJointIds(state?.character?.pose?.pinned),
+  });
 }
 
 export function exportData(state) {

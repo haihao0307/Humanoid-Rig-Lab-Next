@@ -5,13 +5,20 @@ import {
   getBoneLength,
   markPoseModified,
 } from './skeleton-model.js';
+import {
+  HUMAN_COORDINATE_SYSTEM,
+  INCOMING_ROTATION_CONVENTION_FULL,
+  INCOMING_ROTATION_CONVENTION_ZERO_TWIST,
+  createHumanKinematicContext,
+  reconstructIncomingBoneWorldPose,
+} from '../../../src/human-motion/kinematic-contract.js';
 
 const EPSILON = 1e-10;
 const LENGTH_TOLERANCE = 1e-8;
 const GROUND_TOLERANCE = 1e-8;
 const POSE_SNAPSHOT_SCHEMA = 'humanoid_rig/pose_snapshot@1.0';
-const POSE_ROTATION_CONVENTION = 'incoming_bone_bind_delta_zero_twist';
-const POSE_ROTATION_CONVENTION_FULL = 'incoming_bone_bind_delta_full_quaternion';
+const POSE_ROTATION_CONVENTION = INCOMING_ROTATION_CONVENTION_ZERO_TWIST;
+const POSE_ROTATION_CONVENTION_FULL = INCOMING_ROTATION_CONVENTION_FULL;
 const SUPPORTED_POSE_ROTATION_CONVENTIONS = new Set([
   POSE_ROTATION_CONVENTION,
   POSE_ROTATION_CONVENTION_FULL,
@@ -81,6 +88,10 @@ export class PhysicsRig {
 
   setDefinition(definition, { preservePose = true } = {}) {
     this.definition = definition;
+    this.kinematicContext = createHumanKinematicContext({}, {
+      definition,
+      rigVersion: definition?.rigProfile?.compatibleRig ?? definition?.rigVersion ?? 'rig@0.4.0',
+    });
     this.ids = definition.joints.map((joint) => joint.id);
     this.indexById = new Map(this.ids.map((id, index) => [id, index]));
 
@@ -809,7 +820,12 @@ export class PhysicsRig {
       updatedAt: new Date().toISOString(),
     };
 
-    const reconstructed = reconstructPoseSnapshot(this.definition, rest, snapshot);
+    const reconstructed = reconstructPoseSnapshot(
+      this.definition,
+      rest,
+      snapshot,
+      this.kinematicContext,
+    );
     let maximumReconstructionError = 0;
     let totalReconstructionError = 0;
     let reconstructionCount = 0;
@@ -868,7 +884,12 @@ export class PhysicsRig {
     }
 
     const rest = computeRestWorldPositions(this.definition);
-    const reconstructed = reconstructPoseSnapshot(this.definition, rest, snapshot);
+    const reconstructed = reconstructPoseSnapshot(
+      this.definition,
+      rest,
+      snapshot,
+      this.kinematicContext,
+    );
     let applied = 0;
     for (let index = 0; index < this.ids.length; index += 1) {
       const point = reconstructed.get(this.ids[index]);
@@ -880,6 +901,10 @@ export class PhysicsRig {
     if (applied === 0) {
       throw new Error('PoseSnapshot does not match the current rig.');
     }
+    // Canonical snapshots carry physical bones only. Refresh control, twist,
+    // corrective and contact helpers before measuring constraints so stale
+    // helper positions cannot trigger an unnecessary full-body projection.
+    this.syncControlNodes();
 
     if (this.biomechanics) {
       const restFrame = computePelvisFrame(rest, { x: 0, y: 0, z: 1 });
@@ -892,13 +917,27 @@ export class PhysicsRig {
     this.pinnedTargets.clear();
     for (const joint of this.definition.joints) joint.pinned = false;
 
-    // Reconcile the quaternion pose before restoring supports. A source pose can
-    // contain tiny residual projection errors, and imposing two exact world
-    // targets during that reconciliation can push an extreme pose into a
-    // different solver basin. The default import pins each requested joint at
-    // its nearest valid reconstructed position. Exact source targets remain an
-    // explicit opt-in for workflows that require them.
-    if (project) {
+    const preProjectionBoneErrorM = this.getMaxBoneError();
+    const preProjectionGroundPenetrationM = this.options.groundEnabled
+      ? this.getMaxGroundPenetration()
+      : 0;
+    const isLosslessCanonical = snapshot.rotationConvention === POSE_ROTATION_CONVENTION_FULL
+      && snapshot.diagnostics?.lossyRotationConversion !== true
+      && snapshot.sourceRepresentation !== 'world_position_pbd';
+    const exactCanonicalPose = isLosslessCanonical
+      && preProjectionBoneErrorM <= this.options.exactTolerance
+      && preProjectionGroundPenetrationM <= GROUND_TOLERANCE;
+    const shouldProject = Boolean(project) && !exactCanonicalPose;
+
+    // Reconcile lossy or structurally invalid input before restoring supports.
+    // A full canonical quaternion snapshot reconstructs bind lengths exactly,
+    // so repeating the high-iteration PBD pass would only risk changing its
+    // authored shoulder, hand and foot targets. Lossy sources can contain tiny
+    // residual projection errors, and imposing two exact world targets during
+    // reconciliation can push an extreme pose into a different solver basin.
+    // The default import pins each requested joint at its nearest valid
+    // reconstructed position. Exact source targets remain an explicit opt-in.
+    if (shouldProject) {
       this.projectPrimaryExact({
         tolerance: this.options.exactTolerance,
         maxPasses: this.options.exactMaxPasses,
@@ -919,7 +958,7 @@ export class PhysicsRig {
       this.pinnedTargets.set(index, clonePoint(target));
       appliedPins += 1;
     }
-    if (project && preservePinTargets && appliedPins > 0) {
+    if (shouldProject && preservePinTargets && appliedPins > 0) {
       this.projectPrimaryExact({
         tolerance: this.options.exactTolerance,
         maxPasses: this.options.exactMaxPasses,
@@ -932,6 +971,21 @@ export class PhysicsRig {
       appliedPins,
       preservePinTargets: Boolean(preservePinTargets),
       maximumPinRemapErrorM: maximumPinRemapError,
+      coordinateSystem: { ...HUMAN_COORDINATE_SYSTEM },
+      rotationConvention: snapshot.rotationConvention,
+      sourceRepresentation: String(snapshot.sourceRepresentation || 'unknown'),
+      lossless: isLosslessCanonical,
+      lossyWorldReconstructionUsed: snapshot.sourceRepresentation === 'world_position_pbd'
+        || snapshot.diagnostics?.lossyRotationConversion === true,
+      projectionRequested: Boolean(project),
+      projectionSkipped: Boolean(project) && exactCanonicalPose,
+      projectionReason: !project
+        ? 'disabled-by-caller'
+        : exactCanonicalPose
+          ? 'exact-lossless-canonical-pose'
+          : 'lossy-or-constraint-reconciliation-required',
+      preProjectionBoneErrorM,
+      preProjectionGroundPenetrationM,
     };
     this.capturePoseTargets();
     this.zeroVelocities({ capturePose: false });
@@ -1353,6 +1407,12 @@ function assertSupportedPoseSnapshot(snapshot, indexById, definition) {
   if (snapshot.type !== 'PoseSnapshot') errors.push('type must be PoseSnapshot');
   if (snapshot.schema !== POSE_SNAPSHOT_SCHEMA) errors.push(`schema must be ${POSE_SNAPSHOT_SCHEMA}`);
   if (snapshot.rotationSpace !== 'local') errors.push('rotationSpace must be local');
+  if (!matchesHumanCoordinateSystem(snapshot.coordinateSystem)) {
+    errors.push('coordinateSystem must be right-handed with +Y up, +Z forward and +X right');
+  }
+  if (typeof snapshot.sourceRepresentation !== 'string' || !snapshot.sourceRepresentation.trim()) {
+    errors.push('sourceRepresentation must explicitly identify the pose authority');
+  }
   if (!SUPPORTED_POSE_ROTATION_CONVENTIONS.has(snapshot.rotationConvention)) {
     errors.push(`rotationConvention must be one of ${[...SUPPORTED_POSE_ROTATION_CONVENTIONS].join(', ')}`);
   }
@@ -1546,40 +1606,24 @@ function axisKey(index) {
   return index === 0 ? 'x' : index === 1 ? 'y' : 'z';
 }
 
-function reconstructPoseSnapshot(definition, rest, snapshot) {
-  const rootJointId = String(snapshot.rootJointId ?? 'hips');
-  const rootRest = rest.get(rootJointId);
-  if (!rootRest) return new Map();
-  const rootTranslation = arrayToPoint(snapshot.rootTranslation, { x: 0, y: 0, z: 0 });
-  const rootRotation = arrayToQuaternion(snapshot.rootRotation);
-  const localRotations = snapshot.localRotations && typeof snapshot.localRotations === 'object'
-    ? snapshot.localRotations
-    : {};
-  const childrenByParent = new Map();
-  for (const joint of definition.joints) {
-    if (!joint.parentId || joint.physicalBone === false || joint.isControl) continue;
-    const children = childrenByParent.get(joint.parentId) ?? [];
-    children.push(joint);
-    childrenByParent.set(joint.parentId, children);
-  }
+function reconstructPoseSnapshot(definition, rest, snapshot, context = null) {
+  void rest;
+  const resolvedContext = context || createHumanKinematicContext({}, {
+    definition,
+    rigVersion: snapshot?.compatibleRig || definition?.rigVersion || 'rig@0.4.0',
+  });
+  const reconstructed = reconstructIncomingBoneWorldPose(resolvedContext, snapshot);
+  return new Map([...reconstructed.positions.entries()].map(([jointId, point]) => [
+    jointId,
+    { x: point[0], y: point[1], z: point[2] },
+  ]));
+}
 
-  const positions = new Map([[rootJointId, add(rootRest, rootTranslation)]]);
-  const worldRotations = new Map([[rootJointId, rootRotation]]);
-  const visit = (jointId) => {
-    const parentPoint = positions.get(jointId);
-    const parentRotation = worldRotations.get(jointId) ?? identityQuaternion();
-    for (const child of childrenByParent.get(jointId) ?? []) {
-      const bindOffset = normalizePoint(child.localPosition, { x: 0, y: 0, z: 0 });
-      const childLocal = arrayToQuaternion(localRotations[child.id]);
-      const childWorldRotation = multiplyQuaternions(parentRotation, childLocal);
-      const childPoint = add(parentPoint, rotatePointByQuaternion(childWorldRotation, bindOffset));
-      positions.set(child.id, childPoint);
-      worldRotations.set(child.id, childWorldRotation);
-      visit(child.id);
-    }
-  };
-  visit(rootJointId);
-  return positions;
+function matchesHumanCoordinateSystem(value) {
+  return value?.handedness === HUMAN_COORDINATE_SYSTEM.handedness
+    && value?.upAxis === HUMAN_COORDINATE_SYSTEM.upAxis
+    && value?.forwardAxis === HUMAN_COORDINATE_SYSTEM.forwardAxis
+    && value?.rightAxis === HUMAN_COORDINATE_SYSTEM.rightAxis;
 }
 
 function quaternionFromTo(fromValue, toValue) {
@@ -1667,11 +1711,6 @@ function quaternionToArray(value) {
 function pointToArray(value) {
   const point = normalizePoint(value, { x: 0, y: 0, z: 0 });
   return [point.x, point.y, point.z];
-}
-
-function arrayToPoint(value, fallback = { x: 0, y: 0, z: 0 }) {
-  if (Array.isArray(value)) return normalizePoint(value, fallback);
-  return normalizePoint(value, fallback);
 }
 
 function normalizeVectorPoint(value) {

@@ -1,6 +1,14 @@
-import { applyBodyProfileToDefinition, bodyProfileKey, normalizeBodyProfile } from '../../../legacy/v8/src/body-profile.js';
-import { computeRestWorldPositions, getBoneLength } from '../../../legacy/v8/src/skeleton-model.js';
-import { createStandardHumanoidPreset } from '../../../legacy/v8/src/skeleton-presets.js';
+import { bodyProfileKey, normalizeBodyProfile } from '../../../legacy/v8/src/body-profile.js';
+import {
+  INCOMING_ROTATION_CONVENTION_FULL as CANONICAL_INCOMING_ROTATION_CONVENTION_FULL,
+  INCOMING_ROTATION_CONVENTION_ZERO_TWIST as CANONICAL_INCOMING_ROTATION_CONVENTION_ZERO_TWIST,
+  buildCanonicalV8PosePayload,
+  buildIncomingBoneLocalRotations as buildCanonicalIncomingBoneLocalRotations,
+  createHumanKinematicContext,
+  forwardKinematicsOutgoingPose,
+  measureFkBoneLengthError,
+  rotationFromAnatomicalChannels,
+} from '../../human-motion/kinematic-contract.js';
 import {
   addClip,
   beginGraphTransition,
@@ -31,7 +39,6 @@ import {
   normalizeQuaternion,
   normalizeVector3,
   quaternionAngularDistance,
-  quaternionFromAnatomicalChannels,
   quaternionFromTo,
   rotateVectorByQuaternion,
   scaleVector,
@@ -42,8 +49,8 @@ import {
 
 export const ANIMATION_POSE_SCHEMA = 'humanoid_rig/animation_pose@0.2';
 export const ANIMATION_RUNTIME_FRAME_SCHEMA = 'humanoid_rig/animation_runtime_frame@0.2';
-export const INCOMING_ROTATION_CONVENTION_FULL = 'incoming_bone_bind_delta_full_quaternion';
-export const INCOMING_ROTATION_CONVENTION_ZERO_TWIST = 'incoming_bone_bind_delta_zero_twist';
+export const INCOMING_ROTATION_CONVENTION_FULL = CANONICAL_INCOMING_ROTATION_CONVENTION_FULL;
+export const INCOMING_ROTATION_CONVENTION_ZERO_TWIST = CANONICAL_INCOMING_ROTATION_CONVENTION_ZERO_TWIST;
 
 const IDENTITY = Object.freeze([0, 0, 0, 1]);
 const ZERO = Object.freeze([0, 0, 0]);
@@ -103,47 +110,7 @@ export function createRigContext(bodyProfile = {}, {
   const cacheKey = `${String(rigVersion)}|${bodyProfileKey(normalizedProfile)}`;
   const cached = RIG_CONTEXT_CACHE.get(cacheKey);
   if (cached) return cached;
-  const definition = applyBodyProfileToDefinition(
-    createStandardHumanoidPreset('A'),
-    normalizedProfile,
-    { preservePose: false },
-  );
-  const joints = definition.joints.map((joint) => ({
-    id: joint.id,
-    parentId: joint.parentId,
-    localPosition: joint.localPosition.map(Number),
-    physicalBone: joint.physicalBone !== false,
-    isControl: Boolean(joint.isControl),
-  }));
-  const jointMap = new Map(joints.map((joint) => [joint.id, joint]));
-  const children = new Map(joints.map((joint) => [joint.id, []]));
-  for (const joint of joints) {
-    if (joint.parentId && children.has(joint.parentId)) children.get(joint.parentId).push(joint.id);
-  }
-  const rest = computeRestWorldPositions(definition);
-  const restPositions = new Map([...rest.entries()].map(([id, point]) => [id, [point.x, point.y, point.z]]));
-  const boneLengths = new Map();
-  for (const joint of joints) {
-    if (!joint.parentId || joint.physicalBone === false) continue;
-    boneLengths.set(joint.id, getBoneLength(definition, joint.id));
-  }
-  const jointAxes = structuredClone(definition.jointAxes ?? {
-    schema: 'humanoid_rig/joint_axes@1.0',
-    entries: {},
-  });
-  const context = {
-    rigVersion: String(rigVersion),
-    bodyProfile: normalizedProfile,
-    bodyHeight: normalizedProfile.height,
-    definition,
-    joints,
-    jointMap,
-    children,
-    restPositions,
-    boneLengths,
-    jointAxes,
-    jointAxisMap: new Map(Object.entries(jointAxes.entries ?? {})),
-  };
+  const context = createHumanKinematicContext(normalizedProfile, { rigVersion });
   RIG_CONTEXT_CACHE.set(cacheKey, context);
   while (RIG_CONTEXT_CACHE.size > MAX_RIG_CONTEXT_CACHE) {
     RIG_CONTEXT_CACHE.delete(RIG_CONTEXT_CACHE.keys().next().value);
@@ -158,11 +125,7 @@ export function resolveAnatomicalRotation(rigContextInput, jointId, twist = 0, b
   const rig = rigContextInput?.jointMap
     ? rigContextInput
     : createRigContext(rigContextInput?.bodyProfile || {});
-  const axisEntry = rig.jointAxisMap?.get(String(jointId));
-  if (!axisEntry) {
-    throw new Error(`Missing jointAxes entry for ${String(jointId)}.`);
-  }
-  return quaternionFromAnatomicalChannels(axisEntry, { twist, bend, side }, order);
+  return rotationFromAnatomicalChannels(rig, jointId, { twist, bend, side }, { order });
 }
 
 /** Object-channel convenience wrapper retained for runtime callers and tests. */
@@ -416,24 +379,7 @@ export function clampPoseToJointLimits(poseInput, {
 export function forwardKinematics(poseInput, rigContextInput) {
   const pose = normalizeAnimationPose(poseInput);
   const rig = rigContextInput?.jointMap ? rigContextInput : createRigContext(rigContextInput?.bodyProfile || {});
-  const positions = new Map();
-  const rotations = new Map();
-  for (const joint of rig.joints) {
-    const localRotation = joint.id === 'hips'
-      ? pose.root.rotation
-      : pose.joints[joint.id]?.rotation || IDENTITY;
-    if (!joint.parentId) {
-      positions.set(joint.id, [...pose.root.position]);
-      rotations.set(joint.id, joint.id === 'root' ? (pose.joints.root?.rotation || IDENTITY) : localRotation);
-      continue;
-    }
-    const parentPosition = positions.get(joint.parentId) || ZERO;
-    const parentRotation = rotations.get(joint.parentId) || IDENTITY;
-    const offset = rotateVectorByQuaternion(joint.localPosition, parentRotation);
-    positions.set(joint.id, addVectors(parentPosition, offset));
-    rotations.set(joint.id, multiplyQuaternions(parentRotation, localRotation));
-  }
-  return { positions, rotations, rig };
+  return forwardKinematicsOutgoingPose(pose, rig);
 }
 
 /**
@@ -446,55 +392,7 @@ export function buildIncomingBoneLocalRotations(fkInput, {
   rootJointId = 'hips',
   rootRotation = null,
 } = {}) {
-  const fk = fkInput;
-  const rig = fk?.rig;
-  if (!rig?.joints || !fk?.positions) return {};
-
-  const children = new Map();
-  for (const joint of rig.joints) {
-    if (!joint.parentId || !joint.physicalBone || joint.isControl) continue;
-    const list = children.get(joint.parentId) ?? [];
-    list.push(joint);
-    children.set(joint.parentId, list);
-  }
-
-  const localRotations = {};
-  const worldRotations = new Map([[
-    rootJointId,
-    normalizeQuaternion(rootRotation || fk.rotations.get(rootJointId) || IDENTITY),
-  ]]);
-  const visit = (parentId) => {
-    const parentPosition = fk.positions.get(parentId);
-    const parentRotation = worldRotations.get(parentId) || IDENTITY;
-    if (!parentPosition) return;
-    for (const child of children.get(parentId) ?? []) {
-      const childPosition = fk.positions.get(child.id);
-      if (!childPosition) continue;
-      const sourceParentWorldRotation = fk.rotations?.get(parentId);
-      let childLocalRotation;
-      let childWorldRotation;
-      if (sourceParentWorldRotation) {
-        childWorldRotation = normalizeQuaternion(sourceParentWorldRotation);
-        childLocalRotation = multiplyQuaternions(
-          conjugateQuaternion(parentRotation),
-          childWorldRotation,
-        );
-      } else {
-        const desiredWorld = subtractVectors(childPosition, parentPosition);
-        const desiredParentLocal = rotateVectorByQuaternion(
-          desiredWorld,
-          conjugateQuaternion(parentRotation),
-        );
-        childLocalRotation = quaternionFromTo(child.localPosition, desiredParentLocal);
-        childWorldRotation = multiplyQuaternions(parentRotation, childLocalRotation);
-      }
-      localRotations[child.id] = normalizeQuaternion(childLocalRotation);
-      worldRotations.set(child.id, normalizeQuaternion(childWorldRotation));
-      visit(child.id);
-    }
-  };
-  visit(rootJointId);
-  return localRotations;
+  return buildCanonicalIncomingBoneLocalRotations(fkInput, { rootJointId, rootRotation });
 }
 
 export function getActiveClipContacts(clipInput, rawTime) {
@@ -707,45 +605,7 @@ export function buildV8PosePayload(fkInput, {
   pinned = new Set(),
   updatedAt = new Date().toISOString(),
 } = {}) {
-  const fk = fkInput;
-  const localRotations = {};
-  for (const joint of fk.rig.joints) {
-    const worldRotation = normalizeQuaternion(fk.rotations.get(joint.id) || IDENTITY);
-    const parentWorldRotation = joint.parentId
-      ? normalizeQuaternion(fk.rotations.get(joint.parentId) || IDENTITY)
-      : IDENTITY;
-    localRotations[joint.id] = normalizeQuaternion(
-      multiplyQuaternions(conjugateQuaternion(parentWorldRotation), worldRotation),
-    );
-  }
-  const incomingBoneLocalRotations = buildIncomingBoneLocalRotations(fk, {
-    rootJointId: 'hips',
-    rootRotation: fk.rotations.get('hips') || IDENTITY,
-  });
-  return {
-    schemaVersion: 2,
-    type: 'humanoid-pose',
-    rigName: fk.rig.definition.name,
-    pose: 'CUSTOM',
-    unit: 'meter',
-    updatedAt,
-    poseName,
-    rootJointId: 'root',
-    localRotations,
-    incomingBoneLocalRotations,
-    rotationConventions: {
-      localRotations: 'outgoing_bone_parent_rotation',
-      incomingBoneLocalRotations: INCOMING_ROTATION_CONVENTION_FULL,
-    },
-    joints: fk.rig.joints.map((joint) => {
-      const position = fk.positions.get(joint.id) || ZERO;
-      return {
-        id: joint.id,
-        poseWorldPosition: { x: position[0], y: position[1], z: position[2] },
-        pinned: pinned.has(joint.id),
-      };
-    }),
-  };
+  return buildCanonicalV8PosePayload(fkInput, { poseName, pinned, updatedAt });
 }
 
 
@@ -1178,14 +1038,7 @@ function contactPlantRawTime(clip, rawTime, contact) {
 }
 
 export function measureBoneLengthError(fk) {
-  let maximum = 0;
-  for (const [jointId, expected] of fk.rig.boneLengths) {
-    const joint = fk.rig.jointMap.get(jointId);
-    if (!joint?.parentId) continue;
-    const actual = distance(fk.positions.get(jointId), fk.positions.get(joint.parentId));
-    maximum = Math.max(maximum, Math.abs(actual - expected));
-  }
-  return maximum;
+  return measureFkBoneLengthError(fk);
 }
 
 function evaluateGraphCondition(parameters, condition) {
