@@ -812,6 +812,8 @@ export function applyPosePresetToDefinition(definition, pose = 'A') {
   const normalizedPose = normalizePosePresetId(pose);
   const restWorld = calculateWorldFromLocals(definition.joints);
 
+  delete definition.poseDiagnostics;
+
   for (const jointItem of definition.joints) {
     const point = restWorld.get(jointItem.id) ?? [0, 0, 0];
     jointItem.poseWorldPosition = [...point];
@@ -832,6 +834,101 @@ export function applyPosePresetToDefinition(definition, pose = 'A') {
   definition.pose = normalizedPose;
   definition.updatedAt = new Date().toISOString();
   return definition;
+}
+
+/**
+ * Reports shoulder-girdle geometry without changing the rig definition.
+ * Positions are expressed in the V8 world-pose space while all length errors
+ * are measured against the immutable bind-space localPosition segments.
+ */
+export function diagnoseShoulderPose(definition) {
+  if (!definition || !Array.isArray(definition.joints)) {
+    throw new Error('Shoulder diagnostics require a RigDefinition with joints.');
+  }
+  const byId = new Map(definition.joints.map((item) => [item.id, item]));
+  const restWorld = calculateWorldFromLocals(definition.joints);
+  const point = (id) => {
+    const item = byId.get(id);
+    if (!item) throw new Error(`Shoulder diagnostics require joint ${id}.`);
+    const raw = item.poseWorldPosition;
+    if (Array.isArray(raw) && raw.length === 3 && raw.every((value) => Number.isFinite(Number(value)))) {
+      return raw.map(Number);
+    }
+    return [...restWorld.get(id)];
+  };
+  const distance = (start, end) => Math.hypot(
+    end[0] - start[0],
+    end[1] - start[1],
+    end[2] - start[2],
+  );
+  const angleBetween = (first, second) => {
+    const firstLength = Math.hypot(...first);
+    const secondLength = Math.hypot(...second);
+    if (firstLength < 1e-12 || secondLength < 1e-12) return 0;
+    const cosine = Math.min(1, Math.max(-1, dot3(first, second) / (firstLength * secondLength)));
+    return Math.acos(cosine) * 180 / Math.PI;
+  };
+  const mirroredPointError = (left, right, origin) => Math.max(
+    Math.abs((left[0] - origin[0]) + (right[0] - origin[0])),
+    Math.abs(left[1] - right[1]),
+    Math.abs(left[2] - right[2]),
+  );
+
+  const upperChestWorld = point('upperChest');
+  const leftShoulderWorld = point('leftShoulder');
+  const rightShoulderWorld = point('rightShoulder');
+  const leftUpperArmWorld = point('leftUpperArm');
+  const rightUpperArmWorld = point('rightUpperArm');
+  const leftHandEndWorld = point('leftHandEnd');
+  const rightHandEndWorld = point('rightHandEnd');
+  const mirrorJointIds = ['Shoulder', 'UpperArm', 'LowerArm', 'Hand', 'HandEnd'];
+  const mirrorError = Math.max(...mirrorJointIds.map((suffix) => mirroredPointError(
+    point(`left${suffix}`),
+    point(`right${suffix}`),
+    upperChestWorld,
+  )));
+  const leftClavicle = subtract3(leftShoulderWorld, upperChestWorld);
+  const rightClavicle = subtract3(rightShoulderWorld, upperChestWorld);
+  const leftShoulderSegment = subtract3(leftUpperArmWorld, leftShoulderWorld);
+  const rightShoulderSegment = subtract3(rightUpperArmWorld, rightShoulderWorld);
+  const upperArmLine = subtract3(rightUpperArmWorld, leftUpperArmWorld);
+
+  return {
+    leftUpperArmWorld,
+    rightUpperArmWorld,
+    leftShoulderWorld,
+    rightShoulderWorld,
+    upperChestWorld,
+    upperArmHeightDifference: Math.abs(leftUpperArmWorld[1] - rightUpperArmWorld[1]),
+    upperArmDepthDifference: Math.abs(leftUpperArmWorld[2] - rightUpperArmWorld[2]),
+    leftClavicleLengthError: Math.abs(
+      distance(upperChestWorld, leftShoulderWorld) - jointSegmentLength(definition, 'leftShoulder')
+    ),
+    rightClavicleLengthError: Math.abs(
+      distance(upperChestWorld, rightShoulderWorld) - jointSegmentLength(definition, 'rightShoulder')
+    ),
+    leftShoulderSegmentLengthError: Math.abs(
+      distance(leftShoulderWorld, leftUpperArmWorld) - jointSegmentLength(definition, 'leftUpperArm')
+    ),
+    rightShoulderSegmentLengthError: Math.abs(
+      distance(rightShoulderWorld, rightUpperArmWorld) - jointSegmentLength(definition, 'rightUpperArm')
+    ),
+    leftArmSpan: distance(upperChestWorld, leftHandEndWorld),
+    rightArmSpan: distance(upperChestWorld, rightHandEndWorld),
+    mirrorError,
+    shoulderSlopeDegrees: Math.atan2(
+      Math.abs(upperArmLine[1]),
+      Math.max(1e-12, Math.abs(upperArmLine[0])),
+    ) * 180 / Math.PI,
+    leftSocketDrop: upperChestWorld[1] - leftUpperArmWorld[1],
+    rightSocketDrop: upperChestWorld[1] - rightUpperArmWorld[1],
+    leftGirdleBendDegrees: 180 - angleBetween(leftClavicle, leftShoulderSegment),
+    rightGirdleBendDegrees: 180 - angleBetween(rightClavicle, rightShoulderSegment),
+    shoulderPresetMode: definition.poseDiagnostics?.shoulderPresetMode ?? 'independent-segment-directions',
+    warnings: Array.isArray(definition.poseDiagnostics?.warnings)
+      ? [...definition.poseDiagnostics.warnings]
+      : [],
+  };
 }
 
 /**
@@ -860,24 +957,19 @@ function applyTPose(definition) {
   poseChainFromBind(definition, ['hips', 'spine', 'chest', 'upperChest']);
   poseChainFromBind(definition, ['upperChest', 'neck', 'head', 'headTop']);
 
-  // Keep the historical hand span while making both clavicle and shoulder
-  // links participate. The two X components still sum to the fitted 0.210 m.
+  const shoulderSolve = solveTPoseShoulderGirdle(definition);
   for (const side of ['left', 'right']) {
     const sign = side === 'left' ? -1 : 1;
-    const clavicleLength = jointSegmentLength(definition, `${side}Shoulder`);
-    const shoulderLength = jointSegmentLength(definition, `${side}UpperArm`);
-    poseShoulderGirdle(
-      definition,
-      side,
-      vectorWithSignedY(clavicleLength, sign * 0.105, 0.012, 1),
-      vectorWithSignedY(shoulderLength, sign * 0.105, -0.015, -1),
-    );
     poseArmFromShoulder(definition, side, [
       [sign, 0, 0],
       [sign, 0, 0],
       [sign, 0, 0],
     ]);
   }
+  definition.poseDiagnostics = {
+    shoulderPresetMode: 'socket-driven',
+    ...shoulderSolve,
+  };
 }
 
 function applyReachPose(definition) {
@@ -999,6 +1091,143 @@ function poseShoulderGirdle(definition, side, clavicleDirection, shoulderDirecti
   ], [clavicleDirection, shoulderDirection]);
 }
 
+/**
+ * Solves both T-pose shoulder sockets first, then places each intermediate
+ * collar joint on the exact intersection circle of its two bind-length
+ * spheres. The bind shoulder plane selects the deterministic anatomical side
+ * of that circle; the forward-axis fallback includes a small natural drop.
+ */
+function solveTPoseShoulderGirdle(definition) {
+  const byId = new Map(definition.joints.map((item) => [item.id, item]));
+  const upperChest = byId.get('upperChest')?.poseWorldPosition;
+  if (!upperChest) {
+    return {
+      warnings: [{ code: 'T_POSE_UPPER_CHEST_MISSING' }],
+    };
+  }
+
+  const bindWorld = calculateWorldFromLocals(definition.joints);
+  const bindUpperChest = bindWorld.get('upperChest');
+  const sideData = Object.fromEntries(['left', 'right'].map((side) => [side, {
+    clavicleLength: jointSegmentLength(definition, `${side}Shoulder`),
+    shoulderLength: jointSegmentLength(definition, `${side}UpperArm`),
+  }]));
+  const average = (left, right) => (Number(left) + Number(right)) / 2;
+  const bindSocketHalfWidth = average(
+    Math.abs(bindWorld.get('leftUpperArm')[0] - bindUpperChest[0]),
+    Math.abs(bindWorld.get('rightUpperArm')[0] - bindUpperChest[0]),
+  );
+  const bindSocketDepth = average(
+    bindWorld.get('leftUpperArm')[2] - bindUpperChest[2],
+    bindWorld.get('rightUpperArm')[2] - bindUpperChest[2],
+  );
+  const averageShoulderReach = average(
+    sideData.left.clavicleLength + sideData.left.shoulderLength,
+    sideData.right.clavicleLength + sideData.right.shoulderLength,
+  );
+  const naturalShoulderDrop = Math.min(
+    0.010,
+    Math.max(0.0045, averageShoulderReach * 0.032),
+  );
+  const requestedOffset = [bindSocketHalfWidth, -naturalShoulderDrop, bindSocketDepth];
+  const requestedDistance = Math.hypot(...requestedOffset);
+  const minimumReach = Math.max(
+    Math.abs(sideData.left.clavicleLength - sideData.left.shoulderLength),
+    Math.abs(sideData.right.clavicleLength - sideData.right.shoulderLength),
+  ) + 1e-8;
+  const maximumReach = Math.min(
+    sideData.left.clavicleLength + sideData.left.shoulderLength,
+    sideData.right.clavicleLength + sideData.right.shoulderLength,
+  ) - 1e-8;
+  const solvedDistance = Math.min(maximumReach, Math.max(minimumReach, requestedDistance));
+  const targetScale = requestedDistance > 1e-12 ? solvedDistance / requestedDistance : 1;
+  const solvedOffset = scale3(requestedOffset, targetScale);
+  const warnings = [];
+  if (Math.abs(solvedDistance - requestedDistance) > 1e-9) {
+    warnings.push({
+      code: 'T_POSE_SHOULDER_SOCKET_PROJECTED_TO_REACH',
+      requestedDistance,
+      solvedDistance,
+    });
+  }
+
+  const bindShoulderHalfWidth = average(
+    Math.abs(bindWorld.get('leftShoulder')[0] - bindUpperChest[0]),
+    Math.abs(bindWorld.get('rightShoulder')[0] - bindUpperChest[0]),
+  );
+  const bindShoulderHeight = average(
+    bindWorld.get('leftShoulder')[1] - bindUpperChest[1],
+    bindWorld.get('rightShoulder')[1] - bindUpperChest[1],
+  );
+  const bindShoulderDepth = average(
+    bindWorld.get('leftShoulder')[2] - bindUpperChest[2],
+    bindWorld.get('rightShoulder')[2] - bindUpperChest[2],
+  );
+
+  for (const side of ['left', 'right']) {
+    const sign = side === 'left' ? -1 : 1;
+    const shoulder = byId.get(`${side}Shoulder`);
+    const upperArm = byId.get(`${side}UpperArm`);
+    const firstLength = sideData[side].clavicleLength;
+    const secondLength = sideData[side].shoulderLength;
+    if (!shoulder || !upperArm || firstLength <= 0 || secondLength <= 0) {
+      warnings.push({ code: 'T_POSE_SHOULDER_CHAIN_MISSING', side });
+      continue;
+    }
+
+    const upperArmTarget = add3(upperChest, [
+      sign * solvedOffset[0],
+      solvedOffset[1],
+      solvedOffset[2],
+    ]);
+    const targetVector = subtract3(upperArmTarget, upperChest);
+    const targetDirection = normalize3(targetVector);
+    const along = (
+      firstLength * firstLength
+      - secondLength * secondLength
+      + solvedDistance * solvedDistance
+    ) / (2 * solvedDistance);
+    const circleRadius = Math.sqrt(Math.max(0, firstLength * firstLength - along * along));
+    const circleCenter = add3(upperChest, scale3(targetDirection, along));
+    const bindPlanePoint = add3(upperChest, [
+      sign * bindShoulderHalfWidth,
+      bindShoulderHeight,
+      bindShoulderDepth,
+    ]);
+    let planeVector = subtract3(bindPlanePoint, circleCenter);
+    planeVector = subtract3(planeVector, scale3(targetDirection, dot3(planeVector, targetDirection)));
+    if (Math.hypot(...planeVector) < 1e-8) {
+      const forwardSign = Math.sign(bindShoulderDepth || bindSocketDepth || 1);
+      const forwardDropHint = [0, -naturalShoulderDrop, forwardSign];
+      planeVector = subtract3(
+        forwardDropHint,
+        scale3(targetDirection, dot3(forwardDropHint, targetDirection)),
+      );
+    }
+    if (Math.hypot(...planeVector) < 1e-8) {
+      planeVector = cross3(targetDirection, [0, 1, 0]);
+    }
+    if (Math.hypot(...planeVector) < 1e-8) {
+      planeVector = cross3(targetDirection, [0, 0, 1]);
+    }
+
+    shoulder.poseWorldPosition = add3(
+      circleCenter,
+      scale3(normalize3(planeVector), circleRadius),
+    );
+    upperArm.poseWorldPosition = upperArmTarget;
+  }
+
+  return {
+    warnings,
+    requestedSocketDistance: requestedDistance,
+    solvedSocketDistance: solvedDistance,
+    socketHalfWidth: solvedOffset[0],
+    socketDepth: solvedOffset[2],
+    naturalShoulderDrop: -solvedOffset[1],
+  };
+}
+
 function poseArmFromShoulder(definition, side, directions) {
   poseChainWithDirections(definition, [
     `${side}UpperArm`, `${side}LowerArm`, `${side}Hand`, `${side}HandEnd`,
@@ -1072,11 +1301,6 @@ function solveTwoBoneIK(definition, {
 function jointSegmentLength(definition, jointId) {
   const item = definition.joints.find((jointItem) => jointItem.id === jointId);
   return item ? Math.hypot(...item.localPosition) : 0;
-}
-
-function vectorWithSignedY(length, x, z, ySign) {
-  const y = Math.sqrt(Math.max(0, length * length - x * x - z * z));
-  return [x, y * Math.sign(ySign || 1), z];
 }
 
 function synchronizeAuxiliaryPresetPose(definition) {
