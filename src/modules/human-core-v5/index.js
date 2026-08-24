@@ -39,9 +39,65 @@ export {
   cloneHumanCoreStateV5,
   createHumanCoreStateV5,
   validateHumanCoreStateV5,
+  withHumanCoreAnatomyStateV5,
   withHumanCoreMotionStateV5,
   withHumanCorePoseFrameV5,
 } from './human-core-state-v5.js';
+
+export {
+  MASS_DISTRIBUTION_MODEL_V5_SCHEMA,
+  MASS_DISTRIBUTION_MODEL_V5_SCHEMA_VERSION,
+  assertMassDistributionModelV5,
+  cloneMassDistributionModelV5,
+  createMassDistributionModelV5,
+  validateMassDistributionModelV5,
+} from './mass-distribution-model-v5.js';
+
+export {
+  MUSCLE_SEMANTIC_PROFILE_V5_SCHEMA,
+  MUSCLE_SEMANTIC_PROFILE_V5_SCHEMA_VERSION,
+  assertMuscleSemanticProfileV5,
+  cloneMuscleSemanticProfileV5,
+  createMuscleSemanticProfileV5,
+  validateMuscleSemanticProfileV5,
+} from './muscle-semantic-profile-v5.js';
+
+export {
+  HUMAN_BALANCE_STATE_V5_SCHEMA,
+  HUMAN_BALANCE_STATE_V5_SCHEMA_VERSION,
+  assertHumanBalanceStateV5,
+  cloneHumanBalanceStateV5,
+  createHumanBalanceStateV5,
+  validateHumanBalanceStateV5,
+} from './human-balance-state-v5.js';
+
+export {
+  ANATOMY_DEFORMATION_SIGNAL_V5_SCHEMA,
+  ANATOMY_DEFORMATION_SIGNAL_V5_SCHEMA_VERSION,
+  assertAnatomyDeformationSignalV5,
+  cloneAnatomyDeformationSignalV5,
+  createAnatomyDeformationSignalV5,
+  validateAnatomyDeformationSignalV5,
+} from './anatomy-deformation-signal-v5.js';
+
+export {
+  HUMAN_ANATOMY_STATE_V5_SCHEMA,
+  HUMAN_ANATOMY_STATE_V5_SCHEMA_VERSION,
+  assertHumanAnatomyStateV5,
+  cloneHumanAnatomyStateV5,
+  createHumanAnatomyStateV5,
+  validateHumanAnatomyStateV5,
+} from './human-anatomy-state-v5.js';
+
+export {
+  AnatomyPoseEvaluatorV5,
+  evaluateHumanAnatomyPoseV5,
+} from './anatomy-pose-evaluator-v5.js';
+
+export {
+  HUMAN_ANATOMY_RUNTIME_V5_SCHEMA,
+  HumanAnatomyRuntimeV5,
+} from './human-anatomy-runtime-v5.js';
 
 export {
   HUMAN_CORE_V4_ADAPTER_SCHEMA,

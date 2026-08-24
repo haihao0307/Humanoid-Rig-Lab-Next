@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/mass_distribution_model@5.0",
+  "title": "Humanoid Rig Lab MassDistributionModel V5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "type", "humanId", "bodyDNAId", "proportionRevision", "totalMassKg", "headMass", "torsoMass", "armMass", "legMass", "centerOfMass", "bodyMeasurements", "assumptions"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/mass_distribution_model@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "MassDistributionModel" },
+    "humanId": { "$ref": "#/$defs/stableId" },
+    "bodyDNAId": { "$ref": "#/$defs/stableId" },
+    "proportionRevision": { "type": "integer", "minimum": 0 },
+    "totalMassKg": { "type": "number", "exclusiveMinimum": 0 },
+    "headMass": { "type": "number", "exclusiveMinimum": 0 },
+    "torsoMass": { "type": "number", "exclusiveMinimum": 0 },
+    "armMass": { "$ref": "#/$defs/bilateralMass" },
+    "legMass": { "$ref": "#/$defs/bilateralMass" },
+    "centerOfMass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["position", "space", "provenance"],
+      "properties": {
+        "position": { "$ref": "#/$defs/vector3" },
+        "space": { "const": "character-root-local" },
+        "provenance": { "type": "string", "minLength": 1 }
+      }
+    },
+    "bodyMeasurements": { "type": "object" },
+    "assumptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "usesWorldPositions", "solverOwned", "leftRightMassSplit"],
+      "properties": {
+        "mode": { "const": "semantic-anthropometric-v5" },
+        "usesWorldPositions": { "const": false },
+        "solverOwned": { "const": false },
+        "leftRightMassSplit": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" },
+    "vector3": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+    "bilateralMass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "left", "right"],
+      "properties": {
+        "total": { "type": "number", "exclusiveMinimum": 0 },
+        "left": { "type": "number", "exclusiveMinimum": 0 },
+        "right": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    }
+  }
+}

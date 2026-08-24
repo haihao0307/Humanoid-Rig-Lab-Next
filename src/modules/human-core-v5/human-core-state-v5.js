@@ -17,6 +17,11 @@ import {
   assertPoseFrameV4,
   clonePoseFrameV4,
 } from '../pose/pose-frame-v4.js';
+import {
+  assertHumanAnatomyStateV5,
+  cloneHumanAnatomyStateV5,
+  createHumanAnatomyStateV5,
+} from './human-anatomy-state-v5.js';
 
 export const HUMAN_CORE_STATE_V5_SCHEMA = 'humanoid_rig/human_core_state@5.0';
 export const HUMAN_CORE_STATE_V5_SCHEMA_VERSION = 5;
@@ -45,12 +50,22 @@ export function createHumanCoreStateV5({
   poseFrame = null,
   motionState = {},
   appearanceState = {},
+  anatomyState = null,
   timestamp = Date.now(),
 } = {}) {
   const dna = createBodyDNA(bodyDNA);
   const core = cloneHumanRigCoreV5(rigCore);
   assertBodyDNAV5(dna);
   if (poseFrame) assertPoseFrameV4(poseFrame);
+  const anatomy = anatomyState
+    ? cloneHumanAnatomyStateV5(anatomyState)
+    : createHumanAnatomyStateV5({
+      bodyDNA: dna,
+      rigCore: core,
+      poseFrame,
+      timestamp,
+    });
+  assertHumanAnatomyStateV5(anatomy);
   const state = {
     schema: HUMAN_CORE_STATE_V5_SCHEMA,
     schemaVersion: HUMAN_CORE_STATE_V5_SCHEMA_VERSION,
@@ -72,6 +87,7 @@ export function createHumanCoreStateV5({
     },
     motionState: normalizeMotionState(motionState),
     balanceState: deriveBalanceState(poseFrame, core),
+    anatomyState: anatomy,
     appearanceState: normalizeAppearanceState(appearanceState),
     lifecycle: {
       createdAt: finiteTimestamp(timestamp),
@@ -109,6 +125,38 @@ export function withHumanCoreMotionStateV5(stateInput, motionState, { timestamp 
   return state;
 }
 
+/**
+ * Adds a derived Anatomy Runtime snapshot without changing V4 PhysicsRig or
+ * Pose authority. The parent HumanCoreState remains the only V5 owner.
+ */
+export function withHumanCoreAnatomyStateV5(stateInput, anatomyState, { timestamp = Date.now() } = {}) {
+  const state = cloneHumanCoreStateV5(stateInput);
+  const anatomy = cloneHumanAnatomyStateV5(anatomyState);
+  if (anatomy.humanId !== state.humanId) {
+    throw new Error(`HumanAnatomyState human ${anatomy.humanId} does not match HumanCoreState human ${state.humanId}.`);
+  }
+  if (anatomy.rigId !== state.rigState.rigId) {
+    throw new Error(`HumanAnatomyState rig ${anatomy.rigId} does not match HumanCoreState rig ${state.rigState.rigId}.`);
+  }
+  if (anatomy.proportionRevision !== state.bodyDNA.proportionRevision) {
+    throw new Error(`HumanAnatomyState proportion r${anatomy.proportionRevision} does not match BodyDNA r${state.bodyDNA.proportionRevision}.`);
+  }
+  state.anatomyState = anatomy;
+  state.balanceState = {
+    ...state.balanceState,
+    anatomy: {
+      observer: 'human-anatomy-v5',
+      status: anatomy.balanceState.stability.status,
+      score: anatomy.balanceState.stability.score,
+      supportJointIds: [...anatomy.balanceState.supportArea.supportJointIds],
+      writesPose: false,
+    },
+  };
+  state.lifecycle.updatedAt = finiteTimestamp(timestamp);
+  assertHumanCoreStateV5(state);
+  return state;
+}
+
 export function validateHumanCoreStateV5(value) {
   const errors = [];
   if (!value || value.schema !== HUMAN_CORE_STATE_V5_SCHEMA || value.type !== 'HumanCoreState') {
@@ -135,6 +183,16 @@ export function validateHumanCoreStateV5(value) {
   }
   if (!value.motionState || typeof value.motionState !== 'object') errors.push('motionState is required.');
   if (!value.balanceState || typeof value.balanceState !== 'object') errors.push('balanceState is required.');
+  try {
+    assertHumanAnatomyStateV5(value.anatomyState);
+    if (value.anatomyState?.humanId !== value.humanId) errors.push('anatomyState.humanId must match HumanCoreState humanId.');
+    if (value.anatomyState?.rigId !== value.rigState?.rigId) errors.push('anatomyState.rigId must match HumanCoreState rigState.rigId.');
+    if (value.anatomyState?.proportionRevision !== value.bodyDNA?.proportionRevision) {
+      errors.push('anatomyState.proportionRevision must match BodyDNA proportionRevision.');
+    }
+  } catch (error) {
+    errors.push(error.message);
+  }
   if (!value.appearanceState || typeof value.appearanceState !== 'object') errors.push('appearanceState is required.');
   if (value.lifecycle?.persistent !== false) errors.push('HumanCoreState must remain a non-persistent runtime state.');
   try {

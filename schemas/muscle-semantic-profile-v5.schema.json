@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/muscle_semantic_profile@5.0",
+  "title": "Humanoid Rig Lab MuscleSemanticProfile V5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "type", "rigId", "compatibleRig", "mode", "groups", "diagnostics"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/muscle_semantic_profile@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "MuscleSemanticProfile" },
+    "rigId": { "$ref": "#/$defs/stableId" },
+    "compatibleRig": { "type": "string", "minLength": 1 },
+    "mode": { "const": "semantic-motion-influence-only" },
+    "groups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["groupId", "muscleGroup", "side", "affectedJoints", "activationRange", "deformationInfluence", "mode"],
+        "properties": {
+          "groupId": { "$ref": "#/$defs/stableId" },
+          "muscleGroup": { "type": "string", "minLength": 1 },
+          "side": { "enum": ["left", "right", "center"] },
+          "affectedJoints": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/stableId" } },
+          "activationRange": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["minimum", "maximum", "source"],
+            "properties": {
+              "minimum": { "const": 0 },
+              "maximum": { "const": 1 },
+              "source": { "const": "local-quaternion-semantic-evaluator" }
+            }
+          },
+          "deformationInfluence": { "type": "object" },
+          "mode": { "const": "semantic-only" }
+        }
+      }
+    },
+    "diagnostics": { "type": "object" }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" }
+  }
+}

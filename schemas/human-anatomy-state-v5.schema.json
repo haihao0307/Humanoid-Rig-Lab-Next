@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/human_anatomy_state@5.0",
+  "title": "Humanoid Rig Lab HumanAnatomyState V5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "type", "humanId", "bodyDNAId", "rigId", "proportionRevision", "source", "muscleState", "massDistribution", "jointLoad", "balanceState", "bodyVolumeState", "postureState", "deformationSignal", "lifecycle"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/human_anatomy_state@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "HumanAnatomyState" },
+    "humanId": { "$ref": "#/$defs/stableId" },
+    "bodyDNAId": { "$ref": "#/$defs/stableId" },
+    "rigId": { "$ref": "#/$defs/stableId" },
+    "proportionRevision": { "type": "integer", "minimum": 0 },
+    "source": { "type": "object" },
+    "muscleState": { "type": "object" },
+    "massDistribution": { "type": "object" },
+    "jointLoad": { "type": "object" },
+    "balanceState": { "type": "object" },
+    "bodyVolumeState": { "type": "object" },
+    "postureState": { "type": "object" },
+    "deformationSignal": { "type": "object" },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timestamp", "persistent", "rendererOwned", "writesMesh"],
+      "properties": {
+        "timestamp": { "type": "number" },
+        "persistent": { "const": false },
+        "rendererOwned": { "const": false },
+        "writesMesh": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" }
+  }
+}

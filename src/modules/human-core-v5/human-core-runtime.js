@@ -4,11 +4,13 @@ import { createHumanRigCoreV5 } from './human-rig-core-v5.js';
 import {
   cloneHumanCoreStateV5,
   createHumanCoreStateV5,
+  withHumanCoreAnatomyStateV5,
   withHumanCoreMotionStateV5,
   withHumanCorePoseFrameV5,
 } from './human-core-state-v5.js';
 import { assertPoseFrameV4 } from '../pose/pose-frame-v4.js';
 import { cloneValue } from './core-utils.js';
+import { HumanAnatomyRuntimeV5 } from './human-anatomy-runtime-v5.js';
 
 export const HUMAN_CORE_RUNTIME_V5_SCHEMA = 'humanoid_rig/human_core_runtime@5.0';
 
@@ -22,6 +24,7 @@ export class HumanCoreRuntime {
     this.rigDefinition = rigDefinition ? cloneValue(rigDefinition) : null;
     this.state = null;
     this.rigCore = null;
+    this.anatomyRuntime = new HumanAnatomyRuntimeV5();
   }
 
   createHuman(bodyDNAInput = {}, {
@@ -41,6 +44,8 @@ export class HumanCoreRuntime {
       appearanceState,
       timestamp,
     });
+    this.anatomyRuntime.setRigCore(this.rigCore);
+    this.refreshAnatomy({ timestamp });
     return this.getState();
   }
 
@@ -48,6 +53,7 @@ export class HumanCoreRuntime {
     this.assertReady();
     assertPoseFrameV4(poseFrame);
     this.state = withHumanCorePoseFrameV5(this.state, poseFrame, { timestamp });
+    this.refreshAnatomy({ poseFrame, timestamp });
     return this.getState();
   }
 
@@ -92,6 +98,8 @@ export class HumanCoreRuntime {
         axisContractComplete: this.rigCore.diagnostics.axisContractComplete,
         axisContractOrthonormal: this.rigCore.diagnostics.axisContractOrthonormal,
         poseAuthority: pose ? 'local-quaternion-v4' : 'not-yet-sampled',
+        anatomyAuthority: this.state.anatomyState?.source?.poseAuthority ?? 'not-yet-sampled',
+        anatomyWritesPose: this.state.anatomyState?.balanceState?.integration?.writesPose ?? false,
         rendererMutation: false,
       },
     };
@@ -120,6 +128,18 @@ export class HumanCoreRuntime {
   getRigCore() {
     this.assertReady();
     return cloneValue(this.rigCore);
+  }
+
+  getAnatomyState() {
+    this.assertReady();
+    return this.anatomyRuntime.getState();
+  }
+
+  refreshAnatomy({ poseFrame = this.state?.poseState?.currentPose ?? null, timestamp = Date.now() } = {}) {
+    this.assertReady();
+    const anatomyState = this.anatomyRuntime.evaluate(this.state, { poseFrame, timestamp });
+    this.state = withHumanCoreAnatomyStateV5(this.state, anatomyState, { timestamp });
+    return cloneValue(anatomyState);
   }
 
   assertReady() {

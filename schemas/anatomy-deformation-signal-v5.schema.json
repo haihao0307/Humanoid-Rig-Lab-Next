@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/anatomy_deformation_signal@5.0",
+  "title": "Humanoid Rig Lab AnatomyDeformationSignal V5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "type", "humanId", "bodyDNAId", "proportionRevision", "shoulderElevation", "chestExpansion", "abdominalCompression", "elbowCompression", "thighCompression", "armVolume", "legVolume", "regions", "application"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/anatomy_deformation_signal@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "AnatomyDeformationSignal" },
+    "humanId": { "$ref": "#/$defs/stableId" },
+    "bodyDNAId": { "$ref": "#/$defs/stableId" },
+    "proportionRevision": { "type": "integer", "minimum": 0 },
+    "shoulderElevation": { "$ref": "#/$defs/unit" },
+    "chestExpansion": { "$ref": "#/$defs/unit" },
+    "abdominalCompression": { "$ref": "#/$defs/unit" },
+    "elbowCompression": { "$ref": "#/$defs/unit" },
+    "thighCompression": { "$ref": "#/$defs/unit" },
+    "armVolume": { "$ref": "#/$defs/unit" },
+    "legVolume": { "$ref": "#/$defs/unit" },
+    "regions": { "type": "object" },
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "writesMesh", "writesSkinWeights", "sourcePoseAuthority"],
+      "properties": {
+        "mode": { "const": "signal-only" },
+        "writesMesh": { "const": false },
+        "writesSkinWeights": { "const": false },
+        "sourcePoseAuthority": { "const": "local-quaternion-v4" }
+      }
+    }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" },
+    "unit": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}

@@ -45,6 +45,13 @@ const required = [
   'src/modules/human-core-v5/joint-semantic-profile-v5.js',
   'src/modules/human-core-v5/human-rig-core-v5.js',
   'src/modules/human-core-v5/human-core-state-v5.js',
+  'src/modules/human-core-v5/mass-distribution-model-v5.js',
+  'src/modules/human-core-v5/muscle-semantic-profile-v5.js',
+  'src/modules/human-core-v5/human-balance-state-v5.js',
+  'src/modules/human-core-v5/anatomy-deformation-signal-v5.js',
+  'src/modules/human-core-v5/human-anatomy-state-v5.js',
+  'src/modules/human-core-v5/anatomy-pose-evaluator-v5.js',
+  'src/modules/human-core-v5/human-anatomy-runtime-v5.js',
   'src/modules/human-core-v5/v4-adapter.js',
   'src/modules/human-core-v5/human-core-runtime.js',
   'src/modules/human-core-v5/index.js',
@@ -117,7 +124,11 @@ const required = [
   'tests/integration-v002.mjs',
   'schemas/body-dna-v5.schema.json', 'schemas/joint-semantic-profile-v5.schema.json',
   'schemas/human-rig-core-v5.schema.json', 'schemas/human-core-state-v5.schema.json',
-  'tests/human-core-v5-bodydna-intelligent-rig.mjs', 'docs/HUMAN_CORE_V5_BODYDNA_DESIGN.md',
+  'schemas/mass-distribution-model-v5.schema.json', 'schemas/muscle-semantic-profile-v5.schema.json',
+  'schemas/human-balance-state-v5.schema.json', 'schemas/anatomy-deformation-signal-v5.schema.json',
+  'schemas/human-anatomy-state-v5.schema.json',
+  'tests/human-core-v5-bodydna-intelligent-rig.mjs', 'tests/human-core-v5-anatomy-runtime.mjs',
+  'docs/HUMAN_CORE_V5_BODYDNA_DESIGN.md', 'docs/HUMAN_CORE_V5_ANATOMY_RUNTIME.md',
   'control/module-scopes/proportion.json', 'control/module-scopes/skin.json',
   'control/module-scopes/pose.json', 'control/module-scopes/animation.json',
 ];
@@ -135,6 +146,8 @@ assert.match(packageJson.scripts.test, /appearance-system/);
 assert.match(packageJson.scripts.test, /character-generator/);
 assert.match(packageJson.scripts.test, /test:character-studio/);
 assert.match(packageJson.scripts.test, /test:human-core-v5/);
+assert.match(packageJson.scripts.test, /test:human-core-v5-anatomy/);
+assert.match(packageJson.scripts['test:human-core-v5-anatomy'], /human-core-v5-anatomy-runtime/);
 assert.match(packageJson.scripts['test:character-studio'], /character-studio-v1/);
 assert.match(packageJson.scripts.test, /integration-v002/);
 assert.match(packageJson.scripts.test, /test:animation/);
@@ -405,14 +418,28 @@ const bodyDnaSchema = JSON.parse(await readFile(join(root, 'schemas/body-dna-v5.
 const jointSemanticSchema = JSON.parse(await readFile(join(root, 'schemas/joint-semantic-profile-v5.schema.json'), 'utf8'));
 const humanRigCoreSchema = JSON.parse(await readFile(join(root, 'schemas/human-rig-core-v5.schema.json'), 'utf8'));
 const humanCoreStateSchema = JSON.parse(await readFile(join(root, 'schemas/human-core-state-v5.schema.json'), 'utf8'));
+const massDistributionSchema = JSON.parse(await readFile(join(root, 'schemas/mass-distribution-model-v5.schema.json'), 'utf8'));
+const muscleSemanticSchema = JSON.parse(await readFile(join(root, 'schemas/muscle-semantic-profile-v5.schema.json'), 'utf8'));
+const humanBalanceSchema = JSON.parse(await readFile(join(root, 'schemas/human-balance-state-v5.schema.json'), 'utf8'));
+const anatomySignalSchema = JSON.parse(await readFile(join(root, 'schemas/anatomy-deformation-signal-v5.schema.json'), 'utf8'));
+const humanAnatomySchema = JSON.parse(await readFile(join(root, 'schemas/human-anatomy-state-v5.schema.json'), 'utf8'));
 const humanCoreIndexSource = await readFile(join(root, 'src/modules/human-core-v5/index.js'), 'utf8');
 assert.equal(bodyDnaSchema.$id, 'humanoid_rig/body_dna@5.0');
 assert.equal(jointSemanticSchema.$id, 'humanoid_rig/joint_semantic_profile@5.0');
 assert.equal(humanRigCoreSchema.$id, 'humanoid_rig/human_rig_core@5.0');
 assert.equal(humanCoreStateSchema.$id, 'humanoid_rig/human_core_state@5.0');
+assert.equal(massDistributionSchema.$id, 'humanoid_rig/mass_distribution_model@5.0');
+assert.equal(muscleSemanticSchema.$id, 'humanoid_rig/muscle_semantic_profile@5.0');
+assert.equal(humanBalanceSchema.$id, 'humanoid_rig/human_balance_state@5.0');
+assert.equal(anatomySignalSchema.$id, 'humanoid_rig/anatomy_deformation_signal@5.0');
+assert.equal(humanAnatomySchema.$id, 'humanoid_rig/human_anatomy_state@5.0');
+assert.ok(humanCoreStateSchema.required.includes('anatomyState'));
 assert.match(humanCoreIndexSource, /HumanCoreRuntime/);
 assert.match(humanCoreIndexSource, /V4Adapter/);
 assert.match(humanCoreIndexSource, /createBodyDNA/);
+assert.match(humanCoreIndexSource, /HumanAnatomyRuntimeV5/);
+assert.match(humanCoreIndexSource, /createMassDistributionModelV5/);
+assert.match(humanCoreIndexSource, /AnatomyPoseEvaluatorV5/);
 
 const javascriptFiles = [
   'server.mjs',
@@ -423,6 +450,13 @@ const javascriptFiles = [
   'src/modules/human-core-v5/joint-semantic-profile-v5.js',
   'src/modules/human-core-v5/human-rig-core-v5.js',
   'src/modules/human-core-v5/human-core-state-v5.js',
+  'src/modules/human-core-v5/mass-distribution-model-v5.js',
+  'src/modules/human-core-v5/muscle-semantic-profile-v5.js',
+  'src/modules/human-core-v5/human-balance-state-v5.js',
+  'src/modules/human-core-v5/anatomy-deformation-signal-v5.js',
+  'src/modules/human-core-v5/human-anatomy-state-v5.js',
+  'src/modules/human-core-v5/anatomy-pose-evaluator-v5.js',
+  'src/modules/human-core-v5/human-anatomy-runtime-v5.js',
   'src/modules/human-core-v5/v4-adapter.js',
   'src/modules/human-core-v5/human-core-runtime.js',
   'src/modules/human-core-v5/index.js',
