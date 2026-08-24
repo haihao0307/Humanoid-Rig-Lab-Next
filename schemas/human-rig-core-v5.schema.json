@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/human_rig_core@5.0",
+  "title": "Humanoid Rig Lab HumanRigCore V5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "type", "rigId", "sourceRig", "topology", "coreJointIds", "optionalDeformJointIds", "joints", "massDistribution", "balanceConstraints", "diagnostics"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/human_rig_core@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "HumanRigCore" },
+    "rigId": { "$ref": "#/$defs/stableId" },
+    "sourceRig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "nativeRig", "compatibleRig", "definitionSchemaVersion", "bindPose", "topologyPolicy", "jointAxisSchema", "jointAxisSpace"],
+      "properties": {
+        "profile": { "type": "string", "minLength": 1 },
+        "nativeRig": { "type": "string", "minLength": 1 },
+        "compatibleRig": { "type": "string", "minLength": 1 },
+        "definitionSchemaVersion": { "type": "integer", "minimum": 1 },
+        "bindPose": { "type": "string", "minLength": 1 },
+        "topologyPolicy": { "type": "string", "minLength": 1 },
+        "jointAxisSchema": { "const": "humanoid_rig/joint_axes@1.0" },
+        "jointAxisSpace": { "const": "joint-local-at-bind" }
+      }
+    },
+    "topology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fingerprint", "jointCount", "physicalJointCount", "rootJointId", "relationships"],
+      "properties": {
+        "fingerprint": { "type": "string", "minLength": 1 },
+        "jointCount": { "type": "integer", "minimum": 1 },
+        "physicalJointCount": { "type": "integer", "minimum": 0 },
+        "rootJointId": { "$ref": "#/$defs/stableId" },
+        "relationships": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["jointId", "parentId"],
+            "properties": {
+              "jointId": { "$ref": "#/$defs/stableId" },
+              "parentId": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/stableId" }] }
+            }
+          }
+        }
+      }
+    },
+    "coreJointIds": { "type": "array", "items": { "$ref": "#/$defs/stableId" }, "uniqueItems": true },
+    "optionalDeformJointIds": { "type": "array", "items": { "$ref": "#/$defs/stableId" }, "uniqueItems": true },
+    "joints": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/joint" } },
+    "massDistribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["torso", "upperLimbs", "lowerLimbs"],
+      "properties": {
+        "torso": { "type": "number", "minimum": 0, "maximum": 1 },
+        "upperLimbs": { "type": "number", "minimum": 0, "maximum": 1 },
+        "lowerLimbs": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "balanceConstraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["centerOfMassJointId", "rootJointId", "supportJointIds", "uprightJointIds", "policy"],
+      "properties": {
+        "centerOfMassJointId": { "$ref": "#/$defs/stableId" },
+        "rootJointId": { "$ref": "#/$defs/stableId" },
+        "supportJointIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/stableId" }, "uniqueItems": true },
+        "uprightJointIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/stableId" }, "uniqueItems": true },
+        "policy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "diagnostics": { "type": "object" }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" },
+    "joint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "schemaVersion", "type", "jointId", "parentId", "mobilityProfile", "limitProfile", "massInfluence", "motionRole", "affects", "axisReference", "source", "childIds", "core", "optionalDeform"],
+      "properties": {
+        "schema": { "const": "humanoid_rig/joint_semantic_profile@5.0" },
+        "schemaVersion": { "const": 5 },
+        "type": { "const": "JointSemanticProfile" },
+        "jointId": { "$ref": "#/$defs/stableId" },
+        "parentId": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/stableId" }] },
+        "mobilityProfile": { "type": "object" },
+        "limitProfile": { "type": "object" },
+        "massInfluence": { "type": "object" },
+        "motionRole": { "type": "string", "minLength": 1 },
+        "affects": { "type": "array", "items": { "$ref": "#/$defs/stableId" } },
+        "axisReference": { "type": "object" },
+        "source": { "type": "object" },
+        "childIds": { "type": "array", "items": { "$ref": "#/$defs/stableId" }, "uniqueItems": true },
+        "core": { "type": "boolean" },
+        "optionalDeform": { "type": "boolean" }
+      }
+    }
+  }
+}

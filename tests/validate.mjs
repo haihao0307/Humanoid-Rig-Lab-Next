@@ -40,6 +40,14 @@ const required = [
   'start.bat', 'START_HERE.cmd', 'launcher.ps1', 'server-windows.ps1', 'DIAGNOSE_STARTUP.bat',
   'src/default-state.js', 'src/state-schema.js', 'src/module-registry.js', 'src/workspace-common.js',
   'src/project-hub.js', 'src/humanoid-preview.js', 'src/dashboard.js', 'src/studio.js', 'src/face-editor-page.js',
+  'src/modules/human-core-v5/core-utils.js',
+  'src/modules/human-core-v5/body-dna-v5.js',
+  'src/modules/human-core-v5/joint-semantic-profile-v5.js',
+  'src/modules/human-core-v5/human-rig-core-v5.js',
+  'src/modules/human-core-v5/human-core-state-v5.js',
+  'src/modules/human-core-v5/v4-adapter.js',
+  'src/modules/human-core-v5/human-core-runtime.js',
+  'src/modules/human-core-v5/index.js',
   ...moduleFiles,
   'workers/project-hub.shared.js',
   ...legacyFiles,
@@ -107,6 +115,9 @@ const required = [
   'PREPARE_BRANCHES.cmd', 'scripts/prepare-module-branches.ps1', '.github/PULL_REQUEST_TEMPLATE.md',
   'UPGRADE_NOTES_V0.5.0.md', 'BUILD_MANIFEST.json', 'THIRD_PARTY_NOTICES.md',
   'tests/integration-v002.mjs',
+  'schemas/body-dna-v5.schema.json', 'schemas/joint-semantic-profile-v5.schema.json',
+  'schemas/human-rig-core-v5.schema.json', 'schemas/human-core-state-v5.schema.json',
+  'tests/human-core-v5-bodydna-intelligent-rig.mjs', 'docs/HUMAN_CORE_V5_BODYDNA_DESIGN.md',
   'control/module-scopes/proportion.json', 'control/module-scopes/skin.json',
   'control/module-scopes/pose.json', 'control/module-scopes/animation.json',
 ];
@@ -123,6 +134,7 @@ assert.match(packageJson.scripts.test, /clothing-system/);
 assert.match(packageJson.scripts.test, /appearance-system/);
 assert.match(packageJson.scripts.test, /character-generator/);
 assert.match(packageJson.scripts.test, /test:character-studio/);
+assert.match(packageJson.scripts.test, /test:human-core-v5/);
 assert.match(packageJson.scripts['test:character-studio'], /character-studio-v1/);
 assert.match(packageJson.scripts.test, /integration-v002/);
 assert.match(packageJson.scripts.test, /test:animation/);
@@ -389,10 +401,31 @@ assert.match(presetSource, /左锁骨控制点/);
 assert.match(presetSource, /visualJoint:\s*false/);
 assert.match(presetSource, /左肩关节/);
 
+const bodyDnaSchema = JSON.parse(await readFile(join(root, 'schemas/body-dna-v5.schema.json'), 'utf8'));
+const jointSemanticSchema = JSON.parse(await readFile(join(root, 'schemas/joint-semantic-profile-v5.schema.json'), 'utf8'));
+const humanRigCoreSchema = JSON.parse(await readFile(join(root, 'schemas/human-rig-core-v5.schema.json'), 'utf8'));
+const humanCoreStateSchema = JSON.parse(await readFile(join(root, 'schemas/human-core-state-v5.schema.json'), 'utf8'));
+const humanCoreIndexSource = await readFile(join(root, 'src/modules/human-core-v5/index.js'), 'utf8');
+assert.equal(bodyDnaSchema.$id, 'humanoid_rig/body_dna@5.0');
+assert.equal(jointSemanticSchema.$id, 'humanoid_rig/joint_semantic_profile@5.0');
+assert.equal(humanRigCoreSchema.$id, 'humanoid_rig/human_rig_core@5.0');
+assert.equal(humanCoreStateSchema.$id, 'humanoid_rig/human_core_state@5.0');
+assert.match(humanCoreIndexSource, /HumanCoreRuntime/);
+assert.match(humanCoreIndexSource, /V4Adapter/);
+assert.match(humanCoreIndexSource, /createBodyDNA/);
+
 const javascriptFiles = [
   'server.mjs',
   'src/default-state.js', 'src/state-schema.js', 'src/module-registry.js', 'src/workspace-common.js',
   'src/project-hub.js', 'src/humanoid-preview.js', 'src/dashboard.js', 'src/studio.js',
+  'src/modules/human-core-v5/core-utils.js',
+  'src/modules/human-core-v5/body-dna-v5.js',
+  'src/modules/human-core-v5/joint-semantic-profile-v5.js',
+  'src/modules/human-core-v5/human-rig-core-v5.js',
+  'src/modules/human-core-v5/human-core-state-v5.js',
+  'src/modules/human-core-v5/v4-adapter.js',
+  'src/modules/human-core-v5/human-core-runtime.js',
+  'src/modules/human-core-v5/index.js',
   'packages/character-core/character-profile.js', 'packages/character-core/character-state.js',
   'packages/character-core/character-version.js', 'packages/character-core/character-manager.js',
   'packages/character-core/index.js',
@@ -472,7 +505,7 @@ assert.ok(entries.includes('legacy'));
 
 console.log(`PASS Humanoid Rig Lab Next ${BUILD_VERSION} build ${BUILD_ID}`);
 console.log(`PASS ${required.length} required files`);
-console.log('PASS schema v11, Character Core, BodyShape, Face Identity, Clothing, Appearance, Character Generator, Character Studio, module state, and migration contract');
+console.log('PASS schema v11, Character Core, BodyShape, Face Identity, Clothing, Appearance, Character Generator, Character Studio, Human Core V5 contracts, module state, and migration contract');
 console.log('PASS primary 3D proportion stage and explicit 2D fallback separation');
 console.log('PASS live body-profile bridge and exact 3D dimension feedback contract');
 console.log('PASS module-scoped synchronization and rig-rule exchange contract');

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/human_core_state@5.0",
+  "title": "Humanoid Rig Lab HumanCoreState V5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "type", "humanId", "bodyDNA", "rigState", "poseState", "motionState", "balanceState", "appearanceState", "lifecycle"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/human_core_state@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "HumanCoreState" },
+    "humanId": { "$ref": "#/$defs/stableId" },
+    "bodyDNA": { "type": "object" },
+    "rigState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rigId", "compatibleRig", "topologyFingerprint", "jointAxisSchema", "jointCount", "authority"],
+      "properties": {
+        "rigId": { "$ref": "#/$defs/stableId" },
+        "compatibleRig": { "type": "string", "minLength": 1 },
+        "topologyFingerprint": { "type": "string", "minLength": 1 },
+        "jointAxisSchema": { "const": "humanoid_rig/joint_axes@1.0" },
+        "jointCount": { "type": "integer", "minimum": 1 },
+        "authority": { "const": "rig-definition-v5-projection" }
+      }
+    },
+    "poseState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "currentPose", "revision"],
+      "properties": {
+        "authority": { "const": "local-quaternion-v4" },
+        "currentPose": { "type": ["object", "null"] },
+        "revision": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "motionState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intent", "sourceClipId", "status", "revision"],
+      "properties": {
+        "intent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["intentId", "action", "priority", "constraints"],
+          "properties": {
+            "intentId": { "$ref": "#/$defs/stableId" },
+            "action": { "type": "string", "minLength": 1 },
+            "priority": { "type": "integer", "minimum": 0 },
+            "constraints": { "type": "object" }
+          }
+        },
+        "sourceClipId": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/stableId" }] },
+        "status": { "type": "string", "minLength": 1 },
+        "revision": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "balanceState": { "type": "object" },
+    "appearanceState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skinBindingRef", "faceRef", "clothingRefs", "hairRef", "accessoryRefs"],
+      "properties": {
+        "skinBindingRef": { "$ref": "#/$defs/nullableReference" },
+        "faceRef": { "$ref": "#/$defs/nullableReference" },
+        "clothingRefs": { "type": "array", "items": { "$ref": "#/$defs/nullableReference" } },
+        "hairRef": { "$ref": "#/$defs/nullableReference" },
+        "accessoryRefs": { "type": "array", "items": { "$ref": "#/$defs/nullableReference" } }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdAt", "updatedAt", "persistent", "rendererOwned"],
+      "properties": {
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" },
+        "persistent": { "const": false },
+        "rendererOwned": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" },
+    "nullableReference": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "revision", "assetClass"],
+          "properties": {
+            "id": { "$ref": "#/$defs/stableId" },
+            "revision": { "type": "integer", "minimum": 0 },
+            "assetClass": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    }
+  }
+}

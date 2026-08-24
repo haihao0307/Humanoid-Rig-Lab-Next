@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/body_dna@5.0",
+  "title": "Humanoid Rig Lab BodyDNA V5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "type",
+    "bodyDNAId",
+    "identity",
+    "topologyFamily",
+    "proportion",
+    "mass",
+    "bodyType",
+    "asymmetry",
+    "ageProfile",
+    "genderProfile",
+    "fitnessProfile",
+    "proportionRevision"
+  ],
+  "properties": {
+    "schema": { "const": "humanoid_rig/body_dna@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "BodyDNA" },
+    "bodyDNAId": { "$ref": "#/$defs/stableId" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["humanId", "characterId", "label"],
+      "properties": {
+        "humanId": { "$ref": "#/$defs/stableId" },
+        "characterId": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/stableId" }] },
+        "label": { "type": "string", "minLength": 1 }
+      }
+    },
+    "topologyFamily": { "type": "string", "minLength": 1 },
+    "proportion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preset", "height", "shoulderWidth", "hipWidth", "headToBodyRatio", "limbLengths", "bodyThickness"],
+      "properties": {
+        "preset": { "type": "string", "minLength": 1 },
+        "height": { "type": "number", "exclusiveMinimum": 0 },
+        "shoulderWidth": { "type": "number", "exclusiveMinimum": 0 },
+        "hipWidth": { "type": "number", "exclusiveMinimum": 0 },
+        "headToBodyRatio": { "type": "number", "exclusiveMinimum": 0 },
+        "limbLengths": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["upperArm", "forearm", "handControl", "thigh", "lowerLeg"],
+          "properties": {
+            "upperArm": { "type": "number", "exclusiveMinimum": 0 },
+            "forearm": { "type": "number", "exclusiveMinimum": 0 },
+            "handControl": { "type": "number", "exclusiveMinimum": 0 },
+            "thigh": { "type": "number", "exclusiveMinimum": 0 },
+            "lowerLeg": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "bodyThickness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["chest", "waist", "hip"],
+          "properties": {
+            "chest": { "type": "number", "exclusiveMinimum": 0 },
+            "waist": { "type": "number", "exclusiveMinimum": 0 },
+            "hip": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        }
+      }
+    },
+    "mass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["weightKg", "distribution"],
+      "properties": {
+        "weightKg": { "type": "number", "exclusiveMinimum": 0 },
+        "distribution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["torso", "upperLimbs", "lowerLimbs"],
+          "properties": {
+            "torso": { "type": "number", "minimum": 0, "maximum": 1 },
+            "upperLimbs": { "type": "number", "minimum": 0, "maximum": 1 },
+            "lowerLimbs": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "bodyType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "label", "morphology"],
+      "properties": {
+        "category": { "enum": ["reference", "ectomorph", "mesomorph", "endomorph", "custom"] },
+        "label": { "type": "string", "minLength": 1 },
+        "morphology": { "type": "string", "minLength": 1 }
+      }
+    },
+    "asymmetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "leftRightScale"],
+      "properties": {
+        "mode": { "enum": ["symmetric", "authored"] },
+        "leftRightScale": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["shoulder", "arm", "hand", "hip", "leg", "foot"],
+          "properties": {
+            "shoulder": { "type": "number", "exclusiveMinimum": 0 },
+            "arm": { "type": "number", "exclusiveMinimum": 0 },
+            "hand": { "type": "number", "exclusiveMinimum": 0 },
+            "hip": { "type": "number", "exclusiveMinimum": 0 },
+            "leg": { "type": "number", "exclusiveMinimum": 0 },
+            "foot": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        }
+      }
+    },
+    "ageProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "years"],
+      "properties": {
+        "stage": { "type": "string", "minLength": 1 },
+        "years": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "genderProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "expression"],
+      "properties": {
+        "identity": { "type": "string", "minLength": 1 },
+        "expression": { "type": ["string", "null"] }
+      }
+    },
+    "fitnessProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["muscle", "fat", "distribution"],
+      "properties": {
+        "muscle": { "type": "number", "minimum": 0, "maximum": 1 },
+        "fat": { "type": "number", "minimum": 0, "maximum": 1 },
+        "distribution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["upperBody", "lowerBody"],
+          "properties": {
+            "upperBody": { "type": "number", "minimum": 0, "maximum": 1 },
+            "lowerBody": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "proportionRevision": { "type": "integer", "minimum": 0 }
+  },
+  "$defs": {
+    "stableId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+    }
+  }
+}

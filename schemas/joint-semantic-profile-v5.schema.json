@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/joint_semantic_profile@5.0",
+  "title": "Humanoid Rig Lab JointSemanticProfile V5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "type", "jointId", "parentId", "mobilityProfile", "limitProfile", "massInfluence", "motionRole", "affects", "axisReference", "source"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/joint_semantic_profile@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "JointSemanticProfile" },
+    "jointId": { "$ref": "#/$defs/stableId" },
+    "parentId": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/stableId" }] },
+    "mobilityProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "motions", "axisContractRequired", "space"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "motions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "axisContractRequired": { "const": true },
+        "space": { "const": "joint-local-at-bind" }
+      }
+    },
+    "limitProfile": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["unit", "ranges"],
+      "properties": {
+        "unit": { "const": "degrees" },
+        "ranges": { "type": "object", "additionalProperties": { "$ref": "#/$defs/range" } },
+        "reverseBendBlocked": { "type": "boolean" }
+      }
+    },
+    "massInfluence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["self", "downstream"],
+      "properties": {
+        "self": { "type": "number", "minimum": 0, "maximum": 1 },
+        "downstream": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "motionRole": { "type": "string", "minLength": 1 },
+    "affects": { "type": "array", "items": { "$ref": "#/$defs/stableId" }, "uniqueItems": true },
+    "axisReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "space", "handedness", "quaternionOrder", "source", "jointType", "twistAxisLocal", "bendAxisLocal", "sideAxisLocal"],
+      "properties": {
+        "schema": { "const": "humanoid_rig/joint_axes@1.0" },
+        "space": { "const": "joint-local-at-bind" },
+        "handedness": { "const": "right" },
+        "quaternionOrder": { "const": "xyzw" },
+        "source": { "type": "string", "minLength": 1 },
+        "jointType": { "type": "string", "minLength": 1 },
+        "twistAxisLocal": { "$ref": "#/$defs/vector3" },
+        "bendAxisLocal": { "$ref": "#/$defs/vector3" },
+        "sideAxisLocal": { "$ref": "#/$defs/vector3" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rigJointType", "rigTier", "solverParticipation", "role", "limitLabel"],
+      "properties": {
+        "rigJointType": { "type": "string" },
+        "rigTier": { "type": "string" },
+        "solverParticipation": { "type": "string" },
+        "role": { "type": "string" },
+        "limitLabel": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" },
+    "vector3": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+    "range": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } }
+  }
+}
