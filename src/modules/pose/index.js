@@ -19,6 +19,16 @@ import {
   updatePoseSnapshotPin,
 } from './pose-contract.js';
 
+export {
+  POSE_FRAME_V4_ROTATION_CONVENTION,
+  POSE_FRAME_V4_SCHEMA,
+  assertPoseFrameV4,
+  clonePoseFrameV4,
+  createPoseFrameV4,
+  isPoseFrameV4,
+  validatePoseFrameV4,
+} from './pose-frame-v4.js';
+
 export function renderControls(context, state) {
   const physics = state.character.physics;
   const pinned = normalizePinnedJointIds(state.character.pose.pinned);

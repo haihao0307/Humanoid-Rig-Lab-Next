@@ -6,6 +6,8 @@ import {
   deformSkinPositions,
   normalizeBodyShapeProfile,
 } from '../../../packages/body-shape/index.js';
+import { ProductionSkinRuntime } from './production-skin-runtime.js';
+import { SMPL24_COMPATIBILITY_BINDING_PROFILE_V4 } from './skin-binding-profile-v4.js';
 
 const EPSILON = 1e-8;
 const REST_EPSILON = 1e-7;
@@ -16,6 +18,7 @@ export const SKIN_RUNTIME_BUILD = Object.freeze({
   patchId: 'skin-patch-v002',
   moduleVersion: 'skin@0.5.1',
   compatibleRigVersion: 'rig@0.4.0',
+  productionRuntimeVersion: 'production-skin-v4-runtime@1',
   assetSha256: '736cb39c828203eae72f5e5d094f1623c0a4465a31b484737a6e8df02a7ec899',
 });
 
@@ -55,12 +58,13 @@ const SMPL_JOINT_IDS = Object.freeze([
 ]);
 
 const RUNTIME_WEIGHT_PROFILE = 'anatomical-extended-deform-v3';
-const POSE_CORRECTIVE_PROFILE = 'sparse-anatomical-pose-corrective-v1';
+const POSE_CORRECTIVE_PROFILE = 'bone-driven-pose-corrective-v4';
 export const POSE_CORRECTIVE_CHANNELS = Object.freeze([
   'shoulderRaise',
   'shoulderTwist',
   'hipTwist',
   'elbowFlex',
+  'wristFlex',
   'kneeFlex',
 ]);
 
@@ -71,30 +75,37 @@ export const POSE_CORRECTIVE_CHANNELS = Object.freeze([
  * buffer (or its current body-shape result), never from the previous frame.
  */
 export const SKIN_DEFORMATION_PIPELINE = Object.freeze({
-  schema: 'humanoid_rig/skin_deformation_pipeline@1.0',
-  source: 'restPositions',
+  schema: 'humanoid_rig/skin_deformation_pipeline@4.0',
+  source: 'simulationRig.finalPose.localRotations',
   stages: Object.freeze([
-    'restPositions',
-    'body-shape-rest',
-    'pose-analysis',
-    'pose-corrective-offset',
+    'simulationRig.finalPose.localRotations',
+    'skin-binding-profile-v4',
+    'core-to-deform-map',
+    'bone-local-quaternions',
+    'three-skeleton-update',
+    'skin-matrix',
+    'bone-driven-corrective',
     'three-gpu-lbs',
   ]),
-  correctiveRegions: Object.freeze(['shoulder', 'hip', 'elbow', 'knee']),
+  correctiveRegions: Object.freeze(['shoulder', 'elbow', 'wrist', 'hip', 'knee']),
   correctiveProfile: POSE_CORRECTIVE_PROFILE,
-  defaultRenderer: 'three-gpu-lbs',
-  experimentalRenderer: 'cpu-dqs-reference',
+  productionDefault: 'three-gpu-lbs-with-bone-driven-correctives',
+  experimentalModes: Object.freeze(['cpu-dqs-reference', 'offline-hybrid-reference']),
   nonAccumulating: true,
+  rotationReconstructionFromWorldPositions: false,
   sourceAsset: Object.freeze({
     profile: 'smpl24',
     jointCount: 24,
+    assetClass: 'compatibility',
+    productionReady: false,
     authoredFingerWeights: false,
     authoredTwistWeights: false,
     authoredScapulaWeights: false,
   }),
   runtimeWeightExtension: Object.freeze({
     profile: RUNTIME_WEIGHT_PROFILE,
-    mode: 'procedural-preview',
+    mode: 'legacy-diagnostic-only',
+    enabledByDefault: false,
     productionAuthoredWeights: false,
   }),
 });
@@ -119,6 +130,16 @@ const POSE_CORRECTIVE_SPECS = Object.freeze([
     id: 'rightElbowVolume', category: 'elbow', parentId: 'rightUpperArm', driverId: 'rightLowerArm',
     jointId: 'rightLowerArm', childId: 'rightHand', startAngle: 0.32, fullAngle: 1.75,
     parentSpan: 0.12, childSpan: 0.13, radius: 0.105, radialGain: 0.095,
+  },
+  {
+    id: 'leftWristVolume', category: 'wrist', parentId: 'leftLowerArm', driverId: 'leftHand',
+    jointId: 'leftHand', childId: 'leftHandEnd', startAngle: 0.20, fullAngle: 1.15,
+    parentSpan: 0.075, childSpan: 0.065, radius: 0.075, radialGain: 0.045,
+  },
+  {
+    id: 'rightWristVolume', category: 'wrist', parentId: 'rightLowerArm', driverId: 'rightHand',
+    jointId: 'rightHand', childId: 'rightHandEnd', startAngle: 0.20, fullAngle: 1.15,
+    parentSpan: 0.075, childSpan: 0.065, radius: 0.075, radialGain: 0.045,
   },
   {
     id: 'leftHipVolume', category: 'hip', parentId: 'hips', driverId: 'leftUpperLeg',
@@ -219,6 +240,7 @@ class NativeSmplSkinnedSurfaceLayer {
     this.THREE = THREE;
     this.scene = scene;
     this.callbacks = callbacks;
+    this.legacyDiagnosticRuntimeWeights = callbacks.legacyDiagnosticRuntimeWeights === true;
     this.visible = true;
     this.opacity = 1;
     this.mode = 'solid';
@@ -228,6 +250,13 @@ class NativeSmplSkinnedSurfaceLayer {
     this.lastDefinition = null;
     this.lastSurfaceState = null;
     this.lastCompatibilityMismatch = null;
+    this.lastSimulationRigFrame = null;
+    this.lastSimulationRigFrameId = '';
+    this.poseAuthority = 'legacy-world-position-fallback';
+    this.productionSkinRuntime = new ProductionSkinRuntime({
+      bindingProfile: SMPL24_COMPATIBILITY_BINDING_PROFILE_V4,
+    });
+    this.productionPoseResult = null;
     this.assetJointIds = [];
     this.assetJointCount = 0;
     this.jointIds = [];
@@ -337,7 +366,7 @@ class NativeSmplSkinnedSurfaceLayer {
     this.mesh.receiveShadow = false;
     this.mesh.frustumCulled = false;
     this.mesh.renderOrder = 0;
-    this.mesh.userData.surfaceEngine = 'native GLB SkinnedMesh with append-only extended runtime deform palette';
+    this.mesh.userData.surfaceEngine = 'Production Skin V4 native GLB SkinnedMesh';
     this.mesh.userData.surfacePickSource = 'detailed-smpl-skinned-mesh';
     this.mesh.userData.assetWeightStatus = meshData.skin.extras?.weightStatus ?? 'unknown';
     this.mesh.userData.humanoidSurfaceRole = 'primary-render-surface';
@@ -349,17 +378,45 @@ class NativeSmplSkinnedSurfaceLayer {
     for (const rootBone of this.rootBones) this.mesh.add(rootBone);
     this.group.add(this.mesh);
     this.group.updateMatrixWorld(true);
-    this.appendRuntimeDeformSkeleton(definition);
-    this.group.updateMatrixWorld(true);
+    if (this.legacyDiagnosticRuntimeWeights) {
+      this.appendRuntimeDeformSkeleton(definition);
+      this.group.updateMatrixWorld(true);
+    } else {
+      this.runtimeSkeletonStats = {
+        profile: 'skin-binding-v4-smpl24-compat@1',
+        assetJointCount: this.assetJointCount,
+        runtimeJointCount: this.jointIds.length,
+        appendedJointCount: 0,
+        twistJointCount: 0,
+        correctiveJointCount: 0,
+        fingerJointCount: 0,
+        faceJointCount: 0,
+        appendedJointIds: [],
+        compatibility: 'asset skeleton preserved; no runtime deform joints appended',
+      };
+    }
     const runtimeBindPoints = new Map(this.jointIds.map((id) => [
       id,
       this.bonesById.get(id).getWorldPosition(new this.THREE.Vector3()),
     ]));
-    this.runtimeWeightStats = rebuildArticulationStableWeights(
-      geometry,
-      runtimeBindPoints,
-      this.boneIndexById,
-    );
+    this.runtimeWeightStats = this.legacyDiagnosticRuntimeWeights
+      ? rebuildArticulationStableWeights(
+        geometry,
+        runtimeBindPoints,
+        this.boneIndexById,
+      )
+      : summarizeRuntimeWeights(
+        this.skinIndices,
+        this.skinWeights,
+        this.jointIds,
+        {
+          profile: 'asset-prebound-v4',
+          vertexCount: geometry.attributes.position.count,
+          runtimeWeightGeneration: false,
+          extendedWeightingApplied: false,
+          weightSource: 'asset-prebound',
+        },
+      );
     this.poseCorrectiveFields = buildPoseCorrectiveFields(
       this.shapedRestPositions ?? this.restPositions,
       runtimeBindPoints,
@@ -367,6 +424,7 @@ class NativeSmplSkinnedSurfaceLayer {
     this.poseCorrectedRestPositions = new Float32Array(this.restPositions.length);
     this.mesh.userData.runtimeWeightProfile = this.runtimeWeightStats.profile;
     this.mesh.userData.runtimeWeightStats = structuredClone(this.runtimeWeightStats);
+    this.mesh.userData.runtimeWeightGeneration = this.legacyDiagnosticRuntimeWeights;
     this.auditSceneSurfaces({ purge: true, phase: 'native-surface-attached' });
 
     const boneInverses = [];
@@ -388,6 +446,27 @@ class NativeSmplSkinnedSurfaceLayer {
     this.mesh.normalizeSkinWeights?.();
 
     this.captureBindState();
+    const definitionRest = computeRestWorldPositions(definition);
+    const definitionRoot = definitionRest.get('hips') ?? definitionRest.get('root') ?? { x: 0, y: 0, z: 0 };
+    this.productionSkinRuntime.bindCharacter({
+      skinAsset: {
+        assetReference: 'assets/smpl/smpl-male-surface-skinned.glb',
+        compatibleRig: SKIN_RUNTIME_BUILD.compatibleRigVersion,
+        vertexCount: geometry.attributes.position.count,
+        jointIds: this.assetJointIds,
+        attributes: [
+          'POSITION',
+          'NORMAL',
+          ...(geometry.attributes.uv ? ['TEXCOORD_0'] : []),
+          'JOINTS_0',
+          'WEIGHTS_0',
+        ],
+        inverseBindMatrixCount: meshData.skin.inverseBindMatrices.count,
+        productionReady: false,
+      },
+      bindingProfile: SMPL24_COMPATIBILITY_BINDING_PROFILE_V4,
+      sourceRootPosition: [definitionRoot.x, definitionRoot.y, definitionRoot.z],
+    });
     this.skinMatrices = new Float32Array(this.jointIds.length * 16);
     this.dualQuaternions = new Float32Array(this.jointIds.length * 8);
     this.lastSourceValues = new Float64Array(this.jointIds.length * 6);
@@ -404,8 +483,8 @@ class NativeSmplSkinnedSurfaceLayer {
     const sceneAudit = this.auditSceneSurfaces({ purge: true, phase: 'ready' });
     this.emitState(
       'ready',
-      'SKIN V002 唯一预绑定表皮已就绪',
-      `${SKIN_RUNTIME_BUILD.buildId} · ${vertexCount.toLocaleString()} 顶点 · 场景可见人体表皮 ${sceneAudit.visibleSurfaceCount} 层`,
+      'Production Skin V4 兼容表皮已就绪',
+      `${SKIN_RUNTIME_BUILD.productionRuntimeVersion} · ${vertexCount.toLocaleString()} 顶点 · 预绑定权重 · 场景可见人体表皮 ${sceneAudit.visibleSurfaceCount} 层`,
     );
     return this;
   }
@@ -646,7 +725,7 @@ class NativeSmplSkinnedSurfaceLayer {
     }
   }
 
-  refresh(definition, _interaction = null, { force = false } = {}) {
+  refresh(definition, _interaction = null, { force = false, simulationRigFrame = undefined } = {}) {
     this.lastDefinition = definition;
     if (!this.ownsPrimarySurfaceSlot()) {
       if (this.group?.parent === this.scene) this.scene.remove(this.group);
@@ -656,37 +735,78 @@ class NativeSmplSkinnedSurfaceLayer {
     this.auditSceneSurfaces({ purge: true, phase: 'refresh-start' });
     if (!this.mesh || !this.weightsReady || !this.skeleton) return;
 
-    const sourceRest = computeRestWorldPositions(definition);
-    const pose = computePoseWorldPositions(definition);
-    const sourceLocalPositions = buildSourceLocalPositions(
-      this.THREE,
-      sourceRest,
-      this.parentIdById,
-      this.jointIds,
-      this.bindLocalPositions,
-    );
+    if (simulationRigFrame !== undefined) {
+      this.lastSimulationRigFrame = isSimulationRigFrameV4(simulationRigFrame)
+        ? structuredClone(simulationRigFrame)
+        : null;
+    }
+    const directSimulationRigFrame = this.lastSimulationRigFrame;
+    const directFrameId = directSimulationRigFrame
+      ? String(directSimulationRigFrame.frameId || directSimulationRigFrame.finalPose?.timestamp || '')
+      : '';
     const compatibilityMismatch = Boolean(definition.profilePreview?.requiresSkinRebind);
-    let poseChanged = force || this.lastCompatibilityMismatch !== compatibilityMismatch;
-    for (let index = 0; index < this.jointIds.length; index += 1) {
-      const id = this.jointIds[index];
-      const restPoint = sourceRest.get(id);
-      const posePoint = pose.get(id);
-      if (!restPoint || !posePoint) continue;
-      const offset = index * 6;
-      const values = [restPoint.x, restPoint.y, restPoint.z, posePoint.x, posePoint.y, posePoint.z];
-      for (let component = 0; component < 6; component += 1) {
-        if (this.lastSourceValues[offset + component] !== values[component]) {
-          poseChanged = true;
-          this.lastSourceValues[offset + component] = values[component];
+    let poseChanged = force
+      || this.lastCompatibilityMismatch !== compatibilityMismatch
+      || this.lastSimulationRigFrameId !== directFrameId;
+    const sourceRest = computeRestWorldPositions(definition);
+    let pose = null;
+    let sourceLocalPositions = this.bindLocalPositions;
+    if (!directSimulationRigFrame) {
+      pose = computePoseWorldPositions(definition);
+      sourceLocalPositions = buildSourceLocalPositions(
+        this.THREE,
+        sourceRest,
+        this.parentIdById,
+        this.jointIds,
+        this.bindLocalPositions,
+      );
+      for (let index = 0; index < this.jointIds.length; index += 1) {
+        const id = this.jointIds[index];
+        const restPoint = sourceRest.get(id);
+        const posePoint = pose.get(id);
+        if (!restPoint || !posePoint) continue;
+        const offset = index * 6;
+        const values = [restPoint.x, restPoint.y, restPoint.z, posePoint.x, posePoint.y, posePoint.z];
+        for (let component = 0; component < 6; component += 1) {
+          if (this.lastSourceValues[offset + component] !== values[component]) {
+            poseChanged = true;
+            this.lastSourceValues[offset + component] = values[component];
+          }
         }
       }
     }
     if (!poseChanged) return;
 
-    const restPose = isRestPose(sourceRest, pose, this.jointIds, REST_EPSILON);
-    if (restPose) this.resetBonesToBind(sourceLocalPositions);
-    else this.applyPoseDeltas(sourceRest, pose, sourceLocalPositions);
-    this.applyPoseCorrectives(sourceRest, pose, restPose);
+    let restPose = pose ? isRestPose(sourceRest, pose, this.jointIds, REST_EPSILON) : false;
+    let directPoseApplied = false;
+    if (directSimulationRigFrame) {
+      if (compatibilityMismatch) {
+        this.resetBonesToBind();
+        this.applyProductionPoseCorrectives({});
+        this.productionPoseResult = {
+          applied: false,
+          reason: 'Rig definition requires a skin rebind after proportion change.',
+        };
+        this.poseAuthority = 'simulation-rig-v4-blocked-proportion-mismatch';
+      } else {
+        const result = this.applySimulationRigPose(directSimulationRigFrame);
+        directPoseApplied = result?.applied === true;
+        this.productionPoseResult = result || null;
+        if (directPoseApplied) {
+          this.applyProductionPoseCorrectives(result.correctiveActivations);
+          this.poseAuthority = 'simulation-rig-final-pose-v4';
+        } else {
+          this.resetBonesToBind();
+          this.applyProductionPoseCorrectives({});
+          this.poseAuthority = 'simulation-rig-v4-blocked-incompatible-skin';
+        }
+      }
+    } else {
+      if (restPose) this.resetBonesToBind(sourceLocalPositions);
+      else this.applyPoseDeltas(sourceRest, pose, sourceLocalPositions);
+      this.applyPoseCorrectives(sourceRest, pose, restPose);
+      this.poseAuthority = 'legacy-world-position-fallback';
+    }
 
     this.mesh.updateMatrixWorld(true);
     this.skeleton.update();
@@ -694,7 +814,10 @@ class NativeSmplSkinnedSurfaceLayer {
     skinMatricesToDualQuaternions(this.skinMatrices, this.dualQuaternions);
     this.mesh.userData.bindPoseProtected = restPose;
     this.mesh.userData.referenceBindingMismatch = compatibilityMismatch;
+    this.mesh.userData.poseAuthority = this.poseAuthority;
+    this.mesh.userData.simulationRigFrameId = directPoseApplied ? directFrameId : null;
     this.lastCompatibilityMismatch = compatibilityMismatch;
+    this.lastSimulationRigFrameId = directFrameId;
     this.auditSceneSurfaces({ purge: true, phase: 'refresh-complete' });
   }
 
@@ -750,6 +873,32 @@ class NativeSmplSkinnedSurfaceLayer {
     }
   }
 
+  /** V4 formal path: finalPose local quaternions are the only rotation input. */
+  applySimulationRigPose(frame) {
+    const result = this.productionSkinRuntime.updatePose(frame);
+    if (!result.applied) return result;
+    for (const id of this.orderedJointIds) {
+      const deltaArray = result.localRotations[id];
+      if (!isQuaternionArray(deltaArray)) continue;
+      const bone = this.bonesById.get(id);
+      const bindQuaternion = this.bindLocalQuaternions.get(id);
+      bone.position.copy(this.bindLocalPositions.get(id));
+      bone.quaternion.copy(bindQuaternion).multiply(
+        this.temp.qA.fromArray(deltaArray),
+      ).normalize();
+      bone.scale.copy(this.bindLocalScales.get(id));
+    }
+    const rootId = result.rootJointId;
+    const rootBone = this.bonesById.get(rootId);
+    if (rootBone && isVector3Array(result.rootDelta)) {
+      rootBone.position.copy(this.bindLocalPositions.get(rootId)).add(
+        this.temp.a.fromArray(result.rootDelta),
+      );
+    }
+    return result;
+  }
+
+  /** @deprecated Legacy compatibility only. V4 runtime frames must not call this. */
   calculateJointDeltaRotation(id, restPoints, posePoints) {
     const THREE = this.THREE;
     const runtimeMeta = this.runtimeDeformMetaById.get(id);
@@ -900,6 +1049,34 @@ class NativeSmplSkinnedSurfaceLayer {
       this.poseCorrectiveFields,
       activations,
     );
+    const position = this.mesh?.geometry?.attributes?.position;
+    if (position?.array) {
+      position.array.set(outputPositions);
+      position.needsUpdate = true;
+    }
+    if (this.mesh) {
+      this.mesh.userData.poseCorrectiveProfile = POSE_CORRECTIVE_PROFILE;
+      this.mesh.userData.poseCorrectiveStats = structuredClone(this.poseCorrectiveStats);
+    }
+    return this.poseCorrectiveStats;
+  }
+
+  applyProductionPoseCorrectives(activationInput = {}) {
+    const basePositions = this.shapedRestPositions ?? this.restPositions;
+    const outputPositions = this.poseCorrectedRestPositions ?? new Float32Array(basePositions.length);
+    this.poseCorrectedRestPositions = outputPositions;
+    const activations = new Map(Object.entries(activationInput ?? {}));
+    this.poseCorrectiveStats = {
+      ...applyPoseCorrectiveFields(
+        basePositions,
+        outputPositions,
+        this.poseCorrectiveFields,
+        activations,
+      ),
+      authority: 'finalPose.localRotations',
+      driverMode: 'bone-driven-local-quaternion',
+      modifiesRig: false,
+    };
     const position = this.mesh?.geometry?.attributes?.position;
     if (position?.array) {
       position.array.set(outputPositions);
@@ -1100,6 +1277,7 @@ class NativeSmplSkinnedSurfaceLayer {
       && sceneAudit.duplicateSurfaceCount === 0
       && renderableCount <= 1,
     ) ? 1 : 0;
+    const production = this.productionSkinRuntime.getDiagnostics();
     return {
       type: 'single-smpl-human-surface',
       pipeline: 'native-glb-skinnedmesh',
@@ -1139,9 +1317,23 @@ class NativeSmplSkinnedSurfaceLayer {
       triangleCount: geometry?.index ? Math.floor(geometry.index.count / 3) : 0,
       pickSource: 'detailed-smpl-skinned-mesh',
       pickable,
+      skinVersion: production.skinVersion,
+      bindingVersion: production.bindingVersion,
+      rigVersion: production.rigVersion,
+      deformRigStatus: production.deformRigStatus,
+      correctiveStatus: production.correctiveStatus,
+      skinQuality: production.skinQuality,
+      productionReady: production.productionReady,
+      assetClass: production.assetClass,
+      weightSource: production.weightSource,
+      inverseBindSource: production.inverseBindSource,
+      runtimeWeightGeneration: this.legacyDiagnosticRuntimeWeights,
+      proportionCompatible: production.proportionCompatible && !this.lastCompatibilityMismatch,
+      lockedProportionRevision: production.lockedProportionRevision,
+      productionSkinDiagnostics: production,
       deformation: `native Three.js SkinnedMesh GPU LBS + ${POSE_CORRECTIVE_PROFILE}`,
       deformationPipeline: structuredClone(SKIN_DEFORMATION_PIPELINE),
-      renderDeformationMode: 'gpu-lbs-with-sparse-pose-correctives',
+      renderDeformationMode: production.deformationMode,
       dqsReferenceMode: 'cpu-quality-reference',
       dqsReferenceAvailable: Boolean(this.dualQuaternions?.length),
       poseCorrectiveProfile: POSE_CORRECTIVE_PROFILE,
@@ -1150,6 +1342,9 @@ class NativeSmplSkinnedSurfaceLayer {
       bodyShape: structuredClone(this.bodyShapeResponse),
       bodyShapeAppliedToSkinOnly: true,
       bindPoseProtected: Boolean(this.mesh?.userData?.bindPoseProtected),
+      poseAuthority: this.poseAuthority,
+      simulationRigFrameId: this.mesh?.userData?.simulationRigFrameId ?? null,
+      legacyDirectionRotationFallback: !this.lastSimulationRigFrame,
       referenceBindingMismatch: Boolean(this.lastCompatibilityMismatch),
       assetWeightStatus: this.mesh?.userData?.assetWeightStatus ?? 'unknown',
       runtimeWeightProfile: this.mesh?.userData?.runtimeWeightProfile ?? null,
@@ -2663,7 +2858,9 @@ export function applyPoseCorrective(restPositions, outputPositions, {
         ? Math.abs(normalized.hipTwist[side])
         : spec.category === 'elbow'
           ? normalized.elbowFlex[side]
-          : normalized.kneeFlex[side];
+          : spec.category === 'wrist'
+            ? normalized.wristFlex[side]
+            : normalized.kneeFlex[side];
     activations.set(spec.id, activation);
   }
 
@@ -2914,6 +3111,32 @@ function makeBodyBasis(THREE, points, leftId, rightId, originId, upId) {
   const z = new THREE.Vector3().crossVectors(x, ySeed).normalize();
   const y = new THREE.Vector3().crossVectors(z, x).normalize();
   return new THREE.Matrix4().makeBasis(x, y, z);
+}
+
+function isSimulationRigFrameV4(value) {
+  return Boolean(
+    value
+    && typeof value === 'object'
+    && value.type === 'SimulationRigFrame'
+    && value.schema === 'humanoid_rig/simulation_rig_frame@4.0'
+    && value.finalPose?.type === 'PoseFrame'
+    && value.finalPose?.schema === 'humanoid_rig/pose_frame@4.0'
+    && value.finalPose?.localRotations
+    && typeof value.finalPose.localRotations === 'object',
+  );
+}
+
+function isQuaternionArray(value) {
+  return (Array.isArray(value) || ArrayBuffer.isView(value))
+    && value.length === 4
+    && Array.from(value).every((component) => Number.isFinite(Number(component)))
+    && Math.abs(Math.hypot(...Array.from(value, Number)) - 1) < 1e-4;
+}
+
+function isVector3Array(value) {
+  return (Array.isArray(value) || ArrayBuffer.isView(value))
+    && value.length === 3
+    && Array.from(value).every((component) => Number.isFinite(Number(component)));
 }
 
 function faceVertexIndices(geometry, intersection) {

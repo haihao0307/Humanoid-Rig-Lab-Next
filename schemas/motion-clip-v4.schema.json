@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/motion_clip@4.0",
+  "title": "Humanoid Rig Lab MotionClip V4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "type",
+    "clipId",
+    "name",
+    "duration",
+    "sourceRigVersion",
+    "sourceProportionRevision",
+    "loopMode",
+    "rootJointId",
+    "rootMotion",
+    "tracks",
+    "contacts",
+    "events",
+    "phaseData",
+    "quality",
+    "metadata"
+  ],
+  "properties": {
+    "schema": { "const": "humanoid_rig/motion_clip@4.0" },
+    "schemaVersion": { "const": 4 },
+    "type": { "const": "MotionClip" },
+    "clipId": { "$ref": "#/$defs/stableId" },
+    "name": { "type": "string", "minLength": 1 },
+    "duration": { "type": "number", "exclusiveMinimum": 0 },
+    "sourceRigVersion": { "type": "string", "minLength": 1 },
+    "sourceProportionRevision": { "type": "integer", "minimum": 0 },
+    "loopMode": { "enum": ["once", "repeat"] },
+    "rootJointId": { "$ref": "#/$defs/stableId" },
+    "rootMotion": { "$ref": "#/$defs/rootMotion" },
+    "tracks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/jointQuaternionTrack" }
+    },
+    "contacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/contact" }
+    },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" }
+    },
+    "phaseData": { "$ref": "#/$defs/phaseData" },
+    "quality": { "$ref": "#/$defs/quality" },
+    "metadata": { "type": "object" }
+  },
+  "$defs": {
+    "stableId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+    },
+    "vector3": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "number" }
+    },
+    "quaternion": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": { "type": "number" }
+    },
+    "vectorKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["time", "value"],
+      "properties": {
+        "time": { "type": "number", "minimum": 0 },
+        "value": { "$ref": "#/$defs/vector3" }
+      }
+    },
+    "quaternionKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["time", "value"],
+      "properties": {
+        "time": { "type": "number", "minimum": 0 },
+        "value": { "$ref": "#/$defs/quaternion" }
+      }
+    },
+    "jointQuaternionTrack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trackId", "jointId", "type", "space", "interpolation", "keyframes"],
+      "properties": {
+        "trackId": { "$ref": "#/$defs/stableId" },
+        "jointId": { "$ref": "#/$defs/stableId" },
+        "type": { "const": "joint_local_quaternion" },
+        "space": { "const": "local" },
+        "interpolation": { "enum": ["slerp", "step"] },
+        "keyframes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/quaternionKey" }
+        }
+      }
+    },
+    "rootMotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "space", "rootJointId", "positionTrack", "rotationTrack"],
+      "properties": {
+        "mode": { "enum": ["in_place", "root_motion"] },
+        "space": { "const": "character_local" },
+        "rootJointId": { "$ref": "#/$defs/stableId" },
+        "positionTrack": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["interpolation", "keyframes"],
+          "properties": {
+            "interpolation": { "enum": ["linear", "step"] },
+            "keyframes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/vectorKey" } }
+          }
+        },
+        "rotationTrack": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["interpolation", "keyframes"],
+          "properties": {
+            "interpolation": { "enum": ["slerp", "step"] },
+            "keyframes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/quaternionKey" } }
+          }
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "contactId", "contactType", "jointId", "time", "endTime", "position", "normal", "confidence"],
+      "properties": {
+        "schema": { "const": "humanoid_rig/motion_contact_data@4.0" },
+        "contactId": { "$ref": "#/$defs/stableId" },
+        "contactType": { "enum": ["foot_contact", "hand_contact"] },
+        "jointId": { "$ref": "#/$defs/stableId" },
+        "time": { "type": "number", "minimum": 0 },
+        "endTime": { "type": "number", "minimum": 0 },
+        "position": { "$ref": "#/$defs/vector3" },
+        "normal": { "$ref": "#/$defs/vector3" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventId", "time", "eventType", "payload"],
+      "properties": {
+        "eventId": { "$ref": "#/$defs/stableId" },
+        "time": { "type": "number", "minimum": 0 },
+        "eventType": { "type": "string", "minLength": 1 },
+        "payload": {}
+      }
+    },
+    "phaseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cyclic", "samples", "markers"],
+      "properties": {
+        "cyclic": { "type": "boolean" },
+        "samples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["time", "phase", "leftFootState", "rightFootState", "supportState"],
+            "properties": {
+              "time": { "type": "number", "minimum": 0 },
+              "phase": { "type": "number", "minimum": 0, "maximum": 1 },
+              "leftFootState": { "enum": ["stance", "swing"] },
+              "rightFootState": { "enum": ["stance", "swing"] },
+              "supportState": { "enum": ["left", "right", "double_support", "flight"] }
+            }
+          }
+        },
+        "markers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["markerId", "markerType", "time", "foot"],
+            "properties": {
+              "markerId": { "$ref": "#/$defs/stableId" },
+              "markerType": { "enum": ["stance_start", "swing_start", "heel_strike", "toe_off", "double_support_start", "double_support_end"] },
+              "time": { "type": "number", "minimum": 0 },
+              "foot": { "enum": ["left", "right", "both"] }
+            }
+          }
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "source", "validated", "visualAcceptance", "warnings"],
+      "properties": {
+        "status": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "validated": { "type": "boolean" },
+        "visualAcceptance": { "type": "boolean" },
+        "warnings": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

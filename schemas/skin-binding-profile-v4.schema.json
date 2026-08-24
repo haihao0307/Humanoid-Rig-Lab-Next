@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanoid-rig-lab-next.local/schemas/skin-binding-profile-v4.schema.json",
+  "title": "SkinBindingProfile V4",
+  "type": "object",
+  "required": [
+    "schema",
+    "bindingVersion",
+    "assetReference",
+    "assetClass",
+    "productionReady",
+    "compatibleRig",
+    "expectedJointCount",
+    "weightSource",
+    "inverseBindSource",
+    "runtimeWeightGeneration",
+    "coreJointMap",
+    "deformJointMap",
+    "correctiveMap"
+  ],
+  "properties": {
+    "schema": { "const": "humanoid_rig/skin_binding_profile@4.0" },
+    "schemaVersion": { "const": 4 },
+    "bindingVersion": { "type": "string", "minLength": 1 },
+    "name": { "type": "string" },
+    "assetReference": { "type": "string", "minLength": 1 },
+    "assetClass": { "enum": ["compatibility", "production"] },
+    "productionReady": { "type": "boolean" },
+    "compatibleRig": { "type": "string", "minLength": 1 },
+    "expectedJointCount": { "type": "integer", "minimum": 1 },
+    "requiredAttributes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "optionalProductionAttributes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "weightSource": { "const": "asset-prebound" },
+    "inverseBindSource": { "const": "asset-prebound" },
+    "runtimeWeightGeneration": { "const": false },
+    "proportionPolicy": { "enum": ["lock-on-first-final-pose", "exact"] },
+    "boundProportionRevision": { "type": ["integer", "null"], "minimum": 0 },
+    "deformationMode": { "type": "string", "minLength": 1 },
+    "coreJointMap": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "deformJointMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["sourceJointId", "mode"],
+        "properties": {
+          "sourceJointId": { "type": "string", "minLength": 1 },
+          "mode": { "enum": ["direct", "fractional", "identity"] },
+          "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+          "optional": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "correctiveMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["region", "driverJointId", "startAngle", "fullAngle"],
+        "properties": {
+          "region": { "enum": ["shoulder", "elbow", "wrist", "hip", "knee"] },
+          "driverJointId": { "type": "string", "minLength": 1 },
+          "startAngle": { "type": "number", "minimum": 0 },
+          "fullAngle": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "quality": { "type": "object" }
+  },
+  "additionalProperties": false
+}

@@ -35,6 +35,7 @@ class ThreeSkeletonView {
     this.skinSource = 'detail';
     this.bodyShapeProfile = null;
     this.skinLayer = null;
+    this.simulationRigFrame = null;
     this.clothingProfile = null;
     this.clothingLayer = null;
     this.clothingFrame = null;
@@ -240,11 +241,17 @@ class ThreeSkeletonView {
       hoveredKind: this.hoveredKind,
     };
     if (this.skinLayer) {
-      this.skinLayer.refresh(definition, surfaceInteraction);
+      this.skinLayer.refresh(definition, surfaceInteraction, {
+        simulationRigFrame: this.simulationRigFrame,
+      });
     } else {
       this.ensureSkinLayer();
     }
     this.ensureClothingLayer();
+  }
+
+  setSimulationRigFrame(frame) {
+    this.simulationRigFrame = frame?.finalPose ? structuredClone(frame) : null;
   }
 
   setView(viewType) {
@@ -409,6 +416,8 @@ class ThreeSkeletonView {
         selectedJointId: this.selectedJointId,
         hoveredJointId: this.hoveredJointId,
         hoveredKind: this.hoveredKind,
+      }, {
+        simulationRigFrame: this.simulationRigFrame,
       });
       return layer;
     }).catch((error) => {

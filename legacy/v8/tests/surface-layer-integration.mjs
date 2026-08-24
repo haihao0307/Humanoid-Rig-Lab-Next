@@ -10,6 +10,8 @@ import {
 import { computeRestWorldPositions } from '../src/skeleton-model.js';
 import { applyBodyProfileToDefinition } from '../src/body-profile.js';
 import { createStandardHumanoidPreset, normalizeSkeletonDefinition } from '../src/skeleton-presets.js';
+import { PhysicsRig } from '../src/physics-rig.js';
+import { createPoseFrameV4 } from '../../../src/modules/pose/pose-frame-v4.js';
 
 const { deformSurfaceLbs } = __surfaceTestUtils;
 
@@ -446,6 +448,7 @@ const definition = normalizeSkeletonDefinition(createStandardHumanoidPreset('A')
 const start = performance.now();
 const layer = await createSmplSkinLayer(THREE, scene, definition, {
   onSurfaceState: (state) => states.push(state),
+  legacyDiagnosticRuntimeWeights: true,
 });
 
 const immediate = layer.getDiagnostics();
@@ -502,6 +505,48 @@ assert.equal(diagnostics.runtimeWeightProfile, 'anatomical-extended-deform-v3');
 assert.equal(diagnostics.runtimeWeightStats.extendedWeightingApplied, true);
 assert.equal(diagnostics.runtimeWeightStats.weightedTwistJointCount, 8);
 assert.equal(diagnostics.runtimeWeightStats.weightedScapulaJointCount, 2);
+
+// V4 formal path: the skin receives SimulationRig.finalPose local quaternions
+// directly. This regression specifically proves it does not need the
+// world-direction calculateJointDeltaRotation fallback for an animation frame.
+const directDefinition = normalizeSkeletonDefinition(createStandardHumanoidPreset('A'));
+const directRest = computeRestWorldPositions(directDefinition);
+const directRoot = directRest.get('root');
+const inverseBindBeforeV4 = layer.skeleton.boneInverses.map((matrix) => [...matrix.elements]);
+const directPhysics = new PhysicsRig(directDefinition, {
+  gravityEnabled: false,
+  groundEnabled: true,
+  jointLimits: true,
+});
+const directAngle = Math.PI / 7;
+const directPose = createPoseFrameV4({
+  compatibleRig: 'rig@0.4.0',
+  rootJointId: 'hips',
+  rootPosition: [directRoot.x, directRoot.y, directRoot.z],
+  rootRotation: [0, 0, 0, 1],
+  localRotations: {
+    leftUpperArm: [0, 0, Math.sin(directAngle / 2), Math.cos(directAngle / 2)],
+  },
+  contacts: [],
+  ikTargets: [],
+  constraintState: { stage: 'surface-direct-v4-test' },
+  proportionRevision: 0,
+  timestamp: 1_786_000_123_456,
+});
+directPhysics.applyPoseFrame(directPose, { project: false });
+const directFrame = directPhysics.getSimulationRigFrame({ frameId: 'surface-direct-v4' });
+layer.refresh(directDefinition, null, { force: true, simulationRigFrame: directFrame });
+const directDiagnostics = layer.getDiagnostics();
+assert.equal(directDiagnostics.poseAuthority, 'simulation-rig-final-pose-v4');
+assert.equal(directDiagnostics.simulationRigFrameId, 'surface-direct-v4');
+assert.equal(directDiagnostics.legacyDirectionRotationFallback, false);
+assert.deepEqual(
+  layer.skeleton.boneInverses.map((matrix) => [...matrix.elements]),
+  inverseBindBeforeV4,
+  'Direct SimulationRig skinning modified inverse bind matrices.',
+);
+// Restore the legacy fixture path for the pre-existing geometry regressions.
+layer.refresh(definition, null, { force: true, simulationRigFrame: null });
 assert.equal(
   diagnostics.runtimeWeightStats.weightedFingerJointCount,
   30,
@@ -534,27 +579,34 @@ assert.equal(diagnostics.runtimeWeightStats.dominantCounts.rightEye, 0);
 assert.equal(diagnostics.runtimeWeightStats.dominantCounts.jaw, 0);
 assert.ok(Math.abs(diagnostics.runtimeWeightStats.minimumWeightSum - 1) < 1e-5);
 assert.ok(Math.abs(diagnostics.runtimeWeightStats.maximumWeightSum - 1) < 1e-5);
-assert.equal(diagnostics.renderDeformationMode, 'gpu-lbs-with-sparse-pose-correctives');
+assert.equal(diagnostics.renderDeformationMode, 'gpu-lbs-bone-corrective');
 assert.equal(diagnostics.dqsReferenceMode, 'cpu-quality-reference');
 assert.equal(diagnostics.dqsReferenceAvailable, true);
 assert.deepEqual(diagnostics.deformationPipeline.stages, [
-  'restPositions',
-  'body-shape-rest',
-  'pose-analysis',
-  'pose-corrective-offset',
+  'simulationRig.finalPose.localRotations',
+  'skin-binding-profile-v4',
+  'core-to-deform-map',
+  'bone-local-quaternions',
+  'three-skeleton-update',
+  'skin-matrix',
+  'bone-driven-corrective',
   'three-gpu-lbs',
 ]);
-assert.equal(diagnostics.deformationPipeline.defaultRenderer, 'three-gpu-lbs');
-assert.equal(diagnostics.deformationPipeline.experimentalRenderer, 'cpu-dqs-reference');
+assert.equal(
+  diagnostics.deformationPipeline.productionDefault,
+  'three-gpu-lbs-with-bone-driven-correctives',
+);
+assert.ok(diagnostics.deformationPipeline.experimentalModes.includes('cpu-dqs-reference'));
 assert.equal(diagnostics.deformationPipeline.nonAccumulating, true);
+assert.equal(diagnostics.deformationPipeline.rotationReconstructionFromWorldPositions, false);
 assert.equal(diagnostics.deformationPipeline.sourceAsset.jointCount, 24);
 assert.equal(diagnostics.deformationPipeline.sourceAsset.authoredFingerWeights, false);
 assert.equal(diagnostics.deformationPipeline.sourceAsset.authoredTwistWeights, false);
 assert.equal(diagnostics.deformationPipeline.sourceAsset.authoredScapulaWeights, false);
 assert.equal(diagnostics.deformationPipeline.runtimeWeightExtension.productionAuthoredWeights, false);
 assert.deepEqual(diagnostics.deformationPipeline, SKIN_DEFORMATION_PIPELINE);
-assert.equal(diagnostics.poseCorrectiveProfile, 'sparse-anatomical-pose-corrective-v1');
-assert.equal(diagnostics.poseCorrectiveFieldCount, 8);
+assert.equal(diagnostics.poseCorrectiveProfile, 'bone-driven-pose-corrective-v4');
+assert.equal(diagnostics.poseCorrectiveFieldCount, 10);
 assert.equal(diagnostics.poseCorrectiveStats.activeRegionCount, 0);
 assert.equal(diagnostics.poseCorrectiveStats.correctedVertexCount, 0);
 assert.ok(maximumArrayValue(layer.skinIndices) < 67);
@@ -564,7 +616,7 @@ for (const id of ['leftUpperArmTwist', 'rightScapulaCorrective', 'leftIndexDista
 }
 assert.equal(states[0]?.state, 'loading');
 assert.equal(states.at(-1)?.state, 'ready');
-assert.match(states.at(-1)?.label ?? '', /SKIN V002/);
+assert.match(states.at(-1)?.label ?? '', /Production Skin V4/);
 
 const lateLegacySurface = new Mesh(new Geo(), new Material());
 lateLegacySurface.name = 'LateStaticHumanSurface';
@@ -698,7 +750,7 @@ for (let index = 0; index < dqsReference.length; index += 3) {
 assert.equal(dqsNonFiniteCount, 0);
 assert.ok(maximumDqsReferenceDelta < 0.35, `DQS reference diverged ${maximumDqsReferenceDelta.toFixed(4)} m from final LBS.`);
 const correctiveRestPoints = computeRestWorldPositions(normalizeSkeletonDefinition(createStandardHumanoidPreset('A')));
-for (const channel of ['shoulderRaise', 'shoulderTwist', 'hipTwist', 'elbowFlex', 'kneeFlex']) {
+for (const channel of ['shoulderRaise', 'shoulderTwist', 'hipTwist', 'elbowFlex', 'wristFlex', 'kneeFlex']) {
   const first = new Float32Array(layer.restPositions.length);
   const second = new Float32Array(layer.restPositions.length);
   const analysis = { [channel]: { left: 1, right: 0 } };
@@ -919,6 +971,7 @@ assert.equal(layer.getDiagnostics().referenceBindingMismatch, true);
 const replacementStates = [];
 const replacementLayer = await createSmplSkinLayer(THREE, scene, definition, {
   onSurfaceState: (state) => replacementStates.push(state),
+  legacyDiagnosticRuntimeWeights: true,
 });
 await replacementLayer.detailPromise;
 const replacementDiagnostics = replacementLayer.getDiagnostics();
@@ -932,9 +985,42 @@ assert.equal(staleDiagnostics.ownsPrimarySurfaceSlot, false);
 assert.equal(staleDiagnostics.sceneSurfaceMeshCount, 1);
 assert.equal(staleDiagnostics.renderableSurfaceCount, 1);
 assert.equal(replacementLayer.getPickTargets().length, 1, 'Stale layer diagnostics removed the current primary surface.');
-assert.match(replacementStates.at(-1)?.label ?? '', /SKIN V002/);
+assert.match(replacementStates.at(-1)?.label ?? '', /Production Skin V4/);
 replacementLayer.dispose();
 layer.dispose();
+
+// Default runtime path: preserve asset-authored JOINTS_0/WEIGHTS_0, do not
+// append preview deform bones, and accept finalPose without any FK/world data.
+const productionScene = new Scene();
+const productionLayer = await createSmplSkinLayer(THREE, productionScene, definition);
+await productionLayer.detailPromise;
+const productionDiagnostics = productionLayer.getDiagnostics();
+assert.equal(productionDiagnostics.jointCount, 24);
+assert.equal(productionDiagnostics.runtimeSkeletonStats.appendedJointCount, 0);
+assert.equal(productionDiagnostics.runtimeWeightGeneration, false);
+assert.equal(productionDiagnostics.weightSource, 'asset-prebound');
+assert.equal(productionDiagnostics.inverseBindSource, 'asset-prebound');
+assert.equal(productionDiagnostics.productionReady, false);
+assert.equal(productionDiagnostics.assetClass, 'compatibility');
+assert.equal(productionDiagnostics.skinQuality, 'compatibility');
+assert.equal(productionDiagnostics.runtimeWeightProfile, 'asset-prebound-v4');
+assert.equal(productionDiagnostics.runtimeWeightStats.extendedWeightingApplied, false);
+assert.ok(maximumArrayValue(productionLayer.skinIndices) < 24);
+assert.equal(productionLayer.bonesById.has('leftUpperArmTwist'), false);
+const frameWithoutDerivedFk = structuredClone(directFrame);
+delete frameWithoutDerivedFk.fk;
+productionLayer.refresh(directDefinition, null, {
+  force: true,
+  simulationRigFrame: frameWithoutDerivedFk,
+});
+const quaternionAuthorityDiagnostics = productionLayer.getDiagnostics();
+assert.equal(quaternionAuthorityDiagnostics.poseAuthority, 'simulation-rig-final-pose-v4');
+assert.equal(quaternionAuthorityDiagnostics.legacyDirectionRotationFallback, false);
+assert.equal(
+  quaternionAuthorityDiagnostics.productionSkinDiagnostics.poseAuthority,
+  'finalPose.localRotations',
+);
+productionLayer.dispose();
 
 console.log(
   `T-pose anatomical-extended-deform LBS quality passed: max displacement ${maxDisplacement.toFixed(4)} m, `

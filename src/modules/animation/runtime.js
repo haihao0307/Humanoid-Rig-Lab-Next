@@ -1,6 +1,7 @@
 import { applyBodyProfileToDefinition, bodyProfileKey, normalizeBodyProfile } from '../../../legacy/v8/src/body-profile.js';
 import { computeRestWorldPositions, getBoneLength } from '../../../legacy/v8/src/skeleton-model.js';
 import { createStandardHumanoidPreset } from '../../../legacy/v8/src/skeleton-presets.js';
+import { createPoseFrameV4 } from '../pose/pose-frame-v4.js';
 import {
   addClip,
   beginGraphTransition,
@@ -42,6 +43,7 @@ import {
 
 export const ANIMATION_POSE_SCHEMA = 'humanoid_rig/animation_pose@0.2';
 export const ANIMATION_RUNTIME_FRAME_SCHEMA = 'humanoid_rig/animation_runtime_frame@0.2';
+export const SIMULATION_RIG_FRAME_V4_SCHEMA = 'humanoid_rig/simulation_rig_frame@4.0';
 export const INCOMING_ROTATION_CONVENTION_FULL = 'incoming_bone_bind_delta_full_quaternion';
 export const INCOMING_ROTATION_CONVENTION_ZERO_TWIST = 'incoming_bone_bind_delta_zero_twist';
 
@@ -497,6 +499,112 @@ export function buildIncomingBoneLocalRotations(fkInput, {
   return localRotations;
 }
 
+/**
+ * Converts the AnimationRig's internal pose into the V4 authoritative frame.
+ * The existing AnimationPose keeps hips rotation in `root.rotation`; PoseFrame
+ * V4 records that once as `rootRotation` and stores all remaining outgoing
+ * parent-local rotations under stable joint IDs.
+ */
+export function createAnimationPoseFrameV4(poseInput, {
+  compatibleRig = null,
+  contacts = [],
+  ikTargets = [],
+  constraintState = {},
+  proportionRevision = 0,
+  timestamp = Date.now(),
+} = {}) {
+  const pose = normalizeAnimationPose(poseInput, { compatibleRig: compatibleRig || 'rig@0.4.0' });
+  return createPoseFrameV4({
+    compatibleRig: compatibleRig || pose.compatibleRig,
+    rootJointId: 'hips',
+    rootPosition: pose.root.position,
+    rootRotation: pose.root.rotation,
+    localRotations: Object.fromEntries(
+      Object.entries(pose.joints).map(([jointId, value]) => [jointId, value.rotation]),
+    ),
+    contacts,
+    ikTargets,
+    constraintState,
+    proportionRevision,
+    timestamp,
+  });
+}
+
+/**
+ * Creates the explicit SimulationRig output consumed by V4 skinning. World
+ * transforms are derived frame data only; finalPose remains the authority.
+ */
+export function buildSimulationRigFrameV4(finalPoseInput, rigContextInput, {
+  contacts = [],
+  ikTargets = [],
+  constraintState = {},
+  proportionRevision = 0,
+  timestamp = Date.now(),
+} = {}) {
+  const rig = rigContextInput?.jointMap
+    ? rigContextInput
+    : createRigContext(rigContextInput?.bodyProfile || {});
+  const finalPose = normalizeAnimationPose(finalPoseInput, { compatibleRig: rig.rigVersion });
+  const fk = forwardKinematics(finalPose, rig);
+  const restFk = forwardKinematics(
+    createIdentityAnimationPose({ compatibleRig: rig.rigVersion }),
+    rig,
+  );
+  const finalPoseFrame = createAnimationPoseFrameV4(finalPose, {
+    compatibleRig: rig.rigVersion,
+    contacts,
+    ikTargets,
+    constraintState,
+    proportionRevision,
+    timestamp,
+  });
+  const worldPositions = {};
+  const worldRotations = {};
+  const rotationDeltas = {};
+  for (const joint of rig.joints) {
+    const worldRotation = normalizeQuaternion(fk.rotations.get(joint.id) || IDENTITY);
+    const restRotation = normalizeQuaternion(restFk.rotations.get(joint.id) || IDENTITY);
+    worldPositions[joint.id] = [...(fk.positions.get(joint.id) || ZERO)];
+    worldRotations[joint.id] = worldRotation;
+    rotationDeltas[joint.id] = normalizeQuaternion(
+      multiplyQuaternions(worldRotation, inverseQuaternion(restRotation)),
+    );
+  }
+  const rawTime = Number(finalPose.rawTime ?? finalPose.time ?? 0);
+  return {
+    schema: SIMULATION_RIG_FRAME_V4_SCHEMA,
+    schemaVersion: 4,
+    type: 'SimulationRigFrame',
+    frameId: `simulation:${rig.rigVersion}:${finalPose.clipId || 'none'}:${rawTime.toFixed(6)}:${Number(timestamp) || 0}`,
+    rigVersion: rig.rigVersion,
+    authority: 'local-quaternion-v4',
+    finalPose: finalPoseFrame,
+    fk: {
+      worldPositions,
+      worldRotations,
+      rotationDeltas,
+      derivedFrom: 'finalPose.localRotations',
+    },
+  };
+}
+
+/**
+ * Public AnimationRig sampling interface. Consumers that only need authored
+ * motion receive local quaternions and no world-position primary result.
+ */
+export function sampleAnimationPose(animationInput, options = {}) {
+  const frame = sampleAnimationRuntime(animationInput, options);
+  const desiredPose = frame.animationRig.desiredPose;
+  return {
+    rootTransform: {
+      position: [...desiredPose.rootPosition],
+      rotation: [...desiredPose.rootRotation],
+    },
+    localRotations: structuredClone(desiredPose.localRotations),
+    desiredPose: structuredClone(desiredPose),
+  };
+}
+
 export function getActiveClipContacts(clipInput, rawTime) {
   const clip = isNormalizedAnimationClip(clipInput) ? clipInput : normalizeClip(clipInput);
   const phase = resolveClipPhase(rawTime, clip.duration, clip.loopMode);
@@ -615,6 +723,9 @@ export function sampleAnimationRuntime(animationInput, {
   rigVersion = 'rig@0.4.0',
   previousFinalPose = null,
   deltaTime = 1 / 60,
+  proportionRevision = 0,
+  ikTargets = [],
+  userOverride = null,
 } = {}) {
   const animation = normalizeAnimationState(animationInput, { compatibleRig: rigVersion });
   const rig = createRigContext(bodyProfile, { rigVersion });
@@ -647,6 +758,45 @@ export function sampleAnimationRuntime(animationInput, {
   }
 
   const simulationFk = forwardKinematics(finalPose, rig);
+  const desiredPoseFrame = createAnimationPoseFrameV4(desiredPose, {
+    compatibleRig: rigVersion,
+    constraintState: {
+      stage: 'animation-sample',
+      jointLimitsApplied: false,
+      contactSolverApplied: false,
+    },
+    proportionRevision,
+    timestamp: nowMs,
+  });
+  const constrainedPoseFrame = createAnimationPoseFrameV4(constrainedPose, {
+    compatibleRig: rigVersion,
+    contacts: contactResult.contacts,
+    ikTargets,
+    constraintState: {
+      stage: 'ik-joint-limits-contact',
+      jointLimitsApplied: animation.runtime.jointLimitsEnabled,
+      clampedJoints: limitResult.clampedJoints,
+      contactSolverApplied: animation.runtime.footLockEnabled && animation.retarget.preserveContacts,
+    },
+    proportionRevision,
+    timestamp: nowMs,
+  });
+  const simulationRigFrame = buildSimulationRigFrameV4(finalPose, rig, {
+    contacts: contactResult.contacts,
+    ikTargets,
+    constraintState: {
+      stage: 'simulation-rig-final',
+      jointLimitsApplied: animation.runtime.jointLimitsEnabled,
+      clampedJoints: limitResult.clampedJoints,
+      contactSolverApplied: animation.runtime.footLockEnabled && animation.retarget.preserveContacts,
+      physicsMode: animation.runtime.mode,
+      physicsFollowApplied: animation.runtime.mode === 'physical_follow',
+      fullPhysicsSolverAvailable: false,
+      userOverrideApplied: Boolean(userOverride),
+    },
+    proportionRevision,
+    timestamp: nowMs,
+  });
   const selectedPose = animation.runtime.previewSource === 'desired_pose' ? desiredPose : finalPose;
   const selectedFk = animation.runtime.previewSource === 'desired_pose' ? animationFk : simulationFk;
   const pinned = new Set(contactResult.contacts.map((contact) => contact.jointId));
@@ -665,14 +815,31 @@ export function sampleAnimationRuntime(animationInput, {
     activeClipId: layerSample.activeClip.clipId,
     animationRig: {
       rigVersion,
+      input: {
+        type: 'MotionClip',
+        clipId: layerSample.activeClip.clipId,
+      },
+      desiredPose: desiredPoseFrame,
       pose: desiredPose,
       fk: animationFk,
     },
     simulationRig: {
       rigVersion,
+      input: {
+        desiredPose: desiredPoseFrame,
+        ikTargets: structuredClone(ikTargets),
+        physics: { mode: animation.runtime.mode },
+        userOverride: userOverride ? structuredClone(userOverride) : null,
+      },
+      finalPose: simulationRigFrame.finalPose,
       pose: finalPose,
       fk: simulationFk,
+      frame: simulationRigFrame,
     },
+    desiredPoseFrame,
+    constrainedPoseFrame,
+    finalPoseFrame: simulationRigFrame.finalPose,
+    simulationRigFrame,
     desiredPose,
     constrainedPose,
     finalPose,
@@ -698,6 +865,8 @@ export function sampleAnimationRuntime(animationInput, {
       jointAxesEntryCount: rig.jointAxisMap?.size ?? 0,
       incomingRotationConvention: INCOMING_ROTATION_CONVENTION_FULL,
       incomingRotationPreservesTwist: true,
+      poseAuthority: 'local-quaternion-v4',
+      worldTransformsDerived: true,
     },
   };
 }

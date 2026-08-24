@@ -24,6 +24,14 @@ export const BUILT_IN_CLIP_IDS = Object.freeze([
   'custom',
 ]);
 
+export const LEGACY_PROCEDURAL_MOTION_STATUS = Object.freeze({
+  schema: 'humanoid_rig/legacy_procedural_motion_status@4.0',
+  status: 'frozen-legacy-test-only',
+  mayExtend: false,
+  runtimeRole: 'legacy-test-and-editor-fallback',
+  replacement: 'humanoid_rig/motion_clip@4.0',
+});
+
 export function createBuiltInAnimationClips({ compatibleRig = 'rig@0.4.0' } = {}) {
   return [
     createIdleBreathePreset({ compatibleRig }),
@@ -413,6 +421,10 @@ function createClip({
     metadata: {
       workspaceAlias: 'AnimationClip',
       motionClipExport: 'humanoid_rig/motion_clip@1.0',
+      motionFoundationStatus: metadata.category === 'custom'
+        ? 'editor-draft'
+        : LEGACY_PROCEDURAL_MOTION_STATUS.status,
+      legacyProceduralMotion: metadata.category !== 'custom',
       ...metadata,
     },
     retargetPolicy: {

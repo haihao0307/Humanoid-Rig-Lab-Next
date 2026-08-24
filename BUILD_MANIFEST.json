@@ -39,12 +39,35 @@
     "buildId": "skin-v002-single-surface-guard",
     "asset": "legacy/v8/assets/smpl/smpl-male-surface-skinned.glb",
     "assetSha256": "736cb39c828203eae72f5e5d094f1623c0a4465a31b484737a6e8df02a7ec899",
-    "bindingMetadata": "legacy/v8/assets/smpl/SKIN_BINDING_METADATA.json"
+    "bindingMetadata": "legacy/v8/assets/smpl/SKIN_BINDING_METADATA.json",
+    "productionRuntime": "production-skin-v4-runtime@1",
+    "bindingProfile": "legacy/v8/assets/smpl/SKIN_BINDING_PROFILE_V4.json",
+    "bindingProfileSchema": "humanoid_rig/skin_binding_profile@4.0",
+    "poseAuthority": "simulationRig.finalPose.localRotations",
+    "weightSource": "asset-prebound",
+    "runtimeWeightGeneration": false,
+    "deformationMode": "gpu-lbs-bone-corrective",
+    "assetClass": "compatibility",
+    "productionReady": false
   },
   "poseContract": {
     "canonical": "humanoid_rig/pose_snapshot@1.0",
     "viewportPriority": "local-quaternion-pose-snapshot",
     "legacyFallback": "v8-world-position@1"
+  },
+  "motionFoundationV4": {
+    "runtime": "motion-foundation-v4-runtime@1",
+    "clipSchema": "humanoid_rig/motion_clip@4.0",
+    "contactSchema": "humanoid_rig/motion_contact_data@4.0",
+    "retargetSchema": "humanoid_rig/motion_retarget_profile@4.0",
+    "poseOutput": "humanoid_rig/pose_frame@4.0",
+    "poseAuthority": "desiredPose.localRotations",
+    "rootSpace": "character_local",
+    "coordinateSystem": "right-handed,+Y-up,+Z-forward,+X-right",
+    "legacyMotion": "frozen-test-and-editor-fallback",
+    "developmentAssetFamilies": ["idle", "walk", "stop", "turn", "sit", "stand", "reach"],
+    "visualAcceptance": false,
+    "samplingTargetMs": 1
   },
   "transientBus": "humanoid_rig/transient_bus@1.0",
   "characterCore": {

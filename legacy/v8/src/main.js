@@ -164,6 +164,7 @@ let rendererLoadAttempt = 0;
 let dragEnterDepth = 0;
 let fallbackView = null;
 let threeView = null;
+let simulationRigFrame = null;
 let animationFrameId = 0;
 let lastAnimationTime = performance.now();
 let lastUiRefreshTime = 0;
@@ -488,6 +489,10 @@ function refreshAfterPoseChange({ list = false, fit = false } = {}) {
 
 function refreshViews() {
   fallbackView?.refresh(definition, selectedJointId, hoveredJointId, hoveredKind);
+  simulationRigFrame = physicsRig?.getSimulationRigFrame?.({
+    frameId: simulationRigFrame?.frameId ?? null,
+  }) ?? null;
+  threeView?.setSimulationRigFrame?.(simulationRigFrame);
   threeView?.refresh(definition, selectedJointId, hoveredJointId, hoveredKind);
 }
 
@@ -1691,10 +1696,36 @@ function applyHostState(hostState, hostRevision) {
 }
 
 function applyHostPose(poseState, { animationFrame = false } = {}) {
+  const incomingSimulationRig = poseState?.simulationRig?.finalPose
+    ? poseState.simulationRig
+    : poseState?.simulationRigFrame?.finalPose
+      ? poseState.simulationRigFrame
+      : null;
   const poseSnapshot = poseState?.poseSnapshot;
   const posePayload = poseState?.v8Payload;
+  const simulationStamp = String(
+    incomingSimulationRig?.frameId
+    || incomingSimulationRig?.finalPose?.timestamp
+    || '',
+  );
+  if (incomingSimulationRig && simulationStamp && simulationStamp !== lastHostPoseStamp) {
+    physicsRig.applyPoseFrame(incomingSimulationRig.finalPose, {
+      // The first V4 bridge intentionally derives legacy positions but never
+      // projects them back through world-position PBD. That projection waits
+      // for the rotation-aware solver phase.
+      project: false,
+      preservePinTargets: false,
+    });
+    simulationRigFrame = physicsRig.getSimulationRigFrame({ frameId: incomingSimulationRig.frameId })
+      ?? structuredClone(incomingSimulationRig);
+    lastHostPoseStamp = simulationStamp;
+    if (animationFrame) refreshViews();
+    else refreshAll({ fit: false, list: true });
+    return true;
+  }
   const poseStamp = String(poseSnapshot?.updatedAt || posePayload?.updatedAt || '');
   if (poseSnapshot?.type === 'PoseSnapshot' && poseStamp && poseStamp !== lastHostPoseStamp) {
+    simulationRigFrame = null;
     physicsRig.applyPoseSnapshot(poseSnapshot, {
       // Animation frames already contain local quaternion results from the
       // animation runtime. Re-running the 960-pass position solver for every
@@ -1709,6 +1740,7 @@ function applyHostPose(poseState, { animationFrame = false } = {}) {
     return true;
   }
   if (posePayload?.joints?.length && poseStamp && poseStamp !== lastHostPoseStamp) {
+    simulationRigFrame = null;
     applyPosePayload(definition, posePayload);
     physicsRig.resetFromDefinitionPose({ project: true });
     physicsRig.projectConstraints(64);
@@ -1729,6 +1761,7 @@ function applyHostBodyProfile(rawProfile, { preview = false, preservePose = true
   const previousSelection = selectedJointId;
   definition = applyBodyProfileToDefinition(definition, normalized, { preservePose });
   physicsRig = new PhysicsRig(definition, optionsFromDefinition(definition));
+  simulationRigFrame = null;
   physicsRig.projectConstraints(64);
   physicsRig.zeroVelocities();
   physicsRig.writePoseToDefinition(true);

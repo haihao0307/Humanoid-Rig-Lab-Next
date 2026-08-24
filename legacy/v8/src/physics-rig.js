@@ -5,6 +5,11 @@ import {
   getBoneLength,
   markPoseModified,
 } from './skeleton-model.js';
+import {
+  clonePoseFrameV4,
+  createPoseFrameV4,
+  validatePoseFrameV4,
+} from '../../../src/modules/pose/pose-frame-v4.js';
 
 const EPSILON = 1e-10;
 const LENGTH_TOLERANCE = 1e-8;
@@ -12,6 +17,7 @@ const GROUND_TOLERANCE = 1e-8;
 const POSE_SNAPSHOT_SCHEMA = 'humanoid_rig/pose_snapshot@1.0';
 const POSE_ROTATION_CONVENTION = 'incoming_bone_bind_delta_zero_twist';
 const POSE_ROTATION_CONVENTION_FULL = 'incoming_bone_bind_delta_full_quaternion';
+const SIMULATION_RIG_FRAME_V4_SCHEMA = 'humanoid_rig/simulation_rig_frame@4.0';
 const SUPPORTED_POSE_ROTATION_CONVENTIONS = new Set([
   POSE_ROTATION_CONVENTION,
   POSE_ROTATION_CONVENTION_FULL,
@@ -68,6 +74,12 @@ export class PhysicsRig {
     this.drag = null;
     this.active = true;
     this.lastPoseImportStats = null;
+    // Position PBD remains available for direct manipulation, but a V4 motion
+    // frame keeps local quaternion state alongside its derived positions.
+    this.rotationState = null;
+    this.finalPoseFrame = null;
+    this.poseAuthority = 'legacy-world-position';
+    this.poseAuthorityReason = 'initialization';
     this.lastProjectionStats = {
       maxBoneError: 0,
       maxGroundPenetration: 0,
@@ -93,6 +105,7 @@ export class PhysicsRig {
     this.biomechanics = null;
     this.pinnedTargets = new Map();
     this.drag = null;
+    this.clearRotationState('definition-reset');
 
     const bindWorld = computeRestWorldPositions(definition);
     const poseWorld = preservePose ? computePoseWorldPositions(definition) : bindWorld;
@@ -848,11 +861,122 @@ export class PhysicsRig {
     return snapshot;
   }
 
+  /**
+   * Accepts the V4 local-quaternion authority without projecting it through the
+   * legacy PBD solver. Positions are derived solely for legacy tools and view
+   * compatibility; the returned finalPose remains the original quaternion data.
+   */
+  applyPoseFrame(frameInput, {
+    project = false,
+    preservePinTargets = false,
+  } = {}) {
+    if (!this.definition) throw new Error('Cannot apply a PoseFrame without a rig definition.');
+    const validation = validatePoseFrameV4(frameInput);
+    if (!validation.valid) throw new Error(`Invalid PoseFrame V4: ${validation.errors.join(' ')}`);
+    const frame = createPoseFrameV4(frameInput);
+    if (!this.indexById.has(frame.rootJointId)) {
+      throw new Error(`PoseFrame root joint ${frame.rootJointId} does not exist in this rig.`);
+    }
+    for (const jointId of Object.keys(frame.localRotations)) {
+      if (!this.indexById.has(jointId)) throw new Error(`PoseFrame joint ${jointId} does not exist in this rig.`);
+    }
+
+    const reconstructed = reconstructPoseFrameV4(this.definition, frame);
+    let applied = 0;
+    for (let index = 0; index < this.ids.length; index += 1) {
+      const point = reconstructed.positions.get(this.ids[index]);
+      if (!point) continue;
+      setArrayPoint(this.positions, index, point);
+      setArrayPoint(this.previous, index, point);
+      applied += 1;
+    }
+    if (applied === 0) throw new Error('PoseFrame does not match the current rig.');
+
+    if (!preservePinTargets) {
+      this.pinnedTargets.clear();
+      for (const joint of this.definition.joints) joint.pinned = false;
+    }
+    if (this.biomechanics) {
+      const rest = computeRestWorldPositions(this.definition);
+      const restFrame = computePelvisFrame(rest, { x: 0, y: 0, z: 1 });
+      this.biomechanics.lastForward = normalizeVectorPoint(
+        rotatePointByQuaternion(arrayToQuaternion(frame.rootRotation), restFrame.forward),
+      );
+    }
+
+    this.rotationState = clonePoseFrameV4(frame);
+    this.finalPoseFrame = clonePoseFrameV4(frame);
+    this.poseAuthority = 'local-quaternion-v4';
+    this.poseAuthorityReason = project
+      ? 'position-projection-deferred-until-rotation-aware-solver'
+      : 'simulation-rig-frame';
+    this.lastPoseImportStats = {
+      authority: this.poseAuthority,
+      appliedJoints: applied,
+      requestedPositionProjection: Boolean(project),
+      positionProjectionApplied: false,
+      preservePinTargets: Boolean(preservePinTargets),
+      worldPositionsDerived: true,
+    };
+    this.zeroVelocities({ capturePose: false });
+    this.writePoseToDefinition(true, { preserveRotationAuthority: true });
+    return applied;
+  }
+
+  getFinalPoseFrame() {
+    return this.finalPoseFrame ? clonePoseFrameV4(this.finalPoseFrame) : null;
+  }
+
+  getSimulationRigFrame({ frameId = null } = {}) {
+    const finalPose = this.getFinalPoseFrame();
+    if (!finalPose || !this.definition) return null;
+    const resolved = reconstructPoseFrameV4(this.definition, finalPose);
+    const restFrame = createRestPoseFrameV4(this.definition, finalPose.compatibleRig, finalPose.rootJointId);
+    const rest = reconstructPoseFrameV4(this.definition, restFrame);
+    const worldPositions = {};
+    const worldRotations = {};
+    const rotationDeltas = {};
+    for (const joint of this.definition.joints) {
+      const point = resolved.positions.get(joint.id);
+      const worldRotation = resolved.worldRotations.get(joint.id) ?? identityQuaternion();
+      const restRotation = rest.worldRotations.get(joint.id) ?? identityQuaternion();
+      if (point) worldPositions[joint.id] = pointToArray(point);
+      worldRotations[joint.id] = quaternionToArray(worldRotation);
+      rotationDeltas[joint.id] = quaternionToArray(
+        multiplyQuaternions(worldRotation, inverseQuaternion(restRotation)),
+      );
+    }
+    return {
+      schema: SIMULATION_RIG_FRAME_V4_SCHEMA,
+      schemaVersion: 4,
+      type: 'SimulationRigFrame',
+      frameId: frameId || `physics:${Number(finalPose.timestamp) || 0}`,
+      rigVersion: finalPose.compatibleRig,
+      authority: this.poseAuthority,
+      finalPose,
+      fk: {
+        worldPositions,
+        worldRotations,
+        rotationDeltas,
+        derivedFrom: 'finalPose.localRotations',
+      },
+    };
+  }
+
+  getPoseAuthority() {
+    return {
+      authority: this.poseAuthority,
+      reason: this.poseAuthorityReason,
+      finalPoseAvailable: Boolean(this.finalPoseFrame),
+    };
+  }
+
   /** Applies a canonical PoseSnapshot without touching bind dimensions. */
   applyPoseSnapshot(
     snapshot,
     { project = true, applyConstraintSettings = true, preservePinTargets = false } = {},
   ) {
+    this.clearRotationState('legacy-pose-snapshot');
     assertSupportedPoseSnapshot(snapshot, this.indexById, this.definition);
     if (applyConstraintSettings && snapshot.constraints) {
       this.setOptions({
@@ -1150,10 +1274,11 @@ export class PhysicsRig {
       : null;
   }
 
-  writePoseToDefinition(markCustom = true) {
+  writePoseToDefinition(markCustom = true, { preserveRotationAuthority = false } = {}) {
     if (!this.definition) {
       return;
     }
+    if (!preserveRotationAuthority) this.clearRotationState('world-position-write');
     this.syncControlNodes();
     for (let index = 0; index < this.ids.length; index += 1) {
       const joint = this.definition.joints[index];
@@ -1167,6 +1292,13 @@ export class PhysicsRig {
     if (markCustom) {
       markPoseModified(this.definition, 'CUSTOM');
     }
+  }
+
+  clearRotationState(reason = 'world-position-operation') {
+    this.rotationState = null;
+    this.finalPoseFrame = null;
+    this.poseAuthority = 'legacy-world-position';
+    this.poseAuthorityReason = String(reason);
   }
 
   applyPinnedTargets() {
@@ -1544,6 +1676,97 @@ function quaternionFromRotationMatrix(matrix) {
 
 function axisKey(index) {
   return index === 0 ? 'x' : index === 1 ? 'y' : 'z';
+}
+
+/**
+ * V4 forward kinematics: offsets are rotated by the parent orientation and a
+ * joint's outgoing local quaternion is composed only after its position has
+ * been placed. This intentionally differs from reconstructPoseSnapshot(),
+ * whose input uses the older incoming-bone convention.
+ */
+function reconstructPoseFrameV4(definition, frame) {
+  const rest = computeRestWorldPositions(definition);
+  const rootCarrier = definition.joints.find((joint) => !joint.parentId && !joint.isControl)?.id
+    ?? definition.joints.find((joint) => !joint.parentId)?.id;
+  if (!rootCarrier) return { positions: new Map(), worldRotations: new Map() };
+  const rootRest = rest.get(rootCarrier) ?? { x: 0, y: 0, z: 0 };
+  const rootPosition = arrayToPoint(frame.rootPosition, rootRest);
+  const translation = subtract(rootPosition, rootRest);
+  const positions = new Map();
+  const worldRotations = new Map();
+  const unresolved = new Set(definition.joints.map((joint) => joint.id));
+
+  const localRotationFor = (joint) => {
+    if (joint.id === frame.rootJointId) return arrayToQuaternion(frame.rootRotation);
+    return arrayToQuaternion(frame.localRotations?.[joint.id]);
+  };
+
+  for (let pass = 0; pass <= definition.joints.length && unresolved.size; pass += 1) {
+    let progressed = false;
+    for (const joint of definition.joints) {
+      if (!unresolved.has(joint.id)) continue;
+      const restPoint = rest.get(joint.id) ?? rootRest;
+      if (joint.isControl || joint.physicalBone === false) {
+        positions.set(joint.id, add(restPoint, translation));
+        worldRotations.set(joint.id, identityQuaternion());
+        unresolved.delete(joint.id);
+        progressed = true;
+        continue;
+      }
+      if (!joint.parentId) {
+        positions.set(joint.id, add(restPoint, translation));
+        worldRotations.set(joint.id, localRotationFor(joint));
+        unresolved.delete(joint.id);
+        progressed = true;
+        continue;
+      }
+      const parentPoint = positions.get(joint.parentId);
+      const parentRotation = worldRotations.get(joint.parentId);
+      if (!parentPoint || !parentRotation) continue;
+      const localRotation = localRotationFor(joint);
+      positions.set(
+        joint.id,
+        add(parentPoint, rotatePointByQuaternion(parentRotation, normalizePoint(joint.localPosition, { x: 0, y: 0, z: 0 }))),
+      );
+      worldRotations.set(joint.id, multiplyQuaternions(parentRotation, localRotation));
+      unresolved.delete(joint.id);
+      progressed = true;
+    }
+    if (!progressed) break;
+  }
+
+  // A malformed legacy hierarchy should not invalidate the current viewport.
+  // Such joints use their rest location and identity orientation, while valid
+  // core joints retain the local-quaternion authoritative result above.
+  for (const jointId of unresolved) {
+    positions.set(jointId, add(rest.get(jointId) ?? rootRest, translation));
+    worldRotations.set(jointId, identityQuaternion());
+  }
+  return { positions, worldRotations };
+}
+
+function createRestPoseFrameV4(definition, compatibleRig, rootJointId) {
+  const rest = computeRestWorldPositions(definition);
+  const rootCarrier = definition.joints.find((joint) => !joint.parentId && !joint.isControl)?.id
+    ?? definition.joints.find((joint) => !joint.parentId)?.id;
+  const rootPoint = rest.get(rootCarrier) ?? { x: 0, y: 0, z: 0 };
+  const localRotations = Object.fromEntries(
+    definition.joints
+      .filter((joint) => joint.id !== rootJointId)
+      .map((joint) => [joint.id, [0, 0, 0, 1]]),
+  );
+  return createPoseFrameV4({
+    compatibleRig,
+    rootJointId,
+    rootPosition: pointToArray(rootPoint),
+    rootRotation: [0, 0, 0, 1],
+    localRotations,
+    contacts: [],
+    ikTargets: [],
+    constraintState: { stage: 'bind-derived-reference' },
+    proportionRevision: 0,
+    timestamp: 0,
+  });
 }
 
 function reconstructPoseSnapshot(definition, rest, snapshot) {

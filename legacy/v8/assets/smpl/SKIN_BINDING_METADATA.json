@@ -69,7 +69,24 @@
       "dqsReference": "cpu-quality-reference",
       "rendererCompatibility": ["WebGPU", "WebGL2"]
     },
-    "status": "runtime-preview",
+    "status": "legacy-diagnostic-only",
     "productionReady": false
+  },
+  "productionSkinV4": {
+    "runtime": "production-skin-v4-runtime@1",
+    "bindingProfile": "SKIN_BINDING_PROFILE_V4.json",
+    "bindingSchema": "humanoid_rig/skin_binding_profile@4.0",
+    "poseAuthority": "simulationRig.finalPose.localRotations",
+    "weightSource": "asset-prebound",
+    "inverseBindSource": "asset-prebound",
+    "runtimeWeightGeneration": false,
+    "deformationMode": "gpu-lbs-bone-corrective",
+    "assetClass": "compatibility",
+    "productionReady": false,
+    "limitations": [
+      "No authored clavicle, scapula, twist, or finger weights",
+      "No UV or tangent attributes",
+      "No authored pose-space corrective targets"
+    ]
   }
 }

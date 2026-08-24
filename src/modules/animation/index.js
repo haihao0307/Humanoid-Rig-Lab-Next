@@ -929,10 +929,16 @@ function previewAtTime(context, animationInput, time, {
       rigVersion: state.activeVersions.rig,
       previousFinalPose: previousRuntimePose,
       deltaTime,
+      proportionRevision: currentProportionRevision(state),
     });
     previousRuntimePose = runtimeFrame.finalPose;
     lastRuntimeFrame = runtimeFrame;
-    postPosePreview(context, runtimeFrame.v8Payload, runtimeFrame.finalPose);
+    postPosePreview(
+      context,
+      runtimeFrame.v8Payload,
+      runtimeFrame.finalPose,
+      runtimeFrame.simulationRigFrame,
+    );
     if (status) status.textContent = runtimeStatus(clip, time);
     return;
   }
@@ -950,7 +956,7 @@ function previewAtTime(context, animationInput, time, {
   if (status) status.textContent = runtimeStatus(clip, time);
 }
 
-function postPosePreview(context, v8Payload, localPose = null) {
+function postPosePreview(context, v8Payload, localPose = null, simulationRig = null) {
   const frameWindow = context.elements.legacyFrame?.contentWindow;
   if (!frameWindow || typeof window === 'undefined') return;
   const state = context.getState();
@@ -964,6 +970,9 @@ function postPosePreview(context, v8Payload, localPose = null) {
       name: 'Animation Preview',
       poseSnapshot,
       v8Payload: structuredClone(v8Payload),
+      // V4 is the authoritative runtime hand-off. PoseSnapshot and v8Payload
+      // remain available for old embedded V8 hosts during the migration.
+      simulationRig: simulationRig ? structuredClone(simulationRig) : null,
     },
   }, window.location.origin);
 }
