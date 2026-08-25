@@ -41,7 +41,7 @@ for (const chunk of chunked.chunks) {
   assert.ok(chunk.geometry.getAttribute('position').array.byteLength <= PROCEDURAL_HUMAN_SOFTWARE_BUFFER_LIMIT_V5);
   assert.ok(chunk.geometry.getAttribute('normal').array.byteLength <= PROCEDURAL_HUMAN_SOFTWARE_BUFFER_LIMIT_V5);
   assert.ok(chunk.geometry.index.array.byteLength <= PROCEDURAL_HUMAN_SOFTWARE_BUFFER_LIMIT_V5);
-  assert.ok(chunk.geometry.index.array instanceof Uint16Array);
+  assert.ok(chunk.geometry.index.array instanceof Uint32Array, 'WebGPU chunk indices must not rely on implicit Uint16-to-Uint32 promotion.');
   assert.equal(chunk.geometry.getAttribute('position').usage, THREE.DynamicDrawUsage);
   assert.equal(chunk.geometry.getAttribute('normal').usage, THREE.DynamicDrawUsage);
   for (let localVertex = 0; localVertex < chunk.globalVertexIndices.length; localVertex += 1) {
@@ -62,6 +62,24 @@ for (const chunk of chunked.chunks) {
   }
 }
 
+const originalChunkGeometries = chunked.chunks.map((chunk) => chunk.geometry);
+let runtimeGeometryDisposeEvents = 0;
+for (const geometry of originalChunkGeometries) geometry.addEventListener('dispose', () => { runtimeGeometryDisposeEvents += 1; });
+const compactTopology = createRendererInput(3_000, 'renderer-adapter-fixture-compact-v2');
+chunked.update(compactTopology);
+assert.equal(runtimeGeometryDisposeEvents, 0, 'Runtime topology replacement must not dispose WebGPU geometry buffers.');
+assert.equal(chunked.chunks[0].geometry, originalChunkGeometries[0], 'Topology replacement must reuse the existing fixed-capacity geometry pool.');
+assert.ok(chunked.chunks.slice(chunked.activeChunkCount).every((chunk) => chunk.mesh.visible === false));
+const expandedTopology = createRendererInput(9_000, 'renderer-adapter-fixture-expanded-v3');
+chunked.update(expandedTopology);
+assert.equal(runtimeGeometryDisposeEvents, 0, 'Growing the chunk pool must retain every previously allocated geometry.');
+assert.equal(chunked.chunks[0].geometry, originalChunkGeometries[0]);
+assert.ok(chunked.getDiagnostics().pooledChunkCount >= chunked.getDiagnostics().chunkCount);
+assert.equal(chunked.getDiagnostics().runtimeGeometryDisposeCount, 0);
+assert.equal(chunked.getDiagnostics().bufferObjectsStableAcrossTopology, true);
+assert.equal(chunked.getDiagnostics().localIndexType, 'Uint32Array');
+assert.ok(chunked.getDiagnostics().maximumBufferByteLength <= PROCEDURAL_HUMAN_SOFTWARE_BUFFER_LIMIT_V5);
+
 assert.equal(shouldUseChunkedProceduralHumanAdapterV5({ isFallbackAdapter: true }), true);
 assert.equal(shouldUseChunkedProceduralHumanAdapterV5({ description: 'Google SwiftShader' }), true);
 assert.equal(shouldUseChunkedProceduralHumanAdapterV5({ vendor: 'NVIDIA', isFallbackAdapter: false }), false);
@@ -71,7 +89,7 @@ chunked.dispose();
 console.log(JSON.stringify(diagnostics));
 console.log('Human Core V5 procedural renderer adapter: FrontSide, stable dynamic attributes, and software-safe chunk uploads passed.');
 
-function createRendererInput(vertexCount) {
+function createRendererInput(vertexCount, topologyFingerprint = 'renderer-adapter-fixture-v1') {
   const positions = new Float32Array(vertexCount * 3);
   const normals = new Float32Array(vertexCount * 3);
   const regionIds = new Uint16Array(vertexCount * 4);
@@ -83,7 +101,7 @@ function createRendererInput(vertexCount) {
   for (let triangle = 0; triangle < vertexCount - 2; triangle += 1) indices.set([triangle, triangle + 1, triangle + 2], triangle * 3);
   return {
     schema: RENDERER_ADAPTER_INPUT_V5_SCHEMA,
-    topologyFingerprint: 'renderer-adapter-fixture-v1',
+    topologyFingerprint,
     positions,
     normals,
     indices,
