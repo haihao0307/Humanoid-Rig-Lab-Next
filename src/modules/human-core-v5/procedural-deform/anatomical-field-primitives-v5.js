@@ -47,29 +47,53 @@ export function primitiveBounds(primitive) {
 }
 
 function ellipsoidDistance(point, center, radii) {
-  const q = point.map((value, index) => (value - center[index]) / Math.max(EPSILON, radii[index]));
-  const k0 = Math.hypot(...q);
-  const q2 = q.map((value, index) => value / Math.max(EPSILON, radii[index]));
-  const k1 = Math.hypot(...q2);
+  return ellipsoidDistanceComponents(
+    point[0], point[1], point[2],
+    center[0], center[1], center[2],
+    radii[0], radii[1], radii[2],
+  );
+}
+
+function ellipsoidDistanceComponents(px, py, pz, cx, cy, cz, radiusX, radiusY, radiusZ) {
+  const rx = Math.max(EPSILON, radiusX);
+  const ry = Math.max(EPSILON, radiusY);
+  const rz = Math.max(EPSILON, radiusZ);
+  const qx = (px - cx) / rx;
+  const qy = (py - cy) / ry;
+  const qz = (pz - cz) / rz;
+  const k0 = Math.hypot(qx, qy, qz);
+  const k1 = Math.hypot(qx / rx, qy / ry, qz / rz);
   return k0 * (k0 - 1) / Math.max(EPSILON, k1);
 }
 
 function superellipsoidDistance(point, center, radii, exponent) {
   const power = Math.max(1.4, Number(exponent) || 2.6);
-  const normalized = point.map((value, index) => Math.abs((value - center[index]) / Math.max(EPSILON, radii[index])));
-  const implicit = Math.pow(normalized.reduce((sum, value) => sum + Math.pow(value, power), 0), 1 / power);
-  return (implicit - 1) * Math.min(...radii);
+  const x = Math.abs((point[0] - center[0]) / Math.max(EPSILON, radii[0]));
+  const y = Math.abs((point[1] - center[1]) / Math.max(EPSILON, radii[1]));
+  const z = Math.abs((point[2] - center[2]) / Math.max(EPSILON, radii[2]));
+  const implicit = Math.pow(Math.pow(x, power) + Math.pow(y, power) + Math.pow(z, power), 1 / power);
+  return (implicit - 1) * Math.min(radii[0], radii[1], radii[2]);
 }
 
 function taperedSegmentDistance(point, primitive) {
-  const axis = subtract(primitive.end, primitive.start);
-  const lengthSquared = dot(axis, axis);
-  const relative = subtract(point, primitive.start);
-  const t = lengthSquared < EPSILON ? 0 : clamp(dot(relative, axis) / lengthSquared, 0, 1);
-  const center = add(primitive.start, scale(axis, t));
-  if (primitive.sweep) center[2] += Math.sin(t * Math.PI) * Number(primitive.sweep);
-  const radii = primitive.startRadii.map((value, index) => value + (primitive.endRadii[index] - value) * t);
-  return ellipsoidDistance(point, center, radii);
+  const axisX = primitive.end[0] - primitive.start[0];
+  const axisY = primitive.end[1] - primitive.start[1];
+  const axisZ = primitive.end[2] - primitive.start[2];
+  const lengthSquared = axisX * axisX + axisY * axisY + axisZ * axisZ;
+  const relativeX = point[0] - primitive.start[0];
+  const relativeY = point[1] - primitive.start[1];
+  const relativeZ = point[2] - primitive.start[2];
+  const projection = relativeX * axisX + relativeY * axisY + relativeZ * axisZ;
+  const t = lengthSquared < EPSILON ? 0 : clamp(projection / lengthSquared, 0, 1);
+  const centerX = primitive.start[0] + axisX * t;
+  const centerY = primitive.start[1] + axisY * t;
+  const centerZ = primitive.start[2] + axisZ * t + (primitive.sweep ? Math.sin(t * Math.PI) * Number(primitive.sweep) : 0);
+  const radiusX = primitive.startRadii[0] + (primitive.endRadii[0] - primitive.startRadii[0]) * t;
+  const radiusY = primitive.startRadii[1] + (primitive.endRadii[1] - primitive.startRadii[1]) * t;
+  const radiusZ = primitive.startRadii[2] + (primitive.endRadii[2] - primitive.startRadii[2]) * t;
+  return ellipsoidDistanceComponents(
+    point[0], point[1], point[2], centerX, centerY, centerZ, radiusX, radiusY, radiusZ,
+  );
 }
 
 function freezePrimitive(value) {
