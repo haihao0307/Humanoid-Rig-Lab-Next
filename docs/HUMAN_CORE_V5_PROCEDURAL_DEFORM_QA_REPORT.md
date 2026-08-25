@@ -121,3 +121,9 @@ The prior task worktree reported pre-existing missing Git objects (`d3183073...`
 6. Report visual failures with the corresponding PNG and `user-visual-review.json` record.
 
 Task 15 is not authorized while browser evidence and user visual acceptance remain pending.
+
+## Task 14C WebGPU Run 24 follow-up
+
+Run `32871662057` confirmed that the QA harness used Playwright Chromium `151.0.7922.34`, not the system Chromium fallback. Forced WebGL2 passed. WebGPU selected the SwiftShader fallback adapter and reached runtime readiness, but its renderer-owned device was destroyed 43 ms later. The later 3072-byte mapped-at-creation error is a consequence of that lost device, not evidence of an undersized software-adapter limit.
+
+The next isolated repair removes the page's separate diagnostic adapter request and obtains adapter information only from the initialized `WebGPURenderer` backend. The page still creates no `GPUDevice` directly. Until a subsequent run produces non-empty WebGPU screenshots with zero page errors and unhandled rejections, `userVisualAcceptance=pending`, `visualAcceptance=false`, and `productionReady=false` remain unchanged.
