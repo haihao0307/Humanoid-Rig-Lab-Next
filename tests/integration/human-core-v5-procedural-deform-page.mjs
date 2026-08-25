@@ -61,5 +61,8 @@ assert.match(browserRunner, /spawn\(process\.execPath, \['server\.mjs'\]/);
 assert.match(browserRunner, /chromium\.launchServer/);
 assert.match(browserRunner, /browserServer\.kill/);
 assert.match(browserRunner, /withTimeout/);
+assert.match(browserRunner, /Browser QA evidence summary/);
+assert.match(browserRunner, /consoleErrors/);
+assert.match(browserRunner, /glbRequests/);
 assert.doesNotMatch(browserRunner, /globalThis\.WebSocket|new WebSocket|class CDPClient/);
 console.log('Human Core V5 Procedural Deform page contract: shared anatomical-axis fixtures, independent FK overlay, explicit WebGPU/WebGL2 diagnostics, QA actions, and pinned Playwright browser evidence automation passed file inspection.');

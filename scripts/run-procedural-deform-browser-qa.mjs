@@ -162,13 +162,33 @@ export async function verifyProceduralDeformQAArtifacts({ artifactRoot = default
     if (!expected || expected[2] !== evidence.poseId) throw new Error(`Screenshot pose/file mismatch for ${evidence.artifactPath}.`);
   }
   if (report.visualAcceptance !== false || report.productionReady !== false) throw new Error('Browser evidence cannot promote release flags before user acceptance.');
+  const runSummaries = Object.fromEntries(report.runs.map((run) => [run.requestedBackend, verifiedRunSummary(run)]));
   return {
     commit: currentCommit,
     manifestFileCount: manifest.files.length,
     screenshotCount: report.screenshots.length,
     webgl2: webgl2.classification,
     webgpu: webgpu?.classification ?? 'not-run',
+    runs: runSummaries,
+    totals: {
+      consoleErrors: report.runs.reduce((total, run) => total + run.consoleErrors.length, 0),
+      pageErrors: report.runs.reduce((total, run) => total + run.pageErrors.length, 0),
+      glbRequests: report.runs.reduce((total, run) => total + run.glbRequests.length, 0),
+      screenshots: report.screenshots.length,
+    },
     sha256: 'pass',
+  };
+}
+
+function verifiedRunSummary(run) {
+  return {
+    classification: run.classification,
+    passed: run.passed,
+    activeBackend: run.activeBackend,
+    consoleErrors: run.consoleErrors.length,
+    pageErrors: run.pageErrors.length,
+    glbRequests: run.glbRequests.length,
+    screenshots: run.screenshotCount,
   };
 }
 
@@ -800,10 +820,23 @@ function emitGitHubBrowserFailure(report) {
   console.error(`::error file=human-core-v5-procedural-deform.html,line=1,title=Browser contract failure::${message}`);
 }
 
+function emitGitHubVerificationNotice(verification) {
+  if (process.env.GITHUB_ACTIONS !== 'true') return;
+  const message = JSON.stringify(verification)
+    .replaceAll('%', '%25')
+    .replaceAll('\r', '%0D')
+    .replaceAll('\n', '%0A');
+  console.log(`::notice title=Browser QA evidence summary::${message}`);
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const options = parseBrowserQAArguments();
-    if (options.verifyArtifacts) console.log(JSON.stringify(await verifyProceduralDeformQAArtifacts({ artifactRoot: options.artifactRoot }), null, 2));
+    if (options.verifyArtifacts) {
+      const verification = await verifyProceduralDeformQAArtifacts({ artifactRoot: options.artifactRoot });
+      console.log(JSON.stringify(verification, null, 2));
+      emitGitHubVerificationNotice(verification);
+    }
     else {
       const report = await runProceduralDeformBrowserQA(options);
       console.log(JSON.stringify({ status: report.status, commit: report.commit, runs: report.runs.map((run) => ({ backend: run.requestedBackend, activeBackend: run.activeBackend, classification: run.classification, passed: run.passed })) }, null, 2));
