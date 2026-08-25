@@ -20,10 +20,21 @@ for (const label of [
 ]) assert.match(combined, new RegExp(label.replace(/[+]/g, '\\+')));
 assert.doesNotMatch(`${html}\n${app}`, /GLTFLoader|smpl-male-surface|(?:src|href)=["'][^"']+\.glb/i, 'Procedural page must not request a human GLB.');
 assert.doesNotMatch(app, /(?:import|fetch)\s*\([^)]*\.glb/i, 'Procedural app must not import or fetch a human GLB.');
+assert.match(html, /"three":"https:\/\/cdn\.jsdelivr\.net\/npm\/three@0\.185\.1\/build\/three\.webgpu\.js"/,
+  'The page must resolve all Three.js core, addon, and renderer imports through one WebGPU-capable module instance.');
+assert.doesNotMatch(html, /three\.module\.js|"three\/webgpu"/,
+  'The procedural page must not mix the regular and WebGPU Three.js builds.');
 assert.match(app, /WebGPURenderer/);
+assert.match(app, /new THREE\.WebGPURenderer/);
+assert.match(app, /forceWebGL:\s*forceWebGLBackend/);
+assert.match(app, /backend\?\.isWebGPUBackend/);
+assert.match(app, /backend\?\.isWebGLBackend/);
+assert.doesNotMatch(app, /import\('three\/webgpu'\)|THREE\.WebGLRenderer|getContext\('webgl2'/,
+  'WebGPU and forced WebGL2 must share the same WebGPURenderer module and backend lifecycle.');
 assert.doesNotMatch(app, /navigator\.gpu\.requestAdapter/, 'The page must not create a second WebGPU adapter outside the renderer backend.');
-assert.match(app, /webgpuRenderer\.backend\?\.adapter/, 'WebGPU diagnostics must read the renderer-owned adapter.');
 assert.doesNotMatch(app, /requestDevice/, 'Only Three.js WebGPURenderer may create the production GPUDevice.');
+assert.match(app, /renderer-owned-internal/,
+  'Diagnostics must acknowledge that Three.js owns the internal adapter instead of probing a second adapter.');
 assert.match(app, /renderer-owned-pass/);
 assert.match(app, /ChunkedProceduralHumanAdapterV5/);
 assert.match(app, /measureSteadyStatePerformance/);
@@ -41,7 +52,6 @@ assert.doesNotMatch(app, /software-safe limit|AUXILIARY_PREVIEW_BUFFER_BYTE_LIMI
 assert.doesNotMatch(app, /disposeGroupChildren|\.geometry\?\.dispose\(\)|\.setFromPoints\(/, 'Live auxiliary previews must update stable renderer resources instead of disposing or replacing geometry.');
 assert.match(app, /navigatorGPU:\s*Boolean\(navigator\.gpu\)/);
 assert.match(app, /'navigator\.gpu':\s*rendererState\.navigatorGPU/);
-assert.match(app, /getContext\('webgl2'/);
 assert.match(app, /forceWebGL/);
 assert.match(app, /createProceduralDeformValidationPoseV5/);
 assert.match(app, /createProceduralSimulationRigFrameV5/);
