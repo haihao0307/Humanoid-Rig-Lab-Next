@@ -722,8 +722,10 @@ function browserFailureSummary(report) {
 }
 
 function emitGitHubBrowserFailure(report) {
+  const summary = JSON.stringify(browserFailureSummary(report)).slice(0, 6_000);
+  console.error(`BROWSER_QA_FAILURE_SUMMARY ${summary}`);
   if (process.env.GITHUB_ACTIONS !== 'true') return;
-  const message = JSON.stringify(browserFailureSummary(report)).slice(0, 6_000)
+  const message = summary
     .replaceAll('%', '%25')
     .replaceAll('\r', '%0D')
     .replaceAll('\n', '%0A');
