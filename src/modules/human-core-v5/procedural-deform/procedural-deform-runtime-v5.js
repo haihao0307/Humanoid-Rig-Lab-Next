@@ -50,6 +50,15 @@ export class ProceduralDeformRuntimeV5 {
     const started = performanceNow();
     this.driverFrame = createRegionDeformationDriverFrameV5({ finalPose, rigCore: this.rigCore, anatomyState, bodyDNA: this.bodyDNA, timestamp });
     const transforms = createRegionTransforms(this.field.definition, this.rigCore, finalPose);
+    for (const transform of transforms.values()) transform.dual = dualQuaternionPart(transform.q, transform.t);
+    const transformsByRegionIndex = this.surface.regionNames.map((regionName) => transforms.get(regionName) ?? IDENTITY_TRANSFORM);
+    const correctionByRegionIndex = createRegionCorrectionContexts(
+      this.field.definition,
+      this.surface.regionNames,
+      transformsByRegionIndex,
+      this.driverFrame,
+      anatomyState,
+    );
     const positions = new Float32Array(this.surface.positions.length);
     const normals = new Float32Array(this.surface.normals.length);
     const regionDiagnostics = Object.fromEntries([...transforms].map(([regionName, transform]) => {
@@ -63,29 +72,21 @@ export class ProceduralDeformRuntimeV5 {
       }];
     }));
     for (let vertex = 0; vertex < this.surface.positions.length / 3; vertex += 1) {
-      const point = read3(this.surface.positions, vertex);
-      const normal = read3(this.surface.normals, vertex);
-      const influences = [];
-      for (let influence = 0; influence < 4; influence += 1) {
-        const offset = vertex * 4 + influence;
-        const weight = this.surface.regionBlendWeights[offset];
-        if (weight <= 0) continue;
-        const regionName = this.surface.regionNames[this.surface.regionIds[offset]];
-        influences.push({ regionName, weight, transform: transforms.get(regionName) ?? IDENTITY_TRANSFORM });
-      }
-      const deformed = blendDualQuaternionPoint(point, influences);
-      const primary = influences[0]?.regionName ?? 'upperTorso';
-      const corrected = applyLocalImplicitCorrection(
-        deformed,
-        point,
-        primary,
-        influences[0]?.transform ?? IDENTITY_TRANSFORM,
-        this.driverFrame,
-        anatomyState,
-        this.field.definition,
+      const blended = blendPreparedSurfaceVertex(this.surface, vertex, transformsByRegionIndex);
+      const corrected = applyPreparedLocalImplicitCorrection(
+        blended.position,
+        this.surface.positions,
+        vertex,
+        correctionByRegionIndex[blended.primaryRegionIndex],
       );
-      positions.set(corrected, vertex * 3);
-      normals.set(normalize(blendRotatedNormal(normal, influences)), vertex * 3);
+      const positionOffset = vertex * 3;
+      positions[positionOffset] = corrected[0];
+      positions[positionOffset + 1] = corrected[1];
+      positions[positionOffset + 2] = corrected[2];
+      normals[positionOffset] = blended.normal[0];
+      normals[positionOffset + 1] = blended.normal[1];
+      normals[positionOffset + 2] = blended.normal[2];
+      const primary = this.surface.regionNames[blended.primaryRegionIndex] ?? 'upperTorso';
       regionDiagnostics[primary].vertexCount += 1;
     }
     this.frame = createProceduralDeformFrameV5({
@@ -129,7 +130,7 @@ export class ProceduralDeformRuntimeV5 {
   assertReady() { this.assertCompiled(); if (!this.surface) throw new Error('generateCanonicalSurface() must run first.'); }
 }
 
-const IDENTITY_TRANSFORM = Object.freeze({ q: [0, 0, 0, 1], t: [0, 0, 0] });
+const IDENTITY_TRANSFORM = Object.freeze({ q: [0, 0, 0, 1], t: [0, 0, 0], dual: [0, 0, 0, 0] });
 const REGION_DRIVER_MAP = Object.freeze({
   leftUpperArm: 'leftShoulder', rightUpperArm: 'rightShoulder', leftForearm: 'leftElbow', rightForearm: 'rightElbow',
   leftPalm: 'leftWrist', rightPalm: 'rightWrist', leftThigh: 'leftHip', rightThigh: 'rightHip',
@@ -177,39 +178,99 @@ function primitiveAnchor(primitive, regionName, canonicalLayout) {
   return primitive.center;
 }
 
-function blendDualQuaternionPoint(point, influences) {
-  if (!influences.length) return [...point];
-  let real = [0, 0, 0, 0]; let dual = [0, 0, 0, 0]; const reference = influences[0].transform.q;
-  for (const influence of influences) {
-    let q = influence.transform.q; let d = dualQuaternionPart(q, influence.transform.t);
-    if (dot4(q, reference) < 0) { q = q.map((value) => -value); d = d.map((value) => -value); }
-    real = real.map((value, index) => value + q[index] * influence.weight);
-    dual = dual.map((value, index) => value + d[index] * influence.weight);
+function blendPreparedSurfaceVertex(surface, vertex, transformsByRegionIndex) {
+  const positionOffset = vertex * 3;
+  const influenceOffset = vertex * 4;
+  const px = surface.positions[positionOffset];
+  const py = surface.positions[positionOffset + 1];
+  const pz = surface.positions[positionOffset + 2];
+  const nx = surface.normals[positionOffset];
+  const ny = surface.normals[positionOffset + 1];
+  const nz = surface.normals[positionOffset + 2];
+  let primaryRegionIndex = surface.regionIds[influenceOffset];
+  let reference = transformsByRegionIndex[primaryRegionIndex]?.q ?? IDENTITY_TRANSFORM.q;
+  let realX = 0; let realY = 0; let realZ = 0; let realW = 0;
+  let dualX = 0; let dualY = 0; let dualZ = 0; let dualW = 0;
+  let normalX = 0; let normalY = 0; let normalZ = 0;
+  let influenceCount = 0;
+  for (let influence = 0; influence < 4; influence += 1) {
+    const offset = influenceOffset + influence;
+    const weight = surface.regionBlendWeights[offset];
+    if (weight <= 0) continue;
+    const regionIndex = surface.regionIds[offset];
+    const transform = transformsByRegionIndex[regionIndex] ?? IDENTITY_TRANSFORM;
+    if (influenceCount === 0) { primaryRegionIndex = regionIndex; reference = transform.q; }
+    influenceCount += 1;
+    const q = transform.q;
+    const dual = transform.dual ?? IDENTITY_TRANSFORM.dual;
+    const sign = q[0] * reference[0] + q[1] * reference[1] + q[2] * reference[2] + q[3] * reference[3] < 0 ? -1 : 1;
+    const signedWeight = weight * sign;
+    realX += q[0] * signedWeight; realY += q[1] * signedWeight; realZ += q[2] * signedWeight; realW += q[3] * signedWeight;
+    dualX += dual[0] * signedWeight; dualY += dual[1] * signedWeight; dualZ += dual[2] * signedWeight; dualW += dual[3] * signedWeight;
+    const rotatedNormal = rotateComponents(q[0], q[1], q[2], q[3], nx, ny, nz);
+    normalX += rotatedNormal[0] * weight; normalY += rotatedNormal[1] * weight; normalZ += rotatedNormal[2] * weight;
   }
-  const length = Math.hypot(...real) || 1; real = real.map((value) => value / length); dual = dual.map((value) => value / length);
-  const translationQ = multiplyQuaternion(dual.map((value) => value * 2), conjugate(real));
-  return add(rotate(real, point), translationQ.slice(0, 3));
+  if (!influenceCount) return { position: [px, py, pz], normal: [nx, ny, nz], primaryRegionIndex };
+  const realLength = Math.hypot(realX, realY, realZ, realW) || 1;
+  realX /= realLength; realY /= realLength; realZ /= realLength; realW /= realLength;
+  dualX /= realLength; dualY /= realLength; dualZ /= realLength; dualW /= realLength;
+  const rotatedPoint = rotateComponents(realX, realY, realZ, realW, px, py, pz);
+  const translationX = 2 * (-dualW * realX + dualX * realW - dualY * realZ + dualZ * realY);
+  const translationY = 2 * (-dualW * realY + dualX * realZ + dualY * realW - dualZ * realX);
+  const translationZ = 2 * (-dualW * realZ - dualX * realY + dualY * realX + dualZ * realW);
+  const normalLength = Math.hypot(normalX, normalY, normalZ) || 1;
+  return {
+    position: [rotatedPoint[0] + translationX, rotatedPoint[1] + translationY, rotatedPoint[2] + translationZ],
+    normal: [normalX / normalLength, normalY / normalLength, normalZ / normalLength],
+    primaryRegionIndex,
+  };
 }
 
-function blendRotatedNormal(normal, influences) {
-  const result = [0, 0, 0];
-  for (const influence of influences) { const rotated = rotate(influence.transform.q, normal); for (let axis = 0; axis < 3; axis += 1) result[axis] += rotated[axis] * influence.weight; }
-  return result;
-}
-
-function applyLocalImplicitCorrection(deformed, bindPoint, regionName, regionTransform, driverFrame, anatomyState, definition) {
-  const driver = driverFrame.regions[REGION_DRIVER_MAP[regionName]];
-  if (!driver) return deformed;
-  const region = definition.regions.find((item) => item.regionId === regionName);
-  const center = region.primitive.center ?? region.primitive.start.map((value, axis) => (value + region.primitive.end[axis]) / 2);
-  const radial = subtract(bindPoint, center);
-  const localClass = /UpperArm|Forearm|Palm|Thigh|Calf|Foot/.test(regionName);
-  const activationScale = 1 + (driver.volume - 1) * (localClass ? 0.055 : 0.035);
-  const compressionScale = 1 - driver.compression * (/UpperArm|Thigh/.test(regionName) ? 0.018 : 0.012);
-  const correctionLocal = radial.map((value, axis) => value * (axis === 1 ? compressionScale - 1 : activationScale - 1));
-  const correction = rotate(regionTransform.q, correctionLocal);
+function createRegionCorrectionContexts(definition, regionNames, transformsByRegionIndex, driverFrame, anatomyState) {
   const anatomyBias = anatomyState.deformationSignal?.application?.writesMesh === false ? 1 : 0;
-  return deformed.map((value, axis) => value + correction[axis] * anatomyBias);
+  const regionById = new Map(definition.regions.map((region) => [region.regionId, region]));
+  return regionNames.map((regionName, regionIndex) => {
+    const driver = driverFrame.regions[REGION_DRIVER_MAP[regionName]];
+    if (!driver || !anatomyBias) return null;
+    const region = regionById.get(regionName);
+    const primitive = region.primitive;
+    const center = primitive.center ?? [
+      (primitive.start[0] + primitive.end[0]) * 0.5,
+      (primitive.start[1] + primitive.end[1]) * 0.5,
+      (primitive.start[2] + primitive.end[2]) * 0.5,
+    ];
+    const localClass = /UpperArm|Forearm|Palm|Thigh|Calf|Foot/.test(regionName);
+    const activationDelta = (driver.volume - 1) * (localClass ? 0.055 : 0.035);
+    const compressionDelta = -driver.compression * (/UpperArm|Thigh/.test(regionName) ? 0.018 : 0.012);
+    return { center, q: transformsByRegionIndex[regionIndex].q, activationDelta, compressionDelta };
+  });
+}
+
+function applyPreparedLocalImplicitCorrection(deformed, bindPositions, vertex, context) {
+  if (!context) return deformed;
+  const offset = vertex * 3;
+  const radialX = bindPositions[offset] - context.center[0];
+  const radialY = bindPositions[offset + 1] - context.center[1];
+  const radialZ = bindPositions[offset + 2] - context.center[2];
+  const q = context.q;
+  const correction = rotateComponents(
+    q[0], q[1], q[2], q[3],
+    radialX * context.activationDelta,
+    radialY * context.compressionDelta,
+    radialZ * context.activationDelta,
+  );
+  return [deformed[0] + correction[0], deformed[1] + correction[1], deformed[2] + correction[2]];
+}
+
+function rotateComponents(qx, qy, qz, qw, vx, vy, vz) {
+  const tx = 2 * (qy * vz - qz * vy);
+  const ty = 2 * (qz * vx - qx * vz);
+  const tz = 2 * (qx * vy - qy * vx);
+  return [
+    vx + qw * tx + qy * tz - qz * ty,
+    vy + qw * ty + qz * tx - qx * tz,
+    vz + qw * tz + qx * ty - qy * tx,
+  ];
 }
 
 function dualQuaternionPart(q, t) { return multiplyQuaternion([t[0], t[1], t[2], 0], q).map((value) => value * 0.5); }
@@ -217,8 +278,7 @@ function multiplyQuaternion(a, b) { return [a[3]*b[0]+a[0]*b[3]+a[1]*b[2]-a[2]*b
 function conjugate(q) { return [-q[0], -q[1], -q[2], q[3]]; }
 function rotate(q, v) { const result = multiplyQuaternion(multiplyQuaternion(q, [v[0], v[1], v[2], 0]), conjugate(q)); return result.slice(0, 3); }
 function normalizeQuaternion(value) { const q = Array.from(value, Number); const l = Math.hypot(...q) || 1; return q.map((item) => item / l); }
-function normalize(value) { const length = Math.hypot(...value) || 1; return value.map((item) => item / length); }
-function add(a,b){return a.map((v,i)=>v+b[i]);} function subtract(a,b){return a.map((v,i)=>v-b[i]);} function dot4(a,b){return a.reduce((s,v,i)=>s+v*b[i],0);} function read3(a,i){return [a[i*3],a[i*3+1],a[i*3+2]];}
+function add(a,b){return a.map((v,i)=>v+b[i]);} function subtract(a,b){return a.map((v,i)=>v-b[i]);}
 function cloneFrame(frame) { return { ...frame, deformedPositions: new Float32Array(frame.deformedPositions), deformedNormals: new Float32Array(frame.deformedNormals), indices: new Uint32Array(frame.indices), regionIds: new Uint16Array(frame.regionIds), regionBlendWeights: new Float32Array(frame.regionBlendWeights), bounds: structuredClone(frame.bounds), regionDiagnostics: structuredClone(frame.regionDiagnostics), deformationDiagnostics: structuredClone(frame.deformationDiagnostics) }; }
 function percentile(sorted, p) { if (!sorted.length) return null; return sorted[Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * p))]; }
 function performanceNow() { return globalThis.performance?.now?.() ?? Date.now(); }
