@@ -2,11 +2,11 @@
 
 ## Status
 
-- Runtime: implemented from `feature/human-core-v5-procedural-deform-runtime` and instrumented on `feature/human-core-v5-procedural-deform-visual-qa`.
+- Runtime: implemented from `feature/human-core-v5-procedural-deform-runtime`, instrumented on `feature/human-core-v5-procedural-deform-visual-qa`, and browser-automated on `feature/human-core-v5-procedural-deform-browser-unblock`.
 - Pose authority: `finalPose.localRotations` from PoseFrame V4.
 - GLB dependency: none for the procedural path.
-- Implementation status: `code-complete-browser-blocked`.
-- Browser QA: `blocked-on-browser-runtime` under the repository rule that computer/browser visual checks are user-operated.
+- Implementation status: `complete` for the Task 14B browser package.
+- Browser QA: pinned Playwright automation and a strict WebGL2 CI gate; final user visual review remains separate.
 - Codex visual review: `not-run-by-user-rule`.
 - User visual acceptance: pending.
 - `visualAcceptance`: `false`.
@@ -94,7 +94,7 @@ The cyan skeleton overlay comes from `finalPose + V4Adapter(T Pose RigDefinition
 
 Core files under `src/modules/human-core-v5/procedural-deform/` do not import Three.js. `ThreeProceduralHumanAdapterV5` is limited to BufferGeometry attributes, indices, material/display mode, upload diagnostics, and GPU resource disposal. CPU field generation and CPU reference deformation work independently of WebGPU or WebGL2.
 
-The browser page probes a real WebGPU adapter and device before constructing `WebGPURenderer`. A WebGPU failure and a successful WebGL2 fallback are reported separately. `?forceWebGL=1` explicitly creates a WebGL2 context. Browser execution is intentionally not claimed until the user runs the provided QA command and reviews its evidence.
+The browser page probes a real WebGPU adapter and device before constructing `WebGPURenderer`. A WebGPU failure and a successful WebGL2 fallback are reported separately. `?forceWebGL=1` explicitly creates a WebGL2 context. GitHub Actions records the reproducible browser contract; only the user may approve the resulting visual evidence.
 
 ## Automated evidence
 
@@ -123,4 +123,4 @@ The geometry tests also report one connected component, zero boundary edges, zer
 - Hands and feet are intentionally coarse and do not yet include finger/toe surface articulation.
 - OPFS persistence is a future cache adapter; the current cache is derived runtime memory.
 - Experimental GPU compute is not the default path.
-- WebGPU/WebGL2 rendering, console cleanliness, camera behavior, and screenshots remain `blocked-on-browser-runtime` until the user runs the browser QA command.
+- CI WebGPU is a measured capability classification, not proof of the user's hardware path. The Windows package is still required for local WebGPU and subjective visual review.

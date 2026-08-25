@@ -59,6 +59,7 @@ const required = [
   'workers/project-hub.shared.js',
   ...legacyFiles,
   '.github/workflows/validate.yml', '.github/workflows/pages.yml',
+  '.github/workflows/procedural-deform-browser-qa.yml',
   'control/project-state.json', 'docs/MODULE_BOUNDARIES.md',
   'packages/character-core/index.js', 'packages/character-core/index.ts',
   'packages/character-core/character-profile.ts', 'packages/character-core/character-state.ts',
@@ -160,6 +161,9 @@ const required = [
   'tests/integration/human-core-v5-procedural-deform-page.mjs',
   'tests/browser/human-core-v5-procedural-deform.browser.mjs',
   'scripts/run-procedural-deform-browser-qa.mjs',
+  'scripts/build-procedural-deform-qa-gallery.mjs',
+  'scripts/run-human-core-v5-visual-qa.ps1',
+  'RUN_HUMAN_CORE_V5_VISUAL_QA.bat',
   'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM.md',
   'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_VISUAL_ACCEPTANCE.md',
   'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_QA_REPORT.md',
@@ -172,6 +176,7 @@ for (const file of required) await access(join(root, file));
 const packageJson = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
 assert.equal(packageJson.version, '0.5.0');
 assert.equal(packageJson.dependencies.three, '0.185.1');
+assert.equal(packageJson.devDependencies.playwright, '1.62.1');
 assert.match(packageJson.scripts.test, /module-patches/);
 assert.match(packageJson.scripts.test, /character-core/);
 assert.match(packageJson.scripts.test, /body-shape/);
@@ -191,6 +196,8 @@ assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human
 assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-deform-page/);
 assert.match(packageJson.scripts['test:human-core-v5-procedural-deform-browser'], /tests\/browser\/human-core-v5-procedural-deform\.browser/);
 assert.match(packageJson.scripts['test:human-core-v5-procedural-deform-qa'], /--verify-artifacts/);
+assert.match(packageJson.scripts['build:human-core-v5-procedural-deform-gallery'], /build-procedural-deform-qa-gallery/);
+assert.match(packageJson.scripts['qa:human-core-v5-visual'], /--all-backends/);
 assert.match(packageJson.scripts['test:character-studio'], /character-studio-v1/);
 assert.match(packageJson.scripts.test, /integration-v002/);
 assert.match(packageJson.scripts.test, /test:animation/);
@@ -228,8 +235,13 @@ assert.equal(buildManifest.humanCoreV5ProceduralDeform.poseAuthority, 'finalPose
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.rendererIndependence, true);
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.glbRequired, false);
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.workerGeneration, true);
-assert.equal(buildManifest.humanCoreV5ProceduralDeform.implementationStatus, 'code-complete-browser-blocked');
-assert.equal(buildManifest.humanCoreV5ProceduralDeform.browserQA, 'blocked-on-browser-runtime');
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.implementationStatus, 'complete');
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.browserAutomation, 'complete');
+assert.match(buildManifest.humanCoreV5ProceduralDeform.ciBrowserContract, /pending-github-actions|pass/);
+assert.match(buildManifest.humanCoreV5ProceduralDeform.ciWebGL2, /pending-github-actions|pass/);
+assert.match(buildManifest.humanCoreV5ProceduralDeform.ciWebGPU, /pending-measurement|webgpu-ci-/);
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.localBrowserPackage, 'ready');
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.browserQA, 'automated-contract-ready');
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.codexVisualReview, 'not-run-by-user-rule');
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.userVisualAcceptance, 'pending');
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.visualAcceptance, false);
@@ -544,6 +556,7 @@ const javascriptFiles = [
   'workers/procedural-surface.worker.js',
   'apps/human-core-v5-procedural-deform/index.js',
   'scripts/run-procedural-deform-browser-qa.mjs',
+  'scripts/build-procedural-deform-qa-gallery.mjs',
   'tests/browser/human-core-v5-procedural-deform.browser.mjs',
   'packages/character-core/character-profile.js', 'packages/character-core/character-state.js',
   'packages/character-core/character-version.js', 'packages/character-core/character-manager.js',
@@ -618,6 +631,27 @@ assert.deepEqual(projectState.operationEvents, []);
 const workflow = await readFile(join(root, '.github/workflows/pages.yml'), 'utf8');
 assert.match(workflow, /deploy-pages/);
 assert.match(workflow, /upload-pages-artifact/);
+
+const proceduralBrowserWorkflow = await readFile(join(root, '.github/workflows/procedural-deform-browser-qa.yml'), 'utf8');
+assert.match(proceduralBrowserWorkflow, /node-version:\s*'22'/);
+assert.match(proceduralBrowserWorkflow, /npm ci/);
+assert.match(proceduralBrowserWorkflow, /playwright install chromium --with-deps/);
+assert.match(proceduralBrowserWorkflow, /--backend webgl2 --headless --browser-channel chromium/);
+assert.match(proceduralBrowserWorkflow, /--backend webgpu --headless --browser-channel chromium --continue-on-webgpu-failure/);
+assert.match(proceduralBrowserWorkflow, /if:\s*always\(\)/);
+assert.doesNotMatch(proceduralBrowserWorkflow, /deploy-pages|gh-pages|contents:\s*write/);
+
+const visualQABatch = await readFile(join(root, 'RUN_HUMAN_CORE_V5_VISUAL_QA.bat'), 'utf8');
+assert.match(visualQABatch, /run-human-core-v5-visual-qa\.ps1/i);
+assert.match(visualQABatch, /-Headed/);
+assert.match(visualQABatch, /-KeepServer/);
+assert.ok([...visualQABatch].every((character) => character.charCodeAt(0) < 128), 'RUN_HUMAN_CORE_V5_VISUAL_QA.bat must stay ASCII-only');
+
+const visualQAPowerShell = await readFile(join(root, 'scripts/run-human-core-v5-visual-qa.ps1'), 'utf8');
+for (const parameter of ['SkipInstall', 'BrowserChannel', 'Headed', 'OutputDirectory', 'KeepServer']) assert.match(visualQAPowerShell, new RegExp(`\\$${parameter}`));
+assert.match(visualQAPowerShell, /Node 22 or newer/);
+assert.match(visualQAPowerShell, /--all-backends/);
+assert.match(visualQAPowerShell, /visual-review-gallery\.html/);
 
 const entries = await readdir(root);
 assert.ok(entries.includes('legacy'));

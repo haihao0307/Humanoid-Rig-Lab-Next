@@ -1,0 +1,57 @@
+name: Human Core V5 Procedural Deform Browser QA
+
+on:
+  push:
+    branches:
+      - feature/human-core-v5-procedural-deform-browser-unblock
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install pinned dependencies
+        run: npm ci
+
+      - name: Install pinned Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Run full file and data validation
+        run: npm test
+
+      - name: Run forced WebGL2 browser contract
+        run: npm run test:human-core-v5-procedural-deform-browser -- --backend webgl2 --headless --browser-channel chromium
+
+      - name: Attempt and classify CI WebGPU
+        continue-on-error: true
+        run: npm run test:human-core-v5-procedural-deform-browser -- --backend webgpu --headless --browser-channel chromium --continue-on-webgpu-failure
+
+      - name: Verify browser evidence integrity
+        run: npm run test:human-core-v5-procedural-deform-qa
+
+      - name: Upload browser QA evidence and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: human-core-v5-procedural-deform-browser-qa-${{ github.sha }}
+          path: |
+            artifacts/qa/human-core-v5-procedural-deform/
+            artifacts/logs/procedural-deform-browser-qa/
+          if-no-files-found: warn
+          retention-days: 30

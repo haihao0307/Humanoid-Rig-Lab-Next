@@ -258,7 +258,7 @@ function updateDiagnostics() {
   lastQASnapshot = {
     schema: 'humanoid_rig/procedural_deform_browser_qa@5.0',
     timestamp: new Date().toISOString(),
-    status: 'blocked-on-browser-runtime',
+    status: 'runtime-ready-visual-pending',
     active: { preset: activePreset, poseId: activePoseId, poseLabel: PROCEDURAL_DEFORM_VALIDATION_POSE_LABELS_V5[activePoseId], displayMode, camera: activeCamera },
     pose: {
       authority: deform.poseAuthority,
@@ -334,11 +334,15 @@ function updateDiagnostics() {
     'Active renderer': rendererState.activeBackend,
     'navigator.gpu': rendererState.navigatorGPU,
     'WebGPU probe': rendererState.webgpu.status,
+    'WebGPU adapter': rendererState.webgpu.adapterStatus,
+    'WebGPU device': rendererState.webgpu.deviceStatus,
+    'WebGPU adapter info': JSON.stringify(rendererState.webgpu.adapterInfo ?? 'unavailable'),
+    'WebGPU device lost': rendererState.webgpu.deviceLost ? JSON.stringify(rendererState.webgpu.deviceLost) : 'none',
     'WebGL2 fallback': rendererState.webgl2.status,
     'Camera / display': `${activeCamera} / ${displayMode}`,
     'Runtime errors': runtimeErrors.length,
     'GLB requests': glbRequests.length,
-    'Visual acceptance': 'blocked-on-browser-runtime',
+    'Visual acceptance': 'pending-user-review',
     'Production ready': false,
   };
   const diagnostics = document.querySelector('#diagnostics');
@@ -486,10 +490,11 @@ function exportQAJSON() {
 function getQAState() {
   return {
     schema: 'humanoid_rig/procedural_deform_browser_qa_session@5.0',
-    status: 'blocked-on-browser-runtime',
+    status: 'runtime-ready-visual-pending',
     current: structuredClone(lastQASnapshot),
     records: structuredClone(qaRecords),
-    browserRuntimeExecutedByCodex: false,
+    browserAutomationReady: true,
+    subjectiveVisualReview: 'user-reserved',
     visualAcceptance: false,
     productionReady: false,
   };
@@ -535,15 +540,31 @@ async function createRenderer() {
     activeBackend: null,
     fallbackUsed: false,
     navigatorGPU: Boolean(navigator.gpu),
-    webgpu: { status: forceWebGL ? 'skipped-force-webgl2' : 'not-attempted', error: null },
+    webgpu: {
+      status: forceWebGL ? 'skipped-force-webgl2' : 'not-attempted',
+      adapterStatus: forceWebGL ? 'skipped' : 'not-attempted',
+      deviceStatus: forceWebGL ? 'skipped' : 'not-attempted',
+      adapterInfo: null,
+      deviceLost: null,
+      error: null,
+    },
     webgl2: { status: 'not-attempted', error: null },
   };
   if (!forceWebGL && navigator.gpu) {
     try {
       const adapterGPU = await navigator.gpu.requestAdapter();
       if (!adapterGPU) throw new Error('navigator.gpu.requestAdapter() returned null.');
+      result.webgpu.adapterStatus = 'pass';
+      result.webgpu.adapterInfo = normalizeGPUAdapterInfo(adapterGPU.info);
       const device = await adapterGPU.requestDevice();
-      device.destroy?.();
+      result.webgpu.deviceStatus = 'pass';
+      device.lost.then((info) => {
+        result.webgpu.deviceLost = {
+          reason: String(info?.reason ?? 'unknown'),
+          message: String(info?.message ?? ''),
+          observedAt: new Date().toISOString(),
+        };
+      });
       const { WebGPURenderer } = await import('three/webgpu');
       const webgpuRenderer = new WebGPURenderer({ antialias: true });
       await webgpuRenderer.init();
@@ -551,12 +572,16 @@ async function createRenderer() {
       result.webgpu.status = 'pass';
       return { renderer: webgpuRenderer, ...result };
     } catch (error) {
-      result.webgpu = { status: 'fail', error: formatError(error) };
+      result.webgpu.status = 'fail';
+      result.webgpu.error = formatError(error);
       result.fallbackUsed = true;
       console.warn('WebGPU failed; WebGL2 fallback will be tested independently.', error);
     }
   } else if (!forceWebGL) {
-    result.webgpu = { status: 'unavailable', error: 'navigator.gpu is absent.' };
+    result.webgpu.status = 'unavailable';
+    result.webgpu.adapterStatus = 'unavailable';
+    result.webgpu.deviceStatus = 'unavailable';
+    result.webgpu.error = 'navigator.gpu is absent.';
     result.fallbackUsed = true;
   }
   try {
@@ -625,6 +650,13 @@ function setNested(target, path, value) {
   cursor[keys.at(-1)] = value;
 }
 function getNested(target, path) { return path.split('.').reduce((value, keyName) => value?.[keyName], target); }
+function normalizeGPUAdapterInfo(info) {
+  const source = info && typeof info === 'object' ? info : {};
+  return Object.fromEntries(['vendor', 'architecture', 'device', 'description', 'isFallbackAdapter'].map((keyName) => [
+    keyName,
+    source[keyName] === undefined || source[keyName] === '' ? 'unavailable' : source[keyName],
+  ]));
+}
 function formatError(error) { return error instanceof Error ? `${error.name}: ${error.message}` : String(error); }
 function escapeHTML(value) { return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]); }
 function downloadBlob(blob, fileName) { const url = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: url, download: fileName }); link.click(); setTimeout(() => URL.revokeObjectURL(url), 0); }

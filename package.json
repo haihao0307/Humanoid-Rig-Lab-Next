@@ -21,12 +21,17 @@
     "test:human-core-v5-anatomy": "node tests/human-core-v5-anatomy-runtime.mjs",
     "test:human-core-v5-procedural-deform": "node tests/human-core-v5-procedural-deform-contract.mjs && node tests/human-core-v5-procedural-surface.mjs && node tests/human-core-v5-procedural-deform-validation.mjs && node tests/human-core-v5-procedural-deform-stress.mjs && node tests/integration/human-core-v5-procedural-deform-page.mjs",
     "test:human-core-v5-procedural-deform-browser": "node tests/browser/human-core-v5-procedural-deform.browser.mjs",
-    "test:human-core-v5-procedural-deform-qa": "node scripts/run-procedural-deform-browser-qa.mjs --verify-artifacts"
+    "test:human-core-v5-procedural-deform-qa": "node scripts/run-procedural-deform-browser-qa.mjs --verify-artifacts",
+    "build:human-core-v5-procedural-deform-gallery": "node scripts/build-procedural-deform-qa-gallery.mjs",
+    "qa:human-core-v5-visual": "node scripts/run-procedural-deform-browser-qa.mjs --all-backends --headed --continue-on-webgpu-failure"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
     "three": "0.185.1"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
   }
 }

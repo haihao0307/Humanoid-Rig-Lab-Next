@@ -2,13 +2,17 @@
 
 ## Release gate
 
-Current status: `blocked-on-browser-runtime`.
+Current status: `automated-contract-ready`; GitHub Actions measurement and user visual acceptance are separate gates.
 
 The code, shared anatomical-axis fixtures, independent SimulationRig FK audit, and geometric tests can be verified without a browser. Repository instructions reserve computer/browser visual checks for the user, so no Codex-generated screenshot or visual approval is claimed.
 
 ```text
-implementationStatus = code-complete-browser-blocked
-browserQA = blocked-on-browser-runtime
+implementationStatus = complete
+browserAutomation = complete
+ciBrowserContract = pending-github-actions
+ciWebGL2 = pending-github-actions
+ciWebGPU = pending-measurement
+localBrowserPackage = ready
 codexVisualReview = not-run-by-user-rule
 userVisualAcceptance = pending
 visualAcceptance = false
@@ -20,13 +24,13 @@ productionReady = false
 From this branch's repository root:
 
 ```powershell
-npm install
+npm ci
 npm run test:human-core-v5-procedural-deform
-npm run test:human-core-v5-procedural-deform-browser
+npm run test:human-core-v5-procedural-deform-browser -- --all-backends --headed --continue-on-webgpu-failure
 npm run test:human-core-v5-procedural-deform-qa
 ```
 
-The browser test starts `npm start`, finds Chrome or Edge, attempts WebGPU, then starts an independent forced-WebGL2 run. Set `HRL_BROWSER_PATH` to an executable when automatic discovery cannot find the browser.
+The recommended Windows entry is `RUN_HUMAN_CORE_V5_VISUAL_QA.bat`. It checks Node/npm, installs missing pinned dependencies, discovers Chrome/Edge/Playwright Chromium, captures both backends, verifies evidence, opens the offline gallery, and optionally leaves a hidden local server available for manual review. The PowerShell entry supports `-SkipInstall`, `-BrowserChannel`, `-Headed`, `-OutputDirectory`, and `-KeepServer`.
 
 Manual URLs remain available:
 
@@ -56,16 +60,21 @@ The right panel also exposes `Run Full QA`, `Capture Current View`, `Mark Pass`,
 
 ## Required evidence
 
-The runner writes real Canvas screenshots and JSON to:
+The runner writes real Canvas screenshots, JSON, and the offline review package to:
 
 ```text
 artifacts/qa/human-core-v5-procedural-deform/webgpu/
 artifacts/qa/human-core-v5-procedural-deform/webgl2/
 artifacts/qa/human-core-v5-procedural-deform/metrics.json
 artifacts/qa/human-core-v5-procedural-deform/browser-qa-report.json
+artifacts/qa/human-core-v5-procedural-deform/renderer-diagnostics.json
+artifacts/qa/human-core-v5-procedural-deform/qa-manifest.json
+artifacts/qa/human-core-v5-procedural-deform/visual-review-gallery.html
+artifacts/logs/procedural-deform-browser-qa/console.log
+artifacts/logs/procedural-deform-browser-qa/network.log
 ```
 
-`npm run test:human-core-v5-procedural-deform-qa` verifies that all 15 required PNGs and both JSON files exist, that WebGPU and WebGL2 passed independently, and that release flags remain false.
+`npm run test:human-core-v5-procedural-deform-qa` verifies file sizes, SHA256 hashes, commit identity, screenshot backend/path/pose identity, the strict WebGL2 pass, the recorded WebGPU classification, and unchanged release flags. The gallery exports `user-visual-review.json`; it cannot modify repository flags.
 
 ## Acceptance result
 
