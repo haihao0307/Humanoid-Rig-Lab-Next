@@ -26,6 +26,16 @@ assert.doesNotMatch(app, /requestDevice/, 'Only Three.js WebGPURenderer may crea
 assert.match(app, /renderer-owned-pass/);
 assert.match(app, /ChunkedProceduralHumanAdapterV5/);
 assert.match(app, /measureSteadyStatePerformance/);
+assert.match(app, /AUXILIARY_PREVIEW_CAPACITIES/);
+assert.match(app, /createDynamicPositionPreview/);
+assert.match(app, /updateDynamicPositionPreview/);
+assert.match(app, /primitivePreviewPool/);
+assert.match(app, /THREE\.DynamicDrawUsage/);
+assert.match(app, /clearUpdateRanges/);
+assert.match(app, /addUpdateRange/);
+assert.match(app, /setDrawRange/);
+assert.match(app, /runtimeGeometryDisposeCount:\s*0/);
+assert.doesNotMatch(app, /disposeGroupChildren|\.geometry\?\.dispose\(\)|\.setFromPoints\(/, 'Live auxiliary previews must update stable renderer resources instead of disposing or replacing geometry.');
 assert.match(app, /navigatorGPU:\s*Boolean\(navigator\.gpu\)/);
 assert.match(app, /'navigator\.gpu':\s*rendererState\.navigatorGPU/);
 assert.match(app, /getContext\('webgl2'/);

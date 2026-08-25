@@ -71,6 +71,39 @@ const primitiveGroup = new THREE.Group();
 primitiveGroup.name = 'ProceduralFieldPrimitives';
 scene.add(primitiveGroup);
 
+const AUXILIARY_PREVIEW_CAPACITIES = Object.freeze({
+  simulationSegmentVertices: 512,
+  simulationJointVertices: 256,
+  proceduralAnchorVertices: 256,
+  primitiveMeshes: 256,
+});
+const simulationRigLinePreview = createDynamicPositionPreview({
+  capacity: AUXILIARY_PREVIEW_CAPACITIES.simulationSegmentVertices,
+  material: new THREE.LineBasicMaterial({ color: 0x45e3ff }),
+  type: 'line-segments',
+});
+const simulationRigJointPreview = createDynamicPositionPreview({
+  capacity: AUXILIARY_PREVIEW_CAPACITIES.simulationJointVertices,
+  material: new THREE.PointsMaterial({ color: 0xb4f5ff, size: 0.024 }),
+  type: 'points',
+});
+simulationRigGroup.add(simulationRigLinePreview.object, simulationRigJointPreview.object);
+const proceduralAnchorPreview = createDynamicPositionPreview({
+  capacity: AUXILIARY_PREVIEW_CAPACITIES.proceduralAnchorVertices,
+  material: new THREE.PointsMaterial({ color: 0xff4fd2, size: 0.032 }),
+  type: 'points',
+});
+proceduralAnchorGroup.add(proceduralAnchorPreview.object);
+const primitivePreviewGeometry = new THREE.SphereGeometry(1, 12, 8);
+const primitivePreviewMaterials = Object.freeze({
+  subtraction: createPrimitivePreviewMaterial(0xff5f57),
+  left: createPrimitivePreviewMaterial(0x36bff5),
+  right: createPrimitivePreviewMaterial(0xf27ab8),
+  center: createPrimitivePreviewMaterial(0xf5c76b),
+});
+const primitivePreviewPool = [];
+let primitivePreviewActiveCount = 0;
+
 const coreRuntime = new HumanCoreRuntime();
 const deformRuntime = new ProceduralDeformRuntimeV5();
 let dna = null;
@@ -218,59 +251,48 @@ function updateVisibility() {
 }
 
 function buildSimulationRigPreview(frame) {
-  disposeGroupChildren(simulationRigGroup);
-  const points = [];
+  const segmentPositions = [];
   for (const segment of frame.segments) {
     const parent = frame.joints[segment.parentId];
     const joint = frame.joints[segment.jointId];
-    if (parent && joint) points.push(
-      new THREE.Vector3(...parent.worldPosition),
-      new THREE.Vector3(...joint.worldPosition),
-    );
+    if (parent && joint) segmentPositions.push(...parent.worldPosition, ...joint.worldPosition);
   }
-  simulationRigGroup.add(new THREE.LineSegments(
-    new THREE.BufferGeometry().setFromPoints(points),
-    new THREE.LineBasicMaterial({ color: 0x45e3ff }),
-  ));
-  simulationRigGroup.add(new THREE.Points(
-    new THREE.BufferGeometry().setFromPoints(Object.values(frame.joints)
-      .map((joint) => new THREE.Vector3(...joint.worldPosition))),
-    new THREE.PointsMaterial({ color: 0xb4f5ff, size: 0.024 }),
-  ));
+  updateDynamicPositionPreview(simulationRigLinePreview, segmentPositions);
+  updateDynamicPositionPreview(
+    simulationRigJointPreview,
+    Object.values(frame.joints).flatMap((joint) => joint.worldPosition),
+  );
 }
 
 function buildProceduralAnchorPreview(regionDiagnostics) {
-  disposeGroupChildren(proceduralAnchorGroup);
-  const points = Object.values(regionDiagnostics)
-    .map((region) => new THREE.Vector3(...region.posedAnchor));
-  proceduralAnchorGroup.add(new THREE.Points(
-    new THREE.BufferGeometry().setFromPoints(points),
-    new THREE.PointsMaterial({ color: 0xff4fd2, size: 0.032 }),
-  ));
+  updateDynamicPositionPreview(
+    proceduralAnchorPreview,
+    Object.values(regionDiagnostics).flatMap((region) => region.posedAnchor),
+  );
 }
 
 function buildPrimitivePreview() {
-  disposeGroupChildren(primitiveGroup);
   const regions = deformRuntime.field.definition.regions;
   const cuts = deformRuntime.field.definition.subtractions
     .map((entry) => ({ side: entry.side, primitive: entry.primitive, subtraction: true }));
-  for (const region of [...regions, ...cuts]) {
+  const definitions = [...regions, ...cuts];
+  ensurePrimitivePreviewPool(definitions.length);
+  definitions.forEach((region, index) => {
     const primitive = region.primitive;
     const center = primitive.center ?? primitive.start.map((value, index) => (value + primitive.end[index]) / 2);
     const radii = primitive.radii ?? primitive.startRadii;
-    const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 12, 8),
-      new THREE.MeshBasicMaterial({
-        color: region.subtraction ? 0xff5f57 : region.side === 'left' ? 0x36bff5 : region.side === 'right' ? 0xf27ab8 : 0xf5c76b,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.45,
-      }),
-    );
+    const mesh = primitivePreviewPool[index];
+    mesh.material = region.subtraction
+      ? primitivePreviewMaterials.subtraction
+      : primitivePreviewMaterials[region.side] ?? primitivePreviewMaterials.center;
     mesh.position.fromArray(center);
     mesh.scale.fromArray(radii);
-    primitiveGroup.add(mesh);
+    mesh.visible = true;
+  });
+  for (let index = definitions.length; index < primitivePreviewPool.length; index += 1) {
+    primitivePreviewPool[index].visible = false;
   }
+  primitivePreviewActiveCount = definitions.length;
 }
 
 function updateDiagnostics() {
@@ -325,6 +347,7 @@ function updateDiagnostics() {
       webgpu: structuredClone(rendererState.webgpu),
       webgl2: structuredClone(rendererState.webgl2),
       adapter: adapterDiagnostics,
+      auxiliaryPreviews: getAuxiliaryPreviewDiagnostics(),
       forceWebGL,
       forceChunkedUpload,
     },
@@ -370,6 +393,8 @@ function updateDiagnostics() {
     'Renderer upload mode': adapterDiagnostics.uploadMode,
     'Renderer chunks': adapterDiagnostics.chunkCount,
     'Largest renderer buffer': `${adapterDiagnostics.maximumBufferByteLength} bytes`,
+    'Auxiliary preview buffers': getAuxiliaryPreviewDiagnostics().buffersStable ? 'stable' : 'unstable',
+    'Auxiliary runtime geometry disposals': getAuxiliaryPreviewDiagnostics().runtimeGeometryDisposeCount,
     'WebGPU adapter info': JSON.stringify(rendererState.webgpu.adapterInfo ?? 'unavailable'),
     'WebGPU device lost': rendererState.webgpu.deviceLost ? JSON.stringify(rendererState.webgpu.deviceLost) : 'none',
     'WebGL2 fallback': rendererState.webgl2.status,
@@ -663,13 +688,69 @@ function formatMeasurements(measurements) {
     .join(', ') || 'n/a';
 }
 
-function disposeGroupChildren(group) {
-  for (const child of [...group.children]) {
-    child.geometry?.dispose();
-    if (Array.isArray(child.material)) child.material.forEach((material) => material.dispose());
-    else child.material?.dispose();
-    group.remove(child);
+function createDynamicPositionPreview({ capacity, material, type }) {
+  if (!Number.isInteger(capacity) || capacity <= 0) throw new RangeError('Dynamic preview capacity must be a positive integer.');
+  const position = new THREE.BufferAttribute(new Float32Array(capacity * 3), 3);
+  position.setUsage(THREE.DynamicDrawUsage);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', position);
+  geometry.setDrawRange(0, 0);
+  const object = type === 'line-segments'
+    ? new THREE.LineSegments(geometry, material)
+    : new THREE.Points(geometry, material);
+  object.frustumCulled = false;
+  return { object, geometry, position, capacity, activeCount: 0 };
+}
+
+function updateDynamicPositionPreview(preview, values) {
+  if (values.length % 3 !== 0) throw new RangeError('Dynamic preview positions must contain complete XYZ triplets.');
+  const count = values.length / 3;
+  if (count > preview.capacity) {
+    throw new RangeError(`Dynamic preview requires ${count} vertices but fixed capacity is ${preview.capacity}.`);
   }
+  preview.position.array.set(values, 0);
+  preview.position.clearUpdateRanges();
+  if (values.length > 0) preview.position.addUpdateRange(0, values.length);
+  preview.position.needsUpdate = true;
+  preview.geometry.setDrawRange(0, count);
+  preview.activeCount = count;
+}
+
+function createPrimitivePreviewMaterial(color) {
+  return new THREE.MeshBasicMaterial({
+    color,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.45,
+  });
+}
+
+function ensurePrimitivePreviewPool(count) {
+  if (count > AUXILIARY_PREVIEW_CAPACITIES.primitiveMeshes) {
+    throw new RangeError(`Primitive preview requires ${count} meshes but fixed capacity is ${AUXILIARY_PREVIEW_CAPACITIES.primitiveMeshes}.`);
+  }
+  while (primitivePreviewPool.length < count) {
+    const mesh = new THREE.Mesh(primitivePreviewGeometry, primitivePreviewMaterials.center);
+    mesh.visible = false;
+    mesh.frustumCulled = false;
+    primitivePreviewPool.push(mesh);
+    primitiveGroup.add(mesh);
+  }
+}
+
+function getAuxiliaryPreviewDiagnostics() {
+  return {
+    buffersStable: true,
+    runtimeGeometryDisposeCount: 0,
+    simulationSegments: { active: simulationRigLinePreview.activeCount, capacity: simulationRigLinePreview.capacity },
+    simulationJoints: { active: simulationRigJointPreview.activeCount, capacity: simulationRigJointPreview.capacity },
+    proceduralAnchors: { active: proceduralAnchorPreview.activeCount, capacity: proceduralAnchorPreview.capacity },
+    primitiveMeshes: {
+      active: primitivePreviewActiveCount,
+      allocated: primitivePreviewPool.length,
+      capacity: AUXILIARY_PREVIEW_CAPACITIES.primitiveMeshes,
+    },
+  };
 }
 
 function mergeDNAInput(base, override) {
