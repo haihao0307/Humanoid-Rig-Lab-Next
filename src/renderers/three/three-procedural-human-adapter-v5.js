@@ -96,9 +96,12 @@ export class ChunkedProceduralHumanAdapterV5 {
     this.maximumBufferByteLength = normalizeBufferLimit(maximumBufferByteLength);
     this.topologyFingerprint = null;
     this.chunks = [];
+    this.activeChunkCount = 0;
     this.logicalVertexCount = 0;
     this.logicalTriangleCount = 0;
     this.lastUploadTimeMs = 0;
+    this.topologyReplacementCount = 0;
+    this.runtimeGeometryDisposeCount = 0;
     this.setDisplayMode(displayMode);
   }
 
@@ -112,30 +115,46 @@ export class ChunkedProceduralHumanAdapterV5 {
   }
 
   replaceTopology(input) {
-    this.disposeChunks();
     const descriptors = partitionGlobalTopology(input.indices, this.maximumBufferByteLength);
-    this.chunks = descriptors.map((descriptor, chunkIndex) => {
-      const geometry = createChunkGeometry(input, descriptor);
+    const globalColors = createRegionColors(input.regionIds);
+    const bounds = createGlobalBounds(input.positions);
+    while (this.chunks.length < descriptors.length) {
+      const chunkIndex = this.chunks.length;
+      const geometry = createPooledChunkGeometry(this.maximumBufferByteLength);
       const mesh = new THREE.Mesh(geometry, this.material);
       mesh.name = `HumanCoreV5ProceduralSurfaceChunk:${chunkIndex}`;
       mesh.userData.logicalSurface = 'HumanCoreV5ProceduralSurface';
       mesh.userData.chunkIndex = chunkIndex;
+      mesh.visible = false;
       this.group.add(mesh);
-      return { ...descriptor, geometry, mesh };
-    });
+      this.chunks.push({
+        globalVertexIndices: new Uint32Array(0),
+        localIndexCount: 0,
+        geometry,
+        mesh,
+      });
+    }
+    for (let chunkIndex = 0; chunkIndex < this.chunks.length; chunkIndex += 1) {
+      const chunk = this.chunks[chunkIndex];
+      const descriptor = descriptors[chunkIndex];
+      if (descriptor) writePooledChunkTopology(chunk, input, descriptor, globalColors, bounds);
+      else deactivatePooledChunk(chunk);
+    }
+    this.activeChunkCount = descriptors.length;
     this.logicalVertexCount = input.positions.length / 3;
     this.logicalTriangleCount = input.indices.length / 3;
     this.topologyFingerprint = input.topologyFingerprint;
+    this.topologyReplacementCount += 1;
   }
 
   updateDynamicData(input) {
-    for (const chunk of this.chunks) {
+    const bounds = createGlobalBounds(input.positions);
+    for (const chunk of this.chunks.slice(0, this.activeChunkCount)) {
       copyGlobalVec3ToLocal(input.positions, chunk.globalVertexIndices, chunk.geometry.getAttribute('position').array);
       copyGlobalVec3ToLocal(input.normals, chunk.globalVertexIndices, chunk.geometry.getAttribute('normal').array);
-      markAttributeUpdated(chunk.geometry.getAttribute('position'));
-      markAttributeUpdated(chunk.geometry.getAttribute('normal'));
-      chunk.geometry.computeBoundingBox();
-      chunk.geometry.computeBoundingSphere();
+      markAttributeUpdated(chunk.geometry.getAttribute('position'), chunk.globalVertexIndices.length * 3);
+      markAttributeUpdated(chunk.geometry.getAttribute('normal'), chunk.globalVertexIndices.length * 3);
+      applyGlobalBounds(chunk.geometry, bounds);
     }
   }
 
@@ -156,21 +175,28 @@ export class ChunkedProceduralHumanAdapterV5 {
 
   getObject3D() { return this.group; }
   getDiagnostics() {
-    const uploadedVertexCount = this.chunks.reduce((sum, chunk) => sum + chunk.globalVertexIndices.length, 0);
+    const activeChunks = this.chunks.slice(0, this.activeChunkCount);
+    const uploadedVertexCount = activeChunks.reduce((sum, chunk) => sum + chunk.globalVertexIndices.length, 0);
     return {
       adapter: 'chunked-procedural-human-adapter-v5',
-      uploadMode: 'software-safe-chunked-dynamic-buffer',
+      uploadMode: 'software-safe-pooled-chunk-dynamic-buffer',
       topologyFingerprint: this.topologyFingerprint,
       vertexCount: this.logicalVertexCount,
       triangleCount: this.logicalTriangleCount,
-      chunkCount: this.chunks.length,
+      chunkCount: this.activeChunkCount,
+      pooledChunkCount: this.chunks.length,
       duplicatedBoundaryVertexCount: Math.max(0, uploadedVertexCount - this.logicalVertexCount),
-      maximumBufferByteLength: Math.max(0, ...this.chunks.map((chunk) => maximumGeometryBufferByteLength(chunk.geometry))),
+      maximumBufferByteLength: Math.max(0, ...activeChunks.map((chunk) => maximumGeometryBufferByteLength(chunk.geometry))),
       configuredBufferLimit: this.maximumBufferByteLength,
       rendererUploadTimeMs: this.lastUploadTimeMs,
       displayMode: this.displayMode,
       frontSideSurface: this.material.side === THREE.FrontSide,
       dynamicAttributeObjectsStable: true,
+      bufferObjectsStableAcrossTopology: true,
+      topologyReplacementMode: 'fixed-capacity-buffer-pool',
+      topologyReplacementCount: this.topologyReplacementCount,
+      runtimeGeometryDisposeCount: this.runtimeGeometryDisposeCount,
+      localIndexType: 'Uint32Array',
       globalTopologyPreserved: true,
       logicalSurfaceLayerCount: this.topologyFingerprint ? 1 : 0,
       computesBodyDNA: false,
@@ -181,10 +207,11 @@ export class ChunkedProceduralHumanAdapterV5 {
 
   disposeChunks() {
     for (const chunk of this.chunks) {
-      chunk.geometry.dispose();
       this.group.remove(chunk.mesh);
+      chunk.geometry.dispose();
     }
     this.chunks = [];
+    this.activeChunkCount = 0;
   }
 
   dispose() {
@@ -225,40 +252,77 @@ function updateDynamicAttribute(attribute, source) {
   markAttributeUpdated(attribute);
 }
 
-function markAttributeUpdated(attribute) {
+function markAttributeUpdated(attribute, count = attribute.array.length) {
   attribute.clearUpdateRanges();
-  attribute.addUpdateRange(0, attribute.array.length);
+  attribute.addUpdateRange(0, count);
   attribute.needsUpdate = true;
 }
 
-function createChunkGeometry(input, descriptor) {
-  const positions = new Float32Array(descriptor.globalVertexIndices.length * 3);
-  const normals = new Float32Array(descriptor.globalVertexIndices.length * 3);
-  const regionIds = new Uint16Array(descriptor.globalVertexIndices.length * 4);
-  copyGlobalVec3ToLocal(input.positions, descriptor.globalVertexIndices, positions);
-  copyGlobalVec3ToLocal(input.normals, descriptor.globalVertexIndices, normals);
-  copyGlobalTupleToLocal(input.regionIds, descriptor.globalVertexIndices, regionIds, 4);
+function createPooledChunkGeometry(maximumBufferByteLength) {
+  const maximumVertices = Math.max(3, Math.floor(maximumBufferByteLength / (3 * Float32Array.BYTES_PER_ELEMENT)));
+  const maximumIndexCount = Math.max(3, Math.floor(maximumBufferByteLength / Uint32Array.BYTES_PER_ELEMENT));
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', createDynamicAttribute(positions, 3));
-  geometry.setAttribute('normal', createDynamicAttribute(normals, 3));
-  geometry.setIndex(createStaticAttribute(descriptor.localIndices, 1));
-  geometry.setAttribute('regionId', createStaticUint16Attribute(regionIds, 4));
-  geometry.setAttribute('color', createStaticAttribute(createRegionColors(regionIds), 3));
-  geometry.computeBoundingBox();
-  geometry.computeBoundingSphere();
+  geometry.setAttribute('position', createDynamicAttribute(new Float32Array(maximumVertices * 3), 3));
+  geometry.setAttribute('normal', createDynamicAttribute(new Float32Array(maximumVertices * 3), 3));
+  geometry.setIndex(createDynamicAttribute(new Uint32Array(maximumIndexCount), 1));
+  geometry.setAttribute('color', createDynamicAttribute(new Float32Array(maximumVertices * 3), 3));
+  geometry.setDrawRange(0, 0);
   return geometry;
+}
+
+function writePooledChunkTopology(chunk, input, descriptor, globalColors, bounds) {
+  const position = chunk.geometry.getAttribute('position');
+  const normal = chunk.geometry.getAttribute('normal');
+  const color = chunk.geometry.getAttribute('color');
+  const index = chunk.geometry.index;
+  if (descriptor.globalVertexIndices.length > position.count || descriptor.localIndices.length > index.count) {
+    throw new Error('Procedural renderer chunk exceeds its fixed GPU buffer capacity.');
+  }
+  copyGlobalVec3ToLocal(input.positions, descriptor.globalVertexIndices, position.array);
+  copyGlobalVec3ToLocal(input.normals, descriptor.globalVertexIndices, normal.array);
+  copyGlobalVec3ToLocal(globalColors, descriptor.globalVertexIndices, color.array);
+  index.array.set(descriptor.localIndices, 0);
+  markAttributeUpdated(position, descriptor.globalVertexIndices.length * 3);
+  markAttributeUpdated(normal, descriptor.globalVertexIndices.length * 3);
+  markAttributeUpdated(color, descriptor.globalVertexIndices.length * 3);
+  markAttributeUpdated(index, descriptor.localIndices.length);
+  chunk.geometry.setDrawRange(0, descriptor.localIndices.length);
+  applyGlobalBounds(chunk.geometry, bounds);
+  chunk.globalVertexIndices = descriptor.globalVertexIndices;
+  chunk.localIndexCount = descriptor.localIndices.length;
+  chunk.mesh.visible = true;
+}
+
+function deactivatePooledChunk(chunk) {
+  chunk.geometry.setDrawRange(0, 0);
+  chunk.globalVertexIndices = new Uint32Array(0);
+  chunk.localIndexCount = 0;
+  chunk.mesh.visible = false;
+}
+
+function createGlobalBounds(positions) {
+  const box = new THREE.Box3().setFromArray(positions);
+  const sphere = box.getBoundingSphere(new THREE.Sphere());
+  return { box, sphere };
+}
+
+function applyGlobalBounds(geometry, bounds) {
+  if (geometry.boundingBox) geometry.boundingBox.copy(bounds.box);
+  else geometry.boundingBox = bounds.box.clone();
+  if (geometry.boundingSphere) geometry.boundingSphere.copy(bounds.sphere);
+  else geometry.boundingSphere = bounds.sphere.clone();
 }
 
 function partitionGlobalTopology(globalIndices, maximumBufferByteLength) {
   const maximumVertices = Math.max(3, Math.floor(maximumBufferByteLength / (3 * Float32Array.BYTES_PER_ELEMENT)));
-  const maximumIndexCount = Math.max(3, Math.floor(maximumBufferByteLength / Uint16Array.BYTES_PER_ELEMENT));
+  const maximumIndexCount = Math.max(3, Math.floor(maximumBufferByteLength / Uint32Array.BYTES_PER_ELEMENT));
   const chunks = [];
   let globalToLocal = new Map();
   let globalVertexIndices = [];
   let localIndices = [];
   const flush = () => {
     if (!localIndices.length) return;
-    chunks.push({ globalVertexIndices: Uint32Array.from(globalVertexIndices), localIndices: Uint16Array.from(localIndices) });
+    chunks.push({ globalVertexIndices: Uint32Array.from(globalVertexIndices), localIndices: Uint32Array.from(localIndices) });
     globalToLocal = new Map();
     globalVertexIndices = [];
     localIndices = [];
@@ -271,7 +335,7 @@ function partitionGlobalTopology(globalIndices, maximumBufferByteLength) {
       let localVertex = globalToLocal.get(globalVertex);
       if (localVertex === undefined) {
         localVertex = globalVertexIndices.length;
-        if (localVertex > 0xffff) throw new Error('Chunk local index exceeds Uint16 capacity.');
+        if (localVertex >= maximumVertices) throw new Error('Chunk local index exceeds its fixed GPU buffer capacity.');
         globalToLocal.set(globalVertex, localVertex);
         globalVertexIndices.push(globalVertex);
       }

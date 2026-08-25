@@ -86,6 +86,20 @@ The exact CI run reported an empty canvas with a dropped device/error scope and 
 5. Add deform-only shoulder fields, continuous forearm twist, and bend-aware elbow/hip/knee corrections without adding rig joints.
 6. Compile squat/lunge validation fixtures with explicit root/contact evidence.
 7. Remove the extra WebGPU device and keep dynamic attribute capacity stable; chunk only in the renderer adapter when required.
+
+## Post-baseline WebGPU topology-lifecycle finding
+
+GitHub Actions run `32854645300` proved that the original oversized mapped buffer was no longer the first blocker: the forced WebGL2 matrix completed all 21 captures, while SwiftShader WebGPU failed when the QA sequence changed BodyDNA topology from one preset to the next. The precise stack ended in `WebGPUAttributeUtils.destroyAttribute()` after `ChunkedProceduralHumanAdapterV5.replaceTopology()` called `BufferGeometry.dispose()` during the live render session. Three.js r185 assumes a frontend attribute record always owns a created backend buffer; that assumption is unsafe while WebGPU render-object and buffer state are being replaced.
+
+The renderer-only repair keeps Core surface topology independent and changes the software adapter to a fixed-capacity chunk pool:
+
+- topology changes rewrite existing position, normal, color, local-index arrays and `drawRange`;
+- unused chunks are hidden and retained for later reuse;
+- existing `BufferGeometry` and `BufferAttribute` objects are not disposed or replaced during runtime topology changes;
+- local indices use native `Uint32Array`, preventing Three.js from silently expanding `Uint16Array` buffers after the 48 KiB safety calculation;
+- final adapter teardown still owns explicit disposal, but preset and slider edits do not enter the disposal path.
+
+The regression contract records zero runtime geometry-dispose events across compact and expanded topology replacements. Browser/WebGPU acceptance remains pending a clean CI rerun and does not change `visualAcceptance=false` or `productionReady=false`.
 8. Fail browser evidence when screenshot foreground/silhouette gates fail.
 
 No item in this report changes `visualAcceptance=false`, `productionReady=false`, or the requirement for explicit user visual review.
