@@ -123,8 +123,14 @@ This removes the known auxiliary-preview `BufferGeometry.dispose()` path without
 
 ## Auxiliary-preview mapped-creation follow-up
 
-GitHub Actions run `32863341767` confirmed that the `destroyAttribute()` lifecycle failure was removed: WebGPU completed the preset, pose, display, camera, and all 13 screenshot actions. The new first buffer error occurred during initial rendering because the stable SimulationRig line preview reserved 512 vertices, producing a 6144-byte mapped-at-creation position buffer. That conservative pool was larger than the actual 89-node-class preview requires and exceeded the software adapter's observed safe mapped-creation range for this auxiliary vertex path.
+GitHub Actions run `32863341767` confirmed that the `destroyAttribute()` lifecycle failure was removed: WebGPU completed the preset, pose, display, camera, and all 13 screenshot actions. The next reported buffer error named the stable SimulationRig line preview's 6144-byte mapped-at-creation position buffer. This was initially interpreted as a capacity problem because the pool was larger than the actual 89-node-class preview requires; run `32865619476` later showed that interpretation was incorrect and that device loss had to be diagnosed first.
 
-The stable-resource design remains in place, but auxiliary capacities are now bounded to the real contract: 256 line vertices (128 segments), 128 joint vertices, and 128 procedural anchors. Their largest position buffer is 3072 bytes. Construction also enforces an explicit 4096-byte software-safe ceiling, so future capacity changes fail before the renderer sees an oversized auxiliary buffer. The production human-surface chunking contract remains separate and unchanged.
+The stable-resource design remains in place, and auxiliary capacities are bounded to the actual semantic contract: 256 line vertices (128 segments), 128 joint vertices, and 128 procedural anchors. Their largest position buffer is 3072 bytes. At this point that size was provisionally treated as the likely blocker; the next CI run disproved that interpretation.
 
 This follow-up does not weaken screenshot, silhouette, geometry, contact, or performance gates. `visualAcceptance=false`, `productionReady=false`, and explicit user visual review remain required.
+
+## WebGPU adapter-selection correction
+
+GitHub Actions run `32865619476` failed with the same `mappedAtCreation` message after the largest auxiliary position buffer was reduced from 6144 to 3072 bytes. The device was reported destroyed about 25 ms after runtime readiness. Chromium emits the “size is too large” `RangeError` whenever Dawn returns no mapped-at-creation buffer; the message is therefore not evidence that 3072 bytes exceeds a WebGPU limit. The temporary 4096-byte ceiling was removed rather than preserving a false hardware contract.
+
+The deterministic CI path now follows Chromium's own WebGPU SwiftShader test configuration instead of merely enabling an unspecified WebGPU adapter. It explicitly selects `--use-webgpu-adapter=swiftshader`, enables GPU initialization for tests, and records the exact launch arguments with the renderer diagnostics. The application still owns no extra `GPUDevice`, the stable-resource and pooled-chunk paths remain unchanged, and the normal browser path continues to let Three.js select the user's real adapter.
