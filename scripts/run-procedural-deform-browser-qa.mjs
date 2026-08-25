@@ -685,6 +685,41 @@ async function poll(action, timeoutMs, label) { const deadline = Date.now() + ti
 async function runGit(args) { const child = spawn('git', args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }); let output = ''; let error = ''; child.stdout.on('data', (chunk) => { output += chunk; }); child.stderr.on('data', (chunk) => { error += chunk; }); const code = await new Promise((resolveExit) => child.once('exit', resolveExit)); if (code !== 0) throw new Error(`git ${args.join(' ')} failed: ${error.trim()}`); return output.trim(); }
 function formatError(error) { return error instanceof Error ? `${error.name}: ${error.message}` : String(error); }
 
+function browserFailureSummary(report) {
+  return report.runs.filter((run) => !run.passed).map((run) => ({
+    backend: run.requestedBackend,
+    activeBackend: run.activeBackend,
+    classification: run.classification,
+    failure: run.failure ?? 'browser contract failed',
+    failedInitialChecks: Object.entries(run.initialContract?.checks ?? {}).filter(([, passed]) => !passed).map(([name]) => name),
+    failedButtons: run.buttonChecks.filter((check) => !check.passed).map(({ kind, name, activeChanged, cacheRule, canvasRenderable }) => ({
+      kind, name, activeChanged, cacheRule, canvasRenderable,
+    })),
+    errors: {
+      console: run.consoleErrors,
+      page: run.pageErrors,
+      window: run.windowErrors,
+      unhandledRejections: run.unhandledRejections,
+      requestFailures: run.requestFailures,
+      httpFailures: run.httpFailures,
+      worker: run.workerErrors,
+      contextLosses: run.contextLosses,
+      deviceLost: run.deviceLost,
+    },
+    glbRequests: run.glbRequests,
+    screenshotCount: run.screenshotCount,
+  }));
+}
+
+function emitGitHubBrowserFailure(report) {
+  if (process.env.GITHUB_ACTIONS !== 'true') return;
+  const message = JSON.stringify(browserFailureSummary(report))
+    .replaceAll('%', '%25')
+    .replaceAll('\r', '%0D')
+    .replaceAll('\n', '%0A');
+  console.error(`::error file=human-core-v5-procedural-deform.html,line=1,title=Browser contract failure::${message}`);
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const options = parseBrowserQAArguments();
@@ -692,7 +727,10 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     else {
       const report = await runProceduralDeformBrowserQA(options);
       console.log(JSON.stringify({ status: report.status, commit: report.commit, runs: report.runs.map((run) => ({ backend: run.requestedBackend, activeBackend: run.activeBackend, classification: run.classification, passed: run.passed })) }, null, 2));
-      if (!report.commandPassed) process.exitCode = 1;
+      if (!report.commandPassed) {
+        emitGitHubBrowserFailure(report);
+        process.exitCode = 1;
+      }
     }
   } catch (error) {
     console.error(formatError(error));
