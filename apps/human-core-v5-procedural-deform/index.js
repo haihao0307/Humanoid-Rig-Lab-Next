@@ -71,10 +71,11 @@ const primitiveGroup = new THREE.Group();
 primitiveGroup.name = 'ProceduralFieldPrimitives';
 scene.add(primitiveGroup);
 
+const AUXILIARY_PREVIEW_BUFFER_BYTE_LIMIT = 4 * 1024;
 const AUXILIARY_PREVIEW_CAPACITIES = Object.freeze({
-  simulationSegmentVertices: 512,
-  simulationJointVertices: 256,
-  proceduralAnchorVertices: 256,
+  simulationSegmentVertices: 256,
+  simulationJointVertices: 128,
+  proceduralAnchorVertices: 128,
   primitiveMeshes: 256,
 });
 const simulationRigLinePreview = createDynamicPositionPreview({
@@ -691,6 +692,9 @@ function formatMeasurements(measurements) {
 function createDynamicPositionPreview({ capacity, material, type }) {
   if (!Number.isInteger(capacity) || capacity <= 0) throw new RangeError('Dynamic preview capacity must be a positive integer.');
   const position = new THREE.BufferAttribute(new Float32Array(capacity * 3), 3);
+  if (position.array.byteLength > AUXILIARY_PREVIEW_BUFFER_BYTE_LIMIT) {
+    throw new RangeError(`Dynamic preview buffer is ${position.array.byteLength} bytes; the software-safe limit is ${AUXILIARY_PREVIEW_BUFFER_BYTE_LIMIT}.`);
+  }
   position.setUsage(THREE.DynamicDrawUsage);
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', position);
@@ -739,9 +743,16 @@ function ensurePrimitivePreviewPool(count) {
 }
 
 function getAuxiliaryPreviewDiagnostics() {
+  const maximumPositionBufferByteLength = Math.max(
+    simulationRigLinePreview.position.array.byteLength,
+    simulationRigJointPreview.position.array.byteLength,
+    proceduralAnchorPreview.position.array.byteLength,
+  );
   return {
     buffersStable: true,
     runtimeGeometryDisposeCount: 0,
+    maximumPositionBufferByteLength,
+    configuredBufferByteLimit: AUXILIARY_PREVIEW_BUFFER_BYTE_LIMIT,
     simulationSegments: { active: simulationRigLinePreview.activeCount, capacity: simulationRigLinePreview.capacity },
     simulationJoints: { active: simulationRigJointPreview.activeCount, capacity: simulationRigJointPreview.capacity },
     proceduralAnchors: { active: proceduralAnchorPreview.activeCount, capacity: proceduralAnchorPreview.capacity },

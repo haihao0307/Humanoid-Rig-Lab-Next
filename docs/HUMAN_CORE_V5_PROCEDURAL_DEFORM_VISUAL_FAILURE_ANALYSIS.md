@@ -120,3 +120,11 @@ The page-level repair now treats all auxiliary previews as renderer-owned live r
 - QA diagnostics expose active/capacity counts and record zero runtime geometry-dispose operations.
 
 This removes the known auxiliary-preview `BufferGeometry.dispose()` path without changing Core surface topology, PoseFrame semantics, Rig hierarchy, or the task status. WebGPU acceptance remains pending a clean CI rerun, and user visual acceptance remains pending.
+
+## Auxiliary-preview mapped-creation follow-up
+
+GitHub Actions run `32863341767` confirmed that the `destroyAttribute()` lifecycle failure was removed: WebGPU completed the preset, pose, display, camera, and all 13 screenshot actions. The new first buffer error occurred during initial rendering because the stable SimulationRig line preview reserved 512 vertices, producing a 6144-byte mapped-at-creation position buffer. That conservative pool was larger than the actual 89-node-class preview requires and exceeded the software adapter's observed safe mapped-creation range for this auxiliary vertex path.
+
+The stable-resource design remains in place, but auxiliary capacities are now bounded to the real contract: 256 line vertices (128 segments), 128 joint vertices, and 128 procedural anchors. Their largest position buffer is 3072 bytes. Construction also enforces an explicit 4096-byte software-safe ceiling, so future capacity changes fail before the renderer sees an oversized auxiliary buffer. The production human-surface chunking contract remains separate and unchanged.
+
+This follow-up does not weaken screenshot, silhouette, geometry, contact, or performance gates. `visualAcceptance=false`, `productionReady=false`, and explicit user visual review remain required.
