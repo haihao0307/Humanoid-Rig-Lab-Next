@@ -305,12 +305,13 @@ function createContinuousLimbTwistContext({ parentQ, posedAnchor, localQ, bindAn
     bindAnchor,
     swingQ: decomposition.swing,
     twistQ: decomposition.twist,
+    twistActive: Math.hypot(decomposition.twist[0], decomposition.twist[1], decomposition.twist[2]) > 1e-8,
   };
 }
 
 function resolveVertexInfluenceTransform(surface, vertex, influence, regionIndex, transformsByRegionIndex) {
   const base = transformsByRegionIndex[regionIndex] ?? IDENTITY_TRANSFORM;
-  if (!base.virtualTwist || !(surface.regionAxialU instanceof Float32Array)) return base;
+  if (!base.virtualTwist?.twistActive || !(surface.regionAxialU instanceof Float32Array)) return base;
   const rawU = surface.regionAxialU[vertex * 4 + influence];
   const twistAmount = interpolateTwistStations(rawU, base.virtualTwist.stations);
   const partialTwist = slerpQuaternion([0, 0, 0, 1], base.virtualTwist.twistQ, twistAmount);
