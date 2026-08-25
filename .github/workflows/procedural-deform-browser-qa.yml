@@ -33,7 +33,20 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run full file and data validation
-        run: npm test
+        shell: bash
+        run: |
+          mkdir -p artifacts/logs/procedural-deform-browser-qa
+          set +e
+          set -o pipefail
+          npm test 2>&1 | tee artifacts/logs/procedural-deform-browser-qa/npm-test.log
+          test_status=${PIPESTATUS[0]}
+          if [ "$test_status" -ne 0 ]; then
+            while IFS= read -r line; do
+              escaped=${line//'%'/'%25'}
+              echo "::error file=package.json,line=1::npm test: $escaped"
+            done < <(tail -n 24 artifacts/logs/procedural-deform-browser-qa/npm-test.log)
+          fi
+          exit "$test_status"
 
       - name: Run forced WebGL2 browser contract
         run: npm run test:human-core-v5-procedural-deform-browser -- --backend webgl2 --headless --browser-channel chromium
