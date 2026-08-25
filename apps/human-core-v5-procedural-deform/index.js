@@ -610,17 +610,30 @@ async function createRenderer() {
     },
     webgl2: { status: 'not-attempted', error: null },
   };
-  if (!forceWebGL && navigator.gpu) {
-    try {
-      const { WebGPURenderer } = await import('three/webgpu');
-      const webgpuRenderer = new WebGPURenderer({ antialias: true });
-      await webgpuRenderer.init();
-      const rendererDevice = webgpuRenderer.backend?.device ?? null;
-      const rendererAdapter = webgpuRenderer.backend?.adapter ?? null;
-      result.webgpu.adapterStatus = rendererAdapter ? 'renderer-owned-pass' : 'renderer-owned-unavailable';
-      result.webgpu.adapterInfo = normalizeGPUAdapterInfo(rendererAdapter?.info);
+  if (!forceWebGL && !navigator.gpu) {
+    result.webgpu.status = 'unavailable';
+    result.webgpu.adapterStatus = 'unavailable';
+    result.webgpu.deviceStatus = 'unavailable';
+    result.webgpu.error = 'navigator.gpu is absent.';
+    result.fallbackUsed = true;
+  }
+
+  const initializeUnifiedRenderer = async (forceWebGLBackend) => {
+    const renderer = new THREE.WebGPURenderer({ antialias: true, forceWebGL: forceWebGLBackend });
+    await renderer.init();
+    return renderer;
+  };
+
+  try {
+    const renderer = await initializeUnifiedRenderer(forceWebGL || !navigator.gpu);
+    const isWebGPUBackend = renderer.backend?.isWebGPUBackend === true;
+    const isWebGLBackend = renderer.backend?.isWebGLBackend === true;
+
+    if (isWebGPUBackend) {
+      const rendererDevice = renderer.backend?.device ?? null;
+      result.webgpu.adapterStatus = 'renderer-owned-internal';
       result.webgpu.deviceStatus = rendererDevice ? 'renderer-owned-pass' : 'renderer-owned-unavailable';
-      result.webgpu.rendererBackend = webgpuRenderer.backend?.constructor?.name ?? 'WebGPUBackend';
+      result.webgpu.rendererBackend = renderer.backend?.constructor?.name ?? 'WebGPUBackend';
       rendererDevice?.lost?.then((info) => {
         result.webgpu.deviceLost = {
           reason: String(info?.reason ?? 'unknown'),
@@ -630,31 +643,43 @@ async function createRenderer() {
       });
       result.activeBackend = 'WebGPU';
       result.webgpu.status = 'pass';
-      return { renderer: webgpuRenderer, ...result };
-    } catch (error) {
-      result.webgpu.status = 'fail';
-      result.webgpu.error = formatError(error);
-      result.fallbackUsed = true;
-      console.warn('WebGPU failed; WebGL2 fallback will be tested independently.', error);
+      return { renderer, ...result };
     }
-  } else if (!forceWebGL) {
-    result.webgpu.status = 'unavailable';
-    result.webgpu.adapterStatus = 'unavailable';
-    result.webgpu.deviceStatus = 'unavailable';
-    result.webgpu.error = 'navigator.gpu is absent.';
-    result.fallbackUsed = true;
-  }
-  try {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('webgl2', { antialias: true });
-    if (!context) throw new Error('A WebGL2 context could not be created.');
-    const webglRenderer = new THREE.WebGLRenderer({ canvas, context, antialias: true });
-    result.activeBackend = 'WebGL2';
-    result.webgl2.status = 'pass';
-    return { renderer: webglRenderer, ...result };
-  } catch (error) {
-    result.webgl2 = { status: 'fail', error: formatError(error) };
-    throw Object.assign(new Error(`No supported renderer. WebGPU=${result.webgpu.status}; WebGL2=${result.webgl2.status}.`), { cause: error });
+
+    if (isWebGLBackend) {
+      result.activeBackend = 'WebGL2';
+      result.webgl2.status = 'pass';
+      if (!forceWebGL) {
+        result.fallbackUsed = true;
+        if (navigator.gpu) {
+          result.webgpu.status = 'renderer-fallback-webgl2';
+          result.webgpu.adapterStatus = 'renderer-fallback';
+          result.webgpu.deviceStatus = 'renderer-fallback';
+          result.webgpu.error = 'Three.js selected its WebGL2 backend during WebGPU initialization.';
+        }
+      }
+      return { renderer, ...result };
+    }
+
+    throw new Error(`Three.js initialized an unknown renderer backend: ${renderer.backend?.constructor?.name ?? 'unknown'}.`);
+  } catch (primaryError) {
+    if (!forceWebGL && navigator.gpu) {
+      result.webgpu.status = 'fail';
+      result.webgpu.error = formatError(primaryError);
+      result.fallbackUsed = true;
+      try {
+        const renderer = await initializeUnifiedRenderer(true);
+        if (renderer.backend?.isWebGLBackend !== true) throw new Error('Forced WebGL2 initialization did not select WebGLBackend.');
+        result.activeBackend = 'WebGL2';
+        result.webgl2.status = 'pass';
+        return { renderer, ...result };
+      } catch (fallbackError) {
+        result.webgl2 = { status: 'fail', error: formatError(fallbackError) };
+        throw Object.assign(new Error(`No supported renderer. WebGPU=${result.webgpu.status}; WebGL2=${result.webgl2.status}.`), { cause: fallbackError });
+      }
+    }
+    result.webgl2 = { status: 'fail', error: formatError(primaryError) };
+    throw Object.assign(new Error(`No supported renderer. WebGPU=${result.webgpu.status}; WebGL2=${result.webgl2.status}.`), { cause: primaryError });
   }
 }
 
@@ -773,13 +798,6 @@ function setNested(target, path, value) {
   cursor[keys.at(-1)] = value;
 }
 function getNested(target, path) { return path.split('.').reduce((value, keyName) => value?.[keyName], target); }
-function normalizeGPUAdapterInfo(info) {
-  const source = info && typeof info === 'object' ? info : {};
-  return Object.fromEntries(['vendor', 'architecture', 'device', 'description', 'isFallbackAdapter'].map((keyName) => [
-    keyName,
-    source[keyName] === undefined || source[keyName] === '' ? 'unavailable' : source[keyName],
-  ]));
-}
 function formatError(error) { return error instanceof Error ? `${error.name}: ${error.message}` : String(error); }
 function escapeHTML(value) { return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]); }
 function downloadBlob(blob, fileName) { const url = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: url, download: fileName }); link.click(); setTimeout(() => URL.revokeObjectURL(url), 0); }
