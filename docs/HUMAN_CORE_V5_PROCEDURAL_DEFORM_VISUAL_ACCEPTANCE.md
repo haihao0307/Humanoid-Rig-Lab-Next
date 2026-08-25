@@ -9,9 +9,9 @@ The code, shared anatomical-axis fixtures, independent SimulationRig FK audit, a
 ```text
 implementationStatus = complete
 browserAutomation = complete
-ciBrowserContract = pending-github-actions
-ciWebGL2 = pending-github-actions
-ciWebGPU = pending-measurement
+ciBrowserContract = pass
+ciWebGL2 = pass
+ciWebGPU = webgpu-ci-fail
 localBrowserPackage = ready
 codexVisualReview = not-run-by-user-rule
 userVisualAcceptance = pending
