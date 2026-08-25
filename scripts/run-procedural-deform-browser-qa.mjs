@@ -692,28 +692,38 @@ function browserFailureSummary(report) {
     classification: run.classification,
     failure: run.failure ?? 'browser contract failed',
     failedInitialChecks: Object.entries(run.initialContract?.checks ?? {}).filter(([, passed]) => !passed).map(([name]) => name),
-    failedButtons: run.buttonChecks.filter((check) => !check.passed).map(({ kind, name, activeChanged, cacheRule, canvasRenderable }) => ({
+    failedButtons: run.buttonChecks.filter((check) => !check.passed).slice(0, 12).map(({ kind, name, activeChanged, cacheRule, canvasRenderable }) => ({
       kind, name, activeChanged, cacheRule, canvasRenderable,
     })),
-    errors: {
-      console: run.consoleErrors,
-      page: run.pageErrors,
-      window: run.windowErrors,
-      unhandledRejections: run.unhandledRejections,
-      requestFailures: run.requestFailures,
-      httpFailures: run.httpFailures,
-      worker: run.workerErrors,
-      contextLosses: run.contextLosses,
-      deviceLost: run.deviceLost,
+    errorCounts: {
+      console: run.consoleErrors.length,
+      page: run.pageErrors.length,
+      window: run.windowErrors.length,
+      unhandledRejections: run.unhandledRejections.length,
+      requestFailures: run.requestFailures.length,
+      httpFailures: run.httpFailures.length,
+      worker: run.workerErrors.length,
+      contextLosses: run.contextLosses.length,
     },
-    glbRequests: run.glbRequests,
+    firstErrors: [
+      run.consoleErrors[0]?.text,
+      run.pageErrors[0]?.message,
+      run.windowErrors[0],
+      run.unhandledRejections[0],
+      run.requestFailures[0] ? JSON.stringify(run.requestFailures[0]) : null,
+      run.httpFailures[0] ? JSON.stringify(run.httpFailures[0]) : null,
+      run.workerErrors[0]?.text,
+      run.contextLosses[0] ? JSON.stringify(run.contextLosses[0]) : null,
+    ].filter(Boolean).map((message) => String(message).slice(0, 800)),
+    deviceLost: run.deviceLost,
+    glbRequests: run.glbRequests.slice(0, 3),
     screenshotCount: run.screenshotCount,
   }));
 }
 
 function emitGitHubBrowserFailure(report) {
   if (process.env.GITHUB_ACTIONS !== 'true') return;
-  const message = JSON.stringify(browserFailureSummary(report))
+  const message = JSON.stringify(browserFailureSummary(report)).slice(0, 6_000)
     .replaceAll('%', '%25')
     .replaceAll('\r', '%0D')
     .replaceAll('\n', '%0A');
