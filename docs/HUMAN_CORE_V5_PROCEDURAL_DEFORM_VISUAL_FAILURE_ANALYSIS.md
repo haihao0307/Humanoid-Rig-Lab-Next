@@ -86,6 +86,7 @@ The exact CI run reported an empty canvas with a dropped device/error scope and 
 5. Add deform-only shoulder fields, continuous forearm twist, and bend-aware elbow/hip/knee corrections without adding rig joints.
 6. Compile squat/lunge validation fixtures with explicit root/contact evidence.
 7. Remove the extra WebGPU device and keep dynamic attribute capacity stable; chunk only in the renderer adapter when required.
+8. Fail browser evidence when screenshot foreground/silhouette gates fail.
 
 ## Post-baseline WebGPU topology-lifecycle finding
 
@@ -100,6 +101,9 @@ The renderer-only repair keeps Core surface topology independent and changes the
 - final adapter teardown still owns explicit disposal, but preset and slider edits do not enter the disposal path.
 
 The regression contract records zero runtime geometry-dispose events across compact and expanded topology replacements. Browser/WebGPU acceptance remains pending a clean CI rerun and does not change `visualAcceptance=false` or `productionReady=false`.
-8. Fail browser evidence when screenshot foreground/silhouette gates fail.
+
+## CI generation-timing follow-up
+
+GitHub Actions run `32858618180` reached the complete file/data suite but stopped before browser QA because one-time medium canonical-surface extraction measured 3022.85 ms on the shared runner, 22.85 ms over an extra 3000 ms wall-clock assertion. Task 14C defines hard Node performance gates for steady-state deformation (`median < 5 ms`, `P95 < 8 ms`) and explicitly excludes surface generation from browser steady-state timing. Canonical extraction remains worker-eligible and its actual duration remains recorded, while correctness no longer depends on shared-runner speed. Geometry, orientation, self-intersection, contact, angle, and deformation-performance gates are unchanged.
 
 No item in this report changes `visualAcceptance=false`, `productionReady=false`, or the requirement for explicit user visual review.
