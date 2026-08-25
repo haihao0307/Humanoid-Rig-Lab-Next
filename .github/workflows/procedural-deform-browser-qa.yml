@@ -41,10 +41,11 @@ jobs:
           npm test 2>&1 | tee artifacts/logs/procedural-deform-browser-qa/npm-test.log
           test_status=${PIPESTATUS[0]}
           if [ "$test_status" -ne 0 ]; then
-            while IFS= read -r line; do
-              escaped=${line//'%'/'%25'}
-              echo "::error file=package.json,line=1::npm test: $escaped"
-            done < <(tail -n 24 artifacts/logs/procedural-deform-browser-qa/npm-test.log)
+            failure_excerpt=$(tail -n 120 artifacts/logs/procedural-deform-browser-qa/npm-test.log)
+            failure_excerpt=${failure_excerpt//'%'/'%25'}
+            failure_excerpt=${failure_excerpt//$'\r'/'%0D'}
+            failure_excerpt=${failure_excerpt//$'\n'/'%0A'}
+            echo "::error file=package.json,line=1,title=npm test failure::$failure_excerpt"
           fi
           exit "$test_status"
 
