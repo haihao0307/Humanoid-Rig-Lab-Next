@@ -612,16 +612,13 @@ async function createRenderer() {
   };
   if (!forceWebGL && navigator.gpu) {
     try {
-      const adapterGPU = await navigator.gpu.requestAdapter();
-      if (!adapterGPU) throw new Error('navigator.gpu.requestAdapter() returned null.');
-      result.webgpu.adapterStatus = 'pass';
-      result.webgpu.adapterInfo = normalizeGPUAdapterInfo(adapterGPU.info);
       const { WebGPURenderer } = await import('three/webgpu');
       const webgpuRenderer = new WebGPURenderer({ antialias: true });
       await webgpuRenderer.init();
       const rendererDevice = webgpuRenderer.backend?.device ?? null;
-      const rendererAdapterInfo = normalizeGPUAdapterInfo(webgpuRenderer.backend?.adapter?.info);
-      if (Object.values(rendererAdapterInfo).some((value) => value !== 'unavailable')) result.webgpu.adapterInfo = rendererAdapterInfo;
+      const rendererAdapter = webgpuRenderer.backend?.adapter ?? null;
+      result.webgpu.adapterStatus = rendererAdapter ? 'renderer-owned-pass' : 'renderer-owned-unavailable';
+      result.webgpu.adapterInfo = normalizeGPUAdapterInfo(rendererAdapter?.info);
       result.webgpu.deviceStatus = rendererDevice ? 'renderer-owned-pass' : 'renderer-owned-unavailable';
       result.webgpu.rendererBackend = webgpuRenderer.backend?.constructor?.name ?? 'WebGPUBackend';
       rendererDevice?.lost?.then((info) => {

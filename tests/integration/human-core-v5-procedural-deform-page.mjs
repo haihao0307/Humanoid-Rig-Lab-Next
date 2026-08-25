@@ -21,7 +21,8 @@ for (const label of [
 assert.doesNotMatch(`${html}\n${app}`, /GLTFLoader|smpl-male-surface|(?:src|href)=["'][^"']+\.glb/i, 'Procedural page must not request a human GLB.');
 assert.doesNotMatch(app, /(?:import|fetch)\s*\([^)]*\.glb/i, 'Procedural app must not import or fetch a human GLB.');
 assert.match(app, /WebGPURenderer/);
-assert.match(app, /requestAdapter/);
+assert.doesNotMatch(app, /navigator\.gpu\.requestAdapter/, 'The page must not create a second WebGPU adapter outside the renderer backend.');
+assert.match(app, /webgpuRenderer\.backend\?\.adapter/, 'WebGPU diagnostics must read the renderer-owned adapter.');
 assert.doesNotMatch(app, /requestDevice/, 'Only Three.js WebGPURenderer may create the production GPUDevice.');
 assert.match(app, /renderer-owned-pass/);
 assert.match(app, /ChunkedProceduralHumanAdapterV5/);
