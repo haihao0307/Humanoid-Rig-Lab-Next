@@ -685,7 +685,7 @@ async function poll(action, timeoutMs, label) { const deadline = Date.now() + ti
 async function runGit(args) { const child = spawn('git', args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }); let output = ''; let error = ''; child.stdout.on('data', (chunk) => { output += chunk; }); child.stderr.on('data', (chunk) => { error += chunk; }); const code = await new Promise((resolveExit) => child.once('exit', resolveExit)); if (code !== 0) throw new Error(`git ${args.join(' ')} failed: ${error.trim()}`); return output.trim(); }
 function formatError(error) { return error instanceof Error ? `${error.name}: ${error.message}` : String(error); }
 
-function browserFailureSummary(report) {
+export function browserFailureSummary(report) {
   return report.runs.filter((run) => !run.passed).map((run) => ({
     backend: run.requestedBackend,
     activeBackend: run.activeBackend,
