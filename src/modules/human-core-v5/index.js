@@ -115,3 +115,5 @@ export {
   HUMAN_CORE_RUNTIME_V5_SCHEMA,
   HumanCoreRuntime,
 } from './human-core-runtime.js';
+
+export * from './procedural-deform/index.js';

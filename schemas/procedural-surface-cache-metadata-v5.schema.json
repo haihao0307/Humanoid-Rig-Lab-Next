@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/procedural_surface_cache_metadata@5.0",
+  "title": "Stable Procedural Surface Cache Metadata V5",
+  "type": "object",
+  "required": ["schema", "schemaVersion", "type", "cacheKey", "fieldFingerprint", "bodyDNAFingerprint", "rigTopologyFingerprint", "generatorVersion", "resolution", "topologyFingerprint", "vertexCount", "triangleCount", "regionBindingFingerprint", "bounds", "measurements", "generationDiagnostics", "storage"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/procedural_surface_cache_metadata@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "StableProceduralSurfaceCache" },
+    "cacheKey": { "type": "string" },
+    "fieldFingerprint": { "type": "string" },
+    "bodyDNAFingerprint": { "type": "string" },
+    "rigTopologyFingerprint": { "type": "string" },
+    "generatorVersion": { "type": "string" },
+    "resolution": { "type": "array", "minItems": 3, "maxItems": 3, "items": {"type":"integer","minimum":8} },
+    "topologyFingerprint": { "type": "string" },
+    "vertexCount": { "type": "integer", "minimum": 1 },
+    "triangleCount": { "type": "integer", "minimum": 1 },
+    "regionBindingFingerprint": { "type": "string" },
+    "bounds": { "type": "object" },
+    "measurements": { "type": "object" },
+    "generationDiagnostics": { "type": "object" },
+    "storage": { "type": "object", "required": ["derivedAsset", "projectStateAllowed", "transferableTypedArrays"] }
+  }
+}

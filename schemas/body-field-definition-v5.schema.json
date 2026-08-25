@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/body_field_definition@5.0",
+  "title": "BodyFieldDefinition V5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "type", "fieldId", "generatorVersion", "humanId", "bodyDNAId", "bodyDNAFingerprint", "rigId", "rigTopologyFingerprint", "proportionRevision", "coordinateSystem", "bounds", "regions", "compositionPolicy", "surfacePolicy", "capabilities", "binding", "canonicalLayout", "fingerprint"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/body_field_definition@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "BodyFieldDefinition" },
+    "fieldId": { "type": "string", "minLength": 1 },
+    "generatorVersion": { "type": "string", "minLength": 1 },
+    "humanId": { "type": "string", "minLength": 1 },
+    "bodyDNAId": { "type": "string", "minLength": 1 },
+    "bodyDNAFingerprint": { "type": "string", "minLength": 1 },
+    "rigId": { "type": "string", "minLength": 1 },
+    "rigTopologyFingerprint": { "type": "string", "minLength": 1 },
+    "proportionRevision": { "type": "integer", "minimum": 0 },
+    "coordinateSystem": { "const": "right-handed,+Y-up,+Z-forward,+X-right" },
+    "bounds": { "$ref": "#/$defs/bounds" },
+    "regions": { "type": "array", "minItems": 17, "maxItems": 17, "items": { "$ref": "#/$defs/region" } },
+    "subtractions": { "type": "array", "items": { "$ref": "#/$defs/subtraction" } },
+    "junctions": { "type": "object" },
+    "compositionPolicy": { "type": "object" },
+    "surfacePolicy": { "type": "object" },
+    "capabilities": { "type": "object", "required": ["rendererIndependent", "glbRequired", "workerGeneration", "stableTopology"] },
+    "binding": { "type": "object", "required": ["mode", "maximumInfluences", "createsRig", "modifiesHierarchy"] },
+    "canonicalLayout": { "type": "object" },
+    "fingerprint": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "vec3": { "type": "array", "prefixItems": [{"type":"number"},{"type":"number"},{"type":"number"}], "minItems": 3, "maxItems": 3 },
+    "bounds": { "type": "object", "required": ["min", "max"], "properties": { "min": { "$ref": "#/$defs/vec3" }, "max": { "$ref": "#/$defs/vec3" } } },
+    "region": { "type": "object", "required": ["regionId", "sourceJointId", "side", "primitive"], "properties": { "regionId": {"type":"string"}, "sourceJointId": {"type":"string"}, "side": {"enum":["left","right","center"]}, "primitive": {"type":"object"} } },
+    "subtraction": { "type": "object", "required": ["subtractionId", "side", "targetJunction", "blendRadius", "primitive"], "properties": { "subtractionId": {"type":"string"}, "side": {"enum":["left","right","center"]}, "targetJunction": {"enum":["shoulder","hip","neckTorso","wristPalm","ankleFoot"]}, "blendRadius": {"type":"number","exclusiveMinimum":0}, "primitive": {"type":"object"} } }
+  }
+}

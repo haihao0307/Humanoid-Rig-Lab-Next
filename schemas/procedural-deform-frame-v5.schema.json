@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/procedural_deform_frame@5.0",
+  "title": "Procedural Deform Frame V5",
+  "type": "object",
+  "required": ["schema", "schemaVersion", "type", "surfaceCacheKey", "topologyFingerprint", "poseAuthority", "deformationPolicy", "deformedPositions", "deformedNormals", "indices", "regionIds", "regionBlendWeights", "bounds", "regionDiagnostics", "deformationDiagnostics", "timestamp"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/procedural_deform_frame@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "ProceduralDeformFrame" },
+    "surfaceCacheKey": { "type": "string" },
+    "topologyFingerprint": { "type": "string" },
+    "poseAuthority": { "const": "finalPose.localRotations" },
+    "deformationPolicy": { "const": "region-hybrid-dqs-implicit@5.0" },
+    "deformedPositions": {}, "deformedNormals": {}, "indices": {}, "regionIds": {}, "regionBlendWeights": {},
+    "bounds": { "type": "object" }, "regionDiagnostics": { "type": "object" }, "deformationDiagnostics": { "type": "object" }, "timestamp": {"type":"number"}
+  }
+}

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Human Core V5 · Procedural Deform</title>
+  <link rel="stylesheet" href="./apps/human-core-v5-procedural-deform/styles.css">
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js","three/webgpu":"https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.webgpu.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"}}
+  </script>
+</head>
+<body>
+  <header><div><b>Human Core V5</b><span>Procedural Deform System · visual acceptance pending</span></div><a href="./index.html">返回项目</a></header>
+  <main>
+    <aside class="panel left-panel">
+      <h1>BodyDNA</h1><p>程序化规范体场，不依赖人体 GLB。</p>
+      <section><h2>预设</h2><div id="preset-list" class="button-grid"></div></section>
+      <section id="dna-controls"></section>
+      <section><h2>显示</h2><div id="display-list" class="button-grid"></div></section>
+      <section><h2>压力姿势</h2><div id="pose-list" class="button-grid"></div></section>
+    </aside>
+    <section class="viewport-shell">
+      <div id="viewport"></div>
+      <div id="loading" class="loading">正在生成规范人体表面…</div>
+      <div class="camera-bar" id="camera-list"></div>
+    </section>
+    <aside class="panel diagnostics-panel"><h1>实时诊断</h1><dl id="diagnostics"></dl><p class="warning">浏览器视觉验收尚未执行；productionReady=false。</p></aside>
+  </main>
+  <script type="module" src="./apps/human-core-v5-procedural-deform/index.js"></script>
+</body>
+</html>

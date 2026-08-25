@@ -129,6 +129,35 @@ const required = [
   'schemas/human-anatomy-state-v5.schema.json',
   'tests/human-core-v5-bodydna-intelligent-rig.mjs', 'tests/human-core-v5-anatomy-runtime.mjs',
   'docs/HUMAN_CORE_V5_BODYDNA_DESIGN.md', 'docs/HUMAN_CORE_V5_ANATOMY_RUNTIME.md',
+  'src/modules/human-core-v5/procedural-deform/anatomical-field-primitives-v5.js',
+  'src/modules/human-core-v5/procedural-deform/anatomical-field-composition-v5.js',
+  'src/modules/human-core-v5/procedural-deform/body-field-definition-v5.js',
+  'src/modules/human-core-v5/procedural-deform/body-field-compiler-v5.js',
+  'src/modules/human-core-v5/procedural-deform/surface-region-binding-v5.js',
+  'src/modules/human-core-v5/procedural-deform/surface-extractor-v5.js',
+  'src/modules/human-core-v5/procedural-deform/region-deformation-driver-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-deform-policy-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-deform-frame-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-deform-runtime-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-surface-worker-client-v5.js',
+  'src/modules/human-core-v5/procedural-deform/index.js',
+  'src/renderers/three/three-procedural-human-adapter-v5.js',
+  'workers/procedural-surface.worker.js',
+  'schemas/body-field-definition-v5.schema.json',
+  'schemas/procedural-surface-cache-metadata-v5.schema.json',
+  'schemas/region-deformation-driver-frame-v5.schema.json',
+  'schemas/procedural-deform-frame-v5.schema.json',
+  'schemas/renderer-adapter-input-v5.schema.json',
+  'human-core-v5-procedural-deform.html',
+  'apps/human-core-v5-procedural-deform/index.js',
+  'apps/human-core-v5-procedural-deform/styles.css',
+  'tests/human-core-v5-procedural-deform-contract.mjs',
+  'tests/human-core-v5-procedural-surface.mjs',
+  'tests/human-core-v5-procedural-deform-stress.mjs',
+  'tests/integration/human-core-v5-procedural-deform-page.mjs',
+  'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM.md',
+  'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_VISUAL_ACCEPTANCE.md',
+  'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_RESEARCH_DECISION.md',
   'control/module-scopes/proportion.json', 'control/module-scopes/skin.json',
   'control/module-scopes/pose.json', 'control/module-scopes/animation.json',
 ];
@@ -148,6 +177,11 @@ assert.match(packageJson.scripts.test, /test:character-studio/);
 assert.match(packageJson.scripts.test, /test:human-core-v5/);
 assert.match(packageJson.scripts.test, /test:human-core-v5-anatomy/);
 assert.match(packageJson.scripts['test:human-core-v5-anatomy'], /human-core-v5-anatomy-runtime/);
+assert.match(packageJson.scripts.test, /test:human-core-v5-procedural-deform/);
+assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-deform-contract/);
+assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-surface/);
+assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-deform-stress/);
+assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-deform-page/);
 assert.match(packageJson.scripts['test:character-studio'], /character-studio-v1/);
 assert.match(packageJson.scripts.test, /integration-v002/);
 assert.match(packageJson.scripts.test, /test:animation/);
@@ -179,6 +213,14 @@ assert.equal(buildManifest.characterStudio.persistence.largeResources, 'OPFS');
 assert.deepEqual(buildManifest.characterStudio.windowRoles, [
   'character-studio', 'main-editor', 'animation-editor', 'data-inspector',
 ]);
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.runtime, 'procedural-deform-runtime-v5@1');
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.schema, 'humanoid_rig/procedural_deform_frame@5.0');
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.poseAuthority, 'finalPose.localRotations');
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.rendererIndependence, true);
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.glbRequired, false);
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.workerGeneration, true);
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.visualAcceptance, false);
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.productionReady, false);
 
 const branchLauncher = await readFile(join(root, 'PREPARE_BRANCHES.cmd'), 'utf8');
 assert.match(branchLauncher, /prepare-module-branches\.ps1/i);
@@ -423,6 +465,11 @@ const muscleSemanticSchema = JSON.parse(await readFile(join(root, 'schemas/muscl
 const humanBalanceSchema = JSON.parse(await readFile(join(root, 'schemas/human-balance-state-v5.schema.json'), 'utf8'));
 const anatomySignalSchema = JSON.parse(await readFile(join(root, 'schemas/anatomy-deformation-signal-v5.schema.json'), 'utf8'));
 const humanAnatomySchema = JSON.parse(await readFile(join(root, 'schemas/human-anatomy-state-v5.schema.json'), 'utf8'));
+const bodyFieldDefinitionSchema = JSON.parse(await readFile(join(root, 'schemas/body-field-definition-v5.schema.json'), 'utf8'));
+const proceduralSurfaceCacheSchema = JSON.parse(await readFile(join(root, 'schemas/procedural-surface-cache-metadata-v5.schema.json'), 'utf8'));
+const regionDriverSchema = JSON.parse(await readFile(join(root, 'schemas/region-deformation-driver-frame-v5.schema.json'), 'utf8'));
+const proceduralDeformFrameSchema = JSON.parse(await readFile(join(root, 'schemas/procedural-deform-frame-v5.schema.json'), 'utf8'));
+const rendererAdapterInputSchema = JSON.parse(await readFile(join(root, 'schemas/renderer-adapter-input-v5.schema.json'), 'utf8'));
 const humanCoreIndexSource = await readFile(join(root, 'src/modules/human-core-v5/index.js'), 'utf8');
 assert.equal(bodyDnaSchema.$id, 'humanoid_rig/body_dna@5.0');
 assert.equal(jointSemanticSchema.$id, 'humanoid_rig/joint_semantic_profile@5.0');
@@ -433,6 +480,11 @@ assert.equal(muscleSemanticSchema.$id, 'humanoid_rig/muscle_semantic_profile@5.0
 assert.equal(humanBalanceSchema.$id, 'humanoid_rig/human_balance_state@5.0');
 assert.equal(anatomySignalSchema.$id, 'humanoid_rig/anatomy_deformation_signal@5.0');
 assert.equal(humanAnatomySchema.$id, 'humanoid_rig/human_anatomy_state@5.0');
+assert.equal(bodyFieldDefinitionSchema.$id, 'humanoid_rig/body_field_definition@5.0');
+assert.equal(proceduralSurfaceCacheSchema.$id, 'humanoid_rig/procedural_surface_cache_metadata@5.0');
+assert.equal(regionDriverSchema.$id, 'humanoid_rig/region_deformation_driver_frame@5.0');
+assert.equal(proceduralDeformFrameSchema.$id, 'humanoid_rig/procedural_deform_frame@5.0');
+assert.equal(rendererAdapterInputSchema.$id, 'humanoid_rig/renderer_adapter_input@5.0');
 assert.ok(humanCoreStateSchema.required.includes('anatomyState'));
 assert.match(humanCoreIndexSource, /HumanCoreRuntime/);
 assert.match(humanCoreIndexSource, /V4Adapter/);
@@ -440,6 +492,7 @@ assert.match(humanCoreIndexSource, /createBodyDNA/);
 assert.match(humanCoreIndexSource, /HumanAnatomyRuntimeV5/);
 assert.match(humanCoreIndexSource, /createMassDistributionModelV5/);
 assert.match(humanCoreIndexSource, /AnatomyPoseEvaluatorV5/);
+assert.match(humanCoreIndexSource, /procedural-deform/);
 
 const javascriptFiles = [
   'server.mjs',
@@ -460,6 +513,21 @@ const javascriptFiles = [
   'src/modules/human-core-v5/v4-adapter.js',
   'src/modules/human-core-v5/human-core-runtime.js',
   'src/modules/human-core-v5/index.js',
+  'src/modules/human-core-v5/procedural-deform/anatomical-field-primitives-v5.js',
+  'src/modules/human-core-v5/procedural-deform/anatomical-field-composition-v5.js',
+  'src/modules/human-core-v5/procedural-deform/body-field-definition-v5.js',
+  'src/modules/human-core-v5/procedural-deform/body-field-compiler-v5.js',
+  'src/modules/human-core-v5/procedural-deform/surface-region-binding-v5.js',
+  'src/modules/human-core-v5/procedural-deform/surface-extractor-v5.js',
+  'src/modules/human-core-v5/procedural-deform/region-deformation-driver-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-deform-policy-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-deform-frame-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-deform-runtime-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-surface-worker-client-v5.js',
+  'src/modules/human-core-v5/procedural-deform/index.js',
+  'src/renderers/three/three-procedural-human-adapter-v5.js',
+  'workers/procedural-surface.worker.js',
+  'apps/human-core-v5-procedural-deform/index.js',
   'packages/character-core/character-profile.js', 'packages/character-core/character-state.js',
   'packages/character-core/character-version.js', 'packages/character-core/character-manager.js',
   'packages/character-core/index.js',

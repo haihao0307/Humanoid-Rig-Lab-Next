@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/renderer_adapter_input@5.0",
+  "title": "Renderer Adapter Input V5",
+  "type": "object",
+  "required": ["schema", "schemaVersion", "type", "cacheKey", "topologyFingerprint", "positions", "normals", "indices", "regionIds", "bounds", "poseAuthority"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/renderer_adapter_input@5.0" },
+    "schemaVersion": { "const": 5 },
+    "type": { "const": "RendererAdapterInput" },
+    "cacheKey": { "type": "string" },
+    "topologyFingerprint": { "type": "string" },
+    "positions": {}, "normals": {}, "indices": {}, "regionIds": {}, "bounds": {"type":"object"},
+    "poseAuthority": { "const": "finalPose.localRotations" }
+  }
+}
