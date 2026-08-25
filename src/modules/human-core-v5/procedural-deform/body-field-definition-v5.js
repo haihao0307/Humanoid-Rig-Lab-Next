@@ -1,5 +1,6 @@
 import { createBodyDNA, assertBodyDNAV5, bodyDNAFingerprint } from '../body-dna-v5.js';
 import { assertHumanRigCoreV5, cloneHumanRigCoreV5 } from '../human-rig-core-v5.js';
+import { adaptHumanRigCoreToExistingRig } from '../v4-adapter.js';
 import { stableFingerprint } from '../core-utils.js';
 import {
   createEllipsoidPrimitive,
@@ -21,7 +22,7 @@ export function createBodyFieldDefinitionV5({ bodyDNA = {}, rigCore, fieldOption
   assertBodyDNAV5(dna);
   const core = cloneHumanRigCoreV5(rigCore);
   assertHumanRigCoreV5(core);
-  const layout = createCanonicalLayout(dna);
+  const layout = createCanonicalLayout(dna, core);
   const regions = createRegions(dna, layout);
   const subtractions = createAnatomicalSubtractions(dna, layout);
   const margin = Math.max(0.08, dna.proportion.height * 0.045);
@@ -110,30 +111,41 @@ export function assertBodyFieldDefinitionV5(value) {
   return value;
 }
 
-function createCanonicalLayout(dna) {
+function createCanonicalLayout(dna, rigCore) {
   const p = dna.proportion;
   const limbs = p.limbLengths;
   const height = p.height;
+  const adapted = adaptHumanRigCoreToExistingRig(rigCore, { bodyDNA: dna, pose: 'T' });
+  const bindWorld = new Map(adapted.definition.joints.map((joint) => [joint.id, finiteVector3(joint.poseWorldPosition)]));
   const headHeight = height / p.headToBodyRatio;
   const footHeight = height * 0.035;
-  const ankleY = footHeight * 1.25;
-  const kneeY = ankleY + limbs.lowerLeg;
-  const hipY = kneeY + limbs.thigh;
-  const shoulderY = height - headHeight - height * 0.055;
-  const pelvisCenterY = hipY + height * 0.015;
+  const leftLandmarks = createSideLandmarks(bindWorld, 'left');
+  const rightLandmarks = createSideLandmarks(bindWorld, 'right');
+  const ankleY = average(leftLandmarks.ankle[1], rightLandmarks.ankle[1]);
+  const kneeY = average(leftLandmarks.knee[1], rightLandmarks.knee[1]);
+  const hipY = average(leftLandmarks.hip[1], rightLandmarks.hip[1]);
+  const shoulderY = average(leftLandmarks.shoulder[1], rightLandmarks.shoulder[1]);
+  const rigRootPosition = bindWorld.get('hips') ?? [0, hipY, 0];
+  const pelvisCenterY = rigRootPosition[1];
   const torsoLength = Math.max(height * 0.30, shoulderY - pelvisCenterY);
-  const wristY = shoulderY - height * 0.028;
-  const shoulderX = p.shoulderWidth / 2;
-  const hipX = p.hipWidth / 2;
+  const wristY = average(leftLandmarks.wrist[1], rightLandmarks.wrist[1]);
+  const shoulderX = average(Math.abs(leftLandmarks.shoulder[0]), Math.abs(rightLandmarks.shoulder[0]));
+  const hipX = average(Math.abs(leftLandmarks.hip[0]), Math.abs(rightLandmarks.hip[0]));
   const handLength = Math.max(limbs.handControl * 2.1, height * 0.085);
   const footLength = height * 0.145;
+  const leftScale = sideScales(dna, 'left');
+  const rightScale = sideScales(dna, 'right');
+  const sideSpan = (scale) => shoulderX * scale.shoulder + (limbs.upperArm + limbs.forearm) * scale.arm + handLength * scale.hand;
+  const maximumFootScale = Math.max(leftScale.foot, rightScale.foot);
   return {
     height, headHeight, footHeight, footLength, ankleY, kneeY, hipY, pelvisCenterY,
+    rigRootPosition,
     upperArmLength: limbs.upperArm, forearmLength: limbs.forearm,
     handControlLength: limbs.handControl, thighLength: limbs.thigh, lowerLegLength: limbs.lowerLeg,
     shoulderY, torsoLength, wristY, shoulderX, hipX, handLength,
-    halfSpanX: shoulderX + limbs.upperArm + limbs.forearm + handLength,
-    maxFront: Math.max(p.bodyThickness.chest, p.bodyThickness.hip) / 2 + footLength * 0.72,
+    rigLandmarks: { left: leftLandmarks, right: rightLandmarks },
+    halfSpanX: Math.max(sideSpan(leftScale), sideSpan(rightScale)),
+    maxFront: Math.max(p.bodyThickness.chest, p.bodyThickness.hip) / 2 + footLength * 0.72 * maximumFootScale,
     maxBack: Math.max(p.bodyThickness.chest, p.bodyThickness.hip) / 2 + footLength * 0.28,
   };
 }
@@ -167,7 +179,7 @@ function createRegions(dna, layout) {
   add('upperTorso', 'chest', 'center', createSuperellipsoidPrimitive({
     id: 'upper-torso-field', region: 'upperTorso', sourceJointId: 'chest',
     center: [0, layout.shoulderY - layout.torsoLength * 0.25, 0],
-    radii: [p.shoulderWidth * 0.445, layout.torsoLength * 0.33, p.bodyThickness.chest * 0.52 * torsoScale], exponent: 2.7,
+    radii: [p.shoulderWidth * 0.46, layout.torsoLength * 0.33, p.bodyThickness.chest * 0.52 * torsoScale], exponent: 2.7,
   }));
   add('lowerTorso', 'spine', 'center', createTaperedEllipticalCapsulePrimitive({
     id: 'lower-torso-field', region: 'lowerTorso', sourceJointId: 'spine',
@@ -178,14 +190,13 @@ function createRegions(dna, layout) {
   }));
   add('pelvis', 'hips', 'center', createSuperellipsoidPrimitive({
     id: 'pelvis-field', region: 'pelvis', sourceJointId: 'hips', center: [0, layout.pelvisCenterY, 0],
-    radii: [p.hipWidth * 0.50, p.height * 0.095, p.bodyThickness.hip * 0.54 * torsoScale], exponent: 2.55,
+    radii: [p.hipWidth * 0.465, p.height * 0.095, p.bodyThickness.hip * 0.54 * torsoScale], exponent: 2.55,
   }));
   for (const [side, sign, scaleSet] of [['left', -1, left], ['right', 1, right]]) {
-    const cap = side[0].toUpperCase() + side.slice(1);
-    const shoulder = [sign * layout.shoulderX * scaleSet.shoulder, layout.shoulderY, 0];
-    const elbow = [sign * (layout.shoulderX + p.limbLengths.upperArm * scaleSet.arm), layout.wristY, 0];
-    const wrist = [sign * (layout.shoulderX + (p.limbLengths.upperArm + p.limbLengths.forearm) * scaleSet.arm), layout.wristY - p.height * 0.004, 0];
-    const palm = [sign * (Math.abs(wrist[0]) + layout.handLength * 0.36 * scaleSet.hand), wrist[1], layout.footLength * 0.025];
+    const landmarks = layout.rigLandmarks[side];
+    const shoulder = [sign * Math.abs(landmarks.shoulder[0]) * 1.035 * scaleSet.shoulder, landmarks.shoulder[1], landmarks.shoulder[2]];
+    const elbow = addScaledSegment(shoulder, landmarks.shoulder, landmarks.elbow, scaleSet.arm);
+    const wrist = addScaledSegment(elbow, landmarks.elbow, landmarks.wrist, scaleSet.arm);
     add(`${side}UpperArm`, `${side}UpperArm`, side, createTaperedEllipticalCapsulePrimitive({
       id: `${side}-upper-arm-field`, region: `${side}UpperArm`, sourceJointId: `${side}UpperArm`, side,
       start: shoulder, end: elbow,
@@ -198,14 +209,16 @@ function createRegions(dna, layout) {
       startRadii: [forearmRadius * scaleSet.arm, forearmRadius * 1.02 * scaleSet.arm, forearmRadius * 1.04 * scaleSet.arm],
       endRadii: [Math.max(forearmRadius * 0.72, p.height * 0.030) * scaleSet.arm, Math.max(forearmRadius * 0.76, p.height * 0.032) * scaleSet.arm, Math.max(forearmRadius * 0.78, p.height * 0.034) * scaleSet.arm],
     }));
+    const palmRadii = [layout.handLength * 0.56 * scaleSet.hand, p.height * 0.036 * scaleSet.hand, p.height * 0.050 * scaleSet.hand];
+    const palm = [wrist[0] + sign * palmRadii[0], wrist[1], wrist[2] + layout.footLength * 0.025];
     add(`${side}Palm`, `${side}Hand`, side, createSuperellipsoidPrimitive({
       id: `${side}-palm-field`, region: `${side}Palm`, sourceJointId: `${side}Hand`, side, center: palm,
-      radii: [layout.handLength * 0.56 * scaleSet.hand, p.height * 0.036 * scaleSet.hand, p.height * 0.050 * scaleSet.hand], exponent: 3.2,
+      radii: palmRadii, exponent: 3.2,
     }));
-    const hip = [sign * layout.hipX * scaleSet.hip, layout.hipY, 0];
-    const knee = [sign * layout.hipX * scaleSet.hip, layout.kneeY, p.height * 0.008];
-    const ankle = [sign * layout.hipX * scaleSet.hip, layout.ankleY, 0];
-    const foot = [sign * layout.hipX * scaleSet.foot, layout.footHeight, layout.footLength * 0.30];
+    const hip = [sign * Math.abs(landmarks.hip[0]) * scaleSet.hip, landmarks.hip[1], landmarks.hip[2]];
+    const knee = addScaledSegment(hip, landmarks.hip, landmarks.knee, scaleSet.leg);
+    const ankle = addScaledSegment(knee, landmarks.knee, landmarks.ankle, scaleSet.leg);
+    const foot = [sign * Math.abs(ankle[0]) * scaleSet.foot, layout.footHeight, ankle[2] + layout.footLength * 0.30];
     add(`${side}Thigh`, `${side}UpperLeg`, side, createTaperedEllipticalCapsulePrimitive({
       id: `${side}-thigh-field`, region: `${side}Thigh`, sourceJointId: `${side}UpperLeg`, side,
       start: hip, end: knee,
@@ -272,6 +285,28 @@ function sideScales(dna, side) {
 function scaledJunction(base, scale) {
   return { ...base, blendRadius: Math.max(0.012, base.blendRadius * Math.max(0.5, scale / 0.42)) };
 }
+
+function createSideLandmarks(bindWorld, side) {
+  const sign = side === 'left' ? -1 : 1;
+  return {
+    shoulder: bindWorld.get(`${side}UpperArm`) ?? [sign * 0.21, 1.33, 0],
+    elbow: bindWorld.get(`${side}LowerArm`) ?? [sign * 0.49, 1.33, 0],
+    wrist: bindWorld.get(`${side}Hand`) ?? [sign * 0.73, 1.33, 0],
+    hip: bindWorld.get(`${side}UpperLeg`) ?? [sign * 0.10, 0.93, 0],
+    knee: bindWorld.get(`${side}LowerLeg`) ?? [sign * 0.10, 0.50, 0],
+    ankle: bindWorld.get(`${side}Foot`) ?? [sign * 0.10, 0.10, 0],
+  };
+}
+
+function addScaledSegment(origin, sourceStart, sourceEnd, scale) {
+  return origin.map((value, axis) => value + (sourceEnd[axis] - sourceStart[axis]) * scale);
+}
+
+function finiteVector3(value) {
+  return Array.from({ length: 3 }, (_, axis) => Number.isFinite(Number(value?.[axis])) ? Number(value[axis]) : 0);
+}
+
+function average(a, b) { return (Number(a) + Number(b)) * 0.5; }
 
 function definitionWithoutFingerprint(value) {
   const clone = structuredClone(value);

@@ -19,7 +19,9 @@
     "test:human-core-v4": "node tests/human-core-v4-pose-authority.mjs",
     "test:human-core-v5": "node tests/human-core-v5-bodydna-intelligent-rig.mjs",
     "test:human-core-v5-anatomy": "node tests/human-core-v5-anatomy-runtime.mjs",
-    "test:human-core-v5-procedural-deform": "node tests/human-core-v5-procedural-deform-contract.mjs && node tests/human-core-v5-procedural-surface.mjs && node tests/human-core-v5-procedural-deform-stress.mjs && node tests/integration/human-core-v5-procedural-deform-page.mjs"
+    "test:human-core-v5-procedural-deform": "node tests/human-core-v5-procedural-deform-contract.mjs && node tests/human-core-v5-procedural-surface.mjs && node tests/human-core-v5-procedural-deform-validation.mjs && node tests/human-core-v5-procedural-deform-stress.mjs && node tests/integration/human-core-v5-procedural-deform-page.mjs",
+    "test:human-core-v5-procedural-deform-browser": "node tests/browser/human-core-v5-procedural-deform.browser.mjs",
+    "test:human-core-v5-procedural-deform-qa": "node scripts/run-procedural-deform-browser-qa.mjs --verify-artifacts"
   },
   "engines": {
     "node": ">=18"

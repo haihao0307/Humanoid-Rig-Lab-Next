@@ -10,7 +10,7 @@
   </script>
 </head>
 <body>
-  <header><div><b>Human Core V5</b><span>Procedural Deform System · visual acceptance pending</span></div><a href="./index.html">返回项目</a></header>
+  <header><div><b>Human Core V5</b><span>Procedural Deform QA · code complete / browser acceptance pending</span></div><a href="./index.html">返回项目</a></header>
   <main>
     <aside class="panel left-panel">
       <h1>BodyDNA</h1><p>程序化规范体场，不依赖人体 GLB。</p>
@@ -24,7 +24,27 @@
       <div id="loading" class="loading">正在生成规范人体表面…</div>
       <div class="camera-bar" id="camera-list"></div>
     </section>
-    <aside class="panel diagnostics-panel"><h1>实时诊断</h1><dl id="diagnostics"></dl><p class="warning">浏览器视觉验收尚未执行；productionReady=false。</p></aside>
+    <aside class="panel diagnostics-panel">
+      <h1>实时诊断</h1>
+      <div class="overlay-legend" aria-label="Rig overlay legend">
+        <span><i class="legend-rig"></i>独立 SimulationRig FK</span>
+        <span><i class="legend-anchor"></i>Procedural Region Anchor</span>
+      </div>
+      <div id="rig-surface-gate" class="gate pending" data-qa-gate="rig-surface">等待运行时数据</div>
+      <dl id="diagnostics"></dl>
+      <section class="qa-section">
+        <h2>验收操作</h2>
+        <div id="qa-actions" class="qa-actions">
+          <button type="button" data-qa-action="run-full-qa">Run Full QA</button>
+          <button type="button" data-qa-action="capture-current-view">Capture Current View</button>
+          <button type="button" data-qa-action="mark-pass">Mark Pass</button>
+          <button type="button" data-qa-action="mark-fail">Mark Fail</button>
+          <button type="button" data-qa-action="export-qa-json">Export QA JSON</button>
+        </div>
+        <p id="qa-output" class="qa-output" data-status="pending">尚未执行浏览器视觉验收。</p>
+      </section>
+      <p class="warning">本页提供可复现的浏览器验收入口，但当前正式标志固定为 visualAcceptance=false、productionReady=false。</p>
+    </aside>
   </main>
   <script type="module" src="./apps/human-core-v5-procedural-deform/index.js"></script>
 </body>

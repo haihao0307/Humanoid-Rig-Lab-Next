@@ -9,3 +9,5 @@ export * from './procedural-deform-policy-v5.js';
 export * from './procedural-deform-frame-v5.js';
 export * from './procedural-deform-runtime-v5.js';
 export * from './procedural-surface-worker-client-v5.js';
+export * from './procedural-deform-validation-poses-v5.js';
+export * from './procedural-simulation-rig-fk-v5.js';

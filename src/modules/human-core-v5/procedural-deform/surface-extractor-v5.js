@@ -245,7 +245,8 @@ function normalizeResolution(value, bounds) {
   if (Array.isArray(value)) return value.map((item) => Math.max(8, Math.floor(Number(item) || 8)));
   const ny = Math.max(16, Math.floor(Number(value) || 28));
   const size = bounds.max.map((item, axis) => item - bounds.min[axis]);
-  return [Math.max(12, Math.round(ny * size[0] / size[1])), ny, Math.max(12, Math.round(ny * size[2] / size[1]))];
+  const horizontalQualityScale = ny >= 36 ? 3 : 1;
+  return [Math.max(16, Math.round(ny * size[0] / size[1] * horizontalQualityScale)), ny, Math.max(12, Math.round(ny * size[2] / size[1]))];
 }
 
 function gridIndex(x, y, z, nx, ny) { return x + nx * (y + ny * z); }

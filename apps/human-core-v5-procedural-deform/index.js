@@ -1,129 +1,643 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {
-  HumanCoreRuntime, ProceduralDeformRuntimeV5, createBodyDNA, createRendererAdapterInputV5,
+  HumanCoreRuntime,
+  ProceduralDeformRuntimeV5,
+  PROCEDURAL_DEFORM_VALIDATION_POSE_IDS_V5,
+  PROCEDURAL_DEFORM_VALIDATION_POSE_LABELS_V5,
+  compareProceduralRigSurfaceAnchorsV5,
+  createBodyDNA,
+  createProceduralDeformValidationPoseV5,
+  createProceduralSimulationRigFrameV5,
+  createRendererAdapterInputV5,
+  measureProceduralDeformValidationPoseV5,
 } from '../../src/modules/human-core-v5/index.js';
-import { createPoseFrameV4 } from '../../src/modules/pose/pose-frame-v4.js';
 import { ThreeProceduralHumanAdapterV5 } from '../../src/renderers/three/three-procedural-human-adapter-v5.js';
 
 const container = document.querySelector('#viewport');
 const loading = document.querySelector('#loading');
 const forceWebGL = new URLSearchParams(location.search).get('forceWebGL') === '1';
+const runtimeErrors = [];
+const originalConsoleError = console.error.bind(console);
+console.error = (...values) => {
+  runtimeErrors.push(values.map(formatError).join(' '));
+  originalConsoleError(...values);
+};
+addEventListener('error', (event) => runtimeErrors.push(formatError(event.error ?? event.message)));
+addEventListener('unhandledrejection', (event) => runtimeErrors.push(formatError(event.reason)));
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x01040a);
 const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 100);
 camera.position.set(2.7, 1.45, 3.1);
-const { renderer, backend } = await createRenderer();
+const rendererState = await createRenderer();
+const { renderer } = rendererState;
 container.append(renderer.domElement);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0.95, 0); controls.enableDamping = true;
+controls.target.set(0, 0.95, 0);
+controls.enableDamping = true;
 scene.add(new THREE.HemisphereLight(0xbad8ff, 0x24180e, 2.1));
-const key = new THREE.DirectionalLight(0xffffff, 2.8); key.position.set(2, 4, 3); scene.add(key);
-const rim = new THREE.DirectionalLight(0x61bfff, 1.2); rim.position.set(-3, 2, -3); scene.add(rim);
+const key = new THREE.DirectionalLight(0xffffff, 2.8);
+key.position.set(2, 4, 3);
+scene.add(key);
+const rim = new THREE.DirectionalLight(0x61bfff, 1.2);
+rim.position.set(-3, 2, -3);
+scene.add(rim);
 scene.add(new THREE.GridHelper(8, 40, 0x1f5d8a, 0x10243a));
 
 const adapter = new ThreeProceduralHumanAdapterV5();
 scene.add(adapter.getObject3D());
-const skeletonGroup = new THREE.Group(); scene.add(skeletonGroup);
-const primitiveGroup = new THREE.Group(); scene.add(primitiveGroup);
+const simulationRigGroup = new THREE.Group();
+simulationRigGroup.name = 'IndependentSimulationRigFK';
+scene.add(simulationRigGroup);
+const proceduralAnchorGroup = new THREE.Group();
+proceduralAnchorGroup.name = 'ProceduralRegionAnchors';
+scene.add(proceduralAnchorGroup);
+const primitiveGroup = new THREE.Group();
+primitiveGroup.name = 'ProceduralFieldPrimitives';
+scene.add(primitiveGroup);
+
 const coreRuntime = new HumanCoreRuntime();
 const deformRuntime = new ProceduralDeformRuntimeV5();
-let dna = null; let activePreset = 'Reference'; let activePose = 'A Pose'; let displayMode = 'Procedural Surface';
-let manualDNA = {}; let rebuildChain = Promise.resolve(); let rebuildTimer = null;
+let dna = null;
+let activePreset = 'Reference';
+let activePoseId = 'a-pose';
+let displayMode = 'Procedural Surface';
+let activeCamera = 'Perspective';
+let manualDNA = {};
+let rebuildChain = Promise.resolve();
+let rebuildTimer = null;
+let lastPose = null;
+let lastFrame = null;
+let lastSimulationRigFrame = null;
+let lastAnchorAudit = null;
+let lastAngleMeasurements = null;
+let lastQASnapshot = null;
+let qaRunning = false;
+const qaRecords = [];
 
 const PRESETS = {
   Reference: {},
-  Lean: { bodyType:{category:'ectomorph'}, mass:{weightKg:58}, fitnessProfile:{muscle:.35,fat:.16,distribution:{upperBody:.40,lowerBody:.42}}, proportion:{bodyThickness:{chest:.19,waist:.15,hip:.19}} },
-  Muscular: { bodyType:{category:'mesomorph'}, mass:{weightKg:92}, fitnessProfile:{muscle:.88,fat:.16,distribution:{upperBody:.82,lowerBody:.75}}, proportion:{shoulderWidth:.49,bodyThickness:{chest:.31,waist:.22,hip:.27}} },
-  Heavy: { bodyType:{category:'endomorph'}, mass:{weightKg:112}, fitnessProfile:{muscle:.42,fat:.84,distribution:{upperBody:.52,lowerBody:.62}}, proportion:{bodyThickness:{chest:.35,waist:.34,hip:.38},hipWidth:.25} },
-  Tall: { proportion:{height:2.02,shoulderWidth:.46,hipWidth:.21,headToBodyRatio:8.1,limbLengths:{upperArm:.34,forearm:.30,handControl:.085,thigh:.52,lowerLeg:.49}} },
-  Short: { proportion:{height:1.55,shoulderWidth:.36,hipWidth:.19,headToBodyRatio:6.8,limbLengths:{upperArm:.24,forearm:.21,handControl:.065,thigh:.36,lowerLeg:.34}} },
-  Asymmetric: { asymmetry:{mode:'authored',leftRightScale:{shoulder:1.10,arm:1.08,hand:1.05,hip:1.06,leg:1.08,foot:1.04}} },
+  Lean: { bodyType: { category: 'ectomorph' }, mass: { weightKg: 58 }, fitnessProfile: { muscle: 0.35, fat: 0.16, distribution: { upperBody: 0.40, lowerBody: 0.42 } }, proportion: { bodyThickness: { chest: 0.19, waist: 0.15, hip: 0.19 } } },
+  Muscular: { bodyType: { category: 'mesomorph' }, mass: { weightKg: 92 }, fitnessProfile: { muscle: 0.88, fat: 0.16, distribution: { upperBody: 0.82, lowerBody: 0.75 } }, proportion: { shoulderWidth: 0.49, bodyThickness: { chest: 0.31, waist: 0.22, hip: 0.27 } } },
+  Heavy: { bodyType: { category: 'endomorph' }, mass: { weightKg: 112 }, fitnessProfile: { muscle: 0.42, fat: 0.84, distribution: { upperBody: 0.52, lowerBody: 0.62 } }, proportion: { bodyThickness: { chest: 0.35, waist: 0.34, hip: 0.38 }, hipWidth: 0.25 } },
+  Tall: { proportion: { height: 2.02, shoulderWidth: 0.46, hipWidth: 0.21, headToBodyRatio: 8.1, limbLengths: { upperArm: 0.34, forearm: 0.30, handControl: 0.085, thigh: 0.52, lowerLeg: 0.49 } } },
+  Short: { proportion: { height: 1.55, shoulderWidth: 0.36, hipWidth: 0.19, headToBodyRatio: 6.8, limbLengths: { upperArm: 0.24, forearm: 0.21, handControl: 0.065, thigh: 0.36, lowerLeg: 0.34 } } },
+  Asymmetric: { asymmetry: { mode: 'authored', leftRightScale: { shoulder: 1.10, arm: 1.08, hand: 1.05, hip: 1.06, leg: 1.08, foot: 1.04 } } },
 };
-const POSES = ['A Pose','T Pose','Arm Raise 90','Arm Raise 150','Forearm Twist 180','Elbow Bend 140','Hip Flex','Knee Bend','Squat','Lunge'];
-const DISPLAYS = ['Procedural Surface','Skeleton','Surface + Skeleton','Wireframe','Region Ownership','Field Primitives'];
-const CAMERAS = ['Front','Left','Right','Back','Perspective','Fit','Reset'];
+const DISPLAYS = ['Procedural Surface', 'Skeleton', 'Surface + Skeleton', 'Wireframe', 'Region Ownership', 'Field Primitives'];
+const CAMERAS = ['Perspective', 'Front', 'Left', 'Right', 'Back', 'Fit', 'Reset'];
+const POSE_LABEL_TO_ID = new Map(PROCEDURAL_DEFORM_VALIDATION_POSE_IDS_V5
+  .map((poseId) => [PROCEDURAL_DEFORM_VALIDATION_POSE_LABELS_V5[poseId], poseId]));
 
-buildButtons('#preset-list', Object.keys(PRESETS), async (name) => { activePreset=name; manualDNA={}; await queueRebuild(); });
-buildButtons('#pose-list', POSES, (name) => { activePose=name; updatePose(); });
-buildButtons('#display-list', DISPLAYS, (name) => { displayMode=name; updateVisibility(); });
-buildButtons('#camera-list', CAMERAS, setCamera);
+buildButtons('#preset-list', Object.keys(PRESETS), async (name) => {
+  activePreset = name;
+  manualDNA = {};
+  await queueRebuild();
+}, 'preset');
+buildButtons('#pose-list', [...POSE_LABEL_TO_ID.keys()], async (label) => {
+  activePoseId = POSE_LABEL_TO_ID.get(label);
+  updatePose();
+}, 'pose');
+buildButtons('#display-list', DISPLAYS, async (name) => {
+  displayMode = name;
+  updateVisibility();
+  updateDiagnostics();
+}, 'display');
+buildButtons('#camera-list', CAMERAS, async (name) => setCamera(name), 'camera');
 buildDNAControls();
+buildQAActions();
 await queueRebuild();
-resize(); requestAnimationFrame(render);
+resize();
+requestAnimationFrame(render);
 addEventListener('resize', resize);
+document.body.dataset.qaReady = 'true';
 
 async function rebuildHuman() {
   loading.classList.remove('hidden');
+  document.body.dataset.qaReady = 'false';
   await new Promise((resolve) => requestAnimationFrame(resolve));
   const source = mergeDNAInput(PRESETS[activePreset], manualDNA);
   dna = createBodyDNA({
-    bodyDNAId:`body-dna-${activePreset.toLowerCase()}`, identity:{humanId:'procedural-preview-human',label:activePreset}, proportionRevision:1,
+    bodyDNAId: `body-dna-${activePreset.toLowerCase()}`,
+    identity: { humanId: 'procedural-preview-human', label: activePreset },
+    proportionRevision: 1,
     ...source,
   });
   coreRuntime.createHuman(dna);
-  deformRuntime.compileHuman({ bodyDNA:dna, rigCore:coreRuntime.getRigCore() });
+  deformRuntime.compileHuman({ bodyDNA: dna, rigCore: coreRuntime.getRigCore() });
   await deformRuntime.generateCanonicalSurface({ resolution: 40, worker: true });
   buildPrimitivePreview();
   updatePose();
   syncDNAControls();
   loading.classList.add('hidden');
+  document.body.dataset.qaReady = 'true';
 }
 
-function queueRebuild(){rebuildChain=rebuildChain.then(rebuildHuman);return rebuildChain;}
+function queueRebuild() {
+  rebuildChain = rebuildChain.then(rebuildHuman).catch((error) => {
+    runtimeErrors.push(formatError(error));
+    loading.textContent = `生成失败：${formatError(error)}`;
+    updateDiagnostics();
+    throw error;
+  });
+  return rebuildChain;
+}
 
 function updatePose() {
-  const pose = poseFixture(activePose);
-  coreRuntime.updatePose(pose);
-  const frame = deformRuntime.update({ finalPose:pose, anatomyState:coreRuntime.getAnatomyState(), deltaTime:1/60 });
-  adapter.update(createRendererAdapterInputV5(frame));
-  buildSkeletonPreview(frame);
-  updateVisibility(); updateDiagnostics();
+  const rigCore = coreRuntime.getRigCore();
+  lastPose = createProceduralDeformValidationPoseV5({
+    poseId: activePoseId,
+    rigCore,
+    bodyDNA: dna,
+    timestamp: performance.now(),
+  });
+  coreRuntime.updatePose(lastPose);
+  lastFrame = deformRuntime.update({
+    finalPose: lastPose,
+    anatomyState: coreRuntime.getAnatomyState(),
+    deltaTime: 1 / 60,
+  });
+  lastSimulationRigFrame = createProceduralSimulationRigFrameV5({
+    finalPose: lastPose,
+    rigCore,
+    bodyDNA: dna,
+  });
+  lastAnchorAudit = compareProceduralRigSurfaceAnchorsV5(
+    lastSimulationRigFrame,
+    lastFrame.regionDiagnostics,
+  );
+  lastAngleMeasurements = measureProceduralDeformValidationPoseV5({
+    finalPose: lastPose,
+    simulationRigFrame: lastSimulationRigFrame,
+  });
+  adapter.update(createRendererAdapterInputV5(lastFrame));
+  buildSimulationRigPreview(lastSimulationRigFrame);
+  buildProceduralAnchorPreview(lastFrame.regionDiagnostics);
+  updateVisibility();
+  updateDiagnostics();
+  document.body.dataset.qaPose = activePoseId;
 }
 
-function poseFixture(name) {
-  const rotations = {};
-  const q = (axis, degrees) => axisAngle(axis, degrees*Math.PI/180);
-  if (name==='A Pose') { rotations.leftUpperArm=q([0,0,1],35); rotations.rightUpperArm=q([0,0,-1],35); }
-  if (name==='Arm Raise 150') rotations.leftUpperArm=q([0,0,-1],60);
-  if (name==='Forearm Twist 180') rotations.leftLowerArm=q([1,0,0],180);
-  if (name==='Elbow Bend 140') rotations.leftLowerArm=q([0,0,1],140);
-  if (name==='Hip Flex') rotations.leftUpperLeg=q([-1,0,0],70);
-  if (name==='Knee Bend') rotations.leftLowerLeg=q([1,0,0],110);
-  if (name==='Squat') { rotations.leftUpperLeg=q([-1,0,0],65);rotations.rightUpperLeg=q([-1,0,0],65);rotations.leftLowerLeg=q([1,0,0],105);rotations.rightLowerLeg=q([1,0,0],105); }
-  if (name==='Lunge') { rotations.leftUpperLeg=q([-1,0,0],55);rotations.leftLowerLeg=q([1,0,0],80);rotations.rightUpperLeg=q([1,0,0],24);rotations.rightLowerLeg=q([1,0,0],30); }
-  return createPoseFrameV4({ compatibleRig:coreRuntime.getRigCore().sourceRig.compatibleRig, rootJointId:'hips',
-    rootPosition:[0,deformRuntime.field.definition.canonicalLayout.pelvisCenterY,0], rootRotation:[0,0,0,1], localRotations:rotations,
-    contacts:[],ikTargets:[],constraintState:{fixture:name,wholeBodySolverV5:false},proportionRevision:dna.proportionRevision,timestamp:performance.now() });
+function updateVisibility() {
+  adapter.getObject3D().visible = !['Skeleton', 'Field Primitives'].includes(displayMode);
+  simulationRigGroup.visible = ['Skeleton', 'Surface + Skeleton'].includes(displayMode);
+  proceduralAnchorGroup.visible = displayMode === 'Surface + Skeleton';
+  primitiveGroup.visible = displayMode === 'Field Primitives';
+  adapter.setDisplayMode(displayMode === 'Wireframe'
+    ? 'wireframe'
+    : displayMode === 'Region Ownership' ? 'region-ownership' : 'surface');
 }
 
-function updateVisibility(){adapter.getObject3D().visible=!['Skeleton','Field Primitives'].includes(displayMode);skeletonGroup.visible=['Skeleton','Surface + Skeleton'].includes(displayMode);primitiveGroup.visible=displayMode==='Field Primitives';adapter.setDisplayMode(displayMode==='Wireframe'?'wireframe':displayMode==='Region Ownership'?'region-ownership':'surface');}
-function buildSkeletonPreview(frame){
-  disposeGroupChildren(skeletonGroup);
-  const anchors=Object.fromEntries(Object.entries(frame.regionDiagnostics).map(([name,value])=>[name,new THREE.Vector3(...value.posedAnchor)]));
-  const pairs=[['pelvis','lowerTorso'],['lowerTorso','upperTorso'],['upperTorso','neck'],['neck','head'],['upperTorso','leftUpperArm'],['leftUpperArm','leftForearm'],['leftForearm','leftPalm'],['upperTorso','rightUpperArm'],['rightUpperArm','rightForearm'],['rightForearm','rightPalm'],['pelvis','leftThigh'],['leftThigh','leftCalf'],['leftCalf','leftFoot'],['pelvis','rightThigh'],['rightThigh','rightCalf'],['rightCalf','rightFoot']];
-  const segments=pairs.flatMap(([from,to])=>anchors[from]&&anchors[to]?[anchors[from],anchors[to]]:[]);
-  const lineGeometry=new THREE.BufferGeometry().setFromPoints(segments);
-  skeletonGroup.add(new THREE.LineSegments(lineGeometry,new THREE.LineBasicMaterial({color:0x55d6ff})));
-  const pointGeometry=new THREE.BufferGeometry().setFromPoints(Object.values(anchors));
-  skeletonGroup.add(new THREE.Points(pointGeometry,new THREE.PointsMaterial({color:0xffd166,size:.025})));
+function buildSimulationRigPreview(frame) {
+  disposeGroupChildren(simulationRigGroup);
+  const points = [];
+  for (const segment of frame.segments) {
+    const parent = frame.joints[segment.parentId];
+    const joint = frame.joints[segment.jointId];
+    if (parent && joint) points.push(
+      new THREE.Vector3(...parent.worldPosition),
+      new THREE.Vector3(...joint.worldPosition),
+    );
+  }
+  simulationRigGroup.add(new THREE.LineSegments(
+    new THREE.BufferGeometry().setFromPoints(points),
+    new THREE.LineBasicMaterial({ color: 0x45e3ff }),
+  ));
+  simulationRigGroup.add(new THREE.Points(
+    new THREE.BufferGeometry().setFromPoints(Object.values(frame.joints)
+      .map((joint) => new THREE.Vector3(...joint.worldPosition))),
+    new THREE.PointsMaterial({ color: 0xb4f5ff, size: 0.024 }),
+  ));
 }
-function buildPrimitivePreview(){disposeGroupChildren(primitiveGroup);const regions=deformRuntime.field.definition.regions;const cuts=deformRuntime.field.definition.subtractions.map((entry)=>({side:entry.side,primitive:entry.primitive,subtraction:true}));for(const region of [...regions,...cuts]){const p=region.primitive;const center=p.center??p.start.map((v,i)=>(v+p.end[i])/2);const radii=p.radii??p.startRadii;const mesh=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),new THREE.MeshBasicMaterial({color:region.subtraction?0xff5f57:region.side==='left'?0x36bff5:region.side==='right'?0xf27ab8:0xf5c76b,wireframe:true,transparent:true,opacity:.45}));mesh.position.fromArray(center);mesh.scale.fromArray(radii);primitiveGroup.add(mesh);}}
-function disposeGroupChildren(group){for(const child of [...group.children]){child.geometry?.dispose();if(Array.isArray(child.material))child.material.forEach((material)=>material.dispose());else child.material?.dispose();group.remove(child);}}
-function updateDiagnostics(){const s=deformRuntime.getSurfaceMetadata(),d=deformRuntime.getDiagnostics(),a=adapter.getDiagnostics();const values={
-  'BodyDNA fingerprint':s.bodyDNAFingerprint,'Rig topology fingerprint':s.rigTopologyFingerprint,'Field generator':s.generatorVersion,'Surface cache key':s.cacheKey,
-  'Vertex count':s.vertexCount,'Triangle count':s.triangleCount,'Connected components':s.generationDiagnostics.connectedComponentCount,'Boundary edges':s.generationDiagnostics.boundaryEdgeCount,
-  'Topology fingerprint':s.topologyFingerprint,'Pose authority':d.poseAuthority,'Deformation policy':d.deformationPolicy,'Worker generation':d.generatedByWorker,
-  'Worker generation time':`${s.generationDiagnostics.generationTimeMs.toFixed(2)} ms`,'Per-frame deformation':`${(d.medianDeformationMs??0).toFixed(2)} ms`,'Renderer upload':`${a.rendererUploadTimeMs.toFixed(2)} ms`,
-  'Backend':backend,'GLB dependency':'none','Visual acceptance':'blocked-on-user-browser-acceptance'};document.querySelector('#diagnostics').innerHTML=Object.entries(values).map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('');}
-function buildDNAControls(){const definitions=[['Height','proportion.height',1.45,2.15,.01],['Shoulder width','proportion.shoulderWidth',.32,.56,.01],['Hip width','proportion.hipWidth',.16,.32,.01],['Chest thickness','proportion.bodyThickness.chest',.16,.42,.01],['Waist thickness','proportion.bodyThickness.waist',.12,.40,.01],['Hip thickness','proportion.bodyThickness.hip',.16,.44,.01],['Upper arm','proportion.limbLengths.upperArm',.22,.40,.005],['Forearm','proportion.limbLengths.forearm',.18,.35,.005],['Thigh','proportion.limbLengths.thigh',.34,.58,.005],['Lower leg','proportion.limbLengths.lowerLeg',.32,.56,.005],['Weight kg','mass.weightKg',45,130,1],['Muscle','fitnessProfile.muscle',0,1,.01],['Fat','fitnessProfile.fat',0,1,.01]];const root=document.querySelector('#dna-controls');root.innerHTML='<h2>BodyDNA 参数</h2>'+definitions.map(([label,path,min,max,step])=>`<label class="control">${label}<output data-output="${path}">-</output><input data-dna-path="${path}" type="range" min="${min}" max="${max}" step="${step}"></label>`).join('');for(const input of root.querySelectorAll('[data-dna-path]'))input.addEventListener('input',()=>{setNested(manualDNA,input.dataset.dnaPath,Number(input.value));root.querySelector(`[data-output="${input.dataset.dnaPath}"]`).textContent=Number(input.value).toFixed(input.step<1?3:0);clearTimeout(rebuildTimer);rebuildTimer=setTimeout(()=>queueRebuild(),140);});}
-function syncDNAControls(){for(const input of document.querySelectorAll('[data-dna-path]')){const value=getNested(dna,input.dataset.dnaPath);if(!Number.isFinite(value))continue;input.value=String(value);document.querySelector(`[data-output="${input.dataset.dnaPath}"]`).textContent=value.toFixed(Number(input.step)<1?3:0);}}
-function buildButtons(selector,names,handler){const root=document.querySelector(selector);for(const name of names){const button=document.createElement('button');button.textContent=name;button.onclick=async()=>{[...root.children].forEach((item)=>item.classList.toggle('active',item===button));await handler(name)};root.append(button);}root.firstElementChild?.classList.add('active');}
-function setCamera(name){const target=new THREE.Vector3(0,dna?.proportion.height*.5??.9,0);const distance=2.9;if(name==='Front')camera.position.set(0,target.y,distance);if(name==='Back')camera.position.set(0,target.y,-distance);if(name==='Left')camera.position.set(-distance,target.y,0);if(name==='Right')camera.position.set(distance,target.y,0);if(name==='Perspective')camera.position.set(2.4,target.y+0.45,2.8);if(name==='Fit')camera.position.set(0,target.y,dna.proportion.height*1.5);if(name==='Reset')camera.position.set(2.7,1.45,3.1);controls.target.copy(target);controls.update();}
-function axisAngle(axis,angle){const l=Math.hypot(...axis)||1,h=angle/2;return [axis[0]/l*Math.sin(h),axis[1]/l*Math.sin(h),axis[2]/l*Math.sin(h),Math.cos(h)];}
-function mergeDNAInput(base,override){const result=structuredClone(base??{});for(const [key,value] of Object.entries(override??{})){if(value&&typeof value==='object'&&!Array.isArray(value))result[key]=mergeDNAInput(result[key]??{},value);else result[key]=value;}return result;}
-function setNested(target,path,value){const keys=path.split('.');let cursor=target;for(const key of keys.slice(0,-1))cursor=cursor[key]??={};cursor[keys.at(-1)]=value;}
-function getNested(target,path){return path.split('.').reduce((value,key)=>value?.[key],target);}
-async function createRenderer(){if(!forceWebGL&&navigator.gpu){try{const {WebGPURenderer}=await import('three/webgpu');const value=new WebGPURenderer({antialias:true});await value.init();return{renderer:value,backend:'WebGPU'}}catch(error){console.warn('WebGPU unavailable; falling back to WebGL2.',error)}}return{renderer:new THREE.WebGLRenderer({antialias:true}),backend:forceWebGL?'WebGL2 forced':'WebGL2 fallback'};}
-function resize(){const w=container.clientWidth,h=container.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(w,h,false);}
-function render(){controls.update();renderer.render(scene,camera);requestAnimationFrame(render);}
+
+function buildProceduralAnchorPreview(regionDiagnostics) {
+  disposeGroupChildren(proceduralAnchorGroup);
+  const points = Object.values(regionDiagnostics)
+    .map((region) => new THREE.Vector3(...region.posedAnchor));
+  proceduralAnchorGroup.add(new THREE.Points(
+    new THREE.BufferGeometry().setFromPoints(points),
+    new THREE.PointsMaterial({ color: 0xff4fd2, size: 0.032 }),
+  ));
+}
+
+function buildPrimitivePreview() {
+  disposeGroupChildren(primitiveGroup);
+  const regions = deformRuntime.field.definition.regions;
+  const cuts = deformRuntime.field.definition.subtractions
+    .map((entry) => ({ side: entry.side, primitive: entry.primitive, subtraction: true }));
+  for (const region of [...regions, ...cuts]) {
+    const primitive = region.primitive;
+    const center = primitive.center ?? primitive.start.map((value, index) => (value + primitive.end[index]) / 2);
+    const radii = primitive.radii ?? primitive.startRadii;
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 12, 8),
+      new THREE.MeshBasicMaterial({
+        color: region.subtraction ? 0xff5f57 : region.side === 'left' ? 0x36bff5 : region.side === 'right' ? 0xf27ab8 : 0xf5c76b,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.45,
+      }),
+    );
+    mesh.position.fromArray(center);
+    mesh.scale.fromArray(radii);
+    primitiveGroup.add(mesh);
+  }
+}
+
+function updateDiagnostics() {
+  if (!lastFrame) return;
+  const surface = deformRuntime.getSurfaceMetadata();
+  const deform = deformRuntime.getDiagnostics();
+  const adapterDiagnostics = adapter.getDiagnostics();
+  const normalAudit = auditNormals(lastFrame.deformedNormals);
+  const finiteAudit = auditFiniteGeometry(lastFrame);
+  const requestedAngles = lastPose.constraintState.validationPose.requestedAngles;
+  const glbRequests = performance.getEntriesByType('resource')
+    .filter((entry) => /\.glb(?:$|[?#])/i.test(entry.name));
+  lastQASnapshot = {
+    schema: 'humanoid_rig/procedural_deform_browser_qa@5.0',
+    timestamp: new Date().toISOString(),
+    status: 'blocked-on-browser-runtime',
+    active: { preset: activePreset, poseId: activePoseId, poseLabel: PROCEDURAL_DEFORM_VALIDATION_POSE_LABELS_V5[activePoseId], displayMode, camera: activeCamera },
+    pose: {
+      authority: deform.poseAuthority,
+      fixtureSource: 'procedural-deform-validation-poses-v5.js',
+      requestedAngles,
+      measuredAngles: lastAngleMeasurements,
+    },
+    rigSurfaceAudit: lastAnchorAudit,
+    geometry: {
+      bodyDNAFingerprint: surface.bodyDNAFingerprint,
+      rigTopologyFingerprint: surface.rigTopologyFingerprint,
+      fieldGenerator: surface.generatorVersion,
+      surfaceCacheKey: surface.cacheKey,
+      topologyFingerprint: surface.topologyFingerprint,
+      vertexCount: surface.vertexCount,
+      triangleCount: surface.triangleCount,
+      connectedComponentCount: surface.generationDiagnostics.connectedComponentCount,
+      boundaryEdgeCount: surface.generationDiagnostics.boundaryEdgeCount,
+      degenerateTriangleRatio: surface.generationDiagnostics.degenerateTriangleRatio,
+      finite: finiteAudit,
+      normals: normalAudit,
+      surfaceLayerCount: scene.getObjectsByProperty('name', 'HumanCoreV5ProceduralSurface').length,
+    },
+    performance: {
+      generatedByWorker: deform.generatedByWorker,
+      workerGenerationTimeMs: surface.generationDiagnostics.generationTimeMs,
+      medianDeformationMs: deform.medianDeformationMs,
+      p95DeformationMs: deform.p95DeformationMs,
+      rendererUploadTimeMs: adapterDiagnostics.rendererUploadTimeMs,
+    },
+    renderer: {
+      requestedBackend: rendererState.requestedBackend,
+      activeBackend: rendererState.activeBackend,
+      fallbackUsed: rendererState.fallbackUsed,
+      navigatorGPU: rendererState.navigatorGPU,
+      webgpu: structuredClone(rendererState.webgpu),
+      webgl2: structuredClone(rendererState.webgl2),
+      forceWebGL,
+    },
+    resources: { glbDependency: false, glbRequestCount: glbRequests.length, glbRequests: glbRequests.map((entry) => entry.name) },
+    errors: [...runtimeErrors],
+    visualAcceptance: false,
+    productionReady: false,
+  };
+  const values = {
+    'Active preset': activePreset,
+    'Active pose': `${PROCEDURAL_DEFORM_VALIDATION_POSE_LABELS_V5[activePoseId]} (${activePoseId})`,
+    'Requested angles': requestedAngles.length ? requestedAngles.map((item) => `${item.jointId}.${item.anatomicalChannel}=${item.requestedAngleDegrees}°`).join(', ') : 'canonical identity',
+    'Measured angles': formatMeasurements(lastAngleMeasurements),
+    'Pose authority': deform.poseAuthority,
+    'SimulationRig source': lastSimulationRigFrame.source,
+    'Procedural anchors': lastAnchorAudit.proceduralRegionAnchorSource,
+    'Anchor max error': `${(lastAnchorAudit.maximumErrorMeters * 1000).toFixed(2)} mm`,
+    'Anchor mean error': `${(lastAnchorAudit.meanErrorMeters * 1000).toFixed(2)} mm`,
+    'Rig/surface gate': lastAnchorAudit.passed ? 'PASS' : 'FAIL',
+    'BodyDNA fingerprint': surface.bodyDNAFingerprint,
+    'Rig topology fingerprint': surface.rigTopologyFingerprint,
+    'Field generator': surface.generatorVersion,
+    'Surface cache key': surface.cacheKey,
+    'Vertex count': surface.vertexCount,
+    'Triangle count': surface.triangleCount,
+    'Connected components': surface.generationDiagnostics.connectedComponentCount,
+    'Boundary edges': surface.generationDiagnostics.boundaryEdgeCount,
+    'Degenerate triangle ratio': surface.generationDiagnostics.degenerateTriangleRatio.toFixed(8),
+    'Finite positions/indices': finiteAudit.passed ? 'PASS' : 'FAIL',
+    'Normal length range': `${normalAudit.minimum.toFixed(6)} – ${normalAudit.maximum.toFixed(6)}`,
+    'Surface layers': lastQASnapshot.geometry.surfaceLayerCount,
+    'Worker generation': deform.generatedByWorker,
+    'Worker generation time': `${surface.generationDiagnostics.generationTimeMs.toFixed(2)} ms`,
+    'Per-frame deformation': `${(deform.medianDeformationMs ?? 0).toFixed(2)} ms median / ${(deform.p95DeformationMs ?? 0).toFixed(2)} ms p95`,
+    'Renderer upload': `${adapterDiagnostics.rendererUploadTimeMs.toFixed(2)} ms`,
+    'Requested renderer': rendererState.requestedBackend,
+    'Active renderer': rendererState.activeBackend,
+    'navigator.gpu': rendererState.navigatorGPU,
+    'WebGPU probe': rendererState.webgpu.status,
+    'WebGL2 fallback': rendererState.webgl2.status,
+    'Camera / display': `${activeCamera} / ${displayMode}`,
+    'Runtime errors': runtimeErrors.length,
+    'GLB requests': glbRequests.length,
+    'Visual acceptance': 'blocked-on-browser-runtime',
+    'Production ready': false,
+  };
+  const diagnostics = document.querySelector('#diagnostics');
+  diagnostics.innerHTML = Object.entries(values).map(([keyName, value]) => (
+    `<dt data-qa-kind="${escapeHTML(keyName)}">${escapeHTML(keyName)}</dt><dd data-qa-value="${escapeHTML(keyName)}">${escapeHTML(value)}</dd>`
+  )).join('');
+  const gate = document.querySelector('#rig-surface-gate');
+  gate.className = lastAnchorAudit.passed ? 'gate pass' : 'gate fail';
+  gate.textContent = lastAnchorAudit.passed
+    ? `Rig/Surface PASS · max ${(lastAnchorAudit.maximumErrorMeters * 1000).toFixed(2)} mm`
+    : `Rig/Surface FAIL · max ${(lastAnchorAudit.maximumErrorMeters * 1000).toFixed(2)} mm`;
+}
+
+function buildDNAControls() {
+  const definitions = [
+    ['Height', 'proportion.height', 1.45, 2.15, 0.01], ['Shoulder width', 'proportion.shoulderWidth', 0.32, 0.56, 0.01],
+    ['Hip width', 'proportion.hipWidth', 0.16, 0.32, 0.01], ['Chest thickness', 'proportion.bodyThickness.chest', 0.16, 0.42, 0.01],
+    ['Waist thickness', 'proportion.bodyThickness.waist', 0.12, 0.40, 0.01], ['Hip thickness', 'proportion.bodyThickness.hip', 0.16, 0.44, 0.01],
+    ['Upper arm', 'proportion.limbLengths.upperArm', 0.22, 0.40, 0.005], ['Forearm', 'proportion.limbLengths.forearm', 0.18, 0.35, 0.005],
+    ['Thigh', 'proportion.limbLengths.thigh', 0.34, 0.58, 0.005], ['Lower leg', 'proportion.limbLengths.lowerLeg', 0.32, 0.56, 0.005],
+    ['Weight kg', 'mass.weightKg', 45, 130, 1], ['Muscle', 'fitnessProfile.muscle', 0, 1, 0.01], ['Fat', 'fitnessProfile.fat', 0, 1, 0.01],
+  ];
+  const root = document.querySelector('#dna-controls');
+  root.innerHTML = '<h2>BodyDNA 参数</h2>' + definitions.map(([label, path, min, max, step]) => (
+    `<label class="control">${label}<output data-output="${path}">-</output><input data-dna-path="${path}" type="range" min="${min}" max="${max}" step="${step}"></label>`
+  )).join('');
+  for (const input of root.querySelectorAll('[data-dna-path]')) {
+    input.addEventListener('input', () => {
+      setNested(manualDNA, input.dataset.dnaPath, Number(input.value));
+      root.querySelector(`[data-output="${input.dataset.dnaPath}"]`).textContent = Number(input.value).toFixed(Number(input.step) < 1 ? 3 : 0);
+      clearTimeout(rebuildTimer);
+      rebuildTimer = setTimeout(() => queueRebuild(), 140);
+    });
+  }
+}
+
+function syncDNAControls() {
+  for (const input of document.querySelectorAll('[data-dna-path]')) {
+    const value = getNested(dna, input.dataset.dnaPath);
+    if (!Number.isFinite(value)) continue;
+    input.value = String(value);
+    document.querySelector(`[data-output="${input.dataset.dnaPath}"]`).textContent = value.toFixed(Number(input.step) < 1 ? 3 : 0);
+  }
+}
+
+function buildButtons(selector, names, handler, kind) {
+  const root = document.querySelector(selector);
+  for (const [index, name] of names.entries()) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = name;
+    button.dataset.qaButton = kind;
+    button.dataset.qaName = name;
+    button.addEventListener('click', async () => {
+      [...root.children].forEach((item) => item.classList.toggle('active', item === button));
+      await handler(name);
+    });
+    root.append(button);
+    if (index === 0) button.classList.add('active');
+  }
+}
+
+function buildQAActions() {
+  const actions = {
+    'run-full-qa': async () => runFullQA(),
+    'capture-current-view': async () => captureCurrentView(),
+    'mark-pass': async () => markVisualReview('pass'),
+    'mark-fail': async () => markVisualReview('fail'),
+    'export-qa-json': async () => exportQAJSON(),
+  };
+  for (const [id, action] of Object.entries(actions)) {
+    document.querySelector(`[data-qa-action="${id}"]`)?.addEventListener('click', action);
+  }
+}
+
+async function runFullQA() {
+  if (qaRunning) return getQAState();
+  qaRunning = true;
+  qaRecords.length = 0;
+  document.body.dataset.qaRunning = 'true';
+  setQAOutput('正在执行页面交互矩阵…', 'pending');
+  try {
+    for (const preset of Object.keys(PRESETS)) {
+      await activateButton('preset', preset);
+      for (const poseId of PROCEDURAL_DEFORM_VALIDATION_POSE_IDS_V5) {
+        await activateButton('pose', PROCEDURAL_DEFORM_VALIDATION_POSE_LABELS_V5[poseId]);
+        qaRecords.push(structuredClone(lastQASnapshot));
+      }
+    }
+    const passed = qaRecords.every((record) => record.rigSurfaceAudit.passed
+      && record.geometry.finite.passed
+      && record.geometry.normals.passed
+      && record.geometry.surfaceLayerCount === 1
+      && record.resources.glbRequestCount === 0
+      && record.errors.length === 0);
+    setQAOutput(`${passed ? '文件与运行时诊断 PASS' : '诊断 FAIL'} · ${qaRecords.length} 个组合。视觉验收仍需用户浏览器确认。`, passed ? 'pass' : 'fail');
+    return { passed, recordCount: qaRecords.length, records: structuredClone(qaRecords) };
+  } finally {
+    qaRunning = false;
+    document.body.dataset.qaRunning = 'false';
+  }
+}
+
+async function activateButton(kind, name) {
+  const button = [...document.querySelectorAll(`[data-qa-button="${kind}"]`)]
+    .find((item) => item.dataset.qaName === name);
+  if (!button) throw new Error(`QA button ${kind}:${name} is missing.`);
+  button.click();
+  if (kind === 'preset') await rebuildChain;
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+}
+
+async function captureCurrentView() {
+  const blob = await new Promise((resolve, reject) => renderer.domElement.toBlob(
+    (value) => value ? resolve(value) : reject(new Error('Canvas capture returned no PNG.')),
+    'image/png',
+  ));
+  const name = `${rendererState.activeBackend.toLowerCase()}-${activePreset.toLowerCase()}-${activePoseId}.png`;
+  downloadBlob(blob, name);
+  setQAOutput(`已请求下载 ${name}`, 'pass');
+  return name;
+}
+
+function markVisualReview(result) {
+  const review = {
+    result,
+    timestamp: new Date().toISOString(),
+    preset: activePreset,
+    poseId: activePoseId,
+    backend: rendererState.activeBackend,
+    note: 'Local reviewer mark only. It never changes visualAcceptance or productionReady.',
+  };
+  localStorage.setItem('hrl.proceduralDeformV5.visualReview', JSON.stringify(review));
+  setQAOutput(`已记录本机视觉标记：${result.toUpperCase()}。正式标志仍保持 false。`, result);
+  return review;
+}
+
+function exportQAJSON() {
+  const payload = { ...getQAState(), exportedAt: new Date().toISOString() };
+  downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), 'human-core-v5-procedural-deform-qa.json');
+  setQAOutput('已请求导出 QA JSON。', 'pass');
+  return payload;
+}
+
+function getQAState() {
+  return {
+    schema: 'humanoid_rig/procedural_deform_browser_qa_session@5.0',
+    status: 'blocked-on-browser-runtime',
+    current: structuredClone(lastQASnapshot),
+    records: structuredClone(qaRecords),
+    browserRuntimeExecutedByCodex: false,
+    visualAcceptance: false,
+    productionReady: false,
+  };
+}
+
+function setQAOutput(message, status) {
+  const output = document.querySelector('#qa-output');
+  output.textContent = message;
+  output.dataset.status = status;
+}
+
+function setCamera(name) {
+  activeCamera = name;
+  const target = new THREE.Vector3(0, dna?.proportion.height * 0.5 ?? 0.9, 0);
+  const distance = 2.9;
+  if (name === 'Front') camera.position.set(0, target.y, distance);
+  if (name === 'Back') camera.position.set(0, target.y, -distance);
+  if (name === 'Left') camera.position.set(-distance, target.y, 0);
+  if (name === 'Right') camera.position.set(distance, target.y, 0);
+  if (name === 'Perspective') camera.position.set(2.4, target.y + 0.45, 2.8);
+  if (name === 'Fit') camera.position.set(0, target.y, dna.proportion.height * 1.5);
+  if (name === 'Reset') camera.position.set(2.7, 1.45, 3.1);
+  controls.target.copy(target);
+  controls.update();
+  updateDiagnostics();
+}
+
+function focusJoint(jointId, distance = 0.72) {
+  const joint = lastSimulationRigFrame?.joints?.[jointId];
+  if (!joint) throw new Error(`Cannot focus missing SimulationRig joint ${jointId}.`);
+  const target = new THREE.Vector3(...joint.worldPosition);
+  camera.position.set(target.x, target.y, target.z + distance);
+  controls.target.copy(target);
+  controls.update();
+  activeCamera = `Closeup:${jointId}`;
+  updateDiagnostics();
+  return activeCamera;
+}
+
+async function createRenderer() {
+  const result = {
+    requestedBackend: forceWebGL ? 'WebGL2' : 'WebGPU',
+    activeBackend: null,
+    fallbackUsed: false,
+    navigatorGPU: Boolean(navigator.gpu),
+    webgpu: { status: forceWebGL ? 'skipped-force-webgl2' : 'not-attempted', error: null },
+    webgl2: { status: 'not-attempted', error: null },
+  };
+  if (!forceWebGL && navigator.gpu) {
+    try {
+      const adapterGPU = await navigator.gpu.requestAdapter();
+      if (!adapterGPU) throw new Error('navigator.gpu.requestAdapter() returned null.');
+      const device = await adapterGPU.requestDevice();
+      device.destroy?.();
+      const { WebGPURenderer } = await import('three/webgpu');
+      const webgpuRenderer = new WebGPURenderer({ antialias: true });
+      await webgpuRenderer.init();
+      result.activeBackend = 'WebGPU';
+      result.webgpu.status = 'pass';
+      return { renderer: webgpuRenderer, ...result };
+    } catch (error) {
+      result.webgpu = { status: 'fail', error: formatError(error) };
+      result.fallbackUsed = true;
+      console.warn('WebGPU failed; WebGL2 fallback will be tested independently.', error);
+    }
+  } else if (!forceWebGL) {
+    result.webgpu = { status: 'unavailable', error: 'navigator.gpu is absent.' };
+    result.fallbackUsed = true;
+  }
+  try {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('webgl2', { antialias: true });
+    if (!context) throw new Error('A WebGL2 context could not be created.');
+    const webglRenderer = new THREE.WebGLRenderer({ canvas, context, antialias: true });
+    result.activeBackend = 'WebGL2';
+    result.webgl2.status = 'pass';
+    return { renderer: webglRenderer, ...result };
+  } catch (error) {
+    result.webgl2 = { status: 'fail', error: formatError(error) };
+    throw Object.assign(new Error(`No supported renderer. WebGPU=${result.webgpu.status}; WebGL2=${result.webgl2.status}.`), { cause: error });
+  }
+}
+
+function auditNormals(normals) {
+  let minimum = Number.POSITIVE_INFINITY;
+  let maximum = 0;
+  let invalidCount = 0;
+  for (let offset = 0; offset < normals.length; offset += 3) {
+    const length = Math.hypot(normals[offset], normals[offset + 1], normals[offset + 2]);
+    minimum = Math.min(minimum, length);
+    maximum = Math.max(maximum, length);
+    if (!Number.isFinite(length) || Math.abs(length - 1) > 0.002) invalidCount += 1;
+  }
+  return { minimum, maximum, invalidCount, passed: invalidCount === 0 };
+}
+
+function auditFiniteGeometry(frame) {
+  const nonFinitePositions = [...frame.deformedPositions].filter((value) => !Number.isFinite(value)).length;
+  const nonFiniteIndices = [...frame.indices].filter((value) => !Number.isFinite(value)).length;
+  const outOfRangeIndices = [...frame.indices].filter((value) => value < 0 || value >= frame.deformedPositions.length / 3).length;
+  return { nonFinitePositions, nonFiniteIndices, outOfRangeIndices, passed: nonFinitePositions + nonFiniteIndices + outOfRangeIndices === 0 };
+}
+
+function formatMeasurements(measurements) {
+  return Object.entries(measurements)
+    .filter(([keyName, value]) => keyName !== 'poseId' && Number.isFinite(value))
+    .map(([keyName, value]) => `${keyName}=${value.toFixed(2)}°`)
+    .join(', ') || 'n/a';
+}
+
+function disposeGroupChildren(group) {
+  for (const child of [...group.children]) {
+    child.geometry?.dispose();
+    if (Array.isArray(child.material)) child.material.forEach((material) => material.dispose());
+    else child.material?.dispose();
+    group.remove(child);
+  }
+}
+
+function mergeDNAInput(base, override) {
+  const result = structuredClone(base ?? {});
+  for (const [keyName, value] of Object.entries(override ?? {})) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) result[keyName] = mergeDNAInput(result[keyName] ?? {}, value);
+    else result[keyName] = value;
+  }
+  return result;
+}
+
+function setNested(target, path, value) {
+  const keys = path.split('.');
+  let cursor = target;
+  for (const keyName of keys.slice(0, -1)) cursor = cursor[keyName] ??= {};
+  cursor[keys.at(-1)] = value;
+}
+function getNested(target, path) { return path.split('.').reduce((value, keyName) => value?.[keyName], target); }
+function formatError(error) { return error instanceof Error ? `${error.name}: ${error.message}` : String(error); }
+function escapeHTML(value) { return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]); }
+function downloadBlob(blob, fileName) { const url = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: url, download: fileName }); link.click(); setTimeout(() => URL.revokeObjectURL(url), 0); }
+function resize() { const width = container.clientWidth; const height = container.clientHeight; camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(width, height, false); }
+function render() { controls.update(); renderer.render(scene, camera); requestAnimationFrame(render); }
+
+window.__HRL_PROCEDURAL_DEFORM_QA__ = Object.freeze({
+  getState: getQAState,
+  waitForIdle: async () => { await rebuildChain; while (qaRunning) await new Promise((resolve) => setTimeout(resolve, 25)); return getQAState(); },
+  runFullQA,
+  captureCurrentView,
+  markPass: () => markVisualReview('pass'),
+  markFail: () => markVisualReview('fail'),
+  exportQAJSON,
+  focusJoint,
+});

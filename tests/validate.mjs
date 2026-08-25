@@ -140,6 +140,8 @@ const required = [
   'src/modules/human-core-v5/procedural-deform/procedural-deform-frame-v5.js',
   'src/modules/human-core-v5/procedural-deform/procedural-deform-runtime-v5.js',
   'src/modules/human-core-v5/procedural-deform/procedural-surface-worker-client-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-deform-validation-poses-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-simulation-rig-fk-v5.js',
   'src/modules/human-core-v5/procedural-deform/index.js',
   'src/renderers/three/three-procedural-human-adapter-v5.js',
   'workers/procedural-surface.worker.js',
@@ -153,10 +155,14 @@ const required = [
   'apps/human-core-v5-procedural-deform/styles.css',
   'tests/human-core-v5-procedural-deform-contract.mjs',
   'tests/human-core-v5-procedural-surface.mjs',
+  'tests/human-core-v5-procedural-deform-validation.mjs',
   'tests/human-core-v5-procedural-deform-stress.mjs',
   'tests/integration/human-core-v5-procedural-deform-page.mjs',
+  'tests/browser/human-core-v5-procedural-deform.browser.mjs',
+  'scripts/run-procedural-deform-browser-qa.mjs',
   'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM.md',
   'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_VISUAL_ACCEPTANCE.md',
+  'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_QA_REPORT.md',
   'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_RESEARCH_DECISION.md',
   'control/module-scopes/proportion.json', 'control/module-scopes/skin.json',
   'control/module-scopes/pose.json', 'control/module-scopes/animation.json',
@@ -180,8 +186,11 @@ assert.match(packageJson.scripts['test:human-core-v5-anatomy'], /human-core-v5-a
 assert.match(packageJson.scripts.test, /test:human-core-v5-procedural-deform/);
 assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-deform-contract/);
 assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-surface/);
+assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-deform-validation/);
 assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-deform-stress/);
 assert.match(packageJson.scripts['test:human-core-v5-procedural-deform'], /human-core-v5-procedural-deform-page/);
+assert.match(packageJson.scripts['test:human-core-v5-procedural-deform-browser'], /tests\/browser\/human-core-v5-procedural-deform\.browser/);
+assert.match(packageJson.scripts['test:human-core-v5-procedural-deform-qa'], /--verify-artifacts/);
 assert.match(packageJson.scripts['test:character-studio'], /character-studio-v1/);
 assert.match(packageJson.scripts.test, /integration-v002/);
 assert.match(packageJson.scripts.test, /test:animation/);
@@ -219,6 +228,10 @@ assert.equal(buildManifest.humanCoreV5ProceduralDeform.poseAuthority, 'finalPose
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.rendererIndependence, true);
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.glbRequired, false);
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.workerGeneration, true);
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.implementationStatus, 'code-complete-browser-blocked');
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.browserQA, 'blocked-on-browser-runtime');
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.codexVisualReview, 'not-run-by-user-rule');
+assert.equal(buildManifest.humanCoreV5ProceduralDeform.userVisualAcceptance, 'pending');
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.visualAcceptance, false);
 assert.equal(buildManifest.humanCoreV5ProceduralDeform.productionReady, false);
 
@@ -524,10 +537,14 @@ const javascriptFiles = [
   'src/modules/human-core-v5/procedural-deform/procedural-deform-frame-v5.js',
   'src/modules/human-core-v5/procedural-deform/procedural-deform-runtime-v5.js',
   'src/modules/human-core-v5/procedural-deform/procedural-surface-worker-client-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-deform-validation-poses-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-simulation-rig-fk-v5.js',
   'src/modules/human-core-v5/procedural-deform/index.js',
   'src/renderers/three/three-procedural-human-adapter-v5.js',
   'workers/procedural-surface.worker.js',
   'apps/human-core-v5-procedural-deform/index.js',
+  'scripts/run-procedural-deform-browser-qa.mjs',
+  'tests/browser/human-core-v5-procedural-deform.browser.mjs',
   'packages/character-core/character-profile.js', 'packages/character-core/character-state.js',
   'packages/character-core/character-version.js', 'packages/character-core/character-manager.js',
   'packages/character-core/index.js',

@@ -140,7 +140,7 @@ const REGION_DRIVER_MAP = Object.freeze({
 function createRegionTransforms(definition, rigCore, pose) {
   const anchors = new Map();
   for (const region of definition.regions) anchors.set(region.sourceJointId, primitiveAnchor(region.primitive, region.regionId, definition.canonicalLayout));
-  anchors.set('hips', [0, definition.canonicalLayout.pelvisCenterY, 0]);
+  anchors.set('hips', definition.canonicalLayout.rigRootPosition ?? [0, definition.canonicalLayout.pelvisCenterY, 0]);
   const jointById = new Map(rigCore.joints.map((joint) => [joint.jointId, joint]));
   const cache = new Map();
   function resolve(jointId) {

@@ -2,80 +2,71 @@
 
 ## Release gate
 
-Current status: `blocked-on-browser-visual-acceptance`.
+Current status: `blocked-on-browser-runtime`.
 
-The implementation and automated tests are committed separately from browser approval. Until the checklist below is completed by the user:
+The code, shared anatomical-axis fixtures, independent SimulationRig FK audit, and geometric tests can be verified without a browser. Repository instructions reserve computer/browser visual checks for the user, so no Codex-generated screenshot or visual approval is claimed.
 
 ```text
+implementationStatus = code-complete-browser-blocked
+browserQA = blocked-on-browser-runtime
+codexVisualReview = not-run-by-user-rule
+userVisualAcceptance = pending
 visualAcceptance = false
 productionReady = false
 ```
 
-## Start commands
+## User commands
 
-From the repository root:
+From this branch's repository root:
 
 ```powershell
 npm install
-npm start
+npm run test:human-core-v5-procedural-deform
+npm run test:human-core-v5-procedural-deform-browser
+npm run test:human-core-v5-procedural-deform-qa
 ```
 
-Open the default path:
+The browser test starts `npm start`, finds Chrome or Edge, attempts WebGPU, then starts an independent forced-WebGL2 run. Set `HRL_BROWSER_PATH` to an executable when automatic discovery cannot find the browser.
+
+Manual URLs remain available:
 
 ```text
 http://127.0.0.1:4173/human-core-v5-procedural-deform.html
-```
-
-Open the forced WebGL2 path in a second test:
-
-```text
 http://127.0.0.1:4173/human-core-v5-procedural-deform.html?forceWebGL=1
 ```
 
-## Required checks for both backends
+## Automated browser checks
 
-- [ ] Page loads and the diagnostics panel updates.
-- [ ] Browser console contains zero errors.
-- [ ] Exactly one procedural body surface is visible.
-- [ ] Orbit, zoom, and camera buttons work.
-- [ ] Reference, Lean, Muscular, Heavy, Tall, Short, and Asymmetric produce clear and directionally correct changes.
-- [ ] A Pose, T Pose, Arm Raise 90/150, Forearm Twist 180, Elbow Bend 140, Hip Flex, Knee Bend, Squat, and Lunge switch successfully.
-- [ ] Surface + Skeleton shows the procedural surface aligned to the test Rig.
-- [ ] Region Ownership and Field Primitives modes are readable.
-- [ ] No legacy body GLB covers the procedural body.
-- [ ] DevTools Network shows no human `.glb` request in procedural mode.
-- [ ] Diagnostics reports pose authority `finalPose.localRotations`.
-- [ ] Diagnostics reports GLB dependency `none`.
+The browser runner checks HTTP status, loading completion, canvas dimensions, active renderer, Worker use, geometry topology, normal validity, local-quaternion authority, independent Rig/surface error gates, console/page errors, GLB requests, and every preset/pose/display/camera button. A WebGPU fallback is recorded as `WebGPU FAIL`; it is never counted as a WebGPU pass.
+
+The right panel also exposes `Run Full QA`, `Capture Current View`, `Mark Pass`, `Mark Fail`, and `Export QA JSON`. A local pass mark does not modify the release flags.
 
 ## Visual quality checklist
 
-- [ ] A Pose: shoulders connect without a major hollow or spike.
-- [ ] T Pose: shoulder line and arm attachment remain stable.
-- [ ] Arm Raise: shoulder volume remains plausible at 90 and 150 degrees.
-- [ ] Forearm Twist: forearm radius does not collapse or flip.
-- [ ] Elbow Bend: elbow remains connected and does not fold through itself.
-- [ ] Hip/Knee: flexion preserves a connected pelvis/leg silhouette.
-- [ ] Squat: both legs deform symmetrically and feet remain directionally coherent.
-- [ ] Lunge: left/right region drivers remain distinct.
-- [ ] Asymmetric preset: authored left/right difference is visible in the requested direction.
+- [ ] A Pose shoulders connect without a major hollow, spike, or torso tear.
+- [ ] T Pose actual arm abduction is visually horizontal and both shoulder attachments are stable.
+- [ ] Arm Raise 90/150 retains shoulder volume and does not detach the upper arm.
+- [ ] Forearm Twist 180 retains forearm radius and rotates the palm coherently.
+- [ ] Elbow Bend 140 remains connected without folding through itself.
+- [ ] Hip Flex and Knee Bend retain continuous pelvis/leg and thigh/calf silhouettes.
+- [ ] Squat is bilaterally coherent and both feet point consistently.
+- [ ] Lunge preserves independent left/right drivers.
+- [ ] Lean, Muscular, Heavy, Tall, Short, and Asymmetric change only the intended dimensions and regions.
+- [ ] `Surface + Skeleton` shows cyan independent FK joints aligned with magenta procedural anchors.
 
 ## Required evidence
 
-Save actual browser captures at:
+The runner writes real Canvas screenshots and JSON to:
 
 ```text
-artifacts/qa/human-core-v5-procedural-deform/reference-front.png
-artifacts/qa/human-core-v5-procedural-deform/reference-side.png
-artifacts/qa/human-core-v5-procedural-deform/arm-raise-front.png
-artifacts/qa/human-core-v5-procedural-deform/forearm-twist-closeup.png
-artifacts/qa/human-core-v5-procedural-deform/squat-front.png
-artifacts/qa/human-core-v5-procedural-deform/squat-side.png
-artifacts/qa/human-core-v5-procedural-deform/asymmetric-front.png
+artifacts/qa/human-core-v5-procedural-deform/webgpu/
+artifacts/qa/human-core-v5-procedural-deform/webgl2/
 artifacts/qa/human-core-v5-procedural-deform/metrics.json
+artifacts/qa/human-core-v5-procedural-deform/browser-qa-report.json
 ```
 
-`metrics.json` should record browser backend, user agent, vertex/triangle counts, Worker generation time, per-frame deformation time, renderer upload time, console error count, and the checklist outcome. No evidence files are generated by the code-only task because they must come from the real page.
+`npm run test:human-core-v5-procedural-deform-qa` verifies that all 15 required PNGs and both JSON files exist, that WebGPU and WebGL2 passed independently, and that release flags remain false.
 
 ## Acceptance result
 
-Record failures without lowering automated thresholds or editing screenshots. User approval of A Pose, T Pose, Arm Raise, Forearm Twist, Squat, and Lunge is the gate before any next Human Core phase is proposed.
+Record failures without lowering geometric, angle, volume, symmetry, or Rig/surface thresholds. Do not edit screenshots. User approval is required before any later task changes `visualAcceptance`; `productionReady` remains false beyond this task.
