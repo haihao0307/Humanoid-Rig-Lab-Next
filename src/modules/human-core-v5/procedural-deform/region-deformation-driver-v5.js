@@ -9,7 +9,7 @@ export const REGION_DRIVER_KEYS_V5 = Object.freeze([
   'chest', 'abdomen', 'pelvis',
 ]);
 
-const SOURCE_JOINTS = Object.freeze({
+export const REGION_DEFORMATION_SOURCE_JOINTS_V5 = Object.freeze({
   leftShoulder: ['leftShoulder', 'leftUpperArm'], rightShoulder: ['rightShoulder', 'rightUpperArm'],
   leftElbow: ['leftLowerArm'], rightElbow: ['rightLowerArm'], leftWrist: ['leftHand'], rightWrist: ['rightHand'],
   leftHip: ['leftUpperLeg'], rightHip: ['rightUpperLeg'], leftKnee: ['leftLowerLeg'], rightKnee: ['rightLowerLeg'],
@@ -25,7 +25,7 @@ export function createRegionDeformationDriverFrameV5({ finalPose, rigCore, anato
   const anatomySignal = anatomyState.deformationSignal;
   const regions = {};
   for (const key of REGION_DRIVER_KEYS_V5) {
-    const sourceJointIds = SOURCE_JOINTS[key];
+    const sourceJointIds = REGION_DEFORMATION_SOURCE_JOINTS_V5[key];
     const primary = sourceJointIds.find((id) => jointById.has(id)) ?? sourceJointIds[0];
     const joint = jointById.get(primary);
     const quaternion = primary === finalPose.rootJointId ? finalPose.rootRotation : finalPose.localRotations[primary] ?? [0, 0, 0, 1];

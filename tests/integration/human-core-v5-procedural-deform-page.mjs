@@ -32,6 +32,7 @@ assert.match(app, /getContext\('webgl2'/);
 assert.match(app, /forceWebGL/);
 assert.match(app, /createProceduralDeformValidationPoseV5/);
 assert.match(app, /createProceduralSimulationRigFrameV5/);
+assert.match(app, /resolveProceduralSimulationRigJointV5/);
 assert.match(app, /compareProceduralRigSurfaceAnchorsV5/);
 assert.match(app, /window\.__HRL_PROCEDURAL_DEFORM_QA__/);
 assert.match(app, /data-qa-kind/);

@@ -9,6 +9,7 @@ import {
   createBodyDNA,
   createProceduralDeformValidationPoseV5,
   createProceduralSimulationRigFrameV5,
+  resolveProceduralSimulationRigJointV5,
   StaticValidationPoseCompilerV5,
   createRendererAdapterInputV5,
   measureProceduralDeformValidationPoseV5,
@@ -556,13 +557,14 @@ function setCamera(name) {
 }
 
 function focusJoint(jointId, distance = 0.72) {
-  const joint = lastSimulationRigFrame?.joints?.[jointId];
-  if (!joint) throw new Error(`Cannot focus missing SimulationRig joint ${jointId}.`);
+  const resolved = resolveProceduralSimulationRigJointV5(lastSimulationRigFrame, jointId);
+  if (!resolved) throw new Error(`Cannot focus missing SimulationRig joint or anatomical region ${jointId}.`);
+  const { joint } = resolved;
   const target = new THREE.Vector3(...joint.worldPosition);
   camera.position.set(target.x, target.y, target.z + distance);
   controls.target.copy(target);
   controls.update();
-  activeCamera = `Closeup:${jointId}`;
+  activeCamera = `Closeup:${jointId} (${resolved.resolvedJointId})`;
   updateDiagnostics();
   return activeCamera;
 }

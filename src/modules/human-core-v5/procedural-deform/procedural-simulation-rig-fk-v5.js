@@ -7,6 +7,7 @@ import {
 import { createBodyDNA } from '../body-dna-v5.js';
 import { assertHumanRigCoreV5 } from '../human-rig-core-v5.js';
 import { adaptHumanRigCoreToExistingRig } from '../v4-adapter.js';
+import { REGION_DEFORMATION_SOURCE_JOINTS_V5 } from './region-deformation-driver-v5.js';
 
 export const PROCEDURAL_SIMULATION_RIG_FK_V5_SCHEMA = 'humanoid_rig/procedural_simulation_rig_fk@5.0';
 
@@ -102,6 +103,27 @@ export function createProceduralSimulationRigFrameV5({ finalPose, rigCore, bodyD
     joints,
     segments,
     timestamp: finalPose.timestamp,
+  };
+}
+
+/**
+ * Resolves an anatomical region name (for example leftHip) to the concrete
+ * SimulationRig joint that drives it (leftUpperLeg). Direct SimulationRig IDs
+ * remain valid and take precedence. The mapping is shared with the Region
+ * Deformation Driver so browser QA cannot drift onto a second joint vocabulary.
+ */
+export function resolveProceduralSimulationRigJointV5(simulationRigFrame, requestedJointId) {
+  const joints = simulationRigFrame?.joints ?? {};
+  const candidates = [...new Set([
+    requestedJointId,
+    ...(REGION_DEFORMATION_SOURCE_JOINTS_V5[requestedJointId] ?? []),
+  ])];
+  const resolvedJointId = candidates.find((jointId) => joints[jointId]) ?? null;
+  if (!resolvedJointId) return null;
+  return {
+    requestedJointId,
+    resolvedJointId,
+    joint: joints[resolvedJointId],
   };
 }
 

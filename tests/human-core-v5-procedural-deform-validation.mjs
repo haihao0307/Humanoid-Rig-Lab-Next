@@ -9,6 +9,7 @@ import {
   createProceduralSimulationRigFrameV5,
   getHumanRigJointV5,
   measureProceduralDeformValidationPoseV5,
+  resolveProceduralSimulationRigJointV5,
 } from '../src/modules/human-core-v5/index.js';
 
 const dna = createBodyDNA({
@@ -37,6 +38,20 @@ for (const [leftName, rightName] of [
     assert.ok(difference <= 0.02, `${leftName}/${rightName} axis ${axis} differed by ${(difference * 100).toFixed(3)}%.`);
   }
 }
+
+const focusPose = createProceduralDeformValidationPoseV5({ poseId: 't-pose', rigCore, bodyDNA: dna, timestamp: 99 });
+const focusSimulationRig = createProceduralSimulationRigFrameV5({ finalPose: focusPose, rigCore, bodyDNA: dna });
+for (const [requestedJointId, expectedJointId] of [
+  ['leftShoulder', 'leftShoulder'],
+  ['leftLowerArm', 'leftLowerArm'],
+  ['leftHip', 'leftUpperLeg'],
+  ['leftKnee', 'leftLowerLeg'],
+]) {
+  const resolved = resolveProceduralSimulationRigJointV5(focusSimulationRig, requestedJointId);
+  assert.equal(resolved?.resolvedJointId, expectedJointId, `${requestedJointId} did not resolve to a concrete SimulationRig joint.`);
+  assert.equal(resolved?.joint, focusSimulationRig.joints[expectedJointId]);
+}
+assert.equal(resolveProceduralSimulationRigJointV5(focusSimulationRig, 'missingJoint'), null);
 
 const results = {};
 let referenceLengths = null;
