@@ -869,6 +869,7 @@ async function resolveBrowserTarget(settings) {
 }
 
 function browserCandidates() {
+  const pinnedChromium = ['chromium', 'Playwright Chromium', chromium.executablePath()];
   const windows = [
     ['chrome', 'Google Chrome', join(process.env.PROGRAMFILES ?? '', 'Google', 'Chrome', 'Application', 'chrome.exe')],
     ['chrome', 'Google Chrome', join(process.env['PROGRAMFILES(X86)'] ?? '', 'Google', 'Chrome', 'Application', 'chrome.exe')],
@@ -882,7 +883,12 @@ function browserCandidates() {
     ['msedge', 'Microsoft Edge', '/usr/bin/microsoft-edge'],
     ['chromium', 'System Chromium', '/usr/bin/chromium'],
   ];
-  return [...(process.platform === 'win32' ? windows : unix), ['chromium', 'Playwright Chromium', chromium.executablePath()]]
+  // `--browser-channel chromium` is the deterministic CI contract. Prefer the
+  // browser revision installed by the pinned Playwright package and use a
+  // system Chromium only as an explicit availability fallback. Keeping the
+  // candidates in the opposite order silently couples Playwright to an
+  // unrelated distro browser and makes WebGPU/Dawn failures non-reproducible.
+  return [pinnedChromium, ...(process.platform === 'win32' ? windows : unix)]
     .map(([channel, browserName, executablePath]) => ({ channel, browserName, executablePath }));
 }
 
