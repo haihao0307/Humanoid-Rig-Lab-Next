@@ -107,3 +107,16 @@ The regression contract records zero runtime geometry-dispose events across comp
 GitHub Actions run `32858618180` reached the complete file/data suite but stopped before browser QA because one-time medium canonical-surface extraction measured 3022.85 ms on the shared runner, 22.85 ms over an extra 3000 ms wall-clock assertion. Task 14C defines hard Node performance gates for steady-state deformation (`median < 5 ms`, `P95 < 8 ms`) and explicitly excludes surface generation from browser steady-state timing. Canonical extraction remains worker-eligible and its actual duration remains recorded, while correctness no longer depends on shared-runner speed. Geometry, orientation, self-intersection, contact, angle, and deformation-performance gates are unchanged.
 
 No item in this report changes `visualAcceptance=false`, `productionReady=false`, or the requirement for explicit user visual review.
+
+## Auxiliary-preview WebGPU lifecycle follow-up
+
+GitHub Actions run `32860135235` passed the complete file/data suite and all 21 forced-WebGL2 captures, but SwiftShader WebGPU failed after the renderer-only human-surface chunk pool had already removed itself from the error stack. The new precise stack ended in `WebGPUAttributeUtils.destroyAttribute()` after the page-level `disposeGroupChildren()` destroyed SimulationRig preview geometry during a pose update. The same disposal pattern also existed in procedural-anchor and field-primitive previews, so fixing only the first stack site would have exposed the next one.
+
+The page-level repair now treats all auxiliary previews as renderer-owned live resources:
+
+- SimulationRig segments, SimulationRig joints, and procedural anchors use fixed-capacity `Float32Array`/`BufferAttribute` objects configured with `DynamicDrawUsage` before first render;
+- pose changes update existing arrays, update ranges, and draw ranges without replacing or disposing geometry;
+- field primitives share one sphere geometry and four cached materials, while a persistent mesh pool grows only within an explicit fixed capacity and hides unused entries;
+- QA diagnostics expose active/capacity counts and record zero runtime geometry-dispose operations.
+
+This removes the known auxiliary-preview `BufferGeometry.dispose()` path without changing Core surface topology, PoseFrame semantics, Rig hierarchy, or the task status. WebGPU acceptance remains pending a clean CI rerun, and user visual acceptance remains pending.
