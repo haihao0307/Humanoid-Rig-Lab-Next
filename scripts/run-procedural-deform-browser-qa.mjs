@@ -221,6 +221,8 @@ function verifiedRunSummary(run) {
 
 async function runBackend({ backend, url, screenshots, commit, report, artifactRoot, browserTarget, headless }) {
   const run = createRunRecord({ backend, url, browserTarget, headless });
+  const browserArguments = launchArguments(backend);
+  run.launchArguments = browserArguments;
   let browserServer;
   let browser;
   let context;
@@ -229,7 +231,7 @@ async function runBackend({ backend, url, screenshots, commit, report, artifactR
     browserServer = await chromium.launchServer({
       executablePath: browserTarget.executablePath,
       headless,
-      args: launchArguments(backend),
+      args: browserArguments,
     });
     browser = await chromium.connect(browserServer.wsEndpoint());
     run.browserVersion = browser.version();
@@ -332,6 +334,7 @@ function createRunRecord({ backend, url, browserTarget, headless }) {
     browserChannel: browserTarget.channel,
     browserExecutable: browserTarget.executablePath,
     headless,
+    launchArguments: [],
     activeBackend: null,
     fallbackReason: null,
     httpStatus: null,
@@ -699,6 +702,7 @@ function collectRendererDiagnostics(current, run) {
     browserChannel: run.browserChannel,
     browserExecutable: run.browserExecutable,
     headless: run.headless,
+    launchArguments: [...run.launchArguments],
     navigatorGPU: current.renderer.navigatorGPU,
     adapterStatus: webgpu.adapterStatus ?? 'unavailable',
     deviceStatus: webgpu.deviceStatus ?? 'unavailable',
@@ -885,7 +889,16 @@ function browserCandidates() {
 function launchArguments(backend) {
   const common = ['--window-size=1600,1200', '--hide-scrollbars', '--no-first-run', '--no-default-browser-check', '--ignore-gpu-blocklist', '--disable-dev-shm-usage', '--no-sandbox'];
   return backend === 'webgpu'
-    ? [...common, '--enable-unsafe-webgpu']
+    ? [
+      ...common,
+      '--enable-unsafe-webgpu',
+      '--enable-unsafe-swiftshader',
+      '--use-webgpu-adapter=swiftshader',
+      '--use-gpu-in-tests',
+      '--enable-dawn-features=allow_unsafe_apis',
+      '--disable-dawn-features=use_dxc',
+      '--enable-webgpu-developer-features',
+    ]
     : [...common, '--enable-webgl', '--use-angle=swiftshader'];
 }
 

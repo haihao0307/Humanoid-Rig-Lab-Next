@@ -27,7 +27,6 @@ assert.match(app, /renderer-owned-pass/);
 assert.match(app, /ChunkedProceduralHumanAdapterV5/);
 assert.match(app, /measureSteadyStatePerformance/);
 assert.match(app, /AUXILIARY_PREVIEW_CAPACITIES/);
-assert.match(app, /AUXILIARY_PREVIEW_BUFFER_BYTE_LIMIT\s*=\s*4\s*\*\s*1024/);
 assert.match(app, /createDynamicPositionPreview/);
 assert.match(app, /updateDynamicPositionPreview/);
 assert.match(app, /primitivePreviewPool/);
@@ -36,7 +35,8 @@ assert.match(app, /clearUpdateRanges/);
 assert.match(app, /addUpdateRange/);
 assert.match(app, /setDrawRange/);
 assert.match(app, /runtimeGeometryDisposeCount:\s*0/);
-assert.match(app, /position\.array\.byteLength\s*>\s*AUXILIARY_PREVIEW_BUFFER_BYTE_LIMIT/);
+assert.match(app, /semantic-fixed-capacity-no-runtime-reallocation/);
+assert.doesNotMatch(app, /software-safe limit|AUXILIARY_PREVIEW_BUFFER_BYTE_LIMIT/, 'A device-loss error must not be reinterpreted as an arbitrary auxiliary-buffer size limit.');
 assert.doesNotMatch(app, /disposeGroupChildren|\.geometry\?\.dispose\(\)|\.setFromPoints\(/, 'Live auxiliary previews must update stable renderer resources instead of disposing or replacing geometry.');
 assert.match(app, /navigatorGPU:\s*Boolean\(navigator\.gpu\)/);
 assert.match(app, /'navigator\.gpu':\s*rendererState\.navigatorGPU/);
@@ -88,6 +88,16 @@ assert.match(browserRunner, /chromium\.launchServer/);
 assert.match(browserRunner, /browserServer\.kill/);
 assert.match(browserRunner, /withTimeout/);
 assert.match(browserRunner, /Browser QA evidence summary/);
+for (const webgpuArgument of [
+  '--enable-unsafe-webgpu',
+  '--enable-unsafe-swiftshader',
+  '--use-webgpu-adapter=swiftshader',
+  '--use-gpu-in-tests',
+  '--enable-dawn-features=allow_unsafe_apis',
+  '--disable-dawn-features=use_dxc',
+  '--enable-webgpu-developer-features',
+]) assert.match(browserRunner, new RegExp(webgpuArgument.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+assert.match(browserRunner, /launchArguments:\s*\[\.\.\.run\.launchArguments\]/);
 assert.match(browserRunner, /consoleErrors/);
 assert.match(browserRunner, /glbRequests/);
 assert.doesNotMatch(browserRunner, /globalThis\.WebSocket|new WebSocket|class CDPClient/);
