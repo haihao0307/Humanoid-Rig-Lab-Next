@@ -41,7 +41,11 @@ jobs:
           npm test 2>&1 | tee artifacts/logs/procedural-deform-browser-qa/npm-test.log
           test_status=${PIPESTATUS[0]}
           if [ "$test_status" -ne 0 ]; then
-            failure_excerpt=$(tail -n 120 artifacts/logs/procedural-deform-browser-qa/npm-test.log)
+            if grep -qE 'AssertionError|ERR_ASSERTION|ReferenceError|TypeError|SyntaxError' artifacts/logs/procedural-deform-browser-qa/npm-test.log; then
+              failure_excerpt=$(grep -n -B 8 -A 18 -E 'AssertionError|ERR_ASSERTION|ReferenceError|TypeError|SyntaxError' artifacts/logs/procedural-deform-browser-qa/npm-test.log | tail -n 80)
+            else
+              failure_excerpt=$(tail -n 40 artifacts/logs/procedural-deform-browser-qa/npm-test.log)
+            fi
             failure_excerpt=${failure_excerpt//'%'/'%25'}
             failure_excerpt=${failure_excerpt//$'\r'/'%0D'}
             failure_excerpt=${failure_excerpt//$'\n'/'%0A'}
