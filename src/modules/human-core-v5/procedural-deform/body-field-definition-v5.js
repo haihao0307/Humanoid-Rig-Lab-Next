@@ -10,7 +10,7 @@ import {
 import { ANATOMICAL_JUNCTION_POLICIES_V5 } from './anatomical-field-composition-v5.js';
 
 export const BODY_FIELD_DEFINITION_V5_SCHEMA = 'humanoid_rig/body_field_definition@5.0';
-export const BODY_FIELD_GENERATOR_VERSION_V5 = 'canonical-anatomical-field-v5.0.0';
+export const BODY_FIELD_GENERATOR_VERSION_V5 = 'canonical-anatomical-field-v5.3.0';
 export const BODY_FIELD_REGION_IDS_V5 = Object.freeze([
   'head', 'neck', 'upperTorso', 'lowerTorso', 'pelvis',
   'leftUpperArm', 'rightUpperArm', 'leftForearm', 'rightForearm', 'leftPalm', 'rightPalm',
@@ -24,6 +24,7 @@ export function createBodyFieldDefinitionV5({ bodyDNA = {}, rigCore, fieldOption
   assertHumanRigCoreV5(core);
   const layout = createCanonicalLayout(dna, core);
   const regions = createRegions(dna, layout);
+  const deformHelpers = createShoulderDeformHelpers(dna, layout);
   const subtractions = createAnatomicalSubtractions(dna, layout);
   const margin = Math.max(0.08, dna.proportion.height * 0.045);
   const bounds = {
@@ -45,6 +46,7 @@ export function createBodyFieldDefinitionV5({ bodyDNA = {}, rigCore, fieldOption
     coordinateSystem: 'right-handed,+Y-up,+Z-forward,+X-right',
     bounds,
     regions,
+    deformHelpers,
     subtractions,
     junctions: {
       shoulder: scaledJunction(ANATOMICAL_JUNCTION_POLICIES_V5.ShoulderFieldJunctionV5, dna.proportion.shoulderWidth),
@@ -72,6 +74,7 @@ export function createBodyFieldDefinitionV5({ bodyDNA = {}, rigCore, fieldOption
       workerGeneration: true,
       stableTopology: true,
       authoredAsymmetry: true,
+      deformOnlyHelperFields: true,
     },
     binding: {
       mode: 'field-contribution-regions',
@@ -85,6 +88,52 @@ export function createBodyFieldDefinitionV5({ bodyDNA = {}, rigCore, fieldOption
   definition.fingerprint = stableFingerprint(definitionWithoutFingerprint(definition));
   assertBodyFieldDefinitionV5(definition);
   return definition;
+}
+
+function createShoulderDeformHelpers(dna, layout) {
+  const p = dna.proportion;
+  const height = p.height;
+  const helpers = [];
+  const add = (helperType, side, bindingRegionId, primitive, blendRadius) => helpers.push({
+    helperType,
+    side,
+    bindingRegionId,
+    primitive,
+    blendRadius,
+    deformOnly: true,
+    createsJoint: false,
+    entersPoseFrame: false,
+  });
+  for (const [side, sign] of [['left', -1], ['right', 1]]) {
+    const shoulder = layout.rigLandmarks[side].shoulder;
+    const shoulderCenter = [sign * layout.shoulderX * 1.01, shoulder[1] - height * 0.010, shoulder[2] - height * 0.002];
+    add('DeltoidCapFieldV5', side, `${side}UpperArm`, createEllipsoidPrimitive({
+      id: `${side}-deltoid-cap-field`, region: `${side}ShoulderDeform`, sourceJointId: `${side}UpperArm`, side,
+      center: shoulderCenter,
+      radii: [height * 0.047, height * 0.050, height * 0.048],
+    }), height * 0.018);
+    add('ClavicleShelfFieldV5', side, 'upperTorso', createTaperedEllipticalCapsulePrimitive({
+      id: `${side}-clavicle-shelf-field`, region: `${side}ShoulderDeform`, sourceJointId: 'upperChest', side,
+      start: [sign * layout.shoulderX * 0.20, layout.shoulderY + height * 0.010, -height * 0.006],
+      end: [sign * layout.shoulderX * 0.92, layout.shoulderY - height * 0.006, -height * 0.004],
+      startRadii: [height * 0.026, height * 0.024, height * 0.030],
+      endRadii: [height * 0.032, height * 0.030, height * 0.037],
+    }), height * 0.015);
+    add('AxillaryBridgeFieldV5', side, `${side}UpperArm`, createTaperedEllipticalCapsulePrimitive({
+      id: `${side}-axillary-bridge-field`, region: `${side}ShoulderDeform`, sourceJointId: `${side}UpperArm`, side,
+      start: [sign * layout.shoulderX * 0.62, layout.shoulderY - height * 0.060, -height * 0.002],
+      end: [sign * layout.shoulderX * 1.01, layout.shoulderY - height * 0.026, 0],
+      startRadii: [height * 0.034, height * 0.033, height * 0.036],
+      endRadii: [height * 0.035, height * 0.036, height * 0.038],
+    }), height * 0.017);
+    add('ScapularBackPlaneFieldV5', side, 'upperTorso', createSuperellipsoidPrimitive({
+      id: `${side}-scapular-back-plane-field`, region: `${side}ShoulderDeform`, sourceJointId: 'upperChest', side,
+      center: [sign * layout.shoulderX * 0.55, layout.shoulderY - height * 0.055, -p.bodyThickness.chest * 0.42],
+      radii: [height * 0.076, height * 0.080, height * 0.025],
+      exponent: 3.2,
+    }), height * 0.012);
+  }
+  return helpers;
 }
 
 export function validateBodyFieldDefinitionV5(value) {
@@ -248,14 +297,14 @@ function createAnatomicalSubtractions(dna, layout) {
       subtractionId: `${side}-axilla-relief`,
       side,
       targetJunction: 'shoulder',
-      blendRadius: height * 0.010,
+      blendRadius: height * 0.006,
       primitive: createEllipsoidPrimitive({
         id: `${side}-axilla-relief-field`,
         region: `${side}AxillaRelief`,
         sourceJointId: `${side}UpperArm`,
         side,
-        center: [sign * layout.shoulderX * 0.78, layout.shoulderY - height * 0.050, -height * 0.018],
-        radii: [height * 0.034, height * 0.042, height * 0.038],
+        center: [sign * layout.shoulderX * 0.96, layout.shoulderY - height * 0.058, -height * 0.028],
+        radii: [height * 0.018, height * 0.025, height * 0.022],
       }),
     });
     cuts.push({
@@ -273,6 +322,22 @@ function createAnatomicalSubtractions(dna, layout) {
       }),
     });
   }
+  cuts.push({
+    subtractionId: 'central-groin-separator',
+    side: 'center',
+    targetJunction: 'hip',
+    blendRadius: height * 0.004,
+    primitive: createTaperedEllipticalCapsulePrimitive({
+      id: 'central-groin-separator-field',
+      region: 'CentralGroinSeparator',
+      sourceJointId: 'hips',
+      side: 'center',
+      start: [0, layout.kneeY + height * 0.025, 0],
+      end: [0, layout.hipY - height * 0.045, 0],
+      startRadii: [height * 0.016, height * 0.018, height * 0.072],
+      endRadii: [height * 0.013, height * 0.014, height * 0.045],
+    }),
+  });
   return cuts;
 }
 

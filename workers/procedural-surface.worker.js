@@ -8,7 +8,7 @@ self.addEventListener('message', (event) => {
     const surface = extractStableProceduralSurfaceV5(field, { resolution });
     const transfer = [
       surface.positions.buffer, surface.normals.buffer, surface.indices.buffer,
-      surface.regionIds.buffer, surface.regionBlendWeights.buffer, surface.bindLocalData.buffer,
+      surface.regionIds.buffer, surface.regionBlendWeights.buffer, surface.regionAxialU.buffer, surface.bindLocalData.buffer,
     ];
     self.postMessage({ requestId, surface }, transfer);
   } catch (error) {

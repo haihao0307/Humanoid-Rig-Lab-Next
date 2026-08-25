@@ -10,6 +10,7 @@ import {
 import { createBodyDNA } from '../body-dna-v5.js';
 import { assertHumanRigCoreV5, getHumanRigJointV5 } from '../human-rig-core-v5.js';
 import { adaptHumanRigCoreToExistingRig } from '../v4-adapter.js';
+import { StaticValidationPoseCompilerV5 } from './static-validation-pose-compiler-v5.js';
 
 export const PROCEDURAL_DEFORM_VALIDATION_POSE_IDS_V5 = Object.freeze([
   'a-pose',
@@ -56,15 +57,18 @@ export function createProceduralDeformValidationPoseV5({
   const adapted = adaptHumanRigCoreToExistingRig(rigCore, { bodyDNA: dna, pose: 'T' });
   const validationAxes = createCanonicalTValidationAxes(rigCore, adapted.definition);
   const rotations = {};
+  const authoredChannels = new Map();
   const requestedAngles = [];
   const apply = (jointId, anatomicalChannel, requestedAngleDegrees, localDeltaDegrees = requestedAngleDegrees) => {
     const joint = getHumanRigJointV5(rigCore, jointId);
     const axisKey = channelAxisKey(anatomicalChannel);
     const resolvedAxisReference = validationAxes.get(jointId) ?? joint.axisReference;
     const resolvedLocalAxis = [...resolvedAxisReference[axisKey]];
-    const channels = { bend: 0, twist: 0, side: 0, [anatomicalChannel]: degreesToRadians(localDeltaDegrees) };
-    const resultQuaternion = quaternionFromAnatomicalChannels(resolvedAxisReference, channels);
-    rotations[jointId] = resultQuaternion;
+    const deltaChannels = { bend: 0, twist: 0, side: 0, [anatomicalChannel]: degreesToRadians(localDeltaDegrees) };
+    const channels = authoredChannels.get(jointId) ?? { bend: 0, twist: 0, side: 0 };
+    channels[anatomicalChannel] = degreesToRadians(localDeltaDegrees);
+    authoredChannels.set(jointId, channels);
+    const resultQuaternion = quaternionFromAnatomicalChannels(resolvedAxisReference, deltaChannels);
     requestedAngles.push({
       jointId,
       anatomicalChannel,
@@ -87,8 +91,14 @@ export function createProceduralDeformValidationPoseV5({
   if (poseId === 'arm-raise-90-left') recordCanonicalIdentity(requestedAngles, rigCore, validationAxes, 'leftUpperArm', 'side', 90);
   if (poseId === 'arm-raise-150-left') apply('leftUpperArm', 'side', 150, -60);
   if (poseId === 'forearm-twist-180-left') apply('leftLowerArm', 'twist', 180, 180);
-  if (poseId === 'elbow-bend-140-left') apply('leftLowerArm', 'bend', 140, 140);
-  if (poseId === 'hip-flex-left') apply('leftUpperLeg', 'bend', 70, -70);
+  if (poseId === 'elbow-bend-140-left') {
+    apply('leftUpperArm', 'bend', 35, -35);
+    apply('leftUpperArm', 'side', 150, -60);
+    apply('leftLowerArm', 'bend', 140, 140);
+  }
+  if (poseId === 'hip-flex-left') {
+    apply('leftUpperLeg', 'bend', 55, -55);
+  }
   if (poseId === 'knee-bend-left') apply('leftLowerLeg', 'bend', 110, 110);
   if (poseId === 'squat') {
     apply('leftUpperLeg', 'bend', 65, -65);
@@ -103,8 +113,13 @@ export function createProceduralDeformValidationPoseV5({
     apply('rightLowerLeg', 'bend', 30, 30);
   }
 
+  for (const [jointId, channels] of authoredChannels) {
+    const joint = getHumanRigJointV5(rigCore, jointId);
+    rotations[jointId] = quaternionFromAnatomicalChannels(validationAxes.get(jointId) ?? joint.axisReference, channels);
+  }
+
   const rootPosition = adapted.definition.joints.find((joint) => joint.id === 'hips')?.poseWorldPosition ?? [0, 0, 0];
-  return createPoseFrameV4({
+  const pose = createPoseFrameV4({
     compatibleRig: rigCore.sourceRig.compatibleRig,
     rootJointId: 'hips',
     rootPosition,
@@ -125,7 +140,12 @@ export function createProceduralDeformValidationPoseV5({
     proportionRevision: dna.proportionRevision,
     timestamp,
   });
+  return STATIC_VALIDATION_POSE_IDS.has(poseId)
+    ? new StaticValidationPoseCompilerV5().compile({ poseId, pose, rigCore })
+    : pose;
 }
+
+const STATIC_VALIDATION_POSE_IDS = new Set(['squat', 'lunge-left']);
 
 export function measureProceduralDeformValidationPoseV5({ finalPose, simulationRigFrame } = {}) {
   const poseId = finalPose?.constraintState?.validationPose?.poseId ?? 'unknown';

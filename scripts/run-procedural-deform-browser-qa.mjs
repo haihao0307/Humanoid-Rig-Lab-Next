@@ -18,26 +18,31 @@ const WEBGPU_SHOTS = Object.freeze([
   ['t-pose-front.png', 'Reference', 't-pose', 'Front'],
   ['arm-raise-90-front.png', 'Reference', 'arm-raise-90-left', 'Front'],
   ['arm-raise-150-front.png', 'Reference', 'arm-raise-150-left', 'Front'],
+  ['shoulder-150-closeup.png', 'Reference', 'arm-raise-150-left', 'Perspective', 'leftShoulder'],
   ['forearm-twist-closeup.png', 'Reference', 'forearm-twist-180-left', 'Perspective', 'leftLowerArm'],
   ['elbow-bend-closeup.png', 'Reference', 'elbow-bend-140-left', 'Perspective', 'leftLowerArm'],
   ['squat-front.png', 'Reference', 'squat', 'Front'],
   ['squat-side.png', 'Reference', 'squat', 'Right'],
   ['lunge-front.png', 'Reference', 'lunge-left', 'Front'],
+  ['lunge-side.png', 'Reference', 'lunge-left', 'Right'],
   ['asymmetric-front.png', 'Asymmetric', 'a-pose', 'Front'],
 ]);
 const WEBGL2_SHOTS = Object.freeze([
   ['reference-front.png', 'Reference', 'a-pose', 'Front'],
+  ['reference-side.png', 'Reference', 'a-pose', 'Right'],
   ['reference-back.png', 'Reference', 'a-pose', 'Back'],
   ['t-pose-front.png', 'Reference', 't-pose', 'Front'],
   ['arm-raise-90-front.png', 'Reference', 'arm-raise-90-left', 'Front'],
   ['arm-raise-150-front.png', 'Reference', 'arm-raise-150-left', 'Front'],
+  ['shoulder-150-closeup.png', 'Reference', 'arm-raise-150-left', 'Perspective', 'leftShoulder'],
   ['forearm-twist-closeup.png', 'Reference', 'forearm-twist-180-left', 'Perspective', 'leftLowerArm'],
   ['elbow-bend-closeup.png', 'Reference', 'elbow-bend-140-left', 'Perspective', 'leftLowerArm'],
-  ['hip-flex-side.png', 'Reference', 'hip-flex-left', 'Right'],
-  ['knee-bend-side.png', 'Reference', 'knee-bend-left', 'Right'],
+  ['hip-flex-closeup.png', 'Reference', 'hip-flex-left', 'Perspective', 'leftHip'],
+  ['knee-bend-closeup.png', 'Reference', 'knee-bend-left', 'Perspective', 'leftKnee'],
   ['squat-front.png', 'Reference', 'squat', 'Front'],
   ['squat-side.png', 'Reference', 'squat', 'Right'],
   ['lunge-front.png', 'Reference', 'lunge-left', 'Front'],
+  ['lunge-side.png', 'Reference', 'lunge-left', 'Right'],
   ['lean-front.png', 'Lean', 'a-pose', 'Front'],
   ['muscular-front.png', 'Muscular', 'a-pose', 'Front'],
   ['heavy-front.png', 'Heavy', 'a-pose', 'Front'],
@@ -110,7 +115,7 @@ export async function runProceduralDeformBrowserQA(options = {}) {
       report.screenshots = report.screenshots.filter((entry) => entry.backend !== backend);
       const run = await runBackend({
         backend,
-        url: `${server.url}/human-core-v5-procedural-deform.html${backend === 'webgl2' ? '?forceWebGL=1' : ''}`,
+        url: `${server.url}/human-core-v5-procedural-deform.html${backend === 'webgl2' ? '?forceWebGL=1' : '?forceChunkedUpload=1'}`,
         screenshots: SHOTS_BY_BACKEND[backend],
         commit,
         report,
@@ -123,6 +128,16 @@ export async function runProceduralDeformBrowserQA(options = {}) {
   } finally {
     await server.stop();
   }
+  applyCrossBackendScreenshotGates(report);
+  report.contactSheets = await buildBrowserContactSheets({
+    report,
+    artifactRoot: settings.artifactRoot,
+    browserTarget,
+    headless: settings.headless,
+    baselineRoot: process.env.HRL_PROCEDURAL_DEFORM_BASELINE_ROOT
+      ? resolve(process.env.HRL_PROCEDURAL_DEFORM_BASELINE_ROOT)
+      : null,
+  });
   const failedWebGL2 = report.runs.some((run) => run.requestedBackend === 'webgl2' && !run.passed);
   const failedWebGPU = report.runs.some((run) => run.requestedBackend === 'webgpu' && !run.passed);
   report.commandPassed = !failedWebGL2 && (!failedWebGPU || settings.continueOnWebGPUFailure);
@@ -160,6 +175,15 @@ export async function verifyProceduralDeformQAArtifacts({ artifactRoot = default
     if (!String(evidence.artifactPath).startsWith(`${evidence.backend}/`)) throw new Error(`Screenshot backend/path mismatch for ${evidence.artifactPath}.`);
     const expected = SHOTS_BY_BACKEND[evidence.backend]?.find(([fileName]) => fileName === evidence.artifactPath.split('/').at(-1));
     if (!expected || expected[2] !== evidence.poseId) throw new Error(`Screenshot pose/file mismatch for ${evidence.artifactPath}.`);
+    if (evidence.contentGate?.passed !== true) throw new Error(`Screenshot content gate failed for ${evidence.artifactPath}.`);
+    if (!(evidence.foregroundPixelRatio >= 0.08) || !(evidence.foregroundBoundingBoxAreaRatio >= 0.20)) throw new Error(`Screenshot foreground metrics failed for ${evidence.artifactPath}.`);
+    if (!/^[a-f0-9]{64}$/.test(evidence.silhouetteFingerprint ?? '') || !/^[a-f0-9]{16}$/.test(evidence.perceptualHash ?? '')) throw new Error(`Screenshot fingerprints are invalid for ${evidence.artifactPath}.`);
+  }
+  for (const required of ['before-after-contact-sheet.png', 'joint-closeup-contact-sheet.png', 'webgpu-webgl2-comparison.png']) {
+    if (!manifest.files.some((entry) => entry.path === required)) throw new Error(`qa-manifest.json is missing ${required}.`);
+  }
+  if (webgpu?.passed && webgl2?.passed && !report.crossBackendSilhouetteComparisons?.every((entry) => entry.passed && entry.silhouetteIoU >= 0.97)) {
+    throw new Error('WebGPU/WebGL2 silhouette IoU evidence has not passed.');
   }
   if (report.visualAcceptance !== false || report.productionReady !== false) throw new Error('Browser evidence cannot promote release flags before user acceptance.');
   const runSummaries = Object.fromEntries(report.runs.map((run) => [run.requestedBackend, verifiedRunSummary(run)]));
@@ -189,6 +213,9 @@ function verifiedRunSummary(run) {
     pageErrors: run.pageErrors.length,
     glbRequests: run.glbRequests.length,
     screenshots: run.screenshotCount,
+    screenshotContentPassed: run.screenshotContentGates?.every((gate) => gate.passed) ?? false,
+    screenshotDistinctnessPassed: run.screenshotDistinctness?.passed ?? false,
+    performance: run.performance ?? null,
   };
 }
 
@@ -247,14 +274,26 @@ async function runBackend({ backend, url, screenshots, commit, report, artifactR
         const state = await getPageState(page);
         const destination = join(artifactRoot, backend, fileName);
         await mkdir(join(artifactRoot, backend), { recursive: true });
-        await page.locator('canvas').screenshot({ path: destination, type: 'png' });
-        report.screenshots.push(createScreenshotEvidence({
+        const screenshot = await page.locator('canvas').screenshot({ path: destination, type: 'png' });
+        const pixelAnalysis = await analyzeScreenshotPixels(page, screenshot);
+        const evidence = createScreenshotEvidence({
           fileName, backend, commit, preset, poseId, state: state.current, run, artifactRoot,
-        }));
+          screenshot, pixelAnalysis,
+        });
+        report.screenshots.push(evidence);
+        run.screenshotContentGates.push({
+          artifactPath: evidence.artifactPath,
+          poseId,
+          passed: evidence.contentGate.passed,
+          foregroundPixelRatio: evidence.foregroundPixelRatio,
+          foregroundBoundingBoxAreaRatio: evidence.foregroundBoundingBoxAreaRatio,
+        });
         run.screenshotCount += 1;
         recordProgress(run, `screenshot:${run.screenshotCount}/${screenshots.length}:${fileName}`);
       }
     }
+    run.performance = await page.evaluate(() => window.__HRL_PROCEDURAL_DEFORM_QA__.measureSteadyStatePerformance({ warmupFrames: 20, sampleFrames: 120 }));
+    run.screenshotDistinctness = evaluateScreenshotDistinctness(report.screenshots.filter((entry) => entry.backend === backend));
     run.final = compactState((await getPageState(page)).current);
     const browserEvents = await page.evaluate(() => structuredClone(globalThis.__HRL_BROWSER_QA_EVENTS__));
     run.unhandledRejections.push(...browserEvents.unhandledRejections);
@@ -266,6 +305,9 @@ async function runBackend({ backend, url, screenshots, commit, report, artifactR
       && run.buttonChecks.every((check) => check.passed)
       && totalErrorCount(run) === 0
       && run.glbRequests.length === 0
+      && run.screenshotContentGates.every((gate) => gate.passed)
+      && run.screenshotDistinctness.passed
+      && isFinitePerformanceResult(run.performance)
       && run.screenshotCount === screenshots.length;
     run.classification = classifyRun(run);
     if (!run.passed) run.failure = explainRunFailure(run);
@@ -306,6 +348,8 @@ function createRunRecord({ backend, url, browserTarget, headless }) {
     deviceLost: null,
     glbRequests: [],
     buttonChecks: [],
+    screenshotContentGates: [],
+    screenshotDistinctness: { passed: false, duplicatePairs: [] },
     screenshotCount: 0,
     progress: [],
     teardownWarnings: [],
@@ -374,7 +418,127 @@ async function getPageState(page) {
   return page.evaluate(() => window.__HRL_PROCEDURAL_DEFORM_QA__.getState());
 }
 
-function createScreenshotEvidence({ fileName, backend, commit, preset, poseId, state, run, artifactRoot }) {
+async function analyzeScreenshotPixels(page, screenshot) {
+  const raw = await page.evaluate(async (base64) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${base64}`;
+    await image.decode();
+    const width = Math.min(400, image.naturalWidth);
+    const height = Math.max(1, Math.round(image.naturalHeight * width / image.naturalWidth));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    context.drawImage(image, 0, 0, width, height);
+    const pixels = context.getImageData(0, 0, width, height).data;
+    const corners = [[0, 0], [width - 1, 0], [0, height - 1], [width - 1, height - 1]];
+    const background = [0, 1, 2].map((channel) => corners.reduce((sum, [x, y]) => sum + pixels[(y * width + x) * 4 + channel], 0) / corners.length);
+    const candidates = new Uint8Array(width * height);
+    for (let index = 0; index < candidates.length; index += 1) {
+      const offset = index * 4;
+      const r = pixels[offset]; const g = pixels[offset + 1]; const b = pixels[offset + 2];
+      const brightness = (r + g + b) / 3;
+      const colorDistance = Math.hypot(r - background[0], g - background[1], b - background[2]);
+      const notBlueGrid = r >= b * 0.65 && g >= b * 0.58;
+      candidates[index] = brightness >= 58 && colorDistance >= 45 && notBlueGrid ? 1 : 0;
+    }
+    const visited = new Uint8Array(candidates.length);
+    const queue = new Int32Array(candidates.length);
+    let largest = [];
+    for (let start = 0; start < candidates.length; start += 1) {
+      if (!candidates[start] || visited[start]) continue;
+      let read = 0; let write = 0;
+      queue[write++] = start;
+      visited[start] = 1;
+      const component = [];
+      while (read < write) {
+        const index = queue[read++];
+        component.push(index);
+        const x = index % width; const y = Math.floor(index / width);
+        for (let dy = -1; dy <= 1; dy += 1) for (let dx = -1; dx <= 1; dx += 1) {
+          if (!dx && !dy) continue;
+          const nx = x + dx; const ny = y + dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+          const next = ny * width + nx;
+          if (!candidates[next] || visited[next]) continue;
+          visited[next] = 1;
+          queue[write++] = next;
+        }
+      }
+      if (component.length > largest.length) largest = component;
+    }
+    const foreground = new Uint8Array(candidates.length);
+    let minimumX = width; let minimumY = height; let maximumX = -1; let maximumY = -1;
+    for (const index of largest) {
+      foreground[index] = 1;
+      const x = index % width; const y = Math.floor(index / width);
+      minimumX = Math.min(minimumX, x); minimumY = Math.min(minimumY, y);
+      maximumX = Math.max(maximumX, x); maximumY = Math.max(maximumY, y);
+    }
+    const boundingBox = largest.length ? {
+      x: minimumX / width,
+      y: minimumY / height,
+      width: (maximumX - minimumX + 1) / width,
+      height: (maximumY - minimumY + 1) / height,
+    } : null;
+    const maskWidth = 64; const maskHeight = 64;
+    let silhouetteMaskBits = '';
+    for (let maskY = 0; maskY < maskHeight; maskY += 1) for (let maskX = 0; maskX < maskWidth; maskX += 1) {
+      const x0 = Math.floor(maskX * width / maskWidth); const x1 = Math.max(x0 + 1, Math.floor((maskX + 1) * width / maskWidth));
+      const y0 = Math.floor(maskY * height / maskHeight); const y1 = Math.max(y0 + 1, Math.floor((maskY + 1) * height / maskHeight));
+      let occupied = 0; let total = 0;
+      for (let y = y0; y < y1; y += 1) for (let x = x0; x < x1; x += 1) { occupied += foreground[y * width + x]; total += 1; }
+      silhouetteMaskBits += occupied / total >= 0.25 ? '1' : '0';
+    }
+    const perceptualBits = [];
+    if (boundingBox) {
+      const samples = [];
+      for (let y = 0; y < 8; y += 1) for (let x = 0; x < 9; x += 1) {
+        const sourceX = Math.min(width - 1, minimumX + Math.floor((x + 0.5) * (maximumX - minimumX + 1) / 9));
+        const sourceY = Math.min(height - 1, minimumY + Math.floor((y + 0.5) * (maximumY - minimumY + 1) / 8));
+        const offset = (sourceY * width + sourceX) * 4;
+        samples.push(pixels[offset] * 0.299 + pixels[offset + 1] * 0.587 + pixels[offset + 2] * 0.114);
+      }
+      for (let y = 0; y < 8; y += 1) for (let x = 0; x < 8; x += 1) perceptualBits.push(samples[y * 9 + x] >= samples[y * 9 + x + 1] ? 1 : 0);
+    } else while (perceptualBits.length < 64) perceptualBits.push(0);
+    let perceptualHash = '';
+    for (let offset = 0; offset < perceptualBits.length; offset += 4) perceptualHash += Number.parseInt(perceptualBits.slice(offset, offset + 4).join(''), 2).toString(16);
+    const foregroundPixelRatio = largest.length / (width * height);
+    const foregroundBoundingBoxAreaRatio = boundingBox ? boundingBox.width * boundingBox.height : 0;
+    return {
+      analysisWidth: width,
+      analysisHeight: height,
+      foregroundPixelRatio,
+      foregroundBoundingBox: boundingBox,
+      foregroundBoundingBoxAreaRatio,
+      maskWidth,
+      maskHeight,
+      silhouetteMaskBits,
+      perceptualHash,
+      passed: foregroundPixelRatio >= 0.08 && foregroundBoundingBoxAreaRatio >= 0.20,
+    };
+  }, screenshot.toString('base64'));
+  const silhouetteMask = packBooleanMask(raw.silhouetteMaskBits);
+  return {
+    ...raw,
+    silhouetteMaskBits: undefined,
+    silhouetteMask,
+    silhouetteFingerprint: createHash('sha256').update(raw.silhouetteMaskBits).digest('hex'),
+  };
+}
+
+function packBooleanMask(bits) {
+  const bytes = Buffer.alloc(Math.ceil(bits.length / 8));
+  for (let index = 0; index < bits.length; index += 1) if (bits[index] === '1') bytes[Math.floor(index / 8)] |= 1 << (7 - (index % 8));
+  return bytes.toString('base64');
+}
+
+function unpackBooleanMask(encoded, bitCount) {
+  const bytes = Buffer.from(encoded, 'base64');
+  return Array.from({ length: bitCount }, (_, index) => (bytes[Math.floor(index / 8)] >> (7 - (index % 8))) & 1);
+}
+
+function createScreenshotEvidence({ fileName, backend, commit, preset, poseId, state, run, artifactRoot, screenshot, pixelAnalysis }) {
   return {
     file: relative(root, join(resolve(artifactRoot), backend, fileName)).replaceAll('\\', '/'),
     artifactPath: `${backend}/${fileName}`,
@@ -388,6 +552,19 @@ function createScreenshotEvidence({ fileName, backend, commit, preset, poseId, s
     camera: state.active.camera,
     displayMode: 'Procedural Surface',
     timestamp: new Date().toISOString(),
+    sha256: createHash('sha256').update(screenshot).digest('hex'),
+    foregroundPixelRatio: pixelAnalysis.foregroundPixelRatio,
+    foregroundBoundingBox: pixelAnalysis.foregroundBoundingBox,
+    foregroundBoundingBoxAreaRatio: pixelAnalysis.foregroundBoundingBoxAreaRatio,
+    silhouetteFingerprint: pixelAnalysis.silhouetteFingerprint,
+    perceptualHash: pixelAnalysis.perceptualHash,
+    silhouetteMask: pixelAnalysis.silhouetteMask,
+    silhouetteMaskSize: [pixelAnalysis.maskWidth, pixelAnalysis.maskHeight],
+    contentGate: {
+      foregroundPixelRatioMinimum: 0.08,
+      foregroundBoundingBoxAreaRatioMinimum: 0.20,
+      passed: pixelAnalysis.passed,
+    },
     vertexCount: state.geometry.vertexCount,
     triangleCount: state.geometry.triangleCount,
     topologyFingerprint: state.geometry.topologyFingerprint,
@@ -397,6 +574,79 @@ function createScreenshotEvidence({ fileName, backend, commit, preset, poseId, s
     rigSurfaceErrors: state.rigSurfaceAudit,
     checklistResult: evaluatePageContract(state, run, backend),
   };
+}
+
+function evaluateScreenshotDistinctness(entries) {
+  const duplicatePairs = [];
+  for (let leftIndex = 0; leftIndex < entries.length; leftIndex += 1) for (let rightIndex = leftIndex + 1; rightIndex < entries.length; rightIndex += 1) {
+    const left = entries[leftIndex]; const right = entries[rightIndex];
+    if (left.poseId === right.poseId || allowedEquivalentPosePair(left.poseId, right.poseId)) continue;
+    const identicalSHA256 = left.sha256 === right.sha256;
+    const identicalPerceptualHash = left.perceptualHash === right.perceptualHash;
+    if (identicalSHA256 || identicalPerceptualHash) duplicatePairs.push({
+      left: left.artifactPath,
+      right: right.artifactPath,
+      identicalSHA256,
+      identicalPerceptualHash,
+    });
+  }
+  return { passed: duplicatePairs.length === 0, duplicatePairs };
+}
+
+function allowedEquivalentPosePair(left, right) {
+  return new Set([left, right]).size === 2 && [left, right].every((poseId) => ['t-pose', 'arm-raise-90-left'].includes(poseId));
+}
+
+function applyCrossBackendScreenshotGates(report) {
+  const webgpu = report.screenshots.filter((entry) => entry.backend === 'webgpu');
+  const webgl2 = report.screenshots.filter((entry) => entry.backend === 'webgl2');
+  const comparisons = [];
+  for (const left of webgpu) {
+    const fileName = left.artifactPath.split('/').at(-1);
+    const right = webgl2.find((entry) => entry.artifactPath.endsWith(`/${fileName}`) && entry.poseId === left.poseId);
+    if (!right) continue;
+    const silhouetteIoU = calculateSilhouetteIoU(left, right);
+    comparisons.push({
+      poseId: left.poseId,
+      fileName,
+      webgpu: left.artifactPath,
+      webgl2: right.artifactPath,
+      silhouetteIoU,
+      requiredMinimum: 0.97,
+      passed: silhouetteIoU >= 0.97,
+    });
+  }
+  report.crossBackendSilhouetteComparisons = comparisons;
+  const bothBackendsPresent = report.runs.some((run) => run.requestedBackend === 'webgpu') && report.runs.some((run) => run.requestedBackend === 'webgl2');
+  const passed = !bothBackendsPresent || (comparisons.length > 0 && comparisons.every((entry) => entry.passed));
+  for (const run of report.runs) {
+    run.crossBackendSilhouette = { required: bothBackendsPresent, passed, comparisons };
+    if (!passed) {
+      run.passed = false;
+      run.failure = `${run.failure ? `${run.failure} ` : ''}Cross-backend silhouette IoU gate failed.`;
+    }
+    run.classification = classifyRun(run);
+  }
+}
+
+function calculateSilhouetteIoU(left, right) {
+  const [width, height] = left.silhouetteMaskSize ?? [];
+  if (!width || !height || right.silhouetteMaskSize?.[0] !== width || right.silhouetteMaskSize?.[1] !== height) return 0;
+  const leftBits = unpackBooleanMask(left.silhouetteMask, width * height);
+  const rightBits = unpackBooleanMask(right.silhouetteMask, width * height);
+  let intersection = 0; let union = 0;
+  for (let index = 0; index < leftBits.length; index += 1) {
+    if (leftBits[index] || rightBits[index]) union += 1;
+    if (leftBits[index] && rightBits[index]) intersection += 1;
+  }
+  return union ? intersection / union : 0;
+}
+
+function isFinitePerformanceResult(performanceResult) {
+  return ['deformation', 'normalRebuild', 'rendererUpload', 'frame'].every((name) => {
+    const metric = performanceResult?.[name];
+    return metric?.sampleCount === 120 && Number.isFinite(metric.medianMs) && Number.isFinite(metric.p95Ms);
+  });
 }
 
 function evaluatePageContract(current, run, backend) {
@@ -495,7 +745,8 @@ function totalErrorCount(run) {
 }
 
 function explainRunFailure(run) {
-  return `Browser contract failed: backend=${run.requestedBackend}, active=${run.activeBackend ?? 'none'}, HTTP=${run.httpStatus ?? 'none'}, errors=${totalErrorCount(run)}, screenshots=${run.screenshotCount}.`;
+  const failedContent = run.screenshotContentGates.filter((gate) => !gate.passed).length;
+  return `Browser contract failed: backend=${run.requestedBackend}, active=${run.activeBackend ?? 'none'}, HTTP=${run.httpStatus ?? 'none'}, errors=${totalErrorCount(run)}, screenshots=${run.screenshotCount}, failedContent=${failedContent}, distinct=${run.screenshotDistinctness.passed}.`;
 }
 
 function compactState(state) {
@@ -561,6 +812,10 @@ function createMetrics(report) {
       httpFailureCount: run.httpFailures.length,
       glbRequestCount: run.glbRequests.length,
       screenshotCount: run.screenshotCount,
+      screenshotContentGates: run.screenshotContentGates,
+      screenshotDistinctness: run.screenshotDistinctness,
+      crossBackendSilhouette: run.crossBackendSilhouette ?? null,
+      performance: run.performance ?? null,
       initial: run.initial,
     })),
   };
@@ -739,6 +994,7 @@ function assertScreenshotSet(report, backend, definitions, required) {
   for (const [fileName, , poseId] of definitions) {
     const evidence = actual.find((entry) => entry.artifactPath === `${backend}/${fileName}`);
     if (required && (!evidence || evidence.poseId !== poseId)) throw new Error(`${backend}/${fileName} has missing or incorrect pose evidence.`);
+    if (required && evidence.contentGate?.passed !== true) throw new Error(`${backend}/${fileName} failed the screenshot content gate.`);
   }
 }
 
@@ -806,7 +1062,92 @@ export function browserFailureSummary(report) {
     deviceLost: run.deviceLost,
     glbRequests: run.glbRequests.slice(0, 3),
     screenshotCount: run.screenshotCount,
+    failedScreenshotContent: run.screenshotContentGates.filter((gate) => !gate.passed),
+    screenshotDistinctness: run.screenshotDistinctness,
+    crossBackendSilhouette: run.crossBackendSilhouette,
+    performance: run.performance,
   }));
+}
+
+async function buildBrowserContactSheets({ report, artifactRoot, browserTarget, headless, baselineRoot }) {
+  const webgpu = report.screenshots.filter((entry) => entry.backend === 'webgpu');
+  const webgl2 = report.screenshots.filter((entry) => entry.backend === 'webgl2');
+  if (!webgpu.length || !webgl2.length) return { status: 'pending-both-backends', files: [] };
+  const baselineFiles = baselineRoot && existsSync(baselineRoot) ? await listFilesRecursively(baselineRoot) : [];
+  const browser = await chromium.launch({ executablePath: browserTarget.executablePath, headless, args: launchArguments('webgl2') });
+  const files = [];
+  try {
+    const context = await browser.newContext({ viewport: { width: 1600, height: 1000 }, deviceScaleFactor: 1 });
+    const page = await context.newPage();
+    const closeupNames = [
+      'shoulder-150-closeup.png', 'forearm-twist-closeup.png', 'elbow-bend-closeup.png',
+      'hip-flex-closeup.png', 'knee-bend-closeup.png',
+    ];
+    const closeupCards = await imageCards(closeupNames.map((fileName) => ({
+      path: join(artifactRoot, 'webgl2', fileName),
+      label: `After WebGL2 · ${fileName}`,
+    })));
+    const closeupOutput = join(artifactRoot, 'joint-closeup-contact-sheet.png');
+    await renderContactSheet(page, closeupCards, closeupOutput, 'Human Core V5 Joint Closeups');
+    files.push(relative(artifactRoot, closeupOutput).replaceAll('\\', '/'));
+
+    const commonNames = [...new Set(webgpu.map((entry) => entry.artifactPath.split('/').at(-1)))]
+      .filter((fileName) => webgl2.some((entry) => entry.artifactPath.endsWith(`/${fileName}`)));
+    const comparisonCards = await imageCards(commonNames.flatMap((fileName) => [
+      { path: join(artifactRoot, 'webgpu', fileName), label: `WebGPU · ${fileName}` },
+      { path: join(artifactRoot, 'webgl2', fileName), label: `WebGL2 · ${fileName}` },
+    ]));
+    const comparisonOutput = join(artifactRoot, 'webgpu-webgl2-comparison.png');
+    await renderContactSheet(page, comparisonCards, comparisonOutput, 'WebGPU / WebGL2 Silhouette Comparison');
+    files.push(relative(artifactRoot, comparisonOutput).replaceAll('\\', '/'));
+
+    const beforeAfterNames = [
+      'reference-front.png', 't-pose-front.png', 'arm-raise-150-front.png',
+      'forearm-twist-closeup.png', 'elbow-bend-closeup.png', 'squat-front.png', 'lunge-front.png',
+    ];
+    const beforeAfterSources = [];
+    for (const fileName of beforeAfterNames) {
+      const baselinePath = findBaselineScreenshot(baselineFiles, fileName);
+      if (!baselinePath) throw new Error(`Exact failure baseline is missing ${fileName}; refusing to fabricate a before/after sheet.`);
+      beforeAfterSources.push(
+        { path: baselinePath, label: `Before fb7544a · ${fileName}` },
+        { path: join(artifactRoot, 'webgl2', fileName), label: `After ${report.commit.slice(0, 8)} · ${fileName}` },
+      );
+    }
+    const beforeAfterOutput = join(artifactRoot, 'before-after-contact-sheet.png');
+    await renderContactSheet(page, await imageCards(beforeAfterSources), beforeAfterOutput, 'Failure Baseline / Current Repair');
+    files.push(relative(artifactRoot, beforeAfterOutput).replaceAll('\\', '/'));
+  } finally {
+    await browser.close();
+  }
+  return { status: 'generated', baselineRoot, files };
+}
+
+async function imageCards(definitions) {
+  return Promise.all(definitions.map(async ({ path, label }) => ({
+    label,
+    dataURL: `data:image/png;base64,${(await readFile(path)).toString('base64')}`,
+  })));
+}
+
+async function renderContactSheet(page, cards, output, title) {
+  const html = `<!doctype html><meta charset="utf-8"><style>
+    html,body{margin:0;background:#07101e;color:#e5f2ff;font:18px/1.35 Segoe UI,sans-serif}body{padding:24px}h1{margin:0 0 20px;color:#72d8ff}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{border:1px solid #31516c;border-radius:10px;background:#0c1b2c;padding:10px}.card img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:#01040a}.label{padding:8px 2px 0;overflow-wrap:anywhere}</style>
+    <h1>${escapeSheetHTML(title)}</h1><div class="grid">${cards.map((card) => `<div class="card"><img src="${card.dataURL}"><div class="label">${escapeSheetHTML(card.label)}</div></div>`).join('')}</div>`;
+  await page.setContent(html, { waitUntil: 'load' });
+  await page.evaluate(() => Promise.all([...document.images].map((image) => image.decode())));
+  await page.screenshot({ path: output, type: 'png', fullPage: true });
+}
+
+function findBaselineScreenshot(files, fileName) {
+  const normalizedSuffix = `/webgl2/${fileName}`;
+  return files.find((path) => path.replaceAll('\\', '/').endsWith(normalizedSuffix))
+    ?? files.find((path) => path.replaceAll('\\', '/').endsWith(`/${fileName}`))
+    ?? null;
+}
+
+function escapeSheetHTML(value) {
+  return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 }
 
 function emitGitHubBrowserFailure(report) {

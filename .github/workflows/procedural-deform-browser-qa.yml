@@ -3,7 +3,7 @@ name: Human Core V5 Procedural Deform Browser QA
 on:
   push:
     branches:
-      - feature/human-core-v5-procedural-deform-browser-unblock
+      - feature/human-core-v5-procedural-deform-visual-repair-v2
   pull_request:
     branches:
       - main
@@ -11,11 +11,14 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   browser-contract:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      HRL_PROCEDURAL_DEFORM_BASELINE_ROOT: artifacts/baseline/human-core-v5-procedural-deform-browser-qa-fb7544a19f1869cf763b2d436542e96f2d0c9aba
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,6 +34,26 @@ jobs:
 
       - name: Install pinned Playwright Chromium
         run: npx playwright install chromium --with-deps
+
+      - name: Download and verify exact failure baseline
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASELINE_ARTIFACT_ID: '9555667580'
+          BASELINE_SHA256: dbc8226ec33a56277bd766665e7f53abf756ecd9599783c924ce64ed1b7aefcd
+        run: |
+          set -euo pipefail
+          baseline_zip="${RUNNER_TEMP}/human-core-v5-procedural-deform-failure-baseline.zip"
+          mkdir -p "${HRL_PROCEDURAL_DEFORM_BASELINE_ROOT}"
+          curl --fail-with-body --location --retry 3 \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "Accept: application/vnd.github+json" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            --output "${baseline_zip}" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${BASELINE_ARTIFACT_ID}/zip"
+          echo "${BASELINE_SHA256}  ${baseline_zip}" | sha256sum --check --strict
+          unzip -q "${baseline_zip}" -d "${HRL_PROCEDURAL_DEFORM_BASELINE_ROOT}"
+          test -n "$(find "${HRL_PROCEDURAL_DEFORM_BASELINE_ROOT}" -type f -name '*.png' -print -quit)"
 
       - name: Run full file and data validation
         shell: bash
@@ -72,9 +95,24 @@ jobs:
           fi
           exit "$browser_status"
 
-      - name: Attempt and classify CI WebGPU
-        continue-on-error: true
-        run: npm run test:human-core-v5-procedural-deform-browser -- --backend webgpu --headless --browser-channel chromium --continue-on-webgpu-failure
+      - name: Run and require CI WebGPU
+        shell: bash
+        run: |
+          set +e
+          set -o pipefail
+          npm run test:human-core-v5-procedural-deform-browser -- --backend webgpu --headless --browser-channel chromium 2>&1 | tee artifacts/logs/procedural-deform-browser-qa/webgpu-runner.log
+          browser_status=${PIPESTATUS[0]}
+          if [ "$browser_status" -ne 0 ]; then
+            failure_excerpt=$(grep 'BROWSER_QA_FAILURE_SUMMARY' artifacts/logs/procedural-deform-browser-qa/webgpu-runner.log | tail -n 1)
+            if [ -z "$failure_excerpt" ]; then
+              failure_excerpt=$(tail -n 20 artifacts/logs/procedural-deform-browser-qa/webgpu-runner.log)
+            fi
+            failure_excerpt=${failure_excerpt//'%'/'%25'}
+            failure_excerpt=${failure_excerpt//$'\r'/'%0D'}
+            failure_excerpt=${failure_excerpt//$'\n'/'%0A'}
+            echo "::error file=human-core-v5-procedural-deform.html,line=1,title=WebGPU browser contract failure::$failure_excerpt"
+          fi
+          exit "$browser_status"
 
       - name: Verify browser evidence integrity
         run: npm run test:human-core-v5-procedural-deform-qa

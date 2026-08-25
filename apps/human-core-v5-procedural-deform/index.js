@@ -9,14 +9,21 @@ import {
   createBodyDNA,
   createProceduralDeformValidationPoseV5,
   createProceduralSimulationRigFrameV5,
+  StaticValidationPoseCompilerV5,
   createRendererAdapterInputV5,
   measureProceduralDeformValidationPoseV5,
 } from '../../src/modules/human-core-v5/index.js';
-import { ThreeProceduralHumanAdapterV5 } from '../../src/renderers/three/three-procedural-human-adapter-v5.js';
+import {
+  ChunkedProceduralHumanAdapterV5,
+  ThreeProceduralHumanAdapterV5,
+  shouldUseChunkedProceduralHumanAdapterV5,
+} from '../../src/renderers/three/three-procedural-human-adapter-v5.js';
 
 const container = document.querySelector('#viewport');
 const loading = document.querySelector('#loading');
-const forceWebGL = new URLSearchParams(location.search).get('forceWebGL') === '1';
+const searchParameters = new URLSearchParams(location.search);
+const forceWebGL = searchParameters.get('forceWebGL') === '1';
+const forceChunkedUpload = searchParameters.get('forceChunkedUpload') === '1';
 const runtimeErrors = [];
 const originalConsoleError = console.error.bind(console);
 console.error = (...values) => {
@@ -45,7 +52,13 @@ rim.position.set(-3, 2, -3);
 scene.add(rim);
 scene.add(new THREE.GridHelper(8, 40, 0x1f5d8a, 0x10243a));
 
-const adapter = new ThreeProceduralHumanAdapterV5();
+const useChunkedUpload = rendererState.activeBackend === 'WebGPU'
+  && shouldUseChunkedProceduralHumanAdapterV5(rendererState.webgpu.adapterInfo, { force: forceChunkedUpload });
+const adapter = useChunkedUpload
+  ? new ChunkedProceduralHumanAdapterV5()
+  : new ThreeProceduralHumanAdapterV5();
+rendererState.webgpu.rendererAdapter = adapter.getDiagnostics().adapter;
+rendererState.webgpu.uploadMode = adapter.getDiagnostics().uploadMode;
 scene.add(adapter.getObject3D());
 const simulationRigGroup = new THREE.Group();
 simulationRigGroup.name = 'IndependentSimulationRigFK';
@@ -158,6 +171,20 @@ function updatePose() {
     anatomyState: coreRuntime.getAnatomyState(),
     deltaTime: 1 / 60,
   });
+  if (lastPose.constraintState?.staticValidation?.validationFixtureOnly) {
+    const resolvedPose = new StaticValidationPoseCompilerV5().resolveSurfaceContact({
+      pose: lastPose,
+      surface: deformRuntime.surface,
+      deformFrame: lastFrame,
+    });
+    lastPose = resolvedPose;
+    coreRuntime.updatePose(lastPose);
+    lastFrame = deformRuntime.update({
+      finalPose: lastPose,
+      anatomyState: coreRuntime.getAnatomyState(),
+      deltaTime: 1 / 60,
+    });
+  }
   lastSimulationRigFrame = createProceduralSimulationRigFrameV5({
     finalPose: lastPose,
     rigCore,
@@ -296,7 +323,9 @@ function updateDiagnostics() {
       navigatorGPU: rendererState.navigatorGPU,
       webgpu: structuredClone(rendererState.webgpu),
       webgl2: structuredClone(rendererState.webgl2),
+      adapter: adapterDiagnostics,
       forceWebGL,
+      forceChunkedUpload,
     },
     resources: { glbDependency: false, glbRequestCount: glbRequests.length, glbRequests: glbRequests.map((entry) => entry.name) },
     errors: [...runtimeErrors],
@@ -336,6 +365,10 @@ function updateDiagnostics() {
     'WebGPU probe': rendererState.webgpu.status,
     'WebGPU adapter': rendererState.webgpu.adapterStatus,
     'WebGPU device': rendererState.webgpu.deviceStatus,
+    'Renderer adapter': adapterDiagnostics.adapter,
+    'Renderer upload mode': adapterDiagnostics.uploadMode,
+    'Renderer chunks': adapterDiagnostics.chunkCount,
+    'Largest renderer buffer': `${adapterDiagnostics.maximumBufferByteLength} bytes`,
     'WebGPU adapter info': JSON.stringify(rendererState.webgpu.adapterInfo ?? 'unavailable'),
     'WebGPU device lost': rendererState.webgpu.deviceLost ? JSON.stringify(rendererState.webgpu.deviceLost) : 'none',
     'WebGL2 fallback': rendererState.webgl2.status,
@@ -556,18 +589,21 @@ async function createRenderer() {
       if (!adapterGPU) throw new Error('navigator.gpu.requestAdapter() returned null.');
       result.webgpu.adapterStatus = 'pass';
       result.webgpu.adapterInfo = normalizeGPUAdapterInfo(adapterGPU.info);
-      const device = await adapterGPU.requestDevice();
-      result.webgpu.deviceStatus = 'pass';
-      device.lost.then((info) => {
+      const { WebGPURenderer } = await import('three/webgpu');
+      const webgpuRenderer = new WebGPURenderer({ antialias: true });
+      await webgpuRenderer.init();
+      const rendererDevice = webgpuRenderer.backend?.device ?? null;
+      const rendererAdapterInfo = normalizeGPUAdapterInfo(webgpuRenderer.backend?.adapter?.info);
+      if (Object.values(rendererAdapterInfo).some((value) => value !== 'unavailable')) result.webgpu.adapterInfo = rendererAdapterInfo;
+      result.webgpu.deviceStatus = rendererDevice ? 'renderer-owned-pass' : 'renderer-owned-unavailable';
+      result.webgpu.rendererBackend = webgpuRenderer.backend?.constructor?.name ?? 'WebGPUBackend';
+      rendererDevice?.lost?.then((info) => {
         result.webgpu.deviceLost = {
           reason: String(info?.reason ?? 'unknown'),
           message: String(info?.message ?? ''),
           observedAt: new Date().toISOString(),
         };
       });
-      const { WebGPURenderer } = await import('three/webgpu');
-      const webgpuRenderer = new WebGPURenderer({ antialias: true });
-      await webgpuRenderer.init();
       result.activeBackend = 'WebGPU';
       result.webgpu.status = 'pass';
       return { renderer: webgpuRenderer, ...result };
@@ -663,6 +699,39 @@ function downloadBlob(blob, fileName) { const url = URL.createObjectURL(blob); c
 function resize() { const width = container.clientWidth; const height = container.clientHeight; camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(width, height, false); }
 function render() { controls.update(); renderer.render(scene, camera); requestAnimationFrame(render); }
 
+async function measureSteadyStatePerformance({ warmupFrames = 20, sampleFrames = 120 } = {}) {
+  const warmup = Math.max(1, Math.floor(Number(warmupFrames) || 20));
+  const samples = Math.max(1, Math.floor(Number(sampleFrames) || 120));
+  const measurements = { deformation: [], normalRebuild: [], rendererUpload: [], frame: [] };
+  for (let frameIndex = 0; frameIndex < warmup + samples; frameIndex += 1) {
+    const frameStarted = performance.now();
+    const deformationStarted = performance.now();
+    lastFrame = deformRuntime.update({
+      finalPose: lastPose,
+      anatomyState: coreRuntime.getAnatomyState(),
+      deltaTime: 1 / 60,
+    });
+    const deformationDuration = performance.now() - deformationStarted;
+    adapter.update(createRendererAdapterInputV5(lastFrame));
+    const adapterDiagnostics = adapter.getDiagnostics();
+    await new Promise((resolveFrame) => requestAnimationFrame(resolveFrame));
+    if (frameIndex >= warmup) {
+      measurements.deformation.push(deformationDuration);
+      measurements.normalRebuild.push(lastFrame.deformationDiagnostics.normalRebuild.durationMs);
+      measurements.rendererUpload.push(adapterDiagnostics.rendererUploadTimeMs);
+      measurements.frame.push(performance.now() - frameStarted);
+    }
+  }
+  updateDiagnostics();
+  return Object.fromEntries(Object.entries(measurements).map(([name, values]) => [name, summarizePerformance(values)]));
+}
+
+function summarizePerformance(values) {
+  const sorted = [...values].sort((left, right) => left - right);
+  const pick = (percentile) => sorted[Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * percentile))] ?? null;
+  return { sampleCount: sorted.length, medianMs: pick(0.5), p95Ms: pick(0.95) };
+}
+
 window.__HRL_PROCEDURAL_DEFORM_QA__ = Object.freeze({
   getState: getQAState,
   waitForIdle: async () => { await rebuildChain; while (qaRunning) await new Promise((resolve) => setTimeout(resolve, 25)); return getQAState(); },
@@ -672,4 +741,5 @@ window.__HRL_PROCEDURAL_DEFORM_QA__ = Object.freeze({
   markFail: () => markVisualReview('fail'),
   exportQAJSON,
   focusJoint,
+  measureSteadyStatePerformance,
 });

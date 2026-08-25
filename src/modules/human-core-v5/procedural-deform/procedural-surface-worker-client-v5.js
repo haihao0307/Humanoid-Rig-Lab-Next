@@ -43,6 +43,7 @@ function reviveSurface(surface) {
     indices: new Uint32Array(surface.indices),
     regionIds: new Uint16Array(surface.regionIds),
     regionBlendWeights: new Float32Array(surface.regionBlendWeights),
+    regionAxialU: new Float32Array(surface.regionAxialU),
     bindLocalData: new Float32Array(surface.bindLocalData),
   };
 }

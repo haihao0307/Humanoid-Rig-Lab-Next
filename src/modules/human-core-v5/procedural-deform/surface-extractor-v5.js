@@ -1,6 +1,9 @@
 import { stableFingerprint } from '../core-utils.js';
 import { createCanonicalBodyFieldV5 } from './body-field-compiler-v5.js';
-import { createSurfaceRegionBindingV5 } from './surface-region-binding-v5.js';
+import { fairCanonicalSurfaceV5 } from './canonical-surface-fairing-v5.js';
+import { assertDeformedSurfaceNormalGateV5, rebuildDeformedSurfaceNormalsV5 } from './deformed-surface-normals-v5.js';
+import { assertSurfaceOrientationGateV5, orientTrianglesOutwardV5 } from './orient-procedural-surface-v5.js';
+import { createSurfaceRegionBindingV5, rebaseSurfaceRegionBindingV5 } from './surface-region-binding-v5.js';
 
 export const PROCEDURAL_SURFACE_CACHE_METADATA_V5_SCHEMA = 'humanoid_rig/procedural_surface_cache_metadata@5.0';
 const TETRAHEDRA = Object.freeze([
@@ -60,10 +63,30 @@ export function extractStableProceduralSurfaceV5(fieldInput, { resolution = 28, 
       }
     }
   }
-  const positions = new Float32Array(vertices.flat());
-  const indices = new Uint32Array(removeDegenerateTriangles(triangles, positions));
-  const normals = calculateFieldNormals(field, positions, Math.min(...step) * 0.45);
-  const binding = createSurfaceRegionBindingV5(field, positions);
+  const unreferencedPositions = new Float32Array(vertices.flat());
+  const filteredIndices = new Uint32Array(removeDegenerateTriangles(triangles, unreferencedPositions));
+  const compacted = compactSurfaceVertices(unreferencedPositions, filteredIndices);
+  const extractedPositions = compacted.positions;
+  const extractedIndices = compacted.indices;
+  const initialOrientation = orientTrianglesOutwardV5({ positions: extractedPositions, indices: extractedIndices, field, fullDiagnostics: false });
+  const initialBinding = createSurfaceRegionBindingV5(field, extractedPositions);
+  const fairingProfile = resolveFairingProfile(grid);
+  const fairing = fairCanonicalSurfaceV5({
+    positions: extractedPositions,
+    indices: initialOrientation.indices,
+    field,
+    quality: fairingProfile,
+    regionIds: initialBinding.regionIds,
+    regionNames: initialBinding.regionNames,
+  });
+  const finalOrientation = orientTrianglesOutwardV5({ positions: fairing.positions, indices: initialOrientation.indices, field });
+  const positions = fairing.positions;
+  const indices = finalOrientation.indices;
+  const normalResult = rebuildDeformedSurfaceNormalsV5({ deformedPositions: positions, indices });
+  const normals = normalResult.deformedNormals;
+  if (fairingProfile !== 'preview') assertSurfaceOrientationGateV5(finalOrientation.diagnostics);
+  assertDeformedSurfaceNormalGateV5(normalResult.normalDiagnostics);
+  const binding = rebaseSurfaceRegionBindingV5(initialBinding, positions, definition);
   const geometry = analyzeSurfaceGeometryV5(positions, indices);
   const measurements = measureSurface(definition, positions, binding);
   const topologyFingerprint = hashTypedArrays([indices, binding.regionIds]);
@@ -91,9 +114,13 @@ export function extractStableProceduralSurfaceV5(fieldInput, { resolution = 28, 
       gridSampleCount: gridCount,
       connectedComponentCount: geometry.connectedComponentCount,
       boundaryEdgeCount: geometry.boundaryEdgeCount,
+      nonManifoldEdgeCount: geometry.nonManifoldEdgeCount,
       nonFiniteVertexCount: geometry.nonFiniteVertexCount,
       outOfRangeIndexCount: geometry.outOfRangeIndexCount,
       degenerateTriangleRatio: geometry.degenerateTriangleRatio,
+      orientation: finalOrientation.diagnostics,
+      normals: normalResult.normalDiagnostics,
+      fairing: fairing.diagnostics,
       timestamp,
     },
     storage: { derivedAsset: true, projectStateAllowed: false, transferableTypedArrays: true },
@@ -105,6 +132,7 @@ export function extractStableProceduralSurfaceV5(fieldInput, { resolution = 28, 
     indices,
     regionIds: binding.regionIds,
     regionBlendWeights: binding.regionBlendWeights,
+    regionAxialU: binding.regionAxialU,
     bindLocalData: binding.bindLocalData,
     regionNames: binding.regionNames,
   };
@@ -191,20 +219,6 @@ function polygonizeTetra(ids, values, grid, min, step, edgeVertices, vertices, t
   triangles.push(a, b, c, b, d, c);
 }
 
-function calculateFieldNormals(field, positions, epsilon) {
-  const normals = new Float32Array(positions.length);
-  for (let offset = 0; offset < positions.length; offset += 3) {
-    const p = [positions[offset], positions[offset + 1], positions[offset + 2]];
-    const n = [0, 1, 2].map((axis) => {
-      const plus = [...p]; const minus = [...p]; plus[axis] += epsilon; minus[axis] -= epsilon;
-      return field.sample(plus) - field.sample(minus);
-    });
-    const length = Math.hypot(...n) || 1;
-    normals.set(n.map((value) => value / length), offset);
-  }
-  return normals;
-}
-
 function removeDegenerateTriangles(triangles, positions) {
   const filtered = [];
   for (let offset = 0; offset < triangles.length; offset += 3) {
@@ -225,9 +239,15 @@ function measureSurface(definition, positions, binding) {
     }
   }
   const width = (name) => Math.max(0, regionBounds[name].max[0] - regionBounds[name].min[0]);
+  const shoulderAnchorWidth = definition.canonicalLayout.shoulderX * 2;
   return {
     height: bounds.max[1] - bounds.min[1],
-    shoulderWidth: width('upperTorso'),
+    // BodyDNA shoulderWidth is the stable bi-acromial Rig landmark span. The
+    // deform-only deltoid/scapular helper fields intentionally extend beyond
+    // it, so retain the contract value and expose the rendered envelope
+    // separately instead of silently redefining the anatomical measurement.
+    shoulderWidth: shoulderAnchorWidth,
+    surfaceShoulderEnvelopeWidth: width('upperTorso'),
     hipWidth: width('pelvis'),
     targetHeight: definition.canonicalLayout.height,
     targetShoulderWidth: definition.canonicalLayout.shoulderX * 2,
@@ -246,7 +266,44 @@ function normalizeResolution(value, bounds) {
   const ny = Math.max(16, Math.floor(Number(value) || 28));
   const size = bounds.max.map((item, axis) => item - bounds.min[axis]);
   const horizontalQualityScale = ny >= 36 ? 3 : 1;
-  return [Math.max(16, Math.round(ny * size[0] / size[1] * horizontalQualityScale)), ny, Math.max(12, Math.round(ny * size[2] / size[1]))];
+  const requestedX = Math.max(16, Math.round(ny * size[0] / size[1] * horizontalQualityScale));
+  return [
+    resolveMirrorSafeXResolution(requestedX, bounds),
+    ny,
+    Math.max(12, Math.round(ny * size[2] / size[1])),
+  ];
+}
+
+function resolveMirrorSafeXResolution(requestedX, bounds) {
+  const symmetricX = Math.abs(Number(bounds.min[0]) + Number(bounds.max[0]))
+    <= Math.max(1e-8, Math.abs(Number(bounds.max[0]) - Number(bounds.min[0])) * 1e-8);
+  if (!symmetricX) return requestedX;
+  // Keep the bilateral midline between sample columns. The next even density
+  // removes the coarse-grid left/right ownership bias without placing an
+  // extraction plane directly on the groin subtraction zero set.
+  return requestedX + (requestedX % 2 === 0 ? 2 : 1);
+}
+
+function compactSurfaceVertices(positions, indices) {
+  const remap = new Int32Array(positions.length / 3);
+  remap.fill(-1);
+  let next = 0;
+  for (const index of indices) if (remap[index] < 0) remap[index] = next++;
+  const compactedPositions = new Float32Array(next * 3);
+  for (let oldIndex = 0; oldIndex < remap.length; oldIndex += 1) {
+    const newIndex = remap[oldIndex];
+    if (newIndex < 0) continue;
+    compactedPositions.set(readPosition(positions, oldIndex), newIndex * 3);
+  }
+  const compactedIndices = new Uint32Array(indices.length);
+  for (let offset = 0; offset < indices.length; offset += 1) compactedIndices[offset] = remap[indices[offset]];
+  return { positions: compactedPositions, indices: compactedIndices, removedVertexCount: remap.length - next };
+}
+
+function resolveFairingProfile(grid) {
+  if (grid[1] >= 52) return 'quality';
+  if (grid[1] >= 36) return 'validation';
+  return 'preview';
 }
 
 function gridIndex(x, y, z, nx, ny) { return x + nx * (y + ny * z); }

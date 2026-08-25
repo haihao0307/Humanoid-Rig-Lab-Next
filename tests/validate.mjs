@@ -134,6 +134,12 @@ const required = [
   'src/modules/human-core-v5/procedural-deform/anatomical-field-composition-v5.js',
   'src/modules/human-core-v5/procedural-deform/body-field-definition-v5.js',
   'src/modules/human-core-v5/procedural-deform/body-field-compiler-v5.js',
+  'src/modules/human-core-v5/procedural-deform/canonical-surface-fairing-v5.js',
+  'src/modules/human-core-v5/procedural-deform/deformed-surface-normals-v5.js',
+  'src/modules/human-core-v5/procedural-deform/joint-corrective-fields-v5.js',
+  'src/modules/human-core-v5/procedural-deform/orient-procedural-surface-v5.js',
+  'src/modules/human-core-v5/procedural-deform/procedural-surface-deformation-quality-v5.js',
+  'src/modules/human-core-v5/procedural-deform/static-validation-pose-compiler-v5.js',
   'src/modules/human-core-v5/procedural-deform/surface-region-binding-v5.js',
   'src/modules/human-core-v5/procedural-deform/surface-extractor-v5.js',
   'src/modules/human-core-v5/procedural-deform/region-deformation-driver-v5.js',
@@ -156,6 +162,11 @@ const required = [
   'apps/human-core-v5-procedural-deform/styles.css',
   'tests/human-core-v5-procedural-deform-contract.mjs',
   'tests/human-core-v5-procedural-surface.mjs',
+  'tests/human-core-v5-procedural-surface-orientation.mjs',
+  'tests/human-core-v5-procedural-self-intersection.mjs',
+  'tests/human-core-v5-procedural-joint-quality.mjs',
+  'tests/human-core-v5-static-validation-poses.mjs',
+  'tests/human-core-v5-procedural-renderer-adapter.mjs',
   'tests/human-core-v5-procedural-deform-validation.mjs',
   'tests/human-core-v5-procedural-deform-stress.mjs',
   'tests/integration/human-core-v5-procedural-deform-page.mjs',
@@ -168,6 +179,7 @@ const required = [
   'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_VISUAL_ACCEPTANCE.md',
   'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_QA_REPORT.md',
   'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_RESEARCH_DECISION.md',
+  'docs/HUMAN_CORE_V5_PROCEDURAL_DEFORM_VISUAL_FAILURE_ANALYSIS.md',
   'control/module-scopes/proportion.json', 'control/module-scopes/skin.json',
   'control/module-scopes/pose.json', 'control/module-scopes/animation.json',
 ];
@@ -637,7 +649,11 @@ assert.match(proceduralBrowserWorkflow, /node-version:\s*'22'/);
 assert.match(proceduralBrowserWorkflow, /npm ci/);
 assert.match(proceduralBrowserWorkflow, /playwright install chromium --with-deps/);
 assert.match(proceduralBrowserWorkflow, /--backend webgl2 --headless --browser-channel chromium/);
-assert.match(proceduralBrowserWorkflow, /--backend webgpu --headless --browser-channel chromium --continue-on-webgpu-failure/);
+assert.match(proceduralBrowserWorkflow, /--backend webgpu --headless --browser-channel chromium/);
+assert.doesNotMatch(proceduralBrowserWorkflow, /continue-on-error:\s*true|--continue-on-webgpu-failure/);
+assert.match(proceduralBrowserWorkflow, /actions:\s*read/);
+assert.match(proceduralBrowserWorkflow, /9555667580/);
+assert.match(proceduralBrowserWorkflow, /dbc8226ec33a56277bd766665e7f53abf756ecd9599783c924ce64ed1b7aefcd/);
 assert.match(proceduralBrowserWorkflow, /if:\s*always\(\)/);
 assert.doesNotMatch(proceduralBrowserWorkflow, /deploy-pages|gh-pages|contents:\s*write/);
 

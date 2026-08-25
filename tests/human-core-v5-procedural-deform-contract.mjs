@@ -24,7 +24,10 @@ const rigCore = createHumanRigCoreV5({ bodyDNA:dna });
 const fieldA = new BodyFieldCompilerV5().compile({ bodyDNA:dna, rigCore });
 const fieldB = new BodyFieldCompilerV5().compile({ bodyDNA:dna, rigCore });
 assert.equal(fieldA.fingerprint, fieldB.fingerprint);
-assert.deepEqual(fieldA.definition.subtractions.map((entry) => entry.targetJunction), ['shoulder', 'hip', 'shoulder', 'hip']);
+assert.deepEqual(fieldA.definition.subtractions.map((entry) => entry.subtractionId), [
+  'left-axilla-relief', 'left-groin-relief', 'right-axilla-relief', 'right-groin-relief', 'central-groin-separator',
+]);
+assert.deepEqual(fieldA.definition.subtractions.map((entry) => entry.targetJunction), ['shoulder', 'hip', 'shoulder', 'hip', 'hip']);
 assert.equal(createProceduralSurfaceCacheKeyV5(fieldA.definition, 24), createProceduralSurfaceCacheKeyV5(fieldB.definition, 24));
 const surfaceA = extractStableProceduralSurfaceV5(fieldA, { resolution:24 });
 const surfaceB = extractStableProceduralSurfaceV5(fieldB, { resolution:24 });

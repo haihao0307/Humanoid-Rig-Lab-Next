@@ -15,6 +15,10 @@ export function evaluateComposedBodyField(fieldDefinition, point, { contribution
     sourceJointId: region.sourceJointId,
     value: evaluateAnatomicalPrimitive(region.primitive, point),
   }));
+  const helperValues = (fieldDefinition.deformHelpers ?? []).map((helper) => ({
+    helper,
+    value: evaluateAnatomicalPrimitive(helper.primitive, point),
+  }));
   let distance = Number.POSITIVE_INFINITY;
   let owner = null;
   const orderedValues = [...values].sort((left, right) => compareFieldEntries(left, right, point));
@@ -24,15 +28,22 @@ export function evaluateComposedBodyField(fieldDefinition, point, { contribution
     if (entry.value < distance) owner = entry.regionId;
     distance = merged;
   }
+  for (const { helper, value } of helperValues) {
+    distance = smoothMinimum(
+      distance,
+      value,
+      helper.blendRadius ?? fieldDefinition.compositionPolicy.defaultBlendRadius,
+    );
+  }
   for (const subtraction of fieldDefinition.subtractions ?? []) {
     const cutterDistance = evaluateAnatomicalPrimitive(subtraction.primitive, point);
     distance = smoothSubtraction(distance, cutterDistance, subtraction.blendRadius);
   }
   if (!contributions) return distance;
-  const ranked = values
+  const rankedAll = values
     .map((entry) => ({ ...entry, score: Math.exp(-Math.max(-0.02, entry.value) * 28) }))
-    .sort((left, right) => compareContributionEntries(left, right, point))
-    .slice(0, 4);
+    .sort((left, right) => compareContributionEntries(left, right, point));
+  const ranked = rankedAll.slice(0, 4);
   const total = ranked.reduce((sum, entry) => sum + entry.score, 0) || 1;
   return {
     distance,
@@ -41,6 +52,13 @@ export function evaluateComposedBodyField(fieldDefinition, point, { contribution
       side: entry.side,
       sourceJointId: entry.sourceJointId,
       weight: entry.score / total,
+      fieldDistance: entry.value,
+    })),
+    allContributions: rankedAll.map((entry) => ({
+      regionId: entry.regionId,
+      side: entry.side,
+      sourceJointId: entry.sourceJointId,
+      weight: entry.score,
       fieldDistance: entry.value,
     })),
   };
@@ -68,6 +86,7 @@ function resolveBlendRadius(fieldDefinition, leftId, rightId) {
   if (/calf/.test(pair) && /foot/.test(pair)) return fieldDefinition.junctions.ankleFoot.blendRadius;
   return fieldDefinition.compositionPolicy.defaultBlendRadius;
 }
+
 
 function compareFieldEntries(left, right, point) {
   const delta = left.value - right.value;
