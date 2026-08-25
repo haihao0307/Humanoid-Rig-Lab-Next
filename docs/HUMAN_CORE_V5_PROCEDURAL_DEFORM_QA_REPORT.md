@@ -88,7 +88,7 @@ npm run test:human-core-v5-procedural-deform-browser
 npm run test:human-core-v5-procedural-deform-qa
 ```
 
-The runner starts `node server.mjs` directly, looks for Google Chrome, Microsoft Edge, then pinned Playwright Chromium, and drives the page with Playwright's supported Browser/Page API. It does not use a global WebSocket or a private raw-CDP client. It records WebGPU adapter/device/renderer results separately from WebGL2 fallback and launches forced WebGL2 with `?forceWebGL=1`. Direct server ownership, bounded browser teardown, and per-stage progress records prevent orphaned child processes from exhausting the CI job timeout.
+The runner starts `node server.mjs` directly and drives the page with Playwright's supported Browser/Page API. An explicit `chromium` channel resolves the Chromium revision installed by the pinned Playwright package before a same-channel system fallback; explicit Chrome, Edge, and `--browser-path` selections remain supported. It does not use a global WebSocket or a private raw-CDP client. It records WebGPU adapter/device/renderer results separately from WebGL2 fallback and launches forced WebGL2 with `?forceWebGL=1`. Direct server ownership, bounded browser teardown, and per-stage progress records prevent orphaned child processes from exhausting the CI job timeout.
 
 The dedicated workflow `.github/workflows/procedural-deform-browser-qa.yml` runs Node 22, `npm ci`, pinned Chromium installation, the full project test suite, strict WebGL2 automation, a separately classified WebGPU attempt, SHA256 evidence verification, and unconditional artifact upload. GitHub Actions run `32826585176` on commit `9f4e3edfbcc4556dc255d5a5b2ecf0f6c81a097f` measured:
 

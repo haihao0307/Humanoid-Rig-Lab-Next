@@ -88,6 +88,9 @@ assert.match(browserRunner, /chromium\.launchServer/);
 assert.match(browserRunner, /browserServer\.kill/);
 assert.match(browserRunner, /withTimeout/);
 assert.match(browserRunner, /Browser QA evidence summary/);
+assert.match(browserRunner, /const pinnedChromium = \['chromium', 'Playwright Chromium', chromium\.executablePath\(\)\]/);
+assert.match(browserRunner, /return \[pinnedChromium, \.\.\.\(process\.platform === 'win32' \? windows : unix\)\]/,
+  'The pinned Playwright Chromium must precede a same-channel system Chromium candidate.');
 for (const webgpuArgument of [
   '--enable-unsafe-webgpu',
   '--enable-unsafe-swiftshader',
