@@ -174,15 +174,20 @@ export async function verifyProceduralDeformQAArtifacts({ artifactRoot = default
 
 async function runBackend({ backend, url, screenshots, commit, report, artifactRoot, browserTarget, headless }) {
   const run = createRunRecord({ backend, url, browserTarget, headless });
+  let browserServer;
   let browser;
+  let context;
   try {
-    browser = await chromium.launch({
+    recordProgress(run, 'browser-launch-start');
+    browserServer = await chromium.launchServer({
       executablePath: browserTarget.executablePath,
       headless,
       args: launchArguments(backend),
     });
+    browser = await chromium.connect(browserServer.wsEndpoint());
     run.browserVersion = browser.version();
-    const context = await browser.newContext({ viewport: { width: 1600, height: 1200 }, deviceScaleFactor: 1 });
+    recordProgress(run, 'browser-launch-complete');
+    context = await browser.newContext({ viewport: { width: 1600, height: 1200 }, deviceScaleFactor: 1 });
     await context.addInitScript(() => {
       globalThis.__HRL_BROWSER_QA_EVENTS__ = { unhandledRejections: [], windowErrors: [], contextLosses: [] };
       addEventListener('unhandledrejection', (event) => globalThis.__HRL_BROWSER_QA_EVENTS__.unhandledRejections.push(String(event.reason?.stack ?? event.reason ?? 'unhandled rejection')));
@@ -193,6 +198,7 @@ async function runBackend({ backend, url, screenshots, commit, report, artifactR
     const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90_000 });
     run.httpStatus = response?.status() ?? null;
     await waitForRuntimeReady(page);
+    recordProgress(run, 'runtime-ready');
     await page.evaluate(() => {
       const canvas = document.querySelector('canvas');
       canvas?.addEventListener('webglcontextlost', (event) => {
@@ -212,6 +218,7 @@ async function runBackend({ backend, url, screenshots, commit, report, artifactR
         run.buttonChecks.push(validateButtonTransition(kind, name, prior.current, current.current));
         prior = current;
       }
+      recordProgress(run, `button-group-complete:${kind}`);
     }
     if (run.activeBackend === expectedBackend(backend)) {
       for (const [fileName, preset, poseId, camera, focusJoint] of screenshots) {
@@ -225,6 +232,7 @@ async function runBackend({ backend, url, screenshots, commit, report, artifactR
           fileName, backend, commit, preset, poseId, state: state.current, run, artifactRoot,
         }));
         run.screenshotCount += 1;
+        recordProgress(run, `screenshot:${run.screenshotCount}/${screenshots.length}:${fileName}`);
       }
     }
     run.final = compactState((await getPageState(page)).current);
@@ -241,12 +249,12 @@ async function runBackend({ backend, url, screenshots, commit, report, artifactR
       && run.screenshotCount === screenshots.length;
     run.classification = classifyRun(run);
     if (!run.passed) run.failure = explainRunFailure(run);
-    await context.close();
+    recordProgress(run, 'browser-contract-complete');
   } catch (error) {
     run.failure = formatError(error);
     run.classification = classifyRun(run);
   } finally {
-    await browser?.close().catch(() => {});
+    await closeBrowserResources({ run, context, browser, browserServer });
   }
   run.completedAt = new Date().toISOString();
   return run;
@@ -279,6 +287,8 @@ function createRunRecord({ backend, url, browserTarget, headless }) {
     glbRequests: [],
     buttonChecks: [],
     screenshotCount: 0,
+    progress: [],
+    teardownWarnings: [],
     passed: false,
     classification: backend === 'webgpu' ? 'webgpu-ci-fail' : 'webgl2-ci-fail',
   };
@@ -318,10 +328,18 @@ async function clickQAButton(page, kind, name) {
     return true;
   }, name);
   if (!clicked) throw new Error(`Missing QA button ${kind}:${name}.`);
-  await page.evaluate(() => window.__HRL_PROCEDURAL_DEFORM_QA__.waitForIdle());
+  await withTimeout(
+    page.evaluate(() => window.__HRL_PROCEDURAL_DEFORM_QA__.waitForIdle()),
+    30_000,
+    `QA button ${kind}:${name} idle state`,
+  );
   await page.waitForFunction(({ buttonKind, buttonName }) => [...document.querySelectorAll(`[data-qa-button="${buttonKind}"]`)]
     .some((item) => item.dataset.qaName === buttonName && item.classList.contains('active')), { buttonKind: kind, buttonName: name });
-  await page.evaluate(() => new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame))));
+  await withTimeout(
+    page.evaluate(() => new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)))),
+    10_000,
+    `QA button ${kind}:${name} render frames`,
+  );
 }
 
 async function configureView(page, { preset, poseId, camera, displayMode }) {
@@ -597,8 +615,7 @@ function launchArguments(backend) {
 }
 
 async function startProjectServer(logRoot) {
-  const executable = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  const child = spawn(executable, ['start'], { cwd: root, env: { ...process.env, NO_OPEN: '1', PORT: '4173' }, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+  const child = spawn(process.execPath, ['server.mjs'], { cwd: root, env: { ...process.env, NO_OPEN: '1', PORT: '4173' }, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
   let output = '';
   child.stdout.on('data', (chunk) => { output += String(chunk); });
   child.stderr.on('data', (chunk) => { output += String(chunk); });
@@ -611,11 +628,49 @@ async function startProjectServer(logRoot) {
   return {
     url,
     stop: async () => {
-      child.kill();
-      await Promise.race([new Promise((resolveExit) => child.once('exit', resolveExit)), new Promise((resolveDelay) => setTimeout(resolveDelay, 2500))]);
+      if (child.exitCode === null) child.kill();
+      await withTimeout(new Promise((resolveExit) => {
+        if (child.exitCode !== null) resolveExit(child.exitCode);
+        else child.once('exit', resolveExit);
+      }), 5_000, 'project server shutdown').catch(() => {});
+      child.stdout.removeAllListeners();
+      child.stderr.removeAllListeners();
+      child.stdout.destroy();
+      child.stderr.destroy();
       await writeFile(join(logRoot, 'server.log'), output);
     },
   };
+}
+
+async function closeBrowserResources({ run, context, browser, browserServer }) {
+  for (const [label, resource, close] of [
+    ['browser context', context, () => context.close()],
+    ['browser connection', browser, () => browser.close()],
+    ['browser server', browserServer, () => browserServer.close()],
+  ]) {
+    if (!resource) continue;
+    try {
+      await withTimeout(close(), 10_000, `${label} shutdown`);
+      recordProgress(run, `${label.replaceAll(' ', '-')}-closed`);
+    } catch (error) {
+      run.teardownWarnings.push(formatError(error));
+    }
+  }
+  if (browserServer?.process()?.exitCode === null) {
+    try {
+      await withTimeout(browserServer.kill(), 10_000, 'browser server forced shutdown');
+      recordProgress(run, 'browser-server-killed');
+    } catch (error) {
+      run.teardownWarnings.push(formatError(error));
+    }
+  }
+}
+
+function recordProgress(run, stage) {
+  const entry = { stage, timestamp: new Date().toISOString() };
+  run.progress.push(entry);
+  console.log(`BROWSER_QA_PROGRESS backend=${run.requestedBackend} stage=${stage}`);
+  return entry;
 }
 
 async function loadOrCreateReport(artifactRoot, commit, node) {
@@ -681,6 +736,19 @@ async function readJSON(path) { return JSON.parse(await readFile(path, 'utf8'));
 async function writeJSON(path, value) { await writeFile(path, `${JSON.stringify(value, null, 2)}\n`); }
 async function sha256(path) { return createHash('sha256').update(await readFile(path)).digest('hex'); }
 async function listFilesRecursively(directory) { const result = []; for (const entry of await readdir(directory, { withFileTypes: true })) { const path = join(directory, entry.name); if (entry.isDirectory()) result.push(...await listFilesRecursively(path)); else result.push(path); } return result; }
+async function withTimeout(promise, timeoutMs, label) {
+  let timeoutId;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error(`Timed out waiting for ${label} after ${timeoutMs} ms.`)), timeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 async function poll(action, timeoutMs, label) { const deadline = Date.now() + timeoutMs; while (Date.now() < deadline) { const value = await action(); if (value) return value; await new Promise((resolveDelay) => setTimeout(resolveDelay, 100)); } throw new Error(`Timed out waiting for ${label}.`); }
 async function runGit(args) { const child = spawn('git', args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }); let output = ''; let error = ''; child.stdout.on('data', (chunk) => { output += chunk; }); child.stderr.on('data', (chunk) => { error += chunk; }); const code = await new Promise((resolveExit) => child.once('exit', resolveExit)); if (code !== 0) throw new Error(`git ${args.join(' ')} failed: ${error.trim()}`); return output.trim(); }
 function formatError(error) { return error instanceof Error ? `${error.name}: ${error.message}` : String(error); }
