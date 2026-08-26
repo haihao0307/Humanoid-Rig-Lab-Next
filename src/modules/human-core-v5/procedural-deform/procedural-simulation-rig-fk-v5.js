@@ -104,6 +104,8 @@ export function createProceduralSimulationRigFrameV5({ finalPose, rigCore, bodyD
     bodyDNAFingerprint: adapted.bodyDNAFingerprint,
     expectedBodyDNAFingerprint: bodyDNAFingerprint(dna),
     v4AdapterProportionRevision: adapted.proportionRevision,
+    authoredAsymmetryApplicationCount: adapted.authoredAsymmetryApplicationCount,
+    authoredAsymmetryAuthority: adapted.authoredAsymmetryAuthority,
     joints,
     segments,
     timestamp: finalPose.timestamp,

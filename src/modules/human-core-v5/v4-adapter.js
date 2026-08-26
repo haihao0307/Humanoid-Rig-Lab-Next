@@ -3,6 +3,7 @@ import {
   normalizeBodyProfile,
 } from '../../../legacy/v8/src/body-profile.js';
 import {
+  applyPosePresetToDefinition,
   createStandardHumanoidPreset,
   normalizeSkeletonDefinition,
 } from '../../../legacy/v8/src/skeleton-presets.js';
@@ -67,9 +68,12 @@ export function adaptHumanRigCoreToExistingRig(rigCoreInput, {
   const dna = createBodyDNA(bodyDNA);
   const bodyProfile = bodyDNAToProportionProfile(dna);
   const baseDefinition = createStandardHumanoidPreset(pose);
-  const definition = normalizeSkeletonDefinition(applyBodyProfileToDefinition(baseDefinition, bodyProfile, {
+  const profiledDefinition = applyBodyProfileToDefinition(baseDefinition, bodyProfile, {
     preservePose: false,
-  }));
+  });
+  const authoredAsymmetryApplicationCount = applyAuthoredAsymmetryToDefinition(profiledDefinition, dna);
+  if (authoredAsymmetryApplicationCount) applyPosePresetToDefinition(profiledDefinition, pose);
+  const definition = normalizeSkeletonDefinition(profiledDefinition);
   const actualParents = new Map(definition.joints.map((joint) => [joint.id, joint.parentId ?? null]));
   for (const relationship of core.topology.relationships) {
     if (!actualParents.has(relationship.jointId)) {
@@ -89,10 +93,52 @@ export function adaptHumanRigCoreToExistingRig(rigCoreInput, {
     sourceBodyDNAId: dna.bodyDNAId,
     bodyDNAFingerprint: bodyDNAFingerprint(dna),
     authoredAsymmetry: cloneValue(dna.asymmetry),
+    authoredAsymmetryApplicationCount,
+    authoredAsymmetryAuthority: 'BodyDNA -> V4Adapter RigDefinition',
     sourceRigCoreId: core.rigId,
     topologyFingerprint: core.topology.fingerprint,
     authority: 'rig-definition-v4',
   };
+}
+
+function applyAuthoredAsymmetryToDefinition(definition, bodyDNA) {
+  if (bodyDNA.asymmetry.mode !== 'authored') return 0;
+  const joints = new Map(definition.joints.map((joint) => [joint.id, joint]));
+  for (const side of ['left', 'right']) {
+    const scale = sideScales(bodyDNA, side);
+    scaleJointVectors(joints, [`${side}Shoulder`, `${side}UpperArm`], scale.shoulder);
+    scaleJointVectors(joints, [
+      `${side}LowerArm`, `${side}Hand`, `${side}UpperArmTwist`, `${side}ForearmTwist`,
+    ], scale.arm);
+    scaleJointVectors(joints, [`${side}HandEnd`, `${side}PalmGrip`], scale.hand);
+    scaleJointVectors(joints, [`${side}UpperLeg`], scale.hip);
+    scaleJointVectors(joints, [
+      `${side}LowerLeg`, `${side}Foot`, `${side}ThighTwist`, `${side}CalfTwist`,
+    ], scale.leg);
+    scaleJointVectors(joints, [
+      `${side}Toes`, `${side}ToesEnd`, `${side}HeelContact`, `${side}BallContact`,
+    ], scale.foot);
+    for (const joint of definition.joints) {
+      if (joint.side === side && joint.category === 'hand') scaleJointVector(joint, scale.hand);
+    }
+  }
+  return 1;
+}
+
+function sideScales(bodyDNA, side) {
+  return Object.fromEntries(Object.entries(bodyDNA.asymmetry.leftRightScale).map(([key, value]) => [
+    key,
+    side === 'left' ? value : 2 - value,
+  ]));
+}
+
+function scaleJointVectors(joints, jointIds, scale) {
+  for (const jointId of jointIds) scaleJointVector(joints.get(jointId), scale);
+}
+
+function scaleJointVector(joint, scale) {
+  if (!joint) return;
+  joint.localPosition = joint.localPosition.map((value) => Number(value) * scale);
 }
 
 export function adaptPoseFrameV4ToHumanCoreState(stateInput, poseFrame) {

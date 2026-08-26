@@ -10,7 +10,7 @@ import {
 import { ANATOMICAL_JUNCTION_POLICIES_V5 } from './anatomical-field-composition-v5.js';
 
 export const BODY_FIELD_DEFINITION_V5_SCHEMA = 'humanoid_rig/body_field_definition@5.0';
-export const BODY_FIELD_GENERATOR_VERSION_V5 = 'canonical-anatomical-field-v5.4.0';
+export const BODY_FIELD_GENERATOR_VERSION_V5 = 'canonical-anatomical-field-v5.5.0';
 export const BODY_FIELD_REGION_IDS_V5 = Object.freeze([
   'head', 'neck', 'upperTorso', 'lowerTorso', 'pelvis',
   'leftUpperArm', 'rightUpperArm', 'leftForearm', 'rightForearm', 'leftPalm', 'rightPalm',
@@ -193,6 +193,11 @@ function createCanonicalLayout(dna, rigCore) {
     handControlLength: limbs.handControl, thighLength: limbs.thigh, lowerLegLength: limbs.lowerLeg,
     shoulderY, torsoLength, wristY, shoulderX, hipX, handLength,
     rigLandmarks: { left: leftLandmarks, right: rightLandmarks },
+    authoredAsymmetryAuthority: {
+      source: adapted.authoredAsymmetryAuthority,
+      applicationCount: adapted.authoredAsymmetryApplicationCount,
+      regionPlacementReappliesAuthoredScale: false,
+    },
     halfSpanX: Math.max(sideSpan(leftScale), sideSpan(rightScale)),
     maxFront: Math.max(p.bodyThickness.chest, p.bodyThickness.hip) / 2 + footLength * 0.72 * maximumFootScale,
     maxBack: Math.max(p.bodyThickness.chest, p.bodyThickness.hip) / 2 + footLength * 0.28,
@@ -243,9 +248,9 @@ function createRegions(dna, layout) {
   }));
   for (const [side, sign, scaleSet] of [['left', -1, left], ['right', 1, right]]) {
     const landmarks = layout.rigLandmarks[side];
-    const shoulder = [sign * Math.abs(landmarks.shoulder[0]) * 1.035 * scaleSet.shoulder, landmarks.shoulder[1], landmarks.shoulder[2]];
-    const elbow = addScaledSegment(shoulder, landmarks.shoulder, landmarks.elbow, scaleSet.arm);
-    const wrist = addScaledSegment(elbow, landmarks.elbow, landmarks.wrist, scaleSet.arm);
+    const shoulder = [sign * Math.abs(landmarks.shoulder[0]) * 1.035, landmarks.shoulder[1], landmarks.shoulder[2]];
+    const elbow = addScaledSegment(shoulder, landmarks.shoulder, landmarks.elbow, 1);
+    const wrist = addScaledSegment(elbow, landmarks.elbow, landmarks.wrist, 1);
     add(`${side}UpperArm`, `${side}UpperArm`, side, createTaperedEllipticalCapsulePrimitive({
       id: `${side}-upper-arm-field`, region: `${side}UpperArm`, sourceJointId: `${side}UpperArm`, side,
       start: shoulder, end: elbow,
@@ -264,10 +269,19 @@ function createRegions(dna, layout) {
       id: `${side}-palm-field`, region: `${side}Palm`, sourceJointId: `${side}Hand`, side, center: palm,
       radii: palmRadii, exponent: 3.2,
     }));
-    const hip = [sign * Math.abs(landmarks.hip[0]) * scaleSet.hip, landmarks.hip[1], landmarks.hip[2]];
-    const knee = addScaledSegment(hip, landmarks.hip, landmarks.knee, scaleSet.leg);
-    const ankle = addScaledSegment(knee, landmarks.knee, landmarks.ankle, scaleSet.leg);
-    const foot = [sign * Math.abs(ankle[0]) * scaleSet.foot, layout.footHeight, ankle[2] + layout.footLength * 0.30];
+    const hip = [...landmarks.hip];
+    const knee = [...landmarks.knee];
+    const ankle = [...landmarks.ankle];
+    const footRadii = [
+      p.height * 0.045 * scaleSet.foot,
+      layout.footHeight * scaleSet.foot,
+      layout.footLength * 0.52 * scaleSet.foot,
+    ];
+    const foot = [
+      ankle[0],
+      Math.max(footRadii[1], ankle[1] - footRadii[1] * 0.72),
+      ankle[2] + layout.footLength * 0.30 * scaleSet.foot,
+    ];
     add(`${side}Thigh`, `${side}UpperLeg`, side, createTaperedEllipticalCapsulePrimitive({
       id: `${side}-thigh-field`, region: `${side}Thigh`, sourceJointId: `${side}UpperLeg`, side,
       start: hip, end: knee,
@@ -283,7 +297,7 @@ function createRegions(dna, layout) {
     }));
     add(`${side}Foot`, `${side}Foot`, side, createSuperellipsoidPrimitive({
       id: `${side}-foot-field`, region: `${side}Foot`, sourceJointId: `${side}Foot`, side, center: foot,
-      radii: [p.height * 0.045 * scaleSet.foot, layout.footHeight, layout.footLength * 0.52 * scaleSet.foot], exponent: 3.1,
+      radii: footRadii, exponent: 3.1,
     }));
   }
   return regions.sort((a, b) => BODY_FIELD_REGION_IDS_V5.indexOf(a.regionId) - BODY_FIELD_REGION_IDS_V5.indexOf(b.regionId));
