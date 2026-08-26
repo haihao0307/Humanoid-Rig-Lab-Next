@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Task 14C Template Bind Space Alignment Pilot C</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./apps/human-core-v5-template-bind-alignment-pilot/styles.css">
+  <script type="importmap">
+    {"imports":{"three":"./node_modules/three/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <main id="comparison-page">
+    <header class="pilot-header">
+      <div><b>Task 14C · Template Bind Space Alignment Pilot C</b><span id="scenario-title">Loading…</span></div>
+      <strong>EXPERIMENTAL · NOT FOR ACCEPTANCE</strong>
+    </header>
+    <section class="comparison-grid">
+      <article id="procedural-card" class="surface-card procedural-card">
+        <div class="card-heading"><b>Procedural Pose Truth</b><span>Human Core V5 · R48 · shared finalPose</span></div>
+        <div id="procedural-viewport" class="viewport"></div>
+        <div id="procedural-caption" class="card-caption"></div>
+      </article>
+      <article id="direct-card" class="surface-card direct-card">
+        <div class="card-heading"><b>Template Direct</b><span>Production Skin V4 baseline mapping</span></div>
+        <div id="direct-viewport" class="viewport"></div>
+        <div id="direct-caption" class="card-caption"></div>
+        <div class="template-badge">COMPATIBILITY TEMPLATE<br>DIRECT BASELINE<br>NOT PRODUCTION APPROVED</div>
+      </article>
+      <article id="candidate-card" class="surface-card candidate-card">
+        <div class="card-heading"><b>Template Candidate</b><span>Deterministic bind-basis adapter</span></div>
+        <div id="candidate-viewport" class="viewport"></div>
+        <div id="candidate-caption" class="card-caption"></div>
+        <div class="template-badge">EXPERIMENTAL BIND ADAPTER<br>NOT HUMAN CORE AUTHORITY<br>NOT FOR ACCEPTANCE</div>
+      </article>
+      <aside id="metrics-panel" class="metrics-panel">
+        <h2>Pose &amp; bind evidence</h2>
+        <div id="authority-summary"></div>
+        <div id="metrics-table"></div>
+        <div id="audit-checklist"></div>
+      </aside>
+    </section>
+    <div id="loading">Building deterministic bind-space comparison…</div>
+  </main>
+  <section id="contact-sheet" class="hidden"></section>
+  <script id="pilot-state" type="application/json">{"ready":false}</script>
+  <script type="module" src="./apps/human-core-v5-template-bind-alignment-pilot/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,3367 @@
+{
+  "schema": "humanoid_rig/task14c_template_bind_audit@5.0",
+  "task": "Task 14C Template Bind Space Alignment Pilot C",
+  "sourcePoseConvention": {
+    "value": "bind-relative local delta",
+    "poseFrameRotationConvention": "outgoing_bone_parent_rotation",
+    "proof": [
+      "Reference T uses identity local rotations and independent FK reproduces the canonical T bind positions.",
+      "Reference A and joint fixtures rotate canonical T bind offsets through finalPose.localRotations.",
+      "Production Skin V4 explicitly combines targetBindLocalQuaternion * finalPose local delta."
+    ]
+  },
+  "targetBindConvention": "original glTF node local TRS plus asset-prebound inverse bind matrices",
+  "sourceRig": {
+    "rigId": "human-rig-core-task14c-template-bind-pilot-reference",
+    "bindPose": "T",
+    "hierarchy": [
+      {
+        "jointId": "root",
+        "parentId": null
+      },
+      {
+        "jointId": "hips",
+        "parentId": "root"
+      },
+      {
+        "jointId": "spine",
+        "parentId": "hips"
+      },
+      {
+        "jointId": "chest",
+        "parentId": "spine"
+      },
+      {
+        "jointId": "upperChest",
+        "parentId": "chest"
+      },
+      {
+        "jointId": "neck",
+        "parentId": "upperChest"
+      },
+      {
+        "jointId": "head",
+        "parentId": "neck"
+      },
+      {
+        "jointId": "headTop",
+        "parentId": "head"
+      },
+      {
+        "jointId": "leftShoulder",
+        "parentId": "upperChest"
+      },
+      {
+        "jointId": "leftUpperArm",
+        "parentId": "leftShoulder"
+      },
+      {
+        "jointId": "leftLowerArm",
+        "parentId": "leftUpperArm"
+      },
+      {
+        "jointId": "leftHand",
+        "parentId": "leftLowerArm"
+      },
+      {
+        "jointId": "leftHandEnd",
+        "parentId": "leftHand"
+      },
+      {
+        "jointId": "rightShoulder",
+        "parentId": "upperChest"
+      },
+      {
+        "jointId": "rightUpperArm",
+        "parentId": "rightShoulder"
+      },
+      {
+        "jointId": "rightLowerArm",
+        "parentId": "rightUpperArm"
+      },
+      {
+        "jointId": "rightHand",
+        "parentId": "rightLowerArm"
+      },
+      {
+        "jointId": "rightHandEnd",
+        "parentId": "rightHand"
+      },
+      {
+        "jointId": "leftUpperLeg",
+        "parentId": "hips"
+      },
+      {
+        "jointId": "leftLowerLeg",
+        "parentId": "leftUpperLeg"
+      },
+      {
+        "jointId": "leftFoot",
+        "parentId": "leftLowerLeg"
+      },
+      {
+        "jointId": "leftToes",
+        "parentId": "leftFoot"
+      },
+      {
+        "jointId": "leftToesEnd",
+        "parentId": "leftToes"
+      },
+      {
+        "jointId": "rightUpperLeg",
+        "parentId": "hips"
+      },
+      {
+        "jointId": "rightLowerLeg",
+        "parentId": "rightUpperLeg"
+      },
+      {
+        "jointId": "rightFoot",
+        "parentId": "rightLowerLeg"
+      },
+      {
+        "jointId": "rightToes",
+        "parentId": "rightFoot"
+      },
+      {
+        "jointId": "rightToesEnd",
+        "parentId": "rightToes"
+      },
+      {
+        "jointId": "leftUpperArmTwist",
+        "parentId": "leftUpperArm"
+      },
+      {
+        "jointId": "rightUpperArmTwist",
+        "parentId": "rightUpperArm"
+      },
+      {
+        "jointId": "leftForearmTwist",
+        "parentId": "leftLowerArm"
+      },
+      {
+        "jointId": "rightForearmTwist",
+        "parentId": "rightLowerArm"
+      },
+      {
+        "jointId": "leftThighTwist",
+        "parentId": "leftUpperLeg"
+      },
+      {
+        "jointId": "rightThighTwist",
+        "parentId": "rightUpperLeg"
+      },
+      {
+        "jointId": "leftCalfTwist",
+        "parentId": "leftLowerLeg"
+      },
+      {
+        "jointId": "rightCalfTwist",
+        "parentId": "rightLowerLeg"
+      },
+      {
+        "jointId": "centerOfMass",
+        "parentId": "root"
+      },
+      {
+        "jointId": "leftHandIK",
+        "parentId": "root"
+      },
+      {
+        "jointId": "rightHandIK",
+        "parentId": "root"
+      },
+      {
+        "jointId": "leftElbowPole",
+        "parentId": "root"
+      },
+      {
+        "jointId": "rightElbowPole",
+        "parentId": "root"
+      },
+      {
+        "jointId": "leftFootIK",
+        "parentId": "root"
+      },
+      {
+        "jointId": "rightFootIK",
+        "parentId": "root"
+      },
+      {
+        "jointId": "leftKneePole",
+        "parentId": "root"
+      },
+      {
+        "jointId": "rightKneePole",
+        "parentId": "root"
+      },
+      {
+        "jointId": "leftFootRoll",
+        "parentId": "root"
+      },
+      {
+        "jointId": "rightFootRoll",
+        "parentId": "root"
+      },
+      {
+        "jointId": "gazeTarget",
+        "parentId": "root"
+      },
+      {
+        "jointId": "leftHeelContact",
+        "parentId": "leftFoot"
+      },
+      {
+        "jointId": "rightHeelContact",
+        "parentId": "rightFoot"
+      },
+      {
+        "jointId": "leftBallContact",
+        "parentId": "leftToes"
+      },
+      {
+        "jointId": "rightBallContact",
+        "parentId": "rightToes"
+      },
+      {
+        "jointId": "leftPalmGrip",
+        "parentId": "leftHandEnd"
+      },
+      {
+        "jointId": "rightPalmGrip",
+        "parentId": "rightHandEnd"
+      },
+      {
+        "jointId": "leftScapulaCorrective",
+        "parentId": "upperChest"
+      },
+      {
+        "jointId": "rightScapulaCorrective",
+        "parentId": "upperChest"
+      },
+      {
+        "jointId": "leftThumbMetacarpal",
+        "parentId": "leftHand"
+      },
+      {
+        "jointId": "leftThumbProximal",
+        "parentId": "leftThumbMetacarpal"
+      },
+      {
+        "jointId": "leftThumbDistal",
+        "parentId": "leftThumbProximal"
+      },
+      {
+        "jointId": "leftIndexProximal",
+        "parentId": "leftHand"
+      },
+      {
+        "jointId": "leftIndexIntermediate",
+        "parentId": "leftIndexProximal"
+      },
+      {
+        "jointId": "leftIndexDistal",
+        "parentId": "leftIndexIntermediate"
+      },
+      {
+        "jointId": "leftMiddleProximal",
+        "parentId": "leftHand"
+      },
+      {
+        "jointId": "leftMiddleIntermediate",
+        "parentId": "leftMiddleProximal"
+      },
+      {
+        "jointId": "leftMiddleDistal",
+        "parentId": "leftMiddleIntermediate"
+      },
+      {
+        "jointId": "leftRingProximal",
+        "parentId": "leftHand"
+      },
+      {
+        "jointId": "leftRingIntermediate",
+        "parentId": "leftRingProximal"
+      },
+      {
+        "jointId": "leftRingDistal",
+        "parentId": "leftRingIntermediate"
+      },
+      {
+        "jointId": "leftLittleProximal",
+        "parentId": "leftHand"
+      },
+      {
+        "jointId": "leftLittleIntermediate",
+        "parentId": "leftLittleProximal"
+      },
+      {
+        "jointId": "leftLittleDistal",
+        "parentId": "leftLittleIntermediate"
+      },
+      {
+        "jointId": "rightThumbMetacarpal",
+        "parentId": "rightHand"
+      },
+      {
+        "jointId": "rightThumbProximal",
+        "parentId": "rightThumbMetacarpal"
+      },
+      {
+        "jointId": "rightThumbDistal",
+        "parentId": "rightThumbProximal"
+      },
+      {
+        "jointId": "rightIndexProximal",
+        "parentId": "rightHand"
+      },
+      {
+        "jointId": "rightIndexIntermediate",
+        "parentId": "rightIndexProximal"
+      },
+      {
+        "jointId": "rightIndexDistal",
+        "parentId": "rightIndexIntermediate"
+      },
+      {
+        "jointId": "rightMiddleProximal",
+        "parentId": "rightHand"
+      },
+      {
+        "jointId": "rightMiddleIntermediate",
+        "parentId": "rightMiddleProximal"
+      },
+      {
+        "jointId": "rightMiddleDistal",
+        "parentId": "rightMiddleIntermediate"
+      },
+      {
+        "jointId": "rightRingProximal",
+        "parentId": "rightHand"
+      },
+      {
+        "jointId": "rightRingIntermediate",
+        "parentId": "rightRingProximal"
+      },
+      {
+        "jointId": "rightRingDistal",
+        "parentId": "rightRingIntermediate"
+      },
+      {
+        "jointId": "rightLittleProximal",
+        "parentId": "rightHand"
+      },
+      {
+        "jointId": "rightLittleIntermediate",
+        "parentId": "rightLittleProximal"
+      },
+      {
+        "jointId": "rightLittleDistal",
+        "parentId": "rightLittleIntermediate"
+      },
+      {
+        "jointId": "leftEye",
+        "parentId": "head"
+      },
+      {
+        "jointId": "rightEye",
+        "parentId": "head"
+      },
+      {
+        "jointId": "jaw",
+        "parentId": "head"
+      }
+    ]
+  },
+  "targetAsset": {
+    "path": "legacy/v8/assets/smpl/smpl-male-surface-skinned.glb",
+    "jointCount": 24,
+    "weightSource": "asset-prebound",
+    "inverseBindSource": "asset-prebound"
+  },
+  "adapter": {
+    "name": "TemplateBindSpaceRetargetAdapterV5",
+    "correction": "targetBindLocal * (C * sourceBindRelativeDelta * inverse(C))",
+    "correctionSetFingerprint": "hips:0.000000000000,-0.128373453831,0.695356208250,0.707106781187|leftUpperLeg:-0.000000000000,-0.000000000000,0.000000000000,1.000000000000|rightUpperLeg:-0.000000000000,0.000000000000,-0.000000000000,1.000000000000|spine:0.000000000000,0.000000000000,0.000000000000,1.000000000000|leftLowerLeg:0.000000000000,0.000000000000,0.000000000000,1.000000000000|rightLowerLeg:0.000000000000,0.000000000000,0.000000000000,1.000000000000|chest:0.000000000000,0.000000000000,0.000000000000,1.000000000000|leftFoot:0.000000000000,0.000000000000,0.000000000000,1.000000000000|rightFoot:0.000000000000,0.000000000000,0.000000000000,1.000000000000|upperChest:0.000000000000,0.000000000000,0.000000000000,1.000000000000|leftToes:0.000000000000,0.000000000000,0.000000000000,1.000000000000|rightToes:0.000000000000,0.000000000000,0.000000000000,1.000000000000|neck:0.000000000000,0.000000000000,0.000000000000,1.000000000000|leftShoulder:0.003537535913,0.002267331796,-0.035767034476,0.999351321754|rightShoulder:0.003537535913,-0.002267331796,0.035767034476,0.999351321754|head:0.000000000000,0.000000000000,0.000000000000,1.000000000000|leftUpperArm:0.000000000000,0.093563155451,0.488607589579,0.867472512157|rightUpperArm:0.000000000000,-0.093563155451,-0.488607589579,0.867472512157|leftLowerArm:0.000000000000,0.239310375820,0.516406600453,0.822225496463|rightLowerArm:0.000000000000,-0.239310375820,-0.516406600453,0.822225496463|leftHand:0.000000000000,0.211429360670,0.507430465607,0.835351391943|rightHand:0.000000000000,-0.211429360670,-0.507430465607,0.835351391943|leftHandEnd:0.000000000000,0.000000000000,0.000000000000,1.000000000000|rightHandEnd:0.000000000000,0.000000000000,0.000000000000,1.000000000000",
+    "poseSpecificOffsets": false,
+    "mutatesTargetLocalPosition": false,
+    "mutatesTargetScale": false,
+    "mutatesInverseBindMatrices": false,
+    "mutatesHumanRigCore": false
+  },
+  "identityGate": {
+    "passed": true,
+    "maximumQuaternionAngularErrorDegrees": 0,
+    "maximumPositionErrorMeters": 0,
+    "maximumScaleError": 0,
+    "thresholds": {
+      "quaternionAngularErrorDegrees": 0.01,
+      "positionErrorMeters": 1e-7,
+      "scaleError": 1e-7
+    },
+    "joints": [
+      {
+        "jointId": "hips",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "leftUpperLeg",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "rightUpperLeg",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "spine",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "leftLowerLeg",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "rightLowerLeg",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "chest",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "leftFoot",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "rightFoot",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "upperChest",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "leftToes",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "rightToes",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "neck",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "leftShoulder",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "rightShoulder",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "head",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "leftUpperArm",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "rightUpperArm",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "leftLowerArm",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "rightLowerArm",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "leftHand",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "rightHand",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "leftHandEnd",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      },
+      {
+        "jointId": "rightHandEnd",
+        "quaternionAngularErrorDegrees": 0,
+        "positionErrorMeters": 0,
+        "scaleError": 0
+      }
+    ]
+  },
+  "joints": [
+    {
+      "sourceJointId": "hips",
+      "targetJointId": "hips",
+      "sourceParentId": "root",
+      "targetParentId": null,
+      "sourceBindLocalPosition": [
+        0,
+        0,
+        0
+      ],
+      "targetBindLocalPosition": [
+        0,
+        0.925,
+        0.016
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0,
+        0.93,
+        0.016
+      ],
+      "targetBindWorldPosition": [
+        0,
+        0.925,
+        0.016
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "pelvis",
+        "twistAxisLocal": [
+          0,
+          0.983382180455892,
+          0.1815474790841647
+        ],
+        "bendAxisLocal": [
+          1,
+          0,
+          0
+        ],
+        "sideAxisLocal": [
+          0,
+          0.1815474790841647,
+          -0.983382180455892
+        ]
+      },
+      "sourceBoneLength": 0.13219682295728594,
+      "targetBoneLength": 0.1,
+      "axisBasisDifference": {
+        "degrees": 90,
+        "sourceDirection": [
+          0,
+          0.9833821803872265,
+          0.18154747945610336
+        ],
+        "targetDirection": [
+          -1,
+          0,
+          0
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        -0.12837345383073612,
+        0.6953562082498206,
+        0.7071067811865476
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -0.925000011920929,
+        -0.01600000075995922,
+        1
+      ],
+      "skinJointIndex": 0
+    },
+    {
+      "sourceJointId": "leftUpperLeg",
+      "targetJointId": "leftUpperLeg",
+      "sourceParentId": "hips",
+      "targetParentId": "hips",
+      "sourceBindLocalPosition": [
+        -0.1,
+        0,
+        0
+      ],
+      "targetBindLocalPosition": [
+        -0.1,
+        0,
+        0
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        -0.1,
+        0.93,
+        0.016
+      ],
+      "targetBindWorldPosition": [
+        -0.1,
+        0.925,
+        0.016
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "ball",
+        "twistAxisLocal": [
+          -0.02351015598927009,
+          -0.9991816285439787,
+          -0.03291421798497813
+        ],
+        "bendAxisLocal": [
+          0.9997232982821956,
+          -0.023522901006639896,
+          0
+        ],
+        "sideAxisLocal": [
+          -0.0007742380002542152,
+          -0.03290511101080414,
+          0.9994581803281645
+        ]
+      },
+      "sourceBoneLength": 0.42534809274287333,
+      "targetBoneLength": 0.4253480927428734,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          -0.02351015596546964,
+          -0.99918162853246,
+          -0.03291421835165751
+        ],
+        "targetDirection": [
+          -0.023510155965469633,
+          -0.9991816285324601,
+          -0.032914218351657504
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        -6.938893903907228e-18,
+        -5.421010862427522e-20,
+        5.204170427930421e-18,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0.10000000149011612,
+        -0.925000011920929,
+        -0.01600000075995922,
+        1
+      ],
+      "skinJointIndex": 1
+    },
+    {
+      "sourceJointId": "rightUpperLeg",
+      "targetJointId": "rightUpperLeg",
+      "sourceParentId": "hips",
+      "targetParentId": "hips",
+      "sourceBindLocalPosition": [
+        0.1,
+        0,
+        0
+      ],
+      "targetBindLocalPosition": [
+        0.1,
+        0,
+        0
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0.1,
+        0.93,
+        0.016
+      ],
+      "targetBindWorldPosition": [
+        0.1,
+        0.925,
+        0.016
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "ball",
+        "twistAxisLocal": [
+          0.02351015598927009,
+          -0.9991816285439787,
+          -0.03291421798497813
+        ],
+        "bendAxisLocal": [
+          0.9997232982821956,
+          0.023522901006639896,
+          0
+        ],
+        "sideAxisLocal": [
+          0.0007742380002542152,
+          -0.03290511101080414,
+          0.9994581803281645
+        ]
+      },
+      "sourceBoneLength": 0.42534809274287333,
+      "targetBoneLength": 0.4253480927428734,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          0.02351015596546964,
+          -0.99918162853246,
+          -0.03291421835165751
+        ],
+        "targetDirection": [
+          0.023510155965469633,
+          -0.9991816285324601,
+          -0.032914218351657504
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        -6.938893903907228e-18,
+        5.421010862427522e-20,
+        -5.204170427930421e-18,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -0.10000000149011612,
+        -0.925000011920929,
+        -0.01600000075995922,
+        1
+      ],
+      "skinJointIndex": 2
+    },
+    {
+      "sourceJointId": "spine",
+      "targetJointId": "spine",
+      "sourceParentId": "hips",
+      "targetParentId": "hips",
+      "sourceBindLocalPosition": [
+        0,
+        0.13,
+        0.024
+      ],
+      "targetBindLocalPosition": [
+        0,
+        0.13000000000000012,
+        0.024
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0,
+        1.06,
+        0.04
+      ],
+      "targetBindWorldPosition": [
+        0,
+        1.0550000000000002,
+        0.04
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "spine",
+        "twistAxisLocal": [
+          0,
+          0.9902407678311521,
+          -0.1393672189762362
+        ],
+        "bendAxisLocal": [
+          1,
+          0,
+          0
+        ],
+        "sideAxisLocal": [
+          0,
+          -0.1393672189762362,
+          -0.9902407678311521
+        ]
+      },
+      "sourceBoneLength": 0.13633048081775406,
+      "targetBoneLength": 0.13633048081775404,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          0,
+          0.9902407678035507,
+          -0.13936721917235156
+        ],
+        "targetDirection": [
+          0,
+          0.9902407678035507,
+          -0.13936721917235156
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -1.0549999475479126,
+        -0.03999999910593033,
+        1
+      ],
+      "skinJointIndex": 3
+    },
+    {
+      "sourceJointId": "leftLowerLeg",
+      "targetJointId": "leftLowerLeg",
+      "sourceParentId": "leftUpperLeg",
+      "targetParentId": "leftUpperLeg",
+      "sourceBindLocalPosition": [
+        -0.009999999999999995,
+        -0.42499999999999993,
+        -0.014
+      ],
+      "targetBindLocalPosition": [
+        -0.009999999999999995,
+        -0.42500000000000004,
+        -0.014
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        -0.11,
+        0.5050000000000001,
+        0.002
+      ],
+      "targetBindWorldPosition": [
+        -0.11,
+        0.5,
+        0.002
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "hinge",
+        "twistAxisLocal": [
+          -0.12402862896122838,
+          -0.992229029689827,
+          -0.009922289996898271
+        ],
+        "bendAxisLocal": [
+          0.992277876667514,
+          -0.12403473495843924,
+          0
+        ],
+        "sideAxisLocal": [
+          -0.0012307089998363169,
+          -0.009845668998690537,
+          0.9999507728670076
+        ]
+      },
+      "sourceBoneLength": 0.4031327324839798,
+      "targetBoneLength": 0.4031327324839798,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          -0.12402862871470495,
+          -0.9922290297176396,
+          -0.009922290297176397
+        ],
+        "targetDirection": [
+          -0.12402862871470495,
+          -0.9922290297176396,
+          -0.009922290297176397
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0.10999999940395355,
+        -0.5,
+        -0.0020000000949949026,
+        1
+      ],
+      "skinJointIndex": 4
+    },
+    {
+      "sourceJointId": "rightLowerLeg",
+      "targetJointId": "rightLowerLeg",
+      "sourceParentId": "rightUpperLeg",
+      "targetParentId": "rightUpperLeg",
+      "sourceBindLocalPosition": [
+        0.009999999999999995,
+        -0.42499999999999993,
+        -0.014
+      ],
+      "targetBindLocalPosition": [
+        0.009999999999999995,
+        -0.42500000000000004,
+        -0.014
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0.11,
+        0.5050000000000001,
+        0.002
+      ],
+      "targetBindWorldPosition": [
+        0.11,
+        0.5,
+        0.002
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "hinge",
+        "twistAxisLocal": [
+          0.12402862896122838,
+          -0.992229029689827,
+          -0.009922289996898271
+        ],
+        "bendAxisLocal": [
+          0.992277876667514,
+          0.12403473495843924,
+          0
+        ],
+        "sideAxisLocal": [
+          0.0012307089998363169,
+          -0.009845668998690537,
+          0.9999507728670076
+        ]
+      },
+      "sourceBoneLength": 0.4031327324839798,
+      "targetBoneLength": 0.4031327324839798,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          0.12402862871470495,
+          -0.9922290297176396,
+          -0.009922290297176397
+        ],
+        "targetDirection": [
+          0.12402862871470495,
+          -0.9922290297176396,
+          -0.009922290297176397
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -0.10999999940395355,
+        -0.5,
+        -0.0020000000949949026,
+        1
+      ],
+      "skinJointIndex": 5
+    },
+    {
+      "sourceJointId": "chest",
+      "targetJointId": "chest",
+      "sourceParentId": "spine",
+      "targetParentId": "spine",
+      "sourceBindLocalPosition": [
+        0,
+        0.135,
+        -0.019
+      ],
+      "targetBindLocalPosition": [
+        0,
+        0.135,
+        -0.019
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0,
+        1.195,
+        0.021
+      ],
+      "targetBindWorldPosition": [
+        0,
+        1.1900000000000002,
+        0.021
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "spine",
+        "twistAxisLocal": [
+          0,
+          0.9915239774692823,
+          -0.12992383193045767
+        ],
+        "bendAxisLocal": [
+          1,
+          0,
+          0
+        ],
+        "sideAxisLocal": [
+          0,
+          -0.12992383193045767,
+          -0.9915239774692823
+        ]
+      },
+      "sourceBoneLength": 0.14623952953972466,
+      "targetBoneLength": 0.14623952953972466,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          0,
+          0.9915239775208117,
+          -0.1299238315372098
+        ],
+        "targetDirection": [
+          0,
+          0.9915239775208117,
+          -0.1299238315372098
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -1.190000057220459,
+        -0.020999999716877937,
+        1
+      ],
+      "skinJointIndex": 6
+    },
+    {
+      "sourceJointId": "leftFoot",
+      "targetJointId": "leftFoot",
+      "sourceParentId": "leftLowerLeg",
+      "targetParentId": "leftLowerLeg",
+      "sourceBindLocalPosition": [
+        -0.05,
+        -0.4,
+        -0.004
+      ],
+      "targetBindLocalPosition": [
+        -0.05,
+        -0.4,
+        -0.004
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        -0.16,
+        0.1050000000000001,
+        -0.002
+      ],
+      "targetBindWorldPosition": [
+        -0.16,
+        0.09999999999999998,
+        -0.002
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "ankle",
+        "twistAxisLocal": [
+          -0.11497706904062847,
+          -0.4670943411650532,
+          0.876700148309792
+        ],
+        "bendAxisLocal": [
+          0.9710148789669015,
+          -0.2390190469918527,
+          0
+        ],
+        "sideAxisLocal": [
+          0.20954803403098984,
+          0.8512888881258963,
+          0.48103726507114014
+        ]
+      },
+      "sourceBoneLength": 0.13915818337417316,
+      "targetBoneLength": 0.13915818337417316,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          -0.11497706862828652,
+          -0.4670943413024144,
+          0.8767001482906854
+        ],
+        "targetDirection": [
+          -0.11497706862828652,
+          -0.4670943413024144,
+          0.8767001482906854
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0.1599999964237213,
+        -0.10000000149011612,
+        0.0020000000949949026,
+        1
+      ],
+      "skinJointIndex": 7
+    },
+    {
+      "sourceJointId": "rightFoot",
+      "targetJointId": "rightFoot",
+      "sourceParentId": "rightLowerLeg",
+      "targetParentId": "rightLowerLeg",
+      "sourceBindLocalPosition": [
+        0.05,
+        -0.4,
+        -0.004
+      ],
+      "targetBindLocalPosition": [
+        0.05,
+        -0.4,
+        -0.004
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0.16,
+        0.1050000000000001,
+        -0.002
+      ],
+      "targetBindWorldPosition": [
+        0.16,
+        0.09999999999999998,
+        -0.002
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "ankle",
+        "twistAxisLocal": [
+          0.11497706904062847,
+          -0.4670943411650532,
+          0.876700148309792
+        ],
+        "bendAxisLocal": [
+          0.9710148789669015,
+          0.2390190469918527,
+          0
+        ],
+        "sideAxisLocal": [
+          -0.20954803403098984,
+          0.8512888881258963,
+          0.48103726507114014
+        ]
+      },
+      "sourceBoneLength": 0.13915818337417316,
+      "targetBoneLength": 0.13915818337417316,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          0.11497706862828652,
+          -0.4670943413024144,
+          0.8767001482906854
+        ],
+        "targetDirection": [
+          0.11497706862828652,
+          -0.4670943413024144,
+          0.8767001482906854
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -0.1599999964237213,
+        -0.10000000149011612,
+        0.0020000000949949026,
+        1
+      ],
+      "skinJointIndex": 8
+    },
+    {
+      "sourceJointId": "upperChest",
+      "targetJointId": "upperChest",
+      "sourceParentId": "chest",
+      "targetParentId": "chest",
+      "sourceBindLocalPosition": [
+        0,
+        0.14500000000000002,
+        -0.019
+      ],
+      "targetBindLocalPosition": [
+        0,
+        0.14500000000000002,
+        -0.019
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0,
+        1.34,
+        0.0020000000000000018
+      ],
+      "targetBindWorldPosition": [
+        0,
+        1.3350000000000002,
+        0.0020000000000000018
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "spine",
+        "twistAxisLocal": [
+          0,
+          0.9970165267504175,
+          -0.07718837598067749
+        ],
+        "bendAxisLocal": [
+          1,
+          0,
+          0
+        ],
+        "sideAxisLocal": [
+          0,
+          -0.07718837598067749,
+          -0.9970165267504175
+        ]
+      },
+      "sourceBoneLength": 0.15546382215808285,
+      "targetBoneLength": 0.15546382215808283,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          0,
+          0.9970165267285712,
+          -0.07718837626285711
+        ],
+        "targetDirection": [
+          0,
+          0.9970165267285712,
+          -0.07718837626285711
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -1.3350000381469727,
+        -0.0020000000949949026,
+        1
+      ],
+      "skinJointIndex": 9
+    },
+    {
+      "sourceJointId": "leftToes",
+      "targetJointId": "leftToes",
+      "sourceParentId": "leftFoot",
+      "targetParentId": "leftFoot",
+      "sourceBindLocalPosition": [
+        -0.015999999999999986,
+        -0.065,
+        0.122
+      ],
+      "targetBindLocalPosition": [
+        -0.015999999999999986,
+        -0.065,
+        0.122
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        -0.176,
+        0.04000000000000009,
+        0.12
+      ],
+      "targetBindWorldPosition": [
+        -0.176,
+        0.034999999999999976,
+        0.12
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "toe",
+        "twistAxisLocal": [
+          0,
+          -0.19611613494587632,
+          0.9805806757293816
+        ],
+        "bendAxisLocal": [
+          1,
+          0,
+          0
+        ],
+        "sideAxisLocal": [
+          0,
+          0.9805806757293816,
+          0.19611613494587632
+        ]
+      },
+      "sourceBoneLength": 0.07648529270389179,
+      "targetBoneLength": 0,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": null,
+        "targetDirection": null
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-terminal-no-primary-axis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0.17599999904632568,
+        -0.03500000014901161,
+        -0.11999999731779099,
+        1
+      ],
+      "skinJointIndex": 10
+    },
+    {
+      "sourceJointId": "rightToes",
+      "targetJointId": "rightToes",
+      "sourceParentId": "rightFoot",
+      "targetParentId": "rightFoot",
+      "sourceBindLocalPosition": [
+        0.015999999999999986,
+        -0.065,
+        0.122
+      ],
+      "targetBindLocalPosition": [
+        0.015999999999999986,
+        -0.065,
+        0.122
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0.176,
+        0.04000000000000009,
+        0.12
+      ],
+      "targetBindWorldPosition": [
+        0.176,
+        0.034999999999999976,
+        0.12
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "toe",
+        "twistAxisLocal": [
+          0,
+          -0.19611613494587632,
+          0.9805806757293816
+        ],
+        "bendAxisLocal": [
+          1,
+          0,
+          0
+        ],
+        "sideAxisLocal": [
+          0,
+          0.9805806757293816,
+          0.19611613494587632
+        ]
+      },
+      "sourceBoneLength": 0.07648529270389179,
+      "targetBoneLength": 0,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": null,
+        "targetDirection": null
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-terminal-no-primary-axis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -0.17599999904632568,
+        -0.03500000014901161,
+        -0.11999999731779099,
+        1
+      ],
+      "skinJointIndex": 11
+    },
+    {
+      "sourceJointId": "neck",
+      "targetJointId": "neck",
+      "sourceParentId": "upperChest",
+      "targetParentId": "upperChest",
+      "sourceBindLocalPosition": [
+        0,
+        0.15500000000000003,
+        -0.012
+      ],
+      "targetBindLocalPosition": [
+        0,
+        0.15500000000000003,
+        -0.012
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0,
+        1.495,
+        -0.009999999999999998
+      ],
+      "targetBindWorldPosition": [
+        0,
+        1.4900000000000002,
+        -0.009999999999999998
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "neck",
+        "twistAxisLocal": [
+          0,
+          0.9070089679666898,
+          0.42111130598453456
+        ],
+        "bendAxisLocal": [
+          1,
+          0,
+          0
+        ],
+        "sideAxisLocal": [
+          0,
+          0.42111130598453456,
+          -0.9070089679666898
+        ]
+      },
+      "sourceBoneLength": 0.1543534904043314,
+      "targetBoneLength": 0.15435349040433144,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": [
+          0,
+          0.9070089677484318,
+          0.42111130645462863
+        ],
+        "targetDirection": [
+          0,
+          0.9070089677484318,
+          0.42111130645462863
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -1.4900000095367432,
+        0.009999999776482582,
+        1
+      ],
+      "skinJointIndex": 12
+    },
+    {
+      "sourceJointId": "leftShoulder",
+      "targetJointId": "leftShoulder",
+      "sourceParentId": "upperChest",
+      "targetParentId": "upperChest",
+      "sourceBindLocalPosition": [
+        -0.105,
+        0.061481704595757636,
+        0.012
+      ],
+      "targetBindLocalPosition": [
+        -0.1,
+        0.07000000000000006,
+        -0.007
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        -0.105,
+        1.4014817045957577,
+        0.014000000000000002
+      ],
+      "targetBindWorldPosition": [
+        -0.1,
+        1.4050000000000002,
+        -0.004999999999999998
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "clavicle",
+        "twistAxisLocal": [
+          -0.8550542819846204,
+          -0.5052593479909121,
+          -0.11659831099790277
+        ],
+        "bendAxisLocal": [
+          0.508729312126641,
+          -0.8609265282143155,
+          0
+        ],
+        "sideAxisLocal": [
+          -0.10038257899543805,
+          -0.0593169789973043,
+          0.9931791549548643
+        ]
+      },
+      "sourceBoneLength": 0.12864680330268605,
+      "targetBoneLength": 0.12864680330268605,
+      "axisBasisDifference": {
+        "degrees": 4.127677633514889,
+        "sourceDirection": [
+          -0.8161881780532952,
+          -0.5658990120532994,
+          -0.11659831115047074
+        ],
+        "targetDirection": [
+          -0.8550542817701191,
+          -0.5052593483187063,
+          -0.11659831115047077
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0.003537535912684826,
+        0.002267331796003388,
+        -0.0357670344757034,
+        0.9993513217537702
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0.10000000149011612,
+        -1.4049999713897705,
+        0.004999999888241291,
+        1
+      ],
+      "skinJointIndex": 13
+    },
+    {
+      "sourceJointId": "rightShoulder",
+      "targetJointId": "rightShoulder",
+      "sourceParentId": "upperChest",
+      "targetParentId": "upperChest",
+      "sourceBindLocalPosition": [
+        0.105,
+        0.061481704595757636,
+        0.012
+      ],
+      "targetBindLocalPosition": [
+        0.1,
+        0.07000000000000006,
+        -0.007
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0.105,
+        1.4014817045957577,
+        0.014000000000000002
+      ],
+      "targetBindWorldPosition": [
+        0.1,
+        1.4050000000000002,
+        -0.004999999999999998
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "clavicle",
+        "twistAxisLocal": [
+          0.8550542819846204,
+          -0.5052593479909121,
+          -0.11659831099790277
+        ],
+        "bendAxisLocal": [
+          0.508729312126641,
+          0.8609265282143155,
+          0
+        ],
+        "sideAxisLocal": [
+          0.10038257899543805,
+          -0.0593169789973043,
+          0.9931791549548643
+        ]
+      },
+      "sourceBoneLength": 0.12864680330268605,
+      "targetBoneLength": 0.12864680330268605,
+      "axisBasisDifference": {
+        "degrees": 4.127677633514889,
+        "sourceDirection": [
+          0.8161881780532952,
+          -0.5658990120532994,
+          -0.11659831115047074
+        ],
+        "targetDirection": [
+          0.8550542817701191,
+          -0.5052593483187063,
+          -0.11659831115047077
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0.003537535912684826,
+        -0.002267331796003388,
+        0.0357670344757034,
+        0.9993513217537702
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -0.10000000149011612,
+        -1.4049999713897705,
+        0.004999999888241291,
+        1
+      ],
+      "skinJointIndex": 14
+    },
+    {
+      "sourceJointId": "head",
+      "targetJointId": "head",
+      "sourceParentId": "neck",
+      "targetParentId": "neck",
+      "sourceBindLocalPosition": [
+        0,
+        0.14000000000000012,
+        0.065
+      ],
+      "targetBindLocalPosition": [
+        0,
+        0.14000000000000012,
+        0.065
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0,
+        1.6350000000000002,
+        0.05500000000000001
+      ],
+      "targetBindWorldPosition": [
+        0,
+        1.6300000000000003,
+        0.05500000000000001
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "neck",
+        "twistAxisLocal": [
+          0,
+          0.9981832840582182,
+          -0.060250572003514066
+        ],
+        "bendAxisLocal": [
+          1,
+          0,
+          0
+        ],
+        "sideAxisLocal": [
+          0,
+          -0.060250572003514066,
+          -0.9981832840582182
+        ]
+      },
+      "sourceBoneLength": 0.1659735267565283,
+      "targetBoneLength": 0,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": null,
+        "targetDirection": null
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-terminal-no-primary-axis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -1.6299999952316284,
+        -0.054999999701976776,
+        1
+      ],
+      "skinJointIndex": 15
+    },
+    {
+      "sourceJointId": "leftUpperArm",
+      "targetJointId": "leftUpperArm",
+      "sourceParentId": "leftShoulder",
+      "targetParentId": "leftShoulder",
+      "sourceBindLocalPosition": [
+        -0.10499999999999997,
+        -0.07280109889280517,
+        -0.014999999999999996
+      ],
+      "targetBindLocalPosition": [
+        -0.11000000000000001,
+        -0.06499999999999995,
+        -0.015
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        -0.20999999999999996,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "targetBindWorldPosition": [
+        -0.21000000000000002,
+        1.3400000000000003,
+        -0.019999999999999997
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "ball",
+        "twistAxisLocal": [
+          -0.505017119086682,
+          -0.8477073061455019,
+          0.16232693102786208
+        ],
+        "bendAxisLocal": [
+          0.8591015439742421,
+          -0.5118051749846548,
+          0
+        ],
+        "sideAxisLocal": [
+          0.08307976296650217,
+          0.1394553169437715,
+          0.9867370306021468
+        ]
+      },
+      "sourceBoneLength": 0.27721832551258224,
+      "targetBoneLength": 0.27721832551258213,
+      "axisBasisDifference": {
+        "degrees": 59.66751125308557,
+        "sourceDirection": [
+          -1,
+          0,
+          0
+        ],
+        "targetDirection": [
+          -0.5050171186956608,
+          -0.8477073063820015,
+          0.16232693100931953
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0.09356315545129137,
+        0.48860758957896583,
+        0.8674725121569158
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0.20999999344348907,
+        -1.340000033378601,
+        0.019999999552965164,
+        1
+      ],
+      "skinJointIndex": 16
+    },
+    {
+      "sourceJointId": "rightUpperArm",
+      "targetJointId": "rightUpperArm",
+      "sourceParentId": "rightShoulder",
+      "targetParentId": "rightShoulder",
+      "sourceBindLocalPosition": [
+        0.10499999999999997,
+        -0.07280109889280517,
+        -0.014999999999999996
+      ],
+      "targetBindLocalPosition": [
+        0.11000000000000001,
+        -0.06499999999999995,
+        -0.015
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0.20999999999999996,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "targetBindWorldPosition": [
+        0.21000000000000002,
+        1.3400000000000003,
+        -0.019999999999999997
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "ball",
+        "twistAxisLocal": [
+          0.505017119086682,
+          -0.8477073061455019,
+          0.16232693102786208
+        ],
+        "bendAxisLocal": [
+          0.8591015439742421,
+          0.5118051749846548,
+          0
+        ],
+        "sideAxisLocal": [
+          -0.08307976296650217,
+          0.1394553169437715,
+          0.9867370306021468
+        ]
+      },
+      "sourceBoneLength": 0.27721832551258224,
+      "targetBoneLength": 0.27721832551258213,
+      "axisBasisDifference": {
+        "degrees": 59.66751125308557,
+        "sourceDirection": [
+          1,
+          0,
+          0
+        ],
+        "targetDirection": [
+          0.5050171186956608,
+          -0.8477073063820015,
+          0.16232693100931953
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        -0.09356315545129137,
+        -0.48860758957896583,
+        0.8674725121569158
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -0.20999999344348907,
+        -1.340000033378601,
+        0.019999999552965164,
+        1
+      ],
+      "skinJointIndex": 17
+    },
+    {
+      "sourceJointId": "leftLowerArm",
+      "targetJointId": "leftLowerArm",
+      "sourceParentId": "leftUpperArm",
+      "targetParentId": "leftUpperArm",
+      "sourceBindLocalPosition": [
+        -0.27721832551258224,
+        0,
+        0
+      ],
+      "targetBindLocalPosition": [
+        -0.14,
+        -0.23499999999999988,
+        0.045
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        -0.4872183255125822,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "targetBindWorldPosition": [
+        -0.35000000000000003,
+        1.1050000000000004,
+        0.025
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "hinge",
+        "twistAxisLocal": [
+          -0.3521095339875526,
+          -0.84920534696998,
+          0.3935341849860882
+        ],
+        "bendAxisLocal": [
+          0.9237421135284853,
+          -0.38301502280449395,
+          0
+        ],
+        "sideAxisLocal": [
+          0.15072950501493615,
+          0.3635241000360225,
+          0.9193099830910966
+        ]
+      },
+      "sourceBoneLength": 0.2414021540914662,
+      "targetBoneLength": 0.2414021540914662,
+      "axisBasisDifference": {
+        "degrees": 69.38360195788613,
+        "sourceDirection": [
+          -0.9999999999999999,
+          0,
+          0
+        ],
+        "targetDirection": [
+          -0.3521095340673468,
+          -0.8492053468683065,
+          0.3935341851340934
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0.23931037581966236,
+        0.5164066004529555,
+        0.8222254964629068
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0.3499999940395355,
+        -1.1050000190734863,
+        -0.02500000037252903,
+        1
+      ],
+      "skinJointIndex": 18
+    },
+    {
+      "sourceJointId": "rightLowerArm",
+      "targetJointId": "rightLowerArm",
+      "sourceParentId": "rightUpperArm",
+      "targetParentId": "rightUpperArm",
+      "sourceBindLocalPosition": [
+        0.27721832551258224,
+        0,
+        0
+      ],
+      "targetBindLocalPosition": [
+        0.14,
+        -0.23499999999999988,
+        0.045
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0.4872183255125822,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "targetBindWorldPosition": [
+        0.35000000000000003,
+        1.1050000000000004,
+        0.025
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "hinge",
+        "twistAxisLocal": [
+          0.3521095339875526,
+          -0.84920534696998,
+          0.3935341849860882
+        ],
+        "bendAxisLocal": [
+          0.9237421135284853,
+          0.38301502280449395,
+          0
+        ],
+        "sideAxisLocal": [
+          -0.15072950501493615,
+          0.3635241000360225,
+          0.9193099830910966
+        ]
+      },
+      "sourceBoneLength": 0.2414021540914662,
+      "targetBoneLength": 0.2414021540914662,
+      "axisBasisDifference": {
+        "degrees": 69.38360195788613,
+        "sourceDirection": [
+          0.9999999999999999,
+          0,
+          0
+        ],
+        "targetDirection": [
+          0.3521095340673468,
+          -0.8492053468683065,
+          0.3935341851340934
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        -0.23931037581966236,
+        -0.5164066004529555,
+        0.8222254964629068
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -0.3499999940395355,
+        -1.1050000190734863,
+        -0.02500000037252903,
+        1
+      ],
+      "skinJointIndex": 19
+    },
+    {
+      "sourceJointId": "leftHand",
+      "targetJointId": "leftHand",
+      "sourceParentId": "leftLowerArm",
+      "targetParentId": "leftLowerArm",
+      "sourceBindLocalPosition": [
+        -0.2414021540914662,
+        0,
+        0
+      ],
+      "targetBindLocalPosition": [
+        -0.08500000000000002,
+        -0.20499999999999996,
+        0.095
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        -0.7286204796040484,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "targetBindWorldPosition": [
+        -0.43500000000000005,
+        0.9000000000000005,
+        0.12
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "wrist",
+        "twistAxisLocal": [
+          -0.39562389590990127,
+          -0.8477654918069313,
+          0.35323562091955474
+        ],
+        "bendAxisLocal": [
+          0.9061831401230026,
+          -0.4228854650574012,
+          0
+        ],
+        "sideAxisLocal": [
+          0.14937821004905705,
+          0.3200961651051222,
+          0.9355343903072372
+        ]
+      },
+      "sourceBoneLength": 0.070774289116882,
+      "targetBoneLength": 0.07077428911688195,
+      "axisBasisDifference": {
+        "degrees": 66.69510946079686,
+        "sourceDirection": [
+          -1,
+          0,
+          0
+        ],
+        "targetDirection": [
+          -0.39562389604166465,
+          -0.8477654915178513,
+          0.35323562146577164
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0.2114293606695422,
+        0.507430465606901,
+        0.8353513919428353
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0.4350000023841858,
+        -0.8999999761581421,
+        -0.11999999731779099,
+        1
+      ],
+      "skinJointIndex": 20
+    },
+    {
+      "sourceJointId": "rightHand",
+      "targetJointId": "rightHand",
+      "sourceParentId": "rightLowerArm",
+      "targetParentId": "rightLowerArm",
+      "sourceBindLocalPosition": [
+        0.2414021540914662,
+        0,
+        0
+      ],
+      "targetBindLocalPosition": [
+        0.08500000000000002,
+        -0.20499999999999996,
+        0.095
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0.7286204796040484,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "targetBindWorldPosition": [
+        0.43500000000000005,
+        0.9000000000000005,
+        0.12
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "wrist",
+        "twistAxisLocal": [
+          0.39562389590990127,
+          -0.8477654918069313,
+          0.35323562091955474
+        ],
+        "bendAxisLocal": [
+          0.9061831401230026,
+          0.4228854650574012,
+          0
+        ],
+        "sideAxisLocal": [
+          -0.14937821004905705,
+          0.3200961651051222,
+          0.9355343903072372
+        ]
+      },
+      "sourceBoneLength": 0.070774289116882,
+      "targetBoneLength": 0.07077428911688195,
+      "axisBasisDifference": {
+        "degrees": 66.69510946079686,
+        "sourceDirection": [
+          1,
+          0,
+          0
+        ],
+        "targetDirection": [
+          0.39562389604166465,
+          -0.8477654915178513,
+          0.35323562146577164
+        ]
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        -0.2114293606695422,
+        -0.507430465606901,
+        0.8353513919428353
+      ],
+      "mappingStatus": "mapped-primary-axis-basis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -0.4350000023841858,
+        -0.8999999761581421,
+        -0.11999999731779099,
+        1
+      ],
+      "skinJointIndex": 21
+    },
+    {
+      "sourceJointId": "leftHandEnd",
+      "targetJointId": "leftHandEnd",
+      "sourceParentId": "leftHand",
+      "targetParentId": "leftHand",
+      "sourceBindLocalPosition": [
+        -0.070774289116882,
+        0,
+        0
+      ],
+      "targetBindLocalPosition": [
+        -0.028000000000000025,
+        -0.05999999999999994,
+        0.024999999999999994
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        -0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "targetBindWorldPosition": [
+        -0.4630000000000001,
+        0.8400000000000005,
+        0.145
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "endpoint",
+        "twistAxisLocal": [
+          -0.37628834695520885,
+          -0.37628834695520885,
+          0.84664878189922
+        ],
+        "bendAxisLocal": [
+          0.7071067811865475,
+          -0.7071067811865475,
+          0
+        ],
+        "sideAxisLocal": [
+          0.5986710948555584,
+          0.5986710948555584,
+          0.5321520838716074
+        ]
+      },
+      "sourceBoneLength": 0.021260291625469305,
+      "targetBoneLength": 0,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": null,
+        "targetDirection": null
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-terminal-no-primary-axis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0.46299999952316284,
+        -0.8399999737739563,
+        -0.14499999582767487,
+        1
+      ],
+      "skinJointIndex": 22
+    },
+    {
+      "sourceJointId": "rightHandEnd",
+      "targetJointId": "rightHandEnd",
+      "sourceParentId": "rightHand",
+      "targetParentId": "rightHand",
+      "sourceBindLocalPosition": [
+        0.070774289116882,
+        0,
+        0
+      ],
+      "targetBindLocalPosition": [
+        0.028000000000000025,
+        -0.05999999999999994,
+        0.024999999999999994
+      ],
+      "sourceBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindLocalScale": [
+        1,
+        1,
+        1
+      ],
+      "sourceBindWorldPosition": [
+        0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "targetBindWorldPosition": [
+        0.4630000000000001,
+        0.8400000000000005,
+        0.145
+      ],
+      "sourceBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "targetBindWorldQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "sourceJointAxisDeclaration": {
+        "schema": "humanoid_rig/joint_axes@1.0",
+        "space": "joint-local-at-bind",
+        "handedness": "right",
+        "quaternionOrder": "xyzw",
+        "source": "bind-direction-derived",
+        "jointType": "endpoint",
+        "twistAxisLocal": [
+          0.37628834695520885,
+          -0.37628834695520885,
+          0.84664878189922
+        ],
+        "bendAxisLocal": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ],
+        "sideAxisLocal": [
+          -0.5986710948555584,
+          0.5986710948555584,
+          0.5321520838716074
+        ]
+      },
+      "sourceBoneLength": 0.021260291625469305,
+      "targetBoneLength": 0,
+      "axisBasisDifference": {
+        "degrees": 0,
+        "sourceDirection": null,
+        "targetDirection": null
+      },
+      "candidateCorrectionQuaternion": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "mappingStatus": "mapped-terminal-no-primary-axis",
+      "inverseBindMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -0.46299999952316284,
+        -0.8399999737739563,
+        -0.14499999582767487,
+        1
+      ],
+      "skinJointIndex": 23
+    }
+  ]
+}

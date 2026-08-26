@@ -1,0 +1,45 @@
+:root { color-scheme: dark; font-family: Inter, "Microsoft YaHei", sans-serif; background: #03070d; color: #eaf4fc; }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; background: #03070d; }
+.hidden { display: none !important; }
+#comparison-page { position: relative; width: 2400px; min-height: 940px; padding: 18px; }
+.pilot-header { height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; border: 1px solid #25394c; background: #08111b; }
+.pilot-header div { display: grid; gap: 5px; }
+.pilot-header b { color: #f1c06b; font-size: 21px; }
+.pilot-header span { color: #9bb5ca; font-size: 13px; }
+.pilot-header strong { color: #ffbd63; border: 1px solid #a9661c; padding: 10px 14px; font-size: 13px; letter-spacing: .08em; }
+.comparison-grid { display: grid; grid-template-columns: 600px 600px 600px 534px; gap: 10px; margin-top: 10px; }
+.surface-card { position: relative; height: 830px; overflow: hidden; border: 1px solid #293e50; background: #07101a; }
+.card-heading { height: 62px; padding: 12px 16px; display: grid; gap: 3px; background: #0c1723; border-bottom: 1px solid #263c50; }
+.card-heading b { color: #f1c06b; font-size: 17px; }
+.direct-card .card-heading b { color: #cbd7e0; }
+.candidate-card .card-heading b { color: #8ee2bf; }
+.card-heading span { color: #8da7bd; font-size: 12px; }
+.viewport { width: 598px; height: 718px; background: radial-gradient(circle at 50% 42%, #24303b 0%, #091018 56%, #02050a 100%); }
+.viewport canvas { display: block; width: 598px; height: 718px; }
+.card-caption { position: absolute; left: 14px; bottom: 14px; padding: 8px 11px; background: #06101bdc; border-left: 3px solid #e5aa4d; font-size: 12px; color: #bcd1e2; }
+.template-badge { position: absolute; right: 12px; top: 76px; padding: 9px 11px; text-align: right; color: #ffd18d; background: #321e08e8; border: 1px solid #bd7727; font-size: 10px; line-height: 1.45; font-weight: 900; letter-spacing: .05em; }
+.candidate-card .template-badge { color: #aef5d6; background: #082b22e8; border-color: #2d9b77; }
+.template-badge.failed { color: #ffb8b8; background: #3a0909eb; border-color: #f05959; }
+.metrics-panel { height: 830px; overflow: hidden; padding: 16px; border: 1px solid #293e50; background: #07101a; }
+.metrics-panel h2 { margin: 0 0 12px; color: #f1c06b; font-size: 18px; }
+.authority-box { padding: 11px; background: #0c1723; border: 1px solid #263c50; font-size: 12px; line-height: 1.55; color: #bdd1e1; }
+.authority-box b { color: #8ee2bf; }
+.metric-group { margin-top: 12px; }
+.metric-group h3 { margin: 0 0 6px; color: #9cb9d0; font-size: 13px; }
+.metric-grid { display: grid; grid-template-columns: 1.3fr .8fr .8fr .8fr; font-size: 10px; border-top: 1px solid #24394c; border-left: 1px solid #24394c; }
+.metric-grid div { padding: 6px 7px; border-right: 1px solid #24394c; border-bottom: 1px solid #24394c; }
+.metric-grid .label { color: #819caf; }
+.checklist { margin-top: 12px; padding: 10px; background: #0b1520; font-size: 11px; color: #a9c0d1; line-height: 1.55; }
+.checklist b { color: #f1c06b; }
+#loading { position: absolute; inset: 100px 18px 18px; display: grid; place-items: center; z-index: 30; background: #02050aed; color: #a8d4f6; font-weight: 800; letter-spacing: .06em; }
+#contact-sheet { width: 1920px; min-height: 100%; padding: 16px; background: #03070d; }
+.contact-heading { margin: 0 0 6px; color: #f1c06b; font-size: 24px; }
+.contact-subtitle { margin: 0 0 10px; color: #91a9bc; font-size: 12px; }
+.contact-grid { display: grid; grid-template-columns: 360px 360px 360px 350px 430px; gap: 5px; }
+.contact-title { padding: 7px 10px; background: #0d1925; color: #bad0e1; font-size: 12px; font-weight: 900; }
+.contact-cell { height: 180px; overflow: hidden; border: 1px solid #22384b; background: #07101a; }
+.contact-cell img { display: block; width: 100%; height: 180px; object-fit: contain; }
+.contact-summary, .contact-observation { padding: 9px; font-size: 11px; line-height: 1.38; color: #bfd2e1; }
+.contact-summary b, .contact-observation b { color: #f1c06b; }
+.contact-summary code { color: #8ee2bf; }
