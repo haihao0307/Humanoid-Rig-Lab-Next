@@ -71,5 +71,24 @@ const adjacentFixture = findSurfaceSelfIntersectionsV5({
 });
 assert.equal(adjacentFixture.selfIntersectionPairCount, 0, 'Triangles sharing an edge must be excluded from self-intersection results.');
 
+const isolatedPointContact = findSurfaceSelfIntersectionsV5({
+  positions: new Float32Array([
+    -1, -1, 0,
+     1, -1, 0,
+     0,  1, 0,
+     0,  0.9999997, -1,
+     0,  0.9999997,  1,
+     0,  3,  1,
+  ]),
+  indices: new Uint32Array([0, 1, 2, 3, 4, 5]),
+});
+assert.equal(isolatedPointContact.rawContactCount, 1, 'A strict raw point contact must remain available for truth auditing.');
+assert.equal(isolatedPointContact.penetratingIntersectionCount, 0, 'An isolated point contact must not be classified as penetrating.');
+assert.equal(isolatedPointContact.classifiedContacts[0].intersectionType, 'numeric-uncertainty');
+
+assert.equal(crossingFixture.rawContactCount, 1);
+assert.equal(crossingFixture.penetratingIntersectionCount, 1);
+assert.equal(crossingFixture.classifiedContacts[0].intersectionType, 'penetrating');
+
 console.log(JSON.stringify(results));
 console.log('Human Core V5 procedural self-intersection: key poses and deterministic broad/narrow phase gates passed.');

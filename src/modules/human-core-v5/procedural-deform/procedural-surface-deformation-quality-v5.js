@@ -70,7 +70,7 @@ export function analyzeProceduralSurfaceDeformationQualityV5({
   const edgeQuality = analyzeAdjacentFaces(indices, canonicalFaceNormals, deformedFaceNormals, evaluableTriangles);
   const intersections = detectSelfIntersections
     ? findSurfaceSelfIntersectionsV5({ positions: deformedPositions, indices, regionIds, regionNames })
-    : { selfIntersectionPairCount: 0, criticalRegionSelfIntersectionCount: 0, broadPhasePairCount: 0, pairs: [] };
+    : { selfIntersectionPairCount: 0, criticalRegionSelfIntersectionCount: 0, rawContactCount: 0, penetratingIntersectionCount: 0, criticalPenetratingCount: 0, broadPhasePairCount: 0, pairs: [], classifiedContacts: [] };
   return {
     triangleFlipCount,
     triangleAreaRatioMinimum: evaluableTriangleCount ? triangleAreaRatioMinimum : 0,
@@ -86,9 +86,13 @@ export function analyzeProceduralSurfaceDeformationQualityV5({
     localFoldoverPairs: edgeQuality.localFoldoverPairs,
     selfIntersectionPairCount: intersections.selfIntersectionPairCount,
     criticalRegionSelfIntersectionCount: intersections.criticalRegionSelfIntersectionCount,
+    rawContactCount: intersections.rawContactCount,
+    penetratingIntersectionCount: intersections.penetratingIntersectionCount,
+    criticalPenetratingCount: intersections.criticalPenetratingCount,
     normalDiscontinuityP95: edgeQuality.normalDiscontinuityP95,
     broadPhasePairCount: intersections.broadPhasePairCount,
     intersectingPairs: intersections.pairs,
+    classifiedIntersectionContacts: intersections.classifiedContacts,
   };
 }
 
@@ -132,23 +136,32 @@ export function findSurfaceSelfIntersectionsV5({ positions, indices, regionIds =
     }
   }
 
+  const topology = createTriangleNeighbors(indices);
+  const classifiedContacts = [];
   const pairs = [];
   let criticalRegionSelfIntersectionCount = 0;
   for (const key of [...candidates].sort(comparePairKeys)) {
     const [left, right] = key.split(':').map(Number);
     if (!boxesOverlap(triangleBounds[left], triangleBounds[right], 1e-8)) continue;
-    if (!trianglesIntersect(positions, indices, left, right)) continue;
+    const contact = classifyTriangleContact(positions, indices, left, right, topology);
+    if (!contact) continue;
     const leftRegion = triangleRegion(regionIds, regionNames, indices, left);
     const rightRegion = triangleRegion(regionIds, regionNames, indices, right);
+    classifiedContacts.push({ leftTriangle: left, rightTriangle: right, leftRegion, rightRegion, ...contact });
+    if (!contact.penetrating) continue;
     const critical = isCriticalIntersection(leftRegion, rightRegion);
     if (critical) criticalRegionSelfIntersectionCount += 1;
-    pairs.push({ leftTriangle: left, rightTriangle: right, leftRegion, rightRegion, critical });
+    pairs.push({ leftTriangle: left, rightTriangle: right, leftRegion, rightRegion, critical, ...contact });
   }
   return {
     selfIntersectionPairCount: pairs.length,
     criticalRegionSelfIntersectionCount,
+    rawContactCount: classifiedContacts.length,
+    penetratingIntersectionCount: pairs.length,
+    criticalPenetratingCount: criticalRegionSelfIntersectionCount,
     broadPhasePairCount: candidates.size,
     pairs,
+    classifiedContacts,
   };
 }
 
@@ -199,6 +212,110 @@ function trianglesIntersect(positions, indices, leftTriangle, rightTriangle) {
     if (segmentIntersectsTriangle(right[edge], right[(edge + 1) % 3], left)) return true;
   }
   return coplanarTrianglesOverlap(left, right);
+}
+
+function classifyTriangleContact(positions, indices, leftTriangle, rightTriangle, topology) {
+  if (!trianglesIntersect(positions, indices, leftTriangle, rightTriangle)) return null;
+  const left = readTriangle(positions, indices, leftTriangle);
+  const right = readTriangle(positions, indices, rightTriangle);
+  const leftNormal = normalize(cross(subtract(left[1], left[0]), subtract(left[2], left[0])), [0, 0, 0]);
+  const rightNormal = normalize(cross(subtract(right[1], right[0]), subtract(right[2], right[0])), [0, 0, 0]);
+  const scale = Math.max(1e-6, localPairScale(left, right));
+  const tolerance = scale * 1e-7;
+  const coplanar = Math.hypot(...cross(leftNormal, rightNormal)) <= 1e-6
+    && right.every((point) => Math.abs(dot(leftNormal, subtract(point, left[0]))) <= tolerance);
+  const topologicalRingDistance = triangleRingDistance(topology, leftTriangle, rightTriangle, 2);
+  if (topologicalRingDistance <= 2) return { intersectionType: 'same-surface-neighbor', penetrating: false, coplanar, contactOnly: true, topologicalRingDistance, intersectionSegment: null, intersectionSegmentLength: 0 };
+  if (coplanar) return { intersectionType: 'coplanar-area-overlap', penetrating: false, coplanar: true, contactOnly: true, topologicalRingDistance: null, intersectionSegment: null, intersectionSegmentLength: 0 };
+  const segment = transverseIntersectionSegment(left, right, tolerance);
+  const length = segment ? Math.hypot(...subtract(segment[1], segment[0])) : 0;
+  const midpoint = segment?.[0].map((value, axis) => (value + segment[1][axis]) * 0.5) ?? null;
+  const penetrating = Boolean(segment && length > tolerance
+    && pointStrictlyInsideTriangle(midpoint, left, 1e-7)
+    && pointStrictlyInsideTriangle(midpoint, right, 1e-7));
+  return {
+    intersectionType: penetrating ? 'penetrating' : 'numeric-uncertainty',
+    penetrating,
+    coplanar: false,
+    contactOnly: !penetrating,
+    topologicalRingDistance: null,
+    intersectionSegment: segment?.map((point) => [...point]) ?? null,
+    intersectionSegmentLength: length,
+  };
+}
+
+function transverseIntersectionSegment(left, right, tolerance) {
+  const points = [...trianglePlaneContacts(left, right, tolerance), ...trianglePlaneContacts(right, left, tolerance)];
+  const unique = [];
+  for (const point of points) if (!unique.some((entry) => Math.hypot(...subtract(entry, point)) <= tolerance)) unique.push(point);
+  if (unique.length < 2) return null;
+  let result = null; let maximum = 0;
+  for (let a = 0; a < unique.length; a += 1) for (let b = a + 1; b < unique.length; b += 1) {
+    const length = Math.hypot(...subtract(unique[a], unique[b]));
+    if (length > maximum) { maximum = length; result = [unique[a], unique[b]]; }
+  }
+  return result;
+}
+
+function trianglePlaneContacts(source, target, tolerance) {
+  const normal = normalize(cross(subtract(target[1], target[0]), subtract(target[2], target[0])), [0, 0, 0]);
+  const distances = source.map((point) => dot(normal, subtract(point, target[0])));
+  const contacts = [];
+  for (let edge = 0; edge < 3; edge += 1) {
+    const next = (edge + 1) % 3;
+    const a = source[edge]; const b = source[next]; const da = distances[edge]; const db = distances[next];
+    if (Math.abs(da) <= tolerance && pointInsideTriangle(a, target, tolerance)) contacts.push(a);
+    if (da * db < 0) {
+      const t = da / (da - db);
+      const point = a.map((value, axis) => value + (b[axis] - value) * t);
+      if (pointInsideTriangle(point, target, tolerance)) contacts.push(point);
+    }
+  }
+  return contacts;
+}
+
+function pointInsideTriangle(point, triangle, tolerance) {
+  return barycentric(point, triangle).every((value) => value >= -tolerance && value <= 1 + tolerance);
+}
+function pointStrictlyInsideTriangle(point, triangle, tolerance) {
+  return barycentric(point, triangle).every((value) => value > tolerance && value < 1 - tolerance);
+}
+function barycentric(point, [a, b, c]) {
+  const v0 = subtract(b, a); const v1 = subtract(c, a); const v2 = subtract(point, a);
+  const d00 = dot(v0, v0); const d01 = dot(v0, v1); const d11 = dot(v1, v1); const d20 = dot(v2, v0); const d21 = dot(v2, v1);
+  const denominator = d00 * d11 - d01 * d01;
+  if (Math.abs(denominator) <= EPSILON) return [-Infinity, -Infinity, -Infinity];
+  const v = (d11 * d20 - d01 * d21) / denominator; const w = (d00 * d21 - d01 * d20) / denominator;
+  return [1 - v - w, v, w];
+}
+
+function createTriangleNeighbors(indices) {
+  const neighbors = Array.from({ length: indices.length / 3 }, () => new Set());
+  const edges = new Map();
+  for (let triangle = 0; triangle < indices.length / 3; triangle += 1) {
+    const vertices = [indices[triangle * 3], indices[triangle * 3 + 1], indices[triangle * 3 + 2]];
+    for (const [a, b] of [[vertices[0], vertices[1]], [vertices[1], vertices[2]], [vertices[2], vertices[0]]]) {
+      const key = a < b ? `${a}:${b}` : `${b}:${a}`; const entries = edges.get(key) ?? []; entries.push(triangle); edges.set(key, entries);
+    }
+  }
+  for (const entries of edges.values()) for (const left of entries) for (const right of entries) if (left !== right) neighbors[left].add(right);
+  return neighbors;
+}
+function triangleRingDistance(topology, start, target, maximum) {
+  let frontier = new Set([start]); const visited = new Set(frontier);
+  for (let distance = 1; distance <= maximum; distance += 1) {
+    const next = new Set();
+    for (const triangle of frontier) for (const neighbor of topology[triangle]) {
+      if (neighbor === target) return distance;
+      if (!visited.has(neighbor)) { visited.add(neighbor); next.add(neighbor); }
+    }
+    frontier = next;
+  }
+  return Infinity;
+}
+function localPairScale(left, right) {
+  const points = [...left, ...right];
+  return Math.hypot(...[0, 1, 2].map((axis) => Math.max(...points.map((point) => point[axis])) - Math.min(...points.map((point) => point[axis]))));
 }
 
 function segmentIntersectsTriangle(start, end, triangle) {
