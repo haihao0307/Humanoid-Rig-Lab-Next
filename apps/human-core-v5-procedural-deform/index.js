@@ -135,7 +135,14 @@ const qaRecords = [];
 
 const PRESETS = PROCEDURAL_BODY_DNA_PRESETS_V5;
 const DISPLAYS = ['Procedural Surface', 'Skeleton', 'Surface + Skeleton', 'Wireframe', 'Region Ownership', 'Field Primitives'];
-const CAMERAS = ['Perspective', 'Front', 'Left', 'Right', 'Back', 'Fit', 'Reset'];
+const CLOSEUP_CAMERA_JOINTS = Object.freeze({
+  'Shoulder Closeup': 'leftShoulder',
+  'Forearm Closeup': 'leftLowerArm',
+  'Elbow Closeup': 'leftLowerArm',
+  'Hip Closeup': 'leftHip',
+  'Knee Closeup': 'leftKnee',
+});
+const CAMERAS = ['Perspective', 'Front', 'Left', 'Right', 'Back', 'Fit', ...Object.keys(CLOSEUP_CAMERA_JOINTS), 'Reset'];
 const POSE_LABEL_TO_ID = new Map(PROCEDURAL_DEFORM_VALIDATION_POSE_IDS_V5
   .map((poseId) => [PROCEDURAL_DEFORM_VALIDATION_POSE_LABELS_V5[poseId], poseId]));
 
@@ -624,6 +631,10 @@ function setQAOutput(message, status) {
 
 async function setCamera(name) {
   if (!lastFrame) return;
+  if (CLOSEUP_CAMERA_JOINTS[name]) {
+    focusJoint(CLOSEUP_CAMERA_JOINTS[name]);
+    return;
+  }
   if (name === 'Reset') {
     activePreset = 'Reference';
     activePoseId = 't-pose';
