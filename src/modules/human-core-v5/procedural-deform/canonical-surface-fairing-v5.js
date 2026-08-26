@@ -6,12 +6,21 @@ export const CANONICAL_SURFACE_FAIRING_PROFILES_V5 = Object.freeze({
   quality: Object.freeze({ iterations: 4, lambda: 0.15, mu: -0.158, projectionIterations: 4 }),
 });
 
-export function fairCanonicalSurfaceV5({ positions, indices, field, quality = 'validation', regionIds = null, regionNames = [] }) {
+export function fairCanonicalSurfaceV5({
+  positions,
+  indices,
+  field,
+  quality = 'validation',
+  regionIds = null,
+  regionNames = [],
+  diagnosticHook = null,
+}) {
   if (!(positions instanceof Float32Array) || positions.length % 3) throw new Error('Canonical fairing requires packed Float32Array positions.');
   if (!(indices instanceof Uint32Array) || indices.length % 3) throw new Error('Canonical fairing requires packed Uint32Array indices.');
   if (typeof field?.sample !== 'function') throw new Error('Canonical fairing requires the canonical scalar field.');
   const profile = CANONICAL_SURFACE_FAIRING_PROFILES_V5[quality];
   if (!profile) throw new Error(`Unknown canonical fairing quality profile ${quality}.`);
+  if (diagnosticHook !== null && typeof diagnosticHook !== 'function') throw new Error('Canonical fairing diagnosticHook must be a function or null.');
   const adjacency = buildAdjacency(positions.length / 3, indices);
   const averageEdgeLength = calculateAverageEdgeLength(positions, indices);
   const constrained = createConstraintMask(positions, field.definition, regionIds, regionNames);
@@ -25,10 +34,15 @@ export function fairCanonicalSurfaceV5({ positions, indices, field, quality = 'v
 
   for (let iteration = 0; iteration < profile.iterations; iteration += 1) {
     laplacianPass(result, adjacency, constrained, profile.lambda, maximumPassDisplacement);
+    emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-lambda`, result, indices);
     laplacianPass(result, adjacency, constrained, profile.mu, maximumPassDisplacement);
+    emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-mu`, result, indices);
     projectToZeroSet(result, field, constrained, projectionDirections, profile.projectionIterations, averageEdgeLength * 0.75);
+    emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-projected`, result, indices);
     bilateralHalfSpaceClampCount += preserveBilateralHalfSpaces(result, initial);
+    emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-halfspace`, result, indices);
     for (const vertex of repairUnsafeTriangles(result, initial, indices)) revertedVertices.add(vertex);
+    emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-safe-repair`, result, indices);
   }
 
   let maximumDisplacement = 0;
@@ -61,6 +75,15 @@ export function fairCanonicalSurfaceV5({ positions, indices, field, quality = 'v
       animationTimeFairing: false,
     },
   };
+}
+
+function emitDiagnosticStage(hook, stageId, positions, indices) {
+  if (!hook) return;
+  hook({
+    stageId,
+    positions: new Float32Array(positions),
+    indices: new Uint32Array(indices),
+  });
 }
 
 function preserveBilateralHalfSpaces(positions, canonical) {

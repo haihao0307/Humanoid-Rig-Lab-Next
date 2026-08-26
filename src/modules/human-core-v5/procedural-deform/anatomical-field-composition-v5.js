@@ -18,35 +18,78 @@ export function createComposedBodyFieldEvaluator(fieldDefinition) {
   const orderedRegionIndices = new Uint16Array(regions.length);
   const blendRadii = createBlendRadiusLookup(fieldDefinition, regions);
 
-  return function evaluate(point, { contributions = false } = {}) {
+  return function evaluate(point, { contributions = false, trace = false } = {}) {
+    const traceRecord = trace ? {
+      regionPrimitiveDistances: [],
+      smoothUnionSteps: [],
+      deformHelperDistances: [],
+      smoothSubtractionSteps: [],
+    } : null;
     for (let index = 0; index < regions.length; index += 1) {
       values[index] = evaluateAnatomicalPrimitive(regions[index].primitive, point);
       orderedRegionIndices[index] = index;
+      if (traceRecord) traceRecord.regionPrimitiveDistances.push({
+        regionId: regions[index].regionId,
+        primitiveId: regions[index].primitive.id,
+        distance: values[index],
+      });
     }
     sortRegionIndices(orderedRegionIndices, values, regions, point);
 
     let distance = Number.POSITIVE_INFINITY;
     let ownerIndex = -1;
-    for (const regionIndex of orderedRegionIndices) {
+    for (let orderIndex = 0; orderIndex < orderedRegionIndices.length; orderIndex += 1) {
+      const regionIndex = orderedRegionIndices[orderIndex];
       const region = regions[regionIndex];
       const value = values[regionIndex];
       const blend = blendRadii[(ownerIndex + 1) * regions.length + regionIndex];
+      const inputDistance = distance;
       const merged = smoothMinimum(distance, value, blend);
+      if (traceRecord) traceRecord.smoothUnionSteps.push({
+        orderIndex,
+        regionId: region.regionId,
+        primitiveId: region.primitive.id,
+        inputDistance: Number.isFinite(inputDistance) ? inputDistance : null,
+        primitiveDistance: value,
+        blendRadius: blend,
+        outputDistance: merged,
+      });
       if (value < distance) ownerIndex = regionIndex;
       distance = merged;
     }
-    for (const helper of fieldDefinition.deformHelpers ?? []) {
-      distance = smoothMinimum(
-        distance,
-        evaluateAnatomicalPrimitive(helper.primitive, point),
-        helper.blendRadius ?? fieldDefinition.compositionPolicy.defaultBlendRadius,
-      );
+    for (let helperIndex = 0; helperIndex < (fieldDefinition.deformHelpers ?? []).length; helperIndex += 1) {
+      const helper = fieldDefinition.deformHelpers[helperIndex];
+      const helperDistance = evaluateAnatomicalPrimitive(helper.primitive, point);
+      const blendRadius = helper.blendRadius ?? fieldDefinition.compositionPolicy.defaultBlendRadius;
+      const inputDistance = distance;
+      distance = smoothMinimum(distance, helperDistance, blendRadius);
+      if (traceRecord) traceRecord.deformHelperDistances.push({
+        orderIndex: helperIndex,
+        helperType: helper.helperType,
+        primitiveId: helper.primitive.id,
+        bindingRegionId: helper.bindingRegionId,
+        inputDistance,
+        primitiveDistance: helperDistance,
+        blendRadius,
+        outputDistance: distance,
+      });
     }
-    for (const subtraction of fieldDefinition.subtractions ?? []) {
+    for (let subtractionIndex = 0; subtractionIndex < (fieldDefinition.subtractions ?? []).length; subtractionIndex += 1) {
+      const subtraction = fieldDefinition.subtractions[subtractionIndex];
       const cutterDistance = evaluateAnatomicalPrimitive(subtraction.primitive, point);
-      distance = smoothSubtraction(distance, cutterDistance, subtraction.blendRadius);
+      const inputDistance = distance;
+      distance = smoothSubtraction(inputDistance, cutterDistance, subtraction.blendRadius);
+      if (traceRecord) traceRecord.smoothSubtractionSteps.push({
+        orderIndex: subtractionIndex,
+        subtractionId: subtraction.subtractionId,
+        primitiveId: subtraction.primitive.id,
+        inputDistance,
+        cutterDistance,
+        blendRadius: subtraction.blendRadius,
+        outputDistance: distance,
+      });
     }
-    if (!contributions) return distance;
+    if (!contributions && !traceRecord) return distance;
     const rankedAll = regions
       .map((region, index) => ({
         regionId: region.regionId,
@@ -58,7 +101,7 @@ export function createComposedBodyFieldEvaluator(fieldDefinition) {
       .sort((left, right) => compareContributionEntries(left, right, point));
     const ranked = rankedAll.slice(0, 4);
     const total = ranked.reduce((sum, entry) => sum + entry.score, 0) || 1;
-    return {
+    const result = {
       distance,
       contributions: ranked.map((entry) => ({
         regionId: entry.regionId,
@@ -75,6 +118,8 @@ export function createComposedBodyFieldEvaluator(fieldDefinition) {
         fieldDistance: entry.value,
       })),
     };
+    if (traceRecord) result.trace = traceRecord;
+    return result;
   };
 }
 

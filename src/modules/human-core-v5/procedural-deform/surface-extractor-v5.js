@@ -35,6 +35,9 @@ export function extractStableProceduralSurfaceV5(fieldInput, {
   timestamp = 0,
   tetrahedralization = 'legacy-mirrored-x',
   topologyDiagnostics = false,
+  diagnosticHook = null,
+  diagnosticFairingDisabled = false,
+  diagnosticAllowOrientationGateFailure = false,
 } = {}) {
   const started = performanceNow();
   const field = fieldInput.sample ? fieldInput : createCanonicalBodyFieldV5(fieldInput);
@@ -42,6 +45,10 @@ export function extractStableProceduralSurfaceV5(fieldInput, {
   if (!PROCEDURAL_SURFACE_TETRAHEDRALIZATION_MODES_V5.includes(tetrahedralization)) {
     throw new Error(`Unknown procedural surface tetrahedralization mode ${tetrahedralization}.`);
   }
+  if (diagnosticHook !== null && typeof diagnosticHook !== 'function') throw new Error('Procedural surface diagnosticHook must be a function or null.');
+  if (diagnosticFairingDisabled && !diagnosticHook) throw new Error('Fairing may be disabled only for an active diagnosticHook.');
+  if (diagnosticAllowOrientationGateFailure && !diagnosticHook) throw new Error('Orientation gate failures may be recorded only for an active diagnosticHook.');
+  const emitDiagnosticStage = createDiagnosticStageEmitter(diagnosticHook);
   const grid = normalizeResolution(resolution, definition.bounds);
   const [nx, ny, nz] = grid;
   const min = definition.bounds.min;
@@ -64,6 +71,7 @@ export function extractStableProceduralSurfaceV5(fieldInput, {
   const vertices = [];
   const triangles = [];
   const edgeVertices = new Map();
+  const rawTriangleProvenance = diagnosticHook ? [] : null;
   for (let z = 0; z < nz - 1; z += 1) {
     for (let y = 0; y < ny - 1; y += 1) {
       for (let x = 0; x < nx - 1; x += 1) {
@@ -73,35 +81,108 @@ export function extractStableProceduralSurfaceV5(fieldInput, {
         const tetrahedra = tetrahedralization === 'uniform-conforming'
           ? TETRAHEDRA
           : x < (nx - 1) / 2 ? TETRAHEDRA : MIRRORED_X_TETRAHEDRA;
-        for (const tetra of tetrahedra) polygonizeTetra(tetra.map((corner) => cubeIds[corner]), values, grid, min, step, edgeVertices, vertices, triangles);
+        for (let tetrahedronOrdinal = 0; tetrahedronOrdinal < tetrahedra.length; tetrahedronOrdinal += 1) {
+          const tetra = tetrahedra[tetrahedronOrdinal];
+          polygonizeTetra(
+            tetra.map((corner) => cubeIds[corner]),
+            values,
+            grid,
+            min,
+            step,
+            edgeVertices,
+            vertices,
+            triangles,
+            rawTriangleProvenance,
+            rawTriangleProvenance ? { x, y, z, tetrahedronOrdinal, tetrahedronCorners: tetra, cubeIds } : null,
+          );
+        }
       }
     }
   }
   const unreferencedPositions = new Float32Array(vertices.flat());
-  const topologyFilter = removeTopologicallyInvalidTriangles(triangles, unreferencedPositions);
+  const rawIndices = diagnosticHook ? new Uint32Array(triangles) : null;
+  const unreferencedVertexSourceIds = diagnosticHook ? identityIndices(unreferencedPositions.length / 3) : null;
+  emitDiagnosticStage?.('polygonized-raw', unreferencedPositions, rawIndices, {
+    triangleProvenance: rawTriangleProvenance,
+    vertexSourceIds: unreferencedVertexSourceIds,
+    grid,
+    gridMinimum: min,
+    voxelSize: step,
+  });
+  const topologyFilter = removeTopologicallyInvalidTriangles(triangles, unreferencedPositions, rawTriangleProvenance);
   const filteredIndices = new Uint32Array(topologyFilter.triangles);
-  const compacted = compactSurfaceVertices(unreferencedPositions, filteredIndices);
+  emitDiagnosticStage?.('topology-filtered', unreferencedPositions, filteredIndices, {
+    triangleProvenance: topologyFilter.triangleProvenance,
+    vertexSourceIds: unreferencedVertexSourceIds,
+    grid,
+    gridMinimum: min,
+    voxelSize: step,
+  });
+  const compacted = compactSurfaceVertices(unreferencedPositions, filteredIndices, Boolean(diagnosticHook));
   const extractedPositions = compacted.positions;
   const extractedIndices = compacted.indices;
+  const diagnosticContext = {
+    triangleProvenance: topologyFilter.triangleProvenance,
+    vertexSourceIds: compacted.sourceVertexIndices,
+    grid,
+    gridMinimum: min,
+    voxelSize: step,
+  };
+  emitDiagnosticStage?.('compacted', extractedPositions, extractedIndices, diagnosticContext);
   const initialOrientation = orientTrianglesOutwardV5({ positions: extractedPositions, indices: extractedIndices, field, fullDiagnostics: false });
+  emitDiagnosticStage?.('initial-oriented', extractedPositions, initialOrientation.indices, diagnosticContext);
   const initialBinding = createSurfaceRegionBindingV5(field, extractedPositions);
   const fairingProfile = resolveFairingProfile(grid);
-  const fairing = fairCanonicalSurfaceV5({
-    positions: extractedPositions,
-    indices: initialOrientation.indices,
-    field,
-    quality: fairingProfile,
-    regionIds: initialBinding.regionIds,
-    regionNames: initialBinding.regionNames,
-  });
+  const fairing = diagnosticFairingDisabled
+    ? {
+      positions: new Float32Array(extractedPositions),
+      diagnostics: {
+        profile: 'disabled-for-diagnostics',
+        iterations: 0,
+        deterministic: true,
+        animationTimeFairing: false,
+      },
+    }
+    : fairCanonicalSurfaceV5({
+      positions: extractedPositions,
+      indices: initialOrientation.indices,
+      field,
+      quality: fairingProfile,
+      regionIds: initialBinding.regionIds,
+      regionNames: initialBinding.regionNames,
+      diagnosticHook: emitDiagnosticStage
+        ? (snapshot) => emitDiagnosticStage(snapshot.stageId, snapshot.positions, snapshot.indices, diagnosticContext)
+        : null,
+    });
   const finalOrientation = orientTrianglesOutwardV5({ positions: fairing.positions, indices: initialOrientation.indices, field });
   const positions = fairing.positions;
   const indices = finalOrientation.indices;
+  emitDiagnosticStage?.('final-oriented', positions, indices, diagnosticContext);
   const normalResult = rebuildDeformedSurfaceNormalsV5({ deformedPositions: positions, indices });
   const normals = normalResult.deformedNormals;
-  if (fairingProfile !== 'preview') assertSurfaceOrientationGateV5(finalOrientation.diagnostics);
+  let orientationGateFailure = null;
+  if (fairingProfile !== 'preview') {
+    try {
+      assertSurfaceOrientationGateV5(finalOrientation.diagnostics);
+    } catch (error) {
+      if (!diagnosticAllowOrientationGateFailure) throw error;
+      orientationGateFailure = {
+        name: error.name,
+        message: error.message,
+        diagnostics: structuredClone(finalOrientation.diagnostics),
+      };
+    }
+  }
   assertDeformedSurfaceNormalGateV5(normalResult.normalDiagnostics);
   const binding = rebaseSurfaceRegionBindingV5(initialBinding, positions, definition);
+  emitDiagnosticStage?.('canonical-final', positions, indices, {
+    ...diagnosticContext,
+    regionIds: binding.regionIds,
+    regionBlendWeights: binding.regionBlendWeights,
+    regionAxialU: binding.regionAxialU,
+    regionNames: binding.regionNames,
+    orientationGateFailure,
+  });
   const geometry = analyzeSurfaceGeometryV5(positions, indices);
   const topologyProvenance = topologyDiagnostics ? {
     tetrahedralization,
@@ -223,12 +304,12 @@ export function analyzeSurfaceGeometryV5(positions, indices) {
   };
 }
 
-function polygonizeTetra(ids, values, grid, min, step, edgeVertices, vertices, triangles) {
+function polygonizeTetra(ids, values, grid, min, step, edgeVertices, vertices, triangles, provenance, source) {
   const inside = ids.filter((id) => values[id] < 0);
   const outside = ids.filter((id) => values[id] >= 0);
   if (!inside.length || !outside.length) return;
   const edgeVertex = (left, right) => {
-    const key = left < right ? `${left}:${right}` : `${right}:${left}`;
+    const key = edgeKey(left, right);
     if (edgeVertices.has(key)) return edgeVertices.get(key);
     const a = gridPosition(left, grid, min, step);
     const b = gridPosition(right, grid, min, step);
@@ -243,19 +324,35 @@ function polygonizeTetra(ids, values, grid, min, step, edgeVertices, vertices, t
     const reverse = inside.length === 3;
     const center = reverse ? outside[0] : inside[0];
     const others = reverse ? inside : outside;
-    const tri = others.map((id) => edgeVertex(center, id));
-    triangles.push(...(reverse ? [tri[0], tri[2], tri[1]] : tri));
+    if (!provenance) {
+      const tri = others.map((id) => edgeVertex(center, id));
+      triangles.push(...(reverse ? [tri[0], tri[2], tri[1]] : tri));
+    } else {
+      const refs = others.map((id) => ({ index: edgeVertex(center, id), key: edgeKey(center, id) }));
+      const tri = reverse ? [refs[0], refs[2], refs[1]] : refs;
+      pushProvenanceTriangle(tri, triangles, provenance, source, ids, values, grid, min, step);
+    }
     return;
   }
   const [i0, i1] = inside;
   const [o0, o1] = outside;
-  const a = edgeVertex(i0, o0); const b = edgeVertex(i0, o1);
-  const c = edgeVertex(i1, o0); const d = edgeVertex(i1, o1);
-  triangles.push(a, b, c, b, d, c);
+  if (!provenance) {
+    const a = edgeVertex(i0, o0); const b = edgeVertex(i0, o1);
+    const c = edgeVertex(i1, o0); const d = edgeVertex(i1, o1);
+    triangles.push(a, b, c, b, d, c);
+  } else {
+    const a = { index: edgeVertex(i0, o0), key: edgeKey(i0, o0) };
+    const b = { index: edgeVertex(i0, o1), key: edgeKey(i0, o1) };
+    const c = { index: edgeVertex(i1, o0), key: edgeKey(i1, o0) };
+    const d = { index: edgeVertex(i1, o1), key: edgeKey(i1, o1) };
+    pushProvenanceTriangle([a, b, c], triangles, provenance, source, ids, values, grid, min, step);
+    pushProvenanceTriangle([b, d, c], triangles, provenance, source, ids, values, grid, min, step);
+  }
 }
 
-function removeTopologicallyInvalidTriangles(triangles, positions) {
+function removeTopologicallyInvalidTriangles(triangles, positions, triangleProvenance = null) {
   const filtered = [];
+  const filteredProvenance = triangleProvenance ? [] : null;
   const removedTriangles = [];
   for (let offset = 0; offset < triangles.length; offset += 3) {
     const tri = triangles.slice(offset, offset + 3);
@@ -264,7 +361,10 @@ function removeTopologicallyInvalidTriangles(triangles, positions) {
     // adjacent sheets, and the release contract already bounds its aggregate
     // ratio below 0.1%. Remove only triangles that repeat an index and cannot
     // carry a valid topological edge cycle.
-    if (new Set(tri).size === 3) filtered.push(...tri);
+    if (new Set(tri).size === 3) {
+      filtered.push(...tri);
+      if (filteredProvenance) filteredProvenance.push(triangleProvenance[offset / 3]);
+    }
     else removedTriangles.push({
       triangleIndex: offset / 3,
       indices: tri,
@@ -276,7 +376,7 @@ function removeTopologicallyInvalidTriangles(triangles, positions) {
       positions: tri.map((vertex) => readPosition(positions, vertex)),
     });
   }
-  return { triangles: filtered, removedTriangles };
+  return { triangles: filtered, removedTriangles, triangleProvenance: filteredProvenance };
 }
 
 function measureSurface(definition, positions, binding) {
@@ -335,20 +435,83 @@ function resolveMirrorSafeXResolution(requestedX, bounds) {
   return requestedX + (requestedX % 2 === 0 ? 2 : 1);
 }
 
-function compactSurfaceVertices(positions, indices) {
+function compactSurfaceVertices(positions, indices, includeSourceVertexIndices = false) {
   const remap = new Int32Array(positions.length / 3);
   remap.fill(-1);
   let next = 0;
   for (const index of indices) if (remap[index] < 0) remap[index] = next++;
   const compactedPositions = new Float32Array(next * 3);
+  const sourceVertexIndices = includeSourceVertexIndices ? new Uint32Array(next) : null;
   for (let oldIndex = 0; oldIndex < remap.length; oldIndex += 1) {
     const newIndex = remap[oldIndex];
     if (newIndex < 0) continue;
     compactedPositions.set(readPosition(positions, oldIndex), newIndex * 3);
+    if (sourceVertexIndices) sourceVertexIndices[newIndex] = oldIndex;
   }
   const compactedIndices = new Uint32Array(indices.length);
   for (let offset = 0; offset < indices.length; offset += 1) compactedIndices[offset] = remap[indices[offset]];
-  return { positions: compactedPositions, indices: compactedIndices, removedVertexCount: remap.length - next };
+  return { positions: compactedPositions, indices: compactedIndices, removedVertexCount: remap.length - next, sourceVertexIndices };
+}
+
+function createDiagnosticStageEmitter(hook) {
+  if (!hook) return null;
+  return (stageId, positions, indices, context = {}) => hook({
+    stageId,
+    positions: new Float32Array(positions),
+    indices: new Uint32Array(indices),
+    ...cloneDiagnosticContext(context),
+  });
+}
+
+function cloneDiagnosticContext(context) {
+  return Object.fromEntries(Object.entries(context).map(([key, value]) => {
+    if (ArrayBuffer.isView(value)) return [key, new value.constructor(value)];
+    // Triangle provenance is immutable after polygonization and can be shared
+    // by diagnostic snapshots. Only mutable binary stage data must be copied
+    // for every callback.
+    if (key === 'triangleProvenance') return [key, value];
+    return [key, structuredClone(value)];
+  }));
+}
+
+function identityIndices(length) {
+  return Uint32Array.from({ length }, (_, index) => index);
+}
+
+function edgeKey(left, right) {
+  return left < right ? `${left}:${right}` : `${right}:${left}`;
+}
+
+function pushProvenanceTriangle(refs, triangles, provenance, source, tetraIds, values, grid, min, step) {
+  const rawTriangleIndex = triangles.length / 3;
+  triangles.push(...refs.map((entry) => entry.index));
+  const tetraPositions = tetraIds.map((id) => gridPosition(id, grid, min, step));
+  const cubeMinimum = [min[0] + source.x * step[0], min[1] + source.y * step[1], min[2] + source.z * step[2]];
+  provenance.push({
+    rawTriangleIndex,
+    cubeX: source.x,
+    cubeY: source.y,
+    cubeZ: source.z,
+    tetrahedronOrdinal: source.tetrahedronOrdinal,
+    tetrahedronCornerOrdinals: [...source.tetrahedronCorners],
+    cubeCornerIds: [...source.cubeIds],
+    gridCornerIds: [...tetraIds],
+    gridCornerPositions: tetraPositions,
+    gridCornerFieldValues: tetraIds.map((id) => values[id]),
+    interpolatedEdgeKeys: refs.map((entry) => entry.key),
+    sourceCellBounds: {
+      minimum: cubeMinimum,
+      maximum: cubeMinimum.map((value, axis) => value + step[axis]),
+    },
+    sourceTetraBounds: boundsOfPoints(tetraPositions),
+  });
+}
+
+function boundsOfPoints(points) {
+  return {
+    minimum: [0, 1, 2].map((axis) => Math.min(...points.map((point) => point[axis]))),
+    maximum: [0, 1, 2].map((axis) => Math.max(...points.map((point) => point[axis]))),
+  };
 }
 
 function resolveFairingProfile(grid) {

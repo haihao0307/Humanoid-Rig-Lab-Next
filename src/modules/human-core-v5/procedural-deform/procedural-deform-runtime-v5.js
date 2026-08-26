@@ -35,16 +35,32 @@ export class ProceduralDeformRuntimeV5 {
     return structuredClone(this.field.definition);
   }
 
-  async generateCanonicalSurface({ resolution = 28, worker = true } = {}) {
+  async generateCanonicalSurface({
+    resolution = 28,
+    worker = true,
+    tetrahedralization = 'legacy-mirrored-x',
+    diagnosticHook = null,
+    diagnosticFairingDisabled = false,
+    diagnosticAllowOrientationGateFailure = false,
+  } = {}) {
     this.assertCompiled();
     if (worker) {
+      if (diagnosticHook || diagnosticFairingDisabled || diagnosticAllowOrientationGateFailure || tetrahedralization !== 'legacy-mirrored-x') {
+        throw new Error('Procedural surface diagnostics and alternate tetrahedralization require worker=false.');
+      }
       const client = new ProceduralSurfaceWorkerClientV5();
       try {
         this.surface = await client.generate({ fieldDefinition: this.field.definition, resolution });
         this.generatedByWorker = client.usedWorker;
       } finally { client.dispose(); }
     } else {
-      this.surface = extractStableProceduralSurfaceV5(this.field, { resolution });
+      this.surface = extractStableProceduralSurfaceV5(this.field, {
+        resolution,
+        tetrahedralization,
+        diagnosticHook,
+        diagnosticFairingDisabled,
+        diagnosticAllowOrientationGateFailure,
+      });
       this.generatedByWorker = false;
     }
     return this.getSurfaceMetadata();
@@ -184,6 +200,43 @@ export class ProceduralDeformRuntimeV5 {
   assertReady() { this.assertCompiled(); if (!this.surface) throw new Error('generateCanonicalSurface() must run first.'); }
 }
 
+export function createProceduralSurfaceTransformDiagnosticsV5({
+  surface,
+  fieldDefinition,
+  rigCore,
+  finalPose,
+  vertexIndices = [],
+} = {}) {
+  if (!surface || !(surface.positions instanceof Float32Array)) throw new Error('Surface transform diagnostics require a generated procedural surface.');
+  assertPoseFrameV4(finalPose);
+  const transforms = createRegionTransforms(fieldDefinition, rigCore, finalPose);
+  for (const transform of transforms.values()) transform.dual = dualQuaternionPart(transform.q, transform.t);
+  const transformsByRegionIndex = surface.regionNames.map((regionName) => transforms.get(regionName) ?? IDENTITY_TRANSFORM);
+  const requested = [...new Set(vertexIndices.map(Number))].sort((left, right) => left - right);
+  for (const vertex of requested) {
+    if (!Number.isInteger(vertex) || vertex < 0 || vertex >= surface.positions.length / 3) {
+      throw new Error(`Surface transform diagnostic vertex ${vertex} is out of range.`);
+    }
+  }
+  return {
+    regionTransforms: Object.fromEntries(surface.regionNames.map((regionName, regionIndex) => {
+      const transform = transformsByRegionIndex[regionIndex];
+      return [regionName, {
+        rotation: [...transform.q],
+        translation: [...transform.t],
+        dual: [...(transform.dual ?? IDENTITY_TRANSFORM.dual)],
+        bindAnchor: transform.bindAnchor ? [...transform.bindAnchor] : null,
+        posedAnchor: transform.posedAnchor ? [...transform.posedAnchor] : null,
+      }];
+    })),
+    vertices: requested.map((vertex) => ({
+      vertex,
+      canonicalPosition: readSurfacePosition(surface.positions, vertex),
+      ...blendPreparedSurfaceVertex(surface, vertex, transformsByRegionIndex, true),
+    })),
+  };
+}
+
 const IDENTITY_TRANSFORM = Object.freeze({ q: [0, 0, 0, 1], t: [0, 0, 0], dual: [0, 0, 0, 0] });
 const REGION_DRIVER_MAP = Object.freeze({
   leftUpperArm: 'leftShoulder', rightUpperArm: 'rightShoulder', leftForearm: 'leftElbow', rightForearm: 'rightElbow',
@@ -239,7 +292,7 @@ function primitiveAnchor(primitive, regionName, canonicalLayout) {
   return primitive.center;
 }
 
-function blendPreparedSurfaceVertex(surface, vertex, transformsByRegionIndex) {
+function blendPreparedSurfaceVertex(surface, vertex, transformsByRegionIndex, captureDiagnostics = false) {
   const positionOffset = vertex * 3;
   const influenceOffset = vertex * 4;
   const px = surface.positions[positionOffset];
@@ -254,12 +307,25 @@ function blendPreparedSurfaceVertex(surface, vertex, transformsByRegionIndex) {
   let dualX = 0; let dualY = 0; let dualZ = 0; let dualW = 0;
   let normalX = 0; let normalY = 0; let normalZ = 0;
   let influenceCount = 0;
+  const influenceDiagnostics = captureDiagnostics ? [] : null;
   for (let influence = 0; influence < 4; influence += 1) {
     const offset = influenceOffset + influence;
     const weight = surface.regionBlendWeights[offset];
-    if (weight <= 0) continue;
     const regionIndex = surface.regionIds[offset];
     const transform = resolveVertexInfluenceTransform(surface, vertex, influence, regionIndex, transformsByRegionIndex);
+    if (influenceDiagnostics) influenceDiagnostics.push({
+      influence,
+      regionIndex,
+      regionId: surface.regionNames[regionIndex] ?? 'unclassified',
+      weight,
+      axialU: surface.regionAxialU?.[offset] ?? 0,
+      transform: {
+        rotation: [...transform.q],
+        translation: [...transform.t],
+        dual: [...(transform.dual ?? IDENTITY_TRANSFORM.dual)],
+      },
+    });
+    if (weight <= 0) continue;
     if (influenceCount === 0) { primaryRegionIndex = regionIndex; reference = transform.q; }
     influenceCount += 1;
     const q = transform.q;
@@ -271,7 +337,19 @@ function blendPreparedSurfaceVertex(surface, vertex, transformsByRegionIndex) {
     const rotatedNormal = rotateComponents(q[0], q[1], q[2], q[3], nx, ny, nz);
     normalX += rotatedNormal[0] * weight; normalY += rotatedNormal[1] * weight; normalZ += rotatedNormal[2] * weight;
   }
-  if (!influenceCount) return { position: [px, py, pz], normal: [nx, ny, nz], primaryRegionIndex };
+  if (!influenceCount) return {
+    position: [px, py, pz],
+    normal: [nx, ny, nz],
+    primaryRegionIndex,
+    ...(captureDiagnostics ? {
+      influences: [],
+      blendedTransform: {
+        rotation: [...IDENTITY_TRANSFORM.q],
+        dual: [...IDENTITY_TRANSFORM.dual],
+        translation: [...IDENTITY_TRANSFORM.t],
+      },
+    } : {}),
+  };
   const realLength = Math.hypot(realX, realY, realZ, realW) || 1;
   realX /= realLength; realY /= realLength; realZ /= realLength; realW /= realLength;
   dualX /= realLength; dualY /= realLength; dualZ /= realLength; dualW /= realLength;
@@ -280,11 +358,20 @@ function blendPreparedSurfaceVertex(surface, vertex, transformsByRegionIndex) {
   const translationY = 2 * (-dualW * realY + dualX * realZ + dualY * realW - dualZ * realX);
   const translationZ = 2 * (-dualW * realZ - dualX * realY + dualY * realX + dualZ * realW);
   const normalLength = Math.hypot(normalX, normalY, normalZ) || 1;
-  return {
+  const result = {
     position: [rotatedPoint[0] + translationX, rotatedPoint[1] + translationY, rotatedPoint[2] + translationZ],
     normal: [normalX / normalLength, normalY / normalLength, normalZ / normalLength],
     primaryRegionIndex,
   };
+  if (captureDiagnostics) {
+    result.influences = influenceDiagnostics;
+    result.blendedTransform = {
+      rotation: [realX, realY, realZ, realW],
+      dual: [dualX, dualY, dualZ, dualW],
+      translation: [translationX, translationY, translationZ],
+    };
+  }
+  return result;
 }
 
 function resolveRigLandmarkAnchor(regionName, canonicalLayout) {
@@ -418,6 +505,10 @@ function rotateComponents(qx, qy, qz, qw, vx, vy, vz) {
     vy + qw * ty + qz * tx - qx * tz,
     vz + qw * tz + qx * ty - qy * tx,
   ];
+}
+
+function readSurfacePosition(positions, vertex) {
+  return [positions[vertex * 3], positions[vertex * 3 + 1], positions[vertex * 3 + 2]];
 }
 
 function dualQuaternionPart(q, t) { return multiplyQuaternion([t[0], t[1], t[2], 0], q).map((value) => value * 0.5); }
