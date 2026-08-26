@@ -8,6 +8,7 @@ import {
 } from '../../../legacy/v8/src/skeleton-presets.js';
 import {
   bodyDNAToProportionProfile,
+  bodyDNAFingerprint,
   createBodyDNA,
   proportionProfileToBodyDNA,
 } from './body-dna-v5.js';
@@ -85,6 +86,9 @@ export function adaptHumanRigCoreToExistingRig(rigCoreInput, {
     definition,
     bodyProfile,
     proportionRevision: dna.proportionRevision,
+    sourceBodyDNAId: dna.bodyDNAId,
+    bodyDNAFingerprint: bodyDNAFingerprint(dna),
+    authoredAsymmetry: cloneValue(dna.asymmetry),
     sourceRigCoreId: core.rigId,
     topologyFingerprint: core.topology.fingerprint,
     authority: 'rig-definition-v4',

@@ -10,7 +10,7 @@ import {
 import { ANATOMICAL_JUNCTION_POLICIES_V5 } from './anatomical-field-composition-v5.js';
 
 export const BODY_FIELD_DEFINITION_V5_SCHEMA = 'humanoid_rig/body_field_definition@5.0';
-export const BODY_FIELD_GENERATOR_VERSION_V5 = 'canonical-anatomical-field-v5.3.0';
+export const BODY_FIELD_GENERATOR_VERSION_V5 = 'canonical-anatomical-field-v5.4.0';
 export const BODY_FIELD_REGION_IDS_V5 = Object.freeze([
   'head', 'neck', 'upperTorso', 'lowerTorso', 'pelvis',
   'leftUpperArm', 'rightUpperArm', 'leftForearm', 'rightForearm', 'leftPalm', 'rightPalm',
@@ -332,7 +332,10 @@ function createAnatomicalSubtractions(dna, layout) {
       region: 'CentralGroinSeparator',
       sourceJointId: 'hips',
       side: 'center',
-      start: [0, layout.kneeY + height * 0.025, 0],
+      // Keep the medial separator open to the exterior below both knees. A
+      // cutter that terminates above the shorter asymmetric knee can become a
+      // sealed internal cavity, which is reported as a second surface shell.
+      start: [0, layout.kneeY - height * 0.10, 0],
       end: [0, layout.hipY - height * 0.045, 0],
       startRadii: [height * 0.016, height * 0.018, height * 0.072],
       endRadii: [height * 0.013, height * 0.014, height * 0.045],

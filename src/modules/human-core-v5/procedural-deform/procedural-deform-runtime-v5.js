@@ -231,6 +231,8 @@ function createRegionTransforms(definition, rigCore, pose) {
 }
 
 function primitiveAnchor(primitive, regionName, canonicalLayout) {
+  const landmark = resolveRigLandmarkAnchor(regionName, canonicalLayout);
+  if (landmark) return landmark;
   if (primitive.start) return primitive.start;
   if (/Palm$/.test(regionName)) return [primitive.center[0] - Math.sign(primitive.center[0]) * primitive.radii[0], primitive.center[1], primitive.center[2]];
   if (/Foot$/.test(regionName)) return [primitive.center[0], canonicalLayout.ankleY, 0];
@@ -283,6 +285,21 @@ function blendPreparedSurfaceVertex(surface, vertex, transformsByRegionIndex) {
     normal: [normalX / normalLength, normalY / normalLength, normalZ / normalLength],
     primaryRegionIndex,
   };
+}
+
+function resolveRigLandmarkAnchor(regionName, canonicalLayout) {
+  const match = /^(left|right)(UpperArm|Forearm|Palm|Thigh|Calf|Foot)$/.exec(regionName);
+  if (!match) return null;
+  const landmarkKey = {
+    UpperArm: 'shoulder',
+    Forearm: 'elbow',
+    Palm: 'wrist',
+    Thigh: 'hip',
+    Calf: 'knee',
+    Foot: 'ankle',
+  }[match[2]];
+  const landmark = canonicalLayout?.rigLandmarks?.[match[1]]?.[landmarkKey];
+  return Array.isArray(landmark) ? [...landmark] : null;
 }
 
 const CONTINUOUS_LIMB_TWIST_STATIONS_V5 = Object.freeze([

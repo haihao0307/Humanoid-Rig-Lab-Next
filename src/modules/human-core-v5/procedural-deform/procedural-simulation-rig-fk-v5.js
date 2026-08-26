@@ -4,7 +4,7 @@ import {
   normalizeQuaternion,
   rotateVectorByQuaternion,
 } from '../../animation/quaternion.js';
-import { createBodyDNA } from '../body-dna-v5.js';
+import { bodyDNAFingerprint, createBodyDNA } from '../body-dna-v5.js';
 import { assertHumanRigCoreV5 } from '../human-rig-core-v5.js';
 import { adaptHumanRigCoreToExistingRig } from '../v4-adapter.js';
 import { REGION_DEFORMATION_SOURCE_JOINTS_V5 } from './region-deformation-driver-v5.js';
@@ -100,6 +100,10 @@ export function createProceduralSimulationRigFrameV5({ finalPose, rigCore, bodyD
     poseAuthority: 'finalPose.localRotations',
     compatibleRig: finalPose.compatibleRig,
     proportionRevision: finalPose.proportionRevision,
+    sourceBodyDNAId: adapted.sourceBodyDNAId,
+    bodyDNAFingerprint: adapted.bodyDNAFingerprint,
+    expectedBodyDNAFingerprint: bodyDNAFingerprint(dna),
+    v4AdapterProportionRevision: adapted.proportionRevision,
     joints,
     segments,
     timestamp: finalPose.timestamp,

@@ -64,7 +64,7 @@ export function extractStableProceduralSurfaceV5(fieldInput, { resolution = 28, 
     }
   }
   const unreferencedPositions = new Float32Array(vertices.flat());
-  const filteredIndices = new Uint32Array(removeDegenerateTriangles(triangles, unreferencedPositions));
+  const filteredIndices = new Uint32Array(removeTopologicallyInvalidTriangles(triangles));
   const compacted = compactSurfaceVertices(unreferencedPositions, filteredIndices);
   const extractedPositions = compacted.positions;
   const extractedIndices = compacted.indices;
@@ -219,11 +219,16 @@ function polygonizeTetra(ids, values, grid, min, step, edgeVertices, vertices, t
   triangles.push(a, b, c, b, d, c);
 }
 
-function removeDegenerateTriangles(triangles, positions) {
+function removeTopologicallyInvalidTriangles(triangles) {
   const filtered = [];
   for (let offset = 0; offset < triangles.length; offset += 3) {
     const tri = triangles.slice(offset, offset + 3);
-    if (new Set(tri).size === 3 && triangleArea(positions, tri) >= 1e-12) filtered.push(...tri);
+    // Marching tetrahedra can produce a geometrically tiny face when the zero
+    // set crosses a grid corner. The face is still required to close the two
+    // adjacent sheets, and the release contract already bounds its aggregate
+    // ratio below 0.1%. Remove only triangles that repeat an index and cannot
+    // carry a valid topological edge cycle.
+    if (new Set(tri).size === 3) filtered.push(...tri);
   }
   return filtered;
 }

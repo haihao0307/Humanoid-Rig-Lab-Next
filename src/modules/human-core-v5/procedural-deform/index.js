@@ -9,6 +9,7 @@ export * from './canonical-surface-fairing-v5.js';
 export * from './procedural-surface-deformation-quality-v5.js';
 export * from './joint-corrective-fields-v5.js';
 export * from './static-validation-pose-compiler-v5.js';
+export * from './procedural-body-presets-v5.js';
 export * from './surface-region-binding-v5.js';
 export * from './region-deformation-driver-v5.js';
 export * from './procedural-deform-policy-v5.js';
