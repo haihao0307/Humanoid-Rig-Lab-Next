@@ -12,6 +12,10 @@ const TETRAHEDRA = Object.freeze([
 ]);
 const MIRROR_X_CORNER = Object.freeze([1, 0, 3, 2, 5, 4, 7, 6]);
 const MIRRORED_X_TETRAHEDRA = Object.freeze(TETRAHEDRA.map((tetra) => Object.freeze(tetra.map((corner) => MIRROR_X_CORNER[corner]))));
+export const PROCEDURAL_SURFACE_TETRAHEDRALIZATION_MODES_V5 = Object.freeze([
+  'legacy-mirrored-x',
+  'uniform-conforming',
+]);
 const CUBE_OFFSETS = Object.freeze([
   [0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0],
   [0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1],
@@ -26,10 +30,18 @@ export function createProceduralSurfaceCacheKeyV5(fieldDefinition, resolution) {
   });
 }
 
-export function extractStableProceduralSurfaceV5(fieldInput, { resolution = 28, timestamp = 0 } = {}) {
+export function extractStableProceduralSurfaceV5(fieldInput, {
+  resolution = 28,
+  timestamp = 0,
+  tetrahedralization = 'legacy-mirrored-x',
+  topologyDiagnostics = false,
+} = {}) {
   const started = performanceNow();
   const field = fieldInput.sample ? fieldInput : createCanonicalBodyFieldV5(fieldInput);
   const definition = field.definition;
+  if (!PROCEDURAL_SURFACE_TETRAHEDRALIZATION_MODES_V5.includes(tetrahedralization)) {
+    throw new Error(`Unknown procedural surface tetrahedralization mode ${tetrahedralization}.`);
+  }
   const grid = normalizeResolution(resolution, definition.bounds);
   const [nx, ny, nz] = grid;
   const min = definition.bounds.min;
@@ -58,13 +70,16 @@ export function extractStableProceduralSurfaceV5(fieldInput, { resolution = 28, 
         const cubeIds = CUBE_OFFSETS.map(([dx, dy, dz]) => gridIndex(x + dx, y + dy, z + dz, nx, ny));
         const cubeValues = cubeIds.map((index) => values[index]);
         if (cubeValues.every((value) => value >= 0) || cubeValues.every((value) => value < 0)) continue;
-        const tetrahedra = x < (nx - 1) / 2 ? TETRAHEDRA : MIRRORED_X_TETRAHEDRA;
+        const tetrahedra = tetrahedralization === 'uniform-conforming'
+          ? TETRAHEDRA
+          : x < (nx - 1) / 2 ? TETRAHEDRA : MIRRORED_X_TETRAHEDRA;
         for (const tetra of tetrahedra) polygonizeTetra(tetra.map((corner) => cubeIds[corner]), values, grid, min, step, edgeVertices, vertices, triangles);
       }
     }
   }
   const unreferencedPositions = new Float32Array(vertices.flat());
-  const filteredIndices = new Uint32Array(removeTopologicallyInvalidTriangles(triangles));
+  const topologyFilter = removeTopologicallyInvalidTriangles(triangles, unreferencedPositions);
+  const filteredIndices = new Uint32Array(topologyFilter.triangles);
   const compacted = compactSurfaceVertices(unreferencedPositions, filteredIndices);
   const extractedPositions = compacted.positions;
   const extractedIndices = compacted.indices;
@@ -88,6 +103,24 @@ export function extractStableProceduralSurfaceV5(fieldInput, { resolution = 28, 
   assertDeformedSurfaceNormalGateV5(normalResult.normalDiagnostics);
   const binding = rebaseSurfaceRegionBindingV5(initialBinding, positions, definition);
   const geometry = analyzeSurfaceGeometryV5(positions, indices);
+  const topologyProvenance = topologyDiagnostics ? {
+    tetrahedralization,
+    rawTriangleComponentCount: analyzeSurfaceGeometryV5(
+      unreferencedPositions,
+      new Uint32Array(triangles),
+    ).connectedComponentCount,
+    afterDegenerateRemovalComponentCount: analyzeSurfaceGeometryV5(
+      unreferencedPositions,
+      filteredIndices,
+    ).connectedComponentCount,
+    afterCompactionComponentCount: analyzeSurfaceGeometryV5(
+      extractedPositions,
+      extractedIndices,
+    ).connectedComponentCount,
+    finalComponentCount: geometry.connectedComponentCount,
+    removedTriangleCount: topologyFilter.removedTriangles.length,
+    removedTriangles: topologyFilter.removedTriangles,
+  } : null;
   const measurements = measureSurface(definition, positions, binding);
   const topologyFingerprint = hashTypedArrays([indices, binding.regionIds]);
   const cacheKey = createProceduralSurfaceCacheKeyV5(definition, grid);
@@ -122,6 +155,8 @@ export function extractStableProceduralSurfaceV5(fieldInput, { resolution = 28, 
       normals: normalResult.normalDiagnostics,
       fairing: fairing.diagnostics,
       timestamp,
+      tetrahedralization,
+      topologyProvenance,
     },
     storage: { derivedAsset: true, projectStateAllowed: false, transferableTypedArrays: true },
   };
@@ -219,8 +254,9 @@ function polygonizeTetra(ids, values, grid, min, step, edgeVertices, vertices, t
   triangles.push(a, b, c, b, d, c);
 }
 
-function removeTopologicallyInvalidTriangles(triangles) {
+function removeTopologicallyInvalidTriangles(triangles, positions) {
   const filtered = [];
+  const removedTriangles = [];
   for (let offset = 0; offset < triangles.length; offset += 3) {
     const tri = triangles.slice(offset, offset + 3);
     // Marching tetrahedra can produce a geometrically tiny face when the zero
@@ -229,8 +265,18 @@ function removeTopologicallyInvalidTriangles(triangles) {
     // ratio below 0.1%. Remove only triangles that repeat an index and cannot
     // carry a valid topological edge cycle.
     if (new Set(tri).size === 3) filtered.push(...tri);
+    else removedTriangles.push({
+      triangleIndex: offset / 3,
+      indices: tri,
+      area: triangleArea(positions, tri),
+      centroid: [0, 1, 2].map((axis) => tri.reduce(
+        (sum, vertex) => sum + positions[vertex * 3 + axis] / 3,
+        0,
+      )),
+      positions: tri.map((vertex) => readPosition(positions, vertex)),
+    });
   }
-  return filtered;
+  return { triangles: filtered, removedTriangles };
 }
 
 function measureSurface(definition, positions, binding) {
