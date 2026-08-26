@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Task 14C Template Topology Visual Pilot B</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./apps/human-core-v5-template-topology-visual-pilot/styles.css">
+  <script type="importmap">
+    {"imports":{"three":"./node_modules/three/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <main id="comparison-page">
+    <header class="pilot-header">
+      <div><b>Task 14C · Template Topology Visual Pilot B</b><span id="scenario-title">Loading…</span></div>
+      <strong>EXPERIMENTAL · NOT FOR ACCEPTANCE</strong>
+    </header>
+    <section class="comparison-grid">
+      <article id="procedural-card" class="surface-card procedural-card">
+        <div class="card-heading"><b>Procedural R48</b><span>Human Core V5 · legacy projection</span></div>
+        <div id="procedural-viewport" class="viewport"></div>
+        <div id="procedural-caption" class="card-caption"></div>
+      </article>
+      <article id="template-card" class="surface-card template-card">
+        <div class="card-heading"><b>Stable Template</b><span>Compatibility template · Production Skin V4</span></div>
+        <div id="template-viewport" class="viewport"></div>
+        <div id="template-caption" class="card-caption"></div>
+        <div class="template-badge">COMPATIBILITY TEMPLATE<br>EXPERIMENTAL TOPOLOGY CARRIER<br>NOT PRODUCTION APPROVED<br>NOT HUMAN CORE AUTHORITY</div>
+      </article>
+      <aside id="metrics-panel" class="metrics-panel">
+        <h2>Metrics &amp; decision evidence</h2>
+        <div id="authority-summary"></div>
+        <div id="metrics-table"></div>
+        <div id="audit-checklist"></div>
+      </aside>
+    </section>
+    <div id="loading">Generating shared-pose comparison…</div>
+  </main>
+  <section id="contact-sheet" class="hidden"></section>
+  <script id="pilot-state" type="application/json">{"ready":false}</script>
+  <script type="module" src="./apps/human-core-v5-template-topology-visual-pilot/index.js"></script>
+</body>
+</html>
