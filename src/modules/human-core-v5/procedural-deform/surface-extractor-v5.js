@@ -38,6 +38,7 @@ export function extractStableProceduralSurfaceV5(fieldInput, {
   diagnosticHook = null,
   diagnosticFairingDisabled = false,
   diagnosticAllowOrientationGateFailure = false,
+  projectionMode = 'legacy',
 } = {}) {
   const started = performanceNow();
   const field = fieldInput.sample ? fieldInput : createCanonicalBodyFieldV5(fieldInput);
@@ -47,6 +48,7 @@ export function extractStableProceduralSurfaceV5(fieldInput, {
   }
   if (diagnosticHook !== null && typeof diagnosticHook !== 'function') throw new Error('Procedural surface diagnosticHook must be a function or null.');
   if (diagnosticFairingDisabled && !diagnosticHook) throw new Error('Fairing may be disabled only for an active diagnosticHook.');
+  if (diagnosticFairingDisabled && projectionMode !== 'legacy') throw new Error('Projection pilot mode requires formal fairing to remain enabled.');
   if (diagnosticAllowOrientationGateFailure && !diagnosticHook) throw new Error('Orientation gate failures may be recorded only for an active diagnosticHook.');
   const emitDiagnosticStage = createDiagnosticStageEmitter(diagnosticHook);
   const grid = normalizeResolution(resolution, definition.bounds);
@@ -150,6 +152,7 @@ export function extractStableProceduralSurfaceV5(fieldInput, {
       quality: fairingProfile,
       regionIds: initialBinding.regionIds,
       regionNames: initialBinding.regionNames,
+      projectionMode,
       diagnosticHook: emitDiagnosticStage
         ? (snapshot) => emitDiagnosticStage(snapshot.stageId, snapshot.positions, snapshot.indices, diagnosticContext)
         : null,
@@ -235,6 +238,7 @@ export function extractStableProceduralSurfaceV5(fieldInput, {
       orientation: finalOrientation.diagnostics,
       normals: normalResult.normalDiagnostics,
       fairing: fairing.diagnostics,
+      projectionMode,
       timestamp,
       tetrahedralization,
       topologyProvenance,

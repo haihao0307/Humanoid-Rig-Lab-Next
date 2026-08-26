@@ -42,10 +42,11 @@ export class ProceduralDeformRuntimeV5 {
     diagnosticHook = null,
     diagnosticFairingDisabled = false,
     diagnosticAllowOrientationGateFailure = false,
+    projectionMode = 'legacy',
   } = {}) {
     this.assertCompiled();
     if (worker) {
-      if (diagnosticHook || diagnosticFairingDisabled || diagnosticAllowOrientationGateFailure || tetrahedralization !== 'legacy-mirrored-x') {
+      if (diagnosticHook || diagnosticFairingDisabled || diagnosticAllowOrientationGateFailure || tetrahedralization !== 'legacy-mirrored-x' || projectionMode !== 'legacy') {
         throw new Error('Procedural surface diagnostics and alternate tetrahedralization require worker=false.');
       }
       const client = new ProceduralSurfaceWorkerClientV5();
@@ -60,6 +61,7 @@ export class ProceduralDeformRuntimeV5 {
         diagnosticHook,
         diagnosticFairingDisabled,
         diagnosticAllowOrientationGateFailure,
+        projectionMode,
       });
       this.generatedByWorker = false;
     }

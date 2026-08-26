@@ -1,10 +1,25 @@
 import { sampleFieldGradientV5 } from './orient-procedural-surface-v5.js';
+import { findSurfaceSelfIntersectionsV5 } from './procedural-surface-deformation-quality-v5.js';
 
 export const CANONICAL_SURFACE_FAIRING_PROFILES_V5 = Object.freeze({
   preview: Object.freeze({ iterations: 1, lambda: 0.10, mu: -0.105, projectionIterations: 2 }),
   validation: Object.freeze({ iterations: 2, lambda: 0.13, mu: -0.136, projectionIterations: 3 }),
   quality: Object.freeze({ iterations: 4, lambda: 0.15, mu: -0.158, projectionIterations: 4 }),
 });
+
+export const CANONICAL_SURFACE_PROJECTION_MODES_V5 = Object.freeze([
+  'legacy',
+  'collision-aware-pilot',
+]);
+
+const PILOT_TARGET_REGION_PAIRS = Object.freeze(new Set([
+  'leftThigh/lowerTorso',
+  'leftThigh/pelvis',
+  'lowerTorso/pelvis',
+  'lowerTorso/rightThigh',
+  'pelvis/pelvis',
+  'pelvis/rightThigh',
+]));
 
 export function fairCanonicalSurfaceV5({
   positions,
@@ -14,6 +29,7 @@ export function fairCanonicalSurfaceV5({
   regionIds = null,
   regionNames = [],
   diagnosticHook = null,
+  projectionMode = 'legacy',
 }) {
   if (!(positions instanceof Float32Array) || positions.length % 3) throw new Error('Canonical fairing requires packed Float32Array positions.');
   if (!(indices instanceof Uint32Array) || indices.length % 3) throw new Error('Canonical fairing requires packed Uint32Array indices.');
@@ -21,6 +37,7 @@ export function fairCanonicalSurfaceV5({
   const profile = CANONICAL_SURFACE_FAIRING_PROFILES_V5[quality];
   if (!profile) throw new Error(`Unknown canonical fairing quality profile ${quality}.`);
   if (diagnosticHook !== null && typeof diagnosticHook !== 'function') throw new Error('Canonical fairing diagnosticHook must be a function or null.');
+  if (!CANONICAL_SURFACE_PROJECTION_MODES_V5.includes(projectionMode)) throw new Error(`Unknown canonical surface projection mode ${projectionMode}.`);
   const adjacency = buildAdjacency(positions.length / 3, indices);
   const averageEdgeLength = calculateAverageEdgeLength(positions, indices);
   const constrained = createConstraintMask(positions, field.definition, regionIds, regionNames);
@@ -30,18 +47,85 @@ export function fairCanonicalSurfaceV5({
   const gradientStep = Math.max(1e-6, averageEdgeLength * 0.08);
   const projectionDirections = buildProjectionDirections(initial, field, gradientStep);
   const revertedVertices = new Set();
+  const separationRevertedVertices = new Set();
+  const separationChecks = [];
+  let targetIntersections = projectionMode === 'collision-aware-pilot'
+    ? analyzePilotTargetIntersections(result, indices, regionIds, regionNames)
+    : null;
   let bilateralHalfSpaceClampCount = 0;
 
   for (let iteration = 0; iteration < profile.iterations; iteration += 1) {
-    laplacianPass(result, adjacency, constrained, profile.lambda, maximumPassDisplacement);
+    targetIntersections = runFairingSubstage({
+      projectionMode,
+      stageId: `fairing-iteration-${iteration + 1}-lambda`,
+      positions: result,
+      indices,
+      regionIds,
+      regionNames,
+      adjacency,
+      targetIntersections,
+      separationChecks,
+      separationRevertedVertices,
+      execute: () => laplacianPass(result, adjacency, constrained, profile.lambda, maximumPassDisplacement),
+    });
     emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-lambda`, result, indices);
-    laplacianPass(result, adjacency, constrained, profile.mu, maximumPassDisplacement);
+    targetIntersections = runFairingSubstage({
+      projectionMode,
+      stageId: `fairing-iteration-${iteration + 1}-mu`,
+      positions: result,
+      indices,
+      regionIds,
+      regionNames,
+      adjacency,
+      targetIntersections,
+      separationChecks,
+      separationRevertedVertices,
+      execute: () => laplacianPass(result, adjacency, constrained, profile.mu, maximumPassDisplacement),
+    });
     emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-mu`, result, indices);
-    projectToZeroSet(result, field, constrained, projectionDirections, profile.projectionIterations, averageEdgeLength * 0.75);
+    targetIntersections = runFairingSubstage({
+      projectionMode,
+      stageId: `fairing-iteration-${iteration + 1}-projected`,
+      positions: result,
+      indices,
+      regionIds,
+      regionNames,
+      adjacency,
+      targetIntersections,
+      separationChecks,
+      separationRevertedVertices,
+      execute: () => projectToZeroSet(result, field, constrained, projectionDirections, profile.projectionIterations, averageEdgeLength * 0.75),
+    });
     emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-projected`, result, indices);
-    bilateralHalfSpaceClampCount += preserveBilateralHalfSpaces(result, initial);
+    targetIntersections = runFairingSubstage({
+      projectionMode,
+      stageId: `fairing-iteration-${iteration + 1}-halfspace`,
+      positions: result,
+      indices,
+      regionIds,
+      regionNames,
+      adjacency,
+      targetIntersections,
+      separationChecks,
+      separationRevertedVertices,
+      execute: () => { bilateralHalfSpaceClampCount += preserveBilateralHalfSpaces(result, initial); },
+    });
     emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-halfspace`, result, indices);
-    for (const vertex of repairUnsafeTriangles(result, initial, indices)) revertedVertices.add(vertex);
+    targetIntersections = runFairingSubstage({
+      projectionMode,
+      stageId: `fairing-iteration-${iteration + 1}-safe-repair`,
+      positions: result,
+      indices,
+      regionIds,
+      regionNames,
+      adjacency,
+      targetIntersections,
+      separationChecks,
+      separationRevertedVertices,
+      execute: () => {
+        for (const vertex of repairUnsafeTriangles(result, initial, indices)) revertedVertices.add(vertex);
+      },
+    });
     emitDiagnosticStage(diagnosticHook, `fairing-iteration-${iteration + 1}-safe-repair`, result, indices);
   }
 
@@ -63,6 +147,7 @@ export function fairCanonicalSurfaceV5({
     positions: result,
     diagnostics: {
       profile: quality,
+      projectionMode,
       iterations: profile.iterations,
       constrainedVertexCount: constrained.reduce((sum, value) => sum + value, 0),
       averageEdgeLength,
@@ -70,11 +155,119 @@ export function fairCanonicalSurfaceV5({
       rmsDisplacement: Math.sqrt(squaredDisplacement / Math.max(1, result.length / 3)),
       maximumAbsoluteFieldError,
       revertedUnsafeVertexCount: revertedVertices.size,
+      collisionAwarePilot: projectionMode === 'collision-aware-pilot' ? {
+        targetRegionPairs: [...PILOT_TARGET_REGION_PAIRS],
+        checkCount: separationChecks.length,
+        revertedVertexCount: separationRevertedVertices.size,
+        checks: separationChecks,
+      } : null,
       bilateralHalfSpaceClampCount,
       deterministic: true,
       animationTimeFairing: false,
     },
   };
+}
+
+function runFairingSubstage({
+  projectionMode,
+  stageId,
+  positions,
+  indices,
+  regionIds,
+  regionNames,
+  adjacency,
+  targetIntersections,
+  separationChecks,
+  separationRevertedVertices,
+  execute,
+}) {
+  if (projectionMode === 'legacy') {
+    execute();
+    return null;
+  }
+  const previousPositions = new Float32Array(positions);
+  const allowedPairKeys = new Set(targetIntersections.pairs.map(pilotIntersectionKey));
+  execute();
+  let current = analyzePilotTargetIntersections(positions, indices, regionIds, regionNames);
+  const detectedTargetPenetratingCount = current.pairs.length;
+  const introducedAtDetection = selectIntroducedPilotIntersections(current.pairs, allowedPairKeys);
+  const stageRevertedVertices = new Set();
+
+  const firstVertices = collectPilotIntersectionVertices(introducedAtDetection, indices);
+  restorePilotVertices(positions, previousPositions, firstVertices, stageRevertedVertices, separationRevertedVertices);
+  if (firstVertices.length) current = analyzePilotTargetIntersections(positions, indices, regionIds, regionNames);
+
+  const afterFirstRestore = selectIntroducedPilotIntersections(current.pairs, allowedPairKeys);
+  const oneRingVertices = expandPilotOneRing(collectPilotIntersectionVertices(afterFirstRestore, indices), adjacency);
+  restorePilotVertices(positions, previousPositions, oneRingVertices, stageRevertedVertices, separationRevertedVertices);
+  if (oneRingVertices.length) current = analyzePilotTargetIntersections(positions, indices, regionIds, regionNames);
+
+  const remaining = selectIntroducedPilotIntersections(current.pairs, allowedPairKeys);
+  separationChecks.push({
+    stageId,
+    priorTargetPenetratingCount: targetIntersections.pairs.length,
+    detectedTargetPenetratingCount,
+    introducedTargetPenetratingPairs: introducedAtDetection.map(pilotIntersectionKey),
+    firstRestoreVertices: firstVertices,
+    oneRingRestoreVertices: oneRingVertices,
+    revertedVertexCount: stageRevertedVertices.size,
+    finalTargetPenetratingCount: current.pairs.length,
+    remainingIntroducedTargetPenetratingPairs: remaining.map(pilotIntersectionKey),
+  });
+  return current;
+}
+
+function analyzePilotTargetIntersections(positions, indices, regionIds, regionNames) {
+  const analysis = findSurfaceSelfIntersectionsV5({ positions, indices, regionIds, regionNames });
+  return {
+    pairs: analysis.pairs
+      .filter((pair) => PILOT_TARGET_REGION_PAIRS.has(pilotRegionPair(pair.leftRegion, pair.rightRegion)))
+      .sort(comparePilotIntersectionPairs),
+  };
+}
+
+function selectIntroducedPilotIntersections(pairs, allowedPairKeys) {
+  return pairs
+    .filter((pair) => !allowedPairKeys.has(pilotIntersectionKey(pair)))
+    .sort(comparePilotIntersectionPairs);
+}
+
+function collectPilotIntersectionVertices(pairs, indices) {
+  const triangles = [...new Set(pairs.flatMap((pair) => [pair.leftTriangle, pair.rightTriangle]))]
+    .sort((left, right) => left - right);
+  return [...new Set(triangles.flatMap((triangle) => [
+    indices[triangle * 3],
+    indices[triangle * 3 + 1],
+    indices[triangle * 3 + 2],
+  ]))].sort((left, right) => left - right);
+}
+
+function expandPilotOneRing(vertices, adjacency) {
+  const expanded = new Set(vertices);
+  for (const vertex of vertices) for (const neighbor of adjacency[vertex]) expanded.add(neighbor);
+  return [...expanded].sort((left, right) => left - right);
+}
+
+function restorePilotVertices(positions, previousPositions, vertices, stageRevertedVertices, allRevertedVertices) {
+  for (const vertex of vertices) {
+    positions.set(readVec3(previousPositions, vertex), vertex * 3);
+    stageRevertedVertices.add(vertex);
+    allRevertedVertices.add(vertex);
+  }
+}
+
+function pilotRegionPair(left, right) {
+  return left.localeCompare(right) <= 0 ? `${left}/${right}` : `${right}/${left}`;
+}
+
+function pilotIntersectionKey(pair) {
+  return pair.leftTriangle < pair.rightTriangle
+    ? `${pair.leftTriangle}:${pair.rightTriangle}`
+    : `${pair.rightTriangle}:${pair.leftTriangle}`;
+}
+
+function comparePilotIntersectionPairs(left, right) {
+  return left.leftTriangle - right.leftTriangle || left.rightTriangle - right.rightTriangle;
 }
 
 function emitDiagnosticStage(hook, stageId, positions, indices) {

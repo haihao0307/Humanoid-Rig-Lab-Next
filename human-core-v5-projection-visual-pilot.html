@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Task 14C Projection Visual Pilot A</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./apps/human-core-v5-projection-visual-pilot/styles.css">
+  <script type="importmap">
+    {"imports":{"three":"./node_modules/three/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <main id="capture-frame">
+    <div id="viewport"></div>
+    <div id="loading">Generating resolution-48 procedural surface…</div>
+    <div class="title-block">
+      <strong>Task 14C · Projection Visual Pilot A</strong>
+      <span id="scenario-label">Muscular · T Pose · Legacy</span>
+    </div>
+    <div id="experiment-badge" class="experiment-badge hidden"></div>
+    <dl id="metrics"></dl>
+    <div id="view-label">FULL · FRONT</div>
+  </main>
+  <section id="contact-sheet" class="hidden"></section>
+  <script id="pilot-state" type="application/json">{"ready":false}</script>
+  <script type="module" src="./apps/human-core-v5-projection-visual-pilot/index.js"></script>
+</body>
+</html>
