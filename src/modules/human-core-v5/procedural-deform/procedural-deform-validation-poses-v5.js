@@ -207,10 +207,10 @@ export function measureProceduralDeformValidationPoseV5({ finalPose, simulationR
       joints[joints[`${side}UpperLeg`]?.parentId],
     );
     if (Number.isFinite(hip)) result[`${side}HipFlexDegrees`] = hip;
-    const knee = chainBendDegrees(
-      joints[`${side}UpperLeg`]?.worldPosition,
-      joints[`${side}LowerLeg`]?.worldPosition,
-      joints[`${side}Foot`]?.worldPosition,
+    const knee = segmentRotationFromBindDegrees(
+      joints[`${side}LowerLeg`],
+      joints[`${side}Foot`],
+      joints[joints[`${side}LowerLeg`]?.parentId],
     );
     if (Number.isFinite(knee)) result[`${side}KneeBendDegrees`] = knee;
   }
