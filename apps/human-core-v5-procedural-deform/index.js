@@ -8,6 +8,7 @@ import {
   PROCEDURAL_DEFORM_VALIDATION_POSE_LABELS_V5,
   compareProceduralRigSurfaceAnchorsV5,
   createBodyDNA,
+  createMirroredProceduralDeformValidationPoseV5,
   createProceduralDeformValidationPoseV5,
   createProceduralSimulationRigFrameV5,
   resolveProceduralSimulationRigJointV5,
@@ -20,6 +21,11 @@ import {
   ThreeProceduralHumanAdapterV5,
   shouldUseChunkedProceduralHumanAdapterV5,
 } from '../../src/renderers/three/three-procedural-human-adapter-v5.js';
+import {
+  PROCEDURAL_CAMERA_DIRECTIONS_V5,
+  frameDeformedBoundsV5,
+  selectJointLocalDeformedPositionsV5,
+} from './procedural-camera-fit-v5.js';
 
 const container = document.querySelector('#viewport');
 const loading = document.querySelector('#loading');
@@ -120,6 +126,9 @@ let lastFrame = null;
 let lastSimulationRigFrame = null;
 let lastAnchorAudit = null;
 let lastAngleMeasurements = null;
+let lastMirroredAngleMeasurements = null;
+let lastGeometryQuality = null;
+let lastCameraFrame = null;
 let lastQASnapshot = null;
 let qaRunning = false;
 const qaRecords = [];
@@ -225,6 +234,21 @@ function updatePose() {
     finalPose: lastPose,
     simulationRigFrame: lastSimulationRigFrame,
   });
+  lastMirroredAngleMeasurements = null;
+  if (activePoseId === 'hip-flex-left' || activePoseId === 'knee-bend-left') {
+    const mirroredPoseId = activePoseId.replace('-left', '-right');
+    const mirroredPose = createMirroredProceduralDeformValidationPoseV5(lastPose, mirroredPoseId);
+    const mirroredSimulationRig = createProceduralSimulationRigFrameV5({
+      finalPose: mirroredPose,
+      rigCore,
+      bodyDNA: dna,
+    });
+    lastMirroredAngleMeasurements = measureProceduralDeformValidationPoseV5({
+      finalPose: mirroredPose,
+      simulationRigFrame: mirroredSimulationRig,
+    });
+  }
+  lastGeometryQuality = deformRuntime.analyzeCurrentDeformationQuality();
   adapter.update(createRendererAdapterInputV5(lastFrame));
   buildSimulationRigPreview(lastSimulationRigFrame);
   buildProceduralAnchorPreview(lastFrame.regionDiagnostics);
@@ -296,6 +320,32 @@ function updateDiagnostics() {
   const normalAudit = auditNormals(lastFrame.deformedNormals);
   const finiteAudit = auditFiniteGeometry(lastFrame);
   const requestedAngles = lastPose.constraintState.validationPose.requestedAngles;
+  const topology = createTopologyGate(surface.generationDiagnostics);
+  const alignment = { ...lastAnchorAudit, passed: lastAnchorAudit.passed };
+  const jointSurfaceGeometry = createJointSurfaceGeometryGate(lastGeometryQuality);
+  const qaGates = {
+    topology,
+    rigSurfaceAlignment: alignment,
+    jointSurfaceGeometry,
+    visualAcceptance: { passed: false, status: 'FAIL', reason: 'pending-user-review' },
+    productionReady: { passed: false, status: 'FAIL', reason: 'release-flag-locked' },
+  };
+  const hipDiagnostic = createRequestedAngleDiagnostic(requestedAngles, lastAngleMeasurements, 'leftUpperLeg', 'bend', 'leftHipFlexDegrees');
+  const kneeDiagnostic = createRequestedAngleDiagnostic(requestedAngles, lastAngleMeasurements, 'leftLowerLeg', 'bend', 'leftKneeBendDegrees');
+  const rightHipDiagnostic = createRequestedAngleDiagnostic(
+    lastMirroredAngleMeasurements ? [{ jointId: 'rightUpperLeg', anatomicalChannel: 'bend', requestedAngleDegrees: 55 }] : [],
+    lastMirroredAngleMeasurements,
+    'rightUpperLeg',
+    'bend',
+    'rightHipFlexDegrees',
+  );
+  const rightKneeDiagnostic = createRequestedAngleDiagnostic(
+    lastMirroredAngleMeasurements ? [{ jointId: 'rightLowerLeg', anatomicalChannel: 'bend', requestedAngleDegrees: 110 }] : [],
+    lastMirroredAngleMeasurements,
+    'rightLowerLeg',
+    'bend',
+    'rightKneeBendDegrees',
+  );
   const glbRequests = performance.getEntriesByType('resource')
     .filter((entry) => /\.glb(?:$|[?#])/i.test(entry.name));
   lastQASnapshot = {
@@ -323,8 +373,12 @@ function updateDiagnostics() {
       degenerateTriangleRatio: surface.generationDiagnostics.degenerateTriangleRatio,
       finite: finiteAudit,
       normals: normalAudit,
+      deformationQuality: structuredClone(lastGeometryQuality),
       surfaceLayerCount: scene.getObjectsByProperty('name', 'HumanCoreV5ProceduralSurface').length,
     },
+    qaGates,
+    angleDiagnostics: { hip: hipDiagnostic, knee: kneeDiagnostic, rightHipMirror: rightHipDiagnostic, rightKneeMirror: rightKneeDiagnostic },
+    cameraFraming: getCameraFramingState(),
     performance: {
       generatedByWorker: deform.generatedByWorker,
       workerGenerationTimeMs: surface.generationDiagnostics.generationTimeMs,
@@ -359,7 +413,21 @@ function updateDiagnostics() {
     'Procedural anchors': lastAnchorAudit.proceduralRegionAnchorSource,
     'Anchor max error': `${(lastAnchorAudit.maximumErrorMeters * 1000).toFixed(2)} mm`,
     'Anchor mean error': `${(lastAnchorAudit.meanErrorMeters * 1000).toFixed(2)} mm`,
-    'Rig/surface gate': lastAnchorAudit.passed ? 'PASS' : 'FAIL',
+    'Topology': topology.passed ? 'PASS' : 'FAIL',
+    'Rig/Surface Alignment': alignment.passed ? 'PASS' : 'FAIL',
+    'Joint Surface Geometry': jointSurfaceGeometry.passed ? 'PASS' : 'FAIL',
+    'Visual Acceptance': false,
+    'Production Ready': false,
+    'Hip Flex requested leftUpperLeg bend': formatAngleDiagnosticValue(hipDiagnostic?.requestedAngleDegrees),
+    'Hip Flex measured leftHipFlexDegrees': formatAngleDiagnosticValue(hipDiagnostic?.measuredAngleDegrees),
+    'Hip Flex absolute angle error': formatAngleDiagnosticValue(hipDiagnostic?.absoluteErrorDegrees),
+    'Hip Flex right mirror measured': formatAngleDiagnosticValue(rightHipDiagnostic?.measuredAngleDegrees),
+    'Hip Flex right mirror error': formatAngleDiagnosticValue(rightHipDiagnostic?.absoluteErrorDegrees),
+    'Knee Bend requested leftLowerLeg bend': formatAngleDiagnosticValue(kneeDiagnostic?.requestedAngleDegrees),
+    'Knee Bend measured leftKneeBendDegrees': formatAngleDiagnosticValue(kneeDiagnostic?.measuredAngleDegrees),
+    'Knee Bend absolute angle error': formatAngleDiagnosticValue(kneeDiagnostic?.absoluteErrorDegrees),
+    'Knee Bend right mirror measured': formatAngleDiagnosticValue(rightKneeDiagnostic?.measuredAngleDegrees),
+    'Knee Bend right mirror error': formatAngleDiagnosticValue(rightKneeDiagnostic?.absoluteErrorDegrees),
     'BodyDNA fingerprint': surface.bodyDNAFingerprint,
     'Rig topology fingerprint': surface.rigTopologyFingerprint,
     'Field generator': surface.generatorVersion,
@@ -394,18 +462,12 @@ function updateDiagnostics() {
     'Camera / display': `${activeCamera} / ${displayMode}`,
     'Runtime errors': runtimeErrors.length,
     'GLB requests': glbRequests.length,
-    'Visual acceptance': 'pending-user-review',
-    'Production ready': false,
   };
   const diagnostics = document.querySelector('#diagnostics');
   diagnostics.innerHTML = Object.entries(values).map(([keyName, value]) => (
     `<dt data-qa-kind="${escapeHTML(keyName)}">${escapeHTML(keyName)}</dt><dd data-qa-value="${escapeHTML(keyName)}">${escapeHTML(value)}</dd>`
   )).join('');
-  const gate = document.querySelector('#rig-surface-gate');
-  gate.className = lastAnchorAudit.passed ? 'gate pass' : 'gate fail';
-  gate.textContent = lastAnchorAudit.passed
-    ? `Rig/Surface PASS · max ${(lastAnchorAudit.maximumErrorMeters * 1000).toFixed(2)} mm`
-    : `Rig/Surface FAIL · max ${(lastAnchorAudit.maximumErrorMeters * 1000).toFixed(2)} mm`;
+  renderQAGates(qaGates);
 }
 
 function buildDNAControls() {
@@ -484,7 +546,9 @@ async function runFullQA() {
         qaRecords.push(structuredClone(lastQASnapshot));
       }
     }
-    const passed = qaRecords.every((record) => record.rigSurfaceAudit.passed
+    const passed = qaRecords.every((record) => record.qaGates.topology.passed
+      && record.qaGates.rigSurfaceAlignment.passed
+      && record.qaGates.jointSurfaceGeometry.passed
       && record.geometry.finite.passed
       && record.geometry.normals.passed
       && record.geometry.surfaceLayerCount === 1
@@ -558,33 +622,207 @@ function setQAOutput(message, status) {
   output.dataset.status = status;
 }
 
-function setCamera(name) {
-  activeCamera = name;
-  const target = new THREE.Vector3(0, dna?.proportion.height * 0.5 ?? 0.9, 0);
-  const distance = 2.9;
-  if (name === 'Front') camera.position.set(0, target.y, distance);
-  if (name === 'Back') camera.position.set(0, target.y, -distance);
-  if (name === 'Left') camera.position.set(-distance, target.y, 0);
-  if (name === 'Right') camera.position.set(distance, target.y, 0);
-  if (name === 'Perspective') camera.position.set(2.4, target.y + 0.45, 2.8);
-  if (name === 'Fit') camera.position.set(0, target.y, dna.proportion.height * 1.5);
-  if (name === 'Reset') camera.position.set(2.7, 1.45, 3.1);
-  controls.target.copy(target);
-  controls.update();
-  updateDiagnostics();
+async function setCamera(name) {
+  if (!lastFrame) return;
+  if (name === 'Reset') {
+    activePreset = 'Reference';
+    activePoseId = 't-pose';
+    manualDNA = {};
+    setActiveButton('preset', 'Reference');
+    setActiveButton('pose', PROCEDURAL_DEFORM_VALIDATION_POSE_LABELS_V5['t-pose']);
+    await queueRebuild();
+    frameCurrentPose('Perspective', PROCEDURAL_CAMERA_DIRECTIONS_V5.Perspective);
+    activeCamera = 'Reset';
+    updateDiagnostics();
+    return;
+  }
+  const direction = name === 'Fit'
+    ? camera.position.clone().sub(controls.target).toArray()
+    : PROCEDURAL_CAMERA_DIRECTIONS_V5[name] ?? PROCEDURAL_CAMERA_DIRECTIONS_V5.Perspective;
+  frameCurrentPose(name, direction);
 }
 
-function focusJoint(jointId, distance = 0.72) {
+function createTopologyGate(generationDiagnostics) {
+  const metrics = {
+    connectedComponentCount: generationDiagnostics.connectedComponentCount,
+    boundaryEdgeCount: generationDiagnostics.boundaryEdgeCount,
+    nonManifoldEdgeCount: generationDiagnostics.nonManifoldEdgeCount,
+    nonFiniteVertexCount: generationDiagnostics.nonFiniteVertexCount,
+    outOfRangeIndexCount: generationDiagnostics.outOfRangeIndexCount,
+  };
+  return {
+    ...metrics,
+    passed: metrics.connectedComponentCount === 1
+      && metrics.boundaryEdgeCount === 0
+      && metrics.nonManifoldEdgeCount === 0
+      && metrics.nonFiniteVertexCount === 0
+      && metrics.outOfRangeIndexCount === 0,
+  };
+}
+
+function createJointSurfaceGeometryGate(quality) {
+  const metrics = {
+    triangleFlipCount: quality.triangleFlipCount,
+    localFoldoverCount: quality.localFoldoverCount,
+    criticalRegionSelfIntersectionCount: quality.criticalRegionSelfIntersectionCount,
+    triangleAreaRatioMinimum: quality.triangleAreaRatioMinimum,
+    triangleAreaRatioMaximum: quality.triangleAreaRatioMaximum,
+  };
+  return {
+    ...metrics,
+    passed: metrics.triangleFlipCount === 0
+      && metrics.localFoldoverCount === 0
+      && metrics.criticalRegionSelfIntersectionCount === 0
+      && metrics.triangleAreaRatioMinimum >= 0.15
+      && metrics.triangleAreaRatioMaximum <= 6,
+  };
+}
+
+function createRequestedAngleDiagnostic(requestedAngles, measurements, jointId, anatomicalChannel, measurementKey) {
+  const requested = requestedAngles?.find((entry) => entry.jointId === jointId && entry.anatomicalChannel === anatomicalChannel);
+  const measuredAngleDegrees = measurements?.[measurementKey];
+  if (!requested || !Number.isFinite(measuredAngleDegrees)) return null;
+  const absoluteErrorDegrees = Math.abs(measuredAngleDegrees - requested.requestedAngleDegrees);
+  return {
+    jointId,
+    anatomicalChannel,
+    measurementKey,
+    requestedAngleDegrees: requested.requestedAngleDegrees,
+    measuredAngleDegrees,
+    absoluteErrorDegrees,
+    passed: absoluteErrorDegrees <= 1,
+    source: 'independent SimulationRig FK',
+  };
+}
+
+function formatAngleDiagnosticValue(value) {
+  return Number.isFinite(value) ? `${value.toFixed(2)}°` : 'n/a';
+}
+
+function renderQAGates(gates) {
+  const root = document.querySelector('#qa-gates');
+  const definitions = [
+    ['topology', 'Topology', gates.topology, `components ${gates.topology.connectedComponentCount} · boundary ${gates.topology.boundaryEdgeCount}`],
+    ['rig-surface-alignment', 'Rig/Surface Alignment', gates.rigSurfaceAlignment, `max ${(gates.rigSurfaceAlignment.maximumErrorMeters * 1000).toFixed(2)} mm`],
+    ['joint-surface-geometry', 'Joint Surface Geometry', gates.jointSurfaceGeometry, `flips ${gates.jointSurfaceGeometry.triangleFlipCount} · foldovers ${gates.jointSurfaceGeometry.localFoldoverCount} · intersections ${gates.jointSurfaceGeometry.criticalRegionSelfIntersectionCount}`],
+    ['visual-acceptance', 'Visual Acceptance', gates.visualAcceptance, 'false · user review pending'],
+    ['production-ready', 'Production Ready', gates.productionReady, 'false · release locked'],
+  ];
+  root.innerHTML = definitions.map(([id, label, gate, detail]) => (
+    `<div class="gate ${gate.passed ? 'pass' : 'fail'}" data-qa-gate="${id}">${escapeHTML(label)} ${gate.passed ? 'PASS' : 'FAIL'} · ${escapeHTML(detail)}</div>`
+  )).join('');
+}
+
+function setActiveButton(kind, name) {
+  for (const button of document.querySelectorAll(`[data-qa-button="${kind}"]`)) {
+    button.classList.toggle('active', button.dataset.qaName === name);
+  }
+}
+
+function focusJoint(jointId) {
   const resolved = resolveProceduralSimulationRigJointV5(lastSimulationRigFrame, jointId);
   if (!resolved) throw new Error(`Cannot focus missing SimulationRig joint or anatomical region ${jointId}.`);
   const { joint } = resolved;
-  const target = new THREE.Vector3(...joint.worldPosition);
-  camera.position.set(target.x, target.y, target.z + distance);
-  controls.target.copy(target);
-  controls.update();
+  const worldPositions = currentWorldDeformedPositions();
+  const localPositions = selectJointLocalDeformedPositionsV5({
+    positions: worldPositions,
+    regionIds: lastFrame.regionIds,
+    regionNames: deformRuntime.surface.regionNames,
+    jointId,
+    jointPosition: joint.worldPosition,
+    radius: Math.max(0.16, dna.proportion.height * 0.16),
+  });
+  const direction = camera.position.clone().sub(controls.target).toArray();
+  applyCameraFrame(frameDeformedBoundsV5({
+    positions: localPositions,
+    direction,
+    fovDegrees: camera.getEffectiveFOV(),
+    aspect: camera.aspect,
+    margin: 0.10,
+    target: joint.worldPosition,
+  }), {
+    kind: 'joint-closeup',
+    sourceVertexCount: localPositions.length / 3,
+    jointTarget: [...joint.worldPosition],
+    jointId,
+  });
   activeCamera = `Closeup:${jointId} (${resolved.resolvedJointId})`;
   updateDiagnostics();
   return activeCamera;
+}
+
+function frameCurrentPose(name, direction) {
+  const worldPositions = currentWorldDeformedPositions();
+  applyCameraFrame(frameDeformedBoundsV5({
+    positions: worldPositions,
+    direction,
+    fovDegrees: camera.getEffectiveFOV(),
+    aspect: camera.aspect,
+    margin: 0.10,
+  }), { kind: 'full-body', sourceVertexCount: worldPositions.length / 3 });
+  activeCamera = name;
+  updateDiagnostics();
+}
+
+function applyCameraFrame(frame, metadata) {
+  camera.position.fromArray(frame.position);
+  camera.up.fromArray(frame.up);
+  camera.near = frame.near;
+  camera.far = frame.far;
+  camera.updateProjectionMatrix();
+  controls.target.fromArray(frame.target);
+  controls.update();
+  camera.updateMatrixWorld(true);
+  lastCameraFrame = { ...frame, ...metadata };
+}
+
+function currentWorldDeformedPositions() {
+  const object = adapter.getObject3D();
+  object.updateMatrixWorld(true);
+  const matrix = object.matrixWorld;
+  const point = new THREE.Vector3();
+  const result = new Float32Array(lastFrame.deformedPositions.length);
+  for (let offset = 0; offset < lastFrame.deformedPositions.length; offset += 3) {
+    point.fromArray(lastFrame.deformedPositions, offset).applyMatrix4(matrix);
+    result.set(point.toArray(), offset);
+  }
+  return result;
+}
+
+function getCameraFramingState() {
+  if (!lastFrame) return null;
+  camera.updateMatrixWorld(true);
+  const positions = currentWorldDeformedPositions();
+  const point = new THREE.Vector3();
+  const ndc = { minimum: [Infinity, Infinity, Infinity], maximum: [-Infinity, -Infinity, -Infinity] };
+  let unsafeVertexCount = 0;
+  let nearFarClippedCount = 0;
+  for (let offset = 0; offset < positions.length; offset += 3) {
+    point.fromArray(positions, offset).project(camera);
+    for (let axis = 0; axis < 3; axis += 1) {
+      ndc.minimum[axis] = Math.min(ndc.minimum[axis], point.getComponent(axis));
+      ndc.maximum[axis] = Math.max(ndc.maximum[axis], point.getComponent(axis));
+    }
+    if (Math.abs(point.x) > 0.900001 || Math.abs(point.y) > 0.900001) unsafeVertexCount += 1;
+    if (point.z < -1.000001 || point.z > 1.000001) nearFarClippedCount += 1;
+  }
+  const target = new THREE.Vector3(...(lastCameraFrame?.jointTarget ?? controls.target.toArray())).project(camera);
+  return {
+    kind: lastCameraFrame?.kind ?? 'unfitted',
+    margin: lastCameraFrame?.margin ?? null,
+    source: 'ProceduralDeformFrame.deformedPositions transformed to world space',
+    sourceVertexCount: lastCameraFrame?.sourceVertexCount ?? positions.length / 3,
+    deformedVertexCount: positions.length / 3,
+    ndc,
+    unsafeVertexCount,
+    nearFarClippedCount,
+    allVerticesWithinSafeClip: unsafeVertexCount === 0 && nearFarClippedCount === 0,
+    near: camera.near,
+    far: camera.far,
+    targetNDC: target.toArray(),
+    targetWithinCentral60: Math.abs(target.x) <= 0.6 && Math.abs(target.y) <= 0.6,
+    jointId: lastCameraFrame?.jointId ?? null,
+  };
 }
 
 async function createRenderer() {
@@ -820,6 +1058,8 @@ window.__HRL_PROCEDURAL_DEFORM_QA__ = Object.freeze({
   markPass: () => markVisualReview('pass'),
   markFail: () => markVisualReview('fail'),
   exportQAJSON,
+  setCamera,
   focusJoint,
+  getCameraFramingState,
   measureSteadyStatePerformance,
 });

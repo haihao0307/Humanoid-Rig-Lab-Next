@@ -5,6 +5,7 @@ import {
   PROCEDURAL_DEFORM_VALIDATION_POSE_IDS_V5,
   compareProceduralRigSurfaceAnchorsV5,
   createBodyDNA,
+  createMirroredProceduralDeformValidationPoseV5,
   createProceduralDeformValidationPoseV5,
   createProceduralSimulationRigFrameV5,
   getHumanRigJointV5,
@@ -83,6 +84,20 @@ near(results['arm-raise-90-left'].measurements.leftArmAbductionDegrees, 90, 2, '
 near(results['arm-raise-150-left'].measurements.leftArmAbductionDegrees, 150, 3, 'Arm Raise 150');
 near(results['elbow-bend-140-left'].measurements.leftElbowBendDegrees, 140, 3, 'Elbow Bend 140');
 near(results['forearm-twist-180-left'].measurements.leftForearmTwistDegrees, 180, 3, 'Forearm Twist 180');
+near(results['hip-flex-left'].measurements.leftHipFlexDegrees, 55, 1, 'Hip Flex left independent FK');
+near(results['knee-bend-left'].measurements.leftKneeBendDegrees, 110, 1, 'Knee Bend left independent FK');
+for (const [sourcePoseId, mirroredPoseId, measurementKey, requested] of [
+  ['hip-flex-left', 'hip-flex-right', 'rightHipFlexDegrees', 55],
+  ['knee-bend-left', 'knee-bend-right', 'rightKneeBendDegrees', 110],
+]) {
+  const mirroredPose = createMirroredProceduralDeformValidationPoseV5(
+    createProceduralDeformValidationPoseV5({ poseId: sourcePoseId, rigCore, bodyDNA: dna, timestamp: 101 }),
+    mirroredPoseId,
+  );
+  const mirroredRig = createProceduralSimulationRigFrameV5({ finalPose: mirroredPose, rigCore, bodyDNA: dna });
+  const mirroredMeasurements = measureProceduralDeformValidationPoseV5({ finalPose: mirroredPose, simulationRigFrame: mirroredRig });
+  near(mirroredMeasurements[measurementKey], requested, 1, `${mirroredPoseId} independent FK`);
+}
 assert.equal(rigCore.topology.fingerprint, topologyFingerprint, 'Validation poses changed the authoritative Rig topology.');
 
 const maximumAnchorErrorMeters = Math.max(...Object.values(results).map((entry) => entry.anchorAudit.maximumErrorMeters));

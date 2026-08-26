@@ -145,6 +145,39 @@ export function createProceduralDeformValidationPoseV5({
     : pose;
 }
 
+export function createMirroredProceduralDeformValidationPoseV5(finalPose, poseId) {
+  const localRotations = {};
+  for (const [jointId, quaternion] of Object.entries(finalPose?.localRotations ?? {})) {
+    const mirroredJointId = jointId.startsWith('left')
+      ? `right${jointId.slice(4)}`
+      : jointId.startsWith('right') ? `left${jointId.slice(5)}` : jointId;
+    localRotations[mirroredJointId] = [-quaternion[0], quaternion[1], quaternion[2], quaternion[3]];
+  }
+  const requestedAngles = (finalPose?.constraintState?.validationPose?.requestedAngles ?? []).map((record) => ({
+    ...record,
+    jointId: record.jointId.startsWith('left')
+      ? `right${record.jointId.slice(4)}`
+      : record.jointId.startsWith('right') ? `left${record.jointId.slice(5)}` : record.jointId,
+    sourceLocalAxis: record.sourceLocalAxis ? [-record.sourceLocalAxis[0], record.sourceLocalAxis[1], record.sourceLocalAxis[2]] : record.sourceLocalAxis,
+    resolvedLocalAxis: record.resolvedLocalAxis ? [-record.resolvedLocalAxis[0], record.resolvedLocalAxis[1], record.resolvedLocalAxis[2]] : record.resolvedLocalAxis,
+    resultQuaternion: record.resultQuaternion ? [-record.resultQuaternion[0], record.resultQuaternion[1], record.resultQuaternion[2], record.resultQuaternion[3]] : record.resultQuaternion,
+  }));
+  return {
+    ...finalPose,
+    frameId: `${finalPose.frameId}-mirrored-right`,
+    localRotations,
+    constraintState: {
+      ...finalPose.constraintState,
+      validationPose: {
+        ...finalPose.constraintState.validationPose,
+        poseId,
+        fixture: `${poseId}-test-only-mirrored-fixture`,
+        requestedAngles,
+      },
+    },
+  };
+}
+
 const STATIC_VALIDATION_POSE_IDS = new Set(['squat', 'lunge-left']);
 
 export function measureProceduralDeformValidationPoseV5({ finalPose, simulationRigFrame } = {}) {
@@ -167,6 +200,20 @@ export function measureProceduralDeformValidationPoseV5({ finalPose, simulationR
     joints.leftHand?.worldPosition,
   );
   if (Number.isFinite(elbow)) result.leftElbowBendDegrees = elbow;
+  for (const side of ['left', 'right']) {
+    const hip = segmentRotationFromBindDegrees(
+      joints[`${side}UpperLeg`],
+      joints[`${side}LowerLeg`],
+      joints[joints[`${side}UpperLeg`]?.parentId],
+    );
+    if (Number.isFinite(hip)) result[`${side}HipFlexDegrees`] = hip;
+    const knee = chainBendDegrees(
+      joints[`${side}UpperLeg`]?.worldPosition,
+      joints[`${side}LowerLeg`]?.worldPosition,
+      joints[`${side}Foot`]?.worldPosition,
+    );
+    if (Number.isFinite(knee)) result[`${side}KneeBendDegrees`] = knee;
+  }
   const twistRecord = finalPose?.constraintState?.validationPose?.requestedAngles
     ?.find((record) => record.jointId === 'leftLowerArm' && record.anatomicalChannel === 'twist');
   if (twistRecord) {
@@ -231,6 +278,17 @@ function chainBendDegrees(parent, joint, child) {
   const incoming = normalizeVector3(joint.map((value, index) => value - parent[index]), [1, 0, 0]);
   const outgoing = normalizeVector3(child.map((value, index) => value - joint[index]), incoming);
   return radiansToDegrees(Math.acos(clamp(dotVectors(incoming, outgoing), -1, 1)));
+}
+function segmentRotationFromBindDegrees(joint, child, parent) {
+  if (!joint || !child || !parent) return Number.NaN;
+  const worldDirection = normalizeVector3(
+    child.worldPosition.map((value, index) => value - joint.worldPosition[index]),
+    child.bindLocalPosition,
+  );
+  const parentInverse = [-parent.worldRotation[0], -parent.worldRotation[1], -parent.worldRotation[2], parent.worldRotation[3]];
+  const localDirection = normalizeVector3(rotateVectorByQuaternion(worldDirection, parentInverse), child.bindLocalPosition);
+  const bindDirection = normalizeVector3(child.bindLocalPosition, [0, -1, 0]);
+  return radiansToDegrees(Math.acos(clamp(dotVectors(localDirection, bindDirection), -1, 1)));
 }
 function channelAxisKey(channel) {
   return ({ bend: 'bendAxisLocal', twist: 'twistAxisLocal', side: 'sideAxisLocal' })[channel];
