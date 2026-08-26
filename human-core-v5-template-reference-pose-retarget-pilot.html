@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Task 14C Template Reference Pose Retarget Pilot D</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./apps/human-core-v5-template-reference-pose-retarget-pilot/styles.css">
+  <script type="importmap">
+    {"imports":{"three":"./node_modules/three/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <main id="comparison-page">
+    <header class="pilot-header">
+      <div><b>Task 14C · Canonical Reference Pose + Full Basis Pilot D</b><span id="scenario-title">Loading…</span></div>
+      <strong>EXPERIMENTAL · NOT FOR ACCEPTANCE</strong>
+    </header>
+    <section class="comparison-grid">
+      <article id="procedural-card" class="surface-card procedural-card">
+        <div class="card-heading"><b>Procedural Truth</b><span>Human Core V5 · R48 · shared finalPose</span></div>
+        <div id="procedural-viewport" class="viewport"></div>
+        <div id="procedural-caption" class="card-caption"></div>
+      </article>
+      <article id="direct-card" class="surface-card direct-card">
+        <div class="card-heading"><b>Template Direct</b><span>Production Skin V4 baseline</span></div>
+        <div id="direct-viewport" class="viewport"></div>
+        <div id="direct-caption" class="card-caption"></div>
+        <div class="template-badge">DIRECT BASELINE<br>NOT PRODUCTION APPROVED</div>
+      </article>
+      <article id="pilot-c-card" class="surface-card pilot-c-card">
+        <div class="card-heading"><b>Pilot C</b><span>Primary-axis candidate</span></div>
+        <div id="pilot-c-viewport" class="viewport"></div>
+        <div id="pilot-c-caption" class="card-caption"></div>
+        <div class="template-badge">PRIMARY-AXIS PILOT C<br>FAILED GATES</div>
+      </article>
+      <article id="pilot-d-card" class="surface-card pilot-d-card">
+        <div class="card-heading"><b>Pilot D</b><span>Reference T + full joint basis</span></div>
+        <div id="pilot-d-viewport" class="viewport"></div>
+        <div id="pilot-d-caption" class="card-caption"></div>
+        <div class="template-badge">EXPERIMENTAL PILOT D<br>NOT FOR ACCEPTANCE</div>
+      </article>
+      <aside id="metrics-panel" class="metrics-panel">
+        <h2>Reference and dynamic evidence</h2>
+        <div id="authority-summary"></div>
+        <div id="metrics-table"></div>
+        <div id="audit-checklist"></div>
+      </aside>
+    </section>
+    <div id="loading">Building deterministic Reference Pose comparison…</div>
+  </main>
+  <section id="contact-sheet" class="hidden"></section>
+  <script id="pilot-state" type="application/json">{"ready":false}</script>
+  <script type="module" src="./apps/human-core-v5-template-reference-pose-retarget-pilot/index.js"></script>
+</body>
+</html>

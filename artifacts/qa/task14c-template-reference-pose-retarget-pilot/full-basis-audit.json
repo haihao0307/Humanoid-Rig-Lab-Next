@@ -1,0 +1,1464 @@
+{
+  "schema": "humanoid_rig/task14c_template_full_basis_audit@5.0",
+  "task": "Task 14C Template Canonical Reference Pose and Full Joint Basis Retarget Pilot D",
+  "formula": "targetReferenceLocal * (M_source_to_target * sourceBindRelativeDelta * inverse(M_source_to_target))",
+  "branchSolver": "deterministic multi-vector Wahba pure-rotation fit; quaternion determinant +1",
+  "primaryChildPolicy": "explicit semantic mapping only",
+  "fullBasisGate": {
+    "passed": true,
+    "referenceTUsesCalibratedReference": true,
+    "maximumProbeAngularErrorDegrees": 0,
+    "maximumOrthogonalityError": 3.885780586188048e-16,
+    "minimumDeterminant": 1,
+    "reflectionDetected": false,
+    "probes": [
+      {
+        "jointId": "hips",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "hips",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "hips",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftUpperLeg",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftUpperLeg",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftUpperLeg",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightUpperLeg",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightUpperLeg",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightUpperLeg",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "spine",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "spine",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "spine",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftLowerLeg",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftLowerLeg",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftLowerLeg",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightLowerLeg",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightLowerLeg",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightLowerLeg",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "chest",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "chest",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "chest",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftFoot",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftFoot",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftFoot",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightFoot",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightFoot",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightFoot",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "upperChest",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "upperChest",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "upperChest",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftToes",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftToes",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftToes",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightToes",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightToes",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightToes",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "neck",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "neck",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "neck",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftShoulder",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftShoulder",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftShoulder",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightShoulder",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightShoulder",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightShoulder",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "head",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "head",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "head",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftUpperArm",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftUpperArm",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftUpperArm",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightUpperArm",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightUpperArm",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightUpperArm",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftLowerArm",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftLowerArm",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftLowerArm",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightLowerArm",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightLowerArm",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightLowerArm",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftHand",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftHand",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftHand",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightHand",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightHand",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightHand",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftHandEnd",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftHandEnd",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "leftHandEnd",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightHandEnd",
+        "channel": "twist",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightHandEnd",
+        "channel": "bend",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      },
+      {
+        "jointId": "rightHandEnd",
+        "channel": "side",
+        "probeDegrees": 17,
+        "angularErrorDegrees": 0
+      }
+    ],
+    "thresholds": {
+      "probeAngularErrorDegrees": 0.01,
+      "orthogonalityError": 0.000001,
+      "determinant": 0.999999
+    }
+  },
+  "joints": [
+    {
+      "jointId": "hips",
+      "sourceTwistAxis": [
+        0,
+        0.9833821804558922,
+        0.18154747908416471
+      ],
+      "sourceBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "sourceSideAxis": [
+        0,
+        0.18154747908416471,
+        -0.9833821804558922
+      ],
+      "targetTwistAxis": [
+        0,
+        0.9833821804558922,
+        0.18154747908416455
+      ],
+      "targetBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "targetSideAxis": [
+        0,
+        0.18154747908416455,
+        -0.9833821804558922
+      ],
+      "M_source_to_target": [
+        -8.326672684688674e-17,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 0,
+      "determinant": 1,
+      "basisSource": "multi-vector-wahba:spine+leftUpperLeg+rightUpperLeg+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "leftUpperLeg",
+      "sourceTwistAxis": [
+        -0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "sourceBendAxis": [
+        0.9997232982786027,
+        -0.023522901159343596,
+        -5.030239137553128e-12
+      ],
+      "sourceSideAxis": [
+        -0.000774237891371607,
+        -0.032905110564321494,
+        0.9994581803429483
+      ],
+      "targetTwistAxis": [
+        -0.02351015598927008,
+        -0.9991816285439787,
+        -0.03291421798497812
+      ],
+      "targetBendAxis": [
+        0.9997232982786027,
+        -0.023522901159343586,
+        -5.0302387301334294e-12
+      ],
+      "targetSideAxis": [
+        -0.0007742378913716068,
+        -0.03290511056432149,
+        0.9994581803429483
+      ],
+      "M_source_to_target": [
+        -5.204170427930421e-18,
+        -8.131516293641283e-20,
+        5.204170427930421e-18,
+        1
+      ],
+      "orthogonalityError": 4.365532864778084e-18,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:leftUpperLeg->leftLowerLeg+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "rightUpperLeg",
+      "sourceTwistAxis": [
+        0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "sourceBendAxis": [
+        0.9997232982786027,
+        0.023522901159343596,
+        5.030239137553128e-12
+      ],
+      "sourceSideAxis": [
+        0.000774237891371607,
+        -0.032905110564321494,
+        0.9994581803429483
+      ],
+      "targetTwistAxis": [
+        0.02351015598927008,
+        -0.9991816285439787,
+        -0.03291421798497812
+      ],
+      "targetBendAxis": [
+        0.9997232982786027,
+        0.023522901159343586,
+        5.0302387301334294e-12
+      ],
+      "targetSideAxis": [
+        0.0007742378913716068,
+        -0.03290511056432149,
+        0.9994581803429483
+      ],
+      "M_source_to_target": [
+        -5.204170427930421e-18,
+        8.131516293641283e-20,
+        -5.204170427930421e-18,
+        1
+      ],
+      "orthogonalityError": 4.365532864778084e-18,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:rightUpperLeg->rightLowerLeg+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "spine",
+      "sourceTwistAxis": [
+        0,
+        0.9902407678311523,
+        -0.13936721897623622
+      ],
+      "sourceBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "sourceSideAxis": [
+        0,
+        -0.13936721897623622,
+        -0.9902407678311523
+      ],
+      "targetTwistAxis": [
+        0,
+        0.9902407678311523,
+        -0.13936721897623622
+      ],
+      "targetBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "targetSideAxis": [
+        0,
+        -0.13936721897623622,
+        -0.9902407678311523
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 0,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:spine->chest+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "leftLowerLeg",
+      "sourceTwistAxis": [
+        -0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "sourceBendAxis": [
+        0.9922778766828955,
+        -0.12403473483538655,
+        1.2305267482054516e-12
+      ],
+      "sourceSideAxis": [
+        -0.0012307086099460497,
+        -0.009845668849801528,
+        0.9999507728689535
+      ],
+      "targetTwistAxis": [
+        -0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "targetBendAxis": [
+        0.9922778766828955,
+        -0.12403473483538655,
+        1.2305267482054516e-12
+      ],
+      "targetSideAxis": [
+        -0.0012307086099460497,
+        -0.009845668849801528,
+        0.9999507728689535
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 1.1067761565802131e-17,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:leftLowerLeg->leftFoot+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "rightLowerLeg",
+      "sourceTwistAxis": [
+        0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "sourceBendAxis": [
+        0.9922778766828955,
+        0.12403473483538655,
+        -1.2305267482054516e-12
+      ],
+      "sourceSideAxis": [
+        0.0012307086099460497,
+        -0.009845668849801528,
+        0.9999507728689535
+      ],
+      "targetTwistAxis": [
+        0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "targetBendAxis": [
+        0.9922778766828955,
+        0.12403473483538655,
+        -1.2305267482054516e-12
+      ],
+      "targetSideAxis": [
+        0.0012307086099460497,
+        -0.009845668849801528,
+        0.9999507728689535
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 1.1067761565802131e-17,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:rightLowerLeg->rightFoot+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "chest",
+      "sourceTwistAxis": [
+        0,
+        0.9915239774692826,
+        -0.1299238319304577
+      ],
+      "sourceBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "sourceSideAxis": [
+        0,
+        -0.1299238319304577,
+        -0.9915239774692826
+      ],
+      "targetTwistAxis": [
+        0,
+        0.9915239774692826,
+        -0.1299238319304577
+      ],
+      "targetBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "targetSideAxis": [
+        0,
+        -0.1299238319304577,
+        -0.9915239774692826
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 0,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:chest->upperChest+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "leftFoot",
+      "sourceTwistAxis": [
+        -0.11497706904062847,
+        -0.4670943411650532,
+        0.876700148309792
+      ],
+      "sourceBendAxis": [
+        0.9710148789096549,
+        -0.23901904722441739,
+        4.365060396471775e-10
+      ],
+      "sourceSideAxis": [
+        0.20954803394662247,
+        0.8512888884012976,
+        0.4810372646205164
+      ],
+      "targetTwistAxis": [
+        -0.1149770690406285,
+        -0.46709434116505333,
+        0.8767001483097923
+      ],
+      "targetBendAxis": [
+        0.9710148789096549,
+        -0.23901904722441739,
+        4.365060396471775e-10
+      ],
+      "targetSideAxis": [
+        0.20954803394662241,
+        0.8512888884012974,
+        0.48103726462051627
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 2.220446049250313e-16,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:leftFoot->leftToes+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "rightFoot",
+      "sourceTwistAxis": [
+        0.11497706904062847,
+        -0.4670943411650532,
+        0.876700148309792
+      ],
+      "sourceBendAxis": [
+        0.9710148789096549,
+        0.23901904722441739,
+        -4.365060396471775e-10
+      ],
+      "sourceSideAxis": [
+        -0.20954803394662247,
+        0.8512888884012976,
+        0.4810372646205164
+      ],
+      "targetTwistAxis": [
+        0.1149770690406285,
+        -0.46709434116505333,
+        0.8767001483097923
+      ],
+      "targetBendAxis": [
+        0.9710148789096549,
+        0.23901904722441739,
+        -4.365060396471775e-10
+      ],
+      "targetSideAxis": [
+        -0.20954803394662241,
+        0.8512888884012974,
+        0.48103726462051627
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 2.220446049250313e-16,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:rightFoot->rightToes+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "upperChest",
+      "sourceTwistAxis": [
+        0,
+        0.9970165267504173,
+        -0.07718837598067747
+      ],
+      "sourceBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "sourceSideAxis": [
+        0,
+        -0.07718837598067747,
+        -0.9970165267504173
+      ],
+      "targetTwistAxis": [
+        0,
+        0.9828490644259327,
+        -0.1844118124119735
+      ],
+      "targetBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "targetSideAxis": [
+        0,
+        -0.1844118124119735,
+        -0.9828490644259327
+      ],
+      "M_source_to_target": [
+        -0.054077680952616385,
+        0,
+        0,
+        0.9985367316342384
+      ],
+      "orthogonalityError": 0,
+      "determinant": 1,
+      "basisSource": "multi-vector-wahba:neck+leftShoulder+rightShoulder+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "leftToes",
+      "sourceTwistAxis": [
+        0,
+        -0.19611613494587637,
+        0.9805806757293818
+      ],
+      "sourceBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "sourceSideAxis": [
+        0,
+        0.9805806757293818,
+        0.19611613494587637
+      ],
+      "targetTwistAxis": [
+        0,
+        -0.19611613494587637,
+        0.9805806757293818
+      ],
+      "targetBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "targetSideAxis": [
+        0,
+        0.9805806757293818,
+        0.19611613494587637
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 0,
+      "determinant": 1.0000000000000002,
+      "basisSource": "terminal-source-reference-world+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "rightToes",
+      "sourceTwistAxis": [
+        0,
+        -0.19611613494587637,
+        0.9805806757293818
+      ],
+      "sourceBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "sourceSideAxis": [
+        0,
+        0.9805806757293818,
+        0.19611613494587637
+      ],
+      "targetTwistAxis": [
+        0,
+        -0.19611613494587637,
+        0.9805806757293818
+      ],
+      "targetBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "targetSideAxis": [
+        0,
+        0.9805806757293818,
+        0.19611613494587637
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 0,
+      "determinant": 1.0000000000000002,
+      "basisSource": "terminal-source-reference-world+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "neck",
+      "sourceTwistAxis": [
+        0,
+        0.9070089679666898,
+        0.42111130598453456
+      ],
+      "sourceBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "sourceSideAxis": [
+        0,
+        0.42111130598453456,
+        -0.9070089679666898
+      ],
+      "targetTwistAxis": [
+        0,
+        0.9070089679666898,
+        0.42111130598453456
+      ],
+      "targetBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "targetSideAxis": [
+        0,
+        0.42111130598453456,
+        -0.9070089679666898
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 0,
+      "determinant": 1,
+      "basisSource": "explicit-primary:neck->head+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "leftShoulder",
+      "sourceTwistAxis": [
+        -0.8550542819846204,
+        -0.5052593479909121,
+        -0.11659831099790277
+      ],
+      "sourceBendAxis": [
+        0.5087293117920325,
+        -0.8609265284120389,
+        -4.562845240529967e-11
+      ],
+      "sourceSideAxis": [
+        -0.10038257908307748,
+        -0.059316978549091244,
+        0.9931791549727755
+      ],
+      "targetTwistAxis": [
+        -0.889484661740586,
+        -0.441998578540901,
+        -0.11599264242208744
+      ],
+      "targetBendAxis": [
+        0.44586412859835456,
+        -0.8950613070253195,
+        -0.008392585737239657
+      ],
+      "targetSideAxis": [
+        -0.10011101516549153,
+        -0.059182034722962025,
+        0.9932146149793533
+      ],
+      "M_source_to_target": [
+        0.003542135718252314,
+        0.0022702799739656794,
+        -0.035766392641819744,
+        0.999351321738649
+      ],
+      "orthogonalityError": 6.006480035569695e-17,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:leftShoulder->leftUpperArm+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "rightShoulder",
+      "sourceTwistAxis": [
+        0.8550542819846204,
+        -0.5052593479909121,
+        -0.11659831099790277
+      ],
+      "sourceBendAxis": [
+        0.5087293117920325,
+        0.8609265284120389,
+        4.562845240529967e-11
+      ],
+      "sourceSideAxis": [
+        0.10038257908307748,
+        -0.059316978549091244,
+        0.9931791549727755
+      ],
+      "targetTwistAxis": [
+        0.889484661740586,
+        -0.441998578540901,
+        -0.11599264242208744
+      ],
+      "targetBendAxis": [
+        0.44586412859835456,
+        0.8950613070253195,
+        0.008392585737239657
+      ],
+      "targetSideAxis": [
+        0.10011101516549153,
+        -0.059182034722962025,
+        0.9932146149793533
+      ],
+      "M_source_to_target": [
+        0.003542135718252314,
+        -0.0022702799739656794,
+        0.035766392641819744,
+        0.999351321738649
+      ],
+      "orthogonalityError": 6.006480035569695e-17,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:rightShoulder->rightUpperArm+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "head",
+      "sourceTwistAxis": [
+        0,
+        0.9981832840582182,
+        -0.060250572003514066
+      ],
+      "sourceBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "sourceSideAxis": [
+        0,
+        -0.060250572003514066,
+        -0.9981832840582182
+      ],
+      "targetTwistAxis": [
+        0,
+        0.9981832840582182,
+        -0.060250572003514066
+      ],
+      "targetBendAxis": [
+        1,
+        0,
+        0
+      ],
+      "targetSideAxis": [
+        0,
+        -0.060250572003514066,
+        -0.9981832840582182
+      ],
+      "M_source_to_target": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "orthogonalityError": 0,
+      "determinant": 1.0000000000000002,
+      "basisSource": "terminal-source-reference-world+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "leftUpperArm",
+      "sourceTwistAxis": [
+        -0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "sourceBendAxis": [
+        0.8591015436797046,
+        -0.5118051754790576,
+        9.467282513497821e-11
+      ],
+      "sourceSideAxis": [
+        0.08307976333943697,
+        0.13945531707463665,
+        0.986737030552252
+      ],
+      "targetTwistAxis": [
+        0.4867104481325276,
+        -0.839330334312409,
+        0.24215187296747048
+      ],
+      "targetBendAxis": [
+        0.8735536026994175,
+        0.4663221180656559,
+        -0.13945531690698879
+      ],
+      "targetSideAxis": [
+        0.004128303465429334,
+        0.27940700081740966,
+        0.9601638844513564
+      ],
+      "M_source_to_target": [
+        -0.040233422203053475,
+        0.07080082245411898,
+        0.4924212466902599,
+        0.8665389957097497
+      ],
+      "orthogonalityError": 3.885780586188048e-16,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:leftUpperArm->leftLowerArm+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "rightUpperArm",
+      "sourceTwistAxis": [
+        0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "sourceBendAxis": [
+        0.8591015436797046,
+        0.5118051754790576,
+        -9.467282513497821e-11
+      ],
+      "sourceSideAxis": [
+        -0.08307976333943697,
+        0.13945531707463665,
+        0.986737030552252
+      ],
+      "targetTwistAxis": [
+        -0.4867104481325276,
+        -0.839330334312409,
+        0.24215187296747048
+      ],
+      "targetBendAxis": [
+        0.8735536026994175,
+        -0.4663221180656559,
+        0.13945531690698879
+      ],
+      "targetSideAxis": [
+        -0.004128303465429334,
+        0.27940700081740966,
+        0.9601638844513564
+      ],
+      "M_source_to_target": [
+        -0.040233422203053475,
+        -0.07080082245411898,
+        -0.4924212466902599,
+        0.8665389957097497
+      ],
+      "orthogonalityError": 3.885780586188048e-16,
+      "determinant": 1.0000000000000002,
+      "basisSource": "explicit-primary:rightUpperArm->rightLowerArm+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "leftLowerArm",
+      "sourceTwistAxis": [
+        -0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "sourceBendAxis": [
+        0.9237421136046161,
+        -0.3830150226208846,
+        -8.508729831824269e-11
+      ],
+      "sourceSideAxis": [
+        0.1507295048367945,
+        0.36352409978475897,
+        0.9193099832196621
+      ],
+      "targetTwistAxis": [
+        0.7197828309692922,
+        -0.4812125438208586,
+        0.5003470434721181
+      ],
+      "targetBendAxis": [
+        0.679065511729825,
+        0.6377462343796224,
+        -0.36352410004526936
+      ],
+      "targetSideAxis": [
+        -0.14416208593434812,
+        0.601426826974047,
+        0.7858136323422922
+      ],
+      "M_source_to_target": [
+        -0.11156223397110382,
+        0.16702956736226196,
+        0.5441014212378998,
+        0.8146217741903601
+      ],
+      "orthogonalityError": 1.6653345369377348e-16,
+      "determinant": 1,
+      "basisSource": "explicit-primary:leftLowerArm->leftHand+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "rightLowerArm",
+      "sourceTwistAxis": [
+        0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "sourceBendAxis": [
+        0.9237421136046161,
+        0.3830150226208846,
+        8.508729831824269e-11
+      ],
+      "sourceSideAxis": [
+        -0.1507295048367945,
+        0.36352409978475897,
+        0.9193099832196621
+      ],
+      "targetTwistAxis": [
+        -0.7197828309692922,
+        -0.4812125438208586,
+        0.5003470434721181
+      ],
+      "targetBendAxis": [
+        0.679065511729825,
+        -0.6377462343796224,
+        0.36352410004526936
+      ],
+      "targetSideAxis": [
+        0.14416208593434812,
+        0.601426826974047,
+        0.7858136323422922
+      ],
+      "M_source_to_target": [
+        -0.11156223397110382,
+        -0.16702956736226196,
+        -0.5441014212378998,
+        0.8146217741903601
+      ],
+      "orthogonalityError": 1.6653345369377348e-16,
+      "determinant": 1,
+      "basisSource": "explicit-primary:rightLowerArm->rightHand+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "leftHand",
+      "sourceTwistAxis": [
+        -0.39562389590990127,
+        -0.8477654918069313,
+        0.35323562091955474
+      ],
+      "sourceBendAxis": [
+        0.906183140106806,
+        -0.4228854650921085,
+        1.4461348785133055e-11
+      ],
+      "sourceSideAxis": [
+        0.14937820982740582,
+        0.32009616416818076,
+        0.9355343906632064
+      ],
+      "targetTwistAxis": [
+        0.6644782330735185,
+        -0.580834623558997,
+        0.4702125241277325
+      ],
+      "targetBendAxis": [
+        0.7417193830407496,
+        0.5893986785096633,
+        -0.3200961646016903
+      ],
+      "targetSideAxis": [
+        -0.09121970507047704,
+        0.5614626771621966,
+        0.8224588911068531
+      ],
+      "M_source_to_target": [
+        -0.0964417444467468,
+        0.15143247570975177,
+        0.5284470240994674,
+        0.8297655921698012
+      ],
+      "orthogonalityError": 2.220446049250313e-16,
+      "determinant": 1.0000000000000004,
+      "basisSource": "explicit-primary:leftHand->leftHandEnd+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "rightHand",
+      "sourceTwistAxis": [
+        0.39562389590990127,
+        -0.8477654918069313,
+        0.35323562091955474
+      ],
+      "sourceBendAxis": [
+        0.906183140106806,
+        0.4228854650921085,
+        -1.4461348785133055e-11
+      ],
+      "sourceSideAxis": [
+        -0.14937820982740582,
+        0.32009616416818076,
+        0.9355343906632064
+      ],
+      "targetTwistAxis": [
+        -0.6644782330735185,
+        -0.580834623558997,
+        0.4702125241277325
+      ],
+      "targetBendAxis": [
+        0.7417193830407496,
+        -0.5893986785096633,
+        0.3200961646016903
+      ],
+      "targetSideAxis": [
+        0.09121970507047704,
+        0.5614626771621966,
+        0.8224588911068531
+      ],
+      "M_source_to_target": [
+        -0.0964417444467468,
+        -0.15143247570975177,
+        -0.5284470240994674,
+        0.8297655921698012
+      ],
+      "orthogonalityError": 2.220446049250313e-16,
+      "determinant": 1.0000000000000004,
+      "basisSource": "explicit-primary:rightHand->rightHandEnd+secondary-anatomical-axis+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "leftHandEnd",
+      "sourceTwistAxis": [
+        -0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "sourceBendAxis": [
+        0.7071067811865476,
+        -0.7071067811865476,
+        0
+      ],
+      "sourceSideAxis": [
+        0.5986710949642687,
+        0.5986710949642687,
+        0.532152083627009
+      ],
+      "targetTwistAxis": [
+        -0.3762883469552089,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "targetBendAxis": [
+        0.7071067811865475,
+        -0.7071067811865477,
+        6.012971462757708e-18
+      ],
+      "targetSideAxis": [
+        0.5986710949642687,
+        0.5986710949642686,
+        0.532152083627009
+      ],
+      "M_source_to_target": [
+        9.625974911417289e-18,
+        -1.387778780781446e-17,
+        -4.3238747244090495e-17,
+        1
+      ],
+      "orthogonalityError": 5.551115123125783e-17,
+      "determinant": 1.0000000000000002,
+      "basisSource": "terminal-source-reference-world+HumanRigCore-axisReference"
+    },
+    {
+      "jointId": "rightHandEnd",
+      "sourceTwistAxis": [
+        0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "sourceBendAxis": [
+        0.7071067811865476,
+        0.7071067811865476,
+        0
+      ],
+      "sourceSideAxis": [
+        -0.5986710949642687,
+        0.5986710949642687,
+        0.532152083627009
+      ],
+      "targetTwistAxis": [
+        0.3762883469552089,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "targetBendAxis": [
+        0.7071067811865475,
+        0.7071067811865477,
+        -6.012971462757708e-18
+      ],
+      "targetSideAxis": [
+        -0.5986710949642687,
+        0.5986710949642686,
+        0.532152083627009
+      ],
+      "M_source_to_target": [
+        9.625974911417289e-18,
+        1.387778780781446e-17,
+        4.3238747244090495e-17,
+        1
+      ],
+      "orthogonalityError": 5.551115123125783e-17,
+      "determinant": 1.0000000000000002,
+      "basisSource": "terminal-source-reference-world+HumanRigCore-axisReference"
+    }
+  ]
+}
