@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Humanoid Rig Lab — HRLSurface V1</title>
+  <link rel="stylesheet" href="./apps/human-core-v5-production-surface-v1/styles.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="./artifacts/review/task16a-r2b-production-surface-v1/vendor/three.iife.min.js"></script>
+  <script src="./apps/human-core-v5-production-surface-v1/runtime.js"></script>
+  <script>
+    HRLProductionSurfaceApp.start({
+      rootSelector: '#app',
+      productionUrl: './assets/human/production-surface-v1/humanoid-rig-production-neutral-v1.hrlsurface',
+      referenceUrl: './assets/human/canonical-reference-v1/makehuman-reference-neutral-static-v1.glb'
+    });
+  </script>
+</body>
+</html>
