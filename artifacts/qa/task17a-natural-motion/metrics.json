@@ -1,0 +1,1132 @@
+{
+  "schema": "humanoid_rig/task17a_natural_motion_metrics@1.0",
+  "task": "Task 17A Human Core Natural Motion Execution Foundation",
+  "sampleRate": 30,
+  "authorityChain": [
+    "BehaviorCommand",
+    "BehaviorPlan",
+    "MotionIntent",
+    "desiredPose",
+    "contact-and-balance",
+    "joint-limits",
+    "fixed-bone-lengths",
+    "finalPose",
+    "Renderer"
+  ],
+  "generalNaturalLanguageSupport": false,
+  "developmentGrammarOnly": true,
+  "behaviorPlansEquivalent": true,
+  "executionsEquivalent": true,
+  "mirrorErrors": {
+    "90": 0,
+    "180": 0
+  },
+  "scenarioCount": 11,
+  "numericPassedScenarioCount": 11,
+  "scenarios": [
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "idle-4s",
+      "duration": 4,
+      "frameCount": 121,
+      "sampleRate": 30,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": null,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 120,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 120,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 240,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 1,
+          "swingPhaseCount": 0,
+          "heelStrikeCount": 0,
+          "toeOffCount": 0
+        },
+        "right": {
+          "stancePhaseCount": 1,
+          "swingPhaseCount": 0,
+          "heelStrikeCount": 0,
+          "toeOffCount": 0
+        }
+      },
+      "maximumBoneLengthError": 0,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": null,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 0,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0,
+        "pelvisChestCounterRotation": 0,
+        "stepLengthLeft": 0,
+        "stepLengthRight": 0,
+        "stepDurationLeft": 0,
+        "stepDurationRight": 0,
+        "stanceRatioLeft": 1,
+        "stanceRatioRight": 1,
+        "cadence": 0,
+        "pathDeviation": 0,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "turn-left-90",
+      "duration": 2.7,
+      "frameCount": 82,
+      "sampleRate": 29.999999999999996,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": 0,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 69,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 69,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 138,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 2,
+          "swingPhaseCount": 1,
+          "heelStrikeCount": 1,
+          "toeOffCount": 1
+        },
+        "right": {
+          "stancePhaseCount": 2,
+          "swingPhaseCount": 1,
+          "heelStrikeCount": 1,
+          "toeOffCount": 1
+        }
+      },
+      "maximumBoneLengthError": 3.3306690738754696e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": 0,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 4,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0.9999999999999994,
+        "pelvisChestCounterRotation": -0.9999999999999984,
+        "stepLengthLeft": 0,
+        "stepLengthRight": 0,
+        "stepDurationLeft": 0,
+        "stepDurationRight": 0,
+        "stanceRatioLeft": 0.8658536585365854,
+        "stanceRatioRight": 0.8658536585365854,
+        "cadence": 0,
+        "pathDeviation": 0,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "turn-right-90",
+      "duration": 2.7,
+      "frameCount": 82,
+      "sampleRate": 29.999999999999996,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": 0,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 69,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 69,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 138,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 2,
+          "swingPhaseCount": 1,
+          "heelStrikeCount": 1,
+          "toeOffCount": 1
+        },
+        "right": {
+          "stancePhaseCount": 2,
+          "swingPhaseCount": 1,
+          "heelStrikeCount": 1,
+          "toeOffCount": 1
+        }
+      },
+      "maximumBoneLengthError": 3.3306690738754696e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": 0,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 4,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0.9999999999999994,
+        "pelvisChestCounterRotation": -0.9999999999999984,
+        "stepLengthLeft": 0,
+        "stepLengthRight": 0,
+        "stepDurationLeft": 0,
+        "stepDurationRight": 0,
+        "stanceRatioLeft": 0.8658536585365854,
+        "stanceRatioRight": 0.8658536585365854,
+        "cadence": 0,
+        "pathDeviation": 0,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "turn-left-180",
+      "duration": 3.8200000000000003,
+      "frameCount": 116,
+      "sampleRate": 30.104712041884813,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": 0,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 91,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 92,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 183,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 3,
+          "swingPhaseCount": 2,
+          "heelStrikeCount": 2,
+          "toeOffCount": 2
+        },
+        "right": {
+          "stancePhaseCount": 3,
+          "swingPhaseCount": 2,
+          "heelStrikeCount": 2,
+          "toeOffCount": 2
+        }
+      },
+      "maximumBoneLengthError": 2.7755575615628914e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": 0,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 8,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0.999999999999997,
+        "pelvisChestCounterRotation": -1.0000000000000029,
+        "stepLengthLeft": 0,
+        "stepLengthRight": 0,
+        "stepDurationLeft": 0,
+        "stepDurationRight": 0,
+        "stanceRatioLeft": 0.8103448275862069,
+        "stanceRatioRight": 0.8189655172413793,
+        "cadence": 0,
+        "pathDeviation": 0,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "turn-right-180",
+      "duration": 3.8200000000000003,
+      "frameCount": 116,
+      "sampleRate": 30.104712041884813,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": 0,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 92,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 91,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 183,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 3,
+          "swingPhaseCount": 2,
+          "heelStrikeCount": 2,
+          "toeOffCount": 2
+        },
+        "right": {
+          "stancePhaseCount": 3,
+          "swingPhaseCount": 2,
+          "heelStrikeCount": 2,
+          "toeOffCount": 2
+        }
+      },
+      "maximumBoneLengthError": 2.7755575615628914e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": 0,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 8,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0.999999999999997,
+        "pelvisChestCounterRotation": -1.0000000000000029,
+        "stepLengthLeft": 0,
+        "stepLengthRight": 0,
+        "stepDurationLeft": 0,
+        "stepDurationRight": 0,
+        "stanceRatioLeft": 0.8189655172413793,
+        "stanceRatioRight": 0.8103448275862069,
+        "cadence": 0,
+        "pathDeviation": 0,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "walk-forward-3m",
+      "duration": 7.320000000000001,
+      "frameCount": 221,
+      "sampleRate": 30.054644808743166,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": null,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 167,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 167,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 334,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 6,
+          "swingPhaseCount": 5,
+          "heelStrikeCount": 5,
+          "toeOffCount": 5
+        },
+        "right": {
+          "stancePhaseCount": 6,
+          "swingPhaseCount": 5,
+          "heelStrikeCount": 5,
+          "toeOffCount": 5
+        }
+      },
+      "maximumBoneLengthError": 3.885780586188048e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": null,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 20,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0.999999999999999,
+        "pelvisChestCounterRotation": -1.0000000000000002,
+        "stepLengthLeft": 0.6,
+        "stepLengthRight": 0.6,
+        "stepDurationLeft": 0.32,
+        "stepDurationRight": 0.31999999999999995,
+        "stanceRatioLeft": 0.7828054298642534,
+        "stanceRatioRight": 0.7828054298642534,
+        "cadence": 130.43478260869566,
+        "pathDeviation": 0.024939888888888886,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0.10000000000000009
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "walk-diagonal-2.5m",
+      "duration": 7.320000000000001,
+      "frameCount": 221,
+      "sampleRate": 30.054644808743166,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": null,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 167,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 167,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 334,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 6,
+          "swingPhaseCount": 5,
+          "heelStrikeCount": 5,
+          "toeOffCount": 5
+        },
+        "right": {
+          "stancePhaseCount": 6,
+          "swingPhaseCount": 5,
+          "heelStrikeCount": 5,
+          "toeOffCount": 5
+        }
+      },
+      "maximumBoneLengthError": 3.3306690738754696e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": null,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 20,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0.999999999999999,
+        "pelvisChestCounterRotation": -1.0000000000000002,
+        "stepLengthLeft": 0.5216796433942479,
+        "stepLengthRight": 0.4764530814732516,
+        "stepDurationLeft": 0.32,
+        "stepDurationRight": 0.31999999999999995,
+        "stanceRatioLeft": 0.7828054298642534,
+        "stanceRatioRight": 0.7828054298642534,
+        "cadence": 130.43478260869566,
+        "pathDeviation": 0.029829033764859007,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0.10000000000000009
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "turn-180-walk-3m-stop",
+      "duration": 11.14,
+      "frameCount": 336,
+      "sampleRate": 30.071813285457807,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": 0,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 258,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 260,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 518,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 8,
+          "swingPhaseCount": 7,
+          "heelStrikeCount": 7,
+          "toeOffCount": 7
+        },
+        "right": {
+          "stancePhaseCount": 8,
+          "swingPhaseCount": 7,
+          "heelStrikeCount": 7,
+          "toeOffCount": 7
+        }
+      },
+      "maximumBoneLengthError": 3.885780586188048e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": null,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 28,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0.9999999999999912,
+        "pelvisChestCounterRotation": -1.0000000000000029,
+        "stepLengthLeft": 0.6,
+        "stepLengthRight": 0.6,
+        "stepDurationLeft": 0.32,
+        "stepDurationRight": 0.31999999999999995,
+        "stanceRatioLeft": 0.7916666666666666,
+        "stanceRatioRight": 0.7976190476190477,
+        "cadence": 130.43478260869566,
+        "pathDeviation": 0.02493983840402182,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0.09999999999999964
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "instruction-command-a",
+      "duration": 11.14,
+      "frameCount": 336,
+      "sampleRate": 30.071813285457807,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": 0,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 258,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 260,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 518,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 8,
+          "swingPhaseCount": 7,
+          "heelStrikeCount": 7,
+          "toeOffCount": 7
+        },
+        "right": {
+          "stancePhaseCount": 8,
+          "swingPhaseCount": 7,
+          "heelStrikeCount": 7,
+          "toeOffCount": 7
+        }
+      },
+      "maximumBoneLengthError": 3.885780586188048e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": null,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 28,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0.9999999999999912,
+        "pelvisChestCounterRotation": -1.0000000000000029,
+        "stepLengthLeft": 0.6,
+        "stepLengthRight": 0.6,
+        "stepDurationLeft": 0.32,
+        "stepDurationRight": 0.31999999999999995,
+        "stanceRatioLeft": 0.7916666666666666,
+        "stanceRatioRight": 0.7976190476190477,
+        "cadence": 130.43478260869566,
+        "pathDeviation": 0.02493983840402182,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0.09999999999999964
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "instruction-command-b",
+      "duration": 11.14,
+      "frameCount": 336,
+      "sampleRate": 30.071813285457807,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": 0,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 258,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 260,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 518,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 8,
+          "swingPhaseCount": 7,
+          "heelStrikeCount": 7,
+          "toeOffCount": 7
+        },
+        "right": {
+          "stancePhaseCount": 8,
+          "swingPhaseCount": 7,
+          "heelStrikeCount": 7,
+          "toeOffCount": 7
+        }
+      },
+      "maximumBoneLengthError": 3.885780586188048e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": null,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 28,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 0.9999999999999912,
+        "pelvisChestCounterRotation": -1.0000000000000029,
+        "stepLengthLeft": 0.6,
+        "stepLengthRight": 0.6,
+        "stepDurationLeft": 0.32,
+        "stepDurationRight": 0.31999999999999995,
+        "stanceRatioLeft": 0.7916666666666666,
+        "stanceRatioRight": 0.7976190476190477,
+        "cadence": 130.43478260869566,
+        "pathDeviation": 0.02493983840402182,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0.09999999999999964
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    },
+    {
+      "schema": "humanoid_rig/motion_quality_metrics@1.0",
+      "scenarioId": "repeated-start-stop-30s",
+      "duration": 30,
+      "frameCount": 901,
+      "sampleRate": 30,
+      "finalPositionError": 0,
+      "finalFacingErrorDegrees": 0,
+      "finalYawErrorDegrees": null,
+      "supportFootSlip": {
+        "left": {
+          "sampleCount": 774,
+          "maximum": 0,
+          "mean": 0
+        },
+        "right": {
+          "sampleCount": 773,
+          "maximum": 0,
+          "mean": 0
+        },
+        "combined": {
+          "sampleCount": 1547,
+          "maximum": 0,
+          "mean": 0
+        }
+      },
+      "footPhases": {
+        "left": {
+          "stancePhaseCount": 13,
+          "swingPhaseCount": 12,
+          "heelStrikeCount": 12,
+          "toeOffCount": 12
+        },
+        "right": {
+          "stancePhaseCount": 13,
+          "swingPhaseCount": 12,
+          "heelStrikeCount": 12,
+          "toeOffCount": 12
+        }
+      },
+      "maximumBoneLengthError": 3.3306690738754696e-16,
+      "jointLimitViolationCount": 0,
+      "nonFinitePoseValueCount": 0,
+      "rootTeleportCount": 0,
+      "kneeReverseCount": 0,
+      "elbowReverseCount": 0,
+      "quaternionSignDiscontinuityCount": 0,
+      "leftRightMirrorError": null,
+      "settle": {
+        "settleDuration": 1,
+        "rootSpeedAfterSettle": 0,
+        "rootAngularSpeedAfterSettleDegrees": 0,
+        "footDriftAfterSettle": 0
+      },
+      "balance": {
+        "doubleSupportOutsideCount": 0,
+        "uncontrolledSingleSupportOutsideDuration": 0,
+        "balanceRecoveryCount": 0,
+        "supportTransitionCount": 48,
+        "fallDetected": false
+      },
+      "naturalness": {
+        "armLegCounterSwingCorrelation": 1.0000000000000198,
+        "pelvisChestCounterRotation": -1.0000000000000238,
+        "stepLengthLeft": 0.6034031134574684,
+        "stepLengthRight": 0.6034031134574687,
+        "stepDurationLeft": 0.32,
+        "stepDurationRight": 0.31999999999999995,
+        "stanceRatioLeft": 0.8734739178690344,
+        "stanceRatioRight": 0.8723640399556049,
+        "cadence": 130.43478260869566,
+        "pathDeviation": 0.08793401298989911,
+        "settleDuration": 1,
+        "maximumFrozenDurationDuringWalk": 0.10000000000000142
+      },
+      "gates": {
+        "allGate": true,
+        "contactGate": true,
+        "turnGate": true,
+        "walkGate": true,
+        "settleGate": true,
+        "balanceGate": true,
+        "numericPassed": true
+      },
+      "visualStatus": "unsupported",
+      "thresholds": {
+        "maximumBoneLengthError": 0.000001,
+        "finalYawErrorDegrees": 2,
+        "targetPositionError": 0.05,
+        "targetFacingErrorDegrees": 3,
+        "supportFootMaximumSlip": 0.015,
+        "supportFootMeanSlip": 0.005,
+        "leftRightMirrorError": 0.02,
+        "maximumFrozenDurationDuringWalk": 0.35,
+        "rootSpeedAfterSettle": 0.03,
+        "rootAngularSpeedAfterSettleDegrees": 2,
+        "footDriftAfterSettle": 0.005
+      }
+    }
+  ],
+  "visualEvidence": {
+    "browserCapturePerformedByCodex": false,
+    "requiredVideoCount": 6,
+    "generatedVideoCount": 0,
+    "requiredKeyFrameCount": 12,
+    "generatedKeyFrameCount": 0,
+    "visualReviewStatus": "pending-user-browser-qa"
+  },
+  "acceptanceState": {
+    "visualAcceptance": false,
+    "productionReady": false,
+    "userVisualAcceptance": "pending"
+  },
+  "finalConclusion": "INCONCLUSIVE",
+  "conclusionReason": "Numeric execution foundation passes, but AGENTS.md reserves real browser video, screenshots, and visual naturalness review for the user."
+}

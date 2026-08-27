@@ -1,0 +1,173 @@
+{
+  "schema": "humanoid_rig/task17a_user_browser_capture_manifest@1.0",
+  "task": "Task 17A Human Core Natural Motion Execution Foundation",
+  "status": "pending-user-browser-qa",
+  "page": "human-core-v5-natural-motion-execution-v1.html",
+  "defaultServer": {
+    "command": "powershell -NoProfile -Command \"$env:NO_OPEN='1'; $env:PORT='4173'; node server.mjs\"",
+    "baseUrl": "http://127.0.0.1:4173",
+    "note": "server.mjs may report a different port if 4173 is occupied; use the reported port in every URL."
+  },
+  "stateObject": "window.__HUMAN_CORE_V5_NATURAL_MOTION_V1__",
+  "readiness": [
+    "ready = true",
+    "geometryPresent = true",
+    "webgl2 = true",
+    "consoleErrors.length = 0",
+    "pageErrors.length = 0"
+  ],
+  "recordingPolicy": {
+    "executedBy": "user",
+    "continuousBrowserSession": true,
+    "realBrowserRenderingRequired": true,
+    "staticFrameDuplicationForbidden": true,
+    "postCaptureImageFabricationForbidden": true,
+    "recordFromActionStartThroughStableEnd": true
+  },
+  "videos": [
+    {
+      "id": "turn-left-180",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=turn-left-180",
+      "durationSeconds": 3.82,
+      "output": "artifacts/qa/task17a-natural-motion/videos/turn-left-180.webm"
+    },
+    {
+      "id": "turn-right-180",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=turn-right-180",
+      "durationSeconds": 3.82,
+      "output": "artifacts/qa/task17a-natural-motion/videos/turn-right-180.webm"
+    },
+    {
+      "id": "walk-forward-3m",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=walk-forward-3m",
+      "durationSeconds": 7.32,
+      "output": "artifacts/qa/task17a-natural-motion/videos/walk-forward-3m.webm"
+    },
+    {
+      "id": "turn-180-walk-3m-stop",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=turn-180-walk-3m-stop",
+      "durationSeconds": 11.14,
+      "output": "artifacts/qa/task17a-natural-motion/videos/turn-180-walk-3m-stop.webm"
+    },
+    {
+      "id": "instruction-command-a",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=instruction-command-a",
+      "durationSeconds": 11.14,
+      "output": "artifacts/qa/task17a-natural-motion/videos/instruction-command-a.webm"
+    },
+    {
+      "id": "instruction-command-b",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=instruction-command-b",
+      "durationSeconds": 11.14,
+      "output": "artifacts/qa/task17a-natural-motion/videos/instruction-command-b.webm"
+    }
+  ],
+  "frames": [
+    {
+      "id": "turn-180-prepare",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=turn-left-180&autoplay=0&time=0.25",
+      "output": "artifacts/qa/task17a-natural-motion/frames/turn-180-prepare.png"
+    },
+    {
+      "id": "turn-180-first-step",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=turn-left-180&autoplay=0&time=0.62",
+      "output": "artifacts/qa/task17a-natural-motion/frames/turn-180-first-step.png"
+    },
+    {
+      "id": "turn-180-mid",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=turn-left-180&autoplay=0&time=1.91",
+      "output": "artifacts/qa/task17a-natural-motion/frames/turn-180-mid.png"
+    },
+    {
+      "id": "turn-180-final-step",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=turn-left-180&autoplay=0&time=2.75",
+      "output": "artifacts/qa/task17a-natural-motion/frames/turn-180-final-step.png"
+    },
+    {
+      "id": "turn-180-settle",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=turn-left-180&autoplay=0&time=3.60",
+      "output": "artifacts/qa/task17a-natural-motion/frames/turn-180-settle.png"
+    },
+    {
+      "id": "walk-start",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=walk-forward-3m&autoplay=0&time=0.20",
+      "output": "artifacts/qa/task17a-natural-motion/frames/walk-start.png"
+    },
+    {
+      "id": "walk-left-support",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=walk-forward-3m&autoplay=0&time=0.55",
+      "output": "artifacts/qa/task17a-natural-motion/frames/walk-left-support.png"
+    },
+    {
+      "id": "walk-right-support",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=walk-forward-3m&autoplay=0&time=1.02",
+      "output": "artifacts/qa/task17a-natural-motion/frames/walk-right-support.png"
+    },
+    {
+      "id": "walk-final-step",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=walk-forward-3m&autoplay=0&time=4.68",
+      "output": "artifacts/qa/task17a-natural-motion/frames/walk-final-step.png"
+    },
+    {
+      "id": "walk-stop",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=walk-forward-3m&autoplay=0&time=7.15",
+      "output": "artifacts/qa/task17a-natural-motion/frames/walk-stop.png"
+    },
+    {
+      "id": "command-plan",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=instruction-command-a&autoplay=0&time=0",
+      "output": "artifacts/qa/task17a-natural-motion/frames/command-plan.png"
+    },
+    {
+      "id": "command-complete",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?scenario=instruction-command-a&autoplay=0&time=11.14",
+      "output": "artifacts/qa/task17a-natural-motion/frames/command-complete.png"
+    }
+  ],
+  "diagnosticImages": [
+    {
+      "id": "foot-traces",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?view=foot-traces",
+      "output": "artifacts/qa/task17a-natural-motion/foot-traces.png"
+    },
+    {
+      "id": "root-speed",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?view=root-speed",
+      "output": "artifacts/qa/task17a-natural-motion/root-speed.png"
+    },
+    {
+      "id": "com-support",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?view=com-support",
+      "output": "artifacts/qa/task17a-natural-motion/com-support.png"
+    },
+    {
+      "id": "contact-sheet",
+      "url": "/human-core-v5-natural-motion-execution-v1.html?view=contact-sheet",
+      "output": "artifacts/qa/task17a-natural-motion/contact-sheet.png",
+      "prerequisites": [
+        "all 12 frame PNG files exist"
+      ]
+    }
+  ],
+  "visualReview": {
+    "instructionStepsComplete": "unsupported",
+    "actionOrderCorrect": "unsupported",
+    "turnDirectionCorrect": "unsupported",
+    "turnUsesFootsteps": "unsupported",
+    "supportFootStable": "unsupported",
+    "leftRightLegAlternation": "unsupported",
+    "naturalKneeFlexion": "unsupported",
+    "heelStrikeClear": "unsupported",
+    "toeOffClear": "unsupported",
+    "pelvisWeightShift": "unsupported",
+    "pelvisChestCoordination": "unsupported",
+    "contralateralArmCoordination": "unsupported",
+    "headFacesTarget": "unsupported",
+    "walkingSpeedNatural": "unsupported",
+    "walkStartContinuous": "unsupported",
+    "stopContinuous": "unsupported",
+    "finalStandingStable": "unsupported",
+    "characterRemainsInFrame": "unsupported",
+    "thirtySecondRunStable": "unsupported"
+  }
+}

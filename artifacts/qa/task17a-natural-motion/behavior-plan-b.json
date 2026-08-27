@@ -1,0 +1,151 @@
+{
+  "schema": "humanoid_rig/task17a_behavior_plan_evidence@1.0",
+  "command": {
+    "schema": "humanoid_rig/behavior_command@1.0",
+    "type": "BehaviorCommand",
+    "commandId": "task17a-instruction-command-b",
+    "actorId": "human-reference-001",
+    "text": "转过身去，走到黄点停住",
+    "locale": "zh-CN",
+    "issuedAt": 0,
+    "worldContextRevision": 1,
+    "targetReferences": [
+      "yellow-marker"
+    ]
+  },
+  "normalizedPlan": {
+    "schema": "humanoid_rig/behavior_plan@1.0",
+    "type": "BehaviorPlan",
+    "planId": "plan-task17a-instruction-command-b",
+    "sourceCommandId": "task17a-instruction-command-b",
+    "steps": [
+      {
+        "stepId": "turn-in-place",
+        "stepType": "turn_in_place",
+        "intent": {
+          "schema": "humanoid_rig/motion_intent@1.0",
+          "type": "MotionIntent",
+          "intentType": "turn_in_place",
+          "startPosition": [
+            0,
+            0,
+            0
+          ],
+          "startFacing": 0,
+          "targetPosition": [
+            0,
+            0,
+            0
+          ],
+          "targetFacing": -3.141592653589793,
+          "preferredSpeed": 0.9,
+          "stopRadius": 0.03,
+          "groundNormal": [
+            0,
+            1,
+            0
+          ],
+          "collisionPolicy": "clear-straight-path-development-only",
+          "turnDirection": "left",
+          "turnAngleDegrees": 180,
+          "targetId": null
+        },
+        "completionCriteria": [
+          "yaw-within-2-degrees",
+          "double-support"
+        ],
+        "status": "planned"
+      },
+      {
+        "stepId": "walk-to-target",
+        "stepType": "walk_to_target",
+        "intent": {
+          "schema": "humanoid_rig/motion_intent@1.0",
+          "type": "MotionIntent",
+          "intentType": "walk_to_target",
+          "startPosition": [
+            0,
+            0,
+            0
+          ],
+          "startFacing": -3.141592653589793,
+          "targetPosition": [
+            0,
+            0,
+            -3
+          ],
+          "targetFacing": 3.141592653589793,
+          "preferredSpeed": 0.9,
+          "stopRadius": 0.03,
+          "groundNormal": [
+            0,
+            1,
+            0
+          ],
+          "collisionPolicy": "clear-straight-path-development-only",
+          "turnDirection": null,
+          "turnAngleDegrees": 0,
+          "targetId": "yellow-marker"
+        },
+        "completionCriteria": [
+          "position-within-stop-radius",
+          "alternating-steps-complete"
+        ],
+        "status": "planned"
+      },
+      {
+        "stepId": "stop-and-settle",
+        "stepType": "stop_and_settle",
+        "intent": {
+          "schema": "humanoid_rig/motion_intent@1.0",
+          "type": "MotionIntent",
+          "intentType": "stop_and_settle",
+          "startPosition": [
+            0,
+            0,
+            -3
+          ],
+          "startFacing": 3.141592653589793,
+          "targetPosition": [
+            0,
+            0,
+            -3
+          ],
+          "targetFacing": 3.141592653589793,
+          "preferredSpeed": 0.9,
+          "stopRadius": 0.03,
+          "groundNormal": [
+            0,
+            1,
+            0
+          ],
+          "collisionPolicy": "clear-straight-path-development-only",
+          "turnDirection": null,
+          "turnAngleDegrees": 0,
+          "targetId": "yellow-marker"
+        },
+        "completionCriteria": [
+          "root-speed-below-threshold",
+          "settled-for-one-second"
+        ],
+        "status": "planned"
+      }
+    ],
+    "preconditions": [
+      "actor-ready",
+      "flat-ground",
+      "clear-straight-path"
+    ],
+    "completionCriteria": [
+      "all-steps-completed",
+      "final-double-support",
+      "settled-for-one-second"
+    ],
+    "failurePolicy": "stop-safe-and-report",
+    "currentStep": 0,
+    "status": "planned",
+    "generalNaturalLanguageSupport": false,
+    "developmentGrammarOnly": true
+  },
+  "equivalentToCommandA": true
+}

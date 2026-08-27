@@ -1,0 +1,1283 @@
+{
+  "schema": "humanoid_rig/task17a_existing_motion_foundation_audit@1.0",
+  "task": "Task 17A Human Core Natural Motion Execution Foundation",
+  "sourceModule": "src/modules/animation/motion-foundation-assets-v4.js",
+  "assetCount": 7,
+  "expectedAssetIds": [
+    "foundation-idle-v4",
+    "foundation-walk-v4",
+    "foundation-stop-v4",
+    "foundation-turn-v4",
+    "foundation-sit-v4",
+    "foundation-stand-v4",
+    "foundation-reach-v4"
+  ],
+  "assets": [
+    {
+      "clipId": "foundation-idle-v4",
+      "name": "Foundation Idle",
+      "duration": 2,
+      "loopMode": "repeat",
+      "rootMotion": {
+        "mode": "in_place",
+        "space": "character_local",
+        "rootJointId": "hips",
+        "positionTrack": {
+          "interpolation": "linear",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "rotationTrack": {
+          "interpolation": "slerp",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ]
+        }
+      },
+      "rotationTracks": [
+        {
+          "trackId": "spine-local-rotation",
+          "jointId": "spine",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        }
+      ],
+      "contacts": [
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "idle-left",
+          "contactType": "foot_contact",
+          "jointId": "leftFoot",
+          "time": 0,
+          "endTime": 2,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "idle-right",
+          "contactType": "foot_contact",
+          "jointId": "rightFoot",
+          "time": 0,
+          "endTime": 2,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        }
+      ],
+      "phaseData": {
+        "cyclic": false,
+        "samples": [
+          {
+            "time": 0,
+            "phase": 0,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          }
+        ],
+        "markers": []
+      },
+      "events": [],
+      "featureAudit": {
+        "completeLeftRightSupportAndSwing": false,
+        "pelvisLateralWeightShift": false,
+        "pelvisChestCounterRotation": false,
+        "armSwing": false,
+        "heelStrike": false,
+        "plantedFootSupport": true,
+        "toeOff": false,
+        "trueVisualAcceptance": false,
+        "contractFixtureOnly": true
+      },
+      "quality": {
+        "status": "development-contract-fixture",
+        "source": "explicit-local-quaternion-test-data",
+        "validated": true,
+        "visualAcceptance": false,
+        "warnings": [
+          "Not captured motion and not approved as a production human-motion asset."
+        ]
+      }
+    },
+    {
+      "clipId": "foundation-walk-v4",
+      "name": "Foundation Walk Forward",
+      "duration": 1.2,
+      "loopMode": "repeat",
+      "rootMotion": {
+        "mode": "root_motion",
+        "space": "character_local",
+        "rootJointId": "hips",
+        "positionTrack": {
+          "interpolation": "linear",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.3,
+              "value": [
+                0,
+                0.015,
+                0.225
+              ]
+            },
+            {
+              "time": 0.6,
+              "value": [
+                0,
+                0,
+                0.45
+              ]
+            },
+            {
+              "time": 0.9,
+              "value": [
+                0,
+                0.015,
+                0.675
+              ]
+            },
+            {
+              "time": 1.2,
+              "value": [
+                0,
+                0,
+                0.9
+              ]
+            }
+          ]
+        },
+        "rotationTrack": {
+          "interpolation": "slerp",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ]
+        }
+      },
+      "rotationTracks": [
+        {
+          "trackId": "leftUpperLeg-local-rotation",
+          "jointId": "leftUpperLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 5
+        },
+        {
+          "trackId": "rightUpperLeg-local-rotation",
+          "jointId": "rightUpperLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 5
+        },
+        {
+          "trackId": "leftLowerLeg-local-rotation",
+          "jointId": "leftLowerLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 5
+        },
+        {
+          "trackId": "rightLowerLeg-local-rotation",
+          "jointId": "rightLowerLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 5
+        },
+        {
+          "trackId": "leftFoot-local-rotation",
+          "jointId": "leftFoot",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 3
+        },
+        {
+          "trackId": "rightFoot-local-rotation",
+          "jointId": "rightFoot",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 3
+        }
+      ],
+      "contacts": [
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "walk-left-a",
+          "contactType": "foot_contact",
+          "jointId": "leftFoot",
+          "time": 0,
+          "endTime": 0.36,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "walk-right",
+          "contactType": "foot_contact",
+          "jointId": "rightFoot",
+          "time": 0.3,
+          "endTime": 0.9,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "walk-left-b",
+          "contactType": "foot_contact",
+          "jointId": "leftFoot",
+          "time": 0.84,
+          "endTime": 1.2,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        }
+      ],
+      "phaseData": {
+        "cyclic": true,
+        "samples": [
+          {
+            "time": 0,
+            "phase": 0,
+            "leftFootState": "stance",
+            "rightFootState": "swing",
+            "supportState": "left"
+          },
+          {
+            "time": 0.3,
+            "phase": 0.25,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          },
+          {
+            "time": 0.36,
+            "phase": 0.3,
+            "leftFootState": "swing",
+            "rightFootState": "stance",
+            "supportState": "right"
+          },
+          {
+            "time": 0.84,
+            "phase": 0.7,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          },
+          {
+            "time": 0.9,
+            "phase": 0.75,
+            "leftFootState": "stance",
+            "rightFootState": "swing",
+            "supportState": "left"
+          },
+          {
+            "time": 1.2,
+            "phase": 1,
+            "leftFootState": "stance",
+            "rightFootState": "swing",
+            "supportState": "left"
+          }
+        ],
+        "markers": [
+          {
+            "markerId": "walk-right-heel-phase",
+            "markerType": "heel_strike",
+            "time": 0.3,
+            "foot": "right"
+          },
+          {
+            "markerId": "walk-left-toe-phase",
+            "markerType": "toe_off",
+            "time": 0.36,
+            "foot": "left"
+          },
+          {
+            "markerId": "walk-left-heel-phase",
+            "markerType": "heel_strike",
+            "time": 0.84,
+            "foot": "left"
+          },
+          {
+            "markerId": "walk-right-toe-phase",
+            "markerType": "toe_off",
+            "time": 0.9,
+            "foot": "right"
+          }
+        ]
+      },
+      "events": [
+        {
+          "eventId": "walk-right-heel",
+          "time": 0.3,
+          "eventType": "heel_strike",
+          "payload": {
+            "foot": "right"
+          }
+        },
+        {
+          "eventId": "walk-left-toe",
+          "time": 0.36,
+          "eventType": "toe_off",
+          "payload": {
+            "foot": "left"
+          }
+        },
+        {
+          "eventId": "walk-left-heel",
+          "time": 0.84,
+          "eventType": "heel_strike",
+          "payload": {
+            "foot": "left"
+          }
+        },
+        {
+          "eventId": "walk-right-toe",
+          "time": 0.9,
+          "eventType": "toe_off",
+          "payload": {
+            "foot": "right"
+          }
+        }
+      ],
+      "featureAudit": {
+        "completeLeftRightSupportAndSwing": true,
+        "pelvisLateralWeightShift": false,
+        "pelvisChestCounterRotation": false,
+        "armSwing": false,
+        "heelStrike": true,
+        "plantedFootSupport": true,
+        "toeOff": true,
+        "trueVisualAcceptance": false,
+        "contractFixtureOnly": true
+      },
+      "quality": {
+        "status": "development-contract-fixture",
+        "source": "explicit-local-quaternion-test-data",
+        "validated": true,
+        "visualAcceptance": false,
+        "warnings": [
+          "Not captured motion and not approved as a production human-motion asset."
+        ]
+      }
+    },
+    {
+      "clipId": "foundation-stop-v4",
+      "name": "Foundation Stop",
+      "duration": 1,
+      "loopMode": "once",
+      "rootMotion": {
+        "mode": "root_motion",
+        "space": "character_local",
+        "rootJointId": "hips",
+        "positionTrack": {
+          "interpolation": "linear",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 0.25,
+              "value": [
+                0,
+                0,
+                0.2
+              ]
+            },
+            {
+              "time": 0.5,
+              "value": [
+                0,
+                0,
+                0.35
+              ]
+            },
+            {
+              "time": 0.75,
+              "value": [
+                0,
+                0,
+                0.45
+              ]
+            },
+            {
+              "time": 1,
+              "value": [
+                0,
+                0,
+                0.5
+              ]
+            }
+          ]
+        },
+        "rotationTrack": {
+          "interpolation": "slerp",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ]
+        }
+      },
+      "rotationTracks": [
+        {
+          "trackId": "spine-local-rotation",
+          "jointId": "spine",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        }
+      ],
+      "contacts": [
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "stop-left",
+          "contactType": "foot_contact",
+          "jointId": "leftFoot",
+          "time": 0.45,
+          "endTime": 1,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "stop-right",
+          "contactType": "foot_contact",
+          "jointId": "rightFoot",
+          "time": 0.7,
+          "endTime": 1,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        }
+      ],
+      "phaseData": {
+        "cyclic": false,
+        "samples": [
+          {
+            "time": 0,
+            "phase": 0,
+            "leftFootState": "swing",
+            "rightFootState": "stance",
+            "supportState": "right"
+          },
+          {
+            "time": 0.45,
+            "phase": 0.45,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          },
+          {
+            "time": 1,
+            "phase": 1,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          }
+        ],
+        "markers": [
+          {
+            "markerId": "stop-double-support",
+            "markerType": "double_support_start",
+            "time": 0.45,
+            "foot": "both"
+          }
+        ]
+      },
+      "events": [],
+      "featureAudit": {
+        "completeLeftRightSupportAndSwing": false,
+        "pelvisLateralWeightShift": false,
+        "pelvisChestCounterRotation": false,
+        "armSwing": false,
+        "heelStrike": false,
+        "plantedFootSupport": true,
+        "toeOff": false,
+        "trueVisualAcceptance": false,
+        "contractFixtureOnly": true
+      },
+      "quality": {
+        "status": "development-contract-fixture",
+        "source": "explicit-local-quaternion-test-data",
+        "validated": true,
+        "visualAcceptance": false,
+        "warnings": [
+          "Not captured motion and not approved as a production human-motion asset."
+        ]
+      }
+    },
+    {
+      "clipId": "foundation-turn-v4",
+      "name": "Foundation Turn Left",
+      "duration": 1,
+      "loopMode": "once",
+      "rootMotion": {
+        "mode": "in_place",
+        "space": "character_local",
+        "rootJointId": "hips",
+        "positionTrack": {
+          "interpolation": "linear",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "rotationTrack": {
+          "interpolation": "slerp",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "time": 0.333333,
+              "value": [
+                0,
+                0.1305261920521237,
+                0,
+                0.9914448613959187
+              ]
+            },
+            {
+              "time": 0.666667,
+              "value": [
+                0,
+                0.2588190450791347,
+                0,
+                0.9659258262953346
+              ]
+            },
+            {
+              "time": 1,
+              "value": [
+                0,
+                0.38268343188067994,
+                0,
+                0.9238795327119359
+              ]
+            }
+          ]
+        }
+      },
+      "rotationTracks": [
+        {
+          "trackId": "spine-local-rotation",
+          "jointId": "spine",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        }
+      ],
+      "contacts": [
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "turn-left",
+          "contactType": "foot_contact",
+          "jointId": "leftFoot",
+          "time": 0,
+          "endTime": 0.65,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "turn-right",
+          "contactType": "foot_contact",
+          "jointId": "rightFoot",
+          "time": 0.35,
+          "endTime": 1,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        }
+      ],
+      "phaseData": {
+        "cyclic": false,
+        "samples": [
+          {
+            "time": 0,
+            "phase": 0,
+            "leftFootState": "stance",
+            "rightFootState": "swing",
+            "supportState": "left"
+          },
+          {
+            "time": 0.35,
+            "phase": 0.35,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          },
+          {
+            "time": 0.65,
+            "phase": 0.65,
+            "leftFootState": "swing",
+            "rightFootState": "stance",
+            "supportState": "right"
+          },
+          {
+            "time": 1,
+            "phase": 1,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          }
+        ],
+        "markers": []
+      },
+      "events": [],
+      "featureAudit": {
+        "completeLeftRightSupportAndSwing": false,
+        "pelvisLateralWeightShift": false,
+        "pelvisChestCounterRotation": false,
+        "armSwing": false,
+        "heelStrike": false,
+        "plantedFootSupport": true,
+        "toeOff": false,
+        "trueVisualAcceptance": false,
+        "contractFixtureOnly": true
+      },
+      "quality": {
+        "status": "development-contract-fixture",
+        "source": "explicit-local-quaternion-test-data",
+        "validated": true,
+        "visualAcceptance": false,
+        "warnings": [
+          "Not captured motion and not approved as a production human-motion asset."
+        ]
+      }
+    },
+    {
+      "clipId": "foundation-sit-v4",
+      "name": "Foundation Sit",
+      "duration": 1.4,
+      "loopMode": "once",
+      "rootMotion": {
+        "mode": "in_place",
+        "space": "character_local",
+        "rootJointId": "hips",
+        "positionTrack": {
+          "interpolation": "linear",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "time": 1.4,
+              "value": [
+                0,
+                -0.42,
+                -0.12
+              ]
+            }
+          ]
+        },
+        "rotationTrack": {
+          "interpolation": "slerp",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ]
+        }
+      },
+      "rotationTracks": [
+        {
+          "trackId": "leftUpperLeg-local-rotation",
+          "jointId": "leftUpperLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        },
+        {
+          "trackId": "rightUpperLeg-local-rotation",
+          "jointId": "rightUpperLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        },
+        {
+          "trackId": "leftLowerLeg-local-rotation",
+          "jointId": "leftLowerLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        },
+        {
+          "trackId": "rightLowerLeg-local-rotation",
+          "jointId": "rightLowerLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        }
+      ],
+      "contacts": [
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "sit-left",
+          "contactType": "foot_contact",
+          "jointId": "leftFoot",
+          "time": 0,
+          "endTime": 1.4,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "sit-right",
+          "contactType": "foot_contact",
+          "jointId": "rightFoot",
+          "time": 0,
+          "endTime": 1.4,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        }
+      ],
+      "phaseData": {
+        "cyclic": false,
+        "samples": [
+          {
+            "time": 0,
+            "phase": 0,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          },
+          {
+            "time": 1.4,
+            "phase": 1,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          }
+        ],
+        "markers": []
+      },
+      "events": [],
+      "featureAudit": {
+        "completeLeftRightSupportAndSwing": false,
+        "pelvisLateralWeightShift": false,
+        "pelvisChestCounterRotation": false,
+        "armSwing": false,
+        "heelStrike": false,
+        "plantedFootSupport": true,
+        "toeOff": false,
+        "trueVisualAcceptance": false,
+        "contractFixtureOnly": true
+      },
+      "quality": {
+        "status": "development-contract-fixture",
+        "source": "explicit-local-quaternion-test-data",
+        "validated": true,
+        "visualAcceptance": false,
+        "warnings": [
+          "Not captured motion and not approved as a production human-motion asset."
+        ]
+      }
+    },
+    {
+      "clipId": "foundation-stand-v4",
+      "name": "Foundation Stand",
+      "duration": 1.4,
+      "loopMode": "once",
+      "rootMotion": {
+        "mode": "in_place",
+        "space": "character_local",
+        "rootJointId": "hips",
+        "positionTrack": {
+          "interpolation": "linear",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                -0.42,
+                -0.12
+              ]
+            },
+            {
+              "time": 1.4,
+              "value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "rotationTrack": {
+          "interpolation": "slerp",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ]
+        }
+      },
+      "rotationTracks": [
+        {
+          "trackId": "leftUpperLeg-local-rotation",
+          "jointId": "leftUpperLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        },
+        {
+          "trackId": "rightUpperLeg-local-rotation",
+          "jointId": "rightUpperLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        },
+        {
+          "trackId": "leftLowerLeg-local-rotation",
+          "jointId": "leftLowerLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        },
+        {
+          "trackId": "rightLowerLeg-local-rotation",
+          "jointId": "rightLowerLeg",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 2
+        }
+      ],
+      "contacts": [
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "stand-left",
+          "contactType": "foot_contact",
+          "jointId": "leftFoot",
+          "time": 0,
+          "endTime": 1.4,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "stand-right",
+          "contactType": "foot_contact",
+          "jointId": "rightFoot",
+          "time": 0,
+          "endTime": 1.4,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        }
+      ],
+      "phaseData": {
+        "cyclic": false,
+        "samples": [
+          {
+            "time": 0,
+            "phase": 0,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          },
+          {
+            "time": 1.4,
+            "phase": 1,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          }
+        ],
+        "markers": []
+      },
+      "events": [],
+      "featureAudit": {
+        "completeLeftRightSupportAndSwing": false,
+        "pelvisLateralWeightShift": false,
+        "pelvisChestCounterRotation": false,
+        "armSwing": false,
+        "heelStrike": false,
+        "plantedFootSupport": true,
+        "toeOff": false,
+        "trueVisualAcceptance": false,
+        "contractFixtureOnly": true
+      },
+      "quality": {
+        "status": "development-contract-fixture",
+        "source": "explicit-local-quaternion-test-data",
+        "validated": true,
+        "visualAcceptance": false,
+        "warnings": [
+          "Not captured motion and not approved as a production human-motion asset."
+        ]
+      }
+    },
+    {
+      "clipId": "foundation-reach-v4",
+      "name": "Foundation Reach Right",
+      "duration": 1.2,
+      "loopMode": "once",
+      "rootMotion": {
+        "mode": "in_place",
+        "space": "character_local",
+        "rootJointId": "hips",
+        "positionTrack": {
+          "interpolation": "linear",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "rotationTrack": {
+          "interpolation": "slerp",
+          "keyframes": [
+            {
+              "time": 0,
+              "value": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ]
+        }
+      },
+      "rotationTracks": [
+        {
+          "trackId": "rightUpperArm-local-rotation",
+          "jointId": "rightUpperArm",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 3
+        },
+        {
+          "trackId": "rightLowerArm-local-rotation",
+          "jointId": "rightLowerArm",
+          "type": "joint_local_quaternion",
+          "space": "local",
+          "interpolation": "slerp",
+          "keyframeCount": 3
+        }
+      ],
+      "contacts": [
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "reach-left-foot",
+          "contactType": "foot_contact",
+          "jointId": "leftFoot",
+          "time": 0,
+          "endTime": 1.2,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "reach-right-foot",
+          "contactType": "foot_contact",
+          "jointId": "rightFoot",
+          "time": 0,
+          "endTime": 1.2,
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 1
+        },
+        {
+          "schema": "humanoid_rig/motion_contact_data@4.0",
+          "contactId": "reach-right-hand",
+          "contactType": "hand_contact",
+          "jointId": "rightHand",
+          "time": 0.8,
+          "endTime": 1.2,
+          "position": [
+            0.45,
+            1.15,
+            0.5
+          ],
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "phaseData": {
+        "cyclic": false,
+        "samples": [
+          {
+            "time": 0,
+            "phase": 0,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          },
+          {
+            "time": 1.2,
+            "phase": 1,
+            "leftFootState": "stance",
+            "rightFootState": "stance",
+            "supportState": "double_support"
+          }
+        ],
+        "markers": []
+      },
+      "events": [],
+      "featureAudit": {
+        "completeLeftRightSupportAndSwing": false,
+        "pelvisLateralWeightShift": false,
+        "pelvisChestCounterRotation": false,
+        "armSwing": true,
+        "heelStrike": false,
+        "plantedFootSupport": true,
+        "toeOff": false,
+        "trueVisualAcceptance": false,
+        "contractFixtureOnly": true
+      },
+      "quality": {
+        "status": "development-contract-fixture",
+        "source": "explicit-local-quaternion-test-data",
+        "validated": true,
+        "visualAcceptance": false,
+        "warnings": [
+          "Not captured motion and not approved as a production human-motion asset."
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "allAssetsPreserved": true,
+    "contractFixtureCount": 7,
+    "trueVisualAcceptanceCount": 0,
+    "completeWalkPhaseAssetCount": 1,
+    "pelvisLateralWeightShiftAssetCount": 0,
+    "pelvisChestCounterRotationAssetCount": 0,
+    "armSwingAssetCount": 1,
+    "conclusion": "BASELINE_CONTRACT_FIXTURES_ONLY_NOT_PRODUCTION_MOTION"
+  },
+  "policy": {
+    "existingAssetsModified": false,
+    "existingWalkOrTurnPromotedToProduction": false,
+    "use": "comparison-baseline-only"
+  }
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Task 17A · Human Core Natural Motion Execution V1</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./apps/human-core-v5-natural-motion-execution-v1/styles.css">
+  <script type="importmap">
+    {"imports":{"three":"./node_modules/three/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <main id="motion-app">
+    <header class="app-header">
+      <div><b>Task 17A · Natural Motion Execution V1</b><span id="scenario-label">Loading…</span></div>
+      <strong>DEVELOPMENT FOUNDATION · VISUAL ACCEPTANCE PENDING</strong>
+    </header>
+    <section class="workspace">
+      <aside class="command-panel">
+        <label for="command-input">有限中文指令</label>
+        <textarea id="command-input" rows="3">向后转，走到黄色标记点，然后停下</textarea>
+        <button id="execute-command" type="button">生成计划并执行</button>
+        <div class="grammar-note">仅支持 Task 17A 开发语法；不声明任意自然语言理解。</div>
+        <h2>BehaviorPlan</h2>
+        <ol id="behavior-plan"></ol>
+        <div id="command-diagnostics" class="diagnostics"></div>
+      </aside>
+      <section class="viewport-panel">
+        <div id="viewport"></div>
+        <div class="viewport-legend">
+          <span><i class="swatch skeleton"></i>HumanRigCore</span>
+          <span><i class="swatch root"></i>Root Path</span>
+          <span><i class="swatch left"></i>Left Foot</span>
+          <span><i class="swatch right"></i>Right Foot</span>
+          <span><i class="swatch com"></i>COM</span>
+          <span><i class="swatch target"></i>Target</span>
+        </div>
+        <div class="transport">
+          <button id="restart" type="button">Restart</button>
+          <button id="pause" type="button">Pause</button>
+          <input id="timeline" type="range" min="0" max="1" value="0" step="0.0001">
+          <output id="time-output">0.00 s</output>
+        </div>
+      </section>
+      <aside class="qa-panel">
+        <h2>Execution / QA</h2>
+        <div id="qa-status"></div>
+        <h2>当前步骤</h2>
+        <div id="current-step"></div>
+        <h2>接触与平衡</h2>
+        <div id="contact-status"></div>
+        <h2>Root</h2>
+        <div id="root-status"></div>
+      </aside>
+    </section>
+    <div id="loading">Building deterministic finalPose execution…</div>
+  </main>
+  <section id="evidence-view" class="hidden"></section>
+  <script type="module" src="./apps/human-core-v5-natural-motion-execution-v1/index.js"></script>
+</body>
+</html>
