@@ -7,7 +7,8 @@ export class HrlSurfaceDeformerV1 {
     this.basePositions = new Float32Array(parsed.chunks.basePositions);
     this.positions = new Float32Array(this.basePositions);
     this.normals = parsed.chunks.baseNormals ? new Float32Array(parsed.chunks.baseNormals) : computeVertexNormalsV1(this.positions, this.indices);
-    this.symmetryMap = new Uint32Array(parsed.chunks.symmetryMap);
+    this.vertexSide = new Uint8Array(parsed.chunks.vertexSide);
+    this.symmetryPartner = new Uint32Array(parsed.chunks.symmetryPartner);
     this.parameterBasis = new Float32Array(parsed.chunks.parameterBasis);
     this.parameters = new Map((this.header.parameters ?? []).map((definition, index) => [definition.id, { definition, index, value: definition.default ?? 0 }]));
     this.sculptDelta = new Float32Array(this.positions.length);
@@ -28,7 +29,7 @@ export class HrlSurfaceDeformerV1 {
     return true;
   }
 
-  applyBrush({ center, radius, strength, direction = null, symmetry = true }) {
+  applyBrush({ center, radius, strength, direction = null, symmetricEdit = true, allowCenterlineOffset = false }) {
     if (!Array.isArray(center) || center.length !== 3 || radius <= 0 || !Number.isFinite(strength)) throw new Error('Invalid HRLSurface brush input.');
     const changed = new Map();
     const sourceNormals = this.normals;
@@ -38,14 +39,29 @@ export class HrlSurfaceDeformerV1 {
       if (distance >= radius) continue;
       const t = 1 - distance / radius;
       const falloff = t * t * (3 - 2 * t);
-      const vector = direction ?? [sourceNormals[offset], sourceNormals[offset + 1], sourceNormals[offset + 2]];
+      const requestedVector = direction ?? [sourceNormals[offset], sourceNormals[offset + 1], sourceNormals[offset + 2]];
+      const vector = this.vertexSide[vertex] === 0 && !allowCenterlineOffset ? [0, requestedVector[1], requestedVector[2]] : requestedVector;
       addBrushDelta(changed, this.sculptDelta, vertex, vector, strength * falloff);
-      if (symmetry) {
-        const mirror = this.symmetryMap[vertex];
-        if (mirror !== vertex) addBrushDelta(changed, this.sculptDelta, mirror, [-vector[0], vector[1], vector[2]], strength * falloff);
+      if (symmetricEdit) {
+        const partner = this.symmetryPartner[vertex];
+        if (partner !== vertex) addBrushDelta(changed, this.sculptDelta, partner, [-vector[0], vector[1], vector[2]], strength * falloff);
       }
     }
     if (changed.size === 0) return 0;
+    this.#record({ type: 'sculpt', changes: [...changed.entries()] });
+    this.rebuildPositions();
+    return changed.size;
+  }
+
+  applyVertexDelta({ vertex, delta, symmetricEdit = true, allowCenterlineOffset = false }) {
+    if (!Number.isInteger(vertex) || vertex < 0 || vertex >= this.positions.length / 3 || !Array.isArray(delta) || delta.length !== 3 || delta.some((value) => !Number.isFinite(value))) throw new Error('Invalid HRLSurface vertex delta input.');
+    const changed = new Map();
+    const applied = this.vertexSide[vertex] === 0 && !allowCenterlineOffset ? [0, delta[1], delta[2]] : delta;
+    addBrushDelta(changed, this.sculptDelta, vertex, applied, 1);
+    if (symmetricEdit) {
+      const partner = this.symmetryPartner[vertex];
+      if (partner !== vertex) addBrushDelta(changed, this.sculptDelta, partner, [-applied[0], applied[1], applied[2]], 1);
+    }
     this.#record({ type: 'sculpt', changes: [...changed.entries()] });
     this.rebuildPositions();
     return changed.size;

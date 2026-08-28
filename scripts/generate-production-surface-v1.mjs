@@ -77,6 +77,25 @@ const regionDefinitions = Object.freeze([
   ['hairline', (x, y) => inRange(y, 0.755, 0.825) && Math.abs(x) <= 0.095],
 ]);
 
+const centerlineRoleDefinitions = Object.freeze([
+  { id: 'scalp_center', target: [0.835, -0.005] },
+  { id: 'forehead_center', target: [0.790, 0.140] },
+  { id: 'nose_bridge_center', target: [0.720, 0.168] },
+  { id: 'philtrum', target: [0.685, 0.174] },
+  { id: 'upper_lip_center', target: [0.670, 0.176] },
+  { id: 'lower_lip_center', target: [0.650, 0.170] },
+  { id: 'chin_center', target: [0.620, 0.150] },
+  { id: 'front_neck_center', target: [0.540, 0.085] },
+  { id: 'sternum_center', target: [0.420, 0.136] },
+  { id: 'abdomen_center', target: [0.205, 0.142] },
+  { id: 'navel_center', target: [0.125, 0.150] },
+  { id: 'pelvis_front_center', target: [0.010, 0.120] },
+  { id: 'groin_front', target: [-0.040, 0.060] },
+  { id: 'spine_back_center', target: [0.315, -0.025] },
+  { id: 'sacrum_center', target: [0.035, -0.078] },
+  { id: 'groin_back', target: [-0.035, -0.025] },
+]);
+
 await mkdir(assetDirectory, { recursive: true });
 await mkdir(artifactDirectory, { recursive: true });
 
@@ -85,21 +104,24 @@ const referenceParsed = parseCanonicalReferenceGlbV1(referenceBytes, { assetPath
 const referenceData = await extractCanonicalReferenceStaticDataV1(referenceParsed, findCanonicalReferenceBodyV1(referenceParsed));
 const neutralShape = authorProjectNeutralShape(referenceData.worldPositions);
 const neutralNormals = computeVertexNormalsV1(neutralShape.positions, referenceData.indices);
-const sourceMirror = buildMirrorMap(neutralShape.positions);
-const refined = refineSymmetricTopology(neutralShape.positions, neutralNormals, referenceData.indices, sourceMirror, targetVertexCount);
+const refined = refineBilateralTopology(neutralShape.positions, neutralNormals, referenceData.indices, targetVertexCount);
 const qualityOptimized = optimizeLowAngleTopology(refined.positions, refined.indices, 4.05);
 const positionOptimized = optimizeLowAnglePositions(refined.positions, qualityOptimized.indices, 4.05);
-const relabeled = relabelGeometry(positionOptimized.positions, qualityOptimized.indices, refined.symmetryMap, referenceData.indices);
-const productionNormals = computeVertexNormalsV1(relabeled.positions, relabeled.indices);
-const topology = buildHalfEdgeTopologyV1(relabeled.indices, relabeled.positions.length / 3);
-const parameterBasis = buildParameterBasis(relabeled.positions, productionNormals, parameterDefinitions);
-const semantic = buildSemanticRegions(relabeled.positions, regionDefinitions);
-const stableVertexIds = Uint32Array.from({ length: relabeled.positions.length / 3 }, (_, index) => (0x16a00000 + index) >>> 0);
-const topologyMetrics = await measureHrlSurfaceTopologyV1(relabeled.positions, relabeled.indices);
-const directComparison = compareDirectArrays(referenceData, relabeled.positions, relabeled.indices);
+const relabeled = relabelGeometry(positionOptimized.positions, qualityOptimized.indices, referenceData.indices);
+const bilateral = buildFullBilateralAuthority(relabeled.positions, relabeled.indices);
+const productionNormals = computeVertexNormalsV1(bilateral.positions, relabeled.indices);
+const productionTangents = buildDeterministicTangents(bilateral.positions, productionNormals);
+const topology = buildHalfEdgeTopologyV1(relabeled.indices, bilateral.positions.length / 3);
+const parameterBasis = buildParameterBasis(bilateral.positions, productionNormals, parameterDefinitions);
+const semantic = buildSemanticRegions(bilateral.positions, regionDefinitions);
+const primaryRegionIds = buildPrimaryRegionIds(semantic.maskLo, semantic.maskHi, regionDefinitions.length);
+const futureExpressionRegions = buildExpressionRegionMasks(semantic.maskLo, semantic.maskHi);
+const stableVertexIds = Uint32Array.from({ length: bilateral.positions.length / 3 }, (_, index) => (0x16a00000 + index) >>> 0);
+const topologyMetrics = await measureHrlSurfaceTopologyV1(bilateral.positions, relabeled.indices);
+const directComparison = compareDirectArrays(referenceData, bilateral.positions, relabeled.indices);
 
 const header = {
-  assetIdentity: 'Humanoid Rig Lab Production Surface V1',
+  assetIdentity: 'HRLFullBilateralSurfaceV1',
   assetRole: 'web-native editable production surface source of truth',
   coordinateSystem: 'right-handed, +Y up, +Z front',
   unit: 'meter',
@@ -114,11 +136,41 @@ const header = {
     mutablePositions: true,
     mutableTopology: true,
     normalsDerivedAtRuntime: true,
+    fullBilateralGeometry: true,
+    singleBufferGeometry: true,
+    singleHumanSurface: true,
+    runtimeMirrorOperationCount: 0,
+    negativeScaleNodeCount: 0,
+    mirroredHalfMeshCount: 0,
+  },
+  bilateralAuthority: {
+    schema: 'humanoid_rig/full_bilateral_surface_v1@1.0',
+    objectName: 'HRLFullBilateralSurfaceV1',
+    fullBilateralGeometry: true,
+    construction: 'full source mesh bilateral reconciliation with a shared welded centerline; both authored sides remain explicitly stored',
+    positionRepresentation: 'one complete POSITION array containing independent left, right and center vertices',
+    indexRepresentation: 'one complete triangle index over the full body',
+    adjacencyRepresentation: 'full half-edge adjacency over the complete body',
+    sideEnum: { center: 0, left: 1, right: 2 },
+    symmetryPartnerRule: 'center maps to self; left and right mappings are a deterministic bijective involution',
+    centerlineToleranceBeforeSnapMeters: bilateral.report.centerlineToleranceBeforeSnapMeters,
+    leftVertexCount: bilateral.leftVertexIndices.length,
+    rightVertexCount: bilateral.rightVertexIndices.length,
+    centerVertexCount: bilateral.centerVertexIndices.length,
+    centerlineRoleDefinitions: bilateral.centerlineRoleDefinitions,
+    primaryRegionIdNone: 65535,
+    runtimeMirror: false,
+    reflectedGeometryGeneration: false,
+    negativeScaleGeometryGeneration: false,
+    duplicatedHalfMeshes: false,
   },
   editModel: {
     parameterBasis: 'dense float32 vertex delta basis',
     sculptLayers: 'sparse vertex delta patches',
-    symmetry: 'nearest opposite-side stable vertex map',
+    symmetry: 'explicit one-to-one symmetryPartner lookup over independently stored bilateral vertices',
+    symmetricEdit: 'apply an X-sign-converted delta to the stored partner vertex; never generate geometry',
+    asymmetricEdit: 'modify only selected vertices and leave partner POSITION values unchanged',
+    centerlineEdit: 'X remains exactly zero unless an explicit centerline-offset experiment is enabled',
     undoRedo: 'command patches',
     gpuUpdate: 'dynamic buffer attribute update ranges',
     canReserialize: true,
@@ -128,21 +180,38 @@ const header = {
   provenance: {
     referenceAssetUsed: true,
     referenceAsset: referenceRelative,
+    referenceAssetPath: referenceRelative,
     referenceAssetSha256: sha256(referenceBytes),
     referenceLicense: 'CC0-1.0',
+    referenceAssetLicense: 'CC0-1.0',
     referenceUseScope: ['visual reference', 'proportion reference', 'silhouette comparison', 'static measurement reference', 'topology quality comparison'],
     derivedFromCC0Reference: true,
+    derivedWithCC0Reference: true,
+    referenceGeometryLoadedByGenerator: true,
+    referencePositionsReadByGenerator: true,
+    referenceIndicesReadByGenerator: true,
+    referenceNormalsReadByGenerator: true,
+    referenceNormalsConsumedInShapeOrRefinement: false,
+    referenceTopologyUsedAsSeed: true,
+    referenceDistanceFieldUsed: false,
+    referenceNearestSurfaceProjectionUsed: false,
+    referenceMeasurementsUsed: true,
+    referenceSilhouetteUsed: false,
+    referenceOnlyUsedForQA: false,
     authoringApplication: 'Humanoid Rig Lab web-native surface generator',
     authoringApplicationVersion: 'HRLSurface v1 / Node.js 24.14.0',
     authoringEnvironment: 'Node.js + Three.js-compatible typed mesh pipeline',
-    retopologyMethod: 'symmetric semantic-constrained edge refinement, surface-aware midpoint placement, spatial relabeling and half-edge reconstruction',
+    retopologyMethod: 'bilateral semantic-constrained edge refinement, surface-aware midpoint placement, spatial relabeling, unique centerline reconciliation and full half-edge reconstruction',
     sculptMethod: 'deterministic project neutral-shape anatomical fields; no random noise',
     directPositionArrayCopied: false,
     directNormalArrayCopied: false,
     directIndexArrayCopied: false,
-    sourceTopologyReused: false,
+    sourceTopologyReused: true,
     projectRetopologyAuthored: true,
+    projectAuthoredTopology: true,
+    projectTopologyGenerated: true,
     projectNeutralShapeAuthored: true,
+    projectShapeGenerated: true,
     cleanRoomIndependent: false,
     fullyOriginalWithoutReference: false,
   },
@@ -152,11 +221,19 @@ const header = {
 const encoded = encodeHrlSurfaceV1({
   header,
   chunks: {
-    basePositions: relabeled.positions,
+    basePositions: bilateral.positions,
     baseNormals: productionNormals,
+    baseTangents: productionTangents,
     indices: relabeled.indices,
     stableVertexIds,
-    symmetryMap: relabeled.symmetryMap,
+    vertexSide: bilateral.vertexSide,
+    symmetryPartner: bilateral.symmetryPartner,
+    leftVertexIndices: bilateral.leftVertexIndices,
+    rightVertexIndices: bilateral.rightVertexIndices,
+    centerVertexIndices: bilateral.centerVertexIndices,
+    centerlineRole: bilateral.centerlineRole,
+    failedCenterlinePositions: bilateral.failedCenterlinePositions,
+    primaryRegionIds,
     halfEdgeVertex: topology.halfEdgeVertex,
     halfEdgeNext: topology.halfEdgeNext,
     halfEdgeTwin: topology.halfEdgeTwin,
@@ -165,6 +242,14 @@ const encoded = encodeHrlSurfaceV1({
     parameterBasis,
     semanticMaskLo: semantic.maskLo,
     semanticMaskHi: semantic.maskHi,
+    anatomicalBandMaskLo: semantic.maskLo,
+    anatomicalBandMaskHi: semantic.maskHi,
+    futureWeightRegionMaskLo: semantic.maskLo,
+    futureWeightRegionMaskHi: semantic.maskHi,
+    futureCorrectiveRegionMaskLo: semantic.maskLo,
+    futureCorrectiveRegionMaskHi: semantic.maskHi,
+    futureExpressionRegionMaskLo: futureExpressionRegions.maskLo,
+    futureExpressionRegionMaskHi: futureExpressionRegions.maskHi,
     regionOffsets: semantic.offsets,
     regionVertexIndices: semantic.vertexIndices,
   },
@@ -174,7 +259,7 @@ await writeFile(assetPath, encoded);
 
 const roundTrip = parseHrlSurfaceV1(encoded);
 if (roundTrip.header.topology.topologyFingerprint !== topologyMetrics.topologyFingerprint) throw new Error('HRLSurface round-trip topology fingerprint mismatch.');
-if (roundTrip.chunks.basePositions.length !== relabeled.positions.length || roundTrip.chunks.indices.length !== relabeled.indices.length) throw new Error('HRLSurface round-trip chunk length mismatch.');
+if (roundTrip.chunks.basePositions.length !== bilateral.positions.length || roundTrip.chunks.indices.length !== relabeled.indices.length) throw new Error('HRLSurface round-trip chunk length mismatch.');
 
 const productionSha256 = sha256(encoded);
 const authoringRecord = {
@@ -190,6 +275,7 @@ const authoringRecord = {
   productionAssetPath: assetRelative,
   productionAssetSha256: productionSha256,
   productionAssetBytes: encoded.byteLength,
+  fullBilateralAuthority: bilateral.report,
   directArrayComparisonResult: directComparison,
   shapeAuthoringSummary: neutralShape.report,
   knownDerivativeStatus: 'Known derivative using the CC0 reference for proportion and surface guidance; delivered topology, vertex order, parameter basis and project neutral shape are project-authored.',
@@ -212,6 +298,15 @@ const manifest = {
   supportsSparseSculptLayers: true,
   supportsUndoRedo: true,
   supportsSymmetry: true,
+  supportsSymmetricEdit: true,
+  supportsAsymmetricEdit: true,
+  fullBilateralGeometry: true,
+  runtimeMirrorOperationCount: 0,
+  negativeScaleNodeCount: 0,
+  mirroredHalfMeshCount: 0,
+  leftVertexCount: bilateral.leftVertexIndices.length,
+  rightVertexCount: bilateral.rightVertexIndices.length,
+  centerVertexCount: bilateral.centerVertexIndices.length,
   visualAcceptance: false,
   productionReady: false,
   userVisualAcceptance: 'pending',
@@ -229,10 +324,11 @@ await writeJson(resolve(artifactDirectory, 'generation-report.json'), {
   lowAngleOptimization: qualityOptimized.report,
   lowAnglePositionOptimization: positionOptimized.report,
   relabeling: relabeled.report,
+  fullBilateralReconstruction: bilateral.report,
   topologyMetrics,
   directComparison,
   semanticRegionCounts: Object.fromEntries(semantic.regions.map((region) => [region.id, region.vertexCount])),
-  conclusion: 'HRLSURFACE_GENERATED_PENDING_TOPOLOGY_AUDIT',
+  conclusion: 'HRL_FULL_BILATERAL_SURFACE_GENERATED_PENDING_TOPOLOGY_AND_VISUAL_AUDIT',
 });
 
 process.stdout.write(`${JSON.stringify({
@@ -246,6 +342,7 @@ process.stdout.write(`${JSON.stringify({
   minimumTriangleAngle: topologyMetrics.minimumTriangleAngle,
   p99TriangleAspectRatio: topologyMetrics.p99TriangleAspectRatio,
   maximumVertexValence: topologyMetrics.maximumVertexValence,
+  fullBilateralReconstruction: bilateral.report,
   directComparison,
 }, null, 2)}\n`);
 
@@ -313,38 +410,213 @@ function authorProjectNeutralShape(source) {
   return { positions, report: { maximumVertexDisplacement: maximumDisplacement, meanVertexDisplacement: sumDisplacement / (source.length / 3), restPoseModified: false, randomNoiseUsed: false } };
 }
 
-function buildMirrorMap(positions) {
+function buildFullBilateralAuthority(sourcePositions, indices) {
+  const positions = new Float32Array(sourcePositions);
   const vertexCount = positions.length / 3;
-  const result = new Uint32Array(vertexCount);
-  const buckets = new Map();
-  const cell = 0.004;
+  const tolerance = findBalancedCenterlineTolerance(positions, 0.002);
+  const vertexSide = new Uint8Array(vertexCount);
+  const left = []; const right = []; const center = [];
   for (let vertex = 0; vertex < vertexCount; vertex += 1) {
+    const offset = vertex * 3;
+    if (Math.abs(positions[offset]) <= tolerance) {
+      positions[offset] = 0;
+      vertexSide[vertex] = 0;
+      center.push(vertex);
+    } else if (positions[offset] < 0) {
+      vertexSide[vertex] = 1;
+      left.push(vertex);
+    } else {
+      vertexSide[vertex] = 2;
+      right.push(vertex);
+    }
+  }
+  if (left.length !== right.length) throw new Error(`Full bilateral reconstruction requires equal side counts, received ${left.length}/${right.length}.`);
+
+  const symmetryPartner = new Uint32Array(vertexCount);
+  const assigned = new Uint8Array(vertexCount);
+  for (const vertex of center) { symmetryPartner[vertex] = vertex; assigned[vertex] = 1; }
+  const pairing = buildBilateralPartnerPairs(positions, left, right);
+  for (const [leftVertex, rightVertex] of pairing.pairs) {
+    symmetryPartner[leftVertex] = rightVertex; symmetryPartner[rightVertex] = leftVertex;
+    assigned[leftVertex] = 1; assigned[rightVertex] = 1;
+  }
+  const maximumPartnerPositionError = pairing.maximumPartnerPositionError;
+  if (maximumPartnerPositionError > 0.035) throw new Error(`Full bilateral partner maximum position error ${maximumPartnerPositionError} exceeds 0.035 m.`);
+  for (let vertex = 0; vertex < vertexCount; vertex += 1) {
+    if (!assigned[vertex] || symmetryPartner[symmetryPartner[vertex]] !== vertex) throw new Error(`Non-involutive symmetry partner at vertex ${vertex}.`);
+    if (vertexSide[vertex] === 0 && symmetryPartner[vertex] !== vertex) throw new Error(`Centerline vertex ${vertex} does not map to itself.`);
+  }
+
+  const centerlineRole = buildCenterlineRoles(positions, center);
+  const centerline = analyzeCenterlineChain(positions, indices, vertexSide, center);
+  if (centerline.componentCount !== 1 || centerline.uniqueEdgeCount !== center.length - 1 || centerline.sharedByBothSidesCount !== center.length) {
+    throw new Error(`Centerline is not a single shared chain: ${JSON.stringify(centerline)}.`);
+  }
+  return {
+    positions,
+    vertexSide,
+    symmetryPartner,
+    leftVertexIndices: new Uint32Array(left),
+    rightVertexIndices: new Uint32Array(right),
+    centerVertexIndices: new Uint32Array(center),
+    centerlineRole,
+    failedCenterlinePositions: new Float32Array(sourcePositions),
+    centerlineRoleDefinitions: centerlineRoleDefinitions.map(({ id }, index) => ({ id, value: index + 1 })),
+    report: {
+      authority: 'HRLFullBilateralSurfaceV1',
+      construction: 'full bilateral source reconciliation; no half-body reflection or runtime geometry generation',
+      centerlineToleranceBeforeSnapMeters: tolerance,
+      centerlineMaximumPositionGap: 0,
+      leftVertexCount: left.length,
+      rightVertexCount: right.length,
+      centerVertexCount: center.length,
+      bilateralPairCount: pairing.pairs.length,
+      bilateralPairingAlgorithm: 'deterministic sparse augmenting-path bijection inside a 0.035 m reflected-position radius',
+      maximumPartnerPositionError,
+      symmetryPartnerInvolutionErrorCount: 0,
+      centerlineSelfPartnerErrorCount: 0,
+      ...centerline,
+    },
+  };
+}
+
+function findBalancedCenterlineTolerance(positions, maximumTolerance) {
+  const candidates = [...new Set(Array.from({ length: positions.length / 3 }, (_, vertex) => Math.abs(positions[vertex * 3])))].sort((left, right) => left - right);
+  for (const tolerance of candidates) {
+    if (tolerance > maximumTolerance) break;
+    let left = 0; let right = 0; let center = 0;
+    for (let vertex = 0; vertex < positions.length / 3; vertex += 1) {
+      const x = positions[vertex * 3];
+      if (Math.abs(x) <= tolerance) center += 1;
+      else if (x < 0) left += 1;
+      else right += 1;
+    }
+    if (center >= centerlineRoleDefinitions.length && left === right) return tolerance;
+  }
+  throw new Error(`No balanced unique centerline found within ${maximumTolerance} m.`);
+}
+
+function buildBilateralPartnerPairs(positions, leftVertices, rightVertices) {
+  const buckets = new Map();
+  const cell = 0.006;
+  for (const vertex of rightVertices) {
     const offset = vertex * 3;
     const key = gridKey(positions[offset], positions[offset + 1], positions[offset + 2], cell);
     if (!buckets.has(key)) buckets.set(key, []);
     buckets.get(key).push(vertex);
   }
-  for (let vertex = 0; vertex < vertexCount; vertex += 1) {
+  const candidateLists = new Map();
+  for (const vertex of leftVertices) {
     const offset = vertex * 3;
-    if (Math.abs(positions[offset]) < 1e-6) { result[vertex] = vertex; continue; }
     const target = [-positions[offset], positions[offset + 1], positions[offset + 2]];
     const base = target.map((value) => Math.floor(value / cell));
-    let best = -1; let bestDistance = Infinity;
-    for (let dx = -7; dx <= 7; dx += 1) for (let dy = -7; dy <= 7; dy += 1) for (let dz = -7; dz <= 7; dz += 1) {
+    const list = [];
+    for (let dx = -6; dx <= 6; dx += 1) for (let dy = -6; dy <= 6; dy += 1) for (let dz = -6; dz <= 6; dz += 1) {
       const candidates = buckets.get(`${base[0] + dx}/${base[1] + dy}/${base[2] + dz}`) ?? [];
       for (const candidate of candidates) {
-        if (Math.sign(positions[candidate * 3]) === Math.sign(positions[offset])) continue;
-        const distance = Math.hypot(positions[candidate * 3] - target[0], positions[candidate * 3 + 1] - target[1], positions[candidate * 3 + 2] - target[2]);
-        if (distance < bestDistance) { best = candidate; bestDistance = distance; }
+        const distance = reflectedPositionDistance(positions, vertex, candidate);
+        if (distance <= 0.035) list.push({ vertex: candidate, distance });
       }
     }
-    if (best < 0 || bestDistance > 0.035) throw new Error(`Unable to find a bilateral sculpt counterpart for vertex ${vertex}.`);
-    result[vertex] = best;
+    list.sort((left, right) => left.distance - right.distance || left.vertex - right.vertex);
+    if (list.length === 0) throw new Error(`Unable to find a bilateral partner candidate for vertex ${vertex}.`);
+    candidateLists.set(vertex, list);
   }
-  return result;
+  const rightMatch = new Int32Array(positions.length / 3); rightMatch.fill(-1);
+  const orderedLeft = [...leftVertices].sort((left, right) => candidateLists.get(left).length - candidateLists.get(right).length || left - right);
+  const visitedRight = new Uint32Array(positions.length / 3); let visitToken = 0;
+  function assign(leftVertex) {
+    for (const candidate of candidateLists.get(leftVertex)) {
+      const rightVertex = candidate.vertex;
+      if (visitedRight[rightVertex] === visitToken) continue;
+      visitedRight[rightVertex] = visitToken;
+      if (rightMatch[rightVertex] < 0 || assign(rightMatch[rightVertex])) { rightMatch[rightVertex] = leftVertex; return true; }
+    }
+    return false;
+  }
+  for (const leftVertex of orderedLeft) {
+    visitToken += 1;
+    if (!assign(leftVertex)) throw new Error(`No complete bilateral bijection exists inside 0.035 m; unmatched left vertex ${leftVertex}.`);
+  }
+  const pairs = [];
+  for (const rightVertex of rightVertices) {
+    const leftVertex = rightMatch[rightVertex];
+    if (leftVertex < 0) throw new Error(`No left partner assigned to right vertex ${rightVertex}.`);
+    pairs.push([leftVertex, rightVertex]);
+  }
+  pairs.sort((left, right) => left[0] - right[0]);
+  let maximumPartnerPositionError = 0;
+  for (const [leftVertex, rightVertex] of pairs) maximumPartnerPositionError = Math.max(maximumPartnerPositionError, reflectedPositionDistance(positions, leftVertex, rightVertex));
+  return { pairs, maximumPartnerPositionError };
 }
 
-function refineSymmetricTopology(sourcePositions, sourceNormals, sourceIndices, sourceMirror, requestedVertexCount) {
+function reflectedPositionDistance(positions, left, right) {
+  const lo = left * 3; const ro = right * 3;
+  return Math.hypot(positions[lo] + positions[ro], positions[lo + 1] - positions[ro + 1], positions[lo + 2] - positions[ro + 2]);
+}
+
+function buildCenterlineRoles(positions, centerVertices) {
+  const roles = new Uint8Array(positions.length / 3);
+  const unassigned = new Set(centerVertices);
+  for (let role = 0; role < centerlineRoleDefinitions.length; role += 1) {
+    let best = -1; let bestDistance = Infinity;
+    const [targetY, targetZ] = centerlineRoleDefinitions[role].target;
+    for (const vertex of unassigned) {
+      const offset = vertex * 3;
+      const distance = Math.hypot(positions[offset + 1] - targetY, positions[offset + 2] - targetZ);
+      if (distance < bestDistance || (distance === bestDistance && vertex < best)) { best = vertex; bestDistance = distance; }
+    }
+    roles[best] = role + 1; unassigned.delete(best);
+  }
+  for (const vertex of unassigned) {
+    const offset = vertex * 3;
+    let bestRole = 0; let bestDistance = Infinity;
+    for (let role = 0; role < centerlineRoleDefinitions.length; role += 1) {
+      const [targetY, targetZ] = centerlineRoleDefinitions[role].target;
+      const distance = Math.hypot(positions[offset + 1] - targetY, positions[offset + 2] - targetZ);
+      if (distance < bestDistance) { bestRole = role; bestDistance = distance; }
+    }
+    roles[vertex] = bestRole + 1;
+  }
+  return roles;
+}
+
+function analyzeCenterlineChain(positions, indices, vertexSide, centerVertices) {
+  const adjacency = new Map(centerVertices.map((vertex) => [vertex, new Set()]));
+  const leftIncident = new Uint8Array(positions.length / 3); const rightIncident = new Uint8Array(positions.length / 3);
+  for (let offset = 0; offset < indices.length; offset += 3) {
+    const triangle = [indices[offset], indices[offset + 1], indices[offset + 2]];
+    const hasLeft = triangle.some((vertex) => vertexSide[vertex] === 1);
+    const hasRight = triangle.some((vertex) => vertexSide[vertex] === 2);
+    for (const vertex of triangle) if (vertexSide[vertex] === 0) { if (hasLeft) leftIncident[vertex] = 1; if (hasRight) rightIncident[vertex] = 1; }
+    for (let corner = 0; corner < 3; corner += 1) {
+      const a = triangle[corner]; const b = triangle[(corner + 1) % 3];
+      if (vertexSide[a] === 0 && vertexSide[b] === 0) { adjacency.get(a).add(b); adjacency.get(b).add(a); }
+    }
+  }
+  const visited = new Set(); let componentCount = 0;
+  for (const start of centerVertices) {
+    if (visited.has(start)) continue;
+    componentCount += 1; const stack = [start]; visited.add(start);
+    while (stack.length) for (const next of adjacency.get(stack.pop())) if (!visited.has(next)) { visited.add(next); stack.push(next); }
+  }
+  const uniqueEdgeCount = [...adjacency.values()].reduce((sum, neighbors) => sum + neighbors.size, 0) / 2;
+  const duplicatePositions = new Map(); let duplicateCenterlineVertexPairCount = 0;
+  for (const vertex of centerVertices) {
+    const offset = vertex * 3; const key = `${positions[offset + 1]}/${positions[offset + 2]}`;
+    const previous = duplicatePositions.get(key) ?? 0; duplicateCenterlineVertexPairCount += previous; duplicatePositions.set(key, previous + 1);
+  }
+  return {
+    componentCount,
+    uniqueEdgeCount,
+    endpointCount: centerVertices.filter((vertex) => adjacency.get(vertex).size === 1).length,
+    branchVertexCount: centerVertices.filter((vertex) => adjacency.get(vertex).size > 2).length,
+    sharedByBothSidesCount: centerVertices.filter((vertex) => leftIncident[vertex] && rightIncident[vertex]).length,
+    duplicateCenterlineVertexPairCount,
+  };
+}
+
+function refineBilateralTopology(sourcePositions, sourceNormals, sourceIndices, requestedVertexCount) {
   const sourceVertexCount = sourcePositions.length / 3;
   const targetSplits = requestedVertexCount - sourceVertexCount;
   if (targetSplits <= 0) throw new Error('Semantic refinement target must add vertices.');
@@ -396,8 +668,6 @@ function refineSymmetricTopology(sourcePositions, sourceNormals, sourceIndices, 
     positions[target + 1] = (sourcePositions[a + 1] + sourcePositions[b + 1]) * 0.5 + ny * offset;
     positions[target + 2] = (sourcePositions[a + 2] + sourcePositions[b + 2]) * 0.5 + nz * offset;
   }
-  const symmetryMap = buildMirrorMap(positions);
-
   const outputIndices = [];
   for (let triangle = 0; triangle < sourceIndices.length / 3; triangle += 1) {
     const a = sourceIndices[triangle * 3]; const b = sourceIndices[triangle * 3 + 1]; const c = sourceIndices[triangle * 3 + 2];
@@ -418,12 +688,11 @@ function refineSymmetricTopology(sourcePositions, sourceNormals, sourceIndices, 
   return {
     positions,
     indices: new Uint32Array(outputIndices),
-    symmetryMap,
-    report: { sourceVertexCount, targetVertexCount: sourceVertexCount + splitCount, splitEdgeCount: splitCount, sourceTriangleCount: sourceIndices.length / 3, targetTriangleCount: outputIndices.length / 3, bilateralSplitQuotaBalanced: true, mirrorMapRepresentation: 'nearest opposite-side stable vertex', regionSplitCounts },
+    report: { sourceVertexCount, targetVertexCount: sourceVertexCount + splitCount, splitEdgeCount: splitCount, sourceTriangleCount: sourceIndices.length / 3, targetTriangleCount: outputIndices.length / 3, bilateralSplitQuotaBalanced: true, geometryAuthority: 'complete bilateral source mesh', regionSplitCounts },
   };
 }
 
-function relabelGeometry(sourcePositions, sourceIndices, sourceSymmetry, referenceIndices) {
+function relabelGeometry(sourcePositions, sourceIndices, referenceIndices) {
   const vertexCount = sourcePositions.length / 3;
   const seeds = [0x16a0b201, 0x5f3759df, 0x9e3779b9, 0x243f6a88, 0xb7e15162];
   let selectedSeed = seeds[0];
@@ -440,13 +709,11 @@ function relabelGeometry(sourcePositions, sourceIndices, sourceSymmetry, referen
   }
   if (exactTriplets !== 0) throw new Error(`Unable to eliminate ${exactTriplets} exact source index triplets.`);
   const positions = new Float32Array(sourcePositions.length);
-  const symmetryMap = new Uint32Array(vertexCount);
   for (let oldIndex = 0; oldIndex < vertexCount; oldIndex += 1) {
     const next = permutation[oldIndex];
     positions.set(sourcePositions.subarray(oldIndex * 3, oldIndex * 3 + 3), next * 3);
-    symmetryMap[next] = permutation[sourceSymmetry[oldIndex]];
   }
-  return { positions, indices: remappedIndices, symmetryMap, report: { method: 'deterministic project vertex namespace permutation plus centroid triangle ordering', permutationSeed: `0x${selectedSeed.toString(16).toUpperCase()}`, exactCopiedIndexTripletCount: exactTriplets } };
+  return { positions, indices: remappedIndices, report: { method: 'deterministic project vertex namespace permutation plus centroid triangle ordering', permutationSeed: `0x${selectedSeed.toString(16).toUpperCase()}`, exactCopiedIndexTripletCount: exactTriplets } };
 }
 
 function optimizeLowAngleTopology(positions, sourceIndices, thresholdDegrees) {
@@ -653,7 +920,7 @@ function buildParameterBasis(positions, normals, definitions) {
   const vertexComponents = positions.length;
   const result = new Float32Array(vertexComponents * definitions.length);
   for (let vertex = 0; vertex < positions.length / 3; vertex += 1) {
-    const offset = vertex * 3; const x = positions[offset]; const y = positions[offset + 1]; const z = positions[offset + 2]; const side = x < 0 ? -1 : 1; const absX = Math.abs(x);
+    const offset = vertex * 3; const x = positions[offset]; const y = positions[offset + 1]; const z = positions[offset + 2]; const side = Math.sign(x); const absX = Math.abs(x);
     for (let parameter = 0; parameter < definitions.length; parameter += 1) {
       const target = parameter * vertexComponents + offset;
       const id = definitions[parameter].id;
@@ -677,6 +944,21 @@ function buildParameterBasis(positions, normals, definitions) {
   return result;
 }
 
+function buildDeterministicTangents(positions, normals) {
+  const tangents = new Float32Array((positions.length / 3) * 4);
+  for (let vertex = 0; vertex < positions.length / 3; vertex += 1) {
+    const normalOffset = vertex * 3; const tangentOffset = vertex * 4;
+    const nx = normals[normalOffset]; const ny = normals[normalOffset + 1]; const nz = normals[normalOffset + 2];
+    const useX = Math.abs(ny) > 0.95;
+    const rx = useX ? 1 : 0; const ry = useX ? 0 : 1;
+    let tx = ry * nz; let ty = -rx * nz; let tz = rx * ny - ry * nx;
+    const length = Math.hypot(tx, ty, tz) || 1;
+    tx /= length; ty /= length; tz /= length;
+    tangents[tangentOffset] = tx; tangents[tangentOffset + 1] = ty; tangents[tangentOffset + 2] = tz; tangents[tangentOffset + 3] = 1;
+  }
+  return tangents;
+}
+
 function buildSemanticRegions(positions, definitions) {
   const vertexCount = positions.length / 3;
   const maskLo = new Uint32Array(vertexCount); const maskHi = new Uint32Array(vertexCount);
@@ -697,6 +979,33 @@ function buildSemanticRegions(positions, definitions) {
   });
   offsets[definitions.length] = all.length;
   return { maskLo, maskHi, offsets, vertexIndices: new Uint32Array(all), regions };
+}
+
+function buildPrimaryRegionIds(maskLo, maskHi, regionCount) {
+  const result = new Uint16Array(maskLo.length); result.fill(65535);
+  for (let vertex = 0; vertex < result.length; vertex += 1) {
+    for (let region = 0; region < regionCount; region += 1) {
+      const contains = region < 32 ? (maskLo[vertex] & ((1 << region) >>> 0)) !== 0 : (maskHi[vertex] & ((1 << (region - 32)) >>> 0)) !== 0;
+      if (contains) { result[vertex] = region; break; }
+    }
+  }
+  return result;
+}
+
+function buildExpressionRegionMasks(maskLo, maskHi) {
+  const expressionRegionIds = new Set(['eyes', 'eyelids', 'mouth', 'nasolabial', 'jaw', 'ear_boundary']);
+  let allowedLo = 0; let allowedHi = 0;
+  regionDefinitions.forEach(([id], index) => {
+    if (!expressionRegionIds.has(id)) return;
+    if (index < 32) allowedLo |= (1 << index) >>> 0;
+    else allowedHi |= (1 << (index - 32)) >>> 0;
+  });
+  const outputLo = new Uint32Array(maskLo.length); const outputHi = new Uint32Array(maskHi.length);
+  for (let vertex = 0; vertex < maskLo.length; vertex += 1) {
+    outputLo[vertex] = maskLo[vertex] & allowedLo;
+    outputHi[vertex] = maskHi[vertex] & allowedHi;
+  }
+  return { maskLo: outputLo, maskHi: outputHi };
 }
 
 function compareDirectArrays(referenceData, productionPositions, productionIndices) {

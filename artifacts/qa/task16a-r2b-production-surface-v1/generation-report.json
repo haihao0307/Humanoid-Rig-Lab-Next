@@ -1,8 +1,8 @@
 {
   "schema": "humanoid_rig/task16a_r2b_generation@1.0",
   "referenceAssetSha256": "DFB79A337DB0B6CE36BF3A94C7703A35D710331311026AD3C33BBBAB751EF257",
-  "productionAssetSha256": "938B362FF69845D2EB88550B518B40ECCCE78893E6C7FD7EF7D39FF286C39E1E",
-  "productionAssetBytes": 5364852,
+  "productionAssetSha256": "DBB6D59E7D0D3F15C5350905C86340B9DA0D07D32880752CD3C3A8DF79B3BA68",
+  "productionAssetBytes": 6483284,
   "refinement": {
     "sourceVertexCount": 13380,
     "targetVertexCount": 16384,
@@ -10,7 +10,7 @@
     "sourceTriangleCount": 26756,
     "targetTriangleCount": 32764,
     "bilateralSplitQuotaBalanced": true,
-    "mirrorMapRepresentation": "nearest opposite-side stable vertex",
+    "geometryAuthority": "complete bilateral source mesh",
     "regionSplitCounts": {
       "ankle-foot": 521,
       "hip-groin": 517,
@@ -46,6 +46,26 @@
     "permutationSeed": "0x16A0B201",
     "exactCopiedIndexTripletCount": 0
   },
+  "fullBilateralReconstruction": {
+    "authority": "HRLFullBilateralSurfaceV1",
+    "construction": "full bilateral source reconciliation; no half-body reflection or runtime geometry generation",
+    "centerlineToleranceBeforeSnapMeters": 0.0007329771178774536,
+    "centerlineMaximumPositionGap": 0,
+    "leftVertexCount": 8098,
+    "rightVertexCount": 8098,
+    "centerVertexCount": 188,
+    "bilateralPairCount": 8098,
+    "bilateralPairingAlgorithm": "deterministic sparse augmenting-path bijection inside a 0.035 m reflected-position radius",
+    "maximumPartnerPositionError": 0.03489308371851469,
+    "symmetryPartnerInvolutionErrorCount": 0,
+    "centerlineSelfPartnerErrorCount": 0,
+    "componentCount": 1,
+    "uniqueEdgeCount": 187,
+    "endpointCount": 2,
+    "branchVertexCount": 0,
+    "sharedByBothSidesCount": 188,
+    "duplicateCenterlineVertexPairCount": 0
+  },
   "topologyMetrics": {
     "schema": "humanoid_rig/hrlsurface_topology_metrics@1.0",
     "vertexCount": 16384,
@@ -61,15 +81,15 @@
     "NaNCount": 0,
     "InfCount": 0,
     "triangleWindingConsistency": true,
-    "signedVolume": 0.057883372846272804,
+    "signedVolume": 0.05788337304027823,
     "minimumTriangleArea": 6.59352419560276e-8,
     "minimumTriangleAngle": 4.434661096382183,
     "maximumTriangleAspectRatio": 25.132075037053347,
-    "p99TriangleAspectRatio": 9.200914122751291,
+    "p99TriangleAspectRatio": 9.18893727588513,
     "maximumVertexValence": 10,
     "EulerCharacteristic": 2,
     "topologyFingerprint": "9DF6A9E20CEEF14A97697F53E7D691FF236FC25681F85A0E35A7F4B2B0CC8AF8",
-    "positionHash": "7CFD43193343554105E20AB5C211B48DC2BE5CCAE4D28A200189B5EBA1974742"
+    "positionHash": "37085BB773E58C8CF040DB11FF7B07E0D8228D11E6DC34C18B65AB8A089FD3DA"
   },
   "directComparison": {
     "exactCopiedPositionCount": 0,
@@ -120,5 +140,5 @@
     "ear_boundary": 796,
     "hairline": 341
   },
-  "conclusion": "HRLSURFACE_GENERATED_PENDING_TOPOLOGY_AUDIT"
+  "conclusion": "HRL_FULL_BILATERAL_SURFACE_GENERATED_PENDING_TOPOLOGY_AND_VISUAL_AUDIT"
 }

@@ -30,7 +30,8 @@ const halfEdgeCacheChecks = {
 };
 const stableIds = parsed.chunks.stableVertexIds;
 const stableIdUnique = new Set(stableIds).size === stableIds.length;
-const symmetryMapBoundsValid = [...parsed.chunks.symmetryMap].every((vertex) => vertex < topologyMetrics.vertexCount);
+const symmetryPartnerBoundsValid = [...parsed.chunks.symmetryPartner].every((vertex) => vertex < topologyMetrics.vertexCount);
+const symmetryPartnerInvolutionValid = [...parsed.chunks.symmetryPartner].every((vertex, index) => parsed.chunks.symmetryPartner[vertex] === index);
 const regionMembershipValid = parsed.header.deformationRegions.every((region, index) => {
   const start = parsed.chunks.regionOffsets[index]; const end = parsed.chunks.regionOffsets[index + 1];
   return end >= start && end - start === region.vertexCount && end <= parsed.chunks.regionVertexIndices.length && region.vertexCount > 0;
@@ -44,7 +45,7 @@ const parameterAffectsPositions = !arraysEqual(initialPositions, deformer.positi
 const parameterUndo = deformer.undo() && arraysEqual(initialPositions, deformer.positions);
 const parameterRedo = deformer.redo() && !arraysEqual(initialPositions, deformer.positions);
 deformer.undo();
-const brushVertexCount = deformer.applyBrush({ center: [0.18, 0.42, 0.08], radius: 0.05, strength: 0.002, symmetry: true });
+const brushVertexCount = deformer.applyBrush({ center: [0.18, 0.42, 0.08], radius: 0.05, strength: 0.002, symmetricEdit: true });
 const sculptLayer = deformer.exportSculptLayer('audit-brush');
 const brushUndo = deformer.undo() && arraysEqual(initialPositions, deformer.positions);
 const runtimeChecks = {
@@ -77,7 +78,8 @@ const gates = {
   maximumVertexValence: topologyMetrics.maximumVertexValence <= 10,
   halfEdgeCache: Object.values(halfEdgeCacheChecks).every(Boolean),
   stableIdUnique,
-  symmetryMapBoundsValid,
+  symmetryPartnerBoundsValid,
+  symmetryPartnerInvolutionValid,
   regionMembershipValid,
   parameterBasisLengthValid,
   editableRuntime: Object.values(runtimeChecks).every((value) => value === true || (typeof value === 'number' && value > 0)),

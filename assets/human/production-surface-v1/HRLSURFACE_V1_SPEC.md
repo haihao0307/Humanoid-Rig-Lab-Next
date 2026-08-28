@@ -1,6 +1,6 @@
-# HRLSurface v1
+# HRLSurface v1 — HRLFullBilateralSurfaceV1
 
-HRLSurface is the web-native editable surface format for Humanoid Rig Lab. It is the production surface source of truth; it is not a renamed GLB and it does not depend on Blender authoring state.
+HRLSurface is Humanoid Rig Lab's web-native editable surface format. It is not a renamed GLB, does not depend on Blender authoring state and can be reshaped directly as typed arrays in a web runtime.
 
 ## Container
 
@@ -8,38 +8,53 @@ HRLSurface is the web-native editable surface format for Humanoid Rig Lab. It is
 - Bytes `8..11`: little-endian JSON header byte length.
 - Bytes `12..15`: little-endian binary data-section offset.
 - The UTF-8 JSON header begins at byte `16`.
-- Typed binary chunks begin at the aligned data-section offset.
-- Chunk offsets in the JSON header are relative to the data section.
+- Aligned typed-array chunks follow; descriptor offsets are relative to that data section.
+- Schema: `humanoid_rig/hrlsurface@1.0`.
 
-The schema identifier is `humanoid_rig/hrlsurface@1.0`.
+## Complete bilateral authority
 
-## Required geometry chunks
+`HRLFullBilateralSurfaceV1` is one indexed `BufferGeometry` and one complete human surface. The full `basePositions` and `indices` arrays explicitly contain left, right and unique center vertices. The format does not generate either body half at runtime, use `reflectX`, use negative scale or overlap two half meshes.
 
-- `basePositions`: mutable `Float32Array`, XYZ in metres.
-- `baseNormals`: initial `Float32Array`; normals are regenerated after edits.
-- `indices`: `Uint32Array` counter-clockwise triangles.
-- `stableVertexIds`: project namespace IDs, independent of reference numbering.
-- `symmetryMap`: nearest opposite-side stable vertex mapping. It is intentionally not described as an exact one-to-one pairing because the reference surface has different left/right vertex counts.
-- `halfEdgeVertex`, `halfEdgeNext`, `halfEdgeTwin`, `halfEdgeFace`, `vertexHalfEdge`: navigable control-surface topology.
+Every vertex has:
+
+- `stableVertexIds` (`vertexId`);
+- `vertexSide`, with `center=0`, `left=1`, `right=2`;
+- `symmetryPartner`, an exact bijective involution; center vertices map to themselves;
+- `primaryRegionIds` (`regionId`);
+- `anatomicalBandMaskLo/Hi` (`anatomicalBandIds`);
+- `centerlineRole`;
+- `futureWeightRegionMaskLo/Hi`;
+- `futureCorrectiveRegionMaskLo/Hi`;
+- `futureExpressionRegionMaskLo/Hi`.
+
+`leftVertexIndices`, `rightVertexIndices` and `centerVertexIndices` expose the three explicit sets. `halfEdgeVertex`, `halfEdgeNext`, `halfEdgeTwin`, `halfEdgeFace` and `vertexHalfEdge` cover the complete surface adjacency.
+
+## Unique centerline
+
+The centerline is one welded, unbranched indexed chain shared by triangles from both sides. It spans scalp, forehead, nose bridge, philtrum, lips, chin, front neck, sternum, abdomen, navel, front pelvis, front groin, back spine, sacrum and back groin. Each center vertex has `X=0`, `side=center` and `symmetryPartner=self`.
+
+`baseNormals` and `baseTangents` store one tuple per indexed vertex. Consequently there are no separately stored left/right centerline normals or tangents whose disagreement could create a split-attribute seam.
 
 ## Editable shape chunks
 
-- `parameterBasis`: dense per-parameter XYZ delta basis.
-- `semanticMaskLo` and `semanticMaskHi`: fast overlapping anatomical-region membership.
-- `regionOffsets` and `regionVertexIndices`: sparse stable membership for inspection and editing.
-- Sparse sculpt layers are represented as stable vertex-index and XYZ-delta pairs when serialized.
+- `parameterBasis`: dense per-parameter XYZ deltas.
+- `semanticMaskLo/Hi`: overlapping anatomical membership.
+- `regionOffsets` and `regionVertexIndices`: sparse memberships for inspection and editing.
+- Sparse sculpt layers serialize stable vertex indices and XYZ deltas.
+- `failedCenterlinePositions`: non-authoritative historical diagnostic positions used only by `failed-mirror-compare`.
 
 ## Runtime contract
 
-1. Start from `basePositions`.
-2. Accumulate weighted `parameterBasis` deltas.
-3. Accumulate ordered sparse sculpt-layer deltas.
-4. Recompute normals and bounds.
-5. Mark only affected GPU attribute ranges for update.
-6. Preserve topology and stable IDs unless an explicit topology-edit transaction creates a new topology revision.
+1. Start from the complete bilateral `basePositions` array.
+2. Accumulate `parameterBasis` and sparse sculpt deltas without changing topology.
+3. In symmetric edit mode, look up `symmetryPartner` and apply the X-sign-converted delta to the already stored partner vertex.
+4. With symmetric edit disabled, modify only selected vertices; the opposite side remains byte-for-byte unchanged.
+5. Keep centerline X at zero by default. An explicit centerline-offset experiment may relax that rule without duplicating topology.
+6. Recompute normals and bounds, then mark affected GPU ranges.
+7. Preserve stable IDs unless an explicit topology revision is created.
 
-Edits support mirror pairing, undo/redo command patches, direct brush displacement, parameter reset, and reserialization. A generated GLB may be used as a disposable interchange snapshot, but it is never the HRLSurface source of truth.
+Undo and redo store independent left/right delta changes. A generated GLB may be a disposable interchange snapshot, but it is never the editable authority.
 
 ## Provenance boundary
 
-The R2A CC0 mesh may guide proportions and surface placement. HRLSurface V1 records that derivative relationship explicitly. It does not claim clean-room independence. The delivered arrays, topology order, half-edge structure, parameter basis, semantic edit regions and project neutral shape are newly generated project data.
+The R2A CC0 mesh guides proportions and seeds the derived control surface. HRLSurface records that relationship and does not claim clean-room independence. The delivered vertex order, refined topology, half-edge data, editable region metadata, full-bilateral partner authority and project-neutral shape are generated project data.

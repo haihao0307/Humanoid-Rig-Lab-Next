@@ -1,0 +1,893 @@
+{
+  "schema": "humanoid_rig/task16a_r2b_camera_safety_static_audit@1.0",
+  "method": "file-only projection and clipping simulation against the unchanged HRLFullBilateralSurfaceV1 POSITION data; no browser visual claim",
+  "controllerPath": "apps/human-core-v5-production-surface-v1/camera-safety-controller-v1.js",
+  "assetSha256": "DBB6D59E7D0D3F15C5350905C86340B9DA0D07D32880752CD3C3A8DF79B3BA68",
+  "sourceVertexCount": 16384,
+  "fullBodyBounds": {
+    "min": [
+      -0.5027475953102112,
+      -0.8201470375061035,
+      -0.10713803768157959
+    ],
+    "max": [
+      0.5027475953102112,
+      0.8524065017700195,
+      0.3301812410354614
+    ]
+  },
+  "formulas": {
+    "minimumDistance": "max(bodyRadius * 1.08, bodyHeight * 0.48)",
+    "maximumDistance": "bodyRadius * 8",
+    "near": "max(0.005, cameraDistanceToTarget - bodyRadius * 1.3)",
+    "far": "max(cameraDistanceToTarget + bodyRadius * 4, bodyRadius * 12)"
+  },
+  "regionCatalog": {
+    "full-body": {
+      "pointCount": 16384,
+      "localTarget": [
+        0,
+        0.016129732131958008,
+        0.11152160167694092
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.5027475953102112,
+          -0.8201470375061035,
+          -0.10713803768157959
+        ],
+        "max": [
+          0.5027475953102112,
+          0.8524065017700195,
+          0.3301812410354614
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0,
+          0.016129732131958008,
+          0.11152160167694092
+        ],
+        "radius": 0.9999630082712407
+      },
+      "localMinimumDistance": 1.0799600489329402,
+      "localMaximumDistance": 7.999704066169926,
+      "localNear": 0.005,
+      "localFar": 11.999556099254889
+    },
+    "head-face": {
+      "pointCount": 5261,
+      "localTarget": [
+        0,
+        0.6687913686037064,
+        0.05924893170595169
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.26484134793281555,
+          0.4851762354373932,
+          -0.06347912549972534
+        ],
+        "max": [
+          0.26484134793281555,
+          0.8524065017700195,
+          0.18197698891162872
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0,
+          0.6687913686037064,
+          0.05924893170595169
+        ],
+        "radius": 0.3448443601511173
+      },
+      "localMinimumDistance": 0.3724319089632067,
+      "localMaximumDistance": 2.7587548812089384,
+      "localNear": 0.005,
+      "localFar": 4.138132321813408
+    },
+    "neck-shoulder": {
+      "pointCount": 2089,
+      "localTarget": [
+        0,
+        0.40926599502563477,
+        0.049245983362197876
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.3214351236820221,
+          0.267265260219574,
+          -0.06347912549972534
+        ],
+        "max": [
+          0.3214351236820221,
+          0.5512667298316956,
+          0.1619710922241211
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0,
+          0.40926599502563477,
+          0.049245983362197876
+        ],
+        "radius": 0.36904159330605335
+      },
+      "localMinimumDistance": 0.3985649207705376,
+      "localMaximumDistance": 2.952332746448427,
+      "localNear": 0.005,
+      "localFar": 4.42849911967264
+    },
+    "left-axilla": {
+      "pointCount": 2706,
+      "localTarget": [
+        -0.28168835304677486,
+        0.2674596309661865,
+        0.11594212055206299
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.5027475953102112,
+          0.08423608541488647,
+          -0.09829699993133545
+        ],
+        "max": [
+          -0.06062911078333855,
+          0.4506831765174866,
+          0.3301812410354614
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          -0.28168835304677486,
+          0.2674596309661865,
+          0.11594212055206299
+        ],
+        "radius": 0.3582407807326995
+      },
+      "localMinimumDistance": 0.3869000431913155,
+      "localMaximumDistance": 2.865926245861596,
+      "localNear": 0.005,
+      "localFar": 4.298889368792394
+    },
+    "right-axilla": {
+      "pointCount": 2707,
+      "localTarget": [
+        0.28168835304677486,
+        0.2674596309661865,
+        0.11594212055206299
+      ],
+      "localBoundingBox": {
+        "min": [
+          0.06062911078333855,
+          0.08423608541488647,
+          -0.09829699993133545
+        ],
+        "max": [
+          0.5027475953102112,
+          0.4506831765174866,
+          0.3301812410354614
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0.28168835304677486,
+          0.2674596309661865,
+          0.11594212055206299
+        ],
+        "radius": 0.3582407807326995
+      },
+      "localMinimumDistance": 0.3869000431913155,
+      "localMaximumDistance": 2.865926245861596,
+      "localNear": 0.005,
+      "localFar": 4.298889368792394
+    },
+    "left-elbow": {
+      "pointCount": 1839,
+      "localTarget": [
+        -0.4006491154432297,
+        0.21954917162656784,
+        0.17204629350453615
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.5027475953102112,
+          0.12195636332035065,
+          0.013911345973610878
+        ],
+        "max": [
+          -0.29855063557624817,
+          0.31714197993278503,
+          0.3301812410354614
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          -0.4006491154432297,
+          0.21954917162656784,
+          0.17204629350453615
+        ],
+        "radius": 0.21202621879109895
+      },
+      "localMinimumDistance": 0.22898831629438687,
+      "localMaximumDistance": 1.6962097503287916,
+      "localNear": 0.005,
+      "localFar": 2.5443146254931874
+    },
+    "right-elbow": {
+      "pointCount": 1839,
+      "localTarget": [
+        0.4006491154432297,
+        0.21954917162656784,
+        0.17204629350453615
+      ],
+      "localBoundingBox": {
+        "min": [
+          0.29855063557624817,
+          0.12195636332035065,
+          0.013911345973610878
+        ],
+        "max": [
+          0.5027475953102112,
+          0.31714197993278503,
+          0.3301812410354614
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0.4006491154432297,
+          0.21954917162656784,
+          0.17204629350453615
+        ],
+        "radius": 0.21202621879109895
+      },
+      "localMinimumDistance": 0.22898831629438687,
+      "localMaximumDistance": 1.6962097503287916,
+      "localNear": 0.005,
+      "localFar": 2.5443146254931874
+    },
+    "left-hand": {
+      "pointCount": 1714,
+      "localTarget": [
+        -0.43466195464134216,
+        0.19426945596933365,
+        0.2113276831805706
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.5027475953102112,
+          0.12195636332035065,
+          0.09247412532567978
+        ],
+        "max": [
+          -0.36657631397247314,
+          0.26658254861831665,
+          0.3301812410354614
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          -0.43466195464134216,
+          0.19426945596933365,
+          0.2113276831805706
+        ],
+        "radius": 0.15489030327466155
+      },
+      "localMinimumDistance": 0.16728152753663447,
+      "localMaximumDistance": 1.2391224261972924,
+      "localNear": 0.005,
+      "localFar": 1.8586836392959385
+    },
+    "right-hand": {
+      "pointCount": 1714,
+      "localTarget": [
+        0.43466195464134216,
+        0.19426945596933365,
+        0.2113276831805706
+      ],
+      "localBoundingBox": {
+        "min": [
+          0.36657631397247314,
+          0.12195636332035065,
+          0.09247412532567978
+        ],
+        "max": [
+          0.5027475953102112,
+          0.26658254861831665,
+          0.3301812410354614
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0.43466195464134216,
+          0.19426945596933365,
+          0.2113276831805706
+        ],
+        "radius": 0.15489030327466155
+      },
+      "localMinimumDistance": 0.16728152753663447,
+      "localMaximumDistance": 1.2391224261972924,
+      "localNear": 0.005,
+      "localFar": 1.8586836392959385
+    },
+    "pelvis-groin": {
+      "pointCount": 1055,
+      "localTarget": [
+        0,
+        -0.09287362545728683,
+        0.016609258949756622
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.19990620017051697,
+          -0.25056663155555725,
+          -0.10713803768157959
+        ],
+        "max": [
+          0.19990620017051697,
+          0.06481938064098358,
+          0.14035655558109283
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0,
+          -0.09287362545728683,
+          0.016609258949756622
+        ],
+        "radius": 0.2830953310503157
+      },
+      "localMinimumDistance": 0.305742957534341,
+      "localMaximumDistance": 2.2647626484025256,
+      "localNear": 0.005,
+      "localFar": 3.3971439726037884
+    },
+    "left-knee": {
+      "pointCount": 558,
+      "localTarget": [
+        -0.16281144320964813,
+        -0.4248672276735306,
+        0.01767205446958542
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.24473358690738678,
+          -0.598002016544342,
+          -0.06548089534044266
+        ],
+        "max": [
+          -0.08088929951190948,
+          -0.2517324388027191,
+          0.1008250042796135
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          -0.16281144320964813,
+          -0.4248672276735306,
+          0.01767205446958542
+        ],
+        "radius": 0.20880925699662467
+      },
+      "localMinimumDistance": 0.22551399755635465,
+      "localMaximumDistance": 1.6704740559729974,
+      "localNear": 0.005,
+      "localFar": 2.505711083959496
+    },
+    "right-knee": {
+      "pointCount": 558,
+      "localTarget": [
+        0.16281144320964813,
+        -0.4248672276735306,
+        0.01767205446958542
+      ],
+      "localBoundingBox": {
+        "min": [
+          0.08088929951190948,
+          -0.598002016544342,
+          -0.06548089534044266
+        ],
+        "max": [
+          0.24473358690738678,
+          -0.2517324388027191,
+          0.1008250042796135
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0.16281144320964813,
+          -0.4248672276735306,
+          0.01767205446958542
+        ],
+        "radius": 0.20880925699662467
+      },
+      "localMinimumDistance": 0.22551399755635465,
+      "localMaximumDistance": 1.6704740559729974,
+      "localNear": 0.005,
+      "localFar": 2.505711083959496
+    },
+    "left-ankle-foot": {
+      "pointCount": 1534,
+      "localTarget": [
+        -0.20386575162410736,
+        -0.6531266272068024,
+        0.06707203760743141
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.27343007922172546,
+          -0.8201470375061035,
+          -0.06548089534044266
+        ],
+        "max": [
+          -0.13430142402648926,
+          -0.4861062169075012,
+          0.19962497055530548
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          -0.20386575162410736,
+          -0.6531266272068024,
+          0.06707203760743141
+        ],
+        "radius": 0.22428841513493117
+      },
+      "localMinimumDistance": 0.24223148834572567,
+      "localMaximumDistance": 1.7943073210794493,
+      "localNear": 0.005,
+      "localFar": 2.691460981619174
+    },
+    "right-ankle-foot": {
+      "pointCount": 1533,
+      "localTarget": [
+        0.20386575162410736,
+        -0.6531266272068024,
+        0.06707203760743141
+      ],
+      "localBoundingBox": {
+        "min": [
+          0.13430142402648926,
+          -0.8201470375061035,
+          -0.06548089534044266
+        ],
+        "max": [
+          0.27343007922172546,
+          -0.4861062169075012,
+          0.19962497055530548
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0.20386575162410736,
+          -0.6531266272068024,
+          0.06707203760743141
+        ],
+        "radius": 0.22428841513493117
+      },
+      "localMinimumDistance": 0.24223148834572567,
+      "localMaximumDistance": 1.7943073210794493,
+      "localNear": 0.005,
+      "localFar": 2.691460981619174
+    },
+    "back-centerline": {
+      "pointCount": 1064,
+      "localTarget": [
+        0,
+        0.24667826294898987,
+        0.006990540772676468
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.0603286512196064,
+          -0.15829014778137207,
+          -0.10547128319740295
+        ],
+        "max": [
+          0.0603286512196064,
+          0.6516466736793518,
+          0.11945236474275589
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0,
+          0.24667826294898987,
+          0.006990540772676468
+        ],
+        "radius": 0.424601721261383
+      },
+      "localMinimumDistance": 0.4585698589622937,
+      "localMaximumDistance": 3.396813770091064,
+      "localNear": 0.005,
+      "localFar": 5.095220655136596
+    },
+    "front-centerline": {
+      "pointCount": 486,
+      "localTarget": [
+        0,
+        0.31625177152454853,
+        0.1350153088569641
+      ],
+      "localBoundingBox": {
+        "min": [
+          -0.06027943640947342,
+          -0.01902266964316368,
+          0.10288624465465546
+        ],
+        "max": [
+          0.06027943640947342,
+          0.6515262126922607,
+          0.16714437305927277
+        ]
+      },
+      "localBoundingSphere": {
+        "center": [
+          0,
+          0.31625177152454853,
+          0.1350153088569641
+        ],
+        "radius": 0.3421620056649796
+      },
+      "localMinimumDistance": 0.369534966118178,
+      "localMaximumDistance": 2.737296045319837,
+      "localNear": 0.005,
+      "localFar": 4.105944067979755
+    }
+  },
+  "scenarios": [
+    {
+      "name": "Front full-body minimum distance",
+      "viewRegion": "full-body",
+      "distanceMode": "minimum",
+      "aspect": 1.7777777777777777,
+      "cameraDistance": 1.0799600489329402,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 0.005,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": -0.083828,
+        "maxX": 1.083828,
+        "minY": -1.21711,
+        "maxY": 2.169067
+      },
+      "visibleProjectedCornerCount": 0,
+      "projectedModelHeight": 3.3861772261933583,
+      "modelVisible": true
+    },
+    {
+      "name": "Front full-body maximum distance",
+      "viewRegion": "full-body",
+      "distanceMode": "maximum",
+      "aspect": 1.7777777777777777,
+      "cameraDistance": 7.999704066169926,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 6.699752155417313,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": 0.43649,
+        "maxX": 0.56351,
+        "minY": 0.31321,
+        "maxY": 0.687944
+      },
+      "visibleProjectedCornerCount": 8,
+      "projectedModelHeight": 0.37473436230082535,
+      "modelVisible": true
+    },
+    {
+      "name": "Side full-body minimum distance",
+      "viewRegion": "full-body",
+      "distanceMode": "minimum",
+      "aspect": 1.7777777777777777,
+      "cameraDistance": 1.0799600489329402,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 0.005,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": 0.117422,
+        "maxX": 0.882578,
+        "minY": -2.06944,
+        "maxY": 2.983786
+      },
+      "visibleProjectedCornerCount": 0,
+      "projectedModelHeight": 5.053225755916399,
+      "modelVisible": true
+    },
+    {
+      "name": "Side full-body maximum distance",
+      "viewRegion": "full-body",
+      "distanceMode": "maximum",
+      "aspect": 1.7777777777777777,
+      "cameraDistance": 7.999704066169926,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 6.699752155417313,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": 0.471329,
+        "maxX": 0.528671,
+        "minY": 0.307442,
+        "maxY": 0.696367
+      },
+      "visibleProjectedCornerCount": 8,
+      "projectedModelHeight": 0.3889255077617474,
+      "modelVisible": true
+    },
+    {
+      "name": "Back full-body minimum distance",
+      "viewRegion": "full-body",
+      "distanceMode": "minimum",
+      "aspect": 1.7777777777777777,
+      "cameraDistance": 1.0799600489329402,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 0.005,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": -0.083828,
+        "maxX": 1.083828,
+        "minY": -1.21711,
+        "maxY": 2.169067
+      },
+      "visibleProjectedCornerCount": 0,
+      "projectedModelHeight": 3.386177226193359,
+      "modelVisible": true
+    },
+    {
+      "name": "Back full-body maximum distance",
+      "viewRegion": "full-body",
+      "distanceMode": "maximum",
+      "aspect": 1.7777777777777777,
+      "cameraDistance": 7.999704066169926,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 6.699752155417313,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": 0.43649,
+        "maxX": 0.56351,
+        "minY": 0.31321,
+        "maxY": 0.687944
+      },
+      "visibleProjectedCornerCount": 8,
+      "projectedModelHeight": 0.37473436230082535,
+      "modelVisible": true
+    },
+    {
+      "name": "Three Quarter full-body minimum distance",
+      "viewRegion": "full-body",
+      "distanceMode": "minimum",
+      "aspect": 1.7777777777777777,
+      "cameraDistance": 1.0799600489329402,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 0.005,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": 0.104188,
+        "maxX": 1.08017,
+        "minY": -2.103172,
+        "maxY": 3.015396
+      },
+      "visibleProjectedCornerCount": 0,
+      "projectedModelHeight": 5.118567954126091,
+      "modelVisible": true
+    },
+    {
+      "name": "Three Quarter full-body maximum distance",
+      "viewRegion": "full-body",
+      "distanceMode": "maximum",
+      "aspect": 1.7777777777777777,
+      "cameraDistance": 7.999704066169926,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 6.699752155417313,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": 0.438863,
+        "maxX": 0.564293,
+        "minY": 0.307287,
+        "maxY": 0.696594
+      },
+      "visibleProjectedCornerCount": 8,
+      "projectedModelHeight": 0.3893076884404479,
+      "modelVisible": true
+    },
+    {
+      "name": "Front head-face minimum distance",
+      "viewRegion": "head-face",
+      "distanceMode": "minimum",
+      "aspect": 1.25,
+      "cameraDistance": 0.3724319089632067,
+      "minimumDistance": 0.3724319089632067,
+      "maximumDistance": 2.7587548812089384,
+      "cameraNear": 0.005,
+      "cameraFar": 4.138132321813408,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": -1.001464,
+        "maxX": 2.001464,
+        "minY": -0.783557,
+        "maxY": 1.780135
+      },
+      "visibleProjectedCornerCount": 0,
+      "projectedModelHeight": 2.563691503571124,
+      "modelVisible": true
+    },
+    {
+      "name": "Front shoulder-axilla minimum distance",
+      "viewRegion": "left-axilla",
+      "distanceMode": "minimum",
+      "aspect": 1.25,
+      "cameraDistance": 0.3869000431913155,
+      "minimumDistance": 0.3869000431913155,
+      "maximumDistance": 2.865926245861596,
+      "cameraNear": 0.005,
+      "cameraFar": 4.298889368792394,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": -1.324248,
+        "maxX": 2.324248,
+        "minY": -1.345446,
+        "maxY": 2.353484
+      },
+      "visibleProjectedCornerCount": 0,
+      "projectedModelHeight": 3.6989302576974787,
+      "modelVisible": true
+    },
+    {
+      "name": "Front pelvis-groin minimum distance",
+      "viewRegion": "pelvis-groin",
+      "distanceMode": "minimum",
+      "aspect": 1.25,
+      "cameraDistance": 0.305742957534341,
+      "minimumDistance": 0.305742957534341,
+      "maximumDistance": 2.2647626484025256,
+      "cameraNear": 0.005,
+      "cameraFar": 3.3971439726037884,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": -1.05905,
+        "maxX": 2.05905,
+        "minY": -1.012859,
+        "maxY": 2.007937
+      },
+      "visibleProjectedCornerCount": 0,
+      "projectedModelHeight": 3.0207953437788477,
+      "modelVisible": true
+    },
+    {
+      "name": "Small viewport current-region fit",
+      "viewRegion": "full-body",
+      "distanceMode": "fit",
+      "aspect": 0.7009345794392523,
+      "cameraDistance": 5.687928612114542,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 4.387976701361929,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": 0.283891,
+        "maxX": 0.731977,
+        "minY": 0.220967,
+        "maxY": 0.784085
+      },
+      "visibleProjectedCornerCount": 8,
+      "projectedModelHeight": 0.5631173645911616,
+      "modelVisible": true
+    },
+    {
+      "name": "Large viewport current-region fit",
+      "viewRegion": "full-body",
+      "distanceMode": "fit",
+      "aspect": 1.5857142857142856,
+      "cameraDistance": 4.2286652126374396,
+      "minimumDistance": 1.0799600489329402,
+      "maximumDistance": 7.999704066169926,
+      "cameraNear": 2.9287133018848266,
+      "cameraFar": 11.999556099254889,
+      "cameraInsideBody": false,
+      "nearPlaneIntersectsBody": false,
+      "farPlaneExcludesBody": false,
+      "modelBehindNearPlaneVertexCount": 0,
+      "modelBeyondFarPlaneVertexCount": 0,
+      "modelScreenBounds": {
+        "minX": 0.361559,
+        "maxX": 0.638441,
+        "minY": 0.136818,
+        "maxY": 0.863953
+      },
+      "visibleProjectedCornerCount": 8,
+      "projectedModelHeight": 0.7271350827374766,
+      "modelVisible": true
+    }
+  ],
+  "checks": {
+    "independentControllerModuleExists": true,
+    "allRequiredRegionsImplemented": true,
+    "minimumDistanceFormulaExact": true,
+    "maximumDistanceFormulaExact": true,
+    "nearFormulaExact": true,
+    "farFormulaExact": true,
+    "frontSidePreserved": true,
+    "cameraInsideBodyFalseForAllScenarios": true,
+    "nearPlaneSafeForAllScenarios": true,
+    "farPlaneSafeForAllScenarios": true,
+    "modelVisibleForAllScenarios": true,
+    "maximumDistanceKeepsTwelvePercentHeight": true,
+    "lockedFullBodyUsesFramingMinimum": true,
+    "targetClampImplemented": true,
+    "lastValidCameraRecoveryImplemented": true,
+    "realResizeSequenceImplemented": true,
+    "visibilityGuardMetricsImplemented": true,
+    "publicCameraSafetyMetricsImplemented": true
+  },
+  "passed": true,
+  "cameraNavigationVisualGate": "failed",
+  "fullBodyReviewReliable": false,
+  "cameraNavigationVisualGateNote": "awaiting user real-browser file-protocol retest",
+  "visualAcceptance": false,
+  "productionReady": false,
+  "userVisualAcceptance": "pending"
+}
