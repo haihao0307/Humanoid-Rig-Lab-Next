@@ -1,0 +1,71 @@
+{
+  "schema": "humanoid_rig/task16b_stop_status@1.0",
+  "task": "Task 16B R1 Natural Skinning Foundation V1",
+  "status": "stopped-by-explicit-catastrophic-failure-gate",
+  "conclusion": "SKINNING_CATASTROPHIC_STABILITY_FAILED",
+  "completedGates": {
+    "referencePoseCalibration": true,
+    "bindMatricesAndInverseBindMatrices": true,
+    "restIdentity": true,
+    "projectAuthoredWeightField": true
+  },
+  "failedGate": {
+    "id": "standard-pose-catastrophic-stability",
+    "standardPoseCount": 33,
+    "catastrophicFailureCount": 29,
+    "standardPosePassCount": 4,
+    "volumeFailureCount": 12,
+    "nonContactCriticalSelfIntersectionCount": 2731,
+    "maximumReturnToRestError": 0
+  },
+  "boundedCoreMethodRevisions": [
+    {
+      "revision": 1,
+      "changes": [
+        "exact semantic-region token matching so forearm no longer matches the face ear token",
+        "side-safe and centerline-safe orphan influence placement",
+        "minimum binary-exact orphan injection"
+      ],
+      "nonContactCriticalSelfIntersectionCountAfterRevision": 3322,
+      "catastrophicFailureCountAfterRevision": 31
+    },
+    {
+      "revision": 2,
+      "changes": [
+        "anatomical-zone-specific bone-segment kernel scales",
+        "reduced DQS blend in shoulder, axilla, elbow, wrist, hip, groin and knee regions",
+        "corrected semantic flexion direction in deterministic fixtures"
+      ],
+      "nonContactCriticalSelfIntersectionCountAfterRevision": 2731,
+      "catastrophicFailureCountAfterRevision": 29
+    }
+  ],
+  "notRunBecauseStopGateTriggered": {
+    "randomLegalPoseStressCount": 512,
+    "browserQA": true,
+    "screenshotWorkflow": true,
+    "standaloneBuild": true,
+    "reviewPackageBuild": true
+  },
+  "browserMetrics": {
+    "consoleErrors": null,
+    "pageErrors": null,
+    "startupErrors": null,
+    "failedRequests": null,
+    "firstFrameRendered": null,
+    "visibleMeshCount": null,
+    "humanSurfaceCount": null,
+    "reason": "not executed; file-content-only instruction and earlier catastrophic stability stop gate"
+  },
+  "externalHumanAssetRequests": 0,
+  "externalRigAssetRequests": 0,
+  "externalSkinWeightAssetRequests": 0,
+  "externalSkinnedMeshUsed": false,
+  "weightTransferUsed": false,
+  "task16bVisualAcceptance": false,
+  "visualAcceptance": false,
+  "productionReady": false,
+  "userVisualAcceptance": "pending",
+  "task16bCommitCreated": false,
+  "task16bPushAttempted": false
+}

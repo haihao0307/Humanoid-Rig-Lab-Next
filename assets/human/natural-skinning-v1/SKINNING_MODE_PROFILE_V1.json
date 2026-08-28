@@ -1,0 +1,33 @@
+{
+  "schema": "humanoid_rig/hrl_skinning_mode_profile@1.0",
+  "defaultMode": "hybrid",
+  "modes": {
+    "lbs4": {
+      "influenceCount": 4,
+      "purpose": "compatibility diagnostic"
+    },
+    "lbs8": {
+      "influenceCount": 8,
+      "purpose": "full project-authored linear blend reference"
+    },
+    "dqs8": {
+      "influenceCount": 8,
+      "purpose": "volume-preserving twist diagnostic"
+    },
+    "hybrid": {
+      "influenceCount": 8,
+      "purpose": "region-mask blend of LBS8 and DQS8",
+      "blendAttribute": "hybridBlend"
+    }
+  },
+  "regionPolicy": {
+    "twistLimbs": "prefer-dqs",
+    "faceFingerTipsAndToes": "prefer-lbs",
+    "shoulderAxillaHipGroin": "adjustable-hybrid"
+  },
+  "gpuPerFrameSkinning": true,
+  "cpuReferenceSkinningOnlyForQA": true,
+  "perFrameTopologyGeneration": false,
+  "perFrameWeightGeneration": false,
+  "canonicalPositionMutation": false
+}
