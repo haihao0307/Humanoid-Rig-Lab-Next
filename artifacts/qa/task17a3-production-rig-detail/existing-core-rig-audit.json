@@ -1,0 +1,3943 @@
+{
+  "schema": "humanoid_rig/task17a3_existing_core_rig_audit@1.0",
+  "task": "Task 17A.3 Human Production Rig and Interaction Skeleton Foundation",
+  "authorityChain": [
+    "BodyDNA",
+    "HumanRigCore",
+    "finalPose",
+    "Production Rig Detail",
+    "Performance Deform Rig Contract",
+    "Interaction Anchors",
+    "Diagnostic Renderer"
+  ],
+  "jointCount": 89,
+  "coreHumanJointCount": 20,
+  "joints": [
+    {
+      "jointId": "root",
+      "parentJointId": null,
+      "bindLocalPosition": [
+        0,
+        0,
+        0
+      ],
+      "bindWorldPosition": [
+        0,
+        0,
+        0
+      ],
+      "boneLength": 0,
+      "twistAxisLocal": [
+        0,
+        0.9998504353181158,
+        0.017294710005502544
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.017294710005502544,
+        -0.9998504353181158
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": false,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "hips",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        0,
+        0.925,
+        0.016
+      ],
+      "bindWorldPosition": [
+        0,
+        0.93,
+        0.016
+      ],
+      "boneLength": 0.9251383680293452,
+      "twistAxisLocal": [
+        0,
+        0.983382180455892,
+        0.1815474790841647
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.1815474790841647,
+        -0.983382180455892
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 0.9999999999999997,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "tilt": [
+            -35,
+            45
+          ],
+          "roll": [
+            -25,
+            25
+          ],
+          "yaw": [
+            -45,
+            45
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:SMPL 骨盆根节点与刚性髋距",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "spine",
+      "parentJointId": "hips",
+      "bindLocalPosition": [
+        0,
+        0.13,
+        0.024
+      ],
+      "bindWorldPosition": [
+        0,
+        1.06,
+        0.04
+      ],
+      "boneLength": 0.13219682295728594,
+      "twistAxisLocal": [
+        0,
+        0.9902407678311521,
+        -0.1393672189762362
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.1393672189762362,
+        -0.9902407678311521
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            35
+          ],
+          "extension": [
+            0,
+            25
+          ],
+          "lateral_flexion": [
+            0,
+            25
+          ],
+          "axial_rotation": [
+            0,
+            40
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:腰椎分段弯曲 ≤ 22°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "chest",
+      "parentJointId": "spine",
+      "bindLocalPosition": [
+        0,
+        0.135,
+        -0.019
+      ],
+      "bindWorldPosition": [
+        0,
+        1.195,
+        0.021
+      ],
+      "boneLength": 0.13633048081775406,
+      "twistAxisLocal": [
+        0,
+        0.9915239774692823,
+        -0.12992383193045767
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.12992383193045767,
+        -0.9915239774692823
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            35
+          ],
+          "extension": [
+            0,
+            25
+          ],
+          "lateral_flexion": [
+            0,
+            25
+          ],
+          "axial_rotation": [
+            0,
+            40
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:胸椎分段弯曲 ≤ 18°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "upperChest",
+      "parentJointId": "chest",
+      "bindLocalPosition": [
+        0,
+        0.145,
+        -0.019
+      ],
+      "bindWorldPosition": [
+        0,
+        1.34,
+        0.0020000000000000018
+      ],
+      "boneLength": 0.14623952953972463,
+      "twistAxisLocal": [
+        0,
+        0.9970165267504175,
+        -0.07718837598067749
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.07718837598067749,
+        -0.9970165267504175
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 1.0000000000000004,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            35
+          ],
+          "extension": [
+            0,
+            25
+          ],
+          "lateral_flexion": [
+            0,
+            25
+          ],
+          "axial_rotation": [
+            0,
+            40
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:上胸分段弯曲 ≤ 18°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "neck",
+      "parentJointId": "upperChest",
+      "bindLocalPosition": [
+        0,
+        0.155,
+        -0.012
+      ],
+      "bindWorldPosition": [
+        0,
+        1.495,
+        -0.009999999999999998
+      ],
+      "boneLength": 0.15546382215808283,
+      "twistAxisLocal": [
+        0,
+        0.9070089679666898,
+        0.42111130598453456
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.42111130598453456,
+        -0.9070089679666898
+      ],
+      "axisOrthogonalityError": 1.1102230246251565e-16,
+      "basisDeterminant": 1,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            55
+          ],
+          "extension": [
+            0,
+            55
+          ],
+          "lateral_flexion": [
+            0,
+            45
+          ],
+          "axial_rotation": [
+            0,
+            70
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:颈部综合摆动 ≤ 45°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "head",
+      "parentJointId": "neck",
+      "bindLocalPosition": [
+        0,
+        0.14,
+        0.065
+      ],
+      "bindWorldPosition": [
+        0,
+        1.6350000000000002,
+        0.05500000000000001
+      ],
+      "boneLength": 0.15435349040433133,
+      "twistAxisLocal": [
+        0,
+        0.9981832840582182,
+        -0.060250572003514066
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.060250572003514066,
+        -0.9981832840582182
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            55
+          ],
+          "extension": [
+            0,
+            55
+          ],
+          "lateral_flexion": [
+            0,
+            45
+          ],
+          "axial_rotation": [
+            0,
+            70
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:头部综合摆动 ≤ 60°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "headTop",
+      "parentJointId": "head",
+      "bindLocalPosition": [
+        0,
+        0.165672,
+        -0.01
+      ],
+      "bindWorldPosition": [
+        0,
+        1.8006720000000003,
+        0.045000000000000005
+      ],
+      "boneLength": 0.16597352675652827,
+      "twistAxisLocal": [
+        0,
+        0.9981832840582182,
+        -0.060250572003514066
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.060250572003514066,
+        -0.9981832840582182
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": false,
+      "sourceRole": "marker"
+    },
+    {
+      "jointId": "leftShoulder",
+      "parentJointId": "upperChest",
+      "bindLocalPosition": [
+        -0.1,
+        0.07,
+        -0.007
+      ],
+      "bindWorldPosition": [
+        -0.105,
+        1.4014817045957577,
+        0.014000000000000002
+      ],
+      "boneLength": 0.122266103233889,
+      "twistAxisLocal": [
+        -0.8550542819846204,
+        -0.5052593479909121,
+        -0.11659831099790277
+      ],
+      "bendAxisLocal": [
+        0.508729312126641,
+        -0.8609265282143155,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.10038257899543805,
+        -0.0593169789973043,
+        0.9931791549548643
+      ],
+      "axisOrthogonalityError": 4.3046326225759657e-10,
+      "basisDeterminant": 1,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "elevation": [
+            0,
+            35
+          ],
+          "depression": [
+            0,
+            15
+          ],
+          "protraction": [
+            0,
+            25
+          ],
+          "retraction": [
+            0,
+            25
+          ],
+          "axial_rotation": [
+            0,
+            20
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:锁骨摆动 ≤ 35°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftUpperArm",
+      "parentJointId": "leftShoulder",
+      "bindLocalPosition": [
+        -0.11,
+        -0.065,
+        -0.015
+      ],
+      "bindWorldPosition": [
+        -0.20999999999999996,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.12864680330268607,
+      "twistAxisLocal": [
+        -0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "bendAxisLocal": [
+        0.8591015439742421,
+        -0.5118051749846548,
+        0
+      ],
+      "sideAxisLocal": [
+        0.08307976296650217,
+        0.1394553169437715,
+        0.9867370306021468
+      ],
+      "axisOrthogonalityError": 5.832232474745069e-10,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            170
+          ],
+          "extension": [
+            0,
+            55
+          ],
+          "abduction": [
+            0,
+            170
+          ],
+          "adduction": [
+            0,
+            45
+          ],
+          "internal_rotation": [
+            0,
+            70
+          ],
+          "external_rotation": [
+            0,
+            90
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:肩球窝关节：屈曲 170°，伸展 55°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftLowerArm",
+      "parentJointId": "leftUpperArm",
+      "bindLocalPosition": [
+        -0.14,
+        -0.235,
+        0.045
+      ],
+      "bindWorldPosition": [
+        -0.4872183255125822,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.27721832551258224,
+      "twistAxisLocal": [
+        -0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "bendAxisLocal": [
+        0.9237421135284853,
+        -0.38301502280449395,
+        0
+      ],
+      "sideAxisLocal": [
+        0.15072950501493615,
+        0.3635241000360225,
+        0.9193099830910966
+      ],
+      "axisOrthogonalityError": 3.266946158042572e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            145
+          ],
+          "extension": [
+            0,
+            5
+          ],
+          "pronation": [
+            0,
+            85
+          ],
+          "supination": [
+            0,
+            85
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:肘铰链：伸展 5°，屈曲 145°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftHand",
+      "parentJointId": "leftLowerArm",
+      "bindLocalPosition": [
+        -0.085,
+        -0.205,
+        0.095
+      ],
+      "bindWorldPosition": [
+        -0.7286204796040484,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.2414021540914662,
+      "twistAxisLocal": [
+        -0.39562389590990127,
+        -0.8477654918069313,
+        0.35323562091955474
+      ],
+      "bendAxisLocal": [
+        0.9061831401230026,
+        -0.4228854650574012,
+        0
+      ],
+      "sideAxisLocal": [
+        0.14937821004905705,
+        0.3200961651051222,
+        0.9355343903072372
+      ],
+      "axisOrthogonalityError": 1.0077380596662522e-9,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            80
+          ],
+          "extension": [
+            0,
+            70
+          ],
+          "radial_deviation": [
+            0,
+            20
+          ],
+          "ulnar_deviation": [
+            0,
+            30
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:腕：屈曲 80°，伸展 70°，桡偏 20°，尺偏 30°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftHandEnd",
+      "parentJointId": "leftHand",
+      "bindLocalPosition": [
+        -0.028,
+        -0.06,
+        0.025
+      ],
+      "bindWorldPosition": [
+        -0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.070774289116882,
+      "twistAxisLocal": [
+        -0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "bendAxisLocal": [
+        0.7071067811865475,
+        -0.7071067811865475,
+        0
+      ],
+      "sideAxisLocal": [
+        0.5986710948555584,
+        0.5986710948555584,
+        0.5321520838716074
+      ],
+      "axisOrthogonalityError": 2.8890173586759715e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightShoulder",
+      "parentJointId": "upperChest",
+      "bindLocalPosition": [
+        0.1,
+        0.07,
+        -0.007
+      ],
+      "bindWorldPosition": [
+        0.105,
+        1.4014817045957577,
+        0.014000000000000002
+      ],
+      "boneLength": 0.122266103233889,
+      "twistAxisLocal": [
+        0.8550542819846204,
+        -0.5052593479909121,
+        -0.11659831099790277
+      ],
+      "bendAxisLocal": [
+        0.508729312126641,
+        0.8609265282143155,
+        0
+      ],
+      "sideAxisLocal": [
+        0.10038257899543805,
+        -0.0593169789973043,
+        0.9931791549548643
+      ],
+      "axisOrthogonalityError": 4.3046326225759657e-10,
+      "basisDeterminant": 1,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "elevation": [
+            0,
+            35
+          ],
+          "depression": [
+            0,
+            15
+          ],
+          "protraction": [
+            0,
+            25
+          ],
+          "retraction": [
+            0,
+            25
+          ],
+          "axial_rotation": [
+            0,
+            20
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:锁骨摆动 ≤ 35°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightUpperArm",
+      "parentJointId": "rightShoulder",
+      "bindLocalPosition": [
+        0.11,
+        -0.065,
+        -0.015
+      ],
+      "bindWorldPosition": [
+        0.20999999999999996,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.12864680330268607,
+      "twistAxisLocal": [
+        0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "bendAxisLocal": [
+        0.8591015439742421,
+        0.5118051749846548,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.08307976296650217,
+        0.1394553169437715,
+        0.9867370306021468
+      ],
+      "axisOrthogonalityError": 5.832232474745069e-10,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            170
+          ],
+          "extension": [
+            0,
+            55
+          ],
+          "abduction": [
+            0,
+            170
+          ],
+          "adduction": [
+            0,
+            45
+          ],
+          "internal_rotation": [
+            0,
+            70
+          ],
+          "external_rotation": [
+            0,
+            90
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:肩球窝关节：屈曲 170°，伸展 55°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightLowerArm",
+      "parentJointId": "rightUpperArm",
+      "bindLocalPosition": [
+        0.14,
+        -0.235,
+        0.045
+      ],
+      "bindWorldPosition": [
+        0.4872183255125822,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.27721832551258224,
+      "twistAxisLocal": [
+        0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "bendAxisLocal": [
+        0.9237421135284853,
+        0.38301502280449395,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.15072950501493615,
+        0.3635241000360225,
+        0.9193099830910966
+      ],
+      "axisOrthogonalityError": 3.266946158042572e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            145
+          ],
+          "extension": [
+            0,
+            5
+          ],
+          "pronation": [
+            0,
+            85
+          ],
+          "supination": [
+            0,
+            85
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:肘铰链：伸展 5°，屈曲 145°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightHand",
+      "parentJointId": "rightLowerArm",
+      "bindLocalPosition": [
+        0.085,
+        -0.205,
+        0.095
+      ],
+      "bindWorldPosition": [
+        0.7286204796040484,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.2414021540914662,
+      "twistAxisLocal": [
+        0.39562389590990127,
+        -0.8477654918069313,
+        0.35323562091955474
+      ],
+      "bendAxisLocal": [
+        0.9061831401230026,
+        0.4228854650574012,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.14937821004905705,
+        0.3200961651051222,
+        0.9355343903072372
+      ],
+      "axisOrthogonalityError": 1.0077380596662522e-9,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            80
+          ],
+          "extension": [
+            0,
+            70
+          ],
+          "radial_deviation": [
+            0,
+            20
+          ],
+          "ulnar_deviation": [
+            0,
+            30
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:腕：屈曲 80°，伸展 70°，桡偏 20°，尺偏 30°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightHandEnd",
+      "parentJointId": "rightHand",
+      "bindLocalPosition": [
+        0.028,
+        -0.06,
+        0.025
+      ],
+      "bindWorldPosition": [
+        0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.070774289116882,
+      "twistAxisLocal": [
+        0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "bendAxisLocal": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.5986710948555584,
+        0.5986710948555584,
+        0.5321520838716074
+      ],
+      "axisOrthogonalityError": 2.8890173586759715e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftUpperLeg",
+      "parentJointId": "hips",
+      "bindLocalPosition": [
+        -0.1,
+        0,
+        0
+      ],
+      "bindWorldPosition": [
+        -0.1,
+        0.93,
+        0.016
+      ],
+      "boneLength": 0.1,
+      "twistAxisLocal": [
+        -0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "bendAxisLocal": [
+        0.9997232982821956,
+        -0.023522901006639896,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.0007742380002542152,
+        -0.03290511101080414,
+        0.9994581803281645
+      ],
+      "axisOrthogonalityError": 4.491637062287168e-10,
+      "basisDeterminant": 1,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            130
+          ],
+          "extension": [
+            0,
+            18
+          ],
+          "abduction": [
+            0,
+            45
+          ],
+          "adduction": [
+            0,
+            30
+          ],
+          "internal_rotation": [
+            0,
+            45
+          ],
+          "external_rotation": [
+            0,
+            60
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:髋球窝关节：屈曲 130°，伸展 18°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftLowerLeg",
+      "parentJointId": "leftUpperLeg",
+      "bindLocalPosition": [
+        -0.01,
+        -0.425,
+        -0.014
+      ],
+      "bindWorldPosition": [
+        -0.11,
+        0.5050000000000001,
+        0.002
+      ],
+      "boneLength": 0.4253480927428734,
+      "twistAxisLocal": [
+        -0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "bendAxisLocal": [
+        0.992277876667514,
+        -0.12403473495843924,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.0012307089998363169,
+        -0.009845668998690537,
+        0.9999507728670076
+      ],
+      "axisOrthogonalityError": 3.6841207775445417e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            140
+          ],
+          "extension": [
+            0,
+            2
+          ]
+        },
+        "reverseBendBlocked": true
+      },
+      "currentLimitSource": "JointSemanticProfileV5:膝铰链：伸展 2°，屈曲 140°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftFoot",
+      "parentJointId": "leftLowerLeg",
+      "bindLocalPosition": [
+        -0.05,
+        -0.4,
+        -0.004
+      ],
+      "bindWorldPosition": [
+        -0.16,
+        0.1050000000000001,
+        -0.002
+      ],
+      "boneLength": 0.4031327324839798,
+      "twistAxisLocal": [
+        -0.11497706904062847,
+        -0.4670943411650532,
+        0.876700148309792
+      ],
+      "bendAxisLocal": [
+        0.9710148789669015,
+        -0.2390190469918527,
+        0
+      ],
+      "sideAxisLocal": [
+        0.20954803403098984,
+        0.8512888881258963,
+        0.48103726507114014
+      ],
+      "axisOrthogonalityError": 5.1400000922186e-10,
+      "basisDeterminant": 1,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "dorsiflexion": [
+            0,
+            15
+          ],
+          "plantarflexion": [
+            0,
+            55
+          ],
+          "inversion": [
+            0,
+            20
+          ],
+          "eversion": [
+            0,
+            20
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:踝：背屈 15°，跖屈 55°，侧偏 20°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftToes",
+      "parentJointId": "leftFoot",
+      "bindLocalPosition": [
+        -0.016,
+        -0.065,
+        0.122
+      ],
+      "bindWorldPosition": [
+        -0.176,
+        0.04000000000000009,
+        0.12
+      ],
+      "boneLength": 0.13915818337417316,
+      "twistAxisLocal": [
+        0,
+        -0.19611613494587632,
+        0.9805806757293816
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.9805806757293816,
+        0.19611613494587632
+      ],
+      "axisOrthogonalityError": 1.1102230246251565e-16,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            35
+          ],
+          "extension": [
+            0,
+            45
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:SMPL 足部节点；前脚掌屈曲 35°，伸展 45°",
+      "core": false,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftToesEnd",
+      "parentJointId": "leftToes",
+      "bindLocalPosition": [
+        0,
+        -0.015,
+        0.075
+      ],
+      "bindWorldPosition": [
+        -0.176,
+        0.02500000000000009,
+        0.195
+      ],
+      "boneLength": 0.07648529270389177,
+      "twistAxisLocal": [
+        0,
+        -0.19611613494587632,
+        0.9805806757293816
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.9805806757293816,
+        0.19611613494587632
+      ],
+      "axisOrthogonalityError": 1.1102230246251565e-16,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": false,
+      "sourceRole": "marker"
+    },
+    {
+      "jointId": "rightUpperLeg",
+      "parentJointId": "hips",
+      "bindLocalPosition": [
+        0.1,
+        0,
+        0
+      ],
+      "bindWorldPosition": [
+        0.1,
+        0.93,
+        0.016
+      ],
+      "boneLength": 0.1,
+      "twistAxisLocal": [
+        0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "bendAxisLocal": [
+        0.9997232982821956,
+        0.023522901006639896,
+        0
+      ],
+      "sideAxisLocal": [
+        0.0007742380002542152,
+        -0.03290511101080414,
+        0.9994581803281645
+      ],
+      "axisOrthogonalityError": 4.491637062287168e-10,
+      "basisDeterminant": 1,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            130
+          ],
+          "extension": [
+            0,
+            18
+          ],
+          "abduction": [
+            0,
+            45
+          ],
+          "adduction": [
+            0,
+            30
+          ],
+          "internal_rotation": [
+            0,
+            45
+          ],
+          "external_rotation": [
+            0,
+            60
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:髋球窝关节：屈曲 130°，伸展 18°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightLowerLeg",
+      "parentJointId": "rightUpperLeg",
+      "bindLocalPosition": [
+        0.01,
+        -0.425,
+        -0.014
+      ],
+      "bindWorldPosition": [
+        0.11,
+        0.5050000000000001,
+        0.002
+      ],
+      "boneLength": 0.4253480927428734,
+      "twistAxisLocal": [
+        0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "bendAxisLocal": [
+        0.992277876667514,
+        0.12403473495843924,
+        0
+      ],
+      "sideAxisLocal": [
+        0.0012307089998363169,
+        -0.009845668998690537,
+        0.9999507728670076
+      ],
+      "axisOrthogonalityError": 3.6841207775445417e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            140
+          ],
+          "extension": [
+            0,
+            2
+          ]
+        },
+        "reverseBendBlocked": true
+      },
+      "currentLimitSource": "JointSemanticProfileV5:膝铰链：伸展 2°，屈曲 140°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightFoot",
+      "parentJointId": "rightLowerLeg",
+      "bindLocalPosition": [
+        0.05,
+        -0.4,
+        -0.004
+      ],
+      "bindWorldPosition": [
+        0.16,
+        0.1050000000000001,
+        -0.002
+      ],
+      "boneLength": 0.4031327324839798,
+      "twistAxisLocal": [
+        0.11497706904062847,
+        -0.4670943411650532,
+        0.876700148309792
+      ],
+      "bendAxisLocal": [
+        0.9710148789669015,
+        0.2390190469918527,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.20954803403098984,
+        0.8512888881258963,
+        0.48103726507114014
+      ],
+      "axisOrthogonalityError": 5.1400000922186e-10,
+      "basisDeterminant": 1,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "dorsiflexion": [
+            0,
+            15
+          ],
+          "plantarflexion": [
+            0,
+            55
+          ],
+          "inversion": [
+            0,
+            20
+          ],
+          "eversion": [
+            0,
+            20
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:踝：背屈 15°，跖屈 55°，侧偏 20°",
+      "core": true,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightToes",
+      "parentJointId": "rightFoot",
+      "bindLocalPosition": [
+        0.016,
+        -0.065,
+        0.122
+      ],
+      "bindWorldPosition": [
+        0.176,
+        0.04000000000000009,
+        0.12
+      ],
+      "boneLength": 0.13915818337417316,
+      "twistAxisLocal": [
+        0,
+        -0.19611613494587632,
+        0.9805806757293816
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.9805806757293816,
+        0.19611613494587632
+      ],
+      "axisOrthogonalityError": 1.1102230246251565e-16,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": {
+        "unit": "degrees",
+        "ranges": {
+          "flexion": [
+            0,
+            35
+          ],
+          "extension": [
+            0,
+            45
+          ]
+        }
+      },
+      "currentLimitSource": "JointSemanticProfileV5:SMPL 足部节点；前脚掌屈曲 35°，伸展 45°",
+      "core": false,
+      "optionalDeform": false,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightToesEnd",
+      "parentJointId": "rightToes",
+      "bindLocalPosition": [
+        0,
+        -0.015,
+        0.075
+      ],
+      "bindWorldPosition": [
+        0.176,
+        0.02500000000000009,
+        0.195
+      ],
+      "boneLength": 0.07648529270389177,
+      "twistAxisLocal": [
+        0,
+        -0.19611613494587632,
+        0.9805806757293816
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.9805806757293816,
+        0.19611613494587632
+      ],
+      "axisOrthogonalityError": 1.1102230246251565e-16,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": false,
+      "sourceRole": "marker"
+    },
+    {
+      "jointId": "leftUpperArmTwist",
+      "parentJointId": "leftUpperArm",
+      "bindLocalPosition": [
+        -0.07,
+        -0.11749999999999994,
+        0.0225
+      ],
+      "bindWorldPosition": [
+        -0.34860916275629106,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.13860916275629107,
+      "twistAxisLocal": [
+        -0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "bendAxisLocal": [
+        0.8591015439742421,
+        -0.5118051749846548,
+        0
+      ],
+      "sideAxisLocal": [
+        0.08307976296650217,
+        0.1394553169437715,
+        0.9867370306021468
+      ],
+      "axisOrthogonalityError": 5.832232474745069e-10,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightUpperArmTwist",
+      "parentJointId": "rightUpperArm",
+      "bindLocalPosition": [
+        0.07,
+        -0.11749999999999994,
+        0.0225
+      ],
+      "bindWorldPosition": [
+        0.34860916275629106,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.13860916275629107,
+      "twistAxisLocal": [
+        0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "bendAxisLocal": [
+        0.8591015439742421,
+        0.5118051749846548,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.08307976296650217,
+        0.1394553169437715,
+        0.9867370306021468
+      ],
+      "axisOrthogonalityError": 5.832232474745069e-10,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftForearmTwist",
+      "parentJointId": "leftLowerArm",
+      "bindLocalPosition": [
+        -0.04250000000000004,
+        -0.10250000000000004,
+        0.04750000000000001
+      ],
+      "bindWorldPosition": [
+        -0.6079194025583153,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.12070107704573316,
+      "twistAxisLocal": [
+        -0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "bendAxisLocal": [
+        0.9237421135284853,
+        -0.38301502280449395,
+        0
+      ],
+      "sideAxisLocal": [
+        0.15072950501493615,
+        0.3635241000360225,
+        0.9193099830910966
+      ],
+      "axisOrthogonalityError": 3.266946158042572e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightForearmTwist",
+      "parentJointId": "rightLowerArm",
+      "bindLocalPosition": [
+        0.04250000000000004,
+        -0.10250000000000004,
+        0.04750000000000001
+      ],
+      "bindWorldPosition": [
+        0.6079194025583153,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.12070107704573316,
+      "twistAxisLocal": [
+        0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "bendAxisLocal": [
+        0.9237421135284853,
+        0.38301502280449395,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.15072950501493615,
+        0.3635241000360225,
+        0.9193099830910966
+      ],
+      "axisOrthogonalityError": 3.266946158042572e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftThighTwist",
+      "parentJointId": "leftUpperLeg",
+      "bindLocalPosition": [
+        -0.0050000000000000044,
+        -0.21250000000000002,
+        -0.006999999999999999
+      ],
+      "bindWorldPosition": [
+        -0.10500000000000001,
+        0.7175,
+        0.009000000000000001
+      ],
+      "boneLength": 0.21267404637143672,
+      "twistAxisLocal": [
+        -0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "bendAxisLocal": [
+        0.9997232982821956,
+        -0.023522901006639896,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.0007742380002542152,
+        -0.03290511101080414,
+        0.9994581803281645
+      ],
+      "axisOrthogonalityError": 4.491637062287168e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightThighTwist",
+      "parentJointId": "rightUpperLeg",
+      "bindLocalPosition": [
+        0.0050000000000000044,
+        -0.21250000000000002,
+        -0.006999999999999999
+      ],
+      "bindWorldPosition": [
+        0.10500000000000001,
+        0.7175,
+        0.009000000000000001
+      ],
+      "boneLength": 0.21267404637143672,
+      "twistAxisLocal": [
+        0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "bendAxisLocal": [
+        0.9997232982821956,
+        0.023522901006639896,
+        0
+      ],
+      "sideAxisLocal": [
+        0.0007742380002542152,
+        -0.03290511101080414,
+        0.9994581803281645
+      ],
+      "axisOrthogonalityError": 4.491637062287168e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftCalfTwist",
+      "parentJointId": "leftLowerLeg",
+      "bindLocalPosition": [
+        -0.02500000000000001,
+        -0.2,
+        -0.002
+      ],
+      "bindWorldPosition": [
+        -0.135,
+        0.3050000000000001,
+        0
+      ],
+      "boneLength": 0.2015663662419899,
+      "twistAxisLocal": [
+        -0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "bendAxisLocal": [
+        0.992277876667514,
+        -0.12403473495843924,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.0012307089998363169,
+        -0.009845668998690537,
+        0.9999507728670076
+      ],
+      "axisOrthogonalityError": 3.6841207775445417e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightCalfTwist",
+      "parentJointId": "rightLowerLeg",
+      "bindLocalPosition": [
+        0.02500000000000001,
+        -0.2,
+        -0.002
+      ],
+      "bindWorldPosition": [
+        0.135,
+        0.3050000000000001,
+        0
+      ],
+      "boneLength": 0.2015663662419899,
+      "twistAxisLocal": [
+        0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "bendAxisLocal": [
+        0.992277876667514,
+        0.12403473495843924,
+        0
+      ],
+      "sideAxisLocal": [
+        0.0012307089998363169,
+        -0.009845668998690537,
+        0.9999507728670076
+      ],
+      "axisOrthogonalityError": 3.6841207775445417e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "centerOfMass",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        0,
+        1.0050000000000001,
+        0.016
+      ],
+      "bindWorldPosition": [
+        0,
+        1.01,
+        0.016
+      ],
+      "boneLength": 1.0051273551147637,
+      "twistAxisLocal": [
+        0,
+        0.9998732945461486,
+        0.015918380992774504
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.015918380992774504,
+        -0.9998732945461486
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 1.0000000000000004,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "leftHandIK",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        -0.4630000000000001,
+        0.8400000000000005,
+        0.145
+      ],
+      "bindWorldPosition": [
+        -0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.9700484523981269,
+      "twistAxisLocal": [
+        -0.4772957460837078,
+        0.8659361271518673,
+        0.14947707002621516
+      ],
+      "bendAxisLocal": [
+        -0.8757752942157804,
+        -0.48271900111893606,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07215542202203985,
+        -0.1309083250399859,
+        0.988765192302018
+      ],
+      "axisOrthogonalityError": 1.2285022998881345e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "rightHandIK",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        0.4630000000000001,
+        0.8400000000000005,
+        0.145
+      ],
+      "bindWorldPosition": [
+        0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "boneLength": 0.9700484523981269,
+      "twistAxisLocal": [
+        0.4772957460837078,
+        0.8659361271518673,
+        0.14947707002621516
+      ],
+      "bendAxisLocal": [
+        -0.8757752942157804,
+        0.48271900111893606,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07215542202203985,
+        -0.1309083250399859,
+        0.988765192302018
+      ],
+      "axisOrthogonalityError": 1.2285022998881345e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "leftElbowPole",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        -0.4,
+        1.1250000000000004,
+        0.28500000000000003
+      ],
+      "bindWorldPosition": [
+        -0.5372183255125822,
+        1.3486806057029526,
+        0.259
+      ],
+      "boneLength": 1.2275381867787254,
+      "twistAxisLocal": [
+        -0.32585544312575243,
+        0.9164684343536786,
+        0.2321720030895986
+      ],
+      "bendAxisLocal": [
+        -0.9422146901388511,
+        -0.33500966804936927,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07777986597683625,
+        -0.21875587193485196,
+        0.9726747457103263
+      ],
+      "axisOrthogonalityError": 5.957622728480771e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "rightElbowPole",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        0.4,
+        1.1250000000000004,
+        0.28500000000000003
+      ],
+      "bindWorldPosition": [
+        0.5372183255125822,
+        1.3486806057029526,
+        0.259
+      ],
+      "boneLength": 1.2275381867787254,
+      "twistAxisLocal": [
+        0.32585544312575243,
+        0.9164684343536786,
+        0.2321720030895986
+      ],
+      "bendAxisLocal": [
+        -0.9422146901388511,
+        0.33500966804936927,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07777986597683625,
+        -0.21875587193485196,
+        0.9726747457103263
+      ],
+      "axisOrthogonalityError": 5.957622728480771e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "leftFootIK",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        -0.16,
+        0.02499999999999998,
+        0.038
+      ],
+      "bindWorldPosition": [
+        -0.16,
+        0.030000000000000096,
+        0.038
+      ],
+      "boneLength": 0.1663400132259223,
+      "twistAxisLocal": [
+        -0.9618852188781151,
+        0.15029456498095548,
+        0.22844773897105233
+      ],
+      "bendAxisLocal": [
+        -0.15437687996855717,
+        -0.9880120337987659,
+        0
+      ],
+      "sideAxisLocal": [
+        0.22570911604903246,
+        -0.035267049007661325,
+        0.9735561772114928
+      ],
+      "axisOrthogonalityError": 8.371112969474126e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "rightFootIK",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        0.16,
+        0.02499999999999998,
+        0.038
+      ],
+      "bindWorldPosition": [
+        0.16,
+        0.030000000000000096,
+        0.038
+      ],
+      "boneLength": 0.1663400132259223,
+      "twistAxisLocal": [
+        0.9618852188781151,
+        0.15029456498095548,
+        0.22844773897105233
+      ],
+      "bendAxisLocal": [
+        -0.15437687996855717,
+        0.9880120337987659,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.22570911604903246,
+        -0.035267049007661325,
+        0.9735561772114928
+      ],
+      "axisOrthogonalityError": 8.371112969474126e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "leftKneePole",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        -0.14500000000000002,
+        0.52,
+        0.322
+      ],
+      "bindWorldPosition": [
+        -0.14500000000000002,
+        0.5250000000000001,
+        0.322
+      ],
+      "boneLength": 0.6285769642613385,
+      "twistAxisLocal": [
+        -0.2306797869098453,
+        0.8272654416766866,
+        0.5122682157997944
+      ],
+      "bendAxisLocal": [
+        -0.9632520479635155,
+        -0.2685991289898264,
+        0
+      ],
+      "sideAxisLocal": [
+        0.1375947959789578,
+        -0.4934434079245383,
+        0.8588255208686608
+      ],
+      "axisOrthogonalityError": 5.584494255916894e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "rightKneePole",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        0.14500000000000002,
+        0.52,
+        0.322
+      ],
+      "bindWorldPosition": [
+        0.14500000000000002,
+        0.5250000000000001,
+        0.322
+      ],
+      "boneLength": 0.6285769642613385,
+      "twistAxisLocal": [
+        0.2306797869098453,
+        0.8272654416766866,
+        0.5122682157997944
+      ],
+      "bendAxisLocal": [
+        -0.9632520479635155,
+        0.2685991289898264,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.1375947959789578,
+        -0.4934434079245383,
+        0.8588255208686608
+      ],
+      "axisOrthogonalityError": 5.584494255916894e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "leftFootRoll",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        -0.16,
+        0.014999999999999972,
+        0.078
+      ],
+      "bindWorldPosition": [
+        -0.16,
+        0.020000000000000087,
+        0.078
+      ],
+      "boneLength": 0.17863090438107285,
+      "twistAxisLocal": [
+        -0.8957016735641249,
+        0.0839720319591367,
+        0.4366545657875109
+      ],
+      "bendAxisLocal": [
+        -0.0933407090028356,
+        -0.9956342260302463,
+        0
+      ],
+      "sideAxisLocal": [
+        0.4347482311301143,
+        -0.040757647012198216,
+        0.899629251269247
+      ],
+      "axisOrthogonalityError": 5.570572891855363e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "rightFootRoll",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        0.16,
+        0.014999999999999972,
+        0.078
+      ],
+      "bindWorldPosition": [
+        0.16,
+        0.020000000000000087,
+        0.078
+      ],
+      "boneLength": 0.17863090438107285,
+      "twistAxisLocal": [
+        0.8957016735641249,
+        0.0839720319591367,
+        0.4366545657875109
+      ],
+      "bendAxisLocal": [
+        -0.0933407090028356,
+        0.9956342260302463,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.4347482311301143,
+        -0.040757647012198216,
+        0.899629251269247
+      ],
+      "axisOrthogonalityError": 5.570572891855363e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "gazeTarget",
+      "parentJointId": "root",
+      "bindLocalPosition": [
+        0,
+        1.6600000000000004,
+        0.5750000000000001
+      ],
+      "bindWorldPosition": [
+        0,
+        1.6650000000000003,
+        0.5750000000000001
+      ],
+      "boneLength": 1.7567654937412682,
+      "twistAxisLocal": [
+        0,
+        0.94491837771023,
+        0.3273060638996279
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.3273060638996279,
+        -0.94491837771023
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "control"
+    },
+    {
+      "jointId": "leftHeelContact",
+      "parentJointId": "leftFoot",
+      "bindLocalPosition": [
+        0,
+        -0.075,
+        -0.075
+      ],
+      "bindWorldPosition": [
+        -0.16,
+        0.030000000000000096,
+        -0.077
+      ],
+      "boneLength": 0.10606601717798213,
+      "twistAxisLocal": [
+        0,
+        -0.7071067811865475,
+        -0.7071067811865475
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.7071067811865475,
+        0.7071067811865475
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "marker"
+    },
+    {
+      "jointId": "rightHeelContact",
+      "parentJointId": "rightFoot",
+      "bindLocalPosition": [
+        0,
+        -0.075,
+        -0.075
+      ],
+      "bindWorldPosition": [
+        0.16,
+        0.030000000000000096,
+        -0.077
+      ],
+      "boneLength": 0.10606601717798213,
+      "twistAxisLocal": [
+        0,
+        -0.7071067811865475,
+        -0.7071067811865475
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.7071067811865475,
+        0.7071067811865475
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 0.9999999999999998,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "marker"
+    },
+    {
+      "jointId": "leftBallContact",
+      "parentJointId": "leftToes",
+      "bindLocalPosition": [
+        0,
+        -0.035,
+        0.01999999999999999
+      ],
+      "bindWorldPosition": [
+        -0.176,
+        0.005000000000000088,
+        0.13999999999999999
+      ],
+      "boneLength": 0.04031128874149274,
+      "twistAxisLocal": [
+        0,
+        -0.8682431422475362,
+        0.49613893814144927
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.49613893814144927,
+        0.8682431422475362
+      ],
+      "axisOrthogonalityError": 2.220446049250313e-16,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "marker"
+    },
+    {
+      "jointId": "rightBallContact",
+      "parentJointId": "rightToes",
+      "bindLocalPosition": [
+        0,
+        -0.035,
+        0.01999999999999999
+      ],
+      "bindWorldPosition": [
+        0.176,
+        0.005000000000000088,
+        0.13999999999999999
+      ],
+      "boneLength": 0.04031128874149274,
+      "twistAxisLocal": [
+        0,
+        -0.8682431422475362,
+        0.49613893814144927
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.49613893814144927,
+        0.8682431422475362
+      ],
+      "axisOrthogonalityError": 2.220446049250313e-16,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "marker"
+    },
+    {
+      "jointId": "leftPalmGrip",
+      "parentJointId": "leftHandEnd",
+      "bindLocalPosition": [
+        -0.008000000000000007,
+        -0.008000000000000007,
+        0.017999999999999988
+      ],
+      "bindWorldPosition": [
+        -0.8073947687209304,
+        1.3206806057029525,
+        0.017000000000000005
+      ],
+      "boneLength": 0.02126029162546929,
+      "twistAxisLocal": [
+        -0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "bendAxisLocal": [
+        0.7071067811865475,
+        -0.7071067811865475,
+        0
+      ],
+      "sideAxisLocal": [
+        0.5986710948555584,
+        0.5986710948555584,
+        0.5321520838716074
+      ],
+      "axisOrthogonalityError": 2.8890173586759715e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "marker"
+    },
+    {
+      "jointId": "rightPalmGrip",
+      "parentJointId": "rightHandEnd",
+      "bindLocalPosition": [
+        0.008000000000000007,
+        -0.008000000000000007,
+        0.017999999999999988
+      ],
+      "bindWorldPosition": [
+        0.8073947687209304,
+        1.3206806057029525,
+        0.017000000000000005
+      ],
+      "boneLength": 0.02126029162546929,
+      "twistAxisLocal": [
+        0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "bendAxisLocal": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.5986710948555584,
+        0.5986710948555584,
+        0.5321520838716074
+      ],
+      "axisOrthogonalityError": 2.8890173586759715e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "marker"
+    },
+    {
+      "jointId": "leftScapulaCorrective",
+      "parentJointId": "upperChest",
+      "bindLocalPosition": [
+        -0.14950000000000002,
+        0.040750000000000064,
+        -0.01375
+      ],
+      "bindWorldPosition": [
+        -0.15225,
+        1.3687212100939954,
+        0.007250000000000004
+      ],
+      "boneLength": 0.15556309009530508,
+      "twistAxisLocal": [
+        -0.9610248799802626,
+        0.2619515979946201,
+        -0.08838857599818468
+      ],
+      "bendAxisLocal": [
+        0.2764618960689153,
+        0.9105848092269869,
+        -0.30725254307659067
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.3197134121027969,
+        -0.9475142923046529
+      ],
+      "axisOrthogonalityError": 4.549137178067042e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "corrective"
+    },
+    {
+      "jointId": "rightScapulaCorrective",
+      "parentJointId": "upperChest",
+      "bindLocalPosition": [
+        0.14950000000000002,
+        0.040750000000000064,
+        -0.01375
+      ],
+      "bindWorldPosition": [
+        0.15225,
+        1.3687212100939954,
+        0.007250000000000004
+      ],
+      "boneLength": 0.15556309009530508,
+      "twistAxisLocal": [
+        0.9610248799802626,
+        0.2619515979946201,
+        -0.08838857599818468
+      ],
+      "bendAxisLocal": [
+        0.2764618960689153,
+        -0.9105848092269869,
+        0.30725254307659067
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.3197134121027969,
+        -0.9475142923046529
+      ],
+      "axisOrthogonalityError": 4.549137178067042e-10,
+      "basisDeterminant": 1.0000000000000002,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "corrective"
+    },
+    {
+      "jointId": "leftThumbMetacarpal",
+      "parentJointId": "leftHand",
+      "bindLocalPosition": [
+        -0.02408,
+        -0.039599999999999996,
+        0.0415
+      ],
+      "bindWorldPosition": [
+        -0.7863778947756681,
+        1.3387923774018282,
+        0.01978676179213512
+      ],
+      "boneLength": 0.06221138481017762,
+      "twistAxisLocal": [
+        -0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        -0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ],
+      "axisOrthogonalityError": 5.182444473561532e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftThumbProximal",
+      "parentJointId": "leftThumbMetacarpal",
+      "bindLocalPosition": [
+        -0.0023189567041718914,
+        -0.02087061033754702,
+        0.02000100157348256
+      ],
+      "bindWorldPosition": [
+        -0.8120537789135596,
+        1.3349271078826412,
+        0.032702204691301015
+      ],
+      "boneLength": 0.029000000000000005,
+      "twistAxisLocal": [
+        -0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        -0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ],
+      "axisOrthogonalityError": 5.182444473561532e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftThumbDistal",
+      "parentJointId": "leftThumbProximal",
+      "bindLocalPosition": [
+        -0.0019191365827629443,
+        -0.0172722292448665,
+        0.016552553026330394
+      ],
+      "bindWorldPosition": [
+        -0.8333027864759526,
+        1.3317282641426245,
+        0.043390847090610724
+      ],
+      "boneLength": 0.024,
+      "twistAxisLocal": [
+        -0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        -0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ],
+      "axisOrthogonalityError": 5.182444473561532e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftIndexProximal",
+      "parentJointId": "leftHand",
+      "bindLocalPosition": [
+        -0.03208,
+        -0.0536,
+        0.0405
+      ],
+      "bindWorldPosition": [
+        -0.8010583672037856,
+        1.3385695289040451,
+        0.013046281999544785
+      ],
+      "boneLength": 0.0744468696454055,
+      "twistAxisLocal": [
+        -0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        -0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ],
+      "axisOrthogonalityError": 7.217367953282761e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftIndexIntermediate",
+      "parentJointId": "leftIndexProximal",
+      "bindLocalPosition": [
+        -0.00207730126140153,
+        -0.0236293018484424,
+        0.01064616896468284
+      ],
+      "bindWorldPosition": [
+        -0.8256729100283113,
+        1.3311540683241592,
+        0.016936683768995733
+      ],
+      "boneLength": 0.026,
+      "twistAxisLocal": [
+        -0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        -0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ],
+      "axisOrthogonalityError": 7.217367953282761e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftIndexDistal",
+      "parentJointId": "leftIndexIntermediate",
+      "bindLocalPosition": [
+        -0.0016778202495935435,
+        -0.019085205339126558,
+        0.00859882877916691
+      ],
+      "bindWorldPosition": [
+        -0.8455538869250436,
+        1.3251646578557899,
+        0.020078931352013805
+      ],
+      "boneLength": 0.021,
+      "twistAxisLocal": [
+        -0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        -0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ],
+      "axisOrthogonalityError": 7.217367953282761e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftMiddleProximal",
+      "parentJointId": "leftHand",
+      "bindLocalPosition": [
+        -0.02408,
+        -0.0576,
+        0.029500000000000002
+      ],
+      "bindWorldPosition": [
+        -0.7973988461654002,
+        1.3274870050149052,
+        0.004997333620019719
+      ],
+      "boneLength": 0.06904966618311778,
+      "twistAxisLocal": [
+        -0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        -0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ],
+      "axisOrthogonalityError": 4.4244563568440753e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftMiddleIntermediate",
+      "parentJointId": "leftMiddleProximal",
+      "bindLocalPosition": [
+        -0.0017416553592607925,
+        -0.02699565806854229,
+        0.010449932155564756
+      ],
+      "bindWorldPosition": [
+        -0.8246651622547645,
+        1.3181121094188517,
+        0.008105281412047511
+      ],
+      "boneLength": 0.029000000000000005,
+      "twistAxisLocal": [
+        -0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        -0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ],
+      "axisOrthogonalityError": 4.4244563568440753e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftMiddleDistal",
+      "parentJointId": "leftMiddleIntermediate",
+      "bindLocalPosition": [
+        -0.00138131287113787,
+        -0.021410349502636986,
+        0.00828787722682722
+      ],
+      "bindWorldPosition": [
+        -0.8462901715670189,
+        1.3106768473943955,
+        0.010570205522966104
+      ],
+      "boneLength": 0.023000000000000003,
+      "twistAxisLocal": [
+        -0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        -0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ],
+      "axisOrthogonalityError": 4.4244563568440753e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftRingProximal",
+      "parentJointId": "leftHand",
+      "bindLocalPosition": [
+        -0.02008,
+        -0.0596,
+        0.0175
+      ],
+      "bindWorldPosition": [
+        -0.79327305410668,
+        1.3205510289842777,
+        -0.004946009700552102
+      ],
+      "boneLength": 0.06528105697673713,
+      "twistAxisLocal": [
+        -0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        -0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ],
+      "axisOrthogonalityError": 3.040509163887428e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftRingIntermediate",
+      "parentJointId": "leftRingProximal",
+      "bindLocalPosition": [
+        -0.0013488539609929065,
+        -0.02535845446666664,
+        0.009172206934751764
+      ],
+      "bindWorldPosition": [
+        -0.8185446657977957,
+        1.3113630572758972,
+        -0.002511503915086241
+      ],
+      "boneLength": 0.027,
+      "twistAxisLocal": [
+        -0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        -0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ],
+      "axisOrthogonalityError": 3.040509163887428e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftRingDistal",
+      "parentJointId": "leftRingIntermediate",
+      "bindLocalPosition": [
+        -0.0010491086363278162,
+        -0.019723242362962943,
+        0.007133938727029151
+      ],
+      "bindWorldPosition": [
+        -0.8382003637797746,
+        1.304216857058268,
+        -0.0006179994152794609
+      ],
+      "boneLength": 0.021,
+      "twistAxisLocal": [
+        -0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        -0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ],
+      "axisOrthogonalityError": 3.040509163887428e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftLittleProximal",
+      "parentJointId": "leftHand",
+      "bindLocalPosition": [
+        -0.015080000000000001,
+        -0.0616,
+        0.006500000000000002
+      ],
+      "bindWorldPosition": [
+        -0.7891048737733839,
+        1.312981858859987,
+        -0.013625522148764415
+      ],
+      "boneLength": 0.06375120704739637,
+      "twistAxisLocal": [
+        -0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        -0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ],
+      "axisOrthogonalityError": 8.601179074529952e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftLittleIntermediate",
+      "parentJointId": "leftLittleProximal",
+      "bindLocalPosition": [
+        -0.0009199080137977005,
+        -0.021847815327695384,
+        0.007129287106932179
+      ],
+      "bindWorldPosition": [
+        -0.8105089534275025,
+        1.3046946499618657,
+        -0.012146487720821355
+      ],
+      "boneLength": 0.023,
+      "twistAxisLocal": [
+        -0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        -0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ],
+      "axisOrthogonalityError": 8.601179074529952e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftLittleDistal",
+      "parentJointId": "leftLittleIntermediate",
+      "bindLocalPosition": [
+        -0.0007199280107982003,
+        -0.017098290256457257,
+        0.0055794420836860524
+      ],
+      "bindWorldPosition": [
+        -0.8272599722872476,
+        1.2982090082155098,
+        -0.010988982516344179
+      ],
+      "boneLength": 0.018,
+      "twistAxisLocal": [
+        -0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        -0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ],
+      "axisOrthogonalityError": 8.601179074529952e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightThumbMetacarpal",
+      "parentJointId": "rightHand",
+      "bindLocalPosition": [
+        0.02408,
+        -0.039599999999999996,
+        0.0415
+      ],
+      "bindWorldPosition": [
+        0.7863778947756681,
+        1.3387923774018282,
+        0.01978676179213512
+      ],
+      "boneLength": 0.06221138481017762,
+      "twistAxisLocal": [
+        0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ],
+      "axisOrthogonalityError": 5.182444473561532e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightThumbProximal",
+      "parentJointId": "rightThumbMetacarpal",
+      "bindLocalPosition": [
+        0.0023189567041718914,
+        -0.02087061033754702,
+        0.02000100157348256
+      ],
+      "bindWorldPosition": [
+        0.8120537789135596,
+        1.3349271078826412,
+        0.032702204691301015
+      ],
+      "boneLength": 0.029000000000000005,
+      "twistAxisLocal": [
+        0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ],
+      "axisOrthogonalityError": 5.182444473561532e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightThumbDistal",
+      "parentJointId": "rightThumbProximal",
+      "bindLocalPosition": [
+        0.0019191365827629443,
+        -0.0172722292448665,
+        0.016552553026330394
+      ],
+      "bindWorldPosition": [
+        0.8333027864759526,
+        1.3317282641426245,
+        0.043390847090610724
+      ],
+      "boneLength": 0.024,
+      "twistAxisLocal": [
+        0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ],
+      "axisOrthogonalityError": 5.182444473561532e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightIndexProximal",
+      "parentJointId": "rightHand",
+      "bindLocalPosition": [
+        0.03208,
+        -0.0536,
+        0.0405
+      ],
+      "bindWorldPosition": [
+        0.8010583672037856,
+        1.3385695289040451,
+        0.013046281999544785
+      ],
+      "boneLength": 0.0744468696454055,
+      "twistAxisLocal": [
+        0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ],
+      "axisOrthogonalityError": 7.217367953282761e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightIndexIntermediate",
+      "parentJointId": "rightIndexProximal",
+      "bindLocalPosition": [
+        0.00207730126140153,
+        -0.0236293018484424,
+        0.01064616896468284
+      ],
+      "bindWorldPosition": [
+        0.8256729100283113,
+        1.3311540683241592,
+        0.016936683768995733
+      ],
+      "boneLength": 0.026,
+      "twistAxisLocal": [
+        0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ],
+      "axisOrthogonalityError": 7.217367953282761e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightIndexDistal",
+      "parentJointId": "rightIndexIntermediate",
+      "bindLocalPosition": [
+        0.0016778202495935435,
+        -0.019085205339126558,
+        0.00859882877916691
+      ],
+      "bindWorldPosition": [
+        0.8455538869250436,
+        1.3251646578557899,
+        0.020078931352013805
+      ],
+      "boneLength": 0.021,
+      "twistAxisLocal": [
+        0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ],
+      "axisOrthogonalityError": 7.217367953282761e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightMiddleProximal",
+      "parentJointId": "rightHand",
+      "bindLocalPosition": [
+        0.02408,
+        -0.0576,
+        0.029500000000000002
+      ],
+      "bindWorldPosition": [
+        0.7973988461654002,
+        1.3274870050149052,
+        0.004997333620019719
+      ],
+      "boneLength": 0.06904966618311778,
+      "twistAxisLocal": [
+        0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ],
+      "axisOrthogonalityError": 4.4244563568440753e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightMiddleIntermediate",
+      "parentJointId": "rightMiddleProximal",
+      "bindLocalPosition": [
+        0.0017416553592607925,
+        -0.02699565806854229,
+        0.010449932155564756
+      ],
+      "bindWorldPosition": [
+        0.8246651622547645,
+        1.3181121094188517,
+        0.008105281412047511
+      ],
+      "boneLength": 0.029000000000000005,
+      "twistAxisLocal": [
+        0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ],
+      "axisOrthogonalityError": 4.4244563568440753e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightMiddleDistal",
+      "parentJointId": "rightMiddleIntermediate",
+      "bindLocalPosition": [
+        0.00138131287113787,
+        -0.021410349502636986,
+        0.00828787722682722
+      ],
+      "bindWorldPosition": [
+        0.8462901715670189,
+        1.3106768473943955,
+        0.010570205522966104
+      ],
+      "boneLength": 0.023000000000000003,
+      "twistAxisLocal": [
+        0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ],
+      "axisOrthogonalityError": 4.4244563568440753e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightRingProximal",
+      "parentJointId": "rightHand",
+      "bindLocalPosition": [
+        0.02008,
+        -0.0596,
+        0.0175
+      ],
+      "bindWorldPosition": [
+        0.79327305410668,
+        1.3205510289842777,
+        -0.004946009700552102
+      ],
+      "boneLength": 0.06528105697673713,
+      "twistAxisLocal": [
+        0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ],
+      "axisOrthogonalityError": 3.040509163887428e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightRingIntermediate",
+      "parentJointId": "rightRingProximal",
+      "bindLocalPosition": [
+        0.0013488539609929065,
+        -0.02535845446666664,
+        0.009172206934751764
+      ],
+      "bindWorldPosition": [
+        0.8185446657977957,
+        1.3113630572758972,
+        -0.002511503915086241
+      ],
+      "boneLength": 0.027,
+      "twistAxisLocal": [
+        0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ],
+      "axisOrthogonalityError": 3.040509163887428e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightRingDistal",
+      "parentJointId": "rightRingIntermediate",
+      "bindLocalPosition": [
+        0.0010491086363278162,
+        -0.019723242362962943,
+        0.007133938727029151
+      ],
+      "bindWorldPosition": [
+        0.8382003637797746,
+        1.304216857058268,
+        -0.0006179994152794609
+      ],
+      "boneLength": 0.021,
+      "twistAxisLocal": [
+        0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ],
+      "axisOrthogonalityError": 3.040509163887428e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightLittleProximal",
+      "parentJointId": "rightHand",
+      "bindLocalPosition": [
+        0.015080000000000001,
+        -0.0616,
+        0.006500000000000002
+      ],
+      "bindWorldPosition": [
+        0.7891048737733839,
+        1.312981858859987,
+        -0.013625522148764415
+      ],
+      "boneLength": 0.06375120704739637,
+      "twistAxisLocal": [
+        0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ],
+      "axisOrthogonalityError": 8.601179074529952e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightLittleIntermediate",
+      "parentJointId": "rightLittleProximal",
+      "bindLocalPosition": [
+        0.0009199080137977005,
+        -0.021847815327695384,
+        0.007129287106932179
+      ],
+      "bindWorldPosition": [
+        0.8105089534275025,
+        1.3046946499618657,
+        -0.012146487720821355
+      ],
+      "boneLength": 0.023,
+      "twistAxisLocal": [
+        0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ],
+      "axisOrthogonalityError": 8.601179074529952e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightLittleDistal",
+      "parentJointId": "rightLittleIntermediate",
+      "bindLocalPosition": [
+        0.0007199280107982003,
+        -0.017098290256457257,
+        0.0055794420836860524
+      ],
+      "bindWorldPosition": [
+        0.8272599722872476,
+        1.2982090082155098,
+        -0.010988982516344179
+      ],
+      "boneLength": 0.018,
+      "twistAxisLocal": [
+        0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ],
+      "axisOrthogonalityError": 8.601179074529952e-10,
+      "basisDeterminant": 0.9999999999999999,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "leftEye",
+      "parentJointId": "head",
+      "bindLocalPosition": [
+        -0.031,
+        0.035,
+        0.083
+      ],
+      "bindWorldPosition": [
+        -0.031,
+        1.6700000000000002,
+        0.138
+      ],
+      "boneLength": 0.09526279441628827,
+      "twistAxisLocal": [
+        -0.3254156058848414,
+        0.3674047168699822,
+        0.8712740426916722
+      ],
+      "bendAxisLocal": [
+        -0.7485881802440688,
+        -0.6630352452161752,
+        0
+      ],
+      "sideAxisLocal": [
+        0.5776853987378909,
+        -0.6522254497040704,
+        0.4907968447773142
+      ],
+      "axisOrthogonalityError": 4.1399861316904207e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "rightEye",
+      "parentJointId": "head",
+      "bindLocalPosition": [
+        0.031,
+        0.035,
+        0.083
+      ],
+      "bindWorldPosition": [
+        0.031,
+        1.6700000000000002,
+        0.138
+      ],
+      "boneLength": 0.09526279441628827,
+      "twistAxisLocal": [
+        0.3254156058848414,
+        0.3674047168699822,
+        0.8712740426916722
+      ],
+      "bendAxisLocal": [
+        -0.7485881802440688,
+        0.6630352452161752,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.5776853987378909,
+        -0.6522254497040704,
+        0.4907968447773142
+      ],
+      "axisOrthogonalityError": 4.1399861316904207e-10,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    },
+    {
+      "jointId": "jaw",
+      "parentJointId": "head",
+      "bindLocalPosition": [
+        0,
+        -0.058,
+        0.066
+      ],
+      "bindWorldPosition": [
+        0,
+        1.5770000000000002,
+        0.12100000000000001
+      ],
+      "boneLength": 0.08786353054595519,
+      "twistAxisLocal": [
+        0,
+        -0.6601146081048447,
+        0.751164898119306
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.751164898119306,
+        0.6601146081048447
+      ],
+      "axisOrthogonalityError": 0,
+      "basisDeterminant": 1,
+      "jointRange": null,
+      "currentLimitSource": "LIMIT UNDEFINED",
+      "core": false,
+      "optionalDeform": true,
+      "sourceRole": "deform"
+    }
+  ],
+  "semantics": {
+    "palm": {
+      "current": [
+        "leftHand",
+        "rightHand",
+        "leftHandEnd",
+        "rightHandEnd"
+      ],
+      "interpretation": "wrist joint plus virtual hand-end measurement point; never middle-finger proximal"
+    },
+    "sole": {
+      "current": [
+        "leftFoot",
+        "rightFoot",
+        "leftBallContact",
+        "rightBallContact"
+      ],
+      "source": "V4 RigDefinition"
+    },
+    "heel": {
+      "current": [
+        "leftHeelContact",
+        "rightHeelContact"
+      ],
+      "source": "V4 RigDefinition"
+    },
+    "toe": {
+      "current": [
+        "leftToes",
+        "rightToes",
+        "leftToesEnd",
+        "rightToesEnd"
+      ],
+      "source": "V4 RigDefinition"
+    },
+    "gaze": {
+      "current": [
+        "head"
+      ],
+      "missingDedicatedTarget": true
+    },
+    "centerOfMass": {
+      "source": "HumanBalanceStateV5 mass-distribution-plus-local-quaternion-posture",
+      "writesPose": false
+    },
+    "supportArea": {
+      "source": "HumanBalanceStateV5 pose-frame-v4-contacts semantic footprint",
+      "writesPose": false
+    }
+  },
+  "currentMissingInteractionAnchorIds": [
+    "headGazeOrigin",
+    "headGazeTarget",
+    "chestFacing",
+    "pelvisFacing",
+    "leftPalmCenter",
+    "rightPalmCenter",
+    "leftPalmNormal",
+    "rightPalmNormal",
+    "leftPalmUp",
+    "rightPalmUp",
+    "leftThumbSide",
+    "rightThumbSide",
+    "leftGripCenter",
+    "rightGripCenter",
+    "twoHandCarryCenter",
+    "chestCarryAnchor",
+    "leftSoleCenter",
+    "rightSoleCenter",
+    "leftToeContact",
+    "rightToeContact",
+    "leftFootForward",
+    "rightFootForward",
+    "leftFootUp",
+    "rightFootUp",
+    "pelvisSeatContact",
+    "backCarryAnchor"
+  ],
+  "currentMissingPerformanceCapabilities": [
+    "leftClavicle",
+    "rightClavicle",
+    "leftScapula",
+    "rightScapula",
+    "leftUpperArmTwist01",
+    "leftUpperArmTwist02",
+    "rightUpperArmTwist01",
+    "rightUpperArmTwist02",
+    "leftForearmTwist01",
+    "leftForearmTwist02",
+    "rightForearmTwist01",
+    "rightForearmTwist02",
+    "leftThighTwist01",
+    "leftThighTwist02",
+    "rightThighTwist01",
+    "rightThighTwist02",
+    "leftCalfTwist01",
+    "rightCalfTwist01",
+    "leftPalmFrame",
+    "rightPalmFrame",
+    "leftFootFrame",
+    "rightFootFrame"
+  ],
+  "coreRigTopologyFingerprint": "fnv1a-8f257f74",
+  "coreRigBindFingerprint": "fnv1a-d669d035",
+  "coreRigAxisFingerprint": "fnv1a-e51af5f5",
+  "coreRigLimitFingerprint": "fnv1a-b9bd8ce0",
+  "axisMetrics": {
+    "maximumAxisOrthogonalityError": 1.0077380596662522e-9,
+    "minimumBasisDeterminant": 0.9999999999999997,
+    "maximumBasisDeterminant": 1.0000000000000004,
+    "nonFiniteAxisCount": 0
+  },
+  "limitAudit": {
+    "formalLimitJointCount": 22,
+    "totalJointCount": 89,
+    "coreJointCoverage": 1,
+    "fullRigCoverage": 0.24719101123595505,
+    "missingJointLimitIds": [
+      "root",
+      "headTop",
+      "leftHandEnd",
+      "rightHandEnd",
+      "leftToesEnd",
+      "rightToesEnd",
+      "leftUpperArmTwist",
+      "rightUpperArmTwist",
+      "leftForearmTwist",
+      "rightForearmTwist",
+      "leftThighTwist",
+      "rightThighTwist",
+      "leftCalfTwist",
+      "rightCalfTwist",
+      "centerOfMass",
+      "leftHandIK",
+      "rightHandIK",
+      "leftElbowPole",
+      "rightElbowPole",
+      "leftFootIK",
+      "rightFootIK",
+      "leftKneePole",
+      "rightKneePole",
+      "leftFootRoll",
+      "rightFootRoll",
+      "gazeTarget",
+      "leftHeelContact",
+      "rightHeelContact",
+      "leftBallContact",
+      "rightBallContact",
+      "leftPalmGrip",
+      "rightPalmGrip",
+      "leftScapulaCorrective",
+      "rightScapulaCorrective",
+      "leftThumbMetacarpal",
+      "leftThumbProximal",
+      "leftThumbDistal",
+      "leftIndexProximal",
+      "leftIndexIntermediate",
+      "leftIndexDistal",
+      "leftMiddleProximal",
+      "leftMiddleIntermediate",
+      "leftMiddleDistal",
+      "leftRingProximal",
+      "leftRingIntermediate",
+      "leftRingDistal",
+      "leftLittleProximal",
+      "leftLittleIntermediate",
+      "leftLittleDistal",
+      "rightThumbMetacarpal",
+      "rightThumbProximal",
+      "rightThumbDistal",
+      "rightIndexProximal",
+      "rightIndexIntermediate",
+      "rightIndexDistal",
+      "rightMiddleProximal",
+      "rightMiddleIntermediate",
+      "rightMiddleDistal",
+      "rightRingProximal",
+      "rightRingIntermediate",
+      "rightRingDistal",
+      "rightLittleProximal",
+      "rightLittleIntermediate",
+      "rightLittleDistal",
+      "leftEye",
+      "rightEye",
+      "jaw"
+    ]
+  }
+}

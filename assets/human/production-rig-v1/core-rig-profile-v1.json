@@ -1,0 +1,4301 @@
+{
+  "schema": "humanoid_rig/core_rig_contract@1.0",
+  "rigVersion": "human-core-v5-production-rig-detail-v1",
+  "authority": "HumanRigCore+V4Adapter(T)",
+  "projectionOnly": true,
+  "writesHumanRigCore": false,
+  "writesFinalPose": false,
+  "jointIds": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "upperChest",
+    "neck",
+    "head",
+    "headTop",
+    "leftShoulder",
+    "leftUpperArm",
+    "leftLowerArm",
+    "leftHand",
+    "leftHandEnd",
+    "rightShoulder",
+    "rightUpperArm",
+    "rightLowerArm",
+    "rightHand",
+    "rightHandEnd",
+    "leftUpperLeg",
+    "leftLowerLeg",
+    "leftFoot",
+    "leftToes",
+    "leftToesEnd",
+    "rightUpperLeg",
+    "rightLowerLeg",
+    "rightFoot",
+    "rightToes",
+    "rightToesEnd",
+    "leftUpperArmTwist",
+    "rightUpperArmTwist",
+    "leftForearmTwist",
+    "rightForearmTwist",
+    "leftThighTwist",
+    "rightThighTwist",
+    "leftCalfTwist",
+    "rightCalfTwist",
+    "centerOfMass",
+    "leftHandIK",
+    "rightHandIK",
+    "leftElbowPole",
+    "rightElbowPole",
+    "leftFootIK",
+    "rightFootIK",
+    "leftKneePole",
+    "rightKneePole",
+    "leftFootRoll",
+    "rightFootRoll",
+    "gazeTarget",
+    "leftHeelContact",
+    "rightHeelContact",
+    "leftBallContact",
+    "rightBallContact",
+    "leftPalmGrip",
+    "rightPalmGrip",
+    "leftScapulaCorrective",
+    "rightScapulaCorrective",
+    "leftThumbMetacarpal",
+    "leftThumbProximal",
+    "leftThumbDistal",
+    "leftIndexProximal",
+    "leftIndexIntermediate",
+    "leftIndexDistal",
+    "leftMiddleProximal",
+    "leftMiddleIntermediate",
+    "leftMiddleDistal",
+    "leftRingProximal",
+    "leftRingIntermediate",
+    "leftRingDistal",
+    "leftLittleProximal",
+    "leftLittleIntermediate",
+    "leftLittleDistal",
+    "rightThumbMetacarpal",
+    "rightThumbProximal",
+    "rightThumbDistal",
+    "rightIndexProximal",
+    "rightIndexIntermediate",
+    "rightIndexDistal",
+    "rightMiddleProximal",
+    "rightMiddleIntermediate",
+    "rightMiddleDistal",
+    "rightRingProximal",
+    "rightRingIntermediate",
+    "rightRingDistal",
+    "rightLittleProximal",
+    "rightLittleIntermediate",
+    "rightLittleDistal",
+    "leftEye",
+    "rightEye",
+    "jaw"
+  ],
+  "parentByJointId": {
+    "root": null,
+    "hips": "root",
+    "spine": "hips",
+    "chest": "spine",
+    "upperChest": "chest",
+    "neck": "upperChest",
+    "head": "neck",
+    "headTop": "head",
+    "leftShoulder": "upperChest",
+    "leftUpperArm": "leftShoulder",
+    "leftLowerArm": "leftUpperArm",
+    "leftHand": "leftLowerArm",
+    "leftHandEnd": "leftHand",
+    "rightShoulder": "upperChest",
+    "rightUpperArm": "rightShoulder",
+    "rightLowerArm": "rightUpperArm",
+    "rightHand": "rightLowerArm",
+    "rightHandEnd": "rightHand",
+    "leftUpperLeg": "hips",
+    "leftLowerLeg": "leftUpperLeg",
+    "leftFoot": "leftLowerLeg",
+    "leftToes": "leftFoot",
+    "leftToesEnd": "leftToes",
+    "rightUpperLeg": "hips",
+    "rightLowerLeg": "rightUpperLeg",
+    "rightFoot": "rightLowerLeg",
+    "rightToes": "rightFoot",
+    "rightToesEnd": "rightToes",
+    "leftUpperArmTwist": "leftUpperArm",
+    "rightUpperArmTwist": "rightUpperArm",
+    "leftForearmTwist": "leftLowerArm",
+    "rightForearmTwist": "rightLowerArm",
+    "leftThighTwist": "leftUpperLeg",
+    "rightThighTwist": "rightUpperLeg",
+    "leftCalfTwist": "leftLowerLeg",
+    "rightCalfTwist": "rightLowerLeg",
+    "centerOfMass": "root",
+    "leftHandIK": "root",
+    "rightHandIK": "root",
+    "leftElbowPole": "root",
+    "rightElbowPole": "root",
+    "leftFootIK": "root",
+    "rightFootIK": "root",
+    "leftKneePole": "root",
+    "rightKneePole": "root",
+    "leftFootRoll": "root",
+    "rightFootRoll": "root",
+    "gazeTarget": "root",
+    "leftHeelContact": "leftFoot",
+    "rightHeelContact": "rightFoot",
+    "leftBallContact": "leftToes",
+    "rightBallContact": "rightToes",
+    "leftPalmGrip": "leftHandEnd",
+    "rightPalmGrip": "rightHandEnd",
+    "leftScapulaCorrective": "upperChest",
+    "rightScapulaCorrective": "upperChest",
+    "leftThumbMetacarpal": "leftHand",
+    "leftThumbProximal": "leftThumbMetacarpal",
+    "leftThumbDistal": "leftThumbProximal",
+    "leftIndexProximal": "leftHand",
+    "leftIndexIntermediate": "leftIndexProximal",
+    "leftIndexDistal": "leftIndexIntermediate",
+    "leftMiddleProximal": "leftHand",
+    "leftMiddleIntermediate": "leftMiddleProximal",
+    "leftMiddleDistal": "leftMiddleIntermediate",
+    "leftRingProximal": "leftHand",
+    "leftRingIntermediate": "leftRingProximal",
+    "leftRingDistal": "leftRingIntermediate",
+    "leftLittleProximal": "leftHand",
+    "leftLittleIntermediate": "leftLittleProximal",
+    "leftLittleDistal": "leftLittleIntermediate",
+    "rightThumbMetacarpal": "rightHand",
+    "rightThumbProximal": "rightThumbMetacarpal",
+    "rightThumbDistal": "rightThumbProximal",
+    "rightIndexProximal": "rightHand",
+    "rightIndexIntermediate": "rightIndexProximal",
+    "rightIndexDistal": "rightIndexIntermediate",
+    "rightMiddleProximal": "rightHand",
+    "rightMiddleIntermediate": "rightMiddleProximal",
+    "rightMiddleDistal": "rightMiddleIntermediate",
+    "rightRingProximal": "rightHand",
+    "rightRingIntermediate": "rightRingProximal",
+    "rightRingDistal": "rightRingIntermediate",
+    "rightLittleProximal": "rightHand",
+    "rightLittleIntermediate": "rightLittleProximal",
+    "rightLittleDistal": "rightLittleIntermediate",
+    "leftEye": "head",
+    "rightEye": "head",
+    "jaw": "head"
+  },
+  "bindLocalPositions": {
+    "root": [
+      0,
+      0,
+      0
+    ],
+    "hips": [
+      0,
+      0.925,
+      0.016
+    ],
+    "spine": [
+      0,
+      0.13,
+      0.024
+    ],
+    "chest": [
+      0,
+      0.135,
+      -0.019
+    ],
+    "upperChest": [
+      0,
+      0.145,
+      -0.019
+    ],
+    "neck": [
+      0,
+      0.155,
+      -0.012
+    ],
+    "head": [
+      0,
+      0.14,
+      0.065
+    ],
+    "headTop": [
+      0,
+      0.165672,
+      -0.01
+    ],
+    "leftShoulder": [
+      -0.1,
+      0.07,
+      -0.007
+    ],
+    "leftUpperArm": [
+      -0.11,
+      -0.065,
+      -0.015
+    ],
+    "leftLowerArm": [
+      -0.14,
+      -0.235,
+      0.045
+    ],
+    "leftHand": [
+      -0.085,
+      -0.205,
+      0.095
+    ],
+    "leftHandEnd": [
+      -0.028,
+      -0.06,
+      0.025
+    ],
+    "rightShoulder": [
+      0.1,
+      0.07,
+      -0.007
+    ],
+    "rightUpperArm": [
+      0.11,
+      -0.065,
+      -0.015
+    ],
+    "rightLowerArm": [
+      0.14,
+      -0.235,
+      0.045
+    ],
+    "rightHand": [
+      0.085,
+      -0.205,
+      0.095
+    ],
+    "rightHandEnd": [
+      0.028,
+      -0.06,
+      0.025
+    ],
+    "leftUpperLeg": [
+      -0.1,
+      0,
+      0
+    ],
+    "leftLowerLeg": [
+      -0.01,
+      -0.425,
+      -0.014
+    ],
+    "leftFoot": [
+      -0.05,
+      -0.4,
+      -0.004
+    ],
+    "leftToes": [
+      -0.016,
+      -0.065,
+      0.122
+    ],
+    "leftToesEnd": [
+      0,
+      -0.015,
+      0.075
+    ],
+    "rightUpperLeg": [
+      0.1,
+      0,
+      0
+    ],
+    "rightLowerLeg": [
+      0.01,
+      -0.425,
+      -0.014
+    ],
+    "rightFoot": [
+      0.05,
+      -0.4,
+      -0.004
+    ],
+    "rightToes": [
+      0.016,
+      -0.065,
+      0.122
+    ],
+    "rightToesEnd": [
+      0,
+      -0.015,
+      0.075
+    ],
+    "leftUpperArmTwist": [
+      -0.07,
+      -0.11749999999999994,
+      0.0225
+    ],
+    "rightUpperArmTwist": [
+      0.07,
+      -0.11749999999999994,
+      0.0225
+    ],
+    "leftForearmTwist": [
+      -0.04250000000000004,
+      -0.10250000000000004,
+      0.04750000000000001
+    ],
+    "rightForearmTwist": [
+      0.04250000000000004,
+      -0.10250000000000004,
+      0.04750000000000001
+    ],
+    "leftThighTwist": [
+      -0.0050000000000000044,
+      -0.21250000000000002,
+      -0.006999999999999999
+    ],
+    "rightThighTwist": [
+      0.0050000000000000044,
+      -0.21250000000000002,
+      -0.006999999999999999
+    ],
+    "leftCalfTwist": [
+      -0.02500000000000001,
+      -0.2,
+      -0.002
+    ],
+    "rightCalfTwist": [
+      0.02500000000000001,
+      -0.2,
+      -0.002
+    ],
+    "centerOfMass": [
+      0,
+      1.0050000000000001,
+      0.016
+    ],
+    "leftHandIK": [
+      -0.4630000000000001,
+      0.8400000000000005,
+      0.145
+    ],
+    "rightHandIK": [
+      0.4630000000000001,
+      0.8400000000000005,
+      0.145
+    ],
+    "leftElbowPole": [
+      -0.4,
+      1.1250000000000004,
+      0.28500000000000003
+    ],
+    "rightElbowPole": [
+      0.4,
+      1.1250000000000004,
+      0.28500000000000003
+    ],
+    "leftFootIK": [
+      -0.16,
+      0.02499999999999998,
+      0.038
+    ],
+    "rightFootIK": [
+      0.16,
+      0.02499999999999998,
+      0.038
+    ],
+    "leftKneePole": [
+      -0.14500000000000002,
+      0.52,
+      0.322
+    ],
+    "rightKneePole": [
+      0.14500000000000002,
+      0.52,
+      0.322
+    ],
+    "leftFootRoll": [
+      -0.16,
+      0.014999999999999972,
+      0.078
+    ],
+    "rightFootRoll": [
+      0.16,
+      0.014999999999999972,
+      0.078
+    ],
+    "gazeTarget": [
+      0,
+      1.6600000000000004,
+      0.5750000000000001
+    ],
+    "leftHeelContact": [
+      0,
+      -0.075,
+      -0.075
+    ],
+    "rightHeelContact": [
+      0,
+      -0.075,
+      -0.075
+    ],
+    "leftBallContact": [
+      0,
+      -0.035,
+      0.01999999999999999
+    ],
+    "rightBallContact": [
+      0,
+      -0.035,
+      0.01999999999999999
+    ],
+    "leftPalmGrip": [
+      -0.008000000000000007,
+      -0.008000000000000007,
+      0.017999999999999988
+    ],
+    "rightPalmGrip": [
+      0.008000000000000007,
+      -0.008000000000000007,
+      0.017999999999999988
+    ],
+    "leftScapulaCorrective": [
+      -0.14950000000000002,
+      0.040750000000000064,
+      -0.01375
+    ],
+    "rightScapulaCorrective": [
+      0.14950000000000002,
+      0.040750000000000064,
+      -0.01375
+    ],
+    "leftThumbMetacarpal": [
+      -0.02408,
+      -0.039599999999999996,
+      0.0415
+    ],
+    "leftThumbProximal": [
+      -0.0023189567041718914,
+      -0.02087061033754702,
+      0.02000100157348256
+    ],
+    "leftThumbDistal": [
+      -0.0019191365827629443,
+      -0.0172722292448665,
+      0.016552553026330394
+    ],
+    "leftIndexProximal": [
+      -0.03208,
+      -0.0536,
+      0.0405
+    ],
+    "leftIndexIntermediate": [
+      -0.00207730126140153,
+      -0.0236293018484424,
+      0.01064616896468284
+    ],
+    "leftIndexDistal": [
+      -0.0016778202495935435,
+      -0.019085205339126558,
+      0.00859882877916691
+    ],
+    "leftMiddleProximal": [
+      -0.02408,
+      -0.0576,
+      0.029500000000000002
+    ],
+    "leftMiddleIntermediate": [
+      -0.0017416553592607925,
+      -0.02699565806854229,
+      0.010449932155564756
+    ],
+    "leftMiddleDistal": [
+      -0.00138131287113787,
+      -0.021410349502636986,
+      0.00828787722682722
+    ],
+    "leftRingProximal": [
+      -0.02008,
+      -0.0596,
+      0.0175
+    ],
+    "leftRingIntermediate": [
+      -0.0013488539609929065,
+      -0.02535845446666664,
+      0.009172206934751764
+    ],
+    "leftRingDistal": [
+      -0.0010491086363278162,
+      -0.019723242362962943,
+      0.007133938727029151
+    ],
+    "leftLittleProximal": [
+      -0.015080000000000001,
+      -0.0616,
+      0.006500000000000002
+    ],
+    "leftLittleIntermediate": [
+      -0.0009199080137977005,
+      -0.021847815327695384,
+      0.007129287106932179
+    ],
+    "leftLittleDistal": [
+      -0.0007199280107982003,
+      -0.017098290256457257,
+      0.0055794420836860524
+    ],
+    "rightThumbMetacarpal": [
+      0.02408,
+      -0.039599999999999996,
+      0.0415
+    ],
+    "rightThumbProximal": [
+      0.0023189567041718914,
+      -0.02087061033754702,
+      0.02000100157348256
+    ],
+    "rightThumbDistal": [
+      0.0019191365827629443,
+      -0.0172722292448665,
+      0.016552553026330394
+    ],
+    "rightIndexProximal": [
+      0.03208,
+      -0.0536,
+      0.0405
+    ],
+    "rightIndexIntermediate": [
+      0.00207730126140153,
+      -0.0236293018484424,
+      0.01064616896468284
+    ],
+    "rightIndexDistal": [
+      0.0016778202495935435,
+      -0.019085205339126558,
+      0.00859882877916691
+    ],
+    "rightMiddleProximal": [
+      0.02408,
+      -0.0576,
+      0.029500000000000002
+    ],
+    "rightMiddleIntermediate": [
+      0.0017416553592607925,
+      -0.02699565806854229,
+      0.010449932155564756
+    ],
+    "rightMiddleDistal": [
+      0.00138131287113787,
+      -0.021410349502636986,
+      0.00828787722682722
+    ],
+    "rightRingProximal": [
+      0.02008,
+      -0.0596,
+      0.0175
+    ],
+    "rightRingIntermediate": [
+      0.0013488539609929065,
+      -0.02535845446666664,
+      0.009172206934751764
+    ],
+    "rightRingDistal": [
+      0.0010491086363278162,
+      -0.019723242362962943,
+      0.007133938727029151
+    ],
+    "rightLittleProximal": [
+      0.015080000000000001,
+      -0.0616,
+      0.006500000000000002
+    ],
+    "rightLittleIntermediate": [
+      0.0009199080137977005,
+      -0.021847815327695384,
+      0.007129287106932179
+    ],
+    "rightLittleDistal": [
+      0.0007199280107982003,
+      -0.017098290256457257,
+      0.0055794420836860524
+    ],
+    "leftEye": [
+      -0.031,
+      0.035,
+      0.083
+    ],
+    "rightEye": [
+      0.031,
+      0.035,
+      0.083
+    ],
+    "jaw": [
+      0,
+      -0.058,
+      0.066
+    ]
+  },
+  "bindWorldPositions": {
+    "root": [
+      0,
+      0,
+      0
+    ],
+    "hips": [
+      0,
+      0.93,
+      0.016
+    ],
+    "spine": [
+      0,
+      1.06,
+      0.04
+    ],
+    "chest": [
+      0,
+      1.195,
+      0.021
+    ],
+    "upperChest": [
+      0,
+      1.34,
+      0.0020000000000000018
+    ],
+    "neck": [
+      0,
+      1.495,
+      -0.009999999999999998
+    ],
+    "head": [
+      0,
+      1.6350000000000002,
+      0.05500000000000001
+    ],
+    "headTop": [
+      0,
+      1.8006720000000003,
+      0.045000000000000005
+    ],
+    "leftShoulder": [
+      -0.105,
+      1.4014817045957577,
+      0.014000000000000002
+    ],
+    "leftUpperArm": [
+      -0.20999999999999996,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "leftLowerArm": [
+      -0.4872183255125822,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "leftHand": [
+      -0.7286204796040484,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "leftHandEnd": [
+      -0.7993947687209304,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "rightShoulder": [
+      0.105,
+      1.4014817045957577,
+      0.014000000000000002
+    ],
+    "rightUpperArm": [
+      0.20999999999999996,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "rightLowerArm": [
+      0.4872183255125822,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "rightHand": [
+      0.7286204796040484,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "rightHandEnd": [
+      0.7993947687209304,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "leftUpperLeg": [
+      -0.1,
+      0.93,
+      0.016
+    ],
+    "leftLowerLeg": [
+      -0.11,
+      0.5050000000000001,
+      0.002
+    ],
+    "leftFoot": [
+      -0.16,
+      0.1050000000000001,
+      -0.002
+    ],
+    "leftToes": [
+      -0.176,
+      0.04000000000000009,
+      0.12
+    ],
+    "leftToesEnd": [
+      -0.176,
+      0.02500000000000009,
+      0.195
+    ],
+    "rightUpperLeg": [
+      0.1,
+      0.93,
+      0.016
+    ],
+    "rightLowerLeg": [
+      0.11,
+      0.5050000000000001,
+      0.002
+    ],
+    "rightFoot": [
+      0.16,
+      0.1050000000000001,
+      -0.002
+    ],
+    "rightToes": [
+      0.176,
+      0.04000000000000009,
+      0.12
+    ],
+    "rightToesEnd": [
+      0.176,
+      0.02500000000000009,
+      0.195
+    ],
+    "leftUpperArmTwist": [
+      -0.34860916275629106,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "rightUpperArmTwist": [
+      0.34860916275629106,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "leftForearmTwist": [
+      -0.6079194025583153,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "rightForearmTwist": [
+      0.6079194025583153,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "leftThighTwist": [
+      -0.10500000000000001,
+      0.7175,
+      0.009000000000000001
+    ],
+    "rightThighTwist": [
+      0.10500000000000001,
+      0.7175,
+      0.009000000000000001
+    ],
+    "leftCalfTwist": [
+      -0.135,
+      0.3050000000000001,
+      0
+    ],
+    "rightCalfTwist": [
+      0.135,
+      0.3050000000000001,
+      0
+    ],
+    "centerOfMass": [
+      0,
+      1.01,
+      0.016
+    ],
+    "leftHandIK": [
+      -0.7993947687209304,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "rightHandIK": [
+      0.7993947687209304,
+      1.3286806057029525,
+      -0.000999999999999994
+    ],
+    "leftElbowPole": [
+      -0.5372183255125822,
+      1.3486806057029526,
+      0.259
+    ],
+    "rightElbowPole": [
+      0.5372183255125822,
+      1.3486806057029526,
+      0.259
+    ],
+    "leftFootIK": [
+      -0.16,
+      0.030000000000000096,
+      0.038
+    ],
+    "rightFootIK": [
+      0.16,
+      0.030000000000000096,
+      0.038
+    ],
+    "leftKneePole": [
+      -0.14500000000000002,
+      0.5250000000000001,
+      0.322
+    ],
+    "rightKneePole": [
+      0.14500000000000002,
+      0.5250000000000001,
+      0.322
+    ],
+    "leftFootRoll": [
+      -0.16,
+      0.020000000000000087,
+      0.078
+    ],
+    "rightFootRoll": [
+      0.16,
+      0.020000000000000087,
+      0.078
+    ],
+    "gazeTarget": [
+      0,
+      1.6650000000000003,
+      0.5750000000000001
+    ],
+    "leftHeelContact": [
+      -0.16,
+      0.030000000000000096,
+      -0.077
+    ],
+    "rightHeelContact": [
+      0.16,
+      0.030000000000000096,
+      -0.077
+    ],
+    "leftBallContact": [
+      -0.176,
+      0.005000000000000088,
+      0.13999999999999999
+    ],
+    "rightBallContact": [
+      0.176,
+      0.005000000000000088,
+      0.13999999999999999
+    ],
+    "leftPalmGrip": [
+      -0.8073947687209304,
+      1.3206806057029525,
+      0.017000000000000005
+    ],
+    "rightPalmGrip": [
+      0.8073947687209304,
+      1.3206806057029525,
+      0.017000000000000005
+    ],
+    "leftScapulaCorrective": [
+      -0.15225,
+      1.3687212100939954,
+      0.007250000000000004
+    ],
+    "rightScapulaCorrective": [
+      0.15225,
+      1.3687212100939954,
+      0.007250000000000004
+    ],
+    "leftThumbMetacarpal": [
+      -0.7863778947756681,
+      1.3387923774018282,
+      0.01978676179213512
+    ],
+    "leftThumbProximal": [
+      -0.8120537789135596,
+      1.3349271078826412,
+      0.032702204691301015
+    ],
+    "leftThumbDistal": [
+      -0.8333027864759526,
+      1.3317282641426245,
+      0.043390847090610724
+    ],
+    "leftIndexProximal": [
+      -0.8010583672037856,
+      1.3385695289040451,
+      0.013046281999544785
+    ],
+    "leftIndexIntermediate": [
+      -0.8256729100283113,
+      1.3311540683241592,
+      0.016936683768995733
+    ],
+    "leftIndexDistal": [
+      -0.8455538869250436,
+      1.3251646578557899,
+      0.020078931352013805
+    ],
+    "leftMiddleProximal": [
+      -0.7973988461654002,
+      1.3274870050149052,
+      0.004997333620019719
+    ],
+    "leftMiddleIntermediate": [
+      -0.8246651622547645,
+      1.3181121094188517,
+      0.008105281412047511
+    ],
+    "leftMiddleDistal": [
+      -0.8462901715670189,
+      1.3106768473943955,
+      0.010570205522966104
+    ],
+    "leftRingProximal": [
+      -0.79327305410668,
+      1.3205510289842777,
+      -0.004946009700552102
+    ],
+    "leftRingIntermediate": [
+      -0.8185446657977957,
+      1.3113630572758972,
+      -0.002511503915086241
+    ],
+    "leftRingDistal": [
+      -0.8382003637797746,
+      1.304216857058268,
+      -0.0006179994152794609
+    ],
+    "leftLittleProximal": [
+      -0.7891048737733839,
+      1.312981858859987,
+      -0.013625522148764415
+    ],
+    "leftLittleIntermediate": [
+      -0.8105089534275025,
+      1.3046946499618657,
+      -0.012146487720821355
+    ],
+    "leftLittleDistal": [
+      -0.8272599722872476,
+      1.2982090082155098,
+      -0.010988982516344179
+    ],
+    "rightThumbMetacarpal": [
+      0.7863778947756681,
+      1.3387923774018282,
+      0.01978676179213512
+    ],
+    "rightThumbProximal": [
+      0.8120537789135596,
+      1.3349271078826412,
+      0.032702204691301015
+    ],
+    "rightThumbDistal": [
+      0.8333027864759526,
+      1.3317282641426245,
+      0.043390847090610724
+    ],
+    "rightIndexProximal": [
+      0.8010583672037856,
+      1.3385695289040451,
+      0.013046281999544785
+    ],
+    "rightIndexIntermediate": [
+      0.8256729100283113,
+      1.3311540683241592,
+      0.016936683768995733
+    ],
+    "rightIndexDistal": [
+      0.8455538869250436,
+      1.3251646578557899,
+      0.020078931352013805
+    ],
+    "rightMiddleProximal": [
+      0.7973988461654002,
+      1.3274870050149052,
+      0.004997333620019719
+    ],
+    "rightMiddleIntermediate": [
+      0.8246651622547645,
+      1.3181121094188517,
+      0.008105281412047511
+    ],
+    "rightMiddleDistal": [
+      0.8462901715670189,
+      1.3106768473943955,
+      0.010570205522966104
+    ],
+    "rightRingProximal": [
+      0.79327305410668,
+      1.3205510289842777,
+      -0.004946009700552102
+    ],
+    "rightRingIntermediate": [
+      0.8185446657977957,
+      1.3113630572758972,
+      -0.002511503915086241
+    ],
+    "rightRingDistal": [
+      0.8382003637797746,
+      1.304216857058268,
+      -0.0006179994152794609
+    ],
+    "rightLittleProximal": [
+      0.7891048737733839,
+      1.312981858859987,
+      -0.013625522148764415
+    ],
+    "rightLittleIntermediate": [
+      0.8105089534275025,
+      1.3046946499618657,
+      -0.012146487720821355
+    ],
+    "rightLittleDistal": [
+      0.8272599722872476,
+      1.2982090082155098,
+      -0.010988982516344179
+    ],
+    "leftEye": [
+      -0.031,
+      1.6700000000000002,
+      0.138
+    ],
+    "rightEye": [
+      0.031,
+      1.6700000000000002,
+      0.138
+    ],
+    "jaw": [
+      0,
+      1.5770000000000002,
+      0.12100000000000001
+    ]
+  },
+  "boneLengths": {
+    "root": 0,
+    "hips": 0.9251383680293452,
+    "spine": 0.13219682295728594,
+    "chest": 0.13633048081775406,
+    "upperChest": 0.14623952953972463,
+    "neck": 0.15546382215808283,
+    "head": 0.15435349040433133,
+    "headTop": 0.16597352675652827,
+    "leftShoulder": 0.122266103233889,
+    "leftUpperArm": 0.12864680330268607,
+    "leftLowerArm": 0.27721832551258224,
+    "leftHand": 0.2414021540914662,
+    "leftHandEnd": 0.070774289116882,
+    "rightShoulder": 0.122266103233889,
+    "rightUpperArm": 0.12864680330268607,
+    "rightLowerArm": 0.27721832551258224,
+    "rightHand": 0.2414021540914662,
+    "rightHandEnd": 0.070774289116882,
+    "leftUpperLeg": 0.1,
+    "leftLowerLeg": 0.4253480927428734,
+    "leftFoot": 0.4031327324839798,
+    "leftToes": 0.13915818337417316,
+    "leftToesEnd": 0.07648529270389177,
+    "rightUpperLeg": 0.1,
+    "rightLowerLeg": 0.4253480927428734,
+    "rightFoot": 0.4031327324839798,
+    "rightToes": 0.13915818337417316,
+    "rightToesEnd": 0.07648529270389177,
+    "leftUpperArmTwist": 0.13860916275629107,
+    "rightUpperArmTwist": 0.13860916275629107,
+    "leftForearmTwist": 0.12070107704573316,
+    "rightForearmTwist": 0.12070107704573316,
+    "leftThighTwist": 0.21267404637143672,
+    "rightThighTwist": 0.21267404637143672,
+    "leftCalfTwist": 0.2015663662419899,
+    "rightCalfTwist": 0.2015663662419899,
+    "centerOfMass": 1.0051273551147637,
+    "leftHandIK": 0.9700484523981269,
+    "rightHandIK": 0.9700484523981269,
+    "leftElbowPole": 1.2275381867787254,
+    "rightElbowPole": 1.2275381867787254,
+    "leftFootIK": 0.1663400132259223,
+    "rightFootIK": 0.1663400132259223,
+    "leftKneePole": 0.6285769642613385,
+    "rightKneePole": 0.6285769642613385,
+    "leftFootRoll": 0.17863090438107285,
+    "rightFootRoll": 0.17863090438107285,
+    "gazeTarget": 1.7567654937412682,
+    "leftHeelContact": 0.10606601717798213,
+    "rightHeelContact": 0.10606601717798213,
+    "leftBallContact": 0.04031128874149274,
+    "rightBallContact": 0.04031128874149274,
+    "leftPalmGrip": 0.02126029162546929,
+    "rightPalmGrip": 0.02126029162546929,
+    "leftScapulaCorrective": 0.15556309009530508,
+    "rightScapulaCorrective": 0.15556309009530508,
+    "leftThumbMetacarpal": 0.06221138481017762,
+    "leftThumbProximal": 0.029000000000000005,
+    "leftThumbDistal": 0.024,
+    "leftIndexProximal": 0.0744468696454055,
+    "leftIndexIntermediate": 0.026,
+    "leftIndexDistal": 0.021,
+    "leftMiddleProximal": 0.06904966618311778,
+    "leftMiddleIntermediate": 0.029000000000000005,
+    "leftMiddleDistal": 0.023000000000000003,
+    "leftRingProximal": 0.06528105697673713,
+    "leftRingIntermediate": 0.027,
+    "leftRingDistal": 0.021,
+    "leftLittleProximal": 0.06375120704739637,
+    "leftLittleIntermediate": 0.023,
+    "leftLittleDistal": 0.018,
+    "rightThumbMetacarpal": 0.06221138481017762,
+    "rightThumbProximal": 0.029000000000000005,
+    "rightThumbDistal": 0.024,
+    "rightIndexProximal": 0.0744468696454055,
+    "rightIndexIntermediate": 0.026,
+    "rightIndexDistal": 0.021,
+    "rightMiddleProximal": 0.06904966618311778,
+    "rightMiddleIntermediate": 0.029000000000000005,
+    "rightMiddleDistal": 0.023000000000000003,
+    "rightRingProximal": 0.06528105697673713,
+    "rightRingIntermediate": 0.027,
+    "rightRingDistal": 0.021,
+    "rightLittleProximal": 0.06375120704739637,
+    "rightLittleIntermediate": 0.023,
+    "rightLittleDistal": 0.018,
+    "leftEye": 0.09526279441628827,
+    "rightEye": 0.09526279441628827,
+    "jaw": 0.08786353054595519
+  },
+  "jointAxes": {
+    "root": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        0,
+        0.9998504353181158,
+        0.017294710005502544
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.017294710005502544,
+        -0.9998504353181158
+      ]
+    },
+    "hips": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "pelvis",
+      "twistAxisLocal": [
+        0,
+        0.983382180455892,
+        0.1815474790841647
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.1815474790841647,
+        -0.983382180455892
+      ]
+    },
+    "spine": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "spine",
+      "twistAxisLocal": [
+        0,
+        0.9902407678311521,
+        -0.1393672189762362
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.1393672189762362,
+        -0.9902407678311521
+      ]
+    },
+    "chest": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "spine",
+      "twistAxisLocal": [
+        0,
+        0.9915239774692823,
+        -0.12992383193045767
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.12992383193045767,
+        -0.9915239774692823
+      ]
+    },
+    "upperChest": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "spine",
+      "twistAxisLocal": [
+        0,
+        0.9970165267504175,
+        -0.07718837598067749
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.07718837598067749,
+        -0.9970165267504175
+      ]
+    },
+    "neck": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "neck",
+      "twistAxisLocal": [
+        0,
+        0.9070089679666898,
+        0.42111130598453456
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.42111130598453456,
+        -0.9070089679666898
+      ]
+    },
+    "head": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "neck",
+      "twistAxisLocal": [
+        0,
+        0.9981832840582182,
+        -0.060250572003514066
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.060250572003514066,
+        -0.9981832840582182
+      ]
+    },
+    "headTop": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "endpoint",
+      "twistAxisLocal": [
+        0,
+        0.9981832840582182,
+        -0.060250572003514066
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.060250572003514066,
+        -0.9981832840582182
+      ]
+    },
+    "leftShoulder": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "clavicle",
+      "twistAxisLocal": [
+        -0.8550542819846204,
+        -0.5052593479909121,
+        -0.11659831099790277
+      ],
+      "bendAxisLocal": [
+        0.508729312126641,
+        -0.8609265282143155,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.10038257899543805,
+        -0.0593169789973043,
+        0.9931791549548643
+      ]
+    },
+    "leftUpperArm": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "ball",
+      "twistAxisLocal": [
+        -0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "bendAxisLocal": [
+        0.8591015439742421,
+        -0.5118051749846548,
+        0
+      ],
+      "sideAxisLocal": [
+        0.08307976296650217,
+        0.1394553169437715,
+        0.9867370306021468
+      ]
+    },
+    "leftLowerArm": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "hinge",
+      "twistAxisLocal": [
+        -0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "bendAxisLocal": [
+        0.9237421135284853,
+        -0.38301502280449395,
+        0
+      ],
+      "sideAxisLocal": [
+        0.15072950501493615,
+        0.3635241000360225,
+        0.9193099830910966
+      ]
+    },
+    "leftHand": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "wrist",
+      "twistAxisLocal": [
+        -0.39562389590990127,
+        -0.8477654918069313,
+        0.35323562091955474
+      ],
+      "bendAxisLocal": [
+        0.9061831401230026,
+        -0.4228854650574012,
+        0
+      ],
+      "sideAxisLocal": [
+        0.14937821004905705,
+        0.3200961651051222,
+        0.9355343903072372
+      ]
+    },
+    "leftHandEnd": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "endpoint",
+      "twistAxisLocal": [
+        -0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "bendAxisLocal": [
+        0.7071067811865475,
+        -0.7071067811865475,
+        0
+      ],
+      "sideAxisLocal": [
+        0.5986710948555584,
+        0.5986710948555584,
+        0.5321520838716074
+      ]
+    },
+    "rightShoulder": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "clavicle",
+      "twistAxisLocal": [
+        0.8550542819846204,
+        -0.5052593479909121,
+        -0.11659831099790277
+      ],
+      "bendAxisLocal": [
+        0.508729312126641,
+        0.8609265282143155,
+        0
+      ],
+      "sideAxisLocal": [
+        0.10038257899543805,
+        -0.0593169789973043,
+        0.9931791549548643
+      ]
+    },
+    "rightUpperArm": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "ball",
+      "twistAxisLocal": [
+        0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "bendAxisLocal": [
+        0.8591015439742421,
+        0.5118051749846548,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.08307976296650217,
+        0.1394553169437715,
+        0.9867370306021468
+      ]
+    },
+    "rightLowerArm": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "hinge",
+      "twistAxisLocal": [
+        0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "bendAxisLocal": [
+        0.9237421135284853,
+        0.38301502280449395,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.15072950501493615,
+        0.3635241000360225,
+        0.9193099830910966
+      ]
+    },
+    "rightHand": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "wrist",
+      "twistAxisLocal": [
+        0.39562389590990127,
+        -0.8477654918069313,
+        0.35323562091955474
+      ],
+      "bendAxisLocal": [
+        0.9061831401230026,
+        0.4228854650574012,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.14937821004905705,
+        0.3200961651051222,
+        0.9355343903072372
+      ]
+    },
+    "rightHandEnd": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "endpoint",
+      "twistAxisLocal": [
+        0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "bendAxisLocal": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.5986710948555584,
+        0.5986710948555584,
+        0.5321520838716074
+      ]
+    },
+    "leftUpperLeg": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "ball",
+      "twistAxisLocal": [
+        -0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "bendAxisLocal": [
+        0.9997232982821956,
+        -0.023522901006639896,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.0007742380002542152,
+        -0.03290511101080414,
+        0.9994581803281645
+      ]
+    },
+    "leftLowerLeg": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "hinge",
+      "twistAxisLocal": [
+        -0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "bendAxisLocal": [
+        0.992277876667514,
+        -0.12403473495843924,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.0012307089998363169,
+        -0.009845668998690537,
+        0.9999507728670076
+      ]
+    },
+    "leftFoot": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "ankle",
+      "twistAxisLocal": [
+        -0.11497706904062847,
+        -0.4670943411650532,
+        0.876700148309792
+      ],
+      "bendAxisLocal": [
+        0.9710148789669015,
+        -0.2390190469918527,
+        0
+      ],
+      "sideAxisLocal": [
+        0.20954803403098984,
+        0.8512888881258963,
+        0.48103726507114014
+      ]
+    },
+    "leftToes": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "toe",
+      "twistAxisLocal": [
+        0,
+        -0.19611613494587632,
+        0.9805806757293816
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.9805806757293816,
+        0.19611613494587632
+      ]
+    },
+    "leftToesEnd": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "endpoint",
+      "twistAxisLocal": [
+        0,
+        -0.19611613494587632,
+        0.9805806757293816
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.9805806757293816,
+        0.19611613494587632
+      ]
+    },
+    "rightUpperLeg": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "ball",
+      "twistAxisLocal": [
+        0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "bendAxisLocal": [
+        0.9997232982821956,
+        0.023522901006639896,
+        0
+      ],
+      "sideAxisLocal": [
+        0.0007742380002542152,
+        -0.03290511101080414,
+        0.9994581803281645
+      ]
+    },
+    "rightLowerLeg": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "hinge",
+      "twistAxisLocal": [
+        0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "bendAxisLocal": [
+        0.992277876667514,
+        0.12403473495843924,
+        0
+      ],
+      "sideAxisLocal": [
+        0.0012307089998363169,
+        -0.009845668998690537,
+        0.9999507728670076
+      ]
+    },
+    "rightFoot": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "ankle",
+      "twistAxisLocal": [
+        0.11497706904062847,
+        -0.4670943411650532,
+        0.876700148309792
+      ],
+      "bendAxisLocal": [
+        0.9710148789669015,
+        0.2390190469918527,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.20954803403098984,
+        0.8512888881258963,
+        0.48103726507114014
+      ]
+    },
+    "rightToes": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "toe",
+      "twistAxisLocal": [
+        0,
+        -0.19611613494587632,
+        0.9805806757293816
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.9805806757293816,
+        0.19611613494587632
+      ]
+    },
+    "rightToesEnd": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "endpoint",
+      "twistAxisLocal": [
+        0,
+        -0.19611613494587632,
+        0.9805806757293816
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.9805806757293816,
+        0.19611613494587632
+      ]
+    },
+    "leftUpperArmTwist": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "twist",
+      "twistAxisLocal": [
+        -0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "bendAxisLocal": [
+        0.8591015439742421,
+        -0.5118051749846548,
+        0
+      ],
+      "sideAxisLocal": [
+        0.08307976296650217,
+        0.1394553169437715,
+        0.9867370306021468
+      ]
+    },
+    "rightUpperArmTwist": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "twist",
+      "twistAxisLocal": [
+        0.505017119086682,
+        -0.8477073061455019,
+        0.16232693102786208
+      ],
+      "bendAxisLocal": [
+        0.8591015439742421,
+        0.5118051749846548,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.08307976296650217,
+        0.1394553169437715,
+        0.9867370306021468
+      ]
+    },
+    "leftForearmTwist": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "twist",
+      "twistAxisLocal": [
+        -0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "bendAxisLocal": [
+        0.9237421135284853,
+        -0.38301502280449395,
+        0
+      ],
+      "sideAxisLocal": [
+        0.15072950501493615,
+        0.3635241000360225,
+        0.9193099830910966
+      ]
+    },
+    "rightForearmTwist": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "twist",
+      "twistAxisLocal": [
+        0.3521095339875526,
+        -0.84920534696998,
+        0.3935341849860882
+      ],
+      "bendAxisLocal": [
+        0.9237421135284853,
+        0.38301502280449395,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.15072950501493615,
+        0.3635241000360225,
+        0.9193099830910966
+      ]
+    },
+    "leftThighTwist": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "twist",
+      "twistAxisLocal": [
+        -0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "bendAxisLocal": [
+        0.9997232982821956,
+        -0.023522901006639896,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.0007742380002542152,
+        -0.03290511101080414,
+        0.9994581803281645
+      ]
+    },
+    "rightThighTwist": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "twist",
+      "twistAxisLocal": [
+        0.02351015598927009,
+        -0.9991816285439787,
+        -0.03291421798497813
+      ],
+      "bendAxisLocal": [
+        0.9997232982821956,
+        0.023522901006639896,
+        0
+      ],
+      "sideAxisLocal": [
+        0.0007742380002542152,
+        -0.03290511101080414,
+        0.9994581803281645
+      ]
+    },
+    "leftCalfTwist": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "twist",
+      "twistAxisLocal": [
+        -0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "bendAxisLocal": [
+        0.992277876667514,
+        -0.12403473495843924,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.0012307089998363169,
+        -0.009845668998690537,
+        0.9999507728670076
+      ]
+    },
+    "rightCalfTwist": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "twist",
+      "twistAxisLocal": [
+        0.12402862896122838,
+        -0.992229029689827,
+        -0.009922289996898271
+      ],
+      "bendAxisLocal": [
+        0.992277876667514,
+        0.12403473495843924,
+        0
+      ],
+      "sideAxisLocal": [
+        0.0012307089998363169,
+        -0.009845668998690537,
+        0.9999507728670076
+      ]
+    },
+    "centerOfMass": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        0,
+        0.9998732945461486,
+        0.015918380992774504
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.015918380992774504,
+        -0.9998732945461486
+      ]
+    },
+    "leftHandIK": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        -0.4772957460837078,
+        0.8659361271518673,
+        0.14947707002621516
+      ],
+      "bendAxisLocal": [
+        -0.8757752942157804,
+        -0.48271900111893606,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07215542202203985,
+        -0.1309083250399859,
+        0.988765192302018
+      ]
+    },
+    "rightHandIK": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        0.4772957460837078,
+        0.8659361271518673,
+        0.14947707002621516
+      ],
+      "bendAxisLocal": [
+        -0.8757752942157804,
+        0.48271900111893606,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07215542202203985,
+        -0.1309083250399859,
+        0.988765192302018
+      ]
+    },
+    "leftElbowPole": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        -0.32585544312575243,
+        0.9164684343536786,
+        0.2321720030895986
+      ],
+      "bendAxisLocal": [
+        -0.9422146901388511,
+        -0.33500966804936927,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07777986597683625,
+        -0.21875587193485196,
+        0.9726747457103263
+      ]
+    },
+    "rightElbowPole": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        0.32585544312575243,
+        0.9164684343536786,
+        0.2321720030895986
+      ],
+      "bendAxisLocal": [
+        -0.9422146901388511,
+        0.33500966804936927,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07777986597683625,
+        -0.21875587193485196,
+        0.9726747457103263
+      ]
+    },
+    "leftFootIK": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        -0.9618852188781151,
+        0.15029456498095548,
+        0.22844773897105233
+      ],
+      "bendAxisLocal": [
+        -0.15437687996855717,
+        -0.9880120337987659,
+        0
+      ],
+      "sideAxisLocal": [
+        0.22570911604903246,
+        -0.035267049007661325,
+        0.9735561772114928
+      ]
+    },
+    "rightFootIK": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        0.9618852188781151,
+        0.15029456498095548,
+        0.22844773897105233
+      ],
+      "bendAxisLocal": [
+        -0.15437687996855717,
+        0.9880120337987659,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.22570911604903246,
+        -0.035267049007661325,
+        0.9735561772114928
+      ]
+    },
+    "leftKneePole": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        -0.2306797869098453,
+        0.8272654416766866,
+        0.5122682157997944
+      ],
+      "bendAxisLocal": [
+        -0.9632520479635155,
+        -0.2685991289898264,
+        0
+      ],
+      "sideAxisLocal": [
+        0.1375947959789578,
+        -0.4934434079245383,
+        0.8588255208686608
+      ]
+    },
+    "rightKneePole": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        0.2306797869098453,
+        0.8272654416766866,
+        0.5122682157997944
+      ],
+      "bendAxisLocal": [
+        -0.9632520479635155,
+        0.2685991289898264,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.1375947959789578,
+        -0.4934434079245383,
+        0.8588255208686608
+      ]
+    },
+    "leftFootRoll": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        -0.8957016735641249,
+        0.0839720319591367,
+        0.4366545657875109
+      ],
+      "bendAxisLocal": [
+        -0.0933407090028356,
+        -0.9956342260302463,
+        0
+      ],
+      "sideAxisLocal": [
+        0.4347482311301143,
+        -0.040757647012198216,
+        0.899629251269247
+      ]
+    },
+    "rightFootRoll": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        0.8957016735641249,
+        0.0839720319591367,
+        0.4366545657875109
+      ],
+      "bendAxisLocal": [
+        -0.0933407090028356,
+        0.9956342260302463,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.4347482311301143,
+        -0.040757647012198216,
+        0.899629251269247
+      ]
+    },
+    "gazeTarget": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "control",
+      "twistAxisLocal": [
+        0,
+        0.94491837771023,
+        0.3273060638996279
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.3273060638996279,
+        -0.94491837771023
+      ]
+    },
+    "leftHeelContact": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "marker",
+      "twistAxisLocal": [
+        0,
+        -0.7071067811865475,
+        -0.7071067811865475
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.7071067811865475,
+        0.7071067811865475
+      ]
+    },
+    "rightHeelContact": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "marker",
+      "twistAxisLocal": [
+        0,
+        -0.7071067811865475,
+        -0.7071067811865475
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.7071067811865475,
+        0.7071067811865475
+      ]
+    },
+    "leftBallContact": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "marker",
+      "twistAxisLocal": [
+        0,
+        -0.8682431422475362,
+        0.49613893814144927
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.49613893814144927,
+        0.8682431422475362
+      ]
+    },
+    "rightBallContact": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "marker",
+      "twistAxisLocal": [
+        0,
+        -0.8682431422475362,
+        0.49613893814144927
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.49613893814144927,
+        0.8682431422475362
+      ]
+    },
+    "leftPalmGrip": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "marker",
+      "twistAxisLocal": [
+        -0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "bendAxisLocal": [
+        0.7071067811865475,
+        -0.7071067811865475,
+        0
+      ],
+      "sideAxisLocal": [
+        0.5986710948555584,
+        0.5986710948555584,
+        0.5321520838716074
+      ]
+    },
+    "rightPalmGrip": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "marker",
+      "twistAxisLocal": [
+        0.37628834695520885,
+        -0.37628834695520885,
+        0.84664878189922
+      ],
+      "bendAxisLocal": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.5986710948555584,
+        0.5986710948555584,
+        0.5321520838716074
+      ]
+    },
+    "leftScapulaCorrective": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "corrective",
+      "twistAxisLocal": [
+        -0.9610248799802626,
+        0.2619515979946201,
+        -0.08838857599818468
+      ],
+      "bendAxisLocal": [
+        0.2764618960689153,
+        0.9105848092269869,
+        -0.30725254307659067
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.3197134121027969,
+        -0.9475142923046529
+      ]
+    },
+    "rightScapulaCorrective": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "corrective",
+      "twistAxisLocal": [
+        0.9610248799802626,
+        0.2619515979946201,
+        -0.08838857599818468
+      ],
+      "bendAxisLocal": [
+        0.2764618960689153,
+        -0.9105848092269869,
+        0.30725254307659067
+      ],
+      "sideAxisLocal": [
+        0,
+        -0.3197134121027969,
+        -0.9475142923046529
+      ]
+    },
+    "leftThumbMetacarpal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "thumb",
+      "twistAxisLocal": [
+        -0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        -0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ]
+    },
+    "leftThumbProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "thumb",
+      "twistAxisLocal": [
+        -0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        -0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ]
+    },
+    "leftThumbDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "thumb",
+      "twistAxisLocal": [
+        -0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        -0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ]
+    },
+    "leftIndexProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        -0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ]
+    },
+    "leftIndexIntermediate": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        -0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ]
+    },
+    "leftIndexDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        -0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ]
+    },
+    "leftMiddleProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        -0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ]
+    },
+    "leftMiddleIntermediate": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        -0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ]
+    },
+    "leftMiddleDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        -0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ]
+    },
+    "leftRingProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        -0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ]
+    },
+    "leftRingIntermediate": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        -0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ]
+    },
+    "leftRingDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        -0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ]
+    },
+    "leftLittleProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        -0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ]
+    },
+    "leftLittleIntermediate": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        -0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ]
+    },
+    "leftLittleDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        -0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        -0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ]
+    },
+    "rightThumbMetacarpal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "thumb",
+      "twistAxisLocal": [
+        0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ]
+    },
+    "rightThumbProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "thumb",
+      "twistAxisLocal": [
+        0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ]
+    },
+    "rightThumbDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "thumb",
+      "twistAxisLocal": [
+        0.07996402399884399,
+        -0.7196762189895959,
+        0.6896897089900295
+      ],
+      "bendAxisLocal": [
+        0.9938837346858139,
+        0.11043152596509044,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.07616348701357059,
+        0.6854713841221353,
+        0.724105037129019
+      ]
+    },
+    "rightIndexProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ]
+    },
+    "rightIndexIntermediate": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ]
+    },
+    "rightIndexDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.0798962019957485,
+        -0.9088193019516393,
+        0.4094680369782111
+      ],
+      "bendAxisLocal": [
+        0.9961579879222954,
+        0.08757432899316883,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.03585888801455699,
+        0.4078948561655858,
+        0.9123244633703601
+      ]
+    },
+    "rightMiddleProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ]
+    },
+    "rightMiddleIntermediate": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ]
+    },
+    "rightMiddleDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.060057081003053965,
+        -0.9308847610473364,
+        0.3603424880183238
+      ],
+      "bendAxisLocal": [
+        0.9979253089684582,
+        0.06438227799796505,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.023199670007651288,
+        0.35959488911859494,
+        0.9328200743076456
+      ]
+    },
+    "rightRingProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ]
+    },
+    "rightRingIntermediate": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ]
+    },
+    "rightRingDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.04995755401281505,
+        -0.9392020172409228,
+        0.3397113680871423
+      ],
+      "bendAxisLocal": [
+        0.9985883276171434,
+        0.05311639997963529,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.018044245001449005,
+        0.33923180702724126,
+        0.9405297370755271
+      ]
+    },
+    "rightLittleProximal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ]
+    },
+    "rightLittleIntermediate": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ]
+    },
+    "rightLittleDistal": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "finger-hinge",
+      "twistAxisLocal": [
+        0.03999600100441911,
+        -0.9499050141049539,
+        0.3099690050342481
+      ],
+      "bendAxisLocal": [
+        0.9991147503166861,
+        0.042067989013334146,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.013039773004237015,
+        0.30969460510062913,
+        0.9507466623089262
+      ]
+    },
+    "leftEye": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "eye-ball",
+      "twistAxisLocal": [
+        -0.3254156058848414,
+        0.3674047168699822,
+        0.8712740426916722
+      ],
+      "bendAxisLocal": [
+        -0.7485881802440688,
+        -0.6630352452161752,
+        0
+      ],
+      "sideAxisLocal": [
+        0.5776853987378909,
+        -0.6522254497040704,
+        0.4907968447773142
+      ]
+    },
+    "rightEye": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "eye-ball",
+      "twistAxisLocal": [
+        0.3254156058848414,
+        0.3674047168699822,
+        0.8712740426916722
+      ],
+      "bendAxisLocal": [
+        -0.7485881802440688,
+        0.6630352452161752,
+        0
+      ],
+      "sideAxisLocal": [
+        -0.5776853987378909,
+        -0.6522254497040704,
+        0.4907968447773142
+      ]
+    },
+    "jaw": {
+      "schema": "humanoid_rig/joint_axes@1.0",
+      "space": "joint-local-at-bind",
+      "handedness": "right",
+      "quaternionOrder": "xyzw",
+      "source": "bind-direction-derived",
+      "jointType": "jaw-hinge",
+      "twistAxisLocal": [
+        0,
+        -0.6601146081048447,
+        0.751164898119306
+      ],
+      "bendAxisLocal": [
+        1,
+        0,
+        0
+      ],
+      "sideAxisLocal": [
+        0,
+        0.751164898119306,
+        0.6601146081048447
+      ]
+    }
+  },
+  "jointLimits": {
+    "root": {
+      "unit": "degrees",
+      "ranges": {
+        "target": [
+          0,
+          1
+        ]
+      }
+    },
+    "hips": {
+      "unit": "degrees",
+      "ranges": {
+        "tilt": [
+          -35,
+          45
+        ],
+        "roll": [
+          -25,
+          25
+        ],
+        "yaw": [
+          -45,
+          45
+        ]
+      }
+    },
+    "spine": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          35
+        ],
+        "extension": [
+          0,
+          25
+        ],
+        "lateral_flexion": [
+          0,
+          25
+        ],
+        "axial_rotation": [
+          0,
+          40
+        ]
+      }
+    },
+    "chest": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          35
+        ],
+        "extension": [
+          0,
+          25
+        ],
+        "lateral_flexion": [
+          0,
+          25
+        ],
+        "axial_rotation": [
+          0,
+          40
+        ]
+      }
+    },
+    "upperChest": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          35
+        ],
+        "extension": [
+          0,
+          25
+        ],
+        "lateral_flexion": [
+          0,
+          25
+        ],
+        "axial_rotation": [
+          0,
+          40
+        ]
+      }
+    },
+    "neck": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          55
+        ],
+        "extension": [
+          0,
+          55
+        ],
+        "lateral_flexion": [
+          0,
+          45
+        ],
+        "axial_rotation": [
+          0,
+          70
+        ]
+      }
+    },
+    "head": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          55
+        ],
+        "extension": [
+          0,
+          55
+        ],
+        "lateral_flexion": [
+          0,
+          45
+        ],
+        "axial_rotation": [
+          0,
+          70
+        ]
+      }
+    },
+    "headTop": {
+      "unit": "degrees",
+      "ranges": {
+        "stabilize": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftShoulder": {
+      "unit": "degrees",
+      "ranges": {
+        "elevation": [
+          0,
+          35
+        ],
+        "depression": [
+          0,
+          15
+        ],
+        "protraction": [
+          0,
+          25
+        ],
+        "retraction": [
+          0,
+          25
+        ],
+        "axial_rotation": [
+          0,
+          20
+        ]
+      }
+    },
+    "leftUpperArm": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          170
+        ],
+        "extension": [
+          0,
+          55
+        ],
+        "abduction": [
+          0,
+          170
+        ],
+        "adduction": [
+          0,
+          45
+        ],
+        "internal_rotation": [
+          0,
+          70
+        ],
+        "external_rotation": [
+          0,
+          90
+        ]
+      }
+    },
+    "leftLowerArm": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          145
+        ],
+        "extension": [
+          0,
+          5
+        ],
+        "pronation": [
+          0,
+          85
+        ],
+        "supination": [
+          0,
+          85
+        ]
+      }
+    },
+    "leftHand": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          80
+        ],
+        "extension": [
+          0,
+          70
+        ],
+        "radial_deviation": [
+          0,
+          20
+        ],
+        "ulnar_deviation": [
+          0,
+          30
+        ]
+      }
+    },
+    "leftHandEnd": {
+      "unit": "degrees",
+      "ranges": {
+        "stabilize": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightShoulder": {
+      "unit": "degrees",
+      "ranges": {
+        "elevation": [
+          0,
+          35
+        ],
+        "depression": [
+          0,
+          15
+        ],
+        "protraction": [
+          0,
+          25
+        ],
+        "retraction": [
+          0,
+          25
+        ],
+        "axial_rotation": [
+          0,
+          20
+        ]
+      }
+    },
+    "rightUpperArm": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          170
+        ],
+        "extension": [
+          0,
+          55
+        ],
+        "abduction": [
+          0,
+          170
+        ],
+        "adduction": [
+          0,
+          45
+        ],
+        "internal_rotation": [
+          0,
+          70
+        ],
+        "external_rotation": [
+          0,
+          90
+        ]
+      }
+    },
+    "rightLowerArm": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          145
+        ],
+        "extension": [
+          0,
+          5
+        ],
+        "pronation": [
+          0,
+          85
+        ],
+        "supination": [
+          0,
+          85
+        ]
+      }
+    },
+    "rightHand": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          80
+        ],
+        "extension": [
+          0,
+          70
+        ],
+        "radial_deviation": [
+          0,
+          20
+        ],
+        "ulnar_deviation": [
+          0,
+          30
+        ]
+      }
+    },
+    "rightHandEnd": {
+      "unit": "degrees",
+      "ranges": {
+        "stabilize": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftUpperLeg": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          130
+        ],
+        "extension": [
+          0,
+          18
+        ],
+        "abduction": [
+          0,
+          45
+        ],
+        "adduction": [
+          0,
+          30
+        ],
+        "internal_rotation": [
+          0,
+          45
+        ],
+        "external_rotation": [
+          0,
+          60
+        ]
+      }
+    },
+    "leftLowerLeg": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          140
+        ],
+        "extension": [
+          0,
+          2
+        ]
+      },
+      "reverseBendBlocked": true
+    },
+    "leftFoot": {
+      "unit": "degrees",
+      "ranges": {
+        "dorsiflexion": [
+          0,
+          15
+        ],
+        "plantarflexion": [
+          0,
+          55
+        ],
+        "inversion": [
+          0,
+          20
+        ],
+        "eversion": [
+          0,
+          20
+        ]
+      }
+    },
+    "leftToes": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          35
+        ],
+        "extension": [
+          0,
+          45
+        ]
+      }
+    },
+    "leftToesEnd": {
+      "unit": "degrees",
+      "ranges": {
+        "stabilize": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightUpperLeg": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          130
+        ],
+        "extension": [
+          0,
+          18
+        ],
+        "abduction": [
+          0,
+          45
+        ],
+        "adduction": [
+          0,
+          30
+        ],
+        "internal_rotation": [
+          0,
+          45
+        ],
+        "external_rotation": [
+          0,
+          60
+        ]
+      }
+    },
+    "rightLowerLeg": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          140
+        ],
+        "extension": [
+          0,
+          2
+        ]
+      },
+      "reverseBendBlocked": true
+    },
+    "rightFoot": {
+      "unit": "degrees",
+      "ranges": {
+        "dorsiflexion": [
+          0,
+          15
+        ],
+        "plantarflexion": [
+          0,
+          55
+        ],
+        "inversion": [
+          0,
+          20
+        ],
+        "eversion": [
+          0,
+          20
+        ]
+      }
+    },
+    "rightToes": {
+      "unit": "degrees",
+      "ranges": {
+        "flexion": [
+          0,
+          35
+        ],
+        "extension": [
+          0,
+          45
+        ]
+      }
+    },
+    "rightToesEnd": {
+      "unit": "degrees",
+      "ranges": {
+        "stabilize": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftUpperArmTwist": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightUpperArmTwist": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftForearmTwist": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightForearmTwist": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftThighTwist": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightThighTwist": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftCalfTwist": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightCalfTwist": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "centerOfMass": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftHandIK": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightHandIK": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftElbowPole": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightElbowPole": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftFootIK": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightFootIK": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftKneePole": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightKneePole": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftFootRoll": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightFootRoll": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "gazeTarget": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftHeelContact": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightHeelContact": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftBallContact": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightBallContact": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftPalmGrip": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightPalmGrip": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftScapulaCorrective": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightScapulaCorrective": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftThumbMetacarpal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftThumbProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftThumbDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftIndexProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftIndexIntermediate": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftIndexDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftMiddleProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftMiddleIntermediate": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftMiddleDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftRingProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftRingIntermediate": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftRingDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftLittleProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftLittleIntermediate": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftLittleDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightThumbMetacarpal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightThumbProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightThumbDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightIndexProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightIndexIntermediate": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightIndexDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightMiddleProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightMiddleIntermediate": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightMiddleDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightRingProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightRingIntermediate": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightRingDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightLittleProximal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightLittleIntermediate": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightLittleDistal": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "leftEye": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "rightEye": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    },
+    "jaw": {
+      "unit": "degrees",
+      "ranges": {
+        "derived": [
+          0,
+          1
+        ]
+      }
+    }
+  },
+  "topologyFingerprint": "fnv1a-8f257f74",
+  "bindFingerprint": "fnv1a-d669d035",
+  "axisFingerprint": "fnv1a-e51af5f5",
+  "limitFingerprint": "fnv1a-b9bd8ce0"
+}

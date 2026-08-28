@@ -1,0 +1,607 @@
+{
+  "schema": "humanoid_rig/interaction_anchor_profile@1.0",
+  "authority": "derived-interaction-targets",
+  "anchors": [
+    {
+      "anchorId": "headGazeOrigin",
+      "sourceJointId": "head",
+      "sourceFrame": "head-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "gaze-origin",
+        "motion-goal"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "headGazeTarget",
+      "sourceJointId": "head",
+      "sourceFrame": "head-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "gaze-target",
+        "motion-goal"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "chestFacing",
+      "sourceJointId": "upperChest",
+      "sourceFrame": "upper-chest-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "facing",
+        "carry-planning"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "pelvisFacing",
+      "sourceJointId": "hips",
+      "sourceFrame": "pelvis-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "facing",
+        "balance"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "twoHandCarryCenter",
+      "sourceJointId": "upperChest",
+      "sourceFrame": "world-derived-two-hand",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "carry-target",
+        "ik-target"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "chestCarryAnchor",
+      "sourceJointId": "upperChest",
+      "sourceFrame": "upper-chest-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "carry-target",
+        "ik-target"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftPalmCenter",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame+virtual-hand-end-measurement",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "palm-frame",
+        "salute",
+        "grasp",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftPalmNormal",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "palm-normal",
+        "salute",
+        "grasp"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftPalmUp",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        1,
+        0
+      ],
+      "capabilities": [
+        "palm-up",
+        "salute",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftThumbSide",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        -1,
+        0,
+        0
+      ],
+      "capabilities": [
+        "thumb-side",
+        "grasp"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftGripCenter",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "ik-target",
+        "object-target",
+        "grasp",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": false,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightPalmCenter",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame+virtual-hand-end-measurement",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "palm-frame",
+        "salute",
+        "grasp",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightPalmNormal",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "palm-normal",
+        "salute",
+        "grasp"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightPalmUp",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        1,
+        0
+      ],
+      "capabilities": [
+        "palm-up",
+        "salute",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightThumbSide",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        1,
+        0,
+        0
+      ],
+      "capabilities": [
+        "thumb-side",
+        "grasp"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightGripCenter",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "ik-target",
+        "object-target",
+        "grasp",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": false,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftHeelContact",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "heel-strike",
+        "contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftSoleCenter",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "foot-plant",
+        "contact",
+        "support"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftToeContact",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "toe-off",
+        "contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftFootForward",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "foot-forward",
+        "locomotion"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftFootUp",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        1,
+        0
+      ],
+      "capabilities": [
+        "foot-up",
+        "ground-normal"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightHeelContact",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "heel-strike",
+        "contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightSoleCenter",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "foot-plant",
+        "contact",
+        "support"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightToeContact",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "toe-off",
+        "contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightFootForward",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "foot-forward",
+        "locomotion"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightFootUp",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        1,
+        0
+      ],
+      "capabilities": [
+        "foot-up",
+        "ground-normal"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "pelvisSeatContact",
+      "sourceJointId": "hips",
+      "sourceFrame": "pelvis-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "sit-contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "backCarryAnchor",
+      "sourceJointId": "chest",
+      "sourceFrame": "chest-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "capabilities": [
+        "carry-target",
+        "ik-target"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    }
+  ]
+}

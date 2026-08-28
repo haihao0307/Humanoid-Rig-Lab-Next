@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Task 17A.3 · Human Production Rig Detail</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./apps/human-core-v5-production-rig-detail-v1/styles.css">
+  <script type="importmap">
+    {"imports":{"three":"./node_modules/three/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <main id="production-rig-app">
+    <header class="app-header">
+      <div>
+        <b>Task 17A.3 · Human Production Rig Detail</b>
+        <span id="pose-label">reference-t</span>
+      </div>
+      <strong>DERIVED DIAGNOSTIC FOUNDATION · SKIN WEIGHTS PENDING</strong>
+    </header>
+    <section class="workspace">
+      <aside id="left-panel" class="side-panel left-panel">
+        <div class="panel-heading"><h1>Rig Explorer</h1><button type="button" data-collapse="left" aria-label="Collapse left panel">‹</button></div>
+        <label for="pose-select">Deterministic finalPose</label>
+        <select id="pose-select"></select>
+        <h2>Display Mode</h2>
+        <div id="mode-buttons" class="button-grid">
+          <button type="button" data-mode="lite">1 · Lite</button>
+          <button type="button" data-mode="rig">2 · Rig</button>
+          <button type="button" data-mode="interaction">3 · Interaction</button>
+          <button type="button" data-mode="deform">4 · Deform</button>
+        </div>
+        <div class="toggle-row">
+          <label><input id="axes-toggle" type="checkbox"> Axes (A)</label>
+          <label><input id="limits-toggle" type="checkbox"> Limits (L)</label>
+        </div>
+        <h2>Skeleton Tree</h2>
+        <nav id="rig-tree" aria-label="Production rig element tree"></nav>
+      </aside>
+      <section class="viewport-panel">
+        <div id="viewport" aria-label="Production rig diagnostic viewport"></div>
+        <div class="legend">
+          <span><i class="core"></i>Core</span>
+          <span><i class="deform"></i>Derived Deform</span>
+          <span><i class="interaction"></i>Interaction</span>
+          <span><i class="twist"></i>Twist</span>
+          <span><i class="bend"></i>Bend</span>
+          <span><i class="side"></i>Side</span>
+        </div>
+        <div class="viewport-status"><span id="mode-label">rig</span><span id="contract-label">Contract checking…</span><span>F · Frame selection</span></div>
+      </section>
+      <aside id="right-panel" class="side-panel right-panel">
+        <div class="panel-heading"><h1>Inspector</h1><button type="button" data-collapse="right" aria-label="Collapse right panel">›</button></div>
+        <div id="inspector"></div>
+        <h2>Quality Gates</h2>
+        <div id="quality-gates"></div>
+      </aside>
+    </section>
+    <div id="loading">Building read-only production rig layers…</div>
+  </main>
+  <button id="restore-left" class="restore-panel left" type="button">Rig Explorer</button>
+  <button id="restore-right" class="restore-panel right" type="button">Inspector</button>
+  <script type="module" src="./apps/human-core-v5-production-rig-detail-v1/index.js"></script>
+</body>
+</html>

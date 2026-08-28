@@ -1,0 +1,1377 @@
+{
+  "schema": "humanoid_rig/task17a3_interaction_anchor_audit@1.0",
+  "authority": "derived-interaction-targets",
+  "writesHumanRigCore": false,
+  "writesFinalPose": false,
+  "requiredAnchorIds": [
+    "headGazeOrigin",
+    "headGazeTarget",
+    "chestFacing",
+    "pelvisFacing",
+    "twoHandCarryCenter",
+    "chestCarryAnchor",
+    "leftPalmCenter",
+    "leftPalmNormal",
+    "leftPalmUp",
+    "leftThumbSide",
+    "leftGripCenter",
+    "rightPalmCenter",
+    "rightPalmNormal",
+    "rightPalmUp",
+    "rightThumbSide",
+    "rightGripCenter",
+    "leftHeelContact",
+    "leftSoleCenter",
+    "leftToeContact",
+    "leftFootForward",
+    "leftFootUp",
+    "rightHeelContact",
+    "rightSoleCenter",
+    "rightToeContact",
+    "rightFootForward",
+    "rightFootUp",
+    "pelvisSeatContact",
+    "backCarryAnchor"
+  ],
+  "anchors": [
+    {
+      "anchorId": "headGazeOrigin",
+      "sourceJointId": "head",
+      "sourceFrame": "head-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "worldPosition": [
+        0,
+        1.7150000000000003,
+        0.095
+      ],
+      "worldDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "gaze-origin",
+        "motion-goal"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "headGazeTarget",
+      "sourceJointId": "head",
+      "sourceFrame": "head-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "worldPosition": [
+        0,
+        1.7150000000000003,
+        2.095
+      ],
+      "worldDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "gaze-target",
+        "motion-goal"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "chestFacing",
+      "sourceJointId": "upperChest",
+      "sourceFrame": "upper-chest-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "worldPosition": [
+        0,
+        1.34,
+        0.0020000000000000018
+      ],
+      "worldDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "facing",
+        "carry-planning"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "pelvisFacing",
+      "sourceJointId": "hips",
+      "sourceFrame": "pelvis-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "worldPosition": [
+        0,
+        0.93,
+        0.016
+      ],
+      "worldDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "facing",
+        "balance"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "twoHandCarryCenter",
+      "sourceJointId": "upperChest",
+      "sourceFrame": "world-derived-two-hand",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        0,
+        1.3166806057029525,
+        0.024000000000000007
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "carry-target",
+        "ik-target"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "chestCarryAnchor",
+      "sourceJointId": "upperChest",
+      "sourceFrame": "upper-chest-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        0,
+        1.3,
+        0.202
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "carry-target",
+        "ik-target"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftPalmCenter",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame+virtual-hand-end-measurement",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        -0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "palm-frame",
+        "salute",
+        "grasp",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftPalmNormal",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "worldPosition": [
+        -0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "worldDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "palm-normal",
+        "salute",
+        "grasp"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftPalmUp",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        1,
+        0
+      ],
+      "worldPosition": [
+        -0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "worldDirection": [
+        0,
+        1,
+        0
+      ],
+      "capabilities": [
+        "palm-up",
+        "salute",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftThumbSide",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        -1,
+        0,
+        0
+      ],
+      "worldPosition": [
+        -0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "worldDirection": [
+        -1,
+        0,
+        0
+      ],
+      "capabilities": [
+        "thumb-side",
+        "grasp"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftGripCenter",
+      "sourceJointId": "leftHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        -0.7993947687209304,
+        1.3166806057029525,
+        0.024000000000000007
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "ik-target",
+        "object-target",
+        "grasp",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": false,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightPalmCenter",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame+virtual-hand-end-measurement",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "palm-frame",
+        "salute",
+        "grasp",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightPalmNormal",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "worldPosition": [
+        0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "worldDirection": [
+        0,
+        0,
+        1
+      ],
+      "capabilities": [
+        "palm-normal",
+        "salute",
+        "grasp"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightPalmUp",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        1,
+        0
+      ],
+      "worldPosition": [
+        0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "worldDirection": [
+        0,
+        1,
+        0
+      ],
+      "capabilities": [
+        "palm-up",
+        "salute",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightThumbSide",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        1,
+        0,
+        0
+      ],
+      "worldPosition": [
+        0.7993947687209304,
+        1.3286806057029525,
+        -0.000999999999999994
+      ],
+      "worldDirection": [
+        1,
+        0,
+        0
+      ],
+      "capabilities": [
+        "thumb-side",
+        "grasp"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightGripCenter",
+      "sourceJointId": "rightHand",
+      "sourceFrame": "hand-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        0.7993947687209304,
+        1.3166806057029525,
+        0.024000000000000007
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "ik-target",
+        "object-target",
+        "grasp",
+        "carry"
+      ],
+      "supported": true,
+      "measurementOnly": false,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftHeelContact",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        -0.16,
+        0.030000000000000096,
+        -0.077
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "heel-strike",
+        "contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftSoleCenter",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        -0.16832,
+        0.03520000000000009,
+        0.025440000000000004
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "foot-plant",
+        "contact",
+        "support"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftToeContact",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        -0.176,
+        0.04000000000000009,
+        0.12
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "toe-off",
+        "contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftFootForward",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "worldPosition": [
+        -0.16832,
+        0.03520000000000009,
+        0.025440000000000004
+      ],
+      "worldDirection": [
+        -0.08095171768679042,
+        0,
+        0.996718024018608
+      ],
+      "capabilities": [
+        "foot-forward",
+        "locomotion"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "leftFootUp",
+      "sourceJointId": "leftFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        1,
+        0
+      ],
+      "worldPosition": [
+        -0.16832,
+        0.03520000000000009,
+        0.025440000000000004
+      ],
+      "worldDirection": [
+        0,
+        1,
+        0
+      ],
+      "capabilities": [
+        "foot-up",
+        "ground-normal"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightHeelContact",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        0.16,
+        0.030000000000000096,
+        -0.077
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "heel-strike",
+        "contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightSoleCenter",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        0.16832,
+        0.03520000000000009,
+        0.025440000000000004
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "foot-plant",
+        "contact",
+        "support"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightToeContact",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        0.176,
+        0.04000000000000009,
+        0.12
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "toe-off",
+        "contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightFootForward",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        0,
+        1
+      ],
+      "worldPosition": [
+        0.16832,
+        0.03520000000000009,
+        0.025440000000000004
+      ],
+      "worldDirection": [
+        0.08095171768679042,
+        0,
+        0.996718024018608
+      ],
+      "capabilities": [
+        "foot-forward",
+        "locomotion"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "rightFootUp",
+      "sourceJointId": "rightFoot",
+      "sourceFrame": "foot-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": [
+        0,
+        1,
+        0
+      ],
+      "worldPosition": [
+        0.16832,
+        0.03520000000000009,
+        0.025440000000000004
+      ],
+      "worldDirection": [
+        0,
+        1,
+        0
+      ],
+      "capabilities": [
+        "foot-up",
+        "ground-normal"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "pelvisSeatContact",
+      "sourceJointId": "hips",
+      "sourceFrame": "pelvis-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        0,
+        0.81,
+        -0.064
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "sit-contact"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    },
+    {
+      "anchorId": "backCarryAnchor",
+      "sourceJointId": "chest",
+      "sourceFrame": "chest-frame",
+      "localOffset": [
+        0,
+        0,
+        0
+      ],
+      "localDirection": null,
+      "worldPosition": [
+        0,
+        1.215,
+        -0.139
+      ],
+      "worldDirection": null,
+      "capabilities": [
+        "carry-target",
+        "ik-target"
+      ],
+      "supported": true,
+      "measurementOnly": true,
+      "drivesSkin": false,
+      "drivesPose": false
+    }
+  ],
+  "scenarios": [
+    {
+      "poseId": "reference-t",
+      "metrics": {
+        "anchorCount": 28,
+        "nonFiniteAnchorCount": 0,
+        "missingRequiredAnchorCount": 0,
+        "missingRequiredAnchorIds": [],
+        "maximumAnchorSymmetryError": 0,
+        "palmFrameDeterminant": 1,
+        "footFrameDeterminant": 1.0000000000000002,
+        "palmFrames": {
+          "left": {
+            "determinant": 1,
+            "rawSemanticHandedness": -1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 0,
+            "palmCenter": [
+              -0.7993947687209304,
+              1.3286806057029525,
+              -0.000999999999999994
+            ],
+            "gripCenter": [
+              -0.7993947687209304,
+              1.3166806057029525,
+              0.024000000000000007
+            ]
+          },
+          "right": {
+            "determinant": 1,
+            "rawSemanticHandedness": 1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 0,
+            "palmCenter": [
+              0.7993947687209304,
+              1.3286806057029525,
+              -0.000999999999999994
+            ],
+            "gripCenter": [
+              0.7993947687209304,
+              1.3166806057029525,
+              0.024000000000000007
+            ]
+          }
+        },
+        "footFrames": {
+          "left": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          },
+          "right": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "poseId": "reference-a",
+      "metrics": {
+        "anchorCount": 28,
+        "nonFiniteAnchorCount": 0,
+        "missingRequiredAnchorCount": 0,
+        "missingRequiredAnchorIds": [],
+        "maximumAnchorSymmetryError": 0,
+        "palmFrameDeterminant": 1,
+        "footFrameDeterminant": 1.0000000000000002,
+        "palmFrames": {
+          "left": {
+            "determinant": 1,
+            "rawSemanticHandedness": -1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 1.1611805267319752e-16,
+            "palmCenter": [
+              -0.6928039296909876,
+              0.9920720754756079,
+              0.030325009955716343
+            ],
+            "gripCenter": [
+              -0.6846219303486315,
+              0.9826407512091511,
+              0.05508596731488614
+            ]
+          },
+          "right": {
+            "determinant": 1,
+            "rawSemanticHandedness": 1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 1.1611805267319752e-16,
+            "palmCenter": [
+              0.6928039296909876,
+              0.9920720754756079,
+              0.030325009955716343
+            ],
+            "gripCenter": [
+              0.6846219303486315,
+              0.9826407512091511,
+              0.05508596731488614
+            ]
+          }
+        },
+        "footFrames": {
+          "left": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          },
+          "right": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "poseId": "locomotion-neutral",
+      "metrics": {
+        "anchorCount": 28,
+        "nonFiniteAnchorCount": 0,
+        "missingRequiredAnchorCount": 0,
+        "missingRequiredAnchorIds": [],
+        "maximumAnchorSymmetryError": 0,
+        "palmFrameDeterminant": 1,
+        "footFrameDeterminant": 1.0000000000000002,
+        "palmFrames": {
+          "left": {
+            "determinant": 1,
+            "rawSemanticHandedness": -1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 0,
+            "palmCenter": [
+              -0.2534465636479895,
+              0.7400877833344935,
+              -0.016999999999999994
+            ],
+            "gripCenter": [
+              -0.24156334682309066,
+              0.7384177061229728,
+              0.008000000000000007
+            ]
+          },
+          "right": {
+            "determinant": 1,
+            "rawSemanticHandedness": 1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 0,
+            "palmCenter": [
+              0.2534465636479895,
+              0.7400877833344935,
+              -0.016999999999999994
+            ],
+            "gripCenter": [
+              0.24156334682309066,
+              0.7384177061229728,
+              0.008000000000000007
+            ]
+          }
+        },
+        "footFrames": {
+          "left": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          },
+          "right": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "poseId": "walk-left-support",
+      "metrics": {
+        "anchorCount": 28,
+        "nonFiniteAnchorCount": 0,
+        "missingRequiredAnchorCount": 0,
+        "missingRequiredAnchorIds": [],
+        "maximumAnchorSymmetryError": 0.5611490525518764,
+        "palmFrameDeterminant": 0.9999999999999998,
+        "footFrameDeterminant": 1.0000000000000002,
+        "palmFrames": {
+          "left": {
+            "determinant": 0.9999999999999999,
+            "rawSemanticHandedness": -1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 1.004437079842567e-16,
+            "palmCenter": [
+              -0.2651486152922472,
+              0.7400978975141701,
+              0.30211255137750087
+            ],
+            "gripCenter": [
+              -0.2532731067254388,
+              0.7383064748714954,
+              0.32710781295234687
+            ]
+          },
+          "right": {
+            "determinant": 0.9999999999999998,
+            "rawSemanticHandedness": 1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 5.885777840585957e-17,
+            "palmCenter": [
+              0.24174448789650932,
+              0.74009789751417,
+              0.3022688829815251
+            ],
+            "gripCenter": [
+              0.2298535639438228,
+              0.7383064748714953,
+              0.32725681471800017
+            ]
+          }
+        },
+        "footFrames": {
+          "left": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.52,
+            "groundNormalCompatibility": 1
+          },
+          "right": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 1.3877787807814457e-17,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.52,
+            "groundNormalCompatibility": 0.9967848145069068
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "poseId": "walk-right-support",
+      "metrics": {
+        "anchorCount": 28,
+        "nonFiniteAnchorCount": 0,
+        "missingRequiredAnchorCount": 0,
+        "missingRequiredAnchorIds": [],
+        "maximumAnchorSymmetryError": 0.04987014488552346,
+        "palmFrameDeterminant": 1,
+        "footFrameDeterminant": 1,
+        "palmFrames": {
+          "left": {
+            "determinant": 1,
+            "rawSemanticHandedness": -1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 8.130923370578205e-17,
+            "palmCenter": [
+              -0.2285273158512339,
+              0.740128229059948,
+              -0.011083714344018893
+            ],
+            "gripCenter": [
+              -0.21662867351026177,
+              0.7387009254157236,
+              0.013923986764815747
+            ]
+          },
+          "right": {
+            "determinant": 1,
+            "rawSemanticHandedness": 1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 7.714776083592167e-17,
+            "palmCenter": [
+              0.27836571504167157,
+              0.740128229059948,
+              -0.011396335683454207
+            ],
+            "gripCenter": [
+              0.2664979282528466,
+              0.7387009254157236,
+              0.013626023139050439
+            ]
+          }
+        },
+        "footFrames": {
+          "left": {
+            "determinant": 1,
+            "maximumOrthogonalityError": 1.3877787807814457e-17,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.52,
+            "groundNormalCompatibility": 0.9969337415640409
+          },
+          "right": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "poseId": "turn-mid",
+      "metrics": {
+        "anchorCount": 28,
+        "nonFiniteAnchorCount": 0,
+        "missingRequiredAnchorCount": 0,
+        "missingRequiredAnchorIds": [],
+        "maximumAnchorSymmetryError": 0.5212027356975645,
+        "palmFrameDeterminant": 0.9999999999999999,
+        "footFrameDeterminant": 1,
+        "palmFrames": {
+          "left": {
+            "determinant": 0.9999999999999999,
+            "rawSemanticHandedness": -1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 1.1102230246251565e-16,
+            "palmCenter": [
+              0.04618061631338121,
+              0.7426177766983286,
+              -0.2821541223969803
+            ],
+            "gripCenter": [
+              0.022220950403139057,
+              0.7390346789095068,
+              -0.2686598339864964
+            ]
+          },
+          "right": {
+            "determinant": 1.0000000000000002,
+            "rawSemanticHandedness": 1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 9.71445146547012e-17,
+            "palmCenter": [
+              0.07964190591835146,
+              0.7426177766983287,
+              0.22363336716545473
+            ],
+            "gripCenter": [
+              0.05411335797675197,
+              0.7390346789095069,
+              0.2134130613858219
+            ]
+          }
+        },
+        "footFrames": {
+          "left": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 3.908315336409662e-18,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          },
+          "right": {
+            "determinant": 1,
+            "maximumOrthogonalityError": 1.3877787807814457e-17,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.52,
+            "groundNormalCompatibility": 0.9941185592021325
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "poseId": "salute-ready",
+      "metrics": {
+        "anchorCount": 28,
+        "nonFiniteAnchorCount": 0,
+        "missingRequiredAnchorCount": 0,
+        "missingRequiredAnchorIds": [],
+        "maximumAnchorSymmetryError": 0,
+        "palmFrameDeterminant": 1,
+        "footFrameDeterminant": 1.0000000000000002,
+        "palmFrames": {
+          "left": {
+            "determinant": 1,
+            "rawSemanticHandedness": -1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 0,
+            "palmCenter": [
+              -0.2534465636479895,
+              0.7400877833344935,
+              -0.016999999999999994
+            ],
+            "gripCenter": [
+              -0.24156334682309066,
+              0.7384177061229728,
+              0.008000000000000007
+            ]
+          },
+          "right": {
+            "determinant": 1,
+            "rawSemanticHandedness": 1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 0,
+            "palmCenter": [
+              0.2534465636479895,
+              0.7400877833344935,
+              -0.016999999999999994
+            ],
+            "gripCenter": [
+              0.24156334682309066,
+              0.7384177061229728,
+              0.008000000000000007
+            ]
+          }
+        },
+        "footFrames": {
+          "left": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          },
+          "right": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.5199999999999999,
+            "groundNormalCompatibility": 1
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "poseId": "jump-preload",
+      "metrics": {
+        "anchorCount": 28,
+        "nonFiniteAnchorCount": 0,
+        "missingRequiredAnchorCount": 0,
+        "missingRequiredAnchorIds": [],
+        "maximumAnchorSymmetryError": 0,
+        "palmFrameDeterminant": 1,
+        "footFrameDeterminant": 1.0000000000000002,
+        "palmFrames": {
+          "left": {
+            "determinant": 1,
+            "rawSemanticHandedness": -1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 0,
+            "palmCenter": [
+              -0.7993947687209304,
+              1.3286806057029525,
+              -0.036
+            ],
+            "gripCenter": [
+              -0.7993947687209304,
+              1.3166806057029525,
+              -0.010999999999999996
+            ]
+          },
+          "right": {
+            "determinant": 1,
+            "rawSemanticHandedness": 1,
+            "mirrorNormalized": true,
+            "maximumOrthogonalityError": 0,
+            "palmCenter": [
+              0.7993947687209304,
+              1.3286806057029525,
+              -0.036
+            ],
+            "gripCenter": [
+              0.7993947687209304,
+              1.3166806057029525,
+              -0.010999999999999996
+            ]
+          }
+        },
+        "footFrames": {
+          "left": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.52,
+            "groundNormalCompatibility": 1
+          },
+          "right": {
+            "determinant": 1.0000000000000002,
+            "maximumOrthogonalityError": 0,
+            "heelSoleToeOrderPassed": true,
+            "soleInterpolationRatio": 0.52,
+            "groundNormalCompatibility": 1
+          }
+        },
+        "passed": true
+      }
+    }
+  ],
+  "gates": {
+    "maximumAnchorSymmetryError": 0,
+    "nonFiniteAnchorCount": 0,
+    "missingRequiredAnchorCount": 0,
+    "palmFrameDeterminant": 0.9999999999999998,
+    "footFrameDeterminant": 1
+  },
+  "passed": true
+}
