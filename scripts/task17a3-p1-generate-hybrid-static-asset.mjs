@@ -44,9 +44,12 @@ await emitJson(materialProfilePath, materialProfile);
 await emit(glbPath, encoded.glb);
 
 const receipt = {
-  schema: 'humanoid_rig/hybrid_static_asset_receipt@1',
+  schema: 'humanoid_rig/hybrid_static_asset_receipt@1.1',
   assetId: source.assetId,
-  sourceStartCommit: 'c81a458d8526c6df9129b0c201abd46db1fccdda',
+  sourceStartCommit: '28c12417b171f53de94dd2e41bd2febc411e6e60',
+  refinementRevision: source.refinementRevision,
+  userReviewBaseline: source.userReviewBaseline,
+  refinedModules: ['head', 'neck', 'thorax', 'pelvis', 'leftClavicle', 'rightClavicle', 'leftScapula', 'rightScapula', 'leftHand', 'rightHand', 'leftFoot', 'rightFoot'],
   humanRigCoreReferenceCommit: source.sourceCommit,
   coreRigFingerprint: source.coreRigFingerprint,
   pose: source.pose,
@@ -100,7 +103,7 @@ await emitJson(path.join(artifactRoot, 'visual-review-status.json'), visualRevie
 await emit(reviewPath, createReviewHtml(fullViews, closeupSvgs, receipt, visualReview));
 
 const manifest = {
-  schema: 'humanoid_rig/task17a3_p1_static_generation_manifest@1',
+  schema: 'humanoid_rig/task17a3_p1_1_static_refinement_manifest@1',
   deterministic: true,
   generatedAt: 'deterministic-no-timestamp',
   sourceStartCommit: receipt.sourceStartCommit,
@@ -124,7 +127,7 @@ function createModuleProfile(assetSource) {
   const descriptions = {
     head: ['ellipsoid cranium', 'jaw wedge', 'neck-root connector', 'gaze direction frame'],
     neck: ['dual waisted neck links', 'neck-root interface'],
-    thorax: ['upper thorax ring', 'lower thorax ring', 'sternum beam', 'back beam', 'bilateral shoulder sockets'],
+    thorax: ['upper thorax arch', 'lower thorax arch', 'side depth returns', 'sternum bridge', 'back beam', 'bilateral shoulder sockets'],
     pelvis: ['left iliac wing', 'right iliac wing', 'central sacrum bridge', 'bilateral hip sockets', 'forward marker'],
     leftClavicle: ['left clavicle arc', 'left shoulder joint ball'], rightClavicle: ['right clavicle arc', 'right shoulder joint ball'],
     leftScapula: ['left back-facing scapula plate', 'left proximal upper-arm interface'], rightScapula: ['right back-facing scapula plate', 'right proximal upper-arm interface'],
@@ -138,6 +141,7 @@ function createModuleProfile(assetSource) {
   return {
     schema: 'humanoid_rig/hybrid_static_module_profile@1',
     assetId: assetSource.assetId,
+    refinementRevision: assetSource.refinementRevision,
     moduleCount: assetSource.modules.length,
     fixedVertexAndIndexData: true,
     disconnectedModulesAllowed: true,
@@ -196,12 +200,25 @@ function createVisualReviewStatus() {
     'heel_and_arch_clear', 'forefoot_and_toe_clear', 'front_lines_not_overcrowded', 'side_structure_not_collapsed_to_single_line', 'three_quarter_view_expresses_depth',
     'overall_proportions_coordinated', 'valuable_to_connect_dynamic_final_pose_in_future',
   ];
-  return { schema: 'humanoid_rig/hybrid_static_visual_review@1', userReviewRequired: true, codexMayNotMarkPass: true, summary: { total: items.length, pending_user_review: items.length, passed: 0, failed: 0 }, items: items.map((item, index) => ({ index: index + 1, item, status: 'pending_user_review' })) };
+  const refinementFocus = [
+    'palm_plate_and_thumb_side_clear', 'thorax_front_clear', 'pelvis_bilateral_structure_clear', 'scapulae_clear_from_back',
+    'forefoot_and_toe_clear', 'front_lines_not_overcrowded', 'overall_proportions_coordinated', 'valuable_to_connect_dynamic_final_pose_in_future',
+  ];
+  return {
+    schema: 'humanoid_rig/hybrid_static_visual_review@1.1',
+    previousUserReviewResult: 'P1_VISUAL_PARTIAL_PASS',
+    refinementRevision: 'P1.1',
+    userReviewRequired: true,
+    codexMayNotMarkPass: true,
+    summary: { total: items.length, pending_user_review: items.length, passed: 0, failed: 0 },
+    refinementFocus: refinementFocus.map((item, index) => ({ index: index + 1, item, status: 'pending_user_review' })),
+    items: items.map((item, index) => ({ index: index + 1, item, status: 'pending_user_review' })),
+  };
 }
 
 function createContactSheet(fullRasters, closeupRasters, stats) {
   const sheet = new Raster(2000, 2520, '#071018');
-  drawText(sheet, 34, 24, 'HRL HYBRID PRODUCTION SKELETON STATIC V1', '#eef8f5', 4);
+  drawText(sheet, 34, 24, 'HRL HYBRID PRODUCTION SKELETON STATIC V1  P1.1 REFINED', '#eef8f5', 3);
   drawText(sheet, 34, 62, `REFERENCE T  20 JOINTS  19 SEGMENTS  ${stats.vertexCount} VERTICES  ${stats.triangleCount} TRIANGLES`, '#e99c38', 2);
   const fullNames = ['front', 'side', 'back', 'three-quarter'];
   for (let index = 0; index < fullNames.length; index += 1) {
@@ -227,12 +244,12 @@ function createReviewHtml(fullViews, closeupSvgs, receipt, visualReview) {
   const viewCards = [...fullViews.entries()].map(([name, svg]) => `<figure><figcaption>${escapeHtml(name)}</figcaption>${inlineSvg(svg)}</figure>`).join('\n');
   const closeupCards = [...closeupSvgs.entries()].map(([name, svg]) => `<figure><figcaption>${escapeHtml(name)}</figcaption>${inlineSvg(svg)}</figure>`).join('\n');
   const gateItems = visualReview.items.map((item) => `<li><span>${item.index}. ${escapeHtml(item.item)}</span><strong>${item.status}</strong></li>`).join('\n');
-  return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>HRL Hybrid Production Skeleton Static V1 Review</title>\n<style>\n:root{color-scheme:dark;background:#071018;color:#e8f1ef;font-family:Inter,Segoe UI,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;padding:28px;background:#071018}header{max-width:1500px;margin:auto}h1{margin:0 0 8px;font-size:28px}.notice{color:#efb04b}.stats{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}.stats span{padding:8px 12px;border:1px solid #31505c;border-radius:8px;background:#0c1d26}section{max-width:1500px;margin:26px auto}h2{font-size:18px;color:#79d9cf}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}figure{margin:0;border:1px solid #294754;border-radius:10px;background:#0a1821;overflow:hidden}figcaption{padding:10px 14px;color:#efb04b;font-weight:700;text-transform:uppercase}figure svg{display:block;width:100%;height:auto}ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:8px}li{display:flex;justify-content:space-between;gap:14px;padding:9px 12px;background:#0c1d26;border:1px solid #243f4b;border-radius:7px}li strong{color:#efb04b;white-space:nowrap}footer{max-width:1500px;margin:28px auto;color:#92a8af}\n</style>\n</head>\n<body>\n<header><h1>HRL Hybrid Production Skeleton Static V1</h1><p class="notice">Candidate B selected for detailed static direction. Visual acceptance remains a user decision.</p><div class="stats"><span>Reference T</span><span>20 Core joints</span><span>19 Core segments</span><span>${receipt.glb.vertexCount} vertices</span><span>${receipt.glb.triangleCount} triangles</span><span>${receipt.glb.meshCount} meshes</span><span>${receipt.glb.materialCount} materials</span></div></header>\n<section><h2>Full-body orthographic views</h2><div class="grid">${viewCards}</div></section>\n<section><h2>Structural close-ups</h2><div class="grid">${closeupCards}</div></section>\n<section><h2>Visual gates</h2><ul>${gateItems}</ul></section>\n<footer>Single-file static review · embedded SVG only · no scripts · no network dependency · GLB is a display cache, not pose authority.</footer>\n</body>\n</html>\n`;
+  return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>HRL Hybrid Production Skeleton Static V1 P1.1 Refined Review</title>\n<style>\n:root{color-scheme:dark;background:#071018;color:#e8f1ef;font-family:Inter,Segoe UI,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;padding:28px;background:#071018}header{max-width:1500px;margin:auto}h1{margin:0 0 8px;font-size:28px}.notice{color:#efb04b}.stats{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}.stats span{padding:8px 12px;border:1px solid #31505c;border-radius:8px;background:#0c1d26}section{max-width:1500px;margin:26px auto}h2{font-size:18px;color:#79d9cf}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}figure{margin:0;border:1px solid #294754;border-radius:10px;background:#0a1821;overflow:hidden}figcaption{padding:10px 14px;color:#efb04b;font-weight:700;text-transform:uppercase}figure svg{display:block;width:100%;height:auto}ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:8px}li{display:flex;justify-content:space-between;gap:14px;padding:9px 12px;background:#0c1d26;border:1px solid #243f4b;border-radius:7px}li strong{color:#efb04b;white-space:nowrap}footer{max-width:1500px;margin:28px auto;color:#92a8af}\n</style>\n</head>\n<body>\n<header><h1>HRL Hybrid Production Skeleton Static V1 · P1.1 Refinement</h1><p class="notice">Previous result: P1_VISUAL_PARTIAL_PASS. Static proportions and structures were refined; all visual gates still require user review.</p><div class="stats"><span>Reference T</span><span>20 Core joints</span><span>19 Core segments</span><span>${receipt.glb.vertexCount} vertices</span><span>${receipt.glb.triangleCount} triangles</span><span>${receipt.glb.meshCount} meshes</span><span>${receipt.glb.materialCount} materials</span></div></header>\n<section><h2>Full-body orthographic views</h2><div class="grid">${viewCards}</div></section>\n<section><h2>Structural close-ups</h2><div class="grid">${closeupCards}</div></section>\n<section><h2>Visual gates — pending user review</h2><ul>${gateItems}</ul></section>\n<footer>Single-file static review · embedded SVG only · no scripts · no network dependency · GLB is a display cache, not pose authority.</footer>\n</body>\n</html>\n`;
 }
 
 async function validateOutputs(receiptValue, gate, review, manifestValue) {
   if (!gate.passed) throw new Error('Geometry gate failed.');
-  if (review.items.length !== 22 || review.items.some((item) => item.status !== 'pending_user_review')) throw new Error('Visual review status contract failed.');
+  if (review.items.length !== 22 || review.refinementFocus.length !== 8 || review.items.some((item) => item.status !== 'pending_user_review') || review.refinementFocus.some((item) => item.status !== 'pending_user_review')) throw new Error('Visual review status contract failed.');
   if (source.joints.length !== 20 || source.segments.length !== 19 || source.modules.length !== 24) throw new Error('Core or module count mismatch.');
   if (receiptValue.glb.externalUriCount !== 0 || receiptValue.glb.meshCount !== 24 || receiptValue.glb.materialCount !== 6) throw new Error('GLB cache contract failed.');
   if (generated.length !== 26 || manifestValue.generatedFileCount !== 27) throw new Error(`Generated file count mismatch: tracked=${generated.length}, manifest=${manifestValue.generatedFileCount}`);
@@ -276,7 +293,7 @@ function closeupSpecs() {
     { name: 'shoulder-front-closeup', view: 'front', viewport: { worldCenter: [0.14, 1.355, 0], orthographicWidthMeters: 0.64, orthographicHeightMeters: 0.55 } },
     { name: 'scapula-back-closeup', view: 'back', viewport: { worldCenter: [0.14, 1.34, 0.07], orthographicWidthMeters: 0.64, orthographicHeightMeters: 0.55 } },
     { name: 'forearm-closeup', view: 'three-quarter', viewport: { worldCenter: [0.60, 1.329, 0], orthographicWidthMeters: 0.60, orthographicHeightMeters: 0.42 } },
-    { name: 'hand-closeup', view: 'three-quarter', viewport: { worldCenter: [0.78, 1.30, -0.03], orthographicWidthMeters: 0.42, orthographicHeightMeters: 0.40 } },
+    { name: 'hand-closeup', view: 'three-quarter', viewport: { worldCenter: [0.79, 1.30, -0.03], orthographicWidthMeters: 0.46, orthographicHeightMeters: 0.42 } },
     { name: 'lower-leg-closeup', view: 'three-quarter', viewport: { worldCenter: [0.135, 0.31, 0], orthographicWidthMeters: 0.48, orthographicHeightMeters: 0.68 } },
     { name: 'foot-side-closeup', view: 'side', viewport: { worldCenter: [0.16, 0.09, -0.10], orthographicWidthMeters: 0.48, orthographicHeightMeters: 0.40 } },
   ];

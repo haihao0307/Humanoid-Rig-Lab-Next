@@ -35,6 +35,9 @@ export function createHybridStaticAssetSource() {
     displayName: 'HRL Hybrid Production Skeleton Static V1',
     sourceCommit: snapshot.source.baselineCommit,
     p0SelectionCommit: 'c81a458d8526c6df9129b0c201abd46db1fccdda',
+    refinementBaseCommit: '28c12417b171f53de94dd2e41bd2febc411e6e60',
+    refinementRevision: 'P1.1',
+    userReviewBaseline: 'P1_VISUAL_PARTIAL_PASS',
     candidateSelection: 'HYBRID_PRODUCTION',
     pose: snapshot.source.referencePose,
     coreRigFingerprint: snapshot.source.coreRigFingerprint,
@@ -52,44 +55,48 @@ export function createHybridStaticAssetSource() {
 function createHeadModule(joint) {
   const module = createModule('head', ['neck', 'head']);
   const shell = part(module, 'bonePrimary');
-  appendEllipsoid(shell, [0, 1.69, 0.055], [0.108, 0.132, 0.098], 14, 8);
-  appendFrustum(shell, [0, 1.585, 0.044], [0.085, 0.055, 0.078], [0.058, 0.050, 0.060]);
+  appendEllipsoid(shell, [0, 1.685, 0.055], [0.098, 0.120, 0.089], 14, 8);
+  appendFrustum(shell, [0, 1.590, 0.044], [0.070, 0.048, 0.062], [0.047, 0.041, 0.047]);
   const frame = part(module, 'directionCyan');
-  const z = -0.072;
-  appendCylinderBetween(frame, [-0.072, 1.625, z], [0.072, 1.625, z], 0.0055, 6);
-  appendCylinderBetween(frame, [0.072, 1.625, z], [0.072, 1.705, z], 0.0055, 6);
-  appendCylinderBetween(frame, [0.072, 1.705, z], [-0.072, 1.705, z], 0.0055, 6);
-  appendCylinderBetween(frame, [-0.072, 1.705, z], [-0.072, 1.625, z], 0.0055, 6);
-  appendCylinderBetween(frame, [0, 1.665, z], [0, 1.665, -0.135], 0.006, 6);
-  appendCone(frame, [0, 1.665, -0.135], [0, 1.665, -0.170], 0.020, 7);
+  const z = -0.050;
+  appendCylinderBetween(frame, [-0.055, 1.632, z], [0.055, 1.632, z], 0.0042, 6);
+  appendCylinderBetween(frame, [0.055, 1.632, z], [0.055, 1.694, z], 0.0042, 6);
+  appendCylinderBetween(frame, [0.055, 1.694, z], [-0.055, 1.694, z], 0.0042, 6);
+  appendCylinderBetween(frame, [-0.055, 1.694, z], [-0.055, 1.632, z], 0.0042, 6);
+  appendCylinderBetween(frame, [0, 1.663, z], [0, 1.663, -0.092], 0.0042, 6);
+  appendCone(frame, [0, 1.663, -0.092], [0, 1.663, -0.115], 0.011, 7);
   const connector = part(module, 'structureWarm');
-  appendCylinderBetween(connector, joint.get('head'), [0, 1.585, 0.044], 0.033, 8);
+  appendCylinderBetween(connector, joint.get('head'), [0, 1.592, 0.044], 0.024, 8);
   return module;
 }
 
 function createNeckModule(joint) {
   const module = createModule('neck', ['upperChest', 'neck', 'head']);
   const primary = part(module, 'boneSecondary');
-  appendWaistedBone(primary, joint.get('upperChest'), joint.get('neck'), [0.041, 0.033, 0.037], 8);
-  appendWaistedBone(primary, joint.get('neck'), joint.get('head'), [0.037, 0.029, 0.034], 8);
+  appendWaistedBone(primary, joint.get('upperChest'), joint.get('neck'), [0.035, 0.027, 0.031], 8);
+  appendWaistedBone(primary, joint.get('neck'), joint.get('head'), [0.032, 0.025, 0.029], 8);
   const root = part(module, 'structureWarm');
-  appendEllipsoid(root, joint.get('neck'), [0.050, 0.028, 0.045], 10, 5);
+  appendEllipsoid(root, joint.get('neck'), [0.036, 0.020, 0.033], 10, 5);
   return module;
 }
 
 function createThoraxModule(joint) {
   const module = createModule('thorax', ['spine', 'chest', 'upperChest', 'leftShoulder', 'rightShoulder']);
-  const rings = part(module, 'bonePrimary');
-  appendTubePath(rings, ellipsePath([0, 1.345, 0.012], 0.205, 0.105, 24), 0.012, 6, true);
-  appendTubePath(rings, ellipsePath([0, 1.205, 0.020], 0.165, 0.082, 24), 0.011, 6, true);
+  const arches = part(module, 'bonePrimary');
+  appendTubePath(arches, thoraxArch(1.325, 0.195, 0.058, -0.078, 10), 0.011, 6, false);
+  appendTubePath(arches, thoraxArch(1.205, 0.158, 0.032, -0.066, 9), 0.010, 6, false);
+  const depth = part(module, 'boneSecondary');
+  appendTubePath(depth, [[-0.195, 1.325, -0.053], [-0.185, 1.338, 0.020], [-0.165, 1.330, 0.092]], 0.008, 6, false);
+  appendTubePath(depth, [[0.195, 1.325, -0.053], [0.185, 1.338, 0.020], [0.165, 1.330, 0.092]], 0.008, 6, false);
+  appendTubePath(depth, [[-0.158, 1.205, -0.048], [-0.150, 1.215, 0.015], [-0.137, 1.205, 0.075]], 0.0075, 6, false);
+  appendTubePath(depth, [[0.158, 1.205, -0.048], [0.150, 1.215, 0.015], [0.137, 1.205, 0.075]], 0.0075, 6, false);
   const front = part(module, 'structureWarm');
-  appendCylinderBetween(front, [0, 1.19, -0.070], [0, 1.365, -0.094], 0.012, 7);
-  appendCylinderBetween(front, [-0.055, 1.365, -0.085], [0.055, 1.365, -0.085], 0.009, 6);
+  appendCylinderBetween(front, [0, 1.205, -0.066], [0, 1.383, -0.078], 0.009, 7);
   const back = part(module, 'backStructure');
-  appendCylinderBetween(back, [0, 1.19, 0.082], [0, 1.365, 0.108], 0.014, 7);
+  appendCylinderBetween(back, [0, 1.205, 0.075], [0, 1.370, 0.105], 0.010, 7);
   const sockets = part(module, 'jointIvory');
-  appendEllipsoid(sockets, joint.get('leftShoulder'), [0.033, 0.033, 0.033], 10, 5);
-  appendEllipsoid(sockets, joint.get('rightShoulder'), [0.033, 0.033, 0.033], 10, 5);
+  appendEllipsoid(sockets, joint.get('leftShoulder'), [0.038, 0.038, 0.038], 10, 5);
+  appendEllipsoid(sockets, joint.get('rightShoulder'), [0.038, 0.038, 0.038], 10, 5);
   return module;
 }
 
@@ -98,14 +105,14 @@ function createPelvisModule(joint) {
   const wings = part(module, 'bonePrimary');
   appendWing(wings, -1);
   appendWing(wings, 1);
-  const sacrum = part(module, 'backStructure');
-  appendFrustum(sacrum, [0, 0.925, 0.075], [0.065, 0.105, 0.045], [0.045, 0.065, 0.035]);
-  appendCylinderBetween(sacrum, [-0.115, 0.945, 0.060], [0.115, 0.945, 0.060], 0.018, 8);
+  const sacrum = part(module, 'structureWarm');
+  appendFrustum(sacrum, [0, 0.925, 0.078], [0.052, 0.092, 0.040], [0.036, 0.060, 0.030]);
+  appendTubePath(sacrum, [[-0.105, 0.955, 0.058], [0, 0.992, 0.075], [0.105, 0.955, 0.058]], 0.014, 7, false);
   const sockets = part(module, 'jointIvory');
-  appendEllipsoid(sockets, joint.get('leftUpperLeg'), [0.041, 0.041, 0.041], 10, 5);
-  appendEllipsoid(sockets, joint.get('rightUpperLeg'), [0.041, 0.041, 0.041], 10, 5);
+  appendEllipsoid(sockets, joint.get('leftUpperLeg'), [0.045, 0.045, 0.045], 10, 5);
+  appendEllipsoid(sockets, joint.get('rightUpperLeg'), [0.045, 0.045, 0.045], 10, 5);
   const direction = part(module, 'directionCyan');
-  appendCone(direction, [0, 0.915, -0.090], [0, 0.915, -0.160], 0.030, 7);
+  appendCone(direction, [0, 0.915, -0.082], [0, 0.915, -0.135], 0.022, 7);
   return module;
 }
 
@@ -115,15 +122,15 @@ function createShoulderModules(joint, side) {
   const upperArm = joint.get(`${side}UpperArm`);
   const clavicle = createModule(`${side}Clavicle`, ['upperChest', `${side}Shoulder`]);
   appendTubePath(part(clavicle, 'structureWarm'), [
-    [sign * 0.035, 1.355, -0.020], [sign * 0.085, 1.390, -0.018], [sign * 0.140, 1.410, -0.004], shoulder,
-  ], 0.014, 7, false);
-  appendEllipsoid(part(clavicle, 'jointIvory'), shoulder, [0.034, 0.034, 0.034], 10, 5);
+    [sign * 0.020, 1.355, -0.026], [sign * 0.052, 1.382, -0.024], [sign * 0.082, 1.402, -0.010], shoulder,
+  ], 0.011, 7, false);
+  appendEllipsoid(part(clavicle, 'jointIvory'), shoulder, [0.038, 0.038, 0.038], 10, 5);
 
   const scapula = createModule(`${side}Scapula`, ['upperChest', `${side}Shoulder`]);
   appendExtrudedPlate(part(scapula, 'backStructure'), [
-    [sign * 0.070, 1.365, 0.094], [sign * 0.195, 1.392, 0.075], [sign * 0.170, 1.275, 0.088], [sign * 0.085, 1.255, 0.102],
-  ], 0.016);
-  appendCylinderBetween(part(scapula, 'boneSecondary'), shoulder, upperArm, 0.027, 8);
+    [sign * 0.065, 1.365, 0.125], [sign * 0.190, 1.392, 0.108], [sign * 0.166, 1.275, 0.118], [sign * 0.080, 1.255, 0.132],
+  ], 0.010);
+  appendCylinderBetween(part(scapula, 'boneSecondary'), shoulder, upperArm, 0.025, 8);
   return [clavicle, scapula];
 }
 
@@ -146,15 +153,15 @@ function createArmModules(joint, side) {
 
   const handModule = createModule(`${side}Hand`, [`${side}LowerArm`, `${side}Hand`]);
   const wrist = part(handModule, 'jointIvory');
-  appendCylinderBetween(wrist, add(hand, [sign * -0.010, 0, 0]), add(hand, [sign * 0.020, 0, 0]), 0.034, 8);
+  appendCylinderBetween(wrist, add(hand, [sign * -0.010, 0, 0]), add(hand, [sign * 0.025, 0, 0]), 0.037, 8);
   const palm = part(handModule, 'bonePrimary');
-  appendFrustum(palm, add(hand, [sign * 0.065, 0, 0]), [0.060, 0.040, 0.018], [0.045, 0.034, 0.014], side === 'left' ? 'x-' : 'x+');
+  appendFrustum(palm, add(hand, [sign * 0.075, 0, 0]), [0.072, 0.050, 0.022], [0.058, 0.043, 0.018], side === 'left' ? 'x-' : 'x+');
   const thumb = part(handModule, 'structureWarm');
-  appendCone(thumb, add(hand, [sign * 0.045, -0.022, -0.010]), add(hand, [sign * 0.095, -0.056, -0.018]), 0.014, 7);
+  appendFrustum(thumb, add(hand, [sign * 0.072, -0.052, -0.008]), [0.038, 0.018, 0.015], [0.026, 0.010, 0.010], side === 'left' ? 'x-' : 'x+');
   const grasp = part(handModule, 'directionCyan');
-  appendEllipsoid(grasp, add(hand, [sign * 0.065, 0, -0.010]), [0.014, 0.014, 0.014], 8, 4);
-  appendCylinderBetween(grasp, add(hand, [sign * 0.065, 0, -0.020]), add(hand, [sign * 0.065, 0, -0.075]), 0.005, 6);
-  appendCone(grasp, add(hand, [sign * 0.065, 0, -0.075]), add(hand, [sign * 0.065, 0, -0.105]), 0.014, 7);
+  appendEllipsoid(grasp, add(hand, [sign * 0.075, 0, -0.010]), [0.011, 0.011, 0.011], 8, 4);
+  appendCylinderBetween(grasp, add(hand, [sign * 0.075, 0, -0.022]), add(hand, [sign * 0.075, 0, -0.055]), 0.0038, 6);
+  appendCone(grasp, add(hand, [sign * 0.075, 0, -0.055]), add(hand, [sign * 0.075, 0, -0.076]), 0.0085, 7);
   return [upperArm, radius, ulna, handModule];
 }
 
@@ -176,18 +183,18 @@ function createLegModules(joint, side) {
 
   const footModule = createModule(`${side}Foot`, [`${side}LowerLeg`, `${side}Foot`]);
   const sole = part(footModule, 'backStructure');
-  appendBox(sole, [foot[0], 0.055, -0.080], [0.110, 0.018, 0.285]);
+  appendBox(sole, [foot[0], 0.052, -0.087], [0.100, 0.014, 0.270]);
   const heel = part(footModule, 'bonePrimary');
-  appendFrustum(heel, [foot[0], 0.086, 0.030], [0.055, 0.060, 0.070], [0.048, 0.045, 0.055]);
+  appendFrustum(heel, [foot[0], 0.080, 0.022], [0.046, 0.045, 0.055], [0.040, 0.034, 0.044]);
   const arch = part(footModule, 'boneSecondary');
-  appendTubePath(arch, [[foot[0], 0.090, 0.000], [foot[0], 0.110, -0.080], [foot[0], 0.082, -0.155]], 0.016, 7, false);
+  appendTubePath(arch, [[foot[0], 0.085, 0.000], [foot[0], 0.105, -0.082], [foot[0], 0.073, -0.155]], 0.014, 7, false);
   const forefoot = part(footModule, 'bonePrimary');
-  appendFrustum(forefoot, [foot[0], 0.078, -0.175], [0.066, 0.042, 0.075], [0.058, 0.030, 0.062]);
-  const toe = part(footModule, 'structureWarm');
-  appendFrustum(toe, [foot[0], 0.070, -0.245], [0.058, 0.025, 0.055], [0.045, 0.018, 0.038]);
+  appendFrustum(forefoot, [foot[0], 0.068, -0.175], [0.062, 0.030, 0.070], [0.054, 0.021, 0.058]);
+  const toe = part(footModule, 'boneSecondary');
+  appendFrustum(toe, [foot[0], 0.062, -0.238], [0.054, 0.021, 0.050], [0.043, 0.014, 0.033]);
   const direction = part(footModule, 'directionCyan');
-  appendCylinderBetween(direction, [foot[0], 0.060, -0.205], [foot[0], 0.060, -0.285], 0.0055, 6);
-  appendCone(direction, [foot[0], 0.060, -0.285], [foot[0], 0.060, -0.320], 0.016, 7);
+  appendCylinderBetween(direction, [foot[0], 0.056, -0.220], [foot[0], 0.056, -0.275], 0.0042, 6);
+  appendCone(direction, [foot[0], 0.056, -0.275], [foot[0], 0.056, -0.300], 0.010, 7);
   return [thigh, tibia, fibula, footModule];
 }
 
@@ -362,14 +369,21 @@ function appendExtrudedPlate(target, polygon, depth) {
 
 function appendWing(target, sign) {
   appendExtrudedPlate(target, [
-    [sign * 0.035, 1.015, 0.025], [sign * 0.175, 1.015, 0.030], [sign * 0.205, 0.945, 0.020], [sign * 0.145, 0.865, 0.005], [sign * 0.050, 0.885, 0.030],
-  ], 0.065);
+    [sign * 0.032, 1.005, 0.032], [sign * 0.118, 1.032, 0.038], [sign * 0.188, 0.970, 0.018], [sign * 0.178, 0.920, 0.004], [sign * 0.132, 0.872, 0.000], [sign * 0.046, 0.892, 0.034],
+  ], 0.052);
 }
 
 function ellipsePath(center, radiusX, radiusZ, segments) {
   return Array.from({ length: segments }, (_, index) => {
     const angle = index / segments * TAU;
     return [center[0] + Math.cos(angle) * radiusX, center[1], center[2] + Math.sin(angle) * radiusZ];
+  });
+}
+
+function thoraxArch(baseY, halfWidth, rise, frontZ, segments) {
+  return Array.from({ length: segments + 1 }, (_, index) => {
+    const unit = -1 + index / segments * 2;
+    return [unit * halfWidth, baseY + rise * (1 - unit * unit), frontZ + Math.abs(unit) * 0.025];
   });
 }
 

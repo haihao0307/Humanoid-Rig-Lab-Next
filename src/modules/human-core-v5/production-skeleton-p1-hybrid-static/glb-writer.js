@@ -53,7 +53,7 @@ export function encodeHybridStaticGlb(source, materials) {
 
   const binaryChunk = Buffer.concat(bufferParts);
   const gltf = {
-    asset: { version: '2.0', generator: 'Humanoid Rig Lab Next deterministic hybrid-static-v1 writer', copyright: 'Project-owned geometry' },
+    asset: { version: '2.0', generator: 'Humanoid Rig Lab Next deterministic hybrid-static-v1 P1.1 writer', copyright: 'Project-owned geometry' },
     scene: 0,
     scenes: [{ name: 'HRL Hybrid Production Skeleton Static V1', nodes: nodes.map((_, index) => index) }],
     nodes,
@@ -71,6 +71,9 @@ export function encodeHybridStaticGlb(source, materials) {
       assetId: source.assetId,
       sourceCommit: source.sourceCommit,
       p0SelectionCommit: source.p0SelectionCommit,
+      refinementBaseCommit: source.refinementBaseCommit,
+      refinementRevision: source.refinementRevision,
+      userReviewBaseline: source.userReviewBaseline,
       coreRigFingerprint: source.coreRigFingerprint,
       pose: source.pose,
       authoritativeForPose: false,
