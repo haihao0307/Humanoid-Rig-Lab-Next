@@ -1,7 +1,8 @@
 {
   "schema": "humanoid_rig/hybrid_skeleton_p2_review_ui_audit@1.0",
-  "baselineCommit": "df892641400c63cf146ba9a4feaeda79a033ddf8",
+  "baselineCommit": "e6ea131143a43bf261cac24c028b7c42f7269674",
   "result": "PASS_FILE_ONLY",
+  "auditScope": "static structure plus executable pure projection fixtures; not browser validation",
   "cameraChecks": {
     "orbitControls": true,
     "leftRotate": true,
@@ -19,6 +20,50 @@
     "noFinalPoseWrites": true,
     "noProjectStateWrites": true,
     "visibleHelp": true
+  },
+  "overlayProjectionChecks": {
+    "projectionReadyState": true,
+    "explicitActivation": true,
+    "publicReadyReceipt": true,
+    "finiteViewportGuard": true,
+    "cameraWorldMatrixUpdate": true,
+    "finiteCameraMatrices": true,
+    "finiteClipCoordinates": true,
+    "clipSpaceWEpsilon": true,
+    "cameraFrontGuard": true,
+    "finitePixelCoordinates": true,
+    "invalidLineHidden": true,
+    "invalidPointHidden": true,
+    "overlayRecovery": true,
+    "finiteViewBoxOrder": true
+  },
+  "overlayProjectionFixtures": {
+    "valid": [
+      100,
+      50
+    ],
+    "cameraBehind": null,
+    "nonFinitePosition": null,
+    "positiveInfinityPosition": null,
+    "negativeInfinityPosition": null,
+    "zeroViewport": null,
+    "singularClipW": null
+  },
+  "captureFailClosedChecks": {
+    "finiteOverlayAssertion": true,
+    "finiteViewBoxAssertion": true,
+    "visibleLineAssertion": true,
+    "visiblePointAssertion": true,
+    "consoleErrorsGate": true,
+    "pageErrorsGate": true,
+    "overlayGate": true,
+    "poseGate": true,
+    "sequenceStartGate": true,
+    "sequenceEndGate": true,
+    "failedRuntimeStatus": true,
+    "nonZeroExit": true,
+    "failureManifestWrittenFirst": true,
+    "successSummaryGuarded": true
   },
   "poseSourceChecks": {
     "nonReloadingHistory": true,
@@ -125,10 +170,22 @@
       "baselineSha256": "2f410a00462b48ab25d1aa05b5de23a7e80bbba2f19bfe92f1463a80614dd7e4",
       "currentSha256": "2f410a00462b48ab25d1aa05b5de23a7e80bbba2f19bfe92f1463a80614dd7e4",
       "unchanged": true
+    },
+    {
+      "path": "apps/human-core-v5-production-skeleton-p2-finalpose/p2-review-state-v1.js",
+      "baselineSha256": "6727a08e8d79ba02ad7e0469da67e8dbadd01bdbcd8d92af38ca178471f2c396",
+      "currentSha256": "6727a08e8d79ba02ad7e0469da67e8dbadd01bdbcd8d92af38ca178471f2c396",
+      "unchanged": true
+    },
+    {
+      "path": "human-core-v5-production-skeleton-p2-finalpose.html",
+      "baselineSha256": "849481327d50a5050b1b03d2f83f54c597829912433ecf3be78bcb287a77a3fe",
+      "currentSha256": "849481327d50a5050b1b03d2f83f54c597829912433ecf3be78bcb287a77a3fe",
+      "unchanged": true
     }
   ],
   "protectedFilesUnchanged": true,
   "browserOperationPerformed": false,
-  "mediaStatus": "pending_user_capture",
+  "mediaStatus": "pending_user_recapture",
   "captureCommand": "node scripts/capture-task17a3-p2-finalpose.mjs"
 }

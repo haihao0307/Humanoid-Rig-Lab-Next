@@ -19,6 +19,7 @@ import {
   isP2SequenceRequest,
   normalizeP2ReviewPoseId,
 } from './p2-review-state-v1.js';
+import { projectWorldPositionToViewportV1 } from './overlay-projection-v1.js';
 
 const ASSET_PATH = 'assets/human/production-skeleton-v2/hybrid-static-v1/hybrid-production-skeleton-static-v1.glb';
 const ASSET_URL = `./${ASSET_PATH}`;
@@ -59,6 +60,8 @@ const state = {
   metrics: null,
   maximumFrameToFrameModuleJump: 0,
   summaryPoseId: requestedSequence ? P2_SEQUENCE_POSE_ID : requestedPoseId,
+  reviewCameraInitialized: false,
+  overlayProjectionReady: false,
 };
 const elements = {
   viewport: document.querySelector('#viewport'), loading: document.querySelector('#loading'),
@@ -115,6 +118,7 @@ async function initialize() {
   resize({ preserveReview: false });
   resetDefaultReviewCamera();
   if (state.closeup) applyCloseupCameraPreset(state.closeup);
+  if (!activateOverlayProjection()) throw new Error('Overlay projection could not enter its ready state.');
   clearTimeout(window.__HRL_P2_BOOT_TIMEOUT__);
   pageState.status = 'ready';
   pageState.ready = true;
@@ -330,12 +334,14 @@ function createCoreOverlay(frame) {
   const lines = segments.map(({ parentId, jointId }) => {
     const element = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     element.dataset.parentId = parentId; element.dataset.jointId = jointId;
+    setOverlayElementVisible(element, false);
     elements.coreOverlay.append(element);
     return element;
   });
   const points = [...coreIds].map((jointId) => {
     const element = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     element.setAttribute('r', '3.2'); element.dataset.jointId = jointId;
+    setOverlayElementVisible(element, false);
     elements.coreOverlay.append(element);
     return element;
   });
@@ -343,26 +349,106 @@ function createCoreOverlay(frame) {
 }
 
 function updateOverlay() {
-  if (!overlayElements || !state.currentFrame) return;
-  elements.coreOverlay.hidden = !state.overlay;
-  if (!state.overlay) return;
+  if (!overlayElements) return;
+  elements.coreOverlay.hidden = !state.overlay || !state.overlayProjectionReady;
+  if (!state.overlay || !state.overlayProjectionReady || !state.currentFrame) return;
   const rect = elements.viewport.getBoundingClientRect();
+  if (!isFinitePositiveViewportRect(rect) || !prepareCameraForOverlay(rect)) {
+    elements.coreOverlay.hidden = true;
+    hideAllOverlayElements();
+    return;
+  }
+  elements.coreOverlay.hidden = false;
   elements.coreOverlay.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
   const joints = state.currentFrame.simulationRigFrame.joints;
   for (const line of overlayElements.lines) {
     const a = project(joints[line.dataset.parentId].worldPosition, rect);
     const b = project(joints[line.dataset.jointId].worldPosition, rect);
+    if (!a || !b) { setOverlayElementVisible(line, false); continue; }
     line.setAttribute('x1', a[0]); line.setAttribute('y1', a[1]); line.setAttribute('x2', b[0]); line.setAttribute('y2', b[1]);
+    setOverlayElementVisible(line, true);
   }
   for (const point of overlayElements.points) {
     const projected = project(joints[point.dataset.jointId].worldPosition, rect);
+    if (!projected) { setOverlayElementVisible(point, false); continue; }
     point.setAttribute('cx', projected[0]); point.setAttribute('cy', projected[1]);
+    setOverlayElementVisible(point, true);
   }
 }
 
 function project(position, rect) {
-  const point = new THREE.Vector3(...position).project(view.camera);
-  return [(point.x * .5 + .5) * rect.width, (-point.y * .5 + .5) * rect.height];
+  if (!view?.camera || !isFinitePosition(position) || !isFinitePositiveViewportRect(rect)) return null;
+  return projectWorldPositionToViewportV1({
+    position,
+    viewportWidth: rect.width,
+    viewportHeight: rect.height,
+    matrixWorldInverse: view.camera.matrixWorldInverse.elements,
+    projectionMatrix: view.camera.projectionMatrix.elements,
+  });
+}
+
+function activateOverlayProjection() {
+  const rect = elements.viewport.getBoundingClientRect();
+  state.overlayProjectionReady = Boolean(
+    view
+    && state.currentFrame
+    && state.reviewCameraInitialized
+    && isFinitePositiveViewportRect(rect)
+    && prepareCameraForOverlay(rect)
+  );
+  if (!state.overlayProjectionReady) {
+    elements.coreOverlay.hidden = true;
+    hideAllOverlayElements();
+    return false;
+  }
+  updateOverlay();
+  return true;
+}
+
+function prepareCameraForOverlay(rect) {
+  const camera = view?.camera;
+  const target = view?.controls?.target;
+  if (!camera || !target || !isFinitePositiveViewportRect(rect)
+    || !isFiniteVector3(camera.position)
+    || !isFiniteVector3(target)
+    || !Number.isFinite(camera.aspect)
+    || camera.aspect <= 0) return false;
+  const expectedAspect = rect.width / rect.height;
+  if (!Number.isFinite(expectedAspect)
+    || Math.abs(camera.aspect - expectedAspect) > Math.max(1, expectedAspect) * 1e-6) return false;
+  camera.updateProjectionMatrix();
+  camera.updateMatrixWorld(true);
+  return isFiniteMatrix4(camera.projectionMatrix)
+    && isFiniteMatrix4(camera.matrixWorld)
+    && isFiniteMatrix4(camera.matrixWorldInverse);
+}
+
+function isFinitePositiveViewportRect(rect) {
+  return Boolean(rect && Number.isFinite(rect.width) && rect.width > 0
+    && Number.isFinite(rect.height) && rect.height > 0);
+}
+
+function isFinitePosition(position) {
+  return (Array.isArray(position) || ArrayBuffer.isView(position))
+    && position.length === 3
+    && Array.from(position).every(Number.isFinite);
+}
+
+function isFiniteVector3(vector) {
+  return vector && [vector.x, vector.y, vector.z].every(Number.isFinite);
+}
+
+function isFiniteMatrix4(matrix) {
+  return matrix?.elements?.length === 16 && matrix.elements.every(Number.isFinite);
+}
+
+function hideAllOverlayElements() {
+  if (!overlayElements) return;
+  for (const element of [...overlayElements.lines, ...overlayElements.points]) setOverlayElementVisible(element, false);
+}
+
+function setOverlayElementVisible(element, visible) {
+  element.style.display = visible ? '' : 'none';
 }
 
 function resetDefaultReviewCamera() {
@@ -374,6 +460,7 @@ function resetDefaultReviewCamera() {
   view.camera.position.set(target.x, target.y - 0.06, target.z - distance);
   view.camera.up.set(0, 1, 0);
   view.controls.update();
+  state.reviewCameraInitialized = true;
   updateOverlay();
   publish();
 }
@@ -516,11 +603,18 @@ function render() {
 function resize({ preserveReview = true } = {}) {
   if (!view) return;
   const rect = elements.viewport.getBoundingClientRect();
-  view.renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
-  view.camera.aspect = Math.max(1, rect.width) / Math.max(1, rect.height);
+  if (!isFinitePositiveViewportRect(rect)) {
+    state.overlayProjectionReady = false;
+    elements.coreOverlay.hidden = true;
+    hideAllOverlayElements();
+    return;
+  }
+  view.renderer.setSize(rect.width, rect.height, false);
+  view.camera.aspect = rect.width / rect.height;
   view.camera.updateProjectionMatrix();
   if (preserveReview && state.currentFrame) framePerson({ preserveDirection: true });
   else updateOverlay();
+  if (state.reviewCameraInitialized) activateOverlayProjection();
 }
 
 function publish() {
@@ -541,6 +635,7 @@ function publish() {
     summaryPoseId: state.summaryPoseId,
     poseSynchronization: synchronization,
     overlay: state.overlay,
+    overlayProjectionReady: state.overlayProjectionReady,
     closeup: state.closeup,
     sequencePlaying: state.sequencePlaying,
     sequenceComplete: state.sequenceComplete,
