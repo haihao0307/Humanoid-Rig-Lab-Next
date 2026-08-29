@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Task 17A.3 P2 · Hybrid Skeleton finalPose Connection</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./apps/human-core-v5-production-skeleton-p2-finalpose/styles.css">
+  <script type="importmap">
+    {"imports":{"three":"./node_modules/three/build/three.module.js"}}
+  </script>
+  <script>
+    window.__HRL_PRODUCTION_SKELETON_P2__ = {
+      schema: 'humanoid_rig/hybrid_skeleton_p2_page_state@1.0',
+      status: 'loading', ready: false, webgl2: false, consoleErrors: [], pageErrors: []
+    };
+    window.__HRL_P2_BOOT_TIMEOUT__ = setTimeout(function () {
+      var state = window.__HRL_PRODUCTION_SKELETON_P2__;
+      if (state.status !== 'loading') return;
+      var message = '页面在 10 秒内未进入 ready；请确认 node_modules/three 和冻结 GLB 均可访问。';
+      state.status = 'error'; state.ready = false; state.pageErrors.push(message);
+      var panel = document.getElementById('error-panel');
+      if (panel) { panel.hidden = false; panel.textContent = message; }
+      var loading = document.getElementById('loading');
+      if (loading) loading.textContent = message;
+    }, 10000);
+    window.addEventListener('error', function (event) {
+      var state = window.__HRL_PRODUCTION_SKELETON_P2__;
+      var message = String(event.error && event.error.stack || event.message || 'Unknown page error');
+      state.pageErrors.push(message);
+      if (state.status === 'loading') state.status = 'error';
+      var panel = document.getElementById('error-panel');
+      if (panel) { panel.hidden = false; panel.textContent = message; }
+      var loading = document.getElementById('loading');
+      if (loading) loading.textContent = message;
+      var ready = document.getElementById('ready-state');
+      if (ready) { ready.textContent = 'ERROR'; ready.className = 'error'; }
+    });
+  </script>
+</head>
+<body>
+  <main class="app-shell">
+    <header>
+      <div><b>Task 17A.3 P2</b><span>Hybrid Production Skeleton · finalPose Read-only Connection</span></div>
+      <strong id="ready-state">LOADING</strong>
+    </header>
+    <section class="toolbar" aria-label="Hybrid Skeleton controls">
+      <label>姿势 <select id="pose-select"></select></label>
+      <button id="sequence-button" type="button">播放诊断序列</button>
+      <label class="toggle"><input id="overlay-toggle" type="checkbox"> Core Rig Overlay</label>
+      <button id="copy-button" type="button">复制诊断 JSON</button>
+      <span id="copy-status" role="status"></span>
+    </section>
+    <section class="content">
+      <div id="viewport" aria-label="Hybrid Production Skeleton WebGL2 viewport">
+        <svg id="core-overlay" aria-hidden="true"></svg>
+        <div id="loading">正在直接加载冻结 P1.1 GLB…</div>
+      </div>
+      <aside>
+        <h1>数值摘要</h1>
+        <dl id="metrics"></dl>
+        <h2>错误</h2>
+        <pre id="error-panel" hidden></pre>
+        <p class="note">仅显示预生成 GLB；每帧只写入 24 个 Object3D 矩阵。默认无标签、无轨迹、无骨骼缩放。</p>
+      </aside>
+    </section>
+  </main>
+  <script type="module" src="./apps/human-core-v5-production-skeleton-p2-finalpose/index.js"></script>
+</body>
+</html>

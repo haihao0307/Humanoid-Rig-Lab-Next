@@ -1,0 +1,75 @@
+{
+  "schema": "humanoid_rig/hybrid_skeleton_p2_sequence_continuity@1.0",
+  "sequencePoseIds": [
+    "reference-t",
+    "reference-a",
+    "locomotion-neutral",
+    "walk-left-support",
+    "walk-right-support",
+    "turn-mid",
+    "locomotion-neutral"
+  ],
+  "samplesPerTransition": 61,
+  "usesFinalPoseQuaternionInterpolation": true,
+  "rootChannelInterpolatedIndependently": true,
+  "usesScale": false,
+  "writesFinalPose": false,
+  "maximumFrameToFrameModuleJump": 0.029837143834175416,
+  "maximumFrameToFrameMatrixElementJump": 0.02982840982697907,
+  "transitions": [
+    {
+      "fromPoseId": "reference-t",
+      "toPoseId": "reference-a",
+      "sampleCount": 61,
+      "rootInterpolation": "independent linear position plus quaternion slerp",
+      "jointInterpolation": "finalPose local quaternion slerp",
+      "maximumFrameToFrameModuleJump": 0.013638721886745062,
+      "maximumFrameToFrameMatrixElementJump": 0.013459042395912418
+    },
+    {
+      "fromPoseId": "reference-a",
+      "toPoseId": "locomotion-neutral",
+      "sampleCount": 61,
+      "rootInterpolation": "independent linear position plus quaternion slerp",
+      "jointInterpolation": "finalPose local quaternion slerp",
+      "maximumFrameToFrameModuleJump": 0.02157144737066797,
+      "maximumFrameToFrameMatrixElementJump": 0.021538421887586257
+    },
+    {
+      "fromPoseId": "locomotion-neutral",
+      "toPoseId": "walk-left-support",
+      "sampleCount": 61,
+      "rootInterpolation": "independent linear position plus quaternion slerp",
+      "jointInterpolation": "finalPose local quaternion slerp",
+      "maximumFrameToFrameModuleJump": 0.010415659526529251,
+      "maximumFrameToFrameMatrixElementJump": 0.01041555290359869
+    },
+    {
+      "fromPoseId": "walk-left-support",
+      "toPoseId": "walk-right-support",
+      "sampleCount": 61,
+      "rootInterpolation": "independent linear position plus quaternion slerp",
+      "jointInterpolation": "finalPose local quaternion slerp",
+      "maximumFrameToFrameModuleJump": 0.010428742703129363,
+      "maximumFrameToFrameMatrixElementJump": 0.010428494915365627
+    },
+    {
+      "fromPoseId": "walk-right-support",
+      "toPoseId": "turn-mid",
+      "sampleCount": 61,
+      "rootInterpolation": "independent linear position plus quaternion slerp",
+      "jointInterpolation": "finalPose local quaternion slerp",
+      "maximumFrameToFrameModuleJump": 0.029837143834175416,
+      "maximumFrameToFrameMatrixElementJump": 0.02982840982697907
+    },
+    {
+      "fromPoseId": "turn-mid",
+      "toPoseId": "locomotion-neutral",
+      "sampleCount": 61,
+      "rootInterpolation": "independent linear position plus quaternion slerp",
+      "jointInterpolation": "finalPose local quaternion slerp",
+      "maximumFrameToFrameModuleJump": 0.02982820445241503,
+      "maximumFrameToFrameMatrixElementJump": 0.0298177838659893
+    }
+  ]
+}
