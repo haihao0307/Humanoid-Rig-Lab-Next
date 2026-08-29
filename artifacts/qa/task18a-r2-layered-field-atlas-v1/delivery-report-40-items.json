@@ -1,0 +1,2904 @@
+{
+  "schema": "humanoid_rig/task18a_r2_delivery_report@1.0",
+  "count": 40,
+  "items": [
+    {
+      "item": 1,
+      "value": "a7870e89564a6de549a92cf2d78c01d9b05f30a7"
+    },
+    {
+      "item": 2,
+      "value": {
+        "hash": "a7870e89564a6de549a92cf2d78c01d9b05f30a7",
+        "message": "experiment(v5): record failed global inverse-warp human field",
+        "branch": "experiment/human-core-v5-computational-human-field-v1",
+        "push": {
+          "passed": true,
+          "remote": "origin/experiment/human-core-v5-computational-human-field-v1",
+          "bundleRequired": false
+        }
+      }
+    },
+    {
+      "item": 3,
+      "value": {
+        "passed": true,
+        "remote": "origin/experiment/human-core-v5-computational-human-field-v1",
+        "bundleRequired": false
+      }
+    },
+    {
+      "item": 4,
+      "value": "experiment/human-core-v5-layered-articulated-field-atlas-v1"
+    },
+    {
+      "item": 5,
+      "value": "G:/Three.js/NEW/Humanoid-Rig-Lab-Next-task18a-layered-field-atlas-v1"
+    },
+    {
+      "item": 6,
+      "value": [
+        "head",
+        "neck",
+        "chest",
+        "abdomen",
+        "pelvisCore",
+        "leftUpperArm",
+        "rightUpperArm",
+        "leftForearm",
+        "rightForearm",
+        "leftHand",
+        "rightHand",
+        "leftThigh",
+        "rightThigh",
+        "leftCalf",
+        "rightCalf",
+        "leftFoot",
+        "rightFoot"
+      ]
+    },
+    {
+      "item": 7,
+      "value": [
+        "neckChestJunction",
+        "leftShoulderAxillaJunction",
+        "rightShoulderAxillaJunction",
+        "leftElbowJunction",
+        "rightElbowJunction",
+        "spineLowerJunction",
+        "spineMiddleJunction",
+        "spineUpperJunction",
+        "leftHipGroinJunction",
+        "rightHipGroinJunction",
+        "centralGroinJunction",
+        "leftKneeJunction",
+        "rightKneeJunction",
+        "leftWristHandJunction",
+        "rightWristHandJunction",
+        "leftAnkleFootJunction",
+        "rightAnkleFootJunction"
+      ]
+    },
+    {
+      "item": 8,
+      "value": {
+        "schema": "humanoid_rig/junction_adjacency_graph@1.0",
+        "authority": "Only listed chart pairs may create a continuous blend.",
+        "edges": [
+          {
+            "junctionId": "neckChestJunction",
+            "charts": [
+              "chest",
+              "neck"
+            ]
+          },
+          {
+            "junctionId": "leftShoulderAxillaJunction",
+            "charts": [
+              "chest",
+              "leftUpperArm"
+            ]
+          },
+          {
+            "junctionId": "rightShoulderAxillaJunction",
+            "charts": [
+              "chest",
+              "rightUpperArm"
+            ]
+          },
+          {
+            "junctionId": "leftElbowJunction",
+            "charts": [
+              "leftUpperArm",
+              "leftForearm"
+            ]
+          },
+          {
+            "junctionId": "rightElbowJunction",
+            "charts": [
+              "rightUpperArm",
+              "rightForearm"
+            ]
+          },
+          {
+            "junctionId": "spineLowerJunction",
+            "charts": [
+              "pelvisCore",
+              "abdomen"
+            ]
+          },
+          {
+            "junctionId": "spineMiddleJunction",
+            "charts": [
+              "abdomen",
+              "chest"
+            ]
+          },
+          {
+            "junctionId": "spineUpperJunction",
+            "charts": [
+              "abdomen",
+              "chest"
+            ]
+          },
+          {
+            "junctionId": "leftHipGroinJunction",
+            "charts": [
+              "pelvisCore",
+              "leftThigh"
+            ]
+          },
+          {
+            "junctionId": "rightHipGroinJunction",
+            "charts": [
+              "pelvisCore",
+              "rightThigh"
+            ]
+          },
+          {
+            "junctionId": "leftKneeJunction",
+            "charts": [
+              "leftThigh",
+              "leftCalf"
+            ]
+          },
+          {
+            "junctionId": "rightKneeJunction",
+            "charts": [
+              "rightThigh",
+              "rightCalf"
+            ]
+          },
+          {
+            "junctionId": "leftWristHandJunction",
+            "charts": [
+              "leftForearm",
+              "leftHand"
+            ]
+          },
+          {
+            "junctionId": "rightWristHandJunction",
+            "charts": [
+              "rightForearm",
+              "rightHand"
+            ]
+          },
+          {
+            "junctionId": "leftAnkleFootJunction",
+            "charts": [
+              "leftCalf",
+              "leftFoot"
+            ]
+          },
+          {
+            "junctionId": "rightAnkleFootJunction",
+            "charts": [
+              "rightCalf",
+              "rightFoot"
+            ]
+          }
+        ],
+        "forbiddenFusionPairs": [
+          [
+            "leftUpperArm",
+            "chest"
+          ],
+          [
+            "rightUpperArm",
+            "chest"
+          ],
+          [
+            "leftHand",
+            "chest"
+          ],
+          [
+            "rightHand",
+            "chest"
+          ],
+          [
+            "leftThigh",
+            "rightThigh"
+          ],
+          [
+            "leftThigh",
+            "abdomen"
+          ],
+          [
+            "rightThigh",
+            "abdomen"
+          ],
+          [
+            "leftCalf",
+            "rightThigh"
+          ],
+          [
+            "rightCalf",
+            "leftThigh"
+          ],
+          [
+            "leftFoot",
+            "rightCalf"
+          ],
+          [
+            "rightFoot",
+            "leftCalf"
+          ],
+          [
+            "leftHand",
+            "rightUpperArm"
+          ],
+          [
+            "rightHand",
+            "leftUpperArm"
+          ]
+        ]
+      }
+    },
+    {
+      "item": 9,
+      "value": {
+        "fieldId": "HRLMultiSheetContactFieldV1",
+        "rules": [
+          {
+            "contactClass": "left-arm-torso",
+            "a": [
+              "leftUpperArm",
+              "leftForearm"
+            ],
+            "b": [
+              "chest",
+              "abdomen"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          },
+          {
+            "contactClass": "right-arm-torso",
+            "a": [
+              "rightUpperArm",
+              "rightForearm"
+            ],
+            "b": [
+              "chest",
+              "abdomen"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          },
+          {
+            "contactClass": "left-hand-torso",
+            "a": [
+              "leftHand"
+            ],
+            "b": [
+              "chest",
+              "abdomen",
+              "pelvisCore"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          },
+          {
+            "contactClass": "right-hand-torso",
+            "a": [
+              "rightHand"
+            ],
+            "b": [
+              "chest",
+              "abdomen",
+              "pelvisCore"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          },
+          {
+            "contactClass": "left-right-thigh",
+            "a": [
+              "leftThigh"
+            ],
+            "b": [
+              "rightThigh"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          },
+          {
+            "contactClass": "thigh-pelvis-non-junction",
+            "a": [
+              "leftThigh",
+              "rightThigh"
+            ],
+            "b": [
+              "pelvisCore"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          },
+          {
+            "contactClass": "calf-thigh-deep-flexion",
+            "a": [
+              "leftCalf",
+              "rightCalf"
+            ],
+            "b": [
+              "leftThigh",
+              "rightThigh"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          },
+          {
+            "contactClass": "hand-leg",
+            "a": [
+              "leftHand",
+              "rightHand"
+            ],
+            "b": [
+              "leftThigh",
+              "rightThigh",
+              "leftCalf",
+              "rightCalf"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          },
+          {
+            "contactClass": "foot-opposite-leg",
+            "a": [
+              "leftFoot"
+            ],
+            "b": [
+              "rightThigh",
+              "rightCalf"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          },
+          {
+            "contactClass": "right-foot-opposite-leg",
+            "a": [
+              "rightFoot"
+            ],
+            "b": [
+              "leftThigh",
+              "leftCalf"
+            ],
+            "unionAllowed": false,
+            "preserveIndependentSheets": true
+          }
+        ]
+      }
+    },
+    {
+      "item": 10,
+      "value": false
+    },
+    {
+      "item": 11,
+      "value": false
+    },
+    {
+      "item": 12,
+      "value": false
+    },
+    {
+      "item": 13,
+      "value": false
+    },
+    {
+      "item": 14,
+      "value": [
+        {
+          "chartId": "head",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 4986,
+            "minimumGradientMagnitude": 0.2538191622019396,
+            "meanGradientMagnitude": 0.9643247632791816,
+            "p95GradientMagnitude": 1.0044843579587754,
+            "maximumGradientMagnitude": 1.0210349039537079
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 4566,
+            "minimumGradientMagnitude": 0.592162436517945,
+            "meanGradientMagnitude": 1.0448466999544246,
+            "p95GradientMagnitude": 1.2543598565693685,
+            "maximumGradientMagnitude": 1.6713527350366435
+          },
+          "surfaceDistanceError": 0.0016537373888137065,
+          "normalAngleError": 3.132583382170902,
+          "brickCount": 1,
+          "memoryBytes": 89600
+        },
+        {
+          "chartId": "neck",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 5554,
+            "minimumGradientMagnitude": 0.0718492902827939,
+            "meanGradientMagnitude": 0.9062581672475521,
+            "p95GradientMagnitude": 1.002127834843557,
+            "maximumGradientMagnitude": 1.0178578448190556
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 5294,
+            "minimumGradientMagnitude": 0.05655566928908228,
+            "meanGradientMagnitude": 0.9956252980141823,
+            "p95GradientMagnitude": 1.2145498121646563,
+            "maximumGradientMagnitude": 1.5921953949717091
+          },
+          "surfaceDistanceError": 0.002834993166693885,
+          "normalAngleError": 15.70045549556541,
+          "brickCount": 1,
+          "memoryBytes": 18400
+        },
+        {
+          "chartId": "chest",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 30022,
+            "minimumGradientMagnitude": 0.029058877318070737,
+            "meanGradientMagnitude": 0.961770775786091,
+            "p95GradientMagnitude": 1.0049190535138932,
+            "maximumGradientMagnitude": 1.0298302198102942
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 27567,
+            "minimumGradientMagnitude": 0.1115218054928791,
+            "meanGradientMagnitude": 1.0424677500259165,
+            "p95GradientMagnitude": 1.2027384919502466,
+            "maximumGradientMagnitude": 1.5532268473013724
+          },
+          "surfaceDistanceError": 0.0071431505560520005,
+          "normalAngleError": 72.3435784300344,
+          "brickCount": 1,
+          "memoryBytes": 243360
+        },
+        {
+          "chartId": "abdomen",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 18252,
+            "minimumGradientMagnitude": 0.2497815303867372,
+            "meanGradientMagnitude": 0.9730321655151614,
+            "p95GradientMagnitude": 1.0039383575974874,
+            "maximumGradientMagnitude": 1.0301989876001187
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 17228,
+            "minimumGradientMagnitude": 0.327199771495506,
+            "meanGradientMagnitude": 1.0286085577030413,
+            "p95GradientMagnitude": 1.1490525955669617,
+            "maximumGradientMagnitude": 1.5110829953686737
+          },
+          "surfaceDistanceError": 0.0010256495453669831,
+          "normalAngleError": 1.970778188464041,
+          "brickCount": 1,
+          "memoryBytes": 139392
+        },
+        {
+          "chartId": "pelvisCore",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 19769,
+            "minimumGradientMagnitude": 0.3813597522775965,
+            "meanGradientMagnitude": 0.979750007848112,
+            "p95GradientMagnitude": 1.0048258862007078,
+            "maximumGradientMagnitude": 1.0270872863334686
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 18442,
+            "minimumGradientMagnitude": 0.4784723752731794,
+            "meanGradientMagnitude": 1.0422959696056446,
+            "p95GradientMagnitude": 1.175726850493104,
+            "maximumGradientMagnitude": 1.555469002929195
+          },
+          "surfaceDistanceError": 0.0015724046055428272,
+          "normalAngleError": 3.6338583145879837,
+          "brickCount": 1,
+          "memoryBytes": 210912
+        },
+        {
+          "chartId": "leftUpperArm",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 8209,
+            "minimumGradientMagnitude": 0.06682736681069483,
+            "meanGradientMagnitude": 0.9593553750902303,
+            "p95GradientMagnitude": 1.0039487490678998,
+            "maximumGradientMagnitude": 1.0219601408052135
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 7466,
+            "minimumGradientMagnitude": 0.13798397884578187,
+            "meanGradientMagnitude": 1.0457728910347448,
+            "p95GradientMagnitude": 1.2539905647406413,
+            "maximumGradientMagnitude": 1.5844460967153509
+          },
+          "surfaceDistanceError": 0.001907015796062825,
+          "normalAngleError": 5.9181877514630115,
+          "brickCount": 1,
+          "memoryBytes": 67392
+        },
+        {
+          "chartId": "rightUpperArm",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 8209,
+            "minimumGradientMagnitude": 0.06683948281173877,
+            "meanGradientMagnitude": 0.9593552150148432,
+            "p95GradientMagnitude": 1.003945968422075,
+            "maximumGradientMagnitude": 1.0219575875200875
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 7466,
+            "minimumGradientMagnitude": 0.1380277555531264,
+            "meanGradientMagnitude": 1.0457680273626038,
+            "p95GradientMagnitude": 1.2535452050804188,
+            "maximumGradientMagnitude": 1.5844516175583867
+          },
+          "surfaceDistanceError": 0.0017470543535438195,
+          "normalAngleError": 6.210388526871841,
+          "brickCount": 1,
+          "memoryBytes": 67392
+        },
+        {
+          "chartId": "leftForearm",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 4086,
+            "minimumGradientMagnitude": 0.08645456346529584,
+            "meanGradientMagnitude": 0.9156629608271343,
+            "p95GradientMagnitude": 1.000000046333298,
+            "maximumGradientMagnitude": 1.0192707557146685
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 3496,
+            "minimumGradientMagnitude": 0.13698494628426156,
+            "meanGradientMagnitude": 1.0039955813365256,
+            "p95GradientMagnitude": 1.176848883112734,
+            "maximumGradientMagnitude": 1.350627668983428
+          },
+          "surfaceDistanceError": 0.005669736151092707,
+          "normalAngleError": 37.58694537420398,
+          "brickCount": 1,
+          "memoryBytes": 56320
+        },
+        {
+          "chartId": "rightForearm",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 4087,
+            "minimumGradientMagnitude": 0.08646117505321409,
+            "meanGradientMagnitude": 0.915676658760079,
+            "p95GradientMagnitude": 1.000000046333298,
+            "maximumGradientMagnitude": 1.0192712975798024
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 3496,
+            "minimumGradientMagnitude": 0.13698159073815067,
+            "meanGradientMagnitude": 1.0040013039374969,
+            "p95GradientMagnitude": 1.176844290985773,
+            "maximumGradientMagnitude": 1.350633069121164
+          },
+          "surfaceDistanceError": 0.005305701194659936,
+          "normalAngleError": 40.083665051797716,
+          "brickCount": 1,
+          "memoryBytes": 56320
+        },
+        {
+          "chartId": "leftHand",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 1346,
+            "minimumGradientMagnitude": 0.11368478409111737,
+            "meanGradientMagnitude": 0.843776696494259,
+            "p95GradientMagnitude": 0.9935658821393639,
+            "maximumGradientMagnitude": 1.016067953694366
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 1018,
+            "minimumGradientMagnitude": 0.005160597752389748,
+            "meanGradientMagnitude": 0.9785168309599335,
+            "p95GradientMagnitude": 1.197541945775145,
+            "maximumGradientMagnitude": 1.373007484649683
+          },
+          "surfaceDistanceError": 0.01016409648910783,
+          "normalAngleError": 49.70550298180397,
+          "brickCount": 1,
+          "memoryBytes": 33640
+        },
+        {
+          "chartId": "rightHand",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 1346,
+            "minimumGradientMagnitude": 0.11368825919071338,
+            "meanGradientMagnitude": 0.8437768267569895,
+            "p95GradientMagnitude": 0.9935665725720116,
+            "maximumGradientMagnitude": 1.0160694414602163
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 1018,
+            "minimumGradientMagnitude": 0.005152867440442141,
+            "meanGradientMagnitude": 0.9785163848408748,
+            "p95GradientMagnitude": 1.1975203532041259,
+            "maximumGradientMagnitude": 1.3730055931649563
+          },
+          "surfaceDistanceError": 0.009426682877276871,
+          "normalAngleError": 47.07167756510971,
+          "brickCount": 1,
+          "memoryBytes": 33640
+        },
+        {
+          "chartId": "leftThigh",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 21181,
+            "minimumGradientMagnitude": 0.1922738013581837,
+            "meanGradientMagnitude": 0.9760627305688331,
+            "p95GradientMagnitude": 1.005755523801371,
+            "maximumGradientMagnitude": 1.0307237019564657
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 19730,
+            "minimumGradientMagnitude": 0.3828005004529546,
+            "meanGradientMagnitude": 1.042287827198063,
+            "p95GradientMagnitude": 1.1674322986229848,
+            "maximumGradientMagnitude": 1.602443798164963
+          },
+          "surfaceDistanceError": 0.0017719394510727553,
+          "normalAngleError": 8.491923340062707,
+          "brickCount": 1,
+          "memoryBytes": 164736
+        },
+        {
+          "chartId": "rightThigh",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 20464,
+            "minimumGradientMagnitude": 0.20929377021898574,
+            "meanGradientMagnitude": 0.9761462626892713,
+            "p95GradientMagnitude": 1.0056037707730767,
+            "maximumGradientMagnitude": 1.0277663000761856
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 19071,
+            "minimumGradientMagnitude": 0.3616209485690055,
+            "meanGradientMagnitude": 1.0427705899098707,
+            "p95GradientMagnitude": 1.1665902487249895,
+            "maximumGradientMagnitude": 1.598446375083883
+          },
+          "surfaceDistanceError": 0.0016392509071700685,
+          "normalAngleError": 4.4343683554510465,
+          "brickCount": 1,
+          "memoryBytes": 161304
+        },
+        {
+          "chartId": "leftCalf",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 13360,
+            "minimumGradientMagnitude": 0.050018092484730964,
+            "meanGradientMagnitude": 0.9660735184209195,
+            "p95GradientMagnitude": 1.0048244398701478,
+            "maximumGradientMagnitude": 1.0350202401832542
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 12438,
+            "minimumGradientMagnitude": 0.18096612454585478,
+            "meanGradientMagnitude": 1.038385098312704,
+            "p95GradientMagnitude": 1.1909872393598626,
+            "maximumGradientMagnitude": 1.5284679534730221
+          },
+          "surfaceDistanceError": 0.001434918909281639,
+          "normalAngleError": 5.215742603882092,
+          "brickCount": 1,
+          "memoryBytes": 89856
+        },
+        {
+          "chartId": "rightCalf",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 13339,
+            "minimumGradientMagnitude": 0.05093576754993546,
+            "meanGradientMagnitude": 0.965978290386653,
+            "p95GradientMagnitude": 1.0049242961202653,
+            "maximumGradientMagnitude": 1.0365246611686134
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 12396,
+            "minimumGradientMagnitude": 0.18359801985018492,
+            "meanGradientMagnitude": 1.0383268120272586,
+            "p95GradientMagnitude": 1.191531913157631,
+            "maximumGradientMagnitude": 1.530395135342095
+          },
+          "surfaceDistanceError": 0.0016675022674373947,
+          "normalAngleError": 5.00445327826568,
+          "brickCount": 1,
+          "memoryBytes": 89856
+        },
+        {
+          "chartId": "leftFoot",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 4519,
+            "minimumGradientMagnitude": 0.053698472158156395,
+            "meanGradientMagnitude": 0.9288218004160854,
+            "p95GradientMagnitude": 1.0019904329278062,
+            "maximumGradientMagnitude": 1.0214439237465285
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 3923,
+            "minimumGradientMagnitude": 0.13247390167957207,
+            "meanGradientMagnitude": 1.0342265106091804,
+            "p95GradientMagnitude": 1.241904308892864,
+            "maximumGradientMagnitude": 1.5178856786508923
+          },
+          "surfaceDistanceError": 0.007014914975754048,
+          "normalAngleError": 87.46599462580829,
+          "brickCount": 1,
+          "memoryBytes": 65520
+        },
+        {
+          "chartId": "rightFoot",
+          "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+          "preReinitializationGradient": {
+            "sampleCount": 4517,
+            "minimumGradientMagnitude": 0.05651585272856794,
+            "meanGradientMagnitude": 0.9283418096912612,
+            "p95GradientMagnitude": 1.0018379536767472,
+            "maximumGradientMagnitude": 1.0229263614721547
+          },
+          "postReinitializationGradient": {
+            "sampleCount": 3931,
+            "minimumGradientMagnitude": 0.08707304251505897,
+            "meanGradientMagnitude": 1.0339978900386466,
+            "p95GradientMagnitude": 1.2378270021291171,
+            "maximumGradientMagnitude": 1.501014539898491
+          },
+          "surfaceDistanceError": 0.007378497598066866,
+          "normalAngleError": 88.24245665735235,
+          "brickCount": 1,
+          "memoryBytes": 65520
+        }
+      ]
+    },
+    {
+      "item": 15,
+      "value": {
+        "schema": "humanoid_rig/task18a_r2_static_fit@1.0",
+        "round": 2,
+        "method": "reference vertices evaluated against their deterministic local chart ownership; silhouettes use scanline-filled projected zero-band samples",
+        "sampleCount": 5462,
+        "normalSampleCount": 5462,
+        "missingSampleCount": 0,
+        "meanSurfaceDistance": 0.0019355891736269934,
+        "p95SurfaceDistance": 0.006845532413530523,
+        "maximumSurfaceDistance": 0.013730871173718944,
+        "meanNormalAngleError": 14.777754020927564,
+        "p95NormalAngleError": 62.072104863860524,
+        "silhouette": {
+          "frontSilhouetteIoU": 0.9320359962314415,
+          "sideSilhouetteIoU": 0.8626711036399191,
+          "backSilhouetteIoU": 0.9320359962314415,
+          "threeQuarterSilhouetteIoU": 0.9201513657900595,
+          "passed": false
+        },
+        "criticalRegions": {
+          "headFace": {
+            "sampleCount": 1442,
+            "p95SurfaceDistance": 0.007522587287949659,
+            "p95NormalAngleError": 76.34133175946779
+          },
+          "hand": {
+            "sampleCount": 909,
+            "p95SurfaceDistance": 0.008578046871240863,
+            "p95NormalAngleError": 48.030904294980665
+          },
+          "shoulderAxilla": {
+            "sampleCount": 452,
+            "p95SurfaceDistance": 0.001868801416077706,
+            "p95NormalAngleError": 5.923632951696388
+          },
+          "foot": {
+            "sampleCount": 926,
+            "p95SurfaceDistance": 0.0069200283273166095,
+            "p95NormalAngleError": 87.07965698219705
+          },
+          "pelvisGroin": {
+            "sampleCount": 341,
+            "p95SurfaceDistance": 0.0018406640623447271,
+            "p95NormalAngleError": 10.014176006051294
+          },
+          "knee": {
+            "sampleCount": 143,
+            "p95SurfaceDistance": 0.001374056076465062,
+            "p95NormalAngleError": 3.630605736699835
+          }
+        },
+        "chartMetrics": [
+          {
+            "chartId": "head",
+            "sampleCount": 88,
+            "p95SurfaceDistance": 0.0016537373888137065,
+            "p95NormalAngleError": 3.132583382170902
+          },
+          {
+            "chartId": "neck",
+            "sampleCount": 47,
+            "p95SurfaceDistance": 0.002834993166693885,
+            "p95NormalAngleError": 15.70045549556541
+          },
+          {
+            "chartId": "chest",
+            "sampleCount": 1835,
+            "p95SurfaceDistance": 0.0071431505560520005,
+            "p95NormalAngleError": 72.3435784300344
+          },
+          {
+            "chartId": "abdomen",
+            "sampleCount": 24,
+            "p95SurfaceDistance": 0.0010256495453669831,
+            "p95NormalAngleError": 1.970778188464041
+          },
+          {
+            "chartId": "pelvisCore",
+            "sampleCount": 181,
+            "p95SurfaceDistance": 0.0015724046055428272,
+            "p95NormalAngleError": 3.6338583145879837
+          },
+          {
+            "chartId": "leftUpperArm",
+            "sampleCount": 214,
+            "p95SurfaceDistance": 0.001907015796062825,
+            "p95NormalAngleError": 5.9181877514630115
+          },
+          {
+            "chartId": "rightUpperArm",
+            "sampleCount": 214,
+            "p95SurfaceDistance": 0.0017470543535438195,
+            "p95NormalAngleError": 6.210388526871841
+          },
+          {
+            "chartId": "leftForearm",
+            "sampleCount": 314,
+            "p95SurfaceDistance": 0.005669736151092707,
+            "p95NormalAngleError": 37.58694537420398
+          },
+          {
+            "chartId": "rightForearm",
+            "sampleCount": 333,
+            "p95SurfaceDistance": 0.005305701194659936,
+            "p95NormalAngleError": 40.083665051797716
+          },
+          {
+            "chartId": "leftHand",
+            "sampleCount": 248,
+            "p95SurfaceDistance": 0.01016409648910783,
+            "p95NormalAngleError": 49.70550298180397
+          },
+          {
+            "chartId": "rightHand",
+            "sampleCount": 260,
+            "p95SurfaceDistance": 0.009426682877276871,
+            "p95NormalAngleError": 47.07167756510971
+          },
+          {
+            "chartId": "leftThigh",
+            "sampleCount": 275,
+            "p95SurfaceDistance": 0.0017719394510727553,
+            "p95NormalAngleError": 8.491923340062707
+          },
+          {
+            "chartId": "rightThigh",
+            "sampleCount": 271,
+            "p95SurfaceDistance": 0.0016392509071700685,
+            "p95NormalAngleError": 4.4343683554510465
+          },
+          {
+            "chartId": "leftCalf",
+            "sampleCount": 165,
+            "p95SurfaceDistance": 0.001434918909281639,
+            "p95NormalAngleError": 5.215742603882092
+          },
+          {
+            "chartId": "rightCalf",
+            "sampleCount": 187,
+            "p95SurfaceDistance": 0.0016675022674373947,
+            "p95NormalAngleError": 5.00445327826568
+          },
+          {
+            "chartId": "leftFoot",
+            "sampleCount": 380,
+            "p95SurfaceDistance": 0.007014914975754048,
+            "p95NormalAngleError": 87.46599462580829
+          },
+          {
+            "chartId": "rightFoot",
+            "sampleCount": 426,
+            "p95SurfaceDistance": 0.007378497598066866,
+            "p95NormalAngleError": 88.24245665735235
+          }
+        ],
+        "passed": false
+      }
+    },
+    {
+      "item": 16,
+      "value": {
+        "front": 0.9320359962314415,
+        "side": 0.8626711036399191,
+        "back": 0.9320359962314415,
+        "threeQuarter": 0.9201513657900595
+      }
+    },
+    {
+      "item": 17,
+      "value": [
+        {
+          "poseId": "reference_a_pose",
+          "label": "Reference A Pose",
+          "visibleHumanEntityCount": 1,
+          "activeChartCount": 17,
+          "activeSheetCount": 12,
+          "ghostChartCount": 0,
+          "duplicateLimbCount": 0,
+          "missingRegionCount": 0,
+          "illegalFusionCount": 0,
+          "detachedAnatomicalRegionCount": 0,
+          "junctionGapMaximum": 0,
+          "junctionNormalAngleMaximum": 0,
+          "negativeChartTransformDeterminantCount": 17,
+          "negativeJunctionJacobianProxyCount": 0,
+          "chartSupportViolationCount": 0,
+          "chartLeakCount": 0,
+          "rayMissRate": null,
+          "rayMissMeasurementAvailable": false,
+          "returnToReferenceFieldError": 0,
+          "jointVolumeRatio": {
+            "shoulder": 1,
+            "elbow": 1,
+            "hip": 1,
+            "knee": 1
+          },
+          "torsoVolumeRatio": 1,
+          "junctionMetrics": [
+            {
+              "junctionId": "neckChestJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01234459267049861,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016252896376663054,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016250851505616788,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineLowerJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineMiddleJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineUpperJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "centralGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.0032455757643837986,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245646555918892,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01659293335377999,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016144554773143065,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            }
+          ],
+          "legacyFailureGates": {
+            "poseId": "reference_a_pose",
+            "originalAPoseArmGhostCount": 0,
+            "horizontalArmDuplicateCount": 0,
+            "shoulderArmSheetCountPerSide": 1,
+            "extraArmSurfaceCount": 0,
+            "detachedForearmCount": 0,
+            "detachedTorsoPatchCount": 0,
+            "spineJunctionGap": 0,
+            "pelvisThighIllegalFusionCount": 0,
+            "legWrongDirectionCount": 0,
+            "hipGroinMissingRegionCount": 0,
+            "leftRightThighIllegalFusionCount": 0,
+            "calfThighIllegalFusionCount": 0,
+            "pelvisGroinIllegalFusionCount": 0,
+            "extraFootSurfaceCount": 0,
+            "missingCalfRegionCount": 0,
+            "kneeJunctionGap": 0
+          },
+          "passed": false
+        },
+        {
+          "poseId": "reference_t_pose",
+          "label": "Reference T Pose",
+          "visibleHumanEntityCount": 1,
+          "activeChartCount": 17,
+          "activeSheetCount": 12,
+          "ghostChartCount": 0,
+          "duplicateLimbCount": 0,
+          "missingRegionCount": 0,
+          "illegalFusionCount": 0,
+          "detachedAnatomicalRegionCount": 0,
+          "junctionGapMaximum": 0,
+          "junctionNormalAngleMaximum": 0,
+          "negativeChartTransformDeterminantCount": 17,
+          "negativeJunctionJacobianProxyCount": 0,
+          "chartSupportViolationCount": 0,
+          "chartLeakCount": 0,
+          "rayMissRate": null,
+          "rayMissMeasurementAvailable": false,
+          "returnToReferenceFieldError": 0,
+          "jointVolumeRatio": {
+            "shoulder": 1,
+            "elbow": 1,
+            "hip": 1,
+            "knee": 1
+          },
+          "torsoVolumeRatio": 1,
+          "junctionMetrics": [
+            {
+              "junctionId": "neckChestJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01234459267049861,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016252896376663054,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016250851505616788,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineLowerJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineMiddleJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineUpperJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "centralGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.0032455757643839074,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245646555918745,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01659293335377999,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016144554773143065,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            }
+          ],
+          "legacyFailureGates": {
+            "poseId": "reference_t_pose",
+            "originalAPoseArmGhostCount": 0,
+            "horizontalArmDuplicateCount": 0,
+            "shoulderArmSheetCountPerSide": 1,
+            "extraArmSurfaceCount": 0,
+            "detachedForearmCount": 0,
+            "detachedTorsoPatchCount": 0,
+            "spineJunctionGap": 0,
+            "pelvisThighIllegalFusionCount": 0,
+            "legWrongDirectionCount": 0,
+            "hipGroinMissingRegionCount": 0,
+            "leftRightThighIllegalFusionCount": 0,
+            "calfThighIllegalFusionCount": 0,
+            "pelvisGroinIllegalFusionCount": 0,
+            "extraFootSurfaceCount": 0,
+            "missingCalfRegionCount": 0,
+            "kneeJunctionGap": 0
+          },
+          "passed": false
+        },
+        {
+          "poseId": "shoulder_150",
+          "label": "Shoulder 150",
+          "visibleHumanEntityCount": 1,
+          "activeChartCount": 17,
+          "activeSheetCount": 12,
+          "ghostChartCount": 0,
+          "duplicateLimbCount": 0,
+          "missingRegionCount": 0,
+          "illegalFusionCount": 0,
+          "detachedAnatomicalRegionCount": 0,
+          "junctionGapMaximum": 0,
+          "junctionNormalAngleMaximum": 0,
+          "negativeChartTransformDeterminantCount": 17,
+          "negativeJunctionJacobianProxyCount": 0,
+          "chartSupportViolationCount": 0,
+          "chartLeakCount": 0,
+          "rayMissRate": null,
+          "rayMissMeasurementAvailable": false,
+          "returnToReferenceFieldError": 0,
+          "jointVolumeRatio": {
+            "shoulder": 1,
+            "elbow": 1,
+            "hip": 1,
+            "knee": 1
+          },
+          "torsoVolumeRatio": 1,
+          "junctionMetrics": [
+            {
+              "junctionId": "neckChestJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01234459267049861,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016252896376663054,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016250851505616788,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineLowerJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineMiddleJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineUpperJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "centralGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245575764383869,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245646555918892,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01659293335377999,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016144554773143065,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            }
+          ],
+          "legacyFailureGates": {
+            "poseId": "shoulder_150",
+            "originalAPoseArmGhostCount": 0,
+            "horizontalArmDuplicateCount": 0,
+            "shoulderArmSheetCountPerSide": 1,
+            "extraArmSurfaceCount": 0,
+            "detachedForearmCount": 0,
+            "detachedTorsoPatchCount": 0,
+            "spineJunctionGap": 0,
+            "pelvisThighIllegalFusionCount": 0,
+            "legWrongDirectionCount": 0,
+            "hipGroinMissingRegionCount": 0,
+            "leftRightThighIllegalFusionCount": 0,
+            "calfThighIllegalFusionCount": 0,
+            "pelvisGroinIllegalFusionCount": 0,
+            "extraFootSurfaceCount": 0,
+            "missingCalfRegionCount": 0,
+            "kneeJunctionGap": 0
+          },
+          "passed": false
+        },
+        {
+          "poseId": "elbow_135",
+          "label": "Elbow 135",
+          "visibleHumanEntityCount": 1,
+          "activeChartCount": 17,
+          "activeSheetCount": 12,
+          "ghostChartCount": 0,
+          "duplicateLimbCount": 0,
+          "missingRegionCount": 0,
+          "illegalFusionCount": 0,
+          "detachedAnatomicalRegionCount": 0,
+          "junctionGapMaximum": 0,
+          "junctionNormalAngleMaximum": 0,
+          "negativeChartTransformDeterminantCount": 17,
+          "negativeJunctionJacobianProxyCount": 0,
+          "chartSupportViolationCount": 0,
+          "chartLeakCount": 0,
+          "rayMissRate": null,
+          "rayMissMeasurementAvailable": false,
+          "returnToReferenceFieldError": 0,
+          "jointVolumeRatio": {
+            "shoulder": 1,
+            "elbow": 1,
+            "hip": 1,
+            "knee": 1
+          },
+          "torsoVolumeRatio": 1,
+          "junctionMetrics": [
+            {
+              "junctionId": "neckChestJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01234459267049861,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016252896376663054,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016250851505616788,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineLowerJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineMiddleJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineUpperJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "centralGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245575764383874,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.0032456465559189494,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01659293335377999,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016144554773143065,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            }
+          ],
+          "legacyFailureGates": {
+            "poseId": "elbow_135",
+            "originalAPoseArmGhostCount": 0,
+            "horizontalArmDuplicateCount": 0,
+            "shoulderArmSheetCountPerSide": 1,
+            "extraArmSurfaceCount": 0,
+            "detachedForearmCount": 0,
+            "detachedTorsoPatchCount": 0,
+            "spineJunctionGap": 0,
+            "pelvisThighIllegalFusionCount": 0,
+            "legWrongDirectionCount": 0,
+            "hipGroinMissingRegionCount": 0,
+            "leftRightThighIllegalFusionCount": 0,
+            "calfThighIllegalFusionCount": 0,
+            "pelvisGroinIllegalFusionCount": 0,
+            "extraFootSurfaceCount": 0,
+            "missingCalfRegionCount": 0,
+            "kneeJunctionGap": 0
+          },
+          "passed": false
+        },
+        {
+          "poseId": "forearm_pronation_90",
+          "label": "Forearm Pronation 90",
+          "visibleHumanEntityCount": 1,
+          "activeChartCount": 17,
+          "activeSheetCount": 12,
+          "ghostChartCount": 0,
+          "duplicateLimbCount": 0,
+          "missingRegionCount": 0,
+          "illegalFusionCount": 0,
+          "detachedAnatomicalRegionCount": 0,
+          "junctionGapMaximum": 0,
+          "junctionNormalAngleMaximum": 0,
+          "negativeChartTransformDeterminantCount": 17,
+          "negativeJunctionJacobianProxyCount": 0,
+          "chartSupportViolationCount": 0,
+          "chartLeakCount": 0,
+          "rayMissRate": null,
+          "rayMissMeasurementAvailable": false,
+          "returnToReferenceFieldError": 0,
+          "jointVolumeRatio": {
+            "shoulder": 1,
+            "elbow": 1,
+            "hip": 1,
+            "knee": 1
+          },
+          "torsoVolumeRatio": 1,
+          "junctionMetrics": [
+            {
+              "junctionId": "neckChestJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01234459267049861,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016252896376663054,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016250851505616788,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineLowerJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineMiddleJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineUpperJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "centralGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245575764383931,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245646555918841,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01659293335377999,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016144554773143065,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            }
+          ],
+          "legacyFailureGates": {
+            "poseId": "forearm_pronation_90",
+            "originalAPoseArmGhostCount": 0,
+            "horizontalArmDuplicateCount": 0,
+            "shoulderArmSheetCountPerSide": 1,
+            "extraArmSurfaceCount": 0,
+            "detachedForearmCount": 0,
+            "detachedTorsoPatchCount": 0,
+            "spineJunctionGap": 0,
+            "pelvisThighIllegalFusionCount": 0,
+            "legWrongDirectionCount": 0,
+            "hipGroinMissingRegionCount": 0,
+            "leftRightThighIllegalFusionCount": 0,
+            "calfThighIllegalFusionCount": 0,
+            "pelvisGroinIllegalFusionCount": 0,
+            "extraFootSurfaceCount": 0,
+            "missingCalfRegionCount": 0,
+            "kneeJunctionGap": 0
+          },
+          "passed": false
+        },
+        {
+          "poseId": "spine_twist_45",
+          "label": "Spine Twist 45",
+          "visibleHumanEntityCount": 1,
+          "activeChartCount": 17,
+          "activeSheetCount": 12,
+          "ghostChartCount": 0,
+          "duplicateLimbCount": 0,
+          "missingRegionCount": 0,
+          "illegalFusionCount": 0,
+          "detachedAnatomicalRegionCount": 0,
+          "junctionGapMaximum": 0,
+          "junctionNormalAngleMaximum": 0,
+          "negativeChartTransformDeterminantCount": 17,
+          "negativeJunctionJacobianProxyCount": 0,
+          "chartSupportViolationCount": 0,
+          "chartLeakCount": 0,
+          "rayMissRate": null,
+          "rayMissMeasurementAvailable": false,
+          "returnToReferenceFieldError": 0,
+          "jointVolumeRatio": {
+            "shoulder": 1,
+            "elbow": 1,
+            "hip": 1,
+            "knee": 1
+          },
+          "torsoVolumeRatio": 1,
+          "junctionMetrics": [
+            {
+              "junctionId": "neckChestJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.013015837041642702,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.023453799636569815,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.0032400276006118445,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineLowerJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineMiddleJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineUpperJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "centralGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245575764383948,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245646555918853,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01659293335377999,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016144554773143065,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            }
+          ],
+          "legacyFailureGates": {
+            "poseId": "spine_twist_45",
+            "originalAPoseArmGhostCount": 0,
+            "horizontalArmDuplicateCount": 0,
+            "shoulderArmSheetCountPerSide": 1,
+            "extraArmSurfaceCount": 0,
+            "detachedForearmCount": 0,
+            "detachedTorsoPatchCount": 0,
+            "spineJunctionGap": 0,
+            "pelvisThighIllegalFusionCount": 0,
+            "legWrongDirectionCount": 0,
+            "hipGroinMissingRegionCount": 0,
+            "leftRightThighIllegalFusionCount": 0,
+            "calfThighIllegalFusionCount": 0,
+            "pelvisGroinIllegalFusionCount": 0,
+            "extraFootSurfaceCount": 0,
+            "missingCalfRegionCount": 0,
+            "kneeJunctionGap": 0
+          },
+          "passed": false
+        },
+        {
+          "poseId": "hip_flexion_90",
+          "label": "Hip Flexion 90",
+          "visibleHumanEntityCount": 1,
+          "activeChartCount": 17,
+          "activeSheetCount": 12,
+          "ghostChartCount": 0,
+          "duplicateLimbCount": 0,
+          "missingRegionCount": 0,
+          "illegalFusionCount": 0,
+          "detachedAnatomicalRegionCount": 0,
+          "junctionGapMaximum": 0,
+          "junctionNormalAngleMaximum": 0,
+          "negativeChartTransformDeterminantCount": 17,
+          "negativeJunctionJacobianProxyCount": 0,
+          "chartSupportViolationCount": 0,
+          "chartLeakCount": 0,
+          "rayMissRate": null,
+          "rayMissMeasurementAvailable": false,
+          "returnToReferenceFieldError": 0,
+          "jointVolumeRatio": {
+            "shoulder": 1,
+            "elbow": 1,
+            "hip": 1,
+            "knee": 1
+          },
+          "torsoVolumeRatio": 1,
+          "junctionMetrics": [
+            {
+              "junctionId": "neckChestJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01234459267049861,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016252896376663054,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016250851505616788,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineLowerJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineMiddleJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineUpperJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "centralGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.0032455757643837986,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245646555918892,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01659293335378005,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016144554773143176,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            }
+          ],
+          "legacyFailureGates": {
+            "poseId": "hip_flexion_90",
+            "originalAPoseArmGhostCount": 0,
+            "horizontalArmDuplicateCount": 0,
+            "shoulderArmSheetCountPerSide": 1,
+            "extraArmSurfaceCount": 0,
+            "detachedForearmCount": 0,
+            "detachedTorsoPatchCount": 0,
+            "spineJunctionGap": 0,
+            "pelvisThighIllegalFusionCount": 0,
+            "legWrongDirectionCount": 0,
+            "hipGroinMissingRegionCount": 0,
+            "leftRightThighIllegalFusionCount": 0,
+            "calfThighIllegalFusionCount": 0,
+            "pelvisGroinIllegalFusionCount": 0,
+            "extraFootSurfaceCount": 0,
+            "missingCalfRegionCount": 0,
+            "kneeJunctionGap": 0
+          },
+          "passed": false
+        },
+        {
+          "poseId": "deep_squat",
+          "label": "Deep Squat",
+          "visibleHumanEntityCount": 1,
+          "activeChartCount": 17,
+          "activeSheetCount": 12,
+          "ghostChartCount": 0,
+          "duplicateLimbCount": 0,
+          "missingRegionCount": 0,
+          "illegalFusionCount": 0,
+          "detachedAnatomicalRegionCount": 0,
+          "junctionGapMaximum": 0,
+          "junctionNormalAngleMaximum": 0,
+          "negativeChartTransformDeterminantCount": 17,
+          "negativeJunctionJacobianProxyCount": 0,
+          "chartSupportViolationCount": 0,
+          "chartLeakCount": 0,
+          "rayMissRate": null,
+          "rayMissMeasurementAvailable": false,
+          "returnToReferenceFieldError": 0,
+          "jointVolumeRatio": {
+            "shoulder": 1,
+            "elbow": 1,
+            "hip": 1,
+            "knee": 1
+          },
+          "torsoVolumeRatio": 1,
+          "junctionMetrics": [
+            {
+              "junctionId": "neckChestJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01234459267049861,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016252896376663054,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016250851505616788,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineLowerJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineMiddleJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineUpperJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "centralGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.0032455757643837986,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245646555918892,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016592933353779985,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01614455477314307,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            }
+          ],
+          "legacyFailureGates": {
+            "poseId": "deep_squat",
+            "originalAPoseArmGhostCount": 0,
+            "horizontalArmDuplicateCount": 0,
+            "shoulderArmSheetCountPerSide": 1,
+            "extraArmSurfaceCount": 0,
+            "detachedForearmCount": 0,
+            "detachedTorsoPatchCount": 0,
+            "spineJunctionGap": 0,
+            "pelvisThighIllegalFusionCount": 0,
+            "legWrongDirectionCount": 0,
+            "hipGroinMissingRegionCount": 0,
+            "leftRightThighIllegalFusionCount": 0,
+            "calfThighIllegalFusionCount": 0,
+            "pelvisGroinIllegalFusionCount": 0,
+            "extraFootSurfaceCount": 0,
+            "missingCalfRegionCount": 0,
+            "kneeJunctionGap": 0
+          },
+          "passed": false
+        },
+        {
+          "poseId": "knee_flexion_135",
+          "label": "Knee Flexion 135",
+          "visibleHumanEntityCount": 1,
+          "activeChartCount": 17,
+          "activeSheetCount": 12,
+          "ghostChartCount": 0,
+          "duplicateLimbCount": 0,
+          "missingRegionCount": 0,
+          "illegalFusionCount": 0,
+          "detachedAnatomicalRegionCount": 0,
+          "junctionGapMaximum": 0,
+          "junctionNormalAngleMaximum": 0,
+          "negativeChartTransformDeterminantCount": 17,
+          "negativeJunctionJacobianProxyCount": 0,
+          "chartSupportViolationCount": 0,
+          "chartLeakCount": 0,
+          "rayMissRate": null,
+          "rayMissMeasurementAvailable": false,
+          "returnToReferenceFieldError": 0,
+          "jointVolumeRatio": {
+            "shoulder": 1,
+            "elbow": 1,
+            "hip": 1,
+            "knee": 1
+          },
+          "torsoVolumeRatio": 1,
+          "junctionMetrics": [
+            {
+              "junctionId": "neckChestJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01234459267049861,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016252896376663054,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightShoulderAxillaJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.016250851505616788,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightElbowJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineLowerJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineMiddleJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "spineUpperJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightHipGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "centralGroinJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightKneeJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.0032455757643837986,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightWristHandJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.003245646555918892,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "leftAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01659293335377993,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            },
+            {
+              "junctionId": "rightAnkleFootJunction",
+              "junctionGap": 0,
+              "unbridgedChartGap": 0.01614455477314297,
+              "junctionNormalAngle": 0,
+              "junctionNormalMeasurement": "analytic shared-gradient junction authority",
+              "junctionLocalJacobianProxy": 1
+            }
+          ],
+          "legacyFailureGates": {
+            "poseId": "knee_flexion_135",
+            "originalAPoseArmGhostCount": 0,
+            "horizontalArmDuplicateCount": 0,
+            "shoulderArmSheetCountPerSide": 1,
+            "extraArmSurfaceCount": 0,
+            "detachedForearmCount": 0,
+            "detachedTorsoPatchCount": 0,
+            "spineJunctionGap": 0,
+            "pelvisThighIllegalFusionCount": 0,
+            "legWrongDirectionCount": 0,
+            "hipGroinMissingRegionCount": 0,
+            "leftRightThighIllegalFusionCount": 0,
+            "calfThighIllegalFusionCount": 0,
+            "pelvisGroinIllegalFusionCount": 0,
+            "extraFootSurfaceCount": 0,
+            "missingCalfRegionCount": 0,
+            "kneeJunctionGap": 0
+          },
+          "passed": false
+        }
+      ]
+    },
+    {
+      "item": 18,
+      "value": 0
+    },
+    {
+      "item": 19,
+      "value": 0
+    },
+    {
+      "item": 20,
+      "value": 0
+    },
+    {
+      "item": 21,
+      "value": 0
+    },
+    {
+      "item": 22,
+      "value": 0
+    },
+    {
+      "item": 23,
+      "value": 0
+    },
+    {
+      "item": 24,
+      "value": null
+    },
+    {
+      "item": 25,
+      "value": {
+        "shoulder": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "elbow": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "hip": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "knee": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "torso": {
+          "minimum": 1,
+          "maximum": 1
+        }
+      }
+    },
+    {
+      "item": 26,
+      "value": [
+        {
+          "name": "layered-field-a-pose-front.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-a-pose-side.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-a-pose-back.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-a-pose-three-quarter.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-t-pose.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-shoulder-150.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-elbow-135.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-forearm-pronation.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-spine-twist.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-hip-90.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-deep-squat.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-knee-135.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "head-face-closeup.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "shoulder-axilla-closeup.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "elbow-closeup.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "hand-closeup.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "spine-junction-closeup.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "pelvis-groin-closeup.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "knee-closeup.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "ankle-foot-closeup.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "chart-region-debug.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "sheet-id-debug.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "junction-region-debug.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "self-contact-sheet-debug.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "chart-support-debug.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "junction-gradient-debug.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "legacy-vs-layered-t-pose.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "legacy-vs-layered-shoulder.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "legacy-vs-layered-spine.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "legacy-vs-layered-hip.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "legacy-vs-layered-deep-squat.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-contact-sheet.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "nine-pose-contact-sheet.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "field-atlas-debug-contact-sheet.png",
+          "status": "not-generated"
+        }
+      ]
+    },
+    {
+      "item": 27,
+      "value": [
+        {
+          "name": "self-contact-sheet-debug.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "layered-field-contact-sheet.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "nine-pose-contact-sheet.png",
+          "status": "not-generated"
+        },
+        {
+          "name": "field-atlas-debug-contact-sheet.png",
+          "status": "not-generated"
+        }
+      ]
+    },
+    {
+      "item": 28,
+      "value": "http://127.0.0.1:4173/human-core-v5-layered-articulated-field-atlas-v1.html"
+    },
+    {
+      "item": 29,
+      "value": "artifacts/review/task18a-r2-layered-field-atlas-v1/layered-articulated-field-atlas-review-standalone.html"
+    },
+    {
+      "item": 30,
+      "value": null
+    },
+    {
+      "item": 31,
+      "value": null
+    },
+    {
+      "item": 32,
+      "value": null
+    },
+    {
+      "item": 33,
+      "value": null
+    },
+    {
+      "item": 34,
+      "value": null
+    },
+    {
+      "item": 35,
+      "value": "BROWSER_EVIDENCE_INCONCLUSIVE"
+    },
+    {
+      "item": 36,
+      "value": false
+    },
+    {
+      "item": 37,
+      "value": false
+    },
+    {
+      "item": 38,
+      "value": false
+    },
+    {
+      "item": 39,
+      "value": "pending"
+    },
+    {
+      "item": 40,
+      "value": "dirty only with uncommitted Task 18A R2 implementation and evidence; no final pass commit"
+    }
+  ],
+  "conclusion": "BROWSER_EVIDENCE_INCONCLUSIVE"
+}

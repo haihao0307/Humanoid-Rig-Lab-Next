@@ -1,0 +1,2817 @@
+{
+  "schema": "humanoid_rig/layered_articulated_human_field_atlas@1.0",
+  "atlasId": "HRLLayeredArticulatedHumanFieldAtlasV1",
+  "implementationRound": 2,
+  "unit": "meter",
+  "coordinateSystem": "right-handed, +Y up, +Z front",
+  "authorityChain": [
+    "Character Specification",
+    "BodyDNA Reference",
+    "HumanRigCore",
+    "finalPose.localRotations",
+    "Performance Deform Rig",
+    "HRLLayeredArticulatedHumanFieldAtlasV1",
+    "Human Field Renderer"
+  ],
+  "runtimeAuthority": "layered-continuous-field",
+  "runtimeMeshAuthority": false,
+  "runtimeProductionPositionArray": false,
+  "runtimeProductionIndexArray": false,
+  "runtimeSkinnedMesh": false,
+  "runtimeHumanGlbLoaded": false,
+  "traditionalSkinWeightsUsed": false,
+  "traditionalMorphTargetUsed": false,
+  "blenderCageUsed": false,
+  "hiddenHumanMeshUsed": false,
+  "perFrameTriangleReconstructionUsed": false,
+  "globalInverseWarpEnabled": false,
+  "globalWholeBodySmoothUnionEnabled": false,
+  "singleCanonicalPointLookupEnabled": false,
+  "directPosedChartQuery": true,
+  "atlasHash": "5C7A534B00FE58F8B299119D9F37AF6A4D80A88540EBC6BE9BA18AE0B63469CE",
+  "sourceGlobalFieldHash": "CB039C2A2F9A6773C86C1889C4B24FE539570701562FCE38308A3E831D032B42",
+  "sourceBoundary": {
+    "globalFieldUsedOfflineForLocalChartFittingOnly": true,
+    "productionSurfaceUsedOfflineForQaOnly": true,
+    "runtimeCopiesSourceArrays": false
+  },
+  "charts": [
+    {
+      "chartId": "head",
+      "sheetId": "head-sheet",
+      "anchorJointIds": [
+        "head"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          8.979432896549775e-11,
+          0.8720829650964779,
+          0.1264385454635173
+        ],
+        "bindAxes": [
+          [
+            -1,
+            0,
+            0
+          ],
+          [
+            0,
+            0.990549866766363,
+            0.13715305847534248
+          ],
+          [
+            0,
+            -0.13715305847534248,
+            0.990549866766363
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.145,
+          0.16,
+          0.18518856115122598
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "head-local-grid-r2"
+      ],
+      "regionIds": [
+        "eyes",
+        "hairline"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 0
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [],
+      "forbiddenFusionChartIds": [],
+      "grid": {
+        "dimensions": [
+          32,
+          35,
+          40
+        ],
+        "spacing": [
+          0.009354838709677418,
+          0.009411764705882354,
+          0.00949684928980646
+        ],
+        "valueOffset": 0,
+        "valueCount": 44800,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 308,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 4986,
+          "minimumGradientMagnitude": 0.2538191622019396,
+          "meanGradientMagnitude": 0.9643247632791816,
+          "p95GradientMagnitude": 1.0044843579587754,
+          "maximumGradientMagnitude": 1.0210349039537079
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 4566,
+          "minimumGradientMagnitude": 0.592162436517945,
+          "meanGradientMagnitude": 1.0448466999544246,
+          "p95GradientMagnitude": 1.2543598565693685,
+          "maximumGradientMagnitude": 1.6713527350366435
+        },
+        "surfaceDistanceError": 0.0016537373888137065,
+        "normalAngleError": 3.132583382170902,
+        "brickCount": 1,
+        "memoryBytes": 89600
+      }
+    },
+    {
+      "chartId": "neck",
+      "sheetId": "neck-sheet",
+      "anchorJointIds": [
+        "neck",
+        "head"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          1.5238185239024753e-8,
+          0.7337465507834235,
+          0.09339649198000996
+        ],
+        "bindAxes": [
+          [
+            -0.9999999999999787,
+            -2.065602886636147e-7,
+            0
+          ],
+          [
+            -1.9628180574832237e-7,
+            0.9502397920636376,
+            0.31151940160897934
+          ],
+          [
+            6.434753752066728e-8,
+            -0.3115194016089726,
+            0.9502397920636577
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.09,
+          0.1,
+          0.09
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "neck-local-grid-r2"
+      ],
+      "regionIds": [
+        "eyes",
+        "mouth"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 0
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "neckChestJunction"
+      ],
+      "forbiddenFusionChartIds": [],
+      "grid": {
+        "dimensions": [
+          20,
+          23,
+          20
+        ],
+        "spacing": [
+          0.009473684210526315,
+          0.009090909090909092,
+          0.009473684210526315
+        ],
+        "valueOffset": 44800,
+        "valueCount": 9200,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 111,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 5554,
+          "minimumGradientMagnitude": 0.0718492902827939,
+          "meanGradientMagnitude": 0.9062581672475521,
+          "p95GradientMagnitude": 1.002127834843557,
+          "maximumGradientMagnitude": 1.0178578448190556
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 5294,
+          "minimumGradientMagnitude": 0.05655566928908228,
+          "meanGradientMagnitude": 0.9956252980141823,
+          "p95GradientMagnitude": 1.2145498121646563,
+          "maximumGradientMagnitude": 1.5921953949717091
+        },
+        "surfaceDistanceError": 0.002834993166693885,
+        "normalAngleError": 15.70045549556541,
+        "brickCount": 1,
+        "memoryBytes": 18400
+      }
+    },
+    {
+      "chartId": "chest",
+      "sheetId": "torso-sheet",
+      "anchorJointIds": [
+        "spineUpper",
+        "chest",
+        "neck"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          0.00000237732354674016,
+          0.5142916085268584,
+          0.10459784445320833
+        ],
+        "bindAxes": [
+          [
+            -0.9999999998710083,
+            -0.000016061871162537732,
+            0
+          ],
+          [
+            -0.000015614106896935636,
+            0.9721225339759579,
+            -0.23447340721788076
+          ],
+          [
+            -0.0000037660816577748455,
+            0.23447340718763565,
+            0.972122534101354
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.26,
+          0.3355010442021037,
+          0.20512151508661097
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "chest-local-grid-r2"
+      ],
+      "regionIds": [
+        "clavicle",
+        "ear_boundary",
+        "eyes",
+        "front_axilla",
+        "hairline",
+        "jaw",
+        "mouth",
+        "nasolabial",
+        "neck_base",
+        "scapular",
+        "shoulder_cap"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 0
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "neckChestJunction",
+        "leftShoulderAxillaJunction",
+        "rightShoulderAxillaJunction",
+        "spineMiddleJunction",
+        "spineUpperJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "leftHand",
+        "leftUpperArm",
+        "rightHand",
+        "rightUpperArm"
+      ],
+      "grid": {
+        "dimensions": [
+          52,
+          52,
+          45
+        ],
+        "spacing": [
+          0.01019607843137255,
+          0.013156903694200145,
+          0.00932370523120959
+        ],
+        "valueOffset": 54000,
+        "valueCount": 121680,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 5398,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 30022,
+          "minimumGradientMagnitude": 0.029058877318070737,
+          "meanGradientMagnitude": 0.961770775786091,
+          "p95GradientMagnitude": 1.0049190535138932,
+          "maximumGradientMagnitude": 1.0298302198102942
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 27567,
+          "minimumGradientMagnitude": 0.1115218054928791,
+          "meanGradientMagnitude": 1.0424677500259165,
+          "p95GradientMagnitude": 1.2027384919502466,
+          "maximumGradientMagnitude": 1.5532268473013724
+        },
+        "surfaceDistanceError": 0.0071431505560520005,
+        "normalAngleError": 72.3435784300344,
+        "brickCount": 1,
+        "memoryBytes": 243360
+      }
+    },
+    {
+      "chartId": "abdomen",
+      "sheetId": "torso-sheet",
+      "anchorJointIds": [
+        "spineLower",
+        "spineMiddle",
+        "spineUpper"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          0.000020822609380420133,
+          0.3000078742115917,
+          0.13977506023622596
+        ],
+        "bindAxes": [
+          [
+            -0.9999999721126563,
+            -0.0002361666496885869,
+            0
+          ],
+          [
+            -0.0002361665383489565,
+            0.9999995006674822,
+            0.0009710253098357424
+          ],
+          [
+            2.2932379418672936e-7,
+            -0.000971025282756426,
+            0.9999995285548127
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.22,
+          0.2,
+          0.15
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "abdomen-local-grid-r2"
+      ],
+      "regionIds": [
+        "abdomen",
+        "waist"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 0
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "spineLowerJunction",
+        "spineMiddleJunction",
+        "spineUpperJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "leftThigh",
+        "rightThigh"
+      ],
+      "grid": {
+        "dimensions": [
+          48,
+          44,
+          33
+        ],
+        "spacing": [
+          0.009361702127659575,
+          0.009302325581395349,
+          0.009375
+        ],
+        "valueOffset": 175680,
+        "valueCount": 69696,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 69,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 18252,
+          "minimumGradientMagnitude": 0.2497815303867372,
+          "meanGradientMagnitude": 0.9730321655151614,
+          "p95GradientMagnitude": 1.0039383575974874,
+          "maximumGradientMagnitude": 1.0301989876001187
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 17228,
+          "minimumGradientMagnitude": 0.327199771495506,
+          "meanGradientMagnitude": 1.0286085577030413,
+          "p95GradientMagnitude": 1.1490525955669617,
+          "maximumGradientMagnitude": 1.5110829953686737
+        },
+        "surfaceDistanceError": 0.0010256495453669831,
+        "normalAngleError": 1.970778188464041,
+        "brickCount": 1,
+        "memoryBytes": 139392
+      }
+    },
+    {
+      "chartId": "pelvisCore",
+      "sheetId": "pelvis-sheet",
+      "anchorJointIds": [
+        "pelvis",
+        "spineLower"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          0.002409931075316022,
+          0.1660638451796823,
+          0.133666079943035
+        ],
+        "bindAxes": [
+          [
+            -0.9993499102244564,
+            -0.03605214188326749,
+            0
+          ],
+          [
+            -0.03590116712319559,
+            0.9951649546284053,
+            0.091421109589833
+          ],
+          [
+            0.0032959268140584056,
+            -0.0913616776612198,
+            0.9958123220373223
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.24,
+          0.18,
+          0.2583082635037759
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "pelvisCore-local-grid-r2"
+      ],
+      "regionIds": [
+        "pelvis"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 0
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "spineLowerJunction",
+        "leftHipGroinJunction",
+        "rightHipGroinJunction",
+        "centralGroinJunction"
+      ],
+      "forbiddenFusionChartIds": [],
+      "grid": {
+        "dimensions": [
+          52,
+          39,
+          52
+        ],
+        "spacing": [
+          0.009411764705882352,
+          0.009473684210526315,
+          0.010129735823677486
+        ],
+        "valueOffset": 245376,
+        "valueCount": 105456,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 485,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 19769,
+          "minimumGradientMagnitude": 0.3813597522775965,
+          "meanGradientMagnitude": 0.979750007848112,
+          "p95GradientMagnitude": 1.0048258862007078,
+          "maximumGradientMagnitude": 1.0270872863334686
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 18442,
+          "minimumGradientMagnitude": 0.4784723752731794,
+          "meanGradientMagnitude": 1.0422959696056446,
+          "p95GradientMagnitude": 1.175726850493104,
+          "maximumGradientMagnitude": 1.555469002929195
+        },
+        "surfaceDistanceError": 0.0015724046055428272,
+        "normalAngleError": 3.6338583145879837,
+        "brickCount": 1,
+        "memoryBytes": 210912
+      }
+    },
+    {
+      "chartId": "leftUpperArm",
+      "sheetId": "left-arm-sheet",
+      "anchorJointIds": [
+        "leftUpperArm",
+        "leftUpperArmTwist01",
+        "leftUpperArmTwist02"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          -0.2828463159678696,
+          0.4043880504044766,
+          0.06160340957478412
+        ],
+        "bindAxes": [
+          [
+            0.8255059889451832,
+            -0.564393357699783,
+            0
+          ],
+          [
+            -0.5554436091503351,
+            -0.8124157019559223,
+            0.17737847746983249
+          ],
+          [
+            0.10011123448287404,
+            0.14642699546132495,
+            0.9841427110589622
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.1086943035945219,
+          0.24470404289106817,
+          0.12191009820276685
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "leftUpperArm-local-grid-r2"
+      ],
+      "regionIds": [
+        "clavicle",
+        "deltoid",
+        "elbow",
+        "forearm",
+        "shoulder_cap"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": -1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "leftShoulderAxillaJunction",
+        "leftElbowJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "chest",
+        "rightHand"
+      ],
+      "grid": {
+        "dimensions": [
+          24,
+          52,
+          27
+        ],
+        "spacing": [
+          0.009451678573436687,
+          0.009596236976120321,
+          0.009377699861751297
+        ],
+        "valueOffset": 350832,
+        "valueCount": 33696,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 683,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 8209,
+          "minimumGradientMagnitude": 0.06682736681069483,
+          "meanGradientMagnitude": 0.9593553750902303,
+          "p95GradientMagnitude": 1.0039487490678998,
+          "maximumGradientMagnitude": 1.0219601408052135
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 7466,
+          "minimumGradientMagnitude": 0.13798397884578187,
+          "meanGradientMagnitude": 1.0457728910347448,
+          "p95GradientMagnitude": 1.2539905647406413,
+          "maximumGradientMagnitude": 1.5844460967153509
+        },
+        "surfaceDistanceError": 0.001907015796062825,
+        "normalAngleError": 5.9181877514630115,
+        "brickCount": 1,
+        "memoryBytes": 67392
+      }
+    },
+    {
+      "chartId": "rightUpperArm",
+      "sheetId": "right-arm-sheet",
+      "anchorJointIds": [
+        "rightUpperArm",
+        "rightUpperArmTwist01",
+        "rightUpperArmTwist02"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          0.282846618516183,
+          0.40438781678222224,
+          0.06160341958902396
+        ],
+        "bindAxes": [
+          [
+            0.8255064956725578,
+            0.5643926165378255,
+            0
+          ],
+          [
+            0.5554428387452176,
+            -0.8124161406853774,
+            0.17737888048054495
+          ],
+          [
+            -0.10011133047296498,
+            0.14642741803181614,
+            0.9841426384216205
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.10869450506348,
+          0.24470441615588953,
+          0.12191006179930171
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "rightUpperArm-local-grid-r2"
+      ],
+      "regionIds": [
+        "clavicle",
+        "deltoid",
+        "elbow",
+        "forearm",
+        "shoulder_cap"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "rightShoulderAxillaJunction",
+        "rightElbowJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "chest",
+        "leftHand"
+      ],
+      "grid": {
+        "dimensions": [
+          24,
+          52,
+          27
+        ],
+        "spacing": [
+          0.009451696092476522,
+          0.009596251613956452,
+          0.009377697061484747
+        ],
+        "valueOffset": 384528,
+        "valueCount": 33696,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 681,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 8209,
+          "minimumGradientMagnitude": 0.06683948281173877,
+          "meanGradientMagnitude": 0.9593552150148432,
+          "p95GradientMagnitude": 1.003945968422075,
+          "maximumGradientMagnitude": 1.0219575875200875
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 7466,
+          "minimumGradientMagnitude": 0.1380277555531264,
+          "meanGradientMagnitude": 1.0457680273626038,
+          "p95GradientMagnitude": 1.2535452050804188,
+          "maximumGradientMagnitude": 1.5844516175583867
+        },
+        "surfaceDistanceError": 0.0017470543535438195,
+        "normalAngleError": 6.210388526871841,
+        "brickCount": 1,
+        "memoryBytes": 67392
+      }
+    },
+    {
+      "chartId": "leftForearm",
+      "sheetId": "left-arm-sheet",
+      "anchorJointIds": [
+        "leftLowerArm",
+        "leftForearmTwist01",
+        "leftForearmTwist02"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          -0.42308799399982366,
+          0.21834337909125934,
+          0.15812726767769758
+        ],
+        "bindAxes": [
+          [
+            0.757691277494048,
+            -0.6526131534143621,
+            0
+          ],
+          [
+            -0.5240392708784828,
+            -0.6084155407098618,
+            0.5959977956334022
+          ],
+          [
+            0.3889560008363231,
+            0.451582331157109,
+            0.8029860693686569
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.09,
+          0.2,
+          0.14683781604060014
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "leftForearm-local-grid-r2"
+      ],
+      "regionIds": [
+        "elbow",
+        "forearm",
+        "palm",
+        "wrist"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": -1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "leftElbowJunction",
+        "leftWristHandJunction"
+      ],
+      "forbiddenFusionChartIds": [],
+      "grid": {
+        "dimensions": [
+          20,
+          44,
+          32
+        ],
+        "spacing": [
+          0.009473684210526315,
+          0.009302325581395349,
+          0.009473407486490332
+        ],
+        "valueOffset": 418224,
+        "valueCount": 28160,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 962,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 4086,
+          "minimumGradientMagnitude": 0.08645456346529584,
+          "meanGradientMagnitude": 0.9156629608271343,
+          "p95GradientMagnitude": 1.000000046333298,
+          "maximumGradientMagnitude": 1.0192707557146685
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 3496,
+          "minimumGradientMagnitude": 0.13698494628426156,
+          "meanGradientMagnitude": 1.0039955813365256,
+          "p95GradientMagnitude": 1.176848883112734,
+          "maximumGradientMagnitude": 1.350627668983428
+        },
+        "surfaceDistanceError": 0.005669736151092707,
+        "normalAngleError": 37.58694537420398,
+        "brickCount": 1,
+        "memoryBytes": 56320
+      }
+    },
+    {
+      "chartId": "rightForearm",
+      "sheetId": "right-arm-sheet",
+      "anchorJointIds": [
+        "rightLowerArm",
+        "rightForearmTwist01",
+        "rightForearmTwist02"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          0.4230881762942354,
+          0.21834313311953535,
+          0.15812739486758395
+        ],
+        "bindAxes": [
+          [
+            0.757691133249493,
+            0.6526133208838899,
+            0
+          ],
+          [
+            0.5240391592912984,
+            -0.6084151392018223,
+            0.5959983036211566
+          ],
+          [
+            -0.3889564321673679,
+            0.45158263008548954,
+            0.8029856923262728
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.09,
+          0.2,
+          0.14683785240487918
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "rightForearm-local-grid-r2"
+      ],
+      "regionIds": [
+        "elbow",
+        "forearm",
+        "palm",
+        "wrist"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "rightElbowJunction",
+        "rightWristHandJunction"
+      ],
+      "forbiddenFusionChartIds": [],
+      "grid": {
+        "dimensions": [
+          20,
+          44,
+          32
+        ],
+        "spacing": [
+          0.009473684210526315,
+          0.009302325581395349,
+          0.00947340983257285
+        ],
+        "valueOffset": 446384,
+        "valueCount": 28160,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 962,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 4087,
+          "minimumGradientMagnitude": 0.08646117505321409,
+          "meanGradientMagnitude": 0.915676658760079,
+          "p95GradientMagnitude": 1.000000046333298,
+          "maximumGradientMagnitude": 1.0192712975798024
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 3496,
+          "minimumGradientMagnitude": 0.13698159073815067,
+          "meanGradientMagnitude": 1.0040013039374969,
+          "p95GradientMagnitude": 1.176844290985773,
+          "maximumGradientMagnitude": 1.350633069121164
+        },
+        "surfaceDistanceError": 0.005305701194659936,
+        "normalAngleError": 40.083665051797716,
+        "brickCount": 1,
+        "memoryBytes": 56320
+      }
+    },
+    {
+      "chartId": "leftHand",
+      "sheetId": "left-hand-sheet",
+      "anchorJointIds": [
+        "leftHand",
+        "leftMiddleProximal",
+        "leftMiddleDistal"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          -0.47608246785767366,
+          0.08575027036911445,
+          0.22862238606384494
+        ],
+        "bindAxes": [
+          [
+            0.9852973596196735,
+            0.17084821663248242,
+            0
+          ],
+          [
+            0.17079893043429922,
+            -0.985013121587268,
+            -0.024018236059402703
+          ],
+          [
+            0.004103472797406935,
+            -0.02366510457205152,
+            0.9997115205581031
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.09,
+          0.1315891417314492,
+          0.13177221995520355
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "leftHand-local-grid-r2"
+      ],
+      "regionIds": [
+        "palm",
+        "wrist"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": -1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "leftWristHandJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "chest",
+        "rightUpperArm"
+      ],
+      "grid": {
+        "dimensions": [
+          20,
+          29,
+          29
+        ],
+        "spacing": [
+          0.009473684210526315,
+          0.009399224409389229,
+          0.009412301425371682
+        ],
+        "valueOffset": 474544,
+        "valueCount": 16820,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 797,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 1346,
+          "minimumGradientMagnitude": 0.11368478409111737,
+          "meanGradientMagnitude": 0.843776696494259,
+          "p95GradientMagnitude": 0.9935658821393639,
+          "maximumGradientMagnitude": 1.016067953694366
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 1018,
+          "minimumGradientMagnitude": 0.005160597752389748,
+          "meanGradientMagnitude": 0.9785168309599335,
+          "p95GradientMagnitude": 1.197541945775145,
+          "maximumGradientMagnitude": 1.373007484649683
+        },
+        "surfaceDistanceError": 0.01016409648910783,
+        "normalAngleError": 49.70550298180397,
+        "brickCount": 1,
+        "memoryBytes": 33640
+      }
+    },
+    {
+      "chartId": "rightHand",
+      "sheetId": "right-hand-sheet",
+      "anchorJointIds": [
+        "rightHand",
+        "rightMiddleProximal",
+        "rightMiddleDistal"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          0.4760825610228095,
+          0.08575009299417426,
+          0.22862250163732353
+        ],
+        "bindAxes": [
+          [
+            0.9852971376959199,
+            -0.17084949648221828,
+            0
+          ],
+          [
+            -0.17080020492162445,
+            -0.9850128709315124,
+            -0.02401945249148182
+          ],
+          [
+            -0.004103711363948233,
+            -0.023666297788880176,
+            0.9997114913323791
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.09,
+          0.13158934641711464,
+          0.13177201008094575
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "rightHand-local-grid-r2"
+      ],
+      "regionIds": [
+        "palm",
+        "wrist"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "rightWristHandJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "chest",
+        "leftUpperArm"
+      ],
+      "grid": {
+        "dimensions": [
+          20,
+          29,
+          29
+        ],
+        "spacing": [
+          0.009473684210526315,
+          0.009399239029793904,
+          0.009412286434353268
+        ],
+        "valueOffset": 491364,
+        "valueCount": 16820,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 797,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 1346,
+          "minimumGradientMagnitude": 0.11368825919071338,
+          "meanGradientMagnitude": 0.8437768267569895,
+          "p95GradientMagnitude": 0.9935665725720116,
+          "maximumGradientMagnitude": 1.0160694414602163
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 1018,
+          "minimumGradientMagnitude": 0.005152867440442141,
+          "meanGradientMagnitude": 0.9785163848408748,
+          "p95GradientMagnitude": 1.1975203532041259,
+          "maximumGradientMagnitude": 1.3730055931649563
+        },
+        "surfaceDistanceError": 0.009426682877276871,
+        "normalAngleError": 47.07167756510971,
+        "brickCount": 1,
+        "memoryBytes": 33640
+      }
+    },
+    {
+      "chartId": "leftThigh",
+      "sheetId": "left-leg-sheet",
+      "anchorJointIds": [
+        "leftUpperLeg",
+        "leftThighTwist01",
+        "leftThighTwist02"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          -0.10900108433620101,
+          -0.10747152481045749,
+          0.06517557194673429
+        ],
+        "bindAxes": [
+          [
+            0.9935921683509402,
+            -0.11302478927950502,
+            0
+          ],
+          [
+            -0.11259108354989551,
+            -0.9897794948741221,
+            -0.08752028011717163
+          ],
+          [
+            -0.009891961217926577,
+            -0.08695946489630225,
+            0.9961627379942555
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.15,
+          0.3220307301933987,
+          0.21863015688855336
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "leftThigh-local-grid-r2"
+      ],
+      "regionIds": [
+        "back_groin",
+        "front_groin",
+        "gluteal",
+        "hip_root",
+        "knee",
+        "pelvis",
+        "thigh_twist"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": -1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "leftHipGroinJunction",
+        "centralGroinJunction",
+        "leftKneeJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "abdomen",
+        "rightCalf",
+        "rightThigh"
+      ],
+      "grid": {
+        "dimensions": [
+          33,
+          52,
+          48
+        ],
+        "spacing": [
+          0.009375,
+          0.012628656086015634,
+          0.009303410931427803
+        ],
+        "valueOffset": 508184,
+        "valueCount": 82368,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 801,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 21181,
+          "minimumGradientMagnitude": 0.1922738013581837,
+          "meanGradientMagnitude": 0.9760627305688331,
+          "p95GradientMagnitude": 1.005755523801371,
+          "maximumGradientMagnitude": 1.0307237019564657
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 19730,
+          "minimumGradientMagnitude": 0.3828005004529546,
+          "meanGradientMagnitude": 1.042287827198063,
+          "p95GradientMagnitude": 1.1674322986229848,
+          "maximumGradientMagnitude": 1.602443798164963
+        },
+        "surfaceDistanceError": 0.0017719394510727553,
+        "normalAngleError": 8.491923340062707,
+        "brickCount": 1,
+        "memoryBytes": 164736
+      }
+    },
+    {
+      "chartId": "rightThigh",
+      "sheetId": "right-leg-sheet",
+      "anchorJointIds": [
+        "rightUpperLeg",
+        "rightThighTwist01",
+        "rightThighTwist02"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          0.11338301565623549,
+          -0.10787178835672945,
+          0.06420882328350493
+        ],
+        "bindAxes": [
+          [
+            0.9956747703725928,
+            0.0929072206208133,
+            0
+          ],
+          [
+            0.09258371259021808,
+            -0.9922077762904943,
+            -0.08337856338222795
+          ],
+          [
+            0.007746470583199119,
+            -0.0830179319495965,
+            0.9965179452314523
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.15,
+          0.32317310935973564,
+          0.21704754262090034
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "rightThigh-local-grid-r2"
+      ],
+      "regionIds": [
+        "back_groin",
+        "front_groin",
+        "gluteal",
+        "hip_root",
+        "knee",
+        "pelvis",
+        "thigh_twist"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "rightHipGroinJunction",
+        "centralGroinJunction",
+        "rightKneeJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "abdomen",
+        "leftCalf",
+        "leftThigh"
+      ],
+      "grid": {
+        "dimensions": [
+          33,
+          52,
+          47
+        ],
+        "spacing": [
+          0.009375,
+          0.01267345526900924,
+          0.00943684967916958
+        ],
+        "valueOffset": 590552,
+        "valueCount": 80652,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 791,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 20464,
+          "minimumGradientMagnitude": 0.20929377021898574,
+          "meanGradientMagnitude": 0.9761462626892713,
+          "p95GradientMagnitude": 1.0056037707730767,
+          "maximumGradientMagnitude": 1.0277663000761856
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 19071,
+          "minimumGradientMagnitude": 0.3616209485690055,
+          "meanGradientMagnitude": 1.0427705899098707,
+          "p95GradientMagnitude": 1.1665902487249895,
+          "maximumGradientMagnitude": 1.598446375083883
+        },
+        "surfaceDistanceError": 0.0016392509071700685,
+        "normalAngleError": 4.4343683554510465,
+        "brickCount": 1,
+        "memoryBytes": 161304
+      }
+    },
+    {
+      "chartId": "leftCalf",
+      "sheetId": "left-leg-sheet",
+      "anchorJointIds": [
+        "leftLowerLeg",
+        "leftCalfTwist01"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          -0.1666290683757811,
+          -0.5166827441096802,
+          0.04947509493828632
+        ],
+        "bindAxes": [
+          [
+            0.9859361177220755,
+            -0.16712262495282287,
+            0
+          ],
+          [
+            -0.16710517406084277,
+            -0.9858331665824887,
+            0.014450898520120919
+          ],
+          [
+            0.002415072093609471,
+            0.014247662784523704,
+            0.9998955803142453
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.12,
+          0.32996168422374483,
+          0.14698675487607565
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "leftCalf-local-grid-r2"
+      ],
+      "regionIds": [
+        "ankle",
+        "arch",
+        "calf",
+        "heel",
+        "knee"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": -1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "leftKneeJunction",
+        "leftAnkleFootJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "rightFoot",
+        "rightThigh"
+      ],
+      "grid": {
+        "dimensions": [
+          27,
+          52,
+          32
+        ],
+        "spacing": [
+          0.00923076923076923,
+          0.012939673891127249,
+          0.009483016443617783
+        ],
+        "valueOffset": 671204,
+        "valueCount": 44928,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 543,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 13360,
+          "minimumGradientMagnitude": 0.050018092484730964,
+          "meanGradientMagnitude": 0.9660735184209195,
+          "p95GradientMagnitude": 1.0048244398701478,
+          "maximumGradientMagnitude": 1.0350202401832542
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 12438,
+          "minimumGradientMagnitude": 0.18096612454585478,
+          "meanGradientMagnitude": 1.038385098312704,
+          "p95GradientMagnitude": 1.1909872393598626,
+          "maximumGradientMagnitude": 1.5284679534730221
+        },
+        "surfaceDistanceError": 0.001434918909281639,
+        "normalAngleError": 5.215742603882092,
+        "brickCount": 1,
+        "memoryBytes": 89856
+      }
+    },
+    {
+      "chartId": "rightCalf",
+      "sheetId": "right-leg-sheet",
+      "anchorJointIds": [
+        "rightLowerLeg",
+        "rightCalfTwist01"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          0.16676918353269737,
+          -0.5175964898903188,
+          0.049437004404770245
+        ],
+        "bindAxes": [
+          [
+            0.9859248885683951,
+            0.16718885758745325,
+            0
+          ],
+          [
+            0.16717082179948836,
+            -0.9858185302111688,
+            0.01468815274888994
+          ],
+          [
+            -0.00245569547815692,
+            0.014481415362224878,
+            0.9998921232657176
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.12,
+          0.3290151331701483,
+          0.14693540587413206
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "rightCalf-local-grid-r2"
+      ],
+      "regionIds": [
+        "ankle",
+        "arch",
+        "calf",
+        "heel",
+        "knee"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "rightKneeJunction",
+        "rightAnkleFootJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "leftFoot",
+        "leftThigh"
+      ],
+      "grid": {
+        "dimensions": [
+          27,
+          52,
+          32
+        ],
+        "spacing": [
+          0.00923076923076923,
+          0.0129025542419666,
+          0.009479703604782714
+        ],
+        "valueOffset": 716132,
+        "valueCount": 44928,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 543,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 13339,
+          "minimumGradientMagnitude": 0.05093576754993546,
+          "meanGradientMagnitude": 0.965978290386653,
+          "p95GradientMagnitude": 1.0049242961202653,
+          "maximumGradientMagnitude": 1.0365246611686134
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 12396,
+          "minimumGradientMagnitude": 0.18359801985018492,
+          "meanGradientMagnitude": 1.0383268120272586,
+          "p95GradientMagnitude": 1.191531913157631,
+          "maximumGradientMagnitude": 1.530395135342095
+        },
+        "surfaceDistanceError": 0.0016675022674373947,
+        "normalAngleError": 5.00445327826568,
+        "brickCount": 1,
+        "memoryBytes": 89856
+      }
+    },
+    {
+      "chartId": "leftFoot",
+      "sheetId": "left-foot-sheet",
+      "anchorJointIds": [
+        "leftFoot",
+        "leftToe"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          -0.19550557517741324,
+          -0.7540133765406161,
+          0.11006510621519164
+        ],
+        "bindAxes": [
+          [
+            0.9923447828093942,
+            0.12349830780612565,
+            0
+          ],
+          [
+            0.06907643945198469,
+            -0.5550492595642349,
+            0.8289443678376919
+          ],
+          [
+            -0.10237322669337352,
+            0.8225986186629649,
+            0.5593310603123781
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.11590798637517487,
+          0.16,
+          0.16505278759982672
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "leftFoot-local-grid-r2"
+      ],
+      "regionIds": [
+        "ankle",
+        "arch",
+        "forefoot",
+        "heel"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": -1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "leftAnkleFootJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "rightCalf"
+      ],
+      "grid": {
+        "dimensions": [
+          26,
+          35,
+          36
+        ],
+        "spacing": [
+          0.00927263891001399,
+          0.009411764705882354,
+          0.009431587862847242
+        ],
+        "valueOffset": 761060,
+        "valueCount": 32760,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 1228,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 4519,
+          "minimumGradientMagnitude": 0.053698472158156395,
+          "meanGradientMagnitude": 0.9288218004160854,
+          "p95GradientMagnitude": 1.0019904329278062,
+          "maximumGradientMagnitude": 1.0214439237465285
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 3923,
+          "minimumGradientMagnitude": 0.13247390167957207,
+          "meanGradientMagnitude": 1.0342265106091804,
+          "p95GradientMagnitude": 1.241904308892864,
+          "maximumGradientMagnitude": 1.5178856786508923
+        },
+        "surfaceDistanceError": 0.007014914975754048,
+        "normalAngleError": 87.46599462580829,
+        "brickCount": 1,
+        "memoryBytes": 65520
+      }
+    },
+    {
+      "chartId": "rightFoot",
+      "sheetId": "right-foot-sheet",
+      "anchorJointIds": [
+        "rightFoot",
+        "rightToe"
+      ],
+      "localFrame": {
+        "type": "bone-local-orthonormal",
+        "bindCenter": [
+          0.1955743549045,
+          -0.7546395149212011,
+          0.11025734027013548
+        ],
+        "bindAxes": [
+          [
+            0.9919595513258594,
+            -0.12655531807632556,
+            0
+          ],
+          [
+            -0.07029185925569052,
+            -0.550958128263587,
+            0.8315673126227743
+          ],
+          [
+            0.10523926575085045,
+            0.8248811383265379,
+            0.5554239863179634
+          ]
+        ],
+        "directPosedQuery": true
+      },
+      "compactSupportOBB": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "halfExtents": [
+          0.11589703211182853,
+          0.16,
+          0.1641279067913069
+        ],
+        "queryMargin": 0.014,
+        "traceBandMeters": 0.065
+      },
+      "fieldBrickIds": [
+        "rightFoot-local-grid-r2"
+      ],
+      "regionIds": [
+        "ankle",
+        "arch",
+        "forefoot",
+        "heel"
+      ],
+      "materialCoordinateField": {
+        "longitudinal": "local-y-normalized",
+        "circumference": "atan2(local-z,local-x)",
+        "side": 1
+      },
+      "localSdfScale": 0.00025,
+      "localGradientScale": 1,
+      "allowedJunctionIds": [
+        "rightAnkleFootJunction"
+      ],
+      "forbiddenFusionChartIds": [
+        "leftCalf"
+      ],
+      "grid": {
+        "dimensions": [
+          26,
+          35,
+          36
+        ],
+        "spacing": [
+          0.009271762568946282,
+          0.009411764705882354,
+          0.009378737530931823
+        ],
+        "valueOffset": 793820,
+        "valueCount": 32760,
+        "storage": "int16"
+      },
+      "ownedReferenceVertexCount": 1225,
+      "reinitialization": {
+        "method": "26-neighbour Euclidean fast-marching distance propagation from sampled zero-band seeds",
+        "preReinitializationGradient": {
+          "sampleCount": 4517,
+          "minimumGradientMagnitude": 0.05651585272856794,
+          "meanGradientMagnitude": 0.9283418096912612,
+          "p95GradientMagnitude": 1.0018379536767472,
+          "maximumGradientMagnitude": 1.0229263614721547
+        },
+        "postReinitializationGradient": {
+          "sampleCount": 3931,
+          "minimumGradientMagnitude": 0.08707304251505897,
+          "meanGradientMagnitude": 1.0339978900386466,
+          "p95GradientMagnitude": 1.2378270021291171,
+          "maximumGradientMagnitude": 1.501014539898491
+        },
+        "surfaceDistanceError": 0.007378497598066866,
+        "normalAngleError": 88.24245665735235,
+        "brickCount": 1,
+        "memoryBytes": 65520
+      }
+    }
+  ],
+  "junctions": [
+    {
+      "junctionId": "neckChestJunction",
+      "parentChartId": "chest",
+      "childChartId": "neck",
+      "allowedBlendCharts": [
+        "neck",
+        "chest"
+      ],
+      "jointIds": [
+        "neck",
+        "spineUpper"
+      ],
+      "jointAngleInputs": [
+        "neck.finalPose.localRotation",
+        "spineUpper.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "central",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "leftShoulderAxillaJunction",
+      "parentChartId": "chest",
+      "childChartId": "leftUpperArm",
+      "allowedBlendCharts": [
+        "chest",
+        "leftUpperArm"
+      ],
+      "jointIds": [
+        "leftClavicle",
+        "leftScapula",
+        "leftUpperArm"
+      ],
+      "jointAngleInputs": [
+        "leftClavicle.finalPose.localRotation",
+        "leftScapula.finalPose.localRotation",
+        "leftUpperArm.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-right",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "rightShoulderAxillaJunction",
+      "parentChartId": "chest",
+      "childChartId": "rightUpperArm",
+      "allowedBlendCharts": [
+        "chest",
+        "rightUpperArm"
+      ],
+      "jointIds": [
+        "rightClavicle",
+        "rightScapula",
+        "rightUpperArm"
+      ],
+      "jointAngleInputs": [
+        "rightClavicle.finalPose.localRotation",
+        "rightScapula.finalPose.localRotation",
+        "rightUpperArm.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-left",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "leftElbowJunction",
+      "parentChartId": "leftUpperArm",
+      "childChartId": "leftForearm",
+      "allowedBlendCharts": [
+        "leftUpperArm",
+        "leftForearm"
+      ],
+      "jointIds": [
+        "leftLowerArm"
+      ],
+      "jointAngleInputs": [
+        "leftLowerArm.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-right",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "rightElbowJunction",
+      "parentChartId": "rightUpperArm",
+      "childChartId": "rightForearm",
+      "allowedBlendCharts": [
+        "rightUpperArm",
+        "rightForearm"
+      ],
+      "jointIds": [
+        "rightLowerArm"
+      ],
+      "jointAngleInputs": [
+        "rightLowerArm.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-left",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "spineLowerJunction",
+      "parentChartId": "pelvisCore",
+      "childChartId": "abdomen",
+      "allowedBlendCharts": [
+        "pelvisCore",
+        "abdomen"
+      ],
+      "jointIds": [
+        "pelvis",
+        "spineLower"
+      ],
+      "jointAngleInputs": [
+        "pelvis.finalPose.localRotation",
+        "spineLower.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "central",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "spineMiddleJunction",
+      "parentChartId": "abdomen",
+      "childChartId": "chest",
+      "allowedBlendCharts": [
+        "abdomen",
+        "chest"
+      ],
+      "jointIds": [
+        "spineMiddle"
+      ],
+      "jointAngleInputs": [
+        "spineMiddle.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "central",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "spineUpperJunction",
+      "parentChartId": "abdomen",
+      "childChartId": "chest",
+      "allowedBlendCharts": [
+        "abdomen",
+        "chest"
+      ],
+      "jointIds": [
+        "spineUpper"
+      ],
+      "jointAngleInputs": [
+        "spineUpper.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "central",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "leftHipGroinJunction",
+      "parentChartId": "pelvisCore",
+      "childChartId": "leftThigh",
+      "allowedBlendCharts": [
+        "pelvisCore",
+        "leftThigh"
+      ],
+      "jointIds": [
+        "pelvis",
+        "leftUpperLeg"
+      ],
+      "jointAngleInputs": [
+        "pelvis.finalPose.localRotation",
+        "leftUpperLeg.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-right",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "rightHipGroinJunction",
+      "parentChartId": "pelvisCore",
+      "childChartId": "rightThigh",
+      "allowedBlendCharts": [
+        "pelvisCore",
+        "rightThigh"
+      ],
+      "jointIds": [
+        "pelvis",
+        "rightUpperLeg"
+      ],
+      "jointAngleInputs": [
+        "pelvis.finalPose.localRotation",
+        "rightUpperLeg.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-left",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "centralGroinJunction",
+      "parentChartId": "pelvisCore",
+      "childChartId": "leftThigh",
+      "allowedBlendCharts": [
+        "pelvisCore",
+        "leftThigh",
+        "rightThigh"
+      ],
+      "jointIds": [
+        "pelvis"
+      ],
+      "jointAngleInputs": [
+        "pelvis.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "central",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "leftKneeJunction",
+      "parentChartId": "leftThigh",
+      "childChartId": "leftCalf",
+      "allowedBlendCharts": [
+        "leftThigh",
+        "leftCalf"
+      ],
+      "jointIds": [
+        "leftLowerLeg"
+      ],
+      "jointAngleInputs": [
+        "leftLowerLeg.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-right",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "rightKneeJunction",
+      "parentChartId": "rightThigh",
+      "childChartId": "rightCalf",
+      "allowedBlendCharts": [
+        "rightThigh",
+        "rightCalf"
+      ],
+      "jointIds": [
+        "rightLowerLeg"
+      ],
+      "jointAngleInputs": [
+        "rightLowerLeg.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-left",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "leftWristHandJunction",
+      "parentChartId": "leftForearm",
+      "childChartId": "leftHand",
+      "allowedBlendCharts": [
+        "leftForearm",
+        "leftHand"
+      ],
+      "jointIds": [
+        "leftHand"
+      ],
+      "jointAngleInputs": [
+        "leftHand.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-right",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "rightWristHandJunction",
+      "parentChartId": "rightForearm",
+      "childChartId": "rightHand",
+      "allowedBlendCharts": [
+        "rightForearm",
+        "rightHand"
+      ],
+      "jointIds": [
+        "rightHand"
+      ],
+      "jointAngleInputs": [
+        "rightHand.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-left",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "leftAnkleFootJunction",
+      "parentChartId": "leftCalf",
+      "childChartId": "leftFoot",
+      "allowedBlendCharts": [
+        "leftCalf",
+        "leftFoot"
+      ],
+      "jointIds": [
+        "leftFoot"
+      ],
+      "jointAngleInputs": [
+        "leftFoot.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-right",
+      "globalUnion": false
+    },
+    {
+      "junctionId": "rightAnkleFootJunction",
+      "parentChartId": "rightCalf",
+      "childChartId": "rightFoot",
+      "allowedBlendCharts": [
+        "rightCalf",
+        "rightFoot"
+      ],
+      "jointIds": [
+        "rightFoot"
+      ],
+      "jointAngleInputs": [
+        "rightFoot.finalPose.localRotation"
+      ],
+      "localCoordinates": "direct parent/child posed chart coordinates",
+      "blendWidth": 0.026,
+      "continuityProfile": {
+        "target": "C1",
+        "authority": "compactly-supported local junction only"
+      },
+      "volumeProfile": {
+        "minimum": 0.7,
+        "maximum": 1.25
+      },
+      "compressionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.012
+      },
+      "extensionProfile": {
+        "type": "pose-conditioned analytic residual",
+        "maximumMeters": 0.008
+      },
+      "symmetryPolicy": "paired-with-left",
+      "globalUnion": false
+    }
+  ],
+  "adjacencyGraph": {
+    "schema": "humanoid_rig/junction_adjacency_graph@1.0",
+    "authority": "Only listed chart pairs may create a continuous blend.",
+    "edges": [
+      {
+        "junctionId": "neckChestJunction",
+        "charts": [
+          "chest",
+          "neck"
+        ]
+      },
+      {
+        "junctionId": "leftShoulderAxillaJunction",
+        "charts": [
+          "chest",
+          "leftUpperArm"
+        ]
+      },
+      {
+        "junctionId": "rightShoulderAxillaJunction",
+        "charts": [
+          "chest",
+          "rightUpperArm"
+        ]
+      },
+      {
+        "junctionId": "leftElbowJunction",
+        "charts": [
+          "leftUpperArm",
+          "leftForearm"
+        ]
+      },
+      {
+        "junctionId": "rightElbowJunction",
+        "charts": [
+          "rightUpperArm",
+          "rightForearm"
+        ]
+      },
+      {
+        "junctionId": "spineLowerJunction",
+        "charts": [
+          "pelvisCore",
+          "abdomen"
+        ]
+      },
+      {
+        "junctionId": "spineMiddleJunction",
+        "charts": [
+          "abdomen",
+          "chest"
+        ]
+      },
+      {
+        "junctionId": "spineUpperJunction",
+        "charts": [
+          "abdomen",
+          "chest"
+        ]
+      },
+      {
+        "junctionId": "leftHipGroinJunction",
+        "charts": [
+          "pelvisCore",
+          "leftThigh"
+        ]
+      },
+      {
+        "junctionId": "rightHipGroinJunction",
+        "charts": [
+          "pelvisCore",
+          "rightThigh"
+        ]
+      },
+      {
+        "junctionId": "leftKneeJunction",
+        "charts": [
+          "leftThigh",
+          "leftCalf"
+        ]
+      },
+      {
+        "junctionId": "rightKneeJunction",
+        "charts": [
+          "rightThigh",
+          "rightCalf"
+        ]
+      },
+      {
+        "junctionId": "leftWristHandJunction",
+        "charts": [
+          "leftForearm",
+          "leftHand"
+        ]
+      },
+      {
+        "junctionId": "rightWristHandJunction",
+        "charts": [
+          "rightForearm",
+          "rightHand"
+        ]
+      },
+      {
+        "junctionId": "leftAnkleFootJunction",
+        "charts": [
+          "leftCalf",
+          "leftFoot"
+        ]
+      },
+      {
+        "junctionId": "rightAnkleFootJunction",
+        "charts": [
+          "rightCalf",
+          "rightFoot"
+        ]
+      }
+    ],
+    "forbiddenFusionPairs": [
+      [
+        "leftUpperArm",
+        "chest"
+      ],
+      [
+        "rightUpperArm",
+        "chest"
+      ],
+      [
+        "leftHand",
+        "chest"
+      ],
+      [
+        "rightHand",
+        "chest"
+      ],
+      [
+        "leftThigh",
+        "rightThigh"
+      ],
+      [
+        "leftThigh",
+        "abdomen"
+      ],
+      [
+        "rightThigh",
+        "abdomen"
+      ],
+      [
+        "leftCalf",
+        "rightThigh"
+      ],
+      [
+        "rightCalf",
+        "leftThigh"
+      ],
+      [
+        "leftFoot",
+        "rightCalf"
+      ],
+      [
+        "rightFoot",
+        "leftCalf"
+      ],
+      [
+        "leftHand",
+        "rightUpperArm"
+      ],
+      [
+        "rightHand",
+        "leftUpperArm"
+      ]
+    ]
+  },
+  "multiSheetContact": {
+    "fieldId": "HRLMultiSheetContactFieldV1",
+    "rules": [
+      {
+        "contactClass": "left-arm-torso",
+        "a": [
+          "leftUpperArm",
+          "leftForearm"
+        ],
+        "b": [
+          "chest",
+          "abdomen"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      },
+      {
+        "contactClass": "right-arm-torso",
+        "a": [
+          "rightUpperArm",
+          "rightForearm"
+        ],
+        "b": [
+          "chest",
+          "abdomen"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      },
+      {
+        "contactClass": "left-hand-torso",
+        "a": [
+          "leftHand"
+        ],
+        "b": [
+          "chest",
+          "abdomen",
+          "pelvisCore"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      },
+      {
+        "contactClass": "right-hand-torso",
+        "a": [
+          "rightHand"
+        ],
+        "b": [
+          "chest",
+          "abdomen",
+          "pelvisCore"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      },
+      {
+        "contactClass": "left-right-thigh",
+        "a": [
+          "leftThigh"
+        ],
+        "b": [
+          "rightThigh"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      },
+      {
+        "contactClass": "thigh-pelvis-non-junction",
+        "a": [
+          "leftThigh",
+          "rightThigh"
+        ],
+        "b": [
+          "pelvisCore"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      },
+      {
+        "contactClass": "calf-thigh-deep-flexion",
+        "a": [
+          "leftCalf",
+          "rightCalf"
+        ],
+        "b": [
+          "leftThigh",
+          "rightThigh"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      },
+      {
+        "contactClass": "hand-leg",
+        "a": [
+          "leftHand",
+          "rightHand"
+        ],
+        "b": [
+          "leftThigh",
+          "rightThigh",
+          "leftCalf",
+          "rightCalf"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      },
+      {
+        "contactClass": "foot-opposite-leg",
+        "a": [
+          "leftFoot"
+        ],
+        "b": [
+          "rightThigh",
+          "rightCalf"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      },
+      {
+        "contactClass": "right-foot-opposite-leg",
+        "a": [
+          "rightFoot"
+        ],
+        "b": [
+          "leftThigh",
+          "leftCalf"
+        ],
+        "unionAllowed": false,
+        "preserveIndependentSheets": true
+      }
+    ]
+  },
+  "approvals": {
+    "task18aR2VisualAcceptance": false,
+    "visualAcceptance": false,
+    "productionReady": false,
+    "userVisualAcceptance": "pending"
+  }
+}

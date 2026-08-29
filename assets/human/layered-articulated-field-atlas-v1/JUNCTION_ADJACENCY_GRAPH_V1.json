@@ -1,0 +1,172 @@
+{
+  "schema": "humanoid_rig/junction_adjacency_graph@1.0",
+  "authority": "Only listed chart pairs may create a continuous blend.",
+  "edges": [
+    {
+      "junctionId": "neckChestJunction",
+      "charts": [
+        "chest",
+        "neck"
+      ]
+    },
+    {
+      "junctionId": "leftShoulderAxillaJunction",
+      "charts": [
+        "chest",
+        "leftUpperArm"
+      ]
+    },
+    {
+      "junctionId": "rightShoulderAxillaJunction",
+      "charts": [
+        "chest",
+        "rightUpperArm"
+      ]
+    },
+    {
+      "junctionId": "leftElbowJunction",
+      "charts": [
+        "leftUpperArm",
+        "leftForearm"
+      ]
+    },
+    {
+      "junctionId": "rightElbowJunction",
+      "charts": [
+        "rightUpperArm",
+        "rightForearm"
+      ]
+    },
+    {
+      "junctionId": "spineLowerJunction",
+      "charts": [
+        "pelvisCore",
+        "abdomen"
+      ]
+    },
+    {
+      "junctionId": "spineMiddleJunction",
+      "charts": [
+        "abdomen",
+        "chest"
+      ]
+    },
+    {
+      "junctionId": "spineUpperJunction",
+      "charts": [
+        "abdomen",
+        "chest"
+      ]
+    },
+    {
+      "junctionId": "leftHipGroinJunction",
+      "charts": [
+        "pelvisCore",
+        "leftThigh"
+      ]
+    },
+    {
+      "junctionId": "rightHipGroinJunction",
+      "charts": [
+        "pelvisCore",
+        "rightThigh"
+      ]
+    },
+    {
+      "junctionId": "leftKneeJunction",
+      "charts": [
+        "leftThigh",
+        "leftCalf"
+      ]
+    },
+    {
+      "junctionId": "rightKneeJunction",
+      "charts": [
+        "rightThigh",
+        "rightCalf"
+      ]
+    },
+    {
+      "junctionId": "leftWristHandJunction",
+      "charts": [
+        "leftForearm",
+        "leftHand"
+      ]
+    },
+    {
+      "junctionId": "rightWristHandJunction",
+      "charts": [
+        "rightForearm",
+        "rightHand"
+      ]
+    },
+    {
+      "junctionId": "leftAnkleFootJunction",
+      "charts": [
+        "leftCalf",
+        "leftFoot"
+      ]
+    },
+    {
+      "junctionId": "rightAnkleFootJunction",
+      "charts": [
+        "rightCalf",
+        "rightFoot"
+      ]
+    }
+  ],
+  "forbiddenFusionPairs": [
+    [
+      "leftUpperArm",
+      "chest"
+    ],
+    [
+      "rightUpperArm",
+      "chest"
+    ],
+    [
+      "leftHand",
+      "chest"
+    ],
+    [
+      "rightHand",
+      "chest"
+    ],
+    [
+      "leftThigh",
+      "rightThigh"
+    ],
+    [
+      "leftThigh",
+      "abdomen"
+    ],
+    [
+      "rightThigh",
+      "abdomen"
+    ],
+    [
+      "leftCalf",
+      "rightThigh"
+    ],
+    [
+      "rightCalf",
+      "leftThigh"
+    ],
+    [
+      "leftFoot",
+      "rightCalf"
+    ],
+    [
+      "rightFoot",
+      "leftCalf"
+    ],
+    [
+      "leftHand",
+      "rightUpperArm"
+    ],
+    [
+      "rightHand",
+      "leftUpperArm"
+    ]
+  ]
+}

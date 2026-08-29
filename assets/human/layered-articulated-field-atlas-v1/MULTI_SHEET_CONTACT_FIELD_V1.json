@@ -1,0 +1,133 @@
+{
+  "schema": "humanoid_rig/multi_sheet_contact_field@1.0",
+  "fieldId": "HRLMultiSheetContactFieldV1",
+  "rules": [
+    {
+      "contactClass": "left-arm-torso",
+      "a": [
+        "leftUpperArm",
+        "leftForearm"
+      ],
+      "b": [
+        "chest",
+        "abdomen"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    },
+    {
+      "contactClass": "right-arm-torso",
+      "a": [
+        "rightUpperArm",
+        "rightForearm"
+      ],
+      "b": [
+        "chest",
+        "abdomen"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    },
+    {
+      "contactClass": "left-hand-torso",
+      "a": [
+        "leftHand"
+      ],
+      "b": [
+        "chest",
+        "abdomen",
+        "pelvisCore"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    },
+    {
+      "contactClass": "right-hand-torso",
+      "a": [
+        "rightHand"
+      ],
+      "b": [
+        "chest",
+        "abdomen",
+        "pelvisCore"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    },
+    {
+      "contactClass": "left-right-thigh",
+      "a": [
+        "leftThigh"
+      ],
+      "b": [
+        "rightThigh"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    },
+    {
+      "contactClass": "thigh-pelvis-non-junction",
+      "a": [
+        "leftThigh",
+        "rightThigh"
+      ],
+      "b": [
+        "pelvisCore"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    },
+    {
+      "contactClass": "calf-thigh-deep-flexion",
+      "a": [
+        "leftCalf",
+        "rightCalf"
+      ],
+      "b": [
+        "leftThigh",
+        "rightThigh"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    },
+    {
+      "contactClass": "hand-leg",
+      "a": [
+        "leftHand",
+        "rightHand"
+      ],
+      "b": [
+        "leftThigh",
+        "rightThigh",
+        "leftCalf",
+        "rightCalf"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    },
+    {
+      "contactClass": "foot-opposite-leg",
+      "a": [
+        "leftFoot"
+      ],
+      "b": [
+        "rightThigh",
+        "rightCalf"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    },
+    {
+      "contactClass": "right-foot-opposite-leg",
+      "a": [
+        "rightFoot"
+      ],
+      "b": [
+        "leftThigh",
+        "leftCalf"
+      ],
+      "unionAllowed": false,
+      "preserveIndependentSheets": true
+    }
+  ]
+}
