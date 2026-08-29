@@ -1,0 +1,130 @@
+{
+  "schema": "human_system/procedural_originality_policy@1.0.0",
+  "policyId": "human-system-procedural-originality-v1",
+  "effectiveDate": "2026-08-29",
+  "status": "approved_by_user",
+  "scope": [
+    "body_dna",
+    "skeletal_dna",
+    "anatomical_graph",
+    "bone_generation",
+    "human_rig",
+    "pose",
+    "animation",
+    "muscle",
+    "fascia",
+    "soft_tissue",
+    "skin",
+    "image_driven_human_reconstruction",
+    "human_asset_export"
+  ],
+  "canonicalDirective": "Do not move third-party human models into the production route. External sources may provide data and knowledge references. Build a project-owned procedural skeleton agent and a modifiable human generation system whose structure can be regenerated, recompiled, versioned and rolled back.",
+  "requiredReadOrder": [
+    "AGENTS.md",
+    "docs/HUMAN_SYSTEM_PROCEDURAL_ORIGINALITY_POLICY.md",
+    "docs/HUMAN_SYSTEM_PROCEDURAL_ORIGINALITY_POLICY.json",
+    "HUMANOID_RIG_LAB_NEXT_MASTER_CONTEXT.md",
+    "README.md",
+    "BUILD_MANIFEST.json"
+  ],
+  "externalReferencePolicy": {
+    "referenceDataAllowed": true,
+    "officialMeasurementsAllowed": true,
+    "peerReviewedStatisticsAllowed": true,
+    "anatomicalRelationshipsAllowed": true,
+    "mathematicalFitsAllowed": true,
+    "isolatedVisualComparisonAllowed": true,
+    "productionHumanMeshImportAllowed": false,
+    "productionSkeletonMeshImportAllowed": false,
+    "productionMuscleMeshImportAllowed": false,
+    "productionSkinMeshImportAllowed": false,
+    "copiedVerticesAllowed": false,
+    "copiedIndicesAllowed": false,
+    "copiedTopologyAllowed": false,
+    "retopologizedThirdPartyModelAllowed": false,
+    "simplifiedThirdPartyModelAllowed": false,
+    "convertedThirdPartyModelAllowed": false,
+    "bakedThirdPartyShapeAllowed": false
+  },
+  "authorityChain": [
+    "BodyDNA",
+    "SkeletalDNA",
+    "AnatomicalGraph",
+    "ProceduralBoneGenerators",
+    "SkeletonAssemblySolver",
+    "CompiledAnatomicalProfile",
+    "HumanRigCoreCompiler",
+    "HumanRigCore",
+    "finalPose",
+    "PerformanceDeformRig",
+    "MuscleSystem",
+    "FasciaAndSoftTissueSystem",
+    "SurfaceCarrier",
+    "Skin",
+    "Renderer"
+  ],
+  "agentComponents": [
+    "SkeletonIntentParser",
+    "SkeletalDNAManager",
+    "AnatomicalDependencyGraph",
+    "BoneGeneratorRegistry",
+    "SkeletonAssemblySolver",
+    "JointSurfaceSolver",
+    "AnatomicalValidator",
+    "AnatomicalProfileCompiler",
+    "HumanRigCoreCompiler",
+    "SkeletonRevisionManager"
+  ],
+  "structuralRules": {
+    "stableSemanticIds": true,
+    "parameterDrivenGeometry": true,
+    "localRegenerationRequired": true,
+    "dependencyInvalidationRequired": true,
+    "deterministicReplayRequired": true,
+    "revisionOnStructuralChangeRequired": true,
+    "rollbackRequired": true,
+    "runtimeBoneScaleAllowed": false,
+    "negativeScaleAllowed": false,
+    "glbStructuralAuthorityAllowed": false,
+    "displayWritesHumanRigCore": false,
+    "displayWritesFinalPose": false,
+    "skinWritesHumanRigCore": false,
+    "skinWritesFinalPose": false
+  },
+  "derivedAssetPolicy": {
+    "glbAllowedRoles": [
+      "derived_cache",
+      "review_asset",
+      "performance_lod",
+      "compatibility_output",
+      "standard_export",
+      "historical_comparison"
+    ],
+    "mustCarryRevisionAndHashes": true,
+    "mustBeRebuildable": true
+  },
+  "legacyPolicy": {
+    "preserveExistingCommands": true,
+    "preserveExistingWorktrees": true,
+    "preserveP1P2AsHistoricalEvidence": true,
+    "preserveTask17ASemanticWork": true,
+    "preserveNativeHumanSurfaceV1": true,
+    "legacyAssetsCanBecomeNewAuthority": false
+  },
+  "hardGates": {
+    "externalGeometrySourceCount": 0,
+    "loadedExternalHumanModelCount": 0,
+    "runtimeBoneScaleCount": 0,
+    "authorityWriteViolationCount": 0,
+    "deterministicReplayPassed": true,
+    "visualAcceptance": false,
+    "productionReady": false,
+    "userVisualAcceptance": "pending"
+  },
+  "conflictStatus": "HUMAN_SYSTEM_POLICY_CONFLICT",
+  "userApprovals": [
+    "OLD_CANONICAL_ASSET_TASK_WITHDRAWN",
+    "EXTERNAL_MESH_IMPORT_FORBIDDEN",
+    "PROCEDURAL_SKELETON_AGENT_ROUTE_ACCEPTED"
+  ]
+}
