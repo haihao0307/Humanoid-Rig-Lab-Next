@@ -33,8 +33,13 @@ try {
     const errors = observeErrors(page);
     await page.goto(`${baseUrl}/${pagePath}?${query}`, { waitUntil: 'domcontentloaded' });
     const state = await waitForReady(page);
+    const expectedPoseId = new URLSearchParams(query).get('pose');
+    const poseSynchronization = await assertPoseSynchronization(page, expectedPoseId);
     await page.screenshot({ path: resolve(outputDirectory, file) });
-    evidence.push({ file, status: 'captured', webgl2: state.webgl2, consoleErrors: errors.consoleErrors, pageErrors: errors.pageErrors });
+    evidence.push({
+      file, status: 'captured', webgl2: state.webgl2, poseSynchronization,
+      consoleErrors: errors.consoleErrors, pageErrors: errors.pageErrors,
+    });
     await page.close();
   }
   await captureContactSheet(context);
@@ -81,10 +86,26 @@ function observeErrors(page) {
 
 async function waitForReady(page) {
   await page.waitForFunction(() => ['ready', 'error'].includes(window.__HRL_PRODUCTION_SKELETON_P2__?.status), null, { timeout: 10000 });
-  const state = await page.evaluate(() => structuredClone(window.__HRL_PRODUCTION_SKELETON_P2__));
+  let state = await page.evaluate(() => structuredClone(window.__HRL_PRODUCTION_SKELETON_P2__));
   if (state.status !== 'ready') throw new Error(`P2 page failed: ${state.pageErrors.join(' | ')}`);
   await page.waitForFunction(() => window.__HRL_PRODUCTION_SKELETON_P2__.renderedFrames >= 3, null, { timeout: 5000 });
+  state = await page.evaluate(() => structuredClone(window.__HRL_PRODUCTION_SKELETON_P2__));
   return state;
+}
+
+async function assertPoseSynchronization(page, expectedPoseId) {
+  const synchronization = await page.evaluate(() => ({
+    urlPoseId: new URL(location.href).searchParams.get('pose'),
+    selectPoseId: document.querySelector('#pose-select').value,
+    summaryPoseId: document.querySelector('[data-metric="pose-id"]')?.textContent,
+    publicPoseId: window.__HRL_PRODUCTION_SKELETON_P2__.poseId,
+    publicSnapshot: window.__HRL_PRODUCTION_SKELETON_P2__.poseSynchronization,
+  }));
+  const values = [synchronization.urlPoseId, synchronization.selectPoseId, synchronization.summaryPoseId, synchronization.publicPoseId];
+  if (values.some((value) => value !== expectedPoseId) || synchronization.publicSnapshot?.consistent !== true) {
+    throw new Error(`Pose synchronization failed for ${expectedPoseId}: ${JSON.stringify(synchronization)}`);
+  }
+  return synchronization;
 }
 
 async function captureSequenceVideo(activeBrowser, baseUrl) {
@@ -98,14 +119,19 @@ async function captureSequenceVideo(activeBrowser, baseUrl) {
   const errors = observeErrors(page);
   await page.goto(`${baseUrl}/${pagePath}?sequence=1`, { waitUntil: 'domcontentloaded' });
   await waitForReady(page);
+  await page.waitForFunction(() => window.__HRL_PRODUCTION_SKELETON_P2__.sequencePlaying
+    && window.__HRL_PRODUCTION_SKELETON_P2__.poseId === 'sequence', null, { timeout: 5000 });
+  const sequenceSynchronization = await assertPoseSynchronization(page, 'sequence');
   await page.waitForFunction(() => window.__HRL_PRODUCTION_SKELETON_P2__.sequenceComplete === true, null, { timeout: 30000 });
   const state = await page.evaluate(() => structuredClone(window.__HRL_PRODUCTION_SKELETON_P2__));
+  const finalSynchronization = await assertPoseSynchronization(page, 'locomotion-neutral');
   const video = page.video();
   await page.close();
   await video.saveAs(resolve(outputDirectory, 'pose-connection-cycle.webm'));
   await context.close();
   return {
     file: 'pose-connection-cycle.webm', status: 'captured', webgl2: state.webgl2,
+    sequenceSynchronization, finalSynchronization,
     consoleErrors: errors.consoleErrors, pageErrors: errors.pageErrors,
   };
 }

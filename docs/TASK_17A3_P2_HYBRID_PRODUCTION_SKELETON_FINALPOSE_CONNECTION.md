@@ -91,6 +91,20 @@ It validates the frozen GLB, 24-module identity, deterministic transform equalit
 
 The offline audit currently passes all six numerical scenes. The maximum sequence frame-to-frame module translation jump is recorded, but the task does not define a pass threshold for that field; visual discontinuity remains a user review item.
 
+## Review camera and pose synchronization
+
+The P2 review viewport uses window-local `OrbitControls`: left drag rotates, the wheel zooms, right drag pans, `F` frames the complete person, `R` restores the default camera, and double-click focuses the person. Distance is clamped, the initial target is between the pelvis and thorax, and resize reframes the person. The published camera receipt explicitly records that it does not write HumanRigCore, finalPose, or project state.
+
+The URL `pose`, pose selector, numerical-summary pose ID, and public page-state `poseId` share one normalized value. Selecting a pose uses `history.replaceState` without reloading. A direct URL is canonicalized immediately, and the diagnostic sequence explicitly publishes `sequence` while it is playing.
+
+Run the file-only UI contract audit with:
+
+```powershell
+node scripts/task17a3-p2-review-ui-audit.mjs
+```
+
+It checks the camera contract, all six fixed poses plus `sequence`, the browser-capture synchronization assertions, byte-for-byte equality of the frozen GLB, and normalized text-content equality of HumanRigCore/finalPose inputs, module map, and transform runtime against the P2 baseline commit.
+
 ## Browser review reserved for the user
 
 Repository instructions reserve computer/browser effect validation for the user. Codex therefore does not launch the page, capture screenshots, or record video. After dependencies are available, the user can run:
@@ -99,7 +113,7 @@ Repository instructions reserve computer/browser effect validation for the user.
 node scripts/capture-task17a3-p2-finalpose.mjs
 ```
 
-The script uses only the six committed finalPose fixtures, directly loads the frozen GLB, creates the 12 full-body/overlay images, four closeups, contact sheet, and diagnostic WebM, then records WebGL2/console/page evidence. It does not manually move a module.
+The script uses only the six committed finalPose fixtures, directly loads the frozen GLB, creates the 12 full-body/overlay images, four closeups, contact sheet, and diagnostic WebM, then records WebGL2/console/page evidence. Every capture asserts that URL, selector, numerical summary, and public pose state agree. It does not manually move a module.
 
 Until that capture and the 22 visual decisions are completed, the only allowed conclusion is:
 

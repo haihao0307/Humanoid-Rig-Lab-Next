@@ -8,5 +8,6 @@ Committed file/numerical evidence:
 - `sequence-continuity.json`: 61 samples per quaternion/root interpolation transition.
 - `browser-capture-manifest.json`: browser media and runtime evidence status.
 - `visual-review-status.json`: 22 user-owned visual decisions.
+- `review-ui-audit.json`: file-only camera, pose synchronization, and frozen-file receipt.
 
 The PNG, contact sheet, and WebM files are intentionally absent until the user runs `node scripts/capture-task17a3-p2-finalpose.mjs`. This repository's AGENTS.md assigns computer/browser effect verification to the user. Missing browser evidence keeps the P2 conclusion at `INCONCLUSIVE`; it is not substituted with generated placeholders.

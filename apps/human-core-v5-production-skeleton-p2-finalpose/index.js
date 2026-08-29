@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/OrbitControls.js';
 
 import { createTask17A3BodyDNA, createTask17A3Scenario } from '../human-core-v5-production-rig-detail-v1/scenario.js';
 import { createHumanRigCoreV5 } from '../../src/modules/human-core-v5/human-rig-core-v5.js';
@@ -10,13 +11,21 @@ import {
   createHybridSkeletonPoseMetricsV1,
   interpolateFinalPoseV1,
 } from '../../src/modules/human-core-v5/production-skeleton-runtime-v2/index.js';
+import {
+  P2_FIXED_POSE_IDS,
+  P2_SEQUENCE_POSE_ID,
+  buildP2ReviewUrl,
+  createP2PoseSynchronizationSnapshot,
+  isP2SequenceRequest,
+  normalizeP2ReviewPoseId,
+} from './p2-review-state-v1.js';
 
 const ASSET_PATH = 'assets/human/production-skeleton-v2/hybrid-static-v1/hybrid-production-skeleton-static-v1.glb';
 const ASSET_URL = `./${ASSET_PATH}`;
 const EXPECTED_ASSET_SHA256 = 'ffef1a04df026f576c9b5af5867b1dbd585145578cde465998a0ef56e32fbdcd';
 const EXPECTED_GEOMETRY_HASH = 'e3aba47d7a53812713e9ae37b21f2b68f48c6f0c0bb6eacba4f924c7c78f49c2';
 const EXPECTED_INDEX_HASH = 'd4d03eed8c5215828d26c310320794bc9cd7469b4aad727c3ca0d2fb461f2239';
-const POSE_IDS = Object.freeze(['reference-t', 'reference-a', 'locomotion-neutral', 'walk-left-support', 'walk-right-support', 'turn-mid']);
+const POSE_IDS = P2_FIXED_POSE_IDS;
 const SEQUENCE_IDS = Object.freeze([...POSE_IDS, 'locomotion-neutral']);
 const POSE_LABELS = Object.freeze({
   'reference-t': 'Reference T', 'reference-a': 'Reference A', 'locomotion-neutral': 'Locomotion Neutral',
@@ -33,18 +42,23 @@ console.error = (...values) => {
 addEventListener('unhandledrejection', (event) => pageErrors.push(formatError(event.reason)));
 
 const search = new URLSearchParams(location.search);
+const requestedSequence = isP2SequenceRequest(search);
+const requestedPoseId = POSE_IDS.includes(search.get('pose')) ? search.get('pose') : 'reference-t';
 const state = {
-  poseId: POSE_IDS.includes(search.get('pose')) ? search.get('pose') : 'reference-t',
+  poseId: requestedSequence ? P2_SEQUENCE_POSE_ID : requestedPoseId,
+  actualPoseId: requestedSequence ? 'reference-t' : requestedPoseId,
   overlay: search.get('overlay') === '1',
   closeup: search.get('closeup') || null,
-  sequenceRequested: search.get('sequence') === '1',
+  sequenceRequested: requestedSequence,
   sequencePlaying: false,
   sequenceComplete: false,
+  sequenceStatus: null,
   sequenceGeneration: 0,
   renderedFrames: 0,
   currentFrame: null,
   metrics: null,
   maximumFrameToFrameModuleJump: 0,
+  summaryPoseId: requestedSequence ? P2_SEQUENCE_POSE_ID : requestedPoseId,
 };
 const elements = {
   viewport: document.querySelector('#viewport'), loading: document.querySelector('#loading'),
@@ -97,7 +111,10 @@ async function initialize() {
     },
   });
   overlayElements = createCoreOverlay(restSimulationFrame);
-  applyPose(state.poseId);
+  applyPose(state.actualPoseId, fixtures[state.actualPoseId], { synchronize: !state.sequenceRequested, updateUrl: true });
+  resize({ preserveReview: false });
+  resetDefaultReviewCamera();
+  if (state.closeup) applyCloseupCameraPreset(state.closeup);
   clearTimeout(window.__HRL_P2_BOOT_TIMEOUT__);
   pageState.status = 'ready';
   pageState.ready = true;
@@ -105,26 +122,30 @@ async function initialize() {
   elements.ready.textContent = 'READY · WEBGL2 · FINALPOSE READ-ONLY';
   elements.ready.className = 'ready';
   elements.loading.classList.add('hidden');
-  resize();
   view.renderer.setAnimationLoop(render);
   publish();
   if (state.sequenceRequested) playSequence();
 }
 
 function initializeControls() {
-  elements.poseSelect.innerHTML = POSE_IDS.map((poseId) => `<option value="${poseId}">${POSE_LABELS[poseId]}</option>`).join('');
+  elements.poseSelect.innerHTML = [
+    ...POSE_IDS.map((poseId) => `<option value="${poseId}">${POSE_LABELS[poseId]}</option>`),
+    `<option value="${P2_SEQUENCE_POSE_ID}" disabled>Sequence</option>`,
+  ].join('');
   elements.poseSelect.value = state.poseId;
   elements.overlayToggle.checked = state.overlay;
+  updateSequenceOption();
+  updateUrlFromState();
+  publish();
   elements.poseSelect.addEventListener('change', () => {
-    stopSequence();
-    state.poseId = elements.poseSelect.value;
+    stopSequence({ synchronizeToActual: false });
+    const poseId = elements.poseSelect.value;
     state.closeup = null;
-    applyPose(state.poseId);
-    updateQuery();
+    applyPose(poseId, fixtures[poseId], { synchronize: true, updateUrl: true });
   });
   elements.overlayToggle.addEventListener('change', () => {
     state.overlay = elements.overlayToggle.checked;
-    updateOverlay(); updateQuery(); publish();
+    updateOverlay(); updateUrlFromState(); publish();
   });
   elements.sequenceButton.addEventListener('click', () => state.sequencePlaying ? stopSequence() : playSequence());
   elements.copyButton.addEventListener('click', async () => {
@@ -136,7 +157,11 @@ function initializeControls() {
       pageErrors.push(formatError(error));
     }
   });
-  addEventListener('resize', resize);
+  elements.viewport.addEventListener('dblclick', () => focusPerson());
+  elements.viewport.addEventListener('contextmenu', (event) => event.preventDefault());
+  addEventListener('keydown', handleReviewKeydown);
+  addEventListener('resize', () => resize({ preserveReview: true }));
+  addEventListener('popstate', synchronizeFromLocation);
 }
 
 function createWebGL2View(container) {
@@ -155,7 +180,28 @@ function createWebGL2View(container) {
   const key = new THREE.DirectionalLight(0xffffff, 3.0); key.position.set(-2.4, 3.2, -3.1); scene.add(key);
   const rim = new THREE.DirectionalLight(0x62c8ff, 2.1); rim.position.set(2.8, 2.2, 2.6); scene.add(rim);
   const camera = new THREE.PerspectiveCamera(31, 1, 0.01, 20);
-  return { renderer, scene, camera };
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableRotate = true;
+  controls.enableZoom = true;
+  controls.enablePan = true;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.075;
+  controls.rotateSpeed = 0.72;
+  controls.zoomSpeed = 0.9;
+  controls.panSpeed = 0.78;
+  controls.screenSpacePanning = true;
+  controls.minDistance = 0.38;
+  controls.maxDistance = 7.5;
+  controls.minPolarAngle = 0.08;
+  controls.maxPolarAngle = Math.PI - 0.08;
+  controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+  controls.mouseButtons.MIDDLE = THREE.MOUSE.DOLLY;
+  controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
+  controls.addEventListener('change', () => {
+    updateOverlay();
+    publish();
+  });
+  return { renderer, scene, camera, controls };
 }
 
 async function loadFrozenAsset() {
@@ -181,20 +227,20 @@ async function loadFrozenAsset() {
   return { scene: sceneAsset.scene, identity: { ...measured, assetSha256: sha256, assetPath: ASSET_PATH } };
 }
 
-function applyPose(poseId, finalPose = fixtures[poseId]) {
+function applyPose(poseId, finalPose = fixtures[poseId], { synchronize = true, updateUrl = true } = {}) {
   if (!runtime) return;
+  if (!POSE_IDS.includes(poseId) || !finalPose) throw new Error(`Unknown fixed P2 pose ${poseId}.`);
   const frame = runtime.update(finalPose);
   const metrics = createHybridSkeletonPoseMetricsV1({
     poseId, moduleMap, runtimeFrame: frame, restSimulationFrame,
     geometryHash: identity.geometryHash, indexHash: identity.indexHash,
     loadedModuleIds: [...objectByModuleId.keys()], maximumFrameToFrameModuleJump: 0,
   });
-  state.poseId = poseId;
+  state.actualPoseId = poseId;
   state.currentFrame = frame;
   state.metrics = metrics;
-  elements.poseSelect.value = poseId;
-  applyCameraPreset();
-  updateMetrics(); updateOverlay(); publish();
+  if (synchronize) synchronizePoseState(poseId, { updateUrl });
+  else { updateMetrics(); updateOverlay(); publish(); }
 }
 
 async function playSequence() {
@@ -202,17 +248,21 @@ async function playSequence() {
   const generation = ++state.sequenceGeneration;
   state.sequencePlaying = true;
   state.sequenceComplete = false;
+  state.sequenceRequested = false;
   state.maximumFrameToFrameModuleJump = 0;
   let previousSequenceTransforms = null;
   elements.sequenceButton.textContent = '停止诊断序列';
   elements.poseSelect.disabled = true;
-  publish();
-  applyPose(SEQUENCE_IDS[0]);
+  applyPose(SEQUENCE_IDS[0], fixtures[SEQUENCE_IDS[0]], { synchronize: false });
+  state.sequenceStatus = { fromPoseId: SEQUENCE_IDS[0], toPoseId: SEQUENCE_IDS[0], alpha: 1 };
+  synchronizePoseState(P2_SEQUENCE_POSE_ID, { updateUrl: true });
   for (let index = 0; index < SEQUENCE_IDS.length - 1; index += 1) {
     if (generation !== state.sequenceGeneration) return;
     await wait(350);
     const fromPoseId = SEQUENCE_IDS[index];
     const toPoseId = SEQUENCE_IDS[index + 1];
+    state.sequenceStatus = { fromPoseId, toPoseId, alpha: 0 };
+    updateSequencePresentation();
     const startedAt = performance.now();
     while (generation === state.sequenceGeneration) {
       const alpha = Math.min(1, (performance.now() - startedAt) / 1050);
@@ -230,31 +280,48 @@ async function playSequence() {
         }
       }
       previousSequenceTransforms = frame.transforms;
+      state.actualPoseId = alpha >= 1 ? toPoseId : null;
+      state.sequenceStatus = { fromPoseId, toPoseId, alpha };
       state.currentFrame = frame;
+      updateSequencePresentation();
       updateOverlay();
       if (alpha >= 1) break;
       await nextFrame();
     }
     if (generation !== state.sequenceGeneration) return;
-    applyPose(toPoseId);
+    applyPose(toPoseId, fixtures[toPoseId], { synchronize: false });
+    state.sequenceStatus = { fromPoseId, toPoseId, alpha: 1 };
+    updateSequencePresentation();
   }
   await wait(500);
   if (generation !== state.sequenceGeneration) return;
   state.sequencePlaying = false;
   state.sequenceComplete = true;
+  state.sequenceRequested = false;
+  state.sequenceStatus = null;
   state.metrics = { ...state.metrics, maximumFrameToFrameModuleJump: state.maximumFrameToFrameModuleJump };
   elements.sequenceButton.textContent = '播放诊断序列';
   elements.poseSelect.disabled = false;
-  updateMetrics();
-  publish();
+  synchronizePoseState('locomotion-neutral', { updateUrl: true });
 }
 
-function stopSequence() {
+function stopSequence({ synchronizeToActual = true } = {}) {
+  const status = state.sequenceStatus;
+  const poseId = POSE_IDS.includes(state.actualPoseId)
+    ? state.actualPoseId
+    : status?.alpha >= 0.5 ? status?.toPoseId : status?.fromPoseId;
   state.sequenceGeneration += 1;
   state.sequencePlaying = false;
+  state.sequenceRequested = false;
+  state.sequenceComplete = false;
+  state.sequenceStatus = null;
   elements.sequenceButton.textContent = '播放诊断序列';
   elements.poseSelect.disabled = false;
-  publish();
+  if (synchronizeToActual && runtime && POSE_IDS.includes(poseId)) {
+    applyPose(poseId, fixtures[poseId], { synchronize: true, updateUrl: true });
+  } else if (synchronizeToActual) {
+    publish();
+  }
 }
 
 function createCoreOverlay(frame) {
@@ -298,66 +365,198 @@ function project(position, rect) {
   return [(point.x * .5 + .5) * rect.width, (-point.y * .5 + .5) * rect.height];
 }
 
-function applyCameraPreset() {
-  if (!view) return;
-  let target = [0, 0.92, 0];
-  let position = [0, 0.98, -3.25];
-  const joints = state.currentFrame?.simulationRigFrame?.joints;
-  if (state.closeup === 'shoulder' && joints) { target = midpoint(joints.leftShoulder.worldPosition, joints.rightShoulder.worldPosition); position = [target[0], target[1], target[2] - 1.0]; }
-  if (state.closeup === 'pelvis' && joints) { target = [...joints.hips.worldPosition]; position = [target[0], target[1] + .02, target[2] - .9]; }
-  if (state.closeup === 'hand' && joints) { target = [...joints.leftHand.worldPosition]; position = [target[0], target[1], target[2] - .62]; }
-  if (state.closeup === 'foot' && joints) { target = [...joints.leftFoot.worldPosition]; position = [target[0] - .72, target[1] + .08, target[2]]; }
-  view.camera.position.set(...position);
-  view.camera.lookAt(...target);
-  view.camera.updateMatrixWorld(true);
+function resetDefaultReviewCamera() {
+  if (!view || !state.currentFrame) return;
+  const bounds = getPersonBounds();
+  const target = getInitialReviewTarget();
+  const distance = THREE.MathUtils.clamp(requiredCameraDistance(bounds, 1.18), view.controls.minDistance, view.controls.maxDistance);
+  view.controls.target.copy(target);
+  view.camera.position.set(target.x, target.y - 0.06, target.z - distance);
+  view.camera.up.set(0, 1, 0);
+  view.controls.update();
+  updateOverlay();
+  publish();
+}
+
+function framePerson({ preserveDirection = true } = {}) {
+  if (!view || !state.currentFrame) return;
+  const bounds = getPersonBounds();
+  const direction = preserveDirection
+    ? view.camera.position.clone().sub(view.controls.target).normalize()
+    : new THREE.Vector3(0, -0.018, -1).normalize();
+  if (direction.lengthSq() < 1e-10) direction.set(0, 0, -1);
+  const distance = THREE.MathUtils.clamp(requiredCameraDistance(bounds, 1.2), view.controls.minDistance, view.controls.maxDistance);
+  view.controls.target.copy(bounds.center);
+  view.camera.position.copy(bounds.center).addScaledVector(direction, distance);
+  view.controls.update();
+  updateOverlay();
+  publish();
+}
+
+function focusPerson() {
+  if (!view || !state.currentFrame) return;
+  const bounds = getPersonBounds();
+  const direction = view.camera.position.clone().sub(view.controls.target).normalize();
+  if (direction.lengthSq() < 1e-10) direction.set(0, 0, -1);
+  const framedDistance = requiredCameraDistance(bounds, 1.08);
+  const distance = THREE.MathUtils.clamp(Math.min(view.controls.getDistance(), framedDistance), view.controls.minDistance, view.controls.maxDistance);
+  view.controls.target.copy(bounds.center);
+  view.camera.position.copy(bounds.center).addScaledVector(direction, distance);
+  view.controls.update();
+  updateOverlay();
+  publish();
+}
+
+function applyCloseupCameraPreset(closeup) {
+  if (!view || !state.currentFrame) return;
+  const joints = state.currentFrame.simulationRigFrame.joints;
+  let target = getInitialReviewTarget();
+  let offset = new THREE.Vector3(0, 0, -1.0);
+  if (closeup === 'shoulder') target = new THREE.Vector3(...midpoint(joints.leftShoulder.worldPosition, joints.rightShoulder.worldPosition));
+  if (closeup === 'pelvis') { target = new THREE.Vector3(...joints.hips.worldPosition); offset.set(0, 0.02, -0.9); }
+  if (closeup === 'hand') { target = new THREE.Vector3(...joints.leftHand.worldPosition); offset.set(0, 0, -0.62); }
+  if (closeup === 'foot') { target = new THREE.Vector3(...joints.leftFoot.worldPosition); offset.set(-0.72, 0.08, 0); }
+  view.controls.target.copy(target);
+  view.camera.position.copy(target).add(offset);
+  view.controls.update();
+  updateOverlay();
+}
+
+function getInitialReviewTarget() {
+  const joints = state.currentFrame.simulationRigFrame.joints;
+  const thoraxCenter = midpoint(joints.chest.worldPosition, joints.upperChest.worldPosition);
+  return new THREE.Vector3(...midpoint(joints.hips.worldPosition, thoraxCenter));
+}
+
+function getPersonBounds() {
+  const joints = state.currentFrame.simulationRigFrame.joints;
+  const points = rigCore.coreJointIds.map((jointId) => new THREE.Vector3(...joints[jointId].worldPosition));
+  const box = new THREE.Box3().setFromPoints(points);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  return { box, center, size };
+}
+
+function requiredCameraDistance(bounds, padding) {
+  const verticalFov = THREE.MathUtils.degToRad(view.camera.fov);
+  const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(view.camera.aspect, 1e-6));
+  const verticalDistance = bounds.size.y * 0.5 / Math.tan(verticalFov / 2);
+  const horizontalDistance = bounds.size.x * 0.5 / Math.tan(horizontalFov / 2);
+  return Math.max(verticalDistance, horizontalDistance, bounds.size.z * 1.4, 0.8) * padding;
+}
+
+function handleReviewKeydown(event) {
+  if (event.defaultPrevented || ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+  if (event.key.toLowerCase() === 'f') { event.preventDefault(); framePerson({ preserveDirection: true }); }
+  if (event.key.toLowerCase() === 'r') { event.preventDefault(); resetDefaultReviewCamera(); }
 }
 
 function updateMetrics() {
   const metrics = state.metrics;
   if (!metrics) return;
   const rows = [
-    ['姿势', POSE_LABELS[state.poseId]], ['模块', `${metrics.moduleCount}/24`],
-    ['缺失模块', metrics.missingModuleCount], ['非有限 transform', metrics.nonFiniteTransformCount],
-    ['反射', metrics.reflectionCount], ['finalPose read-only', metrics.finalPoseReadOnlyPassed],
-    ['Joint center max', formatMetric(metrics.maximumJointCenterError, 'm')],
-    ['Segment axis max', formatMetric(metrics.maximumSegmentAxisError, '°')],
-    ['Segment length max', formatMetric(metrics.maximumSegmentLengthError, 'm')],
-    ['Attachment max', formatMetric(metrics.maximumModuleAttachmentError, 'm')],
-    ['L/R residual delta', formatMetric(metrics.leftRightSymmetryError, 'm')],
-    ['Frame jump max', formatMetric(metrics.maximumFrameToFrameModuleJump, 'm')],
-    ['Geometry hash', metrics.geometryHash.slice(0, 12)], ['Index hash', metrics.indexHash.slice(0, 12)],
-    ['数值门', metrics.passed],
+    ['pose-id', '姿势', state.summaryPoseId],
+    ['pose-label', '姿势标签', state.poseId === P2_SEQUENCE_POSE_ID ? sequenceDisplayLabel() : POSE_LABELS[state.poseId]],
+    ['modules', '模块', `${metrics.moduleCount}/24`],
+    ['missing', '缺失模块', metrics.missingModuleCount], ['non-finite', '非有限 transform', metrics.nonFiniteTransformCount],
+    ['reflection', '反射', metrics.reflectionCount], ['read-only', 'finalPose read-only', metrics.finalPoseReadOnlyPassed],
+    ['joint-center', 'Joint center max', formatMetric(metrics.maximumJointCenterError, 'm')],
+    ['segment-axis', 'Segment axis max', formatMetric(metrics.maximumSegmentAxisError, '°')],
+    ['segment-length', 'Segment length max', formatMetric(metrics.maximumSegmentLengthError, 'm')],
+    ['attachment', 'Attachment max', formatMetric(metrics.maximumModuleAttachmentError, 'm')],
+    ['symmetry', 'L/R residual delta', formatMetric(metrics.leftRightSymmetryError, 'm')],
+    ['frame-jump', 'Frame jump max', formatMetric(metrics.maximumFrameToFrameModuleJump, 'm')],
+    ['geometry-hash', 'Geometry hash', metrics.geometryHash.slice(0, 12)], ['index-hash', 'Index hash', metrics.indexHash.slice(0, 12)],
+    ['numeric-gate', '数值门', metrics.passed],
   ];
-  elements.metrics.innerHTML = rows.map(([label, value]) => `<dt>${label}</dt><dd class="${value === true ? 'pass' : value === false ? 'fail' : ''}">${value}</dd>`).join('');
+  elements.metrics.innerHTML = rows.map(([key, label, value]) => `<dt>${label}</dt><dd data-metric="${key}" class="${value === true ? 'pass' : value === false ? 'fail' : ''}">${value}</dd>`).join('');
+}
+
+function synchronizePoseState(poseId, { updateUrl = true } = {}) {
+  const normalized = normalizeP2ReviewPoseId(poseId);
+  state.poseId = normalized;
+  state.summaryPoseId = normalized;
+  elements.poseSelect.value = normalized;
+  updateSequenceOption();
+  if (updateUrl) updateUrlFromState();
+  updateMetrics();
+  updateOverlay();
+  publish();
+}
+
+function updateSequencePresentation() {
+  if (state.poseId !== P2_SEQUENCE_POSE_ID) return;
+  state.summaryPoseId = P2_SEQUENCE_POSE_ID;
+  elements.poseSelect.value = P2_SEQUENCE_POSE_ID;
+  updateSequenceOption();
+  updateMetrics();
+  publish();
+}
+
+function updateSequenceOption() {
+  const option = elements.poseSelect.querySelector(`option[value="${P2_SEQUENCE_POSE_ID}"]`);
+  if (option) option.textContent = state.poseId === P2_SEQUENCE_POSE_ID ? sequenceDisplayLabel() : 'Sequence';
+}
+
+function sequenceDisplayLabel() {
+  const status = state.sequenceStatus;
+  if (!status) return 'Sequence';
+  const percent = Math.round(Number(status.alpha ?? 0) * 100);
+  return `Sequence · ${POSE_LABELS[status.fromPoseId]} → ${POSE_LABELS[status.toPoseId]} · ${percent}%`;
 }
 
 function render() {
+  view.controls.update();
   view.renderer.render(view.scene, view.camera);
   state.renderedFrames += 1;
   if (state.overlay) updateOverlay();
   if (state.renderedFrames < 4 || state.sequencePlaying) publish();
 }
 
-function resize() {
+function resize({ preserveReview = true } = {}) {
   if (!view) return;
   const rect = elements.viewport.getBoundingClientRect();
   view.renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
   view.camera.aspect = Math.max(1, rect.width) / Math.max(1, rect.height);
   view.camera.updateProjectionMatrix();
-  updateOverlay();
+  if (preserveReview && state.currentFrame) framePerson({ preserveDirection: true });
+  else updateOverlay();
 }
 
 function publish() {
+  const urlPoseId = new URL(location.href).searchParams.get('pose');
+  const selectPoseId = elements.poseSelect.value;
+  const synchronization = createP2PoseSynchronizationSnapshot({
+    poseId: state.poseId,
+    urlPoseId,
+    selectPoseId,
+    summaryPoseId: state.summaryPoseId,
+  });
   Object.assign(pageState, {
     status: pageState.status,
     ready: pageState.ready,
     webgl2: Boolean(view),
     poseId: state.poseId,
+    actualPoseId: state.actualPoseId,
+    summaryPoseId: state.summaryPoseId,
+    poseSynchronization: synchronization,
     overlay: state.overlay,
     closeup: state.closeup,
     sequencePlaying: state.sequencePlaying,
     sequenceComplete: state.sequenceComplete,
+    sequenceStatus: state.sequenceStatus ? { ...state.sequenceStatus } : null,
     renderedFrames: state.renderedFrames,
+    camera: view ? {
+      authority: 'window-only',
+      position: view.camera.position.toArray(),
+      target: view.controls.target.toArray(),
+      distance: view.controls.getDistance(),
+      minDistance: view.controls.minDistance,
+      maxDistance: view.controls.maxDistance,
+      writesHumanRigCore: false,
+      writesFinalPose: false,
+      writesProjectState: false,
+    } : null,
     asset: identity ?? null,
     moduleMap: moduleMap?.map(({ moduleId, moduleClass, sourceJointIds, transformMode, authority, writesHumanRigCore, writesFinalPose }) => ({ moduleId, moduleClass, sourceJointIds, transformMode, authority, writesHumanRigCore, writesFinalPose })) ?? [],
     metrics: state.metrics,
@@ -434,11 +633,49 @@ async function digestHex(chunks) {
   return [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, '0')).join('');
 }
 
-function updateQuery() {
-  const next = new URLSearchParams();
-  next.set('pose', state.poseId);
-  if (state.overlay) next.set('overlay', '1');
-  history.replaceState(null, '', `${location.pathname}?${next}`);
+function updateUrlFromState() {
+  const url = buildP2ReviewUrl(location.href, {
+    poseId: state.poseId,
+    overlay: state.overlay,
+    sequence: state.poseId === P2_SEQUENCE_POSE_ID && (state.sequencePlaying || state.sequenceRequested),
+    closeup: state.closeup,
+  });
+  history.replaceState({ poseId: state.poseId }, '', url);
+}
+
+function synchronizeFromLocation() {
+  const params = new URLSearchParams(location.search);
+  const rawPoseId = params.get('pose');
+  state.overlay = params.get('overlay') === '1';
+  state.closeup = params.get('closeup') || null;
+  elements.overlayToggle.checked = state.overlay;
+  if (isP2SequenceRequest(params)) {
+    state.sequenceRequested = true;
+    state.poseId = P2_SEQUENCE_POSE_ID;
+    state.summaryPoseId = P2_SEQUENCE_POSE_ID;
+    elements.poseSelect.value = P2_SEQUENCE_POSE_ID;
+    updateSequenceOption();
+    updateUrlFromState();
+    updateMetrics();
+    updateOverlay();
+    publish();
+    if (runtime && !state.sequencePlaying) void playSequence();
+    return;
+  }
+  const poseId = POSE_IDS.includes(rawPoseId) ? rawPoseId : 'reference-t';
+  stopSequence({ synchronizeToActual: false });
+  state.poseId = poseId;
+  state.actualPoseId = poseId;
+  state.summaryPoseId = poseId;
+  elements.poseSelect.value = poseId;
+  if (runtime) applyPose(poseId, fixtures[poseId], { synchronize: true, updateUrl: rawPoseId !== poseId });
+  else {
+    if (rawPoseId !== poseId) updateUrlFromState();
+    updateSequenceOption();
+    updateMetrics();
+    updateOverlay();
+    publish();
+  }
 }
 
 function withDeadline(promise, milliseconds, message) {
