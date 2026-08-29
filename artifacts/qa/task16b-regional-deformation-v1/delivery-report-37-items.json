@@ -1,0 +1,377 @@
+{
+  "schema": "humanoid_rig/task16b_r3_delivery_report@1.0",
+  "items": {
+    "1_TASK16B_R2A_FORENSICS_HEAD": "3189b4d3828a88200fcf2b645ed3e706e90a3007",
+    "2_forensics_checkpoint_commit": {
+      "hash": "3189b4d3828a88200fcf2b645ed3e706e90a3007",
+      "message": "experiment(v5): record calibrated skinning failure forensics",
+      "parent": "48eb4df8bd87ca3bfdd1110a047cf77e5cdb8c7b"
+    },
+    "3_push_or_bundle": {
+      "pushAttemptCount": 1,
+      "pushResult": "transport-blocked-before-process-launch",
+      "remoteUploadOccurred": false,
+      "bundlePath": "G:/Three.js/NEW/Humanoid-Rig-Lab-Next-task16b-r2a-forensics-3189b4d-all-refs.bundle",
+      "bundleBytes": 63940580,
+      "bundleSha256": "5C74D6B7C3D160FD053D1CD12DBB27F738F08E36E2B28F2E29CF99B7F9D47CD8",
+      "bundleVerified": true
+    },
+    "4_repair_branch": "experiment/human-core-v5-regional-natural-deformation-v1",
+    "5_repair_worktree": "G:/Three.js/NEW/Humanoid-Rig-Lab-Next-task16b-regional-deformation-v1",
+    "6_four_regional_modules": [
+      "SpineTorsoDeformerV1",
+      "PelvisHipGroinDeformerV1",
+      "ElbowVolumeCorrectiveV1",
+      "KneeVolumeCorrectiveV1"
+    ],
+    "7_spine_lattice": {
+      "latticeId": "SpineTorsoLatticeV1",
+      "ringCount": 6,
+      "controlsPerRing": 8,
+      "ringIds": [
+        "pelvis-ring",
+        "lower-spine-ring",
+        "waist-ring",
+        "lower-chest-ring",
+        "upper-chest-ring",
+        "neck-base-ring"
+      ],
+      "hidden": true
+    },
+    "8_pelvis_hip_groin_lattice": {
+      "latticeId": "PelvisHipGroinLatticeV1",
+      "sectionCount": 10,
+      "sectionIds": [
+        "pelvis-upper-ring",
+        "pelvis-lower-ring",
+        "left-hip-root-ring",
+        "right-hip-root-ring",
+        "left-upper-thigh-proximal-ring",
+        "right-upper-thigh-proximal-ring",
+        "groin-front-bridge",
+        "groin-back-bridge",
+        "left-gluteal-control-band",
+        "right-gluteal-control-band"
+      ],
+      "hidden": true
+    },
+    "9_elbow_corrective_curve": [
+      {
+        "degrees": 0,
+        "weight": 0
+      },
+      {
+        "degrees": 45,
+        "weight": 0.34
+      },
+      {
+        "degrees": 90,
+        "weight": 0.88
+      },
+      {
+        "degrees": 120,
+        "weight": 0.96
+      },
+      {
+        "degrees": 135,
+        "weight": 1
+      }
+    ],
+    "10_knee_corrective_curve": [
+      {
+        "degrees": 0,
+        "weight": 0
+      },
+      {
+        "degrees": 45,
+        "weight": 0.3
+      },
+      {
+        "degrees": 90,
+        "weight": 0.72
+      },
+      {
+        "degrees": 120,
+        "weight": 0.96
+      },
+      {
+        "degrees": 135,
+        "weight": 1
+      }
+    ],
+    "11_orientation_barrier_result": {
+      "poseCount": 33,
+      "passedPoseCount": 25,
+      "failedPoseCount": 8,
+      "iterationCount": 102,
+      "finalViolationCount": 16,
+      "criticalSelfIntersectionCount": 0
+    },
+    "12_collision_barrier_result": {
+      "poseCount": 33,
+      "passedPoseCount": 24,
+      "failedPoseCount": 9,
+      "iterationCount": 89,
+      "finalViolationCount": 0,
+      "criticalSelfIntersectionCount": 2724
+    },
+    "13_two_round_results": {
+      "schema": "humanoid_rig/task16b_r3_two_round_summary@1.0",
+      "maximumImplementationRounds": 2,
+      "roundsExecuted": 2,
+      "thirdRoundProhibitedAndNotRun": true,
+      "round1": {
+        "schema": "humanoid_rig/task16b_r3_regional_deformation_summary@1.0",
+        "implementationRound": 1,
+        "standardPoseCount": 33,
+        "standardPosePassedCount": 15,
+        "standardPoseFailedCount": 18,
+        "sweepCount": 6,
+        "sweepSampleCount": 33,
+        "sweepFailedSampleCount": 14,
+        "hipTrueTriangleInversionCount": 0,
+        "hipCriticalSelfIntersectionCount": 2152,
+        "spineCriticalSelfIntersectionCount": 0,
+        "elbowVolumeRange": {
+          "minimum": 0.44467261361316945,
+          "maximum": 2.0447812249871706
+        },
+        "kneeVolumeRange": {
+          "minimum": 0.5979861013507243,
+          "maximum": 1.4852448157676834
+        },
+        "returnToRestError": 0,
+        "NaNCount": 0,
+        "InfCount": 0,
+        "task16bVisualAcceptance": false,
+        "visualAcceptance": false,
+        "productionReady": false,
+        "userVisualAcceptance": "pending",
+        "catastrophicFailureCleared": false,
+        "numericalStandardPosePass": false,
+        "conclusion": "REGIONAL_DEFORMATION_PROMISING_NEEDS_REFINEMENT"
+      },
+      "round2": {
+        "schema": "humanoid_rig/task16b_r3_regional_deformation_summary@1.0",
+        "implementationRound": 2,
+        "standardPoseCount": 33,
+        "standardPosePassedCount": 16,
+        "standardPoseFailedCount": 17,
+        "sweepCount": 6,
+        "sweepSampleCount": 33,
+        "sweepFailedSampleCount": 14,
+        "hipTrueTriangleInversionCount": 1,
+        "hipCriticalSelfIntersectionCount": 2371,
+        "spineCriticalSelfIntersectionCount": 0,
+        "elbowVolumeRange": {
+          "minimum": 0.44467261361316945,
+          "maximum": 2.0447812249871706
+        },
+        "kneeVolumeRange": {
+          "minimum": 0.4676933499880874,
+          "maximum": 3.953702657343175
+        },
+        "returnToRestError": 0,
+        "NaNCount": 0,
+        "InfCount": 0,
+        "task16bVisualAcceptance": false,
+        "visualAcceptance": false,
+        "productionReady": false,
+        "userVisualAcceptance": "pending",
+        "catastrophicFailureCleared": false,
+        "numericalStandardPosePass": false,
+        "conclusion": "REGIONAL_DEFORMATION_FAILED"
+      },
+      "delta": {
+        "standardPosePassedCount": 1,
+        "standardPoseFailedCount": -1,
+        "sweepFailedSampleCount": 0,
+        "hipTrueTriangleInversionCount": 1,
+        "hipCriticalSelfIntersectionCount": 219,
+        "spineCriticalSelfIntersectionCount": 0
+      },
+      "conclusion": "REGIONAL_DEFORMATION_FAILED"
+    },
+    "14_standard_poses": {
+      "count": 33,
+      "passed": 16,
+      "failed": 17,
+      "failedPoseIds": [
+        "reference_t_pose",
+        "arms_down",
+        "both_arms_forward",
+        "left_shoulder_150",
+        "right_shoulder_150",
+        "upper_arm_external_twist",
+        "elbow_flex_90",
+        "forearm_pronation",
+        "forearm_supination",
+        "hip_flexion_90",
+        "hip_abduction",
+        "thigh_twist",
+        "deep_squat",
+        "large_step",
+        "seated_pose",
+        "kneeling_pose",
+        "knee_flex_135"
+      ]
+    },
+    "15_progressive_sweeps": [
+      {
+        "sweepId": "shoulder_abduction",
+        "sampleCount": 6,
+        "firstTrueInversionAngle": 90,
+        "firstCriticalIntersectionAngle": 60,
+        "elbowVolumeRange": {
+          "minimum": 0.4181932307722313,
+          "maximum": 3.7557460794240853
+        },
+        "kneeVolumeRange": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "passed": false
+      },
+      {
+        "sweepId": "elbow_flexion",
+        "sampleCount": 5,
+        "firstTrueInversionAngle": null,
+        "firstCriticalIntersectionAngle": null,
+        "elbowVolumeRange": {
+          "minimum": 1,
+          "maximum": 1.3217334983434712
+        },
+        "kneeVolumeRange": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "passed": false
+      },
+      {
+        "sweepId": "forearm_rotation",
+        "sampleCount": 7,
+        "firstTrueInversionAngle": 60,
+        "firstCriticalIntersectionAngle": -90,
+        "elbowVolumeRange": {
+          "minimum": 0.8584725083863315,
+          "maximum": 1.4106477288425723
+        },
+        "kneeVolumeRange": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "passed": false
+      },
+      {
+        "sweepId": "hip_flexion",
+        "sampleCount": 5,
+        "firstTrueInversionAngle": 120,
+        "firstCriticalIntersectionAngle": 60,
+        "elbowVolumeRange": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "kneeVolumeRange": {
+          "minimum": 0.9862667299410994,
+          "maximum": 5.352381780430544
+        },
+        "passed": false
+      },
+      {
+        "sweepId": "knee_flexion",
+        "sampleCount": 5,
+        "firstTrueInversionAngle": null,
+        "firstCriticalIntersectionAngle": 120,
+        "elbowVolumeRange": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "kneeVolumeRange": {
+          "minimum": 0.6470413728032937,
+          "maximum": 1
+        },
+        "passed": false
+      },
+      {
+        "sweepId": "spine_twist",
+        "sampleCount": 5,
+        "firstTrueInversionAngle": null,
+        "firstCriticalIntersectionAngle": null,
+        "elbowVolumeRange": {
+          "minimum": 0.9999999945342882,
+          "maximum": 1.0000000231192359
+        },
+        "kneeVolumeRange": {
+          "minimum": 1,
+          "maximum": 1
+        },
+        "passed": true
+      }
+    ],
+    "16_hip_true_triangle_inversion_count": 1,
+    "17_hip_critical_self_intersection_count": 2371,
+    "18_spine_critical_self_intersection_count": 0,
+    "19_elbow_volume_range": {
+      "minimum": 0.44467261361316945,
+      "maximum": 2.0447812249871706
+    },
+    "20_knee_volume_range": {
+      "minimum": 0.4676933499880874,
+      "maximum": 3.953702657343175
+    },
+    "21_return_to_rest_error": 0,
+    "22_all_screenshot_paths": [
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/a-pose-front.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/t-pose-front.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/shoulder-90-front.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/shoulder-150-front.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/elbow-90-before-after.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/elbow-135-before-after.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/forearm-pronation.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/forearm-supination.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/spine-twist-before-after.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/spine-twist-wireframe.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/spine-lattice-debug.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/spine-intersection-map.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/hip-30-before-after.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/hip-90-before-after.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/hip-groin-wireframe.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/hip-lattice-debug.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/hip-inversion-map.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/hip-intersection-map.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/knee-90-before-after.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/knee-135-before-after.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/shallow-squat-side.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/deep-squat-side.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/large-step-three-quarter.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/seated-side.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/kneeling-three-quarter.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/finger-curl-closeup.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/fist-closeup.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/regional-deformation-contact-sheet.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/joint-corrective-contact-sheet.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/all-33-pose-contact-sheet.png"
+    ],
+    "23_three_contact_sheets": [
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/regional-deformation-contact-sheet.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/joint-corrective-contact-sheet.png",
+      "artifacts/qa/task16b-regional-deformation-v1/screenshots/all-33-pose-contact-sheet.png"
+    ],
+    "24_http_page_entry": "human-core-v5-regional-natural-deformation-v1.html",
+    "25_standalone_path": "artifacts/review/task16b-regional-deformation-v1/regional-natural-deformation-standalone.html",
+    "26_console_errors": null,
+    "27_page_errors": null,
+    "28_startup_errors": null,
+    "29_failed_requests": null,
+    "30_external_human_asset_requests": null,
+    "31_external_rig_asset_requests": null,
+    "32_final_conclusion": "REGIONAL_DEFORMATION_FAILED",
+    "33_task16b_visual_acceptance": false,
+    "34_visual_acceptance": false,
+    "35_production_ready": false,
+    "36_user_visual_acceptance": "pending",
+    "37_worktree_status": "uncommitted R3 implementation and evidence artifacts; no final pass commit created"
+  },
+  "browserEvidenceStatus": "not-run-by-codex-user-computer-operation-required",
+  "staticAuditPassed": true
+}

@@ -1,0 +1,1561 @@
+{
+  "schema": "humanoid_rig/task16b_r3_regional_deformation_implementation@1.0",
+  "round": 2,
+  "authorityChain": [
+    "BodyDNA",
+    "HumanRigCore",
+    "finalPose.localRotations",
+    "PerformanceDeformRig",
+    "BaseHybridSkinning",
+    "HRLRegionalDeformationLayerV1",
+    "HRLFullBilateralSurfaceV1",
+    "Renderer"
+  ],
+  "fourRegionalSystems": [
+    "SpineTorsoDeformerV1",
+    "PelvisHipGroinDeformerV1",
+    "ElbowVolumeCorrectiveV1",
+    "KneeVolumeCorrectiveV1"
+  ],
+  "profile": {
+    "schema": "humanoid_rig/regional_deformation_profile@1.0",
+    "profileId": "HRLRegionalDeformationLayerV1",
+    "revision": 1,
+    "authorityChain": [
+      "BodyDNA",
+      "HumanRigCore",
+      "finalPose.localRotations",
+      "PerformanceDeformRig",
+      "BaseHybridSkinning",
+      "HRLRegionalDeformationLayerV1",
+      "HRLFullBilateralSurfaceV1",
+      "Renderer"
+    ],
+    "spine": {
+      "blendStrength": 0.82,
+      "radialPreservation": 0.97,
+      "longitudinalFeather": 0.045,
+      "latticeRings": [
+        {
+          "id": "pelvis-ring",
+          "boneId": "pelvis"
+        },
+        {
+          "id": "lower-spine-ring",
+          "boneId": "spineLower"
+        },
+        {
+          "id": "waist-ring",
+          "boneId": "spineMiddle"
+        },
+        {
+          "id": "lower-chest-ring",
+          "boneId": "spineUpper"
+        },
+        {
+          "id": "upper-chest-ring",
+          "boneId": "chest"
+        },
+        {
+          "id": "neck-base-ring",
+          "boneId": "neck"
+        }
+      ]
+    },
+    "pelvisHipGroin": {
+      "blendStrength": 0.78,
+      "bridgePelvisBias": 0.96,
+      "thighRootFollow": 0.5,
+      "glutealStretch": 0.018,
+      "latticeSections": [
+        {
+          "id": "pelvis-upper-ring",
+          "driverIds": [
+            "pelvis"
+          ]
+        },
+        {
+          "id": "pelvis-lower-ring",
+          "driverIds": [
+            "pelvis"
+          ]
+        },
+        {
+          "id": "left-hip-root-ring",
+          "driverIds": [
+            "pelvis",
+            "leftUpperLeg"
+          ]
+        },
+        {
+          "id": "right-hip-root-ring",
+          "driverIds": [
+            "pelvis",
+            "rightUpperLeg"
+          ]
+        },
+        {
+          "id": "left-upper-thigh-proximal-ring",
+          "driverIds": [
+            "leftUpperLeg",
+            "leftThighTwist01",
+            "leftThighTwist02"
+          ]
+        },
+        {
+          "id": "right-upper-thigh-proximal-ring",
+          "driverIds": [
+            "rightUpperLeg",
+            "rightThighTwist01",
+            "rightThighTwist02"
+          ]
+        },
+        {
+          "id": "groin-front-bridge",
+          "driverIds": [
+            "pelvis",
+            "leftUpperLeg",
+            "rightUpperLeg"
+          ]
+        },
+        {
+          "id": "groin-back-bridge",
+          "driverIds": [
+            "pelvis",
+            "leftUpperLeg",
+            "rightUpperLeg"
+          ]
+        },
+        {
+          "id": "left-gluteal-control-band",
+          "driverIds": [
+            "pelvis",
+            "leftUpperLeg"
+          ]
+        },
+        {
+          "id": "right-gluteal-control-band",
+          "driverIds": [
+            "pelvis",
+            "rightUpperLeg"
+          ]
+        }
+      ]
+    },
+    "elbow": {
+      "curve": [
+        {
+          "degrees": 0,
+          "weight": 0
+        },
+        {
+          "degrees": 45,
+          "weight": 0.34
+        },
+        {
+          "degrees": 90,
+          "weight": 0.88
+        },
+        {
+          "degrees": 120,
+          "weight": 0.96
+        },
+        {
+          "degrees": 135,
+          "weight": 1
+        }
+      ],
+      "compressionScale": 0.82,
+      "extensionBulge": 0.01,
+      "supportRadius": 0.115
+    },
+    "knee": {
+      "curve": [
+        {
+          "degrees": 0,
+          "weight": 0
+        },
+        {
+          "degrees": 45,
+          "weight": 0.3
+        },
+        {
+          "degrees": 90,
+          "weight": 0.72
+        },
+        {
+          "degrees": 120,
+          "weight": 0.96
+        },
+        {
+          "degrees": 135,
+          "weight": 1
+        }
+      ],
+      "compressionScale": 1.08,
+      "patellaBulge": 0.048,
+      "supportRadius": 0.145
+    },
+    "orientationBarrier": {
+      "minimumAreaRatio": 0.08,
+      "maximumIterations": 10,
+      "correctionBlend": 0.8,
+      "oneRingBlend": 0.35
+    },
+    "collisionBarrier": {
+      "maximumIterations": 10,
+      "correctionBlend": 0.92,
+      "oneRingBlend": 0.4,
+      "maximumSingleIterationCorrection": 0.03,
+      "cellSize": 0.025,
+      "epsilon": 1e-8
+    },
+    "allowedSecondRoundFields": [
+      "region blend weight",
+      "lattice control distribution",
+      "corrective curve",
+      "barrier stiffness",
+      "intentional contact classification"
+    ],
+    "externalCageUsed": false,
+    "externalWeightsUsed": false,
+    "topologyRegenerated": false,
+    "visibleLattice": false
+  },
+  "coordinates": {
+    "schema": "humanoid_rig/regional_deformation_coordinates@1.0",
+    "vertexCount": 16384,
+    "affectedVertexCount": 5313,
+    "groupCounts": {
+      "spineTorso": 2240,
+      "pelvisHipGroin": 1344,
+      "leftElbow": 434,
+      "rightElbow": 433,
+      "leftKnee": 431,
+      "rightKnee": 431
+    },
+    "everyAffectedVertexHasCoordinates": true,
+    "perFrameNearestTriangleSearch": false,
+    "topologyRegeneratedPerFrame": false,
+    "fields": [
+      "regionId",
+      "latticeCellId",
+      "localCoordinates",
+      "blendWeight",
+      "distanceToJoint",
+      "distanceToCompressionSide",
+      "distanceToExtensionSide",
+      "symmetryPartner",
+      "centerlineRole"
+    ]
+  },
+  "spineLattice": {
+    "schema": "humanoid_rig/spine_torso_lattice@1.0",
+    "latticeId": "SpineTorsoLatticeV1",
+    "hidden": true,
+    "visibleMesh": false,
+    "ringCount": 6,
+    "controlsPerRing": 8,
+    "rings": [
+      {
+        "id": "pelvis-ring",
+        "boneId": "pelvis",
+        "center": [
+          0,
+          0.10028502251952887,
+          0.017411985235441033
+        ],
+        "radiusX": 0.1701171100139618,
+        "frontRadius": 0.11986984984375208,
+        "backRadius": 0.10619504077934057,
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              1.0416668712939822e-17,
+              0.10028502251952887,
+              0.13728183507919312
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.1202909620867303,
+              0.10028502251952887,
+              0.10217276891977135
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.1701171100139618,
+              0.10028502251952887,
+              0.017411985235441046
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.12029096208673035,
+              0.10028502251952887,
+              -0.057679248228012625
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -3.125000613881947e-17,
+              0.10028502251952887,
+              -0.08878305554389954
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.12029096208673029,
+              0.10028502251952887,
+              -0.05767924822801265
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.1701171100139618,
+              0.10028502251952887,
+              0.017411985235441033
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.12029096208673032,
+              0.10028502251952887,
+              0.10217276891977134
+            ]
+          }
+        ]
+      },
+      {
+        "id": "lower-spine-ring",
+        "boneId": "spineLower",
+        "center": [
+          0,
+          0.23184266783983576,
+          0.05158441686117109
+        ],
+        "radiusX": 0.13735069334506989,
+        "frontRadius": 0.08959968960798327,
+        "backRadius": 0.07872571782254632,
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              8.410304348285475e-18,
+              0.23184266783983576,
+              0.14118410646915436
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.09712160666497291,
+              0.23184266783983576,
+              0.1149409649751859
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.13735069334506989,
+              0.23184266783983576,
+              0.0515844168611711
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.09712160666497294,
+              0.23184266783983576,
+              -0.0040830720649300545
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -2.5230913044856423e-17,
+              0.23184266783983576,
+              -0.027141300961375237
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.0971216066649729,
+              0.23184266783983576,
+              -0.004083072064930075
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.13735069334506989,
+              0.23184266783983576,
+              0.05158441686117109
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.09712160666497292,
+              0.23184266783983576,
+              0.11494096497518588
+            ]
+          }
+        ]
+      },
+      {
+        "id": "waist-ring",
+        "boneId": "spineMiddle",
+        "center": [
+          0,
+          0.3068243948487673,
+          0.052862081852794174
+        ],
+        "radiusX": 0.13139532506465912,
+        "frontRadius": 0.08891792205250215,
+        "backRadius": 0.07365048135542918,
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              8.045643213168039e-18,
+              0.3068243948487673,
+              0.14178000390529633
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.09291052536943119,
+              0.3068243948487673,
+              0.1157365475051353
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.13139532506465912,
+              0.3068243948487673,
+              0.05286208185279419
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.09291052536943122,
+              0.3068243948487673,
+              0.0007833270487168226
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -2.4136929639504116e-17,
+              0.3068243948487673,
+              -0.020788399502635002
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.09291052536943117,
+              0.3068243948487673,
+              0.0007833270487168087
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.13139532506465912,
+              0.3068243948487673,
+              0.052862081852794174
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.0929105253694312,
+              0.3068243948487673,
+              0.11573654750513529
+            ]
+          }
+        ]
+      },
+      {
+        "id": "lower-chest-ring",
+        "boneId": "spineUpper",
+        "center": [
+          0,
+          0.3681730805833476,
+          0.07531814485742498
+        ],
+        "radiusX": 0.1564299464225769,
+        "frontRadius": 0.07213805407331537,
+        "backRadius": 0.10129819832696367,
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              9.578571658860039e-18,
+              0.3681730805833476,
+              0.14745619893074036
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.11061267589605243,
+              0.3681730805833476,
+              0.12632745207426813
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.1564299464225769,
+              0.3681730805833476,
+              0.075318144857425
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.11061267589605246,
+              0.3681730805833476,
+              0.003689501898449188
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -2.8735714976580113e-17,
+              0.3681730805833476,
+              -0.02598005346953869
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.1106126758960524,
+              0.3681730805833476,
+              0.003689501898449174
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.1564299464225769,
+              0.3681730805833476,
+              0.07531814485742498
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.11061267589605245,
+              0.3681730805833476,
+              0.12632745207426813
+            ]
+          }
+        ]
+      },
+      {
+        "id": "upper-chest-ring",
+        "boneId": "chest",
+        "center": [
+          0,
+          0.5067950531342599,
+          0.019374084908045933
+        ],
+        "radiusX": 0.22262080013751984,
+        "frontRadius": 0.08163255707593997,
+        "backRadius": 0.07143208502558629,
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              1.3631592515601816e-17,
+              0.5067950531342599,
+              0.1010066419839859
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.15741667741041535,
+              0.5067950531342599,
+              0.07709701958204097
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.22262080013751984,
+              0.5067950531342599,
+              0.019374084908045944
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.1574166774104154,
+              0.5067950531342599,
+              -0.031136026807840163
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -4.089477754680545e-17,
+              0.5067950531342599,
+              -0.05205800011754036
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.15741667741041532,
+              0.5067950531342599,
+              -0.031136026807840177
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.22262080013751984,
+              0.5067950531342599,
+              0.019374084908045933
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.15741667741041537,
+              0.5067950531342599,
+              0.07709701958204096
+            ]
+          }
+        ]
+      },
+      {
+        "id": "neck-base-ring",
+        "boneId": "neck",
+        "center": [
+          0,
+          0.6604101364703693,
+          0.11069762011008583
+        ],
+        "radiusX": 0.07295016944408417,
+        "frontRadius": 0.05766656200451531,
+        "backRadius": 0.0735921752913507,
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              4.466909575347736e-18,
+              0.6604101364703693,
+              0.16836418211460114
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.051583559502619586,
+              0.6604101364703693,
+              0.15147403715119312
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.07295016944408417,
+              0.6604101364703693,
+              0.11069762011008584
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.0515835595026196,
+              0.6604101364703693,
+              0.05866009391930266
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -1.3400728726043209e-17,
+              0.6604101364703693,
+              0.03710544481873512
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.05158355950261958,
+              0.6604101364703693,
+              0.058660093919302644
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.07295016944408417,
+              0.6604101364703693,
+              0.11069762011008583
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.05158355950261959,
+              0.6604101364703693,
+              0.15147403715119312
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "pelvisHipGroinLattice": {
+    "schema": "humanoid_rig/pelvis_hip_groin_lattice@1.0",
+    "latticeId": "PelvisHipGroinLatticeV1",
+    "hidden": true,
+    "visibleMesh": false,
+    "sectionCount": 10,
+    "sections": [
+      {
+        "id": "pelvis-upper-ring",
+        "driverIds": [
+          "pelvis"
+        ],
+        "restCenter": [
+          0,
+          0.17,
+          0.1
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              5.5109105961630896e-18,
+              0.17,
+              0.165
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.06363961030678927,
+              0.17,
+              0.1459619407771256
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.09,
+              0.17,
+              0.10000000000000002
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.06363961030678929,
+              0.17,
+              0.05403805922287442
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -1.6532731788489266e-17,
+              0.17,
+              0.035
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.06363961030678926,
+              0.17,
+              0.054038059222874406
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.09,
+              0.17,
+              0.1
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.06363961030678927,
+              0.17,
+              0.1459619407771256
+            ]
+          }
+        ]
+      },
+      {
+        "id": "pelvis-lower-ring",
+        "driverIds": [
+          "pelvis"
+        ],
+        "restCenter": [
+          0,
+          0.055,
+          0.085
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              5.5109105961630896e-18,
+              0.055,
+              0.15000000000000002
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.06363961030678927,
+              0.055,
+              0.13096194077712559
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.09,
+              0.055,
+              0.08500000000000002
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.06363961030678929,
+              0.055,
+              0.03903805922287442
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -1.6532731788489266e-17,
+              0.055,
+              0.020000000000000004
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.06363961030678926,
+              0.055,
+              0.039038059222874406
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.09,
+              0.055,
+              0.085
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.06363961030678927,
+              0.055,
+              0.13096194077712559
+            ]
+          }
+        ]
+      },
+      {
+        "id": "left-hip-root-ring",
+        "driverIds": [
+          "pelvis",
+          "leftUpperLeg"
+        ],
+        "restCenter": [
+          -0.08505588301230023,
+          0.085,
+          0.08378886405881478
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              -0.08505588301230023,
+              0.085,
+              0.14878886405881478
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.1486954933190895,
+              0.085,
+              0.12975080483594037
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.17505588301230024,
+              0.085,
+              0.08378886405881479
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.14869549331908952,
+              0.085,
+              0.03782692328168919
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -0.08505588301230024,
+              0.085,
+              0.018788864058814775
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              -0.02141627270551097,
+              0.085,
+              0.03782692328168918
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.004944116987699768,
+              0.085,
+              0.08378886405881478
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              -0.021416272705510955,
+              0.085,
+              0.12975080483594037
+            ]
+          }
+        ]
+      },
+      {
+        "id": "right-hip-root-ring",
+        "driverIds": [
+          "pelvis",
+          "rightUpperLeg"
+        ],
+        "restCenter": [
+          0.09369286287158367,
+          0.085,
+          0.08194127973864065
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              0.09369286287158367,
+              0.085,
+              0.14694127973864066
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              0.030053252564794394,
+              0.085,
+              0.12790322051576625
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              0.0036928628715836714,
+              0.085,
+              0.08194127973864067
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              0.03005325256479438,
+              0.085,
+              0.03597933896151507
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              0.09369286287158365,
+              0.085,
+              0.016941279738640652
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.15733247317837293,
+              0.085,
+              0.035979338961515055
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.18369286287158365,
+              0.085,
+              0.08194127973864065
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.15733247317837296,
+              0.085,
+              0.12790322051576625
+            ]
+          }
+        ]
+      },
+      {
+        "id": "left-upper-thigh-proximal-ring",
+        "driverIds": [
+          "leftUpperLeg",
+          "leftThighTwist01",
+          "leftThighTwist02"
+        ],
+        "restCenter": [
+          -0.08505588301230023,
+          -0.055,
+          0.08378886405881478
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              -0.08505588301230023,
+              -0.055,
+              0.14878886405881478
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.1486954933190895,
+              -0.055,
+              0.12975080483594037
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.17505588301230024,
+              -0.055,
+              0.08378886405881479
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.14869549331908952,
+              -0.055,
+              0.03782692328168919
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -0.08505588301230024,
+              -0.055,
+              0.018788864058814775
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              -0.02141627270551097,
+              -0.055,
+              0.03782692328168918
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.004944116987699768,
+              -0.055,
+              0.08378886405881478
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              -0.021416272705510955,
+              -0.055,
+              0.12975080483594037
+            ]
+          }
+        ]
+      },
+      {
+        "id": "right-upper-thigh-proximal-ring",
+        "driverIds": [
+          "rightUpperLeg",
+          "rightThighTwist01",
+          "rightThighTwist02"
+        ],
+        "restCenter": [
+          0.09369286287158367,
+          -0.055,
+          0.08194127973864065
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              0.09369286287158367,
+              -0.055,
+              0.14694127973864066
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              0.030053252564794394,
+              -0.055,
+              0.12790322051576625
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              0.0036928628715836714,
+              -0.055,
+              0.08194127973864067
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              0.03005325256479438,
+              -0.055,
+              0.03597933896151507
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              0.09369286287158365,
+              -0.055,
+              0.016941279738640652
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.15733247317837293,
+              -0.055,
+              0.035979338961515055
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.18369286287158365,
+              -0.055,
+              0.08194127973864065
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.15733247317837296,
+              -0.055,
+              0.12790322051576625
+            ]
+          }
+        ]
+      },
+      {
+        "id": "groin-front-bridge",
+        "driverIds": [
+          "pelvis",
+          "leftUpperLeg",
+          "rightUpperLeg"
+        ],
+        "restCenter": [
+          0,
+          0.035,
+          0.145
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              4.286263797015737e-18,
+              0.035,
+              0.185
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.049497474683058325,
+              0.035,
+              0.1732842712474619
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.07,
+              0.035,
+              0.145
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.049497474683058346,
+              0.035,
+              0.11671572875253809
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -1.285879139104721e-17,
+              0.035,
+              0.10499999999999998
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.04949747468305832,
+              0.035,
+              0.11671572875253808
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.07,
+              0.035,
+              0.145
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.04949747468305833,
+              0.035,
+              0.17328427124746187
+            ]
+          }
+        ]
+      },
+      {
+        "id": "groin-back-bridge",
+        "driverIds": [
+          "pelvis",
+          "leftUpperLeg",
+          "rightUpperLeg"
+        ],
+        "restCenter": [
+          0,
+          0.025,
+          0.02
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              4.286263797015737e-18,
+              0.025,
+              0.06
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.049497474683058325,
+              0.025,
+              0.0482842712474619
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.07,
+              0.025,
+              0.020000000000000004
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.049497474683058346,
+              0.025,
+              -0.008284271247461897
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -1.285879139104721e-17,
+              0.025,
+              -0.02
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.04949747468305832,
+              0.025,
+              -0.008284271247461908
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.07,
+              0.025,
+              0.02
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.04949747468305833,
+              0.025,
+              0.0482842712474619
+            ]
+          }
+        ]
+      },
+      {
+        "id": "left-gluteal-control-band",
+        "driverIds": [
+          "pelvis",
+          "leftUpperLeg"
+        ],
+        "restCenter": [
+          -0.09,
+          0.065,
+          0.005
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              -0.09,
+              0.065,
+              0.07
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              -0.15363961030678927,
+              0.065,
+              0.05096194077712559
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              -0.18,
+              0.065,
+              0.005000000000000008
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              -0.1536396103067893,
+              0.065,
+              -0.04096194077712559
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              -0.09000000000000001,
+              0.065,
+              -0.060000000000000005
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              -0.026360389693210737,
+              0.065,
+              -0.0409619407771256
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0,
+              0.065,
+              0.005
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              -0.026360389693210723,
+              0.065,
+              0.05096194077712558
+            ]
+          }
+        ]
+      },
+      {
+        "id": "right-gluteal-control-band",
+        "driverIds": [
+          "pelvis",
+          "rightUpperLeg"
+        ],
+        "restCenter": [
+          0.09,
+          0.065,
+          0.005
+        ],
+        "controls": [
+          {
+            "id": "front",
+            "restPosition": [
+              0.09,
+              0.065,
+              0.07
+            ]
+          },
+          {
+            "id": "front-left",
+            "restPosition": [
+              0.026360389693210723,
+              0.065,
+              0.05096194077712559
+            ]
+          },
+          {
+            "id": "left",
+            "restPosition": [
+              0,
+              0.065,
+              0.005000000000000008
+            ]
+          },
+          {
+            "id": "back-left",
+            "restPosition": [
+              0.02636038969321071,
+              0.065,
+              -0.04096194077712559
+            ]
+          },
+          {
+            "id": "back",
+            "restPosition": [
+              0.08999999999999998,
+              0.065,
+              -0.060000000000000005
+            ]
+          },
+          {
+            "id": "back-right",
+            "restPosition": [
+              0.15363961030678924,
+              0.065,
+              -0.0409619407771256
+            ]
+          },
+          {
+            "id": "right",
+            "restPosition": [
+              0.18,
+              0.065,
+              0.005
+            ]
+          },
+          {
+            "id": "front-right",
+            "restPosition": [
+              0.15363961030678927,
+              0.065,
+              0.05096194077712558
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "frozenInputs": {
+    "files": [
+      {
+        "path": "assets/human/production-surface-v1/humanoid-rig-production-neutral-v1.hrlsurface",
+        "bytes": 6483284,
+        "sha256": "DBB6D59E7D0D3F15C5350905C86340B9DA0D07D32880752CD3C3A8DF79B3BA68"
+      },
+      {
+        "path": "assets/human/natural-skinning-v1/PERFORMANCE_DEFORM_RIG_V1.json",
+        "bytes": 89993,
+        "sha256": "7023B9E2AF227563040F70FE9AB4CA11558611952C930E3D88BA5E6D54BD52E6"
+      },
+      {
+        "path": "assets/human/natural-skinning-v1/SKIN_BIND_PROFILE_V1.json",
+        "bytes": 49873,
+        "sha256": "19B55D694D47B9E7C0F4D590341C5C768D8510CAF3011CB7B5F676D57EC86C14"
+      },
+      {
+        "path": "assets/human/natural-skinning-v1/skin-weights-v1.bin",
+        "bytes": 870304,
+        "sha256": "A852637DB00CCF42E989375C117CDD946266188B082EBCF8E28E8C796CCEB916"
+      },
+      {
+        "path": "artifacts/qa/task16b-skinning-forensics-v1/triangle-flip-detector-validation.json",
+        "bytes": 2372,
+        "sha256": "8C4B998E02893A83D918B373ED4F73092C55D5017655513578A73D60738050B4"
+      },
+      {
+        "path": "artifacts/qa/task16b-skinning-forensics-v1/self-intersection-detector-validation.json",
+        "bytes": 4405,
+        "sha256": "55CCE2BA7D81386C4518A30CA55B09A84F5BAC1CA2216AAD4EE0F6D899E44E16"
+      }
+    ],
+    "inputsModified": false
+  },
+  "qaDefinitionsModified": false,
+  "topologyModified": false,
+  "canonicalVertexIdentityModified": false,
+  "coreRigModified": false,
+  "finalPoseWritten": false
+}

@@ -1,0 +1,19 @@
+import { auditLegacyTriangleFlipsV1, detectTrueTriangleInversionsV1 } from '../skinning-forensics-v1/triangle-flip-detector-v1.js';
+import { detectSelfIntersectionsForensicsV1 } from '../skinning-forensics-v1/self-intersection-detector-v1.js';
+import { auditSurfaceForensicsMetricsV1 } from '../skinning-forensics-v1/forensics-metrics-v1.js';
+
+export function auditRegionalDeformationPoseV1({ pose, canonicalPositions, canonicalNormals, indices, output, trajectoryPositions, regionVertexSets, regionResolver, centerlineVertices, returnToRestError = 0 }) {
+  const inversions = detectTrueTriangleInversionsV1({ restPositions: canonicalPositions, samplePositions: trajectoryPositions, indices });
+  const intersections = detectSelfIntersectionsForensicsV1(output.positions, indices, { cellSize: 0.025, epsilon: 1e-8, regionResolver });
+  const legacy = auditLegacyTriangleFlipsV1({ restPositions: canonicalPositions, restNormals: canonicalNormals, posedPositions: output.positions, posedNormals: output.normals, indices });
+  const surface = auditSurfaceForensicsMetricsV1(canonicalPositions, output.positions, indices, regionVertexSets); const finite = finiteCounts(output.positions, output.normals); const centerlineGap = centerlineTopologyGap(centerlineVertices, output.positions);
+  const intentionalContactCount = pose.intentionalContact ? intersections.contactCount : 0; const unclassifiedContactCount = pose.intentionalContact ? 0 : intersections.contactCount;
+  const elbowVolumeRatio = surface.jointVolumeRatio.elbow; const kneeVolumeRatio = surface.jointVolumeRatio.knee;
+  const passed = inversions.trueTriangleInversionCount === 0 && intersections.criticalSelfIntersectionCount === 0 && finite.NaNCount === 0 && finite.InfCount === 0 && centerlineGap === 0 && returnToRestError <= 1e-6 && inRange(elbowVolumeRatio, 0.70, 1.25) && inRange(kneeVolumeRatio, 0.70, 1.25);
+  return { schema: 'humanoid_rig/regional_deformation_pose_qa@1.0', poseId: pose.poseId, intentionalContact: Boolean(pose.intentionalContact), trueTriangleInversionCount: inversions.trueTriangleInversionCount, trueTriangleIds: inversions.invertedTriangleIds, trueTriangleInversionEvidence: inversions.evidence, criticalSelfIntersectionCount: intersections.criticalSelfIntersectionCount, criticalIntersections: intersections.intersections, intentionalContactCount, unclassifiedContactCount, contacts: intersections.contacts, legacyNormalDisagreementCount: legacy.triangleFlipCount, minimumTriangleAreaRatio: surface.minimumTriangleAreaRatio, maximumTriangleAreaRatio: surface.maximumTriangleAreaRatio, maximumSurfaceStrain: surface.maximumSurfaceStrain, shoulderVolumeRatio: surface.jointVolumeRatio.shoulder, elbowVolumeRatio, hipVolumeRatio: surface.jointVolumeRatio.hip, kneeVolumeRatio, centerlineGap, returnToRestError, NaNCount: finite.NaNCount, InfCount: finite.InfCount, barrierMetrics: output.metrics, passed };
+}
+
+export function maximumPositionDifferenceV1(left, right) { let maximum = 0; for (let offset = 0; offset < left.length; offset += 3) maximum = Math.max(maximum, Math.hypot(left[offset] - right[offset], left[offset + 1] - right[offset + 1], left[offset + 2] - right[offset + 2])); return maximum; }
+function finiteCounts(...arrays) { let NaNCount = 0; let InfCount = 0; for (const array of arrays) for (const value of array) { if (Number.isNaN(value)) NaNCount += 1; else if (!Number.isFinite(value)) InfCount += 1; } return { NaNCount, InfCount }; }
+function centerlineTopologyGap(centerlineVertices, positions) { for (const vertex of centerlineVertices) { const offset = vertex * 3; if (![positions[offset], positions[offset + 1], positions[offset + 2]].every(Number.isFinite)) return Infinity; } return 0; }
+function inRange(value, minimum, maximum) { return Number.isFinite(value) && value >= minimum && value <= maximum; }
