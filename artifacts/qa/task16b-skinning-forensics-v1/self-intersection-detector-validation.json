@@ -1,0 +1,187 @@
+{
+  "schema": "humanoid_rig/self_intersection_detector_validation@1.0",
+  "tests": [
+    {
+      "testId": "non-intersecting-triangles",
+      "expectedType": "none",
+      "expectedCritical": false,
+      "actualType": "none",
+      "actualCritical": false,
+      "result": {
+        "intersects": false,
+        "intersectionType": "none",
+        "intersectionSegment": [],
+        "critical": false,
+        "sharedVertexIds": [],
+        "reason": "coplanar-disjoint"
+      },
+      "passed": true
+    },
+    {
+      "testId": "shared-edge-adjacency",
+      "expectedType": "shared-edge-adjacency",
+      "expectedCritical": false,
+      "actualType": "shared-edge-adjacency",
+      "actualCritical": false,
+      "result": {
+        "intersects": true,
+        "intersectionType": "shared-edge-adjacency",
+        "intersectionSegment": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "critical": false,
+        "sharedVertexIds": [
+          0,
+          1
+        ]
+      },
+      "passed": true
+    },
+    {
+      "testId": "shared-vertex-far-overlap",
+      "expectedType": "coplanar-overlap",
+      "expectedCritical": true,
+      "actualType": "coplanar-overlap",
+      "actualCritical": true,
+      "result": {
+        "intersects": true,
+        "intersectionType": "coplanar-overlap",
+        "intersectionSegment": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "critical": true,
+        "sharedVertexIds": [
+          0
+        ]
+      },
+      "passed": true
+    },
+    {
+      "testId": "coplanar-overlap",
+      "expectedType": "coplanar-overlap",
+      "expectedCritical": true,
+      "actualType": "coplanar-overlap",
+      "actualCritical": true,
+      "result": {
+        "intersects": true,
+        "intersectionType": "coplanar-overlap",
+        "intersectionSegment": [
+          [
+            0.3999999999999999,
+            1.4,
+            0
+          ],
+          [
+            0.4,
+            0.39999999999999997,
+            0
+          ]
+        ],
+        "critical": true,
+        "sharedVertexIds": []
+      },
+      "passed": true
+    },
+    {
+      "testId": "true-penetration",
+      "expectedType": "true-penetration",
+      "expectedCritical": true,
+      "actualType": "true-penetration",
+      "actualCritical": true,
+      "result": {
+        "intersects": true,
+        "intersectionType": "true-penetration",
+        "intersectionSegment": [
+          [
+            0,
+            -0.5,
+            0
+          ],
+          [
+            0,
+            0.8,
+            0
+          ]
+        ],
+        "critical": true,
+        "sharedVertexIds": []
+      },
+      "passed": true
+    },
+    {
+      "testId": "point-contact",
+      "expectedType": "point-contact",
+      "expectedCritical": false,
+      "actualType": "point-contact",
+      "actualCritical": false,
+      "result": {
+        "intersects": true,
+        "intersectionType": "point-contact",
+        "intersectionSegment": [
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "critical": false,
+        "sharedVertexIds": []
+      },
+      "passed": true
+    },
+    {
+      "testId": "edge-contact",
+      "expectedType": "edge-contact",
+      "expectedCritical": false,
+      "actualType": "edge-contact",
+      "actualCritical": false,
+      "result": {
+        "intersects": true,
+        "intersectionType": "edge-contact",
+        "intersectionSegment": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "critical": false,
+        "sharedVertexIds": []
+      },
+      "passed": true
+    }
+  ],
+  "requirements": {
+    "selfComparisonSkipped": true,
+    "sharedEdgeAdjacencyExcludedFromCritical": true,
+    "sharedVertexRemoteOverlapTested": true,
+    "coplanarOverlapDetected": true,
+    "penetrationSeparatedFromContact": true,
+    "epsilonExpandedBroadPhase": true,
+    "traceableTriangleAndRegionIds": true
+  },
+  "passed": true
+}

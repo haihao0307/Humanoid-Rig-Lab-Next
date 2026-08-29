@@ -1,0 +1,81 @@
+{
+  "schema": "humanoid_rig/triangle_flip_detector_validation@1.0",
+  "legacyAlgorithmDefinition": "sign disagreement between rest geometric face orientation/rest averaged normals and posed geometric face orientation/skinned averaged normals",
+  "newAlgorithmDefinition": "index parity and temporally sampled local oriented-area/Jacobian proxy with an explicit degeneracy crossing",
+  "tests": [
+    {
+      "testId": "plane-rigid-rotation-180",
+      "expectedTrueTriangleInversionCount": 0,
+      "actualTrueTriangleInversionCount": 0,
+      "passed": true,
+      "evidence": []
+    },
+    {
+      "testId": "whole-human-rigid-rotation-180",
+      "expectedTrueTriangleInversionCount": 0,
+      "actualTrueTriangleInversionCount": 0,
+      "passed": true,
+      "evidence": []
+    },
+    {
+      "testId": "single-triangle-index-swap",
+      "expectedTrueTriangleInversionCount": 1,
+      "actualTrueTriangleInversionCount": 1,
+      "passed": true,
+      "evidence": [
+        {
+          "triangleId": 0,
+          "canonicalVertexIds": [
+            0,
+            1,
+            2
+          ],
+          "deformedVertexIds": [
+            0,
+            2,
+            1
+          ],
+          "inversionReason": "index-parity-reversal",
+          "crossingSampleIndex": null,
+          "minimumAreaRatio": 1,
+          "orientationDotAcrossCrossing": null,
+          "indexPermutationParity": -1
+        }
+      ]
+    },
+    {
+      "testId": "simple-hinge-120",
+      "expectedTrueTriangleInversionCount": 0,
+      "actualTrueTriangleInversionCount": 0,
+      "passed": true,
+      "evidence": []
+    },
+    {
+      "testId": "triangle-degeneracy-crossing",
+      "expectedTrueTriangleInversionCount": 1,
+      "actualTrueTriangleInversionCount": 1,
+      "passed": true,
+      "evidence": [
+        {
+          "triangleId": 0,
+          "canonicalVertexIds": [
+            0,
+            1,
+            2
+          ],
+          "deformedVertexIds": [
+            0,
+            1,
+            2
+          ],
+          "inversionReason": "oriented-area-reversal-after-degeneracy",
+          "crossingSampleIndex": 4,
+          "minimumAreaRatio": 0,
+          "orientationDotAcrossCrossing": -1,
+          "indexPermutationParity": 1
+        }
+      ]
+    }
+  ],
+  "passed": true
+}
