@@ -1,0 +1,133 @@
+{
+  "schema": "humanoid_rig/pose_corrective_fields@1.0",
+  "fields": [
+    {
+      "id": "ShoulderAxillaPoseFieldV1",
+      "inputJointIds": [
+        "leftUpperArm",
+        "rightUpperArm"
+      ],
+      "inputAngles": [
+        "bend",
+        "side",
+        "twist"
+      ],
+      "affectedFieldRegions": [
+        "shoulder_cap",
+        "front_axilla",
+        "back_axilla"
+      ],
+      "correctionAmplitude": "continuous angle-conditioned bounded scalar",
+      "correctionGradient": "analytic C1 falloff",
+      "continuityClass": "C1",
+      "symmetryPolicy": "mirrored coefficients with independent left/right evaluation",
+      "zeroAngleExactZero": true,
+      "morphTargetVertexDeltas": false
+    },
+    {
+      "id": "ElbowPoseFieldV1",
+      "inputJointIds": [
+        "leftLowerArm",
+        "rightLowerArm"
+      ],
+      "inputAngles": [
+        "bend",
+        "side",
+        "twist"
+      ],
+      "affectedFieldRegions": [
+        "elbow",
+        "forearm"
+      ],
+      "correctionAmplitude": "continuous angle-conditioned bounded scalar",
+      "correctionGradient": "analytic C1 falloff",
+      "continuityClass": "C1",
+      "symmetryPolicy": "mirrored coefficients with independent left/right evaluation",
+      "zeroAngleExactZero": true,
+      "morphTargetVertexDeltas": false
+    },
+    {
+      "id": "SpinePoseFieldV1",
+      "inputJointIds": [
+        "spineLower",
+        "spineMiddle",
+        "spineUpper",
+        "chest"
+      ],
+      "inputAngles": [
+        "bend",
+        "side",
+        "twist"
+      ],
+      "affectedFieldRegions": [
+        "clavicle",
+        "scapular"
+      ],
+      "correctionAmplitude": "continuous angle-conditioned bounded scalar",
+      "correctionGradient": "analytic C1 falloff",
+      "continuityClass": "C1",
+      "symmetryPolicy": "mirrored coefficients with independent left/right evaluation",
+      "zeroAngleExactZero": true,
+      "morphTargetVertexDeltas": false
+    },
+    {
+      "id": "PelvisHipGroinPoseFieldV1",
+      "inputJointIds": [
+        "leftUpperLeg",
+        "rightUpperLeg"
+      ],
+      "inputAngles": [
+        "bend",
+        "side",
+        "twist"
+      ],
+      "affectedFieldRegions": [
+        "pelvis",
+        "front_groin",
+        "back_groin",
+        "hip_root"
+      ],
+      "correctionAmplitude": "continuous angle-conditioned bounded scalar",
+      "correctionGradient": "analytic C1 falloff",
+      "continuityClass": "C1",
+      "symmetryPolicy": "mirrored coefficients with independent left/right evaluation",
+      "zeroAngleExactZero": true,
+      "morphTargetVertexDeltas": false
+    },
+    {
+      "id": "KneePoseFieldV1",
+      "inputJointIds": [
+        "leftLowerLeg",
+        "rightLowerLeg"
+      ],
+      "inputAngles": [
+        "bend",
+        "side",
+        "twist"
+      ],
+      "affectedFieldRegions": [
+        "knee",
+        "patella",
+        "popliteal"
+      ],
+      "correctionAmplitude": "continuous angle-conditioned bounded scalar",
+      "correctionGradient": "analytic C1 falloff",
+      "continuityClass": "C1",
+      "symmetryPolicy": "mirrored coefficients with independent left/right evaluation",
+      "zeroAngleExactZero": true,
+      "morphTargetVertexDeltas": false
+    }
+  ],
+  "audit": {
+    "zeroAngleMaximumAbsoluteCorrection": 0,
+    "zeroAngleExactZero": true,
+    "maximumFiniteDifferenceGradient": 0.004725172817084122,
+    "NaNCount": 0,
+    "InfCount": 0,
+    "leftRightIndependent": true,
+    "symmetricPoseSymmetryPolicy": "mirrored coefficients, independent evaluations",
+    "additionalComponentGeneration": false,
+    "passed": true
+  },
+  "morphTargetVertexDeltasUsed": false
+}

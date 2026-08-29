@@ -1,0 +1,711 @@
+{
+  "schema": "humanoid_rig/task18a_nine_pose_field_qa@1.0",
+  "round": 2,
+  "fieldAssetId": "HRLComputationalHumanFieldV1",
+  "fieldCoefficientHash": "CB039C2A2F9A6773C86C1889C4B24FE539570701562FCE38308A3E831D032B42",
+  "fieldBrickHash": "49B6DF418B9FFA38425EEAAB987B1DA1A113DA002BE88CDB97E4D8583D2AE847",
+  "sameCanonicalFieldForAllPoses": true,
+  "poseCount": 9,
+  "poseIds": [
+    "reference_a_pose",
+    "reference_t_pose",
+    "shoulder_150",
+    "elbow_135",
+    "forearm_pronation_90",
+    "spine_twist_45",
+    "hip_flexion_90",
+    "deep_squat",
+    "knee_flexion_135"
+  ],
+  "failedPoseIds": [
+    "reference_a_pose",
+    "reference_t_pose",
+    "shoulder_150",
+    "elbow_135",
+    "forearm_pronation_90",
+    "spine_twist_45",
+    "hip_flexion_90",
+    "deep_squat",
+    "knee_flexion_135"
+  ],
+  "poses": [
+    {
+      "poseId": "reference_a_pose",
+      "label": "Reference A Pose",
+      "poseAuthority": "finalPose.localRotations",
+      "canonicalFieldAssetId": "HRLComputationalHumanFieldV1",
+      "canonicalFieldSharedAcrossAllPoses": true,
+      "fieldComponentCount": 11,
+      "spuriousComponentCount": 10,
+      "missingRegionCount": 8,
+      "missingRegions": [
+        "back_axilla",
+        "upper_arm_root",
+        "finger_base",
+        "finger_joints",
+        "patella",
+        "popliteal",
+        "toe_base",
+        "eyelids"
+      ],
+      "surfaceLeakCount": 0,
+      "minimumGradientMagnitude": 0.9999999999999997,
+      "meanGradientMagnitude": 1,
+      "negativeJacobianProxyCount": 0,
+      "nearZeroJacobianProxyCount": 0,
+      "minimumJacobianDeterminantProxy": 0.9999999999999778,
+      "maximumInverseWarpResidual": 0,
+      "jointVolumeRatio": {
+        "shoulder": 1,
+        "elbow": 1,
+        "hip": 1,
+        "knee": 1,
+        "torso": 1
+      },
+      "bodyVolumeRatio": 1,
+      "centerlineContinuity": false,
+      "leftRightIsolation": true,
+      "leftRightIsolationDetails": {
+        "passed": true,
+        "violations": []
+      },
+      "returnToReferenceFieldError": 0,
+      "maximumRoundTripCanonicalError": 0,
+      "meanTransformedSurfaceFieldError": 0.0005667386407132396,
+      "maximumTransformedSurfaceFieldError": 0.0036642531150635023,
+      "rayMissRate": 0,
+      "renderedSilhouetteBounds": {
+        "min": [
+          -0.5027475953102112,
+          -0.8201470375061035,
+          -0.10713803768157959
+        ],
+        "max": [
+          0.5027475953102112,
+          0.8524065017700195,
+          0.3301812410354614
+        ]
+      },
+      "qaIsoSurfaceMetrics": {
+        "qaVertexCount": 6122,
+        "qaTriangleCount": 12288,
+        "qaComponentCount": 11,
+        "qaBoundaryEdgeCount": 0,
+        "qaNonManifoldEdgeCount": 0,
+        "qaSelfIntersectionCount": 0,
+        "method": "posed signed-grid Surface Nets topology audit; QA only"
+      },
+      "boneLengthError": 0,
+      "passed": false
+    },
+    {
+      "poseId": "reference_t_pose",
+      "label": "Reference T Pose",
+      "poseAuthority": "finalPose.localRotations",
+      "canonicalFieldAssetId": "HRLComputationalHumanFieldV1",
+      "canonicalFieldSharedAcrossAllPoses": true,
+      "fieldComponentCount": 21,
+      "spuriousComponentCount": 20,
+      "missingRegionCount": 8,
+      "missingRegions": [
+        "back_axilla",
+        "upper_arm_root",
+        "finger_base",
+        "finger_joints",
+        "patella",
+        "popliteal",
+        "toe_base",
+        "eyelids"
+      ],
+      "surfaceLeakCount": 0,
+      "minimumGradientMagnitude": 0.9999999999999997,
+      "meanGradientMagnitude": 1,
+      "negativeJacobianProxyCount": 2,
+      "nearZeroJacobianProxyCount": 1,
+      "minimumJacobianDeterminantProxy": -0.27085939791796554,
+      "maximumInverseWarpResidual": 0.007983717131182328,
+      "jointVolumeRatio": {
+        "shoulder": 1.0641895791095421,
+        "elbow": 0.9718403935388334,
+        "hip": 0.9909802481314266,
+        "knee": 0.9728018713383112,
+        "torso": 1.0365793978419142
+      },
+      "bodyVolumeRatio": 1.0135859995153957,
+      "centerlineContinuity": false,
+      "leftRightIsolation": true,
+      "leftRightIsolationDetails": {
+        "passed": true,
+        "violations": []
+      },
+      "returnToReferenceFieldError": 0,
+      "maximumRoundTripCanonicalError": 0.012874935994254813,
+      "meanTransformedSurfaceFieldError": 0.0005971448829584785,
+      "maximumTransformedSurfaceFieldError": 0.012326982761689205,
+      "rayMissRate": 0.000244140625,
+      "renderedSilhouetteBounds": {
+        "min": [
+          -0.6887879864345556,
+          -0.8201470375061035,
+          -0.10713803768157959
+        ],
+        "max": [
+          0.688787964770835,
+          0.8524065017700195,
+          0.31289229186716816
+        ]
+      },
+      "qaIsoSurfaceMetrics": {
+        "qaVertexCount": 5658,
+        "qaTriangleCount": 11372,
+        "qaComponentCount": 21,
+        "qaBoundaryEdgeCount": 0,
+        "qaNonManifoldEdgeCount": 0,
+        "qaSelfIntersectionCount": 0,
+        "method": "posed signed-grid Surface Nets topology audit; QA only"
+      },
+      "boneLengthError": 4.85722573273506e-17,
+      "passed": false
+    },
+    {
+      "poseId": "shoulder_150",
+      "label": "Shoulder 150",
+      "poseAuthority": "finalPose.localRotations",
+      "canonicalFieldAssetId": "HRLComputationalHumanFieldV1",
+      "canonicalFieldSharedAcrossAllPoses": true,
+      "fieldComponentCount": 24,
+      "spuriousComponentCount": 23,
+      "missingRegionCount": 8,
+      "missingRegions": [
+        "back_axilla",
+        "upper_arm_root",
+        "finger_base",
+        "finger_joints",
+        "patella",
+        "popliteal",
+        "toe_base",
+        "eyelids"
+      ],
+      "surfaceLeakCount": 0,
+      "minimumGradientMagnitude": 0.9999999999999997,
+      "meanGradientMagnitude": 1,
+      "negativeJacobianProxyCount": 7,
+      "nearZeroJacobianProxyCount": 0,
+      "minimumJacobianDeterminantProxy": -1.2672537091174685,
+      "maximumInverseWarpResidual": 0.04591813127763684,
+      "jointVolumeRatio": {
+        "shoulder": 1.2843987862398223,
+        "elbow": 0.9233308666054888,
+        "hip": 1.0104289528121513,
+        "knee": 0.9832335600957495,
+        "torso": 1.048614591473084
+      },
+      "bodyVolumeRatio": 1.039335412455279,
+      "centerlineContinuity": false,
+      "leftRightIsolation": true,
+      "leftRightIsolationDetails": {
+        "passed": true,
+        "violations": []
+      },
+      "returnToReferenceFieldError": 0,
+      "maximumRoundTripCanonicalError": 0.08632352251571197,
+      "meanTransformedSurfaceFieldError": 0.0007110600365260992,
+      "maximumTransformedSurfaceFieldError": 0.06052087382871826,
+      "rayMissRate": 0.00213623046875,
+      "renderedSilhouetteBounds": {
+        "min": [
+          -0.5876489505769268,
+          -0.8201470375061035,
+          -0.10713803768157959
+        ],
+        "max": [
+          0.5027475953102112,
+          0.8866996769769833,
+          0.3301812410354614
+        ]
+      },
+      "qaIsoSurfaceMetrics": {
+        "qaVertexCount": 6481,
+        "qaTriangleCount": 13044,
+        "qaComponentCount": 24,
+        "qaBoundaryEdgeCount": 0,
+        "qaNonManifoldEdgeCount": 0,
+        "qaSelfIntersectionCount": 0,
+        "method": "posed signed-grid Surface Nets topology audit; QA only"
+      },
+      "boneLengthError": 5.551115123125783e-17,
+      "passed": false
+    },
+    {
+      "poseId": "elbow_135",
+      "label": "Elbow 135",
+      "poseAuthority": "finalPose.localRotations",
+      "canonicalFieldAssetId": "HRLComputationalHumanFieldV1",
+      "canonicalFieldSharedAcrossAllPoses": true,
+      "fieldComponentCount": 13,
+      "spuriousComponentCount": 12,
+      "missingRegionCount": 8,
+      "missingRegions": [
+        "back_axilla",
+        "upper_arm_root",
+        "finger_base",
+        "finger_joints",
+        "patella",
+        "popliteal",
+        "toe_base",
+        "eyelids"
+      ],
+      "surfaceLeakCount": 4,
+      "minimumGradientMagnitude": 0.9999999999999997,
+      "meanGradientMagnitude": 1,
+      "negativeJacobianProxyCount": 2,
+      "nearZeroJacobianProxyCount": 0,
+      "minimumJacobianDeterminantProxy": -0.45282051543891305,
+      "maximumInverseWarpResidual": 0.10980102523157348,
+      "jointVolumeRatio": {
+        "shoulder": 1.2625240877440338,
+        "elbow": 1.2595832917415244,
+        "hip": 1.0067724628930403,
+        "knee": 0.9902114817897711,
+        "torso": 0.9991890573189139
+      },
+      "bodyVolumeRatio": 1.0189962362294933,
+      "centerlineContinuity": false,
+      "leftRightIsolation": true,
+      "leftRightIsolationDetails": {
+        "passed": true,
+        "violations": []
+      },
+      "returnToReferenceFieldError": 0,
+      "maximumRoundTripCanonicalError": 0.18027794377636433,
+      "meanTransformedSurfaceFieldError": 0.0008136112129769309,
+      "maximumTransformedSurfaceFieldError": 0.04916509819597631,
+      "rayMissRate": 0.0078125,
+      "renderedSilhouetteBounds": {
+        "min": [
+          -0.4384510103023249,
+          -0.8201470375061035,
+          -0.21071740852111873
+        ],
+        "max": [
+          0.4384512193210712,
+          0.8524065017700195,
+          0.19962497055530548
+        ]
+      },
+      "qaIsoSurfaceMetrics": {
+        "qaVertexCount": 7193,
+        "qaTriangleCount": 14488,
+        "qaComponentCount": 13,
+        "qaBoundaryEdgeCount": 4,
+        "qaNonManifoldEdgeCount": 0,
+        "qaSelfIntersectionCount": 0,
+        "method": "posed signed-grid Surface Nets topology audit; QA only"
+      },
+      "boneLengthError": 2.7755575615628914e-17,
+      "passed": false
+    },
+    {
+      "poseId": "forearm_pronation_90",
+      "label": "Forearm Pronation 90",
+      "poseAuthority": "finalPose.localRotations",
+      "canonicalFieldAssetId": "HRLComputationalHumanFieldV1",
+      "canonicalFieldSharedAcrossAllPoses": true,
+      "fieldComponentCount": 6,
+      "spuriousComponentCount": 5,
+      "missingRegionCount": 8,
+      "missingRegions": [
+        "back_axilla",
+        "upper_arm_root",
+        "finger_base",
+        "finger_joints",
+        "patella",
+        "popliteal",
+        "toe_base",
+        "eyelids"
+      ],
+      "surfaceLeakCount": 0,
+      "minimumGradientMagnitude": 0.9999999999999997,
+      "meanGradientMagnitude": 1,
+      "negativeJacobianProxyCount": 10,
+      "nearZeroJacobianProxyCount": 1,
+      "minimumJacobianDeterminantProxy": -56.93343418656537,
+      "maximumInverseWarpResidual": 0.01883125308575593,
+      "jointVolumeRatio": {
+        "shoulder": 1.1620494143346032,
+        "elbow": 1.0526839583266714,
+        "hip": 1.015242374239971,
+        "knee": 0.9728407259165706,
+        "torso": 0.9925936292139007
+      },
+      "bodyVolumeRatio": 1.0094944033124051,
+      "centerlineContinuity": false,
+      "leftRightIsolation": true,
+      "leftRightIsolationDetails": {
+        "passed": true,
+        "violations": []
+      },
+      "returnToReferenceFieldError": 0,
+      "maximumRoundTripCanonicalError": 0.2379361567320835,
+      "meanTransformedSurfaceFieldError": 0.0027528758662346826,
+      "maximumTransformedSurfaceFieldError": 0.17978815791487354,
+      "rayMissRate": 0.01922607421875,
+      "renderedSilhouetteBounds": {
+        "min": [
+          -0.3863315148166174,
+          -0.8201470375061035,
+          -0.10713803768157959
+        ],
+        "max": [
+          0.3863315985552094,
+          0.8524065017700195,
+          0.2537089566356302
+        ]
+      },
+      "qaIsoSurfaceMetrics": {
+        "qaVertexCount": 7729,
+        "qaTriangleCount": 15540,
+        "qaComponentCount": 6,
+        "qaBoundaryEdgeCount": 0,
+        "qaNonManifoldEdgeCount": 0,
+        "qaSelfIntersectionCount": 0,
+        "method": "posed signed-grid Surface Nets topology audit; QA only"
+      },
+      "boneLengthError": 2.7755575615628914e-17,
+      "passed": false
+    },
+    {
+      "poseId": "spine_twist_45",
+      "label": "Spine Twist 45",
+      "poseAuthority": "finalPose.localRotations",
+      "canonicalFieldAssetId": "HRLComputationalHumanFieldV1",
+      "canonicalFieldSharedAcrossAllPoses": true,
+      "fieldComponentCount": 13,
+      "spuriousComponentCount": 12,
+      "missingRegionCount": 8,
+      "missingRegions": [
+        "back_axilla",
+        "upper_arm_root",
+        "finger_base",
+        "finger_joints",
+        "patella",
+        "popliteal",
+        "toe_base",
+        "eyelids"
+      ],
+      "surfaceLeakCount": 8,
+      "minimumGradientMagnitude": 0.9999999999999997,
+      "meanGradientMagnitude": 1,
+      "negativeJacobianProxyCount": 11,
+      "nearZeroJacobianProxyCount": 4,
+      "minimumJacobianDeterminantProxy": -0.8849882672527414,
+      "maximumInverseWarpResidual": 0.003968100717824769,
+      "jointVolumeRatio": {
+        "shoulder": 1.0393153555891088,
+        "elbow": 1.0050232245671331,
+        "hip": 1.0025085709610435,
+        "knee": 0.9641093407778222,
+        "torso": 1.055837967489722
+      },
+      "bodyVolumeRatio": 1.0256083955589426,
+      "centerlineContinuity": false,
+      "leftRightIsolation": true,
+      "leftRightIsolationDetails": {
+        "passed": true,
+        "violations": []
+      },
+      "returnToReferenceFieldError": 0,
+      "maximumRoundTripCanonicalError": 0.05423413911115069,
+      "meanTransformedSurfaceFieldError": 0.0007548887051103418,
+      "maximumTransformedSurfaceFieldError": 0.035562792526875546,
+      "rayMissRate": 0.0050048828125,
+      "renderedSilhouetteBounds": {
+        "min": [
+          -0.33034970417434917,
+          -0.8201470375061035,
+          -0.2075886870493395
+        ],
+        "max": [
+          0.4755141776456574,
+          0.8524065017700195,
+          0.5982751947706672
+        ]
+      },
+      "qaIsoSurfaceMetrics": {
+        "qaVertexCount": 5569,
+        "qaTriangleCount": 11208,
+        "qaComponentCount": 13,
+        "qaBoundaryEdgeCount": 8,
+        "qaNonManifoldEdgeCount": 0,
+        "qaSelfIntersectionCount": 0,
+        "method": "posed signed-grid Surface Nets topology audit; QA only"
+      },
+      "boneLengthError": 4.163336342344337e-17,
+      "passed": false
+    },
+    {
+      "poseId": "hip_flexion_90",
+      "label": "Hip Flexion 90",
+      "poseAuthority": "finalPose.localRotations",
+      "canonicalFieldAssetId": "HRLComputationalHumanFieldV1",
+      "canonicalFieldSharedAcrossAllPoses": true,
+      "fieldComponentCount": 7,
+      "spuriousComponentCount": 6,
+      "missingRegionCount": 8,
+      "missingRegions": [
+        "back_axilla",
+        "upper_arm_root",
+        "finger_base",
+        "finger_joints",
+        "patella",
+        "popliteal",
+        "toe_base",
+        "eyelids"
+      ],
+      "surfaceLeakCount": 73,
+      "minimumGradientMagnitude": 0.9999999999999997,
+      "meanGradientMagnitude": 1,
+      "negativeJacobianProxyCount": 18,
+      "nearZeroJacobianProxyCount": 4,
+      "minimumJacobianDeterminantProxy": -2.3167962280299794,
+      "maximumInverseWarpResidual": 0.10545553800847152,
+      "jointVolumeRatio": {
+        "shoulder": 1.044198381775988,
+        "elbow": 1.0234515830576143,
+        "hip": 1.0159690701085304,
+        "knee": 0.9896165143851754,
+        "torso": 1.1504777175052483
+      },
+      "bodyVolumeRatio": 1.0756075526016062,
+      "centerlineContinuity": false,
+      "leftRightIsolation": true,
+      "leftRightIsolationDetails": {
+        "passed": true,
+        "violations": []
+      },
+      "returnToReferenceFieldError": 0,
+      "maximumRoundTripCanonicalError": 0.290009000108321,
+      "meanTransformedSurfaceFieldError": 0.0019096857440625975,
+      "maximumTransformedSurfaceFieldError": 0.08662271924478632,
+      "rayMissRate": 0.03167724609375,
+      "renderedSilhouetteBounds": {
+        "min": [
+          -0.5027475953102112,
+          -0.02402730689169902,
+          -0.8437058515824458
+        ],
+        "max": [
+          0.5027475953102112,
+          0.8524065017700195,
+          0.3301812410354614
+        ]
+      },
+      "qaIsoSurfaceMetrics": {
+        "qaVertexCount": 6302,
+        "qaTriangleCount": 12746,
+        "qaComponentCount": 7,
+        "qaBoundaryEdgeCount": 73,
+        "qaNonManifoldEdgeCount": 0,
+        "qaSelfIntersectionCount": 0,
+        "method": "posed signed-grid Surface Nets topology audit; QA only"
+      },
+      "boneLengthError": 5.551115123125783e-17,
+      "passed": false
+    },
+    {
+      "poseId": "deep_squat",
+      "label": "Deep Squat",
+      "poseAuthority": "finalPose.localRotations",
+      "canonicalFieldAssetId": "HRLComputationalHumanFieldV1",
+      "canonicalFieldSharedAcrossAllPoses": true,
+      "fieldComponentCount": 10,
+      "spuriousComponentCount": 9,
+      "missingRegionCount": 8,
+      "missingRegions": [
+        "back_axilla",
+        "upper_arm_root",
+        "finger_base",
+        "finger_joints",
+        "patella",
+        "popliteal",
+        "toe_base",
+        "eyelids"
+      ],
+      "surfaceLeakCount": 206,
+      "minimumGradientMagnitude": 0.9999999999999997,
+      "meanGradientMagnitude": 1,
+      "negativeJacobianProxyCount": 15,
+      "nearZeroJacobianProxyCount": 4,
+      "minimumJacobianDeterminantProxy": -101.69538836726565,
+      "maximumInverseWarpResidual": 0.1485635856033093,
+      "jointVolumeRatio": {
+        "shoulder": 1.024633624098467,
+        "elbow": 1.0223974092924906,
+        "hip": 1.051993497766936,
+        "knee": 0.888330518056501,
+        "torso": 1.0607286966084604
+      },
+      "bodyVolumeRatio": 1.0348972635933553,
+      "centerlineContinuity": false,
+      "leftRightIsolation": true,
+      "leftRightIsolationDetails": {
+        "passed": true,
+        "violations": []
+      },
+      "returnToReferenceFieldError": 0,
+      "maximumRoundTripCanonicalError": 1.358082408189653,
+      "meanTransformedSurfaceFieldError": 0.002510762838106011,
+      "maximumTransformedSurfaceFieldError": 0.10986931511568296,
+      "rayMissRate": 0.05181884765625,
+      "renderedSilhouetteBounds": {
+        "min": [
+          -0.5027475953102112,
+          -0.024521052031679782,
+          -0.3792395593638106
+        ],
+        "max": [
+          0.5027475953102112,
+          0.8524065017700195,
+          0.3301812410354614
+        ]
+      },
+      "qaIsoSurfaceMetrics": {
+        "qaVertexCount": 8034,
+        "qaTriangleCount": 16312,
+        "qaComponentCount": 10,
+        "qaBoundaryEdgeCount": 206,
+        "qaNonManifoldEdgeCount": 0,
+        "qaSelfIntersectionCount": 0,
+        "method": "posed signed-grid Surface Nets topology audit; QA only"
+      },
+      "boneLengthError": 1.1102230246251565e-16,
+      "passed": false
+    },
+    {
+      "poseId": "knee_flexion_135",
+      "label": "Knee Flexion 135",
+      "poseAuthority": "finalPose.localRotations",
+      "canonicalFieldAssetId": "HRLComputationalHumanFieldV1",
+      "canonicalFieldSharedAcrossAllPoses": true,
+      "fieldComponentCount": 10,
+      "spuriousComponentCount": 9,
+      "missingRegionCount": 8,
+      "missingRegions": [
+        "back_axilla",
+        "upper_arm_root",
+        "finger_base",
+        "finger_joints",
+        "patella",
+        "popliteal",
+        "toe_base",
+        "eyelids"
+      ],
+      "surfaceLeakCount": 32,
+      "minimumGradientMagnitude": 0.9999999999999997,
+      "meanGradientMagnitude": 1,
+      "negativeJacobianProxyCount": 17,
+      "nearZeroJacobianProxyCount": 13,
+      "minimumJacobianDeterminantProxy": -0.5840914307607501,
+      "maximumInverseWarpResidual": 0.26681216863579266,
+      "jointVolumeRatio": {
+        "shoulder": 1.0478064955395152,
+        "elbow": 0.9983716774697677,
+        "hip": 1.0787403733256213,
+        "knee": 0.8267605845515154,
+        "torso": 0.9818196925331427
+      },
+      "bodyVolumeRatio": 1.0064863845520877,
+      "centerlineContinuity": false,
+      "leftRightIsolation": true,
+      "leftRightIsolationDetails": {
+        "passed": true,
+        "violations": []
+      },
+      "returnToReferenceFieldError": 0,
+      "maximumRoundTripCanonicalError": 0.6028160759719177,
+      "meanTransformedSurfaceFieldError": 0.0014974267014716078,
+      "maximumTransformedSurfaceFieldError": 0.06580059025006645,
+      "rayMissRate": 0.02777099609375,
+      "renderedSilhouetteBounds": {
+        "min": [
+          -0.5027475953102112,
+          -0.336833626428026,
+          -0.4132411632073736
+        ],
+        "max": [
+          0.5027475953102112,
+          0.8524065017700195,
+          0.3301812410354614
+        ]
+      },
+      "qaIsoSurfaceMetrics": {
+        "qaVertexCount": 6364,
+        "qaTriangleCount": 12848,
+        "qaComponentCount": 10,
+        "qaBoundaryEdgeCount": 32,
+        "qaNonManifoldEdgeCount": 0,
+        "qaSelfIntersectionCount": 0,
+        "method": "posed signed-grid Surface Nets topology audit; QA only"
+      },
+      "boneLengthError": 5.551115123125783e-17,
+      "passed": false
+    }
+  ],
+  "volumeRanges": {
+    "shoulder": {
+      "minimum": 1,
+      "maximum": 1.2843987862398223,
+      "target": [
+        0.75,
+        1.25
+      ],
+      "passed": false
+    },
+    "elbow": {
+      "minimum": 0.9233308666054888,
+      "maximum": 1.2595832917415244,
+      "target": [
+        0.7,
+        1.25
+      ],
+      "passed": false
+    },
+    "hip": {
+      "minimum": 0.9909802481314266,
+      "maximum": 1.0787403733256213,
+      "target": [
+        0.75,
+        1.25
+      ],
+      "passed": true
+    },
+    "knee": {
+      "minimum": 0.8267605845515154,
+      "maximum": 1,
+      "target": [
+        0.7,
+        1.25
+      ],
+      "passed": true
+    },
+    "torso": {
+      "minimum": 0.9818196925331427,
+      "maximum": 1.1504777175052483,
+      "target": [
+        0.8,
+        1.2
+      ],
+      "passed": true
+    }
+  },
+  "maximumInverseWarpResidual": 0.26681216863579266,
+  "negativeJacobianProxyCount": 82,
+  "nearZeroJacobianProxyCount": 27,
+  "maximumBoneLengthError": 1.1102230246251565e-16,
+  "maximumReturnToReferenceFieldError": 0,
+  "passed": false,
+  "task18aVisualAcceptance": false,
+  "visualAcceptance": false,
+  "productionReady": false,
+  "userVisualAcceptance": "pending"
+}

@@ -1,0 +1,107 @@
+{
+  "schema": "humanoid_rig/task18a_two_round_summary@1.0",
+  "maximumRounds": 2,
+  "rounds": [
+    {
+      "round": 1,
+      "grid": {
+        "dimensions": [
+          112,
+          192,
+          80
+        ],
+        "bounds": {
+          "min": [
+            -0.5477475953102112,
+            -0.8601470375061036,
+            -0.1471380376815796
+          ],
+          "max": [
+            0.5477475953102112,
+            0.8924065017700196,
+            0.3701812410354614
+          ]
+        },
+        "spacing": [
+          0.009869326041625428,
+          0.009175672980503263,
+          0.006548345300215709
+        ],
+        "voxelCount": 1720320
+      },
+      "brickCount": 1090,
+      "totalFieldAssetBytes": 1728592,
+      "staticFitPassed": false,
+      "silhouettePassed": false,
+      "stabilityPassed": false,
+      "qaIsoSurfacePassed": false,
+      "passed": false
+    },
+    {
+      "round": 2,
+      "grid": {
+        "dimensions": [
+          128,
+          224,
+          96
+        ],
+        "bounds": {
+          "min": [
+            -0.5627475953102112,
+            -0.8751470375061036,
+            -0.16213803768157958
+          ],
+          "max": [
+            0.5627475953102112,
+            0.9074065017700196,
+            0.3851812410354614
+          ]
+        },
+        "spacing": [
+          0.008862166855278917,
+          0.00799351362904091,
+          0.005761255565442537
+        ],
+        "voxelCount": 2752512
+      },
+      "brickCount": 1532,
+      "totalFieldAssetBytes": 2439760,
+      "staticFitPassed": false,
+      "silhouettePassed": false,
+      "stabilityPassed": false,
+      "qaIsoSurfacePassed": true,
+      "passed": false
+    }
+  ],
+  "frozenAfterRound2": true,
+  "thirdRoundPerformed": false,
+  "staticOutcome": {
+    "distanceTargetsPassed": true,
+    "meanNormalTargetPassed": true,
+    "p95NormalTargetPassed": false,
+    "silhouetteTargetsPassed": false,
+    "temporaryQaIsoSurfacePassed": true,
+    "stabilityPassed": false
+  },
+  "dynamicOutcome": {
+    "ninePosePassed": false,
+    "failedPoseIds": [
+      "reference_a_pose",
+      "reference_t_pose",
+      "shoulder_150",
+      "elbow_135",
+      "forearm_pronation_90",
+      "spine_twist_45",
+      "hip_flexion_90",
+      "deep_squat",
+      "knee_flexion_135"
+    ],
+    "negativeJacobianProxyCount": 82,
+    "maximumInverseWarpResidual": 0.26681216863579266
+  },
+  "conclusion": "COMPUTATIONAL_FIELD_DYNAMIC_ARCHITECTURE_FAILED",
+  "task18aVisualAcceptance": false,
+  "visualAcceptance": false,
+  "productionReady": false,
+  "userVisualAcceptance": "pending"
+}
