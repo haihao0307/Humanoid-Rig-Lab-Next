@@ -1,0 +1,152 @@
+{
+  "schema": "humanoid_rig/task17a3_p0_reference_distillation@1",
+  "task": "Task 17A.3 RESET P0 Production Rig Visual Direction Study",
+  "researchLanguage": "English",
+  "researchPolicy": "Official publisher documentation and internal project specifications only.",
+  "sources": [
+    {
+      "sourceId": "BLENDER_ARMATURE_DISPLAY",
+      "publisher": "Blender Foundation",
+      "referenceTopic": "Armature viewport display and Octahedral bones",
+      "url": "https://docs.blender.org/manual/en/latest/animation/armatures/properties/display.html",
+      "usefulPrinciple": "Root, tip, envelope size and roll should remain legible in a compact diagnostic bone.",
+      "adoptedPrinciple": "Use a square-section octahedral body with explicit root and tip endpoints in Candidate A.",
+      "rejectedPrinciple": "Do not copy Blender mesh data, icons, UI chrome, or viewport styling.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "BLENDER_CUSTOM_SHAPES",
+      "publisher": "Blender Foundation",
+      "referenceTopic": "Custom bone shapes",
+      "url": "https://docs.blender.org/manual/en/latest/animation/armatures/bones/properties/display.html",
+      "usefulPrinciple": "Animator controls benefit from shapes distinct from deform bones.",
+      "adoptedPrinciple": "Use a separate magenta control vocabulary in Candidate C.",
+      "rejectedPrinciple": "Do not reproduce Blender widgets or theme assets.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "BLENDER_RIGIFY_META_RIGS",
+      "publisher": "Blender Foundation",
+      "referenceTopic": "Rigify meta-rigs",
+      "url": "https://docs.blender.org/manual/en/latest/addons/rigging/rigify/metarigs.html",
+      "usefulPrinciple": "A light structural rig can describe intent before a generated production rig exists.",
+      "adoptedPrinciple": "Keep Candidate C as a static direction study rather than a generated functional rig.",
+      "rejectedPrinciple": "Do not reproduce Rigify algorithms, source code, naming, or assets.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "EPIC_CONTROLS_BONES_NULLS",
+      "publisher": "Epic Games",
+      "referenceTopic": "Controls, bones and nulls in Control Rig",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/controls-bones-and-nulls-in-control-rig-in-unreal-engine",
+      "usefulPrinciple": "Controls and hierarchy elements need visually distinct responsibilities.",
+      "adoptedPrinciple": "Separate core bones, selection controls and aim/pole indicators in Candidate C.",
+      "rejectedPrinciple": "Do not copy Control Rig node logic, gizmos, UI, or code.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "EPIC_MODULAR_CONTROL_RIG",
+      "publisher": "Epic Games",
+      "referenceTopic": "Modular Control Rig connectors and sockets",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/modular-control-rigs-in-unreal-engine",
+      "usefulPrinciple": "Modular intent becomes clearer when connection regions are explicit.",
+      "adoptedPrinciple": "Express pelvis, chest, hands and feet as readable regions without adding functional connectors.",
+      "rejectedPrinciple": "Do not copy modules, connector implementations, samples, or assets.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "EPIC_FULL_BODY_IK",
+      "publisher": "Epic Games",
+      "referenceTopic": "Full Body IK controls and effectors",
+      "url": "https://dev.epicgames.com/documentation/en-us/unreal-engine/control-rig-full-body-ik-in-unreal-engine",
+      "usefulPrinciple": "Effectors and pole intent should remain visually separate from skeletal links.",
+      "adoptedPrinciple": "Use static hand/foot control outlines and elbow/knee pole diamonds only in Candidate C.",
+      "rejectedPrinciple": "Do not implement FBIK, solvers, constraints, effectors, or Epic code.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "UNITY_AVATAR_CONFIGURATION",
+      "publisher": "Unity Technologies",
+      "referenceTopic": "Humanoid Avatar configuration and bone mapping",
+      "url": "https://docs.unity3d.com/Manual/ConfiguringtheAvatar.html",
+      "usefulPrinciple": "A humanoid overview benefits from an immediately recognizable body map and unambiguous required regions.",
+      "adoptedPrinciple": "Keep the same 20-joint map in all three candidates and make Candidate B recognizably human.",
+      "rejectedPrinciple": "Do not copy Unity avatar UI, silhouettes, bone mapping logic, or assets.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "VRM_1_HUMANOID",
+      "publisher": "VRM Consortium",
+      "referenceTopic": "VRM 1.0 Humanoid",
+      "url": "https://vrm.dev/en/vrm1/humanoid/",
+      "usefulPrinciple": "Interoperability starts from stable humanoid roles rather than display-specific geometry.",
+      "adoptedPrinciple": "Preserve project joint IDs and parent relationships across every candidate.",
+      "rejectedPrinciple": "Do not import VRM models, schemas, source code, or sample assets.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "OPENXR_HAND_JOINTS",
+      "publisher": "Khronos Group",
+      "referenceTopic": "OpenXR hand-tracking joint semantics",
+      "url": "https://registry.khronos.org/OpenXR/specs/1.1/man/html/XrHandJointEXT.html",
+      "usefulPrinciple": "Hand semantics distinguish wrist/palm and directional digit chains.",
+      "adoptedPrinciple": "Candidate B uses a palm plate and parallel digit hints without claiming a full tracked-hand skeleton.",
+      "rejectedPrinciple": "Do not reproduce OpenXR runtime code, conformance data, or external hand assets.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "INTERNAL_MASTER_CONTEXT",
+      "publisher": "Humanoid Rig Lab Next",
+      "referenceTopic": "Humanoid architecture and pose authority",
+      "url": "HUMANOID_RIG_LAB_NEXT_MASTER_CONTEXT.md",
+      "usefulPrinciple": "Shared rig data, fixed hierarchy, segment lengths and one pose authority prevent divergent windows.",
+      "adoptedPrinciple": "Freeze a Reference T snapshot sourced from HumanRigCore while keeping the prototypes fully disconnected from finalPose.",
+      "rejectedPrinciple": "Reject any runtime binding, bone scaling, alternate hierarchy, or modification of HumanRigCore.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "INTERNAL_PROJECT_SPEC",
+      "publisher": "Humanoid Rig Lab Next",
+      "referenceTopic": "Character project and world-human system direction",
+      "url": "docs/PROJECT_SPEC_FULL.md",
+      "usefulPrinciple": "One shared humanoid foundation should support character authoring, animation and multiple humans without visual drift.",
+      "adoptedPrinciple": "Compare observation-first, crowd-first and editor-first display directions against the same body input.",
+      "rejectedPrinciple": "Reject a new runtime page, NPC system, motion stack, mode switcher or behavior implementation.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    },
+    {
+      "sourceId": "INTERNAL_PERFORMANCE_ARCHITECTURE",
+      "publisher": "Humanoid Rig Lab Next",
+      "referenceTopic": "Performance rig architecture",
+      "url": "docs/PERFORMANCE_RIG_ARCHITECTURE.md",
+      "usefulPrinciple": "Core, production and performance concerns should remain explicit layers.",
+      "adoptedPrinciple": "Limit P0 to display geometry and record its future suitability without implementing a performance layer.",
+      "rejectedPrinciple": "Reject performance deform, skin weights, anchors, limits, controllers and motion logic.",
+      "geometryCopied": false,
+      "sourceCodeCopied": false,
+      "externalAssetUsed": false
+    }
+  ]
+}
