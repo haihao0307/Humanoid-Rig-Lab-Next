@@ -34,24 +34,24 @@ Left/right joint centers are evaluated from the same parameter contract with exp
 
 ## Femur generator derivation
 
-`LongBoneGeneratorV1` produces a closed generalized tube with explicit lower and upper poles, independently sampled cross-section rings, project-owned triangle topology, and area-weighted normals. Its regions are parameterized as:
+`LongBoneGeneratorV1@1.1.0` produces one closed regional sweep per side and LOD with explicit lower and upper poles, independently sampled cross-section rings, project-owned triangle topology, and area-weighted normals. Its regions are parameterized as:
 
-1. distal condylar envelope and intercondylar posterior indentation;
+1. distinct medial/lateral distal condylar lobes, an anterior patellar groove, and a deeper posterior intercondylar fossa;
 2. metaphyseal transition;
 3. elliptical diaphyseal shaft on a curved centerline;
 4. greater and lesser trochanter analytic bumps;
-5. neck transition driven by neck length and neck-shaft angle;
-6. proximal head envelope driven by head radius.
+5. a separately measurable neck axis driven by neck length, neck-shaft angle, and anteversion;
+6. an exact spherical latitude region centered on `hipJointCenter` and driven by head radius.
 
-Femoral anteversion rotates proximal cross sections progressively around the long axis. The right side executes the same formula with right-side signs and its own output buffers; it is not a mirrored mesh.
+Femoral anteversion rotates the neck axis anteriorly relative to the side-specific medial axis. The right side executes the same formula with right-side signs and its own output buffers; it is not a mirrored mesh.
 
 LOD sampling is fixed by generator version:
 
 | LOD | Longitudinal segments | Radial segments |
 | ---: | ---: | ---: |
-| 0 | 72 plus bounded surface-detail rows | 32 |
-| 1 | 40 | 20 |
-| 2 | 24 | 12 |
+| 0 | 104 plus bounded surface-detail rows | 40 |
+| 1 | 64 | 28 |
+| 2 | 40 | 20 |
 
 ## Reference normalization
 
@@ -59,6 +59,9 @@ LOD sampling is fixed by generator version:
 - The PLOS CT cohort mean antecurvation radius, `943 mm`, is retained as `0.943 m` provenance. S1 uses a bounded analytic centerline offset; it does not reconstruct any CT surface.
 - Distal AP/ML defaults are the arithmetic means of the reported male and female means in the 100-subject Malay cohort, converted to meters.
 - Femoral version `11.0°` and neck-shaft angle `129.9°` use the reported means from the 1,576-hip CT cohort.
+- OpenStax lower-limb anatomy fixes the qualitative regional relationships: rounded head, narrowed neck, lateral greater trochanter, medial lesser trochanter, anterior patellar surface, and posterior intercondylar fossa.
+- Terzidis et al. define bicondylar width, separate medial/lateral condylar depth, intercondylar width, and intercondylar depth. S1A.3 uses these definitions for audit semantics without reconstructing study geometry.
+- Iranpour et al. describe the trochlear groove as a distinct curved path between medial and lateral trochlear surfaces. S1A.3 uses only this relational shape constraint; no CT points or surface topology are consumed.
 
 ## Pending parameters
 

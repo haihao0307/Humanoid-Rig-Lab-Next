@@ -7,6 +7,7 @@ import { compileAnatomicalSkeletonS1 } from './compile-anatomical-skeleton.mjs';
 import { VARIANT_SPECS, createVariantPackage, sha256Stable } from './anatomical-model-v1.mjs';
 import { parseHrlBone } from './read-hrlbone.mjs';
 import { encodeHrlBone } from './write-hrlbone.mjs';
+import { auditFemurS1A3 } from './qa-femur-s1a3.mjs';
 
 const toolDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(toolDirectory, '../..');
@@ -14,7 +15,8 @@ const assetRoot = path.join(repositoryRoot, 'assets/human/anatomical-skeleton-s1
 const qaRoot = path.join(repositoryRoot, 'artifacts/qa/anatomical-skeleton-s1');
 const STARTING_REMOTE_BRANCH = 'origin/feature/human-core-v5-procedural-skeleton-agent-foundation-v1';
 const STARTING_REMOTE_HEAD = '174c9f5e5708a5e090fb2d4170f127708ceedd91';
-const TASK_BRANCH = 'experiment/human-core-v5-anatomical-skeleton-s1-binary-geometry-v1';
+const TASK_BRANCH = 'experiment/human-core-v5-anatomical-skeleton-s1-femur-visual-refinement-v1';
+const TASK_BASE_HEAD = 'b41482b8e7b87a47445a8aaf593d19727d589429';
 
 export async function runAnatomicalSkeletonQa({ writeArtifacts = true, createReviewPackage = true } = {}) {
   const registry = await readJson(path.join(assetRoot, 'VARIANT_REGISTRY_S1.json'));
@@ -32,7 +34,8 @@ export async function runAnatomicalSkeletonQa({ writeArtifacts = true, createRev
   const variantAudit = await auditVariants(registry);
   const sourceAudit = auditSources(receipts, baselineDNA);
   const policyAudit = await auditPolicyScope(registry, baselineProfile, baselineMapping);
-  const allReportsPassed = [graphAudit, binaryRoundtripAudit, geometryAudit, deterministicReplay, variantAudit, sourceAudit, policyAudit].every((report) => report.passed);
+  const femurS1A3Audit = auditFemurS1A3();
+  const allReportsPassed = [graphAudit, binaryRoundtripAudit, geometryAudit, deterministicReplay, variantAudit, sourceAudit, policyAudit, femurS1A3Audit].every((report) => report.passed);
   if (!allReportsPassed) throw new Error(`Anatomical Skeleton S1 QA failed: ${JSON.stringify({ graphAudit, binary: binaryRoundtripAudit.passed, geometry: geometryAudit.passed, determinism: deterministicReplay.passed, variantAudit, sources: sourceAudit.passed, policyAudit })}`);
 
   let reviewPackage = null;
@@ -45,16 +48,17 @@ export async function runAnatomicalSkeletonQa({ writeArtifacts = true, createRev
     await writeJson(path.join(qaRoot, 'variant-audit.json'), variantAudit);
     await writeJson(path.join(qaRoot, 'source-audit.json'), sourceAudit);
     await writeJson(path.join(qaRoot, 'policy-audit.json'), policyAudit);
+    await writeJson(path.join(qaRoot, 'femur-s1a3-regional-geometry-audit.json'), femurS1A3Audit);
     if (createReviewPackage) reviewPackage = await buildReviewPackage();
   }
 
   const baseline = registry.variants.find(({ variantId }) => variantId === 'baseline');
   const finalStatus = {
     schema: 'humanoid_rig/anatomical_skeleton_s1_final_status@1.0',
-    type: 'TaskS1AFinalStatus', task: 'Task S1A Anatomical Skeleton Binary Geometry Foundation V1',
-    status: 'FILE_QA_PASSED_USER_VISUAL_REVIEW_PENDING', passed: allReportsPassed,
+    type: 'TaskS1AFinalStatus', task: 'Task S1A.3 Femur Visual Refinement V1',
+    status: 'awaiting-user-visual-acceptance', passed: allReportsPassed,
     startingRemoteBranch: STARTING_REMOTE_BRANCH, startingRemoteHead: STARTING_REMOTE_HEAD,
-    branch: TASK_BRANCH, worktree: repositoryRoot,
+    branch: TASK_BRANCH, taskBaseHead: TASK_BASE_HEAD, worktree: repositoryRoot,
     policyId: 'human_system/procedural_originality_policy@1.0.0', policyAccepted: true,
     proceduralGenerationOnly: true, externalGeometrySourceCount: 0, loadedExternalHumanModelCount: 0,
     generatedGlbCount: 0, glbLoaderUseCount: 0, runtimeBoneScaleCount: 0,
@@ -79,7 +83,7 @@ export async function runAnatomicalSkeletonQa({ writeArtifacts = true, createRev
     femurGeneratorParameterNames: Object.keys(baselineDNA.boneParameters.find(({ boneId }) => boneId === 'left_femur').generatorParameters),
     humanRigCoreMapping: { status: baselineMapping.status, exactCount: baselineMapping.exactCount, derivedCount: baselineMapping.derivedCount, unmappedCount: baselineMapping.unmappedCount },
     hrlBoneFormat: { magic: 'HRLBONE1', byteOrder: 'little-endian', positions: 'Float32', normals: 'Float32', indices: 'Uint32', primitives: ['TRIANGLES', 'LINES', 'POINTS'] },
-    fileQa: { graphAudit: graphAudit.passed, binaryRoundtripAudit: binaryRoundtripAudit.passed, geometryAudit: geometryAudit.passed, variantAudit: variantAudit.passed, sourceAudit: sourceAudit.passed, policyAudit: policyAudit.passed },
+    fileQa: { graphAudit: graphAudit.passed, binaryRoundtripAudit: binaryRoundtripAudit.passed, geometryAudit: geometryAudit.passed, variantAudit: variantAudit.passed, sourceAudit: sourceAudit.passed, policyAudit: policyAudit.passed, femurS1A3Audit: femurS1A3Audit.passed },
     performanceAdvisory: {
       baselineUnder4MiB: baseline.byteLength <= 4 * 1024 * 1024,
       defaultDrawCallBudget: { estimated: 5, maximum: 24, passed: true },
@@ -92,7 +96,7 @@ export async function runAnatomicalSkeletonQa({ writeArtifacts = true, createRev
     reviewPackage,
   };
   if (writeArtifacts) await writeJson(path.join(qaRoot, 'TASK_S1A_FINAL_STATUS.json'), finalStatus);
-  return { passed: allReportsPassed, graphAudit, binaryRoundtripAudit, geometryAudit, deterministicReplay, variantAudit, sourceAudit, policyAudit, finalStatus };
+  return { passed: allReportsPassed, graphAudit, binaryRoundtripAudit, geometryAudit, deterministicReplay, variantAudit, sourceAudit, policyAudit, femurS1A3Audit, finalStatus };
 }
 
 function auditGraph(graph, profile) {
@@ -204,9 +208,10 @@ async function auditGeometry(registry) {
 function auditTriangleGroup(parsed, group, manifestGroup) {
   const ids = Array.from(parsed.indices.slice(group.indexOffset, group.indexOffset + group.indexCount));
   const edgeCounts = new Map();
+  const edgeDirections = new Map();
   const adjacency = new Map();
   let degenerateTriangleCount = 0;
-  let invertedNormalCount = 0;
+  let signedVolume = 0;
   for (let index = 0; index < ids.length; index += 3) {
     const [a, b, c] = ids.slice(index, index + 3);
     const pa = vertex(parsed.positions, a);
@@ -214,11 +219,11 @@ function auditTriangleGroup(parsed, group, manifestGroup) {
     const pc = vertex(parsed.positions, c);
     const faceNormal = cross(subtract(pb, pa), subtract(pc, pa));
     if (length(faceNormal) <= 1e-12) degenerateTriangleCount += 1;
-    const averageNormal = add(add(vertex(parsed.normals, a), vertex(parsed.normals, b)), vertex(parsed.normals, c));
-    if (dot(faceNormal, averageNormal) <= 0) invertedNormalCount += 1;
+    signedVolume += dot(pa, cross(pb, pc)) / 6;
     for (const [left, right] of [[a, b], [b, c], [c, a]]) {
       const key = left < right ? `${left},${right}` : `${right},${left}`;
       edgeCounts.set(key, (edgeCounts.get(key) ?? 0) + 1);
+      edgeDirections.set(key, (edgeDirections.get(key) ?? 0) + (left < right ? 1 : -1));
       if (!adjacency.has(left)) adjacency.set(left, new Set());
       if (!adjacency.has(right)) adjacency.set(right, new Set());
       adjacency.get(left).add(right);
@@ -239,12 +244,13 @@ function auditTriangleGroup(parsed, group, manifestGroup) {
   }
   const boundaryEdgeCount = [...edgeCounts.values()].filter((count) => count === 1).length;
   const nonManifoldEdgeCount = [...edgeCounts.values()].filter((count) => count > 2).length;
+  const invertedNormalCount = [...edgeCounts].filter(([key, count]) => count === 2 && Math.abs(edgeDirections.get(key)) === 2).length;
   const result = {
     groupId: manifestGroup.groupId, boneId: manifestGroup.boneId, side: manifestGroup.side, lod: manifestGroup.lod,
     vertexCount: vertices.size, triangleCount: ids.length / 3, connectedComponentCount,
-    boundaryEdgeCount, nonManifoldEdgeCount, degenerateTriangleCount, invertedNormalCount,
+    boundaryEdgeCount, nonManifoldEdgeCount, degenerateTriangleCount, invertedNormalCount, signedVolume,
   };
-  result.passed = connectedComponentCount === 1 && boundaryEdgeCount === 0 && nonManifoldEdgeCount === 0 && degenerateTriangleCount === 0 && invertedNormalCount === 0;
+  result.passed = connectedComponentCount === 1 && boundaryEdgeCount === 0 && nonManifoldEdgeCount === 0 && degenerateTriangleCount === 0 && invertedNormalCount === 0 && signedVolume > 0;
   return result;
 }
 
@@ -364,7 +370,7 @@ async function auditPolicyScope(registry, profile, mapping) {
 }
 
 async function buildReviewPackage() {
-  const reportNames = ['graph-audit.json', 'binary-roundtrip-audit.json', 'geometry-audit.json', 'deterministic-replay.json', 'variant-audit.json', 'source-audit.json', 'policy-audit.json'];
+  const reportNames = ['graph-audit.json', 'binary-roundtrip-audit.json', 'geometry-audit.json', 'deterministic-replay.json', 'variant-audit.json', 'source-audit.json', 'policy-audit.json', 'femur-s1a3-regional-geometry-audit.json'];
   const fixedFiles = [
     'docs/HRL_BONE_BINARY_GEOMETRY_V1.md',
     'schemas/skeletal-dna-v1.schema.json', 'schemas/anatomical-graph-v1.schema.json', 'schemas/anatomical-profile-v1.schema.json', 'schemas/hrl-bone-binary-manifest-v1.schema.json',

@@ -1,0 +1,3572 @@
+{
+  "schema": "humanoid_rig/femur_s1a3_regional_geometry_audit@1.0",
+  "generatorId": "LongBoneGeneratorV1@1.1.0",
+  "packageGeneratorVersion": "anatomical-skeleton-s1@1.1.0",
+  "previousGeneratorId": "LongBoneGeneratorV1@1.0.0",
+  "previousPackageGeneratorVersion": "anatomical-skeleton-s1@1.0.0",
+  "previousBinarySha256": {
+    "baseline": "e690539344efab3f2be1802251e1b2878ca11ec11f2ab0b60bb466bcdd0fe29a",
+    "long_femur_plus_08_percent": "28bf3d2a11335c94b20f89426e7a8e9eb29c46566599c6ed8a7362c1dcb723bd",
+    "anteversion_plus_10_degrees": "a05f6c305169ac02e4c699078b552927d46d489a1ba2bb58528efc7f8920eeda",
+    "left_right_asymmetry_02": "2549d5ddda8588334b39a03859716a56bc0058126b4e8a0282df9eb4433a3979"
+  },
+  "meshConstruction": "single continuous closed regional sweep per side and LOD",
+  "sphereFitTolerance": {
+    "rmsRadiusRatioMaximum": 0.06,
+    "maxRadiusRatioMaximum": 0.15,
+    "centerOffsetMaximumMeters": 0.003
+  },
+  "variants": [
+    {
+      "variantId": "baseline",
+      "records": [
+        {
+          "side": "left",
+          "lod": 0,
+          "vertexCount": 4202,
+          "triangleCount": 8400,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004921816456975754,
+          "sphereFit": {
+            "sampleCount": 401,
+            "fittedCenter": [
+              -0.10499999203395924,
+              0.9649999797927273,
+              -2.173865601418079e-11
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000000269530254,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3968514651360293e-8,
+            "maxErrorMeters": 4.888165795399746e-8,
+            "rmsRadiusRatio": 6.349324763739446e-7,
+            "maxRadiusRatio": 0.00000222189351614227,
+            "centerOffsetMeters": 7.628984753841997e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.919988083963,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01998808396299978,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.15220671892166138,
+                0.9093433022499084,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                -0.1519346982240677,
+                0.9089030027389526,
+                0.004856436047703028
+              ],
+              "distanceMeters": 0.0005490726097040551
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.08576451241970062,
+                0.8891571760177612,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                -0.0853222981095314,
+                0.8895754218101501,
+                -0.004378979094326496
+              ],
+              "distanceMeters": 0.0008808237376166864
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07003821432590485,
+                0.5344435572624207,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.0002483480890161657
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.1391419619321823,
+                0.5344435572624207,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.00024777414297228357
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10459008812904358,
+                0.5344435572624207,
+                -0.022157836705446243
+              ],
+              "distanceMeters": 0.0018023307549576474
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.0018023307549576474,
+          "landmarkToleranceMeters": 0.005,
+          "trochanterSeparationMeters": 0.07011360872388443,
+          "distal": {
+            "ringOrdinal": 8,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.04701545089483261,
+            "intercondylarNotchDepthMeters": 0.011986664146751057,
+            "patellarGrooveDepthMeters": 0.0045620622136013644,
+            "posteriorCondyleSeparationMeters": 0.04701545089483261,
+            "anteriorPosteriorSectionDifferenceMeters": 0.010908769278017878,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "left",
+          "lod": 1,
+          "vertexCount": 1766,
+          "triangleCount": 3528,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.00048739702128538696,
+          "sphereFit": {
+            "sampleCount": 169,
+            "fittedCenter": [
+              -0.10500000572769158,
+              0.9649999756356915,
+              -6.028150027759249e-10
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.02199999882576845,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.2911518862844167e-8,
+            "maxErrorMeters": 5.036614554240759e-8,
+            "rmsRadiusRatio": 5.868872523629862e-7,
+            "maxRadiusRatio": 0.0000022893703741208415,
+            "centerOffsetMeters": 9.216101457492185e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.919988083963,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01998808396299978,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.15220671892166138,
+                0.9093433022499084,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                -0.15240167081356049,
+                0.9096679091453552,
+                0.004537890665233135
+              ],
+              "distanceMeters": 0.0004020575639304714
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.08576451241970062,
+                0.8891571760177612,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                -0.08662533760070801,
+                0.887671709060669,
+                -0.004907690919935703
+              ],
+              "distanceMeters": 0.001720258764333255
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07000795006752014,
+                0.535832405090332,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016450679749672875
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.13912655413150787,
+                0.535832405090332,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016442503621698647
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10456725209951401,
+                0.535832405090332,
+                -0.022001808509230614
+              ],
+              "distanceMeters": 0.003195869814429256
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.003195869814429256,
+          "landmarkToleranceMeters": 0.008,
+          "trochanterSeparationMeters": 0.07011360872388443,
+          "distal": {
+            "ringOrdinal": 5,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.05005158483982086,
+            "intercondylarNotchDepthMeters": 0.01236245263990662,
+            "patellarGrooveDepthMeters": 0.004307859951668051,
+            "posteriorCondyleSeparationMeters": 0.05005158483982086,
+            "anteriorPosteriorSectionDifferenceMeters": 0.01154609138445721,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "left",
+          "lod": 2,
+          "vertexCount": 782,
+          "triangleCount": 1560,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.00047851826784821186,
+          "sphereFit": {
+            "sampleCount": 81,
+            "fittedCenter": [
+              -0.10499999276061948,
+              0.9649999718391116,
+              1.9152359403279418e-9
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000004026252094,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3694149898223477e-8,
+            "maxErrorMeters": 4.274396748354947e-8,
+            "rmsRadiusRatio": 6.224612450926175e-7,
+            "maxRadiusRatio": 0.000001942907257314321,
+            "centerOffsetMeters": 4.806481511170139e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.919988083963,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01998808396299978,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.15220671892166138,
+                0.9093433022499084,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                -0.1547788679599762,
+                0.9145517945289612,
+                0.00250408798456192
+              ],
+              "distanceMeters": 0.006200712927526199
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.08576451241970062,
+                0.8891571760177612,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                -0.08792590349912643,
+                0.8876000046730042,
+                -0.004985519219189882
+              ],
+              "distanceMeters": 0.0026640763298119764
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10459413379430771,
+                0.5341975688934326,
+                -0.022173624485731125
+              ],
+              "distanceMeters": 0.0015562495678863187
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.006200712927526199,
+          "landmarkToleranceMeters": 0.013,
+          "trochanterSeparationMeters": 0.07011360872388443,
+          "distal": {
+            "ringOrdinal": 3,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.046989716589450836,
+            "intercondylarNotchDepthMeters": 0.011977445442924315,
+            "patellarGrooveDepthMeters": 0.005986067067370687,
+            "posteriorCondyleSeparationMeters": 0.046989716589450836,
+            "anteriorPosteriorSectionDifferenceMeters": 0.009472793149986405,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 0,
+          "vertexCount": 4202,
+          "triangleCount": 8400,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004921687637107013,
+          "sphereFit": {
+            "sampleCount": 401,
+            "fittedCenter": [
+              0.10499999203438268,
+              0.9649999797926635,
+              -2.175642999091565e-11
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000000269537825,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3968514643485927e-8,
+            "maxErrorMeters": 4.888178898806994e-8,
+            "rmsRadiusRatio": 6.349324760158004e-7,
+            "maxRadiusRatio": 0.0000022218994722356357,
+            "centerOffsetMeters": 7.62867425556388e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.919988083963,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01998808396299978,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15220671892166138,
+                0.9093433022499084,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                0.1519346982240677,
+                0.9089030027389526,
+                0.004856436047703028
+              ],
+              "distanceMeters": 0.0005490726097040551
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.08576451241970062,
+                0.8891571760177612,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                0.0853222981095314,
+                0.8895754218101501,
+                -0.004378979094326496
+              ],
+              "distanceMeters": 0.0008808237376166864
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07003821432590485,
+                0.5344435572624207,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.0002483480890161657
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.1391419619321823,
+                0.5344435572624207,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.00024777414297228357
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10459008812904358,
+                0.5344435572624207,
+                -0.022157836705446243
+              ],
+              "distanceMeters": 0.0018023307549576474
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.0018023307549576474,
+          "landmarkToleranceMeters": 0.005,
+          "trochanterSeparationMeters": 0.07011360872388443,
+          "distal": {
+            "ringOrdinal": 8,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.04701545089483261,
+            "intercondylarNotchDepthMeters": 0.011986664146751057,
+            "patellarGrooveDepthMeters": 0.0045620622136013644,
+            "posteriorCondyleSeparationMeters": 0.04701545089483261,
+            "anteriorPosteriorSectionDifferenceMeters": 0.010908769278017878,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 1,
+          "vertexCount": 1766,
+          "triangleCount": 3528,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.00048736510051018684,
+          "sphereFit": {
+            "sampleCount": 169,
+            "fittedCenter": [
+              0.10500000572761817,
+              0.9649999756356988,
+              -6.028120641543566e-10
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.021999998825763402,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.2911518863770342e-8,
+            "maxErrorMeters": 5.036615942366485e-8,
+            "rmsRadiusRatio": 5.868872524052197e-7,
+            "maxRadiusRatio": 0.0000022893710050876393,
+            "centerOffsetMeters": 9.216031006069512e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.919988083963,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01998808396299978,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15220671892166138,
+                0.9093433022499084,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                0.15240167081356049,
+                0.9096679091453552,
+                0.004537890665233135
+              ],
+              "distanceMeters": 0.0004020575639304714
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.08576451241970062,
+                0.8891571760177612,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                0.08662533760070801,
+                0.887671709060669,
+                -0.004907690919935703
+              ],
+              "distanceMeters": 0.001720258764333255
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07000795006752014,
+                0.535832405090332,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016450679749672875
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.13912655413150787,
+                0.535832405090332,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016442503621698647
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10456725209951401,
+                0.535832405090332,
+                -0.022001808509230614
+              ],
+              "distanceMeters": 0.003195869814429256
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.003195869814429256,
+          "landmarkToleranceMeters": 0.008,
+          "trochanterSeparationMeters": 0.07011360872388443,
+          "distal": {
+            "ringOrdinal": 5,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.05005158483982086,
+            "intercondylarNotchDepthMeters": 0.01236245263990662,
+            "patellarGrooveDepthMeters": 0.004307859951668051,
+            "posteriorCondyleSeparationMeters": 0.05005158483982086,
+            "anteriorPosteriorSectionDifferenceMeters": 0.01154609138445721,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 2,
+          "vertexCount": 782,
+          "triangleCount": 1560,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004784491045275868,
+          "sphereFit": {
+            "sampleCount": 81,
+            "fittedCenter": [
+              0.1049999927604962,
+              0.9649999718402047,
+              1.915255632908841e-9
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.02200000402636816,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3694150121949097e-8,
+            "maxErrorMeters": 4.274278424601374e-8,
+            "rmsRadiusRatio": 6.224612552586781e-7,
+            "maxRadiusRatio": 0.0000019428534737895624,
+            "centerOffsetMeters": 4.80615104208843e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.919988083963,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01998808396299978,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15220671892166138,
+                0.9093433022499084,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                0.1547788679599762,
+                0.9145517945289612,
+                0.00250408798456192
+              ],
+              "distanceMeters": 0.006200712927526199
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.08576451241970062,
+                0.8891571760177612,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                0.08792590349912643,
+                0.8876000046730042,
+                -0.004985519219189882
+              ],
+              "distanceMeters": 0.0026640763298119764
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10459413379430771,
+                0.5341975688934326,
+                -0.022173624485731125
+              ],
+              "distanceMeters": 0.0015562495678863187
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.006200712927526199,
+          "landmarkToleranceMeters": 0.013,
+          "trochanterSeparationMeters": 0.07011360872388443,
+          "distal": {
+            "ringOrdinal": 3,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.046989716589450836,
+            "intercondylarNotchDepthMeters": 0.011977445442924315,
+            "patellarGrooveDepthMeters": 0.005986067067370687,
+            "posteriorCondyleSeparationMeters": 0.046989716589450836,
+            "anteriorPosteriorSectionDifferenceMeters": 0.009472793149986405,
+            "passed": true
+          },
+          "passed": true
+        }
+      ],
+      "lodComparisons": [
+        {
+          "side": "left",
+          "referenceLod": 0,
+          "lod": 1,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0009511132270062383,
+            "lesserTrochanter": 0.0023667636854240604,
+            "medialCondyle": 0.0013971726643724179,
+            "lateralCondyle": 0.0013969298225235112,
+            "intercondylarNotch": 0.001397771287211584
+          },
+          "maximumLandmarkErrorMeters": 0.0023667636854240604,
+          "toleranceMeters": 0.009,
+          "passed": true
+        },
+        {
+          "side": "left",
+          "referenceLod": 0,
+          "lod": 2,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.006747717509179643,
+            "lesserTrochanter": 0.003323992300461551,
+            "medialCondyle": 0.0002483480890161657,
+            "lateralCondyle": 0.00024777414297228357,
+            "intercondylarNotch": 0.0002465276842286638
+          },
+          "maximumLandmarkErrorMeters": 0.006747717509179643,
+          "toleranceMeters": 0.015,
+          "passed": true
+        },
+        {
+          "side": "right",
+          "referenceLod": 0,
+          "lod": 1,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0009511132270062383,
+            "lesserTrochanter": 0.0023667636854240604,
+            "medialCondyle": 0.0013971726643724179,
+            "lateralCondyle": 0.0013969298225235112,
+            "intercondylarNotch": 0.001397771287211584
+          },
+          "maximumLandmarkErrorMeters": 0.0023667636854240604,
+          "toleranceMeters": 0.009,
+          "passed": true
+        },
+        {
+          "side": "right",
+          "referenceLod": 0,
+          "lod": 2,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.006747717509179643,
+            "lesserTrochanter": 0.003323992300461551,
+            "medialCondyle": 0.0002483480890161657,
+            "lateralCondyle": 0.00024777414297228357,
+            "intercondylarNotch": 0.0002465276842286638
+          },
+          "maximumLandmarkErrorMeters": 0.006747717509179643,
+          "toleranceMeters": 0.015,
+          "passed": true
+        }
+      ],
+      "angleRecords": [
+        {
+          "side": "left",
+          "neckShaftAngle": {
+            "measuredDegrees": 129.919988083963,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01998808396299978,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          }
+        },
+        {
+          "side": "right",
+          "neckShaftAngle": {
+            "measuredDegrees": 129.919988083963,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01998808396299978,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          }
+        }
+      ],
+      "passed": true
+    },
+    {
+      "variantId": "long_femur_plus_08_percent",
+      "records": [
+        {
+          "side": "left",
+          "lod": 0,
+          "vertexCount": 4202,
+          "triangleCount": 8400,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004953895820037642,
+          "sphereFit": {
+            "sampleCount": 401,
+            "fittedCenter": [
+              -0.10499999203395924,
+              0.9649999797927273,
+              -2.173865601418079e-11
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000000269530254,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3968514651360293e-8,
+            "maxErrorMeters": 4.888165795399746e-8,
+            "rmsRadiusRatio": 6.349324763739446e-7,
+            "maxRadiusRatio": 0.00000222189351614227,
+            "centerOffsetMeters": 7.628984753841997e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.91983877163315,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.019838771633146735,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.15220671892166138,
+                0.90900057554245,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                -0.1519346982240677,
+                0.9085546731948853,
+                0.004856436047703028
+              ],
+              "distanceMeters": 0.0005535756271215377
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.08576451241970062,
+                0.8885577917098999,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                -0.0853222981095314,
+                0.8889813423156738,
+                -0.004378979094326496
+              ],
+              "distanceMeters": 0.0008833549850142105
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005984336137772,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07003821432590485,
+                0.5311180949211121,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.0002494698653605501
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391284316778183,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.1391419619321823,
+                0.5311180949211121,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.000248898506083663
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461971908807755,
+                0.5293077826499939,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10459008812904358,
+                0.5311180949211121,
+                -0.022157836705446243
+              ],
+              "distanceMeters": 0.001810614411685773
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.001810614411685773,
+          "landmarkToleranceMeters": 0.005,
+          "trochanterSeparationMeters": 0.07018793234488498,
+          "distal": {
+            "ringOrdinal": 8,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.04701545089483261,
+            "intercondylarNotchDepthMeters": 0.011986664146751057,
+            "patellarGrooveDepthMeters": 0.0045620622136013644,
+            "posteriorCondyleSeparationMeters": 0.04701545089483261,
+            "anteriorPosteriorSectionDifferenceMeters": 0.010908769278017878,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "left",
+          "lod": 1,
+          "vertexCount": 1766,
+          "triangleCount": 3528,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004905818742905332,
+          "sphereFit": {
+            "sampleCount": 169,
+            "fittedCenter": [
+              -0.10500000572769158,
+              0.9649999756356915,
+              -6.028150027759249e-10
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.02199999882576845,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.2911518862844167e-8,
+            "maxErrorMeters": 5.036614554240759e-8,
+            "rmsRadiusRatio": 5.868872523629862e-7,
+            "maxRadiusRatio": 0.0000022893703741208415,
+            "centerOffsetMeters": 9.216101457492185e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.91983877163315,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.019838771633146735,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.15220671892166138,
+                0.90900057554245,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                -0.15240167081356049,
+                0.909329354763031,
+                0.004537890665233135
+              ],
+              "distanceMeters": 0.0004054336246884264
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.08576451241970062,
+                0.8885577917098999,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                -0.08662533760070801,
+                0.887053370475769,
+                -0.004907690919935703
+              ],
+              "distanceMeters": 0.0017366523501714966
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005984336137772,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07000795006752014,
+                0.5325133204460144,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.001652531660968236
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391284316778183,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.13912655413150787,
+                0.5325133204460144,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016517177427560663
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461971908807755,
+                0.5293077826499939,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10456725209951401,
+                0.5325133204460144,
+                -0.022001808509230614
+              ],
+              "distanceMeters": 0.0032105097455153255
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.0032105097455153255,
+          "landmarkToleranceMeters": 0.008,
+          "trochanterSeparationMeters": 0.07018793234488498,
+          "distal": {
+            "ringOrdinal": 5,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.05005158483982086,
+            "intercondylarNotchDepthMeters": 0.01236245263990662,
+            "patellarGrooveDepthMeters": 0.004307859951668051,
+            "posteriorCondyleSeparationMeters": 0.05005158483982086,
+            "anteriorPosteriorSectionDifferenceMeters": 0.01154609138445721,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "left",
+          "lod": 2,
+          "vertexCount": 782,
+          "triangleCount": 1560,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.00048166563198705236,
+          "sphereFit": {
+            "sampleCount": 81,
+            "fittedCenter": [
+              -0.10499999276061948,
+              0.9649999718391116,
+              1.9152359403279418e-9
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000004026252094,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3694149898223477e-8,
+            "maxErrorMeters": 4.274396748354947e-8,
+            "rmsRadiusRatio": 6.224612450926175e-7,
+            "maxRadiusRatio": 0.000001942907257314321,
+            "centerOffsetMeters": 4.806481511170139e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.91983877163315,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.019838771633146735,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.15220671892166138,
+                0.90900057554245,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                -0.1547788679599762,
+                0.9142752885818481,
+                0.00250408798456192
+              ],
+              "distanceMeters": 0.006256440412617698
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.08576451241970062,
+                0.8885577917098999,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                -0.08792590349912643,
+                0.8869807720184326,
+                -0.004985519219189882
+              ],
+              "distanceMeters": 0.002675726294187701
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005984336137772,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07005984336137772,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391284316778183,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.1391284316778183,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461971908807755,
+                0.5293077826499939,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10459413379430771,
+                0.5308709740638733,
+                -0.022173624485731125
+              ],
+              "distanceMeters": 0.0015634011612554956
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.006256440412617698,
+          "landmarkToleranceMeters": 0.013,
+          "trochanterSeparationMeters": 0.07018793234488498,
+          "distal": {
+            "ringOrdinal": 3,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.046989716589450836,
+            "intercondylarNotchDepthMeters": 0.011977445442924315,
+            "patellarGrooveDepthMeters": 0.005986067067370687,
+            "posteriorCondyleSeparationMeters": 0.046989716589450836,
+            "anteriorPosteriorSectionDifferenceMeters": 0.009472793149986405,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 0,
+          "vertexCount": 4202,
+          "triangleCount": 8400,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004953767033516796,
+          "sphereFit": {
+            "sampleCount": 401,
+            "fittedCenter": [
+              0.10499999203438268,
+              0.9649999797926635,
+              -2.175642999091565e-11
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000000269537825,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3968514643485927e-8,
+            "maxErrorMeters": 4.888178898806994e-8,
+            "rmsRadiusRatio": 6.349324760158004e-7,
+            "maxRadiusRatio": 0.0000022218994722356357,
+            "centerOffsetMeters": 7.62867425556388e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.91983877163315,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.019838771633146735,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15220671892166138,
+                0.90900057554245,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                0.1519346982240677,
+                0.9085546731948853,
+                0.004856436047703028
+              ],
+              "distanceMeters": 0.0005535756271215377
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.08576451241970062,
+                0.8885577917098999,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                0.0853222981095314,
+                0.8889813423156738,
+                -0.004378979094326496
+              ],
+              "distanceMeters": 0.0008833549850142105
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005984336137772,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07003821432590485,
+                0.5311180949211121,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.0002494698653605501
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391284316778183,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.1391419619321823,
+                0.5311180949211121,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.000248898506083663
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461971908807755,
+                0.5293077826499939,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10459008812904358,
+                0.5311180949211121,
+                -0.022157836705446243
+              ],
+              "distanceMeters": 0.001810614411685773
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.001810614411685773,
+          "landmarkToleranceMeters": 0.005,
+          "trochanterSeparationMeters": 0.07018793234488498,
+          "distal": {
+            "ringOrdinal": 8,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.04701545089483261,
+            "intercondylarNotchDepthMeters": 0.011986664146751057,
+            "patellarGrooveDepthMeters": 0.0045620622136013644,
+            "posteriorCondyleSeparationMeters": 0.04701545089483261,
+            "anteriorPosteriorSectionDifferenceMeters": 0.010908769278017878,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 1,
+          "vertexCount": 1766,
+          "triangleCount": 3528,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004905499473640277,
+          "sphereFit": {
+            "sampleCount": 169,
+            "fittedCenter": [
+              0.10500000572761817,
+              0.9649999756356988,
+              -6.028120641543566e-10
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.021999998825763402,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.2911518863770342e-8,
+            "maxErrorMeters": 5.036615942366485e-8,
+            "rmsRadiusRatio": 5.868872524052197e-7,
+            "maxRadiusRatio": 0.0000022893710050876393,
+            "centerOffsetMeters": 9.216031006069512e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.91983877163315,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.019838771633146735,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15220671892166138,
+                0.90900057554245,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                0.15240167081356049,
+                0.909329354763031,
+                0.004537890665233135
+              ],
+              "distanceMeters": 0.0004054336246884264
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.08576451241970062,
+                0.8885577917098999,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                0.08662533760070801,
+                0.887053370475769,
+                -0.004907690919935703
+              ],
+              "distanceMeters": 0.0017366523501714966
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005984336137772,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07000795006752014,
+                0.5325133204460144,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.001652531660968236
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391284316778183,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.13912655413150787,
+                0.5325133204460144,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016517177427560663
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461971908807755,
+                0.5293077826499939,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10456725209951401,
+                0.5325133204460144,
+                -0.022001808509230614
+              ],
+              "distanceMeters": 0.0032105097455153255
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.0032105097455153255,
+          "landmarkToleranceMeters": 0.008,
+          "trochanterSeparationMeters": 0.07018793234488498,
+          "distal": {
+            "ringOrdinal": 5,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.05005158483982086,
+            "intercondylarNotchDepthMeters": 0.01236245263990662,
+            "patellarGrooveDepthMeters": 0.004307859951668051,
+            "posteriorCondyleSeparationMeters": 0.05005158483982086,
+            "anteriorPosteriorSectionDifferenceMeters": 0.01154609138445721,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 2,
+          "vertexCount": 782,
+          "triangleCount": 1560,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004815964401392519,
+          "sphereFit": {
+            "sampleCount": 81,
+            "fittedCenter": [
+              0.1049999927604962,
+              0.9649999718402047,
+              1.915255632908841e-9
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.02200000402636816,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3694150121949097e-8,
+            "maxErrorMeters": 4.274278424601374e-8,
+            "rmsRadiusRatio": 6.224612552586781e-7,
+            "maxRadiusRatio": 0.0000019428534737895624,
+            "centerOffsetMeters": 4.80615104208843e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.91983877163315,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.019838771633146735,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15220671892166138,
+                0.90900057554245,
+                0.004673073533922434
+              ],
+              "nearestSurfacePoint": [
+                0.1547788679599762,
+                0.9142752885818481,
+                0.00250408798456192
+              ],
+              "distanceMeters": 0.006256440412617698
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.08576451241970062,
+                0.8885577917098999,
+                -0.005015663802623749
+              ],
+              "nearestSurfacePoint": [
+                0.08792590349912643,
+                0.8869807720184326,
+                -0.004985519219189882
+              ],
+              "distanceMeters": 0.002675726294187701
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005984336137772,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07005984336137772,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391284316778183,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.1391284316778183,
+                0.5308709740638733,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461971908807755,
+                0.5293077826499939,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10459413379430771,
+                0.5308709740638733,
+                -0.022173624485731125
+              ],
+              "distanceMeters": 0.0015634011612554956
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.006256440412617698,
+          "landmarkToleranceMeters": 0.013,
+          "trochanterSeparationMeters": 0.07018793234488498,
+          "distal": {
+            "ringOrdinal": 3,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.046989716589450836,
+            "intercondylarNotchDepthMeters": 0.011977445442924315,
+            "patellarGrooveDepthMeters": 0.005986067067370687,
+            "posteriorCondyleSeparationMeters": 0.046989716589450836,
+            "anteriorPosteriorSectionDifferenceMeters": 0.009472793149986405,
+            "passed": true
+          },
+          "passed": true
+        }
+      ],
+      "lodComparisons": [
+        {
+          "side": "left",
+          "referenceLod": 0,
+          "lod": 1,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0009589922273174379,
+            "lesserTrochanter": 0.0023863200802848408,
+            "medialCondyle": 0.001403512533009375,
+            "lateralCondyle": 0.0014032707883015448,
+            "intercondylarNotch": 0.0014041084529330344
+          },
+          "maximumLandmarkErrorMeters": 0.0023863200802848408,
+          "toleranceMeters": 0.009,
+          "passed": true
+        },
+        {
+          "side": "left",
+          "referenceLod": 0,
+          "lod": 2,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0068079573516862,
+            "lesserTrochanter": 0.003339001866127268,
+            "medialCondyle": 0.0002494698653605501,
+            "lateralCondyle": 0.000248898506083663,
+            "intercondylarNotch": 0.0002476577063129217
+          },
+          "maximumLandmarkErrorMeters": 0.0068079573516862,
+          "toleranceMeters": 0.015,
+          "passed": true
+        },
+        {
+          "side": "right",
+          "referenceLod": 0,
+          "lod": 1,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0009589922273174379,
+            "lesserTrochanter": 0.0023863200802848408,
+            "medialCondyle": 0.001403512533009375,
+            "lateralCondyle": 0.0014032707883015448,
+            "intercondylarNotch": 0.0014041084529330344
+          },
+          "maximumLandmarkErrorMeters": 0.0023863200802848408,
+          "toleranceMeters": 0.009,
+          "passed": true
+        },
+        {
+          "side": "right",
+          "referenceLod": 0,
+          "lod": 2,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0068079573516862,
+            "lesserTrochanter": 0.003339001866127268,
+            "medialCondyle": 0.0002494698653605501,
+            "lateralCondyle": 0.000248898506083663,
+            "intercondylarNotch": 0.0002476577063129217
+          },
+          "maximumLandmarkErrorMeters": 0.0068079573516862,
+          "toleranceMeters": 0.015,
+          "passed": true
+        }
+      ],
+      "angleRecords": [
+        {
+          "side": "left",
+          "neckShaftAngle": {
+            "measuredDegrees": 129.91983877163315,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.019838771633146735,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          }
+        },
+        {
+          "side": "right",
+          "neckShaftAngle": {
+            "measuredDegrees": 129.91983877163315,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.019838771633146735,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.000000394346854,
+            "targetDegrees": 11,
+            "errorDegrees": 3.943468538381012e-7,
+            "passed": true
+          }
+        }
+      ],
+      "passed": true
+    },
+    {
+      "variantId": "anteversion_plus_10_degrees",
+      "records": [
+        {
+          "side": "left",
+          "lod": 0,
+          "vertexCount": 4202,
+          "triangleCount": 8400,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004921551312056753,
+          "sphereFit": {
+            "sampleCount": 401,
+            "fittedCenter": [
+              -0.10499999286763145,
+              0.9649999810119185,
+              1.5996928295902713e-9
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.021999998648877108,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3823135318189464e-8,
+            "maxErrorMeters": 4.2862266184245934e-8,
+            "rmsRadiusRatio": 6.283243712333139e-7,
+            "maxRadiusRatio": 0.000001948284946209924,
+            "centerOffsetMeters": 8.354717353193095e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.98963224289875,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.08963224289874461,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 21.0000004704064,
+            "targetDegrees": 21,
+            "errorDegrees": 4.7040639827855557e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.15147018432617188,
+                0.9093433022499084,
+                0.002104510786011815
+              ],
+              "nearestSurfacePoint": [
+                -0.15121309459209442,
+                0.9089030027389526,
+                0.002339888596907258
+              ],
+              "distanceMeters": 0.000561570569543911
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.0857117623090744,
+                0.8891571760177612,
+                -0.005199619568884373
+              ],
+              "nearestSurfacePoint": [
+                -0.08525538444519043,
+                0.8895754218101501,
+                -0.004612340591847897
+              ],
+              "distanceMeters": 0.0008532917990718881
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07003821432590485,
+                0.5344435572624207,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.0002483480890161657
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.1391419619321823,
+                0.5344435572624207,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.00024777414297228357
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10459008812904358,
+                0.5344435572624207,
+                -0.022157836705446243
+              ],
+              "distanceMeters": 0.0018023307549576474
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.0018023307549576474,
+          "landmarkToleranceMeters": 0.005,
+          "trochanterSeparationMeters": 0.0691736949907997,
+          "distal": {
+            "ringOrdinal": 8,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.04701545089483261,
+            "intercondylarNotchDepthMeters": 0.011986664146751057,
+            "patellarGrooveDepthMeters": 0.0045620622136013644,
+            "posteriorCondyleSeparationMeters": 0.04701545089483261,
+            "anteriorPosteriorSectionDifferenceMeters": 0.010908769278017878,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "left",
+          "lod": 1,
+          "vertexCount": 1766,
+          "triangleCount": 3528,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004873736572162665,
+          "sphereFit": {
+            "sampleCount": 169,
+            "fittedCenter": [
+              -0.10500000328746867,
+              0.9649999779204581,
+              -3.8160853157998e-9
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.021999999890747392,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.2501059192765865e-8,
+            "maxErrorMeters": 5.281918245836348e-8,
+            "rmsRadiusRatio": 5.68229966129385e-7,
+            "maxRadiusRatio": 0.0000024008719418484093,
+            "centerOffsetMeters": 8.652439988292825e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.98963224289875,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.08963224289874461,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 21.0000004704064,
+            "targetDegrees": 21,
+            "errorDegrees": 4.7040639827855557e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.15147018432617188,
+                0.9093433022499084,
+                0.002104510786011815
+              ],
+              "nearestSurfacePoint": [
+                -0.15165415406227112,
+                0.9096679091453552,
+                0.0019309805938974023
+              ],
+              "distanceMeters": 0.0004114938978250896
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.0857117623090744,
+                0.8891571760177612,
+                -0.005199619568884373
+              ],
+              "nearestSurfacePoint": [
+                -0.08662290871143341,
+                0.887671709060669,
+                -0.004916161298751831
+              ],
+              "distanceMeters": 0.0017655447992195813
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07000795006752014,
+                0.535832405090332,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016450679749672875
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.13912655413150787,
+                0.535832405090332,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016442503621698647
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10456725209951401,
+                0.535832405090332,
+                -0.022001808509230614
+              ],
+              "distanceMeters": 0.003195869814429256
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.003195869814429256,
+          "landmarkToleranceMeters": 0.008,
+          "trochanterSeparationMeters": 0.0691736949907997,
+          "distal": {
+            "ringOrdinal": 5,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.05005158483982086,
+            "intercondylarNotchDepthMeters": 0.01236245263990662,
+            "patellarGrooveDepthMeters": 0.004307859951668051,
+            "posteriorCondyleSeparationMeters": 0.05005158483982086,
+            "anteriorPosteriorSectionDifferenceMeters": 0.01154609138445721,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "left",
+          "lod": 2,
+          "vertexCount": 782,
+          "triangleCount": 1560,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.00047849553551288583,
+          "sphereFit": {
+            "sampleCount": 81,
+            "fittedCenter": [
+              -0.10499999183288823,
+              0.9649999721592714,
+              1.2996341763188424e-9
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000001731118615,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.1360103299242197e-8,
+            "maxErrorMeters": 4.268701182807977e-8,
+            "rmsRadiusRatio": 5.163682911521561e-7,
+            "maxRadiusRatio": 0.000001940318566779917,
+            "centerOffsetMeters": 5.310100981303715e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.98963224289875,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.08963224289874461,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 21.0000004704064,
+            "targetDegrees": 21,
+            "errorDegrees": 4.7040639827855557e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.15147018432617188,
+                0.9093433022499084,
+                0.002104510786011815
+              ],
+              "nearestSurfacePoint": [
+                -0.15386591851711273,
+                0.9145517945289612,
+                -0.0006797556416131556
+              ],
+              "distanceMeters": 0.006373387927515043
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.0857117623090744,
+                0.8891571760177612,
+                -0.005199619568884373
+              ],
+              "nearestSurfacePoint": [
+                -0.08792590349912643,
+                0.8876000046730042,
+                -0.004985519219189882
+              ],
+              "distanceMeters": 0.002715334742928928
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10459413379430771,
+                0.5341975688934326,
+                -0.022173624485731125
+              ],
+              "distanceMeters": 0.0015562495678863187
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.006373387927515043,
+          "landmarkToleranceMeters": 0.013,
+          "trochanterSeparationMeters": 0.0691736949907997,
+          "distal": {
+            "ringOrdinal": 3,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.046989716589450836,
+            "intercondylarNotchDepthMeters": 0.011977445442924315,
+            "patellarGrooveDepthMeters": 0.005986067067370687,
+            "posteriorCondyleSeparationMeters": 0.046989716589450836,
+            "anteriorPosteriorSectionDifferenceMeters": 0.009472793149986405,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 0,
+          "vertexCount": 4202,
+          "triangleCount": 8400,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004921350462207258,
+          "sphereFit": {
+            "sampleCount": 401,
+            "fittedCenter": [
+              0.10499999286769285,
+              0.9649999810101397,
+              1.599589297823778e-9
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.02199999864892505,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3823134955659118e-8,
+            "maxErrorMeters": 4.286404774872521e-8,
+            "rmsRadiusRatio": 6.283243547532916e-7,
+            "maxRadiusRatio": 0.0000019483659264142547,
+            "centerOffsetMeters": 8.353128215134005e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.98963224289875,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.08963224289874461,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 21.0000004704064,
+            "targetDegrees": 21,
+            "errorDegrees": 4.7040639827855557e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15147018432617188,
+                0.9093433022499084,
+                0.002104510786011815
+              ],
+              "nearestSurfacePoint": [
+                0.15121309459209442,
+                0.9089030027389526,
+                0.002339888596907258
+              ],
+              "distanceMeters": 0.000561570569543911
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.0857117623090744,
+                0.8891571760177612,
+                -0.005199619568884373
+              ],
+              "nearestSurfacePoint": [
+                0.08525538444519043,
+                0.8895754218101501,
+                -0.004612340591847897
+              ],
+              "distanceMeters": 0.0008532917990718881
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07003821432590485,
+                0.5344435572624207,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.0002483480890161657
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.1391419619321823,
+                0.5344435572624207,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.00024777414297228357
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10459008812904358,
+                0.5344435572624207,
+                -0.022157836705446243
+              ],
+              "distanceMeters": 0.0018023307549576474
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.0018023307549576474,
+          "landmarkToleranceMeters": 0.005,
+          "trochanterSeparationMeters": 0.0691736949907997,
+          "distal": {
+            "ringOrdinal": 8,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.04701545089483261,
+            "intercondylarNotchDepthMeters": 0.011986664146751057,
+            "patellarGrooveDepthMeters": 0.0045620622136013644,
+            "posteriorCondyleSeparationMeters": 0.04701545089483261,
+            "anteriorPosteriorSectionDifferenceMeters": 0.010908769278017878,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 1,
+          "vertexCount": 1766,
+          "triangleCount": 3528,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004873249234449335,
+          "sphereFit": {
+            "sampleCount": 169,
+            "fittedCenter": [
+              0.10500000328722497,
+              0.9649999779210345,
+              -3.816033655734685e-9
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.021999999890765055,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.2501059325385931e-8,
+            "maxErrorMeters": 5.281979864601993e-8,
+            "rmsRadiusRatio": 5.682299721571137e-7,
+            "maxRadiusRatio": 0.0000024008999503764593,
+            "centerOffsetMeters": 8.652508545510822e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.98963224289875,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.08963224289874461,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 21.0000004704064,
+            "targetDegrees": 21,
+            "errorDegrees": 4.7040639827855557e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15147018432617188,
+                0.9093433022499084,
+                0.002104510786011815
+              ],
+              "nearestSurfacePoint": [
+                0.15165415406227112,
+                0.9096679091453552,
+                0.0019309805938974023
+              ],
+              "distanceMeters": 0.0004114938978250896
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.0857117623090744,
+                0.8891571760177612,
+                -0.005199619568884373
+              ],
+              "nearestSurfacePoint": [
+                0.08662290871143341,
+                0.887671709060669,
+                -0.004916161298751831
+              ],
+              "distanceMeters": 0.0017655447992195813
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07000795006752014,
+                0.535832405090332,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016450679749672875
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.13912655413150787,
+                0.535832405090332,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016442503621698647
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10456725209951401,
+                0.535832405090332,
+                -0.022001808509230614
+              ],
+              "distanceMeters": 0.003195869814429256
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.003195869814429256,
+          "landmarkToleranceMeters": 0.008,
+          "trochanterSeparationMeters": 0.0691736949907997,
+          "distal": {
+            "ringOrdinal": 5,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.05005158483982086,
+            "intercondylarNotchDepthMeters": 0.01236245263990662,
+            "patellarGrooveDepthMeters": 0.004307859951668051,
+            "posteriorCondyleSeparationMeters": 0.05005158483982086,
+            "anteriorPosteriorSectionDifferenceMeters": 0.01154609138445721,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 2,
+          "vertexCount": 782,
+          "triangleCount": 1560,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.00047839125700713594,
+          "sphereFit": {
+            "sampleCount": 81,
+            "fittedCenter": [
+              0.10499999183296957,
+              0.964999972159783,
+              1.299649077593501e-9
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000001731161508,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.1360103389224937e-8,
+            "maxErrorMeters": 4.268747421862229e-8,
+            "rmsRadiusRatio": 5.163682952412736e-7,
+            "maxRadiusRatio": 0.000001940339584526413,
+            "centerOffsetMeters": 5.309874200016222e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.98963224289875,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.08963224289874461,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 21.0000004704064,
+            "targetDegrees": 21,
+            "errorDegrees": 4.7040639827855557e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15147018432617188,
+                0.9093433022499084,
+                0.002104510786011815
+              ],
+              "nearestSurfacePoint": [
+                0.15386591851711273,
+                0.9145517945289612,
+                -0.0006797556416131556
+              ],
+              "distanceMeters": 0.006373387927515043
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.0857117623090744,
+                0.8891571760177612,
+                -0.005199619568884373
+              ],
+              "nearestSurfacePoint": [
+                0.08792590349912643,
+                0.8876000046730042,
+                -0.004985519219189882
+              ],
+              "distanceMeters": 0.002715334742928928
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07005984336137772,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.1391284316778183,
+                0.5341975688934326,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461971908807755,
+                0.5326415300369263,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10459413379430771,
+                0.5341975688934326,
+                -0.022173624485731125
+              ],
+              "distanceMeters": 0.0015562495678863187
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.006373387927515043,
+          "landmarkToleranceMeters": 0.013,
+          "trochanterSeparationMeters": 0.0691736949907997,
+          "distal": {
+            "ringOrdinal": 3,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.046989716589450836,
+            "intercondylarNotchDepthMeters": 0.011977445442924315,
+            "patellarGrooveDepthMeters": 0.005986067067370687,
+            "posteriorCondyleSeparationMeters": 0.046989716589450836,
+            "anteriorPosteriorSectionDifferenceMeters": 0.009472793149986405,
+            "passed": true
+          },
+          "passed": true
+        }
+      ],
+      "lodComparisons": [
+        {
+          "side": "left",
+          "referenceLod": 0,
+          "lod": 1,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0009730472864736727,
+            "lesserTrochanter": 0.0023635887699099195,
+            "medialCondyle": 0.0013971726643724179,
+            "lateralCondyle": 0.0013969298225235112,
+            "intercondylarNotch": 0.001397771287211584
+          },
+          "maximumLandmarkErrorMeters": 0.0023635887699099195,
+          "toleranceMeters": 0.009,
+          "passed": true
+        },
+        {
+          "side": "left",
+          "referenceLod": 0,
+          "lod": 2,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0069328619480880345,
+            "lesserTrochanter": 0.003342634764833003,
+            "medialCondyle": 0.0002483480890161657,
+            "lateralCondyle": 0.00024777414297228357,
+            "intercondylarNotch": 0.0002465276842286638
+          },
+          "maximumLandmarkErrorMeters": 0.0069328619480880345,
+          "toleranceMeters": 0.015,
+          "passed": true
+        },
+        {
+          "side": "right",
+          "referenceLod": 0,
+          "lod": 1,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0009730472864736727,
+            "lesserTrochanter": 0.0023635887699099195,
+            "medialCondyle": 0.0013971726643724179,
+            "lateralCondyle": 0.0013969298225235112,
+            "intercondylarNotch": 0.001397771287211584
+          },
+          "maximumLandmarkErrorMeters": 0.0023635887699099195,
+          "toleranceMeters": 0.009,
+          "passed": true
+        },
+        {
+          "side": "right",
+          "referenceLod": 0,
+          "lod": 2,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0069328619480880345,
+            "lesserTrochanter": 0.003342634764833003,
+            "medialCondyle": 0.0002483480890161657,
+            "lateralCondyle": 0.00024777414297228357,
+            "intercondylarNotch": 0.0002465276842286638
+          },
+          "maximumLandmarkErrorMeters": 0.0069328619480880345,
+          "toleranceMeters": 0.015,
+          "passed": true
+        }
+      ],
+      "angleRecords": [
+        {
+          "side": "left",
+          "neckShaftAngle": {
+            "measuredDegrees": 129.98963224289875,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.08963224289874461,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 21.0000004704064,
+            "targetDegrees": 21,
+            "errorDegrees": 4.7040639827855557e-7,
+            "passed": true
+          }
+        },
+        {
+          "side": "right",
+          "neckShaftAngle": {
+            "measuredDegrees": 129.98963224289875,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.08963224289874461,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 21.0000004704064,
+            "targetDegrees": 21,
+            "errorDegrees": 4.7040639827855557e-7,
+            "passed": true
+          }
+        }
+      ],
+      "passed": true
+    },
+    {
+      "variantId": "left_right_asymmetry_02",
+      "records": [
+        {
+          "side": "left",
+          "lod": 0,
+          "vertexCount": 4202,
+          "triangleCount": 8400,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.000492983139885192,
+          "sphereFit": {
+            "sampleCount": 401,
+            "fittedCenter": [
+              -0.10499999293709189,
+              0.9649999818425123,
+              1.3386569873430343e-9
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.0220000006311425,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3982560505463587e-8,
+            "maxErrorMeters": 4.890559196155109e-8,
+            "rmsRadiusRatio": 6.355709138330805e-7,
+            "maxRadiusRatio": 0.0000022229813890242297,
+            "centerOffsetMeters": 9.012058302438737e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.9213875190194,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.021387519019384627,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.200000092955076,
+            "targetDegrees": 11.2,
+            "errorDegrees": 9.295507652495871e-8,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.1521957814693451,
+                0.9092576503753662,
+                0.004620565101504326
+              ],
+              "nearestSurfacePoint": [
+                -0.15192395448684692,
+                0.9088159203529358,
+                0.004804991185665131
+              ],
+              "distanceMeters": 0.0005504800647156328
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.08576265722513199,
+                0.8890073299407959,
+                -0.005019424483180046
+              ],
+              "nearestSurfacePoint": [
+                -0.08532024919986725,
+                0.8894268870353699,
+                -0.004383750259876251
+              ],
+              "distanceMeters": 0.0008808148128857079
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005961984395981,
+                0.5333659052848816,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07003799080848694,
+                0.5336121916770935,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.00024864328390155125
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391282081604004,
+                0.5333659052848816,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.1391417384147644,
+                0.5336121916770935,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.00024807002083487574
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461951047182083,
+                0.5318081378936768,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.10458986461162567,
+                0.5336121916770935,
+                -0.022157836705446243
+              ],
+              "distanceMeters": 0.001804357216738674
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.001804357216738674,
+          "landmarkToleranceMeters": 0.005,
+          "trochanterSeparationMeters": 0.07011679451987701,
+          "distal": {
+            "ringOrdinal": 8,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.04701545089483261,
+            "intercondylarNotchDepthMeters": 0.011986664146751057,
+            "patellarGrooveDepthMeters": 0.0045620622136013644,
+            "posteriorCondyleSeparationMeters": 0.04701545089483261,
+            "anteriorPosteriorSectionDifferenceMeters": 0.010908769278017878,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "left",
+          "lod": 1,
+          "vertexCount": 1766,
+          "triangleCount": 3528,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004881928861831927,
+          "sphereFit": {
+            "sampleCount": 169,
+            "fittedCenter": [
+              -0.1050000016317207,
+              0.9649999807704202,
+              -1.269525623515122e-9
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.021999999709561516,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3456216839931002e-8,
+            "maxErrorMeters": 4.712395345815579e-8,
+            "rmsRadiusRatio": 6.116462280716638e-7,
+            "maxRadiusRatio": 0.000002141997912739746,
+            "centerOffsetMeters": 8.64118438989498e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.9213875190194,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.021387519019384627,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.200000092955076,
+            "targetDegrees": 11.2,
+            "errorDegrees": 9.295507652495871e-8,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.1521957814693451,
+                0.9092576503753662,
+                0.004620565101504326
+              ],
+              "nearestSurfacePoint": [
+                -0.15239058434963226,
+                0.9095832705497742,
+                0.004484598524868488
+              ],
+              "distanceMeters": 0.00040306769916692207
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.08576265722513199,
+                0.8890073299407959,
+                -0.005019424483180046
+              ],
+              "nearestSurfacePoint": [
+                -0.0866241455078125,
+                0.8875170946121216,
+                -0.004907864145934582
+              ],
+              "distanceMeters": 0.001724937420566667
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005961984395981,
+                0.5333659052848816,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07000771164894104,
+                0.535002589225769,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016469047090502923
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391282081604004,
+                0.5333659052848816,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.13912631571292877,
+                0.535002589225769,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016460875557938448
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461951047182083,
+                0.5318081378936768,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.1045670136809349,
+                0.535002589225769,
+                -0.022001808509230614
+              ],
+              "distanceMeters": 0.003199440998925192
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.003199440998925192,
+          "landmarkToleranceMeters": 0.008,
+          "trochanterSeparationMeters": 0.07011679451987701,
+          "distal": {
+            "ringOrdinal": 5,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.05005158483982086,
+            "intercondylarNotchDepthMeters": 0.01236245263990662,
+            "patellarGrooveDepthMeters": 0.004307859951668051,
+            "posteriorCondyleSeparationMeters": 0.05005158483982086,
+            "anteriorPosteriorSectionDifferenceMeters": 0.01154609138445721,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "left",
+          "lod": 2,
+          "vertexCount": 782,
+          "triangleCount": 1560,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004793048542873088,
+          "sphereFit": {
+            "sampleCount": 81,
+            "fittedCenter": [
+              -0.10499999053623411,
+              0.9649999725914578,
+              1.8752267082894347e-9
+            ],
+            "expectedHipJointCenter": [
+              -0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000003628754473,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.2701300172584657e-8,
+            "maxErrorMeters": 3.86403769259136e-8,
+            "rmsRadiusRatio": 5.773317307995253e-7,
+            "maxRadiusRatio": 0.0000017563804796563672,
+            "centerOffsetMeters": 6.570792738305119e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.9213875190194,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.021387519019384627,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.200000092955076,
+            "targetDegrees": 11.2,
+            "errorDegrees": 9.295507652495871e-8,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                -0.1521957814693451,
+                0.9092576503753662,
+                0.004620565101504326
+              ],
+              "nearestSurfacePoint": [
+                -0.15476559102535248,
+                0.9144826531410217,
+                0.002439001575112343
+              ],
+              "distanceMeters": 0.006218021749313724
+            },
+            "lesserTrochanter": {
+              "target": [
+                -0.08576265722513199,
+                0.8890073299407959,
+                -0.005019424483180046
+              ],
+              "nearestSurfacePoint": [
+                -0.08792474865913391,
+                0.8874452114105225,
+                -0.004985519219189882
+              ],
+              "distanceMeters": 0.0026675837828518856
+            },
+            "medialCondyle": {
+              "target": [
+                -0.07005961984395981,
+                0.5333659052848816,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.07005961984395981,
+                0.5333659052848816,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "lateralCondyle": {
+              "target": [
+                -0.1391282081604004,
+                0.5333659052848816,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                -0.1391282081604004,
+                0.5333659052848816,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "intercondylarNotch": {
+              "target": [
+                -0.10461951047182083,
+                0.5318081378936768,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                -0.1045939102768898,
+                0.5333659052848816,
+                -0.022173624485731125
+              ],
+              "distanceMeters": 0.0015579781135860364
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.006218021749313724,
+          "landmarkToleranceMeters": 0.013,
+          "trochanterSeparationMeters": 0.07011679451987701,
+          "distal": {
+            "ringOrdinal": 3,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.046989716589450836,
+            "intercondylarNotchDepthMeters": 0.011977445442924315,
+            "patellarGrooveDepthMeters": 0.005986067067370687,
+            "posteriorCondyleSeparationMeters": 0.046989716589450836,
+            "anteriorPosteriorSectionDifferenceMeters": 0.009472793149986405,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 0,
+          "vertexCount": 4202,
+          "triangleCount": 8400,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.000491367329090507,
+          "sphereFit": {
+            "sampleCount": 401,
+            "fittedCenter": [
+              0.1049999926032027,
+              0.9649999812967422,
+              6.975180381202373e-10
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.021999999588289836,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3273215378702708e-8,
+            "maxErrorMeters": 4.9014752579595866e-8,
+            "rmsRadiusRatio": 6.033279830499532e-7,
+            "maxRadiusRatio": 0.0000022279433407664902,
+            "centerOffsetMeters": 8.60472118980345e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.9186514690775,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01865146907749704,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 10.799999328556602,
+            "targetDegrees": 10.8,
+            "errorDegrees": 6.714433986587665e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15221619606018066,
+                0.9094290137290955,
+                0.004725617356598377
+              ],
+              "nearestSurfacePoint": [
+                0.15194396674633026,
+                0.9089900851249695,
+                0.00490791629999876
+              ],
+              "distanceMeters": 0.0005477225790528773
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.08576412498950958,
+                0.8893070220947266,
+                -0.005011901259422302
+              ],
+              "nearestSurfacePoint": [
+                0.08532211184501648,
+                0.8897239565849304,
+                -0.004374205134809017
+              ],
+              "distanceMeters": 0.0008808327516464368
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005961984395981,
+                0.5350292325019836,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07003799080848694,
+                0.5352749228477478,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.0002480529008947471
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391282081604004,
+                0.5350292325019836,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.1391417384147644,
+                0.5352749228477478,
+                0.0026790709234774113
+              ],
+              "distanceMeters": 0.00024747827025815313
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461951047182083,
+                0.5334749817848206,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.10458986461162567,
+                0.5352749228477478,
+                -0.022157836705446243
+              ],
+              "distanceMeters": 0.0018002451894529022
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.0018002451894529022,
+          "landmarkToleranceMeters": 0.005,
+          "trochanterSeparationMeters": 0.07011127987501356,
+          "distal": {
+            "ringOrdinal": 8,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.04701545089483261,
+            "intercondylarNotchDepthMeters": 0.011986664146751057,
+            "patellarGrooveDepthMeters": 0.0045620622136013644,
+            "posteriorCondyleSeparationMeters": 0.04701545089483261,
+            "anteriorPosteriorSectionDifferenceMeters": 0.010908769278017878,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 1,
+          "vertexCount": 1766,
+          "triangleCount": 3528,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004865696733363906,
+          "sphereFit": {
+            "sampleCount": 169,
+            "fittedCenter": [
+              0.10500000486170624,
+              0.9649999760186893,
+              -2.1389448441599956e-9
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.022000000175062893,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.3329540333298984e-8,
+            "maxErrorMeters": 4.100340850882178e-8,
+            "rmsRadiusRatio": 6.058881921468384e-7,
+            "maxRadiusRatio": 0.000001863791281024595,
+            "centerOffsetMeters": 8.710504442313786e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.9186514690775,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01865146907749704,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 10.799999328556602,
+            "targetDegrees": 10.8,
+            "errorDegrees": 6.714433986587665e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15221619606018066,
+                0.9094290137290955,
+                0.004725617356598377
+              ],
+              "nearestSurfacePoint": [
+                0.1524113118648529,
+                0.909752607345581,
+                0.004591219127178192
+              ],
+              "distanceMeters": 0.00040105596858094965
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.08576412498950958,
+                0.8893070220947266,
+                -0.005011901259422302
+              ],
+              "nearestSurfacePoint": [
+                0.08662422001361847,
+                0.8878262639045715,
+                -0.004907517693936825
+              ],
+              "distanceMeters": 0.0017156060727776424
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005961984395981,
+                0.5350292325019836,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07000771164894104,
+                0.5366621613502502,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016431729738023446
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391282081604004,
+                0.5350292325019836,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.13912631571292877,
+                0.5366621613502502,
+                0.002828326541930437
+              ],
+              "distanceMeters": 0.0016423539638219793
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461951047182083,
+                0.5334749817848206,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.1045670136809349,
+                0.5366621613502502,
+                -0.022001808509230614
+              ],
+              "distanceMeters": 0.003192180598711456
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.003192180598711456,
+          "landmarkToleranceMeters": 0.008,
+          "trochanterSeparationMeters": 0.07011127987501356,
+          "distal": {
+            "ringOrdinal": 5,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.05005158483982086,
+            "intercondylarNotchDepthMeters": 0.01236245263990662,
+            "patellarGrooveDepthMeters": 0.004307859951668051,
+            "posteriorCondyleSeparationMeters": 0.05005158483982086,
+            "anteriorPosteriorSectionDifferenceMeters": 0.01154609138445721,
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "side": "right",
+          "lod": 2,
+          "vertexCount": 782,
+          "triangleCount": 1560,
+          "connectedComponents": 1,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "undefinedNormals": 0,
+          "nanCount": 0,
+          "infCount": 0,
+          "selfIntersections": 0,
+          "invertedNormals": 0,
+          "signedVolume": 0.0004776633677016447,
+          "sphereFit": {
+            "sampleCount": 81,
+            "fittedCenter": [
+              0.10499999168871556,
+              0.9649999757059993,
+              1.9810774826156674e-9
+            ],
+            "expectedHipJointCenter": [
+              0.10499999672174454,
+              0.9649999737739563,
+              0
+            ],
+            "fittedRadiusMeters": 0.02200000273409399,
+            "expectedRadiusMeters": 0.022,
+            "rmsErrorMeters": 1.404765427690462e-8,
+            "maxErrorMeters": 5.1782559736673894e-8,
+            "rmsRadiusRatio": 6.385296605047506e-7,
+            "maxRadiusRatio": 0.00000235375242278607,
+            "centerOffsetMeters": 5.743591101455084e-9,
+            "passed": true
+          },
+          "neckShaftAngle": {
+            "measuredDegrees": 129.9186514690775,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01865146907749704,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 10.799999328556602,
+            "targetDegrees": 10.8,
+            "errorDegrees": 6.714433986587665e-7,
+            "passed": true
+          },
+          "landmarkSurface": {
+            "greaterTrochanter": {
+              "target": [
+                0.15221619606018066,
+                0.9094290137290955,
+                0.004725617356598377
+              ],
+              "nearestSurfacePoint": [
+                0.15479089319705963,
+                0.9146208763122559,
+                0.002569218399003148
+              ],
+              "distanceMeters": 0.006183409972934961
+            },
+            "lesserTrochanter": {
+              "target": [
+                0.08576412498950958,
+                0.8893070220947266,
+                -0.005011901259422302
+              ],
+              "nearestSurfacePoint": [
+                0.08792475610971451,
+                0.8877547979354858,
+                -0.004985519219189882
+              ],
+              "distanceMeters": 0.0026605305279540368
+            },
+            "medialCondyle": {
+              "target": [
+                0.07005961984395981,
+                0.5350292325019836,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.07005961984395981,
+                0.5350292325019836,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "lateralCondyle": {
+              "target": [
+                0.1391282081604004,
+                0.5350292325019836,
+                0.0026526383589953184
+              ],
+              "nearestSurfacePoint": [
+                0.1391282081604004,
+                0.5350292325019836,
+                0.0026526383589953184
+              ],
+              "distanceMeters": 0
+            },
+            "intercondylarNotch": {
+              "target": [
+                0.10461951047182083,
+                0.5334749817848206,
+                -0.022172534838318825
+              ],
+              "nearestSurfacePoint": [
+                0.1045939102768898,
+                0.5350292325019836,
+                -0.022173624485731125
+              ],
+              "distanceMeters": 0.001554461916263617
+            }
+          },
+          "maximumLandmarkDistanceMeters": 0.006183409972934961,
+          "landmarkToleranceMeters": 0.013,
+          "trochanterSeparationMeters": 0.07011127987501356,
+          "distal": {
+            "ringOrdinal": 3,
+            "targetIntercondylarNotchWidthMeters": 0.018,
+            "intercondylarNotchMouthWidthMeters": 0.046989716589450836,
+            "intercondylarNotchDepthMeters": 0.011977445442924315,
+            "patellarGrooveDepthMeters": 0.005986067067370687,
+            "posteriorCondyleSeparationMeters": 0.046989716589450836,
+            "anteriorPosteriorSectionDifferenceMeters": 0.009472793149986405,
+            "passed": true
+          },
+          "passed": true
+        }
+      ],
+      "lodComparisons": [
+        {
+          "side": "left",
+          "referenceLod": 0,
+          "lod": 1,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0009535309174449016,
+            "lesserTrochanter": 0.00237110692448253,
+            "medialCondyle": 0.0013987134840651044,
+            "lateralCondyle": 0.0013984707514762861,
+            "intercondylarNotch": 0.0013993113686419758
+          },
+          "maximumLandmarkErrorMeters": 0.00237110692448253,
+          "toleranceMeters": 0.009,
+          "passed": true
+        },
+        {
+          "side": "left",
+          "referenceLod": 0,
+          "lod": 2,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0067664366948772805,
+            "lesserTrochanter": 0.003327548887068097,
+            "medialCondyle": 0.00024864328390155125,
+            "lateralCondyle": 0.00024807002083487574,
+            "intercondylarNotch": 0.00024682505626964584
+          },
+          "maximumLandmarkErrorMeters": 0.0067664366948772805,
+          "toleranceMeters": 0.015,
+          "passed": true
+        },
+        {
+          "side": "right",
+          "referenceLod": 0,
+          "lod": 1,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.0009487616644900279,
+            "lesserTrochanter": 0.0023624448094190843,
+            "medialCondyle": 0.0013955732621284407,
+            "lateralCondyle": 0.0013953299832645044,
+            "intercondylarNotch": 0.0013961724914468674
+          },
+          "maximumLandmarkErrorMeters": 0.0023624448094190843,
+          "toleranceMeters": 0.009,
+          "passed": true
+        },
+        {
+          "side": "right",
+          "referenceLod": 0,
+          "lod": 2,
+          "landmarkErrors": {
+            "greaterTrochanter": 0.006729064383909976,
+            "lesserTrochanter": 0.0033203987509048305,
+            "medialCondyle": 0.0002480529008947471,
+            "lateralCondyle": 0.00024747827025815313,
+            "intercondylarNotch": 0.0002462303137622694
+          },
+          "maximumLandmarkErrorMeters": 0.006729064383909976,
+          "toleranceMeters": 0.015,
+          "passed": true
+        }
+      ],
+      "angleRecords": [
+        {
+          "side": "left",
+          "neckShaftAngle": {
+            "measuredDegrees": 129.9213875190194,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.021387519019384627,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 11.200000092955076,
+            "targetDegrees": 11.2,
+            "errorDegrees": 9.295507652495871e-8,
+            "passed": true
+          }
+        },
+        {
+          "side": "right",
+          "neckShaftAngle": {
+            "measuredDegrees": 129.9186514690775,
+            "targetDegrees": 129.9,
+            "errorDegrees": 0.01865146907749704,
+            "passed": true
+          },
+          "anteversion": {
+            "measuredDegrees": 10.799999328556602,
+            "targetDegrees": 10.8,
+            "errorDegrees": 6.714433986587665e-7,
+            "passed": true
+          }
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "anteversionDeltas": [
+    {
+      "side": "left",
+      "baselineDegrees": 11.000000394346854,
+      "variantDegrees": 21.0000004704064,
+      "measuredDeltaDegrees": 10.000000076059544,
+      "targetDeltaDegrees": 10,
+      "errorDegrees": 7.605954444045437e-8,
+      "passed": true
+    },
+    {
+      "side": "right",
+      "baselineDegrees": 11.000000394346854,
+      "variantDegrees": 21.0000004704064,
+      "measuredDeltaDegrees": 10.000000076059544,
+      "targetDeltaDegrees": 10,
+      "errorDegrees": 7.605954444045437e-8,
+      "passed": true
+    }
+  ],
+  "policyCounters": {
+    "externalGeometrySourceCount": 0,
+    "generatedGlbCount": 0,
+    "loadedGlbCount": 0,
+    "humanRigCoreWriteCount": 0,
+    "finalPoseWriteCount": 0,
+    "runtimeBoneScaleCount": 0,
+    "negativeScaleCount": 0,
+    "overlappingClosedMeshCount": 0
+  },
+  "passed": true
+}

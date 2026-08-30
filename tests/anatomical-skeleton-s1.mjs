@@ -10,6 +10,7 @@ assert.equal(result.deterministicReplay.passed, true);
 assert.equal(result.variantAudit.passed, true);
 assert.equal(result.sourceAudit.passed, true);
 assert.equal(result.policyAudit.passed, true);
+assert.equal(result.femurS1A3Audit.passed, true);
 assert.equal(result.finalStatus.visualAcceptance, false);
 assert.equal(result.finalStatus.productionReady, false);
 assert.equal(result.finalStatus.userVisualAcceptance, 'pending');

@@ -179,11 +179,7 @@ function crossSectionAt(parameters, side, t) {
 }
 
 function crossSectionPoint(parameters, side, t, theta, center, frame) {
-  const epsilon = 1e-4;
-  const tangent = normalize3(subtract3(
-    centerlinePoint(parameters, side, Math.min(1, t + epsilon), [0, 0, 0]),
-    centerlinePoint(parameters, side, Math.max(0, t - epsilon), [0, 0, 0]),
-  ));
+  const tangent = sectionTangent(parameters, side, t);
   const basisX = perpendicularReference(tangent);
   const basisZ = normalize3(cross3(basisX, tangent));
   let radialOffset = 0;
@@ -211,11 +207,7 @@ function crossSectionPoint(parameters, side, t, theta, center, frame) {
 function surfacePointInDirection(parameters, side, t, origin, direction) {
   const center = centerlinePoint(parameters, side, t, origin);
   const frame = crossSectionAt(parameters, side, t);
-  const epsilon = 1e-4;
-  const tangent = normalize3(subtract3(
-    centerlinePoint(parameters, side, Math.min(1, t + epsilon), [0, 0, 0]),
-    centerlinePoint(parameters, side, Math.max(0, t - epsilon), [0, 0, 0]),
-  ));
+  const tangent = sectionTangent(parameters, side, t);
   const basisX = perpendicularReference(tangent);
   const basisZ = normalize3(cross3(basisX, tangent));
   return crossSectionPoint(parameters, side, t, directionTheta(basisX, basisZ, tangent, direction), center, frame);
@@ -262,6 +254,13 @@ function directionTheta(basisX, basisZ, tangent, direction) {
 function perpendicularReference(tangent) {
   const reference = Math.abs(tangent[0]) < 0.92 ? [1, 0, 0] : [0, 0, 1];
   return normalize3(subtract3(reference, scale3(tangent, dot3(reference, tangent))));
+}
+
+function sectionTangent(parameters, side, t) {
+  if (t <= 0.8) return [0, 1, 0];
+  const neckAxis = anatomyFrame(parameters, side, [0, 0, 0]).neckAxis;
+  if (t >= 0.9) return neckAxis;
+  return normalize3(mix3([0, 1, 0], neckAxis, smoothstep(0.8, 0.9, t)));
 }
 
 function computeVertexNormals(positions, indices) {
