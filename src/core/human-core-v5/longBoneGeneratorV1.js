@@ -183,13 +183,22 @@ function crossSectionPoint(parameters, side, t, theta, center, frame) {
   const basisX = perpendicularReference(tangent);
   const basisZ = normalize3(cross3(basisX, tangent));
   let radialOffset = 0;
+  let axialOffset = 0;
   if (t < 0.17) {
     const distalWeight = Math.sin(Math.PI * Math.min(1, (t / 0.17) / 0.92)) ** 1.4;
     const posteriorLobes = gaussianAngle(theta, -Math.PI / 2 - 0.58, 0.38) + gaussianAngle(theta, -Math.PI / 2 + 0.58, 0.38);
     const anteriorLobes = gaussianAngle(theta, Math.PI / 2 - 0.52, 0.42) + gaussianAngle(theta, Math.PI / 2 + 0.52, 0.42);
     const posteriorNotch = gaussianAngle(theta, -Math.PI / 2, 0.31) * parameters.intercondylarNotchWidth * 0.48;
-    const patellarGroove = gaussianAngle(theta, Math.PI / 2, 0.34) * parameters.intercondylarNotchWidth * 0.27;
-    radialOffset += distalWeight * (parameters.distalCondyleDepth * 0.115 * posteriorLobes + parameters.distalCondyleDepth * 0.065 * anteriorLobes - posteriorNotch - patellarGroove);
+    const patellarGroove = gaussianAngle(theta, Math.PI / 2, 0.32) * parameters.intercondylarNotchWidth * 0.36;
+    radialOffset += distalWeight * (parameters.distalCondyleDepth * 0.13 * posteriorLobes + parameters.distalCondyleDepth * 0.08 * anteriorLobes - posteriorNotch - patellarGroove);
+    // The posterior intercondylar fossa is open toward the distal end, not only
+    // a radial dent. Lift the posterior-center vertices proximally while the
+    // two flanking condyles retain their distal poles. This keeps one closed
+    // sweep but makes the notch legible in a true posterior silhouette.
+    const notchOpeningWeight = 1 - smoothstep(0.025, 0.125, t);
+    axialOffset += parameters.distalCondyleDepth * 0.34
+      * gaussianAngle(theta, -Math.PI / 2, 0.3)
+      * notchOpeningWeight;
   }
   if (t >= 0.64 && t < 0.84) {
     const medial = side === 'left' ? 1 : -1;
@@ -201,7 +210,7 @@ function crossSectionPoint(parameters, side, t, theta, center, frame) {
   const detail = t >= 0.17 && t < 0.7 ? parameters.surfaceDetail * 0.00012 * Math.sin(theta * 5 + t * 29) * Math.sin(Math.PI * t) ** 2 : 0;
   const radiusX = Math.max(parameters.femurLength * 1e-6, frame.rx + radialOffset + detail);
   const radiusZ = Math.max(parameters.femurLength * 1e-6, frame.rz + radialOffset + detail);
-  return add3(center, add3(scale3(basisX, radiusX * Math.cos(theta)), scale3(basisZ, radiusZ * Math.sin(theta)))).map(Math.fround);
+  return add3(add3(center, scale3(tangent, axialOffset)), add3(scale3(basisX, radiusX * Math.cos(theta)), scale3(basisZ, radiusZ * Math.sin(theta)))).map(Math.fround);
 }
 
 function surfacePointInDirection(parameters, side, t, origin, direction) {

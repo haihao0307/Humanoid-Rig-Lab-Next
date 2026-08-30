@@ -26,6 +26,8 @@ export async function runAnatomicalSkeletonQa({ writeArtifacts = true, createRev
   const baselineMapping = await readJson(path.join(assetRoot, 'HUMANRIGCORE_MAPPING_S1.json'));
   const receipts = await readJson(path.join(assetRoot, 'ANATOMICAL_REFERENCE_RECEIPTS.json'));
   const generatorRegistry = await readJson(path.join(assetRoot, 'GENERATOR_REGISTRY_S1.json'));
+  const browserEvidencePath = path.join(qaRoot, 'browser-review-s1a3/browser-run-report.json');
+  const browserEvidence = await readOptionalJson(browserEvidencePath);
 
   const graphAudit = auditGraph(graph, baselineProfile);
   const binaryRoundtripAudit = await auditBinaryRoundtrip(registry);
@@ -49,7 +51,7 @@ export async function runAnatomicalSkeletonQa({ writeArtifacts = true, createRev
     await writeJson(path.join(qaRoot, 'source-audit.json'), sourceAudit);
     await writeJson(path.join(qaRoot, 'policy-audit.json'), policyAudit);
     await writeJson(path.join(qaRoot, 'femur-s1a3-regional-geometry-audit.json'), femurS1A3Audit);
-    if (createReviewPackage) reviewPackage = await buildReviewPackage();
+    if (createReviewPackage) reviewPackage = await buildReviewPackage({ includeBrowserEvidence: Boolean(browserEvidence) });
   }
 
   const baseline = registry.variants.find(({ variantId }) => variantId === 'baseline');
@@ -88,10 +90,22 @@ export async function runAnatomicalSkeletonQa({ writeArtifacts = true, createRev
       baselineUnder4MiB: baseline.byteLength <= 4 * 1024 * 1024,
       defaultDrawCallBudget: { estimated: 5, maximum: 24, passed: true },
       targetFps: 60, decodeAndUploadTargetMs: 100,
-      runtimePerformanceEvidence: 'not-run; browser/computer effect validation reserved for the user',
+      runtimePerformanceEvidence: browserEvidence
+        ? 'real local Chromium evidence captured; no runtime performance certification claimed'
+        : 'not-run; browser/computer effect validation reserved for the user',
     },
     httpEntry: 'http://127.0.0.1:4173/human-core-v5-anatomical-skeleton-s1-binary-v1.html',
-    browserEvidence: 'not-run-by-repository-rule', consoleErrors: [], pageErrors: [], startupErrors: [], failedRequests: [],
+    browserEvidence: browserEvidence ? {
+      path: path.relative(repositoryRoot, browserEvidencePath).replaceAll('\\', '/'),
+      status: browserEvidence.status,
+      browser: browserEvidence.browser,
+      screenshotCount: browserEvidence.screenshots.length,
+      contactSheet: browserEvidence.evidence.contactSheet,
+    } : 'not-run-by-repository-rule',
+    consoleErrors: browserEvidence?.errors.consoleErrors ?? [],
+    pageErrors: browserEvidence?.errors.pageErrors ?? [],
+    startupErrors: browserEvidence?.errors.startupErrors ?? [],
+    failedRequests: browserEvidence?.errors.failedRequests ?? [],
     visualAcceptance: false, productionReady: false, userVisualAcceptance: 'pending',
     reviewPackage,
   };
@@ -369,7 +383,7 @@ async function auditPolicyScope(registry, profile, mapping) {
   return result;
 }
 
-async function buildReviewPackage() {
+async function buildReviewPackage({ includeBrowserEvidence = false } = {}) {
   const reportNames = ['graph-audit.json', 'binary-roundtrip-audit.json', 'geometry-audit.json', 'deterministic-replay.json', 'variant-audit.json', 'source-audit.json', 'policy-audit.json', 'femur-s1a3-regional-geometry-audit.json'];
   const fixedFiles = [
     'docs/HRL_BONE_BINARY_GEOMETRY_V1.md',
@@ -380,7 +394,10 @@ async function buildReviewPackage() {
     'apps/human-core-v5-anatomical-skeleton-s1-binary-v1/index.js', 'apps/human-core-v5-anatomical-skeleton-s1-binary-v1/styles.css',
   ];
   const assetFiles = (await walkFiles(assetRoot)).map((file) => path.relative(repositoryRoot, file).replaceAll('\\', '/'));
-  const files = [...fixedFiles, ...assetFiles, ...reportNames.map((name) => `artifacts/qa/anatomical-skeleton-s1/${name}`)].sort();
+  const browserFiles = includeBrowserEvidence
+    ? (await walkFiles(path.join(qaRoot, 'browser-review-s1a3'))).map((file) => path.relative(repositoryRoot, file).replaceAll('\\', '/'))
+    : [];
+  const files = [...fixedFiles, ...assetFiles, ...browserFiles, ...reportNames.map((name) => `artifacts/qa/anatomical-skeleton-s1/${name}`)].sort();
   const manifest = { schema: 'humanoid_rig/anatomical_review_package_manifest@1.0', files: [] };
   for (const relativePath of files) {
     const bytes = await readFile(path.join(repositoryRoot, relativePath));
@@ -427,6 +444,10 @@ function createStoredZip(entries) {
 const CRC_TABLE = Array.from({ length: 256 }, (_, value) => { let crc = value; for (let bit = 0; bit < 8; bit += 1) crc = (crc & 1) ? (0xedb88320 ^ (crc >>> 1)) : (crc >>> 1); return crc >>> 0; });
 function crc32(bytes) { let crc = 0xffffffff; for (const byte of bytes) crc = CRC_TABLE[(crc ^ byte) & 0xff] ^ (crc >>> 8); return (crc ^ 0xffffffff) >>> 0; }
 async function readJson(filePath) { return JSON.parse(await readFile(filePath, 'utf8')); }
+async function readOptionalJson(filePath) {
+  try { return await readJson(filePath); }
+  catch (error) { if (error?.code === 'ENOENT') return null; throw error; }
+}
 async function writeJson(filePath, value) { await mkdir(path.dirname(filePath), { recursive: true }); await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8'); }
 async function walkFiles(root) { const result = []; for (const entry of await readdir(root, { withFileTypes: true })) { const target = path.join(root, entry.name); if (entry.isDirectory()) result.push(...await walkFiles(target)); else result.push(target); } return result; }
 function sha256(bytes) { return createHash('sha256').update(bytes).digest('hex'); }

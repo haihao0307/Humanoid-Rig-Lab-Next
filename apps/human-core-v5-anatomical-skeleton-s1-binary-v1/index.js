@@ -72,13 +72,15 @@ scene.add(floor);
 
 const displayRoot = new THREE.Group();
 const axesRoot = new THREE.Group();
-scene.add(displayRoot, axesRoot);
+const diagnosticRoot = new THREE.Group();
+scene.add(displayRoot, axesRoot, diagnosticRoot);
 
 const state = {
   variantId: 'baseline', lod: 0, isolateFemur: false, showAxes: true, showLabels: true, showSymmetry: true,
+  showWireframe: false, showFemurLandmarks: false, showAnteversionAxes: false,
   femurSide: 'both', showJoints: true, cameraPreset: 'skeleton-three-quarter-front', renderRevision: 0,
   tab: 'summary', registry: null, generatorRegistry: null, graph: null, receipts: null, qa: null,
-  dna: null, profile: null, mapping: null, manifest: null, binary: null, labelRecords: [],
+  dna: null, profile: null, mapping: null, manifest: null, baselineManifest: null, binary: null, labelRecords: [],
 };
 
 const loader = new HrlBoneBinaryLoaderV1({ fetchImpl: (...args) => fetch(...args) });
@@ -92,6 +94,9 @@ publicState.review = {
   setLabelVisibility,
   setAxisVisibility,
   setJointVisibility,
+  setWireframeVisibility,
+  setFemurLandmarkVisibility,
+  setAnteversionAxisVisibility,
   setInspectorTab,
   captureReadyState,
 };
@@ -112,6 +117,8 @@ async function start() {
   ]);
   const variantSelect = document.querySelector('#variant-select');
   for (const variant of state.registry.variants) variantSelect.add(new Option(variant.label, variant.variantId));
+  const baselineRecord = state.registry.variants.find((variant) => variant.variantId === 'baseline');
+  state.baselineManifest = await fetchJson(`${ASSET_ROOT}${baselineRecord.manifestPath}`);
   bindUi();
   await loadVariant('baseline');
   setCameraPreset('skeleton-three-quarter-front');
@@ -158,6 +165,7 @@ async function loadVariant(variantId) {
 function rebuildDisplay() {
   disposeChildren(displayRoot);
   disposeChildren(axesRoot);
+  disposeChildren(diagnosticRoot);
   labelsRoot.replaceChildren();
   state.labelRecords = [];
   const positionAttribute = new THREE.BufferAttribute(state.binary.positions, 3);
@@ -176,7 +184,7 @@ function rebuildDisplay() {
     if (binaryGroup.primitive === 'TRIANGLES') {
       geometry.setAttribute('normal', normalAttribute.clone());
       const color = manifestGroup.side === 'left' ? 0x59c9ff : 0xff9b72;
-      object = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color, roughness: 0.57, metalness: 0.08, side: THREE.FrontSide }));
+      object = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color, roughness: 0.57, metalness: 0.08, side: THREE.FrontSide, wireframe: femur && state.showWireframe }));
     } else if (binaryGroup.primitive === 'LINES') {
       object = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0xc9eaf1, transparent: true, opacity: 0.76 }));
     } else {
@@ -187,8 +195,55 @@ function rebuildDisplay() {
     displayRoot.add(object);
   });
   buildAxesAndLabels();
+  buildFemurDiagnostics();
   state.renderRevision += 1;
   publishReviewState();
+}
+
+function buildFemurDiagnostics() {
+  const visibleSides = state.femurSide === 'both' ? ['left', 'right'] : [state.femurSide];
+  if (state.showFemurLandmarks) {
+    const markerGeometry = new THREE.SphereGeometry(.0044, 14, 9);
+    for (const landmark of state.manifest.landmarks.filter(({ id }) => visibleSides.some((side) => id.startsWith(`${side}_femur_`)))) {
+      const marker = new THREE.Mesh(markerGeometry.clone(), new THREE.MeshBasicMaterial({ color: 0xffdb67, depthTest: false }));
+      marker.position.fromArray(landmark.position);
+      marker.renderOrder = 20;
+      marker.name = `diagnostic_${landmark.id}`;
+      diagnosticRoot.add(marker);
+      const label = document.createElement('span');
+      label.className = 'joint-label diagnostic-label';
+      label.textContent = landmark.id.replace(/^(left|right)_femur_/, '');
+      labelsRoot.append(label);
+      state.labelRecords.push({ element: label, position: new THREE.Vector3(...landmark.position), jointId: landmark.id });
+    }
+  }
+  if (state.showAnteversionAxes) {
+    const positions = [];
+    const colors = [];
+    for (const side of visibleSides) {
+      appendNeckAxis(state.baselineManifest, side, [0.2, .85, 1], positions, colors);
+      appendNeckAxis(state.manifest, side, [1, .67, .18], positions, colors);
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    const axes = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ vertexColors: true, depthTest: false }));
+    axes.renderOrder = 21;
+    axes.name = 'baseline_current_neck_axes';
+    diagnosticRoot.add(axes);
+  }
+}
+
+function appendNeckAxis(manifest, side, color, positions, colors) {
+  const head = manifest.landmarks.find(({ id }) => id === `${side}_femur_head_center`)?.position;
+  const neck = manifest.landmarks.find(({ id }) => id === `${side}_femur_neck_center`)?.position;
+  if (!head || !neck) return;
+  const direction = new THREE.Vector3().fromArray(head).sub(new THREE.Vector3().fromArray(neck)).normalize();
+  const center = new THREE.Vector3().fromArray(neck);
+  const start = center.clone().addScaledVector(direction, -.026);
+  const end = center.clone().addScaledVector(direction, .078);
+  positions.push(...start.toArray(), ...end.toArray());
+  colors.push(...color, ...color);
 }
 
 function buildAxesAndLabels() {
@@ -264,6 +319,9 @@ function bindUi() {
   document.querySelector('#show-joints').addEventListener('change', (event) => setJointVisibility(event.target.checked));
   document.querySelector('#show-labels').addEventListener('change', (event) => setLabelVisibility(event.target.checked));
   document.querySelector('#show-symmetry').addEventListener('change', (event) => { state.showSymmetry = event.target.checked; rebuildDisplay(); });
+  document.querySelector('#show-wireframe').addEventListener('change', (event) => setWireframeVisibility(event.target.checked));
+  document.querySelector('#show-femur-landmarks').addEventListener('change', (event) => setFemurLandmarkVisibility(event.target.checked));
+  document.querySelector('#show-anteversion-axes').addEventListener('change', (event) => setAnteversionAxisVisibility(event.target.checked));
   document.querySelector('#femur-side-select').addEventListener('change', (event) => setFemurSide(event.target.value));
   document.querySelector('#review-camera-select').addEventListener('change', (event) => setCameraPreset(event.target.value));
   document.querySelector('#fit-view').addEventListener('click', fitVisible);
@@ -296,6 +354,7 @@ function setCameraPreset(name) {
     'femur-head-neck': { direction: [-sideSign * .68, .18, 1], target: [centerX - sideSign * .018, .915, 0], distance: .39 },
     'femur-trochanter': { direction: [sideSign * .72, .18, 1], target: [centerX + sideSign * .018, .875, 0], distance: .38 },
     'femur-distal-condyles-front': { direction: [0, .1, 1], target: [centerX, .555, 0], distance: .38 },
+    'femur-patellar-groove-raking': { direction: [sideSign * .27, .08, 1], target: [centerX, .555, 0], distance: .34 },
     'femur-intercondylar-notch-back': { direction: [0, .08, -1], target: [centerX, .555, 0], distance: .36 },
     'femur-three-quarter-front': { direction: [sideSign * .7, .12, 1], target: [centerX, .75, 0], distance: .94 },
     'femur-comparison-front': { direction: [0, .03, 1], target: [0, .75, 0], distance: 1.04 },
@@ -364,6 +423,27 @@ function setJointVisibility(visible) {
   return captureReadyState();
 }
 
+function setWireframeVisibility(visible) {
+  state.showWireframe = Boolean(visible);
+  document.querySelector('#show-wireframe').checked = state.showWireframe;
+  rebuildDisplay();
+  return captureReadyState();
+}
+
+function setFemurLandmarkVisibility(visible) {
+  state.showFemurLandmarks = Boolean(visible);
+  document.querySelector('#show-femur-landmarks').checked = state.showFemurLandmarks;
+  rebuildDisplay();
+  return captureReadyState();
+}
+
+function setAnteversionAxisVisibility(visible) {
+  state.showAnteversionAxes = Boolean(visible);
+  document.querySelector('#show-anteversion-axes').checked = state.showAnteversionAxes;
+  rebuildDisplay();
+  return captureReadyState();
+}
+
 function setInspectorTab(tab) {
   if (!['summary', 'parameters', 'mapping', 'sources'].includes(tab)) throw new Error(`Unknown inspector tab ${tab}.`);
   state.tab = tab;
@@ -381,7 +461,10 @@ function captureReadyState() {
     femurSide: state.femurSide,
     isolationMode: state.isolateFemur ? 'femur' : 'full-body',
     cameraPreset: state.cameraPreset,
-    displayToggles: { labels: state.showLabels, axes: state.showAxes, joints: state.showJoints, symmetry: state.showSymmetry },
+    displayToggles: {
+      labels: state.showLabels, axes: state.showAxes, joints: state.showJoints, symmetry: state.showSymmetry,
+      wireframe: state.showWireframe, femurLandmarks: state.showFemurLandmarks, anteversionAxes: state.showAnteversionAxes,
+    },
     inspectorTab: state.tab,
     viewport: { width: innerWidth, height: innerHeight },
     browserUserAgent: navigator.userAgent,
@@ -404,7 +487,7 @@ function publishReviewState() {
   reviewRuntimeState.textContent = JSON.stringify(snapshot);
   document.documentElement.dataset.reviewViewport = `${snapshot.viewport.width}x${snapshot.viewport.height}`;
   document.documentElement.dataset.browserUserAgent = snapshot.browserUserAgent;
-  reviewStateBadge.textContent = `${snapshot.variantId} · LOD${snapshot.lod} · ${snapshot.femurSide} · ${snapshot.isolationMode} · ${snapshot.cameraPreset} · labels ${snapshot.displayToggles.labels ? 'on' : 'off'} · axes ${snapshot.displayToggles.axes ? 'on' : 'off'} · joints ${snapshot.displayToggles.joints ? 'on' : 'off'}`;
+  reviewStateBadge.textContent = `${snapshot.variantId} · LOD${snapshot.lod} · ${snapshot.femurSide} · ${snapshot.isolationMode} · ${snapshot.cameraPreset} · labels ${snapshot.displayToggles.labels ? 'on' : 'off'} · axes ${snapshot.displayToggles.axes ? 'on' : 'off'} · joints ${snapshot.displayToggles.joints ? 'on' : 'off'} · wire ${snapshot.displayToggles.wireframe ? 'on' : 'off'} · landmarks ${snapshot.displayToggles.femurLandmarks ? 'on' : 'off'} · neck axes ${snapshot.displayToggles.anteversionAxes ? 'on' : 'off'}`;
 }
 
 function fitVisible() {

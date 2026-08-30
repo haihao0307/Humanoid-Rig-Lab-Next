@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><title>S1A.3 Contact Sheet</title><link rel="stylesheet" href="comparison-layout.css"></head><body>
+<header><div><h1>S1A.3 Femur Visual Refinement · Contact Sheet</h1><p>Real Chromium captures from the local HTTP review page, including retained S1A.2 same-camera comparisons.</p></div><div class="status">awaiting-user-visual-acceptance</div></header>
+<main id="contact" class="contact"></main>
+<script>
+const files = [
+  '01-skeleton-overview-front.png','02-skeleton-overview-side-left.png','03-skeleton-overview-back.png','04-skeleton-overview-three-quarter-front.png',
+  '05-femur-left-baseline-front-lod0.png','06-femur-left-baseline-back-lod0.png','07-femur-left-baseline-medial-lod0.png','08-femur-left-baseline-lateral-lod0.png',
+  '09-femur-left-baseline-head-neck-closeup.png','10-femur-left-baseline-trochanter-closeup.png','11-femur-left-baseline-distal-condyles-front-closeup.png','12-femur-left-baseline-intercondylar-notch-back-closeup.png',
+  '13-femur-right-baseline-front-lod0.png','14-femur-right-baseline-back-lod0.png','15-femur-left-baseline-lod0.png','16-femur-left-baseline-lod1.png','17-femur-left-baseline-lod2.png',
+  '18-femur-variant-long-plus-08.png','19-femur-variant-anteversion-plus-10.png','20-femur-variant-left-right-asymmetry-02.png',
+  '21-anatomy-s1a3-qa-panel.png','22-anatomy-s1a3-variant-parameters.png','23-anatomy-s1a3-source-panel.png',
+  '24-s1a2-vs-s1a3-head-neck.png','25-s1a2-vs-s1a3-trochanters.png','26-s1a2-vs-s1a3-distal-front.png','27-s1a2-vs-s1a3-distal-back.png',
+  '28-baseline-vs-plus10-anteversion-axis-overlay.png','29-lod0-lod1-lod2-wireframe-landmarks.png'
+  ,'30a-femur-left-patellar-groove-raking-front.png'
+];
+document.querySelector('#contact').replaceChildren(...files.map((file) => {
+  const figure = document.createElement('figure');
+  const caption = document.createElement('figcaption');
+  const image = document.createElement('img');
+  caption.textContent = file;
+  image.src = file;
+  figure.append(caption, image);
+  return figure;
+}));
+</script></body></html>
