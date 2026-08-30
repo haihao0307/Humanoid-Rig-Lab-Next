@@ -1,9 +1,9 @@
-export const LONG_BONE_GENERATOR_V1_ID = 'LongBoneGeneratorV1@1.0.0';
+export const LONG_BONE_GENERATOR_V1_ID = 'LongBoneGeneratorV1@1.1.0';
 
 export const FEMUR_LOD_SPECS_V1 = Object.freeze({
-  0: Object.freeze({ longitudinalSegments: 72, radialSegments: 32 }),
-  1: Object.freeze({ longitudinalSegments: 40, radialSegments: 20 }),
-  2: Object.freeze({ longitudinalSegments: 24, radialSegments: 12 }),
+  0: Object.freeze({ longitudinalSegments: 104, radialSegments: 40 }),
+  1: Object.freeze({ longitudinalSegments: 64, radialSegments: 28 }),
+  2: Object.freeze({ longitudinalSegments: 40, radialSegments: 20 }),
 });
 
 const REQUIRED_PARAMETERS = Object.freeze([
@@ -85,89 +85,183 @@ export function generateFemurV1(parameters, { side, lod = 0, hipJointCenter = [0
 
 export function getFemurLandmarksV1(parameters, { side, hipJointCenter = [0, 0, 0] } = {}) {
   validateParameters(parameters, side, 0, hipJointCenter);
-  const medial = side === 'left' ? 1 : -1;
-  const lateral = -medial;
+  const frame = getFemurMeasurementFrameV1(parameters, { side, hipJointCenter });
   const samples = {
-    head_center: centerlinePoint(parameters, side, 0.965, hipJointCenter),
-    neck_center: centerlinePoint(parameters, side, 0.895, hipJointCenter),
-    greater_trochanter: centerlinePoint(parameters, side, 0.82, hipJointCenter),
-    lesser_trochanter: centerlinePoint(parameters, side, 0.74, hipJointCenter),
-    medial_condyle: centerlinePoint(parameters, side, 0.035, hipJointCenter),
-    lateral_condyle: centerlinePoint(parameters, side, 0.035, hipJointCenter),
-    intercondylar_notch: centerlinePoint(parameters, side, 0.025, hipJointCenter),
+    head_center: frame.headCenter,
+    neck_center: frame.neckCenter,
+    greater_trochanter: frame.greaterTrochanter,
+    lesser_trochanter: frame.lesserTrochanter,
+    medial_condyle: frame.medialCondyle,
+    lateral_condyle: frame.lateralCondyle,
+    intercondylar_notch: frame.intercondylarNotch,
   };
-  samples.greater_trochanter[0] += lateral * parameters.greaterTrochanterSize;
-  samples.lesser_trochanter[0] += medial * parameters.lesserTrochanterSize * 0.55;
-  samples.lesser_trochanter[2] -= parameters.lesserTrochanterSize * 0.7;
-  samples.medial_condyle[0] += medial * parameters.distalCondyleWidth * 0.48;
-  samples.lateral_condyle[0] += lateral * parameters.distalCondyleWidth * 0.48;
-  samples.intercondylar_notch[2] -= parameters.distalCondyleDepth * 0.48;
   return Object.fromEntries(Object.entries(samples).map(([id, position]) => [`${side}_femur_${id}`, position.map(Math.fround)]));
 }
 
+export function getFemurMeasurementFrameV1(parameters, { side, hipJointCenter = [0, 0, 0] } = {}) {
+  validateParameters(parameters, side, 0, hipJointCenter);
+  const anatomy = anatomyFrame(parameters, side, hipJointCenter);
+  const medial = [anatomy.medial, 0, 0];
+  const lateral = [-anatomy.medial, 0, 0];
+  const posterior = [0, 0, -1];
+  const anterior = [0, 0, 1];
+  const surface = (t, direction) => surfacePointInDirection(parameters, side, t, hipJointCenter, direction);
+  return Object.freeze({
+    headCenter: hipJointCenter.map(Math.fround),
+    headRadius: Math.fround(parameters.headRadius),
+    neckBase: anatomy.neckBase.map(Math.fround),
+    neckCenter: mix3(anatomy.neckBase, anatomy.headAttach, 0.5).map(Math.fround),
+    neckAxis: anatomy.neckAxis.map(Math.fround),
+    shaftAxisToDistal: normalize3(subtract3(centerlinePoint(parameters, side, 0.24, hipJointCenter), centerlinePoint(parameters, side, 0.68, hipJointCenter))).map(Math.fround),
+    greaterTrochanter: surface(0.765, lateral),
+    lesserTrochanter: surface(0.715, normalize3(add3(scale3(medial, 0.68), scale3(posterior, 0.74)))),
+    medialCondyle: surface(0.075, medial),
+    lateralCondyle: surface(0.075, lateral),
+    intercondylarNotch: surface(0.072, posterior),
+    patellarGroove: surface(0.078, anterior),
+    posteriorCondyleMedial: surface(0.072, normalize3(add3(scale3(medial, 0.62), scale3(posterior, 0.78)))),
+    posteriorCondyleLateral: surface(0.072, normalize3(add3(scale3(lateral, 0.62), scale3(posterior, 0.78)))),
+    anteriorCondyleMedial: surface(0.078, normalize3(add3(scale3(medial, 0.58), scale3(anterior, 0.82)))),
+    anteriorCondyleLateral: surface(0.078, normalize3(add3(scale3(lateral, 0.58), scale3(anterior, 0.82)))),
+  });
+}
+
 function centerlinePoint(parameters, side, t, origin) {
-  const medial = side === 'left' ? 1 : -1;
-  const length = parameters.femurLength;
-  const neckInclination = (180 - parameters.neckShaftAngle) * Math.PI / 180;
-  const neckOffset = parameters.neckLength * Math.sin(neckInclination);
-  const neckProgress = smoothstep(0.77, 0.98, t);
-  const knotOffset = sampleCenterlineKnots(parameters.shaftCenterlineKnots, t);
-  const asymmetry = side === 'left' ? parameters.leftRightAsymmetry : -parameters.leftRightAsymmetry;
-  const x = medial * (
-    -neckOffset * (1 - neckProgress)
-    + parameters.shaftMedialLateralBow * Math.sin(Math.PI * t)
-    + knotOffset.medialLateralOffset
-    + asymmetry * length * 0.0025 * Math.sin(Math.PI * t)
-  );
-  const y = -length * (1 - t);
-  const z = parameters.shaftAnteriorBow * Math.sin(Math.PI * t) + knotOffset.anteriorOffset;
-  return [Math.fround(origin[0] + x), Math.fround(origin[1] + y), Math.fround(origin[2] + z)];
+  const anatomy = anatomyFrame(parameters, side, origin);
+  if (t >= 0.9) {
+    const alpha = (t - 0.9) / 0.1;
+    const q = lerp(-0.86 * parameters.headRadius, parameters.headRadius, alpha);
+    return add3(origin, scale3(anatomy.neckAxis, q)).map(Math.fround);
+  }
+  if (t >= 0.84) {
+    return mix3(anatomy.neckBase, anatomy.headAttach, smoothstep(0.84, 0.9, t)).map(Math.fround);
+  }
+  const shaftStart = shaftCenter(parameters, side, 0.08, origin);
+  const shaftEnd = shaftCenter(parameters, side, 0.82, origin);
+  if (t < 0.17) return mix3(distalPole(parameters, origin), shaftStart, smoothstep(0, 0.17, t)).map(Math.fround);
+  if (t < 0.7) return shaftCenter(parameters, side, lerp(0.08, 0.82, (t - 0.17) / 0.53), origin).map(Math.fround);
+  return mix3(shaftEnd, anatomy.neckBase, smoothstep(0.7, 0.84, t)).map(Math.fround);
 }
 
 function crossSectionAt(parameters, side, t) {
-  const length = parameters.femurLength;
-  const shaftMajor = parameters.shaftCrossSectionMajor;
-  const shaftMinor = parameters.shaftCrossSectionMinor;
-  const keyframes = [
-    [0, 0, 0],
-    [0.018, parameters.distalCondyleWidth * 0.49, parameters.distalCondyleDepth * 0.49],
-    [0.07, parameters.distalCondyleWidth * 0.43, parameters.distalCondyleDepth * 0.44],
-    [0.14, shaftMajor * 1.35, shaftMinor * 1.3],
-    [0.28, shaftMajor, shaftMinor],
-    [0.62, shaftMajor * 0.94, shaftMinor * 0.96],
-    [0.74, shaftMajor * 1.2, shaftMinor * 1.18],
-    [0.82, shaftMajor + parameters.greaterTrochanterSize * 0.55, shaftMinor + parameters.greaterTrochanterSize * 0.3],
-    [0.88, Math.max(shaftMajor * 0.95, parameters.corticalThickness * 3.5), Math.max(shaftMinor * 0.95, parameters.corticalThickness * 3.2)],
-    [0.945, parameters.headRadius * 0.92, parameters.headRadius * 0.92],
-    [0.975, parameters.headRadius, parameters.headRadius],
-    [1, 0, 0],
-  ];
-  const [rx, rz] = samplePairKeyframes(keyframes, t);
-  const sideAngle = (side === 'left' ? 1 : -1) * parameters.femoralAnteversion * Math.PI / 180 * smoothstep(0.3, 0.94, t);
-  return { rx: Math.max(length * 1e-5, rx), rz: Math.max(length * 1e-5, rz), twist: sideAngle };
+  let rx;
+  let rz;
+  if (t < 0.17) {
+    [rx, rz] = samplePairKeyframes([
+      [0, 0, 0],
+      [0.18, parameters.distalCondyleWidth * 0.34, parameters.distalCondyleDepth * 0.34],
+      [0.45, parameters.distalCondyleWidth * 0.49, parameters.distalCondyleDepth * 0.48],
+      [0.7, parameters.distalCondyleWidth * 0.46, parameters.distalCondyleDepth * 0.44],
+      [1, parameters.shaftCrossSectionMajor * 1.42, parameters.shaftCrossSectionMinor * 1.38],
+    ], t / 0.17);
+  } else if (t < 0.7) {
+    [rx, rz] = samplePairKeyframes([
+      [0, parameters.shaftCrossSectionMajor * 1.42, parameters.shaftCrossSectionMinor * 1.38],
+      [0.2, parameters.shaftCrossSectionMajor, parameters.shaftCrossSectionMinor],
+      [0.65, parameters.shaftCrossSectionMajor * 0.94, parameters.shaftCrossSectionMinor * 0.96],
+      [1, parameters.shaftCrossSectionMajor * 1.23, parameters.shaftCrossSectionMinor * 1.18],
+    ], (t - 0.17) / 0.53);
+  } else if (t < 0.84) {
+    const alpha = smoothstep(0.7, 0.84, t);
+    rx = lerp(parameters.shaftCrossSectionMajor * 1.23, parameters.shaftCrossSectionMajor * 0.86, alpha);
+    rz = lerp(parameters.shaftCrossSectionMinor * 1.18, parameters.shaftCrossSectionMinor * 0.82, alpha);
+  } else if (t < 0.9) {
+    const alpha = smoothstep(0.84, 0.9, t);
+    const attachRadius = parameters.headRadius * Math.sqrt(1 - 0.86 ** 2);
+    const neckRadius = Math.max(parameters.corticalThickness * 2.5, parameters.shaftCrossSectionMinor * 0.82);
+    rx = lerp(neckRadius, attachRadius, alpha);
+    rz = lerp(neckRadius * 0.9, attachRadius, alpha);
+  } else {
+    const q = lerp(-0.86 * parameters.headRadius, parameters.headRadius, (t - 0.9) / 0.1);
+    rx = rz = Math.sqrt(Math.max(0, parameters.headRadius ** 2 - q ** 2));
+  }
+  return { rx: Math.max(parameters.femurLength * 1e-6, rx), rz: Math.max(parameters.femurLength * 1e-6, rz) };
 }
 
 function crossSectionPoint(parameters, side, t, theta, center, frame) {
+  const epsilon = 1e-4;
+  const tangent = normalize3(subtract3(
+    centerlinePoint(parameters, side, Math.min(1, t + epsilon), [0, 0, 0]),
+    centerlinePoint(parameters, side, Math.max(0, t - epsilon), [0, 0, 0]),
+  ));
+  const basisX = perpendicularReference(tangent);
+  const basisZ = normalize3(cross3(basisX, tangent));
+  let radialOffset = 0;
+  if (t < 0.17) {
+    const distalWeight = Math.sin(Math.PI * Math.min(1, (t / 0.17) / 0.92)) ** 1.4;
+    const posteriorLobes = gaussianAngle(theta, -Math.PI / 2 - 0.58, 0.38) + gaussianAngle(theta, -Math.PI / 2 + 0.58, 0.38);
+    const anteriorLobes = gaussianAngle(theta, Math.PI / 2 - 0.52, 0.42) + gaussianAngle(theta, Math.PI / 2 + 0.52, 0.42);
+    const posteriorNotch = gaussianAngle(theta, -Math.PI / 2, 0.31) * parameters.intercondylarNotchWidth * 0.48;
+    const patellarGroove = gaussianAngle(theta, Math.PI / 2, 0.34) * parameters.intercondylarNotchWidth * 0.27;
+    radialOffset += distalWeight * (parameters.distalCondyleDepth * 0.115 * posteriorLobes + parameters.distalCondyleDepth * 0.065 * anteriorLobes - posteriorNotch - patellarGroove);
+  }
+  if (t >= 0.64 && t < 0.84) {
+    const medial = side === 'left' ? 1 : -1;
+    const lateralTheta = directionTheta(basisX, basisZ, tangent, [-medial, 0, 0]);
+    const lesserTheta = directionTheta(basisX, basisZ, tangent, normalize3([medial * 0.68, 0, -0.74]));
+    radialOffset += gaussian(t, 0.765, 0.037) * parameters.greaterTrochanterSize * 0.92 * gaussianAngle(theta, lateralTheta, 0.4);
+    radialOffset += gaussian(t, 0.715, 0.028) * parameters.lesserTrochanterSize * 0.88 * gaussianAngle(theta, lesserTheta, 0.34);
+  }
+  const detail = t >= 0.17 && t < 0.7 ? parameters.surfaceDetail * 0.00012 * Math.sin(theta * 5 + t * 29) * Math.sin(Math.PI * t) ** 2 : 0;
+  const radiusX = Math.max(parameters.femurLength * 1e-6, frame.rx + radialOffset + detail);
+  const radiusZ = Math.max(parameters.femurLength * 1e-6, frame.rz + radialOffset + detail);
+  return add3(center, add3(scale3(basisX, radiusX * Math.cos(theta)), scale3(basisZ, radiusZ * Math.sin(theta)))).map(Math.fround);
+}
+
+function surfacePointInDirection(parameters, side, t, origin, direction) {
+  const center = centerlinePoint(parameters, side, t, origin);
+  const frame = crossSectionAt(parameters, side, t);
+  const epsilon = 1e-4;
+  const tangent = normalize3(subtract3(
+    centerlinePoint(parameters, side, Math.min(1, t + epsilon), [0, 0, 0]),
+    centerlinePoint(parameters, side, Math.max(0, t - epsilon), [0, 0, 0]),
+  ));
+  const basisX = perpendicularReference(tangent);
+  const basisZ = normalize3(cross3(basisX, tangent));
+  return crossSectionPoint(parameters, side, t, directionTheta(basisX, basisZ, tangent, direction), center, frame);
+}
+
+function anatomyFrame(parameters, side, origin) {
   const medial = side === 'left' ? 1 : -1;
-  const lateral = -medial;
-  const cos = Math.cos(theta);
-  const sin = Math.sin(theta);
-  const lateralWeight = Math.max(0, lateral * cos) ** 4;
-  const medialPosteriorWeight = Math.max(0, medial * cos) ** 3 * Math.max(0, -sin) ** 2;
-  const trochanterBump = gaussian(t, 0.815, 0.045) * parameters.greaterTrochanterSize * lateralWeight;
-  const lesserBump = gaussian(t, 0.735, 0.035) * parameters.lesserTrochanterSize * medialPosteriorWeight;
-  const notchAngular = gaussianAngle(theta, -Math.PI / 2, 0.42);
-  const notchDepth = gaussian(t, 0.035, 0.035) * Math.min(0.42, parameters.intercondylarNotchWidth / parameters.distalCondyleWidth) * notchAngular;
-  const detail = parameters.surfaceDetail * 0.00022 * Math.sin(theta * 5 + t * 31) * Math.sin(Math.PI * t) ** 2;
-  const localX = (frame.rx + trochanterBump + lesserBump + detail) * cos;
-  const localZ = (frame.rz + trochanterBump * 0.28 + lesserBump * 0.45 + detail) * sin * (1 - notchDepth);
-  const twistCos = Math.cos(frame.twist);
-  const twistSin = Math.sin(frame.twist);
+  const inclination = (180 - parameters.neckShaftAngle) * Math.PI / 180;
+  const anteversion = parameters.femoralAnteversion * Math.PI / 180;
+  const neckAxis = normalize3([
+    medial * Math.sin(inclination) * Math.cos(anteversion),
+    Math.cos(inclination),
+    Math.sin(inclination) * Math.sin(anteversion),
+  ]);
+  return {
+    medial,
+    neckAxis,
+    neckBase: subtract3(origin, scale3(neckAxis, parameters.neckLength)),
+    headAttach: add3(origin, scale3(neckAxis, -0.86 * parameters.headRadius)),
+  };
+}
+
+function shaftCenter(parameters, side, t, origin) {
+  const medial = side === 'left' ? 1 : -1;
+  const knot = sampleCenterlineKnots(parameters.shaftCenterlineKnots, t);
+  const asymmetry = side === 'left' ? parameters.leftRightAsymmetry : -parameters.leftRightAsymmetry;
   return [
-    Math.fround(center[0] + localX * twistCos - localZ * twistSin),
-    Math.fround(center[1]),
-    Math.fround(center[2] + localX * twistSin + localZ * twistCos),
+    origin[0] + medial * (parameters.shaftMedialLateralBow * Math.sin(Math.PI * t) + knot.medialLateralOffset + asymmetry * parameters.femurLength * 0.0025 * Math.sin(Math.PI * t)),
+    origin[1] - parameters.femurLength * (1 - t),
+    origin[2] + parameters.shaftAnteriorBow * Math.sin(Math.PI * t) + knot.anteriorOffset,
   ];
+}
+
+function distalPole(parameters, origin) {
+  return [origin[0], origin[1] - parameters.femurLength - parameters.distalCondyleDepth * 0.42, origin[2]];
+}
+
+function directionTheta(basisX, basisZ, tangent, direction) {
+  const projected = subtract3(direction, scale3(tangent, dot3(direction, tangent)));
+  const normalized = normalize3(projected);
+  return Math.atan2(dot3(normalized, basisZ), dot3(normalized, basisX));
+}
+
+function perpendicularReference(tangent) {
+  const reference = Math.abs(tangent[0]) < 0.92 ? [1, 0, 0] : [0, 0, 1];
+  return normalize3(subtract3(reference, scale3(tangent, dot3(reference, tangent))));
 }
 
 function computeVertexNormals(positions, indices) {
@@ -229,3 +323,10 @@ function smoothstep(minimum, maximum, value) { const t = Math.min(1, Math.max(0,
 function gaussian(value, center, width) { const x = (value - center) / width; return Math.exp(-0.5 * x * x); }
 function gaussianAngle(value, center, width) { const delta = Math.atan2(Math.sin(value - center), Math.cos(value - center)); return Math.exp(-0.5 * (delta / width) ** 2); }
 function lerp(left, right, alpha) { return left + (right - left) * alpha; }
+function mix3(left, right, alpha) { return left.map((value, index) => lerp(value, right[index], alpha)); }
+function add3(left, right) { return left.map((value, index) => value + right[index]); }
+function subtract3(left, right) { return left.map((value, index) => value - right[index]); }
+function scale3(value, amount) { return value.map((component) => component * amount); }
+function dot3(left, right) { return left.reduce((total, value, index) => total + value * right[index], 0); }
+function cross3(left, right) { return [left[1] * right[2] - left[2] * right[1], left[2] * right[0] - left[0] * right[2], left[0] * right[1] - left[1] * right[0]]; }
+function normalize3(value) { const magnitude = Math.hypot(...value); if (!(magnitude > 1e-12)) throw new Error('Cannot normalize a zero-length femur vector.'); return value.map((component) => component / magnitude); }

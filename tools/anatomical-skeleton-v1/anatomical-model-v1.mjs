@@ -7,7 +7,7 @@ import {
 } from '../../src/core/human-core-v5/longBoneGeneratorV1.js';
 
 export const POLICY_ID = 'human_system/procedural_originality_policy@1.0.0';
-export const GENERATOR_VERSION = 'anatomical-skeleton-s1@1.0.0';
+export const GENERATOR_VERSION = 'anatomical-skeleton-s1@1.1.0';
 export const COORDINATE_SYSTEM = Object.freeze({ handedness: 'right-handed', upAxis: '+Y', forwardAxis: '+Z', rightAxis: '+X', unit: 'meter' });
 export const VARIANT_SPECS = Object.freeze([
   Object.freeze({ variantId: 'baseline', revision: 1, fileName: 'baseline-skeleton-s1.hrlbone', label: 'Baseline' }),
