@@ -1,0 +1,1346 @@
+{
+  "schema": "humanoid_rig/anatomical_graph@1.0",
+  "schemaVersion": 1,
+  "type": "AnatomicalGraph",
+  "graphId": "anatomical-graph-s1",
+  "revision": 1,
+  "rootJointId": "pelvis",
+  "coordinateSystem": {
+    "handedness": "right-handed",
+    "upAxis": "+Y",
+    "forwardAxis": "+Z",
+    "rightAxis": "+X",
+    "unit": "meter"
+  },
+  "bones": [
+    {
+      "boneId": "pelvis",
+      "jointId": "pelvis",
+      "parentBoneId": null,
+      "childBoneIds": [
+        "spine_low",
+        "left_hip_link",
+        "right_hip_link"
+      ],
+      "symmetryPairId": null,
+      "proximalJointId": "pelvis",
+      "distalJointId": "pelvis",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "hips",
+      "invalidatedBy": [
+        "shoulderWidth",
+        "pelvisWidth"
+      ]
+    },
+    {
+      "boneId": "spine_low",
+      "jointId": "spine_low",
+      "parentBoneId": "pelvis",
+      "childBoneIds": [
+        "spine_mid"
+      ],
+      "symmetryPairId": null,
+      "proximalJointId": "pelvis",
+      "distalJointId": "spine_low",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "spine",
+      "invalidatedBy": [
+        "spineLength",
+        "bodyHeight"
+      ]
+    },
+    {
+      "boneId": "spine_mid",
+      "jointId": "spine_mid",
+      "parentBoneId": "spine_low",
+      "childBoneIds": [
+        "spine_high"
+      ],
+      "symmetryPairId": null,
+      "proximalJointId": "spine_low",
+      "distalJointId": "spine_mid",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "chest",
+      "invalidatedBy": [
+        "spineLength",
+        "bodyHeight"
+      ]
+    },
+    {
+      "boneId": "spine_high",
+      "jointId": "spine_high",
+      "parentBoneId": "spine_mid",
+      "childBoneIds": [
+        "chest"
+      ],
+      "symmetryPairId": null,
+      "proximalJointId": "spine_mid",
+      "distalJointId": "spine_high",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "upperChest",
+      "invalidatedBy": [
+        "spineLength",
+        "bodyHeight"
+      ]
+    },
+    {
+      "boneId": "chest",
+      "jointId": "chest",
+      "parentBoneId": "spine_high",
+      "childBoneIds": [
+        "neck",
+        "left_clavicle",
+        "right_clavicle"
+      ],
+      "symmetryPairId": null,
+      "proximalJointId": "spine_high",
+      "distalJointId": "chest",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "upperChest",
+      "invalidatedBy": [
+        "spineLength",
+        "bodyHeight"
+      ]
+    },
+    {
+      "boneId": "neck",
+      "jointId": "neck",
+      "parentBoneId": "chest",
+      "childBoneIds": [
+        "head"
+      ],
+      "symmetryPairId": null,
+      "proximalJointId": "chest",
+      "distalJointId": "neck",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "neck",
+      "invalidatedBy": [
+        "spineLength",
+        "bodyHeight"
+      ]
+    },
+    {
+      "boneId": "head",
+      "jointId": "head",
+      "parentBoneId": "neck",
+      "childBoneIds": [],
+      "symmetryPairId": null,
+      "proximalJointId": "neck",
+      "distalJointId": "head",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "head",
+      "invalidatedBy": [
+        "spineLength",
+        "bodyHeight"
+      ]
+    },
+    {
+      "boneId": "left_clavicle",
+      "jointId": "left_clavicle",
+      "parentBoneId": "chest",
+      "childBoneIds": [
+        "left_scapular_link"
+      ],
+      "symmetryPairId": "right_clavicle",
+      "proximalJointId": "chest",
+      "distalJointId": "left_clavicle",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "leftShoulder",
+      "invalidatedBy": [
+        "shoulderWidth",
+        "pelvisWidth"
+      ]
+    },
+    {
+      "boneId": "left_scapular_link",
+      "jointId": "left_shoulder",
+      "parentBoneId": "left_clavicle",
+      "childBoneIds": [
+        "left_humerus"
+      ],
+      "symmetryPairId": "right_scapular_link",
+      "proximalJointId": "left_clavicle",
+      "distalJointId": "left_shoulder",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "leftUpperArm",
+      "invalidatedBy": [
+        "shoulderWidth",
+        "pelvisWidth"
+      ]
+    },
+    {
+      "boneId": "left_humerus",
+      "jointId": "left_elbow",
+      "parentBoneId": "left_scapular_link",
+      "childBoneIds": [
+        "left_forearm_scaffold"
+      ],
+      "symmetryPairId": "right_humerus",
+      "proximalJointId": "left_shoulder",
+      "distalJointId": "left_elbow",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "leftLowerArm",
+      "invalidatedBy": [
+        "upperArmLength"
+      ]
+    },
+    {
+      "boneId": "left_forearm_scaffold",
+      "jointId": "left_wrist",
+      "parentBoneId": "left_humerus",
+      "childBoneIds": [
+        "left_hand_scaffold"
+      ],
+      "symmetryPairId": "right_forearm_scaffold",
+      "proximalJointId": "left_elbow",
+      "distalJointId": "left_wrist",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "leftHand",
+      "invalidatedBy": [
+        "upperArmLength"
+      ]
+    },
+    {
+      "boneId": "left_hand_scaffold",
+      "jointId": "left_hand",
+      "parentBoneId": "left_forearm_scaffold",
+      "childBoneIds": [],
+      "symmetryPairId": "right_hand_scaffold",
+      "proximalJointId": "left_wrist",
+      "distalJointId": "left_hand",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "leftHand",
+      "invalidatedBy": [
+        "handLength"
+      ]
+    },
+    {
+      "boneId": "left_hip_link",
+      "jointId": "left_hip",
+      "parentBoneId": "pelvis",
+      "childBoneIds": [
+        "left_femur"
+      ],
+      "symmetryPairId": "right_hip_link",
+      "proximalJointId": "pelvis",
+      "distalJointId": "left_hip",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "leftUpperLeg",
+      "invalidatedBy": [
+        "shoulderWidth",
+        "pelvisWidth"
+      ]
+    },
+    {
+      "boneId": "left_femur",
+      "jointId": "left_knee",
+      "parentBoneId": "left_hip_link",
+      "childBoneIds": [
+        "left_tibia_fibula_scaffold"
+      ],
+      "symmetryPairId": "right_femur",
+      "proximalJointId": "left_hip",
+      "distalJointId": "left_knee",
+      "landmarkIds": [
+        "left_femur_head_center",
+        "left_femur_neck_center",
+        "left_femur_greater_trochanter",
+        "left_femur_lesser_trochanter",
+        "left_femur_medial_condyle",
+        "left_femur_lateral_condyle",
+        "left_femur_intercondylar_notch"
+      ],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "LongBoneGeneratorV1",
+        "skeletal_dna",
+        "left_hip",
+        "left_knee"
+      ],
+      "humanRigCoreJointId": "leftLowerLeg",
+      "invalidatedBy": [
+        "thighLength",
+        "leftRightAsymmetry",
+        "boneParameters.left_femur",
+        "boneParameters.right_femur"
+      ]
+    },
+    {
+      "boneId": "left_tibia_fibula_scaffold",
+      "jointId": "left_ankle",
+      "parentBoneId": "left_femur",
+      "childBoneIds": [
+        "left_foot_scaffold"
+      ],
+      "symmetryPairId": "right_tibia_fibula_scaffold",
+      "proximalJointId": "left_knee",
+      "distalJointId": "left_ankle",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "leftFoot",
+      "invalidatedBy": [
+        "calfLength"
+      ]
+    },
+    {
+      "boneId": "left_foot_scaffold",
+      "jointId": "left_foot",
+      "parentBoneId": "left_tibia_fibula_scaffold",
+      "childBoneIds": [],
+      "symmetryPairId": "right_foot_scaffold",
+      "proximalJointId": "left_ankle",
+      "distalJointId": "left_foot",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "leftFoot",
+      "invalidatedBy": [
+        "footLength"
+      ]
+    },
+    {
+      "boneId": "right_clavicle",
+      "jointId": "right_clavicle",
+      "parentBoneId": "chest",
+      "childBoneIds": [
+        "right_scapular_link"
+      ],
+      "symmetryPairId": "left_clavicle",
+      "proximalJointId": "chest",
+      "distalJointId": "right_clavicle",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "rightShoulder",
+      "invalidatedBy": [
+        "shoulderWidth",
+        "pelvisWidth"
+      ]
+    },
+    {
+      "boneId": "right_scapular_link",
+      "jointId": "right_shoulder",
+      "parentBoneId": "right_clavicle",
+      "childBoneIds": [
+        "right_humerus"
+      ],
+      "symmetryPairId": "left_scapular_link",
+      "proximalJointId": "right_clavicle",
+      "distalJointId": "right_shoulder",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "rightUpperArm",
+      "invalidatedBy": [
+        "shoulderWidth",
+        "pelvisWidth"
+      ]
+    },
+    {
+      "boneId": "right_humerus",
+      "jointId": "right_elbow",
+      "parentBoneId": "right_scapular_link",
+      "childBoneIds": [
+        "right_forearm_scaffold"
+      ],
+      "symmetryPairId": "left_humerus",
+      "proximalJointId": "right_shoulder",
+      "distalJointId": "right_elbow",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "rightLowerArm",
+      "invalidatedBy": [
+        "upperArmLength"
+      ]
+    },
+    {
+      "boneId": "right_forearm_scaffold",
+      "jointId": "right_wrist",
+      "parentBoneId": "right_humerus",
+      "childBoneIds": [
+        "right_hand_scaffold"
+      ],
+      "symmetryPairId": "left_forearm_scaffold",
+      "proximalJointId": "right_elbow",
+      "distalJointId": "right_wrist",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "rightHand",
+      "invalidatedBy": [
+        "upperArmLength"
+      ]
+    },
+    {
+      "boneId": "right_hand_scaffold",
+      "jointId": "right_hand",
+      "parentBoneId": "right_forearm_scaffold",
+      "childBoneIds": [],
+      "symmetryPairId": "left_hand_scaffold",
+      "proximalJointId": "right_wrist",
+      "distalJointId": "right_hand",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "rightHand",
+      "invalidatedBy": [
+        "handLength"
+      ]
+    },
+    {
+      "boneId": "right_hip_link",
+      "jointId": "right_hip",
+      "parentBoneId": "pelvis",
+      "childBoneIds": [
+        "right_femur"
+      ],
+      "symmetryPairId": "left_hip_link",
+      "proximalJointId": "pelvis",
+      "distalJointId": "right_hip",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "rightUpperLeg",
+      "invalidatedBy": [
+        "shoulderWidth",
+        "pelvisWidth"
+      ]
+    },
+    {
+      "boneId": "right_femur",
+      "jointId": "right_knee",
+      "parentBoneId": "right_hip_link",
+      "childBoneIds": [
+        "right_tibia_fibula_scaffold"
+      ],
+      "symmetryPairId": "left_femur",
+      "proximalJointId": "right_hip",
+      "distalJointId": "right_knee",
+      "landmarkIds": [
+        "right_femur_head_center",
+        "right_femur_neck_center",
+        "right_femur_greater_trochanter",
+        "right_femur_lesser_trochanter",
+        "right_femur_medial_condyle",
+        "right_femur_lateral_condyle",
+        "right_femur_intercondylar_notch"
+      ],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "LongBoneGeneratorV1",
+        "skeletal_dna",
+        "right_hip",
+        "right_knee"
+      ],
+      "humanRigCoreJointId": "rightLowerLeg",
+      "invalidatedBy": [
+        "thighLength",
+        "leftRightAsymmetry",
+        "boneParameters.left_femur",
+        "boneParameters.right_femur"
+      ]
+    },
+    {
+      "boneId": "right_tibia_fibula_scaffold",
+      "jointId": "right_ankle",
+      "parentBoneId": "right_femur",
+      "childBoneIds": [
+        "right_foot_scaffold"
+      ],
+      "symmetryPairId": "left_tibia_fibula_scaffold",
+      "proximalJointId": "right_knee",
+      "distalJointId": "right_ankle",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "rightFoot",
+      "invalidatedBy": [
+        "calfLength"
+      ]
+    },
+    {
+      "boneId": "right_foot_scaffold",
+      "jointId": "right_foot",
+      "parentBoneId": "right_tibia_fibula_scaffold",
+      "childBoneIds": [],
+      "symmetryPairId": "left_foot_scaffold",
+      "proximalJointId": "right_ankle",
+      "distalJointId": "right_foot",
+      "landmarkIds": [],
+      "muscleAttachmentAnchorIds": [],
+      "generatorDependencies": [
+        "SkeletonLineGeneratorV1",
+        "skeletal_dna"
+      ],
+      "humanRigCoreJointId": "rightFoot",
+      "invalidatedBy": [
+        "footLength"
+      ]
+    }
+  ],
+  "joints": [
+    {
+      "jointId": "pelvis",
+      "parentJointId": null,
+      "jointCenter": [
+        0,
+        0.9649999737739563,
+        0
+      ],
+      "childJointIds": [
+        "spine_low",
+        "left_hip",
+        "right_hip"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": null,
+      "humanRigCoreJointId": "hips"
+    },
+    {
+      "jointId": "spine_low",
+      "parentJointId": "pelvis",
+      "jointCenter": [
+        0,
+        1.0670000314712524,
+        0
+      ],
+      "childJointIds": [
+        "spine_mid"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": null,
+      "humanRigCoreJointId": "spine"
+    },
+    {
+      "jointId": "spine_mid",
+      "parentJointId": "spine_low",
+      "jointCenter": [
+        0,
+        1.204699993133545,
+        0
+      ],
+      "childJointIds": [
+        "spine_high"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": null,
+      "humanRigCoreJointId": "chest"
+    },
+    {
+      "jointId": "spine_high",
+      "parentJointId": "spine_mid",
+      "jointCenter": [
+        0,
+        1.3423999547958374,
+        0
+      ],
+      "childJointIds": [
+        "chest"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": null,
+      "humanRigCoreJointId": "upperChest"
+    },
+    {
+      "jointId": "chest",
+      "parentJointId": "spine_high",
+      "jointCenter": [
+        0,
+        1.475000023841858,
+        0
+      ],
+      "childJointIds": [
+        "neck",
+        "left_clavicle",
+        "right_clavicle"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": null,
+      "humanRigCoreJointId": "upperChest"
+    },
+    {
+      "jointId": "neck",
+      "parentJointId": "chest",
+      "jointCenter": [
+        0,
+        1.5800000429153442,
+        0
+      ],
+      "childJointIds": [
+        "head"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": null,
+      "humanRigCoreJointId": "neck"
+    },
+    {
+      "jointId": "head",
+      "parentJointId": "neck",
+      "jointCenter": [
+        0,
+        1.725000023841858,
+        0
+      ],
+      "childJointIds": [],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": null,
+      "humanRigCoreJointId": "head"
+    },
+    {
+      "jointId": "left_clavicle",
+      "parentJointId": "chest",
+      "jointCenter": [
+        -0.1143999993801117,
+        1.4600000381469727,
+        0
+      ],
+      "childJointIds": [
+        "left_shoulder"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "right_clavicle",
+      "humanRigCoreJointId": "leftShoulder"
+    },
+    {
+      "jointId": "left_shoulder",
+      "parentJointId": "left_clavicle",
+      "jointCenter": [
+        -0.2199999988079071,
+        1.4500000476837158,
+        0
+      ],
+      "childJointIds": [
+        "left_elbow"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "right_shoulder",
+      "humanRigCoreJointId": "leftUpperArm"
+    },
+    {
+      "jointId": "left_elbow",
+      "parentJointId": "left_shoulder",
+      "jointCenter": [
+        -0.5099999904632568,
+        1.440000057220459,
+        0
+      ],
+      "childJointIds": [
+        "left_wrist"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "right_elbow",
+      "humanRigCoreJointId": "leftLowerArm"
+    },
+    {
+      "jointId": "left_wrist",
+      "parentJointId": "left_elbow",
+      "jointCenter": [
+        -0.7599999904632568,
+        1.434999942779541,
+        0
+      ],
+      "childJointIds": [
+        "left_hand"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "right_wrist",
+      "humanRigCoreJointId": "leftHand"
+    },
+    {
+      "jointId": "left_hand",
+      "parentJointId": "left_wrist",
+      "jointCenter": [
+        -0.9399999976158142,
+        1.434999942779541,
+        0.009999999776482582
+      ],
+      "childJointIds": [],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "right_hand",
+      "humanRigCoreJointId": "leftHand"
+    },
+    {
+      "jointId": "left_hip",
+      "parentJointId": "pelvis",
+      "jointCenter": [
+        -0.10499999672174454,
+        0.9649999737739563,
+        0
+      ],
+      "childJointIds": [
+        "left_knee"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "right_hip",
+      "humanRigCoreJointId": "leftUpperLeg"
+    },
+    {
+      "jointId": "left_knee",
+      "parentJointId": "left_hip",
+      "jointCenter": [
+        -0.10499999672174454,
+        0.5350000262260437,
+        0.012000000104308128
+      ],
+      "childJointIds": [
+        "left_ankle"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "right_knee",
+      "humanRigCoreJointId": "leftLowerLeg"
+    },
+    {
+      "jointId": "left_ankle",
+      "parentJointId": "left_knee",
+      "jointCenter": [
+        -0.10499999672174454,
+        0.125,
+        0
+      ],
+      "childJointIds": [
+        "left_foot"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "right_ankle",
+      "humanRigCoreJointId": "leftFoot"
+    },
+    {
+      "jointId": "left_foot",
+      "parentJointId": "left_ankle",
+      "jointCenter": [
+        -0.10499999672174454,
+        0.09000000357627869,
+        0.2549999952316284
+      ],
+      "childJointIds": [],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "right_foot",
+      "humanRigCoreJointId": "leftFoot"
+    },
+    {
+      "jointId": "right_clavicle",
+      "parentJointId": "chest",
+      "jointCenter": [
+        0.1143999993801117,
+        1.4600000381469727,
+        0
+      ],
+      "childJointIds": [
+        "right_shoulder"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "left_clavicle",
+      "humanRigCoreJointId": "rightShoulder"
+    },
+    {
+      "jointId": "right_shoulder",
+      "parentJointId": "right_clavicle",
+      "jointCenter": [
+        0.2199999988079071,
+        1.4500000476837158,
+        0
+      ],
+      "childJointIds": [
+        "right_elbow"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "left_shoulder",
+      "humanRigCoreJointId": "rightUpperArm"
+    },
+    {
+      "jointId": "right_elbow",
+      "parentJointId": "right_shoulder",
+      "jointCenter": [
+        0.5099999904632568,
+        1.440000057220459,
+        0
+      ],
+      "childJointIds": [
+        "right_wrist"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "left_elbow",
+      "humanRigCoreJointId": "rightLowerArm"
+    },
+    {
+      "jointId": "right_wrist",
+      "parentJointId": "right_elbow",
+      "jointCenter": [
+        0.7599999904632568,
+        1.434999942779541,
+        0
+      ],
+      "childJointIds": [
+        "right_hand"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "left_wrist",
+      "humanRigCoreJointId": "rightHand"
+    },
+    {
+      "jointId": "right_hand",
+      "parentJointId": "right_wrist",
+      "jointCenter": [
+        0.9399999976158142,
+        1.434999942779541,
+        0.009999999776482582
+      ],
+      "childJointIds": [],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "left_hand",
+      "humanRigCoreJointId": "rightHand"
+    },
+    {
+      "jointId": "right_hip",
+      "parentJointId": "pelvis",
+      "jointCenter": [
+        0.10499999672174454,
+        0.9649999737739563,
+        0
+      ],
+      "childJointIds": [
+        "right_knee"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "left_hip",
+      "humanRigCoreJointId": "rightUpperLeg"
+    },
+    {
+      "jointId": "right_knee",
+      "parentJointId": "right_hip",
+      "jointCenter": [
+        0.10499999672174454,
+        0.5350000262260437,
+        0.012000000104308128
+      ],
+      "childJointIds": [
+        "right_ankle"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "left_knee",
+      "humanRigCoreJointId": "rightLowerLeg"
+    },
+    {
+      "jointId": "right_ankle",
+      "parentJointId": "right_knee",
+      "jointCenter": [
+        0.10499999672174454,
+        0.125,
+        0
+      ],
+      "childJointIds": [
+        "right_foot"
+      ],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "left_ankle",
+      "humanRigCoreJointId": "rightFoot"
+    },
+    {
+      "jointId": "right_foot",
+      "parentJointId": "right_ankle",
+      "jointCenter": [
+        0.10499999672174454,
+        0.09000000357627869,
+        0.2549999952316284
+      ],
+      "childJointIds": [],
+      "jointBasis": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "symmetryPairId": "left_foot",
+      "humanRigCoreJointId": "rightFoot"
+    }
+  ]
+}

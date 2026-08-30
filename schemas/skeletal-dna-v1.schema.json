@@ -77,7 +77,7 @@
         "boneId", "generatorType", "side", "length", "centerline", "crossSections",
         "curvature", "torsion", "proximalEnd", "distalEnd", "articularSurfaces",
         "landmarks", "corticalThickness", "detailLevel", "symmetryPolicy",
-        "minimum", "maximum", "default", "units", "parameterRanges",
+        "minimum", "maximum", "default", "units", "parameterRanges", "generatorParameters",
         "sourceReceiptIds", "confidence"
       ],
       "properties": {
@@ -112,6 +112,7 @@
         "default": { "type": "number" },
         "units": { "enum": ["meter", "degree", "ratio", "level"] },
         "parameterRanges": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterRange" } },
+        "generatorParameters": { "type": "object", "minProperties": 1 },
         "sourceReceiptIds": { "$ref": "#/$defs/sourceReceiptIds" },
         "confidence": { "enum": ["high", "medium", "low", "pending"] }
       }

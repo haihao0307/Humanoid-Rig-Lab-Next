@@ -1,0 +1,44 @@
+{
+  "schema": "humanoid_rig/anatomical_generator_registry@1.0",
+  "type": "AnatomicalGeneratorRegistry",
+  "version": "anatomical-skeleton-s1@1.0.0",
+  "policyId": "human_system/procedural_originality_policy@1.0.0",
+  "proceduralGenerationOnly": true,
+  "externalGeometrySourceCount": 0,
+  "generators": [
+    {
+      "generatorId": "SkeletonLineGeneratorV1@1.0.0",
+      "outputPrimitives": [
+        "LINES",
+        "POINTS"
+      ],
+      "deterministic": true
+    },
+    {
+      "generatorId": "LongBoneGeneratorV1@1.0.0",
+      "outputPrimitives": [
+        "TRIANGLES"
+      ],
+      "supportedBoneIds": [
+        "left_femur",
+        "right_femur"
+      ],
+      "deterministic": true,
+      "lodSpecs": {
+        "0": {
+          "longitudinalSegments": 72,
+          "radialSegments": 32
+        },
+        "1": {
+          "longitudinalSegments": 40,
+          "radialSegments": 20
+        },
+        "2": {
+          "longitudinalSegments": 24,
+          "radialSegments": 12
+        }
+      }
+    }
+  ],
+  "generatorRegistryHash": "1a9ba6b870f5b031b6ec6c0e3953efcc7d7e0dfb26b6563c34e499cf7b3e6e71"
+}

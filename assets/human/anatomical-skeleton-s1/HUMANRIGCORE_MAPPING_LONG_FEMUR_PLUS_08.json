@@ -1,0 +1,166 @@
+{
+  "schema": "humanoid_rig/anatomical_human_rig_core_mapping@1.0",
+  "type": "HumanRigCoreMappingReport",
+  "sourceAnatomicalProfileId": "compiled-anatomical-skeleton-s1-long-femur-plus-08-percent",
+  "sourceAnatomicalProfileHash": "03f9a75704da65ccedb951115c1b9d7ae51d7e167479a2e762adc928ab377420",
+  "targetSchema": "humanoid_rig/human_rig_core@5.0",
+  "targetAccess": "read-only",
+  "writesHumanRigCore": false,
+  "writesFinalPose": false,
+  "status": "mapped-read-only-with-differences",
+  "exactCount": 18,
+  "derivedCount": 7,
+  "unmappedCount": 0,
+  "records": [
+    {
+      "anatomicalJointId": "pelvis",
+      "humanRigCoreJointId": "hips",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "spine_low",
+      "humanRigCoreJointId": "spine",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "spine_mid",
+      "humanRigCoreJointId": "chest",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "spine_high",
+      "humanRigCoreJointId": "upperChest",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "chest",
+      "humanRigCoreJointId": "upperChest",
+      "status": "derived",
+      "difference": "Anatomical chest and spine_high both project to HumanRigCore upperChest; no HumanRigCore joint is created."
+    },
+    {
+      "anatomicalJointId": "neck",
+      "humanRigCoreJointId": "neck",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "head",
+      "humanRigCoreJointId": "head",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "left_clavicle",
+      "humanRigCoreJointId": "leftShoulder",
+      "status": "derived",
+      "difference": "Anatomical clavicle center projects to the existing shoulder control."
+    },
+    {
+      "anatomicalJointId": "left_shoulder",
+      "humanRigCoreJointId": "leftUpperArm",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "left_elbow",
+      "humanRigCoreJointId": "leftLowerArm",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "left_wrist",
+      "humanRigCoreJointId": "leftHand",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "left_hand",
+      "humanRigCoreJointId": "leftHand",
+      "status": "derived",
+      "difference": "Distal anatomical endpoint shares the existing HumanRigCore hand/foot joint."
+    },
+    {
+      "anatomicalJointId": "left_hip",
+      "humanRigCoreJointId": "leftUpperLeg",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "left_knee",
+      "humanRigCoreJointId": "leftLowerLeg",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "left_ankle",
+      "humanRigCoreJointId": "leftFoot",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "left_foot",
+      "humanRigCoreJointId": "leftFoot",
+      "status": "derived",
+      "difference": "Distal anatomical endpoint shares the existing HumanRigCore hand/foot joint."
+    },
+    {
+      "anatomicalJointId": "right_clavicle",
+      "humanRigCoreJointId": "rightShoulder",
+      "status": "derived",
+      "difference": "Anatomical clavicle center projects to the existing shoulder control."
+    },
+    {
+      "anatomicalJointId": "right_shoulder",
+      "humanRigCoreJointId": "rightUpperArm",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "right_elbow",
+      "humanRigCoreJointId": "rightLowerArm",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "right_wrist",
+      "humanRigCoreJointId": "rightHand",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "right_hand",
+      "humanRigCoreJointId": "rightHand",
+      "status": "derived",
+      "difference": "Distal anatomical endpoint shares the existing HumanRigCore hand/foot joint."
+    },
+    {
+      "anatomicalJointId": "right_hip",
+      "humanRigCoreJointId": "rightUpperLeg",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "right_knee",
+      "humanRigCoreJointId": "rightLowerLeg",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "right_ankle",
+      "humanRigCoreJointId": "rightFoot",
+      "status": "exact",
+      "difference": null
+    },
+    {
+      "anatomicalJointId": "right_foot",
+      "humanRigCoreJointId": "rightFoot",
+      "status": "derived",
+      "difference": "Distal anatomical endpoint shares the existing HumanRigCore hand/foot joint."
+    }
+  ]
+}

@@ -1,0 +1,2112 @@
+{
+  "schema": "humanoid_rig/skeletal_dna@1.0",
+  "schemaVersion": 1,
+  "type": "SkeletalDNA",
+  "profileId": "anatomical-skeleton-s1-baseline",
+  "revision": 1,
+  "seed": 7312026,
+  "precision": "float32-deterministic",
+  "coordinateSystem": {
+    "handedness": "right-handed",
+    "upAxis": "+Y",
+    "forwardAxis": "+Z",
+    "rightAxis": "+X",
+    "unit": "meter"
+  },
+  "bodyHeight": 1.78,
+  "shoulderWidth": 0.44,
+  "pelvisWidth": 0.21,
+  "spineLength": 0.51,
+  "upperArmLength": 0.29,
+  "forearmLength": 0.25,
+  "thighLength": 0.43,
+  "calfLength": 0.41,
+  "handLength": 0.18,
+  "footLength": 0.255,
+  "leftRightAsymmetry": 0,
+  "globalDetailLevel": 2,
+  "variantId": "baseline",
+  "generatorVersion": "anatomical-skeleton-s1@1.0.0",
+  "boneParameters": [
+    {
+      "boneId": "pelvis",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "center",
+      "length": 0.20999999344348907,
+      "centerline": [
+        [
+          -0.10499999672174454,
+          0.9649999737739563,
+          0
+        ],
+        [
+          0.10499999672174454,
+          0.9649999737739563,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "pelvis"
+      },
+      "distalEnd": {
+        "jointId": "pelvis"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "center",
+      "minimum": 0.1574999988079071,
+      "maximum": 0.26249998807907104,
+      "default": 0.20999999344348907,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.1574999988079071,
+          "maximum": 0.26249998807907104,
+          "default": 0.20999999344348907,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "spine_low",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "center",
+      "length": 0.10200005769729614,
+      "centerline": [
+        [
+          0,
+          0.9649999737739563,
+          0
+        ],
+        [
+          0,
+          1.0670000314712524,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "pelvis"
+      },
+      "distalEnd": {
+        "jointId": "spine_low"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "center",
+      "minimum": 0.0765000432729721,
+      "maximum": 0.12750007212162018,
+      "default": 0.10200005769729614,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.0765000432729721,
+          "maximum": 0.12750007212162018,
+          "default": 0.10200005769729614,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "spine_mid",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "center",
+      "length": 0.13769996166229248,
+      "centerline": [
+        [
+          0,
+          1.0670000314712524,
+          0
+        ],
+        [
+          0,
+          1.204699993133545,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "spine_low"
+      },
+      "distalEnd": {
+        "jointId": "spine_mid"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "center",
+      "minimum": 0.10327497124671936,
+      "maximum": 0.1721249520778656,
+      "default": 0.13769996166229248,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.10327497124671936,
+          "maximum": 0.1721249520778656,
+          "default": 0.13769996166229248,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "spine_high",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "center",
+      "length": 0.13769996166229248,
+      "centerline": [
+        [
+          0,
+          1.204699993133545,
+          0
+        ],
+        [
+          0,
+          1.3423999547958374,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "spine_mid"
+      },
+      "distalEnd": {
+        "jointId": "spine_high"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "center",
+      "minimum": 0.10327497124671936,
+      "maximum": 0.1721249520778656,
+      "default": 0.13769996166229248,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.10327497124671936,
+          "maximum": 0.1721249520778656,
+          "default": 0.13769996166229248,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "chest",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "center",
+      "length": 0.1326000690460205,
+      "centerline": [
+        [
+          0,
+          1.3423999547958374,
+          0
+        ],
+        [
+          0,
+          1.475000023841858,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "spine_high"
+      },
+      "distalEnd": {
+        "jointId": "chest"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "center",
+      "minimum": 0.09945005178451538,
+      "maximum": 0.16575008630752563,
+      "default": 0.1326000690460205,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.09945005178451538,
+          "maximum": 0.16575008630752563,
+          "default": 0.1326000690460205,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "neck",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "center",
+      "length": 0.10500001907348633,
+      "centerline": [
+        [
+          0,
+          1.475000023841858,
+          0
+        ],
+        [
+          0,
+          1.5800000429153442,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "chest"
+      },
+      "distalEnd": {
+        "jointId": "neck"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "center",
+      "minimum": 0.07875001430511475,
+      "maximum": 0.1312500238418579,
+      "default": 0.10500001907348633,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.07875001430511475,
+          "maximum": 0.1312500238418579,
+          "default": 0.10500001907348633,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "head",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "center",
+      "length": 0.14499998092651367,
+      "centerline": [
+        [
+          0,
+          1.5800000429153442,
+          0
+        ],
+        [
+          0,
+          1.725000023841858,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "neck"
+      },
+      "distalEnd": {
+        "jointId": "head"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "center",
+      "minimum": 0.10874998569488525,
+      "maximum": 0.1812499761581421,
+      "default": 0.14499998092651367,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.10874998569488525,
+          "maximum": 0.1812499761581421,
+          "default": 0.14499998092651367,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "left_clavicle",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "left",
+      "length": 0.115379199385643,
+      "centerline": [
+        [
+          0,
+          1.475000023841858,
+          0
+        ],
+        [
+          -0.1143999993801117,
+          1.4600000381469727,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "chest"
+      },
+      "distalEnd": {
+        "jointId": "left_clavicle"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.08653439581394196,
+      "maximum": 0.14422400295734406,
+      "default": 0.115379199385643,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.08653439581394196,
+          "maximum": 0.14422400295734406,
+          "default": 0.115379199385643,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "left_scapular_link",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "left",
+      "length": 0.10607242584228516,
+      "centerline": [
+        [
+          -0.1143999993801117,
+          1.4600000381469727,
+          0
+        ],
+        [
+          -0.2199999988079071,
+          1.4500000476837158,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "left_clavicle"
+      },
+      "distalEnd": {
+        "jointId": "left_shoulder"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.07955431938171387,
+      "maximum": 0.13259053230285645,
+      "default": 0.10607242584228516,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.07955431938171387,
+          "maximum": 0.13259053230285645,
+          "default": 0.10607242584228516,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "left_humerus",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "left",
+      "length": 0.29017236828804016,
+      "centerline": [
+        [
+          -0.2199999988079071,
+          1.4500000476837158,
+          0
+        ],
+        [
+          -0.5099999904632568,
+          1.440000057220459,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "left_shoulder"
+      },
+      "distalEnd": {
+        "jointId": "left_elbow"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.21762926876544952,
+      "maximum": 0.3627154529094696,
+      "default": 0.29017236828804016,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.21762926876544952,
+          "maximum": 0.3627154529094696,
+          "default": 0.29017236828804016,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "left_forearm_scaffold",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "left",
+      "length": 0.25005000829696655,
+      "centerline": [
+        [
+          -0.5099999904632568,
+          1.440000057220459,
+          0
+        ],
+        [
+          -0.7599999904632568,
+          1.434999942779541,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "left_elbow"
+      },
+      "distalEnd": {
+        "jointId": "left_wrist"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.18753749132156372,
+      "maximum": 0.312562495470047,
+      "default": 0.25005000829696655,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.18753749132156372,
+          "maximum": 0.312562495470047,
+          "default": 0.25005000829696655,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "left_hand_scaffold",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "left",
+      "length": 0.18027757108211517,
+      "centerline": [
+        [
+          -0.7599999904632568,
+          1.434999942779541,
+          0
+        ],
+        [
+          -0.9399999976158142,
+          1.434999942779541,
+          0.009999999776482582
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "left_wrist"
+      },
+      "distalEnd": {
+        "jointId": "left_hand"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.13520817458629608,
+      "maximum": 0.22534696757793427,
+      "default": 0.18027757108211517,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.13520817458629608,
+          "maximum": 0.22534696757793427,
+          "default": 0.18027757108211517,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "left_hip_link",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "left",
+      "length": 0.10499999672174454,
+      "centerline": [
+        [
+          0,
+          0.9649999737739563,
+          0
+        ],
+        [
+          -0.10499999672174454,
+          0.9649999737739563,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "pelvis"
+      },
+      "distalEnd": {
+        "jointId": "left_hip"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.07874999940395355,
+      "maximum": 0.13124999403953552,
+      "default": 0.10499999672174454,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.07874999940395355,
+          "maximum": 0.13124999403953552,
+          "default": 0.10499999672174454,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "left_femur",
+      "generatorType": "LongBoneGeneratorV1@1.0.0",
+      "side": "left",
+      "length": 0.4301673471927643,
+      "centerline": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0.0005000000237487257,
+          0.15055857598781586,
+          0.001500000013038516
+        ],
+        [
+          -0.00039999998989515007,
+          0.3011171519756317,
+          0.0010000000474974513
+        ],
+        [
+          0,
+          0.4301673471927643,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0.03,
+          "major": 0.034860000014305115,
+          "minor": 0.030339999124407768
+        },
+        {
+          "t": 0.35,
+          "major": 0.0155,
+          "minor": 0.0135
+        },
+        {
+          "t": 0.75,
+          "major": 0.01860000006854534,
+          "minor": 0.015930000692605972
+        },
+        {
+          "t": 0.97,
+          "major": 0.022,
+          "minor": 0.022
+        }
+      ],
+      "curvature": {
+        "anteriorBow": 0.0245,
+        "medialLateralBow": 0.0035,
+        "referenceRadius": 0.943
+      },
+      "torsion": {
+        "femoralAnteversion": 11,
+        "units": "degree"
+      },
+      "proximalEnd": {
+        "headRadius": 0.022,
+        "neckLength": 0.04475,
+        "neckShaftAngle": 129.9,
+        "greaterTrochanterSize": 0.018,
+        "lesserTrochanterSize": 0.01
+      },
+      "distalEnd": {
+        "distalCondyleWidth": 0.06972,
+        "distalCondyleDepth": 0.06068,
+        "intercondylarNotchWidth": 0.018
+      },
+      "articularSurfaces": [
+        {
+          "id": "left_femoral_head_surface",
+          "kind": "spherical-pilot"
+        },
+        {
+          "id": "left_distal_condylar_surface",
+          "kind": "paired-condyle-pilot"
+        }
+      ],
+      "landmarks": [
+        {
+          "landmarkId": "left_femur_head_center"
+        },
+        {
+          "landmarkId": "left_femur_neck_center"
+        },
+        {
+          "landmarkId": "left_femur_greater_trochanter"
+        },
+        {
+          "landmarkId": "left_femur_lesser_trochanter"
+        },
+        {
+          "landmarkId": "left_femur_medial_condyle"
+        },
+        {
+          "landmarkId": "left_femur_lateral_condyle"
+        },
+        {
+          "landmarkId": "left_femur_intercondylar_notch"
+        }
+      ],
+      "corticalThickness": 0.0045,
+      "detailLevel": 2,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.34,
+      "maximum": 0.52,
+      "default": 0.4301673471927643,
+      "units": "meter",
+      "parameterRanges": {
+        "femurLength": {
+          "minimum": 0.34,
+          "maximum": 0.52,
+          "default": 0.4301673471927643,
+          "units": "meter"
+        },
+        "shaftAnteriorBow": {
+          "minimum": 0,
+          "maximum": 0.05,
+          "default": 0.0245,
+          "units": "meter"
+        },
+        "shaftMedialLateralBow": {
+          "minimum": -0.02,
+          "maximum": 0.02,
+          "default": 0.0035,
+          "units": "meter"
+        },
+        "shaftCrossSectionMajor": {
+          "minimum": 0.01,
+          "maximum": 0.024,
+          "default": 0.0155,
+          "units": "meter"
+        },
+        "shaftCrossSectionMinor": {
+          "minimum": 0.009,
+          "maximum": 0.022,
+          "default": 0.0135,
+          "units": "meter"
+        },
+        "headRadius": {
+          "minimum": 0.018,
+          "maximum": 0.029,
+          "default": 0.022,
+          "units": "meter"
+        },
+        "neckLength": {
+          "minimum": 0.03,
+          "maximum": 0.065,
+          "default": 0.04475,
+          "units": "meter"
+        },
+        "neckShaftAngle": {
+          "minimum": 116,
+          "maximum": 143,
+          "default": 129.9,
+          "units": "degree"
+        },
+        "femoralAnteversion": {
+          "minimum": -12,
+          "maximum": 38.4,
+          "default": 11,
+          "units": "degree"
+        },
+        "greaterTrochanterSize": {
+          "minimum": 0.01,
+          "maximum": 0.03,
+          "default": 0.018,
+          "units": "meter"
+        },
+        "lesserTrochanterSize": {
+          "minimum": 0.005,
+          "maximum": 0.018,
+          "default": 0.01,
+          "units": "meter"
+        },
+        "distalCondyleWidth": {
+          "minimum": 0.055,
+          "maximum": 0.085,
+          "default": 0.06972,
+          "units": "meter"
+        },
+        "distalCondyleDepth": {
+          "minimum": 0.05,
+          "maximum": 0.075,
+          "default": 0.06068,
+          "units": "meter"
+        },
+        "intercondylarNotchWidth": {
+          "minimum": 0.01,
+          "maximum": 0.028,
+          "default": 0.018,
+          "units": "meter"
+        },
+        "corticalThickness": {
+          "minimum": 0.002,
+          "maximum": 0.008,
+          "default": 0.0045,
+          "units": "meter"
+        },
+        "surfaceDetail": {
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.6,
+          "units": "level"
+        },
+        "leftRightAsymmetry": {
+          "minimum": -0.02,
+          "maximum": 0.02,
+          "default": 0,
+          "units": "ratio"
+        }
+      },
+      "generatorParameters": {
+        "femurLength": 0.4301673471927643,
+        "shaftCenterlineKnots": [
+          {
+            "t": 0,
+            "anteriorOffset": 0,
+            "medialLateralOffset": 0
+          },
+          {
+            "t": 0.35,
+            "anteriorOffset": 0.0015,
+            "medialLateralOffset": 0.0005
+          },
+          {
+            "t": 0.7,
+            "anteriorOffset": 0.001,
+            "medialLateralOffset": -0.0004
+          },
+          {
+            "t": 1,
+            "anteriorOffset": 0,
+            "medialLateralOffset": 0
+          }
+        ],
+        "shaftAnteriorBow": 0.0245,
+        "shaftMedialLateralBow": 0.0035,
+        "shaftCrossSectionMajor": 0.0155,
+        "shaftCrossSectionMinor": 0.0135,
+        "headRadius": 0.022,
+        "neckLength": 0.04475,
+        "neckShaftAngle": 129.9,
+        "femoralAnteversion": 11,
+        "greaterTrochanterSize": 0.018,
+        "lesserTrochanterSize": 0.01,
+        "distalCondyleWidth": 0.06972,
+        "distalCondyleDepth": 0.06068,
+        "intercondylarNotchWidth": 0.018,
+        "corticalThickness": 0.0045,
+        "surfaceDetail": 0.6,
+        "leftRightAsymmetry": 0
+      },
+      "sourceReceiptIds": [
+        "verma-proximal-femur-2017",
+        "thiesen-femoral-antecurvation-2018",
+        "hussain-distal-femur-2013",
+        "meier-hip-morphology-2022",
+        "openstax-long-bone-2022",
+        "hrl-femur-pilot-detail-pending"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "left_tibia_fibula_scaffold",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "left",
+      "length": 0.4101755917072296,
+      "centerline": [
+        [
+          -0.10499999672174454,
+          0.5350000262260437,
+          0.012000000104308128
+        ],
+        [
+          -0.10499999672174454,
+          0.125,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "left_knee"
+      },
+      "distalEnd": {
+        "jointId": "left_ankle"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.3076317012310028,
+      "maximum": 0.5127195119857788,
+      "default": 0.4101755917072296,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.3076317012310028,
+          "maximum": 0.5127195119857788,
+          "default": 0.4101755917072296,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "left_foot_scaffold",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "left",
+      "length": 0.25739073753356934,
+      "centerline": [
+        [
+          -0.10499999672174454,
+          0.125,
+          0
+        ],
+        [
+          -0.10499999672174454,
+          0.09000000357627869,
+          0.2549999952316284
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "left_ankle"
+      },
+      "distalEnd": {
+        "jointId": "left_foot"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.1930430680513382,
+      "maximum": 0.32173842191696167,
+      "default": 0.25739073753356934,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.1930430680513382,
+          "maximum": 0.32173842191696167,
+          "default": 0.25739073753356934,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "right_clavicle",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "right",
+      "length": 0.115379199385643,
+      "centerline": [
+        [
+          0,
+          1.475000023841858,
+          0
+        ],
+        [
+          0.1143999993801117,
+          1.4600000381469727,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "chest"
+      },
+      "distalEnd": {
+        "jointId": "right_clavicle"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.08653439581394196,
+      "maximum": 0.14422400295734406,
+      "default": 0.115379199385643,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.08653439581394196,
+          "maximum": 0.14422400295734406,
+          "default": 0.115379199385643,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "right_scapular_link",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "right",
+      "length": 0.10607242584228516,
+      "centerline": [
+        [
+          0.1143999993801117,
+          1.4600000381469727,
+          0
+        ],
+        [
+          0.2199999988079071,
+          1.4500000476837158,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "right_clavicle"
+      },
+      "distalEnd": {
+        "jointId": "right_shoulder"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.07955431938171387,
+      "maximum": 0.13259053230285645,
+      "default": 0.10607242584228516,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.07955431938171387,
+          "maximum": 0.13259053230285645,
+          "default": 0.10607242584228516,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "right_humerus",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "right",
+      "length": 0.29017236828804016,
+      "centerline": [
+        [
+          0.2199999988079071,
+          1.4500000476837158,
+          0
+        ],
+        [
+          0.5099999904632568,
+          1.440000057220459,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "right_shoulder"
+      },
+      "distalEnd": {
+        "jointId": "right_elbow"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.21762926876544952,
+      "maximum": 0.3627154529094696,
+      "default": 0.29017236828804016,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.21762926876544952,
+          "maximum": 0.3627154529094696,
+          "default": 0.29017236828804016,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "right_forearm_scaffold",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "right",
+      "length": 0.25005000829696655,
+      "centerline": [
+        [
+          0.5099999904632568,
+          1.440000057220459,
+          0
+        ],
+        [
+          0.7599999904632568,
+          1.434999942779541,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "right_elbow"
+      },
+      "distalEnd": {
+        "jointId": "right_wrist"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.18753749132156372,
+      "maximum": 0.312562495470047,
+      "default": 0.25005000829696655,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.18753749132156372,
+          "maximum": 0.312562495470047,
+          "default": 0.25005000829696655,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "right_hand_scaffold",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "right",
+      "length": 0.18027757108211517,
+      "centerline": [
+        [
+          0.7599999904632568,
+          1.434999942779541,
+          0
+        ],
+        [
+          0.9399999976158142,
+          1.434999942779541,
+          0.009999999776482582
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "right_wrist"
+      },
+      "distalEnd": {
+        "jointId": "right_hand"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.13520817458629608,
+      "maximum": 0.22534696757793427,
+      "default": 0.18027757108211517,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.13520817458629608,
+          "maximum": 0.22534696757793427,
+          "default": 0.18027757108211517,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "right_hip_link",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "right",
+      "length": 0.10499999672174454,
+      "centerline": [
+        [
+          0,
+          0.9649999737739563,
+          0
+        ],
+        [
+          0.10499999672174454,
+          0.9649999737739563,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "pelvis"
+      },
+      "distalEnd": {
+        "jointId": "right_hip"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.07874999940395355,
+      "maximum": 0.13124999403953552,
+      "default": 0.10499999672174454,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.07874999940395355,
+          "maximum": 0.13124999403953552,
+          "default": 0.10499999672174454,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "right_femur",
+      "generatorType": "LongBoneGeneratorV1@1.0.0",
+      "side": "right",
+      "length": 0.4301673471927643,
+      "centerline": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0.0005000000237487257,
+          0.15055857598781586,
+          0.001500000013038516
+        ],
+        [
+          -0.00039999998989515007,
+          0.3011171519756317,
+          0.0010000000474974513
+        ],
+        [
+          0,
+          0.4301673471927643,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0.03,
+          "major": 0.034860000014305115,
+          "minor": 0.030339999124407768
+        },
+        {
+          "t": 0.35,
+          "major": 0.0155,
+          "minor": 0.0135
+        },
+        {
+          "t": 0.75,
+          "major": 0.01860000006854534,
+          "minor": 0.015930000692605972
+        },
+        {
+          "t": 0.97,
+          "major": 0.022,
+          "minor": 0.022
+        }
+      ],
+      "curvature": {
+        "anteriorBow": 0.0245,
+        "medialLateralBow": 0.0035,
+        "referenceRadius": 0.943
+      },
+      "torsion": {
+        "femoralAnteversion": 11,
+        "units": "degree"
+      },
+      "proximalEnd": {
+        "headRadius": 0.022,
+        "neckLength": 0.04475,
+        "neckShaftAngle": 129.9,
+        "greaterTrochanterSize": 0.018,
+        "lesserTrochanterSize": 0.01
+      },
+      "distalEnd": {
+        "distalCondyleWidth": 0.06972,
+        "distalCondyleDepth": 0.06068,
+        "intercondylarNotchWidth": 0.018
+      },
+      "articularSurfaces": [
+        {
+          "id": "right_femoral_head_surface",
+          "kind": "spherical-pilot"
+        },
+        {
+          "id": "right_distal_condylar_surface",
+          "kind": "paired-condyle-pilot"
+        }
+      ],
+      "landmarks": [
+        {
+          "landmarkId": "right_femur_head_center"
+        },
+        {
+          "landmarkId": "right_femur_neck_center"
+        },
+        {
+          "landmarkId": "right_femur_greater_trochanter"
+        },
+        {
+          "landmarkId": "right_femur_lesser_trochanter"
+        },
+        {
+          "landmarkId": "right_femur_medial_condyle"
+        },
+        {
+          "landmarkId": "right_femur_lateral_condyle"
+        },
+        {
+          "landmarkId": "right_femur_intercondylar_notch"
+        }
+      ],
+      "corticalThickness": 0.0045,
+      "detailLevel": 2,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.34,
+      "maximum": 0.52,
+      "default": 0.4301673471927643,
+      "units": "meter",
+      "parameterRanges": {
+        "femurLength": {
+          "minimum": 0.34,
+          "maximum": 0.52,
+          "default": 0.4301673471927643,
+          "units": "meter"
+        },
+        "shaftAnteriorBow": {
+          "minimum": 0,
+          "maximum": 0.05,
+          "default": 0.0245,
+          "units": "meter"
+        },
+        "shaftMedialLateralBow": {
+          "minimum": -0.02,
+          "maximum": 0.02,
+          "default": 0.0035,
+          "units": "meter"
+        },
+        "shaftCrossSectionMajor": {
+          "minimum": 0.01,
+          "maximum": 0.024,
+          "default": 0.0155,
+          "units": "meter"
+        },
+        "shaftCrossSectionMinor": {
+          "minimum": 0.009,
+          "maximum": 0.022,
+          "default": 0.0135,
+          "units": "meter"
+        },
+        "headRadius": {
+          "minimum": 0.018,
+          "maximum": 0.029,
+          "default": 0.022,
+          "units": "meter"
+        },
+        "neckLength": {
+          "minimum": 0.03,
+          "maximum": 0.065,
+          "default": 0.04475,
+          "units": "meter"
+        },
+        "neckShaftAngle": {
+          "minimum": 116,
+          "maximum": 143,
+          "default": 129.9,
+          "units": "degree"
+        },
+        "femoralAnteversion": {
+          "minimum": -12,
+          "maximum": 38.4,
+          "default": 11,
+          "units": "degree"
+        },
+        "greaterTrochanterSize": {
+          "minimum": 0.01,
+          "maximum": 0.03,
+          "default": 0.018,
+          "units": "meter"
+        },
+        "lesserTrochanterSize": {
+          "minimum": 0.005,
+          "maximum": 0.018,
+          "default": 0.01,
+          "units": "meter"
+        },
+        "distalCondyleWidth": {
+          "minimum": 0.055,
+          "maximum": 0.085,
+          "default": 0.06972,
+          "units": "meter"
+        },
+        "distalCondyleDepth": {
+          "minimum": 0.05,
+          "maximum": 0.075,
+          "default": 0.06068,
+          "units": "meter"
+        },
+        "intercondylarNotchWidth": {
+          "minimum": 0.01,
+          "maximum": 0.028,
+          "default": 0.018,
+          "units": "meter"
+        },
+        "corticalThickness": {
+          "minimum": 0.002,
+          "maximum": 0.008,
+          "default": 0.0045,
+          "units": "meter"
+        },
+        "surfaceDetail": {
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.6,
+          "units": "level"
+        },
+        "leftRightAsymmetry": {
+          "minimum": -0.02,
+          "maximum": 0.02,
+          "default": 0,
+          "units": "ratio"
+        }
+      },
+      "generatorParameters": {
+        "femurLength": 0.4301673471927643,
+        "shaftCenterlineKnots": [
+          {
+            "t": 0,
+            "anteriorOffset": 0,
+            "medialLateralOffset": 0
+          },
+          {
+            "t": 0.35,
+            "anteriorOffset": 0.0015,
+            "medialLateralOffset": 0.0005
+          },
+          {
+            "t": 0.7,
+            "anteriorOffset": 0.001,
+            "medialLateralOffset": -0.0004
+          },
+          {
+            "t": 1,
+            "anteriorOffset": 0,
+            "medialLateralOffset": 0
+          }
+        ],
+        "shaftAnteriorBow": 0.0245,
+        "shaftMedialLateralBow": 0.0035,
+        "shaftCrossSectionMajor": 0.0155,
+        "shaftCrossSectionMinor": 0.0135,
+        "headRadius": 0.022,
+        "neckLength": 0.04475,
+        "neckShaftAngle": 129.9,
+        "femoralAnteversion": 11,
+        "greaterTrochanterSize": 0.018,
+        "lesserTrochanterSize": 0.01,
+        "distalCondyleWidth": 0.06972,
+        "distalCondyleDepth": 0.06068,
+        "intercondylarNotchWidth": 0.018,
+        "corticalThickness": 0.0045,
+        "surfaceDetail": 0.6,
+        "leftRightAsymmetry": 0
+      },
+      "sourceReceiptIds": [
+        "verma-proximal-femur-2017",
+        "thiesen-femoral-antecurvation-2018",
+        "hussain-distal-femur-2013",
+        "meier-hip-morphology-2022",
+        "openstax-long-bone-2022",
+        "hrl-femur-pilot-detail-pending"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "right_tibia_fibula_scaffold",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "right",
+      "length": 0.4101755917072296,
+      "centerline": [
+        [
+          0.10499999672174454,
+          0.5350000262260437,
+          0.012000000104308128
+        ],
+        [
+          0.10499999672174454,
+          0.125,
+          0
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "right_knee"
+      },
+      "distalEnd": {
+        "jointId": "right_ankle"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.3076317012310028,
+      "maximum": 0.5127195119857788,
+      "default": 0.4101755917072296,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.3076317012310028,
+          "maximum": 0.5127195119857788,
+          "default": 0.4101755917072296,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "boneId": "right_foot_scaffold",
+      "generatorType": "SkeletonLineGeneratorV1@1.0.0",
+      "side": "right",
+      "length": 0.25739073753356934,
+      "centerline": [
+        [
+          0.10499999672174454,
+          0.125,
+          0
+        ],
+        [
+          0.10499999672174454,
+          0.09000000357627869,
+          0.2549999952316284
+        ]
+      ],
+      "crossSections": [
+        {
+          "t": 0,
+          "major": 0.003,
+          "minor": 0.003
+        },
+        {
+          "t": 1,
+          "major": 0.003,
+          "minor": 0.003
+        }
+      ],
+      "curvature": {
+        "kind": "linear"
+      },
+      "torsion": {
+        "degrees": 0
+      },
+      "proximalEnd": {
+        "jointId": "right_ankle"
+      },
+      "distalEnd": {
+        "jointId": "right_foot"
+      },
+      "articularSurfaces": [],
+      "landmarks": [],
+      "corticalThickness": 0.002,
+      "detailLevel": 0,
+      "symmetryPolicy": "parameter-symmetric",
+      "minimum": 0.1930430680513382,
+      "maximum": 0.32173842191696167,
+      "default": 0.25739073753356934,
+      "units": "meter",
+      "parameterRanges": {
+        "length": {
+          "minimum": 0.1930430680513382,
+          "maximum": 0.32173842191696167,
+          "default": 0.25739073753356934,
+          "units": "meter"
+        }
+      },
+      "generatorParameters": {
+        "lineRadius": 0.003
+      },
+      "sourceReceiptIds": [
+        "hrl-bodydna-v5-2026",
+        "openstax-long-bone-2022"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "sourceReceiptIds": [
+    "hrl-bodydna-v5-2026",
+    "openstax-long-bone-2022",
+    "verma-proximal-femur-2017",
+    "thiesen-femoral-antecurvation-2018",
+    "hussain-distal-femur-2013",
+    "meier-hip-morphology-2022",
+    "hrl-femur-pilot-detail-pending"
+  ]
+}
