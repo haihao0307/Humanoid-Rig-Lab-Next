@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>HRL Anatomical Skeleton S1 — Binary Geometry Review</title>
   <link rel="stylesheet" href="./apps/human-core-v5-anatomical-skeleton-s1-binary-v1/styles.css">
+  <script type="importmap">
+    {"imports":{"three":"./node_modules/three/build/three.module.js"}}
+  </script>
 </head>
 <body>
   <main class="workspace">
@@ -29,8 +32,29 @@
         <h2>Layers</h2>
         <label class="check"><input id="isolate-femur" type="checkbox">Isolate femora</label>
         <label class="check"><input id="show-axes" type="checkbox" checked>Joint local axes</label>
+        <label class="check"><input id="show-joints" type="checkbox" checked>Joint centers / landmarks</label>
         <label class="check"><input id="show-labels" type="checkbox" checked>Bone/joint names</label>
         <label class="check"><input id="show-symmetry" type="checkbox" checked>Left/right symmetry display</label>
+      </section>
+      <section>
+        <h2>Review capture</h2>
+        <label>Femur side<select id="femur-side-select"><option value="both">Both</option><option value="left">Left</option><option value="right">Right</option></select></label>
+        <label>Camera preset<select id="review-camera-select">
+          <option value="skeleton-front">Skeleton front</option>
+          <option value="skeleton-side-left">Skeleton side left</option>
+          <option value="skeleton-back">Skeleton back</option>
+          <option value="skeleton-three-quarter-front">Skeleton three-quarter front</option>
+          <option value="femur-front">Femur front</option>
+          <option value="femur-back">Femur back</option>
+          <option value="femur-medial">Femur medial</option>
+          <option value="femur-lateral">Femur lateral</option>
+          <option value="femur-head-neck">Femur head / neck</option>
+          <option value="femur-trochanter">Femur trochanter</option>
+          <option value="femur-distal-condyles-front">Distal condyles front</option>
+          <option value="femur-intercondylar-notch-back">Intercondylar notch back</option>
+          <option value="femur-three-quarter-front">Femur three-quarter front</option>
+          <option value="femur-comparison-front">Both femora comparison</option>
+        </select></label>
       </section>
       <section>
         <h2>Views</h2>
@@ -50,6 +74,7 @@
     <section class="viewport panel">
       <div id="viewport"></div>
       <div id="labels" aria-hidden="true"></div>
+      <div id="review-state-badge" class="review-state-badge">capture state pending</div>
       <div class="viewport-note">Right-handed · +Y up · +Z forward · meters · no runtime scale</div>
     </section>
 
@@ -68,6 +93,7 @@
       <span>HumanRigCore / finalPose access: read-only</span>
     </footer>
   </main>
+  <output id="review-runtime-state" hidden></output>
   <script type="module" src="./apps/human-core-v5-anatomical-skeleton-s1-binary-v1/index.js"></script>
 </body>
 </html>

@@ -7,6 +7,8 @@ const QA_STATUS_URL = '../../artifacts/qa/anatomical-skeleton-s1/TASK_S1A_FINAL_
 const container = document.querySelector('#viewport');
 const labelsRoot = document.querySelector('#labels');
 const inspector = document.querySelector('#inspector-content');
+const reviewStateBadge = document.querySelector('#review-state-badge');
+const reviewRuntimeState = document.querySelector('#review-runtime-state');
 
 const publicState = window.__HRL_ANATOMICAL_SKELETON_S1_BINARY_V1__ = {
   ready: false,
@@ -74,11 +76,25 @@ scene.add(displayRoot, axesRoot);
 
 const state = {
   variantId: 'baseline', lod: 0, isolateFemur: false, showAxes: true, showLabels: true, showSymmetry: true,
+  femurSide: 'both', showJoints: true, cameraPreset: 'skeleton-three-quarter-front', renderRevision: 0,
   tab: 'summary', registry: null, generatorRegistry: null, graph: null, receipts: null, qa: null,
   dna: null, profile: null, mapping: null, manifest: null, binary: null, labelRecords: [],
 };
 
-const loader = new HrlBoneBinaryLoaderV1();
+const loader = new HrlBoneBinaryLoaderV1({ fetchImpl: (...args) => fetch(...args) });
+
+publicState.review = {
+  setCameraPreset,
+  setVariant: async (variantId) => { await loadVariant(variantId); setCameraPreset(state.cameraPreset); return captureReadyState(); },
+  setFemurSide,
+  setLod,
+  setIsolationMode,
+  setLabelVisibility,
+  setAxisVisibility,
+  setJointVisibility,
+  setInspectorTab,
+  captureReadyState,
+};
 
 start().catch((error) => {
   publicState.startupErrors.push(error.message);
@@ -98,13 +114,14 @@ async function start() {
   for (const variant of state.registry.variants) variantSelect.add(new Option(variant.label, variant.variantId));
   bindUi();
   await loadVariant('baseline');
-  resetCamera();
+  setCameraPreset('skeleton-three-quarter-front');
   onResize();
   window.addEventListener('resize', onResize);
   publicState.ready = true;
   const badge = document.querySelector('#ready-status');
   badge.textContent = 'ready';
   badge.classList.add('ready');
+  publishReviewState();
   animate();
 }
 
@@ -132,8 +149,10 @@ async function loadVariant(variantId) {
   publicState.binaryGeometrySha256 = record.sha256;
   publicState.deterministicReplayPassed = state.qa?.deterministicReplayPassed === true;
   publicState.authorityWriteViolationCount = state.qa?.authorityWriteViolationCount ?? 0;
+  document.querySelector('#variant-select').value = variantId;
   rebuildDisplay();
   renderInspector();
+  publishReviewState();
 }
 
 function rebuildDisplay() {
@@ -147,7 +166,9 @@ function rebuildDisplay() {
     const manifestGroup = state.manifest.primitiveGroups[ordinal];
     const rightHidden = !state.showSymmetry && manifestGroup.side === 'right';
     const femur = manifestGroup.boneId?.endsWith('_femur');
-    if (rightHidden || (femur && binaryGroup.lod !== state.lod) || (state.isolateFemur && !femur) || (!state.isolateFemur && femur && binaryGroup.lod !== state.lod)) return;
+    const wrongFemurSide = state.isolateFemur && femur && state.femurSide !== 'both' && manifestGroup.side !== state.femurSide;
+    const hiddenJointMarker = binaryGroup.primitive === 'POINTS' && !state.showJoints;
+    if (rightHidden || wrongFemurSide || hiddenJointMarker || (femur && binaryGroup.lod !== state.lod) || (state.isolateFemur && !femur) || (!state.isolateFemur && femur && binaryGroup.lod !== state.lod)) return;
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', positionAttribute.clone());
     geometry.setIndex(new THREE.BufferAttribute(state.binary.indices.slice(binaryGroup.indexOffset, binaryGroup.indexOffset + binaryGroup.indexCount), 1));
@@ -166,6 +187,8 @@ function rebuildDisplay() {
     displayRoot.add(object);
   });
   buildAxesAndLabels();
+  state.renderRevision += 1;
+  publishReviewState();
 }
 
 function buildAxesAndLabels() {
@@ -234,25 +257,154 @@ function renderInspector() {
 }
 
 function bindUi() {
-  document.querySelector('#variant-select').addEventListener('change', (event) => loadVariant(event.target.value).catch(reportStartup));
-  document.querySelector('#lod-select').addEventListener('change', (event) => { state.lod = Number(event.target.value); rebuildDisplay(); renderInspector(); });
-  document.querySelector('#isolate-femur').addEventListener('change', (event) => { state.isolateFemur = event.target.checked; rebuildDisplay(); fitVisible(); });
-  document.querySelector('#show-axes').addEventListener('change', (event) => { state.showAxes = event.target.checked; axesRoot.visible = state.showAxes; });
-  document.querySelector('#show-labels').addEventListener('change', (event) => { state.showLabels = event.target.checked; labelsRoot.hidden = !state.showLabels; });
+  document.querySelector('#variant-select').addEventListener('change', (event) => publicState.review.setVariant(event.target.value).catch(reportStartup));
+  document.querySelector('#lod-select').addEventListener('change', (event) => setLod(Number(event.target.value)));
+  document.querySelector('#isolate-femur').addEventListener('change', (event) => setIsolationMode(event.target.checked ? 'femur' : 'full-body'));
+  document.querySelector('#show-axes').addEventListener('change', (event) => setAxisVisibility(event.target.checked));
+  document.querySelector('#show-joints').addEventListener('change', (event) => setJointVisibility(event.target.checked));
+  document.querySelector('#show-labels').addEventListener('change', (event) => setLabelVisibility(event.target.checked));
   document.querySelector('#show-symmetry').addEventListener('change', (event) => { state.showSymmetry = event.target.checked; rebuildDisplay(); });
+  document.querySelector('#femur-side-select').addEventListener('change', (event) => setFemurSide(event.target.value));
+  document.querySelector('#review-camera-select').addEventListener('change', (event) => setCameraPreset(event.target.value));
   document.querySelector('#fit-view').addEventListener('click', fitVisible);
   document.querySelector('#reset-view').addEventListener('click', resetCamera);
   document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
-  document.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => { state.tab = button.dataset.tab; renderInspector(); }));
+  document.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => setInspectorTab(button.dataset.tab)));
 }
 
 function setView(view) {
-  const target = state.isolateFemur ? new THREE.Vector3(0, .75, 0) : new THREE.Vector3(0, .9, 0);
-  const directions = { front: [0, 0, 1], side: [1, 0, 0], back: [0, 0, -1], 'three-quarter': [1, .25, 1] };
-  const direction = new THREE.Vector3(...directions[view]).normalize();
-  camera.position.copy(target).addScaledVector(direction, state.isolateFemur ? 1.45 : 2.8);
+  const presets = { front: 'skeleton-front', side: 'skeleton-side-left', back: 'skeleton-back', 'three-quarter': 'skeleton-three-quarter-front' };
+  const femurPresets = { front: 'femur-front', side: 'femur-lateral', back: 'femur-back', 'three-quarter': 'femur-three-quarter-front' };
+  setCameraPreset(state.isolateFemur ? femurPresets[view] : presets[view]);
+}
+
+function setCameraPreset(name) {
+  const skeletonPresets = {
+    'skeleton-front': { direction: [0, 0, 1], target: [0, .9, 0], distance: 2.8 },
+    'skeleton-side-left': { direction: [-1, 0, 0], target: [0, .9, 0], distance: 2.8 },
+    'skeleton-back': { direction: [0, 0, -1], target: [0, .9, 0], distance: 2.8 },
+    'skeleton-three-quarter-front': { direction: [1, .2, 1], target: [0, .9, 0], distance: 2.8 },
+  };
+  if (skeletonPresets[name]) setIsolationMode('full-body', { fit: false });
+  const sideSign = state.femurSide === 'right' ? 1 : -1;
+  const centerX = state.femurSide === 'both' ? 0 : sideSign * .105;
+  const femurPresets = {
+    'femur-front': { direction: [0, .03, 1], target: [centerX, .75, 0], distance: .92 },
+    'femur-back': { direction: [0, .03, -1], target: [centerX, .75, 0], distance: .92 },
+    'femur-medial': { direction: [-sideSign, .03, 0], target: [centerX, .75, 0], distance: .92 },
+    'femur-lateral': { direction: [sideSign, .03, 0], target: [centerX, .75, 0], distance: .92 },
+    'femur-head-neck': { direction: [-sideSign * .68, .18, 1], target: [centerX - sideSign * .018, .915, 0], distance: .39 },
+    'femur-trochanter': { direction: [sideSign * .72, .18, 1], target: [centerX + sideSign * .018, .875, 0], distance: .38 },
+    'femur-distal-condyles-front': { direction: [0, .1, 1], target: [centerX, .555, 0], distance: .38 },
+    'femur-intercondylar-notch-back': { direction: [0, .08, -1], target: [centerX, .555, 0], distance: .36 },
+    'femur-three-quarter-front': { direction: [sideSign * .7, .12, 1], target: [centerX, .75, 0], distance: .94 },
+    'femur-comparison-front': { direction: [0, .03, 1], target: [0, .75, 0], distance: 1.04 },
+  };
+  if (femurPresets[name]) setIsolationMode('femur', { fit: false });
+  const preset = skeletonPresets[name] ?? femurPresets[name];
+  if (!preset) throw new Error(`Unknown review camera preset ${name}.`);
+  const direction = new THREE.Vector3(...preset.direction).normalize();
+  const target = new THREE.Vector3(...preset.target);
+  camera.position.copy(target).addScaledVector(direction, preset.distance);
   controls.target.copy(target);
   controls.update();
+  state.cameraPreset = name;
+  document.querySelector('#review-camera-select').value = name;
+  publishReviewState();
+  return captureReadyState();
+}
+
+function setFemurSide(side) {
+  if (!['left', 'right', 'both'].includes(side)) throw new Error(`Unknown femur side ${side}.`);
+  state.femurSide = side;
+  document.querySelector('#femur-side-select').value = side;
+  rebuildDisplay();
+  if (state.cameraPreset.startsWith('femur-')) setCameraPreset(state.cameraPreset);
+  return captureReadyState();
+}
+
+function setLod(lod) {
+  if (![0, 1, 2].includes(Number(lod))) throw new Error(`Unknown LOD ${lod}.`);
+  state.lod = Number(lod);
+  document.querySelector('#lod-select').value = String(state.lod);
+  rebuildDisplay();
+  renderInspector();
+  return captureReadyState();
+}
+
+function setIsolationMode(mode, { fit = true } = {}) {
+  if (!['full-body', 'femur'].includes(mode)) throw new Error(`Unknown isolation mode ${mode}.`);
+  state.isolateFemur = mode === 'femur';
+  document.querySelector('#isolate-femur').checked = state.isolateFemur;
+  rebuildDisplay();
+  if (fit) fitVisible();
+  return captureReadyState();
+}
+
+function setLabelVisibility(visible) {
+  state.showLabels = Boolean(visible);
+  document.querySelector('#show-labels').checked = state.showLabels;
+  labelsRoot.hidden = !state.showLabels;
+  publishReviewState();
+  return captureReadyState();
+}
+
+function setAxisVisibility(visible) {
+  state.showAxes = Boolean(visible);
+  document.querySelector('#show-axes').checked = state.showAxes;
+  axesRoot.visible = state.showAxes;
+  publishReviewState();
+  return captureReadyState();
+}
+
+function setJointVisibility(visible) {
+  state.showJoints = Boolean(visible);
+  document.querySelector('#show-joints').checked = state.showJoints;
+  rebuildDisplay();
+  return captureReadyState();
+}
+
+function setInspectorTab(tab) {
+  if (!['summary', 'parameters', 'mapping', 'sources'].includes(tab)) throw new Error(`Unknown inspector tab ${tab}.`);
+  state.tab = tab;
+  renderInspector();
+  publishReviewState();
+  return captureReadyState();
+}
+
+function captureReadyState() {
+  return {
+    ready: publicState.ready,
+    firstFrameRendered: publicState.firstFrameRendered,
+    variantId: state.variantId,
+    lod: state.lod,
+    femurSide: state.femurSide,
+    isolationMode: state.isolateFemur ? 'femur' : 'full-body',
+    cameraPreset: state.cameraPreset,
+    displayToggles: { labels: state.showLabels, axes: state.showAxes, joints: state.showJoints, symmetry: state.showSymmetry },
+    inspectorTab: state.tab,
+    viewport: { width: innerWidth, height: innerHeight },
+    browserUserAgent: navigator.userAgent,
+    camera: { position: camera.position.toArray(), target: controls.target.toArray(), fov: camera.fov },
+    renderedObjectCount: displayRoot.children.length,
+    renderRevision: state.renderRevision,
+    consoleErrors: [...publicState.consoleErrors],
+    pageErrors: [...publicState.pageErrors],
+    startupErrors: [...publicState.startupErrors],
+    failedRequests: [...publicState.failedRequests],
+    visualAcceptance: false,
+    productionReady: false,
+    userVisualAcceptance: 'pending',
+  };
+}
+
+function publishReviewState() {
+  if (!reviewRuntimeState || !reviewStateBadge) return;
+  const snapshot = captureReadyState();
+  reviewRuntimeState.textContent = JSON.stringify(snapshot);
+  document.documentElement.dataset.reviewViewport = `${snapshot.viewport.width}x${snapshot.viewport.height}`;
+  document.documentElement.dataset.browserUserAgent = snapshot.browserUserAgent;
+  reviewStateBadge.textContent = `${snapshot.variantId} · LOD${snapshot.lod} · ${snapshot.femurSide} · ${snapshot.isolationMode} · ${snapshot.cameraPreset} · labels ${snapshot.displayToggles.labels ? 'on' : 'off'} · axes ${snapshot.displayToggles.axes ? 'on' : 'off'} · joints ${snapshot.displayToggles.joints ? 'on' : 'off'}`;
 }
 
 function fitVisible() {
@@ -267,14 +419,17 @@ function fitVisible() {
   controls.update();
 }
 
-function resetCamera() { camera.position.set(2.45, 1.45, 2.75); controls.target.set(0, .91, 0); controls.update(); }
+function resetCamera() { setCameraPreset('skeleton-three-quarter-front'); }
 
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
   updateLabels();
   renderer.render(scene, camera);
-  publicState.firstFrameRendered = true;
+  if (!publicState.firstFrameRendered) {
+    publicState.firstFrameRendered = true;
+    publishReviewState();
+  }
 }
 
 function updateLabels() {
@@ -298,6 +453,7 @@ function onResize() {
   renderer.setSize(width, height, false);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
+  publishReviewState();
 }
 
 async function fetchJson(url, { optional = false } = {}) {
