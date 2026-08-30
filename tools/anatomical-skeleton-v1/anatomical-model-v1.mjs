@@ -267,7 +267,7 @@ function createJointSpecs(dimensions) {
       [`${side}_wrist`, `${side}_elbow`, [sign * (shoulderX + dimensions.upperArmLength + dimensions.forearmLength), clavicleY - 0.025, 0]],
       [`${side}_hand`, `${side}_wrist`, [sign * (shoulderX + dimensions.upperArmLength + dimensions.forearmLength + dimensions.handLength), clavicleY - 0.025, 0.01]],
       [`${side}_hip`, 'pelvis', [sign * pelvisX, pelvisY, 0]],
-      [`${side}_knee`, `${side}_hip`, [sign * pelvisX, pelvisY - thighLength, 0.012]],
+      [`${side}_knee`, `${side}_hip`, [sign * pelvisX, pelvisY - thighLength, 0]],
       [`${side}_ankle`, `${side}_knee`, [sign * pelvisX, pelvisY - thighLength - dimensions.calfLength, 0]],
       [`${side}_foot`, `${side}_ankle`, [sign * pelvisX, pelvisY - thighLength - dimensions.calfLength - 0.035, dimensions.footLength]],
     );

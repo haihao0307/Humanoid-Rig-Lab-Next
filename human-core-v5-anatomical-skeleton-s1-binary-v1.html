@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>HRL Anatomical Skeleton S1 — Binary Geometry Review</title>
+  <link rel="stylesheet" href="./apps/human-core-v5-anatomical-skeleton-s1-binary-v1/styles.css">
+</head>
+<body>
+  <main class="workspace">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">HUMAN CORE V5 · S1A · READ-ONLY REVIEW</p>
+        <h1>Anatomical Skeleton Binary Foundation</h1>
+      </div>
+      <div class="status-cluster">
+        <span id="ready-status" class="status">loading</span>
+        <span class="status warning">visual pending</span>
+      </div>
+    </header>
+
+    <aside class="controls panel">
+      <section>
+        <h2>Compiled variant</h2>
+        <label>Variant<select id="variant-select"></select></label>
+        <label>Femur LOD<select id="lod-select"><option value="0">LOD0</option><option value="1">LOD1</option><option value="2">LOD2</option></select></label>
+      </section>
+      <section>
+        <h2>Layers</h2>
+        <label class="check"><input id="isolate-femur" type="checkbox">Isolate femora</label>
+        <label class="check"><input id="show-axes" type="checkbox" checked>Joint local axes</label>
+        <label class="check"><input id="show-labels" type="checkbox" checked>Bone/joint names</label>
+        <label class="check"><input id="show-symmetry" type="checkbox" checked>Left/right symmetry display</label>
+      </section>
+      <section>
+        <h2>Views</h2>
+        <div class="button-grid">
+          <button data-view="front">Front</button><button data-view="side">Side</button>
+          <button data-view="back">Back</button><button data-view="three-quarter">Three-quarter</button>
+          <button id="fit-view">Fit body</button><button id="reset-view">Restore view</button>
+        </div>
+      </section>
+      <section class="legend">
+        <h2>Legend</h2>
+        <p><i class="swatch left"></i>left femur <i class="swatch right"></i>right femur</p>
+        <p><i class="axis x"></i>+X <i class="axis y"></i>+Y <i class="axis z"></i>+Z</p>
+      </section>
+    </aside>
+
+    <section class="viewport panel">
+      <div id="viewport"></div>
+      <div id="labels" aria-hidden="true"></div>
+      <div class="viewport-note">Right-handed · +Y up · +Z forward · meters · no runtime scale</div>
+    </section>
+
+    <aside class="inspector panel">
+      <nav class="tabs" aria-label="Inspector tabs">
+        <button class="active" data-tab="summary">Summary</button>
+        <button data-tab="parameters">Parameters</button>
+        <button data-tab="mapping">Rig map</button>
+        <button data-tab="sources">Sources</button>
+      </nav>
+      <div id="inspector-content"></div>
+    </aside>
+
+    <footer class="footer">
+      <span>Geometry authority: SkeletalDNA + generator version + seed + precision</span>
+      <span>HumanRigCore / finalPose access: read-only</span>
+    </footer>
+  </main>
+  <script type="module" src="./apps/human-core-v5-anatomical-skeleton-s1-binary-v1/index.js"></script>
+</body>
+</html>
