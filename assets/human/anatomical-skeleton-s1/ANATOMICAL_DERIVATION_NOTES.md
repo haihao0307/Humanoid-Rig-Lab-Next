@@ -34,14 +34,14 @@ Left/right joint centers are evaluated from the same parameter contract with exp
 
 ## Femur generator derivation
 
-`LongBoneGeneratorV1@1.1.0` produces one closed regional sweep per side and LOD with explicit lower and upper poles, independently sampled cross-section rings, project-owned triangle topology, and area-weighted normals. Its regions are parameterized as:
+`LongBoneGeneratorV1@1.2.0` produces one closed regional sweep per side and LOD with explicit lower and upper poles, independently sampled cross-section rings, project-owned triangle topology, and area-weighted normals. Its regions are parameterized as:
 
-1. distinct medial/lateral distal condylar lobes, an anterior patellar groove, and a deeper posterior intercondylar fossa;
-2. metaphyseal transition;
-3. elliptical diaphyseal shaft on a curved centerline;
-4. greater and lesser trochanter analytic bumps;
-5. a separately measurable neck axis driven by neck length, neck-shaft angle, and anteversion;
-6. an exact spherical latitude region centered on `hipJointCenter` and driven by head radius.
+1. independently scaled and length-controlled medial/lateral distal condylar regions, separate epicondyles, adductor tubercle, anterior trochlear ridges/patellar groove, and a posterior intercondylar fossa;
+2. parameterized proximal and distal metaphyseal transitions;
+3. station-driven non-circular diaphyseal cross-sections on a curved centerline, with a two-lip linea aspera and low posterior ridge;
+4. independently decayed greater-trochanter tip/crests/fossa, lesser trochanter, intertrochanteric line, and intertrochanteric crest regions;
+5. an elliptical neck with separately controlled superior/inferior/anterior/posterior edges and a measurable neck axis driven by length, neck-shaft angle, and anteversion;
+6. a mildly ellipsoidal head centered on `hipJointCenter`, with an optional shallow posteroinferior fovea.
 
 Femoral anteversion rotates the neck axis anteriorly relative to the side-specific medial axis. The right side executes the same formula with right-side signs and its own output buffers; it is not a mirrored mesh.
 
@@ -49,9 +49,9 @@ LOD sampling is fixed by generator version:
 
 | LOD | Longitudinal segments | Radial segments |
 | ---: | ---: | ---: |
-| 0 | 104 plus bounded surface-detail rows | 40 |
-| 1 | 64 | 28 |
-| 2 | 40 | 20 |
+| 0 | 96 | 48 |
+| 1 | 64 | 32 |
+| 2 | 40 | 24 |
 
 ## Reference normalization
 
@@ -60,8 +60,10 @@ LOD sampling is fixed by generator version:
 - Distal AP/ML defaults are the arithmetic means of the reported male and female means in the 100-subject Malay cohort, converted to meters.
 - Femoral version `11.0°` and neck-shaft angle `129.9°` use the reported means from the 1,576-hip CT cohort.
 - OpenStax lower-limb anatomy fixes the qualitative regional relationships: rounded head, narrowed neck, lateral greater trochanter, medial lesser trochanter, anterior patellar surface, and posterior intercondylar fossa.
-- Terzidis et al. define bicondylar width, separate medial/lateral condylar depth, intercondylar width, and intercondylar depth. S1A.3 uses these definitions for audit semantics without reconstructing study geometry.
-- Iranpour et al. describe the trochlear groove as a distinct curved path between medial and lateral trochlear surfaces. S1A.3 uses only this relational shape constraint; no CT points or surface topology are consumed.
+- Terzidis et al. define bicondylar width, separate medial/lateral condylar depth, intercondylar width, and intercondylar depth. S1A.4 uses these definitions for audit semantics without reconstructing study geometry.
+- Iranpour et al. describe the trochlear groove as a distinct curved path between medial and lateral trochlear surfaces. S1A.4 uses only this relational shape constraint; no CT points or surface topology are consumed.
+- Ceynowa et al. place the fovea capitis inferior to the neck axis and slightly posterior. S1A.4 uses only this relationship for an optional shallow analytic depression.
+- Abdelaal et al. describe the linea aspera as a posterior longitudinal crest with medial and lateral lips and report that its rotation varies. S1A.4 generates two bounded analytic lips at a neutral pilot orientation; no study surface is reconstructed.
 
 ## Pending parameters
 

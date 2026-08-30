@@ -26,7 +26,7 @@
   "leftRightAsymmetry": 0,
   "globalDetailLevel": 2,
   "variantId": "long_femur_plus_08_percent",
-  "generatorVersion": "anatomical-skeleton-s1@1.1.0",
+  "generatorVersion": "anatomical-skeleton-s1@1.2.0",
   "boneParameters": [
     {
       "boneId": "pelvis",
@@ -901,7 +901,7 @@
     },
     {
       "boneId": "left_femur",
-      "generatorType": "LongBoneGeneratorV1@1.1.0",
+      "generatorType": "LongBoneGeneratorV1@1.2.0",
       "side": "left",
       "length": 0.4334399700164795,
       "centerline": [
@@ -959,6 +959,7 @@
       },
       "proximalEnd": {
         "headRadius": 0.022,
+        "headEllipsoidRatio": 1.025,
         "neckLength": 0.04475,
         "neckShaftAngle": 129.9,
         "greaterTrochanterSize": 0.018,
@@ -967,39 +968,91 @@
       "distalEnd": {
         "distalCondyleWidth": 0.06972,
         "distalCondyleDepth": 0.06068,
-        "intercondylarNotchWidth": 0.018
+        "intercondylarNotchWidth": 0.018,
+        "intercondylarFossaWidth": 0.02
       },
       "articularSurfaces": [
         {
           "id": "left_femoral_head_surface",
-          "kind": "spherical-pilot"
+          "kind": "ellipsoidal-with-fovea"
         },
         {
           "id": "left_distal_condylar_surface",
-          "kind": "paired-condyle-pilot"
+          "kind": "asymmetric-paired-condyles-with-trochlea"
         }
       ],
       "landmarks": [
         {
-          "landmarkId": "left_femur_head_center"
+          "landmarkId": "left_femur_head_center",
+          "classification": "joint_center_candidate"
         },
         {
-          "landmarkId": "left_femur_neck_center"
+          "landmarkId": "left_femur_neck_center",
+          "classification": "axis_candidate"
         },
         {
-          "landmarkId": "left_femur_greater_trochanter"
+          "landmarkId": "left_femur_greater_trochanter",
+          "classification": "surface_anatomical_landmark"
         },
         {
-          "landmarkId": "left_femur_lesser_trochanter"
+          "landmarkId": "left_femur_lesser_trochanter",
+          "classification": "surface_anatomical_landmark"
         },
         {
-          "landmarkId": "left_femur_medial_condyle"
+          "landmarkId": "left_femur_medial_condyle",
+          "classification": "lod_review_landmark"
         },
         {
-          "landmarkId": "left_femur_lateral_condyle"
+          "landmarkId": "left_femur_lateral_condyle",
+          "classification": "lod_review_landmark"
         },
         {
-          "landmarkId": "left_femur_intercondylar_notch"
+          "landmarkId": "left_femur_intercondylar_notch",
+          "classification": "derived_internal_point"
+        },
+        {
+          "landmarkId": "left_femur_greater_trochanter_tip",
+          "classification": "lod_review_landmark"
+        },
+        {
+          "landmarkId": "left_femur_trochanteric_fossa",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "left_femur_linea_aspera",
+          "classification": "lod_review_landmark"
+        },
+        {
+          "landmarkId": "left_femur_medial_epicondyle",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "left_femur_lateral_epicondyle",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "left_femur_adductor_tubercle",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "left_femur_intercondylar_fossa",
+          "classification": "lod_review_landmark"
+        },
+        {
+          "landmarkId": "left_femur_patellar_surface",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "left_femur_medial_trochlear_ridge",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "left_femur_lateral_trochlear_ridge",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "left_femur_patellar_groove",
+          "classification": "lod_review_landmark"
         }
       ],
       "corticalThickness": 0.0045,
@@ -1046,6 +1099,73 @@
           "default": 0.022,
           "units": "meter"
         },
+        "shaftCrossSectionStations": {
+          "minimumStations": 5,
+          "maximumStations": 12,
+          "default": [
+            {
+              "t": 0.17,
+              "medialLateralRadius": 0.02,
+              "anteriorPosteriorRadius": 0.018,
+              "triangularity": 0.03
+            },
+            {
+              "t": 0.28,
+              "medialLateralRadius": 0.0158,
+              "anteriorPosteriorRadius": 0.0142,
+              "triangularity": 0.08
+            },
+            {
+              "t": 0.46,
+              "medialLateralRadius": 0.0152,
+              "anteriorPosteriorRadius": 0.0138,
+              "triangularity": 0.13
+            },
+            {
+              "t": 0.62,
+              "medialLateralRadius": 0.0162,
+              "anteriorPosteriorRadius": 0.0146,
+              "triangularity": 0.09
+            },
+            {
+              "t": 0.7,
+              "medialLateralRadius": 0.019,
+              "anteriorPosteriorRadius": 0.0175,
+              "triangularity": 0.04
+            }
+          ],
+          "units": "station-array"
+        },
+        "shaftPosteriorRidge": {
+          "minimum": 0,
+          "maximum": 0.004,
+          "default": 0.001,
+          "units": "meter"
+        },
+        "lineaAsperaHeight": {
+          "minimum": 0,
+          "maximum": 0.004,
+          "default": 0.0018,
+          "units": "meter"
+        },
+        "lineaAsperaWidth": {
+          "minimum": 0.06,
+          "maximum": 0.32,
+          "default": 0.14,
+          "units": "radian"
+        },
+        "proximalMetaphysisBlend": {
+          "minimum": 0.2,
+          "maximum": 0.36,
+          "default": 0.3,
+          "units": "ratio"
+        },
+        "distalMetaphysisBlend": {
+          "minimum": 0.12,
+          "maximum": 0.24,
+          "default": 0.17,
+          "units": "ratio"
+        },
         "neckLength": {
           "minimum": 0.03,
           "maximum": 0.065,
@@ -1058,6 +1178,60 @@
           "default": 129.9,
           "units": "degree"
         },
+        "headEllipsoidRatio": {
+          "minimum": 0.94,
+          "maximum": 1.08,
+          "default": 1.025,
+          "units": "ratio"
+        },
+        "headFoveaDepth": {
+          "minimum": 0,
+          "maximum": 0.003,
+          "default": 0.0014,
+          "units": "meter"
+        },
+        "headFoveaRadius": {
+          "minimum": 0.003,
+          "maximum": 0.009,
+          "default": 0.006,
+          "units": "meter"
+        },
+        "neckCrossSectionMajor": {
+          "minimum": 0.009,
+          "maximum": 0.017,
+          "default": 0.0125,
+          "units": "meter"
+        },
+        "neckCrossSectionMinor": {
+          "minimum": 0.008,
+          "maximum": 0.015,
+          "default": 0.0102,
+          "units": "meter"
+        },
+        "neckSuperiorEdge": {
+          "minimum": -0.002,
+          "maximum": 0.003,
+          "default": 0.0008,
+          "units": "meter"
+        },
+        "neckInferiorEdge": {
+          "minimum": -0.002,
+          "maximum": 0.003,
+          "default": -0.0003,
+          "units": "meter"
+        },
+        "neckAnteriorEdge": {
+          "minimum": -0.002,
+          "maximum": 0.003,
+          "default": 0.0005,
+          "units": "meter"
+        },
+        "neckPosteriorEdge": {
+          "minimum": -0.002,
+          "maximum": 0.003,
+          "default": -0.0002,
+          "units": "meter"
+        },
         "femoralAnteversion": {
           "minimum": -12,
           "maximum": 38.4,
@@ -1068,6 +1242,42 @@
           "minimum": 0.01,
           "maximum": 0.03,
           "default": 0.018,
+          "units": "meter"
+        },
+        "greaterTrochanterTipHeight": {
+          "minimum": 0,
+          "maximum": 0.01,
+          "default": 0.0055,
+          "units": "meter"
+        },
+        "greaterTrochanterAnteriorCrest": {
+          "minimum": 0,
+          "maximum": 0.007,
+          "default": 0.003,
+          "units": "meter"
+        },
+        "greaterTrochanterPosteriorCrest": {
+          "minimum": 0,
+          "maximum": 0.007,
+          "default": 0.0035,
+          "units": "meter"
+        },
+        "trochantericFossaDepth": {
+          "minimum": 0,
+          "maximum": 0.006,
+          "default": 0.003,
+          "units": "meter"
+        },
+        "intertrochantericLineHeight": {
+          "minimum": 0,
+          "maximum": 0.004,
+          "default": 0.0012,
+          "units": "meter"
+        },
+        "intertrochantericCrestHeight": {
+          "minimum": 0,
+          "maximum": 0.004,
+          "default": 0.0015,
           "units": "meter"
         },
         "lesserTrochanterSize": {
@@ -1092,6 +1302,96 @@
           "minimum": 0.01,
           "maximum": 0.028,
           "default": 0.018,
+          "units": "meter"
+        },
+        "medialCondyleScale": {
+          "minimum": 0.85,
+          "maximum": 1.15,
+          "default": 1.04,
+          "units": "ratio"
+        },
+        "lateralCondyleScale": {
+          "minimum": 0.85,
+          "maximum": 1.15,
+          "default": 0.98,
+          "units": "ratio"
+        },
+        "medialCondylePosteriorLength": {
+          "minimum": 0,
+          "maximum": 0.012,
+          "default": 0.0048,
+          "units": "meter"
+        },
+        "lateralCondylePosteriorLength": {
+          "minimum": 0,
+          "maximum": 0.012,
+          "default": 0.0054,
+          "units": "meter"
+        },
+        "medialCondyleDistalOffset": {
+          "minimum": -0.006,
+          "maximum": 0.006,
+          "default": -0.001,
+          "units": "meter"
+        },
+        "lateralCondyleDistalOffset": {
+          "minimum": -0.006,
+          "maximum": 0.006,
+          "default": 0,
+          "units": "meter"
+        },
+        "medialEpicondyleSize": {
+          "minimum": 0,
+          "maximum": 0.009,
+          "default": 0.0042,
+          "units": "meter"
+        },
+        "lateralEpicondyleSize": {
+          "minimum": 0,
+          "maximum": 0.009,
+          "default": 0.0037,
+          "units": "meter"
+        },
+        "adductorTubercleSize": {
+          "minimum": 0,
+          "maximum": 0.008,
+          "default": 0.0035,
+          "units": "meter"
+        },
+        "intercondylarFossaWidth": {
+          "minimum": 0.012,
+          "maximum": 0.032,
+          "default": 0.02,
+          "units": "meter"
+        },
+        "intercondylarFossaDepth": {
+          "minimum": 0.002,
+          "maximum": 0.014,
+          "default": 0.007,
+          "units": "meter"
+        },
+        "patellarSurfaceDepth": {
+          "minimum": 0,
+          "maximum": 0.006,
+          "default": 0.002,
+          "units": "meter"
+        },
+        "medialTrochlearRidgeHeight": {
+          "minimum": 0,
+          "maximum": 0.009,
+          "default": 0.0038,
+          "units": "meter"
+        },
+        "lateralTrochlearRidgeHeight": {
+          "minimum": 0,
+          "maximum": 0.009,
+          "default": 0.005,
+          "units": "meter"
+        },
+        "patellarGrooveDepth": {
+          "minimum": 0.001,
+          "maximum": 0.01,
+          "default": 0.0045,
           "units": "meter"
         },
         "corticalThickness": {
@@ -1141,24 +1441,94 @@
         "shaftMedialLateralBow": 0.0035,
         "shaftCrossSectionMajor": 0.0155,
         "shaftCrossSectionMinor": 0.0135,
+        "shaftCrossSectionStations": [
+          {
+            "t": 0.17,
+            "medialLateralRadius": 0.02,
+            "anteriorPosteriorRadius": 0.018,
+            "triangularity": 0.03
+          },
+          {
+            "t": 0.28,
+            "medialLateralRadius": 0.0158,
+            "anteriorPosteriorRadius": 0.0142,
+            "triangularity": 0.08
+          },
+          {
+            "t": 0.46,
+            "medialLateralRadius": 0.0152,
+            "anteriorPosteriorRadius": 0.0138,
+            "triangularity": 0.13
+          },
+          {
+            "t": 0.62,
+            "medialLateralRadius": 0.0162,
+            "anteriorPosteriorRadius": 0.0146,
+            "triangularity": 0.09
+          },
+          {
+            "t": 0.7,
+            "medialLateralRadius": 0.019,
+            "anteriorPosteriorRadius": 0.0175,
+            "triangularity": 0.04
+          }
+        ],
+        "shaftPosteriorRidge": 0.001,
+        "lineaAsperaHeight": 0.0018,
+        "lineaAsperaWidth": 0.14,
+        "proximalMetaphysisBlend": 0.3,
+        "distalMetaphysisBlend": 0.17,
         "headRadius": 0.022,
         "neckLength": 0.04475,
         "neckShaftAngle": 129.9,
         "femoralAnteversion": 11,
+        "headEllipsoidRatio": 1.025,
+        "headFoveaDepth": 0.0014,
+        "headFoveaRadius": 0.006,
+        "neckCrossSectionMajor": 0.0125,
+        "neckCrossSectionMinor": 0.0102,
+        "neckSuperiorEdge": 0.0008,
+        "neckInferiorEdge": -0.0003,
+        "neckAnteriorEdge": 0.0005,
+        "neckPosteriorEdge": -0.0002,
         "greaterTrochanterSize": 0.018,
         "lesserTrochanterSize": 0.01,
         "distalCondyleWidth": 0.06972,
         "distalCondyleDepth": 0.06068,
+        "greaterTrochanterTipHeight": 0.0055,
+        "greaterTrochanterAnteriorCrest": 0.003,
+        "greaterTrochanterPosteriorCrest": 0.0035,
+        "trochantericFossaDepth": 0.003,
+        "intertrochantericLineHeight": 0.0012,
+        "intertrochantericCrestHeight": 0.0015,
         "intercondylarNotchWidth": 0.018,
         "corticalThickness": 0.0045,
         "surfaceDetail": 0.6,
-        "leftRightAsymmetry": 0
+        "leftRightAsymmetry": 0,
+        "medialCondyleScale": 1.04,
+        "lateralCondyleScale": 0.98,
+        "medialCondylePosteriorLength": 0.0048,
+        "lateralCondylePosteriorLength": 0.0054,
+        "medialCondyleDistalOffset": -0.001,
+        "lateralCondyleDistalOffset": 0,
+        "medialEpicondyleSize": 0.0042,
+        "lateralEpicondyleSize": 0.0037,
+        "adductorTubercleSize": 0.0035,
+        "intercondylarFossaWidth": 0.02,
+        "intercondylarFossaDepth": 0.007,
+        "patellarSurfaceDepth": 0.002,
+        "medialTrochlearRidgeHeight": 0.0038,
+        "lateralTrochlearRidgeHeight": 0.005,
+        "patellarGrooveDepth": 0.0045
       },
       "sourceReceiptIds": [
         "verma-proximal-femur-2017",
         "thiesen-femoral-antecurvation-2018",
         "hussain-distal-femur-2013",
         "meier-hip-morphology-2022",
+        "ceynowa-fovea-capitis-2019",
+        "abdelaal-linea-aspera-2016",
+        "iranpour-trochlear-groove-2010",
         "openstax-long-bone-2022",
         "hrl-femur-pilot-detail-pending"
       ],
@@ -1702,7 +2072,7 @@
     },
     {
       "boneId": "right_femur",
-      "generatorType": "LongBoneGeneratorV1@1.1.0",
+      "generatorType": "LongBoneGeneratorV1@1.2.0",
       "side": "right",
       "length": 0.4334399700164795,
       "centerline": [
@@ -1760,6 +2130,7 @@
       },
       "proximalEnd": {
         "headRadius": 0.022,
+        "headEllipsoidRatio": 1.025,
         "neckLength": 0.04475,
         "neckShaftAngle": 129.9,
         "greaterTrochanterSize": 0.018,
@@ -1768,39 +2139,91 @@
       "distalEnd": {
         "distalCondyleWidth": 0.06972,
         "distalCondyleDepth": 0.06068,
-        "intercondylarNotchWidth": 0.018
+        "intercondylarNotchWidth": 0.018,
+        "intercondylarFossaWidth": 0.02
       },
       "articularSurfaces": [
         {
           "id": "right_femoral_head_surface",
-          "kind": "spherical-pilot"
+          "kind": "ellipsoidal-with-fovea"
         },
         {
           "id": "right_distal_condylar_surface",
-          "kind": "paired-condyle-pilot"
+          "kind": "asymmetric-paired-condyles-with-trochlea"
         }
       ],
       "landmarks": [
         {
-          "landmarkId": "right_femur_head_center"
+          "landmarkId": "right_femur_head_center",
+          "classification": "joint_center_candidate"
         },
         {
-          "landmarkId": "right_femur_neck_center"
+          "landmarkId": "right_femur_neck_center",
+          "classification": "axis_candidate"
         },
         {
-          "landmarkId": "right_femur_greater_trochanter"
+          "landmarkId": "right_femur_greater_trochanter",
+          "classification": "surface_anatomical_landmark"
         },
         {
-          "landmarkId": "right_femur_lesser_trochanter"
+          "landmarkId": "right_femur_lesser_trochanter",
+          "classification": "surface_anatomical_landmark"
         },
         {
-          "landmarkId": "right_femur_medial_condyle"
+          "landmarkId": "right_femur_medial_condyle",
+          "classification": "lod_review_landmark"
         },
         {
-          "landmarkId": "right_femur_lateral_condyle"
+          "landmarkId": "right_femur_lateral_condyle",
+          "classification": "lod_review_landmark"
         },
         {
-          "landmarkId": "right_femur_intercondylar_notch"
+          "landmarkId": "right_femur_intercondylar_notch",
+          "classification": "derived_internal_point"
+        },
+        {
+          "landmarkId": "right_femur_greater_trochanter_tip",
+          "classification": "lod_review_landmark"
+        },
+        {
+          "landmarkId": "right_femur_trochanteric_fossa",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "right_femur_linea_aspera",
+          "classification": "lod_review_landmark"
+        },
+        {
+          "landmarkId": "right_femur_medial_epicondyle",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "right_femur_lateral_epicondyle",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "right_femur_adductor_tubercle",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "right_femur_intercondylar_fossa",
+          "classification": "lod_review_landmark"
+        },
+        {
+          "landmarkId": "right_femur_patellar_surface",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "right_femur_medial_trochlear_ridge",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "right_femur_lateral_trochlear_ridge",
+          "classification": "surface_anatomical_landmark"
+        },
+        {
+          "landmarkId": "right_femur_patellar_groove",
+          "classification": "lod_review_landmark"
         }
       ],
       "corticalThickness": 0.0045,
@@ -1847,6 +2270,73 @@
           "default": 0.022,
           "units": "meter"
         },
+        "shaftCrossSectionStations": {
+          "minimumStations": 5,
+          "maximumStations": 12,
+          "default": [
+            {
+              "t": 0.17,
+              "medialLateralRadius": 0.02,
+              "anteriorPosteriorRadius": 0.018,
+              "triangularity": 0.03
+            },
+            {
+              "t": 0.28,
+              "medialLateralRadius": 0.0158,
+              "anteriorPosteriorRadius": 0.0142,
+              "triangularity": 0.08
+            },
+            {
+              "t": 0.46,
+              "medialLateralRadius": 0.0152,
+              "anteriorPosteriorRadius": 0.0138,
+              "triangularity": 0.13
+            },
+            {
+              "t": 0.62,
+              "medialLateralRadius": 0.0162,
+              "anteriorPosteriorRadius": 0.0146,
+              "triangularity": 0.09
+            },
+            {
+              "t": 0.7,
+              "medialLateralRadius": 0.019,
+              "anteriorPosteriorRadius": 0.0175,
+              "triangularity": 0.04
+            }
+          ],
+          "units": "station-array"
+        },
+        "shaftPosteriorRidge": {
+          "minimum": 0,
+          "maximum": 0.004,
+          "default": 0.001,
+          "units": "meter"
+        },
+        "lineaAsperaHeight": {
+          "minimum": 0,
+          "maximum": 0.004,
+          "default": 0.0018,
+          "units": "meter"
+        },
+        "lineaAsperaWidth": {
+          "minimum": 0.06,
+          "maximum": 0.32,
+          "default": 0.14,
+          "units": "radian"
+        },
+        "proximalMetaphysisBlend": {
+          "minimum": 0.2,
+          "maximum": 0.36,
+          "default": 0.3,
+          "units": "ratio"
+        },
+        "distalMetaphysisBlend": {
+          "minimum": 0.12,
+          "maximum": 0.24,
+          "default": 0.17,
+          "units": "ratio"
+        },
         "neckLength": {
           "minimum": 0.03,
           "maximum": 0.065,
@@ -1859,6 +2349,60 @@
           "default": 129.9,
           "units": "degree"
         },
+        "headEllipsoidRatio": {
+          "minimum": 0.94,
+          "maximum": 1.08,
+          "default": 1.025,
+          "units": "ratio"
+        },
+        "headFoveaDepth": {
+          "minimum": 0,
+          "maximum": 0.003,
+          "default": 0.0014,
+          "units": "meter"
+        },
+        "headFoveaRadius": {
+          "minimum": 0.003,
+          "maximum": 0.009,
+          "default": 0.006,
+          "units": "meter"
+        },
+        "neckCrossSectionMajor": {
+          "minimum": 0.009,
+          "maximum": 0.017,
+          "default": 0.0125,
+          "units": "meter"
+        },
+        "neckCrossSectionMinor": {
+          "minimum": 0.008,
+          "maximum": 0.015,
+          "default": 0.0102,
+          "units": "meter"
+        },
+        "neckSuperiorEdge": {
+          "minimum": -0.002,
+          "maximum": 0.003,
+          "default": 0.0008,
+          "units": "meter"
+        },
+        "neckInferiorEdge": {
+          "minimum": -0.002,
+          "maximum": 0.003,
+          "default": -0.0003,
+          "units": "meter"
+        },
+        "neckAnteriorEdge": {
+          "minimum": -0.002,
+          "maximum": 0.003,
+          "default": 0.0005,
+          "units": "meter"
+        },
+        "neckPosteriorEdge": {
+          "minimum": -0.002,
+          "maximum": 0.003,
+          "default": -0.0002,
+          "units": "meter"
+        },
         "femoralAnteversion": {
           "minimum": -12,
           "maximum": 38.4,
@@ -1869,6 +2413,42 @@
           "minimum": 0.01,
           "maximum": 0.03,
           "default": 0.018,
+          "units": "meter"
+        },
+        "greaterTrochanterTipHeight": {
+          "minimum": 0,
+          "maximum": 0.01,
+          "default": 0.0055,
+          "units": "meter"
+        },
+        "greaterTrochanterAnteriorCrest": {
+          "minimum": 0,
+          "maximum": 0.007,
+          "default": 0.003,
+          "units": "meter"
+        },
+        "greaterTrochanterPosteriorCrest": {
+          "minimum": 0,
+          "maximum": 0.007,
+          "default": 0.0035,
+          "units": "meter"
+        },
+        "trochantericFossaDepth": {
+          "minimum": 0,
+          "maximum": 0.006,
+          "default": 0.003,
+          "units": "meter"
+        },
+        "intertrochantericLineHeight": {
+          "minimum": 0,
+          "maximum": 0.004,
+          "default": 0.0012,
+          "units": "meter"
+        },
+        "intertrochantericCrestHeight": {
+          "minimum": 0,
+          "maximum": 0.004,
+          "default": 0.0015,
           "units": "meter"
         },
         "lesserTrochanterSize": {
@@ -1893,6 +2473,96 @@
           "minimum": 0.01,
           "maximum": 0.028,
           "default": 0.018,
+          "units": "meter"
+        },
+        "medialCondyleScale": {
+          "minimum": 0.85,
+          "maximum": 1.15,
+          "default": 1.04,
+          "units": "ratio"
+        },
+        "lateralCondyleScale": {
+          "minimum": 0.85,
+          "maximum": 1.15,
+          "default": 0.98,
+          "units": "ratio"
+        },
+        "medialCondylePosteriorLength": {
+          "minimum": 0,
+          "maximum": 0.012,
+          "default": 0.0048,
+          "units": "meter"
+        },
+        "lateralCondylePosteriorLength": {
+          "minimum": 0,
+          "maximum": 0.012,
+          "default": 0.0054,
+          "units": "meter"
+        },
+        "medialCondyleDistalOffset": {
+          "minimum": -0.006,
+          "maximum": 0.006,
+          "default": -0.001,
+          "units": "meter"
+        },
+        "lateralCondyleDistalOffset": {
+          "minimum": -0.006,
+          "maximum": 0.006,
+          "default": 0,
+          "units": "meter"
+        },
+        "medialEpicondyleSize": {
+          "minimum": 0,
+          "maximum": 0.009,
+          "default": 0.0042,
+          "units": "meter"
+        },
+        "lateralEpicondyleSize": {
+          "minimum": 0,
+          "maximum": 0.009,
+          "default": 0.0037,
+          "units": "meter"
+        },
+        "adductorTubercleSize": {
+          "minimum": 0,
+          "maximum": 0.008,
+          "default": 0.0035,
+          "units": "meter"
+        },
+        "intercondylarFossaWidth": {
+          "minimum": 0.012,
+          "maximum": 0.032,
+          "default": 0.02,
+          "units": "meter"
+        },
+        "intercondylarFossaDepth": {
+          "minimum": 0.002,
+          "maximum": 0.014,
+          "default": 0.007,
+          "units": "meter"
+        },
+        "patellarSurfaceDepth": {
+          "minimum": 0,
+          "maximum": 0.006,
+          "default": 0.002,
+          "units": "meter"
+        },
+        "medialTrochlearRidgeHeight": {
+          "minimum": 0,
+          "maximum": 0.009,
+          "default": 0.0038,
+          "units": "meter"
+        },
+        "lateralTrochlearRidgeHeight": {
+          "minimum": 0,
+          "maximum": 0.009,
+          "default": 0.005,
+          "units": "meter"
+        },
+        "patellarGrooveDepth": {
+          "minimum": 0.001,
+          "maximum": 0.01,
+          "default": 0.0045,
           "units": "meter"
         },
         "corticalThickness": {
@@ -1942,24 +2612,94 @@
         "shaftMedialLateralBow": 0.0035,
         "shaftCrossSectionMajor": 0.0155,
         "shaftCrossSectionMinor": 0.0135,
+        "shaftCrossSectionStations": [
+          {
+            "t": 0.17,
+            "medialLateralRadius": 0.02,
+            "anteriorPosteriorRadius": 0.018,
+            "triangularity": 0.03
+          },
+          {
+            "t": 0.28,
+            "medialLateralRadius": 0.0158,
+            "anteriorPosteriorRadius": 0.0142,
+            "triangularity": 0.08
+          },
+          {
+            "t": 0.46,
+            "medialLateralRadius": 0.0152,
+            "anteriorPosteriorRadius": 0.0138,
+            "triangularity": 0.13
+          },
+          {
+            "t": 0.62,
+            "medialLateralRadius": 0.0162,
+            "anteriorPosteriorRadius": 0.0146,
+            "triangularity": 0.09
+          },
+          {
+            "t": 0.7,
+            "medialLateralRadius": 0.019,
+            "anteriorPosteriorRadius": 0.0175,
+            "triangularity": 0.04
+          }
+        ],
+        "shaftPosteriorRidge": 0.001,
+        "lineaAsperaHeight": 0.0018,
+        "lineaAsperaWidth": 0.14,
+        "proximalMetaphysisBlend": 0.3,
+        "distalMetaphysisBlend": 0.17,
         "headRadius": 0.022,
         "neckLength": 0.04475,
         "neckShaftAngle": 129.9,
         "femoralAnteversion": 11,
+        "headEllipsoidRatio": 1.025,
+        "headFoveaDepth": 0.0014,
+        "headFoveaRadius": 0.006,
+        "neckCrossSectionMajor": 0.0125,
+        "neckCrossSectionMinor": 0.0102,
+        "neckSuperiorEdge": 0.0008,
+        "neckInferiorEdge": -0.0003,
+        "neckAnteriorEdge": 0.0005,
+        "neckPosteriorEdge": -0.0002,
         "greaterTrochanterSize": 0.018,
         "lesserTrochanterSize": 0.01,
         "distalCondyleWidth": 0.06972,
         "distalCondyleDepth": 0.06068,
+        "greaterTrochanterTipHeight": 0.0055,
+        "greaterTrochanterAnteriorCrest": 0.003,
+        "greaterTrochanterPosteriorCrest": 0.0035,
+        "trochantericFossaDepth": 0.003,
+        "intertrochantericLineHeight": 0.0012,
+        "intertrochantericCrestHeight": 0.0015,
         "intercondylarNotchWidth": 0.018,
         "corticalThickness": 0.0045,
         "surfaceDetail": 0.6,
-        "leftRightAsymmetry": 0
+        "leftRightAsymmetry": 0,
+        "medialCondyleScale": 1.04,
+        "lateralCondyleScale": 0.98,
+        "medialCondylePosteriorLength": 0.0048,
+        "lateralCondylePosteriorLength": 0.0054,
+        "medialCondyleDistalOffset": -0.001,
+        "lateralCondyleDistalOffset": 0,
+        "medialEpicondyleSize": 0.0042,
+        "lateralEpicondyleSize": 0.0037,
+        "adductorTubercleSize": 0.0035,
+        "intercondylarFossaWidth": 0.02,
+        "intercondylarFossaDepth": 0.007,
+        "patellarSurfaceDepth": 0.002,
+        "medialTrochlearRidgeHeight": 0.0038,
+        "lateralTrochlearRidgeHeight": 0.005,
+        "patellarGrooveDepth": 0.0045
       },
       "sourceReceiptIds": [
         "verma-proximal-femur-2017",
         "thiesen-femoral-antecurvation-2018",
         "hussain-distal-femur-2013",
         "meier-hip-morphology-2022",
+        "ceynowa-fovea-capitis-2019",
+        "abdelaal-linea-aspera-2016",
+        "iranpour-trochlear-groove-2010",
         "openstax-long-bone-2022",
         "hrl-femur-pilot-detail-pending"
       ],
@@ -2107,6 +2847,9 @@
     "thiesen-femoral-antecurvation-2018",
     "hussain-distal-femur-2013",
     "meier-hip-morphology-2022",
+    "ceynowa-fovea-capitis-2019",
+    "abdelaal-linea-aspera-2016",
+    "iranpour-trochlear-groove-2010",
     "hrl-femur-pilot-detail-pending"
   ]
 }

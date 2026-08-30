@@ -1,9 +1,9 @@
 export const LONG_BONE_GENERATOR_V1_ID = 'LongBoneGeneratorV1@1.2.0';
 
 export const FEMUR_LOD_SPECS_V1 = Object.freeze({
-  0: Object.freeze({ longitudinalSegments: 104, radialSegments: 40 }),
-  1: Object.freeze({ longitudinalSegments: 64, radialSegments: 28 }),
-  2: Object.freeze({ longitudinalSegments: 40, radialSegments: 20 }),
+  0: Object.freeze({ longitudinalSegments: 96, radialSegments: 48 }),
+  1: Object.freeze({ longitudinalSegments: 64, radialSegments: 32 }),
+  2: Object.freeze({ longitudinalSegments: 40, radialSegments: 24 }),
 });
 
 const REQUIRED_PARAMETERS = Object.freeze([
@@ -30,7 +30,7 @@ const REQUIRED_PARAMETERS = Object.freeze([
 export function generateFemurV1(parameters, { side, lod = 0, hipJointCenter = [0, 0, 0] } = {}) {
   validateParameters(parameters, side, lod, hipJointCenter);
   const spec = FEMUR_LOD_SPECS_V1[lod];
-  const longitudinalSegments = Math.max(spec.longitudinalSegments, spec.longitudinalSegments + Math.round(parameters.surfaceDetail * (lod === 0 ? 4 : 0)));
+  const longitudinalSegments = spec.longitudinalSegments;
   const radialSegments = spec.radialSegments;
   const positions = [];
   const indices = [];
@@ -144,26 +144,26 @@ export function getFemurMeasurementFrameV1(parameters, { side, hipJointCenter = 
     neckCenter: mix3(anatomy.neckBase, anatomy.headAttach, 0.5).map(Math.fround),
     neckAxis: anatomy.neckAxis.map(Math.fround),
     shaftAxisToDistal: normalize3(subtract3(centerlinePoint(parameters, side, 0.24, hipJointCenter), centerlinePoint(parameters, side, 0.68, hipJointCenter))).map(Math.fround),
-    greaterTrochanter: surface(0.765, lateral),
-    greaterTrochanterTip: surface(0.79, lateral),
-    lesserTrochanter: surface(0.715, normalize3(add3(scale3(medial, 0.68), scale3(posterior, 0.74)))),
-    trochantericFossa: surface(0.755, normalize3(add3(scale3(lateral, 0.35), scale3(posterior, 0.94)))),
-    lineaAspera: surface(0.46, posterior),
-    medialCondyle: surface(0.075, medial),
-    lateralCondyle: surface(0.075, lateral),
-    intercondylarNotch: surface(0.072, posterior),
+    greaterTrochanter: surface(0.75, lateral),
+    greaterTrochanterTip: surface(0.78125, lateral),
+    lesserTrochanter: surface(0.71875, normalize3(add3(scale3(medial, 0.68), scale3(posterior, 0.74)))),
+    trochantericFossa: surface(0.75, normalize3(add3(scale3(lateral, 0.35), scale3(posterior, 0.94)))),
+    lineaAspera: surface(0.46875, posterior),
+    medialCondyle: surface(0.0625, medial),
+    lateralCondyle: surface(0.0625, lateral),
+    intercondylarNotch: surface(0.0625, posterior),
     medialEpicondyle: surface(0.125, medial),
     lateralEpicondyle: surface(0.125, lateral),
-    adductorTubercle: surface(0.145, normalize3(add3(scale3(medial, 0.86), scale3(posterior, 0.5)))),
-    intercondylarFossa: surface(0.074, posterior),
-    patellarGroove: surface(0.078, anterior),
-    patellarSurface: surface(0.09, anterior),
-    medialTrochlearRidge: surface(0.09, normalize3(add3(scale3(medial, 0.46), scale3(anterior, 0.89)))),
-    lateralTrochlearRidge: surface(0.09, normalize3(add3(scale3(lateral, 0.46), scale3(anterior, 0.89)))),
-    posteriorCondyleMedial: surface(0.072, normalize3(add3(scale3(medial, 0.62), scale3(posterior, 0.78)))),
-    posteriorCondyleLateral: surface(0.072, normalize3(add3(scale3(lateral, 0.62), scale3(posterior, 0.78)))),
-    anteriorCondyleMedial: surface(0.078, normalize3(add3(scale3(medial, 0.58), scale3(anterior, 0.82)))),
-    anteriorCondyleLateral: surface(0.078, normalize3(add3(scale3(lateral, 0.58), scale3(anterior, 0.82)))),
+    adductorTubercle: surface(0.15625, normalize3(add3(scale3(medial, 0.86), scale3(posterior, 0.5)))),
+    intercondylarFossa: surface(0.0625, posterior),
+    patellarGroove: surface(0.09375, anterior),
+    patellarSurface: surface(0.09375, anterior),
+    medialTrochlearRidge: surface(0.09375, normalize3(add3(scale3(medial, 0.382683), scale3(anterior, 0.92388)))),
+    lateralTrochlearRidge: surface(0.09375, normalize3(add3(scale3(lateral, 0.382683), scale3(anterior, 0.92388)))),
+    posteriorCondyleMedial: surface(0.0625, normalize3(add3(scale3(medial, 0.608761), scale3(posterior, 0.793353)))),
+    posteriorCondyleLateral: surface(0.0625, normalize3(add3(scale3(lateral, 0.608761), scale3(posterior, 0.793353)))),
+    anteriorCondyleMedial: surface(0.09375, normalize3(add3(scale3(medial, 0.382683), scale3(anterior, 0.92388)))),
+    anteriorCondyleLateral: surface(0.09375, normalize3(add3(scale3(lateral, 0.382683), scale3(anterior, 0.92388)))),
   });
 }
 
@@ -233,10 +233,10 @@ function crossSectionPoint(parameters, side, t, theta, center, frame) {
   if (t < parameters.distalMetaphysisBlend) {
     const normalizedT = t / parameters.distalMetaphysisBlend;
     const articularWeight = Math.sin(Math.PI * Math.min(1, normalizedT / 0.92)) ** 1.35;
-    const medialPosteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3(add3(scale3(medialDirection, .56), scale3(posterior, .83))));
-    const lateralPosteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3(add3(scale3(lateralDirection, .56), scale3(posterior, .83))));
-    const medialAnteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3(add3(scale3(medialDirection, .44), scale3(anterior, .9))));
-    const lateralAnteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3(add3(scale3(lateralDirection, .44), scale3(anterior, .9))));
+    const medialPosteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3(add3(scale3(medialDirection, .608761), scale3(posterior, .793353))));
+    const lateralPosteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3(add3(scale3(lateralDirection, .608761), scale3(posterior, .793353))));
+    const medialAnteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3(add3(scale3(medialDirection, .382683), scale3(anterior, .92388))));
+    const lateralAnteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3(add3(scale3(lateralDirection, .382683), scale3(anterior, .92388))));
     radialOffset += articularWeight * parameters.distalCondyleWidth * .07 * (
       parameters.medialCondyleScale * gaussianAngle(theta, medialTheta, .55)
       + parameters.lateralCondyleScale * gaussianAngle(theta, lateralTheta, .55)
@@ -265,7 +265,7 @@ function crossSectionPoint(parameters, side, t, theta, center, frame) {
   if (t >= parameters.distalMetaphysisBlend && t < 1 - parameters.proximalMetaphysisBlend) {
     const station = sampleShaftStation(parameters.shaftCrossSectionStations, t);
     radialOffset += Math.min(frame.rx, frame.rz) * station.triangularity * Math.cos(3 * (theta - posteriorTheta));
-    const ridgeWeight = gaussian(t, .46, .19);
+    const ridgeWeight = gaussian(t, .46875, .19);
     radialOffset += ridgeWeight * parameters.shaftPosteriorRidge * gaussianAngle(theta, posteriorTheta, parameters.lineaAsperaWidth * 1.8);
     radialOffset += ridgeWeight * parameters.lineaAsperaHeight * (
       gaussianAngle(theta, posteriorTheta - parameters.lineaAsperaWidth, parameters.lineaAsperaWidth * .58)
@@ -277,13 +277,13 @@ function crossSectionPoint(parameters, side, t, theta, center, frame) {
     const lesserTheta = directionTheta(basisX, basisZ, tangent, normalize3([medial * 0.68, 0, -0.74]));
     const greaterAnteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3([-medial * .72, 0, .69]));
     const greaterPosteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3([-medial * .72, 0, -.69]));
-    radialOffset += gaussian(t, 0.765, 0.04) * parameters.greaterTrochanterSize * 0.78 * gaussianAngle(theta, lateralTheta, 0.42);
-    radialOffset += gaussian(t, .795, .025) * parameters.greaterTrochanterTipHeight * gaussianAngle(theta, lateralTheta, .28);
-    radialOffset += gaussian(t, .76, .04) * parameters.greaterTrochanterAnteriorCrest * gaussianAngle(theta, greaterAnteriorTheta, .25);
-    radialOffset += gaussian(t, .755, .04) * parameters.greaterTrochanterPosteriorCrest * gaussianAngle(theta, greaterPosteriorTheta, .25);
+    radialOffset += gaussian(t, 0.75, 0.04) * parameters.greaterTrochanterSize * 0.78 * gaussianAngle(theta, lateralTheta, 0.42);
+    radialOffset += gaussian(t, .78125, .025) * parameters.greaterTrochanterTipHeight * gaussianAngle(theta, lateralTheta, .28);
+    radialOffset += gaussian(t, .75, .04) * parameters.greaterTrochanterAnteriorCrest * gaussianAngle(theta, greaterAnteriorTheta, .25);
+    radialOffset += gaussian(t, .75, .04) * parameters.greaterTrochanterPosteriorCrest * gaussianAngle(theta, greaterPosteriorTheta, .25);
     const fossaTheta = directionTheta(basisX, basisZ, tangent, normalize3([-medial * .35, 0, -.94]));
-    radialOffset -= gaussian(t, .755, .032) * parameters.trochantericFossaDepth * gaussianAngle(theta, fossaTheta, .27);
-    radialOffset += gaussian(t, 0.715, 0.028) * parameters.lesserTrochanterSize * 0.88 * gaussianAngle(theta, lesserTheta, 0.34);
+    radialOffset -= gaussian(t, .75, .032) * parameters.trochantericFossaDepth * gaussianAngle(theta, fossaTheta, .27);
+    radialOffset += gaussian(t, 0.71875, 0.028) * parameters.lesserTrochanterSize * 0.88 * gaussianAngle(theta, lesserTheta, 0.34);
     radialOffset += gaussian(t, .69, .05) * parameters.intertrochantericLineHeight * gaussianAngle(theta, anteriorTheta, .38);
     radialOffset += gaussian(t, .7, .05) * parameters.intertrochantericCrestHeight * gaussianAngle(theta, posteriorTheta, .35);
   }

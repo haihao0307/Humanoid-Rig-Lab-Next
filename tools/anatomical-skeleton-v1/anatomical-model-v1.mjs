@@ -23,9 +23,9 @@ const SOURCE_IDS = Object.freeze({
   curvature: 'thiesen-femoral-antecurvation-2018',
   distal: 'hussain-distal-femur-2013',
   angles: 'meier-hip-morphology-2022',
-  fovea: 'perumal-fovea-capitis-2019',
-  lineaAspera: 'polguj-linea-aspera-2016',
-  trochlea: 'iranpour-distal-femur-articular-2010',
+  fovea: 'ceynowa-fovea-capitis-2019',
+  lineaAspera: 'abdelaal-linea-aspera-2016',
+  trochlea: 'iranpour-trochlear-groove-2010',
   pendingDetail: 'hrl-femur-pilot-detail-pending',
 });
 
