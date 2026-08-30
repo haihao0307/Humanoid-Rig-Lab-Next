@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/anatomical_graph@1.0",
+  "title": "Humanoid Rig Lab AnatomicalGraph V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "type", "graphId", "revision", "rootJointId", "coordinateSystem", "bones", "joints"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/anatomical_graph@1.0" },
+    "schemaVersion": { "const": 1 },
+    "type": { "const": "AnatomicalGraph" },
+    "graphId": { "$ref": "#/$defs/stableId" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "rootJointId": { "$ref": "#/$defs/stableId" },
+    "coordinateSystem": { "$ref": "#/$defs/coordinateSystem" },
+    "bones": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/bone" } },
+    "joints": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/joint" } }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" },
+    "nullableStableId": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/stableId" }] },
+    "stableIdArray": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/stableId" } },
+    "vec3": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+    "coordinateSystem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["handedness", "upAxis", "forwardAxis", "rightAxis", "unit"],
+      "properties": {
+        "handedness": { "const": "right-handed" }, "upAxis": { "const": "+Y" },
+        "forwardAxis": { "const": "+Z" }, "rightAxis": { "const": "+X" }, "unit": { "const": "meter" }
+      }
+    },
+    "bone": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "boneId", "jointId", "parentBoneId", "childBoneIds", "symmetryPairId",
+        "proximalJointId", "distalJointId", "landmarkIds", "muscleAttachmentAnchorIds",
+        "generatorDependencies", "humanRigCoreJointId", "invalidatedBy"
+      ],
+      "properties": {
+        "boneId": { "$ref": "#/$defs/stableId" },
+        "jointId": { "$ref": "#/$defs/stableId" },
+        "parentBoneId": { "$ref": "#/$defs/nullableStableId" },
+        "childBoneIds": { "$ref": "#/$defs/stableIdArray" },
+        "symmetryPairId": { "$ref": "#/$defs/nullableStableId" },
+        "proximalJointId": { "$ref": "#/$defs/stableId" },
+        "distalJointId": { "$ref": "#/$defs/stableId" },
+        "landmarkIds": { "$ref": "#/$defs/stableIdArray" },
+        "muscleAttachmentAnchorIds": { "$ref": "#/$defs/stableIdArray" },
+        "generatorDependencies": { "$ref": "#/$defs/stableIdArray" },
+        "humanRigCoreJointId": { "$ref": "#/$defs/nullableStableId" },
+        "invalidatedBy": { "$ref": "#/$defs/stableIdArray" }
+      }
+    },
+    "joint": {
+      "type": "object", "additionalProperties": false,
+      "required": ["jointId", "parentJointId", "childJointIds", "jointCenter", "jointBasis", "symmetryPairId", "humanRigCoreJointId"],
+      "properties": {
+        "jointId": { "$ref": "#/$defs/stableId" },
+        "parentJointId": { "$ref": "#/$defs/nullableStableId" },
+        "childJointIds": { "$ref": "#/$defs/stableIdArray" },
+        "jointCenter": { "$ref": "#/$defs/vec3" },
+        "jointBasis": {
+          "type": "object", "additionalProperties": false,
+          "required": ["x", "y", "z"],
+          "properties": { "x": { "$ref": "#/$defs/vec3" }, "y": { "$ref": "#/$defs/vec3" }, "z": { "$ref": "#/$defs/vec3" } }
+        },
+        "symmetryPairId": { "$ref": "#/$defs/nullableStableId" },
+        "humanRigCoreJointId": { "$ref": "#/$defs/nullableStableId" }
+      }
+    }
+  }
+}

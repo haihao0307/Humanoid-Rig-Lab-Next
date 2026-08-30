@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/skeletal_dna@1.0",
+  "title": "Humanoid Rig Lab SkeletalDNA V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schemaVersion", "type", "profileId", "revision", "seed", "precision",
+    "coordinateSystem", "bodyHeight", "shoulderWidth", "pelvisWidth", "spineLength",
+    "upperArmLength", "forearmLength", "thighLength", "calfLength", "handLength",
+    "footLength", "leftRightAsymmetry", "globalDetailLevel", "boneParameters", "sourceReceiptIds"
+  ],
+  "properties": {
+    "schema": { "const": "humanoid_rig/skeletal_dna@1.0" },
+    "schemaVersion": { "const": 1 },
+    "type": { "const": "SkeletalDNA" },
+    "profileId": { "$ref": "#/$defs/stableId" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "seed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "precision": { "enum": ["float32-deterministic"] },
+    "coordinateSystem": { "$ref": "#/$defs/coordinateSystem" },
+    "bodyHeight": { "$ref": "#/$defs/meters" },
+    "shoulderWidth": { "$ref": "#/$defs/meters" },
+    "pelvisWidth": { "$ref": "#/$defs/meters" },
+    "spineLength": { "$ref": "#/$defs/meters" },
+    "upperArmLength": { "$ref": "#/$defs/meters" },
+    "forearmLength": { "$ref": "#/$defs/meters" },
+    "thighLength": { "$ref": "#/$defs/meters" },
+    "calfLength": { "$ref": "#/$defs/meters" },
+    "handLength": { "$ref": "#/$defs/meters" },
+    "footLength": { "$ref": "#/$defs/meters" },
+    "leftRightAsymmetry": { "type": "number", "minimum": -0.25, "maximum": 0.25 },
+    "globalDetailLevel": { "type": "integer", "minimum": 0, "maximum": 2 },
+    "variantId": { "$ref": "#/$defs/stableId" },
+    "generatorVersion": { "type": "string", "minLength": 1 },
+    "boneParameters": {
+      "type": "array", "minItems": 1,
+      "items": { "$ref": "#/$defs/boneParameter" }
+    },
+    "sourceReceiptIds": { "$ref": "#/$defs/sourceReceiptIds" }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" },
+    "meters": { "type": "number", "exclusiveMinimum": 0 },
+    "vec3": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": { "type": "number" }
+    },
+    "coordinateSystem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["handedness", "upAxis", "forwardAxis", "rightAxis", "unit"],
+      "properties": {
+        "handedness": { "const": "right-handed" },
+        "upAxis": { "const": "+Y" },
+        "forwardAxis": { "const": "+Z" },
+        "rightAxis": { "const": "+X" },
+        "unit": { "const": "meter" }
+      }
+    },
+    "sourceReceiptIds": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/stableId" }
+    },
+    "parameterRange": {
+      "type": "object", "additionalProperties": false,
+      "required": ["minimum", "maximum", "default", "units"],
+      "properties": {
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" },
+        "default": { "type": "number" },
+        "units": { "enum": ["meter", "degree", "ratio", "level"] }
+      }
+    },
+    "boneParameter": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "boneId", "generatorType", "side", "length", "centerline", "crossSections",
+        "curvature", "torsion", "proximalEnd", "distalEnd", "articularSurfaces",
+        "landmarks", "corticalThickness", "detailLevel", "symmetryPolicy",
+        "minimum", "maximum", "default", "units", "parameterRanges",
+        "sourceReceiptIds", "confidence"
+      ],
+      "properties": {
+        "boneId": { "$ref": "#/$defs/stableId" },
+        "generatorType": { "type": "string", "minLength": 1 },
+        "side": { "enum": ["center", "left", "right"] },
+        "length": { "type": "number", "exclusiveMinimum": 0 },
+        "centerline": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/vec3" } },
+        "crossSections": {
+          "type": "array", "minItems": 2,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["t", "major", "minor"],
+            "properties": {
+              "t": { "type": "number", "minimum": 0, "maximum": 1 },
+              "major": { "type": "number", "exclusiveMinimum": 0 },
+              "minor": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        },
+        "curvature": { "type": "object" },
+        "torsion": { "type": "object" },
+        "proximalEnd": { "type": "object" },
+        "distalEnd": { "type": "object" },
+        "articularSurfaces": { "type": "array", "items": { "type": "object" } },
+        "landmarks": { "type": "array", "items": { "type": "object" } },
+        "corticalThickness": { "type": "number", "exclusiveMinimum": 0 },
+        "detailLevel": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "symmetryPolicy": { "enum": ["center", "independent", "parameter-symmetric"] },
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" },
+        "default": { "type": "number" },
+        "units": { "enum": ["meter", "degree", "ratio", "level"] },
+        "parameterRanges": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterRange" } },
+        "sourceReceiptIds": { "$ref": "#/$defs/sourceReceiptIds" },
+        "confidence": { "enum": ["high", "medium", "low", "pending"] }
+      }
+    }
+  }
+}

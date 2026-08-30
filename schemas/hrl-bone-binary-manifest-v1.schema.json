@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/hrl_bone_binary_manifest@1.0",
+  "title": "HRL Bone Binary Geometry Manifest V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schemaVersion", "type", "format", "magic", "byteOrder", "coordinateSystem",
+    "generatorVersion", "variantId", "skeletalDnaRevision", "skeletalDnaHash", "anatomicalProfileHash",
+    "binaryPath", "byteLength", "sha256", "contentChecksum", "primitiveGroups", "semanticGroups",
+    "jointMarkers", "landmarks", "aabb", "deterministicInputs", "policy"
+  ],
+  "properties": {
+    "schema": { "const": "humanoid_rig/hrl_bone_binary_manifest@1.0" },
+    "schemaVersion": { "const": 1 },
+    "type": { "const": "HrlBoneBinaryManifest" },
+    "format": { "const": "HRL Bone Binary Geometry V1" },
+    "magic": { "const": "HRLBONE1" },
+    "byteOrder": { "const": "little-endian" },
+    "coordinateSystem": { "$ref": "#/$defs/coordinateSystem" },
+    "generatorVersion": { "type": "string", "minLength": 1 },
+    "variantId": { "$ref": "#/$defs/stableId" },
+    "skeletalDnaRevision": { "type": "integer", "minimum": 0 },
+    "skeletalDnaHash": { "$ref": "#/$defs/sha256" },
+    "anatomicalProfileHash": { "$ref": "#/$defs/sha256" },
+    "binaryPath": { "type": "string", "pattern": "\\.hrlbone$" },
+    "byteLength": { "type": "integer", "minimum": 128 },
+    "sha256": { "$ref": "#/$defs/sha256" },
+    "contentChecksum": { "$ref": "#/$defs/sha256" },
+    "primitiveGroups": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/primitiveGroup" } },
+    "semanticGroups": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/semanticGroup" } },
+    "jointMarkers": { "type": "array", "items": { "$ref": "#/$defs/marker" } },
+    "landmarks": { "type": "array", "items": { "$ref": "#/$defs/marker" } },
+    "aabb": {
+      "type": "object", "additionalProperties": false, "required": ["minimum", "maximum"],
+      "properties": { "minimum": { "$ref": "#/$defs/vec3" }, "maximum": { "$ref": "#/$defs/vec3" } }
+    },
+    "deterministicInputs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["seed", "precision", "generatorVersion", "skeletalDnaHash"],
+      "properties": {
+        "seed": { "type": "integer", "minimum": 0 }, "precision": { "const": "float32-deterministic" },
+        "generatorVersion": { "type": "string", "minLength": 1 }, "skeletalDnaHash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["proceduralGenerationOnly", "externalGeometrySourceCount", "loadedExternalHumanModelCount", "generatedGlbCount", "runtimeBoneScaleCount"],
+      "properties": {
+        "proceduralGenerationOnly": { "const": true }, "externalGeometrySourceCount": { "const": 0 },
+        "loadedExternalHumanModelCount": { "const": 0 }, "generatedGlbCount": { "const": 0 }, "runtimeBoneScaleCount": { "const": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "vec3": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+    "coordinateSystem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["handedness", "upAxis", "forwardAxis", "rightAxis", "unit"],
+      "properties": {
+        "handedness": { "const": "right-handed" }, "upAxis": { "const": "+Y" },
+        "forwardAxis": { "const": "+Z" }, "rightAxis": { "const": "+X" }, "unit": { "const": "meter" }
+      }
+    },
+    "primitiveGroup": {
+      "type": "object", "additionalProperties": false,
+      "required": ["groupId", "primitive", "indexOffset", "indexCount", "semanticGroupId", "lod", "side", "boneId"],
+      "properties": {
+        "groupId": { "$ref": "#/$defs/stableId" }, "primitive": { "enum": ["TRIANGLES", "LINES", "POINTS"] },
+        "indexOffset": { "type": "integer", "minimum": 0 }, "indexCount": { "type": "integer", "minimum": 0 },
+        "semanticGroupId": { "type": "integer", "minimum": 0 }, "lod": { "type": ["integer", "null"], "minimum": 0, "maximum": 2 },
+        "side": { "enum": ["center", "left", "right"] }, "boneId": { "type": ["string", "null"] }
+      }
+    },
+    "semanticGroup": {
+      "type": "object", "additionalProperties": false, "required": ["semanticGroupId", "semanticId"],
+      "properties": { "semanticGroupId": { "type": "integer", "minimum": 0 }, "semanticId": { "$ref": "#/$defs/stableId" } }
+    },
+    "marker": {
+      "type": "object", "additionalProperties": false, "required": ["id", "semanticGroupId", "position"],
+      "properties": { "id": { "$ref": "#/$defs/stableId" }, "semanticGroupId": { "type": "integer", "minimum": 0 }, "position": { "$ref": "#/$defs/vec3" } }
+    }
+  }
+}

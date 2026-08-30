@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/anatomical_profile@1.0",
+  "title": "Humanoid Rig Lab Compiled AnatomicalProfile V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schemaVersion", "type", "profileId", "revision", "sourceSkeletalDnaId",
+    "coordinateSystem", "rootJointId", "joints", "bindPoseHash", "jointBasisHash",
+    "landmarkSetHash", "anatomyProfileHash", "humanRigCoreMappingStatus", "authorityBoundary"
+  ],
+  "properties": {
+    "schema": { "const": "humanoid_rig/anatomical_profile@1.0" },
+    "schemaVersion": { "const": 1 },
+    "type": { "const": "CompiledAnatomicalProfile" },
+    "profileId": { "$ref": "#/$defs/stableId" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "sourceSkeletalDnaId": { "$ref": "#/$defs/stableId" },
+    "coordinateSystem": { "$ref": "#/$defs/coordinateSystem" },
+    "rootJointId": { "$ref": "#/$defs/stableId" },
+    "joints": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/joint" } },
+    "bindPoseHash": { "$ref": "#/$defs/sha256" },
+    "jointBasisHash": { "$ref": "#/$defs/sha256" },
+    "landmarkSetHash": { "$ref": "#/$defs/sha256" },
+    "anatomyProfileHash": { "$ref": "#/$defs/sha256" },
+    "humanRigCoreMappingStatus": { "enum": ["mapped-read-only-with-differences", "complete-read-only"] },
+    "authorityBoundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["writesHumanRigCore", "writesFinalPose", "finalPoseAccess"],
+      "properties": {
+        "writesHumanRigCore": { "const": false }, "writesFinalPose": { "const": false }, "finalPoseAccess": { "const": "read-only" }
+      }
+    }
+  },
+  "$defs": {
+    "stableId": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z][A-Za-z0-9._-]*$" },
+    "nullableStableId": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/stableId" }] },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "vec3": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+    "quat": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "number" } },
+    "coordinateSystem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["handedness", "upAxis", "forwardAxis", "rightAxis", "unit"],
+      "properties": {
+        "handedness": { "const": "right-handed" }, "upAxis": { "const": "+Y" },
+        "forwardAxis": { "const": "+Z" }, "rightAxis": { "const": "+X" }, "unit": { "const": "meter" }
+      }
+    },
+    "basis": {
+      "type": "object", "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": { "x": { "$ref": "#/$defs/vec3" }, "y": { "$ref": "#/$defs/vec3" }, "z": { "$ref": "#/$defs/vec3" } }
+    },
+    "frame": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["position", "rotation"],
+          "properties": { "position": { "$ref": "#/$defs/vec3" }, "rotation": { "$ref": "#/$defs/quat" } }
+        }
+      ]
+    },
+    "limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["swingX", "swingZ", "twist"],
+      "properties": {
+        "swingX": { "$ref": "#/$defs/range" }, "swingZ": { "$ref": "#/$defs/range" }, "twist": { "$ref": "#/$defs/range" }
+      }
+    },
+    "range": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": { "type": "number" }
+    },
+    "joint": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "boneId", "jointId", "parentJointId", "bindLocalPosition", "bindLocalRotation", "boneLength",
+        "jointCenter", "jointBasis", "degreesOfFreedom", "softLimits", "hardLimits", "segmentMass",
+        "localCenterOfMass", "symmetryPairId", "footContactFrame", "handGripFrame", "humanRigCoreJointId", "mappingStatus"
+      ],
+      "properties": {
+        "boneId": { "$ref": "#/$defs/stableId" }, "jointId": { "$ref": "#/$defs/stableId" },
+        "parentJointId": { "$ref": "#/$defs/nullableStableId" }, "bindLocalPosition": { "$ref": "#/$defs/vec3" },
+        "bindLocalRotation": { "$ref": "#/$defs/quat" }, "boneLength": { "type": "number", "minimum": 0 },
+        "jointCenter": { "$ref": "#/$defs/vec3" }, "jointBasis": { "$ref": "#/$defs/basis" },
+        "degreesOfFreedom": { "type": "array", "uniqueItems": true, "items": { "enum": ["swingX", "swingZ", "twist"] } },
+        "softLimits": { "$ref": "#/$defs/limits" }, "hardLimits": { "$ref": "#/$defs/limits" },
+        "segmentMass": { "type": "number", "minimum": 0 }, "localCenterOfMass": { "$ref": "#/$defs/vec3" },
+        "symmetryPairId": { "$ref": "#/$defs/nullableStableId" }, "footContactFrame": { "$ref": "#/$defs/frame" },
+        "handGripFrame": { "$ref": "#/$defs/frame" }, "humanRigCoreJointId": { "$ref": "#/$defs/nullableStableId" },
+        "mappingStatus": { "enum": ["exact", "derived", "unmapped"] }
+      }
+    }
+  }
+}
