@@ -1,9 +1,9 @@
 export const LONG_BONE_GENERATOR_V1_ID = 'LongBoneGeneratorV1@1.2.0';
 
 export const FEMUR_LOD_SPECS_V1 = Object.freeze({
-  0: Object.freeze({ longitudinalSegments: 96, radialSegments: 48 }),
+  0: Object.freeze({ longitudinalSegments: 128, radialSegments: 64 }),
   1: Object.freeze({ longitudinalSegments: 64, radialSegments: 32 }),
-  2: Object.freeze({ longitudinalSegments: 40, radialSegments: 24 }),
+  2: Object.freeze({ longitudinalSegments: 64, radialSegments: 24 }),
 });
 
 const REQUIRED_PARAMETERS = Object.freeze([
@@ -202,10 +202,14 @@ function crossSectionAt(parameters, side, t) {
     rx = station.medialLateralRadius;
     rz = station.anteriorPosteriorRadius;
   } else if (t < 0.9) {
-    const alpha = smoothstep(proximalStart, 0.9, t);
     const attachRadius = parameters.headRadius * Math.sqrt(1 - 0.86 ** 2);
-    rx = lerp(parameters.neckCrossSectionMajor, attachRadius * parameters.headEllipsoidRatio, alpha);
-    rz = lerp(parameters.neckCrossSectionMinor, attachRadius / parameters.headEllipsoidRatio, alpha);
+    const shaftStation = sampleShaftStation(parameters.shaftCrossSectionStations, proximalStart);
+    [rx, rz] = samplePairKeyframes([
+      [0, shaftStation.medialLateralRadius, shaftStation.anteriorPosteriorRadius],
+      [.38, shaftStation.medialLateralRadius * 1.04, shaftStation.anteriorPosteriorRadius * 1.03],
+      [.72, parameters.neckCrossSectionMajor, parameters.neckCrossSectionMinor],
+      [1, attachRadius * parameters.headEllipsoidRatio, attachRadius / parameters.headEllipsoidRatio],
+    ], (t - proximalStart) / (0.9 - proximalStart));
   } else {
     const q = lerp(-0.86 * parameters.headRadius, parameters.headRadius, (t - 0.9) / 0.1);
     const sphericalRadius = Math.sqrt(Math.max(0, parameters.headRadius ** 2 - q ** 2));
@@ -246,7 +250,8 @@ function crossSectionPoint(parameters, side, t, theta, center, frame) {
       + parameters.lateralCondylePosteriorLength * gaussianAngle(theta, lateralPosteriorTheta, .34)
     );
     const fossaAngularWidth = Math.max(.24, parameters.intercondylarFossaWidth / parameters.distalCondyleWidth * 1.5);
-    radialOffset -= articularWeight * parameters.intercondylarFossaDepth * gaussianAngle(theta, posteriorTheta, fossaAngularWidth);
+    const fossaBasin = broadAngularBasin(theta, posteriorTheta, fossaAngularWidth);
+    radialOffset -= articularWeight * parameters.intercondylarFossaDepth * fossaBasin;
     radialOffset += articularWeight * parameters.medialTrochlearRidgeHeight * gaussianAngle(theta, medialAnteriorTheta, .26);
     radialOffset += articularWeight * parameters.lateralTrochlearRidgeHeight * gaussianAngle(theta, lateralAnteriorTheta, .26);
     radialOffset -= articularWeight * parameters.patellarGrooveDepth * gaussianAngle(theta, anteriorTheta, .27);
@@ -258,7 +263,7 @@ function crossSectionPoint(parameters, side, t, theta, center, frame) {
     const adductorTheta = directionTheta(basisX, basisZ, tangent, normalize3(add3(scale3(medialDirection, .86), scale3(posterior, .5))));
     radialOffset += gaussian(t, parameters.distalMetaphysisBlend * .86, .013) * parameters.adductorTubercleSize * gaussianAngle(theta, adductorTheta, .2);
     const fossaOpeningWeight = 1 - smoothstep(.025, parameters.distalMetaphysisBlend * .72, t);
-    axialOffset += parameters.intercondylarFossaDepth * 1.15 * gaussianAngle(theta, posteriorTheta, fossaAngularWidth) * fossaOpeningWeight;
+    axialOffset += parameters.intercondylarFossaDepth * 1.15 * fossaBasin * fossaOpeningWeight;
     axialOffset += parameters.medialCondyleDistalOffset * gaussianAngle(theta, medialTheta, .48) * (1 - smoothstep(.02, .1, t));
     axialOffset += parameters.lateralCondyleDistalOffset * gaussianAngle(theta, lateralTheta, .48) * (1 - smoothstep(.02, .1, t));
   }
@@ -277,7 +282,7 @@ function crossSectionPoint(parameters, side, t, theta, center, frame) {
     const lesserTheta = directionTheta(basisX, basisZ, tangent, normalize3([medial * 0.68, 0, -0.74]));
     const greaterAnteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3([-medial * .72, 0, .69]));
     const greaterPosteriorTheta = directionTheta(basisX, basisZ, tangent, normalize3([-medial * .72, 0, -.69]));
-    radialOffset += gaussian(t, 0.75, 0.04) * parameters.greaterTrochanterSize * 0.78 * gaussianAngle(theta, lateralTheta, 0.42);
+    radialOffset += gaussian(t, 0.75, 0.035) * parameters.greaterTrochanterSize * 0.90 * gaussianAngle(theta, lateralTheta, 0.38);
     radialOffset += gaussian(t, .78125, .025) * parameters.greaterTrochanterTipHeight * gaussianAngle(theta, lateralTheta, .28);
     radialOffset += gaussian(t, .75, .04) * parameters.greaterTrochanterAnteriorCrest * gaussianAngle(theta, greaterAnteriorTheta, .25);
     radialOffset += gaussian(t, .75, .04) * parameters.greaterTrochanterPosteriorCrest * gaussianAngle(theta, greaterPosteriorTheta, .25);
@@ -345,7 +350,7 @@ function shaftCenter(parameters, side, t, origin) {
 }
 
 function distalPole(parameters, origin) {
-  return [origin[0], origin[1] - parameters.femurLength - parameters.distalCondyleDepth * 0.42, origin[2]];
+  return [origin[0], origin[1] - parameters.femurLength - parameters.distalCondyleDepth * 0.30, origin[2]];
 }
 
 function directionTheta(basisX, basisZ, tangent, direction) {
@@ -442,6 +447,11 @@ function validateParameters(parameters, side, lod, origin) {
 function smoothstep(minimum, maximum, value) { const t = Math.min(1, Math.max(0, (value - minimum) / (maximum - minimum))); return t * t * (3 - 2 * t); }
 function gaussian(value, center, width) { const x = (value - center) / width; return Math.exp(-0.5 * x * x); }
 function gaussianAngle(value, center, width) { const delta = Math.atan2(Math.sin(value - center), Math.cos(value - center)); return Math.exp(-0.5 * (delta / width) ** 2); }
+function broadAngularBasin(value, center, halfWidth) {
+  const delta = Math.abs(Math.atan2(Math.sin(value - center), Math.cos(value - center)));
+  const normalized = Math.min(1, delta / Math.max(1e-6, halfWidth));
+  return (1 - normalized ** 4) ** 2;
+}
 function lerp(left, right, alpha) { return left + (right - left) * alpha; }
 function mix3(left, right, alpha) { return left.map((value, index) => lerp(value, right[index], alpha)); }
 function add3(left, right) { return left.map((value, index) => value + right[index]); }

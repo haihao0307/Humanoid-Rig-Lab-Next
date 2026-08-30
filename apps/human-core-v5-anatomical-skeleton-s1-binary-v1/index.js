@@ -53,7 +53,8 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 container.append(renderer.domElement);
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(34, 1, 0.01, 20);
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 20);
+camera.userData.viewHeight = 2.1;
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.minDistance = 0.35;
@@ -204,15 +205,22 @@ function buildFemurDiagnostics() {
   const visibleSides = state.femurSide === 'both' ? ['left', 'right'] : [state.femurSide];
   if (state.showFemurLandmarks) {
     const markerGeometry = new THREE.SphereGeometry(.0044, 14, 9);
+    const colorByClassification = {
+      surface_anatomical_landmark: 0xffdb67,
+      joint_center_candidate: 0x7de4ff,
+      axis_candidate: 0xa9ffb1,
+      derived_internal_point: 0xff8bb8,
+      lod_review_landmark: 0xc9a1ff,
+    };
     for (const landmark of state.manifest.landmarks.filter(({ id }) => visibleSides.some((side) => id.startsWith(`${side}_femur_`)))) {
-      const marker = new THREE.Mesh(markerGeometry.clone(), new THREE.MeshBasicMaterial({ color: 0xffdb67, depthTest: false }));
+      const marker = new THREE.Mesh(markerGeometry.clone(), new THREE.MeshBasicMaterial({ color: colorByClassification[landmark.classification] ?? 0xffdb67, depthTest: false }));
       marker.position.fromArray(landmark.position);
       marker.renderOrder = 20;
       marker.name = `diagnostic_${landmark.id}`;
       diagnosticRoot.add(marker);
       const label = document.createElement('span');
       label.className = 'joint-label diagnostic-label';
-      label.textContent = landmark.id.replace(/^(left|right)_femur_/, '');
+      label.textContent = `${landmark.id.replace(/^(left|right)_femur_/, '')} · ${landmark.classification ?? 'unclassified'}`;
       labelsRoot.append(label);
       state.labelRecords.push({ element: label, position: new THREE.Vector3(...landmark.position), jointId: landmark.id });
     }
@@ -338,26 +346,42 @@ function setView(view) {
 
 function setCameraPreset(name) {
   const skeletonPresets = {
-    'skeleton-front': { direction: [0, 0, 1], target: [0, .9, 0], distance: 2.8 },
-    'skeleton-side-left': { direction: [-1, 0, 0], target: [0, .9, 0], distance: 2.8 },
-    'skeleton-back': { direction: [0, 0, -1], target: [0, .9, 0], distance: 2.8 },
-    'skeleton-three-quarter-front': { direction: [1, .2, 1], target: [0, .9, 0], distance: 2.8 },
+    'skeleton-front': { direction: [0, 0, 1], target: [0, .9, 0], distance: 2.8, viewHeight: 1.92 },
+    'skeleton-side-left': { direction: [-1, 0, 0], target: [0, .9, 0], distance: 2.8, viewHeight: 1.92 },
+    'skeleton-back': { direction: [0, 0, -1], target: [0, .9, 0], distance: 2.8, viewHeight: 1.92 },
+    'skeleton-three-quarter-front': { direction: [1, .2, 1], target: [0, .9, 0], distance: 2.8, viewHeight: 1.92 },
   };
   if (skeletonPresets[name]) setIsolationMode('full-body', { fit: false });
   const sideSign = state.femurSide === 'right' ? 1 : -1;
   const centerX = state.femurSide === 'both' ? 0 : sideSign * .105;
   const femurPresets = {
-    'femur-front': { direction: [0, .03, 1], target: [centerX, .75, 0], distance: .92 },
-    'femur-back': { direction: [0, .03, -1], target: [centerX, .75, 0], distance: .92 },
-    'femur-medial': { direction: [-sideSign, .03, 0], target: [centerX, .75, 0], distance: .92 },
-    'femur-lateral': { direction: [sideSign, .03, 0], target: [centerX, .75, 0], distance: .92 },
-    'femur-head-neck': { direction: [-sideSign * .68, .18, 1], target: [centerX - sideSign * .018, .915, 0], distance: .39 },
-    'femur-trochanter': { direction: [sideSign * .72, .18, 1], target: [centerX + sideSign * .018, .875, 0], distance: .38 },
-    'femur-distal-condyles-front': { direction: [0, .1, 1], target: [centerX, .555, 0], distance: .38 },
-    'femur-patellar-groove-raking': { direction: [sideSign * .27, .08, 1], target: [centerX, .555, 0], distance: .34 },
-    'femur-intercondylar-notch-back': { direction: [0, .08, -1], target: [centerX, .555, 0], distance: .36 },
-    'femur-three-quarter-front': { direction: [sideSign * .7, .12, 1], target: [centerX, .75, 0], distance: .94 },
-    'femur-comparison-front': { direction: [0, .03, 1], target: [0, .75, 0], distance: 1.04 },
+    'femur-front': { direction: [0, .03, 1], target: [centerX, .75, 0], distance: .92, viewHeight: .56 },
+    'femur-back': { direction: [0, .03, -1], target: [centerX, .75, 0], distance: .92, viewHeight: .56 },
+    'femur-medial': { direction: [-sideSign, .03, 0], target: [centerX, .75, 0], distance: .92, viewHeight: .56 },
+    'femur-lateral': { direction: [sideSign, .03, 0], target: [centerX, .75, 0], distance: .92, viewHeight: .56 },
+    'femur-head-neck': { direction: [-sideSign * .68, .18, 1], target: [centerX - sideSign * .018, .915, 0], distance: .39, viewHeight: .18 },
+    'femur-head-neck-front': { direction: [0, .06, 1], target: [centerX - sideSign * .015, .925, 0], distance: .42, viewHeight: .17 },
+    'femur-head-neck-back': { direction: [0, .06, -1], target: [centerX - sideSign * .015, .925, 0], distance: .42, viewHeight: .17 },
+    'femur-head-neck-superior': { direction: [0, 1, .12], target: [centerX - sideSign * .015, .92, 0], distance: .42, viewHeight: .18 },
+    'femur-greater-trochanter': { direction: [sideSign, .08, .3], target: [centerX + sideSign * .025, .88, -.002], distance: .38, viewHeight: .16 },
+    'femur-lesser-trochanter': { direction: [-sideSign * .62, .06, -.78], target: [centerX - sideSign * .008, .865, -.012], distance: .38, viewHeight: .15 },
+    'femur-trochanteric-fossa': { direction: [sideSign * .42, .08, -.91], target: [centerX + sideSign * .018, .88, -.012], distance: .38, viewHeight: .15 },
+    'femur-trochanter': { direction: [sideSign * .72, .18, 1], target: [centerX + sideSign * .018, .875, 0], distance: .38, viewHeight: .18 },
+    'femur-midshaft-cross-section': { direction: [0, 1, .08], target: [centerX, .755, .01], distance: .44, viewHeight: .12 },
+    'femur-linea-aspera': { direction: [0, .02, -1], target: [centerX, .755, -.015], distance: .44, viewHeight: .22 },
+    'femur-proximal-metaphysis': { direction: [sideSign * .48, .08, 1], target: [centerX, .85, 0], distance: .44, viewHeight: .22 },
+    'femur-distal-metaphysis': { direction: [sideSign * .42, .05, 1], target: [centerX, .62, 0], distance: .44, viewHeight: .22 },
+    'femur-distal-condyles-front': { direction: [0, .1, 1], target: [centerX, .555, 0], distance: .38, viewHeight: .18 },
+    'femur-distal-back': { direction: [0, .08, -1], target: [centerX, .555, 0], distance: .38, viewHeight: .18 },
+    'femur-distal-medial': { direction: [-sideSign, .06, 0], target: [centerX, .555, 0], distance: .38, viewHeight: .18 },
+    'femur-distal-lateral': { direction: [sideSign, .06, 0], target: [centerX, .555, 0], distance: .38, viewHeight: .18 },
+    'femur-patellar-surface': { direction: [0, .03, 1], target: [centerX, .565, .018], distance: .34, viewHeight: .14 },
+    'femur-patellar-groove-raking': { direction: [sideSign * .27, .08, 1], target: [centerX, .555, 0], distance: .34, viewHeight: .14 },
+    'femur-intercondylar-notch-back': { direction: [0, .08, -1], target: [centerX, .555, 0], distance: .36, viewHeight: .14 },
+    'femur-epicondyles': { direction: [0, .04, 1], target: [centerX, .59, 0], distance: .38, viewHeight: .17 },
+    'femur-adductor-tubercle': { direction: [-sideSign * .72, .08, -.69], target: [centerX - sideSign * .035, .61, -.01], distance: .36, viewHeight: .13 },
+    'femur-three-quarter-front': { direction: [sideSign * .7, .12, 1], target: [centerX, .75, 0], distance: .94, viewHeight: .56 },
+    'femur-comparison-front': { direction: [0, .03, 1], target: [0, .75, 0], distance: 1.04, viewHeight: .56 },
   };
   if (femurPresets[name]) setIsolationMode('femur', { fit: false });
   const preset = skeletonPresets[name] ?? femurPresets[name];
@@ -366,6 +390,8 @@ function setCameraPreset(name) {
   const target = new THREE.Vector3(...preset.target);
   camera.position.copy(target).addScaledVector(direction, preset.distance);
   controls.target.copy(target);
+  camera.userData.viewHeight = preset.viewHeight;
+  updateOrthographicProjection();
   controls.update();
   state.cameraPreset = name;
   document.querySelector('#review-camera-select').value = name;
@@ -468,7 +494,7 @@ function captureReadyState() {
     inspectorTab: state.tab,
     viewport: { width: innerWidth, height: innerHeight },
     browserUserAgent: navigator.userAgent,
-    camera: { position: camera.position.toArray(), target: controls.target.toArray(), fov: camera.fov },
+    camera: { type: 'OrthographicCamera', position: camera.position.toArray(), target: controls.target.toArray(), viewHeight: camera.userData.viewHeight },
     renderedObjectCount: displayRoot.children.length,
     renderRevision: state.renderRevision,
     consoleErrors: [...publicState.consoleErrors],
@@ -495,10 +521,12 @@ function fitVisible() {
   if (box.isEmpty()) return;
   const center = box.getCenter(new THREE.Vector3());
   const size = box.getSize(new THREE.Vector3());
-  const distance = Math.max(size.x, size.y, size.z) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * 1.35;
+  const aspect = Math.max(0.01, container.clientWidth / Math.max(1, container.clientHeight));
+  camera.userData.viewHeight = Math.max(size.y, size.x / aspect) * 1.28;
   const direction = camera.position.clone().sub(controls.target).normalize();
-  camera.position.copy(center).addScaledVector(direction, Math.max(.35, distance));
+  camera.position.copy(center).addScaledVector(direction, 2.5);
   controls.target.copy(center);
+  updateOrthographicProjection();
   controls.update();
 }
 
@@ -534,9 +562,20 @@ function onResize() {
   const width = Math.max(1, container.clientWidth);
   const height = Math.max(1, container.clientHeight);
   renderer.setSize(width, height, false);
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
+  updateOrthographicProjection();
   publishReviewState();
+}
+
+function updateOrthographicProjection() {
+  const width = Math.max(1, container.clientWidth);
+  const height = Math.max(1, container.clientHeight);
+  const halfHeight = camera.userData.viewHeight / 2;
+  const halfWidth = halfHeight * width / height;
+  camera.left = -halfWidth;
+  camera.right = halfWidth;
+  camera.top = halfHeight;
+  camera.bottom = -halfHeight;
+  camera.updateProjectionMatrix();
 }
 
 async function fetchJson(url, { optional = false } = {}) {

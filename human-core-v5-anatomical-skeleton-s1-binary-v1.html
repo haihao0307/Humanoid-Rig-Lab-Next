@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>HRL Anatomical Skeleton S1 — Binary Geometry Review</title>
+  <title>HRL Anatomical Skeleton S1A.4 — Femur Articular Review</title>
   <link rel="stylesheet" href="./apps/human-core-v5-anatomical-skeleton-s1-binary-v1/styles.css">
   <script type="importmap">
     {"imports":{"three":"./node_modules/three/build/three.module.js"}}
@@ -13,8 +13,8 @@
   <main class="workspace">
     <header class="topbar">
       <div>
-        <p class="eyebrow">HUMAN CORE V5 · S1A · READ-ONLY REVIEW</p>
-        <h1>Anatomical Skeleton Binary Foundation</h1>
+        <p class="eyebrow">HUMAN CORE V5 · S1A.4 · READ-ONLY ORTHOGRAPHIC REVIEW</p>
+        <h1>Femur Articular Anatomy &amp; Landmark Refinement</h1>
       </div>
       <div class="status-cluster">
         <span id="ready-status" class="status">loading</span>
@@ -52,10 +52,26 @@
           <option value="femur-medial">Femur medial</option>
           <option value="femur-lateral">Femur lateral</option>
           <option value="femur-head-neck">Femur head / neck</option>
+          <option value="femur-head-neck-front">Head / neck front</option>
+          <option value="femur-head-neck-back">Head / neck back</option>
+          <option value="femur-head-neck-superior">Head / neck superior</option>
+          <option value="femur-greater-trochanter">Greater trochanter</option>
+          <option value="femur-lesser-trochanter">Lesser trochanter</option>
+          <option value="femur-trochanteric-fossa">Trochanteric fossa</option>
           <option value="femur-trochanter">Femur trochanter</option>
+          <option value="femur-midshaft-cross-section">Midshaft cross-section</option>
+          <option value="femur-linea-aspera">Linea aspera</option>
+          <option value="femur-proximal-metaphysis">Proximal metaphysis</option>
+          <option value="femur-distal-metaphysis">Distal metaphysis</option>
           <option value="femur-distal-condyles-front">Distal condyles front</option>
+          <option value="femur-distal-back">Distal back</option>
+          <option value="femur-distal-medial">Distal medial</option>
+          <option value="femur-distal-lateral">Distal lateral</option>
+          <option value="femur-patellar-surface">Patellar surface</option>
           <option value="femur-patellar-groove-raking">Patellar groove raking front</option>
           <option value="femur-intercondylar-notch-back">Intercondylar notch back</option>
+          <option value="femur-epicondyles">Epicondyles</option>
+          <option value="femur-adductor-tubercle">Adductor tubercle</option>
           <option value="femur-three-quarter-front">Femur three-quarter front</option>
           <option value="femur-comparison-front">Both femora comparison</option>
         </select></label>
@@ -79,7 +95,7 @@
       <div id="viewport"></div>
       <div id="labels" aria-hidden="true"></div>
       <div id="review-state-badge" class="review-state-badge">capture state pending</div>
-      <div class="viewport-note">Right-handed · +Y up · +Z forward · meters · no runtime scale</div>
+      <div class="viewport-note">Orthographic · right-handed · +Y up · +Z forward · meters · no runtime scale</div>
     </section>
 
     <aside class="inspector panel">
