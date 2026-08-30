@@ -3,11 +3,11 @@ import {
   FEMUR_LOD_SPECS_V1,
   LONG_BONE_GENERATOR_V1_ID,
   generateFemurV1,
-  getFemurLandmarksV1,
+  getFemurLandmarkRecordsV1,
 } from '../../src/core/human-core-v5/longBoneGeneratorV1.js';
 
 export const POLICY_ID = 'human_system/procedural_originality_policy@1.0.0';
-export const GENERATOR_VERSION = 'anatomical-skeleton-s1@1.1.0';
+export const GENERATOR_VERSION = 'anatomical-skeleton-s1@1.2.0';
 export const COORDINATE_SYSTEM = Object.freeze({ handedness: 'right-handed', upAxis: '+Y', forwardAxis: '+Z', rightAxis: '+X', unit: 'meter' });
 export const VARIANT_SPECS = Object.freeze([
   Object.freeze({ variantId: 'baseline', revision: 1, fileName: 'baseline-skeleton-s1.hrlbone', label: 'Baseline' }),
@@ -23,6 +23,9 @@ const SOURCE_IDS = Object.freeze({
   curvature: 'thiesen-femoral-antecurvation-2018',
   distal: 'hussain-distal-femur-2013',
   angles: 'meier-hip-morphology-2022',
+  fovea: 'perumal-fovea-capitis-2019',
+  lineaAspera: 'polguj-linea-aspera-2016',
+  trochlea: 'iranpour-distal-femur-articular-2010',
   pendingDetail: 'hrl-femur-pilot-detail-pending',
 });
 
@@ -223,8 +226,8 @@ export function createCompiledGeometry(skeletalDNA, graph) {
   const jointMarkers = graph.joints.map((joint) => ({ id: joint.jointId, semanticGroupId: 2, position: joint.jointCenter }));
   const landmarks = [];
   for (const side of ['left', 'right']) {
-    const map = getFemurLandmarksV1(femurParameters.get(`${side}_femur`), { side, hipJointCenter: jointById.get(`${side}_hip`).jointCenter });
-    for (const [id, position] of Object.entries(map)) landmarks.push({ id, semanticGroupId: side === 'left' ? 10 : 11, position });
+    const records = getFemurLandmarkRecordsV1(femurParameters.get(`${side}_femur`), { side, hipJointCenter: jointById.get(`${side}_hip`).jointCenter });
+    for (const { id, position, classification } of records) landmarks.push({ id, semanticGroupId: side === 'left' ? 10 : 11, position, classification });
   }
   return {
     positions: Float32Array.from(positions, Math.fround), normals: Float32Array.from(normals, Math.fround), indices: Uint32Array.from(indices),
@@ -319,9 +322,30 @@ function createFemurBoneParameter(segment, variantSpec) {
       { t: 0.7, anteriorOffset: 0.001, medialLateralOffset: -0.0004 }, { t: 1, anteriorOffset: 0, medialLateralOffset: 0 },
     ],
     shaftAnteriorBow: 0.0245, shaftMedialLateralBow: 0.0035, shaftCrossSectionMajor: 0.0155, shaftCrossSectionMinor: 0.0135,
+    shaftCrossSectionStations: [
+      { t: 0.17, medialLateralRadius: 0.0200, anteriorPosteriorRadius: 0.0180, triangularity: 0.03 },
+      { t: 0.28, medialLateralRadius: 0.0158, anteriorPosteriorRadius: 0.0142, triangularity: 0.08 },
+      { t: 0.46, medialLateralRadius: 0.0152, anteriorPosteriorRadius: 0.0138, triangularity: 0.13 },
+      { t: 0.62, medialLateralRadius: 0.0162, anteriorPosteriorRadius: 0.0146, triangularity: 0.09 },
+      { t: 0.70, medialLateralRadius: 0.0190, anteriorPosteriorRadius: 0.0175, triangularity: 0.04 },
+    ],
+    shaftPosteriorRidge: 0.0010, lineaAsperaHeight: 0.0018, lineaAsperaWidth: 0.14,
+    proximalMetaphysisBlend: 0.30, distalMetaphysisBlend: 0.17,
     headRadius: 0.022, neckLength: 0.04475, neckShaftAngle: 129.9, femoralAnteversion: anteversion,
+    headEllipsoidRatio: 1.025, headFoveaDepth: 0.0014, headFoveaRadius: 0.006,
+    neckCrossSectionMajor: 0.0125, neckCrossSectionMinor: 0.0102,
+    neckSuperiorEdge: 0.0008, neckInferiorEdge: -0.0003, neckAnteriorEdge: 0.0005, neckPosteriorEdge: -0.0002,
     greaterTrochanterSize: 0.018, lesserTrochanterSize: 0.010, distalCondyleWidth: 0.06972, distalCondyleDepth: 0.06068,
+    greaterTrochanterTipHeight: 0.0055, greaterTrochanterAnteriorCrest: 0.0030, greaterTrochanterPosteriorCrest: 0.0035,
+    trochantericFossaDepth: 0.0030, intertrochantericLineHeight: 0.0012, intertrochantericCrestHeight: 0.0015,
     intercondylarNotchWidth: 0.018, corticalThickness: 0.0045, surfaceDetail: 0.6, leftRightAsymmetry: asymmetry,
+    medialCondyleScale: 1.04, lateralCondyleScale: 0.98,
+    medialCondylePosteriorLength: 0.0048, lateralCondylePosteriorLength: 0.0054,
+    medialCondyleDistalOffset: -0.0010, lateralCondyleDistalOffset: 0,
+    medialEpicondyleSize: 0.0042, lateralEpicondyleSize: 0.0037, adductorTubercleSize: 0.0035,
+    intercondylarFossaWidth: 0.020, intercondylarFossaDepth: 0.0070,
+    patellarSurfaceDepth: 0.0020, medialTrochlearRidgeHeight: 0.0038,
+    lateralTrochlearRidgeHeight: 0.0050, patellarGrooveDepth: 0.0045,
   };
   const ranges = createFemurParameterRanges(generatorParameters);
   return {
@@ -335,12 +359,12 @@ function createFemurBoneParameter(segment, variantSpec) {
     ],
     curvature: { anteriorBow: generatorParameters.shaftAnteriorBow, medialLateralBow: generatorParameters.shaftMedialLateralBow, referenceRadius: 0.943 },
     torsion: { femoralAnteversion: generatorParameters.femoralAnteversion, units: 'degree' },
-    proximalEnd: { headRadius: generatorParameters.headRadius, neckLength: generatorParameters.neckLength, neckShaftAngle: generatorParameters.neckShaftAngle, greaterTrochanterSize: generatorParameters.greaterTrochanterSize, lesserTrochanterSize: generatorParameters.lesserTrochanterSize },
-    distalEnd: { distalCondyleWidth: generatorParameters.distalCondyleWidth, distalCondyleDepth: generatorParameters.distalCondyleDepth, intercondylarNotchWidth: generatorParameters.intercondylarNotchWidth },
-    articularSurfaces: [{ id: `${segment.side}_femoral_head_surface`, kind: 'spherical-pilot' }, { id: `${segment.side}_distal_condylar_surface`, kind: 'paired-condyle-pilot' }],
-    landmarks: femurLandmarkIds(segment.side).map((landmarkId) => ({ landmarkId })), corticalThickness: generatorParameters.corticalThickness,
+    proximalEnd: { headRadius: generatorParameters.headRadius, headEllipsoidRatio: generatorParameters.headEllipsoidRatio, neckLength: generatorParameters.neckLength, neckShaftAngle: generatorParameters.neckShaftAngle, greaterTrochanterSize: generatorParameters.greaterTrochanterSize, lesserTrochanterSize: generatorParameters.lesserTrochanterSize },
+    distalEnd: { distalCondyleWidth: generatorParameters.distalCondyleWidth, distalCondyleDepth: generatorParameters.distalCondyleDepth, intercondylarNotchWidth: generatorParameters.intercondylarNotchWidth, intercondylarFossaWidth: generatorParameters.intercondylarFossaWidth },
+    articularSurfaces: [{ id: `${segment.side}_femoral_head_surface`, kind: 'ellipsoidal-with-fovea' }, { id: `${segment.side}_distal_condylar_surface`, kind: 'asymmetric-paired-condyles-with-trochlea' }],
+    landmarks: femurLandmarkDescriptors(segment.side), corticalThickness: generatorParameters.corticalThickness,
     detailLevel: 2, symmetryPolicy: 'parameter-symmetric', minimum: ranges.femurLength.minimum, maximum: ranges.femurLength.maximum, default: ranges.femurLength.default, units: 'meter',
-    parameterRanges: ranges, generatorParameters, sourceReceiptIds: [SOURCE_IDS.proximal, SOURCE_IDS.curvature, SOURCE_IDS.distal, SOURCE_IDS.angles, SOURCE_IDS.openStax, SOURCE_IDS.pendingDetail], confidence: 'medium',
+    parameterRanges: ranges, generatorParameters, sourceReceiptIds: [SOURCE_IDS.proximal, SOURCE_IDS.curvature, SOURCE_IDS.distal, SOURCE_IDS.angles, SOURCE_IDS.fovea, SOURCE_IDS.lineaAspera, SOURCE_IDS.trochlea, SOURCE_IDS.openStax, SOURCE_IDS.pendingDetail], confidence: 'medium',
   };
 }
 
@@ -350,16 +374,46 @@ function createFemurParameterRanges(values) {
     femurLength: range(0.34, 0.52, values.femurLength, 'meter'), shaftAnteriorBow: range(0, 0.05, values.shaftAnteriorBow, 'meter'),
     shaftMedialLateralBow: range(-0.02, 0.02, values.shaftMedialLateralBow, 'meter'), shaftCrossSectionMajor: range(0.01, 0.024, values.shaftCrossSectionMajor, 'meter'),
     shaftCrossSectionMinor: range(0.009, 0.022, values.shaftCrossSectionMinor, 'meter'), headRadius: range(0.018, 0.029, values.headRadius, 'meter'),
+    shaftCrossSectionStations: { minimumStations: 5, maximumStations: 12, default: values.shaftCrossSectionStations, units: 'station-array' },
+    shaftPosteriorRidge: range(0, 0.004, values.shaftPosteriorRidge, 'meter'), lineaAsperaHeight: range(0, 0.004, values.lineaAsperaHeight, 'meter'),
+    lineaAsperaWidth: range(0.06, 0.32, values.lineaAsperaWidth, 'radian'), proximalMetaphysisBlend: range(0.20, 0.36, values.proximalMetaphysisBlend, 'ratio'),
+    distalMetaphysisBlend: range(0.12, 0.24, values.distalMetaphysisBlend, 'ratio'),
     neckLength: range(0.03, 0.065, values.neckLength, 'meter'), neckShaftAngle: range(116, 143, values.neckShaftAngle, 'degree'),
+    headEllipsoidRatio: range(0.94, 1.08, values.headEllipsoidRatio, 'ratio'), headFoveaDepth: range(0, 0.003, values.headFoveaDepth, 'meter'), headFoveaRadius: range(0.003, 0.009, values.headFoveaRadius, 'meter'),
+    neckCrossSectionMajor: range(0.009, 0.017, values.neckCrossSectionMajor, 'meter'), neckCrossSectionMinor: range(0.008, 0.015, values.neckCrossSectionMinor, 'meter'),
+    neckSuperiorEdge: range(-0.002, 0.003, values.neckSuperiorEdge, 'meter'), neckInferiorEdge: range(-0.002, 0.003, values.neckInferiorEdge, 'meter'),
+    neckAnteriorEdge: range(-0.002, 0.003, values.neckAnteriorEdge, 'meter'), neckPosteriorEdge: range(-0.002, 0.003, values.neckPosteriorEdge, 'meter'),
     femoralAnteversion: range(-12, 38.4, values.femoralAnteversion, 'degree'), greaterTrochanterSize: range(0.01, 0.03, values.greaterTrochanterSize, 'meter'),
+    greaterTrochanterTipHeight: range(0, 0.01, values.greaterTrochanterTipHeight, 'meter'), greaterTrochanterAnteriorCrest: range(0, 0.007, values.greaterTrochanterAnteriorCrest, 'meter'),
+    greaterTrochanterPosteriorCrest: range(0, 0.007, values.greaterTrochanterPosteriorCrest, 'meter'), trochantericFossaDepth: range(0, 0.006, values.trochantericFossaDepth, 'meter'),
+    intertrochantericLineHeight: range(0, 0.004, values.intertrochantericLineHeight, 'meter'), intertrochantericCrestHeight: range(0, 0.004, values.intertrochantericCrestHeight, 'meter'),
     lesserTrochanterSize: range(0.005, 0.018, values.lesserTrochanterSize, 'meter'), distalCondyleWidth: range(0.055, 0.085, values.distalCondyleWidth, 'meter'),
     distalCondyleDepth: range(0.05, 0.075, values.distalCondyleDepth, 'meter'), intercondylarNotchWidth: range(0.01, 0.028, values.intercondylarNotchWidth, 'meter'),
+    medialCondyleScale: range(0.85, 1.15, values.medialCondyleScale, 'ratio'), lateralCondyleScale: range(0.85, 1.15, values.lateralCondyleScale, 'ratio'),
+    medialCondylePosteriorLength: range(0, 0.012, values.medialCondylePosteriorLength, 'meter'), lateralCondylePosteriorLength: range(0, 0.012, values.lateralCondylePosteriorLength, 'meter'),
+    medialCondyleDistalOffset: range(-0.006, 0.006, values.medialCondyleDistalOffset, 'meter'), lateralCondyleDistalOffset: range(-0.006, 0.006, values.lateralCondyleDistalOffset, 'meter'),
+    medialEpicondyleSize: range(0, 0.009, values.medialEpicondyleSize, 'meter'), lateralEpicondyleSize: range(0, 0.009, values.lateralEpicondyleSize, 'meter'),
+    adductorTubercleSize: range(0, 0.008, values.adductorTubercleSize, 'meter'), intercondylarFossaWidth: range(0.012, 0.032, values.intercondylarFossaWidth, 'meter'),
+    intercondylarFossaDepth: range(0.002, 0.014, values.intercondylarFossaDepth, 'meter'), patellarSurfaceDepth: range(0, 0.006, values.patellarSurfaceDepth, 'meter'),
+    medialTrochlearRidgeHeight: range(0, 0.009, values.medialTrochlearRidgeHeight, 'meter'), lateralTrochlearRidgeHeight: range(0, 0.009, values.lateralTrochlearRidgeHeight, 'meter'),
+    patellarGrooveDepth: range(0.001, 0.010, values.patellarGrooveDepth, 'meter'),
     corticalThickness: range(0.002, 0.008, values.corticalThickness, 'meter'), surfaceDetail: range(0, 1, values.surfaceDetail, 'level'),
     leftRightAsymmetry: range(-0.02, 0.02, values.leftRightAsymmetry, 'ratio'),
   };
 }
 
-function femurLandmarkIds(side) { return ['head_center', 'neck_center', 'greater_trochanter', 'lesser_trochanter', 'medial_condyle', 'lateral_condyle', 'intercondylar_notch'].map((name) => `${side}_femur_${name}`); }
+function femurLandmarkDescriptors(side) {
+  const records = [
+    ['head_center', 'joint_center_candidate'], ['neck_center', 'axis_candidate'], ['greater_trochanter', 'surface_anatomical_landmark'],
+    ['lesser_trochanter', 'surface_anatomical_landmark'], ['medial_condyle', 'lod_review_landmark'], ['lateral_condyle', 'lod_review_landmark'],
+    ['intercondylar_notch', 'derived_internal_point'], ['greater_trochanter_tip', 'lod_review_landmark'], ['trochanteric_fossa', 'surface_anatomical_landmark'],
+    ['linea_aspera', 'lod_review_landmark'], ['medial_epicondyle', 'surface_anatomical_landmark'], ['lateral_epicondyle', 'surface_anatomical_landmark'],
+    ['adductor_tubercle', 'surface_anatomical_landmark'], ['intercondylar_fossa', 'lod_review_landmark'], ['patellar_surface', 'surface_anatomical_landmark'],
+    ['medial_trochlear_ridge', 'surface_anatomical_landmark'], ['lateral_trochlear_ridge', 'surface_anatomical_landmark'], ['patellar_groove', 'lod_review_landmark'],
+  ];
+  return records.map(([name, classification]) => ({ landmarkId: `${side}_femur_${name}`, classification }));
+}
+function femurLandmarkIds(side) { return femurLandmarkDescriptors(side).map(({ landmarkId }) => landmarkId); }
 function sideOf(id) { return id.startsWith('left_') ? 'left' : id.startsWith('right_') ? 'right' : 'center'; }
 function mirrorId(id) { if (id.startsWith('left_')) return `right_${id.slice(5)}`; if (id.startsWith('right_')) return `left_${id.slice(6)}`; return null; }
 function dimensionDependencies(id) { if (id.includes('arm') || id.includes('humerus')) return ['upperArmLength']; if (id.includes('forearm')) return ['forearmLength']; if (id.includes('hand')) return ['handLength']; if (id.includes('tibia') || id.includes('fibula')) return ['calfLength']; if (id.includes('foot')) return ['footLength']; if (id.includes('spine') || id === 'chest' || id === 'neck' || id === 'head') return ['spineLength', 'bodyHeight']; return ['shoulderWidth', 'pelvisWidth']; }
