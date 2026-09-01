@@ -1,0 +1,32 @@
+name: Procedural Bird Lab Build
+on:
+  push:
+    branches: [experiment/procedural-bird-language-lab-v1]
+    paths: ['bird-lab/**', '.github/workflows/bird-lab-build.yml']
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Acquire pinned renderer only
+        run: |
+          mkdir -p /tmp/bird-deps bird-lab/vendor
+          cd /tmp/bird-deps
+          npm init -y
+          npm install --ignore-scripts --no-audit --no-fund three@0.169.0
+          cp node_modules/three/build/three.module.min.js "$GITHUB_WORKSPACE/bird-lab/vendor/three.module.min.js"
+          cp node_modules/three/LICENSE "$GITHUB_WORKSPACE/bird-lab/vendor/THREE-LICENSE.txt"
+      - name: Record package provenance
+        run: |
+          node -e "require('fs').writeFileSync('bird-lab/BUILD.json',JSON.stringify({head:process.env.GITHUB_SHA,three:'0.169.0',originalProceduralBird:true,externalBirdAssets:0,visualAcceptance:false},null,2))"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bird-lab-build
+          path: bird-lab/
+          retention-days: 14
