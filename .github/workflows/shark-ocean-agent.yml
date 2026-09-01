@@ -1,0 +1,46 @@
+name: Shark Ocean Agent candidate
+on:
+  push:
+    branches: [experiment/shark-ocean-agent-v1]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shark-ocean-agent-candidate
+  cancel-in-progress: false
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Locked rendering dependency
+        run: |
+          mkdir -p "$RUNNER_TEMP/shark-deps"
+          npm install --prefix "$RUNNER_TEMP/shark-deps" --no-audit --no-fund three@0.185.1
+          mkdir -p shark-ocean-agent/vendor
+          cp "$RUNNER_TEMP/shark-deps/node_modules/three/build/three.module.js" shark-ocean-agent/vendor/
+          cp "$RUNNER_TEMP/shark-deps/node_modules/three/build/three.core.js" shark-ocean-agent/vendor/
+          cp "$RUNNER_TEMP/shark-deps/node_modules/three/examples/jsm/controls/OrbitControls.js" shark-ocean-agent/vendor/
+          cp "$RUNNER_TEMP/shark-deps/node_modules/three/LICENSE" shark-ocean-agent/vendor/THREE-LICENSE.txt
+          printf '{"threeVersion":"0.185.1","sourceHead":"%s","visualApproved":false,"productionApproved":false}\n' "$GITHUB_SHA" > shark-ocean-agent/BUILD.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shark-ocean-agent-candidate
+          path: shark-ocean-agent/
+          retention-days: 30
+      - name: Candidate browser tests when implemented
+        if: hashFiles('shark-ocean-agent/qa.cjs') != ''
+        run: |
+          npm install --prefix "$RUNNER_TEMP/shark-deps" --no-audit --no-fund playwright@1.55.0
+          "$RUNNER_TEMP/shark-deps/node_modules/.bin/playwright" install --with-deps chromium
+          NODE_PATH="$RUNNER_TEMP/shark-deps/node_modules" node shark-ocean-agent/qa.cjs
+      - uses: actions/upload-artifact@v4
+        if: always() && hashFiles('shark-ocean-agent/evidence/**') != ''
+        with:
+          name: shark-ocean-agent-evidence
+          path: shark-ocean-agent/evidence/
+          retention-days: 30
