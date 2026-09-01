@@ -44,3 +44,22 @@ jobs:
           name: shark-ocean-agent-evidence
           path: shark-ocean-agent/evidence/
           retention-days: 30
+      - name: Package pinned verification browser only
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import glob, os, pathlib, tarfile
+          roots=glob.glob(os.path.expanduser('~/.cache/ms-playwright/chromium_headless_shell-*'))
+          if len(roots)!=1:
+              raise SystemExit('Expected one pinned headless-shell directory')
+          root=pathlib.Path(roots[0])
+          with tarfile.open(os.path.join(os.environ['RUNNER_TEMP'],'shark-verification-driver.tar.gz'),'w:gz') as archive:
+              archive.add(root,arcname=root.name)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shark-standalone-verification-driver
+          path: ${{ runner.temp }}/shark-verification-driver.tar.gz
+          compression-level: 0
+          retention-days: 3
