@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/garment_dna@1.0",
+  "title": "Humanoid Rig Garment DNA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "garmentId", "revision", "garmentType", "fitMode", "units", "coordinateSystem", "pattern", "ease", "topology", "construction", "adaptation", "materialDNA", "contentHash"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/garment_dna@1.0" },
+    "garmentId": { "type": "string", "minLength": 1 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "garmentType": { "enum": ["crew_shirt"] },
+    "fitMode": { "enum": ["close", "regular", "relaxed"] },
+    "units": { "const": "meter" },
+    "coordinateSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handedness", "upAxis", "forwardAxis"],
+      "properties": {
+        "handedness": { "const": "right" },
+        "upAxis": { "const": "Y" },
+        "forwardAxis": { "const": "Z" }
+      }
+    },
+    "pattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bodyLengthRatio", "sleeveLengthRatio", "necklineWidthRatio", "frontNeckDropRatio", "backNeckDropRatio", "shoulderDropRatio", "hemShape", "sleevePitchRadians"],
+      "properties": {
+        "bodyLengthRatio": { "type": "number" },
+        "sleeveLengthRatio": { "type": "number" },
+        "necklineWidthRatio": { "type": "number" },
+        "frontNeckDropRatio": { "type": "number" },
+        "backNeckDropRatio": { "type": "number" },
+        "shoulderDropRatio": { "type": "number" },
+        "hemShape": { "type": "string" },
+        "sleevePitchRadians": { "type": "number" }
+      }
+    },
+    "ease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chest", "waist", "hem", "upperArm", "surfaceClearance"],
+      "properties": {
+        "chest": { "type": "number" },
+        "waist": { "type": "number" },
+        "hem": { "type": "number" },
+        "upperArm": { "type": "number" },
+        "surfaceClearance": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "topology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["torsoCircumferenceSegments", "torsoLengthSegments", "sleeveCircumferenceSegments", "sleeveLengthSegments", "collarSegments", "collarRadialSegments"],
+      "properties": {
+        "torsoCircumferenceSegments": { "type": "integer", "minimum": 12 },
+        "torsoLengthSegments": { "type": "integer", "minimum": 6 },
+        "sleeveCircumferenceSegments": { "type": "integer", "minimum": 8 },
+        "sleeveLengthSegments": { "type": "integer", "minimum": 2 },
+        "collarSegments": { "type": "integer", "minimum": 12 },
+        "collarRadialSegments": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "construction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seamAllowance", "collarBandWidth", "hemAllowance", "sleeveHemAllowance", "grainDirection"],
+      "properties": {
+        "seamAllowance": { "type": "number", "minimum": 0 },
+        "collarBandWidth": { "type": "number", "exclusiveMinimum": 0 },
+        "hemAllowance": { "type": "number", "minimum": 0 },
+        "sleeveHemAllowance": { "type": "number", "minimum": 0 },
+        "grainDirection": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } }
+      }
+    },
+    "adaptation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preserveTopologyAcrossBodies", "regenerateFromMeasurements", "allowWholeGarmentScale", "bodyRevisionRequired", "collisionSource", "finalPoseAuthority"],
+      "properties": {
+        "preserveTopologyAcrossBodies": { "const": true },
+        "regenerateFromMeasurements": { "const": true },
+        "allowWholeGarmentScale": { "const": false },
+        "bodyRevisionRequired": { "const": true },
+        "collisionSource": { "const": "body_surface_sampler_or_sdf" },
+        "finalPoseAuthority": { "const": "simulationRig" }
+      }
+    },
+    "materialDNA": { "$ref": "material-dna.schema.json" },
+    "contentHash": { "type": "string", "pattern": "^fnv1a32:[0-9a-f]{8}$" }
+  }
+}

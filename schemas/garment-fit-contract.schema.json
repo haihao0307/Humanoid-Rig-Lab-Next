@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/garment_fit_contract@1.0",
+  "title": "Humanoid Rig Garment Fit Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "garmentId", "garmentRevision", "garmentHash", "subjectId", "proportionRevision", "bodyHash", "units", "policy", "resolved", "contentHash"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/garment_fit_contract@1.0" },
+    "garmentId": { "type": "string" },
+    "garmentRevision": { "type": "integer", "minimum": 1 },
+    "garmentHash": { "type": "string" },
+    "subjectId": { "type": "string" },
+    "proportionRevision": { "type": "integer", "minimum": 0 },
+    "bodyHash": { "type": "string" },
+    "units": { "const": "meter" },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "topologyStable", "wholeGarmentScaleAllowed", "bodyIsReadOnly", "finalPoseAuthority"],
+      "properties": {
+        "method": { "const": "measurement_driven_regeneration" },
+        "topologyStable": { "const": true },
+        "wholeGarmentScaleAllowed": { "const": false },
+        "bodyIsReadOnly": { "const": true },
+        "finalPoseAuthority": { "const": "simulationRig" }
+      }
+    },
+    "resolved": {
+      "type": "object",
+      "additionalProperties": { "type": "number" },
+      "required": ["bodyHeight", "shoulderY", "underarmY", "waistY", "hemY", "bodyLength", "targetShoulderWidth", "chestSemiWidth", "chestSemiDepth", "waistSemiWidth", "waistSemiDepth", "hemSemiWidth", "hemSemiDepth", "necklineWidth", "sleeveLength", "sleeveStartRadius", "sleeveEndRadius", "surfaceClearance"]
+    },
+    "contentHash": { "type": "string", "pattern": "^fnv1a32:[0-9a-f]{8}$" }
+  }
+}

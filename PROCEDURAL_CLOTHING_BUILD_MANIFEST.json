@@ -1,0 +1,54 @@
+{
+  "schema": "humanoid_rig/procedural_clothing_build_manifest@1.0",
+  "module_id": "HRL-M04",
+  "name": "Procedural Clothing System",
+  "version": "0.1.0",
+  "date": "2026-09-08",
+  "status": "foundation_complete",
+  "base_repository": "haihao0307/Humanoid-Rig-Lab-Next",
+  "base_branch": "main",
+  "base_commit": "d7bbf9a107a1794f460850d4b368265417d7e24a",
+  "historical_clothing_branch": {
+    "branch": "feature/clothing-integration-v001",
+    "commit": "e8be7431afbe3be8a42d53928ce09564d274a987",
+    "classification": "static_attachment_reference_only"
+  },
+  "standard_garment": "standard_crew_shirt_v1",
+  "source_truth": ["GarmentDNA", "PatternGraph", "SeamGraph", "MaterialDNA", "FitContract"],
+  "runtime_truth": {
+    "format": "HRLG@1",
+    "container": "ArrayBuffer",
+    "arrays": 13,
+    "pose_authority": "simulationRig.finalPose"
+  },
+  "external_dependencies": {
+    "garment_meshes": 0,
+    "imported_geometry": 0,
+    "bitmap_surface_inputs": 0,
+    "remote_assets": 0,
+    "runtime_packages": 0
+  },
+  "tests": { "command": "npm run test:procedural-clothing", "passed": 10, "failed": 0 },
+  "entrypoints": {
+    "core": "packages/procedural-clothing/index.js",
+    "preview": "procedural-clothing-lab.html",
+    "start": "HRL_M04_START_HERE.md"
+  },
+  "browser_validation": {
+    "source": "procedural-clothing-lab-single.html",
+    "desktop": {
+      "viewport": "1440x1000",
+      "console_errors": 0,
+      "page_errors": 0,
+      "topology_stable_after_body_change": true,
+      "content_hash_changed": true
+    },
+    "mobile": {
+      "viewport": "390x844",
+      "console_errors": 0,
+      "page_errors": 0,
+      "topology_stable_after_body_change": true,
+      "content_hash_changed": true
+    }
+  }
+}

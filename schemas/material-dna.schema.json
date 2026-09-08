@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/material_dna@1.0",
+  "title": "Humanoid Rig Material DNA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "name", "family", "revision", "units", "mechanics", "optics", "microstructure", "contentHash"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/material_dna@1.0" },
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "family": { "enum": ["knit", "woven"] },
+    "revision": { "type": "integer", "minimum": 1 },
+    "units": { "const": "SI" },
+    "mechanics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["thickness", "arealDensity", "warpStretch", "weftStretch", "shearCompliance", "bendCompliance", "damping", "bodyFriction", "selfFriction", "airDrag"],
+      "properties": {
+        "thickness": { "type": "number", "exclusiveMinimum": 0 },
+        "arealDensity": { "type": "number", "exclusiveMinimum": 0 },
+        "warpStretch": { "type": "number", "exclusiveMinimum": 0 },
+        "weftStretch": { "type": "number", "exclusiveMinimum": 0 },
+        "shearCompliance": { "type": "number", "exclusiveMinimum": 0 },
+        "bendCompliance": { "type": "number", "exclusiveMinimum": 0 },
+        "damping": { "type": "number", "minimum": 0, "maximum": 1 },
+        "bodyFriction": { "type": "number", "minimum": 0 },
+        "selfFriction": { "type": "number", "minimum": 0 },
+        "airDrag": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "optics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseColorLinear", "roughness", "fiberSheen", "anisotropy", "opacity"],
+      "properties": {
+        "baseColorLinear": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number", "minimum": 0, "maximum": 1 } },
+        "roughness": { "type": "number", "minimum": 0, "maximum": 1 },
+        "fiberSheen": { "type": "number", "minimum": 0, "maximum": 1 },
+        "anisotropy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "microstructure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repeatUPerMeter", "repeatVPerMeter", "amplitude", "phase", "skew"],
+      "properties": {
+        "repeatUPerMeter": { "type": "number", "exclusiveMinimum": 0 },
+        "repeatVPerMeter": { "type": "number", "exclusiveMinimum": 0 },
+        "amplitude": { "type": "number", "minimum": 0 },
+        "phase": { "type": "number" },
+        "skew": { "type": "number", "minimum": -1, "maximum": 1 }
+      }
+    },
+    "contentHash": { "type": "string", "pattern": "^fnv1a32:[0-9a-f]{8}$" }
+  }
+}

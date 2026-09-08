@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "humanoid_rig/garment_payload@1.0",
+  "title": "Humanoid Rig Garment Payload Metadata",
+  "description": "Metadata schema. TypedArray sections are stored in memory or HRLG binary and are validated by runtime code.",
+  "type": "object",
+  "required": ["schema", "formatVersion", "garmentId", "garmentRevision", "garmentHash", "materialId", "materialRevision", "materialHash", "subjectId", "proportionRevision", "bodyHash", "fitContract", "patternGraphHash", "jointTable", "regionTable", "topology", "runtimeContract", "contentHash", "topologySignature"],
+  "properties": {
+    "schema": { "const": "humanoid_rig/garment_payload@1.0" },
+    "formatVersion": { "const": 1 },
+    "garmentId": { "type": "string" },
+    "garmentRevision": { "type": "integer" },
+    "garmentHash": { "type": "string" },
+    "materialId": { "type": "string" },
+    "materialRevision": { "type": "integer" },
+    "materialHash": { "type": "string" },
+    "subjectId": { "type": "string" },
+    "proportionRevision": { "type": "integer" },
+    "bodyHash": { "type": "string" },
+    "fitContract": { "$ref": "garment-fit-contract.schema.json" },
+    "patternGraphHash": { "type": "string" },
+    "jointTable": { "type": "array", "items": { "type": "string" } },
+    "regionTable": { "type": "object" },
+    "topology": {
+      "type": "object",
+      "required": ["vertexCount", "triangleCount", "structuralEdgeCount", "seamPairCount", "stableAcrossBodyProfiles"],
+      "properties": {
+        "vertexCount": { "type": "integer", "minimum": 1 },
+        "triangleCount": { "type": "integer", "minimum": 1 },
+        "structuralEdgeCount": { "type": "integer", "minimum": 1 },
+        "seamPairCount": { "type": "integer", "minimum": 1 },
+        "stableAcrossBodyProfiles": { "const": true }
+      }
+    },
+    "runtimeContract": {
+      "type": "object",
+      "required": ["matrixLayout", "matrixMeaning", "poseAuthority", "bodyMutationAllowed", "collisionInput"],
+      "properties": {
+        "matrixLayout": { "const": "column_major_4x4" },
+        "matrixMeaning": { "const": "final_joint_world_times_inverse_bind" },
+        "poseAuthority": { "const": "simulationRig.finalPose" },
+        "bodyMutationAllowed": { "const": false },
+        "collisionInput": { "const": "optional_body_surface_sampler_or_sdf" }
+      }
+    },
+    "contentHash": { "type": "string" },
+    "topologySignature": { "type": "string" }
+  }
+}
