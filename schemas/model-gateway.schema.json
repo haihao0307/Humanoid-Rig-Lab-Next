@@ -1,0 +1,734 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Jarvis local model proposal union",
+  "anyOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "jarvis/scene_goal_proposal@1.0"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "clarify",
+            "noop"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "replace",
+            "append"
+          ]
+        },
+        "goals": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/sceneGoal"
+          }
+        },
+        "response": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "questions": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "message": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "raw": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "slot": {
+                "enum": [
+                  "object",
+                  "target"
+                ]
+              }
+            },
+            "required": [
+              "message"
+            ]
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "status",
+        "mode",
+        "goals"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "mode",
+        "nodes",
+        "response",
+        "constraints"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "ready",
+            "clarify",
+            "chat",
+            "noop",
+            "blocked"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "replace",
+            "append"
+          ]
+        },
+        "nodes": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        },
+        "response": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protectedIds",
+            "collisionAvoidance"
+          ],
+          "properties": {
+            "protectedIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 100
+            },
+            "collisionAvoidance": {
+              "const": true
+            },
+            "forbiddenActions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "questions": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "raw": {
+                "type": "string"
+              },
+              "slot": {
+                "enum": [
+                  "object",
+                  "target"
+                ]
+              },
+              "code": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "walk",
+            "carry",
+            "push",
+            "sit",
+            "lie",
+            "stand",
+            "greet",
+            "wave",
+            "salute",
+            "wait",
+            "observe"
+          ]
+        },
+        "objectId": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "relation": {
+          "enum": [
+            "inside",
+            "near",
+            "left",
+            "right",
+            "front",
+            "behind"
+          ]
+        },
+        "referenceFrame": {
+          "enum": [
+            "world",
+            "self"
+          ]
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 30
+        }
+      }
+    },
+    "predicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "exists",
+            "inside",
+            "movable",
+            "posture"
+          ]
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "objectId": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "value": {
+          "enum": [
+            "standing",
+            "sitting",
+            "lying"
+          ]
+        },
+        "negate": {
+          "type": "boolean"
+        }
+      }
+    },
+    "node": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "id",
+            "step"
+          ],
+          "properties": {
+            "kind": {
+              "const": "action"
+            },
+            "id": {
+              "type": "string"
+            },
+            "step": {
+              "$ref": "#/$defs/step"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "id",
+            "label",
+            "predicate",
+            "then",
+            "else"
+          ],
+          "properties": {
+            "kind": {
+              "const": "condition"
+            },
+            "id": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "predicate": {
+              "$ref": "#/$defs/predicate"
+            },
+            "then": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/node"
+              }
+            },
+            "else": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/node"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sceneQuery": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "all"
+            }
+          },
+          "required": [
+            "op"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "portable"
+            }
+          },
+          "required": [
+            "op"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "ids"
+            },
+            "ids": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 64,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              }
+            }
+          },
+          "required": [
+            "op",
+            "ids"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "type"
+            },
+            "value": {
+              "enum": [
+                "sphere",
+                "box",
+                "cylinder",
+                "cone",
+                "prism",
+                "table",
+                "bench",
+                "shelf",
+                "platform"
+              ]
+            }
+          },
+          "required": [
+            "op",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "color"
+            },
+            "value": {
+              "enum": [
+                "red",
+                "blue",
+                "yellow",
+                "green",
+                "purple",
+                "orange",
+                "cyan",
+                "white",
+                "black"
+              ]
+            }
+          },
+          "required": [
+            "op",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "movable"
+            },
+            "value": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "op",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "context"
+            },
+            "value": {
+              "enum": [
+                "set",
+                "remaining",
+                "object"
+              ]
+            }
+          },
+          "required": [
+            "op",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "support"
+            },
+            "targetId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          },
+          "required": [
+            "op",
+            "targetId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "inside"
+            },
+            "targetId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          },
+          "required": [
+            "op",
+            "targetId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "near"
+            },
+            "targetId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "distanceM": {
+              "type": "number",
+              "minimum": 0.05,
+              "maximum": 3
+            }
+          },
+          "required": [
+            "op",
+            "targetId",
+            "distanceM"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "side"
+            },
+            "targetId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "value": {
+              "enum": [
+                "left",
+                "right",
+                "front",
+                "behind"
+              ]
+            },
+            "frame": {
+              "enum": [
+                "self",
+                "world"
+              ]
+            }
+          },
+          "required": [
+            "op",
+            "targetId",
+            "value",
+            "frame"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "and"
+            },
+            "args": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 64,
+              "items": {
+                "$ref": "#/$defs/sceneQuery"
+              }
+            }
+          },
+          "required": [
+            "op",
+            "args"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "or"
+            },
+            "args": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 64,
+              "items": {
+                "$ref": "#/$defs/sceneQuery"
+              }
+            }
+          },
+          "required": [
+            "op",
+            "args"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "not"
+            },
+            "arg": {
+              "$ref": "#/$defs/sceneQuery"
+            }
+          },
+          "required": [
+            "op",
+            "arg"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "const": "rank"
+            },
+            "arg": {
+              "$ref": "#/$defs/sceneQuery"
+            },
+            "by": {
+              "enum": [
+                "distance",
+                "mass",
+                "volume",
+                "x"
+              ]
+            },
+            "order": {
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 64
+            },
+            "targetId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          },
+          "required": [
+            "op",
+            "arg",
+            "by",
+            "order",
+            "count"
+          ]
+        }
+      ]
+    },
+    "sceneGoal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "const": "relocate"
+        },
+        "method": {
+          "enum": [
+            "carry",
+            "push"
+          ]
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "query": {
+              "$ref": "#/$defs/sceneQuery"
+            },
+            "quantifier": {
+              "enum": [
+                "one",
+                "all",
+                "count"
+              ]
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 64
+            },
+            "raw": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          "required": [
+            "query",
+            "quantifier"
+          ]
+        },
+        "destination": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "relation": {
+              "enum": [
+                "on",
+                "inside",
+                "near",
+                "left",
+                "right",
+                "front",
+                "behind"
+              ]
+            },
+            "raw": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          "required": [
+            "id",
+            "relation"
+          ]
+        }
+      },
+      "required": [
+        "action",
+        "method",
+        "source",
+        "destination"
+      ]
+    }
+  }
+}

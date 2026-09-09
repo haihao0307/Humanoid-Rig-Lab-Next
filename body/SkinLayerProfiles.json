@@ -1,0 +1,29 @@
+{
+  "schema": "jarvis/skin_layer_profiles@1",
+  "units": "mm",
+  "sources": {
+    "anatomy": "https://openstax.org/books/anatomy-and-physiology-2e/pages/5-1-layers-of-the-skin",
+    "regionalThickness": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9838783/",
+    "doi": "10.1111/srt.13219"
+  },
+  "interpretation": "Rounded regional epidermis/dermis reference values. Not measurements of an individual. All subcutaneous values and unsampled sites are authored visualization estimates.",
+  "regions": {
+    "face": {"label":"面部","epidermisMm":0.116,"dermisMm":1.80,"subcutaneousMm":2.5,"basis":"study cheek mean, rounded"},
+    "neck": {"label":"颈部","epidermisMm":0.12,"dermisMm":1.20,"subcutaneousMm":2.0,"basis":"authored unsampled site"},
+    "chest": {"label":"胸部","epidermisMm":0.115,"dermisMm":1.82,"subcutaneousMm":5.0,"basis":"study chest mean, rounded"},
+    "back": {"label":"背部","epidermisMm":0.128,"dermisMm":2.84,"subcutaneousMm":4.0,"basis":"study back mean, rounded"},
+    "abdomen": {"label":"腹臀部","epidermisMm":0.132,"dermisMm":1.56,"subcutaneousMm":8.0,"basis":"study abdomen mean; gluteal assignment authored"},
+    "upperArm": {"label":"上臂","epidermisMm":0.139,"dermisMm":1.13,"subcutaneousMm":4.0,"basis":"average of study flexor/extensor means, rounded"},
+    "forearm": {"label":"前臂","epidermisMm":0.134,"dermisMm":1.10,"subcutaneousMm":2.5,"basis":"average of study flexor/extensor means, rounded"},
+    "thigh": {"label":"大腿","epidermisMm":0.145,"dermisMm":1.19,"subcutaneousMm":6.0,"basis":"average of study flexor/outer means, rounded"},
+    "lowerLeg": {"label":"小腿","epidermisMm":0.143,"dermisMm":1.21,"subcutaneousMm":2.5,"basis":"average of study medial/lateral means, rounded"},
+    "hand": {"label":"手背与手指","epidermisMm":0.18,"dermisMm":1.0,"subcutaneousMm":1.2,"basis":"authored unsampled site"},
+    "palm": {"label":"掌侧","epidermisMm":0.45,"dermisMm":1.2,"subcutaneousMm":2.5,"basis":"authored thick-skin site; not study data"},
+    "foot": {"label":"足背","epidermisMm":0.18,"dermisMm":1.3,"subcutaneousMm":1.5,"basis":"authored unsampled site"},
+    "sole": {"label":"足底","epidermisMm":0.65,"dermisMm":1.8,"subcutaneousMm":6.0,"basis":"authored thick-skin site; not study data"}
+  },
+  "defaults": {"thicknessScale":1,"subcutaneousScale":1,"surfaceSmoothing":1},
+  "limits": {"thicknessScale":[0.75,1.5],"subcutaneousScale":[0.7,1.4],"surfaceSmoothing":[0,1.5]},
+  "geometry": {"maxOutwardAdjustmentMm":4,"maxInwardAdjustmentMm":2,"curvatureRadiusFraction":0.25,"maxFairingMm":1.2,"minFairingMm":0.15},
+  "limitations": ["Regional mapping is approximate, not histological segmentation.","Subcutaneous thickness is an authored estimate, not measured fat volume.","Inset shells are visual boundaries, not closed volumetric tissue meshes.","No skin constitutive law or clinical calibration is claimed."]
+}

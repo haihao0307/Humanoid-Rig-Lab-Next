@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="dark" name="color-scheme"/>
+<meta content="#10151c" name="theme-color"/>
+<title>贾维斯 · 清爽工作台 V1.15.1</title>
+<style>
+:root{
+  --bg:#02060d;--panel:#07121c;--panel2:#0a1a27;--line:#173249;--line2:#275775;
+  --text:#e7f7ff;--muted:#7895a7;--soft:#476578;--cyan:#5fe3ff;--blue:#3888ff;
+  --violet:#8f7cff;--good:#61e3b1;--warn:#efc46b;--bad:#ff6f91;--header:66px;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text)}
+body{background:radial-gradient(circle at 46% -16%,rgba(54,135,255,.18),transparent 38%),radial-gradient(circle at 90% 28%,rgba(143,124,255,.08),transparent 32%),linear-gradient(150deg,#02060d,#04101a 62%,#02070e)}
+button,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
+.app{height:100%;display:grid;grid-template-rows:var(--header) minmax(0,1fr)}
+.topbar{display:grid;grid-template-columns:minmax(220px,1fr) auto minmax(220px,1fr);align-items:center;gap:14px;padding:0 18px;border-bottom:1px solid rgba(75,151,196,.22);background:rgba(3,9,16,.88);backdrop-filter:blur(20px);z-index:20}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}.brand-mark{position:relative;width:38px;height:38px;border:1px solid #2e7ea1;border-radius:50%;box-shadow:inset 0 0 20px rgba(95,227,255,.17),0 0 20px rgba(31,133,191,.12)}.brand-mark:before,.brand-mark:after{content:"";position:absolute;inset:7px;border:1px solid var(--cyan);border-radius:50%;animation:spin 8s linear infinite}.brand-mark:after{inset:13px;background:var(--cyan);box-shadow:0 0 15px var(--cyan);animation:none}.brand-copy{min-width:0}.brand-copy small{display:block;color:#5b7f94;font:8px ui-monospace,monospace;letter-spacing:.18em}.brand-copy strong{display:block;margin-top:3px;font-size:15px;white-space:nowrap}.brand-copy strong b{color:#80ebff;font-weight:650}
+.binding-strip{display:flex;gap:7px}.status-pill{min-width:126px;display:grid;grid-template-columns:8px 1fr;gap:3px 9px;padding:8px 11px;border:1px solid rgba(65,133,172,.26);border-radius:10px;background:linear-gradient(145deg,rgba(8,26,40,.88),rgba(5,15,25,.84))}.status-pill i{grid-row:1/3;align-self:center;width:7px;height:7px;border-radius:50%;background:#456274}.status-pill span{font-size:9px;color:#92afbe}.status-pill strong{font:8px ui-monospace,monospace;color:#6d8b9b;letter-spacing:.09em}.status-pill.good i{background:var(--good);box-shadow:0 0 13px rgba(97,227,177,.7)}.status-pill.good strong{color:#8ef0ca}.status-pill.active i{background:var(--cyan);box-shadow:0 0 13px rgba(95,227,255,.65)}.status-pill.active strong{color:#8feeff}.top-actions{display:flex;justify-content:flex-end;gap:7px}.top-actions button,.small-btn{height:35px;padding:0 11px;border:1px solid rgba(69,137,177,.28);border-radius:9px;background:rgba(9,24,35,.68);font-size:9px}.top-actions button:hover,.small-btn:hover{border-color:#367da3;background:rgba(15,43,61,.82)}
+.workspace{min-height:0;display:grid;grid-template-columns:244px minmax(600px,1fr) 330px;gap:8px;padding:8px}
+.panel{min-width:0;min-height:0;border:1px solid rgba(55,117,153,.22);border-radius:14px;background:linear-gradient(160deg,rgba(7,20,31,.92),rgba(3,11,18,.95));box-shadow:inset 0 1px rgba(255,255,255,.025),0 18px 50px rgba(0,0,0,.18);overflow:hidden}
+.panel-scroll{height:100%;overflow:auto;padding:12px}.panel-scroll::-webkit-scrollbar,.event-list::-webkit-scrollbar,.chat-log::-webkit-scrollbar,.json-box::-webkit-scrollbar{width:5px}.panel-scroll::-webkit-scrollbar-thumb,.event-list::-webkit-scrollbar-thumb,.chat-log::-webkit-scrollbar-thumb,.json-box::-webkit-scrollbar-thumb{background:#17374b;border-radius:8px}
+.section{padding:12px;border:1px solid rgba(47,101,134,.18);border-radius:11px;background:rgba(5,15,24,.54);margin-bottom:9px}.section:last-child{margin-bottom:0}.section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.section-head h2{margin:0;font-size:10px;letter-spacing:.08em}.section-state{font:7px ui-monospace,monospace;color:#6f92a5;letter-spacing:.1em}.section-state.connected{color:#7de8bd}.identity-card{display:flex;align-items:center;gap:10px}.identity-core{position:relative;width:42px;height:42px;border:1px solid #2b81a8;border-radius:50%;background:radial-gradient(circle,#6df0ff 0 7%,#1d81cb 8% 19%,transparent 22%);box-shadow:0 0 25px rgba(44,157,226,.22)}.identity-core:after{content:"";position:absolute;inset:7px;border:1px solid rgba(129,232,255,.5);border-radius:50%;animation:spin 9s linear infinite}.identity-copy strong{display:block;font-size:13px}.identity-copy span{display:block;margin-top:3px;color:#6d8fa1;font:8px ui-monospace,monospace}.identity-copy small{display:block;margin-top:4px;color:#526f7f;font-size:8px}
+.body-list{display:grid;gap:6px}.body-card{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px;border:1px solid rgba(52,111,145,.17);border-radius:9px;background:rgba(7,20,30,.58)}.body-card.active{border-color:rgba(97,227,177,.4);background:linear-gradient(100deg,rgba(97,227,177,.09),rgba(41,111,155,.04))}.body-icon{width:30px;height:30px;display:grid;place-items:center;border:1px solid #21475d;border-radius:9px;color:#86cfe8}.body-card b{display:block;font-size:9px}.body-card small{display:block;margin-top:2px;color:#587688;font:7px ui-monospace,monospace}.body-card em{font:7px ui-monospace,monospace;color:#506e80;font-style:normal}.body-card.active em{color:#78e4b8}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.metric{padding:8px;border:1px solid rgba(48,101,132,.16);border-radius:8px;background:#06121b}.metric span{display:block;color:#5f7e90;font-size:7px}.metric strong{display:block;margin-top:4px;font:9px ui-monospace,monospace;color:#b7dae8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.capability-tags{display:flex;flex-wrap:wrap;gap:5px}.capability-tags span,.tag{padding:4px 6px;border:1px solid rgba(56,126,165,.25);border-radius:999px;color:#83a8ba;font-size:7px;background:rgba(8,24,36,.65)}
+.center{min-width:0;min-height:0;display:grid;grid-template-rows:minmax(360px,1fr) 232px;gap:8px}.link-stage{position:relative;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(250px,.88fr) 74px minmax(340px,1.12fr);overflow:hidden;border:1px solid rgba(64,134,176,.24);border-radius:15px;background:#02070d;box-shadow:0 24px 80px rgba(0,0,0,.32)}.brain-pane,.body-pane{position:relative;min-width:0;min-height:0;overflow:hidden}.brain-pane{border-right:1px solid rgba(67,143,185,.18)}.body-pane{border-left:1px solid rgba(75,145,184,.18);background:#040a10}.embed-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#030910}.pane-label{position:absolute;left:12px;bottom:11px;z-index:12;padding:5px 8px;border:1px solid rgba(71,142,181,.28);border-radius:999px;background:rgba(3,12,20,.72);backdrop-filter:blur(10px);font:7px ui-monospace,monospace;letter-spacing:.12em;color:#7095a9;pointer-events:none}.pane-label b{color:#aeeeff;font-weight:650}.body-pane .pane-label b{color:#9ce8c7}.body-tools{position:absolute;right:10px;top:10px;z-index:12;display:flex;gap:5px}.body-tools button{width:30px;height:29px;padding:0;border:1px solid rgba(66,132,169,.25);border-radius:8px;background:rgba(4,16,24,.72);font-size:9px;backdrop-filter:blur(8px)}
+.link-bus{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:linear-gradient(180deg,rgba(5,17,27,.98),rgba(4,13,21,.98));overflow:hidden}.link-bus:before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:linear-gradient(transparent,rgba(80,212,255,.45),rgba(97,227,177,.5),transparent)}.link-core{position:relative;width:38px;height:38px;border:1px solid #357a9c;border-radius:50%;background:radial-gradient(circle,#b9fbff 0 5%,#36b8ed 7% 16%,#0e3853 18% 38%,transparent 40%);box-shadow:0 0 28px rgba(54,184,237,.32);z-index:2}.link-core:before,.link-core:after{content:"";position:absolute;inset:-7px;border:1px solid rgba(82,195,241,.27);border-radius:50%;animation:spin 7s linear infinite}.link-core:after{inset:-13px;border-style:dashed;animation-direction:reverse;animation-duration:12s}.bus-packet{position:relative;z-index:2;width:60px;padding:5px 3px;border:1px solid rgba(54,118,152,.24);border-radius:7px;background:#06141e;text-align:center;font:6px ui-monospace,monospace;color:#64889b;letter-spacing:.04em}.bus-packet i{display:block;width:5px;height:5px;margin:0 auto 3px;border-radius:50%;background:#36586a}.bus-packet.active{border-color:rgba(95,227,255,.5);color:#9deeff;box-shadow:0 0 18px rgba(50,151,210,.13)}.bus-packet.active i{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}.bus-packet.feedback.active{border-color:rgba(97,227,177,.5);color:#a2efcf}.bus-packet.feedback.active i{background:var(--good);box-shadow:0 0 10px var(--good)}.link-pulse{position:absolute;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);opacity:0}.link-bus.transmitting .link-pulse.outgoing{animation:flowDown 1.2s ease-in-out infinite}.link-bus.receiving .link-pulse.incoming{background:var(--good);box-shadow:0 0 12px var(--good);animation:flowUp 1.2s ease-in-out infinite}
+.console{min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr);overflow:hidden}.dialogue{min-width:0;display:grid;grid-template-rows:38px minmax(0,1fr) 58px;border-right:1px solid rgba(55,118,153,.2)}.console-head{display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid rgba(54,115,150,.18);font-size:9px}.console-head span{color:#5e7f91;font:7px ui-monospace,monospace}.mode-switch{display:flex;gap:4px}.mode-switch button{height:25px;padding:0 8px;border:1px solid rgba(55,117,151,.2);border-radius:7px;background:#071823;color:#658799;font-size:7px}.mode-switch button.active{border-color:rgba(97,227,177,.38);color:#9ceacb;background:rgba(97,227,177,.07)}.chat-log{overflow:auto;padding:10px 12px;display:grid;gap:7px;align-content:start}.message{max-width:88%;padding:8px 10px;border:1px solid rgba(55,115,148,.18);border-radius:9px;background:#06131d;color:#a9c2cf;font-size:9px;line-height:1.6}.message.user{justify-self:end;border-color:rgba(75,145,210,.22);background:rgba(19,49,70,.64);color:#d6eef8}.message.brain{justify-self:start}.message.system{justify-self:start;border-style:dashed;color:#7192a3;font-size:8px}.message.success{border-color:rgba(97,227,177,.3);color:#a8e8cf}.message.error{border-color:rgba(255,111,145,.35);color:#ffadbe}.message-meta{display:flex;gap:7px;margin-top:5px;color:#4f7081;font:6px ui-monospace,monospace}.input-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:8px 10px;border-top:1px solid rgba(55,116,150,.19)}textarea{width:100%;height:41px;min-height:41px;max-height:90px;resize:none;padding:9px 10px;border:1px solid rgba(60,126,163,.25);border-radius:9px;background:#040e16;color:#d8edf5;font-size:9px;line-height:1.5;outline:none}textarea:focus{border-color:#2d7ca5;box-shadow:0 0 0 2px rgba(45,124,165,.09)}.send{min-width:82px;border:0;border-radius:9px;background:linear-gradient(120deg,#4bd7ee,#63e0ad);color:#03131a;font-weight:800;font-size:9px}.send:disabled{opacity:.45;cursor:wait}.trace{min-width:0;display:grid;grid-template-rows:38px minmax(0,1fr);background:rgba(4,13,21,.45)}.trace-list{overflow:auto;padding:9px;display:grid;gap:5px;align-content:start}.trace-node{display:grid;grid-template-columns:23px minmax(0,1fr) auto;align-items:center;gap:7px;padding:6px 7px;border:1px solid rgba(48,103,134,.16);border-radius:8px;background:#06131c}.trace-node i{width:23px;height:23px;display:grid;place-items:center;border:1px solid #1d4155;border-radius:7px;color:#557b8f;font:7px ui-monospace,monospace}.trace-node b{display:block;font-size:8px}.trace-node small{display:block;margin-top:2px;color:#4f7082;font:6px ui-monospace,monospace}.trace-node em{font:6px ui-monospace,monospace;color:#486879;font-style:normal}.trace-node.active{border-color:rgba(95,227,255,.38);background:rgba(34,104,139,.1)}.trace-node.active i{border-color:#2f8ab4;color:#9cecff;box-shadow:0 0 12px rgba(47,138,180,.18)}.trace-node.done em{color:#72dab1}
+.right{min-width:0;min-height:0}.binding-card{position:relative;padding:10px;border:1px solid rgba(97,227,177,.22);border-radius:9px;background:linear-gradient(135deg,rgba(97,227,177,.07),rgba(43,117,164,.04))}.binding-card:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:2px;background:var(--good);box-shadow:0 0 10px var(--good)}.binding-row{display:grid;grid-template-columns:88px minmax(0,1fr);gap:5px;margin:5px 0;font-size:8px}.binding-row span{color:#5f7f90}.binding-row strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:8px ui-monospace,monospace;color:#afcedb}.control-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}.control-grid button{height:31px;border:1px solid rgba(55,116,151,.22);border-radius:8px;background:#071924;font-size:8px}.control-grid button.stop{border-color:rgba(255,111,145,.22);color:#e69aaa}.intent-card{display:grid;gap:7px}.intent-summary{padding:8px;border-left:2px solid var(--cyan);background:#06151f;color:#aec8d5;font-size:8px;line-height:1.55}.json-box{max-height:145px;overflow:auto;margin:0;padding:8px;border:1px solid rgba(49,105,137,.16);border-radius:8px;background:#030b12;color:#6f99ab;font:7px/1.55 ui-monospace,monospace;white-space:pre-wrap;word-break:break-word}.event-list{max-height:174px;overflow:auto;display:grid;gap:5px}.execution-event{padding:7px;border-left:2px solid #2c5c73;background:#06131c;color:#7599aa;font-size:7px;line-height:1.5}.execution-event.accepted,.execution-event.started{border-color:var(--cyan)}.execution-event.completed{border-color:var(--good);color:#91dabb}.execution-event.failed{border-color:var(--bad);color:#e996aa}.validation-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:5px 0;border-bottom:1px solid rgba(45,93,120,.12);font-size:8px}.validation-row:last-child{border:0}.validation-row span{color:#658596}.validation-row strong{font:8px ui-monospace,monospace;color:#b2d1dc}.validation-row strong.good{color:#78e1b5}.empty{padding:9px;border:1px dashed rgba(52,109,140,.2);border-radius:8px;color:#4e7183;font-size:8px;line-height:1.6}
+.toast{position:fixed;right:15px;bottom:15px;z-index:50;max-width:340px;padding:10px 12px;border:1px solid #28536b;border-radius:10px;background:#071722;color:#abd0df;font-size:9px;box-shadow:0 18px 45px rgba(0,0,0,.35);opacity:0;transform:translateY(8px);pointer-events:none;transition:.18s}.toast.show{opacity:1;transform:none}.toast.error{border-color:#743246;color:#ffb1c1}.loading-cover{position:absolute;inset:0;z-index:15;display:grid;place-items:center;background:radial-gradient(circle,rgba(12,38,55,.94),rgba(2,7,12,.98) 62%);transition:.25s}.loading-cover.hidden{opacity:0;pointer-events:none}.loading-card{text-align:center;color:#89afc0;font-size:9px}.spinner{width:30px;height:30px;margin:0 auto 10px;border:2px solid rgba(95,227,255,.13);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite}
+.loading-card{max-width:min(600px,90%);padding:24px;line-height:1.8}.loading-cover.failed .loading-card{color:#f0b5bf;font-size:12px}.loading-card [hidden]{display:none!important}#startupErrorDetail{margin:16px 0;padding:14px;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;max-height:38vh;overflow:auto;background:#180e15;border:1px solid #773347;border-radius:8px;color:#ffd2d9;font:12px/1.6 ui-monospace,monospace}#retryStartupBtn{margin-top:12px;padding:9px 18px;font-size:12px}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes flowDown{0%{top:20%;opacity:0}20%{opacity:1}80%{opacity:1}100%{top:80%;opacity:0}}@keyframes flowUp{0%{top:80%;opacity:0}20%{opacity:1}80%{opacity:1}100%{top:20%;opacity:0}}
+@media(max-width:1260px){.workspace{grid-template-columns:216px minmax(540px,1fr) 292px}.binding-strip .status-pill{min-width:108px}.status-pill{padding:7px 9px}}
+@media(max-width:1040px){.workspace{grid-template-columns:1fr}.left,.right{display:none}.center{grid-template-rows:minmax(370px,1fr) 240px}.topbar{grid-template-columns:1fr auto}.binding-strip{display:none}.link-stage{grid-template-columns:minmax(230px,.85fr) 60px minmax(320px,1.15fr)}}
+
+
+/* V1.1 communication and voice layer */
+:root{--console-height:clamp(312px,36vh,390px)}
+.center{grid-template-rows:minmax(300px,1fr) var(--console-height)}
+.app.comm-focus .center{grid-template-rows:minmax(270px,1fr) clamp(360px,42vh,430px)}
+.top-actions{min-width:0;flex-wrap:nowrap}.top-actions .comm-action{border-color:rgba(95,227,255,.48);color:#a9f4ff;background:linear-gradient(135deg,rgba(24,91,122,.44),rgba(13,42,62,.72));box-shadow:inset 0 0 18px rgba(95,227,255,.06),0 0 24px rgba(38,132,180,.08)}
+.communication-panel{border-color:rgba(71,170,220,.42);box-shadow:inset 0 1px rgba(255,255,255,.035),0 22px 66px rgba(0,0,0,.26),0 0 30px rgba(27,120,172,.08)}
+.console{grid-template-columns:minmax(0,1fr) minmax(270px,320px)}
+.dialogue{grid-template-rows:58px minmax(0,1fr) 112px}.dialogue,.trace{min-height:0;height:100%;overflow:hidden}.chat-log,.trace-list{min-height:0}
+.conversation-head{padding:0 13px;background:linear-gradient(90deg,rgba(18,55,77,.32),rgba(6,18,28,.36))}.conversation-heading{min-width:0}.conversation-heading>span{display:block;color:#5fdcf4;font:6px ui-monospace,monospace;letter-spacing:.19em}.conversation-heading>b{display:block;margin-top:3px;font-size:11px;letter-spacing:.02em}.conversation-heading>small{display:block;margin-top:2px;color:#5f8092;font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.conversation-tools{display:flex;align-items:center;gap:6px}.utility-btn{height:25px;padding:0 8px;border:1px solid rgba(55,117,151,.2);border-radius:7px;background:#071823;color:#658799;font-size:7px}.utility-btn:hover{border-color:#337a9f;color:#a7d9ea}
+.chat-log{background:radial-gradient(circle at 50% 110%,rgba(40,126,169,.08),transparent 48%)}.message{font-size:10px;line-height:1.58;border-radius:11px}.message.user{box-shadow:inset 0 1px rgba(255,255,255,.025)}.message.brain{border-color:rgba(65,145,183,.24);background:linear-gradient(145deg,#06151f,#07131d)}.message-meta{font-size:6.5px;letter-spacing:.04em}.message-meta .voice-source{color:#82eaff}.message-meta .text-source{color:#7897a8}
+.composer{display:grid;grid-template-columns:minmax(0,1fr) 78px 82px;gap:8px;padding:9px 10px;border-top:1px solid rgba(66,142,181,.26);background:linear-gradient(180deg,rgba(5,17,26,.94),rgba(3,11,18,.98))}.composer-main{min-width:0;display:grid;grid-template-rows:minmax(54px,1fr) 22px;gap:5px}.composer textarea{height:100%;min-height:54px;max-height:none;padding:10px 11px;border-radius:10px;font-size:10px;background:linear-gradient(145deg,#030c13,#06131c)}.voice-live{min-width:0;display:grid;grid-template-columns:7px minmax(0,1fr) auto;align-items:center;gap:7px;padding:0 4px;color:#5a7b8d;font-size:7px}.voice-live i{width:6px;height:6px;border-radius:50%;background:#355667}.voice-live.listening{color:#95dceb}.voice-live.listening i{background:var(--cyan);box-shadow:0 0 11px var(--cyan);animation:voicePulse 1.1s ease-in-out infinite}.voice-live.processing i{background:var(--good);box-shadow:0 0 10px var(--good)}.voice-live.error i{background:var(--bad);box-shadow:0 0 10px rgba(255,111,145,.6)}.voice-live span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.voice-live em{font:6px ui-monospace,monospace;color:#426477;font-style:normal;letter-spacing:.08em}.voice-live.listening em{color:#79e6fb}
+.mic-btn,.send{height:100%;min-width:0;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}.mic-btn{border:1px solid rgba(65,137,176,.33);background:linear-gradient(145deg,#071a26,#05121b);color:#82aabc;position:relative;overflow:hidden}.mic-btn:before{content:"";position:absolute;inset:-35%;background:conic-gradient(from 0deg,transparent,rgba(95,227,255,.16),transparent 32%);opacity:0;animation:spin 2.6s linear infinite}.mic-btn b,.mic-btn small,.mic-glyph{position:relative;z-index:1}.mic-btn b,.send b{font-size:9px}.mic-btn small,.send small{font-size:6px;opacity:.7}.mic-btn:hover{border-color:#3d91b8;color:#bdeffd}.mic-btn.listening{border-color:rgba(95,227,255,.8);color:#c6fbff;background:radial-gradient(circle at 50% 24%,rgba(52,188,229,.28),rgba(7,26,38,.96) 60%);box-shadow:inset 0 0 24px rgba(95,227,255,.12),0 0 24px rgba(44,168,220,.17)}.mic-btn.listening:before{opacity:1}.mic-btn.processing{border-color:rgba(97,227,177,.65);color:#b8f5dc}.mic-btn:disabled{opacity:.45;cursor:not-allowed}.mic-glyph{width:26px;height:26px;border:1px solid rgba(92,196,230,.42);border-radius:50%;display:grid;place-items:center}.mic-glyph i{position:relative;width:8px;height:13px;border:1.5px solid currentColor;border-radius:6px}.mic-glyph i:before{content:"";position:absolute;left:50%;top:11px;width:12px;height:7px;margin-left:-6px;border:1.5px solid currentColor;border-top:0;border-radius:0 0 8px 8px}.mic-glyph i:after{content:"";position:absolute;left:50%;top:17px;width:1.5px;height:4px;margin-left:-.75px;background:currentColor;box-shadow:-3px 4px 0 -.2px currentColor,3px 4px 0 -.2px currentColor}.send{border:0;padding:0 8px;background:linear-gradient(145deg,#5ce1f2,#65dfb1);color:#03131a;box-shadow:0 8px 24px rgba(51,188,196,.12)}.send:hover{filter:brightness(1.06)}
+.trace{grid-template-rows:126px 38px minmax(0,1fr)}.voice-console{padding:10px;border-bottom:1px solid rgba(54,115,150,.2);background:linear-gradient(155deg,rgba(11,35,50,.72),rgba(4,14,22,.92))}.voice-console-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.voice-console-head span{display:block;color:#4f849b;font:6px ui-monospace,monospace;letter-spacing:.16em}.voice-console-head b{display:block;margin-top:2px;font-size:9px}.voice-console-head strong{padding:4px 6px;border:1px solid rgba(64,121,151,.26);border-radius:999px;color:#66889a;font:6px ui-monospace,monospace;letter-spacing:.08em}.voice-console-head strong[data-state="ready"]{color:#87e9c2;border-color:rgba(97,227,177,.28)}.voice-console-head strong[data-state="starting"],.voice-console-head strong[data-state="listening"],.voice-console-head strong[data-state="hearing"],.voice-console-head strong[data-state="transcribing"],.voice-console-head strong[data-state="restarting"]{color:#9ceeff;border-color:rgba(95,227,255,.5);box-shadow:0 0 14px rgba(95,227,255,.08)}.voice-console-head strong[data-state="error"],.voice-console-head strong[data-state="unsupported"]{color:#ff9bb0;border-color:rgba(255,111,145,.32)}#voiceMeter{display:block;width:100%;height:30px;margin:7px 0 6px;border:1px solid rgba(48,104,135,.18);border-radius:7px;background:#030b12}.voice-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.voice-options .option,.voice-options select{height:24px;padding:0 5px;border:1px solid rgba(54,111,143,.2);border-radius:6px;background:#06151f;color:#5f8193;font-size:6px;outline:none}.voice-options .option.active{border-color:rgba(95,227,255,.35);color:#9deeff;background:rgba(35,106,139,.16)}.voice-options select{grid-column:1/5;width:100%;color:#7699aa}.voice-privacy{display:flex;align-items:center;gap:6px;margin-top:5px;color:#46697a;font-size:6px}.voice-privacy i{width:5px;height:5px;border-radius:50%;background:#416477}.voice-privacy.warning{color:#d4ad67}.voice-privacy.warning i{background:var(--warn)}.voice-privacy.error{color:#e38da1}.voice-privacy.error i{background:var(--bad)}
+@keyframes voicePulse{0%,100%{transform:scale(.78);opacity:.6}50%{transform:scale(1.18);opacity:1}}
+@media(max-width:1380px){.top-actions button{padding:0 8px;font-size:8px}.console{grid-template-columns:minmax(0,1fr) 285px}.composer{grid-template-columns:minmax(0,1fr) 72px 76px}}
+@media(max-width:1120px){.app.comm-focus .center{grid-template-rows:minmax(260px,1fr) 365px}.conversation-heading>small{display:none}.trace{grid-template-rows:118px 38px minmax(0,1fr)}.voice-console{padding:8px}}
+@media(max-width:1040px){:root{--console-height:clamp(310px,39vh,380px)}.center{grid-template-rows:minmax(300px,1fr) var(--console-height)}.app.comm-focus .center{grid-template-rows:minmax(250px,1fr) clamp(350px,43vh,420px)}}
+
+@media(max-height:760px) and (min-width:721px){:root{--header:58px;--console-height:302px}.app.comm-focus .center{grid-template-rows:minmax(245px,1fr) 330px}.dialogue{grid-template-rows:50px minmax(0,1fr) 104px}.trace{grid-template-rows:112px 34px minmax(0,1fr)}.voice-console{padding:7px 9px}.conversation-heading>small{display:none}}
+
+
+.scene-action{border-color:rgba(97,227,177,.36)!important;color:#a3edd0!important;background:linear-gradient(145deg,rgba(14,48,43,.78),rgba(6,24,28,.82))!important}.scene-action.active{box-shadow:0 0 0 1px rgba(97,227,177,.22),0 0 24px rgba(97,227,177,.12);border-color:rgba(97,227,177,.66)!important}.placement-hint{position:absolute;z-index:30;left:50%;top:12px;transform:translateX(-50%);display:none;align-items:center;gap:8px;padding:7px 9px;border:1px solid rgba(97,227,177,.55);border-radius:10px;background:rgba(4,20,20,.92);box-shadow:0 12px 36px rgba(0,0,0,.38),0 0 24px rgba(97,227,177,.12);backdrop-filter:blur(12px);font-size:8px}.placement-hint.show{display:flex}.placement-hint b{color:#a9f0d2}.placement-hint span{color:#789f96}.placement-hint button{height:24px;padding:0 7px;border:1px solid rgba(97,227,177,.28);border-radius:6px;background:#0d2a27;font-size:8px}
+.scene-drawer-host{position:fixed;inset:var(--header) 0 0 0;z-index:90;pointer-events:none;visibility:hidden}.scene-drawer-host.open{visibility:visible}.scene-drawer{position:absolute;right:8px;top:8px;bottom:8px;width:min(660px,calc(100vw - 16px));pointer-events:auto;display:grid;grid-template-rows:auto minmax(0,1fr) auto;border:1px solid rgba(75,158,186,.42);border-radius:16px;background:linear-gradient(150deg,rgba(7,20,30,.985),rgba(3,11,18,.99));box-shadow:0 30px 90px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.035);transform:translateX(calc(100% + 22px));transition:transform .24s ease;overflow:hidden}.scene-drawer-host.open .scene-drawer{transform:translateX(0);transition:none}.scene-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;border-bottom:1px solid rgba(57,122,153,.24);background:rgba(7,23,34,.92)}.scene-drawer-title small{display:block;color:#5d8498;font:7px ui-monospace,monospace;letter-spacing:.15em}.scene-drawer-title b{display:block;margin-top:3px;font-size:13px}.scene-drawer-title span{display:block;margin-top:3px;color:#6f90a1;font-size:8px}.scene-drawer-head-actions{display:flex;align-items:center;gap:7px}.scene-revision{padding:5px 7px;border:1px solid rgba(70,141,174,.22);border-radius:7px;color:#7ca5b8;font:7px ui-monospace,monospace}.scene-close{width:32px;height:31px;padding:0;border:1px solid rgba(70,141,174,.26);border-radius:8px;background:#091924}.scene-editor-main{min-height:0;display:grid;grid-template-columns:230px minmax(0,1fr)}.scene-library{min-height:0;overflow:auto;padding:11px;border-right:1px solid rgba(55,118,151,.21);background:rgba(5,15,23,.68)}.scene-inspector{min-height:0;overflow:auto;padding:12px}.scene-block{margin-bottom:13px}.scene-block:last-child{margin-bottom:0}.scene-block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}.scene-block-head b{font-size:9px}.scene-block-head span{font:7px ui-monospace,monospace;color:#5f8295}.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.preset-card{min-height:62px;padding:8px;text-align:left;border:1px solid rgba(58,119,151,.2);border-radius:9px;background:rgba(8,23,34,.72)}.preset-card:hover,.preset-card.active{border-color:rgba(95,227,255,.46);background:rgba(12,38,53,.82)}.preset-card b{display:block;font-size:8px}.preset-card span{display:block;margin-top:4px;color:#5f8193;font-size:7px;line-height:1.5}.template-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.template-btn{min-height:48px;padding:6px 4px;border:1px solid rgba(58,119,151,.2);border-radius:8px;background:#081722;font-size:7px}.template-btn i{display:block;margin:auto auto 4px;width:16px;height:16px;border:1px solid #4794b4;border-radius:4px;box-shadow:inset 0 0 8px rgba(95,227,255,.12)}.template-btn[data-template="sphere"] i,.template-btn[data-template="pillar"] i{border-radius:50%}.template-btn[data-template="cone"] i{border-radius:60% 60% 25% 25%;transform:scaleX(.75)}.template-btn[data-template="wall"] i{width:24px;height:9px;margin-top:4px;margin-bottom:7px}.template-btn[data-template="landmark"] i{width:18px;height:5px;margin-top:8px;margin-bottom:7px;border-radius:50%}.scene-filter{display:grid;grid-template-columns:1fr auto;gap:6px;margin-bottom:7px}.scene-filter input{min-width:0;height:31px;padding:0 8px;border:1px solid rgba(57,119,151,.22);border-radius:7px;background:#06131d;font-size:8px}.scene-filter button{height:31px;padding:0 8px;border:1px solid rgba(57,119,151,.22);border-radius:7px;background:#091925;font-size:8px}.entity-list{display:grid;gap:5px}.entity-row{display:grid;grid-template-columns:23px minmax(0,1fr) auto;align-items:center;gap:7px;padding:7px;border:1px solid rgba(52,106,136,.17);border-radius:8px;background:rgba(6,17,26,.68);text-align:left}.entity-row:hover,.entity-row.selected{border-color:rgba(95,227,255,.42);background:rgba(10,32,44,.82)}.entity-swatch{width:22px;height:22px;border:1px solid rgba(255,255,255,.18);border-radius:6px;box-shadow:inset 0 0 8px rgba(0,0,0,.22)}.entity-row b{display:block;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.entity-row small{display:block;margin-top:2px;color:#547586;font:7px ui-monospace,monospace}.entity-row em{font:7px ui-monospace,monospace;color:#607f8e;font-style:normal}.entity-row em.static{color:#d2ae6c}.scene-empty{display:grid;place-items:center;min-height:180px;border:1px dashed rgba(58,119,151,.24);border-radius:11px;color:#5b7b8b;font-size:9px;text-align:center;padding:18px}.inspector-form{display:grid;gap:10px}.inspector-identity{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;padding:10px;border:1px solid rgba(57,119,151,.2);border-radius:10px;background:#06141e}.inspector-swatch{width:44px;height:44px;border:1px solid rgba(255,255,255,.2);border-radius:11px;box-shadow:inset 0 0 16px rgba(0,0,0,.28),0 0 16px rgba(45,144,193,.08)}.inspector-identity b{display:block;font-size:12px}.inspector-identity span{display:block;margin-top:3px;color:#5c8193;font:7px ui-monospace,monospace}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.form-field{min-width:0}.form-field.full{grid-column:1/-1}.form-field label{display:flex;justify-content:space-between;margin:0 0 4px;color:#69899a;font-size:7px}.form-field label em{font:7px ui-monospace,monospace;color:#476778;font-style:normal}.form-field input,.form-field select,.form-field textarea{width:100%;min-width:0;border:1px solid rgba(58,119,151,.24);border-radius:7px;background:#06131d;color:#d7e9f1;font-size:8px}.form-field input,.form-field select{height:31px;padding:0 8px}.form-field input[type="color"]{padding:3px}.form-field textarea{min-height:56px;padding:7px;resize:vertical}.form-checks{display:grid;grid-template-columns:1fr 1fr;gap:7px}.form-check{display:flex;align-items:center;gap:7px;padding:8px;border:1px solid rgba(58,119,151,.2);border-radius:8px;background:#071722;color:#7796a5;font-size:8px}.form-check input{accent-color:#5fe3ff}.inspector-actions{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:6px}.inspector-actions button,.scene-footer button{height:34px;border:1px solid rgba(61,128,161,.26);border-radius:8px;background:#0a1c29;font-size:8px}.inspector-actions .apply{border-color:rgba(95,227,255,.42);background:linear-gradient(145deg,rgba(19,77,96,.76),rgba(8,35,50,.8));color:#b9f3ff}.inspector-actions .danger{border-color:rgba(255,111,145,.28);color:#ef9db0}.scene-note{padding:9px;border-left:2px solid #2f7d91;background:rgba(12,34,45,.6);color:#698b9b;font-size:7px;line-height:1.65}.scene-footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 12px;border-top:1px solid rgba(57,122,153,.22);background:#06131d}.scene-save-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px}.scene-save-row input{min-width:0;height:34px;padding:0 9px;border:1px solid rgba(61,128,161,.25);border-radius:8px;background:#041019;font-size:8px}.scene-footer-actions{display:flex;gap:6px}.saved-scenes{display:grid;gap:5px}.saved-scene{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:5px;align-items:center;padding:6px;border:1px solid rgba(53,108,138,.17);border-radius:8px;background:#06141e}.saved-scene b{font-size:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.saved-scene small{display:block;color:#4d6d7d;font:6px ui-monospace,monospace}.saved-scene button{height:25px;padding:0 6px;border:1px solid rgba(58,119,151,.2);border-radius:6px;background:#091925;font-size:7px}.scene-status-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:7px}.scene-stat{padding:7px;border:1px solid rgba(55,113,144,.17);border-radius:8px;background:#06141e}.scene-stat span{display:block;color:#4f7284;font-size:6px}.scene-stat b{display:block;margin-top:3px;font:8px ui-monospace,monospace;color:#b2d5e3}
+@media(max-width:760px){.scene-drawer{right:4px;top:4px;bottom:4px;width:calc(100vw - 8px)}.scene-editor-main{grid-template-columns:190px minmax(0,1fr)}.template-grid{grid-template-columns:1fr 1fr}.scene-footer{grid-template-columns:1fr}.scene-footer-actions{justify-content:flex-end}}
+@media(max-width:560px){.scene-editor-main{display:block;overflow:auto}.scene-library,.scene-inspector{overflow:visible;border:0}.scene-drawer{overflow:auto}.scene-drawer-head{position:sticky;top:0;z-index:3}.scene-footer{position:sticky;bottom:0;z-index:3}.preset-grid{grid-template-columns:1fr 1fr}}
+
+/* Reasoning inspection remains separate from body execution and accessible on narrow screens. */
+.language-drawer[hidden]{display:none!important}
+.language-drawer{position:fixed;right:9px;top:calc(var(--header) + 8px);bottom:9px;width:min(720px,calc(100vw - 18px));z-index:110;border:1px solid #295064;border-radius:16px;background:rgba(4,16,26,.988);box-shadow:0 24px 100px #000b;display:grid;grid-template-rows:76px minmax(0,1fr);color:#d6ebf7}
+.language-drawer header{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1e3a4d}.language-drawer header small{color:#65cbd9;font:10px monospace;letter-spacing:.12em}.language-drawer h2{font-size:20px;margin:5px 0}
+.language-scroll{overflow:auto;padding:16px 20px;font-size:13px;line-height:1.65}.language-notice{padding:11px 13px;border:1px solid #17354a;background:#081d2b;border-radius:10px;color:#a8c7d7;margin:0 0 12px}.reasoning-notice{border-color:#23546a;background:linear-gradient(135deg,rgba(14,44,61,.92),rgba(8,27,42,.92));color:#c1e4ef}
+.language-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:11px 0}.soft-btn,.language-examples button{border:1px solid #2a5068;background:#0c2535;color:#c8ecf4;border-radius:8px;padding:8px 11px;font-size:12px;min-height:36px}.soft-btn:disabled{opacity:.4;cursor:default}.language-examples{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}.language-examples button{text-align:left;background:#071a28}.language-examples button:hover{border-color:#58b7cf;background:#0c2636}
+.reasoning-switches{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 12px}.reasoning-switches label{display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid #1c3d50;border-radius:8px;background:#071823;color:#9fc2d1;font-size:11px}
+.reasoning-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:11px 0}.reasoning-metrics div{padding:9px 10px;border:1px solid #19394d;border-radius:9px;background:#061620}.reasoning-metrics span{display:block;color:#5f879b;font-size:9px}.reasoning-metrics b{display:block;margin-top:4px;color:#b9eef5;font:11px ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.semantic-step{padding:10px 12px;background:#091f2b;border-left:2px solid #70d2c2;margin:8px 0;border-radius:5px}.semantic-question{background:#29251c;border:1px solid #695d33;padding:12px;border-radius:8px;color:#ffdf94}.language-scroll details{margin:12px 0;border:1px solid #193446;padding:9px 11px;border-radius:10px}.language-scroll summary{cursor:pointer;color:#bfe8f1}.language-scroll pre{white-space:pre-wrap;word-break:break-word;font:11px/1.6 ui-monospace,monospace;max-height:360px;overflow:auto;color:#9dbccf}.language-scroll input[type=checkbox]{accent-color:#64d6c6}
+.reasoning-list{display:grid;gap:7px;margin:9px 0}.reasoning-item{padding:9px 11px;border:1px solid #173649;border-radius:8px;background:#071923}.reasoning-item b{display:block;color:#bfeaf2;font-size:11px}.reasoning-item span{display:block;margin-top:4px;color:#779cac;font-size:10px}.reasoning-item.good{border-color:rgba(97,227,177,.36)}.reasoning-item.warn{border-color:rgba(239,196,107,.4)}
+.candidate-list{display:grid;gap:8px;margin:9px 0}.candidate-card{position:relative;padding:10px 11px;border:1px solid #1d4054;border-radius:9px;background:#061722}.candidate-card.chosen{border-color:#5ecbd8;box-shadow:inset 3px 0 #5edbc4;background:linear-gradient(100deg,rgba(35,112,127,.16),rgba(6,23,34,.96))}.candidate-card.failed{border-color:rgba(255,111,145,.28)}.candidate-card header{padding:0;border:0;display:flex;align-items:center;justify-content:space-between}.candidate-card header b{font-size:11px;color:#c6edf5}.candidate-card header em{font:9px ui-monospace,monospace;font-style:normal;color:#75cfae}.candidate-card.failed header em{color:#ff91a7}.candidate-card ol{margin:7px 0 5px;padding-left:19px;color:#91b5c4;font-size:10px}.candidate-card p{margin:5px 0;color:#6f94a5;font-size:10px}.candidate-score{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}.candidate-score span{padding:3px 6px;border:1px solid #23485b;border-radius:999px;color:#7ea9b9;font:8px ui-monospace,monospace}
+.reasoning-decision{padding:11px;border:1px solid #235067;border-radius:9px;background:linear-gradient(140deg,#08212d,#071722)}.reasoning-decision b{display:block;color:#a8f0dc}.reasoning-decision p{margin:6px 0 0;color:#91b8c8}.reasoning-decision ul{margin:7px 0 0;padding-left:19px;color:#789eae}
+.model-field{display:flex;flex-direction:column;gap:6px}.model-field input{width:100%;background:#020e18;color:#cfecf7;border:1px solid #264554;border-radius:7px;padding:9px}.language-consent{display:block;margin:12px 0}.language-inline{display:flex;align-items:center;gap:9px;padding:5px 12px;background:#0a212a;border-top:1px solid #235056;min-width:0}.language-inline b{white-space:nowrap;color:#a3e5d4;font-size:10px}.language-inline span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#83aebe;font-size:10px;flex:1}.language-inline button{white-space:nowrap;border:1px solid #285164;background:#102f3d;color:#b1e7eb;border-radius:5px;font-size:10px;padding:4px 7px}
+.dialogue{grid-template-rows:58px 35px minmax(0,1fr) 112px}
+@media(max-height:760px) and (min-width:721px){.dialogue{grid-template-rows:50px 32px minmax(0,1fr) 104px}}
+@media(max-width:1450px){.binding-strip{display:none}.topbar{grid-template-columns:minmax(150px,1fr) minmax(0,auto)}.top-actions{overflow-x:auto;max-width:76vw}}
+@media(max-width:720px){.dialogue{grid-template-rows:62px 32px minmax(0,1fr) 128px}.top-actions button span{display:inline}.top-actions button{min-width:54px;white-space:nowrap}.language-scroll{padding:12px}.language-examples{grid-template-columns:1fr}.reasoning-metrics{grid-template-columns:1fr 1fr}.reasoning-switches{display:grid;grid-template-columns:1fr}}
+
+.grounding-card{padding:12px;border:1px solid #447777;border-radius:10px;margin:12px 0;background:rgba(20,65,60,.18)}.grounding-card h3{margin:0 0 8px}.grounding-card p{line-height:1.65}.grounding-card pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto}
+
+.control-dock{position:fixed;right:22px;bottom:16px;z-index:130;display:flex;gap:5px;padding:6px;border:1px solid #31566a;border-radius:11px;background:#071621f5;box-shadow:0 4px 18px #0007}
+.control-dock button,.control-monitor button{min-height:36px;border:1px solid #355168;background:#142b3a;border-radius:7px;padding:5px 10px;color:#e1f5ff;font:12px system-ui;cursor:pointer}
+.control-dock .control-stop,.control-monitor .control-stop{background:#822d3c;border-color:#ed8394;color:white;font-weight:700}
+.control-monitor{width:min(900px,94vw);max-height:85dvh;overflow:auto;padding:20px;border:1px solid #3c708c;border-radius:14px;background:#071621;color:#e1f5ff;box-shadow:0 15px 70px #0009}
+.control-monitor::backdrop{background:#000a}.control-monitor header,.control-monitor footer{display:flex;align-items:center;justify-content:space-between;gap:10px}.control-monitor h2{font-size:21px;margin:6px 0}.control-monitor small{color:#81c8dc;font:10px monospace}.control-description{font-size:12px;color:#b0c4cf;line-height:1.7}.control-pipeline{display:flex;gap:6px;flex-wrap:wrap}.control-pipeline span{border:1px solid #385264;background:#122433;border-radius:6px;font-size:12px;padding:8px}.control-pipeline .done{border-color:#57b598;color:#8de0c8}.control-pipeline .active{border-color:#4ad6f3;color:#a4f2ff}.control-table-wrap{overflow:auto;max-height:40vh}.control-monitor table{width:100%;border-collapse:collapse;font-size:12px;text-align:left}.control-monitor th,.control-monitor td{padding:8px;border-bottom:1px solid #294154}.control-monitor td:last-child{font-family:monospace;white-space:nowrap}
+#controlInputStatus,#controlMotionStatus{font-size:13px;line-height:1.7;overflow-wrap:anywhere}.control-monitor footer{margin-top:16px;font-size:11px;color:#a2c5d6}
+@media(max-width:700px){.control-dock{top:auto;bottom:8px;right:7px;left:7px;justify-content:space-between;padding:5px;z-index:130}.control-dock button{padding:5px 10px;min-height:36px;font-size:12px}.control-monitor{padding:14px;width:96vw;max-height:88dvh}.control-monitor h2{font-size:18px}}
+
+.resident-panel label{display:block;font-size:10px;color:#96afbc;margin:8px 0 4px}.resident-panel input,.resident-panel select{width:100%;padding:7px;border:1px solid #355260;border-radius:6px;background:#101f28;color:#deebe8}.resident-panel button{padding:6px 8px;font-size:10px;margin-top:8px}.resident-panel p{font-size:10px;color:#a6c4bb}.resident-actions{display:flex;gap:6px}.body-tools{flex-wrap:wrap;max-width:calc(100% - 24px)}.body-tools select{background:#13242c;color:#d6e5df;border:1px solid #41605d;border-radius:6px;font:11px system-ui;padding:5px}.link-stage{grid-template-columns:minmax(160px,.43fr) 54px minmax(340px,1.57fr)}@media(max-width:720px){.link-stage{grid-template-columns:1fr}}
+.trace{grid-template-rows:228px 38px minmax(0,1fr)}.voice-console{overflow:auto}.voice-options{grid-template-columns:repeat(3,minmax(0,1fr))}.voice-options select{grid-column:1/-1}.voice-options .option,.voice-options select{font-size:9px;height:25px}.voice-engine-row{display:grid;grid-template-columns:1fr;gap:5px;margin-top:6px}.voice-engine-row select,.voice-engine-row button{background:#0a2130;border:1px solid #315364;color:#b2d3df;border-radius:6px;padding:5px 7px;font-size:10px}.voice-engine-row [hidden]{display:none!important}#voiceEngineHint{margin-top:5px;color:#86aaba;font-size:9px}.voice-privacy{font-size:8px;line-height:1.5}.voice-console-head strong{font-size:9px}#voiceMeter{height:27px}
+</style>
+<style id="clean-workbench-style">/* Presentation only. No imported fonts, images, libraries or additional canvases. */
+:root{--bg:#10151c;--panel:#151c25;--panel2:#1c2631;--line:#2b3744;--text:#e3e9ef;--muted:#99a9b9;--cyan:#8ccccc;--header:58px;font-size:14px;color-scheme:dark}
+[hidden]{display:none!important}
+html,body{background:var(--bg);font-size:14px}
+body{background:#10151c}
+button,input,textarea,select,summary{font:inherit}
+button,summary{-webkit-tap-highlight-color:transparent}
+button:focus-visible,summary:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #92d7d4;outline-offset:3px}
+button:disabled{opacity:.45;cursor:default}
+.app.clean-ui{height:100dvh;display:grid;grid-template-rows:var(--header) minmax(0,1fr)}
+.clean-ui .topbar{display:flex;justify-content:space-between;gap:12px;padding:0 20px;background:#121922;border-bottom:1px solid #27323e;backdrop-filter:none;z-index:220;box-shadow:none}
+.clean-ui .brand{gap:11px;flex:0 1 auto}.clean-ui .brand strong{font-size:17px;font-weight:650;letter-spacing:.04em;white-space:nowrap}
+.brand-symbol{width:29px;height:29px;display:grid;place-items:center;border:1px solid #719eaa;border-radius:9px;background:#21343d;color:#c6eeed;font-size:17px;font-weight:650}
+.header-status{margin-left:7px;color:#8c9dac;font-size:12px;white-space:nowrap}.header-status[data-state=ready]{color:#9dbcb6}.header-status[data-state=error]{color:#eaa9a4}
+.clean-ui .top-actions{gap:8px;align-items:center;flex-wrap:nowrap;overflow:visible;max-width:none;flex:0 0 auto}
+.clean-ui button,.utility-drawer button,.language-drawer button{min-height:36px;padding:7px 12px;border:1px solid #34414f;border-radius:8px;background:#202b36;color:#dbe5ed;font-size:13px;line-height:1.4;box-shadow:none}
+.clean-ui .top-actions button,.tools-menu summary{min-height:36px;height:36px}
+.clean-ui button:hover,.utility-drawer button:hover{background:#2b3a47;border-color:#586e80}
+.clean-ui button.active{background:#294449;border-color:#548b8e;color:#ddfffc}
+.clean-ui .quiet-button{background:transparent;border-color:transparent;color:#b8c6d3}
+.header-divider{height:20px;border-left:1px solid #35404c;margin:0 3px}
+.clean-ui .stop-button,.utility-drawer .stop-button{background:#412a2c;color:#f1beba;border-color:#764449;white-space:nowrap;font-weight:500}
+.clean-ui .stop-button:hover,.utility-drawer .stop-button:hover{background:#5b3135}
+.tools-menu,.view-menu{position:relative}
+.tools-menu summary,.view-menu summary{list-style:none;cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:center;padding:7px 12px;border:1px solid transparent;border-radius:8px;color:#bac8d4;font-size:13px}
+.tools-menu summary::-webkit-details-marker,.view-menu summary::-webkit-details-marker{display:none}
+.tools-menu[open]>summary,.view-menu[open]>summary{background:#25333f;border-color:#3d5261}
+.tools-menu nav,.view-options{position:absolute;right:0;top:calc(100% + 10px);width:212px;padding:6px;background:#1a2430;border:1px solid #3c4c5b;box-shadow:0 12px 32px #0006;border-radius:12px;z-index:260}
+.clean-ui .tools-menu nav button{width:100%;display:block;text-align:left;margin:2px 0;min-height:42px;background:transparent;border-color:transparent;font-size:14px}
+.clean-ui .tools-menu nav button:hover{background:#2a3947}.build-label{display:block;margin:7px 10px 4px;padding-top:9px;border-top:1px solid #344451;color:#8295a7;font-size:12px}
+.clean-ui .workspace{display:grid;grid-template-columns:minmax(0,1fr) 344px;gap:12px;padding:12px;min-width:0;min-height:0}
+.scene-main{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;border:1px solid #2b3743;border-radius:13px;overflow:hidden;background:#0b121a}
+.scene-heading{flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 13px;background:#151e28;border-bottom:1px solid #27333f;color:#9badbb;font-size:13px;z-index:3;min-width:0}
+#cleanSceneName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:45%}
+.scene-view-tools{display:flex;gap:4px;align-items:center}
+.clean-ui .scene-view-tools>button{font-size:12px;min-height:32px;padding:5px 10px;border-color:transparent;background:transparent}
+.clean-ui .scene-view-tools>button:hover{background:#263741}
+.clean-ui .view-menu summary{font-size:12px;min-height:32px;padding:5px 10px}
+.view-options{padding:14px;width:228px;z-index:230}
+.view-options>label{display:flex;gap:10px;align-items:center;color:#a7b6c4;font-size:13px}
+.view-options select{min-height:34px;padding:6px;border:1px solid #45586a;border-radius:6px;background:#111c27;color:#dce8f0;min-width:0;flex:1}
+.angle-buttons{display:flex;gap:6px;margin:14px 0}.clean-ui .angle-buttons button{flex:1;font-size:12px;padding:5px}
+.label-toggle{margin-top:8px;cursor:pointer}.label-toggle input{accent-color:#80c9c4}
+.clean-ui .link-stage{position:relative;display:block;flex:1 1 0;height:auto;min-height:0;min-width:0;border:0;border-radius:0;background:#0b121a;overflow:hidden}
+.clean-ui .body-pane{position:absolute;inset:0;height:100%;width:100%;border:0;border-radius:0;min-width:0;background:transparent;display:block}
+.clean-ui .embed-frame{width:100%;height:100%;display:block;border:0}
+.scene-help{position:absolute;bottom:12px;left:14px;pointer-events:none;color:#c3d0d4;background:#111a22bf;border:0;border-radius:6px;padding:6px 9px;font-size:12px;opacity:.75}
+.clean-ui .loading-cover{inset:0;background:#0f1820}.clean-ui .loading-card b{font-size:16px}.clean-ui .loading-card div{font-size:13px;color:#a6b8c5}
+.conversation-column{display:flex;flex-direction:column;min-width:0;min-height:0;border:1px solid #2b3743;border-radius:13px;overflow:hidden;background:#141d27}
+.presence-header{height:42px;flex:0 0 42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;color:#bdd4df}
+.clean-ui #mobilePortraitBtn{display:flex;align-items:center;gap:8px;font-size:13px;padding:0;min-height:32px;background:none;border:0}
+#mobilePortraitBtn i{width:5px;height:5px;border-radius:50%;background:#93c5be;display:block}
+.clean-ui #mobileConversationBtn{display:none}
+.clean-ui .brain-pane{position:relative;height:162px;flex:0 0 162px;width:100%;border:0;border-bottom:1px solid #26323f;border-radius:0;background:#070e16;min-width:0;display:block}
+.clean-ui .portrait-tools{position:absolute;right:10px;bottom:10px;top:auto;display:flex;z-index:8}
+.clean-ui .portrait-tools button{background:#13212aad;border:1px solid #334b5b;font-size:12px;min-height:30px;padding:4px 9px;opacity:.85}
+.clean-ui .communication-panel.console.panel{flex:1;display:block;min-width:0;min-height:0;border:0;background:transparent;border-radius:0;box-shadow:none;overflow:hidden}
+.clean-ui .dialogue{height:100%;display:flex;flex-direction:column;min-height:0;min-width:0;background:transparent}
+.chat-empty{padding:26px 20px 18px;flex:1;display:flex;flex-direction:column;justify-content:center;color:#c1cfd9}
+.chat-empty b{font-size:17px;font-weight:500;line-height:1.6}.chat-empty p{font-size:13px;color:#839aaa;margin:10px 0 0}
+.clean-ui .chat-log{flex:1;min-height:0;padding:16px 14px;overflow:auto;display:flex;flex-direction:column;gap:14px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#354958 transparent}
+.clean-ui .chat-log:empty{display:none}
+.clean-ui .message{margin:0;padding:0;border:0;border-radius:0;max-width:100%;background:transparent;box-shadow:none;flex-shrink:0;font-size:14px;line-height:1.75;overflow-wrap:anywhere;color:#d1dde6}
+.clean-ui .message.user{align-self:flex-end;background:#243941;padding:10px 13px;border-radius:12px 12px 3px 12px;max-width:94%;color:#e4f1f2}
+.clean-ui .message.brain{align-self:stretch;padding:0 3px}.clean-ui .message.system{color:#a4b6c3;font-size:13px;border-left:2px solid #4e6576;padding-left:10px}
+.clean-ui .message.error{color:#edb3a9}.clean-ui .message.success{color:#bacfc9}
+.clean-ui .message-meta{margin-top:5px;font-size:11px;color:#758c9c;display:flex;gap:8px}
+.clean-ui .message-meta span{font:inherit}.clean-ui .message-meta span:not(:first-child){display:none}
+.task-card{margin:0 14px 12px;padding:11px 12px;border:1px solid #354650;border-radius:9px;background:#1b2a33;flex:0 0 auto;max-height:160px;overflow:auto}
+.task-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.task-top b{font-size:13px;font-weight:550}
+.clean-ui .task-top button{font-size:12px;min-height:28px;padding:2px 6px;background:transparent;border-color:transparent;color:#9fc5d2}
+.task-card p{margin:5px 0 0;color:#9eb6c3;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.task-card[data-status=clarify],.task-card[data-status=confirmation]{border-color:#6b6347;background:#2a2a22}.task-card[data-status=failed]{border-color:#77504c}
+.quick-choices{display:flex;gap:5px;flex-wrap:wrap}.clean-ui .quick-choices button{min-height:32px;font-size:12px;padding:4px 9px;margin-top:7px}
+.clean-ui #cleanConfirmBtn{margin-top:9px;background:#32514f;border-color:#63998e;color:#e2fffb;min-height:36px}
+.composer-area{border-top:1px solid #2c3944;padding:12px;background:#16202a;flex:0 0 auto}
+.compose-mode{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.clean-ui .mode-switch{display:flex;gap:2px;background:none;border:0;padding:0}
+.clean-ui .mode-switch button{font-size:11px;min-height:28px;padding:3px 7px;color:#8ea5b5;background:transparent;border-color:transparent}
+.clean-ui .mode-switch button.active{color:#cee4e9;background:#29414a;border-color:transparent}
+#cleanMicStatus{font-size:11px;color:#8da4b4;text-align:right;max-width:48%}#cleanMicStatus[data-active=true]{color:#98ded0}#cleanMicStatus[data-error=true]{color:#ecb7a9}
+.clean-ui .composer{display:grid;grid-template-columns:minmax(0,1fr) 52px 52px;gap:6px;padding:0;border:0;background:none;min-width:0}
+.clean-ui .composer-main{min-width:0;display:flex;flex-direction:column}
+.clean-ui #commandInput{width:100%;resize:none;min-height:68px;height:68px;max-height:130px;line-height:1.6;font-size:14px;padding:10px 11px;color:#e5edf3;background:#101922;border:1px solid #3b4f5f;border-radius:9px;outline-offset:1px}
+.clean-ui #commandInput::placeholder{color:#708797}
+.clean-ui .composer .mic-btn,.clean-ui .composer .send{height:68px;min-width:0;padding:7px 4px;min-height:0;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:13px}
+.clean-ui .composer .mic-btn{background:#223340;border-color:#3e5565;color:#c2d8e3}.clean-ui .composer .mic-btn.listening{border-color:#7edbc8;background:#2b534e;color:#d1fff5}
+.clean-ui .composer .send{background:#a8d5d2;color:#142f35;border:0;font-weight:600}.clean-ui .composer .send:hover{background:#c1e3df}
+.clean-ui .mic-btn b{font-size:12px;font-weight:500}.clean-ui .mic-glyph{width:18px;height:22px;transform:scale(.85);margin:0}
+.clean-ui .voice-live{padding:0;min-height:0;height:auto;display:none;font-size:12px;line-height:1.6;color:#9bb8c8;white-space:normal;margin-top:5px;gap:5px}
+.clean-ui .voice-live.listening,.clean-ui .voice-live.processing,.clean-ui .voice-live.error{display:flex;align-items:flex-start}
+.clean-ui .voice-live>i{flex:0 0 5px;margin-top:6px}.clean-ui .voice-live span{font-size:12px;overflow:visible;text-overflow:clip;white-space:normal}
+.clean-ui .voice-live.error{color:#e5b6a7}
+/* One utility page at a time; main task and mic remain alive while a drawer is open. */
+.utility-drawer{position:fixed;inset:0 0 0 auto;margin:0;width:min(470px,100vw);height:100dvh;max-height:100dvh;max-width:100vw;padding:0;border:0;border-left:1px solid #425160;border-radius:0;background:#151f29;color:#e0e9f0;overflow:hidden;box-shadow:-12px 0 40px #0005}
+.utility-drawer[open]{display:flex;flex-direction:column}.utility-drawer::backdrop{background:#03081088}
+.utility-drawer>header{padding:17px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #354450;background:#182531;flex:0 0 auto}.utility-drawer>header>div{display:flex;gap:6px}
+.utility-drawer h2{margin:0;font-size:17px;font-weight:550}.utility-content{flex:1;min-height:0;overflow:auto;padding:16px;overscroll-behavior:contain}
+.utility-content .panel-scroll{padding:0;height:auto;overflow:visible}.utility-content .section{padding:14px;margin-bottom:12px;background:#192631;border-color:#334450;border-radius:9px}
+.utility-content .section-head h2{font-size:14px;font-weight:600;letter-spacing:0}.detail-state{font-size:10px}.utility-content .section-state{font-size:10px}
+.utility-content .resident-panel label{display:block;font-size:13px;margin:12px 0 5px;color:#b2c3ce}
+.utility-content input,.utility-content select{width:100%;max-width:100%;font-size:14px;padding:9px;border:1px solid #435869;background:#111c26;border-radius:7px;color:#dbe8f0;min-height:38px}
+.utility-content .resident-panel p,.utility-content .resident-panel p span{font-size:13px;line-height:1.7}.utility-content .resident-panel button{margin-top:12px}.utility-content .resident-actions{display:flex;gap:8px;flex-wrap:wrap}
+.utility-content .body-card b{font-size:13px}.utility-content .body-card small,.utility-content .body-card em{font-size:11px}.utility-content .empty,.utility-content .intent-summary{font-size:13px;line-height:1.7}
+.utility-content .capability-tags span{font-size:12px;padding:7px 9px}.utility-content .binding-row,.utility-content .binding-row strong,.utility-content .validation-row,.utility-content .execution-event{font-size:12px;line-height:1.8;overflow-wrap:anywhere}
+.utility-content .json-box{font-size:12px;line-height:1.6;max-height:260px;min-height:0}.utility-content .status-pill{min-width:0;flex:1}.utility-content .binding-strip{margin-bottom:14px}
+.utility-content .trace-list{max-height:none}.utility-content .trace-node b{font-size:13px}.utility-content .trace-node small{font-size:10px}
+.utility-content .voice-console{padding:0;background:none;border:0}.utility-content .voice-console-head b{font-size:16px}.utility-content .voice-console-head span{display:none}.utility-content #voiceStatus{font-size:12px}
+.utility-content .voice-options{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.utility-content .voice-engine-row{display:flex;flex-direction:column;gap:10px}
+.utility-content .voice-options button.active{background:#2c4a4b;border-color:#619a95}.utility-content .voice-options select{flex-basis:100%}
+.utility-content #voiceMeter{width:100%;height:52px;margin-top:15px}.utility-content #voiceEngineHint,.utility-content .voice-privacy{font-size:13px;line-height:1.7;margin-top:14px;overflow-wrap:anywhere}
+.advanced-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.utility-note{color:#93aaba;font-size:13px;line-height:1.7}.utility-actions{margin-bottom:14px}
+.language-drawer{top:70px!important;bottom:12px!important;right:12px!important;width:min(570px,calc(100vw - 24px))!important;z-index:200!important;border-color:#425466!important;background:#14202b!important;max-height:none!important;border-radius:12px!important}
+.language-drawer>header h2{font-size:18px}.language-drawer>header small{font-size:12px}.language-scroll{padding:16px!important}.language-drawer .language-notice,.language-drawer .semantic-step,.language-drawer .semantic-question,.language-drawer label,.language-drawer summary{font-size:13px!important;line-height:1.7}.language-drawer pre{font-size:12px!important}.language-drawer details{margin:12px 0}.language-drawer .language-examples button{font-size:13px}.language-drawer .reasoning-metrics b{font-size:15px}
+.scene-drawer-host{z-index:190!important;top:58px!important}.scene-drawer{max-height:calc(100dvh - 72px)!important}.scene-drawer button,.scene-drawer input,.scene-drawer select{font-size:13px!important;min-height:34px}.scene-drawer-title small,.scene-block-head span,.form-field em{display:none}.scene-drawer-title b{font-size:18px}.scene-drawer-title span,.scene-note{font-size:12px}.scene-drawer .entity-item{font-size:13px}.scene-block-head b,.scene-drawer label{font-size:13px}
+.control-monitor{font-size:14px;background:#15232f}.control-monitor header h2{font-size:20px}.control-monitor header small{font-size:12px}
+.toast{font-size:13px;z-index:400;bottom:20px;max-width:min(480px,calc(100vw - 28px));white-space:normal}
+.clean-ui.portrait-focus .brain-pane{position:fixed;inset:78px auto auto 50%;transform:translateX(-50%);width:min(640px,calc(100vw - 30px));height:calc(100dvh - 105px);z-index:205;border:1px solid #4b6273;border-radius:14px;box-shadow:0 0 0 100vmax #03080dcc}
+.clean-ui.portrait-focus .portrait-tools{right:14px;bottom:14px}.clean-ui.portrait-focus .portrait-tools button{min-height:38px;font-size:14px}
+@media(min-width:1650px){.clean-ui .workspace{grid-template-columns:minmax(0,1fr) 370px}.clean-ui .brain-pane{height:190px;flex-basis:190px}}
+@media(max-height:720px) and (min-width:761px){.clean-ui .brain-pane{height:112px;flex-basis:112px}.presence-header{height:34px;flex-basis:34px}.chat-empty{padding:15px}.task-card{max-height:120px}.clean-ui .workspace{gap:9px;padding:9px}}
+@media(max-width:1000px) and (min-width:761px){.clean-ui .workspace{grid-template-columns:minmax(0,1fr) 320px;gap:9px;padding:9px}.clean-ui .topbar{padding:0 13px}.clean-ui .brain-pane{height:140px;flex-basis:140px}}
+@media(max-width:760px){
+ :root{--header:58px}.clean-ui .topbar{padding:0 10px;gap:6px}.clean-ui .brand{gap:7px}.brand-symbol{display:none}.clean-ui .brand strong{font-size:15px}.header-status{display:none}.header-divider{display:none}.clean-ui .top-actions{gap:3px}.clean-ui .top-actions button,.tools-menu summary{height:44px;min-height:44px;font-size:12px;padding:8px 9px}
+ .clean-ui .workspace{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(200px,1fr) 282px;gap:8px;padding:8px;padding-bottom:max(8px,env(safe-area-inset-bottom));min-width:0}
+ .scene-main{border-radius:11px}.scene-heading{flex-basis:43px;padding:0 9px;font-size:12px}.clean-ui .scene-view-tools>button,.clean-ui .view-menu summary{min-height:38px;padding:5px 10px}.scene-help{bottom:8px;left:8px;font-size:11px}
+ .conversation-column{border-radius:11px}.presence-header{height:40px;flex-basis:40px;padding:0 12px;border-bottom:1px solid #2b3944}.clean-ui #mobileConversationBtn{display:block;min-height:36px;padding:4px 8px;background:none;border:0;font-size:12px;color:#90a9b8}
+ .clean-ui .brain-pane{display:none}.clean-ui .chat-log{padding:10px 12px;gap:10px}.clean-ui .message{font-size:14px;line-height:1.6}.clean-ui .message-meta{font-size:10px;margin-top:2px}.chat-empty{padding:10px 14px}.chat-empty b{font-size:15px}.chat-empty p{display:none}
+ .composer-area{padding:8px 10px 10px}.compose-mode{margin-bottom:6px}.clean-ui .mode-switch button{min-height:30px;padding:4px 9px;font-size:12px}#cleanMicStatus{font-size:11px}
+ .clean-ui .composer{grid-template-columns:minmax(0,1fr) 54px 54px}.clean-ui #commandInput{min-height:62px;height:62px;font-size:16px;padding:8px 10px}.clean-ui .composer .mic-btn,.clean-ui .composer .send{height:62px;font-size:14px}.clean-ui .task-card{margin:0 10px 7px;padding:7px 10px;max-height:114px}.task-card p{font-size:12px}.clean-ui .quick-choices button{min-height:36px}
+ .clean-ui.chat-expanded .workspace{grid-template-rows:minmax(110px,.38fr) minmax(280px,.62fr)}.clean-ui.chat-expanded .scene-main{min-height:110px}
+ .clean-ui.portrait-focus .brain-pane{display:block;top:72px;height:calc(100dvh - 94px)}
+ .utility-drawer{width:100vw}.utility-drawer>header{padding:12px}.utility-drawer>header button{min-height:44px}.utility-content{padding:14px}
+ .language-drawer{top:66px!important;bottom:8px!important;right:8px!important;width:calc(100vw - 16px)!important}.language-drawer button{min-height:40px}
+ .scene-drawer-host{top:58px!important}.scene-drawer{max-height:calc(100dvh - 66px)!important;width:calc(100vw - 16px)!important}
+ .scene-editor-main{grid-template-columns:1fr!important;overflow:auto!important}.scene-inspector{overflow:visible!important}.scene-library{overflow:visible!important}.scene-drawer .scene-footer{display:block}.scene-footer-actions{margin-top:9px;flex-wrap:wrap}
+ .tools-menu nav{right:-78px;max-width:calc(100vw - 24px)}.control-monitor{width:calc(100vw - 16px);padding:12px;max-height:94dvh}.control-monitor header{align-items:flex-start;gap:6px}.control-monitor header>div:last-child{display:flex;gap:4px}.control-monitor header h2{font-size:17px}.control-monitor button{min-height:40px}
+}
+@media(max-width:380px){.clean-ui .topbar{padding:0 6px}.clean-ui .top-actions button,.tools-menu summary{padding:7px}.clean-ui .brand strong{font-size:14px}.clean-ui .workspace{padding:6px;gap:6px}.clean-ui .top-actions{gap:1px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+.clean-ui .voice-live{max-height:64px;overflow:auto}.scene-drawer-host:not(.open){visibility:hidden!important}
+
+.clean-ui .top-actions>button:not([hidden]){display:inline-flex;align-items:center;justify-content:center}.clean-ui .top-actions button span{display:inline}.clean-ui .tools-menu nav button{display:block}
+
+/* v1.15.0 Voice: controls live in the existing drawer; main composer stays quiet. */
+.local-voice-panel{display:flex;flex-direction:column;gap:12px;padding:4px 0 20px}
+.local-voice-panel .voice-guide{font-size:13px;line-height:1.65;color:#98b3c0;margin:0}
+.local-voice-panel label,.local-voice-panel #voiceEngineHint{font-size:14px;line-height:1.6}
+.local-voice-panel select,.local-voice-panel button,.local-voice-panel textarea{font-size:14px;min-height:42px;padding:9px 12px;background:#10232e;color:#c5dde6;border:1px solid #2c4653;border-radius:8px}
+.local-voice-panel button:disabled{opacity:.45;cursor:default}
+.local-voice-panel .voice-install-row,.local-voice-panel .voice-action-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.local-voice-panel .voice-options{display:flex;flex-wrap:wrap;gap:8px}.local-voice-panel .voice-options .option{height:auto;font-size:14px}
+.local-voice-panel .voice-options .active{background:#1d4952;border-color:#56aeaf}
+.local-voice-panel audio,.local-voice-panel textarea{width:100%}.local-voice-panel .voice-privacy{font-size:12px;line-height:1.6}
+.local-voice-panel #voiceMeter{width:100%;height:30px}.local-voice-panel #voiceTranscript{min-height:85px;resize:vertical}
+#voiceCancelInline{padding:4px 8px;margin-left:6px;background:transparent;border:1px solid #6b4144;color:#dfb8b8;border-radius:6px;min-height:32px;flex:none}
+@media(max-width:760px){.local-voice-panel button,.local-voice-panel select{min-height:44px}.local-voice-panel .voice-install-row>*{max-width:100%}}
+
+/* Voice diagnostics remain inside the existing utility drawer. */
+.voice-capture-options{margin:12px 0;padding:10px 12px;border:1px solid #354650;border-radius:8px}
+.voice-capture-options summary{cursor:pointer;font-size:14px;line-height:1.7}
+.voice-capture-options label{margin-top:10px}.voice-capture-options select{width:100%;max-width:100%}
+#voiceCaptureDetails{overflow-wrap:anywhere}#voicePlayback{width:100%}
+
+/* R2 scene examples stay outside the canvas; playback keeps a fixed camera. */
+/* The canvas takes remaining height regardless of optional task panels. */
+.action-examples{flex:0 0 auto;min-width:0;background:#121c26;border-bottom:1px solid #2b3743;color:#d5e3e9}
+.action-examples>summary{padding:8px 13px;cursor:pointer;font-size:13px;line-height:1.4}
+.action-examples>summary span{font-size:11px;color:#92a7b6;margin-left:8px}
+.action-example-list{display:flex;gap:8px;overflow-x:auto;padding:0 12px 8px;scrollbar-width:thin}
+.clean-ui .action-example-list>button{flex:0 0 174px;text-align:left;min-height:76px;padding:9px 11px;background:#1b2935;white-space:normal}
+.action-example-list strong,.action-example-list span{display:block}
+.action-example-list strong{font-size:13px;font-weight:600;color:#d7eeec}
+.action-example-list span{font-size:11px;line-height:1.5;color:#a3b5c3;margin-top:5px}
+.clean-ui .action-example-list>button[aria-pressed=true]{border-color:#72aaa7;background:#233e45}
+.action-example-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 13px 8px;min-height:25px;font-size:11px;color:#9eb6c2}
+#actionExampleStatus{overflow-wrap:anywhere}.action-example-footer>div{display:flex;gap:5px;flex:none}
+.clean-ui .action-example-footer button{min-height:28px;font-size:11px;padding:3px 9px}
+@media(max-width:760px){.clean-ui .action-example-list>button{flex-basis:162px}.action-example-footer{font-size:10px}}
+</style></head>
+<body>
+<section aria-label="推理、语言理解与行为计划" class="language-drawer" hidden="" id="languageDrawer">
+<header><div><small>理解与执行详情</small><h2>本轮计划</h2></div><button aria-label="关闭推理面板" class="soft-btn" id="languageClose">关闭</button></header>
+<div class="language-scroll">
+<div class="language-notice reasoning-notice">贾维斯先读取当前场景，把对象描述转换成可核对的筛选条件，再检查目标关系与身体能力。明确集合保持成员和目标不变，可执行方案进入身体物理推演。当前本地理解使用组合语法与场景查询；可选语言模型需要另外连接。</div>
+<div class="language-toolbar"><button class="soft-btn" id="analyzePlanBtn">仅推理输入</button><label><input id="previewBeforeExecute" type="checkbox"/>所有新计划先确认</label><button class="soft-btn" disabled="" id="executePlanBtn">确认执行</button></div>
+<div class="reasoning-switches">
+<label><input checked="" id="reasoningEnabled" type="checkbox"/>目标与候选方案推理</label>
+<label><input checked="" id="physicalPreflight" type="checkbox"/>每步执行前物理预检</label>
+<label><input checked="" id="autoReplan" type="checkbox"/>原有单项任务失败后尝试重规划（集合任务保留范围并报告失败）</label>
+</div>
+<small id="languageEngine">LOCAL · 状态空间推理器</small>
+<div class="reasoning-metrics">
+<div><span>推理状态</span><b id="reasoningStatus">WAITING</b></div>
+<div><span>目标</span><b id="reasoningGoalCount">0</b></div>
+<div><span>候选</span><b id="reasoningCandidateCount">0</b></div>
+<div><span>可行方案</span><b id="reasoningFeasibleCount">0</b></div>
+</div>
+<section class="grounding-card"><h3>本轮理解了哪些东西</h3><p id="sceneGroundingSummary">等待场景关系或对象集合。</p><details><summary>对象、关系与排除依据</summary><pre id="sceneGroundingEvidence"></pre></details></section>
+<div id="languageSummary"></div><div class="language-toolbar" id="clarifyChoices"></div>
+<details><summary>可以这样测试推理</summary><div class="language-examples">
+<button data-language-example="把地上所有的东西都放到桌子上。">地面集合与桌面能力边界</button>
+<button data-language-example="把地上所有东西都搬到一区。">地面集合逐件执行</button>
+<button data-language-example="除了蓝球以外，把地上的东西都搬到一区。">集合排除</button>
+<button data-language-example="地上有多少东西？">按实时场景计数</button>
+<button data-language-example="把最轻的能搬动的物体放到空余最大的区域。">属性筛选与空间选择</button>
+<button data-language-example="把能放进一区的最大物体搬过去。">容纳关系与最大对象</button>
+<button data-language-example="把红色箱子移动到蓝球旁边，如果搬不动就推过去。">搬运与推动候选比较</button>
+<button data-language-example="腾出通往三区的路，然后走到三区。">通道诊断与行为修复</button>
+<button data-language-example="尽量省力地把最近的可移动物体送到一区。">目标函数与代价选择</button>
+<button data-language-example="把场景里的可移动物体都整理到合适的区域。">多物体动态整理</button>
+<button data-language-example="不要坐下，走到三区旁边向我敬礼。">限制条件与复合动作</button>
+<button data-language-example="如果有蓝球，就敬礼，否则挥手。">按世界状态选择分支</button>
+</div></details>
+<details><summary>目标图</summary><div class="reasoning-list" id="reasoningGoals"><div class="empty">等待目标。</div></div></details>
+<details><summary>世界事实与推断能力</summary><div class="reasoning-list" id="reasoningFacts"><div class="empty">等待世界状态。</div></div></details>
+<details><summary>候选方案与物理模拟</summary><div class="candidate-list" id="reasoningCandidates"><div class="empty">等待候选方案。</div></div></details>
+<details><summary>最终决策</summary><div class="reasoning-decision" id="reasoningDecision"><div class="empty">等待决策。</div></div></details>
+<details><summary>结构化推理证据</summary><pre id="reasoningTrace">尚无推理记录</pre></details>
+<details><summary>结构化行为计划与对象绑定</summary><pre id="languagePlan"></pre></details>
+<details><summary>实际执行与重规划记录</summary><pre id="languageTasks"></pre></details>
+<details><summary>接入语言模型作为目标建议器</summary>
+<p class="language-notice">模型服务可以补充更自由的语言理解。模型只提出语义候选，场景绑定、规则审查、身体能力验证、物理推演和最终选择仍在本地完成。麦克风音频不会发送到该接口。</p>
+<label class="model-field">模型服务地址<input aria-label="模型语义服务地址" id="modelEndpoint" spellcheck="false" type="text" value="/api/semantic"/></label>
+<label class="language-consent"><input id="modelConsent" type="checkbox"/>同意发送本轮文字、近期会话与训练场实体</label>
+<label class="language-consent"><input id="autoModelFallback" type="checkbox"/>本地无法完整解释时，允许自动请求上述模型服务（仍需发送授权与执行确认）</label>
+<button class="soft-btn" id="modelUnderstandBtn">使用模型提出本轮语义候选</button>
+</details>
+<div class="language-toolbar"><button class="soft-btn" id="clearContextBtn">清空指代上下文</button><button class="soft-btn" id="languageExportBtn">导出推理与执行证据</button></div>
+</div>
+</section>
+
+<div class="app clean-ui">
+<header class="topbar">
+<div class="brand"><span aria-hidden="true" class="brand-symbol">J</span><strong>贾维斯</strong><span class="header-status" id="cleanConnection" role="status">连接中</span></div>
+<div class="top-actions">
+<button class="quiet-button" id="sceneBtn" title="编辑场景中的物体与区域">场景</button>
+<details class="tools-menu" id="toolsMenu"><summary>工具</summary><nav aria-label="工具菜单">
+<button data-body-settings type="button">人物设置</button>
+<button data-utility="tasks" type="button">任务与动作</button>
+<button data-utility="profile" type="button">人物资料</button>
+<button data-utility="voice" type="button">语音设置</button>
+<button class="comm-action" id="languageBtn"><span>推理与计划</span></button>
+<button data-utility="diagnostics" type="button">开发诊断</button>
+<button data-utility="advanced" type="button">更多操作</button>
+<button id="fullBtn"><span>全屏</span></button>
+<span class="build-label">V1.15.1 · 界面精简版</span>
+</nav></details>
+<span aria-hidden="true" class="header-divider"></span>
+<button hidden="" id="controlPauseBtn" title="暂停当前人物任务" type="button">暂停</button>
+<button hidden="" id="controlResumeBtn" title="继续当前人物任务" type="button">继续</button>
+<button class="stop-button" id="controlStopBtn" title="停止收音并停止人物任务" type="button">停止全部</button>
+</div>
+</header>
+<main class="workspace">
+<section aria-label="人物与场景" class="scene-main">
+<div class="scene-heading"><span id="cleanSceneName">人物场景</span><div class="scene-view-tools" id="cleanViewTools"><button id="campEnter" type="button">进入军营</button><button id="bodyNear" title="人物近景">人物</button><button id="bodyField" title="场域全景">全景</button><details class="view-menu"><summary>视图</summary><div class="view-options"><label>显示层<select aria-label="身体组织显示" id="anatomyView"><option value="skin">皮肤</option><option value="clay">素模比例</option><option value="muscle">肌肉</option><option value="fascia">皮下组织</option><option value="skeleton">骨骼</option></select></label><div class="angle-buttons"><button id="bodyFront" title="正面 · 正交比例检查">正面</button><button id="bodySide" title="侧面 · 正交比例检查">侧面</button><button id="bodyBack" title="背面 · 肩胛骨与臀部检查">背面</button></div><label class="label-toggle"><input id="bodyFollowToggle" type="checkbox"/>镜头跟随人物</label><label class="label-toggle"><input id="sceneLabelsToggle" type="checkbox"/>显示物体名称</label></div></details></div></div>
+<div class="link-stage"><div class="body-pane"><iframe class="embed-frame" id="bodyFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-pointer-lock allow-modals" title="程序化智能人物身体"></iframe><div class="placement-hint" id="placementHint"><b>点选定位</b><span>请在右侧场景地面单击</span><button id="cancelPlacementBtn">取消</button></div></div><div class="loading-cover" id="loadingCover"><div aria-live="polite" class="loading-card" role="status"><div class="spinner" id="loadingSpinner"></div><b id="loadingTitle">正在建立大脑与身体连接</b><div id="loadingText">解压认知核心与程序化人体运行时</div><pre hidden="" id="startupErrorDetail"></pre><button hidden="" id="retryStartupBtn">重新加载</button></div></div></div>
+<div aria-hidden="true" class="scene-help">拖动旋转 · 滚轮缩放</div>
+</section>
+<aside aria-label="与贾维斯交流" class="conversation-column">
+<div class="presence-header"><button id="mobilePortraitBtn" title="查看贾维斯粒子形象" type="button"><i aria-hidden="true"></i>贾维斯</button><button aria-expanded="false" id="mobileConversationBtn" type="button">展开对话</button></div>
+<div class="brain-pane"><div class="portrait-tools"><button id="portraitFocusBtn" title="放大贾维斯头像">放大</button></div><iframe class="embed-frame" id="brainFrame" title="贾维斯量子认知面"></iframe></div>
+<section aria-label="对话与指令" class="communication-panel console panel" id="communicationPanel">
+<div class="dialogue">
+<div class="chat-empty" id="cleanChatEmpty"><b>我在，想让我做什么？</b><p>直接说出你的想法。</p></div>
+<div aria-live="polite" aria-relevant="additions" class="chat-log" id="chatLog" role="log"></div>
+<section aria-label="当前任务" aria-live="polite" class="task-card" hidden="" id="cleanTask">
+<div class="task-top"><b id="cleanTaskTitle">当前任务</b><button id="showLanguageBtn" type="button">详情</button></div>
+<p id="cleanTaskProgress"></p><div class="quick-choices" id="cleanChoices"></div>
+<button hidden="" id="cleanConfirmBtn" type="button">确认执行</button>
+</section>
+<div class="composer-area"><div class="compose-mode"><div class="mode-switch"><button class="active" data-mode="replace">新任务</button><button data-mode="append">追加任务</button></div><span id="cleanMicStatus" role="status">麦克风未开启</span></div><div class="composer">
+<div class="composer-main"><textarea aria-label="发送给贾维斯的文字或语音转写内容" id="commandInput" placeholder="说说你想让我做什么…" rows="2" spellcheck="false"></textarea><div class="voice-live" id="voiceLive"><i id="voiceLiveDot"></i><span id="interimTranscript"></span><button type="button" id="voiceCancelInline" hidden>取消</button><em hidden="" id="voiceInputBadge">TEXT INPUT</em></div></div>
+<button aria-label="开始或停止语音输入" aria-pressed="false" class="mic-btn" id="micBtn" type="button"><span aria-hidden="true" class="mic-glyph"><i></i></span><b>说话</b><small hidden="" id="micButtonLabel">点击说话</small></button>
+<button class="send" id="sendBtn" type="button">发送</button>
+</div></div>
+</div>
+</section>
+</aside>
+</main>
+</div>
+<dialog aria-labelledby="utilityTitle" class="utility-drawer" id="utilityDrawer">
+<header><h2 id="utilityTitle">工具</h2><div><button class="stop-button" id="utilityStopBtn" type="button">停止全部</button><button id="utilityCloseBtn" type="button">关闭</button></div></header>
+<div class="utility-content">
+<section data-utility-page="tasks" hidden><p class="utility-note">选择职业任务或组合动作。执行状态继续显示在对话区，可随时停止。</p><details class="camp-tasks" id="campTaskPanel" hidden>
+<summary>职业长任务 <span>军营与邻村 · 连续动作与状态观察</span></summary>
+<div class="camp-task-content"><div class="camp-toolbar"><label>身份 <select id="campRoleSelect"><option value="" disabled>选择职业</option></select></label><button data-camp-view="all" type="button">全域</button><button data-camp-view="camp" type="button">营区</button><button data-camp-view="village" type="button">村庄</button><label><input id="campRoofs" type="checkbox"/>显示屋顶</label><button id="campRestore" type="button">恢复军营布局</button></div>
+<p class="camp-identity" id="campIdentity"></p><div class="camp-job-list" id="campJobList"></div><ol class="camp-stages" id="campStageList"></ol>
+<div class="camp-task-footer"><span id="campTaskStatus" role="status" aria-live="polite">按身份选择一项长任务</span><div><button id="campPause" type="button" hidden>暂停</button><button id="campStop" type="button" hidden>停止任务</button><button id="campExport" type="button" disabled>导出观察记录</button></div></div>
+<p class="camp-observation" id="campObservation"></p><p class="camp-help">地面休息区支持坐下与起身。核对、分拣和田间作业目前以停留节点表达；切换身份后仍由当前这一个身体执行任务。</p></div></details>
+<details class="action-examples" id="actionExamples">
+<summary>动作示例 <span>当前场景组合</span></summary>
+<div class="action-example-list" id="actionExampleList" aria-label="可播放的组合动作"></div>
+<div class="action-example-footer"><span id="actionExampleStatus" role="status" aria-live="polite">正在准备当前场景…</span><div><button id="actionExamplePause" type="button" hidden>暂停</button><button id="actionExampleStop" type="button" hidden>停止示例</button></div></div>
+</details>
+</section>
+<section data-utility-page="profile" hidden=""><div class="panel-scroll">
+
+<section class="section resident-panel"><div class="section-head"><h2>智能人身份与活动</h2><span class="section-state detail-state">RESIDENT 001</span></div>
+<label for="residentName">姓名</label><input id="residentName" maxlength="24" value="阿澈"/>
+<label for="residentRole">身份</label><select id="residentRole"><option value="soldier">士兵</option><option value="officer">军官</option><option value="villager">附近村庄农民</option><option value="general">通用智能人</option><option value="host">空间接待员</option><option value="caretaker">空间整理员</option><option value="observer">空间观察员</option></select>
+<button id="applyResident">保存身份</button><p>日常活动：<span id="residentActivity">熟悉空间</span></p>
+<div class="resident-actions"><button id="residentRoutine">开始活动</button><button id="playerGreeting">玩家问候</button></div></section>
+<section class="section"><div class="section-head"><h2>人物接口</h2><span class="section-state detail-state">1 HUMAN</span></div><div class="body-list">
+<div class="body-card active"><div class="body-icon">♧</div><div><b>程序化智能人</b><small>身体 1.16.0 · 控制 1.13.0</small></div><em>已绑定</em></div>
+</div></section>
+
+<section class="section"><div class="section-head"><h2>能力清单</h2><span class="section-state detail-state" id="capabilityCount">WAITING</span></div><div class="capability-tags" id="capabilityTags"><div class="empty">等待身体返回 CapabilityManifest。</div></div></section>
+<section class="section"><div class="section-head"><h2>大脑记忆</h2><span class="section-state detail-state" id="memoryState">0 ITEMS</span></div><div class="empty" id="memoryPreview">完成的身体任务会成为情景记忆。</div></section>
+</div></section>
+<section data-utility-page="voice" hidden><div class="voice-console local-voice-panel">
+<div class="voice-console-head"><div><b>本机语音</b></div><strong data-state="checking" id="voiceStatus">检查中</strong></div>
+<p class="voice-guide">点击说话，完整说完后点击结束。停顿不会截断录音。转写文字进入输入框，默认确认后再执行。</p>
+<div id="voiceEngineHint" role="status">正在检查本机识别引擎…</div>
+<div class="voice-install-row"><label for="voiceModel">本地模型</label><select id="voiceModel"><option value="base">平衡 · 约145 MB模型</option><option value="tiny">轻量 · 约76 MB模型</option><option value="small">更大模型 · 约484 MB</option></select><button id="voiceInstallLocal" type="button">安装本地语音引擎</button><button id="voiceSetupCancel" type="button" hidden>取消安装</button><button id="voiceRefresh" type="button">刷新状态</button></div>
+<p class="voice-guide">首次安装另外下载CPU识别组件，磁盘占用会高于模型大小。安装位置为用户目录，后续版本共用；未安装完成不会启用转写。</p>
+<label for="voiceDevice">输入设备</label><select id="voiceDevice"><option value="">系统默认麦克风</option></select>
+<details class="voice-capture-options"><summary>录音方式与收音检查</summary>
+<label for="voiceCaptureProfile">声音处理</label><select id="voiceCaptureProfile"><option value="raw">原声直录：关闭降噪、回声消除与自动增益</option><option value="speech">通话模式：开启回声消除与降噪，关闭自动增益</option><option value="browser">浏览器默认：由浏览器决定</option></select>
+<label for="voiceCaptureMode">保存方式</label><select id="voiceCaptureMode"><option value="pcm">PCM WAV：音频线程原生采样率</option><option value="native">浏览器原生编码：用于对照检查</option></select>
+<label for="voiceCaptureChannel">输入声道</label><select id="voiceCaptureChannel"><option value="auto">自动选择能量较高声道，不混合相消</option><option value="left">第一声道</option><option value="right">第二声道</option></select>
+<button id="voiceIsolatedTest" type="button">打开无三维录音检查</button><p class="voice-guide">原声模式不主动滤除环境声。录音不会直通扬声器。设备驱动仍可能有自身处理；下方显示浏览器实际报告的设置。</p></details>
+<p id="voiceCaptureDetails" class="voice-guide">默认采用原声PCM录音，录好后先检查回放。</p>
+<div class="voice-action-row"><button id="voiceTestRecord" type="button">测试麦克风并回放</button><button id="voiceEndRecord" type="button" hidden>结束录音</button><button id="voiceCancelRun" type="button" hidden>取消本轮</button></div>
+<canvas aria-label="麦克风实时音量" height="36" id="voiceMeter" width="520"></canvas><p id="voiceElapsed" class="voice-guide">未开启麦克风</p>
+<div class="voice-options"><button aria-pressed="false" class="option" id="autoSendBtn" type="button">转写后自动发送</button><button aria-pressed="false" class="option" id="voiceReplyBtn" type="button">语音回应</button><select aria-label="语音识别语言" id="voiceLanguage"><option value="zh-CN">普通话</option><option value="zh-TW">中文转简体指令</option><option value="en-US">English</option></select></div>
+<div id="voiceRecordingPanel" hidden><p id="voiceRecordingInfo" class="voice-guide"></p><audio id="voicePlayback" controls preload="metadata" aria-label="回放刚才的录音"></audio><div class="voice-action-row"><button id="voiceDownload" type="button">保存录音文件</button><button id="voiceAudioReport" type="button">导出收音诊断</button><button id="voiceRetry" type="button">用原录音重新转写</button><button id="voiceDiscard" type="button">删除本轮录音</button></div></div>
+<div id="voiceTranscriptPanel" hidden><label for="voiceTranscript">本轮转写文字</label><textarea id="voiceTranscript" readonly rows="3"></textarea><button id="voiceUseTranscript" type="button">插入输入框，稍后发送</button></div>
+<div class="voice-privacy" id="voicePrivacy"><i></i><span>录音仅传给本机服务，保留在内存，关闭页面后清除。</span></div>
+</div></section>
+<section data-utility-page="diagnostics" hidden=""><div class="utility-actions"><button id="controlMonitorBtn" type="button">查看关节反馈</button></div><div class="panel-scroll">
+<section class="section"><div class="section-head"><h2>Embodiment Binding</h2><span class="section-state connected detail-state" id="bindingState">CONNECTING</span></div><div class="binding-card"><div class="binding-row"><span>agent_id</span><strong>agent_jarvis_001</strong></div><div class="binding-row"><span>embodiment_id</span><strong>embodiment_humanoid_001</strong></div><div class="binding-row"><span>运行协议</span><strong>life_agent/runtime@1.0</strong></div><div class="binding-row"><span>身体原生接口</span><strong>HumanLab</strong></div><div class="binding-row"><span>绑定状态</span><strong id="bindingDetail">等待握手</strong></div></div></section>
+<section class="section" hidden=""><div class="section-head"><h2>身体控制</h2><span class="section-state detail-state" id="runtimeState">OFFLINE</span></div><div class="control-grid"><button id="pauseBtn">暂停</button><button id="resumeBtn">继续</button><button class="stop" id="stopBtn">停止</button></div></section>
+<section class="section"><div class="section-head"><h2>BehaviorIntent</h2><span class="section-state detail-state" id="intentState">WAITING</span></div><div class="intent-card"><div class="intent-summary" id="intentSummary">等待大脑形成高层行为意图。</div><pre class="json-box" id="intentJson">{}</pre></div></section>
+<section class="section"><div class="section-head"><h2>ExecutionFeedback</h2><span class="section-state detail-state" id="feedbackState">0 EVENTS</span></div><div class="event-list" id="eventList"><div class="empty">身体执行事件会返回大脑。</div></div></section>
+<section class="section"><div class="section-head"><h2>身体与约束验证</h2><span class="section-state detail-state" id="validationState">WAITING</span></div><div id="validationRows"><div class="empty">完成一次任务后读取身体诊断。</div></div></section>
+<section class="section"><div class="section-head"><h2>World Snapshot</h2><span class="section-state detail-state" id="snapshotState">WAITING</span></div><pre class="json-box" id="snapshotJson">{}</pre></section>
+</div><div class="binding-strip">
+<div class="status-pill good"><i></i><span>善良约束</span><strong>LOCKED</strong></div>
+<div class="status-pill active"><i></i><span>认知循环</span><strong id="brainStatusTop">BOOTING</strong></div>
+<div class="status-pill" id="bodyStatusPill"><i></i><span>身体绑定</span><strong id="bodyStatusTop">CONNECTING</strong></div>
+</div><div class="console-head trace-head"><b>认知到执行闭环</b><span id="latencyReadout">IDLE</span></div><div class="trace-list" id="traceList"></div></section>
+<section data-utility-page="advanced" hidden=""><h3>记录与运行</h3><div class="advanced-actions"><button class="utility-btn" id="clearChatBtn" title="清空当前交流记录">清空</button><button id="openWindowBtn"><span>独立语音窗口</span></button><button id="voiceDiagTopBtn"><span>麦克风诊断</span></button><button id="demoBtn"><span>运行闭环演示</span></button><button id="reconnectBtn"><span>重新连接</span></button><button id="exportBtn"><span>导出状态</span></button><button id="portraitQualityBtn" title="切换粒子数量和帧率上限">头像省电</button></div><p class="utility-note">运行演示会发送示例动作。重新连接会重新加载页面，请先停止当前任务。</p></section>
+</div>
+</dialog>
+<div aria-hidden="true" class="backstage" hidden=""><button class="comm-action" id="commBtn"><span>交流窗口</span></button><button id="portraitTabBtn">看贾维斯</button><div class="link-bus" id="linkBus">
+<div class="bus-packet feedback" id="sensoryPacket"><i></i>SENSORY<br/>OBSERVATION</div>
+<div class="link-core"></div>
+<div class="bus-packet" id="intentPacket"><i></i>BEHAVIOR<br/>INTENT</div>
+<span class="link-pulse outgoing"></span><span class="link-pulse incoming"></span>
+</div><div class="language-inline"><b id="languageBadge">语义理解</b><span id="languageBrief"></span></div></div>
+<div aria-hidden="true" class="scene-drawer-host" id="sceneDrawerHost" inert="">
+<section aria-labelledby="sceneDrawerTitle" aria-modal="false" class="scene-drawer" role="dialog">
+<header class="scene-drawer-head">
+<div class="scene-drawer-title"><small>TRAINING ENVIRONMENT AUTHORING</small><b id="sceneDrawerTitle">训练场景编辑器</b><span>添加、移动、缩放和保存环境实体，实时进入 World Snapshot 与路径规划</span></div>
+<div class="scene-drawer-head-actions"><span class="scene-revision" id="sceneRevision">REV --</span><button aria-label="关闭训练场景编辑器" class="scene-close" id="sceneCloseBtn">×</button></div>
+</header>
+<div class="scene-editor-main">
+<aside class="scene-library">
+<div class="scene-block"><div class="scene-block-head"><b>场景预设</b><span id="scenePresetState">CUSTOM</span></div><div class="preset-grid" id="scenePresetGrid"></div></div>
+<div class="scene-block"><div class="scene-block-head"><b>添加环境物品</b><span>CLICK TO ADD</span></div><div class="template-grid" id="sceneTemplateGrid"></div></div>
+<div class="scene-block"><div class="scene-block-head"><b>场景实体</b><span id="sceneEntityCount">0 ITEMS</span></div><div class="scene-filter"><input id="sceneSearch" placeholder="按 ID 或名称筛选"/><button id="addZoneBtn">＋区域</button></div><div class="entity-list" id="sceneEntityList"></div></div>
+<div class="scene-block"><div class="scene-block-head"><b>已保存训练场</b><span>LOCAL</span></div><div class="saved-scenes" id="savedSceneList"></div></div>
+</aside>
+<section class="scene-inspector"><div class="scene-empty" id="sceneInspectorEmpty">从左侧选择一个物体或区域。<br/>静态障碍会真实参与人物的地面路径碰撞检查。</div><form class="inspector-form" hidden="" id="sceneInspectorForm">
+<div class="inspector-identity"><div class="inspector-swatch" id="inspectorSwatch"></div><div><b id="inspectorTitle">实体</b><span id="inspectorMeta">ID</span></div></div>
+<div class="form-grid">
+<div class="form-field"><label>名称 <em>NAME</em></label><input id="entityName" maxlength="28"/></div>
+<div class="form-field"><label>形状 <em>SHAPE</em></label><select id="entityShape"><option value="box">长方体</option><option value="sphere">球体</option><option value="cylinder">圆柱</option><option value="cone">圆锥</option><option value="prism">三棱柱</option><option value="square">正方形区域</option><option value="circle">圆形区域</option><option value="hexagon">六边形区域</option></select></div>
+<div class="form-field"><label>颜色 <em>COLOR</em></label><input id="entityColor" type="color" value="#39b6d5"/></div>
+<div class="form-field"><label>质量信息 <em>KG</em></label><input id="entityMass" max="250" min="0" step="0.1" type="number"/></div>
+<div class="form-field"><label>X 位置 <em>M</em></label><input id="entityX" max="4.35" min="-4.35" step="0.05" type="number"/></div>
+<div class="form-field"><label>Z 位置 <em>M</em></label><input id="entityZ" max="3.3" min="-3.3" step="0.05" type="number"/></div>
+<div class="form-field"><label>Y 旋转 <em>DEG</em></label><input id="entityYaw" max="360" min="-360" step="5" type="number"/></div>
+<div class="form-field"><label>半径 / 区域尺寸 <em>M</em></label><input id="entityRadius" max="1.8" min="0.025" step="0.025" type="number"/></div>
+<div class="form-field"><label>宽度 <em>M</em></label><input id="entityWidth" max="40" min="0.04" step="0.05" type="number"/></div>
+<div class="form-field"><label>高度 <em>M</em></label><input id="entityHeight" max="4" min="0.03" step="0.05" type="number"/></div>
+<div class="form-field"><label>深度 <em>M</em></label><input id="entityDepth" max="40" min="0.04" step="0.05" type="number"/></div>
+<div class="form-field full"><label>语言别名 <em>ALIASES</em></label><textarea id="entityAliases" placeholder="例如：红箱，工具箱，目标箱"></textarea></div>
+</div>
+<div class="form-checks"><label class="form-check"><input id="entityMovable" type="checkbox"/>人物可以搬运或推动</label><label class="form-check"><input id="entityCollidable" type="checkbox"/>参与路径与碰撞检查</label></div>
+<div class="inspector-actions"><button class="apply" id="applyEntityBtn" type="button">应用修改</button><button id="placeEntityBtn" type="button">场中点选位置</button><button id="duplicateEntityBtn" type="button">复制</button><button class="danger" id="deleteEntityBtn" type="button">删除实体</button><button id="focusEntityBtn" type="button">场域全景</button><button id="cancelEditBtn" type="button">重新读取</button></div>
+<div class="scene-note" id="entityNote">尺寸与位置会立即改变程序化几何、World Snapshot、语言指代和避障路径。质量、尺寸与碰撞几何会进入训练身体的可行性推演。该推演用于规划筛选，仍不等同于真实人体肌肉力或完整动力学。</div>
+</form></section>
+</div>
+<footer class="scene-footer"><div><div class="scene-save-row"><input id="sceneSaveName" placeholder="输入训练场名称"/><button id="saveSceneBtn">保存副本</button><button id="randomizeSceneBtn">重排可动物体</button></div><div class="scene-status-strip"><div class="scene-stat"><span>物体</span><b id="sceneObjectStat">0</b></div><div class="scene-stat"><span>区域</span><b id="sceneZoneStat">0</b></div><div class="scene-stat"><span>身体任务</span><b id="sceneTaskStat">IDLE</b></div></div></div><div class="scene-footer-actions"><button id="importSceneBtn">导入 JSON</button><button id="exportSceneBtn">导出 JSON</button><button id="resetSceneBtn">恢复分类场</button></div></footer>
+</section>
+<input accept="application/json,.json" hidden="" id="sceneImportFile" type="file"/>
+</div>
+<div class="toast" id="toast"></div>
+
+<dialog class="control-monitor" id="controlMonitorDialog">
+<header><div><small>关节反馈</small><h2>指令与关节执行</h2></div><div><button class="control-stop" id="controlDialogStopBtn" type="button">停止全部</button> <button id="controlMonitorClose" type="button">关闭</button></div></header>
+<p class="control-description">身体构造保持 V1.10.0。读取约束求解后的实际关节四元数，沿用身体已有技能执行。此处不发送力矩或修改骨长。</p>
+<div class="control-pipeline" id="controlPipeline"></div>
+<p aria-live="polite" id="controlInputStatus">等待指令</p><p id="controlMotionStatus">等待身体反馈</p>
+<div class="control-table-wrap"><table><thead><tr><th>关节</th><th>骨链</th><th>本步采样峰值</th><th>当前局部四元数 XYZW</th></tr></thead><tbody id="controlJointRows"></tbody></table></div>
+<p class="control-description">转动峰值表示相对于该步骤开始姿态的旋转差。动作完成、运动学约束通过和视觉验收分别记录。</p>
+<footer><button id="controlExportBtn" type="button">导出链路证据</button><span id="controlContractStatus"></span></footer>
+</dialog>
+
+<script>
+/*__SOURCE:control/JointGoalContract.js__*/
+
+/*__SOURCE:language/ContextualUnderstanding.js__*/
+
+/*__SOURCE:language/SceneGrounding.js__*/
+
+/*__SOURCE:language/JarvisSemanticPlanner.js__*/
+
+</script>
+<script>
+/*__SOURCE:language/JarvisReasoningEngine.js__*/
+
+</script>
+<script>/*__SOURCE:control/CommandArbiter.js__*/
+
+
+(()=>{'use strict';
+const VERSION='1.15.1';
+const BUILD_REVISION='raw-pcm-audio-integrity-v1151';
+const BODY_PROTOCOL='life_agent/runtime@1.0';
+const BRAIN_PAYLOAD='/*__BRAIN_GZIP__*/';
+const BODY_PAYLOAD='/*__BODY_GZIP__*/';
+const BODY_ID='humanoid';
+const EMBODIMENT_ID='embodiment_humanoid_001';
+const $=id=>document.getElementById(id);
+const TRACE=[['01','sensory_gateway','感官入口','SENSORY OBSERVATION'],['02','perception','知觉融合','WORLD GROUNDING'],['03','attention','注意选择','ATTENTION'],['04','memory','记忆检索','MEMORY'],['05','values','规则审查','VALUES'],['06','reasoning','推理规划','REASONING'],['07','decision','高层决策','BEHAVIOR INTENT'],['08','body','身体执行','BODY RUNTIME'],['09','feedback','执行反馈','EXECUTION FEEDBACK']];
+const state={brainReady:false,bodyReady:false,binding:null,capabilities:null,heartbeat:null,snapshot:null,diagnostics:null,mode:'replace',pending:new Map(),requestSeq:0,events:[],feedback:[],currentIntent:null,currentPlan:null,currentTicket:null,lastObservation:null,startedAt:0,errors:[],processedInputIds:new Set(),lastInputModality:'text',voice:{supported:false,secureContext:window.isSecureContext,embedded:window.top!==window.self,status:'checking',listening:false,permission:'unknown',language:'zh-CN',autoSend:true,continuous:false,replyEnabled:false,lastTranscript:'',lastConfidence:null},environment:{scene:null,templates:[],presets:[],selectedId:null,selectedKind:null,placementId:null,loading:false,saved:{}}};
+state.startupFailure=null;
+state.bodyStartup={status:'initializing',stage:'unpack',message:'正在准备身体运行时'};
+let toastTimer=0;
+function toast(text,type=''){const el=$('toast');el.textContent=text;el.className='toast show '+type;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.className='toast',3200)}
+function uid(prefix='id'){return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`}
+function safe(value){try{return JSON.parse(JSON.stringify(value,(k,v)=>typeof v==='number'&&!Number.isFinite(v)?null:typeof v==='function'?undefined:v))}catch{return{unserializable:true}}}
+async function unpack(payload){const binary=Uint8Array.from(atob(payload),c=>c.charCodeAt(0));if(typeof DecompressionStream!=='function')throw Error('当前浏览器缺少 DecompressionStream，建议使用最新版 Chrome 或 Edge');const stream=new Blob([binary]).stream().pipeThrough(new DecompressionStream('gzip'));return await new Response(stream).text()}
+function renderTrace(){const root=$('traceList');root.innerHTML=TRACE.map(([n,id,label,sub])=>`<div class="trace-node" data-trace="${id}"><i>${n}</i><div><b>${label}</b><small>${sub}</small></div><em>WAIT</em></div>`).join('')}
+function setTrace(id,status='active'){for(const el of document.querySelectorAll('[data-trace]')){if(el.dataset.trace===id){el.classList.toggle('active',status==='active');el.classList.toggle('done',status==='done');el.querySelector('em').textContent=status==='active'?'RUN':status==='done'?'DONE':'WAIT'}else if(status==='active')el.classList.remove('active')}}
+function resetTrace(){for(const el of document.querySelectorAll('[data-trace]')){el.className='trace-node';el.querySelector('em').textContent='WAIT'}}
+function pulse(kind,duration=1100){if(!cleanVisible('linkBus'))return;const bus=$('linkBus');bus.classList.add(kind);setTimeout(()=>bus.classList.remove(kind),duration);if(kind==='transmitting')$('intentPacket').classList.add('active');else $('sensoryPacket').classList.add('active');setTimeout(()=>{if(kind==='transmitting')$('intentPacket').classList.remove('active');else $('sensoryPacket').classList.remove('active')},duration)}
+let speakJarvisResponse=()=>{};function addMessage(role,text,meta={}){if(!cleanMessageVisible(role,text,meta))return null;const root=$('chatLog');const el=document.createElement('div');el.className='message '+role+(meta.kind?' '+meta.kind:'');const time=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});const source=meta.modality==='voice'?'VOICE INPUT':meta.modality==='text'?'TEXT INPUT':'';el.innerHTML=`<div>${escapeHtml(text)}</div><div class="message-meta"><span>${role==='user'?'你':role==='brain'?'贾维斯':'提示'}</span>${source?`<span class="${meta.modality==='voice'?'voice-source':'text-source'}">${source}</span>`:''}<span>${time}</span>${meta.confidence!=null?`<span>CONF ${Number(meta.confidence).toFixed(2)}</span>`:''}</div>`;root.append(el);root.scrollTop=root.scrollHeight;renderCleanSummary();if(role==='brain'&&meta.speak!==false)setTimeout(()=>speakJarvisResponse(text),0);return el}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function setBrainExpression(name){try{$('brainFrame').contentWindow.__JARVIS_APP__?.setExpression(name)}catch{}}
+function brainApp(){return $('brainFrame').contentWindow?.__JARVIS_APP__||null}
+function mergeCapabilities(remote){const skills=remote?.native?.semanticSkills||[];return{schema:'world_human/capability_manifest@1.0',embodimentId:EMBODIMENT_ID,bodyAgentId:BODY_ID,bodyType:'procedural_humanoid',protocol:BODY_PROTOCOL,semanticSkills:skills,placementRelations:remote?.native?.placementRelations||[],supportPickup:remote?.native?.supportPickup===true,queueModes:remote?.queueModes||['replace','append'],runtimeActions:remote?.actions||[],hardJointROM:remote?.native?.hardJointROM===true,fixedBoneLengths:remote?.native?.fixedBoneLengths===true,contactValidation:remote?.native?.contactValidation===true,mechanicalControlExposed:false,jointControl:remote?.native?.jointControl||null,worldEntities:remote?.native?.worldEntities||[],environmentEditor:remote?.native?.environmentEditor||null,physicalReasoning:remote?.native?.physicalReasoning||null,anatomy:remote?.native?.anatomy||null,source:remote}}
+function renderCapabilities(){if(!cleanVisible('capabilityTags'))return;const c=state.capabilities,root=$('capabilityTags');if(!c){root.innerHTML='<div class="empty">等待身体返回 CapabilityManifest。</div>';return}const skills=c.semanticSkills||[];$('capabilityCount').textContent=`${skills.length} SKILLS`;root.innerHTML=skills.map(s=>`<span title="${escapeHtml(s.id)}">${escapeHtml(s.label||s.id)}</span>`).join('')||'<div class="empty">身体接口已连接，语义能力清单为空。</div>'}
+function updateBodyStartup(detail={}){
+ if(state.startupFailure||state.bodyReady)return;
+ state.bodyStartup={status:'initializing',stage:detail.stage||'startup',message:detail.message||'正在准备身体运行时'};
+ $('loadingText').textContent=state.bodyStartup.message;
+}
+function showStartupFailure(detail={},component='body'){
+ if(state.startupFailure)return;
+ const error=String(detail.error||detail.message||'未知初始化错误');
+ state.startupFailure={component,stage:detail.stage||'startup',error};
+ if(component==='body'){state.bodyReady=false;state.bodyStartup={...state.startupFailure,status:'failed'}}
+ state.binding=null;state.errors.push(error);
+ for(const pending of state.pending.values()){clearTimeout(pending.timer);pending.reject(Error(error))}state.pending.clear();
+ $('loadingCover').classList.remove('hidden');$('loadingCover').classList.add('failed');
+ $('loadingSpinner').hidden=true;$('loadingTitle').textContent=component==='body'?'身体启动失败':'系统启动失败';
+ $('loadingText').textContent='初始化已停止，错误详情如下。';
+ const phases={graphics:'图形与皮肤着色器',skeleton:'骨骼与关节',tissue:'肌肉与皮肤',world:'活动空间',binding:'首帧与身体接口',unpack:'运行时解压',startup:'初始化'};
+ $('startupErrorDetail').textContent=(phases[state.startupFailure.stage]||'初始化')+'\n'+error;
+ $('startupErrorDetail').hidden=false;$('retryStartupBtn').hidden=false;
+ updateBinding();addMessage('system','启动失败：'+error,{kind:'error'});
+}
+function updateBinding(){
+ renderCleanSummary();
+ syncPortraitVisibility();
+ const failed=state.startupFailure,connected=!failed&&state.brainReady&&state.bodyReady;
+ $('brainStatusTop').textContent=state.brainReady?'READY':'BOOTING';
+ $('bodyStatusTop').textContent=failed?'FAILED':connected?'CONNECTED':state.bodyReady?'BODY READY':'CONNECTING';
+ $('bodyStatusPill').classList.toggle('good',connected);$('bodyStatusPill').classList.toggle('active',!connected&&!failed);
+ $('bindingState').textContent=failed?'FAILED':connected?'CONNECTED':'CONNECTING';
+ $('bindingDetail').textContent=failed?'启动失败，请查看中央错误详情':connected?'贾维斯已绑定程序化智能人':'等待认知核心与身体握手';
+ if(connected){if($('toast').textContent.includes('身体运行时仍在初始化')){clearTimeout(toastTimer);$('toast').className='toast';}state.binding={schema:'world_human/embodiment_binding@1.0',bindingId:'binding_jarvis_humanoid_001',agentId:'agent_jarvis_001',embodimentId:EMBODIMENT_ID,bodyAgentId:BODY_ID,protocol:BODY_PROTOCOL,authority:{brain:['perception','memory','values','reasoning','decision','behavior_intent'],body:['motion_planning','pose','constraints','animation','physics','rendering']},connectedAt:new Date().toISOString(),status:'connected'};$('loadingCover').classList.add('hidden');addSystemOnce('binding','大脑身份已与程序化智能人建立语义绑定。身体保留自己的骨骼、动作与约束求解器。');addSystemOnce('communication','交流窗口与语音输入插件已经就绪。你可以直接打字，也可以点击麦克风发布指令或与我交谈。')}
+}
+const systemOnce=new Set();function addSystemOnce(key,text){if(systemOnce.has(key))return;systemOnce.add(key);addMessage('system',text)}
+function requestBody(action,payload={},timeout=18000){const frame=$('bodyFrame');if(!frame.contentWindow||!state.bodyReady&&action!=='capabilities')return Promise.reject(Error('身体运行时尚未就绪'));const requestId=`jarvis:${++state.requestSeq}:${Date.now()}`;return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{state.pending.delete(requestId);reject(Error('身体接口请求超时'))},timeout);state.pending.set(requestId,{resolve,reject,timer,action});frame.contentWindow.postMessage({type:'LIFE_AGENT_REQUEST',protocol:BODY_PROTOCOL,id:BODY_ID,requestId,action,payload},'*')})}
+function createObservation(kind,detail={}){const obs={schema:'world_human/sensory_observation@1.0',observationId:uid('obs'),agentId:'agent_jarvis_001',embodimentId:EMBODIMENT_ID,source:'life_agent_runtime',modality:'body_state',kind,confidence:1,observedAt:new Date().toISOString(),detail:safe(detail)};state.lastObservation=obs;pulse('receiving');return obs}
+function createFeedback(event){return{schema:'world_human/execution_feedback@1.0',feedbackId:uid('feedback'),agentId:'agent_jarvis_001',embodimentId:EMBODIMENT_ID,intentId:state.currentIntent?.intentId||null,ticketId:event.detail?.ticketId||state.currentTicket?.ticketId||null,status:event.event,eventSeq:event.seq,summary:event.detail?.summary||event.detail?.error||event.event,evidence:safe(event.detail||{}),bodyState:safe(state.heartbeat||{}),observedAt:new Date(event.timestamp||Date.now()).toISOString()}}
+function renderEvents(){if(!cleanVisible('eventList'))return;cleanStats.diagnosticRenders++;const root=$('eventList');$('feedbackState').textContent=`${state.feedback.length} EVENTS`;if(!state.feedback.length){root.innerHTML='<div class="empty">身体执行事件会返回大脑。</div>';return}root.innerHTML=state.feedback.slice(-20).reverse().map(f=>`<div class="execution-event ${f.status}"><b>${escapeHtml(f.status)}</b> · ${new Date(f.observedAt).toLocaleTimeString()}<br>${escapeHtml(f.summary||'')}</div>`).join('')}
+function renderSnapshot(){renderCleanSummary();if(!cleanVisible('snapshotJson'))return;cleanStats.diagnosticRenders++;const h=state.heartbeat||{};$('runtimeState').textContent=(h.status||'offline').toUpperCase();$('snapshotState').textContent=state.snapshot?'UPDATED':'WAITING';const snap=state.snapshot||{};const compact={resident:residentContext(),tissue:snap.body?.tissue?{layers:snap.body.tissue.layers,muscleCount:snap.body.tissue.muscleCount,surface:snap.body.tissue.surface}:null,posture:snap.basic?.posture||null,phase:snap.phase||h.summary||null,position:h.position||snap.body?.root||null,heldObject:snap.heldObject||null,activeStep:snap.activeStep||null,world:snap.world?{seed:snap.world.seed,sceneName:snap.world.sceneName,revision:snap.world.revision,objects:snap.world.objects?.map(o=>({id:o.id,name:o.name,p:o.p,shape:o.shape,movable:o.movable,collidable:o.collidable,held:o.held})),zones:snap.world.zones}:null};$('snapshotJson').textContent=JSON.stringify(compact,null,2)}
+function renderValidation(){if(!cleanVisible('validationRows'))return;cleanStats.diagnosticRenders++;
+ const d=state.diagnostics;
+ if(!d){$('validationRows').innerHTML='<div class="empty">读取身体最终姿态后显示诊断。</div>';return;}
+ const body=d.body||{},hard=body.jointConstraints?.hardViolationCount??null;
+ const foot=body.maxFootTargetErrorM,hand=body.maxHandTargetErrorM;
+ const valid=hard===0&&Number.isFinite(foot)&&foot<=.012&&Number.isFinite(hand)&&hand<=.04&&!d.error;
+ const mm=value=>Number.isFinite(value)?(value*1000).toFixed(2)+' mm':'未报告';
+ const gesture=d.basic?.lastGestureValidation;
+ const rows=[['姿态',d.basic?.posture||'unknown'],['硬关节越界',hard==null?'未报告':String(hard)],
+  ['骨长误差',mm(body.maxBoneLengthErrorM)],['当前脚目标误差',mm(foot)],['当前手目标误差',mm(hand)],
+  ['最近手势跟踪',gesture?(gesture.passed?'目标达标':'目标未达标'):'尚未执行'],['运动权威',body.poseAuthority||'Human.finalPose']];
+ $('validationState').textContent=valid?'TARGETS OK':'CHECK';
+ $('validationRows').innerHTML=rows.map(([label,value])=>`<div class="validation-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('');
+}
+function renderMemory(){if(!cleanVisible('memoryPreview'))return;const app=brainApp();const records=app?.memoryStore?.state?.memories||[];$('memoryState').textContent=`${records.length} ITEMS`;const root=$('memoryPreview');if(!records.length){root.className='empty';root.textContent='完成的身体任务会成为情景记忆。';return}const last=records.at(-1);root.className='intent-summary';root.textContent=last.content}
+async function refreshBodyEvidence(){if(!state.bodyReady)return;try{state.snapshot=await requestBody('snapshot',{},12000);createObservation('world_snapshot',{phase:state.snapshot?.phase,posture:state.snapshot?.basic?.posture,world:state.snapshot?.world});renderSnapshot()}catch(e){state.errors.push(e.message)}try{state.diagnostics=await requestBody('diagnostics',{},12000);renderValidation()}catch(e){state.errors.push(e.message)}}
+/* Mounted in the parent workbench. Only semantic steps cross the embodiment boundary. */
+function renderIntent(intent,validation){state.currentIntent=intent;state.cleanIntentValidation=validation;if(!cleanVisible('intentJson'))return;$('intentState').textContent=validation.ok?'VALIDATED':'NEEDS CHECK';$('intentSummary').textContent=intent.goal.summary;$('intentJson').textContent=JSON.stringify({intentId:intent.intentId,embodimentId:intent.embodimentId,goal:intent.goal,requiredCapabilities:intent.requiredCapabilities,constraints:intent.constraints,validation},null,2)}
+
+// One resident context per embodiment. Jarvis is the controller, not the
+// resident's identity. Player events enter the normal checked semantic path.
+const RESIDENT_ROLES=Object.freeze({
+  soldier:{name:'士兵',activity:'值勤、补给与回收',command:'走到集合场，然后敬礼，然后走到门岗交接',scene:'camp'},
+  officer:{name:'军官',activity:'营区日常巡查',command:'走到办公室报到，然后走到营房补给，然后走到集合场',scene:'camp'},
+  villager:{name:'附近村庄农民',activity:'农事整理与村口交货',command:'走到田间作业点，然后走到农产品分拣，然后走到村口交接',scene:'camp'},
+  general:{name:'通用智能人',activity:'熟悉空间',command:'走到交流区，然后打招呼'},
+  host:{name:'空间接待员',activity:'迎接访客',command:'走到交流区，然后打招呼'},
+  caretaker:{name:'空间整理员',activity:'物品归位',command:'把红色训练箱搬到工作区'},
+  observer:{name:'空间观察员',activity:'巡视与休息',command:'走到工作区，然后走到休息区，然后坐在地上'}
+});
+const RESIDENT_STORAGE_KEY='jarvis.resident.v150.'+EMBODIMENT_ID;
+let residentProfile={schema:'jarvis/resident_profile@1.0',residentId:'resident_001',
+  embodimentId:EMBODIMENT_ID,displayName:'阿澈',role:'soldier',revision:1};
+try{
+  const saved=JSON.parse(localStorage.getItem(RESIDENT_STORAGE_KEY)||'null');
+  if(saved?.schema===residentProfile.schema&&saved.embodimentId===EMBODIMENT_ID&&RESIDENT_ROLES[saved.role])
+    residentProfile={...residentProfile,displayName:String(saved.displayName||'阿澈').slice(0,24),role:saved.role,revision:Math.max(1,Number(saved.revision)||1)};
+}catch{}
+const residentEvents=new Map();
+let residentReactionTime=-Infinity;
+
+function residentContext(){
+  const role=RESIDENT_ROLES[residentProfile.role];
+  return {...residentProfile,roleName:role.name,activity:role.activity,
+    activeTask:languageState.current?.plan?.sourceText||null,
+    reactions:{playerGreeting:'greet when idle and nearby',playerApproach:'observe only'},
+    controllerAgentId:'agent_jarvis_001'};
+}
+
+function renderResident(){
+  $('residentName').value=residentProfile.displayName;
+  $('residentRole').value=residentProfile.role;
+  $('residentActivity').textContent=RESIDENT_ROLES[residentProfile.role].activity;
+}
+
+function resolveResidentActivity(text, world){
+  if(!/^(开始日常活动|执行身份活动|按身份活动)$/.test(text.trim()))return text;
+  const required=RESIDENT_ROLES[residentProfile.role].scene||'living';
+  if(required==='camp'?world?.theme!=='camp'&&world?.presetId!=='camp':world?.presetId!==required)throw Error('当前身份活动需要'+(required==='camp'?'军营与邻村':'智能生活空间')+'场景，请先切换预设。');
+  return RESIDENT_ROLES[residentProfile.role].command;
+}
+
+async function updateResidentProfile(input){
+  const snapshot=await requestBody('snapshot');
+  if(languageState.submitting>0||languageState.current||languageState.pending||languageState.confirmation||snapshot.plan||snapshot.activeStep||snapshot.heldObject||snapshot.basic?.transition||snapshot.basic?.gesture)
+    throw Error('请先停止或完成当前任务，再修改人物身份。');
+  const displayName=String(input.displayName||'').trim();
+  if(!displayName||displayName.length>24||!Object.hasOwn(RESIDENT_ROLES,input.role))throw Error('请填写 1 至 24 字姓名并选择身份。');
+  residentProfile={...residentProfile,displayName,role:input.role,revision:residentProfile.revision+1};
+  try{localStorage.setItem(RESIDENT_STORAGE_KEY,JSON.stringify(residentProfile));}catch{}
+  renderResident();createObservation('resident_identity_changed',{resident:residentContext()});
+  addMessage('system',`${displayName}的身份已设为${RESIDENT_ROLES[input.role].name}。`);
+  return residentContext();
+}
+
+async function observePlayer(event){
+  if(!event||event.targetEmbodimentId!==EMBODIMENT_ID)throw Error('玩家事件必须指定当前身体实例。');
+  if(!['greeting','approach'].includes(event.type))throw Error('尚不支持这种玩家事件。');
+  const id=String(event.eventId||'');
+  if(!id||id.length>120)throw Error('玩家事件需要有效的 eventId。');
+  if(residentEvents.has(id))return {observed:false,reason:'duplicate'};
+  const p=event.position;
+  if(!Array.isArray(p)||p.length!==3||!p.every(Number.isFinite))throw Error('玩家事件需要空间坐标。');
+  const snapshot=await requestBody('snapshot'),root=snapshot.body.root;
+  const distanceM=Math.hypot(root[0]-p[0],root[2]-p[2]);
+  // Recheck after the asynchronous snapshot to keep concurrent events ordered.
+  if(residentEvents.has(id))return {observed:false,reason:'duplicate'};
+  residentEvents.set(id,Date.now());if(residentEvents.size>100)residentEvents.delete(residentEvents.keys().next().value);
+  createObservation('player_event',{resident:residentContext(),eventId:id,type:event.type,position:p,distanceM});
+  if(event.type==='approach')return {observed:true,reacted:false,reason:'observation_only'};
+  if(distanceM>2.5)return {observed:true,reacted:false,reason:'outside_personal_range'};
+  if(languageState.submitting>0||languageState.current||languageState.pending||languageState.confirmation||languageState.draining||snapshot.paused||snapshot.error||snapshot.plan||snapshot.activeStep||snapshot.heldObject||snapshot.basic?.transition||snapshot.basic?.gesture)
+    return {observed:true,reacted:false,reason:'busy'};
+  if(performance.now()-residentReactionTime<6000)return {observed:true,reacted:false,reason:'cooldown'};
+  residentReactionTime=performance.now();
+  const result=await submit('打招呼','append',{inputId:'player:'+id,modality:'player'});
+  return {observed:true,reacted:result.dispatched===true,awaitingConfirmation:!!result.awaitingConfirmation};
+}
+
+function setupResident(){
+  renderResident();
+  $('applyResident').onclick=()=>updateResidentProfile({displayName:$('residentName').value,role:$('residentRole').value}).catch(e=>toast(e.message,'error'));
+  $('residentRoutine').onclick=()=>submit('执行身份活动','append',{inputId:uid('routine')}).catch(e=>toast(e.message,'error'));
+  $('playerGreeting').onclick=async()=>{
+    try{
+      const snap=await requestBody('snapshot'),p=snap.body.root;
+      const result=await observePlayer({eventId:uid('player_greeting'),targetEmbodimentId:EMBODIMENT_ID,type:'greeting',position:[p[0],0,p[2]+1.3]});
+      if(!result.reacted&&!result.awaitingConfirmation)toast(({busy:'人物正在处理当前活动',cooldown:'刚刚已回应过问候',outside_personal_range:'玩家距离较远'})[result.reason]||'已观察到玩家问候');
+    }catch(e){toast(e.message,'error');}
+  };
+  $('anatomyView').onchange=async e=>{
+    try{await requestBody('anatomy.view',{mode:e.target.value});}
+    catch(error){toast(error.message,'error');}
+  };
+}
+
+/*__SOURCE:language/JarvisLanguageController.js__*/
+
+/*__SOURCE:control/ControlMonitor.js__*/
+
+/*__SOURCE:language/handleBodyMessage.js__*/
+
+async function boot(){renderTrace();addMessage('system','正在启动贾维斯认知核心与程序化智能人身体。');addEventListener('message',handleBodyMessage);const [brainHtml,bodyHtml]=await Promise.all([unpack(BRAIN_PAYLOAD),unpack(BODY_PAYLOAD)]);$('loadingText').textContent='认知核心已解压，正在建立身体运行时';$('brainFrame').srcdoc=brainHtml;$('bodyFrame').srcdoc=bodyHtml;const brainStart=Date.now();const brainTimer=setInterval(()=>{if(brainApp()){clearInterval(brainTimer);state.brainReady=true;updateBinding();setBrainExpression('attentive');addSystemOnce('brain','贾维斯认知核心已就绪，善良约束保持锁定。');if(!systemOnce.has('greeting')){systemOnce.add('greeting');addMessage('brain','我在这里。你可以直接输入文字，也可以点击下方麦克风与我交流。涉及身体的要求会先形成目标、比较候选行为，并通过身体物理推演后执行。你也可以打开“训练场景”改变障碍、物体与目标区域。',{speak:false})}renderMemory()}else if(Date.now()-brainStart>20000){clearInterval(brainTimer);state.errors.push('brain startup timeout');toast('认知核心启动超时','error')}},80);setTimeout(()=>{if(!state.bodyReady&&!state.startupFailure)toast('身体运行时仍在初始化，请稍候')},5000)}
+
+/*__SOURCE:voice/AudioCapture.js__*/
+
+/*__SOURCE:voice/VoiceInputController.js__*/
+
+
+const SCENE_AUTOSAVE_KEY='jarvis.training.scene.autosave.v150';
+const SCENE_LIBRARY_KEY='jarvis.training.scene.library.v1';
+function sceneStorageGet(key,fallback=null){try{const raw=localStorage.getItem(key);return raw==null?fallback:JSON.parse(raw)}catch{return fallback}}
+function sceneStorageSet(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch{return false}}
+function colorArrayToHex(color=[.2,.6,.8]){return'#'+color.slice(0,3).map(v=>Math.round(Math.max(0,Math.min(1,Number(v)||0))*255).toString(16).padStart(2,'0')).join('')}
+function sceneEntityById(id){const scene=state.environment.scene;if(!scene)return null;return[...(scene.objects||[]),...(scene.zones||[])].find(e=>e.id===id)||null}
+function openSceneEditor(){cleanBeforeOverlay('scene');$('sceneDrawerHost').inert=false;const host=$('sceneDrawerHost');host.classList.add('open');host.setAttribute('aria-hidden','false');$('sceneBtn').classList.add('active');loadEnvironmentEditor().catch(error=>toast(error.message,'error'))}
+function closeSceneEditor(){$('sceneDrawerHost').inert=true;const host=$('sceneDrawerHost');host.classList.remove('open');host.setAttribute('aria-hidden','true');$('sceneBtn').classList.remove('active')}
+async function loadEnvironmentEditor(){if(!state.bodyReady)return;state.environment.loading=true;try{const data=await requestBody('environment.list',{},12000);applyEnvironmentState(data)}finally{state.environment.loading=false}}
+function applyEnvironmentState(data,{persist=false}={}){if(!data)return;state.environment.scene=data.scene||data;state.environment.templates=data.templates||state.environment.templates||[];state.environment.presets=data.presets||state.environment.presets||[];if(data.placement)state.environment.placementId=data.placement.active?data.placement.entityId:null;if(state.environment.selectedId&&!sceneEntityById(state.environment.selectedId))state.environment.selectedId=null;renderEnvironmentEditor();if(persist&&state.environment.scene)sceneStorageSet(SCENE_AUTOSAVE_KEY,state.environment.scene)}
+function renderEnvironmentEditor(){const env=state.environment,scene=env.scene||{objects:[],zones:[]},presets=env.presets||[],templates=env.templates||[];const bounds=scene.bounds||{xMin:-4.35,xMax:4.35,zMin:-3.3,zMax:3.3};for(const [id,lo,hi] of [['entityX','xMin','xMax'],['entityZ','zMin','zMax']]){$(id).min=bounds[lo];$(id).max=bounds[hi];}$('sceneRevision').textContent=`REV ${scene.revision??'--'}`;$('scenePresetState').textContent=(scene.presetId||'custom').toUpperCase();$('sceneObjectStat').textContent=String(scene.objects?.length||0);$('sceneZoneStat').textContent=String(scene.zones?.length||0);$('sceneTaskStat').textContent=state.heartbeat?.status?.toUpperCase?.()||'IDLE';$('sceneEntityCount').textContent=`${(scene.objects?.length||0)+(scene.zones?.length||0)} ITEMS`;
+ $('scenePresetGrid').innerHTML=presets.map(p=>`<button class="preset-card ${p.id===scene.presetId?'active':''}" data-preset="${escapeHtml(p.id)}"><b>${escapeHtml(p.name)}</b><span>${escapeHtml(p.description||'')}</span></button>`).join('');
+ $('sceneTemplateGrid').innerHTML=templates.map(t=>`<button class="template-btn" data-template="${escapeHtml(t.templateId)}" title="添加${escapeHtml(t.name)}"><i></i>${escapeHtml(t.name)}</button>`).join('');
+ const query=String($('sceneSearch')?.value||'').trim().toLowerCase(),entities=[...(scene.objects||[]).map(e=>({...e,__kind:'object'})),...(scene.zones||[]).map(e=>({...e,__kind:'zone'}))].filter(e=>!query||`${e.id} ${e.name} ${(e.aliases||[]).join(' ')}`.toLowerCase().includes(query));$('sceneEntityList').innerHTML=entities.length?entities.map(e=>`<button class="entity-row ${env.selectedId===e.id?'selected':''}" data-entity="${escapeHtml(e.id)}"><span class="entity-swatch" style="background:${colorArrayToHex(e.color)}"></span><span><b>${escapeHtml(e.id)} · ${escapeHtml(e.name)}</b><small>${escapeHtml(e.__kind==='zone'?'TARGET ZONE':`${e.shape||'object'} · ${e.movable===false?'STATIC':'MOVABLE'}`)}</small></span><em class="${e.movable===false&&e.__kind==='object'?'static':''}">${e.__kind==='zone'?'区域':e.movable===false?'固定':'可动'}</em></button>`).join(''):'<div class="scene-empty" style="min-height:90px">没有匹配的场景实体</div>';
+ renderSavedScenes();renderEnvironmentInspector();document.querySelectorAll('[data-preset]').forEach(btn=>btn.onclick=()=>applyScenePreset(btn.dataset.preset));document.querySelectorAll('[data-template]').forEach(btn=>btn.onclick=()=>addSceneEntity(btn.dataset.template));document.querySelectorAll('[data-entity]').forEach(btn=>btn.onclick=()=>{env.selectedId=btn.dataset.entity;renderEnvironmentEditor()});}
+function renderEnvironmentInspector(){const entity=sceneEntityById(state.environment.selectedId),form=$('sceneInspectorForm'),empty=$('sceneInspectorEmpty');if(!entity){form.hidden=true;empty.hidden=false;return}form.hidden=false;empty.hidden=true;const isZone=String(entity.id).startsWith('Z');state.environment.selectedKind=isZone?'zone':'object';$('inspectorTitle').textContent=`${entity.id} · ${entity.name}`;$('inspectorMeta').textContent=isZone?`TARGET ZONE · ${entity.shape}`:`${entity.category||'object'} · ${entity.shape}`;$('inspectorSwatch').style.background=colorArrayToHex(entity.color);$('entityName').value=entity.name||'';$('entityShape').value=entity.shape||'box';$('entityColor').value=colorArrayToHex(entity.color);$('entityMass').value=isZone?'':Number(entity.mass??0);$('entityX').value=Number(entity.p?.[0]||0).toFixed(2);$('entityZ').value=Number(entity.p?.[2]||0).toFixed(2);$('entityYaw').value=isZone?'0':(Number(entity.yaw||0)*180/Math.PI).toFixed(1);$('entityRadius').max=isZone?1.8:entity.shape==='box'?40:3;$('entityRadius').value=Number(entity.r||.5).toFixed(3);$('entityWidth').value=isZone?'':Number(entity.w||entity.r*2||.3).toFixed(3);$('entityHeight').value=isZone?'':Number(entity.h||.3).toFixed(3);$('entityDepth').value=isZone?'':Number(entity.d||entity.r*2||.3).toFixed(3);$('entityAliases').value=(entity.aliases||[]).filter(a=>a!==entity.id&&a!==entity.name).join('，');$('entityMovable').checked=!isZone&&entity.movable!==false;$('entityCollidable').checked=!isZone&&entity.collidable!==false;$('entityMass').disabled=isZone;$('entityYaw').disabled=isZone;$('entityWidth').disabled=isZone;$('entityHeight').disabled=isZone;$('entityDepth').disabled=isZone;$('entityMovable').disabled=isZone;$('entityCollidable').disabled=isZone;for(const option of $('entityShape').options)option.hidden=isZone?!['square','circle','hexagon'].includes(option.value):['square','circle','hexagon'].includes(option.value);if(!$('entityShape').selectedOptions.length)$('entityShape').value=isZone?'circle':'box';$('entityNote').textContent=isZone?'目标区域会进入语言指代和放置完成验证，可以调整位置、轮廓和尺寸。':'尺寸与位置会立即改变程序化几何、World Snapshot、语言指代和避障路径。质量与摩擦会进入现有力量模型，尺寸和碰撞几何参与路径与放置检查。'}
+function readEntityPatch(){const isZone=state.environment.selectedKind==='zone',number=id=>Number($(id).value);return{name:$('entityName').value.trim(),shape:$('entityShape').value,color:$('entityColor').value,p:[number('entityX'),0,number('entityZ')],r:number('entityRadius'),aliases:$('entityAliases').value.split(/[，,;；]/).map(v=>v.trim()).filter(Boolean),...(isZone?{}:{yaw:number('entityYaw')*Math.PI/180,w:number('entityWidth'),h:number('entityHeight'),d:number('entityDepth'),mass:number('entityMass'),movable:$('entityMovable').checked,collidable:$('entityCollidable').checked})}}
+async function afterSceneMutation(result,message){applyEnvironmentState(result,{persist:true});state.capabilities=mergeCapabilities(await requestBody('capabilities',{},12000));renderCapabilities();await refreshBodyEvidence();createObservation('environment_changed',{sceneName:state.environment.scene?.sceneName,sceneRevision:state.environment.scene?.revision,objects:state.environment.scene?.objects?.length,zones:state.environment.scene?.zones?.length});toast(message);return result}
+async function addSceneEntity(templateId){try{const result=await requestBody('environment.add',{templateId},12000);state.environment.selectedId=result.selected?.id||result.scene?.objects?.at?.(-1)?.id;await afterSceneMutation(result,`已添加 ${result.selected?.name||templateId}`)}catch(error){toast(error.message,'error')}}
+async function addSceneZone(){try{const result=await requestBody('environment.add',{kind:'zone',shape:'circle',name:'新训练区域'},12000);state.environment.selectedId=result.selected?.id;await afterSceneMutation(result,'已添加训练区域')}catch(error){toast(error.message,'error')}}
+async function updateSceneEntity(){const id=state.environment.selectedId;if(!id)return;try{const result=await requestBody('environment.update',{id,patch:readEntityPatch()},12000);await afterSceneMutation(result,`${id} 已更新`)}catch(error){toast(error.message,'error')}}
+async function deleteSceneEntity(){const id=state.environment.selectedId;if(!id)return;if(!confirm(`删除场景实体 ${id}？`))return;try{const result=await requestBody('environment.remove',{id},12000);state.environment.selectedId=null;await afterSceneMutation(result,`${id} 已删除`)}catch(error){toast(error.message,'error')}}
+async function duplicateSceneEntity(){const id=state.environment.selectedId;if(!id)return;try{const result=await requestBody('environment.duplicate',{id},12000);state.environment.selectedId=result.selected?.id;await afterSceneMutation(result,`已复制为 ${result.selected?.id||'新实体'}`)}catch(error){toast(error.message,'error')}}
+async function armScenePlacement(){const id=state.environment.selectedId;if(!id)return;try{const result=await requestBody('environment.placement',{id},12000);applyEnvironmentState(result);state.environment.placementId=id;$('placementHint').classList.add('show');toast(`请在右侧身体场景地面单击，为 ${id} 选择位置`)}catch(error){toast(error.message,'error')}}
+async function cancelScenePlacement(){try{const result=await requestBody('environment.cancelPlacement',{},12000);applyEnvironmentState(result);state.environment.placementId=null;$('placementHint').classList.remove('show')}catch(error){toast(error.message,'error')}}
+async function applyScenePreset(presetId){if(!confirm('切换预设会替换当前场景。已保存的训练场不会受影响。'))return;try{const result=await requestBody('environment.preset',{presetId},12000);state.environment.selectedId=null;await afterSceneMutation(result,`已切换为 ${result.scene?.sceneName||presetId}`);try{$('bodyFrame').contentWindow.HumanLab?.focus('field')}catch{}}catch(error){toast(error.message,'error')}}
+async function randomizeScene(){try{const result=await requestBody('environment.randomize',{seed:Date.now()&0xffffffff,includeStatic:false},12000);await afterSceneMutation(result,'可动物体位置已经重排');try{$('bodyFrame').contentWindow.HumanLab?.focus('field')}catch{}}catch(error){toast(error.message,'error')}}
+function loadSavedSceneLibrary(){state.environment.saved=sceneStorageGet(SCENE_LIBRARY_KEY,{})||{}}
+function renderSavedScenes(){const root=$('savedSceneList'),items=Object.values(state.environment.saved||{}).sort((a,b)=>String(b.savedAt).localeCompare(String(a.savedAt)));root.innerHTML=items.length?items.map(item=>`<div class="saved-scene"><span><b>${escapeHtml(item.name)}</b><small>${new Date(item.savedAt).toLocaleString()} · ${item.scene?.objects?.length||0} OBJ</small></span><button data-load-scene="${escapeHtml(item.id)}">读取</button><button data-delete-scene="${escapeHtml(item.id)}">删除</button></div>`).join(''):'<div class="scene-empty" style="min-height:70px">尚未保存训练场副本</div>';document.querySelectorAll('[data-load-scene]').forEach(btn=>btn.onclick=()=>loadSavedScene(btn.dataset.loadScene));document.querySelectorAll('[data-delete-scene]').forEach(btn=>btn.onclick=()=>deleteSavedScene(btn.dataset.deleteScene))}
+async function saveCurrentScene(){try{const scene=await requestBody('environment.export',{},12000),name=$('sceneSaveName').value.trim()||scene.sceneName||`训练场 ${new Date().toLocaleTimeString()}`,id=`scene_${Date.now().toString(36)}`;state.environment.saved[id]={id,name,savedAt:new Date().toISOString(),scene:{...scene,sceneId:id,sceneName:name,presetId:'custom'}};sceneStorageSet(SCENE_LIBRARY_KEY,state.environment.saved);$('sceneSaveName').value='';renderSavedScenes();toast(`已保存训练场：${name}`)}catch(error){toast(error.message,'error')}}
+async function loadSavedScene(id){const item=state.environment.saved?.[id];if(!item)return;try{const result=await requestBody('environment.import',{scene:item.scene},12000);state.environment.selectedId=null;await afterSceneMutation(result,`已读取训练场：${item.name}`);try{$('bodyFrame').contentWindow.HumanLab?.focus('field')}catch{}}catch(error){toast(error.message,'error')}}
+function deleteSavedScene(id){const item=state.environment.saved?.[id];if(!item||!confirm(`删除已保存训练场“${item.name}”？`))return;delete state.environment.saved[id];sceneStorageSet(SCENE_LIBRARY_KEY,state.environment.saved);renderSavedScenes()}
+async function exportCurrentScene(){try{const scene=await requestBody('environment.export',{},12000),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(scene,null,2)],{type:'application/json'}));a.download=`${(scene.sceneName||'jarvis-training-scene').replace(/[\\/:*?\"<>|]/g,'_')}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}catch(error){toast(error.message,'error')}}
+async function importSceneFile(file){if(!file)return;try{const scene=JSON.parse(await file.text()),result=await requestBody('environment.import',{scene},12000);state.environment.selectedId=null;await afterSceneMutation(result,`已导入训练场：${result.scene?.sceneName||file.name}`)}catch(error){toast(`导入失败：${error.message}`,'error')}finally{$('sceneImportFile').value=''}}
+async function restoreAutosavedScene(){const scene=sceneStorageGet(SCENE_AUTOSAVE_KEY,null);if(!scene)return false;try{const result=await requestBody('environment.import',{scene},12000);applyEnvironmentState(result);return true}catch(error){state.errors.push(`scene autosave restore: ${error.message}`);return false}}
+function setupSceneEditor(){loadSavedSceneLibrary();$('sceneBtn').onclick=()=>$('sceneDrawerHost').classList.contains('open')?closeSceneEditor():openSceneEditor();$('sceneCloseBtn').onclick=closeSceneEditor;$('sceneSearch').oninput=renderEnvironmentEditor;$('addZoneBtn').onclick=addSceneZone;$('applyEntityBtn').onclick=updateSceneEntity;$('deleteEntityBtn').onclick=deleteSceneEntity;$('duplicateEntityBtn').onclick=duplicateSceneEntity;$('placeEntityBtn').onclick=armScenePlacement;$('cancelPlacementBtn').onclick=cancelScenePlacement;$('cancelEditBtn').onclick=loadEnvironmentEditor;$('focusEntityBtn').onclick=()=>{try{$('bodyFrame').contentWindow.HumanLab?.focus('field')}catch{}};$('saveSceneBtn').onclick=saveCurrentScene;$('randomizeSceneBtn').onclick=randomizeScene;$('importSceneBtn').onclick=()=>$('sceneImportFile').click();$('sceneImportFile').onchange=e=>importSceneFile(e.target.files?.[0]);$('exportSceneBtn').onclick=exportCurrentScene;$('resetSceneBtn').onclick=()=>applyScenePreset('sorting');document.addEventListener('keydown',event=>{if(event.key==='Escape'&&$('sceneDrawerHost').classList.contains('open')&&!state.environment.placementId)closeSceneEditor()});renderEnvironmentEditor()}
+
+
+function portraitRenderer(){return brainApp()?.state?.renderer;}
+function syncPortraitVisibility(){const el=document.querySelector('.brain-pane');if(!el)return;const r=el.getBoundingClientRect();portraitRenderer()?.setVisible?.(!document.hidden&&r.width>1&&r.height>1&&getComputedStyle(el).display!=='none');}
+function setupPortrait(){
+ window.addEventListener('jarvis-tts-state',e=>portraitRenderer()?.setSpeaking?.(e.detail?.speaking===true));
+ const app=document.querySelector('.app');
+ $('portraitFocusBtn').onclick=()=>{app.classList.toggle('portrait-focus');$('portraitFocusBtn').textContent=app.classList.contains('portrait-focus')?'收起':'放大';setTimeout(syncPortraitVisibility,40);};
+ $('portraitQualityBtn').onclick=()=>{const renderer=portraitRenderer();if(!renderer?.setQuality)return;const next=renderer.quality==='economy'?'balanced':'economy';renderer.setQuality(next);$('portraitQualityBtn').textContent=next==='economy'?'标准':'省电';const d=renderer.diagnostics();$('portraitQualityBtn').title=`当前 ${d.pointCount} 个示踪粒子，${d.frameCap} 帧上限；密度随窗口调整`; };
+ $('portraitTabBtn').onclick=()=>{app.classList.toggle('show-portrait');$('portraitTabBtn').textContent=app.classList.contains('show-portrait')?'看人物':'看贾维斯';setTimeout(syncPortraitVisibility,40);};
+ const observer=new ResizeObserver(syncPortraitVisibility);observer.observe(document.querySelector('.brain-pane'));
+ document.addEventListener('visibilitychange',syncPortraitVisibility);window.addEventListener('resize',syncPortraitVisibility);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&app.classList.contains('portrait-focus')){app.classList.remove('portrait-focus');$('portraitFocusBtn').textContent='放大';syncPortraitVisibility();}});
+}
+
+function setup(){
+  document.querySelectorAll('[data-mode]').forEach(btn=>btn.onclick=()=>{state.mode=btn.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===btn));toast(state.mode==='append'?'后续指令将追加到当前任务':'后续指令会接管当前任务')});
+  const input=$('commandInput');
+  try{const params=new URLSearchParams(location.search),prefill=localStorage.getItem('jarvis.voice.prefill');if(params.get('voice_prefill')==='1'&&prefill){input.value=prefill;input.dataset.inputModality='voice';input.dataset.inputId=uid('voice_diagnostic');$('voiceInputBadge').textContent='VOICE READY';$('interimTranscript').textContent='麦克风诊断页的转写内容已带入。检查后点击发送。';localStorage.removeItem('jarvis.voice.prefill')}}catch{}
+  const sendInput=()=>VoiceInputPlugin.dispatch();
+  $('sendBtn').onclick=sendInput;
+  input.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();sendInput()}});
+  $('clearChatBtn').onclick=()=>{$('chatLog').innerHTML='';addMessage('brain','交流记录已经清空。我仍保留经过你同意写入的长期记忆。',{speak:false});input.focus()};
+  $('commBtn').onclick=()=>{document.querySelector('.app').classList.add('comm-focus');setTimeout(()=>{input.focus();document.getElementById('communicationPanel').scrollIntoView?.({block:'nearest',behavior:'smooth'})},120)};
+  $('openWindowBtn').onclick=()=>VoiceInputPlugin.openStandalone();
+  $('pauseBtn').onclick=()=>bodyAction('pause').catch(()=>{});$('resumeBtn').onclick=()=>bodyAction('resume').catch(()=>{});$('stopBtn').onclick=()=>emergencyStop().catch(()=>{});
+  $('demoBtn').onclick=()=>{const sample='坐在地上，然后起身，走到三区旁边，最后敬礼。';input.value=sample;input.dataset.inputModality='text';submit(sample,'replace',{modality:'text',inputId:uid('demo_input')}).then(()=>{input.value=''}).catch(()=>{})};
+  $('reconnectBtn').onclick=()=>location.reload();$('retryStartupBtn').onclick=()=>location.reload();$('fullBtn').onclick=()=>document.documentElement.requestFullscreen?.();
+  $('exportBtn').onclick=()=>{const data={schema:'world_human/jarvis_embodiment_voice_session@1.0',version:VERSION,exportedAt:new Date().toISOString(),binding:state.binding,capabilities:state.capabilities,currentIntent:state.currentIntent,currentPlan:state.currentPlan,lastObservation:state.lastObservation,feedback:state.feedback,snapshot:state.snapshot,diagnostics:state.diagnostics,voice:{...state.voice},control:controlEvidence(),environment:state.environment.scene,brain:brainApp()?.exportState?.()||null,errors:state.errors};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='jarvis-brain-body-voice-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+  $('bodyNear').onclick=()=>{try{$('bodyFrame').contentWindow.HumanLab?.focus('body')}catch{}};$('bodyField').onclick=()=>{try{$('bodyFrame').contentWindow.HumanLab?.focus('field')}catch{}};$('bodyFront').onclick=()=>{try{$('bodyFrame').contentWindow.HumanLab?.inspectBody('front')}catch{}};$('bodySide').onclick=()=>{try{$('bodyFrame').contentWindow.HumanLab?.inspectBody('side')}catch{}};$('bodyBack').onclick=()=>{try{$('bodyFrame').contentWindow.HumanLab?.inspectBody('back')}catch{}};
+  VoiceInputPlugin.init();
+  setupSceneEditor();
+  setupResident();
+  setupLanguage();
+  setupControlMonitor();
+  setupPortrait();
+  setupCleanUI();
+}
+/* UI-only integration. Existing task arbiter, voice session and body remain authoritative. */
+let cleanUIReady=false,cleanReturnFocus=null,cleanChoiceSignature='',cleanPromptOpened='',cleanBodyDocument=null,cleanBrainDocument=null;
+const cleanMessages=[],cleanStats={summaryUpdates:0,languageDetailRenders:0,diagnosticRenders:0,embeddedStyleInstalls:0};
+function cleanVisible(id){const e=$(id);return !!e&&!document.hidden&&e.getClientRects().length>0&&e.offsetWidth>0;}
+function cleanText(id,value){const el=$(id);if(el&&el.textContent!==String(value??''))el.textContent=String(value??'');}
+function cleanMessageVisible(role,text,meta={}){
+ cleanMessages.push({role,text,meta:safe(meta),at:new Date().toISOString()});if(cleanMessages.length>300)cleanMessages.splice(0,50);
+ const startup=role==='system'&&/^(正在启动贾维斯认知核心|贾维斯认知核心已就绪|大脑身份已与程序化智能人|交流窗口与语音输入插件已经就绪)/.test(text);
+ const greeting=role==='brain'&&text.startsWith('我在这里。你可以直接输入文字');
+ return !startup&&!greeting;
+}
+function cleanBeforeOverlay(kind){
+ $('toolsMenu').open=false;document.querySelectorAll('.view-menu').forEach(e=>e.open=false);
+ if(kind!=='utility'&&$('utilityDrawer').open)$('utilityDrawer').close();
+ if(kind!=='language')$('languageDrawer').hidden=true;
+ if(kind!=='scene'&&$('sceneDrawerHost').classList.contains('open'))closeSceneEditor();
+ if(kind!=='monitor'&&$('controlMonitorDialog').open)$('controlMonitorDialog').close();
+ if(kind!=='portrait'){document.querySelector('.app').classList.remove('portrait-focus');cleanText('portraitFocusBtn','放大');syncPortraitVisibility();}
+}
+function openCleanUtility(page){
+ const title={tasks:'任务与动作',profile:'人物资料',voice:'语音设置',diagnostics:'开发诊断',advanced:'更多操作'}[page];if(!title)return;
+ cleanReturnFocus=document.activeElement;cleanBeforeOverlay('utility');
+ for(const e of document.querySelectorAll('[data-utility-page]'))e.hidden=e.dataset.utilityPage!==page;
+ cleanText('utilityTitle',title);const d=$('utilityDrawer');d.dataset.page=page;if(!d.open)d.showModal();
+ if(page==='profile'){renderCapabilities();renderMemory();}
+ if(page==='diagnostics'){renderEvents();renderSnapshot();renderValidation();if(state.currentIntent&&state.cleanIntentValidation)renderIntent(state.currentIntent,state.cleanIntentValidation);}
+ if(page==='advanced')cleanText('cleanMessageArchive',cleanMessages.map(m=>`[${m.role}] ${m.text}`).join('\n\n'));
+ $('utilityCloseBtn').focus();renderCleanSummary();
+}
+function closeCleanUtility(){const d=$('utilityDrawer');if(d.open)d.close();const target=cleanReturnFocus;setTimeout(()=>{if(target&&target.getClientRects().length)target.focus();else document.querySelector('#toolsMenu>summary').focus();},0);}
+function installCleanEmbeddedView(){
+ const brainDoc=$('brainFrame')?.contentDocument;if(brainDoc?.head&&brainDoc.querySelector('.stage-hud')&&brainDoc!==cleanBrainDocument){const s=brainDoc.createElement('style');s.textContent='.stage-hud{display:none!important}';brainDoc.head.append(s);cleanBrainDocument=brainDoc;}
+ const doc=$('bodyFrame')?.contentDocument;if(!doc?.head||doc===cleanBodyDocument)return;
+ if(!doc.querySelector('#view'))return;cleanBodyDocument=doc;
+ const s=doc.createElement('style');s.id='jarvis-clean-ui-presentation';s.textContent='.hud{display:none!important}html:not([data-clean-labels="all"]) #labels{display:none!important}.worldLabel{font-size:11px!important;opacity:.86!important}';doc.head.append(s);
+ doc.documentElement.dataset.cleanLabels=$('sceneLabelsToggle').checked?'all':'none';cleanStats.embeddedStyleInstalls++;
+}
+function cleanSetPortraitFocus(on){
+ if(on){cleanBeforeOverlay('portrait');document.querySelector('.app').classList.add('portrait-focus');}
+ else document.querySelector('.app').classList.remove('portrait-focus');
+ cleanText('portraitFocusBtn',on?'收起':'放大');syncPortraitVisibility();
+}
+function renderCleanVoice(){
+ if(!cleanUIReady)return;
+ const v=state.voice||{},active=!!v.desired||!!v.listening;
+ const map={checking:'检查本机语音',setup:'语音待安装',installing:'语音安装中',recorded:'录音已保留',review:'转写待确认',ready:'麦克风未开启',starting:'等待麦克风权限',listening:'正在聆听',hearing:'正在聆听',transcribing:'本机转写中',waiting:'正在聆听',recovering:'重新连接中',stopping:'保存录音',processing:'正在发送',error:'语音识别异常',unsupported:'请使用文字输入',system:'系统听写'};
+ cleanText('cleanMicStatus',map[v.status]||'麦克风未开启');$('cleanMicStatus').dataset.active=String(active);$('cleanMicStatus').dataset.error=String(v.status==='error');
+ cleanText('micBtnLabel',v.status==='transcribing'?'转写中':v.status==='stopping'?'保存中':v.status==='starting'?'取消':active?'结束':'说话');
+}
+function renderCleanSummary(){
+ if(!cleanUIReady)return;cleanStats.summaryUpdates++;
+ const connected=state.brainReady&&state.bodyReady&&!state.startupFailure;
+ cleanText('cleanConnection',state.startupFailure?'连接异常':connected?'已连接':'连接中');$('cleanConnection').dataset.state=state.startupFailure?'error':connected?'ready':'connecting';
+ installCleanEmbeddedView();
+ const task=languageState.current,p=languageState.preview,last=languageState.tasks.at(-1),pending=!!languageState.confirmation;
+ const paused=languageState.paused||task?.status==='paused';
+ const hasTask=!!task||languageState.queue.some(t=>t.status==='queued');
+ $('controlPauseBtn').hidden=!hasTask||paused;$('controlResumeBtn').hidden=!paused;
+ $('controlPauseBtn').disabled=!hasTask;$('controlResumeBtn').disabled=!connected;
+ $('cleanChatEmpty').hidden=$('chatLog').children.length>0;
+ const isQuestion=p?.status==='clarify',isBlocked=p?.status==='blocked',submitting=languageState.submitting>0;
+ let title='',description='',status='idle';
+ if(pending){title='计划已准备';description=(p.summary||[]).join('；');status='confirmation';}
+ else if(isQuestion&&!submitting){title=p?.groundedIntent?.capabilityGaps?.length?'已理解，当前身体能力受限':'需要你补充';description='直接在下方回答即可。';status='clarify';}
+ else if(isBlocked&&!submitting){title='本轮请求已拦截';description='原因已显示在对话中。';status='failed';}
+ else if(task){const total=Lang.flatten(task.plan.nodes).length;title=paused?'任务已暂停':'正在执行';description=`已完成 ${task.finished} / ${total} 步`+(languageState.queue.length?` · 后续 ${languageState.queue.length} 项`:'');status=paused?'paused':'running';}
+ else if(submitting){title='正在理解你的意思';description='核对场景和身体能力';status='thinking';}
+ else if(last&&p&&last.plan?.id===p.id){const total=Lang.flatten(last.plan.nodes).length;title=({completed:'任务已完成',failed:'任务未完成',cancelled:'任务已停止'}[last.status]||'任务记录');description=last.status==='failed'?'具体原因已保留在对话和详情中。':`已完成 ${last.finished} / ${total} 步`;status=last.status;}
+ else if(p?.status==='control'){title=({stop:'已停止',pause:'已暂停',resume:'已继续'}[p.control]||'控制已处理');status='control';}
+ $('cleanTask').hidden=!title;cleanText('cleanTaskTitle',title);cleanText('cleanTaskProgress',description);$('cleanTaskProgress').hidden=!description;$('cleanTask').dataset.status=status;
+ $('cleanConfirmBtn').hidden=!pending;$('cleanConfirmBtn').disabled=!!confirmationFlight;
+ const choices=isQuestion?[...(p.questions?.[0]?.candidates||[]),...(p.questions?.[0]?.choices||[])]:[];
+ const signature=JSON.stringify([p?.id,choices.map(c=>[c.id,c.name,c.text])]);
+ if(signature!==cleanChoiceSignature){cleanChoiceSignature=signature;$('cleanChoices').replaceChildren();for(const c of choices.slice(0,6)){const b=document.createElement('button');b.type='button';b.textContent=c.name||c.id;b.onclick=()=>submit(c.text||c.id,state.mode,{inputId:uid('choice')}).catch(()=>{});$('cleanChoices').append(b);}}
+ if((pending||isQuestion)&&p?.id!==cleanPromptOpened&&matchMedia('(max-width:760px)').matches){cleanPromptOpened=p.id;cleanExpandConversation(true);}
+ renderCleanVoice();renderActionExamples();renderCampTasks();
+}
+function cleanExpandConversation(expand){document.querySelector('.app').classList.toggle('chat-expanded',expand);$('mobileConversationBtn').setAttribute('aria-expanded',String(expand));cleanText('mobileConversationBtn',expand?'收起对话':'展开对话');}
+function setupCleanUI(){
+ cleanUIReady=true;setupActionExamples();setupCampTasks();
+ const micLabel=$('micBtn').querySelector('b');micLabel.id='micBtnLabel';
+ const archive=document.createElement('details');archive.innerHTML='<summary>完整交流记录</summary><pre id="cleanMessageArchive" style="font-size:12px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere"></pre>';document.querySelector('[data-utility-page="advanced"]').append(archive);
+ $('utilityCloseBtn').onclick=closeCleanUtility;$('utilityStopBtn').onclick=()=>emergencyStop().catch(()=>{});
+ document.querySelectorAll('[data-body-settings]').forEach(b=>b.onclick=()=>{try{cleanBeforeOverlay('body-settings');const api=$('bodyFrame').contentWindow.HumanLab?.settings;if(!api)throw Error('人物仍在载入');api.open();}catch(e){toast(e.message,'error');}});
+ document.querySelectorAll('[data-utility]').forEach(b=>b.onclick=()=>openCleanUtility(b.dataset.utility));
+ $('controlMonitorBtn').onclick=()=>{cleanBeforeOverlay('monitor');$('controlMonitorDialog').showModal();renderControlMonitor();};
+ $('portraitFocusBtn').onclick=()=>cleanSetPortraitFocus(!document.querySelector('.app').classList.contains('portrait-focus'));
+ $('mobilePortraitBtn').onclick=()=>cleanSetPortraitFocus(true);
+ $('mobileConversationBtn').onclick=()=>cleanExpandConversation(!document.querySelector('.app').classList.contains('chat-expanded'));
+ $('cleanConfirmBtn').onclick=()=>{confirmSemanticPlan().catch(e=>toast(e.message,'error')).finally(renderCleanSummary);renderCleanSummary();};
+ $('sceneLabelsToggle').onchange=()=>{installCleanEmbeddedView();if(cleanBodyDocument)cleanBodyDocument.documentElement.dataset.cleanLabels=$('sceneLabelsToggle').checked?'all':'none';};
+ $('bodyFrame').addEventListener('load',()=>{installCleanEmbeddedView();renderCleanSummary();});
+ $('toolsMenu').addEventListener('click',e=>{if(e.target.closest('button'))$('toolsMenu').open=false;});
+ document.addEventListener('pointerdown',e=>{for(const d of document.querySelectorAll('.tools-menu[open],.view-menu[open]'))if(!d.contains(e.target))d.open=false;});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){for(const d of document.querySelectorAll('.tools-menu[open],.view-menu[open]'))d.open=false;if(!$('utilityDrawer').open&&!$('controlMonitorDialog').open){$('languageDrawer').hidden=true;if($('sceneDrawerHost').classList.contains('open')&&!state.environment.placementId)closeSceneEditor();cleanSetPortraitFocus(false);}}});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden){renderCleanSummary();if(!$('languageDrawer').hidden)renderLanguage();}});
+ $('utilityDrawer').addEventListener('click',e=>{if(e.target!==$('utilityDrawer'))return;const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeCleanUtility();});
+ if(window.visualViewport){const resize=()=>{if(matchMedia('(max-width:760px)').matches)document.querySelector('.app').style.height=window.visualViewport.height+'px';else document.querySelector('.app').style.height='';};window.visualViewport.addEventListener('resize',resize);resize();}
+ renderCleanSummary();
+ if(new URLSearchParams(location.search).get('voiceSettings')==='1')openCleanUtility('voice');
+ window.JarvisCleanUI={version:'1.14.0',open:openCleanUtility,close:closeCleanUtility,refresh:renderCleanSummary,get stats(){return {...cleanStats}},get messages(){return cleanMessages.slice()},bodyPresentationOnly:true};
+}
+
+/* Scene-aware, one-click examples. Existing semantic queue owns execution,
+ * pause/stop, capabilities, collision preflight and completion reporting. */
+const ACTION_EXAMPLES={"schema":"jarvis/scene_action_examples@1.0","examples":[{"id":"living-welcome","presets":["living"],"title":"到交流区迎客","description":"走到交流区，站稳后挥手打招呼。","steps":[{"type":"walk","targetId":"Z2"},{"type":"greet","duration":3.2},{"type":"wait","duration":0.8}]},{"id":"living-tidy","presets":["living"],"title":"整理后打招呼","description":"把训练箱搬到工作区，再去交流区打招呼。","steps":[{"type":"carry","objectId":"A","targetId":"Z1"},{"type":"walk","targetId":"Z2"},{"type":"greet","duration":3.2}]},{"id":"living-rest","presets":["living"],"title":"去休息区坐一会","description":"走到休息区，坐在地上稍作停留，再起身。","steps":[{"type":"walk","targetId":"Z3"},{"type":"sit"},{"type":"wait","duration":2},{"type":"stand"},{"type":"greet","duration":3.2}]},{"id":"living-tour","presets":["living"],"title":"三区巡游","description":"依次走过工作区、交流区、休息区，最后敬礼。","steps":[{"type":"walk","targetId":"Z1"},{"type":"walk","targetId":"Z2"},{"type":"walk","targetId":"Z3"},{"type":"salute","duration":4.2}]},{"id":"sorting-tidy","presets":["sorting"],"title":"分区整理","description":"训练箱搬到一区，训练球搬到二区，最后挥手。","steps":[{"type":"carry","objectId":"A","targetId":"Z1"},{"type":"carry","objectId":"B","targetId":"Z2"},{"type":"greet","duration":3.2}]},{"id":"obstacle-tour","presets":["obstacle"],"title":"绕障碍巡查","description":"沿避障路线经过三个区域，观察连续转向和停步。","steps":[{"type":"walk","targetId":"Z1"},{"type":"walk","targetId":"Z3"},{"type":"walk","targetId":"Z2"},{"type":"salute","duration":4.2}]},{"id":"corridor-arrive","presets":["corridor"],"title":"穿过通道报到","description":"经过狭窄通道到达终点标记，站稳后敬礼。","steps":[{"type":"walk","targetId":"M1"},{"type":"wait","duration":0.8},{"type":"salute","duration":4.2}]},{"id":"mixed-observe","presets":["mixed"],"title":"观察点与区域巡游","description":"绕过障碍到观察点，再去三区挥手。","steps":[{"type":"walk","targetId":"M1"},{"type":"wait","duration":0.8},{"type":"walk","targetId":"Z3"},{"type":"greet","duration":3.2}]},{"id":"empty-walk","presets":["empty"],"title":"起停与转向","description":"一区停稳，再转身走向三区，最后挥手。","steps":[{"type":"walk","targetId":"Z1"},{"type":"wait","duration":0.8},{"type":"walk","targetId":"Z3"},{"type":"greet","duration":3.2}]},{"id":"custom-tour","presets":["custom"],"title":"当前区域巡游","description":"使用当前场景的前两个区域，依次走到并挥手。","steps":[{"type":"walk","targetId":"$zone0"},{"type":"walk","targetId":"$zone1"},{"type":"greet","duration":3.2}]},{"id":"basic-greeting","presets":["*"],"title":"挥手与敬礼","description":"原地打招呼，放松停留片刻，再敬礼。","steps":[{"type":"greet","duration":3.2},{"type":"wait","duration":0.8},{"type":"salute","duration":4.2}]}]};
+const actionExampleUI={signature:'',launching:false,taskId:null,selected:null,message:''};
+function exampleWorld(){return state.snapshot?.world||state.environment?.scene||null;}
+function exampleBusy(){return actionExampleUI.launching||!!languageState.current||languageState.queue.length>0||languageState.submitting>0||!!languageState.confirmation||languageState.draining||!!state.snapshot?.plan||!!state.snapshot?.activeStep||!!state.snapshot?.heldObject||!!state.snapshot?.basic?.transition||!!state.snapshot?.basic?.gesture;}
+function examplesForWorld(w){
+ const known=ACTION_EXAMPLES.examples.some(e=>e.presets.includes(w?.presetId));
+ const preset=known?w.presetId:'custom';
+ return ACTION_EXAMPLES.examples.filter(e=>e.presets.includes('*')||e.presets.includes(preset));
+}
+function resolveActionExample(example,w){
+ if(!w)throw Error('场景尚未准备好');
+ const entities=[...(w.objects||[]),...(w.zones||[])];
+ const steps=example.steps.map(original=>{
+  const step={...original};
+  if(step.targetId?.startsWith('$zone'))step.targetId=w.zones?.[Number(step.targetId.slice(5))]?.id;
+  if(original.targetId&&!step.targetId)throw Error('当前场景需要至少两个区域');
+  if(step.targetId&&!entities.some(e=>e.id===step.targetId))throw Error('当前场景缺少目标 '+step.targetId);
+  if(step.objectId){const object=w.objects?.find(o=>o.id===step.objectId);if(!object||object.movable===false)throw Error('当前场景缺少可搬运物体 '+step.objectId);}
+  return step;
+ });
+ return steps;
+}
+function actionExamplePlan(example,w){
+ const steps=resolveActionExample(example,w),nodes=steps.map((step,i)=>({kind:'action',id:'example_step_'+(i+1),step}));
+ const summary=steps.map(step=>Lang.describeStep(step,w));
+ return {schema:'jarvis/semantic_plan@1.0',id:uid('example_plan'),sourceText:example.title+'：'+summary.join('，'),
+  worldRevision:w.revision,sceneId:w.sceneId,engine:'authored-scene-example',status:'ready',mode:'append',nodes,summary,
+  constraints:{protectedIds:(w.objects||[]).filter(o=>o.movable===false).map(o=>o.id),collisionAvoidance:true,forbiddenActions:[]},
+  grounding:[],assumptions:[],questions:[],contextAfter:null,
+  // Keep a failed example intact for inspection, rather than reinterpreting its
+  // title into a different action. Each step still revalidates the current scene.
+  groundedIntent:{kind:'action-example',selectedIds:[...new Set(steps.flatMap(s=>[s.objectId,s.targetId].filter(Boolean)))]}};
+}
+function renderActionExamples(){
+ const host=$('actionExampleList');if(!host)return;
+ const w=exampleWorld(),ready=state.bodyReady&&state.brainReady&&!state.startupFailure&&!!w;
+ const signature=JSON.stringify([w?.sceneId,w?.presetId,(w?.zones||[]).map(e=>[e.id,e.name]),(w?.objects||[]).map(e=>[e.id,e.name,e.movable])]);
+ if(signature!==actionExampleUI.signature){
+  actionExampleUI.signature=signature;host.replaceChildren();
+  if(w)for(const example of examplesForWorld(w)){
+   const button=document.createElement('button');button.type='button';button.dataset.actionExample=example.id;
+   const title=document.createElement('strong'),description=document.createElement('span');title.textContent=example.title;description.textContent=example.description;
+   button.append(title,description);button.setAttribute('aria-label','播放示例：'+example.title);button.title=example.description;
+   try{const steps=resolveActionExample(example,w);button.title=steps.map(s=>Lang.describeStep(s,w)).join(' → ');}
+   catch(error){button.dataset.unavailable=error.message;button.title=error.message;description.textContent=error.message;}
+   button.onclick=()=>playActionExample(example.id).catch(error=>{actionExampleUI.message=error.message;toast(error.message,'error');renderActionExamples();});
+   host.append(button);
+  }
+ }
+ const busy=exampleBusy();for(const button of host.querySelectorAll('button')){
+  button.disabled=!ready||busy||!!button.dataset.unavailable;button.setAttribute('aria-pressed',String(button.dataset.actionExample===actionExampleUI.selected));
+ }
+ const task=languageState.tasks.find(t=>t.id===actionExampleUI.taskId);
+ const active=task&&['queued','running','paused','paused_with_grip','cancelling'].includes(task.status);
+ const paused=languageState.paused||task?.status==='paused'||task?.status==='paused_with_grip';
+ $('actionExamplePause').hidden=!active;$('actionExampleStop').hidden=!active&&!actionExampleUI.launching;
+ $('actionExamplePause').textContent=paused?'继续':'暂停';
+ let message=!ready?'正在准备当前场景…':actionExampleUI.launching?'正在准备示例…':actionExampleUI.message;
+ if(task&&!actionExampleUI.launching){const total=Lang.flatten(task.plan.nodes).length;
+  if(active)message=(paused?'已暂停':'正在播放')+' · '+task.finished+'/'+total+' 步'+(task.currentStep?' · '+Lang.describeStep(task.currentStep.step,w):'');
+  else if(task.status==='completed')message='示例已完成 · '+total+' 步，可再次点击播放';
+  else if(task.status==='cancelled')message='示例已停止，可选择其他动作';
+  else if(task.status==='failed')message='示例未完成：'+(task.error||'请查看任务详情');
+ }
+ if(!message)message=busy?'当前任务结束后可播放示例':'按当前场景显示 · 点击即播放';
+ cleanText('actionExampleStatus',message);
+ try{const camera=$('bodyFrame').contentWindow.HumanLab?.camera;if(camera)$('bodyFollowToggle').checked=camera.follow;}catch{}
+}
+async function playActionExample(id){
+ if(!state.bodyReady||!state.brainReady)throw Error('请等待人物与场景初始化完成');
+ if(exampleBusy())throw Error('请先完成或停止当前任务，再播放示例');
+ actionExampleUI.launching=true;actionExampleUI.message='';actionExampleUI.taskId=null;renderActionExamples();
+ try{return await commandArbiter.schedule('append',async token=>{
+  const w=await freshWorld(token);token.assert();
+  // Another input may have obtained ownership while the scene was refreshed.
+  if(languageState.current||languageState.queue.length||languageState.confirmation||languageState.submitting||languageState.draining||state.snapshot?.plan||state.snapshot?.activeStep||state.snapshot?.heldObject||state.snapshot?.basic?.transition||state.snapshot?.basic?.gesture)throw Error('身体已有任务，请结束后再播放示例');
+  const example=examplesForWorld(w).find(e=>e.id===id);if(!example)throw Error('场景已切换，请重新选择示例');
+  const lab=$('bodyFrame').contentWindow.HumanLab;
+  if(['hands','shoulders','torso','headNeck','lowerLimb'].some(k=>lab?.[k]?.active))throw Error('请先退出部位编辑视图，再播放全身示例');
+  const plan=actionExamplePlan(example,w),check=Lang.validatePlan(plan,w,state.capabilities);if(!check.ok)throw Error(check.errors.join('；'));
+  token.assert();lab?.focus('field'); // One framing change on click; fixed during playback.
+  languageState.paused=false; // A fresh, idle example may follow an earlier failed task.
+  showUnderstanding(plan);addMessage('user','播放动作示例：'+example.title,{modality:'text'});
+  const task=await enqueueSemantic(plan,{token,inputId:uid('example_input'),modality:'text'});
+  actionExampleUI.selected=id;actionExampleUI.taskId=task.id;return{dispatched:true,taskId:task.id};
+ });}finally{actionExampleUI.launching=false;renderActionExamples();}
+}
+function setupActionExamples(){
+ $('actionExamplePause').onclick=()=>controlSemantic(languageState.paused?'resume':'pause').catch(e=>toast(e.message,'error'));
+ $('actionExampleStop').onclick=()=>controlSemantic('stop').catch(e=>toast(e.message,'error'));
+ $('bodyFollowToggle').onchange=e=>{try{$('bodyFrame').contentWindow.HumanLab?.setCameraFollow(e.target.checked);}catch{};};
+ window.JarvisActionExamples={play:playActionExample,list:()=>examplesForWorld(exampleWorld()).map(e=>({...e,steps:e.steps.map(s=>({...s}))}))};
+ renderActionExamples();
+}
+
+// Duty authoring and observation. Execution belongs to the existing semantic
+// queue; the observer never sets poses, fatigue, speed or strength parameters.
+const CAMP_DUTIES={"schema":"jarvis/camp_duty_tasks@1","sceneId":"camp","jobs":[{"id":"soldier-supply","role":"soldier","title":"士兵 · 补给与回收","description":"报到、核对、分送三类物资，回收空箱后休息。","phases":[{"title":"集合与领取","steps":[{"type":"walk","targetId":"Z2"},{"type":"salute","duration":3.2},{"type":"wait","duration":15},{"type":"walk","targetId":"Z3"},{"type":"wait","duration":25},{"type":"wait","duration":20}]},{"title":"营房补给","steps":[{"type":"carry","objectId":"SUP_A","targetId":"Z5","relation":"inside"},{"type":"greet","duration":3.2},{"type":"wait","duration":25},{"type":"walk","targetId":"Z6"},{"type":"wait","duration":20}]},{"title":"食堂配送","steps":[{"type":"walk","targetId":"Z3"},{"type":"wait","duration":20},{"type":"carry","objectId":"SUP_B","targetId":"Z8","relation":"inside"},{"type":"greet","duration":3.2},{"type":"wait","duration":30}]},{"title":"耗材归整","steps":[{"type":"walk","targetId":"Z3"},{"type":"wait","duration":20},{"type":"carry","objectId":"SUP_C","targetId":"Z13","relation":"inside"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z7"},{"type":"wait","duration":20}]},{"title":"周转箱回收","steps":[{"type":"walk","targetId":"Z8"},{"type":"wait","duration":20},{"type":"carry","objectId":"EMPTY_A","targetId":"Z4","relation":"inside"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z1"},{"type":"salute","duration":3.2},{"type":"wait","duration":15}]},{"title":"休息与结束","steps":[{"type":"walk","targetId":"Z10"},{"type":"sit"},{"type":"wait","duration":30},{"type":"wait","duration":30},{"type":"stand"},{"type":"walk","targetId":"Z2"},{"type":"salute","duration":3.2}]}],"stepCount":36,"scheduledWaitSeconds":340},{"id":"soldier-rounds","role":"soldier","title":"士兵 · 值勤巡视","description":"连续三轮巡视，经过门岗、营房、仓库和公共区域，轮间休息。","phases":[{"title":"交接班","steps":[{"type":"walk","targetId":"Z6"},{"type":"salute","duration":3.2},{"type":"wait","duration":30},{"type":"walk","targetId":"Z1"},{"type":"wait","duration":30}]},{"title":"第一轮：营房与仓库","steps":[{"type":"walk","targetId":"Z5"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z3"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z8"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z1"},{"type":"wait","duration":30}]},{"title":"第二轮：营区事务","steps":[{"type":"walk","targetId":"Z2"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z7"},{"type":"greet","duration":3.2},{"type":"wait","duration":25},{"type":"walk","targetId":"Z9"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z1"},{"type":"wait","duration":30}]},{"title":"轮间休息","steps":[{"type":"walk","targetId":"Z10"},{"type":"sit"},{"type":"wait","duration":30},{"type":"wait","duration":30},{"type":"stand"}]},{"title":"第三轮：复查","steps":[{"type":"walk","targetId":"Z5"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z3"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z8"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z2"},{"type":"wait","duration":25}]},{"title":"回岗交班","steps":[{"type":"walk","targetId":"Z1"},{"type":"salute","duration":3.2},{"type":"wait","duration":30},{"type":"walk","targetId":"Z6"},{"type":"wait","duration":30},{"type":"salute","duration":3.2}]}],"stepCount":41,"scheduledWaitSeconds":490},{"id":"officer-inspection","role":"officer","title":"军官 · 日常巡查","description":"从办公室出发，巡视集合场、营房、仓库和食堂，再到门岗交接。","phases":[{"title":"办公室准备","steps":[{"type":"walk","targetId":"Z6"},{"type":"wait","duration":30},{"type":"wait","duration":30},{"type":"salute","duration":3.2}]},{"title":"集合场与营房","steps":[{"type":"walk","targetId":"Z2"},{"type":"greet","duration":3.2},{"type":"wait","duration":30},{"type":"wait","duration":20},{"type":"walk","targetId":"Z5"},{"type":"wait","duration":30},{"type":"wait","duration":20}]},{"title":"仓储与食堂","steps":[{"type":"walk","targetId":"Z3"},{"type":"wait","duration":30},{"type":"wait","duration":20},{"type":"walk","targetId":"Z13"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z8"},{"type":"greet","duration":3.2},{"type":"wait","duration":30}]},{"title":"公共事务与门岗","steps":[{"type":"walk","targetId":"Z9"},{"type":"wait","duration":20},{"type":"walk","targetId":"Z7"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z1"},{"type":"salute","duration":3.2},{"type":"wait","duration":30}]},{"title":"休息与回访","steps":[{"type":"walk","targetId":"Z10"},{"type":"sit"},{"type":"wait","duration":30},{"type":"wait","duration":30},{"type":"stand"},{"type":"walk","targetId":"Z2"},{"type":"wait","duration":25},{"type":"walk","targetId":"Z6"},{"type":"wait","duration":30},{"type":"wait","duration":20},{"type":"salute","duration":3.2}]}],"stepCount":37,"scheduledWaitSeconds":475},{"id":"villager-delivery","role":"villager","title":"农民 · 收获整理与交货","description":"到田间作业点，分批整理收获、搬到村口交接，再返回村庄休息。","phases":[{"title":"田间停留与收获归集","steps":[{"type":"walk","targetId":"Z14"},{"type":"wait","duration":30},{"type":"wait","duration":30},{"type":"carry","objectId":"AGR_C","targetId":"Z11","relation":"inside"},{"type":"wait","duration":25}]},{"title":"首批交接","steps":[{"type":"carry","objectId":"AGR_C","targetId":"Z12","relation":"inside"},{"type":"greet","duration":3.2},{"type":"wait","duration":30},{"type":"wait","duration":20}]},{"title":"青菜归集","steps":[{"type":"walk","targetId":"Z14"},{"type":"wait","duration":30},{"type":"carry","objectId":"AGR_A","targetId":"Z11","relation":"inside"},{"type":"wait","duration":25},{"type":"wait","duration":20}]},{"title":"青菜交货与短休","steps":[{"type":"carry","objectId":"AGR_A","targetId":"Z17","relation":"inside"},{"type":"greet","duration":3.2},{"type":"wait","duration":30},{"type":"walk","targetId":"Z16"},{"type":"sit"},{"type":"wait","duration":30},{"type":"wait","duration":30},{"type":"stand"}]},{"title":"根菜归集与交货","steps":[{"type":"walk","targetId":"Z14"},{"type":"wait","duration":30},{"type":"wait","duration":20},{"type":"carry","objectId":"AGR_B","targetId":"Z11","relation":"inside"},{"type":"wait","duration":25},{"type":"carry","objectId":"AGR_B","targetId":"Z18","relation":"inside"},{"type":"greet","duration":3.2},{"type":"wait","duration":30}]},{"title":"田间复查与收工","steps":[{"type":"walk","targetId":"Z14"},{"type":"wait","duration":30},{"type":"walk","targetId":"Z11"},{"type":"wait","duration":20},{"type":"walk","targetId":"Z16"},{"type":"sit"},{"type":"wait","duration":30},{"type":"wait","duration":30},{"type":"stand"}]}],"stepCount":39,"scheduledWaitSeconds":515}],"observation":{"sampleIntervalMs":1000,"maxSamples":3600,"units":"meter,second","readOnly":true},"notes":["巡视核对与田间作业用停留节点表达，尚无写字、采摘或烹饪手部动画。","阶段是待执行计划；只有运行队列与最终目标校验返回完成才计为完成。","预设等待时间不含步行、搬运和姿态转换；真实耗时在执行时记录。"]};
+const CAMP_RESIDENTS={"schema":"jarvis/camp_residents@1","singleActiveEmbodiment":true,"residents":[{"role":"soldier","displayName":"林川","roleName":"士兵","responsibilities":["营区执勤","后勤补给","空箱回收"],"defaultJob":"soldier-supply"},{"role":"officer","displayName":"陈远","roleName":"军官","responsibilities":["日常巡查","事务交接","公共设施检查"],"defaultJob":"officer-inspection"},{"role":"villager","displayName":"周禾","roleName":"附近村庄农民","responsibilities":["田间整理","农产品分拣","村口交货"],"defaultJob":"villager-delivery"}]};
+const campUI={launching:false,selected:null,taskId:null,record:null,records:[],signature:'',message:'',timer:null};
+const campTask=()=>languageState.tasks.find(t=>t.id===campUI.taskId);
+const campTaskActive=t=>!!t&&['queued','running','paused','paused_with_grip','cancelling'].includes(t.status);
+function campLab(){try{return $('bodyFrame').contentWindow.HumanLab||null;}catch{return null;}}
+function campRole(){return CAMP_RESIDENTS.residents.find(r=>r.role===residentProfile.role)||null;}
+function campJobs(){return CAMP_DUTIES.jobs.filter(j=>j.role===residentProfile.role);}
+function campSteps(job){return job.phases.flatMap(p=>p.steps.map(s=>({...s})));}
+function campDutyPlan(job,w){
+ const steps=campSteps(job),finalEffects=new Map();
+ for(const step of steps)if(step.type==='carry'||step.type==='push')finalEffects.set(step.objectId,{objectId:step.objectId,targetId:step.targetId,relation:step.relation||'inside'});
+ return {schema:'jarvis/semantic_plan@1.0',id:uid('camp_plan'),sourceText:job.title,worldRevision:w.revision,sceneId:w.sceneId,engine:'authored-camp-duty',status:'ready',mode:'append',
+  nodes:steps.map((step,i)=>({kind:'action',id:'duty_step_'+(i+1),step})),summary:job.phases.map(p=>p.title),
+  constraints:{protectedIds:(w.objects||[]).filter(o=>o.movable===false).map(o=>o.id),collisionAvoidance:true,forbiddenActions:[]},
+  grounding:[],assumptions:[],questions:[],contextAfter:null,requiredEffects:[...finalEffects.values()],
+  groundedIntent:{kind:'camp-duty',selectedIds:[...new Set(steps.flatMap(s=>[s.objectId,s.targetId].filter(Boolean)))]}};
+}
+function campPhase(job,finished){let from=0;for(let i=0;i<job.phases.length;i++){const p=job.phases[i],to=from+p.steps.length;if(finished<to)return {index:i,title:p.title,from,to};from=to;}return {index:job.phases.length,title:'全部阶段结束',from,to:from};}
+function campStrengthReading(lab){
+ try{const r=lab.strength?.report();if(!r)return null;const groups=Object.entries(r.groups||{}).map(([id,g])=>({id,fatigue:g.fatigue,activation:g.activation}));
+  const values=groups.map(g=>g.fatigue).filter(Number.isFinite);return {profileId:r.profileId,readiness:r.readiness,meanFatigue:values.length?values.reduce((a,b)=>a+b,0)/values.length:null,maxFatigue:values.length?Math.max(...values):null,limitingGroup:r.lastAssessment?.limitingGroup||null,maxUtilization:r.lastAssessment?.maxUtilization??null,groups,modelEstimate:true};
+ }catch{return null;}
+}
+function campObservationSample(){
+ const lab=campLab(),a=lab?.agent,t=campTask();if(!a||!t)return null;
+ return {at:Date.now(),taskStatus:t.status,finished:t.finished,paused:!!(languageState.paused||a.paused),position:[...a.pos],phase:a.phase,posture:a.basic?.posture||null,action:t.currentStep?.step?.type||null,walkSpeedMps:Number.isFinite(a.walkSpeed)?a.walkSpeed:null,heldObject:a.held?.id||null,bodyError:a.error||null,taskError:t.error||null,strength:campStrengthReading(lab)};
+}
+function campObserveTick(){
+ const record=campUI.record,t=campTask();if(!record||record.endedAt||!t)return;
+ const sample=campObservationSample();if(!sample)return;const previous=record.samples.at(-1);
+ if(previous){const dt=(sample.at-previous.at)/1000;if(dt<=2.5){if(!previous.paused&&campTaskActive({status:previous.taskStatus}))record.observedActiveSeconds+=dt;record.sampledDistanceM+=Math.hypot(sample.position[0]-previous.position[0],sample.position[2]-previous.position[2]);}else record.sampleGaps.push({at:sample.at,seconds:dt});}
+ record.samples.push(sample);if(!record.firstSample)record.firstSample=sample;record.lastSample=sample;
+ if(record.samples.length>CAMP_DUTIES.observation.maxSamples){record.samples.shift();record.droppedSamples++;}
+ if(record.sampleGaps.length>120)record.sampleGaps.shift();
+ if(!campTaskActive(t)){record.endedAt=sample.at;record.status=t.status;record.finished=t.finished;record.error=t.error||null;record.goalVerification=t.goalVerification?safe(t.goalVerification):null;}
+ renderCampTasks();
+}
+function campObservationText(record){
+ if(!record)return '启动职业长任务后，每秒记录位置、动作、持物及力量模型状态。';
+ const s=record.lastSample||record.firstSample,elapsed=((record.endedAt||Date.now())-record.startedAt)/1000,fmt=n=>Math.round(n*100)+'%';
+ const parts=['已用 '+Math.floor(elapsed/60)+'分'+Math.floor(elapsed%60)+'秒','采样路程 '+record.sampledDistanceM.toFixed(1)+' m'];
+ if(s){parts.push('速度 '+(s.walkSpeedMps==null?'未提供':s.walkSpeedMps.toFixed(2)+' m/s'));parts.push('持物 '+(s.heldObject||'无'));const before=record.firstSample?.strength,now=s.strength;if(now){parts.push('最高肌群疲劳 '+(before?.maxFatigue==null?'—':fmt(before.maxFatigue))+' → '+fmt(now.maxFatigue||0)+'（模型）');parts.push('状态系数 '+Number(now.readiness).toFixed(2));}else parts.push('力量状态接口暂不可用');}
+ if(record.sampleGaps.length)parts.push('存在采样间隔，路程仅为已采样片段');return parts.join(' · ');
+}
+function renderCampTasks(){
+ const host=$('campTaskPanel');if(!host)return;const w=exampleWorld(),isCamp=w?.theme==='camp'||w?.presetId==='camp',ready=state.bodyReady&&state.brainReady&&!state.startupFailure;
+ host.hidden=!isCamp;$('actionExamples').hidden=isCamp;$('campEnter').hidden=isCamp;$('campEnter').disabled=!ready||exampleBusy()||campUI.launching;if(!isCamp)return;
+ const jobs=campJobs(),role=campRole(),busy=exampleBusy()||campUI.launching,t=campTask(),active=campTaskActive(t),job=CAMP_DUTIES.jobs.find(j=>j.id===campUI.selected);
+ const signature=JSON.stringify([residentProfile.role,jobs.map(j=>j.id)]);
+ if(signature!==campUI.signature){campUI.signature=signature;$('campJobList').replaceChildren();for(const j of jobs){const button=document.createElement('button');button.type='button';button.dataset.campJob=j.id;const strong=document.createElement('strong'),span=document.createElement('span');strong.textContent=j.title;span.textContent=j.description+' '+j.stepCount+' 步，预设停留 '+Math.round(j.scheduledWaitSeconds/60)+' 分钟，另计移动耗时。';button.append(strong,span);button.onclick=()=>playCampDuty(j.id).catch(campError);$('campJobList').append(button);}}
+ for(const button of $('campJobList').querySelectorAll('button')){button.disabled=!ready||busy;button.setAttribute('aria-pressed',String(button.dataset.campJob===campUI.selected));}
+ $('campRoleSelect').value=role?.role||'';$('campRoleSelect').disabled=!ready||busy;$('campRestore').disabled=!ready||busy;
+ cleanText('campIdentity',role?residentProfile.displayName+' · '+role.roleName:'选择士兵、军官或农民身份以显示职业任务');
+ $('campPause').hidden=!active;$('campStop').hidden=!active&&!campUI.launching;cleanText('campPause',languageState.paused?'继续':'暂停');
+ const phase=job&&t?campPhase(job,t.finished):null;
+ cleanText('campTaskStatus',campUI.launching?'正在准备职业任务…':active?(languageState.paused?'已暂停':'执行中')+' · '+t.finished+'/'+job.stepCount+' 步 · '+phase.title:t?.status==='completed'?'职业任务已完成 · '+t.finished+' 步':t?.status==='failed'?'任务已阻断：'+t.error:t?.status==='cancelled'?'职业任务已停止':campUI.message||'按身份选择一项长任务');
+ const stages=$('campStageList'),stageSignature=JSON.stringify([job?.id,t?.finished,t?.status]);if(stages.dataset.signature!==stageSignature){stages.dataset.signature=stageSignature;stages.replaceChildren();let count=0;for(const p of job?.phases||[]){count+=p.steps.length;const li=document.createElement('li');li.textContent=p.title;li.dataset.state=t&&t.finished>=count?'done':phase?.title===p.title&&active?'active':'pending';stages.append(li);}}
+ cleanText('campObservation',campObservationText(campUI.record));$('campExport').disabled=!campUI.record;
+ const lab=campLab();$('campRoofs').checked=lab?.camp?.roofsVisible===true;
+}
+function campError(error){campUI.message=error.message;toast(error.message,'error');renderCampTasks();}
+async function playCampDuty(id){
+ if(!state.bodyReady||!state.brainReady)throw Error('请等待人物和场景准备完成');if(exampleBusy()||campUI.launching)throw Error('请先完成或停止当前任务');
+ campUI.launching=true;campUI.message='';renderCampTasks();
+ try{return await commandArbiter.schedule('append',async token=>{
+  const w=await freshWorld(token);token.assert();
+  if(w.theme!=='camp'&&w.presetId!=='camp')throw Error('请先切换到军营与邻村场景');
+  if(languageState.current||languageState.queue.length||languageState.confirmation||languageState.submitting||languageState.draining||state.snapshot?.plan||state.snapshot?.activeStep||state.snapshot?.heldObject||state.snapshot?.basic?.transition||state.snapshot?.basic?.gesture)throw Error('身体已有任务，请结束后再开始职业任务');
+  const job=campJobs().find(j=>j.id===id);if(!job)throw Error('该任务与当前身份不符，请重新选择');
+  const lab=campLab();if(['hands','shoulders','torso','headNeck','lowerLimb'].some(k=>lab?.[k]?.active))throw Error('请先退出部位编辑视图');
+  const plan=campDutyPlan(job,w),check=Lang.validatePlan(plan,w,state.capabilities);if(!check.ok)throw Error(check.errors.join('；'));
+  token.assert();languageState.paused=false;showUnderstanding(plan);addMessage('user','开始职业任务：'+job.title,{modality:'text'});
+  const task=await enqueueSemantic(plan,{token,inputId:uid('camp_input'),modality:'text'});
+  if(campUI.record&&!campUI.records.includes(campUI.record)){campUI.records.push(campUI.record);if(campUI.records.length>8)campUI.records.shift();}
+  campUI.selected=id;campUI.taskId=task.id;campUI.record={schema:'jarvis/camp_duty_observation@1',jobId:id,taskId:task.id,title:job.title,resident:safe(residentContext()),sceneId:w.sceneId,sceneRevision:w.revision,startedAt:Date.now(),endedAt:null,initialWorld:safe(w),samples:[],firstSample:null,lastSample:null,droppedSamples:0,sampleGaps:[],sampledDistanceM:0,observedActiveSeconds:0,notes:['只读采样；力量与疲劳来自现有人体模型。','路程按相邻采样点累计；长采样间隔不补推路线。','巡视、核对和田间停留节点不表示已实现写字或采摘手部动作。']};
+  campObserveTick();return {dispatched:true,taskId:task.id};
+ });}finally{campUI.launching=false;renderCampTasks();}
+}
+function exportCampObservation(){
+ if(!campUI.record)return;campObserveTick();const report={schema:'jarvis/camp_duty_session@1',exportedAt:new Date().toISOString(),current:campUI.record,previous:campUI.records};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='camp-duty-observation-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function setupCampTasks(){
+ const select=$('campRoleSelect');for(const resident of CAMP_RESIDENTS.residents){const option=document.createElement('option');option.value=resident.role;option.textContent=resident.roleName;select.append(option);}
+ select.onchange=async e=>{const selected=CAMP_RESIDENTS.residents.find(r=>r.role===e.target.value);if(!selected)return;try{await updateResidentProfile({displayName:residentProfile.displayName,role:selected.role});campUI.message='已切换为'+selected.roleName;renderCampTasks();}catch(error){campError(error);}};
+ $('campPause').onclick=()=>controlSemantic(languageState.paused?'resume':'pause').catch(campError);$('campStop').onclick=()=>controlSemantic('stop').catch(campError);
+ const restore=async()=>{try{if(exampleBusy()||campUI.launching)throw Error('请先结束当前任务');const result=await requestBody('environment.preset',{presetId:'camp'});await afterSceneMutation(result,'军营布局已恢复');await freshWorld();campLab()?.focus('field');campUI.message='军营布局已恢复；可开始下一次观察';renderCampTasks();}catch(error){campError(error);}};
+ $('campRestore').onclick=restore;$('campEnter').onclick=restore;
+ $('campRoofs').onchange=e=>{try{campLab()?.camp?.setRoofs(e.target.checked);}catch(error){campError(error);}};
+ for(const button of document.querySelectorAll('[data-camp-view]'))button.onclick=()=>{try{campLab()?.camp?.overview(button.dataset.campView);}catch(error){campError(error);}};
+ $('campExport').onclick=exportCampObservation;campUI.timer=setInterval(campObserveTick,CAMP_DUTIES.observation.sampleIntervalMs);
+ window.addEventListener('beforeunload',()=>clearInterval(campUI.timer));
+ window.JarvisCampTasks={play:playCampDuty,list:()=>safe(campJobs()),get observation(){return campUI.record?safe(campUI.record):null;},export:exportCampObservation};renderCampTasks();
+}
+
+/* START BODY STARTUP DIAGNOSTICS */
+/*__SOURCE:ui/StartupDiagnostics.js__*/
+
+watchBodyStartup();
+/* END BODY STARTUP DIAGNOSTICS */
+setup();boot().catch(e=>showStartupFailure({stage:'unpack',error:String(e?.message||e)},'workbench'));
+window.JarvisEmbodimentLab={version:VERSION,buildRevision:BUILD_REVISION,protocol:BODY_PROTOCOL,get state(){return state},get ready(){return state.brainReady&&state.bodyReady},language:{planner,reasoner,get state(){return languageState},get trace(){return languageState.reasoningTrace},analyze:(text,mode='replace')=>submit(text,mode,{dryRun:true}),confirm:confirmSemanticPlan,control:controlSemantic,open:openLanguage},command:(text,mode='replace',options={})=>submit(text,mode,options),voice:VoiceInputPlugin,environment:{open:openSceneEditor,close:closeSceneEditor,refresh:loadEnvironmentEditor,add:addSceneEntity,update:updateSceneEntity,preset:applyScenePreset,export:exportCurrentScene,get state(){return state.environment}},openCommunication:()=>{document.querySelector('.app').classList.add('comm-focus');$('commandInput').focus()},requestBody,advance:seconds=>requestBody('advance',{seconds},20000),resident:{snapshot:residentContext,update:updateResidentProfile,observePlayer},snapshot:async()=>{await refreshBodyEvidence();return{resident:residentContext(),binding:state.binding,capabilities:state.capabilities,intent:state.currentIntent,feedback:state.feedback,body:state.snapshot,diagnostics:state.diagnostics,voice:{...state.voice},reasoning:{trace:languageState.reasoningTrace,status:languageState.reasoningStatus,profile:physicalProfile()},brain:brainApp()?.exportState?.()||null}},waitForReady:(timeout=25000)=>new Promise((resolve,reject)=>{const start=Date.now(),timer=setInterval(()=>{if(state.brainReady&&state.bodyReady){clearInterval(timer);resolve(true)}else if(state.startupFailure){clearInterval(timer);reject(Error(state.startupFailure.error))}else if(Date.now()-start>timeout){clearInterval(timer);reject(Error('ready timeout'))}},100)})};
+document.documentElement.dataset.jarvisEmbodimentLab='1.14.1';document.documentElement.dataset.jarvisBuildRevision=BUILD_REVISION;document.documentElement.dataset.voiceInputPlugin='1.11.0';document.documentElement.dataset.trainingSceneEditor='1.0.0';
+})();
+</script>
+</body></html>

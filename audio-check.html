@@ -1,0 +1,311 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>贾维斯原声录音检查 V1.15.1</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Microsoft YaHei",sans-serif;color:#dce8ed;background:#0b1118}*{box-sizing:border-box}body{margin:0;padding:30px 18px}main{max-width:760px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;gap:16px}h1{font-size:24px;margin:8px 0}p{line-height:1.65;color:#b6c6ce}a{color:#8dd6d3}section{margin-top:22px;padding:22px;background:#141f2a;border:1px solid #2e414d;border-radius:16px}label{display:block;margin:15px 0 6px}select,button{font:inherit;min-height:46px;border-radius:9px;border:1px solid #3d5360;background:#1b2b37;color:inherit;padding:10px 13px}select{width:100%}button{cursor:pointer}button:disabled{opacity:.4;cursor:default}.primary{background:#a5d8d5;color:#102b32;font-weight:650}.stop{background:#41292f;color:#ffccc7}.row{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.status{min-height:46px;line-height:1.6;overflow-wrap:anywhere}meter{width:100%;height:22px}audio{width:100%;margin:8px 0}summary{cursor:pointer;line-height:1.7}pre{white-space:pre-wrap;word-break:break-word;font-size:12px;color:#aebfc9}small{color:#9dafb9}#warning{color:#ffbdb2}[hidden]{display:none!important}button:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #c5f5ef;outline-offset:3px}@media(max-width:450px){body{padding:18px 12px}section{padding:16px}h1{font-size:21px}.row button{flex:1}header{align-items:flex-start}}
+</style></head><body><main>
+<header><div><small>JARVIS · V1.15.1</small><h1>先把声音录清楚</h1></div><a href="index.html">返回工作台</a></header>
+<p>此页仅运行录音和回放，不加载人物、粒子头像或识别模型。与工作台共用同一份音频采集代码。录音只留在当前页面内存。</p>
+<section><label for="device">输入设备</label><select id="device"><option value="">系统默认麦克风</option></select>
+<details style="margin-top:16px"><summary>录音方式与对照设置</summary>
+<label for="profile">声音处理</label><select id="profile"><option value="raw">原声直录：关闭降噪、回声消除与自动增益</option><option value="speech">通话模式：回声消除与降噪，关闭自动增益</option><option value="browser">浏览器默认处理</option></select>
+<label for="mode">音频保存方式</label><select id="mode"><option value="pcm">PCM WAV，实际采样率</option><option value="native">浏览器原生编码，用于对照</option></select>
+<label for="channel">输入声道</label><select id="channel"><option value="auto">自动选择能量较高声道</option><option value="left">第一声道</option><option value="right">第二声道</option></select>
+<p>自动声道模式保存能量较高的一路，避免把两路反相音频混合抵消。原声模式会保留环境声，硬件驱动自身的效果仍可能存在。</p>
+<button id="refresh">刷新设备</button><button id="selftest">检查录音引擎，不开启麦克风</button><p><small>引擎检查使用合成测试音，核对编码、采样率与音频连续性，不能替代真人麦克风验收。</small></p>
+</details>
+<div class="row"><button class="primary" id="start">开始录音</button><button id="stop" disabled>结束录音</button><button class="stop" id="cancel" disabled>取消</button></div>
+<meter id="level" min="0" max="1" value="0" aria-label="输入音量"></meter><div id="status" class="status" role="status">默认采用原声PCM。先录5至10秒，再回放确认。</div><p id="warning" hidden></p>
+</section>
+<section id="result" hidden><h2 style="font-size:18px;margin:0 0 8px">本轮录音</h2><p id="info"></p><audio id="playback" controls preload="metadata"></audio>
+<div class="row"><button id="save">保存音频文件</button><button id="report">导出收音诊断</button><button id="delete">删除录音</button></div>
+<details><summary>设备与音频检查结果</summary><pre id="details"></pre></details>
+<p>网页回放仍有杂音时，可保存这份录音，用系统播放器听同一文件。如果文件在系统播放器中也异常，问题位于采集或编码环节；文件在系统播放器中清楚，则继续检查网页回放与设备路由。</p>
+</section><p><small>数字检查通过仅表示所检查的采样数据一致。没有真人听音确认之前，不标记语音识别成功。</small></p>
+</main><script>/* Jarvis audio capture 1.15.1. No speech recognition or scene vocabulary here.
+ * PCM16 WAV uses the AudioContext's actual rate. No JS resampling, DSP, live
+ * microphone monitoring, ScriptProcessorNode, or per-frame DOM work.
+ * Native recorder is a separately labelled fallback, never relabelled as WAV.
+ */
+(function (root) {
+ 'use strict';
+ function processorDefinition() {
+  class JarvisPCM extends AudioWorkletProcessor {
+   constructor(options) {
+    super();
+    const o=options.processorOptions||{};
+    this.maxFrames=Math.max(1,Math.floor(o.maxFrames||sampleRate*90));
+    this.capacity=4096;this.offset=0;this.frames=0;this.sequence=0;this.channels=0;
+    this.blockStart=0;this.expectedFrame=null;this.gaps=0;this.channelChanges=0;this.invalid=0;
+    this.sums=[0,0];this.peaks=[0,0];this.clips=[0,0];this.active=true;this.started=false;
+    this.port.onmessage=e=>{if(e.data?.type==='stop')this.finish('manual');if(e.data?.type==='cancel'){this.active=false;this.buffer=null;}};
+   }
+   flush() {
+    if(!this.offset)return;
+    const pcm=this.offset===this.capacity?this.buffer:this.buffer.slice(0,this.offset*this.channels);
+    this.port.postMessage({type:'chunk',sequence:this.sequence++,startFrame:this.frames-this.offset,
+      frames:this.offset,channels:this.channels,pcm:pcm.buffer},[pcm.buffer]);
+    this.buffer=new Int16Array(this.capacity*this.channels);this.offset=0;
+   }
+   finish(reason) {
+    if(!this.active)return;this.active=false;this.flush();
+    this.port.postMessage({type:'done',reason,frames:this.frames,sampleRate,channels:this.channels,
+      chunks:this.sequence,missingFrames:this.gaps,channelChanges:this.channelChanges,invalidSamples:this.invalid,
+      sums:this.sums,peaks:this.peaks,clips:this.clips});
+   }
+   process(inputs,outputs) {
+    // Output silence even when connected to the destination to keep the graph alive.
+    for(const output of outputs)for(const channel of output)channel.fill(0);
+    if(!this.active)return false;
+    const input=inputs[0]||[];
+    const n=input[0]?.length||outputs[0]?.[0]?.length||128;
+    if(!this.started){
+     if(!input.length)return true;
+     this.started=true;this.channels=Math.min(2,input.length);this.buffer=new Int16Array(this.capacity*this.channels);
+     this.port.postMessage({type:'started',sampleRate,channels:this.channels,availableChannels:input.length});
+    }
+    if(this.expectedFrame!==null&&currentFrame!==this.expectedFrame)this.gaps+=Math.abs(currentFrame-this.expectedFrame);
+    this.expectedFrame=currentFrame+n;
+    if(input.length<this.channels)this.channelChanges++;
+    for(let i=0;i<n&&this.frames<this.maxFrames;i++){
+     for(let ch=0;ch<this.channels;ch++){
+      let value=input[ch]?.[i]??0;
+      if(!Number.isFinite(value)){this.invalid++;value=0;}
+      this.sums[ch]+=value*value;this.peaks[ch]=Math.max(this.peaks[ch],Math.abs(value));
+      if(Math.abs(value)>=.999)this.clips[ch]++;
+      value=Math.max(-1,Math.min(1,value));
+      this.buffer[this.offset*this.channels+ch]=Math.round(value<0?value*32768:value*32767);
+     }
+     this.offset++;this.frames++;
+     if(this.offset===this.capacity)this.flush();
+    }
+    if(this.frames>=this.maxFrames)this.finish('limit');
+    return this.active;
+   }
+  }
+  registerProcessor('jarvis-pcm-v1151',JarvisPCM);
+ }
+ const workletSource='('+processorDefinition.toString()+')();';
+ const VERSION='1.15.1';
+ function constraints({deviceId='',profile='raw'}={}) {
+  const audio={};
+  if(deviceId)audio.deviceId={exact:deviceId};
+  if(profile!=='browser')Object.assign(audio,{echoCancellation:profile==='speech',noiseSuppression:profile==='speech',autoGainControl:false});
+  // Deliberately do not request sampleRate or channelCount. Inspect the result.
+  return {audio:Object.keys(audio).length?audio:true,video:false};
+ }
+ function trackInfo(stream) {
+  const t=stream.getAudioTracks()[0];if(!t)throw Error('没有音频输入轨道');
+  const s=t.getSettings?.()||{};
+  return {label:t.label||'浏览器未提供设备名称',sampleRate:s.sampleRate??null,channelCount:s.channelCount??null,
+   echoCancellation:s.echoCancellation??null,noiseSuppression:s.noiseSuppression??null,
+   autoGainControl:s.autoGainControl??null,readyState:t.readyState};
+ }
+ function wavHeader(frames,sampleRate) {
+  if(!Number.isInteger(frames)||frames<0||!Number.isInteger(sampleRate)||sampleRate<8000||sampleRate>384000)throw Error('无效的PCM帧数或采样率');
+  const b=new ArrayBuffer(44),d=new DataView(b),write=(p,s)=>{for(let i=0;i<s.length;i++)d.setUint8(p+i,s.charCodeAt(i));};
+  write(0,'RIFF');d.setUint32(4,36+frames*2,true);write(8,'WAVE');write(12,'fmt ');d.setUint32(16,16,true);
+  d.setUint16(20,1,true);d.setUint16(22,1,true);d.setUint32(24,sampleRate,true);d.setUint32(28,sampleRate*2,true);
+  d.setUint16(32,2,true);d.setUint16(34,16,true);write(36,'data');d.setUint32(40,frames*2,true);return b;
+ }
+ function encodeWav(chunks,summary,{channel='auto'}={}) {
+  const channels=summary.channels||1;
+  let chosen=channel==='right'?1:channel==='left'?0:(channels>1&&summary.sums[1]>summary.sums[0]?1:0);
+  if(chosen>=channels)chosen=0;
+  const header=wavHeader(summary.frames,summary.sampleRate),parts=[header];let frames=0;
+  // Explicit little-endian output. No sample-rate guess and no stereo downmix:
+  // opposite-phase stereo inputs must not cancel each other.
+  for(const item of chunks){const src=new Int16Array(item);const count=src.length/channels;
+   if(!Number.isInteger(count))throw Error('PCM声道边界错误');
+   const out=new ArrayBuffer(count*2),view=new DataView(out);
+   for(let i=0;i<count;i++)view.setInt16(i*2,src[i*channels+chosen],true);
+   parts.push(out);frames+=count;
+  }
+  if(frames!==summary.frames)throw Error('PCM样本总数与录音记录不一致，已阻止提交');
+  return {blob:new Blob(parts,{type:'audio/wav'}),selectedChannel:chosen,frames};
+ }
+ function assess(meta) {
+  const warnings=[];const ch=meta.selectedChannel||0,n=meta.frames||0;
+  const rms=n&&meta.sums?Math.sqrt(meta.sums[ch]/n):null;
+  const clippedFraction=n&&meta.clips?meta.clips[ch]/n:null;
+  if(meta.missingFrames||meta.sequenceErrors||meta.invalidSamples||meta.channelChanges)warnings.push('音频连续性检查异常');
+  if(meta.contextInterruptions)warnings.push('音频设备或时钟曾中断');
+  if(rms!==null&&rms<.00012)warnings.push('录音接近静音');
+  if(clippedFraction!==null&&clippedFraction>.01)warnings.push('录音存在削波，输入音量可能过大');
+  if(meta.wallSeconds>.75&&Math.abs(meta.seconds-meta.wallSeconds)>Math.max(.3,meta.wallSeconds*.12))warnings.push('录音样本时长与计时时长存在较大差异');
+  const unsafe=!!(meta.missingFrames||meta.sequenceErrors||meta.invalidSamples||meta.channelChanges||meta.contextInterruptions);
+  return {...meta,rms,clippedFraction,warnings,unsafe,reviewRequired:warnings.length>0,
+   qualityMeaning:'仅检查数字采样连续性、时长与幅度；不能据此判断是否为清晰的人声。'};
+ }
+ class Capture {
+  constructor(options={}) {
+   this.options={profile:'raw',mode:'pcm',channel:'auto',maxSeconds:90,maxBytes:20*1024*1024,...options};
+   this.state='new';this.chunks=[];this.expected=0;this.sequence=0;this.sequenceErrors=0;this.contextInterruptions=0;
+   this.finished=new Promise((resolve,reject)=>{this.resolve=resolve;this.reject=reject;});
+   // Lifecycle errors may happen while the UI still awaits permission.
+   this.finished.catch(()=>{});
+  }
+  async start() {
+   this.state='starting';const opts=this.options;
+   try{
+    this.stream=opts.stream||await navigator.mediaDevices.getUserMedia(constraints(opts));
+    if(this.state==='cancelled'){this.close();throw new DOMException('已取消','AbortError');}
+    this.device=trackInfo(this.stream);
+    this.stream.getAudioTracks()[0].addEventListener('ended',()=>{if(this.state==='recording'){this.contextInterruptions++;this.stop().catch(()=>{});}});
+    const AC=root.AudioContext||root.webkitAudioContext;
+    this.ctx=null;this.outputRoute='none';
+    if(AC){
+     // A silent sink avoids opening a speaker output for microphone analysis.
+     // This is optional; unsupported browsers retain an explicitly silent graph.
+     if('setSinkId' in AC.prototype){try{this.ctx=new AC({latencyHint:'playback',sinkId:{type:'none'}});}catch{}}
+     if(!this.ctx)this.ctx=new AC({latencyHint:'playback'});
+     this.outputRoute=this.ctx.sinkId?.type==='none'?'silent-sink':'zero-output-graph';
+    }
+    if(this.ctx){await this.ctx.resume();if(this.state==='cancelled'){this.close();throw new DOMException('已取消','AbortError');}}
+    this.startedAt=performance.now();
+    if(opts.mode==='pcm'&&this.ctx?.audioWorklet&&typeof root.AudioWorkletNode==='function')await this.startPCM();
+    else {this.fallback=opts.mode==='pcm'?'当前环境未开放AudioWorklet，已明确切换浏览器原生编码':null;this.startNative();}
+    if(this.state==='cancelled'){this.close();throw new DOMException('已取消','AbortError');}
+    this.wallTimer=setTimeout(()=>this.stop().catch(()=>{}),opts.maxSeconds*1000+500);
+    return this;
+   }catch(e){this.close();if(this.state!=='cancelled')this.state='error';this.reject(e);throw e;}
+  }
+  async startPCM() {
+   const url=URL.createObjectURL(new Blob([workletSource],{type:'application/javascript'}));
+   try{await this.ctx.audioWorklet.addModule(url);}finally{URL.revokeObjectURL(url);}
+   if(this.state==='cancelled')throw new DOMException('已取消','AbortError');
+   this.mode='pcm-wav';this.ctx.onstatechange=()=>{if(this.state==='recording'&&this.ctx.state!=='running'){
+    this.contextInterruptions++;this.fail(Error('音频时钟中断，已停止本轮录音，请重新录制'));}};
+   const maxFrames=Math.min(Math.floor(this.ctx.sampleRate*this.options.maxSeconds),Math.floor((this.options.maxBytes-44)/2));
+   this.node=new AudioWorkletNode(this.ctx,'jarvis-pcm-v1151',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1],
+    channelCountMode:'max',channelInterpretation:'discrete',processorOptions:{maxFrames}});
+   this.node.onprocessorerror=()=>this.fail(Error('录音处理线程异常，未提交损坏音频'));
+   let readyResolve,readyReject;const ready=new Promise((resolve,reject)=>{readyResolve=resolve;readyReject=reject;});
+   const timer=setTimeout(()=>readyReject(Error('音频线程未收到输入样本，请检查所选设备')),5000);
+   this.node.port.onmessage=({data:d})=>{
+    if(['cancelled','error','done'].includes(this.state))return;
+    if(d.type==='started'){this.startedAt=performance.now();this.state='recording';this.availableChannels=d.availableChannels;clearTimeout(timer);readyResolve();}
+    if(d.type==='chunk'){
+     if(d.sequence!==this.sequence++||d.startFrame!==this.expected)this.sequenceErrors++;
+     this.expected+=d.frames;this.chunks.push(d.pcm);
+     const x=new Int16Array(d.pcm);let sum=0;for(let i=0;i<x.length;i++)sum+=(x[i]/32768)**2;
+     this.options.onLevel?.(Math.sqrt(sum/Math.max(1,x.length)),this.expected/this.ctx.sampleRate);
+    }
+    if(d.type==='done'){
+     clearTimeout(timer);clearTimeout(this.stopTimer);readyResolve();
+     try{
+      if(d.chunks!==this.sequence||d.frames!==this.expected)this.sequenceErrors++;
+      const encoded=encodeWav(this.chunks,d,this.options);
+      const meta=assess({...d,mode:this.mode,version:VERSION,profile:this.options.profile,device:this.device,
+       selectedChannel:encoded.selectedChannel,availableChannels:this.availableChannels,
+       sequenceErrors:this.sequenceErrors,contextInterruptions:this.contextInterruptions,outputRoute:this.outputRoute,
+       seconds:d.frames/d.sampleRate,wallSeconds:(performance.now()-this.startedAt)/1000});
+      this.complete(encoded.blob,meta);
+     }catch(e){this.fail(e);}
+    }
+   };
+   this.source=this.ctx.createMediaStreamSource(this.stream);this.source.connect(this.node);this.node.connect(this.ctx.destination);
+   try{await ready;}finally{clearTimeout(timer);}
+  }
+  startNative() {
+   if(typeof root.MediaRecorder!=='function')throw Error('当前浏览器不支持录音，请使用启动器打开支持录音的浏览器');
+   this.mode='native-recorder';this.bytes=0;
+   const mime=['audio/webm;codecs=opus','audio/ogg;codecs=opus','audio/mp4','audio/webm'].find(x=>MediaRecorder.isTypeSupported(x));
+   this.recorder=new MediaRecorder(this.stream,{...(mime?{mimeType:mime}:{}),audioBitsPerSecond:128000});
+   this.recorder.ondataavailable=({data})=>{if(this.state==='cancelled'||!data.size)return;this.chunks.push(data);this.bytes+=data.size;if(this.bytes>this.options.maxBytes)this.stop().catch(()=>{});};
+   this.recorder.onerror=()=>this.fail(Error('浏览器原生编码异常，请切换PCM录音'));
+   this.recorder.onstop=()=>{
+    if(this.state==='cancelled'||this.state==='error')return;clearTimeout(this.stopTimer);
+    const seconds=(performance.now()-this.startedAt)/1000;
+    const blob=new Blob(this.chunks,{type:this.recorder.mimeType||mime||'application/octet-stream'});
+    this.complete(blob,{version:VERSION,mode:this.mode,profile:this.options.profile,device:this.device,seconds,
+     wallSeconds:seconds,sampleRate:null,encodedMime:blob.type,frames:null,fallback:this.fallback,outputRoute:this.outputRoute,
+     contextInterruptions:this.contextInterruptions,unsafe:!!this.contextInterruptions,reviewRequired:!!this.contextInterruptions,
+     warnings:['浏览器原生编码模式，未进行逐样本连续性校验'],qualityMeaning:'回放原始编码，需人工听音确认；未伪装为PCM结果。'});
+   };
+   if(this.ctx){
+    this.source=this.ctx.createMediaStreamSource(this.stream);this.analyser=this.ctx.createAnalyser();this.analyser.fftSize=512;
+    this.source.connect(this.analyser);this.samples=new Float32Array(512);
+    this.meterTimer=setInterval(()=>{this.analyser.getFloatTimeDomainData(this.samples);let sum=0;for(const x of this.samples)sum+=x*x;
+     this.options.onLevel?.(Math.sqrt(sum/512),(performance.now()-this.startedAt)/1000);},150);
+   }
+   this.recorder.start(1000);this.state='recording';
+  }
+  stop() {
+   if(this.state==='recording'){
+    this.state='stopping';clearTimeout(this.wallTimer);
+    this.stopTimer=setTimeout(()=>this.fail(Error('录音尾部保存超时，未将不完整音频提交为指令')),5000);
+    if(this.mode==='pcm-wav')this.node.port.postMessage({type:'stop'});
+    else if(this.recorder.state!=='inactive')this.recorder.stop();
+   }else if(this.state==='starting')this.cancel();
+   return this.finished;
+  }
+  complete(blob,meta) {
+   if(['cancelled','error','done'].includes(this.state))return;
+   this.state='done';this.result={blob,meta};this.chunks=[];this.close();this.resolve(this.result);
+  }
+  fail(error) {if(['cancelled','error','done'].includes(this.state))return;this.state='error';this.close();this.reject(error);}
+  cancel() {
+   if(['cancelled','done','error'].includes(this.state))return;
+   this.state='cancelled';try{this.node?.port.postMessage({type:'cancel'});if(this.recorder?.state==='recording')this.recorder.stop();}catch{}
+   this.chunks=[];this.close();this.reject(new DOMException('已取消本轮录音','AbortError'));
+  }
+  close() {
+   clearTimeout(this.wallTimer);clearTimeout(this.stopTimer);clearInterval(this.meterTimer);
+   if(this.ctx)this.ctx.onstatechange=null;
+   try{this.source?.disconnect();this.node?.disconnect();this.analyser?.disconnect();}catch{}
+   this.stream?.getTracks().forEach(t=>t.stop());
+   if(this.ctx&&this.ctx.state!=='closed')this.ctx.close().catch(()=>{});
+  }
+ }
+ root.JarvisAudioCapture=Object.freeze({VERSION,Capture,constraints,workletSource,encodeWav,wavHeader,assess,trackInfo});
+})(typeof window!=='undefined'?window:globalThis);
+</script><script>
+(()=>{'use strict';const $=id=>document.getElementById(id);let capture=null,saved=null,url='',generation=0,testSource=null,startedAt=0,timer=0,preparing=false;
+const store=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch{}return null;};
+$('device').value=store('jarvis.voice.device.v1150')||'';$('profile').value=store('jarvis.voice.captureProfile.v1151')||'raw';
+function status(text){$('status').textContent=text;}
+function controls(){const busy=preparing||!!capture;for(const id of ['start','device','profile','mode','channel','refresh','selftest'])$(id).disabled=busy;
+ $('stop').disabled=!capture||capture.state!=='recording';$('cancel').disabled=!busy;for(const id of ['save','report','delete'])$(id).disabled=busy;}
+async function devices(){try{const old=$('device').value||store('jarvis.voice.device.v1150')||'',list=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
+ $('device').replaceChildren(new Option('系统默认麦克风',''));for(const d of list)if(d.deviceId!=='default')$('device').append(new Option(d.label||'麦克风 '+$('device').options.length,d.deviceId));
+ if(old&&!list.some(d=>d.deviceId===old))$('device').append(new Option('此前所选设备当前不可用',old));$('device').value=old;
+}catch{}}
+function cleanup(){clearInterval(timer);$('level').value=0;if(testSource){testSource.ctx.close().catch(()=>{});testSource=null;}controls();}
+function download(blob,name){const a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500);}
+async function start(test=false){if(preparing||capture)return;preparing=true;controls();const token=++generation;$('playback').pause();$('warning').hidden=true;
+ store('jarvis.voice.device.v1150',$('device').value);store('jarvis.voice.captureProfile.v1151',$('profile').value);
+ let extra={};
+ try{
+ if(test){const ctx=new AudioContext(),osc=ctx.createOscillator(),gain=ctx.createGain(),dest=ctx.createMediaStreamDestination();
+ osc.frequency.value=440;gain.gain.value=.12;osc.connect(gain);gain.connect(dest);osc.start();testSource={ctx,osc};await ctx.resume();if(token!==generation){ctx.close().catch(()=>{});return;}extra={stream:dest.stream,maxSeconds:2.0};}
+ capture=new JarvisAudioCapture.Capture({profile:$('profile').value,deviceId:$('device').value,mode:$('mode').value,channel:$('channel').value,
+  ...extra,onLevel:level=>$('level').value=Math.min(1,Math.sqrt(level)*3)});
+ const active=capture;preparing=false;controls();status(test?'正在检查合成音频链路，不开启麦克风…':'正在等待麦克风授权…');
+ active.finished.then(async result=>{if(token!==generation)return;saved=result;saved.meta.syntheticSelfTest=test;
+ if(test&&result.meta.mode==='pcm-wav'){
+  const bytes=await result.blob.arrayBuffer(),d=new DataView(bytes),rate=d.getUint32(24,true),n=(bytes.byteLength-44)/2;
+  let crossings=0,previous=0;const start=Math.min(Math.floor(rate*.15),n);
+  for(let i=start;i<n;i++){const v=d.getInt16(44+i*2,true);if(i>start&&previous<=0&&v>0)crossings++;previous=v;}
+  const hz=crossings/Math.max(.01,(n-start)/rate);saved.meta.selfTest={frequencyHz:hz,expectedHz:440,
+   passed:Math.abs(hz-440)<5&&!result.meta.unsafe&&result.meta.rms>.02&&result.meta.rms<.2};
+ }
+ if(token!==generation)return;
+ URL.revokeObjectURL(url);url=URL.createObjectURL(saved.blob);$('playback').src=url;$('playback').playbackRate=1;$('playback').defaultPlaybackRate=1;
+ const m=saved.meta;$('info').textContent=`${test?'合成测试音 · ':''}${m.mode==='pcm-wav'?'PCM WAV':'浏览器原生编码'} · ${m.seconds.toFixed(2)}秒 · ${m.sampleRate?m.sampleRate+' Hz · ':''}${(saved.blob.size/1024).toFixed(1)} KiB`;
+ $('details').textContent=JSON.stringify(m,null,2);$('result').hidden=false;capture=null;cleanup();
+ status(test?(m.selfTest?.passed?'合成音频链路检查通过。请继续录一段自己的声音。':'合成音频检查已完成，请查看详细结果。'):'录音已保存。现在回放，先确认自己的声音是否清楚。');
+ if(m.warnings?.length){$('warning').textContent=m.warnings.join('；');$('warning').hidden=false;}
+ }).catch(e=>{if(token!==generation)return;capture=null;cleanup();status('录音未完成：'+e.message);});
+ await active.start();if(token!==generation){active.cancel();return;}
+ startedAt=performance.now();controls();devices();status('正在录音，请说话。完成后点击“结束录音”。');
+ timer=setInterval(()=>status(`${test?'合成音频检查':'正在录音'} ${(performance.now()-startedAt)/1000|0} 秒 · ${active.mode==='pcm-wav'?'PCM WAV':'浏览器原生编码'} · ${active.device.label}`),500);
+ }catch(e){if(token===generation){preparing=false;capture=null;cleanup();status('无法开始录音：'+e.message);}}
+}
+function cancel(){generation++;preparing=false;capture?.cancel();capture=null;cleanup();status('已取消，未保存或提交本轮录音。');}
+$('start').onclick=()=>start();$('selftest').onclick=()=>start(true);$('stop').onclick=()=>{capture?.stop().catch(()=>{});$('stop').disabled=true;status('正在保存音频尾部…');};$('cancel').onclick=cancel;
+$('refresh').onclick=devices;$('save').onclick=()=>{if(saved)download(saved.blob,'Jarvis-audio-'+(saved.meta.syntheticSelfTest?'synthetic':'microphone')+(saved.blob.type.includes('wav')?'.wav':saved.blob.type.includes('mp4')?'.m4a':saved.blob.type.includes('ogg')?'.ogg':'.webm'));};
+$('report').onclick=()=>{if(saved)download(new Blob([JSON.stringify(saved.meta,null,2)],{type:'application/json'}),'Jarvis-audio-report.json');};
+$('delete').onclick=()=>{if(capture)return;$('playback').pause();$('playback').removeAttribute('src');$('playback').load();URL.revokeObjectURL(url);url='';saved=null;$('result').hidden=true;};
+addEventListener('beforeunload',()=>{cancel();URL.revokeObjectURL(url);});document.addEventListener('visibilitychange',()=>{if(document.hidden&&capture)capture.stop().catch(()=>{});});
+window.JarvisAudioCheck={start,cancel,get recording(){return saved;},get capture(){return capture;}};devices();
+})();
+</script></body></html>

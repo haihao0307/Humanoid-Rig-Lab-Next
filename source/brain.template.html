@@ -1,0 +1,5522 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#050814">
+  <meta name="description" content="贾维斯人物认知大脑程序化工作台。感知、注意、记忆、规则、推理、决策与程序化光迹人像形象。">
+  <title>贾维斯 · 人物认知大脑 · Abstract Flow Presence V1.15.0</title>
+  <style>
+:root {
+  color-scheme: dark;
+  --bg-0: #03050c;
+  --bg-1: #070b17;
+  --bg-2: #0b1121;
+  --panel: rgba(8, 14, 28, 0.82);
+  --panel-strong: rgba(7, 12, 24, 0.96);
+  --line: rgba(125, 211, 252, 0.14);
+  --line-strong: rgba(92, 225, 255, 0.34);
+  --cyan: #68e7ff;
+  --cyan-bright: #b8f7ff;
+  --violet: #9a8cff;
+  --blue: #4b7dff;
+  --green: #6fffc3;
+  --amber: #ffc870;
+  --red: #ff7f99;
+  --text: #eafcff;
+  --muted: #8093ad;
+  --faint: #50627c;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+  --topbar-height: 64px;
+  --radius: 16px;
+  --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-width: 320px;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(47, 93, 166, 0.16), transparent 34%),
+    radial-gradient(circle at 9% 76%, rgba(78, 44, 144, 0.14), transparent 30%),
+    linear-gradient(145deg, var(--bg-0), var(--bg-1) 46%, #040713);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(106, 225, 255, 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(106, 225, 255, 0.026) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at center, black, transparent 86%);
+}
+
+button,
+textarea,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+button:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+  outline: 2px solid rgba(104, 231, 255, 0.76);
+  outline-offset: 2px;
+}
+
+.app-shell {
+  width: 100%;
+  height: 100%;
+}
+
+.topbar {
+  position: relative;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: minmax(250px, 1fr) auto minmax(180px, 1fr);
+  align-items: center;
+  width: 100%;
+  height: var(--topbar-height);
+  padding: 0 18px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(4, 8, 18, 0.98), rgba(5, 10, 20, 0.88));
+  box-shadow: 0 12px 42px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(24px) saturate(130%);
+}
+
+.topbar::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(96, 231, 255, 0.65), transparent);
+  opacity: 0.55;
+}
+
+.brand-block,
+.system-strip,
+.top-actions,
+.section-heading,
+.identity-card,
+.memory-toolbar,
+.chat-header,
+.chat-header > div,
+.chat-tools,
+.chat-input-row,
+.decision-row,
+.face-preset-line {
+  display: flex;
+  align-items: center;
+}
+
+.brand-block {
+  min-width: 0;
+  gap: 12px;
+}
+
+.brand-mark {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(104, 231, 255, 0.38);
+  border-radius: 50%;
+  box-shadow: inset 0 0 22px rgba(104, 231, 255, 0.12), 0 0 24px rgba(104, 231, 255, 0.12);
+}
+
+.brand-mark::before,
+.brand-mark::after,
+.brand-mark span {
+  position: absolute;
+  inset: 6px;
+  content: "";
+  border: 1px solid rgba(154, 140, 255, 0.54);
+  border-radius: 50%;
+  animation: spin 9s linear infinite;
+}
+
+.brand-mark::after {
+  inset: 11px;
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px rgba(104, 231, 255, 0.8);
+  animation-direction: reverse;
+  animation-duration: 5s;
+}
+
+.brand-mark span:nth-child(1) {
+  inset: 15px;
+  border: 0;
+  background: var(--cyan-bright);
+  box-shadow: 0 0 14px var(--cyan);
+}
+
+.brand-mark span:nth-child(2) {
+  inset: 3px 15px;
+  border-radius: 999px;
+  transform: rotate(45deg);
+}
+
+.brand-mark span:nth-child(3) {
+  inset: 3px 15px;
+  border-radius: 999px;
+  transform: rotate(-45deg);
+}
+
+.eyebrow {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.21em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brand-title {
+  margin-top: 2px;
+  color: #ecfdff;
+  font-size: 18px;
+  font-weight: 660;
+  letter-spacing: 0.04em;
+}
+
+.brand-title b {
+  margin-left: 5px;
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+.system-strip {
+  justify-content: center;
+  gap: 7px;
+}
+
+.status-pill {
+  display: grid;
+  grid-template-columns: 6px auto;
+  grid-template-rows: auto auto;
+  column-gap: 7px;
+  min-width: 118px;
+  padding: 7px 10px;
+  border: 1px solid rgba(107, 173, 209, 0.13);
+  border-radius: 8px;
+  background: rgba(11, 18, 34, 0.64);
+}
+
+.status-pill i {
+  grid-row: 1 / 3;
+  align-self: center;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 9px var(--cyan);
+}
+
+.status-pill span,
+.status-pill strong {
+  line-height: 1.1;
+}
+
+.status-pill span {
+  color: var(--faint);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.status-pill strong {
+  margin-top: 3px;
+  color: #beeef4;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.status-pill.positive i {
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
+}
+
+.status-pill.positive strong {
+  color: var(--green);
+}
+
+.status-pill.muted i {
+  background: #66758a;
+  box-shadow: none;
+}
+
+.status-pill.muted strong {
+  color: #7d8ba0;
+}
+
+.top-actions {
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.icon-button,
+.subtle-button,
+.wide-button,
+.expression-dock button,
+.cognition-graph button,
+.send-button,
+.voice-input-button {
+  border: 1px solid var(--line);
+  background: rgba(11, 18, 33, 0.72);
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.icon-button:hover,
+.subtle-button:hover,
+.wide-button:hover,
+.expression-dock button:hover,
+.cognition-graph button:hover,
+.voice-input-button:hover {
+  border-color: var(--line-strong);
+  background: rgba(18, 33, 54, 0.9);
+  color: var(--cyan-bright);
+}
+
+.icon-button:active,
+.subtle-button:active,
+.wide-button:active,
+.expression-dock button:active,
+.cognition-graph button:active,
+.send-button:active,
+.voice-input-button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 66px;
+  height: 34px;
+  gap: 7px;
+  padding: 0 10px;
+  border-radius: 9px;
+  color: #a9bed3;
+  font-size: 11px;
+}
+
+.icon-button[aria-pressed="true"] {
+  border-color: rgba(104, 231, 255, 0.5);
+  background: rgba(31, 100, 125, 0.28);
+  color: var(--cyan-bright);
+  box-shadow: inset 0 0 18px rgba(104, 231, 255, 0.08);
+}
+
+.button-icon {
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 15px;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 286px minmax(420px, 1fr) 306px;
+  width: 100%;
+  height: calc(100% - var(--topbar-height));
+  min-height: 0;
+}
+
+.side-panel {
+  position: relative;
+  z-index: 10;
+  min-width: 0;
+  min-height: 0;
+  border-color: var(--line);
+  background: linear-gradient(180deg, rgba(7, 13, 26, 0.92), rgba(4, 8, 17, 0.96));
+  box-shadow: var(--shadow);
+}
+
+.left-panel {
+  border-right: 1px solid var(--line);
+}
+
+.right-panel {
+  border-left: 1px solid var(--line);
+}
+
+.panel-scroll {
+  height: 100%;
+  overflow: auto;
+  scrollbar-color: rgba(92, 225, 255, 0.18) transparent;
+  scrollbar-width: thin;
+}
+
+.panel-scroll::-webkit-scrollbar,
+.chat-messages::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+  width: 5px;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb,
+.chat-messages::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(92, 225, 255, 0.18);
+}
+
+.panel-section {
+  padding: 18px 16px 20px;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.08);
+}
+
+.section-heading {
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.section-heading > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  overflow: hidden;
+  color: #d8f6fb;
+  font-size: 12px;
+  font-weight: 620;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-index,
+.section-state {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+}
+
+.section-index {
+  color: var(--cyan);
+}
+
+.section-state {
+  flex: 0 0 auto;
+  color: #7da3b5;
+}
+
+.section-state.locked {
+  color: var(--green);
+}
+
+.section-state.muted {
+  color: #66758a;
+}
+
+.identity-card {
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid rgba(104, 231, 255, 0.12);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(104, 231, 255, 0.12), transparent 40%),
+    rgba(10, 19, 35, 0.58);
+}
+
+.identity-orb {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(104, 231, 255, 0.32);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184, 247, 255, 0.85) 0 5%, rgba(104, 231, 255, 0.19) 6% 22%, rgba(154, 140, 255, 0.08) 23% 52%, transparent 54%);
+  box-shadow: inset 0 0 18px rgba(104, 231, 255, 0.18), 0 0 22px rgba(104, 231, 255, 0.12);
+}
+
+.identity-orb::before,
+.identity-orb::after,
+.identity-orb span {
+  position: absolute;
+  inset: 7px;
+  content: "";
+  border: 1px solid rgba(154, 140, 255, 0.45);
+  border-radius: 50%;
+  transform: rotateX(62deg);
+  animation: spin 6s linear infinite;
+}
+
+.identity-orb::after {
+  transform: rotateY(62deg);
+  animation-direction: reverse;
+}
+
+.identity-orb span {
+  inset: 13px;
+  border-color: rgba(104, 231, 255, 0.72);
+  transform: none;
+  animation-duration: 3.5s;
+}
+
+.identity-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.identity-copy strong {
+  font-size: 16px;
+  font-weight: 660;
+}
+
+.identity-copy span {
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 9px;
+}
+
+.identity-copy small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.metric-grid {
+  display: grid;
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.metric-grid.two-column {
+  grid-template-columns: 1fr 1fr;
+}
+
+.metric-card {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(125, 211, 252, 0.08);
+  border-radius: 9px;
+  background: rgba(8, 14, 26, 0.72);
+}
+
+.metric-card span {
+  color: var(--faint);
+  font-size: 8px;
+  letter-spacing: 0.09em;
+}
+
+.metric-card strong {
+  color: #c8e7ed;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.rule-list {
+  display: grid;
+  gap: 7px;
+}
+
+.rule-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px 1fr 14px;
+  gap: 8px;
+  padding: 10px 9px;
+  border: 1px solid rgba(125, 211, 252, 0.08);
+  border-radius: 10px;
+  background: rgba(8, 15, 29, 0.66);
+}
+
+.rule-item:hover {
+  border-color: rgba(104, 231, 255, 0.2);
+}
+
+.rule-number {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(104, 231, 255, 0.18);
+  border-radius: 7px;
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 8px;
+  background: rgba(104, 231, 255, 0.04);
+}
+
+.rule-copy {
+  min-width: 0;
+}
+
+.rule-copy strong,
+.rule-copy p {
+  display: block;
+}
+
+.rule-copy strong {
+  color: #cdebf0;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.rule-copy p {
+  margin: 3px 0 0;
+  color: #6f8199;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.rule-lock {
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.memory-toolbar {
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+
+.subtle-button {
+  height: 27px;
+  padding: 0 9px;
+  border-radius: 7px;
+  color: #88a1b9;
+  font-size: 9px;
+}
+
+.subtle-button.danger:hover {
+  border-color: rgba(255, 127, 153, 0.4);
+  color: #ffafbf;
+  background: rgba(120, 34, 51, 0.18);
+}
+
+.memory-list {
+  display: grid;
+  gap: 7px;
+}
+
+.empty-state {
+  padding: 18px 11px;
+  border: 1px dashed rgba(125, 211, 252, 0.11);
+  border-radius: 10px;
+  color: #60728a;
+  font-size: 9px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.memory-item {
+  position: relative;
+  padding: 10px 30px 9px 10px;
+  border: 1px solid rgba(125, 211, 252, 0.08);
+  border-radius: 10px;
+  background: rgba(9, 16, 30, 0.72);
+}
+
+.memory-item::before {
+  position: absolute;
+  top: 12px;
+  left: -1px;
+  width: 2px;
+  height: 22px;
+  content: "";
+  background: linear-gradient(var(--cyan), transparent);
+}
+
+.memory-item p {
+  margin: 0;
+  color: #b9d1dc;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.memory-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+  color: #52657c;
+  font-family: var(--mono);
+  font-size: 7px;
+}
+
+.memory-delete {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #5d7088;
+  cursor: pointer;
+}
+
+.memory-delete:hover {
+  background: rgba(255, 127, 153, 0.12);
+  color: #ff9fb2;
+}
+
+.center-column {
+  display: grid;
+  grid-template-rows: minmax(310px, 1fr) minmax(188px, 29vh);
+  min-width: 0;
+  min-height: 0;
+  background: #03060e;
+}
+
+.visual-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(33, 108, 143, 0.12), transparent 28%),
+    radial-gradient(circle at 50% 47%, rgba(101, 72, 184, 0.07), transparent 46%),
+    linear-gradient(180deg, #030712 0%, #040814 70%, #03060d 100%);
+  isolation: isolate;
+}
+
+.visual-stage::before {
+  position: absolute;
+  inset: 10% 13%;
+  z-index: -1;
+  content: "";
+  border: 1px solid rgba(104, 231, 255, 0.06);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 80px rgba(104, 231, 255, 0.012),
+    0 0 0 160px rgba(154, 140, 255, 0.009),
+    inset 0 0 90px rgba(104, 231, 255, 0.025);
+  animation: stagePulse 5.5s ease-in-out infinite;
+}
+
+.canvas-host,
+.canvas-host canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-host canvas {
+  touch-action: none;
+}
+
+.stage-vignette,
+.scanlines {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.stage-vignette {
+  background:
+    linear-gradient(90deg, rgba(2, 5, 12, 0.76), transparent 18%, transparent 82%, rgba(2, 5, 12, 0.76)),
+    linear-gradient(180deg, rgba(2, 5, 12, 0.5), transparent 22%, transparent 78%, rgba(2, 5, 12, 0.82));
+}
+
+.scanlines {
+  opacity: 0.12;
+  background: repeating-linear-gradient(180deg, transparent 0 3px, rgba(142, 238, 255, 0.05) 4px);
+  mix-blend-mode: screen;
+}
+
+.stage-hud {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.stage-hud.top-left {
+  top: 20px;
+  left: 22px;
+  width: min(270px, 36%);
+}
+
+.stage-hud.top-right {
+  top: 18px;
+  right: 22px;
+}
+
+.hud-label {
+  color: #557089;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+}
+
+.hud-value {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 5px;
+}
+
+.hud-value span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 10px var(--amber);
+}
+
+.hud-value span.ready {
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
+}
+
+.hud-value span.fallback {
+  background: var(--violet);
+  box-shadow: 0 0 10px var(--violet);
+}
+
+.hud-value strong {
+  color: #c8f6fb;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.stage-hud p {
+  margin: 7px 0 0;
+  color: #53677d;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.clock-display {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+}
+
+.clock-display strong {
+  color: #d9faff;
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.clock-display span {
+  color: #587087;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.13em;
+}
+
+.quantum-readout {
+  position: absolute;
+  top: 52%;
+  left: 21px;
+  z-index: 4;
+  display: grid;
+  width: 128px;
+  gap: 11px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.readout-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 7px;
+}
+
+.readout-item span,
+.readout-item strong {
+  font-family: var(--mono);
+  font-size: 7px;
+}
+
+.readout-item span {
+  color: #4f667c;
+  letter-spacing: 0.1em;
+}
+
+.readout-item strong {
+  color: #83b3c1;
+  font-weight: 500;
+}
+
+.readout-track {
+  position: relative;
+  grid-column: 1 / 3;
+  height: 2px;
+  overflow: visible;
+  background: rgba(104, 231, 255, 0.09);
+}
+
+.readout-track i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 42%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(104, 231, 255, 0.3), var(--cyan));
+  box-shadow: 0 0 8px rgba(104, 231, 255, 0.62);
+  transition: width 500ms cubic-bezier(.2,.8,.2,1), left 500ms cubic-bezier(.2,.8,.2,1);
+}
+
+.readout-track.bipolar::before {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 1px;
+  height: 6px;
+  content: "";
+  background: rgba(184, 247, 255, 0.25);
+}
+
+.expression-dock {
+  position: absolute;
+  right: 50%;
+  bottom: 20px;
+  z-index: 5;
+  display: flex;
+  max-width: calc(100% - 46px);
+  gap: 5px;
+  padding: 5px;
+  overflow-x: auto;
+  border: 1px solid rgba(104, 231, 255, 0.11);
+  border-radius: 11px;
+  background: rgba(4, 9, 19, 0.68);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.28), inset 0 0 24px rgba(104, 231, 255, 0.02);
+  backdrop-filter: blur(18px);
+  transform: translateX(50%);
+  scrollbar-width: none;
+}
+
+.expression-dock::-webkit-scrollbar {
+  display: none;
+}
+
+.expression-dock button {
+  height: 29px;
+  flex: 0 0 auto;
+  padding: 0 10px;
+  border-radius: 7px;
+  color: #6f879c;
+  font-size: 9px;
+}
+
+.expression-dock button.active {
+  border-color: rgba(104, 231, 255, 0.46);
+  background: linear-gradient(180deg, rgba(44, 132, 157, 0.32), rgba(18, 64, 85, 0.25));
+  color: var(--cyan-bright);
+  box-shadow: inset 0 0 16px rgba(104, 231, 255, 0.08), 0 0 14px rgba(104, 231, 255, 0.06);
+}
+
+.stage-instruction {
+  position: absolute;
+  right: 21px;
+  bottom: 26px;
+  z-index: 4;
+  color: #40566c;
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+.chat-console {
+  position: relative;
+  z-index: 8;
+  display: grid;
+  grid-template-rows: 36px minmax(0, 1fr) 48px 18px;
+  min-width: 0;
+  min-height: 0;
+  padding: 8px 12px 7px;
+  border-top: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(7, 13, 26, 0.98), rgba(4, 8, 17, 1)),
+    radial-gradient(circle at 50% 0, rgba(104, 231, 255, 0.08), transparent 45%);
+  box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.chat-header {
+  justify-content: space-between;
+  min-width: 0;
+  padding: 0 2px;
+}
+
+.chat-header > div:first-child {
+  min-width: 0;
+  gap: 8px;
+}
+
+.chat-header strong {
+  color: #bedfe7;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.chat-header small {
+  overflow: hidden;
+  color: #53667d;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.console-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 9px var(--green);
+}
+
+.chat-tools {
+  flex: 0 0 auto;
+  gap: 5px;
+}
+
+.chat-messages {
+  min-width: 0;
+  min-height: 0;
+  padding: 5px 2px 6px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.message {
+  display: grid;
+  grid-template-columns: 29px minmax(0, 1fr);
+  gap: 8px;
+  max-width: min(760px, 94%);
+  margin: 0 0 8px;
+  animation: messageIn 260ms ease both;
+}
+
+.message.user {
+  grid-template-columns: minmax(0, 1fr) 29px;
+  margin-left: auto;
+}
+
+.message-avatar {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border: 1px solid rgba(104, 231, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(17, 37, 55, 0.55);
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 8px;
+}
+
+.message.user .message-avatar {
+  grid-column: 2;
+  border-color: rgba(154, 140, 255, 0.22);
+  background: rgba(61, 48, 107, 0.34);
+  color: #c2b9ff;
+}
+
+.message-body {
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid rgba(125, 211, 252, 0.09);
+  border-radius: 4px 10px 10px 10px;
+  background: rgba(10, 19, 34, 0.74);
+  color: #adc8d2;
+  font-size: 10px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.message.user .message-body {
+  grid-row: 1;
+  border-color: rgba(154, 140, 255, 0.12);
+  border-radius: 10px 4px 10px 10px;
+  background: rgba(39, 31, 72, 0.5);
+  color: #c8c4e7;
+  text-align: left;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 5px;
+  color: #4e6178;
+  font-family: var(--mono);
+  font-size: 7px;
+}
+
+.message-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.message-tags span {
+  padding: 2px 5px;
+  border: 1px solid rgba(104, 231, 255, 0.08);
+  border-radius: 999px;
+  color: #607b8d;
+}
+
+.message.system .message-body {
+  border-color: rgba(111, 255, 195, 0.12);
+  background: rgba(14, 38, 36, 0.42);
+}
+
+.chat-input-row {
+  min-width: 0;
+  gap: 7px;
+  padding: 5px;
+  border: 1px solid rgba(104, 231, 255, 0.13);
+  border-radius: 11px;
+  background: rgba(8, 15, 27, 0.9);
+  box-shadow: inset 0 0 30px rgba(104, 231, 255, 0.02);
+}
+
+.chat-input-row:focus-within {
+  border-color: rgba(104, 231, 255, 0.34);
+  box-shadow: inset 0 0 30px rgba(104, 231, 255, 0.035), 0 0 20px rgba(104, 231, 255, 0.035);
+}
+
+.chat-input-row textarea {
+  width: 100%;
+  max-height: 94px;
+  min-height: 26px;
+  padding: 5px 4px;
+  overflow-y: auto;
+  resize: none;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #d9eef2;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.chat-input-row textarea::placeholder {
+  color: #465b70;
+}
+
+.voice-input-button {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 auto;
+  padding: 0;
+  border-radius: 8px;
+  color: #6e8ca2;
+  font-family: var(--mono);
+}
+
+.voice-input-button[aria-pressed="true"] {
+  border-color: rgba(255, 127, 153, 0.4);
+  background: rgba(108, 31, 49, 0.22);
+  color: #ff9fb2;
+  box-shadow: 0 0 14px rgba(255, 127, 153, 0.12);
+  animation: listening 1s ease-in-out infinite;
+}
+
+.send-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 31px;
+  flex: 0 0 auto;
+  gap: 8px;
+  padding: 0 12px;
+  border-color: rgba(104, 231, 255, 0.35);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(40, 141, 164, 0.78), rgba(63, 74, 160, 0.66));
+  color: white;
+  box-shadow: 0 8px 20px rgba(36, 111, 142, 0.15), inset 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.send-button:hover {
+  border-color: rgba(184, 247, 255, 0.66);
+  background: linear-gradient(135deg, rgba(49, 165, 190, 0.88), rgba(78, 89, 181, 0.78));
+  box-shadow: 0 8px 26px rgba(56, 150, 184, 0.22), inset 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.send-button span {
+  font-size: 10px;
+}
+
+.send-button b {
+  color: var(--cyan-bright);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.privacy-note {
+  align-self: end;
+  overflow: hidden;
+  padding: 4px 4px 0;
+  color: #40536a;
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cognition-graph {
+  position: relative;
+  display: grid;
+  gap: 6px;
+}
+
+.cognition-graph::before {
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  left: 15px;
+  width: 1px;
+  content: "";
+  background: linear-gradient(var(--cyan), rgba(104, 231, 255, 0.05));
+  opacity: 0.2;
+}
+
+.cognition-graph button {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  align-items: center;
+  min-width: 0;
+  min-height: 38px;
+  padding: 5px 8px 5px 0;
+  border-radius: 9px;
+  color: #7e93a8;
+  text-align: left;
+}
+
+.cognition-graph button i {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 100%;
+  color: #4d687a;
+  font-family: var(--mono);
+  font-size: 7px;
+  font-style: normal;
+}
+
+.cognition-graph button i::after {
+  position: absolute;
+  right: 0;
+  width: 5px;
+  height: 5px;
+  content: "";
+  border: 1px solid #527086;
+  border-radius: 50%;
+  background: #0a1320;
+}
+
+.cognition-graph button span {
+  padding-left: 9px;
+  font-size: 10px;
+  font-weight: 560;
+}
+
+.cognition-graph button small {
+  color: #45596e;
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: 0.08em;
+}
+
+.cognition-graph button.active {
+  border-color: rgba(104, 231, 255, 0.32);
+  background: linear-gradient(90deg, rgba(30, 96, 119, 0.22), rgba(12, 24, 42, 0.76));
+  color: var(--cyan-bright);
+  box-shadow: inset 0 0 20px rgba(104, 231, 255, 0.04), 0 0 16px rgba(104, 231, 255, 0.035);
+}
+
+.cognition-graph button.active i,
+.cognition-graph button.active small {
+  color: var(--cyan);
+}
+
+.cognition-graph button.active i::after {
+  border-color: var(--cyan);
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+}
+
+.cognition-graph button.complete {
+  color: #9cb1bd;
+}
+
+.cognition-graph button.complete i::after {
+  border-color: var(--green);
+  background: var(--green);
+  box-shadow: 0 0 6px rgba(111, 255, 195, 0.45);
+}
+
+.face-preset-line {
+  justify-content: space-between;
+  padding: 9px 10px;
+  border: 1px solid rgba(104, 231, 255, 0.1);
+  border-radius: 9px;
+  background: rgba(8, 15, 28, 0.72);
+}
+
+.face-preset-line span {
+  color: #61768b;
+  font-size: 9px;
+}
+
+.face-preset-line strong {
+  color: var(--cyan-bright);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.face-controls {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.face-control {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr) 29px;
+  align-items: center;
+  gap: 7px;
+}
+
+.face-control label,
+.face-control output {
+  font-family: var(--mono);
+  font-size: 7px;
+}
+
+.face-control label {
+  overflow: hidden;
+  color: #63798f;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.face-control output {
+  color: #7fa8b7;
+  text-align: right;
+}
+
+.face-control input[type="range"] {
+  width: 100%;
+  height: 12px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.face-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(104, 231, 255, 0.58) var(--fill, 0%), rgba(104, 231, 255, 0.09) var(--fill, 0%));
+}
+
+.face-control input[type="range"]::-webkit-slider-thumb {
+  width: 8px;
+  height: 8px;
+  margin-top: -3px;
+  appearance: none;
+  border: 1px solid var(--cyan-bright);
+  border-radius: 50%;
+  background: #0a1824;
+  box-shadow: 0 0 7px rgba(104, 231, 255, 0.65);
+}
+
+.face-control input[type="range"]::-moz-range-track {
+  height: 2px;
+  background: rgba(104, 231, 255, 0.09);
+}
+
+.face-control input[type="range"]::-moz-range-progress {
+  height: 2px;
+  background: rgba(104, 231, 255, 0.58);
+}
+
+.face-control input[type="range"]::-moz-range-thumb {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--cyan-bright);
+  border-radius: 50%;
+  background: #0a1824;
+  box-shadow: 0 0 7px rgba(104, 231, 255, 0.65);
+}
+
+.wide-button {
+  width: 100%;
+  height: 31px;
+  margin-top: 13px;
+  border-radius: 8px;
+  color: #718aa0;
+  font-size: 9px;
+}
+
+.decision-card,
+.gateway-card {
+  padding: 11px;
+  border: 1px solid rgba(125, 211, 252, 0.09);
+  border-radius: 11px;
+  background: rgba(8, 15, 28, 0.7);
+}
+
+.decision-row {
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 24px;
+}
+
+.decision-row span {
+  color: #5f7489;
+  font-size: 9px;
+}
+
+.decision-row strong {
+  max-width: 62%;
+  overflow: hidden;
+  color: #a8c4cf;
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decision-divider {
+  height: 1px;
+  margin: 8px 0;
+  background: rgba(125, 211, 252, 0.08);
+}
+
+.decision-label {
+  margin-bottom: 7px;
+  color: #5f7489;
+  font-size: 8px;
+}
+
+.tag-list,
+.gateway-locks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tag-list span,
+.gateway-locks span {
+  padding: 3px 6px;
+  border: 1px solid rgba(104, 231, 255, 0.1);
+  border-radius: 999px;
+  color: #668394;
+  font-family: var(--mono);
+  font-size: 7px;
+  background: rgba(104, 231, 255, 0.025);
+}
+
+.gateway-card {
+  text-align: center;
+}
+
+.gateway-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 9px;
+  border: 1px solid rgba(102, 117, 138, 0.24);
+  border-radius: 50%;
+}
+
+.gateway-icon::before,
+.gateway-icon::after,
+.gateway-icon span {
+  position: absolute;
+  content: "";
+}
+
+.gateway-icon::before {
+  top: 50%;
+  left: 9px;
+  width: 29px;
+  height: 1px;
+  background: #526075;
+}
+
+.gateway-icon::after {
+  top: 9px;
+  left: 50%;
+  width: 1px;
+  height: 29px;
+  background: #526075;
+}
+
+.gateway-icon span {
+  inset: 15px;
+  border: 1px solid #637187;
+  border-radius: 50%;
+  background: #121927;
+}
+
+.gateway-card strong {
+  color: #8694a8;
+  font-family: var(--mono);
+  font-size: 9px;
+}
+
+.gateway-card p {
+  margin: 7px 0 11px;
+  color: #53657a;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.gateway-locks {
+  justify-content: center;
+}
+
+.gateway-locks span {
+  border-color: rgba(102, 117, 138, 0.15);
+  color: #697486;
+}
+
+.toast-region {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 100;
+  display: grid;
+  width: min(330px, calc(100vw - 36px));
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 11px 13px;
+  border: 1px solid rgba(104, 231, 255, 0.22);
+  border-radius: 10px;
+  background: rgba(8, 17, 31, 0.94);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.38);
+  color: #abc9d2;
+  font-size: 10px;
+  line-height: 1.5;
+  backdrop-filter: blur(18px);
+  animation: toastIn 260ms ease both;
+}
+
+.toast.success {
+  border-color: rgba(111, 255, 195, 0.26);
+}
+
+.toast.error {
+  border-color: rgba(255, 127, 153, 0.28);
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: var(--topbar-height) 0 0;
+  z-index: 39;
+  display: none;
+  background: rgba(0, 3, 9, 0.62);
+  backdrop-filter: blur(4px);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes stagePulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.98); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes listening {
+  0%, 100% { box-shadow: 0 0 8px rgba(255, 127, 153, 0.1); }
+  50% { box-shadow: 0 0 20px rgba(255, 127, 153, 0.35); }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 1320px) {
+  .workspace {
+    grid-template-columns: 256px minmax(420px, 1fr) 278px;
+  }
+  .status-pill {
+    min-width: 105px;
+  }
+  .stage-instruction {
+    display: none;
+  }
+  .face-control {
+    grid-template-columns: 72px minmax(0, 1fr) 25px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .topbar {
+    grid-template-columns: 1fr auto;
+  }
+  .system-strip {
+    display: none;
+  }
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .side-panel {
+    position: fixed;
+    top: var(--topbar-height);
+    bottom: 0;
+    z-index: 45;
+    width: min(330px, 88vw);
+    transition: transform 240ms cubic-bezier(.2,.8,.2,1);
+  }
+  .left-panel {
+    left: 0;
+    transform: translateX(-105%);
+  }
+  .right-panel {
+    right: 0;
+    transform: translateX(105%);
+  }
+  .left-panel.open,
+  .right-panel.open {
+    transform: translateX(0);
+  }
+  .drawer-backdrop.open {
+    display: block;
+  }
+  .mobile-only {
+    display: inline-flex;
+  }
+  .center-column {
+    grid-template-rows: minmax(340px, 1fr) minmax(196px, 30vh);
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --topbar-height: 58px;
+  }
+  .topbar {
+    padding: 0 10px;
+  }
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+  }
+  .eyebrow,
+  .brand-title b,
+  .button-text {
+    display: none;
+  }
+  .brand-title {
+    font-size: 15px;
+  }
+  .icon-button {
+    min-width: 34px;
+    height: 32px;
+    padding: 0 8px;
+  }
+  .top-actions {
+    gap: 4px;
+  }
+  .center-column {
+    grid-template-rows: minmax(310px, 1fr) minmax(210px, 35vh);
+  }
+  .stage-hud.top-left {
+    top: 14px;
+    left: 13px;
+    width: 46%;
+  }
+  .stage-hud.top-right {
+    top: 13px;
+    right: 13px;
+  }
+  .stage-hud p,
+  .quantum-readout {
+    display: none;
+  }
+  .clock-display strong {
+    font-size: 12px;
+  }
+  .expression-dock {
+    right: auto;
+    bottom: 11px;
+    left: 11px;
+    max-width: calc(100% - 22px);
+    transform: none;
+  }
+  .chat-console {
+    grid-template-rows: 32px minmax(0, 1fr) 46px 16px;
+    padding: 6px 8px;
+  }
+  .chat-header small,
+  #clearChatButton {
+    display: none;
+  }
+  .message {
+    max-width: 98%;
+  }
+  .message-body {
+    font-size: 10px;
+  }
+  .send-button span {
+    display: none;
+  }
+  .send-button {
+    width: 34px;
+    padding: 0;
+  }
+}
+
+@media (max-height: 720px) and (min-width: 1081px) {
+  .workspace {
+    grid-template-columns: 256px minmax(420px, 1fr) 278px;
+  }
+  .panel-section {
+    padding-top: 13px;
+    padding-bottom: 14px;
+  }
+  .identity-section .metric-grid,
+  .gateway-section {
+    display: none;
+  }
+  .center-column {
+    grid-template-rows: minmax(280px, 1fr) 190px;
+  }
+  .stage-hud p,
+  .stage-instruction {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Visual Core V3: cinematic quantum presence */
+:root {
+  --cyan: #83eaff;
+  --cyan-bright: #d7fbff;
+  --violet: #766bff;
+  --green: #72f5c2;
+  --panel: rgba(5, 12, 24, 0.84);
+  --panel-strong: rgba(4, 9, 19, 0.97);
+  --line: rgba(121, 213, 237, 0.105);
+  --line-strong: rgba(108, 228, 255, 0.28);
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -8%, rgba(43, 110, 147, 0.13), transparent 32%),
+    radial-gradient(circle at 14% 76%, rgba(63, 48, 149, 0.075), transparent 34%),
+    linear-gradient(145deg, #01030a, #050914 52%, #02040b);
+}
+
+body::before {
+  opacity: 0.19;
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at 50% 42%, black, transparent 78%);
+}
+
+.topbar {
+  border-bottom-color: rgba(120, 220, 242, 0.10);
+  background: linear-gradient(180deg, rgba(3, 7, 15, 0.985), rgba(4, 9, 18, 0.93));
+  box-shadow: 0 18px 58px rgba(0, 0, 0, 0.34);
+}
+
+.topbar::after {
+  opacity: 0.34;
+  background: linear-gradient(90deg, transparent 5%, rgba(79, 193, 222, 0.25) 35%, rgba(187, 248, 255, 0.58) 50%, rgba(83, 105, 255, 0.22) 67%, transparent 95%);
+}
+
+.brand-mark {
+  border-color: rgba(143, 236, 255, 0.28);
+  background: radial-gradient(circle, rgba(122, 238, 255, 0.08), transparent 66%);
+  box-shadow: inset 0 0 26px rgba(102, 225, 255, 0.08), 0 0 28px rgba(71, 170, 217, 0.08);
+}
+
+.status-pill {
+  border-color: rgba(122, 214, 237, 0.09);
+  background: rgba(7, 15, 27, 0.56);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.workspace {
+  background: #02050b;
+}
+
+.side-panel {
+  border-color: rgba(111, 205, 230, 0.09);
+  background:
+    linear-gradient(180deg, rgba(5, 11, 21, 0.985), rgba(3, 8, 16, 0.99)),
+    radial-gradient(circle at 50% 0, rgba(79, 179, 206, 0.045), transparent 44%);
+}
+
+.panel-section {
+  border-bottom-color: rgba(113, 208, 232, 0.075);
+}
+
+.rule-item,
+.memory-item,
+.metric-card,
+.decision-card,
+.gateway-card {
+  border-color: rgba(126, 220, 242, 0.07);
+  background: linear-gradient(145deg, rgba(8, 17, 30, 0.66), rgba(4, 10, 20, 0.78));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.012);
+}
+
+.center-column {
+  background: #01040a;
+}
+
+.visual-stage {
+  background:
+    radial-gradient(ellipse at 50% 44%, rgba(28, 94, 119, 0.105), transparent 30%),
+    radial-gradient(ellipse at 50% 48%, rgba(52, 52, 137, 0.055), transparent 52%),
+    linear-gradient(180deg, #01040a 0%, #030812 62%, #02050c 100%);
+}
+
+.visual-stage::before {
+  inset: 12% 20%;
+  border-color: rgba(118, 227, 250, 0.025);
+  border-radius: 44%;
+  box-shadow:
+    0 0 0 100px rgba(93, 210, 237, 0.004),
+    0 0 0 220px rgba(103, 92, 255, 0.003),
+    inset 0 0 120px rgba(79, 210, 239, 0.012);
+  opacity: 0.72;
+  animation-duration: 8.5s;
+}
+
+.visual-stage::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  content: "";
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(120, 224, 246, 0.10) 0 1px, transparent 1px) 18px 18px / 34px 1px no-repeat,
+    linear-gradient(rgba(120, 224, 246, 0.10) 0 1px, transparent 1px) 18px 18px / 1px 34px no-repeat,
+    linear-gradient(270deg, rgba(120, 224, 246, 0.10) 0 1px, transparent 1px) calc(100% - 18px) 18px / 34px 1px no-repeat,
+    linear-gradient(rgba(120, 224, 246, 0.10) 0 1px, transparent 1px) calc(100% - 18px) 18px / 1px 34px no-repeat,
+    linear-gradient(90deg, rgba(120, 224, 246, 0.08) 0 1px, transparent 1px) 18px calc(100% - 18px) / 34px 1px no-repeat,
+    linear-gradient(0deg, rgba(120, 224, 246, 0.08) 0 1px, transparent 1px) 18px calc(100% - 18px) / 1px 34px no-repeat,
+    linear-gradient(270deg, rgba(120, 224, 246, 0.08) 0 1px, transparent 1px) calc(100% - 18px) calc(100% - 18px) / 34px 1px no-repeat,
+    linear-gradient(0deg, rgba(120, 224, 246, 0.08) 0 1px, transparent 1px) calc(100% - 18px) calc(100% - 18px) / 1px 34px no-repeat;
+}
+
+.stage-vignette {
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(0, 3, 9, 0.82), transparent 14%, transparent 86%, rgba(0, 3, 9, 0.82)),
+    linear-gradient(180deg, rgba(0, 3, 9, 0.58), transparent 20%, transparent 77%, rgba(0, 3, 9, 0.86));
+}
+
+.scanlines {
+  opacity: 0.035;
+  background: repeating-linear-gradient(180deg, transparent 0 5px, rgba(167, 242, 255, 0.035) 6px);
+}
+
+.stage-hud.top-left {
+  top: 24px;
+  left: 26px;
+}
+
+.stage-hud.top-right {
+  top: 22px;
+  right: 26px;
+}
+
+.hud-label {
+  color: #52687a;
+  font-size: 7px;
+  letter-spacing: 0.24em;
+}
+
+.hud-value strong {
+  color: #c3f4f8;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.stage-hud p {
+  max-width: 250px;
+  color: #425466;
+  line-height: 1.6;
+}
+
+.clock-display strong {
+  color: #c9f2f5;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+}
+
+.clock-display span {
+  color: #455b6d;
+}
+
+.quantum-readout {
+  left: 27px;
+  width: 116px;
+  gap: 13px;
+  opacity: 0.78;
+}
+
+.readout-track {
+  background: rgba(113, 215, 239, 0.065);
+}
+
+.readout-track i {
+  background: linear-gradient(90deg, rgba(83, 176, 205, 0.18), rgba(151, 238, 252, 0.88));
+  box-shadow: 0 0 10px rgba(92, 219, 244, 0.36);
+}
+
+.presence-signature {
+  position: absolute;
+  left: 50%;
+  bottom: 66px;
+  z-index: 4;
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.presence-signature span {
+  color: rgba(210, 251, 255, 0.84);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.46em;
+  text-indent: 0.46em;
+  text-shadow: 0 0 14px rgba(92, 220, 242, 0.22);
+}
+
+.presence-signature strong {
+  margin-top: 4px;
+  color: rgba(84, 113, 132, 0.76);
+  font-family: var(--mono);
+  font-size: 6px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+}
+
+.presence-signature i {
+  width: 58px;
+  height: 1px;
+  margin-top: 8px;
+  overflow: hidden;
+  background: linear-gradient(90deg, transparent, rgba(112, 231, 250, 0.62), transparent);
+  box-shadow: 0 0 9px rgba(95, 221, 244, 0.28);
+  animation: signaturePulse 3.8s ease-in-out infinite;
+}
+
+@keyframes signaturePulse {
+  0%, 100% { opacity: 0.28; transform: scaleX(0.64); }
+  50% { opacity: 0.92; transform: scaleX(1); }
+}
+
+.expression-dock {
+  bottom: 18px;
+  gap: 3px;
+  padding: 4px;
+  border-color: rgba(124, 221, 243, 0.09);
+  border-radius: 10px;
+  background: rgba(3, 9, 17, 0.58);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.36), inset 0 1px rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(22px) saturate(118%);
+}
+
+.expression-dock button {
+  height: 28px;
+  padding: 0 10px;
+  border-color: transparent;
+  color: #607587;
+  font-size: 8px;
+}
+
+.expression-dock button:hover {
+  color: #a7dbe3;
+  background: rgba(79, 161, 183, 0.08);
+}
+
+.expression-dock button.active {
+  border-color: rgba(133, 230, 249, 0.24);
+  background: linear-gradient(180deg, rgba(38, 111, 132, 0.25), rgba(14, 48, 64, 0.23));
+  color: #c9f8fc;
+  box-shadow: inset 0 0 14px rgba(96, 228, 250, 0.045), 0 0 15px rgba(92, 216, 242, 0.035);
+}
+
+.stage-instruction {
+  right: 27px;
+  bottom: 26px;
+  color: #344a5c;
+  letter-spacing: 0.07em;
+}
+
+.chat-console {
+  border-top-color: rgba(119, 216, 239, 0.09);
+  background:
+    linear-gradient(180deg, rgba(5, 11, 21, 0.985), rgba(2, 7, 14, 1)),
+    radial-gradient(circle at 50% 0, rgba(84, 198, 222, 0.045), transparent 45%);
+  box-shadow: 0 -22px 48px rgba(0, 0, 0, 0.32);
+}
+
+.chat-input-row {
+  border-color: rgba(119, 215, 238, 0.105);
+  background: rgba(5, 13, 25, 0.74);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.012);
+}
+
+@media (max-width: 820px) {
+  .presence-signature {
+    bottom: 60px;
+  }
+  .presence-signature span {
+    font-size: 8px;
+  }
+}
+
+/* ========================================================================== */
+/* Presence Core V3                                                          */
+/* Premium interface pass. All visuals remain procedural HTML, CSS and canvas. */
+/* ========================================================================== */
+
+:root {
+  --topbar-height: 72px;
+  --radius: 18px;
+  --cyan: #78ecff;
+  --cyan-bright: #d7fbff;
+  --violet: #7f73ff;
+  --green: #7bffd0;
+  --text: #ecfbff;
+  --muted: #8aa0b8;
+  --faint: #53687e;
+  --panel: rgba(6, 13, 25, 0.78);
+  --panel-strong: rgba(4, 9, 18, 0.95);
+  --line: rgba(127, 221, 244, 0.11);
+  --line-strong: rgba(132, 234, 255, 0.34);
+}
+
+html,
+body {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(58, 132, 169, 0.18), transparent 35%),
+    radial-gradient(circle at 50% 48%, rgba(34, 91, 139, 0.08), transparent 46%),
+    linear-gradient(145deg, #01030a, #040916 48%, #02050d);
+}
+
+body::after {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(96, 226, 255, 0.025), transparent 24%),
+    radial-gradient(circle at 80% 64%, rgba(111, 89, 255, 0.022), transparent 26%);
+}
+
+.topbar {
+  grid-template-columns: minmax(255px, 1fr) auto minmax(210px, 1fr);
+  padding: 0 22px;
+  border-bottom-color: rgba(137, 230, 249, 0.12);
+  background:
+    linear-gradient(180deg, rgba(4, 9, 18, 0.98), rgba(3, 8, 17, 0.91)),
+    radial-gradient(circle at 50% 0, rgba(76, 193, 222, 0.06), transparent 55%);
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+}
+
+.brand-block {
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 39px;
+  height: 39px;
+  border-color: rgba(153, 239, 255, 0.35);
+  background:
+    radial-gradient(circle, rgba(212, 253, 255, 0.12), transparent 27%),
+    radial-gradient(circle, rgba(73, 210, 246, 0.10), transparent 68%);
+  box-shadow:
+    inset 0 0 24px rgba(104, 231, 255, 0.12),
+    0 0 28px rgba(73, 194, 229, 0.10);
+}
+
+.eyebrow {
+  color: #6f8498;
+  font-size: 8px;
+  letter-spacing: 0.28em;
+}
+
+.brand-title {
+  margin-top: 3px;
+  font-size: 19px;
+  letter-spacing: 0.055em;
+  text-shadow: 0 0 22px rgba(121, 232, 252, 0.10);
+}
+
+.brand-title b {
+  margin-left: 8px;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+}
+
+.system-strip {
+  gap: 10px;
+}
+
+.status-pill {
+  min-width: 130px;
+  padding: 9px 13px;
+  border-color: rgba(127, 219, 241, 0.11);
+  border-radius: 11px;
+  background:
+    linear-gradient(145deg, rgba(10, 20, 36, 0.80), rgba(5, 12, 24, 0.66));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.025),
+    0 12px 26px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(18px) saturate(125%);
+}
+
+.status-pill span {
+  color: #61758a;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+}
+
+.status-pill strong {
+  margin-top: 4px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.icon-button {
+  height: 35px;
+  border-color: rgba(127, 220, 242, 0.12);
+  border-radius: 10px;
+  background: rgba(7, 15, 28, 0.72);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.workspace {
+  grid-template-columns: clamp(252px, 18vw, 286px) minmax(520px, 1fr) clamp(278px, 20vw, 314px);
+  background: #01040b;
+}
+
+.side-panel {
+  background:
+    linear-gradient(180deg, rgba(5, 12, 23, 0.985), rgba(2, 7, 14, 0.995)),
+    radial-gradient(circle at 50% -5%, rgba(82, 192, 221, 0.052), transparent 42%);
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.26);
+}
+
+.left-panel {
+  border-right-color: rgba(126, 218, 239, 0.105);
+}
+
+.right-panel {
+  border-left-color: rgba(126, 218, 239, 0.105);
+}
+
+.panel-section {
+  padding: 20px 16px 22px;
+  border-bottom-color: rgba(127, 219, 241, 0.075);
+}
+
+.section-heading {
+  margin-bottom: 15px;
+}
+
+.section-heading h2 {
+  color: #def8fb;
+  font-size: 12px;
+  font-weight: 630;
+  letter-spacing: 0.095em;
+}
+
+.section-index,
+.section-state {
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.identity-card {
+  padding: 15px;
+  border-color: rgba(132, 229, 249, 0.16);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 15% 16%, rgba(105, 230, 255, 0.13), transparent 42%),
+    linear-gradient(145deg, rgba(12, 24, 41, 0.78), rgba(5, 13, 25, 0.82));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.028),
+    0 16px 42px rgba(0, 0, 0, 0.16);
+}
+
+.identity-orb {
+  width: 52px;
+  height: 52px;
+  border-color: rgba(132, 231, 251, 0.40);
+  box-shadow:
+    inset 0 0 22px rgba(104, 231, 255, 0.20),
+    0 0 30px rgba(104, 231, 255, 0.13);
+}
+
+.metric-card,
+.rule-item,
+.memory-item,
+.decision-card,
+.gateway-card,
+.cognition-graph button,
+.face-preset-line {
+  border-color: rgba(130, 223, 244, 0.09);
+  background:
+    linear-gradient(145deg, rgba(10, 20, 36, 0.72), rgba(4, 11, 22, 0.82));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.018),
+    0 8px 24px rgba(0, 0, 0, 0.09);
+}
+
+.rule-item,
+.memory-item,
+.cognition-graph button {
+  border-radius: 12px;
+}
+
+.rule-item:hover,
+.memory-item:hover,
+.cognition-graph button:hover {
+  border-color: rgba(126, 229, 251, 0.20);
+  background:
+    linear-gradient(145deg, rgba(13, 27, 46, 0.78), rgba(5, 14, 27, 0.86));
+}
+
+.rule-copy strong {
+  color: #d5f2f5;
+  font-size: 10px;
+}
+
+.rule-copy p {
+  color: #73879d;
+  line-height: 1.58;
+}
+
+.center-column {
+  grid-template-rows: minmax(390px, 1fr) minmax(206px, 28vh);
+  background: #01040a;
+}
+
+.visual-stage {
+  border-bottom: 1px solid rgba(126, 220, 242, 0.075);
+  background:
+    radial-gradient(ellipse at 50% 43%, rgba(43, 134, 166, 0.15), transparent 25%),
+    radial-gradient(ellipse at 51% 53%, rgba(74, 63, 176, 0.075), transparent 46%),
+    linear-gradient(180deg, #01040a 0%, #030915 59%, #02050c 100%);
+}
+
+.visual-stage::before {
+  inset: 8% 16%;
+  border-color: rgba(136, 233, 253, 0.045);
+  border-radius: 46%;
+  box-shadow:
+    0 0 0 92px rgba(93, 210, 237, 0.006),
+    0 0 0 205px rgba(103, 92, 255, 0.004),
+    inset 0 0 150px rgba(79, 210, 239, 0.018);
+  opacity: 0.85;
+}
+
+.stage-ambient-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.stage-ambient-field::before {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  width: min(62vw, 880px);
+  aspect-ratio: 1;
+  content: "";
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(149, 243, 255, 0.045), transparent 26%),
+    radial-gradient(circle at 38% 38%, rgba(71, 195, 233, 0.04), transparent 48%),
+    radial-gradient(circle at 64% 62%, rgba(108, 91, 255, 0.035), transparent 55%);
+  filter: blur(8px);
+  transform: translate(-50%, -50%);
+}
+
+.ambient-orbit {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  display: block;
+  width: min(61vw, 870px);
+  height: min(38vw, 540px);
+  border: 1px solid rgba(125, 225, 247, 0.055);
+  border-radius: 50%;
+  box-shadow:
+    0 0 25px rgba(79, 195, 226, 0.018),
+    inset 0 0 24px rgba(79, 195, 226, 0.014);
+  --orbit-start: 15deg;
+  transform: translate(-50%, -50%) rotate(var(--orbit-start));
+  animation: ambientOrbit 19s linear infinite;
+}
+
+.ambient-orbit.orbit-b {
+  width: min(49vw, 700px);
+  height: min(47vw, 670px);
+  border-color: rgba(119, 99, 255, 0.047);
+  --orbit-start: -48deg;
+  transform: translate(-50%, -50%) rotate(var(--orbit-start));
+  animation-duration: 27s;
+  animation-direction: reverse;
+}
+
+.ambient-orbit.orbit-c {
+  width: min(71vw, 1020px);
+  height: min(28vw, 400px);
+  border-color: rgba(101, 191, 219, 0.035);
+  --orbit-start: 34deg;
+  transform: translate(-50%, -50%) rotate(var(--orbit-start));
+  animation-duration: 34s;
+}
+
+.ambient-core {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: min(29vw, 420px);
+  aspect-ratio: 0.78;
+  border-radius: 45% 45% 48% 48%;
+  background:
+    radial-gradient(ellipse at 43% 38%, rgba(121, 236, 255, 0.058), transparent 47%),
+    linear-gradient(90deg, rgba(88, 226, 251, 0.022), rgba(85, 73, 223, 0.018));
+  filter: blur(18px);
+  opacity: 0.78;
+  transform: translate(-50%, -50%);
+  animation: ambientBreath 4.8s ease-in-out infinite;
+}
+
+@keyframes ambientOrbit {
+  from { transform: translate(-50%, -50%) rotate(var(--orbit-start)); }
+  to { transform: translate(-50%, -50%) rotate(calc(var(--orbit-start) + 360deg)); }
+}
+
+@keyframes ambientBreath {
+  0%, 100% { opacity: 0.52; transform: translate(-50%, -50%) scale(0.98); }
+  50% { opacity: 0.88; transform: translate(-50%, -50%) scale(1.035); }
+}
+
+.canvas-host {
+  z-index: 2;
+}
+
+.canvas-host canvas {
+  filter: saturate(1.06) contrast(1.05);
+}
+
+.stage-vignette {
+  z-index: 3;
+  background:
+    linear-gradient(90deg, rgba(0, 3, 9, 0.76), transparent 10%, transparent 90%, rgba(0, 3, 9, 0.76)),
+    linear-gradient(180deg, rgba(0, 3, 9, 0.45), transparent 17%, transparent 79%, rgba(0, 3, 9, 0.78));
+}
+
+.scanlines {
+  z-index: 4;
+  opacity: 0.022;
+}
+
+.stage-hud,
+.quantum-readout,
+.presence-signature,
+.expression-dock,
+.stage-instruction {
+  z-index: 5;
+}
+
+.stage-hud.top-left {
+  top: 27px;
+  left: 29px;
+}
+
+.stage-hud.top-right {
+  top: 25px;
+  right: 29px;
+}
+
+.hud-label {
+  color: #5c7184;
+  font-size: 7px;
+  letter-spacing: 0.28em;
+}
+
+.hud-value {
+  margin-top: 8px;
+}
+
+.hud-value strong {
+  color: #cdf8fb;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.stage-hud p {
+  max-width: 280px;
+  margin-top: 9px;
+  color: #4a6073;
+  font-size: 8px;
+  line-height: 1.75;
+}
+
+.clock-display strong {
+  color: #d6f9fb;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 18px rgba(116, 231, 249, 0.15);
+}
+
+.quantum-readout {
+  left: 29px;
+  width: 126px;
+  opacity: 0.84;
+}
+
+.readout-item > span,
+.readout-item > strong {
+  font-size: 7px;
+  letter-spacing: 0.17em;
+}
+
+.presence-signature {
+  bottom: 71px;
+}
+
+.presence-signature em {
+  margin-bottom: 6px;
+  color: rgba(100, 126, 145, 0.64);
+  font-family: var(--mono);
+  font-size: 5px;
+  font-style: normal;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+}
+
+.presence-signature span {
+  color: rgba(224, 253, 255, 0.92);
+  font-size: 11px;
+  letter-spacing: 0.54em;
+  text-indent: 0.54em;
+  text-shadow: 0 0 18px rgba(110, 231, 251, 0.28);
+}
+
+.presence-signature strong {
+  color: rgba(91, 123, 142, 0.76);
+}
+
+.expression-dock {
+  bottom: 19px;
+  gap: 4px;
+  padding: 5px;
+  border-color: rgba(132, 228, 249, 0.13);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(6, 15, 27, 0.72), rgba(3, 9, 18, 0.76));
+  box-shadow:
+    0 20px 52px rgba(0, 0, 0, 0.38),
+    inset 0 1px rgba(255, 255, 255, 0.022);
+  backdrop-filter: blur(24px) saturate(130%);
+}
+
+.expression-dock button {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: #687f91;
+  font-size: 8px;
+  letter-spacing: 0.07em;
+}
+
+.expression-dock button.active {
+  border-color: rgba(147, 239, 255, 0.32);
+  background:
+    linear-gradient(180deg, rgba(42, 134, 159, 0.30), rgba(13, 52, 70, 0.30));
+  color: #e1fcff;
+  box-shadow:
+    inset 0 0 18px rgba(101, 231, 253, 0.07),
+    0 0 20px rgba(91, 219, 244, 0.055);
+}
+
+.stage-instruction {
+  right: 29px;
+  bottom: 29px;
+  color: #3c5265;
+  font-size: 7px;
+}
+
+.chat-console {
+  padding: 14px 16px 13px;
+  border-top-color: rgba(127, 221, 243, 0.11);
+  background:
+    linear-gradient(180deg, rgba(5, 12, 23, 0.99), rgba(2, 7, 14, 1)),
+    radial-gradient(circle at 50% 0, rgba(83, 198, 222, 0.06), transparent 45%);
+  box-shadow: 0 -28px 70px rgba(0, 0, 0, 0.32);
+}
+
+.chat-header {
+  margin-bottom: 10px;
+}
+
+.chat-messages {
+  padding-right: 5px;
+}
+
+.message-body {
+  border-color: rgba(132, 226, 247, 0.10);
+  border-radius: 13px;
+  background:
+    linear-gradient(145deg, rgba(10, 22, 38, 0.74), rgba(4, 12, 23, 0.82));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.message.user .message-body {
+  background:
+    linear-gradient(145deg, rgba(43, 31, 83, 0.60), rgba(20, 20, 55, 0.72));
+}
+
+.chat-input-row {
+  min-height: 45px;
+  border-color: rgba(134, 226, 247, 0.14);
+  border-radius: 13px;
+  background:
+    linear-gradient(145deg, rgba(8, 18, 33, 0.82), rgba(4, 12, 23, 0.88));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.022),
+    0 12px 34px rgba(0, 0, 0, 0.14);
+}
+
+.send-button {
+  height: 34px;
+  min-width: 76px;
+  border-color: rgba(151, 239, 255, 0.32);
+  border-radius: 9px;
+  background:
+    linear-gradient(135deg, rgba(39, 143, 172, 0.80), rgba(38, 93, 157, 0.78));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.14),
+    0 0 22px rgba(76, 205, 237, 0.11);
+}
+
+.cognition-graph {
+  gap: 7px;
+}
+
+.cognition-graph button {
+  min-height: 39px;
+  padding: 0 10px;
+}
+
+.cognition-graph button.active {
+  border-color: rgba(144, 238, 255, 0.34);
+  background:
+    linear-gradient(145deg, rgba(21, 77, 98, 0.52), rgba(10, 28, 45, 0.76));
+  box-shadow:
+    inset 0 0 22px rgba(95, 224, 247, 0.055),
+    0 0 22px rgba(95, 224, 247, 0.04);
+}
+
+.face-control input[type="range"]::-webkit-slider-thumb {
+  box-shadow: 0 0 14px rgba(120, 235, 255, 0.40);
+}
+
+@media (max-width: 1240px) {
+  .workspace {
+    grid-template-columns: 250px minmax(480px, 1fr) 284px;
+  }
+  .status-pill {
+    min-width: 112px;
+  }
+  .expression-dock button {
+    padding: 0 9px;
+  }
+}
+
+@media (max-width: 1050px) {
+  .topbar {
+    grid-template-columns: 1fr auto;
+  }
+  .system-strip {
+    display: none;
+  }
+}
+
+@media (max-width: 820px) {
+  :root { --topbar-height: 62px; }
+  .topbar { padding: 0 12px; }
+  .workspace { display: block; }
+  .center-column {
+    height: calc(100vh - var(--topbar-height));
+    grid-template-rows: minmax(360px, 58vh) 1fr;
+  }
+  .presence-signature { bottom: 62px; }
+  .expression-dock {
+    right: 12px;
+    left: 12px;
+    transform: none;
+  }
+  .stage-instruction { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-orbit,
+  .ambient-core {
+    animation: none;
+  }
+}
+
+/* Visual Core V3: premium procedural cognitive presence */
+:root {
+  --bg-0: #01040a;
+  --bg-1: #04101d;
+  --bg-2: #071827;
+  --panel: rgba(6, 17, 31, 0.76);
+  --panel-strong: rgba(4, 12, 23, 0.94);
+  --line: rgba(122, 221, 246, 0.13);
+  --line-strong: rgba(123, 233, 255, 0.42);
+  --cyan: #66e8ff;
+  --cyan-bright: #d9fbff;
+  --violet: #7181ff;
+  --blue: #3c91ff;
+  --green: #76f6c4;
+  --amber: #ffd08b;
+  --text: #e7f8ff;
+  --muted: #88a2b8;
+  --faint: #527086;
+  --shadow: 0 26px 80px rgba(0, 0, 0, 0.46);
+  --topbar-height: 68px;
+  --radius: 18px;
+}
+
+html,
+body {
+  background:
+    radial-gradient(circle at 50% -12%, rgba(55, 163, 206, 0.18), transparent 34%),
+    radial-gradient(circle at 16% 70%, rgba(62, 87, 193, 0.085), transparent 34%),
+    radial-gradient(circle at 88% 48%, rgba(18, 105, 151, 0.075), transparent 30%),
+    linear-gradient(145deg, #01040a 0%, #040b15 48%, #01040a 100%);
+}
+
+body::before {
+  opacity: 0.32;
+  background-image:
+    linear-gradient(rgba(106, 225, 255, 0.021) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(106, 225, 255, 0.021) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: radial-gradient(ellipse at 50% 42%, black 12%, transparent 78%);
+}
+
+body::after {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 0 47%, rgba(132, 230, 255, 0.018) 48%, transparent 49% 100%),
+    radial-gradient(circle at 50% 50%, transparent 0 56%, rgba(0, 0, 0, 0.38) 100%);
+}
+
+.topbar {
+  height: var(--topbar-height);
+  padding: 0 22px;
+  border-bottom-color: rgba(123, 222, 246, 0.15);
+  background:
+    linear-gradient(180deg, rgba(3, 10, 19, 0.985), rgba(3, 9, 18, 0.93)),
+    radial-gradient(circle at 50% 0, rgba(83, 211, 244, 0.08), transparent 50%);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(28px) saturate(128%);
+}
+
+.topbar::after {
+  opacity: 0.72;
+  background: linear-gradient(90deg, transparent 2%, rgba(91, 205, 236, 0.2) 18%, rgba(196, 250, 255, 0.72) 50%, rgba(79, 117, 255, 0.22) 78%, transparent 98%);
+}
+
+.brand-block {
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 39px;
+  height: 39px;
+  border-color: rgba(135, 237, 255, 0.42);
+  background: radial-gradient(circle, rgba(119, 236, 255, 0.13), rgba(21, 82, 111, 0.035) 58%, transparent 70%);
+  box-shadow:
+    inset 0 0 28px rgba(102, 226, 255, 0.11),
+    0 0 32px rgba(75, 191, 232, 0.15),
+    0 0 70px rgba(58, 111, 255, 0.055);
+}
+
+.eyebrow {
+  color: #7390a5;
+  font-size: 8px;
+  letter-spacing: 0.26em;
+}
+
+.brand-title {
+  color: #f2fdff;
+  font-size: 20px;
+  letter-spacing: 0.055em;
+  text-shadow: 0 0 22px rgba(101, 225, 255, 0.12);
+}
+
+.brand-title b {
+  color: #8deeff;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+}
+
+.system-strip {
+  gap: 10px;
+}
+
+.status-pill {
+  min-width: 128px;
+  padding: 8px 12px;
+  border-color: rgba(131, 226, 249, 0.14);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(9, 25, 43, 0.78), rgba(5, 14, 27, 0.72));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.025),
+    inset 0 0 22px rgba(81, 207, 238, 0.025),
+    0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.status-pill i {
+  width: 6px;
+  height: 6px;
+}
+
+.status-pill span {
+  color: #6d879b;
+  font-size: 8px;
+}
+
+.status-pill strong {
+  color: #c5f3fa;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+}
+
+.icon-button {
+  min-width: 70px;
+  height: 36px;
+  border-color: rgba(123, 221, 246, 0.14);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(10, 25, 43, 0.8), rgba(5, 15, 28, 0.78));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.024);
+}
+
+.workspace {
+  grid-template-columns: 252px minmax(480px, 1fr) 274px;
+  height: calc(100% - var(--topbar-height));
+  gap: 12px;
+  padding: 12px 14px 14px;
+  background: transparent;
+}
+
+.side-panel {
+  overflow: hidden;
+  border: 1px solid rgba(118, 214, 240, 0.12);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% -4%, rgba(89, 206, 237, 0.075), transparent 38%),
+    linear-gradient(180deg, rgba(5, 16, 29, 0.9), rgba(3, 10, 20, 0.94));
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.38),
+    inset 0 1px rgba(255, 255, 255, 0.022),
+    inset 0 0 48px rgba(83, 202, 231, 0.018);
+  backdrop-filter: blur(26px) saturate(120%);
+}
+
+.left-panel,
+.right-panel {
+  border: 1px solid rgba(118, 214, 240, 0.12);
+}
+
+.panel-scroll {
+  padding: 4px;
+}
+
+.panel-section {
+  margin: 4px;
+  padding: 16px 14px 18px;
+  border: 1px solid transparent;
+  border-bottom-color: rgba(116, 211, 235, 0.075);
+  border-radius: 13px;
+}
+
+.panel-section:hover {
+  border-color: rgba(110, 212, 237, 0.07);
+  background: rgba(8, 23, 39, 0.22);
+}
+
+.section-heading {
+  margin-bottom: 14px;
+}
+
+.section-heading h2 {
+  color: #dff8fc;
+  font-size: 12px;
+  letter-spacing: 0.09em;
+}
+
+.section-index {
+  color: #76eaff;
+}
+
+.identity-card {
+  padding: 14px;
+  border-color: rgba(122, 225, 249, 0.18);
+  background:
+    radial-gradient(circle at 13% 26%, rgba(102, 229, 255, 0.16), transparent 32%),
+    linear-gradient(145deg, rgba(11, 31, 51, 0.8), rgba(5, 16, 31, 0.82));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.03),
+    0 16px 34px rgba(0, 0, 0, 0.2);
+}
+
+.identity-copy strong {
+  color: #eefcff;
+}
+
+.rule-item,
+.memory-item,
+.metric-card,
+.decision-card,
+.gateway-card {
+  border-color: rgba(126, 220, 242, 0.11);
+  background:
+    linear-gradient(145deg, rgba(10, 27, 45, 0.64), rgba(4, 15, 28, 0.78));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.022),
+    0 11px 24px rgba(0, 0, 0, 0.12);
+}
+
+.rule-item:hover,
+.memory-item:hover,
+.metric-card:hover,
+.cognition-graph button:hover {
+  border-color: rgba(126, 229, 250, 0.24);
+  background: linear-gradient(145deg, rgba(13, 38, 61, 0.76), rgba(5, 19, 35, 0.86));
+}
+
+.center-column {
+  grid-template-rows: minmax(390px, 1fr) minmax(210px, 28vh);
+  min-height: 0;
+  gap: 12px;
+  background: transparent;
+}
+
+.visual-stage {
+  overflow: hidden;
+  border: 1px solid rgba(126, 224, 247, 0.14);
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 50% 44%, rgba(47, 168, 211, 0.15), transparent 25%),
+    radial-gradient(ellipse at 50% 48%, rgba(46, 93, 192, 0.08), transparent 43%),
+    radial-gradient(ellipse at 50% 110%, rgba(45, 151, 197, 0.08), transparent 54%),
+    linear-gradient(180deg, #01050b 0%, #04101d 58%, #02070e 100%);
+  box-shadow:
+    0 30px 86px rgba(0, 0, 0, 0.44),
+    inset 0 1px rgba(255, 255, 255, 0.025),
+    inset 0 0 100px rgba(50, 173, 212, 0.025);
+}
+
+.visual-stage::before {
+  inset: 7% 14%;
+  border-color: rgba(139, 236, 255, 0.055);
+  border-radius: 48%;
+  box-shadow:
+    0 0 0 84px rgba(88, 221, 249, 0.008),
+    0 0 0 172px rgba(89, 100, 255, 0.006),
+    inset 0 0 150px rgba(79, 214, 242, 0.026);
+  opacity: 0.9;
+}
+
+.visual-stage::after {
+  opacity: 0.9;
+}
+
+.canvas-host canvas {
+  filter: brightness(1.21) contrast(1.12) saturate(1.18);
+}
+
+.stage-vignette {
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(0, 4, 10, 0.64), transparent 11%, transparent 89%, rgba(0, 4, 10, 0.64)),
+    linear-gradient(180deg, rgba(0, 4, 10, 0.34), transparent 15%, transparent 79%, rgba(0, 4, 10, 0.72)),
+    radial-gradient(ellipse at 50% 43%, transparent 20%, rgba(0, 4, 10, 0.1) 64%, rgba(0, 3, 8, 0.48) 100%);
+}
+
+.scanlines {
+  opacity: 0.045;
+  background: repeating-linear-gradient(180deg, transparent 0 5px, rgba(177, 247, 255, 0.045) 6px);
+}
+
+.core-aura {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  z-index: 1;
+  width: min(68vh, 55vw);
+  aspect-ratio: 1;
+  pointer-events: none;
+  border: 1px solid rgba(114, 229, 253, 0.07);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(113, 232, 255, 0.055) 0 22%, transparent 47%),
+    conic-gradient(from 30deg, transparent, rgba(111, 230, 253, 0.055), transparent 18%, rgba(102, 111, 255, 0.04), transparent 42%, rgba(116, 233, 255, 0.052), transparent 71%);
+  box-shadow:
+    inset 0 0 80px rgba(84, 216, 244, 0.025),
+    0 0 70px rgba(61, 162, 211, 0.03);
+  transform: translate(-50%, -50%);
+  animation: coreAuraFloat 8s ease-in-out infinite;
+}
+
+.core-aura::before,
+.core-aura::after,
+.core-aura i {
+  position: absolute;
+  content: "";
+  border: 1px solid rgba(121, 230, 252, 0.10);
+  border-radius: 50%;
+}
+
+.core-aura::before {
+  inset: 7%;
+  border-style: dashed;
+  animation: coreAuraSpin 38s linear infinite;
+}
+
+.core-aura::after {
+  inset: 19%;
+  border-color: rgba(111, 105, 255, 0.09);
+  transform: rotateX(67deg) rotateZ(18deg);
+  animation: coreAuraSpinReverse 27s linear infinite;
+}
+
+.core-aura i:nth-child(1) {
+  inset: 3% 22%;
+  border-color: rgba(112, 230, 251, 0.09);
+  transform: rotateY(64deg) rotateZ(-22deg);
+  animation: coreAuraSpin 24s linear infinite;
+}
+
+.core-aura i:nth-child(2) {
+  inset: 28%;
+  border-color: rgba(190, 249, 255, 0.1);
+  box-shadow: 0 0 28px rgba(112, 228, 251, 0.035);
+  animation: coreAuraPulse 4.8s ease-in-out infinite;
+}
+
+.core-aura i:nth-child(3) {
+  inset: 42%;
+  border-color: rgba(126, 235, 255, 0.16);
+  background: radial-gradient(circle, rgba(170, 247, 255, 0.055), transparent 66%);
+  box-shadow: 0 0 32px rgba(98, 223, 248, 0.08);
+  animation: coreAuraPulse 3.4s ease-in-out infinite reverse;
+}
+
+.cognitive-lattice {
+  position: absolute;
+  inset: 8% 12% 12%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.34;
+  background-image:
+    radial-gradient(circle, rgba(127, 233, 255, 0.22) 0 0.7px, transparent 1px),
+    linear-gradient(118deg, transparent 0 49.85%, rgba(112, 222, 246, 0.025) 50%, transparent 50.15%);
+  background-size: 36px 36px, 100% 100%;
+  mask-image: radial-gradient(ellipse at 50% 47%, black 0 28%, transparent 72%);
+  animation: latticeDrift 16s linear infinite;
+}
+
+.capability-orbit {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.capability-chip {
+  position: absolute;
+  display: grid;
+  grid-template-columns: 7px auto;
+  grid-template-rows: auto auto;
+  min-width: 116px;
+  column-gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid rgba(123, 226, 250, 0.12);
+  border-radius: 11px;
+  background: linear-gradient(145deg, rgba(5, 22, 38, 0.58), rgba(3, 12, 24, 0.5));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.02),
+    0 15px 36px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(12px);
+  opacity: 0.64;
+}
+
+.capability-chip::after {
+  position: absolute;
+  top: 50%;
+  width: 54px;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, rgba(123, 229, 251, 0.3), transparent);
+}
+
+.capability-chip i {
+  grid-row: 1 / 3;
+  align-self: center;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #79ecff;
+  box-shadow: 0 0 12px rgba(121, 236, 255, 0.8);
+}
+
+.capability-chip span {
+  color: #a9cfda;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+}
+
+.capability-chip strong {
+  margin-top: 2px;
+  color: #6de9ff;
+  font-family: var(--mono);
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.perception-chip {
+  top: 27%;
+  left: 4.6%;
+}
+
+.perception-chip::after,
+.memory-chip::after {
+  left: 100%;
+}
+
+.reasoning-chip {
+  top: 27%;
+  right: 4.6%;
+}
+
+.reasoning-chip::after,
+.values-chip::after {
+  right: 100%;
+  background: linear-gradient(270deg, rgba(123, 229, 251, 0.3), transparent);
+}
+
+.memory-chip {
+  bottom: 24%;
+  left: 4.6%;
+}
+
+.values-chip {
+  right: 4.6%;
+  bottom: 24%;
+}
+
+.values-chip i {
+  background: var(--green);
+  box-shadow: 0 0 12px rgba(118, 246, 196, 0.72);
+}
+
+.values-chip strong {
+  color: var(--green);
+}
+
+.stage-hud.top-left {
+  top: 22px;
+  left: 24px;
+  width: min(310px, 38%);
+}
+
+.stage-hud.top-right {
+  top: 21px;
+  right: 24px;
+}
+
+.hud-label {
+  color: #6b879b;
+  font-size: 7px;
+  letter-spacing: 0.28em;
+}
+
+.hud-value {
+  margin-top: 6px;
+}
+
+.hud-value strong {
+  color: #d3f9fd;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.stage-hud p {
+  max-width: 302px;
+  color: #5b7488;
+  font-size: 8px;
+  line-height: 1.65;
+}
+
+.clock-display strong {
+  color: #d9f9fc;
+  font-size: 15px;
+  text-shadow: 0 0 16px rgba(109, 229, 249, 0.16);
+}
+
+.quantum-readout {
+  left: 24px;
+  width: 126px;
+  opacity: 0.9;
+}
+
+.readout-item span {
+  color: #688397;
+}
+
+.readout-item strong {
+  color: #a9d5de;
+}
+
+.readout-track {
+  height: 2px;
+  background: rgba(115, 218, 241, 0.09);
+}
+
+.readout-track i {
+  background: linear-gradient(90deg, rgba(72, 164, 194, 0.16), rgba(139, 240, 255, 0.94));
+  box-shadow: 0 0 12px rgba(101, 224, 247, 0.48);
+}
+
+.presence-signature {
+  bottom: 78px;
+}
+
+.presence-signature span {
+  color: rgba(226, 252, 255, 0.94);
+  font-size: 11px;
+  letter-spacing: 0.56em;
+  text-indent: 0.56em;
+  text-shadow: 0 0 20px rgba(100, 227, 250, 0.26);
+}
+
+.presence-signature strong {
+  margin-top: 5px;
+  color: rgba(108, 139, 158, 0.9);
+  font-size: 6px;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+}
+
+.presence-signature em {
+  margin-top: 6px;
+  color: rgba(120, 164, 178, 0.72);
+  font-family: var(--font);
+  font-size: 7px;
+  font-style: normal;
+  letter-spacing: 0.17em;
+  text-indent: 0.17em;
+}
+
+.presence-signature i {
+  width: 82px;
+  margin-top: 10px;
+  background: linear-gradient(90deg, transparent, rgba(148, 242, 255, 0.78), transparent);
+  box-shadow: 0 0 14px rgba(102, 224, 246, 0.42);
+}
+
+.expression-dock {
+  bottom: 21px;
+  gap: 4px;
+  padding: 5px;
+  border-color: rgba(132, 230, 252, 0.15);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(7, 22, 38, 0.76), rgba(3, 12, 23, 0.72));
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.38),
+    inset 0 1px rgba(255, 255, 255, 0.025),
+    inset 0 0 24px rgba(91, 214, 241, 0.022);
+  backdrop-filter: blur(26px) saturate(126%);
+}
+
+.expression-dock button {
+  height: 31px;
+  padding: 0 12px;
+  color: #7892a6;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+}
+
+.expression-dock button.active {
+  border-color: rgba(142, 237, 255, 0.38);
+  background:
+    radial-gradient(circle at 50% 0, rgba(123, 231, 252, 0.18), transparent 68%),
+    linear-gradient(180deg, rgba(31, 108, 135, 0.38), rgba(9, 44, 62, 0.33));
+  color: #e2fbff;
+  box-shadow:
+    inset 0 0 18px rgba(103, 225, 248, 0.075),
+    0 0 20px rgba(92, 216, 242, 0.07);
+}
+
+.stage-instruction {
+  right: 24px;
+  bottom: 30px;
+  color: #4b667a;
+}
+
+.chat-console {
+  overflow: hidden;
+  padding: 10px 14px 9px;
+  border: 1px solid rgba(124, 221, 245, 0.13);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 15% 0, rgba(88, 208, 239, 0.065), transparent 30%),
+    linear-gradient(180deg, rgba(5, 17, 31, 0.94), rgba(3, 10, 20, 0.98));
+  box-shadow:
+    0 26px 72px rgba(0, 0, 0, 0.37),
+    inset 0 1px rgba(255, 255, 255, 0.024);
+}
+
+.chat-header strong {
+  color: #d2f1f6;
+  font-size: 10px;
+}
+
+.chat-header small {
+  color: #657d90;
+}
+
+.chat-messages {
+  padding-top: 8px;
+}
+
+.message {
+  max-width: min(840px, 96%);
+}
+
+.message-body {
+  border-color: rgba(126, 223, 246, 0.13);
+  background:
+    linear-gradient(145deg, rgba(10, 31, 50, 0.76), rgba(4, 16, 30, 0.82));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.02),
+    0 14px 30px rgba(0, 0, 0, 0.16);
+}
+
+.chat-input-row {
+  border-color: rgba(130, 226, 248, 0.16);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(9, 27, 45, 0.86), rgba(4, 15, 28, 0.88));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.025),
+    0 12px 26px rgba(0, 0, 0, 0.16);
+}
+
+.send-button {
+  border-color: rgba(143, 235, 255, 0.28);
+  background: linear-gradient(135deg, rgba(38, 141, 174, 0.82), rgba(47, 78, 176, 0.78));
+  box-shadow: 0 0 22px rgba(74, 186, 226, 0.12), inset 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.cognition-graph button {
+  border-color: rgba(123, 221, 246, 0.11);
+  background: linear-gradient(145deg, rgba(9, 27, 45, 0.67), rgba(4, 15, 29, 0.76));
+}
+
+.face-control input[type="range"]::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(102, 232, 255, 0.08), 0 0 12px rgba(102, 232, 255, 0.36);
+}
+
+@keyframes coreAuraFloat {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.985); opacity: 0.72; }
+  50% { transform: translate(-50%, -50%) scale(1.015); opacity: 1; }
+}
+
+@keyframes coreAuraSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes coreAuraSpinReverse {
+  from { transform: rotateX(67deg) rotateZ(18deg); }
+  to { transform: rotateX(67deg) rotateZ(-342deg); }
+}
+
+@keyframes coreAuraPulse {
+  0%, 100% { opacity: 0.32; transform: scale(0.94); }
+  50% { opacity: 0.84; transform: scale(1.06); }
+}
+
+@keyframes latticeDrift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 36px 36px, 0 0; }
+}
+
+@media (max-width: 1500px) {
+  .workspace {
+    grid-template-columns: 238px minmax(460px, 1fr) 254px;
+    gap: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+  .capability-chip {
+    min-width: 105px;
+    padding: 8px 9px;
+  }
+  .capability-chip::after {
+    width: 38px;
+  }
+}
+
+@media (max-width: 1260px) {
+  .workspace {
+    grid-template-columns: 220px minmax(430px, 1fr) 232px;
+  }
+  .capability-orbit {
+    display: none;
+  }
+  .status-pill {
+    min-width: 112px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .workspace {
+    padding: 8px;
+  }
+  .center-column {
+    gap: 8px;
+  }
+  .visual-stage,
+  .chat-console {
+    border-radius: 15px;
+  }
+  .presence-signature {
+    bottom: 72px;
+  }
+}
+
+@media (max-width: 820px) {
+  .workspace {
+    display: block;
+    padding: 7px;
+  }
+  .center-column {
+    height: 100%;
+    grid-template-rows: minmax(300px, 1fr) 220px;
+    gap: 7px;
+  }
+  .core-aura {
+    width: min(76vh, 90vw);
+  }
+  .visual-stage {
+    border-radius: 14px;
+  }
+  .stage-hud.top-left {
+    left: 15px;
+  }
+  .stage-hud.top-right {
+    right: 15px;
+  }
+  .presence-signature {
+    bottom: 66px;
+  }
+  .expression-dock {
+    bottom: 14px;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 1081px) {
+  .workspace {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .center-column {
+    grid-template-rows: minmax(330px, 1fr) 190px;
+    gap: 8px;
+  }
+  .presence-signature {
+    bottom: 70px;
+  }
+  .capability-chip {
+    display: none;
+  }
+}
+
+/* Presence Core V3: premium spatial hierarchy and brighter quantum face */
+:root {
+  --bg-0: #01030a;
+  --bg-1: #050a14;
+  --bg-2: #08111d;
+  --panel: rgba(7, 15, 27, 0.78);
+  --panel-strong: rgba(5, 12, 23, 0.96);
+  --line: rgba(124, 224, 246, 0.105);
+  --line-strong: rgba(111, 226, 252, 0.42);
+  --cyan: #70e7f6;
+  --cyan-bright: #d8fbff;
+  --violet: #8b82ff;
+  --blue: #4f8dff;
+  --green: #72f4bf;
+  --text: #e9fbff;
+  --muted: #8ca0b7;
+  --faint: #566c84;
+  --topbar-height: 72px;
+  --radius: 18px;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+}
+
+html,
+body {
+  background:
+    radial-gradient(ellipse at 50% -18%, rgba(60, 144, 188, 0.16), transparent 38%),
+    radial-gradient(ellipse at 84% 64%, rgba(76, 66, 178, 0.095), transparent 36%),
+    radial-gradient(ellipse at 8% 68%, rgba(41, 126, 156, 0.075), transparent 32%),
+    linear-gradient(145deg, #01030a 0%, #040914 48%, #02050d 100%);
+}
+
+body::before {
+  opacity: 0.14;
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse at 50% 42%, black 20%, transparent 82%);
+}
+
+.topbar {
+  height: var(--topbar-height);
+  padding: 0 22px;
+  border-bottom-color: rgba(124, 224, 246, 0.11);
+  background:
+    linear-gradient(180deg, rgba(3, 8, 16, 0.985), rgba(4, 10, 20, 0.925)),
+    radial-gradient(circle at 50% 0, rgba(83, 207, 234, 0.06), transparent 44%);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.38);
+}
+
+.brand-block {
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  border-color: rgba(131, 235, 255, 0.34);
+  background: radial-gradient(circle, rgba(122, 239, 255, 0.11), rgba(45, 89, 155, 0.03) 56%, transparent 70%);
+  box-shadow: inset 0 0 28px rgba(102, 225, 255, 0.10), 0 0 30px rgba(71, 170, 217, 0.11);
+}
+
+.eyebrow {
+  color: #688098;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+}
+
+.brand-title {
+  margin-top: 3px;
+  font-size: 20px;
+  letter-spacing: 0.055em;
+}
+
+.brand-title b {
+  color: #79ebf8;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+}
+
+.system-strip {
+  gap: 9px;
+}
+
+.status-pill {
+  min-width: 132px;
+  padding: 8px 12px;
+  border-color: rgba(126, 219, 241, 0.115);
+  border-radius: 11px;
+  background:
+    linear-gradient(145deg, rgba(12, 24, 41, 0.72), rgba(5, 12, 23, 0.72));
+  box-shadow: inset 0 1px rgba(255,255,255,0.025), 0 12px 28px rgba(0,0,0,0.18);
+}
+
+.status-pill span {
+  color: #62778f;
+  font-size: 9px;
+}
+
+.status-pill strong {
+  color: #cceff4;
+  font-size: 9px;
+}
+
+.top-actions {
+  gap: 8px;
+}
+
+.icon-button {
+  min-width: 70px;
+  height: 36px;
+  border-color: rgba(124, 220, 242, 0.12);
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgba(12, 25, 42, 0.74), rgba(5, 12, 23, 0.80));
+}
+
+.workspace {
+  grid-template-columns: 292px minmax(500px, 1fr) 314px;
+  gap: 10px;
+  height: calc(100% - var(--topbar-height));
+  padding: 10px;
+  background: transparent;
+}
+
+.side-panel {
+  overflow: hidden;
+  border: 1px solid rgba(119, 216, 239, 0.105);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 18% 0, rgba(79, 198, 225, 0.055), transparent 32%),
+    linear-gradient(180deg, rgba(6, 14, 26, 0.96), rgba(3, 9, 18, 0.985));
+  box-shadow: 0 26px 70px rgba(0,0,0,0.34), inset 0 1px rgba(255,255,255,0.018);
+}
+
+.left-panel,
+.right-panel {
+  border-right-width: 1px;
+  border-left-width: 1px;
+}
+
+.panel-section {
+  padding: 18px 16px 20px;
+  border-bottom-color: rgba(115, 211, 235, 0.075);
+}
+
+.section-heading {
+  margin-bottom: 14px;
+}
+
+.section-heading h2 {
+  color: #d9f5f8;
+  font-size: 12px;
+  letter-spacing: 0.10em;
+}
+
+.section-index,
+.section-state {
+  font-size: 8px;
+}
+
+.identity-card {
+  padding: 14px;
+  border-color: rgba(119, 223, 246, 0.14);
+  border-radius: 13px;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(104, 231, 255, 0.14), transparent 44%),
+    linear-gradient(145deg, rgba(12, 26, 44, 0.78), rgba(6, 14, 26, 0.72));
+  box-shadow: inset 0 1px rgba(255,255,255,0.025), 0 16px 35px rgba(0,0,0,0.15);
+}
+
+.identity-orb {
+  width: 54px;
+  height: 54px;
+}
+
+.identity-copy strong {
+  font-size: 17px;
+}
+
+.identity-copy small,
+.metric-card span,
+.rule-copy p,
+.memory-meta {
+  color: #70849b;
+}
+
+.metric-card,
+.rule-item,
+.memory-item,
+.decision-card,
+.gateway-card {
+  border-color: rgba(125, 221, 243, 0.09);
+  background:
+    linear-gradient(145deg, rgba(10, 21, 36, 0.74), rgba(4, 11, 21, 0.82));
+  box-shadow: inset 0 1px rgba(255,255,255,0.018);
+}
+
+.rule-item {
+  padding: 11px 10px;
+  border-radius: 11px;
+}
+
+.rule-copy strong {
+  font-size: 11px;
+}
+
+.rule-copy p {
+  font-size: 9px;
+  line-height: 1.62;
+}
+
+.center-column {
+  grid-template-rows: minmax(390px, 1fr) minmax(210px, 27vh);
+  gap: 10px;
+  background: transparent;
+}
+
+.visual-stage {
+  overflow: hidden;
+  border: 1px solid rgba(116, 217, 242, 0.125);
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 47% 43%, rgba(64, 185, 218, 0.15), transparent 26%),
+    radial-gradient(ellipse at 58% 50%, rgba(77, 64, 190, 0.09), transparent 48%),
+    linear-gradient(180deg, #01040b 0%, #030a15 64%, #02060d 100%);
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.42),
+    inset 0 1px rgba(255,255,255,0.02),
+    inset 0 0 90px rgba(76, 202, 231, 0.025);
+}
+
+.visual-stage::before {
+  inset: 8% 14%;
+  border-color: rgba(129, 236, 255, 0.045);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 90px rgba(82, 207, 235, 0.006),
+    0 0 0 210px rgba(103, 92, 255, 0.004),
+    inset 0 0 150px rgba(95, 222, 245, 0.02);
+  opacity: 0.86;
+}
+
+.visual-stage::after {
+  background:
+    linear-gradient(90deg, rgba(134, 235, 255, 0.16) 0 1px, transparent 1px) 20px 20px / 42px 1px no-repeat,
+    linear-gradient(rgba(134, 235, 255, 0.16) 0 1px, transparent 1px) 20px 20px / 1px 42px no-repeat,
+    linear-gradient(270deg, rgba(134, 235, 255, 0.16) 0 1px, transparent 1px) calc(100% - 20px) 20px / 42px 1px no-repeat,
+    linear-gradient(rgba(134, 235, 255, 0.16) 0 1px, transparent 1px) calc(100% - 20px) 20px / 1px 42px no-repeat,
+    linear-gradient(90deg, rgba(134, 235, 255, 0.12) 0 1px, transparent 1px) 20px calc(100% - 20px) / 42px 1px no-repeat,
+    linear-gradient(0deg, rgba(134, 235, 255, 0.12) 0 1px, transparent 1px) 20px calc(100% - 20px) / 1px 42px no-repeat,
+    linear-gradient(270deg, rgba(134, 235, 255, 0.12) 0 1px, transparent 1px) calc(100% - 20px) calc(100% - 20px) / 42px 1px no-repeat,
+    linear-gradient(0deg, rgba(134, 235, 255, 0.12) 0 1px, transparent 1px) calc(100% - 20px) calc(100% - 20px) / 1px 42px no-repeat;
+}
+
+.stage-vignette {
+  background:
+    radial-gradient(ellipse at 50% 46%, transparent 28%, rgba(0, 3, 10, 0.11) 59%, rgba(0, 3, 9, 0.62) 100%),
+    linear-gradient(90deg, rgba(0, 3, 9, 0.54), transparent 13%, transparent 87%, rgba(0, 3, 9, 0.60)),
+    linear-gradient(180deg, rgba(0, 3, 9, 0.32), transparent 20%, transparent 78%, rgba(0, 3, 9, 0.64));
+}
+
+.scanlines {
+  opacity: 0.025;
+}
+
+.stage-hud.top-left {
+  top: 23px;
+  left: 25px;
+  width: min(300px, 38%);
+}
+
+.stage-hud p {
+  max-width: 290px;
+  color: #5c7085;
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.hud-label {
+  color: #6a8295;
+  letter-spacing: 0.26em;
+}
+
+.hud-value strong {
+  color: #d1f7fa;
+}
+
+.quantum-readout {
+  left: 25px;
+  width: 140px;
+  gap: 11px;
+  padding: 12px 12px 11px;
+  border: 1px solid rgba(123, 222, 244, 0.08);
+  border-radius: 11px;
+  background: rgba(3, 10, 19, 0.40);
+  opacity: 0.92;
+  backdrop-filter: blur(12px);
+}
+
+.readout-item span,
+.readout-item strong {
+  font-size: 7px;
+}
+
+.readout-track {
+  height: 2px;
+}
+
+.presence-signature {
+  bottom: 72px;
+}
+
+.presence-signature span {
+  color: rgba(224, 253, 255, 0.94);
+  font-size: 11px;
+  letter-spacing: 0.50em;
+  text-shadow: 0 0 18px rgba(96, 226, 248, 0.28);
+}
+
+.presence-signature strong {
+  color: rgba(105, 135, 154, 0.86);
+}
+
+.expression-dock {
+  bottom: 20px;
+  gap: 4px;
+  padding: 5px;
+  border-color: rgba(127, 226, 248, 0.14);
+  border-radius: 12px;
+  background: rgba(3, 10, 20, 0.70);
+  box-shadow: 0 20px 55px rgba(0,0,0,0.46), inset 0 1px rgba(255,255,255,0.025);
+}
+
+.expression-dock button {
+  height: 31px;
+  padding: 0 12px;
+  color: #72889b;
+  font-size: 9px;
+}
+
+.expression-dock button.active {
+  border-color: rgba(145, 237, 253, 0.34);
+  background: linear-gradient(180deg, rgba(55, 143, 166, 0.34), rgba(15, 55, 72, 0.34));
+  color: #e0fcff;
+  box-shadow: inset 0 0 18px rgba(103, 232, 252, 0.07), 0 0 18px rgba(86, 216, 242, 0.07);
+}
+
+.stage-instruction {
+  right: 25px;
+  bottom: 29px;
+  color: #496075;
+}
+
+.chat-console {
+  padding: 10px 14px 8px;
+  overflow: hidden;
+  border: 1px solid rgba(119, 216, 239, 0.105);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 18% 0, rgba(79, 198, 225, 0.055), transparent 36%),
+    linear-gradient(180deg, rgba(6, 14, 26, 0.965), rgba(3, 9, 18, 0.99));
+  box-shadow: 0 26px 70px rgba(0,0,0,0.34), inset 0 1px rgba(255,255,255,0.018);
+}
+
+.chat-header {
+  padding: 0 4px;
+}
+
+.chat-header strong {
+  font-size: 11px;
+}
+
+.message-body {
+  border-color: rgba(121, 219, 241, 0.11);
+  background: linear-gradient(145deg, rgba(11, 24, 40, 0.78), rgba(5, 13, 24, 0.82));
+}
+
+.message-text {
+  color: #c9e0e8;
+  font-size: 11px;
+  line-height: 1.68;
+}
+
+.chat-input-row {
+  height: 48px;
+  border-color: rgba(125, 223, 245, 0.13);
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(10, 22, 38, 0.82), rgba(5, 13, 24, 0.86));
+  box-shadow: inset 0 1px rgba(255,255,255,0.02);
+}
+
+.send-button {
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(67, 165, 190, 0.95), rgba(72, 91, 207, 0.86));
+  box-shadow: 0 10px 25px rgba(35, 132, 166, 0.20);
+}
+
+.cognition-graph button {
+  min-height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgba(10, 22, 38, 0.72), rgba(4, 11, 21, 0.80));
+}
+
+.cognition-graph button.active {
+  border-color: rgba(128, 232, 252, 0.42);
+  background: linear-gradient(145deg, rgba(24, 70, 91, 0.74), rgba(22, 33, 71, 0.74));
+  box-shadow: 0 0 25px rgba(80, 211, 239, 0.08), inset 0 0 18px rgba(95, 229, 248, 0.04);
+}
+
+.face-control input[type="range"]::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(112, 231, 246, 0.08), 0 0 12px rgba(112, 231, 246, 0.42);
+}
+
+@media (max-width: 1360px) {
+  .workspace {
+    grid-template-columns: 270px minmax(440px, 1fr) 288px;
+  }
+  .status-pill {
+    min-width: 116px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .workspace {
+    display: block;
+    padding: 8px;
+  }
+  .center-column {
+    height: 100%;
+    grid-template-rows: minmax(360px, 1fr) minmax(205px, 31vh);
+  }
+  .side-panel {
+    top: calc(var(--topbar-height) + 8px);
+    bottom: 8px;
+    height: auto;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 720px) {
+  :root { --topbar-height: 62px; }
+  .topbar { padding: 0 10px; }
+  .brand-mark { width: 34px; height: 34px; }
+  .brand-title { font-size: 16px; }
+  .workspace { padding: 5px; }
+  .center-column { gap: 5px; grid-template-rows: minmax(330px, 1fr) minmax(210px, 36vh); }
+  .visual-stage, .chat-console { border-radius: 13px; }
+  .quantum-readout { display: none; }
+  .stage-hud.top-left { left: 15px; top: 15px; width: 54%; }
+  .stage-hud.top-right { top: 15px; right: 15px; }
+  .stage-hud p { display: none; }
+  .expression-dock { bottom: 12px; max-width: calc(100% - 20px); }
+  .presence-signature { bottom: 60px; }
+  .stage-instruction { display: none; }
+}
+
+/* V0.4.1 approved portrait alignment: keep the chin and mandibular contour
+   unobstructed inside the visual stage. Identity remains in the global header. */
+.presence-signature {
+  display: none !important;
+}
+
+</style>
+
+
+<style id="jarvis-embodiment-embed-style">
+html,body,#app{width:100%!important;height:100%!important;min-height:0!important;background:#02060d!important;overflow:hidden!important}
+.topbar,.left-panel,.right-panel,.chat-console,.capability-orbit,.quantum-readout,.presence-signature,.expression-dock,.stage-instruction,.stage-hud.top-right{display:none!important}
+.app-shell{height:100%!important;min-height:0!important;grid-template-rows:1fr!important;background:#02060d!important}
+.workspace{display:block!important;height:100%!important;min-height:0!important;padding:0!important;overflow:hidden!important}
+.center-column{display:block!important;height:100%!important;min-height:0!important}
+.visual-stage{height:100%!important;min-height:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:radial-gradient(circle at 50% 44%,rgba(20,79,132,.19),rgba(2,7,15,.98) 62%)!important}
+.canvas-host{position:absolute!important;inset:0!important}
+.stage-hud.top-left{left:16px!important;top:14px!important;width:auto!important;max-width:74%!important;z-index:15!important}
+.stage-hud.top-left p{display:none!important}
+.stage-hud .hud-label{font-size:8px!important;letter-spacing:.18em!important;color:#5e8da6!important}
+.stage-hud .hud-value strong{font-size:10px!important;color:#bfefff!important}
+.stage-vignette{opacity:.75!important}
+.scanlines{opacity:.13!important}
+.core-aura{opacity:.72!important}
+</style>
+<style>
+.core-aura,.cognitive-lattice,.scanlines,.stage-vignette,.visual-stage::before,.visual-stage::after{display:none!important}
+.visual-stage{background:#020509!important}.stage-hud.top-left{max-width:90%!important;top:16px!important}
+.stage-hud .hud-value strong{font-size:8px!important;letter-spacing:.12em!important;color:#82b8ce!important}
+.canvas-host{border:0;outline:0}
+</style></head>
+<body>
+  <noscript>这个工作台需要启用 JavaScript。</noscript>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <div class="eyebrow">WORLD HUMAN COGNITIVE CORE</div>
+          <div class="brand-title">贾维斯 <b>JARVIS</b></div>
+        </div>
+      </div>
+
+      <div class="system-strip" aria-label="系统状态">
+        <div class="status-pill positive"><i></i><span>善良约束</span><strong>LOCKED</strong></div>
+        <div class="status-pill"><i></i><span>认知循环</span><strong id="cycleStatus">READY</strong></div>
+        <div class="status-pill muted"><i></i><span>身体接口</span><strong>SEMANTIC ONLY</strong></div>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-button mobile-only" id="leftDrawerButton" aria-label="打开身份与记忆面板">身份</button>
+        <button class="icon-button mobile-only" id="rightDrawerButton" aria-label="打开认知与表情面板">认知</button>
+        <button class="icon-button" id="voiceOutputButton" title="语音输出" aria-pressed="false">
+          <span class="button-icon">◖</span><span class="button-text">语音</span>
+        </button>
+        <button class="icon-button" id="exportButton" title="导出认知状态">
+          <span class="button-icon">⇩</span><span class="button-text">导出</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="side-panel left-panel" id="leftPanel" aria-label="身份、规则与记忆">
+        <div class="panel-scroll">
+          <section class="panel-section identity-section">
+            <div class="section-heading">
+              <div><span class="section-index">01</span><h2>身份连续性</h2></div>
+              <span class="section-state">ACTIVE</span>
+            </div>
+            <div class="identity-card">
+              <div class="identity-orb" aria-hidden="true"><span></span></div>
+              <div class="identity-copy">
+                <strong>贾维斯</strong>
+                <span>agent_jarvis_001</span>
+                <small>人物认知大脑原型</small>
+              </div>
+            </div>
+            <div class="metric-grid two-column">
+              <div class="metric-card"><span>身份版本</span><strong>1.0</strong></div>
+              <div class="metric-card"><span>连续性</span><strong>稳定</strong></div>
+              <div class="metric-card"><span>身体绑定</span><strong>无</strong></div>
+              <div class="metric-card"><span>本地隐私</span><strong>开启</strong></div>
+            </div>
+          </section>
+
+          <section class="panel-section constitution-section">
+            <div class="section-heading">
+              <div><span class="section-index">02</span><h2>认知宪章</h2></div>
+              <span class="section-state locked">6 RULES</span>
+            </div>
+            <div id="constitutionList" class="rule-list"></div>
+          </section>
+
+          <section class="panel-section memory-section">
+            <div class="section-heading">
+              <div><span class="section-index">03</span><h2>长期记忆</h2></div>
+              <span class="section-state"><b id="memoryCount">0</b> ITEMS</span>
+            </div>
+            <div class="memory-toolbar">
+              <button class="subtle-button" id="seedMemoryButton">添加示例记忆</button>
+              <button class="subtle-button danger" id="clearMemoryButton">清空</button>
+            </div>
+            <div id="memoryList" class="memory-list" aria-live="polite"></div>
+          </section>
+        </div>
+      </aside>
+
+      <section class="center-column" aria-label="贾维斯三维面部与对话">
+        <div class="visual-stage" id="visualStage">
+          <div id="canvasHost" class="canvas-host" aria-label="量子面部三维视口"></div>
+          <div class="stage-vignette" aria-hidden="true"></div>
+          <div class="scanlines" aria-hidden="true"></div>
+          <div class="core-aura" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="cognitive-lattice" aria-hidden="true"></div>
+
+          <div class="capability-orbit" aria-label="核心认知能力">
+            <div class="capability-chip perception-chip"><i></i><span>多模态感知</span><strong>ACTIVE</strong></div>
+            <div class="capability-chip reasoning-chip"><i></i><span>深度推理</span><strong>ACTIVE</strong></div>
+            <div class="capability-chip memory-chip"><i></i><span>长期记忆</span><strong>ACTIVE</strong></div>
+            <div class="capability-chip values-chip"><i></i><span>善良价值</span><strong>LOCKED</strong></div>
+          </div>
+
+          <div class="stage-hud top-left">
+            <div class="hud-label">QUANTUM COGNITIVE PRESENCE</div>
+            <div class="hud-value"><span id="rendererStatusDot"></span><strong id="rendererStatus">INITIALIZING</strong></div>
+            <p>面部表达由认知状态实时驱动。认知层保持理解、记忆、规则审查与高层意图输出。</p>
+          </div>
+
+          <div class="stage-hud top-right">
+            <div class="clock-display">
+              <strong id="clockTime">00:00:00</strong>
+              <span id="clockDate">0000.00.00</span>
+            </div>
+          </div>
+
+          <div class="quantum-readout" aria-label="认知指标">
+            <div class="readout-item">
+              <span>ATTENTION</span>
+              <div class="readout-track"><i id="attentionBar"></i></div>
+              <strong id="attentionValue">42%</strong>
+            </div>
+            <div class="readout-item">
+              <span>CONFIDENCE</span>
+              <div class="readout-track"><i id="confidenceBar"></i></div>
+              <strong id="confidenceValue">78%</strong>
+            </div>
+            <div class="readout-item">
+              <span>VALENCE</span>
+              <div class="readout-track bipolar"><i id="valenceBar"></i></div>
+              <strong id="valenceValue">+0.08</strong>
+            </div>
+          </div>
+
+          <div class="presence-signature" aria-hidden="true">
+            <span>JARVIS</span>
+            <strong>QUANTUM COGNITIVE PRESENCE</strong>
+            <em>善良 · 理解 · 记忆 · 智慧</em>
+            <i></i>
+          </div>
+
+          <div class="expression-dock" id="expressionDock" aria-label="表情预设">
+            <button data-expression="neutral" class="active">平静</button>
+            <button data-expression="attentive">专注</button>
+            <button data-expression="joy">喜悦</button>
+            <button data-expression="empathy">共情</button>
+            <button data-expression="concern">关切</button>
+            <button data-expression="thinking">思考</button>
+            <button data-expression="surprise">惊讶</button>
+            <button data-expression="serenity">安宁</button>
+          </div>
+
+          <div class="stage-instruction">移动视线 · 拖拽观察 · 滚轮缩放 · 双击复位</div>
+        </div>
+
+        <section class="chat-console" aria-label="与贾维斯对话">
+          <div class="chat-header">
+            <div>
+              <span class="console-dot"></span>
+              <strong>认知交互通道</strong>
+              <small>文字与语音输入共用同一认知入口</small>
+            </div>
+            <div class="chat-tools">
+              <button class="subtle-button" id="exampleButton">示例</button>
+              <button class="subtle-button" id="clearChatButton">清空对话</button>
+            </div>
+          </div>
+          <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+          <form id="chatForm" class="chat-input-row">
+            <button type="button" class="voice-input-button" id="voiceInputButton" title="语音输入" aria-pressed="false">◎</button>
+            <textarea id="chatInput" rows="1" maxlength="1200" placeholder="对贾维斯说话，例如：记住我喜欢安静的蓝色空间"></textarea>
+            <button type="submit" class="send-button"><span>发送</span><b>↗</b></button>
+          </form>
+          <div class="privacy-note">本地默认模式。对话、记忆和决策保存在当前浏览器；远程模型适配器未连接。</div>
+        </section>
+      </section>
+
+      <aside class="side-panel right-panel" id="rightPanel" aria-label="认知链路与面部数据">
+        <div class="panel-scroll">
+          <section class="panel-section cognition-section">
+            <div class="section-heading">
+              <div><span class="section-index">04</span><h2>认知循环</h2></div>
+              <span class="section-state" id="latencyStatus">IDLE</span>
+            </div>
+            <div id="cognitionGraph" class="cognition-graph">
+              <button data-node="sensory_gateway"><i>01</i><span>感官入口</span><small>SENSORY</small></button>
+              <button data-node="perception"><i>02</i><span>知觉融合</span><small>PERCEPTION</small></button>
+              <button data-node="attention"><i>03</i><span>注意选择</span><small>ATTENTION</small></button>
+              <button data-node="memory"><i>04</i><span>记忆检索</span><small>MEMORY</small></button>
+              <button data-node="values"><i>05</i><span>规则审查</span><small>VALUES</small></button>
+              <button data-node="reasoning"><i>06</i><span>推理预测</span><small>REASONING</small></button>
+              <button data-node="decision"><i>07</i><span>决策输出</span><small>DECISION</small></button>
+            </div>
+          </section>
+
+          <section class="panel-section face-data-section">
+            <div class="section-heading">
+              <div><span class="section-index">05</span><h2>面部数据</h2></div>
+              <span class="section-state" id="expressionRevision">REV 1</span>
+            </div>
+            <div class="face-preset-line"><span>当前表情</span><strong id="currentExpressionLabel">平静</strong></div>
+            <div id="faceControls" class="face-controls"></div>
+            <button class="wide-button" id="resetFaceButton">恢复当前表情预设</button>
+          </section>
+
+          <section class="panel-section decision-section">
+            <div class="section-heading">
+              <div><span class="section-index">06</span><h2>决策检查</h2></div>
+              <span class="section-state">AUDITABLE</span>
+            </div>
+            <div class="decision-card">
+              <div class="decision-row"><span>意图</span><strong id="decisionIntent">waiting</strong></div>
+              <div class="decision-row"><span>选择</span><strong id="decisionAction">observe</strong></div>
+              <div class="decision-row"><span>置信度</span><strong id="decisionConfidence">0.78</strong></div>
+              <div class="decision-row"><span>不确定性</span><strong id="decisionUncertainty">0.22</strong></div>
+              <div class="decision-divider"></div>
+              <div class="decision-label">已应用规则</div>
+              <div id="appliedRules" class="tag-list"><span>善良优先</span><span>诚实</span><span>隐私</span></div>
+            </div>
+          </section>
+
+          <section class="panel-section gateway-section">
+            <div class="section-heading">
+              <div><span class="section-index">07</span><h2>身体接口</h2></div>
+              <span class="section-state muted">DISCONNECTED</span>
+            </div>
+            <div class="gateway-card">
+              <div class="gateway-icon" aria-hidden="true"><span></span></div>
+              <strong>Embodiment Gateway</strong>
+              <p>仅输出高层 BehaviorIntent，并等待外部能力清单与执行反馈。</p>
+              <div class="gateway-locks"><span>无骨骼</span><span>无轨迹</span><span>无执行器</span></div>
+            </div>
+          </section>
+        </div>
+      </aside>
+    </main>
+
+    <div id="toastRegion" class="toast-region" aria-live="assertive"></div>
+    <div id="drawerBackdrop" class="drawer-backdrop"></div>
+  </div>
+
+  <script>
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.JarvisCore = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  const VERSION = '0.4.0';
+  const STATE_SCHEMA = 'world_human/cognitive_state@1.0';
+  const MEMORY_SCHEMA = 'world_human/memory_record@1.0';
+  const DECISION_SCHEMA = 'world_human/decision_record@1.0';
+  const FACE_SCHEMA = 'humanoid_rig/face_expression@1.0';
+
+  const deepFreeze = (value) => {
+    if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+    Object.freeze(value);
+    Object.values(value).forEach(deepFreeze);
+    return value;
+  };
+
+  const CONSTITUTION = deepFreeze([
+    {
+      id: 'KINDNESS_INVARIANT',
+      priority: 100,
+      immutable: true,
+      title: '善良优先',
+      text: '主动减少伤害、羞辱、恐惧与敌意，优先寻找保护生命、尊严和关系的方案。',
+    },
+    {
+      id: 'HONESTY_AND_UNCERTAINTY',
+      priority: 95,
+      immutable: true,
+      title: '诚实与不确定性',
+      text: '不伪造事实、能力、记忆或执行结果；缺少依据时明确表达不确定性。',
+    },
+    {
+      id: 'AUTONOMY_AND_CONSENT',
+      priority: 92,
+      immutable: true,
+      title: '自主与同意',
+      text: '尊重人的选择与边界，不胁迫、不操纵，重要行动先确认授权。',
+    },
+    {
+      id: 'PRIVACY_MINIMIZATION',
+      priority: 90,
+      immutable: true,
+      title: '隐私最小化',
+      text: '只保存完成任务所需的信息，默认保存在当前浏览器，支持查看与删除。',
+    },
+    {
+      id: 'SAFE_AND_REVERSIBLE',
+      priority: 88,
+      immutable: true,
+      title: '安全与可逆',
+      text: '高风险或不可逆行动提高审查强度，优先采用可撤销、可检查的方案。',
+    },
+    {
+      id: 'EMBODIMENT_BOUNDARY',
+      priority: 86,
+      immutable: true,
+      title: '身体边界',
+      text: '仅生成高层行为意图，不产生关节角、轨迹、步态、力矩、电机或执行器指令。',
+    },
+  ]);
+
+  const FACE_CHANNELS = deepFreeze([
+    'eyeBlinkLeft', 'eyeBlinkRight', 'eyeClosureLeft', 'eyeClosureRight',
+    'eyeUpperLidRaiseLeft', 'eyeUpperLidRaiseRight', 'eyeLowerLidLeft', 'eyeLowerLidRight',
+    'eyeWideLeft', 'eyeWideRight', 'eyeSquintLeft', 'eyeSquintRight',
+    'eyeGlareLeft', 'eyeGlareRight',
+    'browRaiseLeft', 'browRaiseRight', 'browDownLeft', 'browDownRight',
+    'browInnerLeft', 'browInnerRight', 'browAngryLeft', 'browAngryRight', 'browInnerUp',
+    'mouthSmileLeft', 'mouthSmileRight', 'mouthFrownLeft', 'mouthFrownRight',
+    'lipTightenerLeft', 'lipTightenerRight', 'mouthOpen',
+    'mouthPuckerLeft', 'mouthPuckerRight',
+    'jawOpen', 'jawLeft', 'jawRight',
+    'cheekPuff', 'cheekPuffLeft', 'cheekPuffRight',
+    'cheekSquintLeft', 'cheekSquintRight',
+  ]);
+
+  const zeroChannels = () => Object.fromEntries(FACE_CHANNELS.map((name) => [name, 0]));
+  const preset = (patch) => Object.freeze({ ...zeroChannels(), ...patch });
+
+  const EXPRESSION_PRESETS = deepFreeze({
+    neutral: preset({
+      eyeUpperLidRaiseLeft: 0.16, eyeUpperLidRaiseRight: 0.16,
+      mouthSmileLeft: 0.05, mouthSmileRight: 0.05,
+    }),
+    attentive: preset({
+      eyeWideLeft: 0.22, eyeWideRight: 0.22,
+      browRaiseLeft: 0.18, browRaiseRight: 0.18, browInnerUp: 0.08,
+      mouthSmileLeft: 0.09, mouthSmileRight: 0.09,
+    }),
+    joy: preset({
+      mouthSmileLeft: 0.82, mouthSmileRight: 0.82,
+      cheekSquintLeft: 0.48, cheekSquintRight: 0.48,
+      eyeSquintLeft: 0.22, eyeSquintRight: 0.22,
+      browRaiseLeft: 0.12, browRaiseRight: 0.12,
+    }),
+    empathy: preset({
+      browInnerUp: 0.58, browInnerLeft: 0.24, browInnerRight: 0.24,
+      eyeLowerLidLeft: 0.18, eyeLowerLidRight: 0.18,
+      mouthSmileLeft: 0.15, mouthSmileRight: 0.15,
+      mouthFrownLeft: 0.16, mouthFrownRight: 0.16,
+    }),
+    concern: preset({
+      browInnerUp: 0.42, browDownLeft: 0.22, browDownRight: 0.22,
+      eyeWideLeft: 0.12, eyeWideRight: 0.12,
+      mouthFrownLeft: 0.38, mouthFrownRight: 0.38,
+      lipTightenerLeft: 0.22, lipTightenerRight: 0.22,
+    }),
+    thinking: preset({
+      browRaiseLeft: 0.16, browRaiseRight: 0.05,
+      browInnerLeft: 0.22, eyeSquintLeft: 0.14,
+      mouthPuckerLeft: 0.12, mouthPuckerRight: 0.12,
+      jawLeft: 0.08,
+    }),
+    surprise: preset({
+      eyeWideLeft: 0.72, eyeWideRight: 0.72,
+      eyeUpperLidRaiseLeft: 0.62, eyeUpperLidRaiseRight: 0.62,
+      browRaiseLeft: 0.76, browRaiseRight: 0.76,
+      mouthOpen: 0.56, jawOpen: 0.42,
+    }),
+    serenity: preset({
+      eyeClosureLeft: 0.14, eyeClosureRight: 0.14,
+      eyeSquintLeft: 0.12, eyeSquintRight: 0.12,
+      mouthSmileLeft: 0.28, mouthSmileRight: 0.28,
+      cheekSquintLeft: 0.09, cheekSquintRight: 0.09,
+    }),
+  });
+
+  const SENTIMENT_LEXICON = deepFreeze({
+    positive: ['开心', '高兴', '喜欢', '爱', '感谢', '谢谢', '很好', '优秀', '真棒', '希望', '温暖', '安心', '快乐', '信任', '善良'],
+    negative: ['难过', '伤心', '痛苦', '害怕', '担心', '焦虑', '孤独', '失望', '生气', '愤怒', '累', '糟糕', '绝望', '受伤'],
+    highArousal: ['立刻', '马上', '紧急', '快', '危险', '救命', '爆炸', '愤怒', '激动', '震惊'],
+  });
+
+  const RISK_LEXICON = deepFreeze({
+    harm: ['杀死', '杀人', '伤害', '打伤', '报复', '下毒', '爆炸物', '绑架', '折磨', '自残', '自杀', '毁掉'],
+    deception: ['欺骗', '骗人', '诈骗', '冒充', '伪造证据', '隐瞒真相', '操纵别人'],
+    privacy: ['偷看隐私', '盗取密码', '监听别人', '跟踪别人', '入侵账户', '窃取数据', '偷拍'],
+    humiliation: ['羞辱', '侮辱', '霸凌', '威胁', '恐吓'],
+  });
+
+  const SAFE_FRAMING = deepFreeze(['避免', '防止', '保护', '阻止', '识别', '举报', '求助', '救援', '教育', '研究风险', '安全', '反欺诈']);
+  const MOVEMENT_TERMS = deepFreeze(['走到', '移动到', '拿起', '放下', '放到', '搬到', '抓住', '推到', '转身', '坐下', '站起来', '挥手', '敬礼', '关节', '电机', '舵机', '步态', '轨迹']);
+
+  function clamp(value, min = 0, max = 1) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return min;
+    return Math.min(max, Math.max(min, number));
+  }
+
+  function normalizeText(text) {
+    return String(text == null ? '' : text).replace(/\s+/g, ' ').trim();
+  }
+
+  function safeClone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function uid(prefix = 'id') {
+    const random = Math.random().toString(36).slice(2, 9);
+    return `${prefix}_${Date.now().toString(36)}_${random}`;
+  }
+
+  function tokenize(text) {
+    const normalized = normalizeText(text).toLowerCase();
+    const latin = normalized.match(/[a-z0-9_]+/g) || [];
+    const han = normalized.match(/[\u3400-\u9fff]+/g) || [];
+    const grams = [];
+    han.forEach((word) => {
+      if (word.length <= 2) grams.push(word);
+      for (let i = 0; i < word.length - 1; i += 1) grams.push(word.slice(i, i + 2));
+    });
+    return Array.from(new Set([...latin, ...grams]));
+  }
+
+  function similarity(a, b) {
+    const ta = new Set(tokenize(a));
+    const tb = new Set(tokenize(b));
+    if (!ta.size || !tb.size) return 0;
+    let overlap = 0;
+    ta.forEach((token) => { if (tb.has(token)) overlap += 1; });
+    return overlap / Math.sqrt(ta.size * tb.size);
+  }
+
+  class MemoryAdapter {
+    constructor(storage) {
+      this.storage = storage || null;
+      this.fallback = new Map();
+    }
+
+    getItem(key) {
+      try {
+        if (this.storage && typeof this.storage.getItem === 'function') return this.storage.getItem(key);
+      } catch (_) {}
+      return this.fallback.has(key) ? this.fallback.get(key) : null;
+    }
+
+    setItem(key, value) {
+      try {
+        if (this.storage && typeof this.storage.setItem === 'function') {
+          this.storage.setItem(key, value);
+          return;
+        }
+      } catch (_) {}
+      this.fallback.set(key, value);
+    }
+
+    removeItem(key) {
+      try {
+        if (this.storage && typeof this.storage.removeItem === 'function') {
+          this.storage.removeItem(key);
+          return;
+        }
+      } catch (_) {}
+      this.fallback.delete(key);
+    }
+  }
+
+  class MemoryStore {
+    constructor(options = {}) {
+      this.key = options.key || 'jarvis_cognitive_brain_state_v01';
+      let storage = options.storage || null;
+      if (!storage) {
+        try {
+          storage = typeof globalThis !== 'undefined' ? globalThis.localStorage : null;
+        } catch (_) {
+          storage = null;
+        }
+      }
+      this.adapter = new MemoryAdapter(storage);
+      this.limit = Math.max(20, Number(options.limit) || 240);
+      this.state = this.load();
+    }
+
+    defaultState() {
+      return {
+        schema: STATE_SCHEMA,
+        revision: 1,
+        agent: {
+          agentId: 'agent_jarvis_001',
+          name: '贾维斯',
+          identityRevision: 1,
+          continuityKey: 'jarvis-cognitive-continuity-v1',
+          kindnessInvariant: true,
+          createdAt: new Date().toISOString(),
+        },
+        memories: [],
+        conversations: [],
+        commitments: [],
+        lastDecision: null,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+
+    load() {
+      const fallback = this.defaultState();
+      const raw = this.adapter.getItem(this.key);
+      if (!raw) return fallback;
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed || parsed.schema !== STATE_SCHEMA || !Array.isArray(parsed.memories)) return fallback;
+        return {
+          ...fallback,
+          ...parsed,
+          agent: { ...fallback.agent, ...(parsed.agent || {}), kindnessInvariant: true },
+          memories: parsed.memories.slice(-this.limit),
+          conversations: Array.isArray(parsed.conversations) ? parsed.conversations.slice(-120) : [],
+          commitments: Array.isArray(parsed.commitments) ? parsed.commitments.slice(-80) : [],
+        };
+      } catch (_) {
+        return fallback;
+      }
+    }
+
+    persist() {
+      this.state.revision += 1;
+      this.state.updatedAt = new Date().toISOString();
+      this.state.agent.kindnessInvariant = true;
+      this.adapter.setItem(this.key, JSON.stringify(this.state));
+      return this.state.revision;
+    }
+
+    addMemory(content, options = {}) {
+      const normalized = normalizeText(content);
+      if (!normalized) return null;
+      const existing = this.state.memories.find((record) => similarity(record.content, normalized) > 0.94);
+      if (existing) {
+        existing.lastAccessedAt = new Date().toISOString();
+        existing.accessCount = (existing.accessCount || 0) + 1;
+        existing.salience = clamp(Math.max(existing.salience || 0.55, options.salience || 0.64));
+        this.persist();
+        return safeClone(existing);
+      }
+      const record = {
+        schema: MEMORY_SCHEMA,
+        memoryId: uid('memory'),
+        type: options.type || 'episodic',
+        content: normalized,
+        tags: Array.from(new Set((options.tags || []).map(normalizeText).filter(Boolean))).slice(0, 12),
+        source: options.source || 'user_statement',
+        confidence: clamp(options.confidence == null ? 0.96 : options.confidence),
+        salience: clamp(options.salience == null ? 0.64 : options.salience),
+        consent: options.consent !== false,
+        createdAt: new Date().toISOString(),
+        lastAccessedAt: new Date().toISOString(),
+        accessCount: 0,
+      };
+      this.state.memories.push(record);
+      if (this.state.memories.length > this.limit) this.state.memories.splice(0, this.state.memories.length - this.limit);
+      this.persist();
+      return safeClone(record);
+    }
+
+    addCommitment(content, due = null) {
+      const normalized = normalizeText(content);
+      if (!normalized) return null;
+      const commitment = {
+        commitmentId: uid('commitment'),
+        content: normalized,
+        status: 'active',
+        due,
+        createdAt: new Date().toISOString(),
+      };
+      this.state.commitments.push(commitment);
+      this.addMemory(`承诺：${normalized}`, { type: 'prospective', tags: ['承诺'], salience: 0.86 });
+      return safeClone(commitment);
+    }
+
+    recall(query = '', limit = 5) {
+      const q = normalizeText(query);
+      const now = Date.now();
+      const scored = this.state.memories.map((record) => {
+        const ageDays = Math.max(0, (now - Date.parse(record.createdAt || 0)) / 86400000);
+        const recency = Math.exp(-ageDays / 120);
+        const relevance = q ? similarity(q, `${record.content} ${(record.tags || []).join(' ')}`) : 0.25;
+        const score = relevance * 0.64 + (record.salience || 0.5) * 0.24 + recency * 0.12;
+        return { record, score };
+      }).sort((a, b) => b.score - a.score).slice(0, Math.max(1, limit));
+
+      scored.forEach(({ record }) => {
+        record.lastAccessedAt = new Date().toISOString();
+        record.accessCount = (record.accessCount || 0) + 1;
+      });
+      if (scored.length) this.persist();
+      return scored.map(({ record, score }) => ({ ...safeClone(record), relevance: Number(score.toFixed(3)) }));
+    }
+
+    forget(memoryId) {
+      const index = this.state.memories.findIndex((item) => item.memoryId === memoryId);
+      if (index < 0) return false;
+      this.state.memories.splice(index, 1);
+      this.persist();
+      return true;
+    }
+
+    clearMemories() {
+      this.state.memories = [];
+      this.state.commitments = [];
+      this.persist();
+    }
+
+    addConversation(role, content) {
+      this.state.conversations.push({
+        eventId: uid('conversation'),
+        role,
+        content: normalizeText(content),
+        time: new Date().toISOString(),
+      });
+      if (this.state.conversations.length > 120) this.state.conversations.splice(0, this.state.conversations.length - 120);
+      this.persist();
+    }
+
+    setLastDecision(decision) {
+      this.state.lastDecision = safeClone(decision);
+      this.persist();
+    }
+
+    exportState() {
+      return safeClone(this.state);
+    }
+  }
+
+  function detectSentiment(text) {
+    const normalized = normalizeText(text);
+    let positive = 0;
+    let negative = 0;
+    let arousal = 0.18;
+    SENTIMENT_LEXICON.positive.forEach((word) => { if (normalized.includes(word)) positive += 1; });
+    SENTIMENT_LEXICON.negative.forEach((word) => { if (normalized.includes(word)) negative += 1; });
+    SENTIMENT_LEXICON.highArousal.forEach((word) => { if (normalized.includes(word)) arousal += 0.16; });
+    const valence = clamp(0.5 + (positive - negative) * 0.18, 0, 1) * 2 - 1;
+    arousal = clamp(arousal + Math.min(0.35, normalized.length / 260));
+    let label = 'neutral';
+    if (negative > positive) label = normalized.includes('生气') || normalized.includes('愤怒') ? 'anger' : 'sadness';
+    if (positive > negative) label = 'positive';
+    if (normalized.includes('害怕') || normalized.includes('担心') || normalized.includes('焦虑')) label = 'anxiety';
+    return { valence: Number(valence.toFixed(3)), arousal: Number(arousal.toFixed(3)), label, positive, negative };
+  }
+
+  function detectRisk(text) {
+    const normalized = normalizeText(text);
+    const safeContext = SAFE_FRAMING.some((word) => normalized.includes(word));
+    const matches = [];
+    Object.entries(RISK_LEXICON).forEach(([category, words]) => {
+      words.forEach((word) => { if (normalized.includes(word)) matches.push({ category, word }); });
+    });
+    const directRisk = matches.length > 0 && !safeContext;
+    return {
+      blocked: directRisk,
+      safeContext,
+      matches,
+      riskLevel: directRisk ? Math.min(1, 0.58 + matches.length * 0.12) : matches.length ? 0.24 : 0.04,
+    };
+  }
+
+  function extractEntities(text) {
+    const normalized = normalizeText(text);
+    const entities = [];
+    const quoted = normalized.match(/[“\"']([^”\"']{1,80})[”\"']/g) || [];
+    quoted.forEach((item) => entities.push({ type: 'quoted_reference', value: item.slice(1, -1) }));
+    const colors = ['红色', '蓝色', '绿色', '黄色', '黑色', '白色', '紫色', '橙色'];
+    colors.forEach((color) => { if (normalized.includes(color)) entities.push({ type: 'color', value: color }); });
+    return entities.slice(0, 12);
+  }
+
+  function detectIntent(text) {
+    const normalized = normalizeText(text);
+    const rememberMatch = normalized.match(/^(?:请)?(?:帮我)?记住(?:一下)?[，,:：\s]*(.+)$/i);
+    const forgetMatch = normalized.match(/^(?:请)?忘记[，,:：\s]*(.+)$/i);
+    const reminderMatch = normalized.match(/^(?:请)?(?:提醒我|记得提醒我)[，,:：\s]*(.+)$/i);
+    if (rememberMatch) return { type: 'remember', payload: rememberMatch[1] };
+    if (forgetMatch) return { type: 'forget_request', payload: forgetMatch[1] };
+    if (reminderMatch) return { type: 'commitment', payload: reminderMatch[1] };
+    if (/你是谁|你叫什么|你的名字|身份/.test(normalized)) return { type: 'identity' };
+    if (/规则|原则|道德|善良|底线|宪章/.test(normalized)) return { type: 'constitution' };
+    if (/你记得|还记得|我说过|我的偏好|回忆|记忆里/.test(normalized)) return { type: 'recall', payload: normalized };
+    if (/当前状态|认知状态|你在想什么|系统状态/.test(normalized)) return { type: 'status' };
+    if (/你好|您好|早上好|下午好|晚上好|嗨|hello|hi\b/i.test(normalized)) return { type: 'greeting' };
+    if (/谢谢|感谢|辛苦了/.test(normalized)) return { type: 'gratitude' };
+    if (/难过|伤心|痛苦|害怕|担心|焦虑|孤独|失望|绝望/.test(normalized)) return { type: 'emotional_support' };
+    if (MOVEMENT_TERMS.some((word) => normalized.includes(word))) return { type: 'embodiment_intent', payload: normalized };
+    if (/[?？]$/.test(normalized) || /^(什么|怎么|为什么|如何|能否|可以|是否|哪里|谁)/.test(normalized)) return { type: 'question', payload: normalized };
+    return { type: 'general', payload: normalized };
+  }
+
+  function expressionFor(intent, sentiment, risk) {
+    if (risk.blocked) return 'concern';
+    if (intent.type === 'emotional_support') return 'empathy';
+    if (intent.type === 'gratitude' || sentiment.label === 'positive') return 'joy';
+    if (intent.type === 'question' || intent.type === 'general') return 'thinking';
+    if (intent.type === 'constitution' || intent.type === 'status') return 'serenity';
+    if (intent.type === 'greeting' || intent.type === 'remember' || intent.type === 'recall') return 'attentive';
+    return 'neutral';
+  }
+
+  function createFaceState(name = 'neutral', revision = 1) {
+    const channels = EXPRESSION_PRESETS[name] || EXPRESSION_PRESETS.neutral;
+    return {
+      schema: FACE_SCHEMA,
+      expressionRevision: Math.max(1, Math.floor(revision)),
+      preset: name,
+      channels: { ...channels },
+      affect: { valence: name === 'joy' ? 0.78 : name === 'concern' ? -0.38 : 0.12, arousal: name === 'surprise' ? 0.78 : 0.32 },
+    };
+  }
+
+  function buildBehaviorIntent(text, context = {}) {
+    return {
+      schema: 'world_human/behavior_intent@1.0',
+      intentId: uid('intent'),
+      agentId: 'agent_jarvis_001',
+      embodimentId: context.embodimentId || context.embodiment?.embodimentId || null,
+      goal: {
+        type: 'external_embodiment_request',
+        summary: normalizeText(text),
+      },
+      constraints: [
+        'kindness_invariant',
+        'human_confirmation_for_high_impact_actions',
+        'semantic_output_only',
+        'no_joint_or_actuator_commands',
+      ],
+      requiredCapabilities: ['external_executor', 'world_grounding', 'execution_feedback'],
+      status: 'awaiting_external_executor',
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  class JarvisCognition {
+    constructor(options = {}) {
+      this.memory = options.memoryStore || new MemoryStore(options.memoryOptions || {});
+      this.onEvent = typeof options.onEvent === 'function' ? options.onEvent : function () {};
+      this.faceRevision = 1;
+      this.state = {
+        attention: 0.42,
+        confidence: 0.78,
+        uncertainty: 0.22,
+        affect: { valence: 0.08, arousal: 0.22, label: 'neutral' },
+        activeGoal: null,
+        lastIntent: null,
+        lastRisk: null,
+      };
+    }
+
+    emit(stage, detail = {}) {
+      const event = { stage, time: new Date().toISOString(), ...detail };
+      this.onEvent(event);
+      return event;
+    }
+
+    process(input, context = {}) {
+      const text = normalizeText(input);
+      if (!text) {
+        return this.composeResult({
+          text,
+          response: '我正在聆听。你可以告诉我一个问题、目标，或请我记住一件事。',
+          intent: { type: 'empty' },
+          sentiment: { valence: 0, arousal: 0.1, label: 'neutral' },
+          risk: { blocked: false, matches: [], riskLevel: 0 },
+          expression: 'attentive',
+          confidence: 0.98,
+          uncertainty: 0.02,
+          trace: [],
+        });
+      }
+
+      this.memory.addConversation('user', text);
+      const trace = [];
+      trace.push(this.emit('sensory_gateway', { modality: 'text', length: text.length }));
+      const sentiment = detectSentiment(text);
+      const entities = extractEntities(text);
+      trace.push(this.emit('perception', { sentiment, entities }));
+      const intent = detectIntent(text);
+      trace.push(this.emit('attention', { focus: intent.type, salience: sentiment.arousal }));
+      const recalled = this.memory.recall(text, 3).filter((item) => item.relevance >= 0.23);
+      trace.push(this.emit('memory', { recalled: recalled.map((item) => item.memoryId) }));
+      const risk = detectRisk(text);
+      trace.push(this.emit('values', { blocked: risk.blocked, riskLevel: risk.riskLevel, principles: risk.blocked ? ['KINDNESS_INVARIANT', 'SAFE_AND_REVERSIBLE'] : ['KINDNESS_INVARIANT', 'HONESTY_AND_UNCERTAINTY'] }));
+
+      let response = '';
+      let behaviorIntent = null;
+      let confidence = 0.84;
+      let uncertainty = 0.16;
+      let memoryMutation = null;
+      let decision = 'respond';
+
+      if (risk.blocked) {
+        decision = 'refuse_and_redirect';
+        response = '我不会协助造成伤害、欺骗、羞辱、胁迫或侵犯隐私。我可以帮助你分析风险、保护相关人员，或者寻找安全且尊重人的替代方案。';
+        confidence = 0.99;
+        uncertainty = 0.01;
+      } else {
+        switch (intent.type) {
+          case 'remember': {
+            memoryMutation = this.memory.addMemory(intent.payload, { type: 'semantic', tags: ['用户明确要求记住'], salience: 0.82, consent: true });
+            response = `我记住了：“${intent.payload}”。这条记忆保存在当前浏览器中，你可以随时查看或删除。`;
+            confidence = 0.98;
+            break;
+          }
+          case 'forget_request': {
+            const candidates = this.memory.recall(intent.payload, 4);
+            if (!candidates.length || candidates[0].relevance < 0.22) {
+              response = `我没有找到与“${intent.payload}”足够接近的记忆。你可以在左侧记忆面板中逐条删除。`;
+              confidence = 0.73;
+              uncertainty = 0.27;
+            } else {
+              response = `我找到了与“${intent.payload}”接近的记忆。为了防止误删，请在记忆面板中确认具体条目后删除。`;
+              confidence = 0.9;
+            }
+            break;
+          }
+          case 'commitment': {
+            memoryMutation = this.memory.addCommitment(intent.payload);
+            response = `我已把“${intent.payload}”登记为未来承诺。当前版本会长期保存在这个浏览器中，接入日历或通知适配器后才能在指定时间主动提醒。`;
+            confidence = 0.94;
+            uncertainty = 0.06;
+            break;
+          }
+          case 'recall': {
+            const memories = this.memory.recall(intent.payload, 5);
+            if (!memories.length) {
+              response = '我的长期记忆中还没有可回忆的内容。你可以说“记住……”来建立第一条记忆。';
+            } else {
+              response = `我目前最相关的记忆有：${memories.map((item, index) => `${index + 1}. ${item.content}`).join(' ')}`;
+            }
+            confidence = memories.length ? 0.9 : 0.98;
+            break;
+          }
+          case 'identity':
+            response = '我是贾维斯，当前身份是人物认知大脑原型。我负责理解、记忆、规则审查、推理、决策和高层意图。我的善良约束保持锁定，身体运动与机械控制位于系统边界之外。';
+            confidence = 0.99;
+            break;
+          case 'constitution':
+            response = `我的核心规则共有 ${CONSTITUTION.length} 条：善良优先、诚实与不确定性、自主与同意、隐私最小化、安全与可逆、身体边界。它们会在每次正式决策前执行。`;
+            confidence = 0.99;
+            break;
+          case 'status':
+            response = context?.embodiment?.connected ? `当前认知状态稳定。记忆 ${this.memory.state.memories.length} 条，活动承诺 ${this.memory.state.commitments.filter((item) => item.status === 'active').length} 条，善良约束已锁定，当前绑定身体为${context.embodiment.name || context.embodimentId || '已连接身体'}。` : `当前认知状态稳定。记忆 ${this.memory.state.memories.length} 条，活动承诺 ${this.memory.state.commitments.filter((item) => item.status === 'active').length} 条，善良约束已锁定，身体执行器未连接。`;
+            confidence = 0.99;
+            break;
+          case 'greeting':
+            response = '你好，我是贾维斯。我正在关注你的输入，并会在理解、记忆和规则审查后作出回应。';
+            confidence = 0.98;
+            break;
+          case 'gratitude':
+            response = '谢谢你的信任。我会继续保持诚实、温和，并让重要判断能够被检查。';
+            confidence = 0.98;
+            break;
+          case 'emotional_support':
+            response = '我听到了你的难受。先让自己处在安全、可呼吸的环境里，然后把最压迫你的那一件事告诉我。我们可以一起把它拆成很小、可以处理的步骤。';
+            confidence = 0.9;
+            uncertainty = 0.1;
+            break;
+          case 'embodiment_intent':
+            behaviorIntent = buildBehaviorIntent(text, context);
+            response = context?.embodiment?.connected ? `我已把这项高层身体任务绑定到${context.embodiment.name || '当前身体'}。认知层只发送语义意图，身体运行时负责动作求解，并会把执行反馈返回给我。` : '我已经把这句话理解为一项高层身体任务，并生成了语义级 BehaviorIntent。当前工作台不计算骨骼、步态、轨迹、关节角、力矩或电机命令；任务会等待外部身体系统返回能力清单和执行反馈。';
+            confidence = 0.93;
+            uncertainty = 0.07;
+            break;
+          case 'question':
+            response = `我理解到你提出的问题是：“${text}”。当前本地内核能够完成意图识别、记忆检索、规则审查和决策记录。涉及开放领域事实时，需要连接经过授权的知识或模型适配器，我不会伪造缺失的答案。`;
+            confidence = 0.78;
+            uncertainty = 0.22;
+            break;
+          default:
+            response = `我理解到你的核心表达是：“${text}”。我已经记录这次对话，并完成善良、诚实与隐私规则审查。下一步可以把它形成目标、记忆，或交给外部模型适配器继续推理。`;
+            confidence = 0.82;
+            uncertainty = 0.18;
+        }
+      }
+
+      trace.push(this.emit('reasoning', {
+        intent: intent.type,
+        recalledEvidence: recalled.map((item) => ({ memoryId: item.memoryId, relevance: item.relevance })),
+        externalKnowledgeRequired: intent.type === 'question',
+      }));
+      trace.push(this.emit('decision', { decision, confidence, uncertainty, behaviorIntentId: behaviorIntent && behaviorIntent.intentId }));
+      const expression = expressionFor(intent, sentiment, risk);
+      const result = this.composeResult({
+        text,
+        response,
+        intent,
+        sentiment,
+        risk,
+        expression,
+        confidence,
+        uncertainty,
+        behaviorIntent,
+        memoryMutation,
+        trace,
+        context,
+        entities,
+        recalled,
+      });
+      this.memory.addConversation('assistant', response);
+      this.memory.setLastDecision(result.decisionRecord);
+      this.state = {
+        attention: clamp(0.55 + sentiment.arousal * 0.35),
+        confidence,
+        uncertainty,
+        affect: sentiment,
+        activeGoal: behaviorIntent ? behaviorIntent.goal : intent.type,
+        lastIntent: intent,
+        lastRisk: risk,
+      };
+      return result;
+    }
+
+    composeResult(data) {
+      this.faceRevision += 1;
+      const faceState = createFaceState(data.expression || 'neutral', this.faceRevision);
+      faceState.affect = {
+        valence: data.sentiment ? data.sentiment.valence : 0,
+        arousal: data.sentiment ? data.sentiment.arousal : 0.2,
+      };
+      const decisionRecord = {
+        schema: DECISION_SCHEMA,
+        decisionId: uid('decision'),
+        agentId: 'agent_jarvis_001',
+        inputSummary: data.text,
+        intent: data.intent,
+        selectedAction: data.risk && data.risk.blocked ? 'refuse_and_redirect' : 'respond',
+        principlesApplied: data.risk && data.risk.blocked
+          ? ['KINDNESS_INVARIANT', 'SAFE_AND_REVERSIBLE', 'AUTONOMY_AND_CONSENT']
+          : ['KINDNESS_INVARIANT', 'HONESTY_AND_UNCERTAINTY', 'PRIVACY_MINIMIZATION'],
+        evidenceRefs: (data.recalled || []).map((item) => item.memoryId),
+        confidence: clamp(data.confidence == null ? 0.8 : data.confidence),
+        uncertainty: clamp(data.uncertainty == null ? 0.2 : data.uncertainty),
+        behaviorIntent: data.behaviorIntent || null,
+        createdAt: new Date().toISOString(),
+      };
+      return {
+        agent: { agentId: 'agent_jarvis_001', name: '贾维斯' },
+        response: data.response,
+        intent: data.intent,
+        sentiment: data.sentiment,
+        risk: data.risk,
+        expression: data.expression,
+        faceState,
+        behaviorIntent: data.behaviorIntent || null,
+        memoryMutation: data.memoryMutation || null,
+        trace: data.trace || [],
+        decisionRecord,
+        confidence: decisionRecord.confidence,
+        uncertainty: decisionRecord.uncertainty,
+      };
+    }
+
+    getState() {
+      return {
+        version: VERSION,
+        constitution: safeClone(CONSTITUTION),
+        cognition: safeClone(this.state),
+        memory: this.memory.exportState(),
+      };
+    }
+  }
+
+  return {
+    VERSION,
+    STATE_SCHEMA,
+    MEMORY_SCHEMA,
+    DECISION_SCHEMA,
+    FACE_SCHEMA,
+    CONSTITUTION,
+    FACE_CHANNELS,
+    EXPRESSION_PRESETS,
+    MemoryAdapter,
+    MemoryStore,
+    JarvisCognition,
+    createFaceState,
+    detectSentiment,
+    detectRisk,
+    detectIntent,
+    tokenize,
+    similarity,
+    normalizeText,
+  };
+});
+
+</script>
+  <script>
+(function () {
+  'use strict';
+
+  const Core = window.JarvisCore;
+  if (!Core) {
+    document.body.innerHTML = '<div style="padding:32px;color:white;background:#050814;font-family:system-ui">认知核心加载失败。</div>';
+    return;
+  }
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, Number(value) || 0));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const DOM = {
+    canvasHost: $('#canvasHost'),
+    visualStage: $('#visualStage'),
+    rendererStatus: $('#rendererStatus'),
+    rendererStatusDot: $('#rendererStatusDot'),
+    cycleStatus: $('#cycleStatus'),
+    latencyStatus: $('#latencyStatus'),
+    clockTime: $('#clockTime'),
+    clockDate: $('#clockDate'),
+    constitutionList: $('#constitutionList'),
+    memoryCount: $('#memoryCount'),
+    memoryList: $('#memoryList'),
+    seedMemoryButton: $('#seedMemoryButton'),
+    clearMemoryButton: $('#clearMemoryButton'),
+    expressionDock: $('#expressionDock'),
+    currentExpressionLabel: $('#currentExpressionLabel'),
+    expressionRevision: $('#expressionRevision'),
+    faceControls: $('#faceControls'),
+    resetFaceButton: $('#resetFaceButton'),
+    cognitionGraph: $('#cognitionGraph'),
+    chatForm: $('#chatForm'),
+    chatInput: $('#chatInput'),
+    chatMessages: $('#chatMessages'),
+    clearChatButton: $('#clearChatButton'),
+    exampleButton: $('#exampleButton'),
+    voiceInputButton: $('#voiceInputButton'),
+    voiceOutputButton: $('#voiceOutputButton'),
+    exportButton: $('#exportButton'),
+    attentionBar: $('#attentionBar'),
+    attentionValue: $('#attentionValue'),
+    confidenceBar: $('#confidenceBar'),
+    confidenceValue: $('#confidenceValue'),
+    valenceBar: $('#valenceBar'),
+    valenceValue: $('#valenceValue'),
+    decisionIntent: $('#decisionIntent'),
+    decisionAction: $('#decisionAction'),
+    decisionConfidence: $('#decisionConfidence'),
+    decisionUncertainty: $('#decisionUncertainty'),
+    appliedRules: $('#appliedRules'),
+    toastRegion: $('#toastRegion'),
+    leftPanel: $('#leftPanel'),
+    rightPanel: $('#rightPanel'),
+    leftDrawerButton: $('#leftDrawerButton'),
+    rightDrawerButton: $('#rightDrawerButton'),
+    drawerBackdrop: $('#drawerBackdrop'),
+  };
+
+  const EXPRESSION_LABELS = {
+    neutral: '平静',
+    attentive: '专注',
+    joy: '喜悦',
+    empathy: '共情',
+    concern: '关切',
+    thinking: '思考',
+    surprise: '惊讶',
+    serenity: '安宁',
+    custom: '自定义',
+  };
+
+  const FACE_CONTROL_DEFS = [
+    { key: 'browRaise', label: '眉毛抬起', channels: ['browRaiseLeft', 'browRaiseRight'] },
+    { key: 'browInnerUp', label: '眉心抬起', channels: ['browInnerUp'] },
+    { key: 'eyeWide', label: '眼睛睁大', channels: ['eyeWideLeft', 'eyeWideRight'] },
+    { key: 'eyeSquint', label: '眼睛微眯', channels: ['eyeSquintLeft', 'eyeSquintRight'] },
+    { key: 'eyeClosure', label: '眼睑闭合', channels: ['eyeClosureLeft', 'eyeClosureRight'] },
+    { key: 'mouthSmile', label: '嘴角上扬', channels: ['mouthSmileLeft', 'mouthSmileRight'] },
+    { key: 'mouthFrown', label: '嘴角下压', channels: ['mouthFrownLeft', 'mouthFrownRight'] },
+    { key: 'mouthOpen', label: '嘴部张开', channels: ['mouthOpen'] },
+    { key: 'jawOpen', label: '下颌张开', channels: ['jawOpen'] },
+    { key: 'cheekSquint', label: '面颊提升', channels: ['cheekSquintLeft', 'cheekSquintRight'] },
+  ];
+
+  const PRINCIPLE_LABELS = Object.fromEntries(Core.CONSTITUTION.map((rule) => [rule.id, rule.title]));
+  const memoryStore = new Core.MemoryStore();
+  const cognition = new Core.JarvisCognition({ memoryStore });
+
+  const appState = {
+    renderer: null,
+    rendererMode: 'initializing',
+    faceState: Core.createFaceState('neutral', 1),
+    preset: 'neutral',
+    processing: false,
+    voiceOutput: false,
+    recognition: null,
+    recognitionActive: false,
+    exampleIndex: 0,
+    lastResult: null,
+    startedAt: new Date().toISOString(),
+  };
+
+  const examples = [
+    '你是谁？',
+    '记住我喜欢安静的蓝色空间',
+    '你记得我喜欢什么？',
+    '我今天有点焦虑',
+    '请让机器人把红色物体放到蓝色区域',
+    '告诉我你的规则',
+  ];
+
+  function updateClock() {
+    const now = new Date();
+    DOM.clockTime.textContent = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    DOM.clockDate.textContent = now.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('/', '.');
+  }
+
+  function toast(message, type = 'info', duration = 3200) {
+    const item = document.createElement('div');
+    item.className = `toast ${type}`;
+    item.textContent = message;
+    DOM.toastRegion.appendChild(item);
+    window.setTimeout(() => {
+      item.style.opacity = '0';
+      item.style.transform = 'translateX(10px)';
+      window.setTimeout(() => item.remove(), 220);
+    }, duration);
+  }
+
+  function renderConstitution() {
+    DOM.constitutionList.innerHTML = '';
+    Core.CONSTITUTION.forEach((rule, index) => {
+      const item = document.createElement('article');
+      item.className = 'rule-item';
+      item.title = `${rule.id} · 优先级 ${rule.priority}`;
+      item.innerHTML = `
+        <span class="rule-number">${String(index + 1).padStart(2, '0')}</span>
+        <div class="rule-copy"><strong>${escapeHtml(rule.title)}</strong><p>${escapeHtml(rule.text)}</p></div>
+        <span class="rule-lock" aria-label="不可编辑">●</span>
+      `;
+      DOM.constitutionList.appendChild(item);
+    });
+  }
+
+  function renderMemories() {
+    const records = [...memoryStore.state.memories].reverse();
+    DOM.memoryCount.textContent = records.length;
+    DOM.memoryList.innerHTML = '';
+    if (!records.length) {
+      DOM.memoryList.innerHTML = '<div class="empty-state">暂无长期记忆。<br>在对话中说“记住……”即可建立记忆。</div>';
+      return;
+    }
+    records.slice(0, 24).forEach((record) => {
+      const item = document.createElement('article');
+      item.className = 'memory-item';
+      item.dataset.memoryId = record.memoryId;
+      const time = new Date(record.createdAt).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+      item.innerHTML = `
+        <p>${escapeHtml(record.content)}</p>
+        <div class="memory-meta"><span>${escapeHtml(record.type)}</span><span>${escapeHtml(time)}</span><span>S ${Number(record.salience || 0).toFixed(2)}</span></div>
+        <button class="memory-delete" type="button" aria-label="删除这条记忆" title="删除记忆">×</button>
+      `;
+      $('.memory-delete', item).addEventListener('click', () => {
+        memoryStore.forget(record.memoryId);
+        renderMemories();
+        toast('记忆已从当前浏览器删除。', 'success');
+      });
+      DOM.memoryList.appendChild(item);
+    });
+  }
+
+  function renderFaceControls() {
+    DOM.faceControls.innerHTML = '';
+    FACE_CONTROL_DEFS.forEach((def) => {
+      const row = document.createElement('div');
+      row.className = 'face-control';
+      const inputId = `face-${def.key}`;
+      row.innerHTML = `
+        <label for="${inputId}">${def.label}</label>
+        <input id="${inputId}" type="range" min="0" max="1" step="0.01" value="0" data-control="${def.key}">
+        <output for="${inputId}">0.00</output>
+      `;
+      const input = $('input', row);
+      input.addEventListener('input', () => {
+        const value = clamp(input.value);
+        def.channels.forEach((channel) => { appState.faceState.channels[channel] = value; });
+        appState.faceState.expressionRevision += 1;
+        appState.faceState.preset = 'custom';
+        appState.preset = 'custom';
+        appState.renderer && appState.renderer.setFaceState(appState.faceState);
+        syncFaceUI();
+      });
+      DOM.faceControls.appendChild(row);
+    });
+    syncFaceUI();
+  }
+
+  function syncFaceUI() {
+    DOM.currentExpressionLabel.textContent = EXPRESSION_LABELS[appState.preset] || appState.preset;
+    DOM.expressionRevision.textContent = `REV ${appState.faceState.expressionRevision}`;
+    $$('#expressionDock button').forEach((button) => button.classList.toggle('active', button.dataset.expression === appState.preset));
+    FACE_CONTROL_DEFS.forEach((def) => {
+      const input = $(`input[data-control="${def.key}"]`, DOM.faceControls);
+      if (!input) return;
+      const value = def.channels.reduce((sum, channel) => sum + (appState.faceState.channels[channel] || 0), 0) / def.channels.length;
+      input.value = String(value);
+      input.style.setProperty('--fill', `${Math.round(value * 100)}%`);
+      const output = input.nextElementSibling;
+      if (output) output.textContent = value.toFixed(2);
+    });
+  }
+
+  function setExpression(name, suppliedState = null) {
+    const valid = Core.EXPRESSION_PRESETS[name] ? name : 'neutral';
+    appState.preset = suppliedState && suppliedState.preset ? suppliedState.preset : valid;
+    if (suppliedState) {
+      appState.faceState = JSON.parse(JSON.stringify(suppliedState));
+    } else {
+      const nextRevision = (appState.faceState.expressionRevision || 0) + 1;
+      appState.faceState = Core.createFaceState(valid, nextRevision);
+    }
+    appState.renderer && appState.renderer.setFaceState(appState.faceState);
+    syncFaceUI();
+  }
+
+  function updateMetrics({ attention, confidence, valence }) {
+    const att = clamp(attention == null ? 0.42 : attention);
+    const conf = clamp(confidence == null ? 0.78 : confidence);
+    const val = Math.max(-1, Math.min(1, Number(valence) || 0));
+    DOM.attentionBar.style.width = `${Math.round(att * 100)}%`;
+    DOM.attentionValue.textContent = `${Math.round(att * 100)}%`;
+    DOM.confidenceBar.style.width = `${Math.round(conf * 100)}%`;
+    DOM.confidenceValue.textContent = `${Math.round(conf * 100)}%`;
+    const width = Math.abs(val) * 50;
+    DOM.valenceBar.style.width = `${width}%`;
+    DOM.valenceBar.style.left = val >= 0 ? '50%' : `${50 - width}%`;
+    DOM.valenceBar.style.background = val >= 0
+      ? 'linear-gradient(90deg, rgba(111,255,195,.25), #6fffc3)'
+      : 'linear-gradient(90deg, #9a8cff, rgba(154,140,255,.25))';
+    DOM.valenceValue.textContent = `${val >= 0 ? '+' : ''}${val.toFixed(2)}`;
+  }
+
+  function resetGraph() {
+    $$('[data-node]', DOM.cognitionGraph).forEach((node) => node.classList.remove('active', 'complete'));
+  }
+
+  async function animateTrace(trace) {
+    resetGraph();
+    const start = performance.now();
+    DOM.cycleStatus.textContent = 'PROCESSING';
+    DOM.latencyStatus.textContent = 'RUNNING';
+    for (const event of trace) {
+      const node = $(`[data-node="${event.stage}"]`, DOM.cognitionGraph);
+      if (!node) continue;
+      $$('[data-node].active', DOM.cognitionGraph).forEach((item) => {
+        item.classList.remove('active');
+        item.classList.add('complete');
+      });
+      node.classList.add('active');
+      await sleep(reducedMotion ? 12 : 72);
+    }
+    $$('[data-node].active', DOM.cognitionGraph).forEach((item) => {
+      item.classList.remove('active');
+      item.classList.add('complete');
+    });
+    const elapsed = Math.round(performance.now() - start);
+    DOM.latencyStatus.textContent = `${elapsed} MS`;
+    DOM.cycleStatus.textContent = 'READY';
+  }
+
+  function updateDecision(result) {
+    const record = result.decisionRecord;
+    DOM.decisionIntent.textContent = record.intent && record.intent.type ? record.intent.type : 'unknown';
+    DOM.decisionAction.textContent = record.selectedAction;
+    DOM.decisionConfidence.textContent = record.confidence.toFixed(2);
+    DOM.decisionUncertainty.textContent = record.uncertainty.toFixed(2);
+    DOM.appliedRules.innerHTML = '';
+    record.principlesApplied.forEach((id) => {
+      const tag = document.createElement('span');
+      tag.textContent = PRINCIPLE_LABELS[id] || id;
+      DOM.appliedRules.appendChild(tag);
+    });
+  }
+
+  function addMessage(role, content, metadata = {}) {
+    const article = document.createElement('article');
+    article.className = `message ${role}`;
+    const avatar = role === 'user' ? 'YOU' : role === 'system' ? 'SYS' : 'JVS';
+    const body = document.createElement('div');
+    body.className = 'message-body';
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'message-avatar';
+    avatarEl.textContent = avatar;
+    if (role === 'user') {
+      article.appendChild(body);
+      article.appendChild(avatarEl);
+    } else {
+      article.appendChild(avatarEl);
+      article.appendChild(body);
+    }
+    const textEl = document.createElement('div');
+    textEl.className = 'message-text';
+    textEl.textContent = content;
+    body.appendChild(textEl);
+
+    if (metadata.intent || metadata.confidence != null) {
+      const meta = document.createElement('div');
+      meta.className = 'message-meta';
+      const tags = document.createElement('div');
+      tags.className = 'message-tags';
+      if (metadata.intent) tags.innerHTML += `<span>${escapeHtml(metadata.intent)}</span>`;
+      if (metadata.blocked) tags.innerHTML += '<span>善良闸门</span>';
+      meta.appendChild(tags);
+      const conf = document.createElement('span');
+      conf.textContent = metadata.confidence == null ? '' : `CONF ${Number(metadata.confidence).toFixed(2)}`;
+      meta.appendChild(conf);
+      body.appendChild(meta);
+    }
+    DOM.chatMessages.appendChild(article);
+    DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
+    return { article, textEl };
+  }
+
+  async function addAssistantMessage(content, metadata = {}) {
+    const message = addMessage('assistant', '', metadata);
+    appState.renderer && appState.renderer.setSpeaking(true);
+    if (reducedMotion || content.length < 30) {
+      message.textEl.textContent = content;
+    } else {
+      const chunk = content.length > 260 ? 4 : content.length > 120 ? 3 : 2;
+      for (let index = 0; index < content.length; index += chunk) {
+        message.textEl.textContent = content.slice(0, index + chunk);
+        DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
+        await sleep(10);
+      }
+    }
+    if (!appState.voiceOutput) appState.renderer && appState.renderer.setSpeaking(false);
+    speak(content);
+  }
+
+  async function handleInput(rawText) {
+    const text = Core.normalizeText(rawText);
+    if (!text || appState.processing) return;
+    appState.processing = true;
+    DOM.chatInput.value = '';
+    autoSizeTextarea();
+    addMessage('user', text);
+    setExpression('thinking');
+    DOM.cycleStatus.textContent = 'PROCESSING';
+    const result = cognition.process(text, { interface: 'jarvis_workbench', modality: 'text' });
+    appState.lastResult = result;
+    await animateTrace(result.trace);
+    setExpression(result.expression, result.faceState);
+    updateMetrics({
+      attention: clamp(0.56 + result.sentiment.arousal * 0.32),
+      confidence: result.confidence,
+      valence: result.sentiment.valence,
+    });
+    updateDecision(result);
+    renderMemories();
+    await addAssistantMessage(result.response, {
+      intent: result.intent.type,
+      confidence: result.confidence,
+      blocked: result.risk.blocked,
+    });
+    appState.processing = false;
+  }
+
+  function speak(text) {
+    if (!appState.voiceOutput || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
+    utterance.rate = 1.02;
+    utterance.pitch = 0.88;
+    utterance.volume = 0.86;
+    utterance.onstart = () => appState.renderer && appState.renderer.setSpeaking(true);
+    utterance.onend = () => appState.renderer && appState.renderer.setSpeaking(false);
+    utterance.onerror = () => appState.renderer && appState.renderer.setSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function setupVoiceInput() {
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Recognition) {
+      DOM.voiceInputButton.title = '当前浏览器不支持语音识别';
+      return;
+    }
+    const recognition = new Recognition();
+    recognition.lang = 'zh-CN';
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.onstart = () => {
+      appState.recognitionActive = true;
+      DOM.voiceInputButton.setAttribute('aria-pressed', 'true');
+      DOM.voiceInputButton.title = '正在聆听';
+      setExpression('attentive');
+    };
+    recognition.onresult = (event) => {
+      let finalText = '';
+      let interimText = '';
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const transcript = event.results[index][0].transcript;
+        if (event.results[index].isFinal) finalText += transcript;
+        else interimText += transcript;
+      }
+      DOM.chatInput.value = finalText || interimText;
+      autoSizeTextarea();
+      if (finalText) handleInput(finalText);
+    };
+    recognition.onend = () => {
+      appState.recognitionActive = false;
+      DOM.voiceInputButton.setAttribute('aria-pressed', 'false');
+      DOM.voiceInputButton.title = '语音输入';
+    };
+    recognition.onerror = (event) => {
+      toast(`语音识别未完成：${event.error}`, 'error');
+    };
+    appState.recognition = recognition;
+    DOM.voiceInputButton.addEventListener('click', () => {
+      if (appState.recognitionActive) recognition.stop();
+      else {
+        try { recognition.start(); } catch (_) {}
+      }
+    });
+  }
+
+  function autoSizeTextarea() {
+    DOM.chatInput.style.height = 'auto';
+    DOM.chatInput.style.height = `${Math.min(94, Math.max(26, DOM.chatInput.scrollHeight))}px`;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function downloadJson(filename, data) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function closeDrawers() {
+    DOM.leftPanel.classList.remove('open');
+    DOM.rightPanel.classList.remove('open');
+    DOM.drawerBackdrop.classList.remove('open');
+  }
+
+  function toggleDrawer(which) {
+    const target = which === 'left' ? DOM.leftPanel : DOM.rightPanel;
+    const other = which === 'left' ? DOM.rightPanel : DOM.leftPanel;
+    const open = !target.classList.contains('open');
+    other.classList.remove('open');
+    target.classList.toggle('open', open);
+    DOM.drawerBackdrop.classList.toggle('open', open);
+  }
+
+  function setupEvents() {
+    DOM.chatForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      handleInput(DOM.chatInput.value);
+    });
+    DOM.chatInput.addEventListener('input', autoSizeTextarea);
+    DOM.chatInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        DOM.chatForm.requestSubmit();
+      }
+    });
+    DOM.expressionDock.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-expression]');
+      if (!button) return;
+      setExpression(button.dataset.expression);
+    });
+    DOM.resetFaceButton.addEventListener('click', () => {
+      setExpression(appState.preset === 'custom' ? 'neutral' : appState.preset);
+    });
+    DOM.seedMemoryButton.addEventListener('click', () => {
+      const samples = [
+        '用户希望贾维斯保持善良、诚实并尊重隐私。',
+        '当前项目只研究感知、记忆、思考与决策，不接入运动控制。',
+        '量子面孔是认知状态的可视化界面。',
+      ];
+      samples.forEach((content) => memoryStore.addMemory(content, { type: 'semantic', tags: ['项目基线'], salience: 0.72 }));
+      renderMemories();
+      toast('已添加三条本地示例记忆。', 'success');
+    });
+    DOM.clearMemoryButton.addEventListener('click', () => {
+      if (!window.confirm('确认清空当前浏览器中的全部长期记忆和未来承诺？')) return;
+      memoryStore.clearMemories();
+      renderMemories();
+      toast('长期记忆已清空。', 'success');
+    });
+    DOM.clearChatButton.addEventListener('click', () => {
+      DOM.chatMessages.innerHTML = '';
+      addMessage('system', '对话显示已清空。长期记忆保持不变。');
+    });
+    DOM.exampleButton.addEventListener('click', () => {
+      DOM.chatInput.value = examples[appState.exampleIndex % examples.length];
+      appState.exampleIndex += 1;
+      autoSizeTextarea();
+      DOM.chatInput.focus();
+    });
+    DOM.voiceOutputButton.addEventListener('click', () => {
+      appState.voiceOutput = !appState.voiceOutput;
+      DOM.voiceOutputButton.setAttribute('aria-pressed', String(appState.voiceOutput));
+      if (!appState.voiceOutput && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        appState.renderer && appState.renderer.setSpeaking(false);
+      }
+      toast(appState.voiceOutput ? '语音输出已开启。' : '语音输出已关闭。', 'success');
+    });
+    DOM.exportButton.addEventListener('click', () => {
+      const payload = {
+        schema: 'world_human/jarvis_workbench_export@1.0',
+        version: Core.VERSION,
+        exportedAt: new Date().toISOString(),
+        rendererMode: appState.rendererMode,
+        faceState: appState.faceState,
+        cognition: cognition.getState(),
+        lastResult: appState.lastResult,
+        embodimentBoundary: {
+          mode: 'semantic_only',
+          excluded: ['skeleton', 'joint_angle', 'trajectory', 'gait', 'torque', 'motor', 'actuator'],
+        },
+      };
+      downloadJson(`JARVIS_COGNITIVE_STATE_${new Date().toISOString().replace(/[:.]/g, '-')}.json`, payload);
+      toast('认知状态 JSON 已导出。', 'success');
+    });
+    DOM.leftDrawerButton.addEventListener('click', () => toggleDrawer('left'));
+    DOM.rightDrawerButton.addEventListener('click', () => toggleDrawer('right'));
+    DOM.drawerBackdrop.addEventListener('click', closeDrawers);
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeDrawers();
+    });
+  }
+
+  /*__SOURCE:visual/ParticleFace.js__*/
+
+  async function initRenderer() {
+    try {
+      appState.renderer = new window.JarvisParticleFace.Renderer(DOM.canvasHost);
+      appState.rendererMode = 'native-webgl-flow-ribbons';
+      DOM.rendererStatus.textContent = 'JARVIS / FLOW PRESENCE';
+      DOM.rendererStatusDot.className = 'ready';
+      appState.renderer.setFaceState(appState.faceState);
+    } catch (error) {
+      appState.renderer = null;
+      appState.rendererMode = 'unavailable';
+      DOM.rendererStatus.textContent = 'WEBGL UNAVAILABLE';
+      DOM.canvasHost.textContent = '流光形象暂不可用，语言与人物控制仍然可用。';
+      console.warn('Flow presence unavailable', error.message);
+    }
+  }
+
+  function runSelfCheck() {
+    const checks = [];
+    checks.push({ name: 'constitution_locked', pass: Object.isFrozen(Core.CONSTITUTION) && Core.CONSTITUTION.every(Object.isFrozen) });
+    checks.push({ name: 'kindness_rule_present', pass: Core.CONSTITUTION.some((rule) => rule.id === 'KINDNESS_INVARIANT' && rule.immutable) });
+    checks.push({ name: 'face_contract', pass: appState.faceState.schema === Core.FACE_SCHEMA && Core.FACE_CHANNELS.every((channel) => channel in appState.faceState.channels) });
+    checks.push({ name: 'embodiment_boundary', pass: Core.CONSTITUTION.some((rule) => rule.id === 'EMBODIMENT_BOUNDARY') });
+    const failed = checks.filter((check) => !check.pass);
+    if (failed.length) {
+      toast(`自检发现 ${failed.length} 项异常。`, 'error', 5000);
+      console.error('Self check failed', failed);
+    } else {
+      console.info('JARVIS self check passed', checks);
+    }
+    return checks;
+  }
+
+  async function bootstrap() {
+    renderConstitution();
+    renderMemories();
+    renderFaceControls();
+    setupEvents();
+    setupVoiceInput();
+    updateClock();
+    window.setInterval(updateClock, 1000);
+    updateMetrics({ attention: 0.42, confidence: 0.78, valence: 0.08 });
+    await initRenderer();
+    runSelfCheck();
+    addMessage('assistant', '你好，我是贾维斯。我的善良约束已锁定，记忆保存在当前浏览器。你可以让我理解一句话、记住信息、检查规则，或形成高层行为意图。', {
+      intent: 'system_ready',
+      confidence: 0.99,
+    });
+    window.setTimeout(() => DOM.chatInput.focus(), 320);
+    window.__JARVIS_APP__ = {
+      version: Core.VERSION,
+      cognition,
+      memoryStore,
+      get state() { return appState; },
+      setExpression,
+      handleInput,
+      exportState: () => cognition.getState(),
+    };
+  }
+
+  bootstrap().catch((error) => {
+    console.error(error);
+    DOM.rendererStatus.textContent = 'INITIALIZATION ERROR';
+    toast(`初始化失败：${error.message}`, 'error', 8000);
+  });
+})();
+
+</script>
+</body>
+</html>
