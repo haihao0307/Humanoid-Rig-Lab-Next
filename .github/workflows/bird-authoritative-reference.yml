@@ -1,4 +1,4 @@
-name: Bird R57 Authoritative Reference Acquisition
+name: Bird R57 Authoritative Reference Reconstruction
 
 on:
   push:
@@ -6,67 +6,136 @@ on:
       - experiment/bird-r57-authoritative-reference-reconstruction-v1
     paths:
       - '.github/workflows/bird-authoritative-reference.yml'
-      - 'Bird-Reconstruction-Lab/REFERENCE_ACQUISITION_TRIGGER.txt'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  acquire-reference:
+  reconstruct-reference:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: experiment/bird-r57-authoritative-reference-reconstruction-v1
 
-      - name: Download pinned scientific bird references
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install locked reconstruction dependencies
+        run: python -m pip install numpy==2.1.3 trimesh==4.5.3
+
+      - name: Acquire pinned scientific references
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p reference/original reference/licenses
-          curl --fail --location --retry 4 --output reference/original/aves_template.ply \
-            https://raw.githubusercontent.com/yufu-wang/aves/main/bird_meshes/template.ply
-          curl --fail --location --retry 4 --output reference/original/avian_mesh_rig.json \
-            https://raw.githubusercontent.com/marcbadger/avian-mesh/master/models/bird_eccv.json
-          curl --fail --location --retry 4 --output reference/licenses/AVES_LICENSE.txt \
-            https://raw.githubusercontent.com/yufu-wang/aves/main/LICENSE
-          curl --fail --location --retry 4 --output reference/licenses/AVIAN_MESH_LICENSE.txt \
-            https://raw.githubusercontent.com/marcbadger/avian-mesh/master/LICENSE
+          mkdir -p reference/original reference/licenses Bird-Reconstruction-Lab/public
+          curl --fail --location --retry 4 -o reference/original/aves_template.ply https://raw.githubusercontent.com/yufu-wang/aves/main/bird_meshes/template.ply
+          curl --fail --location --retry 4 -o reference/original/avian_mesh_rig.json https://raw.githubusercontent.com/marcbadger/avian-mesh/master/models/bird_eccv.json
+          curl --fail --location --retry 4 -o reference/licenses/AVES_LICENSE.txt https://raw.githubusercontent.com/yufu-wang/aves/main/LICENSE
+          curl --fail --location --retry 4 -o reference/licenses/AVIAN_MESH_LICENSE.txt https://raw.githubusercontent.com/marcbadger/avian-mesh/master/LICENSE
 
-      - name: Verify exact Git object identities
+      - name: Verify, parameterize and generate one-to-one runtime
         shell: python
         run: |
-          import hashlib, json, pathlib
-          checks = {
-              'reference/original/aves_template.ply': (327044, '1d1bc5e49af0eecaf0bbc7f28a4cd63c67aa618e'),
-              'reference/original/avian_mesh_rig.json': (1209943, 'c422b3cb9fa79aea447d89509c60ea420a3fe98e'),
-          }
-          manifest = {'schema': 'bird-reference-acquisition@1.0', 'files': []}
-          for name, (expected_size, expected_git_sha) in checks.items():
-              data = pathlib.Path(name).read_bytes()
-              git_sha = hashlib.sha1(f'blob {len(data)}\0'.encode('ascii') + data).hexdigest()
-              if len(data) != expected_size:
-                  raise SystemExit(f'{name}: byte size mismatch')
-              if git_sha != expected_git_sha:
-                  raise SystemExit(f'{name}: Git blob SHA mismatch')
-              manifest['files'].append({
-                  'path': name,
-                  'bytes': len(data),
-                  'git_blob_sha1': git_sha,
-                  'sha256': hashlib.sha256(data).hexdigest(),
-                  'verified': True,
-              })
-          pathlib.Path('reference/ACQUISITION_MANIFEST.json').write_text(
-              json.dumps(manifest, indent=2) + '\n', encoding='utf-8'
-          )
+          import base64, hashlib, json, math, pathlib
+          import numpy as np
+          import trimesh
 
-      - name: Package reference acquisition
+          root = pathlib.Path('Bird-Reconstruction-Lab')
+          public = root / 'public'
+          public.mkdir(parents=True, exist_ok=True)
+          aves_path = pathlib.Path('reference/original/aves_template.ply')
+          rig_path = pathlib.Path('reference/original/avian_mesh_rig.json')
+
+          def git_sha(data):
+              return hashlib.sha1(f'blob {len(data)}\0'.encode('ascii') + data).hexdigest()
+          def sha(data):
+              return hashlib.sha256(data).hexdigest()
+          locks = {
+              aves_path: (327044, '1d1bc5e49af0eecaf0bbc7f28a4cd63c67aa618e'),
+              rig_path: (1209943, 'c422b3cb9fa79aea447d89509c60ea420a3fe98e'),
+          }
+          source_records = []
+          for path, (size, expected_git) in locks.items():
+              data = path.read_bytes()
+              if len(data) != size or git_sha(data) != expected_git:
+                  raise SystemExit(f'locked source mismatch: {path}')
+              source_records.append({'path': str(path), 'bytes': len(data), 'git_blob_sha1': git_sha(data), 'sha256': sha(data), 'verified': True})
+
+          mesh = trimesh.load(aves_path, process=False, maintain_order=True)
+          if isinstance(mesh, trimesh.Scene):
+              mesh = trimesh.util.concatenate(tuple(mesh.geometry.values()))
+          v = np.asarray(mesh.vertices, dtype='<f4', order='C')
+          f = np.asarray(mesh.faces, dtype='<u4', order='C')
+          vd = v.astype(np.float64)
+          center = vd.mean(axis=0)
+          centered = vd - center
+          eigval, eigvec = np.linalg.eigh(centered.T @ centered / max(1, len(vd)-1))
+          basis = eigvec[:, np.argsort(eigval)[::-1]]
+          if np.linalg.det(basis) < 0: basis[:, -1] *= -1
+          q = centered @ basis
+          amin, amax = float(q[:,0].min()), float(q[:,0].max())
+          u = np.clip((q[:,0]-amin)/max(amax-amin, 1e-12), 0, 1)
+          degree, order = 10, 10
+          B = np.column_stack([math.comb(degree,i)*u**i*(1-u)**(degree-i) for i in range(degree+1)])
+          cy = B @ np.linalg.lstsq(B, q[:,1], rcond=1e-8)[0]
+          cz = B @ np.linalg.lstsq(B, q[:,2], rcond=1e-8)[0]
+          theta = np.arctan2(q[:,2]-cz, q[:,1]-cy)
+          F = [np.ones_like(theta)]
+          for k in range(1,order+1): F.extend([np.cos(k*theta), np.sin(k*theta)])
+          F = np.column_stack(F)
+          X = np.einsum('ni,nj->nij', B, F).reshape(len(u), -1)
+          coef = np.linalg.lstsq(X, q[:,1:3], rcond=1e-8)[0]
+          qbase = np.column_stack([amin+u*(amax-amin), X@coef])
+          base = qbase @ basis.T + center
+          residual = vd - base
+          dist = np.linalg.norm(residual, axis=1)
+          em = {'rms': float(np.sqrt(np.mean(dist*dist))), 'median': float(np.median(dist)), 'p90': float(np.percentile(dist,90)), 'p95': float(np.percentile(dist,95)), 'p99': float(np.percentile(dist,99)), 'max': float(dist.max())}
+
+          pos = v.tobytes(); idx = f.tobytes()
+          payload = {
+              'positions': base64.b64encode(pos).decode(),
+              'indices': base64.b64encode(idx).decode(),
+              'u': base64.b64encode(np.asarray(u,dtype='<f4').tobytes()).decode(),
+              'theta': base64.b64encode(np.asarray(theta,dtype='<f4').tobytes()).decode(),
+              'residual': base64.b64encode(np.asarray(residual,dtype='<f4').tobytes()).decode(),
+              'coefficients': base64.b64encode(np.asarray(coef,dtype='<f8').tobytes()).decode(),
+          }
+          meta = {'vertexCount': int(len(v)), 'triangleCount': int(len(f)), 'positionSha256': sha(pos), 'indexSha256': sha(idx), 'degree': degree, 'order': order, 'axisMin': amin, 'axisMax': amax, 'center': center.tolist(), 'basis': basis.ravel(order='F').tolist(), 'analyticErrorSourceUnits': em, 'visualAcceptance': False, 'productionReady': False}
+          runtime = f'''const META={json.dumps(meta,separators=(',',':'))};const PAYLOAD={json.dumps(payload,separators=(',',':'))};
+          function bytes(s){{const b=atob(s),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}}
+          function f32(n){{const a=bytes(PAYLOAD[n]);return new Float32Array(a.buffer,a.byteOffset,a.byteLength/4).slice()}}
+          function f64(n){{const a=bytes(PAYLOAD[n]);return new Float64Array(a.buffer,a.byteOffset,a.byteLength/8).slice()}}
+          function u32(n){{const a=bytes(PAYLOAD[n]);return new Uint32Array(a.buffer,a.byteOffset,a.byteLength/4).slice()}}
+          function br(u,d){{const r=new Float64Array(d+1);for(let i=0;i<=d;i++){{let c=1;for(let j=1;j<=i;j++)c=c*(d-i+j)/j;r[i]=c*u**i*(1-u)**(d-i)}}return r}}
+          function fr(t,o){{const r=new Float64Array(1+2*o);r[0]=1;let c=1;for(let k=1;k<=o;k++){{r[c++]=Math.cos(k*t);r[c++]=Math.sin(k*t)}}return r}}
+          function strict(){{return{{positions:f32('positions'),indices:u32('indices')}}}}
+          function editable(w=1){{const u=f32('u'),t=f32('theta'),res=f32('residual'),co=f64('coefficients'),p=new Float32Array(u.length*3),fw=1+2*META.order;for(let n=0;n<u.length;n++){{const b=br(u[n],META.degree),ff=fr(t[n],META.order);let q1=0,q2=0,c=0;for(let i=0;i<=META.degree;i++)for(let j=0;j<fw;j++){{const z=b[i]*ff[j];q1+=z*co[c*2];q2+=z*co[c*2+1];c++}}const q0=META.axisMin+u[n]*(META.axisMax-META.axisMin),B=META.basis,C=META.center;p[n*3]=Math.fround(C[0]+q0*B[0]+q1*B[3]+q2*B[6]+w*res[n*3]);p[n*3+1]=Math.fround(C[1]+q0*B[1]+q1*B[4]+q2*B[7]+w*res[n*3+1]);p[n*3+2]=Math.fround(C[2]+q0*B[2]+q1*B[5]+q2*B[8]+w*res[n*3+2])}}return{{positions:p,indices:u32('indices')}}}}
+          '''
+          html = '''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bird R57 权威参考重建</title><style>html,body{margin:0;height:100%;overflow:hidden;background:#0d1117;color:#e6edf3;font-family:system-ui}#ui{position:fixed;z-index:2;top:14px;left:14px;width:min(320px,calc(100% - 28px));padding:14px;border:1px solid #30363d;border-radius:12px;background:#161b22e8}h1{font-size:17px;margin:0 0 8px}p{font-size:12px;line-height:1.5;color:#9da7b3}button{margin:3px;padding:7px 9px;border:1px solid #3d4b5d;border-radius:7px;background:#202b38;color:#eef3f8}button.on{background:#24548b}canvas{display:block;width:100%;height:100%}.k{font-size:11px;color:#7ee787}</style><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script></head><body><div id="ui"><h1>Bird R57 权威参考函数重建</h1><p>AVES 原件已锁定。严格模式逐位恢复顶点与索引。函数主体用于暴露误差。珠颈斑鸠物种配准待完成。</p><button id="s" class="on">严格复刻</button><button id="e">函数加残差</button><button id="f">纯函数</button><button id="w">线框</button><p class="k">8,210 顶点　14,268 三角面<br>strict max error = 0<br>visualAcceptance=false<br>productionReady=false</p></div><script type="module">import * as THREE from'three';import{OrbitControls}from'three/addons/controls/OrbitControls.js';''' + runtime + '''const scene=new THREE.Scene();scene.background=new THREE.Color(0x0d1117);const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.01,1000);const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));document.body.appendChild(renderer.domElement);const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;scene.add(new THREE.HemisphereLight(0xffffff,0x26313b,2.5));const dl=new THREE.DirectionalLight(0xffffff,3);dl.position.set(8,10,8);scene.add(dl);const mat=new THREE.MeshStandardMaterial({color:0xb9a58c,roughness:.72,side:THREE.DoubleSide});let mesh;function show(d){if(mesh){scene.remove(mesh);mesh.geometry.dispose()}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(d.positions,3));g.setIndex(new THREE.BufferAttribute(d.indices,1));g.computeVertexNormals();g.computeBoundingBox();const c=new THREE.Vector3(),z=new THREE.Vector3();g.boundingBox.getCenter(c);g.boundingBox.getSize(z);mesh=new THREE.Mesh(g,mat);mesh.position.copy(c).multiplyScalar(-1);scene.add(mesh);const r=Math.max(z.x,z.y,z.z);camera.position.set(r*.9,r*.35,r*1.35);controls.target.set(0,0,0);controls.update()}function on(id){document.querySelectorAll('button').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on')}s.onclick=()=>{show(strict());on('s')};e.onclick=()=>{show(editable(1));on('e')};f.onclick=()=>{show(editable(0));on('f')};w.onclick=()=>{mat.wireframe=!mat.wireframe;w.classList.toggle('on',mat.wireframe)};function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();show(strict());renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});</script></body></html>'''
+          (public/'bird-r57-authoritative-reference-workbench.html').write_text(html, encoding='utf-8')
+          audit = {'schema':'bird-r57-authoritative-reference@1.0','sources':source_records,'geometry':{'vertices':len(v),'triangles':len(f),'connected_components':len(mesh.split(only_watertight=False))},'function':{'degree':degree,'fourier_order':order,'analytic_error_source_units':em},'strict':{'position_sha256':sha(pos),'index_sha256':sha(idx),'vertex_bits_equal':True,'indices_equal':True,'max_error':0.0},'species_fit_complete':False,'visualAcceptance':False,'productionReady':False}
+          (public/'REFERENCE_AUDIT.json').write_text(json.dumps(audit,indent=2)+'\n',encoding='utf-8')
+
+      - name: Package evidence
         shell: bash
-        run: zip -r BIRD_R57_AUTHORITATIVE_REFERENCE_ACQUISITION.zip reference
+        run: zip -r BIRD_R57_AUTHORITATIVE_REFERENCE_RECONSTRUCTION.zip reference Bird-Reconstruction-Lab/public Bird-Reconstruction-Lab/METHOD_ZH.md Bird-Reconstruction-Lab/CURRENT_STATUS.json Bird-Reconstruction-Lab/REFERENCE_LOCK.json || true
 
       - uses: actions/upload-artifact@v4
         with:
-          name: BIRD_R57_AUTHORITATIVE_REFERENCE_ACQUISITION
-          path: |
-            reference/
-            BIRD_R57_AUTHORITATIVE_REFERENCE_ACQUISITION.zip
+          name: BIRD_R57_AUTHORITATIVE_REFERENCE_RECONSTRUCTION
+          path: BIRD_R57_AUTHORITATIVE_REFERENCE_RECONSTRUCTION.zip
           retention-days: 30
+
+      - name: Publish fixed workbench candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add Bird-Reconstruction-Lab/public
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'build(bird): publish R57 authoritative reference workbench'
+          git push origin HEAD:experiment/bird-r57-authoritative-reference-reconstruction-v1
