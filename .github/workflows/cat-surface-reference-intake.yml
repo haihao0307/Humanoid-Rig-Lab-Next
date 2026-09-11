@@ -26,10 +26,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install objaverse trimesh pygltflib numpy matplotlib pillow requests networkx scipy
 
-      - name: Download and inspect locked CC BY body candidate
+      - name: Download and inspect selected CC BY body candidate
         run: |
           set -euo pipefail
-          mkdir -p reference-intake/cat-surface-v3
+          mkdir -p reference-intake/cat-surface-v4
           python - <<'PY'
           from pathlib import Path
           import hashlib
@@ -43,8 +43,8 @@ jobs:
           from PIL import Image
           from io import BytesIO
 
-          UID = 'b1ec7fdcf0874e64ada6dbd13e8a66b4'
-          OUT = Path('reference-intake/cat-surface-v3')
+          UID = '28d33c1592e14d8b895d36a1e0dfaa5d'
+          OUT = Path('reference-intake/cat-surface-v4')
           OUT.mkdir(parents=True, exist_ok=True)
 
           response = requests.get(f'https://api.sketchfab.com/v3/models/{UID}', timeout=45)
@@ -59,14 +59,14 @@ jobs:
               thumb_response = requests.get(best['url'], timeout=45)
               thumb_response.raise_for_status()
               Image.open(BytesIO(thumb_response.content)).convert('RGB').save(
-                  OUT / 'REFERENCE_OFFICIAL_THUMBNAIL.jpg', quality=94)
+                  OUT / 'REFERENCE_OFFICIAL_THUMBNAIL.jpg', quality=95)
 
           downloaded = objaverse.load_objects(uids=[UID], download_processes=1)
           if UID not in downloaded:
               raise RuntimeError(f'Objaverse has no downloadable object for {UID}')
           source_path = Path(downloaded[UID])
           suffix = source_path.suffix.lower() or '.glb'
-          preserved = OUT / f'cat-emma-reference-{UID}{suffix}'
+          preserved = OUT / f'my-cat-modeled-reference-{UID}{suffix}'
           shutil.copy2(source_path, preserved)
 
           sha = hashlib.sha256(preserved.read_bytes()).hexdigest()
@@ -92,7 +92,8 @@ jobs:
                   'vertexCount': int(len(geom.vertices)),
                   'triangleCount': int(len(geom.faces)),
                   'bounds': geom.bounds.tolist(),
-                  'watertight': bool(geom.is_watertight)
+                  'watertight': bool(geom.is_watertight),
+                  'eulerNumber': int(geom.euler_number)
               })
           combined = trimesh.util.concatenate(meshes)
           vertices = np.asarray(combined.vertices, dtype=np.float64)
@@ -108,18 +109,18 @@ jobs:
               ('A/B', 0, 1, 2), ('A/C', 0, 2, 1), ('B/C', 1, 2, 0),
               ('B/A', 1, 0, 2), ('C/A', 2, 0, 1), ('C/B', 2, 1, 0)
           ]
-          fig, axes = plt.subplots(2, 3, figsize=(15, 9), dpi=160)
-          stride = max(1, len(principal) // 160000)
+          fig, axes = plt.subplots(2, 3, figsize=(15, 9), dpi=180)
+          stride = max(1, len(principal) // 180000)
           pts = principal[::stride]
           for ax, (title, xi, yi, di) in zip(axes.flat, views):
               depth = pts[:, di]
               depth_order = np.argsort(depth)
               ax.scatter(pts[depth_order, xi], pts[depth_order, yi],
-                         c=depth[depth_order], s=0.10, linewidths=0, cmap='viridis')
+                         c=depth[depth_order], s=0.12, linewidths=0, cmap='viridis')
               ax.set_aspect('equal', adjustable='box')
               ax.set_title(title)
               ax.axis('off')
-          fig.suptitle('Actual downloaded body candidate: The Cat / Emma A1', fontsize=16)
+          fig.suptitle('Actual downloaded candidate: My Cat Modeled', fontsize=16)
           fig.tight_layout()
           fig.savefig(OUT / 'REFERENCE_SURFACE_MULTIVIEW.png', bbox_inches='tight')
           plt.close(fig)
@@ -131,7 +132,7 @@ jobs:
               'uid': UID,
               'title': metadata.get('name'),
               'author': (metadata.get('user') or {}).get('displayName') or (metadata.get('user') or {}).get('username'),
-              'sourcePage': f'https://sketchfab.com/3d-models/the-catemma-a1-{UID}',
+              'sourcePage': f'https://sketchfab.com/3d-models/my-cat-modeled-{UID}',
               'license': metadata.get('license'),
               'isDownloadable': metadata.get('isDownloadable'),
               'publishedAt': metadata.get('publishedAt'),
@@ -149,8 +150,9 @@ jobs:
               'principalExtents': extents.tolist(),
               'principalBasis': basis.tolist(),
               'visualEvidence': ['REFERENCE_OFFICIAL_THUMBNAIL.jpg', 'REFERENCE_SURFACE_MULTIVIEW.png'],
-              'role': 'candidate living-surface geometry for parameter recording and code reconstruction',
+              'role': 'selected candidate living-surface geometry for direct parameter recording and code reconstruction',
               'runtimeDependency': False,
+              'selectionStatus': 'pending-actual-visual-acceptance',
               'oneToOneAccepted': False,
               'productionReady': False
           }
@@ -162,16 +164,16 @@ jobs:
       - name: Validate artifact contents
         run: |
           set -euo pipefail
-          test -s reference-intake/cat-surface-v3/REFERENCE_SURFACE_RECEIPT.json
-          test -s reference-intake/cat-surface-v3/REFERENCE_OFFICIAL_THUMBNAIL.jpg
-          test -s reference-intake/cat-surface-v3/REFERENCE_SURFACE_MULTIVIEW.png
-          find reference-intake/cat-surface-v3 -maxdepth 1 -type f -printf '%f %s bytes\n'
+          test -s reference-intake/cat-surface-v4/REFERENCE_SURFACE_RECEIPT.json
+          test -s reference-intake/cat-surface-v4/REFERENCE_OFFICIAL_THUMBNAIL.jpg
+          test -s reference-intake/cat-surface-v4/REFERENCE_SURFACE_MULTIVIEW.png
+          find reference-intake/cat-surface-v4 -maxdepth 1 -type f -printf '%f %s bytes\n'
 
       - name: Upload surface reference artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cat-emma-surface-reference-v3
-          path: reference-intake/cat-surface-v3/
+          name: cat-my-modeled-surface-reference-v4
+          path: reference-intake/cat-surface-v4/
           if-no-files-found: error
           compression-level: 0
           retention-days: 7
