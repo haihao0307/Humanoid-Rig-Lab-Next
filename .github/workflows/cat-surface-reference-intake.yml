@@ -26,10 +26,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install objaverse trimesh pygltflib numpy matplotlib pillow requests networkx scipy
 
-      - name: Download one locked CC BY surface candidate
+      - name: Download and inspect locked CC BY body candidate
         run: |
           set -euo pipefail
-          mkdir -p reference-intake/cat-surface-v2
+          mkdir -p reference-intake/cat-surface-v3
           python - <<'PY'
           from pathlib import Path
           import hashlib
@@ -43,12 +43,11 @@ jobs:
           from PIL import Image
           from io import BytesIO
 
-          UID = '3da649dd14df43f4966b3a38577262fc'
-          OUT = Path('reference-intake/cat-surface-v2')
+          UID = 'b1ec7fdcf0874e64ada6dbd13e8a66b4'
+          OUT = Path('reference-intake/cat-surface-v3')
           OUT.mkdir(parents=True, exist_ok=True)
 
-          metadata_url = f'https://api.sketchfab.com/v3/models/{UID}'
-          response = requests.get(metadata_url, timeout=45)
+          response = requests.get(f'https://api.sketchfab.com/v3/models/{UID}', timeout=45)
           response.raise_for_status()
           metadata = response.json()
           (OUT / 'SKETCHFAB_METADATA.json').write_text(
@@ -63,9 +62,11 @@ jobs:
                   OUT / 'REFERENCE_OFFICIAL_THUMBNAIL.jpg', quality=94)
 
           downloaded = objaverse.load_objects(uids=[UID], download_processes=1)
+          if UID not in downloaded:
+              raise RuntimeError(f'Objaverse has no downloadable object for {UID}')
           source_path = Path(downloaded[UID])
           suffix = source_path.suffix.lower() or '.glb'
-          preserved = OUT / f'realistic-siamese-cat-reference-{UID}{suffix}'
+          preserved = OUT / f'cat-emma-reference-{UID}{suffix}'
           shutil.copy2(source_path, preserved)
 
           sha = hashlib.sha256(preserved.read_bytes()).hexdigest()
@@ -73,18 +74,21 @@ jobs:
           scene = trimesh.Scene(loaded) if isinstance(loaded, trimesh.Trimesh) else loaded
 
           meshes = []
+          names = []
           for node_name in scene.graph.nodes_geometry:
               transform, geom_name = scene.graph[node_name]
               geom = scene.geometry[geom_name].copy()
               geom.apply_transform(transform)
               meshes.append(geom)
+              names.append({'node': str(node_name), 'geometry': str(geom_name)})
           if not meshes:
               raise RuntimeError('No mesh geometry found in downloaded reference')
 
           geometry_inventory = []
-          for index, geom in enumerate(meshes):
+          for index, (geom, names_entry) in enumerate(zip(meshes, names)):
               geometry_inventory.append({
                   'index': index,
+                  **names_entry,
                   'vertexCount': int(len(geom.vertices)),
                   'triangleCount': int(len(geom.faces)),
                   'bounds': geom.bounds.tolist(),
@@ -111,11 +115,11 @@ jobs:
               depth = pts[:, di]
               depth_order = np.argsort(depth)
               ax.scatter(pts[depth_order, xi], pts[depth_order, yi],
-                         c=depth[depth_order], s=0.08, linewidths=0, cmap='viridis')
+                         c=depth[depth_order], s=0.10, linewidths=0, cmap='viridis')
               ax.set_aspect('equal', adjustable='box')
               ax.set_title(title)
               ax.axis('off')
-          fig.suptitle('Actual downloaded surface candidate: Realistic Siamese Cat', fontsize=16)
+          fig.suptitle('Actual downloaded body candidate: The Cat / Emma A1', fontsize=16)
           fig.tight_layout()
           fig.savefig(OUT / 'REFERENCE_SURFACE_MULTIVIEW.png', bbox_inches='tight')
           plt.close(fig)
@@ -127,7 +131,7 @@ jobs:
               'uid': UID,
               'title': metadata.get('name'),
               'author': (metadata.get('user') or {}).get('displayName') or (metadata.get('user') or {}).get('username'),
-              'sourcePage': f'https://sketchfab.com/3d-models/realistic-siamese-cat-3d-model-{UID}',
+              'sourcePage': f'https://sketchfab.com/3d-models/the-catemma-a1-{UID}',
               'license': metadata.get('license'),
               'isDownloadable': metadata.get('isDownloadable'),
               'publishedAt': metadata.get('publishedAt'),
@@ -158,16 +162,16 @@ jobs:
       - name: Validate artifact contents
         run: |
           set -euo pipefail
-          test -s reference-intake/cat-surface-v2/REFERENCE_SURFACE_RECEIPT.json
-          test -s reference-intake/cat-surface-v2/REFERENCE_OFFICIAL_THUMBNAIL.jpg
-          test -s reference-intake/cat-surface-v2/REFERENCE_SURFACE_MULTIVIEW.png
-          find reference-intake/cat-surface-v2 -maxdepth 1 -type f -printf '%f %s bytes\n'
+          test -s reference-intake/cat-surface-v3/REFERENCE_SURFACE_RECEIPT.json
+          test -s reference-intake/cat-surface-v3/REFERENCE_OFFICIAL_THUMBNAIL.jpg
+          test -s reference-intake/cat-surface-v3/REFERENCE_SURFACE_MULTIVIEW.png
+          find reference-intake/cat-surface-v3 -maxdepth 1 -type f -printf '%f %s bytes\n'
 
       - name: Upload surface reference artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cat-realistic-siamese-surface-reference-v2
-          path: reference-intake/cat-surface-v2/
+          name: cat-emma-surface-reference-v3
+          path: reference-intake/cat-surface-v3/
           if-no-files-found: error
           compression-level: 0
           retention-days: 7
