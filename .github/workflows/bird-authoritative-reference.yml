@@ -1,0 +1,72 @@
+name: Bird R57 Authoritative Reference Acquisition
+
+on:
+  push:
+    branches:
+      - experiment/bird-r57-authoritative-reference-reconstruction-v1
+    paths:
+      - '.github/workflows/bird-authoritative-reference.yml'
+      - 'Bird-Reconstruction-Lab/REFERENCE_ACQUISITION_TRIGGER.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download pinned scientific bird references
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reference/original reference/licenses
+          curl --fail --location --retry 4 --output reference/original/aves_template.ply \
+            https://raw.githubusercontent.com/yufu-wang/aves/main/bird_meshes/template.ply
+          curl --fail --location --retry 4 --output reference/original/avian_mesh_rig.json \
+            https://raw.githubusercontent.com/marcbadger/avian-mesh/master/models/bird_eccv.json
+          curl --fail --location --retry 4 --output reference/licenses/AVES_LICENSE.txt \
+            https://raw.githubusercontent.com/yufu-wang/aves/main/LICENSE
+          curl --fail --location --retry 4 --output reference/licenses/AVIAN_MESH_LICENSE.txt \
+            https://raw.githubusercontent.com/marcbadger/avian-mesh/master/LICENSE
+
+      - name: Verify exact Git object identities
+        shell: python
+        run: |
+          import hashlib, json, pathlib
+          checks = {
+              'reference/original/aves_template.ply': (327044, '1d1bc5e49af0eecaf0bbc7f28a4cd63c67aa618e'),
+              'reference/original/avian_mesh_rig.json': (1209943, 'c422b3cb9fa79aea447d89509c60ea420a3fe98e'),
+          }
+          manifest = {'schema': 'bird-reference-acquisition@1.0', 'files': []}
+          for name, (expected_size, expected_git_sha) in checks.items():
+              data = pathlib.Path(name).read_bytes()
+              git_sha = hashlib.sha1(f'blob {len(data)}\0'.encode('ascii') + data).hexdigest()
+              if len(data) != expected_size:
+                  raise SystemExit(f'{name}: byte size mismatch')
+              if git_sha != expected_git_sha:
+                  raise SystemExit(f'{name}: Git blob SHA mismatch')
+              manifest['files'].append({
+                  'path': name,
+                  'bytes': len(data),
+                  'git_blob_sha1': git_sha,
+                  'sha256': hashlib.sha256(data).hexdigest(),
+                  'verified': True,
+              })
+          pathlib.Path('reference/ACQUISITION_MANIFEST.json').write_text(
+              json.dumps(manifest, indent=2) + '\n', encoding='utf-8'
+          )
+
+      - name: Package reference acquisition
+        shell: bash
+        run: zip -r BIRD_R57_AUTHORITATIVE_REFERENCE_ACQUISITION.zip reference
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BIRD_R57_AUTHORITATIVE_REFERENCE_ACQUISITION
+          path: |
+            reference/
+            BIRD_R57_AUTHORITATIVE_REFERENCE_ACQUISITION.zip
+          retention-days: 30
