@@ -1,12 +1,56 @@
 {
-  "schema": "humanoid-rig-lab-next/bird-authoritative-reference-lock@1.0",
-  "version": "R57.0",
+  "schema": "humanoid-rig-lab-next/bird-authoritative-reference-lock@1.1",
+  "version": "R57.1",
+  "date": "2026-09-11",
   "target_species": {
-    "scientific_name": "Spilopelia chinensis",
+    "accepted_scientific_name": "Spilopelia chinensis",
+    "legacy_synonym": "Streptopelia chinensis",
     "common_name": "Spotted Dove",
-    "status": "species fit pending"
+    "gbif_usage_key": 6101224,
+    "status": "exact species museum surface located, archive acquisition pending authenticated download"
   },
-  "canonical_surface_reference": {
+  "primary_species_surface_reference": {
+    "project": "oBird 3D Models",
+    "institution": "Moore Laboratory of Zoology, Occidental College",
+    "method": "museum specimen photogrammetry",
+    "specimen_guid": "MLZ:Bird:65780",
+    "provider": "MooreLab",
+    "platform": "Sketchfab",
+    "model_uid": "0014e26b6ddd4c1ab48116355ed46209",
+    "model_name": "Spotted Dove - Spilopelia chinensis",
+    "published_at": "2022-11-16T19:17:56.600502Z",
+    "vertex_count": 43609,
+    "face_count": 87214,
+    "texture_count": 1,
+    "material_count": 1,
+    "downloadable": true,
+    "license": {
+      "label": "Creative Commons Attribution",
+      "version": "4.0",
+      "slug": "by",
+      "commercial_use_allowed": true,
+      "attribution_required": true
+    },
+    "acquisition": {
+      "status": "pending_authenticated_download",
+      "reason": "Sketchfab requires authenticated access before issuing the temporary glTF archive URL",
+      "access_controls_must_not_be_bypassed": true
+    },
+    "role": [
+      "species-specific external surface proportions",
+      "head and beak silhouette",
+      "neck and thorax volume",
+      "folded wing envelope",
+      "tail envelope",
+      "plumage color region reference"
+    ],
+    "limitations": [
+      "preserved museum specimen posture is not a live neutral pose",
+      "surface includes feather volume and does not expose the internal skeleton",
+      "texture is reference evidence only and will not be shipped in the final procedural runtime"
+    ]
+  },
+  "canonical_topology_reference": {
     "project": "AVES",
     "paper": "Birds of a Feather: Capturing Avian Shape Models from Images",
     "venue": "CVPR 2021",
@@ -15,7 +59,8 @@
     "path": "bird_meshes/template.ply",
     "expected_bytes": 327044,
     "git_blob_sha1": "1d1bc5e49af0eecaf0bbc7f28a4cd63c67aa618e",
-    "license": "MIT"
+    "license": "MIT",
+    "role": "canonical bird topology and cross-species shape basis"
   },
   "articulated_rig_reference": {
     "project": "3D Bird Reconstruction",
@@ -26,13 +71,66 @@
     "path": "models/bird_eccv.json",
     "expected_bytes": 1209943,
     "git_blob_sha1": "c422b3cb9fa79aea447d89509c60ea420a3fe98e",
-    "license": "MIT"
+    "license": "MIT",
+    "role": "bird kinematic tree, joints, skin weights and keypoint regressor"
+  },
+  "anatomical_skull_references": [
+    {
+      "repository": "MorphoSource",
+      "media_id": "000865537",
+      "specimen": "sama:Ornithology:B47804",
+      "institution": "South Australian Museum",
+      "part": "Skull",
+      "modality": "MicroNanoXRayComputedTomography",
+      "voxel_spacing_mm": [0.025, 0.025, 0.025],
+      "license": "CC BY-NC 4.0",
+      "visibility": "restricted_download",
+      "role": "noncommercial anatomical validation only"
+    },
+    {
+      "repository": "MorphoSource",
+      "media_id": "000865532",
+      "specimen": "sama:Ornithology:B48177",
+      "institution": "South Australian Museum",
+      "part": "Skull",
+      "modality": "MicroNanoXRayComputedTomography",
+      "voxel_spacing_mm": [0.025, 0.025, 0.025],
+      "license": "CC BY-NC 4.0",
+      "visibility": "restricted_download",
+      "role": "noncommercial anatomical validation only"
+    },
+    {
+      "repository": "MorphoSource",
+      "media_id": "000865409",
+      "specimen": "nmv:ornithology:B30170",
+      "institution": "Museums Victoria",
+      "part": "Skull",
+      "modality": "MicroNanoXRayComputedTomography",
+      "voxel_spacing_mm": [0.025, 0.025, 0.025],
+      "license": "CC BY-NC 4.0",
+      "visibility": "restricted_download",
+      "role": "noncommercial anatomical validation only"
+    }
+  ],
+  "live_posture_and_soft_tissue_reference": {
+    "primary_collection": "Cornell Lab of Ornithology, Macaulay Library",
+    "role": [
+      "live standing posture",
+      "head and neck carriage",
+      "folded wing relationship",
+      "leg posture",
+      "soft tissue and feather compression"
+    ],
+    "rule": "museum specimen geometry must be corrected against live multi-view observations before runtime acceptance"
   },
   "policy": {
     "source_files_read_only": true,
     "original_and_generated_separate": true,
     "final_runtime_external_mesh_dependency": false,
+    "final_runtime_texture_dependency": false,
     "source_units_must_be_verified_before_mm_claims": true,
+    "commercial_runtime_must_exclude_noncommercial_ct_assets": true,
+    "r56_baseline_preserved": true,
     "visualAcceptance": false,
     "productionReady": false
   }
