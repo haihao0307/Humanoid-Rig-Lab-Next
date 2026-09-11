@@ -1,0 +1,213 @@
+name: Cat V4.22 real CT reference public preview
+
+on:
+  push:
+    branches:
+      - experiment/cat-authoritative-reference-intake-v1-20260911
+    paths:
+      - .github/workflows/cat-v422-real-reference-public-preview.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PREVIEW_FILE: cat-v422-real-ct-reference-preview.html
+      QA_FILE: reference/cat/digimorph-tmm-m-628/PUBLIC_PREVIEW_QA.json
+      FIXED_TAG: cat-v422-real-reference-20260911
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/cat-authoritative-reference-intake-v1-20260911
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deterministic reconstruction dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --quiet \
+            numpy==2.1.3 pillow==11.0.0 scipy==1.14.1 scikit-image==0.24.0
+
+      - name: Download and verify official DigiMorph source
+        run: |
+          set -euo pipefail
+          mkdir -p .cat-v422/source .cat-v422/unpacked
+          curl --fail --location --retry 5 --retry-delay 3 \
+            --output .cat-v422/source/digimorph-felis-catus.zip \
+            'https://utexas.box.com/shared/static/tznrfnutqelnd6wtcozcdbyktkewrk0w.zip'
+          test -s .cat-v422/source/digimorph-felis-catus.zip
+          unzip -t .cat-v422/source/digimorph-felis-catus.zip
+          unzip -q .cat-v422/source/digimorph-felis-catus.zip -d .cat-v422/unpacked
+          sha256sum .cat-v422/source/digimorph-felis-catus.zip | tee .cat-v422/source/SHA256SUMS.txt
+
+      - name: Generate real CT reference and code-replica preview
+        shell: bash
+        run: |
+          cat > .cat-v422/build_preview.py <<'PY'
+          from pathlib import Path
+          import base64, hashlib, json, math, re, struct
+          import numpy as np
+          from PIL import Image
+          from scipy import ndimage as ndi
+          from scipy.spatial import cKDTree
+          from skimage.measure import marching_cubes
+
+          root=Path('.cat-v422')
+          source_zip=root/'source/digimorph-felis-catus.zip'
+          files=sorted([p for p in (root/'unpacked').rglob('*') if p.is_file()],key=lambda p:[int(x) if x.isdigit() else x.lower() for x in re.split(r'(\d+)',str(p))])
+          image_records=[]
+          for p in files:
+              try:
+                  with Image.open(p) as im:
+                      if im.width>=64 and im.height>=64:
+                          image_records.append((p,im.size,im.mode))
+              except Exception:
+                  pass
+          if not image_records:
+              raise SystemExit('No readable CT images')
+          groups={}
+          for p,size,mode in image_records:
+              groups.setdefault((size,mode),[]).append(p)
+          (size,mode),paths=max(groups.items(),key=lambda x:len(x[1]))
+          paths=sorted(paths,key=lambda p:[int(x) if x.isdigit() else x.lower() for x in re.split(r'(\d+)',str(p))])
+          stride=max(1,math.ceil(len(paths)/96))
+          paths=paths[::stride]
+          scale=min(1.0,96/max(size))
+          target=(max(32,round(size[0]*scale)),max(32,round(size[1]*scale)))
+          stack=[]
+          for p in paths:
+              with Image.open(p) as im:
+                  a=np.asarray(im)
+                  if a.ndim==3:a=a[...,:3].mean(2)
+                  a=a.astype(np.float32)
+                  if im.size!=target:a=np.asarray(Image.fromarray(a,mode='F').resize(target,Image.Resampling.BILINEAR),dtype=np.float32)
+                  stack.append(a)
+          raw=np.stack(stack)
+          lo,hi=np.percentile(raw,[1,99.5])
+          vol=np.clip((raw-lo)/max(hi-lo,1e-6),0,1)
+          border=np.concatenate([vol[:,0,:].ravel(),vol[:,-1,:].ravel(),vol[:,:,0].ravel(),vol[:,:,-1].ravel()])
+          work=vol if np.median(border)<.5 else 1-vol
+          hist,edges=np.histogram(work,bins=256,range=(0,1));prob=hist/max(hist.sum(),1);omega=np.cumsum(prob);cent=(edges[:-1]+edges[1:])/2;mu=np.cumsum(prob*cent);den=omega*(1-omega);score=np.zeros_like(den);ok=den>1e-12;score[ok]=(mu[-1]*omega[ok]-mu[ok])**2/den[ok];threshold=float(cent[int(np.argmax(score))]);threshold=max(.12,min(.92,threshold))
+          mask=work>=threshold
+          mask=ndi.binary_opening(mask,iterations=1);mask=ndi.binary_closing(mask,iterations=2)
+          lab,n=ndi.label(mask);sizes=np.bincount(lab.ravel());sizes[0]=0
+          keep=np.argsort(sizes)[-12:];keep=keep[sizes[keep]>=max(16,sizes.max()*.0005)]
+          mask=np.isin(lab,keep)
+          verts,faces,_,_=marching_cubes(mask.astype(np.float32),.5,allow_degenerate=False)
+          verts=verts[:,[2,1,0]].astype(np.float64)
+          center=verts.mean(0);v=(verts-center)
+          eigval,eigvec=np.linalg.eigh(np.cov(v.T));basis=eigvec[:,np.argsort(eigval)[::-1]]
+          if np.linalg.det(basis)<0:basis[:,-1]*=-1
+          v=v@basis
+          ext=v.max(0)-v.min(0);axis=int(np.argmax(ext))
+          if axis!=0:v[:,[0,axis]]=v[:,[axis,0]]
+          section_count=48;ring_count=64;order=12
+          xmin,xmax=np.percentile(v[:,0],[.5,99.5]);edges=np.linspace(xmin,xmax,section_count+1);rings={};section_errors=[]
+          for i in range(section_count):
+              pts=v[(v[:,0]>=edges[i])&(v[:,0]<edges[i+1])]
+              if len(pts)<20:continue
+              c=np.median(pts[:,1:3],0);rel=pts[:,1:3]-c;th=np.arctan2(rel[:,1],rel[:,0]);rr=np.linalg.norm(rel,axis=1)
+              bins=np.linspace(-np.pi,np.pi,ring_count+1);idx=np.clip(np.digitize(th,bins)-1,0,ring_count-1);ang=(bins[:-1]+bins[1:])/2;rad=np.full(ring_count,np.nan)
+              for j in range(ring_count):
+                  q=rr[idx==j]
+                  if len(q):rad[j]=np.percentile(q,95)
+              valid=np.isfinite(rad)
+              if valid.sum()<8:continue
+              x=np.arange(ring_count);xv=x[valid];yv=rad[valid];rad=np.interp(x,np.r_[xv-ring_count,xv,xv+ring_count],np.r_[yv,yv,yv])
+              cols=[np.ones_like(ang)]
+              for k in range(1,order+1):cols.extend([np.cos(k*ang),np.sin(k*ang)])
+              A=np.stack(cols,1);coef=np.linalg.lstsq(A,rad,rcond=None)[0];pred=A@coef;section_errors.append(float(np.percentile(np.abs(pred-rad),95)))
+              u=(edges[i]+edges[i+1])/2;r=np.maximum(pred,0);rings[i]=np.c_[np.full(ring_count,u),c[0]+r*np.cos(ang),c[1]+r*np.sin(ang)]
+          valid=sorted(rings)
+          if len(valid)<16:raise SystemExit('Insufficient fitted sections')
+          full=[]
+          for i in range(section_count):
+              if i in rings:r=rings[i]
+              else:
+                  left=max([j for j in valid if j<i],default=valid[0]);right=min([j for j in valid if j>i],default=valid[-1])
+                  if left==right:r=rings[left].copy()
+                  else:r=(1-(i-left)/(right-left))*rings[left]+((i-left)/(right-left))*rings[right]
+                  r[:,0]=(edges[i]+edges[i+1])/2
+              full.append(r)
+          replica=np.concatenate(full)
+          rng=np.random.default_rng(422)
+          source_sample=v if len(v)<=6000 else v[rng.choice(len(v),6000,False)]
+          replica_sample=replica if len(replica)<=6000 else replica[rng.choice(len(replica),6000,False)]
+          d1=cKDTree(replica).query(source_sample,workers=-1)[0];d2=cKDTree(v).query(replica_sample,workers=-1)[0];d=np.r_[d1,d2]
+          cloud=np.vstack([source_sample,replica_sample]);c=(cloud.min(0)+cloud.max(0))/2;s=max(float(np.max(cloud.max(0)-cloud.min(0))/2),1e-9)
+          def enc(a):return base64.b64encode(np.clip(np.rint((a-c)/s*32760),-32760,32760).astype('<i2').tobytes()).decode()
+          qa={'schema':'kaopu.cat.public-preview-qa@4.22','sourceArchiveSha256':hashlib.sha256(source_zip.read_bytes()).hexdigest(),'sourceImageCount':len(image_records),'selectedStackCount':len(groups[(size,mode)]),'workingSliceCount':len(paths),'workingImageSize':target,'segmentationThreshold':threshold,'segmentationOccupancy':float(mask.mean()),'referenceVertexCount':int(len(v)),'referenceTriangleCount':int(len(faces)),'functionSectionCount':section_count,'validFunctionSectionCount':len(valid),'replicaVertexCount':int(len(replica)),'distanceUnits':'working_voxel_units','bidirectionalDistance':{'mean':float(d.mean()),'p95':float(np.percentile(d,95)),'p99':float(np.percentile(d,99)),'max':float(d.max()),'normalizedP95':float(np.percentile(d,95)/max(ext))},'oneToOneAccepted':False,'visualAcceptance':False,'productionReady':False,'scope':'CT-derived cranial osseous envelope'}
+          Path('reference/cat/digimorph-tmm-m-628').mkdir(parents=True,exist_ok=True)
+          Path('reference/cat/digimorph-tmm-m-628/PUBLIC_PREVIEW_QA.json').write_text(json.dumps(qa,indent=2),encoding='utf-8')
+          src64,rep64=enc(source_sample),enc(replica_sample)
+          html=f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CAT KAOPU V4.22 Real CT Reference</title><style>:root{{color-scheme:dark}}*{{box-sizing:border-box}}body{{margin:0;background:#070a10;color:#edf4ff;font:14px/1.5 system-ui}}header{{padding:20px}}h1{{margin:0 0 8px}}p{{color:#a9b7c9;max-width:900px}}main{{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;padding:0 14px 20px}}article,aside{{border:1px solid #29374a;background:#101722;border-radius:14px;overflow:hidden}}canvas{{display:block;width:100%;height:72vh;min-height:520px;touch-action:none}}aside{{padding:14px}}button{{background:#152235;color:#fff;border:1px solid #35485f;border-radius:8px;padding:7px;margin:3px}}pre{{white-space:pre-wrap;word-break:break-word;font-size:11px;color:#cfe2fa}}@media(max-width:760px){{main{{grid-template-columns:1fr}}canvas{{height:55vh;min-height:390px}}}}</style></head><body><header><h1>CAT KAOPU V4.22 真实 CT 参考反求</h1><p>青色点为 DigiMorph TMM M-628 CT 表面，洋红点为独立函数重建。拖动旋转，滚轮缩放。当前范围是头颅骨性外包络，完整软组织猫体仍在权威参考锁定阶段。</p></header><main><article><canvas id="c"></canvas></article><aside><button onclick="setView(0,0)">正视</button><button onclick="setView(1.5708,0)">侧视</button><button onclick="setView(-.65,.25)">三分之四</button><pre id="q"></pre></aside></main><script>const Q={json.dumps(qa)},S='{src64}',R='{rep64}';q.textContent=JSON.stringify(Q,null,2);function dec(s){{let b=atob(s),a=new Int16Array(b.length/2),f=new Float32Array(a.length);for(let i=0;i<a.length;i++){{let v=b.charCodeAt(i*2)|(b.charCodeAt(i*2+1)<<8);if(v>32767)v-=65536;f[i]=v/32760}}return f}}let A=dec(S),B=dec(R),c=document.getElementById('c'),g=c.getContext('webgl');if(!g)throw Error('WebGL unavailable');function sh(t,s){{let x=g.createShader(t);g.shaderSource(x,s);g.compileShader(x);return x}}let p=g.createProgram();g.attachShader(p,sh(g.VERTEX_SHADER,'attribute vec3 p;uniform mat4 m;void main(){{gl_Position=m*vec4(p,1.);gl_PointSize=2.;}}'));g.attachShader(p,sh(g.FRAGMENT_SHADER,'precision mediump float;uniform vec3 k;void main(){{vec2 d=gl_PointCoord-.5;if(dot(d,d)>.25)discard;gl_FragColor=vec4(k,.75);}}'));g.linkProgram(p);g.useProgram(p);let lp=g.getAttribLocation(p,'p'),lm=g.getUniformLocation(p,'m'),lk=g.getUniformLocation(p,'k');function buf(a){{let b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,a,g.STATIC_DRAW);return b}}let ba=buf(A),bb=buf(B),y=-.65,x=.25,z=2.7,d=false,lx=0,ly=0;function mm(a,b){{let o=new Float32Array(16);for(let r=0;r<4;r++)for(let c=0;c<4;c++)for(let k=0;k<4;k++)o[c*4+r]+=a[k*4+r]*b[c*4+k];return o}}function ry(a){{let C=Math.cos(a),s=Math.sin(a);return new Float32Array([C,0,-s,0,0,1,0,0,s,0,C,0,0,0,0,1])}}function rx(a){{let C=Math.cos(a),s=Math.sin(a);return new Float32Array([1,0,0,0,0,C,s,0,0,-s,C,0,0,0,0,1])}}function draw(b,n,k){{g.bindBuffer(g.ARRAY_BUFFER,b);g.enableVertexAttribArray(lp);g.vertexAttribPointer(lp,3,g.FLOAT,0,0,0);g.uniform3fv(lk,k);g.drawArrays(g.POINTS,0,n)}}function render(){{let dpr=Math.min(devicePixelRatio,2),w=c.clientWidth*dpr,h=c.clientHeight*dpr;if(c.width!=w||c.height!=h){{c.width=w;c.height=h}}g.viewport(0,0,w,h);g.clearColor(.02,.03,.05,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.enable(g.DEPTH_TEST);let f=1/Math.tan(.7/2),P=new Float32Array([f*h/w,0,0,0,0,f,0,0,0,0,-1.02,-1,0,0,-.202,0]),T=new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,-z,1]);g.uniformMatrix4fv(lm,0,mm(P,mm(T,mm(rx(x),ry(y)))));draw(ba,A.length/3,new Float32Array([.1,.82,.95]));draw(bb,B.length/3,new Float32Array([.95,.18,.72]));requestAnimationFrame(render)}}c.onpointerdown=e=>{{d=true;lx=e.clientX;ly=e.clientY;c.setPointerCapture(e.pointerId)}};c.onpointermove=e=>{{if(d){{y+=(e.clientX-lx)*.008;x+=(e.clientY-ly)*.008;lx=e.clientX;ly=e.clientY}}}};c.onpointerup=()=>d=false;c.onwheel=e=>{{e.preventDefault();z=Math.max(1.3,Math.min(6,z*Math.exp(e.deltaY*.001)))}};function setView(Y,X){{y=Y;x=X}}requestAnimationFrame(render);</script></body></html>'''
+          Path('cat-v422-real-ct-reference-preview.html').write_text(html,encoding='utf-8')
+          if len(html.encode())>1_500_000:raise SystemExit('Preview exceeds size guard')
+          PY
+          python .cat-v422/build_preview.py
+
+      - name: Static and content QA
+        run: |
+          set -euo pipefail
+          test -s "$PREVIEW_FILE"
+          test -s "$QA_FILE"
+          grep -q 'CAT KAOPU V4.22' "$PREVIEW_FILE"
+          grep -q 'WebGL unavailable' "$PREVIEW_FILE"
+          python -m json.tool "$QA_FILE" >/dev/null
+          python - <<'PY'
+          import json
+          q=json.load(open('reference/cat/digimorph-tmm-m-628/PUBLIC_PREVIEW_QA.json'))
+          assert q['sourceImageCount'] > 0
+          assert q['selectedStackCount'] > 0
+          assert q['referenceVertexCount'] > 100
+          assert q['replicaVertexCount'] > 100
+          assert q['oneToOneAccepted'] is False
+          assert q['productionReady'] is False
+          PY
+
+      - name: Commit generated preview and fixed tag
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$PREVIEW_FILE" "$QA_FILE"
+          if ! git diff --cached --quiet; then
+            git commit -m 'experiment(cat): publish V4.22 real CT reference preview'
+            git push origin HEAD:experiment/cat-authoritative-reference-intake-v1-20260911
+          fi
+          git tag -f "$FIXED_TAG" HEAD
+          git push origin "refs/tags/$FIXED_TAG" --force
+
+      - name: Verify fixed public HTTPS preview
+        run: |
+          set -euo pipefail
+          URL="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/$FIXED_TAG/$PREVIEW_FILE"
+          ok=0
+          for i in $(seq 1 18); do
+            if curl --fail --location --silent --show-error "$URL" -o /tmp/public-preview.html; then
+              if grep -q 'CAT KAOPU V4.22' /tmp/public-preview.html; then ok=1; break; fi
+            fi
+            sleep 10
+          done
+          test "$ok" = 1
+          test -s /tmp/public-preview.html
+          grep -q 'TMM M-628' /tmp/public-preview.html
+          printf '%s\n' "$URL" > reference/cat/digimorph-tmm-m-628/FIXED_PUBLIC_PREVIEW_URL.txt
+
+      - name: Upload publication evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-v422-real-reference-publication-evidence
+          path: |
+            cat-v422-real-ct-reference-preview.html
+            reference/cat/digimorph-tmm-m-628/PUBLIC_PREVIEW_QA.json
+            reference/cat/digimorph-tmm-m-628/FIXED_PUBLIC_PREVIEW_URL.txt
+            /tmp/public-preview.html
+          if-no-files-found: error
+          retention-days: 14
