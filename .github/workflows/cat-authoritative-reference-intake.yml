@@ -1,0 +1,73 @@
+name: Cat authoritative reference intake
+
+on:
+  push:
+    branches:
+      - experiment/cat-authoritative-reference-intake-v1-20260911
+    paths:
+      - .github/workflows/cat-authoritative-reference-intake.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Create isolated reference workspace
+        run: |
+          set -euo pipefail
+          mkdir -p reference-intake
+
+      - name: Download University of Texas DigiMorph Felis catus CT
+        run: |
+          set -euo pipefail
+          URL='https://utexas.box.com/shared/static/tznrfnutqelnd6wtcozcdbyktkewrk0w.zip'
+          curl --fail --location --retry 4 --retry-delay 3 \
+            --output reference-intake/digimorph-felis-catus-ct.zip "$URL"
+          test -s reference-intake/digimorph-felis-catus-ct.zip
+
+      - name: Verify and inventory source asset
+        run: |
+          set -euo pipefail
+          sha256sum reference-intake/digimorph-felis-catus-ct.zip \
+            | tee reference-intake/SHA256SUMS.txt
+          unzip -t reference-intake/digimorph-felis-catus-ct.zip \
+            | tee reference-intake/ZIP_TEST.txt
+          unzip -l reference-intake/digimorph-felis-catus-ct.zip \
+            | tee reference-intake/ZIP_INVENTORY.txt
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          p = Path('reference-intake/digimorph-felis-catus-ct.zip')
+          payload = {
+              'schema': 'kaopu.cat.authoritative-reference-receipt.v1',
+              'sourceId': 'digimorph-felis-sylvestris-catus-tmm-m-628',
+              'institution': 'The University of Texas at Austin, DigiMorph',
+              'sourcePage': 'https://digimorph.org/specimens/Felis_sylvestris_catus/',
+              'downloadUrl': 'https://utexas.box.com/shared/static/tznrfnutqelnd6wtcozcdbyktkewrk0w.zip',
+              'specimenId': 'TMM M-628',
+              'scanDate': '2000-06-26',
+              'sliceCountDeclaredBySource': 387,
+              'sliceThicknessMmDeclaredBySource': 0.238,
+              'intersliceSpacingMmDeclaredBySource': 0.238,
+              'assetBytes': p.stat().st_size,
+              'sha256': hashlib.sha256(p.read_bytes()).hexdigest(),
+              'role': 'isolated measurement and anatomical audit reference',
+              'productionRuntimeDependency': False,
+              'status': 'downloaded-unmodified-source'
+          }
+          Path('reference-intake/REFERENCE_SOURCE_RECEIPT.json').write_text(
+              json.dumps(payload, indent=2, ensure_ascii=False), encoding='utf-8')
+          PY
+
+      - name: Upload immutable source reference artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-digimorph-authoritative-reference-v1
+          path: reference-intake/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
