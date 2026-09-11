@@ -1,0 +1,59 @@
+name: Cat Objaverse path lookup
+
+on:
+  push:
+    branches:
+      - experiment/cat-authoritative-reference-intake-v1-20260911
+    paths:
+      - .github/workflows/cat-objaverse-path-lookup.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install objaverse
+      - name: Resolve paths
+        run: |
+          set -euo pipefail
+          mkdir -p resolved
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import objaverse
+          uids = [
+              '28d33c1592e14d8b895d36a1e0dfaa5d',
+              '7239efeec7104dc3af46a8842a66aec0',
+              'fc89fe933afe448084682263a5d0f10e',
+              '9cf0d4d9c380433e9ae04b05d2397368'
+          ]
+          paths = objaverse._load_object_paths()
+          payload = {
+              uid: {
+                  'objectPath': paths.get(uid),
+                  'downloadUrl': (
+                      f"https://huggingface.co/datasets/allenai/objaverse/resolve/main/{paths[uid]}"
+                      if uid in paths else None
+                  )
+              }
+              for uid in uids
+          }
+          Path('resolved/CAT_OBJAVERSE_PATHS.json').write_text(
+              json.dumps(payload, indent=2), encoding='utf-8')
+          print(json.dumps(payload, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cat-objaverse-paths
+          path: resolved/
+          if-no-files-found: error
+          retention-days: 7
