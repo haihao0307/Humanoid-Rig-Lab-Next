@@ -1,0 +1,139 @@
+name: Cat Objaverse LVIS discovery
+
+on:
+  push:
+    branches:
+      - experiment/cat-authoritative-reference-intake-v1-20260911
+    paths:
+      - .github/workflows/cat-objaverse-lvis-discovery.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install objaverse requests pillow
+      - name: Discover cat candidates
+        run: |
+          set -euo pipefail
+          mkdir -p discovery
+          python - <<'PY'
+          from pathlib import Path
+          from io import BytesIO
+          import json
+          import re
+          import requests
+          import objaverse
+          from PIL import Image, ImageOps, ImageDraw
+
+          out = Path('discovery')
+          lvis = objaverse.load_lvis_annotations()
+          keys = sorted(k for k in lvis if 'cat' in k.lower())
+          all_uids = []
+          for key in keys:
+              all_uids.extend(lvis[key])
+          all_uids = list(dict.fromkeys(all_uids))
+          annotations = objaverse.load_annotations(all_uids)
+
+          positive = {
+              'realistic': 12, 'real': 6, 'animal': 4, 'domestic': 8,
+              'feline': 6, 'cat': 6, 'standing': 7, 'neutral': 10,
+              't-pose': 8, 't pose': 8, 'rigged': 4, 'anatomy': 8,
+              'scan': 5, 'high poly': 4, 'highpoly': 4
+          }
+          negative = {
+              'cartoon': -18, 'stylized': -14, 'low poly': -10,
+              'lowpoly': -10, 'voxel': -20, 'toy': -18, 'plush': -20,
+              'sculpture': -8, 'statue': -10, 'robot': -18,
+              'anthro': -25, 'biped': -25, 'skull': -30,
+              'skeleton': -30, 'bone': -20, 'sleeping': -8,
+              'lying': -6, 'sitting': -3, 'cute': -4, 'anime': -20
+          }
+          candidates = []
+          for uid, ann in annotations.items():
+              license_id = str(ann.get('license') or '').lower()
+              if license_id not in {'by', 'cc0'}:
+                  continue
+              name = str(ann.get('name') or '')
+              description = str(ann.get('description') or '')
+              tags = ' '.join(str(t.get('name') if isinstance(t, dict) else t) for t in (ann.get('tags') or []))
+              categories = ' '.join(str(c.get('name') if isinstance(c, dict) else c) for c in (ann.get('categories') or []))
+              text = ' '.join((name, description, tags, categories)).lower()
+              score = 0
+              for term, weight in positive.items():
+                  if term in text: score += weight
+              for term, weight in negative.items():
+                  if term in text: score += weight
+              face_count = ann.get('faceCount') or 0
+              vertex_count = ann.get('vertexCount') or 0
+              if isinstance(face_count, (int, float)):
+                  if 8000 <= face_count <= 600000: score += 8
+                  if face_count > 1500000: score -= 6
+              if isinstance(vertex_count, (int, float)) and vertex_count >= 5000: score += 4
+              candidates.append({
+                  'uid': uid,
+                  'score': score,
+                  'license': license_id,
+                  'name': name,
+                  'description': description[:700],
+                  'tags': tags,
+                  'categories': categories,
+                  'faceCount': face_count,
+                  'vertexCount': vertex_count,
+                  'viewerUrl': ann.get('viewerUrl'),
+                  'uri': ann.get('uri')
+              })
+          candidates.sort(key=lambda x: (x['score'], x.get('faceCount') or 0), reverse=True)
+          top = candidates[:60]
+          (out / 'CAT_LVIS_CANDIDATES.json').write_text(
+              json.dumps({'categoryKeys': keys, 'uidCount': len(all_uids), 'candidateCount': len(candidates), 'candidates': top}, indent=2, ensure_ascii=False), encoding='utf-8')
+
+          # Pull public Sketchfab thumbnails for the top 24 candidates and build a visible contact sheet.
+          tiles = []
+          for item in top[:24]:
+              try:
+                  response = requests.get(f"https://api.sketchfab.com/v3/models/{item['uid']}", timeout=20)
+                  response.raise_for_status()
+                  metadata = response.json()
+                  images = ((metadata.get('thumbnails') or {}).get('images') or [])
+                  if not images:
+                      continue
+                  best = max(images, key=lambda image: image.get('width', 0) * image.get('height', 0))
+                  image_response = requests.get(best['url'], timeout=20)
+                  image_response.raise_for_status()
+                  image = Image.open(BytesIO(image_response.content)).convert('RGB')
+                  image = ImageOps.fit(image, (360, 240), method=Image.Resampling.LANCZOS)
+                  tiles.append((item, image))
+              except Exception as exc:
+                  item['thumbnailError'] = str(exc)
+          if tiles:
+              cols = 3
+              tile_w, tile_h = 380, 315
+              rows = (len(tiles) + cols - 1) // cols
+              sheet = Image.new('RGB', (cols * tile_w, rows * tile_h), (15, 18, 22))
+              draw = ImageDraw.Draw(sheet)
+              for i, (item, image) in enumerate(tiles):
+                  x = (i % cols) * tile_w + 10
+                  y = (i // cols) * tile_h + 10
+                  sheet.paste(image, (x, y))
+                  label = f"{i+1}. {item['name'][:38]}\nscore {item['score']}  {item['license']}\n{item['uid']}"
+                  draw.multiline_text((x, y + 246), label, fill=(230, 235, 240), spacing=4)
+              sheet.save(out / 'CAT_LVIS_CANDIDATE_THUMBNAILS.jpg', quality=94)
+          print(json.dumps({'keys': keys, 'uids': len(all_uids), 'filtered': len(candidates), 'top': top[:10]}, indent=2, ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cat-objaverse-lvis-discovery
+          path: discovery/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
