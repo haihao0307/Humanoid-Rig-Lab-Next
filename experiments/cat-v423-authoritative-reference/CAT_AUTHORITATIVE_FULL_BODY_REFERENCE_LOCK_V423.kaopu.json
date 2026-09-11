@@ -1,0 +1,95 @@
+{
+  "schema": "kaopu.cat.authoritative_full_body_reference_lock/1.0",
+  "objectId": "CAT_AUTHORITATIVE_FULL_BODY_REFERENCE_LOCK_V423",
+  "revision": "v4.23-reference-lock-r1",
+  "date": "2026-09-11",
+  "selectionStatus": "primary-reference-selected",
+  "primaryReference": {
+    "id": "uoe-opened-domestic-cat-7c99ca8",
+    "title": "Domestic Cat (Felis catus)",
+    "species": "Felis catus",
+    "publisher": "The University of Edinburgh Open.Ed",
+    "department": "The Royal (Dick) School of Veterinary Studies, The University of Edinburgh",
+    "originalCTInformationCourtesyOf": "Dr. Tobias Schwarz",
+    "adaptedAndPreparedBy": "Brian Mather",
+    "host": "Sketchfab",
+    "modelUid": "7c99ca836d834c39872ecf5e9b5e2087",
+    "sourcePage": "https://sketchfab.com/3d-models/domestic-cat-felis-catus-7c99ca836d834c39872ecf5e9b5e2087",
+    "publisherCollectionPage": "https://open.ed.ac.uk/3d-skeletons-and-skulls/",
+    "embedUrl": "https://sketchfab.com/models/7c99ca836d834c39872ecf5e9b5e2087/embed?autostart=0&ui_theme=dark&ui_infos=0",
+    "sourceGeometryDeclared": {
+      "triangles": 1100000,
+      "vertices": 541300,
+      "representation": "CT-derived domestic-cat skeletal model"
+    },
+    "licenseDeclaredByModelPage": "Creative Commons Attribution",
+    "licenseShortId": "CC-BY",
+    "authorityBasis": [
+      "veterinary-school provenance",
+      "CT-derived anatomy",
+      "named source contributor and preparer",
+      "downloadable official model page",
+      "declared attribution license"
+    ],
+    "canonicalRoles": [
+      "whole-body skeletal topology",
+      "skull-to-spine relationship",
+      "ribcage and sternum organization",
+      "scapula and forelimb placement",
+      "pelvis and hindlimb placement",
+      "carpus, tarsus, metapodials and digit relationship",
+      "whole-body proportion audit"
+    ],
+    "forbiddenRoles": [
+      "sole muscle volume truth",
+      "sole live soft-tissue exterior truth",
+      "fur direction or pigmentation truth",
+      "unverified commercial runtime dependency"
+    ],
+    "runtimeDependency": false,
+    "sourceAssetRedistributedInThisPackage": false,
+    "sourceGeometryIngested": false,
+    "sourceGeometryStatus": "official-download-requires-authenticated-Sketchfab-session",
+    "nextRequiredAction": "download the officially offered archive while signed in, then pass it to intake_reference.py without modifying the archive"
+  },
+  "inheritedCranialReference": {
+    "id": "digimorph-felis-catus-tmm-m-628-v422",
+    "role": "high-resolution cranial CT function truth",
+    "status": "locked-and-exactly-reconstructable-in-v4.22",
+    "runtimeDependency": false
+  },
+  "secondaryExteriorValidation": {
+    "id": "pixelbeaker-feline-skeletal-thorax-abdomen-83c598f",
+    "title": "Feline Skeletal System - Thorax & Abdomen",
+    "sourcePage": "https://sketchfab.com/3d-models/feline-skeletal-system-thorax-abdomen-83c598fa236047fba2736a9fd9a16850",
+    "declaredSource": "3D anatomical reconstruction of an 11-year-old male cat segmented from a 1,573-slice CT scan at 0.6 mm and 512 by 512 resolution",
+    "declaredCoverage": "skeleton and exterior skin",
+    "role": "independent soft-tissue envelope and skeleton-to-skin relationship check only",
+    "reasonNotPrimary": "weaker institutional and license traceability than the selected University of Edinburgh reference",
+    "runtimeDependency": false
+  },
+  "productionPolicy": {
+    "referenceAssetsStoredSeparately": true,
+    "generatedResultsStoredSeparately": true,
+    "sourceIdentityAndHashRequiredBeforeMeasurement": true,
+    "coordinateFrameAndScaleLockRequired": true,
+    "partByPartFunctionRecordingRequired": true,
+    "bidirectionalSurfaceDistanceRequired": true,
+    "failedRegionsRemainExplicit": true,
+    "finalRuntimeUsesProjectOwnedParametersAndBinary": true,
+    "finalRuntimeContainsThirdPartyReferenceMesh": false,
+    "oneToOneWholeBodyAccepted": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "selectionRationale": {
+    "decision": "The University of Edinburgh model is the primary whole-body structural reference.",
+    "why": [
+      "The model has direct veterinary-school provenance.",
+      "The geometry is described as CT-derived.",
+      "The source page provides named contributors and an attribution license.",
+      "The model covers the full domestic-cat skeleton at substantially higher resolution than generic game or robotics meshes."
+    ],
+    "boundary": "The selected model establishes structural anatomy. Living exterior, muscles, fascia, paw pads, pinna soft tissue and coat still require separate evidence and region-level reconstruction."
+  }
+}
