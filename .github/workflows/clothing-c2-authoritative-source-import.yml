@@ -1,0 +1,95 @@
+name: Clothing C2 authoritative source import
+
+on:
+  push:
+    branches:
+      - experiment/clothing-c2-authoritative-3d-import-20260911
+    paths:
+      - .github/workflows/clothing-c2-authoritative-source-import.yml
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-authoritative-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout HRL branch
+        uses: actions/checkout@v4
+
+      - name: Fetch fixed GarmentCode source set
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_COMMIT=d449629979028123a5c4dc9e732a2ec19b7fce31
+          SOURCE_ROOT="https://raw.githubusercontent.com/maria-korosteleva/GarmentCode/${SOURCE_COMMIT}"
+          OUT="artifacts/authoritative-source-c2"
+          mkdir -p "$OUT"
+
+          curl --fail --location --retry 3 "$SOURCE_ROOT/assets/bodies/mean_all.obj" -o "$OUT/mean_all.obj"
+          curl --fail --location --retry 3 "$SOURCE_ROOT/assets/bodies/mean_all.yaml" -o "$OUT/mean_all.yaml"
+          curl --fail --location --retry 3 "$SOURCE_ROOT/assets/Patterns/shirt_mean_specification.json" -o "$OUT/shirt_mean_specification.json"
+          curl --fail --location --retry 3 "$SOURCE_ROOT/assets/Sim_props/default_sim_props.yaml" -o "$OUT/default_sim_props.yaml"
+          curl --fail --location --retry 3 "$SOURCE_ROOT/LICENSE" -o "$OUT/LICENSE_GARMENTCODE.txt"
+
+          test "$(git hash-object "$OUT/mean_all.obj")" = "5dc5946631cdd88a8890510e5c3c9775706798d4"
+          test "$(git hash-object "$OUT/mean_all.yaml")" = "608c5cd7827354fdc23b204fc407b991dfcfdf40"
+          test "$(git hash-object "$OUT/shirt_mean_specification.json")" = "b8c7c10fe57c02cebef974cd1385022095c096d9"
+          test "$(git hash-object "$OUT/default_sim_props.yaml")" = "7ee52d245f2f0d06bd9762d72df66b7296255389"
+          test "$(git hash-object "$OUT/LICENSE_GARMENTCODE.txt")" = "c35600839d01ba0f3f37be2d0f8754fa51e07598"
+
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          out = Path('artifacts/authoritative-source-c2')
+          files = {}
+          for path in sorted(out.iterdir()):
+              if path.is_file():
+                  files[path.name] = {
+                      'bytes': path.stat().st_size,
+                      'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
+                  }
+
+          lock = {
+              'schema': 'humanoid_rig/clothing_authoritative_source_lock@1.0',
+              'stage': 'C2A',
+              'sourceRepository': 'maria-korosteleva/GarmentCode',
+              'sourceCommit': 'd449629979028123a5c4dc9e732a2ec19b7fce31',
+              'sourceLicense': 'MIT',
+              'sourceFiles': files,
+              'gitBlobLocks': {
+                  'mean_all.obj': '5dc5946631cdd88a8890510e5c3c9775706798d4',
+                  'mean_all.yaml': '608c5cd7827354fdc23b204fc407b991dfcfdf40',
+                  'shirt_mean_specification.json': 'b8c7c10fe57c02cebef974cd1385022095c096d9',
+                  'default_sim_props.yaml': '7ee52d245f2f0d06bd9762d72df66b7296255389',
+                  'LICENSE_GARMENTCODE.txt': 'c35600839d01ba0f3f37be2d0f8754fa51e07598',
+              },
+              'scope': [
+                  'authoritative body carrier',
+                  'body measurements',
+                  'authoritative shirt sewing pattern',
+                  'official default simulation configuration',
+                  'license receipt',
+              ],
+              'doesNotProve': [
+                  'completed drape',
+                  'HRL procedural clone fidelity',
+                  'user visual acceptance',
+              ],
+          }
+          (out / 'SOURCE_LOCK.json').write_text(json.dumps(lock, indent=2), encoding='utf-8')
+          PY
+
+          (cd "$OUT" && sha256sum * > SHA256SUMS.txt)
+          find "$OUT" -maxdepth 1 -type f -printf '%f %s bytes\n' | sort
+
+      - name: Upload fixed source set
+        uses: actions/upload-artifact@v4
+        with:
+          name: HRL-M04-C2-authoritative-source-set
+          path: artifacts/authoritative-source-c2
+          if-no-files-found: error
+          retention-days: 30
