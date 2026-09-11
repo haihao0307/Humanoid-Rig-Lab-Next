@@ -1,97 +1,67 @@
 {
-  "schema": "humanoid-rig-lab-next/bird-r57-current-status@1.1",
-  "version": "R57.1-exact-species-model-located",
+  "schema": "humanoid-rig-lab-next/bird-r57-stage-a-status@1.1",
+  "version": "R57-A1-authoritative-reference-claw-repair",
   "date": "2026-09-11",
-  "stage": "exact-species-authoritative-source-lock",
-  "target_species": {
-    "accepted_scientific_name": "Spilopelia chinensis",
-    "legacy_synonym": "Streptopelia chinensis",
-    "common_name": "Spotted Dove",
-    "gbif_usage_key": 6101224
-  },
+  "scope": "bird module only",
+  "r56BaselinePreserved": true,
+  "a0AuthorityReplicaPreserved": true,
   "completed": {
-    "r56_baseline_preserved": true,
-    "general_aves_template_downloaded": true,
-    "general_aves_template_hash_locked": true,
-    "avian_rig_and_weights_downloaded": true,
-    "avian_rig_and_weights_hash_locked": true,
-    "exact_species_model_located": true,
-    "exact_species_metadata_locked": true,
-    "museum_specimen_guid_locked": true,
-    "exact_species_license_locked": true,
-    "morphosource_exact_species_skull_records_located": true,
-    "official_authenticated_acquisition_workflow_prepared": true,
-    "authoritative_search_workflow_passed": true
+    "avesOriginalImported": true,
+    "avesSourceHashLocked": true,
+    "avianRigImported": true,
+    "avianRigSourceHashLocked": true,
+    "topologyAuditComplete": true,
+    "componentAwareControlCageRecorded": true,
+    "localResidualClosureRecorded": true,
+    "singleFileRuntimeGenerated": true,
+    "pythonStrictReplicaVerified": true,
+    "nodeRuntimeReplicaVerified": true,
+    "exactSpeciesModelLocated": true,
+    "exactSpeciesMetadataLocked": true,
+    "clawDefectCauseAudited": true,
+    "clawDerivedRepairGenerated": true,
+    "clawRepairTopologyPreserved": true,
+    "clawRepairPayloadVerified": true,
+    "clawRepairStaticVisualCheckComplete": true
   },
-  "exact_species_surface": {
-    "provider": "Moore Laboratory of Zoology, Occidental College",
-    "project": "oBird 3D Models",
-    "platform": "Sketchfab",
-    "model_name": "Spotted Dove - Spilopelia chinensis",
-    "model_uid": "0014e26b6ddd4c1ab48116355ed46209",
-    "specimen_guid": "MLZ:Bird:65780",
-    "vertex_count": 43609,
-    "triangle_count": 87214,
-    "texture_count": 1,
-    "material_count": 1,
-    "downloadable": true,
+  "clawRepair": {
+    "cause": "The source foot is topologically closed. Coarse distal triangles and high-frequency scute spikes caused chipped or missing-looking silhouettes at ordinary observation distance.",
+    "method": "localized constrained Taubin fairing with bilateral restoration",
+    "sourceVertices": 8210,
+    "repairedVertices": 8210,
+    "triangles": 14268,
+    "changedVertices": 3272,
+    "topologyChanged": false,
+    "faceOrderChanged": false,
+    "degenerateFaces": 0,
+    "maximumDisplacementSourceUnits": 0.12776952079488935,
+    "sourcePositionSha256": "4f52fba89163696b19da620e9600109bc0244e0a5b55709d4214ce1a1f7bda94",
+    "repairedPositionSha256": "17b0602e9be33d54618eac9af7738d712ae2d46651afae1286a885802abcbcf4",
+    "indexSha256": "8c7ac172dc43a2b4ead1aa653461d9ad5c320ee240d6db9acb1ae6752d68dc92"
+  },
+  "exactSpeciesSource": {
+    "model": "Spotted Dove - Spilopelia chinensis",
+    "institution": "Moore Laboratory of Zoology, Occidental College",
+    "specimenGuid": "MLZ:Bird:65780",
+    "modelUid": "0014e26b6ddd4c1ab48116355ed46209",
+    "vertices": 43609,
+    "triangles": 87214,
     "license": "CC BY 4.0",
-    "commercial_use_allowed": true,
-    "attribution_required": true,
-    "archive_acquired": false,
-    "archive_acquisition_blocker": "GitHub repository secret SKETCHFAB_TOKEN is absent; official authenticated download steps were skipped"
+    "archiveAcquired": false,
+    "acquisitionWorkflowRerunRequested": true,
+    "acquisitionWorkflowRerunResult": "completed_without_archive; authenticated download steps skipped because SKETCHFAB_TOKEN remains absent"
   },
-  "general_reference_foundation": {
-    "canonical_topology": {
-      "project": "AVES",
-      "vertices": 8210,
-      "triangles": 14268,
-      "git_blob_sha1": "1d1bc5e49af0eecaf0bbc7f28a4cd63c67aa618e"
-    },
-    "articulated_rig": {
-      "project": "3D Bird Reconstruction",
-      "path": "models/bird_eccv.json",
-      "git_blob_sha1": "c422b3cb9fa79aea447d89509c60ea420a3fe98e"
-    }
-  },
-  "anatomical_validation": {
-    "exact_species_skull_ct_records": [
-      "MorphoSource:000865537",
-      "MorphoSource:000865532",
-      "MorphoSource:000865409"
-    ],
-    "voxel_spacing_mm": 0.025,
-    "license": "CC BY-NC 4.0",
-    "commercial_runtime_use_allowed": false,
-    "role": "noncommercial anatomical validation only"
-  },
-  "open_gates": {
-    "exact_species_archive_acquired": false,
-    "exact_species_archive_hash_locked": false,
-    "scan_cleanup_audited": false,
-    "moorelab_to_aves_registration_complete": false,
-    "live_posture_correction_complete": false,
-    "species_function_parameters_recorded": false,
-    "species_residual_closure_recorded": false,
-    "species_strict_reconstruction_verified": false,
-    "regional_error_thresholds_validated": false,
-    "species_surface_bound_to_rig": false,
-    "r57_runtime_generated": false,
-    "public_fixed_commit_preview_verified": false,
+  "openGates": {
+    "sourceUnitsResolved": false,
+    "exactSpeciesArchiveAcquired": false,
+    "exactSpeciesArchiveHashLocked": false,
+    "moorelabToAvesRegistrationComplete": false,
+    "livePostureCorrectionComplete": false,
+    "speciesFunctionParametersRecorded": false,
+    "speciesStrictReplicaVerified": false,
+    "appliedToR56": false,
+    "browserGpuScreenshotVerifiedInCurrentEnvironment": false,
     "visualAcceptance": false,
     "productionReady": false
-  },
-  "next_execution_order": [
-    "acquire the exact MooreLab archive through the official authenticated Sketchfab endpoint",
-    "hash-lock and preserve the untouched glTF archive, geometry, material and texture files",
-    "audit and remove only specimen stand, background or unrelated scan components with reversible records",
-    "register the MooreLab species surface to the AVES canonical topology",
-    "correct museum specimen posture against live Spotted Dove multi-view observations",
-    "fit head, beak, neck, thorax, folded wing, tail, legs and feet as independent error regions",
-    "record low-frequency function parameters and local high-frequency residuals",
-    "retarget the articulated bird rig and skin weights",
-    "verify strict reconstruction, bidirectional surface distance and fixed-view silhouette error",
-    "generate a new R57 runtime while keeping R56 untouched",
-    "run fixed-commit desktop and 390 by 844 mobile visual QA"
-  ]
+  }
 }
