@@ -1,0 +1,284 @@
+name: Clothing C2 controlled convergence reference v6
+
+on:
+  push:
+    branches:
+      - experiment/clothing-c2-authoritative-3d-import-20260911
+    paths:
+      - .github/workflows/clothing-c2-controlled-convergence-v6.yml
+
+permissions:
+  contents: read
+
+jobs:
+  controlled-convergence:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 55
+    env:
+      PYTHONUNBUFFERED: "1"
+      MPLBACKEND: Agg
+      PYOPENGL_PLATFORM: osmesa
+      GARMENTCODE_COMMIT: d449629979028123a5c4dc9e732a2ec19b7fce31
+      WARP_COMMIT: 63baf6855efdd89b2834b74640f84b3bb0d86b50
+      FORCED_POST_GRAVITY_FRAMES: "120"
+    steps:
+      - name: Checkout HRL experiment branch
+        uses: actions/checkout@v4
+
+      - name: Create diagnostic output root
+        shell: bash
+        run: mkdir -p artifacts/clothing-c2-controlled-convergence-v6
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install system prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential gcc-11 g++-11 clang cmake ninja-build git curl \
+            libcgal-dev libgmp-dev libmpfr-dev \
+            libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev libosmesa6-dev \
+            xvfb
+
+      - name: Clone fixed upstream repositories
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/maria-korosteleva/GarmentCode.git upstream/GarmentCode
+          git -C upstream/GarmentCode checkout "$GARMENTCODE_COMMIT"
+          test "$(git -C upstream/GarmentCode rev-parse HEAD)" = "$GARMENTCODE_COMMIT"
+
+          git clone https://github.com/maria-korosteleva/NvidiaWarp-GarmentCode.git upstream/NvidiaWarp-GarmentCode
+          git -C upstream/NvidiaWarp-GarmentCode checkout "$WARP_COMMIT"
+          test "$(git -C upstream/NvidiaWarp-GarmentCode rev-parse HEAD)" = "$WARP_COMMIT"
+
+      - name: Install Python dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install \
+            numpy==1.24.4 scipy "pyyaml>=6.0" svgwrite psutil matplotlib \
+            svgpathtools cairosvg nicegui trimesh libigl pyrender cgal
+
+      - name: Build fixed Warp fork with standalone CPU compiler
+        shell: bash
+        working-directory: upstream/NvidiaWarp-GarmentCode
+        run: |
+          set -euo pipefail
+          unset CUDA_HOME CUDA_PATH
+          export CC=gcc-11
+          export CXX=g++-11
+          chmod +x ./tools/packman/packman || true
+          python build_lib.py --no_verbose 2>&1 | tee ../../warp-build.log
+          test -f warp/bin/warp.so
+          test -f warp/bin/warp-clang.so
+          python -m pip install -e .
+
+      - name: Prove CPU kernel JIT from source file
+        shell: bash
+        working-directory: upstream/NvidiaWarp-GarmentCode
+        run: |
+          set -euo pipefail
+          export CC=gcc-11
+          export CXX=g++-11
+          cat > cpu_jit_probe.py <<'PY'
+          import numpy as np
+          import warp as wp
+          wp.init()
+          @wp.kernel
+          def fill(a: wp.array(dtype=float)):
+              i = wp.tid()
+              a[i] = float(i + 1)
+          a = wp.zeros(4, dtype=float, device="cpu")
+          wp.launch(fill, dim=4, inputs=[a], device="cpu")
+          got = a.numpy()
+          if not np.allclose(got, np.asarray([1,2,3,4], dtype=np.float32)):
+              raise RuntimeError(got)
+          print("CPU_JIT_PROBE_OK", got.tolist())
+          PY
+          python cpu_jit_probe.py 2>&1 | tee ../../warp-cpu-jit-probe.log
+
+      - name: Configure and verify fixed source inputs
+        shell: bash
+        working-directory: upstream/GarmentCode
+        run: |
+          set -euo pipefail
+          cat > system.json <<'JSON'
+          {
+            "output": "./Logs/",
+            "datasets_path": "",
+            "datasets_sim": "",
+            "sim_configs_path": "./assets/Sim_props",
+            "bodies_default_path": "./assets/bodies",
+            "body_samples_path": ""
+          }
+          JSON
+          test "$(git hash-object assets/bodies/mean_all.obj)" = "5dc5946631cdd88a8890510e5c3c9775706798d4"
+          test "$(git hash-object assets/bodies/mean_all.yaml)" = "608c5cd7827354fdc23b204fc407b991dfcfdf40"
+          test "$(git hash-object assets/Patterns/shirt_mean_specification.json)" = "b8c7c10fe57c02cebef974cd1385022095c096d9"
+          test "$(git hash-object assets/Sim_props/default_sim_props.yaml)" = "7ee52d245f2f0d06bd9762d72df66b7296255389"
+
+      - name: Write explicit convergence-only wrapper
+        shell: bash
+        working-directory: upstream/GarmentCode
+        run: |
+          set -euo pipefail
+          cat > run_controlled_convergence.py <<'PY'
+          import json
+          import os
+          import runpy
+          import sys
+          from pathlib import Path
+          from pygarment.meshgen.sim_config import SimConfig
+
+          forced = int(os.environ["FORCED_POST_GRAVITY_FRAMES"])
+          original_update_min_steps = SimConfig.update_min_steps
+
+          def controlled_update_min_steps(self):
+              original_update_min_steps(self)
+              self.min_sim_steps = max(
+                  self.min_sim_steps,
+                  self.zero_gravity_steps + forced,
+              )
+
+          SimConfig.update_min_steps = controlled_update_min_steps
+
+          policy = {
+              "schema": "humanoid_rig/clothing_c2_controlled_convergence_policy@1.0",
+              "scope": "stopping-policy-only",
+              "sourcePatternChanged": False,
+              "bodyChanged": False,
+              "materialChanged": False,
+              "collisionSettingsChanged": False,
+              "solverChanged": False,
+              "forcedPostGravityFrames": forced,
+              "reason": "The fixed default shirt has no requested attachment labels. The upstream minimum-step policy then permits a static check immediately after gravity is enabled. This wrapper delays only that check.",
+              "authoritativeClassification": "derived controlled reference, not untouched upstream default output",
+          }
+          Path("CONTROLLED_CONVERGENCE_POLICY.json").write_text(
+              json.dumps(policy, indent=2), encoding="utf-8"
+          )
+
+          sys.argv = [
+              "test_garment_sim.py",
+              "--pattern_spec", "./assets/Patterns/shirt_mean_specification.json",
+              "--sim_config", "./assets/Sim_props/default_sim_props.yaml",
+          ]
+          runpy.run_path("test_garment_sim.py", run_name="__main__")
+          PY
+
+      - name: Run controlled post-gravity convergence
+        id: simulate
+        shell: bash
+        working-directory: upstream/GarmentCode
+        continue-on-error: true
+        run: |
+          set +e
+          export PYTHONPATH="$PWD:${PYTHONPATH:-}"
+          export CC=gcc-11
+          export CXX=g++-11
+          START=$(date +%s)
+          xvfb-run -a python run_controlled_convergence.py 2>&1 | tee ../../garmentcode-controlled-convergence.log
+          CODE=${PIPESTATUS[0]}
+          END=$(date +%s)
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "elapsed_seconds=$((END-START))" >> "$GITHUB_OUTPUT"
+          exit $CODE
+
+      - name: Collect and audit outputs
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          OUT=artifacts/clothing-c2-controlled-convergence-v6
+          mkdir -p "$OUT"
+          cp warp-build.log "$OUT/" 2>/dev/null || true
+          cp warp-cpu-jit-probe.log "$OUT/" 2>/dev/null || true
+          cp garmentcode-controlled-convergence.log "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/CONTROLLED_CONVERGENCE_POLICY.json "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/assets/Patterns/shirt_mean_specification.json "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/assets/bodies/mean_all.obj "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/assets/bodies/mean_all.yaml "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/assets/Sim_props/default_sim_props.yaml "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/LICENSE "$OUT/LICENSE_GARMENTCODE.txt" 2>/dev/null || true
+          if [ -d upstream/GarmentCode/Logs ]; then
+            cp -a upstream/GarmentCode/Logs "$OUT/Logs"
+          fi
+
+          SIM_EXIT='${{ steps.simulate.outputs.exit_code }}'
+          ELAPSED='${{ steps.simulate.outputs.elapsed_seconds }}'
+          SIM_EXIT="$SIM_EXIT" ELAPSED="$ELAPSED" python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import yaml
+
+          root = Path("artifacts/clothing-c2-controlled-convergence-v6")
+          files = []
+          for p in sorted(root.rglob("*")):
+              if p.is_file():
+                  files.append({
+                      "path": p.relative_to(root).as_posix(),
+                      "bytes": p.stat().st_size,
+                      "sha256": hashlib.sha256(p.read_bytes()).hexdigest(),
+                  })
+          box_objs = [f for f in files if f["path"].endswith("_boxmesh.obj")]
+          sim_objs = [f for f in files if f["path"].endswith("_sim.obj")]
+          renders = [f for f in files if "_render" in f["path"] and f["path"].endswith(".png")]
+          sim_props_files = list(root.glob("Logs/*/sim_props.yaml"))
+          stats = {}
+          fails = {}
+          if sim_props_files:
+              data = yaml.safe_load(sim_props_files[0].read_text(encoding="utf-8"))
+              stats = data.get("sim", {}).get("stats", {})
+              fails = stats.get("fails", {})
+          report = {
+              "schema": "humanoid_rig/clothing_c2_controlled_convergence_run@1.0",
+              "garmentCodeCommit": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+              "warpCommit": "63baf6855efdd89b2834b74640f84b3bb0d86b50",
+              "sourceInputsUnchanged": True,
+              "stoppingPolicyExtensionOnly": True,
+              "forcedPostGravityFrames": 120,
+              "classification": "derived controlled reference",
+              "simulationExitCode": os.environ.get("SIM_EXIT", ""),
+              "elapsedSeconds": os.environ.get("ELAPSED", ""),
+              "boxMeshProduced": bool(box_objs),
+              "drapedMeshProduced": bool(sim_objs),
+              "renderProduced": bool(renders),
+              "upstreamQualityFails": fails,
+              "simulationStats": stats,
+              "files": files,
+              "visualAcceptance": False,
+              "productionReady": False,
+          }
+          (root / "RUN_REPORT.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+          print(json.dumps({
+              "drapedMeshProduced": report["drapedMeshProduced"],
+              "renderProduced": report["renderProduced"],
+              "simulationExitCode": report["simulationExitCode"],
+              "elapsedSeconds": report["elapsedSeconds"],
+              "upstreamQualityFails": report["upstreamQualityFails"],
+              "finFrame": stats.get("fin_frame", {}),
+              "bodyCollisions": stats.get("body_collisions", {}),
+              "selfCollisions": stats.get("self_collisions", {}),
+          }, indent=2))
+          PY
+          (cd "$OUT" && find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt)
+          find "$OUT" -maxdepth 5 -type f -printf '%p %s bytes\n' | sort
+          exit 0
+
+      - name: Upload controlled convergence reference
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HRL-M04-C2-controlled-convergence-v6
+          path: artifacts/clothing-c2-controlled-convergence-v6
+          if-no-files-found: error
+          retention-days: 30
