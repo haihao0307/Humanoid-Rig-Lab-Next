@@ -1,0 +1,158 @@
+name: Cat surface reference intake
+
+on:
+  push:
+    branches:
+      - experiment/cat-authoritative-reference-intake-v1-20260911
+    paths:
+      - .github/workflows/cat-surface-reference-intake.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-and-inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install reference tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install objaverse trimesh pygltflib numpy matplotlib pillow requests
+
+      - name: Download one locked CC BY surface candidate
+        run: |
+          set -euo pipefail
+          mkdir -p reference-intake/cat-surface-v1
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import shutil
+          import requests
+          import objaverse
+          import trimesh
+          import numpy as np
+          import matplotlib.pyplot as plt
+
+          UID = '9cf0d4d9c380433e9ae04b05d2397368'
+          OUT = Path('reference-intake/cat-surface-v1')
+          OUT.mkdir(parents=True, exist_ok=True)
+
+          metadata_url = f'https://api.sketchfab.com/v3/models/{UID}'
+          response = requests.get(metadata_url, timeout=45)
+          response.raise_for_status()
+          metadata = response.json()
+          (OUT / 'SKETCHFAB_METADATA.json').write_text(
+              json.dumps(metadata, indent=2, ensure_ascii=False), encoding='utf-8')
+
+          downloaded = objaverse.load_objects(uids=[UID], download_processes=1)
+          source_path = Path(downloaded[UID])
+          suffix = source_path.suffix.lower() or '.glb'
+          preserved = OUT / f'realistic-cat-reference-{UID}{suffix}'
+          shutil.copy2(source_path, preserved)
+
+          sha = hashlib.sha256(preserved.read_bytes()).hexdigest()
+          loaded = trimesh.load(preserved, force='scene', process=False)
+          if isinstance(loaded, trimesh.Trimesh):
+              scene = trimesh.Scene(loaded)
+          else:
+              scene = loaded
+
+          meshes = []
+          for node_name in scene.graph.nodes_geometry:
+              transform, geom_name = scene.graph[node_name]
+              geom = scene.geometry[geom_name].copy()
+              geom.apply_transform(transform)
+              meshes.append(geom)
+          if not meshes:
+              raise RuntimeError('No mesh geometry found in downloaded reference')
+          combined = trimesh.util.concatenate(meshes)
+
+          vertices = np.asarray(combined.vertices, dtype=np.float64)
+          centered = vertices - vertices.mean(axis=0)
+          covariance = np.cov(centered.T)
+          eigvals, eigvecs = np.linalg.eigh(covariance)
+          order = np.argsort(eigvals)[::-1]
+          basis = eigvecs[:, order]
+          principal = centered @ basis
+          extents = principal.max(axis=0) - principal.min(axis=0)
+
+          views = [
+              ('Principal A/B', 0, 1, 2),
+              ('Principal A/C', 0, 2, 1),
+              ('Principal B/C', 1, 2, 0),
+              ('Principal B/A', 1, 0, 2),
+              ('Principal C/A', 2, 0, 1),
+              ('Principal C/B', 2, 1, 0),
+          ]
+          fig, axes = plt.subplots(2, 3, figsize=(15, 9), dpi=160)
+          stride = max(1, len(principal) // 140000)
+          pts = principal[::stride]
+          for ax, (title, xi, yi, di) in zip(axes.flat, views):
+              depth = pts[:, di]
+              order_depth = np.argsort(depth)
+              ax.scatter(pts[order_depth, xi], pts[order_depth, yi],
+                         c=depth[order_depth], s=0.08, linewidths=0, cmap='viridis')
+              ax.set_aspect('equal', adjustable='box')
+              ax.set_title(title)
+              ax.axis('off')
+          fig.suptitle('Actual downloaded surface reference: Realistic Cat 3D Model', fontsize=16)
+          fig.tight_layout()
+          fig.savefig(OUT / 'REFERENCE_SURFACE_MULTIVIEW.png', bbox_inches='tight')
+          plt.close(fig)
+
+          faces = np.asarray(combined.faces)
+          receipt = {
+              'schema': 'kaopu.cat.surface-reference-receipt/1.0',
+              'uid': UID,
+              'title': metadata.get('name'),
+              'author': (metadata.get('user') or {}).get('displayName') or (metadata.get('user') or {}).get('username'),
+              'sourcePage': f'https://sketchfab.com/3d-models/realistic-cat-3d-model-{UID}',
+              'license': metadata.get('license'),
+              'isDownloadable': metadata.get('isDownloadable'),
+              'publishedAt': metadata.get('publishedAt'),
+              'sourceFile': preserved.name,
+              'sourceBytes': preserved.stat().st_size,
+              'sha256': sha,
+              'geometryCount': len(meshes),
+              'vertexCount': int(len(vertices)),
+              'triangleCount': int(len(faces)),
+              'connectedComponents': int(len(combined.split(only_watertight=False))),
+              'watertight': bool(combined.is_watertight),
+              'eulerNumber': int(combined.euler_number),
+              'bounds': combined.bounds.tolist(),
+              'principalExtents': extents.tolist(),
+              'principalBasis': basis.tolist(),
+              'visualEvidence': 'REFERENCE_SURFACE_MULTIVIEW.png',
+              'role': 'candidate surface geometry for function recording and parameterized reconstruction',
+              'runtimeDependency': False,
+              'oneToOneAccepted': False,
+              'productionReady': False
+          }
+          (OUT / 'REFERENCE_SURFACE_RECEIPT.json').write_text(
+              json.dumps(receipt, indent=2, ensure_ascii=False), encoding='utf-8')
+          print(json.dumps(receipt, indent=2, ensure_ascii=False))
+          PY
+
+      - name: Validate artifact contents
+        run: |
+          set -euo pipefail
+          test -s reference-intake/cat-surface-v1/REFERENCE_SURFACE_RECEIPT.json
+          test -s reference-intake/cat-surface-v1/REFERENCE_SURFACE_MULTIVIEW.png
+          find reference-intake/cat-surface-v1 -maxdepth 1 -type f -printf '%f %s bytes\n'
+
+      - name: Upload surface reference artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-realistic-surface-reference-v1
+          path: reference-intake/cat-surface-v1/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
