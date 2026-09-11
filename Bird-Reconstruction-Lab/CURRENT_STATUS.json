@@ -1,0 +1,59 @@
+{
+  "schema": "humanoid-rig-lab-next/bird-r57-current-status@1.0",
+  "version": "R57.0-authoritative-reference-bootstrap",
+  "date": "2026-09-11",
+  "stage": "authoritative-reference-bootstrap",
+  "target_species": {
+    "scientific_name": "Spilopelia chinensis",
+    "common_name": "Spotted Dove",
+    "species_reference_registration": "pending"
+  },
+  "completed": {
+    "authoritative_reference_downloaded": true,
+    "source_hash_locked": true,
+    "source_topology_audited": true,
+    "articulated_rig_and_weights_audited": true,
+    "function_parameters_recorded": true,
+    "strict_code_reconstruction_byte_identical": true,
+    "residual_closure_available": true,
+    "r56_baseline_preserved": true
+  },
+  "quantitative_result": {
+    "reference_vertices": 8210,
+    "reference_triangles": 14268,
+    "reference_connected_components": 89,
+    "main_body_component_watertight": true,
+    "function_only_error_source_units": {
+      "rms": 0.4133297953867166,
+      "median": 0.18560639990403902,
+      "p90": 0.5394930689911128,
+      "p95": 0.6641279637920392,
+      "p99": 1.3253728096891952,
+      "max": 6.373167895593284
+    },
+    "strict_error_source_units": {
+      "rms": 0.0,
+      "max": 0.0
+    },
+    "strict_position_sha256": "4f52fba89163696b19da620e9600109bc0244e0a5b55709d4214ce1a1f7bda94",
+    "strict_index_sha256": "b457e343ae302e6fd178b260d3e12c5fe1c0e8e32b4598b5c2b810d0e4fea0bb"
+  },
+  "open_gates": {
+    "source_units_resolved": false,
+    "spotted_dove_multiview_set_locked": false,
+    "species_specific_fit_complete": false,
+    "regional_error_thresholds_validated": false,
+    "applied_to_r56_runtime": false,
+    "public_fixed_commit_preview_verified": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "next_execution_order": [
+    "lock Spotted Dove orthographic and calibrated photographic references",
+    "register AVES main body and detached feather components to the species silhouette",
+    "fit head, neck, pectoral trunk, folded wing, tail, legs and feet as separate regions",
+    "measure bidirectional surface and silhouette errors per region",
+    "transfer accepted parameters into a new R57 generator without touching the R56 baseline",
+    "run fixed-view browser and mobile visual QA before opening acceptance gates"
+  ]
+}
