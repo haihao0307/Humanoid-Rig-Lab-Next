@@ -1,0 +1,152 @@
+name: Clothing C2 authoritative drape reference
+
+on:
+  push:
+    branches:
+      - experiment/clothing-c2-authoritative-3d-import-20260911
+    paths:
+      - .github/workflows/clothing-c2-authoritative-drape.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  simulate-authoritative-reference:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      GARMENTCODE_COMMIT: d449629979028123a5c4dc9e732a2ec19b7fce31
+      WARP_COMMIT: 63baf6855efdd89b2834b74640f84b3bb0d86b50
+      PYTHONUNBUFFERED: "1"
+      WP_DISABLE_CUDA: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+          cache: pip
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake ninja-build git git-lfs \
+            xvfb libgl1-mesa-dev libegl1-mesa-dev libglu1-mesa-dev \
+            libcairo2 libcairo2-dev pkg-config
+          git lfs install
+
+      - name: Fetch fixed upstream revisions
+        run: |
+          git clone --filter=blob:none https://github.com/maria-korosteleva/GarmentCode.git upstream/GarmentCode
+          git -C upstream/GarmentCode checkout --detach "$GARMENTCODE_COMMIT"
+          git clone --filter=blob:none https://github.com/maria-korosteleva/NvidiaWarp-GarmentCode.git upstream/NvidiaWarp-GarmentCode
+          git -C upstream/NvidiaWarp-GarmentCode checkout --detach "$WARP_COMMIT"
+          git -C upstream/GarmentCode lfs pull || true
+          git -C upstream/NvidiaWarp-GarmentCode lfs pull || true
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install \
+            "numpy<2" scipy "pyyaml>=6.0" svgwrite svgpathtools psutil \
+            matplotlib CairoSVG nicegui trimesh pyrender libigl networkx pillow
+
+      - name: Build fixed GarmentCode Warp CPU runtime
+        working-directory: upstream/NvidiaWarp-GarmentCode
+        run: |
+          unset CUDA_PATH CUDA_HOME
+          python build_lib.py --mode release
+          python -m pip install -e .
+          python - <<'PY'
+          import warp as wp
+          wp.init()
+          print("warp_version", getattr(wp, "__version__", "unknown"))
+          print("warp_devices", wp.get_devices())
+          PY
+
+      - name: Configure fixed GarmentCode paths
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path.cwd().resolve()
+          gc = root / "upstream" / "GarmentCode"
+          output = root / "c2-output"
+          values = {
+              "output": str(output),
+              "datasets_path": str(root / "datasets"),
+              "datasets_sim": str(root / "datasets-sim"),
+              "sim_configs_path": str(gc / "assets" / "Sim_props"),
+              "bodies_default_path": str(gc / "assets" / "bodies"),
+              "body_samples_path": str(gc / "assets" / "bodies"),
+          }
+          for path in [output, root/"datasets", root/"datasets-sim"]:
+              path.mkdir(parents=True, exist_ok=True)
+          (gc / "system.json").write_text(json.dumps(values, indent=2), encoding="utf-8")
+          print((gc / "system.json").read_text())
+          PY
+
+      - name: Run fixed authoritative shirt simulation
+        working-directory: upstream/GarmentCode
+        env:
+          PYTHONPATH: ${{ github.workspace }}/upstream/GarmentCode
+          PYOPENGL_PLATFORM: egl
+        run: |
+          set -o pipefail
+          xvfb-run -a python test_garment_sim.py \
+            --pattern_spec ./assets/Patterns/shirt_mean_specification.json \
+            --sim_config ./assets/Sim_props/default_sim_props.yaml \
+            2>&1 | tee ../../c2-output/simulation.log
+
+      - name: Build provenance and file inventory
+        if: always()
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path.cwd().resolve()
+          out = root / "c2-output"
+          out.mkdir(exist_ok=True)
+          def h(path):
+              d=hashlib.sha256()
+              with path.open("rb") as f:
+                  for b in iter(lambda:f.read(1024*1024), b""):
+                      d.update(b)
+              return d.hexdigest()
+          files=[]
+          for p in sorted(out.rglob("*")):
+              if p.is_file():
+                  files.append({"path":str(p.relative_to(out)),"bytes":p.stat().st_size,"sha256":h(p)})
+          source={}
+          for rel in [
+              "assets/Patterns/shirt_mean_specification.json",
+              "assets/bodies/mean_all.obj",
+              "assets/bodies/mean_all.yaml",
+              "assets/Sim_props/default_sim_props.yaml",
+          ]:
+              p=root/"upstream"/"GarmentCode"/rel
+              source[rel]={"bytes":p.stat().st_size,"sha256":h(p)} if p.exists() else None
+          report={
+              "schema":"humanoid_rig/clothing_c2_authoritative_drape_run@1.0",
+              "garmentCodeCommit":"d449629979028123a5c4dc9e732a2ec19b7fce31",
+              "warpCommit":"63baf6855efdd89b2834b74640f84b3bb0d86b50",
+              "source":source,
+              "outputs":files,
+              "productionAdoption":False,
+              "visualAcceptance":False,
+              "licenseNote":"Reference-only experiment. Fixed Warp revision is isolated from production.",
+          }
+          (out/"C2_DRAPE_RUN.json").write_text(json.dumps(report,indent=2),encoding="utf-8")
+          PY
+          find c2-output -maxdepth 6 -type f -printf '%p %s bytes\n' | sort
+
+      - name: Upload authoritative drape reference
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HRL-M04-C2-authoritative-drape-reference
+          path: c2-output
+          if-no-files-found: error
+          retention-days: 30
