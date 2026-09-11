@@ -1,0 +1,63 @@
+name: Cat selected surface direct download
+
+on:
+  push:
+    branches:
+      - experiment/cat-authoritative-reference-intake-v1-20260911
+    paths:
+      - .github/workflows/cat-selected-surface-direct-download.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download locked GLB directly from Objaverse mirror
+        run: |
+          set -euo pipefail
+          mkdir -p selected-reference
+          URL='https://huggingface.co/datasets/allenai/objaverse/resolve/main/glbs/000-053/28d33c1592e14d8b895d36a1e0dfaa5d.glb'
+          curl --fail --location --retry 5 --retry-delay 2 --connect-timeout 20 \
+            --output selected-reference/my-cat-modeled-28d33c1592e14d8b895d36a1e0dfaa5d.glb "$URL"
+          test -s selected-reference/my-cat-modeled-28d33c1592e14d8b895d36a1e0dfaa5d.glb
+          sha256sum selected-reference/*.glb | tee selected-reference/SHA256SUMS.txt
+      - name: Write source lock
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          p = Path('selected-reference/my-cat-modeled-28d33c1592e14d8b895d36a1e0dfaa5d.glb')
+          receipt = {
+              'schema': 'kaopu.cat.selected_surface_source/1.0',
+              'uid': '28d33c1592e14d8b895d36a1e0dfaa5d',
+              'title': 'My Cat Modeled',
+              'description': 'Model referenced from the author\'s cat, textured and polished',
+              'authorDeclaredLicense': 'CC BY 4.0',
+              'sourcePage': 'https://sketchfab.com/3d-models/28d33c1592e14d8b895d36a1e0dfaa5d',
+              'mirrorPath': 'glbs/000-053/28d33c1592e14d8b895d36a1e0dfaa5d.glb',
+              'sourceFile': p.name,
+              'bytes': p.stat().st_size,
+              'sha256': hashlib.sha256(p.read_bytes()).hexdigest(),
+              'role': 'candidate living-body surface reference for visual acceptance before parameter capture',
+              'runtimeDependency': False,
+              'visualAccepted': False,
+              'parameterCaptureStarted': False
+          }
+          Path('selected-reference/SELECTED_SOURCE_RECEIPT.json').write_text(
+              json.dumps(receipt, ensure_ascii=False, indent=2), encoding='utf-8')
+          print(json.dumps(receipt, ensure_ascii=False, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cat-selected-living-surface-candidate
+          path: selected-reference/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
