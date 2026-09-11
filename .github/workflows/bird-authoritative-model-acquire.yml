@@ -1,0 +1,159 @@
+name: Bird R57 Acquire Exact MooreLab Model
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - experiment/bird-r57-authoritative-reference-reconstruction-v1
+    paths:
+      - '.github/workflows/bird-authoritative-model-acquire.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-exact-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MODEL_UID: 0014e26b6ddd4c1ab48116355ed46209
+      SKETCHFAB_TOKEN: ${{ secrets.SKETCHFAB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare acquisition record
+        shell: python
+        run: |
+          import json
+          import pathlib
+          import urllib.request
+
+          out = pathlib.Path('bird-r57-moorelab-acquisition')
+          out.mkdir(parents=True, exist_ok=True)
+          uid = '0014e26b6ddd4c1ab48116355ed46209'
+          req = urllib.request.Request(
+              f'https://api.sketchfab.com/v3/models/{uid}',
+              headers={
+                  'Accept': 'application/json',
+                  'User-Agent': 'Humanoid-Rig-Lab-Next-Bird-R57/1.0'
+              }
+          )
+          with urllib.request.urlopen(req, timeout=45) as response:
+              metadata = json.loads(response.read().decode('utf-8'))
+          (out / 'SKETCHFAB_MODEL_METADATA.json').write_text(
+              json.dumps(metadata, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+
+      - name: Record missing authenticated access
+        if: ${{ env.SKETCHFAB_TOKEN == '' }}
+        shell: python
+        run: |
+          import json
+          import pathlib
+          status = {
+              'schema': 'humanoid-rig-lab-next/bird-r57-model-acquisition@1.0',
+              'model_uid': '0014e26b6ddd4c1ab48116355ed46209',
+              'model_name': 'Spotted Dove - Spilopelia chinensis',
+              'specimen_guid': 'MLZ:Bird:65780',
+              'provider': 'Moore Laboratory of Zoology, Occidental College',
+              'status': 'blocked_by_missing_sketchfab_token',
+              'source_is_downloadable': True,
+              'license': 'CC BY 4.0',
+              'required_repository_secret': 'SKETCHFAB_TOKEN',
+              'access_controls_must_not_be_bypassed': True,
+              'visualAcceptance': False,
+              'productionReady': False
+          }
+          pathlib.Path('bird-r57-moorelab-acquisition/ACQUISITION_STATUS.json').write_text(
+              json.dumps(status, indent=2) + '\n', encoding='utf-8'
+          )
+
+      - name: Request authenticated archive URL
+        if: ${{ env.SKETCHFAB_TOKEN != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bird-r57-moorelab-acquisition/original
+          code=$(curl --silent --show-error --location \
+            --output bird-r57-moorelab-acquisition/download-response.json \
+            --write-out '%{http_code}' \
+            --header "Authorization: Token ${SKETCHFAB_TOKEN}" \
+            "https://api.sketchfab.com/v3/models/${MODEL_UID}/download")
+          if [ "$code" = "401" ] || [ "$code" = "403" ]; then
+            code=$(curl --silent --show-error --location \
+              --output bird-r57-moorelab-acquisition/download-response.json \
+              --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${SKETCHFAB_TOKEN}" \
+              "https://api.sketchfab.com/v3/models/${MODEL_UID}/download")
+          fi
+          test "$code" = "200"
+
+      - name: Download and unpack exact model
+        if: ${{ env.SKETCHFAB_TOKEN != '' }}
+        shell: python
+        run: |
+          import hashlib
+          import json
+          import pathlib
+          import urllib.request
+          import zipfile
+
+          root = pathlib.Path('bird-r57-moorelab-acquisition')
+          response = json.loads((root / 'download-response.json').read_text(encoding='utf-8'))
+          archive = response.get('gltf') or response.get('glb')
+          if not archive or not archive.get('url'):
+              raise SystemExit('Sketchfab response does not contain a glTF or GLB archive URL')
+
+          archive_path = root / 'original' / 'moorelab_spotted_dove_gltf.zip'
+          req = urllib.request.Request(
+              archive['url'],
+              headers={'User-Agent': 'Humanoid-Rig-Lab-Next-Bird-R57/1.0'}
+          )
+          with urllib.request.urlopen(req, timeout=180) as response_obj:
+              archive_path.write_bytes(response_obj.read())
+
+          unpacked = root / 'original' / 'unpacked'
+          unpacked.mkdir(parents=True, exist_ok=True)
+          with zipfile.ZipFile(archive_path) as zf:
+              zf.extractall(unpacked)
+
+          files = []
+          for path in sorted(root.rglob('*')):
+              if path.is_file() and path.name != 'ACQUISITION_MANIFEST.json':
+                  data = path.read_bytes()
+                  files.append({
+                      'path': str(path.relative_to(root)),
+                      'bytes': len(data),
+                      'sha256': hashlib.sha256(data).hexdigest()
+                  })
+
+          manifest = {
+              'schema': 'humanoid-rig-lab-next/bird-r57-model-acquisition@1.0',
+              'model_uid': '0014e26b6ddd4c1ab48116355ed46209',
+              'model_name': 'Spotted Dove - Spilopelia chinensis',
+              'specimen_guid': 'MLZ:Bird:65780',
+              'provider': 'Moore Laboratory of Zoology, Occidental College',
+              'license': 'CC BY 4.0',
+              'status': 'acquired_and_hash_locked',
+              'archive_type': 'gltf',
+              'files': files,
+              'source_files_read_only': True,
+              'final_runtime_external_mesh_dependency': False,
+              'visualAcceptance': False,
+              'productionReady': False
+          }
+          (root / 'ACQUISITION_MANIFEST.json').write_text(
+              json.dumps(manifest, indent=2) + '\n', encoding='utf-8'
+          )
+
+      - name: Package acquisition evidence
+        run: zip -r BIRD_R57_MOORELAB_EXACT_MODEL_ACQUISITION.zip bird-r57-moorelab-acquisition
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BIRD_R57_MOORELAB_EXACT_MODEL_ACQUISITION
+          path: |
+            bird-r57-moorelab-acquisition/
+            BIRD_R57_MOORELAB_EXACT_MODEL_ACQUISITION.zip
+          retention-days: 30
