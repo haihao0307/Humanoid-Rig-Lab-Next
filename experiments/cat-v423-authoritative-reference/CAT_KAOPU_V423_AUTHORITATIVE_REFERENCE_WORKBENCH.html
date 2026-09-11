@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CAT KAOPU V4.23 权威参考模型工作台</title>
+<style>
+:root{color-scheme:dark;--bg:#070b0f;--panel:#10161d;--panel2:#141d26;--line:#2b3947;--text:#eef4f7;--muted:#9baab8;--accent:#76c8ff;--good:#7dd5a7;--warn:#f0bf6a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,"PingFang SC","Microsoft YaHei",sans-serif}.app{display:grid;grid-template-columns:390px minmax(0,1fr);min-height:100vh}.side{padding:18px;background:var(--panel);border-right:1px solid var(--line);overflow:auto}.main{padding:16px;display:grid;grid-template-rows:auto minmax(520px,1fr) auto;gap:12px}.card{background:var(--panel2);border:1px solid var(--line);border-radius:15px;padding:14px}.title{margin:0 0 6px;font-size:22px}.muted{color:var(--muted);font-size:13px;line-height:1.55}.tag{display:inline-block;padding:4px 8px;margin:8px 5px 0 0;border-radius:999px;background:#173044;color:#a8dbff;font-size:12px}.ok{color:var(--good)}.warn{color:var(--warn)}.kv{display:grid;grid-template-columns:120px 1fr;gap:7px 10px;font-size:12px;line-height:1.45}.kv b{color:#b9cad6}.viewer{position:relative;overflow:hidden;padding:0}.viewer iframe{width:100%;height:100%;min-height:540px;border:0;background:#06090c}.overlay{position:absolute;left:14px;top:14px;background:rgba(7,11,15,.84);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:10px 12px;pointer-events:none}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.drop{border:1px dashed #4b657a;border-radius:12px;padding:14px;background:#0b1219}.drop input{width:100%;margin:10px 0}.hash{font:12px ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;word-break:break-all;background:#080d12;border:1px solid #263542;padding:10px;border-radius:10px;min-height:92px}.divider{height:1px;background:var(--line);margin:14px 0}.checklist{padding-left:18px;margin:8px 0;font-size:13px;color:#cbd6de;line-height:1.65}@media(max-width:900px){.app{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line)}.main{grid-template-rows:auto 480px auto;padding:10px}.viewer iframe{min-height:480px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <h1 class="title">CAT KAOPU V4.23</h1>
+    <div class="muted">权威完整身体参考模型锁定工作台</div>
+    <span class="tag">主参考已选定</span><span class="tag">CT 衍生</span><span class="tag">兽医学院来源</span>
+    <div class="divider"></div>
+    <div class="card">
+      <strong>Domestic Cat (Felis catus)</strong>
+      <div class="muted" style="margin-top:6px">The University of Edinburgh Open.Ed<br>The Royal (Dick) School of Veterinary Studies</div>
+      <div class="divider"></div>
+      <div class="kv">
+        <b>模型 UID</b><span>7c99ca836d834c39872ecf5e9b5e2087</span>
+        <b>三角形</b><span>约 1.1 M</span>
+        <b>顶点</b><span>约 541.3 K</span>
+        <b>来源</b><span>CT 衍生骨架</span>
+        <b>许可声明</b><span>CC Attribution</span>
+        <b>运行依赖</b><span class="ok">否</span>
+        <b>原件已装入</b><span class="warn">等待官方登录下载包</span>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <strong>作为基础数据的职责</strong>
+      <ul class="checklist"><li>完整骨架拓扑与比例</li><li>脊柱、胸廓与骨盆</li><li>肩胛与四肢骨链</li><li>腕跗、掌跖与趾骨</li><li>各部位函数反求的结构锚点</li></ul>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <strong>仍需其他证据</strong>
+      <div class="muted" style="margin-top:7px">肌肉、筋膜、皮下组织、活体外轮廓、耳廓软组织、肉垫和皮毛不会由骨架固定增厚得到。</div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="card"><strong>官方模型并排检查</strong><div class="muted">下面的查看器直接指向官方 Sketchfab 模型。模型原件不在网页里复制。</div></div>
+    <section class="card viewer">
+      <iframe title="University of Edinburgh Domestic Cat CT reference" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen src="https://sketchfab.com/models/7c99ca836d834c39872ecf5e9b5e2087/embed?autostart=0&ui_theme=dark&ui_infos=0"></iframe>
+      <div class="overlay"><strong>PRIMARY STRUCTURAL REFERENCE</strong><div class="muted">University of Edinburgh Open.Ed</div></div>
+    </section>
+    <div class="grid">
+      <section class="card drop">
+        <strong>导入官方原始下载包</strong>
+        <div class="muted">请从官方页面登录下载后，将未修改的 ZIP、GLB、GLTF、OBJ、PLY、STL 或 FBX 放入此处。网页只计算本地 SHA256，不上传文件。</div>
+        <input id="file" type="file" accept=".zip,.glb,.gltf,.obj,.ply,.stl,.fbx,.dae">
+        <div id="hash" class="hash">等待文件</div>
+      </section>
+      <section class="card">
+        <strong>锁定后执行顺序</strong>
+        <ol class="checklist"><li>保存原件与下载许可</li><li>计算 SHA256 和目录清单</li><li>锁定单位、轴向、尺度和姿态</li><li>按解剖区域记录函数</li><li>代码重建并做双向距离审计</li><li>原件退出正式运行时</li></ol>
+        <div class="muted">命令行入口：<code>python tools/cat-v423/intake_reference.py 官方下载包</code></div>
+      </section>
+    </div>
+  </main>
+</div>
+<script>
+const input=document.getElementById('file');const output=document.getElementById('hash');input.addEventListener('change',async()=>{const file=input.files&&input.files[0];if(!file){output.textContent='等待文件';return;}output.textContent='正在计算 SHA256…';try{const bytes=await file.arrayBuffer();const digest=await crypto.subtle.digest('SHA-256',bytes);const hex=[...new Uint8Array(digest)].map(v=>v.toString(16).padStart(2,'0')).join('');const record={modelUid:'7c99ca836d834c39872ecf5e9b5e2087',originalFileName:file.name,bytes:file.size,sha256:hex,lastModified:file.lastModified,uploadedToNetwork:false,status:'local-source-hash-recorded'};output.textContent=JSON.stringify(record,null,2);}catch(error){output.textContent='读取失败：'+String(error);}});
+</script>
+</body>
+</html>
