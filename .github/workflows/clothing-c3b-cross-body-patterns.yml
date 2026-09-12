@@ -1,0 +1,57 @@
+name: Clothing C3B cross body patterns
+on:
+  push:
+    branches: [experiment/clothing-c2-authoritative-3d-import-20260911]
+    paths: [.github/workflows/clothing-c3b-cross-body-patterns.yml]
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'numpy<2' scipy pyyaml svgwrite svgpathtools psutil matplotlib CairoSVG
+      - name: Fetch fixed GarmentCode
+        run: |
+          curl -L --fail https://github.com/maria-korosteleva/GarmentCode/archive/d449629979028123a5c4dc9e732a2ec19b7fce31.zip -o /tmp/GarmentCode.zip
+          unzip -q /tmp/GarmentCode.zip -d /tmp
+          mv /tmp/GarmentCode-d449629979028123a5c4dc9e732a2ec19b7fce31 /tmp/GarmentCode
+      - name: Generate three body variants
+        working-directory: /tmp/GarmentCode
+        run: |
+          cat > /tmp/c3b_variants.py <<'PY'
+          import copy, json, sys, yaml
+          from pathlib import Path
+          sys.path.insert(0, '/tmp/GarmentCode')
+          from assets.garment_programs.meta_garment import MetaGarment
+          from assets.bodies.body_params import BodyParameters
+          root=Path('/tmp/GarmentCode')
+          out=Path('/tmp/c3b-cross-body'); out.mkdir()
+          design=yaml.safe_load((root/'assets/design_params/t-shirt.yaml').read_text())['design']
+          bodies={'neutral':'mean_all.yaml','male':'mean_male.yaml','female':'mean_female.yaml'}
+          summary={}
+          for key,filename in bodies.items():
+              body=BodyParameters(str(root/'assets/bodies'/filename))
+              garment=MetaGarment('standard_tee_'+key,body,copy.deepcopy(design))
+              pattern=garment.assembly()
+              path=out/(key+'_specification.json')
+              path.write_text(json.dumps(pattern.spec,indent=2),encoding='utf-8')
+              panels=pattern.spec['pattern']['panels']
+              summary[key]={'body':filename,'panels':len(panels),'stitches':len(pattern.spec['pattern']['stitches']),'selfIntersecting':bool(garment.is_self_intersecting())}
+          (out/'SUMMARY.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
+          PY
+          python /tmp/c3b_variants.py
+          cp assets/design_params/t-shirt.yaml /tmp/c3b-cross-body/SOURCE_T_SHIRT_DESIGN.yaml
+          cp assets/bodies/mean_all.yaml /tmp/c3b-cross-body/
+          cp assets/bodies/mean_male.yaml /tmp/c3b-cross-body/
+          cp assets/bodies/mean_female.yaml /tmp/c3b-cross-body/
+          cd /tmp/c3b-cross-body && sha256sum * > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HRL-M04-C3B-cross-body-patterns
+          path: /tmp/c3b-cross-body
+          retention-days: 30
