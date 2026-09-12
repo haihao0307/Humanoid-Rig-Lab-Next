@@ -1,0 +1,158 @@
+name: Bruce clean CC0 canine anchors R13E
+
+on:
+  push:
+    branches:
+      - automation/bruce-cc0-reference-fetch-r13e-20260912
+    paths:
+      - .github/workflows/bruce_cc0_clean_canine_anchors_r13e.yml
+      - tools/_temporary/bruce_cc0_fetch_r13e.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-inspect-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Fetch pinned CC0 source files
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="bruce_cc0_clean_canine_anchors_r13e"
+          ORIGINALS="$ROOT/originals"
+          EVIDENCE="$ROOT/evidence"
+          DERIVED="$ROOT/derived"
+          mkdir -p "$ORIGINALS" "$EVIDENCE" "$DERIVED"
+
+          SOURCE_COMMIT="db3df04d1e4714298a09510b26fb6de6645138a2"
+          BASE="https://raw.githubusercontent.com/agentkaerf/FreeModels/${SOURCE_COMMIT}/Ultimate%20Animated%20Animals%20-%20July%202021/glTF"
+
+          for MODEL in Husky ShibaInu Wolf; do
+            curl --fail --location --retry 3 --retry-all-errors \
+              "$BASE/${MODEL}.gltf" \
+              --output "$ORIGINALS/${MODEL}.gltf"
+          done
+
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://raw.githubusercontent.com/agentkaerf/FreeModels/${SOURCE_COMMIT}/Ultimate%20Animated%20Animals%20-%20July%202021/License.txt" \
+            --output "$EVIDENCE/Ultimate_Animated_Animals_License.txt"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://raw.githubusercontent.com/agentkaerf/FreeModels/${SOURCE_COMMIT}/README.md" \
+            --output "$EVIDENCE/FreeModels_README.md"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://quaternius.com/packs/ultimateanimatedanimals.html" \
+            --output "$EVIDENCE/quaternius_ultimate_animated_animals.html"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt" \
+            --output "$EVIDENCE/CC0-1.0-legalcode.txt"
+
+      - name: Inspect glTF and export immutable static surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/_temporary/bruce_cc0_fetch_r13e.py \
+            bruce_cc0_clean_canine_anchors_r13e/originals/Husky.gltf \
+            bruce_cc0_clean_canine_anchors_r13e/originals/ShibaInu.gltf \
+            bruce_cc0_clean_canine_anchors_r13e/originals/Wolf.gltf \
+            --out bruce_cc0_clean_canine_anchors_r13e/derived
+
+      - name: Write source manifest and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import datetime as dt
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("bruce_cc0_clean_canine_anchors_r13e")
+          commit = "db3df04d1e4714298a09510b26fb6de6645138a2"
+          def digest(path):
+              h = hashlib.sha256()
+              with Path(path).open("rb") as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          records = [
+              ("Husky.gltf", "domestic_primary_medium_muzzle_double_coat_anchor", "cece6d1fc74ad0c0e37ac59cb766274838e938c3", True),
+              ("ShibaInu.gltf", "domestic_primary_compact_spitz_anchor", "132db537c19e98fde409e8c8c4407e88e1b0e4ff", True),
+              ("Wolf.gltf", "wild_canid_boundary_contrast_only", "36f718eabfc65c25c971acfd3ef73b5fcc3fc7b9", False),
+          ]
+          files = []
+          for name, role, blob, domestic in records:
+              path = root / "originals" / name
+              repo_path = f"Ultimate Animated Animals - July 2021/glTF/{name}"
+              files.append({
+                  "name": name,
+                  "role": role,
+                  "domesticDogAnchor": domestic,
+                  "repositoryPath": repo_path,
+                  "gitBlobSha1": blob,
+                  "sizeBytes": path.stat().st_size,
+                  "sha256": digest(path),
+                  "sourceUrl": f"https://github.com/agentkaerf/FreeModels/blob/{commit}/{repo_path.replace(' ', '%20')}",
+              })
+
+          manifest = {
+              "schema": "bruce/cc0_clean_canine_anchor_manifest@1.0",
+              "createdAtUtc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "purpose": "Coarse surface, rig inventory and variation-axis observation. Originals are immutable evidence and never the Bruce production surface.",
+              "author": "Quaternius",
+              "pack": "Ultimate Animated Animal Pack",
+              "packRelease": "July 2021",
+              "licenseSpdx": "CC0-1.0",
+              "commercialUse": True,
+              "modificationAllowed": True,
+              "attributionRequired": False,
+              "officialPackPage": "https://quaternius.com/packs/ultimateanimatedanimals.html",
+              "mirrorRepository": "agentkaerf/FreeModels",
+              "mirrorCommit": commit,
+              "files": files,
+              "evidenceFiles": [
+                  "evidence/Ultimate_Animated_Animals_License.txt",
+                  "evidence/FreeModels_README.md",
+                  "evidence/quaternius_ultimate_animated_animals.html",
+                  "evidence/CC0-1.0-legalcode.txt"
+              ],
+              "acceptanceBoundary": {
+                  "domesticPrimaryAnchors": ["Husky.gltf", "ShibaInu.gltf"],
+                  "boundaryContrastOnly": ["Wolf.gltf"],
+                  "permittedUses": [
+                      "record coarse rest-surface proportions and sectional envelopes",
+                      "inspect source joint naming and animation inventory as hypotheses",
+                      "derive dimensionless ratios and variation axes",
+                      "construct a new parameterized topology from measurements"
+                  ],
+                  "prohibitedClaims": [
+                      "low-poly surface is 3A reference quality",
+                      "source rig is veterinary anatomy",
+                      "joint centers, muscles or range of motion are uniquely recoverable from surface",
+                      "wolf is interchangeable with domestic dog",
+                      "source vertices are the final Bruce topology"
+                  ]
+              }
+          }
+          (root / "SOURCE_MANIFEST.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+
+          (
+            cd bruce_cc0_clean_canine_anchors_r13e
+            find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+            sha256sum -c SHA256SUMS.txt
+          )
+
+      - name: Upload immutable reference artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruce-cc0-clean-canines-r13e
+          path: bruce_cc0_clean_canine_anchors_r13e
+          if-no-files-found: error
+          retention-days: 7
