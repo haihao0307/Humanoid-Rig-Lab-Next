@@ -143,8 +143,8 @@ jobs:
               | sort -z \
               | xargs -0 sha256sum \
               > SHA256SUMS.txt
+            sha256sum -c SHA256SUMS.txt
           )
-          sha256sum -c bruce_cc0_reference_r13e/SHA256SUMS.txt --ignore-missing
 
       - name: Upload immutable reference artifact
         uses: actions/upload-artifact@v4
