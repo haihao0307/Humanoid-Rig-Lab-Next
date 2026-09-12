@@ -70,7 +70,7 @@ jobs:
           python test_garmentcode.py
           PATTERN=$(find PatternLogs -name '*_specification.json' -type f | head -1)
           test -n "$PATTERN"
-          cp "$PATTERN" STANDARD_TEE_SPECIFICATION.json
+          cp "$PATTERN" standard_tee_specification.json
           cp assets/design_params/t-shirt.yaml SOURCE_T_SHIRT_DESIGN.yaml
           cp assets/bodies/mean_all.yaml SOURCE_MEAN_ALL.yaml
           echo "$PATTERN" > GENERATED_PATTERN_PATH.txt
@@ -105,7 +105,7 @@ jobs:
               "classification": "derived controlled drape reference"
           }
           Path("CONTROLLED_CONVERGENCE_POLICY.json").write_text(json.dumps(policy, indent=2), encoding="utf-8")
-          sys.argv = ["test_garment_sim.py", "--pattern_spec", "./STANDARD_TEE_SPECIFICATION.json", "--sim_config", "./assets/Sim_props/default_sim_props.yaml"]
+          sys.argv = ["test_garment_sim.py", "--pattern_spec", "./standard_tee_specification.json", "--sim_config", "./assets/Sim_props/default_sim_props.yaml"]
           runpy.run_path("test_garment_sim.py", run_name="__main__")
           PY
 
@@ -130,7 +130,7 @@ jobs:
           OUT=artifacts/clothing-c3b-standard-tee-drape
           mkdir -p "$OUT"
           cp c3b-standard-tee-drape.log "$OUT/" 2>/dev/null || true
-          cp upstream/GarmentCode/STANDARD_TEE_SPECIFICATION.json "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/standard_tee_specification.json "$OUT/" 2>/dev/null || true
           cp upstream/GarmentCode/SOURCE_T_SHIRT_DESIGN.yaml "$OUT/" 2>/dev/null || true
           cp upstream/GarmentCode/SOURCE_MEAN_ALL.yaml "$OUT/" 2>/dev/null || true
           cp upstream/GarmentCode/CONTROLLED_CONVERGENCE_POLICY.json "$OUT/" 2>/dev/null || true
