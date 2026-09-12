@@ -1,0 +1,155 @@
+name: Bruce CC0 canine reference fetch R13E
+
+on:
+  push:
+    branches:
+      - automation/bruce-cc0-reference-fetch-r13e-20260912
+    paths:
+      - .github/workflows/bruce_cc0_reference_fetch_r13e.yml
+      - tools/_temporary/bruce_cc0_fetch_r13e.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-inspect-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Fetch pinned CC0 source files
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="bruce_cc0_reference_r13e"
+          ORIGINALS="$ROOT/originals"
+          EVIDENCE="$ROOT/evidence"
+          DERIVED="$ROOT/derived"
+          mkdir -p "$ORIGINALS" "$EVIDENCE" "$DERIVED"
+
+          SOURCE_COMMIT="db3df04d1e4714298a09510b26fb6de6645138a2"
+          BASE="https://raw.githubusercontent.com/agentkaerf/FreeModels/${SOURCE_COMMIT}/Zombie%20Apocalypse%20Kit%20-%20March%202024/Characters/glTF"
+
+          curl --fail --location --retry 3 --retry-all-errors \
+            "$BASE/Characters_GermanShepherd.gltf" \
+            --output "$ORIGINALS/Characters_GermanShepherd.gltf"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "$BASE/Characters_Pug.gltf" \
+            --output "$ORIGINALS/Characters_Pug.gltf"
+
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://raw.githubusercontent.com/agentkaerf/FreeModels/${SOURCE_COMMIT}/README.md" \
+            --output "$EVIDENCE/FreeModels_README.md"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://quaternius.com/packs/zombieapocalypsekit.html" \
+            --output "$EVIDENCE/quaternius_zombie_apocalypse_kit.html"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt" \
+            --output "$EVIDENCE/CC0-1.0-legalcode.txt"
+
+      - name: Inspect glTF and export immutable static surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/_temporary/bruce_cc0_fetch_r13e.py \
+            bruce_cc0_reference_r13e/originals/Characters_GermanShepherd.gltf \
+            bruce_cc0_reference_r13e/originals/Characters_Pug.gltf \
+            --out bruce_cc0_reference_r13e/derived
+
+      - name: Write source manifest and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import datetime as dt
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("bruce_cc0_reference_r13e")
+          def digest(path):
+              h = hashlib.sha256()
+              with Path(path).open("rb") as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          commit = "db3df04d1e4714298a09510b26fb6de6645138a2"
+          rows = [
+              {
+                  "role": "primary_medium_long_muzzle_anchor",
+                  "name": "Characters_GermanShepherd.gltf",
+                  "repository_path": "Zombie Apocalypse Kit - March 2024/Characters/glTF/Characters_GermanShepherd.gltf",
+                  "git_blob_sha1": "c7a53bf8678dc07500f18d680fc6e794463b1039",
+              },
+              {
+                  "role": "short_muzzle_compact_body_contrast_anchor",
+                  "name": "Characters_Pug.gltf",
+                  "repository_path": "Zombie Apocalypse Kit - March 2024/Characters/glTF/Characters_Pug.gltf",
+                  "git_blob_sha1": "9d4d99c85af7de68465733d93554f90040ec6420",
+              },
+          ]
+          for row in rows:
+              path = root / "originals" / row["name"]
+              row["size_bytes"] = path.stat().st_size
+              row["sha256"] = digest(path)
+              row["source_url"] = f"https://github.com/agentkaerf/FreeModels/blob/{commit}/{row['repository_path'].replace(' ', '%20')}"
+
+          manifest = {
+              "schema": "bruce/cc0_reference_source_manifest@1.0",
+              "created_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "purpose": "Surface observation and parameter-system research only. Originals are never the Bruce production mesh.",
+              "author": "Quaternius",
+              "pack": "Zombie Apocalypse Kit",
+              "pack_release": "March 2024",
+              "license_spdx": "CC0-1.0",
+              "commercial_use": True,
+              "modification_allowed": True,
+              "attribution_required": False,
+              "official_pack_page": "https://quaternius.com/packs/zombieapocalypsekit.html",
+              "official_download_folder": "https://drive.google.com/drive/folders/1mWP6sCHun7OUMHQeDNZLrXTteXlzWg_t?usp=sharing",
+              "mirror_repository": "agentkaerf/FreeModels",
+              "mirror_commit": commit,
+              "mirror_commit_verified_signature": True,
+              "files": rows,
+              "evidence_files": [
+                  "evidence/FreeModels_README.md",
+                  "evidence/quaternius_zombie_apocalypse_kit.html",
+                  "evidence/CC0-1.0-legalcode.txt",
+              ],
+              "boundary": {
+                  "allowed": [
+                      "inspect topology, rest surface, source rig naming and animation inventory",
+                      "derive measurements, ratios, landmarks, section functions and constraint hypotheses",
+                      "build an independently generated parameterized canine surface",
+                  ],
+                  "not_claimed": [
+                      "source model is anatomically authoritative",
+                      "surface uniquely determines bones, muscles or joint range of motion",
+                      "one specimen spans all canine breeds",
+                      "source asset itself is the production Bruce mesh",
+                  ],
+              },
+          }
+          (root / "SOURCE_MANIFEST.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+
+          (
+            cd bruce_cc0_reference_r13e
+            find . -type f ! -name SHA256SUMS.txt -print0 \
+              | sort -z \
+              | xargs -0 sha256sum \
+              > SHA256SUMS.txt
+          )
+          sha256sum -c bruce_cc0_reference_r13e/SHA256SUMS.txt --ignore-missing
+
+      - name: Upload immutable reference artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruce-cc0-canine-reference-r13e
+          path: bruce_cc0_reference_r13e
+          if-no-files-found: error
+          retention-days: 7
