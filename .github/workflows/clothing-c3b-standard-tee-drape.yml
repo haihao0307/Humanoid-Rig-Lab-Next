@@ -1,0 +1,185 @@
+name: Clothing C3B standard tee controlled drape
+
+on:
+  push:
+    branches:
+      - experiment/clothing-c2-authoritative-3d-import-20260911
+    paths:
+      - .github/workflows/clothing-c3b-standard-tee-drape.yml
+
+permissions:
+  contents: read
+
+jobs:
+  drape:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    env:
+      PYTHONUNBUFFERED: "1"
+      MPLBACKEND: Agg
+      PYOPENGL_PLATFORM: osmesa
+      GARMENTCODE_COMMIT: d449629979028123a5c4dc9e732a2ec19b7fce31
+      WARP_COMMIT: 63baf6855efdd89b2834b74640f84b3bb0d86b50
+      FORCED_POST_GRAVITY_FRAMES: "160"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install system prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential gcc-11 g++-11 clang cmake ninja-build git curl libcgal-dev libgmp-dev libmpfr-dev libgl1-mesa-dev libglu1-mesa-dev libegl1-mesa-dev libosmesa6-dev xvfb
+
+      - name: Clone fixed upstreams
+        run: |
+          git clone https://github.com/maria-korosteleva/GarmentCode.git upstream/GarmentCode
+          git -C upstream/GarmentCode checkout "$GARMENTCODE_COMMIT"
+          git clone https://github.com/maria-korosteleva/NvidiaWarp-GarmentCode.git upstream/NvidiaWarp-GarmentCode
+          git -C upstream/NvidiaWarp-GarmentCode checkout "$WARP_COMMIT"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install numpy==1.24.4 scipy "pyyaml>=6.0" svgwrite psutil matplotlib svgpathtools cairosvg nicegui trimesh libigl pyrender cgal
+
+      - name: Build fixed Warp CPU runtime
+        working-directory: upstream/NvidiaWarp-GarmentCode
+        run: |
+          unset CUDA_HOME CUDA_PATH
+          export CC=gcc-11 CXX=g++-11
+          chmod +x ./tools/packman/packman || true
+          python build_lib.py --no_verbose
+          python -m pip install -e .
+
+      - name: Generate fixed official standard T-shirt pattern
+        working-directory: upstream/GarmentCode
+        run: |
+          cat > system.json <<'JSON'
+          {
+            "output": "./PatternLogs/",
+            "datasets_path": "",
+            "datasets_sim": "",
+            "sim_configs_path": "./assets/Sim_props",
+            "bodies_default_path": "./assets/bodies",
+            "body_samples_path": ""
+          }
+          JSON
+          python test_garmentcode.py
+          PATTERN=$(find PatternLogs -name '*_specification.json' -type f | head -1)
+          test -n "$PATTERN"
+          cp "$PATTERN" STANDARD_TEE_SPECIFICATION.json
+          cp assets/design_params/t-shirt.yaml SOURCE_T_SHIRT_DESIGN.yaml
+          cp assets/bodies/mean_all.yaml SOURCE_MEAN_ALL.yaml
+          echo "$PATTERN" > GENERATED_PATTERN_PATH.txt
+
+      - name: Write controlled convergence wrapper
+        working-directory: upstream/GarmentCode
+        run: |
+          cat > run_c3b_drape.py <<'PY'
+          import json
+          import os
+          import runpy
+          import sys
+          from pathlib import Path
+          from pygarment.meshgen.sim_config import SimConfig
+
+          forced = int(os.environ["FORCED_POST_GRAVITY_FRAMES"])
+          original = SimConfig.update_min_steps
+          def update(self):
+              original(self)
+              self.min_sim_steps = max(self.min_sim_steps, self.zero_gravity_steps + forced)
+          SimConfig.update_min_steps = update
+
+          policy = {
+              "schema": "humanoid_rig/clothing_c3b_standard_tee_convergence@1.0",
+              "sourceDesignChanged": False,
+              "sourceBodyChanged": False,
+              "sourceProgramChanged": False,
+              "materialChanged": False,
+              "collisionSettingsChanged": False,
+              "solverChanged": False,
+              "forcedPostGravityFrames": forced,
+              "classification": "derived controlled drape reference"
+          }
+          Path("CONTROLLED_CONVERGENCE_POLICY.json").write_text(json.dumps(policy, indent=2), encoding="utf-8")
+          sys.argv = ["test_garment_sim.py", "--pattern_spec", "./STANDARD_TEE_SPECIFICATION.json", "--sim_config", "./assets/Sim_props/default_sim_props.yaml"]
+          runpy.run_path("test_garment_sim.py", run_name="__main__")
+          PY
+
+      - name: Run standard T-shirt drape
+        id: simulate
+        continue-on-error: true
+        working-directory: upstream/GarmentCode
+        run: |
+          export PYTHONPATH="$PWD:${PYTHONPATH:-}"
+          export CC=gcc-11 CXX=g++-11
+          START=$(date +%s)
+          xvfb-run -a python run_c3b_drape.py 2>&1 | tee ../../c3b-standard-tee-drape.log
+          CODE=${PIPESTATUS[0]}
+          END=$(date +%s)
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "elapsed_seconds=$((END-START))" >> "$GITHUB_OUTPUT"
+          exit $CODE
+
+      - name: Collect outputs
+        if: always()
+        run: |
+          OUT=artifacts/clothing-c3b-standard-tee-drape
+          mkdir -p "$OUT"
+          cp c3b-standard-tee-drape.log "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/STANDARD_TEE_SPECIFICATION.json "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/SOURCE_T_SHIRT_DESIGN.yaml "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/SOURCE_MEAN_ALL.yaml "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/CONTROLLED_CONVERGENCE_POLICY.json "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/assets/bodies/mean_all.obj "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/assets/Sim_props/default_sim_props.yaml "$OUT/" 2>/dev/null || true
+          cp upstream/GarmentCode/LICENSE "$OUT/LICENSE_GARMENTCODE.txt" 2>/dev/null || true
+          cp -a upstream/GarmentCode/PatternLogs "$OUT/" 2>/dev/null || true
+          cp -a upstream/GarmentCode/Logs "$OUT/" 2>/dev/null || true
+          SIM_EXIT='${{ steps.simulate.outputs.exit_code }}' ELAPSED='${{ steps.simulate.outputs.elapsed_seconds }}' python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          import yaml
+          root = Path('artifacts/clothing-c3b-standard-tee-drape')
+          files=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file():
+                  files.append({'path':p.relative_to(root).as_posix(),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+          sim_props=list(root.glob('Logs/*/sim_props.yaml'))
+          stats={}; fails={}
+          if sim_props:
+              data=yaml.safe_load(sim_props[0].read_text(encoding='utf-8'))
+              stats=data.get('sim',{}).get('stats',{})
+              fails=stats.get('fails',{})
+          report={
+              'schema':'humanoid_rig/clothing_c3b_standard_tee_run@1.0',
+              'garmentCodeCommit':'d449629979028123a5c4dc9e732a2ec19b7fce31',
+              'warpCommit':'63baf6855efdd89b2834b74640f84b3bb0d86b50',
+              'designPreset':'assets/design_params/t-shirt.yaml',
+              'bodyPreset':'assets/bodies/mean_all.yaml',
+              'sourceDesignChanged':False,
+              'sourceBodyChanged':False,
+              'simulationExitCode':os.environ.get('SIM_EXIT',''),
+              'elapsedSeconds':os.environ.get('ELAPSED',''),
+              'simulationStats':stats,
+              'upstreamQualityFails':fails,
+              'files':files,
+              'visualAcceptance':False,
+              'productionReady':False
+          }
+          (root/'RUN_REPORT.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+          print(json.dumps({'exit':report['simulationExitCode'],'elapsed':report['elapsedSeconds'],'stats':stats,'fails':fails},indent=2))
+          PY
+          (cd "$OUT" && find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt)
+
+      - name: Upload standard tee drape reference
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: HRL-M04-C3B-standard-tee-drape
+          path: artifacts/clothing-c3b-standard-tee-drape
+          if-no-files-found: error
+          retention-days: 30
