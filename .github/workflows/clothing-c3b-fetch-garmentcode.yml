@@ -1,0 +1,23 @@
+name: Clothing C3B fetch GarmentCode
+on:
+  push:
+    branches: [experiment/clothing-c2-authoritative-3d-import-20260911]
+    paths: [.github/workflows/clothing-c3b-fetch-garmentcode.yml]
+permissions:
+  contents: read
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch fixed source archive
+        run: |
+          curl -L --fail https://github.com/maria-korosteleva/GarmentCode/archive/d449629979028123a5c4dc9e732a2ec19b7fce31.zip -o GarmentCode.zip
+          sha256sum GarmentCode.zip > GarmentCode.zip.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HRL-M04-C3B-GarmentCode-source
+          path: |
+            GarmentCode.zip
+            GarmentCode.zip.sha256
+          retention-days: 30
