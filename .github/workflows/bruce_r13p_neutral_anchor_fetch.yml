@@ -1,0 +1,174 @@
+name: Bruce R13P neutral canine candidate fetch
+
+on:
+  push:
+    branches:
+      - automation/bruce-r13p-neutral-anchor-20260914
+    paths:
+      - .github/workflows/bruce_r13p_neutral_anchor_fetch.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-audit-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Fetch pinned candidates and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="bruce_r13p_neutral_candidates"
+          mkdir -p "$ROOT/vast_dog/originals" "$ROOT/vast_dog/evidence" \
+                   "$ROOT/open_game_art_jack_russell/originals" "$ROOT/open_game_art_jack_russell/evidence"
+
+          VAST_COMMIT="5146227784496c813e0df5d5637373f1468d28fd"
+          VAST_RAW="https://raw.githubusercontent.com/VAST-AI-Research/Deformable-Radial-Kernel-Splatting/${VAST_COMMIT}"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "$VAST_RAW/meshes/dog.obj" -o "$ROOT/vast_dog/originals/dog.obj"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "$VAST_RAW/meshes/dog.mtl" -o "$ROOT/vast_dog/originals/dog.mtl"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "$VAST_RAW/LICENSE" -o "$ROOT/vast_dog/evidence/LICENSE"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://api.github.com/repos/VAST-AI-Research/Deformable-Radial-Kernel-Splatting/commits/${VAST_COMMIT}" \
+            -o "$ROOT/vast_dog/evidence/source_commit.json"
+
+          OGA_PAGE="https://opengameart.org/content/dog-low-poly-rigged"
+          OGA_ARCHIVE="https://opengameart.org/sites/default/files/OBJ.zip"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "$OGA_PAGE" -o "$ROOT/open_game_art_jack_russell/evidence/source_page.html"
+          curl --fail --location --retry 3 --retry-all-errors \
+            -H 'Referer: https://opengameart.org/content/dog-low-poly-rigged' \
+            "$OGA_ARCHIVE" -o "$ROOT/open_game_art_jack_russell/originals/OBJ.zip"
+          unzip -q "$ROOT/open_game_art_jack_russell/originals/OBJ.zip" \
+            -d "$ROOT/open_game_art_jack_russell/originals/unpacked"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt" \
+            -o "$ROOT/open_game_art_jack_russell/evidence/CC0-1.0-legalcode.txt"
+
+      - name: Inspect source geometry
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from __future__ import annotations
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path('bruce_r13p_neutral_candidates')
+
+          def digest(path: Path) -> str:
+              h = hashlib.sha256()
+              with path.open('rb') as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b''):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          def inspect_obj(path: Path) -> dict:
+              verts = []
+              faces = 0
+              objects = []
+              groups = []
+              materials = []
+              with path.open('r', encoding='utf-8', errors='replace') as f:
+                  for raw in f:
+                      line = raw.strip()
+                      if line.startswith('v '):
+                          p = line.split()
+                          if len(p) >= 4:
+                              verts.append(tuple(float(v) for v in p[1:4]))
+                      elif line.startswith('f '):
+                          faces += 1
+                      elif line.startswith('o '):
+                          objects.append(line[2:].strip())
+                      elif line.startswith('g '):
+                          groups.append(line[2:].strip())
+                      elif line.startswith('usemtl '):
+                          materials.append(line[7:].strip())
+              if verts:
+                  mins = [min(v[i] for v in verts) for i in range(3)]
+                  maxs = [max(v[i] for v in verts) for i in range(3)]
+                  ext = [maxs[i] - mins[i] for i in range(3)]
+              else:
+                  mins = maxs = ext = [None, None, None]
+              return {
+                  'file': str(path.relative_to(root)),
+                  'size_bytes': path.stat().st_size,
+                  'sha256': digest(path),
+                  'vertices': len(verts),
+                  'faces': faces,
+                  'bounds_min': mins,
+                  'bounds_max': maxs,
+                  'extents': ext,
+                  'objects': sorted(set(objects)),
+                  'groups': sorted(set(groups)),
+                  'materials': sorted(set(materials)),
+              }
+
+          candidates = []
+          for obj in sorted(root.rglob('*.obj')):
+              candidates.append(inspect_obj(obj))
+          report = {
+              'schema': 'bruce/r13p_neutral_candidate_audit@1.0',
+              'purpose': 'Candidate references only. No candidate is accepted as the Bruce canonical surface by this artifact.',
+              'candidates': candidates,
+              'boundary': {
+                  'source_surface_can_support': [
+                      'gross silhouette, proportions, coarse surface regions and candidate landmarks visible in the source geometry'
+                  ],
+                  'source_surface_does_not_automatically_support': [
+                      'veterinary anatomy, eyelid loops, nasal alae, lip volume, individual digits, paw pads, breed statistics or a universal canine morph space'
+                  ],
+              },
+          }
+          (root / 'CANDIDATE_GEOMETRY_AUDIT.json').write_text(
+              json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
+          )
+
+          manifest = {
+              'schema': 'bruce/r13p_candidate_source_manifest@1.0',
+              'candidates': [
+                  {
+                      'id': 'vast_luna_dog',
+                      'role': 'generic_short_coat_contrast_candidate',
+                      'repository': 'VAST-AI-Research/Deformable-Radial-Kernel-Splatting',
+                      'commit': '5146227784496c813e0df5d5637373f1468d28fd',
+                      'license_evidence': 'vast_dog/evidence/LICENSE',
+                      'status': 'candidate_not_accepted',
+                  },
+                  {
+                      'id': 'oga_jack_russell',
+                      'role': 'short_coat_small_terrier_contrast_candidate',
+                      'source_page': 'https://opengameart.org/content/dog-low-poly-rigged',
+                      'license': 'CC0-1.0',
+                      'license_evidence': 'open_game_art_jack_russell/evidence/source_page.html',
+                      'status': 'candidate_not_accepted',
+                  },
+              ],
+          }
+          (root / 'SOURCE_MANIFEST.json').write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
+          )
+          with (root / 'SHA256SUMS.txt').open('w', encoding='utf-8') as out:
+              for path in sorted(p for p in root.rglob('*') if p.is_file() and p.name != 'SHA256SUMS.txt'):
+                  out.write(f"{digest(path)}  {path.relative_to(root).as_posix()}\n")
+          PY
+          (
+            cd bruce_r13p_neutral_candidates
+            sha256sum -c SHA256SUMS.txt
+          )
+
+      - name: Upload neutral candidate artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruce-r13p-neutral-canine-candidates
+          path: bruce_r13p_neutral_candidates
+          if-no-files-found: error
+          retention-days: 7
