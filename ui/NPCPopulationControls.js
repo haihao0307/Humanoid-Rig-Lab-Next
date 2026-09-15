@@ -48,10 +48,10 @@ function installNPCPopulationControls(lab,population){
  async function run(action){if(busy)return;busy=true;render();try{await action();}catch(error){report(error.message||String(error));}finally{busy=false;render();}}
  const time=value=>{const seconds=Math.max(0,Math.floor(value||0));return Math.floor(seconds/60)+'分'+String(seconds%60).padStart(2,'0')+'秒';};
  function taskStatus(row){
-  const b=row.behavior;if(row.error||b.error)return'已阻断 · '+(row.error||b.error);
+  const b=row.behavior;if(row.error||b.error)return'已阻断 · '+(row.error||b.error);if(row.resource?.mode==='circulating')return'资源占用 · 正在改走备用路线后重试\n冲突：'+(row.resource.conflict?.id||'共享资源');
   const checking=row.preflight?.status==='checking'?'保持姿态，检查后续动作':null;
   if(b.type!=='repeat'||!b.stepCount)return row.status==='paused'?'已暂停':checking||({idle:'等待任务',running:'正在执行单次任务',failed:'已阻断'})[row.status]||row.status;
-  const status=row.status==='paused'?'已暂停':checking||({scheduled:'待开始',resourceWait:'等待搬运通道空闲',running:'执行中',waiting:'等待 '+Math.ceil(b.waitRemainingS)+' 秒',interval:'下轮开始前 '+Math.ceil(b.waitRemainingS)+' 秒',finishing:'到时，等待当前动作收尾',completed:'已完成',stopped:'已停止',idle:'已载入，尚未开始',failed:'已阻断'})[b.status]||b.status;
+  const status=row.status==='paused'?'已暂停':checking||({scheduled:'待开始',resourceCirculation:'资源占用，正在改走备用路线',running:'执行中',waiting:'等待 '+Math.ceil(b.waitRemainingS)+' 秒',interval:'下轮开始前 '+Math.ceil(b.waitRemainingS)+' 秒',finishing:'到时，等待当前动作收尾',completed:'已完成',stopped:'已停止',idle:'已载入，尚未开始',failed:'已阻断'})[b.status]||b.status;
   return b.title+' · '+status+'\n已完成 '+b.cycles+(b.cycleLimit?'/'+b.cycleLimit:'')+' 轮 · 已运行 '+time(b.elapsedS)+(b.durationS?' / '+time(b.durationS):'')+(b.enabled?'\n第 '+(b.stepIndex+1)+'/'+b.stepCount+' 步：'+b.currentStep:'');
  }
  function render(){

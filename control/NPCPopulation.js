@@ -28,6 +28,8 @@ function npcCompileTask(command,world,last=null){
  });
 }
 function npcIdleBehavior(recipe=npcTaskRecipe({type:'manual'}),steps=[]){return{...recipe,steps,enabled:false,cycles:0,stepIndex:0,elapsedS:0,nextAt:0,waitUntil:null,status:'idle',finishReason:null,error:null};}
+function npcResourceHash(value){let h=2166136261;for(const c of String(value||'')){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function npcResourceDirectionOrder(id,attempt=0){const base=['left','forward','right','backward'],offset=(npcResourceHash(id)+Math.max(0,attempt))%base.length;return base.map((_,i)=>base[(i+offset)%base.length]);}
 // A second recipe from the same source family; no saved mesh or copied live state.
 function npcMotherVariant(definition){
  const mother=npcCopy(definition),base=mother.character;
@@ -58,7 +60,7 @@ function npcReviewCast(){return [
  ];}
 class NPCPopulation {
  constructor(lab){
-  this.lab=lab;this.actors=new Map();this.selected=new Set();this.claims=new Map();this.pendingIds=new Set();this.pending=0;this.serial=0;this.closed=false;this.elapsedS=0;this.clock=new MotionLab.FixedClock();this.physicsOwner=null;this.physicsDeferred=new Set();
+  this.lab=lab;this.actors=new Map();this.selected=new Set();this.claims=new Map();this.stationClaims=new Map();this.pendingIds=new Set();this.pending=0;this.serial=0;this.closed=false;this.elapsedS=0;this.clock=new MotionLab.FixedClock();this.physicsOwner=null;this.physicsDeferred=new Set();
   const definition=lab.npc.export(),actor=this.context('npc-'+(++this.serial),definition,lab.human,lab.agent,lab.compact);
   this.actors.set(actor.id,actor);this.activeId=actor.id;this.selected.add(actor.id);lab.world.population=this;
   actor.hairStatus=lab.hairStatus;actor.hairTask=lab.hairTask||null;
@@ -75,7 +77,7 @@ class NPCPopulation {
   const actor={id,definitionId:definition.character.id,definition:npcCopy(definition),label:definition.character.label,
    identity:{residentId:definition.behavior?.presetId||id,displayName:definition.behavior?.displayName||definition.character.label.slice(0,24),role:definition.behavior?.role||'general'},
    human,agent,tissue:human.tissue,compact,renderer:this.lab.renderer,world:this.lab.world,hairTask:null,hairStatus:{state:'pending'},compactQualityPending:false,
-   hair:{enabled:definition.attachments.hair.enabled,windEnabled:false,windSpeed:0},queue:[],logs:[],behavior:{...npcIdleBehavior()},disposed:false};
+   hair:{enabled:definition.attachments.hair.enabled,windEnabled:false,windSpeed:0},queue:[],logs:[],behavior:{...npcIdleBehavior()},resource:{mode:'clear',requestKey:null,attempts:0,diversions:0,conflict:null,anchor:null},disposed:false};
   agent.npcId=id;
   agent.log=message=>{actor.logs.unshift(message);actor.logs.length=Math.min(actor.logs.length,16);if(this.activeId===id)logMessage('['+actor.label+'] '+message);};
   let residentFacePose=null,residentFaceUniforms=null;
@@ -95,7 +97,7 @@ class NPCPopulation {
  bindSurface(actor){if(actor.compact){actor.compact.lab=actor;if(actor.compact.hair)actor.compact.hair.lab=actor;}}
  syncSurfaces(){this.lab.renderer.compacts=[...this.values()].map(a=>a.compact).filter(Boolean);this.lab.renderer.compact=this.active?.compact||null;needsRedraw=true;}
  changed(){this.syncSurfaces();window.dispatchEvent(new CustomEvent('humanlab:population-change',{detail:{activeId:this.activeId,count:this.actors.size,pending:this.pending}}));}
- list(){return [...this.values()].map(a=>({id:a.id,definitionId:a.definitionId,label:a.label,identity:npcCopy(a.identity),active:a.id===this.activeId,selected:this.selected.has(a.id),position:[...a.agent.pos],status:a.agent.activity().status,phase:a.agent.phase,queued:a.queue.length,error:a.agent.error,preflight:a.agent.preflight?{...a.agent.preflight}:null,behavior:{...a.behavior,steps:undefined,stepCount:a.behavior.steps.length,currentStep:a.behavior.steps[a.behavior.stepIndex]?.text||'',waitRemainingS:Math.max(0,a.behavior.waitUntil===null?a.behavior.nextAt-a.agent.time:a.behavior.waitUntil-a.behavior.elapsedS)}}));}
+ list(){return [...this.values()].map(a=>({id:a.id,definitionId:a.definitionId,label:a.label,identity:npcCopy(a.identity),active:a.id===this.activeId,selected:this.selected.has(a.id),position:[...a.agent.pos],status:a.agent.activity().status,phase:a.agent.phase,queued:a.queue.length,error:a.agent.error,preflight:a.agent.preflight?{...a.agent.preflight}:null,resource:npcCopy(a.resource),behavior:{...a.behavior,steps:undefined,stepCount:a.behavior.steps.length,currentStep:a.behavior.steps[a.behavior.stepIndex]?.text||'',waitRemainingS:Math.max(0,a.behavior.waitUntil===null?a.behavior.nextAt-a.agent.time:a.behavior.waitUntil-a.behavior.elapsedS)}}));}
  targets(input='selected'){
   const ids=input==='all'?[...this.actors.keys()]:input==='selected'?[...this.selected]:Array.isArray(input)?input:[input];
   if(!ids.length)throw Error('请先选择 NPC');return [...new Set(ids)].map(id=>this.get(id));
@@ -225,9 +227,40 @@ class NPCPopulation {
  }
  collisionFor(a,p,radius){return [...this.values()].some(other=>other.id!==a.npcId&&other.agent!==a&&!other.disposed&&horizontal(p,other.agent.pos)<radius+bodyPhysicalProfile(other.human).bodyRadiusM+.06);}
  sweepFor(a,start,end,radius){let fraction=1;for(const other of this.values())if(other.id!==a.npcId&&other.agent!==a&&!other.disposed)fraction=Math.min(fraction,motionCircleSweep(start,end,other.agent.pos,radius+bodyPhysicalProfile(other.human).bodyRadiusM+.06));return fraction;}
- claimObject(a,id){const owner=this.claims.get(id),o=this.lab.world.get(id);if(owner&&owner!==a.npcId||o?.held&&o.heldOwner!==a.npcId)throw Error('物体正由其他 NPC 使用：'+id);if(this.physicsOwner&&this.physicsOwner!==a.npcId)throw Error('已有 NPC 正在操作物体，请等待其放置完成');this.physicsOwner=a.npcId;this.claims.set(id,a.npcId);}
- releaseObjects(a){for(const [id,owner]of this.claims)if(owner===a.npcId&&a.held?.id!==id){this.lab.world.physics?.clearManipulation(id);this.claims.delete(id);}if(this.physicsOwner===a.npcId&&!a.held){this.physicsOwner=null;}}
+ resourceStep(a,request){return parse(request.text,this.lab.world,a.lastObject).steps.find(step=>step&&['carry','push'].includes(step.type))||null;}
+ resourceConflict(a,request,step=this.resourceStep(a,request)){
+  if(!step)return null;const o=this.lab.world.get(step.objectId),objectOwner=this.claims.get(step.objectId)||(o?.held?(o.heldOwner??'main'):null);
+  if(objectOwner&&objectOwner!==a.npcId)return{kind:'object',id:step.objectId,ownerId:objectOwner,step};
+  const stationOwner=this.stationClaims.get(step.targetId);if(stationOwner&&stationOwner!==a.npcId)return{kind:'station',id:step.targetId,ownerId:stationOwner,step};
+  if(this.physicsOwner&&this.physicsOwner!==a.npcId)return{kind:'manipulation',id:'shared-physics',ownerId:this.physicsOwner,step};return null;
+ }
+ reserveResource(actor,request){
+  const a=actor.agent,step=this.resourceStep(a,request);if(!step){actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};return null;}
+  const conflict=this.resourceConflict(a,request,step);if(conflict)return conflict;
+  this.claims.set(step.objectId,a.npcId);this.stationClaims.set(step.targetId,a.npcId);this.physicsOwner=a.npcId;
+  actor.resource={mode:'reserved',requestKey:[request.source,request.text].join('|'),attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:[...a.pos]};return null;
+ }
+ startResourceCirculation(actor,request,conflict){
+  const a=actor.agent,key=[request.source,request.text].join('|'),same=actor.resource?.requestKey===key,attempts=(same?actor.resource.attempts:0)+1;if(attempts>16)throw Error('共享资源持续被占用，完成 16 次机动后仍未获得操作权：'+conflict.id);
+  actor.queue.unshift(request);let lastError=null;const distances=[.65,.85,1.05];
+  for(const direction of npcResourceDirectionOrder(a.npcId,attempts))for(const distanceM of distances)try{
+   const step={type:'walk',direction,distanceM,referenceFrame:'self'};a.submitPlan({schema:'knowledge_human/checked_semantic_plan@1.0',steps:[step]});actor.running={source:'resource-circulation',kind:'command',text:'资源机动',requestKey:key};
+   actor.resource={mode:'circulating',requestKey:key,attempts,diversions:(actor.resource?.diversions||0)+1,conflict:{...conflict},anchor:actor.resource?.anchor||[...a.pos]};if(request.source==='behavior')actor.behavior.status='resourceCirculation';
+   a.log('共享资源 '+conflict.id+' 正由 '+conflict.ownerId+' 使用，已改走备用路线后重试原任务');this.observation?.event('resource-circulation',actor,{attempts,conflict:{...conflict},step});return true;
+  }catch(error){lastError=error;}
+  actor.queue.shift();throw Error('资源被占用且周边没有可执行的机动路线：'+conflict.id+(lastError?'；'+lastError.message:''));
+ }
+ claimObject(a,id,targetId=null){
+  const owner=this.claims.get(id),o=this.lab.world.get(id);if(owner&&owner!==a.npcId||o?.held&&o.heldOwner!==a.npcId)throw Error('物体正由其他 NPC 使用：'+id);
+  const stationOwner=targetId?this.stationClaims.get(targetId):null;if(stationOwner&&stationOwner!==a.npcId)throw Error('目标工位正由其他 NPC 使用：'+targetId);
+  if(this.physicsOwner&&this.physicsOwner!==a.npcId)throw Error('已有 NPC 正在操作物体');if(targetId)this.stationClaims.set(targetId,a.npcId);this.physicsOwner=a.npcId;this.claims.set(id,a.npcId);
+ }
+ releaseObjects(a,{preserveResource=false}={}){
+  for(const [id,owner]of this.claims)if(owner===a.npcId&&a.held?.id!==id){this.lab.world.physics?.clearManipulation(id);this.claims.delete(id);}if(!a.held)for(const [id,owner]of this.stationClaims)if(owner===a.npcId)this.stationClaims.delete(id);if(this.physicsOwner===a.npcId&&!a.held)this.physicsOwner=null;
+  const actor=this.actors.get(a.npcId);if(actor&&!preserveResource&&!a.held)actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};
+ }
  dispatch(text,{targets='selected',mode='append'}={}){
+
   if(typeof text!=='string'||!text.trim()||text.length>4096)throw Error('请输入不超过 4096 字的动作指令');
   if(!['append','replace'].includes(mode))throw Error('任务提交模式无效');
   const actors=this.targets(targets);
@@ -279,7 +312,7 @@ class NPCPopulation {
     b.waitUntil=null;b.stepIndex++;
     if(b.stepIndex===b.steps.length){b.cycles++;b.stepIndex=0;b.nextAt=a.time+b.intervalS;b.status='interval';if(b.cycleLimit>0&&b.cycles>=b.cycleLimit)this.finishBehavior(actor,'cycles');}
    }
-   actor.running=null;this.releaseObjects(a);
+   actor.running=null;this.releaseObjects(a,{preserveResource:previous.source==='resource-circulation'});
   }
   if(b.enabled&&timeLimit)this.finishBehavior(actor,'duration');
   let request=actor.queue.shift();
@@ -287,7 +320,7 @@ class NPCPopulation {
   if(!request&&b.enabled&&a.time>=b.nextAt){const step=b.steps[b.stepIndex];request={text:step.text,source:'behavior',behavior:b,kind:step.kind,seconds:step.seconds};}
   if(!request)return;
   try{
-   if(request.source==='behavior'&&request.kind!=='wait'&&this.physicsOwner&&this.physicsOwner!==a.npcId&&parse(request.text,this.lab.world,a.lastObject).steps.some(s=>s.type==='carry'||s.type==='push')){b.status='resourceWait';actor.queue.unshift(request);return;}
+   if(request.kind!=='wait'){const conflict=this.reserveResource(actor,request);if(conflict){this.startResourceCirculation(actor,request,conflict);return;}}
    if(request.source==='behavior')b.status=request.kind==='wait'?'waiting':'running';
    if(request.kind==='wait'){request.until=b.elapsedS+request.seconds;b.waitUntil=request.until;}else a.submit(request.text,{cooperative:true});
    actor.running=request;
@@ -362,6 +395,6 @@ class NPCPopulation {
   }catch(error){for(const actor of staged){actor.disposed=true;actor.compact?.dispose();}throw error;}
   finally{for(const actor of staged)this.pendingIds.delete(actor.id);this.pending-=specs.length;this.changed();}
  }
- disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();}
+ disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();this.stationClaims.clear();this.physicsOwner=null;}
 }
 function installNPCPopulation(lab){const population=new NPCPopulation(lab);lab.population=population;installNPCPopulationControls(lab,population);population.announceActive();window.addEventListener('pagehide',event=>{if(!event.persisted)population.disposeAll();});return population;}

@@ -103,7 +103,7 @@ class Agent{
   if(s.type==='turn'){s.turnTargets=motionTurnPlan(s,this.yaw);s.turnIndex=0;this.enter('turn');return;}
   if(!t)throw Error('目标已不存在');
   const o=this.w.get(s.objectId);if(!o||o.held||(o.heldOwner&&o.heldOwner!==this.npcId))throw Error('操作物体不可用');if(o.movable===false)throw Error(`${o.name} 是固定环境物体，只能作为导航或避障目标`);
-  this.w.population?.claimObject(this,o.id);
+  this.w.population?.claimObject(this,o.id,s.targetId);
   this.requireStableObject(o);
   s.o=o;s.target=t;
   this.startPreflight('transport',()=>physicalAnalyzeStepSteps(this.w,actorForReasoning(this),this.plan.steps[this.index]),capability=>{
