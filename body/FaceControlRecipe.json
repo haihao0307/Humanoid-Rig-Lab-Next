@@ -1,0 +1,1189 @@
+{
+  "schema": "jarvis/face_control_recipe@1",
+  "revision": "r3-independent-lip-opening",
+  "status": "Candidate",
+  "frame": "R2 source metres before X reflection and skeletal skinning; positive X is character left",
+  "kernel": "wendland-c2-manual-plus-c2-affine-muscle-fields",
+  "maximumOffsetMm": 6,
+  "sources": [
+    "reconstruction/features.chf.gz: fields.domains projection bounds for FJ2812 and FJ2814",
+    "body/CompactWorkbench.js: COMPACT_EYES",
+    "https://developer.apple.com/documentation/arkit/arfaceanchor/blendshapelocation",
+    "https://github.khronos.org/glTF-Tutorials/gltfTutorial/gltfTutorial_018_MorphTargets.html",
+    "https://www.dgp.toronto.edu/projects/animatomy/",
+    "https://doi.org/10.1002/vis.4340010208",
+    "docs/NATURAL_FACE_STUDY_R8.md",
+    "https://arxiv.org/abs/1307.2548"
+  ],
+  "provenance": "Authored procedural muscle-inspired contraction fields, coordinated by semantic expression channels; not a physical muscle or tissue simulation, not scanned or measured muscle actions. Manual local offsets retain millimetre semantics; muscle strain scales with the head. Lip opening uses separate upper and lower free-edge motion with a continuous outer skin attachment; it is not a jaw joint simulation.",
+  "nodes": [
+    {
+      "id": "browInnerLeft",
+      "label": "左眉头",
+      "mirror": "browInnerRight",
+      "centre": [
+        0.016,
+        1.539,
+        0.18
+      ],
+      "radius": [
+        0.024,
+        0.025,
+        0.035
+      ]
+    },
+    {
+      "id": "browInnerRight",
+      "label": "右眉头",
+      "mirror": "browInnerLeft",
+      "centre": [
+        -0.017,
+        1.539,
+        0.18
+      ],
+      "radius": [
+        0.024,
+        0.025,
+        0.035
+      ]
+    },
+    {
+      "id": "browOuterLeft",
+      "label": "左眉尾",
+      "mirror": "browOuterRight",
+      "centre": [
+        0.0475,
+        1.539,
+        0.17
+      ],
+      "radius": [
+        0.024,
+        0.025,
+        0.035
+      ]
+    },
+    {
+      "id": "browOuterRight",
+      "label": "右眉尾",
+      "mirror": "browOuterLeft",
+      "centre": [
+        -0.0485,
+        1.539,
+        0.17
+      ],
+      "radius": [
+        0.024,
+        0.025,
+        0.035
+      ]
+    },
+    {
+      "id": "lidUpperLeft",
+      "label": "左上眼睑",
+      "mirror": "lidUpperRight",
+      "centre": [
+        0.03,
+        1.527,
+        0.165
+      ],
+      "radius": [
+        0.025,
+        0.014,
+        0.03
+      ]
+    },
+    {
+      "id": "lidUpperRight",
+      "label": "右上眼睑",
+      "mirror": "lidUpperLeft",
+      "centre": [
+        -0.031,
+        1.527,
+        0.165
+      ],
+      "radius": [
+        0.025,
+        0.014,
+        0.03
+      ]
+    },
+    {
+      "id": "lidLowerLeft",
+      "label": "左下眼睑",
+      "mirror": "lidLowerRight",
+      "centre": [
+        0.03,
+        1.513,
+        0.162
+      ],
+      "radius": [
+        0.025,
+        0.014,
+        0.03
+      ]
+    },
+    {
+      "id": "lidLowerRight",
+      "label": "右下眼睑",
+      "mirror": "lidLowerLeft",
+      "centre": [
+        -0.031,
+        1.513,
+        0.162
+      ],
+      "radius": [
+        0.025,
+        0.014,
+        0.03
+      ]
+    },
+    {
+      "id": "cheekLeft",
+      "label": "左面颊",
+      "mirror": "cheekRight",
+      "centre": [
+        0.05,
+        1.482,
+        0.163
+      ],
+      "radius": [
+        0.034,
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "id": "cheekRight",
+      "label": "右面颊",
+      "mirror": "cheekLeft",
+      "centre": [
+        -0.051,
+        1.482,
+        0.163
+      ],
+      "radius": [
+        0.034,
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "id": "noseLeft",
+      "label": "左鼻翼",
+      "mirror": "noseRight",
+      "centre": [
+        0.015,
+        1.476,
+        0.186
+      ],
+      "radius": [
+        0.018,
+        0.019,
+        0.03
+      ]
+    },
+    {
+      "id": "noseRight",
+      "label": "右鼻翼",
+      "mirror": "noseLeft",
+      "centre": [
+        -0.016,
+        1.476,
+        0.186
+      ],
+      "radius": [
+        0.018,
+        0.019,
+        0.03
+      ]
+    },
+    {
+      "id": "mouthLeft",
+      "label": "左嘴角",
+      "mirror": "mouthRight",
+      "centre": [
+        0.022,
+        1.459,
+        0.181
+      ],
+      "radius": [
+        0.024,
+        0.023,
+        0.035
+      ]
+    },
+    {
+      "id": "mouthRight",
+      "label": "右嘴角",
+      "mirror": "mouthLeft",
+      "centre": [
+        -0.023,
+        1.459,
+        0.181
+      ],
+      "radius": [
+        0.024,
+        0.023,
+        0.035
+      ]
+    },
+    {
+      "id": "lipUpper",
+      "label": "上唇中央",
+      "centre": [
+        -0.0006,
+        1.462,
+        0.19
+      ],
+      "radius": [
+        0.024,
+        0.013,
+        0.031
+      ]
+    },
+    {
+      "id": "lipLower",
+      "label": "下唇中央",
+      "centre": [
+        -0.0006,
+        1.452,
+        0.189
+      ],
+      "radius": [
+        0.025,
+        0.013,
+        0.031
+      ]
+    },
+    {
+      "id": "chin",
+      "label": "颏部",
+      "centre": [
+        -0.0006,
+        1.432,
+        0.184
+      ],
+      "radius": [
+        0.036,
+        0.028,
+        0.038
+      ]
+    }
+  ],
+  "channels": [
+    {
+      "id": "browInnerUp",
+      "label": "眉头抬起",
+      "offsets": {}
+    },
+    {
+      "id": "browOuterUpLeft",
+      "label": "左眉尾抬起",
+      "offsets": {}
+    },
+    {
+      "id": "browOuterUpRight",
+      "label": "右眉尾抬起",
+      "offsets": {}
+    },
+    {
+      "id": "browDownLeft",
+      "label": "左皱眉",
+      "offsets": {}
+    },
+    {
+      "id": "browDownRight",
+      "label": "右皱眉",
+      "offsets": {}
+    },
+    {
+      "id": "eyeNarrowLeft",
+      "label": "左眼收窄",
+      "offsets": {}
+    },
+    {
+      "id": "eyeNarrowRight",
+      "label": "右眼收窄",
+      "offsets": {}
+    },
+    {
+      "id": "eyeWideLeft",
+      "label": "左眼睁大",
+      "offsets": {}
+    },
+    {
+      "id": "eyeWideRight",
+      "label": "右眼睁大",
+      "offsets": {}
+    },
+    {
+      "id": "cheekRaiseLeft",
+      "label": "左提颊",
+      "offsets": {}
+    },
+    {
+      "id": "cheekRaiseRight",
+      "label": "右提颊",
+      "offsets": {}
+    },
+    {
+      "id": "noseSneerLeft",
+      "label": "左鼻翼上提",
+      "offsets": {}
+    },
+    {
+      "id": "noseSneerRight",
+      "label": "右鼻翼上提",
+      "offsets": {}
+    },
+    {
+      "id": "mouthSmileLeft",
+      "label": "左嘴角上扬",
+      "offsets": {}
+    },
+    {
+      "id": "mouthSmileRight",
+      "label": "右嘴角上扬",
+      "offsets": {}
+    },
+    {
+      "id": "mouthFrownLeft",
+      "label": "左嘴角下垂",
+      "offsets": {}
+    },
+    {
+      "id": "mouthFrownRight",
+      "label": "右嘴角下垂",
+      "offsets": {}
+    },
+    {
+      "id": "lipPurse",
+      "label": "抿拢前送",
+      "offsets": {}
+    },
+    {
+      "id": "lipPart",
+      "label": "唇部拉开（近似）",
+      "offsets": {
+        "chin": [
+          0,
+          -2,
+          0
+        ]
+      }
+    },
+    {
+      "id": "cheekPuff",
+      "label": "鼓颊",
+      "offsets": {}
+    },
+    {
+      "id": "eyeBlinkLeft",
+      "label": "左眼闭合",
+      "offsets": {}
+    },
+    {
+      "id": "eyeBlinkRight",
+      "label": "右眼闭合",
+      "offsets": {}
+    }
+  ],
+  "presets": [
+    {
+      "id": "neutral",
+      "label": "中性",
+      "weights": {}
+    },
+    {
+      "id": "smile",
+      "label": "微笑",
+      "weights": {
+        "mouthSmileLeft": 1,
+        "mouthSmileRight": 1,
+        "cheekRaiseLeft": 0.85,
+        "cheekRaiseRight": 0.85,
+        "eyeNarrowLeft": 0.35,
+        "eyeNarrowRight": 0.35
+      }
+    },
+    {
+      "id": "frown",
+      "label": "皱眉",
+      "weights": {
+        "browDownLeft": 1,
+        "browDownRight": 1,
+        "eyeNarrowLeft": 0.48,
+        "eyeNarrowRight": 0.48,
+        "noseSneerLeft": 0.18,
+        "noseSneerRight": 0.18,
+        "mouthFrownLeft": 0.35,
+        "mouthFrownRight": 0.35
+      }
+    },
+    {
+      "id": "surprise",
+      "label": "惊讶",
+      "weights": {
+        "browInnerUp": 1,
+        "browOuterUpLeft": 0.85,
+        "browOuterUpRight": 0.85,
+        "eyeWideLeft": 1,
+        "eyeWideRight": 1,
+        "lipPart": 0.42
+      }
+    },
+    {
+      "id": "sad",
+      "label": "委屈",
+      "weights": {
+        "browInnerUp": 0.88,
+        "browDownLeft": 0.25,
+        "browDownRight": 0.25,
+        "mouthFrownLeft": 1,
+        "mouthFrownRight": 1,
+        "lipPurse": 0.12
+      }
+    },
+    {
+      "id": "smirk",
+      "label": "单侧挑眉笑",
+      "weights": {
+        "browOuterUpLeft": 0.9,
+        "mouthSmileLeft": 1,
+        "cheekRaiseLeft": 0.7,
+        "eyeNarrowLeft": 0.2
+      }
+    },
+    {
+      "id": "puff",
+      "label": "鼓颊抿嘴",
+      "weights": {
+        "cheekPuff": 1,
+        "lipPurse": 0.8
+      }
+    }
+  ],
+  "runtimeVerified": false,
+  "visualAcceptance": false,
+  "calibration": "r2-regional-contraction-authored-20260912",
+  "legacyRevisions": [
+    "r1-local-fields",
+    "r2-muscle-fields"
+  ],
+  "muscleModel": {
+    "envelope": "(1-dot(q,q))^3 within ellipsoid, zero outside; C2 boundary",
+    "contraction": "affine principal shortening with determinant-one transverse compensation before spatial taper",
+    "normalTransform": "analytic derivative of both envelope and affine strain; inverse transpose",
+    "limits": "bounded authored strains and saturating channel activations; no material constitutive law or force integration",
+    "units": "centres and radii in canonical reference metres; anchorMm and liftMm in reference millimetres; dimensionless strain",
+    "deformationBudgetMm": 14
+  },
+  "muscleFields": [
+    {
+      "id": "frontalisInnerLeft",
+      "kind": "fiber",
+      "activation": {
+        "browInnerUp": 1
+      },
+      "centre": [
+        0.0165,
+        1.546,
+        0.165
+      ],
+      "radius": [
+        0.027,
+        0.033,
+        0.05
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "contraction": 0.125,
+      "transverseExpansion": 0.06904496764969759,
+      "anchorMm": 41,
+      "liftMm": [
+        0,
+        0,
+        0.2
+      ]
+    },
+    {
+      "id": "frontalisOuterLeft",
+      "kind": "fiber",
+      "activation": {
+        "browOuterUpLeft": 1
+      },
+      "centre": [
+        0.0435,
+        1.547,
+        0.153
+      ],
+      "radius": [
+        0.032,
+        0.032,
+        0.05
+      ],
+      "axis": [
+        0.11997306906865186,
+        0.9927771465430942,
+        0
+      ],
+      "contraction": 0.14,
+      "transverseExpansion": 0.07832773203438426,
+      "anchorMm": 39,
+      "liftMm": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "corrugatorLeft",
+      "kind": "fiber",
+      "activation": {
+        "browDownLeft": 1
+      },
+      "centre": [
+        0.0205,
+        1.537,
+        0.169
+      ],
+      "radius": [
+        0.03,
+        0.028,
+        0.045
+      ],
+      "axis": [
+        -0.6801057646702489,
+        -0.733114008093077,
+        0
+      ],
+      "contraction": 0.16,
+      "transverseExpansion": 0.09108945117996181,
+      "anchorMm": 30,
+      "liftMm": [
+        0,
+        0,
+        0.6
+      ]
+    },
+    {
+      "id": "zygomaticLeft",
+      "kind": "fiber",
+      "activation": {
+        "mouthSmileLeft": 1
+      },
+      "centre": [
+        0.0365,
+        1.48,
+        0.167
+      ],
+      "radius": [
+        0.041,
+        0.039,
+        0.049
+      ],
+      "axis": [
+        0.6603302477064307,
+        0.7503752814845803,
+        -0.03001501125938321
+      ],
+      "contraction": 0.19,
+      "transverseExpansion": 0.11111111111111116,
+      "anchorMm": 34,
+      "liftMm": [
+        0,
+        0,
+        0.5
+      ]
+    },
+    {
+      "id": "commissureLiftLeft",
+      "kind": "fiber",
+      "activation": {
+        "mouthSmileLeft": 1
+      },
+      "centre": [
+        0.0245,
+        1.461,
+        0.181
+      ],
+      "radius": [
+        0.035,
+        0.025,
+        0.037
+      ],
+      "axis": [
+        0.5,
+        0.8655056325639944,
+        -0.03
+      ],
+      "contraction": 0.095,
+      "transverseExpansion": 0.051176662455273414,
+      "anchorMm": 34,
+      "liftMm": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "cheekOrbitalLiftLeft",
+      "kind": "fiber",
+      "activation": {
+        "cheekRaiseLeft": 1,
+        "mouthSmileLeft": 0.15
+      },
+      "centre": [
+        0.0395,
+        1.498,
+        0.153
+      ],
+      "radius": [
+        0.038,
+        0.031,
+        0.045
+      ],
+      "axis": [
+        0.11997306906865186,
+        0.9927771465430942,
+        0
+      ],
+      "contraction": 0.115,
+      "transverseExpansion": 0.0629880069054678,
+      "anchorMm": 30,
+      "liftMm": [
+        0,
+        0,
+        1.1
+      ]
+    },
+    {
+      "id": "orbicularisOculiLeft",
+      "kind": "sphincter",
+      "activation": {
+        "eyeNarrowLeft": 0.9,
+        "eyeBlinkLeft": 0.3,
+        "cheekRaiseLeft": 0.15
+      },
+      "centre": [
+        0.0295,
+        1.518,
+        0.154
+      ],
+      "radius": [
+        0.037,
+        0.028,
+        0.044
+      ],
+      "diagonal": [
+        -0.025,
+        -0.105,
+        0.14596762641455374
+      ],
+      "liftMm": [
+        0,
+        0,
+        0.2
+      ]
+    },
+    {
+      "id": "levatorNasiLeft",
+      "kind": "fiber",
+      "activation": {
+        "noseSneerLeft": 1
+      },
+      "centre": [
+        0.017499999999999998,
+        1.478,
+        0.182
+      ],
+      "radius": [
+        0.022,
+        0.03,
+        0.033
+      ],
+      "axis": [
+        0.11997306906865186,
+        0.9927771465430942,
+        0
+      ],
+      "contraction": 0.14,
+      "transverseExpansion": 0.07832773203438426,
+      "anchorMm": 27,
+      "liftMm": [
+        0,
+        0,
+        0.4
+      ]
+    },
+    {
+      "id": "depressorAnguliLeft",
+      "kind": "fiber",
+      "activation": {
+        "mouthFrownLeft": 1
+      },
+      "centre": [
+        0.0255,
+        1.449,
+        0.175
+      ],
+      "radius": [
+        0.033,
+        0.031,
+        0.042
+      ],
+      "axis": [
+        -0.14995344668108657,
+        -0.9886930584506308,
+        0
+      ],
+      "contraction": 0.13,
+      "transverseExpansion": 0.0721125348377949,
+      "anchorMm": 33,
+      "liftMm": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "nasolabialFoldLeft",
+      "kind": "fold",
+      "activation": {
+        "mouthSmileLeft": 0.6,
+        "noseSneerLeft": 0.8
+      },
+      "centre": [
+        0.0255,
+        1.479,
+        0.181
+      ],
+      "radius": [
+        0.016,
+        0.026,
+        0.031
+      ],
+      "diagonal": [
+        -0.04,
+        0.01,
+        0.065
+      ],
+      "liftMm": [
+        0.05,
+        0.3,
+        -0.4
+      ]
+    },
+    {
+      "id": "buccalInflationLeft",
+      "kind": "pressure",
+      "activation": {
+        "cheekPuff": 1
+      },
+      "centre": [
+        0.0485,
+        1.477,
+        0.156
+      ],
+      "radius": [
+        0.04,
+        0.04,
+        0.045
+      ],
+      "diagonal": [
+        0.065,
+        -0.055,
+        0.015
+      ],
+      "liftMm": [
+        0.9,
+        0.1,
+        4.7
+      ]
+    },
+    {
+      "id": "frontalisInnerRight",
+      "kind": "fiber",
+      "activation": {
+        "browInnerUp": 1
+      },
+      "centre": [
+        -0.0175,
+        1.546,
+        0.165
+      ],
+      "radius": [
+        0.027,
+        0.033,
+        0.05
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "contraction": 0.125,
+      "transverseExpansion": 0.06904496764969759,
+      "anchorMm": 41,
+      "liftMm": [
+        0,
+        0,
+        0.2
+      ]
+    },
+    {
+      "id": "frontalisOuterRight",
+      "kind": "fiber",
+      "activation": {
+        "browOuterUpRight": 1
+      },
+      "centre": [
+        -0.0445,
+        1.547,
+        0.153
+      ],
+      "radius": [
+        0.032,
+        0.032,
+        0.05
+      ],
+      "axis": [
+        -0.11997306906865186,
+        0.9927771465430942,
+        0
+      ],
+      "contraction": 0.14,
+      "transverseExpansion": 0.07832773203438426,
+      "anchorMm": 39,
+      "liftMm": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "corrugatorRight",
+      "kind": "fiber",
+      "activation": {
+        "browDownRight": 1
+      },
+      "centre": [
+        -0.021500000000000002,
+        1.537,
+        0.169
+      ],
+      "radius": [
+        0.03,
+        0.028,
+        0.045
+      ],
+      "axis": [
+        0.6801057646702489,
+        -0.733114008093077,
+        0
+      ],
+      "contraction": 0.16,
+      "transverseExpansion": 0.09108945117996181,
+      "anchorMm": 30,
+      "liftMm": [
+        0,
+        0,
+        0.6
+      ]
+    },
+    {
+      "id": "zygomaticRight",
+      "kind": "fiber",
+      "activation": {
+        "mouthSmileRight": 1
+      },
+      "centre": [
+        -0.0375,
+        1.48,
+        0.167
+      ],
+      "radius": [
+        0.041,
+        0.039,
+        0.049
+      ],
+      "axis": [
+        -0.6603302477064307,
+        0.7503752814845803,
+        -0.03001501125938321
+      ],
+      "contraction": 0.19,
+      "transverseExpansion": 0.11111111111111116,
+      "anchorMm": 34,
+      "liftMm": [
+        0,
+        0,
+        0.5
+      ]
+    },
+    {
+      "id": "commissureLiftRight",
+      "kind": "fiber",
+      "activation": {
+        "mouthSmileRight": 1
+      },
+      "centre": [
+        -0.025500000000000002,
+        1.461,
+        0.181
+      ],
+      "radius": [
+        0.035,
+        0.025,
+        0.037
+      ],
+      "axis": [
+        -0.5,
+        0.8655056325639944,
+        -0.03
+      ],
+      "contraction": 0.095,
+      "transverseExpansion": 0.051176662455273414,
+      "anchorMm": 34,
+      "liftMm": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "cheekOrbitalLiftRight",
+      "kind": "fiber",
+      "activation": {
+        "cheekRaiseRight": 1,
+        "mouthSmileRight": 0.15
+      },
+      "centre": [
+        -0.0405,
+        1.498,
+        0.153
+      ],
+      "radius": [
+        0.038,
+        0.031,
+        0.045
+      ],
+      "axis": [
+        -0.11997306906865186,
+        0.9927771465430942,
+        0
+      ],
+      "contraction": 0.115,
+      "transverseExpansion": 0.0629880069054678,
+      "anchorMm": 30,
+      "liftMm": [
+        0,
+        0,
+        1.1
+      ]
+    },
+    {
+      "id": "orbicularisOculiRight",
+      "kind": "sphincter",
+      "activation": {
+        "eyeNarrowRight": 0.9,
+        "eyeBlinkRight": 0.3,
+        "cheekRaiseRight": 0.15
+      },
+      "centre": [
+        -0.0305,
+        1.518,
+        0.154
+      ],
+      "radius": [
+        0.037,
+        0.028,
+        0.044
+      ],
+      "diagonal": [
+        -0.025,
+        -0.105,
+        0.14596762641455374
+      ],
+      "liftMm": [
+        0,
+        0,
+        0.2
+      ]
+    },
+    {
+      "id": "levatorNasiRight",
+      "kind": "fiber",
+      "activation": {
+        "noseSneerRight": 1
+      },
+      "centre": [
+        -0.0185,
+        1.478,
+        0.182
+      ],
+      "radius": [
+        0.022,
+        0.03,
+        0.033
+      ],
+      "axis": [
+        -0.11997306906865186,
+        0.9927771465430942,
+        0
+      ],
+      "contraction": 0.14,
+      "transverseExpansion": 0.07832773203438426,
+      "anchorMm": 27,
+      "liftMm": [
+        0,
+        0,
+        0.4
+      ]
+    },
+    {
+      "id": "depressorAnguliRight",
+      "kind": "fiber",
+      "activation": {
+        "mouthFrownRight": 1
+      },
+      "centre": [
+        -0.0265,
+        1.449,
+        0.175
+      ],
+      "radius": [
+        0.033,
+        0.031,
+        0.042
+      ],
+      "axis": [
+        0.14995344668108657,
+        -0.9886930584506308,
+        0
+      ],
+      "contraction": 0.13,
+      "transverseExpansion": 0.0721125348377949,
+      "anchorMm": 33,
+      "liftMm": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "nasolabialFoldRight",
+      "kind": "fold",
+      "activation": {
+        "mouthSmileRight": 0.6,
+        "noseSneerRight": 0.8
+      },
+      "centre": [
+        -0.0265,
+        1.479,
+        0.181
+      ],
+      "radius": [
+        0.016,
+        0.026,
+        0.031
+      ],
+      "diagonal": [
+        -0.04,
+        0.01,
+        0.065
+      ],
+      "liftMm": [
+        -0.05,
+        0.3,
+        -0.4
+      ]
+    },
+    {
+      "id": "buccalInflationRight",
+      "kind": "pressure",
+      "activation": {
+        "cheekPuff": 1
+      },
+      "centre": [
+        -0.0495,
+        1.477,
+        0.156
+      ],
+      "radius": [
+        0.04,
+        0.04,
+        0.045
+      ],
+      "diagonal": [
+        0.065,
+        -0.055,
+        0.015
+      ],
+      "liftMm": [
+        -0.9,
+        0.1,
+        4.7
+      ]
+    },
+    {
+      "id": "orbicularisOris",
+      "kind": "sphincter",
+      "activation": {
+        "lipPurse": 1
+      },
+      "centre": [
+        -0.0006,
+        1.457,
+        0.183
+      ],
+      "radius": [
+        0.043,
+        0.026,
+        0.039
+      ],
+      "diagonal": [
+        -0.145,
+        -0.12,
+        0.32908027644869753
+      ],
+      "liftMm": [
+        0,
+        0,
+        2.5
+      ]
+    },
+    {
+      "id": "mentalis",
+      "kind": "sheet",
+      "activation": {
+        "lipPurse": 0.45,
+        "mouthFrownLeft": 0.18,
+        "mouthFrownRight": 0.18
+      },
+      "centre": [
+        -0.0006,
+        1.438,
+        0.172
+      ],
+      "radius": [
+        0.039,
+        0.028,
+        0.04
+      ],
+      "diagonal": [
+        -0.025,
+        -0.075,
+        0.10880110880110871
+      ],
+      "liftMm": [
+        0,
+        1.1,
+        0.6
+      ]
+    }
+  ]
+}

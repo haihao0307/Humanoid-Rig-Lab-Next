@@ -1,0 +1,21 @@
+// Exercise recorded-range caching and the committed-pose transition boundary.
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+const motion=JSON.parse(readFileSync(new URL('../reconstruction/motion-reference.json',import.meta.url),'utf8'));
+const sandbox={degrees:r=>r*180/Math.PI,qangle:()=>0,qi:()=>[0,0,0,1],clamp:(x,a,b)=>Math.min(b,Math.max(a,x)),dot:(a,b)=>a.reduce((n,v,i)=>n+v*b[i],0)};
+vm.createContext(sandbox);
+const code=readFileSync(new URL('../body/ReferenceMotion.js',import.meta.url),'utf8').replace('/*__R2_MOTION_JSON__*/',JSON.stringify(motion));
+vm.runInContext(code+'\nglobalThis.profile=r2CaptureConstraintProfile;',sandbox);
+const human={byId:new Map(['left','right'].flatMap(s=>['forearm','tibia'].map(j=>[s+'_'+j,{bindQ:[0,0,0,1]}])))};
+const source={kind:'capture',clip:'wave'},base=sandbox.profile(human,source),original=base.hingeDegrees.left_tibia;
+assert(original<60,'A standing wave recording has a narrow knee range');
+const adapted=sandbox.profile(human,{...source,transitionHingeDegrees:{left_tibia:60}});
+assert.equal(adapted.hingeDegrees.left_tibia,60.5);
+assert.equal(adapted.hingeDegrees.right_tibia,base.hingeDegrees.right_tibia);
+assert.equal(sandbox.profile(human,source),base);
+assert.equal(base.hingeDegrees.left_tibia,original,'Transition must not widen future unblended clips');
+assert.throws(()=>sandbox.profile(human,{...source,transitionHingeDegrees:{left_tibia:181}}),/过渡/);
+assert.throws(()=>sandbox.profile(human,{...source,transitionHingeDegrees:{left_tibia:NaN}}),/过渡/);
+assert.equal(sandbox.profile(human,{kind:'contact-adaptation'}),null);
+console.log(JSON.stringify({checks:8,recordedRange:original,transitionRange:adapted.hingeDegrees.left_tibia}));

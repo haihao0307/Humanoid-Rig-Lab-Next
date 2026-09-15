@@ -5,11 +5,13 @@ function strengthGroupLabel(id){
  const key=id.replace(/^(left|right|center)_/,'');return side+(STRENGTH_CATALOG.groups.find(g=>g.id===key)?.label||key);
 }
 function strengthReason(assessment){return assessment.reasons.map(reason=>reason.replace(/(?:left|right|center)_\w+/g,id=>strengthGroupLabel(id))).join('；');}
+function strengthWorldParameters(world){return{gravityMps2:world.physicsSettings?.gravityMps2??9.81,groundFriction:world.physicsSettings?.groundFriction??.65};}
 function strengthTaskRequest(type,object,options={}){
  return {type,massKg:object.mass,durationS:0,reachM:.46,elbowLeverM:.24,crouch:1,
   accelerationMps2:.25,speedMps:type==='push'?.22:.43,
-  objectFriction:object.friction??.4,gripFriction:object.gripFriction??.6,
-  groundFriction:.65,pushHeightM:Math.min(1.2,Math.max(.15,object.h*.65)),
+  // cannon-es multiplies the two materials' friction coefficients.
+  objectFriction:(object.friction??.4)*(options.groundFriction??.65),gripFriction:object.gripFriction??.6,
+  gravityMps2:9.81,groundFriction:.65,pushHeightM:Math.min(1.2,Math.max(.15,object.h*.65)),
   ...options};
 }
 function strengthRuntimeAssessment(agent,candidate,dt){
@@ -26,14 +28,44 @@ function strengthRuntimeAssessment(agent,candidate,dt){
    shorteningRates[id]=dt>0&&agent.strengthLastLengths?.[id]!=null?clamp((agent.strengthLastLengths[id]-ratio)/dt,-3,3):0;
   }
  }
- const verticalSpeed=dt>0?(candidate.p[1]-o.p[1])/dt:0;
- const req=strengthTaskRequest(type,o,{reachM:clamp(shoulderLever,.05,1.2),elbowLeverM:clamp(elbowLever,.02,.7),crouch:clamp((REST_HIP_HEIGHT-agent.pos[1])/(REST_HIP_HEIGHT-.325),0,1),speedMps:clamp(agent.walkSpeed||0,0,3),accelerationMps2:agent.phase==='lift'?.25:0,lengthRatios,shorteningRates});
+ // Measure acceleration from consecutive solved velocities. Hand target error
+ // is spring extension, so dividing that error by dt is not object velocity.
+ const velocity=Array.isArray(o.v)?[...o.v]:[0,0,0],previous=agent.strengthLastObjectVelocity;
+ const acceleration=dt>0&&previous?.id===o.id?len(sub(velocity,previous.v))/dt:0;
+ agent.strengthLastObjectVelocity={id:o.id,v:velocity};
+ const verticalSpeed=velocity[1];
+ const hip=agent.h.bodyMetrics.restHipHeightM,lowHip=agent.h.bodyMetrics.crouchLowHipM;
+ const req=strengthTaskRequest(type,o,{...strengthWorldParameters(agent.w),reachM:clamp(shoulderLever,.05,1.2),elbowLeverM:clamp(elbowLever,.02,.7),crouch:clamp((hip-agent.pos[1])/(hip-lowHip),0,1),speedMps:clamp(len(velocity),0,3),accelerationMps2:clamp(acceleration,0,5),lengthRatios,shorteningRates});
  const assessment=agent.strength.assess(req);
  assessment.phase=agent.phase;assessment.muscleWork=verticalSpeed>.005?'shortening':verticalSpeed<-.005?'lengthening':'holding';
+ assessment.measuredAccelerationMps2=acceleration;
+ assessment.accelerationOutsideEnvelope=acceleration>5;
+ assessment.physicsLimits=strengthManipulationLimits(agent,assessment);
  return assessment;
 }
+function strengthManipulationLimits(agent,assessment){
+ const request=assessment.request,push=request.type==='push',g=request.gravityMps2??9.81,slope=request.slopeRad??0;
+ // The zero-payload request retains segment weight and posture costs. A unit
+ // payload supplies each group's external-force coefficient without granting
+ // the rigid-body actuator its entire tendon force as hand force.
+ const base=agent.strength.assess({...request,massKg:0,accelerationMps2:0});
+ const probe=agent.strength.assess({...request,massKg:1,accelerationMps2:0,objectFriction:push?1:request.objectFriction});
+ const unitForceN=push?g*(Math.cos(slope)+Math.abs(Math.sin(slope))):g,limits=[];
+ for(const [id,group]of Object.entries(assessment.groups)){
+  const coefficient=(probe.groups[id].required-base.groups[id].required)/unitForceN;
+  if(coefficient>1e-8)limits.push(Math.max(0,group.available-base.groups[id].required)/coefficient);
+ }
+ const tractionForceN=(request.groundFriction??.65)*assessment.bodyMassKg*g*Math.cos(slope);
+ const balanceForceN=push?assessment.bodyMassKg*g*((request.supportHalfLengthM??.14)+(request.bodyBackshiftM??.04))/Math.max(.05,request.pushHeightM):Infinity;
+ const capacityForceN=limits.length?Math.min(...limits):0;
+ // Keep a separate reserve for orientation control so translation and torque
+ // cannot each consume the same full muscle budget.
+ const maxForceN=Math.max(0,Math.min(capacityForceN*.9,push?tractionForceN:Infinity,balanceForceN));
+ const armTorque=Math.min(...['left','right'].map(side=>Math.min(assessment.groups[side+'_shoulder'].available,assessment.groups[side+'_elbowExtensors'].available)));
+ return {maxForceN,maxHorizontalForceN:Math.min(maxForceN,tractionForceN),maxTorqueNm:push?0:Math.max(0,armTorque*.1),tractionForceN,capacityForceN,balanceForceN:push?balanceForceN:null,basis:'current-muscle-capacity-after-posture-and-ground-traction',calibrated:false};
+}
 function strengthIdleGuard(lab){
- const a=lab.agent;if(a.held||a.skill||a.plan||a.basic?.busy||['character','torso','headNeck','shoulders','hands'].some(k=>lab[k]?.busy))throw Error('请先完成或停止当前任务，再修改身体力量或状态');
+ requireCharacterIdle(lab.agent,'修改身体力量或状态');
 }
 function installStrengthAPI(lab){
  const assign=async model=>{
@@ -52,8 +84,8 @@ function installStrengthAPI(lab){
   import(data){strengthIdleGuard(lab);return assign(StrengthModel.fromSnapshot(data));},
   setCondition(id){strengthIdleGuard(lab);const c=STRENGTH_CATALOG.conditions[id];if(!Object.hasOwn(STRENGTH_CATALOG.conditions,id))throw Error('未知状态');const model=lab.agent.strength;model.resetState();model.state.readiness=c.readiness;for(const s of Object.values(model.state.groups))s.fatigue=c.fatigue;lab.human.characterPreset.strength=model.export();return model.report();},
   setReadiness(value){strengthIdleGuard(lab);strengthNumber(value,.2,1,'readiness');lab.agent.strength.state.readiness=value;lab.agent.strength.lastAssessment=null;lab.human.characterPreset.strength=lab.agent.strength.export();return api.report();},
-  assess:request=>lab.agent.strength.assess(request),
-  compare(request){return api.presets().map(p=>{const model=new StrengthModel(makeCharacterStrengthProfile(lab.human.bodySex,p.id),lab.agent.strength.state);const a=model.assess(request);return {id:p.id,label:p.label,modeledMuscleMassKg:model.modeledMuscleMassKg,feasible:a.feasible,maxUtilization:a.maxUtilization,limitingGroup:a.limitingGroup,reasons:a.reasons};});}
+  assess:request=>lab.agent.strength.assess({...request,...strengthWorldParameters(lab.world)}),
+  compare(request){return api.presets().map(p=>{const model=new StrengthModel(makeCharacterStrengthProfile(lab.human.bodySex,p.id),lab.agent.strength.state);const a=model.assess({...request,...strengthWorldParameters(lab.world)});return {id:p.id,label:p.label,modeledMuscleMassKg:model.modeledMuscleMassKg,feasible:a.feasible,maxUtilization:a.maxUtilization,limitingGroup:a.limitingGroup,reasons:a.reasons};});}
  };
  installStrengthControls(lab,api);return api;
 }
@@ -63,7 +95,7 @@ function installStrengthControls(lab,api){
  document.head.append(style);
  const toggle=document.createElement('button');toggle.id='strength-open';toggle.textContent='力量与状态';toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-controls','strength-panel');
  const panel=document.createElement('section');panel.id='strength-panel';panel.hidden=true;panel.setAttribute('aria-label','力量与状态');
- panel.innerHTML='<h2>力量与状态</h2><p class="strength-help">肌群参数决定能力，持续用力积累疲劳。这里的数值为模型估算。</p><label>身体配置 <select id="strength-preset"></select></label><button id="strength-apply">应用配置</button><label>状态 <select id="strength-condition"><option value="fresh">充分恢复</option><option value="tired">疲劳状态</option></select></label><button id="strength-condition-apply">应用状态</button><label>当前状态系数 <input id="strength-readiness" type="number" min="0.2" max="1" step="0.05" value="1"></label><button id="strength-readiness-apply">设置状态系数</button><output id="strength-summary"></output><details><summary>调整单侧肌群</summary><label>肌群 <select id="strength-group"></select></label><label>肌肉体积 cm³ <input id="strength-volume" type="number" min="10" max="10000" step="10"></label><button id="strength-volume-apply">应用肌量</button><p class="strength-help">基础体积变化会改变力量和估算体重。应用后同步重建肌肉与皮肤轮廓。疲劳只改变出力和步速，不改变肌量。</p></details><details><summary>任务能力比较</summary><label>动作 <select id="strength-type"><option value="carry">双手搬运</option><option value="push">地面推动</option></select></label><label>重量 kg <input id="strength-mass" type="number" min="0" max="250" value="10" step="1"></label><label>持续时间 秒 <input id="strength-duration" type="number" min="0" max="7200" value="20"></label><label>前伸距离 m <input id="strength-reach" type="number" min="0.05" max="1.2" step="0.05" value="0.34"></label><label>物体滑动摩擦系数 <input id="strength-friction" type="number" min="0" max="2" step="0.05" value="0.4"></label><button id="strength-compare">比较各配置</button><p class="strength-help">比较使用相同的当前疲劳和状态，按持续用力保守估算；不会执行动作。</p><output id="strength-comparison"></output></details><details><summary>各肌群状态</summary><table><thead><tr><th>肌群</th><th>可用力矩</th><th>激活</th><th>疲劳</th></tr></thead><tbody id="strength-groups"></tbody></table></details><button id="strength-export">导出力量存档</button><label>导入力量存档 <input id="strength-import" type="file" accept="application/json,.json"></label><output id="strength-message" role="status"></output>';
+ panel.innerHTML='<h2>力量与状态</h2><p class="strength-help">肌群参数决定能力，持续用力积累疲劳。这里的数值为模型估算。</p><label>身体配置 <select id="strength-preset"></select></label><button id="strength-apply">应用配置</button><label>状态 <select id="strength-condition"><option value="fresh">充分恢复</option><option value="tired">疲劳状态</option></select></label><button id="strength-condition-apply">应用状态</button><label>当前状态系数 <input id="strength-readiness" type="number" min="0.2" max="1" step="0.05" value="1"></label><button id="strength-readiness-apply">设置状态系数</button><output id="strength-summary"></output><details><summary>调整单侧肌群</summary><label>肌群 <select id="strength-group"></select></label><label>肌肉体积 cm³ <input id="strength-volume" type="number" min="10" max="10000" step="10"></label><button id="strength-volume-apply">应用肌量</button><p class="strength-help">基础体积变化会改变力量和估算体重。能力参数用于任务估算；身高由人物配方控制，肌量参数不自动改变皮肤形状。</p></details><details><summary>任务能力比较</summary><label>动作 <select id="strength-type"><option value="carry">双手搬运</option><option value="push">地面推动</option></select></label><label>重量 kg <input id="strength-mass" type="number" min="0" max="250" value="10" step="1"></label><label>持续时间 秒 <input id="strength-duration" type="number" min="0" max="7200" value="20"></label><label>前伸距离 m <input id="strength-reach" type="number" min="0.05" max="1.2" step="0.05" value="0.34"></label><label>物体滑动摩擦系数 <input id="strength-friction" type="number" min="0" max="2" step="0.05" value="0.4"></label><button id="strength-compare">比较各配置</button><p class="strength-help">比较使用相同的当前疲劳和状态，按持续用力保守估算；不会执行动作。</p><output id="strength-comparison"></output></details><details><summary>各肌群状态</summary><table><thead><tr><th>肌群</th><th>可用力矩</th><th>激活</th><th>疲劳</th></tr></thead><tbody id="strength-groups"></tbody></table></details><button id="strength-export">导出力量存档</button><label>导入力量存档 <input id="strength-import" type="file" accept="application/json,.json"></label><output id="strength-message" role="status"></output>';
  document.body.append(toggle,panel);const el=id=>panel.querySelector('#strength-'+id);
  for(const p of api.presets()){const option=document.createElement('option');option.value=p.id;option.textContent=p.label;el('preset').append(option);}
  for(const id of Object.keys(lab.agent.strength.profile.groups)){const option=document.createElement('option');option.value=id;option.textContent=strengthGroupLabel(id);el('group').append(option);}
@@ -79,7 +111,7 @@ function installStrengthControls(lab,api){
  el('export').onclick=()=>{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(api.export(),null,2)],{type:'application/json'}));a.href=url;a.download='human-strength.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  el('import').onchange=async event=>{const f=event.target.files[0];if(!f)return;try{if(f.size>65536)throw Error('力量存档不能超过 64 KB');const data=JSON.parse(await f.text());await act(()=>api.import(data));}catch(e){el('message').textContent=e.message;}finally{event.target.value='';}};
  api.refresh=()=>{
-  if(panel.hidden)return;const r=api.report(),a=r.lastAssessment,reference=new StrengthModel(lab.agent.strength.profile),current=api.assess({type:'carry',massKg:10,durationS:0,reachM:.34}),fresh=reference.assess({type:'carry',massKg:10,durationS:0,reachM:.34});
+  if(panel.hidden)return;const r=api.report(),a=r.lastAssessment,reference=new StrengthModel(lab.agent.strength.profile),current=api.assess({type:'carry',massKg:10,durationS:0,reachM:.34}),fresh=reference.assess({type:'carry',massKg:10,durationS:0,reachM:.34,...strengthWorldParameters(lab.world)});
   el('summary').textContent=r.label+' · 建模肌群质量 '+r.modeledMuscleMassKg.toFixed(1)+' kg\n估算体重 '+r.bodyMassKg.toFixed(1)+' kg · 状态系数 '+r.readiness.toFixed(2)+'\n步速系数 '+r.movementFactor.toFixed(2)+' · 10 kg 标准负荷利用率 '+Math.round(current.maxUtilization*100)+'%（充分恢复 '+Math.round(fresh.maxUtilization*100)+'%）'+(a?'\n'+(a.feasible?'当前负荷可承受':'当前负荷超限')+' · '+strengthGroupLabel(a.limitingGroup):'');
   el('groups').replaceChildren(...Object.entries(r.groups).map(([id,g])=>{const row=document.createElement('tr');for(const value of [strengthGroupLabel(id),g.availableTorqueNm.toFixed(1)+' Nm',Math.round(g.activation*100)+'%',Math.round(g.fatigue*100)+'%']){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}return row;}));
   const busy=applying||lab.character.busy||!!(lab.agent.held||lab.agent.skill||lab.agent.plan||lab.agent.basic?.busy);

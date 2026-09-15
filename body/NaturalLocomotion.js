@@ -1,135 +1,160 @@
-/* Basic locomotion R1. Authored controls informed by human gait references;
- * R2 refines continuity; see docs/ACTION_EXAMPLES_R2.md. Not imported mocap.
- * Owns contact targets and pose signals; Human.pose remains the only IK owner. */
-const NATURAL_GAIT=Object.freeze({version:2,accelerationMps2:.8,decelerationMps2:1.1,
- speedResponseS:.20,brakeResponseS:.30,startTransferS:.16,maxTurnRadS:1.55,
- swingSlowS:.49,swingFastS:.40,doubleSupportSlowS:.12,doubleSupportFastS:.08,
- maxLandingLeadM:.31,maxFootReachM:.34,clearanceSlowM:.024,clearanceFastM:.050,
- toeOffRad:.18,heelStrikeRad:-.12,soleHeelM:LOWER_BODY_PLAN.foot.heelZ,soleToeM:LOWER_BODY_PLAN.foot.toeZ,
- pelvisYawRad:.046,pelvisRollRad:.022,swayM:.012,bobM:.008});
-
-// Closed-form critically damped response: keep both position and velocity
-// continuous when a new support leg or heading becomes the target.
-function gaitResponse(state,key,target,responseS,dt){
- const velocityKey=key+'Velocity',velocity=state[velocityKey]||0;
- const omega=2/responseS,error=(state[key]||0)-target,j=velocity+omega*error,e=Math.exp(-omega*dt);
- state[key]=target+(error+j*dt)*e;state[velocityKey]=(velocity-omega*j*dt)*e;
- return state[key];
+/* Routes belong to Agent/PlanForecast. Root movement, stepping and contact
+ * ownership belong exclusively to the pinned MotionController R2.2. */
+const NATURAL_GAIT=Object.freeze({version:'motion-lab-r2.2',fixedStepS:1/120,maxSubsteps:24});
+function motionCircleSweep(start,end,centre,radius){
+ const d=sub(end,start),p=sub(start,centre),a=d[0]*d[0]+d[2]*d[2],c=p[0]*p[0]+p[2]*p[2]-radius*radius;
+ if(c<=0)return 0;if(a<1e-16)return 1;
+ const b=2*(p[0]*d[0]+p[2]*d[2]),disc=b*b-4*a*c;if(disc<0)return 1;
+ const t=(-b-Math.sqrt(disc))/(2*a);return t>=0&&t<=1?Math.max(0,t-1e-5):1;
 }
-
-class NaturalLocomotion{
- constructor(agent){this.a=agent;this.velocity=0;this.speed=0;this.acceleration=0;
-  this.startTime=0;this.state='standing';this.support=0;this.bob=0;this.armSignal=0;
-  this.wait=NATURAL_GAIT.doubleSupportSlowS;this.elapsed=0;this.lastSpeed=0;
-  this.turnTarget=0;this.lookYaw=0;this.turnLean=0;
-  this.settled=true;this.sample={};this.contacts={left:'flat',right:'flat'};}
- remainingDistance(){const a=this.a;let distance=0,prev=a.pos;for(let i=a.routeIndex;i<a.route.length;i++){distance+=horizontal(prev,a.route[i]);prev=a.route[i];}return distance;}
- // Navigation stays on the collision-checked route. Brake before the destination;
- // preserve the positional endpoint and let the contact scheduler finish landing.
- move(dt,speed){
-  const a=this.a,c=NATURAL_GAIT;
-  while(a.routeIndex<a.route.length&&horizontal(a.pos,a.route[a.routeIndex])<.001)a.routeIndex++;
-  if(a.routeIndex>=a.route.length){this.velocity=0;this.startTime=0;this.turnTarget=0;return false;}
-  const end=a.route[a.routeIndex],d=[end[0]-a.pos[0],0,end[2]-a.pos[2]],distance=len(d);
-  const wanted=Math.atan2(d[0],d[2]),turn=angleDiff(wanted,a.yaw);
-  const next=a.route[a.routeIndex+1],corner=next?angleDiff(Math.atan2(next[0]-end[0],next[2]-end[2]),wanted):0;
-  const cornerWeight=next?1-smoother(distance/.55):0;
-  this.turnTarget=clamp(turn+corner*cornerWeight*.65,-.32,.32);
-  // Do not twist a planted leg through a large turn: first take a placement step.
-  const supportSide=a.swing?(a.swing.side==='left'?'right':'left'):null;
-  let delta=clamp(turn*(1-Math.exp(-dt*8)),-c.maxTurnRadS*dt,c.maxTurnRadS*dt);
-  if(supportSide){const twist=angleDiff(a.yaw+delta,a.feet[supportSide].yaw);if(Math.abs(twist)>.55&&Math.sign(delta)===Math.sign(twist))delta=0;}
-  a.yaw+=delta;
-  this.startTime+=dt;
-  const readiness=smoother((this.startTime-c.startTransferS)/.22);
-  const heading=smoother(clamp(1-Math.abs(turn)/1.25,0,1));
-  const cornerSpeed=1-cornerWeight*(1-Math.max(.12,Math.cos(Math.abs(corner)*.5)**2));
-  speed*=a.strength?.movementFactor()??1;
-  const desired=Math.min(speed*cornerSpeed,this.remainingDistance()/c.brakeResponseS)*heading*readiness;
-  const dv=(desired-this.velocity)*(1-Math.exp(-dt/c.speedResponseS));
-  this.velocity=Math.max(0,this.velocity+clamp(dv,-c.decelerationMps2*dt,c.accelerationMps2*dt));
-  const step=Math.min(distance,this.velocity*dt);
-  a.pos[0]+=d[0]/distance*step;a.pos[2]+=d[2]/distance*step;
-  this.state=readiness<1?'starting':desired<speed*.8?'braking':'walking';
-  return true;
+function motionWorldSweep(world,start,end,radius,ignore=[]){
+ const r=radius+.06,b=world.bounds,d=sub(end,start);let fraction=1;
+ for(const [k,low,high]of [[0,b.xMin+radius,b.xMax-radius],[2,b.zMin+radius,b.zMax-radius]]){
+  if(start[k]<low||start[k]>high)return{position:[...start],fraction:0,blocked:true};
+  if(d[k]>0&&end[k]>high)fraction=Math.min(fraction,(high-start[k])/d[k]);
+  if(d[k]<0&&end[k]<low)fraction=Math.min(fraction,(low-start[k])/d[k]);
  }
- expected(side,moving,duration){
-  const a=this.a,c=NATURAL_GAIT,s=side==='left'?-1:1;
-  let lead=ADULT_STANCE.ankleForwardM;
-  if(moving&&this.speed>.025){
-   // Predict landing plus half of the following step's travel. Scale by actual
-   // speed; facing-only turns use short placement steps and no walking arm pump.
-   lead+=Math.min(c.maxLandingLeadM,this.speed*(duration+.5*(duration+this.wait)));
-   if(a.routeIndex<a.route.length)lead=Math.min(lead,this.remainingDistance()+ADULT_STANCE.ankleForwardM);
-  }
-  return add([a.pos[0],SKIN_SOLE_HEIGHT,a.pos[2]],rotate(qy(a.yaw),[s*ADULT_STANCE.footHalfSpacingM,0,lead]));
+ for(const o of world.objects){
+  if(ignore.includes(o.id)||o.held||o.collidable===false)continue;
+  if(objectTilted(o)){const [rx,rz]=objectFootprint(o);const flat=new MotionLab.FlatWorld([{minX:o.p[0]-rx-r,maxX:o.p[0]+rx+r,minZ:o.p[2]-rz-r,maxZ:o.p[2]+rz+r}]);fraction=Math.min(fraction,flat.sweep(start,end,0).fraction);continue;}
+  if(o.shape!=='box'){fraction=Math.min(fraction,motionCircleSweep(start,end,o.p,(o.r||objectRadius(o))+r));continue;}
+  const q=qy(-objectYaw(o)),a=rotate(q,sub(start,o.p)),z=rotate(q,sub(end,o.p)),x=o.w/2,y=o.d/2;
+  // Swept circle/OBB: two side strips and four rounded corners, sharing
+  // World's circle/OBB clearance convention.
+  const flat=new MotionLab.FlatWorld([{minX:-x-r,maxX:x+r,minZ:-y,maxZ:y},{minX:-x,maxX:x,minZ:-y-r,maxZ:y+r}]);
+  fraction=Math.min(fraction,flat.sweep(a,z,0).fraction);
+  for(const sx of [-1,1])for(const sz of [-1,1])fraction=Math.min(fraction,motionCircleSweep(a,z,[sx*x,0,sz*y],r));
  }
- needs(side){const a=this.a;return horizontal(a.feet[side].p,this.expected(side,false,0))>.018||Math.abs(angleDiff(a.yaw,a.feet[side].yaw))>.06;}
- isSettled(){return !this.a.swing&&!this.needs('left')&&!this.needs('right')&&this.speed<.018;}
- update(dt,moving,measuredSpeed=null){
-  const a=this.a,c=NATURAL_GAIT;this.elapsed+=dt;
-  const measured=measuredSpeed===null?0:measuredSpeed;
-  this.speed+=(measured-this.speed)*(1-Math.exp(-dt*10));
-  const rawAcceleration=(this.speed-this.lastSpeed)/Math.max(dt,.00001);this.lastSpeed=this.speed;
-  this.acceleration+=(clamp(rawAcceleration,-1.1,.8)-this.acceleration)*(1-Math.exp(-dt*6));
-  const pace=clamp(this.speed/.8,0,1),duration=c.swingSlowS+(c.swingFastS-c.swingSlowS)*pace;
-  this.wait=c.doubleSupportSlowS+(c.doubleSupportFastS-c.doubleSupportSlowS)*pace;
-  for(const side of ['left','right']){delete a.feet[side].q;this.contacts[side]='flat';}
-  a.sinceStep+=dt;
-  if(a.swing){
-   const sw=a.swing,ft=a.feet[sw.side];sw.t+=dt;const t=clamp(sw.t/sw.duration,0,1);
-   const u=clamp((t-.08)/.84,0,1),air=smooth(u);
-   const pitch=t<.08?c.toeOffRad*smoother(t/.08):t>.92?c.heelStrikeRad*(1-smoother((t-.92)/.08)):c.toeOffRad+(c.heelStrikeRad-c.toeOffRad)*air;
-   // Peak clearance arrives in early swing, then the leg extends toward contact.
-   // Cubic travel avoids the concentrated mid-swing speed of the old quintic.
-   const lift=sw.clearance*(u/.4)**2*((1-u)/.6)**3;
-   const flat=mix(sw.from,sw.to,air);ft.yaw=sw.fromYaw+angleDiff(sw.toYaw,sw.fromYaw)*air;
-   // Roll about a fixed sole edge. Its conservative support proxy also keeps
-   // the swinging sole above the floor while the ankle changes orientation.
-   const pivotZ=c.soleToeM+(c.soleHeelM-c.soleToeM)*smoother((u-.2)/.6);
-   const pivot=[0,-SKIN_SOLE_HEIGHT,pivotZ];
-   const offset=rotate(qy(ft.yaw),sub(pivot,rotate(qx(pitch),pivot)));
-   // During flight the pivot shifts smoothly rather than switching at pitch=0.
-   // Account for the lowest end of the sole proxy while it is off the ground.
-   const floorLift=Math.max(0,Math.sin(pitch)*((pitch>=0?c.soleToeM:c.soleHeelM)-pivotZ));
-   ft.p=add(flat,offset);ft.p[1]+=lift+floorLift;ft.q=qm(qy(ft.yaw),qx(pitch));
-   this.contacts[sw.side]=t<.08?'toe':t>.92?'heel':'swing';
-   if(t>=1){ft.p=[...sw.to];ft.yaw=sw.toYaw;delete ft.q;this.contacts[sw.side]='flat';a.swing=null;a.nextFoot=sw.side==='left'?'right':'left';a.sinceStep=0;}
-  }
-  if(!a.swing&&a.sinceStep>=this.wait){
-   let side=a.nextFoot;if(!moving&&!this.needs(side))side=side==='left'?'right':'left';
-   const turning=Math.abs(angleDiff(a.yaw,a.feet[side].yaw))>.06;
-   if((moving&&(this.speed>.035||turning))||this.needs(side)){
-    const from=[...a.feet[side].p],to=this.expected(side,moving,duration),travel=horizontal(from,to);
-    // Bound relative to the current pelvis, not the previous foot position:
-    // limiting each foot's travel would accumulate lag over a long route.
-    const reach=horizontal(a.pos,to);
-    if(reach>c.maxFootReachM){const d=sub(to,a.pos);to[0]=a.pos[0]+d[0]*c.maxFootReachM/reach;to[2]=a.pos[2]+d[2]*c.maxFootReachM/reach;}
-    a.swing={side,from,to,fromYaw:a.feet[side].yaw,toYaw:a.yaw,t:0,duration,
-     clearance:(c.clearanceSlowM+(c.clearanceFastM-c.clearanceSlowM)*pace)*clamp(travel/.12,.35,1)};
-   }
-  }
-  const localL=rotate(inv(qy(a.yaw)),sub(a.feet.left.p,a.pos)),localR=rotate(inv(qy(a.yaw)),sub(a.feet.right.p,a.pos));
-  a.gaitSignal+=(clamp((localL[2]-localR[2])/.30,-1,1)-a.gaitSignal)*(1-Math.exp(-dt*14));
-  a.gaitBlend+=(clamp(this.speed/.5,0,1)-a.gaitBlend)*(1-Math.exp(-dt*8));
-  gaitResponse(this,'armSignal',a.gaitSignal,.13,dt);
-  const swingSide=a.swing?.side||a.nextFoot,weight=swingSide==='left'?1:-1;
-  const activity=moving||a.swing||this.needs('left')||this.needs('right');
-  gaitResponse(this,'support',activity?weight:0,.14,dt);
-  const progress=a.swing?clamp(a.swing.t/a.swing.duration,0,1):0;
-  gaitResponse(this,'bob',a.swing?Math.sin(Math.PI*progress)**2:0,.10,dt);
-  gaitResponse(this,'lookYaw',moving?this.turnTarget:0,.16,dt);
-  gaitResponse(this,'turnLean',moving?-this.turnTarget*this.speed*.055:0,.20,dt);
-  this.settled=this.isSettled();
-  if(!moving){this.velocity=0;this.startTime=0;this.state=this.settled?'standing':'settling';}
-  const blend=a.gaitBlend,signal=a.gaitSignal*blend;
-  this.sample={pelvisYaw:signal*c.pelvisYawRad,pelvisRoll:this.support*c.pelvisRollRad*blend+this.turnLean,
-   sway:this.support*c.swayM,bob:this.bob*c.bobM*blend,
-   lean:clamp(this.acceleration*.028,-.02,.025),armSignal:this.armSignal,lookYaw:this.lookYaw,
-   idleRoll:Math.sin(a.time*.63)*.0018*(1-blend),idleYaw:Math.sin(a.time*.41)*.002*(1-blend)};
-  a.walkSpeed=this.speed;
+ return{position:add(start,mul(d,fraction)),fraction,blocked:fraction<1-1e-9};
+}
+class MotionLabWorld {
+ constructor(agent){this.a=agent;}
+ context(radius){const a=this.a,body=radius>.1,profile=bodyPhysicalProfile(a.h),ignore=a.skill?.o?[a.skill.o.id]:[];
+  return {radius:body?Math.max(profile.bodyRadiusM,a.held?(a.skill?.type==='carry'?carryRouteRadius(a.held,profile,a.skill?.carryConfiguration):profile.pushClearanceM):0):radius*a.h.bodyMetrics.statureScale,ignore};}
+ free(point,radius){const a=this.a,c=this.context(radius);return !a.w.collision(point,c.radius,c.ignore)&&!a.w.population?.collisionFor(a,point,c.radius);}
+ sweep(start,end,radius){
+  const a=this.a,c=this.context(radius),result=motionWorldSweep(a.w,start,end,c.radius,c.ignore);
+  // The population excludes this actor, including when the kernel queries feet.
+  const fraction=Math.min(result.fraction,a.w.population?.sweepFor(a,start,end,c.radius)??1);
+  return{position:add(start,mul(sub(end,start),fraction)),fraction,blocked:fraction<1-1e-9};
  }
- report(){return{version:NATURAL_GAIT.version,state:this.state,speedMps:this.speed,accelerationMps2:this.acceleration,
-  contacts:{...this.contacts},doubleSupport:!this.a.swing,settled:this.settled,
-  source:'authored contact controller informed by published gait research',mocapRetargeted:false};}
+}
+class NaturalLocomotion {
+ constructor(agent){
+  this.a=agent;const source=agent.h.resolvedRig;this.rig=MotionLab.rigFromSource(source);
+  // Source left/right ankle heights differ slightly. Use the higher ankle
+  // plane so both individually resolved skin soles clear the flat floor.
+  this.skinFloorOffsetM=Math.max(...['left','right'].map(s=>source.nodes[s+'_foot'].positionM[1]-source.sourceFloorM))-this.rig.ankleHeight;
+  this.rig.ankleHeight+=this.skinFloorOffsetM;this.rig.hipHeight=agent.h.bodyMetrics.walkingHipHeightM;
+  this.standingHipHeightM=agent.h.bodyMetrics.standingHipHeightM;
+  this.engine=new MotionLab.MotionController(this.rig);
+  this.world=new MotionLabWorld(agent);this.engine.world=this.world;
+  this.pose=new MotionLabPose(agent.h,this.engine);agent.h.motionDriver=this.pose;
+  this.resetFromPose();
+ }
+ resetFromPose(){
+  const a=this.a,e=this.engine,root=[a.pos[0],this.standingHipHeightM,a.pos[2]],yaw=a.yaw;
+  const world=e.world;e.world=new MotionLab.FlatWorld();e.reset();e.world=world;
+  e.state.root=root;e.state.yaw=yaw;e.state.time=a.time;
+  for(const side of ['left','right'])e.state.feet[side]={position:e.stance(e.state,side),yaw,contact:true};
+  e.state.pose=e.solve(e.state);this.requestKey=null;this.requested=false;this.tempo=1;
+  this.traffic={active:false,waitS:0,totalWaitS:0,blockers:[],nextCheckAtS:0};this.sync();
+ }
+ sync(){const a=this.a,s=this.engine.state;
+  a.pos=[...s.root];a.yaw=s.yaw;a.swing=s.swing?{side:s.swing.side,t:s.swing.elapsed,duration:s.swing.duration}:null;
+  a.feet=Object.fromEntries(['left','right'].map(side=>[side,{p:[...s.feet[side].position],yaw:s.feet[side].yaw,contact:s.feet[side].contact}]));
+  this.speed=s.speed*this.tempo;this.velocity=this.speed;this.blend=s.motion.weight;this.state=s.status;this.contacts=Object.fromEntries(['left','right'].map(side=>[side,s.feet[side].contact?'planted':'swing']));
+  a.gaitBlend=this.blend;a.gaitSignal=s.motion.frame?clamp(s.motion.frame.leftUpperArm[2]-s.motion.frame.rightUpperArm[2],-1,1):0;a.walkSpeed=this.speed;
+  this.sample={motionLab:true,sourceClip:'08_01'};
+ }
+ request(command){
+  this.requested=true;const key=JSON.stringify(command);
+  if(this.requestKey===key&&this.engine.state.command)return;
+  const answer=this.engine.command(command);if(!answer.accepted)throw Error(answer.reason);this.requestKey=key;
+ }
+ waitForTraffic(dt,target){
+  const a=this.a,population=a.w.population,traffic=this.traffic;
+  if(!population)return false;
+  if(traffic.active&&a.time<traffic.nextCheckAtS){
+   traffic.waitS+=dt;traffic.totalWaitS+=dt;this.stop();return true;
+  }
+  const context=this.world.context(.23);
+  // Static route errors still fail through the regular controller. Only a
+  // moving actor can turn this check into a bounded, observable wait.
+  if(a.w.collision(target,context.radius,context.ignore)){traffic.active=false;return false;}
+  if(!population.collisionFor(a,target,context.radius)){traffic.active=false;traffic.waitS=0;traffic.blockers=[];return false;}
+  traffic.active=true;traffic.phase=a.phase;traffic.target=[...target];traffic.reason='npc-at-route-target';
+  traffic.waitS+=dt;traffic.totalWaitS+=dt;traffic.nextCheckAtS=a.time+.2;
+  traffic.blockers=[...population.values()].filter(other=>other.agent!==a&&other.id!==a.npcId&&!other.disposed).filter(other=>{
+   const radius=context.radius+bodyPhysicalProfile(other.human).bodyRadiusM+.06;
+   return horizontal(target,other.agent.pos)<radius;
+  }).map(other=>other.id);
+  if(traffic.waitS>30)throw Error('等待其他 NPC 让行超时，保持当前安全支撑：'+traffic.blockers.join('、'));
+  this.stop();return true;
+ }
+ move(dt,speed=.48){
+  const a=this.a,s=this.engine.state;
+  const pace=a.manipulationPace();
+  // A blocked load requests normal braking, never a frozen mid-air foot.
+  // Route ownership is retained so recovery can resume the same destination.
+  if(a.held&&pace<.08){this.tempo=1;this.stop();return a.routeIndex<a.route.length||!this.isSettled();}
+  this.tempo=clamp(speed/.48*(a.strength?.movementFactor()??1)*pace,.05,1);
+  while(a.routeIndex<a.route.length&&horizontal(s.root,a.route[a.routeIndex])<=.015){
+   if(a.routeIndex===a.route.length-1){if(s.command||!this.isSettled()){this.requested=true;return true;}a.routeIndex++;return false;}
+   a.routeIndex++;
+  }
+  if(a.routeIndex>=a.route.length)return false;
+  if(this.waitForTraffic(dt,a.route[a.routeIndex]))return true;
+  this.request({type:'walk',target:[...a.route[a.routeIndex]]});return true;
+ }
+ turnInPlace(yaw,dt){
+  const pace=this.a.manipulationPace();
+  if(this.a.held&&pace<.08){this.tempo=1;this.stop();return true;}
+  this.tempo=clamp(pace,.05,1);
+  if(Math.abs(angleDiff(yaw,this.engine.state.yaw))<.015&&this.kernelSettled()){this.requested=true;return !this.isSettled();}
+  this.request({type:'turn',yaw});return true;
+ }
+ stop(){if(this.kernelSettled()){this.requested=true;return;}if(!this.engine.state.fault)this.request({type:'stop'});}
+ kernelSettled(){const s=this.engine.state;return !s.fault&&!s.swing&&s.speed<.001&&s.status==='idle';}
+ standingTarget(){
+  const s=this.engine.state,scale=this.a.h.bodyMetrics.statureScale;let target=this.standingHipHeightM;
+  for(const side of ['left','right']){
+   const hip=add(s.root,rotate(qy(s.yaw),[this.rig.hipHalf*(side==='left'?-1:1),0,0])),foot=s.feet[side].position;
+   const reach=this.rig.legs[side].upper+this.rig.legs[side].lower-.0005*scale,d=horizontal(hip,foot);
+   target=Math.min(target,foot[1]+Math.sqrt(Math.max(0,reach*reach-d*d)));
+  }
+  return target;
+ }
+ isSettled(){return this.kernelSettled()&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
+ updateHeight(dt,standing){
+  const e=this.engine;if(e.state.paused||e.state.fault)return;
+  const target=standing?this.standingTarget():Math.min(this.rig.hipHeight,this.standingTarget()),before=e.state;
+  const y=Math.min(this.standingTarget(),before.root[1]+(target-before.root[1])*(1-Math.exp(-dt/.18)));
+  if(Math.abs(y-before.root[1])<1e-10)return;
+  const candidate={...before,root:[before.root[0],y,before.root[2]]};candidate.pose=e.solve(candidate);
+  for(const side of ['left','right']){
+   const leg=candidate.pose.legs[side];
+   if(leg.residual>.012||leg.lengthError>1e-7)throw Error('站立高度过渡超出固定脚锚可达范围');
+  }
+  e.state=candidate;
+ }
+ canTransition(){return this.isSettled();}
+ update(dt){
+  const e=this.engine;
+  if(this.traffic.active&&this.traffic.phase!==this.a.phase){this.traffic.active=false;this.traffic.waitS=0;this.traffic.blockers=[];}
+  if(!this.requested&&e.state.command?.type==='walk')this.stop();
+  this.requested=false;
+  if(!this.kernelSettled())this.updateHeight(dt*this.tempo,false);
+  e.update(dt*this.tempo);
+  if(e.state.fault||e.state.status==='blocked')throw Error(e.state.fault||'连续碰撞检测发现路线受阻，目标未完成');
+  // The scheduler may have advanced an independent foot target. Apply its
+  // exact reach ceiling once more; do not leave even a small clamped-IK foot
+  // hovering above that anchor while the height response catches up.
+  this.updateHeight(this.kernelSettled()?dt*this.tempo:0,this.kernelSettled());
+  this.sync();
+ }
+ report(){const s=this.engine.state;return{version:NATURAL_GAIT.version,state:s.status,speedMps:this.speed,timeScale:this.tempo,contacts:{...this.contacts},settled:this.isSettled(),
+  source:MotionLab.MOTION_SOURCE,sourcePhase:s.motion.phase,referenceBlend:s.motion.weight,metrics:{...s.metrics},skinFloorOffsetM:this.skinFloorOffsetM,
+  height:{standingTargetM:this.standingHipHeightM,walkingTargetM:this.rig.hipHeight,currentM:s.root[1],reachableStandingM:this.standingTarget(),timeConstantS:.18},
+  traffic:structuredClone(this.traffic),contactBasis:'Motion-Lab explicit foot anchors',pose:this.pose.report(),visualAcceptance:false};}
 }

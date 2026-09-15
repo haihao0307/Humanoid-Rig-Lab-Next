@@ -57,13 +57,13 @@ class StrengthModel{
   return {pcsaCm2,maxTendonForceN,availableForceN,availableTorqueNm:availableForceN*g.momentArmM,lengthFactor,velocityFactor};
  }
  assess(input){
-  strengthKeys(input,['type','massKg','durationS','reachM','elbowLeverM','crouch','speedMps','accelerationMps2','objectFriction','groundFriction','gripFriction','slopeRad','pushHeightM','bodyBackshiftM','supportHalfLengthM','leftShare','lengthRatios','shorteningRates'],'task');
+  strengthKeys(input,['type','massKg','durationS','reachM','elbowLeverM','crouch','speedMps','accelerationMps2','objectFriction','groundFriction','gravityMps2','gripFriction','slopeRad','pushHeightM','bodyBackshiftM','supportHalfLengthM','leftShare','lengthRatios','shorteningRates'],'task');
   if(!['carry','push'].includes(input.type))throw Error('力量模型当前支持搬运与推动');
   const value=(key,def,lo,hi)=>strengthNumber(input[key]??def,lo,hi,key);
   const mass=value('massKg',0,0,2000),duration=value('durationS',0,0,7200),reach=value('reachM',.34,.05,1.2),elbow=value('elbowLeverM',.20,.02,.7),crouch=value('crouch',0,0,1),speed=value('speedMps',0,0,3),accel=value('accelerationMps2',0,0,5),slope=value('slopeRad',0,-.35,.35);
-  const mu=value('objectFriction',.4,0,2),ground=value('groundFriction',.65,0,2),grip=value('gripFriction',.6,.05,2),height=value('pushHeightM',.55,.05,1.8),back=value('bodyBackshiftM',.04,0,.12),support=value('supportHalfLengthM',.14,.03,.4),leftShare=value('leftShare',.5,0,1);
+  const mu=value('objectFriction',.4,0,4),ground=value('groundFriction',.65,0,2),grip=value('gripFriction',.6,.05,2),height=value('pushHeightM',.55,.05,1.8),back=value('bodyBackshiftM',.04,0,.12),support=value('supportHalfLengthM',.14,.03,.4),leftShare=value('leftShare',.5,0,1);
   for(const key of ['lengthRatios','shorteningRates'])if(input[key]!=null){strengthKeys(input[key],Object.keys(this.profile.groups),key);for(const n of Object.values(input[key]))strengthNumber(n,key==='lengthRatios'?.4:-3,key==='lengthRatios'?1.8:3,key);}
-  const body=this.bodyMassKg,g=9.81,push=input.type==='push',weight=mass*g,vertical=weight+mass*accel;
+  const body=this.bodyMassKg,g=value('gravityMps2',9.81,.1,30),push=input.type==='push',weight=mass*g,vertical=weight+mass*accel;
   const pushN=mass*g*(mu*Math.cos(slope)+Math.abs(Math.sin(slope)))+mass*accel;
   const demand={},units={},reserve=this.profile.reserve;
   const add=(id,n,unit='Nm')=>{demand[id]=Math.max(0,n);units[id]=unit;};

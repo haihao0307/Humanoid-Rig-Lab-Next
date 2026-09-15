@@ -18,16 +18,33 @@ const fail=(code,message,detail={})=>{throw new GroundingError(code,message,deta
 const worldData=w=>{w=w?.world||w||{};return{...w,objects:w.objects||[],zones:w.zones||[],revision:w.revision??0}};
 function number(s){if(/^\d+$/.test(s))return Number(s);const d={零:0,一:1,二:2,两:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9};if(s==='十')return 10;if(s.includes('十')){const[a,b]=s.split('十');return(d[a]||1)*10+(d[b]||0)}return d[s]??NaN;}
 function height(o){return Number(o.h)||(o.shape==='sphere'?Number(o.r)*2:0);}
-function halfSize(o){return o.shape==='box'?[Number(o.w)/2||Number(o.r)||.1,Number(o.d)/2||Number(o.r)||.1]:[Number(o.r)||.1,Number(o.r)||.1];}
-function radius(o){const[a,b]=halfSize(o);return o.shape==='box'?Math.hypot(a,b):a;}
+function halfSize(o){if(o.halfExtentsM&&o.q&&Math.abs(1-2*(o.q[0]**2+o.q[2]**2))<.9999)return [o.halfExtentsM[0],o.halfExtentsM[2]];return o.shape==='box'?[Number(o.w)/2||Number(o.r)||.1,Number(o.d)/2||Number(o.r)||.1]:[Number(o.r)||.1,Number(o.r)||.1];}
+function radius(o){if(o.shape==='sphere')return Number(o.r)||.1;const[a,b]=halfSize(o);return o.shape==='box'||o.q&&Math.abs(1-2*(o.q[0]**2+o.q[2]**2))<.9999?Math.hypot(a,b):a;}
 function yaw(o){return Number.isFinite(o.yaw)?o.yaw:2*Math.atan2(o.q?.[1]||0,o.q?.[3]||1);}
 function kind(o){return ({worktable:'table',bench:'bench',shelf:'shelf',platform:'platform'})[o.templateId]||o.semanticType||o.shape;}
 function portable(o){return o.movable!==false&&!['furniture','landmark','obstacle'].includes(o.category);}
 function color(o){let c=o.color;if(typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c))c=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)/255);if(!Array.isArray(c))return null;return Object.keys(PALETTE).sort((a,b)=>PALETTE[a].reduce((s,x,i)=>s+(x-c[i])**2,0)-PALETTE[b].reduce((s,x,i)=>s+(x-c[i])**2,0))[0];}
-function surface(o){if(o.supportSurface?.enabled===true&&Number.isFinite(o.supportSurface.height))return{...o.supportSurface,id:o.id,p:o.p,yaw:yaw(o),w:o.w,d:o.d,topY:o.supportSurface.height};if(['table','bench','platform'].includes(kind(o))&&o.shape==='box')return{id:o.id,topY:(o.p?.[1]||0)+height(o)/2,p:o.p,yaw:yaw(o),w:o.w,d:o.d};return null;}
+function surface(o){if(o.q&&1-2*(o.q[0]**2+o.q[2]**2)<.9999)return null;if(o.supportSurface?.enabled===true&&Number.isFinite(o.supportSurface.height))return{...o.supportSurface,id:o.id,p:o.p,yaw:yaw(o),w:o.w,d:o.d,topY:o.supportSurface.height};if(['table','bench','platform'].includes(kind(o))&&o.shape==='box')return{id:o.id,topY:(o.p?.[1]||0)+height(o)/2,p:o.p,yaw:yaw(o),w:o.w,d:o.d};return null;}
 function fitsSupport(o,s,margin=0){if(!s||!o.p)return false;const a=-s.yaw,dx=o.p[0]-s.p[0],dz=o.p[2]-s.p[2],x=Math.cos(a)*dx-Math.sin(a)*dz,z=Math.sin(a)*dx+Math.cos(a)*dz,[rx,rz]=halfSize(o),da=yaw(o)-s.yaw,ex=o.shape==='box'?Math.abs(Math.cos(da))*rx+Math.abs(Math.sin(da))*rz:rx,ez=o.shape==='box'?Math.abs(Math.sin(da))*rx+Math.abs(Math.cos(da))*rz:rz;return Math.abs(x)+ex<=s.w/2+margin&&Math.abs(z)+ez<=s.d/2+margin;}
-function inside(o,z){if(!o?.p||!z?.p)return false;const dx=Math.abs(o.p[0]-z.p[0]),dz=Math.abs(o.p[2]-z.p[2]),r=radius(o);return z.shape==='square'?dx+r<=z.r+.001&&dz+r<=z.r+.001:Math.hypot(dx,dz)+r<=z.r*(z.shape==='hexagon'?Math.cos(Math.PI/6):1)+.001;}
-function facts(world){const w=worldData(world),surfaces=w.objects.map(surface).filter(Boolean),groundY=Number(w.groundY)||0;return{schema:'jarvis/scene_facts@1.0',sceneId:w.sceneId,revision:w.revision,units:'meter',positionConvention:'object_center',supportToleranceM:.025,groundY,surfaces,objects:w.objects.map(o=>{const h=height(o),bottomY=Number(o.p?.[1])-h/2;const supportedBy=o.held?[]:surfaces.filter(s=>s.id!==o.id&&Math.abs(bottomY-s.topY)<=.025&&fitsSupport(o,s,.001)).map(s=>s.id);if(!o.held&&Math.abs(bottomY-groundY)<=.025)supportedBy.push('ground');return{id:o.id,name:o.name,type:kind(o),shape:o.shape,color:color(o),portable:portable(o),movable:o.movable!==false,held:!!o.held,bottomY,heightM:h,supportedBy,inside:w.zones.filter(z=>inside(o,z)).map(z=>z.id),position:clone(o.p),massKg:Number.isFinite(o.mass)?o.mass:null};})};}
+function inside(o,z){if(!o?.p||!z?.p)return false;const dx=Math.abs(o.p[0]-z.p[0]),dz=Math.abs(o.p[2]-z.p[2]),r=radius(o);const ex=o.halfExtentsM?.[0]??r,ez=o.halfExtentsM?.[2]??r;return z.shape==='square'?dx+ex<=z.r+.001&&dz+ez<=z.r+.001:Math.hypot(dx,dz)+r<=z.r*(z.shape==='hexagon'?Math.cos(Math.PI/6):1)+.001;}
+function facts(world){
+ const w=worldData(world),surfaces=w.objects.map(surface).filter(Boolean),groundY=Number(w.groundY)||0;
+ return{schema:'jarvis/scene_facts@1.0',sceneId:w.sceneId,revision:w.revision,units:'meter',positionConvention:'object_center',
+  supportToleranceM:.025,groundY,surfaces,physicsSettings:w.physicsSettings?clone(w.physicsSettings):null,
+  objects:w.objects.map(o=>{
+   const h=height(o),bottomY=Number(o.p?.[1])-Number(o.halfExtentsM?.[1]??h/2),physical=o.physicsState;
+   // Observed contact state takes precedence over geometric proximity. A body
+   // can pass through this height while falling, which is not a resting contact.
+   let supportedBy;
+   if(physical)supportedBy=[...(physical.supportIds||[])];
+   else{supportedBy=o.held?[]:surfaces.filter(s=>s.id!==o.id&&Math.abs(bottomY-s.topY)<=.025&&fitsSupport(o,s,.001)).map(s=>s.id);if(!o.held&&Math.abs(bottomY-groundY)<=.025)supportedBy.push('ground');}
+   return{id:o.id,name:o.name,type:kind(o),shape:o.shape,color:color(o),portable:portable(o),movable:o.movable!==false,
+    held:!!o.held,bottomY,heightM:h,supportedBy,supportBasis:physical?'rigid-body-contact':'geometry-estimate',
+    settled:physical?!!physical.settled:null,speedMps:physical?.speedMps??null,
+    velocity:Array.isArray(o.v)?clone(o.v):null,inside:w.zones.filter(z=>inside(o,z)).map(z=>z.id),
+    position:clone(o.p),massKg:Number.isFinite(o.mass)?o.mass:null};
+  })};
+}
 function entityView(o){return{id:o.id,name:o.name,position:o.p,shape:o.shape};}
 function aliases(w,raw,ctx={},bindings={}){let t=norm(bindings[raw]||raw).replace(/^(?:那个|这个|那张|这张|那一个|这一个|的)+/,'').replace(/的$/,'');t=t.replace(/一号区|第一区|一区/g,'Z1').replace(/二号区|第二区|二区/g,'Z2').replace(/三号区|第三区|三区/g,'Z3').replace(/第?(\d+)号?区/g,'Z$1');const pool=[...w.objects,...w.zones];if(/^(那里|这里|那儿|上次的地方|刚才那里)$/.test(t)){const e=pool.find(o=>o.id===ctx.lastTarget);if(e)return e;fail('MISSING_CONTEXT','还没有明确的目标位置。',{slot:'target',raw})}let es=pool.filter(o=>o.id.toLowerCase()===t.toLowerCase());if(!es.length)es=pool.filter(o=>[o.name,...(o.aliases||[])].some(a=>norm(a).toLowerCase()===t.toLowerCase()));if(!es.length){const k=Object.keys(TYPES).find(k=>TYPES[k].includes(t));if(k)es=w.objects.filter(o=>kind(o)===k);}if(es.length===1)return es[0];if(es.length>1)fail('AMBIGUOUS',`“${raw}”对应 ${es.length} 个目标，请选一个。`,{slot:'target',raw,candidates:es.map(entityView)});fail('NOT_FOUND',`场景中没有可确认的“${raw}”。`,{slot:'target',raw});}
 function and(args){args=args.filter(Boolean);return args.length===1?args[0]:{op:'and',args};}
