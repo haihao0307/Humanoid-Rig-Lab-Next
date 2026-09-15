@@ -197,9 +197,9 @@ class NaturalLocomotion {
   const a=this.a,other=conflict.actor;if(!other)return false;
   const root=this.engine.state.root,target=a.route[a.routeIndex];let direction=sub(target,root);direction[1]=0;if(len(direction)<.12)return false;direction=norm(direction);
   const right=[direction[2],0,-direction[0]],side=trafficPairSide(a.npcId,other.id),clearance=context.radius+bodyPhysicalProfile(other.human).bodyRadiusM+TRAFFIC_AVOIDANCE.sideMarginM;
-  for(const back of [.34,.52,.76])for(const lateral of [.55,.9,1.25]){
+  for(const back of [.34,.52,.76,1.0])for(const lateral of [.55,.9,1.25,1.6]){
    const point=add(add(root,mul(direction,-back)),mul(right,side*clearance*lateral));point[1]=0;
-   if(!trafficSegmentClear(a,root,point,context,{dynamic:false}))continue;
+   if(!trafficSegmentClear(a,root,point,context,{dynamic:false})||a.w.population?.collisionFor(a,point,context.radius))continue;
    a.route.splice(a.routeIndex,0,point);this.requestKey=null;Object.assign(this.traffic,{active:true,mode:'retreat',reason:'multi-way-mobile-yield',blockers:[other.id],side,detourEndIndex:a.routeIndex,originalTarget:[...target],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null});this.traffic.retreats++;
    a.log?.('交叉路线暂无直接净空，已主动移动到侧后方重新进入路线');return true;
   }
