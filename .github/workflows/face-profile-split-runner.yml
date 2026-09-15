@@ -1,0 +1,62 @@
+name: Face profile split runner
+
+on:
+  push:
+    branches:
+      - feature/human-face-workbench-v1-20260915
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: face-profile-split-runner
+  cancel-in-progress: false
+
+jobs:
+  implement-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-face-workbench-v1-20260915
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Execute implementation script
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          source=Path('.github/workflows/face-profile-split-r1.yml').read_text(encoding='utf-8')
+          marker="python3 - <<'PY'\n"
+          if marker not in source or '\n          PY' not in source:
+              raise SystemExit('embedded implementation script not found')
+          script=source.split(marker,1)[1].rsplit('\n          PY',1)[0]
+          script='\n'.join(line[10:] if line.startswith('          ') else line for line in script.splitlines())
+          exec(compile(script,'face-profile-split-r1.py','exec'),{'__name__':'__main__'})
+          PY
+      - name: Build workbench
+        run: node tools/build-pure.mjs
+      - name: Validate assembled source
+        run: node tools/check-pure.mjs
+      - name: Validate face profile separation
+        run: node tools/test-face-profile-separation.mjs
+      - name: Validate NPC face uniforms
+        run: node tools/test-npc-face-uniforms.mjs
+      - name: Validate face startup guard
+        run: node tools/test-face-startup.mjs
+      - name: Refresh file audit
+        run: python3 tools/audit-files.py
+      - name: Commit verified implementation
+        shell: bash
+        run: |
+          rm -f .github/workflows/face-profile-split-r1.yml .github/workflows/face-profile-split-runner.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "face: separate fixed identity from transient expression"
+          git push origin HEAD:feature/human-face-workbench-v1-20260915
