@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Photo Fit R1.2 · 新建样本 NPC 001</title>
+<style>
+:root{--bg:#05090e;--panel:#09131b;--line:#29404f;--text:#e6eef2;--muted:#8299a6;--good:#82d7bd;--warn:#e3bd73;--bad:#e58e97;font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text)}body{display:grid;grid-template-rows:58px minmax(0,1fr)}header{display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--line);background:var(--panel)}h1{margin:0 auto 0 0;font-size:15px}h1 small{display:block;margin-top:2px;color:var(--muted);font:9px ui-monospace,monospace}button{min-height:32px;padding:5px 9px;border:1px solid #365063;border-radius:7px;background:#111f29;color:var(--text);font:inherit;cursor:pointer}button.primary{background:#31534d;border-color:#75ad9f}button:disabled{opacity:.45;cursor:not-allowed}.status{min-width:210px;text-align:right;color:var(--muted);font-size:11px}.status[data-state=ready]{color:var(--good)}.status[data-state=working]{color:var(--warn)}.status[data-state=error]{color:var(--bad)}main{position:relative;min-height:0}iframe{width:100%;height:100%;border:0;display:block;background:#020508}.banner{position:absolute;left:50%;top:10px;z-index:5;transform:translateX(-50%);max-width:min(720px,calc(100% - 24px));padding:8px 12px;border:1px solid #6b5a34;border-radius:8px;background:#201c13ed;color:#dbc999;font-size:11px;line-height:1.5;box-shadow:0 10px 35px #0008}.banner[hidden]{display:none}@media(max-width:800px){header{height:auto;min-height:58px;flex-wrap:wrap;padding:8px 10px}.status{min-width:0;margin-left:auto}body{grid-template-rows:auto minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Photo Fit R1.2 · 新建样本 NPC 001<small>自动新建独立 NPC，不再覆盖当前 R2 参考人物</small></h1>
+  <button id="generate" class="primary" type="button">重新应用并聚焦样本 NPC</button>
+  <button id="showAll" type="button">查看全体</button>
+  <span id="status" class="status" data-state="working">正在等待人物工作台…</span>
+</header>
+<main>
+  <iframe id="sampleFrame" src="./photo-fit-sample-001.html?generatedNpcHost=1" title="风格化样本 001 工作台"></iframe>
+  <div id="banner" class="banner">正在创建独立样本 NPC。完成后中间视口会自动切换并聚焦新人物；原来的 NPC 不会被修改。</div>
+</main>
+<script type="module">
+const CHARACTER_ID='stylized-explorer-175-front-001';
+const CHARACTER_LABEL='风格化探索者 001';
+const CHARACTER_SEED=26091541;
+const $=id=>document.getElementById(id),clone=value=>JSON.parse(JSON.stringify(value));
+const state={status:'waiting',busy:false,sampleInstanceId:null,sourceInstanceId:null,sourcePreset:null,error:null};
+const setStatus=(text,status='working')=>{$('status').textContent=text;$('status').dataset.state=status;state.status=status;};
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function api(){try{return $('sampleFrame').contentWindow?.PhotoFitSample001||null}catch{return null}}
+function getLab(){return api()?.getLab?.()||null}
+async function waitFor(test,{timeout=480000,interval=300,label='condition'}={}){const started=performance.now();let lastError=null;while(performance.now()-started<timeout){try{const value=await test();if(value)return value}catch(error){lastError=error}await sleep(interval)}throw Error('等待超时：'+label+(lastError?' · '+lastError.message:''));}
+function sampleRow(lab){return lab.population.list().find(row=>row.definitionId===CHARACTER_ID||row.identity?.residentId===CHARACTER_ID)||null;}
+async function focusSample(){const lab=getLab();if(!lab?.population||!state.sampleInstanceId)return false;if(lab.population.activeId!==state.sampleInstanceId)lab.population.activate(state.sampleInstanceId);lab.population.select?.([state.sampleInstanceId]);lab.population.focus?.([state.sampleInstanceId]);await sleep(120);lab.focus?.('body');lab.inspectBody?.('front');return true;}
+async function generateSample(){
+ if(state.busy)return;state.busy=true;state.error=null;$('generate').disabled=true;$('banner').hidden=false;setStatus('正在准备独立样本 NPC…','working');
+ try{
+  const sampleApi=await waitFor(()=>api()?.state?.ready?api():null,{label:'样本参数与页面就绪'});
+  const lab=await waitFor(()=>{const value=getLab();return value?.population?.activeId&&typeof value?.npc?.spawn==='function'&&value?.character?.export?value:null},{label:'完整人物与 NPC 人口系统就绪'});
+  let existing=sampleRow(lab);
+  if(!existing){
+   const rows=lab.population.list();
+   if(rows.length>=8)throw Error('当前场景已经达到 8 名 NPC 上限。请先在内层 NPC 面板移除一名空闲人物，再点击重新生成。');
+   state.sourceInstanceId=lab.population.activeId;state.sourcePreset=clone(lab.character.export());
+   const definition=clone(lab.npc.export());
+   definition.character={...definition.character,id:CHARACTER_ID,label:CHARACTER_LABEL,seed:CHARACTER_SEED,task:{command:'',startOnSpawn:false}};
+   definition.behavior=null;
+   definition.attachments={...(definition.attachments||{}),hair:{assetId:'builtin/r2-hair-v1',enabled:true},outfit:[],accessories:[]};
+   setStatus('正在生成新的身体与表皮…','working');
+   const instanceId=await lab.npc.spawn(definition,{identity:{residentId:CHARACTER_ID,displayName:CHARACTER_LABEL,role:'explorer'}});
+   state.sampleInstanceId=instanceId;existing=sampleRow(lab)||{id:instanceId};
+  }else state.sampleInstanceId=existing.id;
+  if(lab.population.activeId!==state.sampleInstanceId)lab.population.activate(state.sampleInstanceId);
+  await waitFor(()=>{const actor=lab.population.get(state.sampleInstanceId);return !lab.character.busy&&!actor.hairTask&&!actor.compactQualityPending?actor:null},{label:'样本 NPC 可编辑'});
+  await sampleApi.prepare();
+  setStatus('正在应用 1.75 m、体型、面部、肤色与发型…','working');
+  await sampleApi.applyAll();
+  await waitFor(()=>{const actor=lab.population.get(state.sampleInstanceId);return !lab.character.busy&&!actor.hairTask&&!actor.compactQualityPending?actor:null},{label:'样本外观完成'});
+  await focusSample();
+  setStatus('已生成并聚焦 '+CHARACTER_LABEL+' · '+state.sampleInstanceId,'ready');$('banner').hidden=true;state.status='ready';
+ }catch(error){state.error=String(error?.message||error);setStatus(state.error,'error');$('banner').textContent='生成没有完成：'+state.error;$('banner').hidden=false;state.status='error';}
+ finally{state.busy=false;$('generate').disabled=false;}
+}
+$('generate').onclick=()=>generateSample();
+$('showAll').onclick=()=>{const lab=getLab();lab?.population?.focus?.('all');};
+$('sampleFrame').addEventListener('load',()=>{setTimeout(generateSample,300);},{once:true});
+window.PhotoFitGeneratedSample001={CHARACTER_ID,CHARACTER_LABEL,state,getLab,api,generateSample,focusSample};
+</script>
+</body>
+</html>
