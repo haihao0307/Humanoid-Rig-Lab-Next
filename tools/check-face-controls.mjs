@@ -7,6 +7,11 @@ export function checkFaceControlSources({read,assert}){
   let checks=0;const check=(value,message)=>{assert(value,'Face controls: '+message);checks++;};
   const recipe=JSON.parse(read('body/FaceControlRecipe.json')),source=read('body/FaceControls.js'),renderer=read('body/CompactWorkbench.js'),runtime=read('source/runtime.template.js'),character=read('body/CharacterPresets.js'),manifest=JSON.parse(read('source/assembly.json'));
   check(recipe.schema==='jarvis/face_control_recipe@1'&&recipe.status==='Candidate'&&!recipe.runtimeVerified&&!recipe.visualAcceptance,'explicit authored recipe and unverified acceptance');
+  check(source.includes("const FACE_SCHEMA='jarvis/face_profile@2'")&&source.includes("const FACE_IDENTITY_SCHEMA='jarvis/face_identity@1'")&&source.includes("const FACE_EXPRESSION_SCHEMA='jarvis/face_expression@1'"),'versioned identity and expression profiles');
+check(source.includes("const FACE_LEGACY_SCHEMA='jarvis/face_pose@1'")&&source.includes("legacyOffsetsInterpretation:'neutral identity'"),'legacy face-pose migration keeps an explicit assumption');
+check(source.includes('weights=pose.expression.weights,offsetsMm=pose.identity.neutralOffsetsMm'),'resolver composes fixed identity before transient expression');
+check(source.includes('identity:demo.saved.identity,expression:{weights:')&&source.includes('identity:saved.identity,expression:{weights:'),'demo and eased presets retain the current identity');
+check(source.includes('verifySeparation(){')&&source.includes('face-identities')&&source.includes('reset-identity'),'visible separation controls and invariant check');
   const ids=recipe.nodes.map(n=>n.id),channels=recipe.channels.map(c=>c.id),presets=recipe.presets.map(p=>p.id);
   check(ids.length===17&&new Set(ids).size===17,'17 distinct local regions');
   check(channels.length===22&&new Set(channels).size===22&&channels.includes('eyeBlinkLeft')&&channels.includes('eyeBlinkRight'),'22 distinct expression channels including independent blinks');

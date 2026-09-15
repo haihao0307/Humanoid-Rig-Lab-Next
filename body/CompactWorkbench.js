@@ -452,5 +452,7 @@ async function installCompactWorkbench(lab,pending){
     el('compact-model-label').textContent='重建人物 R2 · '+hairText+(lab.compact.report.precisionLimited?' · 部分区域采用较粗细节，尚未满足目标精度。':'')+' · 几何缓冲不是显卡总占用；JS 堆不是进程总内存。';
   },500);
   window.addEventListener('pagehide',event=>{if(event.persisted||disposed)return;disposed=true;clearInterval(timer);doc.removeEventListener('click',onBasicCommand);panel.remove();style.remove();cancelCompactSurface('人物页面已关闭');lab.compact.dispose();lab.renderer.compactPerformance.dispose();});
-  lab.renderer.setQuality('shadow');if(!lab.hair?.inStudio())lab.focus('body');publishCompactProgress({group:'ready',state:'ready'});needsRedraw=true;
+  lab.renderer.setQuality('shadow');if(!lab.hair?.inStudio())lab.focus('body');
+  const review=new URLSearchParams(window.parent.location.search);if(review.get('review')==='face')requestAnimationFrame(()=>{if(disposed)return;panel.open=false;lab.settings.open('face');lab.face.refresh();lab.face.closeup(review.get('faceView')==='lips'?'lips':'front');});
+  publishCompactProgress({group:'ready',state:'ready'});needsRedraw=true;
 }
