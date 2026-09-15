@@ -176,11 +176,6 @@ new_source = """ check(source.includes('function compactPerioralDepth')&&source.
 if c.count(old_source) != 1:
     raise SystemExit('R9 face source checks anchor mismatch')
 c = c.replace(old_source, new_source, 1)
-old_api = """globalThis.api={create:compactCreateFaceAnatomy,sample:compactFaceRaySampler,form:compactFaceFormDepth,perioral:compactPerioralDepth,outline:compactLipOutline,relief:compactLipReliefDepth,radial:compactLipRadial,opening:compactLipOpening,parameters:COMPACT_FACE_ANATOMY};
-"""
-new_api = old_api
-if c.count(old_api) != 1:
-    raise SystemExit('R9 face fixture API anchor mismatch')
 old_perioral_checks = """ check(api.perioral(-api.parameters.perioral.ridgeX,api.parameters.perioral.philtrumY)>0&&api.perioral(0,api.parameters.perioral.philtrumY)<0,'philtral ridges flank a central groove');
  check(api.perioral(0,api.parameters.perioral.labiomentalY)<0&&api.perioral(0,api.parameters.perioral.mentalisY)>0,'labiomental crease separates lower lip support from the mentalis pad');
 """
