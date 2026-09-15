@@ -108,7 +108,7 @@ function trafficReserveTargetSlot(locomotion,context){
   if(!Array.isArray(route)||!route.length)continue;
   claims.set(a.npcId,{point:[...point],index,taskKey});runtime.slots.set(key,claims);
   a.route.splice(a.routeIndex,a.route.length-a.routeIndex,...route.map(p=>[...p]));locomotion.requestKey=null;
-  Object.assign(locomotion.traffic,{slotKey:key,slotTaskKey:taskKey,slotPoint:[...point],slotIndex:index});locomotion.traffic.slotReservations++;
+  Object.assign(locomotion.traffic,{slotKey:key,slotTaskKey:taskKey,slotPoint:[...point],slotIndex:index,advancePoint:null,advanceRouteIndex:-1});locomotion.traffic.slotReservations++;
   if(index>0)a.log?.('同一目标已有其他人物，已分配独立接近站位');
   return [...point];
  }
@@ -146,7 +146,7 @@ class NaturalLocomotion {
   e.state.root=root;e.state.yaw=yaw;e.state.time=a.time;
   for(const side of ['left','right'])e.state.feet[side]={position:e.stance(e.state,side),yaw,contact:true};
   e.state.pose=e.solve(e.state);this.requestKey=null;this.requested=false;this.tempo=1;
-  this.traffic={active:false,mode:'clear',reason:null,blockers:[],side:0,detours:0,retreats:0,replans:0,recoveries:0,slotReservations:0,lastPlanAtS:-Infinity,nextPlanAtS:0,detourEndIndex:-1,originalTarget:null,lastError:null,slotKey:null,slotTaskKey:null,slotPoint:null,slotIndex:null};this.sync();
+  this.traffic={active:false,mode:'clear',reason:null,blockers:[],side:0,detours:0,retreats:0,replans:0,recoveries:0,slotReservations:0,lastPlanAtS:-Infinity,nextPlanAtS:0,detourEndIndex:-1,originalTarget:null,lastError:null,slotKey:null,slotTaskKey:null,slotPoint:null,slotIndex:null,advancePoint:null,advanceRouteIndex:-1};this.sync();
  }
  sync(){const a=this.a,s=this.engine.state;
   a.pos=[...s.root];a.yaw=s.yaw;a.swing=s.swing?{side:s.swing.side,t:s.swing.elapsed,duration:s.swing.duration}:null;
@@ -168,7 +168,7 @@ class NaturalLocomotion {
   try{
    const route=a.w.path(root,goal,context.radius,context.ignore);if(!Array.isArray(route)||!route.length)return false;
    a.route.splice(a.routeIndex,a.route.length-a.routeIndex,...route.map(point=>[...point]));
-   this.requestKey=null;Object.assign(this.traffic,{active:false,mode:'replanned',reason,blockers:[],side:0,detourEndIndex:-1,originalTarget:[...goal],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null});this.traffic.replans++;
+   this.requestKey=null;Object.assign(this.traffic,{active:false,mode:'replanned',reason,blockers:[],side:0,detourEndIndex:-1,originalTarget:[...goal],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null,advancePoint:null,advanceRouteIndex:-1});this.traffic.replans++;
    a.log?.('路线已根据当前物体位置重新规划');return true;
   }catch(error){this.traffic.lastError=error.message;return false;}
  }
@@ -188,7 +188,7 @@ class NaturalLocomotion {
    if(!trafficSegmentClear(a,root,entry,context)||!trafficSegmentClear(a,entry,exit,context)||!trafficSegmentClear(a,exit,resume,context))continue;
    const deleteCount=terminalShift?resumeIndex-a.routeIndex+1:resumeIndex-a.routeIndex;
    a.route.splice(a.routeIndex,deleteCount,entry,exit,...(terminalShift?[resume]:[]));
-   this.requestKey=null;Object.assign(this.traffic,{active:true,mode:'detour',reason:'predicted-npc-conflict',blockers:[other.id],side,detourEndIndex:a.routeIndex+1,originalTarget:[...current],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null});this.traffic.detours++;
+   this.requestKey=null;Object.assign(this.traffic,{active:true,mode:'detour',reason:'predicted-npc-conflict',blockers:[other.id],side,detourEndIndex:a.routeIndex+1,originalTarget:[...current],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null,advancePoint:null,advanceRouteIndex:-1});this.traffic.detours++;
    a.log?.('已预测到 '+other.label+' 的路线冲突，采用确定性'+(side>0?'右':'左')+'侧绕行');return true;
   }
   return false;
@@ -200,10 +200,23 @@ class NaturalLocomotion {
   for(const back of [.34,.52,.76,1.0])for(const lateral of [.55,.9,1.25,1.6]){
    const point=add(add(root,mul(direction,-back)),mul(right,side*clearance*lateral));point[1]=0;
    if(!trafficSegmentClear(a,root,point,context,{dynamic:false})||!this.world.free(point,.23))continue;
-   a.route.splice(a.routeIndex,0,point);this.requestKey=null;Object.assign(this.traffic,{active:true,mode:'retreat',reason:'multi-way-mobile-yield',blockers:[other.id],side,detourEndIndex:a.routeIndex,originalTarget:[...target],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null});this.traffic.retreats++;
+   a.route.splice(a.routeIndex,0,point);this.requestKey=null;Object.assign(this.traffic,{active:true,mode:'retreat',reason:'multi-way-mobile-yield',blockers:[other.id],side,detourEndIndex:a.routeIndex,originalTarget:[...target],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null,advancePoint:null,advanceRouteIndex:-1});this.traffic.retreats++;
    a.log?.('交叉路线暂无直接净空，已主动移动到侧后方重新进入路线');return true;
   }
   return false;
+ }
+ rollingTrafficTarget(target,context){
+  const a=this.a,t=this.traffic,root=this.engine.state.root;
+  if(t.advancePoint&&t.advanceRouteIndex===a.routeIndex&&horizontal(root,t.advancePoint)>.025&&this.world.free(t.advancePoint,.23))return [...t.advancePoint];
+  t.advancePoint=null;t.advanceRouteIndex=-1;
+  if(this.world.free(target,.23))return target;
+  let direction=sub(target,root);direction[1]=0;const distance=len(direction);if(distance<.08)return null;direction=norm(direction);
+  for(const lookahead of [Math.min(.72,distance-.04),Math.min(.52,distance-.04),Math.min(.34,distance-.04),Math.min(.20,distance-.04)]){
+   if(lookahead<.12)continue;const point=add(root,mul(direction,lookahead));point[1]=0;
+   if(!trafficSegmentClear(a,root,point,context)||!this.world.free(point,.23))continue;
+   t.advancePoint=[...point];t.advanceRouteIndex=a.routeIndex;t.mode='advance';t.reason='occupied-distant-route-target';return point;
+  }
+  return null;
  }
  prepareTrafficTarget(speed=.48,{force=false}={}){
   const a=this.a;this.clearTrafficIfPassed();let target=a.route[a.routeIndex];if(!target)return null;
@@ -215,10 +228,11 @@ class NaturalLocomotion {
    target=a.route[a.routeIndex];if(!target)return null;
   }
   if(!a.w.population)return target;
-  if(this.traffic.active&&a.routeIndex<=this.traffic.detourEndIndex&&!force)return target;
-  if(!force&&a.time<this.traffic.nextPlanAtS)return target;
+  const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;
+  if(this.traffic.active&&a.routeIndex<=this.traffic.detourEndIndex&&!force&&this.world.free(target,.23))return target;
+  if(!force&&a.time<this.traffic.nextPlanAtS&&this.world.free(target,.23))return target;
   this.traffic.nextPlanAtS=a.time+.10;
-  const conflict=predictTrafficConflict(a,speed,context);
+  const conflict=predictTrafficConflict(a,speed,context)||[...a.w.population.values()].filter(other=>other.agent!==a&&other.id!==a.npcId&&!other.disposed).map(other=>{const threshold=context.radius+bodyPhysicalProfile(other.human).bodyRadiusM+TRAFFIC_AVOIDANCE.sideMarginM,separation=horizontal(target,other.agent.pos);return{actor:other,timeS:0,selfPoint:target,otherPoint:[...other.agent.pos],separation,threshold,score:separation};}).filter(row=>row.separation<row.threshold).sort((x,y)=>x.score-y.score)[0]||null;
   if(!conflict){this.traffic.blockers=[];return target;}
   if(this.installLocalDetour(conflict,context)||this.installDeterministicRetreat(conflict,context))return a.route[a.routeIndex];
   throw Error('预测到多人路线冲突，但局部偏移和移动让行均无可用净空：'+conflict.actor.id);
