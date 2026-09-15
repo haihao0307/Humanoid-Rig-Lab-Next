@@ -19,7 +19,11 @@ jobs:
         with:
           node-version: '24'
       - name: Syntax check
-        run: node --check body/NaturalLocomotion.js
+        run: |
+          node --check body/NaturalLocomotion.js
+          node --check control/NPCPopulation.js
+          node --check control/TaskAgent.js
+          node --check ui/NPCPopulationControls.js
       - name: Task recipient selection
         run: node tools/test-npc-task-selection-bridge.mjs
       - name: Predictive detour and static replan
@@ -30,5 +34,7 @@ jobs:
         run: node tools/test-npc-four-way-crossing.mjs
       - name: Active narrow-corridor yielding
         run: node tools/test-npc-corridor-active-yield.mjs
+      - name: Shared-resource active circulation
+        run: node tools/test-npc-resource-circulation.mjs
       - name: Grid navigation batch
         run: node tools/test-grid-navigation-batch.mjs
