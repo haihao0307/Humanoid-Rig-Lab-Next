@@ -1,0 +1,120 @@
+name: Apply Resource Circulation R2.4
+
+on:
+  push:
+    branches:
+      - feature/human-task-workbench-adjustment-v2-fullbase
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-task-workbench-adjustment-v2-fullbase
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Patch resource coordination
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def load(path):
+              raw=Path(path).read_bytes().decode('utf-8')
+              nl='\r\n' if raw.count('\r\n') > raw.count('\n')/2 else '\n'
+              return raw.replace('\r\n','\n'),nl
+          def save(path,text,nl):
+              Path(path).write_bytes(text.replace('\n',nl).encode('utf-8'))
+          def once(text,old,new,label):
+              n=text.count(old)
+              if n!=1: raise SystemExit(f'{label}: expected 1 match, found {n}')
+              return text.replace(old,new,1)
+
+          path='control/NPCPopulation.js';text,nl=load(path)
+          anchor="function npcIdleBehavior(recipe=npcTaskRecipe({type:'manual'}),steps=[]){return{...recipe,steps,enabled:false,cycles:0,stepIndex:0,elapsedS:0,nextAt:0,waitUntil:null,status:'idle',finishReason:null,error:null};}\n"
+          helpers="""function npcResourceHash(value){let h=2166136261;for(const c of String(value||'')){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+          function npcResourceDirectionOrder(id,attempt=0){const base=['left','forward','right','backward'],offset=(npcResourceHash(id)+Math.max(0,attempt))%base.length;return base.map((_,i)=>base[(i+offset)%base.length]);}
+          """
+          text=once(text,anchor,anchor+helpers,'helpers')
+          text=once(text,'this.actors=new Map();this.selected=new Set();this.claims=new Map();this.pendingIds=new Set();','this.actors=new Map();this.selected=new Set();this.claims=new Map();this.stationClaims=new Map();this.pendingIds=new Set();','station claims')
+          text=once(text,"hair:{enabled:definition.attachments.hair.enabled,windEnabled:false,windSpeed:0},queue:[],logs:[],behavior:{...npcIdleBehavior()},disposed:false};","hair:{enabled:definition.attachments.hair.enabled,windEnabled:false,windSpeed:0},queue:[],logs:[],behavior:{...npcIdleBehavior()},resource:{mode:'clear',requestKey:null,attempts:0,diversions:0,conflict:null,anchor:null},disposed:false};",'actor resource')
+          text=once(text,'preflight:a.agent.preflight?{...a.agent.preflight}:null,behavior:{...a.behavior','preflight:a.agent.preflight?{...a.agent.preflight}:null,resource:npcCopy(a.resource),behavior:{...a.behavior','list resource')
+
+          pattern=r" claimObject\(a,id\)\{.*?\n releaseObjects\(a\)\{.*?\n dispatch\(text,\{targets='selected',mode='append'\}=\{\}\)\{"
+          m=re.search(pattern,text,re.S)
+          if not m: raise SystemExit('claim/release block not found')
+          block=""" resourceStep(a,request){return parse(request.text,this.lab.world,a.lastObject).steps.find(step=>step&&['carry','push'].includes(step.type))||null;}
+           resourceConflict(a,request,step=this.resourceStep(a,request)){
+            if(!step)return null;const o=this.lab.world.get(step.objectId),objectOwner=this.claims.get(step.objectId)||(o?.held?(o.heldOwner??'main'):null);
+            if(objectOwner&&objectOwner!==a.npcId)return{kind:'object',id:step.objectId,ownerId:objectOwner,step};
+            const stationOwner=this.stationClaims.get(step.targetId);if(stationOwner&&stationOwner!==a.npcId)return{kind:'station',id:step.targetId,ownerId:stationOwner,step};
+            if(this.physicsOwner&&this.physicsOwner!==a.npcId)return{kind:'manipulation',id:'shared-physics',ownerId:this.physicsOwner,step};return null;
+           }
+           reserveResource(actor,request){
+            const a=actor.agent,step=this.resourceStep(a,request);if(!step){actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};return null;}
+            const conflict=this.resourceConflict(a,request,step);if(conflict)return conflict;
+            this.claims.set(step.objectId,a.npcId);this.stationClaims.set(step.targetId,a.npcId);this.physicsOwner=a.npcId;
+            actor.resource={mode:'reserved',requestKey:[request.source,request.text].join('|'),attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:[...a.pos]};return null;
+           }
+           startResourceCirculation(actor,request,conflict){
+            const a=actor.agent,key=[request.source,request.text].join('|'),same=actor.resource?.requestKey===key,attempts=(same?actor.resource.attempts:0)+1;if(attempts>16)throw Error('共享资源持续被占用，完成 16 次机动后仍未获得操作权：'+conflict.id);
+            actor.queue.unshift(request);let lastError=null;const distances=[.65,.85,1.05];
+            for(const direction of npcResourceDirectionOrder(a.npcId,attempts))for(const distanceM of distances)try{
+             const step={type:'walk',direction,distanceM,referenceFrame:'self'};a.submitPlan({schema:'knowledge_human/checked_semantic_plan@1.0',steps:[step]});actor.running={source:'resource-circulation',kind:'command',text:'资源机动',requestKey:key};
+             actor.resource={mode:'circulating',requestKey:key,attempts,diversions:(actor.resource?.diversions||0)+1,conflict:{...conflict},anchor:actor.resource?.anchor||[...a.pos]};if(request.source==='behavior')actor.behavior.status='resourceCirculation';
+             a.log('共享资源 '+conflict.id+' 正由 '+conflict.ownerId+' 使用，已改走备用路线后重试原任务');this.observation?.event('resource-circulation',actor,{attempts,conflict:{...conflict},step});return true;
+            }catch(error){lastError=error;}
+            actor.queue.shift();throw Error('资源被占用且周边没有可执行的机动路线：'+conflict.id+(lastError?'；'+lastError.message:''));
+           }
+           claimObject(a,id,targetId=null){
+            const owner=this.claims.get(id),o=this.lab.world.get(id);if(owner&&owner!==a.npcId||o?.held&&o.heldOwner!==a.npcId)throw Error('物体正由其他 NPC 使用：'+id);
+            if(targetId){const stationOwner=this.stationClaims.get(targetId);if(stationOwner&&stationOwner!==a.npcId)throw Error('目标工位正由其他 NPC 使用：'+targetId);this.stationClaims.set(targetId,a.npcId);}
+            if(this.physicsOwner&&this.physicsOwner!==a.npcId)throw Error('已有 NPC 正在操作物体');this.physicsOwner=a.npcId;this.claims.set(id,a.npcId);
+           }
+           releaseObjects(a,{preserveResource=false}={}){
+            for(const [id,owner]of this.claims)if(owner===a.npcId&&a.held?.id!==id){this.lab.world.physics?.clearManipulation(id);this.claims.delete(id);}if(!a.held)for(const [id,owner]of this.stationClaims)if(owner===a.npcId)this.stationClaims.delete(id);if(this.physicsOwner===a.npcId&&!a.held)this.physicsOwner=null;
+            const actor=this.actors.get(a.npcId);if(actor&&!preserveResource&&!a.held)actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};
+           }
+           dispatch(text,{targets='selected',mode='append'}={){
+          """
+          text=text[:m.start()]+block+text[m.end():]
+          text=once(text,"actor.running=null;this.releaseObjects(a);","actor.running=null;this.releaseObjects(a,{preserveResource:previous.source==='resource-circulation'});",'preserve circulation')
+          old="if(request.source==='behavior'&&request.kind!=='wait'&&this.physicsOwner&&this.physicsOwner!==a.npcId&&parse(request.text,this.lab.world,a.lastObject).steps.some(s=>s.type==='carry'||s.type==='push')){b.status='resourceWait';actor.queue.unshift(request);return;}"
+          new="if(request.kind!=='wait'){const conflict=this.reserveResource(actor,request);if(conflict){this.startResourceCirculation(actor,request,conflict);return;}}"
+          text=once(text,old,new,'replace resource wait')
+          text=once(text,"disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();}","disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();this.stationClaims.clear();}",'dispose station claims')
+          save(path,text,nl)
+
+          path='control/TaskAgent.js';text,nl=load(path)
+          text=once(text,'this.w.population?.claimObject(this,o.id);','this.w.population?.claimObject(this,o.id,s.targetId);','claim station')
+          save(path,text,nl)
+
+          path='ui/NPCPopulationControls.js';text,nl=load(path)
+          text=once(text,"const b=row.behavior;if(row.error||b.error)return'已阻断 · '+(row.error||b.error);","const b=row.behavior;if(row.error||b.error)return'已阻断 · '+(row.error||b.error);if(row.resource?.mode==='circulating')return'资源占用 · 正在改走备用路线后重试\\n冲突：'+(row.resource.conflict?.id||'共享资源');",'resource card')
+          text=once(text,"resourceWait:'等待搬运通道空闲'","resourceCirculation:'资源占用，正在改走备用路线'",'resource label')
+          save(path,text,nl)
+          PY
+      - name: Verify resource circulation
+        run: |
+          node --check control/NPCPopulation.js
+          node --check control/TaskAgent.js
+          node --check ui/NPCPopulationControls.js
+          node tools/test-npc-resource-circulation.mjs
+          node tools/test-npc-traffic-wait.mjs
+          node tools/test-npc-target-reservations.mjs
+          node tools/test-npc-four-way-crossing.mjs
+          node tools/test-npc-corridor-active-yield.mjs
+      - name: Commit resource coordination
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add control/NPCPopulation.js control/TaskAgent.js ui/NPCPopulationControls.js
+          git commit -m "feat(task): replace resource parking with active circulation"
+          git push origin HEAD:feature/human-task-workbench-adjustment-v2-fullbase
