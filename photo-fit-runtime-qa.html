@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Photo Fit R1.1 Runtime QA</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#05090e;color:#dce9ee;font:13px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}body{display:grid;grid-template-rows:auto minmax(0,1fr)}header{padding:10px 14px;border-bottom:1px solid #29404f;background:#0b141c}header b{display:block;font-size:15px}header span{color:#7f98a7}main{position:relative;min-height:0}iframe{width:100%;height:100%;border:0;display:block;background:#020508}#qaResult{position:absolute;left:12px;right:12px;bottom:12px;z-index:9;max-height:34%;overflow:auto;margin:0;padding:10px;border:1px solid #365466;border-radius:8px;background:#08131de8;color:#a9c5cf;font:10px/1.55 ui-monospace,monospace;white-space:pre-wrap}#qaResult[data-status=passed]{border-color:#4d8e78;color:#aee9d1}#qaResult[data-status=failed]{border-color:#8b4a53;color:#f2b5bd}</style>
+</head>
+<body>
+<header><b>Photo Fit R1.1 · Runtime Closure QA</b><span>完整源码、NPC选择、图片输入、参数应用、实例隔离与基线恢复</span></header>
+<main>
+<iframe id="fitFrame" src="./photo-fit-test.html?runtimeQaHost=1" title="照片驱动人物拟合测试板"></iframe>
+<pre id="qaResult" data-status="running">{"status":"running"}</pre>
+</main>
+<script type="module">
+import {SHAPE_PARAMETER_SPECS} from './photo-fit/PhotoFitCore.mjs';
+
+const resultNode=document.getElementById('qaResult');
+const fitFrame=document.getElementById('fitFrame');
+const report={
+ schema:'humanoid_rig/photo_fit_runtime_qa@0.1',
+ baseCommit:'2c10edaec6e8515bc64f9df8b3da78cb34c89e61',
+ startedAt:new Date().toISOString(),
+ checks:[],
+ warnings:[],
+ consoleErrors:[]
+};
+const clone=value=>JSON.parse(JSON.stringify(value));
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function stable(value){return JSON.stringify(value);}
+function check(condition,id,detail=''){
+ if(!condition)throw new Error(id+(detail?' · '+detail:''));
+ report.checks.push({id,status:'passed',detail});
+}
+function note(id,detail=''){report.checks.push({id,status:'observed',detail});}
+function frameDocument(){try{return fitFrame.contentDocument}catch{return null}}
+function getLab(){
+ try{
+  const doc=frameDocument(),outer=doc?.getElementById('workbench')?.contentWindow;
+  const body=outer?.document?.getElementById('bodyFrame')?.contentWindow;
+  return body?.HumanLab||null;
+ }catch{return null}
+}
+async function waitFor(test,{timeout=240000,interval=250,label='condition'}={}){
+ const started=performance.now();let lastError=null;
+ while(performance.now()-started<timeout){
+  try{const value=await test();if(value)return value;}catch(error){lastError=error;}
+  await sleep(interval);
+ }
+ throw new Error('等待超时：'+label+(lastError?' · '+lastError.message:''));
+}
+function dispatchInput(element,type='input'){element.dispatchEvent(new Event(type,{bubbles:true}));}
+function stageButton(doc,id){
+ const row=[...doc.querySelectorAll('.stage-row')].find(item=>item.querySelector('small')?.textContent?.includes(id));
+ if(!row)throw new Error('未找到阶段按钮 '+id);
+ return row.querySelector('button');
+}
+function makeSvgFile(name,view){
+ const front=view==='front';
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1200" viewBox="0 0 600 1200"><rect width="600" height="1200" fill="#182630"/><ellipse cx="300" cy="105" rx="55" ry="72" fill="#b99a82"/><path d="M${front?210:265} 190 L${front?390:355} 190 L${front?375:365} 610 L${front?225:255} 610 Z" fill="#73879a"/><path d="M245 610 L285 610 L275 1130 L235 1130 ZM315 610 L355 610 L365 1130 L325 1130 Z" fill="#6e8295"/></svg>`;
+ return new File([svg],name,{type:'image/svg+xml'});
+}
+function setFile(input,file){
+ const transfer=new DataTransfer();transfer.items.add(file);input.files=transfer.files;dispatchInput(input,'change');
+}
+function chooseSafeValue(base,spec,delta=.14){
+ const up=base+delta;if(up<=spec.max-.01)return Number(up.toFixed(3));
+ const down=base-delta;if(down>=spec.min+.01)return Number(down.toFixed(3));
+ return base;
+}
+function stablePreset(preset){
+ return {
+  schema:preset.schema,
+  bodyPlanRevision:preset.bodyPlanRevision,
+  bodyArchetype:preset.bodyArchetype,
+  id:preset.id,
+  label:preset.label,
+  seed:preset.seed,
+  bodySex:preset.bodySex,
+  shape:clone(preset.shape),
+  appearance:{skin:clone(preset.appearance.skin),skinLayers:clone(preset.appearance.skinLayers),hair:clone(preset.appearance.hair),face:clone(preset.appearance.face)},
+  task:clone(preset.task)
+ };
+}
+function offset(face,id){return face.offsetsMm?.[id]??[0,0,0]}
+function sameVector(a,b,tolerance=1e-6){return a.length===b.length&&a.every((value,index)=>Math.abs(value-b[index])<=tolerance)}
+
+window.addEventListener('error',event=>report.consoleErrors.push({type:'error',message:String(event.message||event.error||'window error')}));
+window.addEventListener('unhandledrejection',event=>report.consoleErrors.push({type:'unhandledrejection',message:String(event.reason?.stack||event.reason)}));
+
+async function run(){
+ try{
+  const doc=await waitFor(()=>frameDocument()?.getElementById('status')?frameDocument():null,{label:'照片拟合页面载入'});
+  const lab=await waitFor(()=>{
+   const candidate=getLab();
+   return candidate?.population?.list?.().length&&candidate?.character?.export&&candidate?.shape?.report&&candidate?.face?.report?candidate:null;
+  },{timeout:360000,label:'完整人物工作台与人口系统就绪'});
+  await waitFor(()=>doc.getElementById('status')?.dataset.state==='ready',{timeout:120000,label:'照片拟合页面连接状态'});
+  check(lab.version==='1.24.0-staged-startup-r15','complete-source-version',lab.version);
+  check(lab.character.export().schema==='jarvis/character_preset@6','character-preset-v6');
+  check(lab.shape.report().parameters.schema==='jarvis/human_shape@2','human-shape-v2');
+
+  const initialRows=lab.population.list();
+  const originalId=lab.population.activeId;
+  check(initialRows.length>=2,'population-available',String(initialRows.length));
+  await waitFor(()=>doc.getElementById('npcSelect').options.length===initialRows.length,{label:'NPC选择器同步'});
+  check(doc.getElementById('npcSelect').value===originalId,'active-npc-reflected',originalId);
+
+  if(initialRows.length>1){
+   const other=initialRows.find(row=>row.id!==originalId);
+   const select=doc.getElementById('npcSelect');
+   select.value=other.id;dispatchInput(select,'change');
+   await waitFor(()=>lab.population.activeId===other.id&&doc.getElementById('npcSelect').value===other.id,{timeout:120000,label:'切换到第二个NPC'});
+   select.value=originalId;dispatchInput(select,'change');
+   await waitFor(()=>lab.population.activeId===originalId&&doc.getElementById('npcSelect').value===originalId,{timeout:120000,label:'切回原NPC'});
+   check(true,'npc-selector-roundtrip',other.id);
+  }
+
+  doc.getElementById('captureBase').click();
+  await waitFor(()=>doc.getElementById('status')?.textContent?.includes('已记录当前 NPC 基线'),{label:'记录基线'});
+  const baseline=clone(lab.character.export()),baselineStable=stablePreset(baseline);
+  const otherActor=initialRows.find(row=>row.id!==originalId);
+  const otherBefore=otherActor?stablePreset(lab.population.get(otherActor.id).human.characterPreset):null;
+  check(baseline.id===lab.population.get(originalId).human.characterPreset.id,'baseline-target-instance',originalId);
+
+  setFile(doc.getElementById('frontInput'),makeSvgFile('qa-front.svg','front'));
+  setFile(doc.getElementById('sideInput'),makeSvgFile('qa-side.svg','side'));
+  doc.getElementById('height').value=String(baseline.statureM);dispatchInput(doc.getElementById('height'));
+  await waitFor(()=>doc.getElementById('candidateState')?.textContent==='READY'&&doc.getElementById('export').disabled===false,{timeout:120000,label:'正侧面候选生成'});
+  let profile=JSON.parse(doc.getElementById('preview').textContent);
+  check(profile.schema==='humanoid_rig/photo_fit_profile@0.2','profile-schema');
+  check(profile.sourceImages.length===2,'two-view-source-set');
+  check(profile.targetInstanceId===originalId,'profile-target-instance',profile.targetInstanceId);
+  check(!/data:image|blob:|base64,/i.test(doc.getElementById('preview').textContent),'profile-excludes-image-payload');
+
+  const waistSpec=SHAPE_PARAMETER_SPECS.find(spec=>spec.id==='waistWidth');
+  const waistTarget=chooseSafeValue(baseline.shape.waistWidth,waistSpec);
+  const waistInput=doc.getElementById('manual-waistWidth');waistInput.value=String(waistTarget);dispatchInput(waistInput);
+  await waitFor(()=>{
+   try{return Math.abs(JSON.parse(doc.getElementById('preview').textContent).candidate.shape.shape.waistWidth-waistTarget)<1e-8}catch{return false}
+  },{label:'人工体型覆盖进入候选'});
+
+  stageButton(doc,'widths').click();
+  await waitFor(()=>{
+   const current=lab.character.export();
+   return !lab.character.busy&&doc.getElementById('mask').hidden&&Math.abs(current.shape.waistWidth-waistTarget)<1e-8;
+  },{timeout:300000,label:'宽度阶段重建完成'});
+  check(Math.abs(lab.character.export().shape.waistWidth-waistTarget)<1e-8,'shape-stage-applied',String(waistTarget));
+  if(otherActor)check(stable(otherBefore)===stable(stablePreset(lab.population.get(otherActor.id).human.characterPreset)),'npc-instance-isolation',otherActor.id);
+
+  profile=JSON.parse(doc.getElementById('preview').textContent);
+  const faceBefore=clone(lab.character.export().appearance.face);
+  const faceExpected=profile.candidate.face.face;
+  const faceFrontNode=Object.keys(faceExpected.offsetsMm).find(id=>{
+   const before=offset(faceBefore,id),after=offset(faceExpected,id);
+   return Math.abs(before[0]-after[0])>.001||Math.abs(before[1]-after[1])>.001;
+  });
+  check(Boolean(faceFrontNode),'face-front-candidate-present',faceFrontNode||'none');
+  stageButton(doc,'faceFront').click();
+  await waitFor(()=>{
+   if(lab.character.busy||!doc.getElementById('mask').hidden)return false;
+   const actual=offset(lab.character.export().appearance.face,faceFrontNode),expected=offset(faceExpected,faceFrontNode);
+   return Math.abs(actual[0]-expected[0])<1e-6&&Math.abs(actual[1]-expected[1])<1e-6;
+  },{timeout:180000,label:'面部正面阶段应用'});
+  check(stable(lab.character.export().appearance.face.weights)===stable(baseline.appearance.face.weights),'expression-weights-preserved');
+
+  const faceDepthNode=Object.keys(faceExpected.offsetsMm).find(id=>{
+   const before=offset(faceBefore,id),after=offset(faceExpected,id);return Math.abs(before[2]-after[2])>.001;
+  });
+  check(Boolean(faceDepthNode),'face-depth-candidate-present',faceDepthNode||'none');
+  stageButton(doc,'faceDepth').click();
+  await waitFor(()=>{
+   if(lab.character.busy||!doc.getElementById('mask').hidden)return false;
+   return Math.abs(offset(lab.character.export().appearance.face,faceDepthNode)[2]-offset(faceExpected,faceDepthNode)[2])<1e-6;
+  },{timeout:180000,label:'面部深度阶段应用'});
+  check(true,'face-stages-applied',faceFrontNode+' / '+faceDepthNode);
+
+  doc.getElementById('frontView').click();doc.getElementById('sideView').click();doc.getElementById('faceView').click();doc.getElementById('clayView').click();
+  check(true,'inspection-controls-callable');
+
+  doc.getElementById('restore').click();
+  await waitFor(()=>{
+   if(lab.character.busy||!doc.getElementById('mask').hidden)return false;
+   return stable(stablePreset(lab.character.export()))===stable(baselineStable);
+  },{timeout:300000,label:'恢复完整人物基线'});
+  check(stable(stablePreset(lab.character.export()))===stable(baselineStable),'baseline-restored');
+  check(lab.population.activeId===originalId,'active-instance-preserved',originalId);
+  if(otherActor)check(stable(otherBefore)===stable(stablePreset(lab.population.get(otherActor.id).human.characterPreset)),'non-target-remains-unchanged-after-restore',otherActor.id);
+
+  report.finishedAt=new Date().toISOString();report.status='passed';report.runtimeVerified=true;report.rollbackVerified=true;report.npcIsolationVerified=true;report.visualAcceptance=false;report.productionReady=false;
+  resultNode.dataset.status='passed';resultNode.textContent=JSON.stringify(report,null,2);
+  document.title='PASS · Photo Fit R1.1 Runtime QA';
+  window.__PHOTO_FIT_RUNTIME_QA__=report;
+ }catch(error){
+  report.finishedAt=new Date().toISOString();report.status='failed';report.error=String(error?.stack||error);report.runtimeVerified=false;report.visualAcceptance=false;report.productionReady=false;
+  resultNode.dataset.status='failed';resultNode.textContent=JSON.stringify(report,null,2);
+  document.title='FAIL · Photo Fit R1.1 Runtime QA';
+  window.__PHOTO_FIT_RUNTIME_QA__=report;
+ }
+}
+fitFrame.addEventListener('load',()=>run(),{once:true});
+</script>
+</body>
+</html>
