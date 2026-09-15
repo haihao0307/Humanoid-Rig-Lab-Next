@@ -5,7 +5,7 @@ const TRAFFIC_AVOIDANCE=Object.freeze({horizonS:1.8,sampleS:.15,planCooldownS:.2
 const trafficRuntimeByPopulation=new WeakMap();
 function motionCircleSweep(start,end,centre,radius){
  const d=sub(end,start),p=sub(start,centre),a=d[0]*d[0]+d[2]*d[2],c=p[0]*p[0]+p[2]*p[2]-radius*radius;
- if(c<=0)return 0;if(a<1e-16)return 1;
+ if(c<=0)return p[0]*d[0]+p[2]*d[2]>1e-9?1:0;if(a<1e-16)return 1;
  const b=2*(p[0]*d[0]+p[2]*d[2]),disc=b*b-4*a*c;if(disc<0)return 1;
  const t=(-b-Math.sqrt(disc))/(2*a);return t>=0&&t<=1?Math.max(0,t-1e-5):1;
 }
