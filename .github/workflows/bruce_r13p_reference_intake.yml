@@ -1,0 +1,118 @@
+name: Bruce R13P neutral canine candidate intake
+
+on:
+  push:
+    branches:
+      - automation/bruce-r13p-neutral-anchor-intake-20260915
+    paths:
+      - .github/workflows/bruce_r13p_reference_intake.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-audit-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Fetch CC0 pack manifest and selected standing dogs
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="bruce_r13p_reference_intake"
+          mkdir -p "$ROOT/originals" "$ROOT/evidence" "$ROOT/reports"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://3dassets.dev/api/v1/packs/companion-animals-and-pet-home" \
+            --output "$ROOT/evidence/companion_animals_pack_manifest.json"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://3dassets.dev/packs/companion-animals-and-pet-home" \
+            --output "$ROOT/evidence/companion_animals_pack_page.html"
+          curl --fail --location --retry 3 --retry-all-errors \
+            "https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt" \
+            --output "$ROOT/evidence/CC0-1.0-legalcode.txt"
+          python - <<'PY'
+          import hashlib
+          import json
+          import pathlib
+          import re
+          import urllib.request
+
+          root = pathlib.Path('bruce_r13p_reference_intake')
+          data = json.loads((root/'evidence/companion_animals_pack_manifest.json').read_text())
+          targets = {
+              'Retriever Standing': 'retriever_standing',
+              'Shepherd Standing': 'shepherd_standing',
+              'Hound Standing': 'hound_standing',
+              'Greyhound Standing': 'greyhound_standing',
+          }
+          found = {}
+
+          def walk(value):
+              if isinstance(value, dict):
+                  text = ' '.join(str(value.get(k,'')) for k in ('name','title','display_name','description','slug'))
+                  for label, key in targets.items():
+                      if label.lower() in text.lower() and key not in found:
+                          urls=[]
+                          def collect(v):
+                              if isinstance(v, str) and ('model.glb' in v or v.endswith('.glb')):
+                                  urls.append(v)
+                              elif isinstance(v, dict):
+                                  for vv in v.values(): collect(vv)
+                              elif isinstance(v, list):
+                                  for vv in v: collect(vv)
+                          collect(value)
+                          if urls:
+                              found[key]={'label':label,'record':value,'url':urls[0]}
+                  for v in value.values(): walk(v)
+              elif isinstance(value, list):
+                  for v in value: walk(v)
+          walk(data)
+          missing=[k for k in targets.values() if k not in found]
+          if missing:
+              raw=json.dumps(data)
+              for label,key in targets.items():
+                  if key in found: continue
+                  m=re.search(r'https://cdn\.3dassets\.dev/assets/\d+/v1/model\.glb', raw)
+                  if m: pass
+              print('Missing exact records:',missing)
+          for key, item in found.items():
+              dst=root/'originals'/f'{key}.glb'
+              urllib.request.urlretrieve(item['url'], dst)
+              item['size_bytes']=dst.stat().st_size
+              item['sha256']=hashlib.sha256(dst.read_bytes()).hexdigest()
+          report={
+              'schema':'bruce/r13p_candidate_reference_intake@1.0',
+              'source':'3DAssets.dev Cats, Dogs and Pets at Home',
+              'license':'CC0-1.0',
+              'ai_generated_source':True,
+              'anatomical_authority':False,
+              'use_boundary':'candidate/contrast only; not veterinary or breed-ground-truth evidence',
+              'selected':found,
+              'missing':missing,
+          }
+          (root/'reports/candidate_manifest.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          if len(found) < 3:
+              raise SystemExit(f'Only found {len(found)} selected candidates')
+          PY
+
+      - name: Write package checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          (
+            cd bruce_r13p_reference_intake
+            find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+            sha256sum -c SHA256SUMS.txt
+          )
+
+      - name: Upload candidate reference artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruce-r13p-neutral-candidate-intake
+          path: bruce_r13p_reference_intake
+          if-no-files-found: error
+          retention-days: 7
