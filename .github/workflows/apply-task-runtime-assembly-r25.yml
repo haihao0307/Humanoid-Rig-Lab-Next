@@ -1,0 +1,92 @@
+name: Apply Task Runtime Assembly R2.5
+
+on:
+  push:
+    branches:
+      - feature/human-task-workbench-adjustment-v2-fullbase
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-task-workbench-adjustment-v2-fullbase
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Connect task selection bridge to runtime assembly
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          runtime=Path('source/runtime.template.js')
+          text=runtime.read_text(encoding='utf-8')
+          old='/*__SOURCE:ui/NPCPopulationControls.js__*/\nasync function init(){try{'
+          new='/*__SOURCE:ui/NPCPopulationControls.js__*/\n/*__SOURCE:ui/NPCTaskSelectionBridge.js__*/\nasync function init(){try{'
+          if text.count(old)!=1:
+              raise SystemExit(f'runtime assembly anchor count: {text.count(old)}')
+          runtime.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
+
+          assembly=Path('source/assembly.json')
+          data=json.loads(assembly.read_text(encoding='utf-8'))
+          modules=data['modules']
+          bridge='ui/NPCTaskSelectionBridge.js'
+          if bridge not in modules:
+              index=modules.index('ui/NPCPopulationControls.js')+1
+              modules.insert(index,bridge)
+          if modules.count(bridge)!=1:
+              raise SystemExit('selection bridge must appear exactly once in assembly')
+          assembly.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
+          PY
+      - name: Build and audit assembled source
+        run: |
+          node tools/build-pure.mjs
+          node tools/build-pure.mjs --check
+          node tools/check-pure.mjs
+          node tools/test-npc-task-selection-bridge.mjs
+          node tools/test-npc-traffic-wait.mjs
+          node tools/test-npc-target-reservations.mjs
+          node tools/test-npc-four-way-crossing.mjs
+          node tools/test-npc-corridor-active-yield.mjs
+          node tools/test-npc-resource-circulation.mjs
+          node tools/test-grid-navigation-batch.mjs
+      - name: Install browser smoke dependency
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          if ! command -v google-chrome >/dev/null 2>&1 && ! command -v google-chrome-stable >/dev/null 2>&1 && ! command -v chromium >/dev/null 2>&1; then
+            npx playwright install --with-deps chromium
+          fi
+      - name: Run assembled browser smoke
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/humanlab-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/index.html >/dev/null && break; sleep 1; done
+          if [ -n "$CHROME_BIN" ]; then
+            CHROME_BIN="$CHROME_BIN" HUMANLAB_URL=http://127.0.0.1:4173/index.html node tools/test-task-runtime-browser.mjs
+          else
+            HUMANLAB_URL=http://127.0.0.1:4173/index.html node tools/test-task-runtime-browser.mjs
+          fi
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: task-runtime-browser-r25
+          path: artifacts/task-runtime-browser.png
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Commit assembled runtime
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/runtime.template.js source/assembly.json index.html
+          git commit -m "build(task): assemble recipient and crowd runtime R2.5"
+          git push origin HEAD:feature/human-task-workbench-adjustment-v2-fullbase
