@@ -1,7 +1,6 @@
 /* Checkbox selection is the single source of truth for population task targets.
  * This module wraps the existing population panel without creating another
- * queue, active actor, task clock or body authority. Add it to assembly only
- * after the full-source build can be regenerated and checked. */
+ * queue, active actor, task clock or body authority. */
 function npcTaskSelectedRows(population){
  return population.list().filter(row=>row.selected);
 }
@@ -18,8 +17,8 @@ function installNPCTaskSelectionBridge(baseInstall=installNPCPopulationControls)
   if(!panel||panel.dataset.taskSelectionBridge==='1')return installed;
   panel.dataset.taskSelectionBridge='1';
   const doc=panel.ownerDocument||document,target=panel.querySelector('[data-el="target"]'),selectNone=panel.querySelector('[data-el="selectNone"]'),row=selectNone?.parentElement;
-  // Keep the legacy element for compatibility with the existing event
-  // handlers, but remove the second, conflicting task-scope state from UI.
+  // Keep the legacy element for existing event handlers, but remove the
+  // second conflicting task-scope choice from the visible interface.
   if(target){target.value='selected';target.hidden=true;target.tabIndex=-1;target.setAttribute('aria-hidden','true');}
   const recipients=doc.createElement('div');recipients.className='npc-pop-muted';recipients.setAttribute('data-el','taskRecipients');
   const onlyCurrent=doc.createElement('button');onlyCurrent.type='button';onlyCurrent.textContent='仅当前人物';onlyCurrent.setAttribute('data-el','selectCurrent');
@@ -35,11 +34,21 @@ function installNPCTaskSelectionBridge(baseInstall=installNPCPopulationControls)
   return{...installed,syncTaskRecipients:sync};
  };
 }
+function activateNPCTaskSelectionBridge(){
+ if(typeof installNPCPopulationControls!=='function')return false;
+ if(installNPCPopulationControls.__npcTaskSelectionBridge===true)return true;
+ const wrapped=installNPCTaskSelectionBridge(installNPCPopulationControls);
+ Object.defineProperty(wrapped,'__npcTaskSelectionBridge',{value:true});
+ installNPCPopulationControls=wrapped;
+ return true;
+}
 
 if(typeof globalThis!=='undefined'){
  Object.defineProperties(globalThis,{
   npcTaskSelectedRows:{value:npcTaskSelectedRows,configurable:true},
   npcTaskRecipientText:{value:npcTaskRecipientText,configurable:true},
-  installNPCTaskSelectionBridge:{value:installNPCTaskSelectionBridge,configurable:true}
+  installNPCTaskSelectionBridge:{value:installNPCTaskSelectionBridge,configurable:true},
+  activateNPCTaskSelectionBridge:{value:activateNPCTaskSelectionBridge,configurable:true}
  });
 }
+activateNPCTaskSelectionBridge();
