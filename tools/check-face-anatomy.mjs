@@ -9,6 +9,7 @@ export function checkFaceAnatomySources({read=readDefault,assert=assertDefault}=
  const source=read('body/FaceAnatomy.js'),renderer=read('body/CompactWorkbench.js'),manifest=JSON.parse(read('source/assembly.json'));
  new vm.Script(source);
  check(manifest.modules.filter(p=>p==='body/FaceAnatomy.js').length===1,'generator assembled once');
+ check(source.includes("revision:'r8-orbital-continuity'")&&source.includes("id:'upperLidSulcus'")&&source.includes("id:'lowerLidTransition'"),'versioned orbital transition separates broad socket depth from local lid sulci');
  check(manifest.modules.indexOf('body/FaceAnatomy.js')<manifest.modules.indexOf('body/CompactWorkbench.js'),'generator precedes renderer');
  check((read('source/runtime.template.js').match(/__SOURCE:body\/FaceAnatomy\.js__/g)||[]).length===1,'runtime includes generator once');
  check(!/\b(?:document|window|fetch|Worker|localStorage)\b/.test(source),'generator has no external side effects');

@@ -1,7 +1,7 @@
 /* Dense, source-fitted facial skin with authored secondary anatomical forms.
  * The temporary grid and fibres are generated at upload; only these parameters
  * persist. This is a geometric refinement, not measured anatomy or a scan. */
-const COMPACT_FACE_ANATOMY={revision:'r7-model-referenced-lip-sections',columns:160,rows:152,
+const COMPACT_FACE_ANATOMY={revision:'r8-orbital-continuity',columns:160,rows:152,
   bounds:[-.073,.072,1.433,1.575],ellipse:[-.0005,1.506,.068,.067],
   smoothingRadiusM:.0045,nostrils:{x:.0093,y:1.4793,rx:.0036,ry:.00165,tilt:.10,depth:.0050},
   lips:{centreX:-.0006,halfWidth:.0255,seamY:1.4586,apron:1.75,innerDepth:.0032,columns:160,rings:36,
@@ -14,9 +14,11 @@ const COMPACT_FACE_ANATOMY={revision:'r7-model-referenced-lip-sections',columns:
     underturn:[[1.465,0],[1.471,0],[1.475,.0020],[1.480,-.0035],[1.487,-.0004],[1.494,0]],underturnWidth:.023,underturnCentreWeight:.40,columellaDrop:.0013,alarHeight:.0040,columellaHeight:.0012},
   forms:[
     ...[-1,1].flatMap(side=>[
-      {id:'orbitalTransition',x:side*.030,y:1.532,rx:.026,ry:.016,z:-.0016},
-      {id:'infraorbitalTransition',x:side*.030,y:1.505,rx:.025,ry:.015,z:-.0013},
-      {id:'malarVolume',x:side*.037,y:1.493,rx:.021,ry:.014,z:.0009},
+      {id:'orbitalTransition',x:side*.030,y:1.532,rx:.028,ry:.017,z:-.00095},
+      {id:'upperLidSulcus',x:side*.030,y:1.536,rx:.022,ry:.009,z:-.00035},
+      {id:'infraorbitalTransition',x:side*.030,y:1.505,rx:.027,ry:.016,z:-.00070},
+      {id:'lowerLidTransition',x:side*.030,y:1.502,rx:.024,ry:.009,z:-.00025},
+      {id:'malarVolume',x:side*.037,y:1.493,rx:.022,ry:.015,z:.00075},
       {id:'philtralColumn',x:side*.0028,y:1.470,rx:.0025,ry:.007,z:.00020}
     ])],brow:{strandsPerSide:900,segments:4,widthM:.00009}};
 function compactFaceRaySampler(meshes){

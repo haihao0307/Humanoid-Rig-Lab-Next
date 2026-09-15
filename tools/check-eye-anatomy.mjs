@@ -14,6 +14,8 @@ export function checkEyeAnatomySources({read=readDefault,assert=assertDefault}={
   check(manifest.modules.filter(path=>path==='body/EyeAnatomy.js').length===1&&manifest.modules.indexOf('body/EyeAnatomy.js')<manifest.modules.indexOf('body/CompactWorkbench.js'),'one anatomy module assembled before its renderer');
   check((runtime.match(/__SOURCE:body\/EyeAnatomy\.js__/g)||[]).length===1,'one runtime assembly insertion');
   check(/function compactCreateEyeLids\(/.test(source)&&/function compactEyeSkinSampler\(/.test(source),'procedural geometry and neutral aperture sampling are explicit functions');
+  check(source.includes("revision:'r12-neutral-fissure-orbital-continuity'")&&source.includes('function compactEyeNeutralFissure')&&source.includes('lateralCanthusLift:.00070'),'neutral fissure has an explicit versioned canthus-aware model');
+  check(source.includes('lowerSulcus=-p.lowerSulcusM')&&source.includes('lowerSulcus=-${COMPACT_EYE_ANATOMY.fissure.lowerSulcusM.toFixed(6)}'),'CPU and shader include the same bounded lower-lid transition');
   check(!/\b(?:document|window|fetch|Worker|requestAnimationFrame|localStorage|sessionStorage)\b/.test(source),'anatomy helper has no UI, network, persistence, or simulation side effects');
   check(source.includes('canonicalPositions')&&source.includes('statureScale'),'anatomy retains canonical coordinates and applies stature separately');
   check(renderer.includes("compactCreateEyeLids(faceTissue.meshes.filter(m=>m.name==='faceSkin'),this.eyeFrames,this.rig,this.statureScale)"),'current replacement geometry, eye frames and rig drive tissue generation');
@@ -54,8 +56,14 @@ function fixtureSkin(frames){
 export function checkEyeAnatomyParameterFixtures({read=readDefault,assert=assertDefault}={}){
   let checks=0;const check=(value,message)=>{assert(value,'Eye parameter fixture: '+message);checks++;};
   const context=vm.createContext({add,sub,mul,dot,cross,norm,clamp,COMPACT_INFLUENCES:8});
-  new vm.Script(read('body/EyeAnatomy.js')+'\n;globalThis.eyeFixtureAPI={create:compactCreateEyeLids,sampler:compactEyeSkinSampler,patch:compactEyePatchPoint,contact:compactEyeContactDepth,anatomy:COMPACT_EYE_ANATOMY,shader:COMPACT_EYE_LID_GLSL};',{filename:'isolated-eye-parameter-functions'}).runInContext(context,{timeout:1000});
+  new vm.Script(read('body/EyeAnatomy.js')+'\n;globalThis.eyeFixtureAPI={create:compactCreateEyeLids,sampler:compactEyeSkinSampler,patch:compactEyePatchPoint,contact:compactEyeContactDepth,fissure:compactEyeNeutralFissure,anatomy:COMPACT_EYE_ANATOMY,shader:COMPACT_EYE_LID_GLSL};',{filename:'isolated-eye-parameter-functions'}).runInContext(context,{timeout:1000});
   const api=context.eyeFixtureAPI,frames=Object.fromEntries(['left','right'].map(side=>[side,{centre:add(Array.from(api.anatomy[side].centre),[0,0,.00925]),u:[1,0,0],v:[0,1,0],n:[0,0,1]}]));
+  const leftTemporal=api.fissure(0,'left'),leftMedial=api.fissure(Math.PI,'left'),rightTemporal=api.fissure(Math.PI,'right'),rightMedial=api.fissure(0,'right');
+  const top=api.fissure(Math.PI/2,'left'),bottom=api.fissure(Math.PI*1.5,'left'),width=(leftTemporal[0]-leftMedial[0])*1000,height=(top[1]-bottom[1])*1000;
+  check(width>25&&width<27,'neutral fissure width remains in the authored human-scale range');
+  check(height>7&&height<8,'neutral fissure height remains in the authored human-scale range');
+  check(leftTemporal[1]-leftMedial[1]>.0013&&rightTemporal[1]-rightMedial[1]>.0013,'temporal canthi sit above medial canthi on both sides');
+  check(Math.abs(leftTemporal[1]-rightTemporal[1])<1e-12&&Math.abs(leftMedial[1]-rightMedial[1])<1e-12,'left and right neutral fissures remain mirrored');
   const contactGlobe=[0,0,-.00925,api.anatomy.left.radius];
   for(const x of [-.006,0,.006])for(const y of [-.003,0,.003]){
     const rest=api.contact(x,y,contactGlobe,0),early=api.contact(x,y,contactGlobe,.35),closed=api.contact(x,y,contactGlobe,1);

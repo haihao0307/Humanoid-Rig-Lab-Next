@@ -3,9 +3,16 @@
  * Inspired by spherical-coordinate lid sliding, not a tissue simulation:
  * https://disneyanimation.com/publications/realistic-eye-motion-using-procedural-geometric-methods/
  */
-const COMPACT_EYE_ANATOMY={revision:'r11-resting-globe-lid-balance',recess:.0002,blinkRetractionM:.0010,segments:96,rings:24,
+const COMPACT_EYE_ANATOMY={revision:'r12-neutral-fissure-orbital-continuity',recess:.0002,blinkRetractionM:.0010,segments:96,rings:24,
+  fissure:{halfWidth:.0128,upperHeight:.00415,lowerHeight:.00315,lateralCanthusLift:.00070,upperTemporalBias:.08,lowerTemporalBias:.04,verticalRoundness:.16,lowerSulcusM:.00030},
   left:{centre:[.029181616,1.518095373,.152055491],radius:.012623681},
   right:{centre:[-.030466569,1.518094244,.151979130],radius:.012591195}};
+function compactEyeNeutralFissure(angle,side){
+  const p=COMPACT_EYE_ANATOMY.fissure,c=Math.cos(angle),s=Math.sin(angle),vertical=Math.abs(s),lateral=c*(side==='left'?1:-1),canthus=vertical*vertical;
+  const height=s>=0?p.upperHeight*(1+p.upperTemporalBias*lateral):p.lowerHeight*(1-p.lowerTemporalBias*lateral);
+  const y=(s>=0?1:-1)*height*vertical*(1-p.verticalRoundness+p.verticalRoundness*vertical)+p.lateralCanthusLift*lateral*(1-canthus);
+  return [p.halfWidth*c,y];
+}
 function compactEyeSkinSampler(meshes,frame){
   const triangles=[];
   for(const mesh of meshes){if(mesh.name!=='skin'&&mesh.name!=='faceSkin')continue;const coords=mesh.canonicalPositions;
@@ -39,10 +46,12 @@ function compactEyeContactDepth(x,y,globe,blink=0){
 // Every pose reconstructs the whole meridian. The outer position and tangent
 // remain fixed; the free inner margin travels across the eye contact surface.
 function compactEyePatchPoint(angle,t,side,outer,gradient,globe,corners,state=[0,0,0],margin=0){
-  const c=Math.cos(angle),s=Math.sin(angle),canthus=s*s,lateral=c*(side==='left'?1:-1),tilt=.00055*lateral*canthus;
-  const ex=.0124*c,restY=(s>=0?.0045:.0027)*s*(.90+.10*Math.abs(s))*(1+(s>=0?-.12:.10)*lateral)+tilt;
+  const c=Math.cos(angle),s=Math.sin(angle),canthus=s*s,lateral=c*(side==='left'?1:-1),neutral=compactEyeNeutralFissure(angle,side);
+  const ex=neutral[0],restY=neutral[1];
   const dy=((s>=0?-.0022:.0014)*state[0]+(s>=0?.0019:-.0004)*state[1])*canthus;
-  const ey=(restY+dy)*(1-state[2])+(.00035*lateral-.0024)*canthus*canthus*state[2];
+  const blinkCanthus=COMPACT_EYE_ANATOMY.fissure.lateralCanthusLift*lateral*(1+2*canthus*(1-canthus)**3);
+  const blinkY=blinkCanthus+(.00035*lateral-.0024)*canthus*canthus;
+  const ey=(restY+dy)*(1-state[2])+blinkY*state[2];
   const x=ex+(outer[0]-ex)*t,y=ey+(outer[1]-ey)*t,dx=outer[0]-ex,dyRadial=outer[1]-ey;
   const base=compactEyeContactDepth(ex,ey,globe,state[2]),corner=c<0?corners[0]:corners[1];
   const a=clamp((Math.abs(c)-.76)/.22,0,1),cornerWeight=a*a*(3-2*a),inner=base+(Math.max(base,corner)-base)*cornerWeight;
@@ -54,7 +63,8 @@ function compactEyePatchPoint(angle,t,side,outer,gradient,globe,corners,state=[0
   const m0=clamp(slope*(1-cornerWeight)+m1*cornerWeight,-.020,Math.min(.020,3*Math.max(0,delta)+.0003)),t2=t*t,t3=t2*t;
   // The upper fold opens as the lid closes. It is a local transition outside
   // the pretarsal surface, rather than an equally thick ring around the eye.
-  const envelope=16*t2*(1-t)*(1-t),fold=-.00065*Math.max(0,s)*Math.exp(-(((t-.58)/.12)**2))*envelope*(1-state[2])**2;
+  const p=COMPACT_EYE_ANATOMY.fissure,envelope=16*t2*(1-t)*(1-t),upperFold=-.00065*Math.max(0,s)*Math.exp(-(((t-.58)/.12)**2))*envelope*(1-state[2])**2;
+  const lowerSulcus=-p.lowerSulcusM*Math.max(0,-s)*Math.exp(-(((t-.58)/.17)**2))*envelope*(1-.55*state[2]),fold=upperFold+lowerSulcus;
   let depth=(2*t3-3*t2+1)*inner+(t3-2*t2+t)*m0+(-2*t3+3*t2)*(outer[2]+.00004)+(t3-t2)*m1+.00008*envelope+fold;
   const contact=compactEyeContactDepth(x,y,globe,state[2]),h=clamp(.5+.5*(depth-contact)/.00008,0,1),supported=contact+(depth-contact)*h+.00008*h*(1-h);
   const q=clamp((t-.80)/.16,0,1);depth+=(supported-depth)*(1-q*q*(3-2*q));
@@ -78,7 +88,7 @@ function compactCreateEyeLids(meshes,eyeFrames,rig,statureScale){
       boundary=clamp(boundary,.65,1.75);const x=dx*boundary,y=dy*boundary;
       // The fitted source opening contains local folds. Regularize its free
       // inner tissue margin to an almond while anchoring the outer skin fit.
-      const lateral=c*(side==='left'?1:-1);edge.push([.0124*c,(s>=0?.0045:.0027)*s*(.90+.10*Math.abs(s))*(1+(s>=0?-.12:.10)*lateral)+.00055*lateral*s*s]);
+      edge.push(compactEyeNeutralFissure(angle,side));
       const r=Math.hypot(x,y),ox=x*(1+.0055/r),oy=y*(1+.0055/r),z=sample(ox,oy);
       const eps=.00025,zx1=sample(ox+eps,oy),zx0=sample(ox-eps,oy),zy1=sample(ox,oy+eps),zy0=sample(ox,oy-eps);
       outer.push([ox,oy,z??.008,zx1!==null&&zx0!==null?(zx1-zx0)/(2*eps):0,zy1!==null&&zy0!==null?(zy1-zy0)/(2*eps):0]);
@@ -208,17 +218,22 @@ float compactLidContact(float x,float y){
 vec3 compactLidPatchLocal(float angle,float t,vec3 outer,vec2 gradient){
   int offset=compactEyeSide<.5?0:3;
   float narrow=compactLidState[offset],wide=compactLidState[offset+1],blink=compactLidState[offset+2];
-  float c=cos(angle),s=sin(angle),canthus=s*s,lateral=c*(compactEyeSide<.5?1.:-1.),tilt=.00055*lateral*canthus;
-  float ex=.0124*c,restY=(s>=0.?.0045:.0027)*s*(.90+.10*abs(s))*(1.+(s>=0.?-.12:.10)*lateral)+tilt;
+  float c=cos(angle),s=sin(angle),vertical=abs(s),canthus=vertical*vertical,lateral=c*(compactEyeSide<.5?1.:-1.);
+  float cornerLift=${COMPACT_EYE_ANATOMY.fissure.lateralCanthusLift.toFixed(6)}*lateral*(1.-canthus);
+  float height=s>=0.?${COMPACT_EYE_ANATOMY.fissure.upperHeight.toFixed(6)}*(1.+${COMPACT_EYE_ANATOMY.fissure.upperTemporalBias.toFixed(6)}*lateral):${COMPACT_EYE_ANATOMY.fissure.lowerHeight.toFixed(6)}*(1.-${COMPACT_EYE_ANATOMY.fissure.lowerTemporalBias.toFixed(6)}*lateral);
+  float ex=${COMPACT_EYE_ANATOMY.fissure.halfWidth.toFixed(6)}*c,restY=(s>=0.?1.:-1.)*height*vertical*(${(1-COMPACT_EYE_ANATOMY.fissure.verticalRoundness).toFixed(6)}+${COMPACT_EYE_ANATOMY.fissure.verticalRoundness.toFixed(6)}*vertical)+cornerLift;
   float dy=((s>=0.?-.0022:.0014)*narrow+(s>=0.?.0019:-.0004)*wide)*canthus;
-  float ey=mix(restY+dy,(.00035*lateral-.0024)*canthus*canthus,blink);
+  float blinkCanthus=${COMPACT_EYE_ANATOMY.fissure.lateralCanthusLift.toFixed(6)}*lateral*(1.+2.*canthus*pow(1.-canthus,3.));
+  float blinkY=blinkCanthus+(.00035*lateral-.0024)*canthus*canthus;
+  float ey=mix(restY+dy,blinkY,blink);
   float x=mix(ex,outer.x,t),y=mix(ey,outer.y,t),dx=outer.x-ex,dyRadial=outer.y-ey;
   float base=compactLidContact(ex,ey),corner=c<0.?compactCanthusDepth.x:compactCanthusDepth.y;
   float a=clamp((abs(c)-.76)/.22,0.,1.),cornerWeight=a*a*(3.-2.*a),inner=mix(base,max(base,corner),cornerWeight);
   float eps=.0001,slope=((compactLidContact(ex+eps,ey)-compactLidContact(ex-eps,ey))*dx+(compactLidContact(ex,ey+eps)-compactLidContact(ex,ey-eps))*dyRadial)/(2.*eps);
   float delta=outer.z+.00004-inner,m1=clamp(gradient.x*dx+gradient.y*dyRadial,-min(.020,3.*max(0.,-delta)+.0003),.020);
   float m0=clamp(mix(slope,m1,cornerWeight),-.020,min(.020,3.*max(0.,delta)+.0003)),t2=t*t,t3=t2*t;
-  float envelope=16.*t2*(1.-t)*(1.-t),fold=-.00065*max(0.,s)*exp(-pow((t-.58)/.12,2.))*envelope*(1.-blink)*(1.-blink);
+  float envelope=16.*t2*(1.-t)*(1.-t),upperFold=-.00065*max(0.,s)*exp(-pow((t-.58)/.12,2.))*envelope*(1.-blink)*(1.-blink);
+  float lowerSulcus=-${COMPACT_EYE_ANATOMY.fissure.lowerSulcusM.toFixed(6)}*max(0.,-s)*exp(-pow((t-.58)/.17,2.))*envelope*(1.-.55*blink),fold=upperFold+lowerSulcus;
   float depth=(2.*t3-3.*t2+1.)*inner+(t3-2.*t2+t)*m0+(-2.*t3+3.*t2)*(outer.z+.00004)+(t3-t2)*m1+.00008*envelope+fold;
   float contact=compactLidContact(x,y),h=clamp(.5+.5*(depth-contact)/.00008,0.,1.),supported=mix(contact,depth,h)+.00008*h*(1.-h);
   float q=clamp((t-.80)/.16,0.,1.),finalDepth=depth+(supported-depth)*(1.-q*q*(3.-2.*q))+(compactEyeLid>1.5?.00007:0.);
