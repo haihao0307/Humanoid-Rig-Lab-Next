@@ -53,6 +53,13 @@ jobs:
           if test.count(old)!=1:
               raise SystemExit('structural identity residual assertion anchor mismatch')
           test_path.write_text(test.replace(old,new,1),encoding='utf-8',newline='\n')
+          mixed="assert.throws(()=>api.validateFacePose({schema:'jarvis/face_profile@3',identity:{shape:{}},weights:{}}),/未知字段/);"
+          mixed_fixed="assert.throws(()=>api.validateFacePose({schema:'jarvis/face_profile@3',identity:{shape:{}},weights:{}}),/字段不匹配|未知字段/);"
+          for path in ['tools/test-face-profile-separation.mjs','tools/test-face-identity-landmarks.mjs']:
+              p=Path(path);text=p.read_text(encoding='utf-8')
+              if text.count(mixed)!=1:
+                  raise SystemExit('mixed-schema assertion anchor mismatch: '+path)
+              p.write_text(text.replace(mixed,mixed_fixed,1),encoding='utf-8',newline='\n')
           runtime=Path('source/runtime.template.js')
           text=runtime.read_text(encoding='utf-8')
           old='/*__SOURCE:body/FaceControls.js__*/'
