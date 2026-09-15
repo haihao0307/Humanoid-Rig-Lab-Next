@@ -1,0 +1,303 @@
+name: Face identity landmarks R2
+
+on:
+  push:
+    branches:
+      - feature/human-face-workbench-v1-20260915
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: face-identity-landmarks-r2
+  cancel-in-progress: false
+
+jobs:
+  implement-verify-review:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-face-workbench-v1-20260915
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply structural identity and landmark layer
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re
+
+          def replace_regex(path,pattern,replacement,label):
+              p=Path(path);text=p.read_text(encoding='utf-8')
+              updated,count=re.subn(pattern,lambda _:replacement,text,count=1,flags=re.S)
+              if count!=1: raise SystemExit(f'{label}: expected one match, got {count}')
+              p.write_text(updated,encoding='utf-8',newline='\n')
+
+          def replace_text(path,old,new,label):
+              p=Path(path);text=p.read_text(encoding='utf-8')
+              count=text.count(old)
+              if count!=1: raise SystemExit(f'{label}: expected one match, got {count}')
+              p.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
+
+          recipe_path=Path('body/FaceControlRecipe.json')
+          recipe=json.loads(recipe_path.read_text(encoding='utf-8'))
+          old_revision=recipe['revision']
+          if old_revision!='r3-independent-lip-opening': raise SystemExit('unexpected face recipe baseline '+old_revision)
+          recipe['revision']='r4-structural-identity-landmarks'
+          legacy=list(recipe.get('legacyRevisions',[]))
+          if old_revision not in legacy: legacy.append(old_revision)
+          recipe['legacyRevisions']=legacy
+          extra_nodes=[
+            {'id':'forehead','label':'额部中央','centre':[0,1.553,.168],'radius':[.05,.025,.032]},
+            {'id':'templeLeft','label':'左颞部','mirror':'templeRight','centre':[.059,1.528,.153],'radius':[.026,.033,.04]},
+            {'id':'templeRight','label':'右颞部','mirror':'templeLeft','centre':[-.059,1.528,.153],'radius':[.026,.033,.04]},
+            {'id':'jawLeft','label':'左下颌','mirror':'jawRight','centre':[.049,1.447,.159],'radius':[.032,.027,.04]},
+            {'id':'jawRight','label':'右下颌','mirror':'jawLeft','centre':[-.049,1.447,.159],'radius':[.032,.027,.04]},
+            {'id':'noseBridge','label':'鼻梁','centre':[0,1.518,.186],'radius':[.02,.032,.035]},
+            {'id':'noseTip','label':'鼻尖','centre':[0,1.487,.201],'radius':[.022,.02,.03]},
+            {'id':'philtrum','label':'人中','centre':[0,1.47,.188],'radius':[.016,.015,.03]}
+          ]
+          ids={node['id'] for node in recipe['nodes']}
+          if ids.intersection(node['id'] for node in extra_nodes): raise SystemExit('structural identity nodes already exist')
+          recipe['nodes'].extend(extra_nodes)
+          recipe['calibration']='r4-structural-identity-landmarks-authored-20260915'
+          recipe_path.write_text(json.dumps(recipe,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
+
+          assembly_path=Path('source/assembly.json')
+          assembly=json.loads(assembly_path.read_text(encoding='utf-8'))
+          modules=assembly['modules']
+          if 'body/FaceIdentity.js' not in modules:
+              modules.insert(modules.index('body/FaceControls.js'),'body/FaceIdentity.js')
+          assembly_path.write_text(json.dumps(assembly,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
+
+          header=r'''const FACE_RECIPE=/*__FACE_RECIPE_JSON__*/;
+          const FACE_SCHEMA='jarvis/face_profile@3';
+          const FACE_LEGACY_PROFILE_SCHEMA='jarvis/face_profile@2';
+          const FACE_IDENTITY_SCHEMA='jarvis/face_identity@2';
+          const FACE_IDENTITY_LEGACY_SCHEMA='jarvis/face_identity@1';
+          const FACE_EXPRESSION_SCHEMA='jarvis/face_expression@1';
+          const FACE_LEGACY_SCHEMA='jarvis/face_pose@1';
+          const FACE_NODE_INDEX=new Map(FACE_RECIPE.nodes.map((node,index)=>[node.id,index]));
+          const faceHas=(value,key)=>Object.prototype.hasOwnProperty.call(value,key);
+          function faceObject(value,label){if(!value||typeof value!=='object'||Array.isArray(value))throw Error(label+'必须为对象');}
+          function faceNumber(value,min,max,label){if(typeof value!=='number'||!Number.isFinite(value)||value<min||value>max)throw Error(label+'超出范围 '+min+' 至 '+max);return value;}
+          function validateFaceRevision(input){if(input.revision!==undefined&&input.revision!==FACE_RECIPE.revision&&!FACE_RECIPE.legacyRevisions.includes(input.revision))throw Error('面部配方版本不匹配');}
+          function validateFaceWeights(input={}){
+            faceObject(input,'表情权重');const weights={},channels=new Set(FACE_RECIPE.channels.map(c=>c.id));
+            for(const [key,value]of Object.entries(input)){if(!channels.has(key))throw Error('未知表情通道 '+key);weights[key]=faceNumber(value,0,1,key);}
+            return weights;
+          }
+          function validateFaceOffsets(input={}){
+            faceObject(input,'固定身份局部残差');const offsetsMm={};
+            for(const [key,value]of Object.entries(input)){
+              if(!FACE_NODE_INDEX.has(key)||!Array.isArray(value)||value.length!==3)throw Error('局部控制点或位移无效 '+key);
+              offsetsMm[key]=value.map(v=>faceNumber(v,-FACE_RECIPE.maximumOffsetMm,FACE_RECIPE.maximumOffsetMm,key));
+            }
+            return offsetsMm;
+          }
+          function validateFacePose(input={}){
+            faceObject(input,'面部配方');validateFaceRevision(input);
+            const directLegacy=input.schema===FACE_LEGACY_SCHEMA||faceHas(input,'weights')||faceHas(input,'offsetsMm');
+            if(directLegacy){
+              if(input.schema!==undefined&&input.schema!==FACE_LEGACY_SCHEMA)throw Error('面部配方 schema 与字段不匹配');
+              if(Object.keys(input).some(key=>!['schema','revision','weights','offsetsMm'].includes(key)))throw Error('面部配方含未知字段');
+              const neutralOffsetsMm=validateFaceOffsets(input.offsetsMm??{}),weights=validateFaceWeights(input.weights??{});
+              return {schema:FACE_SCHEMA,revision:FACE_RECIPE.revision,identity:{schema:FACE_IDENTITY_SCHEMA,shape:{},neutralOffsetsMm},expression:{schema:FACE_EXPRESSION_SCHEMA,weights}};
+            }
+            const profileSchema=input.schema??FACE_SCHEMA;
+            if(profileSchema!==FACE_SCHEMA&&profileSchema!==FACE_LEGACY_PROFILE_SCHEMA)throw Error('不支持的面部配方 schema');
+            if(Object.keys(input).some(key=>!['schema','revision','identity','expression'].includes(key)))throw Error('面部配方含未知字段');
+            const identity=input.identity??{},expression=input.expression??{};faceObject(identity,'固定身份');faceObject(expression,'临时表情');
+            if(Object.keys(identity).some(key=>!['schema','shape','neutralOffsetsMm'].includes(key)))throw Error('固定身份格式无效');
+            if(identity.schema!==undefined&&identity.schema!==FACE_IDENTITY_SCHEMA&&identity.schema!==FACE_IDENTITY_LEGACY_SCHEMA)throw Error('固定身份 schema 无效');
+            if(Object.keys(expression).some(key=>!['schema','weights'].includes(key))||expression.schema!==undefined&&expression.schema!==FACE_EXPRESSION_SCHEMA)throw Error('临时表情格式无效');
+            const shape=validateFaceIdentityShape(identity.shape??{}),neutralOffsetsMm=validateFaceOffsets(identity.neutralOffsetsMm??{}),weights=validateFaceWeights(expression.weights??{});
+            return {schema:FACE_SCHEMA,revision:FACE_RECIPE.revision,identity:{schema:FACE_IDENTITY_SCHEMA,shape,neutralOffsetsMm},expression:{schema:FACE_EXPRESSION_SCHEMA,weights}};
+          }
+          function faceOffsetKey(offsetsMm={}){return FACE_RECIPE.nodes.map(node=>node.id+':'+(offsetsMm[node.id]||[0,0,0]).map(v=>Number(v).toFixed(4)).join(',')).join('|');}
+          function faceIdentityKey(identity){return faceIdentityShapeKey(identity.shape)+'|'+faceOffsetKey(identity.neutralOffsetsMm);}
+          function faceWeightKey(weights={}){return FACE_RECIPE.channels.map(channel=>channel.id+':'+Number(weights[channel.id]||0).toFixed(4)).join('|');}
+          function faceIdentityPreset(identity){const key=faceIdentityKey(identity);return FACE_IDENTITY_PRESETS.find(preset=>faceIdentityKey({shape:validateFaceIdentityShape(preset.shape),neutralOffsetsMm:validateFaceOffsets(preset.offsetsMm)})===key)||null;}
+          function faceExpressionPreset(expression){const key=faceWeightKey(expression.weights);return FACE_RECIPE.presets.find(preset=>faceWeightKey(preset.weights)===key)||null;}
+          function resolveFaceOffsets(input){'''
+          replace_regex('body/FaceControls.js',r"const FACE_RECIPE=/\*__FACE_RECIPE_JSON__\*/;.*?function resolveFaceOffsets\(input\)\{",header,'face profile header')
+
+          resolver=r'''function resolveFaceOffsets(input){
+            const pose=validateFacePose(input),weights=pose.expression.weights,structuralOffsetsMm=compileFaceIdentityShape(pose.identity.shape),offsetsMm=mergeFaceIdentityOffsets(structuralOffsetsMm,pose.identity.neutralOffsetsMm),values=new Float32Array(FACE_RECIPE.nodes.length*3),limited=[];
+            for(const [key,value]of Object.entries(offsetsMm))values.set(value,FACE_NODE_INDEX.get(key)*3);
+            for(const channel of FACE_RECIPE.channels){const weight=weights[channel.id]||0;
+              for(const [key,delta]of Object.entries(channel.offsets)){const offset=FACE_NODE_INDEX.get(key)*3;for(let axis=0;axis<3;axis++)values[offset+axis]+=weight*delta[axis];}
+            }
+            for(let i=0;i<FACE_RECIPE.nodes.length;i++){
+              const at=i*3,length=Math.hypot(values[at],values[at+1],values[at+2]),scale=Math.min(1,FACE_RECIPE.maximumOffsetMm/Math.max(length,1e-12));
+              if(scale<1)limited.push(FACE_RECIPE.nodes[i].id);
+              for(let axis=0;axis<3;axis++)values[at+axis]*=scale*.001;
+            }
+            const muscles=new Float32Array(FACE_RECIPE.muscleFields.map(field=>Math.min(1,Object.entries(field.activation).reduce((sum,[id,gain])=>sum+(weights[id]||0)*gain,0))));
+            const eyelids=new Float32Array(['Left','Right'].flatMap(side=>['eyeNarrow','eyeWide','eyeBlink'].map(id=>weights[id+side]||0)));
+            return {profile:pose,identityOffsetsMm:offsetsMm,landmarks:faceIdentityLandmarks(pose.identity.shape),values,muscles,eyelids,lipOpen:weights.lipPart||0,limited};
+          }
+          function interpolateFacePose'''
+          replace_regex('body/FaceControls.js',r"function resolveFaceOffsets\(input\)\{.*?function interpolateFacePose",resolver,'face identity resolver')
+
+          panel=r'''panel.innerHTML=`<p>人物长期中性脸、局部残差与临时表情分层保存。先调结构比例，再做局部收尾；微笑、眨眼和皱眉不会覆盖人物长相。</p>
+              <button id="face-closeup">面部近景</button><button id="face-lip-closeup">嘴唇近景</button><button id="face-neutral">清除表情（回到本人的中性脸）</button>
+              <label><input id="face-enabled" type="checkbox" checked>显示形变</label>
+              <h3>1 · 固定身份起点</h3><div id="face-identities"></div>
+              <button id="face-reset-identity">重置身份为参考脸</button><button id="face-verify-separation">检查身份/表情分层</button>
+              <h3>2 · 结构脸型参数</h3><div id="face-shape"></div><output id="face-landmark-summary"></output>
+              <h3>3 · 固定身份局部残差</h3><label>控制点 <select id="face-node"></select></label>
+              <label><input id="face-mirror" type="checkbox">左右联动</label>
+              <label><input id="face-heat" type="checkbox">显示所选点影响范围</label>
+              <div id="face-axes"></div><button id="face-reset-node">清零所选点残差</button>
+              <label>采样步幅（毫米）<input id="face-step" type="number" value="0.5" min="0.1" max="1" step="0.1"></label>
+              <button id="face-prev">上一采样</button><button id="face-next">下一采样</button><button id="face-exit-sample">结束采样并还原</button>
+              <p id="face-sample-label">逐点、逐轴、正负位移；开始时暂存当前身份与表情。</p><output id="face-coverage"></output>
+              <button id="face-export-samples">导出采样读数与步骤</button>
+              <h3>4 · 临时表情示例</h3><div id="face-presets"></div>
+              <label>示例强度 <input id="face-intensity" type="range" min="0" max="1" step="0.01" value="1"><output id="face-intensity-value">100%</output></label>
+              <button id="face-demo">依次演示</button><button id="face-stop">停止并还原</button>
+              <details><summary>单独调整 ${FACE_RECIPE.channels.length} 项表情通道</summary><div id="face-channels"></div></details>
+              <button id="face-export">导出身份与表情配方</button><label>导入面部配方<input id="face-import" type="file" accept=".json,application/json"></label>
+              <p class="settings-hint">十三项结构参数编译为中性脸位移，局部控制点只保存残差。当前仍未包含真实下颌关节、牙齿和舌头。</p>
+              <output id="face-status" role="status" aria-live="polite"></output>`;'''
+          replace_regex('body/FaceControls.js',r"panel\.innerHTML=`.*?`;\n  const style=",panel+'\n  const style=','face panel')
+          replace_text('body/FaceControls.js',"identityPresets:()=>copy(FACE_IDENTITY_PRESETS),","identityPresets:()=>copy(FACE_IDENTITY_PRESETS),\n  shapeParameters:()=>copy(FACE_IDENTITY_PARAMETERS),\n  landmarks:()=>copy(resolved.landmarks),",'face API model access')
+          replace_text('body/FaceControls.js',"  setIdentityPreset(id){const preset=FACE_IDENTITY_PRESETS.find(p=>p.id===id);if(!preset)throw Error('未知身份脸型起点');\n    const pose=api.export();identityPresetId=id;return api.apply({...pose,identity:{schema:FACE_IDENTITY_SCHEMA,neutralOffsetsMm:copy(preset.offsetsMm)}});},","  setShapeParameter(id,value){const parameter=FACE_IDENTITY_PARAMETER_MAP.get(id);if(!parameter)throw Error('未知结构脸型参数');\n    const pose=api.export(),shape=validateFaceIdentityShape({...pose.identity.shape,[id]:value});identityPresetId=null;return api.apply({...pose,identity:{...pose.identity,shape}});},\n  setIdentityPreset(id){const preset=FACE_IDENTITY_PRESETS.find(p=>p.id===id);if(!preset)throw Error('未知身份脸型起点');\n    const pose=api.export();identityPresetId=id;return api.apply({...pose,identity:{schema:FACE_IDENTITY_SCHEMA,shape:copy(preset.shape),neutralOffsetsMm:copy(preset.offsetsMm)}});},",'identity preset and shape setter')
+          replace_text('body/FaceControls.js',"const ok=faceOffsetKey(before.identity.neutralOffsetsMm)===faceOffsetKey(neutral.identity.neutralOffsetsMm);","const ok=faceIdentityKey(before.identity)===faceIdentityKey(neutral.identity);",'identity invariant key')
+
+          refresh=r'''  refresh(){resolved=resolveFaceOffsets(api.export());const pose=api.export(),node=FACE_RECIPE.nodes[selected],offset=pose.identity.neutralOffsetsMm[node.id]||[0,0,0],shape=pose.identity.shape;
+            identityPresetId=faceIdentityPreset(pose.identity)?.id||null;
+            el('node').value=node.id;el('enabled').checked=enabled;el('heat').checked=heatmap;
+            for(const parameter of FACE_IDENTITY_PARAMETERS){const value=shape[parameter.id]||0;el('shape-'+parameter.id).value=value;el('shape-value-'+parameter.id).textContent=(value>=0?'+':'')+value.toFixed(2);}
+            ['x','y','z'].forEach((axis,i)=>{el(axis).value=offset[i];el(axis+'-value').textContent=offset[i].toFixed(2)+' mm';});
+            for(const c of FACE_RECIPE.channels){el('channel-'+c.id).value=pose.expression.weights[c.id]||0;el('value-'+c.id).textContent=Math.round((pose.expression.weights[c.id]||0)*100)+'%';}
+            for(const button of el('identities').children)button.setAttribute('aria-pressed',String(button.dataset.identity===identityPresetId));
+            for(const button of el('presets').children)button.setAttribute('aria-pressed',String(button.dataset.preset===presetId));
+            const sample=lab.compact?.faceSampling?.nodes[selected];
+            el('coverage').textContent=sample?`${node.label} · 覆盖 ${sample.coveredVertices} 个显示顶点 · 峰值权重 ${sample.peakWeight.toFixed(3)} · 最近距离 ${sample.nearestDistanceMm===null?'未知':sample.nearestDistanceMm.toFixed(2)+' mm'} · ${lab.compact.quality}${sample.peakWeight<.2?' · 覆盖偏弱，请复查控制点范围':''}`:'人物就绪后生成采样读数。';
+            const landmarks=resolved.landmarks.values,jawWidth=Math.abs(landmarks.jawLeft[0]-landmarks.jawRight[0])*1000,noseProjection=landmarks.noseTip[2]*1000;
+            el('landmark-summary').textContent=`共享标志点 ${Object.keys(landmarks).length} 个 · 下颌点间距 ${jawWidth.toFixed(1)} mm · 鼻尖参考深度 ${noseProjection.toFixed(1)} mm。`;
+            const identity=faceIdentityPreset(pose.identity),expression=faceExpressionPreset(pose.expression),limit=resolved.limited.length?'组合位移已限制到每点 '+FACE_RECIPE.maximumOffsetMm+' mm：'+resolved.limited.join('、')+'。':'';
+            el('status').textContent=limit+'固定身份：'+(identity?.label||'自定义身份')+'；结构参数 '+Object.keys(shape).length+'/'+FACE_IDENTITY_PARAMETERS.length+'；临时表情：'+(expression?.label||(Object.keys(pose.expression.weights).length?'自定义表情':'中性'))+'。';
+            needsRedraw=true;
+          },
+          uniforms()'''
+          replace_regex('body/FaceControls.js',r"  refresh\(\)\{.*?\n  \},\n  uniforms\(\)",refresh,'face refresh')
+
+          closeup_old="""    const lips=view==='lips';r.target=add(rotate(q,(lips?[-.0006,1.4586,.188]:[.0006,1.500,.160]).map(v=>v*s)),translation);r.distance=(lips?.125:.50)*s;r.projection='perspective';r.pitch=0;"""
+          closeup_new="""    const landmarks=resolved.landmarks.values,lips=view==='lips',local=lips?[0,1,2].map(axis=>(landmarks.lipUpper[axis]+landmarks.lipLower[axis])*.5):[(landmarks.noseBridge[0]+landmarks.chin[0])*.5,(landmarks.forehead[1]+landmarks.chin[1])*.5,(landmarks.cheekLeft[2]+landmarks.cheekRight[2])*.5];
+              r.target=add(rotate(q,local.map(v=>v*s)),translation);r.distance=(lips?.125:.50)*s;r.projection='perspective';r.pitch=0;"""
+          replace_text('body/FaceControls.js',closeup_old,closeup_new,'landmark camera target')
+          replace_text('body/FaceControls.js',"report:()=>{const profile=api.export();return {schema:FACE_SCHEMA,recipe:copy(FACE_RECIPE),parameters:profile,identity:copy(profile.identity),expression:copy(profile.expression),separation:api.verifySeparation(),sampling:api.samples(),limitedNodes:resolved.limited.slice(),enabled,generatedGeometryIncluded:false,runtimeVerified:false,visualAcceptance:false};}","report:()=>{const profile=api.export();return {schema:FACE_SCHEMA,recipe:copy(FACE_RECIPE),parameters:profile,identity:copy(profile.identity),expression:copy(profile.expression),identityModel:{shapeSchema:FACE_IDENTITY_SHAPE_SCHEMA,landmarkSchema:FACE_LANDMARK_SCHEMA,parameters:copy(FACE_IDENTITY_PARAMETERS),landmarks:copy(resolved.landmarks)},separation:api.verifySeparation(),sampling:api.samples(),limitedNodes:resolved.limited.slice(),enabled,generatedGeometryIncluded:false,runtimeVerified:false,visualAcceptance:false};}",'face report')
+          replace_text('body/FaceControls.js',"  for(const node of FACE_RECIPE.nodes){const option=document.createElement('option');option.value=node.id;option.textContent=node.label;el('node').append(option);}","  for(const parameter of FACE_IDENTITY_PARAMETERS){const row=document.createElement('label');row.className='face-slider';row.innerHTML=`<span>${parameter.label}</span><output id=\"face-shape-value-${parameter.id}\">0.00</output><input id=\"face-shape-${parameter.id}\" aria-label=\"${parameter.label}\" type=\"range\" min=\"${parameter.min}\" max=\"${parameter.max}\" step=\"${parameter.step}\" value=\"0\">`;el('shape').append(row);el('shape-'+parameter.id).oninput=e=>edit(()=>api.setShapeParameter(parameter.id,Number(e.target.value)));}\n  for(const node of FACE_RECIPE.nodes){const option=document.createElement('option');option.value=node.id;option.textContent=node.label;el('node').append(option);}",'shape controls')
+
+          check_path=Path('tools/check-face-controls.mjs')
+          check=check_path.read_text(encoding='utf-8')
+          check=check.replace("const recipe=JSON.parse(read('body/FaceControlRecipe.json')),source=read('body/FaceControls.js'),renderer=read('body/CompactWorkbench.js')","const recipe=JSON.parse(read('body/FaceControlRecipe.json')),identity=read('body/FaceIdentity.js'),source=read('body/FaceControls.js'),renderer=read('body/CompactWorkbench.js')")
+          check=check.replace("const FACE_SCHEMA='jarvis/face_profile@2'","const FACE_SCHEMA='jarvis/face_profile@3'")
+          check=check.replace("const FACE_IDENTITY_SCHEMA='jarvis/face_identity@1'","const FACE_IDENTITY_SCHEMA='jarvis/face_identity@2'")
+          check=check.replace("check(source.includes(\"const FACE_LEGACY_SCHEMA='jarvis/face_pose@1'\")&&source.includes(\"legacyOffsetsInterpretation:'neutral identity'\"),'legacy face-pose migration keeps an explicit assumption');","check(source.includes(\"const FACE_LEGACY_PROFILE_SCHEMA='jarvis/face_profile@2'\")&&source.includes(\"const FACE_IDENTITY_LEGACY_SCHEMA='jarvis/face_identity@1'\")&&source.includes(\"const FACE_LEGACY_SCHEMA='jarvis/face_pose@1'\")&&source.includes(\"legacyOffsetsInterpretation:'neutral identity'\"),'legacy profile and face-pose migrations keep an explicit assumption');")
+          check=check.replace("check(source.includes('weights=pose.expression.weights,offsetsMm=pose.identity.neutralOffsetsMm'),'resolver composes fixed identity before transient expression');","check(source.includes('structuralOffsetsMm=compileFaceIdentityShape(pose.identity.shape)')&&source.includes('mergeFaceIdentityOffsets(structuralOffsetsMm,pose.identity.neutralOffsetsMm)'),'resolver composes structural identity, manual residuals and transient expression in order');")
+          check=check.replace("check(ids.length===17&&new Set(ids).size===17,'17 distinct local regions');","check(ids.length===25&&new Set(ids).size===25,'25 distinct local regions including forehead, temples, jaw, bridge, tip and philtrum');")
+          check=check.replace("check(manifest.modules.filter(p=>p==='body/FaceControls.js').length===1&&manifest.jsonTokens.FACE_RECIPE==='FaceControlRecipe'&&runtime.includes('/*__SOURCE:body/FaceControls.js__*/'),'single assembly owner');","check(manifest.modules.filter(p=>p==='body/FaceControls.js').length===1&&manifest.modules.filter(p=>p==='body/FaceIdentity.js').length===1&&manifest.jsonTokens.FACE_RECIPE==='FaceControlRecipe'&&runtime.includes('/*__SOURCE:body/FaceIdentity.js__*/')&&runtime.includes('/*__SOURCE:body/FaceControls.js__*/'),'single identity and control assembly owners');")
+          check=check.replace("check(manifest.modules.indexOf('body/FaceControls.js')<manifest.modules.indexOf('body/CharacterPresets.js'),'face validator precedes initial character parsing');","check(manifest.modules.indexOf('body/FaceIdentity.js')<manifest.modules.indexOf('body/FaceControls.js')&&manifest.modules.indexOf('body/FaceControls.js')<manifest.modules.indexOf('body/CharacterPresets.js'),'identity compiler and face validator precede initial character parsing');")
+          check=check.replace("  const ids=recipe.nodes.map(n=>n.id),channels=recipe.channels.map(c=>c.id),presets=recipe.presets.map(p=>p.id);","  check(identity.includes(\"const FACE_IDENTITY_SHAPE_SCHEMA='jarvis/face_identity_shape@1'\")&&identity.includes(\"const FACE_LANDMARK_SCHEMA='jarvis/face_landmarks@1'\")&&identity.includes('compileFaceIdentityShape')&&identity.includes('faceIdentityLandmarks'),'versioned structural identity and shared landmark compiler');\n  check(identity.includes(\"id:'cranialWidth'\")&&identity.includes(\"id:'jawWidth'\")&&identity.includes(\"id:'noseProjection'\")&&identity.includes(\"id:'lipFullness'\"),'interpretable low-frequency identity parameters');\n  const ids=recipe.nodes.map(n=>n.id),channels=recipe.channels.map(c=>c.id),presets=recipe.presets.map(p=>p.id);")
+          check=check.replace("102 independent signed samples and restore","150 independent signed samples and restore")
+          check=check.replace("return {checks,nodes:ids.length,axes:ids.length*3,channels:channels.length,expressionExamples:presets.length-1,samplingSteps:ids.length*6,muscles","return {checks,nodes:ids.length,axes:ids.length*3,structuralParameters:13,landmarks:21,channels:channels.length,expressionExamples:presets.length-1,samplingSteps:ids.length*6,muscles")
+          check_path.write_text(check,encoding='utf-8',newline='\n')
+
+          separation='''// Execute versioned face-profile migration and identity/expression invariants.\nimport assert from 'node:assert/strict';\nimport {readFileSync} from 'node:fs';\nimport vm from 'node:vm';\nconst read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');\nconst face=read('body/FaceControls.js').replace('/*__FACE_RECIPE_JSON__*/',read('body/FaceControlRecipe.json'));\nconst source=read('body/FaceIdentity.js')+'\\n'+face.slice(0,face.indexOf('function faceChunkEligible'));\nconst api=vm.runInNewContext(source+'\\n({FACE_SCHEMA,FACE_IDENTITY_SCHEMA,FACE_EXPRESSION_SCHEMA,FACE_IDENTITY_PRESETS,validateFacePose,resolveFaceOffsets,interpolateFacePose})');\nconst normal=value=>JSON.parse(JSON.stringify(value,(key,v)=>ArrayBuffer.isView(v)?Array.from(v):v));\nconst legacy=api.validateFacePose({schema:'jarvis/face_pose@1',offsetsMm:{cheekLeft:[2,0,0],chin:[0,-1,1]},weights:{mouthSmileLeft:.7}});\nassert.equal(legacy.schema,'jarvis/face_profile@3');\nassert.equal(legacy.identity.schema,'jarvis/face_identity@2');\nassert.equal(legacy.expression.schema,'jarvis/face_expression@1');\nassert.deepEqual(normal(legacy.identity.shape),{});\nassert.deepEqual(normal(legacy.identity.neutralOffsetsMm),{cheekLeft:[2,0,0],chin:[0,-1,1]});\nassert.deepEqual(normal(legacy.expression.weights),{mouthSmileLeft:.7});\nconst shaped=api.validateFacePose({identity:{shape:{jawWidth:.6,noseProjection:.25},neutralOffsetsMm:{chin:[0,-1,1]}},expression:{weights:{}}});\nconst smile=api.validateFacePose({identity:shaped.identity,expression:{weights:{mouthSmileLeft:1,mouthSmileRight:1,cheekRaiseLeft:.8,cheekRaiseRight:.8}}});\nconst halfway=api.interpolateFacePose(shaped,smile,.5),neutral=api.interpolateFacePose(smile,api.validateFacePose({identity:shaped.identity,expression:{weights:{}}}),1);\nassert.deepEqual(normal(halfway.identity),normal(shaped.identity),'expression interpolation must preserve identity');\nassert.deepEqual(normal(neutral.identity),normal(shaped.identity),'return to neutral must restore the same identity');\nassert.deepEqual(normal(neutral.expression.weights),{});\nconst resolved=api.resolveFaceOffsets(neutral),recipe=JSON.parse(read('body/FaceControlRecipe.json')),cheekIndex=recipe.nodes.findIndex(n=>n.id==='cheekLeft')*3,jawIndex=recipe.nodes.findIndex(n=>n.id==='jawLeft')*3;\nassert(Math.abs(resolved.values[cheekIndex]-.002)<1e-7,'neutral identity residual reaches renderer uniforms');\nassert(resolved.values[jawIndex]>.00239,'structural jaw width reaches renderer uniforms');\nfor(const preset of api.FACE_IDENTITY_PRESETS){const profile=api.validateFacePose({identity:{shape:preset.shape,neutralOffsetsMm:preset.offsetsMm}});assert.equal(profile.schema,api.FACE_SCHEMA);api.resolveFaceOffsets(profile);}\nassert.throws(()=>api.validateFacePose({schema:'jarvis/face_profile@3',identity:{shape:{}},weights:{}}),/未知字段/);\nassert.throws(()=>api.validateFacePose({identity:{neutralOffsetsMm:{unknown:[0,0,0]}}}),/局部控制点/);\nconsole.log(JSON.stringify({legacyMigrated:true,profileSchema:api.FACE_SCHEMA,identityPreservedAcrossExpression:true,identityPresetCount:api.FACE_IDENTITY_PRESETS.length,rendererStructuralAndResidualOffsetsChecked:true,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));\n'''
+          Path('tools/test-face-profile-separation.mjs').write_text(separation,encoding='utf-8',newline='\n')
+          replace_text('tools/test-npc-face-uniforms.mjs',"const faceSource=read('body/FaceControls.js').replace('/*__FACE_RECIPE_JSON__*/',read('body/FaceControlRecipe.json'));","const faceSource=read('body/FaceIdentity.js')+'\\n'+read('body/FaceControls.js').replace('/*__FACE_RECIPE_JSON__*/',read('body/FaceControlRecipe.json'));",'NPC face test identity source')
+
+          readme=Path('README.md')
+          text=readme.read_text(encoding='utf-8')
+          marker='# 重建人物 R2 · 行为与人物模块修整 R11\n'
+          entry='''\n2026-09-15 **面部结构身份与共享标志点 R2**：在固定身份与临时表情分层之上增加 13 项低频结构脸型参数、25 个有界局部区域和 21 个共享标志点。结构参数先编译为中性脸位移，再叠加人工残差与临时表情；旧 `face_pose@1`、`face_profile@2` 和 `face_identity@1` 继续迁移。实现边界和检查方法见 [面部结构身份与共享标志点 R2](docs/FACE_IDENTITY_LANDMARKS_R2.md)。\n'''
+          if entry.strip() not in text:
+              if marker not in text: raise SystemExit('README title anchor missing')
+              text=text.replace(marker,marker+entry,1)
+          readme.write_text(text,encoding='utf-8',newline='\n')
+          PY
+      - name: Build and validate source
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/test-face-profile-separation.mjs
+          node tools/test-face-identity-landmarks.mjs
+          node tools/test-npc-face-uniforms.mjs
+          node tools/test-face-startup.mjs
+      - name: Install browser harness
+        run: |
+          mkdir -p /tmp/face-qa
+          cd /tmp/face-qa
+          npm init -y >/dev/null 2>&1
+          npm install playwright >/dev/null 2>&1
+          npx playwright install --with-deps chromium
+      - name: Run browser review
+        shell: bash
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/face-server.log 2>&1 &
+          mkdir -p docs/qa
+          cat >/tmp/face-qa/run.cjs <<'JS'
+          const fs=require('fs');
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const page=await browser.newPage({viewport:{width:1440,height:960},deviceScaleFactor:1});
+            const consoleErrors=[],pageErrors=[];
+            page.on('console',message=>{if(message.type()==='error')consoleErrors.push(message.text());});
+            page.on('pageerror',error=>pageErrors.push(String(error)));
+            await page.goto('http://127.0.0.1:8000/index.html?review=face',{waitUntil:'domcontentloaded',timeout:180000});
+            let faceFrame=null;const deadline=Date.now()+180000;
+            while(Date.now()<deadline&&!faceFrame){for(const frame of page.frames()){try{if(await frame.locator('#face-shape').count()){faceFrame=frame;break;}}catch{}}if(!faceFrame)await page.waitForTimeout(500);}
+            if(!faceFrame)throw new Error('Face identity controls did not become available');
+            for(const frame of page.frames())try{await frame.evaluate(()=>{for(const overlay of document.querySelectorAll('#bodyStartupDiagnostics,[data-startup-diagnostics]')){overlay.hidden=true;overlay.style.display='none';overlay.style.pointerEvents='none';}});}catch{}
+            const shapeSliders=await faceFrame.locator('#face-shape input[type=range]').count();
+            const identityButtons=await faceFrame.locator('#face-identities button').count();
+            if(shapeSliders!==13)throw new Error('Expected 13 structural parameters, got '+shapeSliders);
+            if(identityButtons!==5)throw new Error('Expected 5 identity presets, got '+identityButtons);
+            const runtime=await faceFrame.evaluate(()=>{
+              const api=window.HumanLab?.face;if(!api)throw new Error('Face API unavailable');
+              window.HumanLab.setAuto?.(false);api.setIdentityPreset('angular');api.setShapeParameter('noseProjection',.55);
+              const identityBefore=api.export().identity,landmarksBefore=api.landmarks();
+              api.preset('smile',1);
+              const identityDuring=api.export().identity,landmarksDuring=api.landmarks();
+              document.getElementById('face-verify-separation').click();api.closeup('front');window.HumanLab.render?.();
+              return {identityBefore,identityDuring,landmarksBefore,landmarksDuring,status:document.getElementById('face-status').textContent,report:api.report()};
+            });
+            if(JSON.stringify(runtime.identityBefore)!==JSON.stringify(runtime.identityDuring))throw new Error('Expression changed structural identity');
+            if(JSON.stringify(runtime.landmarksBefore)!==JSON.stringify(runtime.landmarksDuring))throw new Error('Expression changed identity landmarks');
+            if(!runtime.status.includes('通过'))throw new Error('Visible separation check failed: '+runtime.status);
+            await page.waitForTimeout(400);
+            await page.screenshot({path:'/tmp/face-identity-landmarks-r2.png',fullPage:true});
+            const report={schema:'jarvis/face_identity_browser_qa@1',url:'index.html?review=face',shapeSliders,identityButtons,landmarks:Object.keys(runtime.landmarksDuring.values).length,status:runtime.status,identityPreserved:true,landmarksPreservedAcrossExpression:true,consoleErrors,pageErrors,viewport:[1440,960],browserExecuted:true,gpuAcceptance:false,visualAcceptance:false};
+            fs.writeFileSync('docs/qa/face-identity-landmarks-r2.json',JSON.stringify(report,null,2));
+            await browser.close();
+          })().catch(error=>{console.error(error);process.exit(1);});
+          JS
+          NODE_PATH=/tmp/face-qa/node_modules node /tmp/face-qa/run.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: face-identity-landmarks-r2-screenshot
+          path: /tmp/face-identity-landmarks-r2.png
+          retention-days: 14
+      - name: Refresh audit and recheck
+        run: |
+          node tools/check-pure.mjs
+          python3 tools/audit-files.py
+      - name: Commit verified implementation
+        shell: bash
+        run: |
+          rm -f .github/workflows/face-identity-landmarks-r2.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "face: add structural identity parameters and shared landmarks"
+          git push origin HEAD:feature/human-face-workbench-v1-20260915
