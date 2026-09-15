@@ -1,0 +1,30 @@
+name: Apply Traffic Radial Escape
+
+on:
+  push:
+    branches:
+      - feature/human-task-workbench-adjustment-v2-fullbase
+    paths:
+      - .github/workflows/apply-traffic-radial-escape.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-task-workbench-adjustment-v2-fullbase
+      - name: Apply bounded source patch
+        run: python tools/apply-traffic-radial-escape.py
+      - name: Commit radial escape fix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/apply-traffic-radial-escape.yml tools/apply-traffic-radial-escape.py
+          git add body/NaturalLocomotion.js
+          git commit -m "fix(traffic): add multi-agent radial escape and route rejoin"
+          git push origin HEAD:feature/human-task-workbench-adjustment-v2-fullbase
