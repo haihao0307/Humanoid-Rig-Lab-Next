@@ -139,6 +139,11 @@ try {
   await capture('R92_WHOLE_NEUTRAL_THREE_QUARTER.png');
 } catch (error) {
   fatal = String(error?.stack || error);
+  try {
+    await capture('R92_BROWSER_FAILURE.png');
+  } catch {
+    // Keep the original failure as the authoritative diagnostic.
+  }
 } finally {
   await browser.close();
 }
@@ -153,8 +158,8 @@ const checks = {
   noPageErrors: pageErrors.length === 0,
   noConsoleErrors: consoleErrors.length === 0,
   noFailedRequests: failedRequests.length === 0,
-  candidateMeshesPresent: runtime?.candidateMeshCount === null || runtime.candidateMeshCount > 0,
-  sampledGeometryFinite: runtime?.geometry === null || runtime.geometry.finite === true,
+  candidateMeshesPresent: runtime?.candidateMeshCount == null || runtime.candidateMeshCount > 0,
+  sampledGeometryFinite: runtime?.geometry == null || runtime.geometry.finite === true,
   expectedCapturesWritten: [
     'R92_HEAD_NEUTRAL_LEFT.png',
     'R92_HEAD_NEUTRAL_FRONT.png',
