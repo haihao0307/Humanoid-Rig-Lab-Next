@@ -46,6 +46,13 @@ jobs:
               raise SystemExit('forehead support radius anchor mismatch')
           forehead['radius'][0]=0.049
           recipe_path.write_text(json.dumps(recipe,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
+          test_path=Path('tools/test-face-profile-separation.mjs')
+          test=test_path.read_text(encoding='utf-8')
+          old="cheekIndex=recipe.nodes.findIndex(n=>n.id==='cheekLeft')*3,jawIndex=recipe.nodes.findIndex(n=>n.id==='jawLeft')*3;\nassert(Math.abs(resolved.values[cheekIndex]-.002)<1e-7,'neutral identity residual reaches renderer uniforms');"
+          new="chinIndex=recipe.nodes.findIndex(n=>n.id==='chin')*3,jawIndex=recipe.nodes.findIndex(n=>n.id==='jawLeft')*3;\nassert(Math.abs(resolved.values[chinIndex+1]+.001)<1e-7,'neutral identity residual reaches renderer uniforms');"
+          if test.count(old)!=1:
+              raise SystemExit('structural identity residual assertion anchor mismatch')
+          test_path.write_text(test.replace(old,new,1),encoding='utf-8',newline='\n')
           runtime=Path('source/runtime.template.js')
           text=runtime.read_text(encoding='utf-8')
           old='/*__SOURCE:body/FaceControls.js__*/'
