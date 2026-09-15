@@ -61,7 +61,8 @@ world.population={
  collisionFor:(agent,p,r)=>actors.some(other=>other.agent!==agent&&!other.disposed&&horizontal(p,other.agent.pos)<r+other.human.bodyMetrics.bodyRadiusM+.06),
  sweepFor:(agent,start,end,r)=>actors.filter(other=>other.agent!==agent&&!other.disposed).reduce((fraction,other)=>Math.min(fraction,api.motionCircleSweep(start,end,other.agent.pos,r+other.human.bodyMetrics.bodyRadiusM+.06)),1)
 };
-const debug=(failed,error)=>({failed,error:error.message,frame:frames,bodyRadiusM,corridorHalf,actors:actors.map(actor=>({id:actor.id,position:actor.agent.pos,goal:actor.goal,routeIndex:actor.agent.routeIndex,route:actor.agent.route,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-8)}))});
+const stateRows=()=>actors.map(actor=>({id:actor.id,done:actor.done,position:actor.agent.pos,goal:actor.goal,targetErrorM:horizontal(actor.agent.pos,actor.goal),routeIndex:actor.agent.routeIndex,route:actor.agent.route,command:actor.locomotion.engine.state.command,status:actor.locomotion.engine.state.status,fault:actor.locomotion.engine.state.fault,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-12)}));
+const debug=(failed,error)=>({failed,error:error.message,frame:frames,bodyRadiusM,corridorHalf,actors:stateRows()});
 let minSeparation=Infinity,frames=0;
 for(;frames<10000&&!actors.every(actor=>actor.done);frames++){
  const order=frames%2?actors:[...actors].reverse();
@@ -71,6 +72,7 @@ for(;frames<10000&&!actors.every(actor=>actor.done);frames++){
  }
  minSeparation=Math.min(minSeparation,horizontal(actors[0].agent.pos,actors[1].agent.pos));
 }
+if(!actors.every(actor=>actor.done))console.error('CORRIDOR_FINAL '+JSON.stringify({frames,minSeparation,bodyRadiusM,corridorHalf,actors:stateRows()}));
 assert(actors.every(actor=>actor.done),'both corridor users must complete their original routes');
 for(const actor of actors){assert(horizontal(actor.agent.pos,actor.goal)<.025);assert(!Object.hasOwn(actor.locomotion.traffic,'waitS'));}
 assert(minSeparation>.50,'continuous sweep must retain body clearance');
