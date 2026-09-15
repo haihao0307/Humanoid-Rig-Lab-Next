@@ -58,9 +58,11 @@ for(;frames<12000&&!actors.every(actor=>actor.done);frames++){
  }
  for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++)minSeparation=Math.min(minSeparation,horizontal(actors[i].agent.pos,actors[j].agent.pos));
 }
+const finalRows=actors.map(actor=>({id:actor.id,done:actor.done,position:actor.agent.pos,goal:actor.goal,targetErrorM:horizontal(actor.agent.pos,actor.goal),routeIndex:actor.agent.routeIndex,route:actor.agent.route,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-8)}));
+if(!actors.every(actor=>actor.done)||finalRows.some(row=>row.targetErrorM>=.025))console.error('FOUR_WAY_FINAL '+JSON.stringify({frames,minSeparation,actors:finalRows}));
 assert(actors.every(actor=>actor.done),'all four agents must complete their original routes');
 for(const actor of actors){assert(horizontal(actor.agent.pos,actor.goal)<.025,actor.id+' must reach its original target');assert(!Object.hasOwn(actor.locomotion.traffic,'waitS'));}
 assert(minSeparation>.50,'continuous sweep must prevent body overlap');
-const trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries,0);
+const trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries+(actor.locomotion.traffic.escapes||0),0);
 assert(trafficActions>0,'the crossing must exercise predictive traffic handling');
 console.log(JSON.stringify({passed:true,agents:4,frames,minSeparationM:minSeparation,trafficActions,parkingWait:false}));
