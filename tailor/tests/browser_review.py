@@ -14,21 +14,35 @@ async def main():
     async with async_playwright() as p:
         browser=await p.chromium.launch(headless=True,args=['--use-angle=swiftshader','--enable-unsafe-swiftshader'])
         page=await browser.new_page(viewport={'width':1280,'height':960},device_scale_factor=1)
-        page.set_default_timeout(90000)
-        page.on('console',lambda msg: logs.append({'type':msg.type,'text':msg.text}))
-        page.on('pageerror',lambda error: errors.append(str(error)))
-        page.on('requestfailed',lambda request: requests.append({'url':request.url,'error':request.failure}))
+        def observe(target):
+            target.set_default_timeout(90000)
+            target.on('console',lambda msg: logs.append({'type':msg.type,'text':msg.text}))
+            target.on('pageerror',lambda error: errors.append(str(error)))
+            target.on('requestfailed',lambda request: requests.append({'url':request.url,'error':request.failure}))
+        observe(page)
         try:
             entry=(f"https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/{os.environ['GITHUB_SHA']}/npc-tailor.html" if os.environ.get('REVIEW_ROUTE')=='public' else f'http://127.0.0.1:{server.server_port}/npc-tailor.html')
             response=await page.goto(entry,wait_until='domcontentloaded',timeout=90000)
             tests['entryHTTP200']=response.status==200
             (OUT/'entry-url.txt').write_text(entry)
+            if response.status!=200: raise RuntimeError(f'Entry HTTP {response.status}')
+            gate=page.get_by_text('Open the page',exact=True)
+            if await gate.count():
+                await page.screenshot(path=str(OUT/'host-confirmation.png'),timeout=90000)
+                context=page.context; before=len(context.pages)
+                await gate.click();await page.wait_for_timeout(1000)
+                if len(context.pages)>before:
+                    page=context.pages[-1];observe(page)
+                await page.wait_for_load_state('domcontentloaded',timeout=90000)
+                tests['normalHostConfirmationClicked']=True
+            await page.wait_for_selector('#progress',state='attached',timeout=90000)
             for k in range(240):
                 await asyncio.sleep(2)
-                status=await page.evaluate("({ready:!!window.TailorApp?.ready,progress:document.getElementById('progress')?.textContent})")
+                status=await page.evaluate("({ready:!!window.TailorApp?.ready,progress:document.getElementById('progress')?.textContent,stageError:document.getElementById('bodyFrame')?.contentWindow?.__startupError})")
                 if k%8==0: print('PROGRESS',status,flush=True)
                 if status['ready']: break
                 if errors: raise RuntimeError('; '.join(errors))
+                if status.get('stageError'): raise RuntimeError(str(status['stageError']))
                 if '失败' in (status['progress'] or ''): raise RuntimeError(status['progress'])
             else: raise RuntimeError('NPC fitting initialization timeout')
             report=await page.evaluate('TailorApp.report')
