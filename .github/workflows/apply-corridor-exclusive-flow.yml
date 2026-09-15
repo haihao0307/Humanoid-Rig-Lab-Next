@@ -1,0 +1,30 @@
+name: Apply Corridor Exclusive Flow
+
+on:
+  push:
+    branches:
+      - feature/human-task-workbench-adjustment-v2-fullbase
+    paths:
+      - .github/workflows/apply-corridor-exclusive-flow.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-task-workbench-adjustment-v2-fullbase
+      - name: Apply bounded source patch
+        run: python tools/apply-corridor-exclusive-flow.py
+      - name: Commit exclusive corridor flow
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/apply-corridor-exclusive-flow.yml tools/apply-corridor-exclusive-flow.py
+          git add body/NaturalLocomotion.js
+          git commit -m "fix(traffic): keep corridor ownership exclusive with active circulation"
+          git push origin HEAD:feature/human-task-workbench-adjustment-v2-fullbase
