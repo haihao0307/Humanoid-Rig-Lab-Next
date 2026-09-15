@@ -1,0 +1,41 @@
+name: Apply Traffic Target Fix
+
+on:
+  push:
+    branches:
+      - feature/human-task-workbench-adjustment-v2-fullbase
+    paths:
+      - .github/workflows/apply-traffic-target-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-task-workbench-adjustment-v2-fullbase
+      - name: Apply bounded source edit
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('body/NaturalLocomotion.js')
+          text = path.read_text(encoding='utf-8')
+          old = "if(!trafficSegmentClear(a,root,point,context,{dynamic:false})||a.w.population?.collisionFor(a,point,context.radius))continue;"
+          new = "if(!trafficSegmentClear(a,root,point,context,{dynamic:false})||!this.world.free(point,.23))continue;"
+          if text.count(old) != 1:
+              raise SystemExit('expected exactly one retreat target validation site')
+          path.write_text(text.replace(old,new), encoding='utf-8', newline='\n')
+          Path('.github/workflows/apply-traffic-target-fix.yml').unlink()
+          PY
+      - name: Commit exact fix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add body/NaturalLocomotion.js .github/workflows/apply-traffic-target-fix.yml
+          git commit -m "fix(traffic): validate mobile-yield target through motion world"
+          git push origin HEAD:feature/human-task-workbench-adjustment-v2-fullbase
