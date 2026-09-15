@@ -18,12 +18,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Syntax check
+      - name: Syntax and assembly check
         run: |
           node --check body/NaturalLocomotion.js
           node --check control/NPCPopulation.js
           node --check control/TaskAgent.js
           node --check ui/NPCPopulationControls.js
+          node --check ui/NPCTaskSelectionBridge.js
+          node tools/build-pure.mjs --check
       - name: Task recipient selection
         run: node tools/test-npc-task-selection-bridge.mjs
       - name: Predictive detour and static replan
