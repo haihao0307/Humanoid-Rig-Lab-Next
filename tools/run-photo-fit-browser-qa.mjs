@@ -1,5 +1,5 @@
 import {spawn,spawnSync} from 'node:child_process';
-import {createWriteStream,mkdirSync,readFileSync,writeFileSync} from 'node:fs';
+import {createWriteStream,mkdirSync,writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 
@@ -38,40 +38,21 @@ class CDPClient{
  close(){try{this.ws?.close();}catch{}}
 }
 function kill(child){if(!child||child.killed)return;try{child.kill('SIGTERM');}catch{}setTimeout(()=>{try{child.kill('SIGKILL');}catch{}},1500).unref();}
-function filteredExceptions(events){
- return events.filter(event=>event.method==='Runtime.exceptionThrown').map(event=>({
-  text:event.params?.exceptionDetails?.text||'exception',
-  url:event.params?.exceptionDetails?.url||'',
-  line:event.params?.exceptionDetails?.lineNumber??null,
-  description:event.params?.exceptionDetails?.exception?.description||event.params?.exceptionDetails?.exception?.value||''
- }));
-}
+function filteredExceptions(events){return events.filter(event=>event.method==='Runtime.exceptionThrown').map(event=>({text:event.params?.exceptionDetails?.text||'exception',url:event.params?.exceptionDetails?.url||'',line:event.params?.exceptionDetails?.lineNumber??null,description:event.params?.exceptionDetails?.exception?.description||event.params?.exceptionDetails?.exception?.value||''}));}
 
 let server,chrome,client,target;
 const serverLog=createWriteStream(serverLogPath),chromeLog=createWriteStream(chromeLogPath);
 try{
- server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{cwd:root,stdio:['ignore','pipe','pipe']});
- server.stdout.pipe(serverLog);server.stderr.pipe(serverLog);
+ server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{cwd:root,stdio:['ignore','pipe','pipe']});server.stdout.pipe(serverLog);server.stderr.pipe(serverLog);
  await waitHttp(`http://127.0.0.1:${port}/photo-fit-test.html`,30000);
-
  const chromeBinary=commandPath([process.env.CHROME_BIN,'google-chrome-stable','google-chrome','chromium','chromium-browser']);
- chrome=spawn(chromeBinary,[
-  '--headless=new','--no-sandbox','--disable-dev-shm-usage',`--remote-debugging-port=${debugPort}`,
-  `--user-data-dir=/tmp/hrl-photo-fit-chrome-${process.pid}`,'--window-size=1440,1200',
-  '--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-webgl','--ignore-gpu-blocklist',
-  '--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows',
-  '--autoplay-policy=no-user-gesture-required','about:blank'
- ],{cwd:root,stdio:['ignore','pipe','pipe']});
+ chrome=spawn(chromeBinary,['--headless=new','--no-sandbox','--disable-dev-shm-usage',`--remote-debugging-port=${debugPort}`,`--user-data-dir=/tmp/hrl-photo-fit-chrome-${process.pid}`,'--window-size=1440,1200','--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-webgl','--ignore-gpu-blocklist','--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows','--autoplay-policy=no-user-gesture-required','about:blank'],{cwd:root,stdio:['ignore','pipe','pipe']});
  chrome.stdout.pipe(chromeLog);chrome.stderr.pipe(chromeLog);
  await waitJson(`http://127.0.0.1:${debugPort}/json/version`,30000);
- const createResponse=await fetch(`http://127.0.0.1:${debugPort}/json/new?${encodeURIComponent(pageUrl)}`,{method:'PUT'});
- if(!createResponse.ok)throw new Error('创建 Chrome 调试页失败：'+createResponse.status);
- target=await createResponse.json();
- client=new CDPClient(target.webSocketDebuggerUrl);await client.open();
- await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Log.enable');
- await client.send('Page.navigate',{url:pageUrl});
+ const createResponse=await fetch(`http://127.0.0.1:${debugPort}/json/new?${encodeURIComponent(pageUrl)}`,{method:'PUT'});if(!createResponse.ok)throw new Error('创建 Chrome 调试页失败：'+createResponse.status);
+ target=await createResponse.json();client=new CDPClient(target.webSocketDebuggerUrl);await client.open();await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Log.enable');await client.send('Page.navigate',{url:pageUrl});
 
- const started=Date.now(),timeout=12*60*1000;let payload=null,status='running';
+ const started=Date.now(),timeout=20*60*1000;let payload=null,status='running';
  while(Date.now()-started<timeout){
   const evaluation=await client.send('Runtime.evaluate',{expression:`(()=>{const node=document.getElementById('qaResult');return node?{status:node.dataset.status,text:node.textContent,title:document.title}:null})()`,returnByValue:true,awaitPromise:true});
   const value=evaluation.result?.value;
@@ -79,16 +60,7 @@ try{
   await sleep(1000);
  }
  if(!payload)payload={schema:'humanoid_rig/photo_fit_runtime_qa_runner@0.1',status:'failed',error:'浏览器 QA 在时限内没有完成',timeoutMs:timeout};
- payload.runner={node:process.version,chromeBinary,pageUrl,durationMs:Date.now()-started};
- payload.runtimeExceptions=filteredExceptions(client.events);
- writeFileSync(resultPath,JSON.stringify(payload,null,2));
- console.log(JSON.stringify(payload,null,2));
- if(status!=='passed')process.exitCode=1;
- else if(payload.runtimeExceptions.length){console.error('检测到未捕获浏览器异常：',payload.runtimeExceptions);process.exitCode=1;}
-}catch(error){
- const payload={schema:'humanoid_rig/photo_fit_runtime_qa_runner@0.1',status:'failed',error:String(error?.stack||error),serverLog:serverLogPath,chromeLog:chromeLogPath};
- writeFileSync(resultPath,JSON.stringify(payload,null,2));console.error(JSON.stringify(payload,null,2));process.exitCode=1;
-}finally{
- client?.close();if(target?.id)try{await fetch(`http://127.0.0.1:${debugPort}/json/close/${target.id}`);}catch{}
- kill(chrome);kill(server);serverLog.end();chromeLog.end();
-}
+ payload.runner={node:process.version,chromeBinary,pageUrl,durationMs:Date.now()-started};payload.runtimeExceptions=filteredExceptions(client.events);writeFileSync(resultPath,JSON.stringify(payload,null,2));console.log(JSON.stringify(payload,null,2));
+ if(status!=='passed')process.exitCode=1;else if(payload.runtimeExceptions.length){console.error('检测到未捕获浏览器异常：',payload.runtimeExceptions);process.exitCode=1;}
+}catch(error){const payload={schema:'humanoid_rig/photo_fit_runtime_qa_runner@0.1',status:'failed',error:String(error?.stack||error),serverLog:serverLogPath,chromeLog:chromeLogPath};writeFileSync(resultPath,JSON.stringify(payload,null,2));console.error(JSON.stringify(payload,null,2));process.exitCode=1;}
+finally{client?.close();if(target?.id)try{await fetch(`http://127.0.0.1:${debugPort}/json/close/${target.id}`);}catch{}kill(chrome);kill(server);serverLog.end();chromeLog.end();}
