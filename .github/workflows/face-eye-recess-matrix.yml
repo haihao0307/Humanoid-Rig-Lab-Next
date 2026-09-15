@@ -37,7 +37,6 @@ jobs:
         shell: bash
         env:
           EYE_RECESS: ${{ matrix.recess }}
-          VARIANT_LABEL: ${{ matrix.label }}
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -54,10 +53,7 @@ jobs:
           text=path.read_text(encoding='utf-8')
           if text.count('recess:.0002')!=1:
               raise SystemExit('eye recess anchor mismatch')
-          recess=os.environ['EYE_RECESS']
-          label=os.environ['VARIANT_LABEL']
-          text=text.replace('recess:.0002',f'recess:{recess}',1)
-          text=text.replace("revision:'r13-compact-lid-orbit-blend'",f"revision:'r13-compact-lid-orbit-blend-{label}'",1)
+          text=text.replace('recess:.0002',f"recess:{os.environ['EYE_RECESS']}",1)
           path.write_text(text,encoding='utf-8',newline='\n')
           PY
       - name: Build and validate
