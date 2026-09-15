@@ -30,7 +30,7 @@ const browser = await chromium.launch({
 });
 
 const report = {
-  schema: 'cat_kaopu/v441_browser_qa@1.0',
+  schema: 'cat_kaopu/v441_browser_qa@1.1',
   version: 'V4.41',
   url,
   ready: null,
@@ -60,7 +60,24 @@ try {
     throw new Error(`V4.41 did not enter WebGL2 mode: ${report.ready}`);
   }
 
-  await page.click('[data-view="front"]');
+  const stage = page.locator('#stage');
+  const captureStage = async (key, filename) => {
+    await waitFrames(page, 8);
+    const outputPath = path.join(qaDir, filename);
+    const buffer = await stage.screenshot({ path: outputPath });
+    report.metrics[key] = await page.evaluate(() => window.__CAT_V441_GET_METRICS__());
+    report.screenshots[key] = {
+      path: path.relative(moduleRoot, outputPath),
+      bytes: buffer.length,
+      sha256: sha256(buffer),
+    };
+  };
+  const setView = async (view) => {
+    await page.click(`[data-view="${view}"]`);
+    await waitFrames(page, 6);
+  };
+
+  await setView('front');
   await page.evaluate(() => {
     window.__CAT_V441_SET_SAMPLE__('blink_check', 0.45);
     window.__CAT_V441_SET_CAMERA_TARGET__(0.214, 0, 0.205, 0.34);
@@ -80,28 +97,25 @@ try {
       furEnabled: true,
     });
   });
-  await waitFrames(page, 8);
-
-  const stage = page.locator('#stage');
-  const openPath = path.join(qaDir, 'CAT_KAOPU_V441_EYE_OPEN_FRONT_2026-09-15.png');
-  const openBuffer = await stage.screenshot({ path: openPath });
-  report.metrics.open = await page.evaluate(() => window.__CAT_V441_GET_METRICS__());
-  report.screenshots.open = { path: path.relative(moduleRoot, openPath), bytes: openBuffer.length, sha256: sha256(openBuffer) };
+  await captureStage('open', 'CAT_KAOPU_V441_EYE_OPEN_FRONT_2026-09-15.png');
 
   await page.evaluate(() => window.__CAT_V441_SET_EXPRESSION__({ autoBlink: false, blink: 0.55 }));
-  await waitFrames(page, 8);
-  const halfPath = path.join(qaDir, 'CAT_KAOPU_V441_EYE_HALF_BLINK_FRONT_2026-09-15.png');
-  const halfBuffer = await stage.screenshot({ path: halfPath });
-  report.metrics.half = await page.evaluate(() => window.__CAT_V441_GET_METRICS__());
-  report.screenshots.half = { path: path.relative(moduleRoot, halfPath), bytes: halfBuffer.length, sha256: sha256(halfBuffer) };
+  await captureStage('half', 'CAT_KAOPU_V441_EYE_HALF_BLINK_FRONT_2026-09-15.png');
 
+  await setView('quarter');
+  await captureStage('halfQuarter', 'CAT_KAOPU_V441_EYE_HALF_BLINK_QUARTER_2026-09-15.png');
+
+  await setView('front');
   await page.evaluate(() => window.__CAT_V441_SET_EXPRESSION__({ autoBlink: false, blink: 1 }));
-  await waitFrames(page, 8);
-  const closedPath = path.join(qaDir, 'CAT_KAOPU_V441_EYE_CLOSED_FRONT_2026-09-15.png');
-  const closedBuffer = await stage.screenshot({ path: closedPath });
-  report.metrics.closed = await page.evaluate(() => window.__CAT_V441_GET_METRICS__());
-  report.screenshots.closed = { path: path.relative(moduleRoot, closedPath), bytes: closedBuffer.length, sha256: sha256(closedBuffer) };
+  await captureStage('closed', 'CAT_KAOPU_V441_EYE_CLOSED_FRONT_2026-09-15.png');
 
+  await setView('quarter');
+  await captureStage('closedQuarter', 'CAT_KAOPU_V441_EYE_CLOSED_QUARTER_2026-09-15.png');
+
+  await setView('left');
+  await captureStage('closedLeft', 'CAT_KAOPU_V441_EYE_CLOSED_LEFT_2026-09-15.png');
+
+  await setView('front');
   await page.evaluate(() => {
     window.__CAT_V441_SET_EXPRESSION__({ autoBlink: true, blink: 0, cornea: 0.82, pupilAdapt: 0.42 });
     window.__CAT_V441_SET_SAMPLE__('blink_check', 0.86);
@@ -114,10 +128,16 @@ try {
   report.assertions.noConsoleErrors = report.consoleErrors.length === 0;
   report.assertions.openMetric = (report.metrics.open?.expression?.blink ?? 1) < 0.05;
   report.assertions.halfMetric = Math.abs((report.metrics.half?.expression?.blink ?? -1) - 0.55) < 0.08;
+  report.assertions.halfQuarterMetric = Math.abs((report.metrics.halfQuarter?.expression?.blink ?? -1) - 0.55) < 0.08;
   report.assertions.closedMetric = (report.metrics.closed?.expression?.blink ?? 0) > 0.95;
+  report.assertions.closedQuarterMetric = (report.metrics.closedQuarter?.expression?.blink ?? 0) > 0.95;
+  report.assertions.closedLeftMetric = (report.metrics.closedLeft?.expression?.blink ?? 0) > 0.95;
   report.assertions.autoBlinkPeak = (report.metrics.automaticPeak?.expression?.blink ?? 0) > 0.9;
   report.assertions.openClosedPixelsDiffer = report.screenshots.open.sha256 !== report.screenshots.closed.sha256;
   report.assertions.openHalfPixelsDiffer = report.screenshots.open.sha256 !== report.screenshots.half.sha256;
+  report.assertions.halfClosedPixelsDiffer = report.screenshots.half.sha256 !== report.screenshots.closed.sha256;
+  report.assertions.frontQuarterPixelsDiffer = report.screenshots.closed.sha256 !== report.screenshots.closedQuarter.sha256;
+  report.assertions.frontLeftPixelsDiffer = report.screenshots.closed.sha256 !== report.screenshots.closedLeft.sha256;
   report.assertions.payloadInvariant = await page.evaluate(() => window.__CAT_V441_BASELINE__?.payload === 'CATV440');
   report.assertions.boneCount = await page.evaluate(() => window.__CAT_V441_STATS__?.bones === 34);
 
