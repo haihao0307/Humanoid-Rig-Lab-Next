@@ -9,8 +9,9 @@ export function checkFaceAnatomySources({read=readDefault,assert=assertDefault}=
  const source=read('body/FaceAnatomy.js'),renderer=read('body/CompactWorkbench.js'),manifest=JSON.parse(read('source/assembly.json'));
  new vm.Script(source);
  check(manifest.modules.filter(p=>p==='body/FaceAnatomy.js').length===1,'generator assembled once');
- check(source.includes("revision:'r11-nasal-subunit-continuity'")&&source.includes("id:'upperLidSulcus'")&&source.includes("id:'lowerLidTransition'"),'versioned orbital transition separates broad socket depth from local lid sulci');
+ check(source.includes("revision:'r12-perioral-chin-continuity'")&&source.includes("id:'upperLidSulcus'")&&source.includes("id:'lowerLidTransition'"),'versioned orbital transition separates broad socket depth from local lid sulci');
  check(source.includes('domeX:.0046')&&source.includes('alarGrooveDepth:.00072')&&source.includes('sidewallHeight:.00030'),'nasal tip domes, alar lobules, grooves and sidewalls are explicit bounded subunits');
+ check(source.includes('function compactPerioralDepth')&&source.includes('whiteRollUpper:.00012')&&source.includes('mentalisHeight:.00072'),'philtrum, white roll, labiomental crease and mentalis pad are explicit bounded structures');
  check(manifest.modules.indexOf('body/FaceAnatomy.js')<manifest.modules.indexOf('body/CompactWorkbench.js'),'generator precedes renderer');
  check((read('source/runtime.template.js').match(/__SOURCE:body\/FaceAnatomy\.js__/g)||[]).length===1,'runtime includes generator once');
  check(!/\b(?:document|window|fetch|Worker|localStorage)\b/.test(source),'generator has no external side effects');
@@ -26,9 +27,9 @@ export function checkFaceAnatomyParameters(){
  const add=(a,b)=>a.map((v,i)=>v+b[i]),sub=(a,b)=>a.map((v,i)=>v-b[i]),mul=(a,s)=>a.map(v=>v*s);
  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>mul(a,1/(Math.hypot(...a)||1));
  const context=vm.createContext({add,sub,mul,cross,norm,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),COMPACT_INFLUENCES:8});
- new vm.Script(readDefault('body/EyeAnatomy.js')+'\n'+readDefault('body/FaceAnatomy.js')+'\nglobalThis.api={create:compactCreateFaceAnatomy,sample:compactFaceRaySampler,form:compactFaceFormDepth,outline:compactLipOutline,relief:compactLipReliefDepth,radial:compactLipRadial,opening:compactLipOpening,parameters:COMPACT_FACE_ANATOMY};').runInContext(context);
+ new vm.Script(readDefault('body/EyeAnatomy.js')+'\n'+readDefault('body/FaceAnatomy.js')+'\nglobalThis.api={create:compactCreateFaceAnatomy,sample:compactFaceRaySampler,form:compactFaceFormDepth,perioral:compactPerioralDepth,outline:compactLipOutline,relief:compactLipReliefDepth,radial:compactLipRadial,opening:compactLipOpening,parameters:COMPACT_FACE_ANATOMY};').runInContext(context);
  const api=context.api,rig={jointIds:new Map([['head',7]])};
- const plane={name:'skin',canonicalPositions:Float32Array.from([-.09,1.43,.19,.09,1.43,.19,.09,1.59,.19,-.09,1.59,.19]),indices:Uint16Array.from([0,1,2,0,2,3])};
+ const plane={name:'skin',canonicalPositions:Float32Array.from([-.09,1.40,.19,.09,1.40,.19,.09,1.59,.19,-.09,1.59,.19]),indices:Uint16Array.from([0,1,2,0,2,3])};
  const before=JSON.stringify(plane),front=api.sample([plane]);
  check(Math.abs(front(0,1.5)-.19)<1e-7,'barycentric source depth');
  check(front(.1,1.5)===null,'outside ray remains missing');
@@ -54,6 +55,12 @@ export function checkFaceAnatomyParameters(){
  const nose=api.parameters.nose;check(n.ry>n.rx*.5&&n.ry<n.rx*.7,'nostril aperture is oval rather than a horizontal slit');
  check(nose.domeHeight>nose.tipHeight&&nose.alarGrooveDepth>0&&nose.alarHeight>nose.alarGrooveDepth,'tip, ala and alar groove retain ordered bounded amplitudes');
  check(nose.knots.every((row,i,all)=>i===0||row[0]>all[i-1][0])&&nose.knots.every(row=>row[2]>.008&&row[2]<.020),'nasal profile rails are ordered and bounded');
+ const lips=api.parameters.lips,centre=api.outline(lips.centreX),peak=api.outline(lips.centreX+lips.halfWidth*.18),centralHeight=centre.top-centre.bottom;
+ check(lips.halfWidth>.023&&lips.halfWidth<.025&&centralHeight>.007&&centralHeight<.009,'neutral mouth width and central vermilion height remain bounded');
+ check(peak.top>centre.top&&centre.bottom>peak.bottom,'Cupid bow and lower-lip belly remain distinct without an inflated uniform ring');
+ check(api.relief(0,0,true)<.0021&&api.relief(0,0,false)<.0021,'neutral free-edge projection remains below the former swollen candidate');
+ check(api.perioral(-api.parameters.perioral.ridgeX,api.parameters.perioral.philtrumY)>0&&api.perioral(0,api.parameters.perioral.philtrumY)<0,'philtral ridges flank a central groove');
+ check(api.perioral(0,api.parameters.perioral.labiomentalY)<0&&api.perioral(0,api.parameters.perioral.mentalisY)>0,'labiomental crease separates lower lip support from the mentalis pad');
  check(full.report.nostrilFrames.length===2&&full.report.nostrilFrames.every(f=>f.rimVertices>=16),'both nasal openings have tessellated rims');
  check(full.meshes.find(m=>m.name==='faceBrow').triangles===2*api.parameters.brow.strandsPerSide*api.parameters.brow.segments*2,'individual fibre topology');
  check(api.form(.5,1.5)===0,'secondary forms have bounded support');

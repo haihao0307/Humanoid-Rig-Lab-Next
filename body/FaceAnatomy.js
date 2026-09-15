@@ -1,15 +1,19 @@
 /* Dense, source-fitted facial skin with authored secondary anatomical forms.
  * The temporary grid and fibres are generated at upload; only these parameters
  * persist. This is a geometric refinement, not measured anatomy or a scan. */
-const COMPACT_FACE_ANATOMY={revision:'r11-nasal-subunit-continuity',columns:160,rows:152,
-  bounds:[-.073,.072,1.433,1.575],ellipse:[-.0005,1.506,.068,.067],
+const COMPACT_FACE_ANATOMY={revision:'r12-perioral-chin-continuity',columns:160,rows:176,
+  bounds:[-.073,.072,1.425,1.579],ellipse:[-.0005,1.503,.069,.073],
   smoothingRadiusM:.0045,nostrils:{x:.0090,y:1.4778,rx:.00345,ry:.00205,tilt:.16,depth:.0052},
-  lips:{centreX:-.0006,halfWidth:.0255,seamY:1.4586,apron:1.75,innerDepth:.0032,columns:160,rings:36,
+  lips:{centreX:-.0006,halfWidth:.0244,seamY:1.4587,apron:1.36,innerDepth:.0027,columns:160,rings:36,
     // Authored landmarks and sectional rails, visually informed by VAA and Ten24.
     // Rows: abs(horizontal parameter), fissure, upper border, lower border (m).
-    outline:[[0,-.00085,.0043,-.0064],[.22,-.00035,.0050,-.0064],[.45,.00030,.0041,-.0056],[.70,.00006,.0025,-.0036],[.88,-.00030,.00075,-.00165],[1,-.00045,-.00045,-.00045]],
-    upperSection:[[0,.0023],[.20,.00255],[.50,.00235],[.85,.00190],[1,.00165],[1.75,0]],
-    lowerSection:[[0,.0023],[.20,.0032],[.50,.0038],[.75,.0038],[1,.0030],[1.75,0]]},
+    outline:[[0,-.00035,.00325,-.00460],[.18,.00015,.00395,-.00475],[.38,.00045,.00355,-.00420],[.62,.00015,.00245,-.00320],[.82,-.00010,.00110,-.00190],[.94,-.00022,.00018,-.00065],[1,-.00028,-.00028,-.00028]],
+    upperSection:[[0,.00155],[.18,.00175],[.45,.00162],[.78,.00130],[1,.00100],[1.08,.00100],[1.20,.00050],[1.36,0]],
+    lowerSection:[[0,.00155],[.20,.00195],[.48,.00220],[.75,.00205],[1,.00145],[1.10,.00078],[1.24,.00032],[1.36,0]],
+    whiteRollUpper:.00012,whiteRollLower:.00005,whiteRollCentre:1.045,whiteRollWidth:.065},
+  perioral:{philtrumY:1.4690,ridgeX:.0032,ridgeRx:.0021,ridgeRy:.0090,ridgeHeight:.00030,grooveRx:.0035,grooveRy:.0095,grooveDepth:.00022,
+    labiomentalY:1.4450,labiomentalRx:.0230,labiomentalRy:.0048,labiomentalDepth:.00038,
+    mentalisY:1.4355,mentalisRx:.0210,mentalisRy:.0060,mentalisHeight:.00072},
   nose:{knots:[[1.465,.1900,.0135],[1.471,.1905,.0125],[1.476,.1930,.0100],[1.481,.1990,.0088],[1.486,.2035,.0088],[1.490,.2025,.0092],[1.496,.1985,.0102],[1.506,.1930,.0115],[1.518,.1870,.0125],[1.530,.1810,.0150],[1.538,.1780,.0190]],
     underturn:[[1.465,0],[1.471,.0004],[1.476,.0014],[1.480,-.0021],[1.486,-.0008],[1.494,0]],underturnWidth:.0225,underturnCentreWeight:.30,columellaDrop:.0016,
     tipY:1.486,tipRx:.0105,tipRy:.0072,tipHeight:.00035,domeX:.0046,domeRx:.0048,domeRy:.0058,domeHeight:.00125,
@@ -27,11 +31,11 @@ const COMPACT_FACE_ANATOMY={revision:'r11-nasal-subunit-continuity',columns:160,
 function compactFaceRaySampler(meshes){
   const bins=new Map(),size=.004;
   for(const m of meshes){if(m.name!=='skin')continue;const p=m.canonicalPositions;
-    for(let k=0;k<m.indices.length;k+=3){const ia=m.indices[k]*3,ib=m.indices[k+1]*3,ic=m.indices[k+2]*3;if(Math.max(p[ia+1],p[ib+1],p[ic+1])<1.425||Math.min(p[ia+1],p[ib+1],p[ic+1])>1.58||Math.max(p[ia+2],p[ib+2],p[ic+2])<.12)continue;const a=Array.from(p.subarray(ia,ia+3)),b=Array.from(p.subarray(m.indices[k+1]*3,m.indices[k+1]*3+3)),c=Array.from(p.subarray(m.indices[k+2]*3,m.indices[k+2]*3+3));
+    for(let k=0;k<m.indices.length;k+=3){const ia=m.indices[k]*3,ib=m.indices[k+1]*3,ic=m.indices[k+2]*3;if(Math.max(p[ia+1],p[ib+1],p[ic+1])<1.420||Math.min(p[ia+1],p[ib+1],p[ic+1])>1.58||Math.max(p[ia+2],p[ib+2],p[ic+2])<.12)continue;const a=Array.from(p.subarray(ia,ia+3)),b=Array.from(p.subarray(m.indices[k+1]*3,m.indices[k+1]*3+3)),c=Array.from(p.subarray(m.indices[k+2]*3,m.indices[k+2]*3+3));
       const loX=Math.min(a[0],b[0],c[0]),hiX=Math.max(a[0],b[0],c[0]),loY=Math.min(a[1],b[1],c[1]),hiY=Math.max(a[1],b[1],c[1]);
-      if(loX>.08||hiX<-.08||loY>1.58||hiY<1.425||Math.max(a[2],b[2],c[2])<.12)continue;
+      if(loX>.08||hiX<-.08||loY>1.58||hiY<1.420||Math.max(a[2],b[2],c[2])<.12)continue;
       const den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);if(Math.abs(den)<1e-13)continue;
-      const tri={a,b,c,den};for(let i=Math.floor(Math.max(-.08,loX)/size);i<=Math.floor(Math.min(.08,hiX)/size);i++)for(let j=Math.floor(Math.max(1.425,loY)/size);j<=Math.floor(Math.min(1.58,hiY)/size);j++){const key=i+'/'+j,list=bins.get(key)||[];list.push(tri);bins.set(key,list);}
+      const tri={a,b,c,den};for(let i=Math.floor(Math.max(-.08,loX)/size);i<=Math.floor(Math.min(.08,hiX)/size);i++)for(let j=Math.floor(Math.max(1.420,loY)/size);j<=Math.floor(Math.min(1.58,hiY)/size);j++){const key=i+'/'+j,list=bins.get(key)||[];list.push(tri);bins.set(key,list);}
     }
   }
   return (x,y)=>{let best=null;for(const {a,b,c,den} of bins.get(Math.floor(x/size)+'/'+Math.floor(y/size))||[]){const u=((b[1]-c[1])*(x-c[0])+(c[0]-b[0])*(y-c[1]))/den,v=((c[1]-a[1])*(x-c[0])+(a[0]-c[0])*(y-c[1]))/den;if(u<-.000001||v<-.000001||u+v>1.000001)continue;const z=u*a[2]+v*b[2]+(1-u-v)*c[2];if(z>.12)best=Math.max(best??-Infinity,z);}return best;};
@@ -40,6 +44,17 @@ function compactFaceFormDepth(x,y){
   let depth=0;for(const f of COMPACT_FACE_ANATOMY.forms){const r=Math.hypot((x-f.x)/f.rx,(y-f.y)/f.ry);if(r<1)depth+=f.z*(1-r)**4*(1+4*r);}
   const n=COMPACT_FACE_ANATOMY.nostrils;for(const side of [-1,1]){const r=Math.hypot((x-side*n.x)/n.rx,(y-n.y-n.tilt*(side*x-n.x))/n.ry);if(r<2.5)depth+=.00040*Math.exp(-(((r-1.18)/.48)**2));}
   return depth;
+}
+function compactFaceBump(x,y,cx,cy,rx,ry,amplitude){
+  const r=Math.hypot((x-cx)/rx,(y-cy)/ry);return r<1?amplitude*(1-r)**4*(1+4*r):0;
+}
+function compactPerioralDepth(x,y){
+  const p=COMPACT_FACE_ANATOMY.perioral;
+  const ridges=compactFaceBump(x,y,-p.ridgeX,p.philtrumY,p.ridgeRx,p.ridgeRy,p.ridgeHeight)+compactFaceBump(x,y,p.ridgeX,p.philtrumY,p.ridgeRx,p.ridgeRy,p.ridgeHeight);
+  const groove=compactFaceBump(x,y,0,p.philtrumY,p.grooveRx,p.grooveRy,-p.grooveDepth);
+  const crease=compactFaceBump(x,y,0,p.labiomentalY,p.labiomentalRx,p.labiomentalRy,-p.labiomentalDepth);
+  const chin=compactFaceBump(x,y,0,p.mentalisY,p.mentalisRx,p.mentalisRy,p.mentalisHeight);
+  return ridges+groove+crease+chin;
 }
 // Shape-preserving cubic rails retain the intended peaks without overshoot.
 function compactLipTangent(rows,i,k,freeSlope=false,endSlope=false){
@@ -63,11 +78,13 @@ function compactLipOutline(x){
 // contact, while dz/dr stays positive. It joins the returning inner lip.
 function compactLipRadial(r){const width=.16;if(r>=width)return r;const t=r/width;return width*(2*t*t-t*t*t);}
 function compactLipReliefDepth(u,t,upper){
-  const p=COMPACT_FACE_ANATOMY.lips,r=t*p.apron,envelope=Math.pow(Math.max(0,1-u*u),.72);
+  const p=COMPACT_FACE_ANATOMY.lips,r=t*p.apron,envelope=Math.pow(Math.max(0,1-u*u),.82);
   const base=compactLipCurve(upper?p.upperSection:p.lowerSection,r,1,true);
-  const pad=upper?Math.exp(-((u/.20)**2)):Math.exp(-(((Math.abs(u)-.30)/.24)**2));
-  const swell=(upper?.00055:.00035)*pad*Math.sin(Math.PI*Math.min(1,r))*Math.max(0,1-r);
-  return envelope*(base+swell);
+  const pad=upper?Math.exp(-((u/.22)**2)):Math.exp(-(((Math.abs(u)-.28)/.25)**2));
+  const swell=(upper?.00034:.00018)*pad*Math.sin(Math.PI*Math.min(1,r))*Math.max(0,1-r);
+  const attach=clamp((p.apron-r)/(p.apron-p.whiteRollCentre),0,1),attachGate=attach*attach*(3-2*attach);
+  const whiteRoll=(upper?p.whiteRollUpper:p.whiteRollLower)*Math.exp(-(((r-p.whiteRollCentre)/p.whiteRollWidth)**2))*Math.pow(Math.max(0,1-u*u),1.25)*attachGate;
+  return envelope*(base+swell)+whiteRoll;
 }
 // The nasal base turns beneath the tip. Its parameter y is deliberately not
 // the displayed y: an undercut can have several depths at one front projection.
@@ -116,7 +133,7 @@ function compactCreateFaceAnatomy(meshes,rig,scale){
   // Remove the inherited lip ridge before constructing vermilion. A bounded
   // Hermite bed preserves the top/bottom skin tangents and the lateral face.
   const oralHeight=height.slice(),readOral=(x,y)=>{const u=clamp((x-x0)/dx,0,nx-.00001),v=clamp((y-y0)/dy,0,ny-.00001),i=Math.floor(u),j=Math.floor(v),a=u-i,b=v-j;return (oralHeight[at(i,j)]*(1-a)+oralHeight[at(i+1,j)]*a)*(1-b)+(oralHeight[at(i,j+1)]*(1-a)+oralHeight[at(i+1,j+1)]*a)*b;};
-  const oralLo=1.440,oralHi=1.474,oralSpan=oralHi-oralLo;
+  const oralLo=1.433,oralHi=1.476,oralSpan=oralHi-oralLo;
   // Average the attachment profiles laterally so source triangle gradients do
   // not become vertical bands across the new perioral support.
   const oralProfile=x=>{const row=[0,0,0,0];let total=0;for(let k=-5;k<=5;k++){const xx=x+k*dx,w=Math.exp(-.5*(k*dx/.0023)**2),e=.001;
@@ -130,10 +147,14 @@ function compactCreateFaceAnatomy(meshes,rig,scale){
       const v=clamp(Math.min((y-oralLo)/.011,(oralHi-y)/.011),0,1),blend=u*u*(3-2*u)*v*v*(3-2*v);
       height[at(i,j)]+=(bed-height[at(i,j)])*blend;
     }}
-  // A small shared commissure depression recesses the joining lips into skin.
+  // Reapply bounded philtral, labiomental and mentalis volumes after the
+  // inherited oral ridge has been replaced by its smooth attachment bed.
+  for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){const x=x0+i*dx,y=y0+j*dy;height[at(i,j)]+=compactPerioralDepth(x,y);}
+  // The oral commissures are shallow three-dimensional insertions, not two
+  // sharp lip wedges meeting at a black point.
   for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){
-    const x=x0+i*dx,y=y0+j*dy,q=compactLipOutline(x),r=Math.hypot((Math.abs(x-p.lips.centreX)-p.lips.halfWidth*.98)/.0035,(y-q.seam)/.0026);
-    if(r<1)height[at(i,j)]-=.00055*Math.pow(1-r,4)*(1+4*r);
+    const x=x0+i*dx,y=y0+j*dy,q=compactLipOutline(x),r=Math.hypot((Math.abs(x-p.lips.centreX)-p.lips.halfWidth*.975)/.0044,(y-q.seam)/.0033);
+    if(r<1)height[at(i,j)]-=.00034*Math.pow(1-r,4)*(1+4*r);
   }
   const surface=(x,y)=>{const u=clamp((x-x0)/dx,0,nx-.00001),v=clamp((y-y0)/dy,0,ny-.00001),i=Math.floor(u),j=Math.floor(v),a=u-i,b=v-j;return (height[at(i,j)]*(1-a)+height[at(i+1,j)]*a)*(1-b)+(height[at(i,j+1)]*(1-a)+height[at(i+1,j+1)]*a)*b;};
   const facePoint=(x,y)=>[x,y+compactNasalUnderturn(x,y),surface(x,y)],faceNormal=(x,y)=>{const e=.00012;return norm(cross(sub(facePoint(x+e,y),facePoint(x-e,y)),sub(facePoint(x,y+e),facePoint(x,y-e))));};
@@ -166,7 +187,7 @@ function compactCreateFaceAnatomy(meshes,rig,scale){
   output.push(compactFaceGeneratedMesh('noseInterior',cavityP,cavityN,cavityI,head,scale));
   // Continuous upper and lower vermilion, with a narrow recessed closure line.
   const lp=p.lips,lipP=[],lipN=[],lipI=[],mouthP=[],mouthN=[],mouthI=[];
-  const lipSurface=(x,upper,t)=>{const q=compactLipOutline(x),edge=upper?q.top:q.bottom,r=compactLipRadial(lp.apron*t),y=q.seam+(edge-q.seam)*r+(upper?1:-1)*.000035*Math.min(1,(q.top-q.bottom)/.004)*(1-3*t*t+2*t*t*t);
+  const lipSurface=(x,upper,t)=>{const q=compactLipOutline(x),edge=upper?q.top:q.bottom,r=compactLipRadial(lp.apron*t),y=q.seam+(edge-q.seam)*r+(upper?1:-1)*.000008*Math.min(1,(q.top-q.bottom)/.004)*(1-3*t*t+2*t*t*t);
     const z=surface(x,y)+compactLipReliefDepth(q.u,t,upper)+.000015;
     return [x,y,z];};
   for(const upper of [true,false]){const start=lipP.length/3;
@@ -178,7 +199,7 @@ function compactCreateFaceAnatomy(meshes,rig,scale){
   // The inner return follows a quarter-ellipse, with geometric normals and a
   // shared free-edge tangent instead of the former flat, constant-normal strip.
   for(const upper of [true,false]){const start=lipP.length/3,rows=10;
-    const innerPoint=(x,t)=>{const q=compactLipOutline(x),a=lipSurface(x,upper,0),angle=t*Math.PI/2,sign=upper?1:-1;return [x,a[1]+sign*.0008*q.envelope*(1-Math.cos(angle)),a[2]-lp.innerDepth*q.envelope*Math.sin(angle)];};
+    const innerPoint=(x,t)=>{const q=compactLipOutline(x),a=lipSurface(x,upper,0),angle=t*Math.PI/2,sign=upper?1:-1;return [x,a[1]+sign*.00055*q.envelope*(1-Math.cos(angle)),a[2]-lp.innerDepth*q.envelope*Math.sin(angle)];};
     for(let i=0;i<=lp.columns;i++)for(let j=0;j<=rows;j++){
       const x=lp.centreX+lp.halfWidth*(-.998+1.996*i/lp.columns),t=j/rows,e=.00005,a=sub(innerPoint(x+e,t),innerPoint(x-e,t)),b=sub(innerPoint(x,Math.min(1,t+.0001)),innerPoint(x,Math.max(0,t-.0001)));
       let normal=norm(cross(b,a));if(!upper)normal=mul(normal,-1);lipP.push(...innerPoint(x,t));lipN.push(...compactEyeEncodeNormal(normal));
@@ -202,7 +223,7 @@ function compactCreateFaceAnatomy(meshes,rig,scale){
     for(let k=0;k<b.segments;k++){const a=base+k*2;browI.push(a,a+1,a+2,a+1,a+3,a+2);}
   }
   output.push(compactFaceGeneratedMesh('faceBrow',browP,browN,browI,head,scale));
-  return {meshes:output,report:{revision:p.revision,grid:[nx+1,ny+1],sourceSamples:observed,forms:p.forms.length,nostrilFrames,nasalUnderturn:true,innerVermilion:true,lipSectionRails:true,roundedInnerReturn:true,triangles:output.reduce((s,m)=>s+m.triangles,0),sourceCoefficientsModified:false,measuredAnatomy:false}};
+  return {meshes:output,report:{revision:p.revision,grid:[nx+1,ny+1],sourceSamples:observed,forms:p.forms.length,nostrilFrames,nasalUnderturn:true,innerVermilion:true,lipSectionRails:true,roundedInnerReturn:true,perioralContinuity:true,philtrum:true,labiomentalCrease:true,mentalisPad:true,triangles:output.reduce((s,m)=>s+m.triangles,0),sourceCoefficientsModified:false,measuredAnatomy:false}};
 }
 function compactLipShapeShader(){
   const p=COMPACT_FACE_ANATOMY.lips,rows=p.outline,vec=a=>'vec3('+a.map(v=>v.toFixed(9)).join(',')+')';
@@ -282,7 +303,7 @@ function compactFaceSurfaceShader(){
   void compactFaceSurfaceMask(vec3 p){
     if(compactFaceSkinMode<.5||p.z<.13)return;
     float r=length((p.xy-vec2(${x},${y}))/vec2(${rx},${ry}));
-    if(compactFaceSkinMode<1.5&&r<.94)discard;
+    if(compactFaceSkinMode<1.5&&r<.985)discard;
     if(compactFaceSkinMode>1.5&&r>1.)discard;
     vec4 q=compactLipShape(p);
     if(abs(q.x)<1.&&p.z>.16&&p.y<q.y+q.z*${p.lips.apron}&&p.y>q.y-q.w*${p.lips.apron})discard;
