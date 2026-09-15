@@ -1,0 +1,209 @@
+from pathlib import Path
+
+
+def replace_text(path: str, old: str, new: str, label: str) -> None:
+    file = Path(path)
+    text = file.read_text(encoding="utf-8")
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f"{label}: expected one match, got {count}")
+    file.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+
+
+eye_header = """const COMPACT_EYE_ANATOMY={revision:'r11-resting-globe-lid-balance',recess:.0002,blinkRetractionM:.0010,segments:96,rings:24,
+  left:{centre:[.029181616,1.518095373,.152055491],radius:.012623681},
+  right:{centre:[-.030466569,1.518094244,.151979130],radius:.012591195}};
+"""
+eye_header_new = """const COMPACT_EYE_ANATOMY={revision:'r12-neutral-fissure-orbital-continuity',recess:.0002,blinkRetractionM:.0010,segments:96,rings:24,
+  fissure:{halfWidth:.0128,upperHeight:.00415,lowerHeight:.00315,lateralCanthusLift:.00070,upperTemporalBias:.08,lowerTemporalBias:.04,verticalRoundness:.16,lowerSulcusM:.00030},
+  left:{centre:[.029181616,1.518095373,.152055491],radius:.012623681},
+  right:{centre:[-.030466569,1.518094244,.151979130],radius:.012591195}};
+function compactEyeNeutralFissure(angle,side){
+  const p=COMPACT_EYE_ANATOMY.fissure,c=Math.cos(angle),s=Math.sin(angle),vertical=Math.abs(s),lateral=c*(side==='left'?1:-1),canthus=vertical*vertical;
+  const height=s>=0?p.upperHeight*(1+p.upperTemporalBias*lateral):p.lowerHeight*(1-p.lowerTemporalBias*lateral);
+  const y=(s>=0?1:-1)*height*vertical*(1-p.verticalRoundness+p.verticalRoundness*vertical)+p.lateralCanthusLift*lateral*(1-canthus);
+  return [p.halfWidth*c,y];
+}
+"""
+replace_text("body/EyeAnatomy.js", eye_header, eye_header_new, "eye anatomy header")
+
+replace_text(
+    "body/EyeAnatomy.js",
+    """  const c=Math.cos(angle),s=Math.sin(angle),canthus=s*s,lateral=c*(side==='left'?1:-1),tilt=.00055*lateral*canthus;
+  const ex=.0124*c,restY=(s>=0?.0045:.0027)*s*(.90+.10*Math.abs(s))*(1+(s>=0?-.12:.10)*lateral)+tilt;
+""",
+    """  const c=Math.cos(angle),s=Math.sin(angle),canthus=s*s,lateral=c*(side==='left'?1:-1),neutral=compactEyeNeutralFissure(angle,side);
+  const ex=neutral[0],restY=neutral[1];
+""",
+    "CPU neutral fissure",
+)
+
+replace_text(
+    "body/EyeAnatomy.js",
+    """  const envelope=16*t2*(1-t)*(1-t),fold=-.00065*Math.max(0,s)*Math.exp(-(((t-.58)/.12)**2))*envelope*(1-state[2])**2;
+  let depth=(2*t3-3*t2+1)*inner+(t3-2*t2+t)*m0+(-2*t3+3*t2)*(outer[2]+.00004)+(t3-t2)*m1+.00008*envelope+fold;
+""",
+    """  const p=COMPACT_EYE_ANATOMY.fissure,envelope=16*t2*(1-t)*(1-t),upperFold=-.00065*Math.max(0,s)*Math.exp(-(((t-.58)/.12)**2))*envelope*(1-state[2])**2;
+  const lowerSulcus=-p.lowerSulcusM*Math.max(0,-s)*Math.exp(-(((t-.58)/.17)**2))*envelope*(1-.55*state[2]),fold=upperFold+lowerSulcus;
+  let depth=(2*t3-3*t2+1)*inner+(t3-2*t2+t)*m0+(-2*t3+3*t2)*(outer[2]+.00004)+(t3-t2)*m1+.00008*envelope+fold;
+""",
+    "CPU lower lid sulcus",
+)
+
+replace_text(
+    "body/EyeAnatomy.js",
+    """      const lateral=c*(side==='left'?1:-1);edge.push([.0124*c,(s>=0?.0045:.0027)*s*(.90+.10*Math.abs(s))*(1+(s>=0?-.12:.10)*lateral)+.00055*lateral*s*s]);
+""",
+    """      edge.push(compactEyeNeutralFissure(angle,side));
+""",
+    "generated neutral edge",
+)
+
+replace_text(
+    "body/EyeAnatomy.js",
+    """  float c=cos(angle),s=sin(angle),canthus=s*s,lateral=c*(compactEyeSide<.5?1.:-1.),tilt=.00055*lateral*canthus;
+  float ex=.0124*c,restY=(s>=0.?.0045:.0027)*s*(.90+.10*abs(s))*(1.+(s>=0.?-.12:.10)*lateral)+tilt;
+""",
+    """  float c=cos(angle),s=sin(angle),vertical=abs(s),canthus=vertical*vertical,lateral=c*(compactEyeSide<.5?1.:-1.);
+  float cornerLift=${COMPACT_EYE_ANATOMY.fissure.lateralCanthusLift.toFixed(6)}*lateral*(1.-canthus);
+  float height=s>=0.?${COMPACT_EYE_ANATOMY.fissure.upperHeight.toFixed(6)}*(1.+${COMPACT_EYE_ANATOMY.fissure.upperTemporalBias.toFixed(6)}*lateral):${COMPACT_EYE_ANATOMY.fissure.lowerHeight.toFixed(6)}*(1.-${COMPACT_EYE_ANATOMY.fissure.lowerTemporalBias.toFixed(6)}*lateral);
+  float ex=${COMPACT_EYE_ANATOMY.fissure.halfWidth.toFixed(6)}*c,restY=(s>=0.?1.:-1.)*height*vertical*${(1-COMPACT_EYE_ANATOMY.fissure.verticalRoundness).toFixed(6)}+cornerLift;
+  restY+=(s>=0.?1.:-1.)*height*vertical*${COMPACT_EYE_ANATOMY.fissure.verticalRoundness.toFixed(6)}*vertical;
+""",
+    "GLSL neutral fissure",
+)
+
+replace_text(
+    "body/EyeAnatomy.js",
+    """  float envelope=16.*t2*(1.-t)*(1.-t),fold=-.00065*max(0.,s)*exp(-pow((t-.58)/.12,2.))*envelope*(1.-blink)*(1.-blink);
+  float depth=(2.*t3-3.*t2+1.)*inner+(t3-2.*t2+t)*m0+(-2.*t3+3.*t2)*(outer.z+.00004)+(t3-t2)*m1+.00008*envelope+fold;
+""",
+    """  float envelope=16.*t2*(1.-t)*(1.-t),upperFold=-.00065*max(0.,s)*exp(-pow((t-.58)/.12,2.))*envelope*(1.-blink)*(1.-blink);
+  float lowerSulcus=-${COMPACT_EYE_ANATOMY.fissure.lowerSulcusM.toFixed(6)}*max(0.,-s)*exp(-pow((t-.58)/.17,2.))*envelope*(1.-.55*blink),fold=upperFold+lowerSulcus;
+  float depth=(2.*t3-3.*t2+1.)*inner+(t3-2.*t2+t)*m0+(-2.*t3+3.*t2)*(outer.z+.00004)+(t3-t2)*m1+.00008*envelope+fold;
+""",
+    "GLSL lower lid sulcus",
+)
+
+replace_text(
+    "body/FaceAnatomy.js",
+    "const COMPACT_FACE_ANATOMY={revision:'r7-model-referenced-lip-sections',columns:160,rows:152,",
+    "const COMPACT_FACE_ANATOMY={revision:'r8-orbital-continuity',columns:160,rows:152,",
+    "face anatomy revision",
+)
+
+replace_text(
+    "body/FaceAnatomy.js",
+    """      {id:'orbitalTransition',x:side*.030,y:1.532,rx:.026,ry:.016,z:-.0016},
+      {id:'infraorbitalTransition',x:side*.030,y:1.505,rx:.025,ry:.015,z:-.0013},
+      {id:'malarVolume',x:side*.037,y:1.493,rx:.021,ry:.014,z:.0009},
+      {id:'philtralColumn',x:side*.0028,y:1.470,rx:.0025,ry:.007,z:.00020}
+""",
+    """      {id:'orbitalTransition',x:side*.030,y:1.532,rx:.028,ry:.017,z:-.00095},
+      {id:'upperLidSulcus',x:side*.030,y:1.536,rx:.022,ry:.009,z:-.00035},
+      {id:'infraorbitalTransition',x:side*.030,y:1.505,rx:.027,ry:.016,z:-.00070},
+      {id:'lowerLidTransition',x:side*.030,y:1.502,rx:.024,ry:.009,z:-.00025},
+      {id:'malarVolume',x:side*.037,y:1.493,rx:.022,ry:.015,z:.00075},
+      {id:'philtralColumn',x:side*.0028,y:1.470,rx:.0025,ry:.007,z:.00020}
+""",
+    "periorbital forms",
+)
+
+replace_text(
+    "tools/check-eye-anatomy.mjs",
+    """  check(/function compactCreateEyeLids\\(/.test(source)&&/function compactEyeSkinSampler\\(/.test(source),'procedural geometry and neutral aperture sampling are explicit functions');
+""",
+    """  check(/function compactCreateEyeLids\\(/.test(source)&&/function compactEyeSkinSampler\\(/.test(source),'procedural geometry and neutral aperture sampling are explicit functions');
+  check(source.includes("revision:'r12-neutral-fissure-orbital-continuity'")&&source.includes('function compactEyeNeutralFissure')&&source.includes('lateralCanthusLift:.00070'),'neutral fissure has an explicit versioned canthus-aware model');
+  check(source.includes('lowerSulcus=-p.lowerSulcusM')&&source.includes('lowerSulcus=-${COMPACT_EYE_ANATOMY.fissure.lowerSulcusM.toFixed(6)}'),'CPU and shader include the same bounded lower-lid transition');
+""",
+    "eye source contracts",
+)
+
+replace_text(
+    "tools/check-eye-anatomy.mjs",
+    """  new vm.Script(read('body/EyeAnatomy.js')+'\\n;globalThis.eyeFixtureAPI={create:compactCreateEyeLids,sampler:compactEyeSkinSampler,patch:compactEyePatchPoint,contact:compactEyeContactDepth,anatomy:COMPACT_EYE_ANATOMY,shader:COMPACT_EYE_LID_GLSL};',{filename:'isolated-eye-parameter-functions'}).runInContext(context,{timeout:1000});
+""",
+    """  new vm.Script(read('body/EyeAnatomy.js')+'\\n;globalThis.eyeFixtureAPI={create:compactCreateEyeLids,sampler:compactEyeSkinSampler,patch:compactEyePatchPoint,contact:compactEyeContactDepth,fissure:compactEyeNeutralFissure,anatomy:COMPACT_EYE_ANATOMY,shader:COMPACT_EYE_LID_GLSL};',{filename:'isolated-eye-parameter-functions'}).runInContext(context,{timeout:1000});
+""",
+    "fixture API",
+)
+
+replace_text(
+    "tools/check-eye-anatomy.mjs",
+    """  const api=context.eyeFixtureAPI,frames=Object.fromEntries(['left','right'].map(side=>[side,{centre:add(Array.from(api.anatomy[side].centre),[0,0,.00925]),u:[1,0,0],v:[0,1,0],n:[0,0,1]}]));
+  const contactGlobe=[0,0,-.00925,api.anatomy.left.radius];
+""",
+    """  const api=context.eyeFixtureAPI,frames=Object.fromEntries(['left','right'].map(side=>[side,{centre:add(Array.from(api.anatomy[side].centre),[0,0,.00925]),u:[1,0,0],v:[0,1,0],n:[0,0,1]}]));
+  const leftTemporal=api.fissure(0,'left'),leftMedial=api.fissure(Math.PI,'left'),rightTemporal=api.fissure(Math.PI,'right'),rightMedial=api.fissure(0,'right');
+  const top=api.fissure(Math.PI/2,'left'),bottom=api.fissure(Math.PI*1.5,'left'),width=(leftTemporal[0]-leftMedial[0])*1000,height=(top[1]-bottom[1])*1000;
+  check(width>25&&width<27,'neutral fissure width remains in the authored human-scale range');
+  check(height>7&&height<8,'neutral fissure height remains in the authored human-scale range');
+  check(leftTemporal[1]-leftMedial[1]>.0013&&rightTemporal[1]-rightMedial[1]>.0013,'temporal canthi sit above medial canthi on both sides');
+  check(Math.abs(leftTemporal[1]-rightTemporal[1])<1e-12&&Math.abs(leftMedial[1]-rightMedial[1])<1e-12,'left and right neutral fissures remain mirrored');
+  const contactGlobe=[0,0,-.00925,api.anatomy.left.radius];
+""",
+    "neutral fissure parameter checks",
+)
+
+replace_text(
+    "tools/check-face-anatomy.mjs",
+    """ check(manifest.modules.filter(p=>p==='body/FaceAnatomy.js').length===1,'generator assembled once');
+""",
+    """ check(manifest.modules.filter(p=>p==='body/FaceAnatomy.js').length===1,'generator assembled once');
+ check(source.includes("revision:'r8-orbital-continuity'")&&source.includes("id:'upperLidSulcus'")&&source.includes("id:'lowerLidTransition'"),'versioned orbital transition separates broad socket depth from local lid sulci');
+""",
+    "face anatomy source contract",
+)
+
+docs = Path("docs/FACE_EYE_ORBIT_CONTINUITY_R4.md")
+docs.write_text(
+    """# 眼裂与眼眶连续结构 R4
+
+2026-09-15。本轮只处理上一版近景中最明显的眼部结构问题：眼裂形状缺少内外眼角高度差，宽范围眼眶凹陷过深，程序化眼睑容易像独立厚环贴在眼球外侧。
+
+## 改动
+
+- `body/EyeAnatomy.js` 将中性眼裂升级为 `r12-neutral-fissure-orbital-continuity`。眼裂不再由散落常数定义，而是由半宽、上下高度、内外眼角高度差、颞侧偏置和曲率参数共同生成。
+- 当前候选中性眼裂为约 25.6 mm 宽、7.3 mm 高，颞侧眼角相对内侧约抬高 1.4 mm。它是针对当前 R2 头部的受限候选，不是人口统计平均脸，也不是从扫描测得。
+- 上眼睑继续保留局部折叠，下眼睑新增最大 0.30 mm 的受限眶下过渡凹陷；CPU 构形与 GLSL 重建使用同一参数。
+- `body/FaceAnatomy.js` 将宽范围眼眶和眶下凹陷减弱，并拆出较窄的上睑沟和下睑过渡，避免整圈眼眶同时下陷。
+- 保留现有眼球、虹膜、瞳孔、独立眨眼、身份参数、表情通道和单人物审阅入口，不改 Core Rig、骨长、绑定或人物比例。
+
+## 依据与边界
+
+成人眼裂通常呈椭圆形，外眼角高于内眼角；上睑缘与上方角膜缘、下睑缘与下方角膜缘之间具有不对称关系。参考：
+
+- Disney Animation, *Realistic Eye Motion Using Procedural Geometric Methods*。
+- Park et al., *Anthropometry of Asian Eyelids by Age*, Plast Reconstr Surg. 2008。
+- *Reconstruction of the Eyelids after Mohs Surgery*, PMC2884876。
+
+这些资料只用于约束方向和尺度范围。当前实现仍是程序化几何近似，不是组织仿真、扫描眼睑或个体测量模型。
+
+## 验证
+
+遵守当前 `AGENTS.md`，本轮不运行网页、人物模拟或 GPU。验证只包括：
+
+- `node tools/build-pure.mjs`
+- `node tools/check-pure.mjs`
+- `node tools/check-eye-anatomy.mjs --parameter-fixtures`
+- `node tools/check-face-anatomy.mjs --parameter-fixtures`
+- 面部身份分层、启动与装配既有测试
+
+文件检查不能代替视觉验收。`visualAcceptance` 与 `productionReady` 继续保持 `false`。
+""",
+    encoding="utf-8",
+    newline="\n",
+)
+
+readme = Path("README.md")
+text = readme.read_text(encoding="utf-8")
+marker = "# 重建人物 R2 · 行为与人物模块修整 R11\n"
+entry = """
+2026-09-15 **眼裂与眼眶连续结构 R4**：中性眼裂改为统一参数函数，加入内外眼角高度差、上下睑不对称和受限眶下过渡；减弱整圈眼眶凹陷并拆分局部上睑沟、下睑过渡。仅完成源码和参数夹具验证，尚未进行新一轮网页视觉验收。见 [眼裂与眼眶连续结构 R4](docs/FACE_EYE_ORBIT_CONTINUITY_R4.md)。
+"""
+if marker not in text:
+    raise SystemExit("README title anchor missing")
+if entry.strip() not in text:
+    text = text.replace(marker, marker + entry, 1)
+readme.write_text(text, encoding="utf-8", newline="\n")
