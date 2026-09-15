@@ -10,6 +10,7 @@ on:
       - "photo-fit-runtime-qa.html"
       - "schemas/photo-fit-profile.schema.json"
       - "tools/check-photo-fit.mjs"
+      - "tools/check-packed-entrypoint.mjs"
       - "tools/run-photo-fit-browser-qa.mjs"
       - "reconstruction/shape-contract.mjs"
       - "body/CharacterShape.js"
@@ -41,10 +42,18 @@ jobs:
           python3 --version
           google-chrome --version
 
-      - name: Verify assembled complete workbench
+      - name: Verify uploaded and assembled workbench
+        shell: bash
         run: |
-          node tools/build-pure.mjs --check
+          set -euo pipefail
+          node tools/check-packed-entrypoint.mjs
+          cp index.html /tmp/index-uploaded.html
+          trap 'cp /tmp/index-uploaded.html index.html' EXIT
+          node tools/build-pure.mjs
           node tools/check-pure.mjs
+          cp /tmp/index-uploaded.html index.html
+          trap - EXIT
+          git diff --exit-code -- index.html
 
       - name: Verify current character contracts
         run: |
