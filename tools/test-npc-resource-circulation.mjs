@@ -60,6 +60,18 @@ assert.equal(actor.agent.submitted[0].steps[0].type,'walk');
 assert(!Object.hasOwn(actor.resource,'waitS'),'resource state must not contain a parking timer');
 assert(population.observation.events.some(event=>event.type==='resource-circulation'));
 
+// TaskAgent.finish() releases ordinary claims before the population pump sees
+// the completed diversion. The active diversion identity must preserve the
+// retry counter or a permanently occupied resource would circulate forever.
+population.releaseObjects(actor.agent);
+assert.equal(actor.resource.attempts,1,'movement completion must preserve the bounded retry counter');
+const retry=actor.queue.shift();
+actor.running=null;
+population.releaseObjects(actor.agent,{preserveResource:true});
+population.startResourceCirculation(actor,retry,objectConflict);
+assert.equal(actor.resource.attempts,2,'the next diversion must advance the same request counter');
+assert.equal(actor.agent.submitted.length,2);
+
 objects[0].held=false;objects[0].heldOwner=null;
 population.releaseObjects({npcId:'npc-a',held:null});
 assert.equal(population.physicsOwner,null);
@@ -67,4 +79,4 @@ assert.equal(population.claims.size,0);
 assert.equal(population.stationClaims.size,0);
 assert.equal(population.resourceConflict(actor.agent,{text:'sameObject',source:'manual'}),null);
 
-console.log(JSON.stringify({passed:true,parkingWait:false,objectConflict:true,stationConflict:true,activeDiversion:true,globalManipulationSerialized:true,diversion:actor.agent.submitted[0].steps[0]}));
+console.log(JSON.stringify({passed:true,parkingWait:false,objectConflict:true,stationConflict:true,activeDiversion:true,boundedRetries:actor.resource.attempts,globalManipulationSerialized:true,diversion:actor.agent.submitted[0].steps[0]}));
