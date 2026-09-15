@@ -187,7 +187,7 @@ function compactFragmentSource(){
     }
     vec3 dx=dFdx(P),dy=dFdy(P),rx=cross(dy,n),ry=cross(n,dx);`)
     .replace('vec3 color=C;float rough=',`vec3 color=C;
-      if(compactFeature>2.5&&compactFeature<3.5)color*=mix(vec3(1.),compactLipTint(R),compactLipPigment(R));
+      if(compactFeature>2.5&&compactFeature<3.5){float lipPigment=compactLipPigment(R);color*=mix(vec3(1.),compactLipTint(R),lipPigment);color*=1.-.22*compactLipContactShadow(R);}
       if(compactFeature>.5&&compactFeature<2.5){
         vec2 uv=compactEyeUV(R);float radius=length(uv),angle=atan(uv.y,uv.x);
         if(compactFeature<1.5){color=vec3(.015,.02,.024);}
@@ -337,9 +337,9 @@ class CompactSurfaceRenderer{
       if(!depth&&eye===1&&this.view==='skin'){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);}else{gl.disable(gl.BLEND);gl.depthMask(true);}
       // BodyParts3D: FJ2811 external ear, FJ2812 eyebrow, FJ2814 lip;
       // FJ1317/FJ1368 are sclerae. Ears share the body's pigment and microdetail.
-      const isSkin=c.name==='skin'||c.name==='FJ2811'||c.name==='eyeLidSkin'||c.name==='faceSkin'||c.name==='faceLip',lip=c.name==='FJ2814'||c.name==='faceLip',brow=c.name==='FJ2812'||c.name==='faceBrow',sclera=['FJ1317','FJ1368','eyeSclera'].includes(c.name),margin=c.name==='eyeLidMargin',pupil=c.name==='eyePupil',tear=c.name==='eyeTearDuct',nose=c.name==='noseInterior'||c.name==='mouthInterior';
-      const feature=eye||(lip?3:sclera?5:margin?6:pupil?7:tear?8:nose?9:0);
-      const color=this.view==='clay'?[.54,.55,.55]:lip?skin.color:brow?[.105,.067,.047]:sclera?[.52,.50,.44]:margin?skin.lipColor.map((v,i)=>v*.55+skin.color[i]*.45):pupil?[.0007,.0005,.0003]:tear?skin.lipColor:nose?[.085,.035,.024]:isSkin?skin.color:[.497,.391,.296];
+      const isSkin=c.name==='skin'||c.name==='FJ2811'||c.name==='eyeLidSkin'||c.name==='faceSkin'||c.name==='faceLip',lip=c.name==='FJ2814'||c.name==='faceLip',brow=c.name==='FJ2812'||c.name==='faceBrow',sclera=['FJ1317','FJ1368','eyeSclera'].includes(c.name),margin=c.name==='eyeLidMargin',pupil=c.name==='eyePupil',tear=c.name==='eyeTearDuct',nose=c.name==='noseInterior',mouth=c.name==='mouthInterior';
+      const feature=eye||(lip?3:sclera?5:margin?6:pupil?7:tear?8:nose?9:mouth?10:0);
+      const color=this.view==='clay'?[.54,.55,.55]:lip?skin.color:brow?[.105,.067,.047]:sclera?[.52,.50,.44]:margin?skin.lipColor.map((v,i)=>v*.55+skin.color[i]*.45):pupil?[.0007,.0005,.0003]:tear?skin.lipColor:nose?[.085,.035,.024]:mouth?[.055,.016,.013]:isSkin?skin.color:[.497,.391,.296];
       gl.uniform3fv(p.u.compactOrigin,c.origin);gl.uniform3fv(p.u.compactExtent,c.extent);gl.uniform3fv(p.u.compactColor,color);gl.uniform1f(p.u.compactKind,this.view==='clay'||this.view==='regions'?7:isSkin?1:feature?4:0);gl.uniform1f(p.u.compactRegions,this.view==='regions'?1:0);
       const f=this.eyeFrames[c.eyeSide||(['FJ1289','FJ1297','FJ1317'].includes(c.name)?'left':'right')];
       const globe=COMPACT_EYE_ANATOMY[c.eyeSide||(['FJ1289','FJ1297','FJ1317'].includes(c.name)?'left':'right')],eyeRelative=sub(globe.centre,f.centre);

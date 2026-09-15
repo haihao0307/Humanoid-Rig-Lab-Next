@@ -1,16 +1,4 @@
-from pathlib import Path
-import runpy
-
-# Apply the reviewed production candidate to readable source files.
-for script in (
-    'tools/apply-face-contact-lowerface-r9-candidate.py',
-    'tools/apply-face-lip-bed-smoothing-r9.py',
-    'tools/apply-face-r9-visual-corrections.py',
-):
-    runpy.run_path(script, run_name='__main__')
-
-Path('docs/FACE_CONTACT_LOWERFACE_R9.md').write_text(
-    '''# 中性唇接触与下脸连续结构 R9
+# 中性唇接触与下脸连续结构 R9
 
 2026-09-15。本阶段承接 R8 口周与下巴连续结构，重点解决中性唇缝像永久黑槽、张口时上下唇自由边失去侧别并形成竖向条带、鼻小柱到人中的关系不足，以及中央下巴仍保留旧曲面的横向层次等问题。
 
@@ -43,19 +31,3 @@ Path('docs/FACE_CONTACT_LOWERFACE_R9.md').write_text(
 - 面部身份/表情分层、NPC uniform 隔离和启动测试
 - 独立浏览器单人物正面、侧面、闭口近景与 72% `lipPart` 张口检查
 - WebGL 错误、上下文丢失和页面异常检查
-''',
-    encoding='utf-8',
-    newline='\n',
-)
-
-readme = Path('README.md')
-text = readme.read_text(encoding='utf-8')
-marker = '# 重建人物 R2 · 行为与人物模块修整 R11\n'
-entry = '''
-2026-09-15 **中性唇接触与下脸连续结构 R9**：中性口腔内部改为按张口权重显隐，唇缝采用非均匀接触阴影；上下唇以次视觉侧别标记保留可靠张口方向，唇自由边增加局部横向低通并精确返回皮肤附着面。补充鼻小柱—鼻下点—人中连续关系、颏唇沟、颏肌翼和中央下脸 Hermite 过渡。源码、参数和独立浏览器检查通过，整体人脸仍未视觉验收。见 [中性唇接触与下脸连续结构 R9](docs/FACE_CONTACT_LOWERFACE_R9.md)。
-'''
-if marker not in text:
-    raise SystemExit('README title anchor missing')
-if entry.strip() not in text:
-    text = text.replace(marker, marker + entry, 1)
-readme.write_text(text, encoding='utf-8', newline='\n')
