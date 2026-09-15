@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:humanoid-rig:photo-fit-profile:0.2",
+  "title": "Humanoid Rig Photo Fit Profile 0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "version", "baseCommit", "projectId", "subjectId", "targetInstanceId", "revision", "createdAt",
+    "policy", "coordinateSystem", "sourceImages", "measurement", "candidate", "appliedStages", "base", "boundaries"
+  ],
+  "properties": {
+    "schema": {"const": "humanoid_rig/photo_fit_profile@0.2"},
+    "version": {"type": "string", "minLength": 1},
+    "baseCommit": {"const": "2c10edaec6e8515bc64f9df8b3da78cb34c89e61"},
+    "projectId": {"type": "string", "minLength": 1},
+    "subjectId": {"type": "string", "minLength": 1},
+    "targetInstanceId": {"type": "string", "minLength": 1},
+    "revision": {"type": "integer", "minimum": 1},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceImagePersistence", "automaticIdentityClaim", "depthInference", "poseMutation", "animationMutation", "sharedMotherMutation"],
+      "properties": {
+        "sourceImagePersistence": {"const": "not-embedded"},
+        "automaticIdentityClaim": {"const": false},
+        "depthInference": {"type": "string", "minLength": 1},
+        "poseMutation": {"const": false},
+        "animationMutation": {"const": false},
+        "sharedMotherMutation": {"const": false}
+      }
+    },
+    "coordinateSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image", "rig"],
+      "properties": {
+        "image": {"const": "normalized-top-left"},
+        "rig": {"const": "right-handed-Y-up-Z-forward"}
+      }
+    },
+    "sourceImages": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {"$ref": "#/$defs/sourceImage"}
+    },
+    "measurement": {"type": "object"},
+    "candidate": {
+      "type": "object",
+      "required": ["schema", "shape", "face", "warnings"],
+      "properties": {
+        "schema": {"const": "humanoid_rig/photo_fit_candidate@0.2"},
+        "shape": {"type": "object"},
+        "face": {"type": "object"},
+        "warnings": {"type": "array", "items": {"$ref": "#/$defs/warning"}}
+      },
+      "additionalProperties": true
+    },
+    "appliedStages": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["stature", "widths", "volume", "faceFront", "faceDepth"]}
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["characterSchema", "bodyPlanRevision", "bodyArchetype", "characterId", "label", "shape", "face", "shapeReport"],
+      "properties": {
+        "characterSchema": {"const": "jarvis/character_preset@6"},
+        "bodyPlanRevision": {"const": 17},
+        "bodyArchetype": {"const": "r2-source-reference"},
+        "characterId": {"type": "string"},
+        "label": {"type": "string"},
+        "shape": {"$ref": "#/$defs/shape"},
+        "face": {"type": "object"},
+        "shapeReport": {"type": "object"}
+      }
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proportionProfileCommitted", "projectRevisionIntegrated", "runtimeVerified", "visualAcceptance", "productionReady"],
+      "properties": {
+        "proportionProfileCommitted": {"const": false},
+        "projectRevisionIntegrated": {"const": false},
+        "runtimeVerified": {"type": "boolean"},
+        "visualAcceptance": {"type": "boolean"},
+        "productionReady": {"type": "boolean"}
+      }
+    }
+  },
+  "$defs": {
+    "sourceImage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["imageId", "view", "fileName", "mimeType", "width", "height", "sha256", "storage"],
+      "properties": {
+        "imageId": {"type": "string", "minLength": 1},
+        "view": {"enum": ["front", "side", "unknown"]},
+        "fileName": {"type": "string"},
+        "mimeType": {"type": "string"},
+        "width": {"type": ["integer", "null"], "minimum": 1},
+        "height": {"type": ["integer", "null"], "minimum": 1},
+        "sha256": {"type": ["string", "null"]},
+        "storage": {"const": "local-session-only"}
+      }
+    },
+    "warning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "message"],
+      "properties": {
+        "code": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["info", "warning", "error"]},
+        "message": {"type": "string", "minLength": 1}
+      }
+    },
+    "shape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "revision", "statureScale", "legProportion", "shoulderWidth", "hipWidth", "waistWidth", "torsoDepth", "armFullness", "legFullness"],
+      "properties": {
+        "schema": {"const": "jarvis/human_shape@2"},
+        "revision": {"const": "r2-regional-shape-r2"},
+        "statureScale": {"type": "number", "minimum": 0.94, "maximum": 1.06},
+        "legProportion": {"type": "number", "minimum": -1, "maximum": 1},
+        "shoulderWidth": {"type": "number", "minimum": -1, "maximum": 1},
+        "hipWidth": {"type": "number", "minimum": -1, "maximum": 1},
+        "waistWidth": {"type": "number", "minimum": -1, "maximum": 1},
+        "torsoDepth": {"type": "number", "minimum": -1, "maximum": 1},
+        "armFullness": {"type": "number", "minimum": -1, "maximum": 1},
+        "legFullness": {"type": "number", "minimum": -1, "maximum": 1}
+      }
+    }
+  }
+}
