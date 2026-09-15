@@ -1,0 +1,218 @@
+name: Bruce R13P neutral dog anchor probe
+
+on:
+  push:
+    branches:
+      - automation/bruce-neutral-dog-anchor-r13p-20260915
+    paths:
+      - .github/workflows/bruce_r13p_poly_pizza_probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe-fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Fetch public source evidence and probe download route
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="bruce_r13p_neutral_dog_probe"
+          mkdir -p "$ROOT/evidence" "$ROOT/originals" "$ROOT/diagnostics"
+          PAGE="https://poly.pizza/m/2kUk0QqpCg"
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/139 Safari/537.36"
+
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" "$PAGE" \
+            -o "$ROOT/evidence/poly_pizza_dog_page_initial.html"
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            "https://quaternius.com/" -o "$ROOT/evidence/quaternius_home.html" || true
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            "https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt" \
+            -o "$ROOT/evidence/CC0-1.0-legalcode.txt"
+
+          for URL in \
+            "https://api.poly.pizza/v1/model/2kUk0QqpCg" \
+            "https://poly.pizza/api/model/2kUk0QqpCg" \
+            "https://poly.pizza/api/v1/model/2kUk0QqpCg" \
+            "https://api.poly.pizza/model/2kUk0QqpCg"; do
+            NAME=$(printf '%s' "$URL" | sha256sum | cut -c1-12)
+            curl --location --retry 2 --retry-all-errors -A "$UA" -D "$ROOT/diagnostics/api_${NAME}_headers.txt" "$URL" \
+              -o "$ROOT/diagnostics/api_${NAME}_body.bin" || true
+          done
+
+      - name: Browser probe public page
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet selenium
+          python - <<'PY'
+          import json, os, re, time, urllib.parse, urllib.request
+          from pathlib import Path
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.common.action_chains import ActionChains
+
+          root = Path('bruce_r13p_neutral_dog_probe')
+          evidence = root/'evidence'
+          originals = root/'originals'
+          diagnostics = root/'diagnostics'
+          model_id = '2kUk0QqpCg'
+          page_url = f'https://poly.pizza/m/{model_id}'
+
+          opts = Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1600,1200')
+          opts.add_argument('--disable-gpu')
+          opts.set_capability('goog:loggingPrefs', {'performance':'ALL','browser':'ALL'})
+          driver = webdriver.Chrome(options=opts)
+          found_urls = set()
+          events = []
+          try:
+              driver.get(page_url)
+              time.sleep(8)
+              evidence.joinpath('poly_pizza_dog_page_rendered.html').write_text(driver.page_source, encoding='utf-8')
+              driver.save_screenshot(str(evidence/'poly_pizza_dog_page.png'))
+              try:
+                  storage = driver.execute_script('return {local:{...localStorage},session:{...sessionStorage},cookies:document.cookie,href:location.href,title:document.title};')
+              except Exception as exc:
+                  storage = {'error':repr(exc)}
+              diagnostics.joinpath('browser_storage.json').write_text(json.dumps(storage, ensure_ascii=False, indent=2), encoding='utf-8')
+
+              elements=[]
+              for el in driver.find_elements(By.CSS_SELECTOR, 'a,button,[role="button"]'):
+                  try:
+                      row={'tag':el.tag_name,'text':el.text,'href':el.get_attribute('href'),'outer':el.get_attribute('outerHTML')[:2000]}
+                      elements.append(row)
+                      if row['href']:
+                          found_urls.add(row['href'])
+                  except Exception:
+                      pass
+              diagnostics.joinpath('interactive_elements.json').write_text(json.dumps(elements, ensure_ascii=False, indent=2), encoding='utf-8')
+
+              scripts=[]
+              for el in driver.find_elements(By.CSS_SELECTOR,'script'):
+                  try:
+                      src=el.get_attribute('src')
+                      txt=el.get_attribute('innerHTML') or ''
+                      scripts.append({'src':src,'text':txt[:200000]})
+                      if src: found_urls.add(src)
+                  except Exception:
+                      pass
+              diagnostics.joinpath('scripts.json').write_text(json.dumps(scripts, ensure_ascii=False), encoding='utf-8')
+
+              candidates=[]
+              for el in driver.find_elements(By.XPATH, "//*[contains(translate(normalize-space(.),'DOWNLOAD','download'),'download')]"):
+                  try:
+                      if el.tag_name.lower() not in ('a','button') and el.get_attribute('role')!='button':
+                          continue
+                      candidates.append(el)
+                  except Exception:
+                      pass
+              for idx, el in enumerate(candidates[:8]):
+                  try:
+                      driver.execute_script('arguments[0].scrollIntoView({block:"center"});',el)
+                      time.sleep(.5)
+                      before=set(driver.window_handles)
+                      driver.execute_script('arguments[0].click();',el)
+                      time.sleep(4)
+                      after=set(driver.window_handles)
+                      for handle in after-before:
+                          driver.switch_to.window(handle)
+                          found_urls.add(driver.current_url)
+                          events.append({'click':idx,'newWindow':driver.current_url})
+                          driver.close()
+                          driver.switch_to.window(next(iter(before)))
+                      found_urls.add(driver.current_url)
+                      evidence.joinpath(f'after_download_click_{idx}.html').write_text(driver.page_source,encoding='utf-8')
+                      driver.save_screenshot(str(evidence/f'after_download_click_{idx}.png'))
+                  except Exception as exc:
+                      events.append({'click':idx,'error':repr(exc)})
+
+              perf = driver.get_log('performance')
+              diagnostics.joinpath('performance_log.json').write_text(json.dumps(perf, ensure_ascii=False), encoding='utf-8')
+              for item in perf:
+                  try:
+                      msg=json.loads(item['message'])['message']
+                      params=msg.get('params',{})
+                      if msg.get('method')=='Network.responseReceived':
+                          response=params.get('response',{})
+                          url=response.get('url')
+                          if url:
+                              found_urls.add(url)
+                              events.append({'response':url,'mimeType':response.get('mimeType'),'status':response.get('status')})
+                  except Exception:
+                      pass
+          finally:
+              try: driver.quit()
+              except Exception: pass
+
+          blob='\n'.join([
+              evidence.joinpath('poly_pizza_dog_page_initial.html').read_text(encoding='utf-8', errors='ignore'),
+              evidence.joinpath('poly_pizza_dog_page_rendered.html').read_text(encoding='utf-8', errors='ignore'),
+              diagnostics.joinpath('scripts.json').read_text(encoding='utf-8', errors='ignore'),
+              diagnostics.joinpath('performance_log.json').read_text(encoding='utf-8', errors='ignore'),
+          ])
+          for match in re.findall(r'https?[^"\'<>\\ ]+', blob):
+              found_urls.add(match.replace('\\u0026','&').replace('\\/','/'))
+          diagnostics.joinpath('events.json').write_text(json.dumps(events,ensure_ascii=False,indent=2),encoding='utf-8')
+          diagnostics.joinpath('all_urls.txt').write_text('\n'.join(sorted(found_urls))+'\n',encoding='utf-8')
+
+          ua='Mozilla/5.0'
+          downloadable=[]
+          for u in sorted(found_urls):
+              low=urllib.parse.urlparse(u).path.lower()
+              if any(low.endswith(ext) for ext in ('.glb','.gltf','.zip','.fbx','.obj','.bin','.png','.jpg','.jpeg','.webp')) or 'download' in u.lower() or model_id in u:
+                  downloadable.append(u)
+          diagnostics.joinpath('download_candidates.txt').write_text('\n'.join(downloadable)+'\n',encoding='utf-8')
+
+          fetched=[]
+          for i,u in enumerate(downloadable):
+              if i>80: break
+              try:
+                  req=urllib.request.Request(u,headers={'User-Agent':ua,'Referer':page_url})
+                  with urllib.request.urlopen(req,timeout=45) as resp:
+                      data=resp.read(50_000_000)
+                      ctype=resp.headers.get('content-type','')
+                      final=resp.geturl()
+                  name=Path(urllib.parse.urlparse(final).path).name or f'candidate_{i}'
+                  safe=re.sub(r'[^A-Za-z0-9._-]+','_',name)[:180]
+                  if len(data)>512:
+                      out=originals/f'{i:02d}_{safe}'
+                      out.write_bytes(data)
+                      fetched.append({'url':u,'finalUrl':final,'file':out.name,'bytes':len(data),'contentType':ctype,'magic':data[:16].hex()})
+              except Exception as exc:
+                  fetched.append({'url':u,'error':repr(exc)})
+          diagnostics.joinpath('fetched_candidates.json').write_text(json.dumps(fetched,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps({'urls':len(found_urls),'downloadCandidates':len(downloadable),'fetched':fetched},ensure_ascii=False,indent=2))
+          PY
+
+      - name: Classify fetched files and write checksums
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="bruce_r13p_neutral_dog_probe"
+          find "$ROOT" -type f -maxdepth 3 -print0 | sort -z | xargs -0 file > "$ROOT/diagnostics/file_types.txt" || true
+          (
+            cd "$ROOT"
+            find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+            sha256sum -c SHA256SUMS.txt
+          )
+
+      - name: Upload neutral dog probe artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruce-r13p-neutral-dog-probe
+          path: bruce_r13p_neutral_dog_probe
+          if-no-files-found: error
+          retention-days: 7
