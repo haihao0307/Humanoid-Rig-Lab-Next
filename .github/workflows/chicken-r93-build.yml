@@ -37,15 +37,27 @@ jobs:
       - name: Materialize R9.3 source tools
         shell: bash
         run: |
+          git show ccc9563e71bf085172234099ff3880a84c9571f8:tools/.build_chicken_r93.py.gz.b64 > /tmp/build_chicken_r93.py.gz.b64
           python - <<'PY'
           import base64, gzip
           from pathlib import Path
-          pairs = [
-              (Path('tools/.build_chicken_r93.py.gz.b64'), Path('tools/build_chicken_r93.py')),
-              (Path('tools/.capture_chicken_r93.mjs.gz.b64'), Path('tools/capture_chicken_r93.mjs')),
-          ]
-          for encoded, output in pairs:
-              output.write_bytes(gzip.decompress(base64.b64decode(encoded.read_text(encoding='utf-8').strip())))
+
+          verified = Path('/tmp/build_chicken_r93.py.gz.b64')
+          capture = Path('tools/.capture_chicken_r93.mjs.gz.b64')
+          Path('tools/build_chicken_r93.py').write_bytes(
+              gzip.decompress(base64.b64decode(verified.read_text(encoding='utf-8').strip()))
+          )
+          Path('tools/capture_chicken_r93.mjs').write_bytes(
+              gzip.decompress(base64.b64decode(capture.read_text(encoding='utf-8').strip()))
+          )
+
+          path = Path('tools/build_chicken_r93.py')
+          text = path.read_text(encoding='utf-8')
+          old = " window.__CHICKEN_R93_LAST_HEAD_AUDIT__={movedVertices:moved,maxDisplacement,nonFinite,nonHeadMoved,stationXMonotonic:monotonic,bounds:{min:[minX,minY,minZ],max:[maxX,maxY,maxZ]}};\n return p;"
+          new = " const audit={amount:a,movedVertices:moved,maxDisplacement,nonFinite,nonHeadMoved,stationXMonotonic:monotonic,bounds:{min:[minX,minY,minZ],max:[maxX,maxY,maxZ]}};\n // Preserve the active candidate audit; rollback builds must not overwrite it.\n if(a>.5)window.__CHICKEN_R93_LAST_HEAD_AUDIT__=audit;\n else window.__CHICKEN_R93_LAST_ROLLBACK_AUDIT__=audit;\n return p;"
+          if old not in text:
+              raise SystemExit('Unable to locate R9.3 audit assignment')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
           PY
           python -m py_compile tools/build_chicken_r93.py
           node --check tools/capture_chicken_r93.mjs
