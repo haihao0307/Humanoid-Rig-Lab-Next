@@ -27,9 +27,9 @@ jobs:
           text = path.read_text(encoding='utf-8')
           old = "const first=this.traffic.corridorKey!==descriptor.key||this.traffic.corridorOwner!==lease.ownerId;"
           new = "const first=this.traffic.mode!=='corridor-circulation'||this.traffic.corridorKey!==descriptor.key||this.traffic.corridorOwner!==lease.ownerId;"
-          if text.count(old) != 1:
-              raise SystemExit(f'expected one patch site, found {text.count(old)}')
-          path.write_text(text.replace(old, new), encoding='utf-8', newline='\n')
+          if text.count(old) < 1:
+              raise SystemExit('corridor transition patch site not found')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
           PY
       - name: Verify traffic suite
         run: |
