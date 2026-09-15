@@ -30,7 +30,7 @@ jobs:
       - name: Apply consolidated R9 source candidate
         run: |
           python3 tools/apply-face-contact-lowerface-r9-candidate.py
-          python3 tools/apply-face-inner-return-normals-r9.py
+          python3 tools/apply-face-lip-bed-smoothing-r9.py
           python3 tools/apply-face-r9-visual-corrections.py
       - name: Build and validate candidate
         run: |
