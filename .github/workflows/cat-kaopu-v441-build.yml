@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/cat-kaopu-v441-build.yml
       - cat-kaopu/tools/build_cat_v441_eyelid_cornea.py
+      - cat-kaopu/tools/patch_cat_v441_builder_full_close.py
       - cat-kaopu/tools/capture_cat_v441_browser_qa.mjs
       - cat-kaopu/tools/verify_cat_kaopu_module.py
   workflow_dispatch:
@@ -43,6 +44,11 @@ jobs:
             mkdir -p "$(dirname "$baseline")"
             cp cat-kaopu/workbench/CAT_KAOPU_CURRENT.html "$baseline"
           fi
+
+      - name: Enforce complete eyelid closure in V4.41 builder
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v441_builder_full_close.py
 
       - name: Generate V4.41 workbench and technical audit
         env:
