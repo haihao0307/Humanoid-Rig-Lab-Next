@@ -30,7 +30,7 @@ jobs:
           node-version: '24'
       - name: Apply R9 candidate
         run: python3 tools/apply-face-contact-lowerface-r9-candidate.py
-      - name: Refine lip border and suppress false open-mouth striping
+      - name: Refine lip border and inner mucosa
         shell: bash
         run: |
           python3 - <<'PY'
@@ -48,6 +48,23 @@ jobs:
               if count!=1:
                   raise SystemExit(f'R9 visual correction anchor mismatch: {old!r}, count={count}')
               text=text.replace(old,new,1)
+          old_inner="""    for(let i=0;i<=lp.columns;i++)for(let j=0;j<=rows;j++){
+      const x=lp.centreX+lp.halfWidth*(-.998+1.996*i/lp.columns),t=j/rows,e=.00005,a=sub(innerPoint(x+e,t),innerPoint(x-e,t)),b=sub(innerPoint(x,Math.min(1,t+.0001)),innerPoint(x,Math.max(0,t-.0001)));
+      let normal=norm(cross(b,a));if(!upper)normal=mul(normal,-1);lipP.push(...innerPoint(x,t));lipN.push(...compactEyeEncodeNormal(normal));
+    }
+"""
+          new_inner="""    for(let i=0;i<=lp.columns;i++)for(let j=0;j<=rows;j++){
+      const x=lp.centreX+lp.halfWidth*(-.998+1.996*i/lp.columns),t=j/rows,q=compactLipOutline(x),angle=t*Math.PI/2;
+      // The inherited skin sampler is intentionally excluded from inner-return
+      // normals. Its submillimetre triangle gradients created false vertical
+      // bands that looked like teeth when the lips opened.
+      const normal=norm([-.10*q.u*Math.sin(angle),upper?-Math.cos(angle):Math.cos(angle),-Math.sin(angle)]);
+      lipP.push(...innerPoint(x,t));lipN.push(...compactEyeEncodeNormal(normal));
+    }
+"""
+          if text.count(old_inner)!=1:
+              raise SystemExit('R9 inner-return normal anchor mismatch')
+          text=text.replace(old_inner,new_inner,1)
           face.write_text(text,encoding='utf-8',newline='\n')
 
           check=Path('tools/check-face-anatomy.mjs')
@@ -60,7 +77,7 @@ jobs:
           source_anchor="check(source.includes('const chinLo=1.4270,chinHi=1.4495')&&source.includes('compactLipContactShadow')&&source.includes('compactLipOpen<.025'),'lower-face Hermite bed, nonuniform contact shadow and closed-mouth cavity gate are explicit');"
           if value.count(source_anchor)!=1:
               raise SystemExit('R9 open-mouth striping contract anchor mismatch')
-          value=value.replace(source_anchor,source_anchor+"\n check(source.includes('openingGate=1.-smoothstep(.04,.18,compactLipOpen)'),'open-mouth fallback suppresses outer-lip microgrooves until inner and outer mucosa receive separate material domains');",1)
+          value=value.replace(source_anchor,source_anchor+"\n check(source.includes('openingGate=1.-smoothstep(.04,.18,compactLipOpen)')&&source.includes('upper?-Math.cos(angle):Math.cos(angle)'),'open-mouth fallback suppresses microgrooves and inner-return normals are independent of noisy source triangles');",1)
           check.write_text(value,encoding='utf-8',newline='\n')
           PY
       - name: Build and validate candidate
