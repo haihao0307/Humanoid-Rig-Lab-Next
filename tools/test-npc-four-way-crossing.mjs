@@ -44,12 +44,17 @@ world.population={
  collisionFor:(agent,p,r)=>actors.some(other=>other.agent!==agent&&!other.disposed&&horizontal(p,other.agent.pos)<r+other.human.bodyMetrics.bodyRadiusM+.06),
  sweepFor:(agent,start,end,r)=>actors.filter(other=>other.agent!==agent&&!other.disposed).reduce((fraction,other)=>Math.min(fraction,api.motionCircleSweep(start,end,other.agent.pos,r+other.human.bodyMetrics.bodyRadiusM+.06)),1)
 };
+const debugState=(failed,error)=>({
+ frame:frames,failed,error:error.message,
+ actors:actors.map(actor=>({id:actor.id,done:actor.done,position:actor.agent.pos,yaw:actor.agent.yaw,goal:actor.goal,routeIndex:actor.agent.routeIndex,route:actor.agent.route,command:actor.locomotion.engine.state.command,status:actor.locomotion.engine.state.status,fault:actor.locomotion.engine.state.fault,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-8)})),
+ separations:actors.flatMap((a,i)=>actors.slice(i+1).map(b=>({pair:[a.id,b.id],distance:horizontal(a.agent.pos,b.agent.pos)})))
+});
 let minSeparation=Infinity,frames=0;
 for(;frames<12000&&!actors.every(actor=>actor.done);frames++){
  const order=frames%2?actors:[...actors].reverse();
  for(const actor of order){
   if(actor.done)continue;const a=actor.agent,l=actor.locomotion;a.time+=1/120;
-  try{const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving)actor.done=true;}catch(error){throw Error(actor.id+': '+error.message);}
+  try{const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving)actor.done=true;}catch(error){console.error('FOUR_WAY_DEBUG '+JSON.stringify(debugState(actor.id,error)));throw Error(actor.id+': '+error.message);}
  }
  for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++)minSeparation=Math.min(minSeparation,horizontal(actors[i].agent.pos,actors[j].agent.pos));
 }
