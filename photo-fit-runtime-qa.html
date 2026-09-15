@@ -44,9 +44,9 @@ async function run(){
   definition.character.id='qa-photo-fit-secondary';definition.character.label='QA 二号人物';definition.character.seed=26091511;definition.character.task={command:'',startOnSpawn:false};
   definition.behavior=null;definition.attachments={...definition.attachments,hair:{assetId:null,enabled:false},outfit:[],accessories:[]};
   const qaSecondaryId=await lab.npc.spawn(definition,{identity:{residentId:'qa-photo-fit-secondary',displayName:'QA 二号人物',role:'general'}});
-  const rows=await waitFor(()=>{const list=lab.population.list();return lab.population.pending===0&&list.some(row=>row.id===qaSecondaryId)?list:null},{timeout:300000,label:'生成无毛发测试 NPC'});
-  note('population-created-for-qa',qaSecondaryId);check(rows.length>=2,'population-available',String(rows.length));
-  await waitFor(()=>doc.getElementById('npcSelect').options.length===rows.length,{timeout:120000,label:'NPC选择器同步'});
+  const rows=lab.population.list();
+  check(rows.some(row=>row.id===qaSecondaryId),'population-created-for-qa',qaSecondaryId);check(rows.length>=2,'population-available',String(rows.length));
+  await waitFor(()=>[...doc.getElementById('npcSelect').options].some(option=>option.value===qaSecondaryId),{timeout:120000,label:'NPC选择器同步专用测试人物'});
   check(doc.getElementById('npcSelect').value===originalId,'active-npc-reflected',originalId);
 
   const select=doc.getElementById('npcSelect');select.value=qaSecondaryId;emitInput(select,'change');
