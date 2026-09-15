@@ -28,7 +28,7 @@ const zones=[{id:'ZA',p:[0,0,0]},{id:'ZB',p:[2,0,0]},{id:'ZC',p:[-2,0,0]}];
 const population=Object.create(NPCPopulation.prototype);
 Object.assign(population,{
  lab:{world:{objects,zones,get(id){return [...objects,...zones].find(item=>item.id===id)||null;},physics:{clearManipulation(){}}}},
- claims:new Map([['A','npc-a']]),stationClaims:new Map([['ZA','npc-a']]),physicsOwner:'npc-a',
+ claims:new Map([['A','npc-a']]),stationClaims:new Map([['ZA','npc-a']]),physicsOwner:'npc-a',actors:new Map(),
  observation:{events:[],event(type,actor,detail){this.events.push({type,id:actor.id,detail});}}
 });
 function makeActor(id,pos=[0,0,-1]){
@@ -40,6 +40,7 @@ function makeActor(id,pos=[0,0,-1]){
  return{id,label:id,agent,queue:[],running:null,behavior:{status:'scheduled'},resource:{mode:'clear',requestKey:null,attempts:0,diversions:0,conflict:null,anchor:null}};
 }
 const actor=makeActor('npc-b');
+population.actors.set(actor.id,actor);
 const objectConflict=population.resourceConflict(actor.agent,{text:'sameObject',source:'manual'});
 assert.equal(objectConflict.kind,'object');
 assert.equal(objectConflict.id,'A');
