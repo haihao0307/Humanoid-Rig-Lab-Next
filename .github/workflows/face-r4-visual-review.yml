@@ -1,0 +1,124 @@
+name: Face R4 visual review
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/human-face-workbench-v1-20260915
+    paths:
+      - .github/workflows/face-r4-visual-review.yml
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-face-workbench-v1-20260915
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install browser runtime
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start static server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/hrl-face-server.log 2>&1 &
+          echo $! > /tmp/hrl-face-server.pid
+      - name: Capture fixed face views
+        shell: bash
+        run: |
+          mkdir -p visual-review
+          cat > /tmp/capture-face-r4.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import { writeFile } from 'node:fs/promises';
+
+          const browser = await chromium.launch({
+            headless: true,
+            args: [
+              '--use-angle=swiftshader',
+              '--use-gl=angle',
+              '--enable-webgl',
+              '--enable-unsafe-swiftshader',
+              '--ignore-gpu-blocklist',
+              '--disable-dev-shm-usage'
+            ]
+          });
+          const context = await browser.newContext({
+            viewport: { width: 1600, height: 1200 },
+            deviceScaleFactor: 1
+          });
+          const page = await context.newPage();
+          const consoleMessages = [];
+          const pageErrors = [];
+          page.on('console', message => consoleMessages.push({ type: message.type(), text: message.text() }));
+          page.on('pageerror', error => pageErrors.push(String(error?.stack || error)));
+          await page.goto('http://127.0.0.1:4173/index.html?review=face', {
+            waitUntil: 'domcontentloaded',
+            timeout: 120000
+          });
+
+          let bodyFrame = null;
+          const deadline = Date.now() + 360000;
+          while (!bodyFrame && Date.now() < deadline) {
+            for (const frame of page.frames()) {
+              const ready = await frame.evaluate(() => Boolean(window.HumanLab?.face?.closeup)).catch(() => false);
+              if (ready) {
+                bodyFrame = frame;
+                break;
+              }
+            }
+            if (!bodyFrame) await page.waitForTimeout(1000);
+          }
+          if (!bodyFrame) throw new Error('Face review frame did not expose HumanLab.face.closeup');
+
+          await bodyFrame.waitForFunction(() => window.__compactLoading?.state === 'ready', null, { timeout: 360000 });
+          await bodyFrame.waitForTimeout(5000);
+          const canvas = bodyFrame.locator('canvas').first();
+          await canvas.waitFor({ state: 'visible', timeout: 30000 });
+
+          for (const view of ['front', 'side', 'lips']) {
+            await bodyFrame.evaluate(currentView => {
+              window.HumanLab.face.clearExpression();
+              window.HumanLab.face.closeup(currentView);
+            }, view);
+            await bodyFrame.waitForTimeout(1500);
+            await canvas.screenshot({ path: `visual-review/face-r4-${view}.png` });
+          }
+
+          const diagnostics = await bodyFrame.evaluate(() => {
+            const report = window.HumanLab.face.report();
+            const gl = document.querySelector('canvas')?.getContext('webgl2');
+            return {
+              review: window.HumanLab.review,
+              compactLoading: window.__compactLoading,
+              startup: window.__humanStartup,
+              expression: report.expression,
+              identity: report.identity,
+              landmarks: report.identityModel?.landmarks,
+              separation: report.separation,
+              limitedNodes: report.limitedNodes,
+              renderer: {
+                canvasWidth: document.querySelector('canvas')?.width,
+                canvasHeight: document.querySelector('canvas')?.height,
+                webglError: gl ? gl.getError() : null
+              }
+            };
+          });
+          await writeFile('visual-review/face-r4-diagnostics.json', JSON.stringify({ diagnostics, consoleMessages, pageErrors }, null, 2));
+          await browser.close();
+          JS
+          node /tmp/capture-face-r4.mjs
+      - name: Upload review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-r4-visual-review
+          path: visual-review
+          if-no-files-found: error
+          retention-days: 7
