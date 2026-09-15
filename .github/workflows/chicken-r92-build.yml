@@ -105,6 +105,20 @@ jobs:
           print('R9.2 static and browser gates passed; manual visual gate remains open.')
           PY
 
+      - name: Upload R9.2 visual evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: chicken-r92-visual-evidence-${{ github.run_number }}
+          path: |
+            CHICKEN_V46_R9_2_HEAD_SHAPE.html
+            qa/CHICKEN_R92_STATIC_QA.json
+            qa/CHICKEN_R92_BROWSER_QA.json
+            evidence/r92
+            reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png
+            reference/head/previous_user_review/01_CURRENT_R9_1_REJECTED_HEAD_SCREENSHOT.png
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Commit generated candidate and evidence
         shell: bash
         run: |
