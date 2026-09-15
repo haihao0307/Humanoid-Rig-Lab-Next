@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>照片驱动 NPC 拟合测试板 R0</title>
+<style>
+:root{
+  --bg:#05090e;--panel:#0d151d;--panel2:#111d27;--line:#263846;--line2:#3a5669;
+  --text:#e7eef3;--muted:#91a4b1;--soft:#627886;--accent:#93d9d0;--warn:#e7bf74;--bad:#e38b93;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text)}body{overflow:hidden}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+.app{height:100%;display:grid;grid-template-rows:58px minmax(0,1fr)}
+header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 18px;border-bottom:1px solid var(--line);background:#091119}
+header h1{margin:0;font-size:16px;font-weight:620}header h1 small{display:block;margin-top:3px;font:10px ui-monospace,monospace;color:var(--soft);letter-spacing:.08em}
+.status{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:11px}.status i{width:7px;height:7px;border-radius:50%;background:#596c77}.status[data-state=ready] i{background:#69d4b1;box-shadow:0 0 10px #69d4b177}.status[data-state=error] i{background:var(--bad)}
+.workspace{min-height:0;display:grid;grid-template-columns:minmax(330px,.9fr) minmax(520px,1.35fr) minmax(320px,.85fr);gap:8px;padding:8px}
+.panel{min-width:0;min-height:0;border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,#0c151e,#081018);overflow:hidden}
+.panel-head{height:42px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border-bottom:1px solid var(--line);background:#101a23}.panel-head h2{margin:0;font-size:12px}.panel-head span{font:9px ui-monospace,monospace;color:var(--soft)}
+.scroll{height:calc(100% - 42px);overflow:auto;padding:11px}.scroll::-webkit-scrollbar{width:6px}.scroll::-webkit-scrollbar-thumb{background:#263b49;border-radius:8px}
+.section{padding:11px;border:1px solid #21313d;border-radius:9px;background:#0d1821;margin-bottom:9px}.section:last-child{margin-bottom:0}.section h3{margin:0 0 9px;font-size:12px}.section p{margin:7px 0;color:var(--muted);font-size:11px;line-height:1.65}.note{padding:9px 10px;border-left:2px solid var(--warn);background:#201c13;color:#d7c9a9;font-size:11px;line-height:1.6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.field{display:grid;gap:5px}.field label{font-size:10px;color:var(--muted)}
+input,select{width:100%;min-height:34px;padding:6px 8px;border:1px solid #344b5b;border-radius:7px;background:#0a131b}input[type=file]{padding:5px;font-size:11px}input[type=range]{padding:0;border:0;background:transparent}.range-row{display:grid;grid-template-columns:1fr 54px;gap:8px;align-items:center}.range-row output{font:11px ui-monospace,monospace;text-align:right;color:#b9d9de}
+.actions{display:flex;gap:6px;flex-wrap:wrap}.actions button,.stage-button{min-height:34px;padding:6px 9px;border:1px solid #355061;border-radius:7px;background:#14222c;font-size:11px}.actions button:hover,.stage-button:hover{background:#1c3440}.actions button.primary,.stage-button.primary{border-color:#6faea8;background:#2b4b4a;color:#eafffb}.actions button.danger{border-color:#6a4448;color:#e9b4b8}.actions button:disabled,.stage-button:disabled{opacity:.42;cursor:not-allowed}
+.photo-shell{position:relative;min-height:360px;height:52vh;max-height:650px;border:1px solid #263b49;border-radius:9px;overflow:hidden;background:repeating-linear-gradient(45deg,#0a1118,#0a1118 12px,#0c151d 12px,#0c151d 24px)}
+#photoCanvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}.canvas-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#607684;font-size:12px;pointer-events:none;padding:24px}.photo-shell[data-ready=true] .canvas-empty{display:none}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:7px;color:#738b99;font-size:10px}.legend b{color:#b8cbd5;font-weight:550}
+.viewer{height:100%;display:grid;grid-template-rows:42px minmax(0,1fr)}.viewer-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 10px;border-bottom:1px solid var(--line);background:#101a23}.viewer-tools strong{font-size:12px}.viewer-tools .actions{flex-wrap:nowrap}.viewer-tools button{min-height:29px;padding:4px 8px}
+.workbench-wrap{position:relative;min-height:0;background:#03070b}.workbench-wrap iframe{width:100%;height:100%;border:0;display:block;background:#03070b}.viewer-mask{position:absolute;inset:0;display:grid;place-items:center;background:#071019e8;color:#9eb4c1;font-size:12px;z-index:3}.viewer-mask[hidden]{display:none}
+.stage-list{display:grid;gap:7px}.stage-card{padding:9px;border:1px solid #293d4b;border-radius:8px;background:#0c161f}.stage-card header{height:auto;padding:0;border:0;background:none}.stage-card b{font-size:11px}.stage-card small{font:8px ui-monospace,monospace;color:#698391}.stage-card p{margin:5px 0 8px}.stage-card[data-applied=true]{border-color:#477b72;background:#11251f}.stage-card[data-applied=true] small{color:#86d4bd}
+.warning-list{display:grid;gap:6px}.warning{padding:7px 8px;border:1px solid #344653;border-radius:7px;color:#aab9c2;font-size:10px;line-height:1.5}.warning[data-severity=warning]{border-color:#695b37;color:#e0c992;background:#221e14}.warning[data-severity=error]{border-color:#6c4047;color:#efb0b7;background:#24161a}
+.table-wrap{overflow:auto;border:1px solid #263845;border-radius:8px}table{width:100%;border-collapse:collapse;font-size:10px;white-space:nowrap}th,td{padding:7px 8px;border-bottom:1px solid #21313d;text-align:left}th{position:sticky;top:0;background:#13202a;color:#8fa6b4;font-weight:550}td code{font:10px ui-monospace,monospace;color:#c8e0e5}tr:last-child td{border-bottom:0}.changed{color:#8bd7c4}.unknown{color:#8c9ba5}.manual{color:#e5c88a}
+pre{margin:0;max-height:240px;overflow:auto;padding:9px;border:1px solid #263946;border-radius:8px;background:#081018;color:#9fb7c4;font:9px/1.55 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.footer-line{display:flex;justify-content:space-between;gap:8px;margin-top:7px;color:#647d8b;font-size:9px}.privacy{color:#9bb3be}.privacy b{color:#d6e5ea}
+@media(max-width:1180px){.workspace{grid-template-columns:minmax(330px,.9fr) minmax(480px,1.2fr)}.result-panel{position:fixed;right:8px;top:66px;bottom:8px;width:min(390px,calc(100vw - 16px));z-index:8;box-shadow:0 20px 70px #000b}.result-panel[data-collapsed=true]{display:none}}
+@media(max-width:760px){body{overflow:auto}.app{height:auto;min-height:100%;display:block}header{height:58px;position:sticky;top:0;z-index:9}.workspace{display:grid;grid-template-columns:1fr;min-height:0}.panel{min-height:520px}.viewer{height:72vh}.result-panel{position:static;width:auto;min-height:620px}.photo-shell{height:58vh}.hide-mobile{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>照片驱动 NPC 拟合测试板 R0<small>REFERENCE PHOTO → MANUAL OBSERVATION → PARAMETER CANDIDATE → STAGED APPLY</small></h1>
+  <div class="status" id="connectionStatus" data-state="waiting"><i></i><span>等待人物工作台</span></div>
+</header>
+<main class="workspace">
+  <section class="panel photo-panel">
+    <div class="panel-head"><h2>1 · 参考图片与观测</h2><span>LOCAL IMAGE ONLY</span></div>
+    <div class="scroll">
+      <div class="section">
+        <div class="grid2">
+          <div class="field"><label for="photoInput">选择参考图片</label><input id="photoInput" type="file" accept="image/*"></div>
+          <div class="field"><label for="modeSelect">观测模式</label><select id="modeSelect"><option value="full">正面全身</option><option value="head">正面头像</option></select></div>
+          <div class="field"><label for="knownHeight">已知身高（米，可空）</label><input id="knownHeight" type="number" min="0.8" max="2.5" step="0.01" placeholder="例如 1.75"></div>
+          <div class="field"><label for="fitGain">照片到参数增益</label><div class="range-row"><input id="fitGain" type="range" min="0" max="1.25" step="0.01" value="0.68"><output id="fitGainOut">0.68</output></div></div>
+        </div>
+        <div class="grid2" style="margin-top:8px">
+          <label class="field"><span style="font-size:10px;color:var(--muted)"><input id="looseClothing" type="checkbox" style="width:auto;min-height:auto;margin-right:6px">服装宽松或遮挡轮廓</span></label>
+          <label class="field"><span style="font-size:10px;color:var(--muted)"><input id="perspectiveWarning" type="checkbox" style="width:auto;min-height:auto;margin-right:6px">存在明显俯拍、仰拍或广角</span></label>
+        </div>
+        <p class="privacy"><b>图片只在本页本地内存中读取。</b>导出的 JSON 只保存文件摘要、尺寸、关键点和参数，不嵌入图片像素。</p>
+      </div>
+      <div class="photo-shell" id="photoShell" data-ready="false">
+        <canvas id="photoCanvas" aria-label="参考图片与可拖动关键点"></canvas>
+        <div class="canvas-empty">选择一张正面头像或正面全身图。<br>图片载入后，拖动标记点贴合可见轮廓。</div>
+      </div>
+      <div class="legend"><span><b>拖动点</b>：人工观测</span><span><b>连线</b>：只用于检查比例</span><span><b>未知</b>：不会被系统悄悄补成确定值</span></div>
+      <div class="actions" style="margin-top:9px">
+        <button id="resetPointsBtn" type="button">恢复默认点位</button>
+        <button id="toggleLabelsBtn" type="button">隐藏文字标签</button>
+        <button id="recalcBtn" class="primary" type="button">重新计算候选</button>
+      </div>
+      <div class="section" style="margin-top:9px">
+        <h3>单图边界</h3>
+        <div class="note">正面单图可以约束脸宽、肩宽、胸腰髋投影宽度和肢体投影比例；不能唯一恢复身体厚度、真实鼻梁深度、后脑形状或衣物下面的围度。本测试板把这些项目保留为未知或人工值。</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel viewer-panel">
+    <div class="viewer">
+      <div class="viewer-tools">
+        <strong>2 · 当前 NPC 三维结果</strong>
+        <div class="actions">
+          <button id="frontViewBtn" type="button">正面</button>
+          <button id="sideViewBtn" type="button">侧面</button>
+          <button id="clayViewBtn" type="button">素模</button>
+          <button id="captureBaseBtn" type="button">记录当前基线</button>
+        </div>
+      </div>
+      <div class="workbench-wrap">
+        <iframe id="workbenchFrame" src="./index.html?photoFitHost=1" title="Humanoid Rig Lab Next"></iframe>
+        <div class="viewer-mask" id="viewerMask">正在连接分支中的人物工作台…</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel result-panel" id="resultPanel">
+    <div class="panel-head"><h2>3 · 参数候选与分阶段应用</h2><span id="candidateState">WAITING</span></div>
+    <div class="scroll">
+      <div class="section">
+        <h3>人工体积校正</h3>
+        <p>下面两项无法由正面轮廓可靠恢复，只在你明确调整后写入。</p>
+        <div class="field"><label for="limbVolume">肢体体积</label><div class="range-row"><input id="limbVolume" type="range" min="0.78" max="1.22" step="0.01" value="1"><output id="limbVolumeOut">1.00</output></div></div>
+        <div class="field" style="margin-top:8px"><label for="softness">软组织柔和度</label><div class="range-row"><input id="softness" type="range" min="0.65" max="1.45" step="0.01" value="1"><output id="softnessOut">1.00</output></div></div>
+      </div>
+
+      <div class="section">
+        <h3>逐步应用</h3>
+        <div class="stage-list" id="stageList"></div>
+        <div class="actions" style="margin-top:9px">
+          <button class="primary" id="applyAllBtn" type="button" disabled>应用全部候选</button>
+          <button class="danger" id="resetBaseBtn" type="button" disabled>恢复记录的基线</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>候选参数</h3>
+        <div class="table-wrap"><table><thead><tr><th>参数</th><th>基线</th><th>候选</th><th>依据</th></tr></thead><tbody id="morphRows"><tr><td colspan="4">等待图片与人物基线。</td></tr></tbody></table></div>
+      </div>
+
+      <div class="section">
+        <h3>测量警告</h3>
+        <div class="warning-list" id="warningList"><div class="warning">尚未生成测量。</div></div>
+      </div>
+
+      <div class="section">
+        <h3>拟合档案</h3>
+        <div class="actions" style="margin-bottom:8px"><button id="exportBtn" type="button" disabled>导出 JSON</button><button id="copyBtn" type="button" disabled>复制 JSON</button></div>
+        <pre id="jsonPreview">等待拟合档案。</pre>
+        <div class="footer-line"><span id="photoDigest">NO PHOTO</span><span id="appliedState">0 STAGES</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+<script type="module">
+import {
+  FIT_STAGES,
+  LANDMARK_DEFINITIONS,
+  createDefaultLandmarks,
+  measureLandmarks,
+  buildCandidateMorphs,
+  applyCandidateToPreset,
+  diffMorphs,
+  createPhotoFitProfile
+} from './photo-fit/PhotoFitCore.mjs';
+
+const $ = id => document.getElementById(id);
+const morphLabels = {
+  shoulderWidth:'肩宽', chestWidth:'胸宽', waistWidth:'腰宽', hipWidth:'髋宽', neckWidth:'颈宽',
+  limbVolume:'肢体体积', softness:'软组织柔和度', breastProjectionM:'胸部前向投影', faceWidth:'脸宽'
+};
+const stageOrder = ['rig','torso','face','volume'];
+const stageByMorph = Object.fromEntries(stageOrder.flatMap(stage => FIT_STAGES[stage].keys.map(key => [key, stage])));
+const state = {
+  mode:'full', image:null, objectUrl:null, imageMeta:null, landmarks:createDefaultLandmarks('full'),
+  showLabels:true, dragName:null, transform:null, basePreset:null, measurement:null, candidate:null,
+  appliedStages:new Set(), lab:null, profile:null, connectTimer:null, lastConnectionVersion:null
+};
+
+function clone(value){return JSON.parse(JSON.stringify(value));}
+function setConnection(text, status='waiting'){$('connectionStatus').dataset.state=status;$('connectionStatus').querySelector('span').textContent=text;}
+function setCandidateState(text){$('candidateState').textContent=text;}
+function setViewerMask(text=null){$('viewerMask').hidden=!text;if(text)$('viewerMask').textContent=text;}
+function format(value,digits=3){return Number.isFinite(value)?Number(value).toFixed(digits):'—';}
+function downloadJson(name,data){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);}
+
+async function digestFile(file){
+  if(!crypto?.subtle)return null;
+  const bytes=await file.arrayBuffer();
+  const hash=await crypto.subtle.digest('SHA-256',bytes);
+  return [...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+function getLab(){
+  try{
+    const outer=$('workbenchFrame').contentWindow;
+    const bodyFrame=outer?.document?.getElementById('bodyFrame');
+    return bodyFrame?.contentWindow?.HumanLab||null;
+  }catch{return null;}
+}
+
+async function captureBaseline(force=false){
+  const lab=getLab();
+  if(!lab?.character?.export)throw new Error('人物工作台尚未就绪');
+  if(state.basePreset&&!force)return state.basePreset;
+  state.basePreset=clone(lab.character.export());
+  state.appliedStages.clear();
+  $('limbVolume').value=state.basePreset.appearance.morphs.limbVolume;
+  $('softness').value=state.basePreset.appearance.morphs.softness;
+  syncRangeOutputs();
+  recalculate();
+  renderStages();
+  return state.basePreset;
+}
+
+function monitorConnection(){
+  const lab=getLab();
+  state.lab=lab;
+  if(lab){
+    const version=lab.version||'unknown';
+    setConnection(`已连接 · ${version}`,'ready');setViewerMask(null);
+    if(!state.basePreset)captureBaseline().catch(error=>setConnection(error.message,'error'));
+    state.lastConnectionVersion=version;
+  }else{
+    setConnection('等待人物工作台','waiting');setViewerMask('正在连接分支中的人物工作台…');
+  }
+}
+state.connectTimer=setInterval(monitorConnection,450);
+$('workbenchFrame').addEventListener('load',()=>{setViewerMask('人物工作台已载入，正在等待身体模块…');setTimeout(monitorConnection,250)});
+
+function resetLandmarks(){const aspect=state.image?state.image.naturalHeight/state.image.naturalWidth:1;state.landmarks=createDefaultLandmarks(state.mode,aspect);drawPhoto();recalculate();}
+
+function resizeCanvas(){
+  const canvas=$('photoCanvas'),rect=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
+  const w=Math.max(1,Math.round(rect.width*dpr)),h=Math.max(1,Math.round(rect.height*dpr));
+  if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;drawPhoto();}
+}
+new ResizeObserver(resizeCanvas).observe($('photoCanvas'));
+
+function imageTransform(canvas,image){
+  const dpr=Math.min(devicePixelRatio||1,2),cw=canvas.width/dpr,ch=canvas.height/dpr;
+  const scale=Math.min(cw/image.naturalWidth,ch/image.naturalHeight);
+  const width=image.naturalWidth*scale,height=image.naturalHeight*scale;
+  return {x:(cw-width)/2,y:(ch-height)/2,width,height,dpr};
+}
+
+const pairs=[
+  ['headTop','chin'],['imageLeftTemple','imageRightTemple'],['imageLeftJaw','imageRightJaw'],
+  ['imageLeftNeck','imageRightNeck'],['imageLeftShoulder','imageRightShoulder'],
+  ['imageLeftChest','imageRightChest'],['imageLeftWaist','imageRightWaist'],['imageLeftHip','imageRightHip'],
+  ['imageLeftShoulder','imageLeftElbow'],['imageLeftElbow','imageLeftWrist'],
+  ['imageRightShoulder','imageRightElbow'],['imageRightElbow','imageRightWrist'],
+  ['imageLeftHip','imageLeftKnee'],['imageLeftKnee','imageLeftAnkle'],
+  ['imageRightHip','imageRightKnee'],['imageRightKnee','imageRightAnkle']
+];
+
+function canvasPoint(name){
+  const p=state.landmarks[name],t=state.transform;
+  if(!p||!t)return null;
+  return {x:t.x+p.x*t.width,y:t.y+p.y*t.height};
+}
+
+function drawPhoto(){
+  const canvas=$('photoCanvas'),ctx=canvas.getContext('2d'),dpr=Math.min(devicePixelRatio||1,2);
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,canvas.width/dpr,canvas.height/dpr);
+  if(!state.image){state.transform=null;return;}
+  const t=imageTransform(canvas,state.image);state.transform=t;
+  ctx.fillStyle='#05090e';ctx.fillRect(0,0,canvas.width/dpr,canvas.height/dpr);
+  ctx.drawImage(state.image,t.x,t.y,t.width,t.height);
+  ctx.save();ctx.strokeStyle='rgba(156,219,211,.56)';ctx.lineWidth=1.2;
+  for(const [a,b] of pairs){const p=canvasPoint(a),q=canvasPoint(b);if(!p||!q)continue;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}
+  ctx.restore();
+  for(const [name,definition] of Object.entries(LANDMARK_DEFINITIONS)){
+    const p=canvasPoint(name);if(!p)continue;
+    const active=state.dragName===name;ctx.beginPath();ctx.arc(p.x,p.y,active?6:4.4,0,Math.PI*2);ctx.fillStyle=active?'#fff2bd':'#93d9d0';ctx.fill();ctx.strokeStyle='#102029';ctx.lineWidth=1.5;ctx.stroke();
+    if(state.showLabels){ctx.font='10px system-ui';ctx.fillStyle='rgba(5,10,15,.82)';const label=definition.label,w=ctx.measureText(label).width+8;ctx.fillRect(p.x+7,p.y-16,w,16);ctx.fillStyle='#dbe9ed';ctx.fillText(label,p.x+11,p.y-5);}
+  }
+}
+
+function pointerPosition(event){const rect=$('photoCanvas').getBoundingClientRect();return{x:event.clientX-rect.left,y:event.clientY-rect.top};}
+function nearestLandmark(pos,maxDistance=18){let best=null,bestD=maxDistance;for(const name of Object.keys(state.landmarks)){const p=canvasPoint(name);if(!p)continue;const d=Math.hypot(p.x-pos.x,p.y-pos.y);if(d<bestD){best=name;bestD=d;}}return best;}
+$('photoCanvas').addEventListener('pointerdown',event=>{if(!state.image)return;const name=nearestLandmark(pointerPosition(event));if(!name)return;state.dragName=name;$('photoCanvas').setPointerCapture(event.pointerId);drawPhoto();});
+$('photoCanvas').addEventListener('pointermove',event=>{if(!state.dragName||!state.transform)return;const pos=pointerPosition(event),t=state.transform;state.landmarks[state.dragName]={...state.landmarks[state.dragName],x:Math.max(0,Math.min(1,(pos.x-t.x)/t.width)),y:Math.max(0,Math.min(1,(pos.y-t.y)/t.height)),source:'manual',confidence:1};drawPhoto();recalculate();});
+function endDrag(event){if(!state.dragName)return;state.dragName=null;try{$('photoCanvas').releasePointerCapture(event.pointerId)}catch{}drawPhoto();recalculate();}
+$('photoCanvas').addEventListener('pointerup',endDrag);$('photoCanvas').addEventListener('pointercancel',endDrag);
+
+async function loadPhoto(file){
+  if(state.objectUrl)URL.revokeObjectURL(state.objectUrl);
+  state.objectUrl=URL.createObjectURL(file);const image=new Image();image.decoding='async';
+  await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=()=>reject(new Error('图片无法读取'));image.src=state.objectUrl});
+  state.image=image;state.landmarks=createDefaultLandmarks(state.mode,image.naturalHeight/image.naturalWidth);$('photoShell').dataset.ready='true';
+  const sha256=await digestFile(file).catch(()=>null);
+  state.imageMeta={imageId:`local-${Date.now()}`,fileName:file.name,mimeType:file.type,width:image.naturalWidth,height:image.naturalHeight,sha256};
+  $('photoDigest').textContent=sha256?`SHA256 ${sha256.slice(0,12)}…`:'LOCAL PHOTO';
+  drawPhoto();recalculate();
+}
+$('photoInput').addEventListener('change',event=>{const file=event.target.files?.[0];if(file)loadPhoto(file).catch(error=>showError(error));});
+$('modeSelect').addEventListener('change',event=>{state.mode=event.target.value;resetLandmarks();});
+$('knownHeight').addEventListener('input',recalculate);$('fitGain').addEventListener('input',()=>{syncRangeOutputs();recalculate()});
+$('looseClothing').addEventListener('change',recalculate);$('perspectiveWarning').addEventListener('change',recalculate);
+$('limbVolume').addEventListener('input',()=>{syncRangeOutputs();recalculate()});$('softness').addEventListener('input',()=>{syncRangeOutputs();recalculate()});
+$('resetPointsBtn').onclick=resetLandmarks;$('recalcBtn').onclick=recalculate;$('toggleLabelsBtn').onclick=()=>{state.showLabels=!state.showLabels;$('toggleLabelsBtn').textContent=state.showLabels?'隐藏文字标签':'显示文字标签';drawPhoto();};
+
+function syncRangeOutputs(){
+  $('fitGainOut').value=Number($('fitGain').value).toFixed(2);
+  $('limbVolumeOut').value=Number($('limbVolume').value).toFixed(2);
+  $('softnessOut').value=Number($('softness').value).toFixed(2);
+}
+
+function recalculate(){
+  syncRangeOutputs();
+  if(!state.image){state.measurement=null;state.candidate=null;state.profile=null;renderResults();return;}
+  try{
+    state.measurement=measureLandmarks(state.landmarks,{
+      mode:state.mode,imageWidth:state.image.naturalWidth,imageHeight:state.image.naturalHeight,
+      knownHeightM:$('knownHeight').value,looseClothing:$('looseClothing').checked,perspectiveWarning:$('perspectiveWarning').checked
+    });
+    if(state.basePreset){
+      state.candidate=buildCandidateMorphs(state.measurement,state.basePreset.appearance.morphs,{
+        gain:Number($('fitGain').value),manualMorphs:{limbVolume:Number($('limbVolume').value),softness:Number($('softness').value)}
+      });
+      state.profile=createPhotoFitProfile({source:state.imageMeta,measurementResult:state.measurement,candidate:state.candidate,basePreset:state.basePreset,stageState:[...state.appliedStages]});
+      setCandidateState('CANDIDATE READY');
+    }
+    renderResults();
+  }catch(error){showError(error);}
+}
+
+function showError(error){
+  const message=String(error?.message||error);setCandidateState('ERROR');
+  $('warningList').innerHTML='';const node=document.createElement('div');node.className='warning';node.dataset.severity='error';node.textContent=message;$('warningList').append(node);
+}
+
+function renderStages(){
+  $('stageList').replaceChildren(...stageOrder.map(stage=>{
+    const definition=FIT_STAGES[stage],card=document.createElement('div');card.className='stage-card';card.dataset.applied=state.appliedStages.has(stage);
+    const top=document.createElement('header'),title=document.createElement('b'),flag=document.createElement('small');title.textContent=definition.label;flag.textContent=state.appliedStages.has(stage)?'APPLIED':definition.mayReload?'MAY RELOAD':'LIVE';top.append(title,flag);
+    const p=document.createElement('p');p.textContent=definition.description;
+    const button=document.createElement('button');button.className='stage-button';button.type='button';button.textContent=state.appliedStages.has(stage)?'重新应用此阶段':'应用此阶段';button.disabled=!state.candidate||!state.basePreset;button.onclick=()=>applyStage(stage);
+    card.append(top,p,button);return card;
+  }));
+  $('applyAllBtn').disabled=!state.candidate||!state.basePreset;$('resetBaseBtn').disabled=!state.basePreset;
+}
+
+function renderMorphs(){
+  const body=$('morphRows');
+  if(!state.candidate||!state.basePreset){body.innerHTML='<tr><td colspan="4">等待图片与人物基线。</td></tr>';return;}
+  const diff=diffMorphs(state.basePreset.appearance.morphs,state.candidate.morphs);body.innerHTML='';
+  for(const [key,item] of Object.entries(diff)){
+    const evidence=state.candidate.evidence[key]||{},tr=document.createElement('tr');
+    const status=evidence.status||'unknown',statusText=status==='candidate'?'照片候选':status==='manual'?'人工':status==='unknown'?'未知/保持':'保持';
+    tr.innerHTML=`<td>${morphLabels[key]||key}<br><small>${stageByMorph[key]||'—'}</small></td><td><code>${format(item.before)}</code></td><td class="${item.changed?'changed':''}"><code>${format(item.after)}</code></td><td class="${status}">${statusText}${Number.isFinite(evidence.confidence)?` · ${Math.round(evidence.confidence*100)}%`:''}</td>`;
+    body.append(tr);
+  }
+}
+
+function renderWarnings(){
+  const list=$('warningList'),warnings=state.candidate?.warnings||state.measurement?.warnings||[];list.innerHTML='';
+  if(!warnings.length){const node=document.createElement('div');node.className='warning';node.textContent='当前没有警告。';list.append(node);return;}
+  for(const warning of warnings){const node=document.createElement('div');node.className='warning';node.dataset.severity=warning.severity;node.innerHTML=`<b>${warning.code}</b><br>${warning.message}`;list.append(node);}
+}
+
+function renderProfile(){
+  $('jsonPreview').textContent=state.profile?JSON.stringify(state.profile,null,2):'等待拟合档案。';
+  $('exportBtn').disabled=!state.profile;$('copyBtn').disabled=!state.profile;$('appliedState').textContent=`${state.appliedStages.size} STAGES`;
+}
+function renderResults(){renderStages();renderMorphs();renderWarnings();renderProfile();}
+
+async function applyStage(stage){
+  if(!state.basePreset||!state.candidate)return;
+  const previous=new Set(state.appliedStages);state.appliedStages.add(stage);await applyCommittedStages(previous);
+}
+async function applyCommittedStages(previousStages=new Set(state.appliedStages)){
+  const lab=getLab();if(!lab?.character?.apply)throw new Error('人物工作台未连接');
+  const stages=[...state.appliedStages];const preset=applyCandidateToPreset(state.basePreset,state.candidate,stages);
+  try{
+    setConnection('正在应用人物参数…','waiting');setViewerMask('正在重建人物外形…');
+    const result=await lab.character.apply(preset);
+    if(result?.reloading){setViewerMask('绑定宽度已提交，等待身体重新载入…');setConnection('等待身体重新载入','waiting');}
+    else{setViewerMask(null);setConnection('参数已应用','ready');}
+    state.profile=createPhotoFitProfile({source:state.imageMeta,measurementResult:state.measurement,candidate:state.candidate,basePreset:state.basePreset,stageState:stages});
+    renderResults();
+  }catch(error){state.appliedStages=new Set(previousStages);setViewerMask(null);setConnection('应用失败','error');showError(error);renderResults();}
+}
+$('applyAllBtn').onclick=async()=>{const previous=new Set(state.appliedStages);state.appliedStages=new Set(stageOrder);await applyCommittedStages(previous);};
+$('resetBaseBtn').onclick=async()=>{
+  const lab=getLab();if(!lab?.character?.apply||!state.basePreset)return;
+  try{setViewerMask('正在恢复人物基线…');await lab.character.apply(clone(state.basePreset));state.appliedStages.clear();setViewerMask(null);setConnection('已恢复记录的基线','ready');renderResults();}
+  catch(error){setViewerMask(null);showError(error);}
+};
+$('captureBaseBtn').onclick=()=>captureBaseline(true).then(()=>setConnection('已记录当前人物为新基线','ready')).catch(showError);
+
+$('frontViewBtn').onclick=()=>{const lab=getLab();lab?.focus?.('body');lab?.inspectBody?.('front');};
+$('sideViewBtn').onclick=()=>{const lab=getLab();lab?.focus?.('body');lab?.inspectBody?.('side');};
+$('clayViewBtn').onclick=()=>{const lab=getLab();lab?.setAnatomyView?.('clay');};
+$('exportBtn').onclick=()=>state.profile&&downloadJson(`photo-fit-${state.profile.subjectId}-r0.json`,state.profile);
+$('copyBtn').onclick=async()=>{if(!state.profile)return;await navigator.clipboard.writeText(JSON.stringify(state.profile,null,2));$('copyBtn').textContent='已复制';setTimeout(()=>$('copyBtn').textContent='复制 JSON',1200);};
+
+syncRangeOutputs();renderResults();resizeCanvas();monitorConnection();
+window.addEventListener('beforeunload',()=>{if(state.objectUrl)URL.revokeObjectURL(state.objectUrl);clearInterval(state.connectTimer);});
+</script>
+</body>
+</html>
