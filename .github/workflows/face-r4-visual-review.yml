@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p visual-review
-          cat > /tmp/capture-face-r4.mjs <<'JS'
+          cat > capture-face-r4.mjs <<'JS'
           import { chromium } from 'playwright';
           import { writeFile } from 'node:fs/promises';
 
@@ -114,11 +114,12 @@ jobs:
           await writeFile('visual-review/face-r4-diagnostics.json', JSON.stringify({ diagnostics, consoleMessages, pageErrors }, null, 2));
           await browser.close();
           JS
-          node /tmp/capture-face-r4.mjs
+          node capture-face-r4.mjs
       - name: Upload review artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: face-r4-visual-review
           path: visual-review
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 7
