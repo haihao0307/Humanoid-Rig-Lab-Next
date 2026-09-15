@@ -41,12 +41,12 @@ jobs:
           if count!=1:
               raise SystemExit(f'GLSL fissure scalar anchor mismatch: {count}')
           cpu_old="  const ey=(restY+dy)*(1-state[2])+(.00035*lateral-.0024)*canthus*canthus*state[2];"
-          cpu_new="  const blinkY=COMPACT_EYE_ANATOMY.fissure.lateralCanthusLift*lateral*(1-canthus)+(.00035*lateral-.0024)*canthus*canthus;\n  const ey=(restY+dy)*(1-state[2])+blinkY*state[2];"
+          cpu_new="  const blinkCanthus=COMPACT_EYE_ANATOMY.fissure.lateralCanthusLift*lateral*(1+2*canthus*(1-canthus)**3);\n  const blinkY=blinkCanthus+(.00035*lateral-.0024)*canthus*canthus;\n  const ey=(restY+dy)*(1-state[2])+blinkY*state[2];"
           if text.count(cpu_old)!=1:
               raise SystemExit('CPU canthus attachment anchor mismatch')
           text=text.replace(cpu_old,cpu_new,1)
           glsl_old="  float ey=mix(restY+dy,(.00035*lateral-.0024)*canthus*canthus,blink);"
-          glsl_new="  float blinkY=cornerLift+(.00035*lateral-.0024)*canthus*canthus;\n  float ey=mix(restY+dy,blinkY,blink);"
+          glsl_new="  float blinkCanthus=${COMPACT_EYE_ANATOMY.fissure.lateralCanthusLift.toFixed(6)}*lateral*(1.+2.*canthus*pow(1.-canthus,3.));\n  float blinkY=blinkCanthus+(.00035*lateral-.0024)*canthus*canthus;\n  float ey=mix(restY+dy,blinkY,blink);"
           if text.count(glsl_old)!=1:
               raise SystemExit('GLSL canthus attachment anchor mismatch')
           text=text.replace(glsl_old,glsl_new,1)
