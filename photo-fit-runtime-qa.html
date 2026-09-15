@@ -104,9 +104,16 @@ async function run(){
   let initialRows=lab.population.list();
   const originalId=lab.population.activeId;
   if(initialRows.length<2){
-   check(typeof lab.population.installMotherPair==='function','population-spawn-api');
-   const spawnedId=await lab.population.installMotherPair();
-   initialRows=await waitFor(()=>{const rows=lab.population.list();return rows.length>=2?rows:null;},{timeout:300000,label:'生成第二个 NPC'});
+   check(typeof lab.npc?.spawn==='function','population-spawn-api');
+   const definition=clone(lab.npc.export());
+   definition.character.id='qa-photo-fit-secondary';
+   definition.character.label='QA 二号人物';
+   definition.character.seed=26091511;
+   definition.character.task={command:'',startOnSpawn:false};
+   definition.behavior=null;
+   definition.attachments={...definition.attachments,hair:{assetId:null,enabled:false},outfit:[],accessories:[]};
+   const spawnedId=await lab.npc.spawn(definition,{identity:{residentId:'qa-photo-fit-secondary',displayName:'QA 二号人物',role:'general'}});
+   initialRows=await waitFor(()=>{const rows=lab.population.list();return rows.length>=2?rows:null;},{timeout:300000,label:'生成无毛发测试 NPC'});
    note('population-created-for-qa',spawnedId);
   }
   check(initialRows.length>=2,'population-available',String(initialRows.length));
