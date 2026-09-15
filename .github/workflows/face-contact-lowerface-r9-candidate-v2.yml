@@ -1,0 +1,65 @@
+name: Face neutral oral seal lower-face R9 candidate v2
+
+on:
+  push:
+    branches:
+      - feature/human-face-workbench-v1-20260915
+    paths:
+      - .github/workflows/face-contact-lowerface-r9-candidate-v2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: face-contact-lowerface-r9-candidate-v2
+  cancel-in-progress: true
+
+jobs:
+  validate-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-face-workbench-v1-20260915
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply consolidated R9 source candidate
+        run: |
+          python3 tools/apply-face-contact-lowerface-r9-candidate.py
+          python3 tools/apply-face-inner-return-normals-r9.py
+          python3 tools/apply-face-r9-visual-corrections.py
+      - name: Build and validate candidate
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/check-eye-anatomy.mjs --parameter-fixtures
+          node tools/check-face-anatomy.mjs --parameter-fixtures
+          node tools/test-face-profile-separation.mjs
+          node tools/test-face-identity-landmarks.mjs
+          node tools/test-face-review-entry.mjs
+          node tools/test-npc-face-uniforms.mjs
+          node tools/test-face-startup.mjs
+      - name: Install isolated browser runtime
+        run: |
+          mkdir -p /tmp/face-r9-browser
+          cd /tmp/face-r9-browser
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium
+      - name: Capture fixed review views
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/hrl-face-r9-server.log 2>&1 &
+          NODE_PATH=/tmp/face-r9-browser/node_modules node tools/capture-face-r9.cjs
+      - name: Upload candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-contact-lowerface-r9-candidate-v2
+          path: visual-review-r9
+          if-no-files-found: warn
+          retention-days: 7
