@@ -108,6 +108,7 @@ jobs:
             .github/workflows/face-r7-promote.yml \
             tools/apply-face-nose-midface-r7-candidate.py \
             tools/promote-face-eye-nose-r7.py
+          rm -rf visual-review-r7-final
           node tools/build-pure.mjs --check
           node tools/check-pure.mjs
           python3 tools/audit-files.py
