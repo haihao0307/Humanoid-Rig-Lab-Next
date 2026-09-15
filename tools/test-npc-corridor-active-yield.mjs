@@ -36,9 +36,10 @@ function makeHuman(){
  return h;
 }
 
+const referenceHuman=makeHuman(),bodyRadiusM=referenceHuman.bodyMetrics.bodyRadiusM,corridorHalf=bodyRadiusM+.42;
 const walls=[
- {id:'corridor-left',shape:'box',p:[-.72,0,0],w:.18,d:2.8,held:false,collidable:true},
- {id:'corridor-right',shape:'box',p:[.72,0,0],w:.18,d:2.8,held:false,collidable:true}
+ {id:'corridor-left',shape:'box',p:[-corridorHalf,0,0],w:.18,d:2.8,held:false,collidable:true},
+ {id:'corridor-right',shape:'box',p:[corridorHalf,0,0],w:.18,d:2.8,held:false,collidable:true}
 ];
 const world={objects:walls,bounds:{xMin:-6,xMax:6,zMin:-6,zMax:6},get:()=>null,population:null};
 world.collision=(p,r,ignore=[])=>walls.some(o=>!ignore.includes(o.id)&&pointToObjectClearance(p,o)<r+.06);
@@ -48,8 +49,8 @@ world.path=(start,end,r=.3,ignore=[])=>{
  return[[...end]];
 };
 const specs=[['npc-a',[0,0,-2.5],[0,0,2.5],0],['npc-b',[0,0,2.5],[0,0,-2.5],Math.PI]];
-const actors=specs.map(([id,start,goal,yaw])=>{
- const human=makeHuman(),agent={npcId:id,h:human,pos:[start[0],0,start[2]],yaw,time:0,index:0,phase:'walk',held:null,skill:{type:'walk'},route:[[...goal]],routeIndex:0,manipulationPace:()=>1,strength:{movementFactor:()=>1},walkSpeed:0,w:world,logs:[],log(message){this.logs.push(message);}};
+const actors=specs.map(([id,start,goal,yaw],index)=>{
+ const human=index===0?referenceHuman:makeHuman(),agent={npcId:id,h:human,pos:[start[0],0,start[2]],yaw,time:0,index:0,phase:'walk',held:null,skill:{type:'walk'},route:[[...goal]],routeIndex:0,manipulationPace:()=>1,strength:{movementFactor:()=>1},walkSpeed:0,w:world,logs:[],log(message){this.logs.push(message);}};
  const actor={id,label:id,human,agent,goal,disposed:false,done:false};actor.locomotion=new api.NaturalLocomotion(agent);agent.locomotion=actor.locomotion;return actor;
 });
 world.population={
@@ -57,12 +58,13 @@ world.population={
  collisionFor:(agent,p,r)=>actors.some(other=>other.agent!==agent&&!other.disposed&&horizontal(p,other.agent.pos)<r+other.human.bodyMetrics.bodyRadiusM+.06),
  sweepFor:(agent,start,end,r)=>actors.filter(other=>other.agent!==agent&&!other.disposed).reduce((fraction,other)=>Math.min(fraction,api.motionCircleSweep(start,end,other.agent.pos,r+other.human.bodyMetrics.bodyRadiusM+.06)),1)
 };
+const debug=(failed,error)=>({failed,error:error.message,frame:frames,bodyRadiusM,corridorHalf,actors:actors.map(actor=>({id:actor.id,position:actor.agent.pos,goal:actor.goal,routeIndex:actor.agent.routeIndex,route:actor.agent.route,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-8)}))});
 let minSeparation=Infinity,frames=0;
 for(;frames<10000&&!actors.every(actor=>actor.done);frames++){
  const order=frames%2?actors:[...actors].reverse();
  for(const actor of order){
   if(actor.done)continue;const a=actor.agent,l=actor.locomotion;a.time+=1/120;
-  const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving)actor.done=true;
+  try{const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving)actor.done=true;}catch(error){console.error('CORRIDOR_DEBUG '+JSON.stringify(debug(actor.id,error)));throw error;}
  }
  minSeparation=Math.min(minSeparation,horizontal(actors[0].agent.pos,actors[1].agent.pos));
 }
@@ -73,4 +75,4 @@ const claims=actors.reduce((n,a)=>n+a.locomotion.traffic.corridorClaims,0),yield
 assert(claims>=1,'one direction must obtain corridor ownership');
 assert(yields>=1,'the opposite direction must actively retreat or side-step');
 assert(actors.some(actor=>actor.agent.logs.some(message=>message.includes('主动撤到通道外'))));
-console.log(JSON.stringify({passed:true,agents:2,frames,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,parkingWait:false}));
+console.log(JSON.stringify({passed:true,agents:2,frames,bodyRadiusM,corridorHalf,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,parkingWait:false}));
