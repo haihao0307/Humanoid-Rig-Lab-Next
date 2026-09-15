@@ -32,20 +32,26 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Normalize builder assertion
+      - name: Normalize builder patch and assertions
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           path = Path('tools/build_chicken_r92.py')
           text = path.read_text(encoding='utf-8')
-          old = 'build["patch_marker_count"] == 2'
-          new = 'build["patch_marker_count"] == 1'
-          if old in text:
-              text = text.replace(old, new, 1)
-              path.write_text(text, encoding='utf-8')
-          elif new not in text:
-              raise SystemExit('Unable to locate patch-marker assertion')
+
+          replacements = [
+              ('build["patch_marker_count"] == 2', 'build["patch_marker_count"] == 1'),
+              ('function applyHeadTopR91(input,amount,ctrl){', 'applyHeadTopR91=function(input,amount,ctrl){'),
+              (" return p;\n}\n'''.strip()\n\nVISIBLE_REPLACEMENTS", " return p;\n};\n'''.strip()\n\nVISIBLE_REPLACEMENTS"),
+          ]
+          for old, new in replacements:
+              if old in text:
+                  text = text.replace(old, new, 1)
+              elif new not in text:
+                  raise SystemExit(f'Unable to normalize builder fragment: {old}')
+
+          path.write_text(text, encoding='utf-8')
           PY
 
       - name: Build deterministic R9.2 executable
