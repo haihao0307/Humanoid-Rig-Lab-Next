@@ -1,0 +1,91 @@
+name: Photo Fit R1 Runtime Closure
+
+on:
+  push:
+    branches:
+      - feature/photo-driven-npc-fit-r1-complete-base
+    paths:
+      - "photo-fit/**"
+      - "photo-fit-test.html"
+      - "photo-fit-runtime-qa.html"
+      - "schemas/photo-fit-profile.schema.json"
+      - "tools/check-photo-fit.mjs"
+      - "tools/run-photo-fit-browser-qa.mjs"
+      - "reconstruction/shape-contract.mjs"
+      - "body/CharacterShape.js"
+      - "body/CharacterPresets.js"
+      - "body/FaceControls.js"
+      - "control/NPCPopulation.js"
+      - ".github/workflows/photo-fit-r1-runtime.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-closure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout complete-source photo-fit branch
+        uses: actions/checkout@v4
+
+      - name: Use project Node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Record toolchain
+        run: |
+          node --version
+          python3 --version
+          google-chrome --version
+
+      - name: Verify assembled complete workbench
+        run: |
+          node tools/build-pure.mjs --check
+          node tools/check-pure.mjs
+
+      - name: Verify current character contracts
+        run: |
+          node tools/check-character-shape.mjs
+          node tools/check-character-system.mjs
+          node tools/check-face-controls.mjs
+          node tools/check-npc-population.mjs
+
+      - name: Verify photo-fit data layer
+        run: node tools/check-photo-fit.mjs
+
+      - name: Verify fixed public HTTPS entry
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${GITHUB_SHA}/photo-fit-test.html"
+          for attempt in $(seq 1 12); do
+            if curl --fail --silent --show-error --location "$url" --output /tmp/photo-fit-public.html; then
+              break
+            fi
+            if [ "$attempt" = 12 ]; then
+              echo "Public fixed preview did not become available: $url" >&2
+              exit 1
+            fi
+            sleep 5
+          done
+          grep -q "照片驱动 NPC 拟合测试板 R1" /tmp/photo-fit-public.html
+          printf '%s\n' "$url" > /tmp/photo-fit-public-url.txt
+
+      - name: Run complete browser transaction
+        run: node tools/run-photo-fit-browser-qa.mjs
+
+      - name: Upload runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: photo-fit-r1-runtime-evidence-${{ github.sha }}
+          path: |
+            artifacts/photo-fit-browser-qa.json
+            artifacts/photo-fit-http.log
+            artifacts/photo-fit-chrome.log
+            /tmp/photo-fit-public-url.txt
+          if-no-files-found: warn
+          retention-days: 30
