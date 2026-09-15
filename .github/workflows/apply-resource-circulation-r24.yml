@@ -75,21 +75,23 @@ jobs:
            }
            claimObject(a,id,targetId=null){
             const owner=this.claims.get(id),o=this.lab.world.get(id);if(owner&&owner!==a.npcId||o?.held&&o.heldOwner!==a.npcId)throw Error('物体正由其他 NPC 使用：'+id);
-            if(targetId){const stationOwner=this.stationClaims.get(targetId);if(stationOwner&&stationOwner!==a.npcId)throw Error('目标工位正由其他 NPC 使用：'+targetId);this.stationClaims.set(targetId,a.npcId);}
-            if(this.physicsOwner&&this.physicsOwner!==a.npcId)throw Error('已有 NPC 正在操作物体');this.physicsOwner=a.npcId;this.claims.set(id,a.npcId);
+            const stationOwner=targetId?this.stationClaims.get(targetId):null;if(stationOwner&&stationOwner!==a.npcId)throw Error('目标工位正由其他 NPC 使用：'+targetId);
+            if(this.physicsOwner&&this.physicsOwner!==a.npcId)throw Error('已有 NPC 正在操作物体');if(targetId)this.stationClaims.set(targetId,a.npcId);this.physicsOwner=a.npcId;this.claims.set(id,a.npcId);
            }
            releaseObjects(a,{preserveResource=false}={}){
             for(const [id,owner]of this.claims)if(owner===a.npcId&&a.held?.id!==id){this.lab.world.physics?.clearManipulation(id);this.claims.delete(id);}if(!a.held)for(const [id,owner]of this.stationClaims)if(owner===a.npcId)this.stationClaims.delete(id);if(this.physicsOwner===a.npcId&&!a.held)this.physicsOwner=null;
             const actor=this.actors.get(a.npcId);if(actor&&!preserveResource&&!a.held)actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};
            }
-           dispatch(text,{targets='selected',mode='append'}={){
+           dispatch(text,{targets='selected',mode='append'}={}){
           """
           text=text[:m.start()]+block+text[m.end():]
-          text=once(text,"actor.running=null;this.releaseObjects(a);","actor.running=null;this.releaseObjects(a,{preserveResource:previous.source==='resource-circulation'});",'preserve circulation')
+          old="actor.running=null;this.releaseObjects(a);\n  }\n  if(b.enabled&&timeLimit)this.finishBehavior(actor,'duration');"
+          new="actor.running=null;this.releaseObjects(a,{preserveResource:previous.source==='resource-circulation'});\n  }\n  if(b.enabled&&timeLimit)this.finishBehavior(actor,'duration');"
+          text=once(text,old,new,'preserve circulation')
           old="if(request.source==='behavior'&&request.kind!=='wait'&&this.physicsOwner&&this.physicsOwner!==a.npcId&&parse(request.text,this.lab.world,a.lastObject).steps.some(s=>s.type==='carry'||s.type==='push')){b.status='resourceWait';actor.queue.unshift(request);return;}"
           new="if(request.kind!=='wait'){const conflict=this.reserveResource(actor,request);if(conflict){this.startResourceCirculation(actor,request,conflict);return;}}"
           text=once(text,old,new,'replace resource wait')
-          text=once(text,"disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();}","disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();this.stationClaims.clear();}",'dispose station claims')
+          text=once(text,"disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();}","disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();this.stationClaims.clear();this.physicsOwner=null;}",'dispose station claims')
           save(path,text,nl)
 
           path='control/TaskAgent.js';text,nl=load(path)
