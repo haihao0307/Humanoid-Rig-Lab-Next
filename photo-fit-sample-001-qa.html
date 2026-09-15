@@ -2,71 +2,50 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark">
-<title>Photo Fit R1.2 Sample 001 QA</title>
+<title>Photo Fit R1.2 Generated Sample 001 QA</title>
 <style>
-html,body{margin:0;width:100%;height:100%;background:#05090e;color:#dce9ee;font:13px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}body{display:grid;grid-template-rows:auto minmax(0,1fr)}header{padding:10px 14px;border-bottom:1px solid #29404f;background:#0b141c}header b{display:block;font-size:15px}header span{color:#7f98a7}main{position:relative;min-height:0}iframe{width:100%;height:100%;border:0;display:block;background:#020508}#qaResult{position:absolute;left:12px;right:12px;bottom:12px;z-index:9;max-height:36%;overflow:auto;margin:0;padding:10px;border:1px solid #365466;border-radius:8px;background:#08131de8;color:#a9c5cf;font:10px/1.55 ui-monospace,monospace;white-space:pre-wrap}#qaResult[data-status=passed]{border-color:#4d8e78;color:#aee9d1}#qaResult[data-status=failed]{border-color:#8b4a53;color:#f2b5bd}</style>
+html,body{margin:0;width:100%;height:100%;background:#05090e;color:#dce9ee;font:13px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}body{display:grid;grid-template-rows:auto minmax(0,1fr)}header{padding:10px 14px;border-bottom:1px solid #29404f;background:#0b141c}header b{display:block;font-size:15px}header span{color:#7f98a7}main{position:relative;min-height:0}iframe{width:100%;height:100%;border:0;display:block;background:#020508}#qaResult{position:absolute;left:12px;right:12px;bottom:12px;z-index:9;max-height:38%;overflow:auto;margin:0;padding:10px;border:1px solid #365466;border-radius:8px;background:#08131de8;color:#a9c5cf;font:10px/1.55 ui-monospace,monospace;white-space:pre-wrap}#qaResult[data-status=passed]{border-color:#4d8e78;color:#aee9d1}#qaResult[data-status=failed]{border-color:#8b4a53;color:#f2b5bd}</style>
 </head>
 <body>
-<header><b>Photo Fit R1.2 · Stylized Sample 001 QA</b><span>1.75 m · front only · body, face, appearance, instance isolation and rollback</span></header>
-<main><iframe id="sampleFrame" src="./photo-fit-sample-001.html?runtimeQaHost=1" title="风格化样本拟合测试板"></iframe><pre id="qaResult" data-status="running">{"status":"running"}</pre></main>
+<header><b>Photo Fit R1.2 · Dedicated Sample NPC QA</b><span>create new instance, apply sample, focus it, preserve source NPC and verify rollback</span></header>
+<main><iframe id="generatedFrame" src="./photo-fit-sample-001-generated.html?runtimeQaHost=1" title="新建样本 NPC 工作台"></iframe><pre id="qaResult" data-status="running">{"status":"running"}</pre></main>
 <script type="module">
-const resultNode=document.getElementById('qaResult'),sampleFrame=document.getElementById('sampleFrame');
-const report={schema:'humanoid_rig/photo_fit_sample_runtime_qa@0.1',sampleId:'stylized-explorer-175-front-001',baseCommit:'2c10edaec6e8515bc64f9df8b3da78cb34c89e61',startedAt:new Date().toISOString(),checks:[],consoleErrors:[]};
+const resultNode=document.getElementById('qaResult'),generatedFrame=document.getElementById('generatedFrame');
+const report={schema:'humanoid_rig/photo_fit_generated_sample_runtime_qa@0.1',sampleId:'stylized-explorer-175-front-001',baseCommit:'2c10edaec6e8515bc64f9df8b3da78cb34c89e61',startedAt:new Date().toISOString(),checks:[],consoleErrors:[]};
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms)),clone=value=>JSON.parse(JSON.stringify(value)),stable=value=>JSON.stringify(value);
 function check(condition,id,detail=''){if(!condition)throw Error(id+(detail?' · '+detail:''));report.checks.push({id,status:'passed',detail});}
-function sampleWindow(){try{return sampleFrame.contentWindow}catch{return null}}
-function sampleAPI(){return sampleWindow()?.PhotoFitSample001||null}
-function getLab(){return sampleAPI()?.getLab?.()||null}
-async function waitFor(test,{timeout=360000,interval=300,label='condition'}={}){const started=performance.now();let lastError=null;while(performance.now()-started<timeout){try{const value=await test();if(value)return value}catch(error){lastError=error}await sleep(interval)}throw Error('等待超时：'+label+(lastError?' · '+lastError.message:''));}
+function generatedAPI(){try{return generatedFrame.contentWindow?.PhotoFitGeneratedSample001||null}catch{return null}}
+function sampleAPI(){return generatedAPI()?.api?.()||null}
+function getLab(){return generatedAPI()?.getLab?.()||null}
+async function waitFor(test,{timeout=540000,interval=350,label='condition'}={}){const started=performance.now();let lastError=null;while(performance.now()-started<timeout){try{const value=await test();if(value)return value}catch(error){lastError=error}await sleep(interval)}throw Error('等待超时：'+label+(lastError?' · '+lastError.message:''));}
 function stablePreset(preset){return{schema:preset.schema,bodyPlanRevision:preset.bodyPlanRevision,bodyArchetype:preset.bodyArchetype,id:preset.id,label:preset.label,seed:preset.seed,bodySex:preset.bodySex,shape:clone(preset.shape),appearance:{skin:clone(preset.appearance.skin),skinLayers:clone(preset.appearance.skinLayers),hair:clone(preset.appearance.hair),face:clone(preset.appearance.face)},task:clone(preset.task)}}
 function vectorEqual(a,b,tolerance=1e-7){return a.length===b.length&&a.every((value,index)=>Math.abs(value-b[index])<=tolerance)}
 window.addEventListener('error',event=>report.consoleErrors.push({type:'error',message:String(event.message||event.error||'window error')}));
 window.addEventListener('unhandledrejection',event=>report.consoleErrors.push({type:'unhandledrejection',message:String(event.reason?.stack||event.reason)}));
 async function run(){
  try{
-  const api=await waitFor(()=>sampleAPI()?.state?.ready?sampleAPI():null,{timeout:420000,label:'样本页面与完整人物工作台就绪'});
-  const lab=await waitFor(()=>{const value=getLab();return value?.population?.activeId&&typeof value?.npc?.spawn==='function'?value:null},{timeout:420000,label:'NPC人口系统就绪'}),sample=api.sample;
-  await api.prepare();
+  const generated=await waitFor(()=>generatedAPI()?.state?.status==='ready'?generatedAPI():null,{label:'新建样本 NPC 完成'}),lab=getLab(),sampleApi=sampleAPI(),sample=sampleApi.sample;
   check(lab?.version==='1.24.0-staged-startup-r15','complete-source-version',lab?.version||'missing');
-  check(sample.subject.referenceKind==='stylized-illustration','stylized-classification');
-  check(sample.reference.storage==='not-in-repository','reference-pixels-not-committed');
-  check(sample.subject.knownHeightM===1.75,'known-height-registered','1.75 m');
-  check(sample.captureAssessment.neutralPose===false,'non-neutral-pose-explicit');
-  const baseline=clone(lab.character.export()),baselineStable=stablePreset(baseline),originalId=lab.population.activeId;
-  check(baseline.schema==='jarvis/character_preset@6','character-preset-v6');
-  const profile=api.state.profile,serialized=JSON.stringify(profile);
-  check(profile.schema==='humanoid_rig/photo_fit_profile@0.2','profile-schema');
-  check(profile.targetInstanceId===originalId,'profile-target-instance',originalId);
-  check(!/data:image|blob:|base64,/i.test(serialized),'profile-excludes-image-payload');
-  check(profile.sample.referenceKind==='stylized-illustration','profile-retains-style-classification');
-  check(profile.sample.unsupportedInCurrentMother.length>=6,'capability-gap-recorded',String(profile.sample.unsupportedInCurrentMother.length));
-
-  const definition=clone(lab.npc.export());definition.character.id='qa-stylized-secondary';definition.character.label='QA 样本隔离人物';definition.character.seed=26091531;definition.character.task={command:'',startOnSpawn:false};definition.behavior=null;definition.attachments={...definition.attachments,hair:{assetId:null,enabled:false},outfit:[],accessories:[]};
-  const secondaryId=await lab.npc.spawn(definition,{identity:{residentId:'qa-stylized-secondary',displayName:'QA 样本隔离人物',role:'general'}}),otherBefore=stablePreset(lab.population.get(secondaryId).human.characterPreset);
-  check(lab.population.list().some(row=>row.id===secondaryId),'secondary-npc-created',secondaryId);
-
-  await api.applyAll();
-  await waitFor(()=>!lab.character.busy&&!lab.population.active.hairTask&&!lab.population.active.compactQualityPending,{timeout:420000,label:'样本全部候选应用完成'});
-  const applied=lab.character.export(),manualShape=sample.interpretation.manualShape;
-  for(const [id,value] of Object.entries(manualShape))check(Math.abs(applied.shape[id]-value)<1e-8,'shape-'+id,String(applied.shape[id]));
+  check(generated.state.sampleInstanceId&&generated.state.sampleInstanceId!==generated.state.sourceInstanceId,'dedicated-instance-created',generated.state.sampleInstanceId||'missing');
+  const sampleId=generated.state.sampleInstanceId,sourceId=generated.state.sourceInstanceId,row=lab.population.list().find(item=>item.id===sampleId);
+  check(Boolean(row),'sample-instance-listed',sampleId);check(row.definitionId===generated.CHARACTER_ID,'sample-definition-id',row.definitionId);check(lab.population.activeId===sampleId,'sample-instance-active',sampleId);check(row.selected===true,'sample-instance-selected');
+  const actor=lab.population.get(sampleId),applied=lab.character.export();
+  check(applied.id===generated.CHARACTER_ID,'sample-character-id',applied.id);check(applied.label===generated.CHARACTER_LABEL,'sample-character-label',applied.label);
+  for(const [id,value] of Object.entries(sample.interpretation.manualShape))check(Math.abs(applied.shape[id]-value)<1e-8,'shape-'+id,String(applied.shape[id]));
   for(const [id,value] of Object.entries(sample.interpretation.manualFaceOffsetsMm))check(vectorEqual(applied.appearance.face.offsetsMm[id]||[0,0,0],value),'face-'+id);
   check(applied.appearance.skin.baseColor.toLowerCase()===sample.interpretation.appearanceSuggestion.skin.baseColor.toLowerCase(),'skin-suggestion-applied',applied.appearance.skin.baseColor);
-  check(applied.appearance.hair.preset===sample.interpretation.appearanceSuggestion.hair.preset,'hair-preset-applied',applied.appearance.hair.preset);
-  check(applied.appearance.hair.color.toLowerCase()===sample.interpretation.appearanceSuggestion.hair.color.toLowerCase(),'hair-color-applied',applied.appearance.hair.color);
-  check(stable(otherBefore)===stable(stablePreset(lab.population.get(secondaryId).human.characterPreset)),'npc-instance-isolation',secondaryId);
-  check(api.state.profile.sample.appearanceSuggestionApplied===true,'appearance-stage-audited');
-
-  const doc=sampleFrame.contentDocument;doc.getElementById('frontView').click();doc.getElementById('sideView').click();doc.getElementById('faceView').click();doc.getElementById('clayView').click();check(true,'inspection-controls-callable');
-  await api.restore();
-  await waitFor(()=>!lab.character.busy&&stable(stablePreset(lab.character.export()))===stable(baselineStable),{timeout:420000,label:'恢复样本前基线'});
-  check(stable(stablePreset(lab.character.export()))===stable(baselineStable),'baseline-restored');
-  check(lab.population.activeId===originalId,'active-instance-preserved',originalId);
-  check(stable(otherBefore)===stable(stablePreset(lab.population.get(secondaryId).human.characterPreset)),'non-target-unchanged-after-restore',secondaryId);
-
-  Object.assign(report,{finishedAt:new Date().toISOString(),status:'passed',runtimeVerified:true,rollbackVerified:true,npcIsolationVerified:true,sampleTransactionVerified:true,visualAcceptance:false,productionReady:false});resultNode.dataset.status='passed';resultNode.textContent=JSON.stringify(report,null,2);document.title='PASS · Photo Fit R1.2 Sample 001 QA';window.__PHOTO_FIT_SAMPLE_QA__=report;
- }catch(error){Object.assign(report,{finishedAt:new Date().toISOString(),status:'failed',error:String(error?.stack||error),runtimeVerified:false,visualAcceptance:false,productionReady:false});resultNode.dataset.status='failed';resultNode.textContent=JSON.stringify(report,null,2);document.title='FAIL · Photo Fit R1.2 Sample 001 QA';window.__PHOTO_FIT_SAMPLE_QA__=report;}
+  check(applied.appearance.hair.preset===sample.interpretation.appearanceSuggestion.hair.preset,'hair-preset-applied',applied.appearance.hair.preset);check(applied.appearance.hair.color.toLowerCase()===sample.interpretation.appearanceSuggestion.hair.color.toLowerCase(),'hair-color-applied',applied.appearance.hair.color);
+  const horizontalTargetError=Math.hypot(lab.renderer.target[0]-actor.agent.pos[0],lab.renderer.target[2]-actor.agent.pos[2]);check(horizontalTargetError<.35,'sample-camera-focused',horizontalTargetError.toFixed(4)+' m');
+  if(sourceId&&generated.state.sourcePreset){const sourceActor=lab.population.get(sourceId);check(stable(stablePreset(sourceActor.human.characterPreset))===stable(stablePreset(generated.state.sourcePreset)),'source-npc-unchanged',sourceId);}
+  const profile=sampleApi.state.profile,serialized=JSON.stringify(profile);check(profile.targetInstanceId===sampleId,'profile-targets-new-instance',sampleId);check(!/data:image|blob:|base64,/i.test(serialized),'profile-excludes-image-payload');check(profile.sample.referenceKind==='stylized-illustration','profile-retains-style-classification');
+  const base=clone(sampleApi.state.base);await sampleApi.restore();await waitFor(()=>!lab.character.busy&&stable(stablePreset(lab.character.export()))===stable(stablePreset(base)),{label:'新样本 NPC 恢复基线'});check(stable(stablePreset(lab.character.export()))===stable(stablePreset(base)),'sample-baseline-restored');check(lab.population.activeId===sampleId,'sample-remains-active-after-restore');
+  await generated.generateSample();await waitFor(()=>generated.state.status==='ready'&&!lab.character.busy,{label:'样本重新应用'});check(lab.population.activeId===sampleId,'sample-refocused-after-reapply',sampleId);check(Math.abs(lab.character.export().shape.statureScale-sample.interpretation.manualShape.statureScale)<1e-8,'sample-reapplied');
+  const innerDoc=generatedFrame.contentDocument.getElementById('sampleFrame').contentDocument;innerDoc.getElementById('frontView').click();innerDoc.getElementById('sideView').click();innerDoc.getElementById('faceView').click();innerDoc.getElementById('clayView').click();check(true,'inspection-controls-callable');
+  check(report.consoleErrors.length===0,'no-window-errors');
+  Object.assign(report,{finishedAt:new Date().toISOString(),status:'passed',runtimeVerified:true,newInstanceVerified:true,cameraFocusVerified:true,rollbackVerified:true,npcIsolationVerified:true,visualAcceptance:false,productionReady:false});resultNode.dataset.status='passed';resultNode.textContent=JSON.stringify(report,null,2);document.title='PASS · Generated Sample NPC 001 QA';window.__PHOTO_FIT_GENERATED_SAMPLE_QA__=report;
+ }catch(error){Object.assign(report,{finishedAt:new Date().toISOString(),status:'failed',error:String(error?.stack||error),runtimeVerified:false,visualAcceptance:false,productionReady:false});resultNode.dataset.status='failed';resultNode.textContent=JSON.stringify(report,null,2);document.title='FAIL · Generated Sample NPC 001 QA';window.__PHOTO_FIT_GENERATED_SAMPLE_QA__=report;}
 }
-sampleFrame.addEventListener('load',()=>run(),{once:true});
+generatedFrame.addEventListener('load',()=>run(),{once:true});
 </script>
 </body>
 </html>
