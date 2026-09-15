@@ -10,6 +10,7 @@ on:
       - "photo-fit-test.html"
       - "photo-fit-runtime-qa.html"
       - "photo-fit-sample-001.html"
+      - "photo-fit-sample-001-generated.html"
       - "photo-fit-sample-001-qa.html"
       - "schemas/photo-fit-profile.schema.json"
       - "tools/check-photo-fit.mjs"
@@ -119,32 +120,32 @@ jobs:
       - name: Verify sample data and privacy boundary
         run: node tools/check-photo-fit-sample-001.mjs
 
-      - name: Verify sample fixed public HTTPS entry
+      - name: Verify generated sample fixed public HTTPS entry
         shell: bash
         run: |
           set -euo pipefail
-          url="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${GITHUB_SHA}/photo-fit-sample-001.html"
+          url="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${GITHUB_SHA}/photo-fit-sample-001-generated.html"
           for attempt in $(seq 1 12); do
             if curl --fail --silent --show-error --location "$url" --output /tmp/photo-fit-sample-public.html; then
               break
             fi
             if [ "$attempt" = 12 ]; then
-              echo "Public sample preview did not become available: $url" >&2
+              echo "Public generated sample preview did not become available: $url" >&2
               exit 1
             fi
             sleep 5
           done
-          grep -q "风格化样本 001" /tmp/photo-fit-sample-public.html
+          grep -q "新建样本 NPC 001" /tmp/photo-fit-sample-public.html
           printf '%s\n' "$url" > /tmp/photo-fit-sample-public-url.txt
 
-      - name: Run stylized sample browser transaction
+      - name: Run generated stylized sample browser transaction
         run: node tools/run-photo-fit-sample-001-browser-qa.mjs
 
-      - name: Upload stylized sample evidence
+      - name: Upload generated stylized sample evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: photo-fit-r1-2-sample-001-evidence-${{ github.sha }}
+          name: photo-fit-r1-2-generated-sample-001-evidence-${{ github.sha }}
           path: |
             artifacts/photo-fit-sample-001-browser-qa.json
             artifacts/photo-fit-sample-001-http.log
