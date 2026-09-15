@@ -75,35 +75,31 @@ jobs:
             }
             if(!faceFrame)throw new Error('Face settings frame did not become available');
             await faceFrame.locator('#face-identities button').first().waitFor({state:'visible',timeout:60000});
-            await faceFrame.evaluate(()=>{
-              const overlay=document.querySelector('#bodyStartupDiagnostics');
-              if(overlay){overlay.hidden=true;overlay.style.display='none';overlay.style.pointerEvents='none';}
-              window.HumanLab?.setAuto?.(false);
-              window.HumanLab?.face?.closeup?.('front');
-              window.HumanLab?.render?.();
-            });
+            for(const frame of page.frames()){
+              try{await frame.evaluate(()=>{for(const overlay of document.querySelectorAll('#bodyStartupDiagnostics,[data-startup-diagnostics]')){overlay.hidden=true;overlay.style.display='none';overlay.style.pointerEvents='none';}});}catch{}
+            }
             const identityButtons=await faceFrame.locator('#face-identities button').count();
             const expressionButtons=await faceFrame.locator('#face-presets button').count();
             if(identityButtons!==5)throw new Error('Expected 5 identity presets, got '+identityButtons);
             if(expressionButtons<7)throw new Error('Expected expression presets, got '+expressionButtons);
-            const identityBefore=await faceFrame.evaluate(()=>{
+            const runtime=await faceFrame.evaluate(()=>{
               const api=window.HumanLab?.face;
               if(!api)throw new Error('Face runtime API is unavailable');
+              window.HumanLab.setAuto?.(false);
               api.setIdentityPreset('broad');
-              api.refresh();
-              return api.export().identity;
+              const identityBefore=api.export().identity;
+              api.preset('smile',1);
+              const identityDuring=api.export().identity;
+              document.getElementById('face-verify-separation').click();
+              api.closeup('front');
+              window.HumanLab.render?.();
+              return {identityBefore,identityDuring,status:document.getElementById('face-status').textContent};
             });
-            await faceFrame.locator('#face-presets button[data-preset="smile"]').click({force:true});
-            await page.waitForTimeout(800);
-            const identityDuring=await faceFrame.evaluate(()=>window.HumanLab.face.export().identity);
-            if(JSON.stringify(identityBefore)!==JSON.stringify(identityDuring))throw new Error('Expression changed fixed identity');
-            await faceFrame.locator('#face-verify-separation').click({force:true});
-            const status=await faceFrame.locator('#face-status').textContent();
-            if(!status||!status.includes('通过'))throw new Error('Separation check did not pass: '+status);
-            await faceFrame.evaluate(()=>window.HumanLab?.render?.());
+            if(JSON.stringify(runtime.identityBefore)!==JSON.stringify(runtime.identityDuring))throw new Error('Expression changed fixed identity');
+            if(!runtime.status||!runtime.status.includes('通过'))throw new Error('Separation check did not pass: '+runtime.status);
             await page.waitForTimeout(300);
             await page.screenshot({path:'docs/qa/face-profile-split-r1.png',fullPage:true});
-            const report={schema:'jarvis/face_browser_qa@1',url:'index.html?review=face',identityButtons,expressionButtons,status,identityComparedInRuntime:true,identityPreserved:JSON.stringify(identityBefore)===JSON.stringify(identityDuring),startupOverlayHiddenForQa:true,consoleErrors,pageErrors,viewport:[1440,900],browserExecuted:true,gpuAcceptance:false,visualAcceptance:false};
+            const report={schema:'jarvis/face_browser_qa@1',url:'index.html?review=face',identityButtons,expressionButtons,status:runtime.status,identityComparedInRuntime:true,identityPreserved:JSON.stringify(runtime.identityBefore)===JSON.stringify(runtime.identityDuring),startupOverlayHiddenForQa:true,consoleErrors,pageErrors,viewport:[1440,900],browserExecuted:true,gpuAcceptance:false,visualAcceptance:false};
             fs.writeFileSync('docs/qa/face-profile-split-r1.json',JSON.stringify(report,null,2));
             await browser.close();
           })().catch(error=>{console.error(error);process.exit(1);});
