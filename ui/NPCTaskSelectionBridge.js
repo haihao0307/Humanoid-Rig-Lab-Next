@@ -25,10 +25,11 @@ function installNPCTaskSelectionBridge(baseInstall=installNPCPopulationControls)
   const invert=doc.createElement('button');invert.type='button';invert.textContent='反选';invert.setAttribute('data-el','invertSelection');
   if(row){row.append(onlyCurrent,invert);row.insertAdjacentElement('afterend',recipients);}else panel.append(recipients);
   const sync=()=>{if(target)target.value='selected';recipients.textContent=npcTaskRecipientText(population);};
+  const deferSync=()=>Promise.resolve().then(sync);
   onlyCurrent.onclick=()=>{population.select([population.activeId]);sync();};
   invert.onclick=()=>{const selected=new Set(npcTaskSelectedRows(population).map(item=>item.id));population.select(population.list().filter(item=>!selected.has(item.id)).map(item=>item.id));sync();};
-  panel.addEventListener('change',()=>queueMicrotask(sync));
-  panel.addEventListener('click',()=>queueMicrotask(sync));
+  panel.addEventListener('change',deferSync);
+  panel.addEventListener('click',deferSync);
   window.addEventListener('humanlab:population-change',sync);
   sync();
   return{...installed,syncTaskRecipients:sync};
