@@ -50,29 +50,47 @@ jobs:
           command -v ffmpeg
           command -v Xvfb
 
-      - name: Resolve fixed public preview
+      - name: Resolve immutable source and preview URLs
         id: target
         shell: bash
         run: |
           set -euo pipefail
           SOURCE_SHA="$(git rev-parse HEAD)"
           SHORT_SHA="${SOURCE_SHA:0:12}"
-          APP_URL="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${SOURCE_SHA}/index.html?visualTest=1"
+          PUBLIC_URL="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${SOURCE_SHA}/index.html?visualTest=1"
+          BROWSER_URL="http://127.0.0.1:8765/index.html?visualTest=1"
           echo "source_sha=${SOURCE_SHA}" >> "$GITHUB_OUTPUT"
           echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-          echo "app_url=${APP_URL}" >> "$GITHUB_OUTPUT"
+          echo "public_url=${PUBLIC_URL}" >> "$GITHUB_OUTPUT"
+          echo "browser_url=${BROWSER_URL}" >> "$GITHUB_OUTPUT"
 
       - name: Run one-session Chrome capture
         id: capture
         continue-on-error: true
         env:
           SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
-          APP_URL: ${{ steps.target.outputs.app_url }}
+          PUBLIC_URL: ${{ steps.target.outputs.public_url }}
+          BROWSER_URL: ${{ steps.target.outputs.browser_url }}
           SKIP_AB: ${{ github.event.inputs.skip_ab || 'false' }}
         shell: bash
         run: |
           set -o pipefail
-          args=(--url "$APP_URL" --source-sha "$SOURCE_SHA" --output visual-review)
+          curl -fL --retry 12 --retry-delay 3 --connect-timeout 20 --max-time 240 \
+            -H 'Cache-Control: no-cache' "$PUBLIC_URL" -o public-index.html
+          sha256sum index.html public-index.html | tee preview-hashes.txt
+          if ! cmp -s index.html public-index.html; then
+            echo 'Fixed public HTTPS bytes do not match the checked-out index.html.' >&2
+            exit 1
+          fi
+          python -m http.server 8765 --bind 127.0.0.1 >http-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS --connect-timeout 2 "http://127.0.0.1:8765/index.html" >/dev/null; then break; fi
+            if [[ "$attempt" == 40 ]]; then echo 'Local exact-commit server did not start.' >&2; exit 1; fi
+            sleep .25
+          done
+          args=(--url "$BROWSER_URL" --source-sha "$SOURCE_SHA" --output visual-review)
           if [[ "$SKIP_AB" == "true" ]]; then args+=(--skip-ab); fi
           xvfb-run -a -s "-screen 0 1920x1080x24" \
             python tools/motion_visual_qa.py "${args[@]}" | tee visual-qa-run.log
@@ -80,6 +98,8 @@ jobs:
       - name: Summarize browser QA
         if: always()
         shell: python
+        env:
+          PUBLIC_URL: ${{ steps.target.outputs.public_url }}
         run: |
           from pathlib import Path
           import json, os
@@ -92,7 +112,8 @@ jobs:
                   f"- source: `{data.get('sourceSHA')}`",
                   f"- status: `{data.get('status')}`",
                   f"- preflight: `{pre.get('passed')}`",
-                  f"- fixed HTTPS: {data.get('testedURL')}",
+                  f"- immutable public HTTPS: {os.environ.get('PUBLIC_URL')}",
+                  f"- exact-commit browser URL: {data.get('testedURL')}",
                   f"- scenario failures: `{', '.join(data.get('scenarioFailures',[])) or 'none'}`",
                   '- visualAcceptance: `false`',
                   '- productionReady: `false`',
@@ -111,6 +132,8 @@ jobs:
           path: |
             visual-review
             visual-qa-run.log
+            http-server.log
+            preview-hashes.txt
           if-no-files-found: error
           compression-level: 6
           retention-days: 30
