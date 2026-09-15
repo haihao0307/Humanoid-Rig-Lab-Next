@@ -4,14 +4,19 @@ on:
   push:
     branches:
       - feature/photo-driven-npc-fit-r1-complete-base
+      - feature/photo-fit-r1-2-stylized-sample-001
     paths:
       - "photo-fit/**"
       - "photo-fit-test.html"
       - "photo-fit-runtime-qa.html"
+      - "photo-fit-sample-001.html"
+      - "photo-fit-sample-001-qa.html"
       - "schemas/photo-fit-profile.schema.json"
       - "tools/check-photo-fit.mjs"
+      - "tools/check-photo-fit-sample-001.mjs"
       - "tools/check-packed-entrypoint.mjs"
       - "tools/run-photo-fit-browser-qa.mjs"
+      - "tools/run-photo-fit-sample-001-browser-qa.mjs"
       - "reconstruction/shape-contract.mjs"
       - "body/CharacterShape.js"
       - "body/CharacterPresets.js"
@@ -26,7 +31,7 @@ permissions:
 jobs:
   runtime-closure:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - name: Checkout complete-source photo-fit branch
         uses: actions/checkout@v4
@@ -96,5 +101,54 @@ jobs:
             artifacts/photo-fit-http.log
             artifacts/photo-fit-chrome.log
             /tmp/photo-fit-public-url.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  stylized-sample-001:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout stylized sample branch
+        uses: actions/checkout@v4
+
+      - name: Use project Node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Verify sample data and privacy boundary
+        run: node tools/check-photo-fit-sample-001.mjs
+
+      - name: Verify sample fixed public HTTPS entry
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${GITHUB_SHA}/photo-fit-sample-001.html"
+          for attempt in $(seq 1 12); do
+            if curl --fail --silent --show-error --location "$url" --output /tmp/photo-fit-sample-public.html; then
+              break
+            fi
+            if [ "$attempt" = 12 ]; then
+              echo "Public sample preview did not become available: $url" >&2
+              exit 1
+            fi
+            sleep 5
+          done
+          grep -q "风格化样本 001" /tmp/photo-fit-sample-public.html
+          printf '%s\n' "$url" > /tmp/photo-fit-sample-public-url.txt
+
+      - name: Run stylized sample browser transaction
+        run: node tools/run-photo-fit-sample-001-browser-qa.mjs
+
+      - name: Upload stylized sample evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: photo-fit-r1-2-sample-001-evidence-${{ github.sha }}
+          path: |
+            artifacts/photo-fit-sample-001-browser-qa.json
+            artifacts/photo-fit-sample-001-http.log
+            artifacts/photo-fit-sample-001-chrome.log
+            /tmp/photo-fit-sample-public-url.txt
           if-no-files-found: warn
           retention-days: 30
