@@ -39,9 +39,13 @@ jobs:
           python-version: '3.12'
 
       - name: Install real-browser QA dependencies
+        shell: bash
         run: |
+          set -euo pipefail
           python -m pip install --disable-pip-version-check --no-cache-dir \
             selenium==4.27.1 pillow==11.0.0 requests==2.32.3
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg xvfb xauth fonts-noto-cjk
           command -v google-chrome || command -v google-chrome-stable || command -v chromium
           command -v ffmpeg
           command -v Xvfb
@@ -121,14 +125,14 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin "$REVIE]}BRANCH:refs/remotes/origin/$REVIEW_BRANCH" || true
+          git fetch origin "+refs/heads/$REVIEW_BRANCH:refs/remotes/origin/$REVIEW_BRANCH" || true
           rm -rf /tmp/human-motion-review
           git worktree add --detach /tmp/human-motion-review "$SOURCE_SHA"
           cd /tmp/human-motion-review
           if git show-ref --verify --quiet "refs/remotes/origin/$REVIEW_BRANCH"; then
-            git checkout -B "$REVIEW_BRANCH" "refs/remotes/origin/$REVIE]}BRANCH"
+            git checkout -B "$REVIEW_BRANCH" "refs/remotes/origin/$REVIEW_BRANCH"
           else
-            git checkout --orphan "$REVIE]}BRANCH"
+            git checkout --orphan "$REVIEW_BRANCH"
             git rm -rf . || true
           fi
           mkdir -p "reviews/$SOURCE_SHA"
@@ -157,7 +161,7 @@ jobs:
         shell: python
         run: |
           from pathlib import Path
-          import json, sys
+          import json
           path=Path('visual-review/browser-run-report.json')
           if not path.exists():
               raise SystemExit('Browser QA did not produce browser-run-report.json')
