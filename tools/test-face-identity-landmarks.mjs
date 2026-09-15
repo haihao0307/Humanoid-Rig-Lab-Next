@@ -39,5 +39,5 @@ assert.deepEqual(normal(neutral.identity),normal(shaped.identity),'expression in
 for(const preset of api.FACE_IDENTITY_PRESETS){const profile=api.validateFacePose({identity:{shape:preset.shape,neutralOffsetsMm:preset.offsetsMm}});assert.equal(profile.schema,api.FACE_SCHEMA);api.resolveFaceOffsets(profile);}
 assert.throws(()=>api.validateFacePose({identity:{shape:{unknown:1}}}),/未知结构脸型参数/);
 assert.throws(()=>api.validateFacePose({identity:{shape:{jawWidth:1.1}}}),/超出范围/);
-assert.throws(()=>api.validateFacePose({schema:'jarvis/face_profile@3',identity:{shape:{}},weights:{}}),/未知字段/);
+assert.throws(()=>api.validateFacePose({schema:'jarvis/face_profile@3',identity:{shape:{}},weights:{}}),/字段不匹配|未知字段/);
 console.log(JSON.stringify({profileV1Migrated:true,profileV2Migrated:true,structuralParameters:api.FACE_IDENTITY_PARAMETERS.length,identityPresets:api.FACE_IDENTITY_PRESETS.length,landmarks:Object.keys(resolved.landmarks.values).length,structuralAndResidualComposition:true,identityPreservedAcrossExpression:true,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));

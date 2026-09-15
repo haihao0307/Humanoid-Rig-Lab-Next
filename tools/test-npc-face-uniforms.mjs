@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const parserModule={exports:{}};
 vm.runInNewContext(process.binding('natives')['internal/deps/acorn/acorn/dist/acorn'],{exports:parserModule.exports,module:parserModule});
-const faceSource=read('body/FaceControls.js').replace('/*__FACE_RECIPE_JSON__*/',read('body/FaceControlRecipe.json'));
+const faceSource=read('body/FaceIdentity.js')+'\n'+read('body/FaceControls.js').replace('/*__FACE_RECIPE_JSON__*/',read('body/FaceControlRecipe.json'));
 const tree=parserModule.exports.parse(faceSource,{ecmaVersion:'latest',sourceType:'module'}),methods=[];
 function visit(node){
  if(!node||typeof node!=='object')return;

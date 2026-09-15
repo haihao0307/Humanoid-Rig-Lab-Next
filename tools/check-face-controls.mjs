@@ -5,15 +5,17 @@ import {fileURLToPath} from 'node:url';
 import {checkFaceMuscleParameters} from './check-face-muscles.mjs';
 export function checkFaceControlSources({read,assert}){
   let checks=0;const check=(value,message)=>{assert(value,'Face controls: '+message);checks++;};
-  const recipe=JSON.parse(read('body/FaceControlRecipe.json')),source=read('body/FaceControls.js'),renderer=read('body/CompactWorkbench.js'),runtime=read('source/runtime.template.js'),character=read('body/CharacterPresets.js'),manifest=JSON.parse(read('source/assembly.json'));
+  const recipe=JSON.parse(read('body/FaceControlRecipe.json')),identity=read('body/FaceIdentity.js'),source=read('body/FaceControls.js'),renderer=read('body/CompactWorkbench.js'),runtime=read('source/runtime.template.js'),character=read('body/CharacterPresets.js'),manifest=JSON.parse(read('source/assembly.json'));
   check(recipe.schema==='jarvis/face_control_recipe@1'&&recipe.status==='Candidate'&&!recipe.runtimeVerified&&!recipe.visualAcceptance,'explicit authored recipe and unverified acceptance');
-  check(source.includes("const FACE_SCHEMA='jarvis/face_profile@2'")&&source.includes("const FACE_IDENTITY_SCHEMA='jarvis/face_identity@1'")&&source.includes("const FACE_EXPRESSION_SCHEMA='jarvis/face_expression@1'"),'versioned identity and expression profiles');
-check(source.includes("const FACE_LEGACY_SCHEMA='jarvis/face_pose@1'")&&source.includes("legacyOffsetsInterpretation:'neutral identity'"),'legacy face-pose migration keeps an explicit assumption');
-check(source.includes('weights=pose.expression.weights,offsetsMm=pose.identity.neutralOffsetsMm'),'resolver composes fixed identity before transient expression');
+  check(source.includes("const FACE_SCHEMA='jarvis/face_profile@3'")&&source.includes("const FACE_IDENTITY_SCHEMA='jarvis/face_identity@2'")&&source.includes("const FACE_EXPRESSION_SCHEMA='jarvis/face_expression@1'"),'versioned identity and expression profiles');
+check(source.includes("const FACE_LEGACY_PROFILE_SCHEMA='jarvis/face_profile@2'")&&source.includes("const FACE_IDENTITY_LEGACY_SCHEMA='jarvis/face_identity@1'")&&source.includes("const FACE_LEGACY_SCHEMA='jarvis/face_pose@1'")&&source.includes("legacyOffsetsInterpretation:'neutral identity'"),'legacy profile and face-pose migrations keep an explicit assumption');
+check(source.includes('structuralOffsetsMm=compileFaceIdentityShape(pose.identity.shape)')&&source.includes('mergeFaceIdentityOffsets(structuralOffsetsMm,pose.identity.neutralOffsetsMm)'),'resolver composes structural identity, manual residuals and transient expression in order');
 check(source.includes('identity:demo.saved.identity,expression:{weights:')&&source.includes('identity:saved.identity,expression:{weights:'),'demo and eased presets retain the current identity');
 check(source.includes('verifySeparation(){')&&source.includes('face-identities')&&source.includes('reset-identity'),'visible separation controls and invariant check');
+  check(identity.includes("const FACE_IDENTITY_SHAPE_SCHEMA='jarvis/face_identity_shape@1'")&&identity.includes("const FACE_LANDMARK_SCHEMA='jarvis/face_landmarks@1'")&&identity.includes('compileFaceIdentityShape')&&identity.includes('faceIdentityLandmarks'),'versioned structural identity and shared landmark compiler');
+  check(identity.includes("id:'cranialWidth'")&&identity.includes("id:'jawWidth'")&&identity.includes("id:'noseProjection'")&&identity.includes("id:'lipFullness'"),'interpretable low-frequency identity parameters');
   const ids=recipe.nodes.map(n=>n.id),channels=recipe.channels.map(c=>c.id),presets=recipe.presets.map(p=>p.id);
-  check(ids.length===17&&new Set(ids).size===17,'17 distinct local regions');
+  check(ids.length===25&&new Set(ids).size===25,'25 distinct local regions including forehead, temples, jaw, bridge, tip and philtrum');
   check(channels.length===22&&new Set(channels).size===22&&channels.includes('eyeBlinkLeft')&&channels.includes('eyeBlinkRight'),'22 distinct expression channels including independent blinks');
   check(presets.length===7&&new Set(presets).size===7,'neutral plus six expression examples');
   check(recipe.maximumOffsetMm===6,'bounded authored displacement');
@@ -31,8 +33,8 @@ check(source.includes('verifySeparation(){')&&source.includes('face-identities')
     check(Object.values(sums).every(delta=>Math.hypot(...delta)<=recipe.maximumOffsetMm),'example fits displacement budget '+preset.id);
   }
   check(Object.keys(recipe.presets.find(p=>p.id==='neutral').weights).length===0,'neutral example contains no displacement');
-  check(manifest.modules.filter(p=>p==='body/FaceControls.js').length===1&&manifest.jsonTokens.FACE_RECIPE==='FaceControlRecipe'&&runtime.includes('/*__SOURCE:body/FaceControls.js__*/'),'single assembly owner');
-  check(manifest.modules.indexOf('body/FaceControls.js')<manifest.modules.indexOf('body/CharacterPresets.js'),'face validator precedes initial character parsing');
+  check(manifest.modules.filter(p=>p==='body/FaceControls.js').length===1&&manifest.modules.filter(p=>p==='body/FaceIdentity.js').length===1&&manifest.jsonTokens.FACE_RECIPE==='FaceControlRecipe'&&runtime.includes('/*__SOURCE:body/FaceIdentity.js__*/')&&runtime.includes('/*__SOURCE:body/FaceControls.js__*/'),'single identity and control assembly owners');
+  check(manifest.modules.indexOf('body/FaceIdentity.js')<manifest.modules.indexOf('body/FaceControls.js')&&manifest.modules.indexOf('body/FaceControls.js')<manifest.modules.indexOf('body/CharacterPresets.js'),'identity compiler and face validator precede initial character parsing');
   check(source.includes("return name==='faceLip'||name==='mouthInterior'||name==='faceSkin'||name==='faceBrow'||name==='noseInterior'||name==='skin'||name==='FJ2812'||name==='FJ2814'||name==='eyeLidSkin'||name==='eyeLidMargin'||name==='eyeTearDuct'"),'skin and procedural eyelid structures deform while eyeballs and ears remain rigid');
   check(source.includes('(1-r)**4*(4*r+1)')&&source.includes('w=t*t*t*t*(4.*radius+1.)')&&source.includes('gradient=-20.*t*t*t*q/faceRadii[i]'),'matching C2 kernel and analytic derivative');
   check(source.includes('normalSource.x*cross(jy,jz)')&&source.includes('normalSource.y*cross(jz,jx)')&&source.includes('normalSource.z*cross(jx,jy)'),'inverse transpose normal transform');
@@ -57,14 +59,14 @@ check(source.includes('verifySeparation(){')&&source.includes('face-identities')
   check(source.includes('scale=Math.min(1,FACE_RECIPE.maximumOffsetMm/Math.max(length,1e-12))')&&source.includes('scale*.001'),'bounded vector magnitudes and millimetre conversion');
   check(source.includes('[-offset[0],offset[1],offset[2]]'),'mirror reverses lateral displacement only');
   check(source.includes('Number.isFinite(value)')&&source.includes("Object.keys(input).some")&&source.includes('file.size>65536'),'finite values, unknown-field rejection and import size guard');
-  check(source.includes('[0,1,2].flatMap(axis=>[-1,1].map')&&source.includes('saved:api.export()')&&source.includes('commit(saved)'),'102 independent signed samples and restore');
+  check(source.includes('[0,1,2].flatMap(axis=>[-1,1].map')&&source.includes('saved:api.export()')&&source.includes('commit(saved)'),'150 independent signed samples and restore');
   check(runtime.includes('window.HumanLab.face?.tick(dt)')&&source.includes('Math.min(Math.max(dt,0),.1)')&&source.includes('if(!demo||document.hidden)return'),'bounded demo clock independent of body autoplay');
   const characterAssembly=read('body/CharacterAssembly.js');
   check(character.includes('face:validateFacePose(appearance.face)')&&character.includes('lab.human.characterPreset=p')&&character.includes('refreshCharacterControls(lab)')&&characterAssembly.includes('()=>lab.face?.resetTransient()')&&characterAssembly.includes('()=>lab.face?.refresh()'),'character persistence uses the shared transient reset and face refresh');
   check(read('body/BodySettings.js').includes("['face','面部微控与表情','face-panel',null]")&&renderer.includes("lab.settings.open('face')"),'settings and workbench entries');
   check(read('body/HumanDNA.js').includes('facialExpression:lab.face?.report()')&&JSON.parse(read('body/HumanDNAContract.json')).structureRecipes.some(r=>r.id==='facial-expression'),'DNA recipe and state provenance');
   const muscles=checkFaceMuscleParameters(recipe,assert);
-  return {checks,nodes:ids.length,axes:ids.length*3,channels:channels.length,expressionExamples:presets.length-1,samplingSteps:ids.length*6,muscles,applicationExecuted:false,surfaceSampled:false,shaderCompiled:false,visualAcceptance:false};
+  return {checks,nodes:ids.length,axes:ids.length*3,structuralParameters:13,landmarks:21,channels:channels.length,expressionExamples:presets.length-1,samplingSteps:ids.length*6,muscles,applicationExecuted:false,surfaceSampled:false,shaderCompiled:false,visualAcceptance:false};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
   const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');

@@ -153,6 +153,7 @@ class Human{
 /*__SOURCE:body/HumanDNA.js__*/
 /*__SOURCE:body/SkinAppearance.js__*/
 /*__SOURCE:body/HairProfiles.js__*/
+/*__SOURCE:body/FaceIdentity.js__*/
 /*__SOURCE:body/FaceControls.js__*/
 /*__SOURCE:body/CharacterPresets.js__*/
 /*__SOURCE:body/NPCDefinitions.js__*/

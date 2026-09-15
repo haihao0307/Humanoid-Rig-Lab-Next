@@ -2,18 +2,13 @@
  * Only parameters persist. This is a geometric deformation model, not a
  * physical muscle/tissue simulation or measured anatomy. */
 const FACE_RECIPE=/*__FACE_RECIPE_JSON__*/;
-const FACE_SCHEMA='jarvis/face_profile@2';
-const FACE_IDENTITY_SCHEMA='jarvis/face_identity@1';
+const FACE_SCHEMA='jarvis/face_profile@3';
+const FACE_LEGACY_PROFILE_SCHEMA='jarvis/face_profile@2';
+const FACE_IDENTITY_SCHEMA='jarvis/face_identity@2';
+const FACE_IDENTITY_LEGACY_SCHEMA='jarvis/face_identity@1';
 const FACE_EXPRESSION_SCHEMA='jarvis/face_expression@1';
 const FACE_LEGACY_SCHEMA='jarvis/face_pose@1';
 const FACE_NODE_INDEX=new Map(FACE_RECIPE.nodes.map((node,index)=>[node.id,index]));
-const FACE_IDENTITY_PRESETS=Object.freeze([
-  {id:'reference',label:'参考中性',offsetsMm:{}},
-  {id:'slender',label:'清瘦轮廓',offsetsMm:{cheekLeft:[-2.4,-.4,-1.5],cheekRight:[2.4,-.4,-1.5],mouthLeft:[-1,0,0],mouthRight:[1,0,0],chin:[0,-1.8,1.8],noseLeft:[-.5,0,.8],noseRight:[.5,0,.8]}},
-  {id:'broad',label:'宽阔轮廓',offsetsMm:{cheekLeft:[3.2,0,1.2],cheekRight:[-3.2,0,1.2],mouthLeft:[1.2,0,0],mouthRight:[-1.2,0,0],chin:[0,.8,1.2],noseLeft:[1,0,.4],noseRight:[-1,0,.4]}},
-  {id:'round',label:'圆润轮廓',offsetsMm:{cheekLeft:[2.4,.6,2.6],cheekRight:[-2.4,.6,2.6],lidLowerLeft:[0,-.4,.6],lidLowerRight:[0,-.4,.6],mouthLeft:[.6,.5,.2],mouthRight:[-.6,.5,.2],chin:[0,1.7,-.8]}},
-  {id:'angular',label:'棱角轮廓',offsetsMm:{cheekLeft:[-1.5,.8,-1.8],cheekRight:[1.5,.8,-1.8],mouthLeft:[-.7,-.4,0],mouthRight:[.7,-.4,0],chin:[0,-2.4,2.6],noseLeft:[-.5,0,1],noseRight:[.5,0,1]}}
-]);
 const faceHas=(value,key)=>Object.prototype.hasOwnProperty.call(value,key);
 function faceObject(value,label){if(!value||typeof value!=='object'||Array.isArray(value))throw Error(label+'必须为对象');}
 function faceNumber(value,min,max,label){if(typeof value!=='number'||!Number.isFinite(value)||value<min||value>max)throw Error(label+'超出范围 '+min+' 至 '+max);return value;}
@@ -24,7 +19,7 @@ function validateFaceWeights(input={}){
   return weights;
 }
 function validateFaceOffsets(input={}){
-  faceObject(input,'固定身份局部位移');const offsetsMm={};
+  faceObject(input,'固定身份局部残差');const offsetsMm={};
   for(const [key,value]of Object.entries(input)){
     if(!FACE_NODE_INDEX.has(key)||!Array.isArray(value)||value.length!==3)throw Error('局部控制点或位移无效 '+key);
     offsetsMm[key]=value.map(v=>faceNumber(v,-FACE_RECIPE.maximumOffsetMm,FACE_RECIPE.maximumOffsetMm,key));
@@ -33,27 +28,30 @@ function validateFaceOffsets(input={}){
 }
 function validateFacePose(input={}){
   faceObject(input,'面部配方');validateFaceRevision(input);
-  const legacy=input.schema===FACE_LEGACY_SCHEMA||faceHas(input,'weights')||faceHas(input,'offsetsMm');
-  if(legacy){
+  const directLegacy=input.schema===FACE_LEGACY_SCHEMA||faceHas(input,'weights')||faceHas(input,'offsetsMm');
+  if(directLegacy){
     if(input.schema!==undefined&&input.schema!==FACE_LEGACY_SCHEMA)throw Error('面部配方 schema 与字段不匹配');
     if(Object.keys(input).some(key=>!['schema','revision','weights','offsetsMm'].includes(key)))throw Error('面部配方含未知字段');
     const neutralOffsetsMm=validateFaceOffsets(input.offsetsMm??{}),weights=validateFaceWeights(input.weights??{});
-    return {schema:FACE_SCHEMA,revision:FACE_RECIPE.revision,identity:{schema:FACE_IDENTITY_SCHEMA,neutralOffsetsMm},expression:{schema:FACE_EXPRESSION_SCHEMA,weights}};
+    return {schema:FACE_SCHEMA,revision:FACE_RECIPE.revision,identity:{schema:FACE_IDENTITY_SCHEMA,shape:{},neutralOffsetsMm},expression:{schema:FACE_EXPRESSION_SCHEMA,weights}};
   }
-  if(input.schema!==undefined&&input.schema!==FACE_SCHEMA)throw Error('不支持的面部配方 schema');
+  const profileSchema=input.schema??FACE_SCHEMA;
+  if(profileSchema!==FACE_SCHEMA&&profileSchema!==FACE_LEGACY_PROFILE_SCHEMA)throw Error('不支持的面部配方 schema');
   if(Object.keys(input).some(key=>!['schema','revision','identity','expression'].includes(key)))throw Error('面部配方含未知字段');
   const identity=input.identity??{},expression=input.expression??{};faceObject(identity,'固定身份');faceObject(expression,'临时表情');
-  if(Object.keys(identity).some(key=>!['schema','neutralOffsetsMm'].includes(key))||identity.schema!==undefined&&identity.schema!==FACE_IDENTITY_SCHEMA)throw Error('固定身份格式无效');
+  if(Object.keys(identity).some(key=>!['schema','shape','neutralOffsetsMm'].includes(key)))throw Error('固定身份格式无效');
+  if(identity.schema!==undefined&&identity.schema!==FACE_IDENTITY_SCHEMA&&identity.schema!==FACE_IDENTITY_LEGACY_SCHEMA)throw Error('固定身份 schema 无效');
   if(Object.keys(expression).some(key=>!['schema','weights'].includes(key))||expression.schema!==undefined&&expression.schema!==FACE_EXPRESSION_SCHEMA)throw Error('临时表情格式无效');
-  const neutralOffsetsMm=validateFaceOffsets(identity.neutralOffsetsMm??{}),weights=validateFaceWeights(expression.weights??{});
-  return {schema:FACE_SCHEMA,revision:FACE_RECIPE.revision,identity:{schema:FACE_IDENTITY_SCHEMA,neutralOffsetsMm},expression:{schema:FACE_EXPRESSION_SCHEMA,weights}};
+  const shape=validateFaceIdentityShape(identity.shape??{}),neutralOffsetsMm=validateFaceOffsets(identity.neutralOffsetsMm??{}),weights=validateFaceWeights(expression.weights??{});
+  return {schema:FACE_SCHEMA,revision:FACE_RECIPE.revision,identity:{schema:FACE_IDENTITY_SCHEMA,shape,neutralOffsetsMm},expression:{schema:FACE_EXPRESSION_SCHEMA,weights}};
 }
 function faceOffsetKey(offsetsMm={}){return FACE_RECIPE.nodes.map(node=>node.id+':'+(offsetsMm[node.id]||[0,0,0]).map(v=>Number(v).toFixed(4)).join(',')).join('|');}
+function faceIdentityKey(identity){return faceIdentityShapeKey(identity.shape)+'|'+faceOffsetKey(identity.neutralOffsetsMm);}
 function faceWeightKey(weights={}){return FACE_RECIPE.channels.map(channel=>channel.id+':'+Number(weights[channel.id]||0).toFixed(4)).join('|');}
-function faceIdentityPreset(identity){const key=faceOffsetKey(identity.neutralOffsetsMm);return FACE_IDENTITY_PRESETS.find(preset=>faceOffsetKey(validateFaceOffsets(preset.offsetsMm))===key)||null;}
+function faceIdentityPreset(identity){const key=faceIdentityKey(identity);return FACE_IDENTITY_PRESETS.find(preset=>faceIdentityKey({shape:validateFaceIdentityShape(preset.shape),neutralOffsetsMm:validateFaceOffsets(preset.offsetsMm)})===key)||null;}
 function faceExpressionPreset(expression){const key=faceWeightKey(expression.weights);return FACE_RECIPE.presets.find(preset=>faceWeightKey(preset.weights)===key)||null;}
 function resolveFaceOffsets(input){
-  const pose=validateFacePose(input),weights=pose.expression.weights,offsetsMm=pose.identity.neutralOffsetsMm,values=new Float32Array(FACE_RECIPE.nodes.length*3),limited=[];
+  const pose=validateFacePose(input),weights=pose.expression.weights,structuralOffsetsMm=compileFaceIdentityShape(pose.identity.shape),offsetsMm=mergeFaceIdentityOffsets(structuralOffsetsMm,pose.identity.neutralOffsetsMm),values=new Float32Array(FACE_RECIPE.nodes.length*3),limited=[];
   for(const [key,value]of Object.entries(offsetsMm))values.set(value,FACE_NODE_INDEX.get(key)*3);
   for(const channel of FACE_RECIPE.channels){const weight=weights[channel.id]||0;
     for(const [key,delta]of Object.entries(channel.offsets)){const offset=FACE_NODE_INDEX.get(key)*3;for(let axis=0;axis<3;axis++)values[offset+axis]+=weight*delta[axis];}
@@ -65,7 +63,7 @@ function resolveFaceOffsets(input){
   }
   const muscles=new Float32Array(FACE_RECIPE.muscleFields.map(field=>Math.min(1,Object.entries(field.activation).reduce((sum,[id,gain])=>sum+(weights[id]||0)*gain,0))));
   const eyelids=new Float32Array(['Left','Right'].flatMap(side=>['eyeNarrow','eyeWide','eyeBlink'].map(id=>weights[id+side]||0)));
-  return {profile:pose,values,muscles,eyelids,lipOpen:weights.lipPart||0,limited};
+  return {profile:pose,identityOffsetsMm:offsetsMm,landmarks:faceIdentityLandmarks(pose.identity.shape),values,muscles,eyelids,lipOpen:weights.lipPart||0,limited};
 }
 function interpolateFacePose(from,to,weight){
   const a=validateFacePose(from),b=validateFacePose(to);faceNumber(weight,0,1,'表情过渡');
@@ -158,25 +156,26 @@ void compactFace(inout vec3 source,inout vec3 normalSource,out float heat){
 }`;
 function installFaceControls(lab){
   const panel=document.createElement('section');panel.id='face-panel';panel.hidden=true;
-  panel.innerHTML=`<p>固定身份中性脸与临时表情已经分层：脸型微调长期保存，微笑、眨眼和皱眉只属于当前表情，不会覆盖人物长相。</p>
+  panel.innerHTML=`<p>人物长期中性脸、局部残差与临时表情分层保存。先调结构比例，再做局部收尾；微笑、眨眼和皱眉不会覆盖人物长相。</p>
     <button id="face-closeup">面部近景</button><button id="face-lip-closeup">嘴唇近景</button><button id="face-neutral">清除表情（回到本人的中性脸）</button>
     <label><input id="face-enabled" type="checkbox" checked>显示形变</label>
-    <h3>1 · 固定身份中性脸</h3><div id="face-identities"></div>
+    <h3>1 · 固定身份起点</h3><div id="face-identities"></div>
     <button id="face-reset-identity">重置身份为参考脸</button><button id="face-verify-separation">检查身份/表情分层</button>
-    <h3>2 · 固定身份局部微调</h3><label>控制点 <select id="face-node"></select></label>
+    <h3>2 · 结构脸型参数</h3><div id="face-shape"></div><output id="face-landmark-summary"></output>
+    <h3>3 · 固定身份局部残差</h3><label>控制点 <select id="face-node"></select></label>
     <label><input id="face-mirror" type="checkbox">左右联动</label>
     <label><input id="face-heat" type="checkbox">显示所选点影响范围</label>
-    <div id="face-axes"></div><button id="face-reset-node">清零所选点微调</button>
+    <div id="face-axes"></div><button id="face-reset-node">清零所选点残差</button>
     <label>采样步幅（毫米）<input id="face-step" type="number" value="0.5" min="0.1" max="1" step="0.1"></label>
     <button id="face-prev">上一采样</button><button id="face-next">下一采样</button><button id="face-exit-sample">结束采样并还原</button>
-    <p id="face-sample-label">逐点、逐轴、正负位移；开始时暂存当前表情。</p><output id="face-coverage"></output>
+    <p id="face-sample-label">逐点、逐轴、正负位移；开始时暂存当前身份与表情。</p><output id="face-coverage"></output>
     <button id="face-export-samples">导出采样读数与步骤</button>
-    <h3>3 · 临时表情示例</h3><div id="face-presets"></div>
+    <h3>4 · 临时表情示例</h3><div id="face-presets"></div>
     <label>示例强度 <input id="face-intensity" type="range" min="0" max="1" step="0.01" value="1"><output id="face-intensity-value">100%</output></label>
     <button id="face-demo">依次演示</button><button id="face-stop">停止并还原</button>
     <details><summary>单独调整 ${FACE_RECIPE.channels.length} 项表情通道</summary><div id="face-channels"></div></details>
     <button id="face-export">导出身份与表情配方</button><label>导入面部配方<input id="face-import" type="file" accept=".json,application/json"></label>
-    <p class="settings-hint">固定身份使用中性局部位移，临时表情使用独立通道。当前仍是程序化肌肉形变近似；上下唇可分别拉开，但尚未包含下颌关节、牙齿和舌头。</p>
+    <p class="settings-hint">十三项结构参数编译为中性脸位移，局部控制点只保存残差。当前仍未包含真实下颌关节、牙齿和舌头。</p>
     <output id="face-status" role="status" aria-live="polite"></output>`;
   const style=document.createElement('style');style.textContent=`#face-panel label{display:block;margin:10px 0}#face-panel select{max-width:100%}#face-panel input[type=range]{width:100%;accent-color:#41745e}#face-panel input[type=number]{width:90px}#face-panel output{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}#face-panel button{font:inherit}#face-coverage{display:block;font-size:12px}#face-panel details{margin:12px 0}#face-panel summary{color:inherit}#face-panel .face-slider{display:grid;grid-template-columns:1fr auto}#face-panel .face-slider input{grid-column:1/-1}`;
   document.head.append(style);document.body.append(panel);const el=id=>panel.querySelector('#face-'+id);
@@ -188,6 +187,8 @@ function installFaceControls(lab){
   identity:()=>copy(api.export().identity),
   expression:()=>copy(api.export().expression),
   identityPresets:()=>copy(FACE_IDENTITY_PRESETS),
+  shapeParameters:()=>copy(FACE_IDENTITY_PARAMETERS),
+  landmarks:()=>copy(resolved.landmarks),
   resetTransient(){demo=null;sampling=null;transition=null;presetId=null;},
   apply(input){
     faceObject(input,'面部配方');const previous=api.export(),normalised=validateFacePose(input);
@@ -201,34 +202,40 @@ function installFaceControls(lab){
     const pose=api.export(),offsetsMm={...pose.identity.neutralOffsetsMm,[id]:offset};
     const other=FACE_RECIPE.nodes[FACE_NODE_INDEX.get(id)].mirror;if(mirror&&other)offsetsMm[other]=[-offset[0],offset[1],offset[2]];
     return api.apply({...pose,identity:{...pose.identity,neutralOffsetsMm:offsetsMm}});},
+  setShapeParameter(id,value){const parameter=FACE_IDENTITY_PARAMETER_MAP.get(id);if(!parameter)throw Error('未知结构脸型参数');
+    const pose=api.export(),shape=validateFaceIdentityShape({...pose.identity.shape,[id]:value});identityPresetId=null;return api.apply({...pose,identity:{...pose.identity,shape}});},
   setIdentityPreset(id){const preset=FACE_IDENTITY_PRESETS.find(p=>p.id===id);if(!preset)throw Error('未知身份脸型起点');
-    const pose=api.export();identityPresetId=id;return api.apply({...pose,identity:{schema:FACE_IDENTITY_SCHEMA,neutralOffsetsMm:copy(preset.offsetsMm)}});},
+    const pose=api.export();identityPresetId=id;return api.apply({...pose,identity:{schema:FACE_IDENTITY_SCHEMA,shape:copy(preset.shape),neutralOffsetsMm:copy(preset.offsetsMm)}});},
   resetIdentity(){return api.setIdentityPreset('reference');},
   clearExpression(){return api.apply({weights:{}});},
   verifySeparation(){
     const before=api.export(),smile=FACE_RECIPE.presets.find(p=>p.id==='smile'),withExpression=validateFacePose({identity:before.identity,expression:{weights:smile.weights}}),neutral=interpolateFacePose(withExpression,validateFacePose({identity:before.identity,expression:{weights:{}}}),1);
-    const ok=faceOffsetKey(before.identity.neutralOffsetsMm)===faceOffsetKey(neutral.identity.neutralOffsetsMm);
+    const ok=faceIdentityKey(before.identity)===faceIdentityKey(neutral.identity);
     return {schema:'jarvis/face_separation_check@1',ok,identitySchema:before.identity.schema,expressionSchema:before.expression.schema,legacySchemaAccepted:FACE_LEGACY_SCHEMA,legacyOffsetsInterpretation:'neutral identity',visualAcceptance:false};
   },
-  refresh(){resolved=resolveFaceOffsets(api.export());const pose=api.export(),node=FACE_RECIPE.nodes[selected],offset=pose.identity.neutralOffsetsMm[node.id]||[0,0,0];
-    identityPresetId=faceIdentityPreset(pose.identity)?.id||null;
-    el('node').value=node.id;el('enabled').checked=enabled;el('heat').checked=heatmap;
-    ['x','y','z'].forEach((axis,i)=>{el(axis).value=offset[i];el(axis+'-value').textContent=offset[i].toFixed(2)+' mm';});
-    for(const c of FACE_RECIPE.channels){el('channel-'+c.id).value=pose.expression.weights[c.id]||0;el('value-'+c.id).textContent=Math.round((pose.expression.weights[c.id]||0)*100)+'%';}
-    for(const button of el('identities').children)button.setAttribute('aria-pressed',String(button.dataset.identity===identityPresetId));
-    for(const button of el('presets').children)button.setAttribute('aria-pressed',String(button.dataset.preset===presetId));
-    const sample=lab.compact?.faceSampling?.nodes[selected];
-    el('coverage').textContent=sample?`${node.label} · 覆盖 ${sample.coveredVertices} 个显示顶点 · 峰值权重 ${sample.peakWeight.toFixed(3)} · 最近距离 ${sample.nearestDistanceMm===null?'未知':sample.nearestDistanceMm.toFixed(2)+' mm'} · ${lab.compact.quality}${sample.peakWeight<.2?' · 覆盖偏弱，请复查控制点范围':''}`:'人物就绪后生成采样读数。';
-    const identity=faceIdentityPreset(pose.identity),expression=faceExpressionPreset(pose.expression),limit=resolved.limited.length?'组合位移已限制到每点 '+FACE_RECIPE.maximumOffsetMm+' mm：'+resolved.limited.join('、')+'。':'';
-    el('status').textContent=limit+'固定身份：'+(identity?.label||'自定义身份')+'；临时表情：'+(expression?.label||(Object.keys(pose.expression.weights).length?'自定义表情':'中性'))+'。';
-    needsRedraw=true;
-  },
-  uniforms(){return {offsets:resolved.values,muscles:resolved.muscles,eyelids:resolved.eyelids,lipOpen:resolved.lipOpen,enabled:enabled&&(resolved.lipOpen>0||[resolved.values,resolved.muscles,resolved.eyelids].some(values=>values.some(value=>value!==0)))?1:0,heatmap:heatmap?1:0,selected};},
+  refresh(){resolved=resolveFaceOffsets(api.export());const pose=api.export(),node=FACE_RECIPE.nodes[selected],offset=pose.identity.neutralOffsetsMm[node.id]||[0,0,0],shape=pose.identity.shape;
+  identityPresetId=faceIdentityPreset(pose.identity)?.id||null;
+  el('node').value=node.id;el('enabled').checked=enabled;el('heat').checked=heatmap;
+  for(const parameter of FACE_IDENTITY_PARAMETERS){const value=shape[parameter.id]||0;el('shape-'+parameter.id).value=value;el('shape-value-'+parameter.id).textContent=(value>=0?'+':'')+value.toFixed(2);}
+  ['x','y','z'].forEach((axis,i)=>{el(axis).value=offset[i];el(axis+'-value').textContent=offset[i].toFixed(2)+' mm';});
+  for(const c of FACE_RECIPE.channels){el('channel-'+c.id).value=pose.expression.weights[c.id]||0;el('value-'+c.id).textContent=Math.round((pose.expression.weights[c.id]||0)*100)+'%';}
+  for(const button of el('identities').children)button.setAttribute('aria-pressed',String(button.dataset.identity===identityPresetId));
+  for(const button of el('presets').children)button.setAttribute('aria-pressed',String(button.dataset.preset===presetId));
+  const sample=lab.compact?.faceSampling?.nodes[selected];
+  el('coverage').textContent=sample?`${node.label} · 覆盖 ${sample.coveredVertices} 个显示顶点 · 峰值权重 ${sample.peakWeight.toFixed(3)} · 最近距离 ${sample.nearestDistanceMm===null?'未知':sample.nearestDistanceMm.toFixed(2)+' mm'} · ${lab.compact.quality}${sample.peakWeight<.2?' · 覆盖偏弱，请复查控制点范围':''}`:'人物就绪后生成采样读数。';
+  const landmarks=resolved.landmarks.values,jawWidth=Math.abs(landmarks.jawLeft[0]-landmarks.jawRight[0])*1000,noseProjection=landmarks.noseTip[2]*1000;
+  el('landmark-summary').textContent=`共享标志点 ${Object.keys(landmarks).length} 个 · 下颌点间距 ${jawWidth.toFixed(1)} mm · 鼻尖参考深度 ${noseProjection.toFixed(1)} mm。`;
+  const identity=faceIdentityPreset(pose.identity),expression=faceExpressionPreset(pose.expression),limit=resolved.limited.length?'组合位移已限制到每点 '+FACE_RECIPE.maximumOffsetMm+' mm：'+resolved.limited.join('、')+'。':'';
+  el('status').textContent=limit+'固定身份：'+(identity?.label||'自定义身份')+'；结构参数 '+Object.keys(shape).length+'/'+FACE_IDENTITY_PARAMETERS.length+'；临时表情：'+(expression?.label||(Object.keys(pose.expression.weights).length?'自定义表情':'中性'))+'。';
+  needsRedraw=true;
+},
+uniforms(){return {offsets:resolved.values,muscles:resolved.muscles,eyelids:resolved.eyelids,lipOpen:resolved.lipOpen,enabled:enabled&&(resolved.lipOpen>0||[resolved.values,resolved.muscles,resolved.eyelids].some(values=>values.some(value=>value!==0)))?1:0,heatmap:heatmap?1:0,selected};},
   closeup(view='front'){
     lab.setCameraFollow(false);lab.tissue.setView('skin');
     const reference=lab.human.sourceBind.get('head'),current=lab.human.world('head'),s=lab.human.bodyMetrics.statureScale;
     const q=qnorm(qm(current.q,inv(reference.q))),translation=sub(current.p,rotate(q,reference.p)),r=lab.renderer;
-    const lips=view==='lips';r.target=add(rotate(q,(lips?[-.0006,1.4586,.188]:[.0006,1.500,.160]).map(v=>v*s)),translation);r.distance=(lips?.125:.50)*s;r.projection='perspective';r.pitch=0;
+    const landmarks=resolved.landmarks.values,lips=view==='lips',local=lips?[0,1,2].map(axis=>(landmarks.lipUpper[axis]+landmarks.lipLower[axis])*.5):[(landmarks.noseBridge[0]+landmarks.chin[0])*.5,(landmarks.forehead[1]+landmarks.chin[1])*.5,(landmarks.cheekLeft[2]+landmarks.cheekRight[2])*.5];
+    r.target=add(rotate(q,local.map(v=>v*s)),translation);r.distance=(lips?.125:.50)*s;r.projection='perspective';r.pitch=0;
     r.yaw=lab.agent.yaw+(view==='side'?Math.PI/3:0);needsRedraw=true;
   },
   samples:()=>lab.compact?.faceSampling?copy(lab.compact.faceSampling):{state:'NotObserved'},
@@ -255,7 +262,7 @@ function installFaceControls(lab){
     commit(validateFacePose({identity:demo.saved.identity,expression:{weights:Object.fromEntries(Object.entries(preset.weights).map(([key,value])=>[key,value*weight]))}}));
     el('status').textContent='正在演示：'+preset.label;needsRedraw=true;
   },
-  report:()=>{const profile=api.export();return {schema:FACE_SCHEMA,recipe:copy(FACE_RECIPE),parameters:profile,identity:copy(profile.identity),expression:copy(profile.expression),separation:api.verifySeparation(),sampling:api.samples(),limitedNodes:resolved.limited.slice(),enabled,generatedGeometryIncluded:false,runtimeVerified:false,visualAcceptance:false};}
+  report:()=>{const profile=api.export();return {schema:FACE_SCHEMA,recipe:copy(FACE_RECIPE),parameters:profile,identity:copy(profile.identity),expression:copy(profile.expression),identityModel:{shapeSchema:FACE_IDENTITY_SHAPE_SCHEMA,landmarkSchema:FACE_LANDMARK_SCHEMA,parameters:copy(FACE_IDENTITY_PARAMETERS),landmarks:copy(resolved.landmarks)},separation:api.verifySeparation(),sampling:api.samples(),limitedNodes:resolved.limited.slice(),enabled,generatedGeometryIncluded:false,runtimeVerified:false,visualAcceptance:false};}
 };
 function commit(pose,next=resolveFaceOffsets(pose)){const profile=validateFacePose(pose);lab.human.characterPreset={...lab.human.characterPreset,appearance:{...lab.human.characterPreset.appearance,face:profile}};resolved=next;identityPresetId=faceIdentityPreset(profile.identity)?.id||null;needsRedraw=true;}
 function transitionPreset(id,intensity=1){
@@ -264,6 +271,7 @@ function transitionPreset(id,intensity=1){
   api.stop();sampling=null;commit(saved);transition={saved,target,elapsed:0,duration:.45,label:preset.label};presetId=id;api.refresh();
 }
 const edit=operation=>{try{operation();}catch(error){el('status').textContent=error.message;}};
+  for(const parameter of FACE_IDENTITY_PARAMETERS){const row=document.createElement('label');row.className='face-slider';row.innerHTML=`<span>${parameter.label}</span><output id="face-shape-value-${parameter.id}">0.00</output><input id="face-shape-${parameter.id}" aria-label="${parameter.label}" type="range" min="${parameter.min}" max="${parameter.max}" step="${parameter.step}" value="0">`;el('shape').append(row);el('shape-'+parameter.id).oninput=e=>edit(()=>api.setShapeParameter(parameter.id,Number(e.target.value)));}
   for(const node of FACE_RECIPE.nodes){const option=document.createElement('option');option.value=node.id;option.textContent=node.label;el('node').append(option);}
   for(const [i,axis]of ['x','y','z'].entries()){
     const row=document.createElement('label');row.className='face-slider';row.innerHTML=`<span>${['X 横向（正值向人物左）','Y 上下（正值向上）','Z 前后（正值向前）'][i]}</span><output id="face-${axis}-value"></output><input id="face-${axis}" aria-label="${axis.toUpperCase()} 局部位移，毫米" type="range" min="-${FACE_RECIPE.maximumOffsetMm}" max="${FACE_RECIPE.maximumOffsetMm}" step="0.1" value="0">`;el('axes').append(row);
