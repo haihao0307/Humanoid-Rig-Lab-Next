@@ -1,0 +1,34 @@
+{
+  "schema": "cat_kaopu/source_receipt@1.0",
+  "version": "V4.32",
+  "source": {
+    "title": "My Cat Modeled",
+    "author": "lilyjoyhanna",
+    "url": "https://sketchfab.com/3d-models/my-cat-modeled-28d33c1592e14d8b895d36a1e0dfaa5d",
+    "license": "CC BY 4.0",
+    "sourceFileSha256": "4f0236732d378e90532231d145cfc8f62182b4e2eb9e83656d381340e427ff8e",
+    "sourceFileBytes": 7466064
+  },
+  "includedInRuntime": false,
+  "usedParts": [
+    "outer body surface",
+    "left eye surface",
+    "right eye surface"
+  ],
+  "excludedParts": [
+    "textures",
+    "UV dependence",
+    "whisker mesh",
+    "mouth/teeth/tongue internals",
+    "source GLB file"
+  ],
+  "processing": [
+    "read source positions and triangles",
+    "merge exact duplicate seam vertices",
+    "validate and fix winding",
+    "recompute smooth vertex normals",
+    "convert to project coordinate system and meters",
+    "quantize into project CATV432 binary"
+  ],
+  "interpretation": "This source replaces the visibly defective Cat v1.0 carrier. It is a cleaner recovery baseline, not the final Grey Tabby truth."
+}

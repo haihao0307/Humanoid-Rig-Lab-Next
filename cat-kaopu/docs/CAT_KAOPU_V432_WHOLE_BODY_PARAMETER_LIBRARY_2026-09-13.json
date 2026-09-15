@@ -1,0 +1,129 @@
+{
+  "schema": "cat_kaopu/whole_body_parameter_library@1.1",
+  "version": "V4.32",
+  "date": "2026-09-13",
+  "parameters": {
+    "bodyLength": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "整猫纵向关系"
+    },
+    "chestWidth": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "胸廓左右宽度"
+    },
+    "chestDepth": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "胸廓上下厚度"
+    },
+    "abdomenTuck": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "腹线上提或下放"
+    },
+    "pelvisWidth": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "骨盆与后躯宽度"
+    },
+    "headScale": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "头部整体尺度"
+    },
+    "muzzleLength": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "口鼻前伸量"
+    },
+    "neckThickness": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "颈部宽厚"
+    },
+    "tailLength": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "尾根以后长度"
+    },
+    "tailThickness": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "尾部径向厚度"
+    },
+    "legThickness": {
+      "min": -0.15,
+      "max": 0.15,
+      "default": 0.0,
+      "meaning": "四肢远端粗细，不改接地高度"
+    }
+  },
+  "presets": {
+    "Neutral": {},
+    "GreyTabbyDirection": {
+      "bodyLength": 0.09,
+      "chestWidth": -0.04,
+      "chestDepth": 0.01,
+      "abdomenTuck": 0.1,
+      "pelvisWidth": -0.03,
+      "headScale": -0.04,
+      "muzzleLength": 0.03,
+      "neckThickness": -0.02,
+      "tailLength": 0.02,
+      "tailThickness": -0.03,
+      "legThickness": -0.05
+    },
+    "Compact": {
+      "bodyLength": -0.1,
+      "chestWidth": 0.05,
+      "chestDepth": 0.04,
+      "abdomenTuck": -0.02,
+      "pelvisWidth": 0.06,
+      "headScale": 0.07,
+      "muzzleLength": -0.04,
+      "neckThickness": 0.03,
+      "tailLength": -0.08,
+      "tailThickness": 0.02,
+      "legThickness": 0.03
+    },
+    "Slender": {
+      "bodyLength": 0.11,
+      "chestWidth": -0.1,
+      "chestDepth": -0.05,
+      "abdomenTuck": 0.12,
+      "pelvisWidth": -0.08,
+      "headScale": -0.05,
+      "muzzleLength": 0.05,
+      "neckThickness": -0.08,
+      "tailLength": 0.08,
+      "tailThickness": -0.08,
+      "legThickness": -0.08
+    },
+    "Robust": {
+      "bodyLength": -0.02,
+      "chestWidth": 0.12,
+      "chestDepth": 0.1,
+      "abdomenTuck": -0.08,
+      "pelvisWidth": 0.12,
+      "headScale": 0.03,
+      "muzzleLength": -0.03,
+      "neckThickness": 0.1,
+      "tailLength": -0.03,
+      "tailThickness": 0.08,
+      "legThickness": 0.08
+    }
+  },
+  "boundary": "这些是整猫低频形态入口，不是家猫品种统计模型；动作、骨架和蒙皮继续保持独立。"
+}

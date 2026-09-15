@@ -1,5 +1,13 @@
 # Humanoid Rig Lab Next
 
+## 猫制作平台：当前版本 V4.40（2026-09-15）
+
+- 当前平台：[Cat Kaopu V4.40](cat-kaopu/workbench/CAT_KAOPU_CURRENT.html)。下载后可直接用浏览器打开该 HTML；GitHub 文件页显示源码。
+- 模块目录：[cat-kaopu/](cat-kaopu/)，后续修身修改从此目录开始。
+- 网页端新建分支时，选择基准分支 `experiment/cat-authoritative-reference-intake-v1-20260911`，再创建自己的修身工作分支。
+- [本次导入与分支说明](cat-kaopu/IMPORT_V440.md)；[原始全量交接包](cat-kaopu/handoff/CAT_KAOPU_CURRENT_FULL_HANDOFF_V440_2026-09-15.zip)。
+- V4.22 CT 预览和 V4.23 参考筛选资料保留为历史记录，不再是当前猫平台入口。V4.40 的视觉验收和生产就绪状态仍为未通过。
+
 Humanoid Rig Lab Next 是一个基于 WebGPU、Three.js 和多窗口共享状态的人物生产线协作平台。项目将骨骼比例、人物蒙皮、动作与物理、动画系统拆分为独立工作台，并通过统一的骨架版本、PoseSnapshot、ProjectState 和综合预览保持一致。
 
 当前项目版本为 `0.5.0`，今日四板块合并构建 ID 为：

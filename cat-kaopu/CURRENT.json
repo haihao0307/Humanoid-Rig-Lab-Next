@@ -1,0 +1,51 @@
+{
+  "schema": "cat_kaopu/full_handoff_current@1.0",
+  "handoff": "CAT_KAOPU_CURRENT_FULL_HANDOFF_V440_2026-09-15",
+  "date": "2026-09-15",
+  "currentVersion": "V4.40",
+  "currentEntry": "current/v4.40/CAT_KAOPU_V440_EYE_EAR_SHORT_FUR_WORKBENCH_2026-09-15.html",
+  "repoOverlayEntry": "repo_overlay/cat-kaopu/workbench/CAT_KAOPU_CURRENT.html",
+  "frozenBaselines": {
+    "neutralSurface": "V4.32",
+    "baseSkinWeights": "V4.34 except bounded ear region introduced in V4.40",
+    "camera": "V4.34.1",
+    "locomotionRegression": "V4.36",
+    "postureCorrective": "V4.39"
+  },
+  "currentLayer": "independent ear bones + procedural gaze/iris + short-fur direction field layer 1",
+  "geometry": {
+    "vertices": 3948,
+    "triangles": 7884,
+    "bones": 34,
+    "maxInfluencesPerVertex": 4
+  },
+  "runtimeDependencies": {
+    "externalModel": false,
+    "externalTexture": false,
+    "externalAnimation": false
+  },
+  "acceptance": {
+    "surfaceUserAccepted": true,
+    "visualAcceptance": false,
+    "productionReady": false,
+    "userReviewRequired": true
+  },
+  "invalidatedOrNonMainline": {
+    "V4.31": "defective Cat v1.0 carrier; removed from mainline",
+    "V4.33 original HTML": "VAO/render-state corruption; superseded by V4.33.1",
+    "V4.25-V4.30": "isolated forepaw experiment line; not current whole-cat mainline"
+  },
+  "nextProductionGate": [
+    "eyelid/blink and corneal response without changing V4.32 silhouette",
+    "bounded ear-root corrective for larger ear poses",
+    "short-fur silhouette only after joint folds remain visible and validated",
+    "preserve V4.39 sit/lie regression and V4.36 locomotion regression"
+  ],
+  "github": {
+    "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+    "existingBranch": "experiment/cat-authoritative-reference-intake-v1-20260911",
+    "existingBranchHead": "3ff695a980a346e1cecf6b96e6963d80328052bd",
+    "recommendedNewBranch": "codex/cat-kaopu-v440-mainline-20260915",
+    "recommendedModulePath": "cat-kaopu/"
+  }
+}
