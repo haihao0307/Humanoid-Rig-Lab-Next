@@ -88,6 +88,20 @@ jobs:
           python cat-kaopu/tools/build_cat_v441_eyelid_cornea.py
           python cat-kaopu/tools/verify_cat_kaopu_module.py
 
+      - name: Upload V4.41 QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-kaopu-v441-qa-${{ github.run_number }}
+          path: |
+            cat-kaopu/CURRENT.json
+            cat-kaopu/BUILD_MANIFEST.json
+            cat-kaopu/workbench/CAT_KAOPU_CURRENT.html
+            cat-kaopu/docs/CAT_KAOPU_V441_*.md
+            cat-kaopu/qa/CAT_KAOPU_V441_*.json
+            cat-kaopu/qa/CAT_KAOPU_V441_*.png
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Commit generated V4.41 baseline, workbench and QA
         shell: bash
         run: |
