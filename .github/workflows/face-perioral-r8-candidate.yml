@@ -29,7 +29,7 @@ jobs:
           node-version: '24'
       - name: Apply R8 perioral candidate
         run: python3 tools/apply-face-perioral-r8-candidate.py
-      - name: Preserve the proven oral-cavity parameterization
+      - name: Preserve cavity winding and taper white roll into skin
         shell: bash
         run: |
           python3 - <<'PY'
@@ -40,6 +40,11 @@ jobs:
           new="const mouthPoint=(a,t)=>{const x=lp.centreX+lp.halfWidth*.998*Math.cos(a)*(1-.38*t),q=compactLipOutline(x),seam=lipSurface(x,true,0)[2];return [x,q.seam+.0007*Math.sin(a)*(1+3*t),seam-.0020-.010*t];};"
           if text.count(old)!=1:
               raise SystemExit('R8 oral cavity corrective anchor mismatch')
+          text=text.replace(old,new,1)
+          old="const whiteRoll=(upper?p.whiteRollUpper:p.whiteRollLower)*Math.exp(-(((r-p.whiteRollCentre)/p.whiteRollWidth)**2))*Math.pow(Math.max(0,1-u*u),1.25);\n  return envelope*(base+swell)+whiteRoll;"
+          new="const attach=clamp((p.apron-r)/(p.apron-p.whiteRollCentre),0,1),attachGate=attach*attach*(3-2*attach);\n  const whiteRoll=(upper?p.whiteRollUpper:p.whiteRollLower)*Math.exp(-(((r-p.whiteRollCentre)/p.whiteRollWidth)**2))*Math.pow(Math.max(0,1-u*u),1.25)*attachGate;\n  return envelope*(base+swell)+whiteRoll;"
+          if text.count(old)!=1:
+              raise SystemExit('R8 white-roll attachment anchor mismatch')
           path.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
           PY
       - name: Build and validate candidate
