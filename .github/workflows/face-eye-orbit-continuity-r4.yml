@@ -27,6 +27,22 @@ jobs:
           node-version: '24'
       - name: Apply neutral eyelid and orbital continuity changes
         run: python3 tools/apply-face-eye-orbit-r4.py
+      - name: Keep the scalar shader fixture mathematically identical
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('body/EyeAnatomy.js')
+          text=path.read_text(encoding='utf-8')
+          old="""  float ex=${COMPACT_EYE_ANATOMY.fissure.halfWidth.toFixed(6)}*c,restY=(s>=0.?1.:-1.)*height*vertical*${(1-COMPACT_EYE_ANATOMY.fissure.verticalRoundness).toFixed(6)}+cornerLift;
+          restY+=(s>=0.?1.:-1.)*height*vertical*${COMPACT_EYE_ANATOMY.fissure.verticalRoundness.toFixed(6)}*vertical;
+          """
+          new="""  float ex=${COMPACT_EYE_ANATOMY.fissure.halfWidth.toFixed(6)}*c,restY=(s>=0.?1.:-1.)*height*vertical*(${(1-COMPACT_EYE_ANATOMY.fissure.verticalRoundness).toFixed(6)}+${COMPACT_EYE_ANATOMY.fissure.verticalRoundness.toFixed(6)}*vertical)+cornerLift;
+          """
+          if text.count(old)!=1:
+              raise SystemExit('GLSL fissure scalar anchor mismatch')
+          path.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
+          PY
       - name: Build and run file-only validation
         run: |
           node tools/build-pure.mjs
