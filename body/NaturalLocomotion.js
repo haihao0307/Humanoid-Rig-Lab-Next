@@ -52,13 +52,34 @@ class NaturalLocomotion {
   this.pose=new MotionLabPose(agent.h,this.engine);agent.h.motionDriver=this.pose;
   this.resetFromPose();
  }
- resetFromPose(){
-  const a=this.a,e=this.engine,root=[a.pos[0],this.standingHipHeightM,a.pos[2]],yaw=a.yaw;
+ resetFromPose({preservePoseContacts=false}={}){
+  const a=this.a,e=this.engine,h=a.h,yaw=a.yaw;
+  // A posture clip can end with a valid but non-standard stance. Rebuilding
+  // the lab from its authored default used to move both feet before the
+  // return-to-stance blend even started. When requested, adopt the committed
+  // hip midpoint and ankle joints as the new navigation/contact state.
+  const currentHip=side=>h.byId?.get(side+'_femur')?.world?.p||h.legs?.[side]?.upper?.world?.p;
+  const currentFoot=side=>h.byId?.get(side+'_foot')?.world?.p||h.legs?.[side]?.wrist?.world?.p;
+  const leftHip=preservePoseContacts&&currentHip('left'),rightHip=preservePoseContacts&&currentHip('right');
+  const root=leftHip&&rightHip?mix(leftHip,rightHip,.5):[a.pos[0],this.standingHipHeightM,a.pos[2]];
   const world=e.world;e.world=new MotionLab.FlatWorld();e.reset();e.world=world;
-  e.state.root=root;e.state.yaw=yaw;e.state.time=a.time;
-  for(const side of ['left','right'])e.state.feet[side]={position:e.stance(e.state,side),yaw,contact:true};
-  e.state.pose=e.solve(e.state);this.requestKey=null;this.requested=false;this.tempo=1;
+  e.state.root=[...root];e.state.yaw=yaw;e.state.time=a.time;
+  let maximumAdoptedFootResidualM=0;
+  for(const side of ['left','right']){
+   const foot=preservePoseContacts&&currentFoot(side),previousYaw=a.feet?.[side]?.yaw;
+   e.state.feet[side]={position:foot?[...foot]:e.stance(e.state,side),yaw:Number.isFinite(previousYaw)?previousYaw:yaw,contact:true};
+  }
+  e.state.pose=e.solve(e.state);
+  for(const side of ['left','right']){
+   const leg=e.state.pose.legs[side],foot=e.state.feet[side],residual=dist(leg.end,foot.position);
+   maximumAdoptedFootResidualM=Math.max(maximumAdoptedFootResidualM,residual);
+   if(residual>.012||leg.lengthError>1e-7)throw Error('当前姿势的脚位无法安全交给行走控制器');
+  }
+  this.lastPoseAdoption={preserved:!!(leftHip&&rightHip),maximumAdoptedFootResidualM,
+   root:[...e.state.root],feet:Object.fromEntries(['left','right'].map(side=>[side,[...e.state.feet[side].position]]))};
+  this.requestKey=null;this.requested=false;this.tempo=1;this.routePassThroughCount=this.routePassThroughCount||0;
   this.traffic={active:false,waitS:0,totalWaitS:0,blockers:[],nextCheckAtS:0};this.sync();
+  return structuredClone(this.lastPoseAdoption);
  }
  sync(){const a=this.a,s=this.engine.state;
   a.pos=[...s.root];a.yaw=s.yaw;a.swing=s.swing?{side:s.swing.side,t:s.swing.elapsed,duration:s.swing.duration}:null;
@@ -92,6 +113,35 @@ class NaturalLocomotion {
   if(traffic.waitS>30)throw Error('等待其他 NPC 让行超时，保持当前安全支撑：'+traffic.blockers.join('、'));
   this.stop();return true;
  }
+ routePassThrough(index){
+  const a=this.a,s=this.engine.state,current=a.route[index],next=a.route[index+1];
+  if(!current||!next)return false;
+  const previous=index>0?a.route[index-1]:s.root,into=sub(current,previous),out=sub(next,current);
+  if(horizontal(previous,current)<1e-6||horizontal(current,next)<1e-6)return true;
+  const headingIn=Math.atan2(into[0],into[2]),headingOut=Math.atan2(out[0],out[2]),turn=Math.abs(angleDiff(headingOut,headingIn));
+  // Only round a shallow, collision-free waypoint. Tight corners retain their
+  // explicit target so the controller can brake and place a support foot.
+  if(turn>Math.PI/4)return false;
+  const pace=clamp(s.speed/.48,0,1),radius=.045+.115*pace*Math.max(.25,Math.cos(turn));
+  if(horizontal(s.root,current)>radius)return false;
+  const sweep=this.world.sweep(s.root,next,.23);
+  return !sweep.blocked;
+ }
+ atFinalRoutePoint(toleranceM=.02){
+  const end=this.a.route.at(-1);return !!end&&horizontal(this.engine.state.root,end)<=toleranceM;
+ }
+ canContinuousTaskHandoff(){
+  const a=this.a,current=a.skill,next=a.plan?.steps[a.index+1],end=a.route.at(-1);
+  if(current?.type!=='walk'||next?.type!=='walk'||!end||!this.atFinalRoutePoint())return false;
+  const from=a.route.length>1?a.route.at(-2):current.startPosition;
+  if(!from||horizontal(from,end)<.02)return false;
+  const target=a.w.get(next.targetId),nextEnd=walkDestination(a.w,actorForReasoning(a),next,target);
+  if(!nextEnd||horizontal(end,nextEnd)<.05)return false;
+  const incoming=Math.atan2(end[0]-from[0],end[2]-from[2]),outgoing=Math.atan2(nextEnd[0]-end[0],nextEnd[2]-end[2]);
+  const turnRad=Math.abs(angleDiff(outgoing,incoming));if(turnRad>Math.PI/3)return false;
+  this.lastContinuousWalkHandoff={exitSpeedMps:a.walkSpeed,turnRad,endpoint:[...end]};
+  current.continuousWalkHandoff=structuredClone(this.lastContinuousWalkHandoff);return true;
+ }
  move(dt,speed=.48){
   const a=this.a,s=this.engine.state;
   const pace=a.manipulationPace();
@@ -99,7 +149,13 @@ class NaturalLocomotion {
   // Route ownership is retained so recovery can resume the same destination.
   if(a.held&&pace<.08){this.tempo=1;this.stop();return a.routeIndex<a.route.length||!this.isSettled();}
   this.tempo=clamp(speed/.48*(a.strength?.movementFactor()??1)*pace,.05,1);
-  while(a.routeIndex<a.route.length&&horizontal(s.root,a.route[a.routeIndex])<=.015){
+  if(this.canContinuousTaskHandoff()){
+   if(!a.pendingPhysicsFinish)a.finish();
+   return true;
+  }
+  while(a.routeIndex<a.route.length){
+   if(a.routeIndex<a.route.length-1&&this.routePassThrough(a.routeIndex)){a.routeIndex++;this.routePassThroughCount++;continue;}
+   if(horizontal(s.root,a.route[a.routeIndex])>.015)break;
    if(a.routeIndex===a.route.length-1){if(s.command||!this.isSettled()){this.requested=true;return true;}a.routeIndex++;return false;}
    a.routeIndex++;
   }
@@ -156,5 +212,7 @@ class NaturalLocomotion {
  report(){const s=this.engine.state;return{version:NATURAL_GAIT.version,state:s.status,speedMps:this.speed,timeScale:this.tempo,contacts:{...this.contacts},settled:this.isSettled(),
   source:MotionLab.MOTION_SOURCE,sourcePhase:s.motion.phase,referenceBlend:s.motion.weight,metrics:{...s.metrics},skinFloorOffsetM:this.skinFloorOffsetM,
   height:{standingTargetM:this.standingHipHeightM,walkingTargetM:this.rig.hipHeight,currentM:s.root[1],reachableStandingM:this.standingTarget(),timeConstantS:.18},
-  traffic:structuredClone(this.traffic),contactBasis:'Motion-Lab explicit foot anchors',pose:this.pose.report(),visualAcceptance:false};}
+  traffic:structuredClone(this.traffic),routePassThroughCount:this.routePassThroughCount,poseAdoption:this.lastPoseAdoption?structuredClone(this.lastPoseAdoption):null,
+  continuousWalkHandoff:this.lastContinuousWalkHandoff?structuredClone(this.lastContinuousWalkHandoff):null,
+  contactBasis:'Motion-Lab explicit foot anchors',pose:this.pose.report(),visualAcceptance:false};}
 }

@@ -57,32 +57,40 @@ class StrengthModel{
   return {pcsaCm2,maxTendonForceN,availableForceN,availableTorqueNm:availableForceN*g.momentArmM,lengthFactor,velocityFactor};
  }
  assess(input){
-  strengthKeys(input,['type','massKg','durationS','reachM','elbowLeverM','crouch','speedMps','accelerationMps2','objectFriction','groundFriction','gravityMps2','gripFriction','slopeRad','pushHeightM','bodyBackshiftM','supportHalfLengthM','leftShare','lengthRatios','shorteningRates'],'task');
+  strengthKeys(input,['type','massKg','durationS','reachM','elbowLeverM','crouch','speedMps','accelerationMps2','accelerationVectorMps2','objectFriction','groundFriction','gravityMps2','gripFriction','slopeRad','pushHeightM','bodyBackshiftM','supportHalfLengthM','leftShare','lengthRatios','shorteningRates'],'task');
   if(!['carry','push'].includes(input.type))throw Error('力量模型当前支持搬运与推动');
   const value=(key,def,lo,hi)=>strengthNumber(input[key]??def,lo,hi,key);
-  const mass=value('massKg',0,0,2000),duration=value('durationS',0,0,7200),reach=value('reachM',.34,.05,1.2),elbow=value('elbowLeverM',.20,.02,.7),crouch=value('crouch',0,0,1),speed=value('speedMps',0,0,3),accel=value('accelerationMps2',0,0,5),slope=value('slopeRad',0,-.35,.35);
+  const vector=input.accelerationVectorMps2;
+  if(vector!=null&&(!Array.isArray(vector)||vector.length!==3||!vector.every(Number.isFinite)||vector.some(v=>Math.abs(v)>5)))throw Error('力量参数无效：accelerationVectorMps2');
+  const vectorMagnitude=vector?Math.hypot(...vector):0;
+  const mass=value('massKg',0,0,2000),duration=value('durationS',0,0,7200),reach=value('reachM',.34,.05,1.2),elbow=value('elbowLeverM',.20,.02,.7),crouch=value('crouch',0,0,1),speed=value('speedMps',0,0,3),accel=value('accelerationMps2',vectorMagnitude,0,5),slope=value('slopeRad',0,-.35,.35);
   const mu=value('objectFriction',.4,0,4),ground=value('groundFriction',.65,0,2),grip=value('gripFriction',.6,.05,2),height=value('pushHeightM',.55,.05,1.8),back=value('bodyBackshiftM',.04,0,.12),support=value('supportHalfLengthM',.14,.03,.4),leftShare=value('leftShare',.5,0,1);
   for(const key of ['lengthRatios','shorteningRates'])if(input[key]!=null){strengthKeys(input[key],Object.keys(this.profile.groups),key);for(const n of Object.values(input[key]))strengthNumber(n,key==='lengthRatios'?.4:-3,key==='lengthRatios'?1.8:3,key);}
-  const body=this.bodyMassKg,g=value('gravityMps2',9.81,.1,30),push=input.type==='push',weight=mass*g,vertical=weight+mass*accel;
-  const pushN=mass*g*(mu*Math.cos(slope)+Math.abs(Math.sin(slope)))+mass*accel;
+  const body=this.bodyMassKg,g=value('gravityMps2',9.81,.1,30),push=input.type==='push';
+  // Runtime requests preserve direction. Legacy planning requests without a
+  // vector retain their historical axis: push acceleration is horizontal,
+  // while carry acceleration remains a conservative upward load.
+  const acceleration=vector?[...vector]:push?[accel,0,0]:[0,accel,0],verticalAcceleration=acceleration[1],horizontalAcceleration=Math.hypot(acceleration[0],acceleration[2]);
+  const verticalControlN=mass*Math.abs(g+verticalAcceleration),horizontalForceN=mass*horizontalAcceleration;
+  const pushN=mass*g*(mu*Math.cos(slope)+Math.abs(Math.sin(slope)))+horizontalForceN;
   const demand={},units={},reserve=this.profile.reserve;
   const add=(id,n,unit='Nm')=>{demand[id]=Math.max(0,n);units[id]=unit;};
   for(const side of ['left','right']){
    const share=side==='left'?leftShare:1-leftShare;
    // Segment self weight is retained even for zero external payload.
    const armWeight=body*.049*g;
-   add(side+'_shoulder',(push?pushN*share*.22:vertical*share*reach)+armWeight*.10);
-   add(side+'_elbowFlexors',push?armWeight*.035:vertical*share*elbow+armWeight*.035);
-   add(side+'_elbowExtensors',push?pushN*share*.12:vertical*share*.025);
+   add(side+'_shoulder',(push?pushN*share*.22:verticalControlN*share*reach+horizontalForceN*share*.22)+armWeight*.10);
+   add(side+'_elbowFlexors',push?armWeight*.035:verticalControlN*share*elbow+horizontalForceN*share*.08+armWeight*.035);
+   add(side+'_elbowExtensors',push?pushN*share*.12:verticalControlN*share*.025+horizontalForceN*share*.08);
    // Finger transmission is an authored leverage factor, not tendon force at
    // the contact. Opposing palms must generate normal force for friction.
-   add(side+'_grip',push?pushN*share*.15:vertical*share/grip,'N');
-   const supported=(body+(push?0:mass))*g/2;
+   add(side+'_grip',push?pushN*share*.15:Math.hypot(verticalControlN,horizontalForceN)*share/grip,'N');
+   const supported=(body*g+(push?0:verticalControlN))/2;
    add(side+'_hip',supported*(.035+.16*crouch)+(push?pushN*.15:0));
    add(side+'_knee',supported*(.025+.14*crouch));
-   add(side+'_ankle',supported*.055+(push?pushN*.055:0)+body*speed*.35);
+   add(side+'_ankle',supported*.055+(push?pushN*.055:horizontalForceN*.06)+body*speed*.35);
   }
-  add('center_trunk',body*.5*g*(.035+.13*crouch)+(push?pushN*.22:vertical*reach*.65));
+  add('center_trunk',body*.5*g*(.035+.13*crouch)+(push?pushN*.22:verticalControlN*reach*.65+horizontalForceN*.28));
   const groups={},reasons=[];
   for(const [id,required]of Object.entries(demand)){
    const group=this.profile.groups[id],state=this.state.groups[id];
@@ -97,11 +105,13 @@ class StrengthModel{
    if(endRatio>1)reasons.push(id+' '+(ratio>1?'当前力量不足':'持续用力余量不足'));
   }
   // Simple sagittal contact envelope; no 3D COM/ZMP or collision solver.
-  const tractionRatio=push?pushN/Math.max(1e-8,ground*body*g*Math.cos(slope)):0;
-  const balanceRatio=push?pushN*height/Math.max(1e-8,body*g*(support+back)):Math.abs(mass*reach-body*back)/Math.max(1e-8,(body+mass)*support);
+  const tractionDemandN=push?pushN:horizontalForceN,tractionRatio=tractionDemandN/Math.max(1e-8,ground*body*g*Math.cos(slope));
+  const balanceRatio=push?pushN*height/Math.max(1e-8,body*g*(support+back)):
+   (Math.abs(mass*reach-body*back)+(horizontalForceN/g)*height)/Math.max(1e-8,(body+mass)*support);
   if(tractionRatio>1)reasons.push('脚下摩擦不足');if(balanceRatio>1)reasons.push('前后方向支撑余量不足');
   const limiting=Object.entries(groups).sort((a,b)=>b[1].endRatio-a[1].endRatio)[0];
-  return {schema:'jarvis/strength_assessment@1',type:input.type,feasible:reasons.length===0,reasons,groups,limitingGroup:limiting[0],maxUtilization:Math.max(limiting[1].endRatio,tractionRatio,balanceRatio),tractionRatio,balanceRatio,requiredPushN:push?pushN:0,bodyMassKg:body,durationS:duration,request:strengthCopy(input),model:'muscle-group-capacity-envelope',calibrated:false,fullDynamics:false};
+  return {schema:'jarvis/strength_assessment@1',type:input.type,feasible:reasons.length===0,reasons,groups,limitingGroup:limiting[0],maxUtilization:Math.max(limiting[1].endRatio,tractionRatio,balanceRatio),tractionRatio,balanceRatio,requiredPushN:push?pushN:0,
+   accelerationVectorMps2:acceleration,verticalControlN,horizontalForceN,bodyMassKg:body,durationS:duration,request:strengthCopy(input),model:'muscle-group-capacity-envelope',calibrated:false,fullDynamics:false};
  }
  movementFactor(){
   const ids=['left_hip','right_hip','left_knee','right_knee','left_ankle','right_ankle'],base=makeStrengthProfile();

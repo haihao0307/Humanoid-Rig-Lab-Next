@@ -69,6 +69,33 @@ class MotionLabPose {
    rotations.set(child,rotation);
   }
  }
+ refreshEffectorErrors(frames,errors){
+  for(const error of errors){
+   const f=frames.get(error.id);
+   if(!f||error.target?.length!==3||!error.target.every(Number.isFinite)||!['world','body'].includes(error.targetSpace))throw Error('动作候选包含无效接触目标');
+   const actual=add(f.p,rotate(f.q,error.effectorLocal||[0,0,0]));
+   error.error=dist(actual,error.target);error.orientationErrorRad=error.targetOrientation?qangle(f.q,error.targetOrientation):0;
+   if(!Number.isFinite(error.error)||!Number.isFinite(error.orientationErrorRad))throw Error('动作候选接触误差无效');
+  }
+ }
+ reprojectControlledLegs(frames,state,yaw,from,target,u){
+  const h=this.h,positions=new Map([...frames].map(([id,f])=>[id,[...f.p]]));
+  for(const side of ['left','right']){
+   const femur=side+'_femur',tibia=side+'_tibia',foot=side+'_foot',patella=side+'_patella';
+   const hip=positions.get(femur),pole=mix(from.get(tibia).p,target.get(tibia).p,u);
+   const L1=dist(this.source(femur),this.source(tibia)),L2=dist(this.source(tibia),this.source(foot));
+   const solved=MotionLab.solveTwoBone(hip,state.feet[side].position,pole,L1,L2);
+   positions.set(tibia,solved.knee);positions.set(foot,solved.end);
+   const upper=this.segmentRotation(femur,tibia,positions,yaw),lower=this.segmentRotation(tibia,foot,positions,yaw);
+   const femurFrame=frame(hip,qnorm(qm(upper,h.sourceBind.get(femur).q)));
+   const tibiaFrame=frame(solved.knee,qnorm(qm(lower,h.sourceBind.get(tibia).q)));
+   const footFrame=frame(solved.end,qslerp(from.get(foot).q,target.get(foot).q,u));
+   frames.set(femur,femurFrame);frames.set(tibia,tibiaFrame);frames.set(foot,footFrame);
+   if(frames.has(patella))frames.set(patella,compose(compose(tibiaFrame,inverse(h.sourceBind.get(tibia))),h.sourceBind.get(patella)));
+   const footRigid=compose(footFrame,inverse(h.sourceBind.get(foot)));
+   for(const [child]of this.descendantRows.get(foot))frames.set(child,compose(footRigid,h.sourceBind.get(child)));
+  }
+ }
  segmentRotation(a,b,positions,yaw,preferred=null){
   const h=this.h,source=h.sourceBind.get(a),direction=norm(sub(positions.get(b),positions.get(a)));
   if(preferred){
@@ -158,15 +185,20 @@ class MotionLabPose {
   for(const [id,n]of this.rows)frames.set(id,frame(positions.get(id),qnorm(qm(rotations.get(id),h.sourceBind.get(id).q))));
   if(options.contactHand)frames=contactHandPose(h,frames,options.contactHand);
   if(options.blendFrom&&options.blendAmount<1){
-   const blended=new Map(),u=clamp(options.blendAmount,0,1),from=options.blendFrom;
+   const target=frames,blended=new Map(),u=clamp(options.blendAmount,0,1),from=options.blendFrom;
    for(const [id,n]of this.rows){
-    const a=from.get(id),b=frames.get(id),ap=n.parent&&from.get(n.parent),bp=n.parent&&frames.get(n.parent);
+    const a=from.get(id),b=target.get(id),ap=n.parent&&from.get(n.parent),bp=n.parent&&target.get(n.parent);
     const A=ap?compose(inverse(ap),a):a,B=bp?compose(inverse(bp),b):b;
     const length=n.parent?dist(n.positionM,this.source(n.parent)):null;
     let p=mix(A.p,B.p,u);if(length!==null)p=length<1e-9?[0,0,0]:mul(norm(p),length);
     const local=frame(p,qslerp(A.q,B.q,u));blended.set(id,n.parent?compose(blended.get(n.parent),local):local);
    }
-   frames=blended;errors.length=0;
+   frames=blended;
+   // A visual blend is not permission to drop contact evidence. Re-solve the
+   // controlled legs against their existing world anchors, then measure the
+   // same errors that will be validated after floor clearance.
+   if(controlled&&options.preserveFootContactsOnBlend!==false)this.reprojectControlledLegs(frames,state,yaw,from,target,u);
+   this.refreshEffectorErrors(frames,errors);
   }
   return {frames,errors,controlled,source:options.motionSource||{kind:'motion-lab',revision:MotionLab.revision,trial:'08_01'},state};
  }
@@ -204,13 +236,7 @@ class MotionLabPose {
   return {boneErrorM,radialAttachmentErrorM,attachmentErrorM,attachmentJoint,footErrorM,handErrorM,hingeReserveDegrees,kinematicOnly:true};
  }
  measureEffectors(candidate){
-  for(const error of candidate.errors){
-   const f=candidate.frames.get(error.id);
-   if(!f||error.target?.length!==3||!error.target.every(Number.isFinite)||!['world','body'].includes(error.targetSpace))throw Error('动作候选包含无效接触目标');
-   const actual=add(f.p,rotate(f.q,error.effectorLocal||[0,0,0]));
-   error.error=dist(actual,error.target);error.orientationErrorRad=error.targetOrientation?qangle(f.q,error.targetOrientation):0;
-   if(!Number.isFinite(error.error)||!Number.isFinite(error.orientationErrorRad))throw Error('动作候选接触误差无效');
-  }
+  this.refreshEffectorErrors(candidate.frames,candidate.errors);
  }
  apply(options={}){
   if(this.preflightOnly)throw Error('预检骨架不能提交人物姿态');
