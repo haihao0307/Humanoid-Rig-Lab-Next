@@ -1,0 +1,41 @@
+{
+  "schema": "life_ecosystem/chicken_head_top_candidate@1.0",
+  "version": "V4.6_R9.1",
+  "status": "authoring_candidate_not_anatomical_truth",
+  "units": "normalized_source_units_not_meters",
+  "coordinate_frame": {
+    "cranial_axis": "+X",
+    "dorsal_axis": "+Y",
+    "right_lateral_axis": "+Z",
+    "comb_midline_z": 0.09
+  },
+  "head_roof": {
+    "method": "bounded dorsal-envelope refit on existing carrier topology",
+    "x_domain": [0.27, 0.478],
+    "knots_xy": [
+      [0.280, 0.955], [0.300, 0.976], [0.320, 0.989],
+      [0.340, 0.994], [0.360, 0.992], [0.380, 0.988],
+      [0.400, 0.983], [0.420, 0.976], [0.440, 0.968],
+      [0.455, 0.961], [0.470, 0.956]
+    ],
+    "scope": "visible cranial envelope only",
+    "does_not_claim": ["internal skull anatomy", "breed-specific measurement", "individual measurement"]
+  },
+  "single_comb": {
+    "method": "continuous parametric midline blade",
+    "x_domain": [0.300, 0.446],
+    "sections": 121,
+    "angular_samples": 28,
+    "serration_candidates": 5,
+    "continuous_blade": true,
+    "embedded_root": true,
+    "height_control": "comb_height",
+    "thickness_control": "comb_thickness",
+    "status": "single-comb visual candidate; breed and individual identity remain unknown"
+  },
+  "rollback": {
+    "toggle": "headTopR91",
+    "off_value": 0,
+    "restores": "V4.6 R9 frozen geometry exactly"
+  }
+}

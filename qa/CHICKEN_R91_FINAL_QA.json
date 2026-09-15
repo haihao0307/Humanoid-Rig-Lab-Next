@@ -1,0 +1,893 @@
+{
+  "schema": "life_ecosystem/chicken_r91_final_qa@1.0",
+  "version": "V4.6_R9.1_FINAL_SILHOUETTE_HEAD_TOP_CANDIDATE",
+  "created_at": "2026-09-15",
+  "environment": {
+    "browser": "Chromium",
+    "renderer": "SwiftShader correctness path",
+    "physical_device_tested": false,
+    "safari_tested": false
+  },
+  "default_browser_audit": {
+    "status": 200,
+    "stats": {
+      "bodyAudit": {
+        "roots": 2623,
+        "rejectedWing": 836,
+        "rejectedRegion": 246,
+        "rejectedCurvature": 0,
+        "adjustedSamples": 738,
+        "maxExtraLift": 0.0002800977142138718,
+        "minimumSampleClearance": null,
+        "countsByRegion": {
+          "flank": 254,
+          "breast": 673,
+          "back": 412,
+          "neck": 202
+        }
+      },
+      "tailAudit": {
+        "passed": true,
+        "samples": 38287,
+        "penetration": 0,
+        "degenerateTriangles": 0,
+        "minimumBodyClearance": 0.0017809149882816733,
+        "bounds": {
+          "lo": [
+            -0.4395191967487335,
+            0.5667955875396729,
+            -0.18952961266040802
+          ],
+          "hi": [
+            -0.1901741772890091,
+            0.7924854159355164,
+            0.14774088561534882
+          ]
+        },
+        "mainElements": 19,
+        "covertElements": 7,
+        "sideAttachedElements": 12,
+        "scope": "Four fixed samples per tail triangle against the corresponding side or dorsal carrier where defined; not a continuous inter-feather collision proof."
+      },
+      "feetAudit": {
+        "finite": true,
+        "minY": 0.00179,
+        "degenerateTriangles": 0,
+        "passed": true,
+        "padElements": 18,
+        "clawRootElements": 8
+      },
+      "combAudit": {
+        "finite": true,
+        "degenerateTriangles": 0,
+        "passed": true,
+        "sections": 121,
+        "lobes": 5,
+        "continuousBlade": true,
+        "embeddedRoot": true,
+        "minSectionHeight": 0.0011,
+        "maxSectionHeight": 0.03025566101551243
+      },
+      "vertices": 131948,
+      "triangles": 184512,
+      "coatElements": 1541,
+      "covertElements": 248,
+      "tailElements": 26,
+      "eyePatches": 4,
+      "nostrilPatches": 2,
+      "earPatches": 2,
+      "footElements": 44,
+      "removedPosteriorEnvelope": true,
+      "macroFeatherCandidates": 54,
+      "newWingElements": 226,
+      "wingAudit": {
+        "missingSurfaceSamples": 0,
+        "rejectedElements": 0,
+        "rootMaxGap": 0.00021592897089178775,
+        "minimumCarrierClearance": 0.0002,
+        "layerAdjustedVertices": 28424,
+        "layerMaximumExtraLift": 0.008642294010414747,
+        "bodyInteriorAdjustments": 90,
+        "bodyMaximumAdjustment": 7.746279472929376e-05
+      },
+      "finite": true,
+      "buildMs": 3215.3000000000466
+    },
+    "audit": {
+      "allFinite": true,
+      "allIndices": true,
+      "totalDegenerate": 0,
+      "meshes": [
+        {
+          "mesh": 0,
+          "kind": "body",
+          "vertices": 6914,
+          "triangles": 13820,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 1,
+          "kind": "comb",
+          "vertices": 3390,
+          "triangles": 6776,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 2,
+          "kind": "feather",
+          "vertices": 6770,
+          "triangles": 11576,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 3,
+          "kind": "parts",
+          "vertices": 21564,
+          "triangles": 1404,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 4,
+          "kind": "parts",
+          "vertices": 9424,
+          "triangles": 18192,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 5,
+          "kind": "feather",
+          "vertices": 2002,
+          "triangles": 3168,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 6,
+          "kind": "feather",
+          "vertices": 29810,
+          "triangles": 50696,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 7,
+          "kind": "iris",
+          "vertices": 393,
+          "triangles": 728,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 8,
+          "kind": "lid",
+          "vertices": 156,
+          "triangles": 152,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 9,
+          "kind": "iris",
+          "vertices": 393,
+          "triangles": 728,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 10,
+          "kind": "lid",
+          "vertices": 156,
+          "triangles": 152,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 11,
+          "kind": "nostril",
+          "vertices": 145,
+          "triangles": 252,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 12,
+          "kind": "nostril",
+          "vertices": 145,
+          "triangles": 252,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 13,
+          "kind": "lid",
+          "vertices": 265,
+          "triangles": 484,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 14,
+          "kind": "lid",
+          "vertices": 265,
+          "triangles": 484,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 15,
+          "kind": "lid",
+          "vertices": 844,
+          "triangles": 1680,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        },
+        {
+          "mesh": 16,
+          "kind": "coat",
+          "vertices": 49312,
+          "triangles": 73968,
+          "finite": true,
+          "indexBoundsValid": true,
+          "degenerateTriangles": 0
+        }
+      ]
+    },
+    "comb": {
+      "finite": true,
+      "degenerateTriangles": 0,
+      "passed": true,
+      "sections": 121,
+      "lobes": 5,
+      "continuousBlade": true,
+      "embeddedRoot": true,
+      "minSectionHeight": 0.0011,
+      "maxSectionHeight": 0.03025566101551243
+    },
+    "errors": []
+  },
+  "targeted_boundary_audit": {
+    "schema": "life_ecosystem/chicken_r91_boundary_qa@1.0",
+    "created_at": "2026-09-15",
+    "cases": [
+      {
+        "name": "cranial_all_min",
+        "passed": true,
+        "quickGeometry": {
+          "allFinite": true,
+          "allIndices": true,
+          "sampledDegenerate": 0,
+          "checkedTriangles": 22813
+        },
+        "comb": {
+          "finite": true,
+          "degenerateTriangles": 0,
+          "passed": true,
+          "sections": 121,
+          "lobes": 5,
+          "continuousBlade": true,
+          "embeddedRoot": true,
+          "minSectionHeight": 0.0009350000000000001,
+          "maxSectionHeight": 0.025717311863185568
+        },
+        "feetPassed": true,
+        "tailPassed": true,
+        "elapsedMs": 5105.6
+      },
+      {
+        "name": "cranial_all_max",
+        "passed": true,
+        "quickGeometry": {
+          "allFinite": true,
+          "allIndices": true,
+          "sampledDegenerate": 0,
+          "checkedTriangles": 22817
+        },
+        "comb": {
+          "finite": true,
+          "degenerateTriangles": 0,
+          "passed": true,
+          "sections": 121,
+          "lobes": 5,
+          "continuousBlade": true,
+          "embeddedRoot": true,
+          "minSectionHeight": 0.001265,
+          "maxSectionHeight": 0.0347940101678393
+        },
+        "feetPassed": true,
+        "tailPassed": true,
+        "elapsedMs": 3870.1
+      },
+      {
+        "name": "wide_body_small_head_high_comb",
+        "passed": true,
+        "quickGeometry": {
+          "allFinite": true,
+          "allIndices": true,
+          "sampledDegenerate": 0,
+          "checkedTriangles": 23089
+        },
+        "comb": {
+          "finite": true,
+          "degenerateTriangles": 0,
+          "passed": true,
+          "sections": 121,
+          "lobes": 5,
+          "continuousBlade": true,
+          "embeddedRoot": true,
+          "minSectionHeight": 0.001265,
+          "maxSectionHeight": 0.0347940101678393
+        },
+        "feetPassed": true,
+        "tailPassed": true,
+        "elapsedMs": 3978.3
+      },
+      {
+        "name": "narrow_body_large_head_low_comb",
+        "passed": true,
+        "quickGeometry": {
+          "allFinite": true,
+          "allIndices": true,
+          "sampledDegenerate": 0,
+          "checkedTriangles": 22175
+        },
+        "comb": {
+          "finite": true,
+          "degenerateTriangles": 0,
+          "passed": true,
+          "sections": 121,
+          "lobes": 5,
+          "continuousBlade": true,
+          "embeddedRoot": true,
+          "minSectionHeight": 0.0009350000000000001,
+          "maxSectionHeight": 0.025717311863185568
+        },
+        "feetPassed": true,
+        "tailPassed": true,
+        "elapsedMs": 3400.2
+      }
+    ],
+    "allPassed": true,
+    "note": "Targeted boundary combinations for the edited cranial and comb domain; unchanged full-body controls inherit frozen R9 gates."
+  },
+  "exact_r9_recovery": {
+    "passed": true,
+    "method": "FNV-1a over Float32 bit patterns and Uint32 indices",
+    "meshCountR9": 17,
+    "meshCountR91ToggleOff": 17,
+    "r9": [
+      {
+        "kind": "body",
+        "posLength": 20742,
+        "idxLength": 41460,
+        "posHash": 3692891699,
+        "idxHash": 3698962965
+      },
+      {
+        "kind": "comb",
+        "posLength": 6126,
+        "idxLength": 12240,
+        "posHash": 1885155363,
+        "idxHash": 4028285805
+      },
+      {
+        "kind": "feather",
+        "posLength": 20310,
+        "idxLength": 34728,
+        "posHash": 2620017314,
+        "idxHash": 1335266717
+      },
+      {
+        "kind": "parts",
+        "posLength": 64692,
+        "idxLength": 4212,
+        "posHash": 1999991434,
+        "idxHash": 689273661
+      },
+      {
+        "kind": "parts",
+        "posLength": 28272,
+        "idxLength": 54576,
+        "posHash": 557843516,
+        "idxHash": 1698262721
+      },
+      {
+        "kind": "feather",
+        "posLength": 6006,
+        "idxLength": 9504,
+        "posHash": 3642247209,
+        "idxHash": 3504336981
+      },
+      {
+        "kind": "feather",
+        "posLength": 89430,
+        "idxLength": 152088,
+        "posHash": 15426578,
+        "idxHash": 686683699
+      },
+      {
+        "kind": "iris",
+        "posLength": 1179,
+        "idxLength": 2184,
+        "posHash": 1805773942,
+        "idxHash": 1873421541
+      },
+      {
+        "kind": "lid",
+        "posLength": 468,
+        "idxLength": 456,
+        "posHash": 2112858972,
+        "idxHash": 2066686713
+      },
+      {
+        "kind": "iris",
+        "posLength": 1179,
+        "idxLength": 2184,
+        "posHash": 3896114373,
+        "idxHash": 3197946469
+      },
+      {
+        "kind": "lid",
+        "posLength": 468,
+        "idxLength": 456,
+        "posHash": 2358760799,
+        "idxHash": 4200026785
+      },
+      {
+        "kind": "nostril",
+        "posLength": 435,
+        "idxLength": 756,
+        "posHash": 3675312955,
+        "idxHash": 3489011765
+      },
+      {
+        "kind": "nostril",
+        "posLength": 435,
+        "idxLength": 756,
+        "posHash": 3130011282,
+        "idxHash": 1504329061
+      },
+      {
+        "kind": "lid",
+        "posLength": 795,
+        "idxLength": 1452,
+        "posHash": 2701323924,
+        "idxHash": 3804630101
+      },
+      {
+        "kind": "lid",
+        "posLength": 795,
+        "idxLength": 1452,
+        "posHash": 3659874445,
+        "idxHash": 2583437429
+      },
+      {
+        "kind": "lid",
+        "posLength": 2532,
+        "idxLength": 5040,
+        "posHash": 938134591,
+        "idxHash": 2191447681
+      },
+      {
+        "kind": "coat",
+        "posLength": 147936,
+        "idxLength": 221904,
+        "posHash": 2874292720,
+        "idxHash": 3302108093
+      }
+    ],
+    "r91ToggleOff": [
+      {
+        "kind": "body",
+        "posLength": 20742,
+        "idxLength": 41460,
+        "posHash": 3692891699,
+        "idxHash": 3698962965
+      },
+      {
+        "kind": "comb",
+        "posLength": 6126,
+        "idxLength": 12240,
+        "posHash": 1885155363,
+        "idxHash": 4028285805
+      },
+      {
+        "kind": "feather",
+        "posLength": 20310,
+        "idxLength": 34728,
+        "posHash": 2620017314,
+        "idxHash": 1335266717
+      },
+      {
+        "kind": "parts",
+        "posLength": 64692,
+        "idxLength": 4212,
+        "posHash": 1999991434,
+        "idxHash": 689273661
+      },
+      {
+        "kind": "parts",
+        "posLength": 28272,
+        "idxLength": 54576,
+        "posHash": 557843516,
+        "idxHash": 1698262721
+      },
+      {
+        "kind": "feather",
+        "posLength": 6006,
+        "idxLength": 9504,
+        "posHash": 3642247209,
+        "idxHash": 3504336981
+      },
+      {
+        "kind": "feather",
+        "posLength": 89430,
+        "idxLength": 152088,
+        "posHash": 15426578,
+        "idxHash": 686683699
+      },
+      {
+        "kind": "iris",
+        "posLength": 1179,
+        "idxLength": 2184,
+        "posHash": 1805773942,
+        "idxHash": 1873421541
+      },
+      {
+        "kind": "lid",
+        "posLength": 468,
+        "idxLength": 456,
+        "posHash": 2112858972,
+        "idxHash": 2066686713
+      },
+      {
+        "kind": "iris",
+        "posLength": 1179,
+        "idxLength": 2184,
+        "posHash": 3896114373,
+        "idxHash": 3197946469
+      },
+      {
+        "kind": "lid",
+        "posLength": 468,
+        "idxLength": 456,
+        "posHash": 2358760799,
+        "idxHash": 4200026785
+      },
+      {
+        "kind": "nostril",
+        "posLength": 435,
+        "idxLength": 756,
+        "posHash": 3675312955,
+        "idxHash": 3489011765
+      },
+      {
+        "kind": "nostril",
+        "posLength": 435,
+        "idxLength": 756,
+        "posHash": 3130011282,
+        "idxHash": 1504329061
+      },
+      {
+        "kind": "lid",
+        "posLength": 795,
+        "idxLength": 1452,
+        "posHash": 2701323924,
+        "idxHash": 3804630101
+      },
+      {
+        "kind": "lid",
+        "posLength": 795,
+        "idxLength": 1452,
+        "posHash": 3659874445,
+        "idxHash": 2583437429
+      },
+      {
+        "kind": "lid",
+        "posLength": 2532,
+        "idxLength": 5040,
+        "posHash": 938134591,
+        "idxHash": 2191447681
+      },
+      {
+        "kind": "coat",
+        "posLength": 147936,
+        "idxLength": 221904,
+        "posHash": 2874292720,
+        "idxHash": 3302108093
+      }
+    ]
+  },
+  "mobile_390x844": {
+    "status": 200,
+    "viewport": {
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 455.765625,
+        "top": 0,
+        "right": 390,
+        "bottom": 455.765625,
+        "left": 0
+      },
+      "panel": {
+        "x": 0,
+        "y": 455.75,
+        "width": 390,
+        "height": 388.25,
+        "top": 455.75,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 455.765625,
+        "top": 0,
+        "right": 390,
+        "bottom": 455.765625,
+        "left": 0
+      },
+      "buttons": 27
+    },
+    "interactionPassed": true,
+    "interactionError": null,
+    "pageErrors": [],
+    "consoleErrorsOrWarnings": [],
+    "requestFailures": [],
+    "passed": true
+  },
+  "capture_audit": {
+    "r9_stats": {
+      "bodyAudit": {
+        "roots": 2623,
+        "rejectedWing": 836,
+        "rejectedRegion": 246,
+        "rejectedCurvature": 0,
+        "adjustedSamples": 740,
+        "maxExtraLift": 0.0002800977142138718,
+        "minimumSampleClearance": null,
+        "countsByRegion": {
+          "flank": 254,
+          "breast": 673,
+          "back": 412,
+          "neck": 202
+        }
+      },
+      "tailAudit": {
+        "passed": true,
+        "samples": 38287,
+        "penetration": 0,
+        "degenerateTriangles": 0,
+        "minimumBodyClearance": 0.0017809149882816733,
+        "bounds": {
+          "lo": [
+            -0.4395191967487335,
+            0.5667955875396729,
+            -0.18952961266040802
+          ],
+          "hi": [
+            -0.1901741772890091,
+            0.7924854159355164,
+            0.14774088561534882
+          ]
+        },
+        "mainElements": 19,
+        "covertElements": 7,
+        "sideAttachedElements": 12,
+        "scope": "Four fixed samples per tail triangle against the corresponding side or dorsal carrier where defined; not a continuous inter-feather collision proof."
+      },
+      "feetAudit": {
+        "finite": true,
+        "minY": 0.00179,
+        "degenerateTriangles": 0,
+        "passed": true,
+        "padElements": 18,
+        "clawRootElements": 8
+      },
+      "combAudit": {
+        "finite": true,
+        "degenerateTriangles": 0,
+        "passed": true,
+        "sections": 85,
+        "lobes": 5
+      },
+      "vertices": 130600,
+      "triangles": 181816,
+      "coatElements": 1541,
+      "covertElements": 248,
+      "tailElements": 26,
+      "eyePatches": 4,
+      "nostrilPatches": 2,
+      "earPatches": 2,
+      "footElements": 44,
+      "removedPosteriorEnvelope": true,
+      "macroFeatherCandidates": 54,
+      "newWingElements": 226,
+      "wingAudit": {
+        "missingSurfaceSamples": 0,
+        "rejectedElements": 0,
+        "rootMaxGap": 0.00021592897089178775,
+        "minimumCarrierClearance": 0.0002,
+        "layerAdjustedVertices": 28424,
+        "layerMaximumExtraLift": 0.008642294010414747,
+        "bodyInteriorAdjustments": 90,
+        "bodyMaximumAdjustment": 7.746279472929376e-05
+      },
+      "finite": true,
+      "buildMs": 3535.1999999999534
+    },
+    "r91_stats": {
+      "bodyAudit": {
+        "roots": 2623,
+        "rejectedWing": 836,
+        "rejectedRegion": 246,
+        "rejectedCurvature": 0,
+        "adjustedSamples": 738,
+        "maxExtraLift": 0.0002800977142138718,
+        "minimumSampleClearance": null,
+        "countsByRegion": {
+          "flank": 254,
+          "breast": 673,
+          "back": 412,
+          "neck": 202
+        }
+      },
+      "tailAudit": {
+        "passed": true,
+        "samples": 38287,
+        "penetration": 0,
+        "degenerateTriangles": 0,
+        "minimumBodyClearance": 0.0017809149882816733,
+        "bounds": {
+          "lo": [
+            -0.4395191967487335,
+            0.5667955875396729,
+            -0.18952961266040802
+          ],
+          "hi": [
+            -0.1901741772890091,
+            0.7924854159355164,
+            0.14774088561534882
+          ]
+        },
+        "mainElements": 19,
+        "covertElements": 7,
+        "sideAttachedElements": 12,
+        "scope": "Four fixed samples per tail triangle against the corresponding side or dorsal carrier where defined; not a continuous inter-feather collision proof."
+      },
+      "feetAudit": {
+        "finite": true,
+        "minY": 0.00179,
+        "degenerateTriangles": 0,
+        "passed": true,
+        "padElements": 18,
+        "clawRootElements": 8
+      },
+      "combAudit": {
+        "finite": true,
+        "degenerateTriangles": 0,
+        "passed": true,
+        "sections": 121,
+        "lobes": 5,
+        "continuousBlade": true,
+        "embeddedRoot": true,
+        "minSectionHeight": 0.0011,
+        "maxSectionHeight": 0.03025566101551243
+      },
+      "vertices": 131948,
+      "triangles": 184512,
+      "coatElements": 1541,
+      "covertElements": 248,
+      "tailElements": 26,
+      "eyePatches": 4,
+      "nostrilPatches": 2,
+      "earPatches": 2,
+      "footElements": 44,
+      "removedPosteriorEnvelope": true,
+      "macroFeatherCandidates": 54,
+      "newWingElements": 226,
+      "wingAudit": {
+        "missingSurfaceSamples": 0,
+        "rejectedElements": 0,
+        "rootMaxGap": 0.00021592897089178775,
+        "minimumCarrierClearance": 0.0002,
+        "layerAdjustedVertices": 28424,
+        "layerMaximumExtraLift": 0.008642294010414747,
+        "bodyInteriorAdjustments": 90,
+        "bodyMaximumAdjustment": 7.746279472929376e-05
+      },
+      "finite": true,
+      "buildMs": 3104.79999999993
+    },
+    "console": [],
+    "pageerrors": [],
+    "requestfailed": [],
+    "mobile": {
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 455.765625,
+        "top": 0,
+        "right": 390,
+        "bottom": 455.765625,
+        "left": 0
+      },
+      "panel": {
+        "x": 0,
+        "y": 455.75,
+        "width": 390,
+        "height": 388.25,
+        "top": 455.75,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 455.765625,
+        "top": 0,
+        "right": 390,
+        "bottom": 455.765625,
+        "left": 0
+      }
+    }
+  },
+  "visual_self_review": {
+    "head_top_second_hump_removed": true,
+    "crown_to_bill_slope_more_continuous": true,
+    "comb_is_single_continuous_midline_blade_candidate": true,
+    "comb_root_embedded_candidate": true,
+    "broad_red_face_mask_reduced": true,
+    "whole_visual_gate_passed": false,
+    "remaining_issues": [
+      "comb serration rhythm remains simplified",
+      "head/neck/body proportion still needs whole-silhouette convergence",
+      "eye socket and eyelid still read as procedural patches",
+      "body and wing feather ordering remains visibly regular at close range",
+      "feet and tail remain below close-up final quality"
+    ]
+  },
+  "summary": {
+    "technical_gate_passed": true,
+    "manual_visual_acceptance": false,
+    "whole_visual_gate_passed": false,
+    "canonical_chicken_surface_complete": false,
+    "rig_authorized": false,
+    "motion_implemented": false,
+    "production_ready": false,
+    "public_https_published": false
+  }
+}
