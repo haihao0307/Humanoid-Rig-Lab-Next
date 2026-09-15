@@ -74,6 +74,14 @@ jobs:
           text=text.replace(old,new,1)
           path.write_text(text,encoding='utf-8',newline='\n')
 
+          check_path=Path('tools/check-reconstruction.mjs')
+          check=check_path.read_text(encoding='utf-8')
+          old="/scheduleCompactHair\\(window\\.HumanLab\\.population\\.active\\)/.test(runtime)"
+          new="/if\\(reviewMode!==\'face\'\\)scheduleCompactHair\\(window\\.HumanLab\\.population\\?\\.active\\|\\|window\\.HumanLab\\)/.test(runtime)"
+          if check.count(old)!=1:
+              raise SystemExit('reconstruction hair contract anchor mismatch')
+          check_path.write_text(check.replace(old,new,1),encoding='utf-8',newline='\n')
+
           docs=Path('docs/FACE_IDENTITY_LANDMARKS_R2.md')
           value=docs.read_text(encoding='utf-8')
           marker='打开 `index.html?review=face`，进入“面部微控与表情”。面板新增：\n'
