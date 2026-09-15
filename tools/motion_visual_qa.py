@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 from visual_qa_core import body_state, create_driver, fetch_ready_url, parent_state, reset_body, run_preflight, send_command, set_body_view, set_parent_anatomy, start_video, stop_video, utc_now, wait_for_completion
 from visual_qa_report import build_review_html, capture_canvas, json_dump, make_contact_sheet, make_crops
@@ -93,6 +94,25 @@ def run_scenario(driver: webdriver.Chrome, scenario: Scenario, root: Path, manif
     result["finishedAt"]=utc_now(); return result
 
 
+def capture_failure_diagnostics(driver: webdriver.Chrome, root: Path) -> dict[str,Any]:
+    diagnostics: dict[str,Any]={"capturedAt":utc_now()}
+    with contextlib.suppress(Exception): diagnostics["currentURL"]=driver.current_url
+    with contextlib.suppress(Exception): diagnostics["title"]=driver.title
+    with contextlib.suppress(Exception): diagnostics["parent"]=parent_state(driver)
+    with contextlib.suppress(Exception): diagnostics["body"]=body_state(driver)
+    with contextlib.suppress(Exception):
+        logs=driver.get_log("browser"); diagnostics["browserLogs"]=logs; json_dump(root/"browser-console-failure.json",logs)
+    with contextlib.suppress(Exception):
+        driver.switch_to.default_content(); path=root/"preflight-failure-window.png"; driver.save_screenshot(str(path)); diagnostics["windowScreenshot"]=path.relative_to(root).as_posix()
+    with contextlib.suppress(Exception):
+        driver.switch_to.default_content(); source=driver.page_source; path=root/"preflight-failure-page.html"; path.write_text(source,encoding="utf-8"); diagnostics["pageSource"]=path.relative_to(root).as_posix(); diagnostics["pageSourceBytes"]=len(source.encode("utf-8"))
+    with contextlib.suppress(Exception):
+        driver.switch_to.default_content(); frame=driver.find_element(By.ID,"bodyFrame"); driver.switch_to.frame(frame)
+        canvas=driver.find_element(By.ID,"view"); path=root/"preflight-failure-body-canvas.png"; canvas.screenshot(str(path)); diagnostics["bodyCanvasScreenshot"]=path.relative_to(root).as_posix()
+    with contextlib.suppress(Exception): driver.switch_to.default_content()
+    return diagnostics
+
+
 def main() -> int:
     parser=argparse.ArgumentParser(); parser.add_argument("--url",required=True); parser.add_argument("--source-sha",required=True); parser.add_argument("--output",default="visual-review"); parser.add_argument("--skip-ab",action="store_true"); args=parser.parse_args()
     root=Path(args.output).resolve(); root.mkdir(parents=True,exist_ok=True)
@@ -116,7 +136,14 @@ def main() -> int:
             logs=driver.get_log("browser"); json_dump(root/"browser-console-post.json",logs); report["postRunSevereConsoleEntries"]=[x for x in logs if x.get("level")=="SEVERE"]
         return exit_code
     except Exception as exc:
-        report["status"]="INCONCLUSIVE"; report["browserQA"]="runner-error"; report["runnerError"]={"type":type(exc).__name__,"message":str(exc)}; return 1
+        report["status"]="INCONCLUSIVE"; report["browserQA"]="runner-error"; report["runnerError"]={"type":type(exc).__name__,"message":str(exc)}
+        if driver:
+            report["failureDiagnostics"]=capture_failure_diagnostics(driver,root)
+            diagnostic=report["failureDiagnostics"]
+            report["preflight"]={"passed":False,"checkedAt":utc_now(),"sourceSHA":args.source_sha,"url":args.url,
+              "parent":diagnostic.get("parent"),"body":diagnostic.get("body"),"browser":{"logs":diagnostic.get("browserLogs",[])},
+              "failures":[f"{type(exc).__name__}: {exc}"],"warnings":[]}
+        return 1
     finally:
         report["finishedAt"]=utc_now(); json_dump(root/"screenshot-manifest.json",manifest); json_dump(root/"browser-run-report.json",report)
         if report.get("preflight",{}).get("passed"): build_review_html(root,report)
