@@ -1,0 +1,63 @@
+name: Bruce R13P GitHub dog mirror fetch
+
+on:
+  push:
+    branches:
+      - automation/bruce-neutral-dog-anchor-r13p-20260915
+    paths:
+      - .github/workflows/bruce_r13p_github_dog_mirror.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch pinned public mirror and license evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=bruce_r13p_github_dog_mirror
+          mkdir -p "$ROOT/originals" "$ROOT/evidence" "$ROOT/diagnostics"
+          COMMIT=5146227784496c813e0df5d5637373f1468d28fd
+          BASE="https://raw.githubusercontent.com/VAST-AI-Research/Deformable-Radial-Kernel-Splatting/$COMMIT"
+          curl --fail --location "$BASE/meshes/dog.obj" -o "$ROOT/originals/dog.obj"
+          curl --fail --location "$BASE/meshes/dog.mtl" -o "$ROOT/originals/dog.mtl"
+          curl --fail --location "$BASE/LICENSE" -o "$ROOT/evidence/VAST_REPOSITORY_LICENSE.txt"
+          curl --fail --location "$BASE/README.md" -o "$ROOT/evidence/VAST_REPOSITORY_README.md"
+          cat > "$ROOT/evidence/SOURCE_NOTE.md" <<'EOF'
+          # Source note
+
+          Geometry mirror: VAST-AI-Research/Deformable-Radial-Kernel-Splatting, pinned commit `5146227784496c813e0df5d5637373f1468d28fd`, files `meshes/dog.obj` and `meshes/dog.mtl`.
+
+          The object name inside the OBJ identifies `luna-dog_yellow-white_0`.  This copy is used only after comparing its mesh statistics and appearance to the public Quaternius "Dog" page (Poly Pizza model `2kUk0QqpCg`, marked Public Domain / CC0).  Repository MIT licensing alone is not treated as sufficient proof of third-party asset rights; the public creator page remains the rights claim, and the mirror remains a transport source.
+          EOF
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path('bruce_r13p_github_dog_mirror')
+          obj=root/'originals/dog.obj'
+          v=f=vt=vn=0; objects=[]
+          for line in obj.read_text(errors='ignore').splitlines():
+              if line.startswith('v '): v+=1
+              elif line.startswith('vt '): vt+=1
+              elif line.startswith('vn '): vn+=1
+              elif line.startswith('f '): f+=1
+              elif line.startswith('o '): objects.append(line[2:].strip())
+          report={'vertices':v,'faces':f,'texcoords':vt,'normals':vn,'objects':objects,'bytes':obj.stat().st_size,'sha256':hashlib.sha256(obj.read_bytes()).hexdigest()}
+          (root/'diagnostics/obj_inventory.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+          find "$ROOT" -type f -print0 | sort -z | xargs -0 file > "$ROOT/diagnostics/file_types.txt"
+          (cd "$ROOT"; find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt; sha256sum -c SHA256SUMS.txt)
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruce-r13p-github-dog-mirror
+          path: bruce_r13p_github_dog_mirror
+          if-no-files-found: error
+          retention-days: 7
