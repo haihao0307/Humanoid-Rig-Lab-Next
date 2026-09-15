@@ -3,11 +3,12 @@ import {mkdir} from 'node:fs/promises';
 import {chromium} from 'playwright-core';
 
 const url=process.env.HUMANLAB_URL||'http://127.0.0.1:4173/index.html';
-const browser=await chromium.launch({
+const launchOptions={
  headless:true,
- executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',
  args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-webgl','--ignore-gpu-blocklist']
-});
+};
+if(process.env.CHROME_BIN)launchOptions.executablePath=process.env.CHROME_BIN;
+const browser=await chromium.launch(launchOptions);
 const page=await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:1});
 const pageErrors=[];
 page.on('pageerror',error=>pageErrors.push(String(error?.stack||error)));
