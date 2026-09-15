@@ -3,10 +3,16 @@
  * Inspired by spherical-coordinate lid sliding, not a tissue simulation:
  * https://disneyanimation.com/publications/realistic-eye-motion-using-procedural-geometric-methods/
  */
-const COMPACT_EYE_ANATOMY={revision:'r12-neutral-fissure-orbital-continuity',recess:.0002,blinkRetractionM:.0010,segments:96,rings:24,
-  fissure:{halfWidth:.0128,upperHeight:.00415,lowerHeight:.00315,lateralCanthusLift:.00070,upperTemporalBias:.08,lowerTemporalBias:.04,verticalRoundness:.16,lowerSulcusM:.00030},
+const COMPACT_EYE_ANATOMY={revision:'r14-procedural-iris-lid-integration',recess:.0020,blinkRetractionM:.0010,segments:96,rings:24,
+  fissure:{halfWidth:.0126,upperHeight:.00500,lowerHeight:.00400,lateralCanthusLift:.00070,upperTemporalBias:.08,lowerTemporalBias:.04,verticalRoundness:.22,upperFoldM:.00030,lowerSulcusM:.00008},
+  outerBand:{canthus:.00150,upper:.00220,lower:.00180,marginRadial:.016,marginOffset:.000035},
+  iris:{outerRadius:.00585,pupilRadius:.00210,planeOffset:-.00020,curve:.00010,segments:128,rings:4},
   left:{centre:[.029181616,1.518095373,.152055491],radius:.012623681},
   right:{centre:[-.030466569,1.518094244,.151979130],radius:.012591195}};
+function compactEyeOuterOverlap(angle){
+  const p=COMPACT_EYE_ANATOMY.outerBand,s=Math.sin(angle),vertical=Math.abs(s),pole=s>=0?p.upper:p.lower;
+  return p.canthus+(pole-p.canthus)*vertical*vertical;
+}
 function compactEyeNeutralFissure(angle,side){
   const p=COMPACT_EYE_ANATOMY.fissure,c=Math.cos(angle),s=Math.sin(angle),vertical=Math.abs(s),lateral=c*(side==='left'?1:-1),canthus=vertical*vertical;
   const height=s>=0?p.upperHeight*(1+p.upperTemporalBias*lateral):p.lowerHeight*(1-p.lowerTemporalBias*lateral);
@@ -63,7 +69,7 @@ function compactEyePatchPoint(angle,t,side,outer,gradient,globe,corners,state=[0
   const m0=clamp(slope*(1-cornerWeight)+m1*cornerWeight,-.020,Math.min(.020,3*Math.max(0,delta)+.0003)),t2=t*t,t3=t2*t;
   // The upper fold opens as the lid closes. It is a local transition outside
   // the pretarsal surface, rather than an equally thick ring around the eye.
-  const p=COMPACT_EYE_ANATOMY.fissure,envelope=16*t2*(1-t)*(1-t),upperFold=-.00065*Math.max(0,s)*Math.exp(-(((t-.58)/.12)**2))*envelope*(1-state[2])**2;
+  const p=COMPACT_EYE_ANATOMY.fissure,envelope=16*t2*(1-t)*(1-t),upperFold=-p.upperFoldM*Math.max(0,s)*Math.exp(-(((t-.58)/.12)**2))*envelope*(1-state[2])**2;
   const lowerSulcus=-p.lowerSulcusM*Math.max(0,-s)*Math.exp(-(((t-.58)/.17)**2))*envelope*(1-.55*state[2]),fold=upperFold+lowerSulcus;
   let depth=(2*t3-3*t2+1)*inner+(t3-2*t2+t)*m0+(-2*t3+3*t2)*(outer[2]+.00004)+(t3-t2)*m1+.00008*envelope+fold;
   const contact=compactEyeContactDepth(x,y,globe,state[2]),h=clamp(.5+.5*(depth-contact)/.00008,0,1),supported=contact+(depth-contact)*h+.00008*h*(1-h);
@@ -89,7 +95,7 @@ function compactCreateEyeLids(meshes,eyeFrames,rig,statureScale){
       // The fitted source opening contains local folds. Regularize its free
       // inner tissue margin to an almond while anchoring the outer skin fit.
       edge.push(compactEyeNeutralFissure(angle,side));
-      const r=Math.hypot(x,y),ox=x*(1+.0055/r),oy=y*(1+.0055/r),z=sample(ox,oy);
+      const r=Math.hypot(x,y),overlap=compactEyeOuterOverlap(angle),ox=x*(1+overlap/r),oy=y*(1+overlap/r),z=sample(ox,oy);
       const eps=.00025,zx1=sample(ox+eps,oy),zx0=sample(ox-eps,oy),zy1=sample(ox,oy+eps),zy0=sample(ox,oy-eps);
       outer.push([ox,oy,z??.008,zx1!==null&&zx0!==null?(zx1-zx0)/(2*eps):0,zy1!==null&&zy0!==null?(zy1-zy0)/(2*eps):0]);
     }
@@ -104,7 +110,7 @@ function compactCreateEyeLids(meshes,eyeFrames,rig,statureScale){
     canthusDepths[side]=cornerDepth;
     const canthusBlend=angle=>{const t=clamp((Math.abs(Math.cos(angle))-.76)/.22,0,1);return t*t*(3-2*t);};
     const innerDepth=(angle,x,y)=>{const z=contactDepth(x,y),corner=cornerDepth[Math.cos(angle)<0?0:1];return z+(Math.max(z,corner)-z)*canthusBlend(angle);};
-    const localPoint=(angle,t,margin=false)=>{const o=interpolate(outer,angle);return compactEyePatchPoint(angle,t,side,o,o.slice(3),globe,cornerDepth,[0,0,0],margin?.00007:0);};
+    const localPoint=(angle,t,margin=false)=>{const o=interpolate(outer,angle);return compactEyePatchPoint(angle,t,side,o,o.slice(3),globe,cornerDepth,[0,0,0],margin?COMPACT_EYE_ANATOMY.outerBand.marginOffset:0);};
     const point=(angle,t,margin=false)=>{const p=localPoint(angle,t,margin);return add(frame.centre,add(mul(frame.u,p[0]),add(mul(frame.v,p[1]),mul(frame.n,p[2]))));};
     function meshPart(name,radialStart,radialEnd,nr){
       const positions=[],normals=[],params=[],tangentU=[],tangentV=[],outerPosition=[],outerTangentU=[],outerGradient=[],outerGradientU=[],indices=[],epsilon=.002;
@@ -131,7 +137,7 @@ function compactCreateEyeLids(meshes,eyeFrames,rig,statureScale){
         binding:{ids,weights,colors,groupCounts:{head:vertices},maximumWeightError:0}});
       report.triangles+=indices.length/3;
     }
-    meshPart('eyeLidSkin',0,1,rings);meshPart('eyeLidMargin',0,.035,2);
+    meshPart('eyeLidSkin',0,1,rings);meshPart('eyeLidMargin',0,COMPACT_EYE_ANATOMY.outerBand.marginRadial,2);
     // Replace disconnected source sclera charts with a continuous optical globe.
     // Analytic normals keep the exposed white smooth without baked geometry.
     const globePositions=[],globeNormals=[],globeIndices=[],nuGlobe=96,nvGlobe=32;
@@ -153,11 +159,25 @@ function compactCreateEyeLids(meshes,eyeFrames,rig,statureScale){
       binding:{ids:globeIds,weights:globeWeights,colors:new Uint8Array(globeCount*3),groupCounts:{head:globeCount},maximumWeightError:0}});
     report.triangles+=globeIndices.length/3;
 
-    // The iris is an annulus. Its pupil opening needs a dark interior behind
-    // the iris plane; placing black pigment on the cornea flattens the eye.
+    // Replace the low-resolution source iris with one parameter-generated
+    // annulus in the same eye frame. The corneal shell remains independent.
+    const iris=COMPACT_EYE_ANATOMY.iris,irisPositions=[],irisNormals=[],irisIndices=[];
+    for(let j=0;j<=iris.rings;j++)for(let i=0;i<=iris.segments;i++){
+      const radial=j/iris.rings,r=iris.pupilRadius+(iris.outerRadius-iris.pupilRadius)*radial,angle=i/iris.segments*2*Math.PI;
+      const direction=add(mul(frame.u,Math.cos(angle)),mul(frame.v,Math.sin(angle))),depth=iris.planeOffset-COMPACT_EYE_ANATOMY.recess-iris.curve*radial*radial;
+      irisPositions.push(...add(frame.centre,add(mul(direction,r),mul(frame.n,depth))));irisNormals.push(...compactEyeEncodeNormal(frame.n));
+    }
+    for(let j=0;j<iris.rings;j++)for(let i=0;i<iris.segments;i++){const a=j*(iris.segments+1)+i,b=a+iris.segments+1;irisIndices.push(a,b,a+1,a+1,b,b+1);}
+    const irisCount=irisPositions.length/3,irisIds=new Uint16Array(irisCount*COMPACT_INFLUENCES),irisWeights=new Uint16Array(irisIds.length);
+    for(let i=0;i<irisCount;i++){irisIds[i*COMPACT_INFLUENCES]=head;irisWeights[i*COMPACT_INFLUENCES]=65535;}
+    output.push({name:'eyeIris',eyeSide:side,sourceGroup:'procedural-eye-tissue',origin:[0,0,0],extent:[1,1,1],vertices:irisCount,triangles:irisIndices.length/3,
+      canonicalPositions:Float32Array.from(irisPositions),positions:Float32Array.from(irisPositions,p=>p*statureScale),normals:Int16Array.from(irisNormals),indices:Uint16Array.from(irisIndices),
+      binding:{ids:irisIds,weights:irisWeights,colors:new Uint8Array(irisCount*3),groupCounts:{head:irisCount},maximumWeightError:0}});
+    report.triangles+=irisIndices.length/3;
+    // A separate pupil sits slightly behind the generated iris plane.
     const pupilPositions=[],pupilNormals=[],pupilIndices=[];
-    for(let i=0;i<=64;i++){const angle=i/64*2*Math.PI,r=i===64?0:.0024;
-      pupilPositions.push(...add(frame.centre,add(mul(frame.u,r*Math.cos(angle)),add(mul(frame.v,r*Math.sin(angle)),mul(frame.n,-.00055-COMPACT_EYE_ANATOMY.recess)))));
+    for(let i=0;i<=64;i++){const angle=i/64*2*Math.PI,r=i===64?0:iris.pupilRadius;
+      pupilPositions.push(...add(frame.centre,add(mul(frame.u,r*Math.cos(angle)),add(mul(frame.v,r*Math.sin(angle)),mul(frame.n,iris.planeOffset-.00035-COMPACT_EYE_ANATOMY.recess)))));
       pupilNormals.push(...compactEyeEncodeNormal(frame.n));if(i<64)pupilIndices.push(64,i,(i+1)%64);
     }
     const pupilIds=new Uint16Array(65*COMPACT_INFLUENCES),pupilWeights=new Uint16Array(pupilIds.length);
@@ -232,13 +252,13 @@ vec3 compactLidPatchLocal(float angle,float t,vec3 outer,vec2 gradient){
   float eps=.0001,slope=((compactLidContact(ex+eps,ey)-compactLidContact(ex-eps,ey))*dx+(compactLidContact(ex,ey+eps)-compactLidContact(ex,ey-eps))*dyRadial)/(2.*eps);
   float delta=outer.z+.00004-inner,m1=clamp(gradient.x*dx+gradient.y*dyRadial,-min(.020,3.*max(0.,-delta)+.0003),.020);
   float m0=clamp(mix(slope,m1,cornerWeight),-.020,min(.020,3.*max(0.,delta)+.0003)),t2=t*t,t3=t2*t;
-  float envelope=16.*t2*(1.-t)*(1.-t),upperFold=-.00065*max(0.,s)*exp(-pow((t-.58)/.12,2.))*envelope*(1.-blink)*(1.-blink);
+  float envelope=16.*t2*(1.-t)*(1.-t),upperFold=-${COMPACT_EYE_ANATOMY.fissure.upperFoldM.toFixed(6)}*max(0.,s)*exp(-pow((t-.58)/.12,2.))*envelope*(1.-blink)*(1.-blink);
   float lowerSulcus=-${COMPACT_EYE_ANATOMY.fissure.lowerSulcusM.toFixed(6)}*max(0.,-s)*exp(-pow((t-.58)/.17,2.))*envelope*(1.-.55*blink),fold=upperFold+lowerSulcus;
   float depth=(2.*t3-3.*t2+1.)*inner+(t3-2.*t2+t)*m0+(-2.*t3+3.*t2)*(outer.z+.00004)+(t3-t2)*m1+.00008*envelope+fold;
   float contact=compactLidContact(x,y),h=clamp(.5+.5*(depth-contact)/.00008,0.,1.),supported=mix(contact,depth,h)+.00008*h*(1.-h);
-  float q=clamp((t-.80)/.16,0.,1.),finalDepth=depth+(supported-depth)*(1.-q*q*(3.-2.*q))+(compactEyeLid>1.5?.00007:0.);
+  float q=clamp((t-.80)/.16,0.,1.),finalDepth=depth+(supported-depth)*(1.-q*q*(3.-2.*q))+(compactEyeLid>1.5?${COMPACT_EYE_ANATOMY.outerBand.marginOffset.toFixed(6)}:0.);
   float rimT=clamp((t-.82)/.18,0.,1.),rimWeight=rimT*rimT*(3.-2.*rimT),rimSlope=clamp(gradient.x*dx+gradient.y*dyRadial,-.020,.020);
-  float rimDepth=outer.z+.00004+(t-1.)*rimSlope+(compactEyeLid>1.5?.00007:0.);
+  float rimDepth=outer.z+.00004+(t-1.)*rimSlope+(compactEyeLid>1.5?${COMPACT_EYE_ANATOMY.outerBand.marginOffset.toFixed(6)}:0.);
   float finalRimDepth=mix(finalDepth,rimDepth,rimWeight);
   return vec3(x,y,finalRimDepth);
 }
@@ -249,8 +269,8 @@ vec3 compactLidLocalPoint(vec2 param){
 vec3 compactLidLocalNormal(vec2 param){
   // Use the displayed grid's neighbours. Infinitesimal normals can turn away
   // from the actual coarse triangle where the closed contact curve bends.
-  float da=6.28318530718/${COMPACT_EYE_ANATOMY.segments}.,dr=compactEyeLid>1.5?.0175:1./${COMPACT_EYE_ANATOMY.rings}.;
-  float limit=compactEyeLid>1.5?.035:1.;
+  float da=6.28318530718/${COMPACT_EYE_ANATOMY.segments}.,dr=compactEyeLid>1.5?${(COMPACT_EYE_ANATOMY.outerBand.marginRadial/2).toFixed(6)}:1./${COMPACT_EYE_ANATOMY.rings}.;
+  float limit=compactEyeLid>1.5?${COMPACT_EYE_ANATOMY.outerBand.marginRadial.toFixed(6)}:1.;
   vec3 tu=compactLidLocalPoint(param+vec2(da,0.))-compactLidLocalPoint(param-vec2(da,0.));
   vec3 tv=compactLidLocalPoint(vec2(param.x,min(limit,param.y+dr)))-compactLidLocalPoint(vec2(param.x,max(0.,param.y-dr)));
   return cross(tv,tu);

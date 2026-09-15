@@ -1,24 +1,27 @@
 /* Dense, source-fitted facial skin with authored secondary anatomical forms.
  * The temporary grid and fibres are generated at upload; only these parameters
  * persist. This is a geometric refinement, not measured anatomy or a scan. */
-const COMPACT_FACE_ANATOMY={revision:'r8-orbital-continuity',columns:160,rows:152,
+const COMPACT_FACE_ANATOMY={revision:'r11-nasal-subunit-continuity',columns:160,rows:152,
   bounds:[-.073,.072,1.433,1.575],ellipse:[-.0005,1.506,.068,.067],
-  smoothingRadiusM:.0045,nostrils:{x:.0093,y:1.4793,rx:.0036,ry:.00165,tilt:.10,depth:.0050},
+  smoothingRadiusM:.0045,nostrils:{x:.0090,y:1.4778,rx:.00345,ry:.00205,tilt:.16,depth:.0052},
   lips:{centreX:-.0006,halfWidth:.0255,seamY:1.4586,apron:1.75,innerDepth:.0032,columns:160,rings:36,
     // Authored landmarks and sectional rails, visually informed by VAA and Ten24.
     // Rows: abs(horizontal parameter), fissure, upper border, lower border (m).
     outline:[[0,-.00085,.0043,-.0064],[.22,-.00035,.0050,-.0064],[.45,.00030,.0041,-.0056],[.70,.00006,.0025,-.0036],[.88,-.00030,.00075,-.00165],[1,-.00045,-.00045,-.00045]],
     upperSection:[[0,.0023],[.20,.00255],[.50,.00235],[.85,.00190],[1,.00165],[1.75,0]],
     lowerSection:[[0,.0023],[.20,.0032],[.50,.0038],[.75,.0038],[1,.0030],[1.75,0]]},
-  nose:{knots:[[1.465,.191,.015],[1.471,.190,.014],[1.475,.189,.0105],[1.480,.197,.010],[1.487,.203,.0115],[1.494,.200,.0105],[1.505,.193,.011],[1.518,.187,.012],[1.530,.181,.015],[1.538,.178,.019]],
-    underturn:[[1.465,0],[1.471,0],[1.475,.0020],[1.480,-.0035],[1.487,-.0004],[1.494,0]],underturnWidth:.023,underturnCentreWeight:.40,columellaDrop:.0013,alarHeight:.0040,columellaHeight:.0012},
+  nose:{knots:[[1.465,.1900,.0135],[1.471,.1905,.0125],[1.476,.1930,.0100],[1.481,.1990,.0088],[1.486,.2035,.0088],[1.490,.2025,.0092],[1.496,.1985,.0102],[1.506,.1930,.0115],[1.518,.1870,.0125],[1.530,.1810,.0150],[1.538,.1780,.0190]],
+    underturn:[[1.465,0],[1.471,.0004],[1.476,.0014],[1.480,-.0021],[1.486,-.0008],[1.494,0]],underturnWidth:.0225,underturnCentreWeight:.30,columellaDrop:.0016,
+    tipY:1.486,tipRx:.0105,tipRy:.0072,tipHeight:.00035,domeX:.0046,domeRx:.0048,domeRy:.0058,domeHeight:.00125,
+    alarX:.0140,alarY:1.4805,alarRx:.0058,alarRy:.0056,alarHeight:.0018,alarGrooveX:.0170,alarGrooveY:1.4870,alarGrooveRx:.0048,alarGrooveRy:.0085,alarGrooveDepth:.00072,
+    sidewallX:.0145,sidewallY:1.503,sidewallRx:.0090,sidewallRy:.0180,sidewallHeight:.00030,columellaHeight:.00155},
   forms:[
     ...[-1,1].flatMap(side=>[
-      {id:'orbitalTransition',x:side*.030,y:1.532,rx:.028,ry:.017,z:-.00095},
-      {id:'upperLidSulcus',x:side*.030,y:1.536,rx:.022,ry:.009,z:-.00035},
-      {id:'infraorbitalTransition',x:side*.030,y:1.505,rx:.027,ry:.016,z:-.00070},
-      {id:'lowerLidTransition',x:side*.030,y:1.502,rx:.024,ry:.009,z:-.00025},
-      {id:'malarVolume',x:side*.037,y:1.493,rx:.022,ry:.015,z:.00075},
+      {id:'orbitalTransition',x:side*.030,y:1.532,rx:.029,ry:.018,z:-.00032},
+      {id:'upperLidSulcus',x:side*.030,y:1.538,rx:.021,ry:.0075,z:-.00012},
+      {id:'infraorbitalTransition',x:side*.030,y:1.505,rx:.028,ry:.017,z:-.00022},
+      {id:'lowerLidTransition',x:side*.030,y:1.500,rx:.023,ry:.0075,z:-.00006},
+      {id:'malarVolume',x:side*.037,y:1.493,rx:.023,ry:.016,z:.00055},
       {id:'philtralColumn',x:side*.0028,y:1.470,rx:.0025,ry:.007,z:.00020}
     ])],brow:{strandsPerSide:900,segments:4,widthM:.00009}};
 function compactFaceRaySampler(meshes){
@@ -102,8 +105,14 @@ function compactCreateFaceAnatomy(meshes,rig,scale){
     for(let k=1;k<3;k++){const m0=(b[k]-prev[k])/(b[0]-prev[0])*(b[0]-a[0]),m1=(next[k]-a[k])/(next[0]-a[0])*(b[0]-a[0]);out.push((2*u*u*u-3*u*u+1)*a[k]+(u*u*u-2*u*u+u)*m0+(-2*u*u*u+3*u*u)*b[k]+(u*u*u-u*u)*m1);}return out;};
   for(let j=0;j<=ny;j++){const y=y0+j*dy;if(y<=1.465||y>=1.538)continue;const [center,width]=profile(y);let baseline=0,total=0;for(let v=-4;v<=4;v++){const w=Math.exp(-v*v/8);baseline+=(gridAt(-.027,y+v*dy)+gridAt(.027,y+v*dy))*.5*w;total+=w;}baseline/=total;
     for(let i=0;i<=nx;i++){const x=x0+i*dx;if(Math.abs(x)>=.027)continue;const tx=clamp((.027-Math.abs(x))/.008,0,1),ty=clamp(Math.min((y-1.465)/.008,(1.538-y)/.010),0,1),blend=tx*tx*(3-2*tx)*ty*ty*(3-2*ty);
-      const ridge=(center-baseline)*Math.exp(-.5*(x/width)**2),alar=nose.alarHeight*Math.exp(-(((Math.abs(x)-.0125)/.0045)**2)-((y-1.4815)/.0045)**2),columella=nose.columellaHeight*Math.exp(-((x/.003)**2)-((y-1.477)/.004)**2);
-      height[at(i,j)]+=(baseline+ridge+alar+columella-height[at(i,j)])*blend;}}
+      const ax=Math.abs(x),ridge=(center-baseline)*Math.exp(-.5*(x/width)**2);
+      const tip=nose.tipHeight*Math.exp(-((x/nose.tipRx)**2)-(((y-nose.tipY)/nose.tipRy)**2));
+      const domes=nose.domeHeight*(Math.exp(-(((x-nose.domeX)/nose.domeRx)**2)-(((y-nose.tipY)/nose.domeRy)**2))+Math.exp(-(((x+nose.domeX)/nose.domeRx)**2)-(((y-nose.tipY)/nose.domeRy)**2)));
+      const alar=nose.alarHeight*Math.exp(-(((ax-nose.alarX)/nose.alarRx)**2)-(((y-nose.alarY)/nose.alarRy)**2));
+      const groove=-nose.alarGrooveDepth*Math.exp(-(((ax-nose.alarGrooveX)/nose.alarGrooveRx)**2)-(((y-nose.alarGrooveY)/nose.alarGrooveRy)**2));
+      const sidewall=nose.sidewallHeight*Math.exp(-(((ax-nose.sidewallX)/nose.sidewallRx)**2)-(((y-nose.sidewallY)/nose.sidewallRy)**2));
+      const columella=nose.columellaHeight*Math.exp(-((x/.0032)**2)-(((y-1.4775)/.0042)**2));
+      height[at(i,j)]+=(baseline+ridge+tip+domes+alar+groove+sidewall+columella-height[at(i,j)])*blend;}}
   // Remove the inherited lip ridge before constructing vermilion. A bounded
   // Hermite bed preserves the top/bottom skin tangents and the lateral face.
   const oralHeight=height.slice(),readOral=(x,y)=>{const u=clamp((x-x0)/dx,0,nx-.00001),v=clamp((y-y0)/dy,0,ny-.00001),i=Math.floor(u),j=Math.floor(v),a=u-i,b=v-j;return (oralHeight[at(i,j)]*(1-a)+oralHeight[at(i+1,j)]*a)*(1-b)+(oralHeight[at(i,j+1)]*(1-a)+oralHeight[at(i+1,j+1)]*a)*b;};

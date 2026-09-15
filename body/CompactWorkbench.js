@@ -12,7 +12,7 @@ const COMPACT_EYES={
 };
 const COMPACT_EYE_COORDINATES=`uniform vec3 compactEyeCentre,compactEyeU,compactEyeV;
 vec2 compactEyeUV(vec3 p){vec3 relativeEye=p-compactEyeCentre;return vec2(dot(relativeEye,compactEyeU),dot(relativeEye,compactEyeV))/.0064;}`;
-const COMPACT_SCLERA_APERTURE=`if(compactFeature>4.5&&compactFeature<5.5&&length(compactEyeUV(R))<.985&&dot(R-compactEyeCentre,cross(compactEyeU,compactEyeV))>${(-COMPACT_EYE_ANATOMY.recess-.001).toFixed(6)})discard;`;
+const COMPACT_SCLERA_APERTURE=`if(compactFeature>4.5&&compactFeature<5.5&&length(compactEyeUV(R))<${(COMPACT_EYE_ANATOMY.iris.outerRadius/.0064*.985).toFixed(6)}&&dot(R-compactEyeCentre,cross(compactEyeU,compactEyeV))>${(-COMPACT_EYE_ANATOMY.recess-.001).toFixed(6)})discard;`;
 const COMPACT_START=performance.now();
 let compactPendingWorker=null,compactPendingCancel=null,compactSurfaceQueue=Promise.resolve(),compactQueueEpoch=0,compactQueueCancelReason='人体计算已取消';
 let compactProgressSavedAt=-Infinity,compactProgressSavedGroup='';
@@ -238,7 +238,7 @@ class CompactSurfaceRenderer{
     const stage={chunks:[],geometryBytes:0,maximumWeightError:0,bindingGroups:{},hair:null};
     const faceTissue=compactCreateFaceAnatomy(data.meshes,this.rig,this.statureScale);stage.faceAnatomy=faceTissue.report;
     const eyeTissue=compactCreateEyeLids(faceTissue.meshes.filter(m=>m.name==='faceSkin'),this.eyeFrames,this.rig,this.statureScale);stage.eyeAnatomy=eyeTissue.report;stage.eyeSocketRadii=eyeTissue.socketRadii;stage.canthusDepths=eyeTissue.canthusDepths;
-    const replacedSclera=data.meshes.filter(m=>['FJ1317','FJ1368','FJ2812','FJ2814'].includes(m.name));
+    const replacedSclera=data.meshes.filter(m=>['FJ1297','FJ1348','FJ1317','FJ1368','FJ2812','FJ2814'].includes(m.name));
     const displayMeshes=data.meshes.filter(m=>!replacedSclera.includes(m)).concat(faceTissue.meshes,eyeTissue.meshes);stage.faceSampling=sampleFaceSurface(displayMeshes,data.report.quality,this.statureScale);
     try{
     for(const m of displayMeshes){
@@ -330,10 +330,10 @@ class CompactSurfaceRenderer{
       gl.uniform1f(p.u.compactEyeLid,c.eyeLid?(c.name==='eyeLidMargin'?2:1):0);gl.uniform1f(p.u.compactEyeSide,eyeSide==='left'?0:1);
       gl.uniform1f(p.u.compactSkinSocket,c.name==='skin'||c.name==='faceSkin'?1:0);
       gl.uniform1f(p.u.compactFaceSkinMode,c.name==='skin'?1:c.name==='faceSkin'?2:0);
-      gl.uniform1f(p.u.compactSourceEye,['FJ1289','FJ1340','FJ1297','FJ1348','FJ1317','FJ1368'].includes(c.name)?1:['eyeSclera','eyePupil'].includes(c.name)?2:0);
+      gl.uniform1f(p.u.compactSourceEye,['FJ1289','FJ1340','FJ1297','FJ1348','FJ1317','FJ1368'].includes(c.name)?1:['eyeSclera','eyeIris','eyePupil'].includes(c.name)?2:0);
       gl.uniform1f(p.u.compactEarClearance,c.name==='skin'?1:0);
       gl.uniform1f(p.u.faceEligible,faceChunkEligible(c.name)?1:0);
-      const eye=c.name==='FJ1289'||c.name==='FJ1340'?1:c.name==='FJ1297'||c.name==='FJ1348'?2:0;
+      const eye=c.name==='FJ1289'||c.name==='FJ1340'?1:c.name==='FJ1297'||c.name==='FJ1348'||c.name==='eyeIris'?2:0;
       if(!depth&&eye===1&&this.view==='skin'){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);}else{gl.disable(gl.BLEND);gl.depthMask(true);}
       // BodyParts3D: FJ2811 external ear, FJ2812 eyebrow, FJ2814 lip;
       // FJ1317/FJ1368 are sclerae. Ears share the body's pigment and microdetail.

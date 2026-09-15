@@ -9,7 +9,8 @@ export function checkFaceAnatomySources({read=readDefault,assert=assertDefault}=
  const source=read('body/FaceAnatomy.js'),renderer=read('body/CompactWorkbench.js'),manifest=JSON.parse(read('source/assembly.json'));
  new vm.Script(source);
  check(manifest.modules.filter(p=>p==='body/FaceAnatomy.js').length===1,'generator assembled once');
- check(source.includes("revision:'r8-orbital-continuity'")&&source.includes("id:'upperLidSulcus'")&&source.includes("id:'lowerLidTransition'"),'versioned orbital transition separates broad socket depth from local lid sulci');
+ check(source.includes("revision:'r11-nasal-subunit-continuity'")&&source.includes("id:'upperLidSulcus'")&&source.includes("id:'lowerLidTransition'"),'versioned orbital transition separates broad socket depth from local lid sulci');
+ check(source.includes('domeX:.0046')&&source.includes('alarGrooveDepth:.00072')&&source.includes('sidewallHeight:.00030'),'nasal tip domes, alar lobules, grooves and sidewalls are explicit bounded subunits');
  check(manifest.modules.indexOf('body/FaceAnatomy.js')<manifest.modules.indexOf('body/CompactWorkbench.js'),'generator precedes renderer');
  check((read('source/runtime.template.js').match(/__SOURCE:body\/FaceAnatomy\.js__/g)||[]).length===1,'runtime includes generator once');
  check(!/\b(?:document|window|fetch|Worker|localStorage)\b/.test(source),'generator has no external side effects');
@@ -50,6 +51,9 @@ export function checkFaceAnatomyParameters(){
   check(inverted===0,'geometric winding agrees with three-dimensional normals '+m.name);
  }
  const cavity=full.meshes.find(m=>m.name==='noseInterior'),n=api.parameters.nostrils;
+ const nose=api.parameters.nose;check(n.ry>n.rx*.5&&n.ry<n.rx*.7,'nostril aperture is oval rather than a horizontal slit');
+ check(nose.domeHeight>nose.tipHeight&&nose.alarGrooveDepth>0&&nose.alarHeight>nose.alarGrooveDepth,'tip, ala and alar groove retain ordered bounded amplitudes');
+ check(nose.knots.every((row,i,all)=>i===0||row[0]>all[i-1][0])&&nose.knots.every(row=>row[2]>.008&&row[2]<.020),'nasal profile rails are ordered and bounded');
  check(full.report.nostrilFrames.length===2&&full.report.nostrilFrames.every(f=>f.rimVertices>=16),'both nasal openings have tessellated rims');
  check(full.meshes.find(m=>m.name==='faceBrow').triangles===2*api.parameters.brow.strandsPerSide*api.parameters.brow.segments*2,'individual fibre topology');
  check(api.form(.5,1.5)===0,'secondary forms have bounded support');

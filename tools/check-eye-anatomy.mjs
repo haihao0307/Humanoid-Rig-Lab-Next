@@ -14,8 +14,10 @@ export function checkEyeAnatomySources({read=readDefault,assert=assertDefault}={
   check(manifest.modules.filter(path=>path==='body/EyeAnatomy.js').length===1&&manifest.modules.indexOf('body/EyeAnatomy.js')<manifest.modules.indexOf('body/CompactWorkbench.js'),'one anatomy module assembled before its renderer');
   check((runtime.match(/__SOURCE:body\/EyeAnatomy\.js__/g)||[]).length===1,'one runtime assembly insertion');
   check(/function compactCreateEyeLids\(/.test(source)&&/function compactEyeSkinSampler\(/.test(source),'procedural geometry and neutral aperture sampling are explicit functions');
-  check(source.includes("revision:'r12-neutral-fissure-orbital-continuity'")&&source.includes('function compactEyeNeutralFissure')&&source.includes('lateralCanthusLift:.00070'),'neutral fissure has an explicit versioned canthus-aware model');
-  check(source.includes('lowerSulcus=-p.lowerSulcusM')&&source.includes('lowerSulcus=-${COMPACT_EYE_ANATOMY.fissure.lowerSulcusM.toFixed(6)}'),'CPU and shader include the same bounded lower-lid transition');
+  check(source.includes("revision:'r14-procedural-iris-lid-integration'")&&source.includes('function compactEyeNeutralFissure')&&source.includes('lateralCanthusLift:.00070'),'neutral fissure has an explicit versioned canthus-aware model');
+  check(source.includes('function compactEyeOuterOverlap')&&source.includes('outerBand:{canthus:.00150,upper:.00220,lower:.00180'),'outer lid tissue uses a bounded angular overlap instead of a uniform broad ring');
+  check(source.includes('upperFold=-p.upperFoldM')&&source.includes('lowerSulcus=-p.lowerSulcusM')&&source.includes('upperFold=-${COMPACT_EYE_ANATOMY.fissure.upperFoldM.toFixed(6)}')&&source.includes('lowerSulcus=-${COMPACT_EYE_ANATOMY.fissure.lowerSulcusM.toFixed(6)}'),'CPU and shader share bounded upper and lower lid transitions');
+  check(source.includes("name:'eyeIris'")&&source.includes('iris:{outerRadius:.00585,pupilRadius:.00210')&&source.includes('irisIndices.push'),'iris is generated as a bounded annulus in the shared eye frame');
   check(!/\b(?:document|window|fetch|Worker|requestAnimationFrame|localStorage|sessionStorage)\b/.test(source),'anatomy helper has no UI, network, persistence, or simulation side effects');
   check(source.includes('canonicalPositions')&&source.includes('statureScale'),'anatomy retains canonical coordinates and applies stature separately');
   check(renderer.includes("compactCreateEyeLids(faceTissue.meshes.filter(m=>m.name==='faceSkin'),this.eyeFrames,this.rig,this.statureScale)"),'current replacement geometry, eye frames and rig drive tissue generation');
@@ -28,7 +30,7 @@ export function checkEyeAnatomySources({read=readDefault,assert=assertDefault}={
   check(/compactLidState\[0\]/.test(renderer)&&/face\.eyelids/.test(renderer),'current face state is uploaded for independent lids');
   check(source.includes('eyeOuterTangentU*da')&&source.includes('eyeOuterGradientU*da'),'posed normal evaluation includes fitted boundary and skin-gradient angular derivatives');
   check(source.includes('min(limit,param.y+dr)')&&source.includes('max(0.,param.y-dr)')&&source.includes('max(eyeLidParam.y,.003)'),'normal samples use bounded grid neighbours and a posed side limit at a closed canthus');
-  check(renderer.includes("['eyeSclera','eyePupil'].includes(c.name)?2:0")&&renderer.includes('if(compactSourceEye<1.5)'),'generated and source optical layers share blink correction without applying the rest offset twice');
+  check(renderer.includes("['eyeSclera','eyeIris','eyePupil'].includes(c.name)?2:0")&&renderer.includes("['FJ1297','FJ1348','FJ1317','FJ1368','FJ2812','FJ2814']")&&renderer.includes('if(compactSourceEye<1.5)'),'generated optical layers share blink correction and replace the source iris without applying the rest offset twice');
   check(renderer.includes("p.u.compactEyeSide,eyeSide==='left'?0:1")&&source.includes('compactLidState[sideOffset+2]'),'optical layers and contact use the same independent eye side');
   return {checks,applicationExecuted:false,humanGenerated:false,shaderCompiled:false,visualAcceptance:false};
 }
@@ -56,14 +58,17 @@ function fixtureSkin(frames){
 export function checkEyeAnatomyParameterFixtures({read=readDefault,assert=assertDefault}={}){
   let checks=0;const check=(value,message)=>{assert(value,'Eye parameter fixture: '+message);checks++;};
   const context=vm.createContext({add,sub,mul,dot,cross,norm,clamp,COMPACT_INFLUENCES:8});
-  new vm.Script(read('body/EyeAnatomy.js')+'\n;globalThis.eyeFixtureAPI={create:compactCreateEyeLids,sampler:compactEyeSkinSampler,patch:compactEyePatchPoint,contact:compactEyeContactDepth,fissure:compactEyeNeutralFissure,anatomy:COMPACT_EYE_ANATOMY,shader:COMPACT_EYE_LID_GLSL};',{filename:'isolated-eye-parameter-functions'}).runInContext(context,{timeout:1000});
+  new vm.Script(read('body/EyeAnatomy.js')+'\n;globalThis.eyeFixtureAPI={create:compactCreateEyeLids,sampler:compactEyeSkinSampler,patch:compactEyePatchPoint,contact:compactEyeContactDepth,fissure:compactEyeNeutralFissure,overlap:compactEyeOuterOverlap,anatomy:COMPACT_EYE_ANATOMY,shader:COMPACT_EYE_LID_GLSL};',{filename:'isolated-eye-parameter-functions'}).runInContext(context,{timeout:1000});
   const api=context.eyeFixtureAPI,frames=Object.fromEntries(['left','right'].map(side=>[side,{centre:add(Array.from(api.anatomy[side].centre),[0,0,.00925]),u:[1,0,0],v:[0,1,0],n:[0,0,1]}]));
   const leftTemporal=api.fissure(0,'left'),leftMedial=api.fissure(Math.PI,'left'),rightTemporal=api.fissure(Math.PI,'right'),rightMedial=api.fissure(0,'right');
   const top=api.fissure(Math.PI/2,'left'),bottom=api.fissure(Math.PI*1.5,'left'),width=(leftTemporal[0]-leftMedial[0])*1000,height=(top[1]-bottom[1])*1000;
   check(width>25&&width<27,'neutral fissure width remains in the authored human-scale range');
-  check(height>7&&height<8,'neutral fissure height remains in the authored human-scale range');
+  check(height>8.6&&height<9.4,'neutral fissure height remains in the authored human-scale range');
   check(leftTemporal[1]-leftMedial[1]>.0013&&rightTemporal[1]-rightMedial[1]>.0013,'temporal canthi sit above medial canthi on both sides');
   check(Math.abs(leftTemporal[1]-rightTemporal[1])<1e-12&&Math.abs(leftMedial[1]-rightMedial[1])<1e-12,'left and right neutral fissures remain mirrored');
+  check(Math.abs(api.overlap(0)-api.anatomy.outerBand.canthus)<1e-12&&Math.abs(api.overlap(Math.PI)-api.anatomy.outerBand.canthus)<1e-12,'outer tissue overlap is narrow at both canthi');
+  check(Math.abs(api.overlap(Math.PI/2)-api.anatomy.outerBand.upper)<1e-12&&Math.abs(api.overlap(Math.PI*1.5)-api.anatomy.outerBand.lower)<1e-12,'upper and lower outer tissue overlap retain separate bounded spans');
+  check(api.anatomy.outerBand.marginRadial<.025&&api.anatomy.outerBand.marginOffset<.00006,'wet margin remains a narrow surface detail');
   const contactGlobe=[0,0,-.00925,api.anatomy.left.radius];
   for(const x of [-.006,0,.006])for(const y of [-.003,0,.003]){
     const rest=api.contact(x,y,contactGlobe,0),early=api.contact(x,y,contactGlobe,.35),closed=api.contact(x,y,contactGlobe,1);
