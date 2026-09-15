@@ -21,6 +21,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Fix visible separation result
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('body/FaceControls.js')
+          text=p.read_text(encoding='utf-8')
+          old="  el('verify-separation').onclick=()=>edit(()=>{const result=api.verifySeparation();el('status').textContent=result.ok?'通过：微笑、眨眼等表情不会改写固定身份中性脸。':'失败：固定身份数据发生变化。';});"
+          new="  el('verify-separation').onclick=()=>{const result=api.verifySeparation();el('status').textContent=result.ok?'通过：微笑、眨眼等表情不会改写固定身份中性脸。':'失败：固定身份数据发生变化。';};"
+          if text.count(old)!=1:
+              raise SystemExit('face separation callback anchor mismatch')
+          p.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
+          PY
+      - name: Rebuild and verify source
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/test-face-profile-separation.mjs
+          node tools/test-npc-face-uniforms.mjs
+          node tools/test-face-startup.mjs
+          python3 tools/audit-files.py
       - name: Install browser harness
         run: |
           mkdir -p /tmp/face-qa
@@ -88,12 +109,12 @@ jobs:
           })().catch(error=>{console.error(error);process.exit(1);});
           JS
           NODE_PATH=/tmp/face-qa/node_modules node /tmp/face-qa/run.cjs
-      - name: Commit QA evidence
+      - name: Commit verified implementation and QA evidence
         shell: bash
         run: |
           rm -f .github/workflows/face-browser-qa-r1.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "qa: capture face identity-expression browser review"
+          git commit -m "face: fix separation control and capture browser review"
           git push origin HEAD:feature/human-face-workbench-v1-20260915
