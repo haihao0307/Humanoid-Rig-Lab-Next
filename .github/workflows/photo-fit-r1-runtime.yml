@@ -31,6 +31,7 @@ permissions:
 
 jobs:
   runtime-closure:
+    if: github.ref == 'refs/heads/feature/photo-driven-npc-fit-r1-complete-base'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
@@ -106,6 +107,7 @@ jobs:
           retention-days: 30
 
   stylized-sample-001:
+    if: github.ref == 'refs/heads/feature/photo-fit-r1-2-stylized-sample-001'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
