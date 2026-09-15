@@ -24,7 +24,9 @@ window.addEventListener('error',event=>report.consoleErrors.push({type:'error',m
 window.addEventListener('unhandledrejection',event=>report.consoleErrors.push({type:'unhandledrejection',message:String(event.reason?.stack||event.reason)}));
 async function run(){
  try{
-  const api=await waitFor(()=>sampleAPI()?.state?.ready?sampleAPI():null,{timeout:420000,label:'样本页面与完整人物工作台就绪'}),lab=getLab(),sample=api.sample;
+  const api=await waitFor(()=>sampleAPI()?.state?.ready?sampleAPI():null,{timeout:420000,label:'样本页面与完整人物工作台就绪'});
+  const lab=await waitFor(()=>{const value=getLab();return value?.population?.activeId&&typeof value?.npc?.spawn==='function'?value:null},{timeout:420000,label:'NPC人口系统就绪'}),sample=api.sample;
+  await api.prepare();
   check(lab?.version==='1.24.0-staged-startup-r15','complete-source-version',lab?.version||'missing');
   check(sample.subject.referenceKind==='stylized-illustration','stylized-classification');
   check(sample.reference.storage==='not-in-repository','reference-pixels-not-committed');
