@@ -257,7 +257,7 @@ class NPCPopulation {
  }
  releaseObjects(a,{preserveResource=false}={}){
   for(const [id,owner]of this.claims)if(owner===a.npcId&&a.held?.id!==id){this.lab.world.physics?.clearManipulation(id);this.claims.delete(id);}if(!a.held)for(const [id,owner]of this.stationClaims)if(owner===a.npcId)this.stationClaims.delete(id);if(this.physicsOwner===a.npcId&&!a.held)this.physicsOwner=null;
-  const actor=this.actors.get(a.npcId);if(actor&&!preserveResource&&!a.held)actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};
+  const actor=this.actors.get(a.npcId),keepResource=preserveResource||actor?.running?.source==='resource-circulation';if(actor&&!keepResource&&!a.held)actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};
  }
  dispatch(text,{targets='selected',mode='append'}={}){
 
