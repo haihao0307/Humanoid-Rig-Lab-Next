@@ -65,7 +65,7 @@ try {
   await page.waitForFunction(() => {
     const status = document.querySelector('#status');
     return Boolean(window.__CHICKEN_R92_PATCH__ && status && status.textContent.trim().length > 0);
-  }, { timeout: 120000 });
+  }, null, { timeout: 120000 });
   await page.waitForTimeout(5000);
 
   runtime = await page.evaluate(() => {
