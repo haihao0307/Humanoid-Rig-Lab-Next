@@ -1,0 +1,68 @@
+name: Face identity landmarks R2 runner
+
+on:
+  push:
+    branches:
+      - feature/human-face-workbench-v1-20260915
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: face-identity-landmarks-r2-runner
+  cancel-in-progress: false
+
+jobs:
+  implement-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-face-workbench-v1-20260915
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Execute implementation and repair assembly marker
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          source=Path('.github/workflows/face-identity-landmarks-r2.yml').read_text(encoding='utf-8')
+          marker="python3 - <<'PY'\n"
+          closing='\n          PY'
+          if marker not in source or closing not in source:
+              raise SystemExit('embedded implementation script not found')
+          script=source.split(marker,1)[1].split(closing,1)[0]
+          script='\n'.join(line[10:] if line.startswith('          ') else line for line in script.splitlines())
+          exec(compile(script,'face-identity-landmarks-r2.py','exec'),{'__name__':'__main__'})
+          runtime=Path('source/runtime.template.js')
+          text=runtime.read_text(encoding='utf-8')
+          old='/*__SOURCE:body/FaceControls.js__*/'
+          new='/*__SOURCE:body/FaceIdentity.js__*/\n'+old
+          if text.count(old)!=1 or '/*__SOURCE:body/FaceIdentity.js__*/' in text:
+              raise SystemExit('face identity runtime marker anchor mismatch')
+          runtime.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
+          PY
+          rm -f .github/workflows/face-identity-landmarks-r2.yml .github/workflows/face-identity-landmarks-r2-runner.yml
+      - name: Build and validate source
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/test-face-profile-separation.mjs
+          node tools/test-face-identity-landmarks.mjs
+          node tools/test-npc-face-uniforms.mjs
+          node tools/test-face-startup.mjs
+      - name: Refresh file audit
+        run: python3 tools/audit-files.py
+      - name: Commit verified implementation
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "face: add structural identity parameters and shared landmarks"
+          git push origin HEAD:feature/human-face-workbench-v1-20260915
