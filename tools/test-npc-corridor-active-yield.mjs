@@ -43,10 +43,13 @@ const walls=[
 ];
 const world={objects:walls,bounds:{xMin:-6,xMax:6,zMin:-6,zMax:6},get:()=>null,population:null};
 world.collision=(p,r,ignore=[])=>walls.some(o=>!ignore.includes(o.id)&&pointToObjectClearance(p,o)<r+.06);
+const clearSegment=(start,end,r,ignore)=>{const steps=Math.max(1,Math.ceil(horizontal(start,end)/.05));for(let i=1;i<=steps;i++){const t=i/steps,p=[start[0]+(end[0]-start[0])*t,0,start[2]+(end[2]-start[2])*t];if(world.collision(p,r,ignore))return false;}return true;};
 world.path=(start,end,r=.3,ignore=[])=>{
- const steps=Math.max(1,Math.ceil(horizontal(start,end)/.05));
- for(let i=1;i<=steps;i++){const t=i/steps,p=[start[0]+(end[0]-start[0])*t,0,start[2]+(end[2]-start[2])*t];if(world.collision(p,r,ignore))throw Error('static route blocked');}
- return[[...end]];
+ if(clearSegment(start,end,r,ignore))return[[...end]];
+ const gate=1.72,route=start[2]>=0&&end[2]<0?[[0,0,gate],[0,0,-gate],[...end]]:start[2]<=0&&end[2]>0?[[0,0,-gate],[0,0,gate],[...end]]:null;
+ if(!route)throw Error('static route blocked');let from=start;
+ for(const point of route){if(!clearSegment(from,point,r,ignore))throw Error('static route blocked');from=point;}
+ return route;
 };
 const specs=[['npc-a',[0,0,-2.5],[0,0,2.5],0],['npc-b',[0,0,2.5],[0,0,-2.5],Math.PI]];
 const actors=specs.map(([id,start,goal,yaw],index)=>{
