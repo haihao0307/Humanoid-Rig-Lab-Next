@@ -1,6 +1,6 @@
 // Retarget captured intervals through the single Human.pose authority.
 class BasicController {
- constructor(agent){this.a=agent;this.posture='standing';this.transition=null;this.gesture=null;this.hold=null;this.supportState=null;this.pending=null;this.lastGround={y:0,boneId:null};this.automaticStandUps=0;this.floorMin=Infinity;this.maxFloorCorrection=0;this.samples=0;this.phaseLog=[];this.reachProjectionCount=0;this.maxProjectedResidualM=0;this.reachProjectionLog=[];}
+ constructor(agent){this.a=agent;this.posture='standing';this.transition=null;this.gesture=null;this.hold=null;this.supportState=null;this.supportFrames=null;this.pending=null;this.lastGround={y:0,boneId:null};this.automaticStandUps=0;this.floorMin=Infinity;this.maxFloorCorrection=0;this.samples=0;this.phaseLog=[];this.reachProjectionCount=0;this.maxProjectedResidualM=0;this.reachProjectionLog=[];}
  get busy(){return !!(this.transition||this.gesture)}
  capture(){const a=this.a,h=a.h;return {reference:r2CaptureMotion(h,a.yaw),motionSource:h.lastMotionSource,position:[...h.root.p],rootRotation:[...h.root.q],
   spineRotations:Object.fromEntries(h.spine.map(j=>[j.id,[...j.q]])),
@@ -44,7 +44,15 @@ class BasicController {
   const clips=r2PostureClips(this.posture,t.target);
   t.points=clips.map(clip=>({clip,duration:R2_MOTION.clips[clip].durationS,kind:clip}));
   t.origin=a.h.root.p.slice();t.fromMotion=r2CaptureMotion(a.h,t.yaw);
-  a.swing=null;a.gaitSignal=0;a.gaitBlend=0;t.elapsed=0;a.enter(t.target==='standing'?'standUp':t.target==='lying'?'lieDown':'sitDown');
+  a.swing=null;a.gaitSignal=0;a.gaitBlend=0;t.elapsed=0;
+  if(t.points[0]?.clip==='sitToStand')this.startSeatedPreparation(t);
+  else a.enter(t.target==='standing'?'standUp':t.target==='lying'?'lieDown':'sitDown');
+ }
+ startSeatedPreparation(t){const a=this.a;
+  const frames=new Map(a.h.joints.map(j=>[j.id,frame(j.world.p,j.world.q)]));
+  const feet=Object.fromEntries(sides.map(side=>[side,{p:[...a.h.legs[side].wrist.world.p],q:[...a.h.legs[side].wrist.world.q],yaw:a.feet?.[side]?.yaw??t.yaw}]));
+  t.preparation={kind:R2_SEATED_PREPARATION.revision,duration:R2_SEATED_PREPARATION.durationS,elapsed:0,stage:t.stage,frames,feet};
+  t.elapsed=0;a.enter('standPrepare');
  }
  startGesture(type,duration){const a=this.a;r2RequireMotion(type);
   if(a.characterEditInProgress)throw Error('人物正在更新，请等待完成后再开始动作');
@@ -74,6 +82,14 @@ class BasicController {
  update(dt){const a=this.a;
   if(this.transition){const t=this.transition;
    if(t.returnToLab){t.elapsed+=dt;this.apply({blendFrom:t.endFrames,blendAmount:smoother(t.elapsed/.4),preserveFootContactsOnBlend:true,motionSource:{kind:'lab-stance-blend',support:'adopted-final-foot-anchors'}},null,dt);if(t.elapsed>=.4)this.completeTransition(t);return;}
+   if(t.preparation){const p=t.preparation;p.elapsed+=dt;const u=clamp(p.elapsed/p.duration,0,1);
+    this.apply(r2SeatedPreparationDescriptor(a.h,p.frames,p.feet,t.yaw,u),null,dt);
+    if(u>=1){
+     this.lastSeatedPreparation={kind:p.kind,durationS:p.duration,stage:p.stage,tracking:this.lastMotionTracking||null};
+     t.preparation=null;t.from=this.capture();t.fromMotion=r2CaptureMotion(a.h,t.yaw);
+     t.origin=r2ReferenceOriginForPosition(a.h,'sitToStand',0,a.h.root.p,t.yaw);t.elapsed=0;a.enter('standUp');
+    }return;
+   }
     if(t.align){a.locomotion.turnInPlace(t.yaw,dt);a.gait(dt,false);a.h.pose({position:a.pos,yaw:a.yaw,feet:a.feet,locomotion:a.locomotion.sample,time:a.time,deltaTime:dt});if(Math.abs(angleDiff(t.yaw,a.yaw))<=.016&&a.locomotion.isSettled()){t.yaw=a.yaw;this.preparePoints(t);};return;}
    const current=t.points[t.stage];t.elapsed+=dt;const u=clamp(t.elapsed/current.duration,0,1);
    const blend=smoother(t.elapsed/Math.min(.25,current.duration*.15));
@@ -87,6 +103,7 @@ class BasicController {
     this.lastPostureValidation={...this.lastMotionTracking,clip:current.clip,passed:true};
     this.phaseLog.push({time:a.time,kind:current.kind,minBoneY:this.lastGround.y});
     t.from=this.capture();t.fromMotion=r2CaptureMotion(a.h,t.yaw);t.origin=a.h.root.p.slice();t.stage++;t.elapsed=0;
+    if(t.stage<t.points.length&&t.points[t.stage].clip==='sitToStand'){this.startSeatedPreparation(t);return;}
     if(t.stage>=t.points.length){
      if(t.target==='standing'){
       t.returnToLab=true;t.elapsed=0;t.endFrames=new Map(a.h.joints.map(j=>[j.id,frame(j.world.p,j.world.q)]));t.poseAdoption=a.locomotion.resetFromPose({preservePoseContacts:true});
@@ -121,8 +138,9 @@ class BasicController {
  }
  completeTransition(t){
   const a=this.a;this.posture=t.target;this.hold=this.posture==='standing'?null:{...this.capture(),lockedFrames:new Map(a.h.joints.map(j=>[j.id,frame(j.world.p,j.world.q)]))};
+  this.supportFrames=this.posture==='standing'?null:new Map(a.h.joints.map(j=>[j.id,frame(j.world.p,j.world.q)]));
   this.supportState=this.posture==='standing'?null:{kind:this.posture==='sitting'?'seatedStable':'lyingStable',root:[...a.h.root.p],yaw:a.yaw,
-   feet:Object.fromEntries(sides.map(side=>[side,{p:[...a.h.legs[side].wrist.world.p],q:[...a.h.legs[side].wrist.world.q]}])),
+   feet:Object.fromEntries(sides.map(side=>[side,{p:[...a.h.legs[side].wrist.world.p],q:[...a.h.legs[side].wrist.world.q],yaw:a.feet?.[side]?.yaw??a.yaw}])),
    hands:Object.fromEntries(sides.map(side=>[side,copyFrame(a.h.palm(side))])),source:a.h.lastMotionSource};
   this.lastPoseAdoption=t.poseAdoption||this.lastPoseAdoption||null;this.transition=null;a.swing=null;
   if(this.cancelRequested){this.cancelRequested=false;a.skill=null;this.pending=null;}
@@ -138,10 +156,11 @@ class BasicController {
   if(this.gesture&&!this.gesture.releasing){Object.assign(this.gesture,{releasing:true,releaseTime:0,releaseWeight:this.gesture.weight||0});}
   this.a.log(this.gesture?'收回当前手势后执行新指令':'完成当前支撑转换后执行新指令，尚未开始的旧任务已取消');
  }
- report(){return {posture:this.posture,transition:this.transition?{target:this.transition.target,stage:this.transition.stage,align:this.transition.align,support:this.transition.support?.kind||null}:null,
+ report(){return {posture:this.posture,transition:this.transition?{target:this.transition.target,stage:this.transition.stage,align:this.transition.align,
+   support:this.transition.support?.kind||null,preparation:this.transition.preparation?{kind:this.transition.preparation.kind,progress:clamp(this.transition.preparation.elapsed/this.transition.preparation.duration,0,1)}:null}:null,
   gesture:this.gesture?{type:this.gesture.type,weight:this.gesture.weight||0}:null,lastGestureValidation:this.lastGestureValidation||null,pendingReplacement:!!this.pending,
-  referenceTracking:this.lastMotionTracking||null,lastPostureValidation:this.lastPostureValidation||null,supportState:this.supportState?structuredClone(this.supportState):null,
-  lastPoseAdoption:this.lastPoseAdoption?structuredClone(this.lastPoseAdoption):null,
+  referenceTracking:this.lastMotionTracking||null,lastPostureValidation:this.lastPostureValidation||null,lastSeatedPreparation:this.lastSeatedPreparation||null,
+  supportState:this.supportState?structuredClone(this.supportState):null,lastPoseAdoption:this.lastPoseAdoption?structuredClone(this.lastPoseAdoption):null,
   minimumBoneYM:this.lastGround.y,lowestBone:this.lastGround.boneId,minFloorSampleYM:Number.isFinite(this.floorMin)?this.floorMin:null,
   maxVerticalClearanceCorrectionM:this.maxFloorCorrection,floorSamples:this.samples,automaticStandUps:this.automaticStandUps,
   reachability:{policy:'Motion-Lab candidate validation',projectionCount:this.reachProjectionCount,maxProjectedResidualM:this.maxProjectedResidualM,recent:this.reachProjectionLog.slice(-12)},

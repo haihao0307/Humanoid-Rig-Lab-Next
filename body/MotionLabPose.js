@@ -86,12 +86,21 @@ class MotionLabPose {
    const L1=dist(this.source(femur),this.source(tibia)),L2=dist(this.source(tibia),this.source(foot));
    const solved=MotionLab.solveTwoBone(hip,state.feet[side].position,pole,L1,L2);
    positions.set(tibia,solved.knee);positions.set(foot,solved.end);
-   const upper=this.segmentRotation(femur,tibia,positions,yaw),lower=this.segmentRotation(tibia,foot,positions,yaw);
-   const femurFrame=frame(hip,qnorm(qm(upper,h.sourceBind.get(femur).q)));
-   const tibiaFrame=frame(solved.knee,qnorm(qm(lower,h.sourceBind.get(tibia).q)));
+   const alignFinal=(id,child,preferred)=>{
+    const bind=h.sourceBind.get(id),sourceDirection=norm(sub(this.source(child),this.source(id)));
+    const localDirection=rotate(inv(bind.q),sourceDirection),currentDirection=rotate(preferred.q,localDirection);
+    const desiredDirection=norm(sub(positions.get(child),positions.get(id)));
+    return qnorm(qm(fromTo(currentDirection,desiredDirection),preferred.q));
+   };
+   const previousFemur=frames.get(femur),previousTibia=frames.get(tibia),previousPatella=frames.get(patella);
+   const femurFrame=frame(hip,alignFinal(femur,tibia,previousFemur));
+   const tibiaFrame=frame(solved.knee,alignFinal(tibia,foot,previousTibia));
    const footFrame=frame(solved.end,qslerp(from.get(foot).q,target.get(foot).q,u));
    frames.set(femur,femurFrame);frames.set(tibia,tibiaFrame);frames.set(foot,footFrame);
-   if(frames.has(patella))frames.set(patella,compose(compose(tibiaFrame,inverse(h.sourceBind.get(tibia))),h.sourceBind.get(patella)));
+   // Preserve the already blended patella's local transform. Rebuilding it
+   // from the bind frame on the first contact-preserving sample caused an
+   // otherwise stationary kneecap to jump before the preparation began.
+   if(previousPatella)frames.set(patella,compose(tibiaFrame,compose(inverse(previousTibia),previousPatella)));
    const footRigid=compose(footFrame,inverse(h.sourceBind.get(foot)));
    for(const [child]of this.descendantRows.get(foot))frames.set(child,compose(footRigid,h.sourceBind.get(child)));
   }
@@ -111,9 +120,15 @@ class MotionLabPose {
   const e=this.engine,reference=options.reference||null;
   const state=structuredClone(e.state),yaw=options.yaw??state.yaw;
   state.yaw=yaw;if(options.position)state.root=[...options.position];
+  if(options.feet)for(const side of ['left','right']){
+   const input=options.feet[side],position=input?.p||input?.position;
+   if(!position||position.length!==3||!position.every(Number.isFinite))throw Error('支撑转换缺少有效脚锚：'+side);
+   const footYaw=Number.isFinite(input.yaw)?input.yaw:yaw;
+   state.feet[side]={...state.feet[side],position:[...position],yaw:footYaw,contact:true};
+  }
   if(reference)state.motion={...state.motion,frame:reference,weight:1};
   const controlled=!reference||options.controlledFeet===true;
-  if(controlled&&options.position){
+  if(controlled&&(options.position||options.feet)){
    // Contact extensions lower the pelvis, then use the lab's fixed-length IK
    // against its independent foot anchors. They never scale a bone.
    state.pose=e.solve(state);

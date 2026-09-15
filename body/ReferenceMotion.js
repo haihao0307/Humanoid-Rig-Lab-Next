@@ -94,6 +94,20 @@ function r2PostureClips(from,target){
  return from==='standing'?['standToSit',...(target==='lying'?['sitToLie']:[])]:
   from==='lying'?['lieToSit',...(target==='standing'?['sitToStand']:[])]:target==='lying'?['sitToLie']:['sitToStand'];
 }
+const R2_SEATED_PREPARATION=Object.freeze({clip:'sitToStand',durationS:.72,revision:'support-transfer/v1'});
+function r2ReferenceOriginForPosition(h,id,progress,position,yaw){
+ const raw=r2SampleMotion(id,progress),scale=h.bodyMetrics.rig.femurLengthM+h.bodyMetrics.rig.tibiaLengthM;
+ const offset=rotate(qy(yaw),mul(raw.rootOffset,scale));
+ return [position[0]-offset[0],position[1],position[2]-offset[2]];
+}
+function r2SeatedPreparationDescriptor(h,frames,feet,yaw,progress){
+ if(!(frames instanceof Map)||!frames.has('hips'))throw Error('起身准备缺少已提交的坐姿骨架');
+ const reference=r2SampleMotion(R2_SEATED_PREPARATION.clip,0),start=frames.get('hips').p;
+ const position=[start[0],h.bodyMetrics.restHipHeightM*reference.rootHeightRatio,start[2]];
+ return {position,reference,controlledFeet:true,feet,blendFrom:frames,blendAmount:smoother(clamp(progress,0,1)),preserveFootContactsOnBlend:true,
+  floorMode:true,kind:'seatedPrepare',motionSource:{kind:'engineering-transition',transition:R2_SEATED_PREPARATION.revision,
+   targetClip:R2_SEATED_PREPARATION.clip,progress:clamp(progress,0,1),measuredMotion:false}};
+}
 function r2StandingCaptureMotion(raw,from){
  // A greeting borrows motion changes, not the performer's static neck bias.
  // Preserve each captured WORLD-frame change relative to the first sample.
@@ -155,4 +169,4 @@ function r2MotionTracking(h,reference,yaw){
 }
 function r2MotionReport(){return {revision:R2_MOTION.revision,source:R2_MOTION.source,
  clips:Object.fromEntries(Object.entries(R2_MOTION.clips).map(([id,c])=>[id,{trial:c.sourceTrial,frames:[c.sourceFrameStart,c.sourceFrameEnd],durationS:c.durationS,parameterInterpolationError:c.parameterInterpolationError}])),
- standards:{salute:R2_SALUTE_STANDARD},actions:MOTION_ACTIONS,kernel:'Human-Motion-Lab R2.2',unsupportedActions:R2_UNSOURCED_ACTIONS,retargeting:true,softTissueMotionMeasured:false,visualAcceptance:false};}
+ standards:{salute:R2_SALUTE_STANDARD,seatedPreparation:R2_SEATED_PREPARATION},actions:MOTION_ACTIONS,kernel:'Human-Motion-Lab R2.2',unsupportedActions:R2_UNSOURCED_ACTIONS,retargeting:true,softTissueMotionMeasured:false,visualAcceptance:false};}
