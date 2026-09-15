@@ -1,0 +1,161 @@
+name: Face review entry R3
+
+on:
+  push:
+    branches:
+      - feature/human-face-workbench-v1-20260915
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: face-review-entry-r3
+  cancel-in-progress: false
+
+jobs:
+  implement-verify-review:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-face-workbench-v1-20260915
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Add single-actor face review startup
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path=Path('source/runtime.template.js')
+          text=path.read_text(encoding='utf-8')
+
+          old="let human,world,agent,renderer,auto=!new URLSearchParams(location.search).has('qa'),follow=false,isolation='all',cameraMode='body',floor,lines,labels=[],environmentPlacementId=null,environmentPointerStart=null,needsRedraw=true;"
+          new="const runtimeQuery=(()=>{try{return new URLSearchParams(window.parent.location.search)}catch{return new URLSearchParams(location.search)}})(),reviewMode=runtimeQuery.get('review');\nlet human,world,agent,renderer,auto=!runtimeQuery.has('qa')&&!reviewMode,follow=false,isolation='all',cameraMode='body',floor,lines,labels=[],environmentPlacementId=null,environmentPointerStart=null,needsRedraw=true;"
+          if text.count(old)!=1:
+              raise SystemExit('runtime query anchor mismatch')
+          text=text.replace(old,new,1)
+
+          old="""await installCompactWorkbench(window.HumanLab,compactSurfaceReady);
+installNPCPopulation(window.HumanLab);
+await startupStage('population','正在从同一母体生成第二个人物');
+try{await window.HumanLab.population.installMotherPair();}catch(error){logMessage('母体复制体未生成：'+error.message);}
+await window.HumanLab.population.installReviewCast();
+try{human.characterTaskStatus=window.HumanLab.character.startOnSpawn();}catch(error){human.characterTaskStatus={started:false,error:error.message};logMessage('角色预设任务未开始：'+error.message);} 
+"""
+          new="""await installCompactWorkbench(window.HumanLab,compactSurfaceReady);
+if(reviewMode==='face'){
+ auto=false;window.HumanLab.hair.enabled=false;
+ window.HumanLab.review={mode:'face',singleActor:true,populationSkipped:true,hairSkipped:true};
+ window.HumanLab.face.clearExpression();window.HumanLab.face.closeup('front');
+ logMessage('面部审阅模式：仅加载当前人物，未启动额外 NPC。');
+}else{
+ installNPCPopulation(window.HumanLab);
+ await startupStage('population','正在从同一母体生成第二个人物');
+ try{await window.HumanLab.population.installMotherPair();}catch(error){logMessage('母体复制体未生成：'+error.message);}
+ await window.HumanLab.population.installReviewCast();
+}
+try{human.characterTaskStatus=window.HumanLab.character.startOnSpawn();}catch(error){human.characterTaskStatus={started:false,error:error.message};logMessage('角色预设任务未开始：'+error.message);} 
+"""
+          if text.count(old)!=1:
+              raise SystemExit('population startup anchor mismatch')
+          text=text.replace(old,new,1)
+
+          old='scheduleCompactHair(window.HumanLab.population.active);'
+          new="if(reviewMode!=='face')scheduleCompactHair(window.HumanLab.population?.active||window.HumanLab);"
+          if text.count(old)!=1:
+              raise SystemExit('hair startup anchor mismatch')
+          text=text.replace(old,new,1)
+          path.write_text(text,encoding='utf-8',newline='\n')
+
+          docs=Path('docs/FACE_IDENTITY_LANDMARKS_R2.md')
+          value=docs.read_text(encoding='utf-8')
+          marker='打开 `index.html?review=face`，进入“面部微控与表情”。面板新增：\n'
+          replacement='打开 `index.html?review=face`，系统只生成当前审阅人物，不再等待母体复制体、审查演员或毛发任务；正常入口仍保留原有 NPC 人口流程。页面进入“面部微控与表情”。面板新增：\n'
+          if value.count(marker)!=1:
+              raise SystemExit('face review documentation anchor mismatch')
+          docs.write_text(value.replace(marker,replacement,1),encoding='utf-8',newline='\n')
+          PY
+      - name: Build and validate all source contracts
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/test-face-profile-separation.mjs
+          node tools/test-face-identity-landmarks.mjs
+          node tools/test-face-review-entry.mjs
+          node tools/test-npc-face-uniforms.mjs
+          node tools/test-face-startup.mjs
+      - name: Install browser harness
+        run: |
+          mkdir -p /tmp/face-review-r3
+          cd /tmp/face-review-r3
+          npm init -y >/dev/null 2>&1
+          npm install playwright >/dev/null 2>&1
+          npx playwright install --with-deps chromium
+      - name: Verify public review path without bypassing startup
+        shell: bash
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/face-review-server.log 2>&1 &
+          mkdir -p docs/qa
+          cat >/tmp/face-review-r3/run.cjs <<'JS'
+          const fs=require('fs');
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const page=await browser.newPage({viewport:{width:1440,height:960},deviceScaleFactor:1});
+            const consoleErrors=[],pageErrors=[];
+            page.on('console',message=>{if(message.type()==='error')consoleErrors.push(message.text());});
+            page.on('pageerror',error=>pageErrors.push(String(error)));
+            await page.goto('http://127.0.0.1:8000/index.html?review=face',{waitUntil:'domcontentloaded',timeout:180000});
+            let faceFrame=null;const deadline=Date.now()+180000;
+            while(Date.now()<deadline&&!faceFrame){
+              for(const frame of page.frames()){
+                try{if(await frame.locator('#face-shape').count()){faceFrame=frame;break;}}catch{}
+              }
+              if(!faceFrame)await page.waitForTimeout(500);
+            }
+            if(!faceFrame)throw new Error('Face review frame did not become available');
+            await faceFrame.waitForFunction(()=>window.__humanStartup?.status==='ready'&&window.HumanLab?.review?.mode==='face'&&window.HumanLab.review.singleActor===true&&!window.HumanLab.population&&window.HumanLab.renderer?.frames>0&&!window.HumanLab.renderer.gl.isContextLost(),null,{timeout:180000});
+            await page.waitForFunction(()=>!document.querySelector('#bodyStartupDiagnostics'),null,{timeout:30000});
+            const loadingHidden=await faceFrame.locator('#loading').evaluate(element=>element.hidden||getComputedStyle(element).display==='none');
+            if(!loadingHidden)throw new Error('Body loading layer remained visible after ready');
+            const shapeSliders=await faceFrame.locator('#face-shape input[type=range]').count();
+            const identityButtons=await faceFrame.locator('#face-identities button').count();
+            const localNodes=await faceFrame.locator('#face-node option').count();
+            if(shapeSliders!==13||identityButtons!==5||localNodes!==25)throw new Error('Face review controls are incomplete');
+            const runtime=await faceFrame.evaluate(()=>{
+              const api=window.HumanLab.face;
+              api.setIdentityPreset('angular');api.setShapeParameter('noseProjection',.55);api.clearExpression();api.closeup('front');window.HumanLab.render();
+              return {startup:window.__humanStartup,review:window.HumanLab.review,populationPresent:Boolean(window.HumanLab.population),hairEnabled:window.HumanLab.hair.enabled,frames:window.HumanLab.renderer.frames,drawCalls:window.HumanLab.renderer.drawCalls,items:window.HumanLab.renderer.lastItems?.length??0,contextLost:window.HumanLab.renderer.gl.isContextLost(),identity:api.export().identity,landmarks:api.landmarks(),report:api.report()};
+            });
+            if(runtime.populationPresent)throw new Error('Face review unexpectedly created NPC population');
+            if(runtime.hairEnabled)throw new Error('Face review unexpectedly enabled hair');
+            if(runtime.items<1||runtime.frames<1||runtime.contextLost)throw new Error('Face review renderer is not usable');
+            await page.waitForTimeout(700);
+            await page.screenshot({path:'/tmp/face-review-entry-r3.png',fullPage:true});
+            const report={schema:'jarvis/face_review_browser_qa@1',url:'index.html?review=face',startupReadyNaturally:true,startupOverlayBypassed:false,singleActor:true,populationSkipped:true,hairSkipped:true,shapeSliders,identityButtons,localNodes,landmarks:Object.keys(runtime.landmarks.values).length,rendererFrames:runtime.frames,drawCalls:runtime.drawCalls,renderItems:runtime.items,contextLost:runtime.contextLost,consoleErrors,pageErrors,viewport:[1440,960],browserExecuted:true,gpuAcceptance:false,visualAcceptance:false};
+            fs.writeFileSync('docs/qa/face-review-entry-r3.json',JSON.stringify(report,null,2)+'\n');
+            await browser.close();
+          })().catch(error=>{console.error(error);process.exit(1);});
+          JS
+          NODE_PATH=/tmp/face-review-r3/node_modules node /tmp/face-review-r3/run.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: face-review-entry-r3-screenshot
+          path: /tmp/face-review-entry-r3.png
+          retention-days: 14
+      - name: Final audit and commit
+        shell: bash
+        run: |
+          rm -f .github/workflows/face-review-entry-r3.yml
+          node tools/check-pure.mjs
+          python3 tools/audit-files.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "face: add usable single-actor public review entry"
+          git push origin HEAD:feature/human-face-workbench-v1-20260915
