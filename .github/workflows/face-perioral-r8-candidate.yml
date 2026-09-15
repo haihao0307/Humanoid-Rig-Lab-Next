@@ -29,6 +29,19 @@ jobs:
           node-version: '24'
       - name: Apply R8 perioral candidate
         run: python3 tools/apply-face-perioral-r8-candidate.py
+      - name: Preserve the proven oral-cavity parameterization
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('body/FaceAnatomy.js')
+          text=path.read_text(encoding='utf-8')
+          old="const mouthPoint=(a,t)=>{const x=lp.centreX+lp.halfWidth*.992*Math.cos(a)*(1-.38*t),q=compactLipOutline(x),seam=lipSurface(x,true,0)[2];return [x,q.seam+.00045*Math.sin(a)*(1+3*t),seam-.0030-.010*t];};"
+          new="const mouthPoint=(a,t)=>{const x=lp.centreX+lp.halfWidth*.998*Math.cos(a)*(1-.38*t),q=compactLipOutline(x),seam=lipSurface(x,true,0)[2];return [x,q.seam+.0007*Math.sin(a)*(1+3*t),seam-.0020-.010*t];};"
+          if text.count(old)!=1:
+              raise SystemExit('R8 oral cavity corrective anchor mismatch')
+          path.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
+          PY
       - name: Build and validate candidate
         run: |
           node tools/build-pure.mjs
