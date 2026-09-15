@@ -25,21 +25,21 @@ jobs:
           set -euo pipefail
           ROOT="bruce_r13p_reference_intake"
           mkdir -p "$ROOT/originals" "$ROOT/evidence" "$ROOT/reports"
-          curl --fail --location --retry 3 --retry-all-errors \
+          UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/153 Safari/537.36'
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
             "https://3dassets.dev/api/v1/packs/companion-animals-and-pet-home" \
             --output "$ROOT/evidence/companion_animals_pack_manifest.json"
-          curl --fail --location --retry 3 --retry-all-errors \
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
             "https://3dassets.dev/packs/companion-animals-and-pet-home" \
             --output "$ROOT/evidence/companion_animals_pack_page.html"
-          curl --fail --location --retry 3 --retry-all-errors \
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
             "https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt" \
             --output "$ROOT/evidence/CC0-1.0-legalcode.txt"
           python - <<'PY'
           import hashlib
           import json
           import pathlib
-          import re
-          import urllib.request
+          import subprocess
 
           root = pathlib.Path('bruce_r13p_reference_intake')
           data = json.loads((root/'evidence/companion_animals_pack_manifest.json').read_text())
@@ -72,16 +72,15 @@ jobs:
                   for v in value: walk(v)
           walk(data)
           missing=[k for k in targets.values() if k not in found]
-          if missing:
-              raw=json.dumps(data)
-              for label,key in targets.items():
-                  if key in found: continue
-                  m=re.search(r'https://cdn\.3dassets\.dev/assets/\d+/v1/model\.glb', raw)
-                  if m: pass
-              print('Missing exact records:',missing)
+          print('Found candidates:', {k:v['url'] for k,v in found.items()})
+          print('Missing exact records:', missing)
           for key, item in found.items():
               dst=root/'originals'/f'{key}.glb'
-              urllib.request.urlretrieve(item['url'], dst)
+              subprocess.run([
+                  'curl','--fail','--location','--retry','3','--retry-all-errors',
+                  '-A','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/153 Safari/537.36',
+                  '-e','https://3dassets.dev/', item['url'], '--output', str(dst)
+              ], check=True)
               item['size_bytes']=dst.stat().st_size
               item['sha256']=hashlib.sha256(dst.read_bytes()).hexdigest()
           report={
