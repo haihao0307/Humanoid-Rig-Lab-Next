@@ -82,6 +82,14 @@ jobs:
               raise SystemExit('reconstruction hair contract anchor mismatch')
           check_path.write_text(check.replace(old,new,1),encoding='utf-8',newline='\n')
 
+          startup_path=Path('tools/check-startup.mjs')
+          startup=startup_path.read_text(encoding='utf-8')
+          old="runtime.indexOf('scheduleCompactHair(window.HumanLab.population.active)')>runtime.indexOf(\"status:'ready',stage:'ready'\")"
+          new="runtime.indexOf(\"if(reviewMode!=='face')scheduleCompactHair(window.HumanLab.population?.active||window.HumanLab)\")>runtime.indexOf(\"status:'ready',stage:'ready'\")"
+          if startup.count(old)!=1:
+              raise SystemExit('startup hair scheduling contract anchor mismatch')
+          startup_path.write_text(startup.replace(old,new,1),encoding='utf-8',newline='\n')
+
           docs=Path('docs/FACE_IDENTITY_LANDMARKS_R2.md')
           value=docs.read_text(encoding='utf-8')
           marker='打开 `index.html?review=face`，进入“面部微控与表情”。面板新增：\n'
