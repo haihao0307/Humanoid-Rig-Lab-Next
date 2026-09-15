@@ -194,14 +194,14 @@ class NaturalLocomotion {
   return false;
  }
  installDeterministicRetreat(conflict,context){
-  const a=this.a,other=conflict.actor;if(!other||String(a.npcId).localeCompare(String(other.id))<=0)return false;
+  const a=this.a,other=conflict.actor;if(!other)return false;
   const root=this.engine.state.root,target=a.route[a.routeIndex];let direction=sub(target,root);direction[1]=0;if(len(direction)<.12)return false;direction=norm(direction);
   const right=[direction[2],0,-direction[0]],side=trafficPairSide(a.npcId,other.id),clearance=context.radius+bodyPhysicalProfile(other.human).bodyRadiusM+TRAFFIC_AVOIDANCE.sideMarginM;
   for(const back of [.34,.52,.76])for(const lateral of [.55,.9,1.25]){
    const point=add(add(root,mul(direction,-back)),mul(right,side*clearance*lateral));point[1]=0;
-   if(!trafficSegmentClear(a,root,point,context))continue;
-   a.route.splice(a.routeIndex,0,point);this.requestKey=null;Object.assign(this.traffic,{active:true,mode:'retreat',reason:'narrow-conflict-yield',blockers:[other.id],side,detourEndIndex:a.routeIndex,originalTarget:[...target],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null});this.traffic.retreats++;
-   a.log?.('局部通道不足，按稳定优先级主动后撤让出路线');return true;
+   if(!trafficSegmentClear(a,root,point,context,{dynamic:false}))continue;
+   a.route.splice(a.routeIndex,0,point);this.requestKey=null;Object.assign(this.traffic,{active:true,mode:'retreat',reason:'multi-way-mobile-yield',blockers:[other.id],side,detourEndIndex:a.routeIndex,originalTarget:[...target],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null});this.traffic.retreats++;
+   a.log?.('交叉路线暂无直接净空，已主动移动到侧后方重新进入路线');return true;
   }
   return false;
  }
@@ -221,7 +221,7 @@ class NaturalLocomotion {
   const conflict=predictTrafficConflict(a,speed,context);
   if(!conflict){this.traffic.blockers=[];return target;}
   if(this.installLocalDetour(conflict,context)||this.installDeterministicRetreat(conflict,context))return a.route[a.routeIndex];
-  throw Error('预测到多人路线冲突，但局部偏移和绕行均无可用净空：'+conflict.actor.id);
+  throw Error('预测到多人路线冲突，但局部偏移和移动让行均无可用净空：'+conflict.actor.id);
  }
  recoverNavigationBlock(message){
   if(!/(?:落脚路径受阻|路线受阻|目标无效或与障碍重叠|连续碰撞检测)/.test(String(message||'')))return false;
