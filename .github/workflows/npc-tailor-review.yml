@@ -1,0 +1,22 @@
+name: NPC tailor review
+on:
+  push:
+    branches: [feature/npc-tailor-linen-fit-r1-20260915]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preserve complete source without generated meshes
+        run: |
+          mkdir -p /tmp/tailor-artifact
+          git archive --format=zip HEAD -o /tmp/tailor-artifact/NPC_Tailor_Complete_Source.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npc-tailor-complete-source
+          path: /tmp/tailor-artifact/NPC_Tailor_Complete_Source.zip
+          retention-days: 7
