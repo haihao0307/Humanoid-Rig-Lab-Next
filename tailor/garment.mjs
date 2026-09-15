@@ -8,7 +8,7 @@ export function createMeasuredTop(bvh,joints,{easeCm=8,lengthCm=0}={}){
  const chestY=sy-.195,waistY=hip[1]+.16,hemY=hip[1]-.12-lengthCm/100,outerY=sy+.035,neckY=joints.C7[1]+.01;
  const chest=bodySection(bvh,centre(chestY)),waist=bodySection(bvh,centre(waistY)),hipS=bodySection(bvh,centre(hip[1]));
  const sections=Array.from({length:15},(_,k)=>bodySection(bvh,centre(hemY+.035+(chestY-hemY-.035)*k/14),48));const torsoMax={rx:Math.max(...sections.map(s=>s.rx)),front:Math.max(...sections.map(s=>s.front)),back:Math.max(...sections.map(s=>s.back))};
- const ease=easeCm/100/(2*Math.PI),minGap=.0035,thickness=.0012;
+ const ease=easeCm/100/(2*Math.PI),thickness=.0012;
  const p=[],uv=[],indices=[],seams=[],parts=[],grids={},N=48,M=54,bridgeN=8;
  const sideUnderRow=clamp(Math.round((sy-.215-hemY)/(outerY-hemY)*M),25,M-8),underY=hemY+(outerY-hemY)*sideUnderRow/M;
  const neckCols=Math.max(4,Math.round(.078/shoulderW*N/2)),neckU=neckCols/(N/2);
@@ -20,7 +20,7 @@ export function createMeasuredTop(bvh,joints,{easeCm=8,lengthCm=0}={}){
  for(const front of [true,false]){const name=front?'front.shell × 2':'back.shell × 1',start=indices.length,grid=[];
   for(let j=0;j<=M;j++){const row=[];for(let i=0;i<=N;i++){const u=i/N*2-1,au=Math.abs(u);let top;
    if(au<neckU)top=neckY-(front?.077:.021)*Math.sqrt(Math.max(0,1-(au/neckU)**2));else top=neckY+(outerY-neckY)*(au-neckU)/(1-neckU);
-   const y=hemY+(top-hemY)*j/M,pr=profile(y),at=smooth((j/M-.88)/.12),half=pr.rx*(1-at)+shoulderW*at-.025*Math.sin(Math.PI*smooth((y-underY)/(outerY-underY))),x=cx+u*half,zc=centre(y)[2];
+   const y=hemY+(top-hemY)*j/M,pr=profile(y),at=smooth((j/M-.88)/.12),half=pr.rx*(1-at)+shoulderW*at-.025*Math.sin(Math.PI*smooth((y-underY)/(outerY-underY)))-.009*Math.exp(-(((y-chestY)/.035)**2)),x=cx+u*half,zc=centre(y)[2];
    const edge=(.050*smooth((y-underY)/(outerY-underY))+.014*Math.exp(-(((y-chestY)/.045)**2)))*Math.pow(au,8),zshape=(front?pr.front:-pr.back)*Math.pow(Math.max(0,1-Math.abs(u)**2.6),1/2.6)+(front?edge:-edge);
    let z=zc+zshape;const ray=bvh.ray([x,y,zc+(front?.48:-.48)],[0,0,front?-1:1],.85);
    if(ray&&Math.abs(ray.p[2]-zc)<.28)z=front?Math.max(z,ray.p[2]+.016):Math.min(z,ray.p[2]-.016);
@@ -29,7 +29,18 @@ export function createMeasuredTop(bvh,joints,{easeCm=8,lengthCm=0}={}){
   for(let j=0;j<M;j++)for(let i=0;i<N;i++)quad(grid[j][i],grid[j][i+1],grid[j+1][i+1],grid[j+1][i],!front);
   parts.push({id:name,firstTriangle:start/3,triangleCount:(indices.length-start)/3});grids[front?'front':'back']=grid;
  }
- const F=grids.front,B=grids.back,outerBridge={};
+ // Fill tight local contact valleys to form a broader fabric envelope,
+ // while retaining the sampled outer body clearance and fixed garment edges.
+ for(const [grid,sign] of [[grids.front,1],[grids.back,-1]]){
+  const floor=grid.map(row=>row.map(id=>p[id*3+2]*sign));
+  for(let pass=0;pass<100;pass++){const z=grid.map(row=>row.map(id=>p[id*3+2]*sign));
+   for(let j=1;j<M-2;j++)for(let i=3;i<N-2;i++){
+    const avg=(z[j-1][i]+z[j+1][i]+z[j][i-1]+z[j][i+1])*.25;
+    p[grid[j][i]*3+2]=sign*Math.max(floor[j][i],z[j][i]*.25+avg*.75);
+   }
+  }
+ }
+ const F=grids.front,B=grids.back;
  // Material coordinates are measured on each generated panel edge in centimetres,
  // not normalized 0..1 UVs stretched across the whole garment.
  for(const grid of [F,B]){const vv=Array.from({length:N+1},()=>0);for(let j=0;j<=M;j++){const arc=[0];for(let i=1;i<=N;i++)arc.push(arc.at(-1)+len(sub(pos(grid[j][i]),pos(grid[j][i-1]))));for(let i=0;i<=N;i++){if(j)vv[i]+=len(sub(pos(grid[j][i]),pos(grid[j-1][i])));uv[grid[j][i]*2]=(arc[i]-arc[N/2])*100;uv[grid[j][i]*2+1]=vv[i]*100;}}}
@@ -40,17 +51,15 @@ export function createMeasuredTop(bvh,joints,{easeCm=8,lengthCm=0}={}){
    if(j===0)row.push(F[M][i]);else if(j===bridgeN)row.push(B[M][i]);else{const q=mix(pos(F[M][i]),pos(B[M][i]),j/bridgeN);q[1]+=.004*Math.sin(j/bridgeN*Math.PI);const above=bvh.ray([q[0],q[1]+.06,q[2]],[0,-1,0],.12);if(above)q[1]=Math.max(q[1],above.p[1]+.006);row.push(vtx(q,[(i/N-.5)*chestWidth*100,((q[1]-hemY)+.10*j/bridgeN)*100]));}
   }grid.push(row);}
   const cols=to-from;for(let j=0;j<bridgeN;j++)for(let i=0;i<cols;i++)quad(grid[j][i],grid[j+1][i],grid[j+1][i+1],grid[j][i+1],true);
-  const edgeIndex=side<0?0:cols;outerBridge[side]=grid.map(row=>row[edgeIndex]);seams.push(grid[Math.round(bridgeN/2)]);
+  seams.push(grid[Math.round(bridgeN/2)]);
  }
  const sleeveMetrics={};
  for(const label of ['left','right']){const S=joints[label+'_upperArm'],E=joints[label+'_forearm'],W=joints[label+'_hand'];sleeveMetrics[label]={bodyLengthCm:(len(sub(E,S))+len(sub(W,E)))*100,garmentLengthCm:null,cuffCircumferenceCm:null};}
  seams.push(F[0],B[0],F.map(r=>r[N/2]),F[M].slice(N/2-neckCols,N/2+neckCols+1),B[M].slice(N/2-neckCols,N/2+neckCols+1));
- // Do not displace against unreliable nearest-face signs; validate by ray parity.
- const corrected=0,maxCorrection=0;
  // Smooth normals are welded at coincident pattern seams; UVs remain per-panel cm.
  const i32=Uint32Array.from(indices),p32=Float32Array.from(p),n=normals(p32,i32),groups=new Map();for(let k=0;k<p.length/3;k++){const key=p.slice(k*3,k*3+3).map(v=>Math.round(v*1e6)).join(',');if(!groups.has(key))groups.set(key,[]);groups.get(key).push(k);}for(const ids of groups.values()){const total=unit(ids.reduce((a,id)=>add(a,Array.from(n.slice(id*3,id*3+3))),[0,0,0]));for(const id of ids)n.set(total,id*3);}
  const garmentSections={};for(const [name,y] of [['chest',chestY],['waist',waistY]]){const pr=profile(y);let circumference=0,previous=null;for(let k=0;k<=128;k++){const a=k/128*Math.PI*2,q=[pr.rx*Math.sign(Math.sin(a))*Math.abs(Math.sin(a))**(2/2.6),0,(Math.cos(a)>=0?pr.front:pr.back)*Math.sign(Math.cos(a))*Math.abs(Math.cos(a))**(2/2.6)];if(previous)circumference+=len(sub(q,previous));previous=q;}garmentSections[name]=circumference;}
- const metrics={body:{heightCm:null,chestCm:chest.circumference*100,waistCm:waist.circumference*100,hipCm:hipS.circumference*100,shoulderJointWidthCm:len(sub(shoulders[0],shoulders[1]))*100},garment:{chestEnvelopeCm:garmentSections.chest*100,waistEnvelopeCm:garmentSections.waist*100,shoulderWidthCm:shoulderW*200,lengthCm:(neckY-hemY)*100,sleeves:sleeveMetrics},requestedEaseCm:easeCm,sectionMissingRays:chest.missing+waist.missing+hipS.missing,vertices:p.length/3,triangles:indices.length/3,correctionEvents:corrected,maxCorrectionMm:maxCorrection*1000,measurementMethod:'actual posed-skin triangle rays; analytic garment envelope estimate, not final sewn circumference',garmentType:'sleeveless-fitting-toile',productionPatternApproved:false,visualApproved:false};
+ const metrics={body:{heightCm:null,chestCm:chest.circumference*100,waistCm:waist.circumference*100,hipCm:hipS.circumference*100,shoulderJointWidthCm:len(sub(shoulders[0],shoulders[1]))*100},garment:{chestEnvelopeCm:garmentSections.chest*100,waistEnvelopeCm:garmentSections.waist*100,shoulderWidthCm:shoulderW*200,lengthCm:(neckY-hemY)*100,sleeves:sleeveMetrics},requestedEaseCm:easeCm,sectionMissingRays:chest.missing+waist.missing+hipS.missing,vertices:p.length/3,triangles:indices.length/3,measurementMethod:'actual posed-skin triangle rays; analytic garment envelope estimate, not final sewn circumference',garmentType:'sleeveless-fitting-toile',productionPatternApproved:false,visualApproved:false};
  return {p:p32,n,uv:Float32Array.from(uv),indices:i32,seams,parts,metrics,thickness,parameters:{easeCm,lengthCm},centre:centre((neckY+hemY)/2),chestTarget:centre(chestY),neckTarget:centre(neckY-.025),hemY,neckY};
 }
 export function sampleClearance(mesh,bvh){let min=Infinity,violations=0,samples=0,insideSamples=0,ambiguous=0;const examples=[];const parity=(p,d)=>{let o=p,count=0;for(let k=0;k<24;k++){const h=bvh.ray(o,d,4);if(!h)return count%2;o=add(h.p,mul(d,.000002));count++;}return null;};
