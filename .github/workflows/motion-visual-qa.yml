@@ -1,0 +1,168 @@
+name: Motion real-browser visual QA
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Optional commit SHA to inspect; defaults to the triggering revision
+        required: false
+        type: string
+      skip_ab:
+        description: Skip the R25 balance on/off comparison
+        required: false
+        default: false
+        type: boolean
+  push:
+    branches:
+      - feature/human-motion-workbench-adjustment-v1
+
+permissions:
+  contents: write
+
+concurrency:
+  group: motion-real-browser-qa
+  cancel-in-progress: false
+
+jobs:
+  visual-qa:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[preview-build]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.source_sha || github.sha }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install real-browser QA dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --no-cache-dir \
+            selenium==4.27.1 pillow==11.0.0 requests==2.32.3
+          command -v google-chrome || command -v google-chrome-stable || command -v chromium
+          command -v ffmpeg
+          command -v Xvfb
+
+      - name: Resolve fixed public preview
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          SHORT_SHA="${SOURCE_SHA:0:12}"
+          APP_URL="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${SOURCE_SHA}/index.html?visualTest=1"
+          echo "source_sha=${SOURCE_SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "app_url=${APP_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Run one-session Chrome capture
+        id: capture
+        continue-on-error: true
+        env:
+          SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
+          APP_URL: ${{ steps.target.outputs.app_url }}
+          SKIP_AB: ${{ github.event.inputs.skip_ab || 'false' }}
+        shell: bash
+        run: |
+          set -o pipefail
+          args=(--url "$APP_URL" --source-sha "$SOURCE_SHA" --output visual-review)
+          if [[ "$SKIP_AB" == "true" ]]; then args+=(--skip-ab); fi
+          xvfb-run -a -s "-screen 0 1920x1080x24" \
+            python tools/motion_visual_qa.py "${args[@]}" | tee visual-qa-run.log
+
+      - name: Summarize browser QA
+        if: always()
+        shell: python
+        run: |
+          from pathlib import Path
+          import json, os
+          path=Path('visual-review/browser-run-report.json')
+          lines=['## Motion real-browser visual QA']
+          if path.exists():
+              data=json.loads(path.read_text(encoding='utf-8'))
+              pre=data.get('preflight',{})
+              lines += [
+                  f"- source: `{data.get('sourceSHA')}`",
+                  f"- status: `{data.get('status')}`",
+                  f"- preflight: `{pre.get('passed')}`",
+                  f"- fixed HTTPS: {data.get('testedURL')}",
+                  f"- scenario failures: `{', '.join(data.get('scenarioFailures',[])) or 'none'}`",
+                  '- visualAcceptance: `false`',
+                  '- productionReady: `false`',
+                  '- userVisualAcceptance: `pending`',
+              ]
+          else:
+              lines.append('- No browser report was produced.')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as handle:
+              handle.write('\n'.join(lines)+'\n')
+
+      - name: Upload browser evidence
+        if: always() && hashFiles('visual-review/browser-run-report.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion-visual-review-${{ steps.target.outputs.short_sha }}
+          path: |
+            visual-review
+            visual-qa-run.log
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
+
+      - name: Publish fixed review site
+        if: hashFiles('visual-review/visual-review.html') != ''
+        env:
+          SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
+          REVIEW_BRANCH: visual-review/human-motion-workbench
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "$REVIE]}BRANCH:refs/remotes/origin/$REVIEW_BRANCH" || true
+          rm -rf /tmp/human-motion-review
+          git worktree add --detach /tmp/human-motion-review "$SOURCE_SHA"
+          cd /tmp/human-motion-review
+          if git show-ref --verify --quiet "refs/remotes/origin/$REVIEW_BRANCH"; then
+            git checkout -B "$REVIEW_BRANCH" "refs/remotes/origin/$REVIE]}BRANCH"
+          else
+            git checkout --orphan "$REVIE]}BRANCH"
+            git rm -rf . || true
+          fi
+          mkdir -p "reviews/$SOURCE_SHA"
+          rm -rf "reviews/$SOURCE_SHA"
+          cp -a "$GITHUB_WORKSPACE/visual-review/." "reviews/$SOURCE_SHA/"
+          cat > latest.json <<EOF
+          {
+            "sourceSHA": "$SOURCE_SHA",
+            "reviewPath": "reviews/$SOURCE_SHA/visual-review.html",
+            "updatedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "visualAcceptance": false,
+            "productionReady": false,
+            "userVisualAcceptance": "pending"
+          }
+          EOF
+          cat > index.html <<EOF
+          <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0; url=reviews/$SOURCE_SHA/visual-review.html"><title>人物动作视觉验收</title></head><body><p><a href="reviews/$SOURCE_SHA/visual-review.html">打开人物动作视觉验收</a></p></body></html>
+          EOF
+          git add index.html latest.json "reviews/$SOURCE_SHA"
+          git commit -m "visual-review: $SOURCE_SHA [skip ci]"
+          git push origin "HEAD:$REVIEW_BRANCH"
+          echo "review_commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Enforce preflight gate
+        if: always()
+        shell: python
+        run: |
+          from pathlib import Path
+          import json, sys
+          path=Path('visual-review/browser-run-report.json')
+          if not path.exists():
+              raise SystemExit('Browser QA did not produce browser-run-report.json')
+          data=json.loads(path.read_text(encoding='utf-8'))
+          if not data.get('preflight',{}).get('passed'):
+              raise SystemExit('Browser preflight failed; no screenshots/site were published.')
+          if data.get('status') == 'INCONCLUSIVE':
+              raise SystemExit('Browser QA is inconclusive.')
