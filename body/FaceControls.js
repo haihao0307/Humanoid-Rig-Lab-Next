@@ -281,7 +281,7 @@ el('node').onchange=()=>{selected=FACE_NODE_INDEX.get(el('node').value);api.refr
   el('heat').onchange=()=>{heatmap=el('heat').checked;needsRedraw=true;};el('enabled').onchange=()=>{enabled=el('enabled').checked;needsRedraw=true;};
   el('neutral').onclick=()=>edit(()=>transitionPreset('neutral'));
   el('reset-identity').onclick=()=>edit(()=>api.resetIdentity());
-  el('verify-separation').onclick=()=>edit(()=>{const result=api.verifySeparation();el('status').textContent=result.ok?'通过：微笑、眨眼等表情不会改写固定身份中性脸。':'失败：固定身份数据发生变化。';});
+  el('verify-separation').onclick=()=>{const result=api.verifySeparation();el('status').textContent=result.ok?'通过：微笑、眨眼等表情不会改写固定身份中性脸。':'失败：固定身份数据发生变化。';};
   el('closeup').onclick=()=>api.closeup('front');
   el('lip-closeup').onclick=()=>api.closeup('lips');
   el('reset-node').onclick=()=>edit(()=>api.setOffset(FACE_RECIPE.nodes[selected].id,[0,0,0],el('mirror').checked));
