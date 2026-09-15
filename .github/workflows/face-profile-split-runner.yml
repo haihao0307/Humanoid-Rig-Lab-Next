@@ -37,6 +37,13 @@ jobs:
           script=source.split(marker,1)[1].rsplit('\n          PY',1)[0]
           script='\n'.join(line[10:] if line.startswith('          ') else line for line in script.splitlines())
           exec(compile(script,'face-profile-split-r1.py','exec'),{'__name__':'__main__'})
+          face=Path('body/FaceControls.js')
+          text=face.read_text(encoding='utf-8')
+          old='identity:{...pose.identity,neutralOffsetsMm}}'
+          new='identity:{...pose.identity,neutralOffsetsMm:offsetsMm}}'
+          if text.count(old)!=1:
+              raise SystemExit('identity offset correction anchor mismatch')
+          face.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
           PY
       - name: Build workbench
         run: node tools/build-pure.mjs
