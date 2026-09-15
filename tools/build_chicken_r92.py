@@ -49,7 +49,7 @@ window.__CHICKEN_R92_PATCH__=Object.freeze({
  preserves:['R9 frozen rollback','R9/R9.1 local eye/nostril/wattle/comb/material modules','body','wing','tail','feet'],
  manualVisualAcceptance:false
 });
-function applyHeadTopR91(input,amount,ctrl){
+applyHeadTopR91=function(input,amount,ctrl){
  const p=input.slice(),a=clamp(amount,0,1),zc=.09,rows=72,cols=96;
  const knots=[
   [.268,.960],[.282,.975],[.300,.990],[.322,1.002],
@@ -102,7 +102,7 @@ function applyHeadTopR91(input,amount,ctrl){
   }
  }
  return p;
-}
+};
 '''.strip()
 
 VISIBLE_REPLACEMENTS = {
@@ -240,7 +240,7 @@ def write_static_qa(build: dict[str, Any]) -> None:
         "frozen_source_hash_matches": build["source_sha256"] == EXPECTED_SOURCE_SHA256,
         "frozen_source_preserved": build["source_preserved"],
         "single_scene_anchor": build["anchor_count"] == 1,
-        "single_patch_injection": build["patch_marker_count"] == 2,
+        "single_patch_injection": build["patch_marker_count"] == 1,
         "output_created": OUTPUT.exists(),
         "output_larger_than_source": build["output_bytes"] > build["source_bytes"],
         "all_visible_replacement_anchors_found": all(build["replacement_status"].values()),

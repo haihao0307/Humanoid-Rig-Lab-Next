@@ -1,0 +1,99 @@
+{
+  "schema": "life_ecosystem/chicken_head_shape_candidate@1.0",
+  "version": "V4.6_R9.2",
+  "status": "bounded_visual_candidate_not_anatomical_truth",
+  "units": "normalized_source_units_not_meters",
+  "coordinate_frame": {
+    "cranial_axis": "+X",
+    "dorsal_axis": "+Y",
+    "right_lateral_axis": "+Z",
+    "head_midline_z": 0.09
+  },
+  "source": {
+    "frozen_executable": "CHICKEN_V46_R9_1.html",
+    "sha256": "336dc9d32304f916a8f15e120ebf4b9d2429b54dd2719be1af8aca12df33a4e3",
+    "approved_visual_reference": "reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png"
+  },
+  "deformation": {
+    "method": "bounded ring-wise low-frequency carrier restoration",
+    "x_domain": [
+      0.252,
+      0.492
+    ],
+    "active_blend_domain": [
+      0.258,
+      0.486
+    ],
+    "head_roof_knots_xy": [
+      [
+        0.268,
+        0.96
+      ],
+      [
+        0.282,
+        0.975
+      ],
+      [
+        0.3,
+        0.99
+      ],
+      [
+        0.322,
+        1.002
+      ],
+      [
+        0.346,
+        1.008
+      ],
+      [
+        0.37,
+        1.007
+      ],
+      [
+        0.394,
+        1.001
+      ],
+      [
+        0.418,
+        0.99
+      ],
+      [
+        0.44,
+        0.978
+      ],
+      [
+        0.458,
+        0.967
+      ],
+      [
+        0.474,
+        0.959
+      ]
+    ],
+    "posterior_width_gain": 0.135,
+    "vault_width_gain": 0.086,
+    "cheek_width_gain": 0.076,
+    "bill_root_width_gain": 0.032,
+    "throat_lower_support_gain": 0.078,
+    "preserves_tip_beyond_x": 0.492
+  },
+  "preserved_modules": [
+    "R9 frozen rollback",
+    "R9/R9.1 eyes and eyelids",
+    "R9/R9.1 paired nostrils",
+    "R9/R9.1 wattles and ear-lobe candidates",
+    "R9.1 continuous comb generator",
+    "body, plumage, wings, tail and feet"
+  ],
+  "truth_boundary": {
+    "does_not_claim": [
+      "measured skull anatomy",
+      "breed-specific morphology",
+      "sex-specific morphology",
+      "individual identity",
+      "manual visual acceptance"
+    ],
+    "rig_authorized": false,
+    "motion_authorized": false
+  }
+}
