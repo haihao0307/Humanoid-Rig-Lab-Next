@@ -29,13 +29,31 @@ jobs:
           node-version: '24'
       - name: Apply R8 perioral candidate
         run: python3 tools/apply-face-perioral-r8-candidate.py
-      - name: Preserve cavity winding and taper white roll into skin
+      - name: Preserve cavity winding and refine lower-face continuity
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           path=Path('body/FaceAnatomy.js')
           text=path.read_text(encoding='utf-8')
+          replacements={
+            "bounds:[-.073,.072,1.414,1.579],ellipse:[-.0005,1.498,.069,.080]":"bounds:[-.073,.072,1.425,1.579],ellipse:[-.0005,1.503,.069,.073]",
+            "if(Math.max(p[ia+1],p[ib+1],p[ic+1])<1.410":"if(Math.max(p[ia+1],p[ib+1],p[ic+1])<1.420",
+            "if(loX>.08||hiX<-.08||loY>1.58||hiY<1.410":"if(loX>.08||hiX<-.08||loY>1.58||hiY<1.420",
+            "Math.floor(Math.max(1.410,loY)/size)":"Math.floor(Math.max(1.420,loY)/size)",
+            "lips:{centreX:-.0006,halfWidth:.0244,seamY:1.4587,apron:1.60,innerDepth:.0027,columns:160,rings:36":"lips:{centreX:-.0006,halfWidth:.0244,seamY:1.4587,apron:1.36,innerDepth:.0027,columns:160,rings:36",
+            "upperSection:[[0,.00165],[.18,.00190],[.45,.00178],[.78,.00145],[1,.00115],[1.14,.00122],[1.36,.00055],[1.60,0]]":"upperSection:[[0,.00155],[.18,.00175],[.45,.00162],[.78,.00130],[1,.00100],[1.08,.00100],[1.20,.00050],[1.36,0]]",
+            "lowerSection:[[0,.00165],[.20,.00210],[.48,.00245],[.75,.00235],[1,.00165],[1.18,.00095],[1.42,.00042],[1.60,0]]":"lowerSection:[[0,.00155],[.20,.00195],[.48,.00220],[.75,.00205],[1,.00145],[1.10,.00078],[1.24,.00032],[1.36,0]]",
+            "whiteRollUpper:.00024,whiteRollLower:.00012,whiteRollCentre:1.06,whiteRollWidth:.14":"whiteRollUpper:.00012,whiteRollLower:.00005,whiteRollCentre:1.045,whiteRollWidth:.065",
+            "labiomentalY:1.4398,labiomentalRx:.0245,labiomentalRy:.0058,labiomentalDepth:.00052,\n    mentalisY:1.4268,mentalisRx:.0225,mentalisRy:.0115,mentalisHeight:.00105":"labiomentalY:1.4450,labiomentalRx:.0230,labiomentalRy:.0048,labiomentalDepth:.00038,\n    mentalisY:1.4355,mentalisRx:.0210,mentalisRy:.0060,mentalisHeight:.00072",
+            "const oralLo=1.429,oralHi=1.476,oralSpan=oralHi-oralLo;":"const oralLo=1.433,oralHi=1.476,oralSpan=oralHi-oralLo;",
+            "if(compactFaceSkinMode<1.5&&r<.94)discard;":"if(compactFaceSkinMode<1.5&&r<.985)discard;"
+          }
+          for old,new in replacements.items():
+              count=text.count(old)
+              if count!=1:
+                  raise SystemExit(f'R8 visual refinement anchor mismatch: {old!r}, count={count}')
+              text=text.replace(old,new,1)
           old="const mouthPoint=(a,t)=>{const x=lp.centreX+lp.halfWidth*.992*Math.cos(a)*(1-.38*t),q=compactLipOutline(x),seam=lipSurface(x,true,0)[2];return [x,q.seam+.00045*Math.sin(a)*(1+3*t),seam-.0030-.010*t];};"
           new="const mouthPoint=(a,t)=>{const x=lp.centreX+lp.halfWidth*.998*Math.cos(a)*(1-.38*t),q=compactLipOutline(x),seam=lipSurface(x,true,0)[2];return [x,q.seam+.0007*Math.sin(a)*(1+3*t),seam-.0020-.010*t];};"
           if text.count(old)!=1:
