@@ -607,6 +607,7 @@ async function startupStage(stage,message){
 /*__SOURCE:control/NPCObservation.js__*/
 /*__SOURCE:control/NPCPopulation.js__*/
 /*__SOURCE:ui/NPCPopulationControls.js__*/
+/*__SOURCE:ui/NPCTaskSelectionBridge.js__*/
 async function init(){try{
  await startupStage('graphics','正在初始化 WebGL2 与皮肤着色器');
  renderer=new Renderer($('view'));
