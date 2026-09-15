@@ -11,33 +11,32 @@ const normalize=text=>text.replace(/\r\n/g,'\n');
 const uploaded=read('index.html');
 const generated=assemble();
 
-// The two embedded pages are very large quoted Base64 gzip literals. Their
-// exact compressed bytes can differ across zlib builds even when their decoded
-// HTML is identical. Extract by payload shape rather than surrounding source
-// formatting, then compare both decoded pages and the remaining static shell.
-const payloadPattern=/(["'`])([A-Za-z0-9+/=]{100000,})\1/g;
+// Embedded pages are quoted Base64 gzip literals. Brain and body have very
+// different sizes, and gzip output bytes can vary across zlib builds. Detect
+// payloads by successful gzip decoding rather than by a fixed length or by the
+// surrounding source formatting.
+const longLiteralPattern=/(["'`])([A-Za-z0-9+/=]{1024,})\1/g;
+function tryUnpack(value){try{return gunzipSync(Buffer.from(value,'base64')).toString();}catch{return null;}}
 function extractPacked(text,label){
  const payloads=[];
- const masked=normalize(text.replace(payloadPattern,(full,quote,value)=>{
-  payloads.push(value);
+ const masked=normalize(text.replace(longLiteralPattern,(full,quote,value)=>{
+  const decoded=tryUnpack(value);
+  if(decoded===null)return full;
+  payloads.push({value,decoded});
   return quote+'__PACKED_PAYLOAD_'+payloads.length+'__'+quote;
  }));
- if(payloads.length!==2)throw Error(label+' 应包含 2 个压缩页面载荷，实际 '+payloads.length);
+ if(payloads.length!==2)throw Error(label+' 应包含 2 个 gzip 页面载荷，实际 '+payloads.length);
  return {payloads,masked};
-}
-function unpack(value,label){
- try{return gunzipSync(Buffer.from(value,'base64')).toString();}
- catch(error){throw Error(label+' 无法解压：'+error.message);}
 }
 const expected={body:generated.body,brain:generated.brain};
 function classify(payloads,label){
  const found={};
  for(let index=0;index<payloads.length;index++){
-  const text=unpack(payloads[index],label+' #'+(index+1));
-  const kind=Object.entries(expected).find(([,expectedText])=>text===expectedText)?.[0];
-  if(!kind)throw Error(label+' 的压缩载荷 #'+(index+1)+' 与当前 body/brain 源码均不一致');
+  const {value,decoded}=payloads[index];
+  const kind=Object.entries(expected).find(([,expectedText])=>decoded===expectedText)?.[0];
+  if(!kind)throw Error(label+' 的 gzip 载荷 #'+(index+1)+' 与当前 body/brain 源码均不一致');
   if(found[kind])throw Error(label+' 重复包含 '+kind+' 载荷');
-  found[kind]={payload:payloads[index],text,index};
+  found[kind]={payload:value,text:decoded,index};
  }
  for(const kind of Object.keys(expected))if(!found[kind])throw Error(label+' 缺少 '+kind+' 载荷');
  return found;
