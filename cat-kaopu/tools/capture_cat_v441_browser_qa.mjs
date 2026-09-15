@@ -74,7 +74,7 @@ try {
   };
   const setView = async (view) => {
     await page.click(`[data-view="${view}"]`);
-    await page.evaluate(() => window.__CAT_V441_SET_CAMERA_TARGET__(0.214, 0, 0.205, 0.34));
+    await page.evaluate((zoom) => window.__CAT_V441_SET_CAMERA_TARGET__(0.214, 0, 0.205, zoom), view === 'front' ? 0.34 : 0.20);
     await waitFrames(page, 8);
   };
 
