@@ -1,0 +1,124 @@
+name: Bruce R13P Pixabay dog anchor fetch
+
+on:
+  push:
+    branches:
+      - automation/bruce-neutral-dog-anchor-r13p-20260915
+    paths:
+      - .github/workflows/bruce_r13p_pixabay_dog_fetch.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Probe public Pixabay model page and download route
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="bruce_r13p_pixabay_dog"
+          mkdir -p "$ROOT/evidence" "$ROOT/originals" "$ROOT/diagnostics"
+          python -m pip install --quiet selenium
+          python - <<'PY'
+          import json, re, time, urllib.parse, urllib.request
+          from pathlib import Path
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+
+          root=Path('bruce_r13p_pixabay_dog')
+          ev=root/'evidence'; orig=root/'originals'; diag=root/'diagnostics'
+          page_url='https://pixabay.com/3d-models/dog-animal-pet-canine-brown-914/'
+          opts=Options()
+          opts.add_argument('--headless=new'); opts.add_argument('--no-sandbox'); opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1600,1200'); opts.add_argument('--disable-gpu')
+          opts.set_capability('goog:loggingPrefs',{'performance':'ALL','browser':'ALL'})
+          driver=webdriver.Chrome(options=opts)
+          urls=set(); events=[]
+          try:
+              driver.get(page_url); time.sleep(8)
+              ev.joinpath('pixabay_dog_page.html').write_text(driver.page_source,encoding='utf-8')
+              driver.save_screenshot(str(ev/'pixabay_dog_page.png'))
+              elements=[]
+              for el in driver.find_elements(By.CSS_SELECTOR,'a,button,[role="button"]'):
+                  try:
+                      row={'tag':el.tag_name,'text':el.text,'href':el.get_attribute('href'),'download':el.get_attribute('download'),'outer':el.get_attribute('outerHTML')[:3000]}
+                      elements.append(row)
+                      if row['href']: urls.add(row['href'])
+                  except Exception: pass
+              diag.joinpath('interactive_elements.json').write_text(json.dumps(elements,ensure_ascii=False,indent=2),encoding='utf-8')
+              candidates=[e for e in driver.find_elements(By.XPATH,"//*[contains(translate(normalize-space(.),'DOWNLOAD','download'),'download')]") if e.tag_name.lower() in ('a','button') or e.get_attribute('role')=='button']
+              for i,el in enumerate(candidates[:12]):
+                  try:
+                      driver.execute_script('arguments[0].scrollIntoView({block:"center"});',el); time.sleep(.5)
+                      href=el.get_attribute('href')
+                      if href: urls.add(href)
+                      driver.execute_script('arguments[0].click();',el); time.sleep(4)
+                      ev.joinpath(f'after_click_{i}.html').write_text(driver.page_source,encoding='utf-8')
+                      driver.save_screenshot(str(ev/f'after_click_{i}.png'))
+                      for a in driver.find_elements(By.CSS_SELECTOR,'a[href]'):
+                          h=a.get_attribute('href')
+                          if h: urls.add(h)
+                  except Exception as exc: events.append({'click':i,'error':repr(exc)})
+              perf=driver.get_log('performance')
+              diag.joinpath('performance_log.json').write_text(json.dumps(perf),encoding='utf-8')
+              for item in perf:
+                  try:
+                      msg=json.loads(item['message'])['message']
+                      if msg.get('method')=='Network.responseReceived':
+                          r=msg['params']['response']; u=r.get('url')
+                          if u: urls.add(u); events.append({'response':u,'status':r.get('status'),'mimeType':r.get('mimeType')})
+                  except Exception: pass
+          finally:
+              driver.quit()
+          blob=ev.joinpath('pixabay_dog_page.html').read_text(encoding='utf-8',errors='ignore')+'\n'+diag.joinpath('performance_log.json').read_text(encoding='utf-8',errors='ignore')
+          for m in re.findall(r'https?[^"\'<>\\ ]+',blob): urls.add(m.replace('\\u0026','&').replace('\\/','/'))
+          diag.joinpath('all_urls.txt').write_text('\n'.join(sorted(urls))+'\n',encoding='utf-8')
+          diag.joinpath('events.json').write_text(json.dumps(events,ensure_ascii=False,indent=2),encoding='utf-8')
+          cand=[]
+          for u in sorted(urls):
+              p=urllib.parse.urlparse(u).path.lower()
+              if any(p.endswith(x) for x in ('.glb','.gltf','.zip','.bin','.fbx','.obj')) or 'download' in u.lower() or '/3d-models/' in u:
+                  cand.append(u)
+          diag.joinpath('download_candidates.txt').write_text('\n'.join(cand)+'\n',encoding='utf-8')
+          fetched=[]
+          for i,u in enumerate(cand[:100]):
+              try:
+                  req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0','Referer':page_url})
+                  with urllib.request.urlopen(req,timeout=60) as resp:
+                      data=resp.read(100_000_000); final=resp.geturl(); ct=resp.headers.get('content-type','')
+                  if len(data)<1024: continue
+                  name=Path(urllib.parse.urlparse(final).path).name or f'candidate_{i}'
+                  safe=re.sub(r'[^A-Za-z0-9._-]+','_',name)[:180]
+                  out=orig/f'{i:03d}_{safe}'; out.write_bytes(data)
+                  fetched.append({'url':u,'finalUrl':final,'file':out.name,'bytes':len(data),'contentType':ct,'magic':data[:16].hex()})
+              except Exception as exc: fetched.append({'url':u,'error':repr(exc)})
+          diag.joinpath('fetched_candidates.json').write_text(json.dumps(fetched,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps({'candidates':cand,'fetched':fetched},ensure_ascii=False,indent=2))
+          PY
+
+      - name: Fetch license evidence and classify
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="bruce_r13p_pixabay_dog"
+          curl --location --retry 2 --retry-all-errors -A 'Mozilla/5.0' \
+            'https://pixabay.com/service/license-summary/' -o "$ROOT/evidence/pixabay_license_summary.html" || true
+          find "$ROOT" -type f -maxdepth 3 -print0 | sort -z | xargs -0 file > "$ROOT/diagnostics/file_types.txt" || true
+          (cd "$ROOT"; find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt; sha256sum -c SHA256SUMS.txt)
+
+      - name: Upload artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruce-r13p-pixabay-dog
+          path: bruce_r13p_pixabay_dog
+          if-no-files-found: error
+          retention-days: 7
