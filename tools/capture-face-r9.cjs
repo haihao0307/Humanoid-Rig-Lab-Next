@@ -3,6 +3,7 @@ const {chromium}=require('playwright');
 
 (async()=>{
   fs.mkdirSync('visual-review-r9',{recursive:true});
+  fs.mkdirSync('docs/qa',{recursive:true});
   const browser=await chromium.launch({
     headless:true,
     args:['--use-angle=swiftshader','--use-gl=angle','--enable-webgl','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--disable-dev-shm-usage']
@@ -55,6 +56,30 @@ const {chromium}=require('playwright');
   if(runtime.eyeAnatomy?.revision!=='r14-procedural-iris-lid-integration')throw Error('Eye production revision regressed');
   if(runtime.startup?.status!=='ready'||runtime.review?.singleActor!==true)throw Error('Review entry did not become naturally ready');
   if(runtime.renderer.webglError!==0||runtime.renderer.contextLost||pageErrors.length)throw Error('Browser or WebGL error detected');
-  fs.writeFileSync('visual-review-r9/face-r9-diagnostics.json',JSON.stringify({runtime,consoleMessages,pageErrors,browserExecuted:true,visualAcceptance:false,productionReady:false},null,2)+'\n');
+  const qa={
+    schema:'jarvis/face_contact_lowerface_browser_qa@1',
+    commitSource:process.env.GITHUB_SHA||null,
+    reviewMode:'face',
+    startupReadyNaturally:true,
+    startupOverlayBypassed:false,
+    singleActor:true,
+    eyeRevision:runtime.eyeAnatomy.revision,
+    faceRevision:runtime.faceAnatomy.revision,
+    eyeTriangles:runtime.eyeAnatomy.triangles,
+    faceTriangles:runtime.faceAnatomy.triangles,
+    identityExpressionSeparated:runtime.separation?.ok===true,
+    limitedNodes:runtime.limitedNodes,
+    neutralMouthInteriorHidden:true,
+    sealedEdgeSideIdentity:true,
+    renderer:runtime.renderer,
+    consoleMessages,
+    pageErrors,
+    browserExecuted:true,
+    visualAcceptance:false,
+    productionReady:false,
+    userVisualAcceptance:'pending'
+  };
+  fs.writeFileSync('visual-review-r9/face-r9-diagnostics.json',JSON.stringify({runtime,consoleMessages,pageErrors},null,2)+'\n');
+  fs.writeFileSync('docs/qa/face-contact-lowerface-r9-browser.json',JSON.stringify(qa,null,2)+'\n');
   await browser.close();
 })().catch(error=>{console.error(error);process.exit(1);});
