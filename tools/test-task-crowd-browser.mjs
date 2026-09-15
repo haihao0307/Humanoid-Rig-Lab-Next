@@ -153,7 +153,7 @@ try{
    const before=[...requester.agent.pos];pop.tick(1/120);const travel=horizontal(before,requester.agent.pos);moved=horizontal(start,requester.agent.pos);if(travel<1e-5)stationary++;else stationary=0;maxStationary=Math.max(maxStationary,stationary);
    if(requester.resource.diversions>=1&&moved>.12)break;
   }
-  const conflict={...requester.resource.conflict},diversions=requester.resource.diversions,attemptsBeforeRelease=requester.resource.attempts,queueBeforeRelease:requester.queue.length,runningBeforeRelease:requester.running?.source||null;
+  const conflict={...requester.resource.conflict},diversions=requester.resource.diversions,attemptsBeforeRelease=requester.resource.attempts,queueBeforeRelease=requester.queue.length,runningBeforeRelease=requester.running?.source||null;
   pop.claims.delete(object.id);pop.stationClaims.delete(zone.id);pop.physicsOwner=null;
   let reacquired=false;
   for(;frames<9000;frames++){pop.tick(1/120);if(pop.claims.get(object.id)===requester.id||requester.resource.mode==='reserved'){reacquired=true;break;}if(requester.agent.error)break;}
