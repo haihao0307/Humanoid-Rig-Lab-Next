@@ -1,7 +1,8 @@
 /* Routes belong to Agent/PlanForecast. Root movement, stepping and contact
  * ownership belong exclusively to the pinned MotionController R2.2. */
 const NATURAL_GAIT=Object.freeze({version:'motion-lab-r2.2',fixedStepS:1/120,maxSubsteps:24});
-const TRAFFIC_AVOIDANCE=Object.freeze({horizonS:1.8,sampleS:.15,planCooldownS:.22,sideMarginM:.14});
+const TRAFFIC_AVOIDANCE=Object.freeze({horizonS:1.8,sampleS:.15,planCooldownS:.22,sideMarginM:.14,slotGapM:.16});
+const trafficRuntimeByPopulation=new WeakMap();
 function motionCircleSweep(start,end,centre,radius){
  const d=sub(end,start),p=sub(start,centre),a=d[0]*d[0]+d[2]*d[2],c=p[0]*p[0]+p[2]*p[2]-radius*radius;
  if(c<=0)return 0;if(a<1e-16)return 1;
@@ -63,6 +64,56 @@ function trafficSegmentClear(agent,start,end,context,{dynamic=true}={}){
  if(motionWorldSweep(agent.w,start,end,context.radius,context.ignore).fraction<1-1e-6)return false;
  return !dynamic||(agent.w.population?.sweepFor(agent,start,end,context.radius)??1)>=1-1e-6;
 }
+function trafficRuntime(population){
+ if(!population)return null;let runtime=trafficRuntimeByPopulation.get(population);
+ if(!runtime){runtime={slots:new Map()};trafficRuntimeByPopulation.set(population,runtime);}return runtime;
+}
+function trafficTaskKey(agent){
+ const s=agent.skill;if(!s)return null;return [agent.index,s.type,s.targetId||'',s.objectId||'',agent.phase].join('|');
+}
+function trafficGoalKey(agent,goal){
+ const id=agent.skill?.targetId||agent.skill?.objectId;
+ return id?'target:'+id:'point:'+goal.map(v=>Number(v).toFixed(2)).join(',');
+}
+function trafficPruneSlotClaims(population,runtime){
+ const live=new Map([...population.values()].filter(actor=>!actor.disposed).map(actor=>[actor.id,actor]));
+ for(const [key,claims]of runtime.slots){
+  for(const [id]of claims){const actor=live.get(id),a=actor?.agent;if(!a||a.skill?.type!=='walk')claims.delete(id);}
+  if(!claims.size)runtime.slots.delete(key);
+ }
+}
+function trafficReleaseTargetSlot(locomotion){
+ const a=locomotion.a,t=locomotion.traffic,key=t?.slotKey,population=a.w.population;
+ if(key&&population){const runtime=trafficRuntime(population),claims=runtime?.slots.get(key);claims?.delete(a.npcId);if(claims&&!claims.size)runtime.slots.delete(key);}
+ if(t)Object.assign(t,{slotKey:null,slotTaskKey:null,slotPoint:null,slotIndex:null});
+}
+function trafficSlotCandidates(agent,goal,context){
+ const target=agent.skill?.targetId&&agent.w.get?.(agent.skill.targetId),spacing=Math.max(.62,context.radius*2+TRAFFIC_AVOIDANCE.slotGapM),seed=trafficHash(String(agent.npcId||'')),candidates=[[...goal]];
+ const zone=target?.id?.startsWith?.('Z'),centre=zone?[target.p[0],0,target.p[2]]:[...goal],maximum=zone?Math.max(0,(target.r||0)-context.radius-.08):spacing*1.7;
+ const radii=zone?[Math.min(spacing,maximum),Math.min(spacing*1.65,maximum)]:[spacing,spacing*1.55];
+ for(const radius of radii){if(radius<.08)continue;for(let k=0;k<8;k++){const angle=(k+(seed%8))/8*Math.PI*2,p=[centre[0]+Math.sin(angle)*radius,0,centre[2]+Math.cos(angle)*radius];if(zone&&horizontal(p,target.p)>maximum+.001)continue;candidates.push(p);}}
+ return candidates;
+}
+function trafficReserveTargetSlot(locomotion,context){
+ const a=locomotion.a,population=a.w.population,goal=a.route?.at(-1),taskKey=trafficTaskKey(a);
+ if(!population||a.skill?.type!=='walk'||!goal){if(locomotion.traffic.slotKey)trafficReleaseTargetSlot(locomotion);return null;}
+ const key=trafficGoalKey(a,goal);
+ if(locomotion.traffic.slotKey===key&&locomotion.traffic.slotTaskKey===taskKey)return locomotion.traffic.slotPoint;
+ trafficReleaseTargetSlot(locomotion);const runtime=trafficRuntime(population);trafficPruneSlotClaims(population,runtime);
+ const claims=runtime.slots.get(key)||new Map(),minimumGap=Math.max(.58,context.radius*2+TRAFFIC_AVOIDANCE.slotGapM),root=locomotion.engine?.state?.root||a.pos;
+ for(const [index,point]of trafficSlotCandidates(a,goal,context).entries()){
+  if([...claims.values()].some(claim=>horizontal(claim.point,point)<minimumGap))continue;
+  if(population.collisionFor?.(a,point,context.radius))continue;
+  let route;try{route=a.w.path(root,point,context.radius,context.ignore);}catch{continue;}
+  if(!Array.isArray(route)||!route.length)continue;
+  claims.set(a.npcId,{point:[...point],index,taskKey});runtime.slots.set(key,claims);
+  a.route.splice(a.routeIndex,a.route.length-a.routeIndex,...route.map(p=>[...p]));locomotion.requestKey=null;
+  Object.assign(locomotion.traffic,{slotKey:key,slotTaskKey:taskKey,slotPoint:[...point],slotIndex:index});locomotion.traffic.slotReservations++;
+  if(index>0)a.log?.('同一目标已有其他人物，已分配独立接近站位');
+  return [...point];
+ }
+ throw Error('目标附近没有可用的独立站位，无法安全分配多人到达位置');
+}
 class MotionLabWorld {
  constructor(agent){this.a=agent;}
  context(radius){const a=this.a,body=radius>.1,profile=bodyPhysicalProfile(a.h),ignore=a.skill?.o?[a.skill.o.id]:[];
@@ -89,12 +140,13 @@ class NaturalLocomotion {
   this.resetFromPose();
  }
  resetFromPose(){
+  if(this.traffic?.slotKey)trafficReleaseTargetSlot(this);
   const a=this.a,e=this.engine,root=[a.pos[0],this.standingHipHeightM,a.pos[2]],yaw=a.yaw;
   const world=e.world;e.world=new MotionLab.FlatWorld();e.reset();e.world=world;
   e.state.root=root;e.state.yaw=yaw;e.state.time=a.time;
   for(const side of ['left','right'])e.state.feet[side]={position:e.stance(e.state,side),yaw,contact:true};
   e.state.pose=e.solve(e.state);this.requestKey=null;this.requested=false;this.tempo=1;
-  this.traffic={active:false,mode:'clear',reason:null,blockers:[],side:0,detours:0,retreats:0,replans:0,recoveries:0,lastPlanAtS:-Infinity,nextPlanAtS:0,detourEndIndex:-1,originalTarget:null,lastError:null};this.sync();
+  this.traffic={active:false,mode:'clear',reason:null,blockers:[],side:0,detours:0,retreats:0,replans:0,recoveries:0,slotReservations:0,lastPlanAtS:-Infinity,nextPlanAtS:0,detourEndIndex:-1,originalTarget:null,lastError:null,slotKey:null,slotTaskKey:null,slotPoint:null,slotIndex:null};this.sync();
  }
  sync(){const a=this.a,s=this.engine.state;
   a.pos=[...s.root];a.yaw=s.yaw;a.swing=s.swing?{side:s.swing.side,t:s.swing.elapsed,duration:s.swing.duration}:null;
@@ -155,7 +207,9 @@ class NaturalLocomotion {
  }
  prepareTrafficTarget(speed=.48,{force=false}={}){
   const a=this.a;this.clearTrafficIfPassed();let target=a.route[a.routeIndex];if(!target)return null;
-  const context=this.world.context(.23),root=this.engine.state.root;
+  const context=this.world.context(.23),root=this.engine.state.root,currentTaskKey=trafficTaskKey(a);
+  if(this.traffic.slotTaskKey&&this.traffic.slotTaskKey!==currentTaskKey)trafficReleaseTargetSlot(this);
+  if(a.skill?.type==='walk'&&!this.traffic.slotKey){trafficReserveTargetSlot(this,context);target=a.route[a.routeIndex];if(!target)return null;}
   if(motionWorldSweep(a.w,root,target,context.radius,context.ignore).fraction<1-1e-6){
    if(!this.replanStaticRoute(context))throw Error('当前物体阻断路线，且没有可用的重新规划路径');
    target=a.route[a.routeIndex];if(!target)return null;
@@ -227,7 +281,8 @@ class NaturalLocomotion {
  }
  canTransition(){return this.isSettled();}
  update(dt){
-  const e=this.engine;
+  const e=this.engine,currentTaskKey=trafficTaskKey(this.a);
+  if(this.traffic.slotTaskKey&&this.traffic.slotTaskKey!==currentTaskKey)trafficReleaseTargetSlot(this);
   if(this.traffic.active&&this.traffic.phase!==undefined&&this.traffic.phase!==this.a.phase)Object.assign(this.traffic,{active:false,mode:'clear',reason:null,blockers:[],detourEndIndex:-1});
   if(!this.requested&&e.state.command?.type==='walk')this.stop();
   this.requested=false;
