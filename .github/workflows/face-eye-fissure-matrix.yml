@@ -1,0 +1,121 @@
+name: Face eye fissure matrix
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/human-face-workbench-v1-20260915
+    paths:
+      - .github/workflows/face-eye-fissure-matrix.yml
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: fissure-84
+            upper: '.00470'
+            lower: '.00370'
+          - label: fissure-90
+            upper: '.00500'
+            lower: '.00400'
+          - label: fissure-96
+            upper: '.00530'
+            lower: '.00430'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-face-workbench-v1-20260915
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Rebuild R5 and apply fissure candidate
+        shell: bash
+        env:
+          UPPER_HEIGHT: ${{ matrix.upper }}
+          LOWER_HEIGHT: ${{ matrix.lower }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os, textwrap
+
+          workflow=Path('.github/workflows/face-eye-integration-r5-candidate.yml').read_text(encoding='utf-8')
+          marker="          python3 - <<'PY'\n"
+          start=workflow.index(marker)+len(marker)
+          end=workflow.index("\n          PY",start)
+          exec(compile(textwrap.dedent(workflow[start:end]),'r5-candidate-patch','exec'),{})
+
+          eye=Path('body/EyeAnatomy.js')
+          text=eye.read_text(encoding='utf-8')
+          old="fissure:{halfWidth:.0126,upperHeight:.00405,lowerHeight:.00305,lateralCanthusLift:.00070,upperTemporalBias:.08,lowerTemporalBias:.04,verticalRoundness:.26,upperFoldM:.00042,lowerSulcusM:.00018}"
+          new=f"fissure:{{halfWidth:.0126,upperHeight:{os.environ['UPPER_HEIGHT']},lowerHeight:{os.environ['LOWER_HEIGHT']},lateralCanthusLift:.00070,upperTemporalBias:.08,lowerTemporalBias:.04,verticalRoundness:.22,upperFoldM:.00032,lowerSulcusM:.00010}}"
+          if text.count(old)!=1: raise SystemExit('fissure candidate anchor mismatch')
+          text=text.replace(old,new,1)
+          if text.count('recess:.0002')!=1: raise SystemExit('recess anchor mismatch')
+          text=text.replace('recess:.0002','recess:.0012',1)
+          eye.write_text(text,encoding='utf-8',newline='\n')
+
+          check=Path('tools/check-eye-anatomy.mjs')
+          source=check.read_text(encoding='utf-8')
+          old_check="check(height>7&&height<8,'neutral fissure height remains in the authored human-scale range');"
+          new_check="check(height>8&&height<10,'neutral fissure height remains in the authored human-scale range');"
+          if source.count(old_check)!=1: raise SystemExit('height check anchor mismatch')
+          check.write_text(source.replace(old_check,new_check,1),encoding='utf-8',newline='\n')
+          PY
+      - name: Build and validate
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/check-eye-anatomy.mjs --parameter-fixtures
+          node tools/check-face-anatomy.mjs --parameter-fixtures
+          node tools/test-face-profile-separation.mjs
+          node tools/test-face-identity-landmarks.mjs
+          node tools/test-face-review-entry.mjs
+          node tools/test-npc-face-uniforms.mjs
+          node tools/test-face-startup.mjs
+      - name: Install browser runtime
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start static server
+        run: python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/hrl-eye-fissure-server.log 2>&1 &
+      - name: Capture fixed views
+        shell: bash
+        env:
+          VARIANT_LABEL: ${{ matrix.label }}
+        run: |
+          mkdir -p visual-review
+          cat > capture-eye-fissure.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import { writeFile } from 'node:fs/promises';
+          const label=process.env.VARIANT_LABEL;
+          const browser=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--use-gl=angle','--enable-webgl','--enable-unsafe-swiftshader','--ignore-gpu-blocklist','--disable-dev-shm-usage']});
+          const context=await browser.newContext({viewport:{width:1600,height:1200},deviceScaleFactor:1});
+          const page=await context.newPage(),consoleMessages=[],pageErrors=[];
+          page.on('console',message=>consoleMessages.push({type:message.type(),text:message.text()}));page.on('pageerror',error=>pageErrors.push(String(error?.stack||error)));
+          await page.goto('http://127.0.0.1:4173/index.html?review=face',{waitUntil:'domcontentloaded',timeout:120000});
+          let frame=null;const deadline=Date.now()+420000;
+          while(!frame&&Date.now()<deadline){for(const candidate of page.frames()){if(await candidate.evaluate(()=>Boolean(window.HumanLab?.face?.closeup)).catch(()=>false)){frame=candidate;break;}}if(!frame)await page.waitForTimeout(1000);}
+          if(!frame)throw Error('Face review frame unavailable');
+          await frame.waitForFunction(()=>window.__compactLoading?.state==='ready',null,{timeout:420000});await frame.waitForTimeout(5000);
+          const canvas=frame.locator('canvas').first();await canvas.waitFor({state:'visible',timeout:30000});
+          for(const view of ['front','side']){await frame.evaluate(v=>{window.HumanLab.face.clearExpression();window.HumanLab.face.closeup(v);},view);await frame.waitForTimeout(1500);await canvas.screenshot({path:`visual-review/${label}-${view}.png`});}
+          const diagnostics=await frame.evaluate(()=>{const report=window.HumanLab.face.report(),compact=window.HumanLab.compact?.report,gl=document.querySelector('canvas')?.getContext('webgl2');return {review:window.HumanLab.review,compactLoading:window.__compactLoading,startup:window.__humanStartup,eyeAnatomy:compact?.eyeAnatomy,faceAnatomy:compact?.faceAnatomy,separation:report.separation,renderer:{webglError:gl?gl.getError():null}};});
+          await writeFile(`visual-review/${label}-diagnostics.json`,JSON.stringify({diagnostics,consoleMessages,pageErrors},null,2));await browser.close();
+          JS
+          node capture-eye-fissure.mjs
+      - name: Upload review artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-eye-${{ matrix.label }}
+          path: visual-review
+          if-no-files-found: warn
+          retention-days: 7
