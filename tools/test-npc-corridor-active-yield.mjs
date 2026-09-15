@@ -63,21 +63,28 @@ world.population={
 };
 const stateRows=()=>actors.map(actor=>({id:actor.id,done:actor.done,position:actor.agent.pos,goal:actor.goal,targetErrorM:horizontal(actor.agent.pos,actor.goal),routeIndex:actor.agent.routeIndex,route:actor.agent.route,command:actor.locomotion.engine.state.command,status:actor.locomotion.engine.state.status,fault:actor.locomotion.engine.state.fault,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-12)}));
 const debug=(failed,error)=>({failed,error:error.message,frame:frames,bodyRadiusM,corridorHalf,actors:stateRows()});
-let minSeparation=Infinity,frames=0;
+let minSeparation=Infinity,frames=0,maxConcurrentOwners=0,circulationTravelM=0;
 for(;frames<10000&&!actors.every(actor=>actor.done);frames++){
+ const before=new Map(actors.map(actor=>[actor.id,[...actor.agent.pos]]));
  const order=frames%2?actors:[...actors].reverse();
  for(const actor of order){
   if(actor.done)continue;const a=actor.agent,l=actor.locomotion;a.time+=1/120;
   try{const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving)actor.done=true;}catch(error){console.error('CORRIDOR_DEBUG '+JSON.stringify(debug(actor.id,error)));throw error;}
  }
+ const owners=actors.filter(actor=>actor.locomotion.traffic.mode==='corridor-owner'&&actor.locomotion.traffic.corridorOwner===actor.id);
+ maxConcurrentOwners=Math.max(maxConcurrentOwners,owners.length);
+ assert(owners.length<=1,'one narrow corridor cannot have two simultaneous direction owners');
+ for(const actor of actors)if(actor.locomotion.traffic.mode==='corridor-circulation')circulationTravelM+=horizontal(before.get(actor.id),actor.agent.pos);
  minSeparation=Math.min(minSeparation,horizontal(actors[0].agent.pos,actors[1].agent.pos));
 }
-if(!actors.every(actor=>actor.done))console.error('CORRIDOR_FINAL '+JSON.stringify({frames,minSeparation,bodyRadiusM,corridorHalf,actors:stateRows()}));
+if(!actors.every(actor=>actor.done))console.error('CORRIDOR_FINAL '+JSON.stringify({frames,minSeparation,bodyRadiusM,corridorHalf,maxConcurrentOwners,circulationTravelM,actors:stateRows()}));
 assert(actors.every(actor=>actor.done),'both corridor users must complete their original routes');
 for(const actor of actors){assert(horizontal(actor.agent.pos,actor.goal)<.025);assert(!Object.hasOwn(actor.locomotion.traffic,'waitS'));}
 assert(minSeparation>.50,'continuous sweep must retain body clearance');
 const claims=actors.reduce((n,a)=>n+a.locomotion.traffic.corridorClaims,0),yields=actors.reduce((n,a)=>n+a.locomotion.traffic.corridorYields,0);
 assert(claims>=1,'one direction must obtain corridor ownership');
+assert.equal(maxConcurrentOwners,1,'the exclusive direction owner must be observable during passage');
 assert(yields>=1,'the opposite direction must actively retreat or side-step');
-assert(actors.some(actor=>actor.agent.logs.some(message=>message.includes('主动撤到通道外'))));
-console.log(JSON.stringify({passed:true,agents:2,frames,bodyRadiusM,corridorHalf,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,parkingWait:false}));
+assert(circulationTravelM>.1,'the non-owner must keep circulating instead of parking');
+assert(actors.some(actor=>actor.agent.logs.some(message=>message.includes('循环路线'))));
+console.log(JSON.stringify({passed:true,agents:2,frames,bodyRadiusM,corridorHalf,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,maxConcurrentOwners,circulationTravelM,parkingWait:false}));
