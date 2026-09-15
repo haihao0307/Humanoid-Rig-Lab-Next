@@ -64,6 +64,14 @@ jobs:
           if text.count(old)!=1:
               raise SystemExit('R8 white-roll attachment anchor mismatch')
           path.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
+
+          check_path=Path('tools/check-face-anatomy.mjs')
+          check=check_path.read_text(encoding='utf-8')
+          old="check(source.includes('function compactPerioralDepth')&&source.includes('whiteRollUpper:.00024')&&source.includes('mentalisHeight:.00105'),'philtrum, white roll, labiomental crease and mentalis pad are explicit bounded structures');"
+          new="check(source.includes('function compactPerioralDepth')&&source.includes('whiteRollUpper:.00012')&&source.includes('mentalisHeight:.00072'),'philtrum, white roll, labiomental crease and mentalis pad are explicit bounded structures');"
+          if check.count(old)!=1:
+              raise SystemExit('R8 source contract corrective anchor mismatch')
+          check_path.write_text(check.replace(old,new,1),encoding='utf-8',newline='\n')
           PY
       - name: Build and validate candidate
         run: |
