@@ -267,7 +267,7 @@ class NaturalLocomotion {
  }
  installCorridorYield(conflict,context,descriptor,lease){
   const a=this.a,goal=this.traffic.slotPoint||a.route.at(-1),other=conflict.actor;if(!goal||!other)return false;
-  const first=this.traffic.corridorKey!==descriptor.key||this.traffic.corridorOwner!==lease.ownerId;
+  const first=this.traffic.mode!=='corridor-circulation'||this.traffic.corridorKey!==descriptor.key||this.traffic.corridorOwner!==lease.ownerId;
   Object.assign(this.traffic,{corridorKey:descriptor.key,corridorTaskKey:trafficTaskKey(a),corridorOwner:lease.ownerId,corridorDirection:descriptor.sign,corridorDescriptor:descriptor,mode:'corridor-circulation',reason:'opposing-narrow-corridor',blockers:[other.id],originalTarget:[...goal]});
   if(first){this.traffic.corridorOrbit=null;this.traffic.corridorOrbitIndex=0;this.traffic.corridorOrbitLaps=0;this.traffic.corridorYields++;}
   if(!this.normalizeCorridorRoute(context,goal))return false;
