@@ -1,0 +1,191 @@
+name: Bruce R13Q Canaan photographic evidence
+
+on:
+  push:
+    branches:
+      - automation/bruce-r13q-canaan-photo-evidence-20260915
+    paths:
+      - .github/workflows/bruce_r13q_canaan_photo_evidence.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-audit-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Fetch real-photo evidence and source pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="bruce_r13q_canaan_photo_evidence"
+          mkdir -p "$ROOT/originals" "$ROOT/evidence" "$ROOT/reports"
+          UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/153 Safari/537.36 BruceR13Q/1.0'
+
+          fetch() {
+            local url="$1"
+            local out="$2"
+            curl --fail --location --retry 3 --retry-all-errors \
+              -A "$UA" -H 'Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8' \
+              "$url" --output "$out"
+          }
+
+          fetch 'https://upload.wikimedia.org/wikipedia/commons/f/fe/CanaanDogChakede.jpg' \
+            "$ROOT/originals/CanaanDogChakede_side.jpg"
+          fetch 'https://upload.wikimedia.org/wikipedia/commons/8/88/CanaanDogFace.jpg' \
+            "$ROOT/originals/CanaanDogFace_front.jpg"
+          fetch 'https://upload.wikimedia.org/wikipedia/commons/a/a1/Canaan-fawn.jpg' \
+            "$ROOT/originals/Canaan-fawn_standing.jpg"
+          fetch 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Cannan_Dog_Sitting.JPG' \
+            "$ROOT/originals/Cannan_Dog_Sitting_3q.jpg"
+
+          # Same-session supplementary views. They are optional evidence only.
+          for n in 1 2 3; do
+            curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+              "https://commons.wikimedia.org/wiki/Special:Redirect/file/Kaanaankoirab%26w${n}.jpg" \
+              --output "$ROOT/originals/Kaanaankoirabw${n}.jpg" || true
+          done
+
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            'https://commons.wikimedia.org/wiki/File:CanaanDogChakede.jpg' \
+            --output "$ROOT/evidence/CanaanDogChakede_file_page.html"
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            'https://commons.wikimedia.org/wiki/File:CanaanDogFace.jpg' \
+            --output "$ROOT/evidence/CanaanDogFace_file_page.html"
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            'https://commons.wikimedia.org/wiki/File:Canaan-fawn.jpg' \
+            --output "$ROOT/evidence/Canaan-fawn_file_page.html"
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            'https://commons.wikimedia.org/wiki/File:Cannan_Dog_Sitting.JPG' \
+            --output "$ROOT/evidence/Cannan_Dog_Sitting_file_page.html"
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            'https://www.fci.be/en/nomenclature/CANAAN-DOG-273.html' \
+            --output "$ROOT/evidence/FCI_Canaan_Dog_273.html"
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            'https://creativecommons.org/licenses/by/4.0/legalcode.txt' \
+            --output "$ROOT/evidence/CC-BY-4.0-legalcode.txt"
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            'https://creativecommons.org/licenses/by-sa/3.0/legalcode.txt' \
+            --output "$ROOT/evidence/CC-BY-SA-3.0-legalcode.txt"
+          curl --fail --location --retry 3 --retry-all-errors -A "$UA" \
+            'https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt' \
+            --output "$ROOT/evidence/CC-BY-SA-4.0-legalcode.txt"
+
+      - name: Write manifest and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          from PIL import Image
+
+          root = Path('bruce_r13q_canaan_photo_evidence')
+          records = [
+              {
+                  'file': 'CanaanDogChakede_side.jpg',
+                  'role': 'standing_left_side_low_frequency_proportion',
+                  'author': 'Alexandra Baranova / Samorodok Hanaana',
+                  'license': 'CC-BY-SA-3.0 or GFDL',
+                  'source_page': 'https://commons.wikimedia.org/wiki/File:CanaanDogChakede.jpg',
+                  'same_subject_group': 'chakede_side_only',
+                  'view': 'left_side_near_profile',
+              },
+              {
+                  'file': 'CanaanDogFace_front.jpg',
+                  'role': 'front_head_landmarks_and_symmetry',
+                  'author': 'Arikk',
+                  'license': 'CC-BY-SA-3.0 or GFDL',
+                  'source_page': 'https://commons.wikimedia.org/wiki/File:CanaanDogFace.jpg',
+                  'same_subject_group': 'unknown_individual_face',
+                  'view': 'front_head_closeup',
+              },
+              {
+                  'file': 'Canaan-fawn_standing.jpg',
+                  'role': 'standing_side_contrast_female',
+                  'author': 'Canarian',
+                  'license': 'CC-BY-SA-4.0',
+                  'source_page': 'https://commons.wikimedia.org/wiki/File:Canaan-fawn.jpg',
+                  'same_subject_group': 'unknown_individual_fawn',
+                  'view': 'left_side_show_stance',
+              },
+              {
+                  'file': 'Cannan_Dog_Sitting_3q.jpg',
+                  'role': 'head_neck_chest_three_quarter_relation',
+                  'author': 'Raz Sofer',
+                  'license': 'CC-BY-4.0',
+                  'source_page': 'https://commons.wikimedia.org/wiki/File:Cannan_Dog_Sitting.JPG',
+                  'same_subject_group': 'unknown_individual_sitting',
+                  'view': 'front_left_three_quarter_sitting',
+              },
+          ]
+          optional = sorted(root.joinpath('originals').glob('Kaanaankoirabw*.jpg'))
+          for p in optional:
+              if p.stat().st_size < 1000:
+                  p.unlink(missing_ok=True)
+                  continue
+              records.append({
+                  'file': p.name,
+                  'role': 'same_session_canaan_supplementary_view_candidate',
+                  'author': 'Canarian',
+                  'license': 'CC-BY-4.0',
+                  'source_page': f'https://commons.wikimedia.org/wiki/File:{p.stem.replace("Kaanaankoirabw", "Kaanaankoirab%26w")}.jpg',
+                  'same_subject_group': 'canarian_black_white_2026_session_unknown_identity',
+                  'view': 'unclassified_until_visual_review',
+              })
+
+          for rec in records:
+              p = root / 'originals' / rec['file']
+              rec['size_bytes'] = p.stat().st_size
+              rec['sha256'] = hashlib.sha256(p.read_bytes()).hexdigest()
+              with Image.open(p) as im:
+                  rec['pixel_size'] = [im.width, im.height]
+                  rec['mode'] = im.mode
+
+          manifest = {
+              'schema': 'bruce/r13q_real_photo_evidence_manifest@1.0',
+              'identity': 'Canaan Dog photographic evidence set',
+              'purpose': 'real-photo landmark and low-frequency proportion constraints for a future neutral canine anchor; not a 3D scan and not a single-individual multiview reconstruction',
+              'breed_authority': 'FCI breed identity and broad standard context only',
+              'anatomical_authority': False,
+              'single_subject_multiview': False,
+              'photogrammetry_ready': False,
+              'files': records,
+              'boundaries': {
+                  'allowed': [
+                      'record 2D landmarks and silhouette ratios per image',
+                      'compare low-frequency canine proportions across real photographs',
+                      'constrain future neutral-canine parameter search ranges',
+                  ],
+                  'forbidden': [
+                      'fuse different individuals as if they were one dog',
+                      'infer absolute 3D depth from one view',
+                      'claim veterinary anatomy or Chinese village-dog identity',
+                      'copy coat pattern into body structure',
+                  ],
+              },
+          }
+          (root / 'reports' / 'SOURCE_MANIFEST.json').write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
+          )
+          PY
+
+          (
+            cd bruce_r13q_canaan_photo_evidence
+            find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+            sha256sum -c SHA256SUMS.txt
+          )
+
+      - name: Upload photographic evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruce-r13q-canaan-photo-evidence
+          path: bruce_r13q_canaan_photo_evidence
+          if-no-files-found: error
+          retention-days: 7
