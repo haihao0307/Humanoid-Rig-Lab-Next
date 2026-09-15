@@ -38,18 +38,22 @@ try{
  assert.equal(bridge.hasInvert,true);
  assert.match(bridge.recipients,/任务接收者/);
  const before=await page.evaluate(()=>{
-  const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,rows=lab.population.list();
-  assertBrowser(rows.length>=2,'browser cast must contain at least two NPCs');
+  const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab;
+  const stopped=lab.population.control('stop','all');
+  const rejected=stopped.filter(row=>row.accepted===false);
+  if(rejected.length)throw Error('browser setup could not stop all NPC tasks: '+JSON.stringify(rejected));
+  const rows=lab.population.list();
+  if(rows.length<2)throw Error('browser cast must contain at least two NPCs');
   const chosen=rows[0];lab.population.select([chosen.id]);
   return{chosenId:chosen.id,chosenLabel:chosen.label,rows:rows.map(row=>({id:row.id,completed:lab.population.get(row.id).agent.stats.completed,position:[...lab.population.get(row.id).agent.pos]}))};
  });
  await page.waitForFunction(label=>document.querySelector('[data-el="taskRecipients"]')?.textContent===`任务接收者（1）：${label}`,before.chosenLabel,{timeout:10000});
- const execution=await page.evaluate(({chosenId})=>{
+ const execution=await page.evaluate(()=>{
   const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab;
   const result=lab.population.dispatch('挥手',{targets:'selected',mode:'replace'});
   lab.advance(4.2);
-  return{result,rows:lab.population.list().map(row=>({id:row.id,completed:lab.population.get(row.id).agent.stats.completed,error:lab.population.get(row.id).agent.error,position:[...lab.population.get(row.id).agent.pos]})),selected:lab.population.list().filter(row=>row.selected).map(row=>row.id),chosenId};
- },{chosenId:before.chosenId});
+  return{result,rows:lab.population.list().map(row=>({id:row.id,completed:lab.population.get(row.id).agent.stats.completed,error:lab.population.get(row.id).agent.error,position:[...lab.population.get(row.id).agent.pos]})),selected:lab.population.list().filter(row=>row.selected).map(row=>row.id)};
+ });
  assert.deepEqual(execution.selected,[before.chosenId]);
  assert.equal(execution.result.length,1);
  assert.equal(execution.result[0].id,before.chosenId);
@@ -65,5 +69,3 @@ try{
 }finally{
  await browser.close();
 }
-
-function assertBrowser(value,message){if(!value)throw Error(message);}
