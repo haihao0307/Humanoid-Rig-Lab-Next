@@ -103,7 +103,7 @@ function trafficReserveTargetSlot(locomotion,context){
  const claims=runtime.slots.get(key)||new Map(),minimumGap=Math.max(.58,context.radius*2+TRAFFIC_AVOIDANCE.slotGapM),root=locomotion.engine?.state?.root||a.pos;
  for(const [index,point]of trafficSlotCandidates(a,goal,context).entries()){
   if([...claims.values()].some(claim=>horizontal(claim.point,point)<minimumGap))continue;
-  if(population.collisionFor?.(a,point,context.radius))continue;
+  if((index>0||claims.size)&&population.collisionFor?.(a,point,context.radius))continue;
   let route;try{route=a.w.path(root,point,context.radius,context.ignore);}catch{continue;}
   if(!Array.isArray(route)||!route.length)continue;
   claims.set(a.npcId,{point:[...point],index,taskKey});runtime.slots.set(key,claims);
