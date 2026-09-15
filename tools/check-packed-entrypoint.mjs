@@ -6,34 +6,56 @@ import {assemble} from './build-pure.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const read=path=>readFileSync(root+path,'utf8');
-const template=read('source/index.template.html');
-const uploaded=read('index.html');
-const marker=/\/\*__(BODY_GZIP|BRAIN_GZIP)__\*\//g;
-const names=[],parts=[];let cursor=0,match;
-while((match=marker.exec(template))){parts.push(template.slice(cursor,match.index));names.push(match[1]);cursor=marker.lastIndex;}
-parts.push(template.slice(cursor));
-if(names.length!==2||!names.includes('BODY_GZIP')||!names.includes('BRAIN_GZIP'))throw Error('入口模板压缩占位符不完整');
-
-const payloads={};let at=0;
-for(let index=0;index<names.length;index++){
- const before=parts[index],after=parts[index+1];
- if(!uploaded.startsWith(before,at))throw Error('上传入口的静态外壳与模板不一致：'+names[index]);
- at+=before.length;
- const end=uploaded.indexOf(after,at);
- if(end<0)throw Error('上传入口缺少占位符后的静态外壳：'+names[index]);
- payloads[names[index]]=uploaded.slice(at,end);at=end;
-}
-if(uploaded.slice(at)!==parts.at(-1))throw Error('上传入口尾部与模板不一致');
-for(const [name,value]of Object.entries(payloads))if(!/^[A-Za-z0-9+/=]+$/.test(value))throw Error(name+' 不是有效 Base64 载荷');
-
-const unpack=value=>gunzipSync(Buffer.from(value,'base64')).toString();
-const uploadedBody=unpack(payloads.BODY_GZIP),uploadedBrain=unpack(payloads.BRAIN_GZIP);
-const generated=assemble();
-if(uploadedBody!==generated.body)throw Error('上传入口解压后的身体页面与当前源码装配不一致');
-if(uploadedBrain!==generated.brain)throw Error('上传入口解压后的认知页面与当前源码装配不一致');
-
 const sha=text=>createHash('sha256').update(text).digest('hex');
-const generatedBodyPayload=/^[A-Za-z0-9+/=]+$/.test(payloads.BODY_GZIP)&&sha(payloads.BODY_GZIP);
+const normalize=text=>text.replace(/\r\n/g,'\n');
+const uploaded=read('index.html');
+const generated=assemble();
+
+// The two embedded pages are very large quoted Base64 gzip literals. Their
+// exact compressed bytes can differ across zlib builds even when their decoded
+// HTML is identical. Extract by payload shape rather than surrounding source
+// formatting, then compare both decoded pages and the remaining static shell.
+const payloadPattern=/(["'`])([A-Za-z0-9+/=]{100000,})\1/g;
+function extractPacked(text,label){
+ const payloads=[];
+ const masked=normalize(text.replace(payloadPattern,(full,quote,value)=>{
+  payloads.push(value);
+  return quote+'__PACKED_PAYLOAD_'+payloads.length+'__'+quote;
+ }));
+ if(payloads.length!==2)throw Error(label+' 应包含 2 个压缩页面载荷，实际 '+payloads.length);
+ return {payloads,masked};
+}
+function unpack(value,label){
+ try{return gunzipSync(Buffer.from(value,'base64')).toString();}
+ catch(error){throw Error(label+' 无法解压：'+error.message);}
+}
+const expected={body:generated.body,brain:generated.brain};
+function classify(payloads,label){
+ const found={};
+ for(let index=0;index<payloads.length;index++){
+  const text=unpack(payloads[index],label+' #'+(index+1));
+  const kind=Object.entries(expected).find(([,expectedText])=>text===expectedText)?.[0];
+  if(!kind)throw Error(label+' 的压缩载荷 #'+(index+1)+' 与当前 body/brain 源码均不一致');
+  if(found[kind])throw Error(label+' 重复包含 '+kind+' 载荷');
+  found[kind]={payload:payloads[index],text,index};
+ }
+ for(const kind of Object.keys(expected))if(!found[kind])throw Error(label+' 缺少 '+kind+' 载荷');
+ return found;
+}
+function firstDifference(a,b){
+ const length=Math.min(a.length,b.length);let index=0;
+ while(index<length&&a.charCodeAt(index)===b.charCodeAt(index))index++;
+ if(index===length&&a.length===b.length)return null;
+ return {index,left:a.slice(Math.max(0,index-80),index+120),right:b.slice(Math.max(0,index-80),index+120),leftLength:a.length,rightLength:b.length};
+}
+
+const uploadedPacked=extractPacked(uploaded,'上传入口');
+const generatedPacked=extractPacked(generated.index,'当前装配入口');
+const uploadedPages=classify(uploadedPacked.payloads,'上传入口');
+const generatedPages=classify(generatedPacked.payloads,'当前装配入口');
+const shellDifference=firstDifference(uploadedPacked.masked,generatedPacked.masked);
+if(shellDifference)throw Error('上传入口的静态外壳与当前模板不一致：'+JSON.stringify(shellDifference));
+
 console.log(JSON.stringify({
  schema:'jarvis/packed_entrypoint_check@1',
  staticShellMatches:true,
@@ -42,9 +64,12 @@ console.log(JSON.stringify({
  uploadedIndexSHA256:sha(uploaded),
  assembledIndexSHA256:sha(generated.index),
  compressedBytesIdentical:uploaded===generated.index,
- uploadedBodyGzipSHA256:generatedBodyPayload,
- uploadedBodyBytes:Buffer.byteLength(uploadedBody),
- uploadedBrainBytes:Buffer.byteLength(uploadedBrain),
- explanation:uploaded===generated.index?'exact packed entrypoint match':'decompressed payload and static shell match; gzip bytes differ across zlib builds',
+ uploadedBodyGzipSHA256:sha(uploadedPages.body.payload),
+ uploadedBrainGzipSHA256:sha(uploadedPages.brain.payload),
+ assembledBodyGzipSHA256:sha(generatedPages.body.payload),
+ assembledBrainGzipSHA256:sha(generatedPages.brain.payload),
+ uploadedBodyBytes:Buffer.byteLength(uploadedPages.body.text),
+ uploadedBrainBytes:Buffer.byteLength(uploadedPages.brain.text),
+ explanation:uploaded===generated.index?'exact packed entrypoint match':'decoded body/brain pages and static shell match; gzip bytes differ across zlib builds',
  applicationExecuted:false
 },null,2));
