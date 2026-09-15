@@ -76,6 +76,11 @@ jobs:
             'https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt' \
             --output "$ROOT/evidence/CC-BY-SA-4.0-legalcode.txt"
 
+      - name: Install image metadata dependency
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check --quiet pillow
+
       - name: Write manifest and checksums
         shell: bash
         run: |
