@@ -49,10 +49,22 @@ jobs:
           text=text.replace(helper_old,helper_new,1)
 
           state_old="corridorClaims:0,corridorYields:0};this.sync();"
-          state_new="corridorClaims:0,corridorYields:0,priorityPasses:0,priorityActor:null,priorityUntilS:0};this.sync();"
+          state_new="corridorClaims:0,corridorYields:0,priorityPasses:0,priorityActor:null,priorityUntilS:0,progressKey:null,progressBestM:Infinity,progressAtS:0,progressPlanAtS:0,progressRecoveries:0};this.sync();"
           if text.count(state_old)!=1:
               raise SystemExit(f'traffic state anchor count: {text.count(state_old)}')
           text=text.replace(state_old,state_new,1)
+
+          rolling_old="if(this.world.free(target,.23))return target;"
+          rolling_new="if(this.world.free(target,.23)&&trafficSegmentClear(a,root,target,context))return target;"
+          if text.count(rolling_old)!=1:
+              raise SystemExit(f'rolling sweep anchor count: {text.count(rolling_old)}')
+          text=text.replace(rolling_old,rolling_new,1)
+
+          maintained_old="const maintained=this.maintainCorridor(context,target);if(maintained)return maintained;\n  const predicted=predictTrafficConflict(a,speed,context);"
+          maintained_new="const maintained=this.maintainCorridor(context,target);if(maintained)return maintained;\n  if(this.recoverStalledRoute(context)){target=a.route[a.routeIndex];if(!target)return null;}\n  const predicted=predictTrafficConflict(a,speed,context);"
+          if text.count(maintained_old)!=1:
+              raise SystemExit(f'progress integration anchor count: {text.count(maintained_old)}')
+          text=text.replace(maintained_old,maintained_new,1)
 
           prepare_old=(
               "  if(predicted){\n"
@@ -72,7 +84,7 @@ jobs:
               "  if(openPriority){\n"
               "   const first=this.traffic.priorityActor!==predicted.actor.id||a.time>=this.traffic.priorityUntilS;\n"
               "   if(first&&['detour','retreat','escape'].includes(this.traffic.mode)){this.replanStaticRoute(context,'open-intersection-priority');target=a.route[a.routeIndex]||target;}\n"
-              "   Object.assign(this.traffic,{active:false,mode:'priority-pass',reason:'open-intersection-priority',blockers:[predicted.actor.id],side:0,detourEndIndex:-1,originalTarget:[...(this.traffic.slotPoint||a.route.at(-1)||target)],priorityActor:predicted.actor.id,priorityUntilS:a.time+1.2,lastPlanAtS:a.time,lastError:null,advancePoint:null,advanceRouteIndex:-1});\n"
+              "   Object.assign(this.traffic,{active:false,mode:'priority-pass',reason:'open-intersection-priority',blockers:[predicted.actor.id],side:0,detourEndIndex:-1,originalTarget:[...(this.traffic.slotPoint||a.route.at(-1)||target)],priorityActor:predicted.actor.id,priorityUntilS:a.time+1.2,lastPlanAtS:first?a.time:this.traffic.lastPlanAtS,lastError:null,advancePoint:null,advanceRouteIndex:-1});\n"
               "   if(first){this.traffic.priorityPasses++;a.log?.('开放交叉区域采用稳定通行优先级，保持原路线，由 '+predicted.actor.label+' 主动绕行');}\n"
               "  }\n"
               "  const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;if(openPriority&&rolling===target)return target;"
@@ -93,6 +105,26 @@ jobs:
           if text.count(conflict_old)!=1:
               raise SystemExit(f'priority conflict anchor count: {text.count(conflict_old)}')
           text=text.replace(conflict_old,conflict_new,1)
+
+          watchdog_anchor=" }\n recoverNavigationBlock(message){"
+          watchdog_new=(
+              " }\n"
+              " recoverStalledRoute(context){\n"
+              "  const a=this.a,t=this.traffic,root=this.engine.state.root,taskKey=trafficTaskKey(a),goal=t.slotPoint||a.route.at(-1);if(!goal||a.skill?.type!=='walk')return false;\n"
+              "  let remaining=0,from=root;for(let i=a.routeIndex;i<a.route.length;i++){remaining+=horizontal(from,a.route[i]);from=a.route[i];}\n"
+              "  const key=(taskKey||'walk')+'|'+goal.map(v=>Number(v).toFixed(2)).join(',');\n"
+              "  if(t.progressKey!==key||t.progressPlanAtS!==t.lastPlanAtS||!Number.isFinite(t.progressBestM)){Object.assign(t,{progressKey:key,progressBestM:remaining,progressAtS:a.time,progressPlanAtS:t.lastPlanAtS,progressRecoveries:t.progressKey===key?t.progressRecoveries:0});return false;}\n"
+              "  if(remaining<.06||remaining<t.progressBestM-.08){t.progressBestM=remaining;t.progressAtS=a.time;return false;}\n"
+              "  if(a.time-t.progressAtS<2.8||a.time-t.lastPlanAtS<.8)return false;\n"
+              "  if(t.progressRecoveries>=8)throw Error('路线持续移动但未缩短剩余路程，完成 8 次重新规划后仍无进展');\n"
+              "  if(!this.replanStaticRoute(context,'no-route-progress'))throw Error('路线持续无进展，且当前环境没有可用的重新规划路径');\n"
+              "  t.progressRecoveries++;t.progressBestM=Infinity;t.progressAtS=a.time;t.progressPlanAtS=t.lastPlanAtS;a.log?.('路线持续移动但未缩短剩余路程，已重新计算任务终点路线');return true;\n"
+              " }\n"
+              " recoverNavigationBlock(message){"
+          )
+          if text.count(watchdog_anchor)!=1:
+              raise SystemExit(f'progress watchdog anchor count: {text.count(watchdog_anchor)}')
+          text=text.replace(watchdog_anchor,watchdog_new,1)
           path.write_text(text,encoding='utf-8',newline='\n')
 
           browser=Path('tools/test-task-crowd-browser.mjs')
@@ -101,20 +133,26 @@ jobs:
               "return population>=4;":"return w?.__humanStartup?.status==='ready'&&population>=6&&pending===0;",
               "assert.notEqual(ready.startup?.status,'failed','browser crowd startup failed: '+JSON.stringify(ready));":"assert.equal(ready.startup?.status,'ready','full review cast did not reach ready: '+JSON.stringify(ready));",
               "assert(ready.population>=4,'crowd browser scenario requires at least four real NPCs');":"assert(ready.population>=6,'crowd browser scenario requires the six-person review cast');\n assert.equal(ready.pending,0,'review-cast generation must finish before traffic scenarios');",
-              "['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations']":"['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations','priorityPasses']",
-              "assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');":"assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');\n const browserPriorityPasses=crossing.actors.reduce((sum,actor)=>sum+(Number(actor.traffic.priorityPasses)||0),0);\n assert(browserPriorityPasses>=1,'four-way browser crossing did not issue deterministic open-area right of way');\n assert(browserPriorityPasses<64,'open-area right of way thrashed instead of remaining stable');"
+              "['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations']":"['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations','priorityPasses','progressRecoveries']",
+              "assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');":"assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');\n const browserPriorityPasses=crossing.actors.reduce((sum,actor)=>sum+(Number(actor.traffic.priorityPasses)||0),0),browserKernelRecoveries=crossing.actors.reduce((sum,actor)=>sum+(Number(actor.traffic.recoveries)||0),0);\n assert(browserPriorityPasses>=1,'four-way browser crossing did not issue deterministic open-area right of way');\n assert(browserPriorityPasses<64,'open-area right of way thrashed instead of remaining stable');\n assert(browserKernelRecoveries<128,'browser crossing repeatedly drove the motion kernel into blocked recovery');",
+              "assert(crossing.actors.every(actor=>actor.pathRatio<3.4),'browser crossing produced an excessive detour');":"assert(crossing.actors.every(actor=>actor.pathRatio<3.4),'browser crossing produced an excessive detour');\n assert(crossing.actors.every(actor=>actor.maxStationaryS<15),'browser crossing left an actor stationary for too long');"
           }
           for old,new in replacements.items():
               count=text.count(old)
               if count!=1:
                   raise SystemExit(f'browser patch site count {count} for {old[:80]!r}')
               text=text.replace(old,new,1)
+          actor_old="traffic:{...actor.agent.locomotion.traffic}}))"
+          actor_new="position:[...actor.agent.pos],phase:actor.agent.phase,routeIndex:actor.agent.routeIndex,route:actor.agent.route.map(point=>[...point]),kernelStatus:actor.agent.locomotion.engine.state.status,kernelCommand:structuredClone(actor.agent.locomotion.engine.state.command),logs:actor.agent.logs?.slice?.(-12)||[],traffic:{...actor.agent.locomotion.traffic}}))"
+          if text.count(actor_old)<1:
+              raise SystemExit('browser actor diagnostic anchor missing')
+          text=text.replace(actor_old,actor_new,1)
           browser.write_text(text,encoding='utf-8',newline='\n')
 
           unit=Path('tools/test-npc-four-way-crossing.mjs')
           text=unit.read_text(encoding='utf-8')
           old="const trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries+(actor.locomotion.traffic.escapes||0),0);\nassert(trafficActions>0,'the crossing must exercise predictive traffic handling');"
-          new="const priorityPasses=actors.reduce((sum,actor)=>sum+(actor.locomotion.traffic.priorityPasses||0),0),trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries+(actor.locomotion.traffic.escapes||0)+(actor.locomotion.traffic.priorityPasses||0),0);\nassert(trafficActions>0,'the crossing must exercise predictive traffic handling');\nassert(priorityPasses>0,'the crossing must issue a deterministic open-area right of way');\nassert(priorityPasses<64,'open-area right of way must remain stable instead of thrashing');"
+          new="const priorityPasses=actors.reduce((sum,actor)=>sum+(actor.locomotion.traffic.priorityPasses||0),0),kernelRecoveries=actors.reduce((sum,actor)=>sum+(actor.locomotion.traffic.recoveries||0),0),trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries+(actor.locomotion.traffic.escapes||0)+(actor.locomotion.traffic.priorityPasses||0)+(actor.locomotion.traffic.progressRecoveries||0),0);\nassert(trafficActions>0,'the crossing must exercise predictive traffic handling');\nassert(priorityPasses>0,'the crossing must issue a deterministic open-area right of way');\nassert(priorityPasses<64,'open-area right of way must remain stable instead of thrashing');\nassert(kernelRecoveries<128,'the crossing must not repeatedly drive the motion kernel into blocked recovery');"
           if text.count(old)!=1:
               raise SystemExit(f'unit priority metric anchor count: {text.count(old)}')
           unit.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
@@ -171,5 +209,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add body/NaturalLocomotion.js tools/test-task-crowd-browser.mjs tools/test-npc-four-way-crossing.mjs index.html
-          git commit -m "fix(task): add bounded open-intersection priority R2.7"
+          git commit -m "fix(task): add swept open-intersection recovery R2.7"
           git push origin HEAD:feature/human-task-workbench-adjustment-v2-fullbase
