@@ -2,6 +2,34 @@
 // query the same collision footprints; furniture is never removed for routing.
 const navigationBatches=new WeakMap();
 const navigationDirections=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+function navigationSegmentHitsObject(start,end,o,padding){
+ // Exact continuous footprint test, matching the locomotion sweep. Sampling
+ // every 7.5 cm can miss a short chord through an expanded rounded corner.
+ const tilted=objectTilted(o),yaw=tilted?0:objectYaw(o),c=Math.cos(yaw),s=Math.sin(yaw);
+ const local=p=>{const x=p[0]-o.p[0],z=p[2]-o.p[2];return[c*x-s*z,s*x+c*z];};
+ const a=local(start),b=local(end),delta=[b[0]-a[0],b[1]-a[1]];
+ const circle=(x,z,r)=>{
+  const dx=a[0]-x,dz=a[1]-z,length2=delta[0]**2+delta[1]**2;
+  const t=length2?clamp(-(dx*delta[0]+dz*delta[1])/length2,0,1):0;
+  return (dx+delta[0]*t)**2+(dz+delta[1]*t)**2<=r*r;
+ };
+ const rectangle=(rx,rz)=>{
+  let enter=0,exit=1;
+  for(let i=0;i<2;i++){
+   const half=i?rz:rx;
+   if(Math.abs(delta[i])<1e-12){if(Math.abs(a[i])>half)return false;continue;}
+   const low=(-half-a[i])/delta[i],high=(half-a[i])/delta[i];
+   enter=Math.max(enter,Math.min(low,high));exit=Math.min(exit,Math.max(low,high));
+   if(enter>exit)return false;
+  }
+  return true;
+ };
+ if(tilted){const [rx,rz]=objectFootprint(o);return rectangle(rx+padding,rz+padding);}
+ if(o.shape!=='box')return circle(0,0,o.r+padding);
+ const rx=o.w/2,rz=o.d/2;
+ if(rectangle(rx+padding,rz)||rectangle(rx,rz+padding))return true;
+ return [-1,1].some(x=>[-1,1].some(z=>circle(x*rx,z*rz,padding)));
+}
 function navigationQueryBatch(world,query){
  // Only synchronous, read-only forecasts may share a snapshot. A physics
  // frame can move objects without changing world.revision, so nothing here
@@ -40,7 +68,14 @@ function campGridPath(world,start,end,r=.26,ignore=[]) {
  const {obstacles,buckets}=context,bucketSize=1.5,key=(x,z)=>x+':'+z;
  const inBounds=p=>p[0]-r>=bounds.xMin&&p[0]+r<=bounds.xMax&&p[2]-r>=bounds.zMin&&p[2]+r<=bounds.zMax;
  const collision=p=>{if(!inBounds(p))return true;const seen=new Set(),padding=r+.06;for(let z=Math.floor((p[2]-padding)/bucketSize);z<=Math.floor((p[2]+padding)/bucketSize);z++)for(let x=Math.floor((p[0]-padding)/bucketSize);x<=Math.floor((p[0]+padding)/bucketSize);x++)for(const o of buckets.get(key(x,z))||[]){if(seen.has(o.id))continue;seen.add(o.id);if(pointToObjectClearance(p,o)<padding)return true;}return false;};
- const clear=(a,b)=>{const n=Math.max(1,Math.ceil(horizontal(a,b)/.075));for(let k=1;k<=n;k++)if(collision(mix(a,b,k/n)))return false;return true;};
+ const clear=(a,b)=>{
+  if(!inBounds(a)||!inBounds(b))return false;
+  const seen=new Set(),padding=r+.06;
+  for(let z=Math.floor((Math.min(a[2],b[2])-padding)/bucketSize);z<=Math.floor((Math.max(a[2],b[2])+padding)/bucketSize);z++)for(let x=Math.floor((Math.min(a[0],b[0])-padding)/bucketSize);x<=Math.floor((Math.max(a[0],b[0])+padding)/bucketSize);x++)for(const o of buckets.get(key(x,z))||[]){
+   if(seen.has(o.id))continue;seen.add(o.id);if(navigationSegmentHitsObject(a,b,o,padding))return false;
+  }
+  return true;
+ };
  if(!inBounds(end))throw Error('目标超出当前场景边界');
  if(collision(end))throw Error('目标站位被占用');
  const overlaps=obstacles.filter(o=>pointToObjectClearance(start,o)<r+.06);

@@ -69,16 +69,19 @@ world.population={
 };
 const stateRows=()=>actors.map(actor=>({id:actor.id,done:actor.done,position:actor.agent.pos,goal:actor.goal,targetErrorM:horizontal(actor.agent.pos,actor.goal),routeIndex:actor.agent.routeIndex,route:actor.agent.route,command:actor.locomotion.engine.state.command,status:actor.locomotion.engine.state.status,fault:actor.locomotion.engine.state.fault,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-12)}));
 const debug=(failed,error)=>({failed,error:error.message,frame:frames,bodyRadiusM,corridorHalf,actors:stateRows()});
-let minSeparation=Infinity,frames=0,maxConcurrentOwners=0,circulationTravelM=0;
+let minSeparation=Infinity,frames=0,maxConcurrentOwners=0,circulationTravelM=0,ownerHeldAtArrival=false;
 for(;frames<10000&&!actors.every(actor=>actor.done);frames++){
  world.population.elapsedS+=1/120;
  const before=new Map(actors.map(actor=>[actor.id,[...actor.agent.pos]]));
  const order=frames%2?actors:[...actors].reverse();
  for(const actor of order){
   if(actor.done)continue;const a=actor.agent,l=actor.locomotion;a.time+=1/120;
-  try{const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving)actor.done=true;}catch(error){console.error('CORRIDOR_DEBUG '+JSON.stringify(debug(actor.id,error)));throw error;}
+  // Mirror TaskAgent.finish's semantic completion. Leaving a mock walk skill
+  // live after arrival would retain its lease until expiry, unlike production.
+  try{const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving){actor.done=true;a.skill=null;}}catch(error){console.error('CORRIDOR_DEBUG '+JSON.stringify(debug(actor.id,error)));throw error;}
  }
  const owners=actors.filter(actor=>actor.locomotion.traffic.mode==='corridor-owner'&&actor.locomotion.traffic.corridorOwner===actor.id);
+ if(owners.some(actor=>horizontal(actor.agent.pos,actor.goal)<.05))ownerHeldAtArrival=true;
  maxConcurrentOwners=Math.max(maxConcurrentOwners,owners.length);
  assert(owners.length<=1,'one narrow corridor cannot have two simultaneous direction owners');
  for(const actor of actors)if(actor.locomotion.traffic.mode==='corridor-circulation')circulationTravelM+=horizontal(before.get(actor.id),actor.agent.pos);
@@ -91,10 +94,11 @@ assert(minSeparation>.50,'continuous sweep must retain body clearance');
 const claims=actors.reduce((n,a)=>n+a.locomotion.traffic.corridorClaims,0),yields=actors.reduce((n,a)=>n+a.locomotion.traffic.corridorYields,0);
 assert(claims>=1,'one direction must obtain corridor ownership');
 assert.equal(maxConcurrentOwners,1,'the exclusive direction owner must be observable during passage');
+assert(ownerHeldAtArrival,'a goal at the exit must retain direction ownership through arrival');
 assert(yields>=1,'the opposite direction must actively retreat or side-step');
 assert(circulationTravelM>.1,'the non-owner must keep circulating instead of parking');
 assert(actors.some(actor=>actor.agent.logs.some(message=>message.includes('循环路线'))));
 const recoveries=actors.reduce((n,actor)=>n+actor.locomotion.traffic.recoveries,0),ownerManeuvers=actors.reduce((n,actor)=>n+(actor.locomotion.traffic.corridorManeuvers||0),0);
 assert(recoveries<128,'corridor must not repeatedly recover without route completion');
 if(blockedRetreat)assert(actors.some(actor=>actor.agent.logs.some(message=>message.includes('本侧出口缺少撤离空间'))),'blocked retreat must negotiate direction ownership');
-console.log(JSON.stringify({passed:true,agents:2,frames,skewClocks,blockedRetreat,bodyRadiusM,corridorHalf,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,maxConcurrentOwners,circulationTravelM,recoveries,ownerManeuvers,parkingWait:false}));
+console.log(JSON.stringify({passed:true,agents:2,frames,skewClocks,blockedRetreat,bodyRadiusM,corridorHalf,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,maxConcurrentOwners,ownerHeldAtArrival,circulationTravelM,recoveries,ownerManeuvers,parkingWait:false}));

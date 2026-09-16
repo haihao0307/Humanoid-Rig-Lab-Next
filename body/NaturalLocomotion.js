@@ -35,6 +35,7 @@ function trafficActorVelocity(actor){
  const a=actor.agent,raw=Number(a.walkSpeed??a.locomotion?.speed??0),speed=a.paused||!Number.isFinite(raw)?0:Math.max(0,Math.min(.75,raw));
  return [Math.sin(a.yaw||0)*speed,0,Math.cos(a.yaw||0)*speed];
 }
+function trafficActorStationary(actor){const a=actor.agent;return !actor.disposed&&(a.paused||a.error||!a.skill&&!a.plan&&Math.abs(Number(a.walkSpeed)||0)<.02);}
 function trafficRoutePoint(agent,distance){
  let from=agent.locomotion?.engine?.state?.root||agent.pos,remaining=Math.max(0,distance);
  for(let i=agent.routeIndex;i<agent.route.length;i++){
@@ -306,6 +307,26 @@ class NaturalLocomotion {
    a.log?.('路线已根据当前物体位置重新规划');return true;
   }catch(error){this.traffic.lastError=error.message;return false;}
  }
+ replanStationaryRoute(conflict,context){
+  const a=this.a,t=this.traffic,other=conflict?.actor,goal=t.slotPoint||a.route.at(-1);
+  if(typeof campGridPath!=='function'||!other||!goal||!trafficActorStationary(other)||a.time<(t.nextStationaryPlanAtS||0))return false;
+  const radius=context.radius+bodyPhysicalProfile(other.human).bodyRadiusM+TRAFFIC_AVOIDANCE.sideMarginM;
+  let from=this.engine.state.root,blocked=false;
+  for(const point of a.route.slice(a.routeIndex)){if(motionCircleSweep(from,point,other.agent.pos,radius)<1-1e-6){blocked=true;break;}from=point;}
+  if(!blocked)return false;
+  t.nextStationaryPlanAtS=a.time+TRAFFIC_AVOIDANCE.planCooldownS;
+  const stationary=[...a.w.population.values()].filter(row=>row.agent!==a&&trafficActorStationary(row));
+  const obstacles=stationary.map(row=>({id:'__traffic_npc_'+row.id,shape:'sphere',p:[...row.agent.pos],r:bodyPhysicalProfile(row.human).bodyRadiusM+TRAFFIC_AVOIDANCE.sideMarginM-.06,collidable:true}));
+  try{
+   // Query-local footprints only: never insert NPC proxies into the scene or
+   // physics world. Moving peers continue through predictive coordination.
+   const route=campGridPath({bounds:a.w.bounds,objects:[...a.w.objects,...obstacles]},this.engine.state.root,goal,context.radius,context.ignore);
+   if(!route?.length)return false;
+   a.route.splice(a.routeIndex,a.route.length-a.routeIndex,...route.map(point=>[...point]));this.requestKey=null;
+   Object.assign(t,{active:false,mode:'replanned',reason:'stationary-npc-route',blockers:stationary.map(row=>row.id),side:0,originalTarget:[...goal],lastPlanAtS:a.time,detourEndIndex:-1,advancePoint:null,advanceRouteIndex:-1,recoveryTarget:null,lastError:null});t.replans++;t.stationaryReplans=(t.stationaryReplans||0)+1;
+   a.log?.('已绕过停止人物重新规划完整路线');return true;
+  }catch(error){t.lastError=error.message;return false;}
+ }
  installLocalDetour(conflict,context){
   const a=this.a,root=this.engine.state.root,current=a.route[a.routeIndex],other=conflict.actor,canonicalGoal=this.traffic.slotPoint||a.route.at(-1);if(!current||!other||!canonicalGoal)return false;
   let direction=sub(conflict.selfPoint||current,root);direction[1]=0;if(len(direction)<.12){direction=sub(current,root);direction[1]=0;}if(len(direction)<.12)return false;direction=norm(direction);
@@ -430,6 +451,11 @@ class NaturalLocomotion {
  }
  corridorPassed(lease,context){
   const d=lease?.descriptor;if(!d)return false;const coordinate=this.engine.state.root[d.axisIndex],margin=context.radius+.22;
+  // A destination just outside the portal still occupies the shared exit.
+  // Keep the direction lease until arrival releases it, so the circulating
+  // peer cannot re-enter while the owner is settling at that destination.
+  const goal=this.traffic.slotPoint||this.a.route.at(-1),exit=lease.direction>0?d.upper:d.lower;
+  if(goal&&Math.abs(goal[d.axisIndex]-exit)<context.radius+.85&&Math.abs(goal[d.lateralIndex]-d.midpoint[d.lateralIndex])<context.radius*2+.20)return false;
   return lease.direction>0?coordinate>d.upper+margin:coordinate<d.lower-margin;
  }
  buildCorridorOrbit(lease,context){
@@ -527,7 +553,8 @@ class NaturalLocomotion {
   if(intersectionTarget)return intersectionTarget;
   target=a.route[a.routeIndex];if(!target)return null;
   const maintained=this.maintainCorridor(context,target);if(maintained)return maintained;
-  const predicted=predictTrafficConflict(a,speed,context);
+  let predicted=predictTrafficConflict(a,speed,context);
+  if(this.replanStationaryRoute(predicted,context)){target=a.route[a.routeIndex];predicted=predictTrafficConflict(a,speed,context);}
   if(predicted){
    const corridor=this.resolveNarrowCorridor(predicted,context);
    if(corridor==='owner'||corridor==='yield'){const managed=this.maintainCorridor(context,target);if(managed)return managed;throw Error('狭窄通道没有可用的持续移动路线');}
@@ -551,8 +578,39 @@ class NaturalLocomotion {
   Object.assign(e.state,{fault:null,paused:false,status:'idle',command:null,speed:0});this.requestKey=null;this.requested=false;
   try{
    const target=this.prepareTrafficTarget(.48,{force:true});if(!target)throw Error('恢复时没有剩余路线');
-   this.request({type:'walk',target:[...target]});this.traffic.recoveries++;this.traffic.reason='recovered-navigation-block';return true;
-  }catch(error){Object.assign(e.state,saved);this.traffic.lastError=error.message;return false;}
+   // A clear target chord does not mean the current heading is clear. Let
+   // the existing walking controller align through a safe temporary target;
+   // reissuing the blocked heading causes a CCD rejection every tick.
+   this.traffic.recoveryTarget={point:[...target],goal:[...a.route.at(-1)],taskKey:trafficTaskKey(a),...Object.fromEntries(['intersectionKey','intersectionOwner','corridorKey','corridorOwner'].map(key=>[key,this.traffic[key]]))};
+   this.turnFilter.reset(e.state.yaw);
+   if(!this.continueTrafficRecovery())this.request({type:'walk',target:[...target]});
+   this.traffic.recoveries++;this.traffic.reason='recovered-navigation-block';return true;
+  }catch(error){Object.assign(e.state,saved);this.traffic.recoveryTarget=null;this.traffic.lastError=error.message;return false;}
+ }
+ continueTrafficRecovery(){
+  const recovery=this.traffic.recoveryTarget;if(!recovery)return false;
+  const a=this.a,state=this.engine.state,point=recovery.point,goal=a.route?.at(-1),context=this.world.context(.23);
+  if(recovery.taskKey!==trafficTaskKey(a)||!goal||!recovery.goal||horizontal(goal,recovery.goal)>1e-6||['intersectionKey','intersectionOwner','corridorKey','corridorOwner'].some(key=>recovery[key]!==this.traffic[key])||!this.world.free(point,.23)||!trafficSegmentClear(a,state.root,point,context)||horizontal(state.root,point)<.015){this.traffic.recoveryTarget=null;return false;}
+  const yaw=Math.atan2(point[0]-state.root[0],point[2]-state.root[2]);
+  const headingClear=(heading,distance=.12)=>!this.world.sweep(state.root,add(state.root,[Math.sin(heading)*distance,0,Math.cos(heading)*distance]),.23).blocked;
+  if(Math.abs(angleDiff(yaw,state.yaw))<=.12&&headingClear(state.yaw,Math.min(.12,horizontal(state.root,point)))){this.traffic.recoveryTarget=null;return false;}
+  let alignment=recovery.alignmentPoint;
+  if(alignment&&(horizontal(state.root,alignment)<.045||!this.world.free(alignment,.23)||!trafficSegmentClear(a,state.root,alignment,context)))alignment=null;
+  // Walk already suppresses translation outside its 0.6 rad heading window.
+  // Check the heading where translation would begin, not only the target
+  // chord. Preserve the walking foot scheduler, including an in-flight step.
+  if(!alignment)for(const offset of [0,.35,-.35,.7,-.7,1.05,-1.05,1.4,-1.4,Math.PI]){
+   const heading=yaw+offset,error=angleDiff(heading,state.yaw),entry=Math.abs(error)>.62?heading-Math.sign(error)*.62:state.yaw;
+   if(!headingClear(entry))continue;
+   for(const distance of [.24,.16,.08]){
+    const candidate=add(state.root,[Math.sin(heading)*distance,0,Math.cos(heading)*distance]);candidate[1]=0;
+    if(!this.world.free(candidate,.23)||!trafficSegmentClear(a,state.root,candidate,context))continue;
+    alignment=candidate;break;
+   }
+   if(alignment)break;
+  }
+  if(!alignment){this.traffic.recoveryTarget=null;return false;}
+  recovery.alignmentPoint=alignment;this.turnFilter.reset(state.yaw);this.request({type:'walk',target:[...alignment]});this.traffic.reason='navigation-recovery-aligning';return true;
  }
  routePassThrough(index){
   const a=this.a,state=this.engine.state,current=a.route[index],next=a.route[index+1];
@@ -577,6 +635,7 @@ class NaturalLocomotion {
   this.lastContinuousWalkHandoff={exitSpeedMps:a.walkSpeed,turnRad,endpoint:[...end]};current.continuousWalkHandoff=structuredClone(this.lastContinuousWalkHandoff);return true;
  }
  move(dt,speed=.48){
+  if(this.continueTrafficRecovery())return true;
   const a=this.a,state=this.engine.state,pace=a.manipulationPace();this.turnFilter.reset(state.yaw);
   if(a.held&&pace<.08){this.tempo=1;this.stop();return a.routeIndex<a.route.length||!this.isSettled();}
   this.tempo=clamp(speed/.48*(a.strength?.movementFactor()??1)*pace,.05,1);

@@ -13,6 +13,7 @@ const page=await browser.newPage({viewport:{width:1440,height:1000},deviceScaleF
 page.setDefaultTimeout(720000);
 const pageErrors=[];
 page.on('pageerror',error=>pageErrors.push(String(error?.stack||error)));
+page.on('console',message=>{if(message.text().startsWith('TASK_CROWD_PROGRESS '))console.log(message.text());});
 await mkdir('artifacts',{recursive:true});
 
 async function bodyState(){
@@ -37,6 +38,24 @@ try{
  assert.equal(ready.startup?.status,'ready','browser crowd startup failed: '+JSON.stringify(ready));
  assert(ready.population>=6,'crowd browser scenario requires all six real NPCs');
  assert.equal(ready.pending,0,'all review actors must finish generation');
+ console.log('CROWD_READY '+JSON.stringify({population:ready.population,pending:ready.pending}));
+ await page.evaluate(()=>{
+  const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab;
+  // Read-only diagnostics at the traffic/motion boundary. Keep every count but
+  // bound detailed samples so a regression cannot produce an unbounded report.
+  lab.trafficRecoveryProbe={counts:{},samples:[],snapshot(actor){const a=actor.agent,s=a.locomotion.engine.state;return{position:[...a.pos],route:structuredClone(a.route),routeIndex:a.routeIndex,phase:a.phase,yaw:s.yaw,speed:s.speed,status:s.status,command:structuredClone(s.command),feet:structuredClone(s.feet),swing:structuredClone(s.swing)};},drain(){const result={counts:this.counts,samples:this.samples};this.counts={};this.samples=[];return result;}};
+  for(const actor of lab.population.values()){
+   const l=actor.agent.locomotion,original=l.recoverNavigationBlock;
+   l.recoverNavigationBlock=function(message){
+    const probe=lab.trafficRecoveryProbe,key=actor.id+': '+message;
+    probe.counts[key]=(probe.counts[key]||0)+1;
+    const sample=probe.samples.length<24?{id:actor.id,message,time:lab.population.elapsedS,root:[...this.engine.state.root],yaw:this.engine.state.yaw,command:structuredClone(this.engine.state.command),feet:structuredClone(this.engine.state.feet),swing:structuredClone(this.engine.state.swing),mode:this.traffic.mode,routeIndex:actor.agent.routeIndex,route:structuredClone(actor.agent.route),neighbors:[...lab.population.values()].filter(row=>row!==actor).map(row=>({id:row.id,position:[...row.agent.pos],radius:row.human.bodyMetrics.bodyRadiusM}))}:null;
+    const result=original.call(this,message);
+    if(sample){sample.recovered=result;sample.nextCommand=structuredClone(this.engine.state.command);probe.samples.push(sample);}
+    return result;
+   };
+  }
+ });
 
  const crossing=await page.evaluate(()=>{
   const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,pop=lab.population,world=lab.world;
@@ -83,14 +102,15 @@ try{
     if(!done&&travel<1e-5)stationary.set(actor.id,stationary.get(actor.id)+1);else stationary.set(actor.id,0);
     maxStationary.set(actor.id,Math.max(maxStationary.get(actor.id),stationary.get(actor.id)));
    }
+   if(frames%2400===0)console.log('TASK_CROWD_PROGRESS '+JSON.stringify({scenario:'crossing',frames,completed:completedAt.size}));
    if(completedAt.size===test.length)break;
   }
   for(const actor of test){const t=actor.agent.locomotion.traffic;trafficActions+=['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations','intersectionClaims','intersectionYields','intersectionLaps','intersectionRotations'].reduce((sum,key)=>sum+(Number(t?.[key])||0),0);}
   for(const actor of test)actor.agent.fail=originalFail.get(actor.id);
   pop.focus(test.map(actor=>actor.id));lab.render();
   return{
-   center,frames,failures,minSeparationM:minSeparation,trafficActions,parkingWait:test.some(actor=>Object.hasOwn(actor.agent.locomotion.traffic,'waitS')),
-   actors:test.map(actor=>({id:actor.id,label:actor.label,completed:actor.agent.stats.completed-baselines.get(actor.id),error:actor.agent.error,pathLengthM:path.get(actor.id),directDistanceM:distanceM,pathRatio:path.get(actor.id)/distanceM,maxStationaryS:maxStationary.get(actor.id)/120,goalErrorM:horizontal(actor.agent.pos,goals.get(actor.id)),traffic:{...actor.agent.locomotion.traffic}}))
+   center,frames,failures,recoveryDiagnostics:lab.trafficRecoveryProbe.drain(),minSeparationM:minSeparation,trafficActions,parkingWait:test.some(actor=>Object.hasOwn(actor.agent.locomotion.traffic,'waitS')),
+   actors:test.map(actor=>({id:actor.id,label:actor.label,motion:lab.trafficRecoveryProbe.snapshot(actor),completed:actor.agent.stats.completed-baselines.get(actor.id),error:actor.agent.error,pathLengthM:path.get(actor.id),directDistanceM:distanceM,pathRatio:path.get(actor.id)/distanceM,maxStationaryS:maxStationary.get(actor.id)/120,goalErrorM:horizontal(actor.agent.pos,goals.get(actor.id)),traffic:{...actor.agent.locomotion.traffic}}))
   };
  });
  console.log('CROSSING_METRICS '+JSON.stringify(crossing));
@@ -101,7 +121,7 @@ try{
  assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');
  assert(crossing.actors.reduce((sum,actor)=>sum+(actor.traffic.intersectionClaims||0),0)>=1,'crossing did not claim an intersection');
  assert(crossing.actors.reduce((sum,actor)=>sum+(actor.traffic.intersectionYields||0),0)>=2,'crossing did not exercise circulation');
- assert(crossing.actors.reduce((sum,actor)=>sum+(actor.traffic.recoveries||0),0)<128,'crossing repeatedly blocked the motion kernel');
+ assert(crossing.actors.reduce((sum,actor)=>sum+(actor.traffic.recoveries||0),0)<=8,'crossing repeatedly blocked the motion kernel');
  assert(crossing.actors.every(actor=>actor.maxStationaryS<15),'crossing left an actor stationary for too long');
  assert.equal(crossing.parkingWait,false,'parking wait state returned in the browser crossing');
  assert(crossing.actors.every(actor=>actor.pathRatio<3.4),'browser crossing produced an excessive detour');
@@ -132,17 +152,20 @@ try{
    minSeparation=Math.min(minSeparation,horizontal(test[0].agent.pos,test[1].agent.pos));
    const owners=test.filter(actor=>actor.agent.locomotion.traffic.mode==='corridor-owner'&&actor.agent.locomotion.traffic.corridorOwner===actor.id);maxConcurrentOwners=Math.max(maxConcurrentOwners,owners.length);
    for(const actor of test){const a=actor.agent,travel=horizontal(before.get(actor.id),a.pos);path.set(actor.id,path.get(actor.id)+travel);if(a.locomotion.traffic.mode==='corridor-circulation')circulationTravelM+=travel;const done=a.stats.completed>baselines.get(actor.id);if(!done&&travel<1e-5)stationary.set(actor.id,stationary.get(actor.id)+1);else stationary.set(actor.id,0);maxStationary.set(actor.id,Math.max(maxStationary.get(actor.id),stationary.get(actor.id)));}
+   if(frames%2400===0)console.log('TASK_CROWD_PROGRESS '+JSON.stringify({scenario:'corridor',frames,completed:test.filter(actor=>actor.agent.stats.completed>baselines.get(actor.id)).length}));
    if(test.every(actor=>actor.agent.stats.completed>baselines.get(actor.id)))break;
   }
   pop.focus(test.map(actor=>actor.id));lab.render();
-  const report={center,frames,minSeparationM:minSeparation,maxConcurrentOwners,circulationTravelM,parkingWait:test.some(actor=>Object.hasOwn(actor.agent.locomotion.traffic,'waitS')),actors:test.map(actor=>({id:actor.id,label:actor.label,completed:actor.agent.stats.completed-baselines.get(actor.id),error:actor.agent.error,pathLengthM:path.get(actor.id),pathRatio:path.get(actor.id)/distanceM,maxStationaryS:maxStationary.get(actor.id)/120,traffic:{...actor.agent.locomotion.traffic}}))};
+  const report={center,frames,minSeparationM:minSeparation,maxConcurrentOwners,circulationTravelM,parkingWait:test.some(actor=>Object.hasOwn(actor.agent.locomotion.traffic,'waitS')),actors:test.map(actor=>({id:actor.id,label:actor.label,motion:lab.trafficRecoveryProbe.snapshot(actor),completed:actor.agent.stats.completed-baselines.get(actor.id),error:actor.agent.error,pathLengthM:path.get(actor.id),pathRatio:path.get(actor.id)/distanceM,maxStationaryS:maxStationary.get(actor.id)/120,traffic:{...actor.agent.locomotion.traffic}}))};
   world.objects.splice(0,world.objects.length,...world.objects.filter(object=>!ids.includes(object.id)));world.touch('task-browser-corridor-remove');world.physics?.syncScene?.();
-  return report;
+  report.recoveryDiagnostics=lab.trafficRecoveryProbe.drain();return report;
  });
  console.log('CORRIDOR_METRICS '+JSON.stringify(corridor));
+ await writeFile('artifacts/task-crowd-corridor-r27.json',JSON.stringify(corridor,null,2));
  assert(corridor.actors.every(actor=>actor.completed>=1),'both browser corridor actors must finish');
  assert(corridor.actors.every(actor=>!actor.error),'browser corridor produced an agent error');
  assert(corridor.minSeparationM>.49,'browser corridor lost body clearance');
+ assert(corridor.actors.reduce((sum,actor)=>sum+(actor.traffic.recoveries||0),0)<=8,'corridor repeatedly blocked the motion kernel');
  assert.equal(corridor.maxConcurrentOwners,1,'browser corridor must expose one direction owner at a time');
  assert(corridor.actors.reduce((n,actor)=>n+(Number(actor.traffic.corridorClaims)||0),0)>=1,'browser corridor did not issue a direction claim');
  assert(corridor.actors.reduce((n,actor)=>n+(Number(actor.traffic.corridorYields)||0),0)>=1,'browser corridor did not actively yield');

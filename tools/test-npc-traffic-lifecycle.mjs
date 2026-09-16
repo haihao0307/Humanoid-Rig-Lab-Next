@@ -72,4 +72,11 @@ for(const invalidate of [a=>a.agent.paused=true,a=>a.agent.error='failed',a=>a.a
  check(()=>assert.equal(loc.handoffBlockedCorridor({actor:actors[1]},ctx,descriptor,lease),true));check(()=>assert.equal(lease.ownerId,'a'));check(()=>assert.equal(lease.handoffs,1));
  check(()=>assert.equal(loc.handoffBlockedCorridor({actor:actors[1]},ctx,descriptor,lease),false));
 }
+for(const sign of [-1,1]){
+ const loc={a:{route:[[0,0,sign*2.75]]},traffic:{slotPoint:null},engine:{state:{root:[0,0,sign*2.6]}}};
+ const lease={direction:sign,descriptor:{axisIndex:2,lateralIndex:0,lower:-2.1,upper:2.1,midpoint:[0,0,0]}};
+ check(()=>assert.equal(api.NaturalLocomotion.prototype.corridorPassed.call(loc,lease,ctx),false,'near-exit destination retains ownership'));
+ loc.a.route=[[0,0,sign*6]];
+ check(()=>assert.equal(api.NaturalLocomotion.prototype.corridorPassed.call(loc,lease,ctx),true,'far destination releases at the passage boundary'));
+}
 console.log(JSON.stringify({passed:true,checks,sharedClock:true,sameTickRotationBound:true,geometryMocked:true,physicsExecuted:false}));

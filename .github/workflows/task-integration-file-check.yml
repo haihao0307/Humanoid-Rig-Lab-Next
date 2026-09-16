@@ -7,12 +7,14 @@ on:
       - 'body/CrowdIntersectionCoordinator.js'
       - 'body/NaturalLocomotion.js'
       - 'control/NPCPopulation.js'
+      - 'world/GridNavigation.js'
       - 'source/**'
       - 'tools/check-open-intersection.mjs'
       - 'tools/check-pure.mjs'
       - 'tools/build-pure.mjs'
       - 'tools/test-npc-*.mjs'
-      - 'tools/test-grid-navigation-batch.mjs'
+      - 'tools/traffic-recovery-fixture.json'
+      - 'tools/test-grid-navigation-*.mjs'
       - 'tools/test-task-crowd-browser.mjs'
       - '.github/workflows/task-integration-file-check.yml'
   workflow_dispatch:
@@ -53,6 +55,7 @@ jobs:
       - name: Real navigation and motion kernel regressions (no browser or GPU)
         run: |
           node tools/test-grid-navigation-batch.mjs
+          node tools/test-grid-navigation-sweep.mjs
           node tools/test-npc-traffic-wait.mjs
           node tools/test-npc-four-way-crossing.mjs
           node tools/test-npc-four-way-crossing.mjs --pause-owner

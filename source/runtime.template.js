@@ -415,7 +415,7 @@ function findHumanSpawn(world,h){
  const point=candidates.find(p=>!world.collision(p,radius));if(!point)throw Error('场景没有足够的人物站立空间');return point;
 }
 function objectRadius(o){if(o.shape==='sphere')return o.r;if(o.q&&objectTilted(o)){const e=objectWorldHalfExtents(o);return Math.hypot(e[0],e[2]);}return o.shape==='box'?Math.hypot(o.w,o.d)/2:o.r}
-function pointToObjectClearance(p,o){const dx=p[0]-o.p[0],dz=p[2]-o.p[2];if(objectTilted(o)){const [rx,rz]=objectFootprint(o);return Math.hypot(Math.max(Math.abs(dx)-rx,0),Math.max(Math.abs(dz)-rz,0));}if(o.shape==='box'){const a=-objectYaw(o),x=Math.cos(a)*dx-Math.sin(a)*dz,z=Math.sin(a)*dx+Math.cos(a)*dz,qx=Math.max(Math.abs(x)-o.w/2,0),qz=Math.max(Math.abs(z)-o.d/2,0);return Math.hypot(qx,qz)}return Math.max(0,Math.hypot(dx,dz)-o.r)}
+function pointToObjectClearance(p,o){const dx=p[0]-o.p[0],dz=p[2]-o.p[2];if(objectTilted(o)){const [rx,rz]=objectFootprint(o);return Math.hypot(Math.max(Math.abs(dx)-rx,0),Math.max(Math.abs(dz)-rz,0));}if(o.shape==='box'){const a=objectYaw(o),x=Math.cos(a)*dx-Math.sin(a)*dz,z=Math.sin(a)*dx+Math.cos(a)*dz,qx=Math.max(Math.abs(x)-o.w/2,0),qz=Math.max(Math.abs(z)-o.d/2,0);return Math.hypot(qx,qz)}return Math.max(0,Math.hypot(dx,dz)-o.r)}
 function circleHitsObject(p,r,o){return o.collidable!==false&&pointToObjectClearance(p,o)<r}
 /*__SOURCE:world/PhysicsContract.js__*/
 /*__SOURCE:world/PhysicsWorld.js__*/
