@@ -1,0 +1,131 @@
+name: Cat Kaopu Phase 1 Gate A
+
+on:
+  push:
+    branches:
+      - codex/cat-kaopu-phase1-environment-npc-20260916
+    paths:
+      - .github/workflows/cat-kaopu-phase1-gate-a.yml
+      - cat-kaopu/README.md
+      - cat-kaopu/docs/CAT_KAOPU_PHASE1_ENVIRONMENT_NPC_DIRECTION_2026-09-16.md
+      - cat-kaopu/tools/build_cat_phase1_gate_a.py
+      - cat-kaopu/tools/verify_cat_phase1_gate_a.py
+      - cat-kaopu/tools/capture_cat_phase1_gate_a.mjs
+      - cat-kaopu/workbench/CAT_KAOPU_CURRENT.html
+      - cat-kaopu/runtime/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cat-kaopu-phase1-gate-a-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout Phase 1 branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build Phase 1 Gate A workbench
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/build_cat_phase1_gate_a.py
+
+      - name: Verify static Gate A contract
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/verify_cat_phase1_gate_a.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install pinned browser dependencies
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Run Gate A WebGL2 evidence capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 --bind 127.0.0.1 > "${RUNNER_TEMP}/cat-phase1-http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
+          ready=0
+          for _ in $(seq 1 60); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:4173/cat-kaopu/phase1/index.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat "${RUNNER_TEMP}/cat-phase1-http.log" || true
+            exit 1
+          fi
+          CAT_PHASE1_URL='http://127.0.0.1:4173/cat-kaopu/phase1/index.html' \
+            node cat-kaopu/tools/capture_cat_phase1_gate_a.mjs
+
+      - name: Verify browser evidence
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/verify_cat_phase1_gate_a.py --require-browser
+
+      - name: Upload Gate A evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-kaopu-phase1-gate-a-${{ github.run_number }}
+          path: |
+            cat-kaopu/README.md
+            cat-kaopu/phase1/CAT_KAOPU_PHASE1_GATE_A_SINGLE_NPC_2026-09-16.html
+            cat-kaopu/phase1/index.html
+            cat-kaopu/phase1/PHASE1_NPC_CONTRACT.json
+            cat-kaopu/phase1/PHASE1_GATE_A_MANIFEST.json
+            cat-kaopu/docs/CAT_KAOPU_PHASE1_ENVIRONMENT_NPC_DIRECTION_2026-09-16.md
+            cat-kaopu/docs/CAT_KAOPU_PHASE1_GATE_A_EXECUTION_REPORT_2026-09-16.md
+            cat-kaopu/qa/CAT_KAOPU_PHASE1_GATE_A_*.json
+            cat-kaopu/qa/CAT_KAOPU_PHASE1_GATE_A_*.png
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit generated Gate A workbench and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'cat-kaopu-build-bot'
+          git config user.email 'cat-kaopu-build-bot@users.noreply.github.com'
+          git add \
+            cat-kaopu/phase1 \
+            cat-kaopu/docs/CAT_KAOPU_PHASE1_GATE_A_EXECUTION_REPORT_2026-09-16.md \
+            cat-kaopu/qa/CAT_KAOPU_PHASE1_GATE_A_*.json \
+            cat-kaopu/qa/CAT_KAOPU_PHASE1_GATE_A_*.png
+          if git diff --cached --quiet; then
+            echo 'No generated Gate A changes to commit.'
+            exit 0
+          fi
+          git commit -m 'build(cat): generate Phase 1 Gate A evidence [phase1 generated]'
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              exit 0
+            fi
+            echo "Push attempt ${attempt} failed; rebasing on latest branch head."
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+          done
+          echo 'Unable to push Phase 1 Gate A evidence after three attempts.' >&2
+          exit 1
