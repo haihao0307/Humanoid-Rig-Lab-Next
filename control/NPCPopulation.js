@@ -270,8 +270,9 @@ class NPCPopulation {
    if(actor.agent.characterEditInProgress)throw Error('此人物正在更新外观');
    if(mode==='append'&&actor.queue.length>=64)throw Error('此人物等待队列已满');
    parse(text,this.lab.world,actor.agent.lastObject); // Syntax/targets only; forecast again at execution time.
+   const keepPaused=mode==='append'&&actor.agent.paused&&!!(actor.running||actor.queue.length||actor.agent.activity().physicalBusy);
    if(mode==='replace'){if(actor.agent.held)throw Error('此人物仍在持物，请先继续完成放置');actor.agent.cancel();actor.queue=[];actor.running=null;}
-   actor.behavior.enabled=false;actor.behavior.status='stopped';actor.behavior.error=null;actor.queue.push({text:text.trim(),source:'manual'});actor.agent.paused=false;this.pump(actor);if(actor.behavior.error)throw Error(actor.behavior.error);
+   actor.behavior.enabled=false;actor.behavior.status='stopped';actor.behavior.error=null;actor.queue.push({text:text.trim(),source:'manual'});actor.agent.paused=keepPaused;this.pump(actor);if(actor.behavior.error)throw Error(actor.behavior.error);
    return{id:actor.id,accepted:true,queued:actor.queue.length};
   }catch(error){return{id:actor.id,accepted:false,reason:error.message};}});
   this.lab.setAuto(true);this.changed();return result;

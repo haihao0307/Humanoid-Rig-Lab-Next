@@ -70,6 +70,21 @@ check(()=>assert.throws(()=>npcCompileTask(Array(65).fill('挥手').join('\n'),{
  check(()=>assert.equal(p.dispatch('挥手',{targets:['a'],mode:'replace'})[0].accepted,true));advance(p,1);
  check(()=>assert.deepEqual(a.agent.calls,['挥手']));check(()=>assert.equal(a.queue.length,0));
 }
+// Adding future work must not resume a deliberately paused live task or wait.
+{
+ const p=fixture(),a=p.get('a');p.dispatch('长动作',{targets:['a']});advance(p,.1);p.control('pause',['a']);
+ const time=a.agent.time,running=a.running,remaining=a.agent.remaining;
+ check(()=>assert.equal(p.dispatch('挥手',{targets:['a'],mode:'append'})[0].accepted,true));advance(p,.5);
+ check(()=>assert.equal(a.agent.paused,true));check(()=>assert.equal(a.agent.time,time));check(()=>assert.equal(a.agent.remaining,remaining));check(()=>assert.equal(a.running,running));check(()=>assert.equal(a.queue.length,1));check(()=>assert(p.get('b').agent.time>time));
+ p.control('resume',['a']);advance(p,4);check(()=>assert.deepEqual(a.agent.calls,['长动作','挥手']));
+}
+{
+ const p=fixture(),a=p.get('a');p.setBehavior('a',recipe('等待 2 秒'));p.control('pause',['a']);
+ p.dispatch('挥手',{targets:['a']});advance(p,.5);check(()=>assert.equal(a.agent.paused,true));check(()=>assert.equal(a.agent.calls.length,0));
+ p.control('resume',['a']);advance(p,1);check(()=>assert.deepEqual(a.agent.calls,['挥手']));
+ // An idle, paused spawn can still receive its first task normally.
+ const idle=fixture();idle.get('a').agent.paused=true;idle.dispatch('挥手',{targets:['a']});advance(idle,1);check(()=>assert.deepEqual(idle.get('a').agent.calls,['挥手']));
+}
 // Mixed scheduler scenario: actual NPCPopulation queues/resources, fake task
 // execution durations. This deliberately makes no geometry/physics claim.
 for(const count of [4,8]){

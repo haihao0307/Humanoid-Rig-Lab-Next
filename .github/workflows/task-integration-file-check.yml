@@ -16,6 +16,7 @@ on:
       - 'tools/traffic-recovery-fixture.json'
       - 'tools/test-grid-navigation-*.mjs'
       - 'tools/test-task-crowd-browser.mjs'
+      - 'tools/test-task-mixed-browser.mjs'
       - '.github/workflows/task-integration-file-check.yml'
   workflow_dispatch:
 
@@ -52,6 +53,8 @@ jobs:
           node tools/test-npc-task-selection-bridge.mjs
           node tools/test-npc-target-reservations.mjs
           node tools/test-npc-resource-circulation.mjs
+      - name: Held task lifecycle with real Cannon steps (synthetic grasp)
+        run: node tools/test-npc-held-lifecycle.mjs
       - name: Real navigation and motion kernel regressions (no browser or GPU)
         run: |
           node tools/test-grid-navigation-batch.mjs
