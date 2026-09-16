@@ -16,7 +16,7 @@ const fullBody=read('motion/vendor/full-body.mjs').replace(/from '(\.\/[^']+)'/g
 const {FullBodyMotion,blend,relaxedHandRotation}=await import('data:text/javascript;base64,'+Buffer.from(fullBody+'\nexport {blend,relaxedHandRotation};').toString('base64'));
 const runtime=read('source/runtime.template.js'),math=runtime.split('// MODULE math')[1].split('function matrix')[0],grasp=runtime.slice(runtime.indexOf('function rayBoundary'),runtime.indexOf('function graspResidual'));
 const code=math+'\n'+grasp+'\n'+read('body/ReconstructionRig.js').replace('/*__R2_RIG_JSON__*/',JSON.stringify(reference)).replace('/*__R2_REGIONS_JSON__*/','{}')+'\n'+read('body/CharacterShape.js')+'\n'+read('body/ReferenceMotion.js').replace('/*__R2_MOTION_JSON__*/',read('reconstruction/motion-reference.json'))+'\n'+read('body/ContactHandPose.js')+'\n'+read('body/MotionLabPose.js')+'\n'+read('body/MotionLabActions.js')+'\n'+read('body/NaturalLocomotion.js')+'\n'+read('world/PhysicsContract.js')+'\n'+read('world/PhysicsWorld.js')+'\n'+read('control/TaskAgent.js');
-const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,MotionLabPose,motionChooseContact,motionValidateTransferContacts,motionValidateContactReach,motionCarrySamples,motionRequireContactHandClearance,motionContactAdapter,motionPreflightModel,motionLocalCertificate,motionReachHands,motionFreeHandEndpoints,contactHandSegments,contactHandObjectClearance,motionApproachDistance,rayBoundary,inv,norm,motionContactDescriptor,graspFrames,PhysicsWorld,Agent,frame,qy,qm,compose,sub,add,mul,rotate,dist,qangle})',{
+const api=vm.runInNewContext(code+'\n'+read('body/LightBalanceFeedback.js')+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,MotionLabPose,motionChooseContact,motionValidateTransferContacts,motionValidateContactReach,motionCarrySamples,motionRequireContactHandClearance,motionContactAdapter,motionPreflightModel,motionLocalCertificate,motionReachHands,motionFreeHandEndpoints,contactHandSegments,contactHandObjectClearance,motionApproachDistance,rayBoundary,inv,norm,motionContactDescriptor,graspFrames,PhysicsWorld,Agent,frame,qy,qm,compose,sub,add,mul,rotate,dist,qangle})',{
  structuredClone,WorkbenchPhysicsEngine:C,SHAPE_SCHEMA,SHAPE_REVISION,normalizeCharacterShape,characterShapeParameterKey,createCharacterShapeField,CHARACTER_DEFORMATION_RULES,HUMAN_GENERATOR_REVISION:'release-test',
  degrees:r=>r*180/Math.PI,radians:d=>d*Math.PI/180,r2Mean:f=>(f('left')+f('right'))*.5,DOWN:[0,-1,0],horizontal:(a,b)=>Math.hypot(a[0]-b[0],a[2]-b[2]),angleDiff:(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b)),bodyPhysicalProfile:h=>({bodyRadiusM:h.bodyMetrics.bodyRadiusM}),MotionLab:{FlatWorld,MotionController,rigFromSource,FullBodyMotion,blend,relaxedHandRotation,solveTwoBone}});
 
@@ -83,6 +83,29 @@ for(const [shapeIndex,shape]of [{},{statureScale:.95,legProportion:-.35,shoulder
  const wrist=structuredClone(shifted.hands);wrist.left.q=api.qm(api.qy(.0001),wrist.left.q);assert(!keyFor(wrist).cached,'wrist orientation is part of the proof');
  const moved=api.frame(api.add(shifted.ground.p,[.0001,0,0]),shifted.ground.q);assert(!keyFor(shifted.hands,moved).cached,'relative object position invalidates the proof');
  const physical=shifted.world.physics.bodies.get(shifted.object.id).body.shapes[0],oldHalf=physical.halfExtents.x;physical.halfExtents.x+=.001;assert(!keyFor().cached,'actual collider geometry, not only display dimensions, is keyed');physical.halfExtents.x=oldHalf;
+ // A projected model can outlive feedback creation or rollback replacement.
+ // Both paths must read current lean and invalidate unbalanced certificates.
+ for(const sign of [-1,1]){
+  h.__lightBalanceFeedback={active:true,pitchRad:sign*.012,rollRad:sign*.008,pelvisLocal:[sign*.003,0,-.002],a:{basic:{busy:false}}};
+  assert(!keyFor().cached,'live balance correction is part of the certificate');
+  compare(h,pose,projected,{},shifted.world);
+  // Restore the original contact location for the hand-constrained sample.
+  fixture(h,engine);
+  const balancedContact=choose(h,f).contact,balancedInitial=pose.build(),balancedStart=Object.fromEntries(['left','right'].map(s=>[s,api.compose(balancedInitial.frames.get(s+'_hand'),api.frame(h.bodyMetrics.palmContact))]));
+  const balancedAgent={...agent,skill:{...agent.skill,contactPose:balancedContact,carryConfiguration:balancedContact.carryConfiguration,reachStart:api.motionFreeHandEndpoints(h,balancedInitial.frames,balancedStart)}};
+  for(let i=0;i<=204;i++){
+   const u=i/204,hands=api.motionReachHands(balancedAgent,f.hands,u),options={...api.motionContactDescriptor(balancedAgent,hands,u),hands};
+   compare(h,pose,projected,options,f.world);
+   const shoulders=projected.reachShoulders(options),full=pose.build(options);
+   for(const side of ['left','right'])assert(api.dist(shoulders.get(side+'_upperArm').p,full.frames.get(side+'_upperArm').p)<1e-11);
+  }
+  h.__lightBalanceFeedback.rollRad+=.003;
+  const adjusted=api.motionReachHands(balancedAgent,f.hands,1);
+  for(const side of ['left','right'])assert(api.dist(adjusted[side].p,f.hands[side].p)<1e-11,'changing lean during the same reach must still end at the world palm goal');
+  h.__lightBalanceFeedback.rollRad-=.003;
+  keyFor().save({minimumClearanceM:.02,minimumHandClearanceM:.01,maximumPalmErrorM:0});assert(keyFor().cached);
+ }
+ delete h.__lightBalanceFeedback;
  h.bodyMetrics={...h.bodyMetrics};let model=api.motionPreflightModel(h);h.bodyMetrics.armRadiusM+=.00001;assert.notEqual(api.motionPreflightModel(h),model,'in-place body metric edits clear old proof');h.bodyMetrics.armRadiusM-=.00001;
  model=api.motionPreflightModel(h);h.resolvedRig={...h.resolvedRig,geometryKey:'updated-version'};assert.notEqual(api.motionPreflightModel(h),model,'same h rig version updates clear old proof');
  model=api.motionPreflightModel(h);const bind=h.sourceBind.get('head');bind.q=api.qm(api.qy(.00001),bind.q);assert.notEqual(api.motionPreflightModel(h),model,'in-place bind quaternion edits clear old proof');

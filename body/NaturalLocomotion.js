@@ -263,8 +263,11 @@ class NaturalLocomotion {
   e.state.root=[...root];e.state.yaw=yaw;e.state.time=a.time;
   let maximumAdoptedFootResidualM=0;
   for(const side of ['left','right']){
-   const foot=preservePoseContacts&&currentFoot(side),previousYaw=a.feet?.[side]?.yaw;
-   e.state.feet[side]={position:foot?[...foot]:e.stance(e.state,side),yaw:Number.isFinite(previousYaw)?previousYaw:yaw,contact:true};
+   const foot=preservePoseContacts&&currentFoot(side),orientation=foot&&(h.byId?.get(side+'_foot')?.world?.q||h.legs?.[side]?.wrist?.world?.q);
+   const forward=orientation&&rotate(qm(orientation,inv(h.sourceBind.get(side+'_foot').q)),[0,0,1]);
+   const footYaw=forward&&Math.hypot(forward[0],forward[2])>1e-8?Math.atan2(forward[0],forward[2]):yaw;
+   e.state.feet[side]={position:foot?[...foot]:e.stance(e.state,side),yaw:footYaw,contact:true};
+   if(orientation)e.state.feet[side].adoptedOrientation=[...orientation];
   }
   e.state.pose=e.solve(e.state);
   for(const side of ['left','right']){
@@ -580,7 +583,14 @@ class NaturalLocomotion {
   if(!this.requested&&e.state.command?.type==='walk')this.stop();
   this.requested=false;
   if(!this.kernelSettled())this.updateHeight(dt*this.tempo,false);
+  const previousSwingSide=e.state.swing?.side;
   e.update(dt*this.tempo);this.turnFilter.retargetSwing(e);
+  // An adopted sole keeps its world orientation while planted. Its first
+  // real swing releases pitch/roll and aligns yaw, rather than twisting the
+  // support footprint during the return-to-standing blend.
+  for(const side of ['left','right'])if(e.state.feet[side].adoptedOrientation&&e.state.feet[side].contact&&e.state.swing?.side!==side){
+   if(previousSwingSide===side)delete e.state.feet[side].adoptedOrientation;
+  }
   if(e.state.fault&&!this.recoverNavigationBlock(e.state.fault))throw Error(e.state.fault);
   if(e.state.status==='blocked'&&!this.recoverNavigationBlock('连续碰撞检测发现路线受阻'))throw Error('连续碰撞检测发现路线受阻，局部绕行与重新规划均未找到可用净空');
   // The scheduler may have advanced an independent foot target. Apply its

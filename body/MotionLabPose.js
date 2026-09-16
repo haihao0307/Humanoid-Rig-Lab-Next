@@ -36,7 +36,7 @@ class MotionLabPose {
   this.validate(this.build({reference:this.engine.motion.neutral,controlledFeet:true}));
   const projectedNodes=Object.fromEntries(this.rows.filter(([id])=>keep.has(id))),human={...h,resolvedRig:{...h.resolvedRig,nodes:projectedNodes},joints:h.joints.filter(j=>keep.has(j.id))};
   const engine=Object.create(this.engine);engine.motion=new MotionLab.FullBodyMotion(projectedNodes);
-  const pose=new MotionLabPose(human,engine);pose.preflightOnly=true;
+  const pose=new MotionLabPose(human,engine);pose.preflightOnly=true;pose.sourceHuman=this.sourceHuman||h;
   pose.rigidBranchProof={fullJoints:this.rows.length,checkedJoints:keep.size,rigidEdges:this.rows.length-keep.size,method:'unchanneled-rigid-descendants/v1'};
   return pose;
  }
@@ -78,6 +78,14 @@ class MotionLabPose {
    if(!Number.isFinite(error.error)||!Number.isFinite(error.orientationErrorRad))throw Error('动作候选接触误差无效');
   }
  }
+ controlledFootOrientation(state,side){
+  const foot=state.feet[side],bind=this.h.sourceBind.get(side+'_foot').q;
+  if(!foot.adoptedOrientation)return qm(qy(foot.yaw),bind);
+  const swing=state.swing;
+  if(swing?.side!==side)return [...foot.adoptedOrientation];
+  const u=smooth(clamp(swing.elapsed/Math.max(1e-8,swing.duration),0,1));
+  return qslerp(foot.adoptedOrientation,qm(qy(swing.yaw),bind),u);
+ }
  reprojectControlledLegs(frames,state,yaw,from,target,u){
   const h=this.h,positions=new Map([...frames].map(([id,f])=>[id,[...f.p]]));
   for(const side of ['left','right']){
@@ -95,7 +103,7 @@ class MotionLabPose {
    const previousFemur=frames.get(femur),previousTibia=frames.get(tibia),previousPatella=frames.get(patella);
    const femurFrame=frame(hip,alignFinal(femur,tibia,previousFemur));
    const tibiaFrame=frame(solved.knee,alignFinal(tibia,foot,previousTibia));
-   const footFrame=frame(solved.end,qslerp(from.get(foot).q,target.get(foot).q,u));
+   const footFrame=frame(solved.end,state.feet[side].adoptedOrientation?this.controlledFootOrientation(state,side):qslerp(from.get(foot).q,target.get(foot).q,u));
    frames.set(femur,femurFrame);frames.set(tibia,tibiaFrame);frames.set(foot,footFrame);
    // Preserve the already blended patella's local transform. Rebuilding it
    // from the bind frame on the first contact-preserving sample caused an
@@ -125,6 +133,9 @@ class MotionLabPose {
    if(!position||position.length!==3||!position.every(Number.isFinite))throw Error('支撑转换缺少有效脚锚：'+side);
    const footYaw=Number.isFinite(input.yaw)?input.yaw:yaw;
    state.feet[side]={...state.feet[side],position:[...position],yaw:footYaw,contact:true};
+   // Explicit support anchors (including seated preparation) own the whole
+   // sole frame. Flattening it around a fixed ankle drives toes into ground.
+   if(input.q)state.feet[side].adoptedOrientation=[...input.q];
   }
   if(reference)state.motion={...state.motion,frame:reference,weight:1};
   const controlled=!reference||options.controlledFeet===true;
@@ -177,11 +188,11 @@ class MotionLabPose {
      qm(qy(yaw),MotionLab.relaxedHandRotation(h.resolvedRig.nodes,side,data[side+'Forearm'],inward));
     rotations.set(radius,this.radialRotation(side,positions,palm));this.descendants(positions,rotations,hand,palm);
    }
-   const footQ=controlled?qy(state.feet[side].yaw):data[side+'FootQ']?qm(qy(yaw),qm(data[side+'FootQ'],inv(h.sourceBind.get(foot).q))):rotations.get(side+'_tibia');
+   const footQ=controlled?qm(this.controlledFootOrientation(state,side),inv(h.sourceBind.get(foot).q)):data[side+'FootQ']?qm(qy(yaw),qm(data[side+'FootQ'],inv(h.sourceBind.get(foot).q))):rotations.get(side+'_tibia');
    this.descendants(positions,rotations,foot,footQ);
    const patella=side+'_patella',shank=rotations.get(side+'_tibia');
    positions.set(patella,add(positions.get(side+'_tibia'),rotate(shank,sub(this.source(patella),this.source(side+'_tibia')))));rotations.set(patella,shank);
-   if(controlled)errors.push({id:foot,error:dist(positions.get(foot),state.feet[side].position),target:[...state.feet[side].position],targetSpace:'world',effectorLocal:[0,0,0],orientationErrorRad:0});
+   if(controlled)errors.push({id:foot,error:dist(positions.get(foot),state.feet[side].position),target:[...state.feet[side].position],targetSpace:'world',effectorLocal:[0,0,0],targetOrientation:this.controlledFootOrientation(state,side),orientationErrorRad:0});
   }
   if(options.hands)for(const side of ['left','right']){
    const goal=options.hands[side];if(!goal)continue;
@@ -253,24 +264,41 @@ class MotionLabPose {
  measureEffectors(candidate){
   this.refreshEffectorErrors(candidate.frames,candidate.errors);
  }
+ resolveGroundClearance(candidate,options){
+  let ground=null,groundCorrectionM=0;
+  if(!options.groundClearance)return{ground,groundCorrectionM};
+  const anchored=candidate.controlled&&!options.hands;let previous=null;
+  for(let pass=0;pass<(anchored?8:1);pass++){
+   ground=this.h.minimumBoneY(candidate.frames);
+   if(!Number.isFinite(ground.y))throw Error('动作候选缺少有效支撑采样');
+   let correction=Math.max(0,.0005-ground.y);if(correction<1e-7)return{ground,groundCorrectionM};
+   // A planted shin can rise much less than the pelvis. Estimate that local
+   // response only while the same support probe is limiting the pose; keep
+   // the accelerated step small and re-query the actual surface afterwards.
+   if(anchored&&previous?.boneId===ground.boneId){
+    const response=(ground.y-previous.y)/previous.correction;
+    if(response>.02&&response<.8)correction=Math.min(.025,correction/response*1.05);
+   }
+   previous={y:ground.y,boneId:ground.boneId,correction};
+   const before=anchored?new Map([...candidate.frames].map(([id,f])=>[id,frame([...f.p],[...f.q])])):null;
+   for(const f of candidate.frames.values())f.p[1]+=correction;
+   for(const error of candidate.errors)if(error.targetSpace==='body')error.target[1]+=correction;
+   // Raise the pelvis/body out of the floor, then bend the fixed-length legs
+   // back to the existing world contacts. Translating the feet as well made
+   // a valid seated support fail the contact gate during preparation.
+   if(anchored)this.reprojectControlledLegs(candidate.frames,candidate.state,candidate.state.yaw,before,before,1);
+   groundCorrectionM+=correction;
+  }
+  ground=this.h.minimumBoneY(candidate.frames);
+  if(!Number.isFinite(ground.y)||ground.y<.0005-1e-6)throw Error('地面净空与脚掌支撑无法同时满足：'+ground.boneId+' '+(ground.y*1000).toFixed(3)+' mm，姿态未提交');
+  return{ground,groundCorrectionM};
+ }
  apply(options={}){
   if(this.preflightOnly)throw Error('预检骨架不能提交人物姿态');
   const h=this.h,candidate=this.build(options);this.validate(candidate);
   // Floor queries read candidate frames. Failure cannot partially change the
   // live skeleton, even when this adapter is called outside Agent.tickFixed.
-  let ground=null,groundCorrectionM=0;
-  if(options.groundClearance){
-   ground=h.minimumBoneY(candidate.frames);
-   if(!Number.isFinite(ground.y))throw Error('动作候选缺少有效支撑采样');
-   groundCorrectionM=Math.max(0,.0005-ground.y);
-   if(groundCorrectionM>0){
-    for(const f of candidate.frames.values())f.p[1]+=groundCorrectionM;
-    // Body-relative landmarks move with the pose; world foot/object anchors
-    // remain fixed and any resulting residual must pass the same validator.
-    for(const error of candidate.errors)if(error.targetSpace==='body')error.target[1]+=groundCorrectionM;
-    ground={...ground,y:ground.y+groundCorrectionM};
-   }
-  }
+  const {ground,groundCorrectionM}=this.resolveGroundClearance(candidate,options);
   this.measureEffectors(candidate);const report=this.validate(candidate);
   const localFrames=h.joints.map(j=>{const f=candidate.frames.get(j.id),parent=j.parent&&candidate.frames.get(j.parent.id);return parent?compose(inverse(parent),f):frame(f.p,f.q);});
   for(let i=0;i<h.joints.length;i++){const j=h.joints[i],f=localFrames[i];j.p=f.p;j.q=f.q;}

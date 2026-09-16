@@ -6,7 +6,7 @@ class Agent{
  preflightInput(ignoreOwnedPose=false){
   const state=this.locomotion.engine.state,s=this.skill;
   const geometry=ignoreOwnedPose?{...this.w,objects:this.w.objects.map(o=>o===s?.o?{...o,p:[0,0,0],q:qi(),yaw:0}:o)}:this.w;
-  return JSON.stringify([motionPreflightModel(this.h).signature,this.pos,this.yaw,state.root,state.feet,state.pose,state.motion,
+  return JSON.stringify([motionPreflightModel(this.h).signature,this.pos,this.yaw,state.root,state.feet,state.pose,state.motion,this.locomotion.pose?.balanceInput?.()||null,
    s?.o&&[s.o.id,ignoreOwnedPose?null:s.o.p,ignoreOwnedPose?null:s.o.q,s.o.heldOwner],s?.target&&[s.target.id,s.target.p,s.target.q,s.target.w,s.target.h,s.target.d],this.grips,s?.reachStart,s?.releaseWrists,
    navigationGeometryKey(geometry),s?.o&&motionObjectShapeKey(this.w.physics.bodies.get(s.o.id).body)]);
  }
@@ -382,7 +382,6 @@ class Agent{
  activity(){return characterActivity(this);}
  diagnostics(){return{activity:this.activity(),strength:this.strength.report(),basic:this.basic.report(),locomotion:this.locomotion.report(),armSwing:{signal:this.gaitSignal,blend:this.gaitBlend,speedMPS:this.walkSpeed,mode:this.held?'grasp-priority':'contralateral-gait-coupling'},phase:this.phase,paused:this.paused,error:this.error,preflight:this.preflight?{...this.preflight}:null,activeStep:this.skill?{type:this.skill.type,objectId:this.skill.objectId,targetId:this.skill.targetId}:null,plan:this.plan?{steps:this.plan.steps,index:this.index}:null,heldObject:this.held?.id||null,stats:{...this.stats},completionEvidence:[...this.evidence],world:this.w.snapshot(),body:this.h.diagnostics(),interactionMode:'feedback-governed-rigid-body-manipulation',physicalCoupling:this.skill?.coupling?structuredClone(this.skill.coupling):null,physics:this.w.physics.snapshot(),forceDynamicsEnabled:true,forceDynamicsValidated:false,humanLocomotionDynamics:false,motionClock:{stepS:this.clock.step,ticks:this.clock.ticks,droppedSeconds:this.clock.droppedSeconds},physicalFeasibilityReasoning:true,physicalProfile:bodyPhysicalProfile(this.h),openLanguageUnderstanding:false,visualAcceptance:false,productionReady:false}}
 }
-
 
 
 

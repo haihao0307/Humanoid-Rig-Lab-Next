@@ -44,7 +44,7 @@ class LightBalanceFeedback{
    // Acceleration produces a small anticipatory lean. A carried mass already
    // displaced from the support centre produces a counter-lean instead.
    targetPitch=clamp(this.accelerationLocal[2]/LIGHT_BALANCE_FEEDBACK.gravityMps2*.18-this.comLocal[2]*.10,-LIGHT_BALANCE_FEEDBACK.maximumPitchRad,LIGHT_BALANCE_FEEDBACK.maximumPitchRad);
-   targetRoll=clamp(-this.accelerationLocal[0]/LIGHT_BALANCE_FEEDBACK.gravityMps2*.16-this.comLocal[0]*.12,-LIGHT_BALANCE_FEEDBACK.maximumRollRad,LIGHT_BALANCE_FEEDBACK.maximumRollRad);
+   targetRoll=clamp(-this.accelerationLocal[0]/LIGHT_BALANCE_FEEDBACK.gravityMps2*.16+this.comLocal[0]*.12,-LIGHT_BALANCE_FEEDBACK.maximumRollRad,LIGHT_BALANCE_FEEDBACK.maximumRollRad);
    if(support.feet.length>1)targetPelvis=[clamp(-this.comLocal[0]*.12,-LIGHT_BALANCE_FEEDBACK.maximumPelvisXM,LIGHT_BALANCE_FEEDBACK.maximumPelvisXM),0,
     clamp(-this.comLocal[2]*.10,-LIGHT_BALANCE_FEEDBACK.maximumPelvisZM,LIGHT_BALANCE_FEEDBACK.maximumPelvisZM)];
    const reduction=this.risk*(a.held?.18:.12);targetPace=clamp(1-reduction,a.held?LIGHT_BALANCE_FEEDBACK.minimumPace:.88,1);
@@ -81,16 +81,20 @@ class LightBalanceFeedback{
  NaturalLocomotion.prototype.report=function(){return{...report.call(this),lightBalance:this.balanceFeedback?.report()||null};};
  NaturalLocomotion.prototype.__lightBalanceR25=true;
  const prepare=MotionLabPose.prototype.prepare,apply=MotionLabPose.prototype.apply;
+ MotionLabPose.prototype.balanceInput=function(){
+  const feedback=(this.sourceHuman||this.h).__lightBalanceFeedback;
+  return feedback?.active&&!feedback.a?.basic?.busy?{pitchRad:feedback.pitchRad,rollRad:feedback.rollRad,pelvisLocal:[...feedback.pelvisLocal]}:null;
+ };
  MotionLabPose.prototype.prepare=function(options={}){
-  const result=prepare.call(this,options),feedback=this.h.__lightBalanceFeedback,agent=feedback?.a;
-  if(this.preflightOnly||!feedback?.active||agent?.basic?.busy||options.floorMode||options.lockedFrames)return result;
+  const result=prepare.call(this,options),feedback=this.balanceInput();
+  if(!feedback||options.floorMode||options.lockedFrames)return result;
   const lumbar=qm(qz(feedback.rollRad*.35),qx(feedback.pitchRad*.35)),thorax=qm(qz(feedback.rollRad*.65),qx(feedback.pitchRad*.65));
   result.data={...result.data,lumbarQ:qnorm(qm(lumbar,result.data.lumbarQ)),thoraxQ:qnorm(qm(thorax,result.data.thoraxQ))};
   // Recenter the pelvis only in double support and only when hands are not
   // constrained to a world object. Single support and manipulation receive
   // counter-lean but keep their existing root/contact solution unchanged.
   const doubleSupport=Object.values(result.state.feet||{}).every(foot=>foot.contact!==false);
-  if(doubleSupport&&!options.hands){
+  if(doubleSupport&&!options.hands&&options.motionSource?.kind!=='contact-adaptation'){
    const worldOffset=rotate(qy(result.yaw),feedback.pelvisLocal);result.state.root=add(result.state.root,worldOffset);
    if(result.controlled)result.state.pose=this.engine.solve(result.state);
   }

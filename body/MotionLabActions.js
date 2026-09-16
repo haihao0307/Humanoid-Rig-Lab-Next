@@ -38,9 +38,9 @@ function motionLocalCertificate(h,adapter,position,yaw,world,objectId,kind,param
  const body=world.physics.bodies.get(objectId)?.body;
  if(!body)throw Error('接触证书缺少实际物体几何');
  const shapeKey=motionObjectShapeKey(body);
- const feet=['left','right'].map(side=>[point(s.feet[side].position),angleDiff(s.feet[side].yaw,yaw),s.feet[side].contact]);
+ const feet=['left','right'].map(side=>[point(s.feet[side].position),angleDiff(s.feet[side].yaw,yaw),s.feet[side].contact,s.feet[side].adoptedOrientation?rotation(s.feet[side].adoptedOrientation):null]);
  const legs=['left','right'].map(side=>{const l=s.pose.legs[side];return[point(l.root),point(l.knee),point(l.end),l.residual,l.lengthError];});
- const inputs=[kind,shapeKey,point(s.root),angleDiff(s.yaw,yaw),feet,legs,adapter.pose.frameData(s,null),parameters({point,rotation,frame:localFrame})];
+ const inputs=[kind,shapeKey,point(s.root),angleDiff(s.yaw,yaw),feet,legs,adapter.pose.frameData(s,null),adapter.pose.balanceInput?.()||null,parameters({point,rotation,frame:localFrame})];
  // Quotient out a common world translation/yaw. The 1 pm serialization bin
  // only removes round-off introduced by that coordinate change. Reuse needs
  // an extra 0.1 mm clearance reserve; boundary passes are never cached.
@@ -71,13 +71,13 @@ function* motionCarrySamplesSteps(h){
   manipulationPace:()=>1,strength:{movementFactor:()=>1},w:{objects:[],bounds:{xMin:-10,xMax:10,zMin:-10,zMax:10},collision:()=>false}};
  const locomotion=new NaturalLocomotion(agent),states=[structuredClone(locomotion.engine.state)];
  for(let i=1;i<=360;i++){yield;agent.time+=1/120;locomotion.move(1/120,.43);locomotion.update(1/120);states.push(structuredClone(locomotion.engine.state));}
- const result={states,pose:locomotion.pose.forPreflight(),engine:locomotion.engine};motionCarryStates.set(h,result);return result;
+ const result={states,pose:locomotion.pose.forPreflight(),engine:locomotion.engine};result.pose.sourceHuman=h;motionCarryStates.set(h,result);return result;
 }
 function motionChooseCarryConfiguration(h,object,grips,relativeQ,world){return motionDrainPreflight(motionChooseCarryConfigurationSteps(h,object,grips,relativeQ,world));}
 function* motionChooseCarryConfigurationSteps(h,object,grips,relativeQ,world){
  motionPreflightModel(h);
  let cache=motionCarryConfigurations.get(h);if(!cache){cache=new Map();motionCarryConfigurations.set(h,cache);}
- const rounded=v=>Math.round(v*1e12)/1e12,key=JSON.stringify([motionObjectShapeKey(world.physics.bodies.get(object.id).body),object.shape,object.templateId,object.w,object.h,object.d,object.r,relativeQ.map(rounded),Object.values(grips).map(g=>[g.p.map(rounded),g.q.map(rounded)])]);
+ const rounded=v=>Math.round(v*1e12)/1e12,key=JSON.stringify([motionObjectShapeKey(world.physics.bodies.get(object.id).body),object.shape,object.templateId,object.w,object.h,object.d,object.r,relativeQ.map(rounded),Object.values(grips).map(g=>[g.p.map(rounded),g.q.map(rounded)]),h.motionDriver?.balanceInput?.()||null]);
  if(cache.has(key))return cache.get(key);
  const samples=yield* motionCarrySamplesSteps(h),m=h.bodyMetrics,reach=r2Mean(side=>m.armReachM[side]),contactHand=motionContactHand(object);
  const rear=object.shape==='box'?Math.abs(rotate(relativeQ,[object.w/2,0,0])[2])+Math.abs(rotate(relativeQ,[0,0,object.d/2])[2]):object.r;
@@ -316,9 +316,11 @@ function motionReachHands(agent,targetHands,amount){
  const pose=agent.locomotion.pose,shoulders=u=>{const options=motionContactDescriptor(agent,null,u);return pose.preflightOnly?pose.reachShoulders(options):pose.build(options).frames;},candidate=shoulders(t);
  // The skill freezes this reach's goal, yaw and contact pose. Cache only the
  // two endpoint wrist offsets/quaternions, derived once from the real builder.
- // Every frame still uses that same builder for the moving shoulder frames.
- if(!agent.skill.reachTarget){const end=t===1?candidate:shoulders(1);
-  agent.skill.reachTarget=motionFreeHandEndpoints(agent.h,end,targetHands);}
+ // Every frame uses that builder for moving shoulders. A changed balance
+ // input also moves the endpoint shoulders, so invalidate its offsets too.
+ const balanceKey=JSON.stringify(pose.balanceInput?.()||null);
+ if(!agent.skill.reachTarget||agent.skill.reachBalanceKey!==balanceKey){const end=t===1?candidate:shoulders(1);
+  agent.skill.reachTarget=motionFreeHandEndpoints(agent.h,end,targetHands);agent.skill.reachBalanceKey=balanceKey;}
  const target=agent.skill.reachTarget;
  const hands=motionInterpolateFreeHands(agent.h,candidate,start,target,t);
  if(agent.skill.contactPose?.contactHandMode||agent.skill.o?.shape==='box'){

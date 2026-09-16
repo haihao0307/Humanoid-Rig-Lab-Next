@@ -39,10 +39,11 @@ export function checkCharacterSystemSources({parse,read,assert}){
  check(ordered(language.slice(language.indexOf('async function drainSemanticQueue')),["requestBody('semantic.reserve'",'await waitForBodySettled(task)','await forecastSemantic(task.plan)']),'dispatch forecasts from the settled body');
  check(ordered(language.slice(language.indexOf('async function runNativeSemantic')),['await waitForBodySettled(task)','await freshWorld']),'native batches refresh the scene after settling');
  check(/activity\.readyForTask&&!activity\.paused/.test(language)&&/waitingS\+=Math\.max\(0,activity\.timeS-previousTime\)/.test(language),'settlement wait uses body time and respects body pause');
- const pose=read('body/MotionLabPose.js'),apply=method(pose,'MotionLabPose','apply'),validate=method(pose,'MotionLabPose','validate');
+ const pose=read('body/MotionLabPose.js'),apply=method(pose,'MotionLabPose','apply'),validate=method(pose,'MotionLabPose','validate'),clearance=method(pose,'MotionLabPose','resolveGroundClearance');
  check(/this\.h\.joints\.some\(j=>!candidate\.frames\.has\(j\.id\)\)/.test(validate)&&/f\.p\?\.length!==3\|\|f\.q\?\.length!==4/.test(validate),'candidate has the exact joint identities and transform dimensions');
- check(ordered(apply,['this.build(options)','this.validate(candidate)','h.minimumBoneY(candidate.frames)','this.measureEffectors(candidate)','const report=this.validate(candidate)','const localFrames=','j.p=f.p','h.fk()']),'floor and final effector validation precede every live joint write');
- check(!/h\.root\.p\[1\]|h\.refreshEffectorErrors/.test(apply)&&/error\.targetSpace==='body'/.test(apply),'floor translation preserves fixed world contact targets');
+ check(ordered(apply,['this.build(options)','this.validate(candidate)','this.resolveGroundClearance(candidate,options)','this.measureEffectors(candidate)','const report=this.validate(candidate)','const localFrames=','j.p=f.p','h.fk()']),'floor and final effector validation precede every live joint write');
+ check(!/h\.root\.p\[1\]|h\.refreshEffectorErrors/.test(apply+clearance)&&/error\.targetSpace==='body'/.test(clearance),'floor translation preserves fixed world contact targets');
+ check(ordered(clearance,['this.h.minimumBoneY(candidate.frames)','this.reprojectControlledLegs(','ground=this.h.minimumBoneY(candidate.frames)'])&&/ground\.y<\.0005-1e-6/.test(clearance),'anchored floor correction reprojects fixed-length legs and rechecks actual ground clearance');
  check(/targetSpace:'world'/.test(pose)&&/targetSpace:goal\.space\|\|'world'/.test(pose)&&/space:'body'/.test(read('body/StandardsMotion.js')),'world contacts and body-relative salute landmarks are explicit');
  check(/minimumBoneY\(frames=null\)/.test(template)&&/minimumSupportY\(frames\)/.test(read('body/ReconstructionState.js')),'candidate support frames reach the skin query');
  const surface=read('body/CompactWorkbench.js'),replace=method(surface,'CompactSurfaceRenderer','replace');
