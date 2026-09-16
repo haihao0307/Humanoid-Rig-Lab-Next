@@ -55,6 +55,8 @@ require("__CAT_PHASE1_READY__" in html, "phase1 ready flag missing")
 require("__CAT_PHASE1_GET_STATE__" in html, "phase1 state API missing")
 require("__CAT_PHASE1_SET_OBSTACLE__" in html, "phase1 obstacle API missing")
 require("groupRuntime:false" in html and "variationRuntime:false" in html, "group/variation gates are not locked")
+require("blinkLayerEnabled=false" in html, "secondary eye-region carrier must be disabled in the Phase 1 default")
+require("secondaryFaceCarrierDefault:false" in html, "secondary presentation boundary missing")
 require("fullMeshCollision" not in html, "full-mesh collision leaked into browser runtime")
 
 require(contract.get("schema") == "cat_kaopu/environment_npc_phase1_contract@1.0", "contract schema mismatch")
@@ -73,6 +75,8 @@ require(manifest.get("schema") == "cat_kaopu/phase1_gate_build@1.0", "manifest s
 require(manifest.get("buildId") == BUILD_ID, "manifest build id mismatch")
 require(manifest.get("sourceSha256") == sha256(SOURCE), "source hash mismatch")
 require(manifest.get("technicalReady") is True, "technical-ready flag missing")
+require(manifest.get("secondaryFaceCarrierDefault") is False, "secondary face carrier default mismatch")
+require(manifest.get("wholeBodySilhouetteUnobstructed") is True, "whole-body silhouette guard missing")
 require(manifest.get("visualAcceptance") is False, "visual acceptance must remain false")
 require(manifest.get("productionReady") is False, "production readiness must remain false")
 
@@ -93,6 +97,11 @@ if args.require_browser:
     require(not browser.get("consoleErrors"), f"console errors: {browser.get('consoleErrors')}")
     failed = [key for key, value in browser.get("assertions", {}).items() if value is not True]
     require(not failed, f"browser assertions failed: {failed}")
+    stand_front = browser.get("samples", {}).get("standFront", {})
+    expression = stand_front.get("metrics", {}).get("expression", {})
+    presentation = browser.get("audit", {}).get("presentation", {})
+    require(expression.get("blinkLayerEnabled") is False, "secondary carrier rendered in whole-body browser evidence")
+    require(presentation.get("secondaryFaceCarrierDefault") is False, "browser audit presentation boundary missing")
     require(browser.get("visualAcceptance") is False, "browser QA must not claim visual acceptance")
     require(browser.get("productionReady") is False, "browser QA must not claim production readiness")
 
@@ -103,6 +112,7 @@ print(
             "workbenchBytes": WORKBENCH.stat().st_size,
             "sourceSha256": sha256(SOURCE),
             "browserVerified": args.require_browser,
+            "secondaryFaceCarrierDefault": False,
             "productionReady": False,
         },
         ensure_ascii=False,
