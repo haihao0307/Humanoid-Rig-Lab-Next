@@ -75,12 +75,13 @@ def write_params()->None:
    'controller':'runtime/chicken_phase1_npc_controller.mjs',
    'articulated_skin':'runtime/chicken_phase1_articulated_skin.mjs',
    'peck_adapter':'runtime/chicken_phase1_peck_adapter.mjs',
+   'ring_coherent_adapter':'runtime/chicken_phase1_ring_coherent_adapter.mjs',
    'manual_step':'tools/chicken_r100_manual_step_patch.js',
    'root_motion_scale':0.42,
    'fixed_bone_lengths':True,
    'non_root_scale_forbidden':True,
    'contact_diagnostics':['bill_ground_error','left_foot_ground_error','right_foot_ground_error'],
-   'neck_deformation':'six_link_volume_distribution_v4'
+   'neck_deformation':'ring_coherent_six_link_v5'
   },
   'gates':{'technical_motion_gate':False,'manual_visual_acceptance':False,'single_agent_grounding_complete':False,'collision_complete':False,'group_test_authorized':False,'production_ready':False}
  })
@@ -98,7 +99,8 @@ def write_static(build_info:dict)->None:
   'output_larger_than_source':build_info['output_bytes']>build_info['source_bytes'],
   'controller_exists':(ROOT/'runtime/chicken_phase1_npc_controller.mjs').exists(),
   'skin_runtime_exists':(ROOT/'runtime/chicken_phase1_articulated_skin.mjs').exists(),
-  'peck_adapter_exists':(ROOT/'runtime/chicken_phase1_peck_adapter.mjs').exists()
+  'peck_adapter_exists':(ROOT/'runtime/chicken_phase1_peck_adapter.mjs').exists(),
+  'ring_coherent_adapter_exists':(ROOT/'runtime/chicken_phase1_ring_coherent_adapter.mjs').exists()
  }
  write_json(STATIC_QA,{'schema':'life_ecosystem/chicken_r100_static_qa@1.0','checks':checks,'passed':all(checks.values()),'build':build_info,'scope':'deterministic build and dependency presence only'})
  if not all(checks.values()):raise RuntimeError(f'static checks failed: {[k for k,v in checks.items() if not v]}')
@@ -110,7 +112,7 @@ def write_review()->None:
  REVIEW.write_text(f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chicken R10.0 单只行为审查板</title><style>*{{box-sizing:border-box}}body{{margin:0;background:#171f25;color:#eef3f2;font:14px/1.5 system-ui,-apple-system,Segoe UI,Microsoft Yahei,sans-serif}}header{{padding:24px;border-bottom:1px solid #34444b}}.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;padding:18px}}figure{{margin:0;background:#10181d;border:1px solid #35454c;border-radius:8px;overflow:hidden}}img{{width:100%;height:360px;object-fit:contain;background:#182127}}figcaption{{padding:10px 12px}}.gate{{margin:0 18px 22px;padding:14px;border-left:4px solid #c49b59;background:#232c31}}</style></head><body><header><h1>Chicken V4.6 R10.0 · 单只基础行为闭环</h1><p>此审查板只验证单只鸡的骨链、固定骨长、动作状态与外观协同。群体测试未启用。</p></header><main class="grid">{cards}</main><section class="gate">门槛：脚底接触、喙触地、朝向更新、头颈与腿部骨链、停止边界和循环必须稳定；截图成功不等于动作已经自然。</section></body></html>''',encoding='utf-8')
 
 def write_manifest()->None:
- paths=[SOURCE,PATCH,PECK_PATCH,MANUAL_PATCH,OUTPUT,PARAMS,STATIC_QA,BROWSER_QA,REVIEW,ROOT/'runtime/chicken_phase1_npc_controller.mjs',ROOT/'runtime/chicken_phase1_articulated_skin.mjs',ROOT/'runtime/chicken_phase1_peck_adapter.mjs']+sorted(EVIDENCE.glob('*.png'))
+ paths=[SOURCE,PATCH,PECK_PATCH,MANUAL_PATCH,OUTPUT,PARAMS,STATIC_QA,BROWSER_QA,REVIEW,ROOT/'runtime/chicken_phase1_npc_controller.mjs',ROOT/'runtime/chicken_phase1_articulated_skin.mjs',ROOT/'runtime/chicken_phase1_peck_adapter.mjs',ROOT/'runtime/chicken_phase1_ring_coherent_adapter.mjs']+sorted(EVIDENCE.glob('*.png'))
  files=[{'path':str(p.relative_to(ROOT)),'bytes':p.stat().st_size,'sha256':sha(p)} for p in paths if p.exists()]
  write_json(MANIFEST,{'schema':'life_ecosystem/build_manifest@1.0','package':'CHICKEN_V4_6_R10_0_SINGLE_AGENT_BEHAVIOR_FOUNDATION','active_entry':OUTPUT.name,'group_test_authorized':False,'files':files})
 
