@@ -102,6 +102,30 @@ jobs:
         if: always()
         run: python tools/build_chicken_r93.py --finalize
 
+      - name: Render review board PDF
+        if: always()
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        shell: bash
+        run: |
+          test -s evidence/r93/R93_REVIEW_BOARD.html
+          python -m http.server 8766 > /tmp/chicken-r93-review-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 2
+          "$CHROME_PATH" \
+            --headless=new \
+            --no-sandbox \
+            --disable-dev-shm-usage \
+            --disable-gpu \
+            --hide-scrollbars \
+            --run-all-compositor-stages-before-draw \
+            --virtual-time-budget=8000 \
+            --print-to-pdf=evidence/r93/R93_REVIEW_BOARD.pdf \
+            --print-to-pdf-no-header \
+            http://127.0.0.1:8766/evidence/r93/R93_REVIEW_BOARD.html
+          test -s evidence/r93/R93_REVIEW_BOARD.pdf
+
       - name: Upload R9.3 visual evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -130,6 +154,7 @@ jobs:
               Path('qa/CHICKEN_R93_STATIC_QA.json'),
               Path('qa/CHICKEN_R93_BROWSER_QA.json'),
               Path('evidence/r93/R93_REVIEW_BOARD.html'),
+              Path('evidence/r93/R93_REVIEW_BOARD.pdf'),
               Path('BUILD_MANIFEST_R93.json'),
           ]
           missing = [str(path) for path in required if not path.exists()]
