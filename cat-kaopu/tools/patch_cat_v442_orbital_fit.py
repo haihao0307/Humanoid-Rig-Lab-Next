@@ -31,16 +31,14 @@ NEW = (
     "float outer=(lid>0.?.82:-.72)*q;"
     "float tt=smoothstep(0.,1.,t);"
     "float ey=mix(inner,outer,tt);"
-    "float sphereEf=sqrt(max(.0001,1.-ex*ex-ey*ey));"
-    "float flatten=.10*close*(1.-.62*tt)*q*q;"
-    "float ef=max(.08,sphereEf-flatten);"
+    "float ef=sqrt(max(.0001,1.-ex*ex-ey*ey));"
     "float rMean=max(.0001,(aRadius.x+aRadius.y+aRadius.z)/3.);"
     "float frontScale=1.+uThicknessM/rMean;"
-    "float surfaceScale=mix(frontScale,.985,tt);"
-    "float shell=aParam.w<.5?surfaceScale:(aParam.w<1.5?frontScale:.982);"
-    "vec3 dir=vec3(ef,ex,ey);"
+    "float surfaceScale=mix(frontScale,1.001,tt);"
+    "float shell=aParam.w<.5?surfaceScale:(aParam.w<1.5?frontScale:.998);"
+    "vec3 dir=normalize(vec3(ef,ex,ey));"
     "vec3 p=aCenter+aRadius*dir*shell;"
-    "p.x+=close*(lid>0.?uThicknessM*.35:-uThicknessM*.15)*(1.-tt);"
+    "p.x+=close*(lid>0.?uThicknessM*.25:-uThicknessM*.10)*(1.-tt);"
 )
 
 text = BUILDER.read_text(encoding="utf-8")
@@ -50,4 +48,4 @@ elif text.count(OLD) != 1:
     raise SystemExit(f"expected exactly one V4.42 eyelid shader marker, found {text.count(OLD)}")
 else:
     BUILDER.write_text(text.replace(OLD, NEW, 1), encoding="utf-8")
-    print("patched V4.42 eyelids: tucked outer orbit, asymmetric closure seam and reduced spherical bulge")
+    print("patched V4.42 eyelids: orbit-tucked outer bands, asymmetric overlap seam, eye-sphere-safe depth")
