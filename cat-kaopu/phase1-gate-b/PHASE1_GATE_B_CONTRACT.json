@@ -1,0 +1,47 @@
+{
+  "schema": "cat_kaopu/phase1_gate_b_contract@1.0",
+  "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+  "gate": "B",
+  "status": "active",
+  "goal": "correct torso silhouette before limb, paw and head gates",
+  "requiredViews": [
+    "front",
+    "left",
+    "top",
+    "quarter"
+  ],
+  "requiredActions": [
+    "stand",
+    "walk_forward",
+    "turn_left",
+    "turn_right"
+  ],
+  "requiredComparisons": [
+    "morph_off",
+    "morph_on",
+    "morph_debug"
+  ],
+  "allowedMutation": [
+    "bounded bind-space surface corrective layer"
+  ],
+  "forbiddenMutation": [
+    "CATV440 payload",
+    "rig hierarchy",
+    "bone lengths",
+    "skinning weights",
+    "animation tracks",
+    "collision proxy profile",
+    "group runtime",
+    "variation runtime"
+  ],
+  "deferred": {
+    "limbSegmentation": true,
+    "pawRebuild": true,
+    "headRebuild": true,
+    "groupRuntime": true,
+    "variationRuntime": true,
+    "localAvoidance": true
+  },
+  "visualAcceptance": false,
+  "productionReady": false
+}

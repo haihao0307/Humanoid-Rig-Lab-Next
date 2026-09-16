@@ -1,0 +1,153 @@
+{
+  "schema": "cat_kaopu/bounded_morphology_profile@1.0",
+  "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+  "date": "2026-09-16",
+  "sourceGateA": "cat-kaopu/phase1/CAT_KAOPU_PHASE1_GATE_A_SINGLE_NPC_2026-09-16.html",
+  "space": "bind-space-before-skinning",
+  "representation": "bounded-analytic-regional-field",
+  "runtimePayload": {
+    "format": "CATV440",
+    "sha256": "518aed4758033b2f3b40e6242976a8bb7779a4d70a9f2dba8461c56ac5cee846",
+    "mutation": false
+  },
+  "invariants": {
+    "rigHierarchy": true,
+    "boneLengths": true,
+    "skinningWeights": true,
+    "animationTracks": true,
+    "collisionProfile": true,
+    "eyeRegionVertices": true,
+    "bodyLengthAxis": true,
+    "groundMinimum": true
+  },
+  "regions": [
+    {
+      "id": "thorax",
+      "purpose": "restore lateral rib-cage volume and ventral depth"
+    },
+    {
+      "id": "waist",
+      "purpose": "separate thorax from abdomen without pinching limbs"
+    },
+    {
+      "id": "pelvis",
+      "purpose": "maintain hind-quarter continuity"
+    },
+    {
+      "id": "shoulder-neck",
+      "purpose": "soften chest, scapular and neck-root transition"
+    },
+    {
+      "id": "ventral-line",
+      "purpose": "raise the waist line while retaining thoracic depth"
+    }
+  ],
+  "parameters": {
+    "chest": {
+      "default": 0.82,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "waist": {
+      "default": 0.78,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "pelvis": {
+      "default": 0.36,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "shoulder": {
+      "default": 0.74,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "belly": {
+      "default": 0.82,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "neck": {
+      "default": 0.68,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "master": {
+      "default": 1.0,
+      "min": 0.0,
+      "max": 1.25
+    }
+  },
+  "equationRevision": "gate-b-torso-field-v1",
+  "anatomicalEvidence": [
+    {
+      "title": "Normal cross-sectional anatomy of the feline thorax and abdomen",
+      "pmid": "9845186",
+      "doi": "10.1111/j.1740-8261.1998.tb01640.x",
+      "use": "regional thorax and abdomen cross-sectional reference"
+    },
+    {
+      "title": "Anatomical study of the thorax and abdomen of the domestic cat",
+      "pmid": "42710191",
+      "doi": "10.1016/j.rvsc.2026.106389",
+      "use": "thorax/abdomen sections correlated with CT and 3D reconstruction"
+    }
+  ],
+  "measuredDefault": {
+    "vertexCount": 3948,
+    "bodyVertexCount": 3184,
+    "affectedVertices": 1735,
+    "maxDeltaM": 0.008845951754032532,
+    "meanAffectedDeltaM": 0.00135099465187707,
+    "eyeRegionMaxDeltaM": 0.0,
+    "bodyLengthBaseM": 0.5166386961936951,
+    "bodyLengthM": 0.5166386961936951,
+    "bodyMinZBaseM": 0.0,
+    "bodyMinZM": 0.0,
+    "baseWidthsM": {
+      "chest": 0.09455211214954834,
+      "waist": 0.08950989247323392,
+      "pelvis": 0.10109623077396507
+    },
+    "widthsM": {
+      "chest": 0.10181394656508508,
+      "waist": 0.0847909124547049,
+      "pelvis": 0.10147092516521967
+    },
+    "widthRatios": {
+      "chest": 1.076802455814536,
+      "waist": 0.9472797934603694,
+      "pelvis": 1.0037063141561862
+    },
+    "lowerContours": {
+      "chest": {
+        "baseM": 0.10276402227936962,
+        "morphedM": 0.10019311792824397,
+        "deltaM": -0.002570904351125655
+      },
+      "waist": {
+        "baseM": 0.10265608254691926,
+        "morphedM": 0.1057276501202467,
+        "deltaM": 0.0030715675733274383
+      },
+      "pelvis": {
+        "baseM": 0.10374627384466793,
+        "morphedM": 0.10747835799201567,
+        "deltaM": 0.0037320841473477417
+      }
+    },
+    "triangleOrientationMinDot": 0.8039804610136057,
+    "triangleOrientationP001Dot": 0.9160764195696032,
+    "triangleAreaRatioP001": 0.8043247332300131,
+    "triangleAreaRatioP999": 1.3653903067609188,
+    "edgeRatioP001": 0.8324518778365563,
+    "edgeRatioP999": 1.2084146202695127,
+    "payloadInvariant": true,
+    "rigInvariant": true,
+    "boneLengthInvariant": true,
+    "collisionProfileInvariant": true
+  },
+  "visualAcceptance": false,
+  "productionReady": false
+}

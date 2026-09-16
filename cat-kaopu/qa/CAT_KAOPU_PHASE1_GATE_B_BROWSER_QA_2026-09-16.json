@@ -1,0 +1,3613 @@
+{
+  "schema": "cat_kaopu/phase1_gate_b_browser_qa@1.0",
+  "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+  "url": "http://127.0.0.1:4173/cat-kaopu/phase1-gate-b/index.html",
+  "ready": "gate-b-webgl2",
+  "pageErrors": [],
+  "consoleErrors": [],
+  "audit": {
+    "morphologyViews": [
+      "front",
+      "left",
+      "top",
+      "quarter"
+    ],
+    "coreActions": [
+      "stand",
+      "walk_forward",
+      "turn_left",
+      "turn_right"
+    ],
+    "secondaryActions": [
+      "idle",
+      "look",
+      "tail",
+      "alert",
+      "sniff",
+      "sit_cycle",
+      "lie_cycle",
+      "groom"
+    ],
+    "collision": {
+      "proxyCount": 3,
+      "obstacleCount": 1,
+      "response": "post-contact-bounded-pushout-plus-grounded-gait-brake"
+    },
+    "presentation": {
+      "secondaryFaceCarrierDefault": false,
+      "reason": "whole_body_silhouette_first"
+    },
+    "morphology": {
+      "layer": "bounded-bind-space-surface-corrective",
+      "payloadMutation": false,
+      "rigMutation": false,
+      "boneLengthMutation": false,
+      "weightMutation": false,
+      "regions": [
+        "thorax",
+        "waist",
+        "pelvis",
+        "shoulder-neck",
+        "ventral-line"
+      ]
+    },
+    "gates": {
+      "singleNpc": "active",
+      "morphology": "active",
+      "group": "locked",
+      "variation": "locked",
+      "avoidance": "next"
+    }
+  },
+  "collisionProfile": {
+    "schema": "cat_kaopu/environment_collision_proxy@1.0",
+    "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+    "proxies": [
+      {
+        "id": "pelvis",
+        "label": "骨盆",
+        "local": [
+          -0.092,
+          0,
+          0.135
+        ],
+        "radius": 0.076
+      },
+      {
+        "id": "chest",
+        "label": "胸腔",
+        "local": [
+          0.075,
+          0,
+          0.165
+        ],
+        "radius": 0.084
+      },
+      {
+        "id": "head",
+        "label": "头部",
+        "local": [
+          0.218,
+          0,
+          0.205
+        ],
+        "radius": 0.064
+      }
+    ],
+    "obstacles": [
+      {
+        "id": "wall_A",
+        "label": "测试墙",
+        "min": [
+          0.42,
+          -0.19,
+          0
+        ],
+        "max": [
+          0.44,
+          0.19,
+          0.245
+        ]
+      }
+    ]
+  },
+  "morphologyDefault": {
+    "enabled": true,
+    "params": {
+      "chest": 0.82,
+      "waist": 0.78,
+      "pelvis": 0.36,
+      "shoulder": 0.74,
+      "belly": 0.82,
+      "neck": 0.68,
+      "master": 1
+    },
+    "maxDeltaM": 0.0088459516066638,
+    "meanDeltaM": 0.0013509946502934722,
+    "affectedVertices": 1735,
+    "widths": {
+      "chest": 0.10181394494925897,
+      "waist": 0.0847909131560223,
+      "pelvis": 0.10147092612181441
+    },
+    "baseWidths": {
+      "chest": 0.09455211088061333,
+      "waist": 0.08950989320874214,
+      "pelvis": 0.10109623149037361
+    },
+    "widthRatios": {
+      "chest": 1.07680245317648,
+      "waist": 0.9472797935115964,
+      "pelvis": 1.0037063165057392
+    },
+    "bodyLengthBaseM": 0.5166386961936951,
+    "bodyLengthM": 0.5166386961936951,
+    "bodyMinZBaseM": 0,
+    "bodyMinZM": 0,
+    "lengthInvariant": true,
+    "groundInvariant": true,
+    "eyeRegionMaxDeltaM": 0
+  },
+  "stats": {
+    "vertices": 3948,
+    "triangles": 7884,
+    "bones": 34,
+    "maxInfluences": 4,
+    "neutralSurface": "V4.32-frozen",
+    "weightBaseline": "V4.34-frozen",
+    "cameraHotfix": true,
+    "padContactPlane": true,
+    "gaitPhaseRefine": true,
+    "turnMotion": true,
+    "innerOuterStride": true,
+    "scapulaTranslation": true,
+    "sitTransition": true,
+    "lieTransition": true,
+    "poseCorrectiveLayer": true,
+    "regionalRefinement": true,
+    "poseTargetNormals": true,
+    "earBones": true,
+    "proceduralEye": true,
+    "proceduralEyelid": false,
+    "geometricEyelidVolume": false,
+    "wideEyeRegionCarrier": true,
+    "bilateralFaceField": true,
+    "browNasalCheekContinuity": true,
+    "singlePrimaryClosureSeam": true,
+    "frozenBoundaryReturn": true,
+    "eyeRegionPieces": 1,
+    "eyeRegionVertices": 6693,
+    "eyeRegionTriangles": 13056,
+    "eyeRegionCols": 96,
+    "eyeRegionRows": 68,
+    "legacyV445PeriorbitalAvailable": true,
+    "deterministicBlink": true,
+    "cornealResponse": true,
+    "pupilAdaptation": true,
+    "shortFurDirectionField": true,
+    "correctiveRepresentation": "two-int16-position-residuals-plus-two-snorm16-pose-normal-fields",
+    "correctiveScaleM": 0.00001,
+    "correctiveActions": [
+      "sit_cycle",
+      "sit_hold",
+      "lie_cycle",
+      "lie_hold"
+    ],
+    "neutralInvariant": true,
+    "locomotionInvariant": true,
+    "rootMotion": true,
+    "desiredFinalPose": true,
+    "phase1EnvironmentNpc": true,
+    "phase1Gate": "B",
+    "phase1Morphology": true,
+    "phase1MorphPayloadInvariant": true,
+    "phase1MorphRigInvariant": true,
+    "collisionProxy": true,
+    "groupRuntime": false,
+    "variationRuntime": false,
+    "secondaryFaceCarrierDefault": false,
+    "externalModel": false,
+    "externalTexture": false,
+    "externalAnimation": false
+  },
+  "screenshots": {
+    "morphOffFront": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MORPH_OFF_FRONT_2026-09-16.png",
+      "bytes": 94946,
+      "sha256": "b8153bc4135c2fde47057750defcf6eefb5f0a606cef3afd88ed322894509d3b"
+    },
+    "morphOffLeft": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MORPH_OFF_LEFT_2026-09-16.png",
+      "bytes": 95969,
+      "sha256": "324c06d5c5a87aaac696a34373c62b8017f1f3865c84ebb443cedc646ff8b5db"
+    },
+    "morphOffTop": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MORPH_OFF_TOP_2026-09-16.png",
+      "bytes": 72841,
+      "sha256": "3934e209fdb75f8399ee8b1cd4024805d4d583d3e78f4773787835aa6a3cb218"
+    },
+    "morphOffQuarter": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MORPH_OFF_QUARTER_2026-09-16.png",
+      "bytes": 101797,
+      "sha256": "fc7f5f68ed44556ce7caa293bb818a74b24e26973b4c56614b4bdddf3fa589d0"
+    },
+    "morphOnFront": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MORPH_ON_FRONT_2026-09-16.png",
+      "bytes": 95751,
+      "sha256": "97ee40c6fe460761648028634dd37cd96c983143de9f07d52bf6c0ca747dfd37"
+    },
+    "morphOnLeft": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MORPH_ON_LEFT_2026-09-16.png",
+      "bytes": 95979,
+      "sha256": "34c76e2a5e203790aec28783cd8dce1233bed66d1d37e216554cb1ccadc4f9da"
+    },
+    "morphOnTop": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MORPH_ON_TOP_2026-09-16.png",
+      "bytes": 73702,
+      "sha256": "f932cc45ca79ad725d6f7a281e21331f36a8dc8d9fa80f8d88f9cd135b2a69c9"
+    },
+    "morphOnQuarter": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MORPH_ON_QUARTER_2026-09-16.png",
+      "bytes": 102049,
+      "sha256": "254f432e176d851805fa04f5265d8f647459a4a2d370cef46a474b6489a5a3c6"
+    },
+    "morphDebugTop": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MORPH_DEBUG_TOP_2026-09-16.png",
+      "bytes": 75507,
+      "sha256": "6734a5ebc661443748ac2896b242650fd5ea22980d18383f9d87b9d94fe088f3"
+    },
+    "walkMid": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_WALK_MID_2026-09-16.png",
+      "bytes": 105045,
+      "sha256": "cc6a6ef15ef3c63bfc248190622ff9e7d819243b9117f9384d02a5be1b968301"
+    },
+    "turnLeftTop": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_TURN_LEFT_TOP_2026-09-16.png",
+      "bytes": 77435,
+      "sha256": "2aee061535a4a4b104e3e39f0dd3b0950d6d52dc162281ca6e7d1e0f47e335f7"
+    },
+    "turnRightTop": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_TURN_RIGHT_TOP_2026-09-16.png",
+      "bytes": 77850,
+      "sha256": "4b89b4af02c4a7f6afe815450fb0dde956a15b67df17ef16a52f5535fbe740d8"
+    },
+    "collisionBlocked": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_COLLISION_BLOCKED_2026-09-16.png",
+      "bytes": 104472,
+      "sha256": "b726afffecc4716cace753e6989ae5081522e3b00577e7c0fe41fb8dcabf1fd8"
+    }
+  },
+  "samples": {
+    "morphOffFront": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": false,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.13799999999999998,
+        "contacts": [],
+        "testedFrames": 80
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "stand",
+      "camera": {
+        "az": 0,
+        "el": 0.03,
+        "dist": 1.4094985308897934,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "stand",
+        "cameraDirectionLocked": true,
+        "fitDist": 1.4094985308897934,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "stand",
+        "time": 0.2,
+        "support": [],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0,
+        "rootDistanceM": 0,
+        "rootPosition": [
+          0,
+          0,
+          0
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0,
+          "R": 0
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 0,
+          "gazePitch": 0,
+          "earLeft": 0,
+          "earRight": 0,
+          "earPitchL": 0,
+          "earPitchR": 0,
+          "mode": "auto",
+          "source": "stand",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": 0,
+          "el": 0.03,
+          "dist": 1.4094985308897934,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.13799999999999998,
+          "contacts": [],
+          "testedFrames": 80
+        }
+      }
+    },
+    "morphOffLeft": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": false,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.13799999999999998,
+        "contacts": [],
+        "testedFrames": 134
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "stand",
+      "camera": {
+        "az": -1.5707963267948966,
+        "el": 0.04,
+        "dist": 2.0291091255001152,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "stand",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.0291091255001152,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "stand",
+        "time": 0.2,
+        "support": [],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0,
+        "rootDistanceM": 0,
+        "rootPosition": [
+          0,
+          0,
+          0
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0,
+          "R": 0
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 0,
+          "gazePitch": 0,
+          "earLeft": 0,
+          "earRight": 0,
+          "earPitchL": 0,
+          "earPitchR": 0,
+          "mode": "auto",
+          "source": "stand",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": -1.5707963267948966,
+          "el": 0.04,
+          "dist": 2.0291091255001152,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.13799999999999998,
+          "contacts": [],
+          "testedFrames": 134
+        }
+      }
+    },
+    "morphOffTop": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": false,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.13799999999999998,
+        "contacts": [],
+        "testedFrames": 189
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "stand",
+      "camera": {
+        "az": 0,
+        "el": 1.48,
+        "dist": 2.337724224628662,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "stand",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.337724224628662,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "stand",
+        "time": 0.2,
+        "support": [],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0,
+        "rootDistanceM": 0,
+        "rootPosition": [
+          0,
+          0,
+          0
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0,
+          "R": 0
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 0,
+          "gazePitch": 0,
+          "earLeft": 0,
+          "earRight": 0,
+          "earPitchL": 0,
+          "earPitchR": 0,
+          "mode": "auto",
+          "source": "stand",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": 0,
+          "el": 1.48,
+          "dist": 2.337724224628662,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.13799999999999998,
+          "contacts": [],
+          "testedFrames": 189
+        }
+      }
+    },
+    "morphOffQuarter": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": false,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.13799999999999998,
+        "contacts": [],
+        "testedFrames": 244
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "stand",
+      "camera": {
+        "az": -0.78,
+        "el": 0.24,
+        "dist": 2.093507913302814,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "stand",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.093507913302814,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "stand",
+        "time": 0.2,
+        "support": [],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0,
+        "rootDistanceM": 0,
+        "rootPosition": [
+          0,
+          0,
+          0
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0,
+          "R": 0
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 0,
+          "gazePitch": 0,
+          "earLeft": 0,
+          "earRight": 0,
+          "earPitchL": 0,
+          "earPitchR": 0,
+          "mode": "auto",
+          "source": "stand",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": -0.78,
+          "el": 0.24,
+          "dist": 2.093507913302814,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.13799999999999998,
+          "contacts": [],
+          "testedFrames": 244
+        }
+      }
+    },
+    "morphOnFront": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.13799999999999998,
+        "contacts": [],
+        "testedFrames": 297
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "stand",
+      "camera": {
+        "az": 0,
+        "el": 0.03,
+        "dist": 1.4094985308897934,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "stand",
+        "cameraDirectionLocked": true,
+        "fitDist": 1.4094985308897934,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "stand",
+        "time": 0.2,
+        "support": [],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0,
+        "rootDistanceM": 0,
+        "rootPosition": [
+          0,
+          0,
+          0
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0,
+          "R": 0
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 0,
+          "gazePitch": 0,
+          "earLeft": 0,
+          "earRight": 0,
+          "earPitchL": 0,
+          "earPitchR": 0,
+          "mode": "auto",
+          "source": "stand",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": 0,
+          "el": 0.03,
+          "dist": 1.4094985308897934,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.13799999999999998,
+          "contacts": [],
+          "testedFrames": 297
+        }
+      }
+    },
+    "morphOnLeft": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.13799999999999998,
+        "contacts": [],
+        "testedFrames": 350
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "stand",
+      "camera": {
+        "az": -1.5707963267948966,
+        "el": 0.04,
+        "dist": 2.0291091255001152,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "stand",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.0291091255001152,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "stand",
+        "time": 0.2,
+        "support": [],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0,
+        "rootDistanceM": 0,
+        "rootPosition": [
+          0,
+          0,
+          0
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0,
+          "R": 0
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 0,
+          "gazePitch": 0,
+          "earLeft": 0,
+          "earRight": 0,
+          "earPitchL": 0,
+          "earPitchR": 0,
+          "mode": "auto",
+          "source": "stand",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": -1.5707963267948966,
+          "el": 0.04,
+          "dist": 2.0291091255001152,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.13799999999999998,
+          "contacts": [],
+          "testedFrames": 350
+        }
+      }
+    },
+    "morphOnTop": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.13799999999999998,
+        "contacts": [],
+        "testedFrames": 402
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "stand",
+      "camera": {
+        "az": 0,
+        "el": 1.48,
+        "dist": 2.337724224628662,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "stand",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.337724224628662,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "stand",
+        "time": 0.2,
+        "support": [],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0,
+        "rootDistanceM": 0,
+        "rootPosition": [
+          0,
+          0,
+          0
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0,
+          "R": 0
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 0,
+          "gazePitch": 0,
+          "earLeft": 0,
+          "earRight": 0,
+          "earPitchL": 0,
+          "earPitchR": 0,
+          "mode": "auto",
+          "source": "stand",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": 0,
+          "el": 1.48,
+          "dist": 2.337724224628662,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.13799999999999998,
+          "contacts": [],
+          "testedFrames": 402
+        }
+      }
+    },
+    "morphOnQuarter": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.13799999999999998,
+        "contacts": [],
+        "testedFrames": 455
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "stand",
+      "camera": {
+        "az": -0.78,
+        "el": 0.24,
+        "dist": 2.093507913302814,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "stand",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.093507913302814,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "stand",
+        "time": 0.2,
+        "support": [],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0,
+        "rootDistanceM": 0,
+        "rootPosition": [
+          0,
+          0,
+          0
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0,
+          "R": 0
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 0,
+          "gazePitch": 0,
+          "earLeft": 0,
+          "earRight": 0,
+          "earPitchL": 0,
+          "earPitchR": 0,
+          "mode": "auto",
+          "source": "stand",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": -0.78,
+          "el": 0.24,
+          "dist": 2.093507913302814,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.13799999999999998,
+          "contacts": [],
+          "testedFrames": 455
+        }
+      }
+    },
+    "morphDebugTop": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.13799999999999998,
+        "contacts": [],
+        "testedFrames": 509
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "stand",
+      "camera": {
+        "az": 0,
+        "el": 1.48,
+        "dist": 2.337724224628662,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "stand",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.337724224628662,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "stand",
+        "time": 0.2,
+        "support": [],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0,
+        "rootDistanceM": 0,
+        "rootPosition": [
+          0,
+          0,
+          0
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0,
+          "R": 0
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 0,
+          "gazePitch": 0,
+          "earLeft": 0,
+          "earRight": 0,
+          "earPitchL": 0,
+          "earPitchR": 0,
+          "mode": "auto",
+          "source": "stand",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": 0,
+          "el": 1.48,
+          "dist": 2.337724224628662,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.13799999999999998,
+          "contacts": [],
+          "testedFrames": 509
+        }
+      }
+    },
+    "walkMid": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.07409857559204103,
+        "contacts": [],
+        "testedFrames": 579
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "walk_forward",
+      "camera": {
+        "az": -0.78,
+        "el": 0.24,
+        "dist": 2.093507913302814,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "walk_forward",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.093507913302814,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "walk_forward",
+        "time": 2.15,
+        "support": [
+          "front_L",
+          "hind_L",
+          "hind_R"
+        ],
+        "maxSlipM": 0.000007845986532391498,
+        "meanSlipM": 0.000002979501630074718,
+        "maxPadTiltDeg": 0.3069428970659256,
+        "rootDistanceM": 0.06390142532625168,
+        "rootPosition": [
+          0.06390142440795898,
+          0.000010833301530510653,
+          0.0005694929859600961
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0.00013856911136915905,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": -0.002015035291416443,
+          "R": 0.008036956261003531
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": -0.3746647172508416,
+          "gazePitch": 0,
+          "earLeft": -0.5804626645262896,
+          "earRight": -0.3490039902240019,
+          "earPitchL": -1.2,
+          "earPitchR": -1.2,
+          "mode": "auto",
+          "source": "walk_forward",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": -0.78,
+          "el": 0.24,
+          "dist": 2.093507913302814,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.07409857559204103,
+          "contacts": [],
+          "testedFrames": 579
+        }
+      }
+    },
+    "turnLeftTop": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.07364186173886422,
+        "contacts": [],
+        "testedFrames": 653
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "turn_left",
+      "camera": {
+        "az": 0,
+        "el": 1.48,
+        "dist": 2.337724224628662,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "turn_left",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.337724224628662,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "turn_left",
+        "time": 2.8,
+        "support": [
+          "front_R",
+          "hind_L",
+          "hind_R"
+        ],
+        "maxSlipM": 0.00006254816121294172,
+        "meanSlipM": 0.00002295746619638787,
+        "maxPadTiltDeg": 0.3389549892960452,
+        "rootDistanceM": 0.08007237838582316,
+        "rootPosition": [
+          0.07874234020709991,
+          0.014533741399645805,
+          0.0014421175001189113
+        ],
+        "turnAngleDeg": 20.930021881236872,
+        "rootCorrectionM": 0.0002424141032656465,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0.004169978387855556,
+          "R": -0.0025559213803238714
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 8,
+          "gazePitch": 0,
+          "earLeft": 5,
+          "earRight": 3,
+          "earPitchL": -2,
+          "earPitchR": -2,
+          "mode": "auto",
+          "source": "turn_left",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": 0,
+          "el": 1.48,
+          "dist": 2.337724224628662,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.07364186173886422,
+          "contacts": [],
+          "testedFrames": 653
+        }
+      }
+    },
+    "turnRightTop": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": 0.07364472276181344,
+        "contacts": [],
+        "testedFrames": 712
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "turn_right",
+      "camera": {
+        "az": 0,
+        "el": 1.48,
+        "dist": 2.337724224628662,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "turn_right",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.337724224628662,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "turn_right",
+        "time": 2.8,
+        "support": [
+          "front_R",
+          "hind_L",
+          "hind_R"
+        ],
+        "maxSlipM": 0.000016240101755889502,
+        "meanSlipM": 0.000007437334491335742,
+        "maxPadTiltDeg": 0.37079110257993714,
+        "rootDistanceM": 0.08007370005744814,
+        "rootPosition": [
+          0.0787394791841507,
+          -0.014556505717337132,
+          0.001438044011592865
+        ],
+        "turnAngleDeg": -20.930021881236872,
+        "rootCorrectionM": 0.00023848751662954135,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": 0.005898993816966396,
+          "R": -0.0018067720102289435
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": -8,
+          "gazePitch": 0,
+          "earLeft": -5,
+          "earRight": -3,
+          "earPitchL": -2,
+          "earPitchR": -2,
+          "mode": "auto",
+          "source": "turn_right",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": 0,
+          "el": 1.48,
+          "dist": 2.337724224628662,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": 0.07364472276181344,
+          "contacts": [],
+          "testedFrames": 712
+        }
+      }
+    },
+    "collisionBlocked": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": true,
+        "blocked": true,
+        "obstacle": "wall_A",
+        "maxPenetrationM": 0.032206665992736805,
+        "correctionM": 0.032206665992736805,
+        "brake": 0,
+        "minClearanceM": 3.4570694085189757e-9,
+        "contacts": [
+          {
+            "proxy": "head",
+            "obstacle": "wall_A",
+            "penetrationM": 0.032206665992736805
+          }
+        ],
+        "testedFrames": 795
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "walk_forward",
+      "camera": {
+        "az": -1.5707963267948966,
+        "el": 0.04,
+        "dist": 2.0291091255001152,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "walk_forward",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.0291091255001152,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "walk_forward",
+        "time": 5.25,
+        "support": [
+          "front_L",
+          "front_R",
+          "hind_L",
+          "hind_R"
+        ],
+        "maxSlipM": 0,
+        "meanSlipM": 0,
+        "maxPadTiltDeg": 0.33818330450783257,
+        "rootDistanceM": 0.13799999665152665,
+        "rootPosition": [
+          0.1379999965429306,
+          -0.0000054747156355006155,
+          0.00009008287452161312
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": -0.0009808917069937637,
+          "R": -0.0012233738383735028
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 1.2472044184538185,
+          "gazePitch": 0,
+          "earLeft": -1.1086554390135435,
+          "earRight": 1.1018320320270831,
+          "earPitchL": -1.2,
+          "earPitchR": -1.2,
+          "mode": "auto",
+          "source": "walk_forward",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": -1.5707963267948966,
+          "el": 0.04,
+          "dist": 2.0291091255001152,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": true,
+          "blocked": true,
+          "obstacle": "wall_A",
+          "maxPenetrationM": 0.032206665992736805,
+          "correctionM": 0.032206665992736805,
+          "brake": 0,
+          "minClearanceM": 3.4570694085189757e-9,
+          "contacts": [
+            {
+              "proxy": "head",
+              "obstacle": "wall_A",
+              "penetrationM": 0.032206665992736805
+            }
+          ],
+          "testedFrames": 795
+        }
+      }
+    },
+    "collisionDisabled": {
+      "schema": "cat_kaopu/environment_npc_phase1_state@1.0",
+      "buildId": "cat-kaopu-phase1-gate-b-morphology-20260916",
+      "ready": "gate-b-webgl2",
+      "gate": "B",
+      "priorities": {
+        "morphology": 0.62,
+        "locomotion": 0.28,
+        "collision": 0.1
+      },
+      "morphology": {
+        "enabled": true,
+        "params": {
+          "chest": 0.82,
+          "waist": 0.78,
+          "pelvis": 0.36,
+          "shoulder": 0.74,
+          "belly": 0.82,
+          "neck": 0.68,
+          "master": 1
+        },
+        "maxDeltaM": 0.0088459516066638,
+        "meanDeltaM": 0.0013509946502934722,
+        "affectedVertices": 1735,
+        "widths": {
+          "chest": 0.10181394494925897,
+          "waist": 0.0847909131560223,
+          "pelvis": 0.10147092612181441
+        },
+        "baseWidths": {
+          "chest": 0.09455211088061333,
+          "waist": 0.08950989320874214,
+          "pelvis": 0.10109623149037361
+        },
+        "widthRatios": {
+          "chest": 1.07680245317648,
+          "waist": 0.9472797935115964,
+          "pelvis": 1.0037063165057392
+        },
+        "bodyLengthBaseM": 0.5166386961936951,
+        "bodyLengthM": 0.5166386961936951,
+        "bodyMinZBaseM": 0,
+        "bodyMinZM": 0,
+        "lengthInvariant": true,
+        "groundInvariant": true,
+        "eyeRegionMaxDeltaM": 0
+      },
+      "collision": {
+        "enabled": false,
+        "blocked": false,
+        "obstacle": null,
+        "maxPenetrationM": 0,
+        "correctionM": 0,
+        "brake": 1,
+        "minClearanceM": -0.032206665992736805,
+        "contacts": [],
+        "testedFrames": 810
+      },
+      "collisionProfile": {
+        "schema": "cat_kaopu/environment_collision_proxy@1.0",
+        "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+        "proxies": [
+          {
+            "id": "pelvis",
+            "label": "骨盆",
+            "local": [
+              -0.092,
+              0,
+              0.135
+            ],
+            "radius": 0.076
+          },
+          {
+            "id": "chest",
+            "label": "胸腔",
+            "local": [
+              0.075,
+              0,
+              0.165
+            ],
+            "radius": 0.084
+          },
+          {
+            "id": "head",
+            "label": "头部",
+            "local": [
+              0.218,
+              0,
+              0.205
+            ],
+            "radius": 0.064
+          }
+        ],
+        "obstacles": [
+          {
+            "id": "wall_A",
+            "label": "测试墙",
+            "min": [
+              0.42,
+              -0.19,
+              0
+            ],
+            "max": [
+              0.44,
+              0.19,
+              0.245
+            ]
+          }
+        ]
+      },
+      "groupRuntime": false,
+      "variationRuntime": false,
+      "shapeMutation": "bounded-bind-space-surface-corrective-layer",
+      "action": "walk_forward",
+      "camera": {
+        "az": -1.5707963267948966,
+        "el": 0.04,
+        "dist": 2.0291091255001152,
+        "target": [
+          -0.0016806423664093018,
+          0,
+          0.1768457591533661
+        ],
+        "action": "walk_forward",
+        "cameraDirectionLocked": true,
+        "fitDist": 2.0291091255001152,
+        "zoomScale": 1
+      },
+      "metrics": {
+        "action": "walk_forward",
+        "time": 5.25,
+        "support": [
+          "front_L",
+          "front_R",
+          "hind_R"
+        ],
+        "maxSlipM": 0.00016636704839779857,
+        "meanSlipM": 0.00009883853005812286,
+        "maxPadTiltDeg": 0.3810353146842972,
+        "rootDistanceM": 0.17020666608078422,
+        "rootPosition": [
+          0.17020666599273682,
+          -0.0000054747156355006155,
+          0.0007506906404159963
+        ],
+        "turnAngleDeg": 0,
+        "rootCorrectionM": 0.00018720791665569417,
+        "posture": null,
+        "scapulaSlideM": {
+          "L": -0.0009808917069937637,
+          "R": -0.0012233738383735028
+        },
+        "corrective": {
+          "enabled": true,
+          "normalEnabled": true,
+          "debug": false,
+          "weights": {
+            "sit": 0,
+            "lie": 0
+          },
+          "representation": "regional_position_residual_plus_pose_target_normal"
+        },
+        "expression": {
+          "gazeYaw": 1.2472044184538185,
+          "gazePitch": 0,
+          "earLeft": -1.1086554390135435,
+          "earRight": 1.1018320320270831,
+          "earPitchL": -1.2,
+          "earPitchR": -1.2,
+          "mode": "auto",
+          "source": "walk_forward",
+          "blink": 0,
+          "cornea": 0.82,
+          "pupilAdapt": 0.42,
+          "blinkMode": "auto",
+          "autoBlink": true,
+          "eyeLayerEnabled": true,
+          "blinkLayerEnabled": false,
+          "lidDebugEnabled": false,
+          "lidThickness": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "browStrength": 0.72,
+          "noseStrength": 0.64,
+          "cheekStrength": 0.58,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "corneaLayerEnabled": true,
+          "earLayerEnabled": true,
+          "furLayerEnabled": true,
+          "corneaResponse": 0.82,
+          "furStrength": 0.72,
+          "furDebugEnabled": false
+        },
+        "periorbitalGeometry": {
+          "enabled": false,
+          "debug": false,
+          "thicknessM": 0.00042,
+          "patchStrength": 0.88,
+          "smoothStrength": 0.94,
+          "arcStrength": 0.86,
+          "creaseStrength": 0.54,
+          "vertices": 6693,
+          "triangles": 13056,
+          "pieces": 1,
+          "cols": 96,
+          "rows": 68,
+          "fitMode": "wide_bilateral_face_field_bilateral_smooth_exact_frozen_boundary",
+          "headBoneIndex": 6
+        },
+        "camera": {
+          "az": -1.5707963267948966,
+          "el": 0.04,
+          "dist": 2.0291091255001152,
+          "target": [
+            -0.0016806423664093018,
+            0,
+            0.1768457591533661
+          ],
+          "autoFollow": false
+        },
+        "phase1Collision": {
+          "enabled": false,
+          "blocked": false,
+          "obstacle": null,
+          "maxPenetrationM": 0,
+          "correctionM": 0,
+          "brake": 1,
+          "minClearanceM": -0.032206665992736805,
+          "contacts": [],
+          "testedFrames": 810
+        }
+      }
+    }
+  },
+  "assertions": {
+    "webgl2": true,
+    "noPageErrors": true,
+    "noConsoleErrors": true,
+    "gateB": true,
+    "groupLocked": true,
+    "boundedMorphContract": true,
+    "statsInvariant": true,
+    "morphToggle": true,
+    "morphMagnitude": true,
+    "lengthInvariant": true,
+    "groundInvariant": true,
+    "eyeRegionInvariant": true,
+    "sectionRatios": true,
+    "morphChangesPixels": true,
+    "morphViewsUnique": true,
+    "debugChangesPixels": true,
+    "walkFinite": true,
+    "turnDirections": true,
+    "collisionBlocked": true,
+    "collisionFinite": true,
+    "collisionResolved": true,
+    "collisionBrake": true,
+    "collisionLimitsTravel": true,
+    "noGroupRuntime": true,
+    "motionEvidenceUnique": true,
+    "mobileWebgl2": true,
+    "mobileNoHorizontalOverflow": true,
+    "mobileMorphology": true
+  },
+  "mobile": {
+    "ready": "gate-b-webgl2",
+    "overflowPx": 0,
+    "morphology": {
+      "enabled": true,
+      "params": {
+        "chest": 0.82,
+        "waist": 0.78,
+        "pelvis": 0.36,
+        "shoulder": 0.74,
+        "belly": 0.82,
+        "neck": 0.68,
+        "master": 1
+      },
+      "maxDeltaM": 0.0088459516066638,
+      "meanDeltaM": 0.0013509946502934722,
+      "affectedVertices": 1735,
+      "widths": {
+        "chest": 0.10181394494925897,
+        "waist": 0.0847909131560223,
+        "pelvis": 0.10147092612181441
+      },
+      "baseWidths": {
+        "chest": 0.09455211088061333,
+        "waist": 0.08950989320874214,
+        "pelvis": 0.10109623149037361
+      },
+      "widthRatios": {
+        "chest": 1.07680245317648,
+        "waist": 0.9472797935115964,
+        "pelvis": 1.0037063165057392
+      },
+      "bodyLengthBaseM": 0.5166386961936951,
+      "bodyLengthM": 0.5166386961936951,
+      "bodyMinZBaseM": 0,
+      "bodyMinZM": 0,
+      "lengthInvariant": true,
+      "groundInvariant": true,
+      "eyeRegionMaxDeltaM": 0
+    },
+    "screenshot": {
+      "path": "qa/CAT_KAOPU_PHASE1_GATE_B_MOBILE_390x844_2026-09-16.png",
+      "bytes": 103154,
+      "sha256": "8fe7246014b7df364204a6881ea8fd7047a93052762db280acf2f78d04c2ef5a"
+    }
+  },
+  "visualAcceptance": false,
+  "productionReady": false
+}
