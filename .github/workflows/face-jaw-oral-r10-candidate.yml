@@ -1,0 +1,67 @@
+name: Face jaw and oral anatomy R10 candidate
+
+on:
+  push:
+    branches:
+      - feature/human-face-workbench-v1-20260915
+    paths:
+      - .github/workflows/face-jaw-oral-r10-candidate.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: face-jaw-oral-r10-candidate
+  cancel-in-progress: true
+
+jobs:
+  validate-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-face-workbench-v1-20260915
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply R10 candidate to readable sources
+        shell: bash
+        run: |
+          base64 --decode tools/apply-face-jaw-oral-r10-candidate.py.gz.b64 | gzip -d > /tmp/apply-face-jaw-oral-r10-candidate.py
+          python3 /tmp/apply-face-jaw-oral-r10-candidate.py
+      - name: Build and validate candidate
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/check-face-controls.mjs
+          node tools/check-eye-anatomy.mjs --parameter-fixtures
+          node tools/check-face-anatomy.mjs --parameter-fixtures
+          node tools/test-face-profile-separation.mjs
+          node tools/test-face-identity-landmarks.mjs
+          node tools/test-face-review-entry.mjs
+          node tools/test-npc-face-uniforms.mjs
+          node tools/test-face-startup.mjs
+      - name: Install isolated browser runtime
+        run: |
+          mkdir -p /tmp/face-r10-browser
+          cd /tmp/face-r10-browser
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium
+      - name: Capture fixed review views
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/hrl-face-r10-server.log 2>&1 &
+          NODE_PATH=/tmp/face-r10-browser/node_modules node tools/capture-face-jaw-oral-r10.cjs
+          git diff -- body/FaceAnatomy.js body/FaceControls.js body/FaceControlRecipe.json body/CompactWorkbench.js control/NPCPopulation.js tools/check-face-anatomy.mjs tools/check-face-controls.mjs tools/test-npc-face-uniforms.mjs > visual-review-r10/face-r10-source.diff
+      - name: Upload candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-jaw-oral-r10-candidate
+          path: visual-review-r10
+          if-no-files-found: warn
+          retention-days: 7
