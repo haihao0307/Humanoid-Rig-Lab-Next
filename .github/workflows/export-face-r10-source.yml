@@ -1,0 +1,39 @@
+name: Export materialized face R10 source
+
+on:
+  push:
+    branches:
+      - feature/human-face-workbench-v1-20260915
+    paths:
+      - .github/workflows/export-face-r10-source.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-face-workbench-v1-20260915
+          fetch-depth: 1
+      - name: Materialize the validated R10 candidate
+        shell: bash
+        run: |
+          base64 --decode tools/apply-face-jaw-oral-r10-candidate.py.gz.b64 | gzip -d > /tmp/apply-face-jaw-oral-r10-candidate.py
+          python3 /tmp/apply-face-jaw-oral-r10-candidate.py
+          python3 tools/fix-face-jaw-oral-r10-contract.py
+          node tools/build-pure.mjs
+      - name: Package readable source tree
+        shell: bash
+        run: |
+          tar --exclude=.git --exclude=visual-review-r10 -czf /tmp/Humanoid-Rig-Lab-Next_R10_materialized_source.tar.gz .
+          mv /tmp/Humanoid-Rig-Lab-Next_R10_materialized_source.tar.gz ./Humanoid-Rig-Lab-Next_R10_materialized_source.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: face-r10-materialized-source
+          path: Humanoid-Rig-Lab-Next_R10_materialized_source.tar.gz
+          retention-days: 2
