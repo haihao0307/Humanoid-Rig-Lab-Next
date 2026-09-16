@@ -8,12 +8,14 @@ on:
       - .github/workflows/chicken-r100-single-agent.yml
       - tools/build_chicken_r100.py
       - tools/chicken_r100_motion_patch.js
+      - tools/chicken_r100_peck_patch.js
       - tools/chicken_r100_manual_step_patch.js
       - tools/capture_chicken_r100.mjs
       - tools/build_chicken_r991.py
       - tools/chicken_r991_override.js
       - runtime/chicken_phase1_npc_controller.mjs
       - runtime/chicken_phase1_articulated_skin.mjs
+      - runtime/chicken_phase1_peck_adapter.mjs
       - tests/chicken_phase1_articulated_skin.test.mjs
       - CHICKEN_V46_R9_1.html
   workflow_dispatch:
@@ -49,10 +51,12 @@ jobs:
           python -m py_compile tools/build_chicken_r991.py tools/build_chicken_r100.py
           node --check tools/chicken_r991_override.js
           node --check tools/chicken_r100_motion_patch.js
+          node --check tools/chicken_r100_peck_patch.js
           node --check tools/chicken_r100_manual_step_patch.js
           node --check tools/capture_chicken_r100.mjs
           node --check runtime/chicken_phase1_npc_controller.mjs
           node --check runtime/chicken_phase1_articulated_skin.mjs
+          node --check runtime/chicken_phase1_peck_adapter.mjs
           node --test tests/chicken_phase1_npc_controller.test.mjs
           node --test tests/chicken_phase1_articulated_skin.test.mjs
 
@@ -104,7 +108,11 @@ jobs:
             if not data.get('passed'): raise SystemExit(f'QA failed: {path}')
           browser=json.loads(Path('qa/CHICKEN_R100_BROWSER_QA.json').read_text(encoding='utf-8'))
           boundary=browser.get('truthBoundary',{})
-          if boundary.get('groupTestAuthorized') is not False: raise SystemExit('Group testing must remain closed')
+          if boundary.get('groupTestAuthorized') is not False:
+            raise SystemExit('Group testing must remain closed')
+          skin=browser.get('runtime',{}).get('motion',{}).get('skin',{})
+          if skin.get('peckKinematicsRevision')!='fixed-length-forward-down-s-curve-v1':
+            raise SystemExit('Natural peck adapter was not active in browser QA')
           print('R10.0 technical single-agent gate passed. Naturalness, grounding, collision and group gates remain open.')
           PY
 
@@ -123,8 +131,10 @@ jobs:
             BUILD_MANIFEST_R100.json
             runtime/chicken_phase1_npc_controller.mjs
             runtime/chicken_phase1_articulated_skin.mjs
+            runtime/chicken_phase1_peck_adapter.mjs
             tools/build_chicken_r100.py
             tools/chicken_r100_motion_patch.js
+            tools/chicken_r100_peck_patch.js
             tools/chicken_r100_manual_step_patch.js
             tools/capture_chicken_r100.mjs
             /tmp/chicken-r100-http.log
