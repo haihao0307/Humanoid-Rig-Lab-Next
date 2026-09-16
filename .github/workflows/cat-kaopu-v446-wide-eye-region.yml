@@ -1,0 +1,140 @@
+name: Cat Kaopu V4.46 Wide Eye Region
+
+on:
+  push:
+    branches:
+      - codex/cat-kaopu-v446-wide-eye-region-carrier-20260916
+    paths:
+      - .github/workflows/cat-kaopu-v446-wide-eye-region.yml
+      - cat-kaopu/tools/bootstrap_cat_v446_sources.py
+      - cat-kaopu/tools/bootstrap/v446_sources.tar.xz
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cat-kaopu-v446-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Decode audited V4.46 sources
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/bootstrap_cat_v446_sources.py
+
+      - name: Freeze V4.45 source exactly once
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline='cat-kaopu/baselines/v4.45/CAT_KAOPU_V445_MLS_PERIORBITAL_WORKBENCH_2026-09-16.html'
+          source='cat-kaopu/build/v4.45/CAT_KAOPU_V445_MLS_PERIORBITAL_WORKBENCH_2026-09-16.html'
+          test -f "$source"
+          if [ ! -f "$baseline" ]; then
+            mkdir -p "$(dirname "$baseline")"
+            cp "$source" "$baseline"
+          fi
+
+      - name: Build V4.46 wide eye-region carrier
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/build_cat_v446_wide_eye_region.py
+
+      - name: Verify payload, rig and module invariants
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/verify_cat_v446_module.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install pinned browser dependencies
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Run WebGL2 wide eye-region capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 --bind 127.0.0.1 > "${RUNNER_TEMP}/cat-v446-http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
+          ready=0
+          for _ in $(seq 1 60); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:4173/cat-kaopu/workbench/CAT_KAOPU_CURRENT.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat "${RUNNER_TEMP}/cat-v446-http.log" || true
+            exit 1
+          fi
+          CAT_V446_URL='http://127.0.0.1:4173/cat-kaopu/workbench/CAT_KAOPU_CURRENT.html' \
+            node cat-kaopu/tools/capture_cat_v446_browser_qa.mjs
+
+      - name: Refresh manifest after browser evidence
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python cat-kaopu/tools/build_cat_v446_wide_eye_region.py
+          python cat-kaopu/tools/verify_cat_v446_module.py
+
+      - name: Upload V4.46 QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-kaopu-v446-wide-eye-region-qa-${{ github.run_number }}
+          path: |
+            cat-kaopu/CURRENT.json
+            cat-kaopu/BUILD_MANIFEST.json
+            cat-kaopu/README.md
+            cat-kaopu/workbench/CAT_KAOPU_CURRENT.html
+            cat-kaopu/build/v4.46/CAT_KAOPU_V446_WIDE_EYE_REGION_CARRIER_WORKBENCH_2026-09-16.html
+            cat-kaopu/docs/CAT_KAOPU_V446_*.md
+            cat-kaopu/qa/CAT_KAOPU_V446_*.json
+            cat-kaopu/qa/CAT_KAOPU_V446_*.png
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit generated V4.46 workbench and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'cat-kaopu-build-bot'
+          git config user.email 'cat-kaopu-build-bot@users.noreply.github.com'
+          git add cat-kaopu
+          if git diff --cached --quiet; then
+            echo 'No generated V4.46 changes to commit.'
+            exit 0
+          fi
+          git commit -m 'build(cat): generate V4.46 wide eye-region evidence [cat-v446 generated]'
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              exit 0
+            fi
+            echo "Push attempt ${attempt} failed; rebasing on latest branch head."
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+          done
+          echo 'Unable to push V4.46 evidence after three attempts.' >&2
+          exit 1
