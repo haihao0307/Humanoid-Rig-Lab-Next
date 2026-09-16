@@ -28,17 +28,29 @@ function strengthRuntimeAssessment(agent,candidate,dt){
    shorteningRates[id]=dt>0&&agent.strengthLastLengths?.[id]!=null?clamp((agent.strengthLastLengths[id]-ratio)/dt,-3,3):0;
   }
  }
- // Measure acceleration from consecutive solved velocities. Hand target error
- // is spring extension, so dividing that error by dt is not object velocity.
+ // Measure the solved rigid body's vector acceleration. A magnitude-only
+ // value made horizontal braking and downward motion look like extra upward
+ // lifting load. Preserve direction for the force model, while keeping a
+ // bounded magnitude for the current engineering envelope.
  const velocity=Array.isArray(o.v)?[...o.v]:[0,0,0],previous=agent.strengthLastObjectVelocity;
- const acceleration=dt>0&&previous?.id===o.id?len(sub(velocity,previous.v))/dt:0;
+ const rawAccelerationVector=dt>0&&previous?.id===o.id?mul(sub(velocity,previous.v),1/dt):[0,0,0];
+ const acceleration=len(rawAccelerationVector),scale=acceleration>5?5/acceleration:1;
+ const accelerationVector=mul(rawAccelerationVector,scale);
  agent.strengthLastObjectVelocity={id:o.id,v:velocity};
  const verticalSpeed=velocity[1];
  const hip=agent.h.bodyMetrics.restHipHeightM,lowHip=agent.h.bodyMetrics.crouchLowHipM;
- const req=strengthTaskRequest(type,o,{...strengthWorldParameters(agent.w),reachM:clamp(shoulderLever,.05,1.2),elbowLeverM:clamp(elbowLever,.02,.7),crouch:clamp((hip-agent.pos[1])/(hip-lowHip),0,1),speedMps:clamp(len(velocity),0,3),accelerationMps2:clamp(acceleration,0,5),lengthRatios,shorteningRates});
+ // The navigation root can remain at the route height while contact IK lowers
+ // the committed skeleton. Read the final pelvis/root frame used by skin and
+ // contacts, then fall back to navigation state only if no pose was committed.
+ const pelvisHeightM=Number.isFinite(agent.h.root?.p?.[1])?agent.h.root.p[1]:agent.pos[1];
+ const crouch=clamp((hip-pelvisHeightM)/Math.max(1e-8,hip-lowHip),0,1);
+ const req=strengthTaskRequest(type,o,{...strengthWorldParameters(agent.w),reachM:clamp(shoulderLever,.05,1.2),elbowLeverM:clamp(elbowLever,.02,.7),crouch,
+  speedMps:clamp(len(velocity),0,3),accelerationMps2:Math.min(acceleration,5),accelerationVectorMps2:accelerationVector,lengthRatios,shorteningRates});
  const assessment=agent.strength.assess(req);
  assessment.phase=agent.phase;assessment.muscleWork=verticalSpeed>.005?'shortening':verticalSpeed<-.005?'lengthening':'holding';
  assessment.measuredAccelerationMps2=acceleration;
+ assessment.measuredAccelerationVectorMps2=rawAccelerationVector;
+ assessment.postureInput={pelvisHeightM,restHipHeightM:hip,crouchLowHipM:lowHip,crouch};
  assessment.accelerationOutsideEnvelope=acceleration>5;
  assessment.physicsLimits=strengthManipulationLimits(agent,assessment);
  return assessment;
@@ -48,8 +60,8 @@ function strengthManipulationLimits(agent,assessment){
  // The zero-payload request retains segment weight and posture costs. A unit
  // payload supplies each group's external-force coefficient without granting
  // the rigid-body actuator its entire tendon force as hand force.
- const base=agent.strength.assess({...request,massKg:0,accelerationMps2:0});
- const probe=agent.strength.assess({...request,massKg:1,accelerationMps2:0,objectFriction:push?1:request.objectFriction});
+ const base=agent.strength.assess({...request,massKg:0,accelerationMps2:0,accelerationVectorMps2:[0,0,0]});
+ const probe=agent.strength.assess({...request,massKg:1,accelerationMps2:0,accelerationVectorMps2:[0,0,0],objectFriction:push?1:request.objectFriction});
  const unitForceN=push?g*(Math.cos(slope)+Math.abs(Math.sin(slope))):g,limits=[];
  for(const [id,group]of Object.entries(assessment.groups)){
   const coefficient=(probe.groups[id].required-base.groups[id].required)/unitForceN;
