@@ -22,12 +22,20 @@ const {chromium}=require('playwright');
   if(!frame)throw Error('Face review frame unavailable');
   await frame.waitForFunction(()=>window.__compactLoading?.state==='ready'&&window.__humanStartup?.status==='ready',null,{timeout:420000});
   await frame.waitForTimeout(5000);
-  const canvas=frame.locator('canvas').first();
-  await canvas.waitFor({state:'visible',timeout:30000});
+  await frame.waitForFunction(()=>{const canvas=document.querySelector('canvas');return Boolean(canvas&&canvas.width>0&&canvas.height>0);},null,{timeout:30000});
   const capture=async path=>{
-    const box=await canvas.boundingBox();
-    if(!box)throw Error('Canvas bounds unavailable');
-    await page.screenshot({path,clip:box,animations:'disabled'});
+    const dataUrl=await frame.evaluate(()=>{
+      const canvas=document.querySelector('canvas');
+      if(!canvas)throw Error('Canvas unavailable');
+      window.HumanLab?.render?.();
+      return canvas.toDataURL('image/png');
+    });
+    const marker='base64,';
+    const offset=dataUrl.indexOf(marker);
+    if(offset<0)throw Error('Canvas PNG encoding unavailable');
+    const bytes=Buffer.from(dataUrl.slice(offset+marker.length),'base64');
+    if(bytes.length<10000)throw Error(`Canvas PNG unexpectedly small: ${bytes.length}`);
+    fs.writeFileSync(path,bytes);
   };
   const neutral=async view=>{
     await frame.evaluate(v=>{window.HumanLab.face.clearExpression();window.HumanLab.face.closeup(v);window.HumanLab.render();},view);
