@@ -2,7 +2,7 @@
   "schema": "cat_kaopu/full_handoff_current@1.0",
   "handoff": "CAT_KAOPU_CURRENT_FULL_HANDOFF_V440_2026-09-15",
   "date": "2026-09-16",
-  "currentVersion": "V4.42",
+  "currentVersion": "V4.43",
   "currentEntry": "workbench/CAT_KAOPU_CURRENT.html",
   "repoOverlayEntry": "workbench/CAT_KAOPU_CURRENT.html",
   "frozenBaselines": {
@@ -11,9 +11,9 @@
     "camera": "V4.34.1",
     "locomotionRegression": "V4.36",
     "postureCorrective": "V4.39",
-    "expressionPayload": "V4.40 CATV440 payload and 34-bone rig unchanged; V4.41 eye/cornea controls inherited"
+    "expressionPayload": "V4.40 CATV440 payload and 34-bone rig unchanged; V4.42 geometric eyelids preserved"
   },
-  "currentLayer": "four bounded procedural geometric eyelid shell volumes + deterministic blink + corneal response",
+  "currentLayer": "four frozen-head-sampled orbital soft-tissue transition shells around the V4.42 geometric eyelids",
   "geometry": {
     "vertices": 3948,
     "triangles": 7884,
@@ -22,7 +22,11 @@
     "eyelidVertices": 1476,
     "eyelidTriangles": 2240,
     "eyelidPieces": 4,
-    "eyelidGeometryStorage": "runtime-generated outside CATV440"
+    "eyelidGeometryStorage": "runtime-generated outside CATV440",
+    "orbitalTransitionVertices": 1372,
+    "orbitalTransitionTriangles": 2304,
+    "orbitalTransitionPieces": 4,
+    "orbitalTransitionStorage": "runtime-generated outside CATV440 from frozen head samples"
   },
   "runtimeDependencies": {
     "externalModel": false,
@@ -31,6 +35,7 @@
   },
   "acceptance": {
     "surfaceUserAccepted": true,
+    "geometricEyelidTechnicalCandidate": true,
     "visualAcceptance": false,
     "productionReady": false,
     "userReviewRequired": true
@@ -41,29 +46,31 @@
     "V4.25-V4.30": "isolated forepaw experiment line; not current whole-cat mainline"
   },
   "nextProductionGate": [
-    "user visual review of open, half-blink and closed eyelids from front, three-quarter and side views",
-    "refine inner and outer canthus curves only if the four shell volumes remain inside the frozen head silhouette",
-    "add bounded third-eyelid study only after primary upper/lower closure is accepted",
-    "bounded ear-root corrective for larger ear poses",
-    "repair V4.39 sit/lie paw and chest-abdomen support before silhouette fur"
+    "browser WebGL2 review of V4.43 orbital transition on and off from front, three-quarter and side close-ups",
+    "prove the transition shell remains inside the frozen V4.32 head silhouette",
+    "accept only if open, half-blink and closed states no longer read as independent eyelid plugs",
+    "do not begin third eyelid, whiskers or silhouette fur before orbital integration is accepted",
+    "after eye integration, return to V4.39 sit/lie paw and chest-abdomen support repair"
   ],
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
-    "existingBranch": "codex/cat-kaopu-v440-mainline-20260915",
+    "existingBranch": "codex/cat-kaopu-v443-orbital-soft-tissue-20260916",
     "existingBranchHead": null,
-    "recommendedNewBranch": "codex/cat-kaopu-v440-mainline-20260915",
+    "recommendedNewBranch": "codex/cat-kaopu-v443-orbital-soft-tissue-20260916",
     "recommendedModulePath": "cat-kaopu/",
-    "sourceBranchHead": "1b5396be0b52513fc70f9183d260bccee85a9984"
+    "sourceBranchHead": "1b5396be0b52513fc70f9183d260bccee85a9984",
+    "sourceBranch": "codex/cat-kaopu-v440-mainline-20260915"
   },
   "sourceHandoff": "CAT_KAOPU_CURRENT_FULL_HANDOFF_V440_2026-09-15",
   "technicalInvariants": {
     "embeddedPayloadSha256": "518aed4758033b2f3b40e6242976a8bb7779a4d70a9f2dba8461c56ac5cee846",
     "sourcePayloadSha256": "518aed4758033b2f3b40e6242976a8bb7779a4d70a9f2dba8461c56ac5cee846",
     "payloadUnchangedFromV440": true,
-    "rigJsonIdenticalToV441": true,
+    "rigJsonIdenticalToV442": true,
     "boneCount": 34,
     "neutralSurfaceChanged": false,
     "skinWeightsChanged": false,
-    "addedGeometry": "four head-bone-driven eyelid shell volumes outside CATV440"
+    "v442EyelidGeometryChanged": false,
+    "addedGeometry": "four head-bone-driven orbital transition shells outside CATV440"
   }
 }
