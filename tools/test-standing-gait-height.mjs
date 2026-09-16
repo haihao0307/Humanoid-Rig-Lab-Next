@@ -15,10 +15,11 @@ const {FullBodyMotion,blend,relaxedHandRotation}=await import('data:text/javascr
 const math=read('source/runtime.template.js').split('// MODULE math')[1].split('function matrix')[0];
 const code=math+'\n'+read('body/ReconstructionRig.js').replace('/*__R2_RIG_JSON__*/',JSON.stringify(rig)).replace('/*__R2_REGIONS_JSON__*/','{}')+'\n'+read('body/CharacterShape.js')+'\n'+read('body/ReferenceMotion.js').replace('/*__R2_MOTION_JSON__*/',read('reconstruction/motion-reference.json'))+'\n'+read('body/ContactHandPose.js')+'\n'+read('body/MotionLabPose.js')+'\n'+read('body/NaturalLocomotion.js');
 const horizontal=(a,b)=>Math.hypot(a[0]-b[0],a[2]-b[2]);
-const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,r2StandingGestureDescriptor,r2SampleMotion,NaturalLocomotion,dist,sub,dot,norm})',{
+const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,r2StandingGestureDescriptor,r2SampleMotion,NaturalLocomotion,dist,sub,dot,norm,qangle,qm,qy})',{
  structuredClone,SHAPE_SCHEMA,SHAPE_REVISION,normalizeCharacterShape,characterShapeParameterKey,createCharacterShapeField,CHARACTER_DEFORMATION_RULES,HUMAN_GENERATOR_REVISION:'standing-test',
  degrees:r=>r*180/Math.PI,DOWN:[0,-1,0],horizontal,angleDiff:(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b)),bodyPhysicalProfile:h=>({bodyRadiusM:h.bodyMetrics.bodyRadiusM}),MotionLab:{FullBodyMotion,blend,relaxedHandRotation,solveTwoBone,MotionController,rigFromSource,FlatWorld}});
 let frames=0,walks=0,turns=0,stops=0,maxHeightStepM=0,maxFootErrorM=0,maxBoneErrorM=0,maxIdleKneeDegrees=0,minWalkKneeDegrees=180,maxWalkKneeDegrees=0;
+let stanceKneeSum=0,stanceSamples=0,maxStanceKneeDegrees=0,maxSwingPitch=0,minSwingPitch=0,maxPitchStep=0,maxRenderedFootAngle=0;
 const shapes=[{}, {statureScale:.94},{statureScale:1.06},{legProportion:.7,waistWidth:-.2},{legProportion:-.6,hipWidth:.25},
  {shoulderWidth:.75,waistWidth:.2,torsoDepth:.3,armFullness:.5,legFullness:.3},{shoulderWidth:-.35,hipWidth:-.2,waistWidth:-.65,torsoDepth:-.45,armFullness:-.55,legFullness:-.45},{shoulderWidth:.15,hipWidth:.35,waistWidth:.65,torsoDepth:.65,armFullness:.35,legFullness:.5}];
 for(const shape of shapes){
@@ -39,10 +40,18 @@ for(const shape of shapes){
    maxFootErrorM=Math.max(maxFootErrorM,error);maxBoneErrorM=Math.max(maxBoneErrorM,leg.lengthError);
    assert(error<1e-7,'height transition preserves independent foot anchors: '+JSON.stringify({shape,error,status:s.status,speed:s.speed,height:s.root[1],side,swing:s.swing?.side}));
    if(before.feet[side].contact&&foot.contact)assert(api.dist(before.feet[side].position,foot.position)<1e-10,'planted feet cannot slide during height changes');
+   const pitch=foot.swingPitch||0;maxSwingPitch=Math.max(maxSwingPitch,pitch);minSwingPitch=Math.min(minSwingPitch,pitch);
+   maxPitchStep=Math.max(maxPitchStep,Math.abs(pitch-(before.feet[side].swingPitch||0)));
+   if(foot.contact)assert.equal(pitch,0,'airborne ankle motion must not rotate a locked support foot');
+   const footAngle=api.qangle(candidate.frames.get(side+'_foot').q,api.qm(api.qy(foot.yaw),sourceBind.get(side+'_foot').q));
+   maxRenderedFootAngle=Math.max(maxRenderedFootAngle,footAngle);
+   if(foot.contact)assert(footAngle<1e-6,'rendered support sole must retain its planted orientation');
+   assert(Math.abs(pitch-(before.feet[side].swingPitch||0))<.04,'ankle angle must remain continuous at lift-off and landing');
    const knee=Math.acos(Math.max(-1,Math.min(1,api.dot(api.norm(api.sub(leg.knee,leg.root)),api.norm(api.sub(leg.end,leg.knee))))))*180/Math.PI;
    if(locomotion.isSettled())maxIdleKneeDegrees=Math.max(maxIdleKneeDegrees,knee);
    if(s.speed>.4){minWalkKneeDegrees=Math.min(minWalkKneeDegrees,knee);maxWalkKneeDegrees=Math.max(maxWalkKneeDegrees,knee);
-    assert(s.root[1]<bodyMetrics.walkingHipHeightM+.003*bodyMetrics.statureScale,'walking returns to its lower pelvis target');}
+    assert(s.root[1]<=locomotion.standingTarget()+1e-9,'pelvis must remain within both fixed-length legs reach');
+    if(foot.contact){stanceKneeSum+=knee;stanceSamples++;maxStanceKneeDegrees=Math.max(maxStanceKneeDegrees,knee);}}
   }
  };
  const walk=target=>{
@@ -61,4 +70,7 @@ for(const shape of shapes){
 }
 assert(maxIdleKneeDegrees<15,'idle standing has slight knee flexion instead of the gait crouch');
 assert(maxWalkKneeDegrees>30,'walking retains its swing-knee flexion');
-console.log(JSON.stringify({schema:'human/standing_gait_height@1',shapes:shapes.length,frames,walks,turns,stops,maxHeightStepM,maxFootErrorM,maxBoneErrorM,maxIdleKneeDegrees,minWalkKneeDegrees,maxWalkKneeDegrees,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
+assert(stanceSamples>1000&&stanceKneeSum/stanceSamples<25,'support legs should not stay in the previous deep crouch');
+assert(maxSwingPitch>.02&&minSwingPitch<-.02,'airborne ankle must release and recover instead of staying flat');
+assert(maxRenderedFootAngle>.02,'full pose builder must consume airborne ankle articulation');
+console.log(JSON.stringify({schema:'human/standing_gait_height@2',shapes:shapes.length,frames,walks,turns,stops,maxHeightStepM,maxFootErrorM,maxBoneErrorM,maxIdleKneeDegrees,minWalkKneeDegrees,maxWalkKneeDegrees,stanceSamples,meanStanceKneeDegrees:stanceKneeSum/stanceSamples,maxStanceKneeDegrees,maxSwingPitch,minSwingPitch,maxPitchStep,maxRenderedFootAngle,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));

@@ -270,7 +270,7 @@ class NaturalLocomotion {
   this.standingHipHeightM=agent.h.bodyMetrics.standingHipHeightM;
   this.engine=new MotionLab.MotionController(this.rig);
   const stepFeet=this.engine.stepFeet.bind(this.engine);
-  this.engine.stepFeet=(state,dt)=>{stepFeet(state,dt);this.adaptSwingClearance(state);};
+  this.engine.stepFeet=(state,dt)=>{stepFeet(state,dt);this.adaptSwingClearance(state);this.adaptSwingAnkle(state);};
   this.world=new MotionLabWorld(agent);this.engine.world=this.world;
   this.phaseController=new ContinuousMotionPhase(this.engine);this.turnFilter=new TurnCommandFilter();
   this.pose=new MotionLabPose(agent.h,this.engine);agent.h.motionDriver=this.pose;
@@ -285,6 +285,25 @@ class NaturalLocomotion {
   const distance=horizontal(swing.from,swing.target),height=clamp(.018+distance*.10,.018,.055);
   const u=clamp(swing.elapsed/swing.duration,0,1),arc=16*u*u*(1-u)*(1-u);
   state.feet[swing.side].position[1]+=(height-.065)*arc;swing.clearanceHeightM=height;
+ }
+ adaptSwingAnkle(state){
+  // Only the airborne foot changes pitch. A planted sole still owns its full
+  // world anchor; heel/toe rockers require separate support pivots.
+  for(const side of ['left','right']){
+   const foot=state.feet[side],swing=state.swing;
+   foot.swingPitch=0;
+   if(foot.contact||foot.adoptedOrientation||swing?.side!==side)continue;
+   const u=clamp(swing.elapsed/swing.duration,0,1),distance=horizontal(swing.from,swing.target);
+   const drive=clamp(state.speed*this.tempo/.35,0,1)*clamp(distance/.18,0,1);
+   // Smooth lobes have zero angle and angular velocity at release,
+   // toe-clearance crossover and landing. Not a stance push-off model.
+   const pitch=drive*(u<.4?.18*Math.sin(Math.PI*u/.4)**2:-.12*Math.sin(Math.PI*(u-.4)/.6)**2);
+   const clearance=Math.max(0,foot.position[1]-this.rig.ankleHeight);
+   // Conservative authored foot envelope: bound pitch by the available
+   // clearance as its ankle approaches either endpoint of the swing.
+   const extent=.30*this.a.h.bodyMetrics.statureScale;
+   foot.swingPitch=clamp(pitch,-Math.atan2(clearance*.8,extent),Math.atan2(clearance*.8,extent));
+  }
  }
  // Agent's pose transaction must include the filters outside the pinned
  // kernel. Keep the live engine/callback identities and clone only state.
@@ -605,9 +624,23 @@ class NaturalLocomotion {
   return target;
  }
  isSettled(){return this.kernelSettled()&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
+ gaitSupportTarget(){
+  // Approximate the support-leg vault from this person's lengths and foot
+  // separation. The mild bend is an authored IK reserve, not a clinical norm.
+  // Keep the all-leg reach ceiling as well, including the airborne leg.
+  const s=this.engine.state;let target=this.standingTarget();
+  for(const side of ['left','right']){
+   const foot=s.feet[side];if(!foot.contact)continue;
+   const hip=add(s.root,rotate(qy(s.yaw),[this.rig.hipHalf*(side==='left'?-1:1),0,0]));
+   const {upper,lower}=this.rig.legs[side],knee=12*Math.PI/180;
+   const reach2=upper*upper+lower*lower+2*upper*lower*Math.cos(knee),d=horizontal(hip,foot.position);
+   target=Math.min(target,foot.position[1]+Math.sqrt(Math.max(0,reach2-d*d)));
+  }
+  return target;
+ }
  updateHeight(dt,standing){
   const e=this.engine;if(e.state.paused||e.state.fault)return;
-  const target=standing?this.standingTarget():Math.min(this.rig.hipHeight,this.standingTarget()),before=e.state;
+  const target=standing?this.standingTarget():this.gaitSupportTarget(),before=e.state;
   const y=Math.min(this.standingTarget(),before.root[1]+(target-before.root[1])*(1-Math.exp(-dt/.18)));
   if(Math.abs(y-before.root[1])<1e-10)return;
   const candidate={...before,root:[before.root[0],y,before.root[2]]};candidate.pose=e.solve(candidate);
@@ -645,7 +678,7 @@ class NaturalLocomotion {
  }
  report(){const s=this.engine.state;return{version:NATURAL_GAIT.version,state:s.status,speedMps:this.speed,timeScale:this.tempo,contacts:{...this.contacts},settled:this.isSettled(),
   source:MotionLab.MOTION_SOURCE,sourcePhase:s.motion.phase,referenceBlend:s.motion.weight,metrics:{...s.metrics},skinFloorOffsetM:this.skinFloorOffsetM,
-  height:{standingTargetM:this.standingHipHeightM,walkingTargetM:this.rig.hipHeight,currentM:s.root[1],reachableStandingM:this.standingTarget(),timeConstantS:.18},
+  height:{standingTargetM:this.standingHipHeightM,walkingTargetM:this.gaitSupportTarget(),legacyWalkingTargetM:this.rig.hipHeight,currentM:s.root[1],reachableStandingM:this.standingTarget(),timeConstantS:.18,method:'support-reach/v1'},
   traffic:structuredClone(this.traffic),routePassThroughCount:this.routePassThroughCount,poseAdoption:this.lastPoseAdoption?structuredClone(this.lastPoseAdoption):null,
   continuousWalkHandoff:this.lastContinuousWalkHandoff?structuredClone(this.lastContinuousWalkHandoff):null,
   phaseContinuity:this.phaseController.report(),turnContinuity:this.turnFilter.report(),lastTurnContinuity:this.lastTurnContinuity?structuredClone(this.lastTurnContinuity):null,

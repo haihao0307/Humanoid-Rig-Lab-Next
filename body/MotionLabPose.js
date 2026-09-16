@@ -80,7 +80,7 @@ class MotionLabPose {
  }
  controlledFootOrientation(state,side){
   const foot=state.feet[side],bind=this.h.sourceBind.get(side+'_foot').q;
-  if(!foot.adoptedOrientation)return qm(qy(foot.yaw),bind);
+  if(!foot.adoptedOrientation)return qm(qy(foot.yaw),qm(qx(foot.contact?0:foot.swingPitch||0),bind));
   const swing=state.swing;
   if(swing?.side!==side)return [...foot.adoptedOrientation];
   const u=smooth(clamp(swing.elapsed/Math.max(1e-8,swing.duration),0,1));
