@@ -18,7 +18,7 @@
    const originalInstall=runtime.installSkin.bind(runtime);
    runtime.installSkin=()=>{originalInstall();wrap();};
    window.__CHICKEN_R100_PECK_ADAPTER__=Object.freeze({
-    version:'fixed-length-forward-down-s-curve-v1',
+    version:'six-link-volume-preserving-s-curve-v2',
     installed:true
    });
    clearInterval(timer);
