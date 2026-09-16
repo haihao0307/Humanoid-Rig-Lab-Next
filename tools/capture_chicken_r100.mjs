@@ -167,7 +167,7 @@ try {
       && window.__CHICKEN_R100_PECK_ADAPTER__?.installed === true
       && api?.ready
       && api.diagnostics()?.manualStepAvailable
-      && api.diagnostics()?.skin?.peckKinematicsRevision === 'fixed-length-forward-down-s-curve-v1'
+      && api.diagnostics()?.skin?.peckKinematicsRevision === 'six-link-volume-preserving-s-curve-v2'
     );
   }, null, { timeout: 120_000 });
   stage('runtime-ready');
@@ -262,11 +262,11 @@ const checks = {
   patchLoaded: runtime.patch?.version === 'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
   manualStepLoaded: runtime.motion?.manualStepAvailable === true && runtime.manualPatch?.version === '1.1',
   peckAdapterLoaded: runtime.peckAdapter?.installed === true
-    && runtime.motion?.skin?.peckKinematicsRevision === 'fixed-length-forward-down-s-curve-v1',
+    && runtime.motion?.skin?.peckKinematicsRevision === 'six-link-volume-preserving-s-curve-v2',
   realtimePaused: runtime.motion?.realtimePaused === true,
   motionReady: runtime.motion?.ready === true,
-  boneCount: runtime.motion?.skin?.boneCount === 18,
-  cervicalBasePresent: runtime.motion?.skin?.boneCount === 18,
+  boneCount: runtime.motion?.skin?.boneCount === 21,
+  distributedCervicalChainPresent: runtime.motion?.skin?.boneCount === 21,
   skinnedMeshes: (runtime.motion?.skin?.skinnedMeshCount || 0) > 0,
   poseApplied: (runtime.motion?.skin?.applyCount || 0) > 80,
   rigInvariants: runtime.motion?.skin?.lastInvariantReport?.passed === true,
@@ -297,7 +297,7 @@ const checks = {
     forbiddenBodyBones.every((id) => !item.primaryBoneCounts?.[id])
   )),
   weightingRevision: runtime.motion?.skin?.weightingRevision
-    === 'generated-foot-discriminator-and-cervical-base-v3',
+    === 'six-link-neck-volume-distribution-v4',
   groupTestStillClosed: runtime.patch?.groupTestAuthorized === false,
   errorOverlayHidden: runtime.errorOverlay?.display === 'none',
   canvasAllocated: (runtime.canvas?.width || 0) > 0 && (runtime.canvas?.height || 0) > 0,
@@ -307,7 +307,7 @@ const checks = {
   expectedCapturesWritten: expectedFiles.every((file) => fs.existsSync(path.join(evidenceDir, file)))
 };
 const report = {
-  schema: 'life_ecosystem/chicken_r100_browser_qa@1.1',
+  schema: 'life_ecosystem/chicken_r100_browser_qa@1.2',
   version: 'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
   environment: {
     browser: 'Chrome headless via Playwright Core',
