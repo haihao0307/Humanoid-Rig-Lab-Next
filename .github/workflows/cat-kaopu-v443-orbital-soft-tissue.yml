@@ -10,6 +10,7 @@ on:
       - cat-kaopu/tools/patch_cat_v443_orbital_shaders.py
       - cat-kaopu/tools/patch_cat_v443_orbital_geometry.py
       - cat-kaopu/tools/patch_cat_v443_controls_api.py
+      - cat-kaopu/tools/patch_cat_v443_lid_orbit_blend.py
       - cat-kaopu/tools/finalize_cat_v443_orbital_soft_tissue.py
       - cat-kaopu/tools/verify_cat_v443_module.py
       - cat-kaopu/tools/capture_cat_v443_browser_qa.mjs
@@ -68,6 +69,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_v443_controls_api.py
+
+      - name: Blend V4.42 eyelids into the orbital transition
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v443_lid_orbit_blend.py
 
       - name: Finalize V4.43 metadata and workbench
         env:
