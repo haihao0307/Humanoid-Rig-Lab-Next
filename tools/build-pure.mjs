@@ -40,7 +40,13 @@ export function assemble(){
   if(used.size!==allowed.length)throw Error('HTML manifest has unused sources');return result;
  };
  const body=html('body').replace('/*__BODY_RUNTIME__*/',()=>runtime),brain=html('brain');
- const pack=text=>{const buffer=gzipSync(Buffer.from(text),{level:9,mtime:0});if(gunzipSync(buffer).toString()!==text)throw Error('Compression round trip failed');return buffer.toString('base64');};
+ const pack=text=>{
+  const buffer=gzipSync(Buffer.from(text),{level:9,mtime:0});
+  // gzip byte 9 describes the build host (Windows=10, Unix=3). The payload is
+  // UTF-8 on every host: mark OS unknown so identical sources compare equally.
+  buffer[9]=255;
+  if(gunzipSync(buffer).toString()!==text)throw Error('Compression round trip failed');return buffer.toString('base64');
+ };
  const index=html('index').replace('/*__BODY_GZIP__*/',()=>pack(body)).replace('/*__BRAIN_GZIP__*/',()=>pack(brain));
  return {runtime,body,brain,index};
 }

@@ -10,6 +10,7 @@ on:
       - 'source/**'
       - 'tools/check-open-intersection.mjs'
       - 'tools/check-pure.mjs'
+      - 'tools/build-pure.mjs'
       - 'tools/test-npc-four-way-crossing.mjs'
       - 'tools/test-task-crowd-browser.mjs'
       - '.github/workflows/task-integration-file-check.yml'
@@ -26,7 +27,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          # Match the audited generator/compressor version across build hosts.
+          node-version: '24.14.0'
       - name: Verify generated entrypoint and source contracts only
         run: |
           node tools/build-pure.mjs --check
