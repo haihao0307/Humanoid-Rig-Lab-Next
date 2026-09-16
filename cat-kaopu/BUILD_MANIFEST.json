@@ -1,7 +1,7 @@
 {
-  "schema": "cat_kaopu/module_build_manifest@1.1",
-  "version": "V4.41",
-  "buildId": "cat-kaopu-v441-eyelid-cornea-20260915",
+  "schema": "cat_kaopu/module_build_manifest@1.2",
+  "version": "V4.42",
+  "buildId": "cat-kaopu-v442-geometric-eyelid-20260916",
   "currentEntry": "workbench/CAT_KAOPU_CURRENT.html",
   "runtimePayload": "runtime/cat_v440.bin",
   "frozenBaselines": {
@@ -10,8 +10,10 @@
     "camera": "V4.34.1",
     "locomotionRegression": "V4.36",
     "postureCorrective": "V4.39",
-    "expressionPayload": "V4.40 CATV440 payload and 34-bone rig unchanged"
+    "eyeExpression": "V4.41",
+    "binaryPayload": "V4.40 CATV440 unchanged"
   },
+  "addedGeometry": "four bounded head-bone-driven eyelid shell volumes",
   "visualAcceptance": false,
   "productionReady": false,
   "files": [
@@ -22,8 +24,8 @@
     },
     {
       "path": "CURRENT.json",
-      "bytes": 2534,
-      "sha256": "f3d60ce491a3f73b65da26ffb518a75df80a679879b48226d101a7fada76b2af"
+      "bytes": 2909,
+      "sha256": "eeae9a4c65931de266d95d59f07ec1527cbef5d69681675af4afd1716f6a0c46"
     },
     {
       "path": "IMPORT_V440.md",
@@ -32,8 +34,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 930,
-      "sha256": "31a854701c063c6b723dd3577f7d868953a4333fa369c6c3812062d7d30c8204"
+      "bytes": 993,
+      "sha256": "70add5ba24062f8cd146f9335739fe1a14eca20b4ec4d5ef86c2c61667a2c7b8"
     },
     {
       "path": "baselines/v4.39/CAT_KAOPU_V439_REGIONAL_NORMAL_WORKBENCH_2026-09-15.html",
@@ -46,9 +48,19 @@
       "sha256": "44452642d5088d6cec3a12ea69ba1fe8cc5ca6f2d389ec86fb4b38bf8355302d"
     },
     {
+      "path": "baselines/v4.41/CAT_KAOPU_V441_EYELID_CORNEA_WORKBENCH_2026-09-15.html",
+      "bytes": 495688,
+      "sha256": "ad34dcc71173ed3d43d9a723ca940ce57d1f29af33f938f922b9d148d2077579"
+    },
+    {
       "path": "build/v4.41/CAT_KAOPU_V441_EYELID_CORNEA_WORKBENCH_2026-09-15.html",
       "bytes": 495688,
       "sha256": "ad34dcc71173ed3d43d9a723ca940ce57d1f29af33f938f922b9d148d2077579"
+    },
+    {
+      "path": "build/v4.42/CAT_KAOPU_V442_GEOMETRIC_EYELID_WORKBENCH_2026-09-16.html",
+      "bytes": 501030,
+      "sha256": "720e861a693e906f1c909f5d80f64c4e4943ad0f044274cd1ed7c28fefe8fe9a"
     },
     {
       "path": "docs/CAT_KAOPU_V432_SOURCE_RECEIPT_2026-09-13.json",
@@ -106,6 +118,16 @@
       "sha256": "2591e33e4b3519227bd5179b592ecbfe3ebc9322500ad0d8f175a00f80ac6e0e"
     },
     {
+      "path": "docs/CAT_KAOPU_V442_EXECUTION_REPORT_2026-09-16.md",
+      "bytes": 1491,
+      "sha256": "a65c2e77c567db5d66295ae9e7850bcd3104ffb10b9b3b398b9d6f672f46a279"
+    },
+    {
+      "path": "docs/CAT_KAOPU_V442_SELF_REVIEW_2026-09-16.md",
+      "bytes": 1204,
+      "sha256": "196f0888dc505ebb8373cde70b75b2e9610ce6fdabdf6e851dbaa4946d4b0026"
+    },
+    {
       "path": "docs/GITHUB_IMPORT_AND_BRANCH.md",
       "bytes": 1199,
       "sha256": "b10efd9896a5e3943a9322b71a74eebb5dbfaf38894b665af9051bd2f9b0ff3b"
@@ -124,6 +146,11 @@
       "path": "docs/STAGE_LINEAGE.md",
       "bytes": 812,
       "sha256": "e7ff4dd925baa583acb295c9843a01632461c1f0b700c9c76f92d12f2930f579"
+    },
+    {
+      "path": "handoff/CAT_KAOPU_CURRENT_FULL_HANDOFF_V440_2026-09-15.zip",
+      "bytes": 33494417,
+      "sha256": "29acd78c1fb2bf49d4432e92422eb270b8378f01e4a33211d674af7be38cf4fa"
     },
     {
       "path": "qa/CAT_KAOPU_V438_LIE_HOLD_QUARTER_2026-09-15.png",
@@ -276,6 +303,71 @@
       "sha256": "468be0f2ffb5bbed1ae872a39e6897fd063229ef5309fbc2ce25762031aa08ca"
     },
     {
+      "path": "qa/CAT_KAOPU_V442_BROWSER_RUNTIME_QA_2026-09-16.json",
+      "bytes": 23062,
+      "sha256": "1a4c8efc182bea466beeb74965aaaa6d6fb5babb11e73e4e114278224c00f3fb"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYELID_GEOMETRY_DEBUG_FRONT_2026-09-16.png",
+      "bytes": 171839,
+      "sha256": "d02f53810510b49446c62d10f8f57099d6dd37832063708cc0b0eecf46d446fb"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYELID_THICK_FRONT_2026-09-16.png",
+      "bytes": 171743,
+      "sha256": "501189cab54a87a16b07b37fc0de8877ac1f994a1736ce4f080aabdc42ee5109"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYELID_THIN_FRONT_2026-09-16.png",
+      "bytes": 172067,
+      "sha256": "b4b541f4c9daad28bfcc7d172ad916ad4573c40a409a33e47d8638613df41776"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYE_CLOSED_FRONT_2026-09-16.png",
+      "bytes": 171261,
+      "sha256": "9f3879a29a5eddade08685aa9da393112bc84df73874a8e22f717870f43a51a4"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYE_CLOSED_LEFT_2026-09-16.png",
+      "bytes": 193850,
+      "sha256": "2a78be8ccd5a52330619dffafc900a287cbe1e79ab11ce83bca9d406188d92ed"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYE_CLOSED_QUARTER_2026-09-16.png",
+      "bytes": 279231,
+      "sha256": "39b1fe27a0b0e0c6a3efe580c819151324dbd5dde45f605d0d6eda5c21d72e97"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYE_HALF_BLINK_FRONT_2026-09-16.png",
+      "bytes": 171798,
+      "sha256": "3cfb80e3652788d04f525127f9efb02b630ef4011f14a9f7d72d3c0149977b67"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYE_HALF_BLINK_QUARTER_2026-09-16.png",
+      "bytes": 279740,
+      "sha256": "3cd53fa5916bdac887d0b1b2d041c96126b013a3c29d4b4993a55ae11b663c5d"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYE_OPEN_FRONT_2026-09-16.png",
+      "bytes": 172677,
+      "sha256": "73c3f9017013044501ad7279cfab6a652183127e8ddf5b81d8b53b121c60328c"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_EYE_OPEN_QUARTER_2026-09-16.png",
+      "bytes": 280371,
+      "sha256": "1970790a30e56782d2fd4952764f58c67656d9ea70e1876df9a552de540e44ba"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_MOBILE_390x844_2026-09-16.png",
+      "bytes": 88817,
+      "sha256": "1b9470c93d7efb93ba027014b0ed6eb0eea8afa94e27a0d600cd5ace2643be0f"
+    },
+    {
+      "path": "qa/CAT_KAOPU_V442_TECHNICAL_QA_2026-09-16.json",
+      "bytes": 1316,
+      "sha256": "dd3d66d4dc4dea5f1039341974f1adad0f1d6d642ced9eeb22cbb23436d847dd"
+    },
+    {
       "path": "runtime/CAT_KAOPU_V440_EAR_WEIGHT_AUDIT_2026-09-15.json",
       "bytes": 4989,
       "sha256": "15822999a73b0757148460ac7d22bed7695b166521321f2bb52d71c26b6c950d"
@@ -284,6 +376,31 @@
       "path": "runtime/cat_v440.bin",
       "bytes": 225044,
       "sha256": "518aed4758033b2f3b40e6242976a8bb7779a4d70a9f2dba8461c56ac5cee846"
+    },
+    {
+      "path": "tools/bootstrap/v442/archive.part01.b64",
+      "bytes": 5812,
+      "sha256": "2d0df5ecbfc3e8d3a2c55fbec82158f704843d45be7402c84e6014bb3fb56bcb"
+    },
+    {
+      "path": "tools/bootstrap/v442/archive.part02.b64",
+      "bytes": 5811,
+      "sha256": "7044d66c8881afba9b8de8f659c33a294bb316c65592bb168b77cc490de06311"
+    },
+    {
+      "path": "tools/bootstrap/v442/archive.part03.b64",
+      "bytes": 5811,
+      "sha256": "339eb61c13df208102538b389c185c09b0cdb21f6d049f1a6461464f4796e2fa"
+    },
+    {
+      "path": "tools/bootstrap/v442/archive.part04.b64",
+      "bytes": 5811,
+      "sha256": "8ca4715521ee43792ab8df75cc62ab600394386b86b1e5676ee1ac3c9f6d3f99"
+    },
+    {
+      "path": "tools/bootstrap_cat_v442_sources.py",
+      "bytes": 1828,
+      "sha256": "46301ca00917306a5f51a6bbf1bcf5a7aba564f307ff4fe8b191d67e7459024f"
     },
     {
       "path": "tools/build_cat_v440_eye_ear_short_fur.py",
@@ -301,9 +418,19 @@
       "sha256": "441291e06bf3ed6c494783bacdde35a634442d4d7a7a41c5bc52bb385742ad90"
     },
     {
+      "path": "tools/build_cat_v442_geometric_eyelid.py",
+      "bytes": 35934,
+      "sha256": "057893d99b77d6c75e8e693d1b258333486a94017cca9dddeb6442c8d9049d5d"
+    },
+    {
       "path": "tools/capture_cat_v441_browser_qa.mjs",
       "bytes": 8297,
       "sha256": "e6beed93c5b236781cb97293273fa7fa7d81343cfa53d9c338909696fe5174d9"
+    },
+    {
+      "path": "tools/capture_cat_v442_browser_qa.mjs",
+      "bytes": 10378,
+      "sha256": "e1ee28029a2e751aeca38bc61db30d110c7914186bed9eb5b073c5d165c1e43e"
     },
     {
       "path": "tools/cat_v441_patch.js",
@@ -321,15 +448,14 @@
       "sha256": "b22121744bd99b13217202ad7f25ebb13172578ce9d5551988109d78e8675975"
     },
     {
+      "path": "tools/verify_cat_v442_module.py",
+      "bytes": 5409,
+      "sha256": "178fa718bb1ad00bb7fe47b10d15df0eb02695906035056404a225f0a8c83feb"
+    },
+    {
       "path": "workbench/CAT_KAOPU_CURRENT.html",
-      "bytes": 495688,
-      "sha256": "ad34dcc71173ed3d43d9a723ca940ce57d1f29af33f938f922b9d148d2077579"
+      "bytes": 501030,
+      "sha256": "720e861a693e906f1c909f5d80f64c4e4943ad0f044274cd1ed7c28fefe8fe9a"
     }
-  ],
-  "scope": [
-    "procedural eyelid aperture",
-    "deterministic blink",
-    "corneal wet response",
-    "pupil adaptation"
   ]
 }
