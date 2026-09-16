@@ -6,8 +6,6 @@ on:
       - codex/chicken-r9-2-head-restore
     paths:
       - .github/workflows/chicken-r93-build.yml
-      - tools/.build_chicken_r93.py.gz.b64
-      - tools/.capture_chicken_r93.mjs.gz.b64
       - tools/build_chicken_r93.py
       - tools/capture_chicken_r93.mjs
   workflow_dispatch:
@@ -34,40 +32,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Materialize R9.3 source tools
+      - name: Verify committed R9.3 source tools
         shell: bash
         run: |
-          git show ccc9563e71bf085172234099ff3880a84c9571f8:tools/.build_chicken_r93.py.gz.b64 > /tmp/build_chicken_r93.py.gz.b64
-          python - <<'PY'
-          import base64, gzip
-          from pathlib import Path
-
-          verified = Path('/tmp/build_chicken_r93.py.gz.b64')
-          capture = Path('tools/.capture_chicken_r93.mjs.gz.b64')
-          Path('tools/build_chicken_r93.py').write_bytes(
-              gzip.decompress(base64.b64decode(verified.read_text(encoding='utf-8').strip()))
-          )
-          Path('tools/capture_chicken_r93.mjs').write_bytes(
-              gzip.decompress(base64.b64decode(capture.read_text(encoding='utf-8').strip()))
-          )
-
-          path = Path('tools/build_chicken_r93.py')
-          text = path.read_text(encoding='utf-8')
-
-          old_audit = " window.__CHICKEN_R93_LAST_HEAD_AUDIT__={movedVertices:moved,maxDisplacement,nonFinite,nonHeadMoved,stationXMonotonic:monotonic,bounds:{min:[minX,minY,minZ],max:[maxX,maxY,maxZ]}};\n return p;"
-          new_audit = " const audit={amount:a,movedVertices:moved,maxDisplacement,nonFinite,nonHeadMoved,stationXMonotonic:monotonic,bounds:{min:[minX,minY,minZ],max:[maxX,maxY,maxZ]}};\n // Preserve the active candidate audit; rollback builds must not overwrite it.\n if(a>.5)window.__CHICKEN_R93_LAST_HEAD_AUDIT__=audit;\n else window.__CHICKEN_R93_LAST_ROLLBACK_AUDIT__=audit;\n return p;"
-          if old_audit not in text:
-              raise SystemExit('Unable to locate R9.3 audit assignment')
-          text = text.replace(old_audit, new_audit, 1)
-
-          old_cap = "  const sx=p[start];if(sx<=previousX)monotonic=false;previousX=sx;\n }\n let minX=Infinity,minY=Infinity,minZ=Infinity,maxX=-Infinity,maxY=-Infinity,maxZ=-Infinity;"
-          new_cap = "  const sx=p[start];if(sx<=previousX)monotonic=false;previousX=sx;\n }\n // The source sweep has two cap vertices after the 72x96 rings. Process the\n // anterior cap as part of the bill; otherwise the visual tip remains at R9.1.\n for(let q=rows*cols*3;q<p.length;q+=3){\n  const x=p[q];if(x<=.448)continue;\n  const ox=p[q],oy=p[q+1],oz=p[q+2],u=clamp((x-.448)/(.523116-.448)),blend=ss(.448,.462,x)*a;\n  // Keep the keratin cap inside the same smooth station field while shortening\n  // enough to clear the R9.3 bill-length gate without flattening the root.\n  const newX=.448+(x-.448)*(.84-.02*u);\n  p[q]=x+(newX-x)*blend;\n  p[q+1]-=.0014*ss(.70,1,u)*blend;\n  const d=Math.hypot(p[q]-ox,p[q+1]-oy,p[q+2]-oz);\n  if(d>1e-8){moved++;maxDisplacement=Math.max(maxDisplacement,d);}\n  if(!Number.isFinite(p[q])||!Number.isFinite(p[q+1])||!Number.isFinite(p[q+2]))nonFinite++;\n }\n let minX=Infinity,minY=Infinity,minZ=Infinity,maxX=-Infinity,maxY=-Infinity,maxZ=-Infinity;"
-          if old_cap not in text:
-              raise SystemExit('Unable to locate R9.3 cap insertion point')
-          text = text.replace(old_cap, new_cap, 1)
-
-          path.write_text(text, encoding='utf-8')
-          PY
+          test -s tools/build_chicken_r93.py
+          test -s tools/capture_chicken_r93.mjs
           python -m py_compile tools/build_chicken_r93.py
           node --check tools/capture_chicken_r93.mjs
 
@@ -108,6 +77,7 @@ jobs:
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         shell: bash
         run: |
+          test -n "$CHROME_PATH"
           test -s evidence/r93/R93_REVIEW_BOARD.html
           python -m http.server 8766 > /tmp/chicken-r93-review-http.log 2>&1 &
           SERVER_PID=$!
@@ -172,10 +142,7 @@ jobs:
         run: |
           git config user.name "Codex"
           git config user.email "codex@users.noreply.github.com"
-          rm -f tools/.build_chicken_r93.py.gz.b64 tools/.capture_chicken_r93.mjs.gz.b64
           git add -A \
-            tools/.build_chicken_r93.py.gz.b64 \
-            tools/.capture_chicken_r93.mjs.gz.b64 \
             tools/build_chicken_r93.py \
             tools/capture_chicken_r93.mjs \
             CHICKEN_V46_R9_3_HEAD_SHAPE.html \
