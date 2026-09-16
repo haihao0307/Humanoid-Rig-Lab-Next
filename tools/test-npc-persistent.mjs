@@ -109,4 +109,23 @@ for(const count of [4,8]){
  const p=fixture();p.dispatch('搬运A',{targets:['a']});p.get('a').agent.failNext=true;advance(p,.01);
  check(()=>assert.equal(p.get('a').behavior.status,'failed'));check(()=>assert.equal(p.claims.size,0));check(()=>assert.equal(p.stationClaims.size,0));check(()=>assert.equal(p.physicsOwner,null));
 }
+// A failed executor cannot consume appended work; do not acknowledge it as
+// accepted or erase the visible failure. Explicit stop/replace can recover.
+{
+ const p=fixture(),a=p.get('a');p.dispatch('搬运A',{targets:['a']});a.agent.failNext=true;advance(p,.01);
+ const failure=a.behavior.error,queue=a.queue;
+ check(()=>assert.equal(p.dispatch('挥手',{targets:['a']})[0].accepted,false));
+ check(()=>assert.equal(a.behavior.error,failure));check(()=>assert.equal(a.queue,queue));check(()=>assert.equal(a.queue.length,0));
+ p.dispatch('挥手',{targets:['b']});advance(p,.5);check(()=>assert.deepEqual(p.get('b').agent.calls,['挥手']));
+ p.control('stop',['a']);check(()=>assert.equal(p.dispatch('挥手',{targets:['a']})[0].accepted,true));advance(p,1);check(()=>assert.equal(a.agent.calls.at(-1),'挥手'));
+ a.agent.error='controlled failure';check(()=>assert.equal(p.dispatch('打招呼',{targets:['a'],mode:'replace'})[0].accepted,true));advance(p,1);check(()=>assert.equal(a.agent.calls.at(-1),'打招呼'));
+}
 console.log(JSON.stringify({checks,schedulerExecuted:true,geometryGenerated:false,physicsExecuted:false}));
+// Optional diagnosis, deliberately not a passing fairness assertion. Keeping
+// the measured result visible lets a future allocator demonstrate improvement.
+if(process.argv.includes('--starvation-probe')){
+ const p=fixture(),order=[];
+ for(const actor of p.values()){const submit=actor.agent.submit;actor.agent.submit=function(text){order.push(this.npcId);return submit.call(this,text);};}
+ for(let i=0;i<20;i++)p.dispatch('搬运A',{targets:['a']});p.dispatch('搬运B',{targets:['b']});advance(p,6);
+ console.log(JSON.stringify({probe:'resource-fairness',simulationS:6,order,actors:[...p.values()].map(row=>({id:row.id,started:row.agent.calls.length,diversions:row.agent.diversions,error:row.behavior.error||row.agent.error})),starvationObserved:p.get('b').agent.calls.length===0&&!!p.get('b').behavior.error,fairnessVerified:false,physicsExecuted:false}));
+}

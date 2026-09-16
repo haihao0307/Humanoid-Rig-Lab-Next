@@ -268,6 +268,7 @@ class NPCPopulation {
   const result=actors.map(actor=>{try{
    if(this.isReserved(actor.agent))throw Error('此人物由任务面板或持续日常控制');
    if(actor.agent.characterEditInProgress)throw Error('此人物正在更新外观');
+   if(mode==='append'&&actor.agent.error)throw Error('此人物已失败，请先停止或替换任务后重试：'+actor.agent.error);
    if(mode==='append'&&actor.queue.length>=64)throw Error('此人物等待队列已满');
    parse(text,this.lab.world,actor.agent.lastObject); // Syntax/targets only; forecast again at execution time.
    const keepPaused=mode==='append'&&actor.agent.paused&&!!(actor.running||actor.queue.length||actor.agent.activity().physicalBusy);
