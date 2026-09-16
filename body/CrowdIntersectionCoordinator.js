@@ -40,11 +40,20 @@ function trafficIntersectionSyncMembers(lease,population){
   else{traffic.active=true;traffic.mode='intersection-circulation';traffic.reason='open-intersection-circulation';if(first)traffic.intersectionYields++;}
  }
 }
+function trafficIntersectionHasExited(actor,member,lease){
+ const a=actor.agent,root=a.locomotion?.engine?.state?.root||a.pos,distance=horizontal(root,lease.center);if(distance>TRAFFIC_INTERSECTION.clusterRadiusM)return true;
+ if(member?.goal&&horizontal(root,member.goal)<.62)return true;
+ if(distance<TRAFFIC_INTERSECTION.releaseRadiusM+.48)return false;
+ const direction=trafficIntersectionDirection(actor),outward=sub(root,lease.center);return!!direction&&len(outward)>.08&&dot(direction,norm(outward))>.32;
+}
 function trafficPruneIntersections(population,runtime,now){
  if(!runtime?.intersections)return;
  const live=new Map([...population.values()].filter(trafficIntersectionActive).map(actor=>[actor.id,actor]));
  for(const [key,lease]of runtime.intersections){
-  for(const [id,member]of lease.members){const actor=live.get(id);if(!actor||trafficTaskKey(actor.agent)!==member.taskKey)lease.members.delete(id);}
+  for(const [id,member]of lease.members){
+   const actor=live.get(id),stale=!actor||trafficTaskKey(actor.agent)!==member.taskKey,exited=!stale&&trafficIntersectionHasExited(actor,member,lease);if(!stale&&!exited)continue;
+   lease.members.delete(id);if(exited){const traffic=actor.agent.locomotion?.traffic;if(traffic?.intersectionKey===key)trafficIntersectionClearState(traffic);actor.agent.log?.('已离开开放交叉区域，继续原任务路线');}
+  }
   if(!lease.members.size){runtime.intersections.delete(key);continue;}
   if(!lease.members.has(lease.ownerId))lease.ownerId=null;
   trafficIntersectionAssignOwner(lease,population,now);trafficIntersectionSyncMembers(lease,population);
