@@ -1,0 +1,190 @@
+{
+  "schema": "life_ecosystem/chicken_r984_browser_qa@1.0",
+  "version": "V4.6_R9.8_4_NATURAL_HEAD_FACE_CANDIDATE",
+  "environment": {
+    "browser": "Chrome headless via Playwright Core",
+    "executablePath": "/opt/hostedtoolcache/setup-chrome/chromium/stable/x64/chrome",
+    "candidateUrl": "http://127.0.0.1:8765/CHICKEN_V46_R9_8_4_NATURAL_FACE.html",
+    "predecessorUrl": "http://127.0.0.1:8765/CHICKEN_V46_R9_8_3_CLEAN_FACE.html",
+    "viewport": [
+      1440,
+      1000
+    ],
+    "rendererRequest": "SwiftShader/ANGLE correctness path"
+  },
+  "checks": {
+    "noFatalException": true,
+    "patchLoaded": true,
+    "correctTitle": true,
+    "statusProduced": true,
+    "canvasAllocated": true,
+    "errorOverlayHidden": true,
+    "headAuditProduced": true,
+    "profileAuditProduced": true,
+    "billAuditProduced": true,
+    "eyeAuditProduced": true,
+    "wattleAuditProduced": true,
+    "partAuditProduced": true,
+    "shapeFinite": true,
+    "lowerNeckGuardHeld": true,
+    "stationXMonotonic": true,
+    "boundedDisplacement": true,
+    "crownBounded": true,
+    "posteriorWidthBounded": true,
+    "cheekWidthBounded": true,
+    "jawBottomBounded": true,
+    "billFinite": true,
+    "billNoDegenerateTriangles": true,
+    "billRootEmbedded": true,
+    "billCompact": true,
+    "eyesSurfaceAttached": true,
+    "wattlesAttached": true,
+    "legacyPartsExcluded": true,
+    "noPageErrors": true,
+    "noConsoleErrors": true,
+    "noFailedRequests": true,
+    "expectedCapturesWritten": true
+  },
+  "passed": true,
+  "runtime": {
+    "patch": {
+      "version": "V4.6_R9.8_4_NATURAL_HEAD_FACE_CANDIDATE",
+      "predecessor": "V4.6_R9.8_3_CLEAN_FACE_EMBEDDED_BILL_CANDIDATE",
+      "source": "CHICKEN_V46_R9_1.html",
+      "method": "R9.1 base carrier + smooth full head-mask refit + attached eye dome + compact asymmetric bill",
+      "domain": [
+        0.232,
+        0.47
+      ],
+      "preserves": [
+        "R9/R9.1 rollback",
+        "lower neck",
+        "body",
+        "plumage",
+        "wing",
+        "tail",
+        "feet",
+        "materials",
+        "existing controls"
+      ],
+      "manualVisualAcceptance": false,
+      "rigAuthorized": false,
+      "motionAuthorized": false
+    },
+    "headAudit": {
+      "amount": 1,
+      "movedVertices": 673,
+      "maxDisplacement": 0.09736605137132087,
+      "nonFinite": 0,
+      "nonHeadMoved": 0,
+      "stationXMonotonic": true
+    },
+    "profileAudit": {
+      "crownTop": 0.9971927672718736,
+      "posteriorWidth": 0.13560423753125675,
+      "cheekWidth": 0.12056534735652615,
+      "jawBottom": 0.8729462152157391,
+      "billRoot": 0.405,
+      "billTip": 0.468,
+      "independentCarrier": true
+    },
+    "billAudit": {
+      "vertices": 1361,
+      "triangles": 2680,
+      "finite": true,
+      "degenerateTriangles": 0,
+      "rootEmbedded": true,
+      "rootX": 0.405,
+      "tipX": 0.468,
+      "rootLateralRadius": 0.0108
+    },
+    "eyeAudit": {
+      "patches": 4,
+      "domes": 2,
+      "lids": 2,
+      "geometry": "surface_attached_dome_plus_continuous_lid",
+      "center": [
+        0.382,
+        0.946
+      ],
+      "radius": [
+        0.01,
+        0.0088
+      ],
+      "legacyPartsExcluded": true
+    },
+    "wattleAudit": {
+      "patches": 2,
+      "root": [
+        0.397,
+        0.878
+      ],
+      "length": 0.032,
+      "attached": true
+    },
+    "partAudit": {
+      "legacyEyePartsExcluded": true,
+      "legacyEarLobesExcluded": true,
+      "excluded": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ]
+    },
+    "title": "Chicken R9.8.4 · Natural Head and Face Candidate",
+    "statusText": "R9.8.4 · 连续自然头面候选 · 4 个眼部片",
+    "canvas": {
+      "width": 1110,
+      "height": 1000
+    },
+    "errorOverlay": {
+      "display": "none",
+      "text": ""
+    }
+  },
+  "fatal": null,
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "expectedCaptures": [
+    "R984_HEAD_NEUTRAL_LEFT.png",
+    "R984_HEAD_NEUTRAL_RIGHT.png",
+    "R984_HEAD_NEUTRAL_FRONT.png",
+    "R984_HEAD_NEUTRAL_TOP.png",
+    "R984_HEAD_NEUTRAL_THREE_QUARTER.png",
+    "R984_HEAD_WIRE_LEFT.png",
+    "R984_WHOLE_NEUTRAL_THREE_QUARTER.png",
+    "R984_WHOLE_PROCEDURAL_THREE_QUARTER.png",
+    "R983_BASELINE_HEAD_NEUTRAL_LEFT.png",
+    "R983_BASELINE_HEAD_NEUTRAL_THREE_QUARTER.png"
+  ],
+  "truthBoundary": {
+    "manualVisualAcceptance": false,
+    "visualGatePassed": false,
+    "anatomicalTruthClaimed": false,
+    "rigAuthorized": false,
+    "motionAuthorized": false
+  }
+}

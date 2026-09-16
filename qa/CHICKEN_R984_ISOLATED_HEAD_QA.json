@@ -1,0 +1,89 @@
+{
+  "schema": "life_ecosystem/chicken_r984_isolated_head_qa@1.0",
+  "version": "V4.6_R9.8_4_NATURAL_HEAD_FACE_CANDIDATE",
+  "checks": {
+    "noFatalException": true,
+    "independentHeadProduced": true,
+    "independentHeadFinite": true,
+    "independentHeadNoDegenerateTriangles": true,
+    "independentHeadDenseEnough": true,
+    "legacyBodyHeadTrianglesRemoved": true,
+    "legacyCoatHeadTrianglesRemoved": true,
+    "lowerNeckGuardHeld": true,
+    "carrierStationOrderHeld": true,
+    "correctVersion": true,
+    "statusProduced": true,
+    "noPageErrors": true,
+    "noConsoleErrors": true
+  },
+  "passed": true,
+  "runtime": {
+    "head": {
+      "vertices": 6409,
+      "triangles": 12744,
+      "finite": true,
+      "degenerateTriangles": 0,
+      "posteriorOpen": true,
+      "anteriorCapped": true,
+      "xDomain": [
+        0.21,
+        0.426
+      ]
+    },
+    "cull": {
+      "removedBodyTriangles": 2300,
+      "removedCoatTriangles": 3542
+    },
+    "carrier": {
+      "amount": 1,
+      "movedVertices": 673,
+      "maxDisplacement": 0.09736605137132087,
+      "nonFinite": 0,
+      "nonHeadMoved": 0,
+      "stationXMonotonic": true
+    },
+    "profile": {
+      "crownTop": 0.9971927672718736,
+      "posteriorWidth": 0.13560423753125675,
+      "cheekWidth": 0.12056534735652615,
+      "jawBottom": 0.8729462152157391,
+      "billRoot": 0.405,
+      "billTip": 0.468,
+      "independentCarrier": true
+    },
+    "patch": {
+      "version": "V4.6_R9.8_4_NATURAL_HEAD_FACE_CANDIDATE",
+      "predecessor": "V4.6_R9.8_3_CLEAN_FACE_EMBEDDED_BILL_CANDIDATE",
+      "source": "CHICKEN_V46_R9_1.html",
+      "method": "R9.1 base carrier + smooth full head-mask refit + attached eye dome + compact asymmetric bill",
+      "domain": [
+        0.232,
+        0.47
+      ],
+      "preserves": [
+        "R9/R9.1 rollback",
+        "lower neck",
+        "body",
+        "plumage",
+        "wing",
+        "tail",
+        "feet",
+        "materials",
+        "existing controls"
+      ],
+      "manualVisualAcceptance": false,
+      "rigAuthorized": false,
+      "motionAuthorized": false
+    },
+    "status": "R9.8.4 · 连续自然头面候选 · 4 个眼部片"
+  },
+  "fatal": null,
+  "pageErrors": [],
+  "consoleErrors": [],
+  "truthBoundary": {
+    "manualVisualAcceptance": false,
+    "visualGatePassed": false,
+    "rigAuthorized": false,
+    "motionAuthorized": false
+  }
+}
