@@ -256,6 +256,7 @@ class NPCPopulation {
   if(this.physicsOwner&&this.physicsOwner!==a.npcId)throw Error('已有 NPC 正在操作物体');if(targetId)this.stationClaims.set(targetId,a.npcId);this.physicsOwner=a.npcId;this.claims.set(id,a.npcId);
  }
  releaseObjects(a,{preserveResource=false}={}){
+  a.locomotion?.releaseIntersection?.();
   for(const [id,owner]of this.claims)if(owner===a.npcId&&a.held?.id!==id){this.lab.world.physics?.clearManipulation(id);this.claims.delete(id);}if(!a.held)for(const [id,owner]of this.stationClaims)if(owner===a.npcId)this.stationClaims.delete(id);if(this.physicsOwner===a.npcId&&!a.held)this.physicsOwner=null;
   const actor=this.actors.get(a.npcId),keepResource=preserveResource||actor?.running?.source==='resource-circulation';if(actor&&!keepResource&&!a.held)actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};
  }
@@ -282,7 +283,7 @@ class NPCPopulation {
    if(actor.agent.characterEditInProgress)throw Error('此人物正在更新外观');
    if(action==='stop'){actor.queue=[];actor.behavior.enabled=false;actor.behavior.status='stopped';actor.behavior.error=null;actor.behavior.waitUntil=null;actor.running=null;const result=actor.agent.cancel();this.releaseObjects(actor.agent);return{id:actor.id,accepted:true,...result};}
    if(action==='resume'&&actor.agent.error)throw Error('请先停止并处理此人物的错误');
-   actor.agent.paused=action==='pause';return{id:actor.id,accepted:true};
+   actor.agent.paused=action==='pause';if(actor.agent.paused)actor.agent.locomotion?.releaseIntersection?.();return{id:actor.id,accepted:true};
   }catch(error){return{id:actor.id,accepted:false,reason:error.message};}});
   this.lab.setAuto(true);this.changed();return results;
  }
@@ -335,6 +336,9 @@ class NPCPopulation {
   const physics=this.lab.world.physics,checkpoint=physics?.capture(),worldRevision=this.lab.world.revision,routineBefore=structuredClone(this.lab.world.routineState),elapsedBefore=this.elapsedS;
   this.physicsTickActive=true;
   this.elapsedS+=step;advanceRoutineEnvironment(this.lab.world,step);this.physicsDeferred.clear();
+  // Includes pauses/task changes made by the semantic and routine entry points.
+  // Paused actors still remain physical obstacles in sweepFor/collisionFor.
+  if(typeof trafficPruneIntersections==='function')trafficPruneIntersections(this,trafficRuntime(this),this.elapsedS);
   for(const actor of this.values()){
    if(actor.disposed||actor.agent.characterEditInProgress)continue;
    const tickStarted=this.observation?.recording?performance.now():null;
@@ -395,6 +399,6 @@ class NPCPopulation {
   }catch(error){for(const actor of staged){actor.disposed=true;actor.compact?.dispose();}throw error;}
   finally{for(const actor of staged)this.pendingIds.delete(actor.id);this.pending-=specs.length;this.changed();}
  }
- disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();this.stationClaims.clear();this.physicsOwner=null;}
+ disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.agent.locomotion?.releaseIntersection?.();actor.compact?.dispose();}this.claims.clear();this.stationClaims.clear();this.physicsOwner=null;}
 }
 function installNPCPopulation(lab){const population=new NPCPopulation(lab);lab.population=population;installNPCPopulationControls(lab,population);population.announceActive();window.addEventListener('pagehide',event=>{if(!event.persisted)population.disposeAll();});return population;}

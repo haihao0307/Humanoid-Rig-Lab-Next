@@ -1,0 +1,33 @@
+name: Task integration file checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'body/CrowdIntersectionCoordinator.js'
+      - 'body/NaturalLocomotion.js'
+      - 'control/NPCPopulation.js'
+      - 'source/**'
+      - 'tools/check-open-intersection.mjs'
+      - 'tools/check-pure.mjs'
+      - 'tools/test-npc-four-way-crossing.mjs'
+      - 'tools/test-task-crowd-browser.mjs'
+      - '.github/workflows/task-integration-file-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  file-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify generated entrypoint and source contracts only
+        run: |
+          node tools/build-pure.mjs --check
+          node tools/check-pure.mjs

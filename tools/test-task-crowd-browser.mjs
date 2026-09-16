@@ -30,12 +30,13 @@ try{
   const w=document.querySelector('#bodyFrame')?.contentWindow;
   if(w?.__startupError||w?.__humanStartup?.status==='failed')return true;
   let population=0,pending=1;try{population=w?.HumanLab?.population?.list?.().length||0;pending=w?.HumanLab?.population?.pending??1;}catch{}
-  return population>=4;
+  return w?.__humanStartup?.status==='ready'&&population>=6&&pending===0;
  },null,{timeout:720000,polling:500});
  const ready=await bodyState();
  assert.equal(ready.startupError,null,'body runtime reported startup error: '+JSON.stringify(ready));
- assert.notEqual(ready.startup?.status,'failed','browser crowd startup failed: '+JSON.stringify(ready));
- assert(ready.population>=4,'crowd browser scenario requires at least four real NPCs');
+ assert.equal(ready.startup?.status,'ready','browser crowd startup failed: '+JSON.stringify(ready));
+ assert(ready.population>=6,'crowd browser scenario requires all six real NPCs');
+ assert.equal(ready.pending,0,'all review actors must finish generation');
 
  const crossing=await page.evaluate(()=>{
   const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,pop=lab.population,world=lab.world;
@@ -79,7 +80,7 @@ try{
    }
    if(completedAt.size===test.length)break;
   }
-  for(const actor of test){const t=actor.agent.locomotion.traffic;trafficActions+=['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations'].reduce((sum,key)=>sum+(Number(t?.[key])||0),0);}
+  for(const actor of test){const t=actor.agent.locomotion.traffic;trafficActions+=['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations','intersectionClaims','intersectionYields','intersectionLaps','intersectionRotations'].reduce((sum,key)=>sum+(Number(t?.[key])||0),0);}
   pop.focus(test.map(actor=>actor.id));lab.render();
   return{
    center,frames,minSeparationM:minSeparation,trafficActions,parkingWait:test.some(actor=>Object.hasOwn(actor.agent.locomotion.traffic,'waitS')),
@@ -91,6 +92,10 @@ try{
  assert(crossing.actors.every(actor=>!actor.error),'four-way crossing produced an agent error');
  assert(crossing.minSeparationM>.49,'four-way browser crossing lost body clearance');
  assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');
+ assert(crossing.actors.reduce((sum,actor)=>sum+(actor.traffic.intersectionClaims||0),0)>=1,'crossing did not claim an intersection');
+ assert(crossing.actors.reduce((sum,actor)=>sum+(actor.traffic.intersectionYields||0),0)>=2,'crossing did not exercise circulation');
+ assert(crossing.actors.reduce((sum,actor)=>sum+(actor.traffic.recoveries||0),0)<128,'crossing repeatedly blocked the motion kernel');
+ assert(crossing.actors.every(actor=>actor.maxStationaryS<15),'crossing left an actor stationary for too long');
  assert.equal(crossing.parkingWait,false,'parking wait state returned in the browser crossing');
  assert(crossing.actors.every(actor=>actor.pathRatio<3.4),'browser crossing produced an excessive detour');
  // Diagnostic run records total stationary time; arrival settling is separated in the next revision.
@@ -105,7 +110,7 @@ try{
    let ok=true;for(let dz=-endpoint;dz<=endpoint+.001;dz+=.25)for(const dx of [-.9,-half,0,half,.9])if(!open([x+dx,0,z+dz])){ok=false;break;}if(ok)candidates.push([x,0,z]);
   }
   const center=candidates.sort((a,c)=>Math.hypot(c[0],c[2])-Math.hypot(a[0],a[2]))[0];if(!center)throw Error('没有找到可布置临时窄通道的空地');
-  const ids=['TASK_TEST_CORRIDOR_L','TASK_TEST_CORRIDOR_R'];
+  const ids=['TCORRIDORL','TCORRIDORR'];
   const walls=[
    world.normalizeObject({id:ids[0],templateId:'wall',name:'测试窄通道左墙',shape:'box',p:[center[0]-half,0,center[2]],w:.18,h:1,d:length,mass:100,movable:false,collidable:true,color:[.22,.28,.3]},ids[0]),
    world.normalizeObject({id:ids[1],templateId:'wall',name:'测试窄通道右墙',shape:'box',p:[center[0]+half,0,center[2]],w:.18,h:1,d:length,mass:100,movable:false,collidable:true,color:[.22,.28,.3]},ids[1])

@@ -66,7 +66,7 @@ function trafficSegmentClear(agent,start,end,context,{dynamic=true}={}){
 }
 function trafficRuntime(population){
  if(!population)return null;let runtime=trafficRuntimeByPopulation.get(population);
- if(!runtime){runtime={slots:new Map(),corridors:new Map()};trafficRuntimeByPopulation.set(population,runtime);}return runtime;
+ if(!runtime){runtime={slots:new Map(),corridors:new Map(),intersections:new Map()};trafficRuntimeByPopulation.set(population,runtime);}return runtime;
 }
 function trafficTaskKey(agent){
  const s=agent.skill;if(!s)return null;return [agent.index,s.type,s.targetId||'',s.objectId||'',agent.phase].join('|');
@@ -242,6 +242,7 @@ class NaturalLocomotion {
   this.resetFromPose();
  }
  resetFromPose({preservePoseContacts=false}={}){
+  this.releaseIntersection();
   if(this.traffic?.slotKey)trafficReleaseTargetSlot(this);if(this.traffic?.corridorKey)trafficReleaseCorridor(this);
   const a=this.a,e=this.engine,h=a.h,yaw=a.yaw;
   const currentHip=side=>h.byId?.get(side+'_femur')?.world?.p||h.legs?.[side]?.upper?.world?.p;
@@ -266,8 +267,10 @@ class NaturalLocomotion {
   this.phaseController.reset(e.state.motion.phase||0);this.turnFilter.reset(yaw);
   this.requestKey=null;this.requested=false;this.tempo=1;this.routePassThroughCount=this.routePassThroughCount||0;
   this.traffic={active:false,mode:'clear',reason:null,blockers:[],side:0,detours:0,retreats:0,replans:0,recoveries:0,escapes:0,slotReservations:0,lastPlanAtS:-Infinity,nextPlanAtS:0,detourEndIndex:-1,originalTarget:null,lastError:null,slotKey:null,slotTaskKey:null,slotPoint:null,slotIndex:null,advancePoint:null,advanceRouteIndex:-1,corridorKey:null,corridorTaskKey:null,corridorOwner:null,corridorDirection:0,corridorDescriptor:null,corridorOrbit:null,corridorOrbitIndex:0,corridorOrbitCycleStart:0,corridorOrbitLaps:0,corridorClaims:0,corridorYields:0};this.sync();
+  Object.assign(this.traffic,{intersectionKey:null,intersectionTaskKey:null,intersectionOwner:null,intersectionCenter:null,intersectionOrbitDirection:0,intersectionOrbitLane:-1,intersectionOrbitAngle:null,intersectionClaims:0,intersectionYields:0,intersectionLaps:0,intersectionRotations:0});
   return structuredClone(this.lastPoseAdoption);
  }
+ releaseIntersection(){if(this.traffic?.intersectionKey)trafficReleaseIntersection(this);}
  sync(){const a=this.a,s=this.engine.state;
   a.pos=[...s.root];a.yaw=s.yaw;a.swing=s.swing?{side:s.swing.side,t:s.swing.elapsed,duration:s.swing.duration}:null;
   a.feet=Object.fromEntries(['left','right'].map(side=>[side,{p:[...s.feet[side].position],yaw:s.feet[side].yaw,contact:s.feet[side].contact}]));
@@ -443,9 +446,9 @@ class NaturalLocomotion {
  }
  rollingTrafficTarget(target,context){
   const a=this.a,t=this.traffic,root=this.engine.state.root;
-  if(t.advancePoint&&t.advanceRouteIndex===a.routeIndex&&horizontal(root,t.advancePoint)>.025&&this.world.free(t.advancePoint,.23))return [...t.advancePoint];
+  if(t.advancePoint&&t.advanceRouteIndex===a.routeIndex&&horizontal(root,t.advancePoint)>.025&&this.world.free(t.advancePoint,.23)&&trafficSegmentClear(a,root,t.advancePoint,context))return [...t.advancePoint];
   t.advancePoint=null;t.advanceRouteIndex=-1;
-  if(this.world.free(target,.23))return target;
+  if(this.world.free(target,.23)&&trafficSegmentClear(a,root,target,context))return target;
   let direction=sub(target,root);direction[1]=0;const distance=len(direction);if(distance<.08)return null;direction=norm(direction);
   for(const lookahead of [Math.min(.72,distance-.04),Math.min(.52,distance-.04),Math.min(.34,distance-.04),Math.min(.20,distance-.04)]){
    if(lookahead<.12)continue;const point=add(root,mul(direction,lookahead));point[1]=0;
@@ -459,18 +462,26 @@ class NaturalLocomotion {
   const context=this.world.context(.23),root=this.engine.state.root,currentTaskKey=trafficTaskKey(a);
   if(this.traffic.slotTaskKey&&this.traffic.slotTaskKey!==currentTaskKey)trafficReleaseTargetSlot(this);
   if(this.traffic.corridorTaskKey&&this.traffic.corridorTaskKey!==currentTaskKey)trafficReleaseCorridor(this);
+  if(this.traffic.intersectionTaskKey&&this.traffic.intersectionTaskKey!==currentTaskKey)this.releaseIntersection();
   if(a.skill?.type==='walk'&&!this.traffic.slotKey){trafficReserveTargetSlot(this,context);target=a.route[a.routeIndex];if(!target)return null;}
   if(motionWorldSweep(a.w,root,target,context.radius,context.ignore).fraction<1-1e-6){
    if(!this.replanStaticRoute(context))throw Error('当前物体阻断路线，且没有可用的重新规划路径');
    target=a.route[a.routeIndex];if(!target)return null;
   }
   if(!a.w.population)return target;
+  // Standalone motion harnesses may omit crowd coordination. Production always
+  // assembles the coordinator; it supplies route targets, never motion poses.
+  const intersectionTarget=typeof trafficMaintainOpenIntersection==='function'?trafficMaintainOpenIntersection(this,context,target):null;
+  if(intersectionTarget)return intersectionTarget;
+  target=a.route[a.routeIndex];if(!target)return null;
   const maintained=this.maintainCorridor(context,target);if(maintained)return maintained;
   const predicted=predictTrafficConflict(a,speed,context);
   if(predicted){
    const corridor=this.resolveNarrowCorridor(predicted,context);
    if(corridor==='owner'||corridor==='yield'){const managed=this.maintainCorridor(context,target);if(managed)return managed;throw Error('狭窄通道没有可用的持续移动路线');}
    if(corridor==='blocked')throw Error('狭窄通道没有可用的主动撤离路线');
+   const intersection=typeof trafficResolveOpenIntersection==='function'?trafficResolveOpenIntersection(this,predicted,context):null;
+   if(intersection){const managed=trafficMaintainOpenIntersection(this,context,target);if(managed)return managed;target=a.route[a.routeIndex];if(!target)return null;}
   }
   const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;
   if(this.traffic.active&&a.routeIndex<=this.traffic.detourEndIndex&&!force&&this.world.free(target,.23))return target;
@@ -521,10 +532,10 @@ class NaturalLocomotion {
   while(a.routeIndex<a.route.length){
    if(a.routeIndex<a.route.length-1&&this.routePassThrough(a.routeIndex)){a.routeIndex++;this.routePassThroughCount++;continue;}
    if(horizontal(state.root,a.route[a.routeIndex])>.015)break;
-   if(a.routeIndex===a.route.length-1){if(state.command||!this.isSettled()){this.requested=true;return true;}a.routeIndex++;return false;}
+   if(a.routeIndex===a.route.length-1){if(state.command||!this.isSettled()){this.requested=true;return true;}a.routeIndex++;this.releaseIntersection();return false;}
    a.routeIndex++;
   }
-  if(a.routeIndex>=a.route.length){if(this.traffic.corridorKey)trafficReleaseCorridor(this);return false;}
+  if(a.routeIndex>=a.route.length){this.releaseIntersection();if(this.traffic.corridorKey)trafficReleaseCorridor(this);return false;}
   const target=this.prepareTrafficTarget(speed);if(!target)return false;
   this.request({type:'walk',target:[...target]});return true;
  }
@@ -565,6 +576,7 @@ class NaturalLocomotion {
   const e=this.engine,currentTaskKey=trafficTaskKey(this.a);
   if(this.traffic.slotTaskKey&&this.traffic.slotTaskKey!==currentTaskKey)trafficReleaseTargetSlot(this);
   if(this.traffic.corridorTaskKey&&this.traffic.corridorTaskKey!==currentTaskKey)trafficReleaseCorridor(this);
+  if(this.traffic.intersectionTaskKey&&this.traffic.intersectionTaskKey!==currentTaskKey)this.releaseIntersection();
   if(this.traffic.active&&this.traffic.phase!==undefined&&this.traffic.phase!==this.a.phase)Object.assign(this.traffic,{active:false,mode:'clear',reason:null,blockers:[],detourEndIndex:-1});
   if(!this.requested&&e.state.command?.type==='walk')this.stop();
   this.requested=false;

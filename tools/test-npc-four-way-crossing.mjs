@@ -12,11 +12,11 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8'),rig=JSON.par
 const fullBody=read('motion/vendor/full-body.mjs').replace(/from '(\.\/[^']+)'/g,(_,path)=>'from '+JSON.stringify(new URL('../motion/vendor/'+path,import.meta.url).href));
 const {FullBodyMotion,blend,relaxedHandRotation}=await import('data:text/javascript;base64,'+Buffer.from(fullBody+'\nexport {blend,relaxedHandRotation};').toString('base64'));
 const math=read('source/runtime.template.js').split('// MODULE math')[1].split('function matrix')[0];
-const code=math+'\n'+read('body/ReconstructionRig.js').replace('/*__R2_RIG_JSON__*/',JSON.stringify(rig)).replace('/*__R2_REGIONS_JSON__*/','{}')+'\n'+read('body/CharacterShape.js')+'\n'+read('body/ReferenceMotion.js').replace('/*__R2_MOTION_JSON__*/',read('reconstruction/motion-reference.json'))+'\n'+read('body/ContactHandPose.js')+'\n'+read('body/MotionLabPose.js')+'\n'+read('body/NaturalLocomotion.js');
+const code=math+'\n'+read('body/ReconstructionRig.js').replace('/*__R2_RIG_JSON__*/',JSON.stringify(rig)).replace('/*__R2_REGIONS_JSON__*/','{}')+'\n'+read('body/CharacterShape.js')+'\n'+read('body/ReferenceMotion.js').replace('/*__R2_MOTION_JSON__*/',read('reconstruction/motion-reference.json'))+'\n'+read('body/ContactHandPose.js')+'\n'+read('body/MotionLabPose.js')+'\n'+read('body/CrowdIntersectionCoordinator.js')+'\n'+read('body/NaturalLocomotion.js');
 const horizontal=(a,b)=>Math.hypot(a[0]-b[0],a[2]-b[2]);
 const objectRadius=o=>o.shape==='box'?Math.hypot(o.w,o.d)/2:o.r;
 const objectFootprint=o=>o.shape==='box'?[o.w/2,o.d/2]:[o.r,o.r];
-const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,NaturalLocomotion,motionCircleSweep,dist})',{
+const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,NaturalLocomotion,motionCircleSweep,trafficRuntime,dist})',{
  structuredClone,SHAPE_SCHEMA,SHAPE_REVISION,normalizeCharacterShape,characterShapeParameterKey,createCharacterShapeField,CHARACTER_DEFORMATION_RULES,HUMAN_GENERATOR_REVISION:'four-way-crossing-test',
  degrees:r=>r*180/Math.PI,DOWN:[0,-1,0],horizontal,angleDiff:(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b)),objectTilted:()=>false,objectYaw:()=>0,objectRadius,objectFootprint,
  bodyPhysicalProfile:h=>({bodyRadiusM:h.bodyMetrics.bodyRadiusM}),carryRouteRadius:()=>.55,MotionLab:{FullBodyMotion,blend,relaxedHandRotation,solveTwoBone,MotionController,rigFromSource,FlatWorld}});
@@ -56,6 +56,11 @@ for(;frames<12000&&!actors.every(actor=>actor.done);frames++){
   if(actor.done)continue;const a=actor.agent,l=actor.locomotion;a.time+=1/120;
   try{const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving)actor.done=true;}catch(error){console.error('FOUR_WAY_DEBUG '+JSON.stringify(debugState(actor.id,error)));throw Error(actor.id+': '+error.message);}
  }
+ for(const lease of api.trafficRuntime(world.population).intersections.values()){
+  const owners=actors.filter(actor=>actor.locomotion.traffic.intersectionKey===lease.key&&actor.locomotion.traffic.intersectionOwner===actor.id);
+  assert.equal(owners.length,1,'each live intersection must have exactly one owner');
+  assert.equal(owners[0].id,lease.ownerId,'actor and shared lease ownership must agree');
+ }
  for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++)minSeparation=Math.min(minSeparation,horizontal(actors[i].agent.pos,actors[j].agent.pos));
 }
 const finalRows=actors.map(actor=>({id:actor.id,done:actor.done,position:actor.agent.pos,goal:actor.goal,targetErrorM:horizontal(actor.agent.pos,actor.goal),routeIndex:actor.agent.routeIndex,route:actor.agent.route,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-8)}));
@@ -64,5 +69,8 @@ assert(actors.every(actor=>actor.done),'all four agents must complete their orig
 for(const actor of actors){assert(horizontal(actor.agent.pos,actor.goal)<.025,actor.id+' must reach its original target');assert(!Object.hasOwn(actor.locomotion.traffic,'waitS'));}
 assert(minSeparation>.50,'continuous sweep must prevent body overlap');
 const trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries+(actor.locomotion.traffic.escapes||0),0);
-assert(trafficActions>0,'the crossing must exercise predictive traffic handling');
-console.log(JSON.stringify({passed:true,agents:4,frames,minSeparationM:minSeparation,trafficActions,parkingWait:false}));
+const intersectionClaims=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.intersectionClaims,0),intersectionYields=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.intersectionYields,0);
+assert(intersectionClaims>=1,'crossing must exercise assembled shared ownership');
+assert(intersectionYields>=2,'non-owners must exercise circulation');
+assert(actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.recoveries,0)<128,'motion kernel must not repeatedly recover');
+console.log(JSON.stringify({passed:true,agents:4,frames,minSeparationM:minSeparation,trafficActions,intersectionClaims,intersectionYields,parkingWait:false}));
