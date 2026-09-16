@@ -103,7 +103,7 @@
     return{
      ...base.diagnostics(),
      manualStepAvailable:true,
-     manualStepPatch:'CHICKEN_R100_MANUAL_STEP_PATCH',
+     manualStepPatch:'manual-step-1.1',
      realtimePaused:runtime.manualQaPause
     };
    }
