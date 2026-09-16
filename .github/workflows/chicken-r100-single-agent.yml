@@ -8,6 +8,7 @@ on:
       - .github/workflows/chicken-r100-single-agent.yml
       - tools/build_chicken_r100.py
       - tools/chicken_r100_motion_patch.js
+      - tools/chicken_r100_manual_step_patch.js
       - tools/capture_chicken_r100.mjs
       - tools/build_chicken_r991.py
       - tools/chicken_r991_override.js
@@ -48,6 +49,7 @@ jobs:
           python -m py_compile tools/build_chicken_r991.py tools/build_chicken_r100.py
           node --check tools/chicken_r991_override.js
           node --check tools/chicken_r100_motion_patch.js
+          node --check tools/chicken_r100_manual_step_patch.js
           node --check tools/capture_chicken_r100.mjs
           node --check runtime/chicken_phase1_npc_controller.mjs
           node --check runtime/chicken_phase1_articulated_skin.mjs
@@ -122,6 +124,7 @@ jobs:
             runtime/chicken_phase1_articulated_skin.mjs
             tools/build_chicken_r100.py
             tools/chicken_r100_motion_patch.js
+            tools/chicken_r100_manual_step_patch.js
             tools/capture_chicken_r100.mjs
           if-no-files-found: error
           retention-days: 7
