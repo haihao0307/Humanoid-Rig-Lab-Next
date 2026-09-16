@@ -241,7 +241,7 @@ def main() -> None:
         "periorbitalDraw": "gl.drawElements(gl.TRIANGLES,periMesh.idx.length" in output_text,
         "patchStrengthControl": 'id="patchStrength"' in output_text,
         "creaseStrengthControl": 'id="creaseStrength"' in output_text,
-        "legacyEyelidDataPreserved": "buildGeometricEyelids" in output_text and "lidMesh.idx.length" in output_text,
+        "legacyEyelidDataPreserved": "buildGeometricEyelids" in output_text and "lidVao=gl.createVertexArray()" in output_text,
     }
     checks = {
         "schema": "cat_kaopu/v444_technical_qa@1.0",

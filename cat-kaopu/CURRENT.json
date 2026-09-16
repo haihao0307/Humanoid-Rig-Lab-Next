@@ -2,7 +2,7 @@
   "schema": "cat_kaopu/full_handoff_current@1.0",
   "handoff": "CAT_KAOPU_CURRENT_FULL_HANDOFF_V440_2026-09-15",
   "date": "2026-09-16",
-  "currentVersion": "V4.43",
+  "currentVersion": "V4.44",
   "currentEntry": "workbench/CAT_KAOPU_CURRENT.html",
   "repoOverlayEntry": "workbench/CAT_KAOPU_CURRENT.html",
   "frozenBaselines": {
@@ -11,9 +11,9 @@
     "camera": "V4.34.1",
     "locomotionRegression": "V4.36",
     "postureCorrective": "V4.39",
-    "expressionPayload": "V4.40 CATV440 payload and 34-bone rig unchanged; V4.42 geometric eyelids preserved"
+    "expressionPayload": "V4.40 CATV440 payload and 34-bone rig unchanged; V4.42 eyelid data preserved as legacy comparison"
   },
-  "currentLayer": "four frozen-head-sampled orbital soft-tissue transition shells around the V4.42 geometric eyelids",
+  "currentLayer": "two continuous annular periorbital carriers with dynamic palpebral apertures and frozen-head outer boundaries",
   "geometry": {
     "vertices": 3948,
     "triangles": 7884,
@@ -26,7 +26,11 @@
     "orbitalTransitionVertices": 1372,
     "orbitalTransitionTriangles": 2304,
     "orbitalTransitionPieces": 4,
-    "orbitalTransitionStorage": "runtime-generated outside CATV440 from frozen head samples"
+    "orbitalTransitionStorage": "runtime-generated outside CATV440 from frozen head samples",
+    "continuousPeriorbitalVertices": 1170,
+    "continuousPeriorbitalTriangles": 2048,
+    "continuousPeriorbitalPieces": 2,
+    "continuousPeriorbitalStorage": "runtime-generated outside CATV440 from frozen head samples"
   },
   "runtimeDependencies": {
     "externalModel": false,
@@ -35,7 +39,7 @@
   },
   "acceptance": {
     "surfaceUserAccepted": true,
-    "geometricEyelidTechnicalCandidate": true,
+    "legacyV442TechnicalCandidate": true,
     "visualAcceptance": false,
     "productionReady": false,
     "userReviewRequired": true
@@ -46,20 +50,20 @@
     "V4.25-V4.30": "isolated forepaw experiment line; not current whole-cat mainline"
   },
   "nextProductionGate": [
-    "browser WebGL2 review of V4.43 orbital transition on and off from front, three-quarter and side close-ups",
-    "prove the transition shell remains inside the frozen V4.32 head silhouette",
-    "accept only if open, half-blink and closed states no longer read as independent eyelid plugs",
-    "do not begin third eyelid, whiskers or silhouette fur before orbital integration is accepted",
-    "after eye integration, return to V4.39 sit/lie paw and chest-abdomen support repair"
+    "browser WebGL2 close-up review of open, half-blink and closed continuous apertures from front, three-quarter and side views",
+    "verify inner and outer canthi remain continuous at all blink values",
+    "verify the outer ring returns to the frozen V4.32 head surface without changing the head silhouette",
+    "accept only if the closed state no longer reads as independent horizontal plugs",
+    "do not begin third eyelid, whiskers or silhouette fur before periorbital topology is accepted"
   ],
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
-    "existingBranch": "codex/cat-kaopu-v443-orbital-soft-tissue-20260916",
+    "existingBranch": "codex/cat-kaopu-v444-continuous-periorbital-20260916",
     "existingBranchHead": null,
-    "recommendedNewBranch": "codex/cat-kaopu-v443-orbital-soft-tissue-20260916",
+    "recommendedNewBranch": "codex/cat-kaopu-v444-continuous-periorbital-20260916",
     "recommendedModulePath": "cat-kaopu/",
     "sourceBranchHead": "1b5396be0b52513fc70f9183d260bccee85a9984",
-    "sourceBranch": "codex/cat-kaopu-v440-mainline-20260915"
+    "sourceBranch": "codex/cat-kaopu-v443-orbital-soft-tissue-20260916"
   },
   "sourceHandoff": "CAT_KAOPU_CURRENT_FULL_HANDOFF_V440_2026-09-15",
   "technicalInvariants": {
@@ -70,7 +74,8 @@
     "boneCount": 34,
     "neutralSurfaceChanged": false,
     "skinWeightsChanged": false,
-    "v442EyelidGeometryChanged": false,
-    "addedGeometry": "four head-bone-driven orbital transition shells outside CATV440"
+    "legacyV442EyelidDataPreserved": true,
+    "defaultV442EyelidDrawDisabled": true,
+    "addedGeometry": "two continuous head-bone-driven annular periorbital carriers outside CATV440"
   }
 }
