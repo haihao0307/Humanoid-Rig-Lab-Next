@@ -1,8 +1,8 @@
-# Chicken V4.6 R9.5.1 — Separate Head Shell Candidate
+# Chicken V4.6 R9.6 — Connected Head Refinement Candidate
 
 ## Active executable
 
-`CHICKEN_V46_R9_5_HEAD_CARRIER.html`
+`CHICKEN_V46_R9_6_HEAD_REFINEMENT.html`
 
 ## Frozen rollback
 
@@ -11,15 +11,15 @@
 
 ## What changed
 
-R9.5.1 keeps the lower neck and all non-head systems on the frozen R9.1 path. In the candidate path only, the legacy head surface is collapsed/clipped and replaced by a compact posterior-cranium–crown–cheek–jaw–short-bill shell. Eye, eyelid, nostril, ear-lobe, wattle and continuous-comb modules are rebuilt on that shell.
+R9.6 discards the separate-shell and clipping route. It keeps the original connected carrier and applies staged bands to posterior cranium, crown, cheek, jaw and a shortened bill while guarding the lower neck. Eye, eyelid, nostril, ear-lobe, wattle and continuous-comb modules are reduced and reattached to the connected surface.
 
 ## Evidence and QA
 
-- parameters: `data/CHICKEN_R95_HEAD_CARRIER_PARAMETERS.json`
-- static QA: `qa/CHICKEN_R95_STATIC_QA.json`
-- browser QA: `qa/CHICKEN_R95_BROWSER_QA.json`
-- visual review board: `evidence/r95/R95_REVIEW_BOARD.html`
-- manifest: `BUILD_MANIFEST_R95.json`
+- parameters: `data/CHICKEN_R96_HEAD_REFINEMENT_PARAMETERS.json`
+- static QA: `qa/CHICKEN_R96_STATIC_QA.json`
+- browser QA: `qa/CHICKEN_R96_BROWSER_QA.json`
+- visual review board: `evidence/r96/R96_REVIEW_BOARD.html`
+- manifest: `BUILD_MANIFEST_R96.json`
 
 Browser QA passed: `true`.
 
