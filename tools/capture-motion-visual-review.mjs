@@ -30,7 +30,12 @@ try{
      surface.supportProbes=all.filter(p=>p.influences.some(([i,w])=>w>.5&&(h.joints[i].id===side+'_foot'||h.joints[i].id.startsWith(side+'_toe_'))));
      footSupport[side]={skin:surface.minimumSupportY(),contact:a.agent.locomotion.engine.state.feet[side].contact,rocker:a.agent.locomotion.engine.state.feet[side].rocker||null};
     }}finally{surface.supportProbes=all;}
-    return{png,phase:a.agent.phase,posture:a.agent.basic.posture,error:a.agent.error,root:a.agent.pos,yaw:a.agent.yaw,footErrorM:a.agent.stats.maxFootPositionErrorM,ground:h.minimumBoneY(),footSupport,groundCorrectionM:h.motionDriver.report().groundCorrectionM,bodyResponse:a.agent.locomotion.phaseController.report().bodyResponse,headQ:h.byId.get('head').world.q};
+    const knees={};for(const side of ['left','right']){
+     const p=['femur','tibia','foot'].map(j=>h.byId.get(side+'_'+j).world.p);
+     const u=p[1].map((v,i)=>v-p[0][i]),v=p[2].map((v,i)=>v-p[1][i]);
+     knees[side]=Math.acos(Math.max(-1,Math.min(1,u.reduce((s,x,i)=>s+x*v[i],0)/Math.hypot(...u)/Math.hypot(...v))))*180/Math.PI;
+    }
+    return{png,phase:a.agent.phase,posture:a.agent.basic.posture,error:a.agent.error,root:a.agent.pos,bodyRoot:h.byId.get('hips').world.p,kneeDegrees:knees,weightTransfer:a.agent.locomotion.report().weightTransfer,yaw:a.agent.yaw,footErrorM:a.agent.stats.maxFootPositionErrorM,ground:h.minimumBoneY(),footSupport,groundCorrectionM:h.motionDriver.report().groundCorrectionM,bodyResponse:a.agent.locomotion.phaseController.report().bodyResponse,headQ:h.byId.get('head').world.q};
    },{id:actor.id,angle,view});
    const file=actor.id+'-'+name+'-'+view+'.png';await writeFile(join(out,file),Buffer.from(result.png.split(',')[1],'base64'));
    delete result.png;records.push({actor:actor.label,file,...result});console.log('CAPTURE '+file+' '+result.phase);

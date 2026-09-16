@@ -141,7 +141,7 @@ class MotionLabPose {
   if(reference)state.motion={...state.motion,frame:reference,weight:1};
   const controlled=!reference||options.controlledFeet===true;
   const rockerFeet=controlled&&!options.feet&&Object.values(state.feet).some(foot=>foot.rocker);
-  if(rockerFeet&&!options.position)state.root[1]+=state.pelvisSupportLiftM||0;
+  if(rockerFeet&&!options.position)state.root=add(state.root,rotate(qy(yaw),[state.pelvisSupportXM||0,state.pelvisSupportLiftM||0,0]));
   if(rockerFeet)for(const foot of Object.values(state.feet))if(foot.rocker&&!foot.adoptedOrientation)foot.position=[...foot.rocker.ankle];
   if(controlled&&(options.position||options.feet||rockerFeet)){
    // Contact extensions lower the pelvis, then use the lab's fixed-length IK

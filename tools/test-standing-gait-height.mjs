@@ -22,6 +22,7 @@ let frames=0,walks=0,turns=0,stops=0,maxHeightStepM=0,maxFootErrorM=0,maxBoneErr
 let stanceKneeSum=0,stanceSamples=0,maxStanceKneeDegrees=0,maxSwingPitch=0,minSwingPitch=0,maxPitchStep=0,maxRenderedFootAngle=0;
 let heelSamples=0,forefootSamples=0,maxPivotDriftM=0,maxAnkleLiftM=0,maxRollStep=0;
 let maxBodyHeightStepM=0,maxSupportLiftM=0,maxPhysicalFootErrorM=0;
+let minTransferM=0,maxTransferM=0,maxTransferStepM=0,firstSupportRollSamples=0,midstanceTransferSamples=0;
 const shapes=[{}, {statureScale:.94},{statureScale:1.06},{legProportion:.7,waistWidth:-.2},{legProportion:-.6,hipWidth:.25},
  {shoulderWidth:.75,waistWidth:.2,torsoDepth:.3,armFullness:.5,legFullness:.3},{shoulderWidth:-.35,hipWidth:-.2,waistWidth:-.65,torsoDepth:-.45,armFullness:-.55,legFullness:-.45},{shoulderWidth:.15,hipWidth:.35,waistWidth:.65,torsoDepth:.65,armFullness:.35,legFullness:.5}];
 for(const shape of shapes){
@@ -38,6 +39,15 @@ for(const shape of shapes){
   const s=locomotion.engine.state,candidate=locomotion.pose.build();locomotion.pose.validate(candidate);frames++;
   const bodyHeight=candidate.frames.get('hips').p[1],bodyStep=Math.abs(bodyHeight-lastBodyHeight);lastBodyHeight=bodyHeight;
   maxBodyHeightStepM=Math.max(maxBodyHeightStepM,bodyStep);maxSupportLiftM=Math.max(maxSupportLiftM,s.pelvisSupportLiftM||0);
+  const transfer=s.pelvisSupportXM||0,transferStep=Math.abs(transfer-(before.pelvisSupportXM||0));
+  minTransferM=Math.min(minTransferM,transfer);maxTransferM=Math.max(maxTransferM,transfer);maxTransferStepM=Math.max(maxTransferStepM,transferStep);
+  assert(Math.abs(transfer)<=.018*bodyMetrics.statureScale&&transferStep<=.08*bodyMetrics.statureScale/120+1e-9,'support transfer is bounded and continuous');
+  if(s.swing&&s.speed>.4&&s.swing.elapsed/s.swing.duration>.45&&s.swing.elapsed/s.swing.duration<.65){
+   const support=s.feet[s.swing.side==='left'?'right':'left'],point=support.rocker?.world||support.position;
+   const hips=['left','right'].map(side=>candidate.frames.get(side+'_femur').p),centre=hips[0].map((x,i)=>(x+hips[1][i])/2);
+   const lateral=p=>api.rotate(api.inv(api.qy(s.yaw)),api.sub(point,p))[0];
+   assert(Math.abs(lateral(centre))<Math.abs(lateral(s.root)),'actual hip centre moves towards the stance foot at midstance');midstanceTransferSamples++;
+  }
   assert(bodyStep<.004*bodyMetrics.statureScale,'actual pelvis must not pop during support changes');
   for(const error of candidate.errors){maxPhysicalFootErrorM=Math.max(maxPhysicalFootErrorM,error.error);assert(error.error<1e-7,'physical foot targets remain reachable after pelvis lift');}
   assert.equal(s.fault,null);maxHeightStepM=Math.max(maxHeightStepM,Math.abs(s.root[1]-before.root[1]));
@@ -57,6 +67,9 @@ for(const shape of shapes){
    assert(Math.abs((rocker?.pitch||0)-(previous?.pitch||0))<.04,'physical ankle pitch must stay continuous through contact changes');
    if(foot.contact&&!rocker?.pitch)assert(footAngle<1e-6,'flat support must retain its original orientation');
    if(foot.contact&&rocker?.pitch){
+    if(s.metrics.steps===(s.rockerStepOrigin||0)&&s.swing){
+     assert(s.swing.elapsed/s.swing.duration>=.45,'first support stays flat during early swing');firstSupportRollSamples++;
+    }
     if(rocker.kind==='heel')heelSamples++;else forefootSamples++;
     const f=candidate.frames.get(side+'_foot'),local=api.rotate(api.inv(sourceBind.get(side+'_foot').q),rocker.pivot);
     const actual=api.add(f.p,api.rotate(f.q,local));
@@ -89,7 +102,9 @@ for(const shape of shapes){
 assert(maxIdleKneeDegrees<15,'idle standing has slight knee flexion instead of the gait crouch');
 assert(maxWalkKneeDegrees>30,'walking retains its swing-knee flexion');
 assert(stanceSamples>1000&&stanceKneeSum/stanceSamples<17,'rolling support must not be absorbed as the previous 22-degree average knee bend');
+assert(maxStanceKneeDegrees<35,'first landing must not reproduce the previous 41-degree support knee peak');
+assert(firstSupportRollSamples>20&&midstanceTransferSamples>100&&minTransferM<-.005&&maxTransferM>.005,'first support releases its heel and weight transfers to both stance sides');
 assert(maxSwingPitch>.02&&minSwingPitch<-.02,'airborne ankle must release and recover instead of staying flat');
 assert(maxRenderedFootAngle>.02,'full pose builder must consume airborne ankle articulation');
 assert(heelSamples>100&&forefootSamples>100&&maxAnkleLiftM>.01,'walk must transfer heel/forefoot support and allow the ankle to rise');
-console.log(JSON.stringify({schema:'human/standing_gait_height@4',shapes:shapes.length,frames,walks,turns,stops,maxHeightStepM,maxBodyHeightStepM,maxSupportLiftM,maxPhysicalFootErrorM,maxFootErrorM,maxBoneErrorM,maxIdleKneeDegrees,minWalkKneeDegrees,maxWalkKneeDegrees,stanceSamples,meanStanceKneeDegrees:stanceKneeSum/stanceSamples,maxStanceKneeDegrees,maxSwingPitch,minSwingPitch,maxPitchStep,maxRenderedFootAngle,heelSamples,forefootSamples,maxPivotDriftM,maxAnkleLiftM,maxRollStep,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
+console.log(JSON.stringify({schema:'human/standing_gait_height@5',shapes:shapes.length,frames,walks,turns,stops,maxHeightStepM,maxBodyHeightStepM,maxSupportLiftM,minTransferM,maxTransferM,maxTransferStepM,firstSupportRollSamples,midstanceTransferSamples,maxPhysicalFootErrorM,maxFootErrorM,maxBoneErrorM,maxIdleKneeDegrees,minWalkKneeDegrees,maxWalkKneeDegrees,stanceSamples,meanStanceKneeDegrees:stanceKneeSum/stanceSamples,maxStanceKneeDegrees,maxSwingPitch,minSwingPitch,maxPitchStep,maxRenderedFootAngle,heelSamples,forefootSamples,maxPivotDriftM,maxAnkleLiftM,maxRollStep,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));

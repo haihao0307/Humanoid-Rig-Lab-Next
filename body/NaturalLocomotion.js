@@ -332,7 +332,10 @@ class NaturalLocomotion {
     // forefoot carries a small heel lift before the next explicit release.
     let target=drive*(relative[2]>.025?-.10*smooth(clamp((relative[2]-.025)/.08,0,1)):
      .18*smooth(clamp((-relative[2]-.025)/.06,0,1)));
-    if(state.metrics.steps===(state.rockerStepOrigin||0)&&side!==state.nextFoot)target=0;
+    // Start on a flat support, then allow its heel to release in the latter
+    // half of the first swing. Locking it until landing forces a deep bend
+    // in the new support leg because the trailing ankle cannot rise.
+    if(state.metrics.steps===(state.rockerStepOrigin||0)&&side!==state.nextFoot&&(!swing||swing.elapsed/swing.duration<.45))target=0;
     pitch+=clamp(target-pitch,-1.2*dt,1.2*dt);
    }
    if(Math.abs(pitch)<1e-8)pitch=0;
@@ -666,7 +669,7 @@ class NaturalLocomotion {
   }
   return target;
  }
- isSettled(){return this.kernelSettled()&&!(this.engine.state.pelvisSupportLiftM>0)&&Object.values(this.engine.state.feet).every(foot=>!foot.rocker?.pitch)&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
+ isSettled(){return this.kernelSettled()&&!(this.engine.state.pelvisSupportLiftM>0)&&!this.engine.state.pelvisSupportXM&&Object.values(this.engine.state.feet).every(foot=>!foot.rocker?.pitch)&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
  gaitSupportTarget(){
   // Approximate the support-leg vault from this person's lengths and foot
   // separation. The mild bend is an authored IK reserve, not a clinical norm.
@@ -699,10 +702,24 @@ class NaturalLocomotion {
   // The navigation kernel retains its flat-placement IK. The committed body
   // follows the actual rolling ankles; otherwise heel rise becomes knee bend.
   let ceiling=Infinity,target=this.standingHipHeightM+.035*scale;
-  const active=!this.usesFlatSupport(s)&&Object.values(s.feet).some(f=>f.rocker?.pitch)&&!Object.values(s.feet).some(f=>f.adoptedOrientation);
+  const freeSupport=!this.usesFlatSupport(s)&&!Object.values(s.feet).some(f=>f.adoptedOrientation);
+  const active=freeSupport&&Object.values(s.feet).some(f=>f.rocker?.pitch);
+  // A small contact-driven transfer towards the stance foot, fading at both
+  // ends of the swing. Route/root XZ remain the navigation reference.
+  let transfer=0;
+  if(freeSupport&&s.swing&&s.speed>.03){
+   const support=s.feet[s.swing.side==='left'?'right':'left'];
+   const u=clamp(s.swing.elapsed/s.swing.duration,0,1),envelope=16*u*u*(1-u)*(1-u);
+   const local=rotate(inv(qy(s.yaw)),sub(support.rocker?.world||support.position,s.root));
+   transfer=clamp(local[0]*.20,-.018*scale,.018*scale)*envelope*clamp(s.speed*this.tempo/.35,0,1);
+  }
+  const previousX=s.pelvisSupportXM||0;
+  s.pelvisSupportXM=previousX+clamp((transfer-previousX)*(1-Math.exp(-dt/.06)),-.08*scale*dt,.08*scale*dt);
+  if(Math.abs(s.pelvisSupportXM)<1e-7)s.pelvisSupportXM=0;
+  const bodyRoot=add(s.root,rotate(qy(s.yaw),[s.pelvisSupportXM,0,0]));
   for(const side of ['left','right']){
    const foot=s.feet[side],ankle=foot.rocker?.ankle||foot.position;
-   const hip=add(s.root,rotate(qy(s.yaw),[this.rig.hipHalf*(side==='left'?-1:1),0,0]));
+   const hip=add(bodyRoot,rotate(qy(s.yaw),[this.rig.hipHalf*(side==='left'?-1:1),0,0]));
    const {upper,lower}=this.rig.legs[side],d=horizontal(hip,ankle),reach=upper+lower-.0005*scale;
    ceiling=Math.min(ceiling,ankle[1]+Math.sqrt(Math.max(0,reach*reach-d*d)));
    if(foot.contact){const knee=12*Math.PI/180,r2=upper*upper+lower*lower+2*upper*lower*Math.cos(knee);
@@ -744,6 +761,7 @@ class NaturalLocomotion {
   source:MotionLab.MOTION_SOURCE,sourcePhase:s.motion.phase,referenceBlend:s.motion.weight,metrics:{...s.metrics},skinFloorOffsetM:this.skinFloorOffsetM,
   height:{standingTargetM:this.standingHipHeightM,walkingTargetM:this.gaitSupportTarget(),legacyWalkingTargetM:this.rig.hipHeight,currentM:s.root[1],reachableStandingM:this.standingTarget(),timeConstantS:.18,
    supportLiftM:s.pelvisSupportLiftM||0,bodyRootM:s.root[1]+(s.pelvisSupportLiftM||0),supportResponseS:.08,method:'rolling-support-reach/v2'},
+  weightTransfer:{pelvisLocalXM:s.pelvisSupportXM||0,maximumM:.018*this.a.h.bodyMetrics.statureScale,method:'stance-contact-transfer/v1',dynamicBalanceValidated:false},
   traffic:structuredClone(this.traffic),routePassThroughCount:this.routePassThroughCount,poseAdoption:this.lastPoseAdoption?structuredClone(this.lastPoseAdoption):null,
   continuousWalkHandoff:this.lastContinuousWalkHandoff?structuredClone(this.lastContinuousWalkHandoff):null,
   phaseContinuity:this.phaseController.report(),turnContinuity:this.turnFilter.report(),lastTurnContinuity:this.lastTurnContinuity?structuredClone(this.lastTurnContinuity):null,
