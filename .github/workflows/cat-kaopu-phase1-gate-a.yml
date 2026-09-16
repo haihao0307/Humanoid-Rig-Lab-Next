@@ -10,6 +10,7 @@ on:
       - cat-kaopu/docs/CAT_KAOPU_PHASE1_ENVIRONMENT_NPC_DIRECTION_2026-09-16.md
       - cat-kaopu/tools/build_cat_phase1_gate_a.py
       - cat-kaopu/tools/patch_cat_phase1_gate_a_collision_order.py
+      - cat-kaopu/tools/patch_cat_phase1_disable_secondary_face_carrier.py
       - cat-kaopu/tools/verify_cat_phase1_gate_a.py
       - cat-kaopu/tools/capture_cat_phase1_gate_a.mjs
       - cat-kaopu/workbench/CAT_KAOPU_CURRENT.html
@@ -48,6 +49,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_phase1_gate_a_collision_order.py
+
+      - name: Disable secondary face carrier in whole-body default
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_phase1_disable_secondary_face_carrier.py
 
       - name: Verify static Gate A contract
         env:
