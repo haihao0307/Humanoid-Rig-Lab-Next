@@ -19,7 +19,7 @@ function trafficIntersectionCandidates(agent,center){
  });
 }
 function trafficIntersectionClearState(traffic){
- Object.assign(traffic,{intersectionKey:null,intersectionTaskKey:null,intersectionOwner:null,intersectionCenter:null,intersectionOrbitDirection:0,intersectionOrbitLane:-1,intersectionOrbitAngle:null,intersectionClaims:traffic.intersectionClaims||0,intersectionYields:traffic.intersectionYields||0,intersectionLaps:traffic.intersectionLaps||0,intersectionRotations:traffic.intersectionRotations||0});
+ Object.assign(traffic,{active:false,mode:'clear',reason:null,blockers:[],detourEndIndex:-1,intersectionKey:null,intersectionTaskKey:null,intersectionOwner:null,intersectionCenter:null,intersectionOrbitDirection:0,intersectionOrbitLane:-1,intersectionOrbitAngle:null,intersectionClaims:traffic.intersectionClaims||0,intersectionYields:traffic.intersectionYields||0,intersectionLaps:traffic.intersectionLaps||0,intersectionRotations:traffic.intersectionRotations||0});
 }
 function trafficIntersectionAssignOwner(lease,population,now){
  if(lease.ownerId&&lease.members.has(lease.ownerId))return lease.ownerId;
@@ -36,7 +36,7 @@ function trafficIntersectionSyncMembers(lease,population){
   const member=lease.members.get(actor.id),locomotion=actor.agent?.locomotion;if(!member||!locomotion?.traffic)continue;
   const traffic=locomotion.traffic,owner=lease.ownerId,first=traffic.intersectionKey!==lease.key||traffic.intersectionOwner!==owner,lane=ordered.filter(id=>id!==owner).indexOf(actor.id);
   Object.assign(traffic,{intersectionKey:lease.key,intersectionTaskKey:member.taskKey,intersectionOwner:owner,intersectionCenter:[...lease.center],intersectionOrbitDirection:lease.direction,intersectionOrbitLane:lane,originalTarget:[...member.goal]});
-  if(actor.id===owner){traffic.mode='intersection-owner';traffic.reason='open-intersection-owner';if(first)traffic.intersectionClaims++;}
+  if(actor.id===owner){traffic.active=false;traffic.mode='intersection-owner';traffic.reason='open-intersection-owner';if(first)traffic.intersectionClaims++;}
   else{traffic.active=true;traffic.mode='intersection-circulation';traffic.reason='open-intersection-circulation';if(first)traffic.intersectionYields++;}
  }
 }
@@ -50,10 +50,10 @@ function trafficPruneIntersections(population,runtime,now){
   trafficIntersectionAssignOwner(lease,population,now);trafficIntersectionSyncMembers(lease,population);
  }
 }
-function trafficReleaseIntersection(locomotion,{completed=false}={}){
+function trafficReleaseIntersection(locomotion){
  const a=locomotion.a,population=a.w.population,traffic=locomotion.traffic,key=traffic?.intersectionKey;
  if(key&&population){const runtime=trafficRuntime(population),lease=runtime?.intersections?.get(key);if(lease){lease.members.delete(a.npcId);if(lease.ownerId===a.npcId)lease.ownerId=null;if(!lease.members.size)runtime.intersections.delete(key);else{trafficIntersectionAssignOwner(lease,population,a.time);trafficIntersectionSyncMembers(lease,population);}}}
- if(traffic){if(completed)traffic.intersectionLaps+=0;trafficIntersectionClearState(traffic);}
+ if(traffic)trafficIntersectionClearState(traffic);
 }
 function trafficResolveOpenIntersection(locomotion,conflict,context){
  const a=locomotion.a,population=a.w.population,other=conflict?.actor,target=a.route?.[a.routeIndex];if(!population||!other||!target)return null;
@@ -83,10 +83,11 @@ function trafficMaintainOpenIntersection(locomotion,context,target){
  if(lease.ownerId!==a.npcId){const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context);if(!orbit)throw Error('开放交叉区域没有可用的持续循环路线');return orbit;}
  const root=locomotion.engine.state.root,distance=horizontal(root,lease.center);lease.ownerMinDistance=Math.min(lease.ownerMinDistance,distance);if(distance<=TRAFFIC_INTERSECTION.enterRadiusM)lease.ownerEntered=true;
  const offset=[root[0]-lease.center[0],0,root[2]-lease.center[2]],passed=lease.ownerEntered&&distance>=TRAFFIC_INTERSECTION.releaseRadiusM&&len(offset)>.08&&dot(norm(offset),lease.ownerEntry)<-.12;
- if(passed){lease.members.delete(a.npcId);lease.ownerId=null;trafficIntersectionAssignOwner(lease,population,a.time);trafficIntersectionSyncMembers(lease,population);trafficIntersectionClearState(traffic);if(goal)locomotion.normalizeCorridorRoute(context,goal);a.log?.('已穿过开放交叉区域并释放通行权');return null;}
+ if(passed){lease.members.delete(a.npcId);lease.ownerId=null;if(!lease.members.size)runtime.intersections.delete(lease.key);else{trafficIntersectionAssignOwner(lease,population,a.time);trafficIntersectionSyncMembers(lease,population);}trafficIntersectionClearState(traffic);if(goal)locomotion.normalizeCorridorRoute(context,goal);a.log?.('已穿过开放交叉区域并释放通行权');return null;}
  if(a.time>=lease.expiresAtS){const current=lease.members.get(a.npcId);if(current)current.order=lease.nextOrder++;lease.ownerId=null;lease.rotations++;if(lease.rotations>TRAFFIC_INTERSECTION.maximumRotations)throw Error('开放交叉区域完成 16 次主动轮换后仍未形成可通行顺序');trafficIntersectionAssignOwner(lease,population,a.time);trafficIntersectionSyncMembers(lease,population);traffic.intersectionRotations++;if(lease.ownerId!==a.npcId){a.log?.('开放交叉区域本轮未通过，已继续外侧循环并把通行权交给下一人物');const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context);if(!orbit)throw Error('开放交叉区域轮换后没有可用循环路线');return orbit;}}
  traffic.active=false;traffic.mode='intersection-owner';traffic.reason='open-intersection-owner';traffic.intersectionOwner=a.npcId;
  if(target&&locomotion.world.free(target,.23)&&trafficSegmentClear(a,root,target,context))return target;
  const advance=target&&locomotion.corridorAdvanceTarget(target,context);if(advance)return advance;
  const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context,{ownerFallback:true});if(!orbit)throw Error('开放交叉区域所有者暂时没有可行的前进或循环路线');return orbit;
 }
+".replace("(ownerFallback?.12:0)
