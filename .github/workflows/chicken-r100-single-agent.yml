@@ -11,6 +11,7 @@ on:
       - tools/chicken_r100_peck_patch.js
       - tools/chicken_r100_manual_step_patch.js
       - tools/capture_chicken_r100.mjs
+      - tools/capture_chicken_r100_mesh_diagnostic.mjs
       - tools/build_chicken_r991.py
       - tools/chicken_r991_override.js
       - runtime/chicken_phase1_npc_controller.mjs
@@ -54,6 +55,7 @@ jobs:
           node --check tools/chicken_r100_peck_patch.js
           node --check tools/chicken_r100_manual_step_patch.js
           node --check tools/capture_chicken_r100.mjs
+          node --check tools/capture_chicken_r100_mesh_diagnostic.mjs
           node --check runtime/chicken_phase1_npc_controller.mjs
           node --check runtime/chicken_phase1_articulated_skin.mjs
           node --check runtime/chicken_phase1_peck_adapter.mjs
@@ -83,6 +85,7 @@ jobs:
           trap 'kill $SERVER_PID || true' EXIT
           sleep 2
           timeout --signal=TERM --kill-after=15s 240s node tools/capture_chicken_r100.mjs
+          timeout --signal=TERM --kill-after=15s 180s node tools/capture_chicken_r100_mesh_diagnostic.mjs
 
       - name: Refresh manifest after browser QA
         run: python tools/build_chicken_r100.py
@@ -99,7 +102,9 @@ jobs:
             Path('qa/CHICKEN_R100_STATIC_QA.json'),
             Path('qa/CHICKEN_R100_BROWSER_QA.json'),
             Path('BUILD_MANIFEST_R100.json'),
-            Path('evidence/r100/R100_BEHAVIOR_REVIEW_BOARD.html')
+            Path('evidence/r100/R100_BEHAVIOR_REVIEW_BOARD.html'),
+            Path('evidence/r100/R100_PECK_ISO_BODY.png'),
+            Path('evidence/r100/R100_PECK_ISO_COAT.png')
           ]
           missing=[str(path) for path in required if not path.exists() or path.stat().st_size==0]
           if missing: raise SystemExit(f'Missing R10.0 files: {missing}')
@@ -137,6 +142,7 @@ jobs:
             tools/chicken_r100_peck_patch.js
             tools/chicken_r100_manual_step_patch.js
             tools/capture_chicken_r100.mjs
+            tools/capture_chicken_r100_mesh_diagnostic.mjs
             /tmp/chicken-r100-http.log
           if-no-files-found: warn
           retention-days: 7
