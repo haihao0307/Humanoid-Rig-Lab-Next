@@ -38,27 +38,19 @@ class HumanEcology {
  }
  report(){return {...this.export(),conditionFactor:this.condition,heatFlux:{...this.flux},numericalBoundReached:this.limited,coefficientBasis:HUMAN_BIOLOGY.ecology.basis,calibrated:false};}
 }
-function buildHumanBindingKnowledge(tissue){
- const h=tissue.human;
- const joints=h.joints.map(j=>({id:j.id,parent:j.parent?.id||null,bindPositionM:[...j.bind],role:'rig controller, not a bone count'}));
- const bones=h.bones.map(b=>({id:b.id,label:b.label||b.id,joint:b.joint.id,source:b.source||'original analytic bone generator'}));
- const muscles=tissue.muscles.map(m=>({id:m.id,label:m.label||m.id,attachments:(m.sheetAnchors||m.anchors).map(a=>({joint:a.joint,localM:[...a.p]})),restLengthM:m.restLength,attachmentBasis:'authored registered control path',referenceVolumes:m.referenceVolumes||null}));
- const referenceGroups=Object.fromEntries(['organs','arteries','veins','nerves'].map(group=>[group,{source:'body/ProceduralSystems.js',loaded:true,parts:(tissue.referenceExtra||[]).filter(p=>p.sourceGroup===group).map(p=>({id:p.id,name:p.label,joint:p.joint.id,representation:'authored schematic generated shape'}))}]));
- const ids=new Set(joints.map(j=>j.id));
- const unresolved=[...joints.flatMap(j=>j.parent&&!ids.has(j.parent)?[j.id+':parent']:[]),...bones.filter(b=>!ids.has(b.joint)).map(b=>b.id),...muscles.filter(m=>m.attachments.some(a=>!ids.has(a.joint))).map(m=>m.id)];
- return {schema:'jarvis/human_binding_knowledge@1',catalogRevision:HUMAN_BIOLOGY.revision,units:{length:'m',skinThickness:'mm',force:'N',torque:'Nm',heat:'W',temperature:'degC'},joints,bones,muscles,referenceGroups,unresolvedBindings:unresolved,
-  skin:{regionProfiles:SKIN_LAYER_PROFILES,parameters:{...h.characterPreset.appearance.skinLayers},weightBinding:'same normalized four joint influences as the exterior',boundaries:['epidermis surface','dermis outer boundary','hypodermis outer boundary','estimated subcutaneous base']},
-  limitations:['Rig controllers do not count anatomical bones.','Generated organs and paths are schematic, not a segmented anatomical atlas.','Layer boundaries are offset surfaces, not segmented tissue volumes.']};
-}
+function buildHumanBindingKnowledge(tissue){return {schema:'r2/binding_knowledge@1',source:R2_RIG.source,
+ jointCentres:tissue.human.resolvedRig.nodes,referenceJointCentres:R2_RIG.nodes,shape:validateCharacterShape(tissue.human.characterPreset.shape),shapeDerived:true,regions:R2_REGIONS,sourceSurface:tissue.surface?.report||null,
+ rigControllers:tissue.human.joints.map(j=>({id:j.id,parent:j.parent?.id||null})),
+ calibrated:false,measuredSoftTissueDeformation:false,limitations:R2_RIG.limitations};}
 function installHumanBiology(lab){
  const current=()=>lab.human.tissue.ecology;
  const api={catalog:()=>JSON.parse(JSON.stringify(HUMAN_BIOLOGY)),bindings:()=>buildHumanBindingKnowledge(lab.human.tissue),report:()=>current().report(),
-  export:()=>({schema:'jarvis/human_knowledge_document@1',catalog:api.catalog(),bindings:api.bindings(),hair:typeof HAIR_FOLLICLE_SPEC==='undefined'?null:JSON.parse(JSON.stringify(HAIR_FOLLICLE_SPEC)),ecology:api.report()}),
-  configure(environment){current().configure(environment);syncWind();refresh();return api.report();},reset(){current().reset();refresh();return api.report();}};
+  export:()=>({schema:'jarvis/human_knowledge_document@1',catalog:api.catalog(),bindings:api.bindings(),hair:lab.compact?.hair?.report||null,ecology:api.report()}),
+  configure(environment){current().configure(environment);syncWind();refresh();return api.report();},reset(){requireCharacterIdle(lab.agent,'重置身体状态');current().reset();refresh();return api.report();}};
  const syncWind=()=>{if(!lab.hair)return;lab.hair.windSpeed=current().environment.windMps;lab.hair.windEnabled=lab.hair.windSpeed>0;const speed=document.getElementById('hair-speed'),on=document.getElementById('hair-wind'),value=document.getElementById('hair-speed-value');if(speed)speed.value=lab.hair.windSpeed;if(on)on.checked=lab.hair.windEnabled;if(value)value.textContent=lab.hair.windSpeed.toFixed(1)+' m/s';};
  for(const [id,event]of [['hair-speed','input'],['hair-wind','change']])document.getElementById(id)?.addEventListener(event,()=>{current().configure({windMps:lab.hair.windEnabled?lab.hair.windSpeed:0});refresh();});
  const panel=document.createElement('section');panel.id='human-biology-panel';panel.hidden=true;
- panel.innerHTML='<p>结构知识与这个人物的骨架、肌肉附着、皮肤分层和毛发数据一起保存。</p><div data-biology-systems></div><details><summary>环境与身体状态（简化模型）</summary><p>环境输入会影响散热、水分损失和出力系数；风速与头发共用。数值是模型估计。</p><div data-biology-inputs></div><button data-biology-apply>应用环境</button><button data-biology-reset>恢复身体状态</button><button data-biology-refresh>刷新状态</button><output data-biology-state style="display:block;white-space:pre-wrap"></output></details><button data-biology-export>导出人体知识与绑定</button><p data-biology-status role="status"></p>';
+ panel.innerHTML='<p>保存 R2 同源关节位置、表皮分区及公开动作来源。关节中心仍待功能标定。</p><div data-biology-systems></div><details><summary>环境与身体状态（简化模型）</summary><p>环境输入会影响散热、水分损失和出力系数；风速与头发共用。数值是模型估计。</p><div data-biology-inputs></div><button data-biology-apply>应用环境</button><button data-biology-reset>恢复身体状态</button><button data-biology-refresh>刷新状态</button><output data-biology-state style="display:block;white-space:pre-wrap"></output></details><button data-biology-export>导出人体知识与绑定</button><p data-biology-status role="status"></p>';
  const controls=[];for(const [key,label,unit]of [['airC','空气温度','°C'],['radiantC','周围辐射温度','°C'],['humidity','相对湿度','0—1'],['windMps','风速','m/s'],['insulationClo','衣物隔热参数','clo']]){const row=document.createElement('label');row.style.cssText='display:block;margin:8px 0';row.textContent=label+'（'+unit+'） ';const input=document.createElement('input');input.type='number';input.style.width='80px';input.min=HUMAN_BIOLOGY.ecology.limits[key][0];input.max=HUMAN_BIOLOGY.ecology.limits[key][1];input.step=key==='humidity'?.05:.1;input.dataset.ecology=key;row.append(input);panel.querySelector('[data-biology-inputs]').append(row);controls.push(input);}
  for(const system of HUMAN_BIOLOGY.systems){const detail=document.createElement('details'),summary=document.createElement('summary'),p=document.createElement('p');summary.textContent=system.label;p.textContent=system.facts+' '+system.implementation;detail.append(summary,p);for(const key of system.sources){const a=document.createElement('a');a.href=HUMAN_BIOLOGY.sources[key];a.target='_blank';a.rel='noopener noreferrer';a.textContent='来源 · '+key;a.style.marginRight='10px';detail.append(a);}panel.querySelector('[data-biology-systems]').append(detail);}
  document.body.append(panel);

@@ -1,0 +1,42 @@
+name: Task Traffic Checks
+
+on:
+  push:
+    branches:
+      - feature/human-task-workbench-adjustment-v2-fullbase
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  traffic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Syntax and assembly check
+        run: |
+          node --check body/NaturalLocomotion.js
+          node --check control/NPCPopulation.js
+          node --check control/TaskAgent.js
+          node --check ui/NPCPopulationControls.js
+          node --check ui/NPCTaskSelectionBridge.js
+          node tools/build-pure.mjs --check
+      - name: Task recipient selection
+        run: node tools/test-npc-task-selection-bridge.mjs
+      - name: Predictive detour and static replan
+        run: node tools/test-npc-traffic-wait.mjs
+      - name: Same-target slot reservations
+        run: node tools/test-npc-target-reservations.mjs
+      - name: Four-way crossing
+        run: node tools/test-npc-four-way-crossing.mjs
+      - name: Active narrow-corridor yielding
+        run: node tools/test-npc-corridor-active-yield.mjs
+      - name: Shared-resource active circulation
+        run: node tools/test-npc-resource-circulation.mjs
+      - name: Grid navigation batch
+        run: node tools/test-grid-navigation-batch.mjs

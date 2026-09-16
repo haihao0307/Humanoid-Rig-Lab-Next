@@ -1,0 +1,87 @@
+// Source ownership contracts only. Parse application syntax; never construct an
+// actor, run a worker, advance a clock, generate geometry or initialize WebGL.
+export function checkNPCPopulationSources({parse,read,assert}){
+ let checks=0;const check=(ok,message)=>{assert(ok,'NPC population: '+message);checks++;};
+ const syntax=source=>parse(source,{ecmaVersion:'latest',sourceType:'module'});
+ const population=read('control/NPCPopulation.js'),tree=syntax(population);
+ const runtime=read('source/runtime.template.js'),runtimeTree=syntax(runtime);
+ const surface=read('body/CompactWorkbench.js'),surfaceTree=syntax(surface);
+ const controls=read('ui/NPCPopulationControls.js');syntax(controls);
+ const agent=read('control/TaskAgent.js'),gait=read('body/NaturalLocomotion.js');syntax(agent);syntax(gait);
+ const manifest=JSON.parse(read('source/assembly.json'));
+ const cls=(ast,name)=>ast.body.find(node=>node.type==='ClassDeclaration'&&node.id.name===name);
+ const section=(source,ast,className,name)=>{
+  const node=cls(ast,className)?.body.body.find(node=>node.key.name===name);
+  check(!!node,'declared '+className+'.'+name);return source.slice(node.start,node.end);
+ };
+ const method=name=>section(population,tree,'NPCPopulation',name);
+ const fn=(source,ast,name)=>{const node=ast.body.find(node=>node.type==='FunctionDeclaration'&&node.id.name===name);check(!!node,'declared '+name);return source.slice(node.start,node.end);};
+ const ordered=(source,parts)=>{let at=-1;return parts.every(part=>{at=source.indexOf(part,at+1);return at>=0;});};
+ const constructor=method('constructor'),context=method('context');
+ const schema=tree.body.flatMap(n=>n.declarations||[]).find(n=>n.id.name==='NPC_POPULATION_SCHEMA')?.init;
+ const limit=tree.body.flatMap(n=>n.declarations||[]).find(n=>n.id.name==='NPC_INSTANCE_LIMIT')?.init;
+ check(schema?.type==='Literal'&&schema.value==='jarvis/npc_population_recipe@1','versioned population recipe');
+ check(limit?.type==='Literal'&&Number.isInteger(limit.value)&&limit.value>1&&limit.value<=8,'bounded authoring population without claiming crowd performance');
+ for(const path of ['control/NPCPopulation.js','ui/NPCPopulationControls.js']){
+  check(manifest.modules.filter(item=>item===path).length===1,'one source owner: '+path);
+  check(runtime.includes('/*__SOURCE:'+path+'__*/'),'assembled source: '+path);
+ }
+ check(runtime.includes('installNPCPopulation(window.HumanLab)')&&population.includes('lab.population=population'),'installed population API');
+ check(constructor.includes('this.actors=new Map()')&&constructor.includes('this.selected=new Set()'),'stable actor registry and independent control selection');
+ check(context.includes('definition:npcCopy(definition)')&&context.includes('human,agent,tissue:human.tissue')&&context.includes('queue:[]')&&context.includes('logs:[]')&&context.includes('behavior:{'),'recipe copy and per-actor body, queue, logs and behavior state');
+ check(context.includes('renderer:this.lab.renderer,world:this.lab.world')&&!/new Renderer\b|new World\b/.test(population),'actors share only the existing world and renderer');
+ check(context.includes('agent.npcId=id')&&context.includes('actor.human.characterPreset.appearance.face')&&context.includes('hair:{'),'instance identity and personal face/hair state');
+ const bind=method('bindSurface');
+ check(bind.includes('actor.compact.lab=actor')&&bind.includes('actor.compact.hair.lab=actor'),'surface and hair retain stable actor contexts');
+ const activate=method('activate');
+ check(ordered(activate,['this.editorGuard()','this.activeId=id','human=actor.human;agent=actor.agent']),'active selection validates editor ownership before rebinding');
+ check(activate.includes('humanlab:character-replaced')||activate.includes('jointControl.rebind('),'selection notifies existing joint and semantic observers');
+ const select=method('select');
+ check(/(?:ids|actors)\.length|Array\.isArray\(ids\)/.test(select),'empty control selection has an explicit path');
+ const stage=method('stage'),spawn=method('spawn');
+ check(ordered(stage,['new Human(definition.character)','new ReconstructionState(h)','await loadCompactSurface(','new CompactSurfaceRenderer(actor,data)']),'each staged NPC owns a generated body and surface before registration');
+ check(stage.includes('staged:true'),'NPC construction uses read-only staging in the shared world');
+ check(stage.includes('this.closed')&&stage.includes('this.lab.world.revision!==revision'),'pending generation rejects shutdown or changed scene');
+ check(stage.includes('actor.compact?.dispose()')&&spawn.includes('actor?.compact?.dispose()'),'failed staging and failed registration dispose their own surfaces');
+ check(ordered(spawn,['this.pending++','await this.stage(','this.actors.set(actor.id,actor)'])&&/finally\{[\s\S]*this\.pending--/.test(spawn),'pending actors count toward capacity and become live after successful staging');
+ check(spawn.includes('this.actors.size+this.pending')&&spawn.includes('NPC_INSTANCE_LIMIT'),'concurrent generation counts against the authoring limit');
+ check(stage.includes('this.pendingIds.has(id)')&&stage.includes('this.pendingIds.add(id)')&&spawn.includes('this.actors.has(actor.id)'),'in-flight IDs are reserved and registration rejects an occupied identity');
+ const position=method('positionFor');
+ check(position.includes('this.lab.world.collision(')&&position.includes('...this.values(),...staged')&&position.includes('horizontal(a.agent.pos,p)'),'spawn placement considers shared objects, live actors and staged batch members');
+ const dispatch=method('dispatch'),control=method('control'),pump=method('pump');
+ check(dispatch.includes("['append','replace']")&&dispatch.includes('actors.map(actor=>')&&dispatch.includes('accepted:false'),'group commands retain per-recipient results and queue modes');
+ check(dispatch.includes('this.isReserved(actor.agent)')&&control.includes('this.isReserved(actor.agent)')&&pump.includes('this.isReserved(a)'),'individual and group control respect the active language/routine owner');
+ check(dispatch.includes('actor.queue.push(')&&pump.includes('actor.queue.shift()')&&pump.includes('a.submit(request.text,{cooperative:true})'),'each actor drains its own queue through the existing task agent with cooperative whole-plan validation');
+ check(pump.includes('a.paused||a.error||a.characterEditInProgress')&&pump.includes('a.activity().readyForTask'),'queue progression waits for the recipient body to become ready');
+ check(pump.includes('a.time')&&pump.includes('b.intervalS')&&pump.includes('b.cycles++'),'repeating behavior uses the recipient clock and completion count');
+ check(control.includes("['pause','resume','stop']")&&control.includes('actor.agent.paused=')&&control.includes('actor.queue=[]'),'control operations act on each target and stop clears its queue');
+ check(method('tick').includes('this.clock.advance(dt,step=>this.tickFixed(step)'),'one fixed population clock owns the shared simulation step');
+ const tick=method('tickFixed');
+ check(ordered(tick,['advanceRoutineEnvironment(this.lab.world,step)','for(const actor of this.values())'])&&(tick.match(/advanceRoutineEnvironment\(/g)||[]).length===1,'shared world routine time advances once per population tick');
+ check(tick.includes('a.tick(step)')&&tick.includes('actor.tissue.update(a.time,a.time-before')&&tick.includes('actor.compact?.hair?.update('),'body, biology and hair updates use the owner actor');
+ check(agent.includes('if(!this.w.population)advanceRoutineEnvironment(this.w,dt)'),'legacy agent time advancement does not multiply shared population time');
+ check((tick.match(/\bphysics\?\.step\(/g)||[]).length===1&&tick.includes('this.physicsDeferred'),'one shared physics step resolves the deferred actor feedback');
+ const collision=method('collisionFor'),sweep=method('sweepFor');
+ check(collision.includes('horizontal(p,other.agent.pos)')&&sweep.includes('motionCircleSweep(')&&gait.includes('population?.collisionFor(')&&gait.includes('population?.sweepFor('),'locomotion checks other NPC bodies in clearance and continuous sweeps');
+ check(method('claimObject').includes('this.claims.set(id,a.npcId)')&&method('releaseObjects').includes('owner===a.npcId'),'shared object claims have explicit instance ownership');
+ check(method('requireWorldIdle').includes('for(const actor of this.values())')&&method('requireWorldIdle').includes('actor.behavior.enabled'),'shared-world edits inspect every live actor and recurring behavior');
+ const remove=method('remove'),dispose=method('disposeAll');
+ check(ordered(remove,["requireCharacterIdle(actor.agent,'移除 NPC')",'actor.disposed=true','actor.compact?.dispose()','this.actors.delete(id)']),'removal waits for an idle actor and disposes only its resources');
+ check(dispose.includes('this.closed=true')&&dispose.includes('for(const actor of this.values())')&&dispose.includes('actor.compact?.dispose()'),'shutdown closes generation and disposes every actor');
+ const exported=method('exportScene'),imported=method('importScene');
+ check(exported.includes('schema:NPC_POPULATION_SCHEMA')&&exported.includes('runtimeStateIncluded:false')&&!/\.chunks|\.palette|\.vertices|\.indices/.test(exported),'population export contains recipes without pose buffers or geometry');
+ check(imported.includes('validateNPCDefinition(')&&imported.includes('const staged=[]')&&imported.includes('actor.compact?.dispose()'),'recipe import validates definitions and cleans staged resources on failure');
+ const render=section(runtime,runtimeTree,'Renderer','render');
+ check(render.includes('this.activeCompacts()')&&render.includes('surface.prepare(items)')&&render.includes('surface.replaced'),'render prepares and substitutes every independent surface');
+ check(render.includes('for(const surface of drawCompacts)surface.draw(true)')&&render.includes('for(const surface of drawCompacts){surface.draw(false);surface.hair?.draw();}'),'world shadow pass and body/hair draws traverse all actors with paired palette ownership');
+ const draw=section(surface,surfaceTree,'CompactSurfaceRenderer','draw');
+ check(ordered(draw,['gl.activeTexture(gl.TEXTURE0+COMPACT_PALETTE_UNIT)','gl.bindTexture(gl.TEXTURE_2D,this.texture)','gl.drawElements(']),'each body rebinds its own joint texture immediately before drawing');
+ const queue=fn(surface,surfaceTree,'loadCompactSurface'),cancel=fn(surface,surfaceTree,'cancelCompactSurface');
+ check(queue.includes('compactSurfaceQueue.then(')&&queue.includes('compactSurfaceQueue=task.catch(')&&!queue.includes('cancelCompactSurface('),'body and hair generation serialize without cross-actor cancellation or poisoned queues');
+ check(queue.includes('epoch!==compactQueueEpoch')&&cancel.includes('compactQueueEpoch++'),'explicit cancellation invalidates queued as well as active work');
+ const surfaceDispose=section(surface,surfaceTree,'CompactSurfaceRenderer','dispose');
+ check(surfaceDispose.includes('if(this.disposed)return')&&surfaceDispose.includes('this.boundHuman?.tissue?.surface===this')&&surfaceDispose.includes('filter(surface=>surface!==this)'),'surface disposal is idempotent and does not release a replacement or another actor');
+ for(const name of ['spawn','activate','select','dispatch','control','setBehavior','remove','exportScene','importScene'])check(controls.includes('population.'+name+'('),'UI uses population API: '+name);
+ check(!/new (?:Human|Agent|Renderer)\b|\.pose\(|\.tick\(/.test(controls),'population UI never constructs or advances an actor');
+ return {checks,schema:schema.value,instanceLimit:limit.value,applicationExecuted:false,actorFunctionsExecuted:false,geometryGenerated:false,motionExecuted:false,workerExecuted:false,gpuExecuted:false,visualAcceptance:false};
+}

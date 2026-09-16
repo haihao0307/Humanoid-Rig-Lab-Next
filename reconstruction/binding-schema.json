@@ -1,0 +1,28 @@
+{
+  "schema": "r2/anatomical_surface_regions@1",
+  "regions": {
+    "head_face_ears": 1,
+    "shoulder_neck": 2,
+    "torso": 4,
+    "pelvis": 8,
+    "left_arm": 16,
+    "right_arm": 32,
+    "left_lower_limb": 64,
+    "right_lower_limb": 128,
+    "left_hand_fingers": 256,
+    "right_hand_fingers": 512,
+    "left_foot_toes": 1024,
+    "right_foot_toes": 2048,
+    "proximal_thigh_and_pelvic_interface": 72,
+    "right_ankle_collar": 2176
+  },
+  "featureMask": 1,
+  "tubeMask": 64,
+  "surfaceMembership": "Preserved from the fitted source domains through welding, packing, splitting and interface strips.",
+  "anatomyRules": "reconstruction/anatomy-rules.mjs",
+  "anatomyRuleVersion": "r2/anatomical-constraints@1",
+  "weightMethod": "Source regions and same-source bone axes provide initial priors restricted by segment ownership and local joint transitions. Shoulder priors use signed distance along connected source surface edges, with local same-side shoulder and axial support. The head, neck and torso domains share a continuous cranial-cervical shell field from the same-source C2-C7 and head landmarks; rigid skull rows are pinned and transition rows retain their cervical support. Canonical vertex IDs and paired interface roots share one normalized field. Every diffusion iteration projects onto the vertex's full anatomical support, including legal joints whose initial prior is zero; eight uint16 weights are encoded once per binding root with an exact total of 65535 and copied to draw chunks.",
+  "shoulderCapPrior": "A smooth superior lateral cap envelope transfers at most 0.6 of the normalized final row to the same-side upper arm, using the source AC, glenohumeral centre and humeral head radius. Applied once per shared root, projected onto the same anatomical support, then encoded for both GPU skin and CPU support probes. Authored correction, not measured deltoid motion.",
+  "mandibularPrior": "The source anterior chin extends below C4 into torso domain 4. A forward mandibular envelope joins continuously with the cranial-cervical field and pins this closed-jaw shell to head in every adjacent source domain. Dimensions use the source head-to-C7 length; the posterior cervical field is unchanged. Authored envelope, not an anatomical calibration or a jaw-opening controller.",
+  "weightValidation": "approximate sparse graph diffusion; convergence and pruning reported at runtime; unvalidated anatomy and posed tissue"
+}

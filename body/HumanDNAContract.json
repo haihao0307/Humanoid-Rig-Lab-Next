@@ -1,7 +1,7 @@
 {
   "schema": "jarvis/kaopu_living_contract@1",
   "status": "Candidate",
-  "adapter": "Human procedural workbench",
+  "adapter": "R2 function-reconstruction workbench",
   "formalKAOPUImplementation": false,
   "sourceLocks": [
     {
@@ -59,111 +59,303 @@
   },
   "structureRecipes": [
     {
-      "id": "rig",
-      "source": "source/runtime.template.js",
-      "function": "Human.build",
+      "id": "character-shape",
+      "source": "body/CharacterShape.js",
+      "function": "resolveCharacterRig",
       "inputs": [
-        "AdultHumanSpec",
-        "body archetype",
-        "rig morphs"
+        "npc.character.shape (jarvis/human_shape@2), legacy uniform-only @1 migrates with seven neutral regional parameters",
+        "locked reconstruction/rig-reference.json; copied per individual",
+        "statureScale in [0.94, 1.06]; legProportion, shoulderWidth, hipWidth, waistWidth, torsoDepth, armFullness and legFullness in [-1, 1]; authored, not population measurements",
+        "shared reconstruction/shape-contract.mjs and shape-deform.mjs; same bounded map for all individual rest nodes, tips and display points"
+      ]
+    },
+    {
+      "id": "stature-display",
+      "source": "reconstruction/stature-transform.mjs",
+      "function": "applyCompactStature",
+      "inputs": [
+        "canonical generated surface, shared binding rows and support probes",
+        "same complete individual shape as resolved bind rig; inverse-transpose normal transformation",
+        "canonical material coordinates retained; personal rest area for skin stretch; head and hair retain affine stature transform",
+        "reselect personal support probes from every personalized vertex; personal interpolation and boundary precision remain unmeasured"
+      ]
+    },
+    {
+      "id": "anatomical-constraints",
+      "source": "reconstruction/anatomy-rules.mjs",
+      "function": "createAnatomyRules",
+      "inputs": [
+        "same-source bind landmarks and fitted joint radii",
+        "source surface region masks and ipsilateral pelvis ownership",
+        "authored adjacency and finite shoulder attachment rules",
+        "segment ownership, joint transition bands and distal digit rays"
+      ]
+    },
+    {
+      "id": "toe-separation",
+      "source": "reconstruction/toe-separation.mjs",
+      "function": "createToeSeparation",
+      "inputs": [
+        "same-source toe roots and terminal tips; same-foot domain mask",
+        "authored monotone interdigital corridor retraction with analytic inverse-transpose normals",
+        "local source refinement: 4 mm maximum source edge, 0.25 mm sampled correction tolerance",
+        "source coefficient packages unchanged; generated geometry remains disposable"
+      ]
+    },
+    {
+      "id": "axilla-shape",
+      "source": "reconstruction/axilla-shape.mjs",
+      "function": "createAxillaShape",
+      "inputs": [
+        "same-source shoulder centres and connected skin domains",
+        "bounded monotone reference-shape lift before binding; inverse-transpose normals",
+        "neutral and lifted personal endpoints generated once; arm elevation activates the lift at runtime",
+        "5 mm local source edge and 0.3 mm sampled correction tolerance; no stored geometry"
+      ]
+    },
+    {
+      "id": "muscle-bellies",
+      "source": "body/CompactMuscles.js",
+      "function": "r2DeformTissuePoint",
+      "inputs": [
+        "personal reference shoulder, elbow and wrist; current joint frames",
+        "pose-driven axial contraction with transverse volume compensation",
+        "local shoulder DQS/LBS blend; shared CPU support and GPU position map",
+        "shared chest-relative axilla activation; endpoint normals blended before muscle and skinning",
+        "source-length-scaled superior shoulder cap support; zero at rest; CPU/GPU share the map and shader normals follow its Jacobian",
+        "engineered tissue approximation without physiological activation calibration or self-collision"
+      ]
+    },
+    {
+      "id": "facial-expression",
+      "source": "body/FaceControls.js",
+      "function": "resolveFaceOffsets",
+      "inputs": [
+        "body/FaceControlRecipe.json: authored source-space control centres, radii and expression offsets",
+        "npc.character.appearance.face (jarvis/face_pose@1)",
+        "current generated neutral surface for disposable coverage sampling; no baked vertices"
+      ]
+    },
+    {
+      "id": "skin-appearance",
+      "source": "body/SkinAppearance.js",
+      "function": "resolveSkinMaterial",
+      "inputs": [
+        "npc.character.appearance.skin (jarvis/skin_appearance@2; imports @1 with zero sunExposure/weathering)",
+        "authored sRGB colour, bounded appearance controls and deterministic seed",
+        "body/TissueShaders.js GGX surface and local wrapped-light approximation"
       ]
     },
     {
       "id": "surface",
-      "source": "body/ConnectedSurface.js",
-      "function": "buildConnectedHumanSurface",
+      "source": "reconstruction/assembly.mjs",
+      "function": "generateCompactHuman",
       "inputs": [
-        "rig bind frame",
-        "cross-section profiles",
-        "local shape parameters"
+        "reconstruction/parameters.json",
+        "seven locked function coefficient packages",
+        "source domain memberships"
       ]
     },
     {
-      "id": "composition",
-      "source": "body/BodyComposition.js",
-      "function": "applyProceduralBodyShape",
+      "id": "rig",
+      "source": "body/ReconstructionRig.js",
+      "function": "buildReconstructionRig",
       "inputs": [
-        "morph parameters",
-        "muscle volume ratios"
+        "reconstruction/rig-reference.json",
+        "same-source anatomical estimates"
       ]
     },
     {
-      "id": "skinLayers",
-      "source": "body/SkinLayers.js",
-      "function": "buildSkinLayerSurfaces",
+      "id": "binding",
+      "source": "reconstruction/binding.mjs",
+      "function": "buildCompactBinding",
       "inputs": [
-        "generated exterior",
-        "regional thickness parameters"
+        "canonical surface vertex IDs and paired interface binding roots",
+        "source domain masks as initial priors",
+        "same-source bone axes",
+        "continuous cranial-cervical field plus a forward mandibular envelope shared across head, neck and torso domains; rigid closed-jaw shell, unchanged posterior cervical field",
+        "positive surface-graph diffusion in the interface band, projected onto full allowed anatomical support every iteration, including legal entries with zero initial prior",
+        "eight shared influences encoded with an exact uint16 partition"
       ]
     },
     {
-      "id": "muscles",
-      "source": "body/ProceduralTissue.js",
-      "function": "ProceduralTissue.makeMuscles",
+      "id": "motion",
+      "source": "body/MotionLabPose.js",
+      "function": "MotionLabPose.apply",
       "inputs": [
-        "joint attachments",
-        "muscle radii"
-      ]
-    },
-    {
-      "id": "organsAndPaths",
-      "source": "body/ProceduralSystems.js",
-      "function": "buildProceduralSystems",
-      "inputs": [
-        "authored landmarks",
-        "ellipsoid and sweep functions"
+        "motion/source-lock.json",
+        "Human-Motion-Lab R2.2 fixed-step controller and full hierarchy",
+        "reconstruction/motion-reference.json",
+        "source trial and frame interval",
+        "declared contact and published-standard extensions"
       ]
     },
     {
       "id": "hair",
-      "source": "body/ProceduralHair.js",
-      "function": "ProceduralHair",
+      "source": "reconstruction/hair.mjs",
+      "function": "generateReconstructionHair",
       "inputs": [
-        "generated scalp",
-        "seed",
-        "follicle priors"
+        "current fitted scalp",
+        "reconstruction/appearance.json",
+        "reconstruction/hair-presets.json",
+        "character.appearance.hair"
+      ]
+    },
+    {
+      "id": "activity",
+      "source": "control/CharacterActivity.js",
+      "function": "characterActivity",
+      "inputs": [
+        "task and posture owners",
+        "Motion-Lab settled state",
+        "held object and error state",
+        "read-only derived view; no independent state machine"
       ]
     }
   ],
   "surfaceProgram": {
-    "source": "body/TissueShaders.js",
-    "coordinates": "stable material/rest coordinates",
+    "source": "body/CompactWorkbench.js",
+    "coordinates": "canonical R2 material and binding coordinates retained alongside shared regional shape map positions; personal bind-to-pose transform; personal rest area for skin stretch",
     "authoredImageMaps": 0
   },
   "precisionPolicy": {
-    "implemented": "fixed procedural topology and bounded hair budget",
-    "adaptiveReconstruction": "NotImplemented",
-    "noStoredLODMeshes": true
+    "implemented": "conforming canonical edge subdivision; shared Float32 positions; shared interface weights with approximate positive graph diffusion",
+    "influences": 8,
+    "positionEncoding": "canonical-float32",
+    "weightEncoding": "unorm16x8",
+    "motionInterpolation": "per-clip recorded parameter residuals; not posed-surface error",
+    "noStoredLODMeshes": true,
+    "stature": "source errors stay canonical; only uniform variants derive length errors by statureScale; regional interpolation, boundary and normal errors are unmeasured and inherit no positional certificate; personal Float32 roundoff reported separately",
+    "regionalShape": "bounded authored smooth maps and inverse-transpose normals; no population calibration, full posed-surface certificate or measured collision envelope",
+    "displaySampling": "per-group and per-chart refinement budgets; unmet error targets reported as precisionLimited; bounded global topology allocations",
+    "poseCommit": "validate full candidate and fixed world contacts after sampled clearance, then commit local frames"
   },
   "stateSchema": {
     "capacity": "npc.character.strength.profile",
     "transientStrength": "strengthState",
     "environment": "biology.environment",
     "transientThermal": "biology.state",
-    "animationResume": "NotImplemented"
+    "animationResume": "NotImplemented",
+    "activity": "HumanLab.activity() derived from existing owners"
   },
   "evidenceLedger": [
     {
-      "id": "authored-body",
-      "kind": "Claim",
+      "id": "character-regional-shape-r2",
+      "kind": "DerivedArtifact",
       "status": "Candidate",
-      "subject": "adult shape parameters and organs",
-      "basis": "authored approximation",
-      "observationRoots": []
+      "subject": "seven regional body controls with shared surface/rest-joint map, personal contact dimensions and full recipe identity",
+      "source": "docs/CHARACTER_REGIONAL_SHAPE_IMPLEMENTATION_R2.md",
+      "runtimeVerified": false,
+      "visualAcceptance": false,
+      "populationCalibration": false,
+      "personalSurfacePrecisionMeasured": false
     },
     {
-      "id": "anatomy-relationships",
-      "kind": "Claim",
+      "id": "character-stature-r1",
+      "kind": "DerivedArtifact",
+      "status": "Candidate",
+      "subject": "bounded individual stature, canonical binding, personal skeleton and transactional character replacement",
+      "source": "docs/CHARACTER_STATURE_IMPLEMENTATION_R1.md",
+      "runtimeVerified": false,
+      "visualAcceptance": false,
+      "populationModel": false,
+      "nonUniformProportions": false
+    },
+    {
+      "id": "anatomical-constraints-r1",
+      "kind": "DerivedArtifact",
+      "status": "Candidate",
+      "subject": "region adjacency, stable bone segments, local joint transitions and constrained binding diffusion",
+      "source": "docs/ANATOMICAL_CONNECTION_RULES_R1.md",
+      "runtimeVerified": false,
+      "visualAcceptance": false
+    },
+    {
+      "id": "anatomical-pose-observation-r2",
+      "kind": "DerivedArtifact",
+      "status": "Candidate",
+      "subject": "default reference-shape A45/T90 observation, constrained shoulder weights and local toe separation; axillary source web remains unresolved",
+      "source": "docs/ANATOMICAL_POSE_REVIEW_R2.md",
+      "scopedApplicationObserved": true,
+      "fullSelfIntersectionCertificate": false,
+      "biologicalCalibration": false,
+      "allPoseAcceptance": false,
+      "visualAcceptance": false
+    },
+    {
+      "id": "anatomical-pose-observation-r3",
+      "kind": "DerivedArtifact",
+      "status": "Candidate",
+      "subject": "reference axilla relocation, pose-driven muscle volume and local shoulder skinning; broad web reduced but shoulder creases and strict crossings remain",
+      "source": "docs/ANATOMICAL_POSE_REPAIR_R3.md",
+      "scopedApplicationObserved": true,
+      "cpuGpuPositionAgreementObserved": true,
+      "fullSelfIntersectionCertificate": false,
+      "biologicalCalibration": false,
+      "allPoseAcceptance": false,
+      "visualAcceptance": false
+    },
+    {
+      "id": "skin-appearance-r1",
+      "kind": "DerivedArtifact",
+      "status": "Candidate",
+      "subject": "versioned skin parameters, linear colour pipeline and per-character material uniforms",
+      "source": "docs/SKIN_APPEARANCE_R1.md",
+      "runtimeVerified": false,
+      "visualAcceptance": false,
+      "measuredSkinReflectance": false
+    },
+    {
+      "id": "character-system-r11",
+      "kind": "DerivedArtifact",
+      "status": "Candidate",
+      "subject": "shared activity view, guarded mutations, candidate pose commit and staged surface resources",
+      "source": "docs/CHARACTER_SYSTEM_REVIEW_R11.md",
+      "runtimeVerified": false,
+      "failureInjectionExecuted": false
+    },
+    {
+      "id": "surface-continuity-r10",
+      "kind": "DerivedArtifact",
+      "status": "Candidate",
+      "subject": "canonical topology, shared interface deformation and surface-graph weight field",
+      "source": "docs/SURFACE_CONTINUITY_R10.md",
+      "runtimeVerified": false,
+      "fullManifoldVerified": false,
+      "posedSoftTissueMeasured": false
+    },
+    {
+      "id": "source-fitted-shape",
+      "kind": "DerivedArtifact",
+      "status": "Candidate",
+      "subject": "one static atlas shape and derived joint estimates",
+      "source": "docs/reconstruction/SOURCE_LOCK.json",
+      "functionalJointCalibration": false
+    },
+    {
+      "id": "captured-motion",
+      "kind": "DerivedArtifact",
       "status": "SourceBacked",
-      "subject": "bone, muscle, skin and organ relationships",
-      "sources": "body/HumanBiology.json",
-      "individualMeasurement": false
+      "subject": "retargeted CMU skeletal motion parameters",
+      "source": "reconstruction/motion-reference.json",
+      "subjectSpecific": false,
+      "posedSoftTissueMeasured": false
+    },
+    {
+      "id": "motion-kernel-integration",
+      "kind": "DerivedArtifact",
+      "status": "Candidate",
+      "subject": "pinned Motion-Lab R2.2 core, shared pose adapter and task extensions",
+      "source": "motion/source-lock.json",
+      "extensionMethod": "fixed-length contact IK, captured posture intervals, published salute targets",
+      "measuredManipulation": false,
+      "runtimeVerified": false
     },
     {
       "id": "packaging",
       "kind": "DerivedArtifact",
       "status": "FileChecked",
-      "subject": "source assembly and compression",
+      "subject": "source assembly and file contracts",
       "createsObservationRoot": false
     }
   ],
@@ -176,17 +368,17 @@
     {
       "id": "anatomical-accuracy",
       "state": "Unknown",
-      "reason": "Authored proportions and schematic organs have not been compared against independent measurements."
+      "reason": "Atlas joint centres are estimated and have no functional calibration. Region weights and posed soft tissue have not been measured."
     },
     {
       "id": "visual-acceptance",
-      "state": "NotObserved",
-      "reason": "Only file contents were verified at the user's request."
+      "state": "Unknown",
+      "reason": "Authorized scoped A/T observations and CPU/GPU position checks exist; residual shoulder artifacts and intersections prevent full visual acceptance."
     },
     {
       "id": "runtime-performance",
       "state": "NotObserved",
-      "reason": "No application or GPU run was performed."
+      "reason": "Scoped application and GPU runs were performed, but sustained multi-character performance has not been benchmarked."
     },
     {
       "id": "reference-assets-in-delivery",
@@ -200,13 +392,13 @@
     }
   ],
   "viewPolicy": {
-    "name": "authored-recipe-view@1",
-    "selection": "Use explicit character parameters within declared bounds; defaults fill only unspecified parameters.",
+    "name": "r2-source-recipe-view@1",
+    "selection": "Keep the locked R2 reference and Motion-Lab kernel. Allow declared stature [0.94, 1.06] and seven bounded regional [-1, 1] parameters through the shared shape contract. Distinguish captured motion, published standards and authored shape/contact adaptations; reject unknown parameters and direct joint goals.",
     "conflictPolicy": "Keep unresolved differences in uncertainty; do not average incompatible evidence.",
     "statisticalAgreementIsIndependentEvidence": false
   },
   "acceptance": {
-    "fileContentsOnly": true,
+    "fileContentsOnly": false,
     "runtimeVerified": false,
     "visualAcceptance": false,
     "productionReady": false

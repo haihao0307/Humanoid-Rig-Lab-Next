@@ -1,0 +1,77 @@
+{
+  "schema": "human-reconstruction-provenance/v1",
+  "source": {
+    "name": "BodyParts3D 4.0",
+    "url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html",
+    "licenseURL": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html",
+    "license": "CC BY 4.0",
+    "attribution": "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International",
+    "archiveSHA256": "40665852c49f218326590e204db91064a1ecfc3c6f8cbd7bbbcaac62c7cd409e",
+    "provenance": "MRI-based adult male reference with segmentation and anatomical CAD revisions; not a population average.",
+    "sourceFloorM": -0.0781112,
+    "sourceStatureM": 1.7194712,
+    "displayStatureM": 1.75
+  },
+  "referenceInputs": {
+    "anatomy/whole-body/arteries.js": {
+      "bytes": 19467120,
+      "sha256": "131769e39c3e271b98ab853af53cf85cbbaa2d43f1bf7a7e04c1c91cc7772c72"
+    },
+    "anatomy/whole-body/bones.js": {
+      "bytes": 8369505,
+      "sha256": "efaae075db5ad37499f13eeb9765eafaf4f13d592c8cb0bdbcf36c6de5e9f99f"
+    },
+    "anatomy/whole-body/features.js": {
+      "bytes": 2305196,
+      "sha256": "f43dcc3e1dc225877e74bb577dee2e25517475301b986cba3130250fdadab5e6"
+    },
+    "anatomy/whole-body/female-surface.js": {
+      "bytes": 3698656,
+      "sha256": "9eb41e42c2399c79c2c763289f04f10276f4d9c29520ef83e9f12e4c6f68b533"
+    },
+    "anatomy/whole-body/female-surface.json": {
+      "bytes": 792,
+      "sha256": "e398c18ab29bea7f99d66d7507b8e1ddf919390a161f91c543e35d4ef12a7227"
+    },
+    "anatomy/whole-body/manifest.json": {
+      "bytes": 1274746,
+      "sha256": "80333a490df6a3685a686330114af7b8fcd1aac704e67d41891313e4ea660264"
+    },
+    "anatomy/whole-body/muscles.js": {
+      "bytes": 60081167,
+      "sha256": "7cb0986f407deafc07018c10c3ba85054258dc4046861b794b4929a45498a19f"
+    },
+    "anatomy/whole-body/nerves.js": {
+      "bytes": 8473998,
+      "sha256": "2719625bc939dd25c76a059ea4833ea035a4629716eae261fd0ea27582f5ee0f"
+    },
+    "anatomy/whole-body/organs.js": {
+      "bytes": 13880702,
+      "sha256": "30092378b77043dc730cac8f6df0c22ca44ce1ead18d9d4d224488990566638b"
+    },
+    "anatomy/whole-body/README.md": {
+      "bytes": 6133,
+      "sha256": "d0fefb3de38d7e0768ff008606301c997979169e7295a65a962687216a20f36e"
+    },
+    "anatomy/whole-body/skin.js": {
+      "bytes": 6313248,
+      "sha256": "63c7997d73e170f910af2d13fd9e843fe17f5076e078fc27f3c65304d9799692"
+    },
+    "anatomy/whole-body/support.js": {
+      "bytes": 5378435,
+      "sha256": "44ff11cd9ea4f166e19672c0e76c0ffc60649fe976f4d59e292fc2f8fd17097d"
+    },
+    "anatomy/whole-body/veins.js": {
+      "bytes": 21840225,
+      "sha256": "f82fad65f74bdc03711d1ad963733ba9413accc47158b72279a0126b5337edf1"
+    }
+  },
+  "transformations": [
+    "Piecewise surface and boundary fitting",
+    "Boundary simplification and height coefficient quantization",
+    "Compressed coefficient containers and procedural display sampling"
+  ],
+  "currentParameters": "../../reconstruction/parameters.json",
+  "sourceMeshesDistributed": false,
+  "visualAcceptance": false
+}

@@ -1,0 +1,74 @@
+name: Build motion preview
+
+on:
+  push:
+    branches:
+      - feature/human-motion-workbench-adjustment-v1
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[preview-build]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Register R25 runtime module
+        shell: python
+        run: |
+          from pathlib import Path
+          assembly = Path('source/assembly.json')
+          data = assembly.read_bytes()
+          if b'body/LightBalanceFeedback.js' not in data:
+              needle = b'    "body/NaturalLocomotion.js",\r\n    "control/TaskAgent.js",'
+              replacement = b'    "body/NaturalLocomotion.js",\r\n    "body/LightBalanceFeedback.js",\r\n    "control/TaskAgent.js",'
+              if needle not in data:
+                  needle = needle.replace(b'\r\n', b'\n')
+                  replacement = replacement.replace(b'\r\n', b'\n')
+              if needle not in data:
+                  raise SystemExit('NaturalLocomotion assembly anchor missing')
+              assembly.write_bytes(data.replace(needle, replacement, 1))
+          runtime = Path('source/runtime.template.js')
+          data = runtime.read_bytes()
+          if b'body/LightBalanceFeedback.js' not in data:
+              needle = b'/*__SOURCE:body/NaturalLocomotion.js__*/\r\n/*__SOURCE:control/TaskAgent.js__*/'
+              replacement = b'/*__SOURCE:body/NaturalLocomotion.js__*/\r\n/*__SOURCE:body/LightBalanceFeedback.js__*/\r\n/*__SOURCE:control/TaskAgent.js__*/'
+              if needle not in data:
+                  needle = needle.replace(b'\r\n', b'\n')
+                  replacement = replacement.replace(b'\r\n', b'\n')
+              if needle not in data:
+                  raise SystemExit('NaturalLocomotion runtime anchor missing')
+              runtime.write_bytes(data.replace(needle, replacement, 1))
+      - name: Motion regression
+        run: |
+          node tools/test-light-balance-feedback.mjs
+          node tools/test-motion-phase-continuity.mjs
+          node tools/test-seated-preparation-continuity.mjs
+          node tools/test-turn-command-continuity.mjs
+          node tools/test-motion-skin-attachment.mjs
+          node tools/test-motion-transition-range.mjs
+          node tools/test-ground-contact-fit.mjs
+          node tools/test-contact-hand-pose.mjs
+      - name: Assemble and audit
+        run: |
+          node tools/build-pure.mjs
+          python tools/audit-files.py
+          node tools/build-pure.mjs --check
+      - name: Commit fixed preview
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/assembly.json source/runtime.template.js index.html FILE_AUDIT.json SHA256SUMS.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "build: register R25 and refresh motion preview [preview-build]"
+            git push origin HEAD:feature/human-motion-workbench-adjustment-v1
+          fi

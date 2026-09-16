@@ -1,0 +1,76 @@
+{
+  "schema": "human-reconstruction-appearance/v1",
+  "version": "r2-hair-r15-seeded-bundles",
+  "sourceFloorM": -0.0781112,
+  "sourceHipZM": 0.075,
+  "hair": {
+    "rulesFile": "hair-rules-r2.json",
+    "scalpFile": "hair-scalp-radius-r2.json",
+    "domainsFile": "hair-domains-r2.json",
+    "ruleModule": "hair-rules-r2.mjs",
+    "segmentsPerStrand": 4,
+    "maximumStrands": 3000,
+    "referenceScreenshotStrands": 87391,
+    "enabledByDefault": true,
+    "catalogFile": "hair-presets.json",
+    "profileModule": "hair-profile.mjs",
+    "referenceSegmentsPerStrand": 16,
+    "referenceMaximumStrands": 120000,
+    "regionModule": "hair-zones.mjs",
+    "styleModule": "hair-styles.mjs"
+  },
+  "inputLocks": [
+    {
+      "file": "hair-rules-r2.mjs",
+      "bytes": 9760,
+      "sha256": "f8d231fcbc04ac62a0d43f0a509a62d61d9729fba779368578f3043371f2b1d9",
+      "source": "local R15 bounded display sampler and groom extensions; derived from hair-bundle-rules-r2.mjs",
+      "derivedFromSHA256": "294b81da68a6a6997cd7c0355ef74e06a1a152bf7e3b81ef034a955293e76521"
+    },
+    {
+      "file": "hair-rules-r2.json",
+      "bytes": 592,
+      "sha256": "18a7031107cb1f4ad65454ab3aa4f363c2268b7e68c57871a8086c0074903b9b",
+      "source": "screenshots/visual-r2-20260911/HAIR_RULES_R2.json"
+    },
+    {
+      "file": "hair-scalp-radius-r2.json",
+      "bytes": 198903,
+      "sha256": "2ee533078a097d09318029c057155423cb0af13b2733f49aaefd55b83f900010",
+      "source": "screenshots/visual-r2-20260911/HAIR_SCALP_RADIAL_R2.json"
+    },
+    {
+      "file": "hair-domains-r2.json",
+      "bytes": 112199,
+      "sha256": "ac4c0963a6d85283216102f668966f31cbfcdd4f5693e991340f9529b2c65cca",
+      "source": "DETAIL_SURFACE_ATLAS.json / head_face_ears metadata"
+    },
+    {
+      "file": "hair-presets.json",
+      "source": "local authored R15 hair profile system",
+      "bytes": 5744,
+      "sha256": "7907f3bdb4e73e4f3730aacab1419af447d2687c5c8f2300da0155d5af85392a"
+    },
+    {
+      "file": "hair-profile.mjs",
+      "source": "local authored R15 hair profile system",
+      "bytes": 2899,
+      "sha256": "d893ca382f1f5d535d31e6d40844c3b2ae6cf71315bc6a708e613b5986a46d8d"
+    },
+    {
+      "file": "hair-zones.mjs",
+      "source": "R16 anatomical scalp landmarks authored for the R2 reference head",
+      "bytes": 2926,
+      "sha256": "c80c32943fbeeda1bd176353047e10377448e0e618786b584bbcfd6c32c9644e"
+    },
+    {
+      "file": "hair-styles.mjs",
+      "source": "R22 restores R20 tips while retaining R21 body and shading; docs/HAIR_TIP_RESTORE_R22.md",
+      "bytes": 14491,
+      "sha256": "21f3ede76f43e7d923a558a20b7a3e1b51d9ff2b543e4f6c0b2203c94c519bc2"
+    }
+  ],
+  "reference": "Visual correction R2, 2026-09-11; data provenance in docs/reconstruction/SOURCE_LOCK.json",
+  "applicationExecuted": false,
+  "visualAcceptance": false
+}
