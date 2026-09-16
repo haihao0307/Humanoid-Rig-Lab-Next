@@ -1,0 +1,154 @@
+name: Chicken R9.8 Connected Head and Collapsed Bill Build
+
+on:
+  push:
+    branches:
+      - codex/chicken-r9-2-head-restore
+    paths:
+      - .github/workflows/chicken-r98-build.yml
+      - tools/build_chicken_r95.py
+      - tools/build_chicken_r96.py
+      - tools/build_chicken_r98.py
+      - tools/chicken_r98_override.js
+      - tools/capture_chicken_r98.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: chicken-r98-connected-head-bill
+  cancel-in-progress: true
+
+jobs:
+  build-audit-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out candidate branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify committed R9.8 source tools
+        shell: bash
+        run: |
+          test -s tools/build_chicken_r95.py
+          test -s tools/build_chicken_r96.py
+          test -s tools/build_chicken_r98.py
+          test -s tools/chicken_r98_override.js
+          test -s tools/capture_chicken_r98.mjs
+          python -m py_compile tools/build_chicken_r95.py tools/build_chicken_r96.py tools/build_chicken_r98.py
+          node --check tools/chicken_r98_override.js
+          node --check tools/capture_chicken_r98.mjs
+
+      - name: Build deterministic R9.8 executable
+        run: python tools/build_chicken_r98.py
+
+      - name: Install Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Install Playwright Core
+        run: npm install --no-save playwright-core@1.55.0
+
+      - name: Run browser and collapsed-bill QA
+        id: browser_qa
+        continue-on-error: true
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          CHICKEN_R98_URL: http://127.0.0.1:8765/CHICKEN_V46_R9_8_HEAD_COLLAPSED_BILL.html
+          CHICKEN_R91_URL: http://127.0.0.1:8765/CHICKEN_V46_R9_1.html
+        shell: bash
+        run: |
+          python -m http.server 8765 > /tmp/chicken-r98-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 2
+          node tools/capture_chicken_r98.mjs
+
+      - name: Finalize state, review board and manifest
+        if: always()
+        run: python tools/build_chicken_r98.py --finalize
+
+      - name: Upload R9.8 visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chicken-r98-visual-evidence-${{ github.run_number }}
+          path: |
+            CHICKEN_V46_R9_8_HEAD_COLLAPSED_BILL.html
+            data/CHICKEN_R98_HEAD_COLLAPSED_BILL_PARAMETERS.json
+            qa/CHICKEN_R98_STATIC_QA.json
+            qa/CHICKEN_R98_BROWSER_QA.json
+            evidence/r98
+            BUILD_MANIFEST_R98.json
+            01_CURRENT_STATE.json
+            README.md
+            CURRENT_HANDOFF.md
+            CURRENT_FULL_HANDOFF.md
+            06_NEXT_STAGE_PLAN.md
+            reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Verify generated gates
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          required = [
+              Path('CHICKEN_V46_R9_8_HEAD_COLLAPSED_BILL.html'),
+              Path('data/CHICKEN_R98_HEAD_COLLAPSED_BILL_PARAMETERS.json'),
+              Path('qa/CHICKEN_R98_STATIC_QA.json'),
+              Path('qa/CHICKEN_R98_BROWSER_QA.json'),
+              Path('evidence/r98/R98_REVIEW_BOARD.html'),
+              Path('BUILD_MANIFEST_R98.json'),
+          ]
+          missing = [str(path) for path in required if not path.exists()]
+          if missing:
+              raise SystemExit(f'Missing generated files: {missing}')
+          for path in [Path('qa/CHICKEN_R98_STATIC_QA.json'), Path('qa/CHICKEN_R98_BROWSER_QA.json')]:
+              data = json.loads(path.read_text(encoding='utf-8'))
+              if not data.get('passed'):
+                  raise SystemExit(f'QA failed: {path}')
+          print('R9.8 source, browser and collapsed-bill gates passed. Independent visual gate remains open.')
+          PY
+
+      - name: Commit generated R9.8 candidate and evidence
+        shell: bash
+        run: |
+          git config user.name "Codex"
+          git config user.email "codex@users.noreply.github.com"
+          git add -A \
+            tools/build_chicken_r95.py \
+            tools/build_chicken_r96.py \
+            tools/build_chicken_r98.py \
+            tools/chicken_r98_override.js \
+            tools/capture_chicken_r98.mjs \
+            CHICKEN_V46_R9_8_HEAD_COLLAPSED_BILL.html \
+            data/CHICKEN_R98_HEAD_COLLAPSED_BILL_PARAMETERS.json \
+            qa/CHICKEN_R98_STATIC_QA.json \
+            qa/CHICKEN_R98_BROWSER_QA.json \
+            evidence/r98 \
+            BUILD_MANIFEST_R98.json \
+            01_CURRENT_STATE.json \
+            README.md \
+            CURRENT_HANDOFF.md \
+            CURRENT_FULL_HANDOFF.md \
+            06_NEXT_STAGE_PLAN.md
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "Build Chicken V4.6 R9.8 connected head and collapsed bill [skip ci]"
+            git pull --rebase origin codex/chicken-r9-2-head-restore
+            git push origin HEAD:codex/chicken-r9-2-head-restore
+          fi
