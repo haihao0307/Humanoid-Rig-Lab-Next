@@ -1,0 +1,93 @@
+from __future__ import annotations
+
+import base64
+import hashlib
+import json
+import re
+from pathlib import Path
+from typing import Any
+
+MODULE_ROOT = Path(__file__).resolve().parent.parent
+BASELINE = MODULE_ROOT / "baselines/v4.41/CAT_KAOPU_V441_EYELID_CORNEA_WORKBENCH_2026-09-15.html"
+CURRENT_HTML = MODULE_ROOT / "workbench/CAT_KAOPU_CURRENT.html"
+BUILD_DIR = MODULE_ROOT / "build/v4.42"
+OUT_HTML = BUILD_DIR / "CAT_KAOPU_V442_GEOMETRIC_EYELID_WORKBENCH_2026-09-16.html"
+DOC_REPORT = MODULE_ROOT / "docs/CAT_KAOPU_V442_EXECUTION_REPORT_2026-09-16.md"
+DOC_REVIEW = MODULE_ROOT / "docs/CAT_KAOPU_V442_SELF_REVIEW_2026-09-16.md"
+QA_TECHNICAL = MODULE_ROOT / "qa/CAT_KAOPU_V442_TECHNICAL_QA_2026-09-16.json"
+CURRENT_JSON = MODULE_ROOT / "CURRENT.json"
+README = MODULE_ROOT / "README.md"
+MANIFEST = MODULE_ROOT / "BUILD_MANIFEST.json"
+
+
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def sha256_file(path: Path) -> str:
+    return sha256_bytes(path.read_bytes())
+
+
+def extract_json_constant(s: str, name: str, next_name: str) -> tuple[dict[str, Any], tuple[int, int]]:
+    a = f"const {name}="
+    b = f";\nconst {next_name}="
+    i = s.index(a) + len(a)
+    j = s.index(b, i)
+    return json.loads(s[i:j]), (i, j)
+
+
+def replace_json_constant(s: str, name: str, next_name: str, val: dict[str, Any]) -> str:
+    _, (i, j) = extract_json_constant(s, name, next_name)
+    return s[:i] + json.dumps(val, ensure_ascii=False, separators=(",", ":")) + s[j:]
+
+
+def replace_once(s: str, old: str, new: str, label: str) -> str:
+    count = s.count(old)
+    if count != 1:
+        raise RuntimeError(f"{label}: expected one marker, found {count}")
+    return s.replace(old, new, 1)
+
+
+def embedded_payload(text: str) -> bytes:
+    match = re.search(r"const CAT_B64='([^']+)'", text)
+    if not match:
+        raise RuntimeError("CAT_B64 not found")
+    return base64.b64decode(match.group(1))
+
+
+def replace_section(text: str, start_marker: str, end_marker: str, replacement: str, label: str) -> str:
+    start = text.find(start_marker)
+    if start < 0:
+        raise RuntimeError(f"{label}: start marker missing")
+    end = text.find(end_marker, start)
+    if end < 0:
+        raise RuntimeError(f"{label}: end marker missing")
+    return text[:start] + replacement + text[end:]
+
+
+def build_stage1(s):
+    if "CAT KAOPU V4.41" not in s or "__CAT_V441_READY__" not in s:
+        raise RuntimeError("baseline markers missing")
+    t=s
+    lib,_=extract_json_constant(t,"LIB","canvas")
+    for action in lib["actions"]:
+        if action["id"]=="blink_check":
+            action["label"]="几何眼睑 / 角膜检查"
+            action["status"]="geometric_eyelid_stage1_candidate"
+    lib["behavior"]["version"]="V4.42"
+    lib["behavior"]["boundary"]=(
+        "Deterministic preview only. V4.42 preserves the V4.32 neutral body surface, "
+        "V4.40 CATV440 payload, 34-bone rig, V4.39 posture correctives and V4.36 locomotion/contact. "
+        "It replaces the V4.41 eye-surface lid mask with a bounded procedural upper/lower eyelid overlay "
+        "attached to the head skin matrix. The base payload and weights remain unchanged."
+    )
+    t=replace_json_constant(t,"LIB","canvas",lib)
+    t=replace_once(t,"<title>CAT KAOPU V4.41 · 眼睑眨眼与角膜响应第一层</title>","<title>CAT KAOPU V4.42 · 受限几何眼睑第一层</title>","title")
+    t=replace_once(t,'alt="V4.41 眼睑眨眼与角膜响应第一层静态回退"','alt="V4.42 受限几何眼睑第一层静态回退"',"alt")
+    t=replace_once(t,"<aside><h1>CAT KAOPU V4.41</h1>","<aside><h1>CAT KAOPU V4.42</h1>","h1")
+    t=replace_once(t,"V4.32 冻结整猫表面 → V4.39 坐卧修形 → V4.40 耳眼/短毛 → V4.41 眼睑眨眼与角膜响应","V4.32 冻结整猫表面 → V4.40 耳眼/短毛 → V4.41 片元眨眼 → V4.42 受限几何眼睑","lineage")
+    t=replace_once(t,'<span class="tag good">程序化眼睑</span><span class="tag good">角膜湿润响应</span>','<span class="tag good">上下眼睑几何</span><span class="tag good">头骨矩阵附着</span><span class="tag good">眼缘体积</span><span class="tag good">角膜湿润响应</span>',"tags")
+    t=replace_once(t,'<button class="active" id="blinkLayer">眼睑层</button>','<button class="active" id="blinkLayer">几何眼睑</button>',"toolbar")
+    t=replace_once(t,'<section><h2>眼睑、角膜、耳眼与短毛</h2>','<section><h2>几何眼睑、角膜、耳眼与短毛</h2>',"section")
+    t=replace_once(t,'<button class="active" id="blinkToggle">眼睑遮罩</button>','<button class="active" id="blinkToggle">几何眼睑</button>',"side button")
+    t=replace_once(t,'<div class="kpi"><b>眨眼</b><span id="kBlink">自动 0.00</span></div>','<div class="kpi"><b>几何眨眼</b><span id="kBlink">自动 0.00</span></div><div class="kpi"><b>眼睑网格</b><span id="kLidMesh">0 顶点</span></div>',"kpi")
