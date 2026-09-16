@@ -377,12 +377,19 @@ class Agent{
  this.stepPhysics(dt);if(!this.w.population)this.assessManipulationFeedback(dt);
  if(s&&this.phase==='release'&&this.phaseT>.52)this.releaseObject(s);
  if(s&&this.phase==='rise')this.verifyPlacement(s,dt);
- const d=this.h.diagnostics();this.stats.maxBoneLengthErrorM=Math.max(this.stats.maxBoneLengthErrorM,d.maxBoneLengthErrorM);for(const side of['left','right'])if(this.swing?.side!==side)this.stats.maxFootPositionErrorM=Math.max(this.stats.maxFootPositionErrorM,dist(this.h.legs[side].wrist.world.p,this.feet[side].p));
+ const d=this.h.diagnostics();this.stats.maxBoneLengthErrorM=Math.max(this.stats.maxBoneLengthErrorM,d.maxBoneLengthErrorM);
+ for(const side of['left','right'])if(this.swing?.side!==side){
+  const actual=this.h.legs[side].wrist.world,foot=this.locomotion.engine.state.feet[side],rocker=foot.rocker;
+  // Measure the committed heel/forefoot against its independent world pivot.
+  // The ankle is expected to move while that contact remains stationary.
+  const local=rocker?.pitch?rotate(inv(this.h.sourceBind.get(side+'_foot').q),rocker.pivot):[0,0,0];
+  const point=add(actual.p,rotate(actual.q,local)),target=rocker?.pitch?rocker.world:this.feet[side].p;
+  this.stats.maxFootPositionErrorM=Math.max(this.stats.maxFootPositionErrorM,dist(point,target));
+ }
  }catch(e){this.fail(e.message)}}
  activity(){return characterActivity(this);}
  diagnostics(){return{activity:this.activity(),strength:this.strength.report(),basic:this.basic.report(),locomotion:this.locomotion.report(),armSwing:{signal:this.gaitSignal,blend:this.gaitBlend,speedMPS:this.walkSpeed,mode:this.held?'grasp-priority':'contralateral-gait-coupling'},phase:this.phase,paused:this.paused,error:this.error,preflight:this.preflight?{...this.preflight}:null,activeStep:this.skill?{type:this.skill.type,objectId:this.skill.objectId,targetId:this.skill.targetId}:null,plan:this.plan?{steps:this.plan.steps,index:this.index}:null,heldObject:this.held?.id||null,stats:{...this.stats},completionEvidence:[...this.evidence],world:this.w.snapshot(),body:this.h.diagnostics(),interactionMode:'feedback-governed-rigid-body-manipulation',physicalCoupling:this.skill?.coupling?structuredClone(this.skill.coupling):null,physics:this.w.physics.snapshot(),forceDynamicsEnabled:true,forceDynamicsValidated:false,humanLocomotionDynamics:false,motionClock:{stepS:this.clock.step,ticks:this.clock.ticks,droppedSeconds:this.clock.droppedSeconds},physicalFeasibilityReasoning:true,physicalProfile:bodyPhysicalProfile(this.h),openLanguageUnderstanding:false,visualAcceptance:false,productionReady:false}}
 }
-
 
 
 

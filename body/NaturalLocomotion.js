@@ -261,16 +261,26 @@ class TurnCommandFilter {
  report(){return{targetYaw:this.targetYaw,commandYaw:this.commandYaw,velocityRadS:this.velocity,accelerationRadS2:this.acceleration,supportMarginRad:this.supportMarginRad,placementRetargets:this.placementRetargets,method:'support-aware-angular-increment/v2'};}
 }
 class NaturalLocomotion {
- constructor(agent){
-  this.a=agent;const source=agent.h.resolvedRig;this.rig=MotionLab.rigFromSource(source);
+ constructor(agent,{flatSupport=false}={}){
+  this.flatSupport=flatSupport;this.a=agent;const source=agent.h.resolvedRig;this.rig=MotionLab.rigFromSource(source);
   // Source left/right ankle heights differ slightly. Use the higher ankle
   // plane so both individually resolved skin soles clear the flat floor.
   this.skinFloorOffsetM=Math.max(...['left','right'].map(s=>source.nodes[s+'_foot'].positionM[1]-source.sourceFloorM))-this.rig.ankleHeight;
   this.rig.ankleHeight+=this.skinFloorOffsetM;this.rig.hipHeight=agent.h.bodyMetrics.walkingHipHeightM;
   this.standingHipHeightM=agent.h.bodyMetrics.standingHipHeightM;
   this.engine=new MotionLab.MotionController(this.rig);
+  // Keep the navigation anchor contract. Forward placement anticipates both
+  // the swing travel and a short leading stance, rather than landing under
+  // the already advancing pelvis. The kernel still sweeps every target.
+  const stance=this.engine.stance.bind(this.engine);
+  this.engine.stance=(state,side,lead=0)=>stance(state,side,lead>0&&!this.usesFlatSupport(state)?lead*(.60/.38):lead);
+  this.solePivots=Object.fromEntries(['left','right'].map(side=>{
+   const ankle=source.nodes[side+'_foot'].positionM,scale=agent.h.bodyMetrics.statureScale;
+   const toe=Math.max(...Object.entries(source.nodes).filter(([id])=>id.startsWith(side+'_toe_')).map(([,n])=>n.positionM[2]-ankle[2]));
+   return[side,{heel:[0,-this.rig.ankleHeight+.0005,-.045*scale],forefoot:[0,-this.rig.ankleHeight+.0005,toe+.006*scale]}];
+  }));
   const stepFeet=this.engine.stepFeet.bind(this.engine);
-  this.engine.stepFeet=(state,dt)=>{stepFeet(state,dt);this.adaptSwingClearance(state);this.adaptSwingAnkle(state);};
+  this.engine.stepFeet=(state,dt)=>{stepFeet(state,dt);this.adaptSwingClearance(state);if(this.usesFlatSupport())this.adaptSwingAnkle(state);this.adaptFootRocker(state,dt);};
   this.world=new MotionLabWorld(agent);this.engine.world=this.world;
   this.phaseController=new ContinuousMotionPhase(this.engine);this.turnFilter=new TurnCommandFilter();
   this.pose=new MotionLabPose(agent.h,this.engine);agent.h.motionDriver=this.pose;
@@ -286,6 +296,7 @@ class NaturalLocomotion {
   const u=clamp(swing.elapsed/swing.duration,0,1),arc=16*u*u*(1-u)*(1-u);
   state.feet[swing.side].position[1]+=(height-.065)*arc;swing.clearanceHeightM=height;
  }
+ usesFlatSupport(state=this.engine?.state){return state?.flatFootSupport??(this.flatSupport||!!this.a.held);}
  adaptSwingAnkle(state){
   // Only the airborne foot changes pitch. A planted sole still owns its full
   // world anchor; heel/toe rockers require separate support pivots.
@@ -303,6 +314,34 @@ class NaturalLocomotion {
    // clearance as its ankle approaches either endpoint of the swing.
    const extent=.30*this.a.h.bodyMetrics.statureScale;
    foot.swingPitch=clamp(pitch,-Math.atan2(clearance*.8,extent),Math.atan2(clearance*.8,extent));
+  }
+ }
+ adaptFootRocker(state,dt){
+  const speed=state.speed*this.tempo,drive=clamp(speed/.35,0,1);
+  for(const side of ['left','right']){
+   const foot=state.feet[side],swing=state.swing;
+   if(foot.adoptedOrientation||this.usesFlatSupport()){delete foot.rocker;continue;}
+   let pitch=foot.rocker?.pitch||0;
+   if(swing?.side===side){
+    if(swing.rockerFrom===undefined){swing.rockerFrom=pitch;swing.rockerLanding=-.10*drive;}
+    const u=clamp(swing.elapsed/swing.duration,0,1);
+    pitch=u<.5?swing.rockerFrom*(1-smooth(u/.5)):swing.rockerLanding*smooth((u-.5)/.5);
+   }else{
+    const relative=rotate(inv(qy(foot.yaw)),sub(foot.position,state.root));
+    // Leading heel yields to the sole as the pelvis approaches; the trailing
+    // forefoot carries a small heel lift before the next explicit release.
+    let target=drive*(relative[2]>.025?-.10*smooth(clamp((relative[2]-.025)/.08,0,1)):
+     .18*smooth(clamp((-relative[2]-.025)/.06,0,1)));
+    if(state.metrics.steps===(state.rockerStepOrigin||0)&&side!==state.nextFoot)target=0;
+    pitch+=clamp(target-pitch,-1.2*dt,1.2*dt);
+   }
+   if(Math.abs(pitch)<1e-8)pitch=0;
+   const kind=pitch<0?'heel':pitch>0?'forefoot':'sole';
+   const pivot=pitch===0?[0,0,0]:this.solePivots[side][kind],yaw=qy(foot.yaw);
+   const world=add(foot.position,rotate(yaw,pivot));
+   const ankle=sub(world,rotate(qm(yaw,qx(pitch)),pivot));
+   foot.swingPitch=foot.contact?0:pitch;
+   foot.rocker={pitch,kind,pivot:[...pivot],world,ankle};
   }
  }
  // Agent's pose transaction must include the filters outside the pinned
@@ -323,6 +362,7 @@ class NaturalLocomotion {
   const root=leftHip&&rightHip?mix(leftHip,rightHip,.5):[a.pos[0],this.standingHipHeightM,a.pos[2]];
   const world=e.world;e.world=new MotionLab.FlatWorld();e.reset();e.world=world;
   e.state.root=[...root];e.state.yaw=yaw;e.state.time=a.time;
+  e.state.flatFootSupport=this.flatSupport||!!a.held;
   let maximumAdoptedFootResidualM=0;
   for(const side of ['left','right']){
    const foot=preservePoseContacts&&currentFoot(side),orientation=foot&&(h.byId?.get(side+'_foot')?.world?.q||h.legs?.[side]?.wrist?.world?.q);
@@ -352,6 +392,9 @@ class NaturalLocomotion {
   this.sample={motionLab:true,sourceClip:'08_01'};
  }
  request(command){
+  // Support mode changes at a settled action boundary, never by flattening
+  // a rolling sole midway through a step when the held-object state changes.
+  if(this.isSettled()){this.engine.state.flatFootSupport=this.flatSupport||!!this.a.held;this.engine.state.rockerStepOrigin=this.engine.state.metrics.steps;}
   this.requested=true;const key=JSON.stringify(command);
   if(this.requestKey===key&&this.engine.state.command)return;
   const answer=this.engine.command(command);if(!answer.accepted)throw Error(answer.reason);this.requestKey=key;
@@ -623,7 +666,7 @@ class NaturalLocomotion {
   }
   return target;
  }
- isSettled(){return this.kernelSettled()&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
+ isSettled(){return this.kernelSettled()&&Object.values(this.engine.state.feet).every(foot=>!foot.rocker?.pitch)&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
  gaitSupportTarget(){
   // Approximate the support-leg vault from this person's lengths and foot
   // separation. The mild bend is an authored IK reserve, not a clinical norm.
@@ -682,5 +725,6 @@ class NaturalLocomotion {
   traffic:structuredClone(this.traffic),routePassThroughCount:this.routePassThroughCount,poseAdoption:this.lastPoseAdoption?structuredClone(this.lastPoseAdoption):null,
   continuousWalkHandoff:this.lastContinuousWalkHandoff?structuredClone(this.lastContinuousWalkHandoff):null,
   phaseContinuity:this.phaseController.report(),turnContinuity:this.turnFilter.report(),lastTurnContinuity:this.lastTurnContinuity?structuredClone(this.lastTurnContinuity):null,
-  contactBasis:'Motion-Lab explicit foot anchors',pose:this.pose.report(),visualAcceptance:false};}
+  footSupport:{mode:this.usesFlatSupport()?'flat':'heel-sole-forefoot',feet:Object.fromEntries(['left','right'].map(side=>[side,s.feet[side].rocker?structuredClone(s.feet[side].rocker):null]))},
+  contactBasis:'flat placement anchors with explicit heel/forefoot support pivots',pose:this.pose.report(),visualAcceptance:false};}
 }

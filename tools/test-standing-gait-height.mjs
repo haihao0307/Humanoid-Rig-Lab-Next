@@ -15,11 +15,12 @@ const {FullBodyMotion,blend,relaxedHandRotation}=await import('data:text/javascr
 const math=read('source/runtime.template.js').split('// MODULE math')[1].split('function matrix')[0];
 const code=math+'\n'+read('body/ReconstructionRig.js').replace('/*__R2_RIG_JSON__*/',JSON.stringify(rig)).replace('/*__R2_REGIONS_JSON__*/','{}')+'\n'+read('body/CharacterShape.js')+'\n'+read('body/ReferenceMotion.js').replace('/*__R2_MOTION_JSON__*/',read('reconstruction/motion-reference.json'))+'\n'+read('body/ContactHandPose.js')+'\n'+read('body/MotionLabPose.js')+'\n'+read('body/NaturalLocomotion.js');
 const horizontal=(a,b)=>Math.hypot(a[0]-b[0],a[2]-b[2]);
-const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,r2StandingGestureDescriptor,r2SampleMotion,NaturalLocomotion,dist,sub,dot,norm,qangle,qm,qy})',{
+const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,r2StandingGestureDescriptor,r2SampleMotion,NaturalLocomotion,dist,sub,dot,norm,qangle,qm,qy,rotate,inv,add})',{
  structuredClone,SHAPE_SCHEMA,SHAPE_REVISION,normalizeCharacterShape,characterShapeParameterKey,createCharacterShapeField,CHARACTER_DEFORMATION_RULES,HUMAN_GENERATOR_REVISION:'standing-test',
  degrees:r=>r*180/Math.PI,DOWN:[0,-1,0],horizontal,angleDiff:(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b)),bodyPhysicalProfile:h=>({bodyRadiusM:h.bodyMetrics.bodyRadiusM}),MotionLab:{FullBodyMotion,blend,relaxedHandRotation,solveTwoBone,MotionController,rigFromSource,FlatWorld}});
 let frames=0,walks=0,turns=0,stops=0,maxHeightStepM=0,maxFootErrorM=0,maxBoneErrorM=0,maxIdleKneeDegrees=0,minWalkKneeDegrees=180,maxWalkKneeDegrees=0;
 let stanceKneeSum=0,stanceSamples=0,maxStanceKneeDegrees=0,maxSwingPitch=0,minSwingPitch=0,maxPitchStep=0,maxRenderedFootAngle=0;
+let heelSamples=0,forefootSamples=0,maxPivotDriftM=0,maxAnkleLiftM=0,maxRollStep=0;
 const shapes=[{}, {statureScale:.94},{statureScale:1.06},{legProportion:.7,waistWidth:-.2},{legProportion:-.6,hipWidth:.25},
  {shoulderWidth:.75,waistWidth:.2,torsoDepth:.3,armFullness:.5,legFullness:.3},{shoulderWidth:-.35,hipWidth:-.2,waistWidth:-.65,torsoDepth:-.45,armFullness:-.55,legFullness:-.45},{shoulderWidth:.15,hipWidth:.35,waistWidth:.65,torsoDepth:.65,armFullness:.35,legFullness:.5}];
 for(const shape of shapes){
@@ -45,9 +46,20 @@ for(const shape of shapes){
    if(foot.contact)assert.equal(pitch,0,'airborne ankle motion must not rotate a locked support foot');
    const footAngle=api.qangle(candidate.frames.get(side+'_foot').q,api.qm(api.qy(foot.yaw),sourceBind.get(side+'_foot').q));
    maxRenderedFootAngle=Math.max(maxRenderedFootAngle,footAngle);
-   if(foot.contact)assert(footAngle<1e-6,'rendered support sole must retain its planted orientation');
-   assert(Math.abs(pitch-(before.feet[side].swingPitch||0))<.04,'ankle angle must remain continuous at lift-off and landing');
-   const knee=Math.acos(Math.max(-1,Math.min(1,api.dot(api.norm(api.sub(leg.knee,leg.root)),api.norm(api.sub(leg.end,leg.knee))))))*180/Math.PI;
+   const rocker=foot.rocker,previous=before.feet[side].rocker;
+   maxRollStep=Math.max(maxRollStep,Math.abs((rocker?.pitch||0)-(previous?.pitch||0)));
+   assert(Math.abs((rocker?.pitch||0)-(previous?.pitch||0))<.04,'physical ankle pitch must stay continuous through contact changes');
+   if(foot.contact&&!rocker?.pitch)assert(footAngle<1e-6,'flat support must retain its original orientation');
+   if(foot.contact&&rocker?.pitch){
+    if(rocker.kind==='heel')heelSamples++;else forefootSamples++;
+    const f=candidate.frames.get(side+'_foot'),local=api.rotate(api.inv(sourceBind.get(side+'_foot').q),rocker.pivot);
+    const actual=api.add(f.p,api.rotate(f.q,local));
+    assert(api.dist(actual,rocker.world)<1e-7,'rendered heel/forefoot must hit its independent world support');
+    if(before.feet[side].contact&&previous?.kind===rocker.kind){maxPivotDriftM=Math.max(maxPivotDriftM,api.dist(previous.world,rocker.world));assert(api.dist(previous.world,rocker.world)<1e-9,'active support pivot cannot slide');}
+    maxAnkleLiftM=Math.max(maxAnkleLiftM,f.p[1]-foot.position[1]);
+   }
+   const hipFrame=candidate.frames.get(side+'_femur'),kneeFrame=candidate.frames.get(side+'_tibia'),ankleFrame=candidate.frames.get(side+'_foot');
+   const knee=Math.acos(Math.max(-1,Math.min(1,api.dot(api.norm(api.sub(kneeFrame.p,hipFrame.p)),api.norm(api.sub(ankleFrame.p,kneeFrame.p))))))*180/Math.PI;
    if(locomotion.isSettled())maxIdleKneeDegrees=Math.max(maxIdleKneeDegrees,knee);
    if(s.speed>.4){minWalkKneeDegrees=Math.min(minWalkKneeDegrees,knee);maxWalkKneeDegrees=Math.max(maxWalkKneeDegrees,knee);
     assert(s.root[1]<=locomotion.standingTarget()+1e-9,'pelvis must remain within both fixed-length legs reach');
@@ -73,4 +85,5 @@ assert(maxWalkKneeDegrees>30,'walking retains its swing-knee flexion');
 assert(stanceSamples>1000&&stanceKneeSum/stanceSamples<25,'support legs should not stay in the previous deep crouch');
 assert(maxSwingPitch>.02&&minSwingPitch<-.02,'airborne ankle must release and recover instead of staying flat');
 assert(maxRenderedFootAngle>.02,'full pose builder must consume airborne ankle articulation');
-console.log(JSON.stringify({schema:'human/standing_gait_height@2',shapes:shapes.length,frames,walks,turns,stops,maxHeightStepM,maxFootErrorM,maxBoneErrorM,maxIdleKneeDegrees,minWalkKneeDegrees,maxWalkKneeDegrees,stanceSamples,meanStanceKneeDegrees:stanceKneeSum/stanceSamples,maxStanceKneeDegrees,maxSwingPitch,minSwingPitch,maxPitchStep,maxRenderedFootAngle,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
+assert(heelSamples>100&&forefootSamples>100&&maxAnkleLiftM>.01,'walk must transfer heel/forefoot support and allow the ankle to rise');
+console.log(JSON.stringify({schema:'human/standing_gait_height@3',shapes:shapes.length,frames,walks,turns,stops,maxHeightStepM,maxFootErrorM,maxBoneErrorM,maxIdleKneeDegrees,minWalkKneeDegrees,maxWalkKneeDegrees,stanceSamples,meanStanceKneeDegrees:stanceKneeSum/stanceSamples,maxStanceKneeDegrees,maxSwingPitch,minSwingPitch,maxPitchStep,maxRenderedFootAngle,heelSamples,forefootSamples,maxPivotDriftM,maxAnkleLiftM,maxRollStep,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));

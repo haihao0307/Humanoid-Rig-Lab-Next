@@ -15,18 +15,23 @@ try{
  const actors=await page.evaluate(()=>{const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab;lab.setAuto(false);lab.setCameraFollow(false);return lab.population.list().map(a=>({id:a.id,label:a.label}));});
  console.log('READY '+JSON.stringify(actors));
  async function capture(actor,name){
-  for(const [view,angle]of [['front',.15],['side',Math.PI/2]]){
-   const result=await page.evaluate(({id,angle})=>{
+  for(const [view,angle]of [['front',.15],['side',Math.PI/2],...(process.env.MOTION_QA_FEET==='1'?[['feet',Math.PI/2]]:[])]){
+   const result=await page.evaluate(({id,angle,view})=>{
     const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,a=lab.population.get(id),h=a.human,r=lab.renderer;
     lab.render();const compacts=r.compacts,compact=r.compact,tissue=r.tissue;
     // Only visibility changes for this inspection; do not move actors or alter poses.
     const floor=r.lastItems.filter(o=>o.materialKind===5&&!o.id);
     r.compacts=[a.compact];r.compact=a.compact;r.tissue=a.tissue;
-    r.yaw=a.agent.yaw+angle;r.pitch=.035;r.projection='perspective';r.target=[a.agent.pos[0],h.bodyMetrics.statureM*.46,a.agent.pos[2]];r.distance=h.bodyMetrics.statureM*1.8;
+    r.yaw=a.agent.yaw+angle;r.pitch=.035;r.projection='perspective';r.target=[a.agent.pos[0],h.bodyMetrics.statureM*(view==='feet'?.13:.46),a.agent.pos[2]];r.distance=h.bodyMetrics.statureM*(view==='feet'?.65:1.8);
     r.render([...floor,...h.bones,...h.cartilage,...h.tissue.items].filter(o=>o.visible!==false),[]);
     const png=r.canvas.toDataURL('image/png');r.compacts=compacts;r.compact=compact;r.tissue=tissue;
-    return{png,phase:a.agent.phase,posture:a.agent.basic.posture,error:a.agent.error,root:a.agent.pos,yaw:a.agent.yaw,footErrorM:a.agent.stats.maxFootPositionErrorM,ground:h.minimumBoneY(),groundCorrectionM:h.motionDriver.report().groundCorrectionM,bodyResponse:a.agent.locomotion.phaseController.report().bodyResponse,headQ:h.byId.get('head').world.q};
-   },{id:actor.id,angle});
+    const footSupport={},surface=a.compact,all=surface.supportProbes;
+    try{for(const side of ['left','right']){
+     surface.supportProbes=all.filter(p=>p.influences.some(([i,w])=>w>.5&&(h.joints[i].id===side+'_foot'||h.joints[i].id.startsWith(side+'_toe_'))));
+     footSupport[side]={skin:surface.minimumSupportY(),contact:a.agent.locomotion.engine.state.feet[side].contact,rocker:a.agent.locomotion.engine.state.feet[side].rocker||null};
+    }}finally{surface.supportProbes=all;}
+    return{png,phase:a.agent.phase,posture:a.agent.basic.posture,error:a.agent.error,root:a.agent.pos,yaw:a.agent.yaw,footErrorM:a.agent.stats.maxFootPositionErrorM,ground:h.minimumBoneY(),footSupport,groundCorrectionM:h.motionDriver.report().groundCorrectionM,bodyResponse:a.agent.locomotion.phaseController.report().bodyResponse,headQ:h.byId.get('head').world.q};
+   },{id:actor.id,angle,view});
    const file=actor.id+'-'+name+'-'+view+'.png';await writeFile(join(out,file),Buffer.from(result.png.split(',')[1],'base64'));
    delete result.png;records.push({actor:actor.label,file,...result});console.log('CAPTURE '+file+' '+result.phase);
    if(result.error)throw Error(result.error);

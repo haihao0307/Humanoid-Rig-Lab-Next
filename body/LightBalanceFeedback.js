@@ -18,10 +18,11 @@ class LightBalanceFeedback{
  support(state){
   const planted=Object.values(state.feet||{}).filter(foot=>foot.contact!==false&&Array.isArray(foot.position));
   const feet=planted.length?planted:Object.values(state.feet||{}).filter(foot=>Array.isArray(foot.position));
-  const centre=feet.length?mul(feet.reduce((sum,foot)=>add(sum,foot.position),[0,0,0]),1/feet.length):[...state.root];
-  const local=feet.map(foot=>rotate(inv(qy(state.yaw)),sub(foot.position,centre)));
+  const supportPoint=foot=>foot.rocker?.pitch?foot.rocker.world:foot.position;
+  const centre=feet.length?mul(feet.reduce((sum,foot)=>add(sum,supportPoint(foot)),[0,0,0]),1/feet.length):[...state.root];
+  const local=feet.map(foot=>rotate(inv(qy(state.yaw)),sub(supportPoint(foot),centre)));
   const halfX=Math.max(LIGHT_BALANCE_FEEDBACK.footHalfWidthM,...local.map(p=>Math.abs(p[0])+LIGHT_BALANCE_FEEDBACK.footHalfWidthM));
-  const halfZ=Math.max(LIGHT_BALANCE_FEEDBACK.footHalfLengthM,...local.map(p=>Math.abs(p[2])+LIGHT_BALANCE_FEEDBACK.footHalfLengthM));
+  const halfZ=Math.max(.015,...local.map((p,i)=>Math.abs(p[2])+(feet[i].rocker?.pitch ? .015 : LIGHT_BALANCE_FEEDBACK.footHalfLengthM)));
   return{feet,centre,halfX,halfZ};
  }
  update(dt){

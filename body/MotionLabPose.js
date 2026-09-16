@@ -80,7 +80,7 @@ class MotionLabPose {
  }
  controlledFootOrientation(state,side){
   const foot=state.feet[side],bind=this.h.sourceBind.get(side+'_foot').q;
-  if(!foot.adoptedOrientation)return qm(qy(foot.yaw),qm(qx(foot.contact?0:foot.swingPitch||0),bind));
+  if(!foot.adoptedOrientation)return qm(qy(foot.yaw),qm(qx(foot.rocker?.pitch??(foot.contact?0:foot.swingPitch||0)),bind));
   const swing=state.swing;
   if(swing?.side!==side)return [...foot.adoptedOrientation];
   const u=smooth(clamp(swing.elapsed/Math.max(1e-8,swing.duration),0,1));
@@ -133,13 +133,16 @@ class MotionLabPose {
    if(!position||position.length!==3||!position.every(Number.isFinite))throw Error('支撑转换缺少有效脚锚：'+side);
    const footYaw=Number.isFinite(input.yaw)?input.yaw:yaw;
    state.feet[side]={...state.feet[side],position:[...position],yaw:footYaw,contact:true};
+   delete state.feet[side].rocker;
    // Explicit support anchors (including seated preparation) own the whole
    // sole frame. Flattening it around a fixed ankle drives toes into ground.
    if(input.q)state.feet[side].adoptedOrientation=[...input.q];
   }
   if(reference)state.motion={...state.motion,frame:reference,weight:1};
   const controlled=!reference||options.controlledFeet===true;
-  if(controlled&&(options.position||options.feet)){
+  const rockerFeet=controlled&&!options.feet&&Object.values(state.feet).some(foot=>foot.rocker);
+  if(rockerFeet)for(const foot of Object.values(state.feet))if(foot.rocker&&!foot.adoptedOrientation)foot.position=[...foot.rocker.ankle];
+  if(controlled&&(options.position||options.feet||rockerFeet)){
    // Contact extensions lower the pelvis, then use the lab's fixed-length IK
    // against its independent foot anchors. They never scale a bone.
    state.pose=e.solve(state);
@@ -193,6 +196,12 @@ class MotionLabPose {
    const patella=side+'_patella',shank=rotations.get(side+'_tibia');
    positions.set(patella,add(positions.get(side+'_tibia'),rotate(shank,sub(this.source(patella),this.source(side+'_tibia')))));rotations.set(patella,shank);
    if(controlled)errors.push({id:foot,error:dist(positions.get(foot),state.feet[side].position),target:[...state.feet[side].position],targetSpace:'world',effectorLocal:[0,0,0],targetOrientation:this.controlledFootOrientation(state,side),orientationErrorRad:0});
+   const rocker=state.feet[side].rocker;
+   if(controlled&&state.feet[side].contact&&rocker&&rocker.pitch){
+    const local=rotate(inv(h.sourceBind.get(foot).q),rocker.pivot),orientation=this.controlledFootOrientation(state,side);
+    errors.push({id:foot,kind:rocker.kind+'-support',target:[...rocker.world],targetSpace:'world',effectorLocal:local,
+     error:dist(add(positions.get(foot),rotate(orientation,local)),rocker.world),targetOrientation:orientation,orientationErrorRad:0});
+   }
   }
   if(options.hands)for(const side of ['left','right']){
    const goal=options.hands[side];if(!goal)continue;

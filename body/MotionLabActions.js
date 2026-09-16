@@ -69,7 +69,7 @@ function* motionCarrySamplesSteps(h){
  // a private controller, with no writes to live joints, objects or GPU buffers.
  const human={...h},agent={h:human,pos:[0,0,0],yaw:0,time:0,phase:'travel',route:[[0,0,2]],routeIndex:0,
   manipulationPace:()=>1,strength:{movementFactor:()=>1},w:{objects:[],bounds:{xMin:-10,xMax:10,zMin:-10,zMax:10},collision:()=>false}};
- const locomotion=new NaturalLocomotion(agent),states=[structuredClone(locomotion.engine.state)];
+ const locomotion=new NaturalLocomotion(agent,{flatSupport:true}),states=[structuredClone(locomotion.engine.state)];
  for(let i=1;i<=360;i++){yield;agent.time+=1/120;locomotion.move(1/120,.43);locomotion.update(1/120);states.push(structuredClone(locomotion.engine.state));}
  const result={states,pose:locomotion.pose.forPreflight(),engine:locomotion.engine};result.pose.sourceHuman=h;motionCarryStates.set(h,result);return result;
 }
