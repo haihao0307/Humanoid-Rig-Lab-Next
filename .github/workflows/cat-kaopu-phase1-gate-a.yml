@@ -87,6 +87,7 @@ jobs:
         run: python cat-kaopu/tools/verify_cat_phase1_gate_a.py --require-browser
 
       - name: Upload Gate A evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cat-kaopu-phase1-gate-a-${{ github.run_number }}
