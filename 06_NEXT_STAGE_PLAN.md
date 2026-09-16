@@ -1,7 +1,7 @@
-# Next Stage — Chicken R9.8.1 Independent Visual Audit
+# Next Stage — Chicken R9.8.2 Independent Visual Audit
 
-1. Compare neutral left/right/front/top/three-quarter views with the approved construction reference.
-2. Check the embedded spherical eye, short-bill face root, posterior cranium, cheek/jaw support and attached wattles.
-3. Verify the tightened lower-head boundary did not alter the lower neck or body.
+1. Verify that the neutral-gray legacy eye rosettes are gone in left, right and front views.
+2. Check the new spherical eye and upper-lid relationship, short-bill root, cheek/jaw support and attached wattles.
+3. Verify lower-neck and full-body invariants remain unchanged.
 4. Apply only bounded local corrections; do not reopen body, wing, tail or feet.
-5. Keep Rig, skin binding and motion blocked until the whole-head silhouette is accepted.
+5. Keep Rig and Motion blocked until the whole-head visual gate passes.
