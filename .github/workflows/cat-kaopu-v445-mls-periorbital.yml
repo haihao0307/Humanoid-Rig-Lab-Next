@@ -41,12 +41,15 @@ jobs:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/bootstrap_cat_v445_sources.py
 
-      - name: Confirm frozen V4.44 source
+      - name: Freeze V4.44 source exactly once
         shell: bash
         run: |
           set -euo pipefail
           baseline='cat-kaopu/baselines/v4.44/CAT_KAOPU_V444_CONTINUOUS_PERIORBITAL_WORKBENCH_2026-09-16.html'
-          test -f "$baseline"
+          if [ ! -f "$baseline" ]; then
+            mkdir -p "$(dirname "$baseline")"
+            cp cat-kaopu/workbench/CAT_KAOPU_CURRENT.html "$baseline"
+          fi
 
       - name: Build V4.45 MLS periorbital workbench
         env:
