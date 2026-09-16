@@ -10,6 +10,7 @@ on:
       - cat-kaopu/tools/bootstrap/v442/**
       - cat-kaopu/tools/patch_cat_v442_orbital_fit.py
       - cat-kaopu/tools/patch_cat_v442_closed_seam.py
+      - cat-kaopu/tools/patch_cat_v442_lid_face_integration.py
   workflow_dispatch:
 
 permissions:
@@ -49,6 +50,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_v442_closed_seam.py
+
+      - name: Integrate eyelid surface into face
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v442_lid_face_integration.py
 
       - name: Freeze V4.41 source exactly once
         shell: bash
@@ -137,7 +143,7 @@ jobs:
             echo 'No V4.42 changes to commit.'
             exit 0
           fi
-          git commit -m 'build(cat): refine V4.42 closed-lid seam and browser evidence [cat-v442 generated]'
+          git commit -m 'build(cat): integrate V4.42 eyelids with face and refresh evidence [cat-v442 generated]'
           for attempt in 1 2 3; do
             if git push origin "HEAD:${GITHUB_REF_NAME}"; then
               exit 0
