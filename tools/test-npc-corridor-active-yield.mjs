@@ -52,11 +52,14 @@ world.path=(start,end,r=.3,ignore=[])=>{
  return route;
 };
 const specs=[['npc-a',[0,0,-2.5],[0,0,2.5],0],['npc-b',[0,0,2.5],[0,0,-2.5],Math.PI]];
+const skewClocks=process.argv.includes('--skew-clocks');
 const actors=specs.map(([id,start,goal,yaw],index)=>{
  const human=index===0?referenceHuman:makeHuman(),agent={npcId:id,h:human,pos:[start[0],0,start[2]],yaw,time:0,index:0,phase:'walk',held:null,skill:{type:'walk'},route:[[...goal]],routeIndex:0,manipulationPace:()=>1,strength:{movementFactor:()=>1},walkSpeed:0,w:world,logs:[],log(message){this.logs.push(message);}};
+ if(skewClocks)agent.time=index?100:10;
  const actor={id,label:id,human,agent,goal,disposed:false,done:false};actor.locomotion=new api.NaturalLocomotion(agent);agent.locomotion=actor.locomotion;return actor;
 });
 world.population={
+ elapsedS:0,
  values:()=>actors,
  collisionFor:(agent,p,r)=>actors.some(other=>other.agent!==agent&&!other.disposed&&horizontal(p,other.agent.pos)<r+other.human.bodyMetrics.bodyRadiusM+.06),
  sweepFor:(agent,start,end,r)=>actors.filter(other=>other.agent!==agent&&!other.disposed).reduce((fraction,other)=>Math.min(fraction,api.motionCircleSweep(start,end,other.agent.pos,r+other.human.bodyMetrics.bodyRadiusM+.06)),1)
@@ -65,6 +68,7 @@ const stateRows=()=>actors.map(actor=>({id:actor.id,done:actor.done,position:act
 const debug=(failed,error)=>({failed,error:error.message,frame:frames,bodyRadiusM,corridorHalf,actors:stateRows()});
 let minSeparation=Infinity,frames=0,maxConcurrentOwners=0,circulationTravelM=0;
 for(;frames<10000&&!actors.every(actor=>actor.done);frames++){
+ world.population.elapsedS+=1/120;
  const before=new Map(actors.map(actor=>[actor.id,[...actor.agent.pos]]));
  const order=frames%2?actors:[...actors].reverse();
  for(const actor of order){
@@ -87,4 +91,6 @@ assert.equal(maxConcurrentOwners,1,'the exclusive direction owner must be observ
 assert(yields>=1,'the opposite direction must actively retreat or side-step');
 assert(circulationTravelM>.1,'the non-owner must keep circulating instead of parking');
 assert(actors.some(actor=>actor.agent.logs.some(message=>message.includes('循环路线'))));
-console.log(JSON.stringify({passed:true,agents:2,frames,bodyRadiusM,corridorHalf,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,maxConcurrentOwners,circulationTravelM,parkingWait:false}));
+const recoveries=actors.reduce((n,actor)=>n+actor.locomotion.traffic.recoveries,0),ownerManeuvers=actors.reduce((n,actor)=>n+(actor.locomotion.traffic.corridorManeuvers||0),0);
+assert(recoveries<128,'corridor must not repeatedly recover without route completion');
+console.log(JSON.stringify({passed:true,agents:2,frames,skewClocks,bodyRadiusM,corridorHalf,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,maxConcurrentOwners,circulationTravelM,recoveries,ownerManeuvers,parkingWait:false}));

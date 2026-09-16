@@ -268,7 +268,7 @@ class NPCPopulation {
   const result=actors.map(actor=>{try{
    if(this.isReserved(actor.agent))throw Error('此人物由任务面板或持续日常控制');
    if(actor.agent.characterEditInProgress)throw Error('此人物正在更新外观');
-   if(actor.queue.length>=64)throw Error('此人物等待队列已满');
+   if(mode==='append'&&actor.queue.length>=64)throw Error('此人物等待队列已满');
    parse(text,this.lab.world,actor.agent.lastObject); // Syntax/targets only; forecast again at execution time.
    if(mode==='replace'){if(actor.agent.held)throw Error('此人物仍在持物，请先继续完成放置');actor.agent.cancel();actor.queue=[];actor.running=null;}
    actor.behavior.enabled=false;actor.behavior.status='stopped';actor.behavior.error=null;actor.queue.push({text:text.trim(),source:'manual'});actor.agent.paused=false;this.pump(actor);if(actor.behavior.error)throw Error(actor.behavior.error);
@@ -339,6 +339,7 @@ class NPCPopulation {
   // Includes pauses/task changes made by the semantic and routine entry points.
   // Paused actors still remain physical obstacles in sweepFor/collisionFor.
   if(typeof trafficPruneIntersections==='function')trafficPruneIntersections(this,trafficRuntime(this),this.elapsedS);
+  if(typeof trafficPruneCorridors==='function')trafficPruneCorridors(this,trafficRuntime(this),this.elapsedS);
   for(const actor of this.values()){
    if(actor.disposed||actor.agent.characterEditInProgress)continue;
    const tickStarted=this.observation?.recording?performance.now():null;

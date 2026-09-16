@@ -16,7 +16,7 @@ const code=math+'\n'+read('body/ReconstructionRig.js').replace('/*__R2_RIG_JSON_
 const horizontal=(a,b)=>Math.hypot(a[0]-b[0],a[2]-b[2]);
 const objectRadius=o=>o.shape==='box'?Math.hypot(o.w,o.d)/2:o.r;
 const objectFootprint=o=>o.shape==='box'?[o.w/2,o.d/2]:[o.r,o.r];
-const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,NaturalLocomotion,motionCircleSweep,trafficRuntime,dist})',{
+const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,NaturalLocomotion,motionCircleSweep,trafficRuntime,trafficPruneIntersections,dist})',{
  structuredClone,SHAPE_SCHEMA,SHAPE_REVISION,normalizeCharacterShape,characterShapeParameterKey,createCharacterShapeField,CHARACTER_DEFORMATION_RULES,HUMAN_GENERATOR_REVISION:'four-way-crossing-test',
  degrees:r=>r*180/Math.PI,DOWN:[0,-1,0],horizontal,angleDiff:(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b)),objectTilted:()=>false,objectYaw:()=>0,objectRadius,objectFootprint,
  bodyPhysicalProfile:h=>({bodyRadiusM:h.bodyMetrics.bodyRadiusM}),carryRouteRadius:()=>.55,MotionLab:{FullBodyMotion,blend,relaxedHandRotation,solveTwoBone,MotionController,rigFromSource,FlatWorld}});
@@ -40,6 +40,7 @@ const actors=specs.map(([id,start,goal,yaw])=>{
  const actor={id,label:id,human,agent,goal,disposed:false,done:false};actor.locomotion=new api.NaturalLocomotion(agent);agent.locomotion=actor.locomotion;return actor;
 });
 world.population={
+ elapsedS:0,
  values:()=>actors,
  collisionFor:(agent,p,r)=>actors.some(other=>other.agent!==agent&&!other.disposed&&horizontal(p,other.agent.pos)<r+other.human.bodyMetrics.bodyRadiusM+.06),
  sweepFor:(agent,start,end,r)=>actors.filter(other=>other.agent!==agent&&!other.disposed).reduce((fraction,other)=>Math.min(fraction,api.motionCircleSweep(start,end,other.agent.pos,r+other.human.bodyMetrics.bodyRadiusM+.06)),1)
@@ -49,11 +50,17 @@ const debugState=(failed,error)=>({
  actors:actors.map(actor=>({id:actor.id,done:actor.done,position:actor.agent.pos,yaw:actor.agent.yaw,goal:actor.goal,routeIndex:actor.agent.routeIndex,route:actor.agent.route,command:actor.locomotion.engine.state.command,status:actor.locomotion.engine.state.status,fault:actor.locomotion.engine.state.fault,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-8)})),
  separations:actors.flatMap((a,i)=>actors.slice(i+1).map(b=>({pair:[a.id,b.id],distance:horizontal(a.agent.pos,b.agent.pos)})))
 });
+const pauseOwner=process.argv.includes('--pause-owner');let pausedActor=null,pauseFrame=-1,frozenTime=null;
 let minSeparation=Infinity,frames=0;
 for(;frames<12000&&!actors.every(actor=>actor.done);frames++){
+ world.population.elapsedS+=1/120;
+ const activeLease=[...api.trafficRuntime(world.population).intersections.values()][0];
+ if(pauseOwner&&!pausedActor&&activeLease){pausedActor=actors.find(actor=>actor.id===activeLease.ownerId);pauseFrame=frames;frozenTime=pausedActor.agent.time;pausedActor.agent.paused=true;}
+ if(pausedActor&&frames===pauseFrame+120){assert.equal(pausedActor.agent.time,frozenTime,'paused actor clock must remain frozen');pausedActor.agent.paused=false;}
+ api.trafficPruneIntersections(world.population,api.trafficRuntime(world.population),world.population.elapsedS);
  const order=frames%2?actors:[...actors].reverse();
  for(const actor of order){
-  if(actor.done)continue;const a=actor.agent,l=actor.locomotion;a.time+=1/120;
+  if(actor.done||actor.agent.paused)continue;const a=actor.agent,l=actor.locomotion;a.time+=1/120;
   try{const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving)actor.done=true;}catch(error){console.error('FOUR_WAY_DEBUG '+JSON.stringify(debugState(actor.id,error)));throw Error(actor.id+': '+error.message);}
  }
  for(const lease of api.trafficRuntime(world.population).intersections.values()){
@@ -73,4 +80,5 @@ const intersectionClaims=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic
 assert(intersectionClaims>=1,'crossing must exercise assembled shared ownership');
 assert(intersectionYields>=2,'non-owners must exercise circulation');
 assert(actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.recoveries,0)<128,'motion kernel must not repeatedly recover');
-console.log(JSON.stringify({passed:true,agents:4,frames,minSeparationM:minSeparation,trafficActions,intersectionClaims,intersectionYields,parkingWait:false}));
+if(pauseOwner)assert(pausedActor&&!pausedActor.agent.paused,'pause/resume scenario must run');
+console.log(JSON.stringify({passed:true,agents:4,frames,pauseOwner,minSeparationM:minSeparation,trafficActions,intersectionClaims,intersectionYields,parkingWait:false}));

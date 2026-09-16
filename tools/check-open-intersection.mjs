@@ -15,7 +15,7 @@ export function checkOpenIntersectionSources({parse,read,assert}){
  check(ordered(runtime,['/*__SOURCE:'+module+'__*/','/*__SOURCE:body/NaturalLocomotion.js__*/']),'runtime inclusion order');
  check(!manifest.modules.some(p=>p.includes('NPCTaskCoordinator')),'no parallel task scheduler');
  check(!/\.queue\b|\.selected\b|\.pose\s*\(|\.solve\s*\(|\.command\s*\(|\.engine\.state\.\w+\s*=/.test(source),'coordinator does not own queues, selection, poses or kernel commands');
- check(fn('trafficIntersectionNow').includes('population.elapsedS')&&!/\ba\.time\b/.test(source),'leases use a shared clock');
+ check(fn('trafficIntersectionNow').includes('trafficPopulationNow(agent.w.population)')&&gait.includes('Number.isFinite(population?.elapsedS)')&&!/\ba\.time\b/.test(source),'leases use a shared clock');
  const active=fn('trafficIntersectionActive');
  for(const guard of ['!actor.disposed','!a.paused','!a.error','!a.characterEditInProgress',"a.skill?.type==='walk'",'a.routeIndex<a.route.length'])check(active.includes(guard),'active member guard '+guard);
  const resolve=fn('trafficResolveOpenIntersection');
@@ -36,6 +36,11 @@ export function checkOpenIntersectionSources({parse,read,assert}){
  for(const name of ['control','releaseObjects','disposeAll'])check(npc(name).includes('releaseIntersection'),'population lifecycle '+name);
  check(npc('tickFixed').includes('trafficPruneIntersections(this,trafficRuntime(this),this.elapsedS)'),'external pause and task transition cleanup');
  const maintain=fn('trafficMaintainOpenIntersection');
+ check(maintain.includes('now-lease.blockedSinceS>=TRAFFIC_INTERSECTION.blockedRotationS'),'blocked owner receives elapsed time to maneuver before another rotation');
+ check(fn('trafficIntersectionAssignOwner').includes('lease.blockedSinceS=null'),'each new owner starts a fresh blocked interval');
+ check(fn('trafficIntersectionMobileEscape').includes('axisAlignment<Math.abs(dot(radialDirection,lease.ownerEntry))-.01'),'members can progressively leave a changed owner axis');
+ for(const name of ['resolveNarrowCorridor','maintainCorridor'])check(motion(name).includes('trafficPopulationNow(population)')&&!motion(name).includes('expiresAtS=a.time'),'corridor uses shared time in '+name);
+ check(npc('dispatch').includes("mode==='append'&&actor.queue.length>=64"),'full queue can be replaced after validation');
  check(maintain.includes('return a.route[a.routeIndex]||null')&&maintain.includes('!locomotion.normalizeCorridorRoute'),'route restoration checked and refreshed');
  check(maintain.includes("if(!orbit)throw Error('开放交叉区域让出通行权后没有可用的外侧机动路线')"),'former owner cannot use owner fallback after yielding');
  const crossing=read('tools/test-npc-four-way-crossing.mjs'),browser=read('tools/test-task-crowd-browser.mjs');syntax(crossing);syntax(browser);

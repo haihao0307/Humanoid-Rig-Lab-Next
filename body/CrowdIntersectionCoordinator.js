@@ -1,13 +1,10 @@
 /* Open intersections are coordinated as one shared traffic resource.
  * A single actor crosses while all other members keep moving on deterministic
  * outside lanes. This module does not own tasks, bodies, poses or step timing. */
-const TRAFFIC_INTERSECTION=Object.freeze({clusterRadiusM:2.7,mergeRadiusM:1.20,enterRadiusM:.72,releaseRadiusM:1.08,ownerLeaseS:10,maximumRotations:16,baseOrbitM:1.08,laneGapM:.24});
+const TRAFFIC_INTERSECTION=Object.freeze({clusterRadiusM:2.7,mergeRadiusM:1.20,enterRadiusM:.72,releaseRadiusM:1.08,ownerLeaseS:10,blockedRotationS:1.5,maximumRotations:16,baseOrbitM:1.08,laneGapM:.24});
 // Actor clocks stop independently on pause. All leases use the population clock.
 function trafficIntersectionNow(agent){
- const population=agent.w.population;
- if(Number.isFinite(population?.elapsedS))return population.elapsedS;
- // Minimal motion harnesses do not own a population FixedClock.
- return Math.max(0,...[...(population?.values()||[])].map(actor=>Number(actor.agent?.time)||0));
+ return trafficPopulationNow(agent.w.population);
 }
 function trafficIntersectionKey(center){return'intersection:'+Math.round(center[0]*2)/2+','+Math.round(center[2]*2)/2;}
 function trafficIntersectionActive(actor){
@@ -35,7 +32,7 @@ function trafficIntersectionAssignOwner(lease,population,now){
  const candidates=[...lease.members.entries()].map(([id,member])=>({id,member,actor:live.get(id)})).filter(row=>row.actor&&trafficTaskKey(row.actor.agent)===row.member.taskKey).sort((a,b)=>a.member.order-b.member.order||a.member.joinedAtS-b.member.joinedAtS||String(a.id).localeCompare(String(b.id)));
  if(!candidates.length){lease.ownerId=null;return null;}
  const chosen=candidates[0],root=chosen.actor.agent.locomotion?.engine?.state?.root||chosen.actor.agent.pos,offset=[root[0]-lease.center[0],0,root[2]-lease.center[2]];
- lease.ownerId=chosen.id;lease.ownerEntry=len(offset)>.08?norm(offset):[0,0,1];lease.ownerEntered=false;lease.ownerMinDistance=horizontal(root,lease.center);lease.expiresAtS=now+TRAFFIC_INTERSECTION.ownerLeaseS;
+ lease.ownerId=chosen.id;lease.ownerEntry=len(offset)>.08?norm(offset):[0,0,1];lease.ownerEntered=false;lease.ownerMinDistance=horizontal(root,lease.center);lease.expiresAtS=now+TRAFFIC_INTERSECTION.ownerLeaseS;lease.blockedSinceS=null;
  return lease.ownerId;
 }
 function trafficIntersectionSyncMembers(lease,population){
@@ -107,7 +104,11 @@ function trafficIntersectionMobileEscape(locomotion,lease,context,{ownerFallback
  let repel=[0,0,0];for(const row of neighbours){let away=sub(root,row.actor.agent.pos);away[1]=0;if(len(away)<1e-6)away=[trafficPairSide(a.npcId,row.actor.id),0,1];repel=add(repel,mul(norm(away),1/Math.max(.15,row.clearance+.38)**2));}
  let radial=sub(root,center);radial[1]=0;if(len(radial)<.06)radial=[trafficPairSide(a.npcId,lease.key),0,1];const radialDirection=norm(radial),tangent=mul(norm([radialDirection[2],0,-radialDirection[0]]),lease.direction);
  const base=ownerFallback?add(repel,mul(radialDirection,.35)):add(add(repel,mul(radialDirection,.70)),mul(tangent,.35)),baseDirection=len(base)>.06?norm(base):radialDirection,baseAngle=Math.atan2(baseDirection[0],baseDirection[2]),currentRadius=horizontal(root,center),angles=[0,.28,-.28,.56,-.56,.88,-.88,1.20,-1.20,Math.PI],distances=[.16,.24,.34,.46,.62,.82];let best=null;
- for(const distance of distances)for(const delta of angles){const angle=baseAngle+delta,direction=[Math.sin(angle),0,Math.cos(angle)],point=add(root,mul(direction,distance));point[1]=0;const nextRadial=sub(point,center),nextRadius=len(nextRadial),axisClear=ownerFallback||!lease.ownerEntry||nextRadius<.08||Math.abs(dot(norm(nextRadial),lease.ownerEntry))<.78;
+ for(const distance of distances)for(const delta of angles){const angle=baseAngle+delta,direction=[Math.sin(angle),0,Math.cos(angle)],point=add(root,mul(direction,distance));point[1]=0;const nextRadial=sub(point,center),nextRadius=len(nextRadial),axisAlignment=lease.ownerEntry&&nextRadius>.08?Math.abs(dot(norm(nextRadial),lease.ownerEntry)):0;
+  // A new owner can turn the reserved axis underneath an existing member.
+  // Permit swept steps that move it progressively out of that cone, rather
+  // than requiring one short step to clear the whole cone immediately.
+  const axisClear=ownerFallback||!lease.ownerEntry||axisAlignment<.78||axisAlignment<Math.abs(dot(radialDirection,lease.ownerEntry))-.01;
   if(!axisClear||!ownerFallback&&nextRadius<TRAFFIC_INTERSECTION.enterRadiusM+.16||!locomotion.world.free(point,.23)||!trafficSegmentClear(a,root,point,context))continue;
   const minimum=neighbours.length?Math.min(...neighbours.map(row=>horizontal(point,row.actor.agent.pos)-row.threshold)):2,laneError=Math.abs(nextRadius-desiredRadius),outward=nextRadius-currentRadius,tangentProgress=dot(direction,tangent),score=minimum*5-laneError*.72+outward*.22+tangentProgress*.16-distance*.025;
   if(!best||score>best.score)best={point,score};
@@ -137,9 +138,12 @@ function trafficMaintainOpenIntersection(locomotion,context,target){
  if(passed){lease.members.delete(a.npcId);lease.ownerId=null;if(!lease.members.size)runtime.intersections.delete(lease.key);else{trafficIntersectionAssignOwner(lease,population,trafficIntersectionNow(a));trafficIntersectionSyncMembers(lease,population);}trafficIntersectionClearState(traffic);if(goal&&!locomotion.normalizeCorridorRoute(context,goal))throw Error('穿过交叉区域后无法恢复任务路线');a.log?.('已穿过开放交叉区域并释放通行权');return null;}
  if(trafficIntersectionNow(a)>=lease.expiresAtS){const current=lease.members.get(a.npcId);if(current)current.order=lease.nextOrder++;lease.ownerId=null;lease.rotations++;if(lease.rotations>TRAFFIC_INTERSECTION.maximumRotations)throw Error('开放交叉区域完成 16 次主动轮换后仍未形成可通行顺序');trafficIntersectionAssignOwner(lease,population,trafficIntersectionNow(a));trafficIntersectionSyncMembers(lease,population);traffic.intersectionRotations++;if(lease.ownerId!==a.npcId){a.log?.('开放交叉区域本轮未通过，已继续外侧循环并把通行权交给下一人物');const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context)||trafficIntersectionMobileEscape(locomotion,lease,context);if(!orbit)throw Error('开放交叉区域轮换后没有可用机动路线');return orbit;}}
  traffic.active=false;traffic.mode='intersection-owner';traffic.reason='open-intersection-owner';traffic.intersectionOwner=a.npcId;
- if(target&&locomotion.world.free(target,.23)&&trafficSegmentClear(a,root,target,context))return target;
- const advance=trafficIntersectionOwnerAdvanceTarget(locomotion,lease,context,target);if(advance)return advance;
- const current=lease.members.get(a.npcId);if(current&&lease.members.size>1){
+ if(target&&locomotion.world.free(target,.23)&&trafficSegmentClear(a,root,target,context)){lease.blockedSinceS=null;return target;}
+ const advance=trafficIntersectionOwnerAdvanceTarget(locomotion,lease,context,target);if(advance){lease.blockedSinceS=null;return advance;}
+ // A blocked sample is not a completed attempt. Give the current owner time
+ // to move away before rotating; subsequent actors in this tick cannot churn.
+ const now=trafficIntersectionNow(a);lease.blockedSinceS??=now;
+ const current=lease.members.get(a.npcId);if(current&&lease.members.size>1&&now-lease.blockedSinceS>=TRAFFIC_INTERSECTION.blockedRotationS){
   current.order=lease.nextOrder++;lease.ownerId=null;lease.rotations++;if(lease.rotations>TRAFFIC_INTERSECTION.maximumRotations)throw Error('开放交叉区域完成 16 次主动轮换后仍未形成可通行顺序');
   trafficIntersectionAssignOwner(lease,population,trafficIntersectionNow(a));trafficIntersectionSyncMembers(lease,population);traffic.intersectionRotations++;a.log?.('开放交叉区域当前出口受阻，已主动让出通行权并继续外侧机动');
   if(lease.ownerId!==a.npcId){const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context)||trafficIntersectionMobileEscape(locomotion,lease,context);if(!orbit)throw Error('开放交叉区域让出通行权后没有可用的外侧机动路线');return orbit;}
