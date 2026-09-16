@@ -68,6 +68,11 @@ try{
    goals.set(actor.id,[position[0]+Math.sin(yaw)*distanceM,0,position[2]+Math.cos(yaw)*distanceM]);
    a.submitPlan({schema:'knowledge_human/checked_semantic_plan@1.0',steps:[{type:'walk',direction:'forward',distanceM,referenceFrame:'self'}]});
   }
+  const failures=[],originalFail=new Map(test.map(actor=>[actor.id,actor.agent.fail]));
+  for(const actor of test)actor.agent.fail=function(message){
+   if(failures.length<4)failures.push({id:actor.id,message,time:pop.elapsedS,actors:test.map(row=>({id:row.id,position:[...row.agent.pos],radius:row.human.bodyMetrics.bodyRadiusM,shape:row.human.resolvedRig?.shape,route:structuredClone(row.agent.route),routeIndex:row.agent.routeIndex,traffic:structuredClone(row.agent.locomotion.traffic)})),bounds:{...world.bounds},objects:world.objects.map(o=>({id:o.id,shape:o.shape,p:[...o.p],w:o.w,d:o.d,r:o.r,yaw:o.yaw,q:o.q,collidable:o.collidable}))});
+   return originalFail.get(actor.id).call(this,message);
+  };
   let minSeparation=Infinity,frames=0,trafficActions=0;
   for(;frames<12000;frames++){
    pop.tick(1/120);
@@ -81,13 +86,15 @@ try{
    if(completedAt.size===test.length)break;
   }
   for(const actor of test){const t=actor.agent.locomotion.traffic;trafficActions+=['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations','intersectionClaims','intersectionYields','intersectionLaps','intersectionRotations'].reduce((sum,key)=>sum+(Number(t?.[key])||0),0);}
+  for(const actor of test)actor.agent.fail=originalFail.get(actor.id);
   pop.focus(test.map(actor=>actor.id));lab.render();
   return{
-   center,frames,minSeparationM:minSeparation,trafficActions,parkingWait:test.some(actor=>Object.hasOwn(actor.agent.locomotion.traffic,'waitS')),
+   center,frames,failures,minSeparationM:minSeparation,trafficActions,parkingWait:test.some(actor=>Object.hasOwn(actor.agent.locomotion.traffic,'waitS')),
    actors:test.map(actor=>({id:actor.id,label:actor.label,completed:actor.agent.stats.completed-baselines.get(actor.id),error:actor.agent.error,pathLengthM:path.get(actor.id),directDistanceM:distanceM,pathRatio:path.get(actor.id)/distanceM,maxStationaryS:maxStationary.get(actor.id)/120,goalErrorM:horizontal(actor.agent.pos,goals.get(actor.id)),traffic:{...actor.agent.locomotion.traffic}}))
   };
  });
  console.log('CROSSING_METRICS '+JSON.stringify(crossing));
+ await writeFile('artifacts/task-crowd-crossing-r27.json',JSON.stringify(crossing,null,2));
  assert(crossing.actors.every(actor=>actor.completed>=1),'all four browser actors must finish the crossing');
  assert(crossing.actors.every(actor=>!actor.error),'four-way crossing produced an agent error');
  assert(crossing.minSeparationM>.49,'four-way browser crossing lost body clearance');

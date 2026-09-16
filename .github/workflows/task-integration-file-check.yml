@@ -46,6 +46,7 @@ jobs:
         run: |
           node tools/test-npc-persistent.mjs
           node tools/test-npc-traffic-lifecycle.mjs
+          node tools/test-npc-intersection-escape.mjs
           node tools/test-npc-task-selection-bridge.mjs
           node tools/test-npc-target-reservations.mjs
           node tools/test-npc-resource-circulation.mjs
@@ -55,5 +56,7 @@ jobs:
           node tools/test-npc-traffic-wait.mjs
           node tools/test-npc-four-way-crossing.mjs
           node tools/test-npc-four-way-crossing.mjs --pause-owner
+          node tools/test-npc-four-way-crossing.mjs --review-cast
+          node tools/test-npc-four-way-crossing.mjs --camp-layout
           node tools/test-npc-corridor-active-yield.mjs
           node tools/test-npc-corridor-active-yield.mjs --skew-clocks
