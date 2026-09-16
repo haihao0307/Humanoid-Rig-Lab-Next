@@ -1,0 +1,112 @@
+name: Chicken R9.9 Gameplay Head
+
+on:
+  push:
+    branches:
+      - chat/chicken-phase1-continuation-20260916
+    paths:
+      - .github/workflows/chicken-r99-gameplay-head.yml
+      - tools/build_chicken_r99.py
+      - tools/capture_chicken_r99.mjs
+      - CHICKEN_V46_R9_1.html
+      - reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chicken-r99-gameplay-head
+  cancel-in-progress: true
+
+jobs:
+  build-audit-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out working branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify source tools
+        shell: bash
+        run: |
+          test -s CHICKEN_V46_R9_1.html
+          test -s tools/build_chicken_r99.py
+          test -s tools/capture_chicken_r99.mjs
+          test -s reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png
+          python -m py_compile tools/build_chicken_r99.py
+          node --check tools/capture_chicken_r99.mjs
+
+      - name: Build deterministic R9.9 executable
+        run: python tools/build_chicken_r99.py
+
+      - name: Install Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Install Playwright Core
+        run: npm install --no-save playwright-core@1.55.0
+
+      - name: Run browser QA and capture fixed views
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          CHICKEN_R99_URL: http://127.0.0.1:8765/CHICKEN_V46_R9_9_GAMEPLAY_HEAD.html
+          CHICKEN_R91_URL: http://127.0.0.1:8765/CHICKEN_V46_R9_1.html
+        shell: bash
+        run: |
+          python -m http.server 8765 > /tmp/chicken-r99-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 2
+          node tools/capture_chicken_r99.mjs
+
+      - name: Refresh manifest after browser QA
+        run: python tools/build_chicken_r99.py
+
+      - name: Verify technical gates
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          required = [
+              Path('CHICKEN_V46_R9_9_GAMEPLAY_HEAD.html'),
+              Path('data/CHICKEN_R99_GAMEPLAY_HEAD_PARAMETERS.json'),
+              Path('qa/CHICKEN_R99_STATIC_QA.json'),
+              Path('qa/CHICKEN_R99_BROWSER_QA.json'),
+              Path('BUILD_MANIFEST_R99.json'),
+              Path('evidence/r99/R99_REVIEW_BOARD.html'),
+          ]
+          missing = [str(path) for path in required if not path.exists() or path.stat().st_size == 0]
+          if missing:
+              raise SystemExit(f'Missing R9.9 files: {missing}')
+          for path in [Path('qa/CHICKEN_R99_STATIC_QA.json'), Path('qa/CHICKEN_R99_BROWSER_QA.json')]:
+              data = json.loads(path.read_text(encoding='utf-8'))
+              if not data.get('passed'):
+                  raise SystemExit(f'Technical QA failed: {path}')
+          print('R9.9 deterministic and browser gates passed. Manual visual acceptance remains open.')
+          PY
+
+      - name: Upload R9.9 visual evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: chicken-r99-gameplay-head-${{ github.run_number }}
+          path: |
+            CHICKEN_V46_R9_9_GAMEPLAY_HEAD.html
+            data/CHICKEN_R99_GAMEPLAY_HEAD_PARAMETERS.json
+            qa/CHICKEN_R99_STATIC_QA.json
+            qa/CHICKEN_R99_BROWSER_QA.json
+            evidence/r99
+            BUILD_MANIFEST_R99.json
+            reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png
+            tools/build_chicken_r99.py
+            tools/capture_chicken_r99.mjs
+          if-no-files-found: error
+          retention-days: 7
