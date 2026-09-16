@@ -1,0 +1,45 @@
+name: Chicken Phase 1 Rig Adapter
+
+on:
+  push:
+    branches:
+      - chat/chicken-phase1-continuation-20260916
+      - codex/chicken-r9-2-head-restore
+    paths:
+      - runtime/chicken_phase1_npc_controller.mjs
+      - runtime/chicken_phase1_rig_adapter.mjs
+      - tests/chicken_phase1_npc_controller.test.mjs
+      - tests/chicken_phase1_rig_adapter.test.mjs
+      - data/CHICKEN_PHASE1_NPC_CONTRACT.json
+      - .github/workflows/chicken-phase1-rig-adapter.yml
+  pull_request:
+    paths:
+      - runtime/chicken_phase1_npc_controller.mjs
+      - runtime/chicken_phase1_rig_adapter.mjs
+      - tests/chicken_phase1_npc_controller.test.mjs
+      - tests/chicken_phase1_rig_adapter.test.mjs
+      - data/CHICKEN_PHASE1_NPC_CONTRACT.json
+      - .github/workflows/chicken-phase1-rig-adapter.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rig-adapter-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run controller tests
+        run: node --test tests/chicken_phase1_npc_controller.test.mjs
+
+      - name: Run rig adapter tests
+        run: node --test tests/chicken_phase1_rig_adapter.test.mjs
