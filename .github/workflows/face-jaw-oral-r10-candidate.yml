@@ -1,5 +1,5 @@
 name: Face jaw and oral anatomy R10 candidate
-# Retry after replacing both R9 mouth-gate source contracts.
+# Capture WebGL pixels directly; page-level screenshot stability is irrelevant.
 
 on:
   push:
@@ -46,6 +46,10 @@ jobs:
           node tools/test-face-review-entry.mjs
           node tools/test-npc-face-uniforms.mjs
           node tools/test-face-startup.mjs
+      - name: Persist candidate source diff
+        run: |
+          mkdir -p visual-review-r10
+          git diff -- body/FaceAnatomy.js body/FaceControls.js body/FaceControlRecipe.json body/CompactWorkbench.js control/NPCPopulation.js tools/check-face-anatomy.mjs tools/check-face-controls.mjs tools/test-npc-face-uniforms.mjs > visual-review-r10/face-r10-source.diff
       - name: Install isolated browser runtime
         run: |
           mkdir -p /tmp/face-r10-browser
@@ -58,7 +62,6 @@ jobs:
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/hrl-face-r10-server.log 2>&1 &
           NODE_PATH=/tmp/face-r10-browser/node_modules node tools/capture-face-jaw-oral-r10.cjs
-          git diff -- body/FaceAnatomy.js body/FaceControls.js body/FaceControlRecipe.json body/CompactWorkbench.js control/NPCPopulation.js tools/check-face-anatomy.mjs tools/check-face-controls.mjs tools/test-npc-face-uniforms.mjs > visual-review-r10/face-r10-source.diff
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
