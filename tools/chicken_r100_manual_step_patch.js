@@ -11,8 +11,24 @@
    if(attempts>1200)clearInterval(timer);
    return;
   }
-  const reset=({yaw=0}={})=>{
-   const controller=runtime.controller;
+
+  const controller=runtime.controller;
+  const originalUpdate=controller.update.bind(controller);
+  runtime.manualQaPause=false;
+  runtime.manualQaStepping=false;
+  controller.update=(dt,ctx)=>{
+   if(runtime.manualQaPause&&!runtime.manualQaStepping){
+    return runtime.lastPose||originalUpdate(dt,ctx);
+   }
+   return originalUpdate(dt,ctx);
+  };
+
+  const pauseRealtime=(value=true)=>{
+   runtime.manualQaPause=!!value;
+   return runtime.manualQaPause;
+  };
+
+  const reset=({yaw=0,clearObserved=false}={})=>{
    controller.position=[0,runtime.variant.collision.hipHeight,0];
    controller.velocity=[0,0,0];
    controller.yaw=yaw;
@@ -28,54 +44,72 @@
    controller.taskComplete=false;
    controller.events=[];
    controller.lastContacts={leftFoot:true,rightFoot:true,bill:false};
-   runtime.observedStates=new Set();
+   if(clearObserved)runtime.observedStates=new Set();
    runtime.lastPose=null;
    runtime.lastApply=null;
    runtime.manualWingUntil=0;
    runtime.action='idle';
-   const pose=controller.update(1/60,{groundHeight:0,obstacles:[]});
+   runtime.manualQaStepping=true;
+   const pose=originalUpdate(1/60,{groundHeight:0,obstacles:[]});
+   runtime.manualQaStepping=false;
    runtime.lastPose=pose;
    runtime.observedStates.add(pose.state);
    runtime.lastApply=runtime.skin.applyPose(pose);
    requestRender();
    return pose;
   };
+
   const stepFrames=(count=1,dt=1/60)=>{
    count=Math.max(1,Math.min(600,Math.trunc(count)||1));
    dt=Math.max(1/240,Math.min(1/15,Number(dt)||1/60));
    let pose=null;
-   for(let frame=0;frame<count;frame++){
-    pose=runtime.controller.update(dt,{groundHeight:0,obstacles:[]});
-    if(runtime.action==='wing'){
-     const phase=count<=1?1:Math.sin(Math.PI*(frame+1)/(count+1));
-     pose.wings.leftOpen=Math.max(pose.wings.leftOpen,.72+.22*phase);
-     pose.wings.rightOpen=Math.max(pose.wings.rightOpen,.72+.22*phase);
+   runtime.manualQaStepping=true;
+   try{
+    for(let frame=0;frame<count;frame++){
+     pose=originalUpdate(dt,{groundHeight:0,obstacles:[]});
+     if(runtime.action==='wing'){
+      const phase=count<=1?1:Math.sin(Math.PI*(frame+1)/(count+1));
+      pose.wings.leftOpen=Math.max(pose.wings.leftOpen,.72+.22*phase);
+      pose.wings.rightOpen=Math.max(pose.wings.rightOpen,.72+.22*phase);
+     }
+     runtime.lastPose=pose;
+     runtime.observedStates.add(pose.state);
+     runtime.lastApply=runtime.skin.applyPose(pose);
     }
-    runtime.lastPose=pose;
-    runtime.observedStates.add(pose.state);
-    runtime.lastApply=runtime.skin.applyPose(pose);
+   }finally{
+    runtime.manualQaStepping=false;
    }
    requestRender();
    return pose;
   };
+
   const runAction=(name,{frames=1,dt=1/60,resetFirst=true}={})=>{
    if(resetFirst)reset();
    base.setAction(name);
    runtime.action=name;
    return stepFrames(frames,dt);
   };
+
   const enhanced=Object.freeze({
    get ready(){return base.ready},
    setAction:base.setAction,
    toggleAuto:base.toggleAuto,
    setAuto:base.setAuto,
+   pauseRealtime,
    reset,
    stepFrames,
    runAction,
-   diagnostics(){return{...base.diagnostics(),manualStepAvailable:true,manualStepPatch:'CHICKEN_R100_MANUAL_STEP_PATCH'};}
+   diagnostics(){
+    return{
+     ...base.diagnostics(),
+     manualStepAvailable:true,
+     manualStepPatch:'CHICKEN_R100_MANUAL_STEP_PATCH',
+     realtimePaused:runtime.manualQaPause
+    };
+   }
   });
   window.__CHICKEN_PHASE1_MOTION__=enhanced;
-  window.__CHICKEN_R100_MANUAL_STEP__=Object.freeze({version:'1.0',reset,stepFrames,runAction});
+  window.__CHICKEN_R100_MANUAL_STEP__=Object.freeze({version:'1.1',pauseRealtime,reset,stepFrames,runAction});
   clearInterval(timer);
  },25);
 })();
