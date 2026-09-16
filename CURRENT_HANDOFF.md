@@ -1,42 +1,28 @@
-# Chicken V4.6 R9.3 — Local Head Restore Candidate
+# Chicken V4.6 R9.5.1 — Separate Head Shell Candidate
 
 ## Active executable
 
-`CHICKEN_V46_R9_3_HEAD_SHAPE.html`
+`CHICKEN_V46_R9_5_HEAD_CARRIER.html`
 
-## Rollback and rejected predecessor
+## Frozen rollback
 
-- exact frozen R9.1: `CHICKEN_V46_R9_1.html`
-- exact frozen R9: `history/CHICKEN_V46_R9_FROZEN.html`
-- rejected technical-only R9.2 candidate: `CHICKEN_V46_R9_2_HEAD_SHAPE.html`
+- exact R9.1 executable: `CHICKEN_V46_R9_1.html`
+- exact R9 executable: `history/CHICKEN_V46_R9_FROZEN.html`
 
-R9.2 passed static and browser execution but failed visual inspection: its full-ring field altered long neck sections sharing the same longitudinal stations, creating an enlarged wedge/dolphin-like head. Technical success was not treated as visual acceptance.
+## What changed
 
-## R9.3 change
+R9.5.1 keeps the lower neck and all non-head systems on the frozen R9.1 path. In the candidate path only, the legacy head surface is collapsed/clipped and replaced by a compact posterior-cranium–crown–cheek–jaw–short-bill shell. Eye, eyelid, nostril, ear-lobe, wattle and continuous-comb modules are rebuilt on that shell.
 
-R9.3 starts again from the exact R9.1 file. It reuses the R9.1 dorsal correction, then applies only localized upper-cranium, cheek and lower-jaw fields. Bill shortening keeps a constant X value across every sweep station, so the surface chart remains monotonic. The eye is slightly larger/lower; the ear-lobe patch is smaller/lower; the nostril follows the shortened bill.
+## Evidence and QA
 
-Body, plumage, wings, tail, feet, continuous comb and materials are not redesigned.
-
-## Evidence
-
-- parameters: `data/CHICKEN_R93_HEAD_SHAPE_PARAMETERS.json`
-- static QA: `qa/CHICKEN_R93_STATIC_QA.json`
-- browser QA: `qa/CHICKEN_R93_BROWSER_QA.json`
-- review board: `evidence/r93/R93_REVIEW_BOARD.html`
-- manifest: `BUILD_MANIFEST_R93.json`
+- parameters: `data/CHICKEN_R95_HEAD_CARRIER_PARAMETERS.json`
+- static QA: `qa/CHICKEN_R95_STATIC_QA.json`
+- browser QA: `qa/CHICKEN_R95_BROWSER_QA.json`
+- visual review board: `evidence/r95/R95_REVIEW_BOARD.html`
+- manifest: `BUILD_MANIFEST_R95.json`
 
 Browser QA passed: `true`.
 
-```text
-r9_2VisualGatePassed=false
-r9_3LocalCandidateBuilt=true
-r9_3BrowserQAPassed=true
-manualVisualAcceptance=false
-wholeVisualGatePassed=false
-rigAuthorized=false
-motionImplemented=false
-productionReady=false
-```
+## Truth boundary
 
-R9.3 must be judged from the fixed neutral-gray views before any rig or motion work begins.
+This remains a visual construction candidate. It does not establish measured skull anatomy, breed, sex, age or individual identity. Manual visual acceptance, whole-surface freeze, Rig and Motion remain closed.

@@ -1,9 +1,7 @@
-# Next Stage — R9.3 Independent Visual Gate
+# Next Stage — Chicken R9.5.1 Independent Visual Audit
 
-1. Inspect the approved reference, R9.1 baseline and R9.3 side view at the same scale.
-2. Reject any return of the R9.2 long-wedge/full-ring inflation failure.
-3. Check cranium compactness, eye scale/position, cheek and lower-jaw support, bill length/depth, throat transition and comb attachment.
-4. If refinement is needed, change one named local field at a time and keep R9.1/R9.2/R9.3 immutable.
-5. Only after manual acceptance may a canonical head baseline be frozen.
-
-Blocked: Chicken DNA freeze, rig, skin weights, animation, behavior and production release.
+1. Compare neutral left/right/front/top/three-quarter views with the approved visual construction reference.
+2. Check compact cranium, upper-neck blend, cheek/jaw support and short-bill closure before local detail polishing.
+3. Check eye/eyelid scale, continuous-comb root and attached wattle silhouette.
+4. Apply only bounded candidate-shell corrections; do not reopen body, wing, tail or feet.
+5. Keep Rig, skin binding and motion blocked until the whole-head silhouette is accepted.
