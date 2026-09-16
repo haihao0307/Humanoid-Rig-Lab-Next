@@ -120,7 +120,7 @@ jobs:
           set -euo pipefail
           git config user.name 'cat-kaopu-build-bot'
           git config user.email 'cat-kaopu-build-bot@users.noreply.github.com'
-          git add .github/workflows/cat-kaopu-v442-build.yml cat-kaopu
+          git add cat-kaopu
           if git diff --cached --quiet; then
             echo 'No V4.42 changes to commit.'
             exit 0
