@@ -15,6 +15,7 @@ on:
       - cat-kaopu/tools/patch_cat_v442_aperture_integration.py
       - cat-kaopu/tools/patch_cat_v442_globe_occlusion.py
       - cat-kaopu/tools/patch_cat_v442_canthus_surface.py
+      - cat-kaopu/tools/patch_cat_v442_closed_lid_profile.py
   workflow_dispatch:
 
 permissions:
@@ -79,6 +80,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_v442_canthus_surface.py
+
+      - name: Shape the closed eyelid profile
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v442_closed_lid_profile.py
 
       - name: Freeze V4.41 source exactly once
         shell: bash
