@@ -77,7 +77,7 @@ four_way.write_text(source_text.replace(old_code, new_code, 1), encoding="utf-8"
 browser = Path("tools/test-task-crowd-browser.mjs")
 browser_text = browser.read_text(encoding="utf-8")
 old_ids = "const ids=['TASK_TEST_CORRIDOR_L','TASK_TEST_CORRIDOR_R'];"
-new_ids = "const ids=['TaskTestCorridorLeft','TaskTestCorridorRight'];"
+new_ids = "const ids=['TCORRIDORL','TCORRIDORR'];"
 if browser_text.count(old_ids) != 1:
     raise SystemExit(f"temporary corridor id patch count: {browser_text.count(old_ids)}")
 browser.write_text(browser_text.replace(old_ids, new_ids, 1), encoding="utf-8", newline="\n")
