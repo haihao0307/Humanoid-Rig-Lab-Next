@@ -10,6 +10,7 @@ export const CHICKEN_PHASE1_BONE_ORDER = Object.freeze([
   'body_root',
   'pelvis',
   'chest',
+  'neck_base',
   'neck_c0',
   'neck_c1',
   'head',
@@ -30,6 +31,7 @@ export const CHICKEN_PHASE1_BIND_WORLD = Object.freeze({
   body_root: Object.freeze([-0.08, 0.39, 0.09]),
   pelvis: Object.freeze([-0.08, 0.39, 0.09]),
   chest: Object.freeze([0.10, 0.58, 0.09]),
+  neck_base: Object.freeze([0.10, 0.58, 0.09]),
   neck_c0: Object.freeze([0.22, 0.72, 0.09]),
   neck_c1: Object.freeze([0.30, 0.84, 0.09]),
   head: Object.freeze([0.39, 0.93, 0.09]),
@@ -50,7 +52,8 @@ const PARENT = Object.freeze({
   body_root: null,
   pelvis: 'body_root',
   chest: 'pelvis',
-  neck_c0: 'chest',
+  neck_base: 'chest',
+  neck_c0: 'neck_base',
   neck_c1: 'neck_c0',
   head: 'neck_c1',
   wing_l: 'chest',
@@ -96,10 +99,6 @@ function feetWeights(x, z, vertexKind, localCoord, centerZ, index) {
   const toe = index[`toe_${side}`];
   const bucket = [];
 
-  // kind 3 is the generated tarsometatarsus tube. Its localCoord.x is the
-  // longitudinal parameter from the upper attachment (0) to the ankle (1).
-  // Limit every cross-section to two adjacent bones; the previous four-bone
-  // height blend sheared the tube into a broad triangular sheet.
   if (vertexKind === 3) {
     const s = sat(localCoord?.[0] ?? 0.5);
     if (s <= 0.46) {
@@ -114,9 +113,6 @@ function feetWeights(x, z, vertexKind, localCoord, centerZ, index) {
     return packWeights(bucket);
   }
 
-  // kind 4 contains the metatarsal pad, digits and plantar pads. Keep roots on
-  // the ankle and move the distal portions with the toe controller. This is a
-  // deliberately rigid Phase-1 split rather than a high-cost per-digit rig.
   if (vertexKind === 4) {
     const longitudinal = sat(localCoord?.[0] ?? 0.5);
     const distanceGate = ss(0.016, 0.070, Math.abs(x));
@@ -126,8 +122,6 @@ function feetWeights(x, z, vertexKind, localCoord, centerZ, index) {
     return packWeights(bucket);
   }
 
-  // kind 5 is claw geometry. A rigid toe assignment avoids stretching the
-  // narrow claw tubes between the ankle and toe transforms.
   if (vertexKind === 5) {
     addWeight(bucket, toe, 1);
     return packWeights(bucket);
@@ -144,6 +138,25 @@ function neckFloor(x) {
   return 0.83;
 }
 
+export function summarizeVertexKinds(vertexKinds) {
+  const histogram = {};
+  if (!vertexKinds) return Object.freeze(histogram);
+  for (let i = 0; i < vertexKinds.length; i++) {
+    const kind = Math.round(vertexKinds[i]);
+    histogram[kind] = (histogram[kind] || 0) + 1;
+  }
+  return Object.freeze(histogram);
+}
+
+export function detectGeneratedFootMesh(materialKind, vertexKinds, localCoords) {
+  if (materialKind !== 'parts' || !vertexKinds || !localCoords) return false;
+  const kinds = new Set();
+  for (let i = 0; i < vertexKinds.length; i++) kinds.add(Math.round(vertexKinds[i]));
+  if (!kinds.has(3) || !kinds.has(4)) return false;
+  for (const kind of kinds) if (kind !== 3 && kind !== 4 && kind !== 5) return false;
+  return true;
+}
+
 export function computeChickenPhase1VertexWeights(
   x,
   y,
@@ -157,27 +170,24 @@ export function computeChickenPhase1VertexWeights(
   );
   const vertexKind = Number.isFinite(options.vertexKind) ? Math.round(options.vertexKind) : null;
   const localCoord = options.localCoord || null;
+  const generatedFootMesh = options.generatedFootMesh === true;
   const bucket = [];
 
-  // Small facial and comb meshes follow the head rigidly. The body carrier is
-  // intentionally excluded here; treating every upper-front body vertex as a
-  // rigid head was the main cause of the R10.0 peck fold.
   if (['comb', 'iris', 'nostril', 'lid'].includes(materialKind)) {
     addWeight(bucket, index.head, 1);
     return packWeights(bucket);
   }
-  if (materialKind === 'parts' && x > 0.30 && y > 0.76 && vertexKind !== 3 && vertexKind !== 4 && vertexKind !== 5) {
+  if (materialKind === 'parts' && !generatedFootMesh && x > 0.30 && y > 0.76) {
     addWeight(bucket, index.head, 1);
     return packWeights(bucket);
   }
 
-  if (materialKind === 'parts' && vertexKind !== null) {
+  if (generatedFootMesh && vertexKind !== null) {
     const generatedFoot = feetWeights(x, z, vertexKind, localCoord, centerZ, index);
     if (generatedFoot) return generatedFoot;
   }
 
-  // Fallback for a legacy low part without an explicit kind attribute.
-  if (y < 0.37 && (materialKind === 'parts' || materialKind === 'body')) {
+  if (y < 0.37 && materialKind === 'parts' && !generatedFootMesh) {
     const side = z >= centerZ ? 'l' : 'r';
     const hip = index[`hip_${side}`];
     const knee = index[`knee_${side}`];
@@ -225,25 +235,35 @@ export function computeChickenPhase1VertexWeights(
   const upperGate = ss(floor, floor + 0.075, y);
   const headGate = ss(Math.max(0.79, floor + 0.015), Math.max(0.87, floor + 0.095), y);
   const head = ss(0.325, 0.405, x) * headGate;
-  const neck1 = ss(0.245, 0.335, x)
+  const neck1 = ss(0.245, 0.345, x)
     * (1 - ss(0.405, 0.445, x))
     * upperGate
-    * (1 - head * 0.78);
-  const neck0 = ss(0.135, 0.245, x)
-    * (1 - ss(0.325, 0.375, x))
+    * (1 - head * 0.80);
+  const neck0 = ss(0.175, 0.275, x)
+    * (1 - ss(0.355, 0.405, x))
     * ss(floor - 0.025, floor + 0.060, y)
-    * (1 - head * 0.84)
-    * (1 - neck1 * 0.52);
+    * (1 - head * 0.86)
+    * (1 - neck1 * 0.56);
+  const neckBase = ss(0.080, 0.185, x)
+    * (1 - ss(0.285, 0.345, x))
+    * ss(floor - 0.040, floor + 0.055, y)
+    * (1 - neck0 * 0.62)
+    * (1 - neck1 * 0.25);
   const tail = (1 - ss(-0.30, -0.11, x)) * ss(0.34, 0.61, y);
   const chest = ss(-0.10, 0.16, x)
     * ss(0.41, 0.69, y)
-    * (1 - neck0 * 0.62)
-    * (1 - upperGate * 0.90);
-  const pelvis = Math.max(0.06, 1 - head - neck1 - neck0 - tail * 0.72 - chest * 0.62);
+    * (1 - neckBase * 0.70)
+    * (1 - neck0 * 0.45)
+    * (1 - upperGate * 0.92);
+  const pelvis = Math.max(
+    0.06,
+    1 - head - neck1 - neck0 - neckBase - tail * 0.72 - chest * 0.62
+  );
 
   addWeight(bucket, index.head, head);
   addWeight(bucket, index.neck_c1, neck1);
   addWeight(bucket, index.neck_c0, neck0);
+  addWeight(bucket, index.neck_base, neckBase);
   addWeight(bucket, index.tail, tail * 0.82);
   addWeight(bucket, index.chest, chest);
   addWeight(bucket, index.pelvis, pelvis);
@@ -259,24 +279,35 @@ export function computeChickenPhase1SkinAttributes(positionArray, materialKind =
   const weights = new Float32Array(count * 4);
   const vertexKinds = options.vertexKinds || null;
   const localCoords = options.localCoords || null;
+  const generatedFootMesh = options.generatedFootMesh === true;
   const primaryCounts = new Uint32Array(CHICKEN_PHASE1_BONE_ORDER.length);
+  const reusable = {
+    centerZ: options.centerZ,
+    boneIndex: options.boneIndex,
+    generatedFootMesh,
+    vertexKind: null,
+    localCoord: null
+  };
+  const localCoord = [0, 0, 0];
 
   for (let i = 0; i < count; i++) {
     const q = i * 3;
     const out = i * 4;
-    const localCoord = localCoords
-      ? [localCoords[q], localCoords[q + 1], localCoords[q + 2]]
-      : null;
+    reusable.vertexKind = vertexKinds ? vertexKinds[i] : null;
+    if (localCoords) {
+      localCoord[0] = localCoords[q];
+      localCoord[1] = localCoords[q + 1];
+      localCoord[2] = localCoords[q + 2];
+      reusable.localCoord = localCoord;
+    } else {
+      reusable.localCoord = null;
+    }
     const packed = computeChickenPhase1VertexWeights(
       positionArray[q],
       positionArray[q + 1],
       positionArray[q + 2],
       materialKind,
-      {
-        ...options,
-        vertexKind: vertexKinds ? vertexKinds[i] : null,
-        localCoord
-      }
+      reusable
     );
     for (let k = 0; k < 4; k++) {
       indices[out + k] = packed.indices[k];
@@ -368,11 +399,14 @@ export function createChickenPhase1ArticulatedSkin(THREE, group, meshes, options
     const positions = original.geometry.attributes.position.array;
     const vertexKinds = original.geometry.attributes.kind?.array || null;
     const localCoords = original.geometry.attributes.localCoord?.array || null;
+    const kindHistogram = summarizeVertexKinds(vertexKinds);
+    const generatedFootMesh = detectGeneratedFootMesh(kind, vertexKinds, localCoords);
     const attrs = computeChickenPhase1SkinAttributes(positions, kind, {
       centerZ: options.centerZ ?? 0.09,
       boneIndex,
       vertexKinds,
-      localCoords
+      localCoords,
+      generatedFootMesh
     });
     original.geometry.setAttribute(
       'skinIndex',
@@ -403,6 +437,8 @@ export function createChickenPhase1ArticulatedSkin(THREE, group, meshes, options
       vertexCount: attrs.count,
       hasVertexKind: Boolean(vertexKinds),
       hasLocalCoord: Boolean(localCoords),
+      generatedFootMesh,
+      vertexKindHistogram: kindHistogram,
       primaryBoneCounts: Object.freeze(classifyPrimaryCounts(attrs.primaryCounts))
     }));
   }
@@ -413,6 +449,10 @@ export function createChickenPhase1ArticulatedSkin(THREE, group, meshes, options
   let lastPose = null;
   let lastReport = null;
   let lastAppliedAngles = null;
+  let lastContactPoints = null;
+  const beakTipLocal = new THREE.Vector3(...(options.beakTipLocal || [0.096, -0.011, 0]));
+  const leftToeTipLocal = new THREE.Vector3(...(options.toeTipLocal || [0.070, -0.018, 0]));
+  const rightToeTipLocal = new THREE.Vector3(...(options.toeTipLocal || [0.070, -0.018, 0]));
 
   function resetRotations() {
     for (const id of CHICKEN_PHASE1_BONE_ORDER) {
@@ -432,21 +472,37 @@ export function createChickenPhase1ArticulatedSkin(THREE, group, meshes, options
   }
 
   function mapPoseAngles(pose) {
-    const peck = pose.state === 'peck';
-    const neckPitch = clamp(pose.neck.pitch, peck ? -0.72 : -0.58, 0.52);
-    const headPitch = clamp(pose.head.pitch, peck ? -0.32 : -0.28, 0.36);
+    const isPeck = pose.state === 'peck';
+    const peckDepth = isPeck ? sat((-pose.neck.pitch - 0.12) / 0.93) : 0;
+    const normalNeckPitch = clamp(pose.neck.pitch, -0.58, 0.52);
+    const normalHeadPitch = clamp(pose.head.pitch, -0.28, 0.36);
     const legGain = pose.state === 'short_run'
       ? { hip: 0.48, knee: 0.30, ankle: 0.26 }
       : { hip: 0.54, knee: 0.34, ankle: 0.28 };
+    const targetPeck = {
+      neckBasePitch: -2.40,
+      neck0Pitch: -0.14,
+      neck1Pitch: 0.20,
+      headPitch: 0.88
+    };
+
     return {
-      pelvisPitch: pose.body.pitch * (peck ? 0.28 : 0.42),
-      chestPitch: pose.body.pitch * (peck ? 0.42 : 0.52),
+      peckDepth,
+      rootCrouch: -0.006 * peckDepth,
+      pelvisPitch: pose.body.pitch * 0.42,
+      chestPitch: pose.body.pitch * 0.52,
       bodyRoll: clamp(pose.body.roll, -0.22, 0.22),
-      neck0Pitch: neckPitch * (peck ? 0.38 : 0.46),
-      neck1Pitch: neckPitch * (peck ? 0.31 : 0.38),
-      neck0Yaw: pose.neck.yaw * 0.42,
-      neck1Yaw: pose.neck.yaw * 0.50,
-      headPitch: headPitch * (peck ? 0.42 : 0.68),
+      neckBasePitch: normalNeckPitch * 0.18 * (1 - peckDepth)
+        + targetPeck.neckBasePitch * peckDepth,
+      neck0Pitch: normalNeckPitch * 0.46 * (1 - peckDepth)
+        + targetPeck.neck0Pitch * peckDepth,
+      neck1Pitch: normalNeckPitch * 0.38 * (1 - peckDepth)
+        + targetPeck.neck1Pitch * peckDepth,
+      neckBaseYaw: pose.neck.yaw * 0.28,
+      neck0Yaw: pose.neck.yaw * 0.34,
+      neck1Yaw: pose.neck.yaw * 0.38,
+      headPitch: normalHeadPitch * 0.68 * (1 - peckDepth)
+        + targetPeck.headPitch * peckDepth,
       headYaw: pose.head.yaw * 0.72,
       hipLeft: clamp(pose.legs.left.hipPitch * legGain.hip, -0.38, 0.38),
       kneeLeft: clamp(pose.legs.left.kneePitch * legGain.knee, -0.10, 0.34),
@@ -464,18 +520,21 @@ export function createChickenPhase1ArticulatedSkin(THREE, group, meshes, options
       throw new Error('invalid chicken pose');
     }
     resetRotations();
+    const angles = mapPoseAngles(pose);
     const root = bones.body_root;
     const base = bindLocal.body_root;
     root.position.set(
       base.x + (pose.root.position[0] - rootOrigin[0]) * rootScale,
-      base.y + (pose.root.position[1] - rootOrigin[1]) + clamp(pose.body.yOffset, -0.025, 0.025),
+      base.y + (pose.root.position[1] - rootOrigin[1])
+        + clamp(pose.body.yOffset, -0.025, 0.025)
+        + angles.rootCrouch,
       base.z + (pose.root.position[2] - rootOrigin[2]) * rootScale
     );
 
-    const angles = mapPoseAngles(pose);
     rotate('body_root', 0, pose.root.yaw, 0);
     rotate('pelvis', angles.pelvisPitch, 0, angles.bodyRoll * 0.38);
     rotate('chest', angles.chestPitch, 0, angles.bodyRoll * 0.54);
+    rotate('neck_base', angles.neckBasePitch, angles.neckBaseYaw, 0);
     rotate('neck_c0', angles.neck0Pitch, angles.neck0Yaw, 0);
     rotate('neck_c1', angles.neck1Pitch, angles.neck1Yaw, 0);
     rotate('head', angles.headPitch, angles.headYaw, 0);
@@ -493,6 +552,17 @@ export function createChickenPhase1ArticulatedSkin(THREE, group, meshes, options
 
     group.updateMatrixWorld(true);
     skeleton.update();
+    const beak = beakTipLocal.clone().applyMatrix4(bones.head.matrixWorld);
+    const leftToe = leftToeTipLocal.clone().applyMatrix4(bones.toe_l.matrixWorld);
+    const rightToe = rightToeTipLocal.clone().applyMatrix4(bones.toe_r.matrixWorld);
+    lastContactPoints = Object.freeze({
+      beak: Object.freeze(beak.toArray()),
+      leftToe: Object.freeze(leftToe.toArray()),
+      rightToe: Object.freeze(rightToe.toArray()),
+      billGroundError: beak.y,
+      leftFootGroundError: leftToe.y,
+      rightFootGroundError: rightToe.y
+    });
     applyCount += 1;
     lastPose = pose;
     lastAppliedAngles = angles;
@@ -503,6 +573,7 @@ export function createChickenPhase1ArticulatedSkin(THREE, group, meshes, options
       state: pose.state,
       contacts: { ...pose.contacts },
       appliedAngles: { ...angles },
+      contactPoints: lastContactPoints,
       invariantReport: lastReport
     };
   }
@@ -545,9 +616,10 @@ export function createChickenPhase1ArticulatedSkin(THREE, group, meshes, options
       lastState: lastPose?.state ?? null,
       lastContacts: lastPose?.contacts ? { ...lastPose.contacts } : null,
       lastAppliedAngles: lastAppliedAngles ? { ...lastAppliedAngles } : null,
+      lastContactPoints,
       lastInvariantReport: lastReport,
       rootMotionScale: rootScale,
-      weightingRevision: 'component-aware-feet-and-profile-aware-neck-v2',
+      weightingRevision: 'generated-foot-discriminator-and-cervical-base-v3',
       meshAudits
     };
   }
