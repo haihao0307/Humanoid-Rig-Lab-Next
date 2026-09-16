@@ -45,15 +45,18 @@ async function captureAction(name,file,options={}){
    }else{
     pose=api.runAction(name,{frames:options.frames??1,dt:options.dt??1/60,resetFirst:true});
    }
-   const diagnostics=api.diagnostics();
+   const runtime=api.diagnostics();
    return{
     requested:name,
     state:pose?.state||null,
     speed:pose?.root?.speed??null,
     contacts:pose?.contacts||null,
     wings:pose?.wings||null,
-    observedStates:diagnostics.observedStates||[],
-    invariantPassed:diagnostics.skin?.lastInvariantReport?.passed===true
+    observedStates:runtime.observedStates||[],
+    invariantPassed:runtime.skin?.lastInvariantReport?.passed===true,
+    contactPoints:runtime.skin?.lastContactPoints||null,
+    weightingRevision:runtime.skin?.weightingRevision||null,
+    meshAudits:runtime.skin?.meshAudits||[]
    };
   },{name,options});
   await page.waitForTimeout(options.settleMs??240);
@@ -88,6 +91,9 @@ try{
  await captureAction('idle','R100_IDLE.png',{frames:1,settleMs:260});
  await captureAction('look','R100_LOOK.png',{frames:12,settleMs:260});
  await captureAction('peck','R100_PECK.png',{frames:28,settleMs:260});
+ await click('button[data-view="left"]');
+ await page.screenshot({path:path.join(evidenceDir,'R100_PECK_SIDE_CONTACT.png'),fullPage:false,animations:'disabled'});
+ await click('button[data-view="threeQuarter"]');
  await captureAction('walk','R100_WALK.png',{frames:18,settleMs:260});
  await captureAction('turn','R100_TURN.png',{frames:2,settleMs:220});
  await captureAction('run','R100_RUN.png',{frames:18,settleMs:260});
@@ -106,22 +112,36 @@ const runtime=await page.evaluate(()=>({
 })).catch(error=>({evaluationError:String(error)}));
 await browser.close();
 
-const expectedFiles=['R100_IDLE.png','R100_LOOK.png','R100_PECK.png','R100_WALK.png','R100_TURN.png','R100_RUN.png','R100_WING_BALANCE.png','R100_STOP.png'];
+const expectedFiles=['R100_IDLE.png','R100_LOOK.png','R100_PECK.png','R100_PECK_SIDE_CONTACT.png','R100_WALK.png','R100_TURN.png','R100_RUN.png','R100_WING_BALANCE.png','R100_STOP.png'];
+const expectedActionCount=8;
 const observed=new Set(runtime.motion?.observedStates||[]);
 const requiredStates=['idle_stand','look','peck','walk','stop','turn','short_run'];
 const byRequest=Object.fromEntries(diagnostics.captures.map(item=>[item.requested,item]));
+const groundWindow=(value,min=-0.06,max=0.10)=>Number.isFinite(value)&&value>=min&&value<=max;
+const footContactsGrounded=diagnostics.captures.every(item=>{
+ const points=item.contactPoints;
+ if(!points)return false;
+ if(item.contacts?.leftFoot&&!groundWindow(points.leftFootGroundError))return false;
+ if(item.contacts?.rightFoot&&!groundWindow(points.rightFootGroundError))return false;
+ return true;
+});
+const meshAudits=runtime.motion?.skin?.meshAudits||[];
+const generatedFootAudits=meshAudits.filter(item=>item.generatedFootMesh===true);
+const bodyAudits=meshAudits.filter(item=>item.materialKind==='body');
+const forbiddenBodyBones=['hip_l','knee_l','ankle_l','toe_l','hip_r','knee_r','ankle_r','toe_r'];
 const checks={
  noFatalException:fatal===null,
  patchLoaded:runtime.patch?.version==='V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
  manualStepLoaded:runtime.motion?.manualStepAvailable===true&&runtime.manualPatch?.version==='1.1',
  realtimePaused:runtime.motion?.realtimePaused===true,
  motionReady:runtime.motion?.ready===true,
- boneCount:runtime.motion?.skin?.boneCount===17,
+ boneCount:runtime.motion?.skin?.boneCount===18,
+ cervicalBasePresent:runtime.motion?.skin?.boneCount===18,
  skinnedMeshes:(runtime.motion?.skin?.skinnedMeshCount||0)>0,
  poseApplied:(runtime.motion?.skin?.applyCount||0)>80,
  rigInvariants:runtime.motion?.skin?.lastInvariantReport?.passed===true,
  controllerErrors:(runtime.motion?.errors||[]).length===0,
- actionSequenceCompleted:diagnostics.actionFailures.length===0&&diagnostics.captures.length===expectedFiles.length,
+ actionSequenceCompleted:diagnostics.actionFailures.length===0&&diagnostics.captures.length===expectedActionCount,
  requiredStatesObserved:requiredStates.every(state=>observed.has(state)),
  requestedStateMapping:
   byRequest.idle?.state==='idle_stand'&&
@@ -132,7 +152,13 @@ const checks={
   byRequest.run?.state==='short_run'&&
   byRequest.stop?.state==='stop',
  wingBalanceObserved:byRequest.wing?.state==='wing_balance'||Math.max(byRequest.wing?.wings?.leftOpen||0,byRequest.wing?.wings?.rightOpen||0)>.35,
- contactSignalsCaptured:diagnostics.captures.every(item=>typeof item.contacts?.leftFoot==='boolean'&&typeof item.contacts?.rightFoot==='boolean'),
+ peckContactSignal:byRequest.peck?.contacts?.bill===true,
+ peckBillGrounded:groundWindow(byRequest.peck?.contactPoints?.billGroundError,-0.04,0.07),
+ footContactsGrounded,
+ contactSignalsCaptured:diagnostics.captures.every(item=>typeof item.contacts?.leftFoot==='boolean'&&typeof item.contacts?.rightFoot==='boolean'&&typeof item.contacts?.bill==='boolean'),
+ generatedFootMeshDetected:generatedFootAudits.length>=1,
+ bodyCarrierFreeOfLegPrimaries:bodyAudits.every(item=>forbiddenBodyBones.every(id=>!item.primaryBoneCounts?.[id])),
+ weightingRevision:runtime.motion?.skin?.weightingRevision==='generated-foot-discriminator-and-cervical-base-v3',
  groupTestStillClosed:runtime.patch?.groupTestAuthorized===false,
  errorOverlayHidden:runtime.errorOverlay?.display==='none',
  canvasAllocated:(runtime.canvas?.width||0)>0&&(runtime.canvas?.height||0)>0,
@@ -142,16 +168,17 @@ const checks={
  expectedCapturesWritten:expectedFiles.every(file=>fs.existsSync(path.join(evidenceDir,file)))
 };
 const report={
- schema:'life_ecosystem/chicken_r100_browser_qa@1.0',
+ schema:'life_ecosystem/chicken_r100_browser_qa@1.1',
  version:'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
  environment:{browser:'Chrome headless via Playwright Core',url,viewport:[1440,1000],captureMode:'deterministic manual stepping'},
+ contactTolerance:{bill:[-0.04,0.07],supportFoot:[-0.06,0.10],units:'workbench world units'},
  checks,
  passed:Object.values(checks).every(Boolean),
  runtime,
  fatal,
  ...diagnostics,
  expectedFiles,
- truthBoundary:{technicalMotionGateOnly:true,manualMotionNaturalnessAcceptance:false,manualVisualAcceptance:false,singleAgentGroundingComplete:false,collisionComplete:false,groupTestAuthorized:false,productionReady:false}
+ truthBoundary:{technicalMotionAndContactGateOnly:true,manualMotionNaturalnessAcceptance:false,manualVisualAcceptance:false,singleAgentGroundingComplete:false,collisionComplete:false,groupTestAuthorized:false,productionReady:false}
 };
 fs.writeFileSync(qaPath,JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report,null,2));
