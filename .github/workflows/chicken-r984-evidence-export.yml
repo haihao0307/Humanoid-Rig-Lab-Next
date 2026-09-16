@@ -1,0 +1,53 @@
+name: Chicken R9.8.4 Evidence Export
+
+on:
+  push:
+    branches:
+      - chat/chicken-phase1-continuation-20260916
+    paths:
+      - .github/workflows/chicken-r984-evidence-export.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-r984-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out working branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract comparison branch evidence
+        shell: bash
+        run: |
+          git fetch origin codex/chicken-r984-natural-head
+          mkdir -p comparison-r984
+          git archive --format=tar origin/codex/chicken-r984-natural-head \
+            evidence/r984 \
+            CHICKEN_V46_R9_8_4_NATURAL_FACE.html \
+            qa/CHICKEN_R984_BROWSER_QA.json \
+            data/CHICKEN_R984_NATURAL_FACE_PARAMETERS.json \
+            01_CURRENT_STATE.json \
+            CURRENT_HANDOFF.md | tar -xf - -C comparison-r984
+
+      - name: Verify comparison evidence
+        shell: bash
+        run: |
+          test -s comparison-r984/evidence/r984/R984_HEAD_NEUTRAL_FRONT.png
+          test -s comparison-r984/evidence/r984/R984_HEAD_NEUTRAL_LEFT.png
+          test -s comparison-r984/evidence/r984/R984_HEAD_NEUTRAL_RIGHT.png
+          test -s comparison-r984/evidence/r984/R984_HEAD_NEUTRAL_TOP.png
+          test -s comparison-r984/evidence/r984/R984_HEAD_NEUTRAL_THREE_QUARTER.png
+          test -s comparison-r984/evidence/r984/R984_WHOLE_NEUTRAL_THREE_QUARTER.png
+
+      - name: Upload R9.8.4 comparison evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: chicken-r984-comparison-evidence-${{ github.run_number }}
+          path: comparison-r984
+          if-no-files-found: error
+          retention-days: 7
