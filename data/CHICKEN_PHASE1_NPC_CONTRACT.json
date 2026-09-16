@@ -1,0 +1,145 @@
+{
+  "schema": "life_ecosystem/chicken_phase1_npc_contract@1.0",
+  "version": "PHASE1_ENVIRONMENT_NPC_2026-09-16",
+  "priority": [
+    "morphology",
+    "motion",
+    "collision_and_grounding",
+    "controlled_variation",
+    "minimal_behavior"
+  ],
+  "active_surface_candidate": "CHICKEN_V46_R9_8_3_CLEAN_FACE.html",
+  "scope": {
+    "role": "lightweight environmental creature NPC",
+    "target_view_distance_m": [3, 20],
+    "closeup_full_reconstruction_required": false,
+    "single_agent_first": true,
+    "small_herd_after_single_agent_stable": true,
+    "complex_life_activity_deferred": true
+  },
+  "morphology_gate": {
+    "required_views": [
+      "left",
+      "right",
+      "front",
+      "top",
+      "three_quarter",
+      "whole_body"
+    ],
+    "must_pass": [
+      "immediate domestic-chicken silhouette recognition",
+      "continuous head-neck-body relationship",
+      "credible breast-abdomen-pelvis mass distribution",
+      "leg and foot placement compatible with locomotion",
+      "no visible detached, inverted, floating or penetrating parts",
+      "low-frequency silhouette consistency across LOD"
+    ],
+    "deferred": [
+      "breed-specific reconstruction",
+      "individual identity",
+      "internal anatomy",
+      "per-feather dynamics",
+      "cinematic closeup tissue detail"
+    ]
+  },
+  "motion_set": [
+    {
+      "id": "idle_stand",
+      "loop": true,
+      "requirements": ["stable support", "subtle breathing", "weight micro-shift"]
+    },
+    {
+      "id": "look",
+      "loop": false,
+      "requirements": ["head-neck lead", "bounded body compensation", "orientation update"]
+    },
+    {
+      "id": "peck",
+      "loop": false,
+      "requirements": ["neck extension", "head descent", "bill ground contact", "smooth recovery"]
+    },
+    {
+      "id": "walk",
+      "loop": true,
+      "requirements": ["alternating feet", "foot contact events", "controlled body bob", "head compensation"]
+    },
+    {
+      "id": "stop",
+      "loop": false,
+      "requirements": ["deceleration", "support recovery", "no abrupt root freeze"]
+    },
+    {
+      "id": "turn",
+      "loop": false,
+      "requirements": ["stepped yaw change", "foot replant", "no whole-body pivot shortcut"]
+    },
+    {
+      "id": "short_run",
+      "loop": true,
+      "requirements": ["short acceleration", "larger stride", "stable deceleration"]
+    },
+    {
+      "id": "wing_balance",
+      "loop": false,
+      "requirements": ["brief wing opening", "balance response", "clean fold recovery"]
+    }
+  ],
+  "rig_invariants": {
+    "fixed_bone_lengths": true,
+    "stable_parent_child_hierarchy": true,
+    "root_motion_separate_from_joint_rotation": true,
+    "local_quaternions_for_joint_rotation": true,
+    "pose_does_not_change_morphology": true,
+    "animation_does_not_change_bind_structure": true
+  },
+  "collision": {
+    "body_proxy": "capsule_or_ellipsoid",
+    "head_proxy": "small_sphere_or_ellipsoid",
+    "feet_ground_contacts": 2,
+    "full_mesh_collision": false,
+    "per_feather_collision": false,
+    "agent_agent_response": "soft_separation_with_replan",
+    "obstacle_response": "slow_turn_or_short_detour",
+    "task_abort_on_contact": false
+  },
+  "variation": {
+    "mode": "seeded_bounded_parameters",
+    "allowed": [
+      "overall_scale",
+      "breast_fullness",
+      "abdomen_fullness",
+      "leg_length",
+      "head_scale",
+      "comb_scale",
+      "tail_angle",
+      "plumage_palette",
+      "walk_speed",
+      "motion_phase",
+      "alertness"
+    ],
+    "must_preserve": [
+      "species topology",
+      "rig compatibility",
+      "collision proxy synchronization",
+      "non-pathological parameter ranges"
+    ]
+  },
+  "herd_gate": {
+    "initial_count_range": [6, 12],
+    "required_checks": [
+      "no persistent overlap",
+      "no deadlock",
+      "no task termination on temporary blockage",
+      "bounded rerouting",
+      "stable frame time",
+      "individual motion phase variation"
+    ]
+  },
+  "production_gates": {
+    "morphology_baseline_frozen": false,
+    "single_agent_motion_complete": false,
+    "single_agent_collision_complete": false,
+    "small_herd_stable": false,
+    "phase1_environment_npc_ready": false
+  }
+}
