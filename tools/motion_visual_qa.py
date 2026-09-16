@@ -12,7 +12,8 @@ from typing import Any
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from visual_qa_core import body_state, create_driver, fetch_ready_url, parent_state, reset_body, run_preflight, send_command, set_body_view, set_parent_anatomy, start_video, stop_video, utc_now, wait_for_completion
+from visual_qa_core import body_state, create_driver, fetch_ready_url, parent_state, reset_body, send_command, set_body_view, set_parent_anatomy, start_video, stop_video, utc_now, wait_for_completion
+from visual_qa_preflight import run_preflight
 from visual_qa_report import build_review_html, capture_canvas, json_dump, make_contact_sheet, make_crops
 
 
