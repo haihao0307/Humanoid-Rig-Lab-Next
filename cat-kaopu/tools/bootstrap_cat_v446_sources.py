@@ -32,4 +32,15 @@ missing = [str(path.relative_to(ROOT)) for path in expected if not path.is_file(
 if missing:
     raise SystemExit(f"V4.46 source bootstrap incomplete: {missing}")
 
-print("decoded V4.46 builder, verifier and browser QA sources")
+# The verifier distinguishes positive invariants from deliberately absent
+# runtime dependencies.  The original draft incorrectly required the three
+# external-dependency flags to be True, even though False is the invariant.
+verifier = ROOT / "cat-kaopu/tools/verify_cat_v446_module.py"
+verifier_text = verifier.read_text(encoding="utf-8")
+old = """    if not all(value is True for value in checks.values()):\n        raise SystemExit(f\"V4.46 verification failed: {checks}\")\n"""
+new = """    absent_dependencies = (\"externalModel\", \"externalTexture\", \"externalAnimation\")\n    positive_checks = {key: value for key, value in checks.items() if key not in absent_dependencies}\n    if not all(value is True for value in positive_checks.values()) or not all(checks[key] is False for key in absent_dependencies):\n        raise SystemExit(f\"V4.46 verification failed: {checks}\")\n"""
+if old not in verifier_text:
+    raise SystemExit("V4.46 verifier contract marker missing")
+verifier.write_text(verifier_text.replace(old, new, 1), encoding="utf-8")
+
+print("decoded V4.46 sources and corrected verifier dependency contract")
