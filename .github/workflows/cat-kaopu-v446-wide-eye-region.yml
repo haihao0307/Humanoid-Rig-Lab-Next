@@ -9,6 +9,7 @@ on:
       - cat-kaopu/tools/bootstrap_cat_v446_sources.py
       - cat-kaopu/tools/bootstrap/v446_sources.tar.xz
       - cat-kaopu/tools/patch_cat_v446_trim_face_domain.py
+      - cat-kaopu/tools/patch_cat_v446_orbital_shell.py
   workflow_dispatch:
 
 permissions:
@@ -43,6 +44,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_v446_trim_face_domain.py
+
+      - name: Replace coarse socket with analytic orbital shell
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v446_orbital_shell.py
 
       - name: Freeze V4.45 source exactly once
         shell: bash
@@ -133,7 +139,7 @@ jobs:
             echo 'No generated V4.46 changes to commit.'
             exit 0
           fi
-          git commit -m 'build(cat): generate V4.46 trimmed wide eye-region evidence [cat-v446 generated]'
+          git commit -m 'build(cat): generate V4.46 analytic orbital-shell evidence [cat-v446 generated]'
           for attempt in 1 2 3; do
             if git push origin "HEAD:${GITHUB_REF_NAME}"; then
               exit 0
