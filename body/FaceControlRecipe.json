@@ -1,6 +1,6 @@
 {
   "schema": "jarvis/face_control_recipe@1",
-  "revision": "r4-structural-identity-landmarks",
+  "revision": "r5-jaw-oral-cavity",
   "status": "Candidate",
   "frame": "R2 source metres before X reflection and skeletal skinning; positive X is character left",
   "kernel": "wendland-c2-manual-plus-c2-affine-muscle-fields",
@@ -15,7 +15,7 @@
     "docs/NATURAL_FACE_STUDY_R8.md",
     "https://arxiv.org/abs/1307.2548"
   ],
-  "provenance": "Authored procedural muscle-inspired contraction fields, coordinated by semantic expression channels; not a physical muscle or tissue simulation, not scanned or measured muscle actions. Manual local offsets retain millimetre semantics; muscle strain scales with the head. Lip opening uses separate upper and lower free-edge motion with a continuous outer skin attachment; it is not a jaw joint simulation.",
+  "provenance": "Authored procedural muscle-inspired contraction fields, coordinated by semantic expression channels; not a physical muscle or tissue simulation, not scanned or measured muscle actions. Manual local offsets retain millimetre semantics; muscle strain scales with the head. lipPart remains an independent upper/lower free-edge separation. jawOpen is a bounded Performance Deform approximation that combines a weighted lower-face rotation and translation; it is not a temporomandibular-joint, dental-occlusion, or chewing simulation.",
   "nodes": [
     {
       "id": "browInnerLeft",
@@ -478,8 +478,13 @@
       "offsets": {}
     },
     {
+      "id": "jawOpen",
+      "label": "下颌张开（局部表现）",
+      "offsets": {}
+    },
+    {
       "id": "lipPart",
-      "label": "唇部拉开（近似）",
+      "label": "唇部独立拉开",
       "offsets": {
         "chin": [
           0,
@@ -509,6 +514,14 @@
       "id": "neutral",
       "label": "中性",
       "weights": {}
+    },
+    {
+      "id": "openMouth",
+      "label": "自然张口检查",
+      "weights": {
+        "jawOpen": 0.72,
+        "lipPart": 0.22
+      }
     },
     {
       "id": "smile",
@@ -545,7 +558,8 @@
         "browOuterUpRight": 0.85,
         "eyeWideLeft": 1,
         "eyeWideRight": 1,
-        "lipPart": 0.42
+        "lipPart": 0.18,
+        "jawOpen": 0.34
       }
     },
     {
@@ -581,11 +595,12 @@
   ],
   "runtimeVerified": false,
   "visualAcceptance": false,
-  "calibration": "r4-structural-identity-landmarks-authored-20260915",
+  "calibration": "r5-jaw-oral-cavity-authored-20260916",
   "legacyRevisions": [
     "r1-local-fields",
     "r2-muscle-fields",
-    "r3-independent-lip-opening"
+    "r3-independent-lip-opening",
+    "r4-structural-identity-landmarks"
   ],
   "muscleModel": {
     "envelope": "(1-dot(q,q))^3 within ellipsoid, zero outside; C2 boundary",

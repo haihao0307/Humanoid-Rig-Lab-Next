@@ -86,7 +86,7 @@ class NPCPopulation {
    // their resolved arrays across render passes instead of allocating each time.
    if(residentFacePose!==pose){
     const resolved=resolveFaceOffsets(pose),offsets=resolved.values,muscles=resolved.muscles,eyelids=resolved.eyelids;
-    residentFaceUniforms={offsets,muscles,eyelids,lipOpen:resolved.lipOpen,enabled:resolved.lipOpen>0||[offsets,muscles,eyelids].some(values=>values.some(v=>v!==0))?1:0,heatmap:0,selected:0};residentFacePose=pose;
+    residentFaceUniforms={offsets,muscles,eyelids,lipOpen:resolved.lipOpen,jawOpen:resolved.jawOpen,enabled:resolved.lipOpen>0||resolved.jawOpen>0||[offsets,muscles,eyelids].some(values=>values.some(v=>v!==0))?1:0,heatmap:0,selected:0};residentFacePose=pose;
    }
    return residentFaceUniforms;
   },refresh:()=>{if(this.activeId===id)this.lab.face.refresh();}};

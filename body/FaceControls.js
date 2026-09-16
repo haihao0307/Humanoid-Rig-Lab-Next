@@ -63,7 +63,8 @@ function resolveFaceOffsets(input){
   }
   const muscles=new Float32Array(FACE_RECIPE.muscleFields.map(field=>Math.min(1,Object.entries(field.activation).reduce((sum,[id,gain])=>sum+(weights[id]||0)*gain,0))));
   const eyelids=new Float32Array(['Left','Right'].flatMap(side=>['eyeNarrow','eyeWide','eyeBlink'].map(id=>weights[id+side]||0)));
-  return {profile:pose,identityOffsetsMm:offsetsMm,landmarks:faceIdentityLandmarks(pose.identity.shape),values,muscles,eyelids,lipOpen:weights.lipPart||0,limited};
+  const jawOpen=weights.jawOpen||0,lipOpen=Math.max(weights.lipPart||0,jawOpen*.42);
+  return {profile:pose,identityOffsetsMm:offsetsMm,landmarks:faceIdentityLandmarks(pose.identity.shape),values,muscles,eyelids,lipOpen,jawOpen,limited};
 }
 function interpolateFacePose(from,to,weight){
   const a=validateFacePose(from),b=validateFacePose(to);faceNumber(weight,0,1,'表情过渡');
@@ -175,7 +176,7 @@ function installFaceControls(lab){
     <button id="face-demo">依次演示</button><button id="face-stop">停止并还原</button>
     <details><summary>单独调整 ${FACE_RECIPE.channels.length} 项表情通道</summary><div id="face-channels"></div></details>
     <button id="face-export">导出身份与表情配方</button><label>导入面部配方<input id="face-import" type="file" accept=".json,application/json"></label>
-    <p class="settings-hint">十三项结构参数编译为中性脸位移，局部控制点只保存残差。当前仍未包含真实下颌关节、牙齿和舌头。</p>
+    <p class="settings-hint">十三项结构参数编译为中性脸位移，局部控制点只保存残差。当前下颌只是 Performance Deform 局部近似，不是完整颞下颌关节或咀嚼模拟。</p>
     <output id="face-status" role="status" aria-live="polite"></output>`;
   const style=document.createElement('style');style.textContent=`#face-panel label{display:block;margin:10px 0}#face-panel select{max-width:100%}#face-panel input[type=range]{width:100%;accent-color:#41745e}#face-panel input[type=number]{width:90px}#face-panel output{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}#face-panel button{font:inherit}#face-coverage{display:block;font-size:12px}#face-panel details{margin:12px 0}#face-panel summary{color:inherit}#face-panel .face-slider{display:grid;grid-template-columns:1fr auto}#face-panel .face-slider input{grid-column:1/-1}`;
   document.head.append(style);document.body.append(panel);const el=id=>panel.querySelector('#face-'+id);
@@ -229,7 +230,7 @@ function installFaceControls(lab){
   el('status').textContent=limit+'固定身份：'+(identity?.label||'自定义身份')+'；结构参数 '+Object.keys(shape).length+'/'+FACE_IDENTITY_PARAMETERS.length+'；临时表情：'+(expression?.label||(Object.keys(pose.expression.weights).length?'自定义表情':'中性'))+'。';
   needsRedraw=true;
 },
-uniforms(){return {offsets:resolved.values,muscles:resolved.muscles,eyelids:resolved.eyelids,lipOpen:resolved.lipOpen,enabled:enabled&&(resolved.lipOpen>0||[resolved.values,resolved.muscles,resolved.eyelids].some(values=>values.some(value=>value!==0)))?1:0,heatmap:heatmap?1:0,selected};},
+uniforms(){return {offsets:resolved.values,muscles:resolved.muscles,eyelids:resolved.eyelids,lipOpen:resolved.lipOpen,jawOpen:resolved.jawOpen,enabled:enabled&&(resolved.lipOpen>0||resolved.jawOpen>0||[resolved.values,resolved.muscles,resolved.eyelids].some(values=>values.some(value=>value!==0)))?1:0,heatmap:heatmap?1:0,selected};},
   closeup(view='front'){
     lab.setCameraFollow(false);lab.tissue.setView('skin');
     const reference=lab.human.sourceBind.get('head'),current=lab.human.world('head'),s=lab.human.bodyMetrics.statureScale;

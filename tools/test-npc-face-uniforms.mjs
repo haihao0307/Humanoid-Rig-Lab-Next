@@ -18,9 +18,9 @@ const editorMethod=faceSource.slice(methods[0].start,methods[0].end);
 const scope=vm.createContext({npcCopy:structuredClone,structuredClone});
 const api=vm.runInContext(faceSource+'\n'+read('control/NPCPopulation.js')+`
 ({NPCPopulation,resolveFaceOffsets,editorUniforms:(resolved,enabled=true,heatmap=false,selected=0)=>({${editorMethod}}).uniforms()})`,scope);
-const rendererSource=read('body/CompactWorkbench.js'),upload=rendererSource.match(/gl\.uniform1f\(p\.u\.compactLipOpen,([^;]+)\);/);
-assert(upload,'renderer uploads the mouth channel');
-const uploadedLip=vm.runInContext('(face)=>('+upload[1]+')',scope);
+const rendererSource=read('body/CompactWorkbench.js'),upload=rendererSource.match(/gl\.uniform1f\(p\.u\.compactLipOpen,([^;]+)\);gl\.uniform1f\(p\.u\.compactJawOpen,([^;]+)\);/);
+assert(upload,'renderer uploads the lip and jaw channels');
+const uploadedLip=vm.runInContext('(face)=>('+upload[1]+')',scope),uploadedJaw=vm.runInContext('(face)=>('+upload[2]+')',scope);
 const pop=Object.create(api.NPCPopulation.prototype);pop.activeId='npc-1';
 let editorEnabled=true,editorPose={};
 pop.lab={renderer:{},world:{},face:{uniforms:()=>api.editorUniforms(api.resolveFaceOffsets(editorPose),editorEnabled)}};
@@ -33,19 +33,28 @@ for(const activeId of ['npc-1','npc-2'])for(const amount of [0,.001,.375,1]){
  for(const actor of actors)actor.human.characterPreset.appearance.face=structuredClone(editorPose);
  const results=actors.map(actor=>actor.face.uniforms());
  assert.deepEqual(normal(results[0]),normal(results[1]),'editor selection must not alter a resident mouth');
- for(const value of results){assert.equal(value.lipOpen,amount);assert.equal(value.enabled,amount>0?1:0);assert(Number.isFinite(uploadedLip(value)));assert.equal(uploadedLip(value),amount);cases++;}
+ for(const value of results){assert.equal(value.lipOpen,amount);assert.equal(value.jawOpen,0);assert.equal(value.enabled,amount>0?1:0);assert(Number.isFinite(uploadedLip(value)));assert.equal(uploadedLip(value),amount);assert.equal(uploadedJaw(value),0);cases++;}
  // Editor mute affects only the active face. A dormant actor retains its recipe.
  editorEnabled=false;
- for(const actor of actors){const value=actor.face.uniforms();assert.equal(value.lipOpen,amount);assert.equal(uploadedLip(value),actor.id===activeId?0:amount);cases++;}
+ for(const actor of actors){const value=actor.face.uniforms();assert.equal(value.lipOpen,amount);assert.equal(value.jawOpen,0);assert.equal(uploadedLip(value),actor.id===activeId?0:amount);assert.equal(uploadedJaw(value),0);cases++;}
+}
+for(const activeId of ['npc-1','npc-2'])for(const amount of [0,.001,.375,1]){
+ pop.activeId=activeId;editorEnabled=true;editorPose={weights:{jawOpen:amount}};
+ for(const actor of actors)actor.human.characterPreset.appearance.face=structuredClone(editorPose);
+ const results=actors.map(actor=>actor.face.uniforms());
+ assert.deepEqual(normal(results[0]),normal(results[1]),'editor selection must not alter a resident jaw');
+ for(const value of results){assert.equal(value.jawOpen,amount);assert.equal(value.lipOpen,amount*.42);assert.equal(value.enabled,amount>0?1:0);assert.equal(uploadedJaw(value),amount);cases++;}
+ editorEnabled=false;
+ for(const actor of actors){const value=actor.face.uniforms();assert.equal(uploadedJaw(value),actor.id===activeId?0:amount);cases++;}
 }
 const recipe=JSON.parse(read('body/FaceControlRecipe.json'));
 for(const pose of [{weights:{eyeBlinkLeft:.7}},{offsetsMm:{[recipe.nodes[0].id]:[.3,0,0]}}]){
  editorEnabled=true;editorPose=pose;
- for(const actor of actors){actor.human.characterPreset.appearance.face=structuredClone(editorPose);const value=actor.face.uniforms();assert.equal(value.lipOpen,0);assert.equal(value.enabled,1);assert.equal(uploadedLip(value),0);cases++;}
+ for(const actor of actors){actor.human.characterPreset.appearance.face=structuredClone(editorPose);const value=actor.face.uniforms();assert.equal(value.lipOpen,0);assert.equal(value.jawOpen,0);assert.equal(value.enabled,1);assert.equal(uploadedLip(value),0);assert.equal(uploadedJaw(value),0);cases++;}
 }
-for(const amount of [NaN,Infinity,-.01,1.01])for(const activeId of ['npc-1','npc-2']){
- pop.activeId=activeId;editorPose={weights:{lipPart:amount}};
- for(const actor of actors){actor.human.characterPreset.appearance.face=editorPose;assert.throws(()=>actor.face.uniforms(),/lipPart/);cases++;}
+for(const channel of ['lipPart','jawOpen'])for(const amount of [NaN,Infinity,-.01,1.01])for(const activeId of ['npc-1','npc-2']){
+ pop.activeId=activeId;editorPose={weights:{[channel]:amount}};
+ for(const actor of actors){actor.human.characterPreset.appearance.face=editorPose;assert.throws(()=>actor.face.uniforms(),new RegExp(channel));cases++;}
 }
 pop.activeId='npc-1';
 const resident=actors[1];resident.human.characterPreset.appearance.face={offsetsMm:{cheekLeft:[2,0,0]}};
@@ -56,4 +65,4 @@ const changed=resident.face.uniforms();
 assert.notStrictEqual(changed,cached,'a committed replacement invalidates the face cache');
 assert.notDeepEqual(normal(changed.offsets),normal(cached.offsets),'updated identity reaches the renderer');
 assert.strictEqual(resident.face.uniforms(),changed);
-console.log(JSON.stringify({cases,activeAndInactiveLipTransfer:true,selectionIndependent:true,residentCacheInvalidation:true,editorMuteLocal:true,invalidValuesRejected:true,rendererUploadExpressionChecked:true,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
+console.log(JSON.stringify({cases,activeAndInactiveLipTransfer:true,activeAndInactiveJawTransfer:true,selectionIndependent:true,residentCacheInvalidation:true,editorMuteLocal:true,invalidValuesRejected:true,rendererUploadExpressionChecked:true,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));

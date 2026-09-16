@@ -9,13 +9,17 @@ export function checkFaceAnatomySources({read=readDefault,assert=assertDefault}=
  const source=read('body/FaceAnatomy.js'),renderer=read('body/CompactWorkbench.js'),manifest=JSON.parse(read('source/assembly.json'));
  new vm.Script(source);
  check(manifest.modules.filter(p=>p==='body/FaceAnatomy.js').length===1,'generator assembled once');
- check(source.includes("revision:'r13-neutral-oral-seal-lower-face'")&&source.includes("id:'upperLidSulcus'")&&source.includes("id:'lowerLidTransition'"),'versioned orbital transition separates broad socket depth from local lid sulci');
+ check(source.includes("revision:'r14-jaw-oral-cavity'")&&source.includes("id:'upperLidSulcus'")&&source.includes("id:'lowerLidTransition'"),'versioned orbital transition separates broad socket depth from local lid sulci');
  check(source.includes('domeX:.0046')&&source.includes('alarGrooveDepth:.00072')&&source.includes('sidewallHeight:.00030'),'nasal tip domes, alar lobules, grooves and sidewalls are explicit bounded subunits');
  check(source.includes('function compactPerioralDepth')&&source.includes('whiteRollUpper:.00002')&&source.includes('mentalisWingHeight:.00018'),'columella bridge, philtrum, bounded white roll and distributed mentalis volume are explicit');
- check(source.includes('const chinLo=1.4270,chinHi=1.4495')&&source.includes('compactLipContactShadow')&&source.includes('compactLipOpen<.025'),'lower-face Hermite bed, nonuniform contact shadow and closed-mouth cavity gate are explicit');
+ check(source.includes('const chinLo=1.4270,chinHi=1.4495')&&source.includes('compactLipContactShadow')&&source.includes('float oralOpening=max(compactLipOpen,compactJawOpen)'),'lower-face Hermite bed, nonuniform contact shadow and closed-mouth cavity gate are explicit');
  check(source.includes('openingGate=1.-smoothstep(.04,.18,compactLipOpen)'),'open-mouth fallback suppresses procedural grooves until inner and outer mucosa receive separate material domains');
+ check(source.includes('float oralOpening=max(compactLipOpen,compactJawOpen)')&&source.includes('compactJawOpen<.16'),'oral layers remain hidden until the aperture is meaningfully open');
  check(source.includes('const lipBedSurface=')&&source.includes('smooth+(surface(x,y)-smooth)*attach')&&source.includes('sideTag=(upper?1:-1)*.000001'),'lip free edge is laterally smoothed while a sub-visual side tag preserves upper/lower opening identity');
- check(renderer.includes("mouth=c.name==='mouthInterior'")&&renderer.includes('mouth?10:0')&&renderer.includes('compactLipContactShadow(R)'),'mouth interior has a dedicated feature gate and the lip seam uses controlled shading');
+ check(source.includes("'upperTeeth'")&&source.includes("'lowerTeeth'")&&source.includes("'upperGum'")&&source.includes("'lowerGum'")&&source.includes("'tongue'"),'teeth, gingiva and tongue are separate programmatic oral domains');
+ check(source.includes('function compactJawMotionShader')&&source.includes('jawPerformanceApproximation:true'),'jaw performance shader and explicit approximation report are defined in anatomy');
+ check(renderer.includes('compactJawMotion(source,n,canonicalPosition)')&&renderer.includes("upperTeeth=c.name==='upperTeeth'")&&renderer.includes('compactJawOpen'),'renderer applies the local jaw controller and classifies oral structures');
+ check(renderer.includes("mouth=c.name==='mouthInterior'")&&renderer.includes('mouth?10:upperTeeth?11:lowerTeeth?12:upperGum?13:lowerGum?14:tongue?15:0')&&renderer.includes('compactLipContactShadow(R)'),'mouth interior has a dedicated feature gate and the lip seam uses controlled shading');
  check(manifest.modules.indexOf('body/FaceAnatomy.js')<manifest.modules.indexOf('body/CompactWorkbench.js'),'generator precedes renderer');
  check((read('source/runtime.template.js').match(/__SOURCE:body\/FaceAnatomy\.js__/g)||[]).length===1,'runtime includes generator once');
  check(!/\b(?:document|window|fetch|Worker|localStorage)\b/.test(source),'generator has no external side effects');
@@ -88,8 +92,14 @@ export function checkFaceAnatomyParameters(){
    start=frame.floorVertex+1;
   }
  }
- const lip=full.meshes.find(m=>m.name==='faceLip'),mouth=full.meshes.find(m=>m.name==='mouthInterior');
+ const lip=full.meshes.find(m=>m.name==='faceLip'),mouth=full.meshes.find(m=>m.name==='mouthInterior'),upperTeeth=full.meshes.find(m=>m.name==='upperTeeth'),lowerTeeth=full.meshes.find(m=>m.name==='lowerTeeth'),upperGum=full.meshes.find(m=>m.name==='upperGum'),lowerGum=full.meshes.find(m=>m.name==='lowerGum'),tongue=full.meshes.find(m=>m.name==='tongue');
  check(lip.vertices>2*(api.parameters.lips.columns+1)*(api.parameters.lips.rings+1),'lips include returning inner surfaces');
+ check([upperTeeth,lowerTeeth,upperGum,lowerGum,tongue].every(Boolean),'all layered oral meshes are generated');
+ check(upperTeeth.triangles===lowerTeeth.triangles&&upperTeeth.triangles>1000,'paired dentitions use stable closed crown topology');
+ const width=m=>{const xs=[];for(let i=0;i<m.canonicalPositions.length;i+=3)xs.push(m.canonicalPositions[i]);return Math.max(...xs)-Math.min(...xs);};
+ check(width(upperTeeth)>width(lowerTeeth),'maxillary dental arch remains wider than mandibular arch');
+ check(upperGum.triangles===lowerGum.triangles&&upperGum.triangles>500,'continuous gingival arches use matched tube topology');
+ check(tongue.vertices>200&&full.report.jawPerformanceApproximation===true&&full.report.oralStructures.measuredDentition===false,'tongue and jaw approximation are explicit authored structures rather than measured dentition');
  check(Math.max(...mouth.canonicalPositions.filter((v,i)=>i%3===2))-Math.min(...mouth.canonicalPositions.filter((v,i)=>i%3===2))>.008,'oral cavity has depth rather than a closure strip');
  // The old fractional sine roll sharpened with increasing subdivision. The
  // replacement must meet the skin in position and tangent at every lip section.
