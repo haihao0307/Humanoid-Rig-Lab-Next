@@ -1,0 +1,32 @@
+name: Chicken Phase 1 NPC Controller
+
+on:
+  push:
+    branches:
+      - codex/chicken-r9-2-head-restore
+    paths:
+      - runtime/chicken_phase1_npc_controller.mjs
+      - tests/chicken_phase1_npc_controller.test.mjs
+      - data/CHICKEN_PHASE1_NPC_CONTRACT.json
+      - CHICKEN_PHASE1_ENVIRONMENT_NPC_SCOPE.md
+      - .github/workflows/chicken-phase1-npc-controller.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  controller-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run deterministic controller tests
+        run: node tests/chicken_phase1_npc_controller.test.mjs
