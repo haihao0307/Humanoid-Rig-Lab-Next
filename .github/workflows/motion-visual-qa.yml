@@ -88,7 +88,8 @@ jobs:
           patch_bytes('control/NPCPopulation.js', population_marker, population_insert)
           PY
           node tools/build-pure.mjs
-          grep -q '__motionVisualQAFallback' index.html
+          grep -q '__motionVisualQAFallback' body/CompactWorkbench.js
+          grep -q "has('visualTest')" control/NPCPopulation.js
           sha256sum source-index.html index.html | tee qa-entrypoint-hashes.txt
 
       - name: Run one-session Chrome capture
