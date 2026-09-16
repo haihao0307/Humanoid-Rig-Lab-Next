@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Add deterministic open-intersection right of way
+      - name: Add bounded open-intersection right of way
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -33,8 +33,14 @@ jobs:
               "function trafficPairSide(a,b){return trafficHash([String(a||''),String(b||'')].sort().join('|'))&1?1:-1;}\n"
               "function trafficOpenPriority(agent,other){\n"
               " const otherAgent=other?.agent;\n"
-              " if(!otherAgent||other.disposed||otherAgent.paused||otherAgent.skill?.type!=='walk'||otherAgent.routeIndex>=otherAgent.route.length)return null;\n"
+              " if(!otherAgent||other.disposed||otherAgent.paused||otherAgent.skill?.type!=='walk'||!otherAgent.route?.length||otherAgent.routeIndex>=otherAgent.route.length)return null;\n"
               " return[String(agent.npcId||''),String(other.id||'')].sort()[0];\n"
+              "}\n"
+              "function trafficOpenPriorityEligible(agent,conflict,target,context){\n"
+              " const other=conflict?.actor,otherAgent=other?.agent,ownMode=agent.locomotion?.traffic?.mode,otherMode=otherAgent?.locomotion?.traffic?.mode;\n"
+              " if(!otherAgent||['corridor-owner','corridor-circulation'].includes(ownMode)||['corridor-owner','corridor-circulation'].includes(otherMode))return false;\n"
+              " const root=agent.locomotion?.engine?.state?.root||agent.pos;let direction=sub(target,root);direction[1]=0;if(len(direction)<.08)return false;direction=norm(direction);\n"
+              " const sample=conflict.selfPoint||mix(root,target,.5);return !trafficCorridorLocal(agent,sample,direction,context).narrow;\n"
               "}\n"
               "function trafficActorVelocity(actor){"
           )
@@ -43,7 +49,7 @@ jobs:
           text=text.replace(helper_old,helper_new,1)
 
           state_old="corridorClaims:0,corridorYields:0};this.sync();"
-          state_new="corridorClaims:0,corridorYields:0,priorityPasses:0,priorityActor:null};this.sync();"
+          state_new="corridorClaims:0,corridorYields:0,priorityPasses:0,priorityActor:null,priorityUntilS:0};this.sync();"
           if text.count(state_old)!=1:
               raise SystemExit(f'traffic state anchor count: {text.count(state_old)}')
           text=text.replace(state_old,state_new,1)
@@ -62,25 +68,31 @@ jobs:
               "   if(corridor==='owner'||corridor==='yield'){const managed=this.maintainCorridor(context,target);if(managed)return managed;throw Error('狭窄通道没有可用的持续移动路线');}\n"
               "   if(corridor==='blocked')throw Error('狭窄通道没有可用的主动撤离路线');\n"
               "  }\n"
-              "  if(predicted&&trafficOpenPriority(a,predicted.actor)===String(a.npcId)){\n"
-              "   const first=this.traffic.mode!=='priority-pass'||this.traffic.priorityActor!==predicted.actor.id;\n"
-              "   if(first&&['detour','retreat','escape'].includes(this.traffic.mode))this.replanStaticRoute(context,'open-intersection-priority');\n"
-              "   target=a.route[a.routeIndex]||target;\n"
-              "   Object.assign(this.traffic,{active:false,mode:'priority-pass',reason:'open-intersection-priority',blockers:[predicted.actor.id],side:0,detourEndIndex:-1,originalTarget:[...(this.traffic.slotPoint||a.route.at(-1)||target)],priorityActor:predicted.actor.id,lastPlanAtS:a.time,nextPlanAtS:a.time+.42,lastError:null,advancePoint:null,advanceRouteIndex:-1});\n"
-              "   if(first){this.traffic.priorityPasses++;a.log?.('交叉路线采用稳定通行优先级，保持前进，由 '+predicted.actor.label+' 主动绕行');}\n"
-              "   return target;\n"
+              "  const openPriority=predicted&&trafficOpenPriorityEligible(a,predicted,target,context)&&trafficOpenPriority(a,predicted.actor)===String(a.npcId);\n"
+              "  if(openPriority){\n"
+              "   const first=this.traffic.priorityActor!==predicted.actor.id||a.time>=this.traffic.priorityUntilS;\n"
+              "   if(first&&['detour','retreat','escape'].includes(this.traffic.mode)){this.replanStaticRoute(context,'open-intersection-priority');target=a.route[a.routeIndex]||target;}\n"
+              "   Object.assign(this.traffic,{active:false,mode:'priority-pass',reason:'open-intersection-priority',blockers:[predicted.actor.id],side:0,detourEndIndex:-1,originalTarget:[...(this.traffic.slotPoint||a.route.at(-1)||target)],priorityActor:predicted.actor.id,priorityUntilS:a.time+1.2,lastPlanAtS:a.time,lastError:null,advancePoint:null,advanceRouteIndex:-1});\n"
+              "   if(first){this.traffic.priorityPasses++;a.log?.('开放交叉区域采用稳定通行优先级，保持原路线，由 '+predicted.actor.label+' 主动绕行');}\n"
               "  }\n"
-              "  const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;"
+              "  const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;if(openPriority&&rolling===target)return target;"
           )
           if text.count(prepare_old)!=1:
               raise SystemExit(f'priority insertion anchor count: {text.count(prepare_old)}')
           text=text.replace(prepare_old,prepare_new,1)
 
-          clear_old="if(!conflict){this.traffic.blockers=[];return target;}"
-          clear_new="if(!conflict){this.traffic.blockers=[];if(this.traffic.mode==='priority-pass')Object.assign(this.traffic,{mode:'clear',reason:null,priorityActor:null});return target;}"
-          if text.count(clear_old)!=1:
-              raise SystemExit(f'priority clear anchor count: {text.count(clear_old)}')
-          text=text.replace(clear_old,clear_new,1)
+          conflict_old=(
+              "  if(!conflict){this.traffic.blockers=[];return target;}\n"
+              "  if(this.installLocalDetour(conflict,context)||this.installDeterministicRetreat(conflict,context)||this.installRadialEscape(conflict,context))return a.route[a.routeIndex];"
+          )
+          conflict_new=(
+              "  if(!conflict){this.traffic.blockers=[];if(this.traffic.priorityActor&&a.time>=this.traffic.priorityUntilS)Object.assign(this.traffic,{priorityActor:null,priorityUntilS:0,mode:this.traffic.mode==='priority-pass'?'clear':this.traffic.mode,reason:this.traffic.mode==='priority-pass'?null:this.traffic.reason});return target;}\n"
+              "  const recovered=openPriority?(this.installRadialEscape(conflict,context)||this.installLocalDetour(conflict,context)||this.installDeterministicRetreat(conflict,context)):(this.installLocalDetour(conflict,context)||this.installDeterministicRetreat(conflict,context)||this.installRadialEscape(conflict,context));\n"
+              "  if(recovered)return a.route[a.routeIndex];"
+          )
+          if text.count(conflict_old)!=1:
+              raise SystemExit(f'priority conflict anchor count: {text.count(conflict_old)}')
+          text=text.replace(conflict_old,conflict_new,1)
           path.write_text(text,encoding='utf-8',newline='\n')
 
           browser=Path('tools/test-task-crowd-browser.mjs')
@@ -90,7 +102,7 @@ jobs:
               "assert.notEqual(ready.startup?.status,'failed','browser crowd startup failed: '+JSON.stringify(ready));":"assert.equal(ready.startup?.status,'ready','full review cast did not reach ready: '+JSON.stringify(ready));",
               "assert(ready.population>=4,'crowd browser scenario requires at least four real NPCs');":"assert(ready.population>=6,'crowd browser scenario requires the six-person review cast');\n assert.equal(ready.pending,0,'review-cast generation must finish before traffic scenarios');",
               "['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations']":"['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations','priorityPasses']",
-              "assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');":"assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');\n assert(crossing.actors.reduce((sum,actor)=>sum+(Number(actor.traffic.priorityPasses)||0),0)>=1,'four-way browser crossing did not issue deterministic open-area right of way');"
+              "assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');":"assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');\n const browserPriorityPasses=crossing.actors.reduce((sum,actor)=>sum+(Number(actor.traffic.priorityPasses)||0),0);\n assert(browserPriorityPasses>=1,'four-way browser crossing did not issue deterministic open-area right of way');\n assert(browserPriorityPasses<64,'open-area right of way thrashed instead of remaining stable');"
           }
           for old,new in replacements.items():
               count=text.count(old)
@@ -102,7 +114,7 @@ jobs:
           unit=Path('tools/test-npc-four-way-crossing.mjs')
           text=unit.read_text(encoding='utf-8')
           old="const trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries+(actor.locomotion.traffic.escapes||0),0);\nassert(trafficActions>0,'the crossing must exercise predictive traffic handling');"
-          new="const trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries+(actor.locomotion.traffic.escapes||0)+(actor.locomotion.traffic.priorityPasses||0),0);\nassert(trafficActions>0,'the crossing must exercise predictive traffic handling');\nassert(actors.reduce((sum,actor)=>sum+(actor.locomotion.traffic.priorityPasses||0),0)>0,'the crossing must issue a deterministic open-area right of way');"
+          new="const priorityPasses=actors.reduce((sum,actor)=>sum+(actor.locomotion.traffic.priorityPasses||0),0),trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries+(actor.locomotion.traffic.escapes||0)+(actor.locomotion.traffic.priorityPasses||0),0);\nassert(trafficActions>0,'the crossing must exercise predictive traffic handling');\nassert(priorityPasses>0,'the crossing must issue a deterministic open-area right of way');\nassert(priorityPasses<64,'open-area right of way must remain stable instead of thrashing');"
           if text.count(old)!=1:
               raise SystemExit(f'unit priority metric anchor count: {text.count(old)}')
           unit.write_text(text.replace(old,new,1),encoding='utf-8',newline='\n')
@@ -159,5 +171,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add body/NaturalLocomotion.js tools/test-task-crowd-browser.mjs tools/test-npc-four-way-crossing.mjs index.html
-          git commit -m "fix(task): add deterministic open-intersection priority R2.7"
+          git commit -m "fix(task): add bounded open-intersection priority R2.7"
           git push origin HEAD:feature/human-task-workbench-adjustment-v2-fullbase
