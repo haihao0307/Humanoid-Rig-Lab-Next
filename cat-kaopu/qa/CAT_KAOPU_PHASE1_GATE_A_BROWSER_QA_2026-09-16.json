@@ -33,6 +33,10 @@
       "obstacleCount": 1,
       "response": "post-contact-bounded-pushout-plus-grounded-gait-brake"
     },
+    "presentation": {
+      "secondaryFaceCarrierDefault": false,
+      "reason": "whole_body_silhouette_first"
+    },
     "gates": {
       "singleNpc": "active",
       "group": "locked",
@@ -95,43 +99,43 @@
   "screenshots": {
     "standFront": {
       "path": "qa/CAT_KAOPU_PHASE1_GATE_A_STAND_FRONT_2026-09-16.png",
-      "bytes": 157449,
-      "sha256": "faad31f3d68bbed145a0513e5628ca2579e2affa5017884cbcd8f98bfbe14979"
+      "bytes": 94946,
+      "sha256": "b8153bc4135c2fde47057750defcf6eefb5f0a606cef3afd88ed322894509d3b"
     },
     "standLeft": {
       "path": "qa/CAT_KAOPU_PHASE1_GATE_A_STAND_LEFT_2026-09-16.png",
-      "bytes": 135916,
-      "sha256": "5b0735271684585ce9ee163d016d8c6d33584a6cc616cc8b5cd8ba06c5336621"
+      "bytes": 95970,
+      "sha256": "9061026300868616149950f6bf473bd069e218e155de7fc558bdd2fe7e0a3757"
     },
     "standTop": {
       "path": "qa/CAT_KAOPU_PHASE1_GATE_A_STAND_TOP_2026-09-16.png",
-      "bytes": 108815,
-      "sha256": "3faebd0b4055156e3da9811fa9f96c74eb68eb1f8a6ea6ce47cfa1419cd76a92"
+      "bytes": 72841,
+      "sha256": "3934e209fdb75f8399ee8b1cd4024805d4d583d3e78f4773787835aa6a3cb218"
     },
     "standQuarter": {
       "path": "qa/CAT_KAOPU_PHASE1_GATE_A_STAND_QUARTER_2026-09-16.png",
-      "bytes": 148715,
-      "sha256": "3ae0eac01d5aaedf836839480506c7cd5a27b28aabf09e91e6baabb2c6e02e97"
+      "bytes": 101797,
+      "sha256": "fc7f5f68ed44556ce7caa293bb818a74b24e26973b4c56614b4bdddf3fa589d0"
     },
     "walkMid": {
       "path": "qa/CAT_KAOPU_PHASE1_GATE_A_WALK_MID_2026-09-16.png",
-      "bytes": 141604,
-      "sha256": "f026fe542e1560aa5a219d960f6a1e78a71a6288e58153fffa0035548d7ac86c"
+      "bytes": 104766,
+      "sha256": "859dadd30bd7de536bf350040584eafcb3d2f70ec13af5fcd01d111a3679a87a"
     },
     "turnLeftTop": {
       "path": "qa/CAT_KAOPU_PHASE1_GATE_A_TURN_LEFT_TOP_2026-09-16.png",
-      "bytes": 102899,
-      "sha256": "d73b7491a62e3faa69615817c01b14e213e09948ea47b9c5564b6edc0dcf7724"
+      "bytes": 77114,
+      "sha256": "ed132179b33553e788eb43892db9525f1127e1ad096a6021027713c7adad81ee"
     },
     "turnRightTop": {
       "path": "qa/CAT_KAOPU_PHASE1_GATE_A_TURN_RIGHT_TOP_2026-09-16.png",
-      "bytes": 115087,
-      "sha256": "d30f15ac4c87c1a9d737fd1788130326a659837016695a96d725142e6c0e6640"
+      "bytes": 77494,
+      "sha256": "c3210d638a82f9ba75b046b4a3c723628e447374b67127e743de3d784d146a19"
     },
     "collisionBlocked": {
       "path": "qa/CAT_KAOPU_PHASE1_GATE_A_COLLISION_BLOCKED_2026-09-16.png",
-      "bytes": 151014,
-      "sha256": "d8cc7671afd074036fcf745336c70a2f2a4dcf9ed67e2f0a1b0ff80d2b535132"
+      "bytes": 104276,
+      "sha256": "ebc761902f74a56ec97565c5c5dce6b586eb8fd6d621265bcca177cbddd00bb1"
     }
   },
   "samples": {
@@ -154,7 +158,7 @@
         "brake": 1,
         "minClearanceM": 0.13799999999999998,
         "contacts": [],
-        "testedFrames": 84
+        "testedFrames": 82
       },
       "collisionProfile": {
         "schema": "cat_kaopu/environment_collision_proxy@1.0",
@@ -271,7 +275,7 @@
           "blinkMode": "auto",
           "autoBlink": true,
           "eyeLayerEnabled": true,
-          "blinkLayerEnabled": true,
+          "blinkLayerEnabled": false,
           "lidDebugEnabled": false,
           "lidThickness": 0.00042,
           "patchStrength": 0.88,
@@ -289,7 +293,7 @@
           "furDebugEnabled": false
         },
         "periorbitalGeometry": {
-          "enabled": true,
+          "enabled": false,
           "debug": false,
           "thicknessM": 0.00042,
           "patchStrength": 0.88,
@@ -324,7 +328,7 @@
           "brake": 1,
           "minClearanceM": 0.13799999999999998,
           "contacts": [],
-          "testedFrames": 84
+          "testedFrames": 82
         }
       }
     },
@@ -347,7 +351,7 @@
         "brake": 1,
         "minClearanceM": 0.13799999999999998,
         "contacts": [],
-        "testedFrames": 133
+        "testedFrames": 137
       },
       "collisionProfile": {
         "schema": "cat_kaopu/environment_collision_proxy@1.0",
@@ -464,7 +468,7 @@
           "blinkMode": "auto",
           "autoBlink": true,
           "eyeLayerEnabled": true,
-          "blinkLayerEnabled": true,
+          "blinkLayerEnabled": false,
           "lidDebugEnabled": false,
           "lidThickness": 0.00042,
           "patchStrength": 0.88,
@@ -482,7 +486,7 @@
           "furDebugEnabled": false
         },
         "periorbitalGeometry": {
-          "enabled": true,
+          "enabled": false,
           "debug": false,
           "thicknessM": 0.00042,
           "patchStrength": 0.88,
@@ -517,7 +521,7 @@
           "brake": 1,
           "minClearanceM": 0.13799999999999998,
           "contacts": [],
-          "testedFrames": 133
+          "testedFrames": 137
         }
       }
     },
@@ -540,7 +544,7 @@
         "brake": 1,
         "minClearanceM": 0.13799999999999998,
         "contacts": [],
-        "testedFrames": 185
+        "testedFrames": 190
       },
       "collisionProfile": {
         "schema": "cat_kaopu/environment_collision_proxy@1.0",
@@ -657,7 +661,7 @@
           "blinkMode": "auto",
           "autoBlink": true,
           "eyeLayerEnabled": true,
-          "blinkLayerEnabled": true,
+          "blinkLayerEnabled": false,
           "lidDebugEnabled": false,
           "lidThickness": 0.00042,
           "patchStrength": 0.88,
@@ -675,7 +679,7 @@
           "furDebugEnabled": false
         },
         "periorbitalGeometry": {
-          "enabled": true,
+          "enabled": false,
           "debug": false,
           "thicknessM": 0.00042,
           "patchStrength": 0.88,
@@ -710,7 +714,7 @@
           "brake": 1,
           "minClearanceM": 0.13799999999999998,
           "contacts": [],
-          "testedFrames": 185
+          "testedFrames": 190
         }
       }
     },
@@ -733,7 +737,7 @@
         "brake": 1,
         "minClearanceM": 0.13799999999999998,
         "contacts": [],
-        "testedFrames": 236
+        "testedFrames": 240
       },
       "collisionProfile": {
         "schema": "cat_kaopu/environment_collision_proxy@1.0",
@@ -850,7 +854,7 @@
           "blinkMode": "auto",
           "autoBlink": true,
           "eyeLayerEnabled": true,
-          "blinkLayerEnabled": true,
+          "blinkLayerEnabled": false,
           "lidDebugEnabled": false,
           "lidThickness": 0.00042,
           "patchStrength": 0.88,
@@ -868,7 +872,7 @@
           "furDebugEnabled": false
         },
         "periorbitalGeometry": {
-          "enabled": true,
+          "enabled": false,
           "debug": false,
           "thicknessM": 0.00042,
           "patchStrength": 0.88,
@@ -903,7 +907,7 @@
           "brake": 1,
           "minClearanceM": 0.13799999999999998,
           "contacts": [],
-          "testedFrames": 236
+          "testedFrames": 240
         }
       }
     },
@@ -926,7 +930,7 @@
         "brake": 1,
         "minClearanceM": 0.07409857559204103,
         "contacts": [],
-        "testedFrames": 301
+        "testedFrames": 326
       },
       "collisionProfile": {
         "schema": "cat_kaopu/environment_collision_proxy@1.0",
@@ -1047,7 +1051,7 @@
           "blinkMode": "auto",
           "autoBlink": true,
           "eyeLayerEnabled": true,
-          "blinkLayerEnabled": true,
+          "blinkLayerEnabled": false,
           "lidDebugEnabled": false,
           "lidThickness": 0.00042,
           "patchStrength": 0.88,
@@ -1065,7 +1069,7 @@
           "furDebugEnabled": false
         },
         "periorbitalGeometry": {
-          "enabled": true,
+          "enabled": false,
           "debug": false,
           "thicknessM": 0.00042,
           "patchStrength": 0.88,
@@ -1100,7 +1104,7 @@
           "brake": 1,
           "minClearanceM": 0.07409857559204103,
           "contacts": [],
-          "testedFrames": 301
+          "testedFrames": 326
         }
       }
     },
@@ -1123,7 +1127,7 @@
         "brake": 1,
         "minClearanceM": 0.07364186173886422,
         "contacts": [],
-        "testedFrames": 360
+        "testedFrames": 398
       },
       "collisionProfile": {
         "schema": "cat_kaopu/environment_collision_proxy@1.0",
@@ -1244,7 +1248,7 @@
           "blinkMode": "auto",
           "autoBlink": true,
           "eyeLayerEnabled": true,
-          "blinkLayerEnabled": true,
+          "blinkLayerEnabled": false,
           "lidDebugEnabled": false,
           "lidThickness": 0.00042,
           "patchStrength": 0.88,
@@ -1262,7 +1266,7 @@
           "furDebugEnabled": false
         },
         "periorbitalGeometry": {
-          "enabled": true,
+          "enabled": false,
           "debug": false,
           "thicknessM": 0.00042,
           "patchStrength": 0.88,
@@ -1297,7 +1301,7 @@
           "brake": 1,
           "minClearanceM": 0.07364186173886422,
           "contacts": [],
-          "testedFrames": 360
+          "testedFrames": 398
         }
       }
     },
@@ -1320,7 +1324,7 @@
         "brake": 1,
         "minClearanceM": 0.07364472276181344,
         "contacts": [],
-        "testedFrames": 408
+        "testedFrames": 457
       },
       "collisionProfile": {
         "schema": "cat_kaopu/environment_collision_proxy@1.0",
@@ -1441,7 +1445,7 @@
           "blinkMode": "auto",
           "autoBlink": true,
           "eyeLayerEnabled": true,
-          "blinkLayerEnabled": true,
+          "blinkLayerEnabled": false,
           "lidDebugEnabled": false,
           "lidThickness": 0.00042,
           "patchStrength": 0.88,
@@ -1459,7 +1463,7 @@
           "furDebugEnabled": false
         },
         "periorbitalGeometry": {
-          "enabled": true,
+          "enabled": false,
           "debug": false,
           "thicknessM": 0.00042,
           "patchStrength": 0.88,
@@ -1494,7 +1498,7 @@
           "brake": 1,
           "minClearanceM": 0.07364472276181344,
           "contacts": [],
-          "testedFrames": 408
+          "testedFrames": 457
         }
       }
     },
@@ -1523,7 +1527,7 @@
             "penetrationM": 0.032206665992736805
           }
         ],
-        "testedFrames": 469
+        "testedFrames": 553
       },
       "collisionProfile": {
         "schema": "cat_kaopu/environment_collision_proxy@1.0",
@@ -1645,7 +1649,7 @@
           "blinkMode": "auto",
           "autoBlink": true,
           "eyeLayerEnabled": true,
-          "blinkLayerEnabled": true,
+          "blinkLayerEnabled": false,
           "lidDebugEnabled": false,
           "lidThickness": 0.00042,
           "patchStrength": 0.88,
@@ -1663,7 +1667,7 @@
           "furDebugEnabled": false
         },
         "periorbitalGeometry": {
-          "enabled": true,
+          "enabled": false,
           "debug": false,
           "thicknessM": 0.00042,
           "patchStrength": 0.88,
@@ -1704,7 +1708,7 @@
               "penetrationM": 0.032206665992736805
             }
           ],
-          "testedFrames": 469
+          "testedFrames": 553
         }
       }
     },
@@ -1727,7 +1731,7 @@
         "brake": 1,
         "minClearanceM": -0.032206665992736805,
         "contacts": [],
-        "testedFrames": 483
+        "testedFrames": 571
       },
       "collisionProfile": {
         "schema": "cat_kaopu/environment_collision_proxy@1.0",
@@ -1848,7 +1852,7 @@
           "blinkMode": "auto",
           "autoBlink": true,
           "eyeLayerEnabled": true,
-          "blinkLayerEnabled": true,
+          "blinkLayerEnabled": false,
           "lidDebugEnabled": false,
           "lidThickness": 0.00042,
           "patchStrength": 0.88,
@@ -1866,7 +1870,7 @@
           "furDebugEnabled": false
         },
         "periorbitalGeometry": {
-          "enabled": true,
+          "enabled": false,
           "debug": false,
           "thicknessM": 0.00042,
           "patchStrength": 0.88,
@@ -1901,7 +1905,7 @@
           "brake": 1,
           "minClearanceM": -0.032206665992736805,
           "contacts": [],
-          "testedFrames": 483
+          "testedFrames": 571
         }
       }
     }
@@ -1931,8 +1935,8 @@
     "overflowPx": 0,
     "screenshot": {
       "path": "qa/CAT_KAOPU_PHASE1_GATE_A_MOBILE_390x844_2026-09-16.png",
-      "bytes": 110771,
-      "sha256": "5ca14885f9e032733cfd792d0154616b2ac94d53f246c6ab93c920002a9ad9d8"
+      "bytes": 102973,
+      "sha256": "2c9d38ed11f6d11581bf1a6604948f1af855ea7f757c953999c22b6fe4d5edaa"
     }
   },
   "visualAcceptance": false,
