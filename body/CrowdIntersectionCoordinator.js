@@ -67,11 +67,10 @@ function trafficResolveOpenIntersection(locomotion,conflict,context){
  trafficIntersectionAssignOwner(lease,population,a.time);trafficIntersectionSyncMembers(lease,population);return lease;
 }
 function trafficIntersectionOrbitTarget(locomotion,lease,context,{ownerFallback=false}={}){
- const a=locomotion.a,traffic=locomotion.traffic,root=locomotion.engine.state.root,center=lease.center,waiting=[...lease.members.keys()].filter(id=>id!==lease.ownerId).sort(),lane=ownerFallback?0:Math.max(0,waiting.indexOf(a.npcId)),radius=TRAFFIC_INTERSECTION.baseOrbitM+lane*TRAFFIC_INTERSECTION.laneGapM+(ownerFallback?.12:0),offset=[root[0]-center[0],0,root[2]-center[2]],distance=len(offset);
- let angle=distance>.06?Math.atan2(offset[0],offset[2]):((trafficHash(String(a.npcId||''))%360)/180*Math.PI),base=angle;
- const candidates=[];
+ const a=locomotion.a,traffic=locomotion.traffic,root=locomotion.engine.state.root,center=lease.center,waiting=[...lease.members.keys()].filter(id=>id!==lease.ownerId).sort(),lane=ownerFallback?0:Math.max(0,waiting.indexOf(a.npcId)),radius=TRAFFIC_INTERSECTION.baseOrbitM+lane*TRAFFIC_INTERSECTION.laneGapM+(ownerFallback?0.12:0),offset=[root[0]-center[0],0,root[2]-center[2]],distance=len(offset);
+ const angle=distance>.06?Math.atan2(offset[0],offset[2]):((trafficHash(String(a.npcId||''))%360)/180*Math.PI),candidates=[];
  if(distance<radius-.10||distance>radius+.42)candidates.push([center[0]+Math.sin(angle)*radius,0,center[2]+Math.cos(angle)*radius]);
- for(const step of [.28,.42,.58,.76,1.0])for(const radial of [radius,radius+.16,Math.max(.92,radius-.12)]){const next=base+lease.direction*step;candidates.push([center[0]+Math.sin(next)*radial,0,center[2]+Math.cos(next)*radial]);}
+ for(const step of [.28,.42,.58,.76,1.0])for(const radial of [radius,radius+.16,Math.max(.92,radius-.12)]){const next=angle+lease.direction*step;candidates.push([center[0]+Math.sin(next)*radial,0,center[2]+Math.cos(next)*radial]);}
  for(const point of candidates){if(!locomotion.world.free(point,.23)||!trafficSegmentClear(a,root,point,context))continue;const nextAngle=Math.atan2(point[0]-center[0],point[2]-center[2]);if(Number.isFinite(traffic.intersectionOrbitAngle)){const delta=angleDiff(nextAngle,traffic.intersectionOrbitAngle)*lease.direction;if(delta<-.8)traffic.intersectionLaps++;}traffic.intersectionOrbitAngle=nextAngle;return point;}
  return null;
 }
@@ -90,4 +89,3 @@ function trafficMaintainOpenIntersection(locomotion,context,target){
  const advance=target&&locomotion.corridorAdvanceTarget(target,context);if(advance)return advance;
  const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context,{ownerFallback:true});if(!orbit)throw Error('开放交叉区域所有者暂时没有可行的前进或循环路线');return orbit;
 }
-".replace("(ownerFallback?.12:0)
