@@ -1,6 +1,6 @@
 {
   "schema": "life_ecosystem/chicken_module_state@1.0",
-  "version": "V4.6_R9.8_3_PHASE1_ENVIRONMENT_NPC_INTAKE",
+  "version": "V4.6_R9.8_3_PHASE1_ENVIRONMENT_NPC_FOUNDATION",
   "date": "2026-09-16",
   "identity": {
     "species_scope": "domestic chicken environmental NPC candidate",
@@ -15,6 +15,8 @@
   "candidate_parameters": "data/CHICKEN_R983_CLEAN_FACE_PARAMETERS.json",
   "phase1_contract": "data/CHICKEN_PHASE1_NPC_CONTRACT.json",
   "phase1_scope": "CHICKEN_PHASE1_ENVIRONMENT_NPC_SCOPE.md",
+  "motion_controller": "runtime/chicken_phase1_npc_controller.mjs",
+  "motion_controller_tests": "tests/chicken_phase1_npc_controller.test.mjs",
   "review_board": "evidence/r983/R983_REVIEW_BOARD.html",
   "priority_order": [
     "morphology",
@@ -36,10 +38,15 @@
     "shape_gate": "gameplay_distance_low_frequency_morphology",
     "single_agent_first": true,
     "motion_set_defined": true,
+    "motion_controller_foundation_built": true,
+    "motion_controller_ci_passed": true,
     "collision_contract_defined": true,
+    "soft_separation_and_obstacle_detour_foundation_built": true,
+    "seeded_variation_foundation_built": true,
     "herd_after_single_agent_stable": true,
     "complex_life_activity_deferred": true,
     "morphology_baseline_frozen": false,
+    "rig_adapter_integrated": false,
     "single_agent_motion_complete": false,
     "single_agent_collision_complete": false,
     "small_herd_stable": false,
@@ -48,12 +55,13 @@
   "qa": {
     "technical_gate_passed": true,
     "current_executable_reproducible": true,
+    "motion_controller_unit_and_stress_tests_passed": true,
     "whole_visual_gate_passed": false,
     "canonical_chicken_surface_complete": false,
     "rig_authorized": false,
-    "motion_implemented": false,
+    "motion_implemented_on_rendered_chicken": false,
     "production_ready": false,
     "public_https_published": true
   },
-  "next_stage": "GAMEPLAY_DISTANCE_SHAPE_FREEZE_THEN_SINGLE_AGENT_MOTION_FOUNDATION"
+  "next_stage": "GAMEPLAY_DISTANCE_SHAPE_FREEZE_AND_RIG_ADAPTER_INTEGRATION"
 }
