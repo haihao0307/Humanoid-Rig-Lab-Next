@@ -1,0 +1,151 @@
+name: Chicken R9.5.1 Separate Head Shell Build
+
+on:
+  push:
+    branches:
+      - codex/chicken-r9-2-head-restore
+    paths:
+      - .github/workflows/chicken-r95-v2-build.yml
+      - tools/build_chicken_r95.py
+      - tools/build_chicken_r95_v2.py
+      - tools/chicken_r95_override_v2.js
+      - tools/capture_chicken_r95_v2.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: chicken-r95-v2-head-shell
+  cancel-in-progress: true
+
+jobs:
+  build-audit-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out candidate branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify committed R9.5.1 source tools
+        shell: bash
+        run: |
+          test -s tools/build_chicken_r95.py
+          test -s tools/build_chicken_r95_v2.py
+          test -s tools/chicken_r95_override_v2.js
+          test -s tools/capture_chicken_r95_v2.mjs
+          python -m py_compile tools/build_chicken_r95.py tools/build_chicken_r95_v2.py
+          node --check tools/chicken_r95_override_v2.js
+          node --check tools/capture_chicken_r95_v2.mjs
+
+      - name: Build deterministic R9.5.1 executable
+        run: python tools/build_chicken_r95_v2.py
+
+      - name: Install Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Install Playwright Core
+        run: npm install --no-save playwright-core@1.55.0
+
+      - name: Run browser and bounded-shell QA
+        id: browser_qa
+        continue-on-error: true
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          CHICKEN_R95_URL: http://127.0.0.1:8765/CHICKEN_V46_R9_5_HEAD_CARRIER.html
+          CHICKEN_R91_URL: http://127.0.0.1:8765/CHICKEN_V46_R9_1.html
+        shell: bash
+        run: |
+          python -m http.server 8765 > /tmp/chicken-r95-v2-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 2
+          node tools/capture_chicken_r95_v2.mjs
+
+      - name: Finalize state, review board and manifest
+        if: always()
+        run: python tools/build_chicken_r95_v2.py --finalize
+
+      - name: Upload R9.5.1 visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chicken-r95-v2-visual-evidence-${{ github.run_number }}
+          path: |
+            CHICKEN_V46_R9_5_HEAD_CARRIER.html
+            data/CHICKEN_R95_HEAD_CARRIER_PARAMETERS.json
+            qa/CHICKEN_R95_STATIC_QA.json
+            qa/CHICKEN_R95_BROWSER_QA.json
+            evidence/r95
+            BUILD_MANIFEST_R95.json
+            01_CURRENT_STATE.json
+            README.md
+            CURRENT_HANDOFF.md
+            CURRENT_FULL_HANDOFF.md
+            06_NEXT_STAGE_PLAN.md
+            reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Verify generated gates
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          required = [
+              Path('CHICKEN_V46_R9_5_HEAD_CARRIER.html'),
+              Path('data/CHICKEN_R95_HEAD_CARRIER_PARAMETERS.json'),
+              Path('qa/CHICKEN_R95_STATIC_QA.json'),
+              Path('qa/CHICKEN_R95_BROWSER_QA.json'),
+              Path('evidence/r95/R95_REVIEW_BOARD.html'),
+              Path('BUILD_MANIFEST_R95.json'),
+          ]
+          missing = [str(path) for path in required if not path.exists()]
+          if missing:
+              raise SystemExit(f'Missing generated files: {missing}')
+          for path in [Path('qa/CHICKEN_R95_STATIC_QA.json'), Path('qa/CHICKEN_R95_BROWSER_QA.json')]:
+              data = json.loads(path.read_text(encoding='utf-8'))
+              if not data.get('passed'):
+                  raise SystemExit(f'QA failed: {path}')
+          print('R9.5.1 source, browser and bounded-shell gates passed. Independent visual gate remains open.')
+          PY
+
+      - name: Commit generated R9.5.1 candidate and evidence
+        shell: bash
+        run: |
+          git config user.name "Codex"
+          git config user.email "codex@users.noreply.github.com"
+          git add -A \
+            tools/build_chicken_r95.py \
+            tools/build_chicken_r95_v2.py \
+            tools/chicken_r95_override_v2.js \
+            tools/capture_chicken_r95_v2.mjs \
+            CHICKEN_V46_R9_5_HEAD_CARRIER.html \
+            data/CHICKEN_R95_HEAD_CARRIER_PARAMETERS.json \
+            qa/CHICKEN_R95_STATIC_QA.json \
+            qa/CHICKEN_R95_BROWSER_QA.json \
+            evidence/r95 \
+            BUILD_MANIFEST_R95.json \
+            01_CURRENT_STATE.json \
+            README.md \
+            CURRENT_HANDOFF.md \
+            CURRENT_FULL_HANDOFF.md \
+            06_NEXT_STAGE_PLAN.md
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "Build Chicken V4.6 R9.5.1 separate head shell candidate [skip ci]"
+            git pull --rebase origin codex/chicken-r9-2-head-restore
+            git push origin HEAD:codex/chicken-r9-2-head-restore
+          fi
