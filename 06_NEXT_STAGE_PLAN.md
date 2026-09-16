@@ -1,9 +1,9 @@
-# Next Stage — R9.2 Visual Gate and Bounded Refinement
+# Next Stage — R9.3 Independent Visual Gate
 
-1. Review the R9.2 head carrier in neutral gray from left, front, top and three-quarter views.
-2. Compare directly with the approved construction reference and the rejected R9.1 screenshot.
-3. If needed, alter only the named low-frequency bands: posterior cranium, vault, cheek, lower jaw/throat or bill-root blend.
-4. Do not polish color, feathers, eyes, comb or wattles as a substitute for silhouette acceptance.
-5. After user acceptance, freeze an exact R9.2 visual baseline and begin static rig planning.
+1. Inspect the approved reference, R9.1 baseline and R9.3 side view at the same scale.
+2. Reject any return of the R9.2 long-wedge/full-ring inflation failure.
+3. Check cranium compactness, eye scale/position, cheek and lower-jaw support, bill length/depth, throat transition and comb attachment.
+4. If refinement is needed, change one named local field at a time and keep R9.1/R9.2/R9.3 immutable.
+5. Only after manual acceptance may a canonical head baseline be frozen.
 
-Blocked until acceptance: Chicken DNA freeze, rig, skin weights, animation, behavior and production release.
+Blocked: Chicken DNA freeze, rig, skin weights, animation, behavior and production release.

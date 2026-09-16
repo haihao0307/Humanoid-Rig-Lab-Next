@@ -1,0 +1,74 @@
+{
+  "schema": "life_ecosystem/chicken_head_shape_candidate@1.0",
+  "version": "V4.6_R9.3",
+  "status": "bounded_visual_candidate_not_anatomical_truth",
+  "units": "normalized_source_units_not_meters",
+  "source": {
+    "frozen_executable": "CHICKEN_V46_R9_1.html",
+    "sha256": "336dc9d32304f916a8f15e120ebf4b9d2429b54dd2719be1af8aca12df33a4e3",
+    "approved_visual_reference": "reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png",
+    "rejected_predecessor": "CHICKEN_V46_R9_2_HEAD_SHAPE.html"
+  },
+  "failure_corrected": {
+    "r9_2_problem": "full-ring vertical/lateral scaling altered long neck sections sharing the same stations",
+    "r9_3_rule": "only upper-head local bands may change; bill X changes are uniform per station"
+  },
+  "deformation": {
+    "method": "R9.1 dorsal baseline with localized upper-cranium, cheek, lower-jaw and bill fields",
+    "head_x_domain": [
+      0.262,
+      0.482
+    ],
+    "bill_x_domain": [
+      0.448,
+      0.523116
+    ],
+    "roof_max_target_y": 0.999,
+    "posterior_upper_width_gain": 0.058,
+    "vault_upper_width_gain": 0.038,
+    "cheek_upper_width_gain": 0.027,
+    "bill_station_length_factor_root_to_tip": [
+      0.86,
+      0.84
+    ],
+    "non_head_band_guard_y": 0.78
+  },
+  "local_modules": {
+    "eye_center_xy": [
+      0.399,
+      0.95
+    ],
+    "eye_radius_xy": [
+      0.0138,
+      0.0104
+    ],
+    "ear_lobe_center_xy": [
+      0.367,
+      0.916
+    ],
+    "ear_lobe_radius_xy": [
+      0.006,
+      0.0088
+    ],
+    "nostril_center_xy": [
+      0.4628,
+      0.9468
+    ]
+  },
+  "preserved": [
+    "body",
+    "body plumage",
+    "wings",
+    "tail",
+    "feet",
+    "continuous comb",
+    "materials",
+    "R9 and R9.1 rollback"
+  ],
+  "truth_boundary": {
+    "manual_visual_acceptance": false,
+    "rig_authorized": false,
+    "motion_authorized": false,
+    "anatomical_truth_claimed": false
+  }
+}
