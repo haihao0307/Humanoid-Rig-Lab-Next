@@ -1,28 +1,13 @@
-# Chicken V4.6 R9.8.2 — Legacy Eye Removal and Bill Refinement Candidate
+# Chicken V4.6 R9.8.3 — Clean Face and Embedded Bill Candidate
 
 ## Active executable
 
-`CHICKEN_V46_R9_8_2_HEAD_EYE_BILL.html`
-
-## Frozen rollback
-
-- exact R9.1 executable: `CHICKEN_V46_R9_1.html`
-- exact R9 executable: `history/CHICKEN_V46_R9_FROZEN.html`
+`CHICKEN_V46_R9_8_3_CLEAN_FACE.html`
 
 ## What changed
 
-The persistent neutral-gray rosette was traced to legacy eye parts in the `parts` mesh, not to the replacement iris module. R9.8.2 supplies exactly four eye patches—two embedded spherical eyes and two compact upper lids—so the existing exclusion rule removes legacy part IDs 1 and 2. The eyes are shifted upward/forward and the short bill is further narrowed and embedded.
+The remaining angular patch behind the new eye was traced to legacy `PART_CATALOG` ear-lobe objects 3 and 4. R9.8.3 excludes those objects only in the candidate path, while retaining the existing rollback. The short bill root is moved deeper into the face to close the side seam.
 
-## Evidence and QA
+## QA and truth boundary
 
-- parameters: `data/CHICKEN_R982_HEAD_EYE_BILL_PARAMETERS.json`
-- static QA: `qa/CHICKEN_R982_STATIC_QA.json`
-- browser QA: `qa/CHICKEN_R982_BROWSER_QA.json`
-- visual review board: `evidence/r982/R982_REVIEW_BOARD.html`
-- manifest: `BUILD_MANIFEST_R982.json`
-
-Browser QA passed: `true`.
-
-## Truth boundary
-
-This remains a visual construction candidate. Manual visual acceptance, whole-surface freeze, Rig and Motion remain closed.
+Browser QA passed: `true`. Manual visual acceptance, whole-surface freeze, Rig and Motion remain closed.
