@@ -1,0 +1,128 @@
+name: Chicken Phase 1 Evidence Audit
+
+on:
+  push:
+    branches:
+      - chat/chicken-phase1-continuation-20260916
+    paths:
+      - .github/workflows/chicken-phase1-evidence-audit.yml
+      - CHICKEN_V46_R9_8_3_CLEAN_FACE.html
+      - evidence/r983/**
+      - runtime/chicken_phase1_npc_controller.mjs
+      - runtime/chicken_phase1_rig_adapter.mjs
+      - data/CHICKEN_PHASE1_NPC_CONTRACT.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evidence-and-structure-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out working branch
+        uses: actions/checkout@v4
+
+      - name: Audit generated workbench structure
+        shell: bash
+        run: |
+          mkdir -p qa
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          html_path = Path('CHICKEN_V46_R9_8_3_CLEAN_FACE.html')
+          text = html_path.read_text(encoding='utf-8', errors='replace')
+          lower = text.lower()
+
+          patterns = {
+              'three_bone_constructor': r'new\s+(?:three|t)\.bone\s*\(',
+              'skinned_mesh_constructor': r'new\s+(?:three|t)\.skinnedmesh\s*\(',
+              'skeleton_constructor': r'new\s+(?:three|t)\.skeleton\s*\(',
+              'group_constructor': r'new\s+(?:three|t)\.group\s*\(',
+              'object3d_constructor': r'new\s+(?:three|t)\.object3d\s*\(',
+              'mesh_constructor': r'new\s+(?:three|t)\.mesh\s*\(',
+              'instanced_mesh_constructor': r'new\s+(?:three|t)\.instancedmesh\s*\(',
+              'bind_call': r'\.bind\s*\(',
+              'skeleton_property': r'\.skeleton\b',
+              'skin_index_attribute': r'\bskinindex\b',
+              'skin_weight_attribute': r'\bskinweight\b'
+          }
+          counts = {name: len(re.findall(pattern, text, flags=re.I)) for name, pattern in patterns.items()}
+
+          expected_joint_ids = [
+              'body_root', 'pelvis', 'chest', 'neck_c0', 'neck_c1', 'head',
+              'wing_l', 'wing_r', 'hip_l', 'knee_l', 'ankle_l', 'toe_l',
+              'hip_r', 'knee_r', 'ankle_r', 'toe_r', 'tail'
+          ]
+          joint_mentions = {joint: lower.count(joint.lower()) for joint in expected_joint_ids}
+          explicit_named_joint_count = sum(1 for count in joint_mentions.values() if count > 0)
+
+          true_bone_rig_markers = (
+              counts['three_bone_constructor'] > 0
+              and counts['skeleton_constructor'] > 0
+              and counts['skinned_mesh_constructor'] > 0
+          )
+          procedural_carrier_markers = counts['mesh_constructor'] > 0 and counts['group_constructor'] > 0
+
+          report = {
+              'schema': 'life_ecosystem/chicken_phase1_runtime_structure_audit@1.0',
+              'source': str(html_path),
+              'source_bytes': html_path.stat().st_size,
+              'counts': counts,
+              'expected_joint_mentions': joint_mentions,
+              'explicit_named_joint_count': explicit_named_joint_count,
+              'true_bone_rig_markers_present': true_bone_rig_markers,
+              'procedural_carrier_markers_present': procedural_carrier_markers,
+              'controller_directly_attachable_by_name': explicit_named_joint_count == len(expected_joint_ids),
+              'patch_marker_present': '__CHICKEN_R983_PATCH__' in text,
+              'truth_boundary': {
+                  'static_scan_only': True,
+                  'does_not_prove_runtime_hierarchy': True,
+                  'does_not_authorize_rig': True,
+                  'manual_visual_acceptance': False
+              },
+              'next_action': (
+                  'Bind the controller through the named rig adapter.'
+                  if true_bone_rig_markers and explicit_named_joint_count == len(expected_joint_ids)
+                  else 'Create an explicit articulated carrier hierarchy before browser motion integration.'
+              )
+          }
+          Path('qa/CHICKEN_PHASE1_RUNTIME_STRUCTURE_AUDIT.json').write_text(
+              json.dumps(report, indent=2) + '\n', encoding='utf-8'
+          )
+          print(json.dumps(report, indent=2))
+          PY
+
+      - name: Verify visual evidence set
+        shell: bash
+        run: |
+          test -s evidence/r983/R983_HEAD_NEUTRAL_FRONT.png
+          test -s evidence/r983/R983_HEAD_NEUTRAL_LEFT.png
+          test -s evidence/r983/R983_HEAD_NEUTRAL_RIGHT.png
+          test -s evidence/r983/R983_HEAD_NEUTRAL_TOP.png
+          test -s evidence/r983/R983_HEAD_NEUTRAL_THREE_QUARTER.png
+          test -s evidence/r983/R983_WHOLE_NEUTRAL_THREE_QUARTER.png
+          test -s evidence/r983/R983_WHOLE_PROCEDURAL_THREE_QUARTER.png
+          test -s evidence/r983/R91_BASELINE_HEAD_NEUTRAL_LEFT.png
+          test -s evidence/r983/R91_BASELINE_HEAD_NEUTRAL_THREE_QUARTER.png
+
+      - name: Upload morphology evidence and structure report
+        uses: actions/upload-artifact@v4
+        with:
+          name: chicken-phase1-evidence-audit-${{ github.run_number }}
+          path: |
+            evidence/r983/*.png
+            evidence/r983/R983_REVIEW_BOARD.html
+            qa/CHICKEN_PHASE1_RUNTIME_STRUCTURE_AUDIT.json
+            qa/CHICKEN_R983_BROWSER_QA.json
+            CHICKEN_V46_R9_8_3_CLEAN_FACE.html
+            runtime/chicken_phase1_npc_controller.mjs
+            runtime/chicken_phase1_rig_adapter.mjs
+            data/CHICKEN_PHASE1_NPC_CONTRACT.json
+            01_CURRENT_STATE.json
+            CURRENT_HANDOFF.md
+          if-no-files-found: error
+          retention-days: 7
