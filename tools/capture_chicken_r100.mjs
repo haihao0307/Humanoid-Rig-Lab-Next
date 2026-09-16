@@ -167,7 +167,7 @@ try {
       && window.__CHICKEN_R100_PECK_ADAPTER__?.installed === true
       && api?.ready
       && api.diagnostics()?.manualStepAvailable
-      && api.diagnostics()?.skin?.peckKinematicsRevision === 'six-link-volume-preserving-s-curve-v2'
+      && api.diagnostics()?.skin?.peckKinematicsRevision === 'six-link-ring-coherent-s-curve-v3'
     );
   }, null, { timeout: 120_000 });
   stage('runtime-ready');
@@ -262,7 +262,7 @@ const checks = {
   patchLoaded: runtime.patch?.version === 'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
   manualStepLoaded: runtime.motion?.manualStepAvailable === true && runtime.manualPatch?.version === '1.1',
   peckAdapterLoaded: runtime.peckAdapter?.installed === true
-    && runtime.motion?.skin?.peckKinematicsRevision === 'six-link-volume-preserving-s-curve-v2',
+    && runtime.motion?.skin?.peckKinematicsRevision === 'six-link-ring-coherent-s-curve-v3',
   realtimePaused: runtime.motion?.realtimePaused === true,
   motionReady: runtime.motion?.ready === true,
   boneCount: runtime.motion?.skin?.boneCount === 21,
@@ -297,7 +297,7 @@ const checks = {
     forbiddenBodyBones.every((id) => !item.primaryBoneCounts?.[id])
   )),
   weightingRevision: runtime.motion?.skin?.weightingRevision
-    === 'six-link-neck-volume-distribution-v4',
+    === 'ring-coherent-carrier-and-root-rigid-coat-v5',
   groupTestStillClosed: runtime.patch?.groupTestAuthorized === false,
   errorOverlayHidden: runtime.errorOverlay?.display === 'none',
   canvasAllocated: (runtime.canvas?.width || 0) > 0 && (runtime.canvas?.height || 0) > 0,
