@@ -1,0 +1,138 @@
+name: Cat Kaopu V4.45 MLS Periorbital
+
+on:
+  push:
+    branches:
+      - codex/cat-kaopu-v445-mls-periorbital-20260916
+    paths:
+      - .github/workflows/cat-kaopu-v445-mls-periorbital.yml
+      - cat-kaopu/tools/bootstrap_cat_v445_sources.py
+      - cat-kaopu/tools/bootstrap/v445/**
+      - cat-kaopu/tools/build_cat_v445_mls_periorbital.py
+      - cat-kaopu/tools/verify_cat_v445_module.py
+      - cat-kaopu/tools/capture_cat_v445_browser_qa.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cat-kaopu-v445-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Decode audited V4.45 sources
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/bootstrap_cat_v445_sources.py
+
+      - name: Confirm frozen V4.44 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline='cat-kaopu/baselines/v4.44/CAT_KAOPU_V444_CONTINUOUS_PERIORBITAL_WORKBENCH_2026-09-16.html'
+          test -f "$baseline"
+
+      - name: Build V4.45 MLS periorbital workbench
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/build_cat_v445_mls_periorbital.py
+
+      - name: Verify payload, rig and module invariants
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/verify_cat_v445_module.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install pinned browser dependencies
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Run WebGL2 ultra-close visual QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 --bind 127.0.0.1 > "${RUNNER_TEMP}/cat-v445-http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
+          ready=0
+          for _ in $(seq 1 60); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:4173/cat-kaopu/workbench/CAT_KAOPU_CURRENT.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat "${RUNNER_TEMP}/cat-v445-http.log" || true
+            exit 1
+          fi
+          CAT_V445_URL='http://127.0.0.1:4173/cat-kaopu/workbench/CAT_KAOPU_CURRENT.html' \
+            node cat-kaopu/tools/capture_cat_v445_browser_qa.mjs
+
+      - name: Refresh manifest after browser evidence
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python cat-kaopu/tools/build_cat_v445_mls_periorbital.py
+          python cat-kaopu/tools/verify_cat_v445_module.py
+
+      - name: Upload V4.45 QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-kaopu-v445-mls-qa-${{ github.run_number }}
+          path: |
+            cat-kaopu/CURRENT.json
+            cat-kaopu/BUILD_MANIFEST.json
+            cat-kaopu/README.md
+            cat-kaopu/workbench/CAT_KAOPU_CURRENT.html
+            cat-kaopu/build/v4.45/CAT_KAOPU_V445_MLS_PERIORBITAL_WORKBENCH_2026-09-16.html
+            cat-kaopu/docs/CAT_KAOPU_V445_*.md
+            cat-kaopu/qa/CAT_KAOPU_V445_*.json
+            cat-kaopu/qa/CAT_KAOPU_V445_*.png
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit generated V4.45 sources, workbench and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'cat-kaopu-build-bot'
+          git config user.email 'cat-kaopu-build-bot@users.noreply.github.com'
+          git add cat-kaopu
+          if git diff --cached --quiet; then
+            echo 'No generated V4.45 changes to commit.'
+            exit 0
+          fi
+          git commit -m 'build(cat): generate V4.45 MLS periorbital evidence [cat-v445 generated]'
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              exit 0
+            fi
+            echo "Push attempt ${attempt} failed; rebasing on latest branch head."
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+          done
+          echo 'Unable to push V4.45 evidence after three attempts.' >&2
+          exit 1
