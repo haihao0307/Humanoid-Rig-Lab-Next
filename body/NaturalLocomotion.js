@@ -161,18 +161,45 @@ class ContinuousMotionPhase {
  constructor(engine){this.engine=engine;this.originalAdvance=engine.motion.advance.bind(engine.motion);this.reset(engine.state.motion.phase||0);engine.motion.advance=(state,dt)=>this.advance(state,dt);}
  snapshot(){const {engine,originalAdvance,...state}=this;return structuredClone(state);}
  restore(state){Object.assign(this,structuredClone(state));}
- reset(phase=0){this.phase=Number.isFinite(phase)?phase:0;this.velocity=0;this.target=null;this.error=0;this.initialized=false;this.lastSide=null;this.phaseOffset=0;this.wasActive=false;this.needsCalibration=true;this.contactCorrections=0;this.maximumStep=0;}
+ reset(phase=0){this.phase=Number.isFinite(phase)?phase:0;this.velocity=0;this.target=null;this.error=0;this.initialized=false;this.lastSide=null;this.phaseOffset=0;this.wasActive=false;this.needsCalibration=true;this.contactCorrections=0;this.maximumStep=0;
+  this.sourceFrame=null;this.timeScale=1;this.turnTargetYaw=null;this.drive=0;this.driveVelocity=0;this.headLead=0;this.headLeadVelocity=0;this.chestLead=0;this.chestLeadVelocity=0;}
+ response(key,target,dt,frequency){
+  // Exact critically damped response: retain velocity through starts/stops
+  // without a free-running oscillator or a reset at every foot exchange.
+  const velocity=key+'Velocity',offset=this[key]-target,c=this[velocity]+frequency*offset,e=Math.exp(-frequency*dt);
+  this[key]=target+(offset+c*dt)*e;this[velocity]=(this[velocity]-frequency*c*dt)*e;
+ }
+ coordinateBody(state,dt){
+  const command=state.command,delta=command?.type==='walk'?sub(command.target,state.root):null;
+  const heading=delta?Math.atan2(delta[0],delta[2]):command?.type==='turn'?this.turnTargetYaw:null;
+  const error=Number.isFinite(heading)?angleDiff(heading,state.yaw):0;
+  // Engineering adaptation of a captured walk, not a measured dynamics model.
+  // Translation drives the walk amplitude; placement steps during a turn
+  // must not trigger a full-speed arm cycle. Use actual world speed at slow tempo.
+  const physicalSpeed=state.speed*this.timeScale;
+  this.response('drive',clamp(physicalSpeed/.75,0,.85),dt/Math.max(.05,this.timeScale),8);
+  this.response('headLead',clamp(error*.55,-.55,.55),dt/Math.max(.05,this.timeScale),14);
+  this.response('chestLead',clamp(error*.20,-.18,.18),dt/Math.max(.05,this.timeScale),7);
+  const out=MotionLab.blend(this.engine.motion.neutral,this.sourceFrame,this.drive);
+  out.thoraxQ=qm(qy(this.chestLead),out.thoraxQ);
+  out.cervicalQ=qm(qy((this.headLead-this.chestLead)*.7),out.cervicalQ);
+  out.headQ=qm(qy((this.headLead-this.chestLead)*.3),out.headQ);
+  // Captured limb directions are world-relative: explicitly carry the arms
+  // with the chest, since rotating the spine alone only moves their origins.
+  for(const side of ['left','right'])for(const part of ['UpperArm','Forearm'])out[side+part]=rotate(qy(this.chestLead),out[side+part]);
+  state.motion.frame=out;
+ }
  advance(state,dt){
   const swing=state.swing,active=state.speed>.02||!!swing;let desiredVelocity=0;
   if(active&&!this.wasActive)this.needsCalibration=true;
   if(swing){
    const progress=clamp(swing.elapsed/Math.max(1e-8,swing.duration),0,1),raw=this.engine.motion.peaks[swing.side]+(progress-.5)*.42;
    desiredVelocity=.42/Math.max(.12,swing.duration);
-   // Each new support exchange calibrates the recorded phase to the already
-   // continuous runtime phase. It never teleports the upper body to the
-   // recording's absolute cycle coordinate.
-   if(this.needsCalibration||!this.initialized||swing.side!==this.lastSide){this.phaseOffset=this.phase-raw;this.lastSide=swing.side;this.contactCorrections++;this.initialized=true;this.needsCalibration=false;}
-   this.target=raw+this.phaseOffset;this.error=clamp(this.target-this.phase,-.05,.07);
+   // Match the same source foot in the nearest cycle. A fractional offset
+   // on every exchange erased the left/right phase relationship entirely.
+   // Acquisition stays continuous; only the target changes, never the phase.
+   if(this.needsCalibration||!this.initialized||swing.side!==this.lastSide){this.phaseOffset=Math.round(this.phase-raw);this.lastSide=swing.side;this.contactCorrections++;this.initialized=true;this.needsCalibration=false;}
+   this.target=raw+this.phaseOffset;this.error=clamp(this.target-this.phase,-.20,.20);
   }else{
    this.target=null;this.error=0;desiredVelocity=active?clamp(this.velocity||.8,.45,1.35):0;
   }
@@ -184,11 +211,15 @@ class ContinuousMotionPhase {
   // FullBodyMotion remains the source sampler. Hide the discrete swing event
   // only while it samples, then restore the scheduler-owned contact state.
   const actualSwing=state.swing,actualSpeed=state.speed;state.motion.phase=this.phase;state.swing=null;
-  if(actualSwing&&state.speed<=.02)state.speed=.020001;
+  const headingError=state.command?.type==='turn'&&Number.isFinite(this.turnTargetYaw)?angleDiff(this.turnTargetYaw,state.yaw):0;
+  if((actualSwing||Math.abs(headingError)>.015)&&state.speed<=.02)state.speed=.020001;
+  state.motion.frame=this.sourceFrame;
   this.originalAdvance(state,dt);
+  this.sourceFrame=state.motion.frame;
   state.swing=actualSwing;state.speed=actualSpeed;state.motion.phase=this.phase;this.wasActive=active;
+  this.coordinateBody(state,dt);
  }
- report(){return{phaseUnwrapped:this.phase,phase:this.phase-Math.floor(this.phase),phaseVelocityCyclesPerS:this.velocity,contactTarget:this.target,phaseError:this.error,phaseOffset:this.phaseOffset,contactCorrections:this.contactCorrections,maximumStep:this.maximumStep,method:'continuous-phase-contact-calibration/v2'};}
+ report(){return{phaseUnwrapped:this.phase,phase:this.phase-Math.floor(this.phase),phaseVelocityCyclesPerS:this.velocity,contactTarget:this.target,phaseError:this.error,phaseOffset:this.phaseOffset,contactCorrections:this.contactCorrections,maximumStep:this.maximumStep,bodyResponse:{drive:this.drive,headLeadRad:this.headLead,chestLeadRad:this.chestLead},method:'continuous-phase-contact-calibration/v3'};}
 }
 class TurnCommandFilter {
  constructor(){this.reset(0);}
@@ -238,10 +269,22 @@ class NaturalLocomotion {
   this.rig.ankleHeight+=this.skinFloorOffsetM;this.rig.hipHeight=agent.h.bodyMetrics.walkingHipHeightM;
   this.standingHipHeightM=agent.h.bodyMetrics.standingHipHeightM;
   this.engine=new MotionLab.MotionController(this.rig);
+  const stepFeet=this.engine.stepFeet.bind(this.engine);
+  this.engine.stepFeet=(state,dt)=>{stepFeet(state,dt);this.adaptSwingClearance(state);};
   this.world=new MotionLabWorld(agent);this.engine.world=this.world;
   this.phaseController=new ContinuousMotionPhase(this.engine);this.turnFilter=new TurnCommandFilter();
   this.pose=new MotionLabPose(agent.h,this.engine);agent.h.motionDriver=this.pose;
   this.resetFromPose();
+ }
+ adaptSwingClearance(state){
+  const swing=state.swing;if(!swing||state.feet[swing.side].adoptedOrientation)return;
+  // The pinned flat-ground scheduler uses 65 mm even for a tiny placement
+  // step. Keep its endpoints/contact timing, but give short turns and final
+  // gathering steps a lower, distance-dependent clearance. An adopted tilted
+  // sole keeps the original clearance until its first swing has released it.
+  const distance=horizontal(swing.from,swing.target),height=clamp(.018+distance*.10,.018,.055);
+  const u=clamp(swing.elapsed/swing.duration,0,1),arc=16*u*u*(1-u)*(1-u);
+  state.feet[swing.side].position[1]+=(height-.065)*arc;swing.clearanceHeightM=height;
  }
  // Agent's pose transaction must include the filters outside the pinned
  // kernel. Keep the live engine/callback identities and clone only state.
@@ -584,6 +627,7 @@ class NaturalLocomotion {
   this.requested=false;
   if(!this.kernelSettled())this.updateHeight(dt*this.tempo,false);
   const previousSwingSide=e.state.swing?.side;
+  this.phaseController.timeScale=this.tempo;this.phaseController.turnTargetYaw=this.turnFilter.targetYaw;
   e.update(dt*this.tempo);this.turnFilter.retargetSwing(e);
   // An adopted sole keeps its world orientation while planted. Its first
   // real swing releases pitch/roll and aligns yaw, rather than twisting the
