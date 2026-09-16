@@ -37,8 +37,8 @@ changed |= did
 
 text, did = replace_once(
     text,
-    "outColor=vec4(pow(max(col,vec3(0.)),vec3(1./2.2)),1.);}`;",
-    "outColor=vec4(pow(max(col,vec3(0.)),vec3(1./2.2)),uDebug>.5?1.:edgeAlpha);}`;",
+    "if(uDebug>.5)col=mix(vec3(.08,.52,.92),vec3(1.,.30,.07),step(0.,vLid))*(.55+.45*max(dot(n,l1),0.));outColor=vec4(pow(max(col,vec3(0.)),vec3(1./2.2)),1.);}`;",
+    "if(uDebug>.5)col=mix(vec3(.08,.52,.92),vec3(1.,.30,.07),step(0.,vLid))*(.55+.45*max(dot(n,l1),0.));outColor=vec4(pow(max(col,vec3(0.)),vec3(1./2.2)),uDebug>.5?1.:edgeAlpha);}`;",
     "lid alpha output",
 )
 changed |= did
