@@ -1,0 +1,68 @@
+name: Chicken R9.3 Review PDF
+
+on:
+  push:
+    branches:
+      - codex/chicken-r9-2-head-restore
+    paths:
+      - .github/workflows/chicken-r93-review-pdf.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: chicken-r93-review-pdf
+  cancel-in-progress: true
+
+jobs:
+  render-review-pdf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out candidate branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Render committed R9.3 review board to PDF
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        shell: bash
+        run: |
+          test -s evidence/r93/R93_REVIEW_BOARD.html
+          python -m http.server 8766 > /tmp/chicken-r93-review-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 2
+          "$CHROME_PATH" \
+            --headless=new \
+            --no-sandbox \
+            --disable-dev-shm-usage \
+            --disable-gpu \
+            --hide-scrollbars \
+            --run-all-compositor-stages-before-draw \
+            --virtual-time-budget=8000 \
+            --print-to-pdf=evidence/r93/R93_REVIEW_BOARD.pdf \
+            --print-to-pdf-no-header \
+            http://127.0.0.1:8766/evidence/r93/R93_REVIEW_BOARD.html
+          test -s evidence/r93/R93_REVIEW_BOARD.pdf
+
+      - name: Commit review PDF
+        shell: bash
+        run: |
+          git config user.name "Codex"
+          git config user.email "codex@users.noreply.github.com"
+          git add evidence/r93/R93_REVIEW_BOARD.pdf
+          if git diff --cached --quiet; then
+            echo "Review PDF unchanged."
+          else
+            git commit -m "Add Chicken R9.3 visual review PDF [skip ci]"
+            git push origin HEAD:codex/chicken-r9-2-head-restore
+          fi
