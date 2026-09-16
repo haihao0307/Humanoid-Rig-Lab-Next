@@ -39,6 +39,16 @@ html = replace_once(
     "stable wall placement",
 )
 
+# The generated clamp result stores the scalar under maxPen. Referring to the
+# presentation field name maxPenetrationM produced undefined / NaN, which then
+# poisoned gait angles and the blocked-ground solve.
+html = replace_once(
+    html,
+    "phase1Clamp(1-result.maxPenetrationM/.018,0,1)",
+    "phase1Clamp(1-result.maxPen/.018,0,1)",
+    "finite collision brake scalar",
+)
+
 # Collision root correction must run after the paw-contact solve. Running it first
 # moved the root while the contact solver still held anchors from another world
 # position, which could drive the iterative leg solve into NaN. At a blocked wall,
@@ -78,7 +88,7 @@ note = """
 
 ## Gate A 碰撞求解顺序修复
 
-浏览器首轮证据发现：如果先修正根节点碰撞，再让足掌接触求解器追踪旧世界锚点，腿部迭代会产生非有限数值，整猫会消失。当前构建已经改为：先完成原有步态和足掌接触求解，再执行低成本碰撞代理修正；发生阻挡时降低步态幅度，并把四足重新收敛到地面停止姿势。默认测试墙也移动到有限根运动轨迹的单侧接近范围，避免薄墙离散采样选择错误分离面。
+浏览器首轮证据发现：如果先修正根节点碰撞，再让足掌接触求解器追踪旧世界锚点，腿部迭代会产生非有限数值，整猫会消失。当前构建已经改为：先完成原有步态和足掌接触求解，再执行低成本碰撞代理修正；发生阻挡时降低步态幅度，并把四足重新收敛到地面停止姿势。默认测试墙也移动到有限根运动轨迹的单侧接近范围，避免薄墙离散采样选择错误分离面。碰撞减速现在直接读取求解器的有限 `maxPen` 标量，禁止未定义字段进入动作和足掌求解。
 
 该修复解决的是 Gate A 技术稳定性，不代表绕行、群体避让或最终复杂环境物理已经完成。
 """
