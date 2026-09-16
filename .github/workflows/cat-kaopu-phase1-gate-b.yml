@@ -1,0 +1,133 @@
+name: Cat Kaopu Phase 1 Gate B
+
+on:
+  push:
+    branches:
+      - codex/cat-kaopu-phase1-environment-npc-20260916
+    paths:
+      - .github/workflows/cat-kaopu-phase1-gate-b.yml
+      - cat-kaopu/tools/build_cat_phase1_gate_b_morphology.py
+      - cat-kaopu/tools/verify_cat_phase1_gate_b.py
+      - cat-kaopu/tools/capture_cat_phase1_gate_b.mjs
+      - cat-kaopu/docs/CAT_KAOPU_PHASE1_GATE_B_MORPHOLOGY_DIRECTION_2026-09-16.md
+      - cat-kaopu/phase1/CAT_KAOPU_PHASE1_GATE_A_SINGLE_NPC_2026-09-16.html
+      - cat-kaopu/phase1/PHASE1_GATE_A_MANIFEST.json
+      - package.json
+      - package-lock.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cat-kaopu-phase1-gate-b-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout Phase 1 branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build Gate B bounded morphology workbench
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/build_cat_phase1_gate_b_morphology.py
+
+      - name: Verify static Gate B contract
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/verify_cat_phase1_gate_b.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install pinned browser dependencies
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Run Gate B WebGL2 evidence capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 --bind 127.0.0.1 > "${RUNNER_TEMP}/cat-phase1-gate-b-http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
+          ready=0
+          for _ in $(seq 1 60); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:4173/cat-kaopu/phase1-gate-b/index.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat "${RUNNER_TEMP}/cat-phase1-gate-b-http.log" || true
+            exit 1
+          fi
+          CAT_PHASE1_GATE_B_URL='http://127.0.0.1:4173/cat-kaopu/phase1-gate-b/index.html' \
+            node cat-kaopu/tools/capture_cat_phase1_gate_b.mjs
+
+      - name: Verify browser evidence
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/verify_cat_phase1_gate_b.py --require-browser
+
+      - name: Upload Gate B evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-kaopu-phase1-gate-b-${{ github.run_number }}
+          path: |
+            cat-kaopu/phase1-gate-b/CAT_KAOPU_PHASE1_GATE_B_MORPHOLOGY_2026-09-16.html
+            cat-kaopu/phase1-gate-b/index.html
+            cat-kaopu/phase1-gate-b/PHASE1_MORPHOLOGY_PROFILE.json
+            cat-kaopu/phase1-gate-b/PHASE1_GATE_B_CONTRACT.json
+            cat-kaopu/phase1-gate-b/PHASE1_GATE_B_MANIFEST.json
+            cat-kaopu/docs/CAT_KAOPU_PHASE1_GATE_B_MORPHOLOGY_DIRECTION_2026-09-16.md
+            cat-kaopu/docs/CAT_KAOPU_PHASE1_GATE_B_MORPHOLOGY_REPORT_2026-09-16.md
+            cat-kaopu/qa/CAT_KAOPU_PHASE1_GATE_B_*.json
+            cat-kaopu/qa/CAT_KAOPU_PHASE1_GATE_B_*.png
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit generated Gate B workbench and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'cat-kaopu-build-bot'
+          git config user.email 'cat-kaopu-build-bot@users.noreply.github.com'
+          git add \
+            cat-kaopu/phase1-gate-b \
+            cat-kaopu/docs/CAT_KAOPU_PHASE1_GATE_B_MORPHOLOGY_REPORT_2026-09-16.md \
+            cat-kaopu/qa/CAT_KAOPU_PHASE1_GATE_B_*.json \
+            cat-kaopu/qa/CAT_KAOPU_PHASE1_GATE_B_*.png
+          if git diff --cached --quiet; then
+            echo 'No generated Gate B changes to commit.'
+            exit 0
+          fi
+          git commit -m 'build(cat): generate Phase 1 Gate B morphology evidence [phase1 generated]'
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              exit 0
+            fi
+            echo "Push attempt ${attempt} failed; rebasing on latest branch head."
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+          done
+          echo 'Unable to push Phase 1 Gate B evidence after three attempts.' >&2
+          exit 1
