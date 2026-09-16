@@ -15,7 +15,7 @@ from typing import Any
 from selenium import webdriver
 
 import motion_visual_qa as qa
-from visual_qa_core import body_state, switch_body, utc_now, wait_until
+from visual_qa_core import body_state, get_done_count, switch_body, utc_now, wait_until
 
 
 def _body_script(driver: webdriver.Chrome, script: str, *args: Any) -> Any:
@@ -76,7 +76,7 @@ def reset_body(driver: webdriver.Chrome) -> dict[str, Any]:
 
 
 def send_command(driver: webdriver.Chrome, command: str) -> tuple[int, str]:
-    initial_done = qa.get_done_count(driver)
+    initial_done = get_done_count(driver)
     result = _body_script(
         driver,
         """
