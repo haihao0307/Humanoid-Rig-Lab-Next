@@ -80,16 +80,16 @@ jobs:
               file.write_bytes(data.replace(marker, marker + insertion, 1))
 
           compact_marker = b"async function installCompactWorkbench(lab,pending){"
-          compact_insert = b"\n  if(new URLSearchParams(location.search).has('visualTest')){\n    pending?.catch?.(()=>{});\n    cancelCompactSurface('motion visual QA uses the lightweight fallback surface');\n    window.__motionVisualQAFallback={active:true,renderer:'procedural-fallback',motionEvidence:true,skinApproval:false};\n    window.__compactLoading={quality:'qa-fallback',job:'surface',state:'ready',group:'ready',message:'motion visual QA lightweight surface',startedAt:performance.now(),updatedAt:performance.now()};\n    lab.renderer.setQuality('fast');\n    if(!lab.hair?.inStudio?.())lab.focus('body');\n    needsRedraw=true;\n    return;\n  }"
+          compact_insert = b"\n  const motionVisualTest=new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest');\n  if(motionVisualTest){\n    pending?.catch?.(()=>{});\n    cancelCompactSurface('motion visual QA uses the lightweight fallback surface');\n    window.__motionVisualQAFallback={active:true,renderer:'procedural-fallback',motionEvidence:true,skinApproval:false};\n    window.__compactLoading={quality:'qa-fallback',job:'surface',state:'ready',group:'ready',message:'motion visual QA lightweight surface',startedAt:performance.now(),updatedAt:performance.now()};\n    lab.renderer.setQuality('fast');\n    if(!lab.hair?.inStudio?.())lab.focus('body');\n    needsRedraw=true;\n    return;\n  }"
           patch_bytes('body/CompactWorkbench.js', compact_marker, compact_insert)
 
           population_marker = b"  this.place(actor,position,options.yaw??0);this.pendingIds.add(id);"
-          population_insert = b"\n  if(new URLSearchParams(location.search).has('visualTest')){\n   actor.compact=null;\n   if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};\n   this.pendingIds.delete(id);\n   return actor;\n  }"
+          population_insert = b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){\n   actor.compact=null;\n   if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};\n   this.pendingIds.delete(id);\n   return actor;\n  }"
           patch_bytes('control/NPCPopulation.js', population_marker, population_insert)
           PY
           node tools/build-pure.mjs
           grep -q '__motionVisualQAFallback' body/CompactWorkbench.js
-          grep -q "has('visualTest')" control/NPCPopulation.js
+          grep -q "parent.location.search" control/NPCPopulation.js
           sha256sum source-index.html index.html | tee qa-entrypoint-hashes.txt
 
       - name: Run one-session Chrome capture
