@@ -29,13 +29,15 @@ jobs:
           text=path.read_text(encoding='utf-8')
 
           helper_old="function trafficPairSide(a,b){return trafficHash([String(a||''),String(b||'')].sort().join('|'))&1?1:-1;}\nfunction trafficActorVelocity(actor){"
-          helper_new="""function trafficPairSide(a,b){return trafficHash([String(a||''),String(b||'')].sort().join('|'))&1?1:-1;}
-function trafficOpenPriority(agent,other){
- const otherAgent=other?.agent;
- if(!otherAgent||other.disposed||otherAgent.paused||otherAgent.skill?.type!=='walk'||otherAgent.routeIndex>=otherAgent.route.length)return null;
- return[String(agent.npcId||''),String(other.id||'')].sort()[0];
-}
-function trafficActorVelocity(actor){"""
+          helper_new=(
+              "function trafficPairSide(a,b){return trafficHash([String(a||''),String(b||'')].sort().join('|'))&1?1:-1;}\n"
+              "function trafficOpenPriority(agent,other){\n"
+              " const otherAgent=other?.agent;\n"
+              " if(!otherAgent||other.disposed||otherAgent.paused||otherAgent.skill?.type!=='walk'||otherAgent.routeIndex>=otherAgent.route.length)return null;\n"
+              " return[String(agent.npcId||''),String(other.id||'')].sort()[0];\n"
+              "}\n"
+              "function trafficActorVelocity(actor){"
+          )
           if text.count(helper_old)!=1:
               raise SystemExit(f'open-priority helper anchor count: {text.count(helper_old)}')
           text=text.replace(helper_old,helper_new,1)
@@ -46,26 +48,30 @@ function trafficActorVelocity(actor){"""
               raise SystemExit(f'traffic state anchor count: {text.count(state_old)}')
           text=text.replace(state_old,state_new,1)
 
-          prepare_old="""  if(predicted){
-   const corridor=this.resolveNarrowCorridor(predicted,context);
-   if(corridor==='owner'||corridor==='yield'){const managed=this.maintainCorridor(context,target);if(managed)return managed;throw Error('狭窄通道没有可用的持续移动路线');}
-   if(corridor==='blocked')throw Error('狭窄通道没有可用的主动撤离路线');
-  }
-  const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;"""
-          prepare_new="""  if(predicted){
-   const corridor=this.resolveNarrowCorridor(predicted,context);
-   if(corridor==='owner'||corridor==='yield'){const managed=this.maintainCorridor(context,target);if(managed)return managed;throw Error('狭窄通道没有可用的持续移动路线');}
-   if(corridor==='blocked')throw Error('狭窄通道没有可用的主动撤离路线');
-  }
-  if(predicted&&trafficOpenPriority(a,predicted.actor)===String(a.npcId)){
-   const first=this.traffic.mode!=='priority-pass'||this.traffic.priorityActor!==predicted.actor.id;
-   if(first&&['detour','retreat','escape'].includes(this.traffic.mode))this.replanStaticRoute(context,'open-intersection-priority');
-   target=a.route[a.routeIndex]||target;
-   Object.assign(this.traffic,{active:false,mode:'priority-pass',reason:'open-intersection-priority',blockers:[predicted.actor.id],side:0,detourEndIndex:-1,originalTarget:[...(this.traffic.slotPoint||a.route.at(-1)||target)],priorityActor:predicted.actor.id,lastPlanAtS:a.time,nextPlanAtS:a.time+.42,lastError:null,advancePoint:null,advanceRouteIndex:-1});
-   if(first){this.traffic.priorityPasses++;a.log?.('交叉路线采用稳定通行优先级，保持前进，由 '+predicted.actor.label+' 主动绕行');}
-   return target;
-  }
-  const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;"""
+          prepare_old=(
+              "  if(predicted){\n"
+              "   const corridor=this.resolveNarrowCorridor(predicted,context);\n"
+              "   if(corridor==='owner'||corridor==='yield'){const managed=this.maintainCorridor(context,target);if(managed)return managed;throw Error('狭窄通道没有可用的持续移动路线');}\n"
+              "   if(corridor==='blocked')throw Error('狭窄通道没有可用的主动撤离路线');\n"
+              "  }\n"
+              "  const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;"
+          )
+          prepare_new=(
+              "  if(predicted){\n"
+              "   const corridor=this.resolveNarrowCorridor(predicted,context);\n"
+              "   if(corridor==='owner'||corridor==='yield'){const managed=this.maintainCorridor(context,target);if(managed)return managed;throw Error('狭窄通道没有可用的持续移动路线');}\n"
+              "   if(corridor==='blocked')throw Error('狭窄通道没有可用的主动撤离路线');\n"
+              "  }\n"
+              "  if(predicted&&trafficOpenPriority(a,predicted.actor)===String(a.npcId)){\n"
+              "   const first=this.traffic.mode!=='priority-pass'||this.traffic.priorityActor!==predicted.actor.id;\n"
+              "   if(first&&['detour','retreat','escape'].includes(this.traffic.mode))this.replanStaticRoute(context,'open-intersection-priority');\n"
+              "   target=a.route[a.routeIndex]||target;\n"
+              "   Object.assign(this.traffic,{active:false,mode:'priority-pass',reason:'open-intersection-priority',blockers:[predicted.actor.id],side:0,detourEndIndex:-1,originalTarget:[...(this.traffic.slotPoint||a.route.at(-1)||target)],priorityActor:predicted.actor.id,lastPlanAtS:a.time,nextPlanAtS:a.time+.42,lastError:null,advancePoint:null,advanceRouteIndex:-1});\n"
+              "   if(first){this.traffic.priorityPasses++;a.log?.('交叉路线采用稳定通行优先级，保持前进，由 '+predicted.actor.label+' 主动绕行');}\n"
+              "   return target;\n"
+              "  }\n"
+              "  const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;"
+          )
           if text.count(prepare_old)!=1:
               raise SystemExit(f'priority insertion anchor count: {text.count(prepare_old)}')
           text=text.replace(prepare_old,prepare_new,1)
@@ -80,11 +86,11 @@ function trafficActorVelocity(actor){"""
           browser=Path('tools/test-task-crowd-browser.mjs')
           text=browser.read_text(encoding='utf-8')
           replacements={
-            "return population>=4;":"return w?.__humanStartup?.status==='ready'&&population>=6&&pending===0;",
-            "assert.notEqual(ready.startup?.status,'failed','browser crowd startup failed: '+JSON.stringify(ready));":"assert.equal(ready.startup?.status,'ready','full review cast did not reach ready: '+JSON.stringify(ready));",
-            "assert(ready.population>=4,'crowd browser scenario requires at least four real NPCs');":"assert(ready.population>=6,'crowd browser scenario requires the six-person review cast');\n assert.equal(ready.pending,0,'review-cast generation must finish before traffic scenarios');",
-            "['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations']":"['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations','priorityPasses']",
-            "assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');":"assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');\n assert(crossing.actors.reduce((sum,actor)=>sum+(Number(actor.traffic.priorityPasses)||0),0)>=1,'four-way browser crossing did not issue deterministic open-area right of way');"
+              "return population>=4;":"return w?.__humanStartup?.status==='ready'&&population>=6&&pending===0;",
+              "assert.notEqual(ready.startup?.status,'failed','browser crowd startup failed: '+JSON.stringify(ready));":"assert.equal(ready.startup?.status,'ready','full review cast did not reach ready: '+JSON.stringify(ready));",
+              "assert(ready.population>=4,'crowd browser scenario requires at least four real NPCs');":"assert(ready.population>=6,'crowd browser scenario requires the six-person review cast');\n assert.equal(ready.pending,0,'review-cast generation must finish before traffic scenarios');",
+              "['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations']":"['detours','replans','sideSteps','retreats','corridorYields','corridorClaims','slotReservations','priorityPasses']",
+              "assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');":"assert(crossing.trafficActions>=1,'four-way browser crossing did not exercise traffic recovery');\n assert(crossing.actors.reduce((sum,actor)=>sum+(Number(actor.traffic.priorityPasses)||0),0)>=1,'four-way browser crossing did not issue deterministic open-area right of way');"
           }
           for old,new in replacements.items():
               count=text.count(old)
