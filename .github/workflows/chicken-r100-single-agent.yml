@@ -111,9 +111,9 @@ jobs:
           if boundary.get('groupTestAuthorized') is not False:
             raise SystemExit('Group testing must remain closed')
           skin=browser.get('runtime',{}).get('motion',{}).get('skin',{})
-          if skin.get('peckKinematicsRevision')!='fixed-length-forward-down-s-curve-v1':
-            raise SystemExit('Natural peck adapter was not active in browser QA')
-          print('R10.0 technical single-agent gate passed. Naturalness, grounding, collision and group gates remain open.')
+          if skin.get('peckKinematicsRevision')!='six-link-volume-preserving-s-curve-v2':
+            raise SystemExit('Distributed six-link peck rig was not active in browser QA')
+          print('R10.0 technical single-agent gate passed with distributed cervical rig. Manual naturalness, collision and group gates remain open.')
           PY
 
       - name: Upload R10.0 single-agent evidence
