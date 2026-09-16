@@ -14,6 +14,7 @@ on:
       - cat-kaopu/tools/patch_cat_v442_head_surface_fit.py
       - cat-kaopu/tools/patch_cat_v442_aperture_integration.py
       - cat-kaopu/tools/patch_cat_v442_globe_occlusion.py
+      - cat-kaopu/tools/patch_cat_v442_canthus_surface.py
   workflow_dispatch:
 
 permissions:
@@ -73,6 +74,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_v442_globe_occlusion.py
+
+      - name: Taper eyelid surfaces into canthi
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v442_canthus_surface.py
 
       - name: Freeze V4.41 source exactly once
         shell: bash
