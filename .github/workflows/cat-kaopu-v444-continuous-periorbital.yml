@@ -1,0 +1,150 @@
+name: Cat Kaopu V4.44 Continuous Periorbital
+
+on:
+  push:
+    branches:
+      - codex/cat-kaopu-v444-continuous-periorbital-20260916
+    paths:
+      - .github/workflows/cat-kaopu-v444-continuous-periorbital.yml
+      - cat-kaopu/tools/patch_cat_v444_ui_state.py
+      - cat-kaopu/tools/patch_cat_v444_periorbital_runtime.py
+      - cat-kaopu/tools/patch_cat_v444_controls_api.py
+      - cat-kaopu/tools/finalize_cat_v444_continuous_periorbital.py
+      - cat-kaopu/tools/verify_cat_v444_module.py
+      - cat-kaopu/tools/capture_cat_v444_browser_qa.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cat-kaopu-v444-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Reset workbench to frozen V4.42 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline='cat-kaopu/baselines/v4.42/CAT_KAOPU_V442_GEOMETRIC_EYELID_WORKBENCH_2026-09-16.html'
+          test -f "$baseline"
+          cp "$baseline" cat-kaopu/workbench/CAT_KAOPU_CURRENT.html
+
+      - name: Add V4.44 controls and state
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v444_ui_state.py
+
+      - name: Add V4.44 continuous periorbital runtime
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v444_periorbital_runtime.py
+
+      - name: Wire V4.44 controls and public API
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v444_controls_api.py
+
+      - name: Finalize V4.44 metadata and workbench
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/finalize_cat_v444_continuous_periorbital.py
+
+      - name: Verify payload, rig and module invariants
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/verify_cat_v444_module.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install pinned browser dependencies
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Run WebGL2 close-up capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 --bind 127.0.0.1 > "${RUNNER_TEMP}/cat-v444-http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
+          ready=0
+          for _ in $(seq 1 60); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:4173/cat-kaopu/workbench/CAT_KAOPU_CURRENT.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat "${RUNNER_TEMP}/cat-v444-http.log" || true
+            exit 1
+          fi
+          CAT_V444_URL='http://127.0.0.1:4173/cat-kaopu/workbench/CAT_KAOPU_CURRENT.html' \
+            node cat-kaopu/tools/capture_cat_v444_browser_qa.mjs
+
+      - name: Refresh manifest after browser evidence
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python cat-kaopu/tools/finalize_cat_v444_continuous_periorbital.py
+          python cat-kaopu/tools/verify_cat_v444_module.py
+
+      - name: Upload V4.44 QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-kaopu-v444-periorbital-qa-${{ github.run_number }}
+          path: |
+            cat-kaopu/CURRENT.json
+            cat-kaopu/BUILD_MANIFEST.json
+            cat-kaopu/README.md
+            cat-kaopu/workbench/CAT_KAOPU_CURRENT.html
+            cat-kaopu/build/v4.44/CAT_KAOPU_V444_CONTINUOUS_PERIORBITAL_WORKBENCH_2026-09-16.html
+            cat-kaopu/docs/CAT_KAOPU_V444_*.md
+            cat-kaopu/qa/CAT_KAOPU_V444_*.json
+            cat-kaopu/qa/CAT_KAOPU_V444_*.png
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit generated V4.44 workbench and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'cat-kaopu-build-bot'
+          git config user.email 'cat-kaopu-build-bot@users.noreply.github.com'
+          git add cat-kaopu
+          if git diff --cached --quiet; then
+            echo 'No generated V4.44 changes to commit.'
+            exit 0
+          fi
+          git commit -m 'build(cat): generate V4.44 continuous periorbital evidence [cat-v444 generated]'
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              exit 0
+            fi
+            echo "Push attempt ${attempt} failed; rebasing on latest branch head."
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+          done
+          echo 'Unable to push V4.44 evidence after three attempts.' >&2
+          exit 1
