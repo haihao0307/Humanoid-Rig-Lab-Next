@@ -1,85 +1,52 @@
 {
   "schema": "cat_kaopu/full_handoff_current@1.0",
-  "handoff": "CAT_KAOPU_CURRENT_FULL_HANDOFF_V440_2026-09-15",
   "date": "2026-09-16",
-  "currentVersion": "V4.45",
+  "currentVersion": "V4.46",
   "currentEntry": "workbench/CAT_KAOPU_CURRENT.html",
-  "repoOverlayEntry": "workbench/CAT_KAOPU_CURRENT.html",
+  "runtimePayload": "runtime/cat_v440.bin",
+  "currentLayer": "single bilateral wide eye-region facial carrier with two dynamic palpebral apertures",
   "frozenBaselines": {
     "neutralSurface": "V4.32",
     "baseSkinWeights": "V4.34 except bounded ear region introduced in V4.40",
     "camera": "V4.34.1",
     "locomotionRegression": "V4.36",
     "postureCorrective": "V4.39",
-    "expressionPayload": "V4.40 CATV440 payload and 34-bone rig unchanged; V4.42 eyelid data preserved as legacy comparison"
+    "payload": "V4.40 CATV440 and 34-bone RIG unchanged"
   },
-  "currentLayer": "high-resolution quadratic-MLS periorbital carriers with C1 frozen-boundary return and upper-lid-dominant feline closure",
   "geometry": {
-    "vertices": 3948,
-    "triangles": 7884,
+    "bodyVertices": 3948,
+    "bodyTriangles": 7884,
     "bones": 34,
-    "maxInfluencesPerVertex": 4,
-    "eyelidVertices": 1476,
-    "eyelidTriangles": 2240,
-    "eyelidPieces": 4,
-    "eyelidGeometryStorage": "runtime-generated outside CATV440",
-    "orbitalTransitionVertices": 1372,
-    "orbitalTransitionTriangles": 2304,
-    "orbitalTransitionPieces": 4,
-    "orbitalTransitionStorage": "runtime-generated outside CATV440 from frozen head samples",
-    "continuousPeriorbitalVertices": 1170,
-    "continuousPeriorbitalTriangles": 2048,
-    "continuousPeriorbitalPieces": 2,
-    "continuousPeriorbitalStorage": "runtime-generated outside CATV440 from frozen head samples",
-    "mlsPeriorbitalVertices": 2910,
-    "mlsPeriorbitalTriangles": 5376,
-    "mlsPeriorbitalPieces": 2,
-    "mlsPeriorbitalSegmentsPerEye": 96,
-    "mlsPeriorbitalRadialRings": 14,
-    "mlsPeriorbitalStorage": "runtime-generated outside CATV440; quadratic MLS + periodic low-pass + exact frozen boundary return"
-  },
-  "runtimeDependencies": {
-    "externalModel": false,
-    "externalTexture": false,
-    "externalAnimation": false
+    "wideEyeRegionVertices": 6693,
+    "wideEyeRegionTriangles": 13056,
+    "wideEyeRegionPieces": 1,
+    "wideEyeRegionCols": 96,
+    "wideEyeRegionRows": 68,
+    "storage": "runtime-generated outside CATV440"
   },
   "acceptance": {
-    "surfaceUserAccepted": true,
-    "legacyV444TechnicalCandidate": true,
     "visualAcceptance": false,
     "productionReady": false,
     "userReviewRequired": true
   },
-  "invalidatedOrNonMainline": {
-    "V4.31": "defective Cat v1.0 carrier; removed from mainline",
-    "V4.33 original HTML": "VAO/render-state corruption; superseded by V4.33.1",
-    "V4.25-V4.30": "isolated forepaw experiment line; not current whole-cat mainline"
-  },
-  "nextProductionGate": [
-    "inspect ultra-close front, three-quarter and side views at open, half and fully closed states",
-    "verify MLS 0 versus 1 changes local curvature without moving the frozen head silhouette",
-    "verify full closure uses a curved upper-lid-dominant seam and no horizontal plug remains",
-    "verify inner and outer canthi stay continuous with no eye-globe leakage",
-    "only after this gate decide whether eye anatomy is accepted or requires a local head carrier rebuild"
-  ],
-  "github": {
-    "repository": "haihao0307/Humanoid-Rig-Lab-Next",
-    "existingBranch": "codex/cat-kaopu-v445-mls-periorbital-20260916",
-    "existingBranchHead": null,
-    "recommendedNewBranch": "codex/cat-kaopu-v445-mls-periorbital-20260916",
-    "recommendedModulePath": "cat-kaopu/",
-    "sourceBranch": "codex/cat-kaopu-v444-continuous-periorbital-20260916"
-  },
-  "sourceHandoff": "CAT_KAOPU_CURRENT_FULL_HANDOFF_V440_2026-09-15",
   "technicalInvariants": {
     "embeddedPayloadSha256": "518aed4758033b2f3b40e6242976a8bb7779a4d70a9f2dba8461c56ac5cee846",
-    "sourcePayloadSha256": "518aed4758033b2f3b40e6242976a8bb7779a4d70a9f2dba8461c56ac5cee846",
     "payloadUnchangedFromV440": true,
-    "rigJsonIdenticalToV444": true,
-    "boneCount": 34,
+    "rigJsonIdenticalToV445": true,
     "neutralSurfaceChanged": false,
     "skinWeightsChanged": false,
-    "legacyV444TopologyPreserved": true,
-    "addedGeometry": "two head-bone-driven quadratic-MLS periorbital carriers outside CATV440"
-  }
+    "outputHtmlSha256": "da42a70291e351b257e57e6cb2fc6bb8c2cc75a2b8f686610948a0aae04fb8a4"
+  },
+  "github": {
+    "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+    "branch": "codex/cat-kaopu-v446-wide-eye-region-carrier-20260916",
+    "modulePath": "cat-kaopu/"
+  },
+  "nextProductionGate": [
+    "front/three-quarter/side ultra-close open, half and closed review",
+    "carrier off/on comparison against V4.45",
+    "confirm one primary closure seam and no ring-shaped patch boundary",
+    "confirm brow, nasal root, canthi and upper cheek remain continuous",
+    "do not begin third eyelid or silhouette fur before this gate"
+  ]
 }
