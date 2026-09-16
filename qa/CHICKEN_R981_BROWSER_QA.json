@@ -1,0 +1,127 @@
+{
+  "schema": "life_ecosystem/chicken_r981_browser_qa@1.0",
+  "version": "V4.6_R9.8_1_HEAD_EYE_BILL_REFINEMENT_CANDIDATE",
+  "environment": {
+    "browser": "Chrome headless via Playwright Core",
+    "executablePath": "/opt/hostedtoolcache/setup-chrome/chromium/stable/x64/chrome",
+    "candidateUrl": "http://127.0.0.1:8765/CHICKEN_V46_R9_8_1_HEAD_EYE_BILL.html",
+    "baselineUrl": "http://127.0.0.1:8765/CHICKEN_V46_R9_1.html",
+    "viewport": [
+      1440,
+      1000
+    ],
+    "rendererRequest": "SwiftShader/ANGLE correctness path"
+  },
+  "checks": {
+    "noFatalException": true,
+    "patchLoaded": true,
+    "correctTitle": true,
+    "statusProduced": true,
+    "canvasAllocated": true,
+    "errorOverlayHidden": true,
+    "headAuditProduced": true,
+    "profileAuditProduced": true,
+    "billAuditProduced": true,
+    "eyeAuditProduced": true,
+    "billFinite": true,
+    "billNoDegenerateTriangles": true,
+    "billRootEmbedded": true,
+    "embeddedSphereEyes": true,
+    "shapeFinite": true,
+    "lowerBoundaryLeakAtMostTwo": true,
+    "stationXMonotonic": true,
+    "boundedDisplacement": true,
+    "crownBounded": true,
+    "headWidthBounded": true,
+    "cheekWidthBounded": true,
+    "closedShortBill": true,
+    "noPageErrors": true,
+    "noConsoleErrors": true,
+    "noFailedRequests": true,
+    "expectedCapturesWritten": true
+  },
+  "passed": true,
+  "runtime": {
+    "patch": {
+      "version": "V4.6_R9.8_1_HEAD_EYE_BILL_REFINEMENT_CANDIDATE",
+      "source": "CHICKEN_V46_R9_1.html",
+      "method": "connected dorsal cranium + side-local cheek/jaw support + collapsed legacy bill + compact closed bill",
+      "preserves": [
+        "R9/R9.1 rollback",
+        "lower neck",
+        "body",
+        "plumage",
+        "wing",
+        "tail",
+        "feet",
+        "materials",
+        "existing controls"
+      ],
+      "manualVisualAcceptance": false,
+      "rigAuthorized": false,
+      "motionAuthorized": false
+    },
+    "headAudit": {
+      "amount": 1,
+      "movedVertices": 1084,
+      "maxDisplacement": 0.09433298841782654,
+      "nonFinite": 0,
+      "nonHeadMoved": 2,
+      "stationXMonotonic": true
+    },
+    "profileAudit": {
+      "crownTop": 1.0010000000000001,
+      "posteriorWidth": 0.144,
+      "cheekWidth": 0.138,
+      "billRoot": 0.426,
+      "billTip": 0.484
+    },
+    "billAudit": {
+      "vertices": 1153,
+      "triangles": 2268,
+      "finite": true,
+      "degenerateTriangles": 0,
+      "rootEmbedded": true,
+      "rootX": 0.428,
+      "tipX": 0.481
+    },
+    "eyeAudit": {
+      "patches": 2,
+      "geometry": "embedded_sphere",
+      "radius": 0.00645
+    },
+    "title": "Chicken R9.8.1 · Head, Eye and Bill Refinement",
+    "statusText": "R9.8.1 · 头部、眼与短喙候选 · 2 个眼部片",
+    "canvas": {
+      "width": 1110,
+      "height": 1000
+    },
+    "errorOverlay": {
+      "display": "none",
+      "text": ""
+    }
+  },
+  "fatal": null,
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": [],
+  "expectedCaptures": [
+    "R981_HEAD_NEUTRAL_LEFT.png",
+    "R981_HEAD_NEUTRAL_RIGHT.png",
+    "R981_HEAD_NEUTRAL_FRONT.png",
+    "R981_HEAD_NEUTRAL_TOP.png",
+    "R981_HEAD_NEUTRAL_THREE_QUARTER.png",
+    "R981_HEAD_WIRE_LEFT.png",
+    "R981_WHOLE_NEUTRAL_THREE_QUARTER.png",
+    "R981_WHOLE_PROCEDURAL_THREE_QUARTER.png",
+    "R91_BASELINE_HEAD_NEUTRAL_LEFT.png",
+    "R91_BASELINE_HEAD_NEUTRAL_THREE_QUARTER.png"
+  ],
+  "truthBoundary": {
+    "manualVisualAcceptance": false,
+    "visualGatePassed": false,
+    "anatomicalTruthClaimed": false,
+    "rigAuthorized": false,
+    "motionAuthorized": false
+  }
+}

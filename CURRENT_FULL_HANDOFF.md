@@ -1,8 +1,8 @@
-# Chicken V4.6 R9.6 — Connected Head Refinement Candidate
+# Chicken V4.6 R9.8.1 — Head, Eye and Bill Refinement Candidate
 
 ## Active executable
 
-`CHICKEN_V46_R9_6_HEAD_REFINEMENT.html`
+`CHICKEN_V46_R9_8_1_HEAD_EYE_BILL.html`
 
 ## Frozen rollback
 
@@ -11,15 +11,15 @@
 
 ## What changed
 
-R9.6 discards the separate-shell and clipping route. It keeps the original connected carrier and applies staged bands to posterior cranium, crown, cheek, jaw and a shortened bill while guarding the lower neck. Eye, eyelid, nostril, ear-lobe, wattle and continuous-comb modules are reduced and reattached to the connected surface.
+R9.8.1 retains R9.8's connected carrier and hidden legacy-bill strategy. The lower carrier guard is tightened, the replacement bill is smaller and rooted inside the face, the chart-projected rosette eye is replaced by a small embedded spherical eye, and the wattles are moved beneath the jaw.
 
 ## Evidence and QA
 
-- parameters: `data/CHICKEN_R96_HEAD_REFINEMENT_PARAMETERS.json`
-- static QA: `qa/CHICKEN_R96_STATIC_QA.json`
-- browser QA: `qa/CHICKEN_R96_BROWSER_QA.json`
-- visual review board: `evidence/r96/R96_REVIEW_BOARD.html`
-- manifest: `BUILD_MANIFEST_R96.json`
+- parameters: `data/CHICKEN_R981_HEAD_EYE_BILL_PARAMETERS.json`
+- static QA: `qa/CHICKEN_R981_STATIC_QA.json`
+- browser QA: `qa/CHICKEN_R981_BROWSER_QA.json`
+- visual review board: `evidence/r981/R981_REVIEW_BOARD.html`
+- manifest: `BUILD_MANIFEST_R981.json`
 
 Browser QA passed: `true`.
 
