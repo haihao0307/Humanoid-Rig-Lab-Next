@@ -21,6 +21,7 @@ const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetri
 let frames=0,walks=0,turns=0,stops=0,maxHeightStepM=0,maxFootErrorM=0,maxBoneErrorM=0,maxIdleKneeDegrees=0,minWalkKneeDegrees=180,maxWalkKneeDegrees=0;
 let stanceKneeSum=0,stanceSamples=0,maxStanceKneeDegrees=0,maxSwingPitch=0,minSwingPitch=0,maxPitchStep=0,maxRenderedFootAngle=0;
 let heelSamples=0,forefootSamples=0,maxPivotDriftM=0,maxAnkleLiftM=0,maxRollStep=0;
+let maxBodyHeightStepM=0,maxSupportLiftM=0,maxPhysicalFootErrorM=0;
 const shapes=[{}, {statureScale:.94},{statureScale:1.06},{legProportion:.7,waistWidth:-.2},{legProportion:-.6,hipWidth:.25},
  {shoulderWidth:.75,waistWidth:.2,torsoDepth:.3,armFullness:.5,legFullness:.3},{shoulderWidth:-.35,hipWidth:-.2,waistWidth:-.65,torsoDepth:-.45,armFullness:-.55,legFullness:-.45},{shoulderWidth:.15,hipWidth:.35,waistWidth:.65,torsoDepth:.65,armFullness:.35,legFullness:.5}];
 for(const shape of shapes){
@@ -29,11 +30,16 @@ for(const shape of shapes){
  for(const side of ['left','right'])h.arms[side]={s:side==='left'?-1:1,L1:api.dist(sourceBind.get(side+'_upperArm').p,sourceBind.get(side+'_forearm').p),L2:api.dist(sourceBind.get(side+'_forearm').p,sourceBind.get(side+'_hand').p)};
  const a={h,pos:[0,0,0],yaw:0,time:0,route:[],routeIndex:0,manipulationPace:()=>1,strength:{movementFactor:()=>1},w:{objects:[],bounds:{xMin:-100,xMax:100,zMin:-100,zMax:100},collision:()=>false}};
  const locomotion=new api.NaturalLocomotion(a);a.locomotion=locomotion;
+ let lastBodyHeight=locomotion.pose.build().frames.get('hips').p[1];
  assert.equal(locomotion.rig.hipHeight,bodyMetrics.walkingHipHeightM);
  assert.equal(locomotion.engine.state.root[1],bodyMetrics.standingHipHeightM);
  const step=()=>{
   const before=structuredClone(locomotion.engine.state);locomotion.update(1/120);
   const s=locomotion.engine.state,candidate=locomotion.pose.build();locomotion.pose.validate(candidate);frames++;
+  const bodyHeight=candidate.frames.get('hips').p[1],bodyStep=Math.abs(bodyHeight-lastBodyHeight);lastBodyHeight=bodyHeight;
+  maxBodyHeightStepM=Math.max(maxBodyHeightStepM,bodyStep);maxSupportLiftM=Math.max(maxSupportLiftM,s.pelvisSupportLiftM||0);
+  assert(bodyStep<.004*bodyMetrics.statureScale,'actual pelvis must not pop during support changes');
+  for(const error of candidate.errors){maxPhysicalFootErrorM=Math.max(maxPhysicalFootErrorM,error.error);assert(error.error<1e-7,'physical foot targets remain reachable after pelvis lift');}
   assert.equal(s.fault,null);maxHeightStepM=Math.max(maxHeightStepM,Math.abs(s.root[1]-before.root[1]));
   assert(Math.abs(s.root[1]-before.root[1])<.004*bodyMetrics.statureScale,'height cannot snap on a fixed step');
   for(const side of ['left','right']){
@@ -82,8 +88,8 @@ for(const shape of shapes){
 }
 assert(maxIdleKneeDegrees<15,'idle standing has slight knee flexion instead of the gait crouch');
 assert(maxWalkKneeDegrees>30,'walking retains its swing-knee flexion');
-assert(stanceSamples>1000&&stanceKneeSum/stanceSamples<25,'support legs should not stay in the previous deep crouch');
+assert(stanceSamples>1000&&stanceKneeSum/stanceSamples<17,'rolling support must not be absorbed as the previous 22-degree average knee bend');
 assert(maxSwingPitch>.02&&minSwingPitch<-.02,'airborne ankle must release and recover instead of staying flat');
 assert(maxRenderedFootAngle>.02,'full pose builder must consume airborne ankle articulation');
 assert(heelSamples>100&&forefootSamples>100&&maxAnkleLiftM>.01,'walk must transfer heel/forefoot support and allow the ankle to rise');
-console.log(JSON.stringify({schema:'human/standing_gait_height@3',shapes:shapes.length,frames,walks,turns,stops,maxHeightStepM,maxFootErrorM,maxBoneErrorM,maxIdleKneeDegrees,minWalkKneeDegrees,maxWalkKneeDegrees,stanceSamples,meanStanceKneeDegrees:stanceKneeSum/stanceSamples,maxStanceKneeDegrees,maxSwingPitch,minSwingPitch,maxPitchStep,maxRenderedFootAngle,heelSamples,forefootSamples,maxPivotDriftM,maxAnkleLiftM,maxRollStep,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
+console.log(JSON.stringify({schema:'human/standing_gait_height@4',shapes:shapes.length,frames,walks,turns,stops,maxHeightStepM,maxBodyHeightStepM,maxSupportLiftM,maxPhysicalFootErrorM,maxFootErrorM,maxBoneErrorM,maxIdleKneeDegrees,minWalkKneeDegrees,maxWalkKneeDegrees,stanceSamples,meanStanceKneeDegrees:stanceKneeSum/stanceSamples,maxStanceKneeDegrees,maxSwingPitch,minSwingPitch,maxPitchStep,maxRenderedFootAngle,heelSamples,forefootSamples,maxPivotDriftM,maxAnkleLiftM,maxRollStep,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));

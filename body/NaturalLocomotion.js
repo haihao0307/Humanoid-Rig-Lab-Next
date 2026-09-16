@@ -666,7 +666,7 @@ class NaturalLocomotion {
   }
   return target;
  }
- isSettled(){return this.kernelSettled()&&Object.values(this.engine.state.feet).every(foot=>!foot.rocker?.pitch)&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
+ isSettled(){return this.kernelSettled()&&!(this.engine.state.pelvisSupportLiftM>0)&&Object.values(this.engine.state.feet).every(foot=>!foot.rocker?.pitch)&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
  gaitSupportTarget(){
   // Approximate the support-leg vault from this person's lengths and foot
   // separation. The mild bend is an authored IK reserve, not a clinical norm.
@@ -693,6 +693,26 @@ class NaturalLocomotion {
   }
   e.state=candidate;
  }
+ updateSupportLift(dt){
+  const s=this.engine.state,scale=this.a.h.bodyMetrics.statureScale;
+  if(s.paused||s.fault)return;
+  // The navigation kernel retains its flat-placement IK. The committed body
+  // follows the actual rolling ankles; otherwise heel rise becomes knee bend.
+  let ceiling=Infinity,target=this.standingHipHeightM+.035*scale;
+  const active=!this.usesFlatSupport(s)&&Object.values(s.feet).some(f=>f.rocker?.pitch)&&!Object.values(s.feet).some(f=>f.adoptedOrientation);
+  for(const side of ['left','right']){
+   const foot=s.feet[side],ankle=foot.rocker?.ankle||foot.position;
+   const hip=add(s.root,rotate(qy(s.yaw),[this.rig.hipHalf*(side==='left'?-1:1),0,0]));
+   const {upper,lower}=this.rig.legs[side],d=horizontal(hip,ankle),reach=upper+lower-.0005*scale;
+   ceiling=Math.min(ceiling,ankle[1]+Math.sqrt(Math.max(0,reach*reach-d*d)));
+   if(foot.contact){const knee=12*Math.PI/180,r2=upper*upper+lower*lower+2*upper*lower*Math.cos(knee);
+    target=Math.min(target,ankle[1]+Math.sqrt(Math.max(0,r2-d*d)));}
+  }
+  const desired=active?clamp(Math.min(target,ceiling)-s.root[1],0,.035*scale):0;
+  const previous=s.pelvisSupportLiftM||0,step=(desired-previous)*(1-Math.exp(-dt/.08));
+  s.pelvisSupportLiftM=Math.min(Math.max(0,ceiling-s.root[1]),Math.max(0,previous+clamp(step,-.15*scale*dt,.15*scale*dt)));
+  if(s.pelvisSupportLiftM<1e-7)s.pelvisSupportLiftM=0;
+ }
  canTransition(){return this.isSettled();}
  update(dt){
   const e=this.engine,currentTaskKey=trafficTaskKey(this.a);
@@ -717,11 +737,13 @@ class NaturalLocomotion {
   // exact reach ceiling once more; do not leave even a small clamped-IK foot
   // hovering above that anchor while the height response catches up.
   this.updateHeight(this.kernelSettled()?dt*this.tempo:0,this.kernelSettled());
+  this.updateSupportLift(dt*this.tempo);
   this.sync();
  }
  report(){const s=this.engine.state;return{version:NATURAL_GAIT.version,state:s.status,speedMps:this.speed,timeScale:this.tempo,contacts:{...this.contacts},settled:this.isSettled(),
   source:MotionLab.MOTION_SOURCE,sourcePhase:s.motion.phase,referenceBlend:s.motion.weight,metrics:{...s.metrics},skinFloorOffsetM:this.skinFloorOffsetM,
-  height:{standingTargetM:this.standingHipHeightM,walkingTargetM:this.gaitSupportTarget(),legacyWalkingTargetM:this.rig.hipHeight,currentM:s.root[1],reachableStandingM:this.standingTarget(),timeConstantS:.18,method:'support-reach/v1'},
+  height:{standingTargetM:this.standingHipHeightM,walkingTargetM:this.gaitSupportTarget(),legacyWalkingTargetM:this.rig.hipHeight,currentM:s.root[1],reachableStandingM:this.standingTarget(),timeConstantS:.18,
+   supportLiftM:s.pelvisSupportLiftM||0,bodyRootM:s.root[1]+(s.pelvisSupportLiftM||0),supportResponseS:.08,method:'rolling-support-reach/v2'},
   traffic:structuredClone(this.traffic),routePassThroughCount:this.routePassThroughCount,poseAdoption:this.lastPoseAdoption?structuredClone(this.lastPoseAdoption):null,
   continuousWalkHandoff:this.lastContinuousWalkHandoff?structuredClone(this.lastContinuousWalkHandoff):null,
   phaseContinuity:this.phaseController.report(),turnContinuity:this.turnFilter.report(),lastTurnContinuity:this.lastTurnContinuity?structuredClone(this.lastTurnContinuity):null,

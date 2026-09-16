@@ -33,7 +33,10 @@ function walk(target,flat,changeHeld){
   const moving=locomotion.move(dt);locomotion.update(dt);const state=locomotion.engine.state;
   assert.equal(locomotion.usesFlatSupport(),flat,'held-object changes cannot switch support mode mid-stride');
   const full=locomotion.pose.build();locomotion.pose.validate(full);samples++;
-  if(flat)for(const foot of Object.values(state.feet))assert(!foot.rocker,'carry execution uses the flat-support preflight contract');
+  if(flat){
+   assert.equal(state.pelvisSupportLiftM||0,0,'loaded flat-support mode cannot inherit a free-walk body lift');
+   for(const foot of Object.values(state.feet))assert(!foot.rocker,'carry execution uses the flat-support preflight contract');
+  }
   for(const foot of Object.values(state.feet))if(foot.contact&&foot.rocker?.pitch){
    if(foot.rocker.kind==='heel')heel++;else forefoot++;
   }
@@ -57,7 +60,9 @@ function walk(target,flat,changeHeld){
    assert(api.dist(proxy.centre,rolled.rocker.world)<1e-10,'balance centre follows the actual heel or forefoot');
    assert(proxy.halfZ<.02,'rolling contact cannot retain a full flat-sole support length');
   }
-  if(!moving&&locomotion.isSettled())return;
+  if(!moving&&locomotion.isSettled()){
+   assert.equal(state.pelvisSupportLiftM||0,0,'next action waits for body support lift to settle');return;
+  }
  }
  assert.fail('support mode must settle before its next handoff');
 }
