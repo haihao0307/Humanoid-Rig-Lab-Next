@@ -1,0 +1,51 @@
+name: Chicken Phase 1 Source Export
+
+on:
+  push:
+    branches:
+      - chat/chicken-phase1-continuation-20260916
+    paths:
+      - .github/workflows/chicken-phase1-source-export.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out working branch
+        uses: actions/checkout@v4
+
+      - name: Verify source set
+        shell: bash
+        run: |
+          test -s CHICKEN_V46_R9_1.html
+          test -s CHICKEN_V46_R9_8_3_CLEAN_FACE.html
+          test -s tools/build_chicken_r92.py
+          test -s tools/build_chicken_r95.py
+          test -s tools/build_chicken_r96.py
+          test -s tools/build_chicken_r98.py
+          test -s tools/build_chicken_r981.py
+          test -s tools/build_chicken_r982.py
+          test -s tools/build_chicken_r983.py
+          test -s tools/chicken_r98_override.js
+
+      - name: Upload source set
+        uses: actions/upload-artifact@v4
+        with:
+          name: chicken-phase1-source-${{ github.run_number }}
+          path: |
+            CHICKEN_V46_R9_1.html
+            CHICKEN_V46_R9_8_3_CLEAN_FACE.html
+            tools/build_chicken_r*.py
+            tools/chicken_r*.js
+            tools/capture_chicken_r*.mjs
+            data/CHICKEN_R9*.json
+            reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png
+            qa/CHICKEN_R983_BROWSER_QA.json
+            BUILD_MANIFEST_R983.json
+          if-no-files-found: warn
+          retention-days: 7
