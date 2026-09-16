@@ -1,0 +1,148 @@
+name: Chicken R9.8.3 Clean Face Build
+
+on:
+  push:
+    branches:
+      - codex/chicken-r9-2-head-restore
+    paths:
+      - .github/workflows/chicken-r983-build.yml
+      - tools/build_chicken_r95.py
+      - tools/build_chicken_r96.py
+      - tools/build_chicken_r98.py
+      - tools/build_chicken_r981.py
+      - tools/build_chicken_r982.py
+      - tools/build_chicken_r983.py
+      - tools/chicken_r98_override.js
+      - tools/capture_chicken_r983.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: chicken-r983-clean-face
+  cancel-in-progress: true
+
+jobs:
+  build-audit-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out candidate branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify committed R9.8.3 source tools
+        shell: bash
+        run: |
+          test -s tools/build_chicken_r983.py
+          test -s tools/capture_chicken_r983.mjs
+          python -m py_compile tools/build_chicken_r95.py tools/build_chicken_r96.py tools/build_chicken_r98.py tools/build_chicken_r981.py tools/build_chicken_r982.py tools/build_chicken_r983.py
+          node --check tools/chicken_r98_override.js
+          node --check tools/capture_chicken_r983.mjs
+
+      - name: Build deterministic R9.8.3 executable
+        run: python tools/build_chicken_r983.py
+
+      - name: Install Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Install Playwright Core
+        run: npm install --no-save playwright-core@1.55.0
+
+      - name: Run browser and clean-face QA
+        id: browser_qa
+        continue-on-error: true
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          CHICKEN_R983_URL: http://127.0.0.1:8765/CHICKEN_V46_R9_8_3_CLEAN_FACE.html
+          CHICKEN_R91_URL: http://127.0.0.1:8765/CHICKEN_V46_R9_1.html
+        shell: bash
+        run: |
+          python -m http.server 8765 > /tmp/chicken-r983-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 2
+          node tools/capture_chicken_r983.mjs
+
+      - name: Finalize state, review board and manifest
+        if: always()
+        run: python tools/build_chicken_r983.py --finalize
+
+      - name: Upload R9.8.3 visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chicken-r983-visual-evidence-${{ github.run_number }}
+          path: |
+            CHICKEN_V46_R9_8_3_CLEAN_FACE.html
+            data/CHICKEN_R983_CLEAN_FACE_PARAMETERS.json
+            qa/CHICKEN_R983_STATIC_QA.json
+            qa/CHICKEN_R983_BROWSER_QA.json
+            evidence/r983
+            BUILD_MANIFEST_R983.json
+            01_CURRENT_STATE.json
+            README.md
+            CURRENT_HANDOFF.md
+            CURRENT_FULL_HANDOFF.md
+            06_NEXT_STAGE_PLAN.md
+            reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Verify generated gates
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          required=[Path('CHICKEN_V46_R9_8_3_CLEAN_FACE.html'),Path('data/CHICKEN_R983_CLEAN_FACE_PARAMETERS.json'),Path('qa/CHICKEN_R983_STATIC_QA.json'),Path('qa/CHICKEN_R983_BROWSER_QA.json'),Path('evidence/r983/R983_REVIEW_BOARD.html'),Path('BUILD_MANIFEST_R983.json')]
+          missing=[str(path) for path in required if not path.exists()]
+          if missing: raise SystemExit(f'Missing generated files: {missing}')
+          for path in [Path('qa/CHICKEN_R983_STATIC_QA.json'),Path('qa/CHICKEN_R983_BROWSER_QA.json')]:
+              data=json.loads(path.read_text(encoding='utf-8'))
+              if not data.get('passed'): raise SystemExit(f'QA failed: {path}')
+          print('R9.8.3 source, browser, parts exclusion and bill gates passed. Independent visual gate remains open.')
+          PY
+
+      - name: Commit generated R9.8.3 candidate and evidence
+        shell: bash
+        run: |
+          git config user.name "Codex"
+          git config user.email "codex@users.noreply.github.com"
+          git add -A \
+            tools/build_chicken_r95.py \
+            tools/build_chicken_r96.py \
+            tools/build_chicken_r98.py \
+            tools/build_chicken_r981.py \
+            tools/build_chicken_r982.py \
+            tools/build_chicken_r983.py \
+            tools/chicken_r98_override.js \
+            tools/capture_chicken_r983.mjs \
+            CHICKEN_V46_R9_8_3_CLEAN_FACE.html \
+            data/CHICKEN_R983_CLEAN_FACE_PARAMETERS.json \
+            qa/CHICKEN_R983_STATIC_QA.json \
+            qa/CHICKEN_R983_BROWSER_QA.json \
+            evidence/r983 \
+            BUILD_MANIFEST_R983.json \
+            01_CURRENT_STATE.json \
+            README.md \
+            CURRENT_HANDOFF.md \
+            CURRENT_FULL_HANDOFF.md \
+            06_NEXT_STAGE_PLAN.md
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "Build Chicken V4.6 R9.8.3 clean face candidate [skip ci]"
+            git pull --rebase origin codex/chicken-r9-2-head-restore
+            git push origin HEAD:codex/chicken-r9-2-head-restore
+          fi
