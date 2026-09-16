@@ -30,13 +30,21 @@ for(let i=0;i<3000;i++){
  const moving=locomotion.move(dt);locomotion.update(dt);
  const s=locomotion.engine.state,f=s.motion.frame;
  const forward=p=>p[0]*Math.sin(s.yaw)+p[2]*Math.cos(s.yaw);
+ const pose=locomotion.pose.build();locomotion.pose.validate(pose);
+ const axis=part=>{const L=pose.frames.get('left_'+part).p,R=pose.frames.get('right_'+part).p,d=R.map((v,i)=>v-L[i]);
+  const x=d[0]*Math.cos(s.yaw)-d[2]*Math.sin(s.yaw),z=forward(d);
+  return{yaw:Math.atan2(-z,x),roll:Math.atan2(d[1],Math.hypot(x,z))};};
+ const pelvis=axis('femur'),shoulders=axis('upperArm');
  rows.push({speed:locomotion.speed,drive:locomotion.phaseController.drive,phaseError:locomotion.phaseController.error,
+  pelvisYaw:pelvis.yaw,pelvisRoll:pelvis.roll,shoulderYaw:shoulders.yaw,
   foot:forward(s.feet.left.position)-forward(s.feet.right.position),arm:f.leftUpperArm[2]-f.rightUpperArm[2]});
- locomotion.pose.validate(locomotion.pose.build());
  if(!moving&&locomotion.isSettled())break;
 }
 const steady=rows.filter(r=>r.speed>.40),cov=steady.reduce((s,r)=>s+r.foot*r.arm,0),mag=Math.sqrt(steady.reduce((s,r)=>s+r.foot*r.foot,0)*steady.reduce((s,r)=>s+r.arm*r.arm,0));
-console.log(JSON.stringify({frames:rows.length,steady:steady.length,armLegCorrelation:cov/mag,maxDrive:Math.max(...rows.map(r=>r.drive)),meanPhaseError:steady.reduce((s,r)=>s+Math.abs(r.phaseError),0)/steady.length}));
+const range=key=>(Math.max(...steady.map(r=>r[key]))-Math.min(...steady.map(r=>r[key])))*180/Math.PI;
+assert(range('pelvisYaw')>8&&range('pelvisRoll')>3,'committed hip centres must retain captured pelvic rotation instead of a locked horizontal axis');
+assert(range('shoulderYaw')>2,'captured torso response must survive contact retargeting');
+console.log(JSON.stringify({frames:rows.length,steady:steady.length,armLegCorrelation:cov/mag,pelvisYawRangeDegrees:range('pelvisYaw'),pelvisRollRangeDegrees:range('pelvisRoll'),shoulderYawRangeDegrees:range('shoulderYaw'),maxDrive:Math.max(...rows.map(r=>r.drive)),meanPhaseError:steady.reduce((s,r)=>s+Math.abs(r.phaseError),0)/steady.length}));
 assert(steady.length>300);assert(cov/mag<-.35,'same-side arm and foot must predominantly travel in opposing directions');
 assert(Number.isInteger(locomotion.phaseController.phaseOffset),'support calibration must preserve source left/right phase, not erase error with a fractional offset');
 assert(locomotion.phaseController.drive<.001,'arm drive must decay after stopping');

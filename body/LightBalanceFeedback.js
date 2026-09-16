@@ -97,7 +97,7 @@ class LightBalanceFeedback{
   const doubleSupport=Object.values(result.state.feet||{}).every(foot=>foot.contact!==false);
   if(doubleSupport&&!options.hands&&options.motionSource?.kind!=='contact-adaptation'){
    const worldOffset=rotate(qy(result.yaw),feedback.pelvisLocal);result.state.root=add(result.state.root,worldOffset);
-   if(result.controlled)result.state.pose=this.engine.solve(result.state);
+   if(result.controlled)result.state.pose=this.solveControlledState(result.state,result.data);
   }
   result.state.motion={...result.state.motion,frame:result.data,weight:1};return result;
  };

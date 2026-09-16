@@ -55,6 +55,25 @@ class MotionLabPose {
   const world=qm(qy(yaw),rotation);
   return qnorm(qm(inv(qy(yaw)),qm(fromTo(rotate(world,sourceAxis),targetAxis),world)));
  }
+ solveControlledState(state,data){
+  if(!state.articulatedPelvis)return this.engine.solve(state);
+  // A recorded pelvis is a rigid body, not a horizontal bar. Rotate the real
+  // source hip offsets first, then solve each fixed-length leg to its contact.
+  // Keep the navigation proxy separate from the complete committed skeleton.
+  const world=qm(qy(state.yaw),data.rootQ),offsets={},legs={};let ceiling=Infinity;
+  for(const side of ['left','right']){
+   const offset=rotate(world,sub(this.source(side+'_femur'),this.source('hips')));offsets[side]=offset;
+   const hip=add(state.root,offset),foot=state.feet[side].position,{upper,lower}=this.engine.rig.legs[side];
+   const horizontal2=(hip[0]-foot[0])**2+(hip[2]-foot[2])**2,reach=upper+lower-.0005*this.h.bodyMetrics.statureScale;
+   ceiling=Math.min(ceiling,foot[1]+Math.sqrt(Math.max(0,reach*reach-horizontal2))-offset[1]);
+  }
+  state.root[1]=Math.min(state.root[1],ceiling);
+  for(const side of ['left','right']){
+   const hip=add(state.root,offsets[side]),pole=add(hip,rotate(world,[0,-.2,1])),{upper,lower}=this.engine.rig.legs[side];
+   legs[side]=MotionLab.solveTwoBone(hip,state.feet[side].position,pole,upper,lower);
+  }
+  return{root:[...state.root],yaw:state.yaw,legs};
+ }
  radialRotation(side,positions,palm){
   // Radius/ulna twist at the elbow. Wrist flexion belongs to the hand pivot:
   // using palm directly here rotates the distal forearm away from the wrist.
@@ -150,7 +169,11 @@ class MotionLabPose {
   }
   let data=this.frameData(state,reference);
   if(controlled){
-   data={...data,rootQ:this.controlledPelvisRotation(state,data.rootQ,yaw)};
+   // Only the production free-gait mode opts into articulated hip centres.
+   // Raw kernel clients without a support mode retain their existing contract.
+   state.articulatedPelvis=!reference&&!options.position&&!options.feet&&!options.hands&&state.flatFootSupport===false&&!Object.values(state.feet).some(foot=>foot.adoptedOrientation);
+   if(state.articulatedPelvis)state.pose=this.solveControlledState(state,data);
+   else data={...data,rootQ:this.controlledPelvisRotation(state,data.rootQ,yaw)};
    state.motion={...state.motion,frame:data,weight:1};
   }
   return{state,yaw,controlled,data};
