@@ -9,6 +9,7 @@ on:
       - cat-kaopu/tools/patch_cat_v444_ui_state.py
       - cat-kaopu/tools/patch_cat_v444_periorbital_runtime.py
       - cat-kaopu/tools/patch_cat_v444_controls_api.py
+      - cat-kaopu/tools/patch_cat_v444_validation_marker.py
       - cat-kaopu/tools/finalize_cat_v444_continuous_periorbital.py
       - cat-kaopu/tools/verify_cat_v444_module.py
       - cat-kaopu/tools/capture_cat_v444_browser_qa.mjs
@@ -59,6 +60,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_v444_controls_api.py
+
+      - name: Correct V4.44 validation marker
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v444_validation_marker.py
 
       - name: Finalize V4.44 metadata and workbench
         env:
