@@ -1,0 +1,52 @@
+{
+  "schema": "cat_kaopu/environment_npc_phase1_contract@1.0",
+  "buildId": "cat-kaopu-phase1-gate-a-single-npc-20260916",
+  "date": "2026-09-16",
+  "priority": {
+    "morphology": 0.48,
+    "locomotion": 0.42,
+    "collision": 0.1
+  },
+  "singleNpcGate": {
+    "status": "active",
+    "requiredViews": [
+      "front",
+      "left",
+      "top",
+      "quarter"
+    ],
+    "requiredActions": [
+      "stand",
+      "walk_forward",
+      "turn_left",
+      "turn_right"
+    ],
+    "requiredSystems": [
+      "ground_contact",
+      "root_motion",
+      "direction_sync",
+      "collision_proxy"
+    ]
+  },
+  "collision": {
+    "profile": "environment_collision_proxy@1.0",
+    "proxies": [
+      "pelvis",
+      "chest",
+      "head"
+    ],
+    "staticObstacle": "wall_A",
+    "response": "bounded_pushout_plus_gait_brake",
+    "fullMeshCollision": false
+  },
+  "deferred": {
+    "groupRuntime": false,
+    "variationRuntime": false,
+    "localAvoidance": false,
+    "lifeBehaviorPriority": "secondary",
+    "thirdEyelid": false,
+    "whiskerDetail": false
+  },
+  "nextGate": "single NPC morphology and locomotion audit, then stop-or-bypass response",
+  "productionReady": false
+}
