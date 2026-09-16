@@ -8,6 +8,7 @@ on:
       - .github/workflows/cat-kaopu-v442-bootstrap.yml
       - cat-kaopu/tools/bootstrap_cat_v442_sources.py
       - cat-kaopu/tools/bootstrap/v442/**
+      - cat-kaopu/tools/patch_cat_v442_orbital_fit.py
   workflow_dispatch:
 
 permissions:
@@ -37,6 +38,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/bootstrap_cat_v442_sources.py
+
+      - name: Apply orbital-fit eyelid repair
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_v442_orbital_fit.py
 
       - name: Freeze V4.41 source exactly once
         shell: bash
@@ -125,7 +131,7 @@ jobs:
             echo 'No V4.42 changes to commit.'
             exit 0
           fi
-          git commit -m 'build(cat): install V4.42 geometric eyelid and browser evidence [cat-v442 generated]'
+          git commit -m 'build(cat): refine V4.42 orbital-fit eyelid and browser evidence [cat-v442 generated]'
           for attempt in 1 2 3; do
             if git push origin "HEAD:${GITHUB_REF_NAME}"; then
               exit 0
