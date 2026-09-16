@@ -159,6 +159,8 @@ class MotionLabWorld {
 }
 class ContinuousMotionPhase {
  constructor(engine){this.engine=engine;this.originalAdvance=engine.motion.advance.bind(engine.motion);this.reset(engine.state.motion.phase||0);engine.motion.advance=(state,dt)=>this.advance(state,dt);}
+ snapshot(){const {engine,originalAdvance,...state}=this;return structuredClone(state);}
+ restore(state){Object.assign(this,structuredClone(state));}
  reset(phase=0){this.phase=Number.isFinite(phase)?phase:0;this.velocity=0;this.target=null;this.error=0;this.initialized=false;this.lastSide=null;this.phaseOffset=0;this.wasActive=false;this.needsCalibration=true;this.contactCorrections=0;this.maximumStep=0;}
  advance(state,dt){
   const swing=state.swing,active=state.speed>.02||!!swing;let desiredVelocity=0;
@@ -240,6 +242,15 @@ class NaturalLocomotion {
   this.phaseController=new ContinuousMotionPhase(this.engine);this.turnFilter=new TurnCommandFilter();
   this.pose=new MotionLabPose(agent.h,this.engine);agent.h.motionDriver=this.pose;
   this.resetFromPose();
+ }
+ // Agent's pose transaction must include the filters outside the pinned
+ // kernel. Keep the live engine/callback identities and clone only state.
+ snapshotExecution(){return structuredClone({requestKey:this.requestKey,requested:this.requested,tempo:this.tempo,traffic:this.traffic,
+  phase:this.phaseController.snapshot(),turn:this.turnFilter,lastTurnContinuity:this.lastTurnContinuity,
+  lastPoseAdoption:this.lastPoseAdoption,lastContinuousWalkHandoff:this.lastContinuousWalkHandoff,routePassThroughCount:this.routePassThroughCount});}
+ restoreExecution(saved){
+  const {phase,turn,...state}=structuredClone(saved);Object.assign(this,state);
+  this.phaseController.restore(phase);Object.assign(this.turnFilter,turn);
  }
  resetFromPose({preservePoseContacts=false}={}){
   if(this.traffic?.slotKey)trafficReleaseTargetSlot(this);if(this.traffic?.corridorKey)trafficReleaseCorridor(this);

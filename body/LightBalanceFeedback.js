@@ -10,6 +10,8 @@ const LIGHT_BALANCE_FEEDBACK=Object.freeze({
 });
 class LightBalanceFeedback{
  constructor(agent){this.a=agent;this.enabled=typeof location==='undefined'||!new URLSearchParams(location.search).has('balanceOff');this.reset();}
+ snapshot(){const {a,...state}=this;return structuredClone(state);}
+ restore(state){Object.assign(this,structuredClone(state));}
  reset(){this.active=false;this.pitchRad=0;this.rollRad=0;this.pelvisLocal=[0,0,0];this.paceScale=1;
   this.rootVelocity=[0,0,0];this.lastRoot=null;this.marginM=Infinity;this.risk=0;this.supportCount=0;
   this.comLocal=[0,0,0];this.accelerationLocal=[0,0,0];this.source='support-proxy';}
@@ -59,6 +61,20 @@ class LightBalanceFeedback{
 (function installLightBalanceFeedback(){
  if(NaturalLocomotion.prototype.__lightBalanceR25)return;
  const update=NaturalLocomotion.prototype.update,move=NaturalLocomotion.prototype.move,resetFromPose=NaturalLocomotion.prototype.resetFromPose,report=NaturalLocomotion.prototype.report;
+ const snapshotExecution=NaturalLocomotion.prototype.snapshotExecution,restoreExecution=NaturalLocomotion.prototype.restoreExecution;
+ NaturalLocomotion.prototype.snapshotExecution=function(){return{...snapshotExecution.call(this),balance:this.balanceFeedback?.snapshot()||null};};
+ NaturalLocomotion.prototype.restoreExecution=function(saved){
+  const {balance,...state}=saved;restoreExecution.call(this,state);
+  if(balance){
+   if(!this.balanceFeedback)this.balanceFeedback=new LightBalanceFeedback(this.a);
+   this.balanceFeedback.restore(balance);this.a.h.__lightBalanceFeedback=this.balanceFeedback;
+  }else{
+   // A failed first tick can create feedback after the checkpoint. Remove
+   // its pose hook too, so the restored stance has no future-frame lean.
+   if(this.a.h.__lightBalanceFeedback===this.balanceFeedback)delete this.a.h.__lightBalanceFeedback;
+   this.balanceFeedback=null;
+  }
+ };
  NaturalLocomotion.prototype.update=function(dt){const value=update.call(this,dt);if(!this.balanceFeedback)this.balanceFeedback=new LightBalanceFeedback(this.a);this.balanceFeedback.update(dt);return value;};
  NaturalLocomotion.prototype.move=function(dt,speed=.48){return move.call(this,dt,speed*(this.balanceFeedback?.paceScale??1));};
  NaturalLocomotion.prototype.resetFromPose=function(options){const value=resetFromPose.call(this,options);this.balanceFeedback?.reset();return value;};

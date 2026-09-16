@@ -120,7 +120,7 @@ class Agent{
   const task=this.skill?{...this.skill,o:undefined,target:undefined}:null;
   const ownedIds=[this.skill?.o?.id,this.held?.id].filter(Boolean);
   this.lastSafe={pose:this.locomotion.pose.snapshot(),kernel:this.locomotion.engine.snapshot(),
-   locomotion:{requestKey:this.locomotion.requestKey,requested:this.locomotion.requested,tempo:this.locomotion.tempo,traffic:structuredClone(this.locomotion.traffic)},
+   locomotion:this.locomotion.snapshotExecution(),
    state:structuredClone({pos:this.pos,yaw:this.yaw,feet:this.feet,swing:this.swing,time:this.time,pendingPhysicsFinish:this.pendingPhysicsFinish,phase:this.phase,phaseT:this.phaseT,phaseWallT:this.phaseWallT,plan:this.plan,index:this.index,
     skill:task,route:this.route,routeIndex:this.routeIndex,walkHandoff:this.walkHandoff,grips:this.grips,lastObject:this.lastObject,stats:this.stats,strengthLastLengths:this.strengthLastLengths,strengthLastObjectVelocity:this.strengthLastObjectVelocity}),
    heldId:this.held?.id||null,objectId:this.skill?.o?.id||null,targetId:this.skill?.target?.id||null,evidenceLength:this.evidence.length,
@@ -141,7 +141,7 @@ class Agent{
    if(population&&this.held?.heldOwner!==this.npcId){this.held=null;this.grips=null;}
    this.strength.state=structuredClone(saved.strength);this.strength.lastAssessment=structuredClone(saved.assessment);
    Object.assign(this.basic,structuredClone(saved.basic));this.evidence.length=saved.evidenceLength;
-   this.locomotion.engine.state=structuredClone(saved.kernel);Object.assign(this.locomotion,saved.locomotion);this.locomotion.sync();
+   this.locomotion.engine.state=structuredClone(saved.kernel);this.locomotion.restoreExecution(saved.locomotion);this.locomotion.sync();
    // Floor extensions have a different pelvis height from the navigation root.
    this.pos=[...saved.state.pos];this.yaw=saved.state.yaw;this.feet=structuredClone(saved.state.feet);this.swing=structuredClone(saved.state.swing);this.locomotion.pose.restore(saved.pose);
   }
