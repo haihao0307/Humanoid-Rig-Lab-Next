@@ -1,0 +1,29 @@
+{
+  "schema": "life_ecosystem/chicken_phase1_npc_controller_qa@1.0",
+  "date": "2026-09-16",
+  "controller": "runtime/chicken_phase1_npc_controller.mjs",
+  "test": "tests/chicken_phase1_npc_controller.test.mjs",
+  "workflow": ".github/workflows/chicken-phase1-npc-controller.yml",
+  "workflow_run_id": 35075356329,
+  "result": "passed",
+  "checks": {
+    "seeded_variation_deterministic": true,
+    "variation_ranges_bounded": true,
+    "facing_direction_updates": true,
+    "root_position_advances": true,
+    "bone_lengths_immutable": true,
+    "left_right_foot_contacts_alternate": true,
+    "peck_emits_bill_contact": true,
+    "temporary_blockage_does_not_abort_task": true,
+    "obstacle_detour_or_replan_occurs": true,
+    "overlapping_agents_separate": true,
+    "twelve_agent_3600_frame_stress_run_finite": true,
+    "all_states_valid": true
+  },
+  "truth_boundary": {
+    "rendered_rig_adapter_integrated": false,
+    "rendered_motion_visually_accepted": false,
+    "single_agent_motion_complete": false,
+    "small_herd_production_ready": false
+  }
+}
