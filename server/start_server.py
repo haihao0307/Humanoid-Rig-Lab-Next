@@ -109,6 +109,7 @@ class JarvisHTTPServer(ThreadingHTTPServer):
 
 
 class Handler(SimpleHTTPRequestHandler):
+    extensions_map = {**SimpleHTTPRequestHandler.extensions_map, '.mjs': 'text/javascript', '.js': 'text/javascript', '.gz': 'application/octet-stream'}
     server_version = "JarvisLocal/1.15.1"
 
     def __init__(self, *args, **kwargs):

@@ -1,0 +1,79 @@
+name: Patch Open Intersection Circulation R2.7
+
+on:
+  push:
+    branches:
+      - feature/human-task-workbench-adjustment-v2-fullbase
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-verify:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/human-task-workbench-adjustment-v2-fullbase
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply R2.7 source changes
+        run: python tools/apply-open-intersection-r27.py
+      - name: Build and verify source traffic suite
+        run: |
+          node --check body/CrowdIntersectionCoordinator.js
+          node --check body/NaturalLocomotion.js
+          node --check tools/test-task-crowd-browser.mjs
+          node --check tools/test-npc-four-way-crossing.mjs
+          node tools/build-pure.mjs
+          node tools/build-pure.mjs --check
+          node tools/check-pure.mjs
+          node tools/test-npc-task-selection-bridge.mjs
+          node tools/test-npc-traffic-wait.mjs
+          node tools/test-npc-target-reservations.mjs
+          node tools/test-npc-four-way-crossing.mjs
+          node tools/test-npc-corridor-active-yield.mjs
+          node tools/test-npc-resource-circulation.mjs
+          node tools/test-grid-navigation-batch.mjs
+      - name: Install browser dependency
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          if ! command -v google-chrome >/dev/null 2>&1 && ! command -v google-chrome-stable >/dev/null 2>&1 && ! command -v chromium >/dev/null 2>&1; then
+            npx playwright install --with-deps chromium
+          fi
+      - name: Verify six-person browser crowd scenarios
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/humanlab-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/index.html >/dev/null && break; sleep 1; done
+          if [ -n "$CHROME_BIN" ]; then
+            CHROME_BIN="$CHROME_BIN" HUMANLAB_URL=http://127.0.0.1:4173/index.html node tools/test-task-crowd-browser.mjs
+          else
+            HUMANLAB_URL=http://127.0.0.1:4173/index.html node tools/test-task-crowd-browser.mjs
+          fi
+      - name: Upload R2.7 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: task-open-intersection-r27
+          path: |
+            artifacts/task-crowd-crossing-r26.png
+            artifacts/task-crowd-corridor-r26.png
+            artifacts/task-crowd-resource-r26.png
+            artifacts/task-crowd-browser-r26.json
+            artifacts/task-crowd-browser-r26-failure.png
+            artifacts/task-crowd-browser-r26-failure.json
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Commit verified R2.7 runtime
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add body/CrowdIntersectionCoordinator.js body/NaturalLocomotion.js source/runtime.template.js source/assembly.json tools/test-task-crowd-browser.mjs tools/test-npc-four-way-crossing.mjs index.html
+          git commit -m "fix(task): coordinate open intersections without parking R2.7"
+          git push origin HEAD:feature/human-task-workbench-adjustment-v2-fullbase

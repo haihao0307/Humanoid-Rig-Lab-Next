@@ -1,34 +1,14 @@
-## 模块
+## 变更
 
-- [ ] proportion
-- [ ] skin
-- [ ] pose
-- [ ] animation
-- [ ] integration
+说明触发问题、修改后的行为与涉及模块。
 
-## 兼容版本
+## 文件验证
 
-```text
-Rig：
-ProjectState schema：
-```
+- `node tools/build-pure.mjs`
+- `python tools/audit-files.py`
 
-## 完成内容
+记录文件检查结果。除非用户另行授权，不启动网页或人物模拟。文件验证与运行、视觉验收分别说明。
 
-## 修改文件
+## 接口与限制
 
-## 测试结果
-
-```text
-npm test：
-实机浏览器：
-```
-
-## 已知问题
-
-## 是否修改共享协议
-
-- [ ] 没有
-- [ ] 有，已经在下方说明
-
-## 集成说明
+说明是否修改共享协议，以及仍需用户检查的行为。

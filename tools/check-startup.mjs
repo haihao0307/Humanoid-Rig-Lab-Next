@@ -1,0 +1,70 @@
+// Source contracts only: do not import the worker, mesher, or binding solver.
+export function checkStartupSources({read,assert}){
+ let checks=0;const check=(ok,message)=>{assert(ok,'Startup file contract: '+message);checks++;};
+ const worker=read('reconstruction/worker.mjs'),binding=read('reconstruction/binding.mjs'),surface=read('body/CompactWorkbench.js'),shapeTransform=read('reconstruction/stature-transform.mjs');
+ const runtime=read('source/runtime.template.js'),mesher=read('reconstruction/mesher.mjs'),topology=read('reconstruction/topology.mjs');
+ check(/from '\.\/binding\.mjs'/.test(worker)&&/field=buildCompactBinding\(result,data\.rig,progress\)/.test(worker),'binding executes in the generation worker');
+ check(!/buildCompactBinding\(|bindCompactArrays\(|collectCompactSupport\(/.test(surface),'display does not repeat the worker CPU calculations');
+ check(/mesh\.binding=bindCompactArrays\(mesh,data\.rig,field\)/.test(worker)&&worker.includes('applyCompactStature(result,shape,data.rig,progress)')&&shapeTransform.includes('collectPersonalSupport(mesh,rig,candidates)')&&shapeTransform.includes('const binding=mesh.binding,dominant=binding.ids[v*COMPACT_INFLUENCES]'),'one canonical binding field supplies every personal chunk and reselected support probe');
+ for(const name of ['ids','weights','colors'])check(worker.includes('m.binding.'+name+'.buffer'),'binding buffer transferred: '+name);
+ check(/data\.bindingJointNames\.some\(\(id,i\)=>id!==this\.rig\.jointNames\[i\]\)/.test(surface),'uploaded binding matches exact source joint order');
+ check(/binding\.ids\.length!==m\.vertices\*COMPACT_INFLUENCES/.test(surface)&&/binding\.weights\.length!==binding\.ids\.length/.test(surface),'upload checks binding extents');
+ check(/loadCompactSurface\('preview',false,compactSourceRig\(human\)\)/.test(runtime)&&runtime.indexOf('human=new Human();')<runtime.indexOf('const compactSurfaceReady='),'startup sends the constructed source rig without blocking on hair');
+ check(/requestSurface=lab\.compact/.test(surface)&&/loadCompactSurface\(select\.value,false,requestSurface\.rig\)/.test(surface)&&/lab\.compact!==requestSurface\|\|requestSurface\.disposed/.test(surface),'quality replacement uses the captured worker rig and rejects a replaced character');
+ check(read('body/CompactBinding.js').includes('/*__COMPACT_BINDING_CORE__*/')&&read('tools/build-pure.mjs').includes("read('reconstruction/binding.mjs')"),'assembled body and worker share one binding source');
+ for(const prefix of ['const add=','const sub=','const mul=','const dot=','const norm=','const dist=','const clamp=','const mix=','const smooth=','const inv=','function rotate(']){
+  const line=runtime.split(/\r?\n/).find(line=>line.startsWith(prefix));check(!!line&&binding.includes(line),'worker preserves original math: '+prefix);
+ }
+ check(/edgeFraction:ai<bi\?split\.t:1-split\.t/.test(topology),'reused edge knots retain their actual directed parameter');
+ check(mesher.includes('mix(vertices[i].p,vertices[(i+1)%3].p,m.edgeFraction??.5)')&&mesher.includes('mix(vertices[i].shade,vertices[(i+1)%3].shade,m.edgeFraction??.5)')&&mesher.includes('mix(mapped[i],mapped[(i+1)%3],m.edgeFraction??.5)'),'position, normal and corrected-surface errors compare the same directed point on each edge');
+ check(/visitedTriangles&1023/.test(mesher)&&/now-lastProgress<200/.test(mesher),'long domains report throttled real progress');
+ check(/publishCompactProgress\(\{\.\.\.data\.progress,state:'running'\}\)/.test(surface)&&read('ui/StartupDiagnostics.js').includes('win?.__compactLoading'),'worker progress reaches startup diagnostics');
+ check(/now-lastProgressAt>45000/.test(surface)&&!/now-startedAt>120000/.test(surface)&&/clearInterval\(watchdog\)/.test(surface),'stalled work is bounded without terminating healthy work at 120 seconds');
+ check(/controller\.abort\(\),15000/.test(worker)&&/signal:controller\.signal/.test(worker)&&/finally\{clearTimeout\(timer\)/.test(worker),'parameter fetches have bounded cancellation');
+ const kernel=read('reconstruction/surface-kernel.mjs'),diagnostics=read('ui/StartupDiagnostics.js');
+ check(/values=\[get\(row,col\),get\(row\+1,col\),get\(row,col\+1\),get\(row\+1,col\+1\)\]/.test(kernel)&&/cells\.size>=4096/.test(kernel),'sparse cache preserves all four coefficient corners and bounds per-layer memory');
+ check(/corners\[0\]=dense\[at\];corners\[1\]=dense\[at\+nv\+1\];corners\[2\]=dense\[at\+1\];corners\[3\]=dense\[at\+nv\+2\]/.test(kernel),'dense and sparse corners have identical orientation');
+ for(const formula of ['q+=(1-a)*(1-b)*v00+a*(1-b)*v10+(1-a)*b*v01+a*b*v11;',
+   'qu+=((1-b)*(v10-v00)+b*(v11-v01))*nu/extent[0];','qv+=((1-a)*(v01-v00)+a*(v11-v10))*nv/extent[1];'])check(kernel.includes(formula),'original interpolation or derivative formula: '+formula.split('+=')[0]);
+ check(/t===0\?\(s\.rawStart\?\?=raw\(pu,pv\)\):t===1\?\(s\.rawEnd\?\?=raw\(pu,pv\)\):raw\(pu,pv\)/.test(kernel),'only fixed boundary endpoint evaluations are memoized');
+ check(/cache\.get\(uv\[0\]\)/.test(mesher)&&/row\?\.get\(uv\[1\]\)/.test(mesher)&&!/toPrecision/.test(mesher),'probe cache uses exact numeric UV keys');
+ check(/cachedValues>=65536/.test(mesher)&&/centre=sample\(/.test(mesher),'probe cache is bounded and one-use centroids are not retained');
+ check(/previous\.split===split&&previous\.boundary===boundary/.test(topology)&&/cache\.size>=32768/.test(topology),'edge cache invalidates on split and boundary changes and has a fixed cap');
+ check(/previous\.from===ai\?v:\{\.\.\.v,edgeFraction:1-\(v\.edgeFraction\?\?\.5\)\}/.test(topology)&&/val,inverse,edges\)/.test(mesher),'edge cache is chart-local and reverses directed fractions');
+ check(/progress\.state==='failed'\?previous:/.test(surface)&&/updatedAt:progress\.state==='failed'\?previous\.updatedAt:now/.test(surface),'failure retains last domain and work counters without inventing progress');
+ check(/finishedAt===null&&\(error\|\|connected\)/.test(diagnostics)&&/\(finishedAt\?\?Date\.now\(\)\)/.test(diagnostics)&&/reconstruction\.state==='failed'/.test(diagnostics),'terminal startup time stops increasing and failed computation is labeled stopped');
+ const assembly=read('reconstruction/assembly.mjs');
+ check(/REFINEMENT_BUDGET=\{body:24000,left:8000,detail:40000,features:16000,collar:2000\}/.test(mesher)&&/SKIN_REFINEMENT_BUDGET\[name\]\?\.\[quality\]\?\?/.test(mesher),'explicit skin quotas override the retained detail/feature/collar budget policy');
+ check(mesher.includes("name==='features'?(quality==='preview'?1800:6000):(quality==='preview'?5000:quality==='close'?22000:15000)")&&mesher.includes('baseRefinementBudget+faceRefinementBudget')&&mesher.includes('allocateChartRefinementBudget(faceDomains,faceRefinementBudget)'),'face and lip refinement has an explicit bounded quota separate from the existing body budget');
+ check(mesher.includes('if(!usableParameterTriangle(a.uv,bb.uv,c.uv))')&&mesher.includes('stats.parameterSliversRejected'),'parameter-degenerate source triangles are rejected before refinement and reported');
+ check(/Math\.floor\(chartBudget\/surface\.domainIds\.length\)\+\(di<chartBudget%surface\.domainIds\.length\?1:0\)/.test(mesher),'chart quotas sum to the group quota instead of starving later charts');
+ check(/name==='left'\?Math\.floor\(baseRefinementBudget\/2\)/.test(mesher)&&/Math\.floor\(\(baseRefinementBudget-chartBudget\)\/4\)/.test(mesher),'radial charts retain their own base-budget share without consuming local correction quotas');
+ check(mesher.includes('needsRefinement&&depth<20&&(domainSplits<domainSplitBudget||correctionPool)')&&mesher.includes('c.remaining>0&&activeCorrections.includes(c.correction)')&&mesher.includes('if(correctionPool)correctionPool.remaining--;else domainSplits++;stats.adaptiveSplits++;')&&mesher.includes('budget,remaining:budget')&&mesher.includes('correctionAllocations.reduce((sum,c)=>sum+c.budget,0)')&&mesher.includes('stats.adaptiveSplits>refinementBudget'),'every queued split consumes a finite chart or matching local correction quota under a total-work guard');
+ check(/pending=new SurfaceRefinementQueue\(\)/.test(mesher)&&/pending\.push\(candidate,candidate\.priority\)/.test(mesher)&&/for\(const f of faces\)emit\(\.\.\.f\.map\(i=>val\(uv\[i\]\)\)\);flush\(\)/.test(mesher),'all root faces enter the error-priority queue before any chart quota is spent');
+ check(/outward\[chart\.c\.heightAxis\]=chart\.c\.outwardSign/.test(mesher)&&/1,outward,earBudgets.has\(chart.c.id\),chartCorrections\)/.test(mesher),'height charts retain source outward orientation alongside ear sampling and chart corrections');
+ check(/if\(normalField\)v\.shade=normalField\(b\.name,v\.p,v\.n\)/.test(mesher),'normal interpolation errors are sampled on body skin as well as facial features');
+ check(/if\(needsRefinement\)\{stats\.refinementLimitCount\+\+/.test(mesher)&&/precisionLimited:groups\.some\(g=>g\.refinementLimitCount>0\)/.test(assembly)&&/lab\.compact\.report\.precisionLimited\?/.test(surface),'unmet error targets including normal refinement are exposed to the user');
+ check(/MAX_VERTICES=350000,MAX_TRIANGLES=600000,MAX_SPLITS=250000,MAX_BOUNDARIES=700000/.test(topology),'global topology has conservative element guards beyond the local caches');
+ check(topology.indexOf('if(id>=MAX_VERTICES)')<topology.indexOf('this.positions.push(...p)')&&topology.indexOf('this.splits.size>=MAX_SPLITS')<topology.indexOf('this.splits.set(key,{id,t})'),'vertex and split guards run before allocating their entries');
+ check(/this\.topology\.claimTriangle\(\);this\.indices\.push/.test(mesher)&&/this\.claimTriangle\(true\);faces\.add/.test(topology)&&/topology\.claimTriangle\(\);topology\.claimTriangle\(\);indices\.push/.test(topology),'sampling, conformity and interface triangles all consume allocation guards');
+ check(/positions=new Float32Array\(count\*3\)/.test(topology)&&/indices=new Uint32Array\(mesh\.indices\.length\)/.test(topology),'materialization sizes typed buffers from actual topology without duplicate growing number arrays');
+ check(/mesh\.indices=null/.test(topology)&&/raw\.indices=null;settled\.meshes\[i\]=null/.test(assembly)&&/topology\.releaseGeometry\(\)/.test(assembly),'consumed topology arrays are released before binding starts');
+ check(/this\.positions\.length=0;this\.normals\.length=0;this\.hasNormal\.length=0;this\.masks\.length=0;this\.parents\.length=0/.test(topology),'canonical source arrays have explicit end-of-generation release');
+ check(/reconstruction\.canonicalVertices/.test(diagnostics)&&/reconstruction\.refinementBudget/.test(diagnostics),'startup diagnostics expose global count and remaining group work');
+ check(/body:\{preview:108000,interactive:108000,balanced:90000,small:72000,close:144000\}/.test(mesher)&&/left:\{preview:36000,interactive:36000,balanced:30000,small:24000,close:48000\}/.test(mesher)&&/value="preview">启动档/.test(surface),'skin quotas are finite per quality and close does not multiply the repaired startup quota again');
+ check(/if\(data\.job==='hair'\)/.test(worker)&&/generateCompactHair\(\{load,progress,hairProfile:data\.hairProfile\}\)/.test(worker)&&/\[hair\.segments\.buffer\]/.test(worker),'hair has an independent transferable result');
+ const hairOnly=assembly.slice(assembly.indexOf('export async function generateCompactHair'),assembly.indexOf('export async function generateCompactHuman'));
+ check(/detail\.chf\.gz/.test(hairOnly)&&/createCompactSurface\(decoded\.data\)/.test(hairOnly)&&!/sampleCompactGroup|buildCompactBinding|normal-field/.test(hairOnly),'hair-only work never rebuilds body triangles, normals or binding');
+ check(!/if\(!lab\.compact\.hair\)throw Error/.test(surface)&&/lab\.hairStatus=\{state:lab\.compact\.hair\?'ready':'pending'\}/.test(surface),'body ready explicitly permits pending default hair');
+ check(runtime.indexOf("if(reviewMode!=='face')scheduleCompactHair(window.HumanLab.population?.active||window.HumanLab)")>runtime.indexOf("status:'ready',stage:'ready'")&&/requestAnimationFrame\(\(\)=>requestAnimationFrame/.test(surface),'hair is scheduled after body ready and a paint opportunity');
+ check(/stage=new CompactHairRenderer\(this,data\);this\.checkUpload\(\)/.test(surface)&&/catch\(error\)\{stage\?\.dispose\(\);throw error;\}/.test(surface),'independent hair upload is staged and locally recoverable');
+ check(/if\(lab\.hairTask\)await lab\.hairTask\.catch/.test(surface)&&/if\(lab\.compactQualityPending\)return Promise\.resolve/.test(surface),'hair and surface replacement do not cancel or overlap each other');
+ check(/navigator\.locks\.request\('human-reconstruction-v1',\{signal:queueController\.signal\},run\)/.test(surface)&&surface.indexOf('const run=()=>new Promise')<surface.indexOf('new window.Worker'),'cross-tab lock encloses worker creation and owns its full lifetime');
+ check(/cancelQueued=reason=>queueController\.abort\(reason\)/.test(surface)&&/finally\{if\(compactPendingCancel===cancelQueued\)compactPendingCancel=null;\}/.test(surface),'queued jobs can be cancelled and cannot clear a newer request');
+ check(/sessionStorage\.setItem\('human-reconstruction-last-runs',JSON\.stringify\(compactRunLog\)\)/.test(surface)&&/now-compactProgressSavedAt<1000/.test(surface)&&/window\.__compactPreviousRuns/.test(surface),'small throttled per-tab progress journal survives reload without caching geometry');
+ check(/__compactPreviousRuns/.test(diagnostics)&&/jsHeapSizeLimit/.test(diagnostics),'next startup exposes previous unfinished phase and browser-reported heap limit');
+ const hair=read('reconstruction/hair.mjs');
+ check(/onStrand\(strand\)/.test(hair)&&/progress:report/.test(hair)&&/phase:'roots'/.test(hair)&&/onStrand\(strand\(bundle,0,item\.root\),emitted\+\+\)/.test(read('reconstruction/hair-rules-r2.mjs')),'hair streams curves without retaining their closures and reports bounded work');
+ check(/cancelCompactSurface\('人物初始化失败：'\+error\)/.test(runtime),'an unrelated initialization error cancels the pending generation job');
+ return {checks,applicationExecuted:false,workerExecuted:false,weightSolverExecuted:false,startupDurationMeasured:false};
+}
