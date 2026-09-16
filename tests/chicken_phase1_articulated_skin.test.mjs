@@ -5,49 +5,93 @@ import {
   computeChickenPhase1SkinAttributes
 } from '../runtime/chicken_phase1_articulated_skin.mjs';
 
-const sum=(values)=>values.reduce((total,value)=>total+value,0);
+const sum = (values) => values.reduce((total, value) => total + value, 0);
+const bone = (id) => CHICKEN_PHASE1_BONE_ORDER.indexOf(id);
 
-for(const [position,kind] of [
-  [[.39,.95,.12],'body'],
-  [[-.32,.53,.09],'feather'],
-  [[0,.55,.20],'feather'],
-  [[0,.08,.14],'parts'],
-  [[.40,.95,.12],'iris'],
-  [[0,.52,.09],'body']
-]){
-  const result=computeChickenPhase1VertexWeights(...position,kind);
-  assert.equal(result.indices.length,4);
-  assert.equal(result.weights.length,4);
-  assert.ok(Math.abs(sum(result.weights)-1)<1e-6);
-  assert.ok(result.indices.every(index=>index>=0&&index<CHICKEN_PHASE1_BONE_ORDER.length));
-  assert.ok(result.weights.every(weight=>weight>=0&&Number.isFinite(weight)));
+for (const [position, kind, options] of [
+  [[0.39, 0.95, 0.12], 'body', {}],
+  [[-0.32, 0.53, 0.09], 'feather', {}],
+  [[0, 0.55, 0.20], 'feather', {}],
+  [[0, 0.08, 0.14], 'parts', { vertexKind: 3, localCoord: [0.8, 0, 0] }],
+  [[0.40, 0.95, 0.12], 'iris', {}],
+  [[0, 0.52, 0.09], 'body', {}]
+]) {
+  const result = computeChickenPhase1VertexWeights(...position, kind, options);
+  assert.equal(result.indices.length, 4);
+  assert.equal(result.weights.length, 4);
+  assert.ok(Math.abs(sum(result.weights) - 1) < 1e-6);
+  assert.ok(result.indices.every((index) => index >= 0 && index < CHICKEN_PHASE1_BONE_ORDER.length));
+  assert.ok(result.weights.every((weight) => weight >= 0 && Number.isFinite(weight)));
 }
 
-let result=computeChickenPhase1VertexWeights(.39,.95,.12,'body');
-assert.equal(result.indices[0],CHICKEN_PHASE1_BONE_ORDER.indexOf('head'));
+let result = computeChickenPhase1VertexWeights(0.39, 0.95, 0.12, 'body');
+assert.equal(result.indices[0], bone('head'));
 
-result=computeChickenPhase1VertexWeights(-.34,.52,.12,'feather');
-assert.equal(result.indices[0],CHICKEN_PHASE1_BONE_ORDER.indexOf('tail'));
+// A lower vertex at the same x must stay on the torso. The old rule rigidly
+// assigned all upper-front carrier vertices to the head and folded the breast.
+result = computeChickenPhase1VertexWeights(0.34, 0.62, 0.12, 'body');
+assert.notEqual(result.indices[0], bone('head'));
+assert.ok(result.indices.includes(bone('chest')) || result.indices.includes(bone('pelvis')));
 
-result=computeChickenPhase1VertexWeights(0,.56,.20,'feather');
-assert.equal(result.indices[0],CHICKEN_PHASE1_BONE_ORDER.indexOf('wing_l'));
+result = computeChickenPhase1VertexWeights(-0.34, 0.52, 0.12, 'feather');
+assert.equal(result.indices[0], bone('tail'));
 
-result=computeChickenPhase1VertexWeights(0,.06,.14,'parts');
-assert.ok(
-  result.indices.includes(CHICKEN_PHASE1_BONE_ORDER.indexOf('ankle_l'))||
-  result.indices.includes(CHICKEN_PHASE1_BONE_ORDER.indexOf('toe_l'))
-);
+result = computeChickenPhase1VertexWeights(0, 0.56, 0.20, 'feather');
+assert.equal(result.indices[0], bone('wing_l'));
 
-const attributes=computeChickenPhase1SkinAttributes(
-  new Float32Array([.39,.95,.12,-.34,.52,.12,0,.06,.04]),
-  'body'
-);
-assert.equal(attributes.count,3);
-assert.equal(attributes.indices.length,12);
-assert.equal(attributes.weights.length,12);
-for(let vertex=0;vertex<3;vertex++){
-  assert.ok(Math.abs(sum([...attributes.weights.slice(vertex*4,vertex*4+4)])-1)<1e-6);
+// Generated tarsometatarsus kind 3 is always limited to two adjacent bones.
+for (const s of [0, 0.18, 0.44, 0.52, 0.76, 1]) {
+  result = computeChickenPhase1VertexWeights(0, 0.28 - s * 0.23, 0.14, 'parts', {
+    vertexKind: 3,
+    localCoord: [s, 0, 0]
+  });
+  const active = result.weights.filter((weight) => weight > 1e-7).length;
+  assert.ok(active <= 2, `kind 3 at s=${s} used ${active} bones`);
+  assert.ok(result.indices.every((index) => [bone('hip_l'), bone('knee_l'), bone('ankle_l'), 0].includes(index)));
 }
-assert.throws(()=>computeChickenPhase1SkinAttributes(new Float32Array([1,2]),'body'));
+
+// Digit/pad kind 4 moves from ankle to toe without involving the hip or knee.
+for (const [x, s] of [[0.006, 0.05], [0.04, 0.45], [0.10, 0.92]]) {
+  result = computeChickenPhase1VertexWeights(x, 0.02, 0.14, 'parts', {
+    vertexKind: 4,
+    localCoord: [s, 0, 0]
+  });
+  assert.ok(result.indices.every((index) => [bone('ankle_l'), bone('toe_l'), 0].includes(index)));
+  assert.ok(!result.indices.includes(bone('hip_l')));
+  assert.ok(!result.indices.includes(bone('knee_l')));
+}
+
+// Claws are rigidly driven by the toe controller.
+result = computeChickenPhase1VertexWeights(0.12, 0.01, 0.14, 'parts', {
+  vertexKind: 5,
+  localCoord: [0.8, 0, 0]
+});
+assert.equal(result.indices[0], bone('toe_l'));
+assert.equal(result.weights[0], 1);
+
+const positions = new Float32Array([
+  0, 0.30, 0.14,
+  0, 0.12, 0.14,
+  0.09, 0.02, 0.14,
+  0.12, 0.01, 0.14
+]);
+const attributes = computeChickenPhase1SkinAttributes(positions, 'parts', {
+  vertexKinds: new Float32Array([3, 3, 4, 5]),
+  localCoords: new Float32Array([
+    0.05, 0, 0,
+    0.72, 0, 0,
+    0.86, 0, 0,
+    0.92, 0, 0
+  ])
+});
+assert.equal(attributes.count, 4);
+assert.equal(attributes.indices.length, 16);
+assert.equal(attributes.weights.length, 16);
+for (let vertex = 0; vertex < 4; vertex++) {
+  assert.ok(Math.abs(sum([...attributes.weights.slice(vertex * 4, vertex * 4 + 4)]) - 1) < 1e-6);
+}
+assert.equal(attributes.indices[12], bone('toe_l'));
+assert.ok(attributes.primaryCounts[bone('toe_l')] >= 1);
+assert.throws(() => computeChickenPhase1SkinAttributes(new Float32Array([1, 2]), 'body'));
 
 console.log('Chicken Phase 1 articulated skin weight tests passed.');
