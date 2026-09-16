@@ -74,7 +74,7 @@ class BasicController {
   this.lastMotionTracking=desc.reference&&desc.motionSource?.kind!=='standard'?r2MotionTracking(h,desc.reference,a.yaw):null;
   const feetResidual=Math.max(0,...h.lastErrors.filter(e=>/_foot$/.test(e.id)).map(e=>e.error));
   a.stats.maxFootPositionErrorM=Math.max(a.stats.maxFootPositionErrorM,feetResidual);
-  this.lastGround=ground;this.floorMin=Math.min(this.floorMin,ground.y);this.maxFloorCorrection=Math.max(this.maxFloorCorrection,correction);this.samples++;
+  this.lastGround=ground;this.floorMin=Math.min(this.floorMin,ground.y);this.maxFloorCorrection=Math.max(this.maxFloorCorrection,Math.abs(correction));this.samples++;
   a.pos=[...h.root.p];a.feet=Object.fromEntries(sides.map(s=>[s,{p:[...h.legs[s].wrist.world.p],q:[...h.legs[s].wrist.world.q],yaw:a.yaw}]));
   const d=h.diagnostics();a.stats.maxBoneLengthErrorM=Math.max(a.stats.maxBoneLengthErrorM,d.maxBoneLengthErrorM);
  }

@@ -268,14 +268,22 @@ class MotionLabPose {
   let ground=null,groundCorrectionM=0;
   if(!options.groundClearance)return{ground,groundCorrectionM};
   const anchored=candidate.controlled&&!options.hands;let previous=null;
+  // These non-airborne floor clips have a different source body height.
+  // Fit their retargeted support surface in BOTH directions. Clearance-only
+  // lifting allowed an entire crouched/seated body to hover above the floor.
+  // Explicit world contacts always retain ownership of height instead.
+  const fitFloor=options.groundSupport==='continuous-floor'&&options.floorMode&&
+   !candidate.controlled&&!options.hands&&candidate.source?.kind==='capture'&&
+   !candidate.errors.some(error=>error.targetSpace==='world');
   for(let pass=0;pass<(anchored?8:1);pass++){
    ground=this.h.minimumBoneY(candidate.frames);
    if(!Number.isFinite(ground.y))throw Error('动作候选缺少有效支撑采样');
-   let correction=Math.max(0,.0005-ground.y);if(correction<1e-7)return{ground,groundCorrectionM};
+   let correction=fitFloor?.0005-ground.y:Math.max(0,.0005-ground.y);
+   if(Math.abs(correction)<1e-7)return{ground,groundCorrectionM};
    // A planted shin can rise much less than the pelvis. Estimate that local
    // response only while the same support probe is limiting the pose; keep
    // the accelerated step small and re-query the actual surface afterwards.
-   if(anchored&&previous?.boneId===ground.boneId){
+   if(anchored&&previous&&previous.boneId===ground.boneId){
     const response=(ground.y-previous.y)/previous.correction;
     if(response>.02&&response<.8)correction=Math.min(.025,correction/response*1.05);
    }

@@ -20,8 +20,14 @@ try{
   if(w.__startupError)throw Error(w.__startupError);lab.setAuto(false);lab.inspectBody('front');
   const gl=w.document.querySelector('#view').getContext('webgl2');
   const pose=lab.agent.locomotion.pose,apply=pose.apply;
-  lab.motionQA={adoptedSamples:0,maxAdoptedAngleRad:0};
+  lab.motionQA={adoptedSamples:0,maxAdoptedAngleRad:0,floorSamples:0,loweredFloorSamples:0,maxLoweringM:0,maxFloorGapM:0};
   pose.apply=function(...args){const result=apply.apply(this,args),s=this.engine.state;
+   if(args[0]?.groundSupport==='continuous-floor'){
+    const report=this.report(),qa=lab.motionQA;qa.floorSamples++;
+    qa.maxFloorGapM=Math.max(qa.maxFloorGapM,Math.abs(report.ground.y-.0005));
+    qa.maxLoweringM=Math.max(qa.maxLoweringM,-report.groundCorrectionM);
+    if(report.groundCorrectionM<-.000001)qa.loweredFloorSamples++;
+   }
    for(const side of ['left','right']){const foot=s.feet[side];if(!foot.adoptedOrientation||!foot.contact||s.swing?.side===side)continue;
     const q=this.h.byId.get(side+'_foot').world.q,goal=foot.adoptedOrientation;
     const d=Math.min(1,Math.abs(q.reduce((sum,v,k)=>sum+v*goal[k],0)));
@@ -31,7 +37,7 @@ try{
   return{status:w.__humanStartup,population:lab.population.list().length,webgl:!!gl,contextLost:gl?.isContextLost()};
  });
  assert(startup.webgl&&!startup.contextLost);console.log('STARTUP '+JSON.stringify(startup));
- for(const command of ['坐下','起身','向前走1米','向左转90度','挥手']){
+ for(const command of ['坐下','躺下','坐下','起身','向前走1米','向左转90度','挥手']){
   console.log('BEGIN '+command);
   const result=await page.evaluate(command=>{
    const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,a=lab.agent,start=a.stats.completed,phases=new Set();
@@ -49,7 +55,8 @@ try{
   // The review cast is arranged along X; a side camera is occluded by the
   // neighbouring actor. Keep the whole body framed from a clear front angle.
   await page.evaluate(()=>{const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab;lab.inspectBody('front');lab.renderer.yaw=0;lab.renderer.target=[lab.agent.pos[0],lab.human.bodyMetrics.statureM*.45,lab.agent.pos[2]];lab.render();});
-  await page.screenshot({path:join(out,'motion-'+results.length+'.png'),timeout:120000});
+  const png=await page.evaluate(()=>document.querySelector('#bodyFrame').contentWindow.HumanLab.renderer.canvas.toDataURL('image/png'));
+  await writeFile(join(out,'motion-'+results.length+'.png'),Buffer.from(png.split(',')[1],'base64'));
  }
  await page.waitForFunction(()=>document.querySelector('#bodyFrame')?.contentWindow?.HumanLab?.population?.list().length>=6,null,{timeout:480000});
  crowd=await page.evaluate(()=>{
@@ -64,6 +71,7 @@ try{
   return{dispatch,actors:[...p.values()].map(a=>({id:a.id,completed:a.agent.stats.completed-before[a.id],ready:a.agent.activity().readyForTask}))};
  });
  assert.equal(crowd.actors.length,6);for(const a of crowd.actors){assert.equal(a.completed,1);assert(a.ready);}
+ assert(results.at(-1).floorSamples>0);assert(results.at(-1).loweredFloorSamples>0);assert(results.at(-1).maxFloorGapM<1e-6);
  assert.equal(pageErrors.length,0);console.log('PASS '+JSON.stringify({actions:results.length,simultaneousGestures:crowd.actors.length,pageErrors:0,visualAcceptance:false,crowdPerformanceMeasured:false}));
 }catch(error){failure=String(error);console.error('FAIL '+failure);process.exitCode=1;
  try{console.error('STATE '+JSON.stringify(await page.evaluate(()=>{const w=document.querySelector('#bodyFrame')?.contentWindow,lab=w?.HumanLab;return{startup:w?.__humanStartup,startupError:w?.__startupError,population:lab?.population?.list().length,error:lab?.agent?.error,basic:lab?.agent?.basic?.report(),pose:lab?.agent?.locomotion?.pose.report()};})));}catch{}

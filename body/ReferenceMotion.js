@@ -87,7 +87,8 @@ function r2ReferenceDescriptor(h,id,t,origin,yaw,from=null,blend=1){
  const transitionHingeDegrees=from&&blend<1?Object.fromEntries(['left','right'].flatMap(side=>[['forearm','UpperArm','Forearm'],['tibia','Thigh','Shank']].map(([joint,a,b])=>[side+'_'+joint,degrees(Math.acos(clamp(dot(from[side+a],from[side+b]),-1,1)))]))):null;
  const scale=(h.bodyMetrics.rig.femurLengthM+h.bodyMetrics.rig.tibiaLengthM),offset=rotate(qy(yaw),mul(raw.rootOffset,scale));
  return {position:[origin[0]+offset[0],h.bodyMetrics.restHipHeightM*reference.rootHeightRatio,origin[2]+offset[2]],
-  reference,floorMode:true,kind:id,motionSource:{kind:'capture',clip:id,trial:R2_MOTION.clips[id].sourceTrial,progress:t,transitionHingeDegrees}};
+  reference,floorMode:true,groundSupport:['standToSit','sitToLie','lieToSit','sitToStand'].includes(id)?'continuous-floor':null,
+  kind:id,motionSource:{kind:'capture',clip:id,trial:R2_MOTION.clips[id].sourceTrial,progress:t,transitionHingeDegrees}};
 }
 function r2PostureClips(from,target){
  if(from===target)return [];
