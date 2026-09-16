@@ -6,7 +6,7 @@ import io
 import tarfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[2]
 PART_DIR = Path(__file__).resolve().parent / "bootstrap" / "v442"
 PARTS = ['archive.part01.b64', 'archive.part02.b64', 'archive.part03.b64', 'archive.part04.b64']
 ARCHIVE_SHA256 = "14906f5a6ece08854df2d25a5eacc79f93e764e5c5b04b8a6ba73c806758cad4"
