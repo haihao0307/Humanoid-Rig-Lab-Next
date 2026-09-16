@@ -69,7 +69,7 @@ def write_params()->None:
  write_json(PARAMS,{
   'schema':'life_ecosystem/chicken_single_agent_runtime@1.0','version':'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
   'morphology_source':'V4.6_R9.9.1_CONTINUOUS_RING_REFIT_CANDIDATE','active_entry':OUTPUT.name,
-  'bone_order':['body_root','pelvis','chest','neck_base','neck_c0','neck_c1','head','wing_l','wing_r','hip_l','knee_l','ankle_l','toe_l','hip_r','knee_r','ankle_r','toe_r','tail'],
+  'bone_order':['body_root','pelvis','chest','neck_base','neck_c0','neck_c1','neck_c2','neck_c3','head_base','head','wing_l','wing_r','hip_l','knee_l','ankle_l','toe_l','hip_r','knee_r','ankle_r','toe_r','tail'],
   'behavior_set':['idle_stand','look','peck','walk','stop','turn','short_run','wing_balance'],
   'runtime':{
    'controller':'runtime/chicken_phase1_npc_controller.mjs',
@@ -79,7 +79,8 @@ def write_params()->None:
    'root_motion_scale':0.42,
    'fixed_bone_lengths':True,
    'non_root_scale_forbidden':True,
-   'contact_diagnostics':['bill_ground_error','left_foot_ground_error','right_foot_ground_error']
+   'contact_diagnostics':['bill_ground_error','left_foot_ground_error','right_foot_ground_error'],
+   'neck_deformation':'six_link_volume_distribution_v4'
   },
   'gates':{'technical_motion_gate':False,'manual_visual_acceptance':False,'single_agent_grounding_complete':False,'collision_complete':False,'group_test_authorized':False,'production_ready':False}
  })
