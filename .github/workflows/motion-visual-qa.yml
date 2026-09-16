@@ -64,6 +64,33 @@ jobs:
           echo "public_url=${PUBLIC_URL}" >> "$GITHUB_OUTPUT"
           echo "browser_url=${BROWSER_URL}" >> "$GITHUB_OUTPUT"
 
+      - name: Build lightweight motion-QA entrypoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp index.html source-index.html
+          python - <<'PY'
+          from pathlib import Path
+
+          def patch_bytes(path, marker, insertion):
+              file = Path(path)
+              data = file.read_bytes()
+              if data.count(marker) != 1:
+                  raise SystemExit(f'{path}: expected one marker, found {data.count(marker)}')
+              file.write_bytes(data.replace(marker, marker + insertion, 1))
+
+          compact_marker = b"async function installCompactWorkbench(lab,pending){"
+          compact_insert = b"\n  if(new URLSearchParams(location.search).has('visualTest')){\n    pending?.catch?.(()=>{});\n    cancelCompactSurface('motion visual QA uses the lightweight fallback surface');\n    window.__motionVisualQAFallback={active:true,renderer:'procedural-fallback',motionEvidence:true,skinApproval:false};\n    window.__compactLoading={quality:'qa-fallback',job:'surface',state:'ready',group:'ready',message:'motion visual QA lightweight surface',startedAt:performance.now(),updatedAt:performance.now()};\n    lab.renderer.setQuality('fast');\n    if(!lab.hair?.inStudio?.())lab.focus('body');\n    needsRedraw=true;\n    return;\n  }"
+          patch_bytes('body/CompactWorkbench.js', compact_marker, compact_insert)
+
+          population_marker = b"  this.place(actor,position,options.yaw??0);this.pendingIds.add(id);"
+          population_insert = b"\n  if(new URLSearchParams(location.search).has('visualTest')){\n   actor.compact=null;\n   if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};\n   this.pendingIds.delete(id);\n   return actor;\n  }"
+          patch_bytes('control/NPCPopulation.js', population_marker, population_insert)
+          PY
+          node tools/build-pure.mjs
+          grep -q '__motionVisualQAFallback' index.html
+          sha256sum source-index.html index.html | tee qa-entrypoint-hashes.txt
+
       - name: Run one-session Chrome capture
         id: capture
         continue-on-error: true
@@ -77,9 +104,9 @@ jobs:
           set -o pipefail
           curl -fL --retry 12 --retry-delay 3 --connect-timeout 20 --max-time 240 \
             -H 'Cache-Control: no-cache' "$PUBLIC_URL" -o public-index.html
-          sha256sum index.html public-index.html | tee preview-hashes.txt
-          if ! cmp -s index.html public-index.html; then
-            echo 'Fixed public HTTPS bytes do not match the checked-out index.html.' >&2
+          sha256sum source-index.html public-index.html index.html | tee preview-hashes.txt
+          if ! cmp -s source-index.html public-index.html; then
+            echo 'Fixed public HTTPS bytes do not match the checked-out source index.html.' >&2
             exit 1
           fi
           python -m http.server 8765 --bind 127.0.0.1 >http-server.log 2>&1 &
@@ -112,8 +139,9 @@ jobs:
                   f"- source: `{data.get('sourceSHA')}`",
                   f"- status: `{data.get('status')}`",
                   f"- preflight: `{pre.get('passed')}`",
-                  f"- immutable public HTTPS: {os.environ.get('PUBLIC_URL')}",
-                  f"- exact-commit browser URL: {data.get('testedURL')}",
+                  f"- surface review scope: `{pre.get('surfaceReviewScope')}`",
+                  f"- immutable public HTTPS source: {os.environ.get('PUBLIC_URL')}",
+                  f"- local QA harness URL: {data.get('testedURL')}",
                   f"- scenario failures: `{', '.join(data.get('scenarioFailures',[])) or 'none'}`",
                   '- visualAcceptance: `false`',
                   '- productionReady: `false`',
@@ -134,6 +162,7 @@ jobs:
             visual-qa-run.log
             http-server.log
             preview-hashes.txt
+            qa-entrypoint-hashes.txt
           if-no-files-found: error
           compression-level: 6
           retention-days: 30
@@ -166,6 +195,7 @@ jobs:
             "sourceSHA": "$SOURCE_SHA",
             "reviewPath": "reviews/$SOURCE_SHA/visual-review.html",
             "updatedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "surfaceReviewScope": "motion-preview",
             "visualAcceptance": false,
             "productionReady": false,
             "userVisualAcceptance": "pending"
