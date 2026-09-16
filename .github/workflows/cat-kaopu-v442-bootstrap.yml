@@ -1,0 +1,138 @@
+name: Bootstrap Cat Kaopu V4.42 Geometric Eyelid
+
+on:
+  push:
+    branches:
+      - codex/cat-kaopu-v440-mainline-20260915
+    paths:
+      - .github/workflows/cat-kaopu-v442-bootstrap.yml
+      - cat-kaopu/tools/bootstrap_cat_v442_sources.py
+      - cat-kaopu/tools/bootstrap/v442/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cat-kaopu-v442-bootstrap-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bootstrap-build-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Decode audited V4.42 sources
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/bootstrap_cat_v442_sources.py
+
+      - name: Freeze V4.41 source exactly once
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline='cat-kaopu/baselines/v4.41/CAT_KAOPU_V441_EYELID_CORNEA_WORKBENCH_2026-09-15.html'
+          if [ ! -f "$baseline" ]; then
+            mkdir -p "$(dirname "$baseline")"
+            cp cat-kaopu/workbench/CAT_KAOPU_CURRENT.html "$baseline"
+          fi
+
+      - name: Generate V4.42 geometric eyelid workbench
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/build_cat_v442_geometric_eyelid.py
+
+      - name: Verify payload, rig and module invariants
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/verify_cat_v442_module.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install pinned browser dependencies
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Run WebGL2 geometric eyelid capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 --bind 127.0.0.1 > "${RUNNER_TEMP}/cat-v442-http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
+          ready=0
+          for _ in $(seq 1 60); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:4173/cat-kaopu/workbench/CAT_KAOPU_CURRENT.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat "${RUNNER_TEMP}/cat-v442-http.log" || true
+            exit 1
+          fi
+          CAT_V442_URL='http://127.0.0.1:4173/cat-kaopu/workbench/CAT_KAOPU_CURRENT.html' \
+            node cat-kaopu/tools/capture_cat_v442_browser_qa.mjs
+
+      - name: Refresh manifest with browser evidence
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python cat-kaopu/tools/build_cat_v442_geometric_eyelid.py
+          python cat-kaopu/tools/verify_cat_v442_module.py
+
+      - name: Upload V4.42 QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-kaopu-v442-bootstrap-qa-${{ github.run_number }}
+          path: |
+            cat-kaopu/CURRENT.json
+            cat-kaopu/BUILD_MANIFEST.json
+            cat-kaopu/README.md
+            cat-kaopu/workbench/CAT_KAOPU_CURRENT.html
+            cat-kaopu/build/v4.42/CAT_KAOPU_V442_GEOMETRIC_EYELID_WORKBENCH_2026-09-16.html
+            cat-kaopu/docs/CAT_KAOPU_V442_*.md
+            cat-kaopu/qa/CAT_KAOPU_V442_*.json
+            cat-kaopu/qa/CAT_KAOPU_V442_*.png
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit decoded sources, workbench and QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'cat-kaopu-build-bot'
+          git config user.email 'cat-kaopu-build-bot@users.noreply.github.com'
+          git add .github/workflows/cat-kaopu-v442-build.yml cat-kaopu
+          if git diff --cached --quiet; then
+            echo 'No V4.42 changes to commit.'
+            exit 0
+          fi
+          git commit -m 'build(cat): install V4.42 geometric eyelid and browser evidence [cat-v442 generated]'
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              exit 0
+            fi
+            echo "Push attempt ${attempt} failed; rebasing on latest branch head."
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+          done
+          echo 'Unable to push V4.42 evidence after three attempts.' >&2
+          exit 1
