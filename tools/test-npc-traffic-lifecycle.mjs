@@ -15,7 +15,7 @@ function fixture(){
  const population={elapsedS:0,values:()=>actors};
  const actors=['a','b','c'].map((id,i)=>{
   const agent={npcId:id,time:10+i*90,w:{population},index:0,phase:'walk',skill:{type:'walk'},route:[[0,0,5]],routeIndex:0,pos:[i-1,0,-1]};
-  const locomotion=Object.assign(Object.create(api.NaturalLocomotion.prototype),{a:agent,engine:{state:{root:agent.pos}},traffic:{intersectionClaims:0,intersectionYields:0,intersectionRotations:0},world:{free:()=>false},normalizeCorridorRoute:()=>true,corridorPassed:()=>false,corridorAdvanceTarget:()=>[0,0,1],corridorOrbitTarget:()=>[2,0,2]});
+  const locomotion=Object.assign(Object.create(api.NaturalLocomotion.prototype),{a:agent,engine:{state:{root:agent.pos}},traffic:{intersectionClaims:0,intersectionYields:0,intersectionRotations:0,corridorClaims:0},world:{free:()=>false,context:()=>ctx},normalizeCorridorRoute:()=>true,corridorPassed:()=>false,corridorAdvanceTarget:()=>[0,0,1],corridorOrbitTarget:()=>[2,0,2]});
   agent.locomotion=locomotion;return{id,agent};
  });
  const runtime=api.trafficRuntime(population),lease={key:'intersection:test',center:[0,0,0],direction:1,ownerId:null,rotations:0,nextOrder:3,members:new Map(actors.map((actor,i)=>[actor.id,{taskKey:api.trafficTaskKey(actor.agent),goal:[0,0,5],joinedAtS:0,order:i}]))};
@@ -62,5 +62,14 @@ for(const invalidate of [a=>a.agent.paused=true,a=>a.agent.error='failed',a=>a.a
  check(()=>assert.equal(runtime.corridors.size,0));check(()=>assert.equal(loc.traffic.corridorKey,null));check(()=>assert.equal(other.locomotion.traffic.corridorKey,null));
  check(()=>assert.equal(other.locomotion.resolveNarrowCorridor({actor:actors[0]},ctx),null));
  check(()=>assert.equal(api.trafficPopulationNow(population),201));
+}
+{
+ const {actors}=fixture(),loc=actors[0].agent.locomotion,peer=actors[1].agent.locomotion,lease={ownerId:'b',direction:-1,taskKey:'b-task',expiresAtS:6},descriptor={sign:1,key:'corridor:test'},beforeRoute=JSON.stringify(peer.a.route);
+ peer.installCorridorYield=()=>{peer.traffic.corridorOwner='a';peer.a.route=[[99,0,99]];return false;};
+ check(()=>assert.equal(loc.handoffBlockedCorridor({actor:actors[1]},ctx,descriptor,lease),false));
+ check(()=>assert.equal(lease.ownerId,'b'));check(()=>assert.equal(lease.handoffs,undefined));check(()=>assert.equal(peer.traffic.corridorOwner,undefined));check(()=>assert.equal(JSON.stringify(peer.a.route),beforeRoute));
+ peer.installCorridorYield=()=>true;
+ check(()=>assert.equal(loc.handoffBlockedCorridor({actor:actors[1]},ctx,descriptor,lease),true));check(()=>assert.equal(lease.ownerId,'a'));check(()=>assert.equal(lease.handoffs,1));
+ check(()=>assert.equal(loc.handoffBlockedCorridor({actor:actors[1]},ctx,descriptor,lease),false));
 }
 console.log(JSON.stringify({passed:true,checks,sharedClock:true,sameTickRotationBound:true,geometryMocked:true,physicsExecuted:false}));

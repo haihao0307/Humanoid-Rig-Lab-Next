@@ -405,7 +405,23 @@ class NaturalLocomotion {
    this.traffic.corridorOrbit=null;this.traffic.mode='corridor-owner';this.traffic.reason='narrow-corridor-direction-owner';
    if(goal&&!this.normalizeCorridorRoute(context,goal))return'blocked';return'owner';
   }
-  return this.installCorridorYield(conflict,context,descriptor,lease)?'yield':'blocked';
+  if(this.installCorridorYield(conflict,context,descriptor,lease))return'yield';
+  return this.handoffBlockedCorridor(conflict,context,descriptor,lease)?'owner':'blocked';
+ }
+ handoffBlockedCorridor(conflict,context,descriptor,lease){
+  // If only one entrance has a usable retreat lane, that side must yield.
+  // At most one negotiated handover per lease prevents same-tick ping-pong.
+  const a=this.a,other=conflict.actor,peer=other.agent.locomotion;
+  if(lease.ownerId!==other.id||lease.handoffs||!peer)return false;
+  const goal=this.traffic.slotPoint||a.route.at(-1);if(!this.normalizeCorridorRoute(context,goal))return false;
+  const before={...lease},peerTraffic={...peer.traffic},peerRoute=other.agent.route.map(p=>[...p]),peerRequest=peer.requestKey;
+  Object.assign(lease,{ownerId:a.npcId,direction:descriptor.sign,taskKey:trafficTaskKey(a),expiresAtS:trafficPopulationNow(a.w.population)+TRAFFIC_AVOIDANCE.corridorLeaseS,handoffs:1});
+  const actor=[...a.w.population.values()].find(row=>row.agent===a);
+  if(!actor||!peer.installCorridorYield({actor},peer.world.context(.23),{...descriptor,sign:-descriptor.sign},lease)){
+   for(const key of Object.keys(lease))delete lease[key];Object.assign(lease,before);peer.traffic=peerTraffic;other.agent.route=peerRoute;peer.requestKey=peerRequest;return false;
+  }
+  Object.assign(this.traffic,{corridorOwner:a.npcId,corridorOrbit:null,corridorManeuverPoint:null,mode:'corridor-owner',reason:'opposite-entrance-has-retreat-space'});this.traffic.corridorClaims++;
+  a.log?.('本侧出口缺少撤离空间，已由对方退让并取得通道方向权');return true;
  }
  normalizeCorridorRoute(context,goal){
   const a=this.a,root=this.engine.state.root;if(!goal)return false;

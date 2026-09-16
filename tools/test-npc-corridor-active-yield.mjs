@@ -24,7 +24,7 @@ const pointToObjectClearance=(p,o)=>{
  if(o.shape==='box'){const qx=Math.max(Math.abs(dx)-o.w/2,0),qz=Math.max(Math.abs(dz)-o.d/2,0);return Math.hypot(qx,qz);}
  return Math.max(0,Math.hypot(dx,dz)-o.r);
 };
-const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,NaturalLocomotion,motionCircleSweep,dist})',{
+const api=vm.runInNewContext(code+'\n'+read('world/GridNavigation.js')+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,NaturalLocomotion,motionCircleSweep,campGridPath,dist})',{
  structuredClone,SHAPE_SCHEMA,SHAPE_REVISION,normalizeCharacterShape,characterShapeParameterKey,createCharacterShapeField,CHARACTER_DEFORMATION_RULES,HUMAN_GENERATOR_REVISION:'corridor-active-yield-test',
  degrees:r=>r*180/Math.PI,DOWN:[0,-1,0],horizontal,angleDiff:(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b)),objectTilted:()=>false,objectYaw,objectRadius,objectFootprint,pointToObjectClearance,
  bodyPhysicalProfile:h=>({bodyRadiusM:h.bodyMetrics.bodyRadiusM}),carryRouteRadius:()=>.55,MotionLab:{FullBodyMotion,blend,relaxedHandRotation,solveTwoBone,MotionController,rigFromSource,FlatWorld}});
@@ -41,10 +41,13 @@ const walls=[
  {id:'corridor-left',shape:'box',p:[-corridorHalf,0,0],w:.18,d:2.8,held:false,collidable:true},
  {id:'corridor-right',shape:'box',p:[corridorHalf,0,0],w:.18,d:2.8,held:false,collidable:true}
 ];
+const blockedRetreat=process.argv.includes('--blocked-retreat');
+if(blockedRetreat)walls.push(...[-1,1].map(side=>({id:'blocked-bay-'+side,shape:'box',p:[side*1.1,0,-2.8],w:1.2,d:.5,held:false,collidable:true})));
 const world={objects:walls,bounds:{xMin:-6,xMax:6,zMin:-6,zMax:6},get:()=>null,population:null};
 world.collision=(p,r,ignore=[])=>walls.some(o=>!ignore.includes(o.id)&&pointToObjectClearance(p,o)<r+.06);
 const clearSegment=(start,end,r,ignore)=>{const steps=Math.max(1,Math.ceil(horizontal(start,end)/.05));for(let i=1;i<=steps;i++){const t=i/steps,p=[start[0]+(end[0]-start[0])*t,0,start[2]+(end[2]-start[2])*t];if(world.collision(p,r,ignore))return false;}return true;};
 world.path=(start,end,r=.3,ignore=[])=>{
+ if(blockedRetreat)return api.campGridPath(world,start,end,r,ignore);
  if(clearSegment(start,end,r,ignore))return[[...end]];
  const gate=1.72,route=start[2]>=0&&end[2]<0?[[0,0,gate],[0,0,-gate],[...end]]:start[2]<=0&&end[2]>0?[[0,0,-gate],[0,0,gate],[...end]]:null;
  if(!route)throw Error('static route blocked');let from=start;
@@ -93,4 +96,5 @@ assert(circulationTravelM>.1,'the non-owner must keep circulating instead of par
 assert(actors.some(actor=>actor.agent.logs.some(message=>message.includes('循环路线'))));
 const recoveries=actors.reduce((n,actor)=>n+actor.locomotion.traffic.recoveries,0),ownerManeuvers=actors.reduce((n,actor)=>n+(actor.locomotion.traffic.corridorManeuvers||0),0);
 assert(recoveries<128,'corridor must not repeatedly recover without route completion');
-console.log(JSON.stringify({passed:true,agents:2,frames,skewClocks,bodyRadiusM,corridorHalf,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,maxConcurrentOwners,circulationTravelM,recoveries,ownerManeuvers,parkingWait:false}));
+if(blockedRetreat)assert(actors.some(actor=>actor.agent.logs.some(message=>message.includes('本侧出口缺少撤离空间'))),'blocked retreat must negotiate direction ownership');
+console.log(JSON.stringify({passed:true,agents:2,frames,skewClocks,blockedRetreat,bodyRadiusM,corridorHalf,minSeparationM:minSeparation,corridorClaims:claims,corridorYields:yields,maxConcurrentOwners,circulationTravelM,recoveries,ownerManeuvers,parkingWait:false}));
