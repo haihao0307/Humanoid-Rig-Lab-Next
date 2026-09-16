@@ -37,7 +37,9 @@ method = """ corridorOwnerManeuverTarget(lease,context,target){
   const a=this.a,t=this.traffic,root=this.engine.state.root,d=lease?.descriptor;if(!d)return null;
   if(t.advancePoint&&t.advanceRouteIndex===a.routeIndex&&horizontal(root,t.advancePoint)>.025&&this.world.free(t.advancePoint,.23)&&trafficSegmentClear(a,root,t.advancePoint,context))return [...t.advancePoint];
   t.advancePoint=null;t.advanceRouteIndex=-1;
-  const axis=[0,0,0];axis[d.axisIndex]=lease.direction||1;const lateral=[0,0,0];lateral[d.lateralIndex]=1,preferred=trafficPairSide(a.npcId,lease.ownerId||d.key),neighbours=[...a.w.population.values()].filter(actor=>actor.agent!==a&&!actor.disposed).map(actor=>({actor,threshold:context.radius+bodyPhysicalProfile(actor.human).bodyRadiusM+.06}));
+  const axis=[0,0,0];axis[d.axisIndex]=lease.direction||1;
+  const lateral=[0,0,0];lateral[d.lateralIndex]=1;
+  const preferred=trafficPairSide(a.npcId,lease.ownerId||d.key),neighbours=[...a.w.population.values()].filter(actor=>actor.agent!==a&&!actor.disposed).map(actor=>({actor,threshold:context.radius+bodyPhysicalProfile(actor.human).bodyRadiusM+.06}));
   let best=null;
   for(const back of [.12,.20,.30,.42,.58,.76])for(const side of [0,preferred*.08,-preferred*.08,preferred*.14,-preferred*.14,preferred*.20,-preferred*.20]){
    const point=add(add(root,mul(axis,-back)),mul(lateral,side));point[1]=0;
