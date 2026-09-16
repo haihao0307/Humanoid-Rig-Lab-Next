@@ -1,4 +1,5 @@
 name: Face jaw and oral anatomy R10 candidate
+# Retry after replacing the closed-mouth-only R9 source contract.
 
 on:
   push:
@@ -32,6 +33,7 @@ jobs:
         run: |
           base64 --decode tools/apply-face-jaw-oral-r10-candidate.py.gz.b64 | gzip -d > /tmp/apply-face-jaw-oral-r10-candidate.py
           python3 /tmp/apply-face-jaw-oral-r10-candidate.py
+          python3 tools/fix-face-jaw-oral-r10-contract.py
       - name: Build and validate candidate
         run: |
           node tools/build-pure.mjs
