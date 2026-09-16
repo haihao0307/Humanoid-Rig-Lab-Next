@@ -9,6 +9,17 @@ export function checkFaceAnatomySources({read=readDefault,assert=assertDefault}=
  const source=read('body/FaceAnatomy.js'),renderer=read('body/CompactWorkbench.js'),manifest=JSON.parse(read('source/assembly.json'));
  new vm.Script(source);
  check(manifest.modules.filter(p=>p==='body/FaceAnatomy.js').length===1,'generator assembled once');
+ check(source.includes("revision:'r14-jaw-oral-cavity'")&&source.includes("id:'upperLidSulcus'")&&source.includes("id:'lowerLidTransition'"),'versioned orbital transition separates broad socket depth from local lid sulci');
+ check(source.includes('domeX:.0046')&&source.includes('alarGrooveDepth:.00072')&&source.includes('sidewallHeight:.00030'),'nasal tip domes, alar lobules, grooves and sidewalls are explicit bounded subunits');
+ check(source.includes('function compactPerioralDepth')&&source.includes('whiteRollUpper:.00002')&&source.includes('mentalisWingHeight:.00018'),'columella bridge, philtrum, bounded white roll and distributed mentalis volume are explicit');
+ check(source.includes('const chinLo=1.4270,chinHi=1.4495')&&source.includes('compactLipContactShadow')&&source.includes('float oralOpening=max(compactLipOpen,compactJawOpen)'),'lower-face Hermite bed, nonuniform contact shadow and closed-mouth cavity gate are explicit');
+ check(source.includes('openingGate=1.-smoothstep(.04,.18,compactLipOpen)'),'open-mouth fallback suppresses procedural grooves until inner and outer mucosa receive separate material domains');
+ check(source.includes('float oralOpening=max(compactLipOpen,compactJawOpen)')&&source.includes('compactJawOpen<.16'),'oral layers remain hidden until the aperture is meaningfully open');
+ check(source.includes('const lipBedSurface=')&&source.includes('smooth+(surface(x,y)-smooth)*attach')&&source.includes('sideTag=(upper?1:-1)*.000001'),'lip free edge is laterally smoothed while a sub-visual side tag preserves upper/lower opening identity');
+ check(source.includes("'upperTeeth'")&&source.includes("'lowerTeeth'")&&source.includes("'upperGum'")&&source.includes("'lowerGum'")&&source.includes("'tongue'"),'teeth, gingiva and tongue are separate programmatic oral domains');
+ check(source.includes('function compactJawMotionShader')&&source.includes('jawPerformanceApproximation:true'),'jaw performance shader and explicit approximation report are defined in anatomy');
+ check(renderer.includes('compactJawMotion(source,n,canonicalPosition)')&&renderer.includes("upperTeeth=c.name==='upperTeeth'")&&renderer.includes('compactJawOpen'),'renderer applies the local jaw controller and classifies oral structures');
+ check(renderer.includes("mouth=c.name==='mouthInterior'")&&renderer.includes('mouth?10:upperTeeth?11:lowerTeeth?12:upperGum?13:lowerGum?14:tongue?15:0')&&renderer.includes('compactLipContactShadow(R)'),'mouth interior has a dedicated feature gate and the lip seam uses controlled shading');
  check(manifest.modules.indexOf('body/FaceAnatomy.js')<manifest.modules.indexOf('body/CompactWorkbench.js'),'generator precedes renderer');
  check((read('source/runtime.template.js').match(/__SOURCE:body\/FaceAnatomy\.js__/g)||[]).length===1,'runtime includes generator once');
  check(!/\b(?:document|window|fetch|Worker|localStorage)\b/.test(source),'generator has no external side effects');
@@ -24,9 +35,9 @@ export function checkFaceAnatomyParameters(){
  const add=(a,b)=>a.map((v,i)=>v+b[i]),sub=(a,b)=>a.map((v,i)=>v-b[i]),mul=(a,s)=>a.map(v=>v*s);
  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>mul(a,1/(Math.hypot(...a)||1));
  const context=vm.createContext({add,sub,mul,cross,norm,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),COMPACT_INFLUENCES:8});
- new vm.Script(readDefault('body/EyeAnatomy.js')+'\n'+readDefault('body/FaceAnatomy.js')+'\nglobalThis.api={create:compactCreateFaceAnatomy,sample:compactFaceRaySampler,form:compactFaceFormDepth,outline:compactLipOutline,relief:compactLipReliefDepth,radial:compactLipRadial,opening:compactLipOpening,parameters:COMPACT_FACE_ANATOMY};').runInContext(context);
+ new vm.Script(readDefault('body/EyeAnatomy.js')+'\n'+readDefault('body/FaceAnatomy.js')+'\nglobalThis.api={create:compactCreateFaceAnatomy,sample:compactFaceRaySampler,form:compactFaceFormDepth,perioral:compactPerioralDepth,outline:compactLipOutline,relief:compactLipReliefDepth,radial:compactLipRadial,opening:compactLipOpening,parameters:COMPACT_FACE_ANATOMY};').runInContext(context);
  const api=context.api,rig={jointIds:new Map([['head',7]])};
- const plane={name:'skin',canonicalPositions:Float32Array.from([-.09,1.43,.19,.09,1.43,.19,.09,1.59,.19,-.09,1.59,.19]),indices:Uint16Array.from([0,1,2,0,2,3])};
+ const plane={name:'skin',canonicalPositions:Float32Array.from([-.09,1.40,.19,.09,1.40,.19,.09,1.59,.19,-.09,1.59,.19]),indices:Uint16Array.from([0,1,2,0,2,3])};
  const before=JSON.stringify(plane),front=api.sample([plane]);
  check(Math.abs(front(0,1.5)-.19)<1e-7,'barycentric source depth');
  check(front(.1,1.5)===null,'outside ray remains missing');
@@ -49,6 +60,17 @@ export function checkFaceAnatomyParameters(){
   check(inverted===0,'geometric winding agrees with three-dimensional normals '+m.name);
  }
  const cavity=full.meshes.find(m=>m.name==='noseInterior'),n=api.parameters.nostrils;
+ const nose=api.parameters.nose;check(n.ry>n.rx*.5&&n.ry<n.rx*.7,'nostril aperture is oval rather than a horizontal slit');
+ check(nose.domeHeight>nose.tipHeight&&nose.alarGrooveDepth>0&&nose.alarHeight>nose.alarGrooveDepth,'tip, ala and alar groove retain ordered bounded amplitudes');
+ check(nose.knots.every((row,i,all)=>i===0||row[0]>all[i-1][0])&&nose.knots.every(row=>row[2]>.008&&row[2]<.020),'nasal profile rails are ordered and bounded');
+ const lips=api.parameters.lips,centre=api.outline(lips.centreX),peak=api.outline(lips.centreX+lips.halfWidth*.18),centralHeight=centre.top-centre.bottom;
+ check(lips.halfWidth>.023&&lips.halfWidth<.025&&centralHeight>.007&&centralHeight<.009,'neutral mouth width and central vermilion height remain bounded');
+ check(peak.top>centre.top&&centre.bottom>peak.bottom,'Cupid bow and lower-lip belly remain distinct without an inflated uniform ring');
+ check(api.relief(0,0,true)<.0021&&api.relief(0,0,false)<.0021,'neutral free-edge projection remains below the former swollen candidate');
+ check(api.perioral(0,api.parameters.perioral.columellaBridgeY)>0&&api.perioral(0,api.parameters.perioral.subnasaleY)<api.perioral(0,api.parameters.perioral.columellaBridgeY),'columella bridge transitions through a bounded subnasale recess');
+ check(api.perioral(-api.parameters.perioral.ridgeX,api.parameters.perioral.philtrumY)>0&&api.perioral(0,api.parameters.perioral.philtrumY)<0,'philtral ridges flank a central groove');
+ check(api.perioral(0,api.parameters.perioral.labiomentalY)<0&&api.perioral(0,api.parameters.perioral.mentalisY)>0,'labiomental crease separates lower lip support from the mentalis pad');
+ check(api.perioral(api.parameters.perioral.mentalisWingX,api.parameters.perioral.mentalisWingY)>0,'paired mentalis wings distribute the central chin volume');
  check(full.report.nostrilFrames.length===2&&full.report.nostrilFrames.every(f=>f.rimVertices>=16),'both nasal openings have tessellated rims');
  check(full.meshes.find(m=>m.name==='faceBrow').triangles===2*api.parameters.brow.strandsPerSide*api.parameters.brow.segments*2,'individual fibre topology');
  check(api.form(.5,1.5)===0,'secondary forms have bounded support');
@@ -70,8 +92,14 @@ export function checkFaceAnatomyParameters(){
    start=frame.floorVertex+1;
   }
  }
- const lip=full.meshes.find(m=>m.name==='faceLip'),mouth=full.meshes.find(m=>m.name==='mouthInterior');
+ const lip=full.meshes.find(m=>m.name==='faceLip'),mouth=full.meshes.find(m=>m.name==='mouthInterior'),upperTeeth=full.meshes.find(m=>m.name==='upperTeeth'),lowerTeeth=full.meshes.find(m=>m.name==='lowerTeeth'),upperGum=full.meshes.find(m=>m.name==='upperGum'),lowerGum=full.meshes.find(m=>m.name==='lowerGum'),tongue=full.meshes.find(m=>m.name==='tongue');
  check(lip.vertices>2*(api.parameters.lips.columns+1)*(api.parameters.lips.rings+1),'lips include returning inner surfaces');
+ check([upperTeeth,lowerTeeth,upperGum,lowerGum,tongue].every(Boolean),'all layered oral meshes are generated');
+ check(upperTeeth.triangles===lowerTeeth.triangles&&upperTeeth.triangles>1000,'paired dentitions use stable closed crown topology');
+ const width=m=>{const xs=[];for(let i=0;i<m.canonicalPositions.length;i+=3)xs.push(m.canonicalPositions[i]);return Math.max(...xs)-Math.min(...xs);};
+ check(width(upperTeeth)>width(lowerTeeth),'maxillary dental arch remains wider than mandibular arch');
+ check(upperGum.triangles===lowerGum.triangles&&upperGum.triangles>500,'continuous gingival arches use matched tube topology');
+ check(tongue.vertices>200&&full.report.jawPerformanceApproximation===true&&full.report.oralStructures.measuredDentition===false,'tongue and jaw approximation are explicit authored structures rather than measured dentition');
  check(Math.max(...mouth.canonicalPositions.filter((v,i)=>i%3===2))-Math.min(...mouth.canonicalPositions.filter((v,i)=>i%3===2))>.008,'oral cavity has depth rather than a closure strip');
  // The old fractional sine roll sharpened with increasing subdivision. The
  // replacement must meet the skin in position and tangent at every lip section.

@@ -153,6 +153,7 @@ class Human{
 /*__SOURCE:body/HumanDNA.js__*/
 /*__SOURCE:body/SkinAppearance.js__*/
 /*__SOURCE:body/HairProfiles.js__*/
+/*__SOURCE:body/FaceIdentity.js__*/
 /*__SOURCE:body/FaceControls.js__*/
 /*__SOURCE:body/CharacterPresets.js__*/
 /*__SOURCE:body/NPCDefinitions.js__*/
@@ -520,7 +521,8 @@ function inferHeldFrame(human,grips){const a=compose(human.palm('left'),inverse(
 // MODULE app
 const $=id=>document.getElementById(id),logLines=[];
 function logMessage(t){logLines.unshift(t);if(logLines.length>16)logLines.pop();$('log').replaceChildren(...logLines.map((s,i)=>{const p=document.createElement('div');p.textContent=s;p.className=i===0?'latest':'';return p}));$('stateLine').textContent=t}
-let human,world,agent,renderer,auto=!new URLSearchParams(location.search).has('qa'),follow=false,isolation='all',cameraMode='body',floor,lines,labels=[],environmentPlacementId=null,environmentPointerStart=null,needsRedraw=true;
+const runtimeQuery=(()=>{try{return new URLSearchParams(window.parent.location.search)}catch{return new URLSearchParams(location.search)}})(),reviewMode=runtimeQuery.get('review');
+let human,world,agent,renderer,auto=!runtimeQuery.has('qa')&&!reviewMode,follow=false,isolation='all',cameraMode='body',floor,lines,labels=[],environmentPlacementId=null,environmentPointerStart=null,needsRedraw=true;
 function buildLines(){const grid=[];const camp=world.theme==='camp';for(let x=-5;x<=5;x+=.5)grid.push([[x,.003,-4],[x,.003,4]]);for(let z=-4;z<=4;z+=.5)grid.push([[-5,.003,z],[5,.003,z]]);lines=camp?[]:[{g:lineMesh(grid),color:[.075,.105,.12]}];for(const z of world.zones){let segments=[];if(z.shape==='square'){const p=[[-z.r,-z.r],[z.r,-z.r],[z.r,z.r],[-z.r,z.r]];segments=p.map((a,i)=>[[z.p[0]+a[0],.009,z.p[2]+a[1]],[z.p[0]+p[(i+1)%4][0],.009,z.p[2]+p[(i+1)%4][1]]])}else{for(let k=0;k<120;k++){if(z.shape==='circle'&&Math.floor(k/5)%2)continue;if(z.shape==='hexagon'&&k%4!==0)continue;const fn=t=>{if(z.shape==='circle')return[z.p[0]+z.r*Math.cos(t*Math.PI*2),.009,z.p[2]+z.r*Math.sin(t*Math.PI*2)];const segment=t*6,a=Math.floor(segment),v=segment-a,A=[Math.cos(a*Math.PI/3)*z.r,Math.sin(a*Math.PI/3)*z.r],B=[Math.cos((a+1)*Math.PI/3)*z.r,Math.sin((a+1)*Math.PI/3)*z.r];return[z.p[0]+A[0]+(B[0]-A[0])*v,.009,z.p[2]+A[1]+(B[1]-A[1])*v]};segments.push([fn(k/120),fn((k+1)/120)])}}lines.push({g:lineMesh(segments),color:z.color})}}
 function buildLabels(){for(const l of labels)l.el.remove();labels=[];for(const o of[...world.objects.filter(o=>world.theme!=='camp'||!['architecture','landscape'].includes(o.category)),...world.zones]){const el=document.createElement('div');el.className='worldLabel'+(o.id.startsWith('Z')?' zoneLabel':'');el.textContent=o.id.startsWith('Z')?o.name:o.id+' '+o.name;$('labels').append(el);labels.push({el,o})}$('objectList').replaceChildren(...world.objects.map(o=>{const row=document.createElement('div');row.className='object';const dot=document.createElement('span');dot.style.background=`rgb(${o.color.map(x=>Math.round(x*255)).join(',')})`;const name=document.createElement('span');name.textContent=o.id+' · '+o.name+(o.movable===false?' · 固定':'');row.append(dot,name);return row}))}
 
@@ -633,10 +635,17 @@ installReconstructionViews(window.HumanLab);
 window.HumanLab.settings=installBodySettings(window.HumanLab);
 await startupStage("reconstruction","正在连接重建人体与训练场动作系统");
 await installCompactWorkbench(window.HumanLab,compactSurfaceReady);
-installNPCPopulation(window.HumanLab);
-await startupStage('population','正在从同一母体生成第二个人物');
-try{await window.HumanLab.population.installMotherPair();}catch(error){logMessage('母体复制体未生成：'+error.message);}
-await window.HumanLab.population.installReviewCast();
+if(reviewMode==='face'){
+ auto=false;window.HumanLab.hair.enabled=false;
+ window.HumanLab.review={mode:'face',singleActor:true,populationSkipped:true,hairSkipped:true};
+ window.HumanLab.face.clearExpression();window.HumanLab.face.closeup('front');
+ logMessage('面部审阅模式：仅加载当前人物，未启动额外 NPC。');
+}else{
+ installNPCPopulation(window.HumanLab);
+ await startupStage('population','正在从同一母体生成第二个人物');
+ try{await window.HumanLab.population.installMotherPair();}catch(error){logMessage('母体复制体未生成：'+error.message);}
+ await window.HumanLab.population.installReviewCast();
+}
 try{human.characterTaskStatus=window.HumanLab.character.startOnSpawn();}catch(error){human.characterTaskStatus={started:false,error:error.message};logMessage('角色预设任务未开始：'+error.message);}
 let previous=performance.now(),lastPanel=0;needsRedraw=true;
 for(const name of ['click','change','input','pointermove','wheel'])document.addEventListener(name,()=>needsRedraw=true,{passive:true});
@@ -653,7 +662,7 @@ window.HumanLab.hair.restoreReviewCamera();
 logMessage('R2 人体与同源骨架已连接。生活空间就绪。');panel();renderFrame();
 window.__humanStartup={status:'ready',stage:'ready',message:'身体已就绪'};
 $('loading').hidden=true;needsRedraw=false;requestAnimationFrame(loop);
-scheduleCompactHair(window.HumanLab.population.active);
+if(reviewMode!=='face')scheduleCompactHair(window.HumanLab.population?.active||window.HumanLab);
 }catch(e){
  const error=String(e?.message||e);
  window.__startupError=String(e?.stack||error);
