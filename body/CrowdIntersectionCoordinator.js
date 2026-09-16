@@ -70,14 +70,29 @@ function trafficIntersectionOrbitTarget(locomotion,lease,context,{ownerFallback=
  const a=locomotion.a,traffic=locomotion.traffic,root=locomotion.engine.state.root,center=lease.center,waiting=[...lease.members.keys()].filter(id=>id!==lease.ownerId).sort(),lane=ownerFallback?0:Math.max(0,waiting.indexOf(a.npcId)),radius=TRAFFIC_INTERSECTION.baseOrbitM+lane*TRAFFIC_INTERSECTION.laneGapM+(ownerFallback?0.12:0),offset=[root[0]-center[0],0,root[2]-center[2]],distance=len(offset);
  const angle=distance>.06?Math.atan2(offset[0],offset[2]):((trafficHash(String(a.npcId||''))%360)/180*Math.PI),candidates=[];
  if(distance<radius-.10||distance>radius+.42)candidates.push([center[0]+Math.sin(angle)*radius,0,center[2]+Math.cos(angle)*radius]);
- for(const step of [.28,.42,.58,.76,1.0])for(const radial of [radius,radius+.16,Math.max(.92,radius-.12)]){const next=angle+lease.direction*step;candidates.push([center[0]+Math.sin(next)*radial,0,center[2]+Math.cos(next)*radial]);}
- for(const point of candidates){if(!locomotion.world.free(point,.23)||!trafficSegmentClear(a,root,point,context))continue;const nextAngle=Math.atan2(point[0]-center[0],point[2]-center[2]);if(Number.isFinite(traffic.intersectionOrbitAngle)){const delta=angleDiff(nextAngle,traffic.intersectionOrbitAngle)*lease.direction;if(delta<-.8)traffic.intersectionLaps++;}traffic.intersectionOrbitAngle=nextAngle;return point;}
+ for(const step of [.28,.42,.58,.76,1.0,1.22])for(const radial of [radius,radius+.16,Math.max(.92,radius-.12)]){const next=angle+lease.direction*step;candidates.push([center[0]+Math.sin(next)*radial,0,center[2]+Math.cos(next)*radial]);}
+ for(const point of candidates){
+  const radial=sub(point,center),axisClear=ownerFallback||!lease.ownerEntry||len(radial)<.08||Math.abs(dot(norm(radial),lease.ownerEntry))<.78;
+  if(!axisClear||!locomotion.world.free(point,.23)||!trafficSegmentClear(a,root,point,context))continue;
+  const nextAngle=Math.atan2(point[0]-center[0],point[2]-center[2]);if(Number.isFinite(traffic.intersectionOrbitAngle)){const delta=angleDiff(nextAngle,traffic.intersectionOrbitAngle)*lease.direction;if(delta<-.8)traffic.intersectionLaps++;}traffic.intersectionOrbitAngle=nextAngle;return point;
+ }
+ return null;
+}
+function trafficIntersectionOwnerAdvanceTarget(locomotion,lease,context,target){
+ const a=locomotion.a,root=locomotion.engine.state.root;let direction=target?sub(target,root):lease.ownerEntry?mul(lease.ownerEntry,-1):[0,0,1];direction[1]=0;if(len(direction)<.08)direction=lease.ownerEntry?mul(lease.ownerEntry,-1):[0,0,1];direction=norm(direction);
+ const right=[direction[2],0,-direction[0]],preferred=trafficPairSide(a.npcId,lease.key),laterals=[0,preferred*.22,-preferred*.22,preferred*.36,-preferred*.36,preferred*.52,-preferred*.52];
+ for(const forward of [.16,.24,.34,.46,.62,.82])for(const lateral of laterals){
+  const point=add(add(root,mul(direction,forward)),mul(right,lateral));point[1]=0;
+  if(!locomotion.world.free(point,.23)||!trafficSegmentClear(a,root,point,context))continue;
+  return point;
+ }
  return null;
 }
 function trafficMaintainOpenIntersection(locomotion,context,target){
  const a=locomotion.a,population=a.w.population,traffic=locomotion.traffic,key=traffic.intersectionKey;if(!population||!key)return null;
  const runtime=trafficRuntime(population);runtime.intersections??=new Map();trafficPruneIntersections(population,runtime,a.time);const lease=runtime.intersections.get(key),member=lease?.members.get(a.npcId),goal=member?.goal||traffic.slotPoint||traffic.originalTarget||a.route.at(-1);
  if(!lease||!member){trafficIntersectionClearState(traffic);return null;}
+ if(lease.members.size===1){runtime.intersections.delete(lease.key);trafficIntersectionClearState(traffic);if(goal)locomotion.normalizeCorridorRoute(context,goal);return target;}
  trafficIntersectionAssignOwner(lease,population,a.time);trafficIntersectionSyncMembers(lease,population);
  if(lease.ownerId!==a.npcId){const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context);if(!orbit)throw Error('开放交叉区域没有可用的持续循环路线');return orbit;}
  const root=locomotion.engine.state.root,distance=horizontal(root,lease.center);lease.ownerMinDistance=Math.min(lease.ownerMinDistance,distance);if(distance<=TRAFFIC_INTERSECTION.enterRadiusM)lease.ownerEntered=true;
@@ -86,6 +101,11 @@ function trafficMaintainOpenIntersection(locomotion,context,target){
  if(a.time>=lease.expiresAtS){const current=lease.members.get(a.npcId);if(current)current.order=lease.nextOrder++;lease.ownerId=null;lease.rotations++;if(lease.rotations>TRAFFIC_INTERSECTION.maximumRotations)throw Error('开放交叉区域完成 16 次主动轮换后仍未形成可通行顺序');trafficIntersectionAssignOwner(lease,population,a.time);trafficIntersectionSyncMembers(lease,population);traffic.intersectionRotations++;if(lease.ownerId!==a.npcId){a.log?.('开放交叉区域本轮未通过，已继续外侧循环并把通行权交给下一人物');const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context);if(!orbit)throw Error('开放交叉区域轮换后没有可用循环路线');return orbit;}}
  traffic.active=false;traffic.mode='intersection-owner';traffic.reason='open-intersection-owner';traffic.intersectionOwner=a.npcId;
  if(target&&locomotion.world.free(target,.23)&&trafficSegmentClear(a,root,target,context))return target;
- const advance=target&&locomotion.corridorAdvanceTarget(target,context);if(advance)return advance;
+ const advance=trafficIntersectionOwnerAdvanceTarget(locomotion,lease,context,target);if(advance)return advance;
+ const current=lease.members.get(a.npcId);if(current&&lease.members.size>1){
+  current.order=lease.nextOrder++;lease.ownerId=null;lease.rotations++;if(lease.rotations>TRAFFIC_INTERSECTION.maximumRotations)throw Error('开放交叉区域完成 16 次主动轮换后仍未形成可通行顺序');
+  trafficIntersectionAssignOwner(lease,population,a.time);trafficIntersectionSyncMembers(lease,population);traffic.intersectionRotations++;a.log?.('开放交叉区域当前出口受阻，已主动让出通行权并继续外侧循环');
+  if(lease.ownerId!==a.npcId){const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context);if(orbit)return orbit;}
+ }
  const orbit=trafficIntersectionOrbitTarget(locomotion,lease,context,{ownerFallback:true});if(!orbit)throw Error('开放交叉区域所有者暂时没有可行的前进或循环路线');return orbit;
 }
