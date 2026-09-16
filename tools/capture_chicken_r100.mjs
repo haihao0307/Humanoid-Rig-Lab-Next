@@ -24,7 +24,7 @@ let browser = null;
 let page = null;
 
 function stage(name, details = {}) {
-  const record = { name, at: new Date().toISOString(), ...details };
+  const record = { ...details, name, at: new Date().toISOString() };
   diagnostics.stages.push(record);
   console.log(`[r100-qa] ${name}`, JSON.stringify(details));
 }
@@ -68,11 +68,15 @@ async function click(selector, settle = 120) {
 
 async function captureCanvas(file) {
   stage('capture-start', { file });
-  const canvas = page.locator('canvas').first();
-  await canvas.screenshot({
+  // Element screenshots wait for a continuously rendered WebGL canvas to become
+  // motionless. The workbench intentionally renders every frame, so capture the
+  // viewport directly instead of waiting on locator stability.
+  await page.screenshot({
     path: path.join(evidenceDir, file),
-    animations: 'disabled',
-    timeout: 15_000
+    fullPage: false,
+    animations: 'allow',
+    caret: 'hide',
+    timeout: 30_000
   });
   stage('capture-complete', { file });
 }
@@ -160,8 +164,10 @@ try {
     return Boolean(
       window.__CHICKEN_R100_PATCH__
       && window.__CHICKEN_R100_MANUAL_STEP__
+      && window.__CHICKEN_R100_PECK_ADAPTER__?.installed === true
       && api?.ready
       && api.diagnostics()?.manualStepAvailable
+      && api.diagnostics()?.skin?.peckKinematicsRevision === 'fixed-length-forward-down-s-curve-v1'
     );
   }, null, { timeout: 120_000 });
   stage('runtime-ready');
@@ -200,6 +206,7 @@ if (page) {
   runtime = await page.evaluate(() => ({
     patch: window.__CHICKEN_R100_PATCH__ || null,
     manualPatch: window.__CHICKEN_R100_MANUAL_STEP__ || null,
+    peckAdapter: window.__CHICKEN_R100_PECK_ADAPTER__ || null,
     motion: window.__CHICKEN_PHASE1_MOTION__?.diagnostics() || null,
     errorOverlay: (() => {
       const node = document.querySelector('#error');
@@ -254,6 +261,8 @@ const checks = {
   noFatalException: fatal === null,
   patchLoaded: runtime.patch?.version === 'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
   manualStepLoaded: runtime.motion?.manualStepAvailable === true && runtime.manualPatch?.version === '1.1',
+  peckAdapterLoaded: runtime.peckAdapter?.installed === true
+    && runtime.motion?.skin?.peckKinematicsRevision === 'fixed-length-forward-down-s-curve-v1',
   realtimePaused: runtime.motion?.realtimePaused === true,
   motionReady: runtime.motion?.ready === true,
   boneCount: runtime.motion?.skin?.boneCount === 18,
