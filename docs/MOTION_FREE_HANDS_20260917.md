@@ -1,5 +1,7 @@
 # 自由手腕与动作切换
 
+本文记录 `fb11430` 阶段；后续坐起掌部接触、共享表面查询和最新验证见 [坐起掌部支撑记录](MOTION_FLOOR_PALM_SUPPORT_20260917.md)。本文哈希和截图仍保留为该阶段证据。
+
 在 `cdaa91d` 的行走节律修复上继续处理手部僵硬。统一 main 仍为 `3c3e9a4`，本轮生产改动限于 `body/MotionLabPose.js` 和 `body/ReferenceMotion.js`。没有修改任务调度、外貌、衣物、面部、人物选择或锁定 vendor。
 
 ## 观测、实现与边界

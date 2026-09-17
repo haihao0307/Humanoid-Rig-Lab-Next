@@ -5,7 +5,7 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright-core');
 const out=process.env.MOTION_QA_DIR;if(!out)throw Error('MOTION_QA_DIR must point outside the repository');
-const upper=process.env.MOTION_QA_SEQUENCE==='upper',chain=process.env.MOTION_QA_SEQUENCE==='chain',continuous=process.env.MOTION_QA_SEQUENCE==='continuous'||chain,gaitSequence=process.env.MOTION_QA_SEQUENCE==='gait',minimumActors=(gaitSequence||continuous||upper)?1:6;
+const support=process.env.MOTION_QA_SEQUENCE==='support',upper=process.env.MOTION_QA_SEQUENCE==='upper',chain=process.env.MOTION_QA_SEQUENCE==='chain',continuous=process.env.MOTION_QA_SEQUENCE==='continuous'||chain,gaitSequence=process.env.MOTION_QA_SEQUENCE==='gait',minimumActors=(gaitSequence||continuous||upper||support)?1:6;
 await mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN,args:['--no-sandbox','--enable-webgl','--ignore-gpu-blocklist']});
 const page=await browser.newPage({viewport:{width:1100,height:760}}),records=[],errors=[];
@@ -18,7 +18,7 @@ try{
  const actors=await page.evaluate(()=>{const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab;lab.setAuto(false);lab.setCameraFollow(false);return lab.population.list().map(a=>({id:a.id,label:a.label}));});
  console.log('READY '+JSON.stringify(actors));
  async function capture(actor,name){
-  for(const [view,angle]of (upper?[['side',Math.PI/2],['hand',-Math.PI/2-.45]]:continuous?[['front',.15],['side',Math.PI/2]]:[['front',.15],['side',Math.PI/2],...(process.env.MOTION_QA_FEET==='1'?[['feet',Math.PI/2]]:[])])){
+  for(const [view,angle]of (support?[['front',-1],['support-hand',-.65]]:upper?[['side',Math.PI/2],['hand',-Math.PI/2-.45]]:continuous?[['front',.15],['side',Math.PI/2]]:[['front',.15],['side',Math.PI/2],...(process.env.MOTION_QA_FEET==='1'?[['feet',Math.PI/2]]:[])])){
    const result=await page.evaluate(({id,angle,view})=>{
     const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,a=lab.population.get(id),h=a.human,r=lab.renderer;
     lab.render();const compacts=r.compacts,compact=r.compact,tissue=r.tissue;
@@ -27,6 +27,7 @@ try{
     r.compacts=[a.compact];r.compact=a.compact;r.tissue=a.tissue;
     r.yaw=a.agent.yaw+angle;r.pitch=.035;r.projection='perspective';r.target=[a.agent.pos[0],h.bodyMetrics.statureM*(view==='feet'?.13:.46),a.agent.pos[2]];r.distance=h.bodyMetrics.statureM*(view==='feet'?.65:1.8);
     if(view==='hand'){const p=h.byId.get('left_hand').world.p;r.target=[p[0],p[1]-.035,p[2]];r.distance=h.bodyMetrics.statureM*.34;}
+    if(view==='support-hand'){const p=h.byId.get('right_hand').world.p;r.target=[p[0],p[1]-.025,p[2]];r.pitch=.3;r.distance=h.bodyMetrics.statureM*.43;}
     r.render([...floor,...h.bones,...h.cartilage,...h.tissue.items].filter(o=>o.visible!==false),[]);
     const png=r.canvas.toDataURL('image/png');r.compacts=compacts;r.compact=compact;r.tissue=tissue;
     const footSupport={},surface=a.compact,all=surface.supportProbes;
@@ -39,7 +40,7 @@ try{
      const u=p[1].map((v,i)=>v-p[0][i]),v=p[2].map((v,i)=>v-p[1][i]);
      knees[side]=Math.acos(Math.max(-1,Math.min(1,u.reduce((s,x,i)=>s+x*v[i],0)/Math.hypot(...u)/Math.hypot(...v))))*180/Math.PI;
     }
-    return{png,phase:a.agent.phase,posture:a.agent.basic.posture,error:a.agent.error,root:a.agent.pos,bodyRoot:h.byId.get('hips').world.p,pelvisQ:h.byId.get('hips').world.q,kneeDegrees:knees,weightTransfer:a.agent.locomotion.report().weightTransfer,yaw:a.agent.yaw,footErrorM:a.agent.stats.maxFootPositionErrorM,ground:h.minimumBoneY(),footSupport,groundCorrectionM:h.motionDriver.report().groundCorrectionM,bodyResponse:a.agent.locomotion.phaseController.report().bodyResponse,headQ:h.byId.get('head').world.q};
+    return{png,phase:a.agent.phase,posture:a.agent.basic.posture,error:a.agent.error,ready:a.agent.activity().readyForTask,rightPalm:h.palm('right'),floorSupport:h.motionDriver.report().floorSupport,root:a.agent.pos,bodyRoot:h.byId.get('hips').world.p,pelvisQ:h.byId.get('hips').world.q,kneeDegrees:knees,weightTransfer:a.agent.locomotion.report().weightTransfer,yaw:a.agent.yaw,footErrorM:a.agent.stats.maxFootPositionErrorM,ground:h.minimumBoneY(),footSupport,groundCorrectionM:h.motionDriver.report().groundCorrectionM,bodyResponse:a.agent.locomotion.phaseController.report().bodyResponse,headQ:h.byId.get('head').world.q};
    },{id:actor.id,angle,view});
    const file=actor.id+'-'+name+'-'+view+'.png';await writeFile(join(out,file),Buffer.from(result.png.split(',')[1],'base64'));
    delete result.png;records.push({actor:actor.label,file,...result});console.log('CAPTURE '+file+' '+result.phase);
@@ -54,7 +55,14 @@ try{
  },{id,text});}
  for(const actor of actors)await capture(actor,'stand');
  const lead=actors[0];
- if(upper){
+ if(support){
+  const sample=async(name,count)=>{for(let i=1;i<=count;i++){await advance(1/20);await capture(lead,name+'-'+String(i).padStart(3,'0'));}};
+  await command(lead.id,'坐下');await sample('sit',64);await advance(3);await capture(lead,'seated');
+  await command(lead.id,'起身');await sample('rise',84);await advance(3);await capture(lead,'stood');
+  const contacts=records.filter(r=>r.floorSupport?.weight===1);
+  if(contacts.length<10||!records.at(-1).ready)throw Error('support sequence did not plant and finish');
+  for(const r of contacts){const drift=Math.hypot(...r.rightPalm.p.map((v,i)=>v-r.floorSupport.anchor.p[i]));if(drift>.0001||r.floorSupport.surfaceY<.0005-1e-6)throw Error('support contact drift or penetration: '+r.file);}
+ }else if(upper){
   const sample=async(name,count)=>{for(let i=1;i<=count;i++){await advance(1/15);await capture(lead,name+'-'+String(i).padStart(3,'0'));}};
   await command(lead.id,'向前走2米');await sample('walk',48);
   await command(lead.id,'停止');await sample('stop',24);await advance(6);await capture(lead,'stopped');
@@ -98,5 +106,5 @@ try{
  await advance(1.2);for(const actor of actors)await capture(actor,'wave-mid');
  await advance(6);for(const actor of actors)await capture(actor,'wave-end');
  }
-}finally{await writeFile(join(out,'review.json'),JSON.stringify({entrypointSHA256,records,errors,visualAcceptance:false,isolatedRendering:true,simulationSampleHz:upper?15:continuous?30:null,realTimePerformanceMeasured:false},null,2));await browser.close();}
+}finally{await writeFile(join(out,'review.json'),JSON.stringify({entrypointSHA256,records,errors,visualAcceptance:false,isolatedRendering:true,simulationSampleHz:support?20:upper?15:continuous?30:null,realTimePerformanceMeasured:false},null,2));await browser.close();}
 if(errors.length)throw Error(errors.join('\n'));

@@ -287,11 +287,11 @@ class CompactSurfaceRenderer{
     finally{this.gl.bindVertexArray(null);this.gl.bindBuffer(this.gl.ARRAY_BUFFER,null);}
     const previous=this.hair;this.hair=stage;this.report={...this.report,hair:stage.report,hairEnabled:true};previous?.dispose();needsRedraw=true;
   }
-  minimumSupportY(frames=null){
+  minimumSupportY(frames=null,jointIds=null){
     const transforms=this.lab.human.joints.map(j=>{const f=frames?frames.get(j.id):j.world,source=this.controlBind.get(j.id),q=qnorm(qm(f.q,inv(source.q))),t=sub(f.p,rotate(q,source.p));return {q,d:mul(qm([...t,0],q),.5)};});
     const muscles=r2MuscleFrames(this.lab.human,frames);
-    let y=Infinity,boneId=null;for(const probe of this.supportProbes){const p=r2DeformTissuePoint(probe.p,probe.influences,transforms,muscles,this.statureScale,probe.axillaDelta);if(p[1]<y){y=p[1];boneId=this.lab.human.joints[probe.influences[0][0]].id;}}
-    return {y,boneId,sampled:true,sampleCount:this.supportProbes.length,fullCollisionCertificate:false};
+    let y=Infinity,boneId=null,sampleCount=0;for(const probe of this.supportProbes){const id=this.lab.human.joints[probe.influences[0][0]].id;if(jointIds&&!jointIds.has(id))continue;sampleCount++;const p=r2DeformTissuePoint(probe.p,probe.influences,transforms,muscles,this.statureScale,probe.axillaDelta);if(p[1]<y){y=p[1];boneId=id;}}
+    return {y,boneId,sampled:true,sampleCount,fullCollisionCertificate:false};
   }
   prepare(items){
     if(this.disposed){this.visible=false;return false;}

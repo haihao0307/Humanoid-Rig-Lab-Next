@@ -11,7 +11,7 @@ if(process.env.HUMANLAB_SOFTWARE_GL==='1')args.push('--use-angle=swiftshader','-
 const browser=await chromium.launch({headless:true,args,...(process.env.CHROME_BIN?{executablePath:process.env.CHROME_BIN}:{})});
 const page=await browser.newPage({viewport:{width:1100,height:760}}),pageErrors=[],results=[];
 page.on('pageerror',error=>pageErrors.push(String(error)));
-let startup=null,crowd=null,failure=null,benchmark=null;
+let startup=null,crowd=null,failure=null,benchmark=null,floorCrowd=null;
 try{
  await page.goto(process.env.HUMANLAB_URL||'http://127.0.0.1:4173/index.html?qa=1',{waitUntil:'domcontentloaded',timeout:120000});
  await page.waitForFunction(()=>{const w=document.querySelector('#bodyFrame')?.contentWindow;return w?.HumanLab?.population?.list().length>=2||w?.__startupError;},null,{timeout:480000});
@@ -20,11 +20,18 @@ try{
   if(w.__startupError)throw Error(w.__startupError);lab.setAuto(false);lab.inspectBody('front');
   const gl=w.document.querySelector('#view').getContext('webgl2');
   const pose=lab.agent.locomotion.pose,apply=pose.apply;
-  lab.motionQA={adoptedSamples:0,maxAdoptedAngleRad:0,floorSamples:0,loweredFloorSamples:0,maxLoweringM:0,maxFloorGapM:0};
+  lab.motionQA={adoptedSamples:0,maxAdoptedAngleRad:0,floorSamples:0,loweredFloorSamples:0,maxLoweringM:0,maxFloorGapM:0,maxUnconstrainedFloorGapM:0,maxFloorPenetrationM:0,plantedPalmSamples:0,maxPlantedPalmDriftM:0,maxPlantedSurfaceGapM:0};
   pose.apply=function(...args){const result=apply.apply(this,args),s=this.engine.state;
    if(args[0]?.groundSupport==='continuous-floor'){
     const report=this.report(),qa=lab.motionQA;qa.floorSamples++;
     qa.maxFloorGapM=Math.max(qa.maxFloorGapM,Math.abs(report.ground.y-.0005));
+    qa.maxFloorPenetrationM=Math.max(qa.maxFloorPenetrationM,.0005-report.ground.y);
+    if(!report.floorSupport?.active)qa.maxUnconstrainedFloorGapM=Math.max(qa.maxUnconstrainedFloorGapM,Math.abs(report.ground.y-.0005));
+    if(report.floorSupport?.weight===1){
+     qa.plantedPalmSamples++;const actual=this.h.palm('right').p,anchor=report.floorSupport.anchor.p;
+     qa.maxPlantedPalmDriftM=Math.max(qa.maxPlantedPalmDriftM,Math.hypot(...actual.map((v,i)=>v-anchor[i])));
+     qa.maxPlantedSurfaceGapM=Math.max(qa.maxPlantedSurfaceGapM,report.floorSupport.surfaceY);
+    }
     qa.maxLoweringM=Math.max(qa.maxLoweringM,-report.groundCorrectionM);
     if(report.groundCorrectionM<-.000001)qa.loweredFloorSamples++;
    }
@@ -71,7 +78,25 @@ try{
   return{dispatch,actors:[...p.values()].map(a=>({id:a.id,completed:a.agent.stats.completed-before[a.id],ready:a.agent.activity().readyForTask}))};
  });
  assert.equal(crowd.actors.length,6);for(const a of crowd.actors){assert.equal(a.completed,1);assert(a.ready);}
- assert(results.at(-1).floorSamples>0);assert(results.at(-1).loweredFloorSamples>0);assert(results.at(-1).maxFloorGapM<1e-6);
+ const finalQA=results.at(-1);assert(finalQA.floorSamples>0);assert(finalQA.loweredFloorSamples>0);
+ assert(finalQA.maxUnconstrainedFloorGapM<1e-6);assert(finalQA.maxFloorPenetrationM<1e-6);
+ assert(finalQA.plantedPalmSamples>100);assert(finalQA.maxPlantedPalmDriftM<.0001);assert(finalQA.maxPlantedSurfaceGapM<.004);
+ floorCrowd=await page.evaluate(()=>{
+  const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,p=lab.population,ids=p.list().map(a=>a.id),runs=[];
+  p.control('stop','all');lab.setAuto(false);lab.advance(3);lab.world.applyPreset('empty');
+  // Six independent floor-action envelopes need more room than the small
+  // default field. Enlarge this isolated test fixture; retain collision and
+  // forecast checks, and do not change production world or traffic behavior.
+  lab.world.bounds={xMin:-10,xMax:10,zMin:-8,zMax:8};
+  ids.forEach((id,i)=>p.place(p.get(id),[-7.5+i*3,0,0],i%2?.7:0));
+  for(const command of ['坐下','起身']){
+   const before=Object.fromEntries([...p.values()].map(a=>[a.id,a.agent.stats.completed])),dispatch=p.dispatch(command,{targets:ids,mode:'replace'});lab.setAuto(false);
+   if(dispatch.some(r=>!r.accepted))throw Error('floor crowd dispatch rejected: '+JSON.stringify(dispatch));
+   for(let i=0;i<360;i++){lab.advance(.1);for(const a of p.values())if(a.agent.error)throw Error(a.id+': '+a.agent.error);if([...p.values()].every(a=>a.agent.stats.completed>before[a.id]&&a.agent.activity().readyForTask))break;}
+   const actors=[...p.values()].map(a=>({id:a.id,completed:a.agent.stats.completed-before[a.id],ready:a.agent.activity().readyForTask,posture:a.agent.basic.posture}));
+   if(actors.some(a=>a.completed!==1||!a.ready))throw Error('floor crowd failed to complete');runs.push({command,actors});
+  }return{actors:ids.length,bounds:{...lab.world.bounds},runs,performanceMeasured:false};
+ });console.log('FLOOR_CROWD '+JSON.stringify(floorCrowd));
  if(process.env.MOTION_BENCHMARK==='1'){
   console.log('BENCHMARK preparing 8 actor scene');
   await page.evaluate(async()=>{const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,p=lab.population;lab.setAuto(false);
@@ -117,4 +142,4 @@ try{
 }catch(error){failure=String(error);console.error('FAIL '+failure);process.exitCode=1;
  try{console.error('STATE '+JSON.stringify(await page.evaluate(()=>{const w=document.querySelector('#bodyFrame')?.contentWindow,lab=w?.HumanLab;return{startup:w?.__humanStartup,startupError:w?.__startupError,population:lab?.population?.list().length,error:lab?.agent?.error,basic:lab?.agent?.basic?.report(),pose:lab?.agent?.locomotion?.pose.report()};})));}catch{}
 }
-finally{await writeFile(join(out,'motion-browser-results.json'),JSON.stringify({startup,results,crowd,benchmark,pageErrors,failure,visualAcceptance:false},null,2));await browser.close();}
+finally{await writeFile(join(out,'motion-browser-results.json'),JSON.stringify({startup,results,crowd,floorCrowd,benchmark,pageErrors,failure,visualAcceptance:false},null,2));await browser.close();}

@@ -45,7 +45,7 @@ export function checkCharacterSystemSources({parse,read,assert}){
  check(!/h\.root\.p\[1\]|h\.refreshEffectorErrors/.test(apply+clearance)&&/error\.targetSpace==='body'/.test(clearance),'floor translation preserves fixed world contact targets');
  check(ordered(clearance,['this.h.minimumBoneY(candidate.frames)','this.reprojectControlledLegs(','ground=this.h.minimumBoneY(candidate.frames)'])&&/ground\.y<\.0005-1e-6/.test(clearance),'anchored floor correction reprojects fixed-length legs and rechecks actual ground clearance');
  check(/targetSpace:'world'/.test(pose)&&/targetSpace:goal\.space\|\|'world'/.test(pose)&&/space:'body'/.test(read('body/StandardsMotion.js')),'world contacts and body-relative salute landmarks are explicit');
- check(/minimumBoneY\(frames=null\)/.test(template)&&/minimumSupportY\(frames\)/.test(read('body/ReconstructionState.js')),'candidate support frames reach the skin query');
+ check(/minimumBoneY\(frames=null,jointIds=null\)/.test(template)&&/minimumSupportY\(frames,jointIds\)/.test(read('body/ReconstructionState.js')),'candidate support frames and optional joint filter reach the skin query');
  const surface=read('body/CompactWorkbench.js'),replace=method(surface,'CompactSurfaceRenderer','replace');
  const support=method(surface,'CompactSurfaceRenderer','minimumSupportY');
  check(/frames\?frames\.get\(j\.id\):j\.world/.test(support)&&!/\.fk\(|\.pose\(|\.world\s*=/.test(support),'support query is read-only for candidate and live poses');

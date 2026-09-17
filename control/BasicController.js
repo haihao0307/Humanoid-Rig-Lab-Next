@@ -35,7 +35,7 @@ class BasicController {
    if(support){seat=[...support.root];yaw=support.yaw;}
    if(!this.hasFloorRoom(a.pos,yaw,r2PostureClips(this.posture,target)))throw Error('身后躺卧范围被占用，请先起身走到空地');
   }
-  const t={target,resume,seat,yaw,support,elapsed:0,stage:0,from:null,points:[],align:Math.abs(angleDiff(yaw,a.yaw))>.015};
+  const t={target,resume,seat,yaw,support,floorSupport:structuredClone(support?.floorSupport||{}),elapsed:0,stage:0,from:null,points:[],align:Math.abs(angleDiff(yaw,a.yaw))>.015};
   this.transition=t;this.gesture=null;
   if(t.align){a.enter('floorAlign');return;}
   this.preparePoints(t);
@@ -83,7 +83,7 @@ class BasicController {
   if(this.transition){const t=this.transition;
    if(t.returnToLab){t.elapsed+=dt;this.apply({blendFrom:t.endFrames,blendAmount:smoother(t.elapsed/.4),preserveFootContactsOnBlend:true,motionSource:{kind:'lab-stance-blend',support:'adopted-final-foot-anchors'}},null,dt);if(t.elapsed>=.4)this.completeTransition(t);return;}
    if(t.preparation){const p=t.preparation;p.elapsed+=dt;const u=clamp(p.elapsed/p.duration,0,1);
-    this.apply(r2SeatedPreparationDescriptor(a.h,p.frames,p.feet,t.yaw,u),null,dt);
+    this.apply({...r2SeatedPreparationDescriptor(a.h,p.frames,p.feet,t.yaw,u,!!t.floorSupport.right),floorSupport:t.floorSupport,floorPalmWeight:t.floorSupport.right?1:0},null,dt);
     if(u>=1){
      this.lastSeatedPreparation={kind:p.kind,durationS:p.duration,stage:p.stage,tracking:this.lastMotionTracking||null};
      t.preparation=null;t.from=this.capture();t.fromMotion=r2CaptureMotion(a.h,t.yaw);
@@ -93,7 +93,7 @@ class BasicController {
     if(t.align){a.locomotion.turnInPlace(t.yaw,dt);a.gait(dt,false);a.h.pose({position:a.pos,yaw:a.yaw,feet:a.feet,locomotion:a.locomotion.sample,time:a.time,deltaTime:dt});if(Math.abs(angleDiff(t.yaw,a.yaw))<=.016&&a.locomotion.isSettled()){t.yaw=a.yaw;this.preparePoints(t);};return;}
    const current=t.points[t.stage];t.elapsed+=dt;const u=clamp(t.elapsed/current.duration,0,1);
    const blend=smoother(t.elapsed/Math.min(.25,current.duration*.15));
-   this.apply(r2ReferenceDescriptor(a.h,current.clip,u,t.origin,t.yaw,t.fromMotion,blend),null,dt);
+   this.apply({...r2ReferenceDescriptor(a.h,current.clip,u,t.origin,t.yaw,t.fromMotion,blend),floorSupport:t.floorSupport,floorPalmWeight:r2FloorPalmWeight(current.clip,u)},null,dt);
    if(t.elapsed>=current.duration){
     if(!this.lastMotionTracking?.passed){
      if(t.elapsed<current.duration+.6)return;
@@ -141,7 +141,7 @@ class BasicController {
   this.supportFrames=this.posture==='standing'?null:new Map(a.h.joints.map(j=>[j.id,frame(j.world.p,j.world.q)]));
   this.supportState=this.posture==='standing'?null:{kind:this.posture==='sitting'?'seatedStable':'lyingStable',root:[...a.h.root.p],yaw:a.yaw,
    feet:Object.fromEntries(sides.map(side=>[side,{p:[...a.h.legs[side].wrist.world.p],q:[...a.h.legs[side].wrist.world.q],yaw:a.feet?.[side]?.yaw??a.yaw}])),
-   hands:Object.fromEntries(sides.map(side=>[side,copyFrame(a.h.palm(side))])),source:a.h.lastMotionSource};
+   hands:Object.fromEntries(sides.map(side=>[side,copyFrame(a.h.palm(side))])),floorSupport:structuredClone(t.floorSupport),source:a.h.lastMotionSource};
   this.lastPoseAdoption=t.poseAdoption||this.lastPoseAdoption||null;this.transition=null;a.swing=null;
   if(this.cancelRequested){this.cancelRequested=false;a.skill=null;this.pending=null;}
   else if(t.resume){a.skill=null;if(!this.commitPending())a.begin();}

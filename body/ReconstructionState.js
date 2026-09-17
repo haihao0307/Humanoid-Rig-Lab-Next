@@ -12,7 +12,7 @@ class ReconstructionState{
   setView(view){if(!['skin','clay','regions'].includes(view))throw Error('R2 支持肤色、灰模和关节分区显示');this.view=view;this.visibility();}
   visibility(){this.skin.visible=this.view!=='clay';this.clay.visible=this.view==='clay';}
   update(time,dt=0){this.time=time;this.ecology.step(dt);}
-  minimumSupportY(frames=null){return this.surface?.minimumSupportY(frames)||{y:Math.min(...['left','right'].map(s=>(frames?frames.get(s+'_foot'):this.human.world(s+'_foot')).p[1]-this.human.bodyMetrics.skinSoleHeightM)),boneId:'source-foot-support',sampled:true};}
+  minimumSupportY(frames=null,jointIds=null){return this.surface?.minimumSupportY(frames,jointIds)||(jointIds?{y:Infinity,boneId:null,sampled:false}:{y:Math.min(...['left','right'].map(s=>(frames?frames.get(s+'_foot'):this.human.world(s+'_foot')).p[1]-this.human.bodyMetrics.skinSoleHeightM)),boneId:'source-foot-support',sampled:true});}
   report(){return {schema:'r2/reconstruction_state@1',view:this.view,time:this.time,
     sourceRegionsPreserved:true,jointCount:this.human.joints.length,rigReference:R2_RIG.status,
     legacyConstructor:false,fixedReferenceShape:isReferenceCharacterShape(this.human.characterPreset.shape),shape:validateCharacterShape(this.human.characterPreset.shape),geometryKey:this.human.bodyMetrics.geometryKey,geometry:this.surfaceInfo,skin:validateSkinAppearance(this.skinAppearance),
