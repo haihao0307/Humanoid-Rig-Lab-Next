@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CAT BODY BIND V1 R1 · 连续整猫身体候选</title>
+<title>CAT BODY BIND V1 R2 · 参考校准整猫身体候选</title>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"}}
 </script>
@@ -20,17 +20,17 @@ main{position:relative;min-height:0}canvas{display:block;width:100%;height:100%}
 <body>
 <div id="app">
 <header>
-  <div class="brand"><h1>CAT BODY BIND V1 · R1 整猫身体候选</h1><p>新身体母体，不继承 Gate corrective。当前只审整猫形态与基础材质，不生产动作。</p></div>
+  <div class="brand"><h1>CAT BODY BIND V1 · R2 参考校准整猫身体候选</h1><p>新身体母体，不继承 Gate corrective。按参考截面与骨架锚点校准；当前只审整猫形态与基础材质，不生产动作。</p></div>
   <div class="toolbar">
     <button data-view="front">正面</button><button data-view="left">左侧</button><button data-view="right">右侧</button><button data-view="top">顶部</button><button data-view="quarter-front" class="active">前四分之三</button><button data-view="quarter-rear">后四分之三</button>
-    <button id="skeletonBtn">骨架锚点</button><button id="wireBtn">线框</button><button id="coatBtn" class="active">灰虎斑材质</button><button id="panelBtn">参数与指标</button><button id="resetBtn">恢复 R0</button>
+    <button id="skeletonBtn">骨架锚点</button><button id="featureBtn">眼鼻尺度标志</button><button id="wireBtn">线框</button><button id="coatBtn" class="active">灰虎斑材质</button><button id="panelBtn">参数与指标</button><button id="resetBtn">恢复 R2</button>
   </div>
 </header>
 <main id="stage">
   <div id="loading"><div class="loader"><b>正在生成连续整猫身体</b><p id="loadText">初始化程序化解剖场…</p><div class="bar"><i id="loadBar"></i></div></div></div>
-  <div class="panel" id="panel">
-    <h2>R0 生产边界</h2>
-    <p>连续隐式作者态用于整猫轮廓决策。眼球、鼻镜和耳内是功能子结构；身体、耳根、四肢、足掌和尾根由同一连续场生成。当前尚未建立正式稳定拓扑、蒙皮和动作。</p>
+  <div class="panel hidden" id="panel">
+    <h2>R2 生产边界</h2>
+    <p>连续隐式作者态由参考截面、骨架锚点和中性站立约束驱动。眼鼻尺度标志默认隐藏；身体、耳根、四肢、足掌和尾根由同一连续场生成。当前尚未建立稳定拓扑、正式蒙皮和动作。</p>
     <h3>低频形态参数</h3>
     <label><span>胸腔体积</span><input data-param="thorax" type="range" min="0.84" max="1.18" step="0.01" value="1"><output>1.00</output></label>
     <label><span>腹部收束</span><input data-param="abdomen" type="range" min="0.82" max="1.16" step="0.01" value="1"><output>1.00</output></label>
@@ -51,7 +51,7 @@ main{position:relative;min-height:0}canvas{display:block;width:100%;height:100%}
     <h3>本轮硬检查</h3>
     <ul><li>头颈、肩胛胸廓、胸腹骨盆整体节奏。</li><li>前后肢段落、趾行姿态、四足接地。</li><li>尾根是否进入荐骨后端而非插接。</li><li>不能以材质或镜头掩盖轮廓错误。</li></ul>
   </div>
-  <div class="status" id="status"><b>R1</b>：整猫身体作者态已与旧 V4.32 / Gate corrective 分离。下一门是四视图形态审批，不是动作或猫群。</div>
+  <div class="status" id="status"><b>R2</b>：参考校准整猫作者态。先通过固定四视图，再冻结拓扑；动作、碰撞和猫群继续锁定。</div>
 </main>
 </div>
 <script type="module">
@@ -68,7 +68,7 @@ scene.add(new THREE.HemisphereLight(0xbfe8ff,0x1a2024,1.55));const key=new THREE
 const grid=new THREE.GridHelper(1.8,36,0x2d7f91,0x15343e);grid.rotation.x=Math.PI/2;grid.position.z=.001;scene.add(grid);const floor=new THREE.Mesh(new THREE.PlaneGeometry(3,2),new THREE.MeshStandardMaterial({color:0x0b171c,roughness:1,metalness:0}));floor.receiveShadow=true;floor.position.z=-.002;scene.add(floor);
 
 const defaults={thorax:1,abdomen:1,pelvis:1,head:1,muzzle:1,limbs:1,paws:1,ears:1};const params={...defaults};
-const bounds={minX:-.72,maxX:.56,minY:-.20,maxY:.20,minZ:-.025,maxZ:.60};const resolution=80;
+const bounds={minX:-.74,maxX:.54,minY:-.18,maxY:.18,minZ:-.025,maxZ:.58};const resolution=82;
 const coatMaterial=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.78,metalness:0,side:THREE.DoubleSide});
 const body=new MarchingCubes(resolution,coatMaterial,false,false,280000);body.isolation=0;body.scale.set((bounds.maxX-bounds.minX)/2,(bounds.maxY-bounds.minY)/2,(bounds.maxZ-bounds.minZ)/2);body.position.set((bounds.maxX+bounds.minX)/2,(bounds.maxY+bounds.minY)/2,(bounds.maxZ+bounds.minZ)/2);body.castShadow=true;body.receiveShadow=true;scene.add(body);
 
@@ -77,46 +77,56 @@ function smin(a,b,k){const h=clamp(.5+.5*(b-a)/k);return mix(b,a,h)-k*h*(1-h)}
 function ellipsoid(x,y,z,cx,cy,cz,rx,ry,rz){const px=x-cx,py=y-cy,pz=z-cz;const k0=Math.hypot(px/rx,py/ry,pz/rz);const k1=Math.hypot(px/(rx*rx),py/(ry*ry),pz/(rz*rz));return k0*(k0-1)/(k1||1)}
 function taperedCapsule(x,y,z,a,b,r0,r1){const bax=b[0]-a[0],bay=b[1]-a[1],baz=b[2]-a[2],pax=x-a[0],pay=y-a[1],paz=z-a[2],den=bax*bax+bay*bay+baz*baz;const h=clamp((pax*bax+pay*bay+paz*baz)/(den||1));const qx=pax-bax*h,qy=pay-bay*h,qz=paz-baz*h;return Math.hypot(qx,qy,qz)-mix(r0,r1,h)}
 function torsoSdf(x,y,z){
-  const x0=-.245,x1=.225,xc=clamp(x,x0,x1),t=(xc-x0)/(x1-x0);
-  const wp=Math.exp(-Math.pow((xc+.155)/.095,2)),wt=Math.exp(-Math.pow((xc-.105)/.105,2)),wa=Math.exp(-Math.pow((xc+.025)/.070,2));
-  let ry=.079+.023*wp+.034*wt-.013*Math.exp(-Math.pow((xc+.025)/.065,2));
-  let rz=.098+.022*Math.exp(-Math.pow((xc+.145)/.100,2))+.048*wt-.008*wa;
-  ry*=1+(params.pelvis-1)*wp*.72+(params.thorax-1)*wt*.78+(params.abdomen-1)*wa*.68;
-  rz*=1+(params.pelvis-1)*wp*.52+(params.thorax-1)*wt*.72+(params.abdomen-1)*wa*.48;
-  const cz=.240+.047*(3*t*t-2*t*t*t)+.004*Math.exp(-Math.pow((xc-.12)/.10,2)),dx=x-xc,cap=.085;
+  const x0=-.285,x1=.220,xc=clamp(x,x0,x1),t=(xc-x0)/(x1-x0);
+  const pelvis=Math.exp(-Math.pow((xc+.185)/.105,2)),thorax=Math.exp(-Math.pow((xc-.112)/.105,2)),lumbar=Math.exp(-Math.pow((xc+.045)/.070,2));
+  let ry=.068+.020*pelvis+.030*thorax-.010*lumbar;
+  let rz=.083+.018*pelvis+.038*thorax-.004*lumbar;
+  ry*=1+(params.pelvis-1)*pelvis*.65+(params.thorax-1)*thorax*.72+(params.abdomen-1)*lumbar*.50;
+  rz*=1+(params.pelvis-1)*pelvis*.55+(params.thorax-1)*thorax*.68+(params.abdomen-1)*lumbar*.45;
+  const cz=.258+.032*(3*t*t-2*t*t*t)+.004*Math.exp(-Math.pow((xc-.10)/.10,2)),dx=x-xc,cap=.075;
   const q=Math.sqrt(Math.pow(dx/cap,2)+Math.pow(y/ry,2)+Math.pow((z-cz)/rz,2))-1;
   return q*Math.min(ry,rz,cap);
 }
-function bodySdf(x,y,z){let d=torsoSdf(x,y,z);const add=(v,k=.018)=>{d=smin(d,v,k)};
-  add(ellipsoid(x,y,z,.170,0,.268,.105,.103,.118),.024);
-  add(taperedCapsule(x,y,z,[.175,0,.300],[.295,0,.370],.080,.065),.024);
-  add(taperedCapsule(x,y,z,[.185,0,.230],[.345,0,.342],.060,.047),.022);
-  add(ellipsoid(x,y,z,.355,0,.402,.108,.093*params.head,.103),.027);
-  add(ellipsoid(x,y,z,.418,0,.370,.055*params.muzzle,.055,.045),.018);
-  add(ellipsoid(x,y,z,.404,0,.342,.059*params.muzzle,.049,.030),.016);
-  add(ellipsoid(x,y,z,.390,0,.413,.065,.077*params.head,.060),.019);
+function bodySdf(x,y,z){let d=torsoSdf(x,y,z);const add=(v,k=.014)=>{d=smin(d,v,k)};
+  add(ellipsoid(x,y,z,.145,0,.286,.095,.090,.105),.018);
+  add(taperedCapsule(x,y,z,[.175,0,.315],[.285,0,.377],.062,.050),.017);
+  add(taperedCapsule(x,y,z,[.175,0,.245],[.315,0,.350],.047,.040),.014);
+  add(ellipsoid(x,y,z,.350,0,.405,.082,.070*params.head,.082),.018);
+  add(ellipsoid(x,y,z,.405,0,.380,.055*params.muzzle,.046,.038),.012);
+  add(ellipsoid(x,y,z,.408,0,.350,.052*params.muzzle,.043,.026),.010);
+  add(ellipsoid(x,y,z,.376,0,.417,.055,.060*params.head,.048),.012);
   for(const side of [-1,1]){
-    add(ellipsoid(x,y,z,.357,side*.048,.384,.071,.048*params.head,.060),.016);
-    const tip=[.318,side*.067,.449+.101*params.ears],base=[.338,side*.057,.449];
-    add(taperedCapsule(x,y,z,base,tip,.034,.0035),.014);add(ellipsoid(x,y,z,.337,side*.055,.450,.048,.031,.039),.014);
-    const sy=side*.067,lr=params.limbs;
-    add(ellipsoid(x,y,z,.148,sy,.280,.067,.036*lr,.074),.016);
-    add(taperedCapsule(x,y,z,[.165,sy,.274],[.118,sy,.165],.031*lr,.024*lr),.012);
-    add(taperedCapsule(x,y,z,[.118,sy,.165],[.145,sy,.067],.024*lr,.016*lr),.010);
-    add(taperedCapsule(x,y,z,[.145,sy,.067],[.170,sy,.031],.016*lr,.012*lr),.008);
-    add(ellipsoid(x,y,z,.190,sy,.019,.045*params.paws,.026*params.paws,.016),.009);
-    const hy=side*.075;
-    add(ellipsoid(x,y,z,-.155,hy,.247,.090,.052*lr,.091),.017);
-    add(taperedCapsule(x,y,z,[-.155,hy,.242],[-.038,hy,.155],.041*lr,.030*lr),.014);
-    add(taperedCapsule(x,y,z,[-.038,hy,.155],[-.205,hy,.074],.030*lr,.019*lr),.010);
-    add(taperedCapsule(x,y,z,[-.205,hy,.074],[-.158,hy,.032],.019*lr,.013*lr),.008);
-    add(ellipsoid(x,y,z,-.128,hy,.019,.050*params.paws,.028*params.paws,.016),.009);
+    add(ellipsoid(x,y,z,.357,side*.042,.385,.055,.037*params.head,.048),.010);
+    const tip=[.322,side*.052,.500+.060*(params.ears-1)],base=[.340,side*.050,.447];
+    add(taperedCapsule(x,y,z,base,tip,.027,.003),.010);add(ellipsoid(x,y,z,.338,side*.048,.447,.036,.025,.031),.010);
+    const sy=side*.060,lr=params.limbs;
+    add(ellipsoid(x,y,z,.137,sy,.276,.054,.029*lr,.060),.012);
+    add(taperedCapsule(x,y,z,[.145,sy,.273],[.112,sy,.160],.026*lr,.020*lr),.009);
+    add(taperedCapsule(x,y,z,[.112,sy,.160],[.142,sy,.061],.020*lr,.0135*lr),.007);
+    add(taperedCapsule(x,y,z,[.142,sy,.061],[.168,sy,.025],.014*lr,.010*lr),.005);
+    add(ellipsoid(x,y,z,.187,sy,.015,.039*params.paws,.022*params.paws,.014),.006);
+    const hy=side*.067;
+    add(ellipsoid(x,y,z,-.175,hy,.260,.076,.043*lr,.080),.013);
+    add(taperedCapsule(x,y,z,[-.175,hy,.255],[-.055,hy,.172],.035*lr,.026*lr),.010);
+    add(taperedCapsule(x,y,z,[-.055,hy,.172],[-.205,hy,.074],.026*lr,.016*lr),.007);
+    add(taperedCapsule(x,y,z,[-.205,hy,.074],[-.150,hy,.027],.016*lr,.011*lr),.005);
+    add(ellipsoid(x,y,z,-.122,hy,.015,.043*params.paws,.023*params.paws,.014),.006);
   }
-  const tail=[[-.260,0,.255],[-.355,.003,.225],[-.455,.010,.185],[-.555,.018,.160],[-.645,.028,.210],[-.695,.040,.295]];
-  for(let i=0;i<tail.length-1;i++){const t0=i/(tail.length-1),t1=(i+1)/(tail.length-1),r0=mix(.034,.011,t0),r1=mix(.034,.011,t1);add(taperedCapsule(x,y,z,tail[i],tail[i+1],r0,r1),.012)}
+  const tail=[[-.285,0,.275],[-.375,.002,.270],[-.470,.008,.255],[-.560,.015,.245],[-.640,.023,.280],[-.705,.032,.345]];
+  for(let i=0;i<tail.length-1;i++){const u=i/(tail.length-1),v=(i+1)/(tail.length-1);add(taperedCapsule(x,y,z,tail[i],tail[i+1],mix(.029,.009,u),mix(.029,.009,v)),.008)}
   return d;
 }
-
+function smoothScalarField(field,N,passes=1,strength=.16){
+  const scratch=new Float32Array(field.length),N2=N*N;
+  for(let pass=0;pass<passes;pass++){
+    scratch.set(field);
+    for(let z=1;z<N-1;z++)for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++){
+      const i=x+y*N+z*N2,avg=(field[i-1]+field[i+1]+field[i-N]+field[i+N]+field[i-N2]+field[i+N2])/6;
+      scratch[i]=mix(field[i],avg,strength);
+    }
+    field.set(scratch);
+  }
+}
 function setProgress(p,text){loadBar.style.width=`${Math.round(p*100)}%`;loadText.textContent=text}
 function smoothstep(a,b,x){const t=clamp((x-a)/(b-a));return t*t*(3-2*t)}
 function applyCoatColors(){
@@ -145,19 +155,20 @@ function applyCoatColors(){
   return used;
 }
 
-let buildStart=0;async function rebuild(){loading.style.display='grid';buildStart=performance.now();setProgress(.03,'采样连续解剖场…');await new Promise(r=>setTimeout(r,20));const N=resolution,N2=N*N,field=body.field;let idx=0;for(let iz=0;iz<N;iz++){const z=mix(bounds.minZ,bounds.maxZ,iz/(N-1));for(let iy=0;iy<N;iy++){const y=mix(bounds.minY,bounds.maxY,iy/(N-1));for(let ix=0;ix<N;ix++){const x=mix(bounds.minX,bounds.maxX,ix/(N-1));field[idx++]=-bodySdf(x,y,z)}}if(iz%7===0){setProgress(.05+.55*iz/(N-1),`采样 ${iz+1}/${N}`);await new Promise(r=>requestAnimationFrame(r))}}
-  setProgress(.65,'提取统一身体表面…');await new Promise(r=>requestAnimationFrame(r));body.update();setProgress(.82,'生成程序化灰虎斑材质…');await new Promise(r=>requestAnimationFrame(r));const used=applyCoatColors();body.geometry.computeBoundingSphere();body.geometry.computeBoundingBox();setProgress(.96,'更新四视图与指标…');await new Promise(r=>requestAnimationFrame(r));const ms=performance.now()-buildStart;const tri=Math.floor(used/3);document.querySelector('#mResolution').textContent=`${resolution}³`;document.querySelector('#mTriangles').textContent=tri.toLocaleString();document.querySelector('#mBuild').textContent=`${ms.toFixed(0)} ms`;window.__CAT_BODY_BIND_V1_STATS__={schema:'cat_kaopu/cat_kaopu/cat_body_bind_r1_stats@1.0',buildId:'cat-body-bind-v1-r1-20260917',resolution,triangles:tri,vertices:used,continuousBodyObjects:1,externalAnimalMeshes:0,externalImageTextures:0,fieldRepresentation:'continuous-anatomical-sdf',stableTopology:false,skinned:false,visualAcceptance:false,bindAcceptance:false,motionAcceptance:false,productionReady:false,buildMs:ms,params:{...params}};setProgress(1,'完成');setTimeout(()=>loading.style.display='none',120)}
+let buildStart=0;async function rebuild(){loading.style.display='grid';buildStart=performance.now();setProgress(.03,'采样连续解剖场…');await new Promise(r=>setTimeout(r,20));const N=resolution,N2=N*N,field=body.field;let idx=0;for(let iz=0;iz<N;iz++){const z=mix(bounds.minZ,bounds.maxZ,iz/(N-1));for(let iy=0;iy<N;iy++){const y=mix(bounds.minY,bounds.maxY,iy/(N-1));for(let ix=0;ix<N;ix++){const x=mix(bounds.minX,bounds.maxX,ix/(N-1));field[idx++]=-bodySdf(x,y,z)}}if(iz%7===0){setProgress(.05+.50*iz/(N-1),`采样 ${iz+1}/${N}`);await new Promise(r=>requestAnimationFrame(r))}}
+  setProgress(.58,'平滑参考截面场…');await new Promise(r=>requestAnimationFrame(r));smoothScalarField(field,N,1,.16);
+  setProgress(.68,'提取统一身体表面…');await new Promise(r=>requestAnimationFrame(r));body.update();body.geometry.computeVertexNormals();setProgress(.82,'生成程序化灰虎斑材质…');await new Promise(r=>requestAnimationFrame(r));const used=applyCoatColors();body.geometry.computeBoundingSphere();body.geometry.computeBoundingBox();setProgress(.96,'更新四视图与指标…');await new Promise(r=>requestAnimationFrame(r));const ms=performance.now()-buildStart;const tri=Math.floor(used/3);document.querySelector('#mResolution').textContent=`${resolution}³`;document.querySelector('#mTriangles').textContent=tri.toLocaleString();document.querySelector('#mBuild').textContent=`${ms.toFixed(0)} ms`;window.__CAT_BODY_BIND_V1_STATS__={schema:'cat_kaopu/cat_body_bind_r2_stats@1.0',buildId:'cat-body-bind-v1-r2-20260917',resolution,triangles:tri,vertices:used,continuousBodyObjects:1,externalAnimalMeshes:0,externalImageTextures:0,fieldRepresentation:'reference-calibrated-section-sdf',referenceCalibrated:true,fieldSmoothingPasses:1,featuresDefault:false,stableTopology:false,skinned:false,visualAcceptance:false,bindAcceptance:false,motionAcceptance:false,productionReady:false,buildMs:ms,params:{...params}};setProgress(1,'完成');setTimeout(()=>loading.style.display='none',120)}
 
-const features=new THREE.Group();scene.add(features);const eyeMat=new THREE.MeshStandardMaterial({color:0x79916e,roughness:.28,metalness:0}),pupilMat=new THREE.MeshStandardMaterial({color:0x050608,roughness:.25}),noseMat=new THREE.MeshStandardMaterial({color:0x3a2327,roughness:.7}),innerMat=new THREE.MeshStandardMaterial({color:0x8f6668,roughness:.88,side:THREE.DoubleSide});
-for(const side of [-1,1]){const eye=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),eyeMat);eye.position.set(.423,side*.071,.383);eye.scale.set(.018,.014,.019);features.add(eye);const pupil=new THREE.Mesh(new THREE.SphereGeometry(1,18,12),pupilMat);pupil.position.set(.438,side*.075,.383);pupil.scale.set(.006,.004,.012);features.add(pupil);const earGeo=new THREE.BufferGeometry();const s=side;earGeo.setAttribute('position',new THREE.Float32BufferAttribute([.320,s*.054,.430,.348,s*.056,.425,.303,s*.069,.505],3));earGeo.computeVertexNormals();features.add(new THREE.Mesh(earGeo,innerMat))}
-const nose=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),noseMat);nose.position.set(.480,0,.336);nose.scale.set(.016,.022,.014);features.add(nose);
+const features=new THREE.Group();features.visible=false;scene.add(features);const eyeMat=new THREE.MeshStandardMaterial({color:0x79916e,roughness:.28,metalness:0}),pupilMat=new THREE.MeshStandardMaterial({color:0x050608,roughness:.25}),noseMat=new THREE.MeshStandardMaterial({color:0x3a2327,roughness:.7}),innerMat=new THREE.MeshStandardMaterial({color:0x8f6668,roughness:.88,side:THREE.DoubleSide});
+for(const side of [-1,1]){const eye=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),eyeMat);eye.position.set(.414,side*.054,.397);eye.scale.set(.011,.009,.012);features.add(eye);const pupil=new THREE.Mesh(new THREE.SphereGeometry(1,18,12),pupilMat);pupil.position.set(.424,side*.058,.397);pupil.scale.set(.0035,.0025,.007);features.add(pupil);const earGeo=new THREE.BufferGeometry();const s=side;earGeo.setAttribute('position',new THREE.Float32BufferAttribute([.326,s*.044,.446,.350,s*.047,.442,.322,s*.056,.498],3));earGeo.computeVertexNormals();features.add(new THREE.Mesh(earGeo,innerMat))}
+const nose=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),noseMat);nose.position.set(.458,0,.371);nose.scale.set(.009,.014,.008);features.add(nose);
 
-const skeleton=new THREE.Group();skeleton.visible=false;scene.add(skeleton);const anchors={pelvis:[-.155,0,.247],lumbar:[-.035,0,.255],thorax:[.105,0,.280],neck:[.255,0,.345],head:[.355,0,.402],tail0:[-.260,0,.255],tail1:[-.455,.01,.185]};for(const side of [-1,1]){anchors[`shoulder${side}`]=[.165,side*.067,.274];anchors[`elbow${side}`]=[.118,side*.067,.165];anchors[`wrist${side}`]=[.145,side*.067,.067];anchors[`forepaw${side}`]=[.190,side*.067,.019];anchors[`hip${side}`]=[-.155,side*.075,.242];anchors[`stifle${side}`]=[-.038,side*.075,.155];anchors[`hock${side}`]=[-.205,side*.075,.074];anchors[`hindpaw${side}`]=[-.128,side*.075,.019]}
+const skeleton=new THREE.Group();skeleton.visible=false;scene.add(skeleton);const anchors={pelvis:[-.175,0,.268],lumbar:[-.045,0,.279],thorax:[.115,0,.302],neck:[.215,0,.326],head:[.355,0,.404],tail0:[-.292,0,.280],tail1:[-.470,.008,.255]};for(const side of [-1,1]){anchors[`shoulder${side}`]=[.155,side*.060,.290];anchors[`elbow${side}`]=[.116,side*.060,.170];anchors[`wrist${side}`]=[.144,side*.060,.060];anchors[`forepaw${side}`]=[.185,side*.060,.016];anchors[`hip${side}`]=[-.175,side*.068,.264];anchors[`stifle${side}`]=[-.055,side*.068,.178];anchors[`hock${side}`]=[-.205,side*.068,.076];anchors[`hindpaw${side}`]=[-.120,side*.068,.016]}
 const links=[['pelvis','lumbar'],['lumbar','thorax'],['thorax','neck'],['neck','head'],['pelvis','tail0'],['tail0','tail1']];for(const side of [-1,1])links.push(['thorax',`shoulder${side}`],[`shoulder${side}`,`elbow${side}`],[`elbow${side}`,`wrist${side}`],[`wrist${side}`,`forepaw${side}`],['pelvis',`hip${side}`],[`hip${side}`,`stifle${side}`],[`stifle${side}`,`hock${side}`],[`hock${side}`,`hindpaw${side}`]);const linePts=[];for(const [a,b] of links)linePts.push(...anchors[a],...anchors[b]);const line=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(linePts,3)),new THREE.LineBasicMaterial({color:0x43d7e8,depthTest:false,transparent:true,opacity:.9}));line.renderOrder=5;skeleton.add(line);const jointGeo=new THREE.SphereGeometry(.009,12,8),jointMat=new THREE.MeshBasicMaterial({color:0xffc767,depthTest:false});for(const p of Object.values(anchors)){const m=new THREE.Mesh(jointGeo,jointMat);m.position.fromArray(p);m.renderOrder=6;skeleton.add(m)}
 
 const views={front:{p:[1.35,0,.29],u:[0,0,1]},left:{p:[-.02,1.35,.30],u:[0,0,1]},right:{p:[-.02,-1.35,.30],u:[0,0,1]},top:{p:[-.04,0,1.55],u:[1,0,0]},'quarter-front':{p:[1.18,.86,.62],u:[0,0,1]},'quarter-rear':{p:[-1.15,.86,.60],u:[0,0,1]}};
-function setView(name){const v=views[name]||views['quarter-front'];camera.up.fromArray(v.u);camera.position.fromArray(v.p);controls.target.set(-.02,0,.245);controls.update();document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));window.__CAT_BODY_BIND_V1_VIEW__=name}
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.querySelector('#skeletonBtn').onclick=e=>{skeleton.visible=!skeleton.visible;e.currentTarget.classList.toggle('active',skeleton.visible)};document.querySelector('#wireBtn').onclick=e=>{coatMaterial.wireframe=!coatMaterial.wireframe;e.currentTarget.classList.toggle('active',coatMaterial.wireframe)};document.querySelector('#coatBtn').onclick=e=>{coatMaterial.vertexColors=!coatMaterial.vertexColors;coatMaterial.color.set(coatMaterial.vertexColors?0xffffff:0x8c8f91);coatMaterial.needsUpdate=true;e.currentTarget.classList.toggle('active',coatMaterial.vertexColors)};document.querySelector('#panelBtn').onclick=()=>document.querySelector('#panel').classList.toggle('hidden');document.querySelector('#resetBtn').onclick=()=>{Object.assign(params,defaults);document.querySelectorAll('[data-param]').forEach(i=>{i.value='1';i.nextElementSibling.value='1.00'});rebuild()};let rebuildTimer=0;document.querySelectorAll('[data-param]').forEach(i=>i.oninput=()=>{params[i.dataset.param]=+i.value;i.nextElementSibling.value=(+i.value).toFixed(2);clearTimeout(rebuildTimer);rebuildTimer=setTimeout(rebuild,220)});
+function setView(name){const v=views[name]||views['quarter-front'];camera.up.fromArray(v.u);camera.position.fromArray(v.p);controls.target.set(-.045,0,.270);controls.update();document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));window.__CAT_BODY_BIND_V1_VIEW__=name}
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.querySelector('#skeletonBtn').onclick=e=>{skeleton.visible=!skeleton.visible;e.currentTarget.classList.toggle('active',skeleton.visible)};document.querySelector('#featureBtn').onclick=e=>{features.visible=!features.visible;e.currentTarget.classList.toggle('active',features.visible)};document.querySelector('#wireBtn').onclick=e=>{coatMaterial.wireframe=!coatMaterial.wireframe;e.currentTarget.classList.toggle('active',coatMaterial.wireframe)};document.querySelector('#coatBtn').onclick=e=>{coatMaterial.vertexColors=!coatMaterial.vertexColors;coatMaterial.color.set(coatMaterial.vertexColors?0xffffff:0x8c8f91);coatMaterial.needsUpdate=true;e.currentTarget.classList.toggle('active',coatMaterial.vertexColors)};document.querySelector('#panelBtn').onclick=()=>document.querySelector('#panel').classList.toggle('hidden');document.querySelector('#resetBtn').onclick=()=>{Object.assign(params,defaults);document.querySelectorAll('[data-param]').forEach(i=>{i.value='1';i.nextElementSibling.value='1.00'});rebuild()};let rebuildTimer=0;document.querySelectorAll('[data-param]').forEach(i=>i.oninput=()=>{params[i.dataset.param]=+i.value;i.nextElementSibling.value=(+i.value).toFixed(2);clearTimeout(rebuildTimer);rebuildTimer=setTimeout(rebuild,220)});
 window.__CAT_BODY_BIND_V1_SET_VIEW__=setView;window.__CAT_BODY_BIND_V1_SET_PARAMS__=async cfg=>{Object.assign(params,cfg||{});await rebuild();return{...params}};window.__CAT_BODY_BIND_V1_GET_METRICS__=()=>JSON.parse(JSON.stringify(window.__CAT_BODY_BIND_V1_STATS__||{}));
 function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}addEventListener('resize',resize);function loop(){requestAnimationFrame(loop);controls.update();renderer.render(scene,camera)}loop();
 try{await rebuild();setView('quarter-front');window.__CAT_BODY_BIND_V1_READY__='webgl2'}catch(error){console.error(error);loadText.textContent=String(error?.message||error);loadText.classList.add('error');window.__CAT_BODY_BIND_V1_READY__='error';window.__CAT_BODY_BIND_V1_ERROR__=String(error?.stack||error)}
