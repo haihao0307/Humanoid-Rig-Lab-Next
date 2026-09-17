@@ -118,7 +118,7 @@ export const DEFAULT_CAT_DNA = Object.freeze({
     roughness: 0.82
   },
   material: {
-    shortHairAmplitude: 0.0035,
+    shortHairAmplitude: 0.00035,
     shortHairFrequency: 46.0,
     rimSoftness: 0.35,
     noseRoughness: 0.55,
@@ -208,7 +208,7 @@ export const CAT_PARAMETER_DEFINITIONS = Object.freeze({
   'coat.legBands': { group: '毛色', label: '腿部环纹', min: 3, max: 12, step: 0.5 },
   'coat.tailBands': { group: '毛色', label: '尾部环纹', min: 5, max: 18, step: 0.5 },
   'coat.roughness': { group: '毛色', label: '表面粗糙度', min: 0.55, max: 0.98, step: 0.01 },
-  'material.shortHairAmplitude': { group: '表面', label: '短毛起伏', min: 0.0, max: 0.007, step: 0.0002 },
+  'material.shortHairAmplitude': { group: '表面', label: '短毛起伏', min: 0.0, max: 0.002, step: 0.0001 },
   'material.shortHairFrequency': { group: '表面', label: '短毛频率', min: 18, max: 90, step: 1 }
 });
 
