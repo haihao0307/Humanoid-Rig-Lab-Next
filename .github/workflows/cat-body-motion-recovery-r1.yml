@@ -1,0 +1,108 @@
+name: Cat Body Motion Recovery R1
+
+on:
+  push:
+    branches:
+      - codex/cat-body-motion-recovery-r1-20260917
+    paths:
+      - .github/workflows/cat-body-motion-recovery-r1.yml
+      - cat-kaopu/tools/capture_cat_body_motion_recovery_r1.mjs
+      - cat-kaopu/recovery-r1/index.html
+      - cat-kaopu/recovery-r1/RECOVERY_R1_CANDIDATES.json
+      - cat-kaopu/recovery-r1/RECOVERY_R1_CONTRACT.json
+      - cat-kaopu/recovery-r1/baselines/**
+      - cat-kaopu/baselines/v4.40/**
+      - cat-kaopu/phase1/**
+      - cat-kaopu/phase1-gate-b/**
+      - package.json
+      - package-lock.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cat-body-motion-recovery-r1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fixed-evidence-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout Recovery R1 branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install pinned browser dependencies
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Serve repository and capture fixed evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 --bind 127.0.0.1 > "${RUNNER_TEMP}/cat-recovery-r1-http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
+          ready=0
+          for _ in $(seq 1 60); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:4173/cat-kaopu/recovery-r1/index.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat "${RUNNER_TEMP}/cat-recovery-r1-http.log" || true
+            exit 1
+          fi
+          CAT_RECOVERY_R1_BASE_URL='http://127.0.0.1:4173' \
+            node cat-kaopu/tools/capture_cat_body_motion_recovery_r1.mjs
+
+      - name: Upload Recovery R1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cat-body-motion-recovery-r1-${{ github.run_number }}
+          path: |
+            cat-kaopu/recovery-r1/index.html
+            cat-kaopu/recovery-r1/RECOVERY_R1_CANDIDATES.json
+            cat-kaopu/recovery-r1/RECOVERY_R1_CONTRACT.json
+            cat-kaopu/docs/CAT_BODY_MOTION_RECOVERY_R1_*.md
+            cat-kaopu/qa/recovery-r1/*.json
+            cat-kaopu/qa/recovery-r1/*.png
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit fixed evidence without changing candidate code
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'cat-kaopu-recovery-bot'
+          git config user.email 'cat-kaopu-recovery-bot@users.noreply.github.com'
+          git add cat-kaopu/qa/recovery-r1
+          if git diff --cached --quiet; then
+            echo 'No Recovery R1 evidence changes to commit.'
+            exit 0
+          fi
+          git commit -m 'test(cat): archive Recovery R1 fixed evidence [recovery-r1 evidence]'
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              exit 0
+            fi
+            echo "Push attempt ${attempt} failed; rebasing on latest branch head."
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+          done
+          echo 'Unable to push Recovery R1 evidence after three attempts.' >&2
+          exit 1
