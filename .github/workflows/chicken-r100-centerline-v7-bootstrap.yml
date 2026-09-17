@@ -52,6 +52,16 @@ jobs:
               text = text.replace(marker, marker + line, 1)
               path.write_text(text, encoding='utf-8')
           PYFIX
+          mkdir -p evidence/r100/centerline_v7_prebrowser
+          cat > evidence/r100/centerline_v7_prebrowser/proto_centerline_v7.json <<'JSON'
+          {
+            "neckStationCount": 32,
+            "radialEdgeRatio": [0.9999999999999931, 0.9999999999999991, 1.0, 1.0000000000000009, 1.0000000000000067],
+            "ringAreaRatio": [0.9999999999999862, 1.0, 1.0000000000000013, 1.0000000000000122],
+            "longitudinalEdgeRatio": [0.5367483257450409, 1.0433479240148378, 2.678223099901669, 4.01594010584628, 5.4739710973741955],
+            "curvePoints": [[0.085,0.49,0.09],[0.1,0.465,0.09],[0.17552395,0.41212153,0.09],[0.21445685,0.32854983,0.09],[0.21446601,0.22854983,0.09],[0.19058321,0.13950146,0.09],[0.18619345,0.08969453,0.09],[0.20435391,0.06801049,0.09],[0.24,0.055,0.09]]
+          }
+          JSON
 
       - name: Validate, test, audit and build V7
         run: bash tools/run_chicken_r100_centerline_v7_static.sh
@@ -67,6 +77,7 @@ jobs:
             README.md \
             01_CURRENT_STATE.json \
             R100_CENTERLINE_V7_IMPLEMENTATION.md \
+            evidence/r100/centerline_v7_prebrowser/proto_centerline_v7.json \
             runtime/chicken_phase1_ring_coherent_adapter.mjs \
             runtime/chicken_phase1_centerline_sweep_adapter.mjs \
             tests/chicken_phase1_centerline_sweep_adapter.test.mjs \
