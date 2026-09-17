@@ -1,0 +1,113 @@
+{
+  "schema": "cat_kaopu/cat_body_bind_contract@1.0",
+  "buildId": "cat-body-bind-v1-r0-20260917",
+  "date": "2026-09-17",
+  "status": "active",
+  "goal": "replace the frozen V4.32 body with one continuous, anatomically organized and versioned cat body before producing motion or groups",
+  "coordinateSystem": {
+    "units": "meter",
+    "handedness": "right",
+    "forward": "+X",
+    "left": "+Y",
+    "up": "+Z",
+    "ground": 0.0
+  },
+  "sourcePolicy": {
+    "externalAnimalMesh": false,
+    "externalImageTexture": false,
+    "proceduralBinaryTarget": true,
+    "historicalEvidenceOnly": [
+      "V4.15 anatomical anchors, longitudinal sections, internal scapula and unified-surface principles",
+      "V4.34/V4.39 weight, contact and pose-corrective lessons",
+      "V4.40 actions as regression inputs",
+      "Gate A collision proxies as diagnostics"
+    ]
+  },
+  "body": {
+    "representation": "continuous implicit authoring field to stable reviewed production surface",
+    "requiredRegions": [
+      "cranium",
+      "muzzle",
+      "mandible",
+      "pinnae",
+      "neck",
+      "scapular-thoracic-sling",
+      "thorax",
+      "abdomen",
+      "lumbar",
+      "pelvis",
+      "forelimbs",
+      "hindlimbs",
+      "forepaws",
+      "hindpaws",
+      "tail-root",
+      "tail"
+    ],
+    "hardChecks": {
+      "connectedComponents": 1,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "finite": true,
+      "groundPaws": 4,
+      "surfaceTears": 0
+    }
+  },
+  "authoringAndRuntime": {
+    "authoringTargetTriangles": [60000, 180000],
+    "lod0TargetTriangles": [24000, 60000],
+    "lod1TargetTriangles": [8000, 20000],
+    "lod2TargetTriangles": [2500, 6000],
+    "groupPreferredLod": ["lod1", "lod2"],
+    "stableTopologyRequiredBeforeSkinning": true
+  },
+  "bind": {
+    "version": "cat_body_bind_v1",
+    "boneScalingInPoseOrAnimation": false,
+    "reuseStableJointIdsWhereValid": true,
+    "allowNewBindPositions": true,
+    "allowNewInverseBindMatrices": true,
+    "allowNewSkinWeights": true,
+    "allowNewCorrectives": true,
+    "requiredStressJoints": [
+      "neck-root",
+      "scapula-shoulder",
+      "elbow",
+      "wrist",
+      "hip",
+      "stifle",
+      "hock",
+      "tail-root"
+    ]
+  },
+  "material": {
+    "requiredInBodyPhase": true,
+    "procedural": true,
+    "defaultCoat": "grey-tabby-short-hair",
+    "requiredRegions": ["coat", "tabby-markings", "ear-inner", "nose", "eye-rim", "paw-pads"],
+    "expensiveStrandFurDeferred": true
+  },
+  "motion": {
+    "lockedUntilBodyAndBindApproval": true,
+    "firstProductionSet": ["stand", "idle", "start-walk", "walk", "stop-walk", "turn-left", "turn-right"],
+    "frameByFrameReviewRequired": true,
+    "skinReadsFinalPoseOnly": true
+  },
+  "deferred": {
+    "fineEyes": true,
+    "whiskers": true,
+    "lifeActivities": true,
+    "navigation": true,
+    "groupRuntime": true,
+    "breedLibrary": true
+  },
+  "acceptance": {
+    "fixedViews": ["front", "left", "right", "top", "quarter-front", "quarter-rear"],
+    "visualApprovalRequired": true,
+    "automaticQaCannotApproveVisuals": true,
+    "singleCatRequiredBeforeGroup": true
+  },
+  "visualAcceptance": false,
+  "bindAcceptance": false,
+  "motionAcceptance": false,
+  "productionReady": false
+}
