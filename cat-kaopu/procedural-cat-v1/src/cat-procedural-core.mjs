@@ -363,8 +363,8 @@ export function deriveCatSections(input = DEFAULT_CAT_DNA) {
   const sections = [
     { x: pelvisX - dna.torso.pelvisLength * 0.50, z: zPelvis - 0.005, ry: dna.torso.pelvisWidth * 0.34 * bulk, rz: dna.torso.pelvisDepth * 0.38 * bulk },
     { x: pelvisX, z: zPelvis, ry: dna.torso.pelvisWidth * 0.50 * bulk, rz: dna.torso.pelvisDepth * 0.50 * bulk },
-    { x: anchors.lumbar[0] - dna.torso.lumbarLength * 0.28, z: zLumbar - dna.torso.abdomenTuck * 0.10, ry: dna.torso.lumbarWidth * 0.50 * bulk, rz: dna.torso.lumbarDepth * 0.50 * bulk },
-    { x: anchors.lumbar[0] + dna.torso.lumbarLength * 0.30, z: zLumbar + dna.torso.dorsalArc * 0.18, ry: dna.torso.lumbarWidth * 0.54 * bulk, rz: dna.torso.lumbarDepth * 0.48 * bulk },
+    { x: anchors.lumbar[0] - dna.torso.lumbarLength * 0.28, z: zLumbar - dna.torso.abdomenTuck * 0.10 - dna.torso.ventralSag * 0.30, ry: dna.torso.lumbarWidth * 0.50 * bulk, rz: (dna.torso.lumbarDepth + dna.torso.ventralSag * 0.35) * 0.50 * bulk },
+    { x: anchors.lumbar[0] + dna.torso.lumbarLength * 0.30, z: zLumbar + dna.torso.dorsalArc * 0.18 - dna.torso.ventralSag * 0.42, ry: dna.torso.lumbarWidth * 0.54 * bulk, rz: (dna.torso.lumbarDepth + dna.torso.ventralSag * 0.42) * 0.48 * bulk },
     { x: thoraxX - dna.torso.thoraxLength * 0.24, z: zThorax, ry: dna.torso.thoraxWidth * 0.50 * bulk, rz: dna.torso.thoraxDepth * 0.50 * bulk },
     { x: thoraxX + dna.torso.thoraxLength * 0.24, z: zThorax + dna.torso.dorsalArc * 0.12, ry: dna.torso.thoraxWidth * 0.44 * bulk, rz: dna.torso.thoraxDepth * 0.46 * bulk },
     { x: thoraxX + dna.torso.thoraxLength * 0.46, z: zThorax + dna.torso.dorsalArc * 0.15, ry: dna.neck.baseWidth * 0.48 * bulk, rz: dna.neck.baseDepth * 0.46 * bulk }
@@ -373,6 +373,8 @@ export function deriveCatSections(input = DEFAULT_CAT_DNA) {
 }
 
 function smin(a, b, k) {
+  if (!Number.isFinite(a)) return b;
+  if (!Number.isFinite(b)) return a;
   const h = clamp(0.5 + 0.5 * (b - a) / k, 0, 1);
   return mix(b, a, h) - k * h * (1 - h);
 }
@@ -383,6 +385,7 @@ function ellipsoidSdf(x, y, z, center, radii) {
   const pz = z - center[2];
   const [rx, ry, rz] = radii;
   const k0 = Math.hypot(px / rx, py / ry, pz / rz);
+  if (k0 < 1e-9) return -Math.min(rx, ry, rz);
   const k1 = Math.hypot(px / (rx * rx), py / (ry * ry), pz / (rz * rz));
   return k0 * (k0 - 1) / (k1 || 1);
 }
@@ -465,7 +468,7 @@ export function createCatSdf(input = DEFAULT_CAT_DNA) {
       d = smin(d, taperedCapsuleSdf(x, y, z, shoulder, elbow, dna.forelimb.upperRadius, dna.forelimb.lowerRadius * 1.10), 0.010);
       d = smin(d, taperedCapsuleSdf(x, y, z, elbow, wrist, dna.forelimb.lowerRadius, dna.forelimb.wristRadius), 0.008);
       d = smin(d, taperedCapsuleSdf(x, y, z, wrist, forePaw, dna.forelimb.wristRadius, dna.forelimb.wristRadius * 0.82), 0.006);
-      d = smin(d, ellipsoidSdf(x, y, z, [forePaw[0] + dna.paws.foreLength * 0.15, forePaw[1], dna.paws.height * 0.52], [dna.paws.foreLength * 0.50, dna.paws.foreWidth * 0.50, dna.paws.height * 0.50]), 0.008);
+      d = smin(d, ellipsoidSdf(x, y, z, [forePaw[0] + dna.paws.foreLength * 0.15, forePaw[1], dna.paws.height * 0.52], [dna.paws.foreLength * 0.50, (dna.paws.foreWidth + dna.paws.toeSplay) * 0.50, dna.paws.height * 0.50]), 0.008);
 
       const hip = anchors[`hip${side}`];
       const stifle = anchors[`stifle${side}`];
@@ -475,7 +478,7 @@ export function createCatSdf(input = DEFAULT_CAT_DNA) {
       d = smin(d, taperedCapsuleSdf(x, y, z, hip, stifle, dna.hindlimb.upperRadius, dna.hindlimb.lowerRadius * 1.10), 0.011);
       d = smin(d, taperedCapsuleSdf(x, y, z, stifle, hock, dna.hindlimb.lowerRadius, dna.hindlimb.hockRadius), 0.008);
       d = smin(d, taperedCapsuleSdf(x, y, z, hock, hindPaw, dna.hindlimb.hockRadius, dna.hindlimb.hockRadius * 0.78), 0.006);
-      d = smin(d, ellipsoidSdf(x, y, z, [hindPaw[0] + dna.paws.hindLength * 0.15, hindPaw[1], dna.paws.height * 0.52], [dna.paws.hindLength * 0.50, dna.paws.hindWidth * 0.50, dna.paws.height * 0.50]), 0.008);
+      d = smin(d, ellipsoidSdf(x, y, z, [hindPaw[0] + dna.paws.hindLength * 0.15, hindPaw[1], dna.paws.height * 0.52], [dna.paws.hindLength * 0.50, (dna.paws.hindWidth + dna.paws.toeSplay) * 0.50, dna.paws.height * 0.50]), 0.008);
     }
 
     for (let i = 0; i < tailPoints.length - 1; i += 1) {
@@ -483,7 +486,8 @@ export function createCatSdf(input = DEFAULT_CAT_DNA) {
       const t1 = (i + 1) / (tailPoints.length - 1);
       d = smin(d, taperedCapsuleSdf(x, y, z, tailPoints[i], tailPoints[i + 1], mix(dna.tail.baseRadius, dna.tail.tipRadius, t0), mix(dna.tail.baseRadius, dna.tail.tipRadius, t1)), 0.009);
     }
-    return d;
+    const hairNoise = (hashNoise(x * dna.material.shortHairFrequency, y * dna.material.shortHairFrequency, z * dna.material.shortHairFrequency, dna.meta.seed) - 0.5) * 2;
+    return d - hairNoise * dna.material.shortHairAmplitude;
   };
 }
 
@@ -520,7 +524,9 @@ export function sampleCoatColor(position, input = DEFAULT_CAT_DNA) {
   const legMask = smooth01(Math.abs(y) / Math.max(0.05, dna.global.frontStanceWidth * 0.30)) * underside;
   const tailMask = smooth01((-x - dna.global.bodyLength * 0.25) / 0.10);
   const stripeSignal = Math.max(0, bodyWave * bodyMask, legWave * legMask, tailWave * tailMask);
-  const stripeAmount = smooth01((stripeSignal - 0.18) / 0.72) * dna.coat.stripeContrast;
+  const stripeThreshold = mix(0.08, 0.28, dna.material.rimSoftness);
+  const stripeWidth = mix(0.86, 0.58, dna.material.rimSoftness);
+  const stripeAmount = smooth01((stripeSignal - stripeThreshold) / stripeWidth) * dna.coat.stripeContrast;
   const dorsalAmount = dorsal * dna.coat.dorsalDarkness;
   const bellyAmount = underside * centerBelly * 0.72;
   const warmAmount = smooth01((0.36 - z) / 0.22) * (1 - centerBelly) * 0.18;
