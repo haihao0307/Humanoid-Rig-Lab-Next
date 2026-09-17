@@ -1,0 +1,59 @@
+{
+  "schema": "cat_kaopu/body_reference_intake_contract@1.0",
+  "buildId": "cat-body-reference-intake-v1-20260917",
+  "date": "2026-09-17",
+  "goal": "extract auditable geometry, section and scale evidence from an authorized domestic-cat reference without shipping that reference in the runtime",
+  "acceptedInputs": [".obj", ".stl", ".glb"],
+  "inputPolicy": {
+    "authorizedDownloadOnly": true,
+    "licenseAndAttributionRequired": true,
+    "rawReferenceCommittedToRuntime": false,
+    "rawReferenceIncludedInDistribution": false,
+    "referenceUsedAsVisualTruth": false,
+    "referenceUsedAsMeasuredEvidence": true
+  },
+  "requiredSourceMetadata": [
+    "title",
+    "provider",
+    "sourceUrl",
+    "license",
+    "licenseUrl",
+    "acquisitionMethod",
+    "species",
+    "intendedUse"
+  ],
+  "outputs": {
+    "schema": "cat_kaopu/body_reference_profile@1.0",
+    "geometryAudit": [
+      "vertexCount",
+      "triangleCount",
+      "connectedComponents",
+      "boundaryEdges",
+      "nonManifoldEdges",
+      "boundingBox",
+      "axisHypotheses"
+    ],
+    "sectionAudit": [
+      "normalizedLongitudinalSlices",
+      "halfWidth",
+      "halfDepth",
+      "centroid",
+      "sampleCount"
+    ],
+    "landmarkAudit": [
+      "geometricExtremeCandidates",
+      "manualAnatomicalLandmarks",
+      "axisConfirmationRequired"
+    ]
+  },
+  "hardRules": [
+    "automatic axis guesses cannot become production truth without confirmation",
+    "geometric extremes are not anatomical landmarks",
+    "a skeletal CT reference cannot be treated as an external skin surface",
+    "the final cat body remains procedurally regenerated from recorded evidence",
+    "source attribution must remain attached to every derived profile",
+    "no pose, rig or motion production begins until whole-body morphology is accepted"
+  ],
+  "visualAcceptance": false,
+  "productionReady": false
+}
