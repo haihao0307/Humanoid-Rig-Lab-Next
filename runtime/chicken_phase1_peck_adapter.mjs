@@ -169,10 +169,10 @@ export function createChickenPhase1PeckAdapter(THREE,baseSkin,options={}){
   const peckDepth=pose.state==='peck'?sat((-pose.neck.pitch-.12)/.93):0;
   const neckPitch=clamp(pose.neck.pitch,-.58,.52),headPitch=clamp(pose.head.pitch,-.28,.36);
   const legGain=pose.state==='short_run'?{hip:.48,knee:.30,ankle:.26}:{hip:.54,knee:.34,ankle:.28};
-  const peck={neckBase:-1.473,neck0:-.524,neck1:-.501,neck2:-.197,neck3:.109,headBase:.927,head:1.161,hip:.365,knee:-.815,ankle:.865,toe:.350};
+  const peck={pelvis:-.202,chest:-.356,neckBase:-.908,neck0:-.569,neck1:-.359,neck2:-.007,neck3:.323,headBase:.756,head:1.110,hip:.561,knee:-.849,ankle:1.070,toe:.359};
   const mix=(normal,target)=>normal*(1-peckDepth)+target*peckDepth;
   return{
-   peckDepth,rootCrouch:-.115*peckDepth,pelvisPitch:pose.body.pitch*.42,chestPitch:pose.body.pitch*.52,bodyRoll:clamp(pose.body.roll,-.22,.22),
+   peckDepth,rootCrouch:-.104*peckDepth,pelvisPitch:pose.body.pitch*.42+peck.pelvis*peckDepth,chestPitch:pose.body.pitch*.52+peck.chest*peckDepth,bodyRoll:clamp(pose.body.roll,-.22,.22),
    neckBasePitch:mix(neckPitch*.10,peck.neckBase),neck0Pitch:mix(neckPitch*.18,peck.neck0),neck1Pitch:mix(neckPitch*.22,peck.neck1),
    neck2Pitch:mix(neckPitch*.20,peck.neck2),neck3Pitch:mix(neckPitch*.16,peck.neck3),headBasePitch:mix(neckPitch*.14,peck.headBase),
    neckBaseYaw:pose.neck.yaw*.12,neck0Yaw:pose.neck.yaw*.16,neck1Yaw:pose.neck.yaw*.18,neck2Yaw:pose.neck.yaw*.18,
