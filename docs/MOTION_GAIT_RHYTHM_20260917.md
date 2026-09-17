@@ -1,5 +1,7 @@
 # 行走节律与走转停衔接
 
+本页保存 `cdaa91d` 阶段的结果与性能初测。后续手部放松、动作切换和当前入口证据见 [MOTION_FREE_HANDS_20260917.md](MOTION_FREE_HANDS_20260917.md)。
+
 本轮基于动作分支的 `90cbb84` 继续修复自由步态，统一 main 为 `3c3e9a4`。此前全身重定向结果见 [MOTION_FULL_BODY_RETARGET_20260916.md](MOTION_FULL_BODY_RETARGET_20260916.md)。本轮生产改动只在 `body/NaturalLocomotion.js`，入口由构建工具生成。
 
 ## 根因与行为

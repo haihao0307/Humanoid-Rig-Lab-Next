@@ -81,6 +81,47 @@ class MotionLabPose {
   const direction=norm(sub(positions.get(side+'_hand'),positions.get(side+'_forearm')));
   return qm(fromTo(rotate(palm,rest),direction),palm);
  }
+ freeHandRotation(side,forearm,inward){
+  // A free wrist is not a continuation of a rigid forearm. Use a small
+  // extension bias and a bounded gravity-dependent deviation. This is a
+  // quasi-static retargeting rule, not measured wrist motion or a force solve.
+  const medial=norm(sub(inward,mul(forearm,dot(inward,forearm))));
+  const gravity=sub(DOWN,mul(forearm,dot(DOWN,forearm)));
+  const handDirection=norm(add(sub(forearm,mul(medial,.14)),mul(gravity,.18)));
+  return MotionLab.relaxedHandRotation(this.h.resolvedRig.nodes,side,handDirection,inward);
+ }
+ relaxedHandRecipe(side){
+  this.relaxedHandRecipes??=new Map();if(this.relaxedHandRecipes.has(side))return this.relaxedHandRecipes.get(side);
+  const h=this.h,p=id=>this.source(side+'_'+id),long=norm(sub(p('finger_3_1'),p('hand')));
+  const across=norm(sub(p('finger_2_1'),p('finger_5_1'))),palm=mul(norm(cross(long,across)),side==='left'?-1:1),rows=[];
+  // Curl the four long digits softly, with more flexion at PIP than DIP.
+  // Metacarpal origins, thumb opposition and all source bone lengths stay.
+  for(let digit=2;digit<=5;digit++){
+   let parentTarget=h.sourceBind.get(side+'_metacarpal_'+digit).q;
+   const curls=[.20+(digit-2)*.025,.55+(digit-2)*.035,.72+(digit-2)*.035];
+   for(let joint=1;joint<=3;joint++){
+    const id=side+'_finger_'+digit+'_'+joint,n=h.resolvedRig.nodes[id],bind=h.sourceBind.get(id),parent=h.sourceBind.get(n.parent);
+    const next=joint===3?n.tipM:this.source(side+'_finger_'+digit+'_'+(joint+1)),rest=sub(next,n.positionM);
+    const splay=dot(norm(rest),across)*.45,target=norm(add(add(long,mul(across,splay)),mul(palm,Math.tan(curls[joint-1]))));
+    const absolute=qm(fromTo(rest,target),bind.q);
+    rows.push({id,parent:n.parent,offset:rotate(inv(parent.q),sub(bind.p,parent.p)),restQ:qm(inv(parent.q),bind.q),relaxedQ:qm(inv(parentTarget),absolute)});
+    parentTarget=absolute;
+   }
+  }
+  this.relaxedHandRecipes.set(side,rows);return rows;
+ }
+ captureHandRelaxation(side){
+  // Infer from committed local articulation, including transition blends;
+  // no independent timer/state can drift away from the actual fingers.
+  const row=this.relaxedHandRecipe(side).find(r=>r.id===side+'_finger_3_2');
+  const current=this.h.byId.get(row.id)?.world,parent=this.h.byId.get(row.parent)?.world;
+  if(!current||!parent)return 0;
+  return clamp(qangle(row.restQ,qm(inv(parent.q),current.q))/Math.max(1e-8,qangle(row.restQ,row.relaxedQ)),0,1);
+ }
+ relaxHand(frames,side,amount){
+  if(amount<=0)return;
+  for(const row of this.relaxedHandRecipe(side))frames.set(row.id,compose(frames.get(row.parent),frame(row.offset,qslerp(row.restQ,row.relaxedQ,amount))));
+ }
  descendants(positions,rotations,id,rotation){
   rotations.set(id,rotation);
   for(const [child,parent,offset]of this.descendantRows.get(id)){
@@ -212,7 +253,7 @@ class MotionLabPose {
    if(!options.hands?.[side]){
     const inward=rotate(data.rootQ,[side==='left'?1:-1,0,0]);
     const palm=reference&&data[side+'HandQ']?qm(qy(yaw),qm(data[side+'HandQ'],inv(h.sourceBind.get(hand).q))):
-     qm(qy(yaw),MotionLab.relaxedHandRotation(h.resolvedRig.nodes,side,data[side+'Forearm'],inward));
+     qm(qy(yaw),state.flatFootSupport===undefined?MotionLab.relaxedHandRotation(h.resolvedRig.nodes,side,data[side+'Forearm'],inward):this.freeHandRotation(side,data[side+'Forearm'],inward));
     rotations.set(radius,this.radialRotation(side,positions,palm));this.descendants(positions,rotations,hand,palm);
    }
    const footQ=controlled?qm(this.controlledFootOrientation(state,side),inv(h.sourceBind.get(foot).q)):data[side+'FootQ']?qm(qy(yaw),qm(data[side+'FootQ'],inv(h.sourceBind.get(foot).q))):rotations.get(side+'_tibia');
@@ -242,6 +283,10 @@ class MotionLabPose {
   }
   let frames=new Map();
   for(const [id,n]of this.rows)frames.set(id,frame(positions.get(id),qnorm(qm(rotations.get(id),h.sourceBind.get(id).q))));
+  for(const side of ['left','right'])if(!options.hands?.[side]&&!options.contactHand){
+   const amount=reference?(data[side+'HandRelaxation']??0):(state.flatFootSupport===undefined?0:1);
+   this.relaxHand(frames,side,clamp(amount,0,1));
+  }
   if(options.contactHand)frames=contactHandPose(h,frames,options.contactHand);
   if(options.blendFrom&&options.blendAmount<1){
    const target=frames,blended=new Map(),u=clamp(options.blendAmount,0,1),from=options.blendFrom;

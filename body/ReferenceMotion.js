@@ -52,7 +52,7 @@ function r2SampleMotion(id,progress){
  const rows=clip.samples,t=clamp(progress,0,1);let lo=0,hi=rows.length-1;
  while(hi-lo>1){const mid=(lo+hi)>>1;if(rows[mid].t<=t)lo=mid;else hi=mid;}
  const A=rows[lo],B=rows[hi],u=(t-A.t)/Math.max(1e-9,B.t-A.t);
- return r2BlendMotion(A,B,u);
+ return {...r2BlendMotion(A,B,u),leftHandRelaxation:0,rightHandRelaxation:0};
 }
 function r2NeutralMotion(h){
  const r={rootOffset:[0,0,0],rootHeightRatio:1,rootQ:qi(),lumbarQ:qi(),thoraxQ:qi(),cervicalQ:qi(),headQ:qi()};
@@ -78,6 +78,7 @@ function r2CaptureMotion(h,yaw){
   r[side+'Thigh']=d(leg.upper,leg.elbow);r[side+'Shank']=d(leg.elbow,leg.wrist);
   for(const [key,j]of [['UpperArm',arm.upper],['Forearm',arm.elbow],['Thigh',leg.upper],['Shank',leg.elbow]])r[side+key+'Q']=qm(baseInv,j.world.q);
   r[side+'HandQ']=qm(baseInv,arm.wrist.world.q);r[side+'FootQ']=qm(baseInv,leg.wrist.world.q);
+  r[side+'HandRelaxation']=h.motionDriver?.captureHandRelaxation?.(side)??0;
   r[side+'ClavicleQ']=relativeToBind(h.shoulders[side].sc,h.shoulders[side].sc.q);
  }
  return r;
