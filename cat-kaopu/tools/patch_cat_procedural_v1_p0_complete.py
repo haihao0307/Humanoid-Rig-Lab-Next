@@ -24,6 +24,22 @@ changed = False
 
 core, did = replace_once(
     core,
+    "function smin(a, b, k) {\n  const h = clamp(0.5 + 0.5 * (b - a) / k, 0, 1);\n  return mix(b, a, h) - k * h * (1 - h);\n}",
+    "function smin(a, b, k) {\n  if (!Number.isFinite(a)) return b;\n  if (!Number.isFinite(b)) return a;\n  const h = clamp(0.5 + 0.5 * (b - a) / k, 0, 1);\n  return mix(b, a, h) - k * h * (1 - h);\n}",
+    "finite smooth union",
+)
+changed |= did
+
+core, did = replace_once(
+    core,
+    "  const k0 = Math.hypot(px / rx, py / ry, pz / rz);\n  const k1 = Math.hypot(px / (rx * rx), py / (ry * ry), pz / (rz * rz));\n  return k0 * (k0 - 1) / (k1 || 1);",
+    "  const k0 = Math.hypot(px / rx, py / ry, pz / rz);\n  if (k0 < 1e-9) return -Math.min(rx, ry, rz);\n  const k1 = Math.hypot(px / (rx * rx), py / (ry * ry), pz / (rz * rz));\n  return k0 * (k0 - 1) / (k1 || 1);",
+    "ellipsoid center sign",
+)
+changed |= did
+
+core, did = replace_once(
+    core,
     "{ x: anchors.lumbar[0] - dna.torso.lumbarLength * 0.28, z: zLumbar - dna.torso.abdomenTuck * 0.10, ry: dna.torso.lumbarWidth * 0.50 * bulk, rz: dna.torso.lumbarDepth * 0.50 * bulk },\n    { x: anchors.lumbar[0] + dna.torso.lumbarLength * 0.30, z: zLumbar + dna.torso.dorsalArc * 0.18, ry: dna.torso.lumbarWidth * 0.54 * bulk, rz: dna.torso.lumbarDepth * 0.48 * bulk },",
     "{ x: anchors.lumbar[0] - dna.torso.lumbarLength * 0.28, z: zLumbar - dna.torso.abdomenTuck * 0.10 - dna.torso.ventralSag * 0.30, ry: dna.torso.lumbarWidth * 0.50 * bulk, rz: (dna.torso.lumbarDepth + dna.torso.ventralSag * 0.35) * 0.50 * bulk },\n    { x: anchors.lumbar[0] + dna.torso.lumbarLength * 0.30, z: zLumbar + dna.torso.dorsalArc * 0.18 - dna.torso.ventralSag * 0.42, ry: dna.torso.lumbarWidth * 0.54 * bulk, rz: (dna.torso.lumbarDepth + dna.torso.ventralSag * 0.42) * 0.48 * bulk },",
     "ventral surface parameter",
@@ -73,6 +89,6 @@ changed |= did
 if changed:
     CORE.write_text(core, encoding="utf-8")
     PAGE.write_text(page, encoding="utf-8")
-    print("connected remaining P0 CatDNA fields to geometry or material output")
+    print("connected all P0 CatDNA fields and repaired the procedural SDF")
 else:
-    print("P0 CatDNA output wiring already complete")
+    print("P0 CatDNA output wiring and SDF repair already complete")
