@@ -11,7 +11,7 @@
    }
    const wrap=()=>{
     if(!runtime.skin)return;
-    if(runtime.skin.diagnostics?.().peckKinematicsRevision==='six-link-ring-coherent-s-curve-v3')return;
+    if(runtime.skin.diagnostics?.().weightingRevision==='sector-gated-carrier-and-root-rigid-coat-v6')return;
     runtime.skin=adapterModule.createChickenPhase1RingCoherentAdapter(T,runtime.skin);
    };
    wrap();
@@ -22,7 +22,11 @@
      return (runtime.skin?.meshes||[]).map((mesh,index)=>({
       index,
       kind:mesh.userData?.materialKind||'unknown',
+      name:mesh.name||'',
+      component:mesh.userData?.component||null,
+      generatedBy:mesh.userData?.generatedBy||null,
       vertices:mesh.geometry?.attributes?.position?.count||0,
+      triangles:mesh.geometry?.index?.count?mesh.geometry.index.count/3:0,
       visible:mesh.visible!==false
      }));
     },
@@ -40,8 +44,8 @@
     }
    });
    window.__CHICKEN_R100_PECK_ADAPTER__=Object.freeze({
-    version:'six-link-ring-coherent-s-curve-v3',
-    weightingRevision:'ring-coherent-carrier-and-root-rigid-coat-v5',
+    version:'six-link-sector-gated-s-curve-v4',
+    weightingRevision:'sector-gated-carrier-and-root-rigid-coat-v6',
     installed:true
    });
    clearInterval(timer);

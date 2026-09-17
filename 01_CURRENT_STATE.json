@@ -1,67 +1,68 @@
 {
-  "schema": "life_ecosystem/chicken_module_state@1.0",
-  "version": "V4.6_R9.8_3_PHASE1_ENVIRONMENT_NPC_FOUNDATION",
-  "date": "2026-09-16",
-  "identity": {
-    "species_scope": "domestic chicken environmental NPC candidate",
-    "sex": "unknown",
-    "breed": "unknown",
-    "age": "unknown",
-    "real_world_scale": "unknown"
+  "schema": "life_ecosystem/chicken_current_state@1.1",
+  "updated_at": "2026-09-16T13:30:00Z",
+  "branch": "chat/chicken-phase1-continuation-20260916",
+  "version": "V4.6_R10.0_CENTERLINE_SWEEP_V7_CANDIDATE",
+  "active_entry": "CHICKEN_V46_R10_0_SINGLE_AGENT.html",
+  "morphology_source": "V4.6_R9.9.1_CONTINUOUS_RING_REFIT_CANDIDATE",
+  "revisions": {
+    "weighting": "anatomical-topology-split-and-centerline-sweep-v7",
+    "topology": "anatomical-torso-neck-split-v7",
+    "centerline_curve": "bone-centerline-pchip-volume-preserving-v1",
+    "peck_kinematics": "six-link-sector-gated-s-curve-v4"
   },
-  "active_entry": "CHICKEN_V46_R9_8_3_CLEAN_FACE.html",
-  "frozen_r9_1_baseline": "CHICKEN_V46_R9_1.html",
-  "approved_head_reference": "reference/head/APPROVED_HEAD_SHAPE_REFERENCE_2026-09-15.png",
-  "candidate_parameters": "data/CHICKEN_R983_CLEAN_FACE_PARAMETERS.json",
-  "phase1_contract": "data/CHICKEN_PHASE1_NPC_CONTRACT.json",
-  "phase1_scope": "CHICKEN_PHASE1_ENVIRONMENT_NPC_SCOPE.md",
-  "motion_controller": "runtime/chicken_phase1_npc_controller.mjs",
-  "motion_controller_tests": "tests/chicken_phase1_npc_controller.test.mjs",
-  "review_board": "evidence/r983/R983_REVIEW_BOARD.html",
-  "priority_order": [
-    "morphology",
-    "motion",
-    "collision_and_grounding",
-    "controlled_variation",
-    "minimal_behavior"
-  ],
-  "head_status": {
-    "r9_2_through_r9_8_2_visual_gate_passed": false,
-    "r9_8_3_candidate_built": true,
-    "r9_8_3_browser_qa_passed": true,
-    "legacy_eye_and_ear_parts_excluded": true,
+  "single_agent": {
+    "logical_bones": 21,
+    "expected_skeleton_bones_with_helper": 22,
+    "helper_bones": 1,
+    "behavior_set": [
+      "idle_stand",
+      "look",
+      "peck",
+      "walk",
+      "stop",
+      "turn",
+      "short_run",
+      "wing_balance"
+    ],
+    "neck_shell": {
+      "ring_count": 32,
+      "ring_size": 32,
+      "vertex_count": 1024,
+      "triangle_count": 1984
+    },
+    "torso": {
+      "source_triangle_count": 13824,
+      "retained_triangle_count": 10216,
+      "retained_fraction": 0.7390046296296297,
+      "retained_neck_sector_violations": 0
+    }
+  },
+  "verified": {
+    "source_syntax": true,
+    "unit_tests": true,
+    "deterministic_build": true,
+    "topology_math_audit": true,
+    "browser_qa_v7": false,
     "manual_visual_acceptance": false,
-    "closeup_full_reconstruction_required_for_phase1": false
+    "single_agent_collision": false,
+    "group_test": false
   },
-  "phase1": {
-    "role": "lightweight environmental creature NPC",
-    "shape_gate": "gameplay_distance_low_frequency_morphology",
-    "single_agent_first": true,
-    "motion_set_defined": true,
-    "motion_controller_foundation_built": true,
-    "motion_controller_ci_passed": true,
-    "collision_contract_defined": true,
-    "soft_separation_and_obstacle_detour_foundation_built": true,
-    "seeded_variation_foundation_built": true,
-    "herd_after_single_agent_stable": true,
-    "complex_life_activity_deferred": true,
-    "morphology_baseline_frozen": false,
-    "rig_adapter_integrated": false,
-    "single_agent_motion_complete": false,
+  "known_blockers": [
+    "A fresh browser render of V7 has not been captured.",
+    "Prototype longitudinal transition edges still show high local stretch, with a sampled maximum near 5.47x.",
+    "The throat-to-head transition and torso/neck seam require manual visual review.",
+    "Single-agent collision and obstacle response remain incomplete."
+  ],
+  "truth_boundary": {
+    "local_static_gate": true,
+    "local_topology_math_gate": true,
+    "browser_qa_passed": false,
+    "manual_motion_naturalness_acceptance": false,
+    "manual_visual_acceptance": false,
+    "single_agent_grounding_complete": false,
     "single_agent_collision_complete": false,
-    "small_herd_stable": false,
-    "phase1_environment_npc_ready": false
-  },
-  "qa": {
-    "technical_gate_passed": true,
-    "current_executable_reproducible": true,
-    "motion_controller_unit_and_stress_tests_passed": true,
-    "whole_visual_gate_passed": false,
-    "canonical_chicken_surface_complete": false,
-    "rig_authorized": false,
-    "motion_implemented_on_rendered_chicken": false,
-    "production_ready": false,
-    "public_https_published": true
-  },
-  "next_stage": "GAMEPLAY_DISTANCE_SHAPE_FREEZE_AND_RIG_ADAPTER_INTEGRATION"
+    "group_test_authorized": false,
+    "production_ready": false
+  }
 }

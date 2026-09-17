@@ -32,13 +32,13 @@ function stage(name, details = {}) {
 function writeEmergencyReport(reason) {
   try {
     fs.writeFileSync(qaPath, JSON.stringify({
-      schema: 'life_ecosystem/chicken_r100_browser_qa@1.1',
-      version: 'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
+      schema: 'life_ecosystem/chicken_r100_browser_qa@1.3',
+      version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_CANDIDATE',
       passed: false,
       fatal: reason,
       diagnostics,
       truthBoundary: {
-        technicalMotionAndContactGateOnly: true,
+        technicalMotionContactTopologyGateOnly: true,
         manualMotionNaturalnessAcceptance: false,
         manualVisualAcceptance: false,
         singleAgentGroundingComplete: false,
@@ -114,6 +114,14 @@ async function captureAction(name, file, options = {}) {
         invariantPassed: runtime.skin?.lastInvariantReport?.passed === true,
         contactPoints: runtime.skin?.lastContactPoints || null,
         weightingRevision: runtime.skin?.weightingRevision || null,
+        topologyRevision: runtime.skin?.topologyRevision || null,
+        centerlineCurveRevision: runtime.skin?.centerlineCurveRevision || null,
+        logicalBoneCount: runtime.skin?.logicalBoneCount ?? runtime.skin?.boneCount ?? null,
+        skeletonBoneCount: runtime.skin?.skeletonBoneCount ?? null,
+        helperBoneCount: runtime.skin?.helperBoneCount ?? null,
+        neckShell: runtime.skin?.neckShell || null,
+        torso: runtime.skin?.torso || null,
+        frameAudit: runtime.skin?.lastFrameAudit || null,
         meshAudits: runtime.skin?.meshAudits || []
       };
     }, { name, options });
@@ -165,9 +173,13 @@ try {
       window.__CHICKEN_R100_PATCH__
       && window.__CHICKEN_R100_MANUAL_STEP__
       && window.__CHICKEN_R100_PECK_ADAPTER__?.installed === true
+      && window.__CHICKEN_R100_CENTERLINE_SWEEP__?.installed === true
       && api?.ready
       && api.diagnostics()?.manualStepAvailable
-      && api.diagnostics()?.skin?.peckKinematicsRevision === 'six-link-ring-coherent-s-curve-v3'
+      && api.diagnostics()?.skin?.peckKinematicsRevision === 'six-link-sector-gated-s-curve-v4'
+      && api.diagnostics()?.skin?.weightingRevision === 'anatomical-topology-split-and-centerline-sweep-v7'
+      && api.diagnostics()?.skin?.topologyRevision === 'anatomical-torso-neck-split-v7'
+      && api.diagnostics()?.skin?.centerlineCurveRevision === 'bone-centerline-pchip-volume-preserving-v1'
     );
   }, null, { timeout: 120_000 });
   stage('runtime-ready');
@@ -207,6 +219,7 @@ if (page) {
     patch: window.__CHICKEN_R100_PATCH__ || null,
     manualPatch: window.__CHICKEN_R100_MANUAL_STEP__ || null,
     peckAdapter: window.__CHICKEN_R100_PECK_ADAPTER__ || null,
+    centerlineSweep: window.__CHICKEN_R100_CENTERLINE_SWEEP__ || null,
     motion: window.__CHICKEN_PHASE1_MOTION__?.diagnostics() || null,
     errorOverlay: (() => {
       const node = document.querySelector('#error');
@@ -257,19 +270,41 @@ const forbiddenBodyBones = [
   'hip_l', 'knee_l', 'ankle_l', 'toe_l',
   'hip_r', 'knee_r', 'ankle_r', 'toe_r'
 ];
+const skin = runtime.motion?.skin || {};
+const neckShell = skin.neckShell || null;
+const torso = skin.torso || null;
+const peckFrameAudit = byRequest.peck?.frameAudit || null;
+const ringAreaRetained = Number.isFinite(peckFrameAudit?.ringAreaRatioMin)
+  && Number.isFinite(peckFrameAudit?.ringAreaRatioMax)
+  && Math.abs(peckFrameAudit.ringAreaRatioMin - 1) <= 1e-6
+  && Math.abs(peckFrameAudit.ringAreaRatioMax - 1) <= 1e-6;
+const curveLengthRatioStable = Number.isFinite(peckFrameAudit?.curveLengthRatio)
+  && peckFrameAudit.curveLengthRatio >= 0.90
+  && peckFrameAudit.curveLengthRatio <= 1.10;
+const neckShellValid = neckShell?.ringCount >= 25
+  && neckShell?.ringSize === 32
+  && neckShell?.vertexCount === neckShell.ringCount * neckShell.ringSize
+  && neckShell?.triangleCount === (neckShell.ringCount - 1) * neckShell.ringSize * 2;
+const torsoSplitValid = Number.isFinite(torso?.originalTriangleCount)
+  && Number.isFinite(torso?.retainedTriangleCount)
+  && torso.retainedTriangleCount > torso.originalTriangleCount * 0.45
+  && torso.retainedTriangleCount < torso.originalTriangleCount * 0.90;
 const checks = {
   noFatalException: fatal === null,
   patchLoaded: runtime.patch?.version === 'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
   manualStepLoaded: runtime.motion?.manualStepAvailable === true && runtime.manualPatch?.version === '1.1',
   peckAdapterLoaded: runtime.peckAdapter?.installed === true
-    && runtime.motion?.skin?.peckKinematicsRevision === 'six-link-ring-coherent-s-curve-v3',
+    && skin.peckKinematicsRevision === 'six-link-sector-gated-s-curve-v4',
+  centerlineSweepLoaded: runtime.centerlineSweep?.installed === true
+    && runtime.centerlineSweep?.version === 'anatomical-topology-split-and-centerline-sweep-v7',
   realtimePaused: runtime.motion?.realtimePaused === true,
   motionReady: runtime.motion?.ready === true,
-  boneCount: runtime.motion?.skin?.boneCount === 21,
-  distributedCervicalChainPresent: runtime.motion?.skin?.boneCount === 21,
-  skinnedMeshes: (runtime.motion?.skin?.skinnedMeshCount || 0) > 0,
-  poseApplied: (runtime.motion?.skin?.applyCount || 0) > 80,
-  rigInvariants: runtime.motion?.skin?.lastInvariantReport?.passed === true,
+  logicalBoneCount: skin.logicalBoneCount === 21 && skin.boneCount === 21,
+  helperBoneTruth: skin.skeletonBoneCount === 22 && skin.helperBoneCount === 1,
+  distributedCervicalChainPresent: skin.logicalBoneCount === 21,
+  skinnedMeshes: (skin.skinnedMeshCount || 0) > 0,
+  poseApplied: (skin.applyCount || 0) > 80,
+  rigInvariants: skin.lastInvariantReport?.passed === true,
   controllerErrors: (runtime.motion?.errors || []).length === 0,
   actionSequenceCompleted: diagnostics.actionFailures.length === 0
     && diagnostics.captures.length === expectedActionCount,
@@ -296,9 +331,15 @@ const checks = {
   bodyCarrierFreeOfLegPrimaries: bodyAudits.every((item) => (
     forbiddenBodyBones.every((id) => !item.primaryBoneCounts?.[id])
   )),
-  weightingRevision: runtime.motion?.skin?.weightingRevision
-    === 'ring-coherent-carrier-and-root-rigid-coat-v5',
-  groupTestStillClosed: runtime.patch?.groupTestAuthorized === false,
+  topologyRevision: skin.topologyRevision === 'anatomical-torso-neck-split-v7',
+  centerlineCurveRevision: skin.centerlineCurveRevision === 'bone-centerline-pchip-volume-preserving-v1',
+  weightingRevision: skin.weightingRevision === 'anatomical-topology-split-and-centerline-sweep-v7',
+  independentNeckShell: neckShellValid,
+  torsoNeckTopologySplit: torsoSplitValid,
+  rigidRingAreaRetained: ringAreaRetained,
+  centerlineLengthStableDuringPeck: curveLengthRatioStable,
+  groupTestStillClosed: runtime.patch?.groupTestAuthorized === false
+    && runtime.centerlineSweep?.groupTestAuthorized === false,
   errorOverlayHidden: runtime.errorOverlay?.display === 'none',
   canvasAllocated: (runtime.canvas?.width || 0) > 0 && (runtime.canvas?.height || 0) > 0,
   noPageErrors: diagnostics.pageErrors.length === 0,
@@ -307,13 +348,13 @@ const checks = {
   expectedCapturesWritten: expectedFiles.every((file) => fs.existsSync(path.join(evidenceDir, file)))
 };
 const report = {
-  schema: 'life_ecosystem/chicken_r100_browser_qa@1.2',
-  version: 'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
+  schema: 'life_ecosystem/chicken_r100_browser_qa@1.3',
+  version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_CANDIDATE',
   environment: {
     browser: 'Chrome headless via Playwright Core',
     url,
     viewport: [1280, 900],
-    captureMode: 'deterministic manual stepping and canvas-only evidence'
+    captureMode: 'deterministic manual stepping with V7 topology and centerline evidence'
   },
   contactTolerance: {
     bill: [-0.04, 0.07],
@@ -327,7 +368,7 @@ const report = {
   ...diagnostics,
   expectedFiles,
   truthBoundary: {
-    technicalMotionAndContactGateOnly: true,
+    technicalMotionContactTopologyGateOnly: true,
     manualMotionNaturalnessAcceptance: false,
     manualVisualAcceptance: false,
     singleAgentGroundingComplete: false,

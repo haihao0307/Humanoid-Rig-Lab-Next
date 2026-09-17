@@ -1,44 +1,54 @@
-# Chicken V4.6 R9.8.3 — Phase 1 Environmental NPC Intake
+# Chicken V4.6 R10.0 — Centerline Sweep V7 Single-Agent Candidate
 
 ## Active executable
 
-`CHICKEN_V46_R9_8_3_CLEAN_FACE.html`
+`CHICKEN_V46_R10_0_SINGLE_AGENT.html`
 
-## Current technical baseline
+## Current baseline
 
-R9.8.3 keeps the frozen R9.1 rollback, excludes the remaining legacy eye/ear-lobe artifacts from the candidate path, and embeds the short bill root farther into the face. Browser QA passed, but the whole visual gate remains open.
+R10.0 V7 replaces the rejected mixed-ring neck deformation with an anatomical topology split. The torso remains on the original body carrier, while the neck/head is rebuilt as an independent closed shell and transported over the posed cervical bone centerline with rigid per-ring frames.
 
-## Phase 1 direction
+The local topology and mathematics gate passes. A fresh browser run and manual visual review have not yet passed, so this is a candidate rather than an accepted production baseline.
 
-The project is now scoped as a lightweight environmental creature NPC rather than a full close-up anatomical reconstruction.
+## Priority remains fixed
 
-Priority is fixed as:
-
-1. morphology;
-2. motion;
+1. single-agent morphology;
+2. single-agent motion;
 3. grounding and collision;
 4. bounded individual variation;
-5. minimal behavior;
+5. small-group test;
 6. complex life activity later.
 
-Morphology will be frozen once the chicken reads correctly at gameplay distance and supports stable head, neck, leg and foot motion. The first motion set is idle, look, peck, walk, stop, stepped turn, short run and wing balance. A small herd is allowed only after the single-agent shape, motion and collision loop is stable.
+## Active revisions
 
-## Contracts
+```text
+weightingRevision=anatomical-topology-split-and-centerline-sweep-v7
+topologyRevision=anatomical-torso-neck-split-v7
+centerlineCurveRevision=bone-centerline-pchip-volume-preserving-v1
+```
 
-- `CHICKEN_PHASE1_ENVIRONMENT_NPC_SCOPE.md`
-- `data/CHICKEN_PHASE1_NPC_CONTRACT.json`
-- `06_NEXT_STAGE_PLAN.md`
+## Primary files
+
+- `R100_CENTERLINE_V7_IMPLEMENTATION.md`
+- `runtime/chicken_phase1_centerline_sweep_adapter.mjs`
+- `tools/chicken_r100_centerline_patch.js`
+- `tests/chicken_phase1_centerline_sweep_adapter.test.mjs`
+- `tools/verify_chicken_r100_centerline_v7.mjs`
+- `qa/CHICKEN_R100_CENTERLINE_V7_QA.json`
+- `evidence/r100/centerline_v7_prebrowser/`
 
 ## Current gates
 
 ```text
-technicalGatePassed=true
-wholeVisualGatePassed=false
-morphologyBaselineFrozen=false
-singleAgentMotionComplete=false
+localStaticGate=true
+localTopologyMathGate=true
+browserQAPassed=false
+manualMotionNaturalnessAcceptance=false
+manualVisualAcceptance=false
+singleAgentGroundingComplete=false
 singleAgentCollisionComplete=false
-smallHerdStable=false
-phase1EnvironmentNpcReady=false
+groupTestAuthorized=false
+productionReady=false
 ```
 
-Rig and Motion are no longer blocked by an unlimited close-up reconstruction requirement. They remain blocked only until the low-frequency gameplay-distance morphology gate is passed.
+The worst remaining technical risk is local longitudinal stretch at short transition edges. Passing numerical ring-area checks alone is not sufficient; the throat, head base and torso/neck seam still require browser and human visual inspection.
