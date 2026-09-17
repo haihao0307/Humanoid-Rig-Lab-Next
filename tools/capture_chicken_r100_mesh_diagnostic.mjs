@@ -33,9 +33,9 @@ await page.waitForFunction(() => {
     && api.diagnostics()?.manualStepAvailable
     && window.__CHICKEN_R100_CENTERLINE_SWEEP__?.installed === true
     && skin?.peckKinematicsRevision === 'six-link-sector-gated-s-curve-v4'
-    && skin?.weightingRevision === 'anatomical-topology-split-and-centerline-sweep-v7'
-    && skin?.topologyRevision === 'anatomical-torso-neck-split-v7'
-    && skin?.centerlineCurveRevision === 'bone-centerline-pchip-volume-preserving-v1'
+    && skin?.weightingRevision === 'anatomical-neck-root-preserving-centerline-sweep-v7.1'
+    && skin?.topologyRevision === 'torso-preserving-neck-root-split-v7.1'
+    && skin?.centerlineCurveRevision === 'rotation-minimizing-frame-centerline-v2'
     && window.__CHICKEN_R100_MESH_DEBUG__
   );
 }, null, { timeout: 120_000 });
@@ -82,7 +82,7 @@ async function capture(name, visible) {
 const all = inventory.map((item) => item.index);
 const body = inventory.filter((item) => item.kind === 'body').map((item) => item.index);
 const centerlineNeck = inventory
-  .filter((item) => item.component === 'anatomical_neck_centerline_shell_v7')
+  .filter((item) => item.component === 'anatomical_neck_root_preserving_shell_v7_1')
   .map((item) => item.index);
 const torso = body.filter((index) => !centerlineNeck.includes(index));
 const coat = inventory.filter((item) => item.kind === 'coat').map((item) => item.index);

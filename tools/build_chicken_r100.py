@@ -31,9 +31,9 @@ MARKER = 'CHICKEN_R100_SINGLE_AGENT_MOTION_PATCH'
 PECK_MARKER = 'CHICKEN_R100_PECK_ADAPTER_PATCH'
 CENTERLINE_MARKER = 'CHICKEN_R100_CENTERLINE_SWEEP_PATCH'
 MANUAL_MARKER = 'CHICKEN_R100_MANUAL_STEP_PATCH'
-V7_WEIGHTING = 'anatomical-topology-split-and-centerline-sweep-v7'
-V7_TOPOLOGY = 'anatomical-torso-neck-split-v7'
-V7_CURVE = 'bone-centerline-pchip-volume-preserving-v1'
+V7_WEIGHTING = 'anatomical-neck-root-preserving-centerline-sweep-v7.1'
+V7_TOPOLOGY = 'torso-preserving-neck-root-split-v7.1'
+V7_CURVE = 'rotation-minimizing-frame-centerline-v2'
 
 
 def sha(path: Path) -> str:
@@ -74,17 +74,17 @@ def build() -> dict:
     output = source.replace(ANCHOR, injected, 1)
     output = output.replace(
         '<title>Chicken R9.9.1 · Continuous Ring Refit Candidate</title>',
-        '<title>Chicken R10.0 · Centerline Sweep V7 Single Agent Candidate</title>',
+        '<title>Chicken R10.0 · Centerline Sweep V7.1 Single Agent Candidate</title>',
         1,
     )
     output = output.replace(
         '鸡 · R9.9.1 · 连续头颈环带候选',
-        '鸡 · R10.0 · 解剖拓扑拆分与中心线扫掠 V7',
+        '鸡 · R10.0 · 解剖拓扑拆分与中心线扫掠 V7.1',
         1,
     )
     output = output.replace(
         'R9.9.1：连续环带重排 · 尚未视觉验收',
-        'R10.0 V7：单只形态与基础行为候选 · 群体关闭',
+        'R10.0 V7.1：单只形态与基础行为候选 · 群体关闭',
         1,
     )
     OUTPUT.write_text(output, encoding='utf-8')
@@ -113,7 +113,7 @@ def build() -> dict:
 def write_params() -> None:
     write_json(PARAMS, {
         'schema': 'life_ecosystem/chicken_single_agent_runtime@1.1',
-        'version': 'V4.6_R10.0_CENTERLINE_SWEEP_V7_CANDIDATE',
+        'version': 'V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
         'morphology_source': 'V4.6_R9.9.1_CONTINUOUS_RING_REFIT_CANDIDATE',
         'active_entry': OUTPUT.name,
         'bone_order': [
@@ -131,7 +131,7 @@ def write_params() -> None:
             'articulated_skin': 'runtime/chicken_phase1_articulated_skin.mjs',
             'peck_adapter': 'runtime/chicken_phase1_peck_adapter.mjs',
             'sector_adapter_compatibility_layer': 'runtime/chicken_phase1_ring_coherent_adapter.mjs',
-            'centerline_sweep_adapter': 'runtime/chicken_phase1_centerline_sweep_adapter.mjs',
+            'centerline_sweep_adapter': 'runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs',
             'centerline_patch': 'tools/chicken_r100_centerline_patch.js',
             'manual_step': 'tools/chicken_r100_manual_step_patch.js',
             'root_motion_scale': 0.42,
@@ -140,7 +140,7 @@ def write_params() -> None:
             'topology_revision': V7_TOPOLOGY,
             'weighting_revision': V7_WEIGHTING,
             'centerline_curve_revision': V7_CURVE,
-            'neck_deformation': 'independent_closed_shell_rigid_ring_frames_over_pchip_bone_centerline',
+            'neck_deformation': 'torso_preserving_overlap_with_rmf_closed_shell_over_pchip_centerline',
             'contact_diagnostics': [
                 'bill_ground_error', 'left_foot_ground_error', 'right_foot_ground_error'
             ],
@@ -179,7 +179,7 @@ def write_static(build_info: dict) -> None:
             ROOT / 'runtime' / 'chicken_phase1_ring_coherent_adapter.mjs'
         ).exists(),
         'centerline_sweep_adapter_exists': (
-            ROOT / 'runtime' / 'chicken_phase1_centerline_sweep_adapter.mjs'
+            ROOT / 'runtime' / 'chicken_phase1_centerline_sweep_v71_adapter.mjs'
         ).exists(),
         'centerline_unit_test_exists': (
             ROOT / 'tests' / 'chicken_phase1_centerline_sweep_adapter.test.mjs'
@@ -189,11 +189,11 @@ def write_static(build_info: dict) -> None:
     }
     write_json(STATIC_QA, {
         'schema': 'life_ecosystem/chicken_r100_static_qa@1.1',
-        'version': 'V4.6_R10.0_CENTERLINE_SWEEP_V7_CANDIDATE',
+        'version': 'V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
         'checks': checks,
         'passed': all(checks.values()),
         'build': build_info,
-        'scope': 'deterministic build, source presence and local V7 topology evidence only',
+        'scope': 'deterministic build, source presence and local V7.1 topology evidence only',
         'truthBoundary': {
             'browserQAPassed': False,
             'manualVisualAcceptance': False,
@@ -223,7 +223,7 @@ def write_review() -> None:
     EVIDENCE.mkdir(parents=True, exist_ok=True)
     if browser_v7_ready():
         status = (
-            'V7 浏览器技术证据已经生成；但截图通过仍不等于动作自然或外观验收，'
+            'V7.1 浏览器技术证据已经生成；但截图通过仍不等于动作自然或外观验收，'
             '群体测试继续关闭。'
         )
         items = [
@@ -240,7 +240,7 @@ def write_review() -> None:
         ]
     else:
         status = (
-            'V7 已完成拓扑拆分、闭合颈头壳、骨中心线 PCHIP 与刚性环框架的本地数学候选；'
+            'V7.1 已完成拓扑拆分、闭合颈头壳、骨中心线 PCHIP 与刚性环框架的本地数学候选；'
             '尚未得到新的浏览器证据，也未通过人工视觉验收。'
         )
         items = [
@@ -254,7 +254,7 @@ def write_review() -> None:
         for title, src in items
     )
     REVIEW.write_text(
-        f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chicken R10.0 V7 单只行为审查板</title><style>*{{box-sizing:border-box}}body{{margin:0;background:#171f25;color:#eef3f2;font:14px/1.5 system-ui,-apple-system,Segoe UI,Microsoft Yahei,sans-serif}}header{{padding:24px;border-bottom:1px solid #34444b}}.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;padding:18px}}figure{{margin:0;background:#10181d;border:1px solid #35454c;border-radius:8px;overflow:hidden}}img{{width:100%;height:360px;object-fit:contain;background:#182127}}figcaption{{padding:10px 12px}}.gate{{margin:0 18px 22px;padding:14px;border-left:4px solid #c49b59;background:#232c31}}</style></head><body><header><h1>Chicken V4.6 R10.0 · Centerline Sweep V7</h1><p>{status}</p></header><main class="grid">{cards}</main><section class="gate">真实门槛：躯干不得随颈部折叠；颈头闭合壳不得退化为细杆；喙与双脚接触必须成立；固定骨长与环截面积必须保持；浏览器和人工视觉通过前，群体测试不启用。</section></body></html>''',
+        f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chicken R10.0 V7.1 单只行为审查板</title><style>*{{box-sizing:border-box}}body{{margin:0;background:#171f25;color:#eef3f2;font:14px/1.5 system-ui,-apple-system,Segoe UI,Microsoft Yahei,sans-serif}}header{{padding:24px;border-bottom:1px solid #34444b}}.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;padding:18px}}figure{{margin:0;background:#10181d;border:1px solid #35454c;border-radius:8px;overflow:hidden}}img{{width:100%;height:360px;object-fit:contain;background:#182127}}figcaption{{padding:10px 12px}}.gate{{margin:0 18px 22px;padding:14px;border-left:4px solid #c49b59;background:#232c31}}</style></head><body><header><h1>Chicken V4.6 R10.0 · Centerline Sweep V7.1</h1><p>{status}</p></header><main class="grid">{cards}</main><section class="gate">真实门槛：躯干不得随颈部折叠；颈头闭合壳不得退化为细杆；喙与双脚接触必须成立；固定骨长与环截面积必须保持；浏览器和人工视觉通过前，群体测试不启用。</section></body></html>''',
         encoding='utf-8',
     )
 
@@ -281,6 +281,7 @@ def write_manifest() -> None:
         ROOT / 'runtime' / 'chicken_phase1_peck_adapter.mjs',
         ROOT / 'runtime' / 'chicken_phase1_ring_coherent_adapter.mjs',
         ROOT / 'runtime' / 'chicken_phase1_centerline_sweep_adapter.mjs',
+        ROOT / 'runtime' / 'chicken_phase1_centerline_sweep_v71_adapter.mjs',
         ROOT / 'tests' / 'chicken_phase1_centerline_sweep_adapter.test.mjs',
         ROOT / 'tools' / 'verify_chicken_r100_centerline_v7.mjs',
         ROOT / '.github' / 'workflows' / 'chicken-r100-single-agent.yml',
@@ -298,7 +299,7 @@ def write_manifest() -> None:
     ]
     write_json(MANIFEST, {
         'schema': 'life_ecosystem/build_manifest@1.1',
-        'package': 'CHICKEN_V4_6_R10_0_CENTERLINE_SWEEP_V7_CANDIDATE',
+        'package': 'CHICKEN_V4_6_R10_0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
         'active_entry': OUTPUT.name,
         'weighting_revision': V7_WEIGHTING,
         'topology_revision': V7_TOPOLOGY,

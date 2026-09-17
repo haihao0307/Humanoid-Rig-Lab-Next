@@ -1,4 +1,4 @@
-name: Chicken R10.0 Centerline Sweep V7 Single Agent
+name: Chicken R10.0 Centerline Sweep V7.1 Single Agent
 
 on:
   push:
@@ -27,6 +27,7 @@ on:
       - runtime/chicken_phase1_peck_adapter.mjs
       - runtime/chicken_phase1_ring_coherent_adapter.mjs
       - runtime/chicken_phase1_centerline_sweep_adapter.mjs
+      - runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs
       - tests/chicken_phase1_articulated_skin.test.mjs
       - tests/chicken_phase1_centerline_sweep_adapter.test.mjs
       - CHICKEN_V46_R9_1.html
@@ -37,7 +38,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: chicken-r100-centerline-v7-single-agent
+  group: chicken-r100-centerline-v71-single-agent
   cancel-in-progress: true
 
 jobs:
@@ -58,7 +59,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Validate, test, audit and build V7
+      - name: Validate, test, audit and build V7.1
         run: bash tools/run_chicken_r100_centerline_v7_static.sh
 
       - name: Install Chrome
@@ -70,17 +71,17 @@ jobs:
       - name: Install Playwright Core
         run: npm install --no-save playwright-core@1.55.0
 
-      - name: Run V7 browser motion and topology QA
+      - name: Run V7.1 browser motion and topology QA
         env:
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
           CHICKEN_R100_URL: http://127.0.0.1:8765/CHICKEN_V46_R10_0_SINGLE_AGENT.html
         run: bash tools/run_chicken_r100_centerline_v7_browser.sh
 
-      - name: Upload R10.0 V7 single-agent evidence
+      - name: Upload R10.0 V7.1 single-agent evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: chicken-r100-centerline-v7-${{ github.run_number }}
+          name: chicken-r100-centerline-v71-${{ github.run_number }}
           path: |
             CHICKEN_V46_R10_0_SINGLE_AGENT.html
             CHICKEN_V46_R9_9_1_GAMEPLAY_HEAD.html
@@ -99,6 +100,7 @@ jobs:
             runtime/chicken_phase1_peck_adapter.mjs
             runtime/chicken_phase1_ring_coherent_adapter.mjs
             runtime/chicken_phase1_centerline_sweep_adapter.mjs
+            runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs
             tests/chicken_phase1_centerline_sweep_adapter.test.mjs
             tools/build_chicken_r100.py
             tools/chicken_r100_motion_patch.js

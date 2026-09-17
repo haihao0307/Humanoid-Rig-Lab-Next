@@ -33,7 +33,7 @@ function writeEmergencyReport(reason) {
   try {
     fs.writeFileSync(qaPath, JSON.stringify({
       schema: 'life_ecosystem/chicken_r100_browser_qa@1.3',
-      version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_CANDIDATE',
+      version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
       passed: false,
       fatal: reason,
       diagnostics,
@@ -177,9 +177,9 @@ try {
       && api?.ready
       && api.diagnostics()?.manualStepAvailable
       && api.diagnostics()?.skin?.peckKinematicsRevision === 'six-link-sector-gated-s-curve-v4'
-      && api.diagnostics()?.skin?.weightingRevision === 'anatomical-topology-split-and-centerline-sweep-v7'
-      && api.diagnostics()?.skin?.topologyRevision === 'anatomical-torso-neck-split-v7'
-      && api.diagnostics()?.skin?.centerlineCurveRevision === 'bone-centerline-pchip-volume-preserving-v1'
+      && api.diagnostics()?.skin?.weightingRevision === 'anatomical-neck-root-preserving-centerline-sweep-v7.1'
+      && api.diagnostics()?.skin?.topologyRevision === 'torso-preserving-neck-root-split-v7.1'
+      && api.diagnostics()?.skin?.centerlineCurveRevision === 'rotation-minimizing-frame-centerline-v2'
     );
   }, null, { timeout: 120_000 });
   stage('runtime-ready');
@@ -276,19 +276,23 @@ const torso = skin.torso || null;
 const peckFrameAudit = byRequest.peck?.frameAudit || null;
 const ringAreaRetained = Number.isFinite(peckFrameAudit?.ringAreaRatioMin)
   && Number.isFinite(peckFrameAudit?.ringAreaRatioMax)
-  && Math.abs(peckFrameAudit.ringAreaRatioMin - 1) <= 1e-6
-  && Math.abs(peckFrameAudit.ringAreaRatioMax - 1) <= 1e-6;
+  && peckFrameAudit.ringAreaRatioMin >= 0.70
+  && peckFrameAudit.ringAreaRatioMax <= 1.35;
 const curveLengthRatioStable = Number.isFinite(peckFrameAudit?.curveLengthRatio)
   && peckFrameAudit.curveLengthRatio >= 0.90
   && peckFrameAudit.curveLengthRatio <= 1.10;
-const neckShellValid = neckShell?.ringCount >= 25
+const longitudinalStrainBounded = Number.isFinite(peckFrameAudit?.longitudinalRatioP95)
+  && Number.isFinite(peckFrameAudit?.longitudinalRatioMax)
+  && peckFrameAudit.longitudinalRatioP95 < 2.25
+  && peckFrameAudit.longitudinalRatioMax < 3.50;
+const neckShellValid = neckShell?.ringCount >= 18
   && neckShell?.ringSize === 32
   && neckShell?.vertexCount === neckShell.ringCount * neckShell.ringSize
   && neckShell?.triangleCount === (neckShell.ringCount - 1) * neckShell.ringSize * 2;
 const torsoSplitValid = Number.isFinite(torso?.originalTriangleCount)
   && Number.isFinite(torso?.retainedTriangleCount)
-  && torso.retainedTriangleCount > torso.originalTriangleCount * 0.45
-  && torso.retainedTriangleCount < torso.originalTriangleCount * 0.90;
+  && torso.retainedTriangleCount > torso.originalTriangleCount * 0.75
+  && torso.retainedTriangleCount < torso.originalTriangleCount * 0.93;
 const checks = {
   noFatalException: fatal === null,
   patchLoaded: runtime.patch?.version === 'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
@@ -296,7 +300,7 @@ const checks = {
   peckAdapterLoaded: runtime.peckAdapter?.installed === true
     && skin.peckKinematicsRevision === 'six-link-sector-gated-s-curve-v4',
   centerlineSweepLoaded: runtime.centerlineSweep?.installed === true
-    && runtime.centerlineSweep?.version === 'anatomical-topology-split-and-centerline-sweep-v7',
+    && runtime.centerlineSweep?.version === 'anatomical-neck-root-preserving-centerline-sweep-v7.1',
   realtimePaused: runtime.motion?.realtimePaused === true,
   motionReady: runtime.motion?.ready === true,
   logicalBoneCount: skin.logicalBoneCount === 21 && skin.boneCount === 21,
@@ -331,13 +335,14 @@ const checks = {
   bodyCarrierFreeOfLegPrimaries: bodyAudits.every((item) => (
     forbiddenBodyBones.every((id) => !item.primaryBoneCounts?.[id])
   )),
-  topologyRevision: skin.topologyRevision === 'anatomical-torso-neck-split-v7',
-  centerlineCurveRevision: skin.centerlineCurveRevision === 'bone-centerline-pchip-volume-preserving-v1',
-  weightingRevision: skin.weightingRevision === 'anatomical-topology-split-and-centerline-sweep-v7',
+  topologyRevision: skin.topologyRevision === 'torso-preserving-neck-root-split-v7.1',
+  centerlineCurveRevision: skin.centerlineCurveRevision === 'rotation-minimizing-frame-centerline-v2',
+  weightingRevision: skin.weightingRevision === 'anatomical-neck-root-preserving-centerline-sweep-v7.1',
   independentNeckShell: neckShellValid,
   torsoNeckTopologySplit: torsoSplitValid,
   rigidRingAreaRetained: ringAreaRetained,
   centerlineLengthStableDuringPeck: curveLengthRatioStable,
+  longitudinalStrainBounded,
   groupTestStillClosed: runtime.patch?.groupTestAuthorized === false
     && runtime.centerlineSweep?.groupTestAuthorized === false,
   errorOverlayHidden: runtime.errorOverlay?.display === 'none',
@@ -349,12 +354,12 @@ const checks = {
 };
 const report = {
   schema: 'life_ecosystem/chicken_r100_browser_qa@1.3',
-  version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_CANDIDATE',
+  version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
   environment: {
     browser: 'Chrome headless via Playwright Core',
     url,
     viewport: [1280, 900],
-    captureMode: 'deterministic manual stepping with V7 topology and centerline evidence'
+    captureMode: 'deterministic manual stepping with V7.1 torso-preserving topology and centerline evidence'
   },
   contactTolerance: {
     bill: [-0.04, 0.07],

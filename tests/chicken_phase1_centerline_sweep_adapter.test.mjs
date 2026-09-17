@@ -3,16 +3,20 @@ import fs from 'node:fs';
 import {
   CHICKEN_PHASE1_CENTERLINE_SWEEP_REVISION,
   CHICKEN_PHASE1_CENTERLINE_CURVE_REVISION,
+  CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X,
+  CHICKEN_PHASE1_NECK_SHELL_START_X,
   buildChickenPhase1AnatomicalNeckShell,
   computeChickenPhase1NeckSectorGate,
   createChickenPhase1Pchip,
   createChickenPhase1ArcLengthMap,
   filterChickenPhase1TorsoTriangles,
   phaseAlignChickenPhase1ClosedRings
-} from '../runtime/chicken_phase1_centerline_sweep_adapter.mjs';
+} from '../runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs';
 
-assert.equal(CHICKEN_PHASE1_CENTERLINE_SWEEP_REVISION, 'anatomical-topology-split-and-centerline-sweep-v7');
-assert.equal(CHICKEN_PHASE1_CENTERLINE_CURVE_REVISION, 'bone-centerline-pchip-volume-preserving-v1');
+assert.equal(CHICKEN_PHASE1_CENTERLINE_SWEEP_REVISION, 'anatomical-neck-root-preserving-centerline-sweep-v7.1');
+assert.equal(CHICKEN_PHASE1_CENTERLINE_CURVE_REVISION, 'rotation-minimizing-frame-centerline-v2');
+assert.equal(CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X, 0.2835);
+assert.equal(CHICKEN_PHASE1_NECK_SHELL_START_X, 0.255);
 
 const html = fs.readFileSync(new URL('../CHICKEN_V46_R9_9_1_GAMEPLAY_HEAD.html', import.meta.url), 'utf8');
 function decodeFloat(id) {
@@ -59,11 +63,11 @@ positions.set([xs[xs.length - 1], centers[centers.length - 2], centers[centers.l
 
 const shell = buildChickenPhase1AnatomicalNeckShell(positions);
 assert.equal(shell.ringSize, 32);
-assert.ok(shell.ringCount >= 25, `expected substantial neck/head shell, got ${shell.ringCount}`);
+assert.ok(shell.ringCount >= 18, `expected substantial upper-neck/head shell, got ${shell.ringCount}`);
 assert.equal(shell.positions.length, shell.ringCount * shell.ringSize * 3);
 assert.equal(shell.indices.length, (shell.ringCount - 1) * shell.ringSize * 6);
 assert.ok([...shell.positions].every(Number.isFinite));
-assert.ok(shell.stationXs[0] >= 0.075 - 1e-6);
+assert.ok(shell.stationXs[0] >= CHICKEN_PHASE1_NECK_SHELL_START_X - 1e-6);
 assert.ok(shell.stationXs.at(-1) > 0.42);
 
 const torso = filterChickenPhase1TorsoTriangles(positions, indices);
@@ -78,7 +82,7 @@ for (let i = 0; i < torso.length; i += 3) {
     maxGate = Math.max(maxGate, computeChickenPhase1NeckSectorGate(positions[q], positions[q + 1]));
   }
   meanX /= 3;
-  assert.ok(maxGate < 0.72 + 1e-6 || meanX < 0.085 + 1e-6);
+  assert.ok(maxGate < 0.72 + 1e-6 || meanX < CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X + 1e-6);
 }
 
 const pchip = createChickenPhase1Pchip(

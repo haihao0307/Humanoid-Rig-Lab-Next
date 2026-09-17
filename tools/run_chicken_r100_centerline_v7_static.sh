@@ -16,6 +16,7 @@ node --check runtime/chicken_phase1_articulated_skin.mjs
 node --check runtime/chicken_phase1_peck_adapter.mjs
 node --check runtime/chicken_phase1_ring_coherent_adapter.mjs
 node --check runtime/chicken_phase1_centerline_sweep_adapter.mjs
+node --check runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs
 node --test tests/chicken_phase1_npc_controller.test.mjs
 node --test tests/chicken_phase1_articulated_skin.test.mjs
 node --test tests/chicken_phase1_centerline_sweep_adapter.test.mjs

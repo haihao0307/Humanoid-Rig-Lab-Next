@@ -1,6 +1,6 @@
 // CHICKEN_R100_CENTERLINE_SWEEP_PATCH
 (function installChickenR100CenterlineSweep(){
- import('./runtime/chicken_phase1_centerline_sweep_adapter.mjs').then(adapterModule=>{
+ import('./runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs').then(adapterModule=>{
   let attempts=0;
   const timer=setInterval(()=>{
    attempts++;
@@ -21,8 +21,8 @@
    const previousInstall=runtime.installSkin.bind(runtime);
    runtime.installSkin=()=>{previousInstall();wrap();};
    window.__CHICKEN_R100_CENTERLINE_SWEEP__=Object.freeze({
-    version:'anatomical-topology-split-and-centerline-sweep-v7',
-    curve:'bone-centerline-pchip-volume-preserving-v1',
+    version:'anatomical-neck-root-preserving-centerline-sweep-v7.1',
+    curve:'rotation-minimizing-frame-centerline-v2',
     installed:true,
     groupTestAuthorized:false
    });

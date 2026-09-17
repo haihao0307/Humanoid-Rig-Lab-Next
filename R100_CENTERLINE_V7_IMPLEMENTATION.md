@@ -1,79 +1,76 @@
-# Chicken R10.0 Centerline Sweep V7 — Implementation and Truth Boundary
+# Chicken R10.0 Centerline Sweep V7.1 — Implementation and Truth Boundary
 
-## Why V7 exists
+## Why V7.1 exists
 
-The rejected V5/V6 path assumed that vertices sharing the same longitudinal sweep coordinate belonged to one anatomical ring. That assumption is false for the current radial carrier: a single `x` station can contain lower breast, upper thorax, neck and head vertices at the same time. The consequence is structural rather than cosmetic. When the cervical chain bends, conventional linear blend skinning can drag thorax vertices into the neck and can collapse the neck into a thin rod.
+V7 correctly identified that the old radial carrier mixed torso, neck and head vertices in the same longitudinal station. It therefore split the neck/head into a separate closed shell and transported that shell over the cervical centerline.
 
-V7 therefore changes topology instead of adding more corrective rotations to the same mixed carrier.
+The first V7 browser evidence nevertheless failed visually. The cut started around `x≈0.086`, where the source rings still represented the full body cross-section. Removing their dorsal sector opened a large vertical hole in the torso. During pecking, frame/tangent offsets also allowed neighbouring rings to overtake one another, producing a long folded surface sheet. The CI pass proved only that the expected revision strings, contacts and numerical ring checks existed; it did not prove a usable chicken.
 
-## Implemented architecture
+V7.1 addresses those structural causes rather than hiding them with more pose rotations.
+
+## Implemented V7.1 architecture
 
 1. The original body carrier remains the torso source.
-2. High neck/head sector triangles are removed from the torso carrier.
-3. A separate closed 32-sample neck/head shell is rebuilt from 32 longitudinal stations.
-4. The shell is deformed along the posed cervical bone centerline:
-   - control points come from `neck_base` through `head`;
-   - PCHIP interpolation provides a smooth centerline;
-   - bind and posed stations are matched by normalized arc length;
-   - each shell ring is transported by a rigid local frame;
-   - ring cross-section area is therefore preserved by construction.
-5. One identity helper bone is added only to satisfy the Three.js `SkinnedMesh` shader path. Diagnostics report both the 21 logical motion bones and the 22 actual skeleton bones.
+2. The independent neck/head shell now begins at `x=0.255` instead of inside the middle torso.
+3. The torso remains intact until `x=0.2835`, giving a controlled `0.0285` overlap over two source stations rather than an open vertical cut.
+4. The shell root follows the chest rigidly and blends into the cervical sweep over the first 28% of shell length.
+5. The cervical surface uses a sign-continuous rotation-minimising transported frame.
+6. Per-ring tangent offsets are discarded; normalized centerline arc length controls longitudinal placement.
+7. Ring centre normal/lateral offsets are smoothed over neighbouring stations, while each ring profile remains unchanged.
+8. Browser diagnostics now report actual median, P95 and maximum longitudinal edge-length ratios for the rendered peck pose.
+9. One identity helper bone is still used only for the Three.js `SkinnedMesh` path; the motion rig remains 21 logical bones.
 
 Active implementation:
 
-- `runtime/chicken_phase1_centerline_sweep_adapter.mjs`
+- `runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs`
 - `tools/chicken_r100_centerline_patch.js`
 - `tests/chicken_phase1_centerline_sweep_adapter.test.mjs`
 - `tools/verify_chicken_r100_centerline_v7.mjs`
+- `tools/capture_chicken_r100.mjs`
 
 Revision identifiers:
 
 ```text
-weightingRevision=anatomical-topology-split-and-centerline-sweep-v7
-topologyRevision=anatomical-torso-neck-split-v7
-centerlineCurveRevision=bone-centerline-pchip-volume-preserving-v1
+weightingRevision=anatomical-neck-root-preserving-centerline-sweep-v7.1
+topologyRevision=torso-preserving-neck-root-split-v7.1
+centerlineCurveRevision=rotation-minimizing-frame-centerline-v2
 ```
 
-## Local mathematical evidence
+## Local structural evidence
 
-The deterministic audit currently reports:
+The deterministic V7.1 audit currently reports:
 
 ```text
 original carrier: 72 × 96 radial sweep, 6,914 vertices, 13,824 triangles
-independent neck shell: 32 rings × 32 samples, 1,024 vertices, 1,984 triangles
-torso retained: 10,216 triangles (73.9005%)
-retained neck-sector triangle violations: 0
-normalized arc-length round-trip error: 2.78e-17
-prototype peck/bind centerline length ratio: 0.92428
-rigid ring area ratio: approximately 1.0
-radial edge ratio: approximately 1.0
+independent neck shell: 20 rings × 32 samples, 640 vertices, 1,216 triangles
+torso retained: 11,480 triangles (83.04398%)
+torso/shell overlap: 0.0285 x-units
+retained post-boundary neck-sector triangle violations: 0
+normalized arc-length round-trip error: below 0.005
 ```
 
-These numbers prove only that the topology split is deterministic, the shell is closed, the torso no longer contains the removed cervical sector, and rigid ring transport preserves the cross-section.
+These numbers prove that the new split is deterministic, the shell is closed, the torso is no longer cut through its central body region, and the two surfaces have a bounded transition overlap. They do not prove that the rendered seam, silhouette or motion is visually acceptable.
 
-## Known unresolved defect
+## Required V7.1 browser gates
 
-The prototype still contains high local longitudinal stretch around very short transition edges. The stored prototype distribution reaches approximately `5.47×` on the worst sampled edge. This does not invalidate the topology split, but it prevents any claim that V7 is visually complete. The next browser run must inspect the throat-to-head transition and the torso/neck seam for bunching, gaps, self-intersection and excessive elongation.
-
-## Required browser gates
-
-A new V7 browser build must prove all of the following before visual review:
+A fresh browser build must prove all of the following before human visual review:
 
 - logical bone count `21`;
 - actual skeleton bone count `22`;
 - helper bone count `1`;
-- V7 topology, weighting and curve revision strings present;
-- one independent neck shell detected;
-- torso triangle count reduced but still above 45% of the source;
-- peck frame ring-area ratio remains `1 ± 1e-6`;
+- V7.1 topology, weighting and frame revision strings are active;
+- exactly one independent neck shell is detected;
+- the torso retains between 75% and 93% of source triangles;
+- peck-frame rendered ring-area ratio remains within `0.70–1.35`;
 - peck centerline length ratio remains within `0.90–1.10`;
+- peck longitudinal edge ratio has `P95 < 2.25` and `maximum < 3.50`;
 - bill and support-foot contacts remain inside tolerance;
 - fixed-bone-length invariant remains true;
-- no console, page or request failures.
+- no console, page or request failures occur.
 
-A technical browser pass will still not constitute manual visual approval.
+Even a technical pass will not constitute manual visual approval. The rendered peck, side view, isolated torso and isolated neck shell must still be inspected for gaps, doubled surfaces, self-intersection, a vertical body cut, excessive stretching and head/comb detachment.
 
-## Gates
+## Current gates
 
 ```text
 localStaticGate=true
@@ -87,4 +84,4 @@ groupTestAuthorized=false
 productionReady=false
 ```
 
-Group testing remains prohibited. The next accepted milestone is a single chicken whose torso, neck/head shell, feet and bill remain coherent through idle, look, peck, walk, turn, short run, wing balance and stop.
+Group testing remains prohibited. The next accepted milestone is one chicken whose torso, neck/head shell, bill, feet and external head parts remain coherent through idle, look, peck, walk, turn, short run, wing balance and stop.

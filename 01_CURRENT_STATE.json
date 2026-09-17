@@ -1,14 +1,14 @@
 {
-  "schema": "life_ecosystem/chicken_current_state@1.1",
-  "updated_at": "2026-09-16T13:30:00Z",
+  "schema": "life_ecosystem/chicken_current_state@1.2",
+  "updated_at": "2026-09-17T09:32:53Z",
   "branch": "chat/chicken-phase1-continuation-20260916",
-  "version": "V4.6_R10.0_CENTERLINE_SWEEP_V7_CANDIDATE",
+  "version": "V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE",
   "active_entry": "CHICKEN_V46_R10_0_SINGLE_AGENT.html",
   "morphology_source": "V4.6_R9.9.1_CONTINUOUS_RING_REFIT_CANDIDATE",
   "revisions": {
-    "weighting": "anatomical-topology-split-and-centerline-sweep-v7",
-    "topology": "anatomical-torso-neck-split-v7",
-    "centerline_curve": "bone-centerline-pchip-volume-preserving-v1",
+    "weighting": "anatomical-neck-root-preserving-centerline-sweep-v7.1",
+    "topology": "torso-preserving-neck-root-split-v7.1",
+    "centerline_curve": "rotation-minimizing-frame-centerline-v2",
     "peck_kinematics": "six-link-sector-gated-s-curve-v4"
   },
   "single_agent": {
@@ -26,33 +26,41 @@
       "wing_balance"
     ],
     "neck_shell": {
-      "ring_count": 32,
+      "ring_count": 20,
       "ring_size": 32,
-      "vertex_count": 1024,
-      "triangle_count": 1984
+      "vertex_count": 640,
+      "triangle_count": 1216,
+      "start_x": 0.255
     },
     "torso": {
       "source_triangle_count": 13824,
-      "retained_triangle_count": 10216,
-      "retained_fraction": 0.7390046296296297,
+      "retained_triangle_count": 11480,
+      "retained_fraction": 0.8304398148148148,
+      "preserve_before_x": 0.2835,
+      "torso_shell_overlap_x": 0.0285,
       "retained_neck_sector_violations": 0
     }
+  },
+  "previous_v7_evidence": {
+    "technical_workflow_passed": true,
+    "manual_visual_acceptance": false,
+    "decisive_failure": "The topology cut removed the upper torso and the peck pose folded the neck carrier into a long surface sheet."
   },
   "verified": {
     "source_syntax": true,
     "unit_tests": true,
     "deterministic_build": true,
     "topology_math_audit": true,
-    "browser_qa_v7": false,
+    "browser_qa_v7_1": false,
     "manual_visual_acceptance": false,
     "single_agent_collision": false,
     "group_test": false
   },
   "known_blockers": [
-    "A fresh browser render of V7 has not been captured.",
-    "Prototype longitudinal transition edges still show high local stretch, with a sampled maximum near 5.47x.",
-    "The throat-to-head transition and torso/neck seam require manual visual review.",
-    "Single-agent collision and obstacle response remain incomplete."
+    "A fresh browser render of V7.1 has not yet been captured.",
+    "The actual V7.1 peck-pose longitudinal P95 and maximum strain still need browser measurement.",
+    "The throat-to-head transition and torso/neck overlap require manual visual review.",
+    "Single-agent collision, obstacle detour and blocked-task recovery remain incomplete."
   ],
   "truth_boundary": {
     "local_static_gate": true,

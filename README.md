@@ -1,4 +1,4 @@
-# Chicken V4.6 R10.0 — Centerline Sweep V7 Single-Agent Candidate
+# Chicken V4.6 R10.0 — Centerline Sweep V7.1 Single-Agent Candidate
 
 ## Active executable
 
@@ -6,15 +6,24 @@
 
 ## Current baseline
 
-R10.0 V7 replaces the rejected mixed-ring neck deformation with an anatomical topology split. The torso remains on the original body carrier, while the neck/head is rebuilt as an independent closed shell and transported over the posed cervical bone centerline with rigid per-ring frames.
+The previous V7 workflow passed its numerical and browser automation gates, but the evidence exposed a decisive visual failure: the topology cut began inside the upper torso, and the peck pose pulled the detached neck surface into a long folded sheet. Therefore “CI passed” was not treated as visual acceptance.
 
-The local topology and mathematics gate passes. A fresh browser run and manual visual review have not yet passed, so this is a candidate rather than an accepted production baseline.
+V7.1 keeps the independent neck/head shell, but changes the attachment logic:
+
+- the shell starts only at the anatomical upper-neck emergence;
+- the torso is preserved farther forward, creating a short controlled overlap instead of a vertical open cut;
+- the shell root follows the chest rigidly before blending into the cervical sweep;
+- the transported frame uses sign-continuous rotation-minimising transport;
+- per-ring tangent offsets are removed;
+- browser QA now measures actual longitudinal edge strain during the peck pose.
+
+Local syntax, unit, topology and deterministic-build gates pass. A fresh V7.1 browser run and manual visual review are still required, so this remains a candidate rather than a frozen morphology baseline.
 
 ## Priority remains fixed
 
-1. single-agent morphology;
-2. single-agent motion;
-3. grounding and collision;
+1. single-agent morphology and topology;
+2. single-agent motion naturalness;
+3. grounding, collision and blocked-task recovery;
 4. bounded individual variation;
 5. small-group test;
 6. complex life activity later.
@@ -22,20 +31,20 @@ The local topology and mathematics gate passes. A fresh browser run and manual v
 ## Active revisions
 
 ```text
-weightingRevision=anatomical-topology-split-and-centerline-sweep-v7
-topologyRevision=anatomical-torso-neck-split-v7
-centerlineCurveRevision=bone-centerline-pchip-volume-preserving-v1
+weightingRevision=anatomical-neck-root-preserving-centerline-sweep-v7.1
+topologyRevision=torso-preserving-neck-root-split-v7.1
+centerlineCurveRevision=rotation-minimizing-frame-centerline-v2
 ```
 
 ## Primary files
 
 - `R100_CENTERLINE_V7_IMPLEMENTATION.md`
-- `runtime/chicken_phase1_centerline_sweep_adapter.mjs`
+- `runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs`
 - `tools/chicken_r100_centerline_patch.js`
 - `tests/chicken_phase1_centerline_sweep_adapter.test.mjs`
 - `tools/verify_chicken_r100_centerline_v7.mjs`
+- `tools/capture_chicken_r100.mjs`
 - `qa/CHICKEN_R100_CENTERLINE_V7_QA.json`
-- `evidence/r100/centerline_v7_prebrowser/`
 
 ## Current gates
 
@@ -51,4 +60,4 @@ groupTestAuthorized=false
 productionReady=false
 ```
 
-The worst remaining technical risk is local longitudinal stretch at short transition edges. Passing numerical ring-area checks alone is not sufficient; the throat, head base and torso/neck seam still require browser and human visual inspection.
+The current largest risk is no longer simple ring collapse. It is whether the torso/neck overlap remains visually coherent through a deep peck while the longitudinal surface strain stays bounded. Numerical contact or topology checks alone cannot approve the result.

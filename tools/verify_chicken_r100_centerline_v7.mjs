@@ -5,12 +5,14 @@ import assert from 'node:assert/strict';
 import {
   CHICKEN_PHASE1_CENTERLINE_SWEEP_REVISION,
   CHICKEN_PHASE1_CENTERLINE_CURVE_REVISION,
+  CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X,
+  CHICKEN_PHASE1_NECK_SHELL_START_X,
   buildChickenPhase1AnatomicalNeckShell,
   computeChickenPhase1NeckSectorGate,
   createChickenPhase1Pchip,
   createChickenPhase1ArcLengthMap,
   filterChickenPhase1TorsoTriangles
-} from '../runtime/chicken_phase1_centerline_sweep_adapter.mjs';
+} from '../runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs';
 
 const root = process.cwd();
 const htmlPath = path.join(root, 'CHICKEN_V46_R9_9_1_GAMEPLAY_HEAD.html');
@@ -129,10 +131,10 @@ for (let i = 0; i < torso.length; i += 3) {
     meanX += x;
     const gate = computeChickenPhase1NeckSectorGate(x, y);
     maxGate = Math.max(maxGate, gate);
-    if (gate >= 0.72 && x >= 0.085) retainedHighGateVertices++;
+    if (gate >= 0.72 && x >= CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X) retainedHighGateVertices++;
   }
   meanX /= 3;
-  if (maxGate >= 0.72 && meanX >= 0.085) torsoGateViolations++;
+  if (maxGate >= 0.72 && meanX >= CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X) torsoGateViolations++;
 }
 
 const bindCurve = createChickenPhase1Pchip(
@@ -179,17 +181,20 @@ const prototypeLongitudinal = prototype?.longitudinalEdgeRatio || [];
 
 const checks = {
   revisionMatches: CHICKEN_PHASE1_CENTERLINE_SWEEP_REVISION
-    === 'anatomical-topology-split-and-centerline-sweep-v7',
+    === 'anatomical-neck-root-preserving-centerline-sweep-v7.1',
   curveRevisionMatches: CHICKEN_PHASE1_CENTERLINE_CURVE_REVISION
-    === 'bone-centerline-pchip-volume-preserving-v1',
-  shellHasSubstantialCoverage: shell.ringCount >= 25,
+    === 'rotation-minimizing-frame-centerline-v2',
+  shellHasSubstantialCoverage: shell.ringCount >= 18,
   shellUsesClosedThirtyTwoSampleRings: shell.ringSize === 32,
   shellIndexCountValid: shell.indices.length === (shell.ringCount - 1) * shell.ringSize * 6,
   shellFinite: [...shell.positions].every(Number.isFinite),
   shellPositiveCrossSections: ringAreas.every((value) => value > 1e-5),
   shellNoCollapsedStations: longitudinalEdges.every((value) => value > 1e-6),
-  torsoRetainsMajority: torso.length > carrier.indices.length * 0.45,
-  torsoRemovesIndependentNeckSector: torso.length < carrier.indices.length * 0.90,
+  torsoRetainsMajority: torso.length > carrier.indices.length * 0.70,
+  torsoRemovesIndependentNeckSector: torso.length < carrier.indices.length * 0.93,
+  torsoAndShellHaveControlledOverlap:
+    CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X > CHICKEN_PHASE1_NECK_SHELL_START_X
+    && CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X - CHICKEN_PHASE1_NECK_SHELL_START_X <= 0.05,
   torsoGateViolationCountZero: torsoGateViolations === 0,
   normalizedArcRoundTripStable: Math.max(...normalizedArcRoundTrip) < 0.005,
   prototypeRigidRingAreaPreserved: prototypeRingArea.length > 0
@@ -204,19 +209,19 @@ const longitudinalP95 = prototypeLongitudinal.length ? quantile(prototypeLongitu
 const longitudinalMax = prototypeLongitudinal.length ? Math.max(...prototypeLongitudinal) : null;
 if (longitudinalMax !== null && longitudinalMax > 1.6) {
   warnings.push(
-    'Prototype longitudinal edges still show high local stretch on short transition edges; browser/manual visual approval must remain false.'
+    'The archived V7 prototype showed high longitudinal stretch. V7.1 must be judged from its fresh browser edge audit; manual visual approval remains false.'
   );
 }
 warnings.push(
-  'This audit validates topology, closed cross-sections, rigid-ring preservation and arc-length mapping only; it does not validate the rendered silhouette or motion naturalness.'
+  'This audit validates the V7.1 topology split, controlled torso/shell overlap, closed cross-sections and arc-length mapping only; it does not validate the rendered silhouette or motion naturalness.'
 );
 
 const report = {
-  schema: 'life_ecosystem/chicken_r100_centerline_v7_qa@1.0',
-  version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_CANDIDATE',
+  schema: 'life_ecosystem/chicken_r100_centerline_v7_qa@1.1',
+  version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
   revisions: {
     weightingRevision: CHICKEN_PHASE1_CENTERLINE_SWEEP_REVISION,
-    topologyRevision: 'anatomical-torso-neck-split-v7',
+    topologyRevision: 'torso-preserving-neck-root-split-v7.1',
     centerlineCurveRevision: CHICKEN_PHASE1_CENTERLINE_CURVE_REVISION
   },
   checks,
@@ -233,6 +238,7 @@ const report = {
     vertexCount: shell.positions.length / 3,
     triangleCount: shell.indices.length / 3,
     stationXRange: [shell.stationXs[0], shell.stationXs.at(-1)],
+    configuredShellStartX: CHICKEN_PHASE1_NECK_SHELL_START_X,
     crossSectionArea: {
       min: Math.min(...ringAreas),
       median: quantile(ringAreas, 0.5),
@@ -255,7 +261,9 @@ const report = {
     retainedTriangleCount: torso.length / 3,
     retainedFraction: torso.length / carrier.indices.length,
     gateViolationTriangleCount: torsoGateViolations,
-    retainedHighGateVertexReferences: retainedHighGateVertices
+    retainedHighGateVertexReferences: retainedHighGateVertices,
+    preserveBeforeX: CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X,
+    shellOverlapX: CHICKEN_PHASE1_TORSO_PRESERVE_BEFORE_X - CHICKEN_PHASE1_NECK_SHELL_START_X
   },
   centerline: {
     bindCurveLength: bindArc.totalLength,
@@ -265,7 +273,7 @@ const report = {
     interpolation: 'PCHIP',
     stationMapping: 'normalized arclength'
   },
-  prototypeEvidence: prototype ? {
+  legacyV7PrototypeEvidence: prototype ? {
     ringAreaRatio: prototypeRingArea,
     radialEdgeRatio: prototypeRadial,
     longitudinalEdgeRatio: prototypeLongitudinal,
@@ -288,7 +296,7 @@ const report = {
 fs.mkdirSync(path.dirname(qaPath), { recursive: true });
 fs.writeFileSync(qaPath, JSON.stringify(report, null, 2) + '\n');
 fs.writeFileSync(localTestPath, JSON.stringify({
-  schema: 'life_ecosystem/chicken_r100_centerline_v7_local_tests@1.0',
+  schema: 'life_ecosystem/chicken_r100_centerline_v7_local_tests@1.1',
   passed: report.passed,
   commands: [
     'node --check runtime/chicken_phase1_centerline_sweep_adapter.mjs',
@@ -303,4 +311,4 @@ fs.writeFileSync(localTestPath, JSON.stringify({
 }, null, 2) + '\n');
 
 console.log(JSON.stringify(report, null, 2));
-assert.equal(report.passed, true, 'V7 local topology audit failed');
+assert.equal(report.passed, true, 'V7.1 local topology audit failed');
