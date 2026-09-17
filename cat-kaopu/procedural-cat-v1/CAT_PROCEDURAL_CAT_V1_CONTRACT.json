@@ -1,0 +1,96 @@
+{
+  "schema": "cat_kaopu/procedural_cat_contract@1.0",
+  "buildId": "cat-procedural-body-v1-p0-20260917",
+  "status": "active-development",
+  "goal": "build our own fully parameterized and procedural domestic-cat body, material, bind reference and runtime derivatives without shipping any third-party animal mesh or image texture",
+  "coordinateSystem": {
+    "units": "meter",
+    "handedness": "right",
+    "forward": "+X",
+    "left": "+Y",
+    "up": "+Z",
+    "ground": 0.0
+  },
+  "ownershipBoundary": {
+    "finalGeometry": "generated from first-party equations and CatDNA only",
+    "finalTexture": "generated procedurally from CatDNA only",
+    "externalReferenceUse": "measurement and anatomical evidence only; never loaded by the runtime",
+    "externalAnimalMeshAtRuntime": false,
+    "externalImageTextureAtRuntime": false,
+    "boneScalingInPoseOrAnimation": false
+  },
+  "authoringRepresentation": {
+    "stage": "continuous implicit field",
+    "productionTarget": "deterministic stable-topology surface carrier generated from an approved CatDNA revision",
+    "connectedComponents": 1,
+    "requiredRegions": [
+      "cranium",
+      "muzzle",
+      "mandible",
+      "pinnae",
+      "neck",
+      "scapular-thoracic-sling",
+      "thorax",
+      "abdomen",
+      "lumbar",
+      "pelvis",
+      "forelimbs",
+      "hindlimbs",
+      "forepaws",
+      "hindpaws",
+      "tail-root",
+      "tail"
+    ]
+  },
+  "parameterization": {
+    "sourceOfTruth": "CatDNA JSON",
+    "deterministic": true,
+    "seededVariation": true,
+    "allDimensionsInMeters": true,
+    "categories": [
+      "global",
+      "torso",
+      "neck",
+      "head",
+      "forelimb",
+      "hindlimb",
+      "paws",
+      "tail",
+      "coat",
+      "material"
+    ],
+    "constraintRule": "raw values are normalized through anatomical ranges before geometry, skeleton, collision, material or motion systems read them"
+  },
+  "derivedOutputs": [
+    "authoring SDF",
+    "continuous body surface",
+    "anatomical joint anchors",
+    "collision proxies",
+    "procedural coat fields",
+    "morphology metrics",
+    "future stable-topology carrier inputs"
+  ],
+  "acceptanceOrder": [
+    "parameter contract",
+    "neutral standing morphology",
+    "procedural material",
+    "stable topology",
+    "bind and weights",
+    "deformation stress",
+    "core motion",
+    "single-cat collision",
+    "group and breed variation"
+  ],
+  "deferredUntilBodyApproval": [
+    "life activities",
+    "navigation",
+    "group runtime",
+    "breed library",
+    "expensive strand fur",
+    "fine facial animation"
+  ],
+  "visualAcceptance": false,
+  "bindAcceptance": false,
+  "motionAcceptance": false,
+  "productionReady": false
+}
