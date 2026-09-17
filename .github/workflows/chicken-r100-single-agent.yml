@@ -1,4 +1,4 @@
-name: Chicken R10.0 Single Agent Behavior
+name: Chicken R10.0 Centerline Sweep V7 Single Agent
 
 on:
   push:
@@ -6,34 +6,44 @@ on:
       - chat/chicken-phase1-continuation-20260916
     paths:
       - .github/workflows/chicken-r100-single-agent.yml
+      - README.md
+      - 01_CURRENT_STATE.json
+      - R100_CENTERLINE_V7_IMPLEMENTATION.md
       - tools/build_chicken_r100.py
       - tools/chicken_r100_motion_patch.js
       - tools/chicken_r100_peck_patch.js
+      - tools/chicken_r100_centerline_patch.js
       - tools/chicken_r100_manual_step_patch.js
       - tools/capture_chicken_r100.mjs
       - tools/capture_chicken_r100_mesh_diagnostic.mjs
+      - tools/verify_chicken_r100_centerline_v7.mjs
+      - tools/verify_chicken_r100_centerline_v7_gate.py
+      - tools/run_chicken_r100_centerline_v7_static.sh
+      - tools/run_chicken_r100_centerline_v7_browser.sh
       - tools/build_chicken_r991.py
       - tools/chicken_r991_override.js
       - runtime/chicken_phase1_npc_controller.mjs
       - runtime/chicken_phase1_articulated_skin.mjs
       - runtime/chicken_phase1_peck_adapter.mjs
       - runtime/chicken_phase1_ring_coherent_adapter.mjs
+      - runtime/chicken_phase1_centerline_sweep_adapter.mjs
       - tests/chicken_phase1_articulated_skin.test.mjs
-      - tests/chicken_phase1_ring_coherent_adapter.test.mjs
+      - tests/chicken_phase1_centerline_sweep_adapter.test.mjs
       - CHICKEN_V46_R9_1.html
+      - evidence/r100/centerline_v7_prebrowser/**
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: chicken-r100-single-agent
+  group: chicken-r100-centerline-v7-single-agent
   cancel-in-progress: true
 
 jobs:
   unit-browser-and-evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 16
     steps:
       - name: Check out working branch
         uses: actions/checkout@v4
@@ -48,26 +58,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Validate source and runtime modules
-        shell: bash
-        run: |
-          python -m py_compile tools/build_chicken_r991.py tools/build_chicken_r100.py
-          node --check tools/chicken_r991_override.js
-          node --check tools/chicken_r100_motion_patch.js
-          node --check tools/chicken_r100_peck_patch.js
-          node --check tools/chicken_r100_manual_step_patch.js
-          node --check tools/capture_chicken_r100.mjs
-          node --check tools/capture_chicken_r100_mesh_diagnostic.mjs
-          node --check runtime/chicken_phase1_npc_controller.mjs
-          node --check runtime/chicken_phase1_articulated_skin.mjs
-          node --check runtime/chicken_phase1_peck_adapter.mjs
-          node --check runtime/chicken_phase1_ring_coherent_adapter.mjs
-          node --test tests/chicken_phase1_npc_controller.test.mjs
-          node --test tests/chicken_phase1_articulated_skin.test.mjs
-          node --test tests/chicken_phase1_ring_coherent_adapter.test.mjs
-
-      - name: Build deterministic single-agent workbench
-        run: python tools/build_chicken_r100.py
+      - name: Validate, test, audit and build V7
+        run: bash tools/run_chicken_r100_centerline_v7_static.sh
 
       - name: Install Chrome
         id: chrome
@@ -78,65 +70,27 @@ jobs:
       - name: Install Playwright Core
         run: npm install --no-save playwright-core@1.55.0
 
-      - name: Run browser motion QA and capture states
+      - name: Run V7 browser motion and topology QA
         env:
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
           CHICKEN_R100_URL: http://127.0.0.1:8765/CHICKEN_V46_R10_0_SINGLE_AGENT.html
-        shell: bash
-        run: |
-          python -m http.server 8765 > /tmp/chicken-r100-http.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill $SERVER_PID || true' EXIT
-          sleep 2
-          timeout --signal=TERM --kill-after=15s 240s node tools/capture_chicken_r100.mjs
-          timeout --signal=TERM --kill-after=15s 180s node tools/capture_chicken_r100_mesh_diagnostic.mjs
+        run: bash tools/run_chicken_r100_centerline_v7_browser.sh
 
-      - name: Refresh manifest after browser QA
-        run: python tools/build_chicken_r100.py
-
-      - name: Verify technical gates and truth boundary
-        shell: bash
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          required=[
-            Path('CHICKEN_V46_R10_0_SINGLE_AGENT.html'),
-            Path('data/CHICKEN_R100_SINGLE_AGENT_PARAMETERS.json'),
-            Path('qa/CHICKEN_R100_STATIC_QA.json'),
-            Path('qa/CHICKEN_R100_BROWSER_QA.json'),
-            Path('BUILD_MANIFEST_R100.json'),
-            Path('evidence/r100/R100_BEHAVIOR_REVIEW_BOARD.html'),
-            Path('evidence/r100/R100_PECK_ISO_BODY.png'),
-            Path('evidence/r100/R100_PECK_ISO_COAT.png')
-          ]
-          missing=[str(path) for path in required if not path.exists() or path.stat().st_size==0]
-          if missing: raise SystemExit(f'Missing R10.0 files: {missing}')
-          for path in [Path('qa/CHICKEN_R100_STATIC_QA.json'),Path('qa/CHICKEN_R100_BROWSER_QA.json')]:
-            data=json.loads(path.read_text(encoding='utf-8'))
-            if not data.get('passed'): raise SystemExit(f'QA failed: {path}')
-          browser=json.loads(Path('qa/CHICKEN_R100_BROWSER_QA.json').read_text(encoding='utf-8'))
-          boundary=browser.get('truthBoundary',{})
-          if boundary.get('groupTestAuthorized') is not False:
-            raise SystemExit('Group testing must remain closed')
-          skin=browser.get('runtime',{}).get('motion',{}).get('skin',{})
-          if skin.get('peckKinematicsRevision')!='six-link-ring-coherent-s-curve-v3':
-            raise SystemExit('Ring-coherent six-link peck rig was not active in browser QA')
-          if skin.get('weightingRevision')!='ring-coherent-carrier-and-root-rigid-coat-v5':
-            raise SystemExit('Ring-coherent body and root-rigid coat weighting was not active')
-          print('R10.0 technical single-agent gate passed with ring-coherent carrier. Manual naturalness, collision and group gates remain open.')
-          PY
-
-      - name: Upload R10.0 single-agent evidence
+      - name: Upload R10.0 V7 single-agent evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: chicken-r100-single-agent-${{ github.run_number }}
+          name: chicken-r100-centerline-v7-${{ github.run_number }}
           path: |
             CHICKEN_V46_R10_0_SINGLE_AGENT.html
             CHICKEN_V46_R9_9_1_GAMEPLAY_HEAD.html
+            README.md
+            01_CURRENT_STATE.json
+            R100_CENTERLINE_V7_IMPLEMENTATION.md
             data/CHICKEN_R100_SINGLE_AGENT_PARAMETERS.json
             qa/CHICKEN_R100_STATIC_QA.json
+            qa/CHICKEN_R100_CENTERLINE_V7_QA.json
+            qa/CHICKEN_R100_CENTERLINE_V7_LOCAL_TESTS.json
             qa/CHICKEN_R100_BROWSER_QA.json
             evidence/r100
             BUILD_MANIFEST_R100.json
@@ -144,13 +98,19 @@ jobs:
             runtime/chicken_phase1_articulated_skin.mjs
             runtime/chicken_phase1_peck_adapter.mjs
             runtime/chicken_phase1_ring_coherent_adapter.mjs
-            tests/chicken_phase1_ring_coherent_adapter.test.mjs
+            runtime/chicken_phase1_centerline_sweep_adapter.mjs
+            tests/chicken_phase1_centerline_sweep_adapter.test.mjs
             tools/build_chicken_r100.py
             tools/chicken_r100_motion_patch.js
             tools/chicken_r100_peck_patch.js
+            tools/chicken_r100_centerline_patch.js
             tools/chicken_r100_manual_step_patch.js
             tools/capture_chicken_r100.mjs
             tools/capture_chicken_r100_mesh_diagnostic.mjs
+            tools/verify_chicken_r100_centerline_v7.mjs
+            tools/verify_chicken_r100_centerline_v7_gate.py
+            tools/run_chicken_r100_centerline_v7_static.sh
+            tools/run_chicken_r100_centerline_v7_browser.sh
             /tmp/chicken-r100-http.log
           if-no-files-found: warn
           retention-days: 7
