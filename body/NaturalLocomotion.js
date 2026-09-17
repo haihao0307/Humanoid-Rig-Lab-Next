@@ -203,10 +203,13 @@ class ContinuousMotionPhase {
   }else{
    this.target=null;this.error=0;desiredVelocity=active?clamp(this.velocity||.8,.45,1.35):0;
   }
-  const maximumAcceleration=active?5.5:4.0;
+  // Correct phase by changing its rate, not by subtracting this frame's
+  // displacement. A negative contact error used to cancel the entire advance
+  // and freeze the shoulders while the legs kept moving.
+  if(this.target!=null)desiredVelocity+=clamp(this.error*6,-desiredVelocity*.65,desiredVelocity*.65);
+  const maximumAcceleration=active?(desiredVelocity<this.velocity?12:5.5):4.0;
   this.velocity+=clamp(desiredVelocity-this.velocity,-maximumAcceleration*dt,maximumAcceleration*dt);
-  const correction=this.target==null?0:this.error*(1-Math.exp(-dt/.10));
-  const previous=this.phase;this.phase=Math.max(previous,previous+Math.max(0,this.velocity)*dt+correction);
+  const previous=this.phase;this.phase+=Math.max(0,this.velocity)*dt;
   this.maximumStep=Math.max(this.maximumStep,this.phase-previous);
   // FullBodyMotion remains the source sampler. Hide the discrete swing event
   // only while it samples, then restore the scheduler-owned contact state.
@@ -219,7 +222,7 @@ class ContinuousMotionPhase {
   state.swing=actualSwing;state.speed=actualSpeed;state.motion.phase=this.phase;this.wasActive=active;
   this.coordinateBody(state,dt);
  }
- report(){return{phaseUnwrapped:this.phase,phase:this.phase-Math.floor(this.phase),phaseVelocityCyclesPerS:this.velocity,contactTarget:this.target,phaseError:this.error,phaseOffset:this.phaseOffset,contactCorrections:this.contactCorrections,maximumStep:this.maximumStep,bodyResponse:{drive:this.drive,headLeadRad:this.headLead,chestLeadRad:this.chestLead},method:'continuous-phase-contact-calibration/v3'};}
+ report(){return{phaseUnwrapped:this.phase,phase:this.phase-Math.floor(this.phase),phaseVelocityCyclesPerS:this.velocity,worldPhaseVelocityCyclesPerS:this.velocity*this.timeScale,contactTarget:this.target,phaseError:this.error,phaseOffset:this.phaseOffset,contactCorrections:this.contactCorrections,maximumStep:this.maximumStep,bodyResponse:{drive:this.drive,headLeadRad:this.headLead,chestLeadRad:this.chestLead},method:'contact-rate-phase/v4'};}
 }
 class TurnCommandFilter {
  constructor(){this.reset(0);}
@@ -280,11 +283,46 @@ class NaturalLocomotion {
    return[side,{heel:[0,-this.rig.ankleHeight+.0005,-.045*scale],forefoot:[0,-this.rig.ankleHeight+.0005,toe+.006*scale]}];
   }));
   const stepFeet=this.engine.stepFeet.bind(this.engine);
-  this.engine.stepFeet=(state,dt)=>{stepFeet(state,dt);this.adaptSwingClearance(state);if(this.usesFlatSupport())this.adaptSwingAnkle(state);this.adaptFootRocker(state,dt);};
+  this.engine.stepFeet=(state,dt)=>{
+   const freeWalk=!this.usesFlatSupport(state)&&state.speed>.03&&!Object.values(state.feet).some(foot=>foot.adoptedOrientation);
+   if(freeWalk&&!state.swing)this.beginWalkingStep(state);
+   // The kernel's absolute stance-distance score also selects a newly landed
+   // leading foot. Free gait releases a trailing foot; the kernel still owns
+   // interpolation, contact commit and all other support modes.
+   if(state.swing||!freeWalk)stepFeet(state,dt);
+   this.adaptSwingClearance(state);if(this.usesFlatSupport(state))this.adaptSwingAnkle(state);this.adaptFootRocker(state,dt);
+  };
   this.world=new MotionLabWorld(agent);this.engine.world=this.world;
   this.phaseController=new ContinuousMotionPhase(this.engine);this.turnFilter=new TurnCommandFilter();
   this.pose=new MotionLabPose(agent.h,this.engine);agent.h.motionDriver=this.pose;
   this.resetFromPose();
+ }
+ beginWalkingStep(state){
+  // Change stride length AND cadence at reduced world speed. Scaling the
+  // entire kernel clock alone produced normal-length steps in slow motion.
+  // Keep each swing's duration/target fixed once released.
+  const strideScale=Math.sqrt(clamp(this.tempo,.05,1)),duration=.36*strideScale;
+  const releaseDistance=(state.metrics.steps===state.walkingStartStep?.075:.095)*strideScale;
+  const candidates=['left','right'].map(side=>{
+   const foot=state.feet[side],relative=rotate(inv(qy(state.yaw)),sub(foot.position,this.engine.stance(state,side)));
+   return{side,behind:-relative[2],turn:Math.abs(angleDiff(state.yaw,foot.yaw))};
+  }).filter(c=>c.behind>releaseDistance||c.turn>.10);
+  candidates.sort((a,b)=>(a.side===state.nextFoot?-1:1)-(b.side===state.nextFoot?-1:1)||b.behind-a.behind);
+  if(!candidates.length)return;
+  const side=candidates[0].side,foot=state.feet[side],command=state.command;
+  const heading=command?.type==='walk'?Math.atan2(command.target[0]-state.root[0],command.target[2]-state.root[2]):state.yaw;
+  // Land into the curve, with a bounded preview of the requested heading.
+  // Only the free foot changes orientation; planted feet keep their anchors.
+  let placementYaw=state.yaw+clamp(angleDiff(heading,state.yaw),-.24,.24);
+  let target=this.engine.stance({...state,yaw:placementYaw},side,state.speed*.38*strideScale);
+  let path=this.engine.world.sweep(foot.position,target,.045);
+  if((path.blocked||!this.engine.world.free(target,.045))&&placementYaw!==state.yaw){
+   placementYaw=state.yaw;target=this.engine.stance(state,side,state.speed*.38*strideScale);
+   path=this.engine.world.sweep(foot.position,target,.045);
+  }
+  if(path.blocked||!this.engine.world.free(target,.045))throw Error('落脚路径受阻，需重新规划');
+  state.swing={side,from:[...foot.position],target,fromYaw:foot.yaw,yaw:placementYaw,elapsed:0,duration,walkingStrideScale:strideScale};
+  foot.contact=false;
  }
  adaptSwingClearance(state){
   const swing=state.swing;if(!swing||state.feet[swing.side].adoptedOrientation)return;
@@ -637,6 +675,9 @@ class NaturalLocomotion {
  }
  move(dt,speed=.48){
   const a=this.a,state=this.engine.state,pace=a.manipulationPace();this.turnFilter.reset(state.yaw);
+  // Release the first foot before the pelvis has travelled a full steady
+  // trailing distance. Otherwise its first landing absorbs a deep crouch.
+  if(this.kernelSettled())state.walkingStartStep=state.metrics.steps;
   if(a.held&&pace<.08){this.tempo=1;this.stop();return a.routeIndex<a.route.length||!this.isSettled();}
   this.tempo=clamp(speed/.48*(a.strength?.movementFactor()??1)*pace,.05,1);
   if(this.canContinuousTaskHandoff()){if(!a.pendingPhysicsFinish)a.finish();return true;}

@@ -11,7 +11,7 @@ if(process.env.HUMANLAB_SOFTWARE_GL==='1')args.push('--use-angle=swiftshader','-
 const browser=await chromium.launch({headless:true,args,...(process.env.CHROME_BIN?{executablePath:process.env.CHROME_BIN}:{})});
 const page=await browser.newPage({viewport:{width:1100,height:760}}),pageErrors=[],results=[];
 page.on('pageerror',error=>pageErrors.push(String(error)));
-let startup=null,crowd=null,failure=null;
+let startup=null,crowd=null,failure=null,benchmark=null;
 try{
  await page.goto(process.env.HUMANLAB_URL||'http://127.0.0.1:4173/index.html?qa=1',{waitUntil:'domcontentloaded',timeout:120000});
  await page.waitForFunction(()=>{const w=document.querySelector('#bodyFrame')?.contentWindow;return w?.HumanLab?.population?.list().length>=2||w?.__startupError;},null,{timeout:480000});
@@ -72,8 +72,49 @@ try{
  });
  assert.equal(crowd.actors.length,6);for(const a of crowd.actors){assert.equal(a.completed,1);assert(a.ready);}
  assert(results.at(-1).floorSamples>0);assert(results.at(-1).loweredFloorSamples>0);assert(results.at(-1).maxFloorGapM<1e-6);
- assert.equal(pageErrors.length,0);console.log('PASS '+JSON.stringify({actions:results.length,simultaneousGestures:crowd.actors.length,pageErrors:0,visualAcceptance:false,crowdPerformanceMeasured:false}));
+ if(process.env.MOTION_BENCHMARK==='1'){
+  console.log('BENCHMARK preparing 8 actor scene');
+  await page.evaluate(async()=>{const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,p=lab.population;lab.setAuto(false);
+   while(p.list().length<8)await p.spawn(p.definitionFor(p.active));
+   // A fresh empty benchmark fixture; no actor inherits a smoke-test route
+   // close to a boundary. World geometry and traffic checks stay enabled.
+   lab.world.applyPreset('empty');
+   p.focus(p.list().map(a=>a.id));lab.setAuto(false);
+  });
+  benchmark=await page.evaluate(()=>{
+   const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,p=lab.population,ids=p.list().map(a=>a.id),gl=lab.renderer.canvas.getContext('webgl2'),runs=[];
+   const quantile=(values,q)=>[...values].sort((a,b)=>a-b)[Math.floor((values.length-1)*q)];
+   for(const movers of [1,4,8]){
+    p.control('stop','all');lab.setAuto(false);lab.advance(5);
+    ids.forEach((id,i)=>p.place(p.get(id),[-3.5+i,0,-1.2],0));p.focus(ids);
+    const dispatch=p.dispatch('向前走2米',{targets:ids.slice(0,movers),mode:'replace'});lab.setAuto(false);
+    if(dispatch.some(r=>!r.accepted))throw Error('benchmark dispatch rejected: '+JSON.stringify(dispatch));
+    let prepared=false;
+    for(let i=0;i<240;i++){
+     p.tick(1/60);
+     for(const actor of p.values())if(actor.agent.error)throw Error(actor.id+': '+actor.agent.error);
+     if(ids.slice(0,movers).every(id=>{const a=p.get(id).agent;return a.phase==='walk'&&a.pos[2]>-1.1;})){prepared=true;break;}
+    }
+    if(!prepared)throw Error('benchmark actors did not start walking');
+    const tick=[],render=[],total=[],errors=new Set();
+    const distanceBefore=ids.map(id=>[...p.get(id).agent.pos]);let minWalkingActors=movers;
+    for(let i=0;i<140;i++){
+     const start=performance.now();p.tick(1/60);const simulated=performance.now();lab.render();gl.finish();const completed=performance.now();
+     if(i>=20){tick.push(simulated-start);render.push(completed-simulated);total.push(completed-start);}
+     minWalkingActors=Math.min(minWalkingActors,ids.slice(0,movers).filter(id=>p.get(id).agent.phase==='walk').length);
+     for(const actor of p.values())if(actor.agent.error)errors.add(actor.id+': '+actor.agent.error);
+    }
+    runs.push({movers,minWalkingActors,renderedActors:ids.length,awakeActors:ids.length,samples:total.length,simulationStepS:1/60,
+     horizontalDisplacementM:ids.slice(0,movers).map((id,i)=>{const p1=p.get(id).agent.pos,p0=distanceBefore[i];return Math.hypot(p1[0]-p0[0],p1[2]-p0[2]);}),
+     simulationP50Ms:quantile(tick,.5),simulationP95Ms:quantile(tick,.95),renderAndGPUWaitP50Ms:quantile(render,.5),totalP50Ms:quantile(total,.5),totalP95Ms:quantile(total,.95),errors:[...errors]});
+   }
+   return{scope:'Fixed empty eight-actor scene, all awake, with 1/4/8 confirmed walking actors; headless synchronous simulation and render completion, not display FPS or capacity certification',runs};
+  });
+  console.log('BENCHMARK '+JSON.stringify(benchmark));
+  for(const run of benchmark.runs){assert.deepEqual(run.errors,[]);assert.equal(run.minWalkingActors,run.movers);assert(run.horizontalDisplacementM.every(d=>d>.5));}
+ }
+ assert.equal(pageErrors.length,0);console.log('PASS '+JSON.stringify({actions:results.length,simultaneousGestures:crowd.actors.length,pageErrors:0,visualAcceptance:false,crowdPerformanceMeasured:!!benchmark}));
 }catch(error){failure=String(error);console.error('FAIL '+failure);process.exitCode=1;
  try{console.error('STATE '+JSON.stringify(await page.evaluate(()=>{const w=document.querySelector('#bodyFrame')?.contentWindow,lab=w?.HumanLab;return{startup:w?.__humanStartup,startupError:w?.__startupError,population:lab?.population?.list().length,error:lab?.agent?.error,basic:lab?.agent?.basic?.report(),pose:lab?.agent?.locomotion?.pose.report()};})));}catch{}
 }
-finally{await writeFile(join(out,'motion-browser-results.json'),JSON.stringify({startup,results,crowd,pageErrors,failure,visualAcceptance:false},null,2));await browser.close();}
+finally{await writeFile(join(out,'motion-browser-results.json'),JSON.stringify({startup,results,crowd,benchmark,pageErrors,failure,visualAcceptance:false},null,2));await browser.close();}

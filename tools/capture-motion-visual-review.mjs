@@ -5,7 +5,7 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright-core');
 const out=process.env.MOTION_QA_DIR;if(!out)throw Error('MOTION_QA_DIR must point outside the repository');
-const continuous=process.env.MOTION_QA_SEQUENCE==='continuous',gaitSequence=process.env.MOTION_QA_SEQUENCE==='gait',minimumActors=(gaitSequence||continuous)?1:6;
+const chain=process.env.MOTION_QA_SEQUENCE==='chain',continuous=process.env.MOTION_QA_SEQUENCE==='continuous'||chain,gaitSequence=process.env.MOTION_QA_SEQUENCE==='gait',minimumActors=(gaitSequence||continuous)?1:6;
 await mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN,args:['--no-sandbox','--enable-webgl','--ignore-gpu-blocklist']});
 const page=await browser.newPage({viewport:{width:1100,height:760}}),records=[],errors=[];
@@ -46,10 +46,34 @@ try{
   }
  }
  async function advance(seconds){await page.evaluate(seconds=>{const l=document.querySelector('#bodyFrame').contentWindow.HumanLab;l.advance(seconds);for(const a of l.population.values())if(a.agent.error)throw Error(a.id+': '+a.agent.error);},seconds);}
- async function command(id,text){return page.evaluate(({id,text})=>{const l=document.querySelector('#bodyFrame').contentWindow.HumanLab;return l.population.dispatch(text,{targets:[id],mode:'replace'});},{id,text});}
+ async function command(id,text){return page.evaluate(({id,text})=>{
+  const l=document.querySelector('#bodyFrame').contentWindow.HumanLab;
+  const result=text==='停止'?l.population.control('stop',[id]):l.population.dispatch(text,{targets:[id],mode:'replace'});
+  l.setAuto(false);if(result.some(r=>!r.accepted))throw Error('QA command rejected: '+JSON.stringify(result));return result;
+ },{id,text});}
  for(const actor of actors)await capture(actor,'stand');
  const lead=actors[0];
- if(continuous){
+ if(chain){
+  const sample=async(name,count)=>{for(let i=1;i<=count;i++){await advance(1/30);await capture(lead,name+'-'+String(i).padStart(3,'0'));}};
+  const ready=async()=>{await advance(6);const state=await page.evaluate(id=>{const a=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent;return{ready:a.activity().readyForTask,error:a.error};},lead.id);if(state.error||!state.ready)throw Error('chain did not settle: '+JSON.stringify(state));};
+  await command(lead.id,'向前走2米');await sample('start',60);
+  await command(lead.id,'停止');await sample('stop',75);
+  await page.evaluate(id=>{const a=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent;
+   if(a.plan||a.phase!=='idle'||!a.activity().readyForTask)throw Error('stop command did not cancel and settle the walk');
+  },lead.id);await ready();
+  // Exercise the public locomotion speed argument; no source/scheduler patch.
+  await page.evaluate(id=>{const l=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent.locomotion,move=l.move;l.qaMove=move;l.move=function(dt,speed=.48){return move.call(this,dt,speed*.375);};},lead.id);
+  await command(lead.id,'向前走1米');await sample('slow',240);await ready();
+  await page.evaluate(id=>{const l=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent.locomotion;l.move=l.qaMove;delete l.qaMove;},lead.id);
+  await command(lead.id,'向左转90度');await sample('turn',135);await ready();
+  await command(lead.id,'向前走2米');await advance(1/120);
+  // A controlled route fixture supplied at the task/motion boundary. Keep
+  // world collision, traffic and the production executor enabled.
+  await page.evaluate(id=>{const a=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent,[x,,z]=a.pos,yaw=a.yaw;
+   a.route=Array.from({length:9},(_,i)=>{const t=(i+1)*Math.PI/20,lx=1.2*(1-Math.cos(t)),lz=1.2*Math.sin(t);return[x+lx*Math.cos(yaw)+lz*Math.sin(yaw),0,z-lx*Math.sin(yaw)+lz*Math.cos(yaw)];});a.routeIndex=0;a.skill.endPosition=[...a.route.at(-1)];a.locomotion.requestKey=null;
+  },lead.id);
+  await sample('curve',180);await ready();await capture(lead,'chain-settled');
+ }else if(continuous){
   await command(lead.id,'向前走3米');
   for(let i=1;i<=240;i++){await advance(1/30);await capture(lead,'continuous-'+String(i).padStart(3,'0'));}
   await advance(6);await capture(lead,'walk-settled');
