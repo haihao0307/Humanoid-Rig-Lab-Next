@@ -99,9 +99,11 @@ jobs:
           git add cat-kaopu/qa/recovery-r1
           if git diff --cached --quiet; then
             echo 'No Recovery R1 evidence changes to commit.'
+            git restore cat-kaopu/tools/capture_cat_body_motion_recovery_r1.mjs
             exit 0
           fi
           git commit -m 'test(cat): archive Recovery R1 fixed evidence [recovery-r1 evidence]'
+          git restore cat-kaopu/tools/capture_cat_body_motion_recovery_r1.mjs
           for attempt in 1 2 3; do
             if git push origin "HEAD:${GITHUB_REF_NAME}"; then
               exit 0
