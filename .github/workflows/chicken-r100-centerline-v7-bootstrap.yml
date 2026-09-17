@@ -42,6 +42,16 @@ jobs:
           base64 -d /tmp/chicken-v7.b64 > /tmp/chicken-v7.tar.gz
           echo '35820836f8f0c0c70d5769b445a7709fe599af1f4a937759b85b1aed24d12d47  /tmp/chicken-v7.tar.gz' | sha256sum -c -
           tar -xzf /tmp/chicken-v7.tar.gz
+          python - <<'PYFIX'
+          from pathlib import Path
+          path = Path('tools/run_chicken_r100_centerline_v7_static.sh')
+          text = path.read_text(encoding='utf-8')
+          marker = 'set -euo pipefail\n\n'
+          line = 'python tools/build_chicken_r991.py\n'
+          if line not in text:
+              text = text.replace(marker, marker + line, 1)
+              path.write_text(text, encoding='utf-8')
+          PYFIX
 
       - name: Validate, test, audit and build V7
         run: bash tools/run_chicken_r100_centerline_v7_static.sh
