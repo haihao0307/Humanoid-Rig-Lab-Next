@@ -1,0 +1,54 @@
+name: Cat Body Reference Intake V1
+
+on:
+  push:
+    branches:
+      - codex/cat-body-bind-v1-20260917
+    paths:
+      - .github/workflows/cat-body-reference-intake.yml
+      - cat-kaopu/reference-intake/**
+      - cat-kaopu/tools/extract_cat_reference_profile.py
+      - cat-kaopu/tools/test_cat_reference_profile.py
+      - cat-kaopu/docs/CAT_BODY_REFERENCE_INTAKE_V1_2026-09-17.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout body branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile reference tools
+        run: |
+          python -m py_compile \
+            cat-kaopu/tools/extract_cat_reference_profile.py \
+            cat-kaopu/tools/test_cat_reference_profile.py
+
+      - name: Run synthetic reference profile test
+        run: python cat-kaopu/tools/test_cat_reference_profile.py
+
+      - name: Validate contracts and source registry
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('cat-kaopu/reference-intake')
+          contract = json.loads((root/'CAT_BODY_REFERENCE_INTAKE_CONTRACT.json').read_text())
+          sources = json.loads((root/'REFERENCE_SOURCES.json').read_text())
+          assert contract['schema'] == 'cat_kaopu/body_reference_intake_contract@1.0'
+          assert contract['inputPolicy']['authorizedDownloadOnly'] is True
+          assert contract['inputPolicy']['rawReferenceIncludedInDistribution'] is False
+          assert any(item['id'] == 'edinburgh-domestic-cat-ct-skeleton' for item in sources['sources'])
+          assert all(item['runtimeDistribution'] is False for item in sources['sources'])
+          print({'contract': contract['schema'], 'sourceCount': len(sources['sources']), 'status': 'pass'})
+          PY
