@@ -70,7 +70,7 @@ const grid=new THREE.GridHelper(1.8,36,0x2d7f91,0x15343e);grid.rotation.x=Math.P
 const defaults={thorax:1,abdomen:1,pelvis:1,head:1,muzzle:1,limbs:1,paws:1,ears:1};const params={...defaults};
 const bounds={minX:-.64,maxX:.54,minY:-.225,maxY:.225,minZ:-.025,maxZ:.57};const resolution=86;
 const coatMaterial=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.78,metalness:0,side:THREE.DoubleSide});
-const body=new MarchingCubes(resolution,coatMaterial,false,false,520000);body.isolation=0;body.scale.set((bounds.maxX-bounds.minX)/2,(bounds.maxY-bounds.minY)/2,(bounds.maxZ-bounds.minZ)/2);body.position.set((bounds.maxX+bounds.minX)/2,(bounds.maxY+bounds.minY)/2,(bounds.maxZ+bounds.minZ)/2);body.castShadow=true;body.receiveShadow=true;scene.add(body);
+const body=new MarchingCubes(resolution,coatMaterial,false,false,280000);body.isolation=0;body.scale.set((bounds.maxX-bounds.minX)/2,(bounds.maxY-bounds.minY)/2,(bounds.maxZ-bounds.minZ)/2);body.position.set((bounds.maxX+bounds.minX)/2,(bounds.maxY+bounds.minY)/2,(bounds.maxZ+bounds.minZ)/2);body.castShadow=true;body.receiveShadow=true;scene.add(body);
 
 const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));const mix=(a,b,t)=>a+(b-a)*t;
 function smin(a,b,k){const h=clamp(.5+.5*(b-a)/k);return mix(b,a,h)-k*h*(1-h)}
@@ -106,13 +106,35 @@ function bodySdf(x,y,z){let d=1e3;const add=(v,k=.022)=>{d=smin(d,v,k)};
 }
 
 function setProgress(p,text){loadBar.style.width=`${Math.round(p*100)}%`;loadText.textContent=text}
-function worldFromLocal(v){return new THREE.Vector3(mix(bounds.minX,bounds.maxX,(v.x+1)/2),mix(bounds.minY,bounds.maxY,(v.y+1)/2),mix(bounds.minZ,bounds.maxZ,(v.z+1)/2))}
 function smoothstep(a,b,x){const t=clamp((x-a)/(b-a));return t*t*(3-2*t)}
-function coatColor(p){const base=new THREE.Color(.39,.405,.42),dark=new THREE.Color(.115,.125,.135),light=new THREE.Color(.68,.67,.64),warm=new THREE.Color(.47,.43,.39);let c=base.clone();const under=1-smoothstep(.17,.29,p.z);c.lerp(light,under*.28);const dorsal=smoothstep(.245,.38,p.z)*(1-smoothstep(.09,.16,Math.abs(p.y)));c.lerp(dark,dorsal*.28);const bodyBand=(1-smoothstep(.24,.34,Math.abs(p.x-.015)))*smoothstep(.18,.33,p.z);const wave=Math.sin((p.x+.16)*62+Math.sin(p.y*31)*.7);const stripe=smoothstep(.30,.86,wave)*bodyBand;c.lerp(dark,stripe*.58);const sideStripe=smoothstep(.20,.90,Math.sin((p.x+.22)*55+Math.abs(p.y)*22))*smoothstep(.04,.13,Math.abs(p.y))*smoothstep(.18,.34,p.z);c.lerp(dark,sideStripe*.34);if(p.x>.285){const face=smoothstep(.15,.9,Math.sin((p.y+.07)*72+(p.z-.32)*28));c.lerp(dark,face*.25)}if(p.x<-.26){const ring=smoothstep(.15,.85,Math.sin((-p.x+p.z)*92));c.lerp(dark,ring*.52)}const whiteMuzzle=smoothstep(.35,.44,p.x)*(1-smoothstep(.34,.39,p.z));const whiteChest=smoothstep(.12,.22,p.x)*(1-smoothstep(.05,.095,Math.abs(p.y)))*(1-smoothstep(.19,.27,p.z));const paws=(1-smoothstep(.035,.065,p.z));c.lerp(light,Math.max(whiteMuzzle*.75,whiteChest*.62,paws*.32));const hipWarm=(1-smoothstep(.14,.24,Math.abs(p.x+.13)))*smoothstep(.055,.13,Math.abs(p.y));c.lerp(warm,hipWarm*.10);return c}
-function applyCoatColors(){const pos=body.geometry.getAttribute('position'),count=pos.count,arr=new Float32Array(count*3),v=new THREE.Vector3();for(let i=0;i<count;i++){v.fromBufferAttribute(pos,i);const c=coatColor(worldFromLocal(v));arr[i*3]=c.r;arr[i*3+1]=c.g;arr[i*3+2]=c.b}body.geometry.setAttribute('color',new THREE.BufferAttribute(arr,3));body.geometry.attributes.color.needsUpdate=true}
+function applyCoatColors(){
+  const pos=body.geometry.getAttribute('position'),capacity=pos.count,drawCount=body.geometry.drawRange.count;
+  const used=Number.isFinite(drawCount)&&drawCount>0?Math.min(capacity,drawCount):capacity;
+  const arr=new Float32Array(capacity*3);arr.fill(.4);
+  const sx=(bounds.maxX-bounds.minX)*.5,sy=(bounds.maxY-bounds.minY)*.5,sz=(bounds.maxZ-bounds.minZ)*.5;
+  const cx=(bounds.maxX+bounds.minX)*.5,cy=(bounds.maxY+bounds.minY)*.5,cz=(bounds.maxZ+bounds.minZ)*.5;
+  for(let i=0;i<used;i++){
+    const x=cx+pos.getX(i)*sx,y=cy+pos.getY(i)*sy,z=cz+pos.getZ(i)*sz;
+    let r=.39,g=.405,b=.42,t;
+    t=(1-smoothstep(.17,.29,z))*.28;r+=(.68-r)*t;g+=(.67-g)*t;b+=(.64-b)*t;
+    t=smoothstep(.245,.38,z)*(1-smoothstep(.09,.16,Math.abs(y)))*.28;r+=(.115-r)*t;g+=(.125-g)*t;b+=(.135-b)*t;
+    const bodyBand=(1-smoothstep(.24,.34,Math.abs(x-.015)))*smoothstep(.18,.33,z);
+    t=smoothstep(.30,.86,Math.sin((x+.16)*62+Math.sin(y*31)*.7))*bodyBand*.58;r+=(.115-r)*t;g+=(.125-g)*t;b+=(.135-b)*t;
+    t=smoothstep(.20,.90,Math.sin((x+.22)*55+Math.abs(y)*22))*smoothstep(.04,.13,Math.abs(y))*smoothstep(.18,.34,z)*.34;r+=(.115-r)*t;g+=(.125-g)*t;b+=(.135-b)*t;
+    if(x>.285){t=smoothstep(.15,.9,Math.sin((y+.07)*72+(z-.32)*28))*.25;r+=(.115-r)*t;g+=(.125-g)*t;b+=(.135-b)*t}
+    if(x<-.26){t=smoothstep(.15,.85,Math.sin((-x+z)*92))*.52;r+=(.115-r)*t;g+=(.125-g)*t;b+=(.135-b)*t}
+    const whiteMuzzle=smoothstep(.35,.44,x)*(1-smoothstep(.34,.39,z));
+    const whiteChest=smoothstep(.12,.22,x)*(1-smoothstep(.05,.095,Math.abs(y)))*(1-smoothstep(.19,.27,z));
+    const paws=1-smoothstep(.035,.065,z);t=Math.max(whiteMuzzle*.75,whiteChest*.62,paws*.32);r+=(.68-r)*t;g+=(.67-g)*t;b+=(.64-b)*t;
+    t=(1-smoothstep(.14,.24,Math.abs(x+.13)))*smoothstep(.055,.13,Math.abs(y))*.10;r+=(.47-r)*t;g+=(.43-g)*t;b+=(.39-b)*t;
+    arr[i*3]=r;arr[i*3+1]=g;arr[i*3+2]=b;
+  }
+  body.geometry.setAttribute('color',new THREE.BufferAttribute(arr,3));body.geometry.attributes.color.needsUpdate=true;
+  return used;
+}
 
 let buildStart=0;async function rebuild(){loading.style.display='grid';buildStart=performance.now();setProgress(.03,'采样连续解剖场…');await new Promise(r=>setTimeout(r,20));const N=resolution,N2=N*N,field=body.field;let idx=0;for(let iz=0;iz<N;iz++){const z=mix(bounds.minZ,bounds.maxZ,iz/(N-1));for(let iy=0;iy<N;iy++){const y=mix(bounds.minY,bounds.maxY,iy/(N-1));for(let ix=0;ix<N;ix++){const x=mix(bounds.minX,bounds.maxX,ix/(N-1));field[idx++]=-bodySdf(x,y,z)}}if(iz%7===0){setProgress(.05+.55*iz/(N-1),`采样 ${iz+1}/${N}`);await new Promise(r=>requestAnimationFrame(r))}}
-  setProgress(.65,'提取统一身体表面…');await new Promise(r=>requestAnimationFrame(r));body.update();setProgress(.82,'生成程序化灰虎斑材质…');await new Promise(r=>requestAnimationFrame(r));applyCoatColors();body.geometry.computeBoundingSphere();body.geometry.computeBoundingBox();setProgress(.96,'更新四视图与指标…');await new Promise(r=>requestAnimationFrame(r));const ms=performance.now()-buildStart;const tri=Math.floor(body.geometry.drawRange.count/3);document.querySelector('#mResolution').textContent=`${resolution}³`;document.querySelector('#mTriangles').textContent=tri.toLocaleString();document.querySelector('#mBuild').textContent=`${ms.toFixed(0)} ms`;window.__CAT_BODY_BIND_V1_STATS__={schema:'cat_kaopu/cat_body_bind_r0_stats@1.0',buildId:'cat-body-bind-v1-r0-20260917',resolution,triangles:tri,vertices:body.geometry.drawRange.count,continuousBodyObjects:1,externalAnimalMeshes:0,externalImageTextures:0,fieldRepresentation:'continuous-anatomical-sdf',stableTopology:false,skinned:false,visualAcceptance:false,bindAcceptance:false,motionAcceptance:false,productionReady:false,buildMs:ms,params:{...params}};setProgress(1,'完成');setTimeout(()=>loading.style.display='none',120)}
+  setProgress(.65,'提取统一身体表面…');await new Promise(r=>requestAnimationFrame(r));body.update();setProgress(.82,'生成程序化灰虎斑材质…');await new Promise(r=>requestAnimationFrame(r));const used=applyCoatColors();body.geometry.computeBoundingSphere();body.geometry.computeBoundingBox();setProgress(.96,'更新四视图与指标…');await new Promise(r=>requestAnimationFrame(r));const ms=performance.now()-buildStart;const tri=Math.floor(used/3);document.querySelector('#mResolution').textContent=`${resolution}³`;document.querySelector('#mTriangles').textContent=tri.toLocaleString();document.querySelector('#mBuild').textContent=`${ms.toFixed(0)} ms`;window.__CAT_BODY_BIND_V1_STATS__={schema:'cat_kaopu/cat_body_bind_r0_stats@1.0',buildId:'cat-body-bind-v1-r0-20260917',resolution,triangles:tri,vertices:used,continuousBodyObjects:1,externalAnimalMeshes:0,externalImageTextures:0,fieldRepresentation:'continuous-anatomical-sdf',stableTopology:false,skinned:false,visualAcceptance:false,bindAcceptance:false,motionAcceptance:false,productionReady:false,buildMs:ms,params:{...params}};setProgress(1,'完成');setTimeout(()=>loading.style.display='none',120)}
 
 const features=new THREE.Group();scene.add(features);const eyeMat=new THREE.MeshStandardMaterial({color:0x79916e,roughness:.28,metalness:0}),pupilMat=new THREE.MeshStandardMaterial({color:0x050608,roughness:.25}),noseMat=new THREE.MeshStandardMaterial({color:0x3a2327,roughness:.7}),innerMat=new THREE.MeshStandardMaterial({color:0x8f6668,roughness:.88,side:THREE.DoubleSide});
 for(const side of [-1,1]){const eye=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),eyeMat);eye.position.set(.423,side*.071,.383);eye.scale.set(.018,.014,.019);features.add(eye);const pupil=new THREE.Mesh(new THREE.SphereGeometry(1,18,12),pupilMat);pupil.position.set(.438,side*.075,.383);pupil.scale.set(.006,.004,.012);features.add(pupil);const earGeo=new THREE.BufferGeometry();const s=side;earGeo.setAttribute('position',new THREE.Float32BufferAttribute([.320,s*.054,.430,.348,s*.056,.425,.303,s*.069,.505],3));earGeo.computeVertexNormals();features.add(new THREE.Mesh(earGeo,innerMat))}
