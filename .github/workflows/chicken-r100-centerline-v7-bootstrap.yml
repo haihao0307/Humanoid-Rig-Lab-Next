@@ -1,0 +1,115 @@
+name: Chicken R10.0 Centerline V7 Bootstrap
+
+on:
+  push:
+    branches:
+      - chat/chicken-phase1-continuation-20260916
+    paths:
+      - .github/workflows/chicken-r100-centerline-v7-bootstrap.yml
+      - .github/v7_bundle/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: chicken-r100-centerline-v7-bootstrap
+  cancel-in-progress: true
+
+jobs:
+  materialize-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Check out working branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Materialize verified V7 bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .github/v7_bundle/chunk_*.txt > /tmp/chicken-v7.b64
+          base64 -d /tmp/chicken-v7.b64 > /tmp/chicken-v7.tar.gz
+          echo '35820836f8f0c0c70d5769b445a7709fe599af1f4a937759b85b1aed24d12d47  /tmp/chicken-v7.tar.gz' | sha256sum -c -
+          tar -xzf /tmp/chicken-v7.tar.gz
+
+      - name: Validate, test, audit and build V7
+        run: bash tools/run_chicken_r100_centerline_v7_static.sh
+
+      - name: Persist materialized V7 sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            .github/workflows/chicken-r100-single-agent.yml \
+            README.md \
+            01_CURRENT_STATE.json \
+            R100_CENTERLINE_V7_IMPLEMENTATION.md \
+            runtime/chicken_phase1_ring_coherent_adapter.mjs \
+            runtime/chicken_phase1_centerline_sweep_adapter.mjs \
+            tests/chicken_phase1_centerline_sweep_adapter.test.mjs \
+            tools/build_chicken_r100.py \
+            tools/chicken_r100_peck_patch.js \
+            tools/chicken_r100_centerline_patch.js \
+            tools/capture_chicken_r100.mjs \
+            tools/capture_chicken_r100_mesh_diagnostic.mjs \
+            tools/verify_chicken_r100_centerline_v7.mjs \
+            tools/verify_chicken_r100_centerline_v7_gate.py \
+            tools/run_chicken_r100_centerline_v7_static.sh \
+            tools/run_chicken_r100_centerline_v7_browser.sh
+          if ! git diff --cached --quiet; then
+            git commit -m 'Materialize Chicken centerline-sweep V7 sources [skip ci]'
+            git push origin HEAD:chat/chicken-phase1-continuation-20260916
+          fi
+
+      - name: Install Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Install Playwright Core
+        run: npm install --no-save playwright-core@1.55.0
+
+      - name: Run V7 browser motion and topology QA
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          CHICKEN_R100_URL: http://127.0.0.1:8765/CHICKEN_V46_R10_0_SINGLE_AGENT.html
+        run: bash tools/run_chicken_r100_centerline_v7_browser.sh
+
+      - name: Upload bootstrap evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chicken-r100-centerline-v7-bootstrap-${{ github.run_number }}
+          path: |
+            CHICKEN_V46_R10_0_SINGLE_AGENT.html
+            CHICKEN_V46_R9_9_1_GAMEPLAY_HEAD.html
+            README.md
+            01_CURRENT_STATE.json
+            R100_CENTERLINE_V7_IMPLEMENTATION.md
+            data/CHICKEN_R100_SINGLE_AGENT_PARAMETERS.json
+            qa/CHICKEN_R100_STATIC_QA.json
+            qa/CHICKEN_R100_CENTERLINE_V7_QA.json
+            qa/CHICKEN_R100_CENTERLINE_V7_LOCAL_TESTS.json
+            qa/CHICKEN_R100_BROWSER_QA.json
+            evidence/r100
+            BUILD_MANIFEST_R100.json
+            runtime/chicken_phase1_centerline_sweep_adapter.mjs
+            tools/capture_chicken_r100.mjs
+            tools/capture_chicken_r100_mesh_diagnostic.mjs
+            /tmp/chicken-r100-http.log
+          if-no-files-found: warn
+          retention-days: 7
