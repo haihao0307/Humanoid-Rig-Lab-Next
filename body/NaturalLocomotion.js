@@ -9,7 +9,7 @@ function motionCircleSweep(start,end,centre,radius){
  const b=2*(p[0]*d[0]+p[2]*d[2]),disc=b*b-4*a*c;if(disc<0)return 1;
  const t=(-b-Math.sqrt(disc))/(2*a);return t>=0&&t<=1?Math.max(0,t-1e-5):1;
 }
-function motionWorldSweep(world,start,end,radius,ignore=[]){
+function motionWorldSweep(world,start,end,radius,ignore=[],{escapeRadius=null}={}){
  const r=radius+.06,b=world.bounds,d=sub(end,start);let fraction=1;
  for(const [k,low,high]of [[0,b.xMin+radius,b.xMax-radius],[2,b.zMin+radius,b.zMax-radius]]){
   if(start[k]<low||start[k]>high)return{position:[...start],fraction:0,blocked:true};
@@ -18,6 +18,13 @@ function motionWorldSweep(world,start,end,radius,ignore=[]){
  }
  for(const o of world.objects){
   if(ignore.includes(o.id)||o.held||o.collidable===false)continue;
+  if(o.shape==='box'&&Number.isFinite(escapeRadius)&&radius>escapeRadius+1e-6){
+   const tilted=objectTilted(o),q=qy(tilted?0:-objectYaw(o)),a=rotate(q,sub(start,o.p)),delta=rotate(q,d),[rx,rz]=tilted?objectFootprint(o):[o.w/2,o.d/2];
+   const x=a[0]-clamp(a[0],-rx,rx),z=a[2]-clamp(a[2],-rz,rz),clearance=Math.hypot(x,z);
+   // Only the extra loaded envelope overlaps. Distance to this convex
+   // footprint increases along an outward ray; physical body/feet stay clear.
+   if(clearance>=escapeRadius+.06&&clearance<r&&x*delta[0]+z*delta[2]>1e-12)continue;
+  }
   if(objectTilted(o)){const [rx,rz]=objectFootprint(o);const flat=new MotionLab.FlatWorld([{minX:o.p[0]-rx-r,maxX:o.p[0]+rx+r,minZ:o.p[2]-rz-r,maxZ:o.p[2]+rz+r}]);fraction=Math.min(fraction,flat.sweep(start,end,0).fraction);continue;}
   if(o.shape!=='box'){fraction=Math.min(fraction,motionCircleSweep(start,end,o.p,(o.r||objectRadius(o))+r));continue;}
   const q=qy(-objectYaw(o)),a=rotate(q,sub(start,o.p)),z=rotate(q,sub(end,o.p)),x=o.w/2,y=o.d/2;
@@ -62,7 +69,7 @@ function predictTrafficConflict(agent,speed,context){
  return best;
 }
 function trafficSegmentClear(agent,start,end,context,{dynamic=true}={}){
- if(motionWorldSweep(agent.w,start,end,context.radius,context.ignore).fraction<1-1e-6)return false;
+ if(motionWorldSweep(agent.w,start,end,context.radius,context.ignore,context).fraction<1-1e-6)return false;
  return !dynamic||(agent.w.population?.sweepFor(agent,start,end,context.radius)??1)>=1-1e-6;
 }
 function trafficRuntime(population){
@@ -80,7 +87,7 @@ function trafficPopulationNow(population){
 function trafficCorridorLocal(agent,point,direction,context){
  const right=[direction[2],0,-direction[0]],probe=context.radius*2+TRAFFIC_AVOIDANCE.sideMarginM+TRAFFIC_AVOIDANCE.corridorProbeM,left=add(point,mul(right,probe)),rightPoint=add(point,mul(right,-probe));
  left[1]=0;rightPoint[1]=0;
- const leftBlocked=motionWorldSweep(agent.w,point,left,context.radius,context.ignore).fraction<1-1e-6,rightBlocked=motionWorldSweep(agent.w,point,rightPoint,context.radius,context.ignore).fraction<1-1e-6;
+ const leftBlocked=motionWorldSweep(agent.w,point,left,context.radius,context.ignore,context).fraction<1-1e-6,rightBlocked=motionWorldSweep(agent.w,point,rightPoint,context.radius,context.ignore,context).fraction<1-1e-6;
  return{narrow:leftBlocked&&rightBlocked,leftBlocked,rightBlocked,probe,right};
 }
 function trafficCorridorDescriptor(agent,start,end,context){
@@ -160,10 +167,10 @@ function trafficReserveTargetSlot(locomotion,context){
 class MotionLabWorld {
  constructor(agent){this.a=agent;}
  context(radius){const a=this.a,body=radius>.1,profile=bodyPhysicalProfile(a.h),ignore=a.skill?.o?[a.skill.o.id]:[];
-  return {radius:body?Math.max(profile.bodyRadiusM,a.held?(a.skill?.type==='carry'?carryRouteRadius(a.held,profile,a.skill?.carryConfiguration):profile.pushClearanceM):0):radius*a.h.bodyMetrics.statureScale,ignore};}
+  return {radius:body?Math.max(profile.bodyRadiusM,a.held?(a.skill?.type==='carry'?carryRouteRadius(a.held,profile,a.skill?.carryConfiguration):profile.pushClearanceM):0):radius*a.h.bodyMetrics.statureScale,ignore,escapeRadius:body&&a.held&&a.skill?.type==='carry'?profile.bodyRadiusM:null};}
  free(point,radius){const a=this.a,c=this.context(radius);return !a.w.collision(point,c.radius,c.ignore)&&!a.w.population?.collisionFor(a,point,c.radius);}
  sweep(start,end,radius){
-  const a=this.a,c=this.context(radius),result=motionWorldSweep(a.w,start,end,c.radius,c.ignore);
+  const a=this.a,c=this.context(radius),result=motionWorldSweep(a.w,start,end,c.radius,c.ignore,c);
   // The population excludes this actor, including when the kernel queries feet.
   const fraction=Math.min(result.fraction,a.w.population?.sweepFor(a,start,end,c.radius)??1);
   return{position:add(start,mul(sub(end,start),fraction)),fraction,blocked:fraction<1-1e-9};
@@ -542,7 +549,7 @@ class NaturalLocomotion {
   if(this.traffic.corridorTaskKey&&this.traffic.corridorTaskKey!==currentTaskKey)trafficReleaseCorridor(this);
   if(this.traffic.intersectionTaskKey&&this.traffic.intersectionTaskKey!==currentTaskKey)this.releaseIntersection();
   if(a.skill?.type==='walk'&&!this.traffic.slotKey){trafficReserveTargetSlot(this,context);target=a.route[a.routeIndex];if(!target)return null;}
-  if(motionWorldSweep(a.w,root,target,context.radius,context.ignore).fraction<1-1e-6){
+  if(motionWorldSweep(a.w,root,target,context.radius,context.ignore,context).fraction<1-1e-6){
    if(!this.replanStaticRoute(context))throw Error('当前物体阻断路线，且没有可用的重新规划路径');
    target=a.route[a.routeIndex];if(!target)return null;
   }

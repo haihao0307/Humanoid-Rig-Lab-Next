@@ -120,12 +120,35 @@ for(const count of [4,8]){
  p.control('stop',['a']);check(()=>assert.equal(p.dispatch('挥手',{targets:['a']})[0].accepted,true));advance(p,1);check(()=>assert.equal(a.agent.calls.at(-1),'挥手'));
  a.agent.error='controlled failure';check(()=>assert.equal(p.dispatch('打招呼',{targets:['a'],mode:'replace'})[0].accepted,true));advance(p,1);check(()=>assert.equal(a.agent.calls.at(-1),'打招呼'));
 }
+// Every eligible request gets a turn, independent of actor iteration order.
+{
+ const p=fixture(),order=[];
+ for(const actor of p.values()){const submit=actor.agent.submit;actor.agent.submit=function(text){order.push(this.npcId);return submit.call(this,text);};}
+ for(let i=0;i<20;i++)p.dispatch('搬运A',{targets:['a']});p.dispatch('搬运B',{targets:['b']});advance(p,6);
+ check(()=>assert.equal(p.get('b').agent.calls.length,1));check(()=>assert.equal(p.get('b').behavior.error,null));
+ check(()=>assert.equal(order[1],'b'));check(()=>assert.equal(p.get('a').agent.calls.length,20));
+}
+{
+ const p=fixture(3),order=[];p.actors=new Map([...p.actors].reverse());
+ for(const actor of p.values()){const submit=actor.agent.submit;actor.agent.submit=function(text){order.push(this.npcId);return submit.call(this,text);};}
+ p.dispatch('搬运A',{targets:['a']});p.dispatch('搬运B',{targets:['b']});p.dispatch('搬运C',{targets:['c']});p.dispatch('搬运A',{targets:['a']});advance(p,2);
+ check(()=>assert.deepEqual(order,['a','b','c','a']));check(()=>assert.equal(p.physicsOwner,null));
+}
+for(const unavailable of ['pause','stop','error','editing','reserved','disposed','stale']){
+ const p=fixture();p.dispatch('搬运A',{targets:['a']});p.dispatch('搬运B',{targets:['b']});
+ if(['pause','stop'].includes(unavailable))p.control(unavailable,['b']);
+ if(unavailable==='error')p.get('b').agent.error='blocked';if(unavailable==='editing')p.get('b').agent.characterEditInProgress=true;if(unavailable==='reserved')p.isReserved=a=>a.npcId==='b';
+ if(unavailable==='disposed')p.get('b').disposed=true;
+ if(unavailable==='stale')Object.assign(p.get('b').queue[0],{source:'behavior',behavior:{}});
+ p.dispatch('搬运A',{targets:['a']});advance(p,1);check(()=>assert.equal(p.get('a').agent.calls.length,2));
+ if(unavailable==='pause'){p.control('resume',['b']);advance(p,1);check(()=>assert.equal(p.get('b').agent.calls.length,1));}
+}
 console.log(JSON.stringify({checks,schedulerExecuted:true,geometryGenerated:false,physicsExecuted:false}));
-// Optional diagnosis, deliberately not a passing fairness assertion. Keeping
-// the measured result visible lets a future allocator demonstrate improvement.
+// Optional detailed measurement of the scheduler-only regression above.
+// This does not replace the real shared-station browser scenario.
 if(process.argv.includes('--starvation-probe')){
  const p=fixture(),order=[];
  for(const actor of p.values()){const submit=actor.agent.submit;actor.agent.submit=function(text){order.push(this.npcId);return submit.call(this,text);};}
  for(let i=0;i<20;i++)p.dispatch('搬运A',{targets:['a']});p.dispatch('搬运B',{targets:['b']});advance(p,6);
- console.log(JSON.stringify({probe:'resource-fairness',simulationS:6,order,actors:[...p.values()].map(row=>({id:row.id,started:row.agent.calls.length,diversions:row.agent.diversions,error:row.behavior.error||row.agent.error})),starvationObserved:p.get('b').agent.calls.length===0&&!!p.get('b').behavior.error,fairnessVerified:false,physicsExecuted:false}));
+ console.log(JSON.stringify({probe:'resource-fairness',simulationS:6,order,actors:[...p.values()].map(row=>({id:row.id,started:row.agent.calls.length,diversions:row.agent.diversions,error:row.behavior.error||row.agent.error})),starvationObserved:p.get('b').agent.calls.length===0&&!!p.get('b').behavior.error,fairnessVerified:order[1]==='b'&&p.get('a').agent.calls.length===20&&p.get('b').agent.calls.length===1&&![...p.values()].some(row=>row.behavior.error||row.agent.error),physicsExecuted:false}));
 }

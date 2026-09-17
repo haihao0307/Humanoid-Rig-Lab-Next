@@ -41,4 +41,18 @@ parked.agent.skill={type:'walk'};parked.agent.walkSpeed=.3;
 assert.equal(loc.replanStationaryRoute({actor:parked},context),false,'moving traffic is not frozen into a route snapshot');
 parked.agent.paused=true;agent.route=[[0,0,2.5],goal];
 assert(loc.replanStationaryRoute({actor:parked},context),'paused actors remain planning obstacles');
-console.log(JSON.stringify({passed:true,paths,rotatedClearance:true,continuousSegments:true,stationaryPortalRoute:true}));
+// Grasping expands the conservative route radius. Navigation already permits
+// monotone exits from that extra margin; the runtime sweep must agree without
+// allowing an unladen body or a foot to escape through actual occupied space.
+for(const yaw of [0,.37,-.61]){
+ const object={...box(yaw),d:.3},world={objects:[object],bounds:{xMin:-3,xMax:3,zMin:-3,zMax:3}};
+ const point=x=>api.rotate(api.qy(yaw),[x,0,0]),start=point(.55),end=point(2),context={escapeRadius:.26};
+ assert(api.motionWorldSweep(world,start,end,.55).blocked,'ordinary collision semantics remain strict');
+ assert(!api.motionWorldSweep(world,start,end,.55,[],context).blocked,'loaded clearance expansion must allow a strictly outward exit');
+ assert(api.motionWorldSweep(world,start,point(.45),.55,[],context).blocked,'inward motion remains blocked');
+ assert(api.motionWorldSweep(world,point(.3),end,.55,[],context).blocked,'actual body overlap remains blocked');
+ let prior=start;for(const target of api.campGridPath(world,start,end,.55)){assert(!api.motionWorldSweep(world,prior,target,.55,[],context).blocked);prior=target;}
+ const wall={id:'exit-wall',shape:'box',p:point(1.5),q:api.qy(yaw),w:.2,h:1,d:2};world.objects.push(wall);
+ assert(api.motionWorldSweep(world,start,end,.55,[],context).blocked,'escaping one margin must still sweep every other obstacle');
+}
+console.log(JSON.stringify({passed:true,paths,rotatedClearance:true,continuousSegments:true,stationaryPortalRoute:true,loadedMarginExit:true}));

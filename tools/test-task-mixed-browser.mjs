@@ -1,6 +1,7 @@
 // Real generated actors, NPCPopulation queues and Cannon manipulation.
 // Run against a freshly built page; artifacts belong outside the source tree.
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {chromium} from 'playwright-core';
 const url=process.env.HUMANLAB_URL||'http://127.0.0.1:4173/index.html';
@@ -11,7 +12,9 @@ const pageErrors=[];page.on('pageerror',e=>pageErrors.push(String(e)));
 await mkdir('artifacts',{recursive:true});
 let report={schema:'jarvis/task_mixed_browser_report@1',url,pageErrors};
 try{
- await page.goto(url,{waitUntil:'domcontentloaded',timeout:120000});
+ const response=await page.goto(url,{waitUntil:'domcontentloaded',timeout:120000});
+ assert(response?.ok(),'workbench response must succeed');
+ report.entrypointSha256=createHash('sha256').update(await response.body()).digest('hex');
  await page.waitForFunction(()=>{const w=document.querySelector('#bodyFrame')?.contentWindow;return w?.__startupError||w?.__humanStartup?.status==='ready'&&w.HumanLab?.population?.pending===0;},null,{timeout:720000,polling:500});
  const setup=await page.evaluate(async requestedPopulation=>{
   const w=document.querySelector('#bodyFrame').contentWindow,lab=w.HumanLab,pop=lab.population,world=lab.world;

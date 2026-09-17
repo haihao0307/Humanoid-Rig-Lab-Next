@@ -31,6 +31,21 @@ try{
   const tasks=actors.slice(0,2).map((row,i)=>({id:row.id,object:specs[i][0],home:zones[i][0],commands:[`把 ${specs[i][0]} 搬到 Z30`,`把 ${specs[i][0]} 搬到 ${zones[i][0]}`]}));
   const accepted=[];for(const task of tasks)for(const command of task.commands)accepted.push(pop.dispatch(command,{targets:[task.id],mode:'append'})[0]);lab.setAuto(false);
   lab.resourceProbe={actors,tasks,frames:0,maxHeld:0,owners:[],lastOwner:undefined,violations:[],phases:[],lastPhases:{},paths:Object.fromEntries(tasks.map(t=>[t.id,0])),lastPositions:Object.fromEntries(actors.slice(0,2).map(r=>[r.id,[...r.agent.pos]]))};
+  lab.resourceProbe.preflightChanges=[];
+  for(const row of actors.slice(0,2)){
+   const a=row.agent,read=a.preflightInput;let previous=null,kind=null;
+   a.preflightInput=function(...args){
+    const value=read.apply(this,args),key=this.phase+':'+this.preflight?.kind+':'+!!args[0];
+    if(previous&&key===kind&&value!==previous&&this.preflightWaiting){
+     const before=JSON.parse(previous),after=JSON.parse(value),names=['model','position','yaw','root','feet','pose','motion','object','target','grips','reachStart','releaseWrists','geometry','shape'];
+     const fields=names.filter((name,i)=>JSON.stringify(before[i])!==JSON.stringify(after[i]));
+     const geometryBefore=JSON.parse(before[12]),geometryAfter=JSON.parse(after[12]);
+     const objects=geometryAfter[2].filter(o=>JSON.stringify(geometryBefore[2].find(b=>b[0]===o[0]))!==JSON.stringify(o)).map(o=>({id:o[0],before:geometryBefore[2].find(b=>b[0]===o[0]),after:o}));
+     const events=lab.resourceProbe.preflightChanges;events.push({id:row.id,frame:lab.resourceProbe.frames,kind:key,retries:this.preflight?.retries,fields,objects});if(events.length>24)events.shift();
+    }
+    previous=value;kind=key;return value;
+   };
+  }
   return{population:actors.length,tasks,accepted,target:zones[2][1]};
  },long);
  console.log('RESOURCE_READY '+JSON.stringify(report.setup));assert(report.setup.accepted.every(r=>r.accepted));
@@ -50,14 +65,15 @@ try{
    return{frames:t.frames,rows,done:rows.every(r=>r.carryCompleted===2&&r.ready&&!r.running&&!r.queued),failed:rows.some(r=>r.error)};
   });
   report.progress=progress;if(progress.frames%1200===0||progress.done||progress.failed)console.log('RESOURCE_PROGRESS '+JSON.stringify(progress));
-  if(progress.done||progress.failed||progress.frames>=36000)break;await new Promise(r=>setTimeout(r,10));
+  if(progress.done||progress.failed||progress.frames>=(long?72000:36000))break;await new Promise(r=>setTimeout(r,10));
  }
  report.result=await page.evaluate(()=>{
   const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,pop=lab.population,t=lab.resourceProbe;
-  return{frames:t.frames,maxHeld:t.maxHeld,owners:t.owners,violations:t.violations,phases:t.phases,paths:t.paths,claims:[...pop.claims],stationClaims:[...pop.stationClaims],physicsOwner:pop.physicsOwner,actors:t.tasks.map(task=>{const r=pop.get(task.id),o=lab.world.get(task.object);return{id:r.id,object:task.object,insideHome:lab.world.inside(o,lab.world.get(task.home)),objectPhysics:lab.world.physics.objectState(o.id),evidence:r.agent.evidence,stats:r.agent.stats,resource:r.resource,logs:r.logs.slice(0,16),route:r.agent.route,traffic:r.agent.locomotion.traffic};})};
+  return{frames:t.frames,maxHeld:t.maxHeld,owners:t.owners,violations:t.violations,phases:t.phases,preflightChanges:t.preflightChanges,paths:t.paths,claims:[...pop.claims],stationClaims:[...pop.stationClaims],physicsOwner:pop.physicsOwner,actors:t.tasks.map(task=>{const r=pop.get(task.id),o=lab.world.get(task.object);return{id:r.id,object:task.object,insideHome:lab.world.inside(o,lab.world.get(task.home)),objectPhysics:lab.world.physics.objectState(o.id),evidence:r.agent.evidence,stats:r.agent.stats,resource:r.resource,logs:r.logs.slice(0,16),route:r.agent.route,traffic:r.agent.locomotion.traffic};})};
  });
  await writeFile(artifact,JSON.stringify(report,null,2));
  assert.equal(report.progress.done,true,'both carriers must complete both trips');assert.equal(report.result.maxHeld,1);assert.equal(report.result.violations.length,0);
+ assert.deepEqual(report.result.owners.filter(row=>row.owner).map(row=>row.owner),[...report.setup.tasks,...report.setup.tasks].map(row=>row.id),'each submitted carrier must get a turn before the other reacquires');
  assert(report.result.actors.every(r=>r.insideHome&&r.objectPhysics.supported&&r.objectPhysics.settled));assert.equal(report.result.physicsOwner,null);assert.equal(report.result.claims.length,0);assert.equal(report.result.stationClaims.length,0);assert.equal(errors.length,0);
  assert(report.result.actors.some(r=>r.resource.diversions>0),'no resource contention exercised');
  if(!long){

@@ -236,17 +236,63 @@ class NPCPopulation {
  }
  reserveResource(actor,request){
   const a=actor.agent,step=this.resourceStep(a,request);if(!step){actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};return null;}
+  request.resourceTicket??=(this.resourceSerial=(this.resourceSerial||0)+1);
   const conflict=this.resourceConflict(a,request,step);if(conflict)return conflict;
+  let predecessor=null;
+  for(const other of this.values()){
+   const pending=other.queue[0],agent=other.agent;
+   if(other===actor||other.disposed||agent.paused||agent.error||agent.characterEditInProgress||this.isReserved(agent))continue;
+   if(pending?.source==='behavior'&&(!other.behavior.enabled||pending.behavior!==other.behavior))continue;
+   if(pending?.resourceTicket<request.resourceTicket&&(!predecessor||pending.resourceTicket<predecessor.ticket))predecessor={id:other.id,ticket:pending.resourceTicket};
+  }
+  if(predecessor)return{kind:'turn',id:'shared-physics',ownerId:predecessor.id,step};
   this.claims.set(step.objectId,a.npcId);this.stationClaims.set(step.targetId,a.npcId);this.physicsOwner=a.npcId;
   actor.resource={mode:'reserved',requestKey:[request.source,request.text].join('|'),attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:[...a.pos]};return null;
  }
+ resourceProgress(ownerId){
+  const owner=this.actors.get(ownerId),a=owner?.agent;
+  if(!a||owner.disposed||a.paused||a.error||a.characterEditInProgress)return null;
+  const goal=a.route?.at(-1),distance=goal?Math.hypot(a.pos[0]-goal[0],a.pos[2]-goal[2]):null;
+  return{key:JSON.stringify([ownerId,a.index,a.skill?.objectId,a.skill?.targetId,a.phase,a.stats?.completed,goal]),distance,steps:a.preflight?.steps||0};
+ }
+ resourceManeuvers(actor,conflict,maneuver){
+  const a=actor.agent,owner=this.actors.get(conflict.ownerId)?.agent,skill=owner?.skill;
+  const directions={left:[-1,0],forward:[0,1],right:[1,0],backward:[0,-1]},candidates=[];
+  const areas=[];
+  if(['carry','push'].includes(skill?.type)){
+   const radius=(a.h?.bodyMetrics?.bodyRadiusM||.26)+(owner.h?.bodyMetrics?.bodyRadiusM||.26)+.3;
+   for(const p of [owner.pos,skill.o?.p,skill.dest,skill.transferEnd])if(p)areas.push({p,radius});
+  }
+  for(const direction of npcResourceDirectionOrder(a.npcId,maneuver))for(const distanceM of [.65,.85,1.05]){
+   const [x,z]=directions[direction],yaw=a.yaw||0,delta=[(Math.cos(yaw)*x+Math.sin(yaw)*z)*distanceM,(Math.cos(yaw)*z-Math.sin(yaw)*x)*distanceM],end=[a.pos[0]+delta[0],a.pos[2]+delta[1]];
+   let penalty=0;
+   for(const area of areas){
+    const dx=area.p[0]-a.pos[0],dz=area.p[2]-a.pos[2],t=Math.max(0,Math.min(1,(dx*delta[0]+dz*delta[1])/(distanceM*distanceM)));
+    const deficit=d=>Math.max(0,area.radius-d),start=deficit(Math.hypot(dx,dz));
+    // Escape an area already occupied, but do not cut through another area
+    // just because the endpoint is clear. Existing route/pose checks still apply.
+    penalty+=2*deficit(Math.hypot(end[0]-area.p[0],end[1]-area.p[2]))+Math.max(0,deficit(Math.hypot(dx-t*delta[0],dz-t*delta[1]))-start);
+   }
+   candidates.push({direction,distanceM,penalty});
+  }
+  return candidates.sort((x,y)=>x.penalty-y.penalty);
+ }
  startResourceCirculation(actor,request,conflict){
-  const a=actor.agent,key=[request.source,request.text].join('|'),same=actor.resource?.requestKey===key,attempts=(same?actor.resource.attempts:0)+1;if(attempts>16)throw Error('共享资源持续被占用，完成 16 次机动后仍未获得操作权：'+conflict.id);
-  actor.queue.unshift(request);let lastError=null;const distances=[.65,.85,1.05];
-  for(const direction of npcResourceDirectionOrder(a.npcId,attempts))for(const distanceM of distances)try{
+  const a=actor.agent,key=[request.source,request.text].join('|'),same=actor.resource?.requestKey===key,now=Number.isFinite(a.time)?a.time:(this.elapsedS||0);
+  const contention=request.resourceContention??={startedAtS:now,progress:null,resets:0};
+  if(now-contention.startedAtS>300)throw Error('等待共享资源超过 300 秒活跃任务时间，已停止重试：'+conflict.id);
+  const progress=this.resourceProgress(conflict.ownerId),before=contention.progress;
+  const advanced=progress&&before&&(progress.key!==before.key||progress.distance!=null&&before.distance!=null&&progress.distance<before.distance-.25||progress.steps>before.steps+32);
+  if(progress&&(!before||advanced))contention.progress=progress;
+  if(advanced)contention.resets++;
+  const attempts=(same&&!advanced?actor.resource.attempts:0)+1;if(attempts>16)throw Error('共享资源持续被占用，完成 16 次机动且未观察到所有者进展：'+conflict.id);
+  actor.queue.unshift(request);let lastError=null;const maneuver=(contention.maneuvers||0)+1;
+  // Progress can reset the stall budget, never the physical diversion cycle.
+  for(const {direction,distanceM} of this.resourceManeuvers(actor,conflict,maneuver))try{
    const step={type:'walk',direction,distanceM,referenceFrame:'self'};a.submitPlan({schema:'knowledge_human/checked_semantic_plan@1.0',steps:[step]});actor.running={source:'resource-circulation',kind:'command',text:'资源机动',requestKey:key};
-   actor.resource={mode:'circulating',requestKey:key,attempts,diversions:(actor.resource?.diversions||0)+1,conflict:{...conflict},anchor:actor.resource?.anchor||[...a.pos]};if(request.source==='behavior')actor.behavior.status='resourceCirculation';
-   a.log('共享资源 '+conflict.id+' 正由 '+conflict.ownerId+' 使用，已改走备用路线后重试原任务');this.observation?.event('resource-circulation',actor,{attempts,conflict:{...conflict},step});return true;
+   contention.maneuvers=maneuver;
+   actor.resource={mode:'circulating',requestKey:key,attempts,progressResets:contention.resets,diversions:(actor.resource?.diversions||0)+1,conflict:{...conflict},anchor:actor.resource?.anchor||[...a.pos]};if(request.source==='behavior')actor.behavior.status='resourceCirculation';
+   a.log(conflict.kind==='turn'?'较早请求 '+conflict.ownerId+' 优先接手共享资源，已改走备用路线后重试原任务':'共享资源 '+conflict.id+' 正由 '+conflict.ownerId+' 使用，已改走备用路线后重试原任务');this.observation?.event('resource-circulation',actor,{attempts,conflict:{...conflict},step});return true;
   }catch(error){lastError=error;}
   actor.queue.shift();throw Error('资源被占用且周边没有可执行的机动路线：'+conflict.id+(lastError?'；'+lastError.message:''));
  }

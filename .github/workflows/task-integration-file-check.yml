@@ -8,11 +8,14 @@ on:
       - 'body/NaturalLocomotion.js'
       - 'control/NPCPopulation.js'
       - 'world/GridNavigation.js'
+      - 'world/PhysicsWorld.js'
+      - 'ui/NPCPopulationControls.js'
       - 'source/**'
       - 'tools/check-open-intersection.mjs'
       - 'tools/check-pure.mjs'
       - 'tools/build-pure.mjs'
       - 'tools/test-npc-*.mjs'
+      - 'tools/test-physics-preflight-wait.mjs'
       - 'tools/traffic-recovery-fixture.json'
       - 'tools/test-grid-navigation-*.mjs'
       - 'tools/test-task-crowd-browser.mjs'
@@ -54,8 +57,11 @@ jobs:
           node tools/test-npc-task-selection-bridge.mjs
           node tools/test-npc-target-reservations.mjs
           node tools/test-npc-resource-circulation.mjs
-      - name: Held task lifecycle with real Cannon steps (synthetic grasp)
-        run: node tools/test-npc-held-lifecycle.mjs
+          node tools/test-npc-resource-progress.mjs
+      - name: Held task lifecycle and frozen preflight with real Cannon steps (synthetic grasp)
+        run: |
+          node tools/test-npc-held-lifecycle.mjs
+          node tools/test-physics-preflight-wait.mjs
       - name: Real navigation and motion kernel regressions (no browser or GPU)
         run: |
           node tools/test-grid-navigation-batch.mjs
