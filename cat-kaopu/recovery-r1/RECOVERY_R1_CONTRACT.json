@@ -1,0 +1,58 @@
+{
+  "schema": "cat_kaopu/body_motion_recovery_contract@1.0",
+  "buildId": "cat-body-motion-recovery-r1-20260917",
+  "stage": "Recovery R1",
+  "status": "active",
+  "goal": "recover or rebuild a correct whole-cat body and natural core motion before group and breed expansion",
+  "priority": [
+    "whole-body morphology",
+    "rig and skin integrity",
+    "core locomotion naturalness",
+    "basic procedural material",
+    "single-NPC collision"
+  ],
+  "coreActions": [
+    "stand",
+    "idle",
+    "start_walk",
+    "walk",
+    "stop_walk",
+    "turn_left",
+    "turn_right"
+  ],
+  "deferred": {
+    "lifeActivities": true,
+    "fineEyeSystem": true,
+    "whiskers": true,
+    "expensiveFur": true,
+    "navigation": true,
+    "groupRuntime": true,
+    "breedLibrary": true
+  },
+  "allowedChangesAfterBaselineDecision": [
+    "new versioned whole-cat surface",
+    "new versioned bind rig where structurally required",
+    "new skin weights",
+    "pose corrective shapes",
+    "core motion clips",
+    "procedural material and markings"
+  ],
+  "forbiddenShortcuts": [
+    "bone scaling inside pose or animation",
+    "stacking unverified correctives onto a broken body",
+    "using camera framing or fur to hide silhouette errors",
+    "using runtime assertions as visual approval",
+    "starting group replication before single-cat approval"
+  ],
+  "acceptance": {
+    "fixedViews": ["front", "left", "right", "top", "quarter"],
+    "frameByFrameMotionReview": true,
+    "surfaceBreaks": 0,
+    "persistentSelfIntersections": 0,
+    "supportPawSlip": "visually negligible",
+    "basicMaterialRequired": true,
+    "userVisualApprovalRequired": true
+  },
+  "visualAcceptance": false,
+  "productionReady": false
+}

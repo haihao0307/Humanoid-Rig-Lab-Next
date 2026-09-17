@@ -1,0 +1,58 @@
+{
+  "schema": "cat_kaopu/body_motion_recovery_candidates@1.0",
+  "buildId": "cat-body-motion-recovery-r1-20260917",
+  "date": "2026-09-17",
+  "purpose": "recover the best whole-cat body and motion baseline before any group, breed, navigation or life-behavior expansion",
+  "candidates": [
+    {
+      "id": "v439",
+      "label": "V4.39 historical posture baseline",
+      "path": "baselines/CAT_KAOPU_V439_REGIONAL_NORMAL_WORKBENCH_2026-09-15.html",
+      "sourceBranch": "experiment/cat-authoritative-reference-intake-v1-20260911",
+      "sourceCommit": "a525c99bd76f4f6079e37432570354d276065327",
+      "role": "historical whole-cat and posture comparison",
+      "userAccepted": false
+    },
+    {
+      "id": "v440",
+      "label": "V4.40 eye-ear-short-fur workbench",
+      "path": "../workbench/CAT_KAOPU_CURRENT.html",
+      "sourceBranch": "experiment/cat-authoritative-reference-intake-v1-20260911",
+      "sourceCommit": "7fb74a567c0db2f907917fda0c62bcfe0c79d2a1",
+      "role": "pre-Phase-1 current runtime comparison",
+      "userAccepted": false
+    },
+    {
+      "id": "gateA",
+      "label": "Phase 1 Gate A single NPC",
+      "path": "../phase1/index.html",
+      "sourceBranch": "codex/cat-kaopu-phase1-environment-npc-20260916",
+      "sourceCommit": "d899c55c9e434db966f33821ee58bcdb6563ef73",
+      "role": "single-NPC collision and motion foundation",
+      "userAccepted": false
+    },
+    {
+      "id": "gateB",
+      "label": "Phase 1 Gate B torso morphology",
+      "path": "../phase1-gate-b/index.html",
+      "sourceBranch": "codex/cat-kaopu-phase1-environment-npc-20260916",
+      "sourceCommit": "e670d933abef047901a86c81ff07dac8f1ed8fdb",
+      "role": "bounded torso-corrective comparison",
+      "userAccepted": false
+    }
+  ],
+  "requiredViews": ["front", "left", "right", "top", "quarter"],
+  "requiredCoreActions": ["stand", "idle", "walk_forward", "stop", "turn_left", "turn_right"],
+  "hardRejects": [
+    "surface tearing or holes",
+    "joint inversion",
+    "limb self-intersection that persists through multiple frames",
+    "shoulder or hip volume collapse",
+    "paw sliding during support",
+    "body or paw penetration caused by corrective stacking",
+    "camera framing used to hide silhouette defects",
+    "technical metrics used as a substitute for visual acceptance"
+  ],
+  "visualAcceptance": false,
+  "productionReady": false
+}

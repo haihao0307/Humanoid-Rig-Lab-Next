@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CAT BODY & MOTION RECOVERY R1 · 历史基线 A/B</title>
+<style>
+:root{color-scheme:dark;--bg:#071015;--panel:#0c1c24;--line:#214654;--text:#eaf7fb;--muted:#8eabb5;--accent:#43d7e8;--warn:#ffbd59}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,"Noto Sans SC",sans-serif;overflow:hidden}
+header{height:86px;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;background:#09161d}
+.brand{min-width:320px}.brand h1{font-size:18px;margin:0 0 5px}.brand p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}.controls{display:flex;gap:8px;align-items:center;flex:1;flex-wrap:wrap}
+select,button,a.button{border:1px solid var(--line);background:#102732;color:var(--text);border-radius:7px;padding:8px 10px;font-size:13px;text-decoration:none}button,a.button{cursor:pointer}button:hover,a.button:hover{border-color:var(--accent)}.warn{color:var(--warn)}
+main{height:calc(100vh - 86px);display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.pane{background:var(--bg);display:grid;grid-template-rows:36px 1fr;min-width:0}.pane-head{display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:#0c1c24;border-bottom:1px solid var(--line);font-size:12px}.pane-head span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pane-head .tag{color:var(--accent)}iframe{width:100%;height:100%;border:0;background:#000}
+.overlay{position:fixed;right:14px;bottom:14px;width:min(440px,calc(100vw - 28px));background:rgba(5,14,18,.94);border:1px solid var(--line);border-radius:10px;padding:12px 14px;box-shadow:0 10px 30px #0008;font-size:12px;line-height:1.55}.overlay b{color:var(--accent)}.overlay code{color:#b9eef4}.overlay button{float:right;margin-left:8px;padding:4px 8px}
+@media(max-width:900px){body{overflow:auto}header{height:auto;align-items:flex-start;flex-direction:column}.brand{min-width:0}main{height:1200px;grid-template-columns:1fr;grid-template-rows:1fr 1fr}.overlay{position:static;width:auto;margin:10px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>CAT BODY & MOTION RECOVERY R1</h1>
+    <p>只用于找回最佳整猫身体与核心动作基线。<span class="warn">技术可运行不等于视觉通过。</span></p>
+  </div>
+  <div class="controls">
+    <label>A <select id="leftSelect"></select></label>
+    <label>B <select id="rightSelect"></select></label>
+    <button id="swap">交换 A/B</button>
+    <button id="reload">同时重载</button>
+    <a id="openLeft" class="button" target="_blank">单独打开 A</a>
+    <a id="openRight" class="button" target="_blank">单独打开 B</a>
+    <button id="toggleNotes">隐藏说明</button>
+  </div>
+</header>
+<main>
+  <section class="pane">
+    <div class="pane-head"><span><b class="tag">A</b> <span id="leftLabel"></span></span><span id="leftSource"></span></div>
+    <iframe id="leftFrame" title="候选 A"></iframe>
+  </section>
+  <section class="pane">
+    <div class="pane-head"><span><b class="tag">B</b> <span id="rightLabel"></span></span><span id="rightSource"></span></div>
+    <iframe id="rightFrame" title="候选 B"></iframe>
+  </section>
+</main>
+<div class="overlay" id="notes">
+  <button id="closeNotes">×</button>
+  <b>当前复核顺序</b><br>
+  1. 相同中性站立检查正面、左右侧、顶部和三分之四。<br>
+  2. 只测 <code>stand / idle / walk_forward / stop / turn_left / turn_right</code>。<br>
+  3. 发现裂口、塌陷、反折、持续穿插或明显僵硬，直接记录为否决项。<br>
+  4. 不用眼区、毛发、镜头或碰撞指标掩盖整猫身体问题。<br>
+  5. 本页不做“自动选优”，最终由固定证据与用户视觉验收决定。
+</div>
+<script>
+const candidates=[
+  {id:'v439',label:'V4.39 历史姿势修形基线',path:'./baselines/CAT_KAOPU_V439_REGIONAL_NORMAL_WORKBENCH_2026-09-15.html',source:'a525c99 · historical'},
+  {id:'v440',label:'V4.40 眼耳短毛工作台',path:'../workbench/CAT_KAOPU_CURRENT.html',source:'7fb74a5 · pre-Phase-1'},
+  {id:'gateA',label:'Phase 1 Gate A 单体 NPC',path:'../phase1/index.html',source:'d899c55 · collision foundation'},
+  {id:'gateB',label:'Phase 1 Gate B 躯干修正',path:'../phase1-gate-b/index.html',source:'e670d93 · remote code fact'}
+];
+const $=s=>document.querySelector(s);
+function fill(select){for(const c of candidates){const o=document.createElement('option');o.value=c.id;o.textContent=c.label;select.appendChild(o)}}
+fill($('#leftSelect'));fill($('#rightSelect'));$('#leftSelect').value='v439';$('#rightSelect').value='gateB';
+function candidate(id){return candidates.find(c=>c.id===id)||candidates[0]}
+function load(side){const c=candidate($(`#${side}Select`).value);$(`#${side}Frame`).src=c.path;$(`#${side}Label`).textContent=c.label;$(`#${side}Source`).textContent=c.source;$(`#open${side[0].toUpperCase()+side.slice(1)}`).href=c.path;localStorage.setItem(`catRecoveryR1.${side}`,c.id)}
+const savedLeft=localStorage.getItem('catRecoveryR1.left'),savedRight=localStorage.getItem('catRecoveryR1.right');if(candidate(savedLeft)?.id===savedLeft)$('#leftSelect').value=savedLeft;if(candidate(savedRight)?.id===savedRight)$('#rightSelect').value=savedRight;
+$('#leftSelect').onchange=()=>load('left');$('#rightSelect').onchange=()=>load('right');
+$('#swap').onclick=()=>{const a=$('#leftSelect').value;$('#leftSelect').value=$('#rightSelect').value;$('#rightSelect').value=a;load('left');load('right')};
+$('#reload').onclick=()=>{const l=$('#leftFrame'),r=$('#rightFrame');l.src=l.src;r.src=r.src};
+function hideNotes(hidden){$('#notes').style.display=hidden?'none':'block';$('#toggleNotes').textContent=hidden?'显示说明':'隐藏说明'}
+$('#toggleNotes').onclick=()=>hideNotes($('#notes').style.display!=='none');$('#closeNotes').onclick=()=>hideNotes(true);
+load('left');load('right');
+window.__CAT_RECOVERY_R1__={schema:'cat_kaopu/body_motion_recovery_harness@1.0',candidates,visualAcceptance:false,productionReady:false};
+</script>
+</body>
+</html>

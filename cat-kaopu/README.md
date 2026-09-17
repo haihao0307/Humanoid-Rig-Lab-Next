@@ -1,48 +1,56 @@
-# Cat Kaopu — 第一阶段世界环境生物 NPC
+# Cat Kaopu — 身体与核心动作恢复主线
 
-Phase 1 entry: `phase1/index.html`
+当前生产分支：`codex/cat-body-motion-recovery-r1-20260917`
 
-Fixed Gate A workbench: `phase1/CAT_KAOPU_PHASE1_GATE_A_SINGLE_NPC_2026-09-16.html`
+当前入口：`recovery-r1/index.html`
 
-Historical V4.46 entry: `workbench/CAT_KAOPU_CURRENT.html`
+历史 Phase 1 Gate A：`phase1/index.html`
 
-Runtime payload: `runtime/cat_v440.bin`（保持不变）
+历史 Phase 1 Gate B：`phase1-gate-b/index.html`
 
-当前生产分支：`codex/cat-kaopu-phase1-environment-npc-20260916`
+历史 V4.40：`workbench/CAT_KAOPU_CURRENT.html`
 
-本阶段的产品目标不是继续完成一只猫的全解剖复原，而是建立可复用、低开销、可进入大型场景的基础环境生物 NPC。生产优先级已经固定为：
+运行载荷：`runtime/cat_v440.bin`（历史比较时保持不变）
 
-1. 整体形态与正面、侧面、顶部、三分之四轮廓。
-2. 站立、起步、直行、停止、左右转向和四足接触。
-3. 单体地面、墙体和简单障碍碰撞。
-4. 单体通过后再进入实例 DNA、6–12 只群体、空间索引和局部避让。
-5. 生活行为、近景眼部、胡须和毛发细节后置。
+## 当前判断
 
-## 当前生产门
+原 Phase 1 的产品方向是正确的：整体形态、核心动作和单体碰撞先完成，之后再进入受限 DNA、6–12 只猫群、局部避让和品种扩展。但最近 Gate B、C、D 实际执行偏向毫米级表面 corrective、运行指标和局部眼区历史层，没有真正完成整猫身体、蒙皮完整性、自然核心动作和基础材质。
 
-`Gate A · 单体形态 / 核心运动 / 简化碰撞代理`
+因此暂停继续 Gate E 导航，不以 Gate D 作为新母体。当前重新进入：
 
-当前 Gate A 工作台在 V4.46 稳定运行时之外增加：
+`CAT BODY & MOTION RECOVERY R1`
 
-- 四个固定形态检查视角；
-- 站立、直行和左右转向的直接测试入口；
-- 骨盆、胸腔、头部三个低成本碰撞代理；
-- 一面可配置静态测试墙；
-- 有界穿透修正、步态减速和碰撞诊断；
-- 面向自动 QA 的 Phase 1 状态与障碍配置接口。
+## 恢复顺序
 
-本轮没有启用逐三角形全表面碰撞，也没有宣称群体、个体差异或局部避让已经完成。数量增加不能代替单体质量，个体差异也不能由无约束的部位随机缩放实现。
+1. 用固定 A/B 工作台对比 V4.39、V4.40、Gate A 和 Gate B。
+2. 找回最后一个可用整猫形态，或确认必须建立新的 `cat_body_bind_v1`。
+3. 重新审查骨架、骨长、绑定矩阵、蒙皮权重和姿势修形。
+4. 完成头、颈肩、胸腹骨盆、前后肢、足掌和尾根的连续整猫身体。
+5. 建立环境 NPC 所需的程序化基础毛色、斑纹、粗糙度、耳内、鼻头、眼周和掌垫材质。
+6. 重做中性站立、轻微待机、起步、稳定行走、减速停止和左右转向。
+7. 对每个核心动作按关键相位逐帧检查表面破裂、关节反折、体积塌陷、肢体穿插和足掌接触。
+8. 单体经用户视觉验收后，才开放猫群、受限 DNA、品种扩展和其他相似动物。
 
-V4.46 双眼统一面部载体与 `runtime/cat_v440.bin` 继续保留为历史回滚基线，但不再是下一生产门。V4.32 中性表面从“最终冻结体”调整为“历史稳定基线”；Phase 1 将在不破坏 34 骨架、固定骨长、V4.39 姿势修形和 V4.36 接触链的前提下，重新开放整体体型修正。
+## 暂停项
 
-相关文件：
+- 眼睑、角膜和近景眼区继续细化；
+- 胡须和高成本完整毛发；
+- 复杂生活动作；
+- 导航和局部避让；
+- 猫群复制；
+- 继续叠加未经统一验证的 Gate corrective。
 
-- 阶段定义：`docs/CAT_KAOPU_PHASE1_ENVIRONMENT_NPC_DIRECTION_2026-09-16.md`
-- Gate A 合同：`phase1/PHASE1_NPC_CONTRACT.json`
-- Gate A 清单：`phase1/PHASE1_GATE_A_MANIFEST.json`
-- 执行报告：`docs/CAT_KAOPU_PHASE1_GATE_A_EXECUTION_REPORT_2026-09-16.md`
+## 当前文件
 
-当前仍保持：
+- 主线说明：`docs/CAT_BODY_MOTION_RECOVERY_R1_DIRECTION_2026-09-17.md`
+- 复核清单：`docs/CAT_BODY_MOTION_RECOVERY_R1_AUDIT_CHECKLIST_2026-09-17.md`
+- 恢复合同：`recovery-r1/RECOVERY_R1_CONTRACT.json`
+- 历史候选：`recovery-r1/RECOVERY_R1_CANDIDATES.json`
+- A/B 工作台：`recovery-r1/index.html`
+
+当前状态：
 
 - `visualAcceptance=false`
 - `productionReady=false`
+- `groupRuntime=false`
+- `breedExpansion=false`
