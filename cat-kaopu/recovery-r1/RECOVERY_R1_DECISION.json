@@ -1,0 +1,80 @@
+{
+  "schema": "cat_kaopu/body_motion_recovery_decision@1.0",
+  "buildId": "cat-body-motion-recovery-r1-20260917",
+  "date": "2026-09-17",
+  "decision": "rebuild",
+  "newBodyBaseline": "cat_body_bind_v1",
+  "reason": [
+    "V4.39, V4.40 and Phase 1 Gate A use the same V4.32 neutral whole-cat surface and are visually almost identical in fixed views.",
+    "Phase 1 Gate B changes only a bounded torso field; it does not rebuild the head, neck, limbs, paws or tail root.",
+    "V4.40, Gate A and Gate B retain a nearly uniform white material and do not satisfy the required environment-NPC body appearance.",
+    "Walk and turn evidence remains mechanically similar across V4.40, Gate A and Gate B.",
+    "Runtime deformation diagnostics reach approximately 2.08x edge stretch and approximately 0.48x compression in tested action extremes, which is incompatible with treating the current skin as a reliable production body.",
+    "Historical V4.15 evidence documents a stronger anatomical authoring architecture, but that candidate was not visually accepted, its browser run was incomplete and its full source payload is not present in the current GitHub branch. It is a structural reference, not a reusable final body."
+  ],
+  "evidence": {
+    "interactiveCandidates": ["v439", "v440", "gateA", "gateB"],
+    "sharedNeutralSurface": "V4.32-frozen",
+    "externalTexture": false,
+    "fixedViewPixelComparison": {
+      "v440VsGateA": "approximately identical; top view produced zero changed pixels above threshold and other fixed views remained below 0.03 percent",
+      "gateAVsGateB": "only approximately 0.11 to 0.21 percent of fixed-view pixels changed above threshold"
+    },
+    "motionComparison": {
+      "v440VsGateA": "approximately identical across the sampled walk phases",
+      "gateAVsGateB": "torso-only surface differences; no new motion system"
+    },
+    "deformationExtremes": {
+      "maximumObservedEdgeRatio": 2.082367,
+      "minimumObservedEdgeRatio": 0.483399,
+      "notableSamples": ["gateB.turn_right_t2_8", "gateB.walk_t1_05", "gateB.lie_hold"]
+    },
+    "historicalV415": {
+      "status": "evidence-only structural source",
+      "vertices": 87518,
+      "triangles": 175032,
+      "connectedComponents": 1,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "anatomicalAnchors": 36,
+      "majorBoneRelations": 22,
+      "musclePaths": 51,
+      "continuousPinna": true,
+      "internalScapula": true,
+      "visualAcceptance": false,
+      "browserAcceptance": false,
+      "fullSourceAvailableInCurrentBranch": false
+    }
+  },
+  "retainAsReference": [
+    "V4.15 anatomical anchors, longitudinal body sections, internal scapula and fascia-filtered unified-surface generation principles",
+    "V4.34 and V4.39 weight, contact and pose-corrective lessons",
+    "V4.40 actions as regression inputs only",
+    "Gate A collision proxies as temporary diagnostics only"
+  ],
+  "rejectAsProductionFoundation": [
+    "V4.32 frozen neutral surface",
+    "Gate B, Gate C and Gate D corrective stack",
+    "current white short-fur-direction material as body appearance",
+    "current walk and turn clips as production motion"
+  ],
+  "nextBranch": "codex/cat-body-bind-v1-20260917",
+  "nextStage": {
+    "name": "Cat Body Bind V1",
+    "goal": "build one correct continuous cat body, a versioned bind, production-safe skin weights and a basic procedural coat before motion production",
+    "order": [
+      "whole-body authoring surface",
+      "fixed-view morphology approval",
+      "versioned bind and skin weights",
+      "joint stress and volume-preservation review",
+      "basic procedural coat and regional materials",
+      "stand idle start walk stop turn motion production",
+      "single-cat collision",
+      "group and constrained DNA"
+    ]
+  },
+  "visualAcceptance": false,
+  "productionReady": false,
+  "groupRuntime": false,
+  "breedExpansion": false
+}
