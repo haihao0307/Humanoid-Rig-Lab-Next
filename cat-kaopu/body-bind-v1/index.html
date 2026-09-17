@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CAT BODY BIND V1 R0 · 连续整猫身体候选</title>
+<title>CAT BODY BIND V1 R1 · 连续整猫身体候选</title>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"}}
 </script>
@@ -20,7 +20,7 @@ main{position:relative;min-height:0}canvas{display:block;width:100%;height:100%}
 <body>
 <div id="app">
 <header>
-  <div class="brand"><h1>CAT BODY BIND V1 · R0 整猫身体候选</h1><p>新身体母体，不继承 Gate corrective。当前只审整猫形态与基础材质，不生产动作。</p></div>
+  <div class="brand"><h1>CAT BODY BIND V1 · R1 整猫身体候选</h1><p>新身体母体，不继承 Gate corrective。当前只审整猫形态与基础材质，不生产动作。</p></div>
   <div class="toolbar">
     <button data-view="front">正面</button><button data-view="left">左侧</button><button data-view="right">右侧</button><button data-view="top">顶部</button><button data-view="quarter-front" class="active">前四分之三</button><button data-view="quarter-rear">后四分之三</button>
     <button id="skeletonBtn">骨架锚点</button><button id="wireBtn">线框</button><button id="coatBtn" class="active">灰虎斑材质</button><button id="panelBtn">参数与指标</button><button id="resetBtn">恢复 R0</button>
@@ -51,7 +51,7 @@ main{position:relative;min-height:0}canvas{display:block;width:100%;height:100%}
     <h3>本轮硬检查</h3>
     <ul><li>头颈、肩胛胸廓、胸腹骨盆整体节奏。</li><li>前后肢段落、趾行姿态、四足接地。</li><li>尾根是否进入荐骨后端而非插接。</li><li>不能以材质或镜头掩盖轮廓错误。</li></ul>
   </div>
-  <div class="status" id="status"><b>R0</b>：整猫身体作者态已与旧 V4.32 / Gate corrective 分离。下一门是四视图形态审批，不是动作或猫群。</div>
+  <div class="status" id="status"><b>R1</b>：整猫身体作者态已与旧 V4.32 / Gate corrective 分离。下一门是四视图形态审批，不是动作或猫群。</div>
 </main>
 </div>
 <script type="module">
@@ -68,7 +68,7 @@ scene.add(new THREE.HemisphereLight(0xbfe8ff,0x1a2024,1.55));const key=new THREE
 const grid=new THREE.GridHelper(1.8,36,0x2d7f91,0x15343e);grid.rotation.x=Math.PI/2;grid.position.z=.001;scene.add(grid);const floor=new THREE.Mesh(new THREE.PlaneGeometry(3,2),new THREE.MeshStandardMaterial({color:0x0b171c,roughness:1,metalness:0}));floor.receiveShadow=true;floor.position.z=-.002;scene.add(floor);
 
 const defaults={thorax:1,abdomen:1,pelvis:1,head:1,muzzle:1,limbs:1,paws:1,ears:1};const params={...defaults};
-const bounds={minX:-.64,maxX:.54,minY:-.225,maxY:.225,minZ:-.025,maxZ:.57};const resolution=86;
+const bounds={minX:-.72,maxX:.56,minY:-.20,maxY:.20,minZ:-.025,maxZ:.60};const resolution=80;
 const coatMaterial=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.78,metalness:0,side:THREE.DoubleSide});
 const body=new MarchingCubes(resolution,coatMaterial,false,false,280000);body.isolation=0;body.scale.set((bounds.maxX-bounds.minX)/2,(bounds.maxY-bounds.minY)/2,(bounds.maxZ-bounds.minZ)/2);body.position.set((bounds.maxX+bounds.minX)/2,(bounds.maxY+bounds.minY)/2,(bounds.maxZ+bounds.minZ)/2);body.castShadow=true;body.receiveShadow=true;scene.add(body);
 
@@ -76,32 +76,44 @@ const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));const mix=(a,b,t)=>a+(b-a)*t;
 function smin(a,b,k){const h=clamp(.5+.5*(b-a)/k);return mix(b,a,h)-k*h*(1-h)}
 function ellipsoid(x,y,z,cx,cy,cz,rx,ry,rz){const px=x-cx,py=y-cy,pz=z-cz;const k0=Math.hypot(px/rx,py/ry,pz/rz);const k1=Math.hypot(px/(rx*rx),py/(ry*ry),pz/(rz*rz));return k0*(k0-1)/(k1||1)}
 function taperedCapsule(x,y,z,a,b,r0,r1){const bax=b[0]-a[0],bay=b[1]-a[1],baz=b[2]-a[2],pax=x-a[0],pay=y-a[1],paz=z-a[2],den=bax*bax+bay*bay+baz*baz;const h=clamp((pax*bax+pay*bay+paz*baz)/(den||1));const qx=pax-bax*h,qy=pay-bay*h,qz=paz-baz*h;return Math.hypot(qx,qy,qz)-mix(r0,r1,h)}
-function bodySdf(x,y,z){let d=1e3;const add=(v,k=.022)=>{d=smin(d,v,k)};
-  add(ellipsoid(x,y,z,-.145,0,.225,.175,.112*params.pelvis,.132),.048);
-  add(ellipsoid(x,y,z,-.015,0,.228,.205,.099*params.abdomen,.116),.052);
-  add(ellipsoid(x,y,z,.105,0,.255,.182,.124*params.thorax,.145*params.thorax),.052);
-  add(ellipsoid(x,y,z,.205,0,.282,.105,.118,.116),.045);
-  add(taperedCapsule(x,y,z,[.18,0,.286],[.292,0,.352],.087,.067),.036);
-  add(ellipsoid(x,y,z,.345,0,.374,.104,.087*params.head,.087),.035);
-  add(ellipsoid(x,y,z,.410,0,.347,.080*params.muzzle,.064,.054),.027);
-  add(ellipsoid(x,y,z,.370,0,.323,.078,.068,.052),.025);
+function torsoSdf(x,y,z){
+  const x0=-.245,x1=.225,xc=clamp(x,x0,x1),t=(xc-x0)/(x1-x0);
+  const wp=Math.exp(-Math.pow((xc+.155)/.095,2)),wt=Math.exp(-Math.pow((xc-.105)/.105,2)),wa=Math.exp(-Math.pow((xc+.025)/.070,2));
+  let ry=.079+.023*wp+.034*wt-.013*Math.exp(-Math.pow((xc+.025)/.065,2));
+  let rz=.098+.022*Math.exp(-Math.pow((xc+.145)/.100,2))+.048*wt-.008*wa;
+  ry*=1+(params.pelvis-1)*wp*.72+(params.thorax-1)*wt*.78+(params.abdomen-1)*wa*.68;
+  rz*=1+(params.pelvis-1)*wp*.52+(params.thorax-1)*wt*.72+(params.abdomen-1)*wa*.48;
+  const cz=.240+.047*(3*t*t-2*t*t*t)+.004*Math.exp(-Math.pow((xc-.12)/.10,2)),dx=x-xc,cap=.085;
+  const q=Math.sqrt(Math.pow(dx/cap,2)+Math.pow(y/ry,2)+Math.pow((z-cz)/rz,2))-1;
+  return q*Math.min(ry,rz,cap);
+}
+function bodySdf(x,y,z){let d=torsoSdf(x,y,z);const add=(v,k=.018)=>{d=smin(d,v,k)};
+  add(ellipsoid(x,y,z,.170,0,.268,.105,.103,.118),.024);
+  add(taperedCapsule(x,y,z,[.175,0,.300],[.295,0,.370],.080,.065),.024);
+  add(taperedCapsule(x,y,z,[.185,0,.230],[.345,0,.342],.060,.047),.022);
+  add(ellipsoid(x,y,z,.355,0,.402,.108,.093*params.head,.103),.027);
+  add(ellipsoid(x,y,z,.418,0,.370,.055*params.muzzle,.055,.045),.018);
+  add(ellipsoid(x,y,z,.404,0,.342,.059*params.muzzle,.049,.030),.016);
+  add(ellipsoid(x,y,z,.390,0,.413,.065,.077*params.head,.060),.019);
   for(const side of [-1,1]){
-    add(ellipsoid(x,y,z,.350,side*.051,.357,.075,.052,.064),.022);
-    const tip=[.300,side*.068,.520+(params.ears-1)*.055],base1=[.302,side*.042,.420],base2=[.365,side*.043,.415];
-    add(taperedCapsule(x,y,z,base1,tip,.044,.005),.020);add(taperedCapsule(x,y,z,base2,tip,.034,.004),.018);
-    const sy=side*.076,lr=params.limbs;
-    add(taperedCapsule(x,y,z,[.175,sy,.265],[.165,sy,.150],.044*lr,.032*lr),.024);
-    add(taperedCapsule(x,y,z,[.165,sy,.150],[.195,sy,.068],.034*lr,.025*lr),.018);
-    add(taperedCapsule(x,y,z,[.195,sy,.068],[.225,sy,.030],.026*lr,.020*lr),.014);
-    add(ellipsoid(x,y,z,.250,sy,.025,.068*params.paws,.039*params.paws,.022),.018);
-    const hy=side*.083;
-    add(ellipsoid(x,y,z,-.145,hy,.220,.105,.066*lr,.100),.030);
-    add(taperedCapsule(x,y,z,[-.150,hy,.225],[-.045,hy,.145],.055*lr,.039*lr),.025);
-    add(taperedCapsule(x,y,z,[-.045,hy,.145],[-.175,hy,.074],.040*lr,.030*lr),.020);
-    add(taperedCapsule(x,y,z,[-.175,hy,.074],[-.105,hy,.032],.031*lr,.022*lr),.016);
-    add(ellipsoid(x,y,z,-.070,hy,.024,.078*params.paws,.042*params.paws,.023),.018);
+    add(ellipsoid(x,y,z,.357,side*.048,.384,.071,.048*params.head,.060),.016);
+    const tip=[.318,side*.067,.449+.101*params.ears],base=[.338,side*.057,.449];
+    add(taperedCapsule(x,y,z,base,tip,.034,.0035),.014);add(ellipsoid(x,y,z,.337,side*.055,.450,.048,.031,.039),.014);
+    const sy=side*.067,lr=params.limbs;
+    add(ellipsoid(x,y,z,.148,sy,.280,.067,.036*lr,.074),.016);
+    add(taperedCapsule(x,y,z,[.165,sy,.274],[.118,sy,.165],.031*lr,.024*lr),.012);
+    add(taperedCapsule(x,y,z,[.118,sy,.165],[.145,sy,.067],.024*lr,.016*lr),.010);
+    add(taperedCapsule(x,y,z,[.145,sy,.067],[.170,sy,.031],.016*lr,.012*lr),.008);
+    add(ellipsoid(x,y,z,.190,sy,.019,.045*params.paws,.026*params.paws,.016),.009);
+    const hy=side*.075;
+    add(ellipsoid(x,y,z,-.155,hy,.247,.090,.052*lr,.091),.017);
+    add(taperedCapsule(x,y,z,[-.155,hy,.242],[-.038,hy,.155],.041*lr,.030*lr),.014);
+    add(taperedCapsule(x,y,z,[-.038,hy,.155],[-.205,hy,.074],.030*lr,.019*lr),.010);
+    add(taperedCapsule(x,y,z,[-.205,hy,.074],[-.158,hy,.032],.019*lr,.013*lr),.008);
+    add(ellipsoid(x,y,z,-.128,hy,.019,.050*params.paws,.028*params.paws,.016),.009);
   }
-  const tail=[[-.255,0,.255],[-.345,.005,.275],[-.435,.010,.320],[-.520,.018,.385],[-.555,.030,.455],[-.515,.045,.515]];for(let i=0;i<tail.length-1;i++)add(taperedCapsule(x,y,z,tail[i],tail[i+1],mix(.036,.016,i/(tail.length-1)),mix(.034,.009,(i+1)/(tail.length-1))),.018);
+  const tail=[[-.260,0,.255],[-.355,.003,.225],[-.455,.010,.185],[-.555,.018,.160],[-.645,.028,.210],[-.695,.040,.295]];
+  for(let i=0;i<tail.length-1;i++){const t0=i/(tail.length-1),t1=(i+1)/(tail.length-1),r0=mix(.034,.011,t0),r1=mix(.034,.011,t1);add(taperedCapsule(x,y,z,tail[i],tail[i+1],r0,r1),.012)}
   return d;
 }
 
@@ -134,13 +146,13 @@ function applyCoatColors(){
 }
 
 let buildStart=0;async function rebuild(){loading.style.display='grid';buildStart=performance.now();setProgress(.03,'采样连续解剖场…');await new Promise(r=>setTimeout(r,20));const N=resolution,N2=N*N,field=body.field;let idx=0;for(let iz=0;iz<N;iz++){const z=mix(bounds.minZ,bounds.maxZ,iz/(N-1));for(let iy=0;iy<N;iy++){const y=mix(bounds.minY,bounds.maxY,iy/(N-1));for(let ix=0;ix<N;ix++){const x=mix(bounds.minX,bounds.maxX,ix/(N-1));field[idx++]=-bodySdf(x,y,z)}}if(iz%7===0){setProgress(.05+.55*iz/(N-1),`采样 ${iz+1}/${N}`);await new Promise(r=>requestAnimationFrame(r))}}
-  setProgress(.65,'提取统一身体表面…');await new Promise(r=>requestAnimationFrame(r));body.update();setProgress(.82,'生成程序化灰虎斑材质…');await new Promise(r=>requestAnimationFrame(r));const used=applyCoatColors();body.geometry.computeBoundingSphere();body.geometry.computeBoundingBox();setProgress(.96,'更新四视图与指标…');await new Promise(r=>requestAnimationFrame(r));const ms=performance.now()-buildStart;const tri=Math.floor(used/3);document.querySelector('#mResolution').textContent=`${resolution}³`;document.querySelector('#mTriangles').textContent=tri.toLocaleString();document.querySelector('#mBuild').textContent=`${ms.toFixed(0)} ms`;window.__CAT_BODY_BIND_V1_STATS__={schema:'cat_kaopu/cat_body_bind_r0_stats@1.0',buildId:'cat-body-bind-v1-r0-20260917',resolution,triangles:tri,vertices:used,continuousBodyObjects:1,externalAnimalMeshes:0,externalImageTextures:0,fieldRepresentation:'continuous-anatomical-sdf',stableTopology:false,skinned:false,visualAcceptance:false,bindAcceptance:false,motionAcceptance:false,productionReady:false,buildMs:ms,params:{...params}};setProgress(1,'完成');setTimeout(()=>loading.style.display='none',120)}
+  setProgress(.65,'提取统一身体表面…');await new Promise(r=>requestAnimationFrame(r));body.update();setProgress(.82,'生成程序化灰虎斑材质…');await new Promise(r=>requestAnimationFrame(r));const used=applyCoatColors();body.geometry.computeBoundingSphere();body.geometry.computeBoundingBox();setProgress(.96,'更新四视图与指标…');await new Promise(r=>requestAnimationFrame(r));const ms=performance.now()-buildStart;const tri=Math.floor(used/3);document.querySelector('#mResolution').textContent=`${resolution}³`;document.querySelector('#mTriangles').textContent=tri.toLocaleString();document.querySelector('#mBuild').textContent=`${ms.toFixed(0)} ms`;window.__CAT_BODY_BIND_V1_STATS__={schema:'cat_kaopu/cat_kaopu/cat_body_bind_r1_stats@1.0',buildId:'cat-body-bind-v1-r1-20260917',resolution,triangles:tri,vertices:used,continuousBodyObjects:1,externalAnimalMeshes:0,externalImageTextures:0,fieldRepresentation:'continuous-anatomical-sdf',stableTopology:false,skinned:false,visualAcceptance:false,bindAcceptance:false,motionAcceptance:false,productionReady:false,buildMs:ms,params:{...params}};setProgress(1,'完成');setTimeout(()=>loading.style.display='none',120)}
 
 const features=new THREE.Group();scene.add(features);const eyeMat=new THREE.MeshStandardMaterial({color:0x79916e,roughness:.28,metalness:0}),pupilMat=new THREE.MeshStandardMaterial({color:0x050608,roughness:.25}),noseMat=new THREE.MeshStandardMaterial({color:0x3a2327,roughness:.7}),innerMat=new THREE.MeshStandardMaterial({color:0x8f6668,roughness:.88,side:THREE.DoubleSide});
 for(const side of [-1,1]){const eye=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),eyeMat);eye.position.set(.423,side*.071,.383);eye.scale.set(.018,.014,.019);features.add(eye);const pupil=new THREE.Mesh(new THREE.SphereGeometry(1,18,12),pupilMat);pupil.position.set(.438,side*.075,.383);pupil.scale.set(.006,.004,.012);features.add(pupil);const earGeo=new THREE.BufferGeometry();const s=side;earGeo.setAttribute('position',new THREE.Float32BufferAttribute([.320,s*.054,.430,.348,s*.056,.425,.303,s*.069,.505],3));earGeo.computeVertexNormals();features.add(new THREE.Mesh(earGeo,innerMat))}
 const nose=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),noseMat);nose.position.set(.480,0,.336);nose.scale.set(.016,.022,.014);features.add(nose);
 
-const skeleton=new THREE.Group();skeleton.visible=false;scene.add(skeleton);const anchors={pelvis:[-.145,0,.225],lumbar:[-.035,0,.245],thorax:[.10,0,.275],neck:[.24,0,.325],head:[.35,0,.375],tail0:[-.255,0,.255],tail1:[-.43,.01,.32]};for(const side of [-1,1]){anchors[`shoulder${side}`]=[.175,side*.076,.265];anchors[`elbow${side}`]=[.165,side*.076,.150];anchors[`wrist${side}`]=[.195,side*.076,.068];anchors[`forepaw${side}`]=[.25,side*.076,.025];anchors[`hip${side}`]=[-.15,side*.083,.225];anchors[`stifle${side}`]=[-.045,side*.083,.145];anchors[`hock${side}`]=[-.175,side*.083,.074];anchors[`hindpaw${side}`]=[-.07,side*.083,.024]}
+const skeleton=new THREE.Group();skeleton.visible=false;scene.add(skeleton);const anchors={pelvis:[-.155,0,.247],lumbar:[-.035,0,.255],thorax:[.105,0,.280],neck:[.255,0,.345],head:[.355,0,.402],tail0:[-.260,0,.255],tail1:[-.455,.01,.185]};for(const side of [-1,1]){anchors[`shoulder${side}`]=[.165,side*.067,.274];anchors[`elbow${side}`]=[.118,side*.067,.165];anchors[`wrist${side}`]=[.145,side*.067,.067];anchors[`forepaw${side}`]=[.190,side*.067,.019];anchors[`hip${side}`]=[-.155,side*.075,.242];anchors[`stifle${side}`]=[-.038,side*.075,.155];anchors[`hock${side}`]=[-.205,side*.075,.074];anchors[`hindpaw${side}`]=[-.128,side*.075,.019]}
 const links=[['pelvis','lumbar'],['lumbar','thorax'],['thorax','neck'],['neck','head'],['pelvis','tail0'],['tail0','tail1']];for(const side of [-1,1])links.push(['thorax',`shoulder${side}`],[`shoulder${side}`,`elbow${side}`],[`elbow${side}`,`wrist${side}`],[`wrist${side}`,`forepaw${side}`],['pelvis',`hip${side}`],[`hip${side}`,`stifle${side}`],[`stifle${side}`,`hock${side}`],[`hock${side}`,`hindpaw${side}`]);const linePts=[];for(const [a,b] of links)linePts.push(...anchors[a],...anchors[b]);const line=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(linePts,3)),new THREE.LineBasicMaterial({color:0x43d7e8,depthTest:false,transparent:true,opacity:.9}));line.renderOrder=5;skeleton.add(line);const jointGeo=new THREE.SphereGeometry(.009,12,8),jointMat=new THREE.MeshBasicMaterial({color:0xffc767,depthTest:false});for(const p of Object.values(anchors)){const m=new THREE.Mesh(jointGeo,jointMat);m.position.fromArray(p);m.renderOrder=6;skeleton.add(m)}
 
 const views={front:{p:[1.35,0,.29],u:[0,0,1]},left:{p:[-.02,1.35,.30],u:[0,0,1]},right:{p:[-.02,-1.35,.30],u:[0,0,1]},top:{p:[-.04,0,1.55],u:[1,0,0]},'quarter-front':{p:[1.18,.86,.62],u:[0,0,1]},'quarter-rear':{p:[-1.15,.86,.60],u:[0,0,1]}};
