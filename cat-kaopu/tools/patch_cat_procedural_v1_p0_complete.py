@@ -5,6 +5,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 CORE = ROOT / "cat-kaopu/procedural-cat-v1/src/cat-procedural-core.mjs"
 PAGE = ROOT / "cat-kaopu/procedural-cat-v1/index.html"
+DEFAULT_DNA = ROOT / "cat-kaopu/procedural-cat-v1/DEFAULT_GREY_TABBY_A.catdna.json"
+SCHEMA = ROOT / "cat-kaopu/procedural-cat-v1/CAT_DNA_SCHEMA.json"
 
 
 def replace_once(text: str, old: str, new: str, label: str) -> tuple[str, bool]:
@@ -20,6 +22,8 @@ def replace_once(text: str, old: str, new: str, label: str) -> tuple[str, bool]:
 
 core = CORE.read_text(encoding="utf-8")
 page = PAGE.read_text(encoding="utf-8")
+default_dna = DEFAULT_DNA.read_text(encoding="utf-8")
+schema = SCHEMA.read_text(encoding="utf-8")
 changed = False
 
 core, did = replace_once(
@@ -78,6 +82,22 @@ core, did = replace_once(
 )
 changed |= did
 
+core, did = replace_once(
+    core,
+    "    shortHairAmplitude: 0.0035,",
+    "    shortHairAmplitude: 0.00035,",
+    "neutral-review hair amplitude",
+)
+changed |= did
+
+core, did = replace_once(
+    core,
+    "  'material.shortHairAmplitude': { group: '表面', label: '短毛起伏', min: 0.0, max: 0.007, step: 0.0002 },",
+    "  'material.shortHairAmplitude': { group: '表面', label: '短毛起伏', min: 0.0, max: 0.002, step: 0.0001 },",
+    "bounded hair amplitude definition",
+)
+changed |= did
+
 page, did = replace_once(
     page,
     "function updateFeatures(){clearGroup(featureGroup);const {anchors}=deriveCatSkeleton(dna),h=dna.head;",
@@ -86,9 +106,27 @@ page, did = replace_once(
 )
 changed |= did
 
+default_dna, did = replace_once(
+    default_dna,
+    '    "shortHairAmplitude": 0.0035,',
+    '    "shortHairAmplitude": 0.00035,',
+    "default CatDNA hair amplitude",
+)
+changed |= did
+
+schema, did = replace_once(
+    schema,
+    '"shortHairAmplitude": { "type": "number", "minimum": 0.0, "maximum": 0.007 }',
+    '"shortHairAmplitude": { "type": "number", "minimum": 0.0, "maximum": 0.002 }',
+    "CatDNA schema hair bound",
+)
+changed |= did
+
 if changed:
     CORE.write_text(core, encoding="utf-8")
     PAGE.write_text(page, encoding="utf-8")
-    print("connected all P0 CatDNA fields and repaired the procedural SDF")
+    DEFAULT_DNA.write_text(default_dna, encoding="utf-8")
+    SCHEMA.write_text(schema, encoding="utf-8")
+    print("connected all P0 CatDNA fields, repaired the SDF and kept short-hair relief below morphology scale")
 else:
-    print("P0 CatDNA output wiring and SDF repair already complete")
+    print("P0 CatDNA output wiring, SDF repair and neutral hair scale already complete")
