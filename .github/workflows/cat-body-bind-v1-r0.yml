@@ -1,4 +1,4 @@
-name: Cat Body Bind V1 R1
+name: Cat Body Bind V1 R2
 
 on:
   push:
@@ -7,10 +7,7 @@ on:
     paths:
       - .github/workflows/cat-body-bind-v1-r0.yml
       - cat-kaopu/body-bind-v1/**
-      - cat-kaopu/tools/capture_cat_body_bind_v1_r0.mjs
-      - cat-kaopu/tools/patch_cat_body_bind_v1_r0_performance.py
-      - cat-kaopu/tools/fix_cat_body_bind_v1_r1_patch_regex.py
-      - cat-kaopu/tools/patch_cat_body_bind_v1_r1_anatomy.py
+      - cat-kaopu/tools/patch_cat_body_bind_v1_r2_reference.py
       - cat-kaopu/docs/CAT_BODY_BIND_V1_*.md
       - package.json
       - package-lock.json
@@ -34,20 +31,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Optimize authoring runtime
+      - name: Build R2 reference-calibrated body and QA source
         env:
           PYTHONDONTWRITEBYTECODE: '1'
-        run: python cat-kaopu/tools/patch_cat_body_bind_v1_r0_performance.py
-
-      - name: Repair R1 anatomy patch
-        env:
-          PYTHONDONTWRITEBYTECODE: '1'
-        run: python cat-kaopu/tools/fix_cat_body_bind_v1_r1_patch_regex.py
-
-      - name: Build R1 anatomical field and QA source
-        env:
-          PYTHONDONTWRITEBYTECODE: '1'
-        run: python cat-kaopu/tools/patch_cat_body_bind_v1_r1_anatomy.py
+        run: python cat-kaopu/tools/patch_cat_body_bind_v1_r2_reference.py
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -60,11 +47,11 @@ jobs:
           npm ci
           npx playwright install chromium --with-deps
 
-      - name: Serve and capture R1 body evidence
+      - name: Serve and capture R2 body evidence
         shell: bash
         run: |
           set -euo pipefail
-          python -m http.server 4173 --bind 127.0.0.1 > "${RUNNER_TEMP}/cat-body-bind-v1-r1-http.log" 2>&1 &
+          python -m http.server 4173 --bind 127.0.0.1 > "${RUNNER_TEMP}/cat-body-bind-v1-r2-http.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
           ready=0
@@ -76,28 +63,29 @@ jobs:
             sleep 1
           done
           if [ "$ready" -ne 1 ]; then
-            cat "${RUNNER_TEMP}/cat-body-bind-v1-r1-http.log" || true
+            cat "${RUNNER_TEMP}/cat-body-bind-v1-r2-http.log" || true
             exit 1
           fi
           CAT_BODY_BIND_V1_URL='http://127.0.0.1:4173/cat-kaopu/body-bind-v1/index.html' \
-            node cat-kaopu/tools/capture_cat_body_bind_v1_r1.mjs
+            node cat-kaopu/tools/capture_cat_body_bind_v1_r2.mjs
 
-      - name: Upload R1 body evidence
+      - name: Upload R2 body evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cat-body-bind-v1-r1-${{ github.run_number }}
+          name: cat-body-bind-v1-r2-${{ github.run_number }}
           path: |
             cat-kaopu/body-bind-v1/index.html
             cat-kaopu/body-bind-v1/CAT_BODY_BIND_V1_CONTRACT.json
+            cat-kaopu/body-bind-v1/CAT_BODY_BIND_V1_REFERENCE_LANDMARKS_R2.json
             cat-kaopu/docs/CAT_BODY_BIND_V1_*.md
-            cat-kaopu/tools/capture_cat_body_bind_v1_r1.mjs
-            cat-kaopu/qa/body-bind-v1-r1/*.json
-            cat-kaopu/qa/body-bind-v1-r1/*.png
+            cat-kaopu/tools/capture_cat_body_bind_v1_r2.mjs
+            cat-kaopu/qa/body-bind-v1-r2/*.json
+            cat-kaopu/qa/body-bind-v1-r2/*.png
           if-no-files-found: error
           retention-days: 30
 
-      - name: Commit optimized R1 and browser evidence
+      - name: Commit R2 candidate and browser evidence
         shell: bash
         run: |
           set -euo pipefail
@@ -105,13 +93,13 @@ jobs:
           git config user.email 'cat-body-bind-build-bot@users.noreply.github.com'
           git add \
             cat-kaopu/body-bind-v1/index.html \
-            cat-kaopu/tools/capture_cat_body_bind_v1_r1.mjs \
-            cat-kaopu/qa/body-bind-v1-r1
+            cat-kaopu/tools/capture_cat_body_bind_v1_r2.mjs \
+            cat-kaopu/qa/body-bind-v1-r2
           if git diff --cached --quiet; then
-            echo 'No Cat Body Bind V1 R1 generated changes to commit.'
+            echo 'No Cat Body Bind V1 R2 generated changes to commit.'
             exit 0
           fi
-          git commit -m 'build(cat): generate Cat Body Bind V1 R1 anatomical evidence [body-bind-v1 generated]'
+          git commit -m 'build(cat): generate Cat Body Bind V1 R2 reference evidence [body-bind-v1 generated]'
           for attempt in 1 2 3; do
             if git push origin "HEAD:${GITHUB_REF_NAME}"; then
               exit 0
@@ -120,5 +108,5 @@ jobs:
             git fetch origin "${GITHUB_REF_NAME}"
             git rebase "origin/${GITHUB_REF_NAME}"
           done
-          echo 'Unable to push Cat Body Bind V1 R1 generated evidence after three attempts.' >&2
+          echo 'Unable to push Cat Body Bind V1 R2 evidence after three attempts.' >&2
           exit 1
