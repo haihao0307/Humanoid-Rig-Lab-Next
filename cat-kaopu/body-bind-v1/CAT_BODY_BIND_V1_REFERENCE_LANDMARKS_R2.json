@@ -1,0 +1,71 @@
+{
+  "schema": "cat_kaopu/cat_body_reference_landmarks@1.0",
+  "buildId": "cat-body-bind-v1-r2-20260917",
+  "date": "2026-09-17",
+  "units": "meter",
+  "coordinateSystem": {
+    "forward": "+X",
+    "left": "+Y",
+    "up": "+Z",
+    "ground": 0.0
+  },
+  "status": "calibration-targets-not-final-measurements",
+  "method": "normalized synthesis from veterinary CT/cross-sectional evidence, feline skeletal relations and fixed-view domestic-shorthair silhouette review; not direct digitization of one individual",
+  "longitudinalSections": [
+    {"id":"pelvis-rear","x":-0.285,"centerZ":0.270,"halfWidth":0.075,"halfDepth":0.088},
+    {"id":"pelvis","x":-0.185,"centerZ":0.270,"halfWidth":0.088,"halfDepth":0.102},
+    {"id":"lumbar","x":-0.055,"centerZ":0.275,"halfWidth":0.066,"halfDepth":0.083},
+    {"id":"abdomen","x":0.015,"centerZ":0.282,"halfWidth":0.070,"halfDepth":0.088},
+    {"id":"thorax-mid","x":0.115,"centerZ":0.300,"halfWidth":0.098,"halfDepth":0.122},
+    {"id":"thorax-front","x":0.205,"centerZ":0.302,"halfWidth":0.087,"halfDepth":0.108}
+  ],
+  "skeletonAnchors": {
+    "pelvis":[-0.175,0,0.268],
+    "lumbar":[-0.045,0,0.279],
+    "thorax":[0.115,0,0.302],
+    "neckRoot":[0.215,0,0.326],
+    "headCenter":[0.355,0,0.404],
+    "muzzleTip":[0.456,0,0.372],
+    "tailRoot":[-0.292,0,0.280],
+    "leftShoulder":[0.155,0.060,0.290],
+    "leftElbow":[0.116,0.060,0.170],
+    "leftWrist":[0.144,0.060,0.060],
+    "leftForepaw":[0.185,0.060,0.016],
+    "leftHip":[-0.175,0.068,0.264],
+    "leftStifle":[-0.055,0.068,0.178],
+    "leftHock":[-0.205,0.068,0.076],
+    "leftHindpaw":[-0.120,0.068,0.016]
+  },
+  "mirroring": {
+    "rightSide": "mirror left-side Y"
+  },
+  "headTargets": {
+    "craniumCenter":[0.352,0,0.407],
+    "craniumRadii":[0.078,0.067,0.077],
+    "muzzleCenter":[0.410,0,0.378],
+    "muzzleRadii":[0.052,0.043,0.036],
+    "mandibleCenter":[0.405,0,0.350],
+    "mandibleRadii":[0.050,0.041,0.024],
+    "pinnaTipZ":0.505,
+    "pinnaBaseZ":0.447
+  },
+  "reviewConstraints": {
+    "neutralStanding": true,
+    "fourPawsGrounded": true,
+    "headNotHiddenByFeatures": true,
+    "eyesAndNoseDefaultVisible": false,
+    "stableTopology": false,
+    "skinningAllowed": false,
+    "motionAllowed": false
+  },
+  "evidence": [
+    {"type":"paper","pmid":"9845186","doi":"10.1111/j.1740-8261.1998.tb01640.x","use":"thorax and abdomen cross-sectional organization"},
+    {"type":"paper","pmid":"42710191","doi":"10.1016/j.rvsc.2026.106389","use":"thorax/abdomen CT and 3D reconstruction"},
+    {"type":"paper","pmid":"36156372","use":"regional body-surface investment audit"},
+    {"type":"paper","pmid":"32125674","use":"cervical, thoracic and lumbar vertebral transition groups"},
+    {"type":"paper","pmid":"38672320","doi":"10.3390/ani14081172","use":"cranium and nasal-region structural separation"},
+    {"type":"open-3d-reference","title":"Domestic Cat (Felis catus)","provider":"The University of Edinburgh Open.Ed","license":"CC BY","use":"CT-derived skeletal relation and gross scale reference only"}
+  ],
+  "visualAcceptance": false,
+  "productionReady": false
+}
