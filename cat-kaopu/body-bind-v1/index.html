@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CAT BODY BIND V1 R0 · 连续整猫身体候选</title>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"}}
+</script>
+<style>
+:root{color-scheme:dark;--bg:#071015;--panel:#0b1a22;--line:#214552;--text:#edf8fb;--muted:#8ba8b3;--accent:#44d4e5;--warn:#ffbe5c}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,"Noto Sans SC",sans-serif}
+#app{display:grid;grid-template-rows:72px 1fr;height:100%}header{display:flex;align-items:center;gap:14px;padding:9px 14px;border-bottom:1px solid var(--line);background:#09161d}.brand{min-width:330px}.brand h1{margin:0 0 4px;font-size:17px}.brand p{margin:0;font-size:11px;color:var(--muted);line-height:1.35}.toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.toolbar button{border:1px solid var(--line);background:#102630;color:var(--text);border-radius:7px;padding:7px 9px;font-size:12px;cursor:pointer}.toolbar button:hover,.toolbar button.active{border-color:var(--accent);color:#fff;background:#123542}.toolbar .danger{color:var(--warn)}
+main{position:relative;min-height:0}canvas{display:block;width:100%;height:100%}.status{position:absolute;left:12px;bottom:12px;max-width:min(720px,calc(100vw - 24px));border:1px solid var(--line);background:rgba(5,14,18,.92);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--muted);line-height:1.5}.status b{color:var(--accent)}
+.panel{position:absolute;right:12px;top:12px;width:320px;max-height:calc(100% - 24px);overflow:auto;border:1px solid var(--line);border-radius:10px;background:rgba(7,18,24,.94);padding:12px;box-shadow:0 10px 30px #0008}.panel.hidden{display:none}.panel h2{font-size:14px;margin:0 0 8px}.panel h3{font-size:12px;margin:13px 0 7px;color:var(--accent)}.panel p,.panel li{font-size:11px;line-height:1.5;color:var(--muted)}.panel ul{margin:6px 0;padding-left:18px}.metric{display:flex;justify-content:space-between;gap:10px;border-top:1px solid #16333d;padding:5px 0;font-size:11px}.metric span:first-child{color:var(--muted)}.metric span:last-child{text-align:right}.panel label{display:grid;grid-template-columns:105px 1fr 42px;align-items:center;gap:6px;font-size:11px;margin:6px 0}.panel input[type=range]{width:100%}.panel output{text-align:right;color:var(--accent)}
+#loading{position:absolute;inset:0;display:grid;place-items:center;background:#050c10;z-index:5}.loader{width:min(520px,80vw);text-align:center}.bar{height:8px;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin-top:12px}.bar i{display:block;width:4%;height:100%;background:var(--accent);transition:width .12s}.loader p{color:var(--muted);font-size:12px}.error{color:#ff7f7f!important}
+@media(max-width:820px){#app{grid-template-rows:auto 1fr}.brand{min-width:0}.panel{width:min(310px,calc(100vw - 24px));max-height:48%}header{align-items:flex-start;flex-direction:column}.toolbar{padding-bottom:2px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div class="brand"><h1>CAT BODY BIND V1 · R0 整猫身体候选</h1><p>新身体母体，不继承 Gate corrective。当前只审整猫形态与基础材质，不生产动作。</p></div>
+  <div class="toolbar">
+    <button data-view="front">正面</button><button data-view="left">左侧</button><button data-view="right">右侧</button><button data-view="top">顶部</button><button data-view="quarter-front" class="active">前四分之三</button><button data-view="quarter-rear">后四分之三</button>
+    <button id="skeletonBtn">骨架锚点</button><button id="wireBtn">线框</button><button id="coatBtn" class="active">灰虎斑材质</button><button id="panelBtn">参数与指标</button><button id="resetBtn">恢复 R0</button>
+  </div>
+</header>
+<main id="stage">
+  <div id="loading"><div class="loader"><b>正在生成连续整猫身体</b><p id="loadText">初始化程序化解剖场…</p><div class="bar"><i id="loadBar"></i></div></div></div>
+  <div class="panel" id="panel">
+    <h2>R0 生产边界</h2>
+    <p>连续隐式作者态用于整猫轮廓决策。眼球、鼻镜和耳内是功能子结构；身体、耳根、四肢、足掌和尾根由同一连续场生成。当前尚未建立正式稳定拓扑、蒙皮和动作。</p>
+    <h3>低频形态参数</h3>
+    <label><span>胸腔体积</span><input data-param="thorax" type="range" min="0.84" max="1.18" step="0.01" value="1"><output>1.00</output></label>
+    <label><span>腹部收束</span><input data-param="abdomen" type="range" min="0.82" max="1.16" step="0.01" value="1"><output>1.00</output></label>
+    <label><span>骨盆体积</span><input data-param="pelvis" type="range" min="0.86" max="1.16" step="0.01" value="1"><output>1.00</output></label>
+    <label><span>头部宽度</span><input data-param="head" type="range" min="0.86" max="1.14" step="0.01" value="1"><output>1.00</output></label>
+    <label><span>口鼻长度</span><input data-param="muzzle" type="range" min="0.82" max="1.16" step="0.01" value="1"><output>1.00</output></label>
+    <label><span>腿部粗细</span><input data-param="limbs" type="range" min="0.84" max="1.16" step="0.01" value="1"><output>1.00</output></label>
+    <label><span>足掌大小</span><input data-param="paws" type="range" min="0.86" max="1.18" step="0.01" value="1"><output>1.00</output></label>
+    <label><span>耳高</span><input data-param="ears" type="range" min="0.82" max="1.18" step="0.01" value="1"><output>1.00</output></label>
+    <h3>实时指标</h3>
+    <div class="metric"><span>作者态分辨率</span><span id="mResolution">—</span></div>
+    <div class="metric"><span>生成三角形</span><span id="mTriangles">—</span></div>
+    <div class="metric"><span>连续身体对象</span><span>1</span></div>
+    <div class="metric"><span>外部动物模型</span><span>0</span></div>
+    <div class="metric"><span>外部图像贴图</span><span>0</span></div>
+    <div class="metric"><span>生成耗时</span><span id="mBuild">—</span></div>
+    <div class="metric"><span>当前状态</span><span class="danger">视觉未验收</span></div>
+    <h3>本轮硬检查</h3>
+    <ul><li>头颈、肩胛胸廓、胸腹骨盆整体节奏。</li><li>前后肢段落、趾行姿态、四足接地。</li><li>尾根是否进入荐骨后端而非插接。</li><li>不能以材质或镜头掩盖轮廓错误。</li></ul>
+  </div>
+  <div class="status" id="status"><b>R0</b>：整猫身体作者态已与旧 V4.32 / Gate corrective 分离。下一门是四视图形态审批，不是动作或猫群。</div>
+</main>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+
+const stage=document.querySelector('#stage'),loading=document.querySelector('#loading'),loadText=document.querySelector('#loadText'),loadBar=document.querySelector('#loadBar');
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(stage.clientWidth,stage.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.shadowMap.enabled=true;stage.prepend(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x071015);scene.fog=new THREE.Fog(0x071015,1.8,3.1);
+const camera=new THREE.PerspectiveCamera(34,stage.clientWidth/stage.clientHeight,.01,20);camera.position.set(1.35,.9,.72);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.075;controls.target.set(-.02,0,.24);controls.minDistance=.45;controls.maxDistance=3;
+scene.add(new THREE.HemisphereLight(0xbfe8ff,0x1a2024,1.55));const key=new THREE.DirectionalLight(0xffffff,3.0);key.position.set(1.4,-1.2,2.1);key.castShadow=true;scene.add(key);const fill=new THREE.DirectionalLight(0x8acbe0,1.2);fill.position.set(-1.2,1.4,.8);scene.add(fill);const rim=new THREE.DirectionalLight(0xffd1ad,.8);rim.position.set(-1.4,-.8,1.1);scene.add(rim);
+const grid=new THREE.GridHelper(1.8,36,0x2d7f91,0x15343e);grid.rotation.x=Math.PI/2;grid.position.z=.001;scene.add(grid);const floor=new THREE.Mesh(new THREE.PlaneGeometry(3,2),new THREE.MeshStandardMaterial({color:0x0b171c,roughness:1,metalness:0}));floor.receiveShadow=true;floor.position.z=-.002;scene.add(floor);
+
+const defaults={thorax:1,abdomen:1,pelvis:1,head:1,muzzle:1,limbs:1,paws:1,ears:1};const params={...defaults};
+const bounds={minX:-.64,maxX:.54,minY:-.225,maxY:.225,minZ:-.025,maxZ:.57};const resolution=86;
+const coatMaterial=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.78,metalness:0,side:THREE.DoubleSide});
+const body=new MarchingCubes(resolution,coatMaterial,false,false,520000);body.isolation=0;body.scale.set((bounds.maxX-bounds.minX)/2,(bounds.maxY-bounds.minY)/2,(bounds.maxZ-bounds.minZ)/2);body.position.set((bounds.maxX+bounds.minX)/2,(bounds.maxY+bounds.minY)/2,(bounds.maxZ+bounds.minZ)/2);body.castShadow=true;body.receiveShadow=true;scene.add(body);
+
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));const mix=(a,b,t)=>a+(b-a)*t;
+function smin(a,b,k){const h=clamp(.5+.5*(b-a)/k);return mix(b,a,h)-k*h*(1-h)}
+function ellipsoid(x,y,z,cx,cy,cz,rx,ry,rz){const px=x-cx,py=y-cy,pz=z-cz;const k0=Math.hypot(px/rx,py/ry,pz/rz);const k1=Math.hypot(px/(rx*rx),py/(ry*ry),pz/(rz*rz));return k0*(k0-1)/(k1||1)}
+function taperedCapsule(x,y,z,a,b,r0,r1){const bax=b[0]-a[0],bay=b[1]-a[1],baz=b[2]-a[2],pax=x-a[0],pay=y-a[1],paz=z-a[2],den=bax*bax+bay*bay+baz*baz;const h=clamp((pax*bax+pay*bay+paz*baz)/(den||1));const qx=pax-bax*h,qy=pay-bay*h,qz=paz-baz*h;return Math.hypot(qx,qy,qz)-mix(r0,r1,h)}
+function bodySdf(x,y,z){let d=1e3;const add=(v,k=.022)=>{d=smin(d,v,k)};
+  add(ellipsoid(x,y,z,-.145,0,.225,.175,.112*params.pelvis,.132),.048);
+  add(ellipsoid(x,y,z,-.015,0,.228,.205,.099*params.abdomen,.116),.052);
+  add(ellipsoid(x,y,z,.105,0,.255,.182,.124*params.thorax,.145*params.thorax),.052);
+  add(ellipsoid(x,y,z,.205,0,.282,.105,.118,.116),.045);
+  add(taperedCapsule(x,y,z,[.18,0,.286],[.292,0,.352],.087,.067),.036);
+  add(ellipsoid(x,y,z,.345,0,.374,.104,.087*params.head,.087),.035);
+  add(ellipsoid(x,y,z,.410,0,.347,.080*params.muzzle,.064,.054),.027);
+  add(ellipsoid(x,y,z,.370,0,.323,.078,.068,.052),.025);
+  for(const side of [-1,1]){
+    add(ellipsoid(x,y,z,.350,side*.051,.357,.075,.052,.064),.022);
+    const tip=[.300,side*.068,.520+(params.ears-1)*.055],base1=[.302,side*.042,.420],base2=[.365,side*.043,.415];
+    add(taperedCapsule(x,y,z,base1,tip,.044,.005),.020);add(taperedCapsule(x,y,z,base2,tip,.034,.004),.018);
+    const sy=side*.076,lr=params.limbs;
+    add(taperedCapsule(x,y,z,[.175,sy,.265],[.165,sy,.150],.044*lr,.032*lr),.024);
+    add(taperedCapsule(x,y,z,[.165,sy,.150],[.195,sy,.068],.034*lr,.025*lr),.018);
+    add(taperedCapsule(x,y,z,[.195,sy,.068],[.225,sy,.030],.026*lr,.020*lr),.014);
+    add(ellipsoid(x,y,z,.250,sy,.025,.068*params.paws,.039*params.paws,.022),.018);
+    const hy=side*.083;
+    add(ellipsoid(x,y,z,-.145,hy,.220,.105,.066*lr,.100),.030);
+    add(taperedCapsule(x,y,z,[-.150,hy,.225],[-.045,hy,.145],.055*lr,.039*lr),.025);
+    add(taperedCapsule(x,y,z,[-.045,hy,.145],[-.175,hy,.074],.040*lr,.030*lr),.020);
+    add(taperedCapsule(x,y,z,[-.175,hy,.074],[-.105,hy,.032],.031*lr,.022*lr),.016);
+    add(ellipsoid(x,y,z,-.070,hy,.024,.078*params.paws,.042*params.paws,.023),.018);
+  }
+  const tail=[[-.255,0,.255],[-.345,.005,.275],[-.435,.010,.320],[-.520,.018,.385],[-.555,.030,.455],[-.515,.045,.515]];for(let i=0;i<tail.length-1;i++)add(taperedCapsule(x,y,z,tail[i],tail[i+1],mix(.036,.016,i/(tail.length-1)),mix(.034,.009,(i+1)/(tail.length-1))),.018);
+  return d;
+}
+
+function setProgress(p,text){loadBar.style.width=`${Math.round(p*100)}%`;loadText.textContent=text}
+function worldFromLocal(v){return new THREE.Vector3(mix(bounds.minX,bounds.maxX,(v.x+1)/2),mix(bounds.minY,bounds.maxY,(v.y+1)/2),mix(bounds.minZ,bounds.maxZ,(v.z+1)/2))}
+function smoothstep(a,b,x){const t=clamp((x-a)/(b-a));return t*t*(3-2*t)}
+function coatColor(p){const base=new THREE.Color(.39,.405,.42),dark=new THREE.Color(.115,.125,.135),light=new THREE.Color(.68,.67,.64),warm=new THREE.Color(.47,.43,.39);let c=base.clone();const under=1-smoothstep(.17,.29,p.z);c.lerp(light,under*.28);const dorsal=smoothstep(.245,.38,p.z)*(1-smoothstep(.09,.16,Math.abs(p.y)));c.lerp(dark,dorsal*.28);const bodyBand=(1-smoothstep(.24,.34,Math.abs(p.x-.015)))*smoothstep(.18,.33,p.z);const wave=Math.sin((p.x+.16)*62+Math.sin(p.y*31)*.7);const stripe=smoothstep(.30,.86,wave)*bodyBand;c.lerp(dark,stripe*.58);const sideStripe=smoothstep(.20,.90,Math.sin((p.x+.22)*55+Math.abs(p.y)*22))*smoothstep(.04,.13,Math.abs(p.y))*smoothstep(.18,.34,p.z);c.lerp(dark,sideStripe*.34);if(p.x>.285){const face=smoothstep(.15,.9,Math.sin((p.y+.07)*72+(p.z-.32)*28));c.lerp(dark,face*.25)}if(p.x<-.26){const ring=smoothstep(.15,.85,Math.sin((-p.x+p.z)*92));c.lerp(dark,ring*.52)}const whiteMuzzle=smoothstep(.35,.44,p.x)*(1-smoothstep(.34,.39,p.z));const whiteChest=smoothstep(.12,.22,p.x)*(1-smoothstep(.05,.095,Math.abs(p.y)))*(1-smoothstep(.19,.27,p.z));const paws=(1-smoothstep(.035,.065,p.z));c.lerp(light,Math.max(whiteMuzzle*.75,whiteChest*.62,paws*.32));const hipWarm=(1-smoothstep(.14,.24,Math.abs(p.x+.13)))*smoothstep(.055,.13,Math.abs(p.y));c.lerp(warm,hipWarm*.10);return c}
+function applyCoatColors(){const pos=body.geometry.getAttribute('position'),count=pos.count,arr=new Float32Array(count*3),v=new THREE.Vector3();for(let i=0;i<count;i++){v.fromBufferAttribute(pos,i);const c=coatColor(worldFromLocal(v));arr[i*3]=c.r;arr[i*3+1]=c.g;arr[i*3+2]=c.b}body.geometry.setAttribute('color',new THREE.BufferAttribute(arr,3));body.geometry.attributes.color.needsUpdate=true}
+
+let buildStart=0;async function rebuild(){loading.style.display='grid';buildStart=performance.now();setProgress(.03,'采样连续解剖场…');await new Promise(r=>setTimeout(r,20));const N=resolution,N2=N*N,field=body.field;let idx=0;for(let iz=0;iz<N;iz++){const z=mix(bounds.minZ,bounds.maxZ,iz/(N-1));for(let iy=0;iy<N;iy++){const y=mix(bounds.minY,bounds.maxY,iy/(N-1));for(let ix=0;ix<N;ix++){const x=mix(bounds.minX,bounds.maxX,ix/(N-1));field[idx++]=-bodySdf(x,y,z)}}if(iz%7===0){setProgress(.05+.55*iz/(N-1),`采样 ${iz+1}/${N}`);await new Promise(r=>requestAnimationFrame(r))}}
+  setProgress(.65,'提取统一身体表面…');await new Promise(r=>requestAnimationFrame(r));body.update();setProgress(.82,'生成程序化灰虎斑材质…');await new Promise(r=>requestAnimationFrame(r));applyCoatColors();body.geometry.computeBoundingSphere();body.geometry.computeBoundingBox();setProgress(.96,'更新四视图与指标…');await new Promise(r=>requestAnimationFrame(r));const ms=performance.now()-buildStart;const tri=Math.floor(body.geometry.drawRange.count/3);document.querySelector('#mResolution').textContent=`${resolution}³`;document.querySelector('#mTriangles').textContent=tri.toLocaleString();document.querySelector('#mBuild').textContent=`${ms.toFixed(0)} ms`;window.__CAT_BODY_BIND_V1_STATS__={schema:'cat_kaopu/cat_body_bind_r0_stats@1.0',buildId:'cat-body-bind-v1-r0-20260917',resolution,triangles:tri,vertices:body.geometry.drawRange.count,continuousBodyObjects:1,externalAnimalMeshes:0,externalImageTextures:0,fieldRepresentation:'continuous-anatomical-sdf',stableTopology:false,skinned:false,visualAcceptance:false,bindAcceptance:false,motionAcceptance:false,productionReady:false,buildMs:ms,params:{...params}};setProgress(1,'完成');setTimeout(()=>loading.style.display='none',120)}
+
+const features=new THREE.Group();scene.add(features);const eyeMat=new THREE.MeshStandardMaterial({color:0x79916e,roughness:.28,metalness:0}),pupilMat=new THREE.MeshStandardMaterial({color:0x050608,roughness:.25}),noseMat=new THREE.MeshStandardMaterial({color:0x3a2327,roughness:.7}),innerMat=new THREE.MeshStandardMaterial({color:0x8f6668,roughness:.88,side:THREE.DoubleSide});
+for(const side of [-1,1]){const eye=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),eyeMat);eye.position.set(.423,side*.071,.383);eye.scale.set(.018,.014,.019);features.add(eye);const pupil=new THREE.Mesh(new THREE.SphereGeometry(1,18,12),pupilMat);pupil.position.set(.438,side*.075,.383);pupil.scale.set(.006,.004,.012);features.add(pupil);const earGeo=new THREE.BufferGeometry();const s=side;earGeo.setAttribute('position',new THREE.Float32BufferAttribute([.320,s*.054,.430,.348,s*.056,.425,.303,s*.069,.505],3));earGeo.computeVertexNormals();features.add(new THREE.Mesh(earGeo,innerMat))}
+const nose=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),noseMat);nose.position.set(.480,0,.336);nose.scale.set(.016,.022,.014);features.add(nose);
+
+const skeleton=new THREE.Group();skeleton.visible=false;scene.add(skeleton);const anchors={pelvis:[-.145,0,.225],lumbar:[-.035,0,.245],thorax:[.10,0,.275],neck:[.24,0,.325],head:[.35,0,.375],tail0:[-.255,0,.255],tail1:[-.43,.01,.32]};for(const side of [-1,1]){anchors[`shoulder${side}`]=[.175,side*.076,.265];anchors[`elbow${side}`]=[.165,side*.076,.150];anchors[`wrist${side}`]=[.195,side*.076,.068];anchors[`forepaw${side}`]=[.25,side*.076,.025];anchors[`hip${side}`]=[-.15,side*.083,.225];anchors[`stifle${side}`]=[-.045,side*.083,.145];anchors[`hock${side}`]=[-.175,side*.083,.074];anchors[`hindpaw${side}`]=[-.07,side*.083,.024]}
+const links=[['pelvis','lumbar'],['lumbar','thorax'],['thorax','neck'],['neck','head'],['pelvis','tail0'],['tail0','tail1']];for(const side of [-1,1])links.push(['thorax',`shoulder${side}`],[`shoulder${side}`,`elbow${side}`],[`elbow${side}`,`wrist${side}`],[`wrist${side}`,`forepaw${side}`],['pelvis',`hip${side}`],[`hip${side}`,`stifle${side}`],[`stifle${side}`,`hock${side}`],[`hock${side}`,`hindpaw${side}`]);const linePts=[];for(const [a,b] of links)linePts.push(...anchors[a],...anchors[b]);const line=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(linePts,3)),new THREE.LineBasicMaterial({color:0x43d7e8,depthTest:false,transparent:true,opacity:.9}));line.renderOrder=5;skeleton.add(line);const jointGeo=new THREE.SphereGeometry(.009,12,8),jointMat=new THREE.MeshBasicMaterial({color:0xffc767,depthTest:false});for(const p of Object.values(anchors)){const m=new THREE.Mesh(jointGeo,jointMat);m.position.fromArray(p);m.renderOrder=6;skeleton.add(m)}
+
+const views={front:{p:[1.35,0,.29],u:[0,0,1]},left:{p:[-.02,1.35,.30],u:[0,0,1]},right:{p:[-.02,-1.35,.30],u:[0,0,1]},top:{p:[-.04,0,1.55],u:[1,0,0]},'quarter-front':{p:[1.18,.86,.62],u:[0,0,1]},'quarter-rear':{p:[-1.15,.86,.60],u:[0,0,1]}};
+function setView(name){const v=views[name]||views['quarter-front'];camera.up.fromArray(v.u);camera.position.fromArray(v.p);controls.target.set(-.02,0,.245);controls.update();document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));window.__CAT_BODY_BIND_V1_VIEW__=name}
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.querySelector('#skeletonBtn').onclick=e=>{skeleton.visible=!skeleton.visible;e.currentTarget.classList.toggle('active',skeleton.visible)};document.querySelector('#wireBtn').onclick=e=>{coatMaterial.wireframe=!coatMaterial.wireframe;e.currentTarget.classList.toggle('active',coatMaterial.wireframe)};document.querySelector('#coatBtn').onclick=e=>{coatMaterial.vertexColors=!coatMaterial.vertexColors;coatMaterial.color.set(coatMaterial.vertexColors?0xffffff:0x8c8f91);coatMaterial.needsUpdate=true;e.currentTarget.classList.toggle('active',coatMaterial.vertexColors)};document.querySelector('#panelBtn').onclick=()=>document.querySelector('#panel').classList.toggle('hidden');document.querySelector('#resetBtn').onclick=()=>{Object.assign(params,defaults);document.querySelectorAll('[data-param]').forEach(i=>{i.value='1';i.nextElementSibling.value='1.00'});rebuild()};let rebuildTimer=0;document.querySelectorAll('[data-param]').forEach(i=>i.oninput=()=>{params[i.dataset.param]=+i.value;i.nextElementSibling.value=(+i.value).toFixed(2);clearTimeout(rebuildTimer);rebuildTimer=setTimeout(rebuild,220)});
+window.__CAT_BODY_BIND_V1_SET_VIEW__=setView;window.__CAT_BODY_BIND_V1_SET_PARAMS__=async cfg=>{Object.assign(params,cfg||{});await rebuild();return{...params}};window.__CAT_BODY_BIND_V1_GET_METRICS__=()=>JSON.parse(JSON.stringify(window.__CAT_BODY_BIND_V1_STATS__||{}));
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}addEventListener('resize',resize);function loop(){requestAnimationFrame(loop);controls.update();renderer.render(scene,camera)}loop();
+try{await rebuild();setView('quarter-front');window.__CAT_BODY_BIND_V1_READY__='webgl2'}catch(error){console.error(error);loadText.textContent=String(error?.message||error);loadText.classList.add('error');window.__CAT_BODY_BIND_V1_READY__='error';window.__CAT_BODY_BIND_V1_ERROR__=String(error?.stack||error)}
+</script>
+</body>
+</html>
