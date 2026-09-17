@@ -1,0 +1,36 @@
+{
+  "schema": "cat_kaopu/cat_body_reference_landmarks@1.1",
+  "buildId": "cat-body-bind-v1-r3-20260917",
+  "date": "2026-09-17",
+  "units": "meter",
+  "coordinateSystem": {"forward":"+X","left":"+Y","up":"+Z","ground":0.0},
+  "status": "neutral-standing-calibration-targets-not-final-measurements",
+  "method": "R2 veterinary-evidence synthesis adjusted to four-paw neutral standing and low-contrast morphology review",
+  "longitudinalSections": [
+    {"id":"pelvis-rear","x":-0.285,"centerZ":0.282,"halfWidth":0.071,"halfDepth":0.083},
+    {"id":"pelvis","x":-0.185,"centerZ":0.285,"halfWidth":0.087,"halfDepth":0.100},
+    {"id":"lumbar","x":-0.055,"centerZ":0.291,"halfWidth":0.064,"halfDepth":0.081},
+    {"id":"abdomen","x":0.015,"centerZ":0.296,"halfWidth":0.068,"halfDepth":0.086},
+    {"id":"thorax-mid","x":0.105,"centerZ":0.311,"halfWidth":0.094,"halfDepth":0.118},
+    {"id":"thorax-front","x":0.205,"centerZ":0.314,"halfWidth":0.084,"halfDepth":0.104}
+  ],
+  "skeletonAnchors": {
+    "pelvis":[-0.175,0,0.292],"lumbar":[-0.045,0,0.300],"thorax":[0.105,0,0.315],
+    "neckRoot":[0.215,0,0.350],"headCenter":[0.350,0,0.425],"muzzleTip":[0.451,0,0.397],
+    "tailRoot":[-0.292,0,0.300],"leftShoulder":[0.145,0.058,0.305],"leftElbow":[0.110,0.058,0.174],
+    "leftWrist":[0.140,0.058,0.062],"leftForepaw":[0.185,0.058,0.014],"leftHip":[-0.175,0.065,0.288],
+    "leftStifle":[-0.055,0.065,0.190],"leftHock":[-0.205,0.065,0.082],"leftHindpaw":[-0.118,0.065,0.014]
+  },
+  "headTargets": {
+    "craniumCenter":[0.350,0,0.425],"craniumRadii":[0.074,0.063,0.074],
+    "muzzleCenter":[0.406,0,0.397],"muzzleRadii":[0.045,0.039,0.032],
+    "mandibleCenter":[0.405,0,0.370],"mandibleRadii":[0.044,0.037,0.021],
+    "pinnaTipZ":0.505,"pinnaBaseZ":0.458
+  },
+  "reviewConstraints": {
+    "neutralStanding":true,"fourPawsGrounded":true,"featuresDefaultVisible":false,
+    "lowContrastCoatDefault":true,"neutralGreyEvidenceRequired":true,"stableTopology":false,"skinningAllowed":false,"motionAllowed":false
+  },
+  "inheritsEvidenceFrom":"CAT_BODY_BIND_V1_REFERENCE_LANDMARKS_R2.json",
+  "visualAcceptance":false,"productionReady":false
+}
