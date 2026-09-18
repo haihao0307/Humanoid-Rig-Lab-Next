@@ -45,6 +45,14 @@ def main() -> int:
     REPORT.parent.mkdir(parents=True, exist_ok=True)
     steps: list[dict] = []
 
+    morphology_source = ROOT / "CHICKEN_V46_R9_9_1_GAMEPLAY_HEAD.html"
+    morphology_builder = ROOT / "tools" / "build_chicken_r991.py"
+    if not morphology_source.exists() and morphology_builder.exists():
+        steps.append(run(
+            "generate-r9-9-1-morphology-source",
+            [sys.executable, str(morphology_builder.relative_to(ROOT))],
+        ))
+
     mandatory_files = [
         "CHICKEN_V46_R9_9_1_GAMEPLAY_HEAD.html",
         "runtime/chicken_phase1_npc_controller.mjs",
