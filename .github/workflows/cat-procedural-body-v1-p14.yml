@@ -7,8 +7,6 @@ on:
     paths:
       - .github/workflows/cat-procedural-body-v1-p14.yml
       - cat-kaopu/procedural-cat-v1/**
-      - cat-kaopu/tools/bootstrap_cat_procedural_v1_p14.py
-      - cat-kaopu/tools/bootstrap/p14_sources.tar.xz
       - cat-kaopu/tools/patch_cat_procedural_v1_p14_joint_carrier.py
       - cat-kaopu/tools/validate_cat_procedural_v1.mjs
       - cat-kaopu/tools/validate_cat_procedural_v1_p14.mjs
@@ -40,11 +38,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: Decode audited P1.4 sources
-        env:
-          PYTHONDONTWRITEBYTECODE: '1'
-        run: python cat-kaopu/tools/bootstrap_cat_procedural_v1_p14.py
 
       - name: Apply P1.4 joint-carrier reconstruction
         env:
