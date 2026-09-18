@@ -1,0 +1,123 @@
+{
+  "schema": "cat_kaopu/morphology_candidate@1.0",
+  "buildId": "cat-procedural-body-v1-p1-3-mass-20260918",
+  "baseCalibration": "P1_AUTHORITATIVE_CALIBRATION.json",
+  "baseMorphology": "P1_2_SILHOUETTE_CANDIDATE.json",
+  "status": "visual-candidate",
+  "policy": {
+    "directMeasurementsUnchanged": true,
+    "externalRuntimeMesh": false,
+    "externalRuntimeTexture": false,
+    "candidateValuesAreNotAuthoritativeMeasurements": true,
+    "requiresFixedViewApproval": true
+  },
+  "reason": "P1.2 corrected height semantics and the low-frequency torso line, but fixed views still showed separate shoulder and hip bulbs, a pinched midbody, a visible tube-like neck, peg-like paws and coat contrast strong enough to counterfeit body segmentation. P1.3 moves mass back into the continuous torso field, reduces appendage helper volumes and keeps surface detail subordinate to anatomy.",
+  "overrides": {
+    "meta": {
+      "id": "grey-tabby-a-p1-3",
+      "label": "Grey Tabby A · P1.3 anatomical mass candidate",
+      "revision": 5,
+      "seed": 240918
+    },
+    "torso": {
+      "pelvisWidth": 0.116,
+      "lumbarWidth": 0.108,
+      "thoraxWidth": 0.128,
+      "pelvisDepth": 0.118,
+      "lumbarDepth": 0.108,
+      "thoraxDepth": 0.138,
+      "abdomenTuck": 0.018,
+      "dorsalArc": 0.007,
+      "ventralSag": 0.005
+    },
+    "neck": {
+      "length": 0.055,
+      "baseWidth": 0.112,
+      "headWidth": 0.098,
+      "baseDepth": 0.120,
+      "headDepth": 0.100,
+      "pitchDeg": 18
+    },
+    "head": {
+      "cranialLength": 0.094,
+      "width": 0.110,
+      "height": 0.095,
+      "muzzleLength": 0.018,
+      "muzzleWidth": 0.048,
+      "muzzleHeight": 0.032,
+      "jawDepth": 0.028,
+      "eyeSpacing": 0.048,
+      "eyeHeight": 0.016,
+      "earHeight": 0.048,
+      "earWidth": 0.052,
+      "earTiltDeg": 12
+    },
+    "forelimb": {
+      "upperRadius": 0.020,
+      "lowerRadius": 0.0145,
+      "wristRadius": 0.0095,
+      "humerusBackDeg": 24,
+      "radiusForwardDeg": 7,
+      "metacarpalForwardDeg": 13
+    },
+    "hindlimb": {
+      "upperRadius": 0.027,
+      "lowerRadius": 0.019,
+      "hockRadius": 0.012,
+      "femurForwardDeg": 38,
+      "tibiaBackDeg": 44,
+      "tarsusForwardDeg": 50
+    },
+    "paws": {
+      "foreLength": 0.045,
+      "foreWidth": 0.033,
+      "hindLength": 0.052,
+      "hindWidth": 0.035,
+      "height": 0.0165,
+      "toeSplay": 0.010
+    },
+    "tail": {
+      "length": 0.300,
+      "baseRadius": 0.019,
+      "tipRadius": 0.006,
+      "lift": 0.024,
+      "curl": 0.075,
+      "lateral": 0.006,
+      "segments": 24
+    },
+    "coat": {
+      "stripeFrequency": 5.8,
+      "stripeContrast": 0.20,
+      "dorsalDarkness": 0.26,
+      "legBands": 5.0,
+      "tailBands": 8.0,
+      "roughness": 0.87
+    },
+    "material": {
+      "shortHairAmplitude": 0.00003,
+      "shortHairFrequency": 60.0,
+      "rimSoftness": 0.54,
+      "noseRoughness": 0.64,
+      "eyeRoughness": 0.18
+    }
+  },
+  "unchangedDirectMeasurements": [
+    "global.bodyLength",
+    "global.shoulderHeight",
+    "forelimb.scapulaLength",
+    "forelimb.humerusLength",
+    "forelimb.radiusLength",
+    "forelimb.metacarpalLength",
+    "hindlimb.femurLength",
+    "hindlimb.tibiaLength"
+  ],
+  "majorCorrections": [
+    "remove oversized hip and shoulder helper bulbs",
+    "carry shoulder and pelvic mass with the continuous torso field",
+    "widen lumbar soft tissue without erasing feline waist",
+    "embed a shorter neck into thorax and cranium",
+    "separate paw mass from limb cylinders and widen toe fan",
+    "increase tail continuity sampling",
+    "reduce coat contrast below morphology-review priority"
+  ]
+}
