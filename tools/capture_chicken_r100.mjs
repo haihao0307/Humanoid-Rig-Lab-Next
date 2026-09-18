@@ -32,8 +32,8 @@ function stage(name, details = {}) {
 function writeEmergencyReport(reason) {
   try {
     fs.writeFileSync(qaPath, JSON.stringify({
-      schema: 'life_ecosystem/chicken_r100_browser_qa@1.3',
-      version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
+      schema: 'life_ecosystem/chicken_r100_browser_qa@1.4',
+      version: 'V4.6_R10.0_SEGMENTED_NECK_V8_2_CANDIDATE',
       passed: false,
       fatal: reason,
       diagnostics,
@@ -68,9 +68,6 @@ async function click(selector, settle = 120) {
 
 async function captureCanvas(file) {
   stage('capture-start', { file });
-  // Element screenshots wait for a continuously rendered WebGL canvas to become
-  // motionless. The workbench intentionally renders every frame, so capture the
-  // viewport directly instead of waiting on locator stability.
   await page.screenshot({
     path: path.join(evidenceDir, file),
     fullPage: false,
@@ -119,8 +116,8 @@ async function captureAction(name, file, options = {}) {
         logicalBoneCount: runtime.skin?.logicalBoneCount ?? runtime.skin?.boneCount ?? null,
         skeletonBoneCount: runtime.skin?.skeletonBoneCount ?? null,
         helperBoneCount: runtime.skin?.helperBoneCount ?? null,
-        neckShell: runtime.skin?.neckShell || null,
-        torso: runtime.skin?.torso || null,
+        neckTube: runtime.skin?.neckTube || null,
+        domains: runtime.skin?.domains || null,
         frameAudit: runtime.skin?.lastFrameAudit || null,
         meshAudits: runtime.skin?.meshAudits || []
       };
@@ -177,9 +174,9 @@ try {
       && api?.ready
       && api.diagnostics()?.manualStepAvailable
       && api.diagnostics()?.skin?.peckKinematicsRevision === 'six-link-sector-gated-s-curve-v4'
-      && api.diagnostics()?.skin?.weightingRevision === 'anatomical-neck-root-preserving-centerline-sweep-v7.1'
-      && api.diagnostics()?.skin?.topologyRevision === 'torso-preserving-neck-root-split-v7.1'
-      && api.diagnostics()?.skin?.centerlineCurveRevision === 'rotation-minimizing-frame-centerline-v2'
+      && api.diagnostics()?.skin?.weightingRevision === 'segmented-rigid-head-and-buried-root-neck-v8-2'
+      && api.diagnostics()?.skin?.topologyRevision === 'torso-buried-neck-rigid-head-v8-2'
+      && api.diagnostics()?.skin?.centerlineCurveRevision === 'bone-centerline-parallel-transport-with-buried-root-v4'
     );
   }, null, { timeout: 120_000 });
   stage('runtime-ready');
@@ -271,28 +268,34 @@ const forbiddenBodyBones = [
   'hip_r', 'knee_r', 'ankle_r', 'toe_r'
 ];
 const skin = runtime.motion?.skin || {};
-const neckShell = skin.neckShell || null;
-const torso = skin.torso || null;
+const neckTube = skin.neckTube || null;
+const domains = skin.domains || null;
 const peckFrameAudit = byRequest.peck?.frameAudit || null;
 const ringAreaRetained = Number.isFinite(peckFrameAudit?.ringAreaRatioMin)
   && Number.isFinite(peckFrameAudit?.ringAreaRatioMax)
-  && peckFrameAudit.ringAreaRatioMin >= 0.70
-  && peckFrameAudit.ringAreaRatioMax <= 1.35;
+  && Math.abs(peckFrameAudit.ringAreaRatioMin - 1) <= 1e-6
+  && Math.abs(peckFrameAudit.ringAreaRatioMax - 1) <= 1e-6;
 const curveLengthRatioStable = Number.isFinite(peckFrameAudit?.curveLengthRatio)
   && peckFrameAudit.curveLengthRatio >= 0.90
   && peckFrameAudit.curveLengthRatio <= 1.10;
-const longitudinalStrainBounded = Number.isFinite(peckFrameAudit?.longitudinalRatioP95)
+const neckTubeValid = neckTube?.startMode === 'buried-root'
+  && Math.abs((neckTube?.rootBurial ?? 0) - 0.09) < 1e-6
+  && neckTube?.endpointBone === 'head_base'
+  && neckTube?.ringCount === 34
+  && neckTube?.ringSize === 28
+  && neckTube?.vertexCount === neckTube.ringCount * neckTube.ringSize
+  && neckTube?.triangleCount === (neckTube.ringCount - 1) * neckTube.ringSize * 2;
+const domainSplitValid = Number.isFinite(domains?.sourceTriangleCount)
+  && Number.isFinite(domains?.torsoTriangleCount)
+  && Number.isFinite(domains?.headTriangleCount)
+  && domains.torsoTriangleCount > domains.sourceTriangleCount * 0.45
+  && domains.torsoTriangleCount < domains.sourceTriangleCount * 0.90
+  && domains.headTriangleCount > 0
+  && Math.abs(domains.headStartX - 0.392) < 1e-6;
+const longitudinalStable = Number.isFinite(peckFrameAudit?.longitudinalRatioP95)
   && Number.isFinite(peckFrameAudit?.longitudinalRatioMax)
-  && peckFrameAudit.longitudinalRatioP95 < 2.25
-  && peckFrameAudit.longitudinalRatioMax < 3.50;
-const neckShellValid = neckShell?.ringCount >= 18
-  && neckShell?.ringSize === 32
-  && neckShell?.vertexCount === neckShell.ringCount * neckShell.ringSize
-  && neckShell?.triangleCount === (neckShell.ringCount - 1) * neckShell.ringSize * 2;
-const torsoSplitValid = Number.isFinite(torso?.originalTriangleCount)
-  && Number.isFinite(torso?.retainedTriangleCount)
-  && torso.retainedTriangleCount > torso.originalTriangleCount * 0.75
-  && torso.retainedTriangleCount < torso.originalTriangleCount * 0.93;
+  && peckFrameAudit.longitudinalRatioP95 <= 1.50
+  && peckFrameAudit.longitudinalRatioMax <= 2.00;
 const checks = {
   noFatalException: fatal === null,
   patchLoaded: runtime.patch?.version === 'V4.6_R10.0_SINGLE_AGENT_BEHAVIOR_FOUNDATION',
@@ -300,7 +303,7 @@ const checks = {
   peckAdapterLoaded: runtime.peckAdapter?.installed === true
     && skin.peckKinematicsRevision === 'six-link-sector-gated-s-curve-v4',
   centerlineSweepLoaded: runtime.centerlineSweep?.installed === true
-    && runtime.centerlineSweep?.version === 'anatomical-neck-root-preserving-centerline-sweep-v7.1',
+    && runtime.centerlineSweep?.version === 'segmented-rigid-head-and-buried-root-neck-v8-2',
   realtimePaused: runtime.motion?.realtimePaused === true,
   motionReady: runtime.motion?.ready === true,
   logicalBoneCount: skin.logicalBoneCount === 21 && skin.boneCount === 21,
@@ -335,14 +338,14 @@ const checks = {
   bodyCarrierFreeOfLegPrimaries: bodyAudits.every((item) => (
     forbiddenBodyBones.every((id) => !item.primaryBoneCounts?.[id])
   )),
-  topologyRevision: skin.topologyRevision === 'torso-preserving-neck-root-split-v7.1',
-  centerlineCurveRevision: skin.centerlineCurveRevision === 'rotation-minimizing-frame-centerline-v2',
-  weightingRevision: skin.weightingRevision === 'anatomical-neck-root-preserving-centerline-sweep-v7.1',
-  independentNeckShell: neckShellValid,
-  torsoNeckTopologySplit: torsoSplitValid,
+  topologyRevision: skin.topologyRevision === 'torso-buried-neck-rigid-head-v8-2',
+  centerlineCurveRevision: skin.centerlineCurveRevision === 'bone-centerline-parallel-transport-with-buried-root-v4',
+  weightingRevision: skin.weightingRevision === 'segmented-rigid-head-and-buried-root-neck-v8-2',
+  segmentedNeckTube: neckTubeValid,
+  torsoNeckHeadDomainSplit: domainSplitValid,
+  longitudinalStretchBounded: longitudinalStable,
   rigidRingAreaRetained: ringAreaRetained,
   centerlineLengthStableDuringPeck: curveLengthRatioStable,
-  longitudinalStrainBounded,
   groupTestStillClosed: runtime.patch?.groupTestAuthorized === false
     && runtime.centerlineSweep?.groupTestAuthorized === false,
   errorOverlayHidden: runtime.errorOverlay?.display === 'none',
@@ -353,13 +356,13 @@ const checks = {
   expectedCapturesWritten: expectedFiles.every((file) => fs.existsSync(path.join(evidenceDir, file)))
 };
 const report = {
-  schema: 'life_ecosystem/chicken_r100_browser_qa@1.3',
-  version: 'V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
+  schema: 'life_ecosystem/chicken_r100_browser_qa@1.4',
+  version: 'V4.6_R10.0_SEGMENTED_NECK_V8_2_CANDIDATE',
   environment: {
     browser: 'Chrome headless via Playwright Core',
     url,
     viewport: [1280, 900],
-    captureMode: 'deterministic manual stepping with V7.1 torso-preserving topology and centerline evidence'
+    captureMode: 'deterministic manual stepping with V8.2 segmented-domain evidence'
   },
   contactTolerance: {
     bill: [-0.04, 0.07],
