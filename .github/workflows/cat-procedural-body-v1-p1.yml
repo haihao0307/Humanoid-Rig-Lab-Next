@@ -52,11 +52,6 @@ jobs:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_procedural_v1_p1_idempotence.py
 
-      - name: Apply P1.1 morphology repair
-        env:
-          PYTHONDONTWRITEBYTECODE: '1'
-        run: python cat-kaopu/tools/patch_cat_procedural_v1_p11_morphology.py
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -66,11 +61,16 @@ jobs:
       - name: Install pinned dependencies
         run: npm ci
 
-      - name: Validate base procedural contract
-        run: node cat-kaopu/tools/validate_cat_procedural_v1.mjs
-
       - name: Validate P1 evidence calibration
         run: node cat-kaopu/tools/validate_cat_procedural_v1_p1.mjs
+
+      - name: Apply P1.1 morphology repair
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_procedural_v1_p11_morphology.py
+
+      - name: Validate base procedural contract
+        run: node cat-kaopu/tools/validate_cat_procedural_v1.mjs
 
       - name: Validate P1.1 morphology invariants
         run: node cat-kaopu/tools/validate_cat_procedural_v1_p11.mjs
