@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build Chicken V4.6 R10.0 single-agent centerline-sweep candidate."""
+"""Build Chicken V4.6 R10.0 segmented-neck V8.2 single-agent candidate."""
 from __future__ import annotations
 
 import hashlib
@@ -19,21 +19,21 @@ OUTPUT = ROOT / 'CHICKEN_V46_R10_0_SINGLE_AGENT.html'
 PARAMS = ROOT / 'data' / 'CHICKEN_R100_SINGLE_AGENT_PARAMETERS.json'
 STATIC_QA = ROOT / 'qa' / 'CHICKEN_R100_STATIC_QA.json'
 BROWSER_QA = ROOT / 'qa' / 'CHICKEN_R100_BROWSER_QA.json'
-CENTERLINE_QA = ROOT / 'qa' / 'CHICKEN_R100_CENTERLINE_V7_QA.json'
-LOCAL_TEST_QA = ROOT / 'qa' / 'CHICKEN_R100_CENTERLINE_V7_LOCAL_TESTS.json'
+SEGMENTED_QA = ROOT / 'qa' / 'CHICKEN_R100_SEGMENTED_V8_2_GEOMETRY_QA.json'
+LOCAL_TEST_QA = ROOT / 'qa' / 'CHICKEN_R100_SEGMENTED_V8_2_LOCAL_TESTS.json'
 MANIFEST = ROOT / 'BUILD_MANIFEST_R100.json'
 EVIDENCE = ROOT / 'evidence' / 'r100'
-PREBROWSER_EVIDENCE = EVIDENCE / 'centerline_v7_prebrowser'
+PREBROWSER_EVIDENCE = ROOT / 'evidence' / 'r100_v8_2_prebrowser'
 REVIEW = EVIDENCE / 'R100_BEHAVIOR_REVIEW_BOARD.html'
-IMPLEMENTATION_NOTE = ROOT / 'R100_CENTERLINE_V7_IMPLEMENTATION.md'
+IMPLEMENTATION_NOTE = ROOT / 'R100_SEGMENTED_NECK_V8_2_IMPLEMENTATION.md'
 ANCHOR = 'const scene=new T.Scene();'
 MARKER = 'CHICKEN_R100_SINGLE_AGENT_MOTION_PATCH'
 PECK_MARKER = 'CHICKEN_R100_PECK_ADAPTER_PATCH'
 CENTERLINE_MARKER = 'CHICKEN_R100_CENTERLINE_SWEEP_PATCH'
 MANUAL_MARKER = 'CHICKEN_R100_MANUAL_STEP_PATCH'
-V7_WEIGHTING = 'anatomical-neck-root-preserving-centerline-sweep-v7.1'
-V7_TOPOLOGY = 'torso-preserving-neck-root-split-v7.1'
-V7_CURVE = 'rotation-minimizing-frame-centerline-v2'
+V82_WEIGHTING = 'segmented-rigid-head-and-buried-root-neck-v8-2'
+V82_TOPOLOGY = 'torso-buried-neck-rigid-head-v8-2'
+V82_CURVE = 'bone-centerline-parallel-transport-with-buried-root-v4'
 
 
 def sha(path: Path) -> str:
@@ -74,17 +74,17 @@ def build() -> dict:
     output = source.replace(ANCHOR, injected, 1)
     output = output.replace(
         '<title>Chicken R9.9.1 · Continuous Ring Refit Candidate</title>',
-        '<title>Chicken R10.0 · Centerline Sweep V7.1 Single Agent Candidate</title>',
+        '<title>Chicken R10.0 · Segmented Neck V8.2 Single Agent Candidate</title>',
         1,
     )
     output = output.replace(
         '鸡 · R9.9.1 · 连续头颈环带候选',
-        '鸡 · R10.0 · 解剖拓扑拆分与中心线扫掠 V7.1',
+        '鸡 · R10.0 · 躯干、埋入式颈根、渐缩颈管与刚性头部 V8.2',
         1,
     )
     output = output.replace(
         'R9.9.1：连续环带重排 · 尚未视觉验收',
-        'R10.0 V7.1：单只形态与基础行为候选 · 群体关闭',
+        'R10.0 V8.2：单只形态与基础行为候选 · 群体关闭',
         1,
     )
     OUTPUT.write_text(output, encoding='utf-8')
@@ -113,7 +113,7 @@ def build() -> dict:
 def write_params() -> None:
     write_json(PARAMS, {
         'schema': 'life_ecosystem/chicken_single_agent_runtime@1.1',
-        'version': 'V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
+        'version': 'V4.6_R10.0_SEGMENTED_NECK_V8_2_CANDIDATE',
         'morphology_source': 'V4.6_R9.9.1_CONTINUOUS_RING_REFIT_CANDIDATE',
         'active_entry': OUTPUT.name,
         'bone_order': [
@@ -131,23 +131,23 @@ def write_params() -> None:
             'articulated_skin': 'runtime/chicken_phase1_articulated_skin.mjs',
             'peck_adapter': 'runtime/chicken_phase1_peck_adapter.mjs',
             'sector_adapter_compatibility_layer': 'runtime/chicken_phase1_ring_coherent_adapter.mjs',
-            'centerline_sweep_adapter': 'runtime/chicken_phase1_centerline_sweep_v71_adapter.mjs',
+            'segmented_neck_adapter': 'runtime/chicken_phase1_segmented_neck_adapter.mjs',
             'centerline_patch': 'tools/chicken_r100_centerline_patch.js',
             'manual_step': 'tools/chicken_r100_manual_step_patch.js',
             'root_motion_scale': 0.42,
             'fixed_bone_lengths': True,
             'non_root_scale_forbidden': True,
-            'topology_revision': V7_TOPOLOGY,
-            'weighting_revision': V7_WEIGHTING,
-            'centerline_curve_revision': V7_CURVE,
-            'neck_deformation': 'torso_preserving_overlap_with_rmf_closed_shell_over_pchip_centerline',
+            'topology_revision': V82_TOPOLOGY,
+            'weighting_revision': V82_WEIGHTING,
+            'centerline_curve_revision': V82_CURVE,
+            'neck_deformation': 'tapered_swept_neck_to_head_base_plus_rigid_head_domain',
             'contact_diagnostics': [
                 'bill_ground_error', 'left_foot_ground_error', 'right_foot_ground_error'
             ],
         },
         'gates': {
             'local_static_gate': True,
-            'mathematical_topology_gate': True,
+            'segmented_geometry_gate': True,
             'browser_qa_passed': False,
             'manual_motion_naturalness_acceptance': False,
             'manual_visual_acceptance': False,
@@ -178,22 +178,22 @@ def write_static(build_info: dict) -> None:
         'sector_compatibility_adapter_exists': (
             ROOT / 'runtime' / 'chicken_phase1_ring_coherent_adapter.mjs'
         ).exists(),
-        'centerline_sweep_adapter_exists': (
-            ROOT / 'runtime' / 'chicken_phase1_centerline_sweep_v71_adapter.mjs'
+        'segmented_neck_adapter_exists': (
+            ROOT / 'runtime' / 'chicken_phase1_segmented_neck_adapter.mjs'
         ).exists(),
-        'centerline_unit_test_exists': (
-            ROOT / 'tests' / 'chicken_phase1_centerline_sweep_adapter.test.mjs'
+        'segmented_neck_unit_test_exists': (
+            ROOT / 'tests' / 'chicken_phase1_segmented_neck_adapter.test.mjs'
         ).exists(),
-        'centerline_audit_exists': CENTERLINE_QA.exists(),
+        'segmented_geometry_audit_exists': SEGMENTED_QA.exists(),
         'implementation_note_exists': IMPLEMENTATION_NOTE.exists(),
     }
     write_json(STATIC_QA, {
         'schema': 'life_ecosystem/chicken_r100_static_qa@1.1',
-        'version': 'V4.6_R10.0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
+        'version': 'V4.6_R10.0_SEGMENTED_NECK_V8_2_CANDIDATE',
         'checks': checks,
         'passed': all(checks.values()),
         'build': build_info,
-        'scope': 'deterministic build, source presence and local V7.1 topology evidence only',
+        'scope': 'deterministic build, source presence, V8.2 domain split and static geometry evidence only',
         'truthBoundary': {
             'browserQAPassed': False,
             'manualVisualAcceptance': False,
@@ -205,15 +205,15 @@ def write_static(build_info: dict) -> None:
         raise RuntimeError(f"static checks failed: {[key for key, value in checks.items() if not value]}")
 
 
-def browser_v7_ready() -> bool:
+def browser_v82_ready() -> bool:
     try:
         browser = json.loads(BROWSER_QA.read_text(encoding='utf-8'))
         skin = browser.get('runtime', {}).get('motion', {}).get('skin', {})
         return bool(
             browser.get('passed')
-            and skin.get('weightingRevision') == V7_WEIGHTING
-            and skin.get('topologyRevision') == V7_TOPOLOGY
-            and skin.get('centerlineCurveRevision') == V7_CURVE
+            and skin.get('weightingRevision') == V82_WEIGHTING
+            and skin.get('topologyRevision') == V82_TOPOLOGY
+            and skin.get('centerlineCurveRevision') == V82_CURVE
         )
     except Exception:
         return False
@@ -221,9 +221,9 @@ def browser_v7_ready() -> bool:
 
 def write_review() -> None:
     EVIDENCE.mkdir(parents=True, exist_ok=True)
-    if browser_v7_ready():
+    if browser_v82_ready():
         status = (
-            'V7.1 浏览器技术证据已经生成；但截图通过仍不等于动作自然或外观验收，'
+            'V8.2 浏览器技术证据已经生成；但截图通过仍不等于动作自然或外观验收，'
             '群体测试继续关闭。'
         )
         items = [
@@ -240,21 +240,21 @@ def write_review() -> None:
         ]
     else:
         status = (
-            'V7.1 已完成拓扑拆分、闭合颈头壳、骨中心线 PCHIP 与刚性环框架的本地数学候选；'
+            'V8.2 已把旧颈头混合壳拆为躯干、埋入胸腔的渐缩颈管和刚性头部三个域；'
             '尚未得到新的浏览器证据，也未通过人工视觉验收。'
         )
         items = [
-            ('V7 中心线闭合壳实体预检', 'centerline_v7_prebrowser/proto_centerline_v7_filled.png'),
-            ('V7 中心线闭合壳线框预检', 'centerline_v7_prebrowser/proto_centerline_v7.png'),
-            ('拓扑拆分中间候选', 'centerline_v7_prebrowser/proto_split_v7_solid.png'),
-            ('V7 本地审查板', 'centerline_v7_prebrowser/centerline_v7_review.jpg'),
+            ('V8.2 啄地侧面几何审查', '../r100_v8_2_prebrowser/V8_2_PECK_SIDE.png'),
+            ('V8.2 啄地三分之四几何审查', '../r100_v8_2_prebrowser/V8_2_PECK_THREE_QUARTER.png'),
+            ('V8.2 分域侧投影', '../r100_v8_2_prebrowser/V8_2_SIDE_PROJECTION.png'),
+            ('V8.2 静态几何 QA', '../r100_v8_2_prebrowser/V8_2_STATIC_REVIEW.png'),
         ]
     cards = '\n'.join(
         f'<figure><img src="{src}" alt="{title}"><figcaption>{title}</figcaption></figure>'
         for title, src in items
     )
     REVIEW.write_text(
-        f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chicken R10.0 V7.1 单只行为审查板</title><style>*{{box-sizing:border-box}}body{{margin:0;background:#171f25;color:#eef3f2;font:14px/1.5 system-ui,-apple-system,Segoe UI,Microsoft Yahei,sans-serif}}header{{padding:24px;border-bottom:1px solid #34444b}}.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;padding:18px}}figure{{margin:0;background:#10181d;border:1px solid #35454c;border-radius:8px;overflow:hidden}}img{{width:100%;height:360px;object-fit:contain;background:#182127}}figcaption{{padding:10px 12px}}.gate{{margin:0 18px 22px;padding:14px;border-left:4px solid #c49b59;background:#232c31}}</style></head><body><header><h1>Chicken V4.6 R10.0 · Centerline Sweep V7.1</h1><p>{status}</p></header><main class="grid">{cards}</main><section class="gate">真实门槛：躯干不得随颈部折叠；颈头闭合壳不得退化为细杆；喙与双脚接触必须成立；固定骨长与环截面积必须保持；浏览器和人工视觉通过前，群体测试不启用。</section></body></html>''',
+        f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chicken R10.0 V8.2 单只行为审查板</title><style>*{{box-sizing:border-box}}body{{margin:0;background:#171f25;color:#eef3f2;font:14px/1.5 system-ui,-apple-system,Segoe UI,Microsoft Yahei,sans-serif}}header{{padding:24px;border-bottom:1px solid #34444b}}.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;padding:18px}}figure{{margin:0;background:#10181d;border:1px solid #35454c;border-radius:8px;overflow:hidden}}img{{width:100%;height:360px;object-fit:contain;background:#182127}}figcaption{{padding:10px 12px}}.gate{{margin:0 18px 22px;padding:14px;border-left:4px solid #c49b59;background:#232c31}}</style></head><body><header><h1>Chicken V4.6 R10.0 · Segmented Neck V8.2</h1><p>{status}</p></header><main class="grid">{cards}</main><section class="gate">真实门槛：躯干不得随颈部折叠；颈头闭合壳不得退化为细杆；喙与双脚接触必须成立；固定骨长与环截面积必须保持；浏览器和人工视觉通过前，群体测试不启用。</section></body></html>''',
         encoding='utf-8',
     )
 
@@ -263,6 +263,10 @@ def write_manifest() -> None:
     paths = [
         ROOT / 'README.md',
         ROOT / '01_CURRENT_STATE.json',
+        ROOT / '06_NEXT_STAGE_PLAN.md',
+        ROOT / 'CURRENT_HANDOFF.md',
+        ROOT / 'CURRENT_FULL_HANDOFF.md',
+        ROOT / 'GITHUB_HANDOFF.md',
         IMPLEMENTATION_NOTE,
         SOURCE,
         PATCH,
@@ -273,7 +277,7 @@ def write_manifest() -> None:
         PARAMS,
         STATIC_QA,
         BROWSER_QA,
-        CENTERLINE_QA,
+        SEGMENTED_QA,
         LOCAL_TEST_QA,
         REVIEW,
         ROOT / 'runtime' / 'chicken_phase1_npc_controller.mjs',
@@ -281,9 +285,13 @@ def write_manifest() -> None:
         ROOT / 'runtime' / 'chicken_phase1_peck_adapter.mjs',
         ROOT / 'runtime' / 'chicken_phase1_ring_coherent_adapter.mjs',
         ROOT / 'runtime' / 'chicken_phase1_centerline_sweep_adapter.mjs',
-        ROOT / 'runtime' / 'chicken_phase1_centerline_sweep_v71_adapter.mjs',
-        ROOT / 'tests' / 'chicken_phase1_centerline_sweep_adapter.test.mjs',
-        ROOT / 'tools' / 'verify_chicken_r100_centerline_v7.mjs',
+        ROOT / 'runtime' / 'chicken_phase1_segmented_neck_adapter.mjs',
+        ROOT / 'tests' / 'chicken_phase1_segmented_neck_adapter.test.mjs',
+        ROOT / 'tools' / 'build_chicken_r100.py',
+        ROOT / 'tools' / 'capture_chicken_r100.mjs',
+        ROOT / 'tools' / 'audit_v8_2_geometry.py',
+        ROOT / 'tools' / 'verify_chicken_r100_segmented_v8_2.mjs',
+        ROOT / 'tools' / 'run_chicken_r100_segmented_v8_2_static.py',
         ROOT / '.github' / 'workflows' / 'chicken-r100-single-agent.yml',
     ]
     paths += sorted(PREBROWSER_EVIDENCE.glob('*'))
@@ -299,12 +307,12 @@ def write_manifest() -> None:
     ]
     write_json(MANIFEST, {
         'schema': 'life_ecosystem/build_manifest@1.1',
-        'package': 'CHICKEN_V4_6_R10_0_CENTERLINE_SWEEP_V7_1_CANDIDATE',
+        'package': 'CHICKEN_V4_6_R10_0_SEGMENTED_NECK_V8_2_CANDIDATE',
         'active_entry': OUTPUT.name,
-        'weighting_revision': V7_WEIGHTING,
-        'topology_revision': V7_TOPOLOGY,
-        'centerline_curve_revision': V7_CURVE,
-        'browser_qa_passed': browser_v7_ready(),
+        'weighting_revision': V82_WEIGHTING,
+        'topology_revision': V82_TOPOLOGY,
+        'centerline_curve_revision': V82_CURVE,
+        'browser_qa_passed': browser_v82_ready(),
         'manual_visual_acceptance': False,
         'group_test_authorized': False,
         'production_ready': False,
