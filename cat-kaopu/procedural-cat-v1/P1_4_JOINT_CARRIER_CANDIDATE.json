@@ -1,0 +1,125 @@
+{
+  "schema": "cat_kaopu/morphology_candidate@1.0",
+  "buildId": "cat-procedural-body-v1-p1-4-joint-carrier-20260918",
+  "baseCalibration": "P1_AUTHORITATIVE_CALIBRATION.json",
+  "baseMorphology": "P1_3_MASS_DISTRIBUTION_CANDIDATE.json",
+  "status": "visual-candidate",
+  "policy": {
+    "directMeasurementsUnchanged": true,
+    "externalRuntimeMesh": false,
+    "externalRuntimeTexture": false,
+    "candidateValuesAreNotAuthoritativeMeasurements": true,
+    "requiresFixedViewApproval": true,
+    "stableTopologyLocked": true,
+    "motionLocked": true
+  },
+  "reason": "P1.3 reduced helper bulbs, but fixed views still showed shoulder and hip joints floating above the continuous body carrier, an oversized spherical head-neck union, weak eye/ear placement, pipe-like distal limbs and a crouched neutral stance. P1.4 aligns measured limb chains to the body carrier with fixed-length planar IK, rebuilds the cranial silhouette and keeps all geometry first-party and CatDNA-driven.",
+  "overrides": {
+    "meta": {
+      "id": "grey-tabby-a-p1-4",
+      "label": "Grey Tabby A · P1.4 joint-carrier candidate",
+      "revision": 6,
+      "seed": 240918
+    },
+    "torso": {
+      "pelvisWidth": 0.118,
+      "lumbarWidth": 0.108,
+      "thoraxWidth": 0.126,
+      "pelvisDepth": 0.116,
+      "lumbarDepth": 0.108,
+      "thoraxDepth": 0.136,
+      "abdomenTuck": 0.016,
+      "dorsalArc": 0.006,
+      "ventralSag": 0.006
+    },
+    "neck": {
+      "length": 0.052,
+      "baseWidth": 0.106,
+      "headWidth": 0.090,
+      "baseDepth": 0.112,
+      "headDepth": 0.090,
+      "pitchDeg": 16
+    },
+    "head": {
+      "cranialLength": 0.090,
+      "width": 0.104,
+      "height": 0.088,
+      "muzzleLength": 0.015,
+      "muzzleWidth": 0.044,
+      "muzzleHeight": 0.028,
+      "jawDepth": 0.024,
+      "eyeSpacing": 0.046,
+      "eyeHeight": 0.016,
+      "earHeight": 0.056,
+      "earWidth": 0.044,
+      "earTiltDeg": 10
+    },
+    "forelimb": {
+      "upperRadius": 0.019,
+      "lowerRadius": 0.0138,
+      "wristRadius": 0.0090,
+      "humerusBackDeg": 24,
+      "radiusForwardDeg": 7,
+      "metacarpalForwardDeg": 13
+    },
+    "hindlimb": {
+      "upperRadius": 0.026,
+      "lowerRadius": 0.0185,
+      "hockRadius": 0.0115,
+      "femurForwardDeg": 38,
+      "tibiaBackDeg": 44,
+      "tarsusForwardDeg": 50
+    },
+    "paws": {
+      "foreLength": 0.046,
+      "foreWidth": 0.034,
+      "hindLength": 0.054,
+      "hindWidth": 0.036,
+      "height": 0.0155,
+      "toeSplay": 0.012
+    },
+    "tail": {
+      "length": 0.300,
+      "baseRadius": 0.0175,
+      "tipRadius": 0.0055,
+      "lift": 0.018,
+      "curl": 0.060,
+      "lateral": 0.004,
+      "segments": 28
+    },
+    "coat": {
+      "stripeFrequency": 5.5,
+      "stripeContrast": 0.16,
+      "dorsalDarkness": 0.23,
+      "legBands": 4.5,
+      "tailBands": 8.0,
+      "roughness": 0.88
+    },
+    "material": {
+      "shortHairAmplitude": 0.00002,
+      "shortHairFrequency": 62.0,
+      "rimSoftness": 0.58,
+      "noseRoughness": 0.66,
+      "eyeRoughness": 0.17
+    }
+  },
+  "unchangedDirectMeasurements": [
+    "global.bodyLength",
+    "global.shoulderHeight",
+    "forelimb.scapulaLength",
+    "forelimb.humerusLength",
+    "forelimb.radiusLength",
+    "forelimb.metacarpalLength",
+    "hindlimb.femurLength",
+    "hindlimb.tibiaLength"
+  ],
+  "majorCorrections": [
+    "place shoulder and hip roots inside the continuous torso carrier",
+    "solve measured limb chains to grounded paws without changing bone lengths",
+    "replace the spherical head-neck union with a compact cranial and facial field",
+    "move eyes and pupils onto the generated facial surface",
+    "restore triangular ear height without horn-like thickness",
+    "reduce proximal appendage bulbs and distal pipe reading",
+    "keep coat and short-hair relief subordinate to silhouette review"
+  ]
+}
