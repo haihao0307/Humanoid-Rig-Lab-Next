@@ -1,0 +1,247 @@
+{
+  "schema": "cat_kaopu/authoritative_calibration@1.0",
+  "buildId": "cat-procedural-body-v1-p1-calibration-20260918",
+  "subject": {
+    "species": "Felis catus",
+    "population": "adult domestic shorthair / feral domestic cat",
+    "targetMassKg": 3.7,
+    "sexMode": "mixed",
+    "units": "meter"
+  },
+  "policy": {
+    "externalRuntimeMesh": false,
+    "externalRuntimeTexture": false,
+    "measurementsOnly": true,
+    "measuredAndDerivedMustRemainDistinct": true,
+    "visualApprovalStillRequired": true
+  },
+  "sources": [
+    {
+      "id": "paton-2024-body-size",
+      "title": "A non-invasive approach to measuring body dimensions of wildlife with camera traps: A felid field trial",
+      "doi": "10.1002/ece3.11612",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38952652/",
+      "sample": "free-ranging Felis catus in Tasmania",
+      "evidence": {
+        "bodyLengthM": { "mean": 0.4748, "ci95": [0.460, 0.489] },
+        "shoulderHeightM": { "mean": 0.2525, "ci95": [0.244, 0.261] }
+      }
+    },
+    {
+      "id": "rahmati-2025-forelimb",
+      "title": "Role of forelimb morphology in muscle sensorimotor functions during locomotion in the cat",
+      "doi": "10.1113/JP287448",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11275737/",
+      "sample": "six adult female cat forelimbs",
+      "evidence": {
+        "scapulaLengthM": { "mean": 0.0713, "sd": 0.0025 },
+        "humerusLengthM": { "mean": 0.0995, "sd": 0.0036 },
+        "radiusLengthM": { "mean": 0.0917, "sd": 0.0022 },
+        "carpalsMetacarpalsLengthM": { "mean": 0.0333, "sd": 0.0019 }
+      }
+    },
+    {
+      "id": "day-jayne-2007-felid-limbs",
+      "title": "Interspecific scaling of the morphology and posture of the limbs during the locomotion of cats (Felidae)",
+      "doi": "10.1242/jeb.02703",
+      "url": "https://journals.biologists.com/jeb/article/210/4/642/17244/Interspecific-scaling-of-the-morphology-and",
+      "sample": "four domestic cats, mean mass 3.7 kg",
+      "evidence": {
+        "forelimbLengthM": { "mean": 0.24, "range": [0.22, 0.26] },
+        "hindlimbLengthM": { "mean": 0.33, "range": [0.30, 0.35] },
+        "intergirdleDistanceM": { "mean": 0.32, "range": [0.26, 0.44] },
+        "forelimbFractions": { "humerus": 0.368, "radius": 0.342, "metacarpal": 0.146, "phalanges": 0.141 },
+        "hindlimbFractions": { "femur": 0.347, "tibia": 0.324, "metatarsal": 0.221, "phalanges": 0.105 },
+        "neutralSupportRatios": { "shoulderHeightOverForelimb": 0.74, "hipHeightOverHindlimb": 0.77 },
+        "midstanceJointAnglesDeg": { "elbow": 135, "knee": 135, "ankle": 135 }
+      }
+    },
+    {
+      "id": "ramos-2021-skull-ct",
+      "title": "Morphometrical Study of the European Shorthair Cat Skull Using Computed Tomography",
+      "doi": "10.3390/vetsci8080161",
+      "url": "https://www.mdpi.com/2306-7381/8/8/161",
+      "sample": "37 healthy European shorthair cat head CT studies",
+      "evidence": {
+        "skullLengthM": { "mean": 0.0894, "sd": 0.0045 },
+        "cranialLengthM": { "mean": 0.0821, "sd": 0.0042 },
+        "nasalLengthM": { "mean": 0.0073, "sd": 0.0017 },
+        "cranialWidthM": { "mean": 0.0428, "sd": 0.0026 },
+        "externalCraniumHeightM": { "mean": 0.0335, "sd": 0.0012 }
+      }
+    },
+    {
+      "id": "fonseca-2017-femur",
+      "title": "Measurements of femoral angles, femur length, and hip width in cat radiographs",
+      "doi": "10.1590/1678-4162-9583",
+      "url": "https://doaj.org/article/458e16e0a5eb437fbc136ce826db37c7",
+      "sample": "92 adult mixed-breed domestic cats",
+      "evidence": {
+        "femurLengthMaleM": { "mean": 0.129, "sd": 0.0055 },
+        "femurLengthFemaleM": { "mean": 0.134, "sd": 0.0066 },
+        "hipWidthMaleM": { "mean": 0.031, "sd": 0.0023 },
+        "hipWidthFemaleM": { "mean": 0.035, "sd": 0.0026 },
+        "femoralInclinationAngleDeg": { "mean": 136.6, "sd": 3.86 }
+      }
+    },
+    {
+      "id": "pantangco-2026-tibia",
+      "title": "Morphometric description of the feline tibia using three-dimensional CT",
+      "doi": "10.1177/1098612X261433059",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13153514/",
+      "sample": "16 tibiae from eight adult domestic shorthair cats",
+      "evidence": {
+        "tibiaLengthM": { "mean": 0.11161, "ci95": [0.10789, 0.11553] },
+        "tibialPlateauAngleDeg": { "mean": 31.42, "ci95": [30.09, 32.75] }
+      }
+    },
+    {
+      "id": "moseby-2020-feral-size",
+      "title": "Body Size and Bite Force of Stray and Feral Cats",
+      "doi": "10.3390/ani10040707",
+      "url": "https://www.mdpi.com/2076-2615/10/4/707",
+      "sample": "568 stray and feral cats in southwest Western Australia",
+      "evidence": {
+        "headBodyLengthMaleM": { "mean": 0.551, "sd": 0.084 },
+        "headBodyLengthFemaleM": { "mean": 0.504, "sd": 0.074 },
+        "headLengthMaleM": { "mean": 0.112, "sd": 0.014 },
+        "headLengthFemaleM": { "mean": 0.103, "sd": 0.013 }
+      }
+    }
+  ],
+  "calibratedCatDNA": {
+    "meta": {
+      "id": "grey-tabby-a-p1",
+      "label": "Grey Tabby A · P1 measured calibration",
+      "revision": 2,
+      "seed": 240918
+    },
+    "global": {
+      "bodyLength": 0.475,
+      "shoulderHeight": 0.2525,
+      "hipHeight": 0.258,
+      "frontStanceWidth": 0.105,
+      "hindStanceWidth": 0.118,
+      "overallBulk": 1.0
+    },
+    "torso": {
+      "pelvisLength": 0.115,
+      "lumbarLength": 0.105,
+      "thoraxLength": 0.165,
+      "pelvisWidth": 0.135,
+      "lumbarWidth": 0.095,
+      "thoraxWidth": 0.145,
+      "pelvisDepth": 0.145,
+      "lumbarDepth": 0.115,
+      "thoraxDepth": 0.175,
+      "abdomenTuck": 0.025,
+      "dorsalArc": 0.012,
+      "ventralSag": 0.006
+    },
+    "neck": {
+      "length": 0.115,
+      "baseWidth": 0.115,
+      "headWidth": 0.088,
+      "baseDepth": 0.140,
+      "headDepth": 0.098,
+      "pitchDeg": 22
+    },
+    "head": {
+      "cranialLength": 0.102,
+      "width": 0.102,
+      "height": 0.098,
+      "muzzleLength": 0.032,
+      "muzzleWidth": 0.056,
+      "muzzleHeight": 0.043,
+      "jawDepth": 0.034,
+      "eyeSpacing": 0.052,
+      "eyeHeight": 0.022,
+      "earHeight": 0.074,
+      "earWidth": 0.044,
+      "earTiltDeg": 10
+    },
+    "forelimb": {
+      "shoulderLongitudinal": 0.135,
+      "scapulaLength": 0.0713,
+      "humerusLength": 0.0995,
+      "radiusLength": 0.0917,
+      "metacarpalLength": 0.0333,
+      "upperRadius": 0.026,
+      "lowerRadius": 0.018,
+      "wristRadius": 0.012,
+      "humerusBackDeg": 24,
+      "radiusForwardDeg": 7,
+      "metacarpalForwardDeg": 13
+    },
+    "hindlimb": {
+      "hipLongitudinal": -0.125,
+      "femurLength": 0.1315,
+      "tibiaLength": 0.11161,
+      "tarsusLength": 0.0838,
+      "upperRadius": 0.036,
+      "lowerRadius": 0.025,
+      "hockRadius": 0.015,
+      "femurForwardDeg": 33,
+      "tibiaBackDeg": 15,
+      "tarsusForwardDeg": 46
+    },
+    "paws": {
+      "foreLength": 0.042,
+      "foreWidth": 0.032,
+      "hindLength": 0.044,
+      "hindWidth": 0.034,
+      "height": 0.018,
+      "toeSplay": 0.007
+    },
+    "tail": {
+      "length": 0.30,
+      "baseRadius": 0.024,
+      "tipRadius": 0.008,
+      "lift": 0.035,
+      "curl": 0.12,
+      "lateral": 0.010,
+      "segments": 10
+    },
+    "material": {
+      "shortHairAmplitude": 0.0002,
+      "shortHairFrequency": 52.0,
+      "rimSoftness": 0.38,
+      "noseRoughness": 0.58,
+      "eyeRoughness": 0.22
+    }
+  },
+  "classification": {
+    "directlyMeasured": [
+      "global.bodyLength",
+      "global.shoulderHeight",
+      "forelimb.scapulaLength",
+      "forelimb.humerusLength",
+      "forelimb.radiusLength",
+      "forelimb.metacarpalLength",
+      "hindlimb.femurLength",
+      "hindlimb.tibiaLength"
+    ],
+    "ratioDerived": [
+      "global.hipHeight",
+      "hindlimb.tarsusLength",
+      "paws.foreLength",
+      "paws.hindLength"
+    ],
+    "anatomicallyConstrainedCandidate": [
+      "torso.*",
+      "neck.*",
+      "head.width",
+      "head.height",
+      "head.muzzle*",
+      "tail.*",
+      "limb segment radii",
+      "neutral joint angles"
+    ],
+    "notYetAuthoritative": [
+      "soft-tissue cross-sectional widths and depths",
+      "paw-pad and toe topology",
+      "tail soft-tissue profile",
+      "coat stripe placement"
+    ]
+  }
+}
