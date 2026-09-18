@@ -8,6 +8,7 @@ on:
       - .github/workflows/cat-procedural-body-v1-p1.yml
       - cat-kaopu/procedural-cat-v1/**
       - cat-kaopu/tools/patch_cat_procedural_v1_p1_calibration.py
+      - cat-kaopu/tools/patch_cat_procedural_v1_p1_idempotence.py
       - cat-kaopu/tools/patch_cat_procedural_v1_p11_morphology.py
       - cat-kaopu/tools/validate_cat_procedural_v1.mjs
       - cat-kaopu/tools/validate_cat_procedural_v1_p1.mjs
@@ -45,6 +46,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_procedural_v1_p1_calibration.py
+
+      - name: Repair P1 rerun idempotence
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_procedural_v1_p1_idempotence.py
 
       - name: Apply P1.1 morphology repair
         env:
