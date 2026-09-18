@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/chicken-r100-single-agent.yml
       - tools/chicken_v8_3_payload.tar.gz.b64
+      - tools/chicken_v8_3_payload.part*.b64
   workflow_dispatch:
 
 permissions:
@@ -39,7 +40,7 @@ jobs:
       - name: Decode sealed-collar V8.3 payload
         shell: bash
         run: |
-          base64 --decode tools/chicken_v8_3_payload.tar.gz.b64 > /tmp/chicken-v83-payload.tar.gz
+          cat tools/chicken_v8_3_payload.part*.b64 | base64 --decode > /tmp/chicken-v83-payload.tar.gz
           echo "d9a4301f200feec21fb9f6c358c0b66c163a843b66a9f75ccfb561b7595e1b86  /tmp/chicken-v83-payload.tar.gz" | sha256sum -c -
           tar -xzf /tmp/chicken-v83-payload.tar.gz
           test -f runtime/chicken_phase1_segmented_neck_adapter.mjs
@@ -139,6 +140,7 @@ jobs:
             tools/verify_chicken_r100_segmented_v8_3.mjs \
             tools/run_chicken_r100_segmented_v8_3_static.py
           git rm tools/chicken_v8_3_payload.tar.gz.b64
+          git rm tools/chicken_v8_3_payload.part*.b64
           if ! git diff --cached --quiet; then
             git commit -m "Integrate Chicken sealed-collar V8.3 candidate"
             git push origin HEAD:${GITHUB_REF_NAME}
