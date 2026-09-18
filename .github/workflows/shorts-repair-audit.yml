@@ -4,33 +4,40 @@ on:
     branches: [fix/shorts-separated-legs-20260919]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: shorts-repair-audit
   cancel-in-progress: true
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Build from canonical sources
+      - name: Apply isolated source-only candidate and build canonical page
         run: |
+          node tools/apply-shorts-separated-candidate.mjs
           node tools/build-pure.mjs
           node tools/build-shorts-preview.mjs
-      - name: Check canonical assembly
-        run: node tools/check-pure.mjs
-      - name: Focused shorts regressions
-        run: node --test tools/test-shorts-*.mjs
+          node tools/check-pure.mjs
+          node --test tools/test-shorts-*.mjs
+      - name: Retain exact canonical candidate only on this repair branch
+        run: |
+          test "$GITHUB_REF_NAME" = "fix/shorts-separated-legs-20260919"
+          git add clothing/ShortsPattern.js clothing/ClothShorts.js tools/test-shorts-pattern.mjs tools/test-shorts-integration.mjs index.html
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'test(shorts): retain canonical separated-gusset handling candidate; visual acceptance pending'
+            git push origin HEAD:fix/shorts-separated-legs-20260919
+          fi
       - name: Install isolated browser test dependency
         run: |
           mkdir -p /tmp/shorts-browser
           npm install --prefix /tmp/shorts-browser --no-audit --no-fund playwright@1.55.0
           /tmp/shorts-browser/node_modules/.bin/playwright install --with-deps chromium
-      - name: Actual browser capture
+      - name: Actual bounded sewing and multi-view browser review
         run: |
           python3 -m http.server 8793 --bind 127.0.0.1 >/tmp/shorts-http.log 2>&1 &
           node tools/review-shorts-browser.mjs
