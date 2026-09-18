@@ -5,19 +5,35 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: shorts-repair-audit
+  cancel-in-progress: true
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Build from canonical sources
-        run: node tools/build-pure.mjs
+        run: |
+          node tools/build-pure.mjs
+          node tools/build-shorts-preview.mjs
       - name: Check canonical assembly
         run: node tools/check-pure.mjs
+      - name: Focused shorts regressions
+        run: node --test tools/test-shorts-*.mjs
+      - name: Install isolated browser test dependency
+        run: |
+          mkdir -p /tmp/shorts-browser
+          npm install --prefix /tmp/shorts-browser --no-audit --no-fund playwright@1.55.0
+          /tmp/shorts-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Actual browser capture
+        run: |
+          python3 -m http.server 8793 --bind 127.0.0.1 >/tmp/shorts-http.log 2>&1 &
+          node tools/review-shorts-browser.mjs
       - name: Archive exact audited working tree
         if: always()
         run: |
