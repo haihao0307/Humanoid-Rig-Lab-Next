@@ -9,7 +9,8 @@ class ClothingSystem {
  update(){
   if(this.disposed)return;
   const surface=this.surface,human=surface.boundHuman,time=surface.lab.agent?.time||0;
-  const signature=['hips','left_foot','right_foot','left_hand','right_hand'].map(id=>{const f=human.byId.get(id).world;return [...f.p,...f.q].join(',');}).join('|');
+  const poseIds=new Set(['hips','left_foot','right_foot','left_hand','right_hand']);for(const garment of this.garments.values())for(const id of garment.poseJointIds||[])poseIds.add(id);
+  const signature=[...poseIds].map(id=>{const f=human.byId.get(id).world;return [...f.p,...f.q].join(',');}).join('|');
   if(time===this.lastTime&&signature===this.lastSignature)return;
   if(time===this.lastTime&&signature!==this.lastSignature)this.reset();
   this.lastTime=time;this.lastSignature=signature;

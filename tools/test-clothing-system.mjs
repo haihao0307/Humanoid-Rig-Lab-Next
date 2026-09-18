@@ -9,6 +9,8 @@ const garment={update:f=>{calls.push(['update',f.time,f.human]);return true;},dr
 system.add('fixture',garment);assert.throws(()=>system.add('fixture',garment));const body=JSON.stringify([...human.byId]);
 system.update();system.draw(true);system.draw(false);assert.equal(calls.filter(r=>r[0]==='update').length,1,'Depth and colour passes do not step clothing');assert.equal(JSON.stringify([...human.byId]),body);
 human.byId.get('hips').world.p[0]=2;system.update();assert(calls.some(r=>r[0]==='reset'),'A same-time teleport resets the garment');
+human.byId.set('waist',{world:{p:[0,1,0],q:[0,0,0,1]}});garment.poseJointIds=['waist'];system.update();const updates=calls.filter(r=>r[0]==='update').length;
+human.byId.get('waist').world.p[2]=.1;system.update();assert.equal(calls.filter(r=>r[0]==='update').length,updates+1,'A same-time waist edit invalidates clothing even with fixed hands and feet');
 system.dispose();system.dispose();system.update();system.draw(false);assert.equal(calls.filter(r=>r[0]==='dispose').length,1);assert.equal(system.garments.size,0);
 const point=(angle,t)=>[Math.sin(angle)*(.2+.08*t),1-.4*t,Math.cos(angle)*(.18+.08*t)],p={p:[0,.85,0],q:[0,0,0,1]};
 const cloth=new GarmentClothSolver(point),other=new GarmentClothSolver(point),start=performance.now();

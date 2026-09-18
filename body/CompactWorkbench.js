@@ -265,7 +265,7 @@ class CompactSurfaceRenderer{
     }
     stage.chunks.sort((a,b)=>Number(['FJ1289','FJ1340'].includes(a.name))-Number(['FJ1289','FJ1340'].includes(b.name)));
     if(data.hair)stage.hair=new CompactHairRenderer(this,data.hair);
-    stage.clothing=new ClothingSystem(this);stage.skirt=stage.clothing.add('grass-skirt',new ProceduralGrassSkirt(this,data.meshes));stage.geometryBytes+=stage.skirt.geometryBytes;
+    stage.clothing=new ClothingSystem(this);stage.skirt=stage.clothing.add('linen-skirt',new ProceduralLinenSkirt(this,data.meshes));stage.geometryBytes+=stage.skirt.geometryBytes;
     stage.supportProbes=data.supportProbes;
     stage.report={...data.report,eyeAnatomy:stage.eyeAnatomy,faceAnatomy:stage.faceAnatomy,vertices:data.report.vertices-replacedSclera.reduce((sum,m)=>sum+m.vertices,0)+faceTissue.meshes.reduce((sum,m)=>sum+m.vertices,0)+eyeTissue.meshes.reduce((sum,m)=>sum+m.vertices,0),triangles:data.report.triangles-replacedSclera.reduce((sum,m)=>sum+m.triangles,0)+faceTissue.report.triangles+eyeTissue.report.triangles,...(!data.hair&&this.hair?{hair:this.hair.report,hairEnabled:true}:{}),binding:{...field.report,sourceRegionsPreserved:true,groups:stage.bindingGroups,joints:this.lab.human.joints.length,maximumWeightError:stage.maximumWeightError,calibrated:false}};
     this.checkUpload();
