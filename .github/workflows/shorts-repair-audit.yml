@@ -36,9 +36,9 @@ jobs:
       - name: Retain canonical assembly on the isolated repair branch
         run: |
           test "$GITHUB_REF_NAME" = "fix/shorts-separated-legs-20260919"
-          git add clothing/ShortsCloth.js source/assembly.json index.html
+          git add clothing/ShortsCloth.js clothing/ShortsPattern.js clothing/ClothShorts.js source/assembly.json source/runtime.template.js tools/test-shorts-pattern.mjs tools/test-shorts-integration.mjs index.html
           if ! git diff --cached --quiet; then
-            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'test(shorts): retain opt-in leg-assembly candidate; no visual acceptance'
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'test(shorts): retain opt-in leg workspaces and restore rejected defaults; visual acceptance false'
             git push origin HEAD:fix/shorts-separated-legs-20260919
           fi
       - name: Install isolated browser dependency
