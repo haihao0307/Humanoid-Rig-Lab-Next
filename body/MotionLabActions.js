@@ -56,8 +56,9 @@ function motionObjectShapeKey(body){return body.shapes.map((v,i)=>[v.type,v.radi
 function motionCheckCertificateEnvironment(certificate,world,h,ignore,environment){
  for(const [id,p]of environment)if(world.collision(certificate.worldPoint(p),motionBodyPartRadius(h,id),ignore))throw Error('抬放路径的头肩净空不足');
 }
-function motionProofMargins(){return{minimumHingeReserveDegrees:Infinity,maximumFootErrorM:0,maximumBoneErrorM:0,maximumAttachmentErrorM:0};}
+function motionProofMargins(){return{minimumHingeReserveDegrees:Infinity,maximumWristFlexionDegrees:0,maximumWristDeviationDegrees:0,maximumWristRadialDegrees:0,maximumWristUlnarDegrees:0,maximumFootErrorM:0,maximumBoneErrorM:0,maximumAttachmentErrorM:0};}
 function motionAccumulateProofMargins(margins,report){
+ for(const wrist of Object.values(report.wrists||{})){margins.maximumWristRadialDegrees=Math.max(margins.maximumWristRadialDegrees,wrist.radialDeviationDegrees);margins.maximumWristUlnarDegrees=Math.max(margins.maximumWristUlnarDegrees,-wrist.radialDeviationDegrees);margins.maximumWristFlexionDegrees=Math.max(margins.maximumWristFlexionDegrees,Math.abs(wrist.flexionDegrees));margins.maximumWristDeviationDegrees=Math.max(margins.maximumWristDeviationDegrees,Math.abs(wrist.deviationDegrees));}
  margins.minimumHingeReserveDegrees=Math.min(margins.minimumHingeReserveDegrees,report.hingeReserveDegrees);
  margins.maximumFootErrorM=Math.max(margins.maximumFootErrorM,report.footErrorM);margins.maximumBoneErrorM=Math.max(margins.maximumBoneErrorM,report.boneErrorM);margins.maximumAttachmentErrorM=Math.max(margins.maximumAttachmentErrorM,report.attachmentErrorM);
 }
@@ -80,11 +81,11 @@ function* motionChooseCarryConfigurationSteps(h,object,grips,relativeQ,world){
  const rounded=v=>Math.round(v*1e12)/1e12,key=JSON.stringify([motionObjectShapeKey(world.physics.bodies.get(object.id).body),object.shape,object.templateId,object.w,object.h,object.d,object.r,relativeQ.map(rounded),Object.values(grips).map(g=>[g.p.map(rounded),g.q.map(rounded)]),h.motionDriver?.balanceInput?.()||null]);
  if(cache.has(key))return cache.get(key);
  const samples=yield* motionCarrySamplesSteps(h),m=h.bodyMetrics,reach=r2Mean(side=>m.armReachM[side]),contactHand=motionContactHand(object);
- const rear=object.shape==='box'?Math.abs(rotate(relativeQ,[object.w/2,0,0])[2])+Math.abs(rotate(relativeQ,[0,0,object.d/2])[2]):object.r;
+ const rear=object.shape==='box'?Math.abs(rotate(relativeQ,[object.w/2,0,0])[2])+Math.abs(rotate(relativeQ,[0,object.h/2,0])[2])+Math.abs(rotate(relativeQ,[0,0,object.d/2])[2]):object.r;
  const minForward=m.torsoRadiusM+rear+.025;
  const gripHeight=r2Mean(side=>rotate(relativeQ,grips[side].p)[1]),shoulderHeight=motionStandingHipHeight(h)+r2Mean(side=>h.resolvedRig.nodes[side+'_upperArm'].positionM[1]-h.resolvedRig.nodes.hips.positionM[1]);
  const failures=[];
- for(const [dropRatio,baseForward,poleLateralM] of [[.45,.44,.60],[.425,.44,.60],[.475,.44,.60],[.45,.42,.60],[.45,.46,.60],[.45,.44,.45],[.45,.44,.30],[.50,.44,.60],[.40,.44,.60]]){
+ for(const [dropRatio,baseForward,poleLateralM] of [[.62,.32,.25],[.58,.34,.30],[.62,.36,.30],[.45,.44,.60],[.425,.44,.60],[.475,.44,.60],[.45,.42,.60],[.45,.46,.60],[.45,.44,.45],[.45,.44,.30],[.50,.44,.60],[.40,.44,.60]]){
   const forwardM=Math.max(minForward,motionForwardDistance(h,baseForward)),heightM=shoulderHeight-dropRatio*reach-gripHeight;
   if(heightM<object.h/2+.08)continue;
   try{let minimumClearanceM=Infinity,minimumHandClearanceM=Infinity;
@@ -175,18 +176,22 @@ function* contactCandidatesSteps(h){
 }
 function motionChooseContact(h,position,yaw,hands,world=null,ignore=[],options={}){return motionDrainPreflight(motionChooseContactSteps(h,position,yaw,hands,world,ignore,options));}
 function* motionChooseContactSteps(h,position,yaw,hands,world=null,ignore=[],options={}){
+ if(options.contactOnly&&!options.validateTransition)throw Error('替代伸手流程必须提交完整换手路径验证');
  const inverseYaw=qy(-yaw),origin=[position[0],0,position[2]];
  const wrists=Object.fromEntries(['left','right'].map(side=>[side,rotate(inverseYaw,sub(sub(hands[side].p,rotate(hands[side].q,h.bodyMetrics.palmContact)),origin))]));
  const objectId=ignore[0],object=world?.objects?.find(o=>o.id===objectId),checked=object&&world?.physics?.bodyObjectClearance;
  const adapter=checked?motionContactAdapter(h,position,yaw):null,failures=[],contactHand=motionContactHand(object);
  const objectPose=options.objectPose||(object?frame(object.p,object.q):null),carryConfiguration=options.carryConfiguration||(options.grips&&checked?(yield* motionChooseCarryConfigurationSteps(h,object,options.grips,qm(inv(qy(yaw)),objectPose.q),world)):null);
  const choice=checked?motionLocalCertificate(h,adapter,position,yaw,world,objectId,'contact-choice',local=>[
-  local.frame(objectPose),Object.fromEntries(['left','right'].map(s=>[s,local.frame(hands[s])])),options.grips,carryConfiguration,contactHand]):null;
+  local.frame(objectPose),Object.fromEntries(['left','right'].map(s=>[s,local.frame(hands[s])])),options.grips,carryConfiguration,contactHand,!!options.push,!!options.contactOnly,options.transferProfile]):null;
  // A prior successful local fit is only a search hint. Its environment and
  // the complete transfer/reach certificates are checked again below.
  const hint=choice?.cached?.result.contact?structuredClone(choice.cached.result.contact):null,candidates=yield* contactCandidatesSteps(h),ordered=hint?[hint,...candidates.filter(c=>c.heightM!==hint.heightM||c.source.forwardFlexionDegrees!==hint.source.forwardFlexionDegrees)]:candidates;
  for(const candidate of ordered){
   yield;
+  // A moving low push needs room for the trailing shin, not just a valid
+  // stationary squat. Use the hip hinge before descending to a kneel.
+  if(options.push&&candidate.heightM<.58*motionStandingHipHeight(h))continue;
   const reachable=['left','right'].every(side=>{
    const {L1:l1,L2:l2}=h.arms[side],distance=dist(wrists[side],candidate.shoulders[side]);
    return distance<l1+l2-.008&&distance>Math.abs(l1-l2)+.025;
@@ -194,7 +199,7 @@ function* motionChooseContactSteps(h,position,yaw,hands,world=null,ignore=[],opt
   if(!reachable)continue;
   if(world&&[['head',candidate.head],...Object.entries(candidate.shoulders).map(([side,p])=>[side+'_upperArm',p])].some(([id,p])=>world.collision(add(origin,rotate(qy(yaw),p)),motionBodyPartRadius(h,id),ignore)))continue;
   try{
-   let selected={...candidate,carryConfiguration,contactHandMode:contactHand?.mode};
+   let selected={...candidate,carryConfiguration,contactHandMode:contactHand?.mode,transferProfile:options.transferProfile||null};
    if(checked){
     const pose=adapter.pose.build({reference:candidate.reference,position:[position[0],candidate.heightM,position[2]],yaw,controlledFeet:true,hands,armPoleLateralM:carryConfiguration?.poleLateralM,contactHand});adapter.pose.validate(pose);
     const minimumClearanceM=motionRequireObjectClearance(h,world,objectId,pose.frames,options.objectPose||frame(object.p,object.q));
@@ -202,11 +207,12 @@ function* motionChooseContactSteps(h,position,yaw,hands,world=null,ignore=[],opt
     selected={...selected,bodyClearance:{minimumClearanceM,allowedContactEffectors:['leftPalm','rightPalm'],excludedBodyProxies:[]},handClearance:{minimumHandClearanceM,scope:'all metacarpal/finger bone segments including tips; not skin volume'}};
    }
    if(options.grips)yield* motionValidateTransferContactsSteps(h,position,yaw,options.grips,objectPose,selected,world,ignore,16);
-   if(checked)yield* motionValidateContactReachSteps(h,position,yaw,hands,selected,world,ignore,20,objectPose);
+   if(checked&&!options.contactOnly)yield* motionValidateContactReachSteps(h,position,yaw,hands,selected,world,ignore,20,objectPose);
    // Sparse passes only reject candidates. Acceptance uses every fixed-step
    // parameter interval of the authored reach and two-second transfer paths.
    if(options.grips)yield* motionValidateTransferContactsSteps(h,position,yaw,options.grips,objectPose,selected,world,ignore,252);
-   if(checked)yield* motionValidateContactReachSteps(h,position,yaw,hands,selected,world,ignore,204,objectPose);
+   if(checked&&!options.contactOnly)yield* motionValidateContactReachSteps(h,position,yaw,hands,selected,world,ignore,204,objectPose);
+   if(options.validateTransition)yield* options.validateTransition(selected);
    choice?.save({contact:structuredClone(selected),minimumClearanceM:selected.bodyClearance.minimumClearanceM,minimumHandClearanceM:selected.handClearance.minimumHandClearanceM,maximumPalmErrorM:0});
    return selected;
   }catch(error){failures.push(error.message);}
@@ -236,30 +242,30 @@ function* motionValidateTransferContactsSteps(h,position,yaw,grips,ground,contac
  const checked=world?.physics?.bodyObjectClearance&&ignore[0],adapter=checked?motionContactAdapter(h,position,yaw):null;
  const contactHand=contact.contactHandMode?{mode:contact.contactHandMode,amount:1}:null;
  const certificate=checked?motionLocalCertificate(h,adapter,position,yaw,world,ignore[0],'transfer',local=>[
-  samples,local.frame(ground),grips,contact.reference,contact.heightM,contact.carryConfiguration,contactHand]):null;
+  samples,local.frame(ground),grips,contact.reference,contact.heightM,contact.carryConfiguration,contact.transferProfile,contactHand]):null;
  if(certificate?.cached){motionCheckCertificateEnvironment(certificate,world,h,ignore,certificate.cached.environment);return{...certificate.cached.result,certificateReused:true};}
  const source=new MotionLab.FullBodyMotion(adapter?.pose.h.resolvedRig.nodes||h.resolvedRig.nodes),environment=[];
  // Shared forecast/execution check of the authored lift/lower interpolation.
  // These are private skeletal parameter candidates, never live joint writes.
- let minimumClearanceM=Infinity,minimumHandClearanceM=Infinity,maximumPalmErrorM=0;const margins=motionProofMargins();
+ let minimumClearanceM=Infinity,minimumHandClearanceM=Infinity,maximumPalmErrorM=0,maximumJointStepM=0,previousFrames=null;const margins=motionProofMargins();
  for(let i=0;i<=samples;i++){
   yield;
   const u=i/samples,reference=MotionLab.blend(contact.reference,source.neutral,u);
-  const root=[position[0],contact.heightM+(motionStandingHipHeight(h)-contact.heightM)*u,position[2]];
+  const root=[position[0],contact.heightM+(motionStandingHipHeight(h)-contact.heightM)*(contact.transferProfile==='ledge'?u-.14*Math.sin(Math.PI*u):u),position[2]];
   const points=source.positions({root,yaw,motion:{frame:reference,weight:1}}),object=frame(mix(ground.p,carried.p,u),ground.q);
   const hands=Object.fromEntries(['left','right'].map(side=>[side,compose(object,grips[side])]));
   for(const side of ['left','right']){
    const palm=compose(object,grips[side]),wrist=sub(palm.p,rotate(palm.q,h.bodyMetrics.palmContact));
    const {L1:l1,L2:l2}=h.arms[side],distance=dist(wrist,points.get(side+'_upperArm'));
-   if(distance>l1+l2-.005||distance<Math.abs(l1-l2)+.02)throw Error('抬起或放下的中间路径超出双手可达范围');
+   if(distance>l1+l2-.005||distance<Math.abs(l1-l2)+.02)throw Error('抬起或放下的中间路径超出双手可达范围：'+side+' '+u.toFixed(3)+' '+distance.toFixed(3)+' / '+(l1+l2-.005).toFixed(3));
   }
-  if(checked){const candidate=adapter.pose.build({reference,position:root,yaw,controlledFeet:true,hands,armPoleLateralM:contact.carryConfiguration?.poleLateralM,contactHand}),report=adapter.pose.validate(candidate);motionAccumulateProofMargins(margins,report);maximumPalmErrorM=Math.max(maximumPalmErrorM,report.handErrorM);if(report.handErrorM>.001)throw Error('抬放中间路径未保留手部可达余量');minimumClearanceM=Math.min(minimumClearanceM,motionRequireObjectClearance(h,world,ignore[0],candidate.frames,object));minimumHandClearanceM=Math.min(minimumHandClearanceM,motionRequireContactHandClearance(h,world,ignore[0],candidate.frames,object,contactHand));}
+  if(checked){const candidate=adapter.pose.build({reference,position:root,yaw,controlledFeet:true,hands,armPoleLateralM:contact.carryConfiguration?.poleLateralM,contactHand}),report=adapter.pose.validate(candidate);motionAccumulateProofMargins(margins,report);maximumPalmErrorM=Math.max(maximumPalmErrorM,report.handErrorM);if(report.handErrorM>.001)throw Error('抬放中间路径未保留手部可达余量');if(previousFrames)for(const [id,f]of candidate.frames)maximumJointStepM=Math.max(maximumJointStepM,dist(previousFrames.get(id).p,f.p));if(maximumJointStepM>.02*252/samples)throw Error('抬放路径关节跳变超过连续性限度');previousFrames=candidate.frames;try{minimumClearanceM=Math.min(minimumClearanceM,motionRequireObjectClearance(h,world,ignore[0],candidate.frames,object));}catch(error){throw Error('抬放 '+u.toFixed(3)+'：'+error.message);}minimumHandClearanceM=Math.min(minimumHandClearanceM,motionRequireContactHandClearance(h,world,ignore[0],candidate.frames,object,contactHand));}
   if(world)for(const id of ['head','left_upperArm','right_upperArm']){
    const p=points.get(id);if(certificate)environment.push([id,certificate.point(p)]);
    if(world.collision(p,motionBodyPartRadius(h,id),ignore))throw Error('抬放路径的头肩净空不足');
   }
  }
- const result={...margins,parameterSamples:samples+1,maximumPalmErrorM,minimumClearanceM:Number.isFinite(minimumClearanceM)?minimumClearanceM:null,minimumHandClearanceM,scope:'fixed bones, palm reach, all non-contact body proxies against the moving object; box contact includes metacarpal/finger segments and tips; environmental head/shoulder clearance; not skin volume',visualAcceptance:false};
+ const result={...margins,maximumJointStepM,parameterSamples:samples+1,maximumPalmErrorM,minimumClearanceM:Number.isFinite(minimumClearanceM)?minimumClearanceM:null,minimumHandClearanceM,scope:'fixed bones, palm reach, all non-contact body proxies against the moving object; box contact includes metacarpal/finger segments and tips; environmental head/shoulder clearance; not skin volume',visualAcceptance:false};
  certificate?.save(result,environment);return result;
 }
 function motionValidateContactReach(h,position,yaw,hands,contact,world,ignore,samples=204,objectPose=null){return motionDrainPreflight(motionValidateContactReachSteps(h,position,yaw,hands,contact,world,ignore,samples,objectPose));}
@@ -271,16 +277,17 @@ function* motionValidateContactReachSteps(h,position,yaw,hands,contact,world,ign
  const initial=adapter.pose.build();
  const startHands=Object.fromEntries(['left','right'].map(side=>[side,compose(initial.frames.get(side+'_hand'),frame(h.bodyMetrics.palmContact))]));
  const agent={h,phase:'reach',locomotion:adapter,skill:{o:object,contactPose:contact,carryConfiguration:contact.carryConfiguration,reachStart:motionFreeHandEndpoints(h,initial.frames,startHands)}};
- let minimumClearanceM=Infinity,minimumHandClearanceM=Infinity,maximumPalmErrorM=0;const margins=motionProofMargins();
+ let minimumClearanceM=Infinity,minimumHandClearanceM=Infinity,maximumPalmErrorM=0,maximumJointStepM=0,previousFrames=null;const margins=motionProofMargins();
  for(let i=0;i<=samples;i++){
   yield;
   const t=i/samples,goals=motionReachHands(agent,hands,t),descriptor=motionContactDescriptor(agent,goals,t),candidate=adapter.pose.build({...descriptor,hands:goals}),report=adapter.pose.validate(candidate);
   motionAccumulateProofMargins(margins,report);
   maximumPalmErrorM=Math.max(maximumPalmErrorM,report.handErrorM);if(report.handErrorM>.001)throw Error('伸手中间路径未保留手部可达余量');
+  if(previousFrames)for(const [id,f]of candidate.frames)maximumJointStepM=Math.max(maximumJointStepM,dist(previousFrames.get(id).p,f.p));if(maximumJointStepM>.02*204/samples)throw Error('伸手路径关节跳变超过连续性限度');previousFrames=candidate.frames;
   minimumClearanceM=Math.min(minimumClearanceM,motionRequireObjectClearance(h,world,ignore[0],candidate.frames,objectPose));
   minimumHandClearanceM=Math.min(minimumHandClearanceM,motionRequireContactHandClearance(h,world,ignore[0],candidate.frames,objectPose,descriptor.contactHand));
  }
- const result={...margins,parameterSamples:samples+1,minimumClearanceM,minimumHandClearanceM,maximumPalmErrorM};certificate.save(result);return result;
+ const result={...margins,maximumJointStepM,parameterSamples:samples+1,minimumClearanceM,minimumHandClearanceM,maximumPalmErrorM};certificate.save(result);return result;
 }
 function motionContactHand(object,amount=1){return object?.shape==='box'?{mode:CONTACT_HAND_POSE_REVISION,amount}:null;}
 function motionContactDescriptor(agent,hands,crouch,phase=agent.phase){
@@ -291,7 +298,7 @@ function motionContactDescriptor(agent,hands,crouch,phase=agent.phase){
  const free=phase==='reach'||phase==='rise',poleWeight=free?weight:1,handAmount=free?smoother(clamp(weight*3,0,1)):1;
  const contactHand=contact.contactHandMode?{mode:contact.contactHandMode,amount:handAmount}:motionContactHand(agent.skill?.o,handAmount);
  return {reference:MotionLab.blend(base,contact.reference,weight),controlledFeet:true,armPoleLateralM:.30+((agent.skill?.carryConfiguration?.poleLateralM??.30)-.30)*poleWeight,
-  position:[state.root[0],state.root[1]+(contact.heightM-state.root[1])*weight,state.root[2]],
+  position:[state.root[0],state.root[1]+(contact.heightM-state.root[1])*(contact.transferProfile==='ledge'&&!free?weight+.14*Math.sin(Math.PI*weight):weight),state.root[2]],
   motionSource:{...contact.source,phase,weight},floorMode:false,contactHand};
 }
 function motionFreeHandEndpoints(h,frames,hands){

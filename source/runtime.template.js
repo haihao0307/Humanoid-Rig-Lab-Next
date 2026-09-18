@@ -504,6 +504,10 @@ function graspFrames(o,yaw,push=false){const base=qy(yaw),out={};for(const[side,
   // the crouched torso/knees into tall boxes and buried the distal forearm.
   P[1]=o.h/2;const xFace=Math.abs(D[0])/(o.w/2)>=Math.abs(D[2])/(o.d/2),normal=xFace?[Math.sign(D[0]),0,0]:[0,0,Math.sign(D[2])];
   const inward=rotate(o.q,mul(normal,-1));Q=qm(inv(o.q),qy(Math.atan2(inward[0],inward[2])));
+  // Carry with the fingers along the side face, toward the front of the
+  // load. A downward hand against a horizontal forearm folded the wrist
+  // almost 90 degrees. Keep the contact normal; roll within its plane.
+  Q=qm(Q,qz(push?-s*Math.PI/7:s*Math.PI/3));
  }
  out[side]=frame(P,Q);
 }return out}
@@ -515,6 +519,7 @@ function inferHeldFrame(human,grips){const a=compose(human.palm('left'),inverse(
 /*__SOURCE:body/ContactHandPose.js__*/
 /*__SOURCE:body/MotionLabPose.js__*/
 /*__SOURCE:body/MotionLabActions.js__*/
+/*__SOURCE:body/BoxHandling.js__*/
 /*__SOURCE:body/NaturalLocomotion.js__*/
 /*__SOURCE:body/LightBalanceFeedback.js__*/
 /*__SOURCE:control/TaskAgent.js__*/

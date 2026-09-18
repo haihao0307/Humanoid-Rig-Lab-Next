@@ -456,7 +456,32 @@ class MotionLabPose {
    const start=positions.get(upper),target=sub(goal.p,rotate(goal.q,h.bodyMetrics.palmContact));
    const reachRatio=h.bodyMetrics.armReachM[side]/h.bodyMetrics.reference.armReachM[side];
    const pole=options.armPoles?.[side]||add(start,rotate(qy(yaw),mul([arm.s*(options.armPoleLateralM??.30),-.35,-.10],reachRatio)));
-   const solved=MotionLab.solveTwoBone(start,target,pole,arm.L1,arm.L2);
+   // Share orientation demand with the elbow swivel, instead of leaving
+   // all of it at the wrist. Project onto the elbow circle: fixed lengths
+   // and the palm position remain exact, with a continuous pole preference.
+   const axis=norm(sub(target,start)),preferred=sub(target,mul(rotate(goal.q,[0,-1,0]),arm.L2));
+   const radialPole=p=>{const v=sub(p,start);return sub(v,mul(axis,dot(v,axis)));};
+   const original=radialPole(pole),neutral=radialPole(preferred);
+   const solveAt=weight=>MotionLab.solveTwoBone(start,target,len(neutral)>1e-6?add(start,add(mul(norm(original),1-weight),mul(norm(neutral),weight))):pole,arm.L1,arm.L2);
+   let solved=solveAt(.4);
+   if(options.contactHand){
+    const across=rotate(inv(h.sourceBind.get(hand).q),sub(this.source(side+'_finger_2_1'),this.source(side+'_finger_5_1')));
+    const reserve=solution=>{const v=rotate(inv(goal.q),norm(sub(solution.end,solution.knee))),flex=Math.abs(degrees(Math.atan2(v[2],-v[1]))),radial=-degrees(Math.atan2(v[0],Math.hypot(v[1],v[2])))*Math.sign(across[0]);return Math.min(69.5-flex,19.5-radial,39.5+radial);};
+    if(reserve(solved)<0){
+     // A wrist envelope is anisotropic. Its valid elbow arc need not include
+     // the minimum combined-angle pole, so inspect both swivel directions.
+     const base=norm(radialPole(solved.knee));
+     const swivel=angle=>{const v=add(mul(base,Math.cos(angle)),mul(cross(axis,base),Math.sin(angle)));return MotionLab.solveTwoBone(start,target,add(start,v),arm.L1,arm.L2);};
+     let found=null;
+     for(let step=1;step<=18&&!found;step++)for(const sign of [-1,1]){
+      const angle=sign*step*Math.PI/36;if(reserve(swivel(angle))<0)continue;
+      let lo=(step-1)*Math.PI/36,hi=step*Math.PI/36;
+      for(let i=0;i<12;i++){const mid=(lo+hi)/2;if(reserve(swivel(sign*mid))>=0)hi=mid;else lo=mid;}
+      const trial={angle:sign*hi,solution:swivel(sign*hi)};if(!found||Math.abs(trial.angle)<Math.abs(found.angle))found=trial;
+     }
+     if(found)solved=found.solution;
+    }
+   }
    positions.set(forearm,solved.knee);positions.set(radial,solved.knee);positions.set(hand,solved.end);
    rotations.set(upper,this.segmentRotation(upper,forearm,positions,yaw));
    rotations.set(forearm,this.segmentRotation(forearm,hand,positions,yaw));
@@ -486,7 +511,7 @@ class MotionLabPose {
    if(controlled&&options.preserveFootContactsOnBlend!==false)this.reprojectControlledLegs(frames,state,yaw,from,target,u);
    this.refreshEffectorErrors(frames,errors);
   }
-  return {frames,errors,controlled,source:options.motionSource||{kind:'motion-lab',revision:MotionLab.revision,trial:'08_01'},state};
+  return {frames,errors,controlled,manualHandling:!!options.hands&&!!options.contactHand,source:options.motionSource||{kind:'motion-lab',revision:MotionLab.revision,trial:'08_01'},state};
  }
  validate(candidate){
   let boneErrorM=0,radialAttachmentErrorM=0,attachmentErrorM=0,attachmentJoint=null;
@@ -507,7 +532,7 @@ class MotionLabPose {
   }
   if(radialAttachmentErrorM>.0001)throw Error('前臂蒙皮轴未连接到手腕，姿态未提交');
   if(attachmentErrorM>.0001)throw Error('蒙皮变换未连接到子关节：'+attachmentJoint+'，姿态未提交');
-  const ranges=r2CaptureConstraintProfile(this.h,candidate.source),contactHinges={};let hingeReserveDegrees=Infinity;
+  const ranges=r2CaptureConstraintProfile(this.h,candidate.source),contactHinges={},wrists={};let hingeReserveDegrees=Infinity;
   for(const side of ['left','right'])for(const [a,b,c,limit]of [['upperArm','forearm','hand',170],['femur','tibia','foot',160]]){
    const p=id=>candidate.frames.get(side+'_'+id).p;
    const angle=degrees(Math.acos(clamp(dot(norm(sub(p(b),p(a))),norm(sub(p(c),p(b)))),-1,1)));
@@ -515,16 +540,30 @@ class MotionLabPose {
    // Recorded extrema describe the unmodified capture. An explicitly solved
    // palm uses the same fixed-length contact elbow limit as other hand IK;
    // retain both limits in diagnostics instead of widening the whole clip.
-   const maximum=palmAdapted||candidate.controlled&&b==='tibia'?limit:ranges?.hingeDegrees[side+'_'+b]??limit;
+   const sourceMaximum=palmAdapted||candidate.controlled&&b==='tibia'?limit:ranges?.hingeDegrees[side+'_'+b]??limit;
+   const maximum=candidate.manualHandling?Math.min(sourceMaximum,b==='forearm'?155:150):sourceMaximum;
    if(palmAdapted)contactHinges[side+'_'+b]={angleDegrees:angle,maximumDegrees:maximum,recordedMaximumDegrees:ranges?.hingeDegrees[side+'_'+b]??null};
    hingeReserveDegrees=Math.min(hingeReserveDegrees,maximum+.5-angle);
-   if(angle>maximum+.5)throw Error('关节弯曲超过动作来源或接触适配范围：'+side+'_'+b+' '+angle.toFixed(2)+' > '+maximum.toFixed(2));
+  if(angle>maximum+.5)throw Error('关节弯曲超过动作来源或接触适配范围：'+side+'_'+b+' '+angle.toFixed(2)+' > '+maximum.toFixed(2));
+  }
+  for(const side of ['left','right']){
+   const hand=candidate.frames.get(side+'_hand'),elbow=candidate.frames.get(side+'_forearm');
+   // Measure in the anatomical hand frame, independent of body/world yaw.
+   // Local -Y is the authored hand longitudinal axis; Z is its palm normal.
+   const forearm=rotate(inv(hand.q),norm(sub(hand.p,elbow.p)));
+   const flexionDegrees=degrees(Math.atan2(forearm[2],-forearm[1]));
+   const deviationDegrees=degrees(Math.atan2(forearm[0],Math.hypot(forearm[1],forearm[2])));
+   const bind=this.h.sourceBind.get(side+'_hand'),across=rotate(inv(bind.q),sub(this.source(side+'_finger_2_1'),this.source(side+'_finger_5_1')));
+   const radialDeviationDegrees=-deviationDegrees*Math.sign(across[0]);
+   const envelope={flexionExtensionDegrees:70,radialDegrees:20,ulnarDegrees:40};
+   wrists[side]={flexionDegrees,deviationDegrees,radialDeviationDegrees,combinedDegrees:degrees(Math.acos(clamp(-forearm[1],-1,1))),envelope,checked:!!candidate.manualHandling};
+   if(candidate.manualHandling&&(Math.abs(flexionDegrees)>70||radialDeviationDegrees>20||radialDeviationDegrees< -40))throw Error('搬运动作超出腕部活动范围：'+side+' 屈伸 '+flexionDegrees.toFixed(1)+'，桡偏 '+radialDeviationDegrees.toFixed(1));
   }
   const footErrorM=Math.max(0,...candidate.errors.filter(e=>/_foot$/.test(e.id)).map(e=>e.error));
   if(footErrorM>.012)throw Error('落脚目标超出可达范围，姿态未提交');
   const handErrorM=Math.max(0,...candidate.errors.filter(e=>/_hand$/.test(e.id)).map(e=>e.error));
   if(handErrorM>.012)throw Error('手掌目标超出可达范围，姿态未提交');
-  return {boneErrorM,radialAttachmentErrorM,attachmentErrorM,attachmentJoint,footErrorM,handErrorM,hingeReserveDegrees,contactHinges,kinematicOnly:true};
+  return {boneErrorM,radialAttachmentErrorM,attachmentErrorM,attachmentJoint,footErrorM,handErrorM,hingeReserveDegrees,contactHinges,wrists,kinematicOnly:true};
  }
  measureEffectors(candidate){
   this.refreshEffectorErrors(candidate.frames,candidate.errors);
@@ -532,7 +571,7 @@ class MotionLabPose {
  resolveGroundClearance(candidate,options){
   let ground=null,groundCorrectionM=0;
   if(!options.groundClearance)return{ground,groundCorrectionM};
-  const anchored=candidate.controlled&&!options.hands;let previous=null;
+  const anchored=candidate.controlled;let previous=null;
   // These non-airborne floor clips have a different source body height.
   // Fit their retargeted support surface in BOTH directions. Clearance-only
   // lifting allowed an entire crouched/seated body to hover above the floor.
@@ -540,7 +579,7 @@ class MotionLabPose {
   const fitFloor=options.groundSupport==='continuous-floor'&&options.floorMode&&
    !candidate.controlled&&!options.hands&&(candidate.source?.kind==='capture'||candidate.source?.handSupported===true)&&
    !candidate.errors.some(error=>error.targetSpace==='world');
-  for(let pass=0;pass<(anchored||candidate.floorPalmTargets||candidate.floorLegTargets?8:1);pass++){
+  for(let pass=0;pass<(anchored||candidate.floorPalmTargets||candidate.floorLegTargets?24:1);pass++){
    ground=this.h.minimumBoneY(candidate.frames);
    if(!Number.isFinite(ground.y))throw Error('动作候选缺少有效支撑采样');
    let correction=fitFloor?.0005-ground.y:Math.max(0,.0005-ground.y);
@@ -562,6 +601,9 @@ class MotionLabPose {
    // back to the existing world contacts. Translating the feet as well made
    // a valid seated support fail the contact gate during preparation.
    if(anchored)this.reprojectControlledLegs(candidate.frames,candidate.state,candidate.state.yaw,before,before,1);
+   // Manipulation also owns world-space palms. Refit the complete chain
+   // after raising the pelvis; moving feet or hands with it is not clearance.
+   if(options.hands)for(const side of ['left','right'])if(options.hands[side])this.solveFloorPalm(candidate,side,options.hands[side],0);
    for(const target of candidate.floorLegTargets||[])this.projectFloorLeg(candidate,target);
    for(const {side,goal,weight}of candidate.floorPalmTargets||[])this.solveFloorPalm(candidate,side,goal,0);
    groundCorrectionM+=correction;

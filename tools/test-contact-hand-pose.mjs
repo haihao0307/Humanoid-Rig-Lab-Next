@@ -38,7 +38,7 @@ for(const shape of [{},{statureScale:.94},{statureScale:1.06},{statureScale:.95,
   cases++;
  }
 }
-assert(maximumLengthErrorM<1e-12);assert(maximumAttachmentErrorM<1e-12);assert(originalMinimumM<-.025,'the fixture must reproduce the original intersecting hand');
+assert(maximumLengthErrorM<1e-12);assert(maximumAttachmentErrorM<1e-12);assert(originalMinimumM<-.005,'the fixture must reproduce the original intersecting hand');
 assert.equal(api.contactHandBoxSegmentDistance([-2,0,0],[2,0,0],[.5,.5,.5]),-.5);
 assert(Math.abs(api.contactHandBoxSegmentDistance([.51,-.2,0],[.51,.2,0],[.5,.5,.5])-.01)<1e-12);
 let seed=15342,maxSamplingGapM=0;const random=()=>((seed=Math.imul(1664525,seed)+1013904223>>>0)/4294967296);

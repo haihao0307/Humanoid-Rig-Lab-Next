@@ -284,7 +284,8 @@ class NaturalLocomotion {
   }));
   const stepFeet=this.engine.stepFeet.bind(this.engine);
   this.engine.stepFeet=(state,dt)=>{
-   const freeWalk=!this.usesFlatSupport(state)&&state.speed>.03&&!Object.values(state.feet).some(foot=>foot.adoptedOrientation);
+   const lowPush=agent.skill?.type==='push'&&agent.phase==='pushTravel';
+   const freeWalk=(lowPush||!this.usesFlatSupport(state))&&state.speed>.03&&!Object.values(state.feet).some(foot=>foot.adoptedOrientation);
    if(freeWalk&&!state.swing)this.beginWalkingStep(state);
    // The kernel's absolute stance-distance score also selects a newly landed
    // leading foot. Free gait releases a trailing foot; the kernel still owns

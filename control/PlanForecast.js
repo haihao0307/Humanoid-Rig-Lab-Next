@@ -128,13 +128,14 @@ function* planObjectTransferSteps(world,actor,step,o,target,profile,capacity,pos
 }
 function* planObjectTransferInSnapshotSteps(world,actor,step,o,target,profile,capacity,postureDurationS=0){
  const h=reasoningHuman(actor),landings=reasoningDestinations(world,actor,step,o,target),failures=[],approaches=new Map();
+ const contactWorld=step.type==='carry'&&o.shape==='box'&&!world.physics?.bodyObjectClearance?motionBoxQueryWorld(world):world;
  // A reachable object may be beside a wall or shelf. A single approach ray
  // from the actor can put the grasp stance inside that obstacle. Search the
  // same checked grasp from a finite set of sides before rejecting the task.
  // A push retains its required straight line behind the object.
  const candidates=landings.flatMap(destination=>{
   const preferred=step.type==='push'?groundDirection(o.p,destination):groundDirection(actor.pos,o.p);
-  return (step.type==='push'?[0]:[0,Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2,Math.PI*3/4,-Math.PI*3/4,Math.PI]).flatMap(offset=>(step.type==='push'?[0]:[0,-.02,.02,.04,.06,.08]).map(approachExtra=>({destination,direction:rotate(qy(offset),preferred),approachExtra})));
+  return (step.type==='push'?[0]:o.shape==='box'?motionBoxApproachOffsets(o,preferred):[0,Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2,Math.PI*3/4,-Math.PI*3/4,Math.PI]).flatMap(offset=>(step.type==='push'?[0]:[0,-.02,.02,.04,.06,.08]).map(approachExtra=>({destination,direction:rotate(qy(offset),preferred),approachExtra})));
  });
  // A landing is accepted only with its approach, loaded route and strength.
  // Failed candidates leave the actor, world and capacity unchanged.
@@ -152,7 +153,8 @@ function* planObjectTransferInSnapshotSteps(world,actor,step,o,target,profile,ca
      const rearReach=rayBoundary(o,rotate(inv(o.q),mul(direction,-1)));
      entry.end=add(o.p,mul(direction,-(motionApproachDistance(h)+rearReach+approachExtra)));entry.end[1]=0;
      entry.route=world.path(actor.pos,entry.end,profile.bodyRadiusM,[o.id]);entry.distance=routeDistance(actor.pos,entry.route);
-     entry.grip=graspFrames(o,approachYaw,step.type==='push');
+     entry.boxGeometry=step.type==='carry'&&o.shape==='box'?motionBoxHandlingGeometry(o,approachYaw):null;
+     entry.grip=entry.boxGeometry?.supportGrips||graspFrames(o,approachYaw,step.type==='push');
      entry.hands=Object.fromEntries(['left','right'].map(side=>[side,compose(frame(o.p,o.q),entry.grip[side])]));
     }catch(error){entry.error=error;}
    }
@@ -171,32 +173,34 @@ function* planObjectTransferInSnapshotSteps(world,actor,step,o,target,profile,ca
     // treat a failed smaller-radius heuristic path search as a proof instead.
     if(world.collision(bodyEnd,profile.carryClearanceM,[o.id]))throw Error('搬运终点的人物站位被占用');
     if(!Object.hasOwn(entry,'configuration')){
-     try{entry.configuration=world.physics?.bodyObjectClearance?yield* motionChooseCarryConfigurationSteps(h,o,grip,qm(inv(qy(approachYaw)),o.q),world):null;}
+     try{entry.configuration=contactWorld.physics?.bodyObjectClearance?yield* motionChooseCarryConfigurationSteps(h,o,grip,qm(inv(qy(approachYaw)),entry.boxGeometry?.tilted.q||o.q),contactWorld):null;}
      catch(error){entry.error=error;throw error;}
     }
     radius=carryRouteRadius(o,profile,entry.configuration);
     transfer=world.path(approachEnd,bodyEnd,radius,[o.id]);transferD=routeDistance(approachEnd,transfer);
-    durationS=postureDurationS+approachD/(profile.nominalWalkMps*capacity.movementFactor())+transferD/(profile.nominalCarryMps*capacity.movementFactor())+8.7;
+    durationS=postureDurationS+approachD/(profile.nominalWalkMps*capacity.movementFactor())+transferD/(profile.nominalCarryMps*capacity.movementFactor())+8.7+(entry.boxGeometry?8:0);
    }else{
     bodyEnd=straightPushRoute(world,o,destination,approachEnd,profile);bodyYaw=Math.atan2(direction[0],direction[2]);transferD=horizontal(o.p,destination);
     durationS=postureDurationS+approachD/(profile.nominalWalkMps*capacity.movementFactor())+transferD/profile.nominalPushMps+4.5;
    }
-   const strength=capacity.assess(strengthTaskRequest(step.type,o,{durationS,...strengthWorldParameters(world)}));if(!strength.feasible)throw Error(strengthReason(strength));
+   const strength=capacity.assess(strengthTaskRequest(step.type,o,{durationS,leftShare:entry.boxGeometry?.8:.5,...strengthWorldParameters(world)}));if(!strength.feasible)throw Error(strengthReason(strength));
+   if(entry.boxGeometry){const supportedTurn=capacity.assess(strengthTaskRequest(step.type,o,{durationS:4,leftShare:0,...strengthWorldParameters(world)}));if(!supportedTurn.feasible)throw Error('换手支撑力量不足：'+strengthReason(supportedTurn));}
    // Only a route/strength-feasible candidate warrants the dense fixed-bone
    // contact checks. Pickup is identical across this call's landings; keep its
    // result (including a failure) locally, never across mutable world states.
    if(!Object.hasOwn(entry,'pickup')){
-    try{entry.pickup=yield* motionChooseContactSteps(h,approachEnd,approachYaw,hands,world,[o.id],{objectPose:frame(o.p,o.q),grips:step.type==='carry'?grip:null,carryConfiguration:entry.configuration});}
+    try{if(entry.boxGeometry){entry.boxPlan=yield* motionPlanBoxHandlingSteps(h,o,approachEnd,approachYaw,contactWorld,entry.configuration);entry.pickup=entry.boxPlan.supportContact;}else entry.pickup=yield* motionChooseContactSteps(h,approachEnd,approachYaw,hands,world,[o.id],{objectPose:frame(o.p,o.q),grips:step.type==='carry'?grip:null,push:step.type==='push',carryConfiguration:entry.configuration});}
     catch(error){entry.error=error;throw error;}
    }
    const pickupContact=entry.pickup;
    let minClearanceM=routeClearance(world,actor.pos,approach,profile.bodyRadiusM,[o.id]);
    if(step.type==='carry'){
     const finalHands=Object.fromEntries(['left','right'].map(side=>[side,compose(frame(destination,finalQ),grip[side])]));
-    yield* motionChooseContactSteps(h,bodyEnd,bodyYaw,finalHands,world,[o.id],{objectPose:frame(destination,finalQ),grips:grip,carryConfiguration:pickupContact.carryConfiguration});
+    if(entry.boxGeometry)yield* motionPlanBoxHandlingSteps(h,o,bodyEnd,bodyYaw,contactWorld,pickupContact.carryConfiguration,frame(destination,finalQ));
+    else yield* motionChooseContactSteps(h,bodyEnd,bodyYaw,finalHands,world,[o.id],{objectPose:frame(destination,finalQ),grips:grip,carryConfiguration:pickupContact.carryConfiguration});
     minClearanceM=Math.min(minClearanceM,routeClearance(world,approachEnd,transfer,radius,[o.id]));
    }else minClearanceM=Math.min(minClearanceM,routeClearance(world,o.p,[destination],objectRadius(o)+.05,[o.id]),routeClearance(world,approachEnd,[bodyEnd],profile.pushClearanceM,[o.id]));
-   return{destination:[...destination],approachDirection:direction,approach,bodyEnd,bodyYaw,carryConfiguration:pickupContact.carryConfiguration||null,routeLengthM:approachD+transferD,transferDistanceM:transferD,durationS,minClearanceM,strength,rejectedCandidates:failures.length};
+   return{boxHandling:!!entry.boxGeometry,destination:[...destination],approachDirection:direction,approach,bodyEnd,bodyYaw,carryConfiguration:pickupContact.carryConfiguration||null,routeLengthM:approachD+transferD,transferDistanceM:transferD,durationS,minClearanceM,strength,rejectedCandidates:failures.length};
   }catch(error){failures.push(error.message)}
  }
  throw Error(`已检查 ${candidates.length} 组落点和接近姿态，接近路线、运输空间或持续力量均未通过：${[...new Set(failures)].slice(0,3).join('；')}`);
