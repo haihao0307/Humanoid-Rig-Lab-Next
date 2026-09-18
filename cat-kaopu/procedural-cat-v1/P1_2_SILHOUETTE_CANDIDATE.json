@@ -1,0 +1,124 @@
+{
+  "schema": "cat_kaopu/morphology_candidate@1.0",
+  "buildId": "cat-procedural-body-v1-p1-2-silhouette-20260918",
+  "baseCalibration": "P1_AUTHORITATIVE_CALIBRATION.json",
+  "baseMorphology": "P1_1_MORPHOLOGY_CANDIDATE.json",
+  "status": "visual-candidate",
+  "policy": {
+    "directMeasurementsUnchanged": true,
+    "externalRuntimeMesh": false,
+    "externalRuntimeTexture": false,
+    "candidateValuesAreNotAuthoritativeMeasurements": true,
+    "requiresFixedViewApproval": true
+  },
+  "reason": "P1.1 preserved measured limb lengths and fixed several presentation errors, but fixed-view review still showed an over-tall three-lobed torso, a visible tubular neck, horn-like pinnae, weak paw differentiation and a segmented tail. P1.2 reinterprets published shoulder and hip height as external dorsal surface measurements, separates those measurements from internal spine centers, and converges the low-frequency silhouette before topology or motion.",
+  "overrides": {
+    "meta": {
+      "id": "grey-tabby-a-p1-2",
+      "label": "Grey Tabby A · P1.2 silhouette candidate",
+      "revision": 4,
+      "seed": 240918
+    },
+    "torso": {
+      "pelvisWidth": 0.126,
+      "lumbarWidth": 0.102,
+      "thoraxWidth": 0.136,
+      "pelvisDepth": 0.132,
+      "lumbarDepth": 0.102,
+      "thoraxDepth": 0.148,
+      "abdomenTuck": 0.024,
+      "dorsalArc": 0.008,
+      "ventralSag": 0.003
+    },
+    "neck": {
+      "length": 0.075,
+      "baseWidth": 0.108,
+      "headWidth": 0.090,
+      "baseDepth": 0.118,
+      "headDepth": 0.095,
+      "pitchDeg": 24
+    },
+    "head": {
+      "cranialLength": 0.100,
+      "width": 0.108,
+      "height": 0.100,
+      "muzzleLength": 0.022,
+      "muzzleWidth": 0.050,
+      "muzzleHeight": 0.034,
+      "jawDepth": 0.030,
+      "eyeSpacing": 0.050,
+      "eyeHeight": 0.018,
+      "earHeight": 0.045,
+      "earWidth": 0.042,
+      "earTiltDeg": 12
+    },
+    "forelimb": {
+      "upperRadius": 0.022,
+      "lowerRadius": 0.016,
+      "wristRadius": 0.0105,
+      "humerusBackDeg": 24,
+      "radiusForwardDeg": 7,
+      "metacarpalForwardDeg": 13
+    },
+    "hindlimb": {
+      "upperRadius": 0.031,
+      "lowerRadius": 0.021,
+      "hockRadius": 0.0135,
+      "femurForwardDeg": 38,
+      "tibiaBackDeg": 44,
+      "tarsusForwardDeg": 50
+    },
+    "paws": {
+      "foreLength": 0.048,
+      "foreWidth": 0.034,
+      "hindLength": 0.055,
+      "hindWidth": 0.036,
+      "height": 0.017,
+      "toeSplay": 0.010
+    },
+    "tail": {
+      "length": 0.300,
+      "baseRadius": 0.021,
+      "tipRadius": 0.0065,
+      "lift": 0.025,
+      "curl": 0.08,
+      "lateral": 0.006,
+      "segments": 20
+    },
+    "coat": {
+      "stripeFrequency": 6.5,
+      "stripeContrast": 0.32,
+      "dorsalDarkness": 0.30,
+      "legBands": 5.5,
+      "tailBands": 8.5,
+      "roughness": 0.86
+    },
+    "material": {
+      "shortHairAmplitude": 0.00005,
+      "shortHairFrequency": 58.0,
+      "rimSoftness": 0.50,
+      "noseRoughness": 0.62,
+      "eyeRoughness": 0.19
+    }
+  },
+  "unchangedDirectMeasurements": [
+    "global.bodyLength",
+    "global.shoulderHeight",
+    "forelimb.scapulaLength",
+    "forelimb.humerusLength",
+    "forelimb.radiusLength",
+    "forelimb.metacarpalLength",
+    "hindlimb.femurLength",
+    "hindlimb.tibiaLength"
+  ],
+  "majorCorrections": [
+    "external shoulder and hip heights no longer used as torso-center heights",
+    "dorsal surface top constrained near measured shoulder and hip heights",
+    "short neck embedded into cranial thorax",
+    "smooth asymmetric torso section with a shallower dorsal and deeper ventral half",
+    "flatter shorter pinnae",
+    "more explicit stifle-hock-metatarsal posture",
+    "higher tail sampling and smoother tail union",
+    "coat contrast kept below silhouette-reading priority"
+  ]
+}
