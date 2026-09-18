@@ -8,6 +8,7 @@ on:
       - .github/workflows/cat-procedural-body-v1-p12.yml
       - cat-kaopu/procedural-cat-v1/**
       - cat-kaopu/tools/patch_cat_procedural_v1_p12_silhouette.py
+      - cat-kaopu/tools/patch_cat_procedural_v1_p12_hotfix.py
       - cat-kaopu/tools/validate_cat_procedural_v1.mjs
       - cat-kaopu/tools/validate_cat_procedural_v1_p12.mjs
       - cat-kaopu/tools/capture_cat_procedural_v1_p12.mjs
@@ -43,6 +44,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/patch_cat_procedural_v1_p12_silhouette.py
+
+      - name: Repair P1.2 neck section reference
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/patch_cat_procedural_v1_p12_hotfix.py
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
