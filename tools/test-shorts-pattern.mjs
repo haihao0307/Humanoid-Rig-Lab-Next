@@ -336,7 +336,7 @@ test('omitting the real gusset exposes a fourth boundary instead of leaving an o
 
 test('gusset handling uses only actual stitch-boundary points and waits for closed stitches', () => {
   const p = createShortsPattern(fixture()), g = piece(p, 'G');
-  assert.equal(g.handlingPoints.length, 4); assert.equal(g.waistSupports, undefined);
+  assert.deepEqual([...g.handlingPoints].map(p => p.index), [g.landmarks.front, g.landmarks.back]); assert.equal(g.waistSupports, undefined);
   const edgePoints = new Set(Object.values(g.boundaries).flat());
   for (const h of g.handlingPoints) {
     assert.ok(edgePoints.has(h.index)); assert.equal(h.releaseWhenStitched, true);
@@ -349,14 +349,17 @@ test('gusset handling uses only actual stitch-boundary points and waits for clos
   }
 });
 
-test('near gusset placement is a rigid sagittal hold below measured crotch without changing any source paper', () => {
+test('gusset rigid opening identifies left/right and leaves source paper unchanged', () => {
   const m = actualTape(), before = createShortsPattern(m);
   m.waistCenter = [-.000078, .9562635, .0789258];
   m.metadata.crotchY = .6892039196706715;
   const p = createShortsPattern(m), g = piece(p, 'G'), world = uv => g.placement.origin.map((x, k) => x + g.placement.basisU[k] * uv[0] + g.placement.basisV[k] * uv[1]);
   const positions = g.materialCoordinates.map(world);
-  close(Math.max(...positions.map(x => x[1])), m.metadata.crotchY - .010);
-  for (const x of positions) close(x[0], m.waistCenter[0]);
+  close(Math.max(...positions.map(x => x[1])), m.metadata.crotchY - g.placement.topBelowMeasuredCrotchM);
+  assert.ok(positions[g.landmarks.left][0] < m.waistCenter[0]);
+  assert.ok(positions[g.landmarks.right][0] > m.waistCenter[0]);
+  close(Math.hypot(...g.placement.basisU), 1);
+  close(g.placement.basisU.reduce((s,v,k) => s + v*g.placement.basisV[k], 0), 0);
   close(g.placement.origin[2], m.waistCenter[2]);
   assert.ok(positions[g.landmarks.front][2] > positions[g.landmarks.back][2]);
   for (const q of p.pieces) {

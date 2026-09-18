@@ -181,7 +181,7 @@ test('one immutable candidate option set survives the initial actor placement',a
   const initial=simulations[0].options,placed=simulations[1].options;
   assert.equal(placed,initial);assert.equal(Object.isFrozen(initial),true);
   for(const [key,value]of Object.entries({stitchDofs:true,needleSchedule:'overlap',sewingSchedule:'overlap',
-    handlingPolicy:'needle-and-time',triangleBodyContact:true,iterations:32,maxMaterialIterations:32,
+    handlingPolicy:'until-waist-stitched',triangleBodyContact:true,iterations:32,maxMaterialIterations:128,
     maxSeamTensionN:null,stitchJoinToleranceM:.0001,waistSupportSlackM:.004}))assert.equal(placed[key],value,key);
 });
 

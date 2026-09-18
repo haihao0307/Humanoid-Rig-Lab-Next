@@ -185,14 +185,14 @@ function createShortsPattern(measurements, options = {}) {
     landmarks: { front: 0, right: 2, back: 4, left: 6 }, grainDirection: [0, 1],
     sourceContour: { width: o.gussetWidth, frontHeight, backHeight, frontEdgeLength: drafts.front.gussetCut.edgeLength,
       backEdgeLength: drafts.back.gussetCut.edgeLength, midpointFraction: .5 },
-    handlingPoints: [0, 2, 4, 6].map(index => ({ index, releaseWhenStitched: true })),
-    // This source-frame sagittal placement remains flat and rigid. Its top is
-    // 10 mm below the measured crotch; all pieces subsequently receive the
-    // same hips rigid transform. Clearance is checked on the actual body, not
-    // inferred for every future body shape from this placement rule alone.
+    handlingPoints: [0, 4].map(index => ({ index, releaseWhenStitched: true })),
+    // Preserve one flat rigid paper, opening its transverse direction by 10 degrees
+    // to distinguish left/right notches without turning the paper across both thighs.
+    // Only front/back boundary tips are held, leaving transverse roll free.
+    // This is an assembly candidate, not a universal body-clearance certificate.
     placement: { kind: 'rigid_flat_panel', origin: [centerX, crotchY - halfWidth - .010, centerZ],
-      basisU: [0, 1, 0], basisV: [0, 0, -1], rightSide: 'opposite_uv_normal', sourceShapeUnchanged: true,
-      method: 'sagittal_hand_held_paper_below_measured_crotch', topBelowMeasuredCrotchM: .010 },
+      basisU: [Math.sin(Math.PI / 18), Math.cos(Math.PI / 18), 0], basisV: [0, 0, -1], rightSide: 'opposite_uv_normal', sourceShapeUnchanged: true,
+      method: 'side_identified_flat_gusset_two_axis_grips_candidate', topBelowMeasuredCrotchM: .010 + halfWidth * (1 - Math.cos(Math.PI / 18)) },
     seamAllowance: o.seamAllowance, allowanceImplementation: 'reserved_metadata_not_yet_meshed', cutDomain: 'net_seamline_candidate' });
   const addSeam = (id, aid, ae, bid, be, kind = 'sewn', ai, bi) => {
     const a = piece(aid), b = piece(bid), ia = ai || a.boundaries[ae], ib = bi || b.boundaries[be];
