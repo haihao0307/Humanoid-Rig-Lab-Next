@@ -1,6 +1,6 @@
 /** Adaptive display sampling. Indices/vertices are created only in memory. */
 import earcut from './vendor/earcut.js';
-import {createCompactSurface} from './surface-kernel.mjs';
+import {createCompactSurface,cranialInterfaceCollarWidth} from './surface-kernel.mjs';
 import {conformTrimFaces,registerRadialBoundary} from './topology.mjs';
 import {improveTrimQuality} from './trim-quality.mjs';
 const distance=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
@@ -15,6 +15,17 @@ export function usableParameterTriangle(a,b,c){
 export function longestParameterEdge(uv){
   const lengths=uv.map((p,i)=>Math.hypot(p[0]-uv[(i+1)%3][0],p[1]-uv[(i+1)%3][1]));
   return lengths.indexOf(Math.max(...lengths));
+}
+
+// Bisection preserves an earcut fan's poor aspect ratio. After this tiny
+// cranial collar has acquired interior samples, improve only its interior
+// diagonals. No source position, trim knot, hole or binding identity moves.
+export function improveSampledCollarTriangles(indices,point,axes){
+  const ids=[...new Set(indices)],local=new Map(ids.map((id,i)=>[id,i])),uv=ids.map(id=>axes.map(k=>point(id)[k]));
+  let faces=[];for(let i=0;i<indices.length;i+=3)faces.push(indices.slice(i,i+3).map(id=>local.get(id)));
+  faces=conformTrimFaces(uv,faces);let flips=0,rounds=0;
+  for(;rounds<16;rounds++){const changed=improveTrimQuality(uv,faces);flips+=changed;if(!changed){rounds++;break;}}
+  return {indices:faces.flatMap(face=>face.map(i=>ids[i])),flips,rounds};
 }
 export function canonicalRadialParameter(t){
   // Inverting a canonical seam point may produce 1 + one binary ULP. Snap
@@ -113,13 +124,16 @@ export async function sampleCompactGroup(name,data,quality='balanced',progress=(
   // eyelid motion does not stretch a handful of large triangles. Other charts
   // keep their existing quotas; canonical source functions remain unchanged.
   const faceDomains=name==='detail'?data.fields.domains.filter(c=>c.semanticRegion==='head_face_ears'&&c.heightAxis===2&&c.outwardSign>0):name==='features'?data.fields.domains.filter(c=>c.semanticRegion==='FJ2814'):[];
-  const faceRefinementBudget=faceDomains.length?(name==='features'?(quality==='preview'?1800:6000):(quality==='preview'?5000:quality==='close'?22000:15000)):0;
+  // The dense procedural facial skin now replaces the front source patch.
+  // Keep feature apertures' quota; reduce only the overlapping source-head
+  // front-face reserve, preserving its remaining boundary support samples.
+  const faceRefinementBudget=faceDomains.length?Math.floor((name==='features'?(quality==='preview'?1800:6000):(quality==='preview'?5000:quality==='close'?22000:15000))*(name==='detail'?.30:1)):0;
   const faceQuota=allocateChartRefinementBudget(faceDomains,faceRefinementBudget),faceBudgets=new Map(faceDomains.map((c,i)=>[c.id,faceQuota[i]]));
-  // The ear underlay corrective needs a few local samples even when the
-  // undeformed side of the head is almost flat. Keep this quota independent
-  // of face animation and bounded; no whole-body quality increase.
-  const earDomains=name==='detail'?data.fields.domains.filter(c=>c.semanticRegion==='head_face_ears'&&c.heightAxis===0&&c.projectionAxes[0]===1&&c.projectionAxes[1]===2&&c.uvBoundsMetres[0][0]<1.529&&c.uvBoundsMetres[1][0]>1.477&&c.uvBoundsMetres[0][1]<.108&&c.uvBoundsMetres[1][1]>.072):[];
-  const earRefinementBudget=earDomains.length?(quality==='preview'?1400:quality==='close'?4000:2400):0;
+  // The visible pinna is FJ2811 in features. Its independent bounded quota
+  // supplements the existing head-side underlay quota without reallocating
+  // other features/body samples or changing the whole-source allocation guard.
+  const earDomains=name==='features'?data.fields.domains.filter(c=>c.semanticRegion==='FJ2811'):name==='detail'?data.fields.domains.filter(c=>c.semanticRegion==='head_face_ears'&&c.heightAxis===0&&c.projectionAxes[0]===1&&c.projectionAxes[1]===2&&c.uvBoundsMetres[0][0]<1.529&&c.uvBoundsMetres[1][0]>1.477&&c.uvBoundsMetres[0][1]<.108&&c.uvBoundsMetres[1][1]>.072):[];
+  const earRefinementBudget=earDomains.length?(name==='features'?3500:Math.floor((quality==='preview'?1400:quality==='close'?4000:2400)*.70)):0;
   const earQuota=allocateChartRefinementBudget(earDomains,earRefinementBudget),earBudgets=new Map(earDomains.map((c,i)=>[c.id,earQuota[i]]));
   const correctionAllocations=surfaceCorrections.map(correction=>{
     const domains=data.fields.domains.filter(c=>correction.affectsChart(c)),budget=domains.length?correction.parameters.refinementBudget:0;
@@ -130,7 +144,19 @@ export async function sampleCompactGroup(name,data,quality='balanced',progress=(
   const refinementBudget=baseRefinementBudget+faceRefinementBudget+earRefinementBudget+correctionAllocations.reduce((sum,c)=>sum+c.budget,0);
   const chartBudget=name==='left'?Math.floor(baseRefinementBudget/2):baseRefinementBudget;
   const chartBudgets=['body','left'].includes(name)?allocateChartRefinementBudget(data.fields.domains,chartBudget):null;
+  // The detail group also contains broad head skin. Giving a cranial chart
+  // the same quota as a tiny fingertip left centimetre-wide head triangles
+  // while unused detail quota remained. Redistribute ONLY the existing head
+  // allocation by area; other anatomical regions keep their exact quotas.
+  const headDomains=name==='detail'?data.fields.domains.filter(c=>c.semanticRegion==='head_face_ears'):[];
+  // Shared-edge conformity costs additional final triangles. Reserve headroom
+  // under the unchanged 600k whole-body guard, not just this group's sampler.
+  const headBaseBudget=Math.floor(data.fields.domains.reduce((sum,c,i)=>sum+(name==='detail'&&c.semanticRegion==='head_face_ears'?Math.floor(chartBudget/surface.domainIds.length)+(i<chartBudget%surface.domainIds.length?1:0):0),0)*.70);
+  const headQuota=allocateChartRefinementBudget(headDomains,headBaseBudget),headBudgets=new Map(headDomains.map((c,i)=>[c.id,headQuota[i]]));
+  let unusedHeadBudget=0;
   stats.chartBudgetAllocation=chartBudgets?'source-area-weighted; uniform-quarter':'uniform';
+  stats.headChartBudgetAllocation=headDomains.length?'source-area-weighted; uniform-quarter; head-only carry':null;
+  stats.headBaseRefinementBudget=headBaseBudget;
   stats.refinementBudget=refinementBudget;stats.adaptiveSplits=0;stats.budgetLimitedTriangles=0;
   stats.faceRefinementBudget=faceRefinementBudget;stats.faceRefinementCharts=faceDomains.length;
   stats.earRefinementBudget=earRefinementBudget;stats.earRefinementCharts=earDomains.length;
@@ -142,7 +168,8 @@ export async function sampleCompactGroup(name,data,quality='balanced',progress=(
   function sampler(evaluate,b,regionMask,inverse,edgeScale=1,orientation=null,earChart=false,chartCorrections=[]){const cache=new Map(),edges=new Map(),pending=new SurfaceRefinementQueue(),correctedSamples=new WeakMap();let cachedValues=0;
     // Only height-chart parameters have two metre axes. A radial chart's
     // second parameter is dimensionless and retains its own sampling policy.
-    const heightChart=repairSkin&&orientation!==null;
+    const headChart=name==='detail'&&regionMask===bindingSchema.regions.head_face_ears;
+    const heightChart=(repairSkin||headChart)&&orientation!==null;
     const shadingAngle=(heightChart?Math.min(settings.normalAngleDegrees||6,2):settings.normalAngleDegrees||6)*Math.PI/180;
     const edgeLimit=(heightChart?Math.min(maxEdge,.012):maxEdge)*edgeScale;
     const sample=uv=>{const v=evaluate(...uv);v.regionMask=regionMask;if(normalField)v.shade=normalField(b.name,v.p,v.n);stats.evaluations++;return v;};
@@ -166,8 +193,8 @@ export async function sampleCompactGroup(name,data,quality='balanced',progress=(
       }
       const refineShading=shadeError>shadingAngle&&longest>(settings.normalMinimumEdge||.00035);
       const geometricLimit=Math.max(20*Math.PI/180,2*shadingAngle);
-      const refineGeometryNormal=repairSkin&&geometricNormalError>geometricLimit&&longest>(settings.normalMinimumEdge||.00035);
-      const earPatch=earChart&&Math.min(a.p[1],bb.p[1],c.p[1])<1.529&&Math.max(a.p[1],bb.p[1],c.p[1])>1.477&&Math.min(a.p[2],bb.p[2],c.p[2])<.108&&Math.max(a.p[2],bb.p[2],c.p[2])>.072;
+      const refineGeometryNormal=(repairSkin||headChart)&&geometricNormalError>geometricLimit&&longest>(settings.normalMinimumEdge||.00035);
+      const earPatch=earChart&&(name==='features'||Math.min(a.p[1],bb.p[1],c.p[1])<1.529&&Math.max(a.p[1],bb.p[1],c.p[1])>1.477&&Math.min(a.p[2],bb.p[2],c.p[2])<.108&&Math.max(a.p[2],bb.p[2],c.p[2])>.072);
       const activeCorrections=chartCorrections.filter(correction=>correction.affectsSourceTriangle(vertices.map(v=>v.p),regionMask));
       let localEdgeLimit=earPatch?Math.min(edgeLimit,quality==='close'?.0015:.002):edgeLimit,correctionError=0,correctionTolerance=Infinity;
       if(activeCorrections.length){
@@ -214,6 +241,7 @@ export async function sampleCompactGroup(name,data,quality='balanced',progress=(
   for(let di=0;di<surface.domainIds.length;di++){
     const correctionSplitsBefore=stats.correctionRefinementSplits,correctionLimitsBefore=stats.correctionLimitedTriangles;
     domainSplits=0;domainSplitBudget=chartBudgets?chartBudgets[di]:Math.floor(chartBudget/surface.domainIds.length)+(di<chartBudget%surface.domainIds.length?1:0);
+    if(headBudgets.has(data.fields.domains[di].id))domainSplitBudget=headBudgets.get(data.fields.domains[di].id)+unusedHeadBudget;
     // Carry only unused quota forward; every later chart retains its original
     // allocation. This changes neither the total budget nor allocation guards.
     domainSplitBudget+=faceBudgets.get(data.fields.domains[di].id)||0;
@@ -225,7 +253,7 @@ export async function sampleCompactGroup(name,data,quality='balanced',progress=(
       const holes=[];let offset=loops[0].length;for(let i=1;i<loops.length;i++){holes.push(offset);offset+=loops[i].length;}
       trimLoops=loops;uv=loops.flat();const flat=earcut(uv.flat(),holes,2);faces=[];for(let i=0;i<flat.length;i+=3)faces.push(flat.slice(i,i+3));if(!faces.length)throw Error('Empty compact chart '+id);
       faces=conformTrimFaces(uv,faces);
-      if(name==='body'||name==='left'||name==='collar')stats.trimQualityFlips+=improveTrimQuality(uv,faces);}
+      if(name==='body'||name==='left'||name==='collar'||name==='detail'&&chart.c.semanticRegion==='head_face_ears'||name==='features'&&chart.c.semanticRegion==='FJ2811')stats.trimQualityFlips+=improveTrimQuality(uv,faces);}
     try{prepare(surface);}catch(error){if(!/Collapsed compact|Crossing compact|Empty compact/.test(error.message))throw error;
       exactSurface??=createCompactSurface(data,{normalField});prepare(exactSurface);stats.exactBoundaryFallbacks++;}
     const regionMask=name==='features'?bindingSchema.featureMask:bindingSchema.regions[chart.c.semanticRegion];
@@ -235,9 +263,17 @@ export async function sampleCompactGroup(name,data,quality='balanced',progress=(
     const chartCorrections=correctionAllocations.filter(c=>c.domains.has(chart.c.id)).map(c=>c.correction);
     const b=builder(name==='features'?chart.c.semanticRegion:'skin'),{val,emit,flush}=sampler(chart.evaluate,b,regionMask,p=>chart.c.projectionAxes.map(k=>p[k]),faceChart?.35:1,outward,earBudgets.has(chart.c.id),chartCorrections);
     for(const loop of trimLoops){const ids=loop.map(p=>b.vertex(val(p)));for(let k=0;k<ids.length;k++)topology.markBoundary(ids[k],ids[(k+1)%ids.length]);}
+    const emittedStart=b.indices.length;
     for(const f of faces)emit(...f.map(i=>val(uv[i])));flush();
+    if(cranialInterfaceCollarWidth(chart.c)!==null){
+      const previous=b.indices.slice(emittedStart),settled=improveSampledCollarTriangles(previous,id=>topology.point(id),chart.c.projectionAxes);
+      for(let extra=previous.length;extra<settled.indices.length;extra+=3)topology.claimTriangle();
+      b.indices.length=emittedStart;b.indices.push(...settled.indices);
+      stats.cranialCollarRemeshing={domain:id,trianglesBefore:previous.length/3,trianglesAfter:settled.indices.length/3,flips:settled.flips,rounds:settled.rounds,addedSampleBudget:0};
+    }
     if(stats.correctionRefinementSplits!==correctionSplitsBefore||stats.correctionLimitedTriangles!==correctionLimitsBefore)stats.correctionDomains.push({id,refinementSplits:stats.correctionRefinementSplits-correctionSplitsBefore,limitedTriangles:stats.correctionLimitedTriangles-correctionLimitsBefore});
     stats.reusedChartBudget+=Math.max(0,domainSplits-baseBudget);unusedChartBudget=repairSkin?domainSplitBudget-domainSplits:0;
+    if(headBudgets.has(chart.c.id))unusedHeadBudget=domainSplitBudget-domainSplits;
     domainIndex=di+1;if(di%50===0){reportProgress();await new Promise(resolve=>setTimeout(resolve,0));}
   }
   if(name==='left'){

@@ -107,13 +107,17 @@ uniform sampler2D compactPalette;
 uniform vec3 compactOrigin,compactExtent,compactColor;
 uniform mat4 viewProjection,lightVP;
 uniform float compactKind,compactRegions,compactStatureScale,compactFeature;
-uniform float compactEarClearance;
+uniform float compactEarClearance,compactCavityEnabled;
+out float compactCavityVisibility;
+out vec3 compactCavityAxis;
 out vec3 P,N,C,R;out vec4 L;out float AO,MK,activation;
 out vec3 personalRestPosition;
+out vec3 compactEyeContactPosition;
 vec3 compactRotate(vec4 q,vec3 p){return p+2.*cross(q.xyz,cross(q.xyz,p)+q.w*p);}
 vec3 compactNormal(vec2 e){vec3 n=vec3(e,1.-abs(e.x)-abs(e.y));if(n.z<0.)n.xy=(1.-abs(n.yx))*mix(vec2(-1.),vec2(1.),step(vec2(0.),n.xy));return normalize(n);}
 ${COMPACT_MUSCLE_GLSL}
 ${COMPACT_FACE_GLSL}
+${HEAD_SCULPT_GLSL}
 ${COMPACT_EYE_LID_GLSL}
 ${compactLipMotionShader()}
 ${compactJawMotionShader()}
@@ -145,6 +149,13 @@ void main(){
   }compactLipMotion(source,n);compactLid(source,n);vec3 lidAttached=source,lidNormal=n;float faceHeat;compactFace(source,n,faceHeat);
   if(compactEyeLid>.5){float attachment=smoothstep(0.,.35,eyeLidParam.y);source=mix(lidAttached,source,attachment);n=normalize(mix(lidNormal,n,attachment));}
   compactJawMotion(source,n,canonicalPosition);compactClearEar(source,n);
+  compactEyeContactPosition=source;
+  vec3 cavityAxis=vec3(0.,0.,1.);
+  if(compactCavityEnabled>.5){
+    cavityAxis=uintBitsToFloat(axillaCorrective.yzw);vec3 aperturePoint=canonicalPosition;float apertureHeat;
+    compactFace(aperturePoint,cavityAxis,apertureHeat);compactHeadSculpt(aperturePoint,cavityAxis);compactFaceIdentity(aperturePoint,cavityAxis);cavityAxis.x=-cavityAxis.x;
+  }
+  compactHeadSculpt(source,n);compactFaceIdentity(source,n);
   // Head F is exactly uniform stature; face/ear offsets stay in their authored
   // canonical head frame and are added to the already shaped rest surface.
   vec3 delta=source-canonicalPosition;
@@ -163,6 +174,7 @@ void main(){
   float lengthR=max(length(qr),1e-8);qr/=lengthR;qd/=lengthR;qd-=qr*dot(qr,qd);
   vec3 translation=2.*(qr.w*qd.xyz-qd.w*qr.xyz+cross(qr.xyz,qd.xyz));
   P=compactRotate(qr,p)+translation;N=compactRotate(qr,n);
+  compactCavityAxis=normalize(compactRotate(qr,cavityAxis));
   // Reduce DQS bulging only in the shoulder/chest transition. Pure limb
   // rotations retain their rigid skinning; muscle volume is handled above.
   if(shoulderLbs>0.){
@@ -175,36 +187,110 @@ void main(){
     }
     P=mix(P,linearP,shoulderLbs);N=normalize(mix(N,linearN,shoulderLbs));
   }
+  compactCavityVisibility=compactCavityEnabled>.5?uintBitsToFloat(axillaCorrective.x):1.;
   C=compactRegions>.5?regionColor:compactColor;MK=compactKind;AO=1.;activation=0.;L=lightVP*vec4(P,1.);gl_Position=viewProjection*vec4(P,1.);
   if(faceHeatmap>.5&&faceEligible>.5&&faceHeat>.001)C=mix(C,mix(vec3(.04,.38,.85),vec3(1.,.18,.025),faceHeat),min(1.,faceHeat*3.));
 }`;
 function compactFragmentSource(){
-  return FS.replace('uniform vec3 eye;',COMPACT_EYE_COORDINATES+' uniform float compactFeature,compactStatureScale; uniform vec3 eye;')
-    .replace('void main(){',compactEyeSocketSource()+compactFaceSurfaceShader()+'\nin vec3 personalRestPosition;\nvoid main(){compactEyeSocket(R);compactFaceSurfaceMask(R);'+COMPACT_SCLERA_APERTURE)
+  return FS.replace('uniform vec3 eye;',COMPACT_EYE_COORDINATES+' uniform float compactFeature,compactStatureScale,compactCavityEnabled; uniform vec3 eye;')
+    .replace('float screenScatter=skinTransportEnabled*faceWeight;','float screenScatter=skinTransportEnabled*faceWeight*(1.-compactCavityEnabled);if(compactFeature>2.5&&compactFeature<3.5)screenScatter*=1.-compactLipPigment(R);')
+    .replace('void main(){',compactEyeSocketSource()+compactFaceSurfaceShader()+compactEyeOcclusionShader()+`\nin vec3 personalRestPosition;\nin vec3 compactEyeContactPosition;\nin float compactCavityVisibility;\nin vec3 compactCavityAxis;
+    // A downward aperture cannot admit a light above its tangent plane.
+    // The visibility returns smoothly to one at the common epidermal rim.
+    // This is a local aperture estimate, not a ray-traced nasal cavity.
+    float compactCavityAccess(vec3 direction){
+      float wall=clamp((1.-compactCavityVisibility)*8.,0.,1.);
+      return mix(1.,smoothstep(-.08,.12,dot(normalize(compactCavityAxis),direction)),wall);
+    }
+    void main(){compactEyeSocket(R);compactFaceSurfaceMask(R);`+COMPACT_SCLERA_APERTURE)
+    .replace('float s=shade(n,l),nv=max(dot(n,v),0.);','float s=shade(n,l)*compactCavityAccess(l),nv=max(dot(n,v),0.);fill*=compactCavityAccess(studioMode>.5?normalize(studioFill):normalize(vec3(.85,.32,-.8)));')
+    .replace('vec3 faceFill=skinDiffuseResponse(n,skinDiffuseNormal,diffuseFillDirection,localScatter);','vec3 faceFill=skinDiffuseResponse(n,skinDiffuseNormal,diffuseFillDirection,localScatter)*compactCavityAccess(diffuseFillDirection);')
+    .replace('.22*mix(fillBroad,fillTight,skinOil*.45)*AO)', '.22*mix(fillBroad,fillTight,skinOil*.45)*AO*compactCavityAccess(fillDirection))')
     .replace('float restArea=length(cross(dFdx(R),dFdy(R)));','float restArea=length(cross(dFdx(personalRestPosition),dFdy(personalRestPosition)));')
     .replace('vec3 dx=dFdx(P),dy=dFdy(P),rx=cross(dy,n),ry=cross(n,dx);',`if(compactFeature>2.5&&compactFeature<3.5){
       float lipWeight=compactLipPigment(R);reliefHeight=mix(reliefHeight,compactLipMicrorelief(R)/sqrt(skinStretch),lipWeight);
       float lipMoisture=compactLipMoisture(R);rough=mix(rough,mix(.46,.31,lipMoisture),lipWeight);skinOil=mix(skinOil,mix(.30,.65,lipMoisture),lipWeight);skinCavity=mix(skinCavity,1.,lipWeight);
     }
     vec3 dx=dFdx(P),dy=dFdy(P),rx=cross(dy,n),ry=cross(n,dx);`)
+    .replace('n=normalize(n-grad);','float normalStrength=compactFeature>2.5&&compactFeature<3.5?mix(1.,.85,compactLipPigment(R)):1.;n=normalize(n-grad*normalStrength);')
     .replace('vec3 color=C;float rough=',`vec3 color=C;
       if(compactFeature>2.5&&compactFeature<3.5){float lipPigment=compactLipPigment(R);color*=mix(vec3(1.),compactLipTint(R),lipPigment);color*=1.-.22*compactLipContactShadow(R);}
       if(compactFeature>.5&&compactFeature<2.5){
         vec2 uv=compactEyeUV(R);float radius=length(uv),angle=atan(uv.y,uv.x);
         if(compactFeature<1.5){color=vec3(.015,.02,.024);}
-        else{float radialFilter=1.-smoothstep(.012,.04,length(fwidth(uv)));float fibres=.5+radialFilter*(.19*sin(angle*61.+radius*23.)+.12*sin(angle*113.-radius*31.)+.06*sin(angle*197.+radius*73.));color=mix(vec3(.026,.012,.006),vec3(.095,.047,.017),clamp(fibres,0.,1.))*(1.-.65*smoothstep(.82,1.03,radius));color=mix(vec3(.006,.003,.002),color,smoothstep(.31,.39,radius));}
+        else{
+          // Authored stroma: interrupted radial bundles, collarette and crypts.
+          // Circle embedding closes the angular seam without periodic spokes.
+          // Anatomy/optical layers: Epic Digital Humans, Eye Shading section.
+          float irisRadius=${(COMPACT_EYE_ANATOMY.iris.outerRadius/.0064).toFixed(9)},pupilRatio=${(COMPACT_EYE_ANATOMY.iris.pupilRadius/COMPACT_EYE_ANATOMY.iris.outerRadius).toFixed(9)};
+          float r=radius/irisRadius,radial=clamp((r-pupilRatio)/(1.-pupilRatio),0.,1.);
+          vec2 direction=uv/max(radius,.0001);uint eyeSeed=compactEyeSide<.5?5101u:7103u;
+          float sector=compactSkinNoise(vec3(direction*3.8,.73),eyeSeed);
+          float warp=.045*compactSkinNoise(vec3(direction*7.1,radial*2.3),eyeSeed+11u);
+          vec2 flow=vec2(cos(angle+warp),sin(angle+warp));
+          float angularFootprint=max(length(dFdx(direction)),length(dFdy(direction)));
+          float bundleFilter=1.-smoothstep(.35,1.15,angularFootprint*15.);
+          float fibreFilter=1.-smoothstep(.30,1.,angularFootprint*43.);
+          float bundles=compactSkinNoise(vec3(flow*15.,radial*1.9),eyeSeed+23u)*bundleFilter;
+          float filaments=compactSkinNoise(vec3(flow*43.,radial*4.2),eyeSeed+47u)*fibreFilter;
+          float interruptions=.65+.35*compactSkinNoise(vec3(flow*9.,radial*7.7),eyeSeed+61u);
+          float stroma=clamp(.53+.27*bundles+.13*filaments*interruptions+.16*sector,0.,1.);
+          float collaretteRadius=.36+.060*sector+.027*compactSkinNoise(vec3(direction*10.,.2),eyeSeed+79u);
+          float collarDistance=(radial-collaretteRadius)/.055;
+          float collarette=exp(-collarDistance*collarDistance);
+          float cryptNoise=compactSkinNoise(vec3(direction*10.5,radial*8.2),eyeSeed+97u);
+          float cryptDistance=(radial-collaretteRadius)/.13;
+          float crypts=smoothstep(.20,.62,cryptNoise)*exp(-cryptDistance*cryptDistance);
+          color=mix(vec3(.025,.013,.006),vec3(.100,.052,.021),stroma);
+          color=mix(color,vec3(.077,.039,.012),collarette*(.19+.11*sector));
+          color*=1.-.37*crypts;
+          float limbus=smoothstep(.845+.018*sector,1.,r);
+          color*=1.-limbus*(.56+.08*sector);
+          // The dark pupillary ruff softens the regular rim; the actual pupil
+          // remains a separate recessed aperture, with no painted fake pupil.
+          float ruff=1.-smoothstep(.006,.073,radial+.013*bundles);
+          color*=1.-.66*ruff;
+        }
+      }
+      if(compactFeature>4.5&&compactFeature<5.5){
+        vec2 uv=compactEyeUV(R)/${(COMPACT_EYE_ANATOMY.iris.outerRadius/.0064).toFixed(9)};float r=length(uv);
+        uint eyeSeed=compactEyeSide<.5?9103u:11113u;
+        float cloudy=compactSkinNoise(vec3(uv*2.4,.6),eyeSeed);
+        float corner=smoothstep(1.10,1.95,abs(uv.x));
+        // Off-white hydrated tissue, with mild vascular colour near canthi.
+        // This is material colour; moving lid contact remains the posed AO.
+        color=mix(vec3(.435,.448,.426),vec3(.500,.480,.427),.5+.28*cloudy);
+        color=mix(color,vec3(.465,.340,.316),corner*.32);
+        float limbalTransition=1.-smoothstep(.99,1.11,r);
+        color=mix(color,vec3(.140,.155,.148),limbalTransition*.52);
+        float vesselCoverage=0.,aa=max(length(fwidth(uv))*.7,.003);
+        for(int k=0;k<3;k++){
+          float row=float(k)-1.,jitter=compactSkinNoise(vec3(uv.x*2.9,float(k)*3.7,.3),eyeSeed+37u);
+          float path=row*.22+(.045+.018*float(k))*jitter;
+          float width=.0035+.0015*float(k),distanceToVessel=abs(uv.y-path);
+          float vessel=(1.-smoothstep(max(0.,width-aa),width+aa,distanceToVessel))*width/(width+aa);
+          vesselCoverage=max(vesselCoverage,vessel);
+        }
+        color=mix(color,vec3(.39,.19,.17),vesselCoverage*corner*.18);
       }
       float rough=`)
-    .replace('else if(MK>3.5&&MK<4.5){rough=.22;specular=.27;}','else if(MK>3.5&&MK<4.5){rough=compactFeature<1.5?.035:compactFeature<2.5?.38:compactFeature<3.5?.42:compactFeature>10.5&&compactFeature<12.5?.24:compactFeature>12.5&&compactFeature<15.5?.40:compactFeature>5.5&&compactFeature<6.5?.13:.24;specular=compactFeature<1.5?.42:compactFeature>6.5&&compactFeature<7.5?0.:compactFeature>10.5&&compactFeature<12.5?.11:compactFeature>12.5&&compactFeature<15.5?.055:.085;}')
+    .replace('else if(MK>3.5&&MK<4.5){rough=.22;specular=.27;}','else if(MK>3.5&&MK<4.5){rough=compactFeature>15.5?.58:compactFeature<1.5?.035:compactFeature<2.5?.38:compactFeature<3.5?.42:compactFeature>10.5&&compactFeature<12.5?.24:compactFeature>12.5&&compactFeature<15.5?.40:compactFeature>5.5&&compactFeature<6.5?.22:.24;specular=compactFeature>15.5?.08:compactFeature<1.5?.42:compactFeature>6.5&&compactFeature<7.5?0.:compactFeature>5.5&&compactFeature<6.5?.04:compactFeature>10.5&&compactFeature<12.5?.11:compactFeature>12.5&&compactFeature<15.5?.055:.085;}')
+    .replace('vec3 c=color*((.28+.10*n.y)*AO+.82*diffuse*s+.26*fill*AO);',`float eyeContact=((compactFeature>1.5&&compactFeature<2.5)||(compactFeature>4.5&&compactFeature<5.5))?compactEyeContactVisibility(compactEyeContactPosition):1.;
+  vec3 c=color*((.28+.10*n.y)*AO*eyeContact+.82*diffuse*s*mix(1.,eyeContact,.55)+.26*fill*AO*eyeContact);`)
     .replace('frag=vec4(pow(max(c,vec3(0.)),vec3(1./2.2)),1.);',`float alpha=1.;
       if(compactFeature>.5&&compactFeature<1.5){
         // Only the outward shell contributes. The pupil stays behind the iris.
         if(!gl_FrontFacing)discard;
-        vec3 reflected=reflect(-v,n);float key=pow(max(dot(reflected,normalize(vec3(-.45,.65,.8))),0.),180.);
-        float soft=pow(max(dot(reflected,normalize(vec3(.8,.25,.65))),0.),45.);
+        // Finite studio emitters produce a visible footprint even where the
+        // lid covers the infinitesimal directional reflection. This remains
+        // a world-light/view-dependent lobe, never a painted iris glint.
+        float key=pow(max(dot(n,normalize(l+v)),0.),150.);
+        vec3 fillLight=studioMode>.5?normalize(studioFill):normalize(vec3(.8,.25,.65));
+        float soft=pow(max(dot(n,normalize(fillLight+v)),0.),100.);
         alpha=clamp(.018+.11*pow(1.-max(dot(n,v),0.),5.)+.82*key+.12*soft,.018,.9);
         c=mix(vec3(.055,.065,.072),vec3(1.4,1.35,1.24),clamp(key+soft*.35,0.,1.));
       }
+      c*=compactCavityVisibility;
       frag=vec4(skinOutputSRGB(c),alpha);`);
 }
 class CompactSurfaceRenderer{
@@ -215,10 +301,10 @@ class CompactSurfaceRenderer{
     this.main=program(this.gl,COMPACT_VERTEX,compactFragmentSource());
     // Transparent cornea does not cast an opaque pupil-shaped shadow.
     this.depth=program(this.gl,COMPACT_VERTEX,`#version 300 es\nprecision highp float;in vec3 R;uniform float compactFeature;${COMPACT_EYE_COORDINATES}\n${compactEyeSocketSource()}\n${compactFaceSurfaceShader()}\nvoid main(){compactEyeSocket(R);compactFaceSurfaceMask(R);${COMPACT_SCLERA_APERTURE}if(compactFeature>.5&&compactFeature<1.5)discard;}`);
-    for(const p of [this.main,this.depth])for(const key of ['compactMuscleOrigin[0]','compactMuscleAxis[0]','compactMuscleStrain[0]','compactMuscleEnabled','compactAxillaWeight'])p.u[key]=this.gl.getUniformLocation(p.p,key);
+    for(const p of [this.main,this.depth])for(const key of ['compactMuscleOrigin[0]','compactMuscleAxis[0]','compactMuscleStrain[0]','compactMuscleEnabled','compactAxillaWeight','compactCavityEnabled'])p.u[key]=this.gl.getUniformLocation(p.p,key);
     for(const p of [this.main,this.depth])for(const key of ['compactEarClearance','compactPalette','compactOrigin','compactExtent','compactColor','compactKind','compactRegions','compactStatureScale','compactEyeCentre','compactEyeU','compactEyeV','compactFeature','skinControlled','skinSurface','skinDetail','skinSeedOffset','skinExposure'])p.u[key]=this.gl.getUniformLocation(p.p,key);
-    for(const p of [this.main,this.depth])for(const key of ['faceOffsets[0]','faceEnabled','faceEligible','faceHeatmap','faceSelected','compactLipOpen','compactJawOpen'])p.u[key]=this.gl.getUniformLocation(p.p,key);
-    for(const p of [this.main,this.depth])for(const key of ['faceMuscles[0]','compactCanthusDepth','compactFaceSkinMode','compactSkinSocket','compactSocketRadii[0]','compactEyeGlobe','compactSourceEye','compactEyeNormal','compactEyeLid','compactEyeSide','compactLidState[0]'])p.u[key]=this.gl.getUniformLocation(p.p,key);
+    for(const p of [this.main,this.depth])for(const key of ['faceOffsets[0]','faceProportions','faceJawWidth','faceEnabled','faceEligible','faceHeatmap','faceSelected','compactLipOpen','compactJawOpen'])p.u[key]=this.gl.getUniformLocation(p.p,key);
+    for(const p of [this.main,this.depth])for(const key of ['faceMuscles[0]','compactCanthusDepth','compactCanthusSlope','compactFaceSkinMode','compactLipInner','compactSkinSocket','compactSocketRadii[0]','compactEyeGlobe','compactSourceEye','compactEyeNormal','compactEyeLid','compactEyeSide','compactLidState[0]'])p.u[key]=this.gl.getUniformLocation(p.p,key);
     this.eyeFrames=Object.fromEntries(Object.entries(COMPACT_EYES).map(([side,f])=>{const n=norm(f.normal),u=norm(cross([0,1,0],n));return [side,{centre:f.centre,n,u,v:norm(cross(n,u))}];}));
     this.palette=new Float32Array(lab.human.joints.length*8);this.texture=this.gl.createTexture();if(!this.texture)throw Error('无法创建人体关节纹理');this.gl.activeTexture(this.gl.TEXTURE0+COMPACT_PALETTE_UNIT);this.gl.bindTexture(this.gl.TEXTURE_2D,this.texture);
     this.gl.texImage2D(this.gl.TEXTURE_2D,0,this.gl.RGBA32F,2,lab.human.joints.length,0,this.gl.RGBA,this.gl.FLOAT,this.palette);lab.renderer.textureOptions();this.gl.activeTexture(this.gl.TEXTURE0);
@@ -239,7 +325,7 @@ class CompactSurfaceRenderer{
     const stage={chunks:[],geometryBytes:0,maximumWeightError:0,bindingGroups:{},hair:null};
     const faceTissue=compactCreateFaceAnatomy(data.meshes,this.rig,this.statureScale);stage.faceAnatomy=faceTissue.report;
     const eyeTissue=compactCreateEyeLids(faceTissue.meshes.filter(m=>m.name==='faceSkin'),this.eyeFrames,this.rig,this.statureScale);stage.eyeAnatomy=eyeTissue.report;stage.eyeSocketRadii=eyeTissue.socketRadii;stage.canthusDepths=eyeTissue.canthusDepths;
-    const replacedSclera=data.meshes.filter(m=>['FJ1297','FJ1348','FJ1317','FJ1368','FJ2812','FJ2814'].includes(m.name));
+    const replacedSclera=data.meshes.filter(m=>['FJ1289','FJ1340','FJ1297','FJ1348','FJ1317','FJ1368','FJ2812','FJ2814'].includes(m.name));
     const displayMeshes=data.meshes.filter(m=>!replacedSclera.includes(m)).concat(faceTissue.meshes,eyeTissue.meshes);stage.faceSampling=sampleFaceSurface(displayMeshes,data.report.quality,this.statureScale);
     try{
     for(const m of displayMeshes){
@@ -247,7 +333,7 @@ class CompactSurfaceRenderer{
       if(!(m.canonicalPositions instanceof Float32Array)||m.canonicalPositions.length!==m.vertices*3)throw Error('重建分块缺少参考坐标');
       if(!(binding?.ids instanceof Uint16Array)||!(binding.weights instanceof Uint16Array)||!(binding.colors instanceof Uint8Array)||binding.ids.length!==m.vertices*COMPACT_INFLUENCES||binding.weights.length!==binding.ids.length||binding.colors.length!==m.vertices*3)throw Error('重建分块缺少完整绑定');
       const buffers=[],vao=gl.createVertexArray();
-      const chunk={vao,buffers,count:m.indices.length,name:m.name,eyeSide:m.eyeSide,eyeLid:m.eyeLid,sourceGroup:m.sourceGroup,origin:m.origin,extent:m.extent,triangles:m.triangles};stage.chunks.push(chunk);
+      const chunk={vao,buffers,count:m.indices.length,name:m.name,lipSurface:m.lipSurface,cavity:!!m.cavityLight,eyeSide:m.eyeSide,eyeLid:m.eyeLid,sourceGroup:m.sourceGroup,origin:m.origin,extent:m.extent,triangles:m.triangles};stage.chunks.push(chunk);
       if(!vao)throw Error('无法创建人体绘制数组');gl.bindVertexArray(vao);
       const buffer=(target,array)=>{const b=gl.createBuffer();if(!b)throw Error('无法创建人体几何缓冲');buffers.push(b);gl.bindBuffer(target,b);gl.bufferData(target,array,gl.STATIC_DRAW);stage.geometryBytes+=array.byteLength;};
       const attr=(location,array,size,type,normalized)=>{buffer(gl.ARRAY_BUFFER,array);gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,size,type,normalized,0,0);};
@@ -255,6 +341,11 @@ class CompactSurfaceRenderer{
         for(const [location,offset]of [[first,0],[second,8]]){gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,4,gl.UNSIGNED_SHORT,normalized,16,offset);}};
       attr(0,m.positions,3,gl.FLOAT,false);attr(1,m.normals,2,gl.SHORT,true);pair(2,5,binding.ids,false);pair(3,6,binding.weights,true);attr(4,binding.colors,3,gl.UNSIGNED_BYTE,true);attr(7,m.canonicalPositions,3,gl.FLOAT,false);
       if(m.axillaDelta){buffer(gl.ARRAY_BUFFER,r2PackAxillaAttribute(m));gl.enableVertexAttribArray(15);gl.vertexAttribIPointer(15,4,gl.UNSIGNED_INT,0,0);}
+      // Location 15 stays an integer attribute. Eye draws reuse its four bit
+      // channels for source-fitted section jets; muscle corrections are only
+      // enabled for the original skin draw and never for these eye meshes.
+      else if(m.cavityLight){buffer(gl.ARRAY_BUFFER,new Uint32Array(m.cavityLight.buffer,m.cavityLight.byteOffset,m.cavityLight.length));gl.enableVertexAttribArray(15);gl.vertexAttribIPointer(15,4,gl.UNSIGNED_INT,0,0);}
+      else if(m.eyeSection){buffer(gl.ARRAY_BUFFER,new Uint32Array(m.eyeSection.buffer,m.eyeSection.byteOffset,m.eyeSection.length));gl.enableVertexAttribArray(15);gl.vertexAttribIPointer(15,4,gl.UNSIGNED_INT,0,0);}
       else{gl.disableVertexAttribArray(15);gl.vertexAttribI4ui(15,0,0,0,0);}
       if(m.eyeParams){attr(8,m.eyeParams,2,gl.FLOAT,false);attr(9,m.eyeTangentU,3,gl.FLOAT,false);attr(10,m.eyeTangentV,3,gl.FLOAT,false);}
       if(m.eyeOuterPosition){attr(11,m.eyeOuterPosition,3,gl.FLOAT,false);attr(12,m.eyeOuterTangentU,3,gl.FLOAT,false);attr(13,m.eyeOuterGradient,2,gl.FLOAT,false);attr(14,m.eyeOuterGradientU,2,gl.FLOAT,false);}
@@ -263,7 +354,7 @@ class CompactSurfaceRenderer{
       stage.maximumWeightError=Math.max(stage.maximumWeightError,binding.maximumWeightError);
       // Release transferred CPU display arrays after upload; no persistent mesh cache.
     }
-    stage.chunks.sort((a,b)=>Number(['FJ1289','FJ1340'].includes(a.name))-Number(['FJ1289','FJ1340'].includes(b.name)));
+    stage.chunks.sort((a,b)=>Number(['FJ1289','FJ1340','eyeCornea'].includes(a.name))-Number(['FJ1289','FJ1340','eyeCornea'].includes(b.name)));
     if(data.hair)stage.hair=new CompactHairRenderer(this,data.hair);
     stage.skirt=new ProceduralGrassSkirt(this,data.meshes);stage.geometryBytes+=stage.skirt.geometryBytes;
     stage.supportProbes=data.supportProbes;
@@ -315,11 +406,14 @@ class CompactSurfaceRenderer{
     gl.uniformMatrix4fv(p.u.viewProjection,false,depth?r.lightVP:r.vp);gl.uniformMatrix4fv(p.u.lightVP,false,r.lightVP);gl.uniform1i(p.u.compactPalette,COMPACT_PALETTE_UNIT);gl.uniform1f(p.u.compactStatureScale,this.statureScale);
     gl.uniform4fv(p.u['compactMuscleOrigin[0]'],this.muscleFrames.flatMap(f=>[...f.origin,f.length]));gl.uniform4fv(p.u['compactMuscleAxis[0]'],this.muscleFrames.flatMap(f=>[...f.axis,0]));gl.uniform2fv(p.u['compactMuscleStrain[0]'],this.muscleFrames.flatMap(f=>[f.armStrain,f.deltoidStrain]));
     gl.uniform2fv(p.u.compactAxillaWeight,this.muscleFrames.map(f=>f.axillaWeight));
-    if(!depth){gl.uniform3fv(p.u.eye,r.eye);gl.uniform1i(p.u.shadow,1);gl.uniform1f(p.u.shadowsEnabled,r.quality==='shadow'&&r.shadowAvailable?1:0);gl.uniform1f(p.u.studioMode,r.studioMode?1:0);}
+    if(!depth){gl.uniform3fv(p.u.eye,r.eye);gl.uniform1i(p.u.shadow,1);gl.uniform1f(p.u.shadowsEnabled,r.quality==='shadow'&&r.shadowAvailable?1:0);r.tissueUniforms(p);}
     const skin=this.lab.human.tissue.skinMaterial;
     // Face recipe offsets retain their authored physical millimetres. Its
     // landmarks and support radii remain attached to the scaled neutral head.
     const face=this.lab.face.uniforms();gl.uniform3fv(p.u['faceOffsets[0]'],face.offsets.map(v=>v/this.statureScale));gl.uniform1f(p.u.faceEnabled,face.enabled);gl.uniform1f(p.u.faceHeatmap,depth?0:face.heatmap);gl.uniform1i(p.u.faceSelected,face.selected);
+    const proportions=face.proportions;
+    gl.uniform4f(p.u.faceProportions,(proportions?.[0]||0)*face.enabled,(proportions?.[1]||0)*face.enabled,(proportions?.[2]||0)*face.enabled,(proportions?.[3]||0)*face.enabled);
+    gl.uniform1f(p.u.faceJawWidth,(proportions?.[4]||0)*face.enabled);
     gl.uniform1fv(p.u['faceMuscles[0]'],face.muscles);gl.uniform1fv(p.u['compactLidState[0]'],face.eyelids.map(v=>v*face.enabled));
     gl.uniform1f(p.u.compactLipOpen,face.lipOpen*face.enabled);gl.uniform1f(p.u.compactJawOpen,face.jawOpen*face.enabled);
     gl.uniform4fv(p.u['compactSocketRadii[0]'],this.eyeSocketRadii);
@@ -327,25 +421,27 @@ class CompactSurfaceRenderer{
     gl.frontFace(gl.CW);gl.disable(gl.CULL_FACE);
     for(const c of this.chunks){
       const eyeSide=c.eyeSide||(['FJ1289','FJ1297','FJ1317'].includes(c.name)?'left':'right');
-      gl.uniform1f(p.u.compactMuscleEnabled,c.name==='skin'?1:0);
-      gl.uniform1f(p.u.compactEyeLid,c.eyeLid?(c.name==='eyeLidMargin'?2:1):0);gl.uniform1f(p.u.compactEyeSide,eyeSide==='left'?0:1);
+      gl.uniform1f(p.u.compactMuscleEnabled,c.name==='skin'?1:0);gl.uniform1f(p.u.compactCavityEnabled,c.cavity?1:0);
+      gl.uniform1f(p.u.compactEyeLid,c.eyeLid?(c.name==='eyeLash'?3:c.name==='eyeTearDuct'?4:c.name==='eyeLidMargin'?2:1):0);gl.uniform1f(p.u.compactEyeSide,eyeSide==='left'?0:1);
       gl.uniform1f(p.u.compactSkinSocket,c.name==='skin'||c.name==='faceSkin'?1:0);
       gl.uniform1f(p.u.compactFaceSkinMode,c.name==='skin'?1:c.name==='faceSkin'?2:0);
-      gl.uniform1f(p.u.compactSourceEye,['FJ1289','FJ1340','FJ1297','FJ1348','FJ1317','FJ1368'].includes(c.name)?1:['eyeSclera','eyeIris','eyePupil'].includes(c.name)?2:0);
+      gl.uniform1f(p.u.compactLipInner,c.lipSurface==='mucosa'?1:0);
+      gl.uniform1f(p.u.compactSourceEye,['FJ1289','FJ1340','FJ1297','FJ1348','FJ1317','FJ1368'].includes(c.name)?1:['eyeSclera','eyeIris','eyePupil','eyeCornea'].includes(c.name)?2:0);
       gl.uniform1f(p.u.compactEarClearance,c.name==='skin'?1:0);
       gl.uniform1f(p.u.faceEligible,faceChunkEligible(c.name)?1:0);
-      const eye=c.name==='FJ1289'||c.name==='FJ1340'?1:c.name==='FJ1297'||c.name==='FJ1348'||c.name==='eyeIris'?2:0;
+      const eye=c.name==='FJ1289'||c.name==='FJ1340'||c.name==='eyeCornea'?1:c.name==='FJ1297'||c.name==='FJ1348'||c.name==='eyeIris'?2:0;
       if(!depth&&eye===1&&this.view==='skin'){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);}else{gl.disable(gl.BLEND);gl.depthMask(true);}
       // BodyParts3D: FJ2811 external ear, FJ2812 eyebrow, FJ2814 lip;
       // FJ1317/FJ1368 are sclerae. Ears share the body's pigment and microdetail.
       const isSkin=c.name==='skin'||c.name==='FJ2811'||c.name==='eyeLidSkin'||c.name==='faceSkin'||c.name==='faceLip',lip=c.name==='FJ2814'||c.name==='faceLip',brow=c.name==='FJ2812'||c.name==='faceBrow',sclera=['FJ1317','FJ1368','eyeSclera'].includes(c.name),margin=c.name==='eyeLidMargin',pupil=c.name==='eyePupil',tear=c.name==='eyeTearDuct',nose=c.name==='noseInterior',mouth=c.name==='mouthInterior',upperTeeth=c.name==='upperTeeth',lowerTeeth=c.name==='lowerTeeth',upperGum=c.name==='upperGum',lowerGum=c.name==='lowerGum',tongue=c.name==='tongue';
-      const feature=eye||(lip?3:sclera?5:margin?6:pupil?7:tear?8:nose?9:mouth?10:upperTeeth?11:lowerTeeth?12:upperGum?13:lowerGum?14:tongue?15:0);
-      const teeth=upperTeeth||lowerTeeth,gum=upperGum||lowerGum,color=this.view==='clay'?[.54,.55,.55]:lip?skin.color:brow?[.105,.067,.047]:sclera?[.52,.50,.44]:margin?skin.lipColor.map((v,i)=>v*.55+skin.color[i]*.45):pupil?[.0007,.0005,.0003]:tear?skin.lipColor:nose?[.085,.035,.024]:mouth?[.055,.016,.013]:teeth?[.72,.67,.56]:gum?[.38,.12,.14]:tongue?[.46,.16,.19]:isSkin?skin.color:[.497,.391,.296];
-      gl.uniform3fv(p.u.compactOrigin,c.origin);gl.uniform3fv(p.u.compactExtent,c.extent);gl.uniform3fv(p.u.compactColor,color);gl.uniform1f(p.u.compactKind,this.view==='clay'||this.view==='regions'?7:isSkin?1:feature?4:0);gl.uniform1f(p.u.compactRegions,this.view==='regions'?1:0);
+      const lash=c.name==='eyeLash',beard=c.name==='faceBeard',feature=eye||(lip?3:sclera?5:margin?6:pupil?7:tear?8:nose?9:mouth?10:upperTeeth?11:lowerTeeth?12:upperGum?13:lowerGum?14:tongue?15:lash?16:beard?17:brow?18:0);
+      const teeth=upperTeeth||lowerTeeth,gum=upperGum||lowerGum,color=this.view==='clay'?[.54,.55,.55]:lip?skin.color:brow?[.038,.023,.015]:beard?[.046,.029,.019]:sclera?[.52,.50,.44]:margin?skin.lipColor.map((v,i)=>v*.55+skin.color[i]*.45):pupil?[.0007,.0005,.0003]:tear?skin.lipColor:nose?[.085,.035,.024]:mouth?[.055,.016,.013]:teeth?[.72,.67,.56]:gum?[.38,.12,.14]:tongue?[.46,.16,.19]:isSkin?skin.color:[.497,.391,.296];
+      gl.uniform3fv(p.u.compactOrigin,c.origin);gl.uniform3fv(p.u.compactExtent,c.extent);gl.uniform3fv(p.u.compactColor,lash&&this.view!=='clay'?[.025,.014,.008]:color);gl.uniform1f(p.u.compactKind,this.view==='clay'||this.view==='regions'?7:isSkin?1:feature?4:0);gl.uniform1f(p.u.compactRegions,this.view==='regions'?1:0);
       const f=this.eyeFrames[c.eyeSide||(['FJ1289','FJ1297','FJ1317'].includes(c.name)?'left':'right')];
       const globe=COMPACT_EYE_ANATOMY[c.eyeSide||(['FJ1289','FJ1297','FJ1317'].includes(c.name)?'left':'right')],eyeRelative=sub(globe.centre,f.centre);
       gl.uniform4fv(p.u.compactEyeGlobe,[dot(eyeRelative,f.u),dot(eyeRelative,f.v),dot(eyeRelative,f.n)-COMPACT_EYE_ANATOMY.recess,globe.radius]);
       gl.uniform2fv(p.u.compactCanthusDepth,this.canthusDepths[c.eyeSide||'right']);
+      gl.uniform2fv(p.u.compactCanthusSlope,this.canthusDepths[c.eyeSide||'right'].slopes||[0,0]);
       gl.uniform1f(p.u.compactFeature,this.view==='clay'||this.view==='regions'?0:feature);gl.uniform3fv(p.u.compactEyeCentre,f.centre);gl.uniform3fv(p.u.compactEyeU,f.u);gl.uniform3fv(p.u.compactEyeV,f.v);gl.uniform3fv(p.u.compactEyeNormal,f.n);
       gl.bindVertexArray(c.vao);gl.drawElements(gl.TRIANGLES,c.count,gl.UNSIGNED_SHORT,0);if(depth)r.shadowDrawCalls++;else r.drawCalls++;
     }
