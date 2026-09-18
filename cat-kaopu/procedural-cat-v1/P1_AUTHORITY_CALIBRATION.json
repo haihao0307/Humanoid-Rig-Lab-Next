@@ -1,5 +1,138 @@
 {
   "schema": "cat_kaopu/authority_calibration@1.0",
-  "status": "superseded-by-p1-branch",
-  "note": "P1 implementation continues on a dedicated branch; this marker prevents reusing the P0 branch as the production target."
+  "buildId": "cat-procedural-body-v1-p1-authority-20260917",
+  "status": "active-candidate",
+  "date": "2026-09-17",
+  "profile": "European shorthair / general adult domestic-cat calibration candidate",
+  "units": "meter",
+  "sources": [
+    {
+      "id": "poradowski-et-al-2024-long-bones",
+      "title": "Estimation of Height at Withers Based on Long Bone Measurements of Living Cats",
+      "journal": "Veterinary Sciences 11(11):522",
+      "doi": "10.3390/vetsci11110522",
+      "sample": "37 adult living cats (17 female, 20 male)",
+      "license": "CC BY 4.0",
+      "role": "withers height and appendicular long-bone calibration"
+    },
+    {
+      "id": "ramos-et-al-2021-skull-ct",
+      "title": "Morphometrical Study of the European Shorthair Cat Skull Using Computed Tomography",
+      "journal": "Veterinary Sciences 8(8):161",
+      "doi": "10.3390/vetsci8080161",
+      "sample": "37 European shorthair cats",
+      "license": "CC BY 4.0",
+      "role": "skull, cranium and nasal-length calibration"
+    }
+  ],
+  "measuredTargets": {
+    "shoulderHeight": {
+      "mean": 0.2598,
+      "sd": 0.0257,
+      "source": "poradowski-et-al-2024-long-bones"
+    },
+    "humerusGreatestLength": {
+      "mean": 0.1006,
+      "sd": 0.007,
+      "source": "poradowski-et-al-2024-long-bones"
+    },
+    "radiusGreatestLength": {
+      "mean": 0.0974,
+      "sd": 0.0067,
+      "source": "poradowski-et-al-2024-long-bones"
+    },
+    "femurGreatestLength": {
+      "mean": 0.1081,
+      "sd": 0.0083,
+      "source": "poradowski-et-al-2024-long-bones"
+    },
+    "tibiaGreatestLength": {
+      "mean": 0.1138,
+      "sd": 0.0065,
+      "source": "poradowski-et-al-2024-long-bones"
+    },
+    "osCoxaeGreatestLength": {
+      "mean": 0.0843,
+      "sd": 0.005,
+      "source": "poradowski-et-al-2024-long-bones"
+    },
+    "skullLength": {
+      "mean": 0.08942,
+      "sd": 0.00454,
+      "source": "ramos-et-al-2021-skull-ct"
+    },
+    "cranialLength": {
+      "mean": 0.0821,
+      "sd": 0.00417,
+      "source": "ramos-et-al-2021-skull-ct"
+    },
+    "nasalLength": {
+      "mean": 0.00732,
+      "sd": 0.00167,
+      "source": "ramos-et-al-2021-skull-ct"
+    },
+    "cranialWidth": {
+      "mean": 0.04275,
+      "sd": 0.00256,
+      "source": "ramos-et-al-2021-skull-ct"
+    },
+    "externalCraniumHeight": {
+      "mean": 0.03349,
+      "sd": 0.00117,
+      "source": "ramos-et-al-2021-skull-ct"
+    }
+  },
+  "catDnaMapping": {
+    "global.shoulderHeight": {
+      "value": 0.26,
+      "status": "evidence-calibrated",
+      "target": "shoulderHeight"
+    },
+    "forelimb.humerusLength": {
+      "value": 0.1006,
+      "status": "evidence-calibrated",
+      "target": "humerusGreatestLength"
+    },
+    "forelimb.radiusLength": {
+      "value": 0.0974,
+      "status": "evidence-calibrated",
+      "target": "radiusGreatestLength"
+    },
+    "hindlimb.femurLength": {
+      "value": 0.1081,
+      "status": "evidence-calibrated",
+      "target": "femurGreatestLength"
+    },
+    "hindlimb.tibiaLength": {
+      "value": 0.1138,
+      "status": "evidence-calibrated",
+      "target": "tibiaGreatestLength"
+    },
+    "head.cranialLength": {
+      "value": 0.105,
+      "status": "soft-tissue-envelope-candidate",
+      "note": "CatDNA cranialLength is a soft-tissue envelope parameter, not the CT bone length; CT values constrain proportions but are not copied one-to-one"
+    },
+    "head.muzzleLength": {
+      "value": 0.034,
+      "status": "soft-tissue-envelope-candidate",
+      "note": "CT nasal length describes bone landmarks and does not directly equal external muzzle length"
+    }
+  },
+  "candidateOnlyParameters": [
+    "global.bodyLength",
+    "global.hipHeight",
+    "torso.*",
+    "neck.*",
+    "paws.*",
+    "tail.*",
+    "neutralJointAngles",
+    "coat.*",
+    "material.*"
+  ],
+  "runtimeExternalAssets": {
+    "animalMeshes": 0,
+    "imageTextures": 0
+  },
+  "visualAcceptance": false
 }

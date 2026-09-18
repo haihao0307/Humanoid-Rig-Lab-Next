@@ -1,8 +1,8 @@
 {
-  "schema": "cat_kaopu/procedural_cat_contract@1.0",
-  "buildId": "cat-procedural-body-v1-p0-20260917",
+  "schema": "cat_kaopu/procedural_cat_contract@1.1",
+  "buildId": "cat-procedural-body-v1-p1-authority-20260917",
   "status": "active-development",
-  "goal": "build our own fully parameterized and procedural domestic-cat body, material, bind reference and runtime derivatives without shipping any third-party animal mesh or image texture",
+  "goal": "calibrate our own CatDNA-driven domestic-cat body against explicit veterinary morphometry while shipping only first-party equations, DNA, geometry, material and runtime derivatives",
   "coordinateSystem": {
     "units": "meter",
     "handedness": "right",
@@ -14,64 +14,49 @@
   "ownershipBoundary": {
     "finalGeometry": "generated from first-party equations and CatDNA only",
     "finalTexture": "generated procedurally from CatDNA only",
-    "externalReferenceUse": "measurement and anatomical evidence only; never loaded by the runtime",
+    "externalReferenceUse": "numeric morphometry and anatomical evidence only; no external animal mesh or image texture is loaded by authoring or runtime",
     "externalAnimalMeshAtRuntime": false,
     "externalImageTextureAtRuntime": false,
     "boneScalingInPoseOrAnimation": false
   },
+  "calibrationBoundary": {
+    "evidenceBacked": [
+      "shoulder height",
+      "humerus greatest length",
+      "radius greatest length",
+      "femur greatest length",
+      "tibia greatest length",
+      "skull length",
+      "cranial length",
+      "nasal length",
+      "cranial width",
+      "external cranium height"
+    ],
+    "candidateOnly": [
+      "body length",
+      "torso soft-tissue widths and depths",
+      "neck volume",
+      "paw dimensions",
+      "tail dimensions",
+      "neutral joint angles",
+      "coat pattern"
+    ],
+    "rule": "evidence-backed values may constrain CatDNA; candidate-only values remain visually reviewable and must not be labeled measured truth"
+  },
   "authoringRepresentation": {
-    "stage": "continuous implicit field",
-    "productionTarget": "deterministic stable-topology surface carrier generated from an approved CatDNA revision",
-    "connectedComponents": 1,
-    "requiredRegions": [
-      "cranium",
-      "muzzle",
-      "mandible",
-      "pinnae",
-      "neck",
-      "scapular-thoracic-sling",
-      "thorax",
-      "abdomen",
-      "lumbar",
-      "pelvis",
-      "forelimbs",
-      "hindlimbs",
-      "forepaws",
-      "hindpaws",
-      "tail-root",
-      "tail"
-    ]
+    "stage": "continuous first-party implicit field with continuous elliptical torso sweeps and articulated limb chains",
+    "productionTarget": "deterministic stable-topology surface carrier generated only after P2 visual approval",
+    "connectedComponents": 1
   },
   "parameterization": {
     "sourceOfTruth": "CatDNA JSON",
     "deterministic": true,
     "seededVariation": true,
     "allDimensionsInMeters": true,
-    "categories": [
-      "global",
-      "torso",
-      "neck",
-      "head",
-      "forelimb",
-      "hindlimb",
-      "paws",
-      "tail",
-      "coat",
-      "material"
-    ],
-    "constraintRule": "raw values are normalized through anatomical ranges before geometry, skeleton, collision, material or motion systems read them"
+    "parameterCount": 75
   },
-  "derivedOutputs": [
-    "authoring SDF",
-    "continuous body surface",
-    "anatomical joint anchors",
-    "collision proxies",
-    "procedural coat fields",
-    "morphology metrics",
-    "future stable-topology carrier inputs"
-  ],
   "acceptanceOrder": [
-    "parameter contract",
+    "authority calibration",
     "neutral standing morphology",
     "procedural material",
     "stable topology",
@@ -81,15 +66,8 @@
     "single-cat collision",
     "group and breed variation"
   ],
-  "deferredUntilBodyApproval": [
-    "life activities",
-    "navigation",
-    "group runtime",
-    "breed library",
-    "expensive strand fur",
-    "fine facial animation"
-  ],
   "visualAcceptance": false,
+  "stableTopology": false,
   "bindAcceptance": false,
   "motionAcceptance": false,
   "productionReady": false

@@ -20,90 +20,90 @@ export const DEFAULT_CAT_DNA = Object.freeze({
     coordinateSystem: { forward: '+X', left: '+Y', up: '+Z' }
   },
   global: {
-    bodyLength: 0.80,
-    shoulderHeight: 0.36,
-    hipHeight: 0.37,
-    frontStanceWidth: 0.135,
-    hindStanceWidth: 0.145,
+    bodyLength: 0.58,
+    shoulderHeight: 0.260,
+    hipHeight: 0.270,
+    frontStanceWidth: 0.095,
+    hindStanceWidth: 0.105,
     overallBulk: 1.0
   },
   torso: {
-    pelvisLength: 0.20,
-    lumbarLength: 0.18,
-    thoraxLength: 0.29,
-    pelvisWidth: 0.18,
-    lumbarWidth: 0.13,
-    thoraxWidth: 0.21,
-    pelvisDepth: 0.18,
-    lumbarDepth: 0.15,
-    thoraxDepth: 0.23,
-    abdomenTuck: 0.035,
-    dorsalArc: 0.018,
-    ventralSag: 0.010
+    pelvisLength: 0.145,
+    lumbarLength: 0.125,
+    thoraxLength: 0.215,
+    pelvisWidth: 0.135,
+    lumbarWidth: 0.105,
+    thoraxWidth: 0.155,
+    pelvisDepth: 0.145,
+    lumbarDepth: 0.125,
+    thoraxDepth: 0.185,
+    abdomenTuck: 0.026,
+    dorsalArc: 0.012,
+    ventralSag: 0.008
   },
   neck: {
-    length: 0.18,
-    baseWidth: 0.15,
-    headWidth: 0.12,
-    baseDepth: 0.18,
-    headDepth: 0.13,
-    pitchDeg: 19
+    length: 0.105,
+    baseWidth: 0.105,
+    headWidth: 0.092,
+    baseDepth: 0.125,
+    headDepth: 0.098,
+    pitchDeg: 24
   },
   head: {
-    cranialLength: 0.18,
-    width: 0.16,
-    height: 0.16,
-    muzzleLength: 0.088,
-    muzzleWidth: 0.100,
-    muzzleHeight: 0.070,
-    jawDepth: 0.050,
-    eyeSpacing: 0.080,
-    eyeHeight: 0.035,
-    earHeight: 0.120,
-    earWidth: 0.065,
-    earTiltDeg: 8
+    cranialLength: 0.105,
+    width: 0.115,
+    height: 0.105,
+    muzzleLength: 0.034,
+    muzzleWidth: 0.064,
+    muzzleHeight: 0.045,
+    jawDepth: 0.032,
+    eyeSpacing: 0.058,
+    eyeHeight: 0.024,
+    earHeight: 0.075,
+    earWidth: 0.045,
+    earTiltDeg: 10
   },
   forelimb: {
-    shoulderLongitudinal: 0.185,
-    scapulaLength: 0.125,
-    humerusLength: 0.135,
-    radiusLength: 0.125,
-    metacarpalLength: 0.070,
-    upperRadius: 0.034,
-    lowerRadius: 0.024,
-    wristRadius: 0.016,
-    humerusBackDeg: 14,
-    radiusForwardDeg: 11,
-    metacarpalForwardDeg: 34
+    shoulderLongitudinal: 0.120,
+    scapulaLength: 0.105,
+    humerusLength: 0.1006,
+    radiusLength: 0.0974,
+    metacarpalLength: 0.055,
+    upperRadius: 0.025,
+    lowerRadius: 0.018,
+    wristRadius: 0.012,
+    humerusBackDeg: 18,
+    radiusForwardDeg: 7,
+    metacarpalForwardDeg: 18
   },
   hindlimb: {
-    hipLongitudinal: -0.180,
-    femurLength: 0.155,
-    tibiaLength: 0.165,
-    tarsusLength: 0.105,
-    upperRadius: 0.047,
-    lowerRadius: 0.032,
-    hockRadius: 0.019,
-    femurForwardDeg: 34,
-    tibiaBackDeg: 43,
-    tarsusForwardDeg: 54
+    hipLongitudinal: -0.140,
+    femurLength: 0.1081,
+    tibiaLength: 0.1138,
+    tarsusLength: 0.078,
+    upperRadius: 0.034,
+    lowerRadius: 0.022,
+    hockRadius: 0.014,
+    femurForwardDeg: 42,
+    tibiaBackDeg: 48,
+    tarsusForwardDeg: 30
   },
   paws: {
-    foreLength: 0.075,
-    foreWidth: 0.045,
-    hindLength: 0.085,
-    hindWidth: 0.048,
-    height: 0.022,
-    toeSplay: 0.012
+    foreLength: 0.055,
+    foreWidth: 0.036,
+    hindLength: 0.062,
+    hindWidth: 0.040,
+    height: 0.018,
+    toeSplay: 0.006
   },
   tail: {
-    length: 0.64,
-    baseRadius: 0.035,
-    tipRadius: 0.010,
-    lift: 0.085,
-    curl: 0.28,
-    lateral: 0.020,
-    segments: 10
+    length: 0.30,
+    baseRadius: 0.024,
+    tipRadius: 0.006,
+    lift: 0.030,
+    curl: 0.08,
+    lateral: 0.015,
+    segments: 12
   },
   coat: {
     baseColor: '#62666b',
@@ -118,7 +118,7 @@ export const DEFAULT_CAT_DNA = Object.freeze({
     roughness: 0.82
   },
   material: {
-    shortHairAmplitude: 0.00035,
+    shortHairAmplitude: 0.00020,
     shortHairFrequency: 46.0,
     rimSoftness: 0.35,
     noseRoughness: 0.55,
@@ -127,79 +127,79 @@ export const DEFAULT_CAT_DNA = Object.freeze({
 });
 
 export const CAT_PARAMETER_DEFINITIONS = Object.freeze({
-  'global.bodyLength': { group: '整体', label: '身体长度', min: 0.62, max: 1.02, step: 0.005 },
-  'global.shoulderHeight': { group: '整体', label: '肩高', min: 0.28, max: 0.48, step: 0.002 },
-  'global.hipHeight': { group: '整体', label: '髋高', min: 0.29, max: 0.50, step: 0.002 },
-  'global.frontStanceWidth': { group: '整体', label: '前足站距', min: 0.10, max: 0.20, step: 0.002 },
-  'global.hindStanceWidth': { group: '整体', label: '后足站距', min: 0.11, max: 0.22, step: 0.002 },
+  'global.bodyLength': { group: '整体', label: '身体长度', min: 0.48, max: 0.72, step: 0.005 },
+  'global.shoulderHeight': { group: '整体', label: '肩高', min: 0.22, max: 0.34, step: 0.002 },
+  'global.hipHeight': { group: '整体', label: '髋高', min: 0.23, max: 0.35, step: 0.002 },
+  'global.frontStanceWidth': { group: '整体', label: '前足站距', min: 0.070, max: 0.135, step: 0.001 },
+  'global.hindStanceWidth': { group: '整体', label: '后足站距', min: 0.080, max: 0.150, step: 0.001 },
   'global.overallBulk': { group: '整体', label: '整体体量', min: 0.78, max: 1.28, step: 0.01 },
 
-  'torso.pelvisLength': { group: '躯干', label: '骨盆长度', min: 0.14, max: 0.28, step: 0.002 },
-  'torso.lumbarLength': { group: '躯干', label: '腰段长度', min: 0.12, max: 0.26, step: 0.002 },
-  'torso.thoraxLength': { group: '躯干', label: '胸廓长度', min: 0.22, max: 0.38, step: 0.002 },
-  'torso.pelvisWidth': { group: '躯干', label: '骨盆宽度', min: 0.13, max: 0.24, step: 0.002 },
-  'torso.lumbarWidth': { group: '躯干', label: '腰部宽度', min: 0.095, max: 0.18, step: 0.002 },
-  'torso.thoraxWidth': { group: '躯干', label: '胸廓宽度', min: 0.15, max: 0.28, step: 0.002 },
-  'torso.pelvisDepth': { group: '躯干', label: '骨盆深度', min: 0.13, max: 0.24, step: 0.002 },
-  'torso.lumbarDepth': { group: '躯干', label: '腰部深度', min: 0.11, max: 0.21, step: 0.002 },
-  'torso.thoraxDepth': { group: '躯干', label: '胸廓深度', min: 0.17, max: 0.30, step: 0.002 },
+  'torso.pelvisLength': { group: '躯干', label: '骨盆长度', min: 0.105, max: 0.185, step: 0.002 },
+  'torso.lumbarLength': { group: '躯干', label: '腰段长度', min: 0.090, max: 0.170, step: 0.002 },
+  'torso.thoraxLength': { group: '躯干', label: '胸廓长度', min: 0.165, max: 0.275, step: 0.002 },
+  'torso.pelvisWidth': { group: '躯干', label: '骨盆宽度', min: 0.100, max: 0.175, step: 0.001 },
+  'torso.lumbarWidth': { group: '躯干', label: '腰部宽度', min: 0.075, max: 0.135, step: 0.001 },
+  'torso.thoraxWidth': { group: '躯干', label: '胸廓宽度', min: 0.115, max: 0.195, step: 0.001 },
+  'torso.pelvisDepth': { group: '躯干', label: '骨盆深度', min: 0.105, max: 0.185, step: 0.001 },
+  'torso.lumbarDepth': { group: '躯干', label: '腰部深度', min: 0.090, max: 0.155, step: 0.001 },
+  'torso.thoraxDepth': { group: '躯干', label: '胸廓深度', min: 0.140, max: 0.225, step: 0.001 },
   'torso.abdomenTuck': { group: '躯干', label: '腹线收束', min: 0.0, max: 0.075, step: 0.001 },
   'torso.dorsalArc': { group: '躯干', label: '背线弧度', min: -0.015, max: 0.045, step: 0.001 },
   'torso.ventralSag': { group: '躯干', label: '胸腹下缘', min: 0.0, max: 0.035, step: 0.001 },
 
-  'neck.length': { group: '颈部', label: '颈部长度', min: 0.11, max: 0.25, step: 0.002 },
-  'neck.baseWidth': { group: '颈部', label: '颈根宽度', min: 0.10, max: 0.20, step: 0.002 },
-  'neck.headWidth': { group: '颈部', label: '头侧宽度', min: 0.08, max: 0.16, step: 0.002 },
-  'neck.baseDepth': { group: '颈部', label: '颈根深度', min: 0.12, max: 0.23, step: 0.002 },
-  'neck.headDepth': { group: '颈部', label: '头侧深度', min: 0.09, max: 0.18, step: 0.002 },
+  'neck.length': { group: '颈部', label: '颈部长度', min: 0.075, max: 0.145, step: 0.001 },
+  'neck.baseWidth': { group: '颈部', label: '颈根宽度', min: 0.080, max: 0.135, step: 0.001 },
+  'neck.headWidth': { group: '颈部', label: '头侧宽度', min: 0.070, max: 0.115, step: 0.001 },
+  'neck.baseDepth': { group: '颈部', label: '颈根深度', min: 0.095, max: 0.155, step: 0.001 },
+  'neck.headDepth': { group: '颈部', label: '头侧深度', min: 0.075, max: 0.125, step: 0.001 },
   'neck.pitchDeg': { group: '颈部', label: '颈部抬角', min: 5, max: 35, step: 1 },
 
-  'head.cranialLength': { group: '头部', label: '颅部长度', min: 0.13, max: 0.23, step: 0.002 },
-  'head.width': { group: '头部', label: '头部宽度', min: 0.12, max: 0.21, step: 0.002 },
-  'head.height': { group: '头部', label: '头部高度', min: 0.12, max: 0.21, step: 0.002 },
-  'head.muzzleLength': { group: '头部', label: '口鼻长度', min: 0.055, max: 0.13, step: 0.001 },
-  'head.muzzleWidth': { group: '头部', label: '口鼻宽度', min: 0.07, max: 0.14, step: 0.001 },
-  'head.muzzleHeight': { group: '头部', label: '口鼻高度', min: 0.045, max: 0.095, step: 0.001 },
-  'head.jawDepth': { group: '头部', label: '下颌深度', min: 0.03, max: 0.075, step: 0.001 },
-  'head.eyeSpacing': { group: '头部', label: '双眼间距', min: 0.055, max: 0.115, step: 0.001 },
-  'head.eyeHeight': { group: '头部', label: '眼球尺度', min: 0.022, max: 0.050, step: 0.001 },
-  'head.earHeight': { group: '头部', label: '耳高', min: 0.075, max: 0.17, step: 0.002 },
-  'head.earWidth': { group: '头部', label: '耳宽', min: 0.045, max: 0.095, step: 0.001 },
+  'head.cranialLength': { group: '头部', label: '颅部长度', min: 0.085, max: 0.135, step: 0.001 },
+  'head.width': { group: '头部', label: '头部宽度', min: 0.090, max: 0.145, step: 0.001 },
+  'head.height': { group: '头部', label: '头部高度', min: 0.085, max: 0.135, step: 0.001 },
+  'head.muzzleLength': { group: '头部', label: '口鼻长度', min: 0.022, max: 0.050, step: 0.001 },
+  'head.muzzleWidth': { group: '头部', label: '口鼻宽度', min: 0.050, max: 0.080, step: 0.001 },
+  'head.muzzleHeight': { group: '头部', label: '口鼻高度', min: 0.035, max: 0.060, step: 0.001 },
+  'head.jawDepth': { group: '头部', label: '下颌深度', min: 0.022, max: 0.045, step: 0.001 },
+  'head.eyeSpacing': { group: '头部', label: '双眼间距', min: 0.044, max: 0.075, step: 0.001 },
+  'head.eyeHeight': { group: '头部', label: '眼球尺度', min: 0.017, max: 0.032, step: 0.001 },
+  'head.earHeight': { group: '头部', label: '耳高', min: 0.055, max: 0.100, step: 0.001 },
+  'head.earWidth': { group: '头部', label: '耳宽', min: 0.035, max: 0.060, step: 0.001 },
   'head.earTiltDeg': { group: '头部', label: '耳外倾角', min: -5, max: 24, step: 1 },
 
-  'forelimb.scapulaLength': { group: '前肢', label: '肩胛长度', min: 0.09, max: 0.17, step: 0.002 },
-  'forelimb.humerusLength': { group: '前肢', label: '上臂长度', min: 0.10, max: 0.18, step: 0.002 },
-  'forelimb.radiusLength': { group: '前肢', label: '前臂长度', min: 0.095, max: 0.18, step: 0.002 },
-  'forelimb.metacarpalLength': { group: '前肢', label: '掌骨长度', min: 0.045, max: 0.095, step: 0.001 },
-  'forelimb.upperRadius': { group: '前肢', label: '上臂体积', min: 0.024, max: 0.050, step: 0.001 },
-  'forelimb.lowerRadius': { group: '前肢', label: '前臂体积', min: 0.017, max: 0.038, step: 0.001 },
-  'forelimb.wristRadius': { group: '前肢', label: '腕部体积', min: 0.011, max: 0.026, step: 0.001 },
+  'forelimb.scapulaLength': { group: '前肢', label: '肩胛长度', min: 0.080, max: 0.130, step: 0.001 },
+  'forelimb.humerusLength': { group: '前肢', label: '上臂长度', min: 0.080, max: 0.125, step: 0.001 },
+  'forelimb.radiusLength': { group: '前肢', label: '前臂长度', min: 0.078, max: 0.122, step: 0.001 },
+  'forelimb.metacarpalLength': { group: '前肢', label: '掌骨长度', min: 0.040, max: 0.070, step: 0.001 },
+  'forelimb.upperRadius': { group: '前肢', label: '上臂体积', min: 0.019, max: 0.032, step: 0.001 },
+  'forelimb.lowerRadius': { group: '前肢', label: '前臂体积', min: 0.014, max: 0.024, step: 0.001 },
+  'forelimb.wristRadius': { group: '前肢', label: '腕部体积', min: 0.009, max: 0.016, step: 0.001 },
   'forelimb.humerusBackDeg': { group: '前肢', label: '上臂后摆', min: 2, max: 28, step: 1 },
   'forelimb.radiusForwardDeg': { group: '前肢', label: '前臂前摆', min: 0, max: 24, step: 1 },
   'forelimb.metacarpalForwardDeg': { group: '前肢', label: '前掌前倾', min: 18, max: 48, step: 1 },
 
-  'hindlimb.femurLength': { group: '后肢', label: '股骨长度', min: 0.12, max: 0.21, step: 0.002 },
-  'hindlimb.tibiaLength': { group: '后肢', label: '胫骨长度', min: 0.12, max: 0.22, step: 0.002 },
-  'hindlimb.tarsusLength': { group: '后肢', label: '跖部长度', min: 0.075, max: 0.14, step: 0.002 },
-  'hindlimb.upperRadius': { group: '后肢', label: '大腿体积', min: 0.034, max: 0.065, step: 0.001 },
-  'hindlimb.lowerRadius': { group: '后肢', label: '小腿体积', min: 0.022, max: 0.047, step: 0.001 },
-  'hindlimb.hockRadius': { group: '后肢', label: '飞节体积', min: 0.013, max: 0.030, step: 0.001 },
+  'hindlimb.femurLength': { group: '后肢', label: '股骨长度', min: 0.085, max: 0.135, step: 0.001 },
+  'hindlimb.tibiaLength': { group: '后肢', label: '胫骨长度', min: 0.090, max: 0.140, step: 0.001 },
+  'hindlimb.tarsusLength': { group: '后肢', label: '跖部长度', min: 0.060, max: 0.095, step: 0.001 },
+  'hindlimb.upperRadius': { group: '后肢', label: '大腿体积', min: 0.026, max: 0.043, step: 0.001 },
+  'hindlimb.lowerRadius': { group: '后肢', label: '小腿体积', min: 0.017, max: 0.029, step: 0.001 },
+  'hindlimb.hockRadius': { group: '后肢', label: '飞节体积', min: 0.010, max: 0.019, step: 0.001 },
   'hindlimb.femurForwardDeg': { group: '后肢', label: '大腿前摆', min: 18, max: 50, step: 1 },
   'hindlimb.tibiaBackDeg': { group: '后肢', label: '小腿后摆', min: 26, max: 60, step: 1 },
-  'hindlimb.tarsusForwardDeg': { group: '后肢', label: '跖部前倾', min: 38, max: 68, step: 1 },
+  'hindlimb.tarsusForwardDeg': { group: '后肢', label: '跖部前倾', min: 18, max: 44, step: 1 },
 
-  'paws.foreLength': { group: '足掌', label: '前掌长度', min: 0.050, max: 0.105, step: 0.001 },
-  'paws.foreWidth': { group: '足掌', label: '前掌宽度', min: 0.030, max: 0.065, step: 0.001 },
-  'paws.hindLength': { group: '足掌', label: '后掌长度', min: 0.060, max: 0.120, step: 0.001 },
-  'paws.hindWidth': { group: '足掌', label: '后掌宽度', min: 0.032, max: 0.070, step: 0.001 },
-  'paws.height': { group: '足掌', label: '掌垫高度', min: 0.014, max: 0.034, step: 0.001 },
+  'paws.foreLength': { group: '足掌', label: '前掌长度', min: 0.040, max: 0.072, step: 0.001 },
+  'paws.foreWidth': { group: '足掌', label: '前掌宽度', min: 0.028, max: 0.048, step: 0.001 },
+  'paws.hindLength': { group: '足掌', label: '后掌长度', min: 0.048, max: 0.078, step: 0.001 },
+  'paws.hindWidth': { group: '足掌', label: '后掌宽度', min: 0.030, max: 0.052, step: 0.001 },
+  'paws.height': { group: '足掌', label: '掌垫高度', min: 0.012, max: 0.024, step: 0.001 },
   'paws.toeSplay': { group: '足掌', label: '趾端展开', min: 0.0, max: 0.025, step: 0.001 },
 
-  'tail.length': { group: '尾部', label: '尾巴长度', min: 0.42, max: 0.90, step: 0.005 },
-  'tail.baseRadius': { group: '尾部', label: '尾根体积', min: 0.024, max: 0.050, step: 0.001 },
-  'tail.tipRadius': { group: '尾部', label: '尾尖体积', min: 0.006, max: 0.018, step: 0.001 },
-  'tail.lift': { group: '尾部', label: '尾巴抬高', min: -0.04, max: 0.20, step: 0.005 },
-  'tail.curl': { group: '尾部', label: '尾巴弯曲', min: -0.45, max: 0.75, step: 0.01 },
+  'tail.length': { group: '尾部', label: '尾巴长度', min: 0.22, max: 0.42, step: 0.005 },
+  'tail.baseRadius': { group: '尾部', label: '尾根体积', min: 0.017, max: 0.032, step: 0.001 },
+  'tail.tipRadius': { group: '尾部', label: '尾尖体积', min: 0.004, max: 0.010, step: 0.001 },
+  'tail.lift': { group: '尾部', label: '尾巴抬高', min: -0.03, max: 0.10, step: 0.005 },
+  'tail.curl': { group: '尾部', label: '尾巴弯曲', min: -0.20, max: 0.35, step: 0.01 },
   'tail.lateral': { group: '尾部', label: '尾巴侧摆', min: -0.12, max: 0.12, step: 0.005 },
 
   'coat.stripeFrequency': { group: '毛色', label: '虎斑频率', min: 5, max: 20, step: 0.5 },
@@ -287,26 +287,26 @@ function addSegment(point, length, angleDeg, forwardSign = 1) {
 export function deriveCatSkeleton(input = DEFAULT_CAT_DNA) {
   const dna = normalizeCatDNA(input);
   const pawZ = dna.paws.height * 0.5;
-  const pelvisX = -dna.global.bodyLength * 0.22;
-  const lumbarX = -dna.global.bodyLength * 0.035;
-  const thoraxX = dna.global.bodyLength * 0.16;
+  const pelvisX = -dna.global.bodyLength * 0.20;
+  const lumbarX = -dna.global.bodyLength * 0.02;
+  const thoraxX = dna.global.bodyLength * 0.18;
   const shoulderX = dna.forelimb.shoulderLongitudinal;
   const hipX = dna.hindlimb.hipLongitudinal;
   const pelvisZ = dna.global.hipHeight;
-  const thoraxZ = dna.global.shoulderHeight + dna.torso.thoraxDepth * 0.08;
+  const thoraxZ = dna.global.shoulderHeight + dna.torso.thoraxDepth * 0.04;
   const neckPitch = dna.neck.pitchDeg * DEG;
-  const neckBase = [thoraxX + dna.torso.thoraxLength * 0.34, 0, thoraxZ + dna.torso.thoraxDepth * 0.20];
+  const neckBase = [thoraxX + dna.torso.thoraxLength * 0.34, 0, thoraxZ + dna.torso.thoraxDepth * 0.24];
   const neckTip = [
     neckBase[0] + Math.cos(neckPitch) * dna.neck.length,
     0,
     neckBase[2] + Math.sin(neckPitch) * dna.neck.length
   ];
   const head = [
-    neckTip[0] + dna.head.cranialLength * 0.18,
+    neckTip[0] + dna.head.cranialLength * 0.12,
     0,
-    neckTip[2] + dna.head.height * 0.04
+    neckTip[2] + dna.head.height * 0.05
   ];
-  const muzzle = [head[0] + dna.head.cranialLength * 0.46 + dna.head.muzzleLength * 0.42, 0, head[2] - dna.head.height * 0.18];
+  const muzzle = [head[0] + dna.head.cranialLength * 0.34 + dna.head.muzzleLength * 0.30, 0, head[2] - dna.head.height * 0.16];
 
   const anchors = {
     pelvis: [pelvisX, 0, pelvisZ],
@@ -316,7 +316,7 @@ export function deriveCatSkeleton(input = DEFAULT_CAT_DNA) {
     neckTip,
     head,
     muzzle,
-    tailRoot: [pelvisX - dna.torso.pelvisLength * 0.52, 0, pelvisZ + dna.torso.pelvisDepth * 0.10]
+    tailRoot: [pelvisX - dna.torso.pelvisLength * 0.48, 0, pelvisZ + dna.torso.pelvisDepth * 0.04]
   };
 
   for (const side of [-1, 1]) {
@@ -405,6 +405,28 @@ function taperedCapsuleSdf(x, y, z, a, b, r0, r1) {
   return Math.hypot(qx, qy, qz) - mix(r0, r1, h);
 }
 
+function ellipticalSweepSegmentSdf(x, y, z, a, b, ry0, rz0, ry1, rz1) {
+  const vx = b[0] - a[0];
+  const vz = b[2] - a[2];
+  const length = Math.hypot(vx, vz) || 1;
+  const ux = vx / length;
+  const uz = vz / length;
+  const alongRaw = (x - a[0]) * ux + (z - a[2]) * uz;
+  const along = clamp(alongRaw, 0, length);
+  const t = along / length;
+  const cx = a[0] + ux * along;
+  const cz = a[2] + uz * along;
+  const nx = -uz;
+  const nz = ux;
+  const perpendicular = (x - cx) * nx + (z - cz) * nz;
+  const ry = mix(ry0, ry1, t);
+  const rz = mix(rz0, rz1, t);
+  const radial = (Math.hypot(y / ry, perpendicular / rz) - 1) * Math.min(ry, rz);
+  const outside = Math.max(-alongRaw, alongRaw - length, 0);
+  if (outside <= 0) return radial;
+  return Math.hypot(Math.max(radial, 0), outside) + Math.min(radial, 0);
+}
+
 function cubicBezier(a, b, c, d, t) {
   const u = 1 - t;
   const w0 = u * u * u;
@@ -435,50 +457,76 @@ export function createCatSdf(input = DEFAULT_CAT_DNA) {
   const { dna, anchors, sections } = deriveCatSections(input);
   const { points: tailPoints } = deriveTailPoints(dna);
   const bulk = dna.global.overallBulk;
-  const bodySmooth = 0.024 * bulk;
+  const bodySmooth = 0.010 * bulk;
 
   return function catSdf(x, y, z) {
-    let d = Infinity;
-    for (const section of sections) {
-      d = smin(d, ellipsoidSdf(x, y, z, [section.x, 0, section.z], [0.085, section.ry, section.rz]), bodySmooth);
+    const first = sections[0];
+    const last = sections.at(-1);
+    let d = ellipsoidSdf(x, y, z, [first.x, 0, first.z], [0.060, first.ry, first.rz]);
+    for (let i = 0; i < sections.length - 1; i += 1) {
+      const a = sections[i];
+      const b = sections[i + 1];
+      d = smin(d, ellipticalSweepSegmentSdf(x, y, z, [a.x, 0, a.z], [b.x, 0, b.z], a.ry, a.rz, b.ry, b.rz), bodySmooth);
     }
+    d = smin(d, ellipsoidSdf(x, y, z, [last.x, 0, last.z], [0.055, last.ry, last.rz]), bodySmooth);
 
-    d = smin(d, taperedCapsuleSdf(x, y, z, anchors.neckBase, anchors.neckTip, dna.neck.baseWidth * 0.48, dna.neck.headWidth * 0.48), 0.022);
-    d = smin(d, ellipsoidSdf(x, y, z, anchors.head, [dna.head.cranialLength * 0.50, dna.head.width * 0.50, dna.head.height * 0.50]), 0.020);
-    d = smin(d, ellipsoidSdf(x, y, z, anchors.muzzle, [dna.head.muzzleLength * 0.58, dna.head.muzzleWidth * 0.50, dna.head.muzzleHeight * 0.50]), 0.014);
-    d = smin(d, ellipsoidSdf(x, y, z, [anchors.muzzle[0] - dna.head.muzzleLength * 0.08, 0, anchors.muzzle[2] - dna.head.jawDepth * 0.35], [dna.head.muzzleLength * 0.44, dna.head.muzzleWidth * 0.43, dna.head.jawDepth * 0.50]), 0.012);
+    d = smin(d, taperedCapsuleSdf(x, y, z, anchors.neckBase, anchors.neckTip, dna.neck.baseWidth * 0.46, dna.neck.headWidth * 0.46), 0.012);
+    d = smin(d, ellipsoidSdf(x, y, z, anchors.head, [dna.head.cranialLength * 0.50, dna.head.width * 0.50, dna.head.height * 0.50]), 0.012);
+    d = smin(d, ellipsoidSdf(x, y, z, [anchors.head[0] + dna.head.cranialLength * 0.28, 0, anchors.head[2] - dna.head.height * 0.01], [dna.head.cranialLength * 0.30, dna.head.width * 0.36, dna.head.height * 0.32]), 0.009);
+    for (const side of [-1, 1]) {
+      const cheek = [anchors.muzzle[0] - dna.head.muzzleLength * 0.12, side * dna.head.muzzleWidth * 0.18, anchors.muzzle[2] - dna.head.muzzleHeight * 0.02];
+      d = smin(d, ellipsoidSdf(x, y, z, cheek, [dna.head.muzzleLength * 0.52, dna.head.muzzleWidth * 0.34, dna.head.muzzleHeight * 0.48]), 0.007);
+    }
+    d = smin(d, ellipsoidSdf(x, y, z, [anchors.muzzle[0] - dna.head.muzzleLength * 0.16, 0, anchors.muzzle[2] - dna.head.jawDepth * 0.38], [dna.head.muzzleLength * 0.48, dna.head.muzzleWidth * 0.40, dna.head.jawDepth * 0.50]), 0.008);
 
     for (const side of [-1, 1]) {
-      const earBaseA = [anchors.head[0] - dna.head.cranialLength * 0.12, side * dna.head.width * 0.33, anchors.head[2] + dna.head.height * 0.38];
-      const earBaseB = [anchors.head[0] + dna.head.cranialLength * 0.10, side * dna.head.width * 0.31, anchors.head[2] + dna.head.height * 0.34];
       const tilt = dna.head.earTiltDeg * DEG;
       const earTip = [
-        anchors.head[0] - dna.head.earHeight * 0.12,
-        side * (dna.head.width * 0.34 + Math.sin(tilt) * dna.head.earHeight),
-        anchors.head[2] + dna.head.height * 0.38 + Math.cos(tilt) * dna.head.earHeight
+        anchors.head[0] - dna.head.earHeight * 0.08,
+        side * (dna.head.width * 0.35 + Math.sin(tilt) * dna.head.earHeight * 0.55),
+        anchors.head[2] + dna.head.height * 0.36 + Math.cos(tilt) * dna.head.earHeight
       ];
-      d = smin(d, taperedCapsuleSdf(x, y, z, earBaseA, earTip, dna.head.earWidth * 0.45, 0.004), 0.010);
-      d = smin(d, taperedCapsuleSdf(x, y, z, earBaseB, earTip, dna.head.earWidth * 0.36, 0.0035), 0.009);
+      const earRoots = [
+        [anchors.head[0] - dna.head.cranialLength * 0.20, side * dna.head.width * 0.30, anchors.head[2] + dna.head.height * 0.31],
+        [anchors.head[0] + dna.head.cranialLength * 0.08, side * dna.head.width * 0.30, anchors.head[2] + dna.head.height * 0.30],
+        [anchors.head[0] - dna.head.cranialLength * 0.04, side * (dna.head.width * 0.34 + dna.head.earWidth * 0.18), anchors.head[2] + dna.head.height * 0.27]
+      ];
+      for (const root of earRoots) d = smin(d, taperedCapsuleSdf(x, y, z, root, earTip, dna.head.earWidth * 0.25, 0.0025), 0.005);
 
       const shoulder = anchors[`shoulder${side}`];
       const elbow = anchors[`elbow${side}`];
       const wrist = anchors[`wrist${side}`];
       const forePaw = anchors[`forePaw${side}`];
-      d = smin(d, ellipsoidSdf(x, y, z, shoulder, [dna.forelimb.scapulaLength * 0.48, dna.forelimb.upperRadius * 1.10, dna.forelimb.upperRadius * 1.55]), 0.014);
-      d = smin(d, taperedCapsuleSdf(x, y, z, shoulder, elbow, dna.forelimb.upperRadius, dna.forelimb.lowerRadius * 1.10), 0.010);
-      d = smin(d, taperedCapsuleSdf(x, y, z, elbow, wrist, dna.forelimb.lowerRadius, dna.forelimb.wristRadius), 0.008);
-      d = smin(d, taperedCapsuleSdf(x, y, z, wrist, forePaw, dna.forelimb.wristRadius, dna.forelimb.wristRadius * 0.82), 0.006);
-      d = smin(d, ellipsoidSdf(x, y, z, [forePaw[0] + dna.paws.foreLength * 0.15, forePaw[1], dna.paws.height * 0.52], [dna.paws.foreLength * 0.50, (dna.paws.foreWidth + dna.paws.toeSplay) * 0.50, dna.paws.height * 0.50]), 0.008);
+      const scapulaCenter = [shoulder[0] - dna.forelimb.scapulaLength * 0.20, shoulder[1] * 0.78, shoulder[2] + dna.forelimb.scapulaLength * 0.20];
+      d = smin(d, ellipsoidSdf(x, y, z, scapulaCenter, [dna.forelimb.scapulaLength * 0.50, dna.forelimb.upperRadius * 1.15, dna.forelimb.upperRadius * 1.55]), 0.010);
+      d = smin(d, taperedCapsuleSdf(x, y, z, shoulder, elbow, dna.forelimb.upperRadius, dna.forelimb.lowerRadius * 1.08), 0.007);
+      d = smin(d, ellipsoidSdf(x, y, z, elbow, [dna.forelimb.lowerRadius * 1.10, dna.forelimb.lowerRadius * 0.95, dna.forelimb.lowerRadius * 1.05]), 0.005);
+      d = smin(d, taperedCapsuleSdf(x, y, z, elbow, wrist, dna.forelimb.lowerRadius, dna.forelimb.wristRadius), 0.006);
+      d = smin(d, taperedCapsuleSdf(x, y, z, wrist, forePaw, dna.forelimb.wristRadius, dna.forelimb.wristRadius * 0.80), 0.004);
+      const forePad = [forePaw[0] + dna.paws.foreLength * 0.22, forePaw[1], dna.paws.height * 0.52];
+      d = smin(d, ellipsoidSdf(x, y, z, forePad, [dna.paws.foreLength * 0.46, dna.paws.foreWidth * 0.46, dna.paws.height * 0.50]), 0.005);
+      for (const toe of [-1, 0, 1]) {
+        const toeCenter = [forePaw[0] + dna.paws.foreLength * 0.54, forePaw[1] + toe * dna.paws.toeSplay * 0.55, dna.paws.height * 0.54];
+        d = smin(d, ellipsoidSdf(x, y, z, toeCenter, [dna.paws.foreLength * 0.17, dna.paws.foreWidth * 0.14, dna.paws.height * 0.34]), 0.003);
+      }
 
       const hip = anchors[`hip${side}`];
       const stifle = anchors[`stifle${side}`];
       const hock = anchors[`hock${side}`];
       const hindPaw = anchors[`hindPaw${side}`];
-      d = smin(d, ellipsoidSdf(x, y, z, hip, [dna.hindlimb.femurLength * 0.55, dna.hindlimb.upperRadius * 1.20, dna.hindlimb.upperRadius * 1.55]), 0.016);
-      d = smin(d, taperedCapsuleSdf(x, y, z, hip, stifle, dna.hindlimb.upperRadius, dna.hindlimb.lowerRadius * 1.10), 0.011);
-      d = smin(d, taperedCapsuleSdf(x, y, z, stifle, hock, dna.hindlimb.lowerRadius, dna.hindlimb.hockRadius), 0.008);
-      d = smin(d, taperedCapsuleSdf(x, y, z, hock, hindPaw, dna.hindlimb.hockRadius, dna.hindlimb.hockRadius * 0.78), 0.006);
-      d = smin(d, ellipsoidSdf(x, y, z, [hindPaw[0] + dna.paws.hindLength * 0.15, hindPaw[1], dna.paws.height * 0.52], [dna.paws.hindLength * 0.50, (dna.paws.hindWidth + dna.paws.toeSplay) * 0.50, dna.paws.height * 0.50]), 0.008);
+      const glutealCenter = [hip[0] - dna.hindlimb.femurLength * 0.12, hip[1] * 0.78, hip[2] + dna.hindlimb.upperRadius * 0.25];
+      d = smin(d, ellipsoidSdf(x, y, z, glutealCenter, [dna.hindlimb.femurLength * 0.56, dna.hindlimb.upperRadius * 1.20, dna.hindlimb.upperRadius * 1.52]), 0.011);
+      d = smin(d, taperedCapsuleSdf(x, y, z, hip, stifle, dna.hindlimb.upperRadius, dna.hindlimb.lowerRadius * 1.10), 0.008);
+      d = smin(d, ellipsoidSdf(x, y, z, stifle, [dna.hindlimb.lowerRadius * 1.15, dna.hindlimb.lowerRadius, dna.hindlimb.lowerRadius * 1.12]), 0.005);
+      d = smin(d, taperedCapsuleSdf(x, y, z, stifle, hock, dna.hindlimb.lowerRadius, dna.hindlimb.hockRadius), 0.006);
+      d = smin(d, ellipsoidSdf(x, y, z, hock, [dna.hindlimb.hockRadius * 1.12, dna.hindlimb.hockRadius * 0.95, dna.hindlimb.hockRadius * 1.12]), 0.004);
+      d = smin(d, taperedCapsuleSdf(x, y, z, hock, hindPaw, dna.hindlimb.hockRadius, dna.hindlimb.hockRadius * 0.78), 0.004);
+      const hindPad = [hindPaw[0] + dna.paws.hindLength * 0.22, hindPaw[1], dna.paws.height * 0.52];
+      d = smin(d, ellipsoidSdf(x, y, z, hindPad, [dna.paws.hindLength * 0.46, dna.paws.hindWidth * 0.46, dna.paws.height * 0.50]), 0.005);
+      for (const toe of [-1, 0, 1]) {
+        const toeCenter = [hindPaw[0] + dna.paws.hindLength * 0.54, hindPaw[1] + toe * dna.paws.toeSplay * 0.58, dna.paws.height * 0.54];
+        d = smin(d, ellipsoidSdf(x, y, z, toeCenter, [dna.paws.hindLength * 0.17, dna.paws.hindWidth * 0.14, dna.paws.height * 0.34]), 0.003);
+      }
     }
 
     for (let i = 0; i < tailPoints.length - 1; i += 1) {
@@ -585,6 +633,22 @@ export function deriveCatMetrics(input = DEFAULT_CAT_DNA) {
     thoraxLumbarRatio: dna.torso.thoraxWidth / dna.torso.lumbarWidth,
     pelvisLumbarRatio: dna.torso.pelvisWidth / dna.torso.lumbarWidth,
     headWidthM: dna.head.width,
+    authorityCalibration: {
+      profile: 'european-shorthair-p1',
+      shoulderHeightTargetM: 0.2598,
+      shoulderHeightDeltaM: dna.global.shoulderHeight - 0.2598,
+      humerusTargetM: 0.1006,
+      humerusDeltaM: dna.forelimb.humerusLength - 0.1006,
+      radiusTargetM: 0.0974,
+      radiusDeltaM: dna.forelimb.radiusLength - 0.0974,
+      femurTargetM: 0.1081,
+      femurDeltaM: dna.hindlimb.femurLength - 0.1081,
+      tibiaTargetM: 0.1138,
+      tibiaDeltaM: dna.hindlimb.tibiaLength - 0.1138,
+      skullLengthMeasuredM: 0.0894,
+      cranialLengthMeasuredM: 0.0821,
+      nasalLengthMeasuredM: 0.0073
+    },
     pawGroundZ: {
       foreLeft: anchors.forePaw1[2] - dna.paws.height * 0.5,
       foreRight: anchors['forePaw-1'][2] - dna.paws.height * 0.5,
