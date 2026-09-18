@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {auditShortsSnapshot} from './audit-shorts-snapshot.mjs';
+// A triangle can cut a body even though all three vertices are outside it.
+// The unit sphere is an analytic oracle for the finite-sampling audit itself.
+const body={closest(p){const distance=Math.hypot(...p),normal=distance?p.map(v=>v/distance):[1,0,0];return {signedDistance:distance-1,point:normal,normal,triangleId:0,barycentric:[1,0,0]};}};
+const snapshot={version:'audit-counterexample',stepIndex:0,time:0,pieces:[{id:'cutting-triangle',positions:[[2,0,0],[-1,Math.sqrt(3),0],[-1,-Math.sqrt(3),0]],materialCoordinates:[[0,0],[1,0],[0,1]],triangles:[[0,1,2]]}]},before=JSON.stringify(snapshot);
+const result=auditShortsSnapshot(snapshot,body,{groundYM:-3});
+assert.equal(result.bySampleKind.vertex.violations,0);assert.equal(result.bySampleKind.triangleCentroid.violations,1);assert.equal(result.vertexOnlyWouldMissAllViolations,true);assert.equal(result.maxSkinPenetrationM,1);assert.equal(result.worst.kind,'triangleCentroid');assert.deepEqual(result.worst.originalUV,[1/3,1/3]);assert.equal(result.worst.pieceId,'cutting-triangle');assert.equal(result.interiorViolationsWithClearSupportVertices,1);assert.deepEqual(result.counts,{vertex:3,edgeMidpoint:3,triangleCentroid:1});assert.equal(result.limitations.completeTriangleSurfaceCertificate,false);assert.equal(JSON.stringify(snapshot),before);
+const ground=auditShortsSnapshot(snapshot,body,{groundYM:-.5});assert.equal(ground.ground.minimumVertexYM,-Math.sqrt(3));assert.equal(ground.ground.maximumPenetrationM,Math.sqrt(3)-.5);assert.equal(ground.groundCentreSurfacePassed,false);
+const invalid=structuredClone(snapshot);invalid.pieces[0].triangles[0][2]=999;assert.throws(()=>auditShortsSnapshot(invalid,body),/Invalid triangle/);
+const uncertainBody={closest(p){return {...body.closest(p),sideUncertain:true};}},unknown=auditShortsSnapshot(snapshot,uncertainBody,{groundYM:-3});assert.equal(unknown.sideUncertainCount,7);assert.equal(unknown.sampledBodyClearancePassed,false);assert.equal(unknown.maxSkinPenetrationM,0);assert.equal(unknown.uncertainExample.signedBodyDistanceM,null);assert.equal(unknown.uncertainExample.clearanceViolationM,null);assert.equal(JSON.stringify(snapshot),before);
+console.log('PASS audit detects face cut-through hidden by vertex-only samples, retains original UVs, reports ground minimum, rejects invalid topology and does not mutate snapshots');

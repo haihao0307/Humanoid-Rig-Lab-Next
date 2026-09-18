@@ -604,10 +604,16 @@ async function startupStage(stage,message){
 /*__SOURCE:body/CompactBinding.js__*/
 /*__SOURCE:body/CompactMuscles.js__*/
 /*__SOURCE:body/CompactHairRenderer.js__*/
-/*__SOURCE:body/ProceduralGrassSkirt.js__*/
 /*__SOURCE:body/LinenMaterial.js__*/
-/*__SOURCE:body/ProceduralLinenSkirt.js__*/
-/*__SOURCE:body/LinenSkirtControls.js__*/
+/*__SOURCE:clothing/ShortsPattern.js__*/
+/*__SOURCE:clothing/ShortsBody.js__*/
+/*__SOURCE:clothing/ShortsStitchDofs.js__*/
+/*__SOURCE:clothing/ShortsContinuousContact.js__*/
+/*__SOURCE:clothing/ShortsSurfaceContact.js__*/
+/*__SOURCE:clothing/ShortsTriangleBodyContact.js__*/
+/*__SOURCE:clothing/ShortsCloth.js__*/
+/*__SOURCE:clothing/ClothShorts.js__*/
+/*__SOURCE:clothing/ShortsControls.js__*/
 /*__SOURCE:body/FaceAnatomy.js__*/
 /*__SOURCE:body/EyeAnatomy.js__*/
 /*__SOURCE:body/CompactWorkbench.js__*/
@@ -648,14 +654,14 @@ if(reviewMode==='face'){
 }else{
  installNPCPopulation(window.HumanLab);
  await startupStage('population','正在从同一母体生成第二个人物');
- try{if(!runtimeQuery.has('linen'))await window.HumanLab.population.installMotherPair();}catch(error){logMessage('母体复制体未生成：'+error.message);}
- if(!runtimeQuery.has('linen'))await window.HumanLab.population.installReviewCast();
+ try{if(!runtimeQuery.has('linen')&&!runtimeQuery.has('shorts'))await window.HumanLab.population.installMotherPair();}catch(error){logMessage('母体复制体未生成：'+error.message);}
+ if(!runtimeQuery.has('linen')&&!runtimeQuery.has('shorts'))await window.HumanLab.population.installReviewCast();
 }
 try{human.characterTaskStatus=window.HumanLab.character.startOnSpawn();}catch(error){human.characterTaskStatus={started:false,error:error.message};logMessage('角色预设任务未开始：'+error.message);}
 let previous=performance.now(),lastPanel=0;needsRedraw=true;
 for(const name of ['click','change','input','pointermove','wheel'])document.addEventListener(name,()=>needsRedraw=true,{passive:true});
 window.addEventListener('resize',()=>needsRedraw=true);
-function advanceBodyWithoutHair(dt){if(agent.characterEditInProgress)return;const before=agent.time;agent.tick(dt);human.tissue.update(agent.time,agent.time-before,agent.held?.mass||0);}
+function advanceBodyWithoutHair(dt){if(agent.characterEditInProgress)return;advanceShortsSingleActor(window.HumanLab,dt);}
 function advanceBody(dt){if(window.HumanLab?.population){window.HumanLab.population.tick(dt);return;}const hair=window.HumanLab?.hair;if(hair?.demo)hair.tickDemo(dt);else advanceBodyWithoutHair(dt);if(hair){const hairDt=agent.paused&&!hair.inStudio()?0:dt;if(window.HumanLab.compact?.visible)window.HumanLab.compact.hair?.update(hairDt);else hair.update(hairDt);if(hair.dirty&&hair.enabled)needsRedraw=true;}}
 function loop(now){const dt=Math.max(0,(now-previous)/1000);previous=now;const loopStarted=performance.now();
  window.HumanLab.face?.tick(dt);
@@ -664,10 +670,12 @@ function loop(now){const dt=Math.max(0,(now-previous)/1000);previous=now;const l
  if(needsRedraw||(auto&&active)){renderFrame();needsRedraw=false}
  if(now-lastPanel>160){panel();lastPanel=now}window.HumanLab.population?.observation?.frame(dt,performance.now()-loopStarted);requestAnimationFrame(loop)}
 window.HumanLab.hair.restoreReviewCamera();
-installLinenSkirtControls(window.HumanLab);
+await startupStage('garment','正在缝合短裤布片');
+await window.HumanLab.compact.skirt.assemble(runtimeQuery.has('shortsSteps')?Math.max(0,Math.min(SHORTS_ASSEMBLY_STEP_LIMIT,Math.floor(Number(runtimeQuery.get('shortsSteps'))||0))):SHORTS_ASSEMBLY_STEP_LIMIT,()=>{const state=window.HumanLab.compact.skirt.simulation.sewingStage;$('loading').textContent='正在缝制 · 第 '+Math.min(state.index+1,state.stages.length)+' / '+state.stages.length+' 道工序';});
+installShortsControls(window.HumanLab);
 logMessage('R2 人体与同源骨架已连接。生活空间就绪。');panel();renderFrame();
-window.__humanStartup={status:'ready',stage:'ready',message:'身体已就绪'};
-$('loading').hidden=true;needsRedraw=false;requestAnimationFrame(loop);
+window.__humanStartup={status:'ready',stage:'ready',message:'身体预览已就绪',garmentStatus:window.HumanLab.compact.skirt.assemblyState};
+$('loading').hidden=true;needsRedraw=false;previous=performance.now();requestAnimationFrame(loop);
 if(reviewMode!=='face')scheduleCompactHair(window.HumanLab.population?.active||window.HumanLab);
 }catch(e){
  const error=String(e?.message||e);

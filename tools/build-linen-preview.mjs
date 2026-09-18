@@ -1,5 +1,10 @@
 import {writeFileSync} from 'node:fs';
-import {assemble} from './build-pure.mjs';
-const {body}=assemble();
-writeFileSync(new URL('../linen.html',import.meta.url),body.replace('<title>重建人物 R2 · 人体与训练场</title>','<title>人物亚麻裙 · 实时三维</title>'));
-console.log('Built linen.html from the same human runtime. Open linen.html?linen=1 through the local server.');
+import './build-shorts-preview.mjs';
+// Keep existing bookmarks without checking in a second copy of the runtime.
+const alias=`<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><title>布片服装入口</title>
+<script>const destination=new URL('shorts.html',location.href);destination.search=location.search;destination.searchParams.delete('linen');destination.searchParams.set('shorts','1');location.replace(destination.href);</script>
+<p><a href="shorts.html?shorts=1">打开布片短裤</a></p></html>
+`;
+writeFileSync(new URL('../linen.html',import.meta.url),alias);
+console.log('Built the small legacy linen preview entry.');

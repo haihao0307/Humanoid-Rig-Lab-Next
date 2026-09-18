@@ -159,6 +159,9 @@ class NPCPopulation {
    const data=await loadCompactSurface('preview',false,compactSourceRig(h),'surface',definition.character.appearance.hair,definition.character.shape);
    if(this.closed||this.lab.world.revision!==revision)throw Error('生成期间场景已变化，请重新生成 NPC');
    this.positionFor(h,position,null,staged);actor.compact=new CompactSurfaceRenderer(actor,data);
+   await actor.compact.skirt.assemble();
+   if(!actor.compact.skirt.assemblyReady)throw Error('新人物的短裤尚未完成缝制检查');
+   if(this.closed||this.lab.world.revision!==revision)throw Error('缝制期间场景已变化，请重新生成 NPC');
    if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};
    return actor;
   }catch(error){this.pendingIds.delete(id);actor.compact?.dispose();throw error;}

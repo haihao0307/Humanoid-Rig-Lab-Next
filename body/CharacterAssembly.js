@@ -35,6 +35,8 @@ async function prepareCharacterBody(lab,preset,previousDefinition){
   nextHuman.tissue.time=previousHuman.tissue.time;
   nextAgent.locomotion.resetFromPose();nextHuman.pose();nextAgent.saveSafe();
   nextHuman.reconstructionNeutral={rootPosition:[...nextHuman.root.p],frames:new Map(nextHuman.joints.map(j=>[j.id,frame(j.world.p,j.world.q)]))};
+  await nextSurface.skirt.assemble();
+  if(!nextSurface.skirt.assemblyReady)throw Error('新体型的短裤尚未完成缝制检查，保留当前人物');
   current();
   return {
    commit(){

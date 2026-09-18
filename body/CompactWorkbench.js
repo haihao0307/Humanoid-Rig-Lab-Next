@@ -265,11 +265,11 @@ class CompactSurfaceRenderer{
     }
     stage.chunks.sort((a,b)=>Number(['FJ1289','FJ1340'].includes(a.name))-Number(['FJ1289','FJ1340'].includes(b.name)));
     if(data.hair)stage.hair=new CompactHairRenderer(this,data.hair);
-    stage.skirt=new ProceduralLinenSkirt(this,data.meshes);stage.geometryBytes+=stage.skirt.geometryBytes;
+    stage.skirt=this.skirt||new ClothShorts(this,data.meshes);stage.geometryBytes+=stage.skirt.geometryBytes;
     stage.supportProbes=data.supportProbes;
     stage.report={...data.report,eyeAnatomy:stage.eyeAnatomy,faceAnatomy:stage.faceAnatomy,vertices:data.report.vertices-replacedSclera.reduce((sum,m)=>sum+m.vertices,0)+faceTissue.meshes.reduce((sum,m)=>sum+m.vertices,0)+eyeTissue.meshes.reduce((sum,m)=>sum+m.vertices,0),triangles:data.report.triangles-replacedSclera.reduce((sum,m)=>sum+m.triangles,0)+faceTissue.report.triangles+eyeTissue.report.triangles,...(!data.hair&&this.hair?{hair:this.hair.report,hairEnabled:true}:{}),binding:{...field.report,sourceRegionsPreserved:true,groups:stage.bindingGroups,joints:this.lab.human.joints.length,maximumWeightError:stage.maximumWeightError,calibrated:false}};
     this.checkUpload();
-    }catch(error){this.releaseChunks(stage.chunks);stage.hair?.dispose();stage.skirt?.dispose();throw error;}finally{gl.bindVertexArray(null);gl.bindBuffer(gl.ARRAY_BUFFER,null);}
+    }catch(error){this.releaseChunks(stage.chunks);stage.hair?.dispose();if(stage.skirt!==this.skirt)stage.skirt?.dispose();throw error;}finally{gl.bindVertexArray(null);gl.bindBuffer(gl.ARRAY_BUFFER,null);}
     const oldChunks=this.chunks,oldHair=this.hair,oldSkirt=this.skirt;this.skirt=stage.skirt;
     this.chunks=stage.chunks;this.eyeSocketRadii=stage.eyeSocketRadii;this.canthusDepths=stage.canthusDepths;this.geometryBytes=stage.geometryBytes;this.maximumWeightError=stage.maximumWeightError;this.bindingGroups=stage.bindingGroups;this.supportProbes=stage.supportProbes;
     if(stage.hair)this.hair=stage.hair;
@@ -277,7 +277,7 @@ class CompactSurfaceRenderer{
     this.report=stage.report;this.quality=data.report.quality;this.bindingMilliseconds=data.report.bindingMilliseconds;this.uploadMilliseconds=performance.now()-started;
     if(this.renderer.compact===this||this.renderer.compacts?.includes(this))this.renderer.lastItems=[];
     this.faceSampling=stage.faceSampling;this.lab.face?.refresh();
-    this.releaseChunks(oldChunks);if(stage.hair)oldHair?.dispose();oldSkirt?.dispose();
+    this.releaseChunks(oldChunks);if(stage.hair)oldHair?.dispose();if(oldSkirt!==this.skirt)oldSkirt?.dispose();
   }
   attachHair(data){
     if(this.disposed)throw Error('人物显示资源已释放');
