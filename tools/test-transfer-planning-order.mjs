@@ -85,4 +85,17 @@ results.push({scenario:'suspended-world-change-rejected'});
 reset('clear');const cancelled=makeWorld(),cancel=api.planObjectTransferSteps(cancelled,actor,{type:'carry'},object,target,profile,capacity);
 cancel.next();cancel.return();assert.equal(cancel.next().done,true);assert.equal(api.active(cancelled),false);assert.equal(counts.pickup+counts.placement,0);
 results.push({scenario:'suspended-cancellation'});
+// A box pickup should face its delivery, even when the actor approaches from
+// the opposite side. A blocked face remains only a rejected candidate.
+reset('clear');const oldActor=[...actor.pos],oldObject=[...object.p],oldTarget=[...target.p];
+actor.pos=[.46,0,2.91];object.p=[-1,.3,4];target.p=[9,0,0];
+const aligned=run();assert(aligned.approachDirection[0]>.999);assert(aligned.approach.at(-1)[0]<object.p[0]);
+const obstructed=makeWorld(),basePath=obstructed.path;
+obstructed.path=(start,end,r)=>{if(r===profile.bodyRadiusM&&end[0]<object.p[0]-.3&&Math.abs(end[2]-object.p[2])<.01)throw Error('west pickup face blocked');return basePath(start,end,r);};
+const alternateFace=run(obstructed);assert(alternateFace.rejectedCandidates>=6);assert(alternateFace.approachDirection[0]<.999);
+const rotatedYaw=.37;object.q=[0,Math.sin(rotatedYaw/2),0,Math.cos(rotatedYaw/2)];
+const rotated=run();assert(Math.abs(rotated.approachDirection[0]-Math.cos(rotatedYaw))<1e-9);assert(Math.abs(rotated.approachDirection[2]+Math.sin(rotatedYaw))<1e-9);
+object.shape='cylinder';const round=run();const norm=Math.hypot(object.p[0]-actor.pos[0],object.p[2]-actor.pos[2]);assert(Math.abs(round.approachDirection[0]-(object.p[0]-actor.pos[0])/norm)<1e-9);
+object.shape='box';object.q=[0,0,0,1];actor.pos=oldActor;object.p=oldObject;target.p=oldTarget;
+results.push({scenario:'box-departure-faces-and-obstructed-fallback',rotatedBox:true,roundObjectUnchanged:true});
 console.log(JSON.stringify({cases:results.length,source:'production planObjectTransfer; isolated geometric/strength fixtures',results},null,2));

@@ -7,6 +7,7 @@ on:
       - 'body/CrowdIntersectionCoordinator.js'
       - 'body/NaturalLocomotion.js'
       - 'control/NPCPopulation.js'
+      - 'control/PlanForecast.js'
       - 'world/GridNavigation.js'
       - 'world/PhysicsWorld.js'
       - 'ui/NPCPopulationControls.js'
@@ -21,6 +22,8 @@ on:
       - 'tools/test-task-crowd-browser.mjs'
       - 'tools/test-task-mixed-browser.mjs'
       - 'tools/test-task-resource-browser.mjs'
+      - 'tools/test-transfer-planning-order.mjs'
+      - 'tools/test-semantic-preflight-steps.mjs'
       - '.github/workflows/task-integration-file-check.yml'
   workflow_dispatch:
 
@@ -58,6 +61,8 @@ jobs:
           node tools/test-npc-target-reservations.mjs
           node tools/test-npc-resource-circulation.mjs
           node tools/test-npc-resource-progress.mjs
+          node tools/test-transfer-planning-order.mjs
+          node tools/test-semantic-preflight-steps.mjs
       - name: Held task lifecycle and frozen preflight with real Cannon steps (synthetic grasp)
         run: |
           node tools/test-npc-held-lifecycle.mjs

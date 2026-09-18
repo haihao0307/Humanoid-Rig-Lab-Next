@@ -32,7 +32,19 @@ try{
   const accepted=[];for(const task of tasks)for(const command of task.commands)accepted.push(pop.dispatch(command,{targets:[task.id],mode:'append'})[0]);lab.setAuto(false);
   lab.resourceProbe={actors,tasks,frames:0,maxHeld:0,owners:[],lastOwner:undefined,violations:[],phases:[],lastPhases:{},paths:Object.fromEntries(tasks.map(t=>[t.id,0])),lastPositions:Object.fromEntries(actors.slice(0,2).map(r=>[r.id,[...r.agent.pos]]))};
   lab.resourceProbe.preflightChanges=[];
+  lab.resourceProbe.contactSamples=[];
   for(const row of actors.slice(0,2)){
+   const capture=a=>({id:row.id,frame:lab.resourceProbe.frames,phase:a.phase,position:[...a.pos],yaw:a.yaw,shape:pop.definitionFor(row).character.shape,
+    route:structuredClone(a.route),routeIndex:a.routeIndex,feet:structuredClone(a.locomotion.engine.state.feet),
+    approachYaw:a.skill?.approachYaw,finalYaw:a.skill?.finalYaw,transferEnd:a.skill?.transferEnd,
+    carryConfiguration:structuredClone(a.skill?.carryConfiguration),grips:structuredClone(a.grips),
+    object:a.skill?.o&&Object.fromEntries(['id','shape','p','q','yaw','w','h','d','r','mass','friction'].map(k=>[k,structuredClone(a.skill.o[k])]))});
+   const start=row.agent.startPreflight,fail=row.agent.fail;
+   row.agent.startPreflight=function(kind,factory,commit){
+    if(['reach','lower'].includes(kind)){const samples=lab.resourceProbe.contactSamples;samples.push({...capture(this),kind});if(samples.length>16)samples.shift();}
+    return start.call(this,kind,factory,commit);
+   };
+   row.agent.fail=function(message){lab.resourceProbe.failedContact={...capture(this),message};return fail.call(this,message);};
    const a=row.agent,read=a.preflightInput;let previous=null,kind=null;
    a.preflightInput=function(...args){
     const value=read.apply(this,args),key=this.phase+':'+this.preflight?.kind+':'+!!args[0];
@@ -71,6 +83,7 @@ try{
   const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,pop=lab.population,t=lab.resourceProbe;
   return{frames:t.frames,maxHeld:t.maxHeld,owners:t.owners,violations:t.violations,phases:t.phases,preflightChanges:t.preflightChanges,paths:t.paths,claims:[...pop.claims],stationClaims:[...pop.stationClaims],physicsOwner:pop.physicsOwner,actors:t.tasks.map(task=>{const r=pop.get(task.id),o=lab.world.get(task.object);return{id:r.id,object:task.object,insideHome:lab.world.inside(o,lab.world.get(task.home)),objectPhysics:lab.world.physics.objectState(o.id),evidence:r.agent.evidence,stats:r.agent.stats,resource:r.resource,logs:r.logs.slice(0,16),route:r.agent.route,traffic:r.agent.locomotion.traffic};})};
  });
+ report.contacts=await page.evaluate(()=>{const t=document.querySelector('#bodyFrame').contentWindow.HumanLab.resourceProbe;return{samples:t.contactSamples,failure:t.failedContact};});
  await writeFile(artifact,JSON.stringify(report,null,2));
  assert.equal(report.progress.done,true,'both carriers must complete both trips');assert.equal(report.result.maxHeld,1);assert.equal(report.result.violations.length,0);
  assert.deepEqual(report.result.owners.filter(row=>row.owner).map(row=>row.owner),[...report.setup.tasks,...report.setup.tasks].map(row=>row.id),'each submitted carrier must get a turn before the other reacquires');
