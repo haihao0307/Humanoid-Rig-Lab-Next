@@ -5,27 +5,72 @@
   "description": "First-party fully parameterized domestic-cat morphology and material source of truth.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "meta", "global", "torso", "neck", "head", "forelimb", "hindlimb", "paws", "tail", "coat", "material"],
+  "required": [
+    "schema",
+    "meta",
+    "global",
+    "torso",
+    "neck",
+    "head",
+    "forelimb",
+    "hindlimb",
+    "paws",
+    "tail",
+    "coat",
+    "material"
+  ],
   "properties": {
-    "schema": { "const": "cat_kaopu/cat_dna@1.0" },
+    "schema": {
+      "const": "cat_kaopu/cat_dna@1.0"
+    },
     "meta": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "label", "revision", "seed", "units", "coordinateSystem"],
+      "required": [
+        "id",
+        "label",
+        "revision",
+        "seed",
+        "units",
+        "coordinateSystem"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "label": { "type": "string", "minLength": 1 },
-        "revision": { "type": "integer", "minimum": 1 },
-        "seed": { "type": "integer" },
-        "units": { "const": "meter" },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "units": {
+          "const": "meter"
+        },
         "coordinateSystem": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["forward", "left", "up"],
+          "required": [
+            "forward",
+            "left",
+            "up"
+          ],
           "properties": {
-            "forward": { "const": "+X" },
-            "left": { "const": "+Y" },
-            "up": { "const": "+Z" }
+            "forward": {
+              "const": "+X"
+            },
+            "left": {
+              "const": "+Y"
+            },
+            "up": {
+              "const": "+Z"
+            }
           }
         }
       }
@@ -33,160 +78,586 @@
     "global": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["bodyLength", "shoulderHeight", "hipHeight", "frontStanceWidth", "hindStanceWidth", "overallBulk"],
+      "required": [
+        "bodyLength",
+        "shoulderHeight",
+        "hipHeight",
+        "frontStanceWidth",
+        "hindStanceWidth",
+        "overallBulk"
+      ],
       "properties": {
-        "bodyLength": { "type": "number", "minimum": 0.62, "maximum": 1.02 },
-        "shoulderHeight": { "type": "number", "minimum": 0.28, "maximum": 0.48 },
-        "hipHeight": { "type": "number", "minimum": 0.29, "maximum": 0.50 },
-        "frontStanceWidth": { "type": "number", "minimum": 0.10, "maximum": 0.20 },
-        "hindStanceWidth": { "type": "number", "minimum": 0.11, "maximum": 0.22 },
-        "overallBulk": { "type": "number", "minimum": 0.78, "maximum": 1.28 }
+        "bodyLength": {
+          "type": "number",
+          "minimum": 0.4,
+          "maximum": 0.68
+        },
+        "shoulderHeight": {
+          "type": "number",
+          "minimum": 0.2,
+          "maximum": 0.34
+        },
+        "hipHeight": {
+          "type": "number",
+          "minimum": 0.21,
+          "maximum": 0.36
+        },
+        "frontStanceWidth": {
+          "type": "number",
+          "minimum": 0.075,
+          "maximum": 0.16
+        },
+        "hindStanceWidth": {
+          "type": "number",
+          "minimum": 0.085,
+          "maximum": 0.18
+        },
+        "overallBulk": {
+          "type": "number",
+          "minimum": 0.78,
+          "maximum": 1.28
+        }
       }
     },
     "torso": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pelvisLength", "lumbarLength", "thoraxLength", "pelvisWidth", "lumbarWidth", "thoraxWidth", "pelvisDepth", "lumbarDepth", "thoraxDepth", "abdomenTuck", "dorsalArc", "ventralSag"],
+      "required": [
+        "pelvisLength",
+        "lumbarLength",
+        "thoraxLength",
+        "pelvisWidth",
+        "lumbarWidth",
+        "thoraxWidth",
+        "pelvisDepth",
+        "lumbarDepth",
+        "thoraxDepth",
+        "abdomenTuck",
+        "dorsalArc",
+        "ventralSag"
+      ],
       "properties": {
-        "pelvisLength": { "type": "number", "minimum": 0.14, "maximum": 0.28 },
-        "lumbarLength": { "type": "number", "minimum": 0.12, "maximum": 0.26 },
-        "thoraxLength": { "type": "number", "minimum": 0.22, "maximum": 0.38 },
-        "pelvisWidth": { "type": "number", "minimum": 0.13, "maximum": 0.24 },
-        "lumbarWidth": { "type": "number", "minimum": 0.095, "maximum": 0.18 },
-        "thoraxWidth": { "type": "number", "minimum": 0.15, "maximum": 0.28 },
-        "pelvisDepth": { "type": "number", "minimum": 0.13, "maximum": 0.24 },
-        "lumbarDepth": { "type": "number", "minimum": 0.11, "maximum": 0.21 },
-        "thoraxDepth": { "type": "number", "minimum": 0.17, "maximum": 0.30 },
-        "abdomenTuck": { "type": "number", "minimum": 0.0, "maximum": 0.075 },
-        "dorsalArc": { "type": "number", "minimum": -0.015, "maximum": 0.045 },
-        "ventralSag": { "type": "number", "minimum": 0.0, "maximum": 0.035 }
+        "pelvisLength": {
+          "type": "number",
+          "minimum": 0.08,
+          "maximum": 0.17
+        },
+        "lumbarLength": {
+          "type": "number",
+          "minimum": 0.07,
+          "maximum": 0.16
+        },
+        "thoraxLength": {
+          "type": "number",
+          "minimum": 0.12,
+          "maximum": 0.23
+        },
+        "pelvisWidth": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 0.18
+        },
+        "lumbarWidth": {
+          "type": "number",
+          "minimum": 0.075,
+          "maximum": 0.14
+        },
+        "thoraxWidth": {
+          "type": "number",
+          "minimum": 0.11,
+          "maximum": 0.2
+        },
+        "pelvisDepth": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 0.2
+        },
+        "lumbarDepth": {
+          "type": "number",
+          "minimum": 0.085,
+          "maximum": 0.16
+        },
+        "thoraxDepth": {
+          "type": "number",
+          "minimum": 0.13,
+          "maximum": 0.23
+        },
+        "abdomenTuck": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 0.075
+        },
+        "dorsalArc": {
+          "type": "number",
+          "minimum": -0.015,
+          "maximum": 0.045
+        },
+        "ventralSag": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 0.035
+        }
       }
     },
     "neck": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["length", "baseWidth", "headWidth", "baseDepth", "headDepth", "pitchDeg"],
+      "required": [
+        "length",
+        "baseWidth",
+        "headWidth",
+        "baseDepth",
+        "headDepth",
+        "pitchDeg"
+      ],
       "properties": {
-        "length": { "type": "number", "minimum": 0.11, "maximum": 0.25 },
-        "baseWidth": { "type": "number", "minimum": 0.10, "maximum": 0.20 },
-        "headWidth": { "type": "number", "minimum": 0.08, "maximum": 0.16 },
-        "baseDepth": { "type": "number", "minimum": 0.12, "maximum": 0.23 },
-        "headDepth": { "type": "number", "minimum": 0.09, "maximum": 0.18 },
-        "pitchDeg": { "type": "number", "minimum": 5, "maximum": 35 }
+        "length": {
+          "type": "number",
+          "minimum": 0.075,
+          "maximum": 0.17
+        },
+        "baseWidth": {
+          "type": "number",
+          "minimum": 0.085,
+          "maximum": 0.15
+        },
+        "headWidth": {
+          "type": "number",
+          "minimum": 0.065,
+          "maximum": 0.12
+        },
+        "baseDepth": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 0.18
+        },
+        "headDepth": {
+          "type": "number",
+          "minimum": 0.075,
+          "maximum": 0.13
+        },
+        "pitchDeg": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 35
+        }
       }
     },
     "head": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["cranialLength", "width", "height", "muzzleLength", "muzzleWidth", "muzzleHeight", "jawDepth", "eyeSpacing", "eyeHeight", "earHeight", "earWidth", "earTiltDeg"],
+      "required": [
+        "cranialLength",
+        "width",
+        "height",
+        "muzzleLength",
+        "muzzleWidth",
+        "muzzleHeight",
+        "jawDepth",
+        "eyeSpacing",
+        "eyeHeight",
+        "earHeight",
+        "earWidth",
+        "earTiltDeg"
+      ],
       "properties": {
-        "cranialLength": { "type": "number", "minimum": 0.13, "maximum": 0.23 },
-        "width": { "type": "number", "minimum": 0.12, "maximum": 0.21 },
-        "height": { "type": "number", "minimum": 0.12, "maximum": 0.21 },
-        "muzzleLength": { "type": "number", "minimum": 0.055, "maximum": 0.13 },
-        "muzzleWidth": { "type": "number", "minimum": 0.07, "maximum": 0.14 },
-        "muzzleHeight": { "type": "number", "minimum": 0.045, "maximum": 0.095 },
-        "jawDepth": { "type": "number", "minimum": 0.03, "maximum": 0.075 },
-        "eyeSpacing": { "type": "number", "minimum": 0.055, "maximum": 0.115 },
-        "eyeHeight": { "type": "number", "minimum": 0.022, "maximum": 0.050 },
-        "earHeight": { "type": "number", "minimum": 0.075, "maximum": 0.17 },
-        "earWidth": { "type": "number", "minimum": 0.045, "maximum": 0.095 },
-        "earTiltDeg": { "type": "number", "minimum": -5, "maximum": 24 }
+        "cranialLength": {
+          "type": "number",
+          "minimum": 0.075,
+          "maximum": 0.14
+        },
+        "width": {
+          "type": "number",
+          "minimum": 0.075,
+          "maximum": 0.14
+        },
+        "height": {
+          "type": "number",
+          "minimum": 0.075,
+          "maximum": 0.14
+        },
+        "muzzleLength": {
+          "type": "number",
+          "minimum": 0.015,
+          "maximum": 0.06
+        },
+        "muzzleWidth": {
+          "type": "number",
+          "minimum": 0.04,
+          "maximum": 0.08
+        },
+        "muzzleHeight": {
+          "type": "number",
+          "minimum": 0.03,
+          "maximum": 0.06
+        },
+        "jawDepth": {
+          "type": "number",
+          "minimum": 0.025,
+          "maximum": 0.055
+        },
+        "eyeSpacing": {
+          "type": "number",
+          "minimum": 0.038,
+          "maximum": 0.075
+        },
+        "eyeHeight": {
+          "type": "number",
+          "minimum": 0.016,
+          "maximum": 0.032
+        },
+        "earHeight": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 0.105
+        },
+        "earWidth": {
+          "type": "number",
+          "minimum": 0.032,
+          "maximum": 0.065
+        },
+        "earTiltDeg": {
+          "type": "number",
+          "minimum": -5,
+          "maximum": 24
+        }
       }
     },
     "forelimb": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["shoulderLongitudinal", "scapulaLength", "humerusLength", "radiusLength", "metacarpalLength", "upperRadius", "lowerRadius", "wristRadius", "humerusBackDeg", "radiusForwardDeg", "metacarpalForwardDeg"],
+      "required": [
+        "shoulderLongitudinal",
+        "scapulaLength",
+        "humerusLength",
+        "radiusLength",
+        "metacarpalLength",
+        "upperRadius",
+        "lowerRadius",
+        "wristRadius",
+        "humerusBackDeg",
+        "radiusForwardDeg",
+        "metacarpalForwardDeg"
+      ],
       "properties": {
-        "shoulderLongitudinal": { "type": "number" },
-        "scapulaLength": { "type": "number", "minimum": 0.09, "maximum": 0.17 },
-        "humerusLength": { "type": "number", "minimum": 0.10, "maximum": 0.18 },
-        "radiusLength": { "type": "number", "minimum": 0.095, "maximum": 0.18 },
-        "metacarpalLength": { "type": "number", "minimum": 0.045, "maximum": 0.095 },
-        "upperRadius": { "type": "number", "minimum": 0.024, "maximum": 0.050 },
-        "lowerRadius": { "type": "number", "minimum": 0.017, "maximum": 0.038 },
-        "wristRadius": { "type": "number", "minimum": 0.011, "maximum": 0.026 },
-        "humerusBackDeg": { "type": "number", "minimum": 2, "maximum": 28 },
-        "radiusForwardDeg": { "type": "number", "minimum": 0, "maximum": 24 },
-        "metacarpalForwardDeg": { "type": "number", "minimum": 18, "maximum": 48 }
+        "shoulderLongitudinal": {
+          "type": "number"
+        },
+        "scapulaLength": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 0.1
+        },
+        "humerusLength": {
+          "type": "number",
+          "minimum": 0.075,
+          "maximum": 0.125
+        },
+        "radiusLength": {
+          "type": "number",
+          "minimum": 0.07,
+          "maximum": 0.12
+        },
+        "metacarpalLength": {
+          "type": "number",
+          "minimum": 0.024,
+          "maximum": 0.055
+        },
+        "upperRadius": {
+          "type": "number",
+          "minimum": 0.018,
+          "maximum": 0.038
+        },
+        "lowerRadius": {
+          "type": "number",
+          "minimum": 0.012,
+          "maximum": 0.028
+        },
+        "wristRadius": {
+          "type": "number",
+          "minimum": 0.008,
+          "maximum": 0.02
+        },
+        "humerusBackDeg": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 34
+        },
+        "radiusForwardDeg": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20
+        },
+        "metacarpalForwardDeg": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 30
+        }
       }
     },
     "hindlimb": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["hipLongitudinal", "femurLength", "tibiaLength", "tarsusLength", "upperRadius", "lowerRadius", "hockRadius", "femurForwardDeg", "tibiaBackDeg", "tarsusForwardDeg"],
+      "required": [
+        "hipLongitudinal",
+        "femurLength",
+        "tibiaLength",
+        "tarsusLength",
+        "upperRadius",
+        "lowerRadius",
+        "hockRadius",
+        "femurForwardDeg",
+        "tibiaBackDeg",
+        "tarsusForwardDeg"
+      ],
       "properties": {
-        "hipLongitudinal": { "type": "number" },
-        "femurLength": { "type": "number", "minimum": 0.12, "maximum": 0.21 },
-        "tibiaLength": { "type": "number", "minimum": 0.12, "maximum": 0.22 },
-        "tarsusLength": { "type": "number", "minimum": 0.075, "maximum": 0.14 },
-        "upperRadius": { "type": "number", "minimum": 0.034, "maximum": 0.065 },
-        "lowerRadius": { "type": "number", "minimum": 0.022, "maximum": 0.047 },
-        "hockRadius": { "type": "number", "minimum": 0.013, "maximum": 0.030 },
-        "femurForwardDeg": { "type": "number", "minimum": 18, "maximum": 50 },
-        "tibiaBackDeg": { "type": "number", "minimum": 26, "maximum": 60 },
-        "tarsusForwardDeg": { "type": "number", "minimum": 38, "maximum": 68 }
+        "hipLongitudinal": {
+          "type": "number"
+        },
+        "femurLength": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 0.165
+        },
+        "tibiaLength": {
+          "type": "number",
+          "minimum": 0.09,
+          "maximum": 0.15
+        },
+        "tarsusLength": {
+          "type": "number",
+          "minimum": 0.06,
+          "maximum": 0.115
+        },
+        "upperRadius": {
+          "type": "number",
+          "minimum": 0.026,
+          "maximum": 0.05
+        },
+        "lowerRadius": {
+          "type": "number",
+          "minimum": 0.018,
+          "maximum": 0.036
+        },
+        "hockRadius": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 0.023
+        },
+        "femurForwardDeg": {
+          "type": "number",
+          "minimum": 18,
+          "maximum": 46
+        },
+        "tibiaBackDeg": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 38
+        },
+        "tarsusForwardDeg": {
+          "type": "number",
+          "minimum": 30,
+          "maximum": 60
+        }
       }
     },
     "paws": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["foreLength", "foreWidth", "hindLength", "hindWidth", "height", "toeSplay"],
+      "required": [
+        "foreLength",
+        "foreWidth",
+        "hindLength",
+        "hindWidth",
+        "height",
+        "toeSplay"
+      ],
       "properties": {
-        "foreLength": { "type": "number", "minimum": 0.050, "maximum": 0.105 },
-        "foreWidth": { "type": "number", "minimum": 0.030, "maximum": 0.065 },
-        "hindLength": { "type": "number", "minimum": 0.060, "maximum": 0.120 },
-        "hindWidth": { "type": "number", "minimum": 0.032, "maximum": 0.070 },
-        "height": { "type": "number", "minimum": 0.014, "maximum": 0.034 },
-        "toeSplay": { "type": "number", "minimum": 0.0, "maximum": 0.025 }
+        "foreLength": {
+          "type": "number",
+          "minimum": 0.03,
+          "maximum": 0.065
+        },
+        "foreWidth": {
+          "type": "number",
+          "minimum": 0.022,
+          "maximum": 0.05
+        },
+        "hindLength": {
+          "type": "number",
+          "minimum": 0.032,
+          "maximum": 0.072
+        },
+        "hindWidth": {
+          "type": "number",
+          "minimum": 0.024,
+          "maximum": 0.052
+        },
+        "height": {
+          "type": "number",
+          "minimum": 0.012,
+          "maximum": 0.026
+        },
+        "toeSplay": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 0.025
+        }
       }
     },
     "tail": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["length", "baseRadius", "tipRadius", "lift", "curl", "lateral", "segments"],
+      "required": [
+        "length",
+        "baseRadius",
+        "tipRadius",
+        "lift",
+        "curl",
+        "lateral",
+        "segments"
+      ],
       "properties": {
-        "length": { "type": "number", "minimum": 0.42, "maximum": 0.90 },
-        "baseRadius": { "type": "number", "minimum": 0.024, "maximum": 0.050 },
-        "tipRadius": { "type": "number", "minimum": 0.006, "maximum": 0.018 },
-        "lift": { "type": "number", "minimum": -0.04, "maximum": 0.20 },
-        "curl": { "type": "number", "minimum": -0.45, "maximum": 0.75 },
-        "lateral": { "type": "number", "minimum": -0.12, "maximum": 0.12 },
-        "segments": { "type": "integer", "minimum": 6, "maximum": 18 }
+        "length": {
+          "type": "number",
+          "minimum": 0.22,
+          "maximum": 0.42
+        },
+        "baseRadius": {
+          "type": "number",
+          "minimum": 0.017,
+          "maximum": 0.034
+        },
+        "tipRadius": {
+          "type": "number",
+          "minimum": 0.004,
+          "maximum": 0.013
+        },
+        "lift": {
+          "type": "number",
+          "minimum": -0.04,
+          "maximum": 0.2
+        },
+        "curl": {
+          "type": "number",
+          "minimum": -0.45,
+          "maximum": 0.75
+        },
+        "lateral": {
+          "type": "number",
+          "minimum": -0.12,
+          "maximum": 0.12
+        },
+        "segments": {
+          "type": "integer",
+          "minimum": 6,
+          "maximum": 18
+        }
       }
     },
     "coat": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["baseColor", "stripeColor", "bellyColor", "warmColor", "stripeFrequency", "stripeContrast", "dorsalDarkness", "legBands", "tailBands", "roughness"],
+      "required": [
+        "baseColor",
+        "stripeColor",
+        "bellyColor",
+        "warmColor",
+        "stripeFrequency",
+        "stripeContrast",
+        "dorsalDarkness",
+        "legBands",
+        "tailBands",
+        "roughness"
+      ],
       "properties": {
-        "baseColor": { "$ref": "#/$defs/hexColor" },
-        "stripeColor": { "$ref": "#/$defs/hexColor" },
-        "bellyColor": { "$ref": "#/$defs/hexColor" },
-        "warmColor": { "$ref": "#/$defs/hexColor" },
-        "stripeFrequency": { "type": "number", "minimum": 5, "maximum": 20 },
-        "stripeContrast": { "type": "number", "minimum": 0.15, "maximum": 0.95 },
-        "dorsalDarkness": { "type": "number", "minimum": 0.05, "maximum": 0.80 },
-        "legBands": { "type": "number", "minimum": 3, "maximum": 12 },
-        "tailBands": { "type": "number", "minimum": 5, "maximum": 18 },
-        "roughness": { "type": "number", "minimum": 0.55, "maximum": 0.98 }
+        "baseColor": {
+          "$ref": "#/$defs/hexColor"
+        },
+        "stripeColor": {
+          "$ref": "#/$defs/hexColor"
+        },
+        "bellyColor": {
+          "$ref": "#/$defs/hexColor"
+        },
+        "warmColor": {
+          "$ref": "#/$defs/hexColor"
+        },
+        "stripeFrequency": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 20
+        },
+        "stripeContrast": {
+          "type": "number",
+          "minimum": 0.15,
+          "maximum": 0.95
+        },
+        "dorsalDarkness": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 0.8
+        },
+        "legBands": {
+          "type": "number",
+          "minimum": 3,
+          "maximum": 12
+        },
+        "tailBands": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 18
+        },
+        "roughness": {
+          "type": "number",
+          "minimum": 0.55,
+          "maximum": 0.98
+        }
       }
     },
     "material": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["shortHairAmplitude", "shortHairFrequency", "rimSoftness", "noseRoughness", "eyeRoughness"],
+      "required": [
+        "shortHairAmplitude",
+        "shortHairFrequency",
+        "rimSoftness",
+        "noseRoughness",
+        "eyeRoughness"
+      ],
       "properties": {
-        "shortHairAmplitude": { "type": "number", "minimum": 0.0, "maximum": 0.002 },
-        "shortHairFrequency": { "type": "number", "minimum": 18, "maximum": 90 },
-        "rimSoftness": { "type": "number", "minimum": 0, "maximum": 1 },
-        "noseRoughness": { "type": "number", "minimum": 0, "maximum": 1 },
-        "eyeRoughness": { "type": "number", "minimum": 0, "maximum": 1 }
+        "shortHairAmplitude": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 0.002
+        },
+        "shortHairFrequency": {
+          "type": "number",
+          "minimum": 18,
+          "maximum": 90
+        },
+        "rimSoftness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "noseRoughness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "eyeRoughness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
       }
     }
   },
   "$defs": {
-    "hexColor": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+    "hexColor": {
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
+    }
   }
 }

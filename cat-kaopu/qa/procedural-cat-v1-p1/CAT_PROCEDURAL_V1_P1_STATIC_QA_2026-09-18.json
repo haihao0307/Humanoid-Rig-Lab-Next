@@ -1,0 +1,114 @@
+{
+  "schema": "cat_kaopu/procedural_cat_p1_static_qa@1.0",
+  "buildId": "cat-procedural-body-v1-p1-calibration-20260918",
+  "valid": true,
+  "calibrationProfile": "cat-procedural-body-v1-p1-calibration-20260918",
+  "dnaHash": "fnv1a32:7a2f7654",
+  "parameterCount": 75,
+  "evidenceSources": [
+    {
+      "id": "paton-2024-body-size",
+      "doi": "10.1002/ece3.11612",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38952652/"
+    },
+    {
+      "id": "rahmati-2025-forelimb",
+      "doi": "10.1113/JP287448",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11275737/"
+    },
+    {
+      "id": "day-jayne-2007-felid-limbs",
+      "doi": "10.1242/jeb.02703",
+      "url": "https://journals.biologists.com/jeb/article/210/4/642/17244/Interspecific-scaling-of-the-morphology-and"
+    },
+    {
+      "id": "ramos-2021-skull-ct",
+      "doi": "10.3390/vetsci8080161",
+      "url": "https://www.mdpi.com/2306-7381/8/8/161"
+    },
+    {
+      "id": "fonseca-2017-femur",
+      "doi": "10.1590/1678-4162-9583",
+      "url": "https://doaj.org/article/458e16e0a5eb437fbc136ce826db37c7"
+    },
+    {
+      "id": "pantangco-2026-tibia",
+      "doi": "10.1177/1098612X261433059",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13153514/"
+    },
+    {
+      "id": "moseby-2020-feral-size",
+      "doi": "10.3390/ani10040707",
+      "url": "https://www.mdpi.com/2076-2615/10/4/707"
+    }
+  ],
+  "evidenceClassification": {
+    "directlyMeasured": [
+      "global.bodyLength",
+      "global.shoulderHeight",
+      "forelimb.scapulaLength",
+      "forelimb.humerusLength",
+      "forelimb.radiusLength",
+      "forelimb.metacarpalLength",
+      "hindlimb.femurLength",
+      "hindlimb.tibiaLength"
+    ],
+    "ratioDerived": [
+      "global.hipHeight",
+      "hindlimb.tarsusLength",
+      "paws.foreLength",
+      "paws.hindLength"
+    ],
+    "anatomicallyConstrainedCandidate": [
+      "torso.*",
+      "neck.*",
+      "head.width",
+      "head.height",
+      "head.muzzle*",
+      "tail.*",
+      "limb segment radii",
+      "neutral joint angles"
+    ],
+    "notYetAuthoritative": [
+      "soft-tissue cross-sectional widths and depths",
+      "paw-pad and toe topology",
+      "tail soft-tissue profile",
+      "coat stripe placement"
+    ]
+  },
+  "measuredChecks": {
+    "bodyLengthM": 0.475,
+    "shoulderHeightM": 0.2525,
+    "scapulaLengthM": 0.0713,
+    "humerusLengthM": 0.0995,
+    "radiusLengthM": 0.0917,
+    "metacarpalLengthM": 0.0333,
+    "femurLengthM": 0.1315,
+    "tibiaLengthM": 0.11161
+  },
+  "generatedChecks": {
+    "noseToTailRootM": 0.48488614327518054,
+    "tailLengthM": 0.3,
+    "thoraxLumbarRatio": 1.526315789473684,
+    "pelvisLumbarRatio": 1.4210526315789473,
+    "sectionCount": 7,
+    "tailPointCount": 11,
+    "pawGroundZ": {
+      "foreLeft": 0,
+      "foreRight": 0,
+      "hindLeft": 0,
+      "hindRight": 0
+    },
+    "connectedAuthoringFieldExpected": true,
+    "externalAnimalMeshes": 0,
+    "externalImageTextures": 0
+  },
+  "acceptance": {
+    "calibrationTechnical": true,
+    "visualAcceptance": false,
+    "stableTopology": false,
+    "bindAcceptance": false,
+    "motionAcceptance": false,
+    "productionReady": false
+  }
+}

@@ -1,6 +1,6 @@
 {
   "schema": "cat_kaopu/procedural_cat_contract@1.0",
-  "buildId": "cat-procedural-body-v1-p0-20260917",
+  "buildId": "cat-procedural-body-v1-p1-calibration-20260918",
   "status": "active-development",
   "goal": "build our own fully parameterized and procedural domestic-cat body, material, bind reference and runtime derivatives without shipping any third-party animal mesh or image texture",
   "coordinateSystem": {
@@ -92,5 +92,35 @@
   "visualAcceptance": false,
   "bindAcceptance": false,
   "motionAcceptance": false,
-  "productionReady": false
+  "productionReady": false,
+  "calibration": {
+    "profile": "P1_AUTHORITATIVE_CALIBRATION.json",
+    "directMeasuredFields": [
+      "global.bodyLength",
+      "global.shoulderHeight",
+      "forelimb.scapulaLength",
+      "forelimb.humerusLength",
+      "forelimb.radiusLength",
+      "forelimb.metacarpalLength",
+      "hindlimb.femurLength",
+      "hindlimb.tibiaLength"
+    ],
+    "ratioDerivedFields": [
+      "global.hipHeight",
+      "hindlimb.tarsusLength",
+      "paws.foreLength",
+      "paws.hindLength"
+    ],
+    "candidateFields": [
+      "torso.*",
+      "neck.*",
+      "head.width",
+      "head.height",
+      "head.muzzle*",
+      "tail.*",
+      "limb segment radii",
+      "neutral joint angles"
+    ],
+    "externalReferenceLoadedAtRuntime": false
+  }
 }
