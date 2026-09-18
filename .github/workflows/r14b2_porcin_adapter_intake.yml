@@ -1,0 +1,189 @@
+name: R14B2 porcine adapter source intake
+
+on:
+  push:
+    branches:
+      - automation/r14b2-porcine-adapter-intake-20260918
+    paths:
+      - .github/workflows/r14b2_porcin_adapter_intake.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-audit-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Fetch MIT pig model source
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="r14b2_porcin_source_intake"
+          mkdir -p "$ROOT/source/core_txt_files" "$ROOT/source/full_txt_files" "$ROOT/source/pics" "$ROOT/reports" "$ROOT/generated"
+          BASE="https://raw.githubusercontent.com/anl13/PIG_model/main"
+          UA='Mozilla/5.0 R14B2-Porcine-Adapter-Intake/1.0'
+          fetch() {
+            local rel="$1"
+            local out="$ROOT/source/$rel"
+            mkdir -p "$(dirname "$out")"
+            curl --fail --location --retry 3 --retry-all-errors -A "$UA" "$BASE/$rel" --output "$out"
+          }
+          fetch LICENSE
+          fetch readme.md
+          fetch full_txt_files/PIG_reduced.obj
+          fetch full_txt_files/reduced_ids.txt
+          fetch full_txt_files/reduced_faces.txt
+          fetch full_txt_files/body_parts.txt
+          fetch full_txt_files/body_part_defs.txt
+          fetch full_txt_files/sym.txt
+          fetch core_txt_files/t_pose_joints.txt
+          fetch core_txt_files/parents.txt
+          fetch core_txt_files/skinning_weights.txt
+          fetch pics/Jointnames.jpg
+          fetch pics/Joints.jpg
+          fetch pics/model.jpg
+
+      - name: Parse reduced mesh and sampled rig weights
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, math
+          from pathlib import Path
+          from collections import defaultdict
+
+          root = Path('r14b2_porcin_source_intake')
+          src = root / 'source'
+          gen = root / 'generated'
+          reports = root / 'reports'
+
+          def sha(path):
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          obj = src / 'full_txt_files/PIG_reduced.obj'
+          verts=[]; faces=[]
+          for raw in obj.read_text(encoding='utf-8', errors='replace').splitlines():
+              s=raw.strip()
+              if s.startswith('v '):
+                  p=s.split(); verts.append([float(p[1]),float(p[2]),float(p[3])])
+              elif s.startswith('f '):
+                  ids=[]
+                  for tok in s.split()[1:]: ids.append(int(tok.split('/')[0])-1)
+                  if len(ids)==3: faces.append(ids)
+                  elif len(ids)>3:
+                      for i in range(1,len(ids)-1): faces.append([ids[0],ids[i],ids[i+1]])
+          if len(verts) != 546:
+              raise SystemExit(f'unexpected reduced vertex count {len(verts)}')
+          if len(faces) < 1080:
+              raise SystemExit(f'unexpected reduced face count {len(faces)}')
+
+          reduced_ids=[int(x.strip()) for x in (src/'full_txt_files/reduced_ids.txt').read_text().splitlines() if x.strip()]
+          if len(reduced_ids)!=546:
+              raise SystemExit(f'unexpected reduced id count {len(reduced_ids)}')
+          full_to_reduced={full:i for i,full in enumerate(reduced_ids)}
+
+          joint_weights=defaultdict(list)
+          for line in (src/'core_txt_files/skinning_weights.txt').read_text().splitlines():
+              p=line.split()
+              if len(p)<3: continue
+              j=int(p[0]); v=int(p[1]); w=float(p[2])
+              if v in full_to_reduced and w>0:
+                  joint_weights[full_to_reduced[v]].append((j,w))
+
+          joint_indices=[]; joint_values=[]; max_sum_error=0.0; zero=[]
+          for vi in range(len(verts)):
+              arr=sorted(joint_weights.get(vi,[]), key=lambda x:x[1], reverse=True)[:4]
+              if not arr:
+                  zero.append(vi); arr=[(0,1.0)]
+              s=sum(w for _,w in arr)
+              arr=[(j,w/s) for j,w in arr]
+              max_sum_error=max(max_sum_error,abs(sum(w for _,w in arr)-1.0))
+              while len(arr)<4: arr.append((0,0.0))
+              joint_indices.append([j for j,_ in arr])
+              joint_values.append([w for _,w in arr])
+
+          joints=[]
+          for line in (src/'core_txt_files/t_pose_joints.txt').read_text().splitlines():
+              p=line.split()
+              if len(p)>=3: joints.append([float(p[0]),float(p[1]),float(p[2])])
+          parents=[int(x) for x in (src/'core_txt_files/parents.txt').read_text().split()]
+          if len(joints)!=62 or len(parents)!=62:
+              raise SystemExit(f'unexpected rig size joints={len(joints)} parents={len(parents)}')
+
+          mn=[min(v[i] for v in verts) for i in range(3)]
+          mx=[max(v[i] for v in verts) for i in range(3)]
+          center=[(mn[i]+mx[i])*0.5 for i in range(3)]
+          extent=[mx[i]-mn[i] for i in range(3)]
+
+          # Oriented edge and manifold audit.
+          edge_counts=defaultdict(int)
+          for a,b,c in faces:
+              for u,v in ((a,b),(b,c),(c,a)):
+                  edge_counts[tuple(sorted((u,v)))] += 1
+          boundary=sum(1 for n in edge_counts.values() if n==1)
+          nonmanifold=sum(1 for n in edge_counts.values() if n>2)
+
+          payload={
+            'schema':'environment_animal/porcine_source_intake@1.0',
+            'identity':{
+              'species':'Sus scrofa domesticus',
+              'observed_template_population':'Guangxi Bama mini-pig',
+              'source_repository':'anl13/PIG_model',
+              'source_commit_ref':'main',
+              'license':'MIT',
+              'anatomical_authority':False,
+              'breed_scope':'Bama mini-pig template only; not a universal pig mother'
+            },
+            'mesh':{
+              'vertices':len(verts),'triangles':len(faces),
+              'bounds_min':mn,'bounds_max':mx,'center':center,'extent':extent,
+              'boundary_edges':boundary,'nonmanifold_edges':nonmanifold,
+              'source_obj_sha256':sha(obj)
+            },
+            'rig':{
+              'joint_count':len(joints),'parent_count':len(parents),
+              'sampled_weight_vertex_count':len(joint_indices),
+              'zero_weight_vertices_before_fallback':zero,
+              'max_weight_sum_error':max_sum_error
+            },
+            'use_boundary':{
+              'allowed':['independent porcine surface anchor','independent porcine rig adapter','porcine gait/contact experiments','environment NPC collision proxy'],
+              'forbidden':['rename canine bones and call them pig','claim universal porcine statistics','claim veterinary anatomy','reuse canine walk cycle as porcine truth']
+            }
+          }
+          (reports/'SOURCE_INTAKE_REPORT.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
+          (gen/'PIG_REDUCED_RUNTIME_SOURCE.json').write_text(json.dumps({
+            'schema':'environment_animal/porcine_reduced_runtime_source@1.0',
+            'vertices':verts,'triangles':faces,'joint_indices':joint_indices,'joint_weights':joint_values,
+            'joints':joints,'parents':parents,'source_full_vertex_ids':reduced_ids
+          },separators=(',',':'))+'\n')
+
+          manifest=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file() and p.name!='SHA256SUMS.txt':
+                  manifest.append({'path':p.relative_to(root).as_posix(),'bytes':p.stat().st_size,'sha256':sha(p)})
+          (reports/'FILE_MANIFEST.json').write_text(json.dumps({'schema':'environment_animal/source_manifest@1.0','files':manifest},indent=2)+'\n')
+          PY
+
+      - name: Write checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          (
+            cd r14b2_porcin_source_intake
+            find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+            sha256sum -c SHA256SUMS.txt
+          )
+
+      - name: Upload porcine source intake
+        uses: actions/upload-artifact@v4
+        with:
+          name: r14b2-porcine-source-intake
+          path: r14b2_porcin_source_intake
+          if-no-files-found: error
+          retention-days: 7
