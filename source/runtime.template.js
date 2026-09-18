@@ -671,7 +671,7 @@ function loop(now){const dt=Math.max(0,(now-previous)/1000);previous=now;const l
  if(now-lastPanel>160){panel();lastPanel=now}window.HumanLab.population?.observation?.frame(dt,performance.now()-loopStarted);requestAnimationFrame(loop)}
 window.HumanLab.hair.restoreReviewCamera();
 await startupStage('garment','正在缝合短裤布片');
-await window.HumanLab.compact.skirt.assemble(runtimeQuery.has('shortsSteps')?Math.max(0,Math.min(SHORTS_ASSEMBLY_STEP_LIMIT,Math.floor(Number(runtimeQuery.get('shortsSteps'))||0))):SHORTS_ASSEMBLY_STEP_LIMIT,()=>{const state=window.HumanLab.compact.skirt.simulation.sewingStage;$('loading').textContent='正在缝制 · 第 '+Math.min(state.index+1,state.stages.length)+' / '+state.stages.length+' 道工序';});
+await window.HumanLab.compact.skirt.assemble(runtimeQuery.has('shortsSteps')?Math.max(0,Math.min(SHORTS_ASSEMBLY_STEP_LIMIT,Math.floor(Number(runtimeQuery.get('shortsSteps'))||0))):SHORTS_INITIAL_ASSEMBLY_STEPS,()=>{const sim=window.HumanLab.compact.skirt.simulation;$('loading').textContent='正在缝合短裤 · '+sim.seams.filter(s=>s.pairs.every(p=>sim.dofs?.same(p.a,p.b))).length+' / '+sim.seams.length+' 条缝';});
 installShortsControls(window.HumanLab);
 logMessage('R2 人体与同源骨架已连接。生活空间就绪。');panel();renderFrame();
 window.__humanStartup={status:'ready',stage:'ready',message:'身体预览已就绪',garmentStatus:window.HumanLab.compact.skirt.assemblyState};

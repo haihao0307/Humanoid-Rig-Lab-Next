@@ -180,9 +180,9 @@ test('one immutable candidate option set survives the initial actor placement',a
   await finishAssembly(garment.assemble(0),callbacks);
   const initial=simulations[0].options,placed=simulations[1].options;
   assert.equal(placed,initial);assert.equal(Object.isFrozen(initial),true);
-  for(const [key,value]of Object.entries({stitchDofs:true,needleSchedule:'sequential',sewingSchedule:'gated',
-    handlingPolicy:'until-waist-stitched',triangleBodyContact:true,iterations:32,maxMaterialIterations:512,
-    maxSeamTensionN:.05,stitchJoinToleranceM:.0001,waistSupportSlackM:.004}))assert.equal(placed[key],value,key);
+  for(const [key,value]of Object.entries({stitchDofs:true,needleSchedule:'overlap',sewingSchedule:'overlap',
+    handlingPolicy:'needle-and-time',triangleBodyContact:true,iterations:32,maxMaterialIterations:32,
+    maxSeamTensionN:null,stitchJoinToleranceM:.0001,waistSupportSlackM:.004}))assert.equal(placed[key],value,key);
 });
 
 test('wearable readiness requires real closed seams, completed stages and the engineering gate together',async()=>{
@@ -196,16 +196,16 @@ test('wearable readiness requires real closed seams, completed stages and the en
   }
 });
 
-test('bounded checks stop a failed trial and reports are not requested on every fixed step',async()=>{
+test('a bounded formation preview retains failed diagnostics instead of stopping halfway through the shorts',async()=>{
   const failed=rendererHarness({reportFor:sim=>({...incompleteReport(),peakPrincipalStrain:sim.stepIndex>=30?.06:0})});
   await finishAssembly(failed.garment.assemble(100),failed.callbacks);
-  assert.equal(failed.garment.simulation.stepIndex,30);assert.equal(failed.garment.assemblyState,'failed');
+  assert.equal(failed.garment.simulation.stepIndex,100);assert.equal(failed.garment.assemblyState,'failed');
   assert.equal(failed.garment.displayReady,true);assert.equal(failed.garment.assemblyReady,false);
-  assert.equal(failed.garment.simulation.reportCalls,2);
+  assert.equal(failed.garment.simulation.reportCalls,4);
   const uncertain=rendererHarness({reportFor:()=>({...incompleteReport(),selfContact:{
     swept:{uncertainCount:0,unresolvedCount:0},sweptHistory:{budgetExceeded:false,uncertainCount:1}}})});
   await finishAssembly(uncertain.garment.assemble(100),uncertain.callbacks);
-  assert.equal(uncertain.garment.simulation.stepIndex,30,'historical CCD uncertainty cannot be repaired by running forever');
+  assert.equal(uncertain.garment.simulation.stepIndex,100,'finish only the requested bounded formation budget, without clearing history');
   assert.equal(uncertain.garment.assemblyState,'failed');assert.equal(uncertain.garment.assemblyReady,false);
   assert.equal(uncertain.garment.displayReady,true,'retain the actual failed result for inspection');
   const partial=rendererHarness();await finishAssembly(partial.garment.assemble(61),partial.callbacks);
@@ -221,6 +221,26 @@ test('a disposed garment cannot place new material or return an old ready report
     assert.equal(simulations.length,1);assert.equal(garment.body.updates,0);
     assert.equal(garment.displayReady,false);
   }
+});
+
+test('completed physical stitches share shading while positions, UVs and unsewn edges remain untouched',()=>{
+  const scope={};vm.createContext(scope);vm.runInContext(read('clothing/ClothShorts.js'),scope);
+  const vertices=new Float32Array([0,0,0, 0,0,2, .2,.3, 0,0,0, 0,3,0, .7,.8, 1,0,0, 1,0,0, .4,.5]);
+  const before=Array.from(vertices);
+  scope.shortsJoinRenderNormals(vertices,[{members:[0,1]}]);
+  assert.deepEqual(Array.from(vertices.slice(3,6)),[0,3,2]);
+  assert.deepEqual(Array.from(vertices.slice(11,14)),[0,3,2]);
+  for(let i=0;i<3;i++)for(const k of [0,1,2,6,7])assert.equal(vertices[i*8+k],before[i*8+k]);
+  assert.deepEqual(Array.from(vertices.slice(16)),before.slice(16),'no smoothing across an open seam');
+});
+
+test('restored overlapping assembly can be ready only with actual sewn and engineering acceptance',async()=>{
+  const {garment,callbacks}=rendererHarness({reportFor:()=>({...incompleteReport(),sewn:true,
+    sewingStage:{enabled:false,complete:false},engineeringCriteriaMet:true})});
+  await finishAssembly(garment.assemble(1),callbacks);assert.equal(garment.assemblyReady,true);
+  const broken=rendererHarness({reportFor:()=>({...incompleteReport(),sewn:true,
+    sewingStage:{enabled:false,complete:false},engineeringCriteriaMet:false})});
+  await finishAssembly(broken.garment.assemble(1),broken.callbacks);assert.equal(broken.garment.assemblyReady,false);
 });
 
 function controlsHarness(state='incomplete',single=true){

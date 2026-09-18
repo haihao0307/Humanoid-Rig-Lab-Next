@@ -8,10 +8,18 @@ layout(location=2)in vec2 uv;
 uniform mat4 viewProjection,lightVP;
 out vec3 W,N;out vec2 C;out vec4 linenShadow;
 void main(){W=position;N=normal;C=uv*(100./3.);linenShadow=lightVP*vec4(W,1.);gl_Position=viewProjection*vec4(W,1.);}`;
-// These are the same bounded candidate settings used by the actual-body
-// sewing trial. A successful build alone does not accept a garment.
-const SHORTS_WEARING_OPTIONS=Object.freeze({iterations:32,maxMaterialIterations:512,materialConvergenceStrain:.02,stitchDofs:true,stitchJoinToleranceM:.0001,needleSchedule:'sequential',maxSeamTensionN:.05,bendCompliance:40000,waistSupportPath:'edge-rotation',waistSupportSlackM:.004,sewingSchedule:'gated',handlingPolicy:'until-waist-stitched',triangleBodyContact:true,maxSelfCandidates:30000});
+// Restore the formed-shorts assembly route without changing the original
+// paper. The sequential gated experiment remains opt-in at the solver layer.
+// Closed stitches share positions permanently; fit acceptance stays separate.
+const SHORTS_WEARING_OPTIONS=Object.freeze({iterations:32,maxMaterialIterations:32,materialConvergenceStrain:.02,stitchDofs:true,stitchJoinToleranceM:.0001,needleSchedule:'overlap',maxSeamTensionN:null,bendCompliance:40000,waistSupportPath:'edge-rotation',waistSupportSlackM:.004,sewingSchedule:'overlap',handlingPolicy:'needle-and-time',triangleBodyContact:true,maxSelfCandidates:30000});
+const SHORTS_INITIAL_ASSEMBLY_STEPS=420;
 const SHORTS_ASSEMBLY_STEP_LIMIT=1600;
+function shortsJoinRenderNormals(vertices,groups){
+ for(const group of groups){const sum=[0,0,0];for(const i of group.members)for(let k=0;k<3;k++)sum[k]+=vertices[i*8+3+k];
+  if(Math.hypot(...sum)<1e-12)continue;
+  for(const i of group.members)for(let k=0;k<3;k++)vertices[i*8+3+k]=sum[k];
+ }
+}
 class ClothShorts {
  constructor(surface,meshes){
   this.surface=surface;this.gl=surface.gl;this.buffers=[];this.disposed=false;
@@ -36,7 +44,7 @@ class ClothShorts {
    gl.bindVertexArray(null);
   }catch(error){this.dispose();throw error;}
  }
- assemble(maxSteps=SHORTS_ASSEMBLY_STEP_LIMIT,onProgress=()=>{}){
+ assemble(maxSteps=SHORTS_INITIAL_ASSEMBLY_STEPS,onProgress=()=>{}){
   if(!this.assemblyTask){
    this.assemblyTask=this.assembleOnce(maxSteps,onProgress);
    const task=this.assemblyTask;
@@ -63,7 +71,7 @@ class ClothShorts {
    this.simulation.step(1);this.dirty=true;onProgress((start+1)/Math.max(1,remaining));
    // Yield after every fixed step; one step can itself be expensive. Complete
    // reports perform a fresh full contact scan only at these bounded checks.
-   if(this.simulation.stepIndex%30===0){const report=this.simulation.report();if(this.acceptsAssembly(report)||this.failedAssembly(report))break;}
+   if(this.simulation.stepIndex%30===0){const report=this.simulation.report();if(this.acceptsAssembly(report)||report.material?.valid===false)break;}
    await new Promise(resolve=>setTimeout(resolve,0));
   }
   if(this.disposed)throw Error('Sewing was disposed');
@@ -72,7 +80,7 @@ class ClothShorts {
   this.assemblyState=this.assemblyReady?'ready':this.failedAssembly(report)?'failed':'incomplete';
   this.assemblyReport={...report,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs};return this.assemblyReport;
  }
- acceptsAssembly(report){return report.sewn===true&&report.sewingStage?.complete===true&&report.engineeringCriteriaMet===true;}
+ acceptsAssembly(report){return report.sewn===true&&(report.sewingStage?.enabled===false||report.sewingStage?.complete===true)&&report.engineeringCriteriaMet===true;}
  failedAssembly(report){return report.material?.valid===false||!Number.isFinite(report.peakPrincipalStrain??0)||(report.peakPrincipalStrain??0)>.05||report.selfContact?.sweptHistory?.budgetExceeded===true||(report.selfContact?.sweptHistory?.uncertainCount??0)>0;}
  update(dt){
   if(this.disposed||!this.assemblyReady||!(dt>0))return;
@@ -84,6 +92,9 @@ class ClothShorts {
   const positions=this.simulation.positions,indices=this.renderTriangles,uv=this.simulation.materialCoordinates,v=this.vertices;
   for(let i=0;i<positions.length/3;i++){v.set(positions.subarray(i*3,i*3+3),i*8);v.fill(0,i*8+3,i*8+6);v.set(uv.subarray(i*2,i*2+2),i*8+6);}
   for(let t=0;t<indices.length;t+=3){const a=indices[t]*8,b=indices[t+1]*8,c=indices[t+2]*8,ux=v[b]-v[a],uy=v[b+1]-v[a+1],uz=v[b+2]-v[a+2],vx=v[c]-v[a],vy=v[c+1]-v[a+1],vz=v[c+2]-v[a+2],nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;for(const j of [a,b,c]){v[j+3]+=nx;v[j+4]+=ny;v[j+5]+=nz;}}
+  // Only actual completed physical stitches share shading normals. Keep each
+  // source panel's UV and every solved position; do not bridge open edges.
+  if(this.simulation.dofs)shortsJoinRenderNormals(v,this.simulation.dofs.report().groups);
   for(let i=0;i<v.length;i+=8){const length=Math.hypot(v[i+3],v[i+4],v[i+5]);if(length>1e-12)for(let k=3;k<6;k++)v[i+k]/=length;}
   this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.vertexBuffer);this.gl.bufferSubData(this.gl.ARRAY_BUFFER,0,v);this.dirty=false;
  }

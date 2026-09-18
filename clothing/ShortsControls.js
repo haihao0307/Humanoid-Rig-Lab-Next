@@ -24,8 +24,8 @@ function installShortsControls(lab){
  const style=document.createElement('style');style.textContent='#shorts-controls{position:fixed;z-index:50;left:18px;bottom:18px;max-width:calc(100% - 36px);padding:12px 16px;background:#152022ee;border:1px solid #52615b;border-radius:10px;color:#e1e6d8;font:13px/1.5 system-ui}#shorts-controls b{font-size:17px}#shorts-controls div{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}#shorts-controls button{background:#263632;color:#e1e6d8;border:1px solid #53655c;border-radius:5px;padding:6px 10px;cursor:pointer}.compact-panel,.hud,.worldLabel,.npc-population{display:none!important}';document.head.append(style);document.body.append(panel);
  function refreshStatus(){
   if(!single)return;
-  const garment=lab.compact?.skirt,ready=garment?.assemblyReady===true,busy=garment?.assemblyState==='sewing',failed=garment?.assemblyState==='failed',stage=garment?.simulation.sewingStage;
-  panel.querySelector('[data-status]').textContent=ready?'已缝合 · 待试穿检查':failed?'布片检查未通过':busy?'缝制中 · 第 '+Math.min(stage.index+1,stage.stages.length)+' / '+stage.stages.length+' 道工序':'尚未缝完';
+  const garment=lab.compact?.skirt,ready=garment?.assemblyReady===true,busy=garment?.assemblyState==='sewing',failed=garment?.assemblyState==='failed',sewn=garment?.assemblyReport?.sewn===true;
+  panel.querySelector('[data-status]').textContent=ready?'已缝合 · 待试穿检查':sewn?'接缝已闭合 · 物理检查未通过':failed?'布片检查未通过':busy?'正在缝合短裤':'尚未缝完';
   for(const b of panel.querySelectorAll('[data-command],[data-action="pause"]'))b.disabled=!ready;
   const sew=panel.querySelector('[data-action="sew"]');sew.hidden=ready||failed;sew.disabled=busy;
  }
