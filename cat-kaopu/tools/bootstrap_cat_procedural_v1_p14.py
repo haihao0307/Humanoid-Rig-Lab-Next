@@ -1,17 +1,26 @@
 from __future__ import annotations
 
+import base64
 import lzma
 import tarfile
 from io import BytesIO
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ARCHIVE = ROOT / 'cat-kaopu/tools/bootstrap/p14_sources.tar.xz'
+CHUNK_DIR = ROOT / 'cat-kaopu/tools/bootstrap'
+CHUNKS = [CHUNK_DIR / f'p14_sources.b64.{index:02d}' for index in range(6)]
 
-if not ARCHIVE.is_file():
-    raise SystemExit(f'P1.4 source archive missing: {ARCHIVE.relative_to(ROOT)}')
+missing_chunks = [str(path.relative_to(ROOT)) for path in CHUNKS if not path.is_file()]
+if missing_chunks:
+    raise SystemExit(f'P1.4 source chunks missing: {missing_chunks}')
 
-payload = lzma.decompress(ARCHIVE.read_bytes())
+encoded = ''.join(path.read_text(encoding='ascii').strip() for path in CHUNKS)
+try:
+    archive = base64.b64decode(encoded, validate=True)
+    payload = lzma.decompress(archive)
+except Exception as exc:
+    raise SystemExit(f'P1.4 source archive decode failed: {exc}') from exc
+
 with tarfile.open(fileobj=BytesIO(payload), mode='r:') as tf:
     root = ROOT.resolve()
     members = tf.getmembers()
