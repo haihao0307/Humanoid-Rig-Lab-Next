@@ -585,9 +585,11 @@ function renderFrame(){
  if(!renderer||!world)return;updateVisibility();const lab=window.HumanLab,actors=lab?.population?Array.from(lab.population.values()):human?[{human,showRig:lab?.showRig}]:[];
  if(human&&agent&&follow&&isolation==='all'){const seated=agent.basic.posture==='sitting';renderer.target=add(agent.pos,[seated?Math.sin(agent.yaw)*.23:0,seated?.27:renderer.projection==='orthographic'?human.bodyMetrics.statureM/2-agent.pos[1]:human.bodyMetrics.restHipHeightM-agent.pos[1]+.04,seated?Math.cos(agent.yaw)*.23:0]);}
  const items=actors.flatMap(actor=>[...actor.human.bones,...actor.human.cartilage,...actor.human.tissue.items]);
- if(isolation==='all'){renderer.studioMode=false;renderer.background=world.theme==='camp'?[...CAMP_WORLD.presentation.background]:null;items.unshift(floor,...(world.scenery||[]),...(world.showRoofs?world.roofItems||[]:[]),...world.objects);}
+ if(lab?.garment?.studio){if(!renderer.linenWorldLightVP)renderer.linenWorldLightVP=renderer.lightVP;const centre=lab.human.world('hips').p;renderer.lightVP=mm(ortho(-1.6,1.6,-1.6,1.6,.1,9),lookAt(add(centre,[-3,5,3]),add(centre,[0,-.20,0])));renderer.studioMode=false;renderer.background=[.095,.115,.118];items.unshift(floor);}
+ else if(renderer.linenWorldLightVP){renderer.lightVP=renderer.linenWorldLightVP;renderer.linenWorldLightVP=null;}
+ if(isolation==='all'&&!lab?.garment?.studio){renderer.studioMode=false;renderer.background=world.theme==='camp'?[...CAMP_WORLD.presentation.background]:null;items.unshift(floor,...(world.scenery||[]),...(world.showRoofs?world.roofItems||[]:[]),...world.objects);}
  const rigLines=actors.filter(actor=>actor.showRig||(actor.human===human&&lab?.showRig)).map(actor=>({g:lineMesh(actor.human.joints.filter(j=>j.parent).map(j=>[j.parent.world.p,j.world.p])),color:[.2,.95,.7]}));
- renderer.render(items.filter(item=>item.visible!==false),[...(isolation==='all'?lines:[]),...rigLines]);
+ renderer.render(items.filter(item=>item.visible!==false),[...(isolation==='all'&&!lab?.garment?.studio?lines:[]),...rigLines]);
  for(const l of labels){const s=renderer.screen(add(l.o.p,[0,l.o.id.startsWith('Z')?.04:l.o.h/2+.10,0]));l.el.style.display=isolation==='all'&&s?.visible?'block':'none';if(s)l.el.style.transform=`translate(${s.x}px,${s.y}px) translate(-50%,-100%)`;}
 }
 function panel(){window.HumanLab?.strength?.refresh();const d=agent.diagnostics(),st=d.stats;$('phase').textContent=d.error?'已阻断':d.paused?'已暂停':d.activity.phase==='settling'?'减速收脚':({groundSit:'坐在地上',groundLie:'躺在地上',floorAlign:'调整坐躺朝向',sitDown:'缓慢坐下',lieDown:'躺下',standUp:'起身',greet:'打招呼',salute:'敬礼',idle:'等待指令',approach:'寻路接近',settle:'调整站位',reach:'全身趋近',close:'建立接触',lift:'约束抬起',travel:'负载步行',placeSettle:'对齐放置站位',lower:'下蹲放置',release:'解除抓握',rise:'恢复站立',wave:'挥手',walk:'步行',turn:'换脚转向',pushTravel:'接触推动'})[d.phase]||d.phase;$('held').textContent=d.heldObject||'无';$('posture').textContent=({standing:'站立',sitting:'坐姿',lying:'躺姿'})[d.basic.posture];$('swingState').textContent=d.heldObject?'保持抓握':d.basic.gesture?'手势优先':d.armSwing.blend>.1?'随步态交替摆动':'自然放松';$('boneError').textContent=(d.body.maxBoneLengthErrorM*1000).toFixed(5)+' mm';$('gripError').textContent=(st.maxPalmResidualM*1000).toFixed(2)+' mm';$('footError').textContent=(st.maxFootPositionErrorM*1000).toFixed(2)+' mm';$('done').textContent=String(st.completed);$('plan').replaceChildren(...(agent.plan?.steps||[]).map((s,i)=>{const e=document.createElement('div');e.className='planStep'+(i===agent.index?' current':i<agent.index?' finished':'');e.textContent=`${i+1}. ${{carry:'搬运',push:'推动',walk:'走到',turn:'转向',wave:'挥手',sit:'坐地',lie:'躺下',stand:'起身',greet:'打招呼',salute:'敬礼'}[s.type]} ${s.objectId||''} ${s.targetId?'→ '+s.targetId:''}`;return e}));$('pause').textContent=agent.paused?'继续':'暂停';}
@@ -603,6 +605,9 @@ async function startupStage(stage,message){
 /*__SOURCE:body/CompactMuscles.js__*/
 /*__SOURCE:body/CompactHairRenderer.js__*/
 /*__SOURCE:body/ProceduralGrassSkirt.js__*/
+/*__SOURCE:body/LinenMaterial.js__*/
+/*__SOURCE:body/ProceduralLinenSkirt.js__*/
+/*__SOURCE:body/LinenSkirtControls.js__*/
 /*__SOURCE:body/FaceAnatomy.js__*/
 /*__SOURCE:body/EyeAnatomy.js__*/
 /*__SOURCE:body/CompactWorkbench.js__*/
@@ -643,8 +648,8 @@ if(reviewMode==='face'){
 }else{
  installNPCPopulation(window.HumanLab);
  await startupStage('population','正在从同一母体生成第二个人物');
- try{await window.HumanLab.population.installMotherPair();}catch(error){logMessage('母体复制体未生成：'+error.message);}
- await window.HumanLab.population.installReviewCast();
+ try{if(!runtimeQuery.has('linen'))await window.HumanLab.population.installMotherPair();}catch(error){logMessage('母体复制体未生成：'+error.message);}
+ if(!runtimeQuery.has('linen'))await window.HumanLab.population.installReviewCast();
 }
 try{human.characterTaskStatus=window.HumanLab.character.startOnSpawn();}catch(error){human.characterTaskStatus={started:false,error:error.message};logMessage('角色预设任务未开始：'+error.message);}
 let previous=performance.now(),lastPanel=0;needsRedraw=true;
@@ -659,6 +664,7 @@ function loop(now){const dt=Math.max(0,(now-previous)/1000);previous=now;const l
  if(needsRedraw||(auto&&active)){renderFrame();needsRedraw=false}
  if(now-lastPanel>160){panel();lastPanel=now}window.HumanLab.population?.observation?.frame(dt,performance.now()-loopStarted);requestAnimationFrame(loop)}
 window.HumanLab.hair.restoreReviewCamera();
+installLinenSkirtControls(window.HumanLab);
 logMessage('R2 人体与同源骨架已连接。生活空间就绪。');panel();renderFrame();
 window.__humanStartup={status:'ready',stage:'ready',message:'身体已就绪'};
 $('loading').hidden=true;needsRedraw=false;requestAnimationFrame(loop);
