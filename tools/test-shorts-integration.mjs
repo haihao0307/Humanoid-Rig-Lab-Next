@@ -278,7 +278,7 @@ test('incomplete and failed studio garments reject movement even if a stale butt
 test('continue sewing refreshes only light status and unlocks movement only after actual readiness',async()=>{
   const h=controlsHarness(),pending=h.api.continueSewing();
   assert.equal(h.garment.calls,1);assert.equal(h.buttons[3].disabled,true);
-  assert.match(h.status.textContent,/缝制中/);assert.equal(h.buttons[1].disabled,true);
+  assert.match(h.status.textContent,/正在缝合短裤/);assert.equal(h.buttons[1].disabled,true);
   h.finish('ready');await pending;
   assert.equal(h.buttons[1].disabled,false);assert.equal(h.buttons[3].hidden,true);
   const failed=controlsHarness('failed');await failed.api.continueSewing();assert.equal(failed.garment.calls,0);

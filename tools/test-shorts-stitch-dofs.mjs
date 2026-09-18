@@ -23,3 +23,25 @@ test('a finite thread multiplier bounds cumulative tension using the whole sewn 
  const released=d.project(indices,gradients,-.001,{lambda:first.lambda,tensionOnly:true,minimumLambda});assert.equal(released.lambda,0);for(let i=0;i<ps.length;i++)near(ps[i].pos[0],before[i][0]);assert.deepEqual(ps.map(p=>({uv:p.uv,mass:p.mass})),source);
  for(const lower of [NaN,Infinity,-Infinity,.01])assert.throws(()=>d.project(indices,gradients,.1,{tensionOnly:true,minimumLambda:lower}),/lower bound/);
 });
+
+test('collision motion limiting keeps stitched groups coincident and retains original trajectories',()=>{
+ const ps=[p(0,1),p(.002,3),p(.1,2)],d=createStitchDofs(ps);d.join(0,1,close);
+ d.beginStep(.01,{gravity:[0,0,0]});const previous=ps.map(p=>p.previous.slice()),source=ps.map(p=>({uv:p.uv.slice(),mass:p.mass}));
+ d.project([0],[[0,1,0]],-.04);d.project([2],[[0,1,0]],-.02);d.limitStep(.25);
+ assert.deepEqual(ps[0].pos,ps[1].pos);near(ps[0].pos[1],1.01);near(ps[2].pos[1],1.005);
+ assert.deepEqual(ps.map(p=>p.previous),previous);assert.deepEqual(ps.map(p=>({uv:p.uv,mass:p.mass})),source);
+ d.endStep(.01);near(ps[0].velocity[1],1);assert.throws(()=>d.limitStep(-.1),/fraction/);assert.throws(()=>d.limitStep(NaN),/fraction/);
+});
+
+test('sewing does not commit a stitch that only closes transiently inside a solver iteration',()=>{
+ const ps=[p(0),p(.009)],d=createStitchDofs(ps,{joinTolerance:.0001}),source=structuredClone(ps);
+ d.project([0,1],[[-1,0,0],[1,0,0]],.009);
+ assert.ok(Math.abs(ps[0].pos[0]-ps[1].pos[0])<1e-12);
+ const before=structuredClone(ps);assert.equal(d.join(0,1,{...close,requirePreviousClosure:true}),false);assert.deepEqual(ps,before);assert.equal(d.report().spatialDofCount,2);
+ d.limitStep(.5);near(ps[1].pos[0]-ps[0].pos[0],.0045);
+ d.project([0,1],[[-1,0,0],[1,0,0]],.0045);d.endStep(.01);d.beginStep(.01,{gravity:[0,0,0]});
+ // Remove the inherited approach velocity to model an accepted resting seam.
+ d.project([0,1],[[-1,0,0],[1,0,0]],ps[1].pos[0]-ps[0].pos[0]);
+ assert.equal(d.join(0,1,{...close,requirePreviousClosure:true}),true);assert.equal(d.report().spatialDofCount,1);assert.deepEqual(ps[0].pos,ps[1].pos);
+ assert.deepEqual(ps.map(p=>({uv:p.uv,mass:p.mass})),source.map(p=>({uv:p.uv,mass:p.mass})));
+});

@@ -51,8 +51,8 @@ test('candidate exhaustion cannot report a successful clear step',()=>{
 test('distant started seam endpoints do not exempt incident faces',()=>{
  const ps=[particle([0,0,.2],[0,0,-.2]),...triangle.map(p=>particle(p,p,0))],r=create(ps,[{indices:[1,2,3]}],[]).solve({seamMates:new Map([[0,new Set([1])]])});assert.equal(r.detectedCrossingCount,1);
 });
-test('started nearby needle endpoint allows only its incident contact',()=>{
- const ps=[particle([-.2,-.2,.0025]),...triangle.map(p=>particle(p,p,0))],r=create(ps,[{indices:[1,2,3]}],[]).solve({seamMates:new Map([[0,new Set([1])]])});assert.equal(r.candidateCount,0);
+test('nearby unfinished needle keeps incident primitives in collision discovery',()=>{
+ const ps=[particle([-.2,-.2,.0025]),...triangle.map(p=>particle(p,p,0))],r=create(ps,[{indices:[1,2,3]}],[]).solve({seamMates:new Map([[0,new Set([1])]])});assert.equal(r.candidateCount,1);assert.equal(r.detectedCrossingCount,0);
 });
 test('shared original source indices are topology adjacency, not self collision',()=>{
  const ps=triangle.map(p=>particle(p));assert.equal(create(ps,[{indices:[0,1,2]}],[]).solve().candidateCount,0);
@@ -113,4 +113,31 @@ test('a fixed member of a real stitched group blocks the whole CCD correction wi
  const r=create(ps,[{indices:[1,2,3]}],[],{thickness:.0025,dofs}).solve();
  assert.equal(r.detectedCrossingCount,2);assert.equal(r.projectedCount,0);assert.equal(r.unresolvedCount,2);
  assert.deepEqual(ps,before);
+});
+
+// Six-point witness of the actual first front-rise crossing (step 83).
+// Collision data only: no garment rest coordinates or render startup state.
+test('unfinished front-rise stitch does not hide crossing incident edges',()=>{
+ const previous=[[-0.02344111301330333,0.7874759451610339,0.16459815622825816],[0.001263373003435871,0.7556711159724085,0.15927130256362365],[-0.03828208900969362,0.7601474825350292,0.16601399844617437],[0.02373662845461187,0.7874972826820352,0.16591022649928097],[0.03846713586622252,0.7601231426691487,0.16757312095108062],[-0.0008167049389694961,0.7558039592183894,0.15963849308162434]],proposed=[[-0.022862726313440062,0.7874364540627699,0.16405660262831015],[0.0017595919174221196,0.7556147907983989,0.158365774015703],[-0.037702233009849984,0.7600917231977117,0.16554594502211173],[0.023156530027574868,0.7874716783649545,0.16546551226935538],[0.037889094145079814,0.7600815653851982,0.16716820016654643],[-0.0013000321624557411,0.7557601656619726,0.1587346907165016]];
+ const ps=previous.map((p,i)=>particle(p,proposed[i])),before=copy(ps),triangles=[{indices:[0,1,2]},{indices:[3,4,5]}],edges=[[0,1],[1,2],[2,0],[3,4],[4,5],[5,3]].map(([a,b])=>({a,b}));
+ const seamMates=new Map([[1,new Set([5])],[5,new Set([1])]]),contact=create(ps,triangles,edges),r=contact.solve({seamMates});
+ assert.ok(r.detectedCrossingCount>0);assert.ok(r.projectedCount>0);assert.equal(r.unresolvedCount,0);assert.ok(r.postProjectionBroadphaseVerified);
+ for(let i=0;i<ps.length;i++)assert.deepEqual(ps[i].previous,before[i].previous);
+ for(const a of edges.slice(0,3))for(const b of edges.slice(3)){const ai=[a.a,a.b],bi=[b.a,b.b];assert.equal(ee(ai.map(i=>ps[i].previous),ai.map(i=>ps[i].pos),bi.map(i=>ps[i].previous),bi.map(i=>ps[i].pos)),null);}
+ const bounded=previous.map((p,i)=>particle(p,proposed[i]));const report=create(bounded,triangles,edges,{maxPasses:1}).solve({seamMates});
+ assert.ok(report.unresolvedCount>0,'a new crossing created by correction is still reported when the pass budget ends');
+ const limited=previous.map((p,i)=>particle(p,proposed[i])),limitedBefore=copy(limited),safe=create(limited,triangles,edges,{maxPasses:1,motionLimit:true}),safeReport=safe.solve({seamMates});
+ assert.ok(safeReport.motionLimitPasses>0);assert.ok(safeReport.motionLimitedFraction<1);assert.equal(safeReport.unresolvedCount,0);assert.equal(safe.report().currentTriangleCrossingCount,0);
+ for(let i=0;i<limited.length;i++)assert.deepEqual(limited[i].previous,limitedBefore[i].previous);
+});
+
+test('read-only report discovers a new crossing introduced after the last solve',()=>{
+ const ps=[particle([0,0,.2]),...triangle.map(p=>particle(p,p,0))],contact=create(ps,[{indices:[1,2,3]}],[]);
+ assert.equal(contact.solve().unresolvedCount,0);ps[0].pos[2]=-.2;const before=copy(ps),r=contact.report();
+ assert.equal(r.remainingCrossingCount,1);assert.ok(r.unresolvedCount>0);assert.equal(r.currentGeometryRechecked,true);assert.deepEqual(ps,before);
+ assert.equal(contact.solve().unresolvedCount,0);assert.equal(contact.report().unresolvedCount,0);
+});
+test('pre-existing triangle intersection is rejected even without a new swept event',()=>{
+ const ps=[[-.2,-.2,0],[.2,-.2,0],[0,.2,0],[0,-.1,-.1],[0,-.1,.1],[0,.1,.1]].map(p=>particle(p)),before=copy(ps),contact=create(ps,[{indices:[0,1,2]},{indices:[3,4,5]}],[]);
+ const r=contact.report();assert.equal(r.currentTriangleCrossingCount,1);assert.ok(r.unresolvedCount>0);assert.deepEqual(ps,before);
 });

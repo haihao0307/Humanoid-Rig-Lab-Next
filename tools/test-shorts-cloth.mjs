@@ -206,7 +206,9 @@ test('gusset holding survives a started long thread and releases only a fully dr
 test('completed original stitches share all later material corrections without changing UV, mass, or swept origins',()=>{
   const a=piece('a'),b=piece('b',.003),seam={id:'paired',stage:0,a:{pieceId:'a'},b:{pieceId:'b'},pairs:[0,1].map(i=>({a:i,b:i,t:0}))};
   const sim=new Cloth({pieces:[a,b],seams:[seam]},null,{stitchDofs:true,gravity:0,selfContact:false,iterations:8,substeps:1});sim.time=2;
-  const uv=plain(sim.particles.map(p=>p.uv)),mass=sim.particles.map(p=>p.mass),previous=plain(sim.particles.map(p=>p.pos));sim.step();
+  const uv=plain(sim.particles.map(p=>p.uv)),mass=sim.particles.map(p=>p.mass);sim.step();
+  assert.equal(sim.report().stitchDofs.joinedStitchCount,0,'transient first-step closure stays collision-correctable');
+  const previous=plain(sim.particles.map(p=>p.pos));sim.step();
   assert.equal(sim.report().stitchDofs.joinedStitchCount,2);assert.equal(sim.report().stitchDofs.spatialDofCount,6);
   assert.deepEqual(plain(sim.particles[0].pos),plain(sim.particles[4].pos));assert.deepEqual(plain(sim.particles[1].pos),plain(sim.particles[5].pos));
   assert.notEqual(sim.particles[0].pos,sim.particles[4].pos,'spatial equality does not alias original material arrays');

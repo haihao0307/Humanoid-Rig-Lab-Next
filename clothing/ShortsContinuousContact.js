@@ -67,27 +67,28 @@ function createShortsContinuousContact(particles,triangles,edges,options={}){
  const thickness=options.thickness??.0025,cellSize=options.cellSize??.04,maxCandidates=options.maxCandidates??12000,maxCells=options.maxCellsPerPrimitive??2048;
  if(!Number.isFinite(thickness)||thickness<0||!Number.isFinite(cellSize)||cellSize<=0||!Number.isInteger(maxCandidates)||maxCandidates<1||!Number.isInteger(maxCells)||maxCells<1)throw Error('Invalid cloth CCD options');
  if(options.dofs!=null&&typeof options.dofs.project!=='function')throw Error('Cloth CCD stitch DOFs require a project method');
- let state,contacts=[];const reset=()=>({enabled:true,method:'swept_aabb_cubic_vertex_face_edge_edge',candidateCount:0,vertexFaceCandidateCount:0,edgeEdgeCandidateCount:0,detectedCrossingCount:0,projectedCount:0,uncertainCount:0,uncertaintyReasons:{},unresolvedCount:0,maxPenetrationM:0,budgetExceeded:false,continuousCollisionGuaranteed:false});state=reset();
+ const maxPasses=options.maxPasses??8;if(!Number.isInteger(maxPasses)||maxPasses<1||maxPasses>64)throw Error('Invalid cloth CCD pass budget');
+ let state,contacts=[],activeSeamMates=new Map(),lastSettings={};const reset=()=>({enabled:true,method:'swept_aabb_cubic_vertex_face_edge_edge',candidateCount:0,vertexFaceCandidateCount:0,edgeEdgeCandidateCount:0,detectedCrossingCount:0,projectedCount:0,uncertainCount:0,uncertaintyReasons:{},unresolvedCount:0,maxPenetrationM:0,budgetExceeded:false,continuousCollisionGuaranteed:false});state=reset();
  const bounds=ids=>({min:[0,1,2].map(k=>Math.min(...ids.flatMap(i=>[particles[i].previous[k],particles[i].pos[k]]))-thickness),max:[0,1,2].map(k=>Math.max(...ids.flatMap(i=>[particles[i].previous[k],particles[i].pos[k]]))+thickness)}),overlap=(a,b)=>a.min.every((v,k)=>v<=b.max[k]&&a.max[k]>=b.min[k]);
  const cells=b=>{const lo=b.min.map(x=>Math.floor(x/cellSize)),hi=b.max.map(x=>Math.floor(x/cellSize));if(hi.reduce((n,v,k)=>n*(v-lo[k]+1),1)>maxCells){state.budgetExceeded=true;return [];}const result=[];for(let x=lo[0];x<=hi[0];x++)for(let y=lo[1];y<=hi[1];y++)for(let z=lo[2];z<=hi[2];z++)result.push(x+','+y+','+z);return result;};
- const record=(ids,event)=>{if(!event)return;if(event.uncertain){state.uncertainCount++;state.uncertaintyReasons[event.reason]=(state.uncertaintyReasons[event.reason]||0)+1;return;}contacts.push({...event,ids});state.detectedCrossingCount++;};
+ const record=(ids,event)=>{if(!event)return;if(event.uncertain){state.uncertainCount++;state.uncertaintyReasons[event.reason]=(state.uncertaintyReasons[event.reason]||0)+1;return;}contacts.push({...event,ids,clearance:ids.some((a,i)=>ids.some((b,j)=>i!==j&&activeSeamMates.get(a)?.has(b)&&sccNorm(sccSub(particles[a].pos,particles[b].pos))<=2*thickness))?Math.min(thickness,1e-6):thickness});state.detectedCrossingCount++;};
  const gap=c=>sccDot([0,1,2].map(k=>c.weights.reduce((sum,w,i)=>sum+w*particles[c.ids[i]].pos[k],0)),c.normal);
- const report=()=>{let unresolved=0,maxPenetration=0,remainingCrossingCount=0,remainingUncertainCount=0;for(const c of contacts){const depth=thickness-gap(c),event=sccEvent(c.ids.map(i=>particles[i].previous),c.ids.map(i=>particles[i].pos),c.kind);if(event?.hit)remainingCrossingCount++;if(event?.uncertain)remainingUncertainCount++;if(depth>1e-7||event){unresolved++;maxPenetration=Math.max(maxPenetration,depth);}}return {...state,unresolvedCount:unresolved+state.uncertainCount+(state.budgetExceeded?1:0),remainingCrossingCount,remainingUncertainCount,maxPenetrationM:maxPenetration};};
- return {solve({seamMates=new Map(),neighbours=[]}={}){
-  // seamMates contains ONLY started needle endpoint pairs. They also need to
-  // be within two cloth thicknesses: a long active thread does not exempt an
-  // incident cloth face that can still cross another piece during gathering.
-  // An edge joining two different primitives does not make those primitives
-  // incident. Excluding that whole one-ring silently allowed nearby cloth
-  // faces to fold through each other away from their actual shared vertices.
-  state=reset();contacts=[];const local=(a,b)=>a===b||(seamMates.get(a)?.has(b)&&sccNorm(sccSub(particles[a].pos,particles[b].pos))<=2*thickness),candidate=kind=>{if(state.candidateCount>=maxCandidates){state.budgetExceeded=true;return false;}state.candidateCount++;state[kind==='vf'?'vertexFaceCandidateCount':'edgeEdgeCandidateCount']++;return true;};
+ const report=()=>{let unresolved=0,maxPenetration=0,remainingCrossingCount=0,remainingUncertainCount=0;for(const c of contacts){const depth=c.clearance-gap(c),event=sccEvent(c.ids.map(i=>particles[i].previous),c.ids.map(i=>particles[i].pos),c.kind);if(event?.hit)remainingCrossingCount++;if(event?.uncertain)remainingUncertainCount++;if(depth>1e-7||event){unresolved++;maxPenetration=Math.max(maxPenetration,depth);}}return {...state,unresolvedCount:unresolved+state.uncertainCount+(state.budgetExceeded?1:0),remainingCrossingCount,remainingUncertainCount,maxPenetrationM:maxPenetration};};
+ const pass=({seamMates=new Map(),neighbours=[]}={},project=true)=>{
+  // A nearby unfinished thread is not yet a shared cloth vertex. Exempting
+  // whole incident edges here allowed them to cross before closure. Only an
+  // actual shared positional DOF is topological adjacency. At an unfinished
+  // seam only a one-micrometre numerical separation remains; crossings
+  // still collide, while a completed needle may close within its tolerance.
+  activeSeamMates=seamMates;
+  state=reset();contacts=[];const local=(a,b)=>a===b||options.dofs?.same?.(a,b),candidate=kind=>{if(state.candidateCount>=maxCandidates){state.budgetExceeded=true;return false;}state.candidateCount++;state[kind==='vf'?'vertexFaceCandidateCount':'edgeEdgeCandidateCount']++;return true;};
   const tb=triangles.map(t=>bounds(t.indices)),grid=new Map();for(let ti=0;ti<triangles.length;ti++)for(const key of cells(tb[ti])){if(!grid.has(key))grid.set(key,[]);grid.get(key).push(ti);}
   vf:for(let i=0;i<particles.length;i++){const b=bounds([i]),seen=new Set();for(const key of cells(b))for(const ti of grid.get(key)||[]){if(seen.has(ti))continue;seen.add(ti);const ids=triangles[ti].indices;if(ids.some(j=>local(i,j))||!overlap(b,tb[ti]))continue;if(!candidate('vf'))break vf;record([i,...ids],shortsSweptVertexFace(particles[i].previous,particles[i].pos,ids.map(j=>particles[j].previous),ids.map(j=>particles[j].pos)));}}
   const eb=edges.map(e=>bounds([e.a,e.b])),eg=new Map(),seen=new Set();for(let ei=0;ei<edges.length;ei++)for(const key of cells(eb[ei])){if(!eg.has(key))eg.set(key,[]);eg.get(key).push(ei);}
   ee:for(const list of eg.values())for(let a=0;a<list.length;a++)for(let b=a+1;b<list.length;b++){const ia=list[a],ib=list[b],key=ia<ib?ia+':'+ib:ib+':'+ia;if(seen.has(key))continue;seen.add(key);const ea=edges[ia],e=edges[ib],ids=[ea.a,ea.b,e.a,e.b];if(ids.slice(0,2).some(i=>ids.slice(2).some(j=>local(i,j)))||!overlap(eb[ia],eb[ib]))continue;if(!candidate('ee'))break ee;record(ids,shortsSweptEdgeEdge(ids.slice(0,2).map(i=>particles[i].previous),ids.slice(0,2).map(i=>particles[i].pos),ids.slice(2).map(i=>particles[i].previous),ids.slice(2).map(i=>particles[i].pos)));}
-  contacts.sort((a,b)=>a.toi-b.toi);for(let sweep=0;sweep<2;sweep++)for(const c of contacts){
+  contacts.sort((a,b)=>a.toi-b.toi);if(project)for(let sweep=0;sweep<2;sweep++)for(const c of contacts){
    if(options.dofs){
-    const depth=thickness-gap(c);if(depth<=1e-7)continue;
+    const depth=c.clearance-gap(c);if(depth<=1e-7)continue;
     // Detection retains every original index and its own substep trajectory.
     // Only the correction is delegated: aggregate gradients of actually sewn
     // positional DOFs before the common projector uses their total mass.
@@ -96,8 +97,50 @@ function createShortsContinuousContact(particles,triangles,edges,options={}){
     if(result.applied)state.projectedCount++;
     continue;
    }
-   const depth=thickness-gap(c),den=c.ids.reduce((sum,id,i)=>sum+particles[id].invMass*c.weights[i]**2,0);if(depth<=1e-7||den<=0)continue;for(let i=0;i<c.ids.length;i++){const p=particles[c.ids[i]],scale=p.invMass*c.weights[i]*depth/den;for(let k=0;k<3;k++)p.pos[k]+=scale*c.normal[k];}state.projectedCount++;
+   const depth=c.clearance-gap(c),den=c.ids.reduce((sum,id,i)=>sum+particles[id].invMass*c.weights[i]**2,0);if(depth<=1e-7||den<=0)continue;for(let i=0;i<c.ids.length;i++){const p=particles[c.ids[i]],scale=p.invMass*c.weights[i]*depth/den;for(let k=0;k<3;k++)p.pos[k]+=scale*c.normal[k];}state.projectedCount++;
   }
   state=report();return {...state};
- },report};
+ };
+ // A correction can create a new contact outside the previous event list.
+ // Rebuild the swept broadphase after each projection pass, including after
+ // the final bounded pass. Never equate clearing old witnesses with clearance
+ // of the corrected cloth. Previous positions remain the substep start.
+ return {solve(settings={}){
+  lastSettings=settings;let totalDetected=0,totalProjected=0,passes=0,uncertain=0,budget=false,reasons={},motionLimitPasses=0,motionLimitedFraction=1;
+  const accumulate=r=>{totalDetected+=r.detectedCrossingCount;totalProjected+=r.projectedCount;uncertain=Math.max(uncertain,r.uncertainCount);budget||=r.budgetExceeded;for(const [key,n] of Object.entries(r.uncertaintyReasons))reasons[key]=Math.max(reasons[key]||0,n);};
+  let r;for(;passes<maxPasses;){r=pass(settings,true);passes++;accumulate(r);if(!r.projectedCount)break;}
+  if(r.projectedCount){r=pass(settings,false);accumulate(r);}
+  // Coupled contacts need not converge in the projection budget. Do not
+  // advance through a known impact and forget it at the next substep. Limit
+  // the proposed motion to before its earliest remaining impact, then rebuild
+  // all candidates. This conservative fallback changes neither rest data nor
+  // previous trajectories, and preserves completed stitch equivalence.
+  if(options.motionLimit&&(!options.dofs||typeof options.dofs.limitStep==='function'))while(r.remainingCrossingCount>0&&!r.uncertainCount&&!r.budgetExceeded&&motionLimitPasses<4){
+   const fraction=Math.max(0,Math.min(.99,.9*Math.min(...contacts.map(c=>c.toi))));
+   if(options.dofs)options.dofs.limitStep(fraction);else for(const p of particles)if(p.invMass)for(let k=0;k<3;k++)p.pos[k]=p.previous[k]+fraction*(p.pos[k]-p.previous[k]);
+   motionLimitedFraction*=fraction;motionLimitPasses++;r=pass(settings,false);accumulate(r);
+  }
+  state={...r,motionLimitPasses,motionLimitedFraction,detectedCrossingCount:totalDetected,projectedCount:totalProjected,projectionPasses:passes,maximumProjectionPasses:maxPasses,remainingCrossingCount:r.remainingCrossingCount,uncertainCount:uncertain,uncertaintyReasons:reasons,budgetExceeded:budget,unresolvedCount:Math.max(r.unresolvedCount,r.remainingCrossingCount+uncertain+(budget?1:0)),postProjectionBroadphaseVerified:true};
+  return {...state};
+ },report(){
+  // A body/material correction may run after solve. Recheck the current
+  // candidate set without moving particles or altering the last solve stats.
+  const savedState=state,savedContacts=contacts,savedMates=activeSeamMates;
+  const fresh=pass(lastSettings,false),staticState=sccCurrentTriangleCrossings(particles,triangles,maxCandidates);
+  state=savedState;contacts=savedContacts;activeSeamMates=savedMates;
+  const uncertain=Math.max(savedState.uncertainCount,fresh.uncertainCount),budget=savedState.budgetExceeded||fresh.budgetExceeded||staticState.budgetExceeded;
+  return {...savedState,remainingCrossingCount:fresh.remainingCrossingCount,remainingUncertainCount:fresh.remainingUncertainCount,currentTriangleCrossingCount:staticState.crossingCount,currentTriangleCandidateCount:staticState.candidateCount,uncertainCount:uncertain,uncertaintyReasons:{...savedState.uncertaintyReasons,...fresh.uncertaintyReasons},budgetExceeded:budget,unresolvedCount:Math.max(fresh.unresolvedCount,fresh.remainingCrossingCount+staticState.crossingCount+uncertain+(budget?1:0)),maxPenetrationM:fresh.maxPenetrationM,currentGeometryRechecked:true};
+ }};
+}
+
+// Independent discrete witnesses catch intersections already present at the
+// substep start. Swept event absence alone cannot certify a current surface.
+// Strict interiors only: coplanar overlap and boundary-only contact remain
+// outside this audit and must never be described as a full certificate.
+function sccCurrentTriangleCrossings(particles,triangles,maxCandidates){
+ const faces=triangles.map(t=>{const ps=t.indices.map(i=>particles[i].pos);return {ids:t.indices,ps,min:[0,1,2].map(k=>Math.min(...ps.map(p=>p[k]))),max:[0,1,2].map(k=>Math.max(...ps.map(p=>p[k])))};});
+ const segment=(a,b,ps)=>{const e1=sccSub(ps[1],ps[0]),e2=sccSub(ps[2],ps[0]),d=sccSub(b,a),p=sccCross(d,e2),det=sccDot(e1,p);if(Math.abs(det)<1e-14)return false;const q0=sccSub(a,ps[0]),u=sccDot(q0,p)/det,q=sccCross(q0,e1),v=sccDot(d,q)/det,t=sccDot(e2,q)/det,eps=1e-8;return t>eps&&t<1-eps&&u>eps&&v>eps&&u+v<1-eps;};
+ let candidateCount=0,crossingCount=0;
+ for(let i=0;i<faces.length;i++)for(let j=i+1;j<faces.length;j++){const a=faces[i],b=faces[j];if(a.ids.some(k=>b.ids.includes(k))||a.min.some((v,k)=>v>b.max[k]+1e-10||a.max[k]<b.min[k]-1e-10))continue;if(++candidateCount>maxCandidates)return {candidateCount,crossingCount,budgetExceeded:true};if(a.ps.some((p,k)=>segment(p,a.ps[(k+1)%3],b.ps))||b.ps.some((p,k)=>segment(p,b.ps[(k+1)%3],a.ps)))crossingCount++;}
+ return {candidateCount,crossingCount,budgetExceeded:false};
 }

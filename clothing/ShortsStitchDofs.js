@@ -15,11 +15,16 @@ function createShortsStitchDofs(particles,{joinTolerance=.005}={}){
  const denominator=count=>{let result=0;for(let j=0;j<count;j++){const group=ordered[j],offset=group.id*3;if(!group.fixed)result+=(sums[offset]*sums[offset]+sums[offset+1]*sums[offset+1]+sums[offset+2]*sums[offset+2])/group.mass;}return result;};
  return {
   same(a,b){return owner[a]!==undefined&&owner[a]===owner[b];},
-  join(a,b,{started=false,closureProgress=0}={}){
+  join(a,b,{started=false,closureProgress=0,requirePreviousClosure=false}={}){
    if(!started||closureProgress!==1)throw Error('Only completed actual stitches can share a spatial degree of freedom');
    const left=groups.get(owner[a]),right=groups.get(owner[b]);if(!left||!right)throw Error('Unknown source stitch endpoint');if(left===right)return false;
    const gap=Math.hypot(...left.position.map((v,k)=>v-right.position[k]));if(gap>joinTolerance)return false;
    if(left.fixed&&right.fixed&&gap>1e-12)return false;
+   // Sewing may momentarily bring endpoints together inside an iteration,
+   // before collision processing has accepted that trajectory. Committing a
+   // DOF at that instant makes a later collision rollback unable to separate
+   // endpoints that were millimetres apart at the substep start.
+   if(requirePreviousClosure){const pa=particles[a].previous,pb=particles[b].previous;if(!finite3(pa)||!finite3(pb))throw Error('Stable sewing needs original previous positions');if(Math.hypot(...pa.map((v,k)=>v-pb[k]))>joinTolerance)return false;}
    const mass=left.mass+right.mass,fixed=left.fixed||right.fixed,hold=left.fixed?left:right;
    const merged={id:left.id,members:[...left.members,...right.members],mass,fixed,position:fixed?[...hold.position]:left.position.map((v,k)=>(v*left.mass+right.position[k]*right.mass)/mass),velocity:fixed?[0,0,0]:left.velocity.map((v,k)=>(v*left.mass+right.velocity[k]*right.mass)/mass)};
    groups.delete(right.id);groups.set(left.id,merged);for(const i of merged.members)owner[i]=left.id;assign(merged);joins++;return true;
@@ -38,6 +43,10 @@ function createShortsStitchDofs(particles,{joinTolerance=.005}={}){
    if(!(h>0)||!Number.isFinite(h)||!finite3(gravity)||!(damping>=0)||!Number.isFinite(damping))throw Error('Invalid DOF integration');
    for(const p of particles)p.previous=[...p.pos];
    const attenuation=Math.exp(-damping*h);for(const g of groups.values()){if(g.fixed)continue;for(let k=0;k<3;k++){g.velocity[k]=(g.velocity[k]+gravity[k]*h)*attenuation;g.position[k]+=g.velocity[k]*h;}assign(g);}
+  },
+  limitStep(fraction){
+   if(!Number.isFinite(fraction)||fraction<0||fraction>1)throw Error('Invalid collision motion fraction');
+   for(const g of groups.values()){if(g.fixed)continue;const previous=[0,0,0];for(const i of g.members)for(let k=0;k<3;k++)previous[k]+=particles[i].mass*particles[i].previous[k]/g.mass;for(let k=0;k<3;k++)g.position[k]=previous[k]+fraction*(g.position[k]-previous[k]);assign(g);}
   },
   endStep(h){if(!(h>0)||!Number.isFinite(h))throw Error('Invalid DOF velocity step');for(const g of groups.values()){const previous=[0,0,0];for(const i of g.members)for(let k=0;k<3;k++)previous[k]+=particles[i].mass*particles[i].previous[k]/g.mass;for(let k=0;k<3;k++)g.velocity[k]=g.fixed?0:(g.position[k]-previous[k])/h;for(const i of g.members)particles[i].velocity=[...g.velocity];}},
   report(){return {enabled:true,method:'completed_source_stitch_spatial_equality_elimination',sourceParticleCount:particles.length,spatialDofCount:groups.size,joinedStitchCount:joins,totalMass:[...groups.values()].reduce((sum,g)=>sum+g.mass,0),originalMaterialIdentityPreserved:true,groups:[...groups.values()].filter(g=>g.members.length>1).map(g=>({members:[...g.members],mass:g.mass,fixed:g.fixed}))};}
