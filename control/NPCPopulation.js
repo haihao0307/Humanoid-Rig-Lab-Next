@@ -236,17 +236,63 @@ class NPCPopulation {
  }
  reserveResource(actor,request){
   const a=actor.agent,step=this.resourceStep(a,request);if(!step){actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};return null;}
+  request.resourceTicket??=(this.resourceSerial=(this.resourceSerial||0)+1);
   const conflict=this.resourceConflict(a,request,step);if(conflict)return conflict;
+  let predecessor=null;
+  for(const other of this.values()){
+   const pending=other.queue[0],agent=other.agent;
+   if(other===actor||other.disposed||agent.paused||agent.error||agent.characterEditInProgress||this.isReserved(agent))continue;
+   if(pending?.source==='behavior'&&(!other.behavior.enabled||pending.behavior!==other.behavior))continue;
+   if(pending?.resourceTicket<request.resourceTicket&&(!predecessor||pending.resourceTicket<predecessor.ticket))predecessor={id:other.id,ticket:pending.resourceTicket};
+  }
+  if(predecessor)return{kind:'turn',id:'shared-physics',ownerId:predecessor.id,step};
   this.claims.set(step.objectId,a.npcId);this.stationClaims.set(step.targetId,a.npcId);this.physicsOwner=a.npcId;
   actor.resource={mode:'reserved',requestKey:[request.source,request.text].join('|'),attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:[...a.pos]};return null;
  }
+ resourceProgress(ownerId){
+  const owner=this.actors.get(ownerId),a=owner?.agent;
+  if(!a||owner.disposed||a.paused||a.error||a.characterEditInProgress)return null;
+  const goal=a.route?.at(-1),distance=goal?Math.hypot(a.pos[0]-goal[0],a.pos[2]-goal[2]):null;
+  return{key:JSON.stringify([ownerId,a.index,a.skill?.objectId,a.skill?.targetId,a.phase,a.stats?.completed,goal]),distance,steps:a.preflight?.steps||0};
+ }
+ resourceManeuvers(actor,conflict,maneuver){
+  const a=actor.agent,owner=this.actors.get(conflict.ownerId)?.agent,skill=owner?.skill;
+  const directions={left:[-1,0],forward:[0,1],right:[1,0],backward:[0,-1]},candidates=[];
+  const areas=[];
+  if(['carry','push'].includes(skill?.type)){
+   const radius=(a.h?.bodyMetrics?.bodyRadiusM||.26)+(owner.h?.bodyMetrics?.bodyRadiusM||.26)+.3;
+   for(const p of [owner.pos,skill.o?.p,skill.dest,skill.transferEnd])if(p)areas.push({p,radius});
+  }
+  for(const direction of npcResourceDirectionOrder(a.npcId,maneuver))for(const distanceM of [.65,.85,1.05]){
+   const [x,z]=directions[direction],yaw=a.yaw||0,delta=[(Math.cos(yaw)*x+Math.sin(yaw)*z)*distanceM,(Math.cos(yaw)*z-Math.sin(yaw)*x)*distanceM],end=[a.pos[0]+delta[0],a.pos[2]+delta[1]];
+   let penalty=0;
+   for(const area of areas){
+    const dx=area.p[0]-a.pos[0],dz=area.p[2]-a.pos[2],t=Math.max(0,Math.min(1,(dx*delta[0]+dz*delta[1])/(distanceM*distanceM)));
+    const deficit=d=>Math.max(0,area.radius-d),start=deficit(Math.hypot(dx,dz));
+    // Escape an area already occupied, but do not cut through another area
+    // just because the endpoint is clear. Existing route/pose checks still apply.
+    penalty+=2*deficit(Math.hypot(end[0]-area.p[0],end[1]-area.p[2]))+Math.max(0,deficit(Math.hypot(dx-t*delta[0],dz-t*delta[1]))-start);
+   }
+   candidates.push({direction,distanceM,penalty});
+  }
+  return candidates.sort((x,y)=>x.penalty-y.penalty);
+ }
  startResourceCirculation(actor,request,conflict){
-  const a=actor.agent,key=[request.source,request.text].join('|'),same=actor.resource?.requestKey===key,attempts=(same?actor.resource.attempts:0)+1;if(attempts>16)throw Error('共享资源持续被占用，完成 16 次机动后仍未获得操作权：'+conflict.id);
-  actor.queue.unshift(request);let lastError=null;const distances=[.65,.85,1.05];
-  for(const direction of npcResourceDirectionOrder(a.npcId,attempts))for(const distanceM of distances)try{
+  const a=actor.agent,key=[request.source,request.text].join('|'),same=actor.resource?.requestKey===key,now=Number.isFinite(a.time)?a.time:(this.elapsedS||0);
+  const contention=request.resourceContention??={startedAtS:now,progress:null,resets:0};
+  if(now-contention.startedAtS>300)throw Error('等待共享资源超过 300 秒活跃任务时间，已停止重试：'+conflict.id);
+  const progress=this.resourceProgress(conflict.ownerId),before=contention.progress;
+  const advanced=progress&&before&&(progress.key!==before.key||progress.distance!=null&&before.distance!=null&&progress.distance<before.distance-.25||progress.steps>before.steps+32);
+  if(progress&&(!before||advanced))contention.progress=progress;
+  if(advanced)contention.resets++;
+  const attempts=(same&&!advanced?actor.resource.attempts:0)+1;if(attempts>16)throw Error('共享资源持续被占用，完成 16 次机动且未观察到所有者进展：'+conflict.id);
+  actor.queue.unshift(request);let lastError=null;const maneuver=(contention.maneuvers||0)+1;
+  // Progress can reset the stall budget, never the physical diversion cycle.
+  for(const {direction,distanceM} of this.resourceManeuvers(actor,conflict,maneuver))try{
    const step={type:'walk',direction,distanceM,referenceFrame:'self'};a.submitPlan({schema:'knowledge_human/checked_semantic_plan@1.0',steps:[step]});actor.running={source:'resource-circulation',kind:'command',text:'资源机动',requestKey:key};
-   actor.resource={mode:'circulating',requestKey:key,attempts,diversions:(actor.resource?.diversions||0)+1,conflict:{...conflict},anchor:actor.resource?.anchor||[...a.pos]};if(request.source==='behavior')actor.behavior.status='resourceCirculation';
-   a.log('共享资源 '+conflict.id+' 正由 '+conflict.ownerId+' 使用，已改走备用路线后重试原任务');this.observation?.event('resource-circulation',actor,{attempts,conflict:{...conflict},step});return true;
+   contention.maneuvers=maneuver;
+   actor.resource={mode:'circulating',requestKey:key,attempts,progressResets:contention.resets,diversions:(actor.resource?.diversions||0)+1,conflict:{...conflict},anchor:actor.resource?.anchor||[...a.pos]};if(request.source==='behavior')actor.behavior.status='resourceCirculation';
+   a.log(conflict.kind==='turn'?'较早请求 '+conflict.ownerId+' 优先接手共享资源，已改走备用路线后重试原任务':'共享资源 '+conflict.id+' 正由 '+conflict.ownerId+' 使用，已改走备用路线后重试原任务');this.observation?.event('resource-circulation',actor,{attempts,conflict:{...conflict},step});return true;
   }catch(error){lastError=error;}
   actor.queue.shift();throw Error('资源被占用且周边没有可执行的机动路线：'+conflict.id+(lastError?'；'+lastError.message:''));
  }
@@ -256,6 +302,7 @@ class NPCPopulation {
   if(this.physicsOwner&&this.physicsOwner!==a.npcId)throw Error('已有 NPC 正在操作物体');if(targetId)this.stationClaims.set(targetId,a.npcId);this.physicsOwner=a.npcId;this.claims.set(id,a.npcId);
  }
  releaseObjects(a,{preserveResource=false}={}){
+  a.locomotion?.releaseIntersection?.();
   for(const [id,owner]of this.claims)if(owner===a.npcId&&a.held?.id!==id){this.lab.world.physics?.clearManipulation(id);this.claims.delete(id);}if(!a.held)for(const [id,owner]of this.stationClaims)if(owner===a.npcId)this.stationClaims.delete(id);if(this.physicsOwner===a.npcId&&!a.held)this.physicsOwner=null;
   const actor=this.actors.get(a.npcId),keepResource=preserveResource||actor?.running?.source==='resource-circulation';if(actor&&!keepResource&&!a.held)actor.resource={mode:'clear',requestKey:null,attempts:0,diversions:actor.resource?.diversions||0,conflict:null,anchor:null};
  }
@@ -267,10 +314,12 @@ class NPCPopulation {
   const result=actors.map(actor=>{try{
    if(this.isReserved(actor.agent))throw Error('此人物由任务面板或持续日常控制');
    if(actor.agent.characterEditInProgress)throw Error('此人物正在更新外观');
-   if(actor.queue.length>=64)throw Error('此人物等待队列已满');
+   if(mode==='append'&&actor.agent.error)throw Error('此人物已失败，请先停止或替换任务后重试：'+actor.agent.error);
+   if(mode==='append'&&actor.queue.length>=64)throw Error('此人物等待队列已满');
    parse(text,this.lab.world,actor.agent.lastObject); // Syntax/targets only; forecast again at execution time.
+   const keepPaused=mode==='append'&&actor.agent.paused&&!!(actor.running||actor.queue.length||actor.agent.activity().physicalBusy);
    if(mode==='replace'){if(actor.agent.held)throw Error('此人物仍在持物，请先继续完成放置');actor.agent.cancel();actor.queue=[];actor.running=null;}
-   actor.behavior.enabled=false;actor.behavior.status='stopped';actor.behavior.error=null;actor.queue.push({text:text.trim(),source:'manual'});actor.agent.paused=false;this.pump(actor);if(actor.behavior.error)throw Error(actor.behavior.error);
+   actor.behavior.enabled=false;actor.behavior.status='stopped';actor.behavior.error=null;actor.queue.push({text:text.trim(),source:'manual'});actor.agent.paused=keepPaused;this.pump(actor);if(actor.behavior.error)throw Error(actor.behavior.error);
    return{id:actor.id,accepted:true,queued:actor.queue.length};
   }catch(error){return{id:actor.id,accepted:false,reason:error.message};}});
   this.lab.setAuto(true);this.changed();return result;
@@ -282,7 +331,7 @@ class NPCPopulation {
    if(actor.agent.characterEditInProgress)throw Error('此人物正在更新外观');
    if(action==='stop'){actor.queue=[];actor.behavior.enabled=false;actor.behavior.status='stopped';actor.behavior.error=null;actor.behavior.waitUntil=null;actor.running=null;const result=actor.agent.cancel();this.releaseObjects(actor.agent);return{id:actor.id,accepted:true,...result};}
    if(action==='resume'&&actor.agent.error)throw Error('请先停止并处理此人物的错误');
-   actor.agent.paused=action==='pause';return{id:actor.id,accepted:true};
+   actor.agent.paused=action==='pause';if(actor.agent.paused)actor.agent.locomotion?.releaseIntersection?.();return{id:actor.id,accepted:true};
   }catch(error){return{id:actor.id,accepted:false,reason:error.message};}});
   this.lab.setAuto(true);this.changed();return results;
  }
@@ -335,6 +384,10 @@ class NPCPopulation {
   const physics=this.lab.world.physics,checkpoint=physics?.capture(),worldRevision=this.lab.world.revision,routineBefore=structuredClone(this.lab.world.routineState),elapsedBefore=this.elapsedS;
   this.physicsTickActive=true;
   this.elapsedS+=step;advanceRoutineEnvironment(this.lab.world,step);this.physicsDeferred.clear();
+  // Includes pauses/task changes made by the semantic and routine entry points.
+  // Paused actors still remain physical obstacles in sweepFor/collisionFor.
+  if(typeof trafficPruneIntersections==='function')trafficPruneIntersections(this,trafficRuntime(this),this.elapsedS);
+  if(typeof trafficPruneCorridors==='function')trafficPruneCorridors(this,trafficRuntime(this),this.elapsedS);
   for(const actor of this.values()){
    if(actor.disposed||actor.agent.characterEditInProgress)continue;
    const tickStarted=this.observation?.recording?performance.now():null;
@@ -395,6 +448,6 @@ class NPCPopulation {
   }catch(error){for(const actor of staged){actor.disposed=true;actor.compact?.dispose();}throw error;}
   finally{for(const actor of staged)this.pendingIds.delete(actor.id);this.pending-=specs.length;this.changed();}
  }
- disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.compact?.dispose();}this.claims.clear();this.stationClaims.clear();this.physicsOwner=null;}
+ disposeAll(){this.closed=true;for(const actor of this.values()){actor.disposed=true;actor.agent.locomotion?.releaseIntersection?.();actor.compact?.dispose();}this.claims.clear();this.stationClaims.clear();this.physicsOwner=null;}
 }
 function installNPCPopulation(lab){const population=new NPCPopulation(lab);lab.population=population;installNPCPopulationControls(lab,population);population.announceActive();window.addEventListener('pagehide',event=>{if(!event.persisted)population.disposeAll();});return population;}
