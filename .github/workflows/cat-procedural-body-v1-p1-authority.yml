@@ -8,6 +8,8 @@ on:
       - .github/workflows/cat-procedural-body-v1-p1-authority.yml
       - cat-kaopu/tools/bootstrap_cat_procedural_v1_p1_sources.py
       - cat-kaopu/tools/bootstrap/p1_authority_sources.part*.b64
+      - cat-kaopu/tools/apply_cat_procedural_v1_p1_r2_overlay.py
+      - cat-kaopu/tools/bootstrap/p1_r2_shape_overlay.part*.b64
   workflow_dispatch:
 
 permissions:
@@ -37,6 +39,11 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python cat-kaopu/tools/bootstrap_cat_procedural_v1_p1_sources.py
+
+      - name: Apply P1 R2 feline shape overlay
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python cat-kaopu/tools/apply_cat_procedural_v1_p1_r2_overlay.py
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -75,7 +82,7 @@ jobs:
           CAT_PROCEDURAL_URL='http://127.0.0.1:4173/cat-kaopu/procedural-cat-v1/index.html' \
             node cat-kaopu/tools/capture_cat_procedural_v1_p1.mjs
 
-      - name: Upload P1 sources and QA evidence
+      - name: Upload P1 R2 sources and QA evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -90,7 +97,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Commit P1 sources and browser evidence
+      - name: Commit P1 R2 sources and browser evidence
         shell: bash
         run: |
           set -euo pipefail
@@ -103,10 +110,10 @@ jobs:
             cat-kaopu/tools/capture_cat_procedural_v1_p1.mjs \
             cat-kaopu/qa/procedural-cat-v1-p1
           if git diff --cached --quiet; then
-            echo 'No P1 generated changes to commit.'
+            echo 'No P1 R2 generated changes to commit.'
             exit 0
           fi
-          git commit -m 'build(cat): generate P1 authority-calibrated procedural cat [generated]'
+          git commit -m 'build(cat): generate P1 R2 feline morphology evidence [generated]'
           for attempt in 1 2 3; do
             if git push origin "HEAD:${GITHUB_REF_NAME}"; then
               exit 0
