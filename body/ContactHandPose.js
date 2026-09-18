@@ -1,11 +1,11 @@
-/* Fixed-length side-clamp adaptation for box contact.
+/* Fixed-length surface-contact adaptation for box pushing and ledge support.
  * The atlas is a static, partly flexed hand, not a recorded grasp. Rotating
  * that hand onto a flat box face buried the distal fingers by 28--40 mm.
  * This engineering contact pose opens each measured digit along the face.
  * It changes joint rotations only; wrist, palm target and source bone lengths
  * remain authoritative. This is not a measured finger-motion recording.
  */
-const CONTACT_HAND_POSE_REVISION='box-side-clamp/v1';
+const CONTACT_HAND_POSE_REVISION='box-surface-support/v3';
 const contactHandRecipes=new WeakMap();
 function contactHandRecipe(h){
  let cached=contactHandRecipes.get(h);
@@ -24,8 +24,10 @@ function contactHandRecipe(h){
     if(i===1){
      // The metacarpal root remains in the palm. Open its distal knuckle
      // toward the exterior before the finger passes below the upper edge.
-     const dz=-outside-target[i-1][2],dx=delta[0],remaining=length*length-dx*dx-dz*dz;
-     if(remaining<=0)throw Error('当前个体的手指不能保持骨长形成箱面夹持');
+     // The effector is on the palm surface, in front of the wrist bone.
+     // Leave a finger-thickness gap to that plane, not to the wrist plane.
+     const dz=h.bodyMetrics.palmContact[2]-outside-target[i-1][2],dx=delta[0],remaining=length*length-dx*dx-dz*dz;
+     if(remaining<=0)throw Error('当前个体的手指不能保持骨长形成箱面接触');
      v=[dx,-Math.sqrt(remaining),dz];
     }else v=mul(norm([delta[0],delta[1],0]),length);
     target.push(add(target[i-1],v));

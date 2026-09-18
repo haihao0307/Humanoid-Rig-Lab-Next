@@ -12,6 +12,9 @@ const config={forwardM:.44,heightM:.86,poleLateralM:.6};
 const profile={bodyRadiusM:.26,carryClearanceM:.43,pushClearanceM:.34,nominalWalkMps:.48,nominalCarryMps:.43,nominalPushMps:.22};
 const sandbox={
  PHYSICAL_REASONING_PROFILE:profile,
+ motionBoxApproachOffsets:()=>[0,Math.PI/2,-Math.PI/2,Math.PI],
+ motionBoxHandlingGeometry:o=>({supportGrips:sandbox.graspFrames(),tilted:{q:o.q}}),
+ motionPlanBoxHandlingSteps:function*(h,o,position,yaw,world,configuration,pose={p:o.p,q:o.q}){yield {stage:'box-contact'};const contact=sandbox.motionChooseContact(h,position,yaw,null,world,[o.id],{objectPose:pose});return{supportContact:contact};},
  horizontal:(a,b)=>Math.hypot(a[0]-b[0],a[2]-b[2]),
  motionApproachDistance:()=>.46,
  motionChooseCarryConfiguration:()=>{counts.configuration++;return config;},
@@ -57,7 +60,7 @@ for(const scenario of ['endpoint-blocked','route-blocked','weak','bad-grasp']){
  assert.equal(JSON.stringify({actor,object,target}),before,'rejection must leave live inputs unchanged');
  if(scenario==='endpoint-blocked'){assert.equal(counts.configuration,0);assert.equal(counts.pickup,0);}
  if(scenario==='route-blocked'||scenario==='weak')assert.equal(counts.pickup+counts.placement,0,'route/strength rejection should not construct dense contact poses');
- if(scenario==='bad-grasp')assert.equal(counts.pickup,48,'each distinct approach may fail once, not once per landing');
+ if(scenario==='bad-grasp')assert.equal(counts.pickup,24,'each distinct approach may fail once, not once per landing');
  assert.equal(counts.placement,0);assert(counts.approach<=48,'one call shares its repeated approach paths');
  results.push({scenario,...counts});
 }
@@ -65,7 +68,7 @@ reset('clear');const accepted=run();assert.equal(counts.pickup,1);assert.equal(c
 assert.equal(accepted.destination[2],3);assert.equal(accepted.carryConfiguration,config);assert.equal(accepted.rejectedCandidates,0);
 results.push({scenario:'feasible',...counts});
 reset('clear');rejectPlacementAt=3;const alternate=run();assert.notEqual(alternate.destination[2],3,'a failed placement cannot be accepted with pickup alone');
-assert.equal(counts.pickup,48);assert.equal(counts.placement,49);assert.equal(alternate.rejectedCandidates,48);
+assert.equal(counts.pickup,24);assert.equal(counts.placement,25);assert.equal(alternate.rejectedCandidates,24);
 results.push({scenario:'alternate-landing',...counts});
 reset('clear');const sameWorld=makeWorld();run(sameWorld);mode='route-blocked';assert.throws(()=>run(sameWorld),'world changes between analyses must invalidate all local route results');
 assert.equal(counts.pickup,1);assert.equal(counts.placement,1);

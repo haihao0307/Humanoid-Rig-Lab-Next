@@ -1,0 +1,114 @@
+// Opt-in screenshot evidence from the real production WebGL renderer.
+// Run in a separate headless browser; never sends desktop input.
+import {mkdir,writeFile} from 'node:fs/promises';
+import {join} from 'node:path';
+import {createHash} from 'node:crypto';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright-core');
+const out=process.env.MOTION_QA_DIR;if(!out)throw Error('MOTION_QA_DIR must point outside the repository');
+const support=process.env.MOTION_QA_SEQUENCE==='support',upper=process.env.MOTION_QA_SEQUENCE==='upper',chain=process.env.MOTION_QA_SEQUENCE==='chain',continuous=process.env.MOTION_QA_SEQUENCE==='continuous'||chain,gaitSequence=process.env.MOTION_QA_SEQUENCE==='gait',minimumActors=(gaitSequence||continuous||upper||support)?1:6;
+await mkdir(out,{recursive:true});
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN,args:['--no-sandbox','--enable-webgl','--ignore-gpu-blocklist']});
+const page=await browser.newPage({viewport:{width:1100,height:760}}),records=[],errors=[];
+page.on('pageerror',e=>errors.push(String(e)));
+let entrypointSHA256=null;
+try{
+ const response=await page.goto(process.env.HUMANLAB_URL||'http://127.0.0.1:4173/index.html?qa=1',{waitUntil:'domcontentloaded',timeout:120000});
+ entrypointSHA256=createHash('sha256').update(await response.body()).digest('hex');
+ await page.waitForFunction(n=>{const w=document.querySelector('#bodyFrame')?.contentWindow;if(w?.__startupError)throw Error(w.__startupError);const l=w?.HumanLab;return l?.population?.list().length>=n&&l.compact?.chunks?.length>0;},minimumActors,{timeout:600000});
+ const actors=await page.evaluate(()=>{const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab;lab.setAuto(false);lab.setCameraFollow(false);return lab.population.list().map(a=>({id:a.id,label:a.label}));});
+ console.log('READY '+JSON.stringify(actors));
+ async function capture(actor,name){
+  for(const [view,angle]of (support?[['front',-1],['support-hand',-.65]]:upper?[['side',Math.PI/2],['hand',-Math.PI/2-.45]]:continuous?[['front',.15],['side',Math.PI/2]]:[['front',.15],['side',Math.PI/2],...(process.env.MOTION_QA_FEET==='1'?[['feet',Math.PI/2]]:[])])){
+   const result=await page.evaluate(({id,angle,view})=>{
+    const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,a=lab.population.get(id),h=a.human,r=lab.renderer;
+    lab.render();const compacts=r.compacts,compact=r.compact,tissue=r.tissue;
+    // Only visibility changes for this inspection; do not move actors or alter poses.
+    const floor=r.lastItems.filter(o=>o.materialKind===5&&!o.id);
+    r.compacts=[a.compact];r.compact=a.compact;r.tissue=a.tissue;
+    r.yaw=a.agent.yaw+angle;r.pitch=.035;r.projection='perspective';r.target=[a.agent.pos[0],h.bodyMetrics.statureM*(view==='feet'?.13:.46),a.agent.pos[2]];r.distance=h.bodyMetrics.statureM*(view==='feet'?.65:1.8);
+    if(view==='hand'){const p=h.byId.get('left_hand').world.p;r.target=[p[0],p[1]-.035,p[2]];r.distance=h.bodyMetrics.statureM*.34;}
+    if(view==='support-hand'){const p=h.byId.get('right_hand').world.p;r.target=[p[0],p[1]-.025,p[2]];r.pitch=.3;r.distance=h.bodyMetrics.statureM*.43;}
+    r.render([...floor,...h.bones,...h.cartilage,...h.tissue.items].filter(o=>o.visible!==false),[]);
+    const png=r.canvas.toDataURL('image/png');r.compacts=compacts;r.compact=compact;r.tissue=tissue;
+    const footSupport={},surface=a.compact,all=surface.supportProbes;
+    try{for(const side of ['left','right']){
+     surface.supportProbes=all.filter(p=>p.influences.some(([i,w])=>w>.5&&(h.joints[i].id===side+'_foot'||h.joints[i].id.startsWith(side+'_toe_'))));
+     footSupport[side]={skin:surface.minimumSupportY(),contact:a.agent.locomotion.engine.state.feet[side].contact,rocker:a.agent.locomotion.engine.state.feet[side].rocker||null};
+    }}finally{surface.supportProbes=all;}
+    const knees={};for(const side of ['left','right']){
+     const p=['femur','tibia','foot'].map(j=>h.byId.get(side+'_'+j).world.p);
+     const u=p[1].map((v,i)=>v-p[0][i]),v=p[2].map((v,i)=>v-p[1][i]);
+     knees[side]=Math.acos(Math.max(-1,Math.min(1,u.reduce((s,x,i)=>s+x*v[i],0)/Math.hypot(...u)/Math.hypot(...v))))*180/Math.PI;
+    }
+    return{png,headBalance:h.motionDriver.report().headBalance,clothing:a.compact.clothing.report(),phase:a.agent.phase,posture:a.agent.basic.posture,error:a.agent.error,ready:a.agent.activity().readyForTask,rightPalm:h.palm('right'),floorSupport:h.motionDriver.report().floorSupport,floorSeat:h.motionDriver.report().floorSeat,floorFoot:h.motionDriver.report().floorFoot,leftFoot:h.byId.get('left_foot').world,pelvisSurface:h.minimumBoneY(null,new Set(['hips'])),motionSource:h.lastMotionSource,poseAdoption:a.agent.locomotion.lastPoseAdoption,root:a.agent.pos,bodyRoot:h.byId.get('hips').world.p,pelvisQ:h.byId.get('hips').world.q,kneeDegrees:knees,weightTransfer:a.agent.locomotion.report().weightTransfer,yaw:a.agent.yaw,footErrorM:a.agent.stats.maxFootPositionErrorM,ground:h.minimumBoneY(),footSupport,groundCorrectionM:h.motionDriver.report().groundCorrectionM,bodyResponse:a.agent.locomotion.phaseController.report().bodyResponse,headQ:h.byId.get('head').world.q};
+   },{id:actor.id,angle,view});
+   const file=actor.id+'-'+name+'-'+view+'.png';await writeFile(join(out,file),Buffer.from(result.png.split(',')[1],'base64'));
+   delete result.png;records.push({actor:actor.label,file,...result});console.log('CAPTURE '+file+' '+result.phase);
+   if(result.error)throw Error(result.error);
+  }
+ }
+ async function advance(seconds){await page.evaluate(seconds=>{const l=document.querySelector('#bodyFrame').contentWindow.HumanLab;l.advance(seconds);for(const a of l.population.values())if(a.agent.error)throw Error(a.id+': '+a.agent.error);},seconds);}
+ async function command(id,text){return page.evaluate(({id,text})=>{
+  const l=document.querySelector('#bodyFrame').contentWindow.HumanLab;
+  const result=text==='停止'?l.population.control('stop',[id]):l.population.dispatch(text,{targets:[id],mode:'replace'});
+  l.setAuto(false);if(result.some(r=>!r.accepted))throw Error('QA command rejected: '+JSON.stringify(result));return result;
+ },{id,text});}
+ for(const actor of actors)await capture(actor,'stand');
+ const lead=actors[0];
+ if(support){
+  const sample=async(name,count)=>{for(let i=1;i<=count;i++){await advance(1/20);await capture(lead,name+'-'+String(i).padStart(3,'0'));}};
+  await command(lead.id,'坐下');await sample('sit',64);await advance(3);await capture(lead,'seated');
+  await command(lead.id,'起身');await sample('rise',84);await advance(3);await capture(lead,'stood');
+  const contacts=records.filter(r=>r.floorSupport?.weight===1);
+  if(contacts.length<10||!records.at(-1).ready)throw Error('support sequence did not plant and finish');
+  for(const r of contacts){const drift=Math.hypot(...r.rightPalm.p.map((v,i)=>v-r.floorSupport.anchor.p[i]));if(drift>.0001||r.floorSupport.surfaceY<.0005-1e-6)throw Error('support contact drift or penetration: '+r.file);}
+  const seats=records.filter(r=>r.floorSeat?.weight===1),feet=records.filter(r=>r.floorFoot?.weight===1);
+  if(seats.length<10||feet.length<10)throw Error('support sequence missed pelvis or lead-foot support');
+  for(const r of seats)if(r.pelvisSurface.y>.006)throw Error('seated pelvis lost support: '+r.file);
+  for(const r of feet){const drift=Math.hypot(...r.leftFoot.p.map((v,i)=>v-r.floorFoot.anchor.p[i]));if(drift>.0001||r.floorFoot.surfaceY<.0005-1e-6||r.floorFoot.surfaceY>.004)throw Error('lead-foot contact failed: '+r.file);}
+ }else if(upper){
+  const sample=async(name,count)=>{for(let i=1;i<=count;i++){await advance(1/15);await capture(lead,name+'-'+String(i).padStart(3,'0'));}};
+  await command(lead.id,'向前走2米');await sample('walk',48);
+  await command(lead.id,'停止');await sample('stop',24);await advance(6);await capture(lead,'stopped');
+  await command(lead.id,'挥手');await sample('wave',48);await advance(6);await capture(lead,'wave-end');
+  await command(lead.id,'坐下');await sample('sit',48);await advance(6);await capture(lead,'seated');
+  await command(lead.id,'起身');await sample('rise',75);await advance(6);await capture(lead,'stood');
+ }else if(chain){
+  const sample=async(name,count)=>{for(let i=1;i<=count;i++){await advance(1/30);await capture(lead,name+'-'+String(i).padStart(3,'0'));}};
+  const ready=async()=>{await advance(6);const state=await page.evaluate(id=>{const a=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent;return{ready:a.activity().readyForTask,error:a.error};},lead.id);if(state.error||!state.ready)throw Error('chain did not settle: '+JSON.stringify(state));};
+  await command(lead.id,'向前走2米');await sample('start',60);
+  await command(lead.id,'停止');await sample('stop',75);
+  await page.evaluate(id=>{const a=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent;
+   if(a.plan||a.phase!=='idle'||!a.activity().readyForTask)throw Error('stop command did not cancel and settle the walk');
+  },lead.id);await ready();
+  // Exercise the public locomotion speed argument; no source/scheduler patch.
+  await page.evaluate(id=>{const l=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent.locomotion,move=l.move;l.qaMove=move;l.move=function(dt,speed=.48){return move.call(this,dt,speed*.375);};},lead.id);
+  await command(lead.id,'向前走1米');await sample('slow',240);await ready();
+  await page.evaluate(id=>{const l=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent.locomotion;l.move=l.qaMove;delete l.qaMove;},lead.id);
+  await command(lead.id,'向左转90度');await sample('turn',135);await ready();
+  await command(lead.id,'向前走2米');await advance(1/120);
+  // A controlled route fixture supplied at the task/motion boundary. Keep
+  // world collision, traffic and the production executor enabled.
+  await page.evaluate(id=>{const a=document.querySelector('#bodyFrame').contentWindow.HumanLab.population.get(id).agent,[x,,z]=a.pos,yaw=a.yaw;
+   a.route=Array.from({length:9},(_,i)=>{const t=(i+1)*Math.PI/20,lx=1.2*(1-Math.cos(t)),lz=1.2*Math.sin(t);return[x+lx*Math.cos(yaw)+lz*Math.sin(yaw),0,z-lx*Math.sin(yaw)+lz*Math.cos(yaw)];});a.routeIndex=0;a.skill.endPosition=[...a.route.at(-1)];a.locomotion.requestKey=null;
+  },lead.id);
+  await sample('curve',180);await ready();await capture(lead,'chain-settled');
+ }else if(continuous){
+  await command(lead.id,'向前走3米');
+  for(let i=1;i<=240;i++){await advance(1/30);await capture(lead,'continuous-'+String(i).padStart(3,'0'));}
+  await advance(6);await capture(lead,'walk-settled');
+ }else if(gaitSequence){
+  await command(lead.id,'向前走1米');
+  for(let i=1;i<=16;i++){await advance(.15);await capture(lead,'walk-'+String(i).padStart(2,'0'));}
+  await advance(6);await capture(lead,'walk-settled');
+  await command(lead.id,'向左转90度');
+  for(let i=1;i<=20;i++){await advance(.15);await capture(lead,'turn-'+String(i).padStart(2,'0'));}
+  await advance(6);await capture(lead,'turn-settled');
+ }else{
+ for(const s of [{n:'sit-mid',c:'坐下',dt:1.1},{n:'seated',dt:1.5},{n:'prepare',c:'起身',dt:.5},{n:'rise-mid',dt:1.4},{n:'stood',dt:6},{n:'walk-start',c:'向前走1米',dt:.25},{n:'walk-mid',dt:.65},{n:'walk-stop',dt:7},{n:'turn-mid',c:'向左转90度',dt:.7},{n:'turned',dt:6}]){if(s.c)await command(lead.id,s.c);await advance(s.dt);await capture(lead,s.n);}
+ await page.evaluate(()=>document.querySelector('#bodyFrame').contentWindow.HumanLab.population.dispatch('挥手',{targets:'all',mode:'replace'}));
+ await advance(1.2);for(const actor of actors)await capture(actor,'wave-mid');
+ await advance(6);for(const actor of actors)await capture(actor,'wave-end');
+ }
+}finally{await writeFile(join(out,'review.json'),JSON.stringify({entrypointSHA256,records,errors,visualAcceptance:false,isolatedRendering:true,simulationSampleHz:support?20:upper?15:continuous?30:null,realTimePerformanceMeasured:false},null,2));await browser.close();}
+if(errors.length)throw Error(errors.join('\n'));
