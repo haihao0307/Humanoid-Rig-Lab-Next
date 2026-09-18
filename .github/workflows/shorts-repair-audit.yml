@@ -1,0 +1,32 @@
+name: Shorts repair audit
+on:
+  push:
+    branches: [fix/shorts-separated-legs-20260919]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build from canonical sources
+        run: node tools/build-pure.mjs
+      - name: Check canonical assembly
+        run: node tools/check-pure.mjs
+      - name: Archive exact audited working tree
+        if: always()
+        run: |
+          mkdir -p /tmp/shorts-repair-artifact
+          git rev-parse HEAD > /tmp/shorts-repair-artifact/SOURCE_COMMIT.txt
+          tar --exclude=.git --exclude=node_modules -czf /tmp/shorts-repair-artifact/working-tree.tar.gz .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shorts-repair-audited-source
+          path: /tmp/shorts-repair-artifact
+          retention-days: 7
