@@ -11,7 +11,7 @@ void main(){W=position;N=normal;C=uv*(100./3.);linenShadow=lightVP*vec4(W,1.);gl
 // Restore the formed-shorts assembly route without changing the original
 // paper. The sequential gated experiment remains opt-in at the solver layer.
 // Closed stitches share positions permanently; fit acceptance stays separate.
-const SHORTS_WEARING_OPTIONS=Object.freeze({iterations:32,maxMaterialIterations:128,materialConvergenceStrain:.02,stitchDofs:true,stitchJoinToleranceM:.0001,needleSchedule:'overlap',maxSeamTensionN:null,bendCompliance:40000,waistSupportPath:'edge-rotation',waistSupportSlackM:.004,sewingSchedule:'overlap',handlingPolicy:'until-waist-stitched',triangleBodyContact:true,maxSelfCandidates:30000});
+const SHORTS_WEARING_OPTIONS=Object.freeze({iterations:32,maxMaterialIterations:32,materialConvergenceStrain:.02,stitchDofs:true,stitchJoinToleranceM:.0001,needleSchedule:'overlap',maxSeamTensionN:null,bendCompliance:40000,waistSupportPath:'edge-rotation',waistSupportSlackM:.004,sewingSchedule:'overlap',handlingPolicy:'needle-and-time',triangleBodyContact:true,maxSelfCandidates:30000});
 const SHORTS_INITIAL_ASSEMBLY_STEPS=420;
 const SHORTS_ASSEMBLY_STEP_LIMIT=1600;
 function shortsJoinRenderNormals(vertices,groups){
