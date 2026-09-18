@@ -178,6 +178,7 @@ class MotionLabPose {
    const offset=[delta[0]*shift/horizontal,0,delta[2]*shift/horizontal],before=new Map(frames);
    for(const [joint,f]of frames)frames.set(joint,frame(add(f.p,offset),f.q));
    if(candidate.controlled)this.reprojectControlledLegs(frames,candidate.state,candidate.state.yaw,before,before,1);
+   for(const target of candidate.floorLegTargets||[])this.projectFloorLeg(candidate,target);
    candidate.floorRootShiftM=(candidate.floorRootShiftM||0)+shift;
   }
   const a=frames.get(upper),b=frames.get(elbow),solved=MotionLab.solveTwoBone(a.p,target,b.p,arm.L1,arm.L2);
@@ -216,6 +217,93 @@ class MotionLabPose {
   const surface=h.minimumBoneY(candidate.frames,this.floorHandIds(side));
   return{next,revision:'floor-palm/v1',active:true,side,weight,anchor:frame([...anchor.p],[...anchor.q]),surfaceY:surface.y,rootCorrectionM:candidate.floorRootShiftM||0,torsoLeanRad:candidate.floorTorsoLeanRad||0,torsoDeltaQ:candidate.floorTorsoDeltaQ||qi(),measuredForces:false};
  }
+ floorFootIds(side){
+  this.floorFootSets??=new Map();
+  if(!this.floorFootSets.has(side))this.floorFootSets.set(side,new Set([side+'_foot',...this.descendantRows.get(side+'_foot').map(([id])=>id)]));
+  return this.floorFootSets.get(side);
+ }
+ balanceFloorHead(candidate,options){
+  if(!options.floorHeadBalance||options.lockedFrames)return null;
+  const h=this.h,frames=candidate.frames,head=frames.get('head'),thorax=frames.get('T1');
+  const headDelta=qm(head.q,inv(h.sourceBind.get('head').q)),torsoDelta=qm(thorax.q,inv(h.sourceBind.get('T1').q));
+  const up=rotate(headDelta,[0,1,0]),torsoUp=rotate(torsoDelta,[0,1,0]);
+  // A modest horizon response while upright; fade it out as the trunk lies
+  // down. Keeping a lying head vertical would wrench the neck. This is an
+  // authored balance cue, not a vestibular or medically calibrated model.
+  const weight=.75*smoother((torsoUp[1]-.25)/.55)*clamp(options.floorHeadWeight??options.blendAmount??1,0,1),correction=qslerp(qi(),fromTo(up,[0,1,0]),weight);
+  const original=new Map(frames),neck=this.rows.filter(([,n])=>n.region==='C'),count=neck.length;
+  const active=new Set();let index=0;
+  for(const [id,n]of this.rows){
+   if(n.region!=='C'&&id!=='head'&&!active.has(n.parent))continue;
+   active.add(id);const old=original.get(id),parent=frames.get(n.parent),oldParent=original.get(n.parent);
+   const local=compose(inverse(oldParent),old),fraction=n.region==='C'?.65*(++index)/count:1;
+   frames.set(id,frame(add(parent.p,rotate(parent.q,local.p)),qm(qslerp(qi(),correction,fraction),old.q)));
+  }
+  const finalUp=rotate(qm(frames.get('head').q,inv(h.sourceBind.get('head').q)),[0,1,0]);
+  return{revision:'floor-head-balance/v1',weight,beforeTiltDegrees:degrees(Math.acos(clamp(up[1],-1,1))),tiltDegrees:degrees(Math.acos(clamp(finalUp[1],-1,1))),measuredGaze:false};
+ }
+ projectFloorLeg(candidate,target){
+  const before=new Map(candidate.frames),state={yaw:candidate.state.yaw,feet:{[target.side]:{position:target.p,adoptedOrientation:target.q,contact:true}},swing:null};
+  this.reprojectControlledLegs(candidate.frames,state,state.yaw,before,before,1,[target.side]);
+ }
+ resolveFloorSeat(candidate,options){
+  const weight=clamp(options.floorSeatWeight||0,0,1);
+  if(!weight||!options.floorSupport||options.hands||options.contactHand||candidate.controlled)return null;
+  const h=this.h,ids=new Set(['hips']),margin=.002*h.bodyMetrics.statureScale;
+  const before=h.minimumBoneY(candidate.frames,ids);
+  if(!Number.isFinite(before.y))throw Error('缺少坐姿骨盆支撑采样');
+  const correction=(margin-before.y)*weight;
+  if(Math.abs(correction)>.20*h.bodyMetrics.statureScale)throw Error('坐姿骨盆支撑超出有限适配范围');
+  for(const f of candidate.frames.values())f.p[1]+=correction;
+  candidate.floorLegTargets=[];
+  // Lowering the seated body must not drive an ankle/toe through the floor.
+  // Move only penetrating feet vertically, preserving the recorded ankle
+  // orientation and knee pole. This is clearance, not a planted-foot label.
+  for(const side of ['left','right']){
+   let target=null;
+   for(let pass=0;pass<4;pass++){
+    const surface=h.minimumBoneY(candidate.frames,this.floorFootIds(side));
+    if(!Number.isFinite(surface.y))throw Error('缺少坐姿脚部净空采样');
+    if(surface.y>=.0005-1e-7)break;
+    if(!target){const foot=candidate.frames.get(side+'_foot');target={side,p:[...foot.p],q:[...foot.q]};}
+    target.p[1]+=.0005-surface.y;this.projectFloorLeg(candidate,target);
+   }
+   if(target){
+    candidate.floorLegTargets.push(target);
+    candidate.errors.push({id:side+'_foot',kind:'floor-foot-clearance',target:target.p,targetSpace:'world',effectorLocal:[0,0,0],targetOrientation:target.q,error:0,orientationErrorRad:0});
+   }
+  }
+  return{revision:'floor-seat/v1',weight,surfaceY:before.y,correctionM:correction,clearanceFeet:candidate.floorLegTargets.map(t=>t.side),measuredForces:false};
+ }
+ resolveFloorFoot(candidate,options){
+  if(!options.floorSupport||options.hands||options.contactHand||candidate.controlled)return null;
+  const next=structuredClone(options.floorSupport),weight=clamp(options.floorFootWeight||0,0,1),side='left',id=side+'_foot',h=this.h;
+  if(!weight){delete next.foot;return{next,active:false};}
+  const raw=candidate.frames.get(id);
+  if(!next.foot){
+   // Plan the lead foot under the eventual standing body before loading it.
+   // Locking its early crossed-leg location left the standing leg crouched.
+   const source=candidate.source,progress=source.progress,clip=source.clip;
+   if(clip!=='sitToStand'||!Number.isFinite(progress))throw Error('起身支撑脚缺少有效参考阶段');
+   const origin=r2ReferenceOriginForPosition(h,clip,progress,candidate.state.root,candidate.state.yaw);
+   const landing=this.build({...r2ReferenceDescriptor(h,clip,1,origin,candidate.state.yaw)}).frames.get(id);
+   const up=rotate(landing.q,rotate(inv(h.sourceBind.get(id).q),[0,1,0]));
+   const q=qm(fromTo(up,[0,1,0]),landing.q),p=[landing.p[0],0,landing.p[2]],probe=new Map(candidate.frames),transform=compose(frame(p,q),inverse(raw));
+   probe.set(id,frame(p,q));for(const [child]of this.descendantRows.get(id))probe.set(child,compose(transform,probe.get(child)));
+   const skin=h.minimumBoneY(probe,this.floorFootIds(side));if(!Number.isFinite(skin.y))throw Error('缺少起身支撑脚表面采样');
+   p[1]=.002*h.bodyMetrics.statureScale-skin.y;next.foot={side,p,q};
+  }
+  const anchor=next.foot,target={side,p:mix(raw.p,anchor.p,weight),q:qslerp(raw.q,anchor.q,weight)};
+  const hip=candidate.frames.get(side+'_femur').p,{upper,lower}=this.engine.rig.legs[side],reach=upper+lower-.0005*h.bodyMetrics.statureScale;
+  const horizontal2=(hip[0]-target.p[0])**2+(hip[2]-target.p[2])**2;
+  if(horizontal2>reach*reach)throw Error('起身支撑脚水平目标不可达');
+  const lowerBy=Math.max(0,hip[1]-target.p[1]-Math.sqrt(reach*reach-horizontal2));
+  if(lowerBy>.10*h.bodyMetrics.statureScale)throw Error('起身支撑脚超出有限骨盆适配范围');
+  if(lowerBy)for(const f of candidate.frames.values())f.p[1]-=lowerBy;
+  this.projectFloorLeg(candidate,target);candidate.floorLegTargets??=[];candidate.floorLegTargets.push(target);
+  candidate.errors.push({id,kind:'floor-foot-plant',weight,target:target.p,targetSpace:'world',effectorLocal:[0,0,0],targetOrientation:target.q,error:0,orientationErrorRad:0});
+  return{next,revision:'floor-foot/v1',active:true,side,weight,anchor:frame([...anchor.p],[...anchor.q]),rootLoweringM:lowerBy,measuredForces:false};
+ }
  descendants(positions,rotations,id,rotation){
   rotations.set(id,rotation);
   for(const [child,parent,offset]of this.descendantRows.get(id)){
@@ -240,9 +328,9 @@ class MotionLabPose {
   const u=smooth(clamp(swing.elapsed/Math.max(1e-8,swing.duration),0,1));
   return qslerp(foot.adoptedOrientation,qm(qy(swing.yaw),bind),u);
  }
- reprojectControlledLegs(frames,state,yaw,from,target,u){
+ reprojectControlledLegs(frames,state,yaw,from,target,u,activeSides=['left','right']){
   const h=this.h,positions=new Map([...frames].map(([id,f])=>[id,[...f.p]]));
-  for(const side of ['left','right']){
+  for(const side of activeSides){
    const femur=side+'_femur',tibia=side+'_tibia',foot=side+'_foot',patella=side+'_patella';
    const hip=positions.get(femur),pole=mix(from.get(tibia).p,target.get(tibia).p,u);
    const L1=dist(this.source(femur),this.source(tibia)),L2=dist(this.source(tibia),this.source(foot));
@@ -419,19 +507,24 @@ class MotionLabPose {
   }
   if(radialAttachmentErrorM>.0001)throw Error('前臂蒙皮轴未连接到手腕，姿态未提交');
   if(attachmentErrorM>.0001)throw Error('蒙皮变换未连接到子关节：'+attachmentJoint+'，姿态未提交');
-  const ranges=r2CaptureConstraintProfile(this.h,candidate.source);let hingeReserveDegrees=Infinity;
+  const ranges=r2CaptureConstraintProfile(this.h,candidate.source),contactHinges={};let hingeReserveDegrees=Infinity;
   for(const side of ['left','right'])for(const [a,b,c,limit]of [['upperArm','forearm','hand',170],['femur','tibia','foot',160]]){
    const p=id=>candidate.frames.get(side+'_'+id).p;
    const angle=degrees(Math.acos(clamp(dot(norm(sub(p(b),p(a))),norm(sub(p(c),p(b)))),-1,1)));
-   const maximum=candidate.controlled&&b==='tibia'?limit:ranges?.hingeDegrees[side+'_'+b]??limit;
+   const palmAdapted=b==='forearm'&&candidate.errors.some(e=>e.id===side+'_hand'&&e.kind==='floor-palm');
+   // Recorded extrema describe the unmodified capture. An explicitly solved
+   // palm uses the same fixed-length contact elbow limit as other hand IK;
+   // retain both limits in diagnostics instead of widening the whole clip.
+   const maximum=palmAdapted||candidate.controlled&&b==='tibia'?limit:ranges?.hingeDegrees[side+'_'+b]??limit;
+   if(palmAdapted)contactHinges[side+'_'+b]={angleDegrees:angle,maximumDegrees:maximum,recordedMaximumDegrees:ranges?.hingeDegrees[side+'_'+b]??null};
    hingeReserveDegrees=Math.min(hingeReserveDegrees,maximum+.5-angle);
-   if(angle>maximum+.5)throw Error('关节弯曲超过动作来源或接触适配范围：'+side+'_'+b);
+   if(angle>maximum+.5)throw Error('关节弯曲超过动作来源或接触适配范围：'+side+'_'+b+' '+angle.toFixed(2)+' > '+maximum.toFixed(2));
   }
   const footErrorM=Math.max(0,...candidate.errors.filter(e=>/_foot$/.test(e.id)).map(e=>e.error));
   if(footErrorM>.012)throw Error('落脚目标超出可达范围，姿态未提交');
   const handErrorM=Math.max(0,...candidate.errors.filter(e=>/_hand$/.test(e.id)).map(e=>e.error));
   if(handErrorM>.012)throw Error('手掌目标超出可达范围，姿态未提交');
-  return {boneErrorM,radialAttachmentErrorM,attachmentErrorM,attachmentJoint,footErrorM,handErrorM,hingeReserveDegrees,kinematicOnly:true};
+  return {boneErrorM,radialAttachmentErrorM,attachmentErrorM,attachmentJoint,footErrorM,handErrorM,hingeReserveDegrees,contactHinges,kinematicOnly:true};
  }
  measureEffectors(candidate){
   this.refreshEffectorErrors(candidate.frames,candidate.errors);
@@ -447,7 +540,7 @@ class MotionLabPose {
   const fitFloor=options.groundSupport==='continuous-floor'&&options.floorMode&&
    !candidate.controlled&&!options.hands&&(candidate.source?.kind==='capture'||candidate.source?.handSupported===true)&&
    !candidate.errors.some(error=>error.targetSpace==='world');
-  for(let pass=0;pass<(anchored||candidate.floorPalmTargets?8:1);pass++){
+  for(let pass=0;pass<(anchored||candidate.floorPalmTargets||candidate.floorLegTargets?8:1);pass++){
    ground=this.h.minimumBoneY(candidate.frames);
    if(!Number.isFinite(ground.y))throw Error('动作候选缺少有效支撑采样');
    let correction=fitFloor?.0005-ground.y:Math.max(0,.0005-ground.y);
@@ -469,6 +562,7 @@ class MotionLabPose {
    // back to the existing world contacts. Translating the feet as well made
    // a valid seated support fail the contact gate during preparation.
    if(anchored)this.reprojectControlledLegs(candidate.frames,candidate.state,candidate.state.yaw,before,before,1);
+   for(const target of candidate.floorLegTargets||[])this.projectFloorLeg(candidate,target);
    for(const {side,goal,weight}of candidate.floorPalmTargets||[])this.solveFloorPalm(candidate,side,goal,0);
    groundCorrectionM+=correction;
   }
@@ -482,17 +576,23 @@ class MotionLabPose {
   // Floor queries read candidate frames. Failure cannot partially change the
   // live skeleton, even when this adapter is called outside Agent.tickFixed.
   let {ground,groundCorrectionM}=this.resolveGroundClearance(candidate,options);
-  const floorSupport=this.resolveFloorPalm(candidate,options);
-  if(floorSupport?.active){
+  const floorSeat=this.resolveFloorSeat(candidate,options);
+  const floorFoot=this.resolveFloorFoot(candidate,options);
+  const floorSupport=this.resolveFloorPalm(candidate,floorFoot?{...options,floorSupport:floorFoot.next}:options);
+  const headBalance=this.balanceFloorHead(candidate,options);
+  if(floorSeat||floorSupport?.active||floorFoot?.active){
    const clearance=this.resolveGroundClearance(candidate,options);ground=clearance.ground;groundCorrectionM+=clearance.groundCorrectionM;
-   Object.assign(floorSupport,{surfaceY:h.minimumBoneY(candidate.frames,this.floorHandIds(floorSupport.side)).y,rootCorrectionM:candidate.floorRootShiftM||0,torsoLeanRad:candidate.floorTorsoLeanRad||0,torsoDeltaQ:candidate.floorTorsoDeltaQ||qi()});
+   if(floorSupport?.active)Object.assign(floorSupport,{surfaceY:h.minimumBoneY(candidate.frames,this.floorHandIds(floorSupport.side)).y,rootCorrectionM:candidate.floorRootShiftM||0,torsoLeanRad:candidate.floorTorsoLeanRad||0,torsoDeltaQ:candidate.floorTorsoDeltaQ||qi()});
+   if(floorSeat)floorSeat.surfaceY=h.minimumBoneY(candidate.frames,new Set(['hips'])).y;
+   if(floorFoot?.active)floorFoot.surfaceY=h.minimumBoneY(candidate.frames,this.floorFootIds(floorFoot.side)).y;
   }
   this.measureEffectors(candidate);const report=this.validate(candidate);
   const localFrames=h.joints.map(j=>{const f=candidate.frames.get(j.id),parent=j.parent&&candidate.frames.get(j.parent.id);return parent?compose(inverse(parent),f):frame(f.p,f.q);});
   for(let i=0;i<h.joints.length;i++){const j=h.joints[i],f=localFrames[i];j.p=f.p;j.q=f.q;}
   h.fk();h.lastErrors=candidate.errors;h.lastMotionSource=candidate.source;h.phase=options.floorMode?'floor':options.hands?'manipulation':this.engine.state.status;
   if(floorSupport){for(const key of Object.keys(options.floorSupport))delete options.floorSupport[key];Object.assign(options.floorSupport,floorSupport.next);delete floorSupport.next;}
-  this.lastReport={...report,ground,groundCorrectionM,floorSupport,source:candidate.source,contactHand:options.contactHand?{...options.contactHand,measuredMotion:false}:null,poseAuthority:'MotionLabPose.commit',completeHierarchy:true,validatedAfterClearance:true,worldContactTargetsPreserved:true,measuredSoftTissue:false,visualAcceptance:false};
+  if(floorFoot)delete floorFoot.next;
+  this.lastReport={...report,ground,groundCorrectionM,floorSupport,floorSeat,floorFoot,headBalance,source:candidate.source,contactHand:options.contactHand?{...options.contactHand,measuredMotion:false}:null,poseAuthority:'MotionLabPose.commit',completeHierarchy:true,validatedAfterClearance:true,worldContactTargetsPreserved:true,measuredSoftTissue:false,visualAcceptance:false};
   return h.lastErrors;
  }
  report(){return this.lastReport||{poseAuthority:'MotionLabPose.commit',visualAcceptance:false};}

@@ -603,7 +603,9 @@ async function startupStage(stage,message){
 /*__SOURCE:body/CompactBinding.js__*/
 /*__SOURCE:body/CompactMuscles.js__*/
 /*__SOURCE:body/CompactHairRenderer.js__*/
-/*__SOURCE:body/ProceduralGrassSkirt.js__*/
+/*__SOURCE:clothing/GarmentClothSolver.js__*/
+/*__SOURCE:clothing/ProceduralGrassSkirt.js__*/
+/*__SOURCE:clothing/ClothingSystem.js__*/
 /*__SOURCE:body/FaceAnatomy.js__*/
 /*__SOURCE:body/EyeAnatomy.js__*/
 /*__SOURCE:body/CompactWorkbench.js__*/

@@ -265,19 +265,19 @@ class CompactSurfaceRenderer{
     }
     stage.chunks.sort((a,b)=>Number(['FJ1289','FJ1340'].includes(a.name))-Number(['FJ1289','FJ1340'].includes(b.name)));
     if(data.hair)stage.hair=new CompactHairRenderer(this,data.hair);
-    stage.skirt=new ProceduralGrassSkirt(this,data.meshes);stage.geometryBytes+=stage.skirt.geometryBytes;
+    stage.clothing=new ClothingSystem(this);stage.skirt=stage.clothing.add('grass-skirt',new ProceduralGrassSkirt(this,data.meshes));stage.geometryBytes+=stage.skirt.geometryBytes;
     stage.supportProbes=data.supportProbes;
     stage.report={...data.report,eyeAnatomy:stage.eyeAnatomy,faceAnatomy:stage.faceAnatomy,vertices:data.report.vertices-replacedSclera.reduce((sum,m)=>sum+m.vertices,0)+faceTissue.meshes.reduce((sum,m)=>sum+m.vertices,0)+eyeTissue.meshes.reduce((sum,m)=>sum+m.vertices,0),triangles:data.report.triangles-replacedSclera.reduce((sum,m)=>sum+m.triangles,0)+faceTissue.report.triangles+eyeTissue.report.triangles,...(!data.hair&&this.hair?{hair:this.hair.report,hairEnabled:true}:{}),binding:{...field.report,sourceRegionsPreserved:true,groups:stage.bindingGroups,joints:this.lab.human.joints.length,maximumWeightError:stage.maximumWeightError,calibrated:false}};
     this.checkUpload();
-    }catch(error){this.releaseChunks(stage.chunks);stage.hair?.dispose();stage.skirt?.dispose();throw error;}finally{gl.bindVertexArray(null);gl.bindBuffer(gl.ARRAY_BUFFER,null);}
-    const oldChunks=this.chunks,oldHair=this.hair,oldSkirt=this.skirt;this.skirt=stage.skirt;
+    }catch(error){this.releaseChunks(stage.chunks);stage.hair?.dispose();stage.clothing?.dispose();throw error;}finally{gl.bindVertexArray(null);gl.bindBuffer(gl.ARRAY_BUFFER,null);}
+    const oldChunks=this.chunks,oldHair=this.hair,oldClothing=this.clothing;this.clothing=stage.clothing;this.skirt=stage.skirt;
     this.chunks=stage.chunks;this.eyeSocketRadii=stage.eyeSocketRadii;this.canthusDepths=stage.canthusDepths;this.geometryBytes=stage.geometryBytes;this.maximumWeightError=stage.maximumWeightError;this.bindingGroups=stage.bindingGroups;this.supportProbes=stage.supportProbes;
     if(stage.hair)this.hair=stage.hair;
     this.lab.tissue.surfaceInfo={vertices:stage.report.vertices,triangles:stage.report.triangles,topology:'source fitted connected domains with fitted procedural eyelids'};
     this.report=stage.report;this.quality=data.report.quality;this.bindingMilliseconds=data.report.bindingMilliseconds;this.uploadMilliseconds=performance.now()-started;
     if(this.renderer.compact===this||this.renderer.compacts?.includes(this))this.renderer.lastItems=[];
     this.faceSampling=stage.faceSampling;this.lab.face?.refresh();
-    this.releaseChunks(oldChunks);if(stage.hair)oldHair?.dispose();oldSkirt?.dispose();
+    this.releaseChunks(oldChunks);if(stage.hair)oldHair?.dispose();oldClothing?.dispose();
   }
   attachHair(data){
     if(this.disposed)throw Error('人物显示资源已释放');
@@ -298,7 +298,7 @@ class CompactSurfaceRenderer{
     const t=this.lab.human.tissue;this.tissue=t;if(this.hair)this.hair.visible=false;
     this.view=items.includes(t.skin)?t.view:items.includes(t.clay)?'clay':null;
     this.visible=this.enabled&&this.lab.human===this.boundHuman&&this.view!==null;
-    if(this.visible){this.replaced=new Set([t.skin,t.clay,...t.details,...t.clayDetails,...(t.skinLayerItems||[])]);this.updatePalette();}
+    if(this.visible){this.replaced=new Set([t.skin,t.clay,...t.details,...t.clayDetails,...(t.skinLayerItems||[])]);this.updatePalette();this.clothing?.update();}
     return this.visible;
   }
   updatePalette(){
@@ -350,10 +350,10 @@ class CompactSurfaceRenderer{
       gl.bindVertexArray(c.vao);gl.drawElements(gl.TRIANGLES,c.count,gl.UNSIGNED_SHORT,0);if(depth)r.shadowDrawCalls++;else r.drawCalls++;
     }
     gl.depthMask(true);gl.disable(gl.BLEND);gl.frontFace(gl.CCW);
-    this.skirt?.draw(depth);
+    this.clothing?.draw(depth);
   }
   performance(){return {...this.lab.renderer.compactPerformance?.stats,quality:this.quality,model:'reconstructed-r2',parameterBytes:this.report.parameterBytes,generationMilliseconds:this.report.generationMilliseconds,startupMilliseconds:this.startupMilliseconds??null,poseBindingAccepted:false};}
-  dispose(){if(this.disposed)return;const wasActive=this.renderer.compact===this||this.renderer.compacts?.includes(this);this.disposed=true;this.enabled=false;this.visible=false;this.hair?.dispose();this.skirt?.dispose();const gl=this.gl;this.releaseChunks(this.chunks);if(this.texture)gl.deleteTexture(this.texture);if(this.main)gl.deleteProgram(this.main.p);if(this.depth)gl.deleteProgram(this.depth.p);this.chunks=[];this.supportProbes=[];this.palette=null;this.geometryBytes=0;this.hair=null;this.texture=null;this.main=null;this.depth=null;if(this.boundHuman?.tissue?.surface===this)this.boundHuman.tissue.surface=null;if(this.renderer.compacts)this.renderer.compacts=this.renderer.compacts.filter(surface=>surface!==this);if(this.renderer.compact===this)this.renderer.compact=null;if(wasActive){this.renderer.lastItems=[];needsRedraw=true;}}
+  dispose(){if(this.disposed)return;const wasActive=this.renderer.compact===this||this.renderer.compacts?.includes(this);this.disposed=true;this.enabled=false;this.visible=false;this.hair?.dispose();this.clothing?.dispose();const gl=this.gl;this.releaseChunks(this.chunks);if(this.texture)gl.deleteTexture(this.texture);if(this.main)gl.deleteProgram(this.main.p);if(this.depth)gl.deleteProgram(this.depth.p);this.chunks=[];this.supportProbes=[];this.palette=null;this.geometryBytes=0;this.hair=null;this.texture=null;this.main=null;this.depth=null;if(this.boundHuman?.tissue?.surface===this)this.boundHuman.tissue.surface=null;if(this.renderer.compacts)this.renderer.compacts=this.renderer.compacts.filter(surface=>surface!==this);if(this.renderer.compact===this)this.renderer.compact=null;if(wasActive){this.renderer.lastItems=[];needsRedraw=true;}}
 }
 function installCompactPerformance(lab){
   const gl=lab.renderer.gl,ext=gl.getExtension('EXT_disjoint_timer_query_webgl2'),pending=[];

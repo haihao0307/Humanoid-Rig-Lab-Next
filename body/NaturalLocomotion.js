@@ -412,13 +412,30 @@ class NaturalLocomotion {
    e.state.feet[side]={position:foot?[...foot]:e.stance(e.state,side),yaw:footYaw,contact:true};
    if(orientation)e.state.feet[side].adoptedOrientation=[...orientation];
   }
+  // The captured pelvis can tilt, so a fully extended planted leg may be
+  // reachable from its actual hip but not from the kernel's level hip bar.
+  // Fit only the detached handoff target; Basic blends from the unchanged
+  // committed skeleton, keeping both existing foot positions/orientations.
+  let adoptedRootLoweringM=0;
+  if(leftHip&&rightHip){
+   let ceiling=e.state.root[1];
+   for(const side of ['left','right']){
+    const hip=add(e.state.root,rotate(qy(yaw),[side==='left'?-this.rig.hipHalf:this.rig.hipHalf,0,0])),foot=e.state.feet[side].position;
+    const {upper,lower}=this.rig.legs[side],reach=upper+lower-.0005*h.bodyMetrics.statureScale,horizontal2=(hip[0]-foot[0])**2+(hip[2]-foot[2])**2;
+    if(horizontal2>reach*reach)throw Error('当前姿势的脚位超出行走接管的水平可达范围');
+    ceiling=Math.min(ceiling,foot[1]+Math.sqrt(reach*reach-horizontal2));
+   }
+   adoptedRootLoweringM=e.state.root[1]-ceiling;
+   if(adoptedRootLoweringM>.04*h.bodyMetrics.statureScale)throw Error('当前姿势需要过大的行走接管高度调整');
+   e.state.root[1]=ceiling;
+  }
   e.state.pose=e.solve(e.state);
   for(const side of ['left','right']){
    const leg=e.state.pose.legs[side],foot=e.state.feet[side],residual=dist(leg.end,foot.position);
    maximumAdoptedFootResidualM=Math.max(maximumAdoptedFootResidualM,residual);
    if(residual>.012||leg.lengthError>1e-7)throw Error('当前姿势的脚位无法安全交给行走控制器');
   }
-  this.lastPoseAdoption={preserved:!!(leftHip&&rightHip),maximumAdoptedFootResidualM,
+  this.lastPoseAdoption={preserved:!!(leftHip&&rightHip),maximumAdoptedFootResidualM,adoptedRootLoweringM,
    root:[...e.state.root],feet:Object.fromEntries(['left','right'].map(side=>[side,[...e.state.feet[side].position]]))};
   this.phaseController.reset(e.state.motion.phase||0);this.turnFilter.reset(yaw);
   this.requestKey=null;this.requested=false;this.tempo=1;this.routePassThroughCount=this.routePassThroughCount||0;

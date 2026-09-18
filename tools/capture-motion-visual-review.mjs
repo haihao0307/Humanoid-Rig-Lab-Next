@@ -40,7 +40,7 @@ try{
      const u=p[1].map((v,i)=>v-p[0][i]),v=p[2].map((v,i)=>v-p[1][i]);
      knees[side]=Math.acos(Math.max(-1,Math.min(1,u.reduce((s,x,i)=>s+x*v[i],0)/Math.hypot(...u)/Math.hypot(...v))))*180/Math.PI;
     }
-    return{png,phase:a.agent.phase,posture:a.agent.basic.posture,error:a.agent.error,ready:a.agent.activity().readyForTask,rightPalm:h.palm('right'),floorSupport:h.motionDriver.report().floorSupport,root:a.agent.pos,bodyRoot:h.byId.get('hips').world.p,pelvisQ:h.byId.get('hips').world.q,kneeDegrees:knees,weightTransfer:a.agent.locomotion.report().weightTransfer,yaw:a.agent.yaw,footErrorM:a.agent.stats.maxFootPositionErrorM,ground:h.minimumBoneY(),footSupport,groundCorrectionM:h.motionDriver.report().groundCorrectionM,bodyResponse:a.agent.locomotion.phaseController.report().bodyResponse,headQ:h.byId.get('head').world.q};
+    return{png,headBalance:h.motionDriver.report().headBalance,clothing:a.compact.clothing.report(),phase:a.agent.phase,posture:a.agent.basic.posture,error:a.agent.error,ready:a.agent.activity().readyForTask,rightPalm:h.palm('right'),floorSupport:h.motionDriver.report().floorSupport,floorSeat:h.motionDriver.report().floorSeat,floorFoot:h.motionDriver.report().floorFoot,leftFoot:h.byId.get('left_foot').world,pelvisSurface:h.minimumBoneY(null,new Set(['hips'])),motionSource:h.lastMotionSource,poseAdoption:a.agent.locomotion.lastPoseAdoption,root:a.agent.pos,bodyRoot:h.byId.get('hips').world.p,pelvisQ:h.byId.get('hips').world.q,kneeDegrees:knees,weightTransfer:a.agent.locomotion.report().weightTransfer,yaw:a.agent.yaw,footErrorM:a.agent.stats.maxFootPositionErrorM,ground:h.minimumBoneY(),footSupport,groundCorrectionM:h.motionDriver.report().groundCorrectionM,bodyResponse:a.agent.locomotion.phaseController.report().bodyResponse,headQ:h.byId.get('head').world.q};
    },{id:actor.id,angle,view});
    const file=actor.id+'-'+name+'-'+view+'.png';await writeFile(join(out,file),Buffer.from(result.png.split(',')[1],'base64'));
    delete result.png;records.push({actor:actor.label,file,...result});console.log('CAPTURE '+file+' '+result.phase);
@@ -62,6 +62,10 @@ try{
   const contacts=records.filter(r=>r.floorSupport?.weight===1);
   if(contacts.length<10||!records.at(-1).ready)throw Error('support sequence did not plant and finish');
   for(const r of contacts){const drift=Math.hypot(...r.rightPalm.p.map((v,i)=>v-r.floorSupport.anchor.p[i]));if(drift>.0001||r.floorSupport.surfaceY<.0005-1e-6)throw Error('support contact drift or penetration: '+r.file);}
+  const seats=records.filter(r=>r.floorSeat?.weight===1),feet=records.filter(r=>r.floorFoot?.weight===1);
+  if(seats.length<10||feet.length<10)throw Error('support sequence missed pelvis or lead-foot support');
+  for(const r of seats)if(r.pelvisSurface.y>.006)throw Error('seated pelvis lost support: '+r.file);
+  for(const r of feet){const drift=Math.hypot(...r.leftFoot.p.map((v,i)=>v-r.floorFoot.anchor.p[i]));if(drift>.0001||r.floorFoot.surfaceY<.0005-1e-6||r.floorFoot.surfaceY>.004)throw Error('lead-foot contact failed: '+r.file);}
  }else if(upper){
   const sample=async(name,count)=>{for(let i=1;i<=count;i++){await advance(1/15);await capture(lead,name+'-'+String(i).padStart(3,'0'));}};
   await command(lead.id,'向前走2米');await sample('walk',48);

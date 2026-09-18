@@ -20,13 +20,18 @@ try{
   if(w.__startupError)throw Error(w.__startupError);lab.setAuto(false);lab.inspectBody('front');
   const gl=w.document.querySelector('#view').getContext('webgl2');
   const pose=lab.agent.locomotion.pose,apply=pose.apply;
-  lab.motionQA={adoptedSamples:0,maxAdoptedAngleRad:0,floorSamples:0,loweredFloorSamples:0,maxLoweringM:0,maxFloorGapM:0,maxUnconstrainedFloorGapM:0,maxFloorPenetrationM:0,plantedPalmSamples:0,maxPlantedPalmDriftM:0,maxPlantedSurfaceGapM:0};
+  lab.motionQA={adoptedSamples:0,maxAdoptedAngleRad:0,floorSamples:0,loweredFloorSamples:0,maxLoweringM:0,maxFloorGapM:0,maxUnconstrainedFloorGapM:0,maxFloorPenetrationM:0,plantedPalmSamples:0,maxPlantedPalmDriftM:0,maxPlantedSurfaceGapM:0,seatedSupportSamples:0,maxSeatGapM:0,plantedLeadFootSamples:0,maxLeadFootDriftM:0,maxLeadFootSurfaceGapM:0};
   pose.apply=function(...args){const result=apply.apply(this,args),s=this.engine.state;
    if(args[0]?.groundSupport==='continuous-floor'){
     const report=this.report(),qa=lab.motionQA;qa.floorSamples++;
     qa.maxFloorGapM=Math.max(qa.maxFloorGapM,Math.abs(report.ground.y-.0005));
     qa.maxFloorPenetrationM=Math.max(qa.maxFloorPenetrationM,.0005-report.ground.y);
-    if(!report.floorSupport?.active)qa.maxUnconstrainedFloorGapM=Math.max(qa.maxUnconstrainedFloorGapM,Math.abs(report.ground.y-.0005));
+    if(!report.floorSupport?.active&&!report.floorSeat&&!report.floorFoot?.active)qa.maxUnconstrainedFloorGapM=Math.max(qa.maxUnconstrainedFloorGapM,Math.abs(report.ground.y-.0005));
+    if(report.floorSeat?.weight===1){qa.seatedSupportSamples++;qa.maxSeatGapM=Math.max(qa.maxSeatGapM,Math.abs(report.floorSeat.surfaceY-.002*this.h.bodyMetrics.statureScale));}
+    if(report.floorFoot?.weight===1){
+     qa.plantedLeadFootSamples++;const actual=this.h.byId.get('left_foot').world.p,anchor=report.floorFoot.anchor.p;
+     qa.maxLeadFootDriftM=Math.max(qa.maxLeadFootDriftM,Math.hypot(...actual.map((v,i)=>v-anchor[i])));qa.maxLeadFootSurfaceGapM=Math.max(qa.maxLeadFootSurfaceGapM,report.floorFoot.surfaceY);
+    }
     if(report.floorSupport?.weight===1){
      qa.plantedPalmSamples++;const actual=this.h.palm('right').p,anchor=report.floorSupport.anchor.p;
      qa.maxPlantedPalmDriftM=Math.max(qa.maxPlantedPalmDriftM,Math.hypot(...actual.map((v,i)=>v-anchor[i])));
@@ -81,6 +86,7 @@ try{
  const finalQA=results.at(-1);assert(finalQA.floorSamples>0);assert(finalQA.loweredFloorSamples>0);
  assert(finalQA.maxUnconstrainedFloorGapM<1e-6);assert(finalQA.maxFloorPenetrationM<1e-6);
  assert(finalQA.plantedPalmSamples>100);assert(finalQA.maxPlantedPalmDriftM<.0001);assert(finalQA.maxPlantedSurfaceGapM<.004);
+ assert(finalQA.seatedSupportSamples>100);assert(finalQA.maxSeatGapM<.006);assert(finalQA.plantedLeadFootSamples>100);assert(finalQA.maxLeadFootDriftM<.0001);assert(finalQA.maxLeadFootSurfaceGapM<.004);
  floorCrowd=await page.evaluate(()=>{
   const lab=document.querySelector('#bodyFrame').contentWindow.HumanLab,p=lab.population,ids=p.list().map(a=>a.id),runs=[];
   p.control('stop','all');lab.setAuto(false);lab.advance(3);lab.world.applyPreset('empty');

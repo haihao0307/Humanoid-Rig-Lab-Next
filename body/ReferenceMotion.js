@@ -84,12 +84,28 @@ function r2CaptureMotion(h,yaw){
  return r;
 }
 function r2ReferenceDescriptor(h,id,t,origin,yaw,from=null,blend=1){
- const raw=r2SampleMotion(id,t),reference=from?r2BlendMotion(from,raw,blend):raw;
+ const raw=r2SampleMotion(id,t),floorHeadBalance=['standToSit','sitToLie','lieToSit','sitToStand'].includes(id);
+ const adapted=floorHeadBalance?r2FloorCaptureMotion(raw):raw,reference=from?r2BlendMotion(from,adapted,blend):adapted;
  const transitionHingeDegrees=from&&blend<1?Object.fromEntries(['left','right'].flatMap(side=>[['forearm','UpperArm','Forearm'],['tibia','Thigh','Shank']].map(([joint,a,b])=>[side+'_'+joint,degrees(Math.acos(clamp(dot(from[side+a],from[side+b]),-1,1)))]))):null;
  const scale=(h.bodyMetrics.rig.femurLengthM+h.bodyMetrics.rig.tibiaLengthM),offset=rotate(qy(yaw),mul(raw.rootOffset,scale));
  return {position:[origin[0]+offset[0],h.bodyMetrics.restHipHeightM*reference.rootHeightRatio,origin[2]+offset[2]],
   reference,floorMode:true,groundSupport:['standToSit','sitToLie','lieToSit','sitToStand'].includes(id)?'continuous-floor':null,
-  kind:id,motionSource:{kind:'capture',clip:id,trial:R2_MOTION.clips[id].sourceTrial,progress:t,transitionHingeDegrees}};
+  floorHeadBalance,floorHeadWeight:from?blend:1,floorSeatWeight:r2FloorSeatWeight(id,t),floorFootWeight:id==='sitToStand'?smoother((t-.28)/.12):0,kind:id,motionSource:{kind:'capture',clip:id,trial:R2_MOTION.clips[id].sourceTrial,progress:t,transitionHingeDegrees}};
+}
+function r2FloorCaptureMotion(raw){
+ // The four floor clips share one take. Calibrate once against its standing
+ // frame, including the thorax basis; per-clip resets would jump at seams.
+ // Preserve world-frame changes, without importing the performer's static
+ // head roll/yaw. Do not rewrite the published source samples or body motion.
+ const first=r2MotionClips.get('standToSit').samples[0],out={...raw};
+ let sourceBase=qm(first.rootQ,qm(first.lumbarQ,first.thoraxQ));
+ let sourceNow=qm(raw.rootQ,qm(raw.lumbarQ,raw.thoraxQ)),parent=sourceNow;
+ for(const key of ['cervicalQ','headQ']){
+  sourceBase=qm(sourceBase,first[key]);sourceNow=qm(sourceNow,raw[key]);
+  const target=qnorm(qm(sourceNow,inv(sourceBase)));
+  out[key]=qnorm(qm(inv(parent),target));parent=target;
+ }
+ return out;
 }
 function r2PostureClips(from,target){
  if(from===target)return [];
@@ -99,11 +115,20 @@ function r2PostureClips(from,target){
 const R2_SEATED_PREPARATION=Object.freeze({clip:'sitToStand',durationS:.72,revision:'support-transfer/v1'});
 // Authored contact intervals inferred from the installed 113_08 recording.
 // These are retargeting constraints, not measured force/contact labels.
-const R2_FLOOR_PALM_INTERVALS=Object.freeze({standToSit:[.70,.88,1,1],sitToStand:[0,0,.26,.40],sitToLie:[0,0,.12,.25],lieToSit:[.50,.72,1,1]});
+const R2_FLOOR_PALM_INTERVALS=Object.freeze({standToSit:[.70,.88,1,1],sitToStand:[0,0,.40,.48],sitToLie:[0,0,.12,.25],lieToSit:[.50,.72,1,1]});
 function r2FloorPalmWeight(clip,progress){
  const interval=R2_FLOOR_PALM_INTERVALS[clip];if(!interval)return 0;
  const [approach,plant,release,end]=interval;
  return (plant===approach?1:smoother((progress-approach)/(plant-approach)))*(release===end?1:1-smoother((progress-release)/(end-release)));
+}
+// The seated pelvis keeps support while the legs are being repositioned.
+// Release it before the recorded ascent; these are engineering phase labels.
+function r2FloorSeatWeight(clip,progress){
+ if(clip==='standToSit')return smoother((progress-.78)/.16);
+ if(clip==='lieToSit')return smoother((progress-.66)/.20);
+ if(clip==='sitToStand')return 1-smoother((progress-.10)/.13);
+ if(clip==='sitToLie')return 1-smoother((progress-.10)/.12);
+ return 0;
 }
 function r2ReferenceOriginForPosition(h,id,progress,position,yaw){
  const raw=r2SampleMotion(id,progress),scale=h.bodyMetrics.rig.femurLengthM+h.bodyMetrics.rig.tibiaLengthM;
@@ -112,10 +137,10 @@ function r2ReferenceOriginForPosition(h,id,progress,position,yaw){
 }
 function r2SeatedPreparationDescriptor(h,frames,feet,yaw,progress,handSupported=false){
  if(!(frames instanceof Map)||!frames.has('hips'))throw Error('起身准备缺少已提交的坐姿骨架');
- const reference=r2SampleMotion(R2_SEATED_PREPARATION.clip,0),start=frames.get('hips').p;
+ const reference=r2FloorCaptureMotion(r2SampleMotion(R2_SEATED_PREPARATION.clip,0)),start=frames.get('hips').p;
  const position=[start[0],h.bodyMetrics.restHipHeightM*reference.rootHeightRatio,start[2]];
  return {position,reference,...(handSupported?{groundSupport:'continuous-floor'}:{controlledFeet:true,feet}),blendFrom:frames,blendAmount:smoother(clamp(progress,0,1)),preserveFootContactsOnBlend:true,
-  floorMode:true,kind:'seatedPrepare',motionSource:{kind:'engineering-transition',transition:R2_SEATED_PREPARATION.revision,handSupported,
+  floorMode:true,floorHeadBalance:true,floorSeatWeight:handSupported?1:0,kind:'seatedPrepare',motionSource:{kind:'engineering-transition',transition:R2_SEATED_PREPARATION.revision,handSupported,
    targetClip:R2_SEATED_PREPARATION.clip,progress:clamp(progress,0,1),measuredMotion:false}};
 }
 function r2StandingCaptureMotion(raw,from){
@@ -178,8 +203,12 @@ function r2MotionTracking(h,reference,yaw){
  const unconstrainedArmDegrees=Math.max(0,...Object.entries(angles).filter(([k])=>/UpperArm|Forearm/.test(k)&&!contactArms.some(side=>k.startsWith(side))).map(([,v])=>v));
  const adaptedTorsoDegrees=floor?.active&&contacts.length?degrees(qangle(h.byId.get('T1').world.q,qm(floor.torsoDeltaQ,torso))):torsoDegrees;
  const contactPassed=contacts.every(e=>e.error<=.012&&e.orientationErrorRad<.1);
+ const footContacts=h.lastErrors.filter(e=>e.kind==='floor-foot-plant');
+ const footContactPassed=footContacts.every(e=>e.error<=.012&&e.orientationErrorRad<.1);
+ const contactLegs=footContacts.filter(e=>e.weight===1&&e.error<=.012&&e.orientationErrorRad<.1).map(e=>e.id.split('_')[0]);
+ const unconstrainedLegDegrees=Math.max(0,...Object.entries(angles).filter(([k])=>/Thigh|Shank/.test(k)&&!contactLegs.some(side=>k.startsWith(side))).map(([,v])=>v));
  // These are declared animation tolerances, not clinical error bounds.
- return {angles,legDegrees,armDegrees,torsoDegrees,unconstrainedArmDegrees,adaptedTorsoDegrees,contactArms,contactPassed,footM,passed:legDegrees<=12&&unconstrainedArmDegrees<=18&&adaptedTorsoDegrees<=12&&footM<=.05&&contactPassed,
+ return {angles,legDegrees,armDegrees,torsoDegrees,unconstrainedLegDegrees,contactLegs,footContactPassed,unconstrainedArmDegrees,adaptedTorsoDegrees,contactArms,contactPassed,footM,passed:unconstrainedLegDegrees<=12&&unconstrainedArmDegrees<=18&&adaptedTorsoDegrees<=12&&footM<=.05&&contactPassed&&footContactPassed,
   tolerance:{legDegrees:12,armDegrees:18,torsoDegrees:12,footM:.05},scope:'skeletal reference tracking; not soft-tissue or visual acceptance'};
 }
 function r2MotionReport(){return {revision:R2_MOTION.revision,source:R2_MOTION.source,
