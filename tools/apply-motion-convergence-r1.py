@@ -2,9 +2,9 @@
 """Apply the reproducible R1 motion convergence delta.
 
 The patch starts from the clean main assembly, registers only selected motion
-modules, keeps clothing out, preserves the filtered support query and wires a
-read-only MotionRuntimeState mirror into NaturalLocomotion. Repeated execution
-must produce no further changes.
+modules, keeps clothing out, preserves the filtered support query, wires the
+read-only MotionRuntimeState mirror and adds the bounded R1.2 gait transition.
+Repeated execution must produce no further changes.
 """
 
 from __future__ import annotations
@@ -19,9 +19,12 @@ LOCOMOTION = ROOT / "body" / "NaturalLocomotion.js"
 
 BOX_MODULE = "body/BoxHandling.js"
 STATE_MODULE = "body/MotionRuntimeState.js"
+GAIT_MODULE = "body/GaitTransitionFeedback.js"
 ACTIONS_MARKER = "/*__SOURCE:body/MotionLabActions.js__*/"
 BOX_MARKER = "/*__SOURCE:body/BoxHandling.js__*/"
 STATE_MARKER = "/*__SOURCE:body/MotionRuntimeState.js__*/"
+BALANCE_MARKER = "/*__SOURCE:body/LightBalanceFeedback.js__*/"
+GAIT_MARKER = "/*__SOURCE:body/GaitTransitionFeedback.js__*/"
 
 OLD_SUPPORT_HEAD = (
     "minimumBoneY(frames=null){let min=Infinity,id=null;for(const b of this.bones){"
@@ -88,6 +91,38 @@ LOCOMOTION_PATCHES = [
         "  contactBasis:'flat placement anchors with explicit heel/forefoot support pivots',pose:this.pose.report(),visualAcceptance:false};}",
         "  contactBasis:'flat placement anchors with explicit heel/forefoot support pivots',pose:this.pose.report(),runtimeState:this.runtimeState?.report?.()||null,visualAcceptance:false};}",
     ),
+    (
+        "gait-first-release",
+        "  const strideScale=Math.sqrt(clamp(this.tempo,.05,1)),duration=.36*strideScale;\n"
+        "  const releaseDistance=(state.metrics.steps===state.walkingStartStep?.075:.095)*strideScale;",
+        "  const strideScale=Math.sqrt(clamp(this.tempo,.05,1)),firstStep=state.metrics.steps===state.walkingStartStep,duration=.36*strideScale;\n"
+        "  const releaseDistance=(firstStep?(this.gaitTransition?.firstReleaseM??.075):.095)*strideScale;",
+    ),
+    (
+        "gait-terminal-lead",
+        "  const heading=command?.type==='walk'?Math.atan2(command.target[0]-state.root[0],command.target[2]-state.root[2]):state.yaw;\n"
+        "  // Land into the curve, with a bounded preview of the requested heading.",
+        "  const heading=command?.type==='walk'?Math.atan2(command.target[0]-state.root[0],command.target[2]-state.root[2]):state.yaw;\n"
+        "  const remaining=command?.type==='walk'?horizontal(state.root,command.target):Infinity;\n"
+        "  const terminalScale=this.gaitTransition&&Number.isFinite(remaining)?clamp(remaining/(this.gaitTransition.terminalDistanceM||.34),this.gaitTransition.minimumTerminalScale||.28,1):1;\n"
+        "  const lead=state.speed*.38*strideScale*terminalScale;\n"
+        "  // Land into the curve, with a bounded preview of the requested heading.",
+    ),
+    (
+        "gait-terminal-target",
+        "  let target=this.engine.stance({...state,yaw:placementYaw},side,state.speed*.38*strideScale);",
+        "  let target=this.engine.stance({...state,yaw:placementYaw},side,lead);",
+    ),
+    (
+        "gait-terminal-fallback",
+        "   placementYaw=state.yaw;target=this.engine.stance(state,side,state.speed*.38*strideScale);",
+        "   placementYaw=state.yaw;target=this.engine.stance(state,side,lead);",
+    ),
+    (
+        "gait-terminal-report",
+        "  state.swing={side,from:[...foot.position],target,fromYaw:foot.yaw,yaw:placementYaw,elapsed:0,duration,walkingStrideScale:strideScale};",
+        "  state.swing={side,from:[...foot.position],target,fromYaw:foot.yaw,yaw:placementYaw,elapsed:0,duration,walkingStrideScale:strideScale,terminalScale};",
+    ),
 ]
 
 
@@ -113,6 +148,7 @@ def update_assembly() -> bool:
         raise SystemExit("clean motion branch must not register clothing/ modules")
     changed = insert_after(modules, BOX_MODULE, "body/MotionLabActions.js")
     changed = insert_after(modules, STATE_MODULE, BOX_MODULE) or changed
+    changed = insert_after(modules, GAIT_MODULE, "body/LightBalanceFeedback.js") or changed
     ASSEMBLY.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return changed
 
@@ -121,7 +157,7 @@ def update_runtime_modules() -> bool:
     text = RUNTIME.read_text(encoding="utf-8")
     if text.count(ACTIONS_MARKER) != 1:
         raise SystemExit("source/runtime.template.js: MotionLabActions marker is not unique")
-    if text.count(BOX_MARKER) > 1 or text.count(STATE_MARKER) > 1:
+    if any(text.count(marker) > 1 for marker in (BOX_MARKER, STATE_MARKER, GAIT_MARKER)):
         raise SystemExit("source/runtime.template.js: duplicated motion convergence marker")
     changed = False
     if BOX_MARKER not in text:
@@ -134,6 +170,13 @@ def update_runtime_modules() -> bool:
         changed = True
     elif BOX_MARKER + "\n" + STATE_MARKER not in text:
         raise SystemExit("MotionRuntimeState marker is in the wrong assembly position")
+    if BALANCE_MARKER not in text:
+        raise SystemExit("source/runtime.template.js: missing LightBalanceFeedback marker")
+    if GAIT_MARKER not in text:
+        text = text.replace(BALANCE_MARKER, BALANCE_MARKER + "\n" + GAIT_MARKER, 1)
+        changed = True
+    elif BALANCE_MARKER + "\n" + GAIT_MARKER not in text:
+        raise SystemExit("GaitTransitionFeedback marker is in the wrong assembly position")
     RUNTIME.write_text(text, encoding="utf-8")
     return changed
 

@@ -44,12 +44,15 @@ jobs:
           ! grep -q '"clothing/' source/assembly.json
           grep -q 'body/BoxHandling.js' source/assembly.json
           grep -q 'body/MotionRuntimeState.js' source/assembly.json
+          grep -q 'body/GaitTransitionFeedback.js' source/assembly.json
           grep -q '__SOURCE:body/BoxHandling.js__' source/runtime.template.js
           grep -q '__SOURCE:body/MotionRuntimeState.js__' source/runtime.template.js
+          grep -q '__SOURCE:body/GaitTransitionFeedback.js__' source/runtime.template.js
           grep -q 'minimumBoneY(frames=null,jointIds=null)' source/runtime.template.js
           grep -q 'minimumSupportY(frames,jointIds)' source/runtime.template.js
           grep -q "new MotionRuntimeState(agent)" body/NaturalLocomotion.js
           grep -q "runtimeState:this.runtimeState?.report?.()||null" body/NaturalLocomotion.js
+          grep -q "terminalScale" body/NaturalLocomotion.js
 
       - name: Rebuild generated entrypoint
         run: |
@@ -64,6 +67,7 @@ jobs:
           set -euo pipefail
           node tools/check-motion-lab-integration.mjs
           node tools/test-motion-runtime-state.mjs
+          node tools/test-gait-transition-feedback.mjs
           node tools/test-motion-phase-continuity.mjs
           node tools/test-motion-support-continuity.mjs
           node tools/test-motion-execution-rollback.mjs
