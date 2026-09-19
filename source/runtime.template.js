@@ -142,10 +142,10 @@ class Human{
  }
  // Sampled support clearance from the current R2 skinning transform.
  // This is not an exhaustive collision or measured contact-force evaluation.
- minimumBoneY(frames=null){let min=Infinity,id=null;for(const b of this.bones){const f=frames?frames.get(b.joint.id):b.joint.world,[x,y,z,w]=f.q;
+ minimumBoneY(frames=null,jointIds=null){let min=Infinity,id=null;for(const b of this.bones){if(jointIds&&!jointIds.has(b.joint.id))continue;const f=frames?frames.get(b.joint.id):b.joint.world,[x,y,z,w]=f.q;
    const a=2*(x*y+z*w),c=1-2*(x*x+z*z),d=2*(y*z-x*w),py=f.p[1],v=b.g.p;
    for(let k=0;k<v.length;k+=3){const yy=py+a*v[k]+c*v[k+1]+d*v[k+2];if(yy<min){min=yy;id=b.id}}
-  }const soft=this.tissue?.minimumSupportY(frames);return soft&&soft.y<min?soft:{y:min,boneId:id}}
+  }const soft=this.tissue?.minimumSupportY(frames,jointIds);return soft&&soft.y<min?soft:{y:min,boneId:id}}
   diagnostics(){let max=0;for(const b of this.bindLengths){if(/_patella$/.test(b.id))continue;const j=this.byId.get(b.id);max=Math.max(max,Math.abs(len(sub(j.world.p,j.parent.world.p))-b.length))}return{...this.evidence,maxBoneLengthErrorM:max,maxEffectorErrorM:Math.max(0,...this.lastErrors.map(e=>e.error)),maxFootTargetErrorM:Math.max(0,...this.lastErrors.filter(e=>/_foot$/.test(e.id)).map(e=>e.error)),maxHandTargetErrorM:Math.max(0,...this.lastErrors.filter(e=>/_hand$/.test(e.id)).map(e=>e.error)),maxOrientationErrorRad:Math.max(0,...this.lastErrors.map(e=>e.orientationErrorRad||0)),root:[...this.root.p],jointAngles:this.lastErrors.map(e=>({id:e.id,hingeRad:e.hinge,bendPlaneRad:e.bendPlaneRad})),poseAuthority:'MotionLabPose.commit',jointAxisValidation:'source-frames-and-fixed-length-IK',jointConstraints:this.motionDriver?.report()||null,constraintProfile:'motion-lab-frame-and-reach',fullMuscleDynamics:false,tissue:this.tissue?.report()||null}}
 }
 
@@ -515,6 +515,7 @@ function inferHeldFrame(human,grips){const a=compose(human.palm('left'),inverse(
 /*__SOURCE:body/ContactHandPose.js__*/
 /*__SOURCE:body/MotionLabPose.js__*/
 /*__SOURCE:body/MotionLabActions.js__*/
+/*__SOURCE:body/BoxHandling.js__*/
 /*__SOURCE:body/NaturalLocomotion.js__*/
 /*__SOURCE:body/LightBalanceFeedback.js__*/
 /*__SOURCE:control/TaskAgent.js__*/
