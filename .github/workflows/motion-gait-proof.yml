@@ -22,7 +22,7 @@ jobs:
   gait-proof:
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[gait-proof]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,13 +55,13 @@ jobs:
           SOURCE_SHA="$(git rev-parse HEAD)"
           SHORT_SHA="${SOURCE_SHA:0:12}"
           PUBLIC_URL="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${SOURCE_SHA}/index.html"
-          LOCAL_URL="http://127.0.0.1:8765/index.html?visualTest=1"
+          LOCAL_URL="http://127.0.0.1:8765/body-qa.html?visualTest=1"
           echo "source_sha=${SOURCE_SHA}" >> "$GITHUB_OUTPUT"
           echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
           echo "public_url=${PUBLIC_URL}" >> "$GITHUB_OUTPUT"
           echo "local_url=${LOCAL_URL}" >> "$GITHUB_OUTPUT"
 
-      - name: Verify exact public bytes and build lightweight local review
+      - name: Verify exact public bytes and extract exact body runtime
         shell: bash
         env:
           PUBLIC_URL: ${{ steps.target.outputs.public_url }}
@@ -72,6 +72,7 @@ jobs:
             -H 'Cache-Control: no-cache' "$PUBLIC_URL" -o public-index.html
           cmp -s source-index.html public-index.html
           python - <<'PY'
+          from html.parser import HTMLParser
           from pathlib import Path
 
           def patch(path, marker, insertion):
@@ -92,7 +93,28 @@ jobs:
           )
           PY
           node tools/build-pure.mjs
-          sha256sum source-index.html public-index.html index.html | tee proof-entrypoint-hashes.txt
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          class BodySrcdoc(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.srcdoc=None
+              def handle_starttag(self,tag,attrs):
+                  values=dict(attrs)
+                  if tag=='iframe' and values.get('id')=='bodyFrame':
+                      self.srcdoc=values.get('srcdoc')
+
+          parser=BodySrcdoc()
+          parser.feed(Path('index.html').read_text(encoding='utf-8'))
+          if not parser.srcdoc:
+              raise SystemExit('Generated index.html does not contain bodyFrame srcdoc')
+          Path('body-qa.html').write_text(parser.srcdoc,encoding='utf-8')
+          PY
+          grep -q 'gait-transition-r1' body-qa.html
+          grep -q '__motionVisualQAFallback' body-qa.html
+          sha256sum source-index.html public-index.html index.html body-qa.html | tee proof-entrypoint-hashes.txt
 
       - name: Run focused browser proof
         env:
@@ -106,11 +128,12 @@ jobs:
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 40); do
-            if curl -fsS --connect-timeout 2 "http://127.0.0.1:8765/index.html" >/dev/null; then break; fi
-            if [[ "$attempt" == 40 ]]; then echo 'Local server did not start.' >&2; exit 1; fi
+            if curl -fsS --connect-timeout 2 "http://127.0.0.1:8765/body-qa.html?visualTest=1" >/dev/null; then break; fi
+            if [[ "$attempt" == 40 ]]; then echo 'Local direct body server did not start.' >&2; exit 1; fi
             sleep .25
           done
-          xvfb-run -a -s "-screen 0 1920x1080x24" \
+          timeout --signal=TERM --kill-after=10s 420s \
+            xvfb-run -a -s "-screen 0 1920x1080x24" \
             python tools/motion_gait_visual_proof.py \
               --url "$LOCAL_URL" \
               --source-sha "$SOURCE_SHA" \
@@ -159,6 +182,7 @@ jobs:
             "sourceSHA": "$SOURCE_SHA",
             "reviewPath": "reviews/$SOURCE_SHA/visual-review.html",
             "updatedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "bodyExecutionMode": "exact-generated-srcdoc-direct",
             "surfaceReviewScope": "motion-preview-lightweight-fallback",
             "skinApproval": false,
             "fullDynamics": false,
