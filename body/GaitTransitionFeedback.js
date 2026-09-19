@@ -55,8 +55,9 @@ function gaitTransitionUpdateSignal(locomotion){
   const value=resetFromPose.call(this,options);this.resetGaitTransition();return value;
  };
  NaturalLocomotion.prototype.move=function(dt,speed=.48){
-  const a=this.a,s=this.engine.state,target=gaitTransitionRouteTarget(this);this.gaitTransition??=gaitTransitionFresh();const g=this.gaitTransition;
-  if(g.phase==='preparing'&&!gaitTransitionSameTarget(g.target,target))this.resetGaitTransition();
+  const a=this.a,s=this.engine.state,target=gaitTransitionRouteTarget(this);this.gaitTransition??=gaitTransitionFresh();let g=this.gaitTransition;
+  if(g.phase==='completed'&&target)g=this.resetGaitTransition();
+  if(g.phase==='preparing'&&!gaitTransitionSameTarget(g.target,target))g=this.resetGaitTransition();
   if(g.phase==='idle'&&target&&horizontal(s.root,target)>.03&&this.kernelSettled()&&!s.command){
    const stepping=s.nextFoot||'left',support=stepping==='left'?'right':'left';Object.assign(g,{phase:'preparing',elapsedS:0,durationS:a.held?.10:GAIT_TRANSITION_FEEDBACK.startPreparationS,
     prepared:false,startStep:s.metrics.steps,startRoot:[...s.root],target:[...target],steppingSide:stepping,supportSide:support,poseOffsetXM:0,
@@ -76,7 +77,9 @@ function gaitTransitionUpdateSignal(locomotion){
    if(g.startRoot)g.firstSwingRootTravelM=horizontal(g.startRoot,s.root);}
   if(s.swing&&Number.isFinite(s.swing.terminalScale))g.minimumObservedTerminalScale=Math.min(g.minimumObservedTerminalScale,s.swing.terminalScale);
   if(g.phase==='first-swing'&&s.metrics.steps>g.startStep&&!s.swing)g.phase='cruising';
-  if((g.phase==='cruising'||g.phase==='release'||g.phase==='first-swing')&&this.kernelSettled()&&!gaitTransitionRouteTarget(this))this.resetGaitTransition();
+  if((g.phase==='cruising'||g.phase==='release'||g.phase==='first-swing')&&this.kernelSettled()&&!gaitTransitionRouteTarget(this)){
+   Object.assign(g,{phase:'completed',poseOffsetXM:0,active:false,completedAtS:this.a.time});this.a.h.__gaitTransitionFeedback=g;
+  }
   gaitTransitionUpdateSignal(this);return value;
  };
  NaturalLocomotion.prototype.stop=function(){
