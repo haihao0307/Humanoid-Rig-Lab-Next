@@ -29,7 +29,7 @@ jobs:
       - name: Retain exact reviewed source on the isolated branch
         run: |
           test "$GITHUB_REF_NAME" = "fix/shorts-two-leg-assembly-r2-20260919"
-          git add clothing/ClothShorts.js clothing/ShortsControls.js source/assembly.json source/runtime.template.js index.html shorts.html
+          git add clothing/ClothShorts.js clothing/ShortsControls.js source/assembly.json source/runtime.template.js index.html
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat(shorts): retain R2.2 final-pose rigid panel review; no sewing acceptance'
             git push origin HEAD:fix/shorts-two-leg-assembly-r2-20260919
