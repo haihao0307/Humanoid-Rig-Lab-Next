@@ -2,6 +2,12 @@ name: Shorts R2.2 placement review
 on:
   push:
     branches: [fix/shorts-two-leg-assembly-r2-20260919]
+    paths:
+      - 'clothing/**'
+      - 'source/**'
+      - 'tools/test-shorts-*.mjs'
+      - 'tools/review-shorts-placement-r2.mjs'
+      - '.github/workflows/shorts-r2-placement-review.yml'
   workflow_dispatch:
 permissions:
   contents: read
