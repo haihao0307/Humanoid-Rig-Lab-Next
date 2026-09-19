@@ -14,6 +14,8 @@ void main(){W=position;N=normal;C=uv*(100./3.);linenShadow=lightVP*vec4(W,1.);gl
 const SHORTS_WEARING_OPTIONS=Object.freeze({iterations:32,maxMaterialIterations:32,materialConvergenceStrain:.02,stitchDofs:true,stitchJoinToleranceM:.0001,needleSchedule:'overlap',maxSeamTensionN:null,bendCompliance:40000,waistSupportPath:'edge-rotation',waistSupportSlackM:.004,sewingSchedule:'overlap',handlingPolicy:'needle-and-time',triangleBodyContact:true,maxSelfCandidates:30000});
 const SHORTS_INITIAL_ASSEMBLY_STEPS=420;
 const SHORTS_ASSEMBLY_STEP_LIMIT=1600;
+const SHORTS_PANEL_REVIEW_TINTS=Object.freeze({FL:[.20,.62,.90],BL:[.12,.38,.72],FR:[.94,.48,.22],BR:[.72,.24,.14],G:[.54,.72,.24],WFL:[.43,.78,.94],WFR:[1.,.67,.34],WBR:[.82,.38,.25],WBL:[.27,.52,.82]});
+function shortsReviewFragment(source){return source.replace('uniform sampler2D shadow;','uniform sampler2D shadow;uniform float uPanelReview;uniform vec3 uPanelTint;').replace('O=vec4(col,1.);}','if(uPanelReview>.5)col=mix(col,uPanelTint,.66);O=vec4(col,1.);}');}
 function shortsJoinRenderNormals(vertices,groups){
  for(const group of groups){const sum=[0,0,0];for(const i of group.members)for(let k=0;k<3;k++)sum[k]+=vertices[i*8+3+k];
   if(Math.hypot(...sum)<1e-12)continue;
@@ -23,6 +25,7 @@ function shortsJoinRenderNormals(vertices,groups){
 class ClothShorts {
  constructor(surface,meshes){
   this.surface=surface;this.gl=surface.gl;this.buffers=[];this.disposed=false;
+  const search=typeof window==='object'?(window.parent?.location?.search||window.location?.search||''):'';this.placementReview=/(?:[?&])shortsPlacement=r2(?:\.|%2E)2(?:&|$)/i.test(search);this.placementReport=null;
   this.body=new ShortsBody(surface,meshes);this.measurements=this.body.measure();
   this.pattern=createShortsPattern(this.measurements);
   this.simulation=new ShortsCloth(this.pattern,this.body,SHORTS_WEARING_OPTIONS);
@@ -30,12 +33,12 @@ class ClothShorts {
   for(const range of this.simulation.pieceRanges)if(this.pattern.pieces.find(p=>p.id===range.id).placement.rightSide==='opposite_uv_normal')for(let t=range.triangleOffset*3;t<(range.triangleOffset+range.triangleCount)*3;t+=3){const a=this.renderTriangles[t+1];this.renderTriangles[t+1]=this.renderTriangles[t+2];this.renderTriangles[t+2]=a;}
   this.count=this.simulation.triangles.length;this.vertices=new Float32Array(this.simulation.particles.length*8);
   this.geometryBytes=this.vertices.byteLength+this.simulation.triangles.byteLength;
-  this.report={generator:'cut-and-sewn-shorts@1',triangles:this.count/3,panels:this.pattern.pieces.length,geometryBytes:this.geometryBytes,textureScale:3,clothDynamics:true,legSkinning:false};
+  this.report={generator:'cut-and-sewn-shorts@1',triangles:this.count/3,panels:this.pattern.pieces.length,geometryBytes:this.geometryBytes,textureScale:3,clothDynamics:true,legSkinning:false,placementReview:this.placementReview};
   this.assemblyReady=false;this.displayReady=false;this.assemblyState='unstarted';this.dirty=true;this.lastUpdateMilliseconds=0;this.assemblyWallTimeMs=0;this.placed=false;
   const gl=this.gl;
   try{
-   this.main=program(gl,SHORTS_VERTEX,LINEN_MATERIAL_FRAGMENT);this.depth=program(gl,SHORTS_VERTEX,'#version 300 es\nprecision highp float;void main(){}');
-   this.materialUniforms=Object.fromEntries(['uCam','uMode','uMaterial','uLight','uNeutral','uCompare','uDiag','uViewport','uTime','uCoarse','uWeave','uSlub','uAge','uFarId','uSheen','uFuzz'].map(k=>[k,gl.getUniformLocation(this.main.p,k)]));
+   this.main=program(gl,SHORTS_VERTEX,shortsReviewFragment(LINEN_MATERIAL_FRAGMENT));this.depth=program(gl,SHORTS_VERTEX,'#version 300 es\nprecision highp float;void main(){}');
+   this.materialUniforms=Object.fromEntries(['uCam','uMode','uMaterial','uLight','uNeutral','uCompare','uDiag','uViewport','uTime','uCoarse','uWeave','uSlub','uAge','uFarId','uSheen','uFuzz','uPanelReview','uPanelTint'].map(k=>[k,gl.getUniformLocation(this.main.p,k)]));
    this.vao=gl.createVertexArray();if(!this.vao)throw Error('无法创建短裤绘制数组');gl.bindVertexArray(this.vao);
    const upload=(target,array,usage)=>{const b=gl.createBuffer();if(!b)throw Error('无法创建短裤布料缓冲');this.buffers.push(b);gl.bindBuffer(target,b);gl.bufferData(target,array,usage);return b;};
    this.vertexBuffer=upload(gl.ARRAY_BUFFER,this.vertices,gl.DYNAMIC_DRAW);
@@ -55,13 +58,17 @@ class ClothShorts {
  async assembleOnce(maxSteps,onProgress){
   if(!Number.isInteger(maxSteps)||maxSteps<0||maxSteps>SHORTS_ASSEMBLY_STEP_LIMIT)throw Error('Invalid bounded sewing steps');
   if(this.disposed)throw Error('Sewing was disposed');
+  if(this.placementReview&&maxSteps!==0)throw Error('R2.2 rigid placement review cannot activate sewing');
   if(this.assemblyReady)return this.assemblyReport;
   if(!this.placed){
-   // This one rigid placement belongs to dressing setup. It keeps the flat
-   // original pieces at the actor's actual world location and orientation.
-   const h=this.surface.boundHuman,source=h.sourceBind.get('hips'),current=h.byId.get('hips').world,q=qnorm(qm(current.q,inv(source.q)));
+   // Production keeps the original rigid dressing transform. R2.2 review uses
+   // a final-pose pelvis frame and a horizontal independent gusset workspace;
+   // neither path alters paper UVs, topology, mass, seams or the Human rig.
+   const h=this.surface.boundHuman;
    this.body.update();
-   for(const piece of this.pattern.pieces){const p=piece.placement;p.origin=add(current.p,rotate(q,sub(p.origin,source.p)));p.basisU=rotate(q,p.basisU);p.basisV=rotate(q,p.basisV);}
+   if(this.placementReview)this.placementReport=applyShortsRigidPlacementR2(this.pattern,this.body,h);
+   else{const source=h.sourceBind.get('hips'),current=h.byId.get('hips').world,q=qnorm(qm(current.q,inv(source.q)));
+    for(const piece of this.pattern.pieces){const p=piece.placement;p.origin=add(current.p,rotate(q,sub(p.origin,source.p)));p.basisU=rotate(q,p.basisU);p.basisV=rotate(q,p.basisV);}}
    this.simulation=new ShortsCloth(this.pattern,this.body,SHORTS_WEARING_OPTIONS);this.placed=true;
   }
   const begin=performance.now();this.assemblyState='sewing';
@@ -76,7 +83,10 @@ class ClothShorts {
   }
   if(this.disposed)throw Error('Sewing was disposed');
   this.assemblyWallTimeMs+=performance.now()-begin;this.displayReady=true;
-  const report=this.simulation.report();this.assemblyReady=this.acceptsAssembly(report);
+  const report=this.simulation.report();
+  if(this.placementReview){this.assemblyReady=false;this.assemblyState=this.placementReport?.valid?'placement-ready':'placement-failed';
+   this.assemblyReport={...report,placement:this.placementReport,assemblyState:this.assemblyState,assemblySteps:0,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;}
+  this.assemblyReady=this.acceptsAssembly(report);
   this.assemblyState=this.assemblyReady?'ready':this.failedAssembly(report)?'failed':'incomplete';
   this.assemblyReport={...report,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs};return this.assemblyReport;
  }
@@ -86,7 +96,7 @@ class ClothShorts {
   if(this.disposed||!this.assemblyReady||!(dt>0))return;
   const begin=performance.now();this.body.update();this.simulation.advance(dt);this.dirty=true;this.lastUpdateMilliseconds=performance.now()-begin;
  }
- diagnostics(){return {...this.report,pattern:{version:this.pattern.version,options:{...this.pattern.options},draft:JSON.parse(JSON.stringify(this.pattern.draft)),sourceChecks:JSON.parse(JSON.stringify(this.pattern.checks))},displayReady:this.displayReady,assemblyReady:this.assemblyReady,assemblyState:this.assemblyState,assembly:this.assemblyReport,body:this.body.report(),simulation:this.simulation.report(),lastUpdateMilliseconds:this.lastUpdateMilliseconds};}
+ diagnostics(){return {...this.report,placement:this.placementReport,pattern:{version:this.pattern.version,options:{...this.pattern.options},draft:JSON.parse(JSON.stringify(this.pattern.draft)),sourceChecks:JSON.parse(JSON.stringify(this.pattern.checks))},displayReady:this.displayReady,assemblyReady:this.assemblyReady,assemblyState:this.assemblyState,assembly:this.assemblyReport,body:this.body.report(),simulation:this.simulation.report(),lastUpdateMilliseconds:this.lastUpdateMilliseconds};}
  upload(){
   if(!this.dirty)return;
   const positions=this.simulation.positions,indices=this.renderTriangles,uv=this.simulation.materialCoordinates,v=this.vertices;
@@ -101,8 +111,11 @@ class ClothShorts {
  draw(depth){
   if(this.disposed||!this.surface.visible)return;this.upload();
   const gl=this.gl,r=this.surface.renderer,p=depth?this.depth:this.main;gl.useProgram(p.p);gl.uniformMatrix4fv(p.u.viewProjection,false,depth?r.lightVP:r.vp);
-  if(!depth){const u=this.materialUniforms;gl.uniform3fv(u.uCam,r.eye);gl.uniform2f(u.uViewport,gl.drawingBufferWidth,gl.drawingBufferHeight);for(const [key,value]of Object.entries({uMode:2,uMaterial:0,uLight:0,uNeutral:0,uCompare:0,uDiag:0}))gl.uniform1i(u[key],value);for(const [key,value]of Object.entries({uCoarse:1,uWeave:1,uSlub:1,uAge:.35,uFarId:1,uSheen:1,uFuzz:1,uTime:0}))gl.uniform1f(u[key],value);gl.uniformMatrix4fv(p.u.lightVP,false,r.lightVP);gl.uniform1i(p.u.shadow,1);gl.uniform1f(p.u.shadowsEnabled,r.quality==='shadow'&&r.shadowAvailable?1:0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,r.shadow);}
-  gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.disable(gl.BLEND);gl.frontFace(gl.CCW);gl.disable(gl.CULL_FACE);gl.bindVertexArray(this.vao);gl.drawElements(gl.TRIANGLES,this.count,gl.UNSIGNED_INT,0);if(depth)r.shadowDrawCalls++;else r.drawCalls++;gl.bindVertexArray(null);gl.activeTexture(gl.TEXTURE0);
+  if(!depth){const u=this.materialUniforms;gl.uniform3fv(u.uCam,r.eye);gl.uniform2f(u.uViewport,gl.drawingBufferWidth,gl.drawingBufferHeight);for(const [key,value]of Object.entries({uMode:2,uMaterial:0,uLight:0,uNeutral:0,uCompare:0,uDiag:0}))gl.uniform1i(u[key],value);for(const [key,value]of Object.entries({uCoarse:1,uWeave:1,uSlub:1,uAge:.35,uFarId:1,uSheen:1,uFuzz:1,uTime:0,uPanelReview:this.placementReview?1:0}))gl.uniform1f(u[key],value);gl.uniform3fv(u.uPanelTint,[1,1,1]);gl.uniformMatrix4fv(p.u.lightVP,false,r.lightVP);gl.uniform1i(p.u.shadow,1);gl.uniform1f(p.u.shadowsEnabled,r.quality==='shadow'&&r.shadowAvailable?1:0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,r.shadow);}
+  gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.disable(gl.BLEND);gl.frontFace(gl.CCW);gl.disable(gl.CULL_FACE);gl.bindVertexArray(this.vao);
+  if(!depth&&this.placementReview){for(const range of this.simulation.pieceRanges){gl.uniform3fv(this.materialUniforms.uPanelTint,SHORTS_PANEL_REVIEW_TINTS[range.id]||[.65,.65,.65]);gl.drawElements(gl.TRIANGLES,range.triangleCount*3,gl.UNSIGNED_INT,range.triangleOffset*3*4);r.drawCalls++;}}
+  else{gl.drawElements(gl.TRIANGLES,this.count,gl.UNSIGNED_INT,0);if(depth)r.shadowDrawCalls++;else r.drawCalls++;}
+  gl.bindVertexArray(null);gl.activeTexture(gl.TEXTURE0);
  }
  dispose(){if(this.disposed)return;this.disposed=true;const gl=this.gl;for(const b of this.buffers)gl.deleteBuffer(b);if(this.vao)gl.deleteVertexArray(this.vao);if(this.main)gl.deleteProgram(this.main.p);if(this.depth)gl.deleteProgram(this.depth.p);this.buffers=[];}
 }
