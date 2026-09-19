@@ -23,10 +23,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Python syntax
-        run: python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py
+        run: |
+          python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py
+          python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py
 
-      - name: Measurement tool self test
-        run: python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
+      - name: Tool self tests
+        run: |
+          python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
+          python Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py --self-test
 
       - name: Validate JSON records
         shell: python
