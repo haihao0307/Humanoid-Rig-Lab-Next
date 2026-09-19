@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kaopu.local/schemas/original-bird-anatomy-landmarks-r001.schema.json",
+  "title": "Original Bird Anatomy Landmark Record R0.01",
+  "type": "object",
+  "required": ["schema", "referenceId", "sourceIdentity", "coordinateFrame", "landmarks", "truthBoundary"],
+  "properties": {
+    "schema": {"const": "bird/original-anatomy-landmarks@0.0.1"},
+    "referenceId": {"type": "string", "minLength": 1},
+    "sourceIdentity": {
+      "type": "object",
+      "required": ["filename", "sha256"],
+      "properties": {
+        "filename": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "taxonomyStatus": {"enum": ["source-locked", "source-checked", "candidate", "unknown"]},
+        "scientificName": {"type": ["string", "null"]},
+        "ageStatus": {"enum": ["source-locked", "source-checked", "candidate", "unknown"]},
+        "sexStatus": {"enum": ["source-locked", "source-checked", "candidate", "unknown"]},
+        "realScaleStatus": {"enum": ["measured", "source-checked", "candidate", "unknown"]}
+      }
+    },
+    "coordinateFrame": {
+      "type": "object",
+      "required": ["units", "lateralAxis", "dorsalAxis", "cranialAxis", "frameStatus"],
+      "properties": {
+        "units": {"enum": ["metre", "source-unit"]},
+        "lateralAxis": {"type": "string"},
+        "dorsalAxis": {"type": "string"},
+        "cranialAxis": {"type": "string"},
+        "frameStatus": {"enum": ["measured", "source-checked", "candidate", "unknown"]}
+      }
+    },
+    "landmarks": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/landmark"},
+      "properties": {
+        "beak.tip": {"$ref": "#/$defs/landmark"},
+        "beak.base.upper": {"$ref": "#/$defs/landmark"},
+        "beak.base.lower": {"$ref": "#/$defs/landmark"},
+        "orbit.left.center": {"$ref": "#/$defs/landmark"},
+        "orbit.right.center": {"$ref": "#/$defs/landmark"},
+        "skull.occipital": {"$ref": "#/$defs/landmark"},
+        "neck.base": {"$ref": "#/$defs/landmark"},
+        "sternum.cranial": {"$ref": "#/$defs/landmark"},
+        "sternum.caudal": {"$ref": "#/$defs/landmark"},
+        "sternum.keel": {"$ref": "#/$defs/landmark"},
+        "shoulder.left": {"$ref": "#/$defs/landmark"},
+        "shoulder.right": {"$ref": "#/$defs/landmark"},
+        "elbow.left": {"$ref": "#/$defs/landmark"},
+        "elbow.right": {"$ref": "#/$defs/landmark"},
+        "wrist.left": {"$ref": "#/$defs/landmark"},
+        "wrist.right": {"$ref": "#/$defs/landmark"},
+        "wingtip.left": {"$ref": "#/$defs/landmark"},
+        "wingtip.right": {"$ref": "#/$defs/landmark"},
+        "pelvis.left": {"$ref": "#/$defs/landmark"},
+        "pelvis.right": {"$ref": "#/$defs/landmark"},
+        "hip.left": {"$ref": "#/$defs/landmark"},
+        "hip.right": {"$ref": "#/$defs/landmark"},
+        "hock.left": {"$ref": "#/$defs/landmark"},
+        "hock.right": {"$ref": "#/$defs/landmark"},
+        "tarsometatarsus.distal.left": {"$ref": "#/$defs/landmark"},
+        "tarsometatarsus.distal.right": {"$ref": "#/$defs/landmark"},
+        "hallux.tip.left": {"$ref": "#/$defs/landmark"},
+        "hallux.tip.right": {"$ref": "#/$defs/landmark"},
+        "tail.base": {"$ref": "#/$defs/landmark"},
+        "tail.tip": {"$ref": "#/$defs/landmark"}
+      }
+    },
+    "chains": {
+      "type": "object",
+      "properties": {
+        "cervical": {"$ref": "#/$defs/chain"},
+        "wing.left": {"$ref": "#/$defs/chain"},
+        "wing.right": {"$ref": "#/$defs/chain"},
+        "leg.left": {"$ref": "#/$defs/chain"},
+        "leg.right": {"$ref": "#/$defs/chain"}
+      },
+      "additionalProperties": {"$ref": "#/$defs/chain"}
+    },
+    "featherRegions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {"enum": ["measured", "source-checked", "candidate", "unknown"]},
+          "count": {"type": ["integer", "null"], "minimum": 0},
+          "attachmentDomain": {"type": ["string", "null"]},
+          "sourceMethod": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "truthBoundary": {
+      "type": "object",
+      "required": ["anatomyVerified", "visualAcceptance", "productionReady"],
+      "properties": {
+        "anatomyVerified": {"type": "boolean"},
+        "visualAcceptance": {"const": false},
+        "productionReady": {"const": false},
+        "unknownFields": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  },
+  "$defs": {
+    "landmark": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["measured", "source-checked", "candidate", "unknown"]},
+        "xyz": {
+          "type": ["array", "null"],
+          "items": {"type": "number"},
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "sourceMethod": {"type": ["string", "null"]},
+        "sourceId": {"type": ["string", "null"]},
+        "note": {"type": ["string", "null"]}
+      }
+    },
+    "chain": {
+      "type": "object",
+      "required": ["status", "semanticNodes"],
+      "properties": {
+        "status": {"enum": ["measured", "source-checked", "candidate", "unknown"]},
+        "semanticNodes": {"type": "array", "items": {"type": "string"}},
+        "literalAnatomicalElements": {"type": "boolean"},
+        "fixedLengthDuringMotion": {"type": "boolean"},
+        "note": {"type": ["string", "null"]}
+      }
+    }
+  }
+}
