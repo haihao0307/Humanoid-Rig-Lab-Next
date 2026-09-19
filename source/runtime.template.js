@@ -519,6 +519,7 @@ function inferHeldFrame(human,grips){const a=compose(human.palm('left'),inverse(
 /*__SOURCE:body/MotionRuntimeState.js__*/
 /*__SOURCE:body/NaturalLocomotion.js__*/
 /*__SOURCE:body/LightBalanceFeedback.js__*/
+/*__SOURCE:body/GaitTransitionFeedback.js__*/
 /*__SOURCE:control/TaskAgent.js__*/
 
 // MODULE app

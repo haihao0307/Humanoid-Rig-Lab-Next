@@ -303,8 +303,8 @@ class NaturalLocomotion {
   // Change stride length AND cadence at reduced world speed. Scaling the
   // entire kernel clock alone produced normal-length steps in slow motion.
   // Keep each swing's duration/target fixed once released.
-  const strideScale=Math.sqrt(clamp(this.tempo,.05,1)),duration=.36*strideScale;
-  const releaseDistance=(state.metrics.steps===state.walkingStartStep?.075:.095)*strideScale;
+  const strideScale=Math.sqrt(clamp(this.tempo,.05,1)),firstStep=state.metrics.steps===state.walkingStartStep,duration=.36*strideScale;
+  const releaseDistance=(firstStep?(this.gaitTransition?.firstReleaseM??.075):.095)*strideScale;
   const candidates=['left','right'].map(side=>{
    const foot=state.feet[side],relative=rotate(inv(qy(state.yaw)),sub(foot.position,this.engine.stance(state,side)));
    return{side,behind:-relative[2],turn:Math.abs(angleDiff(state.yaw,foot.yaw))};
@@ -313,17 +313,20 @@ class NaturalLocomotion {
   if(!candidates.length)return;
   const side=candidates[0].side,foot=state.feet[side],command=state.command;
   const heading=command?.type==='walk'?Math.atan2(command.target[0]-state.root[0],command.target[2]-state.root[2]):state.yaw;
+  const remaining=command?.type==='walk'?horizontal(state.root,command.target):Infinity;
+  const terminalScale=this.gaitTransition&&Number.isFinite(remaining)?clamp(remaining/(this.gaitTransition.terminalDistanceM||.34),this.gaitTransition.minimumTerminalScale||.28,1):1;
+  const lead=state.speed*.38*strideScale*terminalScale;
   // Land into the curve, with a bounded preview of the requested heading.
   // Only the free foot changes orientation; planted feet keep their anchors.
   let placementYaw=state.yaw+clamp(angleDiff(heading,state.yaw),-.24,.24);
-  let target=this.engine.stance({...state,yaw:placementYaw},side,state.speed*.38*strideScale);
+  let target=this.engine.stance({...state,yaw:placementYaw},side,lead);
   let path=this.engine.world.sweep(foot.position,target,.045);
   if((path.blocked||!this.engine.world.free(target,.045))&&placementYaw!==state.yaw){
-   placementYaw=state.yaw;target=this.engine.stance(state,side,state.speed*.38*strideScale);
+   placementYaw=state.yaw;target=this.engine.stance(state,side,lead);
    path=this.engine.world.sweep(foot.position,target,.045);
   }
   if(path.blocked||!this.engine.world.free(target,.045))throw Error('落脚路径受阻，需重新规划');
-  state.swing={side,from:[...foot.position],target,fromYaw:foot.yaw,yaw:placementYaw,elapsed:0,duration,walkingStrideScale:strideScale};
+  state.swing={side,from:[...foot.position],target,fromYaw:foot.yaw,yaw:placementYaw,elapsed:0,duration,walkingStrideScale:strideScale,terminalScale};
   foot.contact=false;
  }
  adaptSwingClearance(state){
