@@ -23,3 +23,15 @@ jobs:
           node tools/check-pure.mjs
       - name: Run all shorts tests
         run: node --test tools/test-shorts-*.mjs
+      - name: Archive exact staged source
+        if: always()
+        run: |
+          mkdir -p /tmp/shorts-two-leg-r2
+          git rev-parse HEAD > /tmp/shorts-two-leg-r2/SOURCE_COMMIT.txt
+          tar --exclude=.git --exclude=node_modules -czf /tmp/shorts-two-leg-r2/working-tree.tar.gz .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shorts-two-leg-r2-source
+          path: /tmp/shorts-two-leg-r2
+          retention-days: 7
