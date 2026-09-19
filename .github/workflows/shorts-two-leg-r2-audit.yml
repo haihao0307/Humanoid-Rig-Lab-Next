@@ -4,7 +4,7 @@ on:
     branches: [fix/shorts-two-leg-assembly-r2-20260919]
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: shorts-two-leg-r2-audit
   cancel-in-progress: true
@@ -17,8 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Wire canonical R2.3 runtime source
-        run: node tools/apply-shorts-r23-left-tube.mjs
       - name: Assemble canonical source
         run: |
           node tools/build-pure.mjs
@@ -26,14 +24,6 @@ jobs:
           node tools/check-pure.mjs
       - name: Run all shorts tests
         run: node --test tools/test-shorts-*.mjs
-      - name: Retain canonical runtime and generated entrypoint
-        run: |
-          test "$GITHUB_REF_NAME" = "fix/shorts-two-leg-assembly-r2-20260919"
-          git add source/runtime.template.js index.html
-          if ! git diff --cached --quiet; then
-            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build(shorts): retain canonical R2.3 left-tube runtime'
-            git push origin HEAD:fix/shorts-two-leg-assembly-r2-20260919
-          fi
       - name: Archive exact staged source
         if: always()
         run: |
