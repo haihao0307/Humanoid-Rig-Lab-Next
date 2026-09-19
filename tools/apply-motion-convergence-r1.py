@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Apply the minimal R1 motion convergence delta.
+"""Apply the reproducible R1 motion convergence delta.
 
-The script keeps the branch reproducible from the clean main baseline. It
-registers the selected motion modules, migrates the filtered support query and
-wires the read-only MotionRuntimeState mirror into NaturalLocomotion. It must
-not import PR #7's generated entrypoint or its clothing module graph. Running
-it repeatedly is idempotent.
+The patch starts from the clean main assembly, registers only selected motion
+modules, keeps clothing out, preserves the filtered support query and wires a
+read-only MotionRuntimeState mirror into NaturalLocomotion. Repeated execution
+must produce no further changes.
 """
 
 from __future__ import annotations
@@ -19,10 +18,7 @@ RUNTIME = ROOT / "source" / "runtime.template.js"
 LOCOMOTION = ROOT / "body" / "NaturalLocomotion.js"
 
 BOX_MODULE = "body/BoxHandling.js"
-BOX_AFTER_MODULE = "body/MotionLabActions.js"
 STATE_MODULE = "body/MotionRuntimeState.js"
-STATE_AFTER_MODULE = BOX_MODULE
-
 ACTIONS_MARKER = "/*__SOURCE:body/MotionLabActions.js__*/"
 BOX_MARKER = "/*__SOURCE:body/BoxHandling.js__*/"
 STATE_MARKER = "/*__SOURCE:body/MotionRuntimeState.js__*/"
@@ -95,16 +91,16 @@ LOCOMOTION_PATCHES = [
 ]
 
 
-def insert_module(modules: list[str], module: str, after: str) -> bool:
-    if after not in modules:
-        raise SystemExit(f"source/assembly.json: missing {after}")
-    if modules.count(module) > 1:
-        raise SystemExit(f"source/assembly.json: duplicated {module}")
-    if module in modules:
-        if modules.index(module) != modules.index(after) + 1:
-            raise SystemExit(f"{module} must load immediately after {after}")
+def insert_after(items: list[str], value: str, after: str) -> bool:
+    if items.count(value) > 1:
+        raise SystemExit(f"source/assembly.json: duplicated {value}")
+    if value in items:
+        if after not in items or items.index(value) != items.index(after) + 1:
+            raise SystemExit(f"{value} must load immediately after {after}")
         return False
-    modules.insert(modules.index(after) + 1, module)
+    if after not in items:
+        raise SystemExit(f"source/assembly.json: missing {after}")
+    items.insert(items.index(after) + 1, value)
     return True
 
 
@@ -115,59 +111,39 @@ def update_assembly() -> bool:
         raise SystemExit("source/assembly.json: modules must be an array")
     if any(str(path).startswith("clothing/") for path in modules):
         raise SystemExit("clean motion branch must not register clothing/ modules")
-    changed = insert_module(modules, BOX_MODULE, BOX_AFTER_MODULE)
-    changed = insert_module(modules, STATE_MODULE, STATE_AFTER_MODULE) or changed
-    ASSEMBLY.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    changed = insert_after(modules, BOX_MODULE, "body/MotionLabActions.js")
+    changed = insert_after(modules, STATE_MODULE, BOX_MODULE) or changed
+    ASSEMBLY.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return changed
 
 
 def update_runtime_modules() -> bool:
     text = RUNTIME.read_text(encoding="utf-8")
     if text.count(ACTIONS_MARKER) != 1:
-        raise SystemExit(
-            f"source/runtime.template.js: expected one MotionLabActions marker, "
-            f"found {text.count(ACTIONS_MARKER)}"
-        )
+        raise SystemExit("source/runtime.template.js: MotionLabActions marker is not unique")
     if text.count(BOX_MARKER) > 1 or text.count(STATE_MARKER) > 1:
         raise SystemExit("source/runtime.template.js: duplicated motion convergence marker")
-
     changed = False
-    actions_and_box = ACTIONS_MARKER + "\n" + BOX_MARKER
     if BOX_MARKER not in text:
-        text = text.replace(ACTIONS_MARKER, actions_and_box, 1)
+        text = text.replace(ACTIONS_MARKER, ACTIONS_MARKER + "\n" + BOX_MARKER, 1)
         changed = True
-    elif actions_and_box not in text:
+    elif ACTIONS_MARKER + "\n" + BOX_MARKER not in text:
         raise SystemExit("BoxHandling marker is in the wrong assembly position")
-
-    box_and_state = BOX_MARKER + "\n" + STATE_MARKER
     if STATE_MARKER not in text:
-        text = text.replace(BOX_MARKER, box_and_state, 1)
+        text = text.replace(BOX_MARKER, BOX_MARKER + "\n" + STATE_MARKER, 1)
         changed = True
-    elif box_and_state not in text:
+    elif BOX_MARKER + "\n" + STATE_MARKER not in text:
         raise SystemExit("MotionRuntimeState marker is in the wrong assembly position")
-
     RUNTIME.write_text(text, encoding="utf-8")
     return changed
 
 
 def update_support_query() -> bool:
     text = RUNTIME.read_text(encoding="utf-8")
-    old_head_count = text.count(OLD_SUPPORT_HEAD)
-    new_head_count = text.count(NEW_SUPPORT_HEAD)
-    old_skin_count = text.count(OLD_SUPPORT_SKIN)
-    new_skin_count = text.count(NEW_SUPPORT_SKIN)
-
-    if new_head_count == 1 and new_skin_count == 1:
-        if old_head_count or old_skin_count:
-            raise SystemExit("source/runtime.template.js: mixed old/new support-query contract")
+    if text.count(NEW_SUPPORT_HEAD) == 1 and text.count(NEW_SUPPORT_SKIN) == 1:
         return False
-    if old_head_count != 1 or old_skin_count != 1 or new_head_count or new_skin_count:
-        raise SystemExit(
-            "source/runtime.template.js: expected exactly one clean-baseline support query"
-        )
-
+    if text.count(OLD_SUPPORT_HEAD) != 1 or text.count(OLD_SUPPORT_SKIN) != 1:
+        raise SystemExit("source/runtime.template.js: support-query contract is ambiguous")
     text = text.replace(OLD_SUPPORT_HEAD, NEW_SUPPORT_HEAD, 1)
     text = text.replace(OLD_SUPPORT_SKIN, NEW_SUPPORT_SKIN, 1)
     RUNTIME.write_text(text, encoding="utf-8")
@@ -178,11 +154,13 @@ def update_locomotion_runtime_state() -> bool:
     text = LOCOMOTION.read_text(encoding="utf-8")
     changed = False
     for label, old, new in LOCOMOTION_PATCHES:
-        old_count = text.count(old)
         new_count = text.count(new)
-        if new_count == 1 and old_count == 0:
+        old_count = text.count(old)
+        if new_count == 1:
+            if old_count > 1:
+                raise SystemExit(f"body/NaturalLocomotion.js: ambiguous {label} old fragment")
             continue
-        if old_count != 1 or new_count != 0:
+        if new_count != 0 or old_count != 1:
             raise SystemExit(
                 f"body/NaturalLocomotion.js: unexpected {label} patch state "
                 f"(old={old_count}, new={new_count})"
