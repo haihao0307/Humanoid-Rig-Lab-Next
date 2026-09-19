@@ -19,7 +19,9 @@ assert(Math.abs((fissure-bottom)-.00900)<1e-10,'accepted lower visible lip heigh
 assert.match(anatomy,/revision:'r24-anatomical-nasal-body-and-rolled-alar-rim'/,'accepted H nose owner changed');
 assert.match(anatomy,/nostrils:\{x:\.0095,y:1\.4780,rx:\.0039,ry:\.00255,tilt:\.46/,'accepted nostril aperture controls changed');
 assert.match(anatomy,/\[1\.487,0\.2048\],\[1\.49,0\.2049\]/,'accepted H nasal tip profile changed');
-assert.match(eye,/revision:'r24-span-aware-lid-return'/,'R25A must start from the recorded R24 eye surface');
+assert.match(eye,/revision:'r25b-canthus-owned-aperture-family'/,'R25B eye aperture family is not active');
+assert.match(eye,/baselineRevision:'r24-span-aware-lid-return'/,'R25B lost the recorded R24 eye baseline');
+assert.match(eye,/function compactEyeAperturePoint/,'R25B shared aperture owner is missing');
 assert.match(appearance,/coverage:'19 controls:/,'face appearance metadata is not synchronized with R25 identity controls');
 
 const api=vm.runInNewContext(identity+'\n({FACE_IDENTITY_PARAMETERS,compileFaceIdentityShape,sampleFaceIdentity})');
