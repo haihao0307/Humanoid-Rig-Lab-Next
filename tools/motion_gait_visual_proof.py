@@ -1,24 +1,23 @@
 #!/usr/bin/env python3
 """Focused real-browser proof for the R1.2 gait transition.
 
-This is intentionally narrower than the full motion visual matrix. It verifies
-that the production browser runtime exposes and executes the four changes made
-in R1.2: a bounded double-support preparation, early first-foot release,
-terminal step shortening and outside-foot turn preference. Screenshots remain
-motion-preview evidence; they do not approve skin quality or full dynamics.
+This runner can operate either on the complete workbench or directly on the
+body iframe's exact generated srcdoc. Direct-body mode removes unrelated parent
+and optional cognition startup time while executing the same production body
+runtime. Screenshots are motion-preview evidence; they do not approve skin
+quality or full dynamics.
 """
 from __future__ import annotations
 
 import argparse
 import json
-import os
 import shutil
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from PIL import Image, ImageOps, ImageDraw
+from PIL import Image, ImageDraw
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -54,7 +53,7 @@ def chrome() -> webdriver.Chrome:
     options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
     driver = webdriver.Chrome(options=options)
     driver.set_window_size(1720, 980)
-    driver.set_page_load_timeout(180)
+    driver.set_page_load_timeout(120)
     return driver
 
 
@@ -66,20 +65,26 @@ def wait(predicate: Callable[[], Any], timeout: float, message: str, interval: f
             last = predicate()
             if last:
                 return last
-        except Exception as exc:  # keep the last browser error for diagnostics
+        except Exception as exc:
             last = f"{type(exc).__name__}: {exc}"
         time.sleep(interval)
     raise TimeoutError(f"{message}; last={last!r}")
 
 
-def body(driver: webdriver.Chrome) -> None:
+def body(driver: webdriver.Chrome) -> str:
+    """Enter the body document and return iframe/direct mode."""
     driver.switch_to.default_content()
-    frame = wait(lambda: driver.find_element(By.ID, "bodyFrame"), 35, "未找到身体 iframe")
-    driver.switch_to.frame(frame)
+    frames = driver.find_elements(By.ID, "bodyFrame")
+    if frames:
+        driver.switch_to.frame(frames[0])
+        return "iframe"
+    if driver.find_elements(By.ID, "view"):
+        return "direct"
+    raise RuntimeError("未找到身体 iframe 或直接身体画布")
 
 
 def state(driver: webdriver.Chrome) -> dict[str, Any]:
-    body(driver)
+    mode = body(driver)
     result = driver.execute_script(
         """
         const text=id=>document.getElementById(id)?.textContent?.trim()||null;
@@ -88,11 +93,15 @@ def state(driver: webdriver.Chrome) -> dict[str, Any]:
         try{locomotion=lab?.agent?.locomotion?.report?.()||null;}catch(error){locomotion={error:String(error)};}
         try{activity=lab?.agent?.activity?.()||null;}catch(error){activity={error:String(error)};}
         try{diagnostics=lab?.agent?.diagnostics?.()||null;}catch(error){diagnostics={error:String(error)};}
+        const canvas=document.getElementById('view');
+        let gl=null;
+        try{gl=canvas?.getContext('webgl2');}catch(error){}
         return {
           readyState:document.readyState,
           loadingHidden:document.getElementById('loading')?.hidden===true,
           phase:text('phase'),posture:text('posture'),done:text('done'),log:text('log'),plan:text('plan'),
-          canvas:{width:document.getElementById('view')?.width||0,height:document.getElementById('view')?.height||0},
+          canvas:{width:canvas?.width||0,height:canvas?.height||0,clientWidth:canvas?.clientWidth||0,clientHeight:canvas?.clientHeight||0},
+          webgl2:!!gl,contextLost:gl?.isContextLost?.()??null,
           locomotion,activity,diagnostics,
           gait:locomotion?.gaitTransition||null,
           runtime:locomotion?.runtimeState||null,
@@ -101,6 +110,7 @@ def state(driver: webdriver.Chrome) -> dict[str, Any]:
         """
     )
     driver.switch_to.default_content()
+    result["bodyMode"] = mode
     return result
 
 
@@ -153,7 +163,7 @@ def reset(driver: webdriver.Chrome) -> dict[str, Any]:
     time.sleep(1.0)
     return wait(
         lambda: (lambda s: s if "站" in (s.get("posture") or "") and s.get("readyForTask") else None)(state(driver)),
-        35,
+        30,
         "重置后没有恢复可执行站姿",
         0.15,
     )
@@ -221,7 +231,7 @@ def write_html(root: Path, report: dict[str, Any]) -> None:
 <style>body{{margin:0;background:#111;color:#eee;font:15px/1.55 system-ui;padding:24px}}a{{color:#8cc8ff}}.summary,article{{background:#1b1b1b;border:1px solid #333;border-radius:14px;padding:18px;margin:0 0 20px}}img{{display:block;max-width:100%;height:auto;background:#222}}pre{{white-space:pre-wrap;overflow:auto;color:#cfe7ff}}.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(440px,1fr));gap:20px}}</style></head><body>
 <h1>人物动作收敛 R1.2｜真实浏览器步态证据</h1>
 <section class='summary'><p>源提交：<code>{report['sourceSHA']}</code></p><p>状态：<strong>{report['status']}</strong></p>
-<p>范围：起步双支撑准备、首步释放、终点收步、原地转身。此页使用运动预览表面，不代表皮肤质量或完整动力学验收。</p>
+<p>范围：起步双支撑准备、首步释放、终点收步、原地转身。此页使用同一生产身体运行时的运动预览表面，不代表皮肤质量或完整动力学验收。</p>
 <p><a href='{report['interactiveURL']}'>打开精确提交三维工作台</a></p><pre>{json.dumps(report['checks'],ensure_ascii=False,indent=2)}</pre></section>
 <p><img src='{report['contactSheet']}' alt='接触表'></p><div class='grid'>{''.join(cards)}</div></body></html>"""
     (root / "visual-review.html").write_text(html, encoding="utf-8")
@@ -255,13 +265,14 @@ def main() -> int:
     try:
         driver = chrome()
         driver.get(args.url)
-        wait(lambda: driver.execute_script("return document.readyState==='complete'"), 90, "主页面没有完成加载", 0.15)
-        wait(
-            lambda: (lambda s: s if s.get("loadingHidden") and s.get("canvas", {}).get("width", 0) > 500 and s.get("locomotion") else None)(state(driver)),
-            180,
+        wait(lambda: driver.execute_script("return document.readyState==='complete'"), 60, "页面没有完成加载", 0.12)
+        initial = wait(
+            lambda: (lambda s: s if s.get("loadingHidden") and s.get("canvas", {}).get("width", 0) > 500 and s.get("webgl2") and not s.get("contextLost") and s.get("locomotion") else None)(state(driver)),
+            120,
             "人物运动运行时没有完成首帧",
             0.2,
         )
+        report["bodyMode"] = initial.get("bodyMode")
 
         set_view(driver, "front", False)
         start = reset(driver)
@@ -272,7 +283,7 @@ def main() -> int:
         before = command(driver, "向前走1米")
         prep = wait(
             lambda: (lambda s: s if (s.get("gait") or {}).get("maximumPoseOffsetM", 0) >= 0.006 else None)(state(driver)),
-            15,
+            12,
             "没有观察到起步支撑侧转移",
             0.025,
         )
@@ -282,7 +293,7 @@ def main() -> int:
 
         first = wait(
             lambda: (lambda s: s if (s.get("gait") or {}).get("firstSwingRootTravelM") is not None else None)(state(driver)),
-            18,
+            14,
             "没有观察到首步释放",
             0.035,
         )
@@ -292,7 +303,7 @@ def main() -> int:
 
         terminal = wait(
             lambda: (lambda s: s if (s.get("gait") or {}).get("minimumObservedTerminalScale", 1) < 0.8 else None)(state(driver)),
-            38,
+            32,
             "没有观察到终点步幅收短",
             0.08,
         )
@@ -303,7 +314,7 @@ def main() -> int:
 
         completed = wait(
             lambda: (lambda s: s if done_count(s) > before and s.get("readyForTask") and (s.get("gait") or {}).get("phase") == "completed" else None)(state(driver)),
-            30,
+            24,
             "直线行走没有稳定完成",
             0.12,
         )
@@ -316,7 +327,7 @@ def main() -> int:
         turn_before = command(driver, "向左转90度")
         turn = wait(
             lambda: (lambda s: s if (s.get("gait") or {}).get("turnOutsideFoot") == "left" and (s.get("locomotion") or {}).get("state") not in (None, "idle") else None)(state(driver)),
-            18,
+            14,
             "没有观察到左转外侧脚优先",
             0.04,
         )
@@ -325,7 +336,7 @@ def main() -> int:
         report["captures"].append(item)
         turn_done = wait(
             lambda: (lambda s: s if done_count(s) > turn_before and s.get("readyForTask") else None)(state(driver)),
-            38,
+            30,
             "原地转身没有稳定完成",
             0.12,
         )
@@ -336,6 +347,7 @@ def main() -> int:
         gait = completed.get("gait") or {}
         checks = {
             "browserRuntimeExecuted": True,
+            "bodyMode": report.get("bodyMode"),
             "startPreparationObserved": (prep.get("gait") or {}).get("maximumPoseOffsetM", 0) >= 0.006,
             "maximumPelvisPoseShiftM": (prep.get("gait") or {}).get("maximumPoseOffsetM"),
             "firstSwingRootTravelM": gait.get("firstSwingRootTravelM"),
