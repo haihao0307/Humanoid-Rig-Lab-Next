@@ -6,6 +6,7 @@ on:
       - feature/face-features-r25-20260919
     paths:
       - tools/apply-face-r25b.mjs
+      - tools/apply-face-r25b-v2.mjs
       - .github/workflows/apply-face-r25b-once.yml
 
 permissions:
@@ -28,7 +29,9 @@ jobs:
           node-version: '22'
 
       - name: Apply R25B source patch
-        run: node tools/apply-face-r25b.mjs
+        run: |
+          node tools/apply-face-r25b.mjs
+          node tools/apply-face-r25b-v2.mjs
 
       - name: Build generated workbench entry
         run: node tools/build-pure.mjs
