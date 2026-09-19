@@ -15,7 +15,6 @@ import requests
 from selenium import webdriver
 from selenium.common.exceptions import JavascriptException, NoSuchElementException, TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 
 VIEWPORT = (1720, 980)
 DISPLAY_SIZE = (1920, 1080)
@@ -223,13 +222,25 @@ def set_parent_anatomy(driver: webdriver.Chrome, value: str) -> None:
 
 def set_body_view(driver: webdriver.Chrome, view: str, follow: bool = False) -> None:
     switch_body(driver)
-    follow_box = driver.find_element(By.ID, "follow")
-    if follow_box.is_selected() != follow:
-        driver.execute_script("arguments[0].click()", follow_box)
-    driver.find_element(By.ID, "bodyView").click()
-    time.sleep(0.45)
-    driver.find_element(By.ID, view).click()
-    time.sleep(0.8)
+    result = driver.execute_script(
+        """
+        const follow=document.getElementById('follow');
+        const body=document.getElementById('bodyView');
+        const view=document.getElementById(arguments[0]);
+        if(!follow||!body||!view)throw new Error('missing body camera control');
+        if(follow.checked!==arguments[1]){
+          follow.checked=arguments[1];follow.dispatchEvent(new Event('change',{bubbles:true}));
+          follow.dispatchEvent(new Event('input',{bubbles:true}));
+        }
+        body.click();view.click();
+        return {follow:follow.checked,body:body.id,view:view.id};
+        """,
+        view,
+        follow,
+    )
+    if result.get("view") != view or result.get("follow") is not follow:
+        raise RuntimeError(f"身体镜头切换未生效：{result}")
+    time.sleep(1.15)
     driver.switch_to.default_content()
 
 
@@ -243,15 +254,18 @@ def get_done_count(driver: webdriver.Chrome) -> int:
 
 def reset_body(driver: webdriver.Chrome) -> dict[str, Any]:
     switch_body(driver)
-    with contextlib.suppress(Exception):
-        driver.find_element(By.ID, "reset").click()
+    driver.execute_script(
+        """
+        const reset=document.getElementById('reset');
+        const pause=document.getElementById('pause');
+        const body=document.getElementById('bodyView');
+        if(!reset||!pause||!body)throw new Error('missing reset/body control');
+        reset.click();
+        if((pause.textContent||'').includes('继续'))pause.click();
+        body.click();
+        """
+    )
     time.sleep(1.4)
-    with contextlib.suppress(Exception):
-        pause = driver.find_element(By.ID, "pause")
-        if "继续" in pause.text:
-            pause.click()
-    with contextlib.suppress(Exception):
-        driver.find_element(By.ID, "bodyView").click()
     driver.switch_to.default_content()
     wait_until(driver, lambda: "站" in (body_state(driver).get("posture") or ""), 24, "重置后没有恢复站立")
     return body_state(driver)
@@ -260,10 +274,22 @@ def reset_body(driver: webdriver.Chrome) -> dict[str, Any]:
 def send_command(driver: webdriver.Chrome, command: str) -> tuple[int, str]:
     initial_done = get_done_count(driver)
     switch_body(driver)
-    field = driver.find_element(By.ID, "command")
-    field.click(); field.send_keys(Keys.CONTROL, "a"); field.send_keys(command)
-    driver.find_element(By.ID, "send").click()
+    result = driver.execute_script(
+        """
+        const field=document.getElementById('command');
+        const send=document.getElementById('send');
+        if(!field||!send)throw new Error('missing command control');
+        field.value=arguments[0];
+        field.dispatchEvent(new Event('input',{bubbles:true}));
+        field.dispatchEvent(new Event('change',{bubbles:true}));
+        send.click();
+        return {value:field.value,send:send.id};
+        """,
+        command,
+    )
     driver.switch_to.default_content()
+    if result.get("value") != command:
+        raise RuntimeError(f"动作命令未写入：{result}")
     return initial_done, utc_now()
 
 
