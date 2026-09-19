@@ -1,0 +1,40 @@
+name: Shorts R2.2 placement review
+on:
+  push:
+    branches: [fix/shorts-two-leg-assembly-r2-20260919]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shorts-r2-placement-review
+  cancel-in-progress: true
+jobs:
+  actual-browser-placement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build and test R2.2 source
+        run: |
+          node tools/build-pure.mjs
+          node tools/build-shorts-preview.mjs
+          node tools/check-pure.mjs
+          node --test tools/test-shorts-*.mjs
+      - name: Install isolated browser dependency
+        run: |
+          mkdir -p /tmp/shorts-browser
+          npm install --prefix /tmp/shorts-browser --no-audit --no-fund playwright@1.55.0
+          /tmp/shorts-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Capture actual R2.2 progress views
+        run: |
+          python3 -m http.server 8793 --bind 127.0.0.1 >/tmp/shorts-r2-http.log 2>&1 &
+          node tools/review-shorts-placement-r2.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shorts-r2-2-placement-progress
+          path: /tmp/shorts-r2-placement
+          retention-days: 14
