@@ -21,6 +21,9 @@ replace('clothing/ShortsTubeFormationR2.js',
 replace('clothing/ShortsTubeFormationR2.js',
   'const base={...state.report,sourceBefore,massBefore,closedSeams:closed,authoringLockedParticleCount,authoringLocksRemovable:true,otherSeamsStarted:false};',
   "const base={...state.report,sourceBefore,massBefore,closedSeams:closed,authoringLockedParticleCount,authoringLocksRemovable:true,otherSeamsStarted:false,bodyContactPieces:['FL','BL'],inactiveBodyContactPieces:['FR','BR','G','WFL','WFR','WBR','WBL'],bodyContactTriangleCount:activeTriangleRecords.length};");
+replace('clothing/ShortsTubeFormationR2.js',
+  'return {...baseReport,valid,sourceIdentityPreserved,totalMassPreserved,closedSeams:closed,cuff:',
+  'return {...baseReport,stitchJoinToleranceM:simulation.options.stitchJoinToleranceM,valid,sourceIdentityPreserved,totalMassPreserved,closedSeams:closed,cuff:');
 replace('clothing/ShortsSurfaceContact.js',
   'constructor(particles,triangleRecords,body,{clearanceM=.0025,toleranceM=.001,includeVertices=true,dofs=null}={}){',
   'constructor(particles,triangleRecords,body,{clearanceM=.0025,toleranceM=.001,includeVertices=true,includeOnlyIncidentVertices=false,dofs=null}={}){');
@@ -40,6 +43,9 @@ replace('clothing/ClothShorts.js','const minimumSteps=3,maximumSteps=8;','const 
 replace('tools/review-shorts-left-tube-r23.mjs',
   "for(const id of ['outseam-left','inseam-left'])if(seams.get(id)?.progress!==1)failureReasons.push(id+' not closed');",
   "for(const item of tube?.closedSeams??[])if(!(item.maximumGapM<=report.simulation.options.stitchJoinToleranceM))failureReasons.push(item.id+' spatial gap exceeds tolerance');");
+replace('tools/review-shorts-left-tube-r23.mjs',
+  "report.simulation.options.stitchJoinToleranceM",
+  "(tube.stitchJoinToleranceM??1e-4)");
 const surfaceTest='tools/test-shorts-surface-contact.mjs',testName="test('incident-only vertex mode scopes a staged body gate to supplied cloth triangles'";
 if(!read(surfaceTest).includes(testName))edits.set(surfaceTest,read(surfaceTest)+"\ntest('incident-only vertex mode scopes a staged body gate to supplied cloth triangles',()=>{\n const p=[particle([0,1,0]),particle([1,1,0]),particle([0,2,0]),particle([0,-1,0],0)],contact=new Contact(p,triangle,plane(),{clearanceM:.01,includeOnlyIncidentVertices:true});\n assert.deepEqual(contact.counts,{vertex:3,edgeMidpoint:3,triangleCentroid:1});assert.equal(contact.includeOnlyIncidentVertices,true);assert.equal(contact.report().passed,true);assert.equal(p[3].pos[1],-1);\n});\n");
 for(const [file,text]of edits)fs.writeFileSync(file,text);
