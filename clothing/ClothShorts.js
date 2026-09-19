@@ -78,7 +78,7 @@ class ClothShorts {
   }
   const begin=performance.now();
   if(this.leftTubeReview){
-   this.assemblyState='left-tube-relaxing';const minimumSteps=3,maximumSteps=8;
+   this.assemblyState='left-tube-relaxing';const minimumSteps=3,maximumSteps=16;
    for(let step=0;step<maximumSteps;step++){
     if(this.disposed)throw Error('R2.3 left-tube review was disposed');
     this.body.update();this.simulation.step(1);this.dirty=true;

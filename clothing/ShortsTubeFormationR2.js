@@ -30,8 +30,8 @@ function createShortsLeftTubeStateR23(pattern,body,human,options={}){
   if(!Array.isArray(outerSource)||!Array.isArray(innerSource))fail('left leg source seam boundaries are required');
   const outerStartRow=Math.min(...outerSource.map(i=>Math.floor(i/stride))),innerStartRow=Math.min(...innerSource.map(i=>Math.floor(i/stride)));
   if(!(outerStartRow>=1&&innerStartRow>outerStartRow&&innerStartRow<=rows))fail('invalid source leg seam rows');
-  const outerOpeningTopM=options.outerOpeningTopM??.028,innerOpeningTopM=options.innerOpeningTopM??.050;
-  if(![outerOpeningTopM,innerOpeningTopM].every(value=>Number.isFinite(value)&&value>=0&&value<=.10))fail('invalid staged opening');
+  const outerOpeningTopM=options.outerOpeningTopM??.200,innerOpeningTopM=options.innerOpeningTopM??.250;
+  if(![outerOpeningTopM,innerOpeningTopM].every(value=>Number.isFinite(value)&&value>=0&&value<=.50))fail('invalid staged opening');
   const rigidPositions=new Map(),positionsByPiece=new Map();
   for(const piece of pattern.pieces){
     const p=piece.placement,positions=piece.materialCoordinates.map(uv=>add(p.origin,add(mul(p.basisU,uv[0]),mul(p.basisV,uv[1]))));
@@ -88,11 +88,13 @@ function completeShortsLeftTubeR23(simulation,state){
     seam.progress=1;seam.start=0;seam.needleIndex=seam.pairs.length;seam.needleStart=null;closed.push({id,pairCount:seam.pairs.length,maximumGapM});
   }
   simulation.continuousContact=simulation.options.selfContact?createShortsContinuousContact(simulation.particles,simulation.triangleRecords,simulation.edges,{thickness:simulation.options.thickness,maxCandidates:simulation.options.maxSelfCandidates,dofs:simulation.dofs,motionLimit:true}):null;
-  simulation.surfaceContact=simulation.body?new ShortsSurfaceContact(simulation.particles,simulation.triangleRecords,simulation.body,{clearanceM:simulation.options.thickness,toleranceM:.001,dofs:simulation.dofs}):null;
-  simulation.triangleBodyContact=simulation.options.triangleBodyContact?new ShortsTriangleBodyContact(simulation.particles,simulation.triangleRecords,simulation.body,{clearanceM:simulation.options.thickness,toleranceM:.001,dofs:simulation.dofs,maxCandidates:simulation.options.triangleBodyMaxCandidates,maxWitnessQueries:simulation.options.triangleBodyMaxWitnessQueries}):null;
+  const bodyContactPieces=new Set(['FL','BL']),activeTriangleRecords=simulation.triangleRecords.filter(record=>bodyContactPieces.has(record.pieceId));
+  if(!activeTriangleRecords.length)fail('active left-tube contact triangles are missing');
+  simulation.surfaceContact=simulation.body?new ShortsSurfaceContact(simulation.particles,activeTriangleRecords,simulation.body,{clearanceM:simulation.options.thickness,toleranceM:.001,dofs:simulation.dofs,includeOnlyIncidentVertices:true}):null;
+  simulation.triangleBodyContact=simulation.options.triangleBodyContact?new ShortsTriangleBodyContact(simulation.particles,activeTriangleRecords,simulation.body,{clearanceM:simulation.options.thickness,toleranceM:.001,dofs:simulation.dofs,maxCandidates:simulation.options.triangleBodyMaxCandidates,maxWitnessQueries:simulation.options.triangleBodyMaxWitnessQueries}):null;
   for(const support of simulation.temporarySupports){support.start=[...simulation.particles[support.index].pos];support.targetHeight=support.start[1];support.lambda=[0,0,0];if(!['FL','BL'].includes(simulation.particles[support.index].pieceId))support.active=false;}
   simulation._sync();
-  const base={...state.report,sourceBefore,massBefore,closedSeams:closed,authoringLockedParticleCount,authoringLocksRemovable:true,otherSeamsStarted:false};
+  const base={...state.report,sourceBefore,massBefore,closedSeams:closed,authoringLockedParticleCount,authoringLocksRemovable:true,otherSeamsStarted:false,bodyContactPieces:['FL','BL'],inactiveBodyContactPieces:['FR','BR','G','WFL','WFR','WBR','WBL'],bodyContactTriangleCount:activeTriangleRecords.length};
   const report=auditShortsLeftTubeR23(simulation,state,base);
   simulation.events.push({type:'r2.3_left_leg_tube_checkpoint',stepIndex:simulation.stepIndex,closedSeams:closed.map(item=>item.id),cuffAreaM2:report.cuff.projectedAreaM2,valid:report.valid});
   return report;
