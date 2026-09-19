@@ -1,0 +1,79 @@
+name: Motion convergence build
+
+on:
+  push:
+    branches:
+      - feature/human-motion-convergence-r1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: motion-convergence-build
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[motion-build]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: feature/human-motion-convergence-r1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Register the clean motion assembly delta
+        run: |
+          set -euo pipefail
+          python tools/apply-motion-convergence-r1.py
+          python tools/apply-motion-convergence-r1.py | tee motion-assembly-idempotence.json
+          grep -q '"assembly": false' motion-assembly-idempotence.json
+          grep -q '"runtime": false' motion-assembly-idempotence.json
+          ! grep -q '"clothing/' source/assembly.json
+          grep -q 'body/BoxHandling.js' source/assembly.json
+          grep -q '__SOURCE:body/BoxHandling.js__' source/runtime.template.js
+
+      - name: Rebuild generated entrypoint
+        run: |
+          set -euo pipefail
+          node tools/build-pure.mjs
+          node tools/build-pure.mjs --check
+          node tools/check-pure.mjs
+          python tools/audit-files.py
+
+      - name: Run core motion migration checks
+        run: |
+          set -euo pipefail
+          node tools/check-motion-lab-integration.mjs
+          node tools/test-motion-phase-continuity.mjs
+          node tools/test-motion-support-continuity.mjs
+          node tools/test-motion-execution-rollback.mjs
+          node tools/test-locomotion-step-rhythm.mjs
+          node tools/test-turn-command-continuity.mjs
+          node tools/test-free-hand-relaxation.mjs
+          node tools/test-floor-palm-support.mjs
+          node tools/test-box-handling.mjs
+
+      - name: Commit exact generated files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/assembly.json source/runtime.template.js index.html FILE_AUDIT.json SHA256SUMS.txt
+          if git diff --cached --quiet; then
+            echo 'Generated files already match the clean source assembly.'
+            exit 0
+          fi
+          git commit -m "build(motion): refresh convergence entrypoint [motion-build]"
+          git push origin HEAD:feature/human-motion-convergence-r1
