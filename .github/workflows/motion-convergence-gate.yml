@@ -58,10 +58,11 @@ jobs:
           node tools/check-pure.mjs
           python tools/audit-files.py
 
-      - name: Verify pinned motion integration
+      - name: Verify pinned motion integration and runtime state
         run: |
           set -euo pipefail
           node tools/check-motion-lab-integration.mjs
+          node tools/test-motion-runtime-state.mjs
           node tools/test-motion-phase-continuity.mjs
           node tools/test-motion-support-continuity.mjs
           node tools/test-motion-execution-rollback.mjs
@@ -90,6 +91,7 @@ jobs:
           {
             echo '## Motion convergence gate'
             echo '- Scope: file contracts and deterministic CPU motion/contact regressions.'
+            echo '- Runtime state: read-only diagnostic mirror; not a second solver.'
             echo '- Browser visual acceptance: not established by this workflow.'
             echo '- Full-body dynamics and production readiness: not established.'
           } >> "$GITHUB_STEP_SUMMARY"
