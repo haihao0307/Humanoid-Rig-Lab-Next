@@ -1,0 +1,95 @@
+name: Motion convergence gate
+
+on:
+  push:
+    branches:
+      - feature/human-motion-convergence-r1
+    paths:
+      - 'body/**'
+      - 'motion/**'
+      - 'control/**'
+      - 'world/**'
+      - 'source/**'
+      - 'tools/**'
+      - '.github/workflows/motion-convergence-gate.yml'
+      - 'docs/MOTION_CONVERGENCE_R1_20260919.md'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'body/**'
+      - 'motion/**'
+      - 'control/**'
+      - 'world/**'
+      - 'source/**'
+      - 'tools/**'
+      - '.github/workflows/motion-convergence-gate.yml'
+      - 'docs/MOTION_CONVERGENCE_R1_20260919.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motion-convergence-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  file-and-motion-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify generated entrypoint and file contracts
+        run: |
+          set -euo pipefail
+          node tools/build-pure.mjs --check
+          node tools/check-pure.mjs
+          python tools/audit-files.py
+
+      - name: Verify pinned motion integration
+        run: |
+          set -euo pipefail
+          node tools/check-motion-lab-integration.mjs
+          node tools/test-motion-phase-continuity.mjs
+          node tools/test-motion-support-continuity.mjs
+          node tools/test-motion-execution-rollback.mjs
+
+      - name: Verify walk, turn, stop and free hands
+        run: |
+          set -euo pipefail
+          node tools/test-locomotion-step-rhythm.mjs
+          node tools/test-locomotion-body-coordination.mjs
+          node tools/test-turn-command-continuity.mjs
+          node tools/test-free-hand-relaxation.mjs
+          node tools/test-foot-rocker-contract.mjs
+
+      - name: Verify floor support and box-contact candidates
+        run: |
+          set -euo pipefail
+          node tools/test-floor-palm-support.mjs
+          node tools/test-seated-preparation-continuity.mjs
+          node tools/test-contact-hand-pose.mjs
+          node tools/test-box-handling.mjs
+          node tools/test-supported-box-tip.mjs
+
+      - name: Record gate boundary
+        if: always()
+        run: |
+          {
+            echo '## Motion convergence gate'
+            echo '- Scope: file contracts and deterministic CPU motion/contact regressions.'
+            echo '- Browser visual acceptance: not established by this workflow.'
+            echo '- Full-body dynamics and production readiness: not established.'
+          } >> "$GITHUB_STEP_SUMMARY"
