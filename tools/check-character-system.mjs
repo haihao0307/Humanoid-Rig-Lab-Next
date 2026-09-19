@@ -50,7 +50,7 @@ export function checkCharacterSystemSources({parse,read,assert}){
  const support=method(surface,'CompactSurfaceRenderer','minimumSupportY');
  check(/frames\?frames\.get\(j\.id\):j\.world/.test(support)&&!/\.fk\(|\.pose\(|\.world\s*=/.test(support),'support query is read-only for candidate and live poses');
  check(ordered(replace,['const stage=','stage.chunks.push(chunk)','gl.bindVertexArray(vao)','stage.supportProbes=data.supportProbes','stage.report=','this.checkUpload();','this.chunks=stage.chunks','this.releaseChunks(oldChunks)']),'replacement stages geometry, support and report before releasing the old surface');
- check(/catch\(error\)\{this\.releaseChunks\(stage\.chunks\);stage\.hair\?\.dispose\(\);stage\.clothing\?\.dispose\(\);throw error;\}/.test(replace),'failed replacement frees only staged body, hair and clothing resources');
+ check(/catch\(error\)\{this\.releaseChunks\(stage\.chunks\);stage\.hair\?\.dispose\(\);stage\.skirt\?\.dispose\(\);throw error;\}/.test(replace),'failed replacement frees only staged body, hair and skirt resources');
  check(/gl\.isContextLost\(\)\|\|code!==gl\.NO_ERROR/.test(surface)&&/if\(!vao\)throw/.test(replace)&&/if\(!b\)throw/.test(replace),'allocation and upload failures are checked');
  check(/if\(this\.disposed\)return/.test(method(surface,'CompactSurfaceRenderer','dispose'))&&/this\.supportProbes=\[\]/.test(surface),'surface disposal is idempotent and drops CPU probes');
  const hair=read('body/CompactHairRenderer.js');
