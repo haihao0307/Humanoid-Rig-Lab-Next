@@ -1,0 +1,52 @@
+name: Bird Mother Validate
+
+on:
+  push:
+    branches: [bird-mother-production-v001-20260919]
+    paths:
+      - 'bird-mother/**'
+      - '.github/workflows/bird-mother-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate HTML, runtime syntax and exchange contract
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('bird-mother/index.html', 'utf8');
+          const required = [
+            '<canvas id="stage"',
+            'bird-rig-v1',
+            'class BirdMotionRuntime',
+            'class BirdActor',
+            'class BirdWorld',
+            "state.mode==='flock'",
+            'local quaternion',
+            'bird-mother-recipe-v1'
+          ];
+          for (const marker of required) {
+            if (!html.includes(marker)) throw new Error(`Missing workbench marker: ${marker}`);
+          }
+          const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)]
+            .map(match => match[1].trim())
+            .filter(Boolean);
+          if (inlineScripts.length !== 1) throw new Error(`Expected one inline runtime, found ${inlineScripts.length}`);
+          new Function(inlineScripts[0]);
+          const schema = JSON.parse(fs.readFileSync('bird-mother/bird-rig-v1.schema.json', 'utf8'));
+          if (schema.title !== 'Bird Mother Recipe V1') throw new Error('Unexpected schema title');
+          if (!schema.properties?.rig || !schema.properties?.motion || !schema.properties?.flock) {
+            throw new Error('Rig, motion or flock schema is missing');
+          }
+          console.log('Bird Mother static validation passed.');
+          NODE
