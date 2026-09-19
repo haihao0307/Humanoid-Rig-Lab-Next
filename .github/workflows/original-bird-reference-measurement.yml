@@ -1,0 +1,41 @@
+name: Original Bird Reference Measurement Check
+
+on:
+  push:
+    branches:
+      - bird-mother-original-bird-r001-20260920
+    paths:
+      - 'Bird-Reconstruction-Lab/original-bird/**'
+      - '.github/workflows/original-bird-reference-measurement.yml'
+  pull_request:
+    paths:
+      - 'Bird-Reconstruction-Lab/original-bird/**'
+      - '.github/workflows/original-bird-reference-measurement.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python syntax
+        run: python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py
+
+      - name: Measurement tool self test
+        run: python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
+
+      - name: Validate JSON records
+        shell: python
+        run: |
+          import json, pathlib
+          files = [
+            pathlib.Path('Bird-Reconstruction-Lab/original-bird/original-bird-kernel.schema.json'),
+            pathlib.Path('Bird-Reconstruction-Lab/original-bird/original-bird-reference-measurements.r001.json'),
+          ]
+          for p in files:
+            json.loads(p.read_text(encoding='utf-8'))
+            print('JSON_OK', p)
