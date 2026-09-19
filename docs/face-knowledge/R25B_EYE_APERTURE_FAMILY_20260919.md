@@ -36,6 +36,12 @@ R24 的中性眼裂由 `compactEyeNeutralFissure` 生成，闭眼线则在 `comp
 
 `check-eye-anatomy --parameter-fixtures`、R25 基线检查、身份编译、共享身份变形和 NPC uniform 检查继续作为回归门禁。数值通过不能替代真实画面判断。
 
+## 真实浏览器编译修复
+
+真实浏览器首次编译发现，眼部遮蔽片元层复用了 `compactLidPatchLocal` 的函数体，却没有同步携带 R25B 新增的开合辅助函数，因此 WebGL 报告找不到 `compactLidRestApertureY`、`compactLidClosedApertureY` 和 `compactLidSmooth01`。这不是眼裂数学失败，而是共享着色器依赖遗漏。
+
+修复后，`compactEyeOcclusionShader` 会从同一 `COMPACT_EYE_LID_GLSL` 字符串中一并提取开合辅助函数，再提取自由睑缘函数体；顶点位置、片元接触遮蔽与诊断视图因此使用同一套眼裂开合定义。真实浏览器仍需重新运行后才能升级运行状态。
+
 ## 下一步
 
 R25B 下一子阶段继续处理上睑板、下睑板、回折段和眶部外接面的三维截面。重点检查中性、半闭、全闭三个状态是否仍出现独立圆盖、硬沟或局部凸台；结构通过后再接入真正的眼裂宽度和眼角倾斜身份参数。

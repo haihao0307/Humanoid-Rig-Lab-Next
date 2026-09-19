@@ -682,12 +682,14 @@ function compactEyeSocketSource(){
 // ellipse that would lag behind narrowing, widening, or blinking.
 function compactEyeOcclusionShader(){
   const shader=COMPACT_EYE_LID_GLSL,contactStart=shader.indexOf('float compactLidContact('),contactEnd=shader.indexOf('\n}',contactStart)+2;
+  const apertureStart=shader.indexOf('float compactLidSmooth01('),apertureEnd=shader.indexOf('\nfloat compactLidSectionDepth(',apertureStart);
   const rimStart=shader.indexOf('vec3 compactLidRimSurface('),rimEnd=shader.indexOf('\n}',rimStart)+2;
   const patchStart=shader.indexOf('vec3 compactLidPatchLocal('),bodyStart=shader.indexOf('{',patchStart)+1,bodyEnd=shader.indexOf('  float eps=.0001,slope=',bodyStart);
-  if(contactStart<0||contactEnd<2||patchStart<0||bodyEnd<bodyStart)throw Error('眼部遮蔽缺少共享睑缘定义');
+  if(contactStart<0||contactEnd<2||apertureStart<0||apertureEnd<=apertureStart||patchStart<0||bodyEnd<bodyStart)throw Error('眼部遮蔽缺少共享睑缘定义');
   return `uniform float compactEyeSide,compactLidState[6];
 uniform vec3 compactEyeNormal;uniform vec4 compactEyeGlobe;uniform vec2 compactCanthusDepth,compactCanthusSlope;
 ${shader.slice(contactStart,contactEnd)}
+${shader.slice(apertureStart,apertureEnd)}
 ${shader.slice(rimStart,rimEnd)}
 vec3 compactEyeOcclusionMargin(float angle){
   vec3 outer=vec3(0.);float t=0.;
