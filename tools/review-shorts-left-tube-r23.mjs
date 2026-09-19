@@ -42,7 +42,7 @@ try{
   if(tube?.valid!==true||tube.leftTubeFormed!==true)failureReasons.push('left-tube numerical gate');
   if(tube?.bodyContactValidated!==true)failureReasons.push('body-contact gate');
   if(report.assemblyReady!==false||tube?.visualAcceptance!==false||tube?.productionReady!==false)failureReasons.push('staged checkpoint promoted incorrectly');
-  for(const item of tube?.closedSeams??[])if(!(item.maximumGapM<=report.simulation.options.stitchJoinToleranceM))failureReasons.push(item.id+' spatial gap exceeds tolerance');
+  for(const item of tube?.closedSeams??[])if(!(item.maximumGapM<=(tube.stitchJoinToleranceM??1e-4)))failureReasons.push(item.id+' spatial gap exceeds tolerance');
   if(futureStarted.length)failureReasons.push('future seams started: '+futureStarted.join(','));
   const status={stage:'R2.3 left leg tube checkpoint',actualBrowser:true,assemblyState:report.assemblyState,
     leftTubeValid:tube?.valid===true,closedSeamIds:tube?.closedSeamIds??[],cuff:tube?.cuff??null,
