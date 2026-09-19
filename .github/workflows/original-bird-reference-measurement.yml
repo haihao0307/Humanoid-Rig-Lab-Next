@@ -38,7 +38,9 @@ jobs:
           import json, pathlib
           files = [
             pathlib.Path('Bird-Reconstruction-Lab/original-bird/original-bird-kernel.schema.json'),
+            pathlib.Path('Bird-Reconstruction-Lab/original-bird/original-bird-anatomy-landmarks.schema.json'),
             pathlib.Path('Bird-Reconstruction-Lab/original-bird/original-bird-reference-measurements.r001.json'),
+            pathlib.Path('Bird-Reconstruction-Lab/original-bird/CURRENT_STATUS.json'),
           ]
           for p in files:
             json.loads(p.read_text(encoding='utf-8'))
