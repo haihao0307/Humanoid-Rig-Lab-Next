@@ -1,0 +1,91 @@
+name: Face R25 real-browser eye QA
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+    paths:
+      - body/EyeAnatomy.js
+      - body/FaceIdentity.js
+      - tools/capture-face-diagnosis.cjs
+      - .github/workflows/face-r25-browser-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: face-r25-browser-eye-qa
+  cancel-in-progress: true
+
+jobs:
+  eye-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build generated workbench entry
+        run: node tools/build-pure.mjs
+
+      - name: Install isolated Playwright runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA_NODE="$RUNNER_TEMP/face-r25-playwright"
+          mkdir -p "$QA_NODE"
+          cd "$QA_NODE"
+          npm init -y >/dev/null
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+          echo "HUMAN_PLAYWRIGHT_MODULE=$QA_NODE/node_modules/playwright" >> "$GITHUB_ENV"
+
+      - name: Capture actual eye states
+        env:
+          HUMAN_PLAYWRIGHT_MODULE: ${{ env.HUMAN_PLAYWRIGHT_MODULE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/face-r25b-browser"
+          node tools/capture-face-diagnosis.cjs "$OUT" \
+            "eyes,eyes-half,eyes-closed,eyes-closed-clay,eyes-profile,eyes-profile-closed"
+          rm -rf face-r25b-browser-evidence
+          cp -a "$OUT" face-r25b-browser-evidence
+
+      - name: Enforce browser and evidence gate
+        shell: node {0}
+        run: |
+          const fs=require('node:fs');
+          const path='face-r25b-browser-evidence/capture.json';
+          if(!fs.existsSync(path))throw Error('capture.json missing');
+          const data=JSON.parse(fs.readFileSync(path,'utf8'));
+          const expected=['eyes','eyes-half','eyes-closed','eyes-closed-clay','eyes-profile','eyes-profile-closed'];
+          if(data.errors?.length)throw Error('page errors: '+JSON.stringify(data.errors));
+          if(data.samples?.length!==expected.length)throw Error('unexpected sample count');
+          for(const name of expected){
+            const sample=data.samples.find(item=>item.name===name);
+            if(!sample)throw Error('missing sample '+name);
+            if(sample.glError!==0)throw Error(name+' WebGL error '+sample.glError);
+            if(sample.eyes?.revision!=='r25b-canthus-owned-aperture-family')throw Error(name+' used wrong eye revision');
+          }
+          const checks=data.identityChecks||{};
+          for(const key of ['characterSeedPreserved','appearanceRoundTrip','expressionIndependent','characterSamplerOwnsShape','worldLightFixed'])if(!checks[key])throw Error('identity check failed: '+key);
+          console.log(JSON.stringify({sourceSHA:process.env.GITHUB_SHA,samples:expected,eyeRevision:'r25b-canthus-owned-aperture-family',pageErrors:0,glErrors:0,identityChecks:checks,visualAcceptance:false}));
+
+      - name: Upload browser evidence
+        if: always() && hashFiles('face-r25b-browser-evidence/capture.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-r25b-browser-${{ github.sha }}
+          path: face-r25b-browser-evidence
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
