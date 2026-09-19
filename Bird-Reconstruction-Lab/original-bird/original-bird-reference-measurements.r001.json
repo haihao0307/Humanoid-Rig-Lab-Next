@@ -1,0 +1,302 @@
+{
+  "schema": "bird/original-reference-measurements@0.0.1",
+  "revision": "ORIGINAL-BIRD-R001-MEASUREMENTS-20260920",
+  "truthPolicy": {
+    "externalReferenceIsEvidenceOnly": true,
+    "proceduralCandidateIsNotTruth": true,
+    "userVisualAcceptanceRequired": true,
+    "globalScaleIsNotGrowth": true,
+    "unresolvedFieldsStayUnknown": true
+  },
+  "records": [
+    {
+      "referenceId": "OB-REF-COL-001-R57-MOORELAB",
+      "taxon": {
+        "scientificName": "Spilopelia chinensis",
+        "commonNameZh": "珠颈斑鸠",
+        "clade": "columbid",
+        "status": "source-locked"
+      },
+      "sourceType": "museum-photogrammetry-model-metadata",
+      "source": {
+        "provider": "Moore Laboratory of Zoology, Occidental College",
+        "specimenGuid": "MLZ:Bird:65780",
+        "modelUid": "0014e26b6ddd4c1ab48116355ed46209",
+        "license": "CC BY 4.0",
+        "archiveAcquired": false
+      },
+      "geometry": {
+        "vertexCount": 43609,
+        "triangleCount": 87214,
+        "materialCount": 1,
+        "textureCount": 1
+      },
+      "canSupportKernel": [
+        "species-surface-registration-test",
+        "head-beak-silhouette-observation",
+        "thorax-envelope-observation",
+        "folded-wing-envelope-observation",
+        "tail-envelope-observation"
+      ],
+      "speciesDeltaOnly": [
+        "plumage-color-regions",
+        "species-specific-surface-proportions"
+      ],
+      "cannotProve": [
+        "internal-skeleton",
+        "live-neutral-pose",
+        "source-units-until-verified"
+      ],
+      "truthStatus": "metadata-locked-reference-not-yet-acquired",
+      "visualAcceptance": false,
+      "productionReady": false
+    },
+    {
+      "referenceId": "OB-REF-COL-002-R17",
+      "taxon": {
+        "scientificName": "Spilopelia chinensis",
+        "commonNameZh": "珠颈斑鸠",
+        "clade": "columbid",
+        "status": "project-candidate"
+      },
+      "sourceType": "procedural-candidate-workbench",
+      "generator": "spotted-dove-procedural@6.1-specimen-profile-r17",
+      "geometry": {
+        "surfaceModel": "longitudinal-sectioned-superellipse",
+        "profileStationCount": 15,
+        "bodyVertices": 23830,
+        "groomVertices": 116325,
+        "joints": 50,
+        "anatomicalNeckSegments": 12,
+        "flightFeathers": 56,
+        "contourFeathers": 4653,
+        "muscleMeshes": 13,
+        "externalAnimalMeshes": 0,
+        "imageTextures": 0,
+        "importedAnimations": 0
+      },
+      "canSupportKernel": [
+        "longitudinal-body-coordinate-pattern",
+        "stable-attachment-semantics",
+        "bone-length-preservation-gate",
+        "separate-skeleton-muscle-feather-layers",
+        "variable-cervical-chain-interface"
+      ],
+      "speciesDeltaOnly": [
+        "12-segment-neck-count",
+        "56-flight-feather-count",
+        "species-proportions",
+        "spotted-dove-plumage"
+      ],
+      "cannotProve": [
+        "final-species-surface-accuracy",
+        "film-quality",
+        "cross-clade-generality"
+      ],
+      "truthStatus": "procedural-candidate",
+      "visualAcceptance": false,
+      "productionReady": false
+    },
+    {
+      "referenceId": "OB-REF-PAS-001-R60-A0R2",
+      "taxon": {
+        "scientificName": "Passer domesticus",
+        "commonNameZh": "家麻雀",
+        "clade": "passerine",
+        "status": "project-candidate"
+      },
+      "sourceType": "procedural-candidate-runtime",
+      "sourceRevision": "R60-A0R2-birdkeeper-v07-body-port-v1",
+      "measuredRanges": {
+        "bodyLengthM": [
+          0.15258,
+          0.16719
+        ],
+        "openWingChainSpanM": [
+          0.19282,
+          0.21128
+        ],
+        "tailFeatherExtentM": [
+          0.0617,
+          0.06696
+        ],
+        "standingGeometryHeightM": [
+          0.0765,
+          0.08301
+        ]
+      },
+      "externalValidationTargets": {
+        "bodyLengthM": [
+          0.15,
+          0.17
+        ],
+        "wingspanM": [
+          0.19,
+          0.25
+        ],
+        "source": "Cornell Lab All About Birds, House Sparrow"
+      },
+      "wing": {
+        "shoulderDOF": 3,
+        "elbowDOF": 1,
+        "wristDOF": 2,
+        "primaryPerSide": 10,
+        "secondaryPerSide": 12,
+        "covertPerSide": 15,
+        "secondaryAttachment": "ulna",
+        "primaryAttachment": "carpometacarpus-and-digits",
+        "wingBodySurface": "dynamic-continuous-airfoil-ribbon"
+      },
+      "foot": {
+        "topology": "anisodactyl-three-forward-one-hallux",
+        "phalangeFormula": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "segmentLengthPreserving": true
+      },
+      "evidenceBoundary": {
+        "speciesSpecificReferenceMeshImported": false,
+        "engineeringCalibration": true
+      },
+      "canSupportKernel": [
+        "wing-bone-semantic-chain",
+        "primary-secondary-attachment-contract",
+        "bone-length-preserving-motion",
+        "foot-topology-profile-interface",
+        "contact-solver-interface"
+      ],
+      "speciesDeltaOnly": [
+        "passerine-body-ratios",
+        "anisodactyl-profile-parameters",
+        "flight-feather-counts",
+        "ground-hop-policy",
+        "wingbeat-calibration"
+      ],
+      "truthStatus": "procedural-candidate-crosschecked-against-body-length-and-wingspan",
+      "visualAcceptance": false,
+      "productionReady": false
+    },
+    {
+      "referenceId": "OB-REF-ARD-001-R61-H4",
+      "taxon": {
+        "scientificName": "Ardea cinerea",
+        "commonNameZh": "苍鹭",
+        "clade": "ardeid",
+        "status": "project-candidate"
+      },
+      "sourceType": "photo-and-osteology-constrained-procedural-candidate",
+      "sourceRevision": "R61-H4-grey-heron-thoracic-envelope",
+      "units": "metres",
+      "candidateDimensions": {
+        "standingHeightM": 0.95,
+        "billLengthM": 0.136,
+        "trunkLengthM": 0.443,
+        "foldedWingLengthM": 0.382,
+        "cervicalControlLengthM": 0.373,
+        "legSegmentsM": [
+          0.232,
+          0.243
+        ]
+      },
+      "referenceConstraints": {
+        "totalLengthRangeM": [
+          0.84,
+          1.02
+        ],
+        "maleSkull": {
+          "lengthM": 0.205,
+          "craniumLengthM": 0.069,
+          "craniumWidthM": 0.036,
+          "craniumHeightM": 0.029
+        },
+        "sameSpecimenOsteology": {
+          "catalogNumber": "MZB 2011-0371",
+          "sex": "male",
+          "sternumCatalogueBoundsM": [
+            0.0939,
+            0.0504
+          ],
+          "pelvisCatalogueBoundsM": [
+            0.0785,
+            0.0398
+          ],
+          "license": "CC BY 4.0"
+        }
+      },
+      "evidenceBoundary": {
+        "measuredSpecimen": false,
+        "speciesScanImported": false,
+        "exactReconstruction": false,
+        "fullBodyScanImported": false,
+        "groupedCervicalControlsAreLiteralVertebrae": false
+      },
+      "canSupportKernel": [
+        "variable-cervical-chain-requirement",
+        "thoracic-girdle-semantics",
+        "long-leg-chain-test",
+        "clade-specific-neck-control-test"
+      ],
+      "speciesDeltaOnly": [
+        "ardeid-neck-proportions",
+        "ardeid-bill-proportions",
+        "ardeid-leg-proportions",
+        "grey-heron-plumage",
+        "candidate-gait-calibration"
+      ],
+      "cannotProve": [
+        "literal-vertebral-count",
+        "full-body-scan-surface",
+        "measured-gait"
+      ],
+      "truthStatus": "evidence-constrained-procedural-candidate",
+      "visualAcceptance": false,
+      "productionReady": false
+    },
+    {
+      "referenceId": "OB-REF-LAR-001-RED-BILLED-GULL-CANDIDATE",
+      "taxon": {
+        "scientificNameCandidate": "Chroicocephalus ridibundus",
+        "commonNameEn": "Black-headed Gull",
+        "commonNameZhUserLabel": "红嘴鸥",
+        "clade": "larid",
+        "status": "candidate-until-user-model-identity-recovered"
+      },
+      "sourceType": "external-biometric-candidate",
+      "externalEvidence": {
+        "source": "British Trust for Ornithology",
+        "adultWingLengthMeanMm": 305.3,
+        "adultWingLengthSDMm": 11.8,
+        "adultWingLengthRangeMm": [
+          287,
+          323
+        ],
+        "adultWeightMeanG": 289.3,
+        "adultWeightSDG": 33.8,
+        "wingspanReferenceM": [
+          1,
+          1.1
+        ]
+      },
+      "canSupportKernel": [
+        "larid-transfer-test",
+        "long-wing-flight-envelope-test"
+      ],
+      "speciesDeltaOnly": [
+        "gull-proportions",
+        "red-bill-red-leg-color",
+        "plumage-seasonality"
+      ],
+      "cannotProve": [
+        "identity-of-user-uploaded-gull-model",
+        "user-model-geometry",
+        "user-model-skeleton"
+      ],
+      "truthStatus": "taxonomy-and-biometric-candidate",
+      "visualAcceptance": false,
+      "productionReady": false
+    }
+  ]
+}
