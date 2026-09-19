@@ -25,7 +25,7 @@ function shortsJoinRenderNormals(vertices,groups){
 class ClothShorts {
  constructor(surface,meshes){
   this.surface=surface;this.gl=surface.gl;this.buffers=[];this.disposed=false;
-  const search=typeof window==='object'?(window.parent?.location?.search||window.location?.search||''):'';this.placementReview=/(?:[?&])shortsPlacement=r2(?:\.|%2E)2(?:&|$)/i.test(search);this.placementReport=null;
+  const search=typeof window==='object'?(window.parent?.location?.search||window.location?.search||''):'';this.placementReview=/(?:[?&])shortsPlacement=r2(?:\.|%2E)2(?:&|$)/i.test(search);this.leftTubeReview=/(?:[?&])shortsStage=r2(?:\.|%2E)3-left(?:&|$)/i.test(search);this.stagedReview=this.placementReview||this.leftTubeReview;this.placementReport=null;this.leftTubeState=null;this.leftTubeReport=null;
   this.body=new ShortsBody(surface,meshes);this.measurements=this.body.measure();
   this.pattern=createShortsPattern(this.measurements);
   this.simulation=new ShortsCloth(this.pattern,this.body,SHORTS_WEARING_OPTIONS);
@@ -33,7 +33,7 @@ class ClothShorts {
   for(const range of this.simulation.pieceRanges)if(this.pattern.pieces.find(p=>p.id===range.id).placement.rightSide==='opposite_uv_normal')for(let t=range.triangleOffset*3;t<(range.triangleOffset+range.triangleCount)*3;t+=3){const a=this.renderTriangles[t+1];this.renderTriangles[t+1]=this.renderTriangles[t+2];this.renderTriangles[t+2]=a;}
   this.count=this.simulation.triangles.length;this.vertices=new Float32Array(this.simulation.particles.length*8);
   this.geometryBytes=this.vertices.byteLength+this.simulation.triangles.byteLength;
-  this.report={generator:'cut-and-sewn-shorts@1',triangles:this.count/3,panels:this.pattern.pieces.length,geometryBytes:this.geometryBytes,textureScale:3,clothDynamics:true,legSkinning:false,placementReview:this.placementReview};
+  this.report={generator:'cut-and-sewn-shorts@1',triangles:this.count/3,panels:this.pattern.pieces.length,geometryBytes:this.geometryBytes,textureScale:3,clothDynamics:true,legSkinning:false,placementReview:this.placementReview,leftTubeReview:this.leftTubeReview};
   this.assemblyReady=false;this.displayReady=false;this.assemblyState='unstarted';this.dirty=true;this.lastUpdateMilliseconds=0;this.assemblyWallTimeMs=0;this.placed=false;
   const gl=this.gl;
   try{
@@ -58,7 +58,7 @@ class ClothShorts {
  async assembleOnce(maxSteps,onProgress){
   if(!Number.isInteger(maxSteps)||maxSteps<0||maxSteps>SHORTS_ASSEMBLY_STEP_LIMIT)throw Error('Invalid bounded sewing steps');
   if(this.disposed)throw Error('Sewing was disposed');
-  if(this.placementReview&&maxSteps!==0)throw Error('R2.2 rigid placement review cannot activate sewing');
+  if(this.stagedReview&&maxSteps!==0)throw Error('Staged shorts review owns its bounded authoring steps');
   if(this.assemblyReady)return this.assemblyReport;
   if(!this.placed){
    // Production keeps the original rigid dressing transform. R2.2 review uses
@@ -66,13 +66,31 @@ class ClothShorts {
    // neither path alters paper UVs, topology, mass, seams or the Human rig.
    const h=this.surface.boundHuman;
    this.body.update();
-   if(this.placementReview)this.placementReport=applyShortsRigidPlacementR2(this.pattern,this.body,h);
-   else{const source=h.sourceBind.get('hips'),current=h.byId.get('hips').world,q=qnorm(qm(current.q,inv(source.q)));
-    for(const piece of this.pattern.pieces){const p=piece.placement;p.origin=add(current.p,rotate(q,sub(p.origin,source.p)));p.basisU=rotate(q,p.basisU);p.basisV=rotate(q,p.basisV);}}
-   this.simulation=new ShortsCloth(this.pattern,this.body,SHORTS_WEARING_OPTIONS);this.placed=true;
+   if(this.placementReview){this.placementReport=applyShortsRigidPlacementR2(this.pattern,this.body,h);this.simulation=new ShortsCloth(this.pattern,this.body,SHORTS_WEARING_OPTIONS);}
+   else if(this.leftTubeReview){
+    this.leftTubeState=createShortsLeftTubeStateR23(this.pattern,this.body,h);
+    const stagedOptions={...SHORTS_WEARING_OPTIONS,gravity:0,groundY:null,selfContact:false,triangleBodyContact:true,iterations:8,maxMaterialIterations:16,sewingSeconds:1000,handlingDamping:5};
+    this.simulation=new ShortsCloth(this.pattern,this.body,stagedOptions);this.leftTubeReport=completeShortsLeftTubeR23(this.simulation,this.leftTubeState);
+   }else{const source=h.sourceBind.get('hips'),current=h.byId.get('hips').world,q=qnorm(qm(current.q,inv(source.q)));
+    for(const piece of this.pattern.pieces){const p=piece.placement;p.origin=add(current.p,rotate(q,sub(p.origin,source.p)));p.basisU=rotate(q,p.basisU);p.basisV=rotate(q,p.basisV);}
+    this.simulation=new ShortsCloth(this.pattern,this.body,SHORTS_WEARING_OPTIONS);}
+   this.placed=true;
   }
-  const begin=performance.now();this.assemblyState='sewing';
-  const remaining=maxSteps;
+  const begin=performance.now();
+  if(this.leftTubeReview){
+   this.assemblyState='left-tube-relaxing';const minimumSteps=3,maximumSteps=8;
+   for(let step=0;step<maximumSteps;step++){
+    if(this.disposed)throw Error('R2.3 left-tube review was disposed');
+    this.body.update();this.simulation.step(1);this.dirty=true;
+    this.leftTubeReport=auditShortsLeftTubeR23(this.simulation,this.leftTubeState,this.leftTubeReport,{requireBody:true});
+    if(step+1>=minimumSteps&&this.leftTubeReport.valid)break;
+    await new Promise(resolve=>setTimeout(resolve,0));
+   }
+   this.assemblyWallTimeMs+=performance.now()-begin;this.displayReady=true;this.assemblyReady=false;
+   this.assemblyState=this.leftTubeReport?.valid?'left-tube-ready':'left-tube-checkpoint-failed';
+   const staged=this.simulation.report();this.assemblyReport={...staged,leftTube:this.leftTubeReport,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;
+  }
+  this.assemblyState='sewing';const remaining=maxSteps;
   for(let start=0;start<remaining;start++){
    if(this.disposed)throw Error('Sewing was disposed');
    this.simulation.step(1);this.dirty=true;onProgress((start+1)/Math.max(1,remaining));
@@ -96,7 +114,7 @@ class ClothShorts {
   if(this.disposed||!this.assemblyReady||!(dt>0))return;
   const begin=performance.now();this.body.update();this.simulation.advance(dt);this.dirty=true;this.lastUpdateMilliseconds=performance.now()-begin;
  }
- diagnostics(){return {...this.report,placement:this.placementReport,pattern:{version:this.pattern.version,options:{...this.pattern.options},draft:JSON.parse(JSON.stringify(this.pattern.draft)),sourceChecks:JSON.parse(JSON.stringify(this.pattern.checks))},displayReady:this.displayReady,assemblyReady:this.assemblyReady,assemblyState:this.assemblyState,assembly:this.assemblyReport,body:this.body.report(),simulation:this.simulation.report(),lastUpdateMilliseconds:this.lastUpdateMilliseconds};}
+ diagnostics(){return {...this.report,placement:this.placementReport,leftTube:this.leftTubeReport,pattern:{version:this.pattern.version,options:{...this.pattern.options},draft:JSON.parse(JSON.stringify(this.pattern.draft)),sourceChecks:JSON.parse(JSON.stringify(this.pattern.checks))},displayReady:this.displayReady,assemblyReady:this.assemblyReady,assemblyState:this.assemblyState,assembly:this.assemblyReport,body:this.body.report(),simulation:this.simulation.report(),lastUpdateMilliseconds:this.lastUpdateMilliseconds};}
  upload(){
   if(!this.dirty)return;
   const positions=this.simulation.positions,indices=this.renderTriangles,uv=this.simulation.materialCoordinates,v=this.vertices;
@@ -111,9 +129,9 @@ class ClothShorts {
  draw(depth){
   if(this.disposed||!this.surface.visible)return;this.upload();
   const gl=this.gl,r=this.surface.renderer,p=depth?this.depth:this.main;gl.useProgram(p.p);gl.uniformMatrix4fv(p.u.viewProjection,false,depth?r.lightVP:r.vp);
-  if(!depth){const u=this.materialUniforms;gl.uniform3fv(u.uCam,r.eye);gl.uniform2f(u.uViewport,gl.drawingBufferWidth,gl.drawingBufferHeight);for(const [key,value]of Object.entries({uMode:2,uMaterial:0,uLight:0,uNeutral:0,uCompare:0,uDiag:0}))gl.uniform1i(u[key],value);for(const [key,value]of Object.entries({uCoarse:1,uWeave:1,uSlub:1,uAge:.35,uFarId:1,uSheen:1,uFuzz:1,uTime:0,uPanelReview:this.placementReview?1:0}))gl.uniform1f(u[key],value);gl.uniform3fv(u.uPanelTint,[1,1,1]);gl.uniformMatrix4fv(p.u.lightVP,false,r.lightVP);gl.uniform1i(p.u.shadow,1);gl.uniform1f(p.u.shadowsEnabled,r.quality==='shadow'&&r.shadowAvailable?1:0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,r.shadow);}
+  if(!depth){const u=this.materialUniforms;gl.uniform3fv(u.uCam,r.eye);gl.uniform2f(u.uViewport,gl.drawingBufferWidth,gl.drawingBufferHeight);for(const [key,value]of Object.entries({uMode:2,uMaterial:0,uLight:0,uNeutral:0,uCompare:0,uDiag:0}))gl.uniform1i(u[key],value);for(const [key,value]of Object.entries({uCoarse:1,uWeave:1,uSlub:1,uAge:.35,uFarId:1,uSheen:1,uFuzz:1,uTime:0,uPanelReview:this.stagedReview?1:0}))gl.uniform1f(u[key],value);gl.uniform3fv(u.uPanelTint,[1,1,1]);gl.uniformMatrix4fv(p.u.lightVP,false,r.lightVP);gl.uniform1i(p.u.shadow,1);gl.uniform1f(p.u.shadowsEnabled,r.quality==='shadow'&&r.shadowAvailable?1:0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,r.shadow);}
   gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.disable(gl.BLEND);gl.frontFace(gl.CCW);gl.disable(gl.CULL_FACE);gl.bindVertexArray(this.vao);
-  if(!depth&&this.placementReview){for(const range of this.simulation.pieceRanges){gl.uniform3fv(this.materialUniforms.uPanelTint,SHORTS_PANEL_REVIEW_TINTS[range.id]||[.65,.65,.65]);gl.drawElements(gl.TRIANGLES,range.triangleCount*3,gl.UNSIGNED_INT,range.triangleOffset*3*4);r.drawCalls++;}}
+  if(!depth&&this.stagedReview){for(const range of this.simulation.pieceRanges){gl.uniform3fv(this.materialUniforms.uPanelTint,SHORTS_PANEL_REVIEW_TINTS[range.id]||[.65,.65,.65]);gl.drawElements(gl.TRIANGLES,range.triangleCount*3,gl.UNSIGNED_INT,range.triangleOffset*3*4);r.drawCalls++;}}
   else{gl.drawElements(gl.TRIANGLES,this.count,gl.UNSIGNED_INT,0);if(depth)r.shadowDrawCalls++;else r.drawCalls++;}
   gl.bindVertexArray(null);gl.activeTexture(gl.TEXTURE0);
  }
