@@ -12,6 +12,7 @@ on:
       - tools/apply-face-r25b-v5.mjs
       - tools/apply-face-r25b-v6.mjs
       - tools/apply-face-r25b-v7.mjs
+      - tools/apply-face-r25b-v8.mjs
       - .github/workflows/apply-face-r25b-once.yml
 
 permissions:
@@ -42,6 +43,7 @@ jobs:
           node tools/apply-face-r25b-v5.mjs
           node tools/apply-face-r25b-v6.mjs
           node tools/apply-face-r25b-v7.mjs
+          node tools/apply-face-r25b-v8.mjs
 
       - name: Build generated workbench entry
         run: node tools/build-pure.mjs
