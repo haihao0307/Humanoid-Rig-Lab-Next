@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://haihao.world/schemas/bird-rig-v1.schema.json",
+  "title": "Bird Mother Recipe V1",
+  "type": "object",
+  "required": ["format", "birdDNA", "rig", "motion", "flock"],
+  "properties": {
+    "format": { "const": "bird-mother-recipe-v1" },
+    "birdDNA": {
+      "type": "object",
+      "required": ["species", "wingSpan", "tailFan"],
+      "properties": {
+        "species": { "enum": ["gull", "sparrow", "heron", "dove"] },
+        "wingSpan": { "type": "number", "minimum": 0.4, "maximum": 1.25 },
+        "tailFan": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "rig": {
+      "type": "object",
+      "required": ["schema", "rotationSpace", "rotationFormat", "bones"],
+      "properties": {
+        "schema": { "const": "bird-rig-v1" },
+        "rotationSpace": { "const": "local" },
+        "rotationFormat": { "const": "quaternion" },
+        "bones": {
+          "type": "array",
+          "minItems": 22,
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "string" },
+              { "type": ["string", "null"] }
+            ]
+          }
+        }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "required": ["clip", "flapRate", "flapAmplitude", "phaseDriven"],
+      "properties": {
+        "clip": { "enum": ["idle", "flap", "glide", "hover", "takeoff", "landing", "walk", "peck"] },
+        "flapRate": { "type": "number", "exclusiveMinimum": 0 },
+        "flapAmplitude": { "type": "number", "minimum": 0 },
+        "phaseDriven": { "const": true }
+      }
+    },
+    "flock": {
+      "type": "object",
+      "required": ["count", "cohesion", "alignment", "separation", "wind"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 1, "maximum": 48 },
+        "cohesion": { "type": "number", "minimum": 0 },
+        "alignment": { "type": "number", "minimum": 0 },
+        "separation": { "type": "number", "minimum": 0 },
+        "wind": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}
