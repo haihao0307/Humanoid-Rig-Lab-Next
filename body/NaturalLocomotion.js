@@ -296,6 +296,7 @@ class NaturalLocomotion {
   this.world=new MotionLabWorld(agent);this.engine.world=this.world;
   this.phaseController=new ContinuousMotionPhase(this.engine);this.turnFilter=new TurnCommandFilter();
   this.pose=new MotionLabPose(agent.h,this.engine);agent.h.motionDriver=this.pose;
+  this.runtimeState=typeof MotionRuntimeState==='function'?new MotionRuntimeState(agent):null;agent.h.motionRuntimeState=this.runtimeState;
   this.resetFromPose();
  }
  beginWalkingStep(state){
@@ -390,10 +391,11 @@ class NaturalLocomotion {
  // kernel. Keep the live engine/callback identities and clone only state.
  snapshotExecution(){return structuredClone({requestKey:this.requestKey,requested:this.requested,tempo:this.tempo,traffic:this.traffic,
   phase:this.phaseController.snapshot(),turn:this.turnFilter,lastTurnContinuity:this.lastTurnContinuity,
-  lastPoseAdoption:this.lastPoseAdoption,lastContinuousWalkHandoff:this.lastContinuousWalkHandoff,routePassThroughCount:this.routePassThroughCount});}
+  lastPoseAdoption:this.lastPoseAdoption,lastContinuousWalkHandoff:this.lastContinuousWalkHandoff,routePassThroughCount:this.routePassThroughCount,runtime:this.runtimeState?.snapshot?.()||null});}
  restoreExecution(saved){
-  const {phase,turn,...state}=structuredClone(saved);Object.assign(this,state);
+  const {phase,turn,runtime,...state}=structuredClone(saved);Object.assign(this,state);
   this.phaseController.restore(phase);Object.assign(this.turnFilter,turn);
+  if(this.runtimeState){if(runtime)this.runtimeState.restore(runtime);else this.runtimeState.reset();}
  }
  resetFromPose({preservePoseContacts=false}={}){
   if(this.traffic?.slotKey)trafficReleaseTargetSlot(this);if(this.traffic?.corridorKey)trafficReleaseCorridor(this);
@@ -441,6 +443,7 @@ class NaturalLocomotion {
   this.phaseController.reset(e.state.motion.phase||0);this.turnFilter.reset(yaw);
   this.requestKey=null;this.requested=false;this.tempo=1;this.routePassThroughCount=this.routePassThroughCount||0;
   this.traffic={active:false,mode:'clear',reason:null,blockers:[],side:0,detours:0,retreats:0,replans:0,recoveries:0,escapes:0,slotReservations:0,lastPlanAtS:-Infinity,nextPlanAtS:0,detourEndIndex:-1,originalTarget:null,lastError:null,slotKey:null,slotTaskKey:null,slotPoint:null,slotIndex:null,advancePoint:null,advanceRouteIndex:-1,corridorKey:null,corridorTaskKey:null,corridorOwner:null,corridorDirection:0,corridorDescriptor:null,corridorOrbit:null,corridorOrbitIndex:0,corridorOrbitCycleStart:0,corridorOrbitLaps:0,corridorClaims:0,corridorYields:0};this.sync();
+  this.runtimeState?.reset();this.runtimeState?.observe(this,0);
   return structuredClone(this.lastPoseAdoption);
  }
  sync(){const a=this.a,s=this.engine.state;
@@ -455,8 +458,8 @@ class NaturalLocomotion {
   // a rolling sole midway through a step when the held-object state changes.
   if(this.isSettled()){this.engine.state.flatFootSupport=this.flatSupport||!!this.a.held;this.engine.state.rockerStepOrigin=this.engine.state.metrics.steps;}
   this.requested=true;const key=JSON.stringify(command);
-  if(this.requestKey===key&&this.engine.state.command)return;
-  const answer=this.engine.command(command);if(!answer.accepted)throw Error(answer.reason);this.requestKey=key;
+  if(this.requestKey===key&&this.engine.state.command){this.runtimeState?.setIntent(command,this.engine.state,this.tempo);return;}
+  const answer=this.engine.command(command);if(!answer.accepted)throw Error(answer.reason);this.requestKey=key;this.runtimeState?.setIntent(command,this.engine.state,this.tempo);
  }
  clearTrafficIfPassed(){
   const t=this.traffic;if(t.active&&this.a.routeIndex>t.detourEndIndex){Object.assign(t,{active:false,mode:'clear',reason:null,blockers:[],side:0,detourEndIndex:-1,originalTarget:null});}
@@ -717,7 +720,7 @@ class NaturalLocomotion {
   const commandYaw=this.turnFilter.update(yaw,state,dt*this.tempo,this.tempo);
   this.request({type:'turn',yaw:commandYaw});return true;
  }
- stop(){if(this.kernelSettled()){this.requested=true;return;}if(!this.engine.state.fault)this.request({type:'stop'});}
+ stop(){const command={type:'stop'};if(this.kernelSettled()){this.requested=true;this.runtimeState?.setIntent(command,this.engine.state,this.tempo);return;}if(!this.engine.state.fault)this.request(command);}
  kernelSettled(){const s=this.engine.state;return !s.fault&&!s.swing&&s.speed<.001&&s.status==='idle';}
  standingTarget(){
   const s=this.engine.state,scale=this.a.h.bodyMetrics.statureScale;let target=this.standingHipHeightM;
@@ -815,6 +818,7 @@ class NaturalLocomotion {
   this.updateHeight(this.kernelSettled()?dt*this.tempo:0,this.kernelSettled());
   this.updateSupportLift(dt*this.tempo);
   this.sync();
+  this.runtimeState?.observe(this,dt);
  }
  report(){const s=this.engine.state;return{version:NATURAL_GAIT.version,state:s.status,speedMps:this.speed,timeScale:this.tempo,contacts:{...this.contacts},settled:this.isSettled(),
   source:MotionLab.MOTION_SOURCE,sourcePhase:s.motion.phase,referenceBlend:s.motion.weight,metrics:{...s.metrics},skinFloorOffsetM:this.skinFloorOffsetM,
@@ -825,5 +829,5 @@ class NaturalLocomotion {
   continuousWalkHandoff:this.lastContinuousWalkHandoff?structuredClone(this.lastContinuousWalkHandoff):null,
   phaseContinuity:this.phaseController.report(),turnContinuity:this.turnFilter.report(),lastTurnContinuity:this.lastTurnContinuity?structuredClone(this.lastTurnContinuity):null,
   footSupport:{mode:this.usesFlatSupport()?'flat':'heel-sole-forefoot',feet:Object.fromEntries(['left','right'].map(side=>[side,s.feet[side].rocker?structuredClone(s.feet[side].rocker):null]))},
-  contactBasis:'flat placement anchors with explicit heel/forefoot support pivots',pose:this.pose.report(),visualAcceptance:false};}
+  contactBasis:'flat placement anchors with explicit heel/forefoot support pivots',pose:this.pose.report(),runtimeState:this.runtimeState?.report?.()||null,visualAcceptance:false};}
 }
