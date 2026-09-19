@@ -4,25 +4,36 @@ on:
     branches: [fix/shorts-two-leg-assembly-r2-20260919]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: shorts-two-leg-r2-audit
   cancel-in-progress: true
 jobs:
   source-and-contract:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Apply idempotent R2.2 placement migration
+        run: node tools/apply-shorts-r22-placement.mjs
       - name: Assemble canonical source
         run: |
           node tools/build-pure.mjs
+          node tools/build-shorts-preview.mjs
           node tools/check-pure.mjs
       - name: Run all shorts tests
         run: node --test tools/test-shorts-*.mjs
+      - name: Retain exact reviewed source on the isolated branch
+        run: |
+          test "$GITHUB_REF_NAME" = "fix/shorts-two-leg-assembly-r2-20260919"
+          git add clothing/ClothShorts.js clothing/ShortsControls.js source/assembly.json source/runtime.template.js index.html shorts.html
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat(shorts): retain R2.2 final-pose rigid panel review; no sewing acceptance'
+            git push origin HEAD:fix/shorts-two-leg-assembly-r2-20260919
+          fi
       - name: Archive exact staged source
         if: always()
         run: |
