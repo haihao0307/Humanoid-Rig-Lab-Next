@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kaopu.local/schemas/original-bird-kernel-r001.schema.json",
+  "title": "Original Bird Kernel R0.01",
+  "type": "object",
+  "required": ["schema", "units", "coordinateSystem", "skeleton", "featherLayer", "lifeStage", "truthBoundary"],
+  "properties": {
+    "schema": {"const": "bird/original-kernel@0.0.1"},
+    "units": {
+      "type": "object",
+      "properties": {
+        "length": {"const": "metre"},
+        "angle": {"const": "radian"},
+        "time": {"const": "second"}
+      },
+      "required": ["length", "angle", "time"]
+    },
+    "coordinateSystem": {
+      "type": "object",
+      "properties": {
+        "lateral": {"const": "+X"},
+        "dorsal": {"const": "+Y"},
+        "cranial": {"const": "+Z"}
+      },
+      "required": ["lateral", "dorsal", "cranial"]
+    },
+    "skeleton": {
+      "type": "object",
+      "required": ["axial", "cervicalChain", "wingPair", "legPair"],
+      "properties": {
+        "axial": {"type": "array", "items": {"type": "string"}},
+        "cervicalChain": {
+          "type": "object",
+          "required": ["variableLength", "segmentCountStatus"],
+          "properties": {
+            "variableLength": {"const": true},
+            "segmentCountStatus": {"enum": ["measured", "source-checked", "candidate", "unknown"]}
+          }
+        },
+        "wingPair": {"type": "object"},
+        "legPair": {"type": "object"}
+      }
+    },
+    "featherLayer": {
+      "type": "object",
+      "required": ["separateFromSkeleton", "regions"],
+      "properties": {
+        "separateFromSkeleton": {"const": true},
+        "regions": {
+          "type": "array",
+          "items": {"enum": ["contour", "scapular", "coverts", "primary-coverts", "primaries", "secondaries", "tertials", "alula", "rectrices", "down-semiplume"]}
+        }
+      }
+    },
+    "lifeStage": {
+      "type": "object",
+      "required": ["globalScaleOnlyForbidden"],
+      "properties": {
+        "globalScaleOnlyForbidden": {"const": true},
+        "stages": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "cladeMother": {
+      "type": "object",
+      "description": "Clade-specific topology/proportions/capabilities without changing the kernel identity contract."
+    },
+    "speciesDelta": {"type": "object"},
+    "individualDelta": {"type": "object"},
+    "currentState": {"type": "object"},
+    "truthBoundary": {
+      "type": "object",
+      "required": ["visualAcceptance", "productionReady"],
+      "properties": {
+        "visualAcceptance": {"const": false},
+        "productionReady": {"const": false},
+        "status": {"enum": ["research", "candidate", "source-checked", "runtime-verified", "user-accepted"]}
+      }
+    }
+  }
+}
