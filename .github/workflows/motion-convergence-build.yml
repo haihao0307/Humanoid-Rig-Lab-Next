@@ -38,10 +38,13 @@ jobs:
           python tools/apply-motion-convergence-r1.py
           python tools/apply-motion-convergence-r1.py | tee motion-assembly-idempotence.json
           grep -q '"assembly": false' motion-assembly-idempotence.json
-          grep -q '"runtime": false' motion-assembly-idempotence.json
+          grep -q '"runtime_module": false' motion-assembly-idempotence.json
+          grep -q '"support_query": false' motion-assembly-idempotence.json
           ! grep -q '"clothing/' source/assembly.json
           grep -q 'body/BoxHandling.js' source/assembly.json
           grep -q '__SOURCE:body/BoxHandling.js__' source/runtime.template.js
+          grep -q 'minimumBoneY(frames=null,jointIds=null)' source/runtime.template.js
+          grep -q 'minimumSupportY(frames,jointIds)' source/runtime.template.js
 
       - name: Rebuild generated entrypoint
         run: |
