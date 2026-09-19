@@ -38,13 +38,18 @@ jobs:
           python tools/apply-motion-convergence-r1.py
           python tools/apply-motion-convergence-r1.py | tee motion-assembly-idempotence.json
           grep -q '"assembly": false' motion-assembly-idempotence.json
-          grep -q '"runtime_module": false' motion-assembly-idempotence.json
+          grep -q '"runtime_modules": false' motion-assembly-idempotence.json
           grep -q '"support_query": false' motion-assembly-idempotence.json
+          grep -q '"locomotion_runtime_state": false' motion-assembly-idempotence.json
           ! grep -q '"clothing/' source/assembly.json
           grep -q 'body/BoxHandling.js' source/assembly.json
+          grep -q 'body/MotionRuntimeState.js' source/assembly.json
           grep -q '__SOURCE:body/BoxHandling.js__' source/runtime.template.js
+          grep -q '__SOURCE:body/MotionRuntimeState.js__' source/runtime.template.js
           grep -q 'minimumBoneY(frames=null,jointIds=null)' source/runtime.template.js
           grep -q 'minimumSupportY(frames,jointIds)' source/runtime.template.js
+          grep -q "new MotionRuntimeState(agent)" body/NaturalLocomotion.js
+          grep -q "runtimeState:this.runtimeState?.report?.()||null" body/NaturalLocomotion.js
 
       - name: Rebuild generated entrypoint
         run: |
@@ -58,6 +63,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/check-motion-lab-integration.mjs
+          node tools/test-motion-runtime-state.mjs
           node tools/test-motion-phase-continuity.mjs
           node tools/test-motion-support-continuity.mjs
           node tools/test-motion-execution-rollback.mjs
@@ -73,7 +79,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add source/assembly.json source/runtime.template.js index.html FILE_AUDIT.json SHA256SUMS.txt
+          git add body/NaturalLocomotion.js source/assembly.json source/runtime.template.js index.html FILE_AUDIT.json SHA256SUMS.txt
           if git diff --cached --quiet; then
             echo 'Generated files already match the clean source assembly.'
             exit 0
