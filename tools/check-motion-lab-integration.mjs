@@ -84,8 +84,9 @@ export function checkMotionLabIntegration({root,parse,read,runtime,globals,asser
  check(/t\.returnToLab/.test(source)&&/blendAmount:smoother\(t\.elapsed\/\.4\)/.test(source),'standing return blends into lab stance');
  check(/g\.type==='salute'\?\(!hand/.test(source)&&/:!this\.lastMotionTracking\?\.passed/.test(source),'wave tracking is distinct from salute contact validation');
  check(/motionChooseContact/.test(actions)&&/motionValidateTransferContacts/.test(actions),'shared contact and transfer candidate rules');
- for(const path of ['control/PlanForecast.js','control/TaskAgent.js'])check((read(path).match(/motionChooseContact(?:Steps)?\(/g)||[]).length===2,'pickup and placement use the shared contact selector in '+path);
- check(/if\(options\.grips\)(?:yield\* )?motionValidateTransferContacts(?:Steps)?\([^;\n]*,252\)/.test(actions)&&/if\(checked\)(?:yield\* )?motionValidateContactReach(?:Steps)?\([^;\n]*,204,objectPose\)/.test(actions),'the selector retains dense transfer and reach certification before accepting a contact');
+ check((read('control/PlanForecast.js').match(/motionChooseContact(?:Steps)?\(/g)||[]).length===2,'forecast pickup and placement retain shared generic contact selection');
+ check((read('control/TaskAgent.js').match(/this\.prepareManipulationContactSteps\(/g)||[]).length===2&&/motionPlanBoxHandlingSteps/.test(read('control/TaskAgent.js')),'live pickup and placement share the checked box and generic contact adapter');
+ check(/if\(options\.grips\)(?:yield\* )?motionValidateTransferContacts(?:Steps)?\([^;\n]*,252\)/.test(actions)&&/if\(checked&&!options\.contactOnly\)(?:yield\* )?motionValidateContactReach(?:Steps)?\([^;\n]*,204,objectPose\)/.test(actions),'the selector retains dense transfer and reach certification before accepting a contact');
  check(/motionTurnPlan/.test(source)&&/turnIndex\+\+/.test(source),'relative full turns preserve their segmented progress');
  for(const path of ['language/JarvisSemanticPlanner.js','control/TaskAgent.js'])check(read(path).includes('headingDeg')&&read(path).includes('angleDeg'),'turn protocol in '+path);
  const page=read('source/index.template.html');
