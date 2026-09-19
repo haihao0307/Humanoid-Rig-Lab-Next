@@ -1,0 +1,50 @@
+name: Shorts R2.3 left-tube review
+on:
+  push:
+    branches: [fix/shorts-two-leg-assembly-r2-20260919]
+    paths:
+      - 'clothing/ShortsTubeFormationR2.js'
+      - 'clothing/ClothShorts.js'
+      - 'clothing/ShortsControls.js'
+      - 'source/assembly.json'
+      - 'source/runtime.template.js'
+      - 'tools/test-shorts-tube-formation-r2.mjs'
+      - 'tools/review-shorts-left-tube-r23.mjs'
+      - '.github/workflows/shorts-r23-left-tube-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shorts-r23-left-tube-review
+  cancel-in-progress: true
+jobs:
+  actual-browser-left-tube:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wire and build canonical R2.3 source
+        run: |
+          node tools/apply-shorts-r23-left-tube.mjs
+          node tools/build-pure.mjs
+          node tools/build-shorts-preview.mjs
+          node tools/check-pure.mjs
+          node --test tools/test-shorts-*.mjs
+      - name: Install isolated browser dependency
+        run: |
+          mkdir -p /tmp/shorts-browser
+          npm install --prefix /tmp/shorts-browser --no-audit --no-fund playwright@1.55.0
+          /tmp/shorts-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Capture actual R2.3 progress views
+        run: |
+          python3 -m http.server 8793 --bind 127.0.0.1 >/tmp/shorts-r23-http.log 2>&1 &
+          node tools/review-shorts-left-tube-r23.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shorts-r2-3-left-tube-progress
+          path: /tmp/shorts-r23-left-tube
+          retention-days: 14
