@@ -1,6 +1,6 @@
 {
-  "schema": "bird/original-bird-status@0.0.14",
-  "revision": "R0.12-feather-alpha-edge-calibration",
+  "schema": "bird/original-bird-status@0.0.15",
+  "revision": "R0.12.1-click-picked-feather-material-audit",
   "date": "2026-09-20",
   "branch": "bird-mother-original-bird-r001-20260920",
   "visualBirdGenerated": false,
@@ -12,8 +12,8 @@
   "r003DeletedPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-form-r003.html",
   "productionHub": {
     "generated": true,
-    "revision": "R0.12",
-    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r012.html",
+    "revision": "R0.12.1",
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r0121.html",
     "singleEntry": true,
     "defaultBackground": "bright studio gray-white",
     "blackModelBackgroundRemoved": true,
@@ -22,7 +22,7 @@
       {"order": 2, "name": "live semantic mapping", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-semantic-map-r007.html", "available": true},
       {"order": 3, "name": "live material-role calibration", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-material-audit-r008.html", "available": true},
       {"order": 4, "name": "fixed-view source baseline and candidate error", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-fixed-view-baseline-r010.html", "available": true},
-      {"order": 5, "name": "feather alpha-edge calibration", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r012.html", "available": true},
+      {"order": 5, "name": "click-picked feather material and alpha edge", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0121.html", "available": true},
       {"order": 6, "name": "3A game-asset quality gate", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-3a-quality-gate-r011.html", "available": true},
       {"order": 7, "name": "independent Original Bird", "available": false}
     ]
@@ -31,40 +31,51 @@
     "generated": true,
     "revision": "R0.12",
     "contractPath": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_FEATHER_ALPHA_EDGE_R012.json",
-    "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r012.html",
-    "sourceFinding": "Opaque gray feather-card backing is visible at wing tips and trailing edges; the sheet silhouette remains instead of the feather silhouette.",
+    "legacyWorkbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r012.html",
     "severity": "CRITICAL_3A_BLOCKER",
     "correction": {
-      "transparentVoid": "alpha 0 outside the actual feather silhouette",
-      "semiTransparentFringe": "partial alpha only in the narrow outer barb and worn-edge zone",
-      "opaqueCore": "the main vane and rachis remain nearly fully opaque",
-      "finalStrategy": "hybrid masked or dithered opaque core plus narrow blended or alpha-to-coverage fringe"
-    },
-    "workbenchCapabilities": [
-      "original and runtime-calibrated source viewers side by side",
-      "bright gray, sky-blue and warm-gray transparency backgrounds",
-      "wing-top, underside, wing-tip, trailing-edge and three-quarter camera presets",
-      "eight normalized motion phases",
-      "live source material and Opacity-channel audit",
-      "procedural RGBA feather alpha-mask generation",
-      "configurable opaque core, fringe width, tip softness, barb breakup, asymmetry and opacity gain",
-      "Sketchfab addTexture plus setMaterial Opacity-channel runtime calibration",
-      "single-material or named feather-material candidate application",
-      "reversible source-material reset",
-      "before-and-after screenshot evidence",
-      "alpha-mask PNG and calibration JSON export"
+      "transparentVoid": "alpha 0 outside actual feather silhouette",
+      "semiTransparentFringe": "partial alpha only in narrow outer barb and worn-edge region",
+      "opaqueCore": "main vane and rachis remain nearly fully opaque",
+      "finalStrategy": "masked or dithered opaque core plus narrow blended or alpha-to-coverage fringe"
+    }
+  },
+  "featherMaterialPick": {
+    "generated": true,
+    "revision": "R0.12.1",
+    "contractPath": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_FEATHER_MATERIAL_PICK_R0121.json",
+    "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0121.html",
+    "method": "Sketchfab click event with slow pick returning the actual geometry material",
+    "capabilities": [
+      "click wing-tip or trailing-edge geometry to obtain the actual material",
+      "match clicked material by stateSetID, id, uid or name",
+      "highlight the clicked material",
+      "record click position and material identifiers",
+      "read material, registered textures, Albedo or Diffuse texture and Opacity channel",
+      "test reuse of the source Albedo or Diffuse texture in the Opacity channel",
+      "apply a generated diagnostic mask only for channel and UV testing",
+      "restore selected or all source materials",
+      "compare original and calibrated viewers on bright gray, sky-blue and warm-gray backgrounds",
+      "capture five close views across eight normalized phases",
+      "export click evidence, channel audit and before-after screenshots"
     ],
-    "runtimeBoundary": "calibration only; source file and licensed source asset remain unchanged",
-    "sourceFeatherMaterialIdentified": false,
-    "runtimeAlphaMaskApplied": false,
-    "allCriticalAlphaGatesPassed": false
+    "logicBoundary": {
+      "materialNameMatchingIsProof": false,
+      "genericMaskIsProductionTexture": false,
+      "globalOpacityFactorIsFeatherEdgeFix": false,
+      "sourceAlbedoAlphaReuseIsFirstTest": true,
+      "independentAtlasAlphaStillRequired": true
+    },
+    "markedRegionMaterialClickPicked": false,
+    "sourceOpacityChannelAudited": false,
+    "sourceAlbedoAlphaReuseTested": false,
+    "sourceUvCompatibilityKnown": false
   },
   "qualityGate3A": {
     "generated": true,
-    "revision": "R0.11",
+    "revision": "R0.11-standard-amended-by-R0.12",
     "standardPath": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_3A_GAME_ASSET_STANDARD_R011.json",
     "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-3a-quality-gate-r011.html",
-    "classification": "project gate, not universal industry certification",
     "candidateLoaded": false,
     "allCriticalGatesPassed": false
   },
@@ -79,7 +90,8 @@
     "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_MATERIAL_ROLE_MAP_R008.json",
     "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_FIXED_VIEW_BASELINE_R010.json",
     "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_3A_GAME_ASSET_STANDARD_R011.json",
-    "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_FEATHER_ALPHA_EDGE_R012.json"
+    "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_FEATHER_ALPHA_EDGE_R012.json",
+    "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_FEATHER_MATERIAL_PICK_R0121.json"
   ],
   "sourceBatch": {"items": 7, "birds": 6, "nonBirdCounterexamples": 1, "byteExactDuplicates": 0, "geometryExactDuplicates": 0, "localSourceBytesReadable": true, "remoteLfsBinaryIngestComplete": false},
   "primaryVisibleRigReference": {"assetId": "BIRD-REF-002", "file": "pigeon (1)(2).glb", "viewerUid": "821135a09d3f48909b977a416d99c93b", "vertices": 18152, "triangles": 23804, "jointsOrArtistControls": 117, "animationChannels": 340, "license": "CC-BY-NC-4.0", "productionRuntimeDependencyAllowed": false},
@@ -94,29 +106,34 @@
     "inventing a silhouette without direct source comparison",
     "restoring the rejected R0.03 proxy form",
     "using black as the default model-review background",
+    "guessing the marked-region feather material from its name instead of click-picking the geometry",
     "leaving opaque rectangular, triangular or gray backing around feather tips and trailing edges",
     "making the complete feather vane uniformly semi-transparent",
+    "promoting a generic diagnostic mask without proving UV compatibility",
     "using a broad full-wing alpha-blended sheet that creates sorting and mobile-overdraw problems",
     "accepting black or gray halos caused by transparent-pixel RGB contamination or mip filtering",
     "approving feather transparency from one view or one static pose",
     "shipping CC-BY-NC source mesh, textures or animation as the commercial runtime asset"
   ],
   "currentExecutionQueue": [
-    "identify the actual BIRD-REF-002 feather-region source material in R0.12",
-    "audit its existing Opacity channel and texture state",
-    "apply and tune runtime RGBA feather masks against bright gray, sky-blue and warm-gray backgrounds",
-    "capture wing-tip and trailing-edge before/after evidence at eight normalized phases",
-    "author independent candidate alpha textures with transparent void, opaque vane core and narrow semi-transparent barb fringe",
-    "verify color dilation, mip stability, backface behavior, sorting stability and transparent overdraw",
-    "reuse R17 wing, tail, foot and behavior interfaces",
-    "generate the first independent commercial-safe candidate and return it through R0.10, R0.12 and R0.11 gates"
+    "click the marked BIRD-REF-002 wing-tip or trailing-edge geometry in R0.12.1 and record its actual material",
+    "audit the clicked material's Albedo or Diffuse texture, Opacity channel and registered texture data",
+    "test the source texture's existing alpha before applying any generated mask",
+    "use the generated mask only to diagnose channel and UV behavior",
+    "capture before-after evidence on bright-gray, sky-blue and warm-gray backgrounds across five close views and eight phases",
+    "author the independent candidate's alpha against its actual feather-atlas UVs with RGB dilation and alpha-aware mipmaps",
+    "measure sorting stability and mobile transparent overdraw",
+    "return the independent candidate through R0.10 fixed-view, R0.12.1 alpha and R0.11 3A gates"
   ],
   "openGates": {
     "selectedSourceGlbOnlineBinaryAvailable": false,
-    "r012ProductionHubBrowserQaPassed": false,
-    "r012FeatherAlphaWorkbenchBrowserQaPassed": false,
-    "sourceFeatherMaterialIdentified": false,
+    "r0121ProductionHubBrowserQaPassed": false,
+    "r0121FeatherAlphaWorkbenchBrowserQaPassed": false,
+    "markedFeatherRegionMaterialPicked": false,
+    "clickedMaterialHighlighted": false,
     "sourceOpacityChannelAudited": false,
+    "sourceAlbedoAlphaReuseTested": false,
+    "sourceUvCompatibilityKnown": false,
     "runtimeFeatherAlphaMaskApplied": false,
     "threeTransparencyBackgroundsEvidenceComplete": false,
     "eightPhaseFeatherAlphaEvidenceComplete": false,
