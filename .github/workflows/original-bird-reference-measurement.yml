@@ -45,3 +45,24 @@ jobs:
           for p in files:
             json.loads(p.read_text(encoding='utf-8'))
             print('JSON_OK', p)
+
+      - name: Workbench black-screen regression guard
+        shell: python
+        run: |
+          import pathlib, re, subprocess
+          p = pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html')
+          html = p.read_text(encoding='utf-8')
+          broken = 'const root=new THREE.Group();s.add(root),N={},E=[];'
+          fixed = 'const root=new THREE.Group();s.add(root);const N={},E=[];'
+          if broken in html:
+            raise SystemExit('BLACK_SCREEN_SIGNATURE_FOUND: strict-mode undeclared N/E registries')
+          if fixed not in html:
+            raise SystemExit('RUNTIME_REGISTRY_DECLARATION_MISSING')
+          scripts = re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>', html, flags=re.S)
+          inline = [s for s in scripts if s.strip()]
+          if not inline:
+            raise SystemExit('INLINE_RUNTIME_NOT_FOUND')
+          out = pathlib.Path('/tmp/original-bird-workbench-inline.js')
+          out.write_text(inline[-1], encoding='utf-8')
+          subprocess.run(['node', '--check', str(out)], check=True)
+          print('WORKBENCH_RUNTIME_GUARD_OK', p)
