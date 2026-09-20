@@ -27,7 +27,8 @@ export function checkSkinAppearanceSources({parse,read,assert}){
  check(eastAsian.length===12&&new Set([...presets,...eastAsian].map(p=>p.id)).size===20,'twelve scene swatches have distinct IDs alongside the general palette');
  check(eastAsian.every(p=>/^#[0-9a-f]{6}$/.test(p.baseColor)&&p.undertone>=-1&&p.undertone<=1&&p.redness>=0&&p.redness<=1),'scene colours and pigment controls are bounded');
  check(defaults.baseColor===eastAsian[5].baseColor&&defaults.undertone===eastAsian[5].undertone&&defaults.redness===eastAsian[5].redness,'scene default matches the medium neutral swatch');
- check(defaults.redness===0&&eastAsian.every(p=>p.redness===0)&&/const redness=0;/.test(skin),'default and generated faces are neutral without authored cheek blush');
+ check(defaults.redness>0&&eastAsian.every(p=>p.redness>0)&&/const redness=palette==='east-asian'/.test(skin),'reusable skin palettes retain bounded redness variation');
+ check(/function initialCharacterPreset\(\).*redness:0/.test(character),'current face mother disables redness in its own character recipe');
  check(presets.every(p=>/^#[0-9a-f]{6}$/.test(p.baseColor)&&p.undertone>=-1&&p.undertone<=1)&&/^#[0-9a-f]{6}$/.test(defaults.baseColor),'valid sRGB swatch values');
  // Independent luminance check of the authored ramp, excluding the reference.
  const luminance=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
@@ -40,7 +41,7 @@ export function checkSkinAppearanceSources({parse,read,assert}){
  check(/Number\.isInteger\(seed\)/.test(skin)&&/seed<0\|\|seed>4294967295/.test(skin)&&!/Math\.random|Date\.|performance\./.test(skin),'seed includes zero and is independent of wall time/global randomness');
  check(/skinHexToLinear\(ramp\[index\]\.baseColor\)/.test(skin)&&/skinLinearToHex\(a\.map/.test(skin),'seeded ramp interpolates linear colours');
  check(/value<=\.04045\?value\/12\.92/.test(skin)&&/value<=\.0031308\?value\*12\.92/.test(skin),'piecewise sRGB input and legacy output conversion');
- check(/if\(appearance\.skin!==undefined\)return validateSkinAppearance/.test(skin)&&/baseColor:skinLinearToHex\(appearance\.skinColor\),undertone:0,redness:0/.test(skin),'explicit recipe wins; legacy linear colour keeps its original tint controls');
+ check(/if\(appearance\.skin!==undefined\)return validateSkinAppearance/.test(skin)&&/baseColor:skinLinearToHex\(appearance\.skinColor\),undertone:0,redness:\.15/.test(skin),'explicit recipe wins; legacy linear colour keeps its original tint controls');
  check(character.includes("'jarvis/character_preset@3','jarvis/character_preset@4','jarvis/character_preset@5','jarvis/character_preset@6'")&&character.includes("schema:'jarvis/character_preset@6'"),'version 3, 4 and 5 imports migrate to version 6');
  check(/skinColor:skinHexToLinear\(skin\.baseColor\)/.test(character)&&!/skinColor:\[\.497/.test(character),'preset validation preserves chosen colour');
  check(/skin:sampleSkinAppearance\(seed\)/.test(character)&&/lab\.human\.tissue\.setSkinAppearance\(p\.appearance\.skin\)/.test(character),'derived characters and full character apply reach skin');
