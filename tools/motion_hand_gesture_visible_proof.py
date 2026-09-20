@@ -5,7 +5,7 @@ The production action runtime is untouched.  The source proof previously hid
 ``world.objects`` and the first QA shortcut then cancelled Compact reconstruction;
 both paths could leave valid joint state with no rendered person.  This wrapper
 waits for the actual CompactSurfaceRenderer, keeps the active surface enabled,
-and hides only scenery plus non-active actors.
+and captures WebGL before its default framebuffer is cleared.
 """
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from typing import Any
 
 import motion_hand_gesture_quick_proof as gesture
 import motion_hand_visual_proof_fast as proof
+from motion_hand_canvas_capture import capture_canvas
 
 
 _base_load = proof.load
@@ -79,7 +80,7 @@ def isolate_visible_character(driver) -> dict:
         r.studioMode=true;r.background=[.035,.045,.055];
         lab.focus('body');lab.inspectBody('front');compact.prepare?.('skin');lab.render();
         if(compact.visible!==true)throw Error('真实 Compact 人物表面未进入可见绘制状态');
-        return{mode:'real-compact-active-character-v2',hiddenSceneItems:hidden.length,hiddenOtherActors,
+        return{mode:'real-compact-active-character-v3',hiddenSceneItems:hidden.length,hiddenOtherActors,
           activeId:active?.id||null,compact:{enabled:compact.enabled!==false,visible:compact.visible===true,
           chunks:compact.chunks?.length||0,triangles:compact.report?.triangles||0,view:compact.view||null,
           boundToActive:compact.boundHuman===lab.human}};
@@ -88,6 +89,9 @@ def isolate_visible_character(driver) -> dict:
 
 
 proof.load = load_visible_compact
+proof.capture = lambda driver, out_dir, stem, label, names, subtitle, completed=True, error=None: capture_canvas(
+    proof, driver, out_dir, stem, label, names, subtitle, completed, error
+)
 gesture.isolate_character = isolate_visible_character
 
 
