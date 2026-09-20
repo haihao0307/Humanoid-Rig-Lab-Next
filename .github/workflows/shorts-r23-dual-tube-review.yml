@@ -26,12 +26,17 @@ jobs:
       - name: Wire canonical R2.3b dual-tube source
         run: node tools/apply-shorts-r23-dual-tube.mjs
       - name: Build and test canonical source
+        shell: bash
         run: |
-          node tools/apply-shorts-r23-left-tube.mjs
-          node tools/build-pure.mjs
-          node tools/build-shorts-preview.mjs
-          node tools/check-pure.mjs
-          node --test tools/test-shorts-*.mjs
+          mkdir -p /tmp/shorts-r23-dual-tube
+          set -o pipefail
+          {
+            node tools/apply-shorts-r23-left-tube.mjs
+            node tools/build-pure.mjs
+            node tools/build-shorts-preview.mjs
+            node tools/check-pure.mjs
+            node --test tools/test-shorts-*.mjs
+          } 2>&1 | tee /tmp/shorts-r23-dual-tube/build-and-test.log
       - name: Retain validated canonical source
         run: |
           test "$GITHUB_REF_NAME" = "fix/shorts-two-leg-assembly-r2-20260919"
@@ -54,4 +59,5 @@ jobs:
         with:
           name: shorts-r2-3-dual-tube-progress
           path: /tmp/shorts-r23-dual-tube
+          if-no-files-found: error
           retention-days: 14
