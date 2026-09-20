@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Original Bird R0.06｜浅灰棚拍审查</title>
+<style>
+:root{color-scheme:dark;--ui:#0d1922;--ui2:#10232d;--line:#294654;--text:#ecf4f7;--muted:#91a8b4;--good:#72d8aa;--warn:#ead083;--bad:#ef918a;--accent:#80cdf4;--studio:#c7cac8}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#bfc3c2;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}button,input,select{font:inherit}button,select{border:1px solid var(--line);background:#142932;color:var(--text);border-radius:7px;padding:7px 9px}button:hover{border-color:#6d93a7}button.active{border-color:var(--good);color:var(--good);background:#102a25}.app{height:100%;display:grid;grid-template-rows:52px minmax(0,1fr) 30px}.top{display:flex;align-items:center;gap:10px;padding:0 13px;border-bottom:1px solid var(--line);background:#0a1720}.top b{font-size:14px}.top small{color:var(--muted)}.tag{font-size:10px;border:1px solid #31596c;border-radius:999px;padding:4px 8px;color:var(--good)}.main{min-height:0;display:grid;grid-template-columns:238px minmax(0,1fr) 315px}.panel{background:var(--ui);padding:11px;overflow:auto}.left{border-right:1px solid var(--line)}.right{border-left:1px solid var(--line)}h3{font-size:11px;letter-spacing:.08em;color:#cbdde5;margin:6px 0 9px}.row{margin:9px 0;font-size:11px;color:#c6d6de}.row label{display:flex;justify-content:space-between;gap:10px}.row input[type=range]{width:100%;accent-color:var(--accent)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.mode,.preset{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.stage{position:relative;min-width:0;min-height:0;background:var(--studio)}.viewers{position:absolute;inset:0;display:grid;grid-template-columns:1fr;background:#aeb4b3}.viewer-card{position:relative;min-width:0;min-height:0;background:var(--studio)}.viewer-card iframe{width:100%;height:100%;border:0;display:block;background:var(--studio)}.viewer-label{position:absolute;left:12px;top:12px;z-index:3;max-width:calc(100% - 24px);padding:8px 10px;border:1px solid #547182;border-radius:8px;background:#0b1720d9;backdrop-filter:blur(7px);font-size:10px;line-height:1.45}.viewer-label b{display:block;color:#fff}.viewer-label span{color:#b7c8d0}.loading{position:absolute;inset:0;display:grid;place-items:center;background:#c7cac8;color:#24313a;font-size:12px;z-index:2;pointer-events:none}.ready .loading{display:none}.motion-card{display:none}.mode-compare .viewers{grid-template-columns:1fr 1fr;gap:1px}.mode-compare .motion-card{display:block}.mode-motion .detail-card{display:none}.mode-motion .motion-card{display:block}.status{padding:8px;border:1px solid #3f5f6e;border-radius:8px;margin:8px 0;background:#0a151c}.status strong{color:#e5eff3}.note,.audit,.small{font-size:10px;line-height:1.55;color:var(--muted)}.gate{font-size:10px;line-height:1.45;margin:7px 0;color:var(--muted)}.gate:before{content:"●";color:var(--bad);margin-right:6px}.gate.ok:before{color:var(--good)}.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.swatch{height:31px;padding:0}.swatch.light{background:#c7cac8}.swatch.mid{background:#777d7f}.swatch.warm{background:#b9aa98}.swatch.white{background:#ecece8}.toggle{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted);margin:8px 0}.toggle input{accent-color:var(--accent)}.nodes{max-height:190px;overflow:auto;border:1px solid #294654;border-radius:8px;background:#08131a}.node{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #172d38;border-radius:0;padding:7px 8px;background:transparent;font-size:10px;color:#a9bdc7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.node:hover{background:#102630;color:#fff}.node:last-child{border-bottom:0}.picked{padding:8px;margin-top:7px;border:1px dashed #355665;border-radius:7px;font-size:10px;color:var(--muted);white-space:pre-wrap}.phase-list{counter-reset:phase}.phase{position:relative;padding:8px 8px 8px 31px;margin:6px 0;border:1px solid #294654;border-radius:8px;background:#0b1820;font-size:10px;line-height:1.45;color:var(--muted)}.phase:before{counter-increment:phase;content:counter(phase);position:absolute;left:8px;top:8px;width:16px;height:16px;border-radius:50%;display:grid;place-items:center;background:#18333f;color:#dbe9ef;font-size:9px}.phase b{color:#e1edf1}.foot{display:flex;align-items:center;gap:14px;padding:0 10px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);background:#0a1720}.foot b{color:var(--good)}.zen .main{grid-template-columns:1fr}.zen .panel{display:none}.zen .stage{grid-column:1}.fatal{display:none;position:fixed;inset:0;z-index:20;background:#05090c;place-items:center;padding:24px}.fatal.show{display:grid}.fatal div{max-width:620px;padding:20px;border:1px solid #5c3838;border-radius:12px;background:#1a1010;color:#f1c1bc}@media(max-width:920px){.main{grid-template-columns:1fr}.panel{position:absolute;z-index:8;top:52px;bottom:30px;width:min(86vw,330px);box-shadow:0 20px 50px #000a}.left{left:0}.right{right:0;display:none}.mode-compare .viewers{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.tag{display:none}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header class="top"><b>Original Bird R0.06</b><small>浅灰棚拍审查｜形体清楚、结构清楚、步骤清楚</small><span class="tag">默认浅灰背景 · 源模型不遮挡 · 先形体后材质再动作</span></header>
+<main class="main">
+<aside class="panel left">
+<h3>一、查看对象</h3>
+<div class="mode"><button data-mode="detail" class="active">形体</button><button data-mode="motion">动作</button><button data-mode="compare">并排</button></div>
+<h3>二、审查预设</h3>
+<div class="preset"><button data-preset="silhouette">轮廓</button><button data-preset="material" class="active">材质</button><button data-preset="beauty">写实</button></div>
+<h3>三、背景</h3>
+<div class="swatches"><button class="swatch light" data-bg="light" title="浅灰"></button><button class="swatch mid" data-bg="mid" title="中灰"></button><button class="swatch warm" data-bg="warm" title="暖灰"></button><button class="swatch white" data-bg="white" title="白色"></button></div>
+<p class="small">不再提供黑色默认背景。浅灰用于常规审查，中灰用于轮廓，暖灰用于白羽和高光检查。</p>
+<h3>四、光照与镜头</h3>
+<div class="row"><label>曝光 <output id="exposureO">0.10</output></label><input id="exposure" type="range" min="-1" max="1" value=".10" step=".05"></div>
+<div class="row"><label>环境强度 <output id="lightO">1.20</output></label><input id="light" type="range" min="0" max="2" value="1.20" step=".05"></div>
+<div class="row"><label>环境旋转 <output id="rotationO">31°</output></label><input id="rotation" type="range" min="0" max="6.283" value=".54" step=".02"></div>
+<div class="row"><label>镜头视角 <output id="fovO">32°</output></label><input id="fov" type="range" min="20" max="60" value="32" step="1"></div>
+<div class="grid"><button data-view="front">正面</button><button data-view="side">侧面</button><button data-view="top">顶部</button><button data-view="three">三分之四</button><button id="focus">重新居中</button><button id="zen">只看模型</button></div>
+<label class="toggle"><input id="hd" type="checkbox" checked>HD 贴图</label>
+<label class="toggle"><input id="sharpen" type="checkbox" checked>轻度锐化</label>
+<label class="toggle"><input id="wire" type="checkbox">线框核对</label>
+<h3>五、动画</h3>
+<div class="grid"><button id="play">播放</button><button id="pause">暂停</button></div>
+<div class="row"><label>速度 <output id="speedO">1.00×</output></label><input id="speed" type="range" min=".1" max="2" value="1" step=".05"></div>
+<div class="row"><label>归一化相位 <output id="phaseO">0%</output></label><input id="phase" type="range" min="0" max="1" value="0" step=".001"></div>
+</aside>
+<section class="stage mode-detail" id="stage">
+<div class="viewers">
+<div class="viewer-card detail-card" id="detailCard"><div class="viewer-label"><b>BIRD-REF-002｜主形体与高细节绑定</b><span>默认浅灰棚拍 · 18,152 顶点 · 23,804 三角面 · 117 控制节点</span></div><div class="loading" id="detailLoad">正在载入高细节鸽类源模型…</div><iframe id="detailFrame" title="BIRD-REF-002 source model" allow="autoplay; fullscreen; xr-spatial-tracking" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" allowfullscreen></iframe></div>
+<div class="viewer-card motion-card" id="motionCard"><div class="viewer-label"><b>BIRD-REF-001｜显式翼链与动作相位</b><span>44 关节 · 10 个翼关节 · 19 个腿足趾关节</span></div><div class="loading" id="motionLoad">正在载入飞行动作源模型…</div><iframe id="motionFrame" title="BIRD-REF-001 source model" allow="autoplay; fullscreen; xr-spatial-tracking" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" allowfullscreen></iframe></div>
+</div>
+</section>
+<aside class="panel right">
+<h3>实时源模型审计</h3>
+<div class="status"><strong>BIRD-REF-002</strong><div class="audit" id="detailAudit">等待 Viewer API…</div></div>
+<div class="status"><strong>BIRD-REF-001</strong><div class="audit" id="motionAudit">等待 Viewer API…</div></div>
+<h3>语义节点</h3>
+<select id="nodeGroup"><option value="wing">翼与羽</option><option value="tail">尾羽</option><option value="neck">颈部</option><option value="head">头喙眼</option><option value="leg">腿足趾</option><option value="all">全部</option></select>
+<div class="nodes" id="nodeList"><button class="node">等待源节点…</button></div>
+<div class="picked" id="picked">点击节点读取局部矩阵。</div>
+<h3>正常生产顺序</h3>
+<div class="phase-list">
+<div class="phase"><b>形体</b><br>先锁胸部、颈头、翼根、尾基和腿足轮廓。</div>
+<div class="phase"><b>羽层</b><br>再认覆羽、次级飞羽、初级飞羽和尾羽附着。</div>
+<div class="phase"><b>材质</b><br>羽毛、眼角膜、喙和足部角质分别处理。</div>
+<div class="phase"><b>动作</b><br>用 BIRD-REF-001 提取相位，用 BIRD-REF-002 保住蒙皮。</div>
+<div class="phase"><b>独立成品</b><br>最后才生成许可安全的 Original Bird。</div>
+</div>
+<h3>门禁</h3>
+<div class="gate ok">浅灰背景为默认</div>
+<div class="gate ok">直接显示高质量源模型</div>
+<div class="gate ok">结构、材质、动作分开检查</div>
+<div class="gate">独立 Original Bird 尚未生成</div>
+<div class="gate">CC-BY-NC 源模型不进入商业运行时</div>
+</aside>
+</main>
+<footer class="foot"><b>● organized light-studio review</b><span id="readyCount">0/2 viewers ready</span><span id="animState">paused</span><span id="presetState">material / light-gray</span><span>Original Bird R0.06</span></footer>
+</div>
+<div class="fatal" id="fatal"><div><b>工作台启动失败</b><p id="fatalText"></p></div></div>
+<script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+<script>
+(()=>{'use strict';
+const MODELS={detail:{uid:'821135a09d3f48909b977a416d99c93b',frame:'detailFrame',card:'detailCard',audit:'detailAudit',load:'detailLoad'},motion:{uid:'67f9422072664cf1967ae4fe440585a9',frame:'motionFrame',card:'motionCard',audit:'motionAudit',load:'motionLoad'}};
+const GROUPS={wing:/wing|feather|primary|secondary|remige|main_j|w_sub/i,tail:/tail|rectri/i,neck:/neck|cerv/i,head:/head|beak|eye|lid|tongue|jaw/i,leg:/leg|thigh|knee|ankle|foot|toe|digit|calf|horse/i,all:/.*/};
+const BG={light:[.57,.60,.60],mid:[.28,.31,.32],warm:[.54,.47,.39],white:[.84,.84,.81]};
+const state={api:{},camera:{},animations:{},duration:{detail:0,motion:0},ready:new Set(),playing:false,mode:'detail',preset:'material',nodes:{},original:{},background:'light',zen:false};
+const $=id=>document.getElementById(id),clone=o=>o==null?o:JSON.parse(JSON.stringify(o)),esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
+function visibleKeys(){return state.mode==='compare'?['detail','motion']:[state.mode];}
+function eachVisible(fn){visibleKeys().forEach(k=>{const api=state.api[k];if(api)fn(api,k);});}
+function updateFooter(){$('readyCount').textContent=state.ready.size+'/2 viewers ready';$('animState').textContent=state.playing?'playing':'paused';$('presetState').textContent=state.preset+' / '+state.background;}
+function semanticSummary(nodes){const names=nodes.map(n=>String(n.name||''));const hit=re=>names.filter(n=>re.test(n)).length;return {wing:hit(GROUPS.wing),tail:hit(GROUPS.tail),neck:hit(GROUPS.neck),head:hit(GROUPS.head),leg:hit(GROUPS.leg)};}
+function audit(key,api){const box=$(MODELS[key].audit);let nodes=[],materials=[],anims=[];let pending=3;const done=()=>{if(--pending)return;state.nodes[key]=nodes;const sem=semanticSummary(nodes);const clips=anims.length?anims.map(a=>esc(a[1])+' '+Number(a[2]||0).toFixed(2)+'s').join('<br>'):'无可读动画';box.innerHTML='节点 '+nodes.length+' · 材质 '+materials.length+' · 动画 '+anims.length+'<br>翼 '+sem.wing+' / 尾 '+sem.tail+' / 颈 '+sem.neck+' / 头喙眼 '+sem.head+' / 腿足趾 '+sem.leg+'<br>'+clips;if(key==='detail')renderNodes();};api.getNodeMap((err,data)=>{nodes=err?[]:(Array.isArray(data)?data:Object.values(data||{}));done();});api.getMaterialList((err,data)=>{materials=err?[]:(data||[]);done();});api.getAnimations((err,data)=>{anims=err?[]:(data||[]);state.animations[key]=anims;if(anims[0]){state.duration[key]=Number(anims[0][2]||0);api.setCurrentAnimationByUID(anims[0][0],()=>{});}done();});}
+function snapshot(key,api){state.original[key]={};api.getEnvironment((err,v)=>{if(!err&&v)state.original[key].environment=clone(v);});api.getPostProcessing(v=>{state.original[key].post=clone(v||{});});api.getFov((err,v)=>{if(!err&&Number.isFinite(v))state.original[key].fov=v;});}
+function applyVisual(){const exp=Number($('exposure').value),light=Number($('light').value),rot=Number($('rotation').value),fov=Number($('fov').value),hd=$('hd').checked,sharp=$('sharpen').checked,wire=$('wire').checked;eachVisible((api,key)=>{if(api.setTextureQuality)api.setTextureQuality(hd?'hd':'sd',()=>{});if(api.setShadingStyle)api.setShadingStyle('pbr',{type:'lit'},()=>{});if(api.setFov)api.setFov(fov,()=>{});if(api.setWireframe)api.setWireframe(wire,{color:'73C9F0CC'},()=>{});if(api.setBackground)api.setBackground({color:BG[state.background]},()=>{});const env=clone(state.original[key]?.environment||{});env.exposure=exp;env.lightIntensity=light;env.rotation=rot;env.shadowEnabled=true;try{api.setEnvironment(env,()=>{});}catch(e){console.warn(e);}const post=clone(state.original[key]?.post||{});post.enable=true;post.sharpenEnable=sharp;if('sharpenFactor' in post)post.sharpenFactor=sharp?.22:0;if('ssaoEnable' in post)post.ssaoEnable=true;if('ssaoIntensity' in post)post.ssaoIntensity=.28;try{api.setPostProcessing(post,()=>{});}catch(e){console.warn(e);}});updateFooter();}
+function syncOutputs(){$('exposureO').textContent=Number($('exposure').value).toFixed(2);$('lightO').textContent=Number($('light').value).toFixed(2);$('rotationO').textContent=Math.round(Number($('rotation').value)*180/Math.PI)+'°';$('fovO').textContent=Math.round(Number($('fov').value))+'°';}
+function setPreset(name){state.preset=name;document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('active',b.dataset.preset===name));if(name==='silhouette'){state.background='mid';$('exposure').value=0;$('light').value=1.25;$('rotation').value=.25;$('fov').value=34;$('sharpen').checked=false;}if(name==='material'){state.background='light';$('exposure').value=.10;$('light').value=1.20;$('rotation').value=.54;$('fov').value=32;$('sharpen').checked=true;}if(name==='beauty'){state.background='warm';$('exposure').value=.18;$('light').value=1.32;$('rotation').value=.78;$('fov').value=28;$('sharpen').checked=true;}syncOutputs();applyVisual();}
+function init(key){const m=MODELS[key],frame=$(m.frame),card=$(m.card),box=$(m.audit);if(!window.Sketchfab){$('fatalText').textContent='Sketchfab Viewer API 未载入';$('fatal').classList.add('show');return;}const client=new Sketchfab('1.12.1',frame);client.init(m.uid,{autostart:1,camera:0,animation_autoplay:0,dnt:1,preload:0,ui_theme:'dark',success(api){state.api[key]=api;api.start();api.addEventListener('viewerready',()=>{card.classList.add('ready');state.ready.add(key);api.pause(()=>{});api.setCycleMode('loopOne',()=>{});api.getCameraLookAt((err,cam)=>{if(!err&&cam)state.camera[key]=clone(cam);});snapshot(key,api);audit(key,api);setTimeout(applyVisual,250);updateFooter();});},error(){box.textContent='源模型加载失败';$(m.load).textContent='源模型加载失败';}});}
+function setPlaying(v){state.playing=v;eachVisible(api=>v?api.play(()=>{}):api.pause(()=>{}));updateFooter();}
+function setView(type){eachVisible((api,key)=>{const c=state.camera[key];if(!c||!c.position||!c.target)return;const t=c.target.slice(),p=c.position.slice(),d=Math.max(.001,Math.hypot(p[0]-t[0],p[1]-t[1],p[2]-t[2]));let np=p.slice();if(type==='front')np=[t[0],t[1]-d,t[2]+d*.06];if(type==='side')np=[t[0]+d,t[1],t[2]+d*.06];if(type==='top')np=[t[0],t[1],t[2]+d];if(type==='three')np=[t[0]+d*.66,t[1]-d*.66,t[2]+d*.34];api.setCameraLookAt(np,t,.45,()=>{});});}
+function setMode(mode){state.mode=mode;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));$('stage').className='stage mode-'+mode;setPlaying(false);setTimeout(applyVisual,80);}
+function renderNodes(){const re=GROUPS[$('nodeGroup').value],nodes=(state.nodes.detail||[]).filter(n=>re.test(String(n.name||''))).sort((a,b)=>String(a.name).localeCompare(String(b.name)));$('nodeList').innerHTML=nodes.slice(0,180).map(n=>'<button class="node" data-id="'+esc(n.instanceID)+'">'+esc(n.name||'(unnamed)')+'</button>').join('')||'<button class="node">无命中节点</button>';document.querySelectorAll('.node[data-id]').forEach(b=>b.onclick=()=>inspectNode(b.dataset.id,b.textContent));}
+function inspectNode(id,name){const api=state.api.detail;if(!api||!api.getMatrix)return;$('picked').textContent='读取 '+name+'…';api.getMatrix(Number(id),(err,m)=>{if(err||!m){$('picked').textContent=name+'\n矩阵读取失败';return;}const p=[m[12],m[13],m[14]].map(v=>Number(v||0).toFixed(5));$('picked').textContent=name+'\ninstanceID '+id+'\nlocal T ['+p.join(', ')+']';});}
+$('play').onclick=()=>setPlaying(true);$('pause').onclick=()=>setPlaying(false);$('focus').onclick=()=>eachVisible(api=>api.focusOnVisibleGeometries(()=>{}));$('zen').onclick=()=>{state.zen=!state.zen;$('app').classList.toggle('zen',state.zen);$('zen').textContent=state.zen?'恢复界面':'只看模型';};
+$('speed').oninput=e=>{const v=Number(e.target.value);$('speedO').textContent=v.toFixed(2)+'×';eachVisible(api=>api.setSpeed(v,()=>{}));};$('phase').oninput=e=>{const v=Number(e.target.value);$('phaseO').textContent=Math.round(v*100)+'%';state.playing=false;eachVisible((api,key)=>{api.pause(()=>{});api.seekTo(v*(state.duration[key]||0),()=>{});});updateFooter();};
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>setPreset(b.dataset.preset));document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{state.background=b.dataset.bg;applyVisual();});['exposure','light','rotation','fov'].forEach(id=>$(id).oninput=()=>{syncOutputs();applyVisual();});['hd','sharpen','wire'].forEach(id=>$(id).onchange=applyVisual);$('nodeGroup').onchange=renderNodes;
+syncOutputs();init('detail');init('motion');updateFooter();
+})();
+</script>
+</body>
+</html>
