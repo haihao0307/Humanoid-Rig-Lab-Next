@@ -31,8 +31,7 @@ const server=http.createServer((req,res)=>{
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html?review=face&qa=1`);
     let frame=null;
     for(let i=0;i<240;i++){
-      const handle=await page.locator('#bodyFrame').elementHandle().catch(()=>null);
-      frame=handle?await handle.contentFrame():null;
+      frame=page.frames().find(candidate=>candidate.name()==='bodyFrame')||null;
       if(frame){
         const startup=await frame.evaluate(()=>window.__humanStartup).catch(()=>null);
         if(startup?.status==='failed')throw Error(startup.error||startup.message||'Human startup failed');
@@ -59,8 +58,9 @@ const server=http.createServer((req,res)=>{
       renderer.setInspectionLighting({key:[-.65,.65,1],fill:[.8,.1,.6]});
       renderer.setQuality('fast');
       lab.render();
-      renderer.gl.finish();
+      renderer.gl.flush();
     });
+    await page.waitForTimeout(250);
 
     const box=await page.locator('#bodyFrame').boundingBox();
     if(!box)throw Error('Body frame bounds missing');
@@ -76,7 +76,7 @@ const server=http.createServer((req,res)=>{
         lab.face.clearExpression();
         if(blink){lab.face.setWeight('eyeBlinkLeft',blink);lab.face.setWeight('eyeBlinkRight',blink);}
         lab.render();
-        gl.finish();
+        gl.flush();
         return {
           blink,
           camera:{target:[...renderer.target],distance:renderer.distance,yaw:renderer.yaw,pitch:renderer.pitch,projection:renderer.projection},
@@ -87,7 +87,7 @@ const server=http.createServer((req,res)=>{
           glError:gl.getError()
         };
       },item);
-      await page.waitForTimeout(160);
+      await page.waitForTimeout(300);
       const shot=await cdp.send('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false,clip});
       if(!shot.data||shot.data.length<4096)throw Error(item.name+' screenshot was empty');
       const bytes=Buffer.from(shot.data,'base64'),file=path.join(out,item.name+'.png'),digest=crypto.createHash('sha256').update(bytes).digest('hex');
