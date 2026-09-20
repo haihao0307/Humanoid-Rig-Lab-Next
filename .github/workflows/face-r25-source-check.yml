@@ -31,6 +31,12 @@ jobs:
       - name: Check frozen R25 baseline
         run: node tools/check-face-r25-baseline.mjs
 
+      - name: Check clean-shaven neutral-skin contract
+        run: node tools/test-face-clean-shaven-neutral-skin.mjs
+
+      - name: Check current young slender darker role
+        run: node tools/test-face-young-slender-dark.mjs
+
       - name: Check eye source and parameter fixtures
         run: node tools/check-eye-anatomy.mjs --parameter-fixtures
 
