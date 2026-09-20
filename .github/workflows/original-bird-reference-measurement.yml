@@ -32,7 +32,7 @@ jobs:
             python Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py --self-test
           fi
 
-      - name: JSON and workbench syntax
+      - name: JSON and JavaScript syntax
         shell: bash
         run: |
           python - <<'PY'
@@ -48,6 +48,7 @@ jobs:
               root / 'distilled/COLUMBID_SEMANTIC_MAP_R007.json',
               root / 'distilled/COLUMBID_MATERIAL_ROLE_MAP_R008.json',
               root / 'distilled/COLUMBID_FIXED_VIEW_BASELINE_R010.json',
+              root / 'distilled/COLUMBID_3A_GAME_ASSET_STANDARD_R011.json',
               root / 'CURRENT_STATUS.json',
           ]
           for p in json_files:
@@ -61,7 +62,8 @@ jobs:
               root / 'workbench/original-bird-semantic-map-r007.html',
               root / 'workbench/original-bird-material-audit-r008.html',
               root / 'workbench/original-bird-fixed-view-baseline-r010.html',
-              root / 'workbench/original-bird-production-hub-r010.html',
+              root / 'workbench/original-bird-3a-quality-gate-r011.html',
+              root / 'workbench/original-bird-production-hub-r011.html',
           ]
           for p in html_files:
               text = p.read_text(encoding='utf-8')
@@ -74,7 +76,7 @@ jobs:
           PY
           for f in /tmp/original-bird-*.js; do node --check "$f"; done
 
-      - name: R0.10 production guards
+      - name: R0.11 3A quality guards
         shell: python
         run: |
           import json
@@ -89,16 +91,22 @@ jobs:
                   raise SystemExit('REJECTED_FILE_REAPPEARED ' + str(rejected))
 
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
-          if status.get('revision') != 'R0.10-fixed-view-source-baseline':
-              raise SystemExit('R010_STATUS_REVISION_MISMATCH')
+          if status.get('revision') != 'R0.11-evidence-backed-3a-quality-gate':
+              raise SystemExit('R011_STATUS_REVISION_MISMATCH')
           if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
               raise SystemExit('INDEPENDENT_BIRD_GATE_INVALID')
+          if status.get('r003InventedFormDeleted') is not True:
+              raise SystemExit('R003_DELETION_NOT_RECORDED')
           hub = status.get('productionHub', {})
-          fixed = status.get('fixedViewBaselineWorkbench', {})
-          if hub.get('revision') != 'R0.10' or hub.get('singleEntry') is not True or hub.get('blackModelBackgroundRemoved') is not True:
-              raise SystemExit('R010_HUB_STATUS_INVALID')
-          if fixed.get('revision') != 'R0.10' or fixed.get('generated') is not True or fixed.get('blackModelBackgroundRemoved') is not True:
-              raise SystemExit('R010_FIXED_VIEW_STATUS_INVALID')
+          quality = status.get('qualityGate3A', {})
+          if hub.get('revision') != 'R0.11' or hub.get('singleEntry') is not True or hub.get('blackModelBackgroundRemoved') is not True:
+              raise SystemExit('R011_HUB_STATUS_INVALID')
+          if quality.get('revision') != 'R0.11' or quality.get('generated') is not True:
+              raise SystemExit('R011_QUALITY_STATUS_INVALID')
+          if quality.get('candidateLoaded') is not False or quality.get('allCriticalGatesPassed') is not False:
+              raise SystemExit('R011_CANDIDATE_GATE_MUST_REMAIN_FALSE')
+          if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002' or status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
+              raise SystemExit('SOURCE_PAIR_CHANGED')
 
           batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
           by_id = {r['assetId']: r for r in batch['records']}
@@ -109,39 +117,64 @@ jobs:
           if by_id['BIRD-REF-001']['counts']['joints'] != 44 or by_id['BIRD-REF-001']['skeleton']['semanticCounts']['wing'] != 10:
               raise SystemExit('MOTION_REFERENCE_CHANGED')
 
-          paths = {
-              'r006': root / 'workbench/original-bird-source-measure-r006.html',
-              'r007': root / 'workbench/original-bird-semantic-map-r007.html',
-              'r008': root / 'workbench/original-bird-material-audit-r008.html',
-              'r010baseline': root / 'workbench/original-bird-fixed-view-baseline-r010.html',
-              'r010hub': root / 'workbench/original-bird-production-hub-r010.html',
-          }
-          texts = {k: p.read_text(encoding='utf-8') for k, p in paths.items()}
-          required = {
-              'r006': ('821135a09d3f48909b977a416d99c93b','67f9422072664cf1967ae4fe440585a9','双点测量','capturePhase','original-bird-r006-motion-phase.json'),
-              'r007': ('COLUMBID_SEMANTIC_MAP_R007.json','canonicalRole','seedKnown','original-bird-r007-semantic-map.json'),
-              'r008': ('COLUMBID_MATERIAL_ROLE_MAP_R008.json','getMaterialList','setMaterial','RoughnessPBR','MetalnessPBR','SpecularF0','resetAll'),
-              'r010baseline': ('821135a09d3f48909b977a416d99c93b','getScreenShot','front','side','top','three_quarter','maskMetrics','IoU','original-bird-r010-fixed-view-baseline.json','fixed-view baseline runtime'),
-              'r010hub': ('original-bird-source-measure-r006.html','original-bird-semantic-map-r007.html','original-bird-material-audit-r008.html','original-bird-fixed-view-baseline-r010.html','CURRENT_STATUS.json','unified production hub','single-entry'),
-          }
-          for stage, tokens in required.items():
-              for token in tokens:
-                  if token not in texts[stage]:
-                      raise SystemExit(stage.upper() + '_TOKEN_MISSING ' + token)
-          for token in ('data-bg="dark"',"state.background='dark'",'new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
-              if any(token in text for text in texts.values()):
-                  raise SystemExit('FORBIDDEN_TOKEN ' + token)
+          standard = json.loads((root / 'distilled/COLUMBID_3A_GAME_ASSET_STANDARD_R011.json').read_text(encoding='utf-8'))
+          domains = standard['qualityDomains']
+          gates = [g for d in domains for g in d['gates']]
+          if len(domains) != 6 or len(gates) != 30 or sum(d['weight'] for d in domains) != 100:
+              raise SystemExit('R011_STANDARD_STRUCTURE_INVALID')
+          if len([g for g in gates if g['critical']]) < 20:
+              raise SystemExit('R011_CRITICAL_GATE_COUNT_TOO_LOW')
+          if standard['acceptanceLogic']['motionEvidence']['minimumNormalizedPhases'] != 8:
+              raise SystemExit('R011_PHASE_EVIDENCE_INVALID')
+          if standard['openGates']['independentCommercialSafeAssetGenerated'] is not False or standard['openGates']['visualAcceptance'] is not False:
+              raise SystemExit('R011_STANDARD_ACCEPTANCE_GATE_INVALID')
 
-          semantic = json.loads((root / 'distilled/COLUMBID_SEMANTIC_MAP_R007.json').read_text(encoding='utf-8'))
-          material = json.loads((root / 'distilled/COLUMBID_MATERIAL_ROLE_MAP_R008.json').read_text(encoding='utf-8'))
-          baseline = json.loads((root / 'distilled/COLUMBID_FIXED_VIEW_BASELINE_R010.json').read_text(encoding='utf-8'))
-          if len(semantic['candidateMappings']) < 30 or semantic['openGates']['semanticMappingProductionReady'] is not False:
-              raise SystemExit('SEMANTIC_GATE_INVALID')
-          required_roles = {'feather_body','feather_wing','feather_tail','eye_cornea','eye_iris','beak_keratin','foot_keratin_skin','unknown'}
-          if set(material['roles']) != required_roles or material['openGates']['independentCommercialSafeMaterialGenerated'] is not False:
-              raise SystemExit('MATERIAL_GATE_INVALID')
-          if baseline['source']['assetId'] != 'BIRD-REF-002' or len(baseline['capture']['views']) != 4:
-              raise SystemExit('FIXED_VIEW_BASELINE_INVALID')
-          if baseline['openGates']['candidateFourViewCaptureComplete'] is not False or baseline['openGates']['visualAcceptance'] is not False:
-              raise SystemExit('FIXED_VIEW_ACCEPTANCE_GATE_INVALID')
-          print('R010_FIXED_VIEW_PRODUCTION_GUARDS_OK')
+          quality_path = root / 'workbench/original-bird-3a-quality-gate-r011.html'
+          hub_path = root / 'workbench/original-bird-production-hub-r011.html'
+          quality_text = quality_path.read_text(encoding='utf-8')
+          hub_text = hub_path.read_text(encoding='utf-8')
+          for token in (
+              '821135a09d3f48909b977a416d99c93b',
+              'candidateUid',
+              "PHASES=[0,.125,.25,.375,.5,.625,.75,.875]",
+              "neutral:{exp:.22",
+              'grazing',
+              'rim',
+              'overcast',
+              'wingroot',
+              'wingtip',
+              'capture',
+              'original-bird-r011-3a-quality-report.json',
+              '3A evidence gate',
+          ):
+              if token not in quality_text:
+                  raise SystemExit('R011_QUALITY_TOKEN_MISSING ' + token)
+          for gate_id in ('FORM-01','FEATHER-01','MATERIAL-01','RIG-01','MOTION-01','GAME-01'):
+              if gate_id not in quality_text:
+                  raise SystemExit('R011_GATE_ID_MISSING ' + gate_id)
+          for token in (
+              'original-bird-source-measure-r006.html',
+              'original-bird-semantic-map-r007.html',
+              'original-bird-material-audit-r008.html',
+              'original-bird-fixed-view-baseline-r010.html',
+              'original-bird-3a-quality-gate-r011.html',
+              'CURRENT_STATUS.json',
+              'single-entry',
+              '3A production hub',
+          ):
+              if token not in hub_text:
+                  raise SystemExit('R011_HUB_TOKEN_MISSING ' + token)
+
+          files_to_scan = [
+              root / 'workbench/original-bird-source-measure-r006.html',
+              root / 'workbench/original-bird-semantic-map-r007.html',
+              root / 'workbench/original-bird-material-audit-r008.html',
+              root / 'workbench/original-bird-fixed-view-baseline-r010.html',
+              quality_path,
+              hub_path,
+          ]
+          for token in ('data-bg="dark"', "state.background='dark'", 'new THREE.SphereGeometry', 'deformedBodyGeometry', 'original-bird-columbid-form-r003'):
+              for p in files_to_scan:
+                  if token in p.read_text(encoding='utf-8'):
+                      raise SystemExit('FORBIDDEN_TOKEN ' + token + ' in ' + str(p))
+          print('R011_EVIDENCE_BACKED_3A_QUALITY_GUARDS_OK')
