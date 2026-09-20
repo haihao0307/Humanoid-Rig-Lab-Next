@@ -1,0 +1,133 @@
+{
+  "schema": "bird/original-bird-flight-ecology-evidence@0.2",
+  "date": "2026-09-20",
+  "evidenceSources": [
+    {
+      "id": "PIGEON-FLIGHT-TAKEOFF-LANDING-2010",
+      "citation": "Berg AM, Biewener AA. Wing and body kinematics of takeoff and landing flight in the pigeon (Columba livia). J Exp Biol. 2010;213:1651-1658.",
+      "doi": "10.1242/jeb.038109",
+      "authority": "R0_PRIMARY_RESEARCH",
+      "supports": ["takeoff/landing phase separation", "wingbeat frequency/amplitude changes", "leg-wing acceleration partition", "pre-contact deceleration"]
+    },
+    {
+      "id": "PIGEON-ASCEND-DESCEND-2008",
+      "citation": "Berg AM, Biewener AA. Kinematics and power requirements of ascending and descending flight in the pigeon. J Exp Biol. 2008;211:1120-1130.",
+      "doi": "10.1242/jeb.010413",
+      "authority": "R0_PRIMARY_RESEARCH",
+      "supports": ["mass/wing dimensions for four study birds", "6.1-9.6 Hz observed wingbeat envelope", "2.9-4.9 m/s observed speed envelope", "stroke-plane/protraction changes with steep path angle"]
+    },
+    {
+      "id": "PIGEON-FEATHER-ATTACHMENT-2016",
+      "citation": "Hieronymus TL. Flight feather attachment in rock pigeons: covert feathers and smooth muscle coordinate a morphing wing. J Anat. 2016;229:631-656.",
+      "doi": "10.1111/joa.12511",
+      "authority": "R0_PRIMARY_RESEARCH",
+      "supports": ["primary/secondary/covert attachment regions", "smooth-muscle/connective-tissue coordination", "wing shape is not a rigid plate"]
+    },
+    {
+      "id": "ROCK-DOVE-FORAGING-FLIGHTS-2000",
+      "citation": "Foraging flights of wild rock doves (Columba l. livia): a spatio-temporal analysis. Italian Journal of Zoology. 2000;67(4).",
+      "doi": "10.1080/11250000009356342",
+      "authority": "R0_PRIMARY_RESEARCH",
+      "supports": ["stable foraging routes", "agricultural feeding sites up to about 19 km", "seasonal shift toward nearby fruit resources"]
+    },
+    {
+      "id": "BLACK-HEADED-GULL-FORAGING-FLIGHTS-2020",
+      "citation": "Jakubas D et al. Intercolony variation in foraging flight characteristics of black-headed gulls. Ecology and Evolution. 2020;10:5489-5505.",
+      "doi": "10.1002/ece3.6291",
+      "authority": "R0_PRIMARY_RESEARCH",
+      "supports": ["urban/rural colony differences", "agricultural/urban/water habitat use", "1-27 km maximum ranges in tracked sample", "individual specialization/site fidelity"]
+    },
+    {
+      "id": "BLACK-HEADED-GULL-AERIAL-MIDGES-2014",
+      "citation": "Källander H. Black-headed Gulls capturing chironomids in flight. Journal of Ornithology. 2014;155:825-827.",
+      "doi": "10.1007/s10336-014-1055-7",
+      "authority": "R0_PRIMARY_RESEARCH",
+      "supports": ["aerial insect capture mode", "positive energy-balance candidate for aerial midge feeding"]
+    },
+    {
+      "id": "HERON-HABITAT-FORAGING-1996",
+      "citation": "Tojo H. Habitat Selection, Foraging Behaviour and Prey of Five Heron Species in Japan. Japanese Journal of Ornithology. 1996;45:141-158,195.",
+      "doi": "10.3838/jjo.45.141",
+      "authority": "R0_PRIMARY_RESEARCH",
+      "supports": ["species-specific wetland/farmland habitat selection", "standing versus slow/fast walking search modes", "prey-size and capture-mode differences"]
+    },
+    {
+      "id": "EGRET-FLIGHT-ENERGETICS-2008",
+      "citation": "Maccarone AD, Brzorad JN, Stone HM. Characteristics and Energetics of Great Egret and Snowy Egret Foraging Flights. Waterbirds. 2008;31(4):541-549.",
+      "doi": "10.1675/1524-4695-31.4.541",
+      "authority": "R0_PRIMARY_RESEARCH",
+      "supports": ["Great Egret 1.85±0.07 beats/s and Snowy Egret 2.12±0.09 beats/s in sampled flights", "mean airspeeds about 9.2 and 8.7 m/s at one site", "species and wind-dependent flight strategy", "flight-energy budget coupling"]
+    },
+    {
+      "id": "GREAT-EGRET-FEEDING-2025",
+      "citation": "Choi G et al. Feeding behavior and prey characteristics of great egrets in eco-friendly and conventional rice fields. Scientific Reports. 2025;15:341.",
+      "doi": "10.1038/s41598-024-83519-9",
+      "authority": "R0_PRIMARY_RESEARCH",
+      "supports": ["rice-field feeding context", "hunting attempts/intake/handling time vary with prey field conditions", "larger loach handling-time effect"]
+    }
+  ],
+  "profiles": [
+    {
+      "profileId": "COLUMBID-COLUMBA-LIVIA-EVIDENCE-ENVELOPE",
+      "identityBoundary": "Natural evidence profile; does not identify any uploaded pigeon GLB as Columba livia",
+      "flight": {
+        "modes": ["routine takeoff", "escape takeoff", "level flapping", "climb", "descent", "approach/landing"],
+        "controlVariables": ["wingbeat frequency", "downstroke amplitude", "stroke-plane angle", "wing protraction", "tail/body orientation", "leg launch/foot deployment"],
+        "numericStudyEnvelope": {
+          "source": "Berg and Biewener 2008 captive carrier-pigeon sample; use as R0 study envelope, not universal species constants",
+          "bodyMassG": [403, 522],
+          "wingLengthCm": [26.5, 32.3],
+          "singleWingAreaCm2": [338, 375],
+          "observedWingbeatFrequencyHz": [6.1, 9.6],
+          "observedFlightSpeedMS": {"slowest": {"value": 2.9, "condition": "+60 degree ascent"}, "fastest": {"value": 4.9, "condition": "-30 degree descent"}},
+          "takeoffLandingPrinciples": ["takeoff uses greater wingbeat frequency and downstroke amplitude than level flight", "legs contribute strongly at launch while wings provide subsequent acceleration", "landing deceleration occurs mostly before foot contact"]
+        }
+      },
+      "habitat": ["rock/cliff or built-structure colony/roost candidate", "agricultural feeding grounds", "seasonal local fruit resource"],
+      "foragingEcology": {
+        "guild": ["ground granivore", "seasonal frugivore candidate"],
+        "searchCapture": ["walk/stand ground search", "head-bob/visual sampling candidate", "beak peck/pick"],
+        "movement": ["stable commuting routes from colony/roost to feeding sites", "group/flock and site-memory interfaces required"],
+        "predatorRisk": ["escape-takeoff state must be distinct from routine departure", "flock cohesion/alarm signal interface required but exact predator list remains habitat-specific"]
+      }
+    },
+    {
+      "profileId": "LARID-BLACK-HEADED-GULL-EVIDENCE-ENVELOPE",
+      "identityBoundary": "Target Larid evidence profile only; generic seagull GLBs remain exact-species unresolved",
+      "flight": {
+        "modes": ["flapping transit", "gliding/wind-supported travel", "short aerial prey capture", "approach/landing"],
+        "movementEvidence": ["tracked incubation trips in studied colonies: 1-27 km maximum range", "urban birds used urban surfaces and water more; rural birds mainly agricultural areas", "individual site/habitat fidelity must be represented"]
+      },
+      "habitat": ["water bodies", "agricultural land", "urban surfaces", "breeding colony as central place"],
+      "foragingEcology": {
+        "guild": ["opportunistic omnivore", "population-level generalist with individual specialists"],
+        "foodOrPrey": ["earthworms/invertebrates", "seeds/grain", "fish", "anthropogenic waste", "aerial midges"],
+        "captureModes": ["ground pick/probe", "surface-water pick", "aerial insect capture"],
+        "stateVariables": ["colony", "sex", "individual specialization", "season/reproductive state", "wind support"]
+      }
+    },
+    {
+      "profileId": "ARDEID-EGRET-EVIDENCE-ENVELOPE",
+      "identityBoundary": "Ardeid/egret evidence envelope; uploaded generic Egret GLB is not identified as Great, Snowy, Little or Intermediate Egret",
+      "flight": {
+        "modes": ["colony departure", "foraging transit", "return with load", "slow/deep flapping", "approach to tree/wetland"],
+        "numericStudyExamples": {"greatEgretWingbeatHzMeanSD": [1.85, 0.07], "snowyEgretWingbeatHzMeanSD": [2.12, 0.09], "greatEgretAirSpeedMSMean": 9.2, "snowyEgretAirSpeedMSMean": 8.7},
+        "controlVariables": ["species/body mass", "wing loading", "wind direction/speed", "outbound/inbound load state"]
+      },
+      "habitat": ["tidal flats", "rivers", "large water bodies", "farmland/rice fields depending species", "wetland colony/trees"],
+      "foragingEcology": {
+        "guild": ["visual wading predator"],
+        "searchModes": ["standing", "walking slowly", "walking quickly/activity level varies by species"],
+        "captureModes": ["rapid beak strike/stab", "occasional pursuit/flush behavior"],
+        "foodOrPrey": ["fish", "amphibians", "loaches", "aquatic/terrestrial invertebrates depending species and habitat"],
+        "stateVariables": ["water depth", "prey density/size", "habitat type", "season/breeding demand", "handling time"]
+      }
+    }
+  ],
+  "crossProfileRules": [
+    "Do not assign a natural ecology profile from file title alone",
+    "Use flight/habitat/foraging evidence as parameter envelopes with provenance",
+    "Model identity, scientific identity and runtime identity remain separate",
+    "Every behavior state must include environment preconditions and energy/contact consequences"
+  ]
+}
