@@ -93,9 +93,16 @@ jobs:
           PY
           node tools/build-pure.mjs
           grep -q '__motionVisualQAFallback' index.html
-          grep -q 'id="bodyFrame"' index.html
-          grep -q 'MotionRuntimeState' index.html
-          grep -q 'CONTACT_HAND_POSE_REVISION' index.html
+          python - <<'PY'
+          from pathlib import Path
+          data=Path('index.html').read_text(encoding='utf-8')
+          print({
+              'bodyFrame': 'bodyFrame' in data,
+              'motionRuntimeState': 'MotionRuntimeState' in data,
+              'contactHandPose': 'CONTACT_HAND_POSE_REVISION' in data,
+              'entrypointBytes': len(data.encode('utf-8')),
+          })
+          PY
           sha256sum source-index.html public-index.html index.html | tee hand-proof-entrypoint-hashes.txt
 
       - name: Run focused hand-action proof
