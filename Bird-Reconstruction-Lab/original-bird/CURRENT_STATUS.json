@@ -1,6 +1,6 @@
 {
-  "schema": "bird/original-bird-status@0.0.18",
-  "revision": "R0.13-pigeon-motion-behavior-extraction",
+  "schema": "bird/original-bird-status@0.0.19",
+  "revision": "R0.13.1-automatic-pigeon-motion-baseline",
   "date": "2026-09-20",
   "branch": "bird-mother-original-bird-r001-20260920",
   "visualBirdGenerated": false,
@@ -11,11 +11,11 @@
   "r003InventedFormDeleted": true,
   "productionHub": {
     "generated": true,
-    "revision": "R0.13",
-    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r013.html",
+    "revision": "R0.13.1",
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r0131.html",
     "singleEntry": true,
     "mobileFirst": true,
-    "defaultMobileStage": "motion",
+    "defaultMobileStage": "auto",
     "defaultBackground": "bright studio gray-white",
     "blackModelBackgroundRemoved": true,
     "stages": [
@@ -24,19 +24,20 @@
       {"order": 3, "name": "live material-role calibration", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-material-audit-r008.html", "available": true},
       {"order": 4, "name": "fixed-view source baseline and candidate error", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-fixed-view-baseline-r010.html", "available": true},
       {"order": 5, "name": "feather alpha large-screen review", "desktopPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0122.html", "mobilePath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-mobile-r0123.html", "available": true, "deferred": true},
-      {"order": 6, "name": "pigeon motion and behavior extraction", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-pigeon-motion-r013.html", "available": true},
-      {"order": 7, "name": "3A game-asset quality gate", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-3a-quality-gate-r011.html", "available": true},
-      {"order": 8, "name": "independent Original Bird", "available": false}
+      {"order": 6, "name": "pigeon manual motion review", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-pigeon-motion-r013.html", "available": true},
+      {"order": 7, "name": "automatic pigeon motion baseline", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-pigeon-motion-auto-r0131.html", "available": true},
+      {"order": 8, "name": "3A game-asset quality gate", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-3a-quality-gate-r011.html", "available": true},
+      {"order": 9, "name": "independent Original Bird", "available": false}
     ]
   },
   "mobileMode": {
     "generated": true,
-    "revision": "R0.13",
+    "revision": "R0.13.1",
     "targetViewport": "390x844 portrait",
     "stageAndStatusDrawersClosedOnFirstPaint": true,
     "minimumTouchTargetPx": 44,
     "safeAreaAware": true,
-    "activeWorkbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-pigeon-motion-r013.html"
+    "activeWorkbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-pigeon-motion-auto-r0131.html"
   },
   "pigeonMotionBehavior": {
     "generated": true,
@@ -45,27 +46,37 @@
     "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-pigeon-motion-r013.html",
     "species": "Spilopelia chinensis",
     "sourceLine": "R17 source-locked independent columbid line",
-    "capabilities": [
-      "one-viewer mobile-first switching between BIRD-REF-001 motion and BIRD-REF-002 form sources",
-      "source animation enumeration and duration audit",
-      "source node enumeration and semantic group counts",
-      "wing, tail, neck, head and leg-foot-toe semantic group sampling",
-      "automatic eight-normalized-phase matrix capture",
-      "adjacent-phase mean and maximum displacement metrics",
-      "final-to-first loop-closure displacement metrics",
-      "fixed front, side, top and three-quarter views",
-      "source-backed capability matrix for rest, walk, takeoff, flap, glide and landing",
-      "kaopu/bird-motion-source@1.0 export"
-    ],
     "policy": {
       "groundLocomotion": "alternating-walk-primary",
       "microStepUse": "landing-and-contact-alignment-only",
       "inheritHouseSparrowHop": false
-    },
-    "eightPhaseSourceCaptureComplete": false,
-    "semanticGroupContinuityMeasured": false,
-    "loopClosureMeasured": false,
-    "independentCommercialSafeMotionGenerated": false
+    }
+  },
+  "pigeonMotionAutorun": {
+    "generated": true,
+    "revision": "R0.13.1",
+    "contractPath": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_MOTION_AUTORUN_R0131.json",
+    "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-pigeon-motion-auto-r0131.html",
+    "source": "BIRD-REF-001",
+    "groups": ["wing", "tail", "neck", "head", "leg"],
+    "normalizedPhases": [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875],
+    "expectedRecords": 40,
+    "automaticStartOnViewerReady": true,
+    "capabilities": [
+      "automatic five-group eight-phase source capture",
+      "per-group readable-node count",
+      "adjacent-phase mean and maximum displacement",
+      "final-to-first loop-closure displacement",
+      "window.__BIRD_R0131_REPORT__ runtime report",
+      "localStorage persistence",
+      "JSON and .kaopu export"
+    ],
+    "classificationBoundary": "MEASURED means source data completeness only; it does not mean biological or visual acceptance",
+    "viewerRuntimeVerified": false,
+    "allFiveGroupsMeasured": false,
+    "fortyPhaseRecordsCaptured": false,
+    "reportPersisted": false,
+    "wingCycleVisuallyReviewed": false
   },
   "alphaIssue": {
     "status": "DEFERRED_TO_LARGE_SCREEN_REVIEW",
@@ -79,21 +90,12 @@
     "commonNameZh": "家麻雀",
     "phase": "phase1_morphology_and_basic_motion",
     "declaredRuntime": "runtime/current/BIRD_R60_A0_HOUSE_SPARROW_PHASE1_NPC_DIRECT.html",
-    "startRule": "start after the pigeon motion baseline and R17 source lock are preserved",
+    "startRule": "start after the R0.13.1 pigeon source report is persisted and the R17 source lock remains intact",
     "doNotOverwrite": "Spilopelia chinensis R17 independent line"
-  },
-  "featherAlphaAutoExtract": {
-    "generated": true,
-    "revision": "R0.12.2-core-with-R0.12.3-mobile-shell",
-    "desktopWorkbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0122.html",
-    "mobileWorkbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-mobile-r0123.html",
-    "deferred": true,
-    "visibleDifferenceVerified": false,
-    "markedGrayBackingRemoved": false
   },
   "qualityGate3A": {
     "generated": true,
-    "revision": "R0.11-standard-amended-by-R0.13",
+    "revision": "R0.11-standard-amended-by-R0.13.1",
     "standardPath": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_3A_GAME_ASSET_STANDARD_R011.json",
     "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-3a-quality-gate-r011.html",
     "allCriticalGatesPassed": false
@@ -104,25 +106,25 @@
   "prohibitedNextSteps": [
     "continuing automatic alpha edits during the current mobile session",
     "applying alpha outside wing-tip, trailing-edge or wing-underside feather ends",
+    "promoting MEASURED source records directly to accepted natural motion",
     "overwriting the R17 spotted-dove line with house-sparrow hopping or toe parameters",
     "claiming takeoff, glide, landing or walking complete from one generic flight clip",
-    "approving motion from one phase or one view",
     "shipping CC-BY-NC source mesh, texture or animation as the commercial runtime asset"
   ],
   "currentExecutionQueue": [
-    "run R0.13 BIRD-REF-001 eight-phase capture for wing, tail, neck, head and leg groups",
-    "calculate adjacent-phase and loop-closure displacement metrics",
-    "export the first kaopu/bird-motion-source@1.0 evidence file",
-    "lock the continuous-flap evidence boundary",
+    "run the R0.13.1 automatic five-group eight-phase source measurement in a real browser",
+    "persist and export the first forty-record kaopu/bird-motion-source@1.1 report",
+    "visually review the measured wing cycle and loop closure",
     "retain takeoff, glide, landing and alternating-walk as blocked until separate evidence exists",
-    "then begin Passer domesticus phase1 morphology and basic motion without overwriting R17"
+    "begin Passer domesticus phase1 morphology and basic motion only after the pigeon report is preserved"
   ],
   "openGates": {
-    "r013ProductionHubBrowserQaPassed": false,
-    "r013PigeonMotionWorkbenchBrowserQaPassed": false,
-    "pigeonEightPhaseCaptureComplete": false,
-    "pigeonSemanticGroupContinuityMeasured": false,
-    "pigeonLoopClosureMeasured": false,
+    "r0131ProductionHubBrowserQaPassed": false,
+    "r0131PigeonAutoWorkbenchBrowserQaPassed": false,
+    "pigeonAutoFiveGroupsMeasured": false,
+    "pigeonAutoFortyRecordsCaptured": false,
+    "pigeonAutoReportPersisted": false,
+    "pigeonMotionVisualAcceptance": false,
     "pigeonFlapCycleLocked": false,
     "pigeonTakeoffEventLocked": false,
     "pigeonApproachLandingLocked": false,
