@@ -1,5 +1,5 @@
 {
-  "schema": "bird/columbid-3a-game-asset-standard@0.0.11",
+  "schema": "bird/columbid-3a-game-asset-standard@0.0.12",
   "date": "2026-09-20",
   "status": "ACTIVE_PROJECT_GATE_NOT_UNIVERSAL_CERTIFICATION",
   "scope": "hero-quality Columbidae candidate and the shared Original Bird production system",
@@ -8,6 +8,9 @@
     "motionRig": "BIRD-REF-001",
     "legacyInternalSystems": ["R17 spotted-dove", "AVES topology", "avian-mesh rig", "R61 heron delta"]
   },
+  "supplementalContracts": [
+    "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_FEATHER_ALPHA_EDGE_R012.json"
+  ],
   "acceptanceLogic": {
     "criticalGateRule": "every critical gate must be PASS with attached evidence",
     "nonCriticalGateRule": "no FAIL; REVIEW items require an owner, evidence gap and next action",
@@ -21,6 +24,8 @@
       "approval from one view only",
       "approval from a static pose only",
       "hiding defects with dark background, bloom, depth of field or excessive contrast",
+      "leaving opaque card backing around feather tips and trailing edges",
+      "making the complete feather vane uniformly semi-transparent",
       "using the CC-BY-NC source mesh, textures or animation as the commercial runtime asset",
       "calling artist controls literal anatomical bones without hierarchy, skin and motion evidence",
       "using a lower-quality proxy when a higher-quality source reference is available"
@@ -46,9 +51,9 @@
       "gates": [
         {"id": "FEATHER-01", "critical": true, "title": "body covert flow", "pass": "body feather direction follows local surface and hides the carrier without visible tile repetition or floating cards"},
         {"id": "FEATHER-02", "critical": true, "title": "wing hierarchy", "pass": "coverts, secondaries and primaries are distinct, overlap in the correct direction and preserve span/fold continuity"},
-        {"id": "FEATHER-03", "critical": true, "title": "primary separation", "pass": "primary feathers separate near the tip without comb-like uniform spacing, clipping or identical copies"},
-        {"id": "FEATHER-04", "critical": true, "title": "tail hierarchy", "pass": "tail rectrices overlap, fan and close without gaps through the tail base"},
-        {"id": "FEATHER-05", "critical": false, "title": "micro variation", "pass": "length, curvature, edge wear and orientation variation are subtle, non-random and region-aware"}
+        {"id": "FEATHER-03", "critical": true, "title": "primary separation and alpha edge", "pass": "primary feathers separate near the tip without comb-like uniform spacing, clipping or identical copies; all card voids are alpha-zero, the vane core stays opaque, and only a narrow directional barb fringe is partially transparent with no gray plate or dark halo"},
+        {"id": "FEATHER-04", "critical": true, "title": "tail hierarchy", "pass": "tail rectrices overlap, fan and close without gaps through the tail base; the perimeter uses the same transparent-void and soft-fringe rule"},
+        {"id": "FEATHER-05", "critical": false, "title": "micro variation", "pass": "length, curvature, edge wear, alpha-fringe width and orientation variation are subtle, non-random and region-aware"}
       ]
     },
     {
@@ -56,11 +61,11 @@
       "name": "surface and material response",
       "weight": 15,
       "gates": [
-        {"id": "MATERIAL-01", "critical": true, "title": "feather response", "pass": "feathers remain non-metallic with controlled roughness and directional highlight; no global plastic coat"},
+        {"id": "MATERIAL-01", "critical": true, "title": "feather response", "pass": "feathers remain non-metallic with controlled roughness and directional highlight; no global plastic coat, no opaque sheet backing, no whole-vane glass transparency and no filtering halo"},
         {"id": "MATERIAL-02", "critical": true, "title": "eye separation", "pass": "cornea, iris/pupil and surrounding eyelid/feather boundary are materially distinct at macro distance"},
         {"id": "MATERIAL-03", "critical": true, "title": "beak keratin", "pass": "beak has keratin-like roughness/translucency cues and a clean upper/lower boundary without sharing feather response"},
         {"id": "MATERIAL-04", "critical": true, "title": "foot and claw material", "pass": "foot skin/scales and claw keratin are distinct from feathers and do not appear rubbery or metallic"},
-        {"id": "MATERIAL-05", "critical": false, "title": "lighting robustness", "pass": "material roles remain readable under neutral, grazing, overcast and back/rim inspection lights"}
+        {"id": "MATERIAL-05", "critical": false, "title": "lighting robustness", "pass": "material and alpha roles remain readable under neutral, grazing, overcast and back/rim inspection lights and on bright-gray, sky-blue and warm-gray backgrounds"}
       ]
     },
     {
@@ -70,7 +75,7 @@
       "gates": [
         {"id": "RIG-01", "critical": true, "title": "shoulder volume preservation", "pass": "pectoral/shoulder volume does not collapse or inflate through the full wing cycle"},
         {"id": "RIG-02", "critical": true, "title": "elbow-wrist-manus fold", "pass": "wing folding follows a coherent shoulder-humerus-forearm-wrist-manus chain without rubber bending"},
-        {"id": "RIG-03", "critical": true, "title": "feather attachment stability", "pass": "coverts, secondaries, primaries and tail feathers remain attached and do not swim, detach or invert"},
+        {"id": "RIG-03", "critical": true, "title": "feather attachment stability", "pass": "coverts, secondaries, primaries and tail feathers remain attached and do not swim, detach, invert, sort-pop or expose card backing"},
         {"id": "RIG-04", "critical": true, "title": "neck-head continuity", "pass": "neck bends without pinching, head detachment or sudden volume change"},
         {"id": "RIG-05", "critical": true, "title": "ground-contact deformation", "pass": "feet and toes settle on contact, do not skate, jitter or penetrate, and preserve toe spread"}
       ]
@@ -80,7 +85,7 @@
       "name": "motion and behavior",
       "weight": 15,
       "gates": [
-        {"id": "MOTION-01", "critical": true, "title": "phase continuity", "pass": "at least eight normalized phase samples show continuous position and orientation without pops or loop discontinuity"},
+        {"id": "MOTION-01", "critical": true, "title": "phase continuity", "pass": "at least eight normalized phase samples show continuous position, orientation and feather-alpha stability without pops, loop discontinuity or transparency flicker"},
         {"id": "MOTION-02", "critical": true, "title": "whole-body coupling", "pass": "wing, thorax, tail, neck, head and legs participate coherently instead of isolated wing flapping"},
         {"id": "MOTION-03", "critical": true, "title": "takeoff and landing", "pass": "leg impulse, first wingbeat, tail fan, approach deceleration and foot contact are separate readable events"},
         {"id": "MOTION-04", "critical": true, "title": "flight-mode separation", "pass": "flap, glide, climb, descent and approach have distinct posture and timing, not only playback-speed changes"},
@@ -92,16 +97,16 @@
       "name": "game-readability and technical delivery",
       "weight": 10,
       "gates": [
-        {"id": "GAME-01", "critical": true, "title": "distance readability", "pass": "macro reveals material separation, portrait reveals anatomy/feather hierarchy, gameplay distance preserves species silhouette and motion"},
-        {"id": "GAME-02", "critical": true, "title": "mobile evidence", "pass": "triangle, material, draw-call, texture-memory and frame-time evidence are recorded on the target mobile path; increases require visible A/B benefit"},
+        {"id": "GAME-01", "critical": true, "title": "distance readability", "pass": "macro reveals material and alpha separation, portrait reveals anatomy/feather hierarchy, gameplay distance preserves species silhouette and motion without feather thickening or disappearance"},
+        {"id": "GAME-02", "critical": true, "title": "mobile evidence", "pass": "triangle, material, draw-call, texture-memory, transparent-overdraw and frame-time evidence are recorded on the target mobile path; increases require visible A/B benefit"},
         {"id": "GAME-03", "critical": true, "title": "no traditional LOD substitution", "pass": "one coherent asset definition is retained; flock scale uses shared geometry, instancing and state data rather than unrelated lower-quality bird replacements"},
         {"id": "GAME-04", "critical": true, "title": "clean runtime package", "pass": "HTML workbench opens directly, has no black default review background, no missing network asset, no console error and no source-license dependency"},
-        {"id": "GAME-05", "critical": false, "title": "flock compatibility", "pass": "individual variation, formation, separation, alignment, cohesion, habitat and predator-risk states do not break hero-bird anatomy or animation"}
+        {"id": "GAME-05", "critical": false, "title": "flock compatibility", "pass": "individual variation, formation, separation, alignment, cohesion, habitat and predator-risk states do not break hero-bird anatomy, animation or alpha ordering"}
       ]
     }
   ],
   "statusVocabulary": ["BLOCKED", "FAIL", "REVIEW", "PASS"],
-  "evidenceTypes": ["source screenshot", "candidate screenshot", "video", "phase sample", "node map", "material audit", "performance capture", "user visual acceptance"],
+  "evidenceTypes": ["source screenshot", "candidate screenshot", "video", "phase sample", "node map", "material audit", "alpha-mask audit", "performance capture", "user visual acceptance"],
   "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-3a-quality-gate-r011.html",
   "openGates": {
     "candidateUidLoaded": false,
@@ -109,6 +114,7 @@
     "threeDistanceEvidenceComplete": false,
     "fourViewEvidenceComplete": false,
     "eightPhaseEvidenceComplete": false,
+    "featherAlphaEdgeEvidenceComplete": false,
     "mobilePerformanceEvidenceComplete": false,
     "independentCommercialSafeAssetGenerated": false,
     "visualAcceptance": false,
