@@ -26,11 +26,17 @@ jobs:
         run: |
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py
+          if [ -f Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py ]; then
+            python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py
+          fi
 
       - name: Tool self tests
         run: |
           python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
           python Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py --self-test
+          if [ -f Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py ]; then
+            python Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py --self-test
+          fi
 
       - name: Validate JSON records
         shell: python
@@ -46,23 +52,39 @@ jobs:
             json.loads(p.read_text(encoding='utf-8'))
             print('JSON_OK', p)
 
-      - name: Workbench black-screen regression guard
+      - name: Validate workbench inline JavaScript
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib, re
+          files = [
+              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html'),
+              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-form-r003.html'),
+          ]
+          for p in files:
+              text = p.read_text(encoding='utf-8')
+              scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', text, re.S | re.I)]
+              if not scripts:
+                  raise SystemExit(f'NO_INLINE_SCRIPT {p}')
+              out = pathlib.Path('/tmp') / (p.stem + '.js')
+              out.write_text('\n'.join(scripts), encoding='utf-8')
+              print(out)
+          PY
+          node --check /tmp/original-bird-columbid-skeleton-r002.js
+          node --check /tmp/original-bird-columbid-form-r003.js
+
+      - name: Black-screen and visible-form regression guards
         shell: python
         run: |
-          import pathlib, re, subprocess
-          p = pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html')
-          html = p.read_text(encoding='utf-8')
-          broken = 'const root=new THREE.Group();s.add(root),N={},E=[];'
-          fixed = 'const root=new THREE.Group();s.add(root);const N={},E=[];'
-          if broken in html:
-            raise SystemExit('BLACK_SCREEN_SIGNATURE_FOUND: strict-mode undeclared N/E registries')
-          if fixed not in html:
-            raise SystemExit('RUNTIME_REGISTRY_DECLARATION_MISSING')
-          scripts = re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>', html, flags=re.S)
-          inline = [s for s in scripts if s.strip()]
-          if not inline:
-            raise SystemExit('INLINE_RUNTIME_NOT_FOUND')
-          out = pathlib.Path('/tmp/original-bird-workbench-inline.js')
-          out.write_text(inline[-1], encoding='utf-8')
-          subprocess.run(['node', '--check', str(out)], check=True)
-          print('WORKBENCH_RUNTIME_GUARD_OK', p)
+          from pathlib import Path
+          skeleton = Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html').read_text(encoding='utf-8')
+          form = Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-form-r003.html').read_text(encoding='utf-8')
+          if 's.add(root),N={},E=[]' in skeleton:
+              raise SystemExit('STRICT_MODE_UNDECLARED_REGISTRY_REGRESSION')
+          for token in ('const N={},E=[]', 'requestAnimationFrame(loop)', 'runtime fixed'):
+              if token not in skeleton:
+                  raise SystemExit('SKELETON_RUNTIME_TOKEN_MISSING ' + token)
+          for token in ('deformedBodyGeometry', 'makeWing', 'tailFeathers', 'setSkeletonVisible(false)', 'source mesh dependency 0'):
+              if token not in form:
+                  raise SystemExit('VISIBLE_FORM_TOKEN_MISSING ' + token)
+          print('WORKBENCH_GUARDS_OK')
