@@ -31,13 +31,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Apply pending canonical R2.5 source migrations
+      - name: Apply pending sequential R2.5 source migration
         run: |
           mkdir -p /tmp/shorts-r25-gusset
-          node tools/apply-shorts-r25-gusset.mjs
-          node tools/apply-shorts-r25-boundary-audit.mjs
-          node tools/apply-shorts-r25-principal-centre.mjs
-          node tools/apply-shorts-r25-preflight-debug.mjs
           node tools/apply-shorts-r25-sequential-sewing.mjs
       - name: Build and test canonical source
         shell: bash
@@ -52,7 +48,7 @@ jobs:
       - name: Retain validated canonical source
         run: |
           test "$GITHUB_REF_NAME" = "fix/shorts-two-leg-assembly-r2-20260919"
-          git add source/assembly.json source/runtime.template.js clothing/ClothShorts.js clothing/ShortsGussetAssemblyR2.js index.html
+          git add source/assembly.json source/runtime.template.js clothing/ClothShorts.js index.html
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat(shorts): use sequential physical R2.5 gusset sewing'
             git push origin HEAD:fix/shorts-two-leg-assembly-r2-20260919
