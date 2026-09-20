@@ -1,0 +1,69 @@
+{
+  "schema": "bird/original-bird-clade-kernel@0.2",
+  "kernelId": "ORIGINAL-BIRD-COLUMBID-R002",
+  "date": "2026-09-20",
+  "scope": {
+    "clade": "Columbidae candidate",
+    "exactSpeciesIdentity": "UNRESOLVED",
+    "sourceAssets": ["BIRD-REF-001", "BIRD-REF-002", "BIRD-REF-003"],
+    "naturalEvidenceTarget": "Columba livia evidence envelope only; not proof of source-model identity"
+  },
+  "authorityComposition": {
+    "R0": ["PIGEON-FLIGHT-TAKEOFF-LANDING-2010", "PIGEON-ASCEND-DESCEND-2008", "PIGEON-FEATHER-ATTACHMENT-2016", "ROCK-DOVE-FORAGING-FLIGHTS-2000"],
+    "R1": ["BIRD-REF-001", "BIRD-REF-002", "BIRD-REF-003"]
+  },
+  "sharedKernelCandidate": {
+    "axialChain": ["root/pelvis", "multi-segment trunk", "multi-segment neck", "head", "upper/lower beak boundary"],
+    "pectoralWingChain": ["shoulder/girdle attachment", "humeral segment", "forearm segment", "wrist-manus segment", "primary attachment region", "secondary attachment region", "covert coordination layer"],
+    "hindlimbContact": ["hip", "knee", "ankle", "foot", "three-forward/one-rear toe contact candidate"],
+    "tailArray": ["central base", "paired fan arrays", "fan/spread control"],
+    "motionStateMachine": ["perch/stand", "ground walk", "ground peck", "takeoff leg preload", "takeoff wingbeat 1", "powered level flight", "climb/descent", "approach", "foot deployment", "landing", "escape takeoff"],
+    "flightControlSignals": ["wingbeat phase", "shoulder amplitude", "elbow/wrist fold", "stroke-plane angle", "wing protraction", "tail fan", "body pitch", "foot deployment", "neck/head stabilization"]
+  },
+  "numericEvidenceEnvelope": {
+    "source": "Berg and Biewener 2008 captive carrier-pigeon sample; use as R0 study envelope, not universal species constants",
+    "bodyMassG": [403, 522],
+    "wingLengthCm": [26.5, 32.3],
+    "singleWingAreaCm2": [338, 375],
+    "observedWingbeatFrequencyHz": [6.1, 9.6],
+    "observedFlightSpeedMS": {
+      "slowest": {"value": 2.9, "condition": "+60 degree ascent"},
+      "fastest": {"value": 4.9, "condition": "-30 degree descent"}
+    },
+    "takeoffLandingPrinciples": [
+      "takeoff uses greater wingbeat frequency and downstroke amplitude than level flight",
+      "legs contribute strongly at launch while wings provide subsequent acceleration",
+      "landing deceleration occurs mostly before foot contact"
+    ]
+  },
+  "modelConsensus": {
+    "accepted": [
+      "BIRD-REF-001 supplies coarse flight rig/phase",
+      "BIRD-REF-002 supplies dense wing-tail-foot attachment candidates"
+    ],
+    "rejected": ["BIRD-REF-003 Chicken_* skeleton is not accepted as columbid flight skeleton"],
+    "unresolved": ["literal anatomical homology of artist controls", "real-scale normalization", "species/age/sex identity", "muscle and mass distribution"]
+  },
+  "foragingEcology": {
+    "guild": ["ground granivore", "seasonal frugivore candidate"],
+    "searchCapture": ["walk/stand ground search", "head-bob/visual sampling candidate", "beak peck/pick"],
+    "movement": ["stable commuting routes from colony/roost to feeding sites", "group/flock and site-memory interfaces required"],
+    "predatorRisk": ["escape-takeoff state must be distinct from routine departure", "flock cohesion/alarm signal interface required but exact predator list remains habitat-specific"]
+  },
+  "productionGates": {
+    "rigSemanticPass": false,
+    "naturalScalePass": false,
+    "featherAttachmentPass": false,
+    "motionRetargetPass": false,
+    "ecologyStateMachinePass": false,
+    "independentProceduralBirdGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "nextExecution": [
+    "map BIRD-REF-001/002 wing and toe joints into canonical names",
+    "derive source-independent normalized joint graph",
+    "extract animation phase curves without copying source timing",
+    "construct fixed-view skeleton-only HTML QA before surface generation"
+  ]
+}
