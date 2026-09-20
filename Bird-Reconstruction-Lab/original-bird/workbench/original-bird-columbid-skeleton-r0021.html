@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Original Bird R0.02.1｜运行时修复</title>
+  <style>
+    :root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#071018;color:#e8f1f5;font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.boot{height:100%;display:grid;place-items:center;padding:24px}.card{width:min(620px,92vw);padding:22px;border:1px solid #28404f;border-radius:14px;background:#0d1922;box-shadow:0 24px 70px #0008}.card b{display:block;margin-bottom:10px}.card p{margin:0;color:#8fa8b7;line-height:1.65;font-size:13px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#6ed6a8;margin-right:8px;box-shadow:0 0 18px #6ed6a888}.err{color:#ef918a!important;white-space:pre-wrap}
+  </style>
+</head>
+<body>
+  <div class="boot"><div class="card"><b><span class="dot"></span>Original Bird R0.02.1 正在启动</b><p id="msg">正在载入并修复骨架动作工作台……</p></div></div>
+  <script>
+  (()=>{
+    'use strict';
+    const msg=document.getElementById('msg');
+    const source='https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/8ee7efe2bdb85c54478237ed3bd66000953f9668/Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html';
+    const broken='const root=new THREE.Group();s.add(root),N={},E=[];';
+    const fixed='const root=new THREE.Group();s.add(root);const N={},E=[];';
+    fetch(source,{cache:'no-store'})
+      .then(r=>{if(!r.ok)throw new Error('源工作台读取失败：HTTP '+r.status);return r.text()})
+      .then(html=>{
+        if(!html.includes(broken))throw new Error('没有找到预期的黑屏故障签名，已停止自动改写。');
+        html=html.replace(broken,fixed)
+          .replaceAll('Original Bird R0.02','Original Bird R0.02.1')
+          .replace('schema original-bird-columbid@0.2','schema original-bird-columbid@0.2.1')
+          .replace('<b>● runtime</b>','<b>● runtime fixed</b>');
+        document.open();
+        document.write(html);
+        document.close();
+      })
+      .catch(err=>{
+        msg.className='err';
+        msg.textContent='启动失败：'+(err&&err.message?err.message:String(err));
+      });
+  })();
+  </script>
+</body>
+</html>
