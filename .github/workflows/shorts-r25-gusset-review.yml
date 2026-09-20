@@ -1,0 +1,67 @@
+name: Shorts R2.5 gusset review
+on:
+  push:
+    branches: [fix/shorts-two-leg-assembly-r2-20260919]
+    paths:
+      - 'clothing/ShortsGussetAssemblyR2.js'
+      - 'tools/apply-shorts-r25-gusset.mjs'
+      - 'tools/test-shorts-gusset-r25.mjs'
+      - 'tools/review-shorts-gusset-r25.mjs'
+      - '.github/workflows/shorts-r25-gusset-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shorts-r25-gusset-review
+  cancel-in-progress: true
+jobs:
+  actual-browser-gusset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wire canonical R2.5 gusset source
+        run: node tools/apply-shorts-r25-gusset.mjs
+      - name: Build and test canonical source
+        shell: bash
+        run: |
+          mkdir -p /tmp/shorts-r25-gusset
+          set -o pipefail
+          {
+            node tools/build-pure.mjs
+            node tools/build-shorts-preview.mjs
+            node tools/check-pure.mjs
+            node --test tools/test-shorts-*.mjs
+          } 2>&1 | tee /tmp/shorts-r25-gusset/build-and-test.log
+      - name: Retain validated canonical source
+        run: |
+          test "$GITHUB_REF_NAME" = "fix/shorts-two-leg-assembly-r2-20260919"
+          git add source/assembly.json source/runtime.template.js clothing/ClothShorts.js clothing/ShortsGussetAssemblyR2.js index.html
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat(shorts): install independent source gusset in R2.5'
+            git push origin HEAD:fix/shorts-two-leg-assembly-r2-20260919
+          fi
+      - name: Install isolated browser dependency
+        run: |
+          mkdir -p /tmp/shorts-browser
+          npm install --prefix /tmp/shorts-browser --no-audit --no-fund playwright@1.55.0
+          /tmp/shorts-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Capture actual R2.5 progress views
+        run: |
+          python3 -m http.server 8793 --bind 127.0.0.1 >/tmp/shorts-r25-http.log 2>&1 &
+          node tools/review-shorts-gusset-r25.mjs
+      - name: Archive exact reviewed source
+        if: always()
+        run: |
+          git rev-parse HEAD > /tmp/shorts-r25-gusset/SOURCE_COMMIT.txt
+          tar --exclude=.git --exclude=node_modules -czf /tmp/shorts-r25-gusset/reviewed-working-tree.tar.gz .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shorts-r2-5-gusset-progress
+          path: /tmp/shorts-r25-gusset
+          if-no-files-found: error
+          retention-days: 14
