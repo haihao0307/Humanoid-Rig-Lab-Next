@@ -1,0 +1,54 @@
+{
+  "schema": "bird/columbid-motion-autorun@0.0.13.1",
+  "date": "2026-09-20",
+  "status": "ACTIVE_AUTOMATIC_SOURCE_MEASUREMENT_NOT_VISUAL_ACCEPTANCE",
+  "species": "Spilopelia chinensis",
+  "source": {
+    "assetId": "BIRD-REF-001",
+    "viewerUid": "67f9422072664cf1967ae4fe440585a9",
+    "role": "explicit wing, hindlimb, toe, neck, head and tail motion-chain source"
+  },
+  "automaticCapture": {
+    "startsOnViewerReady": true,
+    "groups": ["wing", "tail", "neck", "head", "leg"],
+    "normalizedPhases": [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875],
+    "expectedGroupPhaseRecords": 40,
+    "sampleFields": ["instanceID", "name", "translation"],
+    "runtimeStorage": ["window.__BIRD_R0131_REPORT__", "localStorage:original-bird-r0131-report"]
+  },
+  "diagnostics": {
+    "perGroup": [
+      "readable node count",
+      "completed phase count",
+      "adjacent-phase mean displacement",
+      "adjacent-phase maximum displacement",
+      "loop-closure mean displacement",
+      "loop-closure maximum displacement"
+    ],
+    "classification": ["PENDING", "MEASURED", "INCOMPLETE", "ERROR"],
+    "importantBoundary": "MEASURED does not mean biological acceptance or production-ready motion"
+  },
+  "behaviorBoundary": {
+    "continuousFlap": "source measurement candidate after wing group completes",
+    "takeoff": "blocked until leg preload and first downstroke events are separately evidenced",
+    "glide": "blocked; cannot be created by reducing playback speed",
+    "approachLanding": "blocked until deceleration, foot deployment and contact timing are evidenced",
+    "alternatingWalk": "R17 policy preserved but runtime integration remains blocked"
+  },
+  "alphaIssue": "DEFERRED_TO_LARGE_SCREEN_REVIEW",
+  "nextSpecies": {
+    "species": "Passer domesticus",
+    "startAfter": "R0.13.1 source report is exported or persisted without overwriting R17"
+  },
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-pigeon-motion-auto-r0131.html",
+  "openGates": {
+    "viewerRuntimeVerified": false,
+    "allFiveGroupsMeasured": false,
+    "fortyPhaseRecordsCaptured": false,
+    "reportPersisted": false,
+    "wingCycleVisuallyReviewed": false,
+    "independentCommercialSafeMotionGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
