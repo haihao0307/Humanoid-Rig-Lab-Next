@@ -5,6 +5,7 @@ on:
     paths:
       - 'clothing/ShortsDualTubeR2.js'
       - 'tools/apply-shorts-r23-dual-tube.mjs'
+      - 'tools/apply-shorts-r23-dual-separation-fix.mjs'
       - 'tools/test-shorts-dual-tube-r2.mjs'
       - 'tools/review-shorts-dual-tube-r23.mjs'
       - '.github/workflows/shorts-r23-dual-tube-review.yml'
@@ -23,6 +24,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Separate the two open rise workspaces
+        run: node tools/apply-shorts-r23-dual-separation-fix.mjs
       - name: Wire canonical R2.3b dual-tube source
         run: node tools/apply-shorts-r23-dual-tube.mjs
       - name: Build and test canonical source
@@ -42,7 +45,7 @@ jobs:
           test "$GITHUB_REF_NAME" = "fix/shorts-two-leg-assembly-r2-20260919"
           git add source/assembly.json source/runtime.template.js clothing/ClothShorts.js clothing/ShortsDualTubeR2.js index.html
           if ! git diff --cached --quiet; then
-            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat(shorts): form independent left and right R2.3b tubes'
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat(shorts): form separated left and right R2.3b tubes'
             git push origin HEAD:fix/shorts-two-leg-assembly-r2-20260919
           fi
       - name: Install isolated browser dependency
