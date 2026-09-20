@@ -1,4 +1,4 @@
-name: QA fast visible human hand gestures
+name: QA real Compact human hand gestures
 
 on:
   push:
@@ -10,13 +10,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: qa-fast-visible-human-hand-gestures
+  group: qa-real-compact-human-hand-gestures
   cancel-in-progress: true
 
 jobs:
   visible-gestures:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,7 +38,7 @@ jobs:
           command -v google-chrome || command -v google-chrome-stable || command -v chromium
           command -v xvfb-run
 
-      - name: Build visible lightweight workbench
+      - name: Build real reconstructed-character workbench
         id: target
         shell: bash
         run: |
@@ -59,21 +59,26 @@ jobs:
                   raise SystemExit(f'{path}: marker count {data.count(marker)}')
               file.write_bytes(data.replace(marker, marker+insertion, 1))
 
+          # Preserve the real Compact body.  Hair is outside this hand-motion
+          # review and would otherwise start a second reconstruction job.
           patch(
               'body/CompactWorkbench.js',
-              b"async function installCompactWorkbench(lab,pending){",
-              b"\n  const motionVisualTest=new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest');\n  if(motionVisualTest){pending?.catch?.(()=>{});cancelCompactSurface('fast visible gesture QA');window.__motionVisualQAFallback={active:true,renderer:'procedural-fallback',motionEvidence:true,skinApproval:false};window.__compactLoading={quality:'qa-fallback',job:'surface',state:'ready',group:'ready',message:'fast visible gesture QA',startedAt:performance.now(),updatedAt:performance.now()};lab.renderer.setQuality('fast');if(!lab.hair?.inStudio?.())lab.focus('body');needsRedraw=true;return;}"
+              b"function scheduleCompactHair(lab){",
+              b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){lab.hairStatus={state:'disabled'};return;}"
           )
+          # The active mother already owns the real Compact surface.  Extra
+          # review-cast NPC bodies are not part of this isolated hand proof.
           patch(
               'control/NPCPopulation.js',
               b"  this.place(actor,position,options.yaw??0);this.pendingIds.add(id);",
-              b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){actor.compact=null;this.pendingIds.delete(id);return actor;}"
+              b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){actor.compact=null;if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};this.pendingIds.delete(id);return actor;}"
           )
           PY
           node tools/build-pure.mjs | tee qa-build-result.json
           test "$(wc -c < index.html)" -gt 1000000
+          sha256sum index.html | tee qa-entrypoint-hash.txt
 
-      - name: Capture three visible gestures
+      - name: Capture three real-character gestures
         env:
           SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
           PUBLIC_URL: ${{ steps.target.outputs.public_url }}
@@ -89,7 +94,7 @@ jobs:
             [[ "$attempt" == 40 ]] && exit 1
             sleep .25
           done
-          timeout --signal=TERM --kill-after=15s 720s \
+          timeout --signal=TERM --kill-after=15s 1200s \
             xvfb-run -a -s "-screen 0 1920x1080x24" \
             python tools/motion_hand_gesture_visible_proof.py \
               --url "$QA_URL" \
@@ -97,47 +102,49 @@ jobs:
               --interactive-url "$PUBLIC_URL" \
               --output gesture-visible | tee gesture-visible.log
 
-      - name: Check visible character evidence
+      - name: Require real Compact renderer evidence
         if: always()
         shell: python
         run: |
           from pathlib import Path
           import json
-          from PIL import Image, ImageStat
           report_path=Path('gesture-visible/browser-run-report.json')
           if not report_path.exists():
               raise SystemExit('missing gesture report')
           data=json.loads(report_path.read_text(encoding='utf-8'))
-          failures=[]; checked=[]
-          for capture in data.get('captures',[]):
-              raw=report_path.parent/capture['raw']
-              state=capture.get('state') or {}; points=state.get('points') or {}; canvas=state.get('canvas') or {}
-              with Image.open(raw) as image:
-                  image=image.convert('RGB')
-                  sx=image.width/max(1,float(canvas.get('clientWidth') or image.width)); sy=image.height/max(1,float(canvas.get('clientHeight') or image.height))
-                  scores=[]
-                  for name in ('head','rightHand','leftHand','hips'):
-                      screen=(points.get(name) or {}).get('screen') or {}
-                      if not screen.get('visible'): continue
-                      x=int(float(screen.get('x',0))*sx); y=int(float(screen.get('y',0))*sy)
-                      patch=image.crop((max(0,x-38),max(0,y-38),min(image.width,x+39),min(image.height,y+39)))
-                      scores.append(sum(ImageStat.Stat(patch).stddev))
-                  checked.append({'id':capture.get('id'),'scores':scores})
-                  if not scores or max(scores)<12: failures.append({'id':capture.get('id'),'scores':scores})
-          Path('gesture-visibility-check.json').write_text(json.dumps({'checked':checked,'failures':failures},ensure_ascii=False,indent=2),encoding='utf-8')
-          if failures: raise SystemExit(str(failures))
+          failures=[]
+          startup=(data.get('startup') or {}).get('realCompact') or {}
+          startup_compact=startup.get('compact') or {}
+          scene=data.get('sceneIsolation') or {}
+          compact=scene.get('compact') or {}
+          if data.get('status') not in {'CAPTURED','CAPTURED_WITH_FAILURES'}:
+              failures.append('capture status='+str(data.get('status')))
+          for label,value in [('startup.visible',startup_compact.get('visible')),('startup.boundToActive',startup_compact.get('boundToActive')),('scene.visible',compact.get('visible')),('scene.boundToActive',compact.get('boundToActive'))]:
+              if value is not True: failures.append(label+'='+repr(value))
+          for label,value in [('startup.chunks',startup_compact.get('chunks',0)),('startup.triangles',startup_compact.get('triangles',0)),('scene.chunks',compact.get('chunks',0)),('scene.triangles',compact.get('triangles',0))]:
+              if not isinstance(value,(int,float)) or value<=0: failures.append(label+'='+repr(value))
+          captures=data.get('captures') or []
+          if len(captures)!=3: failures.append('capture count='+str(len(captures)))
+          for capture in captures:
+              raw=report_path.parent/capture.get('raw','')
+              if not raw.is_file() or raw.stat().st_size<50000:
+                  failures.append('missing/small image '+str(raw))
+          result={'status':data.get('status'),'startupCompact':startup_compact,'sceneCompact':compact,'captures':[c.get('id') for c in captures],'failures':failures}
+          Path('real-compact-check.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+          if failures: raise SystemExit('\n'.join(failures))
 
       - name: Upload gesture evidence
         if: always() && hashFiles('gesture-visible/browser-run-report.json') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: qa-fast-visible-hand-gestures-${{ steps.target.outputs.short_sha }}
+          name: qa-real-compact-hand-gestures-${{ steps.target.outputs.short_sha }}
           path: |
             gesture-visible
             gesture-visible.log
-            gesture-visibility-check.json
+            real-compact-check.json
             http-server.log
             qa-build-result.json
+            qa-entrypoint-hash.txt
           if-no-files-found: error
           compression-level: 6
           retention-days: 30
