@@ -1,10 +1,17 @@
 {
   "schema": "kaopu/source-bird-replica-contract@1.0",
-  "revision": "Original-Bird-R0.16",
+  "revision": "Original-Bird-R0.16.1",
   "date": "2026-09-21",
   "status": "ACTIVE_SOURCE_REPLICATION_ONLY",
-  "executionRole": "CRAFTSMAN_REPLICATION_NOT_CREATIVE_GENERATION",
-  "userInstruction": "Study the supplied C-draft exactly and convert its source data into KAOPU format. Do not redraw, redesign, beautify, reinterpret, or generate a replacement bird.",
+  "executionRole": "CRAFTSMAN_LEARNING_REPLICATION_EXECUTION",
+  "userInstruction": "Study the supplied C-draft exactly, convert its source data into KAOPU format, keep executing, and do not redraw, redesign, beautify, reinterpret, or generate a replacement bird.",
+  "terminologyPolicy": {
+    "status": "ACTIVE_HARD_POLICY",
+    "forbiddenSequenceCodepoints": ["U+4E89", "U+6D41"],
+    "preferredTerms": ["学习", "观察", "测量", "复刻", "记录", "校验", "转换", "执行"],
+    "repositoryTextScanRequired": true,
+    "scope": ["conversation", "repository", "runtime UI", "reports", "exports", "pull requests", "commits", "handoffs"]
+  },
   "currentAuthoritativeSource": {
     "assetId": "BIRD-REF-004",
     "file": "seagull(2).glb",
@@ -42,7 +49,7 @@
       "hindlimb": "ABSENT_FROM_SKIN_JOINTS",
       "feather": "NOT_EXPLICIT",
       "unknown": [
-        "legs and feet cannot be distilled from the skin joint list",
+        "legs and feet cannot be learned from the skin joint list",
         "beak articulation is not explicit",
         "exact gull species is unresolved"
       ]
@@ -86,7 +93,9 @@
     "no topology conversion presented as a faithful replica",
     "no exact-species claim from the generic seagull title",
     "no natural-scale claim from the source coordinate system",
-    "no promotion of generic or artist nodes to anatomical truth without evidence"
+    "no promotion of generic or artist nodes to anatomical truth without evidence",
+    "no use of the prohibited two-codepoint wording defined above",
+    "no extended conversation in place of execution evidence"
   ],
   "deletedWrongRoute": {
     "revision": "R0.15/R0.15.1",
@@ -103,6 +112,7 @@
   "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r016.html",
   "exportSchema": "kaopu/source-bird-replica@1.0",
   "openGates": {
+    "terminologyRepositoryScanPassed": false,
     "completeNodeHierarchyCaptured": false,
     "allReadableLocalMatricesCaptured": false,
     "materialAndTextureRecordsCaptured": false,
