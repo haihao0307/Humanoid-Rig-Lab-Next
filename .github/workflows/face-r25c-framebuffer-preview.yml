@@ -5,6 +5,10 @@ on:
     branches:
       - feature/face-features-r25-20260919
     paths:
+      - body/FaceAnatomy.js
+      - body/CharacterPresets.js
+      - body/SkinAppearance.js
+      - tools/capture-face-r25-progress.cjs
       - .github/workflows/face-r25c-framebuffer-preview.yml
   workflow_dispatch:
 
@@ -28,15 +32,18 @@ jobs:
           node tools/build-pure.mjs
           node tools/check-pure.mjs
           node tools/check-face-r25-baseline.mjs
-      - name: Verify clean-face source state
+          node tools/check-skin-appearance.mjs
+          node tools/test-beard-anatomy.mjs
+      - name: Verify current-character clean-face state
         shell: node {0}
         run: |
           const fs=require('node:fs');
           const face=fs.readFileSync('body/FaceAnatomy.js','utf8');
           const skin=fs.readFileSync('body/SkinAppearance.js','utf8');
           const preset=fs.readFileSync('body/CharacterPresets.js','utf8');
-          if(!face.includes('density:0')||!face.includes('if(beard.report.strands)'))throw Error('clean-shaven production gate missing');
-          if(!skin.includes("redness:0")||!skin.includes('const redness=0;')||!preset.includes('redness:0'))throw Error('neutral redness gate missing');
+          if(!face.includes('density:0')||!face.includes('if(beard.report.strands)'))throw Error('current character clean-shaven gate missing');
+          if(!preset.includes("skin:{baseColor:'#c7a18d',roughness:.60,oil:.15,redness:0}"))throw Error('current character neutral redness gate missing');
+          if(!skin.includes("{key:'redness'")||!skin.includes("const redness=palette==='east-asian'"))throw Error('reusable skin redness controls were removed');
       - name: Install isolated Playwright Chromium
         shell: bash
         run: |
