@@ -23,8 +23,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Retain prior actual-body clearance correction
-        run: node tools/apply-shorts-r23-clearance-fix.mjs
       - name: Wire canonical R2.3b dual-tube source
         run: node tools/apply-shorts-r23-dual-tube.mjs
       - name: Build and test canonical source
