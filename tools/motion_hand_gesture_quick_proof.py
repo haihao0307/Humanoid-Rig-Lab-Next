@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Fast deterministic real-browser proof for standing hand gestures."""
+"""Fast deterministic real-browser proof for standing hand gestures.
+
+The production task and pose runtime remains authoritative. Simulation steps
+are executed in browser-local batches to avoid Selenium round-trip timeouts;
+this changes only the proof harness, not any character motion.
+"""
 from __future__ import annotations
 
 import argparse
@@ -7,8 +12,47 @@ import contextlib
 import json
 from pathlib import Path
 
-import motion_hand_visual_proof_fast3  # live renderer readiness + batched advancement
+import motion_hand_visual_proof_fast3  # actual renderer readiness
 import motion_hand_visual_proof_fast as proof
+
+
+def step_to(driver, phases: set[str], minimum_phase_time: float, maximum_steps: int = 150, dt: float = .04):
+    return proof.body_js(
+        driver,
+        """
+        const lab=HumanLab,a=lab.agent,phases=new Set(arguments[0]);
+        const minT=arguments[1],maxSteps=arguments[2],dt=arguments[3];
+        lab.setAuto(false);let reached=false,steps=0;
+        for(;steps<maxSteps;steps++){
+          lab.advance(dt);
+          if(a.error)break;
+          if(phases.has(a.phase)&&Number(a.phaseT||0)>=minT){reached=true;break;}
+        }
+        lab.render();
+        return{reached,steps:steps+1,phase:a.phase,phaseT:Number(a.phaseT||0),error:a.error||null,
+          completed:Number(a.stats?.completed||0),failed:Number(a.stats?.failed||0),readyForTask:a.activity().readyForTask===true};
+        """,
+        sorted(phases), minimum_phase_time, maximum_steps, dt,
+    )
+
+
+def settle(driver, before: int, maximum_steps: int = 240, dt: float = .04):
+    return proof.body_js(
+        driver,
+        """
+        const lab=HumanLab,a=lab.agent,before=arguments[0],maxSteps=arguments[1],dt=arguments[2];
+        lab.setAuto(false);let settled=false,steps=0;
+        for(;steps<maxSteps;steps++){
+          lab.advance(dt);
+          if(a.error)break;
+          const activity=a.activity();
+          if(Number(a.stats?.completed||0)>before&&activity.readyForTask===true){settled=true;break;}
+        }
+        lab.render();return{settled,steps:steps+1,phase:a.phase,phaseT:Number(a.phaseT||0),error:a.error||null,
+          completed:Number(a.stats?.completed||0),failed:Number(a.stats?.failed||0),readyForTask:a.activity().readyForTask===true};
+        """,
+        before, maximum_steps, dt,
+    )
 
 
 def main() -> int:
@@ -20,7 +64,7 @@ def main() -> int:
     args=parser.parse_args()
     root=Path(args.output).resolve();root.mkdir(parents=True,exist_ok=True)
     report={
-        'schema':'human/motion_hand_gesture_quick_proof@2',
+        'schema':'human/motion_hand_gesture_quick_proof@3',
         'sourceSHA':args.source_sha,'testedURL':args.url,'interactiveURL':args.interactive_url,
         'startedAt':proof.now(),'status':'INCONCLUSIVE','captures':[],'scenarioFailures':[],
         'surfaceReviewScope':'motion-preview-lightweight-fallback','skinApproval':False,
@@ -28,21 +72,27 @@ def main() -> int:
     }
     driver=None
     try:
-        driver=proof.driver_new();report['startup']=proof.load(driver,args.url)
+        driver=proof.driver_new();driver.set_script_timeout(180);report['startup']=proof.load(driver,args.url)
         cases=(
-            # The current parser routes 挥手 and 打招呼 through the same greet
-            # action. Preserve that source fact instead of inventing a distinct
-            # wave phase in the proof harness.
+            # Current parser maps 挥手 and 打招呼 to the same greet source.
             ('01-wave','挥手（当前与打招呼共用动作源）','挥手',{'wave','greet'},.45,['rightUpperArm','rightForearm','rightHand','head']),
             ('02-salute','敬礼','敬礼',{'salute'},.35,['rightUpperArm','rightForearm','rightHand','head']),
             ('03-greet','打招呼（当前与挥手共用动作源）','打招呼',{'greet'},.35,['rightUpperArm','rightForearm','rightHand','leftHand','head']),
         )
         for stem,label,command,phases,min_t,names in cases:
             try:
-                proof.inspect(driver,'front',False);started=proof.issue(driver,command);before=int(started['before'])
-                state=proof.advance_until(driver,lambda s,ps=phases,t=min_t:s.get('phase') in ps and float(s.get('phaseT') or 0)>=t,240,label)
+                proof.inspect(driver,'front',False)
+                started=proof.issue(driver,command);before=int(started['before'])
+                state=step_to(driver,phases,min_t)
+                if state.get('error'):raise RuntimeError(state['error'])
+                if not state.get('reached'):raise RuntimeError(f"未到目标阶段，实际 {state.get('phase')} t={state.get('phaseT')}")
                 report['captures'].append(proof.capture(driver,root,stem,label,names,f"实际阶段：{state.get('phase')}｜固定正面镜头"))
-                proof.finish(driver,before,label,420)
+                end=settle(driver,before)
+                if end.get('error'):raise RuntimeError(end['error'])
+                if not end.get('settled'):
+                    # Keep the captured evidence but record that transition-out
+                    # did not settle within the bounded proof window.
+                    report['scenarioFailures'].append(stem+'-transition-out')
             except Exception as exc:
                 report['scenarioFailures'].append(stem)
                 report['captures'].append(proof.capture(driver,root,stem,label,names,'',False,f'{type(exc).__name__}: {exc}'))
