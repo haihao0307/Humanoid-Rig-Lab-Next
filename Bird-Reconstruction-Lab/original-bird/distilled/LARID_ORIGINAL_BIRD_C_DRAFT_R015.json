@@ -1,0 +1,156 @@
+{
+  "schema": "bird/larid-original-bird-c-draft@0.0.15",
+  "date": "2026-09-20",
+  "status": "ACTIVE_CONTINUOUS_FUNCTION_C_DRAFT_NOT_VISUAL_ACCEPTANCE",
+  "projectUse": {
+    "game": "Stone Money Island",
+    "environment": "tropical island, reef, lagoon, beach and offshore water",
+    "safeSpeciesLabel": "Laridae seagull candidate",
+    "exactSpecies": "UNRESOLVED"
+  },
+  "method": {
+    "name": "KAOPU / Original Fish transfer to Original Bird C-draft",
+    "route": [
+      "source evidence",
+      "measurement and normalized coordinates",
+      "continuous functions and semantic anchors",
+      "independent generation",
+      "fixed-view reverse comparison",
+      "continuous correction"
+    ],
+    "sourceAssetsAre": "N2 transitional references only",
+    "runtimeDependencyOnSourceGlb": false,
+    "unknownRemainsUnknown": true
+  },
+  "representation": {
+    "canonical": "continuous parametric fields and semantic anchors",
+    "fixedVertexArrayStored": false,
+    "fixedTriangleArrayStored": false,
+    "displayGeometry": "adaptive in-memory sampling from the canonical functions",
+    "importantCorrection": "a rasterized preview still needs transient vertices and triangles; those samples are not the bird identity and may change with tolerance",
+    "exportPayload": "profile coefficients, knots, anchors, constraints, evidence classes and QA metrics only"
+  },
+  "coordinateSystem": {
+    "unit": "normalized body length for C-draft",
+    "realScaleStatus": "UNKNOWN",
+    "axes": {"x": "right-to-left lateral", "y": "ventral-to-dorsal", "z": "caudal-to-cranial"}
+  },
+  "domains": {
+    "body": {
+      "parameters": ["u in [0,1] tail-base to beak-base", "theta in [0,2pi) section angle"],
+      "function": "P_body(u,theta)=C(u)+N(u)*W(u)*supercos(theta,n(u))+B(u)*H(u)*supersin(theta,n(u))",
+      "fields": ["centerline C(u)", "half-width W(u)", "half-height H(u)", "section exponent n(u)", "local twist tau(u)"],
+      "evidenceClass": "SOURCE_GUIDED_CANDIDATE"
+    },
+    "wing": {
+      "parameters": ["side in {-1,+1}", "s in [0,1] root-to-tip", "c in [0,1] leading-to-trailing", "surface in {-1,+1}"],
+      "function": "P_wing(side,s,c,surface)=center(s)+chordFrame(s,c)+camber(s,c)+surface*thickness(s,c)",
+      "fields": ["span curve", "sweep curve", "chord spectrum", "camber field", "thickness field", "dihedral field", "twist field"],
+      "sourceGuidance": "BIRD-REF-004 long-wing chain with BIRD-REF-005 transform comparison",
+      "evidenceClass": "SOURCE_GUIDED_CANDIDATE"
+    },
+    "feather": {
+      "parameters": ["tract identity", "feather index", "r in [0,1] shaft coordinate", "v in [-1,1] vane coordinate"],
+      "function": "P_feather=shaft(r)+v*halfWidth(r)*vaneDirection(r)+camber(r,v)*normal(r)",
+      "tractsInDraft": ["primaries", "secondaries", "rectrices"],
+      "alphaPolicy": "no automatic whole-atlas alpha; feather-tip transparency remains deferred to large-screen UV-island review",
+      "evidenceClass": "STRUCTURAL_CANDIDATE"
+    },
+    "headBeakEye": {
+      "representation": "continuous ellipsoidal head carrier plus separate upper/lower beak and paired eye anchors",
+      "evidenceClass": "SOURCE_GUIDED_CANDIDATE"
+    },
+    "legFoot": {
+      "status": "UNKNOWN_BLOCKED",
+      "reason": "BIRD-REF-004 has no leg/foot joints in the skin and BIRD-REF-005 generic bones are unresolved",
+      "shoreLandingReady": false,
+      "waterSurfaceRestReady": false
+    }
+  },
+  "sourceGuidance": {
+    "primary": {
+      "assetId": "BIRD-REF-004",
+      "file": "seagull(2).glb",
+      "viewerUid": "dc42ffc81c86480e9e7f7752fa134174",
+      "usable": ["long-wing envelope", "coarse bilateral wing chain", "flap/glide-transition candidate"],
+      "notTruth": ["fixed topology", "material", "animation timing", "coordinate scale", "exact species"]
+    },
+    "secondary": {
+      "assetId": "BIRD-REF-005",
+      "file": "seagull2(2).glb",
+      "viewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
+      "usable": ["wing proportion comparison", "generic-bone transform comparison"],
+      "notTruth": ["generic Bone.* semantic identity", "fixed topology", "material", "animation timing", "exact species"]
+    }
+  },
+  "initialCandidateProfile": {
+    "authority": "C_DRAFT_FIT_SEED_NOT_NATURAL_TRUTH",
+    "body": {
+      "uKnots": [0.0, 0.10, 0.28, 0.50, 0.68, 0.82, 0.94, 1.0],
+      "z": [-0.48, -0.40, -0.26, 0.0, 0.19, 0.34, 0.46, 0.53],
+      "centerY": [0.02, 0.025, 0.04, 0.065, 0.09, 0.135, 0.16, 0.145],
+      "halfWidth": [0.045, 0.09, 0.145, 0.17, 0.145, 0.085, 0.105, 0.07],
+      "halfHeight": [0.05, 0.10, 0.165, 0.205, 0.17, 0.10, 0.115, 0.075],
+      "sectionExponent": [2.0, 2.1, 2.35, 2.55, 2.35, 2.05, 2.0, 2.0]
+    },
+    "wing": {
+      "halfSpan": 1.06,
+      "rootZ": 0.12,
+      "sweep": 0.34,
+      "dihedral": 0.055,
+      "tipDrop": 0.03,
+      "chordKnots": [0.0, 0.18, 0.45, 0.72, 0.9, 1.0],
+      "chord": [0.30, 0.36, 0.34, 0.255, 0.14, 0.035],
+      "camber": 0.026,
+      "thickness": 0.016,
+      "twistTipRadians": -0.10
+    },
+    "tail": {"rectrixCount": 10, "length": 0.31, "fanRadians": 0.36},
+    "head": {"scale": [0.105, 0.105, 0.13]},
+    "beak": {"length": 0.13, "baseWidth": 0.045, "baseHeight": 0.04},
+    "eye": {"radius": 0.016, "lateralOffset": 0.083},
+    "palette": {
+      "body": "warm white candidate",
+      "mantle": "light neutral gray candidate",
+      "primaryTips": "charcoal candidate",
+      "beak": "warm yellow candidate",
+      "eye": "dark brown-black candidate"
+    }
+  },
+  "adaptiveSampling": {
+    "profiles": {
+      "preview": {"positionTolerance": 0.026, "angularToleranceDegrees": 16},
+      "balanced": {"positionTolerance": 0.013, "angularToleranceDegrees": 9},
+      "close": {"positionTolerance": 0.006, "angularToleranceDegrees": 5}
+    },
+    "qa": [
+      "changing sampling tolerance must change display vertex and triangle counts",
+      "semantic anchors must remain invariant within numeric tolerance",
+      "fixed-view silhouette drift between sampling levels must remain below the display threshold"
+    ]
+  },
+  "semanticAnchors": [
+    "beak_tip",
+    "eye_left",
+    "eye_right",
+    "wing_root_left",
+    "wing_root_right",
+    "wing_tip_left",
+    "wing_tip_right",
+    "tail_tip_center",
+    "body_center"
+  ],
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-c-draft-r015.html",
+  "runtimeKernel": "Bird-Reconstruction-Lab/original-bird/runtime/original-bird-c-kernel-r015.js",
+  "export": "kaopu/original-bird-c-profile@1.0",
+  "openGates": {
+    "sourceCandidateSideBySideBrowserQaPassed": false,
+    "samplingIndependenceVerified": false,
+    "fixedViewSourceFitMeasured": false,
+    "naturalScaleLocked": false,
+    "legFootContactKernelGenerated": false,
+    "independentCommercialSafeLaridGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
