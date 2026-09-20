@@ -12,6 +12,7 @@ on:
       - 'tools/apply-shorts-r25-principal-centre.mjs'
       - 'tools/apply-shorts-r25-preflight-debug.mjs'
       - 'tools/apply-shorts-r25-sequential-sewing.mjs'
+      - 'tools/apply-shorts-r25-state-test-isolation.mjs'
       - 'tools/test-shorts-gusset-r25.mjs'
       - 'tools/test-shorts-gusset-sewing-r25.mjs'
       - 'tools/review-shorts-gusset-r25.mjs'
@@ -35,6 +36,7 @@ jobs:
         run: |
           mkdir -p /tmp/shorts-r25-gusset
           node tools/apply-shorts-r25-sequential-sewing.mjs
+          node tools/apply-shorts-r25-state-test-isolation.mjs
       - name: Build and test canonical source
         shell: bash
         run: |
@@ -48,7 +50,7 @@ jobs:
       - name: Retain validated canonical source
         run: |
           test "$GITHUB_REF_NAME" = "fix/shorts-two-leg-assembly-r2-20260919"
-          git add source/assembly.json source/runtime.template.js clothing/ClothShorts.js index.html
+          git add source/assembly.json source/runtime.template.js clothing/ClothShorts.js tools/test-shorts-gusset-sewing-r25.mjs index.html
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'feat(shorts): use sequential physical R2.5 gusset sewing'
             git push origin HEAD:fix/shorts-two-leg-assembly-r2-20260919
