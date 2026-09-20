@@ -1,0 +1,51 @@
+{
+  "schema": "bird/columbid-mobile-ui@0.0.12.3",
+  "date": "2026-09-20",
+  "status": "ACTIVE_TOUCH_FIRST_PRODUCTION_UI",
+  "target": {
+    "primaryViewport": "390x844 portrait",
+    "supportedOrientation": ["portrait", "landscape"],
+    "minimumTouchTargetPx": 44,
+    "viewportUnit": "100dvh",
+    "safeAreaInsets": true
+  },
+  "hub": {
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r0123.html",
+    "defaultStage": "alpha",
+    "defaultMobileState": "viewer full-screen with drawers closed",
+    "stageNavigation": "bottom dock plus off-canvas stage drawer",
+    "statusNavigation": "off-canvas status drawer",
+    "desktopBehaviorRetained": true
+  },
+  "alphaWorkbench": {
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-mobile-r0123.html",
+    "defaultViewer": "calibrated alpha result",
+    "comparisonModel": "single-view toggle between source and calibrated result; no permanent narrow split",
+    "controls": "bottom dock plus parameter bottom sheet",
+    "audit": "bottom audit sheet with source atlas, mask, material and visible-difference metrics",
+    "defaultView": "wing-tip close-up",
+    "defaultFovDegrees": 24
+  },
+  "requirements": [
+    "no stage sidebar visible on first paint",
+    "3D viewport owns the full content area between header and bottom dock",
+    "source and calibrated viewers switch with one tap",
+    "parameter and audit sheets close after tapping backdrop or Done",
+    "all buttons use at least 44px touch targets",
+    "Safari safe-area insets are respected",
+    "title and status text truncate instead of widening the layout",
+    "no horizontal document scrolling",
+    "the mobile page remains operable without pinch zoom"
+  ],
+  "openGates": {
+    "iphonePortraitVisualQaPassed": false,
+    "iphoneLandscapeVisualQaPassed": false,
+    "androidPortraitVisualQaPassed": false,
+    "touchTargetsVerified": false,
+    "drawerOpenCloseVerified": false,
+    "viewerPanOrbitZoomVerified": false,
+    "alphaBeforeAfterToggleVerified": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
