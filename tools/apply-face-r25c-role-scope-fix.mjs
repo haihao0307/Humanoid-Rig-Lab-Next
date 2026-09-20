@@ -35,26 +35,18 @@ writeFileSync(skinPath,skin,'utf8');
 
 const checkPath='tools/check-skin-appearance.mjs';
 let check=readFileSync(checkPath,'utf8');
-check=replaceOnce(check,
- "check(defaults.redness===0&&eastAsian.every(p=>p.redness===0)&&/const redness=0;/.test(skin),'default and generated faces are neutral without authored cheek blush');",
- "check(defaults.redness>0&&eastAsian.every(p=>p.redness>0)&&/const redness=palette==='east-asian'/.test(skin),'reusable skin palettes retain bounded redness variation');\n check(/function initialCharacterPreset\\(\\).*redness:0/.test(character),'current face mother disables redness in its own character recipe');",
- 'skin source contract');
-check=replaceOnce(check,
- "/baseColor:skinLinearToHex\\(appearance\\.skinColor\\),undertone:0,redness:0/.test(skin)",
- "/baseColor:skinLinearToHex\\(appearance\\.skinColor\\),undertone:0,redness:\\.15/.test(skin)",
- 'legacy tint contract');
+const oldNeutralCheck="check(defaults.redness===0&&eastAsian.every(p=>p.redness===0)&&/const redness=0;/.test(skin),'default and generated faces are neutral without authored cheek blush');";
+const scopedNeutralCheck="check(defaults.redness>0&&eastAsian.every(p=>p.redness>0)&&/const redness=palette==='east-asian'/.test(skin),'reusable skin palettes retain bounded redness variation');\n check(/function initialCharacterPreset\\(\\).*redness:0/.test(character),'current face mother disables redness in its own character recipe');";
+if(check.includes(oldNeutralCheck))check=replaceOnce(check,oldNeutralCheck,scopedNeutralCheck,'skin source contract');
+else if(!check.includes('current face mother disables redness'))throw Error('R25C skin source contract unresolved');
+const oldLegacy="/baseColor:skinLinearToHex\\(appearance\\.skinColor\\),undertone:0,redness:0/.test(skin)";
+const restoredLegacy="/baseColor:skinLinearToHex\\(appearance\\.skinColor\\),undertone:0,redness:\\.15/.test(skin)";
+if(check.includes(oldLegacy))check=replaceOnce(check,oldLegacy,restoredLegacy,'legacy tint contract');
+else if(!check.includes(restoredLegacy))throw Error('R25C legacy tint contract unresolved');
 writeFileSync(checkPath,check,'utf8');
 
-const workflowPath='.github/workflows/face-r25c-framebuffer-preview.yml';
-let workflow=readFileSync(workflowPath,'utf8');
-workflow=replaceOnce(workflow,
- "if(!skin.includes(\"redness:0\")||!skin.includes('const redness=0;')||!preset.includes('redness:0'))throw Error('neutral redness gate missing');",
- "if(!preset.includes(\"skin:{baseColor:'#c7a18d',roughness:.60,oil:.15,redness:0}\"))throw Error('current character neutral redness gate missing');\n          if(!skin.includes(\"{key:'redness'\")||!skin.includes(\"const redness=palette==='east-asian'\"))throw Error('reusable skin redness controls were removed');",
- 'framebuffer source gate');
-writeFileSync(workflowPath,workflow,'utf8');
-
 const docPath='docs/face-knowledge/R25C_CLEAN_SHAVEN_NEUTRAL_SKIN_20260920.md';
-const doc=`# R25C：当前角色无胡须与中性面部肤色
+writeFileSync(docPath,`# R25C：当前角色无胡须与中性面部肤色
 
 日期：2026-09-20  
 分支：\`feature/face-features-r25-20260919\`
@@ -86,7 +78,6 @@ const doc=`# R25C：当前角色无胡须与中性面部肤色
 - [ ] 镜头与参数控制已在本轮新构建中操作：等待浏览器复查；
 - [ ] 公网固定链接已验证：本轮未建立；
 - [x] 只有截图而没有工作台判定失败：截图仅来自真实工作台 QA。
-`;
-writeFileSync(docPath,doc,'utf8');
+`,'utf8');
 
 console.log(JSON.stringify({applied:true,currentCharacter:{beardDensity:0,redness:0},globalSkinPalettePreserved:true}));
