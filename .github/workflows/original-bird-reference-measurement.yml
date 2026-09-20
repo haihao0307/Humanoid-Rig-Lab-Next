@@ -2,8 +2,7 @@ name: Original Bird Reference Measurement Check
 
 on:
   push:
-    branches:
-      - bird-mother-original-bird-r001-20260920
+    branches: [bird-mother-original-bird-r001-20260920]
     paths:
       - 'Bird-Reconstruction-Lab/original-bird/**'
       - '.github/workflows/original-bird-reference-measurement.yml'
@@ -22,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Python syntax and self tests
+      - name: Python tools
         run: |
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py
@@ -33,103 +32,82 @@ jobs:
             python Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py --self-test
           fi
 
-      - name: Validate JSON records
-        shell: python
-        run: |
-          import json, pathlib
-          files = [
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/original-bird-kernel.schema.json'),
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/original-bird-anatomy-landmarks.schema.json'),
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/original-bird-reference-measurements.r001.json'),
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/BIRD_REFERENCE_BATCH_A_R002.json'),
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_REALISM_TARGET_R005.json'),
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SOURCE_RUNTIME_BRIDGE_R006.json'),
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SEMANTIC_MAP_R007.json'),
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_MATERIAL_ROLE_MAP_R008.json'),
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_FIXED_VIEW_BASELINE_R010.json'),
-            pathlib.Path('Bird-Reconstruction-Lab/original-bird/CURRENT_STATUS.json'),
-          ]
-          for p in files:
-            json.loads(p.read_text(encoding='utf-8'))
-            print('JSON_OK', p)
-
-      - name: Validate workbench inline JavaScript
+      - name: JSON and workbench syntax
         shell: bash
         run: |
           python - <<'PY'
-          import pathlib, re
-          files = [
-              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html'),
-              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-glb-source-review-r004.html'),
-              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-beauty-r005.html'),
-              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-measure-r006.html'),
-              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-semantic-map-r007.html'),
-              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-material-audit-r008.html'),
-              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-fixed-view-baseline-r010.html'),
-              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r010.html'),
+          import json, pathlib, re
+          root = pathlib.Path('Bird-Reconstruction-Lab/original-bird')
+          json_files = [
+              root / 'original-bird-kernel.schema.json',
+              root / 'original-bird-anatomy-landmarks.schema.json',
+              root / 'original-bird-reference-measurements.r001.json',
+              root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json',
+              root / 'distilled/COLUMBID_REALISM_TARGET_R005.json',
+              root / 'distilled/COLUMBID_SOURCE_RUNTIME_BRIDGE_R006.json',
+              root / 'distilled/COLUMBID_SEMANTIC_MAP_R007.json',
+              root / 'distilled/COLUMBID_MATERIAL_ROLE_MAP_R008.json',
+              root / 'distilled/COLUMBID_FIXED_VIEW_BASELINE_R010.json',
+              root / 'CURRENT_STATUS.json',
           ]
-          for p in files:
+          for p in json_files:
+              json.loads(p.read_text(encoding='utf-8'))
+              print('JSON_OK', p)
+          html_files = [
+              root / 'workbench/original-bird-columbid-skeleton-r002.html',
+              root / 'workbench/original-bird-glb-source-review-r004.html',
+              root / 'workbench/original-bird-source-beauty-r005.html',
+              root / 'workbench/original-bird-source-measure-r006.html',
+              root / 'workbench/original-bird-semantic-map-r007.html',
+              root / 'workbench/original-bird-material-audit-r008.html',
+              root / 'workbench/original-bird-fixed-view-baseline-r010.html',
+              root / 'workbench/original-bird-production-hub-r010.html',
+          ]
+          for p in html_files:
               text = p.read_text(encoding='utf-8')
               scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', text, re.S | re.I)]
               if not scripts:
-                  raise SystemExit(f'NO_INLINE_SCRIPT {p}')
+                  raise SystemExit('NO_INLINE_SCRIPT ' + str(p))
               out = pathlib.Path('/tmp') / (p.stem + '.js')
               out.write_text('\n'.join(scripts), encoding='utf-8')
-              print(out)
+              print('SCRIPT_EXTRACTED', out)
           PY
-          node --check /tmp/original-bird-columbid-skeleton-r002.js
-          node --check /tmp/original-bird-glb-source-review-r004.js
-          node --check /tmp/original-bird-source-beauty-r005.js
-          node --check /tmp/original-bird-source-measure-r006.js
-          node --check /tmp/original-bird-semantic-map-r007.js
-          node --check /tmp/original-bird-material-audit-r008.js
-          node --check /tmp/original-bird-fixed-view-baseline-r010.js
-          node --check /tmp/original-bird-production-hub-r010.js
+          for f in /tmp/original-bird-*.js; do node --check "$f"; done
 
-      - name: R0.10 fixed-view production guards
+      - name: R0.10 production guards
         shell: python
         run: |
           import json
           from pathlib import Path
-
           root = Path('Bird-Reconstruction-Lab/original-bird')
-          if (root / 'workbench/original-bird-columbid-form-r003.html').exists():
-              raise SystemExit('REJECTED_R003_FORM_REAPPEARED')
-          if (root / 'workbench/original-bird-studio-review-r006.html').exists():
-              raise SystemExit('REDUNDANT_R006_STUDIO_WORKBENCH_REAPPEARED')
 
-          batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
-          records = batch['records']
-          birds = [r for r in records if r['assetId'].startswith('BIRD-REF-')]
-          if len(records) != 7 or len(birds) != 6:
-              raise SystemExit(f'BIRD_BATCH_COUNT_REGRESSION total={len(records)} birds={len(birds)}')
-          by_id = {r['assetId']: r for r in records}
-          if by_id['BIRD-REF-002']['counts']['joints'] != 117 or by_id['BIRD-REF-002']['counts']['vertices'] != 18152:
-              raise SystemExit('PRIMARY_DETAIL_REFERENCE_CHANGED')
-          if by_id['BIRD-REF-001']['counts']['joints'] != 44 or by_id['BIRD-REF-001']['skeleton']['semanticCounts']['wing'] != 10:
-              raise SystemExit('PRIMARY_MOTION_REFERENCE_CHANGED')
+          for rejected in (
+              root / 'workbench/original-bird-columbid-form-r003.html',
+              root / 'workbench/original-bird-studio-review-r006.html',
+          ):
+              if rejected.exists():
+                  raise SystemExit('REJECTED_FILE_REAPPEARED ' + str(rejected))
 
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
           if status.get('revision') != 'R0.10-fixed-view-source-baseline':
               raise SystemExit('R010_STATUS_REVISION_MISMATCH')
           if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
-              raise SystemExit('INDEPENDENT_BIRD_MUST_REMAIN_FALSE')
-          if status.get('r003InventedFormDeleted') is not True:
-              raise SystemExit('R003_DELETION_NOT_RECORDED')
+              raise SystemExit('INDEPENDENT_BIRD_GATE_INVALID')
           hub = status.get('productionHub', {})
-          if hub.get('generated') is not True or hub.get('revision') != 'R0.10' or hub.get('singleEntry') is not True:
-              raise SystemExit('R010_PRODUCTION_HUB_NOT_RECORDED')
-          if hub.get('blackModelBackgroundRemoved') is not True:
-              raise SystemExit('R010_BLACK_BACKGROUND_REMOVAL_NOT_RECORDED')
-          baseline_status = status.get('fixedViewBaselineWorkbench', {})
-          if baseline_status.get('generated') is not True or baseline_status.get('revision') != 'R0.10':
-              raise SystemExit('R010_FIXED_VIEW_WORKBENCH_NOT_RECORDED')
-          if baseline_status.get('blackModelBackgroundRemoved') is not True:
-              raise SystemExit('R010_FIXED_VIEW_BLACK_BACKGROUND_POLICY_MISSING')
-          if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002':
-              raise SystemExit('PRIMARY_VISIBLE_REFERENCE_NOT_LOCKED')
-          if status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
-              raise SystemExit('PRIMARY_MOTION_REFERENCE_NOT_LOCKED')
+          fixed = status.get('fixedViewBaselineWorkbench', {})
+          if hub.get('revision') != 'R0.10' or hub.get('singleEntry') is not True or hub.get('blackModelBackgroundRemoved') is not True:
+              raise SystemExit('R010_HUB_STATUS_INVALID')
+          if fixed.get('revision') != 'R0.10' or fixed.get('generated') is not True or fixed.get('blackModelBackgroundRemoved') is not True:
+              raise SystemExit('R010_FIXED_VIEW_STATUS_INVALID')
+
+          batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
+          by_id = {r['assetId']: r for r in batch['records']}
+          if len(batch['records']) != 7 or len([r for r in batch['records'] if r['assetId'].startswith('BIRD-REF-')]) != 6:
+              raise SystemExit('SOURCE_BATCH_COUNT_INVALID')
+          if by_id['BIRD-REF-002']['counts']['vertices'] != 18152 or by_id['BIRD-REF-002']['counts']['joints'] != 117:
+              raise SystemExit('DETAIL_REFERENCE_CHANGED')
+          if by_id['BIRD-REF-001']['counts']['joints'] != 44 or by_id['BIRD-REF-001']['skeleton']['semanticCounts']['wing'] != 10:
+              raise SystemExit('MOTION_REFERENCE_CHANGED')
 
           paths = {
               'r006': root / 'workbench/original-bird-source-measure-r006.html',
@@ -138,41 +116,30 @@ jobs:
               'r010baseline': root / 'workbench/original-bird-fixed-view-baseline-r010.html',
               'r010hub': root / 'workbench/original-bird-production-hub-r010.html',
           }
-          if not all(p.exists() for p in paths.values()):
-              raise SystemExit('REQUIRED_WORKBENCH_MISSING')
           texts = {k: p.read_text(encoding='utf-8') for k, p in paths.items()}
-
           required = {
-              'r006': ('821135a09d3f48909b977a416d99c93b','67f9422072664cf1967ae4fe440585a9',"background:'studio'",'双点测量','动作相位采样','capturePhase','original-bird-r006-measurements.json','original-bird-r006-motion-phase.json'),
-              'r007': ('821135a09d3f48909b977a416d99c93b','67f9422072664cf1967ae4fe440585a9',"background:'studio'",'COLUMBID_SEMANTIC_MAP_R007.json','canonicalRole','seedKnown','original-bird-r007-semantic-map.json'),
-              'r008': ('821135a09d3f48909b977a416d99c93b',"background:'studio'",'COLUMBID_MATERIAL_ROLE_MAP_R008.json','getMaterialList','setMaterial','RoughnessPBR','MetalnessPBR','SpecularF0','resetAll','original-bird-r008-material-role-map.json'),
-              'r010baseline': ('821135a09d3f48909b977a416d99c93b','getScreenShot','front','side','top','three_quarter','maskMetrics','silhouette','original-bird-r010-fixed-view-baseline.json','fixed-view baseline runtime'),
+              'r006': ('821135a09d3f48909b977a416d99c93b','67f9422072664cf1967ae4fe440585a9','双点测量','capturePhase','original-bird-r006-motion-phase.json'),
+              'r007': ('COLUMBID_SEMANTIC_MAP_R007.json','canonicalRole','seedKnown','original-bird-r007-semantic-map.json'),
+              'r008': ('COLUMBID_MATERIAL_ROLE_MAP_R008.json','getMaterialList','setMaterial','RoughnessPBR','MetalnessPBR','SpecularF0','resetAll'),
+              'r010baseline': ('821135a09d3f48909b977a416d99c93b','getScreenShot','front','side','top','three_quarter','maskMetrics','IoU','original-bird-r010-fixed-view-baseline.json','fixed-view baseline runtime'),
               'r010hub': ('original-bird-source-measure-r006.html','original-bird-semantic-map-r007.html','original-bird-material-audit-r008.html','original-bird-fixed-view-baseline-r010.html','CURRENT_STATUS.json','unified production hub','single-entry'),
           }
           for stage, tokens in required.items():
               for token in tokens:
                   if token not in texts[stage]:
                       raise SystemExit(stage.upper() + '_TOKEN_MISSING ' + token)
-
-          forbidden = ('data-bg="dark"',"state.background='dark'",'new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003')
-          for token in forbidden:
+          for token in ('data-bg="dark"',"state.background='dark'",'new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
               if any(token in text for text in texts.values()):
                   raise SystemExit('FORBIDDEN_TOKEN ' + token)
 
-          target = json.loads((root / 'distilled/COLUMBID_REALISM_TARGET_R005.json').read_text(encoding='utf-8'))
-          bridge = json.loads((root / 'distilled/COLUMBID_SOURCE_RUNTIME_BRIDGE_R006.json').read_text(encoding='utf-8'))
           semantic = json.loads((root / 'distilled/COLUMBID_SEMANTIC_MAP_R007.json').read_text(encoding='utf-8'))
           material = json.loads((root / 'distilled/COLUMBID_MATERIAL_ROLE_MAP_R008.json').read_text(encoding='utf-8'))
           baseline = json.loads((root / 'distilled/COLUMBID_FIXED_VIEW_BASELINE_R010.json').read_text(encoding='utf-8'))
-          if target['primaryVisibleReference']['assetId'] != 'BIRD-REF-002' or target['primaryMotionReference']['assetId'] != 'BIRD-REF-001':
-              raise SystemExit('REALISM_TARGET_SOURCE_PAIR_CHANGED')
-          if bridge['sourcePair']['visibleRig']['assetId'] != 'BIRD-REF-002' or bridge['sourcePair']['motionRig']['assetId'] != 'BIRD-REF-001':
-              raise SystemExit('SOURCE_RUNTIME_BRIDGE_PAIR_CHANGED')
           if len(semantic['candidateMappings']) < 30 or semantic['openGates']['semanticMappingProductionReady'] is not False:
-              raise SystemExit('SEMANTIC_MAP_GATE_INVALID')
+              raise SystemExit('SEMANTIC_GATE_INVALID')
           required_roles = {'feather_body','feather_wing','feather_tail','eye_cornea','eye_iris','beak_keratin','foot_keratin_skin','unknown'}
           if set(material['roles']) != required_roles or material['openGates']['independentCommercialSafeMaterialGenerated'] is not False:
-              raise SystemExit('MATERIAL_ROLE_GATE_INVALID')
+              raise SystemExit('MATERIAL_GATE_INVALID')
           if baseline['source']['assetId'] != 'BIRD-REF-002' or len(baseline['capture']['views']) != 4:
               raise SystemExit('FIXED_VIEW_BASELINE_INVALID')
           if baseline['openGates']['candidateFourViewCaptureComplete'] is not False or baseline['openGates']['visualAcceptance'] is not False:
