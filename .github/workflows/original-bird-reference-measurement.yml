@@ -26,92 +26,119 @@ jobs:
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py
           python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
           python Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py --self-test
-      - name: R0.14 structure, syntax and gates
-        shell: bash
+      - name: R0.15 structure and evidence gates
+        shell: python
         run: |
-          python - <<'PY'
           import json, pathlib, re
           root = pathlib.Path('Bird-Reconstruction-Lab/original-bird')
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
-          contract = json.loads((root / 'distilled/LARID_SEAGULL_PHASE1_R014.json').read_text(encoding='utf-8'))
+          contract = json.loads((root / 'distilled/LARID_ORIGINAL_BIRD_C_DRAFT_R015.json').read_text(encoding='utf-8'))
           batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
-          lab = root / 'workbench/original-bird-seagull-phase1-r014.html'
-          hub = root / 'workbench/original-bird-production-hub-r014.html'
-          pigeon = root / 'workbench/original-bird-pigeon-motion-auto-r0131.html'
+          kernel = root / 'runtime/original-bird-c-kernel-r015.js'
+          lab = root / 'workbench/original-bird-seagull-c-draft-r015.html'
+          hub = root / 'workbench/original-bird-production-hub-r015.html'
+          source_lab = root / 'workbench/original-bird-seagull-phase1-r014.html'
+          kernel_text = kernel.read_text(encoding='utf-8')
           lab_text = lab.read_text(encoding='utf-8')
           hub_text = hub.read_text(encoding='utf-8')
 
-          if status.get('revision') != 'R0.14-tropical-island-seagull-phase1':
+          if status.get('revision') != 'R0.15-larid-original-bird-c-draft':
               raise SystemExit('STATUS_REVISION_MISMATCH')
-          if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
-              raise SystemExit('INDEPENDENT_BIRD_GATE_INVALID')
-          if status['productionHub']['revision'] != 'R0.14' or status['productionHub']['defaultMobileStage'] != 'seagull':
+          if status.get('visualBirdGenerated') is not True or status.get('visualBirdClassification') != 'INDEPENDENT_C_DRAFT_NOT_VISUAL_ACCEPTANCE':
+              raise SystemExit('C_DRAFT_VISUAL_CLASSIFICATION_INVALID')
+          if status.get('continuousSurfaceBirdGenerated') is not True:
+              raise SystemExit('CONTINUOUS_SURFACE_STATUS_INVALID')
+          if status['productionHub']['revision'] != 'R0.15' or status['productionHub']['defaultMobileStage'] != 'c':
               raise SystemExit('HUB_STATUS_INVALID')
-          gull = status.get('seagullPhase1', {})
-          if gull.get('generated') is not True or gull.get('primaryAssetId') != 'BIRD-REF-004' or gull.get('secondaryAssetId') != 'BIRD-REF-005':
-              raise SystemExit('SEAGULL_STATUS_INVALID')
-          if gull.get('dualSourcePhaseCaptureComplete') is not False or gull.get('independentCommercialSafeSeagullGenerated') is not False:
-              raise SystemExit('SEAGULL_RUNTIME_GATES_MUST_REMAIN_FALSE')
-          if status['alphaIssue']['status'] != 'DEFERRED_TO_LARGE_SCREEN_REVIEW':
-              raise SystemExit('ALPHA_DEFER_STATUS_INVALID')
-          if status['deferredSpecies']['species'] != 'Passer domesticus':
-              raise SystemExit('DEFERRED_SPECIES_CHANGED')
+          c = status.get('laridCDraft', {})
+          if c.get('kernelGenerated') is not True or c.get('fixedVertexArrayStored') is not False or c.get('fixedTriangleArrayStored') is not False:
+              raise SystemExit('C_DRAFT_REPRESENTATION_INVALID')
+          if c.get('sourceRuntimeDependency') is not False or c.get('exactSpecies') != 'UNRESOLVED' or c.get('realScaleStatus') != 'UNKNOWN':
+              raise SystemExit('C_DRAFT_EVIDENCE_BOUNDARY_INVALID')
+          if c.get('visualAcceptance') is not False or c.get('productionReady') is not False:
+              raise SystemExit('C_DRAFT_ACCEPTANCE_GATE_INVALID')
 
           by_id = {r['assetId']: r for r in batch['records']}
-          if len(batch['records']) != 7 or len([r for r in batch['records'] if r['assetId'].startswith('BIRD-REF-')]) != 6:
-              raise SystemExit('SOURCE_BATCH_COUNT_INVALID')
-          if by_id['BIRD-REF-004']['counts']['joints'] != 15 or by_id['BIRD-REF-004']['skeleton']['semanticCounts']['wing'] != 8:
-              raise SystemExit('PRIMARY_GULL_REFERENCE_CHANGED')
-          if by_id['BIRD-REF-005']['counts']['joints'] != 21 or by_id['BIRD-REF-005']['skeleton']['semanticCounts']['wing'] != 8:
-              raise SystemExit('SECONDARY_GULL_REFERENCE_CHANGED')
-
-          if contract['projectUse']['game'] != 'Stone Money Island' or contract['projectUse']['exactSpecies'] != 'UNRESOLVED':
-              raise SystemExit('GAME_OR_SPECIES_BOUNDARY_CHANGED')
-          if contract['sourcePair']['primary']['assetId'] != 'BIRD-REF-004' or contract['sourcePair']['secondary']['assetId'] != 'BIRD-REF-005':
+          if by_id['BIRD-REF-004']['counts']['joints'] != 15 or by_id['BIRD-REF-005']['counts']['joints'] != 21:
               raise SystemExit('SEAGULL_SOURCE_PAIR_CHANGED')
-          if contract['sourcePair']['primary']['semanticCounts']['leg'] != 0:
-              raise SystemExit('PRIMARY_LEG_ABSENCE_CHANGED')
-          if contract['boundaries']['shoreLandingReady'] is not False or contract['boundaries']['waterContactReady'] is not False:
-              raise SystemExit('CONTACT_GATE_INVALID')
-          if len(contract['gameZones']) != 4 or contract['openGates']['visualAcceptance'] is not False:
-              raise SystemExit('GAME_PROFILE_OR_ACCEPTANCE_GATE_INVALID')
+          if contract['representation']['fixedVertexArrayStored'] is not False or contract['representation']['fixedTriangleArrayStored'] is not False:
+              raise SystemExit('CONTRACT_FIXED_TOPOLOGY_INVALID')
+          if contract['method']['runtimeDependencyOnSourceGlb'] is not False or contract['method']['unknownRemainsUnknown'] is not True:
+              raise SystemExit('CONTRACT_KAOPU_BOUNDARY_INVALID')
+          if contract['sourceGuidance']['primary']['assetId'] != 'BIRD-REF-004' or contract['sourceGuidance']['secondary']['assetId'] != 'BIRD-REF-005':
+              raise SystemExit('CONTRACT_SOURCE_PAIR_CHANGED')
+          if contract['coordinateSystem']['realScaleStatus'] != 'UNKNOWN' or contract['projectUse']['exactSpecies'] != 'UNRESOLVED':
+              raise SystemExit('SCALE_OR_SPECIES_BOUNDARY_CHANGED')
+          if contract['domains']['legFoot']['status'] != 'UNKNOWN_BLOCKED':
+              raise SystemExit('LEG_FOOT_UNKNOWN_GATE_CHANGED')
+          if len(contract['semanticAnchors']) != 9:
+              raise SystemExit('SEMANTIC_ANCHOR_COUNT_CHANGED')
 
+          required_kernel = (
+              'DEFAULT_LARID_C_PROFILE','evaluateBody','evaluateWing','adaptiveParameters',
+              'buildLaridDisplay','semanticAnchors','exportKaopuCProfile',
+              "representation:'continuous-functions-sampled-in-memory'",
+              'sourceTopologyDependency:false','fixedVertexArrayStored:false','fixedTriangleArrayStored:false'
+          )
+          for token in required_kernel:
+              if token not in kernel_text:
+                  raise SystemExit('KERNEL_TOKEN_MISSING ' + token)
           required_lab = (
               'dc42ffc81c86480e9e7f7752fa134174',
-              '1d3b3cea037f4fb3bc9fbd72013bb94a',
-              'PHASES=[0,.125,.25,.375,.5,.625,.75,.875]',
-              'getNodeMap','getAnimations','getMatrix','runBoth','sampleSource','analyze',
-              'window.__BIRD_R014_REPORT__','original-bird-r014-seagull-report',
-              'kaopu/bird-seabird-game-profile@1.0','original-bird-r014-seagull-game-profile.kaopu',
-              'reef_edge','lagoon','beach','offshore','Laridae seagull candidate'
+              '../runtime/original-bird-c-kernel-r015.js',
+              'buildLaridDisplay','exportKaopuCProfile','verifyIndependence',
+              'preview','balanced','close','sourceTopologyDependency',
+              'original-bird-r015-larid-c-draft.kaopu',
+              'Stone Money Island','UNRESOLVED','UNKNOWN'
           )
           for token in required_lab:
               if token not in lab_text:
                   raise SystemExit('LAB_TOKEN_MISSING ' + token)
           required_hub = (
-              'original-bird-seagull-phase1-r014.html',
-              "let active='seagull'",
-              'Stone Money Island',
-              'single-entry-mobile-first'
+              'original-bird-seagull-c-draft-r015.html',
+              "let active='c'",
+              'continuous profile','single-entry-mobile-first'
           )
           for token in required_hub:
               if token not in hub_text:
                   raise SystemExit('HUB_TOKEN_MISSING ' + token)
-          for token in ('data-bg="dark"',"state.background='dark'",'new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
-              if token in lab_text or token in hub_text:
+          if not source_lab.exists():
+              raise SystemExit('R014_SOURCE_WORKBENCH_MISSING')
+          for token in ('new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
+              if token in kernel_text or token in lab_text or token in hub_text:
                   raise SystemExit('FORBIDDEN_TOKEN ' + token)
-          if not pigeon.exists():
-              raise SystemExit('PIGEON_BASELINE_MISSING')
 
           for p in (lab, hub):
               text = p.read_text(encoding='utf-8')
               scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', text, re.S | re.I)]
               if not scripts:
                   raise SystemExit('NO_INLINE_SCRIPT ' + str(p))
-              out = pathlib.Path('/tmp') / (p.stem + '.js')
+              out = pathlib.Path('/tmp') / (p.stem + '.mjs')
               out.write_text('\n'.join(scripts), encoding='utf-8')
               print('SCRIPT_EXTRACTED', out)
-          print('R014_TROPICAL_ISLAND_SEAGULL_PHASE1_GUARDS_OK')
-          PY
-          node --check /tmp/original-bird-seagull-phase1-r014.js
-          node --check /tmp/original-bird-production-hub-r014.js
+          print('R015_STRUCTURE_GATES_OK')
+      - name: R0.15 kernel runtime and sampling independence
+        shell: bash
+        run: |
+          cp Bird-Reconstruction-Lab/original-bird/runtime/original-bird-c-kernel-r015.js /tmp/original-bird-c-kernel-r015.mjs
+          node --input-type=module - <<'NODE'
+          import {cloneProfile,buildLaridDisplay,exportKaopuCProfile} from 'file:///tmp/original-bird-c-kernel-r015.mjs';
+          const profile=cloneProfile();
+          const results=['preview','balanced','close'].map(q=>buildLaridDisplay(profile,q));
+          const counts=new Set(results.map(r=>`${r.stats.vertices}/${r.stats.triangles}`));
+          if(counts.size!==3)throw new Error('DISPLAY_COUNTS_DO_NOT_CHANGE_WITH_TOLERANCE');
+          for(const r of results){
+            if(r.sourceTopologyDependency!==false)throw new Error('SOURCE_TOPOLOGY_DEPENDENCY_REGRESSION');
+            if(r.stats.vertices<=0||r.stats.triangles<=0)throw new Error('EMPTY_DISPLAY_SAMPLE');
+            if(Object.keys(r.anchors).length!==9)throw new Error('ANCHOR_COUNT_REGRESSION');
+          }
+          const keys=Object.keys(results[0].anchors);let max=0;
+          for(let i=1;i<results.length;i++)for(const k of keys)for(let j=0;j<3;j++)max=Math.max(max,Math.abs(results[i].anchors[k][j]-results[0].anchors[k][j]));
+          if(max>1e-12)throw new Error('SEMANTIC_ANCHOR_DRIFT '+max);
+          const doc=exportKaopuCProfile(profile,{test:true});
+          if(doc.representation.fixedVertexArrayStored!==false||doc.representation.fixedTriangleArrayStored!==false)throw new Error('EXPORT_STORES_FIXED_TOPOLOGY');
+          if(doc.evidence.sourceRuntimeDependency!==false)throw new Error('EXPORT_SOURCE_DEPENDENCY_INVALID');
+          console.log('R015_KERNEL_OK',results.map(r=>r.stats), 'anchorDrift',max);
+          NODE
+          node --check /tmp/original-bird-seagull-c-draft-r015.mjs
+          node --check /tmp/original-bird-production-hub-r015.mjs
