@@ -3,7 +3,8 @@
 
 Production task, motion, contact-IK and physics code remains authoritative.
 The wrapper waits for the reconstructed Compact body, keeps only the active
-actor plus the relevant task box visible, and rejects a state-only/blank proof.
+actor plus the relevant task box visible, and captures WebGL before its default
+framebuffer is cleared.
 """
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ from typing import Any
 
 import motion_hand_visual_proof_full_adapter as adapter
 import motion_hand_visual_proof_fast as implementation
+from motion_hand_canvas_capture import capture_canvas
 
 
 def visible_proof_scene(driver, keep: str | None = None):
@@ -46,7 +48,7 @@ def visible_proof_scene(driver, keep: str | None = None):
         for(const el of document.querySelectorAll('[class*=label],.object-label,.zone-label'))el.style.visibility='hidden';
         r.studioMode=true;r.background=[.035,.045,.055];compact.prepare?.('skin');lab.render();
         if(compact.visible!==true)throw Error('功能动作截图中的真实 Compact 人物未进入绘制状态');
-        return{mode:'real-compact-functional-hand-v2',keep:keep||null,taskObjects,hiddenSceneItems,hiddenOtherActors,
+        return{mode:'real-compact-functional-hand-v3',keep:keep||null,taskObjects,hiddenSceneItems,hiddenOtherActors,
           activeId:active?.id||null,compact:{enabled:compact.enabled!==false,visible:compact.visible===true,
           chunks:compact.chunks?.length||0,triangles:compact.report?.triangles||0,view:compact.view||null,
           boundToActive:compact.boundHuman===lab.human}};
@@ -82,6 +84,9 @@ def load_real_compact(driver, url: str) -> dict[str, Any]:
 
 adapter._proof_scene = visible_proof_scene
 implementation.load = load_real_compact
+implementation.capture = lambda driver, out_dir, stem, label, names, subtitle, completed=True, error=None: capture_canvas(
+    implementation, driver, out_dir, stem, label, names, subtitle, completed, error
+)
 
 
 if __name__ == "__main__":
