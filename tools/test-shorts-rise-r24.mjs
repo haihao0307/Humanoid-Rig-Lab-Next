@@ -31,7 +31,7 @@ test('R2.4 closes only the four leg seams and the two original centre rises',()=
    assert.equal(joined.length,1,'left opening may share only its sewn outseam junction');
    assert.ok(joined[0]===0||joined[0]===seam.pairs.length-1,'shared opening point must be an endpoint');
    assert.ok(leftOutseamPairs.has(pairKey(seam.pairs[joined[0]])),'shared opening point must be the real outseam junction');
-  }else assert.deepEqual(joined,[],seam.id+' joined before its source stitch started');
+  }else assert.equal(joined.length,0,seam.id+' joined before its source stitch started');
  }
  assert.deepEqual(plain(report.futureSeamsStarted),[]);
 });
