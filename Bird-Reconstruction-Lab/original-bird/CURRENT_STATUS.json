@@ -1,6 +1,6 @@
 {
-  "schema": "bird/original-bird-status@0.0.11",
-  "revision": "R0.09-unified-production-hub",
+  "schema": "bird/original-bird-status@0.0.12",
+  "revision": "R0.10-fixed-view-source-baseline",
   "date": "2026-09-20",
   "branch": "bird-mother-original-bird-r001-20260920",
   "visualBirdGenerated": false,
@@ -12,70 +12,36 @@
   "r003DeletedPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-form-r003.html",
   "productionHub": {
     "generated": true,
-    "revision": "R0.09",
-    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r009.html",
+    "revision": "R0.10",
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r010.html",
     "singleEntry": true,
     "defaultBackground": "bright studio gray-white",
     "blackModelBackgroundRemoved": true,
     "stages": [
-      {
-        "order": 1,
-        "name": "source measurement and motion sampling",
-        "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-measure-r006.html",
-        "available": true
-      },
-      {
-        "order": 2,
-        "name": "live semantic mapping",
-        "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-semantic-map-r007.html",
-        "available": true
-      },
-      {
-        "order": 3,
-        "name": "live material-role calibration",
-        "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-material-audit-r008.html",
-        "available": true
-      },
-      {
-        "order": 4,
-        "name": "fixed-view source-to-distilled error",
-        "available": false
-      },
-      {
-        "order": 5,
-        "name": "independent Original Bird",
-        "available": false
-      }
+      {"order": 1, "name": "source measurement and motion sampling", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-measure-r006.html", "available": true},
+      {"order": 2, "name": "live semantic mapping", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-semantic-map-r007.html", "available": true},
+      {"order": 3, "name": "live material-role calibration", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-material-audit-r008.html", "available": true},
+      {"order": 4, "name": "fixed-view source baseline and candidate error", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-fixed-view-baseline-r010.html", "available": true},
+      {"order": 5, "name": "independent Original Bird", "available": false}
     ],
     "capabilities": [
       "one-click access to the active Bird production line",
-      "one active child workbench at a time to avoid loading all source viewers simultaneously",
+      "one active child workbench at a time",
       "persistent stage selection",
-      "reload, open-in-new-window and distraction-free model mode",
+      "reload, open-in-new-window and distraction-free modes",
       "live CURRENT_STATUS.json summary",
-      "explicit locked stages for unavailable downstream work"
+      "explicitly locked independent-build stage"
     ]
   },
-  "sourceModelReviewWorkbench": {
-    "revision": "R0.04",
-    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-glb-source-review-r004.html"
-  },
-  "sourceBeautyCalibrationWorkbench": {
-    "revision": "R0.05",
-    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-beauty-r005.html"
-  },
+  "sourceModelReviewWorkbench": {"revision": "R0.04", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-glb-source-review-r004.html"},
+  "sourceBeautyCalibrationWorkbench": {"revision": "R0.05", "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-beauty-r005.html"},
   "sourceMeasurementWorkbench": {
     "generated": true,
     "revision": "R0.06",
     "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-measure-r006.html",
     "defaultBackground": "bright studio gray-white",
     "blackModelBackgroundRemoved": true,
-    "capabilities": [
-      "direct BIRD-REF-002 and BIRD-REF-001 inspection",
-      "bright studio, neutral gray and warm gray backgrounds",
-      "two-point source-model measurement with JSON export",
-      "normalized motion-phase sampling with JSON export"
-    ]
+    "capabilities": ["direct BIRD-REF-002 and BIRD-REF-001 inspection", "two-point source-model measurement with JSON export", "normalized motion-phase sampling with JSON export"]
   },
   "semanticMappingWorkbench": {
     "generated": true,
@@ -83,14 +49,7 @@
     "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-semantic-map-r007.html",
     "defaultBackground": "bright studio gray-white",
     "blackModelBackgroundRemoved": true,
-    "capabilities": [
-      "live source node-name, instanceID and local-transform inspection",
-      "candidate Original Bird role assignment",
-      "evidence-class assignment",
-      "seeded candidate map loading",
-      "persistent mapping edits and JSON export",
-      "candidate mapping separated from anatomical lock"
-    ]
+    "capabilities": ["live source node-name, instanceID and local-transform inspection", "candidate Original Bird role assignment", "evidence-class assignment", "seeded candidate map loading", "persistent mapping edits and JSON export"]
   },
   "materialRoleCalibrationWorkbench": {
     "generated": true,
@@ -98,21 +57,30 @@
     "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-material-audit-r008.html",
     "defaultBackground": "bright studio gray-white",
     "blackModelBackgroundRemoved": true,
+    "capabilities": ["live source material and PBR-channel inspection", "separate feather, cornea, iris, beak and foot candidate roles", "runtime-only calibration", "single/all reset", "persistent mappings and JSON export"]
+  },
+  "fixedViewBaselineWorkbench": {
+    "generated": true,
+    "revision": "R0.10",
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-fixed-view-baseline-r010.html",
+    "defaultBackground": "bright studio gray-white",
+    "blackModelBackgroundRemoved": true,
+    "captureResolution": [1024, 1024],
+    "views": ["front", "side", "top", "three_quarter"],
     "capabilities": [
-      "live BIRD-REF-002 source material list and UID inspection",
-      "source texture-channel count and PBR-factor readout",
-      "separate candidate roles for body feather, wing feather, tail feather, cornea, iris, beak and foot",
-      "runtime-only roughness, metalness and specular calibration",
-      "role-specific candidate presets",
-      "single-material and full-material reset",
-      "persistent role assignments and JSON export",
-      "source asset remains unchanged"
-    ]
+      "automatic four-view source screenshot capture",
+      "source PNG download and baseline JSON export",
+      "foreground bounding box, coverage, centroid and aspect metrics",
+      "optional future candidate PNG loading",
+      "same-view silhouette IoU, bounding-box, centroid and coverage error"
+    ],
+    "boundary": "source baseline generated; independent candidate not yet generated"
   },
   "sourceBackedRealismTarget": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_REALISM_TARGET_R005.json",
   "sourceRuntimeBridge": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SOURCE_RUNTIME_BRIDGE_R006.json",
   "semanticControllerMap": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SEMANTIC_MAP_R007.json",
   "materialRoleMap": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_MATERIAL_ROLE_MAP_R008.json",
+  "fixedViewBaselineContract": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_FIXED_VIEW_BASELINE_R010.json",
   "sourceBatch": {
     "items": 7,
     "birds": 6,
@@ -159,24 +127,27 @@
     "using one plastic material response for feathers, eye, beak and feet",
     "using lighting or material gloss to conceal geometry, skinning or texture defects",
     "promoting candidate semantic or material roles without live verification",
-    "unlocking independent-build stages before measurement, mapping and material gates"
+    "accepting a candidate from one view only"
   ],
   "currentExecutionQueue": [
-    "run browser QA through the R0.09 single-entry production hub",
+    "run browser QA through the R0.10 single-entry production hub",
+    "complete four-view BIRD-REF-002 source capture and baseline export",
     "complete BIRD-REF-002 source measurements and BIRD-REF-001 normalized motion-phase samples",
     "verify semantic candidates against hierarchy, bilateral symmetry, visible skin region and motion participation",
     "identify visible source mesh regions for every source material and complete role separation",
     "reuse R17 wing, tail, foot and behavior interfaces",
-    "build fixed-view source-to-distilled silhouette, landmark and material error readout",
-    "generate an independent commercial-safe Original Bird only after source-backed QA"
+    "generate an independent commercial-safe Original Bird candidate under the fixed-view baseline",
+    "compare candidate and source with four-view silhouette and landmark errors"
   ],
   "openGates": {
     "allHistoricalUserBirdGlbRecovered": false,
     "selectedSourceGlbOnlineBinaryAvailable": false,
-    "r009ProductionHubBrowserQaPassed": false,
+    "r010ProductionHubBrowserQaPassed": false,
     "r006BrightStudioBrowserVisualQaPassed": false,
     "r007SemanticMappingBrowserVisualQaPassed": false,
     "r008MaterialCalibrationBrowserVisualQaPassed": false,
+    "r010FixedViewBaselineBrowserQaPassed": false,
+    "sourceFourViewCaptureComplete": false,
     "sourceLandmarkMeasurementSetComplete": false,
     "liveNodeExistenceVerified": false,
     "sourceNodeSemanticMappingComplete": false,
@@ -188,6 +159,7 @@
     "liveMaterialListCaptured": false,
     "sourceMaterialVisibleRegionsVerified": false,
     "sourceMaterialRoleSeparationComplete": false,
+    "candidateFourViewCaptureComplete": false,
     "sourceToDistilledFixedViewErrorAvailable": false,
     "exactSpeciesIdentityLocked": false,
     "realScaleLocked": false,
