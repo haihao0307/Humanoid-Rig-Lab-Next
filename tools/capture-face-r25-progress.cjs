@@ -30,8 +30,9 @@ const server=http.createServer((req,res)=>{
     page.on('pageerror',error=>errors.push(error.message));
     await page.goto(`http://127.0.0.1:${server.address().port}/index.html?review=face&qa=1`);
     let frame=null;
-    for(let i=0;i<180;i++){
-      frame=page.frames().find(candidate=>candidate.name()==='bodyFrame')||null;
+    for(let i=0;i<240;i++){
+      const handle=await page.locator('#bodyFrame').elementHandle().catch(()=>null);
+      frame=handle?await handle.contentFrame():null;
       if(frame){
         const startup=await frame.evaluate(()=>window.__humanStartup).catch(()=>null);
         if(startup?.status==='failed')throw Error(startup.error||startup.message||'Human startup failed');
@@ -58,44 +59,50 @@ const server=http.createServer((req,res)=>{
       renderer.setInspectionLighting({key:[-.65,.65,1],fill:[.8,.1,.6]});
       renderer.setQuality('fast');
       lab.render();
+      renderer.gl.finish();
     });
 
+    const box=await page.locator('#bodyFrame').boundingBox();
+    if(!box)throw Error('Body frame bounds missing');
+    const viewport=page.viewportSize();
+    const x=Math.max(0,box.x),y=Math.max(0,box.y);
+    const clip={x,y,width:Math.max(1,Math.min(box.width,viewport.width-x)),height:Math.max(1,Math.min(box.height,viewport.height-y)),scale:1};
+    const cdp=await page.context().newCDPSession(page);
     const samples=[];
+    const digests=[];
     for(const item of [{name:'eyes',blink:0},{name:'eyes-half',blink:.5},{name:'eyes-closed',blink:1}]){
       const state=await frame.evaluate(({blink})=>{
         const lab=window.HumanLab,renderer=lab.renderer,gl=renderer.gl;
         lab.face.clearExpression();
         if(blink){lab.face.setWeight('eyeBlinkLeft',blink);lab.face.setWeight('eyeBlinkRight',blink);}
         lab.render();
-        gl.flush();
-        const canvas=gl.canvas;
-        if(!(canvas instanceof HTMLCanvasElement))throw Error('Human renderer canvas missing');
-        const dataURL=canvas.toDataURL('image/png');
+        gl.finish();
         return {
           blink,
-          dataURL,
-          canvas:{width:canvas.width,height:canvas.height},
           camera:{target:[...renderer.target],distance:renderer.distance,yaw:renderer.yaw,pitch:renderer.pitch,projection:renderer.projection},
           triangles:lab.compact.report.triangles,
           eyeAnatomy:lab.compact.report.eyeAnatomy,
           expression:lab.face.expression(),
+          contextLost:gl.isContextLost(),
           glError:gl.getError()
         };
       },item);
-      const encoded=state.dataURL.replace(/^data:image\/png;base64,/,'');
-      delete state.dataURL;
-      if(encoded.length<4096)throw Error(item.name+' canvas capture was empty');
-      const file=path.join(out,item.name+'.png');
-      fs.writeFileSync(file,Buffer.from(encoded,'base64'));
-      samples.push({name:item.name,bytes:fs.statSync(file).size,...state});
-      console.log(item.name+' '+fs.statSync(file).size);
+      await page.waitForTimeout(160);
+      const shot=await cdp.send('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false,clip});
+      if(!shot.data||shot.data.length<4096)throw Error(item.name+' screenshot was empty');
+      const bytes=Buffer.from(shot.data,'base64'),file=path.join(out,item.name+'.png'),digest=crypto.createHash('sha256').update(bytes).digest('hex');
+      fs.writeFileSync(file,bytes);digests.push(digest);
+      samples.push({name:item.name,bytes:bytes.length,sha256:digest,...state});
+      console.log(item.name+' '+bytes.length+' '+digest);
     }
+    await cdp.detach();
+    if(new Set(digests).size<2)throw Error('Eye-state screenshots did not change');
 
     const currentHashes=Object.fromEntries(tracked.map(file=>[file,hash(file)]));
     if(JSON.stringify(hashes)!==JSON.stringify(currentHashes))throw Error('Source changed during diagnosis');
     const result={time:new Date().toISOString(),hashes,errors,samples,productionModified:false,visualAcceptance:false};
     fs.writeFileSync(path.join(out,'capture.json'),JSON.stringify(result,null,2));
-    if(errors.length||samples.some(sample=>sample.glError!==0))throw Error('Runtime errors: '+JSON.stringify({errors,glErrors:samples.filter(sample=>sample.glError)}));
+    if(errors.length||samples.some(sample=>sample.glError!==0||sample.contextLost))throw Error('Runtime errors: '+JSON.stringify({errors,samples:samples.filter(sample=>sample.glError||sample.contextLost)}));
     if(samples.some(sample=>sample.eyeAnatomy?.revision!=='r25b-canthus-owned-aperture-family'))throw Error('Wrong eye revision in actual workbench');
     console.log('CAPTURED '+out);
   }finally{
