@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kaopu.example/schema/original-bird-distillation-card.r002.json",
+  "title": "Original Bird Distillation Card R0.02",
+  "type": "object",
+  "required": ["schema", "identity", "sourceGrade", "fileAudit", "coordinateGate", "anatomy", "motion", "flightEcology", "foragingEcology", "distillationDecision", "validation"],
+  "properties": {
+    "schema": {"const": "bird/original-bird-distillation-card@0.2"},
+    "identity": {
+      "type": "object",
+      "required": ["assetId", "sha256", "sourceFilename", "candidateClade", "exactSpeciesStatus"],
+      "properties": {
+        "assetId": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "geometrySha256": {"type": ["string", "null"]},
+        "sourceFilename": {"type": "string"},
+        "title": {"type": ["string", "null"]},
+        "author": {"type": ["string", "null"]},
+        "license": {"type": ["string", "null"]},
+        "sourceUrl": {"type": ["string", "null"]},
+        "candidateClade": {"type": "string"},
+        "exactSpeciesStatus": {"enum": ["LOCKED", "CANDIDATE", "UNRESOLVED", "NOT_APPLICABLE"]}
+      },
+      "additionalProperties": true
+    },
+    "sourceGrade": {
+      "type": "object",
+      "required": ["authority", "role", "naturalTruthAllowed"],
+      "properties": {
+        "authority": {"enum": ["R0_NATURAL_SCIENTIFIC", "R1_REFERENCE_CALIBRATION", "R2_NUMERIC", "R3_RUNTIME", "R4_VISUAL", "R5_PRODUCT"]},
+        "role": {"type": "array", "items": {"type": "string"}},
+        "naturalTruthAllowed": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "fileAudit": {"type": "object"},
+    "coordinateGate": {
+      "type": "object",
+      "required": ["unitStatus", "forwardAxisStatus", "upAxisStatus", "realScaleStatus"],
+      "properties": {
+        "unitStatus": {"enum": ["LOCKED", "EXPORTER_DECLARED", "UNKNOWN", "ANOMALOUS"]},
+        "forwardAxisStatus": {"enum": ["LOCKED", "INFERRED", "UNKNOWN"]},
+        "upAxisStatus": {"enum": ["LOCKED", "INFERRED", "UNKNOWN"]},
+        "realScaleStatus": {"enum": ["LOCKED", "CANDIDATE", "UNKNOWN"]},
+        "rawBounds": {"type": "object"},
+        "normalizedPcaAspect": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}}
+      },
+      "additionalProperties": true
+    },
+    "anatomy": {
+      "type": "object",
+      "required": ["axial", "pectoral", "hindlimb", "featherAttachment", "unknown"],
+      "properties": {
+        "axial": {"type": "object"},
+        "pectoral": {"type": "object"},
+        "hindlimb": {"type": "object"},
+        "featherAttachment": {"type": "object"},
+        "unknown": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "motion": {
+      "type": "object",
+      "required": ["clips", "timingAuthority", "usableSignals", "rejectedDirectUse"],
+      "properties": {
+        "clips": {"type": "array", "items": {"type": "object"}},
+        "timingAuthority": {"enum": ["R0_MEASURED", "R1_REFERENCE_ONLY", "UNKNOWN"]},
+        "usableSignals": {"type": "array", "items": {"type": "string"}},
+        "rejectedDirectUse": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "flightEcology": {
+      "type": "object",
+      "required": ["flightModes", "habitatCoupling", "evidenceRefs", "unknown"],
+      "properties": {
+        "flightModes": {"type": "array", "items": {"type": "string"}},
+        "habitatCoupling": {"type": "array", "items": {"type": "string"}},
+        "evidenceRefs": {"type": "array", "items": {"type": "string"}},
+        "unknown": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "foragingEcology": {
+      "type": "object",
+      "required": ["guild", "searchMode", "captureMode", "foodOrPrey", "predatorRisk", "evidenceRefs", "unknown"],
+      "properties": {
+        "guild": {"type": "array", "items": {"type": "string"}},
+        "searchMode": {"type": "array", "items": {"type": "string"}},
+        "captureMode": {"type": "array", "items": {"type": "string"}},
+        "foodOrPrey": {"type": "array", "items": {"type": "string"}},
+        "predatorRisk": {"type": "array", "items": {"type": "string"}},
+        "evidenceRefs": {"type": "array", "items": {"type": "string"}},
+        "unknown": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "distillationDecision": {
+      "type": "object",
+      "required": ["usableForKernel", "speciesDeltaOnly", "counterexample", "doNotCopy"],
+      "properties": {
+        "usableForKernel": {"type": "array", "items": {"type": "string"}},
+        "speciesDeltaOnly": {"type": "array", "items": {"type": "string"}},
+        "counterexample": {"type": "array", "items": {"type": "string"}},
+        "doNotCopy": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["numericQA", "semanticQA", "visualQA", "sourceRemovalQA", "acceptedForProduction"],
+      "properties": {
+        "numericQA": {"type": "boolean"},
+        "semanticQA": {"type": "boolean"},
+        "visualQA": {"type": "boolean"},
+        "sourceRemovalQA": {"type": "boolean"},
+        "acceptedForProduction": {"type": "boolean"}
+      }
+    }
+  },
+  "additionalProperties": true
+}
