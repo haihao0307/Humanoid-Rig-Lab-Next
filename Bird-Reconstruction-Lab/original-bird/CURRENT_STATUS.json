@@ -1,11 +1,39 @@
 {
-  "schema": "bird/original-bird-status@0.0.3",
-  "revision": "R0.02.1-skeleton-workbench-runtime-repaired",
+  "schema": "bird/original-bird-status@0.0.4",
+  "revision": "R0.03-first-visible-columbid-form",
   "date": "2026-09-20",
   "branch": "bird-mother-original-bird-r001-20260920",
   "base": "experiment/bird-r57-authoritative-reference-reconstruction-v1",
-  "visualBirdGenerated": false,
+  "visualBirdGenerated": true,
+  "visualFormCandidateGenerated": true,
   "continuousSurfaceBirdGenerated": false,
+  "visibleFormWorkbenchGenerated": true,
+  "visibleFormWorkbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-form-r003.html",
+  "visibleFormWorkbenchRevision": "R0.03",
+  "visibleFormLayers": [
+    "single deformed torso mass",
+    "separate chest and rump masses",
+    "articulated neck and head carriers",
+    "dynamic bilateral wing surfaces",
+    "nine primary-feather carriers per wing",
+    "seven-feather tail array",
+    "articulated legs, feet and toes"
+  ],
+  "visibleFormRuntimeStates": [
+    "stand",
+    "takeoff",
+    "flap",
+    "glide",
+    "approach",
+    "landing"
+  ],
+  "visibleFormNotClaimedAs": [
+    "single continuous skin",
+    "final natural surface truth",
+    "final feather topology",
+    "species-locked pigeon",
+    "production-ready game asset"
+  ],
   "skeletonQaWorkbenchGenerated": true,
   "skeletonQaWorkbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html",
   "skeletonQaWorkbenchRevision": "R0.02.1",
@@ -13,6 +41,7 @@
   "skeletonQaRuntimeBlackScreenFixed": true,
   "skeletonQaBlackScreenRootCause": "strict-mode assignment to undeclared N and E registries stopped execution before the render loop",
   "runtimeRegressionGuardAdded": true,
+  "visibleFormRegressionGuardAdded": true,
   "runtimeRegressionGuardWorkflowRunId": 35495297950,
   "runtimeRegressionGuardConclusion": "success",
   "flockWorkbenchGenerated": false,
@@ -34,6 +63,8 @@
   "firstDeepClade": "Columbidae",
   "columbidKernelR002Created": true,
   "columbidJointMappingR002Created": true,
+  "columbidVisibleFormR003Created": true,
+  "columbidFeatherCarrierR003Created": true,
   "laridDeltaR002Created": true,
   "ardeidDeltaR002Created": true,
   "batExclusionContractR002Created": true,
@@ -47,9 +78,9 @@
   "zipPackageCatalogToolCreated": true,
   "zipPackageCatalogSelfTest": "SELF_TEST_OK",
   "ciWorkflowConfigured": true,
-  "latestCiRemoteStatusObserved": true,
-  "latestCiRemoteConclusion": "success",
-  "latestCiWorkflowRunId": 35495297950,
+  "latestObservedCiRemoteConclusion": "success",
+  "latestObservedCiWorkflowRunId": 35495297950,
+  "visibleFormCiRunPending": true,
   "criticalFindings": [
     "BIRD-REF-001 is useful for coarse bilateral wing phase, leg/toe motion and head-tail coupling, not surface truth.",
     "BIRD-REF-002 provides dense wing, tail, beak, eye and toe attachment controls, but 117 artist controls are not literal anatomical bones and the source license is non-commercial.",
@@ -57,7 +88,8 @@
     "BIRD-REF-004 has a coarse Larid wing chain but no leg joints in the skin, so it cannot support ground or water contact production.",
     "BIRD-REF-005 has mostly generic Bone.* names; manual transform and skin-weight mapping is required before semantic promotion.",
     "BIRD-REF-006 provides long-neck and long-leg Ardeid candidates but lacks foot/toe and distal wrist-manus/feather semantics.",
-    "ANIMAL-BAT-REF-001 is a mammal membrane-wing counterexample and is excluded from the Original Bird shared kernel."
+    "ANIMAL-BAT-REF-001 is a mammal membrane-wing counterexample and is excluded from the Original Bird shared kernel.",
+    "R0.03 produces the first visible massing, but overlapping body masses must not be confused with a continuous anatomical surface."
   ],
   "r17DeliveryManifestRecovered": true,
   "r17FullZipIdentityRecovered": true,
@@ -75,10 +107,12 @@
     "Chroicocephalus ridibundus / red-billed gull taxonomy-biometric candidate"
   ],
   "currentExecutionQueue": [
+    "visually inspect R0.03 mass distribution from fixed front, side, top and three-quarter views",
+    "replace overlapping torso, chest, rump and neck masses with a source-independent continuous carrier surface",
+    "bind coverts, secondaries, primaries and tail feathers to stable attachment fields rather than independent cards",
     "extract normalized phase signals from BIRD-REF-001 and BIRD-REF-002 without copying source cadence",
     "inspect BIRD-REF-005 generic-bone transforms and skin weights for Laridae semantic mapping",
     "supply Ardeidae ankle-foot-toe and distal wrist-manus evidence",
-    "generate source-independent Columbidae continuous body and feather carrier after skeleton QA",
     "run passerine/columbid/larid/ardeid transfer examination",
     "add habitat, foraging, predator-risk and flock state inputs to the HTML production runtime"
   ],
