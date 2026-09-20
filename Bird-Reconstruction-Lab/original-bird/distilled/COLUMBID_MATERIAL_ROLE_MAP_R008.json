@@ -1,0 +1,78 @@
+{
+  "schema": "bird/columbid-material-role-map@0.0.8",
+  "date": "2026-09-20",
+  "authority": "VISUAL_CALIBRATION_CANDIDATE_NOT_MEASURED_NATURAL_TRUTH",
+  "source": {
+    "assetId": "BIRD-REF-002",
+    "file": "pigeon (1)(2).glb",
+    "viewerUid": "821135a09d3f48909b977a416d99c93b"
+  },
+  "principles": [
+    "Do not use one plastic material response for feathers, cornea, beak and feet.",
+    "Preserve source textures while testing channel separation.",
+    "All numeric ranges are calibration candidates until measured or visually accepted.",
+    "Runtime changes in the Viewer do not alter the source asset and do not grant production rights."
+  ],
+  "roles": {
+    "feather_body": {
+      "description": "body contour and covert feather response",
+      "candidateRanges": {"roughness": [0.5, 0.82], "metalness": [0.0, 0.0], "specular": [0.12, 0.35]},
+      "defaultCandidate": {"roughness": 0.68, "metalness": 0.0, "specular": 0.22}
+    },
+    "feather_wing": {
+      "description": "primary, secondary and wing covert response",
+      "candidateRanges": {"roughness": [0.42, 0.75], "metalness": [0.0, 0.0], "specular": [0.15, 0.38]},
+      "defaultCandidate": {"roughness": 0.6, "metalness": 0.0, "specular": 0.25}
+    },
+    "feather_tail": {
+      "description": "rectrix and tail covert response",
+      "candidateRanges": {"roughness": [0.45, 0.78], "metalness": [0.0, 0.0], "specular": [0.15, 0.35]},
+      "defaultCandidate": {"roughness": 0.62, "metalness": 0.0, "specular": 0.23}
+    },
+    "eye_cornea": {
+      "description": "corneal highlight layer separated from iris and surrounding feathers",
+      "candidateRanges": {"roughness": [0.04, 0.2], "metalness": [0.0, 0.0], "specular": [0.55, 1.0]},
+      "defaultCandidate": {"roughness": 0.1, "metalness": 0.0, "specular": 0.8}
+    },
+    "eye_iris": {
+      "description": "iris/pupil color layer below corneal highlight",
+      "candidateRanges": {"roughness": [0.25, 0.55], "metalness": [0.0, 0.0], "specular": [0.15, 0.4]},
+      "defaultCandidate": {"roughness": 0.38, "metalness": 0.0, "specular": 0.25}
+    },
+    "beak_keratin": {
+      "description": "beak keratin response distinct from feather and eye materials",
+      "candidateRanges": {"roughness": [0.25, 0.55], "metalness": [0.0, 0.0], "specular": [0.22, 0.48]},
+      "defaultCandidate": {"roughness": 0.38, "metalness": 0.0, "specular": 0.32}
+    },
+    "foot_keratin_skin": {
+      "description": "scaled foot skin, claws and keratin response",
+      "candidateRanges": {"roughness": [0.45, 0.78], "metalness": [0.0, 0.0], "specular": [0.12, 0.35]},
+      "defaultCandidate": {"roughness": 0.62, "metalness": 0.0, "specular": 0.22}
+    },
+    "unknown": {
+      "description": "unclassified source material; do not promote automatically",
+      "candidateRanges": null,
+      "defaultCandidate": null
+    }
+  },
+  "requiredChecks": [
+    "material name and UID captured from live Viewer API",
+    "visible mesh region identified",
+    "source texture presence recorded",
+    "roughness, metalness and specular channels inspected",
+    "neutral gray and warm gray views compared",
+    "no geometry defect concealed by lighting"
+  ],
+  "reviewWorkbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-material-audit-r008.html",
+  "openGates": {
+    "liveMaterialListCaptured": false,
+    "visibleRegionPerMaterialVerified": false,
+    "featherRoleSeparated": false,
+    "eyeRoleSeparated": false,
+    "beakRoleSeparated": false,
+    "footRoleSeparated": false,
+    "materialCalibrationVisuallyAccepted": false,
+    "independentCommercialSafeMaterialGenerated": false,
+    "productionReady": false
+  }
+}
