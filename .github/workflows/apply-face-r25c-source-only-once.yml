@@ -1,0 +1,40 @@
+name: Apply face R25C source only once
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+    paths:
+      - .github/workflows/apply-face-r25c-source-only-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  commit-clean-face:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/face-features-r25-20260919
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply and validate production changes
+        run: |
+          node tools/apply-face-clean-shaven-neutral-skin.mjs
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/check-face-r25-baseline.mjs
+          node tools/test-beard-anatomy.mjs
+      - name: Commit clean-face production result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add body/FaceAnatomy.js body/CharacterPresets.js body/SkinAppearance.js tools/test-beard-anatomy.mjs tools/check-skin-appearance.mjs docs/face-knowledge/R25C_CLEAN_SHAVEN_NEUTRAL_SKIN_20260920.md index.html FILE_AUDIT.json SHA256SUMS.txt
+          git commit -m "face R25C: remove beard and default facial redness"
+          git push origin HEAD:feature/face-features-r25-20260919
