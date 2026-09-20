@@ -1,0 +1,66 @@
+{
+  "schema": "bird/original-bird-clade-delta@0.2",
+  "deltaId": "ORIGINAL-BIRD-LARID-R002",
+  "date": "2026-09-20",
+  "identityBoundary": {
+    "clade": "Laridae candidate",
+    "sourceAssets": ["BIRD-REF-004", "BIRD-REF-005"],
+    "exactSpecies": "UNRESOLVED",
+    "warning": "Generic seagull filenames do not identify Chroicocephalus ridibundus or any red-billed gull species."
+  },
+  "sourceRigEvidence": [
+    {
+      "assetId": "BIRD-REF-004",
+      "canonicalCandidates": {
+        "axial": ["Bn-Back-1_15", "Bn-Back-2_13", "Bn-Back-3_4", "Bn-Neck_3", "Bn-Head_2"],
+        "wing_l": ["Bn-L-Wing-1_8", "Bn-L-Wing-2_7", "Bn-L-Wing-3_6", "Bn-L-Wing-4_5"],
+        "wing_r": ["Bn-R-Wing-1_12", "Bn-R-Wing-2_11", "Bn-R-Wing-3_10", "Bn-R-Wing-4_9"],
+        "tail": ["Bn-Tail_14"]
+      },
+      "acceptedUse": ["coarse four-control wing chain", "flap/glide phase candidate", "long-wing silhouette comparison"],
+      "blocked": ["ground contact", "water contact", "leg/foot gait", "explicit feather attachment", "exact species identity"]
+    },
+    {
+      "assetId": "BIRD-REF-005",
+      "canonicalCandidates": {
+        "wing_l": ["Wing01.L_3", "Wing02.L_2", "Wing02.L.001_1", "Wing02.L.002_0"],
+        "wing_r": ["Wing01.R_9", "Wing02.R_8", "Wing02.R.001_7", "Wing02.R.002_6"]
+      },
+      "manualMappingRequired": ["Bone_19", "Bone.003_5", "Bone.011_4", "Bone.001_11", "Bone.002_10", "Bone.004_18", "Bone.005_14", "Bone.008_13", "Bone.010_12", "Bone.006_17", "Bone.007_16", "Bone.009_15"],
+      "acceptedUse": ["bilateral wing proportion comparison after transform audit"],
+      "blocked": ["automatic axial/leg/tail promotion", "production dependency", "exact species identity"]
+    }
+  ],
+  "cladeDeltaCandidate": {
+    "flightModes": ["flapping transit", "gliding/wind-supported travel", "short aerial prey capture", "approach/landing"],
+    "flightControls": ["wing aspect/length delta", "flap-glide duty cycle", "wind support", "bank/yaw coupling", "tail trim", "landing substrate"],
+    "habitats": ["water bodies", "agricultural land", "urban surfaces", "breeding colony as central place"],
+    "foragingEcology": {
+      "guild": ["opportunistic omnivore", "population-level generalist with individual specialists"],
+      "searchModes": ["colony-centered commuting", "ground/field search", "water-surface search", "short aerial search"],
+      "captureModes": ["ground pick/probe", "surface-water pick", "aerial insect capture"],
+      "foodOrPrey": ["earthworms/invertebrates", "seeds/grain", "fish", "anthropogenic waste", "aerial midges"],
+      "stateVariables": ["colony", "sex", "individual specialization", "season/reproductive state", "wind support"]
+    },
+    "movementEvidenceEnvelope": {
+      "targetEvidenceProfile": "LARID-BLACK-HEADED-GULL-EVIDENCE-ENVELOPE",
+      "trackedSampleMaximumRangeKm": [1, 27],
+      "boundary": "Study envelope only; do not apply as a universal Laridae constant or source-model identity."
+    }
+  },
+  "productionGates": {
+    "manualBoneMappingComplete": false,
+    "legFootContactEvidenceComplete": false,
+    "featherAttachmentEvidenceComplete": false,
+    "exactSpeciesIdentityLocked": false,
+    "sourceIndependentLaridGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "nextExecution": [
+    "inspect skin weights and rest transforms for BIRD-REF-005 generic bones",
+    "derive Larid wing-length and flap-glide delta without copying source mesh",
+    "add ground/water/air capture-state interfaces",
+    "validate against a locked target species before color or plumage production"
+  ]
+}
