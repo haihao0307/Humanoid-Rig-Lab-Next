@@ -10,12 +10,32 @@ const measurement=()=>({unit:'m',waistFrontArc:.4492584307967932,waistBackArc:.3
 const frame=(p,q=[0,0,0,1])=>({p:[...p],q:[...q]});
 function fake(){const m=measurement(),source=new Map([['hips',frame([0,.8112635,.0789258])],['left_femur',frame([-.088,.8112635,.0789258])],['right_femur',frame([.088,.8112635,.0789258])],['T12',frame([0,1.10,.0789258])]]),joints=[{id:'hips'},{id:'left_femur'},{id:'right_femur'},{id:'T12'}],human={sourceBind:source,byId:new Map([...source].map(([id,world])=>[id,{id,world:{p:[...world.p],q:[...world.q]}}])),joints,spine:[joints[3]]};return {human,body:{nodes:[],update(){},measure(){return m;}}};}
 function build(){const pattern=Pattern(measurement(),{columns:3,rows:7,hipRow:2,crotchRow:4}),{human,body}=fake(),state=State(pattern,body,human),cloth=new Cloth(pattern,null,{stitchDofs:true,selfContact:false,triangleBodyContact:false,gravity:0,groundY:null,iterations:8,maxMaterialIterations:16,bendCompliance:40000,sewingSeconds:1000}),rise=Rise(cloth,state.riseState),report=Begin(cloth,state,{...rise,valid:true,materialAtCheckpoint:{valid:true,maxAbsPrincipalStrain:.02}},{materialLimit:.05});return {pattern,state,cloth,report};}
-function closeActiveEdge(cloth,state){const id=state.sewing.order[state.sewing.index],seam=cloth.seams.find(item=>item.id===id);for(const pair of seam.pairs){const a=cloth.particles[pair.a],b=cloth.particles[pair.b],mid=a.pos.map((value,k)=>(value+b.pos[k])/2);a.pos=[...mid];b.pos=[...mid];a.previous=[...mid];b.previous=[...mid];pair.started=true;pair.initialGap=0;if(!cloth.dofs.same(pair.a,pair.b))assert.equal(cloth.dofs.join(pair.a,pair.b,{started:true,closureProgress:1,requirePreviousClosure:true}),true);}seam.progress=1;return id;}
+function dofMembers(cloth,index){return cloth.dofs.report().groups.find(group=>group.members.includes(index))?.members??[index];}
+function closeActiveEdge(cloth,state){
+ const id=state.sewing.order[state.sewing.index],seam=cloth.seams.find(item=>item.id===id);
+ for(const pair of seam.pairs){
+  if(cloth.dofs.same(pair.a,pair.b)){pair.started=true;pair.initialGap=0;continue;}
+  const members=[...new Set([...dofMembers(cloth,pair.a),...dofMembers(cloth,pair.b)])];
+  // Bring complete existing stitch groups together through the same physical
+  // projector used by the solver. Moving only the two named source particles
+  // would tear their already-completed three-way junctions and is invalid.
+  for(let axis=0;axis<3;axis++){
+   const ga=[0,0,0],gb=[0,0,0];ga[axis]=1;gb[axis]=-1;
+   const value=cloth.particles[pair.a].pos[axis]-cloth.particles[pair.b].pos[axis];
+   cloth.dofs.project([pair.a,pair.b],[ga,gb],value);
+  }
+  for(const index of members)cloth.particles[index].previous=[...cloth.particles[index].pos];
+  pair.started=true;pair.initialGap=0;
+  assert.ok(Math.hypot(...cloth.particles[pair.a].pos.map((value,k)=>value-cloth.particles[pair.b].pos[k]))<=cloth.options.stitchJoinToleranceM);
+  assert.equal(cloth.dofs.join(pair.a,pair.b,{started:true,closureProgress:1,requirePreviousClosure:true}),true);
+ }
+ seam.progress=1;return id;
+}
 
 test('R2.5 begins from unchanged flat G instead of demanding a pre-welded opening',()=>{const {state,cloth,report}=build();assert.equal(report.instantaneousBoundaryWeld,false);assert.equal(report.initialGussetGeometry.maximumBoundaryEdgeStrain<1e-8,true);assert.equal(report.initialGussetGeometry.maximumRadialStrain<1e-8,true);assert.equal(state.sewing.order.join(','),'gusset-FL,gusset-FR,gusset-BL,gusset-BR');assert.equal(state.sewing.index,0);assert.ok(Number.isFinite(cloth.seams.find(seam=>seam.id==='gusset-FL').start));for(const id of ['gusset-FR','gusset-BL','gusset-BR'])assert.equal(cloth.seams.find(seam=>seam.id===id).start,Infinity);});
 
 test('accepted R2.4 seams stay closed while waistband and side opening stay dormant',()=>{const {state,cloth}=build();for(const id of state.report.priorClosedSeamIds)assert.ok(cloth.seams.find(seam=>seam.id===id).pairs.every(pair=>pair.started&&cloth.dofs.same(pair.a,pair.b)),id);for(const seam of cloth.seams)if(!state.report.priorClosedSeamIds.includes(seam.id)&&!state.report.gussetSeamIds.includes(seam.id))assert.ok(seam.pairs.every(pair=>!pair.started),seam.id);});
 
-test('directed gusset edges activate one at a time and only after actual spatial equality',()=>{const {state,cloth}=build(),completed=[];for(let i=0;i<4;i++){completed.push(closeActiveEdge(cloth,state));Advance(cloth,state,{});if(i<3){assert.equal(state.sewing.index,i+1);assert.equal(state.sewing.order[state.sewing.index],['gusset-FR','gusset-BL','gusset-BR'][i]);}else assert.equal(state.sewing.complete,true);}assert.deepEqual(completed,['gusset-FL','gusset-FR','gusset-BL','gusset-BR']);for(const id of state.report.gussetSeamIds)assert.ok(cloth.seams.find(seam=>seam.id===id).pairs.every(pair=>cloth.dofs.same(pair.a,pair.b)),id);});
+test('directed gusset edges activate one at a time and only after actual spatial equality',()=>{const {state,cloth}=build(),completed=[];Advance(cloth,state,{});assert.equal(state.sewing.index,0);for(let i=0;i<4;i++){completed.push(closeActiveEdge(cloth,state));Advance(cloth,state,{});if(i<3){assert.equal(state.sewing.index,i+1);assert.equal(state.sewing.order[state.sewing.index],['gusset-FR','gusset-BL','gusset-BR'][i]);}else assert.equal(state.sewing.complete,true);}assert.deepEqual(completed,['gusset-FL','gusset-FR','gusset-BL','gusset-BR']);for(const id of state.report.gussetSeamIds)assert.ok(cloth.seams.find(seam=>seam.id===id).pairs.every(pair=>cloth.dofs.same(pair.a,pair.b)),id);});
 
 test('source material identity and mass remain unchanged at the sewing boundary',()=>{const {cloth,report}=build(),after=JSON.stringify(cloth.particles.map(p=>({uv:p.uv,mass:p.mass,pieceId:p.pieceId}))),mass=cloth.particles.reduce((sum,p)=>sum+p.mass,0);assert.equal(after,report.sourceBefore);assert.ok(Math.abs(mass-report.massBefore)<1e-12);});
