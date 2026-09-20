@@ -32,9 +32,10 @@ def isolate_character(driver) -> dict:
           if(actor.agent===lab.agent||actor.human===lab.human)continue;
           for(const item of [...(actor.human?.bones||[]),...(actor.human?.cartilage||[]),...(actor.human?.tissue?.items||[])])item.visible=false;
         }
+        for(const el of document.querySelectorAll('[class*=label],.object-label,.zone-label'))el.style.visibility='hidden';
         r.studioMode=true;r.background=[.035,.045,.055];
         lab.inspectBody('front');lab.render();
-        return{hiddenWorldItems:hidden.length,hiddenOtherActors:Math.max(0,actors.length-1)};
+        return{mode:'primary-character-only-v2',hiddenWorldItems:hidden.length,hiddenOtherActors:Math.max(0,actors.length-1)};
         """,
     )
 
@@ -87,7 +88,7 @@ def main() -> int:
     args=parser.parse_args()
     root=Path(args.output).resolve();root.mkdir(parents=True,exist_ok=True)
     report={
-        'schema':'human/motion_hand_gesture_quick_proof@4',
+        'schema':'human/motion_hand_gesture_quick_proof@5',
         'sourceSHA':args.source_sha,'testedURL':args.url,'interactiveURL':args.interactive_url,
         'startedAt':proof.now(),'status':'INCONCLUSIVE','captures':[],'scenarioFailures':[],
         'surfaceReviewScope':'motion-preview-lightweight-fallback','skinApproval':False,
