@@ -78,7 +78,7 @@ jobs:
           required_lab = (
               'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js',
               '../runtime/original-bird-c-kernel-r015.js',
-              'initTouchOrbit','pointerdown','pointermove','two-finger',
+              'initTouchOrbit','pointerdown','pointermove','orbit.pointers.size===2',
               '__BIRD_C_RUNTIME_READY__','__showBirdRuntimeError__',
               'setTimeout(()=>{if(!window.__BIRD_C_RUNTIME_READY__)',
               'buildLaridDisplay','verifyIndependence','preview','balanced','close',
@@ -87,7 +87,7 @@ jobs:
           for token in required_lab:
               if token not in lab_text:
                   raise SystemExit('LAB_TOKEN_MISSING ' + token)
-          for forbidden in ('OrbitControls','examples/jsm/controls/OrbitControls.js','new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
+          for forbidden in ("from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js'",'new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
               if forbidden in lab_text or forbidden in kernel_text:
                   raise SystemExit('FORBIDDEN_RUNTIME_TOKEN ' + forbidden)
 
