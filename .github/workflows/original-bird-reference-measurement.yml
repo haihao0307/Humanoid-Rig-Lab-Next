@@ -26,7 +26,7 @@ jobs:
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py
           python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
           python Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py --self-test
-      - name: R0.15 structure and evidence gates
+      - name: R0.15.1 structure, runtime repair and syntax
         shell: python
         run: |
           import json, pathlib, re
@@ -35,44 +35,35 @@ jobs:
           contract = json.loads((root / 'distilled/LARID_ORIGINAL_BIRD_C_DRAFT_R015.json').read_text(encoding='utf-8'))
           batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
           kernel = root / 'runtime/original-bird-c-kernel-r015.js'
-          lab = root / 'workbench/original-bird-seagull-c-draft-r015.html'
-          hub = root / 'workbench/original-bird-production-hub-r015.html'
-          source_lab = root / 'workbench/original-bird-seagull-phase1-r014.html'
+          lab = root / 'workbench/original-bird-seagull-c-draft-r0151.html'
+          hub = root / 'workbench/original-bird-production-hub-r0151.html'
           kernel_text = kernel.read_text(encoding='utf-8')
           lab_text = lab.read_text(encoding='utf-8')
           hub_text = hub.read_text(encoding='utf-8')
 
-          if status.get('revision') != 'R0.15-larid-original-bird-c-draft':
+          if status.get('revision') != 'R0.15.1-iphone-c-draft-runtime-repair':
               raise SystemExit('STATUS_REVISION_MISMATCH')
-          if status.get('visualBirdGenerated') is not True or status.get('visualBirdClassification') != 'INDEPENDENT_C_DRAFT_NOT_VISUAL_ACCEPTANCE':
-              raise SystemExit('C_DRAFT_VISUAL_CLASSIFICATION_INVALID')
-          if status.get('continuousSurfaceBirdGenerated') is not True:
-              raise SystemExit('CONTINUOUS_SURFACE_STATUS_INVALID')
-          if status['productionHub']['revision'] != 'R0.15' or status['productionHub']['defaultMobileStage'] != 'c':
-              raise SystemExit('HUB_STATUS_INVALID')
+          if status.get('visualBirdGenerated') is not True or status.get('continuousSurfaceBirdGenerated') is not True:
+              raise SystemExit('C_DRAFT_GENERATION_STATUS_INVALID')
+          if status['productionHub']['revision'] != 'R0.15.1' or status['productionHub']['mobileBehavior'] != 'redirect directly to repaired standalone C-draft workbench':
+              raise SystemExit('MOBILE_HUB_REPAIR_NOT_RECORDED')
+          mobile = status.get('mobileMode', {})
+          if mobile.get('directStandaloneOnMobile') is not True or mobile.get('duplicateHubAndChildHeadersRemoved') is not True or mobile.get('duplicateHubAndChildDocksRemoved') is not True:
+              raise SystemExit('MOBILE_DUPLICATE_CHROME_GUARD_INVALID')
           c = status.get('laridCDraft', {})
-          if c.get('kernelGenerated') is not True or c.get('fixedVertexArrayStored') is not False or c.get('fixedTriangleArrayStored') is not False:
+          repair = c.get('runtimeRepair', {})
+          if c.get('fixedVertexArrayStored') is not False or c.get('fixedTriangleArrayStored') is not False or c.get('sourceRuntimeDependency') is not False:
               raise SystemExit('C_DRAFT_REPRESENTATION_INVALID')
-          if c.get('sourceRuntimeDependency') is not False or c.get('exactSpecies') != 'UNRESOLVED' or c.get('realScaleStatus') != 'UNKNOWN':
-              raise SystemExit('C_DRAFT_EVIDENCE_BOUNDARY_INVALID')
+          if repair.get('orbitControlsRemoved') is not True or repair.get('builtInPointerOrbit') is not True or repair.get('visibleRuntimeErrorOverlay') is not True:
+              raise SystemExit('RUNTIME_REPAIR_STATUS_INVALID')
           if c.get('visualAcceptance') is not False or c.get('productionReady') is not False:
-              raise SystemExit('C_DRAFT_ACCEPTANCE_GATE_INVALID')
+              raise SystemExit('ACCEPTANCE_GATE_INVALID')
 
           by_id = {r['assetId']: r for r in batch['records']}
           if by_id['BIRD-REF-004']['counts']['joints'] != 15 or by_id['BIRD-REF-005']['counts']['joints'] != 21:
               raise SystemExit('SEAGULL_SOURCE_PAIR_CHANGED')
-          if contract['representation']['fixedVertexArrayStored'] is not False or contract['representation']['fixedTriangleArrayStored'] is not False:
-              raise SystemExit('CONTRACT_FIXED_TOPOLOGY_INVALID')
-          if contract['method']['runtimeDependencyOnSourceGlb'] is not False or contract['method']['unknownRemainsUnknown'] is not True:
-              raise SystemExit('CONTRACT_KAOPU_BOUNDARY_INVALID')
-          if contract['sourceGuidance']['primary']['assetId'] != 'BIRD-REF-004' or contract['sourceGuidance']['secondary']['assetId'] != 'BIRD-REF-005':
-              raise SystemExit('CONTRACT_SOURCE_PAIR_CHANGED')
-          if contract['coordinateSystem']['realScaleStatus'] != 'UNKNOWN' or contract['projectUse']['exactSpecies'] != 'UNRESOLVED':
-              raise SystemExit('SCALE_OR_SPECIES_BOUNDARY_CHANGED')
-          if contract['domains']['legFoot']['status'] != 'UNKNOWN_BLOCKED':
-              raise SystemExit('LEG_FOOT_UNKNOWN_GATE_CHANGED')
-          if len(contract['semanticAnchors']) != 9:
-              raise SystemExit('SEMANTIC_ANCHOR_COUNT_CHANGED')
+          if contract['representation']['fixedVertexArrayStored'] is not False or contract['method']['runtimeDependencyOnSourceGlb'] is not False:
+              raise SystemExit('C_DRAFT_CONTRACT_REGRESSION')
 
           required_kernel = (
               'DEFAULT_LARID_C_PROFILE','evaluateBody','evaluateWing','adaptiveParameters',
@@ -83,30 +74,33 @@ jobs:
           for token in required_kernel:
               if token not in kernel_text:
                   raise SystemExit('KERNEL_TOKEN_MISSING ' + token)
+
           required_lab = (
-              'dc42ffc81c86480e9e7f7752fa134174',
+              'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js',
               '../runtime/original-bird-c-kernel-r015.js',
-              'buildLaridDisplay','exportKaopuCProfile','verifyIndependence',
-              'preview','balanced','close','sourceTopologyDependency',
-              'original-bird-r015-larid-c-draft.kaopu',
-              'Stone Money Island','UNKNOWN'
+              'initTouchOrbit','pointerdown','pointermove','two-finger',
+              '__BIRD_C_RUNTIME_READY__','__showBirdRuntimeError__',
+              'setTimeout(()=>{if(!window.__BIRD_C_RUNTIME_READY__)',
+              'buildLaridDisplay','verifyIndependence','preview','balanced','close',
+              'original-bird-r0151-larid-c-draft.kaopu','embedded'
           )
           for token in required_lab:
               if token not in lab_text:
                   raise SystemExit('LAB_TOKEN_MISSING ' + token)
+          for forbidden in ('OrbitControls','examples/jsm/controls/OrbitControls.js','new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
+              if forbidden in lab_text or forbidden in kernel_text:
+                  raise SystemExit('FORBIDDEN_RUNTIME_TOKEN ' + forbidden)
+
           required_hub = (
-              'original-bird-seagull-c-draft-r015.html',
-              "let active='c'",
-              'continuous profile','single-entry-mobile-first'
+              'original-bird-seagull-c-draft-r0151.html?standalone=1',
+              "matchMedia('(max-width:999px)').matches",
+              "location.replace('original-bird-seagull-c-draft-r0151.html?standalone=1')",
+              'original-bird-seagull-c-draft-r0151.html?embedded=1',
+              'R0.15.1 runtime repair'
           )
           for token in required_hub:
               if token not in hub_text:
                   raise SystemExit('HUB_TOKEN_MISSING ' + token)
-          if not source_lab.exists():
-              raise SystemExit('R014_SOURCE_WORKBENCH_MISSING')
-          for token in ('new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
-              if token in kernel_text or token in lab_text or token in hub_text:
-                  raise SystemExit('FORBIDDEN_TOKEN ' + token)
 
           for p in (lab, hub):
               text = p.read_text(encoding='utf-8')
@@ -116,8 +110,8 @@ jobs:
               out = pathlib.Path('/tmp') / (p.stem + '.mjs')
               out.write_text('\n'.join(scripts), encoding='utf-8')
               print('SCRIPT_EXTRACTED', out)
-          print('R015_STRUCTURE_GATES_OK')
-      - name: R0.15 kernel runtime and sampling independence
+          print('R0151_RUNTIME_REPAIR_STRUCTURE_OK')
+      - name: R0.15.1 kernel runtime and sampling independence
         shell: bash
         run: |
           cp Bird-Reconstruction-Lab/original-bird/runtime/original-bird-c-kernel-r015.js /tmp/original-bird-c-kernel-r015.mjs
@@ -138,7 +132,7 @@ jobs:
           const doc=exportKaopuCProfile(profile,{test:true});
           if(doc.representation.fixedVertexArrayStored!==false||doc.representation.fixedTriangleArrayStored!==false)throw new Error('EXPORT_STORES_FIXED_TOPOLOGY');
           if(doc.evidence.sourceRuntimeDependency!==false)throw new Error('EXPORT_SOURCE_DEPENDENCY_INVALID');
-          console.log('R015_KERNEL_OK',results.map(r=>r.stats),'anchorDrift',max);
+          console.log('R0151_KERNEL_OK',results.map(r=>r.stats),'anchorDrift',max);
           NODE
-          node --check /tmp/original-bird-seagull-c-draft-r015.mjs
-          node --check /tmp/original-bird-production-hub-r015.mjs
+          node --check /tmp/original-bird-seagull-c-draft-r0151.mjs
+          node --check /tmp/original-bird-production-hub-r0151.mjs
