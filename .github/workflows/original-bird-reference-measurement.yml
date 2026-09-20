@@ -43,6 +43,8 @@ jobs:
             pathlib.Path('Bird-Reconstruction-Lab/original-bird/original-bird-reference-measurements.r001.json'),
             pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/BIRD_REFERENCE_BATCH_A_R002.json'),
             pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_REALISM_TARGET_R005.json'),
+            pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SOURCE_RUNTIME_BRIDGE_R006.json'),
+            pathlib.Path('Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SEMANTIC_MAP_R007.json'),
             pathlib.Path('Bird-Reconstruction-Lab/original-bird/CURRENT_STATUS.json'),
           ]
           for p in files:
@@ -59,6 +61,7 @@ jobs:
               pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-glb-source-review-r004.html'),
               pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-beauty-r005.html'),
               pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-measure-r006.html'),
+              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-semantic-map-r007.html'),
           ]
           for p in files:
               text = p.read_text(encoding='utf-8')
@@ -73,17 +76,19 @@ jobs:
           node --check /tmp/original-bird-glb-source-review-r004.js
           node --check /tmp/original-bird-source-beauty-r005.js
           node --check /tmp/original-bird-source-measure-r006.js
+          node --check /tmp/original-bird-semantic-map-r007.js
 
-      - name: R0.06 source-backed measurement guards
+      - name: R0.07 source-backed semantic mapping guards
         shell: python
         run: |
           import json
           from pathlib import Path
 
           root = Path('Bird-Reconstruction-Lab/original-bird')
-          rejected = root / 'workbench/original-bird-columbid-form-r003.html'
-          if rejected.exists():
+          if (root / 'workbench/original-bird-columbid-form-r003.html').exists():
               raise SystemExit('REJECTED_R003_FORM_REAPPEARED')
+          if (root / 'workbench/original-bird-studio-review-r006.html').exists():
+              raise SystemExit('REDUNDANT_R006_STUDIO_WORKBENCH_REAPPEARED')
 
           batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
           records = batch['records']
@@ -106,16 +111,23 @@ jobs:
               raise SystemExit('R006_MEASUREMENT_WORKBENCH_NOT_RECORDED')
           if r006.get('blackModelBackgroundRemoved') is not True:
               raise SystemExit('BLACK_BACKGROUND_REMOVAL_NOT_RECORDED')
+          r007 = status.get('semanticMappingWorkbench', {})
+          if r007.get('generated') is not True or r007.get('revision') != 'R0.07':
+              raise SystemExit('R007_SEMANTIC_MAPPING_WORKBENCH_NOT_RECORDED')
+          if r007.get('blackModelBackgroundRemoved') is not True:
+              raise SystemExit('R007_BLACK_BACKGROUND_REMOVAL_NOT_RECORDED')
           if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002':
               raise SystemExit('PRIMARY_VISIBLE_REFERENCE_NOT_LOCKED')
           if status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
               raise SystemExit('PRIMARY_MOTION_REFERENCE_NOT_LOCKED')
 
           r006_path = root / 'workbench/original-bird-source-measure-r006.html'
-          if not r006_path.exists():
-              raise SystemExit('R006_WORKBENCH_MISSING')
-          text = r006_path.read_text(encoding='utf-8')
-          required = (
+          r007_path = root / 'workbench/original-bird-semantic-map-r007.html'
+          if not r006_path.exists() or not r007_path.exists():
+              raise SystemExit('REQUIRED_WORKBENCH_MISSING')
+
+          r006_text = r006_path.read_text(encoding='utf-8')
+          r006_required = (
               '821135a09d3f48909b977a416d99c93b',
               '67f9422072664cf1967ae4fe440585a9',
               "background:'studio'",
@@ -129,25 +141,51 @@ jobs:
               'original-bird-r006-motion-phase.json',
               'bright-studio measurement runtime',
           )
-          for token in required:
-              if token not in text:
+          for token in r006_required:
+              if token not in r006_text:
                   raise SystemExit('R006_TOKEN_MISSING ' + token)
+
+          r007_text = r007_path.read_text(encoding='utf-8')
+          r007_required = (
+              '821135a09d3f48909b977a416d99c93b',
+              '67f9422072664cf1967ae4fe440585a9',
+              "background:'studio'",
+              'COLUMBID_SEMANTIC_MAP_R007.json',
+              'canonicalRole',
+              'seedKnown',
+              'getNodeMap',
+              'getMatrix',
+              'original-bird-r007-semantic-map.json',
+              'live semantic mapping',
+          )
+          for token in r007_required:
+              if token not in r007_text:
+                  raise SystemExit('R007_TOKEN_MISSING ' + token)
+
           forbidden = (
               'data-bg="dark"',
-              'state.background=\'dark\'',
+              "state.background='dark'",
               'new THREE.SphereGeometry',
               'deformedBodyGeometry',
               'original-bird-columbid-form-r003',
           )
           for token in forbidden:
-              if token in text:
-                  raise SystemExit('R006_FORBIDDEN_TOKEN ' + token)
+              if token in r006_text or token in r007_text:
+                  raise SystemExit('FORBIDDEN_TOKEN ' + token)
 
           target = json.loads((root / 'distilled/COLUMBID_REALISM_TARGET_R005.json').read_text(encoding='utf-8'))
-          if target['primaryVisibleReference']['assetId'] != 'BIRD-REF-002':
-              raise SystemExit('REALISM_TARGET_VISIBLE_REFERENCE_CHANGED')
-          if target['primaryMotionReference']['assetId'] != 'BIRD-REF-001':
-              raise SystemExit('REALISM_TARGET_MOTION_REFERENCE_CHANGED')
-          if target['openGates']['independentCommercialSafeSurfaceGenerated'] is not False:
-              raise SystemExit('INDEPENDENT_SURFACE_GATE_MUST_REMAIN_FALSE')
-          print('R006_BRIGHT_STUDIO_MEASUREMENT_GUARDS_OK')
+          bridge = json.loads((root / 'distilled/COLUMBID_SOURCE_RUNTIME_BRIDGE_R006.json').read_text(encoding='utf-8'))
+          semantic = json.loads((root / 'distilled/COLUMBID_SEMANTIC_MAP_R007.json').read_text(encoding='utf-8'))
+          if target['primaryVisibleReference']['assetId'] != 'BIRD-REF-002' or target['primaryMotionReference']['assetId'] != 'BIRD-REF-001':
+              raise SystemExit('REALISM_TARGET_SOURCE_PAIR_CHANGED')
+          if bridge['sourcePair']['visibleRig']['assetId'] != 'BIRD-REF-002' or bridge['sourcePair']['motionRig']['assetId'] != 'BIRD-REF-001':
+              raise SystemExit('SOURCE_RUNTIME_BRIDGE_PAIR_CHANGED')
+          if semantic['sources']['BIRD-REF-002']['viewerUid'] != '821135a09d3f48909b977a416d99c93b':
+              raise SystemExit('SEMANTIC_MAP_VISIBLE_UID_CHANGED')
+          if semantic['sources']['BIRD-REF-001']['viewerUid'] != '67f9422072664cf1967ae4fe440585a9':
+              raise SystemExit('SEMANTIC_MAP_MOTION_UID_CHANGED')
+          if len(semantic['candidateMappings']) < 30:
+              raise SystemExit('SEMANTIC_MAP_TOO_SMALL')
+          if semantic['openGates']['semanticMappingProductionReady'] is not False:
+              raise SystemExit('SEMANTIC_MAPPING_GATE_MUST_REMAIN_FALSE')
+          print('R007_LIVE_SEMANTIC_MAPPING_GUARDS_OK')
