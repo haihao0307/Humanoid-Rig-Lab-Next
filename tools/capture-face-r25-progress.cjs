@@ -58,16 +58,9 @@ const server=http.createServer((req,res)=>{
       renderer.setInspectionLighting({key:[-.65,.65,1],fill:[.8,.1,.6]});
       renderer.setQuality('fast');
       lab.render();
-      renderer.gl.flush();
     });
     await page.waitForTimeout(250);
 
-    const box=await page.locator('#bodyFrame').boundingBox();
-    if(!box)throw Error('Body frame bounds missing');
-    const viewport=page.viewportSize();
-    const x=Math.max(0,box.x),y=Math.max(0,box.y);
-    const clip={x,y,width:Math.max(1,Math.min(box.width,viewport.width-x)),height:Math.max(1,Math.min(box.height,viewport.height-y)),scale:1};
-    const cdp=await page.context().newCDPSession(page);
     const samples=[];
     const digests=[];
     for(const item of [{name:'eyes',blink:0},{name:'eyes-half',blink:.5},{name:'eyes-closed',blink:1}]){
@@ -76,26 +69,35 @@ const server=http.createServer((req,res)=>{
         lab.face.clearExpression();
         if(blink){lab.face.setWeight('eyeBlinkLeft',blink);lab.face.setWeight('eyeBlinkRight',blink);}
         lab.render();
-        gl.flush();
+        if(gl.isContextLost())throw Error('WebGL context lost before '+blink+' blink capture');
+        const width=gl.drawingBufferWidth,height=gl.drawingBufferHeight;
+        if(width<64||height<64)throw Error('Invalid WebGL drawing buffer');
+        const raw=new Uint8Array(width*height*4);
+        gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,raw);
+        const error=gl.getError();
+        if(error!==gl.NO_ERROR)throw Error('WebGL readPixels error '+error);
+        const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+        const context=canvas.getContext('2d',{alpha:true}),image=context.createImageData(width,height),row=width*4;
+        for(let y=0;y<height;y++)image.data.set(raw.subarray((height-1-y)*row,(height-y)*row),y*row);
+        context.putImageData(image,0,0);
+        const dataURL=canvas.toDataURL('image/png');
         return {
-          blink,
+          blink,dataURL,canvas:{width,height},
           camera:{target:[...renderer.target],distance:renderer.distance,yaw:renderer.yaw,pitch:renderer.pitch,projection:renderer.projection},
           triangles:lab.compact.report.triangles,
           eyeAnatomy:lab.compact.report.eyeAnatomy,
           expression:lab.face.expression(),
-          contextLost:gl.isContextLost(),
-          glError:gl.getError()
+          contextLost:false,
+          glError:0
         };
       },item);
-      await page.waitForTimeout(300);
-      const shot=await cdp.send('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false,clip});
-      if(!shot.data||shot.data.length<4096)throw Error(item.name+' screenshot was empty');
-      const bytes=Buffer.from(shot.data,'base64'),file=path.join(out,item.name+'.png'),digest=crypto.createHash('sha256').update(bytes).digest('hex');
+      const encoded=state.dataURL.replace(/^data:image\/png;base64,/,'');delete state.dataURL;
+      if(encoded.length<4096)throw Error(item.name+' framebuffer capture was empty');
+      const bytes=Buffer.from(encoded,'base64'),file=path.join(out,item.name+'.png'),digest=crypto.createHash('sha256').update(bytes).digest('hex');
       fs.writeFileSync(file,bytes);digests.push(digest);
       samples.push({name:item.name,bytes:bytes.length,sha256:digest,...state});
       console.log(item.name+' '+bytes.length+' '+digest);
     }
-    await cdp.detach();
     if(new Set(digests).size<2)throw Error('Eye-state screenshots did not change');
 
     const currentHashes=Object.fromEntries(tracked.map(file=>[file,hash(file)]));
