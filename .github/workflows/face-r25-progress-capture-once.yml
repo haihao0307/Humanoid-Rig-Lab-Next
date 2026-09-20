@@ -1,0 +1,102 @@
+name: Face R25 lightweight progress capture once
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+    paths:
+      - tools/capture-face-r25-progress.cjs
+      - .github/workflows/face-r25-progress-capture-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  capture-progress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/face-features-r25-20260919
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build current production workbench
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-face-r25-baseline.mjs
+          node tools/test-eye-aperture-family.mjs
+          node --check tools/capture-face-r25-progress.cjs
+
+      - name: Install isolated Playwright runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA_NODE="$RUNNER_TEMP/face-r25-progress-playwright"
+          mkdir -p "$QA_NODE"
+          cd "$QA_NODE"
+          npm init -y >/dev/null
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+          echo "HUMAN_PLAYWRIGHT_MODULE=$QA_NODE/node_modules/playwright" >> "$GITHUB_ENV"
+
+      - name: Capture open half and closed eye states
+        env:
+          HUMAN_PLAYWRIGHT_MODULE: ${{ env.HUMAN_PLAYWRIGHT_MODULE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/face-r25-progress"
+          node tools/capture-face-r25-progress.cjs "$OUT"
+          rm -rf face-r25-progress-evidence
+          cp -a "$OUT" face-r25-progress-evidence
+
+      - name: Verify requested progress captures
+        shell: node {0}
+        run: |
+          const fs=require('node:fs');
+          const data=JSON.parse(fs.readFileSync('face-r25-progress-evidence/capture.json','utf8'));
+          const expected=['eyes','eyes-half','eyes-closed'];
+          if(data.errors?.length)throw Error('page errors: '+JSON.stringify(data.errors));
+          for(const name of expected){
+            const sample=data.samples.find(item=>item.name===name);
+            if(!sample)throw Error('missing '+name);
+            if(sample.glError!==0)throw Error(name+' WebGL error '+sample.glError);
+            if(sample.eyeAnatomy?.revision!=='r25b-canthus-owned-aperture-family')throw Error(name+' wrong eye revision');
+            if(fs.statSync('face-r25-progress-evidence/'+name+'.png').size<4096)throw Error(name+' screenshot too small');
+          }
+          console.log(JSON.stringify({states:expected,revision:'r25b-canthus-owned-aperture-family',pageErrors:0,glErrors:0,visualAcceptance:false}));
+
+      - name: Publish requested screenshots to QA evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST="docs/face-knowledge/evidence/R25B_PROGRESS_LIGHT_20260920"
+          rm -rf "$DEST"
+          mkdir -p "$DEST"
+          cp face-r25-progress-evidence/eyes.png "$DEST/"
+          cp face-r25-progress-evidence/eyes-half.png "$DEST/"
+          cp face-r25-progress-evidence/eyes-closed.png "$DEST/"
+          cp face-r25-progress-evidence/capture.json "$DEST/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin feature/face-features-r25-20260919
+          git add "$DEST"
+          git commit -m "face R25B: publish lightweight progress screenshots"
+          git push origin HEAD:feature/face-features-r25-20260919
+
+      - name: Upload progress evidence
+        if: always() && hashFiles('face-r25-progress-evidence/*.png') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-r25-progress-${{ github.sha }}
+          path: face-r25-progress-evidence
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
