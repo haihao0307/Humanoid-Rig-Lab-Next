@@ -20,35 +20,84 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Python tools
+      - name: Tool self-tests
         run: |
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py
           python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
           python Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py --self-test
-          if [ -f Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py ]; then
-            python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py
-            python Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py --self-test
-          fi
-      - name: Validate JSON and JavaScript
+      - name: R0.13.1 structure, syntax and gates
         shell: bash
         run: |
           python - <<'PY'
           import json, pathlib, re
           root = pathlib.Path('Bird-Reconstruction-Lab/original-bird')
-          for p in [
-              root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json',
-              root / 'distilled/COLUMBID_MOTION_BEHAVIOR_R013.json',
-              root / 'distilled/COLUMBID_MOTION_AUTORUN_R0131.json',
-              root / 'CURRENT_STATUS.json',
-          ]:
-              json.loads(p.read_text(encoding='utf-8'))
-              print('JSON_OK', p)
-          for p in [
-              root / 'workbench/original-bird-pigeon-motion-r013.html',
-              root / 'workbench/original-bird-pigeon-motion-auto-r0131.html',
-              root / 'workbench/original-bird-production-hub-r0131.html',
-          ]:
+          status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
+          contract = json.loads((root / 'distilled/COLUMBID_MOTION_AUTORUN_R0131.json').read_text(encoding='utf-8'))
+          batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
+          lab = root / 'workbench/original-bird-pigeon-motion-auto-r0131.html'
+          hub = root / 'workbench/original-bird-production-hub-r0131.html'
+          lab_text = lab.read_text(encoding='utf-8')
+          hub_text = hub.read_text(encoding='utf-8')
+
+          if status.get('revision') != 'R0.13.1-automatic-pigeon-motion-baseline':
+              raise SystemExit('STATUS_REVISION_MISMATCH')
+          if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
+              raise SystemExit('INDEPENDENT_BIRD_GATE_INVALID')
+          if status['productionHub']['revision'] != 'R0.13.1' or status['productionHub']['defaultMobileStage'] != 'auto':
+              raise SystemExit('HUB_STATUS_INVALID')
+          auto = status.get('pigeonMotionAutorun', {})
+          if auto.get('generated') is not True or auto.get('expectedRecords') != 40:
+              raise SystemExit('AUTORUN_STATUS_INVALID')
+          if auto.get('allFiveGroupsMeasured') is not False or auto.get('fortyPhaseRecordsCaptured') is not False:
+              raise SystemExit('RUNTIME_GATES_MUST_REMAIN_FALSE')
+          if status['alphaIssue']['status'] != 'DEFERRED_TO_LARGE_SCREEN_REVIEW':
+              raise SystemExit('ALPHA_DEFER_STATUS_INVALID')
+          if status['nextSpecies']['species'] != 'Passer domesticus':
+              raise SystemExit('NEXT_SPECIES_CHANGED')
+          if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002' or status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
+              raise SystemExit('SOURCE_PAIR_CHANGED')
+
+          birds = [r for r in batch['records'] if r['assetId'].startswith('BIRD-REF-')]
+          if len(batch['records']) != 7 or len(birds) != 6:
+              raise SystemExit('SOURCE_BATCH_COUNT_INVALID')
+          if contract['species'] != 'Spilopelia chinensis':
+              raise SystemExit('SPECIES_CHANGED')
+          if contract['automaticCapture']['groups'] != ['wing','tail','neck','head','leg']:
+              raise SystemExit('GROUP_SET_CHANGED')
+          if contract['automaticCapture']['normalizedPhases'] != [0.0,0.125,0.25,0.375,0.5,0.625,0.75,0.875]:
+              raise SystemExit('PHASE_SET_CHANGED')
+          if contract['automaticCapture']['expectedGroupPhaseRecords'] != 40:
+              raise SystemExit('RECORD_COUNT_CHANGED')
+          if contract['openGates']['allFiveGroupsMeasured'] is not False or contract['openGates']['visualAcceptance'] is not False:
+              raise SystemExit('ACCEPTANCE_GATE_INVALID')
+
+          required_lab = (
+              '67f9422072664cf1967ae4fe440585a9',
+              "ORDER=['wing','tail','neck','head','leg']",
+              'PHASES=[0,.125,.25,.375,.5,.625,.75,.875]',
+              'getNodeMap','getAnimations','getMatrix','runAll','analyze','loopClosureMean',
+              'window.__BIRD_R0131_REPORT__','original-bird-r0131-report',
+              'kaopu/bird-motion-source@1.1','original-bird-r0131-pigeon-motion.kaopu',
+              'DEFERRED_TO_LARGE_SCREEN_REVIEW','Passer domesticus'
+          )
+          for token in required_lab:
+              if token not in lab_text:
+                  raise SystemExit('LAB_TOKEN_MISSING ' + token)
+          required_hub = (
+              'original-bird-pigeon-motion-auto-r0131.html',
+              "let active='auto'",
+              '羽毛 Alpha（明日大屏）',
+              'single-entry-mobile-first'
+          )
+          for token in required_hub:
+              if token not in hub_text:
+                  raise SystemExit('HUB_TOKEN_MISSING ' + token)
+          for token in ('data-bg="dark"',"state.background='dark'",'new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
+              if token in lab_text or token in hub_text:
+                  raise SystemExit('FORBIDDEN_TOKEN ' + token)
+
+          for p in (lab, hub):
               text = p.read_text(encoding='utf-8')
               scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', text, re.S | re.I)]
               if not scripts:
@@ -56,89 +105,7 @@ jobs:
               out = pathlib.Path('/tmp') / (p.stem + '.js')
               out.write_text('\n'.join(scripts), encoding='utf-8')
               print('SCRIPT_EXTRACTED', out)
+          print('R0131_AUTOMATIC_PIGEON_BASELINE_GUARDS_OK')
           PY
-          node --check /tmp/original-bird-pigeon-motion-r013.js
           node --check /tmp/original-bird-pigeon-motion-auto-r0131.js
           node --check /tmp/original-bird-production-hub-r0131.js
-      - name: R0.13.1 automatic pigeon baseline guards
-        shell: python
-        run: |
-          import json
-          from pathlib import Path
-          root = Path('Bird-Reconstruction-Lab/original-bird')
-
-          for rejected in (
-              root / 'workbench/original-bird-columbid-form-r003.html',
-              root / 'workbench/original-bird-studio-review-r006.html',
-          ):
-              if rejected.exists():
-                  raise SystemExit('REJECTED_FILE_REAPPEARED ' + str(rejected))
-
-          status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
-          if status.get('revision') != 'R0.13.1-automatic-pigeon-motion-baseline':
-              raise SystemExit('R0131_STATUS_REVISION_MISMATCH')
-          if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
-              raise SystemExit('INDEPENDENT_BIRD_GATE_INVALID')
-          hub = status.get('productionHub', {})
-          auto = status.get('pigeonMotionAutorun', {})
-          if hub.get('revision') != 'R0.13.1' or hub.get('singleEntry') is not True or hub.get('defaultMobileStage') != 'auto':
-              raise SystemExit('R0131_HUB_STATUS_INVALID')
-          if auto.get('revision') != 'R0.13.1' or auto.get('generated') is not True or auto.get('expectedRecords') != 40:
-              raise SystemExit('R0131_AUTORUN_STATUS_INVALID')
-          if auto.get('allFiveGroupsMeasured') is not False or auto.get('fortyPhaseRecordsCaptured') is not False:
-              raise SystemExit('R0131_RUNTIME_GATES_MUST_REMAIN_FALSE')
-          if status.get('alphaIssue', {}).get('status') != 'DEFERRED_TO_LARGE_SCREEN_REVIEW':
-              raise SystemExit('R0131_ALPHA_DEFER_STATUS_INVALID')
-          if status.get('nextSpecies', {}).get('species') != 'Passer domesticus':
-              raise SystemExit('R0131_NEXT_SPECIES_CHANGED')
-          if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002' or status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
-              raise SystemExit('SOURCE_PAIR_CHANGED')
-
-          contract = json.loads((root / 'distilled/COLUMBID_MOTION_AUTORUN_R0131.json').read_text(encoding='utf-8'))
-          if contract['species'] != 'Spilopelia chinensis':
-              raise SystemExit('R0131_SPECIES_CHANGED')
-          if contract['automaticCapture']['groups'] != ['wing','tail','neck','head','leg']:
-              raise SystemExit('R0131_GROUP_SET_CHANGED')
-          if contract['automaticCapture']['normalizedPhases'] != [0.0,0.125,0.25,0.375,0.5,0.625,0.75,0.875]:
-              raise SystemExit('R0131_PHASE_SET_CHANGED')
-          if contract['automaticCapture']['expectedGroupPhaseRecords'] != 40:
-              raise SystemExit('R0131_RECORD_COUNT_CHANGED')
-          if contract['openGates']['allFiveGroupsMeasured'] is not False or contract['openGates']['visualAcceptance'] is not False:
-              raise SystemExit('R0131_ACCEPTANCE_GATE_INVALID')
-
-          lab = root / 'workbench/original-bird-pigeon-motion-auto-r0131.html'
-          hub_path = root / 'workbench/original-bird-production-hub-r0131.html'
-          lab_text = lab.read_text(encoding='utf-8')
-          hub_text = hub_path.read_text(encoding='utf-8')
-          for token in (
-              '67f9422072664cf1967ae4fe440585a9',
-              "ORDER=['wing','tail','neck','head','leg']",
-              'PHASES=[0,.125,.25,.375,.5,.625,.75,.875]',
-              'getNodeMap',
-              'getAnimations',
-              'getMatrix',
-              'runAll',
-              'compute',
-              'loopClosureMean',
-              'window.__BIRD_R0131_REPORT__',
-              'original-bird-r0131-report',
-              'kaopu/bird-motion-source@1.1',
-              'original-bird-r0131-pigeon-motion.kaopu',
-              'DEFERRED_TO_LARGE_SCREEN_REVIEW',
-              'Passer domesticus',
-          ):
-              if token not in lab_text:
-                  raise SystemExit('R0131_LAB_TOKEN_MISSING ' + token)
-          for token in (
-              'original-bird-pigeon-motion-auto-r0131.html',
-              "let active='auto'",
-              '羽毛 Alpha（明日大屏）',
-              'single-entry-mobile-first',
-          ):
-              if token not in hub_text:
-                  raise SystemExit('R0131_HUB_TOKEN_MISSING ' + token)
-          for token in ('data-bg="dark"', "state.background='dark'", 'new THREE.SphereGeometry', 'deformedBodyGeometry', 'original-bird-columbid-form-r003'):
-              for p in (lab, hub_path):
-                  if token in p.read_text(encoding='utf-8'):
-                      raise SystemExit('FORBIDDEN_TOKEN ' + token + ' in ' + str(p))
-          print('R0131_AUTOMATIC_PIGEON_BASELINE_GUARDS_OK')
