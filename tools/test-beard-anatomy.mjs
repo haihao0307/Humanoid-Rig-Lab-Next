@@ -80,8 +80,9 @@ if(process.argv.includes('--production')){
   const sampled=await sampleCompactGroup('detail',detail,'balanced',()=>{},field,JSON.parse(read('reconstruction/binding-schema.json')),topology);
   const settled=topology.finalize(sampled.meshes),source=smoothAndQuantize(settled.meshes.map(m=>topology.materialize(m)),field).meshes.map(m=>({...m,canonicalPositions:m.positions}));
   const face=api.create(source,{jointIds:new Map([['head',7]])},1),beard=face.meshes.find(m=>m.name==='faceBeard');
-  assert(beard,'production face must include its procedural beard');
-  inspect('production-neutral', {...beard,positions:beard.canonicalPositions},face.report.beard);
+  assert.equal(beard,undefined,'clean-shaven production face must omit the beard draw mesh');
+  assert.equal(face.report.beard.strands,0,'clean-shaven production face must report zero beard strands');
+  reports.push({label:'production-neutral-clean-shaven',...face.report.beard});
 }
 console.log(JSON.stringify({deterministic:true,distinctSeed:true,zeroDensity:true,stableThinning:true,maximumAdjacentFieldChange,reports,failures,visualAcceptance:false},null,2));
 assert.equal(failures.length,0,failures.join('; '));
