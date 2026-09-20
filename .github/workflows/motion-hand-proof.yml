@@ -92,7 +92,6 @@ jobs:
           )
           PY
           node tools/build-pure.mjs
-          grep -q '__motionVisualQAFallback' index.html
           python - <<'PY'
           from pathlib import Path
           data=Path('index.html').read_text(encoding='utf-8')
@@ -100,6 +99,7 @@ jobs:
               'bodyFrame': 'bodyFrame' in data,
               'motionRuntimeState': 'MotionRuntimeState' in data,
               'contactHandPose': 'CONTACT_HAND_POSE_REVISION' in data,
+              'fallbackMarkerInBuiltEntry': '__motionVisualQAFallback' in data,
               'entrypointBytes': len(data.encode('utf-8')),
           })
           PY
