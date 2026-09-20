@@ -30,16 +30,19 @@ def main() -> int:
     try:
         driver=proof.driver_new();report['startup']=proof.load(driver,args.url)
         cases=(
-            ('01-wave','挥手','挥手','wave',.45,['rightUpperArm','rightForearm','rightHand','head']),
-            ('02-salute','敬礼','敬礼','salute',.35,['rightUpperArm','rightForearm','rightHand','head']),
-            ('03-greet','打招呼','打招呼','greet',.35,['rightUpperArm','rightForearm','rightHand','leftHand','head']),
+            # The current parser routes 挥手 and 打招呼 through the same greet
+            # action. Preserve that source fact instead of inventing a distinct
+            # wave phase in the proof harness.
+            ('01-wave','挥手（当前与打招呼共用动作源）','挥手',{'wave','greet'},.45,['rightUpperArm','rightForearm','rightHand','head']),
+            ('02-salute','敬礼','敬礼',{'salute'},.35,['rightUpperArm','rightForearm','rightHand','head']),
+            ('03-greet','打招呼（当前与挥手共用动作源）','打招呼',{'greet'},.35,['rightUpperArm','rightForearm','rightHand','leftHand','head']),
         )
-        for stem,label,command,phase,min_t,names in cases:
+        for stem,label,command,phases,min_t,names in cases:
             try:
                 proof.inspect(driver,'front',False);started=proof.issue(driver,command);before=int(started['before'])
-                state=proof.advance_until(driver,lambda s,ph=phase,t=min_t:s.get('phase')==ph and float(s.get('phaseT') or 0)>=t,450,label)
+                state=proof.advance_until(driver,lambda s,ps=phases,t=min_t:s.get('phase') in ps and float(s.get('phaseT') or 0)>=t,240,label)
                 report['captures'].append(proof.capture(driver,root,stem,label,names,f"实际阶段：{state.get('phase')}｜固定正面镜头"))
-                proof.finish(driver,before,label,700)
+                proof.finish(driver,before,label,420)
             except Exception as exc:
                 report['scenarioFailures'].append(stem)
                 report['captures'].append(proof.capture(driver,root,stem,label,names,'',False,f'{type(exc).__name__}: {exc}'))
