@@ -1,0 +1,263 @@
+{
+  "schema": "bird/columbid-source-runtime-bridge@0.0.6",
+  "date": "2026-09-20",
+  "authority": "R1_SOURCE_CALIBRATION_TO_ORIGINAL_RUNTIME_CANDIDATE",
+  "sourcePair": {
+    "visibleRig": {
+      "assetId": "BIRD-REF-002",
+      "file": "pigeon (1)(2).glb",
+      "role": "visible form, skin deformation, feather attachment, tail fan, neck, beak, eye and foot topology"
+    },
+    "motionRig": {
+      "assetId": "BIRD-REF-001",
+      "file": "cine__pigeon_fly(2).glb",
+      "role": "explicit bilateral wing chain, leg-foot-toe phase, neck-head-tail coupling"
+    }
+  },
+  "productionOrder": [
+    "visible_form_envelope",
+    "semantic_attachment_regions",
+    "material_role_separation",
+    "normalized_motion_phase",
+    "independent_commercial_safe_surface",
+    "cross_clade_transfer"
+  ],
+  "semanticControllerGroups": {
+    "axial": {
+      "sourceVisible": [
+        "hip_01_115",
+        "spine1_03_59",
+        "spine2_04_58",
+        "spine3_00_55",
+        "neck1_05_18",
+        "neck2_06_17",
+        "neck3_07_16",
+        "neck4_08_15",
+        "head1_09_14"
+      ],
+      "canonicalCandidates": [
+        "pelvis",
+        "thorax_01",
+        "thorax_02",
+        "thorax_03",
+        "neck_01",
+        "neck_02",
+        "neck_03",
+        "neck_04",
+        "head"
+      ],
+      "status": "GROUP_LOCKED_HOMOLOGY_PENDING"
+    },
+    "beakEyeTongue": {
+      "sourceVisible": [
+        "Upper_Beak_010_1",
+        "Lower_Beak1_011_5"
+      ],
+      "requiredLiveDiscoveryPatterns": [
+        "eye",
+        "lid",
+        "pupil",
+        "tongue",
+        "beak"
+      ],
+      "canonicalCandidates": [
+        "beak_upper",
+        "beak_lower",
+        "tongue_chain",
+        "eye_left",
+        "eye_right",
+        "eyelid_left",
+        "eyelid_right"
+      ],
+      "status": "PARTIAL_STATIC_MAP_LIVE_NODE_AUDIT_REQUIRED"
+    },
+    "wingLeft": {
+      "mainArtistChain": [
+        "L_w_main_j1_023_36",
+        "L_w_main_j2_024_34",
+        "L_w_main_j3_025_32",
+        "L_w_main_j4_026_30",
+        "L_w_main_j5_027_28",
+        "L_w_main_j6_028_22"
+      ],
+      "subAttachmentControls": [
+        "L_w_sub_j_a_040_35",
+        "L_w_sub_j_b_039_33",
+        "L_w_sub_j_c_038_31",
+        "L_w_sub_j_d_037_29",
+        "L_w_sub_j_e_032_23",
+        "L_w_sub_j_f_033_24",
+        "L_w_sub_j_g_034_25",
+        "L_w_sub_j_h_035_26",
+        "L_w_sub_j_i_036_27",
+        "L_w_sub_j_j_029_19",
+        "L_w_sub_j_k_030_20",
+        "L_w_sub_j_l_031_21"
+      ],
+      "canonicalCandidates": [
+        "shoulder_l",
+        "humerus_l",
+        "forearm_l",
+        "wrist_l",
+        "manus_l",
+        "primary_attachment_l",
+        "secondary_attachment_l",
+        "covert_field_l"
+      ],
+      "status": "ARTIST_CHAIN_GROUP_LOCKED_LITERAL_BONE_IDENTITY_BLOCKED"
+    },
+    "wingRight": {
+      "mainArtistChain": [
+        "R_w_main_j1_041_54",
+        "R_w_main_j2_042_52",
+        "R_w_main_j3_043_50",
+        "R_w_main_j4_044_48",
+        "R_w_main_j5_045_46",
+        "R_w_main_j6_046_40"
+      ],
+      "subAttachmentControls": [
+        "R_w_sub_j_a_058_53",
+        "R_w_sub_j_b_057_51",
+        "R_w_sub_j_c_056_49",
+        "R_w_sub_j_d_055_47",
+        "R_w_sub_j_e_050_41",
+        "R_w_sub_j_f_051_42",
+        "R_w_sub_j_g_052_43",
+        "R_w_sub_j_h_053_44",
+        "R_w_sub_j_i_054_45",
+        "R_w_sub_j_j_047_37",
+        "R_w_sub_j_k_048_38",
+        "R_w_sub_j_l_049_39"
+      ],
+      "canonicalCandidates": [
+        "shoulder_r",
+        "humerus_r",
+        "forearm_r",
+        "wrist_r",
+        "manus_r",
+        "primary_attachment_r",
+        "secondary_attachment_r",
+        "covert_field_r"
+      ],
+      "status": "ARTIST_CHAIN_GROUP_LOCKED_LITERAL_BONE_IDENTITY_BLOCKED"
+    },
+    "tail": {
+      "controller": "tails_CTRL_061_73",
+      "center": "tail00_062_60",
+      "left": [
+        "L_tail_joint1_063_61",
+        "L_tail_joint2_064_62",
+        "L_tail_joint3_065_63",
+        "L_tail_joint4_066_64",
+        "L_tail_joint5_067_65",
+        "L_tail_joint6_068_66"
+      ],
+      "right": [
+        "R_tail_joint1_069_67",
+        "R_tail_joint2_070_68",
+        "R_tail_joint3_071_69",
+        "R_tail_joint4_072_70",
+        "R_tail_joint5_073_71",
+        "R_tail_joint6_074_72"
+      ],
+      "canonicalCandidates": [
+        "tail_base",
+        "rectrix_center",
+        "rectrix_left_array",
+        "rectrix_right_array",
+        "tail_fan"
+      ],
+      "status": "ARRAY_STRUCTURE_LOCKED"
+    },
+    "hindlimb": {
+      "left": [
+        "L_UpperLeg_076_93",
+        "L_leg_077_92",
+        "L_knee_078_91",
+        "L_foot_079_90"
+      ],
+      "right": [
+        "R_UpperLeg_096_113",
+        "R_leg_097_112",
+        "R_knee_098_111",
+        "R_foot_099_110"
+      ],
+      "requiredLiveDiscoveryPatterns": [
+        "toe",
+        "digit",
+        "hallux",
+        "claw"
+      ],
+      "canonicalCandidates": [
+        "hip_l",
+        "knee_l",
+        "ankle_l",
+        "foot_l",
+        "digits_l",
+        "hip_r",
+        "knee_r",
+        "ankle_r",
+        "foot_r",
+        "digits_r"
+      ],
+      "status": "PROXIMAL_CHAIN_LOCKED_TOE_IDENTITY_PENDING"
+    }
+  },
+  "normalizedMotionExtraction": {
+    "source": "BIRD-REF-001",
+    "clip": "GltfAnimation 0",
+    "exportedTimelineEnd": 8.333333,
+    "biologicalTimeAssumptionAllowed": false,
+    "phaseDomain": [0.0, 1.0],
+    "channelsToExtract": [
+      "left_wing_main_phase",
+      "right_wing_main_phase",
+      "leg_extension_phase",
+      "toe_spread_phase",
+      "neck_head_stabilization_phase",
+      "tail_compensation_phase"
+    ],
+    "requiredNormalization": [
+      "remove exporter absolute duration",
+      "preserve bilateral timing difference",
+      "separate takeoff, sustained flap and landing when evidence exists",
+      "retain uncertainty where clip state boundaries cannot be proved"
+    ],
+    "status": "EXTRACTION_PENDING"
+  },
+  "materialRoles": {
+    "feather": {
+      "requiredResponse": "non-metallic with regional roughness variation and preserved texture detail",
+      "status": "SOURCE_MATERIAL_AUDIT_PENDING"
+    },
+    "eye": {
+      "requiredResponse": "separate corneal highlight from surrounding feather material",
+      "status": "SOURCE_MATERIAL_AUDIT_PENDING"
+    },
+    "beak": {
+      "requiredResponse": "keratin-like response distinct from feathers",
+      "status": "SOURCE_MATERIAL_AUDIT_PENDING"
+    },
+    "feet": {
+      "requiredResponse": "scaled keratin and skin response distinct from beak and feathers",
+      "status": "SOURCE_MATERIAL_AUDIT_PENDING"
+    }
+  },
+  "reviewWorkbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-studio-review-r006.html",
+  "hardBlocks": [
+    "no black default background",
+    "no proxy bird surface",
+    "no literal promotion of artist controls to anatomical bones",
+    "no source mesh shipping in commercial runtime",
+    "no cross-clade stretching of one pigeon surface"
+  ],
+  "openGates": {
+    "liveSemanticNodeCaptureComplete": false,
+    "normalizedMotionPhaseExtractionComplete": false,
+    "materialRoleSeparationComplete": false,
+    "sourceToDistilledErrorAvailable": false,
+    "independentCommercialSafeSurfaceGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
