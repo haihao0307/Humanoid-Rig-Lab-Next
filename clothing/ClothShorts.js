@@ -25,7 +25,7 @@ function shortsJoinRenderNormals(vertices,groups){
 class ClothShorts {
  constructor(surface,meshes){
   this.surface=surface;this.gl=surface.gl;this.buffers=[];this.disposed=false;
-  const search=typeof window==='object'?(window.parent?.location?.search||window.location?.search||''):'';this.placementReview=/(?:[?&])shortsPlacement=r2(?:\.|%2E)2(?:&|$)/i.test(search);this.leftTubeReview=/(?:[?&])shortsStage=r2(?:\.|%2E)3-left(?:&|$)/i.test(search);this.stagedReview=this.placementReview||this.leftTubeReview;this.placementReport=null;this.leftTubeState=null;this.leftTubeReport=null;
+  const search=typeof window==='object'?(window.parent?.location?.search||window.location?.search||''):'';this.placementReview=/(?:[?&])shortsPlacement=r2(?:\.|%2E)2(?:&|$)/i.test(search);this.leftTubeReview=/(?:[?&])shortsStage=r2(?:\.|%2E)3-left(?:&|$)/i.test(search);this.dualTubeReview=/(?:[?&])shortsStage=r2(?:\.|%2E)3-dual(?:&|$)/i.test(search);this.stagedReview=this.placementReview||this.leftTubeReview||this.dualTubeReview;this.placementReport=null;this.leftTubeState=null;this.leftTubeReport=null;this.dualTubeState=null;this.dualTubeReport=null;
   this.body=new ShortsBody(surface,meshes);this.measurements=this.body.measure();
   this.pattern=createShortsPattern(this.measurements);
   this.simulation=new ShortsCloth(this.pattern,this.body,SHORTS_WEARING_OPTIONS);
@@ -33,7 +33,7 @@ class ClothShorts {
   for(const range of this.simulation.pieceRanges)if(this.pattern.pieces.find(p=>p.id===range.id).placement.rightSide==='opposite_uv_normal')for(let t=range.triangleOffset*3;t<(range.triangleOffset+range.triangleCount)*3;t+=3){const a=this.renderTriangles[t+1];this.renderTriangles[t+1]=this.renderTriangles[t+2];this.renderTriangles[t+2]=a;}
   this.count=this.simulation.triangles.length;this.vertices=new Float32Array(this.simulation.particles.length*8);
   this.geometryBytes=this.vertices.byteLength+this.simulation.triangles.byteLength;
-  this.report={generator:'cut-and-sewn-shorts@1',triangles:this.count/3,panels:this.pattern.pieces.length,geometryBytes:this.geometryBytes,textureScale:3,clothDynamics:true,legSkinning:false,placementReview:this.placementReview,leftTubeReview:this.leftTubeReview};
+  this.report={generator:'cut-and-sewn-shorts@1',triangles:this.count/3,panels:this.pattern.pieces.length,geometryBytes:this.geometryBytes,textureScale:3,clothDynamics:true,legSkinning:false,placementReview:this.placementReview,leftTubeReview:this.leftTubeReview,dualTubeReview:this.dualTubeReview};
   this.assemblyReady=false;this.displayReady=false;this.assemblyState='unstarted';this.dirty=true;this.lastUpdateMilliseconds=0;this.assemblyWallTimeMs=0;this.placed=false;
   const gl=this.gl;
   try{
@@ -71,6 +71,10 @@ class ClothShorts {
     this.leftTubeState=createShortsLeftTubeStateR23(this.pattern,this.body,h);
     const stagedOptions={...SHORTS_WEARING_OPTIONS,gravity:0,groundY:null,selfContact:false,triangleBodyContact:true,iterations:8,maxMaterialIterations:16,sewingSeconds:1000,handlingDamping:5};
     this.simulation=new ShortsCloth(this.pattern,this.body,stagedOptions);this.leftTubeReport=completeShortsLeftTubeR23(this.simulation,this.leftTubeState);
+   }else if(this.dualTubeReview){
+    this.dualTubeState=createShortsDualTubeStateR23(this.pattern,this.body,h);
+    const stagedOptions={...SHORTS_WEARING_OPTIONS,gravity:0,groundY:null,selfContact:false,triangleBodyContact:true,iterations:10,maxMaterialIterations:20,sewingSeconds:1000,handlingDamping:5};
+    this.simulation=new ShortsCloth(this.pattern,this.body,stagedOptions);this.dualTubeReport=completeShortsDualTubeR23(this.simulation,this.dualTubeState);
    }else{const source=h.sourceBind.get('hips'),current=h.byId.get('hips').world,q=qnorm(qm(current.q,inv(source.q)));
     for(const piece of this.pattern.pieces){const p=piece.placement;p.origin=add(current.p,rotate(q,sub(p.origin,source.p)));p.basisU=rotate(q,p.basisU);p.basisV=rotate(q,p.basisV);}
     this.simulation=new ShortsCloth(this.pattern,this.body,SHORTS_WEARING_OPTIONS);}
@@ -89,6 +93,19 @@ class ClothShorts {
    this.assemblyWallTimeMs+=performance.now()-begin;this.displayReady=true;this.assemblyReady=false;
    this.assemblyState=this.leftTubeReport?.valid?'left-tube-ready':'left-tube-checkpoint-failed';
    const staged=this.simulation.report();this.assemblyReport={...staged,leftTube:this.leftTubeReport,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;
+  }
+  if(this.dualTubeReview){
+   this.assemblyState='dual-tube-relaxing';const minimumSteps=3,maximumSteps=24;
+   for(let step=0;step<maximumSteps;step++){
+    if(this.disposed)throw Error('R2.3b dual-tube review was disposed');
+    this.body.update();this.simulation.step(1);this.dirty=true;
+    this.dualTubeReport=auditShortsDualTubeR23(this.simulation,this.dualTubeState,this.dualTubeReport,{requireBody:true});
+    if(step+1>=minimumSteps&&this.dualTubeReport.valid)break;
+    await new Promise(resolve=>setTimeout(resolve,0));
+   }
+   this.assemblyWallTimeMs+=performance.now()-begin;this.displayReady=true;this.assemblyReady=false;
+   this.assemblyState=this.dualTubeReport?.valid?'dual-tube-ready':'dual-tube-checkpoint-failed';
+   const staged=this.simulation.report();this.assemblyReport={...staged,dualTube:this.dualTubeReport,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;
   }
   this.assemblyState='sewing';const remaining=maxSteps;
   for(let start=0;start<remaining;start++){
@@ -114,7 +131,7 @@ class ClothShorts {
   if(this.disposed||!this.assemblyReady||!(dt>0))return;
   const begin=performance.now();this.body.update();this.simulation.advance(dt);this.dirty=true;this.lastUpdateMilliseconds=performance.now()-begin;
  }
- diagnostics(){return {...this.report,placement:this.placementReport,leftTube:this.leftTubeReport,pattern:{version:this.pattern.version,options:{...this.pattern.options},draft:JSON.parse(JSON.stringify(this.pattern.draft)),sourceChecks:JSON.parse(JSON.stringify(this.pattern.checks))},displayReady:this.displayReady,assemblyReady:this.assemblyReady,assemblyState:this.assemblyState,assembly:this.assemblyReport,body:this.body.report(),simulation:this.simulation.report(),lastUpdateMilliseconds:this.lastUpdateMilliseconds};}
+ diagnostics(){return {...this.report,placement:this.placementReport,leftTube:this.leftTubeReport,dualTube:this.dualTubeReport,pattern:{version:this.pattern.version,options:{...this.pattern.options},draft:JSON.parse(JSON.stringify(this.pattern.draft)),sourceChecks:JSON.parse(JSON.stringify(this.pattern.checks))},displayReady:this.displayReady,assemblyReady:this.assemblyReady,assemblyState:this.assemblyState,assembly:this.assemblyReport,body:this.body.report(),simulation:this.simulation.report(),lastUpdateMilliseconds:this.lastUpdateMilliseconds};}
  upload(){
   if(!this.dirty)return;
   const positions=this.simulation.positions,indices=this.renderTriangles,uv=this.simulation.materialCoordinates,v=this.vertices;
