@@ -1,6 +1,6 @@
 {
-  "schema": "bird/original-bird-status@0.0.9",
-  "revision": "R0.07-live-source-semantic-mapping",
+  "schema": "bird/original-bird-status@0.0.10",
+  "revision": "R0.08-live-source-material-role-calibration",
   "date": "2026-09-20",
   "branch": "bird-mother-original-bird-r001-20260920",
   "visualBirdGenerated": false,
@@ -25,18 +25,10 @@
     "defaultBackground": "bright studio gray-white",
     "blackModelBackgroundRemoved": true,
     "capabilities": [
-      "direct BIRD-REF-002 visible-form inspection",
-      "direct BIRD-REF-001 motion-rig inspection",
-      "detail-only, motion-only and side-by-side modes",
+      "direct BIRD-REF-002 and BIRD-REF-001 inspection",
       "bright studio, neutral gray and warm gray backgrounds",
-      "HD texture, PBR lit shading, exposure, environment intensity and rotation",
-      "camera FOV and fixed front, side, top and three-quarter views",
-      "wireframe and light sharpen inspection",
-      "live node, material and animation audit",
-      "semantic node browser for wing, tail, neck, head/beak/eye and leg/foot/toe",
-      "selected-node local transform readout",
       "two-point source-model measurement with JSON export",
-      "normalized BIRD-REF-001 motion-phase sampling with JSON export"
+      "normalized motion-phase sampling with JSON export"
     ]
   },
   "semanticMappingWorkbench": {
@@ -46,21 +38,35 @@
     "defaultBackground": "bright studio gray-white",
     "blackModelBackgroundRemoved": true,
     "capabilities": [
-      "switchable BIRD-REF-002 visible rig and BIRD-REF-001 motion rig",
-      "live node-name and instanceID inspection",
-      "local transform readout",
-      "canonical Original Bird role assignment",
+      "live source node-name, instanceID and local-transform inspection",
+      "candidate Original Bird role assignment",
       "evidence-class assignment",
       "seeded candidate map loading",
-      "persistent local mapping edits",
-      "mapping coverage counts",
-      "candidate mapping JSON export",
-      "hard separation between candidate mapping and anatomical lock"
+      "persistent mapping edits and JSON export",
+      "candidate mapping separated from anatomical lock"
     ]
   },
+  "materialRoleCalibrationWorkbench": {
+    "generated": true,
+    "revision": "R0.08",
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-material-audit-r008.html",
+    "defaultBackground": "bright studio gray-white",
+    "blackModelBackgroundRemoved": true,
+    "capabilities": [
+      "live BIRD-REF-002 source material list and UID inspection",
+      "source texture-channel count and PBR-factor readout",
+      "separate candidate roles for body feather, wing feather, tail feather, cornea, iris, beak and foot",
+      "runtime-only roughness, metalness and specular calibration",
+      "role-specific candidate presets",
+      "single-material and full-material reset",
+      "persistent role assignments and JSON export",
+      "source asset remains unchanged"
+    ]
+  },
+  "sourceBackedRealismTarget": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_REALISM_TARGET_R005.json",
   "sourceRuntimeBridge": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SOURCE_RUNTIME_BRIDGE_R006.json",
   "semanticControllerMap": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SEMANTIC_MAP_R007.json",
-  "sourceBackedRealismTarget": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_REALISM_TARGET_R005.json",
+  "materialRoleMap": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_MATERIAL_ROLE_MAP_R008.json",
   "sourceBatch": {
     "items": 7,
     "birds": 6,
@@ -103,19 +109,20 @@
     "restoring the rejected R0.03 proxy form",
     "using black as the default model-review background",
     "treating artist controls as literal anatomical bones",
-    "shipping CC-BY-NC source meshes as commercial runtime dependencies",
-    "using lighting or color to conceal geometry and deformation errors",
-    "promoting candidate semantic mappings without hierarchy, symmetry, skin-weight and motion verification"
+    "shipping CC-BY-NC source meshes or materials as commercial runtime dependencies",
+    "using one plastic material response for feathers, eye, beak and feet",
+    "using lighting or material gloss to conceal geometry, skinning or texture defects",
+    "promoting candidate semantic or material roles without live verification"
   ],
   "currentExecutionQueue": [
-    "run browser QA on R0.06 bright-studio measurement and R0.07 semantic mapping workbenches",
-    "verify every seeded source node exists in the live Viewer API node map",
-    "complete BIRD-REF-002 wing, tail, neck, head/beak/eye and leg/foot/toe source measurements",
-    "capture normalized BIRD-REF-001 wing, leg, toe, neck and tail motion phases",
-    "verify candidate semantic roles against hierarchy, bilateral symmetry, visible skin region and motion participation",
-    "separate feather, eye, beak and foot material roles",
+    "run browser QA on R0.06 measurement, R0.07 semantic mapping and R0.08 material calibration",
+    "verify every seeded source node exists and complete hierarchy, symmetry, skin-weight and motion checks",
+    "complete BIRD-REF-002 wing, tail, neck, head/beak/eye and leg/foot/toe measurements",
+    "complete BIRD-REF-001 normalized wing, leg, toe, neck and tail phase sampling",
+    "identify visible source mesh regions for every source material",
+    "separate feather, cornea, iris, beak and foot material roles under neutral and warm-gray review",
     "reuse R17 wing, tail, foot and behavior interfaces",
-    "build fixed-view source-to-distilled silhouette and landmark error readout",
+    "build fixed-view source-to-distilled silhouette, landmark and material error readout",
     "generate an independent commercial-safe Original Bird only after source-backed QA"
   ],
   "openGates": {
@@ -123,6 +130,7 @@
     "selectedSourceGlbOnlineBinaryAvailable": false,
     "r006BrightStudioBrowserVisualQaPassed": false,
     "r007SemanticMappingBrowserVisualQaPassed": false,
+    "r008MaterialCalibrationBrowserVisualQaPassed": false,
     "sourceLandmarkMeasurementSetComplete": false,
     "liveNodeExistenceVerified": false,
     "sourceNodeSemanticMappingComplete": false,
@@ -131,6 +139,8 @@
     "sourceBilateralSymmetryVerified": false,
     "sourceMotionParticipationVerified": false,
     "normalizedMotionPhaseExtractionComplete": false,
+    "liveMaterialListCaptured": false,
+    "sourceMaterialVisibleRegionsVerified": false,
     "sourceMaterialRoleSeparationComplete": false,
     "sourceToDistilledFixedViewErrorAvailable": false,
     "exactSpeciesIdentityLocked": false,
