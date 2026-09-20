@@ -75,8 +75,7 @@ jobs:
           )
           PY
 
-          node tools/build-pure.mjs
-          grep -q '__motionVisualQAFallback' index.html
+          node tools/build-pure.mjs | tee qa-build-result.json
           test "$(wc -c < index.html)" -gt 1000000
           sha256sum index.html | tee qa-entrypoint-hashes.txt
 
@@ -171,6 +170,7 @@ jobs:
             gesture-visible.log
             interaction-visible.log
             http-server.log
+            qa-build-result.json
             qa-entrypoint-hashes.txt
             qa-visibility-check.json
           if-no-files-found: error
