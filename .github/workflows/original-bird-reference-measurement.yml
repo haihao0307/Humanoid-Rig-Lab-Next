@@ -30,7 +30,7 @@ jobs:
             python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py
             python Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py --self-test
           fi
-      - name: Validate R0.13 JSON and JavaScript
+      - name: Validate JSON and JavaScript
         shell: bash
         run: |
           python - <<'PY'
@@ -38,18 +38,16 @@ jobs:
           root = pathlib.Path('Bird-Reconstruction-Lab/original-bird')
           for p in [
               root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json',
-              root / 'distilled/COLUMBID_3A_GAME_ASSET_STANDARD_R011.json',
-              root / 'distilled/COLUMBID_FEATHER_ALPHA_AUTO_EXTRACT_R0122.json',
-              root / 'distilled/COLUMBID_MOBILE_UI_R0123.json',
               root / 'distilled/COLUMBID_MOTION_BEHAVIOR_R013.json',
+              root / 'distilled/COLUMBID_MOTION_AUTORUN_R0131.json',
               root / 'CURRENT_STATUS.json',
           ]:
               json.loads(p.read_text(encoding='utf-8'))
               print('JSON_OK', p)
           for p in [
-              root / 'workbench/original-bird-feather-alpha-mobile-r0123.html',
               root / 'workbench/original-bird-pigeon-motion-r013.html',
-              root / 'workbench/original-bird-production-hub-r013.html',
+              root / 'workbench/original-bird-pigeon-motion-auto-r0131.html',
+              root / 'workbench/original-bird-production-hub-r0131.html',
           ]:
               text = p.read_text(encoding='utf-8')
               scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', text, re.S | re.I)]
@@ -59,15 +57,16 @@ jobs:
               out.write_text('\n'.join(scripts), encoding='utf-8')
               print('SCRIPT_EXTRACTED', out)
           PY
-          node --check /tmp/original-bird-feather-alpha-mobile-r0123.js
           node --check /tmp/original-bird-pigeon-motion-r013.js
-          node --check /tmp/original-bird-production-hub-r013.js
-      - name: R0.13 pigeon motion guards
+          node --check /tmp/original-bird-pigeon-motion-auto-r0131.js
+          node --check /tmp/original-bird-production-hub-r0131.js
+      - name: R0.13.1 automatic pigeon baseline guards
         shell: python
         run: |
           import json
           from pathlib import Path
           root = Path('Bird-Reconstruction-Lab/original-bird')
+
           for rejected in (
               root / 'workbench/original-bird-columbid-form-r003.html',
               root / 'workbench/original-bird-studio-review-r006.html',
@@ -76,69 +75,70 @@ jobs:
                   raise SystemExit('REJECTED_FILE_REAPPEARED ' + str(rejected))
 
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
-          if status.get('revision') != 'R0.13-pigeon-motion-behavior-extraction':
-              raise SystemExit('R013_STATUS_REVISION_MISMATCH')
+          if status.get('revision') != 'R0.13.1-automatic-pigeon-motion-baseline':
+              raise SystemExit('R0131_STATUS_REVISION_MISMATCH')
           if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
               raise SystemExit('INDEPENDENT_BIRD_GATE_INVALID')
           hub = status.get('productionHub', {})
-          motion_status = status.get('pigeonMotionBehavior', {})
-          if hub.get('revision') != 'R0.13' or hub.get('singleEntry') is not True or hub.get('defaultMobileStage') != 'motion':
-              raise SystemExit('R013_HUB_STATUS_INVALID')
-          if motion_status.get('revision') != 'R0.13' or motion_status.get('generated') is not True:
-              raise SystemExit('R013_MOTION_STATUS_INVALID')
-          if motion_status.get('eightPhaseSourceCaptureComplete') is not False or motion_status.get('loopClosureMeasured') is not False:
-              raise SystemExit('R013_RUNTIME_GATES_MUST_REMAIN_FALSE')
+          auto = status.get('pigeonMotionAutorun', {})
+          if hub.get('revision') != 'R0.13.1' or hub.get('singleEntry') is not True or hub.get('defaultMobileStage') != 'auto':
+              raise SystemExit('R0131_HUB_STATUS_INVALID')
+          if auto.get('revision') != 'R0.13.1' or auto.get('generated') is not True or auto.get('expectedRecords') != 40:
+              raise SystemExit('R0131_AUTORUN_STATUS_INVALID')
+          if auto.get('allFiveGroupsMeasured') is not False or auto.get('fortyPhaseRecordsCaptured') is not False:
+              raise SystemExit('R0131_RUNTIME_GATES_MUST_REMAIN_FALSE')
           if status.get('alphaIssue', {}).get('status') != 'DEFERRED_TO_LARGE_SCREEN_REVIEW':
-              raise SystemExit('R013_ALPHA_DEFER_STATUS_INVALID')
+              raise SystemExit('R0131_ALPHA_DEFER_STATUS_INVALID')
           if status.get('nextSpecies', {}).get('species') != 'Passer domesticus':
-              raise SystemExit('R013_NEXT_SPECIES_CHANGED')
+              raise SystemExit('R0131_NEXT_SPECIES_CHANGED')
           if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002' or status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
               raise SystemExit('SOURCE_PAIR_CHANGED')
 
-          contract = json.loads((root / 'distilled/COLUMBID_MOTION_BEHAVIOR_R013.json').read_text(encoding='utf-8'))
-          if contract['species']['scientificName'] != 'Spilopelia chinensis':
-              raise SystemExit('R013_SPECIES_CHANGED')
-          if contract['extraction']['normalizedPhases'] != [0.0,0.125,0.25,0.375,0.5,0.625,0.75,0.875]:
-              raise SystemExit('R013_PHASE_SET_CHANGED')
-          if contract['sources']['legacyPolicy']['locomotion'] != 'alternating-walk-primary':
-              raise SystemExit('R013_DOVE_WALK_POLICY_CHANGED')
-          if contract['nextSpecies']['species'] != 'Passer domesticus':
-              raise SystemExit('R013_NEXT_SPECIES_CONTRACT_CHANGED')
-          if contract['openGates']['independentCommercialSafeMotionGenerated'] is not False:
-              raise SystemExit('R013_ACCEPTANCE_GATE_INVALID')
+          contract = json.loads((root / 'distilled/COLUMBID_MOTION_AUTORUN_R0131.json').read_text(encoding='utf-8'))
+          if contract['species'] != 'Spilopelia chinensis':
+              raise SystemExit('R0131_SPECIES_CHANGED')
+          if contract['automaticCapture']['groups'] != ['wing','tail','neck','head','leg']:
+              raise SystemExit('R0131_GROUP_SET_CHANGED')
+          if contract['automaticCapture']['normalizedPhases'] != [0.0,0.125,0.25,0.375,0.5,0.625,0.75,0.875]:
+              raise SystemExit('R0131_PHASE_SET_CHANGED')
+          if contract['automaticCapture']['expectedGroupPhaseRecords'] != 40:
+              raise SystemExit('R0131_RECORD_COUNT_CHANGED')
+          if contract['openGates']['allFiveGroupsMeasured'] is not False or contract['openGates']['visualAcceptance'] is not False:
+              raise SystemExit('R0131_ACCEPTANCE_GATE_INVALID')
 
-          lab = root / 'workbench/original-bird-pigeon-motion-r013.html'
-          hub_path = root / 'workbench/original-bird-production-hub-r013.html'
+          lab = root / 'workbench/original-bird-pigeon-motion-auto-r0131.html'
+          hub_path = root / 'workbench/original-bird-production-hub-r0131.html'
           lab_text = lab.read_text(encoding='utf-8')
           hub_text = hub_path.read_text(encoding='utf-8')
           for token in (
               '67f9422072664cf1967ae4fe440585a9',
-              '821135a09d3f48909b977a416d99c93b',
+              "ORDER=['wing','tail','neck','head','leg']",
               'PHASES=[0,.125,.25,.375,.5,.625,.75,.875]',
               'getNodeMap',
               'getAnimations',
               'getMatrix',
-              'sampleEight',
-              'computeContinuity',
-              '循环闭合',
-              'kaopu/bird-motion-source@1.0',
-              'original-bird-r013-pigeon-motion.kaopu',
-              'alternating-walk-primary',
+              'runAll',
+              'compute',
+              'loopClosureMean',
+              'window.__BIRD_R0131_REPORT__',
+              'original-bird-r0131-report',
+              'kaopu/bird-motion-source@1.1',
+              'original-bird-r0131-pigeon-motion.kaopu',
+              'DEFERRED_TO_LARGE_SCREEN_REVIEW',
               'Passer domesticus',
           ):
               if token not in lab_text:
-                  raise SystemExit('R013_LAB_TOKEN_MISSING ' + token)
+                  raise SystemExit('R0131_LAB_TOKEN_MISSING ' + token)
           for token in (
-              'original-bird-pigeon-motion-r013.html',
-              'original-bird-feather-alpha-mobile-r0123.html',
-              "let active='motion'",
-              '明日大屏',
+              'original-bird-pigeon-motion-auto-r0131.html',
+              "let active='auto'",
+              '羽毛 Alpha（明日大屏）',
               'single-entry-mobile-first',
           ):
               if token not in hub_text:
-                  raise SystemExit('R013_HUB_TOKEN_MISSING ' + token)
+                  raise SystemExit('R0131_HUB_TOKEN_MISSING ' + token)
           for token in ('data-bg="dark"', "state.background='dark'", 'new THREE.SphereGeometry', 'deformedBodyGeometry', 'original-bird-columbid-form-r003'):
               for p in (lab, hub_path):
                   if token in p.read_text(encoding='utf-8'):
                       raise SystemExit('FORBIDDEN_TOKEN ' + token + ' in ' + str(p))
-          print('R013_PIGEON_MOTION_BEHAVIOR_GUARDS_OK')
+          print('R0131_AUTOMATIC_PIGEON_BASELINE_GUARDS_OK')
