@@ -3,7 +3,9 @@
 
 The production task and pose runtime remains authoritative. Simulation steps
 are executed in browser-local batches to avoid Selenium round-trip timeouts;
-this changes only the proof harness, not any character motion.
+this changes only the proof harness, not any character motion. World props are
+hidden for the screenshot pass only so the inspected character cannot be
+occluded by camp furniture between the camera and the body.
 """
 from __future__ import annotations
 
@@ -14,6 +16,27 @@ from pathlib import Path
 
 import motion_hand_visual_proof_fast3  # actual renderer readiness
 import motion_hand_visual_proof_fast as proof
+
+
+def isolate_character(driver) -> dict:
+    return proof.body_js(
+        driver,
+        """
+        const lab=HumanLab,w=lab.world,r=lab.renderer;
+        const hidden=[];
+        for(const item of [...(w.scenery||[]),...(w.roofItems||[]),...(w.objects||[])]){
+          if(item&&item.visible!==false){item.visible=false;hidden.push(item.id||item.label||'item');}
+        }
+        const actors=lab.population?Array.from(lab.population.values()):[];
+        for(const actor of actors){
+          if(actor.agent===lab.agent||actor.human===lab.human)continue;
+          for(const item of [...(actor.human?.bones||[]),...(actor.human?.cartilage||[]),...(actor.human?.tissue?.items||[])])item.visible=false;
+        }
+        r.studioMode=true;r.background=[.035,.045,.055];
+        lab.inspectBody('front');lab.render();
+        return{hiddenWorldItems:hidden.length,hiddenOtherActors:Math.max(0,actors.length-1)};
+        """,
+    )
 
 
 def step_to(driver, phases: set[str], minimum_phase_time: float, maximum_steps: int = 150, dt: float = .04):
@@ -64,7 +87,7 @@ def main() -> int:
     args=parser.parse_args()
     root=Path(args.output).resolve();root.mkdir(parents=True,exist_ok=True)
     report={
-        'schema':'human/motion_hand_gesture_quick_proof@3',
+        'schema':'human/motion_hand_gesture_quick_proof@4',
         'sourceSHA':args.source_sha,'testedURL':args.url,'interactiveURL':args.interactive_url,
         'startedAt':proof.now(),'status':'INCONCLUSIVE','captures':[],'scenarioFailures':[],
         'surfaceReviewScope':'motion-preview-lightweight-fallback','skinApproval':False,
@@ -73,6 +96,7 @@ def main() -> int:
     driver=None
     try:
         driver=proof.driver_new();driver.set_script_timeout(180);report['startup']=proof.load(driver,args.url)
+        report['sceneIsolation']=isolate_character(driver)
         cases=(
             # Current parser maps 挥手 and 打招呼 to the same greet source.
             ('01-wave','挥手（当前与打招呼共用动作源）','挥手',{'wave','greet'},.45,['rightUpperArm','rightForearm','rightHand','head']),
@@ -86,12 +110,10 @@ def main() -> int:
                 state=step_to(driver,phases,min_t)
                 if state.get('error'):raise RuntimeError(state['error'])
                 if not state.get('reached'):raise RuntimeError(f"未到目标阶段，实际 {state.get('phase')} t={state.get('phaseT')}")
-                report['captures'].append(proof.capture(driver,root,stem,label,names,f"实际阶段：{state.get('phase')}｜固定正面镜头"))
+                report['captures'].append(proof.capture(driver,root,stem,label,names,f"实际阶段：{state.get('phase')}｜固定正面镜头｜场景道具仅在截图中隐藏"))
                 end=settle(driver,before)
                 if end.get('error'):raise RuntimeError(end['error'])
                 if not end.get('settled'):
-                    # Keep the captured evidence but record that transition-out
-                    # did not settle within the bounded proof window.
                     report['scenarioFailures'].append(stem+'-transition-out')
             except Exception as exc:
                 report['scenarioFailures'].append(stem)
