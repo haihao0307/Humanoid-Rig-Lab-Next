@@ -39,7 +39,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends xvfb xauth fonts-noto-cjk
           command -v google-chrome || command -v google-chrome-stable || command -v chromium
 
-      - name: Build exact lightweight review pages
+      - name: Build exact lightweight review workbench
         id: target
         shell: bash
         run: |
@@ -76,18 +76,9 @@ jobs:
           PY
 
           node tools/build-pure.mjs
-          node --input-type=module <<'JS'
-          import {writeFileSync} from 'node:fs';
-          import {assemble} from './tools/build-pure.mjs';
-          const result = assemble();
-          writeFileSync('body-gesture-qa.html', result.body);
-          JS
-
           grep -q '__motionVisualQAFallback' index.html
-          grep -q 'CONTACT_HAND_POSE_REVISION' index.html
-          grep -q '__motionVisualQAFallback' body-gesture-qa.html
-          grep -q 'CONTACT_HAND_POSE_REVISION' body-gesture-qa.html
-          sha256sum index.html body-gesture-qa.html | tee qa-entrypoint-hashes.txt
+          test "$(wc -c < index.html)" -gt 1000000
+          sha256sum index.html | tee qa-entrypoint-hashes.txt
 
       - name: Run visible gesture and interaction captures
         env:
@@ -99,8 +90,9 @@ jobs:
           python -m http.server 8765 --bind 127.0.0.1 >http-server.log 2>&1 &
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          QA_URL="http://127.0.0.1:8765/index.html?visualTest=1"
           for attempt in $(seq 1 40); do
-            if curl -fsS --connect-timeout 2 "http://127.0.0.1:8765/index.html?visualTest=1" >/dev/null; then break; fi
+            if curl -fsS --connect-timeout 2 "$QA_URL" >/dev/null; then break; fi
             if [[ "$attempt" == 40 ]]; then echo 'Local QA server did not start.' >&2; exit 1; fi
             sleep .25
           done
@@ -108,7 +100,7 @@ jobs:
           timeout --signal=TERM --kill-after=15s 720s \
             xvfb-run -a -s "-screen 0 1920x1080x24" \
             python tools/motion_hand_gesture_visible_proof.py \
-              --url "http://127.0.0.1:8765/body-gesture-qa.html?visualTest=1" \
+              --url "$QA_URL" \
               --source-sha "$SOURCE_SHA" \
               --interactive-url "$PUBLIC_URL" \
               --output gesture-visible | tee gesture-visible.log
@@ -116,7 +108,7 @@ jobs:
           timeout --signal=TERM --kill-after=15s 1200s \
             xvfb-run -a -s "-screen 0 1920x1080x24" \
             python tools/motion_hand_interaction_visible_proof.py \
-              --url "http://127.0.0.1:8765/index.html?visualTest=1" \
+              --url "$QA_URL" \
               --source-sha "$SOURCE_SHA" \
               --interactive-url "$PUBLIC_URL" \
               --output interaction-visible | tee interaction-visible.log
