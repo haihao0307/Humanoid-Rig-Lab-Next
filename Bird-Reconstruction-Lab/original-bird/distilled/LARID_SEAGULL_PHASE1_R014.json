@@ -1,0 +1,91 @@
+{
+  "schema": "bird/larid-seagull-phase1@0.0.14",
+  "date": "2026-09-20",
+  "status": "ACTIVE_SOURCE_BACKED_GAME_SEABIRD_PHASE1_NOT_FINAL_SPECIES",
+  "projectUse": {
+    "game": "Stone Money Island",
+    "environment": "tropical island, reef, lagoon, shoreline and offshore water",
+    "role": "first game-facing seabird line after the pigeon baseline",
+    "exactSpecies": "UNRESOLVED",
+    "safeLabel": "Laridae seagull candidate",
+    "forbiddenSpeciesClaims": ["black-headed gull", "red-billed gull", "any exact gull species without separate evidence"]
+  },
+  "sourcePair": {
+    "primary": {
+      "assetId": "BIRD-REF-004",
+      "file": "seagull(2).glb",
+      "viewerUid": "dc42ffc81c86480e9e7f7752fa134174",
+      "license": "CC-BY-4.0",
+      "counts": {"vertices": 3291, "triangles": 4352, "joints": 15, "animations": 1, "animationChannels": 36},
+      "semanticCounts": {"wing": 8, "tail": 1, "neck": 1, "headBeak": 1, "leg": 0, "trunk": 1},
+      "role": "primary long-wing source and flap/glide transition candidate",
+      "limits": ["no leg or foot joints in skin", "feather layers not explicit", "exact species unresolved"]
+    },
+    "secondary": {
+      "assetId": "BIRD-REF-005",
+      "file": "seagull2(2).glb",
+      "viewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
+      "license": "CC-BY-NC-SA-4.0",
+      "counts": {"vertices": 4416, "triangles": 5624, "joints": 21, "animations": 1, "animationChannels": 41},
+      "semanticCounts": {"wing": 8, "tail": 0, "neck": 0, "headBeak": 0, "leg": 0, "trunk": 1},
+      "role": "secondary wing-proportion and generic-bone transform comparison",
+      "limits": ["most joints use generic Bone.* names", "manual hierarchy and skin-weight mapping required", "non-commercial share-alike source cannot be a game runtime dependency"]
+    }
+  },
+  "phase1Objectives": [
+    "display both source gulls directly in one mobile-first HTML workbench",
+    "sample eight normalized phases from each source clip",
+    "compare readable wing-chain motion and loop closure",
+    "audit generic Bone.* transforms without promoting them to anatomical truth",
+    "define a game-facing tropical-island flight-state contract",
+    "export a source-backed .kaopu seabird profile for later Game Mother integration"
+  ],
+  "gameZones": [
+    {"id": "offshore", "role": "long patrol and glide candidate", "evidenceClass": "GAMEPLAY_CANDIDATE"},
+    {"id": "reef_edge", "role": "banking patrol and surface-search candidate", "evidenceClass": "GAMEPLAY_CANDIDATE"},
+    {"id": "lagoon", "role": "low-speed circuit and water-skim candidate", "evidenceClass": "GAMEPLAY_CANDIDATE"},
+    {"id": "beach", "role": "shore approach candidate; landing remains blocked", "evidenceClass": "GAMEPLAY_CANDIDATE"}
+  ],
+  "flightStates": [
+    {"id": "powered_flap", "sourceSupport": "PARTIAL", "gate": "REVIEW"},
+    {"id": "glide_transition", "sourceSupport": "PARTIAL", "gate": "REVIEW"},
+    {"id": "bank_turn", "sourceSupport": "INSUFFICIENT", "gate": "BLOCKED"},
+    {"id": "coastal_patrol", "sourceSupport": "GAMEPLAY_POLICY_ONLY", "gate": "BLOCKED_RUNTIME"},
+    {"id": "water_skim", "sourceSupport": "GAMEPLAY_POLICY_ONLY", "gate": "BLOCKED_RUNTIME"},
+    {"id": "shore_landing", "sourceSupport": "ABSENT_LEG_RIG", "gate": "BLOCKED"},
+    {"id": "water_surface_rest", "sourceSupport": "ABSENT_CONTACT_RIG", "gate": "BLOCKED"}
+  ],
+  "flockCandidateDefaults": {
+    "memberCount": 8,
+    "spreadMeters": 18,
+    "patrolRadiusMeters": 42,
+    "glideBias": 0.62,
+    "bankLimitDegrees": 32,
+    "status": "TUNABLE_GAMEPLAY_DEFAULTS_NOT_NATURAL_TRUTH"
+  },
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-phase1-r014.html",
+  "export": "kaopu/bird-seabird-game-profile@1.0",
+  "boundaries": {
+    "sourceMeshCopiedToRuntime": false,
+    "sourceAnimationTimingAcceptedAsBiologicalTruth": false,
+    "secondarySourceCommercialRuntimeAllowed": false,
+    "exactSpeciesLocked": false,
+    "shoreLandingReady": false,
+    "waterContactReady": false,
+    "independentCommercialSafeSeagullGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "openGates": {
+    "primaryViewerRuntimeVerified": false,
+    "secondaryViewerRuntimeVerified": false,
+    "primaryEightPhaseCaptureComplete": false,
+    "secondaryEightPhaseCaptureComplete": false,
+    "primaryWingCycleMeasured": false,
+    "secondaryGenericBoneMapMeasured": false,
+    "gameProfileExported": false,
+    "independentCommercialSafeSeagullGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
