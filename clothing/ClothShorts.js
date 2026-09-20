@@ -146,8 +146,15 @@ class ClothShorts {
     this.assemblyWallTimeMs+=performance.now()-begin;this.displayReady=true;this.assemblyReady=false;this.assemblyState='gusset-input-failed';
     const staged=this.simulation.report();this.assemblyReport={...staged,gussetProgress:this.gussetProgress,gussetRise:this.gussetRiseReport,gusset:null,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;
    }
-   this.gussetReport=completeShortsGussetR25(this.simulation,this.gussetState,this.gussetRiseReport);this.assemblyState='gusset-relaxing';const gussetStartStep=this.simulation.stepIndex,gussetMinimumSteps=1,gussetMaximumSteps=12;
-   this.gussetProgress={phase:'gusset-relaxation',completedSteps:0,maximumSteps:gussetMaximumSteps,valid:this.gussetReport?.valid===true,budgetExceeded:false};
+   this.gussetReport=completeShortsGussetR25(this.simulation,this.gussetState,this.gussetRiseReport);
+   // A stage transition has zero elapsed time but a new active source piece.
+   // Perform a fresh read-only discrete cloth scan; body reports and the swept
+   // contact report also re-query the current geometry. This is not a cached
+   // R2.4 self-contact result.
+   this.simulation._selfContact(false);
+   this.gussetReport=auditShortsGussetR25(this.simulation,this.gussetState,this.gussetReport,{requireBody:true,requireSelfContact:true,materialLimit:.05});
+   this.assemblyState='gusset-relaxing';const gussetStartStep=this.simulation.stepIndex,gussetMinimumSteps=1,gussetMaximumSteps=this.gussetReport.valid?0:12;
+   this.gussetProgress={phase:this.gussetReport.valid?'gusset-stage-boundary':'gusset-relaxation',completedSteps:0,maximumSteps:gussetMaximumSteps,valid:this.gussetReport.valid===true,budgetExceeded:false};
    for(let step=0;step<gussetMaximumSteps;step++){
     if(this.disposed)throw Error('R2.5 gusset review was disposed');
     this.body.update();this.simulation.step(1);this.dirty=true;
