@@ -1,0 +1,59 @@
+name: Face R25C lightweight clean-face preview
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+    paths:
+      - tools/capture-face-r25c-light.cjs
+      - .github/workflows/face-r25c-light-preview.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture-light-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/face-features-r25-20260919
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and validate exact entry
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/check-face-r25-baseline.mjs
+          node --check tools/capture-face-r25c-light.cjs
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA_NODE="$RUNNER_TEMP/face-r25c-light-playwright"
+          mkdir -p "$QA_NODE" && cd "$QA_NODE"
+          npm init -y >/dev/null
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install chromium
+          echo "HUMAN_PLAYWRIGHT_MODULE=$QA_NODE/node_modules/playwright" >> "$GITHUB_ENV"
+      - name: Capture front and angle framebuffers
+        env:
+          HUMAN_PLAYWRIGHT_MODULE: ${{ env.HUMAN_PLAYWRIGHT_MODULE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/face-r25c-light"
+          node tools/capture-face-r25c-light.cjs "$OUT"
+          rm -rf face-r25c-light-evidence
+          cp -a "$OUT" face-r25c-light-evidence
+      - name: Upload actual WebGL screenshots
+        if: always() && hashFiles('face-r25c-light-evidence/capture.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-r25c-light-${{ github.sha }}
+          path: face-r25c-light-evidence
+          retention-days: 30
