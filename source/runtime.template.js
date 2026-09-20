@@ -615,6 +615,7 @@ async function startupStage(stage,message){
 /*__SOURCE:clothing/ShortsTubeFormationR2.js__*/
 /*__SOURCE:clothing/ShortsDualTubeR2.js__*/
 /*__SOURCE:clothing/ShortsRiseAssemblyR2.js__*/
+/*__SOURCE:clothing/ShortsGussetAssemblyR2.js__*/
 /*__SOURCE:clothing/ShortsLegAssembly.js__*/
 /*__SOURCE:clothing/ShortsCloth.js__*/
 /*__SOURCE:clothing/ClothShorts.js__*/
