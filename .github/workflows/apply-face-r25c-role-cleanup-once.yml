@@ -5,6 +5,7 @@ on:
     branches:
       - feature/face-features-r25-20260919
     paths:
+      - tools/apply-face-cleanup-check-contract.mjs
       - .github/workflows/apply-face-r25c-role-cleanup-once.yml
 
 permissions:
@@ -27,7 +28,9 @@ jobs:
           node-version: '22'
 
       - name: Apply clean-shaven and neutral-skin production data
-        run: node tools/apply-face-clean-shaven-neutral-skin.mjs
+        run: |
+          node tools/apply-face-clean-shaven-neutral-skin.mjs
+          node tools/apply-face-cleanup-check-contract.mjs
 
       - name: Rebuild generated workbench
         run: node tools/build-pure.mjs
@@ -38,6 +41,7 @@ jobs:
           node tools/check-face-r25-baseline.mjs
           node tools/check-eye-anatomy.mjs --parameter-fixtures
           node tools/test-face-clean-shaven-neutral-skin.mjs
+          node tools/test-beard-anatomy.mjs
           node tools/test-face-identity-landmarks.mjs
           node tools/test-face-identity-warp.mjs
           node tools/test-npc-face-uniforms.mjs
@@ -52,6 +56,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add body/FaceAnatomy.js body/SkinAppearance.js body/CharacterPresets.js tools/check-face-r25-baseline.mjs tools/test-face-clean-shaven-neutral-skin.mjs docs/face-knowledge/R25C_CLEAN_SHAVEN_NEUTRAL_SKIN_20260920.md index.html FILE_AUDIT.json SHA256SUMS.txt
+          git add body/FaceAnatomy.js body/SkinAppearance.js body/CharacterPresets.js tools/check-skin-appearance.mjs tools/check-face-r25-baseline.mjs tools/test-beard-anatomy.mjs tools/test-face-clean-shaven-neutral-skin.mjs docs/face-knowledge/R25C_CLEAN_SHAVEN_NEUTRAL_SKIN_20260920.md index.html FILE_AUDIT.json SHA256SUMS.txt
           git commit -m "face R25C: disable default beard and facial blush"
           git push origin HEAD:feature/face-features-r25-20260919
