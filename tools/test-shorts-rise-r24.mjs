@@ -21,9 +21,18 @@ function build(){
 test('R2.4 closes only the four leg seams and the two original centre rises',()=>{
  const {report,cloth}=build(),expected=['outseam-left','inseam-left','outseam-right','inseam-right','center-front','center-back'];
  assert.equal(report.topologyGate,true);assert.deepEqual(plain(report.closedSeamIds),expected);assert.equal(report.sourceIdentityPreserved,true);assert.equal(report.totalMassPreserved,true);
- const active=new Set(expected),seams=new Map(cloth.seams.map(seam=>[seam.id,seam]));
+ const active=new Set(expected),seams=new Map(cloth.seams.map(seam=>[seam.id,seam])),pairKey=pair=>pair.a<pair.b?pair.a+':'+pair.b:pair.b+':'+pair.a;
  for(const id of expected)assert.ok(seams.get(id).pairs.every(pair=>pair.started&&cloth.dofs.same(pair.a,pair.b)),id);
- for(const seam of cloth.seams)if(!active.has(seam.id))assert.ok(seam.pairs.every(pair=>!pair.started&&!cloth.dofs.same(pair.a,pair.b)),seam.id);
+ const leftOutseamPairs=new Set(seams.get('outseam-left').pairs.map(pairKey));
+ for(const seam of cloth.seams)if(!active.has(seam.id)){
+  assert.ok(seam.pairs.every(pair=>!pair.started),seam.id+' started');
+  const joined=seam.pairs.map((pair,index)=>cloth.dofs.same(pair.a,pair.b)?index:-1).filter(index=>index>=0);
+  if(seam.id==='side-opening-left'){
+   assert.equal(joined.length,1,'left opening may share only its sewn outseam junction');
+   assert.ok(joined[0]===0||joined[0]===seam.pairs.length-1,'shared opening point must be an endpoint');
+   assert.ok(leftOutseamPairs.has(pairKey(seam.pairs[joined[0]])),'shared opening point must be the real outseam junction');
+  }else assert.deepEqual(joined,[],seam.id+' joined before its source stitch started');
+ }
  assert.deepEqual(plain(report.futureSeamsStarted),[]);
 });
 
