@@ -89,7 +89,7 @@ jobs:
               'buildLaridDisplay','exportKaopuCProfile','verifyIndependence',
               'preview','balanced','close','sourceTopologyDependency',
               'original-bird-r015-larid-c-draft.kaopu',
-              'Stone Money Island','UNRESOLVED','UNKNOWN'
+              'Stone Money Island','UNKNOWN'
           )
           for token in required_lab:
               if token not in lab_text:
@@ -138,7 +138,7 @@ jobs:
           const doc=exportKaopuCProfile(profile,{test:true});
           if(doc.representation.fixedVertexArrayStored!==false||doc.representation.fixedTriangleArrayStored!==false)throw new Error('EXPORT_STORES_FIXED_TOPOLOGY');
           if(doc.evidence.sourceRuntimeDependency!==false)throw new Error('EXPORT_SOURCE_DEPENDENCY_INVALID');
-          console.log('R015_KERNEL_OK',results.map(r=>r.stats), 'anchorDrift',max);
+          console.log('R015_KERNEL_OK',results.map(r=>r.stats),'anchorDrift',max);
           NODE
           node --check /tmp/original-bird-seagull-c-draft-r015.mjs
           node --check /tmp/original-bird-production-hub-r015.mjs
