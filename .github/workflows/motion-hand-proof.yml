@@ -1,0 +1,200 @@
+name: Motion focused hand-action proof
+
+on:
+  push:
+    branches:
+      - feature/human-motion-convergence-r1
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Optional exact commit SHA to inspect
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: motion-hand-action-proof
+  cancel-in-progress: true
+
+jobs:
+  hand-proof:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[hand-proof]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.source_sha || github.sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install real-browser dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --no-cache-dir selenium==4.27.1 pillow==11.0.0
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb xauth fonts-noto-cjk
+          command -v google-chrome || command -v google-chrome-stable || command -v chromium
+
+      - name: Resolve exact source
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          SHORT_SHA="${SOURCE_SHA:0:12}"
+          PUBLIC_URL="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${SOURCE_SHA}/index.html"
+          LOCAL_URL="http://127.0.0.1:8765/body-hand-qa.html?visualTest=1"
+          echo "source_sha=${SOURCE_SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "public_url=${PUBLIC_URL}" >> "$GITHUB_OUTPUT"
+          echo "local_url=${LOCAL_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify immutable public entrypoint and build exact body proof page
+        shell: bash
+        env:
+          PUBLIC_URL: ${{ steps.target.outputs.public_url }}
+        run: |
+          set -euo pipefail
+          cp index.html source-index.html
+          curl -fL --retry 16 --retry-delay 3 --connect-timeout 20 --max-time 300 \
+            -H 'Cache-Control: no-cache' "$PUBLIC_URL" -o public-index.html
+          cmp -s source-index.html public-index.html
+          node tools/build-pure.mjs --check
+          python - <<'PY'
+          from pathlib import Path
+
+          def patch(path, marker, insertion):
+              file=Path(path);data=file.read_bytes()
+              if data.count(marker)!=1:
+                  raise SystemExit(f'{path}: expected one marker, found {data.count(marker)}')
+              file.write_bytes(data.replace(marker,marker+insertion,1))
+
+          patch(
+              'body/CompactWorkbench.js',
+              b"async function installCompactWorkbench(lab,pending){",
+              b"\n  const motionVisualTest=new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest');\n  if(motionVisualTest){\n    pending?.catch?.(()=>{});\n    cancelCompactSurface('focused hand proof uses the lightweight fallback surface');\n    window.__motionVisualQAFallback={active:true,renderer:'procedural-fallback',motionEvidence:true,skinApproval:false};\n    window.__compactLoading={quality:'qa-fallback',job:'surface',state:'ready',group:'ready',message:'focused hand proof lightweight surface',startedAt:performance.now(),updatedAt:performance.now()};\n    lab.renderer.setQuality('fast');\n    if(!lab.hair?.inStudio?.())lab.focus('body');\n    needsRedraw=true;\n    return;\n  }",
+          )
+          patch(
+              'control/NPCPopulation.js',
+              b"  this.place(actor,position,options.yaw??0);this.pendingIds.add(id);",
+              b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){\n   actor.compact=null;\n   if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};\n   this.pendingIds.delete(id);\n   return actor;\n  }",
+          )
+          PY
+          node --input-type=module <<'JS'
+          import {writeFileSync} from 'node:fs';
+          import {assemble} from './tools/build-pure.mjs';
+          const result=assemble();
+          writeFileSync('body-hand-qa.html',result.body);
+          console.log(JSON.stringify({bodyBytes:Buffer.byteLength(result.body),runtimeBytes:Buffer.byteLength(result.runtime)}));
+          JS
+          grep -q '__motionVisualQAFallback' body-hand-qa.html
+          grep -q 'MotionRuntimeState' body-hand-qa.html
+          grep -q 'contact-hand-pose' body-hand-qa.html
+          sha256sum source-index.html public-index.html body-hand-qa.html | tee hand-proof-entrypoint-hashes.txt
+
+      - name: Run focused hand-action proof
+        env:
+          SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
+          LOCAL_URL: ${{ steps.target.outputs.local_url }}
+          PUBLIC_URL: ${{ steps.target.outputs.public_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 8765 --bind 127.0.0.1 >http-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS --connect-timeout 2 "http://127.0.0.1:8765/body-hand-qa.html?visualTest=1" >/dev/null; then break; fi
+            if [[ "$attempt" == 40 ]]; then echo 'Local direct body server did not start.' >&2; exit 1; fi
+            sleep .25
+          done
+          timeout --signal=TERM --kill-after=15s 1200s \
+            xvfb-run -a -s "-screen 0 1920x1080x24" \
+            python tools/motion_hand_visual_proof.py \
+              --url "$LOCAL_URL" \
+              --source-sha "$SOURCE_SHA" \
+              --interactive-url "$PUBLIC_URL" \
+              --output hand-proof | tee hand-proof-run.log
+
+      - name: Upload focused hand proof
+        if: always() && hashFiles('hand-proof/browser-run-report.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion-hand-proof-${{ steps.target.outputs.short_sha }}
+          path: |
+            hand-proof
+            hand-proof-run.log
+            http-server.log
+            hand-proof-entrypoint-hashes.txt
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
+
+      - name: Publish hand-action review site
+        if: hashFiles('hand-proof/visual-review.html') != ''
+        env:
+          SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
+          REVIEW_BRANCH: visual-review/human-motion-convergence-r1-hand-proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "+refs/heads/$REVIEW_BRANCH:refs/remotes/origin/$REVIEW_BRANCH" || true
+          rm -rf /tmp/motion-hand-proof
+          git worktree add --detach /tmp/motion-hand-proof "$SOURCE_SHA"
+          cd /tmp/motion-hand-proof
+          if git show-ref --verify --quiet "refs/remotes/origin/$REVIEW_BRANCH"; then
+            git checkout -B "$REVIEW_BRANCH" "refs/remotes/origin/$REVIEW_BRANCH"
+          else
+            git checkout --orphan "$REVIEW_BRANCH"
+            git rm -rf . || true
+          fi
+          mkdir -p "reviews/$SOURCE_SHA"
+          rm -rf "reviews/$SOURCE_SHA"
+          cp -a "$GITHUB_WORKSPACE/hand-proof/." "reviews/$SOURCE_SHA/"
+          cat > latest.json <<EOF
+          {
+            "sourceSHA": "$SOURCE_SHA",
+            "reviewPath": "reviews/$SOURCE_SHA/visual-review.html",
+            "updatedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "bodyExecutionMode": "exact-generated-body-direct",
+            "surfaceReviewScope": "motion-preview-lightweight-fallback",
+            "skinApproval": false,
+            "fullDynamics": false,
+            "visualAcceptance": false,
+            "userVisualAcceptance": "pending"
+          }
+          EOF
+          cat > index.html <<EOF
+          <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0; url=reviews/$SOURCE_SHA/visual-review.html"><title>人物手部动作测试</title></head><body><p><a href="reviews/$SOURCE_SHA/visual-review.html">打开人物手部动作测试</a></p></body></html>
+          EOF
+          git add index.html latest.json "reviews/$SOURCE_SHA"
+          git commit -m "hand-proof: $SOURCE_SHA [skip ci]"
+          git push origin "HEAD:$REVIEW_BRANCH"
+
+      - name: Enforce evidence production
+        if: always()
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+          path=Path('hand-proof/browser-run-report.json')
+          if not path.exists():
+              raise SystemExit('Hand proof did not produce a report.')
+          data=json.loads(path.read_text(encoding='utf-8'))
+          if data.get('status') not in {'CAPTURED','CAPTURED_WITH_FAILURES'}:
+              raise SystemExit(f"Hand proof did not capture evidence: {data.get('status')} {data.get('runnerError')}")
+          if len(data.get('captures',[])) < 5:
+              raise SystemExit('Hand proof produced fewer than five action captures.')
