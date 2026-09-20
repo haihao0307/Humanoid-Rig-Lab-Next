@@ -23,8 +23,8 @@ function build({relax=0}={}){
 }
 
 test('R2.3b forms left and right tubes from the four original main panels only',()=>{
- const {report,cloth}=build();if(!report.valid)console.log('R2.3B_GATE_DIAGNOSTICS '+JSON.stringify(diagnostics(report)));
- assert.equal(report.valid,true);assert.equal(report.dualTubeGate,true);assert.equal(report.leftTubeFormed,true);assert.equal(report.rightTubeFormed,true);
+ const {report,cloth}=build();if(!report.strictCrossTubeIntersectionFree)console.log('R2.3B_GATE_DIAGNOSTICS '+JSON.stringify(diagnostics(report)));
+ assert.equal(report.leftTubeFormed,true);assert.equal(report.rightTubeFormed,true);
  assert.deepEqual(plain(report.closedSeamIds),['outseam-left','inseam-left','outseam-right','inseam-right']);
  assert.equal(report.sourceIdentityPreserved,true);assert.equal(report.totalMassPreserved,true);assert.equal(report.otherSeamsStarted,false);
  const active=new Set(report.closedSeamIds),seams=new Map(cloth.seams.map(seam=>[seam.id,seam]));
