@@ -38,21 +38,21 @@ if(!dual.includes('simulation.contactTriangleRecords=activeTriangleRecords')){
 
 const clothPath='clothing/ShortsCloth.js';
 let cloth=fs.readFileSync(clothPath,'utf8');
-if(!cloth.includes('const triangles=this.contactTriangleRecords||this.triangleRecords;')){
+if(!cloth.includes('const contactTriangles=this.contactTriangleRecords||this.triangleRecords;')){
   cloth=patchSection(cloth,'  _selfCandidates(){','  _selfEdgeContact(',section=>{
-    section=section.replace('  _selfCandidates(){\n    const size=',"  _selfCandidates(){\n    const triangles=this.contactTriangleRecords||this.triangleRecords;\n    const particleIndices=this.contactParticleIndices||Array.from({length:this.particles.length},(_,i)=>i);\n    const size=");
-    section=section.replaceAll('this.triangleRecords','triangles');
+    section=section.replaceAll('this.triangleRecords','contactTriangles');
+    section=section.replace('  _selfCandidates(){\n    const size=',"  _selfCandidates(){\n    const contactTriangles=this.contactTriangleRecords||this.triangleRecords;\n    const particleIndices=this.contactParticleIndices||Array.from({length:this.particles.length},(_,i)=>i);\n    const size=");
     section=section.replace('for(let i=0;i<this.particles.length;i++){','for(const i of particleIndices){');
     return section;
   },'vertex-face contact domain');
   cloth=patchSection(cloth,'  _selfEdgeContact(','  _selfContact(',section=>{
-    section=section.replace("  _selfEdgeContact(project,budget){\n    const cell=","  _selfEdgeContact(project,budget){\n    const contactEdges=this.contactEdges||this.edges;\n    const cell=");
     section=section.replaceAll('this.edges','contactEdges');
+    section=section.replace("  _selfEdgeContact(project,budget){\n    const cell=","  _selfEdgeContact(project,budget){\n    const contactEdges=this.contactEdges||this.edges;\n    const cell=");
     return section;
   },'edge-edge contact domain');
   cloth=patchSection(cloth,'  _selfContact(','  _sweptSelfContact(',section=>{
-    section=section.replace("  _selfContact(project=true){\n    if(!this.options.selfContact)return;","  _selfContact(project=true){\n    if(!this.options.selfContact)return;const triangles=this.contactTriangleRecords||this.triangleRecords;");
-    section=section.replaceAll('this.triangleRecords','triangles');
+    section=section.replaceAll('this.triangleRecords','contactTriangles');
+    section=section.replace("  _selfContact(project=true){\n    if(!this.options.selfContact)return;","  _selfContact(project=true){\n    if(!this.options.selfContact)return;const contactTriangles=this.contactTriangleRecords||this.triangleRecords;");
     return section;
   },'self-contact triangle domain');
   fs.writeFileSync(clothPath,cloth);
