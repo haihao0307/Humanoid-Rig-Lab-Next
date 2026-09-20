@@ -64,6 +64,7 @@ jobs:
               pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-measure-r006.html'),
               pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-semantic-map-r007.html'),
               pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-material-audit-r008.html'),
+              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r009.html'),
           ]
           for p in files:
               text = p.read_text(encoding='utf-8')
@@ -80,8 +81,9 @@ jobs:
           node --check /tmp/original-bird-source-measure-r006.js
           node --check /tmp/original-bird-semantic-map-r007.js
           node --check /tmp/original-bird-material-audit-r008.js
+          node --check /tmp/original-bird-production-hub-r009.js
 
-      - name: R0.08 source-backed material-role guards
+      - name: R0.09 unified production guards
         shell: python
         run: |
           import json
@@ -109,6 +111,11 @@ jobs:
               raise SystemExit('VISUAL_BIRD_MUST_REMAIN_FALSE_UNTIL_INDEPENDENT_DISTILLATION')
           if status.get('r003InventedFormDeleted') is not True:
               raise SystemExit('R003_DELETION_NOT_RECORDED')
+          hub = status.get('productionHub', {})
+          if hub.get('generated') is not True or hub.get('revision') != 'R0.09' or hub.get('singleEntry') is not True:
+              raise SystemExit('R009_PRODUCTION_HUB_NOT_RECORDED')
+          if hub.get('blackModelBackgroundRemoved') is not True:
+              raise SystemExit('R009_BLACK_BACKGROUND_REMOVAL_NOT_RECORDED')
           for key, revision in (
               ('sourceMeasurementWorkbench', 'R0.06'),
               ('semanticMappingWorkbench', 'R0.07'),
@@ -128,51 +135,57 @@ jobs:
               'r006': root / 'workbench/original-bird-source-measure-r006.html',
               'r007': root / 'workbench/original-bird-semantic-map-r007.html',
               'r008': root / 'workbench/original-bird-material-audit-r008.html',
+              'r009': root / 'workbench/original-bird-production-hub-r009.html',
           }
           if not all(p.exists() for p in paths.values()):
               raise SystemExit('REQUIRED_WORKBENCH_MISSING')
           texts = {k: p.read_text(encoding='utf-8') for k, p in paths.items()}
 
-          for token in (
-              '821135a09d3f48909b977a416d99c93b',
-              '67f9422072664cf1967ae4fe440585a9',
-              "background:'studio'",
-              '双点测量',
-              '动作相位采样',
-              'capturePhase',
-              'original-bird-r006-measurements.json',
-              'original-bird-r006-motion-phase.json',
-          ):
-              if token not in texts['r006']:
-                  raise SystemExit('R006_TOKEN_MISSING ' + token)
-
-          for token in (
-              '821135a09d3f48909b977a416d99c93b',
-              '67f9422072664cf1967ae4fe440585a9',
-              "background:'studio'",
-              'COLUMBID_SEMANTIC_MAP_R007.json',
-              'canonicalRole',
-              'seedKnown',
-              'original-bird-r007-semantic-map.json',
-          ):
-              if token not in texts['r007']:
-                  raise SystemExit('R007_TOKEN_MISSING ' + token)
-
-          for token in (
-              '821135a09d3f48909b977a416d99c93b',
-              "background:'studio'",
-              'COLUMBID_MATERIAL_ROLE_MAP_R008.json',
-              'getMaterialList',
-              'setMaterial',
-              'RoughnessPBR',
-              'MetalnessPBR',
-              'SpecularF0',
-              'resetAll',
-              'original-bird-r008-material-role-map.json',
-              'live material-role calibration',
-          ):
-              if token not in texts['r008']:
-                  raise SystemExit('R008_TOKEN_MISSING ' + token)
+          required_by_stage = {
+              'r006': (
+                  '821135a09d3f48909b977a416d99c93b',
+                  '67f9422072664cf1967ae4fe440585a9',
+                  "background:'studio'",
+                  '双点测量',
+                  '动作相位采样',
+                  'capturePhase',
+                  'original-bird-r006-measurements.json',
+                  'original-bird-r006-motion-phase.json',
+              ),
+              'r007': (
+                  '821135a09d3f48909b977a416d99c93b',
+                  '67f9422072664cf1967ae4fe440585a9',
+                  "background:'studio'",
+                  'COLUMBID_SEMANTIC_MAP_R007.json',
+                  'canonicalRole',
+                  'seedKnown',
+                  'original-bird-r007-semantic-map.json',
+              ),
+              'r008': (
+                  '821135a09d3f48909b977a416d99c93b',
+                  "background:'studio'",
+                  'COLUMBID_MATERIAL_ROLE_MAP_R008.json',
+                  'getMaterialList',
+                  'setMaterial',
+                  'RoughnessPBR',
+                  'MetalnessPBR',
+                  'SpecularF0',
+                  'resetAll',
+                  'original-bird-r008-material-role-map.json',
+              ),
+              'r009': (
+                  'original-bird-source-measure-r006.html',
+                  'original-bird-semantic-map-r007.html',
+                  'original-bird-material-audit-r008.html',
+                  'CURRENT_STATUS.json',
+                  'unified production hub',
+                  'single-entry',
+              ),
+          }
+          for stage, tokens in required_by_stage.items():
+              for token in tokens:
+                  if token not in texts[stage]:
+                      raise SystemExit(stage.upper() + '_TOKEN_MISSING ' + token)
 
           forbidden = (
               'data-bg="dark"',
@@ -204,4 +217,4 @@ jobs:
               raise SystemExit('MATERIAL_ROLE_SET_CHANGED')
           if material['openGates']['independentCommercialSafeMaterialGenerated'] is not False:
               raise SystemExit('MATERIAL_PRODUCTION_GATE_MUST_REMAIN_FALSE')
-          print('R008_LIVE_MATERIAL_ROLE_GUARDS_OK')
+          print('R009_UNIFIED_PRODUCTION_GUARDS_OK')
