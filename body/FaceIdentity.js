@@ -57,6 +57,9 @@ const FACE_IDENTITY_REFERENCE_LANDMARKS=Object.freeze([
 // Other NPC recipes keep their own identities; these are design choices, not
 // an ethnic template or a universal formula for attractiveness.
 const FACE_SCULPTED_MALE_SHAPE=Object.freeze({headWidth:.16,headHeight:-.40,headDepth:.10,eyeSpacing:-.72,cranialWidth:-.12,faceHeight:-.20,cheekboneWidth:.48,cheekProjection:.18,jawWidth:.68,lowerFaceFullness:-.50,chinLength:-.10,chinProjection:.52,noseWidth:-.18,noseLength:-.20,noseProjection:.08,mouthWidth:.36,lipFullness:-.10});
+// R25D current-role recipe: narrower lateral mass and softer lower face.
+// It is a reversible authored identity, not an age estimator or population rule.
+const FACE_YOUNG_SLENDER_MALE_SHAPE=Object.freeze({headWidth:-.05,headHeight:-.34,headDepth:.06,eyeSpacing:-.68,cranialWidth:-.22,faceHeight:-.18,cheekboneWidth:.22,cheekProjection:.10,jawWidth:.25,lowerFaceFullness:-.62,chinLength:-.18,chinProjection:.26,noseWidth:-.20,noseLength:-.24,noseProjection:.04,mouthWidth:.30,lipFullness:.02});
 const FACE_IDENTITY_PRESETS=Object.freeze([
   {id:'sculpted-male',label:'立体男性',shape:FACE_SCULPTED_MALE_SHAPE,offsetsMm:{}},
   {id:'reference',label:'参考中性',shape:{},offsetsMm:{}},
