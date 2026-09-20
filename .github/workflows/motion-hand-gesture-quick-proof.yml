@@ -1,0 +1,100 @@
+name: Motion quick standing hand gestures
+
+on:
+  push:
+    branches:
+      - feature/human-motion-convergence-r1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motion-hand-gesture-quick-proof
+  cancel-in-progress: true
+
+jobs:
+  gesture-proof:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[gesture-proof]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser proof dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --no-cache-dir selenium==4.27.1 pillow==11.0.0
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb xauth fonts-noto-cjk
+      - name: Build exact direct body page
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          PUBLIC_URL="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${SOURCE_SHA}/index.html"
+          echo "source_sha=${SOURCE_SHA}" >> "$GITHUB_OUTPUT"
+          echo "public_url=${PUBLIC_URL}" >> "$GITHUB_OUTPUT"
+          curl -fL --retry 12 --retry-delay 3 --connect-timeout 20 --max-time 240 -H 'Cache-Control: no-cache' "$PUBLIC_URL" -o public-index.html
+          cmp -s index.html public-index.html
+          python - <<'PY'
+          from pathlib import Path
+          def patch(path,marker,insertion):
+              file=Path(path);data=file.read_bytes()
+              if data.count(marker)!=1: raise SystemExit(f'{path}: marker count {data.count(marker)}')
+              file.write_bytes(data.replace(marker,marker+insertion,1))
+          patch('body/CompactWorkbench.js',b"async function installCompactWorkbench(lab,pending){",b"\n  const motionVisualTest=new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest');\n  if(motionVisualTest){pending?.catch?.(()=>{});cancelCompactSurface('quick gesture proof fallback');window.__motionVisualQAFallback={active:true,renderer:'procedural-fallback',motionEvidence:true,skinApproval:false};window.__compactLoading={quality:'qa-fallback',job:'surface',state:'ready',group:'ready',message:'quick gesture proof',startedAt:performance.now(),updatedAt:performance.now()};lab.renderer.setQuality('fast');if(!lab.hair?.inStudio?.())lab.focus('body');needsRedraw=true;return;}" )
+          patch('control/NPCPopulation.js',b"  this.place(actor,position,options.yaw??0);this.pendingIds.add(id);",b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){actor.compact=null;this.pendingIds.delete(id);return actor;}" )
+          PY
+          node --input-type=module <<'JS'
+          import {writeFileSync} from 'node:fs';
+          import {assemble} from './tools/build-pure.mjs';
+          const result=assemble();writeFileSync('body-gesture-qa.html',result.body);
+          JS
+          grep -q '__motionVisualQAFallback' body-gesture-qa.html
+          grep -q 'CONTACT_HAND_POSE_REVISION' body-gesture-qa.html
+      - name: Capture standing hand gestures
+        env:
+          SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
+          PUBLIC_URL: ${{ steps.target.outputs.public_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 8765 --bind 127.0.0.1 >http-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do curl -fsS "http://127.0.0.1:8765/body-gesture-qa.html?visualTest=1" >/dev/null && break; sleep .25; done
+          timeout --signal=TERM --kill-after=10s 600s xvfb-run -a -s "-screen 0 1920x1080x24" \
+            python tools/motion_hand_gesture_quick_proof.py \
+              --url "http://127.0.0.1:8765/body-gesture-qa.html?visualTest=1" \
+              --source-sha "$SOURCE_SHA" --interactive-url "$PUBLIC_URL" --output gesture-proof
+      - name: Upload gesture images
+        if: always() && hashFiles('gesture-proof/browser-run-report.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion-hand-gesture-quick-${{ steps.target.outputs.source_sha }}
+          path: |
+            gesture-proof
+            http-server.log
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
+      - name: Enforce gesture captures
+        if: always()
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+          path=Path('gesture-proof/browser-run-report.json')
+          if not path.exists(): raise SystemExit('No quick gesture report.')
+          data=json.loads(path.read_text(encoding='utf-8'))
+          if len(data.get('captures',[]))!=3: raise SystemExit('Expected three gesture captures.')
