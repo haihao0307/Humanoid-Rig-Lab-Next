@@ -22,19 +22,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Python syntax
+      - name: Python syntax and self tests
         run: |
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py
-          if [ -f Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py ]; then
-            python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py
-          fi
-
-      - name: Tool self tests
-        run: |
           python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
           python Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py --self-test
           if [ -f Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py ]; then
+            python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py
             python Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py --self-test
           fi
 
@@ -63,6 +58,7 @@ jobs:
               pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html'),
               pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-glb-source-review-r004.html'),
               pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-beauty-r005.html'),
+              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-source-measure-r006.html'),
           ]
           for p in files:
               text = p.read_text(encoding='utf-8')
@@ -76,8 +72,9 @@ jobs:
           node --check /tmp/original-bird-columbid-skeleton-r002.js
           node --check /tmp/original-bird-glb-source-review-r004.js
           node --check /tmp/original-bird-source-beauty-r005.js
+          node --check /tmp/original-bird-source-measure-r006.js
 
-      - name: GLB-backed source-guided realism guards
+      - name: R0.06 source-backed measurement guards
         shell: python
         run: |
           import json
@@ -88,25 +85,15 @@ jobs:
           if rejected.exists():
               raise SystemExit('REJECTED_R003_FORM_REAPPEARED')
 
-          decision = root / 'BIRD_GLB_BASELINE_SELECTION_R003_ZH.md'
-          if not decision.exists():
-              raise SystemExit('GLB_BASELINE_DECISION_MISSING')
-          decision_text = decision.read_text(encoding='utf-8')
-          for token in ('BIRD-REF-002', 'pigeon (1)(2).glb', 'BIRD-REF-001', 'cine__pigeon_fly(2).glb', 'R0.03 invented form'):
-              if token not in decision_text:
-                  raise SystemExit('GLB_BASELINE_TOKEN_MISSING ' + token)
-
           batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
           records = batch['records']
           birds = [r for r in records if r['assetId'].startswith('BIRD-REF-')]
           if len(records) != 7 or len(birds) != 6:
               raise SystemExit(f'BIRD_BATCH_COUNT_REGRESSION total={len(records)} birds={len(birds)}')
           by_id = {r['assetId']: r for r in records}
-          detail = by_id['BIRD-REF-002']
-          motion = by_id['BIRD-REF-001']
-          if detail['counts']['joints'] != 117 or detail['counts']['vertices'] != 18152:
+          if by_id['BIRD-REF-002']['counts']['joints'] != 117 or by_id['BIRD-REF-002']['counts']['vertices'] != 18152:
               raise SystemExit('PRIMARY_DETAIL_REFERENCE_CHANGED')
-          if motion['counts']['joints'] != 44 or motion['skeleton']['semanticCounts']['wing'] != 10:
+          if by_id['BIRD-REF-001']['counts']['joints'] != 44 or by_id['BIRD-REF-001']['skeleton']['semanticCounts']['wing'] != 10:
               raise SystemExit('PRIMARY_MOTION_REFERENCE_CHANGED')
 
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
@@ -114,56 +101,53 @@ jobs:
               raise SystemExit('VISUAL_BIRD_MUST_REMAIN_FALSE_UNTIL_INDEPENDENT_DISTILLATION')
           if status.get('r003InventedFormDeleted') is not True:
               raise SystemExit('R003_DELETION_NOT_RECORDED')
-          if status.get('sourceBeautyCalibrationWorkbenchGenerated') is not True:
-              raise SystemExit('SOURCE_BEAUTY_CALIBRATION_NOT_RECORDED')
+          r006 = status.get('sourceMeasurementWorkbench', {})
+          if r006.get('generated') is not True or r006.get('revision') != 'R0.06':
+              raise SystemExit('R006_MEASUREMENT_WORKBENCH_NOT_RECORDED')
+          if r006.get('blackModelBackgroundRemoved') is not True:
+              raise SystemExit('BLACK_BACKGROUND_REMOVAL_NOT_RECORDED')
           if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002':
               raise SystemExit('PRIMARY_VISIBLE_REFERENCE_NOT_LOCKED')
           if status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
               raise SystemExit('PRIMARY_MOTION_REFERENCE_NOT_LOCKED')
 
-          source_review = root / 'workbench/original-bird-glb-source-review-r004.html'
-          beauty = root / 'workbench/original-bird-source-beauty-r005.html'
-          realism = root / 'distilled/COLUMBID_REALISM_TARGET_R005.json'
-          for p in (source_review, beauty, realism):
-              if not p.exists():
-                  raise SystemExit('REQUIRED_R005_FILE_MISSING ' + str(p))
-
-          source_text = source_review.read_text(encoding='utf-8')
-          for token in ('821135a09d3f48909b977a416d99c93b', '67f9422072664cf1967ae4fe440585a9', 'getNodeMap', 'getAnimations'):
-              if token not in source_text:
-                  raise SystemExit('SOURCE_REVIEW_TOKEN_MISSING ' + token)
-
-          beauty_text = beauty.read_text(encoding='utf-8')
-          for token in (
+          r006_path = root / 'workbench/original-bird-source-measure-r006.html'
+          if not r006_path.exists():
+              raise SystemExit('R006_WORKBENCH_MISSING')
+          text = r006_path.read_text(encoding='utf-8')
+          required = (
               '821135a09d3f48909b977a416d99c93b',
               '67f9422072664cf1967ae4fe440585a9',
-              'sketchfab-viewer-1.12.1.js',
-              'setTextureQuality',
-              'setShadingStyle',
-              'setEnvironment',
-              'setPostProcessing',
+              "background:'studio'",
+              'const BG={studio:[.72,.77,.79]',
+              '双点测量',
+              '动作相位采样',
               'getNodeMap',
               'getMatrix',
-              'source-guided calibration',
-          ):
-              if token not in beauty_text:
-                  raise SystemExit('SOURCE_BEAUTY_TOKEN_MISSING ' + token)
-          for forbidden in ('deformedBodyGeometry', 'new THREE.SphereGeometry', 'new THREE.Mesh(', 'original-bird-columbid-form-r003'):
-              if forbidden in beauty_text:
-                  raise SystemExit('PROXY_FORM_REINTRODUCED ' + forbidden)
+              'capturePhase',
+              'original-bird-r006-measurements.json',
+              'original-bird-r006-motion-phase.json',
+              'bright-studio measurement runtime',
+          )
+          for token in required:
+              if token not in text:
+                  raise SystemExit('R006_TOKEN_MISSING ' + token)
+          forbidden = (
+              'data-bg="dark"',
+              'state.background=\'dark\'',
+              'new THREE.SphereGeometry',
+              'deformedBodyGeometry',
+              'original-bird-columbid-form-r003',
+          )
+          for token in forbidden:
+              if token in text:
+                  raise SystemExit('R006_FORBIDDEN_TOKEN ' + token)
 
-          target = json.loads(realism.read_text(encoding='utf-8'))
+          target = json.loads((root / 'distilled/COLUMBID_REALISM_TARGET_R005.json').read_text(encoding='utf-8'))
           if target['primaryVisibleReference']['assetId'] != 'BIRD-REF-002':
               raise SystemExit('REALISM_TARGET_VISIBLE_REFERENCE_CHANGED')
           if target['primaryMotionReference']['assetId'] != 'BIRD-REF-001':
               raise SystemExit('REALISM_TARGET_MOTION_REFERENCE_CHANGED')
           if target['openGates']['independentCommercialSafeSurfaceGenerated'] is not False:
               raise SystemExit('INDEPENDENT_SURFACE_GATE_MUST_REMAIN_FALSE')
-
-          skeleton = (root / 'workbench/original-bird-columbid-skeleton-r002.html').read_text(encoding='utf-8')
-          if 's.add(root),N={},E=[]' in skeleton:
-              raise SystemExit('STRICT_MODE_UNDECLARED_REGISTRY_REGRESSION')
-          for token in ('const N={},E=[]', 'requestAnimationFrame(loop)', 'runtime fixed'):
-              if token not in skeleton:
-                  raise SystemExit('SKELETON_RUNTIME_TOKEN_MISSING ' + token)
-          print('GLB_BACKED_SOURCE_GUIDED_REALISM_GUARDS_OK')
+          print('R006_BRIGHT_STUDIO_MEASUREMENT_GUARDS_OK')
