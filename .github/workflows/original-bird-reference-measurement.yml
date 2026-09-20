@@ -26,68 +26,72 @@ jobs:
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py
           python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
           python Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py --self-test
-      - name: R0.13.1 structure, syntax and gates
+      - name: R0.14 structure, syntax and gates
         shell: bash
         run: |
           python - <<'PY'
           import json, pathlib, re
           root = pathlib.Path('Bird-Reconstruction-Lab/original-bird')
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
-          contract = json.loads((root / 'distilled/COLUMBID_MOTION_AUTORUN_R0131.json').read_text(encoding='utf-8'))
+          contract = json.loads((root / 'distilled/LARID_SEAGULL_PHASE1_R014.json').read_text(encoding='utf-8'))
           batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
-          lab = root / 'workbench/original-bird-pigeon-motion-auto-r0131.html'
-          hub = root / 'workbench/original-bird-production-hub-r0131.html'
+          lab = root / 'workbench/original-bird-seagull-phase1-r014.html'
+          hub = root / 'workbench/original-bird-production-hub-r014.html'
+          pigeon = root / 'workbench/original-bird-pigeon-motion-auto-r0131.html'
           lab_text = lab.read_text(encoding='utf-8')
           hub_text = hub.read_text(encoding='utf-8')
 
-          if status.get('revision') != 'R0.13.1-automatic-pigeon-motion-baseline':
+          if status.get('revision') != 'R0.14-tropical-island-seagull-phase1':
               raise SystemExit('STATUS_REVISION_MISMATCH')
           if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
               raise SystemExit('INDEPENDENT_BIRD_GATE_INVALID')
-          if status['productionHub']['revision'] != 'R0.13.1' or status['productionHub']['defaultMobileStage'] != 'auto':
+          if status['productionHub']['revision'] != 'R0.14' or status['productionHub']['defaultMobileStage'] != 'seagull':
               raise SystemExit('HUB_STATUS_INVALID')
-          auto = status.get('pigeonMotionAutorun', {})
-          if auto.get('generated') is not True or auto.get('expectedRecords') != 40:
-              raise SystemExit('AUTORUN_STATUS_INVALID')
-          if auto.get('allFiveGroupsMeasured') is not False or auto.get('fortyPhaseRecordsCaptured') is not False:
-              raise SystemExit('RUNTIME_GATES_MUST_REMAIN_FALSE')
+          gull = status.get('seagullPhase1', {})
+          if gull.get('generated') is not True or gull.get('primaryAssetId') != 'BIRD-REF-004' or gull.get('secondaryAssetId') != 'BIRD-REF-005':
+              raise SystemExit('SEAGULL_STATUS_INVALID')
+          if gull.get('dualSourcePhaseCaptureComplete') is not False or gull.get('independentCommercialSafeSeagullGenerated') is not False:
+              raise SystemExit('SEAGULL_RUNTIME_GATES_MUST_REMAIN_FALSE')
           if status['alphaIssue']['status'] != 'DEFERRED_TO_LARGE_SCREEN_REVIEW':
               raise SystemExit('ALPHA_DEFER_STATUS_INVALID')
-          if status['nextSpecies']['species'] != 'Passer domesticus':
-              raise SystemExit('NEXT_SPECIES_CHANGED')
-          if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002' or status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
-              raise SystemExit('SOURCE_PAIR_CHANGED')
+          if status['deferredSpecies']['species'] != 'Passer domesticus':
+              raise SystemExit('DEFERRED_SPECIES_CHANGED')
 
-          birds = [r for r in batch['records'] if r['assetId'].startswith('BIRD-REF-')]
-          if len(batch['records']) != 7 or len(birds) != 6:
+          by_id = {r['assetId']: r for r in batch['records']}
+          if len(batch['records']) != 7 or len([r for r in batch['records'] if r['assetId'].startswith('BIRD-REF-')]) != 6:
               raise SystemExit('SOURCE_BATCH_COUNT_INVALID')
-          if contract['species'] != 'Spilopelia chinensis':
-              raise SystemExit('SPECIES_CHANGED')
-          if contract['automaticCapture']['groups'] != ['wing','tail','neck','head','leg']:
-              raise SystemExit('GROUP_SET_CHANGED')
-          if contract['automaticCapture']['normalizedPhases'] != [0.0,0.125,0.25,0.375,0.5,0.625,0.75,0.875]:
-              raise SystemExit('PHASE_SET_CHANGED')
-          if contract['automaticCapture']['expectedGroupPhaseRecords'] != 40:
-              raise SystemExit('RECORD_COUNT_CHANGED')
-          if contract['openGates']['allFiveGroupsMeasured'] is not False or contract['openGates']['visualAcceptance'] is not False:
-              raise SystemExit('ACCEPTANCE_GATE_INVALID')
+          if by_id['BIRD-REF-004']['counts']['joints'] != 15 or by_id['BIRD-REF-004']['skeleton']['semanticCounts']['wing'] != 8:
+              raise SystemExit('PRIMARY_GULL_REFERENCE_CHANGED')
+          if by_id['BIRD-REF-005']['counts']['joints'] != 21 or by_id['BIRD-REF-005']['skeleton']['semanticCounts']['wing'] != 8:
+              raise SystemExit('SECONDARY_GULL_REFERENCE_CHANGED')
+
+          if contract['projectUse']['game'] != 'Stone Money Island' or contract['projectUse']['exactSpecies'] != 'UNRESOLVED':
+              raise SystemExit('GAME_OR_SPECIES_BOUNDARY_CHANGED')
+          if contract['sourcePair']['primary']['assetId'] != 'BIRD-REF-004' or contract['sourcePair']['secondary']['assetId'] != 'BIRD-REF-005':
+              raise SystemExit('SEAGULL_SOURCE_PAIR_CHANGED')
+          if contract['sourcePair']['primary']['semanticCounts']['leg'] != 0:
+              raise SystemExit('PRIMARY_LEG_ABSENCE_CHANGED')
+          if contract['boundaries']['shoreLandingReady'] is not False or contract['boundaries']['waterContactReady'] is not False:
+              raise SystemExit('CONTACT_GATE_INVALID')
+          if len(contract['gameZones']) != 4 or contract['openGates']['visualAcceptance'] is not False:
+              raise SystemExit('GAME_PROFILE_OR_ACCEPTANCE_GATE_INVALID')
 
           required_lab = (
-              '67f9422072664cf1967ae4fe440585a9',
-              "ORDER=['wing','tail','neck','head','leg']",
+              'dc42ffc81c86480e9e7f7752fa134174',
+              '1d3b3cea037f4fb3bc9fbd72013bb94a',
               'PHASES=[0,.125,.25,.375,.5,.625,.75,.875]',
-              'getNodeMap','getAnimations','getMatrix','runAll','analyze','loopClosureMean',
-              'window.__BIRD_R0131_REPORT__','original-bird-r0131-report',
-              'kaopu/bird-motion-source@1.1','original-bird-r0131-pigeon-motion.kaopu',
-              'DEFERRED_TO_LARGE_SCREEN_REVIEW','Passer domesticus'
+              'getNodeMap','getAnimations','getMatrix','runBoth','sampleSource','analyze',
+              'window.__BIRD_R014_REPORT__','original-bird-r014-seagull-report',
+              'kaopu/bird-seabird-game-profile@1.0','original-bird-r014-seagull-game-profile.kaopu',
+              'reef_edge','lagoon','beach','offshore','Laridae seagull candidate'
           )
           for token in required_lab:
               if token not in lab_text:
                   raise SystemExit('LAB_TOKEN_MISSING ' + token)
           required_hub = (
-              'original-bird-pigeon-motion-auto-r0131.html',
-              "let active='auto'",
-              '羽毛 Alpha（明日大屏）',
+              'original-bird-seagull-phase1-r014.html',
+              "let active='seagull'",
+              'Stone Money Island',
               'single-entry-mobile-first'
           )
           for token in required_hub:
@@ -96,6 +100,8 @@ jobs:
           for token in ('data-bg="dark"',"state.background='dark'",'new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
               if token in lab_text or token in hub_text:
                   raise SystemExit('FORBIDDEN_TOKEN ' + token)
+          if not pigeon.exists():
+              raise SystemExit('PIGEON_BASELINE_MISSING')
 
           for p in (lab, hub):
               text = p.read_text(encoding='utf-8')
@@ -105,7 +111,7 @@ jobs:
               out = pathlib.Path('/tmp') / (p.stem + '.js')
               out.write_text('\n'.join(scripts), encoding='utf-8')
               print('SCRIPT_EXTRACTED', out)
-          print('R0131_AUTOMATIC_PIGEON_BASELINE_GUARDS_OK')
+          print('R014_TROPICAL_ISLAND_SEAGULL_PHASE1_GUARDS_OK')
           PY
-          node --check /tmp/original-bird-pigeon-motion-auto-r0131.js
-          node --check /tmp/original-bird-production-hub-r0131.js
+          node --check /tmp/original-bird-seagull-phase1-r014.js
+          node --check /tmp/original-bird-production-hub-r014.js
