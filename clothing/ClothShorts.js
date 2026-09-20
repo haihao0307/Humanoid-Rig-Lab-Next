@@ -73,7 +73,7 @@ class ClothShorts {
     this.simulation=new ShortsCloth(this.pattern,this.body,stagedOptions);this.leftTubeReport=completeShortsLeftTubeR23(this.simulation,this.leftTubeState);
    }else if(this.dualTubeReview){
     this.dualTubeState=createShortsDualTubeStateR23(this.pattern,this.body,h);
-    const stagedOptions={...SHORTS_WEARING_OPTIONS,gravity:0,groundY:null,selfContact:false,triangleBodyContact:true,iterations:10,maxMaterialIterations:20,sewingSeconds:1000,handlingDamping:5};
+    const stagedOptions={...SHORTS_WEARING_OPTIONS,gravity:0,groundY:null,selfContact:true,selfContactSweeps:2,maxSelfCandidates:30000,triangleBodyContact:true,iterations:10,maxMaterialIterations:20,sewingSeconds:1000,handlingDamping:5};
     this.simulation=new ShortsCloth(this.pattern,this.body,stagedOptions);this.dualTubeReport=completeShortsDualTubeR23(this.simulation,this.dualTubeState);
    }else{const source=h.sourceBind.get('hips'),current=h.byId.get('hips').world,q=qnorm(qm(current.q,inv(source.q)));
     for(const piece of this.pattern.pieces){const p=piece.placement;p.origin=add(current.p,rotate(q,sub(p.origin,source.p)));p.basisU=rotate(q,p.basisU);p.basisV=rotate(q,p.basisV);}

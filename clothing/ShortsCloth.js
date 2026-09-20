@@ -272,8 +272,10 @@ class ShortsCloth {
     }
   }
   _selfCandidates(){
+    const contactTriangles=this.contactTriangleRecords||this.triangleRecords;
+    const particleIndices=this.contactParticleIndices||Array.from({length:this.particles.length},(_,i)=>i);
     const size=.04,pad=this.options.thickness,grid=new Map(),key=(x,y,z)=>x+','+y+','+z;let exceeded=false;
-    for(let ti=0;ti<this.triangleRecords.length;ti++){const points=this.triangleRecords[ti].indices.map(i=>this.particles[i].pos),lo=[0,1,2].map(k=>Math.floor((Math.min(...points.map(p=>p[k]))-pad)/size)),hi=[0,1,2].map(k=>Math.floor((Math.max(...points.map(p=>p[k]))+pad)/size));if((hi[0]-lo[0]+1)*(hi[1]-lo[1]+1)*(hi[2]-lo[2]+1)>1000){exceeded=true;continue;}
+    for(let ti=0;ti<contactTriangles.length;ti++){const points=contactTriangles[ti].indices.map(i=>this.particles[i].pos),lo=[0,1,2].map(k=>Math.floor((Math.min(...points.map(p=>p[k]))-pad)/size)),hi=[0,1,2].map(k=>Math.floor((Math.max(...points.map(p=>p[k]))+pad)/size));if((hi[0]-lo[0]+1)*(hi[1]-lo[1]+1)*(hi[2]-lo[2]+1)>1000){exceeded=true;continue;}
       for(let x=lo[0];x<=hi[0];x++)for(let y=lo[1];y<=hi[1];y++)for(let z=lo[2];z<=hi[2];z++){const hash=key(x,y,z);if(!grid.has(hash))grid.set(hash,[]);grid.get(hash).push(ti);}}
     // A started stitch becomes a local topological neighbour only when the
     // original endpoints have actually reached the narrow seam neighbourhood.
@@ -285,15 +287,16 @@ class ShortsCloth {
     // spatial bound; a chain cannot exempt a remote region of cloth.
     const seamMates=new Map(),visited=new Set();for(const start of stitchGraph.keys()){if(visited.has(start))continue;const component=[start];visited.add(start);for(let q=0;q<component.length;q++)for(const next of stitchGraph.get(component[q])||[])if(!visited.has(next)){visited.add(next);component.push(next);}for(const a of component)for(const b of component)if(a!==b&&scDist(this.particles[a].pos,this.particles[b].pos)<=2*this.options.thickness){if(!seamMates.has(a))seamMates.set(a,new Set());seamMates.get(a).add(b);}}
     const result=[];
-    for(let i=0;i<this.particles.length;i++){const p=this.particles[i].pos,cell=grid.get(key(...p.map(v=>Math.floor(v/size))))||[];for(const ti of cell){const ids=this.triangleRecords[ti].indices;if(ids.some(j=>j===i||seamMates.get(i)?.has(j)))continue;result.push({i,ti});if(result.length>=this.options.maxSelfCandidates){exceeded=true;break;}}if(exceeded)break;}
+    for(const i of particleIndices){const p=this.particles[i].pos,cell=grid.get(key(...p.map(v=>Math.floor(v/size))))||[];for(const ti of cell){const ids=contactTriangles[ti].indices;if(ids.some(j=>j===i||seamMates.get(i)?.has(j)))continue;result.push({i,ti});if(result.length>=this.options.maxSelfCandidates){exceeded=true;break;}}if(exceeded)break;}
     this._contactSeamMates=seamMates;return {result,exceeded};
   }
   _selfEdgeContact(project,budget){
+    const contactEdges=this.contactEdges||this.edges;
     const cell=.04,pad=this.options.thickness,grid=new Map(),seen=new Set();let count=0,unresolved=0,maxPenetration=0,crossings=0,ambiguous=0,exceeded=false;
-    for(let ei=0;ei<this.edges.length;ei++){const edge=this.edges[ei],ps=[this.particles[edge.a].pos,this.particles[edge.b].pos],lo=[0,1,2].map(k=>Math.floor((Math.min(ps[0][k],ps[1][k])-pad)/cell)),hi=[0,1,2].map(k=>Math.floor((Math.max(ps[0][k],ps[1][k])+pad)/cell));if((hi[0]-lo[0]+1)*(hi[1]-lo[1]+1)*(hi[2]-lo[2]+1)>1000){exceeded=true;continue;}
+    for(let ei=0;ei<contactEdges.length;ei++){const edge=contactEdges[ei],ps=[this.particles[edge.a].pos,this.particles[edge.b].pos],lo=[0,1,2].map(k=>Math.floor((Math.min(ps[0][k],ps[1][k])-pad)/cell)),hi=[0,1,2].map(k=>Math.floor((Math.max(ps[0][k],ps[1][k])+pad)/cell));if((hi[0]-lo[0]+1)*(hi[1]-lo[1]+1)*(hi[2]-lo[2]+1)>1000){exceeded=true;continue;}
       for(let x=lo[0];x<=hi[0];x++)for(let y=lo[1];y<=hi[1];y++)for(let z=lo[2];z<=hi[2];z++){const key=x+','+y+','+z;if(!grid.has(key))grid.set(key,[]);grid.get(key).push(ei);}}
     outer:for(const list of grid.values())for(let a=0;a<list.length;a++)for(let b=a+1;b<list.length;b++){
-      const ia=list[a],ib=list[b],key=ia<ib?ia+':'+ib:ib+':'+ia;if(seen.has(key))continue;seen.add(key);const ea=this.edges[ia],eb=this.edges[ib],ids=[ea.a,ea.b,eb.a,eb.b];
+      const ia=list[a],ib=list[b],key=ia<ib?ia+':'+ib:ib+':'+ia;if(seen.has(key))continue;seen.add(key);const ea=contactEdges[ia],eb=contactEdges[ib],ids=[ea.a,ea.b,eb.a,eb.b];
       if(ids.slice(0,2).some(i=>ids.slice(2).some(j=>i===j||this._contactSeamMates?.get(i)?.has(j))))continue;
       if(++count>budget){exceeded=true;break outer;}const p=ids.map(i=>this.particles[i]),closest=scClosestSegments(...p.map(v=>v.pos)),delta=scSub(closest.a,closest.b),distance=Math.hypot(...delta);if(distance>pad*1.5)continue;
       const previous=scClosestSegments(...p.map(v=>v.previous)),oldDelta=scSub(previous.a,previous.b),oldDistance=Math.hypot(...oldDelta);if(distance<1e-12&&oldDistance<1e-12){ambiguous++;unresolved++;maxPenetration=Math.max(maxPenetration,pad);continue;}
@@ -304,8 +307,8 @@ class ShortsCloth {
     return {count,unresolved,maxPenetration,crossings,ambiguous,exceeded};
   }
   _selfContact(project=true){
-    if(!this.options.selfContact)return;const candidates=this._selfCandidates();let unresolved=0,maxPenetration=0,crossings=0;
-    for(const {i,ti} of candidates.result){const p=this.particles[i],ids=this.triangleRecords[ti].indices,points=ids.map(j=>this.particles[j].pos),closest=scClosestTriangle(p.pos,...points);if(!closest)continue;const delta=scSub(p.pos,closest.point),distance=Math.hypot(...delta);if(distance>this.options.thickness*1.5)continue;
+    if(!this.options.selfContact)return;const contactTriangles=this.contactTriangleRecords||this.triangleRecords;const candidates=this._selfCandidates();let unresolved=0,maxPenetration=0,crossings=0;
+    for(const {i,ti} of candidates.result){const p=this.particles[i],ids=contactTriangles[ti].indices,points=ids.map(j=>this.particles[j].pos),closest=scClosestTriangle(p.pos,...points);if(!closest)continue;const delta=scSub(p.pos,closest.point),distance=Math.hypot(...delta);if(distance>this.options.thickness*1.5)continue;
       const oldClosest=scClosestTriangle(p.previous,...ids.map(j=>this.particles[j].previous)),normal=scCross(scSub(points[1],points[0]),scSub(points[2],points[0])),nLength=Math.hypot(...normal);if(nLength<1e-12)continue;for(let k=0;k<3;k++)normal[k]/=nLength;
       const previousSide=oldClosest?scDot(scSub(p.previous,oldClosest.point),normal):scDot(delta,normal),sign=previousSide<0?-1:1;let gap=scDot(delta,normal)*sign;
       if(distance>1e-9&&gap>=0){for(let k=0;k<3;k++)normal[k]=delta[k]/distance;gap=distance;}else for(let k=0;k<3;k++)normal[k]*=sign;

@@ -142,9 +142,14 @@ function completeShortsDualTubeR23(simulation,state){
     }
     seam.progress=1;seam.start=0;seam.needleIndex=seam.pairs.length;seam.needleStart=null;closed.push({id,pairCount:seam.pairs.length,maximumGapM});
   }
-  simulation.continuousContact=simulation.options.selfContact?createShortsContinuousContact(simulation.particles,simulation.triangleRecords,simulation.edges,{thickness:simulation.options.thickness,maxCandidates:simulation.options.maxSelfCandidates,dofs:simulation.dofs,motionLimit:true}):null;
   const activeTriangleRecords=simulation.triangleRecords.filter(record=>activePieces.has(record.pieceId));
-  if(!activeTriangleRecords.length)fail('active dual-tube contact triangles are missing');
+  const activeEdges=simulation.edges.filter(edge=>activePieces.has(simulation.particles[edge.a].pieceId)&&activePieces.has(simulation.particles[edge.b].pieceId));
+  const activeParticleIndices=[];for(let i=0;i<simulation.particles.length;i++)if(activePieces.has(simulation.particles[i].pieceId))activeParticleIndices.push(i);
+  if(!activeTriangleRecords.length||!activeEdges.length||!activeParticleIndices.length)fail('active dual-tube contact domain is missing');
+  simulation.contactTriangleRecords=activeTriangleRecords;
+  simulation.contactEdges=activeEdges;
+  simulation.contactParticleIndices=activeParticleIndices;
+  simulation.continuousContact=simulation.options.selfContact?createShortsContinuousContact(simulation.particles,activeTriangleRecords,activeEdges,{thickness:simulation.options.thickness,maxCandidates:simulation.options.maxSelfCandidates,dofs:simulation.dofs,motionLimit:true}):null;
   simulation.surfaceContact=simulation.body?new ShortsSurfaceContact(simulation.particles,activeTriangleRecords,simulation.body,{clearanceM:simulation.options.thickness,toleranceM:.001,dofs:simulation.dofs,includeOnlyIncidentVertices:true}):null;
   simulation.triangleBodyContact=simulation.options.triangleBodyContact?new ShortsTriangleBodyContact(simulation.particles,activeTriangleRecords,simulation.body,{clearanceM:simulation.options.thickness,toleranceM:.001,dofs:simulation.dofs,maxCandidates:simulation.options.triangleBodyMaxCandidates,maxWitnessQueries:simulation.options.triangleBodyMaxWitnessQueries}):null;
   for(const support of simulation.temporarySupports){
@@ -153,7 +158,7 @@ function completeShortsDualTubeR23(simulation,state){
   }
   simulation._sync();
   const base={...state.report,sourceBefore,massBefore,closedSeams:closed,authoringLockedParticleCount,authoringLocksRemovable:true,otherSeamsStarted:false,
-    bodyContactPieces:[...activePieces],inactiveBodyContactPieces:['G','WFL','WFR','WBR','WBL'],bodyContactTriangleCount:activeTriangleRecords.length};
+    bodyContactPieces:[...activePieces],inactiveBodyContactPieces:['G','WFL','WFR','WBR','WBL'],bodyContactTriangleCount:activeTriangleRecords.length,clothContactPieces:[...activePieces],clothContactTriangleCount:activeTriangleRecords.length,clothContactEdgeCount:activeEdges.length,clothContactParticleCount:activeParticleIndices.length};
   const report=auditShortsDualTubeR23(simulation,state,base);
   simulation.events.push({type:'r2.3_dual_leg_tube_checkpoint',stepIndex:simulation.stepIndex,closedSeams:closed.map(item=>item.id),leftCuffAreaM2:report.cuffs.left.projectedAreaM2,rightCuffAreaM2:report.cuffs.right.projectedAreaM2,valid:report.valid});
   return report;
