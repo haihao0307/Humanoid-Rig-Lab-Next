@@ -25,7 +25,7 @@ function shortsJoinRenderNormals(vertices,groups){
 class ClothShorts {
  constructor(surface,meshes){
   this.surface=surface;this.gl=surface.gl;this.buffers=[];this.disposed=false;
-  const search=typeof window==='object'?(window.parent?.location?.search||window.location?.search||''):'';this.placementReview=/(?:[?&])shortsPlacement=r2(?:\.|%2E)2(?:&|$)/i.test(search);this.leftTubeReview=/(?:[?&])shortsStage=r2(?:\.|%2E)3-left(?:&|$)/i.test(search);this.dualTubeReview=/(?:[?&])shortsStage=r2(?:\.|%2E)3-dual(?:&|$)/i.test(search);this.riseReview=/(?:[?&])shortsStage=r2(?:\.|%2E)4-rise(?:&|$)/i.test(search);this.gussetReview=/(?:[?&])shortsStage=r2(?:\.|%2E)5-gusset(?:&|$)/i.test(search);this.stagedReview=this.placementReview||this.leftTubeReview||this.dualTubeReview||this.riseReview||this.gussetReview;this.placementReport=null;this.leftTubeState=null;this.leftTubeReport=null;this.dualTubeState=null;this.dualTubeReport=null;this.riseState=null;this.riseReport=null;this.gussetState=null;this.gussetRiseReport=null;this.gussetReport=null;
+  const search=typeof window==='object'?(window.parent?.location?.search||window.location?.search||''):'';this.placementReview=/(?:[?&])shortsPlacement=r2(?:\.|%2E)2(?:&|$)/i.test(search);this.leftTubeReview=/(?:[?&])shortsStage=r2(?:\.|%2E)3-left(?:&|$)/i.test(search);this.dualTubeReview=/(?:[?&])shortsStage=r2(?:\.|%2E)3-dual(?:&|$)/i.test(search);this.riseReview=/(?:[?&])shortsStage=r2(?:\.|%2E)4-rise(?:&|$)/i.test(search);this.gussetReview=/(?:[?&])shortsStage=r2(?:\.|%2E)5-gusset(?:&|$)/i.test(search);this.stagedReview=this.placementReview||this.leftTubeReview||this.dualTubeReview||this.riseReview||this.gussetReview;this.placementReport=null;this.leftTubeState=null;this.leftTubeReport=null;this.dualTubeState=null;this.dualTubeReport=null;this.riseState=null;this.riseReport=null;this.gussetState=null;this.gussetRiseReport=null;this.gussetReport=null;this.gussetProgress=null;
   this.body=new ShortsBody(surface,meshes);this.measurements=this.body.measure();
   this.pattern=createShortsPattern(this.measurements);
   this.simulation=new ShortsCloth(this.pattern,this.body,SHORTS_WEARING_OPTIONS);
@@ -81,7 +81,7 @@ class ClothShorts {
     this.simulation=new ShortsCloth(this.pattern,this.body,stagedOptions);this.riseReport=completeShortsRiseR24(this.simulation,this.riseState);
    }else if(this.gussetReview){
     this.gussetState=createShortsGussetStateR25(this.pattern,this.body,h);
-    const stagedOptions={...SHORTS_WEARING_OPTIONS,gravity:0,groundY:null,selfContact:true,selfContactSweeps:4,maxSelfCandidates:50000,triangleBodyContact:true,iterations:16,maxMaterialIterations:64,materialConvergenceStrain:.015,sewingSeconds:1000,handlingDamping:10};
+    const stagedOptions={...SHORTS_WEARING_OPTIONS,gravity:0,groundY:null,selfContact:true,selfContactSweeps:3,maxSelfCandidates:40000,triangleBodyContact:true,iterations:12,maxMaterialIterations:32,materialConvergenceStrain:.02,sewingSeconds:1000,handlingDamping:8};
     this.simulation=new ShortsCloth(this.pattern,this.body,stagedOptions);this.gussetRiseReport=completeShortsRiseR24(this.simulation,this.gussetState.riseState);
    }else{const source=h.sourceBind.get('hips'),current=h.byId.get('hips').world,q=qnorm(qm(current.q,inv(source.q)));
     for(const piece of this.pattern.pieces){const p=piece.placement;p.origin=add(current.p,rotate(q,sub(p.origin,source.p)));p.basisU=rotate(q,p.basisU);p.basisV=rotate(q,p.basisV);}
@@ -129,29 +129,36 @@ class ClothShorts {
    const staged=this.simulation.report();this.assemblyReport={...staged,rise:this.riseReport,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;
   }
   if(this.gussetReview){
-   this.assemblyState='gusset-input-relaxing';const riseMinimumSteps=4,riseMaximumSteps=48;
+   // Reproduce the accepted R2.4 state with its exact solver budget. A larger
+   // iteration count is not extra physical or visual evidence.
+   const reviewDeadline=begin+720000,riseMinimumSteps=4,riseMaximumSteps=36;
+   this.assemblyState='gusset-input-relaxing';this.gussetProgress={phase:'rise-input',completedSteps:0,maximumSteps:riseMaximumSteps,valid:false,budgetExceeded:false};
    for(let step=0;step<riseMaximumSteps;step++){
     if(this.disposed)throw Error('R2.5 gusset input review was disposed');
     this.body.update();this.simulation.step(1);this.dirty=true;
-    this.gussetRiseReport=auditShortsRiseR24(this.simulation,this.gussetState.riseState,this.gussetRiseReport,{requireBody:true,requireSelfContact:true});
-    if(step+1>=riseMinimumSteps&&this.gussetRiseReport.valid)break;
+    const completed=step+1,shouldAudit=completed>=riseMinimumSteps&&(completed%4===0||completed>=30||completed===riseMaximumSteps);
+    if(shouldAudit)this.gussetRiseReport=auditShortsRiseR24(this.simulation,this.gussetState.riseState,this.gussetRiseReport,{requireBody:true,requireSelfContact:true});
+    this.gussetProgress={phase:'rise-input',completedSteps:completed,maximumSteps:riseMaximumSteps,valid:this.gussetRiseReport?.valid===true,budgetExceeded:performance.now()>reviewDeadline};
+    if(this.gussetRiseReport?.valid||this.gussetProgress.budgetExceeded)break;
     await new Promise(resolve=>setTimeout(resolve,0));
    }
    if(!this.gussetRiseReport?.valid){
     this.assemblyWallTimeMs+=performance.now()-begin;this.displayReady=true;this.assemblyReady=false;this.assemblyState='gusset-input-failed';
-    const staged=this.simulation.report();this.assemblyReport={...staged,gussetRise:this.gussetRiseReport,gusset:null,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;
+    const staged=this.simulation.report();this.assemblyReport={...staged,gussetProgress:this.gussetProgress,gussetRise:this.gussetRiseReport,gusset:null,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;
    }
-   this.gussetReport=completeShortsGussetR25(this.simulation,this.gussetState,this.gussetRiseReport);this.assemblyState='gusset-relaxing';const gussetStartStep=this.simulation.stepIndex,gussetMinimumSteps=4,gussetMaximumSteps=64;
+   this.gussetReport=completeShortsGussetR25(this.simulation,this.gussetState,this.gussetRiseReport);this.assemblyState='gusset-relaxing';const gussetStartStep=this.simulation.stepIndex,gussetMinimumSteps=1,gussetMaximumSteps=12;
+   this.gussetProgress={phase:'gusset-relaxation',completedSteps:0,maximumSteps:gussetMaximumSteps,valid:this.gussetReport?.valid===true,budgetExceeded:false};
    for(let step=0;step<gussetMaximumSteps;step++){
     if(this.disposed)throw Error('R2.5 gusset review was disposed');
     this.body.update();this.simulation.step(1);this.dirty=true;
     this.gussetReport=auditShortsGussetR25(this.simulation,this.gussetState,this.gussetReport,{requireBody:true,requireSelfContact:true,materialLimit:.05});
-    if(step+1>=gussetMinimumSteps&&this.gussetReport.valid)break;
+    const completed=step+1;this.gussetProgress={phase:'gusset-relaxation',completedSteps:completed,maximumSteps:gussetMaximumSteps,valid:this.gussetReport.valid===true,budgetExceeded:performance.now()>reviewDeadline};
+    if((completed>=gussetMinimumSteps&&this.gussetReport.valid)||this.gussetProgress.budgetExceeded)break;
     await new Promise(resolve=>setTimeout(resolve,0));
    }
-   this.gussetReport={...this.gussetReport,gussetRelaxationSteps:this.simulation.stepIndex-gussetStartStep,totalStageSteps:this.simulation.stepIndex};
+   this.gussetReport={...this.gussetReport,gussetRelaxationSteps:this.simulation.stepIndex-gussetStartStep,totalStageSteps:this.simulation.stepIndex,reviewBudgetExceeded:this.gussetProgress.budgetExceeded};
    this.assemblyWallTimeMs+=performance.now()-begin;this.displayReady=true;this.assemblyReady=false;this.assemblyState=this.gussetReport?.valid?'gusset-ready':'gusset-checkpoint-failed';
-   const staged=this.simulation.report();this.assemblyReport={...staged,gussetRise:this.gussetRiseReport,gusset:this.gussetReport,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;
+   const staged=this.simulation.report();this.assemblyReport={...staged,gussetProgress:this.gussetProgress,gussetRise:this.gussetRiseReport,gusset:this.gussetReport,assemblyState:this.assemblyState,assemblySteps:this.simulation.stepIndex,wallTimeMs:this.assemblyWallTimeMs,visualAcceptance:false};return this.assemblyReport;
   }
   this.assemblyState='sewing';const remaining=maxSteps;
   for(let start=0;start<remaining;start++){
@@ -177,7 +184,7 @@ class ClothShorts {
   if(this.disposed||!this.assemblyReady||!(dt>0))return;
   const begin=performance.now();this.body.update();this.simulation.advance(dt);this.dirty=true;this.lastUpdateMilliseconds=performance.now()-begin;
  }
- diagnostics(){return {...this.report,placement:this.placementReport,leftTube:this.leftTubeReport,dualTube:this.dualTubeReport,rise:this.riseReport,gussetRise:this.gussetRiseReport,gusset:this.gussetReport,pattern:{version:this.pattern.version,options:{...this.pattern.options},draft:JSON.parse(JSON.stringify(this.pattern.draft)),sourceChecks:JSON.parse(JSON.stringify(this.pattern.checks))},displayReady:this.displayReady,assemblyReady:this.assemblyReady,assemblyState:this.assemblyState,assembly:this.assemblyReport,body:this.body.report(),simulation:this.simulation.report(),lastUpdateMilliseconds:this.lastUpdateMilliseconds};}
+ diagnostics(){return {...this.report,placement:this.placementReport,leftTube:this.leftTubeReport,dualTube:this.dualTubeReport,rise:this.riseReport,gussetRise:this.gussetRiseReport,gusset:this.gussetReport,gussetProgress:this.gussetProgress,pattern:{version:this.pattern.version,options:{...this.pattern.options},draft:JSON.parse(JSON.stringify(this.pattern.draft)),sourceChecks:JSON.parse(JSON.stringify(this.pattern.checks))},displayReady:this.displayReady,assemblyReady:this.assemblyReady,assemblyState:this.assemblyState,assembly:this.assemblyReport,body:this.body.report(),simulation:this.simulation.report(),lastUpdateMilliseconds:this.lastUpdateMilliseconds};}
  upload(){
   if(!this.dirty)return;
   const positions=this.simulation.positions,indices=this.renderTriangles,uv=this.simulation.materialCoordinates,v=this.vertices;
