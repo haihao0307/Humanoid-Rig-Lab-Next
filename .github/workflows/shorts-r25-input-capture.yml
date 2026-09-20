@@ -1,0 +1,43 @@
+name: Shorts R2.5 input capture
+on:
+  push:
+    branches: [fix/shorts-two-leg-assembly-r2-20260919]
+    paths:
+      - 'tools/capture-shorts-rise-input-r25.mjs'
+      - '.github/workflows/shorts-r25-input-capture.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shorts-r25-input-capture
+  cancel-in-progress: true
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build accepted R2.4 preview
+        run: |
+          node tools/build-pure.mjs
+          node tools/build-shorts-preview.mjs
+          node tools/check-pure.mjs
+      - name: Install isolated browser dependency
+        run: |
+          mkdir -p /tmp/shorts-browser
+          npm install --prefix /tmp/shorts-browser --no-audit --no-fund playwright@1.55.0
+          /tmp/shorts-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Capture actual relaxed R2.4 input
+        run: |
+          python3 -m http.server 8793 --bind 127.0.0.1 >/tmp/shorts-r25-input-http.log 2>&1 &
+          node tools/capture-shorts-rise-input-r25.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shorts-r2-5-accepted-rise-input
+          path: /tmp/shorts-r25-input
+          if-no-files-found: error
+          retention-days: 7
