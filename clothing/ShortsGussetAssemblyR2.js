@@ -57,6 +57,7 @@ function completeShortsGussetR25(simulation,state,riseReport,options={}){
   gussetPositions[8]=centreFit.point;
   const geometryAtPlacement=sr25GussetGeometry(gussetPiece,gussetPositions,frame),placementRadialLimit=options.placementRadialLimit??.08,placementMaterialLimit=options.placementMaterialLimit??.05;
   if(!Number.isFinite(placementMaterialLimit)||placementMaterialLimit<=0||placementMaterialLimit>.05)fail('invalid gusset placement material limit');
+  state.preflight={stage:'R2.5 actual accepted-rise opening preflight',geometryAtPlacement,centreFit,junctionReports,gussetPositions:gussetPositions.map(point=>[...point]),boundaryCentroid:[...boundaryCentroid],anchor:[...anchor],placementRadialLimit,placementMaterialLimit,riseReportSummary:{valid:riseReport?.valid===true,stepIndex:simulation.stepIndex,material:riseReport?.materialAtCheckpoint??null}};
   if(!geometryAtPlacement.landmarkOrderValid||!geometryAtPlacement.boundarySelfIntersectionFree||geometryAtPlacement.minimumTriangleAreaM2<=1e-8||geometryAtPlacement.maximumBoundaryEdgeStrain>.05||geometryAtPlacement.maximumRadialStrain>placementRadialLimit||centreFit.maximumPrincipalStrain>placementMaterialLimit)
     fail('accepted R2.4 opening cannot receive the source gusset without an invalid fold or excessive material error');
 
