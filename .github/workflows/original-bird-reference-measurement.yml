@@ -53,23 +53,28 @@ jobs:
             json.loads(p.read_text(encoding='utf-8'))
             print('JSON_OK', p)
 
-      - name: Validate skeleton workbench inline JavaScript
+      - name: Validate workbench inline JavaScript
         shell: bash
         run: |
           python - <<'PY'
           import pathlib, re
-          p = pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html')
-          text = p.read_text(encoding='utf-8')
-          scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', text, re.S | re.I)]
-          if not scripts:
-              raise SystemExit(f'NO_INLINE_SCRIPT {p}')
-          out = pathlib.Path('/tmp/original-bird-columbid-skeleton-r002.js')
-          out.write_text('\n'.join(scripts), encoding='utf-8')
-          print(out)
+          files = [
+              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-columbid-skeleton-r002.html'),
+              pathlib.Path('Bird-Reconstruction-Lab/original-bird/workbench/original-bird-glb-source-review-r004.html'),
+          ]
+          for p in files:
+              text = p.read_text(encoding='utf-8')
+              scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', text, re.S | re.I)]
+              if not scripts:
+                  raise SystemExit(f'NO_INLINE_SCRIPT {p}')
+              out = pathlib.Path('/tmp') / (p.stem + '.js')
+              out.write_text('\n'.join(scripts), encoding='utf-8')
+              print(out)
           PY
           node --check /tmp/original-bird-columbid-skeleton-r002.js
+          node --check /tmp/original-bird-glb-source-review-r004.js
 
-      - name: GLB-backed restart guards
+      - name: GLB-backed source-review guards
         shell: python
         run: |
           import json
@@ -103,13 +108,34 @@ jobs:
 
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
           if status.get('visualBirdGenerated') is not False:
-              raise SystemExit('VISUAL_BIRD_MUST_REMAIN_FALSE_AFTER_R003_REJECTION')
+              raise SystemExit('VISUAL_BIRD_MUST_REMAIN_FALSE_UNTIL_INDEPENDENT_DISTILLATION')
           if status.get('r003InventedFormDeleted') is not True:
               raise SystemExit('R003_DELETION_NOT_RECORDED')
+          if status.get('sourceModelReviewWorkbenchGenerated') is not True:
+              raise SystemExit('SOURCE_REVIEW_WORKBENCH_NOT_RECORDED')
           if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002':
               raise SystemExit('PRIMARY_VISIBLE_REFERENCE_NOT_LOCKED')
           if status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
               raise SystemExit('PRIMARY_MOTION_REFERENCE_NOT_LOCKED')
+
+          source_review = root / 'workbench/original-bird-glb-source-review-r004.html'
+          if not source_review.exists():
+              raise SystemExit('SOURCE_REVIEW_WORKBENCH_MISSING')
+          source_text = source_review.read_text(encoding='utf-8')
+          for token in (
+              '821135a09d3f48909b977a416d99c93b',
+              '67f9422072664cf1967ae4fe440585a9',
+              'sketchfab-viewer-1.12.1.js',
+              'getNodeMap',
+              'getAnimations',
+              'setCurrentAnimationByUID',
+              'source-backed runtime',
+          ):
+              if token not in source_text:
+                  raise SystemExit('SOURCE_REVIEW_TOKEN_MISSING ' + token)
+          for forbidden in ('deformedBodyGeometry', 'new THREE.SphereGeometry', 'original-bird-columbid-form-r003'):
+              if forbidden in source_text:
+                  raise SystemExit('PROXY_FORM_REINTRODUCED ' + forbidden)
 
           skeleton = (root / 'workbench/original-bird-columbid-skeleton-r002.html').read_text(encoding='utf-8')
           if 's.add(root),N={},E=[]' in skeleton:
@@ -117,4 +143,4 @@ jobs:
           for token in ('const N={},E=[]', 'requestAnimationFrame(loop)', 'runtime fixed'):
               if token not in skeleton:
                   raise SystemExit('SKELETON_RUNTIME_TOKEN_MISSING ' + token)
-          print('GLB_BACKED_RESTART_GUARDS_OK')
+          print('GLB_BACKED_SOURCE_REVIEW_GUARDS_OK')
