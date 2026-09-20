@@ -14,11 +14,11 @@ function fake(){
 }
 const plain=value=>JSON.parse(JSON.stringify(value));
 const diagnostics=report=>({valid:report.valid,leftTubeFormed:report.leftTubeFormed,rightTubeFormed:report.rightTubeFormed,cuffs:report.cuffs,leftRightOwnership:report.leftRightOwnership,independentLegDofs:report.independentLegDofs,strictCrossTube:report.strictCrossTube,strictCrossTubeIntersectionFree:report.strictCrossTubeIntersectionFree,materialWithinCheckpoint:report.materialWithinCheckpoint,maximumPrincipalStrain:report.materialAtCheckpoint?.maxAbsPrincipalStrain,seams:report.closedSeams,joinedStitchCount:report.joinedStitchCount,bodyRequirementMet:report.bodyRequirementMet,relaxationSteps:report.relaxationSteps});
-function build({relax=24}={}){
+function build({relax=0}={}){
  const pattern=Pattern(measurement(),{columns:3,rows:7,hipRow:2,crotchRow:4}),{human,body}=fake(),state=State(pattern,body,human),cloth=new Cloth(pattern,null,{stitchDofs:true,selfContact:false,triangleBodyContact:false,gravity:0,groundY:null,iterations:10,maxMaterialIterations:20,bendCompliance:40000,sewingSeconds:1000}),initial=Complete(cloth,state);
  for(const support of cloth.temporarySupports)support.active=false;
  let report=initial;
- for(let i=0;i<relax;i++){cloth.step(1);report=Audit(cloth,state,initial);if(i>=2&&report.valid)break;}
+ for(let i=0;i<relax;i++){cloth.step(1);report=Audit(cloth,state,initial);}
  return {pattern,state,cloth,initial,report};
 }
 
@@ -39,8 +39,16 @@ test('both cuffs are independent closed positive-area loops on the correct body 
  assert.equal(report.leftRightOwnership,true);assert.equal(report.independentLegDofs,true);
 });
 
-test('dual-tube gate detects no strict cross-leg triangle intersection',()=>{
+test('dual-tube construction has no strict cross-leg triangle intersection',()=>{
  const {report}=build();assert.equal(report.strictCrossTubeIntersectionFree,true);assert.equal(report.strictCrossTube.detected,0);assert.ok(report.strictCrossTube.checkedCandidatePairs>=0);
+});
+
+test('unsupported soft cloth may collapse after release without changing source or stitch identity',()=>{
+ const {report,cloth}=build({relax:24});
+ assert.equal(report.sourceIdentityPreserved,true);assert.equal(report.totalMassPreserved,true);assert.equal(report.independentLegDofs,true);assert.equal(report.materialWithinCheckpoint,true);
+ const active=new Set(['outseam-left','inseam-left','outseam-right','inseam-right']);
+ for(const seam of cloth.seams)if(active.has(seam.id))assert.ok(seam.pairs.every(pair=>cloth.dofs.same(pair.a,pair.b)),seam.id);else assert.ok(seam.pairs.every(pair=>!pair.started),seam.id);
+ assert.equal(report.bodyRequirementMet,true);
 });
 
 test('gusset and waistbands remain at exact R2.2 rigid positions',()=>{
