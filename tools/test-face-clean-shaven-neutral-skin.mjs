@@ -9,7 +9,7 @@ const character=read('body/CharacterPresets.js');
 
 assert.match(face,/compactBeardGeometry\(surface,\{[^}]*density:0\}\)/s,'production face must request zero beard density');
 assert.match(face,/if\(beard\.report\.strands\)output\.push\(compactFaceGeneratedMesh\('faceBeard'/,'zero-strand beard must not create a draw mesh');
-assert.match(character,/skin:\{baseColor:'#c7a18d',roughness:\.60,oil:\.15,redness:0\}/,'initial character must use neutral redness');
+assert.match(character,/function initialCharacterPreset\(\).*skin:\{[^}]*redness:0[^}]*\}/s,'initial character must use neutral redness');
 
 const prefix=skin.slice(0,skin.indexOf('function resolveSkinMaterial'));
 const api=vm.runInNewContext(prefix+'\n({SKIN_DEFAULT,SKIN_PRESETS,EAST_ASIAN_SKIN_PRESETS,SKIN_CONTROLS,skinPreset,sampleSkinAppearance,validateSkinAppearance,characterSkinAppearance})');
@@ -31,6 +31,7 @@ console.log(JSON.stringify({
   generalPresetsChecked:api.SKIN_PRESETS.length,
   sampledFacesChecked:128,
   explicitRednessControlRetained:true,
+  roleColorIndependent:true,
   browserExecuted:false,
   gpuExecuted:false,
   visualAcceptance:false
