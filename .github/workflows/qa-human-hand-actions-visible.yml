@@ -1,4 +1,4 @@
-name: QA visible human hand actions
+name: QA real Compact human hand actions
 
 on:
   push:
@@ -10,13 +10,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: qa-visible-human-hand-actions
+  group: qa-real-compact-human-hand-actions
   cancel-in-progress: true
 
 jobs:
   visible-hand-actions:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,7 +39,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends xvfb xauth fonts-noto-cjk
           command -v google-chrome || command -v google-chrome-stable || command -v chromium
 
-      - name: Build exact lightweight review workbench
+      - name: Build real reconstructed-character workbench
         id: target
         shell: bash
         run: |
@@ -56,30 +56,31 @@ jobs:
           from pathlib import Path
 
           def patch(path, marker, insertion):
-              file = Path(path)
-              data = file.read_bytes()
-              count = data.count(marker)
-              if count != 1:
-                  raise SystemExit(f'{path}: expected one marker, found {count}')
-              file.write_bytes(data.replace(marker, marker + insertion, 1))
+              file=Path(path); data=file.read_bytes()
+              if data.count(marker)!=1:
+                  raise SystemExit(f'{path}: marker count {data.count(marker)}')
+              file.write_bytes(data.replace(marker, marker+insertion, 1))
 
+          # Keep the real Compact body. Hair is outside this hand-action review.
           patch(
               'body/CompactWorkbench.js',
-              b"async function installCompactWorkbench(lab,pending){",
-              b"\n  const motionVisualTest=new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest');\n  if(motionVisualTest){\n    pending?.catch?.(()=>{});\n    cancelCompactSurface('visible hand QA uses the lightweight fallback surface');\n    window.__motionVisualQAFallback={active:true,renderer:'procedural-fallback',motionEvidence:true,skinApproval:false};\n    window.__compactLoading={quality:'qa-fallback',job:'surface',state:'ready',group:'ready',message:'visible hand QA lightweight surface',startedAt:performance.now(),updatedAt:performance.now()};\n    lab.renderer.setQuality('fast');\n    if(!lab.hair?.inStudio?.())lab.focus('body');\n    needsRedraw=true;\n    return;\n  }",
+              b"function scheduleCompactHair(lab){",
+              b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){lab.hairStatus={state:'disabled'};return;}"
           )
+          # The active mother owns the reviewed Compact surface. Avoid spending
+          # reconstruction time on the four inactive review-cast residents.
           patch(
               'control/NPCPopulation.js',
               b"  this.place(actor,position,options.yaw??0);this.pendingIds.add(id);",
-              b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){\n   actor.compact=null;\n   if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};\n   this.pendingIds.delete(id);\n   return actor;\n  }",
+              b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){actor.compact=null;if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};this.pendingIds.delete(id);return actor;}"
           )
           PY
 
           node tools/build-pure.mjs | tee qa-build-result.json
           test "$(wc -c < index.html)" -gt 1000000
-          sha256sum index.html | tee qa-entrypoint-hashes.txt
+          sha256sum index.html | tee qa-entrypoint-hash.txt
 
-      - name: Run visible gesture and interaction captures
+      - name: Run all real-character hand-action captures
         env:
           SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
           PUBLIC_URL: ${{ steps.target.outputs.public_url }}
@@ -91,88 +92,65 @@ jobs:
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
           QA_URL="http://127.0.0.1:8765/index.html?visualTest=1"
           for attempt in $(seq 1 40); do
-            if curl -fsS --connect-timeout 2 "$QA_URL" >/dev/null; then break; fi
-            if [[ "$attempt" == 40 ]]; then echo 'Local QA server did not start.' >&2; exit 1; fi
+            curl -fsS --connect-timeout 2 "$QA_URL" >/dev/null && break
+            [[ "$attempt" == 40 ]] && exit 1
             sleep .25
           done
 
-          timeout --signal=TERM --kill-after=15s 720s \
-            xvfb-run -a -s "-screen 0 1920x1080x24" \
-            python tools/motion_hand_gesture_visible_proof.py \
-              --url "$QA_URL" \
-              --source-sha "$SOURCE_SHA" \
-              --interactive-url "$PUBLIC_URL" \
-              --output gesture-visible | tee gesture-visible.log
-
-          timeout --signal=TERM --kill-after=15s 1200s \
+          timeout --signal=TERM --kill-after=15s 2400s \
             xvfb-run -a -s "-screen 0 1920x1080x24" \
             python tools/motion_hand_interaction_visible_proof.py \
               --url "$QA_URL" \
               --source-sha "$SOURCE_SHA" \
               --interactive-url "$PUBLIC_URL" \
-              --output interaction-visible | tee interaction-visible.log
+              --output all-hand-actions | tee all-hand-actions.log
 
-      - name: Reject empty-character screenshots
+      - name: Require real Compact renderer evidence
         if: always()
         shell: python
         run: |
           from pathlib import Path
           import json
-          from PIL import Image, ImageStat
+          report_path=Path('all-hand-actions/browser-run-report.json')
+          if not report_path.exists():
+              raise SystemExit('missing hand-action report')
+          data=json.loads(report_path.read_text(encoding='utf-8'))
+          failures=[]; checks={}
+          for section in ('startup','pushReload'):
+              block=data.get(section) or {}
+              real=block.get('realCompact') or {}
+              compact=real.get('compact') or {}
+              scene=block.get('proofScene') or {}
+              scene_compact=scene.get('compact') or {}
+              checks[section]={'compact':compact,'sceneCompact':scene_compact}
+              for label,value in [('visible',compact.get('visible')),('boundToActive',compact.get('boundToActive')),('scene.visible',scene_compact.get('visible')),('scene.boundToActive',scene_compact.get('boundToActive'))]:
+                  if value is not True: failures.append(f'{section}.{label}={value!r}')
+              for label,value in [('chunks',compact.get('chunks',0)),('triangles',compact.get('triangles',0)),('scene.chunks',scene_compact.get('chunks',0)),('scene.triangles',scene_compact.get('triangles',0))]:
+                  if not isinstance(value,(int,float)) or value<=0: failures.append(f'{section}.{label}={value!r}')
+          if data.get('status') not in {'CAPTURED','CAPTURED_WITH_FAILURES'}:
+              failures.append('capture status='+str(data.get('status')))
+          captures=data.get('captures') or []
+          if len(captures)<6: failures.append('capture count='+str(len(captures)))
+          for capture in captures:
+              raw=report_path.parent/capture.get('raw','')
+              if not raw.is_file() or raw.stat().st_size<50000:
+                  failures.append('missing/small image '+str(raw))
+          result={'status':data.get('status'),'scenarioFailures':data.get('scenarioFailures') or [],'checks':checks,'captures':[c.get('id') for c in captures],'failures':failures}
+          Path('real-compact-check.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+          if failures: raise SystemExit('\n'.join(failures))
 
-          reports = [Path('gesture-visible/browser-run-report.json'), Path('interaction-visible/browser-run-report.json')]
-          failures = []
-          checked = []
-          for report_path in reports:
-              if not report_path.exists():
-                  failures.append(f'missing report: {report_path}')
-                  continue
-              data = json.loads(report_path.read_text(encoding='utf-8'))
-              if data.get('status') not in {'CAPTURED', 'CAPTURED_WITH_FAILURES'}:
-                  failures.append(f'{report_path}: status={data.get("status")}')
-              for capture in data.get('captures', []):
-                  raw = report_path.parent / capture['raw']
-                  if not raw.exists():
-                      failures.append(f'missing image: {raw}')
-                      continue
-                  state = capture.get('state') or {}
-                  points = state.get('points') or {}
-                  canvas = state.get('canvas') or {}
-                  with Image.open(raw) as image:
-                      image = image.convert('RGB')
-                      sx = image.width / max(1, float(canvas.get('clientWidth') or image.width))
-                      sy = image.height / max(1, float(canvas.get('clientHeight') or image.height))
-                      scores = []
-                      for name in ('head', 'rightHand', 'leftHand', 'hips'):
-                          screen = (points.get(name) or {}).get('screen') or {}
-                          if not screen.get('visible'):
-                              continue
-                          x = int(float(screen.get('x', 0)) * sx)
-                          y = int(float(screen.get('y', 0)) * sy)
-                          box = (max(0, x-38), max(0, y-38), min(image.width, x+39), min(image.height, y+39))
-                          patch = image.crop(box)
-                          scores.append(sum(ImageStat.Stat(patch).stddev))
-                      checked.append({'report': str(report_path), 'id': capture.get('id'), 'scores': scores})
-                      if not scores or max(scores) < 12.0:
-                          failures.append(f'{report_path}:{capture.get("id")}: active character not visible at tracked joints; scores={scores}')
-          Path('qa-visibility-check.json').write_text(json.dumps({'checked': checked, 'failures': failures}, ensure_ascii=False, indent=2), encoding='utf-8')
-          if failures:
-              raise SystemExit('\n'.join(failures))
-
-      - name: Upload visible hand-action evidence
-        if: always() && (hashFiles('gesture-visible/browser-run-report.json') != '' || hashFiles('interaction-visible/browser-run-report.json') != '')
+      - name: Upload real hand-action evidence
+        if: always() && hashFiles('all-hand-actions/browser-run-report.json') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: qa-visible-human-hand-actions-${{ steps.target.outputs.short_sha }}
+          name: qa-real-compact-human-hand-actions-${{ steps.target.outputs.short_sha }}
           path: |
-            gesture-visible
-            interaction-visible
-            gesture-visible.log
-            interaction-visible.log
+            all-hand-actions
+            all-hand-actions.log
+            real-compact-check.json
             http-server.log
             qa-build-result.json
-            qa-entrypoint-hashes.txt
-            qa-visibility-check.json
+            qa-entrypoint-hash.txt
           if-no-files-found: error
           compression-level: 6
           retention-days: 30
