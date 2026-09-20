@@ -1,0 +1,97 @@
+name: Face R25D young slender darker browser QA
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+    paths:
+      - body/FaceIdentity.js
+      - body/CharacterPresets.js
+      - body/SkinAppearance.js
+      - tools/capture-face-diagnosis.cjs
+      - .github/workflows/face-r25d-browser-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: face-r25d-role-browser-qa
+  cancel-in-progress: true
+
+jobs:
+  role-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build generated workbench entry
+        run: node tools/build-pure.mjs
+
+      - name: Install isolated Playwright runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA_NODE="$RUNNER_TEMP/face-r25-playwright"
+          mkdir -p "$QA_NODE"
+          cd "$QA_NODE"
+          npm init -y >/dev/null
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+          echo "HUMAN_PLAYWRIGHT_MODULE=$QA_NODE/node_modules/playwright" >> "$GITHUB_ENV"
+
+      - name: Capture actual role states
+        env:
+          HUMAN_PLAYWRIGHT_MODULE: ${{ env.HUMAN_PLAYWRIGHT_MODULE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/face-r25d-browser"
+          node tools/capture-face-diagnosis.cjs "$OUT" "world-front,world-angle,skin-close"
+          rm -rf face-r25d-browser-evidence
+          cp -a "$OUT" face-r25d-browser-evidence
+
+      - name: Enforce role runtime gate
+        shell: node {0}
+        run: |
+          const fs=require('node:fs');
+          const data=JSON.parse(fs.readFileSync('face-r25d-browser-evidence/capture.json','utf8'));
+          const expected=['world-front','world-angle','skin-close'];
+          const shape={headWidth:-.05,headHeight:-.34,headDepth:.06,eyeSpacing:-.68,cranialWidth:-.22,faceHeight:-.18,cheekboneWidth:.22,cheekProjection:.10,jawWidth:.25,lowerFaceFullness:-.62,chinLength:-.18,chinProjection:.26,noseWidth:-.20,noseLength:-.24,noseProjection:.04,mouthWidth:.30,lipFullness:.02};
+          const skin={baseColor:'#ad7d66',undertone:-.02,redness:0,roughness:.54,oil:.18,scatter:.36,variation:.18,pores:.20,sunExposure:.20,weathering:.05};
+          if(data.errors?.length)throw Error('page errors: '+JSON.stringify(data.errors));
+          if(data.samples?.length!==expected.length)throw Error('unexpected sample count');
+          for(const name of expected){
+            const sample=data.samples.find(item=>item.name===name);
+            if(!sample)throw Error('missing sample '+name);
+            if(sample.glError!==0)throw Error(name+' WebGL error '+sample.glError);
+            const actualShape=sample.appearance?.identity?.shape||{};
+            for(const [key,value] of Object.entries(shape))if(Math.abs((actualShape[key]??0)-value)>1e-9)throw Error(name+' wrong shape '+key);
+            const actualSkin=sample.appearance?.skin||{};
+            for(const [key,value] of Object.entries(skin)){
+              if(typeof value==='number'){if(Math.abs((actualSkin[key]??NaN)-value)>1e-9)throw Error(name+' wrong skin '+key);}
+              else if(actualSkin[key]!==value)throw Error(name+' wrong skin '+key);
+            }
+            if(sample.faceAnatomy?.beard?.strands!==0)throw Error(name+' retained beard strands');
+            if(sample.sourceGroups?.some(group=>group.name==='faceBeard'))throw Error(name+' retained faceBeard draw group');
+          }
+          console.log(JSON.stringify({sourceSHA:process.env.GITHUB_SHA,samples:expected,role:'young-slender-darker',pageErrors:0,glErrors:0,beardStrands:0,redness:0,visualAcceptance:false}));
+
+      - name: Upload actual browser evidence
+        if: always() && hashFiles('face-r25d-browser-evidence/capture.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-r25d-role-${{ github.sha }}
+          path: face-r25d-browser-evidence
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
