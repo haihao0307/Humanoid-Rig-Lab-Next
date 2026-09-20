@@ -1,0 +1,57 @@
+{
+  "schema": "bird/columbid-feather-material-pick@0.0.12.1",
+  "date": "2026-09-20",
+  "status": "ACTIVE_SOURCE_AUDIT",
+  "source": {
+    "assetId": "BIRD-REF-002",
+    "viewerUid": "821135a09d3f48909b977a416d99c93b"
+  },
+  "problem": "The visually marked wing-tip and trailing-edge regions expose an opaque gray card perimeter. The exact source material controlling those pixels must be identified before any alpha correction is promoted.",
+  "pickMethod": {
+    "viewerEvent": "click",
+    "pickMode": "slow",
+    "requiredPayload": ["material", "position2D"],
+    "actions": [
+      "match clicked material by stateSetID, id, uid or name",
+      "highlight the picked material",
+      "record click screen position and material identifiers",
+      "audit Albedo/Diffuse and Opacity channels",
+      "audit registered texture list",
+      "export the evidence record"
+    ]
+  },
+  "alphaAuditModes": [
+    {
+      "id": "SOURCE_ALBEDO_ALPHA",
+      "priority": 1,
+      "description": "Reuse the selected material's existing AlbedoPBR, DiffusePBR or DiffuseColor texture object in the Opacity channel. This is the first test because the source RGBA texture may already contain a useful alpha channel that was not enabled."
+    },
+    {
+      "id": "DIAGNOSTIC_GENERATED_MASK",
+      "priority": 2,
+      "description": "Apply a generated RGBA mask only as a channel/UV diagnostic. It is not final unless its UV layout is proven to match the selected source material."
+    },
+    {
+      "id": "INDEPENDENT_ATLAS_AUTHORING",
+      "priority": 3,
+      "description": "For the commercial-safe independent asset, author an alpha mask against the actual feather atlas UVs, with transparent voids, opaque vane core, narrow semi-transparent barb fringe, RGB dilation and alpha-aware mip levels."
+    }
+  ],
+  "prohibitedConclusions": [
+    "A generated generic feather mask is not proof that the source atlas UVs are correct.",
+    "Enabling global opacity factor is not a feather-edge solution.",
+    "A whole material becoming translucent is a failure, not a pass.",
+    "Material-name matching alone is not enough; click evidence from the marked geometry is required."
+  ],
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0121.html",
+  "openGates": {
+    "markedRegionMaterialClickPicked": false,
+    "clickedMaterialHighlighted": false,
+    "sourceOpacityChannelAudited": false,
+    "sourceAlbedoAlphaReuseTested": false,
+    "sourceUvCompatibilityKnown": false,
+    "independentAtlasAlphaAuthored": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
