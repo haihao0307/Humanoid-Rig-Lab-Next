@@ -1,0 +1,129 @@
+name: Apply face browser capture repair once
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+    paths:
+      - tools/apply-face-browser-capture-region-fix.mjs
+      - .github/workflows/apply-face-browser-capture-region-fix-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout R25 branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/face-features-r25-20260919
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Apply CDP viewport capture repair
+        run: |
+          node tools/apply-face-browser-capture-region-fix.mjs
+          node --check tools/capture-face-diagnosis.cjs
+
+      - name: Build and source-gate production entry
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/check-face-r25-baseline.mjs
+          node tools/check-eye-anatomy.mjs --parameter-fixtures
+          node tools/test-eye-aperture-family.mjs
+
+      - name: Commit reusable capture repair before browser run
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/capture-face-diagnosis.cjs index.html FILE_AUDIT.json SHA256SUMS.txt
+          if git diff --cached --quiet; then
+            echo "No capture repair changes to commit"
+          else
+            git commit -m "face QA: capture animated viewport through CDP"
+            git push origin HEAD:feature/face-features-r25-20260919
+          fi
+
+      - name: Install isolated Playwright runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA_NODE="$RUNNER_TEMP/face-r25-playwright"
+          mkdir -p "$QA_NODE"
+          cd "$QA_NODE"
+          npm init -y >/dev/null
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+          echo "HUMAN_PLAYWRIGHT_MODULE=$QA_NODE/node_modules/playwright" >> "$GITHUB_ENV"
+
+      - name: Capture requested actual eye progress
+        env:
+          HUMAN_PLAYWRIGHT_MODULE: ${{ env.HUMAN_PLAYWRIGHT_MODULE }}
+        shell: bash
+        run: |
+          set -u
+          OUT="$RUNNER_TEMP/face-r25b-browser"
+          node tools/capture-face-diagnosis.cjs "$OUT" "eyes,eyes-half,eyes-closed"
+          STATUS=$?
+          rm -rf face-r25b-browser-evidence
+          mkdir -p face-r25b-browser-evidence
+          cp -a "$OUT"/. face-r25b-browser-evidence/ 2>/dev/null || true
+          exit "$STATUS"
+
+      - name: Enforce evidence gate
+        shell: node {0}
+        run: |
+          const fs=require('node:fs');
+          const data=JSON.parse(fs.readFileSync('face-r25b-browser-evidence/capture.json','utf8'));
+          const expected=['eyes','eyes-half','eyes-closed'];
+          if(data.errors?.length)throw Error('page errors: '+JSON.stringify(data.errors));
+          if(data.samples?.length!==expected.length)throw Error('unexpected sample count');
+          for(const name of expected){
+            const sample=data.samples.find(item=>item.name===name);
+            if(!sample)throw Error('missing sample '+name);
+            if(sample.glError!==0)throw Error(name+' WebGL error '+sample.glError);
+            if(sample.eyes?.revision!=='r25b-canthus-owned-aperture-family')throw Error(name+' used wrong eye revision');
+            const bytes=fs.statSync('face-r25b-browser-evidence/'+name+'.png').size;
+            if(bytes<4096)throw Error(name+' screenshot is empty');
+          }
+          const checks=data.identityChecks||{};
+          for(const key of ['characterSeedPreserved','appearanceRoundTrip','expressionIndependent','characterSamplerOwnsShape','worldLightFixed'])if(!checks[key])throw Error('identity check failed: '+key);
+          console.log(JSON.stringify({samples:expected,eyeRevision:'r25b-canthus-owned-aperture-family',pageErrors:0,glErrors:0,identityChecks:checks,visualAcceptance:false}));
+
+      - name: Publish requested progress screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST="docs/face-knowledge/evidence/R25B_PROGRESS_20260920"
+          rm -rf "$DEST"
+          mkdir -p "$DEST"
+          cp face-r25b-browser-evidence/eyes.png "$DEST/"
+          cp face-r25b-browser-evidence/eyes-half.png "$DEST/"
+          cp face-r25b-browser-evidence/eyes-closed.png "$DEST/"
+          cp face-r25b-browser-evidence/capture.json "$DEST/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin feature/face-features-r25-20260919
+          git add "$DEST"
+          git commit -m "face R25B: publish requested eye progress captures"
+          git push origin HEAD:feature/face-features-r25-20260919
+
+      - name: Upload browser evidence
+        if: always() && hashFiles('face-r25b-browser-evidence/*.png') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-r25b-browser-${{ github.sha }}-cdp-capture
+          path: face-r25b-browser-evidence
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30

@@ -1,0 +1,73 @@
+name: Face R25C clean-face framebuffer preview
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+    paths:
+      - body/FaceAnatomy.js
+      - body/CharacterPresets.js
+      - body/SkinAppearance.js
+      - tools/capture-face-r25-progress.cjs
+      - .github/workflows/face-r25c-framebuffer-preview.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture-clean-face:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/face-features-r25-20260919
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Rebuild exact production entry
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+          node tools/check-face-r25-baseline.mjs
+          node tools/check-skin-appearance.mjs
+          node tools/test-beard-anatomy.mjs
+      - name: Verify current-character clean-face state
+        shell: node {0}
+        run: |
+          const fs=require('node:fs');
+          const face=fs.readFileSync('body/FaceAnatomy.js','utf8');
+          const skin=fs.readFileSync('body/SkinAppearance.js','utf8');
+          const preset=fs.readFileSync('body/CharacterPresets.js','utf8');
+          if(!face.includes('density:0')||!face.includes('if(beard.report.strands)'))throw Error('current character clean-shaven gate missing');
+          if(!preset.includes("skin:{baseColor:'#c7a18d',roughness:.60,oil:.15,redness:0}"))throw Error('current character neutral redness gate missing');
+          if(!skin.includes("{key:'redness'")||!skin.includes("const redness=palette==='east-asian'"))throw Error('reusable skin redness controls were removed');
+      - name: Install isolated Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA_NODE="$RUNNER_TEMP/face-r25c-playwright"
+          mkdir -p "$QA_NODE" && cd "$QA_NODE"
+          npm init -y >/dev/null
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install chromium
+          echo "HUMAN_PLAYWRIGHT_MODULE=$QA_NODE/node_modules/playwright" >> "$GITHUB_ENV"
+      - name: Capture actual WebGL framebuffer
+        env:
+          HUMAN_PLAYWRIGHT_MODULE: ${{ env.HUMAN_PLAYWRIGHT_MODULE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/face-r25c-framebuffer"
+          node tools/capture-face-r25-progress.cjs "$OUT"
+          rm -rf face-r25c-framebuffer-evidence
+          cp -a "$OUT" face-r25c-framebuffer-evidence
+      - name: Upload actual screenshots
+        if: always() && hashFiles('face-r25c-framebuffer-evidence/capture.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-r25c-framebuffer-${{ github.sha }}
+          path: face-r25c-framebuffer-evidence
+          retention-days: 30

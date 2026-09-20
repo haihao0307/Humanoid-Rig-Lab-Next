@@ -632,9 +632,11 @@ function compactCreateFaceAnatomy(meshes,rig,scale){
   for(const [,target] of oralTargets)for(let i=0;i<target.p.length;i+=3)
     oralDepthOffset=Math.min(oralDepthOffset,surface(target.p[i],target.p[i+1])-.0035-target.p[i+2]);
   for(const [name,target] of oralTargets){for(let i=2;i<target.p.length;i+=3)target.p[i]+=oralDepthOffset;output.push(compactFaceGeneratedMesh(name,target.p,target.n,target.i,head,scale));}
-  const brows=compactCreateBrows(surface),beard=compactBeardGeometry(surface,{lipOutline:compactLipOutline,halfWidth:p.lips.halfWidth,centreX:p.lips.centreX});
+  // R25C keeps the procedural beard generator available for later character
+  // options, but the current face mother is explicitly clean-shaven.
+  const brows=compactCreateBrows(surface),beard=compactBeardGeometry(surface,{lipOutline:compactLipOutline,halfWidth:p.lips.halfWidth,centreX:p.lips.centreX,density:0});
   output.push(compactFaceGeneratedMesh('faceBrow',brows.positions,brows.normals,brows.indices,head,scale));
-  output.push(compactFaceGeneratedMesh('faceBeard',beard.positions,beard.normals,beard.indices,head,scale));
+  if(beard.report.strands)output.push(compactFaceGeneratedMesh('faceBeard',beard.positions,beard.normals,beard.indices,head,scale));
   return {meshes:output,report:{revision:p.revision,grid:[nx+1,ny+1],sourceSamples:observed,forms:p.forms.length,brows:brows.report,beard:beard.report,nostrilFrames,nasalUnderturn:true,innerVermilion:true,explicitLipMaterialDomains:true,continuousLipProfile:true,sharedLipBoundary:true,roundedInnerReturn:true,perioralContinuity:true,philtrum:true,labiomentalCrease:true,mentalisPad:true,jawPerformanceApproximation:true,oralStructures:{upperTeeth:true,lowerTeeth:true,upperGum:true,lowerGum:true,tongue:true,measuredDentition:false},triangles:output.reduce((s,m)=>s+m.triangles,0),sourceCoefficientsModified:false,measuredAnatomy:false}};
 }
 function compactLipShapeShader(){

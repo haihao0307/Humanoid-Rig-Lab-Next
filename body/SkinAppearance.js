@@ -3,7 +3,7 @@
  * These are art controls, not measured melanin or haemoglobin concentrations. */
 const SKIN_SCHEMA='jarvis/skin_appearance@2';
 const SKIN_LEGACY_SCHEMA='jarvis/skin_appearance@1';
-const SKIN_DEFAULT=Object.freeze({schema:SKIN_SCHEMA,baseColor:'#d0ac91',undertone:.02,redness:.13,roughness:.52,oil:.25,scatter:.30,variation:.30,pores:.35,sunExposure:.32,weathering:.16,seed:0});
+const SKIN_DEFAULT=Object.freeze({schema:SKIN_SCHEMA,baseColor:'#d0ac91',undertone:.02,redness:0,roughness:.52,oil:.25,scatter:.30,variation:.30,pores:.35,sunExposure:.32,weathering:.16,seed:0});
 const SKIN_CONTROLS=Object.freeze([
  {key:'undertone',label:'冷暖底调',min:-1,max:1,step:.01,hint:'负值偏冷，正值偏暖'},
  {key:'redness',label:'红润',min:0,max:1,step:.01,hint:'面颊与耳部更明显的柔和血色'},
@@ -38,18 +38,18 @@ const SKIN_PRESETS=Object.freeze([
 // distribution. Rows: light / medium / deeper; columns: cool / neutral /
 // golden / muted olive. Surface roughness and oil remain independent.
 const EAST_ASIAN_SKIN_PRESETS=Object.freeze([
- {id:'ea-light-cool',label:'浅肤 · 柔冷',baseColor:'#e2c4b6',undertone:-.10,redness:.16},
- {id:'ea-light-neutral',label:'浅肤 · 中性',baseColor:'#e2c3aa',undertone:.02,redness:.13},
- {id:'ea-light-golden',label:'浅肤 · 暖金',baseColor:'#e1be9a',undertone:.12,redness:.12},
- {id:'ea-light-olive',label:'浅肤 · 橄榄',baseColor:'#d6bea5',undertone:-.01,redness:.10},
- {id:'ea-medium-cool',label:'中等 · 柔冷',baseColor:'#cfaa96',undertone:-.10,redness:.16},
- {id:'ea-medium-neutral',label:'中等 · 中性',baseColor:'#d0ac91',undertone:.02,redness:.13},
- {id:'ea-medium-golden',label:'中等 · 暖金',baseColor:'#d0a57f',undertone:.12,redness:.12},
- {id:'ea-medium-olive',label:'中等 · 橄榄',baseColor:'#c3a88c',undertone:-.01,redness:.09},
- {id:'ea-deeper-cool',label:'较深 · 柔冷',baseColor:'#b78c76',undertone:-.08,redness:.15},
- {id:'ea-deeper-neutral',label:'较深 · 中性',baseColor:'#b58e70',undertone:.03,redness:.13},
- {id:'ea-deeper-golden',label:'较深 · 暖金',baseColor:'#b58a65',undertone:.10,redness:.11},
- {id:'ea-deeper-olive',label:'较深 · 橄榄',baseColor:'#aa8b6b',undertone:0,redness:.09}
+ {id:'ea-light-cool',label:'浅肤 · 柔冷',baseColor:'#e2c4b6',undertone:-.10,redness:0},
+ {id:'ea-light-neutral',label:'浅肤 · 中性',baseColor:'#e2c3aa',undertone:.02,redness:0},
+ {id:'ea-light-golden',label:'浅肤 · 暖金',baseColor:'#e1be9a',undertone:.12,redness:0},
+ {id:'ea-light-olive',label:'浅肤 · 橄榄',baseColor:'#d6bea5',undertone:-.01,redness:0},
+ {id:'ea-medium-cool',label:'中等 · 柔冷',baseColor:'#cfaa96',undertone:-.10,redness:0},
+ {id:'ea-medium-neutral',label:'中等 · 中性',baseColor:'#d0ac91',undertone:.02,redness:0},
+ {id:'ea-medium-golden',label:'中等 · 暖金',baseColor:'#d0a57f',undertone:.12,redness:0},
+ {id:'ea-medium-olive',label:'中等 · 橄榄',baseColor:'#c3a88c',undertone:-.01,redness:0},
+ {id:'ea-deeper-cool',label:'较深 · 柔冷',baseColor:'#b78c76',undertone:-.08,redness:0},
+ {id:'ea-deeper-neutral',label:'较深 · 中性',baseColor:'#b58e70',undertone:.03,redness:0},
+ {id:'ea-deeper-golden',label:'较深 · 暖金',baseColor:'#b58a65',undertone:.10,redness:0},
+ {id:'ea-deeper-olive',label:'较深 · 橄榄',baseColor:'#aa8b6b',undertone:0,redness:0}
 ]);
 function skinPresetCatalog(palette='east-asian'){
  if(palette==='east-asian')return EAST_ASIAN_SKIN_PRESETS;
@@ -81,7 +81,7 @@ function validateSkinAppearance(input={}){
 }
 function skinPreset(id,seed=0){
  const p=EAST_ASIAN_SKIN_PRESETS.find(p=>p.id===id)||SKIN_PRESETS.find(p=>p.id===id);if(!p)throw Error('未知皮肤预设');
- return validateSkinAppearance({...SKIN_DEFAULT,baseColor:p.baseColor,undertone:p.undertone,redness:p.redness??.15,seed});
+ return validateSkinAppearance({...SKIN_DEFAULT,baseColor:p.baseColor,undertone:p.undertone,redness:p.redness??0,seed});
 }
 function sampleSkinAppearance(seed,palette='east-asian'){
  skinSeed(seed);const catalog=skinPresetCatalog(palette);let state=(seed^0x6d2b79f5)>>>0;
@@ -98,7 +98,7 @@ function sampleSkinAppearance(seed,palette='east-asian'){
  const a=skinHexToLinear(ramp[index].baseColor),b=skinHexToLinear(ramp[index+1].baseColor),round=v=>Math.round(v*1000)/1000;
  const blend=key=>ramp[index][key]+(ramp[index+1][key]-ramp[index][key])*weight;
  const undertone=palette==='east-asian'?blend('undertone')+(random()-.5)*.12:(random()-.5)*.8;
- const redness=palette==='east-asian'?blend('redness')+(random()-.5)*.07:.05+random()*.25;
+ const redness=0;
  return validateSkinAppearance({...SKIN_DEFAULT,baseColor:skinLinearToHex(a.map((v,i)=>v+(b[i]-v)*weight)),
   undertone:round(undertone),redness:round(redness),roughness:round(.46+random()*.20),oil:round(.12+random()*.30),
   scatter:round(.20+random()*.25),variation:round(.15+random()*.35),pores:round(.20+random()*.35),
@@ -109,7 +109,7 @@ function characterSkinAppearance(appearance){
  skinObject(appearance,'角色外观');
  // The explicit recipe owns colour. skinColor remains a derived legacy alias.
  if(appearance.skin!==undefined)return validateSkinAppearance(appearance.skin);
- return validateSkinAppearance(appearance.skinColor===undefined?{}:{baseColor:skinLinearToHex(appearance.skinColor),undertone:0,redness:.15,sunExposure:0,weathering:0});
+ return validateSkinAppearance(appearance.skinColor===undefined?{}:{baseColor:skinLinearToHex(appearance.skinColor),undertone:0,redness:0,sunExposure:0,weathering:0});
 }
 function resolveSkinMaterial(input){
  const p=validateSkinAppearance(input),linear=skinHexToLinear(p.baseColor);

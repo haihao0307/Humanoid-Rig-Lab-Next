@@ -31,7 +31,7 @@ function installFaceAppearance(lab){
     parameters(){return {schema:FACE_APPEARANCE_SCHEMA,identity:lab.face.shapeParameters(),skin:SKIN_CONTROLS.map(c=>({...c})),
       identityUnits:'dimensionless [-1,1]; authored node residuals in millimetres',colorSpace:'sRGB hex',seedRange:[0,4294967295],
       generatorRevision:HUMAN_GENERATOR_REVISION,expressionIncluded:false,generatedGeometryIncluded:false,
-      coverage:'17 controls: shared head proportions and eye spacing plus 13 regional controls; detailed eye/ear shape ranges pending',visualAcceptance:false};}
+      coverage:'19 controls: the established 17 controls plus eye-fissure height and upper-lid fullness; the two R25 eye controls remain excluded from seeded sampling pending multi-identity visual review',visualAcceptance:false};}
   };
   const section=document.createElement('section');section.innerHTML=`<h3>人物外貌配方</h3>
     <label>外貌种子 <input data-look="seed" type="number" min="0" max="4294967295" step="1" value="4101"></label>

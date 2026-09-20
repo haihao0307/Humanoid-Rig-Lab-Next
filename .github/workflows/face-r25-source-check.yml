@@ -1,0 +1,53 @@
+name: Face R25 source check
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  face-source-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build generated workbench entry
+        run: node tools/build-pure.mjs
+
+      - name: Check generated entry and source assembly
+        run: node tools/check-pure.mjs
+
+      - name: Check frozen R25 baseline
+        run: node tools/check-face-r25-baseline.mjs
+
+      - name: Check clean-shaven neutral-skin contract
+        run: node tools/test-face-clean-shaven-neutral-skin.mjs
+
+      - name: Check current young slender darker role
+        run: node tools/test-face-young-slender-dark.mjs
+
+      - name: Check eye source and parameter fixtures
+        run: node tools/check-eye-anatomy.mjs --parameter-fixtures
+
+      - name: Check R25B canthus-owned aperture family
+        run: node tools/test-eye-aperture-family.mjs
+
+      - name: Check identity compiler and eye controls
+        run: node tools/test-face-identity-landmarks.mjs
+
+      - name: Check shared identity warp
+        run: node tools/test-face-identity-warp.mjs
+
+      - name: Check NPC face uniform transfer
+        run: node tools/test-npc-face-uniforms.mjs

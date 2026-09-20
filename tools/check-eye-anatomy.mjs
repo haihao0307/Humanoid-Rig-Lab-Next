@@ -14,13 +14,13 @@ export function checkEyeAnatomySources({read=readDefault,assert=assertDefault}={
   check(manifest.modules.filter(path=>path==='body/EyeAnatomy.js').length===1&&manifest.modules.indexOf('body/EyeAnatomy.js')<manifest.modules.indexOf('body/CompactWorkbench.js'),'one anatomy module assembled before its renderer');
   check((runtime.match(/__SOURCE:body\/EyeAnatomy\.js__/g)||[]).length===1,'one runtime assembly insertion');
   check(/function compactCreateEyeLids\(/.test(source)&&/function compactEyeSkinSampler\(/.test(source),'procedural geometry and neutral aperture sampling are explicit functions');
-  check(source.includes("revision:'r24-span-aware-lid-return'")&&source.includes('function compactEyeNeutralFissure')&&source.includes('lateralCanthusLift:.00070'),'neutral fissure has an explicit versioned canthus-aware model');
+  check(source.includes("revision:'r25b-canthus-owned-aperture-family'")&&source.includes("baselineRevision:'r24-span-aware-lid-return'")&&source.includes('function compactEyeAperturePoint')&&source.includes('function compactEyeClosedApertureY')&&source.includes('vec2 compactLidAperture'),'neutral, half-closed and closed margins share an explicit canthus-owned CPU/GLSL family');
   check(source.includes('function compactEyeOuterOverlap')&&source.includes('outerBand:{canthus:.00180,upper:.00850,lower:.00460'),'outer lid tissue reaches the orbital support while staying narrow at the canthi');
   check(source.includes('function compactEyeClosedDepth')&&source.includes('float compactLidClosedDepth')&&source.includes('upperFoldDistanceM:.00315'),'closed tissue has a separate endpoint-supported curve and the open fold retains its physical distance');
   check(source.includes('upperTurnSpanM:.00300,lowerTurnSpanM:.00180')&&source.includes('function compactEyeTissueDepth')&&source.includes('returnSource=restKnotZ+foldDepth+.00004+returnAllowance')&&!source.includes('plateZ=inner+delta')&&source.includes('dot(eyeCentre,u)'),'upper and lower tissue return has bounded volume above the actual source support, and lashes use the eye frame');
   check(source.includes('function compactEyeMarginPoint')&&source.includes('function compactEyeRimSurface')&&source.includes('wetFraction:.22'),'wet posterior margin and skin-coloured anterior cross-section are distinct physical surfaces');
   check(source.includes("name:'eyeLash'")&&source.includes('lashIndices.push')&&source.includes('if(compactEyeLid>2.5)')&&renderer.includes("c.name==='eyeLash'?3"),'real fibre geometry uses an independent eyelid-following shader path');
-  check(source.includes('function compactEyeOcclusionShader')&&source.includes('shader.slice(bodyStart,bodyEnd)')&&source.includes('compactEyeMarginDistance'),'eye contact visibility uses the actual deformer free-margin definition rather than a second static ellipse');
+  check(source.includes('function compactEyeOcclusionShader')&&source.includes('apertureStart=shader.indexOf')&&source.includes('shader.slice(apertureStart,apertureEnd)')&&source.includes('shader.slice(bodyStart,bodyEnd)')&&source.includes('compactEyeMarginDistance'),'fragment contact visibility carries the same aperture helpers and posed free-margin definition as the vertex deformer');
   check(source.includes('function compactEyeSectionDepth')&&source.includes('float compactLidSectionDepth')&&source.includes('contactWeight=1-gap')&&!source.includes('float rimT='),'CPU and shader share separate C2 lid sections without the former secondary rim blend');
   check(source.includes('function compactEyeTearPoint')&&source.includes('vec3 compactTearLocalPoint')&&source.includes('if(compactEyeLid>3.5)')&&renderer.includes("c.name==='eyeTearDuct'?4"),'medial conjunctival bed follows both posed lid margins through its own renderer class');
   check(source.includes('sectionFraction=uintBitsToFloat(axillaCorrective.x)')&&source.includes('eyeSection:Float32Array.from')&&renderer.includes('m.eyeSection')&&renderer.includes("p.u.compactMuscleEnabled,c.name==='skin'?1:0"),'slot 15 source-section bits are confined to eyelid reconstruction while body corrective data retains its skin-only muscle gate');
@@ -264,6 +264,20 @@ export function checkEyeAnatomyParameterFixtures({read=readDefault,assert=assert
   // Evaluate the shader's authored scalar statements. This independent route
   // catches drift between CPU construction and the GPU reconstruction formula.
   const scalarContext=vm.createContext({clamp,mix:(a,b,t)=>a+(b-a)*t,sin:Math.sin,cos:Math.cos,exp:Math.exp,pow:Math.pow,sqrt:Math.sqrt,abs:Math.abs,max:Math.max,min:Math.min,uintBitsToFloat:x=>x,axillaCorrective:{x:0,y:0,z:0,w:0},eyeLidParam:{x:0,y:0},eyeOuterTangentU:{x:0,y:0,z:0}});
+  scalarContext.compactLidSmooth01=value=>{const t=clamp(value,0,1);return t*t*(3-2*t);};
+  scalarContext.compactLidRestApertureY=(angle,sideSign,narrow,wide)=>{
+    const p=api.anatomy.fissure,c=Math.cos(angle),s=Math.sin(angle),vertical=Math.abs(s),lateral=c*sideSign,canthus=s*s;
+    const height=s>=0?p.upperHeight*(1+p.upperTemporalBias*lateral):p.lowerHeight*(1-p.lowerTemporalBias*lateral);
+    const neutral=(s>=0?1:-1)*height*vertical*(1-p.verticalRoundness+p.verticalRoundness*vertical)+p.lateralCanthusLift*lateral*(1-canthus);
+    return neutral+((s>=0?-.0022:.0014)*narrow+(s>=0?.0019:-.0004)*wide)*canthus;
+  };
+  scalarContext.compactLidClosedApertureY=(angle,sideSign,canthusSlopes)=>{
+    const p=api.anatomy.fissure,c=Math.cos(angle),u=(c+1)*.5,u2=u*u,u3=u2*u,left=-p.lateralCanthusLift*sideSign,right=p.lateralCanthusLift*sideSign;
+    const m0=canthusSlopes.x*2*p.halfWidth,m1=canthusSlopes.y*2*p.halfWidth;
+    const base=(2*u3-3*u2+1)*left+(u3-2*u2+u)*m0+(-2*u3+3*u2)*right+(u3-u2)*m1;
+    const centreFromTangents=(m0-m1)*.125,envelope=Math.pow(Math.max(0,1-c*c),api.anatomy.closure.envelopePower);
+    return base+(api.anatomy.closure.centreY-centreFromTangents)*envelope;
+  };
   function scalarFunction(name,args,returnExpression,source=api.shader){
     const at=source.indexOf(name+'('),body=source.slice(source.indexOf('{',at)+1,source.indexOf('\n}',at));
     const statements=[...body.matchAll(/\b(?:int|float)\s+([^;]+);/g)].map(m=>'let '+m[1]+';').join('\n');
@@ -371,7 +385,8 @@ export function checkEyeAnatomyParameterFixtures({read=readDefault,assert=assert
         scalarContext.axillaCorrective={x:section[0],y:section[1],z:section[2],w:section[3]};scalarContext.eyeLidParam={x:angle,y:t};
         const cpu=api.patch(angle,t,side,o,g,globe,corners,state,0,section),shader=shaderPatch(angle,t,{x:o[0],y:o[1],z:o[2]},{x:g[0],y:g[1]});
         check(cpu.every(Number.isFinite)&&shader.every(Number.isFinite),'finite complete patch under supplied pose');
-        check(Math.hypot(...sub(cpu,shader))<2e-10,'CPU and shader agree for each posed meridian');
+        const cpuShaderError=Math.hypot(...sub(cpu,shader));
+        check(cpuShaderError<2e-10,'CPU and shader agree for each posed meridian; '+JSON.stringify({side,state,angle,t,cpu,shader,error:cpuShaderError,outer:o,gradient:g,section,corners}));
         const boundary=api.patch(angle,1,side,o,g,globe,corners,state);
         check(Math.hypot(boundary[0]-o[0],boundary[1]-o[1],boundary[2]-o[2]-.00004)<2e-10,'posed outer boundary stays fixed');
       }

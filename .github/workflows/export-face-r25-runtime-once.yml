@@ -1,0 +1,51 @@
+name: Export face R25 runtime once
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+    paths:
+      - .github/workflows/export-face-r25-runtime-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout current face branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/face-features-r25-20260919
+          fetch-depth: 1
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build exact runtime
+        run: |
+          node tools/build-pure.mjs
+          node tools/check-pure.mjs
+
+      - name: Assemble inspection package
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p face-r25-runtime
+          cp index.html FILE_AUDIT.json SHA256SUMS.txt face-r25-runtime/
+          for dir in body control language motion reconstruction source ui visual voice world; do
+            if [ -d "$dir" ]; then cp -a "$dir" face-r25-runtime/; fi
+          done
+
+      - name: Upload current runtime
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-r25-runtime-${{ github.sha }}
+          path: face-r25-runtime
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 7

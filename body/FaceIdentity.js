@@ -10,6 +10,11 @@ const FACE_IDENTITY_PARAMETERS=Object.freeze([
   {id:'headHeight',label:'整体头部长度',nodes:{}},
   {id:'headDepth',label:'整体头部纵深',nodes:{}},
   {id:'eyeSpacing',label:'眼眶间距',nodes:{}},
+  // R25 begins with two low-risk eye identity controls that already have
+  // clear tissue owners in FaceControlRecipe. They are deliberately excluded
+  // from seeded random faces until multi-identity visual validation is done.
+  {id:'eyeFissureHeight',label:'眼裂纵向高度',sampleScale:0,nodes:{lidUpperLeft:[0,1.15,0],lidUpperRight:[0,1.15,0],lidLowerLeft:[0,-1.05,0],lidLowerRight:[0,-1.05,0]}},
+  {id:'upperLidFullness',label:'上睑组织饱满度',sampleScale:0,nodes:{lidUpperLeft:[0,0,.85],lidUpperRight:[0,0,.85]}},
   {id:'cranialWidth',label:'颞额宽度',nodes:{templeLeft:[3.8,0,0],templeRight:[-3.8,0,0],browOuterLeft:[1.2,0,0],browOuterRight:[-1.2,0,0]}},
   {id:'faceHeight',label:'面部纵向长度',nodes:{forehead:[0,2.6,0],browInnerLeft:[0,.8,0],browInnerRight:[0,.8,0],browOuterLeft:[0,.8,0],browOuterRight:[0,.8,0],jawLeft:[0,-.7,0],jawRight:[0,-.7,0],chin:[0,-1.8,0]}},
   {id:'cheekboneWidth',label:'颧部宽度',nodes:{cheekLeft:[3.6,0,0],cheekRight:[-3.6,0,0],templeLeft:[.6,0,0],templeRight:[-.6,0,0]}},
@@ -52,6 +57,9 @@ const FACE_IDENTITY_REFERENCE_LANDMARKS=Object.freeze([
 // Other NPC recipes keep their own identities; these are design choices, not
 // an ethnic template or a universal formula for attractiveness.
 const FACE_SCULPTED_MALE_SHAPE=Object.freeze({headWidth:.16,headHeight:-.40,headDepth:.10,eyeSpacing:-.72,cranialWidth:-.12,faceHeight:-.20,cheekboneWidth:.48,cheekProjection:.18,jawWidth:.68,lowerFaceFullness:-.50,chinLength:-.10,chinProjection:.52,noseWidth:-.18,noseLength:-.20,noseProjection:.08,mouthWidth:.36,lipFullness:-.10});
+// R25D current-role recipe: narrower lateral mass and softer lower face.
+// It is a reversible authored identity, not an age estimator or population rule.
+const FACE_YOUNG_SLENDER_MALE_SHAPE=Object.freeze({headWidth:-.05,headHeight:-.34,headDepth:.06,eyeSpacing:-.68,cranialWidth:-.22,faceHeight:-.18,cheekboneWidth:.22,cheekProjection:.10,jawWidth:.25,lowerFaceFullness:-.62,chinLength:-.18,chinProjection:.26,noseWidth:-.20,noseLength:-.24,noseProjection:.04,mouthWidth:.30,lipFullness:.02});
 const FACE_IDENTITY_PRESETS=Object.freeze([
   {id:'sculpted-male',label:'立体男性',shape:FACE_SCULPTED_MALE_SHAPE,offsetsMm:{}},
   {id:'reference',label:'参考中性',shape:{},offsetsMm:{}},
@@ -105,7 +113,7 @@ function sampleFaceIdentity(seed){
   const correlations={headWidth:width*.50,headHeight:length*.48,headDepth:fullness*.25,eyeSpacing:width*.18,cranialWidth:width*.45,cheekboneWidth:width*.4,jawWidth:width*.3,
     faceHeight:length*.45,chinLength:length*.3,noseLength:length*.2,
     lowerFaceFullness:fullness*.4,cheekProjection:fullness*.25,lipFullness:fullness*.12};
-  const shape={};for(const p of FACE_IDENTITY_PARAMETERS)shape[p.id]=Math.round(((correlations[p.id]||0)+signed(p.id)*.42)*10000)/10000;
+  const shape={};for(const p of FACE_IDENTITY_PARAMETERS){const sampleScale=p.sampleScale??.42;shape[p.id]=Math.round(((correlations[p.id]||0)+signed(p.id)*sampleScale)*10000)/10000;}
   return {schema:'jarvis/face_identity@2',seed,shape:validateFaceIdentityShape(shape),neutralOffsetsMm:{}};
 }
 function faceIdentityProportions(shape={}){return new Float32Array(['headWidth','headHeight','headDepth','eyeSpacing','jawWidth'].map(k=>shape[k]||0));}
