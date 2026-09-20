@@ -27,16 +27,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Wire canonical R2.5 gusset source
+      - name: Apply pending canonical R2.5 source migrations
         run: |
+          mkdir -p /tmp/shorts-r25-gusset
           node tools/apply-shorts-r25-gusset.mjs
-          node tools/apply-shorts-r25-bounded-review.mjs
           node tools/apply-shorts-r25-boundary-audit.mjs
           node tools/apply-shorts-r25-principal-centre.mjs
       - name: Build and test canonical source
         shell: bash
         run: |
-          mkdir -p /tmp/shorts-r25-gusset
           set -o pipefail
           {
             node tools/build-pure.mjs
@@ -64,6 +63,7 @@ jobs:
       - name: Archive exact reviewed source
         if: always()
         run: |
+          mkdir -p /tmp/shorts-r25-gusset
           git rev-parse HEAD > /tmp/shorts-r25-gusset/SOURCE_COMMIT.txt
           tar --exclude=.git --exclude=node_modules -czf /tmp/shorts-r25-gusset/reviewed-working-tree.tar.gz .
       - uses: actions/upload-artifact@v4
