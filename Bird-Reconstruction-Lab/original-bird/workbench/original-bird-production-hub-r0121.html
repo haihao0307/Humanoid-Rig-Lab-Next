@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="bird-runtime" content="single-entry">
+<title>Original Bird R0.12.1｜3A 生产入口</title>
+<style>
+:root{color-scheme:dark;--bg:#d0d8dc;--panel:#10212a;--line:#31505f;--text:#edf5f8;--muted:#9fb2bb;--good:#73d9ae;--warn:#f0cd75;--bad:#ef9890}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}button{font:inherit;border:1px solid var(--line);background:#16303c;color:var(--text);border-radius:8px;padding:8px 10px}button:hover{border-color:#7ba6b9}button.active{border-color:var(--good);color:var(--good);background:#12342c}.app{height:100%;display:grid;grid-template-rows:58px minmax(0,1fr) 30px}.top{display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid var(--line);background:#0d1d25}.top b{font-size:15px}.top small{color:var(--muted)}.tag{font-size:10px;border:1px solid #3f6576;border-radius:999px;padding:4px 8px;color:var(--good)}.main{min-height:0;display:grid;grid-template-columns:258px minmax(0,1fr) 270px}.side{background:var(--panel);padding:12px;overflow:auto}.left{border-right:1px solid var(--line)}.right{border-left:1px solid var(--line)}h3{font-size:11px;letter-spacing:.08em;color:#d5e3e8;margin:6px 0 9px}.stage-button{display:grid;grid-template-columns:25px minmax(0,1fr);gap:8px;width:100%;text-align:left;margin:7px 0;padding:9px}.stage-button i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#1c3a47;color:#dbe8ed;font-size:10px}.stage-button b{display:block;font-size:11px}.stage-button span{display:block;font-size:9px;color:var(--muted);margin-top:3px;line-height:1.35}.stage-button.alpha i{background:#25465a;color:#b9e7ff}.stage-button.locked{opacity:.55}.stage-button.locked i{background:#362d20;color:#e6c879}.frame-wrap{position:relative;min-width:0;min-height:0;background:#d0d8dc}.frame-wrap iframe{width:100%;height:100%;border:0;display:block;background:#d0d8dc}.loading{position:absolute;inset:0;display:grid;place-items:center;background:#d0d8dc;color:#263741;font-size:12px;z-index:2}.frame-ready .loading{display:none}.tools{display:grid;grid-template-columns:1fr 1fr;gap:6px}.status{padding:9px;border:1px solid #42616f;border-radius:8px;margin:8px 0;background:#0c1b22;font-size:10px;line-height:1.55;color:var(--muted)}.status b{color:#e3edf1}.gate{font-size:10px;line-height:1.45;margin:7px 0;color:var(--muted)}.gate:before{content:"●";color:var(--bad);margin-right:6px}.gate.ok:before{color:var(--good)}.order{counter-reset:n}.order div{position:relative;padding:7px 7px 7px 29px;margin:5px 0;border:1px solid #294653;border-radius:7px;background:#0b1920;font-size:10px;line-height:1.4;color:var(--muted)}.order div:before{counter-increment:n;content:counter(n);position:absolute;left:7px;top:7px;width:15px;height:15px;border-radius:50%;display:grid;place-items:center;background:#1b3945;color:#dce8ed;font-size:9px}.foot{display:flex;align-items:center;gap:14px;padding:0 10px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);background:#0d1d25}.foot b{color:var(--good)}.zen .main{grid-template-columns:1fr}.zen .side{display:none}.zen .frame-wrap{grid-column:1}@media(max-width:980px){.main{grid-template-columns:1fr}.side{position:absolute;z-index:5;top:58px;bottom:30px;width:min(90vw,330px);box-shadow:0 20px 50px #000a}.left{left:0}.right{right:0;display:none}.tag{display:none}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header class="top"><b>Original Bird R0.12.1</b><small>3A 生产入口｜先点中红圈实际材质，再处理 Alpha</small><span class="tag">slow material pick · source alpha audit · diagnostic mask · bright backgrounds · eight phases</span></header>
+<main class="main">
+<aside class="side left">
+<h3>生产阶段</h3>
+<button class="stage-button active" data-stage="measure"><i>1</i><span><b>形体测量与动作采样</b><span>双点测量、归一化动作相位</span></span></button>
+<button class="stage-button" data-stage="semantic"><i>2</i><span><b>源节点语义映射</b><span>节点、矩阵、候选控制器与证据等级</span></span></button>
+<button class="stage-button" data-stage="material"><i>3</i><span><b>材质角色校准</b><span>羽毛、眼、喙、足部分开</span></span></button>
+<button class="stage-button" data-stage="baseline"><i>4</i><span><b>固定视角基线与误差</b><span>四视角截图、轮廓与候选误差</span></span></button>
+<button class="stage-button alpha" data-stage="alpha"><i>5</i><span><b>点选羽毛材质与透明边缘</b><span>点击灰板几何，直接取得真实材质并审计 Alpha</span></span></button>
+<button class="stage-button" data-stage="quality"><i>6</i><span><b>3A 游戏资产质量门</b><span>形体、羽层、材质、变形、动作、移动端交付</span></span></button>
+<button class="stage-button locked" disabled><i>7</i><span><b>独立 Original Bird</b><span>许可安全的连续表面、羽层、绑定和动作</span></span></button>
+<h3>当前操作</h3><div class="tools"><button id="reload">重载当前</button><button id="open">新窗口</button><button id="zen">只看工作台</button><button id="home">回到第一步</button></div>
+</aside>
+<section class="frame-wrap" id="wrap"><div class="loading" id="loading">正在打开形体测量与动作采样…</div><iframe id="frame" title="Original Bird production stage" allow="autoplay; fullscreen; xr-spatial-tracking" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads" allowfullscreen></iframe></section>
+<aside class="side right">
+<h3>当前状态</h3><div class="status" id="status"><b>读取中</b><br>正在载入 CURRENT_STATUS.json…</div>
+<h3>本轮固定顺序</h3><div class="order"><div>点击翅尖或后缘灰板，直接取得实际材质。</div><div>检查该材质现有 Albedo/Diffuse 与 Opacity 通道。</div><div>先测试源贴图是否已有可用 Alpha。</div><div>通用生成 Mask 只作 UV/通道诊断，不冒充最终贴图。</div><div>独立资产按真实 Feather Atlas UV 重做 Alpha、颜色扩张与 Mip。</div><div>三背景、五视角、八相位和移动端 Overdraw 全部过门禁。</div></div>
+<h3>当前边界</h3><div class="gate ok">名称猜测已被点击选材质取代</div><div class="gate ok">R0.12.1 源 Alpha 测试已开放</div><div class="gate">红圈材质仍需在浏览器中点击确认</div><div class="gate">独立候选 Feather Atlas 尚未生成</div>
+</aside>
+</main>
+<footer class="foot"><b>● 3A production hub</b><span id="stageState">stage 1 / measure</span><span id="revision">status loading</span><span>single-entry</span><span>Original Bird R0.12.1</span></footer>
+</div>
+<script>
+(()=>{'use strict';
+const STAGES={measure:{order:1,name:'形体测量与动作采样',path:'original-bird-source-measure-r006.html'},semantic:{order:2,name:'源节点语义映射',path:'original-bird-semantic-map-r007.html'},material:{order:3,name:'材质角色校准',path:'original-bird-material-audit-r008.html'},baseline:{order:4,name:'固定视角基线与误差',path:'original-bird-fixed-view-baseline-r010.html'},alpha:{order:5,name:'点选羽毛材质与透明边缘',path:'original-bird-feather-alpha-r0121.html'},quality:{order:6,name:'3A 游戏资产质量门',path:'original-bird-3a-quality-gate-r011.html'}};
+const $=id=>document.getElementById(id);let active='measure',zen=false;
+function setStage(key){if(!STAGES[key])return;active=key;document.querySelectorAll('[data-stage]').forEach(b=>b.classList.toggle('active',b.dataset.stage===key));$('wrap').classList.remove('frame-ready');$('loading').textContent='正在打开'+STAGES[key].name+'…';$('frame').src=STAGES[key].path;$('stageState').textContent='stage '+STAGES[key].order+' / '+key;try{localStorage.setItem('original-bird-r0121-stage',key);}catch(e){}}
+function loadStatus(){fetch('../CURRENT_STATUS.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(s=>{$('status').innerHTML='<b>'+String(s.revision||'UNKNOWN')+'</b><br>源模型可见：'+Boolean(s.sourceModelsVisible)+'<br>点击选材质：'+Boolean(s.featherMaterialPick?.generated)+'<br>Alpha 校准：'+Boolean(s.featherAlphaEdge?.generated)+'<br>独立鸟已生成：'+Boolean(s.visualBirdGenerated)+'<br>红圈材质确认：'+Boolean(s.openGates?.markedFeatherRegionMaterialPicked)+'<br>3A 关键门：'+Boolean(s.openGates?.allCritical3AGatesPassed)+'<br>视觉验收：'+Boolean(s.openGates?.visualAcceptance);$('revision').textContent=String(s.revision||'status loaded');}).catch(e=>{$('status').innerHTML='<b>状态读取失败</b><br>'+String(e.message||e);$('revision').textContent='status unavailable';});}
+$('frame').addEventListener('load',()=>$('wrap').classList.add('frame-ready'));document.querySelectorAll('[data-stage]').forEach(b=>b.onclick=()=>setStage(b.dataset.stage));$('reload').onclick=()=>setStage(active);$('open').onclick=()=>window.open(STAGES[active].path,'_blank','noopener');$('home').onclick=()=>setStage('measure');$('zen').onclick=()=>{zen=!zen;$('app').classList.toggle('zen',zen);$('zen').textContent=zen?'恢复界面':'只看工作台';};
+try{const saved=localStorage.getItem('original-bird-r0121-stage');if(STAGES[saved])active=saved;}catch(e){}setStage(active);loadStatus();
+})();
+</script>
+</body>
+</html>
