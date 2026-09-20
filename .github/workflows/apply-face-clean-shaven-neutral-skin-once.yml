@@ -1,0 +1,100 @@
+name: Apply face R25C clean-shaven neutral skin once
+
+on:
+  push:
+    branches:
+      - feature/face-features-r25-20260919
+    paths:
+      - tools/apply-face-clean-shaven-neutral-skin.mjs
+      - .github/workflows/apply-face-clean-shaven-neutral-skin-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  implement-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout exact R25 branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/face-features-r25-20260919
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Apply clean-shaven neutral-skin production patch
+        run: node tools/apply-face-clean-shaven-neutral-skin.mjs
+
+      - name: Rebuild generated workbench
+        run: node tools/build-pure.mjs
+
+      - name: Run source and geometry gates
+        run: |
+          node tools/check-pure.mjs
+          node tools/check-face-r25-baseline.mjs
+          node tools/test-beard-anatomy.mjs --production
+          node --check tools/capture-face-clean-preview.cjs
+
+      - name: Install isolated Playwright runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA_NODE="$RUNNER_TEMP/face-r25c-playwright"
+          mkdir -p "$QA_NODE"
+          cd "$QA_NODE"
+          npm init -y >/dev/null
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+          echo "HUMAN_PLAYWRIGHT_MODULE=$QA_NODE/node_modules/playwright" >> "$GITHUB_ENV"
+
+      - name: Capture clean face from the actual WebGL workbench
+        env:
+          HUMAN_PLAYWRIGHT_MODULE: ${{ env.HUMAN_PLAYWRIGHT_MODULE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/face-r25c-clean"
+          node tools/capture-face-clean-preview.cjs "$OUT"
+          rm -rf face-r25c-clean-evidence
+          cp -a "$OUT" face-r25c-clean-evidence
+
+      - name: Enforce clean-face browser gate
+        shell: node {0}
+        run: |
+          const fs=require('node:fs');
+          const data=JSON.parse(fs.readFileSync('face-r25c-clean-evidence/capture.json','utf8'));
+          const expected=['clean-front','clean-angle','clean-profile'];
+          if(data.errors?.length)throw Error('page errors: '+JSON.stringify(data.errors));
+          if(data.setup.redness!==0||data.setup.beard?.strands!==0||data.setup.groups.includes('faceBeard'))throw Error('setup is not clean-shaven neutral skin');
+          if(data.samples?.length!==expected.length)throw Error('unexpected capture count');
+          for(const name of expected){
+            const sample=data.samples.find(item=>item.name===name);
+            if(!sample)throw Error('missing '+name);
+            if(sample.glError!==0||sample.skin.redness!==0||sample.beard?.strands!==0||sample.groups.includes('faceBeard'))throw Error(name+' failed clean-face gate');
+          }
+          console.log(JSON.stringify({samples:expected,redness:0,beardStrands:0,faceBeardGroup:false,pageErrors:0,glErrors:0,visualAcceptance:false}));
+
+      - name: Commit production changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add body/FaceAnatomy.js body/CharacterPresets.js body/SkinAppearance.js tools/test-beard-anatomy.mjs tools/check-skin-appearance.mjs docs/face-knowledge/R25C_CLEAN_SHAVEN_NEUTRAL_SKIN_20260920.md index.html FILE_AUDIT.json SHA256SUMS.txt
+          git commit -m "face R25C: remove beard and default facial redness"
+          git push origin HEAD:feature/face-features-r25-20260919
+
+      - name: Upload clean-face screenshots and report
+        if: always() && hashFiles('face-r25c-clean-evidence/capture.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: face-r25c-clean-${{ github.sha }}
+          path: face-r25c-clean-evidence
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
