@@ -1,6 +1,6 @@
 {
-  "schema": "bird/original-bird-status@0.0.8",
-  "revision": "R0.06-bright-studio-measurement-and-motion-sampling",
+  "schema": "bird/original-bird-status@0.0.9",
+  "revision": "R0.07-live-source-semantic-mapping",
   "date": "2026-09-20",
   "branch": "bird-mother-original-bird-r001-20260920",
   "visualBirdGenerated": false,
@@ -39,6 +39,27 @@
       "normalized BIRD-REF-001 motion-phase sampling with JSON export"
     ]
   },
+  "semanticMappingWorkbench": {
+    "generated": true,
+    "revision": "R0.07",
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-semantic-map-r007.html",
+    "defaultBackground": "bright studio gray-white",
+    "blackModelBackgroundRemoved": true,
+    "capabilities": [
+      "switchable BIRD-REF-002 visible rig and BIRD-REF-001 motion rig",
+      "live node-name and instanceID inspection",
+      "local transform readout",
+      "canonical Original Bird role assignment",
+      "evidence-class assignment",
+      "seeded candidate map loading",
+      "persistent local mapping edits",
+      "mapping coverage counts",
+      "candidate mapping JSON export",
+      "hard separation between candidate mapping and anatomical lock"
+    ]
+  },
+  "sourceRuntimeBridge": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SOURCE_RUNTIME_BRIDGE_R006.json",
+  "semanticControllerMap": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_SEMANTIC_MAP_R007.json",
   "sourceBackedRealismTarget": "Bird-Reconstruction-Lab/original-bird/distilled/COLUMBID_REALISM_TARGET_R005.json",
   "sourceBatch": {
     "items": 7,
@@ -83,13 +104,15 @@
     "using black as the default model-review background",
     "treating artist controls as literal anatomical bones",
     "shipping CC-BY-NC source meshes as commercial runtime dependencies",
-    "using lighting or color to conceal geometry and deformation errors"
+    "using lighting or color to conceal geometry and deformation errors",
+    "promoting candidate semantic mappings without hierarchy, symmetry, skin-weight and motion verification"
   ],
   "currentExecutionQueue": [
-    "run browser QA on the R0.06 bright studio default",
-    "capture BIRD-REF-002 source measurements for wing root, neck-head, tail fan and leg-foot-toe landmarks",
-    "capture normalized BIRD-REF-001 motion phases for wing, leg, toe, neck and tail groups",
-    "persist semantic node mappings from the live Viewer API",
+    "run browser QA on R0.06 bright-studio measurement and R0.07 semantic mapping workbenches",
+    "verify every seeded source node exists in the live Viewer API node map",
+    "complete BIRD-REF-002 wing, tail, neck, head/beak/eye and leg/foot/toe source measurements",
+    "capture normalized BIRD-REF-001 wing, leg, toe, neck and tail motion phases",
+    "verify candidate semantic roles against hierarchy, bilateral symmetry, visible skin region and motion participation",
     "separate feather, eye, beak and foot material roles",
     "reuse R17 wing, tail, foot and behavior interfaces",
     "build fixed-view source-to-distilled silhouette and landmark error readout",
@@ -99,8 +122,14 @@
     "allHistoricalUserBirdGlbRecovered": false,
     "selectedSourceGlbOnlineBinaryAvailable": false,
     "r006BrightStudioBrowserVisualQaPassed": false,
+    "r007SemanticMappingBrowserVisualQaPassed": false,
     "sourceLandmarkMeasurementSetComplete": false,
+    "liveNodeExistenceVerified": false,
     "sourceNodeSemanticMappingComplete": false,
+    "sourceHierarchyVerified": false,
+    "sourceSkinWeightVerified": false,
+    "sourceBilateralSymmetryVerified": false,
+    "sourceMotionParticipationVerified": false,
     "normalizedMotionPhaseExtractionComplete": false,
     "sourceMaterialRoleSeparationComplete": false,
     "sourceToDistilledFixedViewErrorAvailable": false,
