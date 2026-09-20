@@ -26,113 +26,104 @@ jobs:
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py
           python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
           python Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py --self-test
-      - name: R0.15.1 structure, runtime repair and syntax
+      - name: R0.16 source-only replication guards
         shell: python
         run: |
           import json, pathlib, re
           root = pathlib.Path('Bird-Reconstruction-Lab/original-bird')
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
-          contract = json.loads((root / 'distilled/LARID_ORIGINAL_BIRD_C_DRAFT_R015.json').read_text(encoding='utf-8'))
+          contract = json.loads((root / 'distilled/LARID_C_SOURCE_REPLICA_R016.json').read_text(encoding='utf-8'))
           batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
-          kernel = root / 'runtime/original-bird-c-kernel-r015.js'
-          lab = root / 'workbench/original-bird-seagull-c-draft-r0151.html'
-          hub = root / 'workbench/original-bird-production-hub-r0151.html'
-          kernel_text = kernel.read_text(encoding='utf-8')
+          lab = root / 'workbench/original-bird-seagull-source-distillation-r016.html'
           lab_text = lab.read_text(encoding='utf-8')
-          hub_text = hub.read_text(encoding='utf-8')
 
-          if status.get('revision') != 'R0.15.1-iphone-c-draft-runtime-repair':
+          deleted = [
+              root / 'distilled/LARID_ORIGINAL_BIRD_C_DRAFT_R015.json',
+              root / 'runtime/original-bird-c-kernel-r015.js',
+              root / 'workbench/original-bird-seagull-c-draft-r015.html',
+              root / 'workbench/original-bird-seagull-c-draft-r0151.html',
+              root / 'workbench/original-bird-production-hub-r015.html',
+              root / 'workbench/original-bird-production-hub-r0151.html',
+          ]
+          for p in deleted:
+              if p.exists():
+                  raise SystemExit('REJECTED_CREATIVE_ARTIFACT_REAPPEARED ' + str(p))
+
+          if status.get('revision') != 'R0.16-source-replication-only':
               raise SystemExit('STATUS_REVISION_MISMATCH')
-          if status.get('visualBirdGenerated') is not True or status.get('continuousSurfaceBirdGenerated') is not True:
-              raise SystemExit('C_DRAFT_GENERATION_STATUS_INVALID')
-          if status['productionHub']['revision'] != 'R0.15.1' or status['productionHub']['mobileBehavior'] != 'redirect directly to repaired standalone C-draft workbench':
-              raise SystemExit('MOBILE_HUB_REPAIR_NOT_RECORDED')
-          mobile = status.get('mobileMode', {})
-          if mobile.get('directStandaloneOnMobile') is not True or mobile.get('duplicateHubAndChildHeadersRemoved') is not True or mobile.get('duplicateHubAndChildDocksRemoved') is not True:
-              raise SystemExit('MOBILE_DUPLICATE_CHROME_GUARD_INVALID')
-          c = status.get('laridCDraft', {})
-          repair = c.get('runtimeRepair', {})
-          if c.get('fixedVertexArrayStored') is not False or c.get('fixedTriangleArrayStored') is not False or c.get('sourceRuntimeDependency') is not False:
-              raise SystemExit('C_DRAFT_REPRESENTATION_INVALID')
-          if repair.get('orbitControlsRemoved') is not True or repair.get('builtInPointerOrbit') is not True or repair.get('visibleRuntimeErrorOverlay') is not True:
-              raise SystemExit('RUNTIME_REPAIR_STATUS_INVALID')
-          if c.get('visualAcceptance') is not False or c.get('productionReady') is not False:
-              raise SystemExit('ACCEPTANCE_GATE_INVALID')
+          if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
+              raise SystemExit('GENERATED_REPLACEMENT_STATUS_MUST_BE_FALSE')
+          if status.get('executionRole') != 'CRAFTSMAN_REPLICATION_NOT_CREATIVE_GENERATION':
+              raise SystemExit('EXECUTION_ROLE_CHANGED')
+          deletion = status.get('wrongRouteDeletion', {})
+          if deletion.get('completed') is not True or deletion.get('restoreAllowed') is not False:
+              raise SystemExit('WRONG_ROUTE_DELETION_NOT_LOCKED')
+          replica = status.get('seagullSourceReplica', {})
+          if replica.get('authoritativeSourceAssetId') != 'BIRD-REF-004':
+              raise SystemExit('AUTHORITATIVE_SOURCE_CHANGED')
+          if replica.get('generatedReplacementGeometry') is not False:
+              raise SystemExit('REPLACEMENT_GEOMETRY_FLAG_INVALID')
+          if replica.get('inventedShapeParameters') is not False or replica.get('inventedFeatherGeometry') is not False:
+              raise SystemExit('INVENTED_DATA_FLAG_INVALID')
+          if status['productionEntry']['path'] != 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r016.html':
+              raise SystemExit('SOURCE_ONLY_ENTRY_CHANGED')
 
           by_id = {r['assetId']: r for r in batch['records']}
-          if by_id['BIRD-REF-004']['counts']['joints'] != 15 or by_id['BIRD-REF-005']['counts']['joints'] != 21:
-              raise SystemExit('SEAGULL_SOURCE_PAIR_CHANGED')
-          if contract['representation']['fixedVertexArrayStored'] is not False or contract['method']['runtimeDependencyOnSourceGlb'] is not False:
-              raise SystemExit('C_DRAFT_CONTRACT_REGRESSION')
+          src = by_id['BIRD-REF-004']
+          if src['sha256'] != '5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af':
+              raise SystemExit('SOURCE_SHA_CHANGED')
+          if src['geometrySha256'] != 'd6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac':
+              raise SystemExit('SOURCE_GEOMETRY_SHA_CHANGED')
+          if src['counts']['nodes'] != 22 or src['counts']['joints'] != 15 or src['counts']['vertices'] != 3291 or src['counts']['triangles'] != 4352:
+              raise SystemExit('SOURCE_COUNTS_CHANGED')
 
-          required_kernel = (
-              'DEFAULT_LARID_C_PROFILE','evaluateBody','evaluateWing','adaptiveParameters',
-              'buildLaridDisplay','semanticAnchors','exportKaopuCProfile',
-              "representation:'continuous-functions-sampled-in-memory'",
-              'sourceTopologyDependency:false','fixedVertexArrayStored:false','fixedTriangleArrayStored:false'
-          )
-          for token in required_kernel:
-              if token not in kernel_text:
-                  raise SystemExit('KERNEL_TOKEN_MISSING ' + token)
+          if contract['status'] != 'ACTIVE_SOURCE_REPLICATION_ONLY':
+              raise SystemExit('CONTRACT_STATUS_INVALID')
+          if contract['executionRole'] != 'CRAFTSMAN_REPLICATION_NOT_CREATIVE_GENERATION':
+              raise SystemExit('CONTRACT_ROLE_INVALID')
+          auth = contract['currentAuthoritativeSource']
+          if auth['assetId'] != 'BIRD-REF-004' or auth['sha256'] != src['sha256'] or auth['geometrySha256'] != src['geometrySha256']:
+              raise SystemExit('CONTRACT_SOURCE_IDENTITY_MISMATCH')
+          if contract['secondaryComparisonOnly']['assetId'] != 'BIRD-REF-005':
+              raise SystemExit('SECONDARY_COMPARISON_CHANGED')
+          if contract['openGates']['sourceReplicaDatasetComplete'] is not False:
+              raise SystemExit('SOURCE_DATASET_GATE_MUST_REMAIN_FALSE')
 
-          required_lab = (
-              'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js',
-              '../runtime/original-bird-c-kernel-r015.js',
-              'initTouchOrbit','pointerdown','pointermove','orbit.pointers.size===2',
-              '__BIRD_C_RUNTIME_READY__','__showBirdRuntimeError__',
-              'setTimeout(()=>{if(!window.__BIRD_C_RUNTIME_READY__)',
-              'buildLaridDisplay','verifyIndependence','preview','balanced','close',
-              'original-bird-r0151-larid-c-draft.kaopu','embedded'
+          required = (
+              'dc42ffc81c86480e9e7f7752fa134174',
+              '5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af',
+              'd6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac',
+              'getNodeMap','getMatrix','getMaterialList','getTextureList','getAnimations',
+              'PHASES=[0,.125,.25,.375,.5,.625,.75,.875]',
+              'kaopu/source-bird-replica@1.0',
+              'CRAFTSMAN_REPLICATION_NOT_CREATIVE_GENERATION',
+              'generatedReplacementGeometry:false',
+              'inventedBodyProfile:false',
+              'original-bird-r016-seagull-source-replica.kaopu'
           )
-          for token in required_lab:
+          for token in required:
               if token not in lab_text:
-                  raise SystemExit('LAB_TOKEN_MISSING ' + token)
-          for forbidden in ("from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js'",'new THREE.SphereGeometry','deformedBodyGeometry','original-bird-columbid-form-r003'):
-              if forbidden in lab_text or forbidden in kernel_text:
-                  raise SystemExit('FORBIDDEN_RUNTIME_TOKEN ' + forbidden)
+                  raise SystemExit('SOURCE_WORKBENCH_TOKEN_MISSING ' + token)
 
-          required_hub = (
-              'original-bird-seagull-c-draft-r0151.html?standalone=1',
-              "matchMedia('(max-width:999px)').matches",
-              "location.replace('original-bird-seagull-c-draft-r0151.html?standalone=1')",
-              'original-bird-seagull-c-draft-r0151.html?embedded=1',
-              'R0.15.1 runtime repair'
+          forbidden = (
+              'new THREE.',
+              'buildLaridDisplay',
+              'evaluateBody',
+              'evaluateWing',
+              'original-bird-c-kernel-r015',
+              'LARID_ORIGINAL_BIRD_C_DRAFT_R015',
+              'generated candidate',
+              'C稿候选'
           )
-          for token in required_hub:
-              if token not in hub_text:
-                  raise SystemExit('HUB_TOKEN_MISSING ' + token)
+          for token in forbidden:
+              if token in lab_text:
+                  raise SystemExit('CREATIVE_GENERATION_TOKEN_FORBIDDEN ' + token)
 
-          for p in (lab, hub):
-              text = p.read_text(encoding='utf-8')
-              scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', text, re.S | re.I)]
-              if not scripts:
-                  raise SystemExit('NO_INLINE_SCRIPT ' + str(p))
-              out = pathlib.Path('/tmp') / (p.stem + '.mjs')
-              out.write_text('\n'.join(scripts), encoding='utf-8')
-              print('SCRIPT_EXTRACTED', out)
-          print('R0151_RUNTIME_REPAIR_STRUCTURE_OK')
-      - name: R0.15.1 kernel runtime and sampling independence
-        shell: bash
-        run: |
-          cp Bird-Reconstruction-Lab/original-bird/runtime/original-bird-c-kernel-r015.js /tmp/original-bird-c-kernel-r015.mjs
-          node --input-type=module - <<'NODE'
-          import {cloneProfile,buildLaridDisplay,exportKaopuCProfile} from 'file:///tmp/original-bird-c-kernel-r015.mjs';
-          const profile=cloneProfile();
-          const results=['preview','balanced','close'].map(q=>buildLaridDisplay(profile,q));
-          const counts=new Set(results.map(r=>`${r.stats.vertices}/${r.stats.triangles}`));
-          if(counts.size!==3)throw new Error('DISPLAY_COUNTS_DO_NOT_CHANGE_WITH_TOLERANCE');
-          for(const r of results){
-            if(r.sourceTopologyDependency!==false)throw new Error('SOURCE_TOPOLOGY_DEPENDENCY_REGRESSION');
-            if(r.stats.vertices<=0||r.stats.triangles<=0)throw new Error('EMPTY_DISPLAY_SAMPLE');
-            if(Object.keys(r.anchors).length!==9)throw new Error('ANCHOR_COUNT_REGRESSION');
-          }
-          const keys=Object.keys(results[0].anchors);let max=0;
-          for(let i=1;i<results.length;i++)for(const k of keys)for(let j=0;j<3;j++)max=Math.max(max,Math.abs(results[i].anchors[k][j]-results[0].anchors[k][j]));
-          if(max>1e-12)throw new Error('SEMANTIC_ANCHOR_DRIFT '+max);
-          const doc=exportKaopuCProfile(profile,{test:true});
-          if(doc.representation.fixedVertexArrayStored!==false||doc.representation.fixedTriangleArrayStored!==false)throw new Error('EXPORT_STORES_FIXED_TOPOLOGY');
-          if(doc.evidence.sourceRuntimeDependency!==false)throw new Error('EXPORT_SOURCE_DEPENDENCY_INVALID');
-          console.log('R0151_KERNEL_OK',results.map(r=>r.stats),'anchorDrift',max);
-          NODE
-          node --check /tmp/original-bird-seagull-c-draft-r0151.mjs
-          node --check /tmp/original-bird-production-hub-r0151.mjs
+          scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', lab_text, re.S | re.I)]
+          if not scripts:
+              raise SystemExit('NO_INLINE_SCRIPT')
+          out = pathlib.Path('/tmp/original-bird-seagull-source-distillation-r016.js')
+          out.write_text('\n'.join(scripts), encoding='utf-8')
+          print('R016_SOURCE_ONLY_REPLICATION_GUARDS_OK')
+      - name: R0.16 JavaScript syntax
+        run: node --check /tmp/original-bird-seagull-source-distillation-r016.js
