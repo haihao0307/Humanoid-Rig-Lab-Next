@@ -32,7 +32,7 @@ jobs:
             python Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py --self-test
           fi
 
-      - name: JSON and JavaScript syntax
+      - name: Validate JSON and inline JavaScript
         shell: bash
         run: |
           python - <<'PY'
@@ -50,6 +50,7 @@ jobs:
               root / 'distilled/COLUMBID_FIXED_VIEW_BASELINE_R010.json',
               root / 'distilled/COLUMBID_3A_GAME_ASSET_STANDARD_R011.json',
               root / 'distilled/COLUMBID_FEATHER_ALPHA_EDGE_R012.json',
+              root / 'distilled/COLUMBID_FEATHER_MATERIAL_PICK_R0121.json',
               root / 'CURRENT_STATUS.json',
           ]
           for p in json_files:
@@ -62,7 +63,8 @@ jobs:
               root / 'workbench/original-bird-fixed-view-baseline-r010.html',
               root / 'workbench/original-bird-3a-quality-gate-r011.html',
               root / 'workbench/original-bird-feather-alpha-r012.html',
-              root / 'workbench/original-bird-production-hub-r012.html',
+              root / 'workbench/original-bird-feather-alpha-r0121.html',
+              root / 'workbench/original-bird-production-hub-r0121.html',
           ]
           for p in html_files:
               text = p.read_text(encoding='utf-8')
@@ -75,7 +77,7 @@ jobs:
           PY
           for f in /tmp/original-bird-*.js; do node --check "$f"; done
 
-      - name: R0.12 feather-alpha production guards
+      - name: R0.12.1 click-picked feather-material guards
         shell: python
         run: |
           import json
@@ -90,71 +92,85 @@ jobs:
                   raise SystemExit('REJECTED_FILE_REAPPEARED ' + str(rejected))
 
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
-          if status.get('revision') != 'R0.12-feather-alpha-edge-calibration':
-              raise SystemExit('R012_STATUS_REVISION_MISMATCH')
+          if status.get('revision') != 'R0.12.1-click-picked-feather-material-audit':
+              raise SystemExit('R0121_STATUS_REVISION_MISMATCH')
           if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
               raise SystemExit('INDEPENDENT_BIRD_GATE_INVALID')
           hub = status.get('productionHub', {})
-          alpha_status = status.get('featherAlphaEdge', {})
-          if hub.get('revision') != 'R0.12' or hub.get('singleEntry') is not True or hub.get('blackModelBackgroundRemoved') is not True:
-              raise SystemExit('R012_HUB_STATUS_INVALID')
-          if alpha_status.get('revision') != 'R0.12' or alpha_status.get('generated') is not True:
-              raise SystemExit('R012_ALPHA_STATUS_INVALID')
-          if alpha_status.get('runtimeAlphaMaskApplied') is not False or alpha_status.get('allCriticalAlphaGatesPassed') is not False:
-              raise SystemExit('R012_ALPHA_ACCEPTANCE_MUST_REMAIN_FALSE')
+          pick_status = status.get('featherMaterialPick', {})
+          if hub.get('revision') != 'R0.12.1' or hub.get('singleEntry') is not True or hub.get('blackModelBackgroundRemoved') is not True:
+              raise SystemExit('R0121_HUB_STATUS_INVALID')
+          if pick_status.get('revision') != 'R0.12.1' or pick_status.get('generated') is not True:
+              raise SystemExit('R0121_PICK_STATUS_INVALID')
+          if pick_status.get('markedRegionMaterialClickPicked') is not False or pick_status.get('sourceUvCompatibilityKnown') is not False:
+              raise SystemExit('R0121_OPEN_GATES_MUST_REMAIN_FALSE')
           if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002' or status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
               raise SystemExit('SOURCE_PAIR_CHANGED')
 
+          batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
+          by_id = {r['assetId']: r for r in batch['records']}
+          if len(batch['records']) != 7 or len([r for r in batch['records'] if r['assetId'].startswith('BIRD-REF-')]) != 6:
+              raise SystemExit('SOURCE_BATCH_COUNT_INVALID')
+          if by_id['BIRD-REF-002']['counts']['vertices'] != 18152 or by_id['BIRD-REF-002']['counts']['joints'] != 117:
+              raise SystemExit('DETAIL_REFERENCE_CHANGED')
+          if by_id['BIRD-REF-001']['counts']['joints'] != 44 or by_id['BIRD-REF-001']['skeleton']['semanticCounts']['wing'] != 10:
+              raise SystemExit('MOTION_REFERENCE_CHANGED')
+
           alpha = json.loads((root / 'distilled/COLUMBID_FEATHER_ALPHA_EDGE_R012.json').read_text(encoding='utf-8'))
-          zones = alpha['correctionModel']['zones']
-          gates = alpha['qualityGates']
-          if len(zones) != 4 or len(gates) != 7 or len([g for g in gates if g['critical']]) != 6:
-              raise SystemExit('R012_ALPHA_CONTRACT_STRUCTURE_INVALID')
-          if {z['id'] for z in zones} != {'VOID','BARB_FRINGE','VANE_CORE','RACHIS_SHAFT'}:
-              raise SystemExit('R012_ALPHA_ZONE_SET_INVALID')
-          if alpha['openGates']['runtimeAlphaMaskApplied'] is not False or alpha['openGates']['allCriticalAlphaGatesPassed'] is not False:
-              raise SystemExit('R012_ALPHA_CONTRACT_GATE_INVALID')
-
+          pick = json.loads((root / 'distilled/COLUMBID_FEATHER_MATERIAL_PICK_R0121.json').read_text(encoding='utf-8'))
           standard = json.loads((root / 'distilled/COLUMBID_3A_GAME_ASSET_STANDARD_R011.json').read_text(encoding='utf-8'))
+          if {z['id'] for z in alpha['correctionModel']['zones']} != {'VOID','BARB_FRINGE','VANE_CORE','RACHIS_SHAFT'}:
+              raise SystemExit('ALPHA_ZONE_SET_INVALID')
+          if pick['pickMethod']['pickMode'] != 'slow' or pick['openGates']['markedRegionMaterialClickPicked'] is not False:
+              raise SystemExit('CLICK_PICK_CONTRACT_INVALID')
+          if [m['id'] for m in pick['alphaAuditModes']] != ['SOURCE_ALBEDO_ALPHA','DIAGNOSTIC_GENERATED_MASK','INDEPENDENT_ATLAS_AUTHORING']:
+              raise SystemExit('ALPHA_AUDIT_ORDER_CHANGED')
           domains = standard['qualityDomains']
-          all_gates = [g for d in domains for g in d['gates']]
-          if len(domains) != 6 or len(all_gates) != 30 or sum(d['weight'] for d in domains) != 100:
-              raise SystemExit('R011_3A_STANDARD_CHANGED')
+          gates = [g for d in domains for g in d['gates']]
+          if len(domains) != 6 or len(gates) != 30 or sum(d['weight'] for d in domains) != 100:
+              raise SystemExit('3A_STANDARD_STRUCTURE_INVALID')
+          if 'COLUMBID_FEATHER_ALPHA_EDGE_R012.json' not in ''.join(standard.get('supplementalContracts', [])):
+              raise SystemExit('3A_ALPHA_SUPPLEMENT_MISSING')
 
-          alpha_path = root / 'workbench/original-bird-feather-alpha-r012.html'
-          hub_path = root / 'workbench/original-bird-production-hub-r012.html'
-          alpha_text = alpha_path.read_text(encoding='utf-8')
+          lab = root / 'workbench/original-bird-feather-alpha-r0121.html'
+          hub_path = root / 'workbench/original-bird-production-hub-r0121.html'
+          lab_text = lab.read_text(encoding='utf-8')
           hub_text = hub_path.read_text(encoding='utf-8')
           for token in (
               '821135a09d3f48909b977a416d99c93b',
-              'channels?.Opacity',
+              "addEventListener('click'",
+              "{pick:'slow'}",
+              'info?.material',
+              'highlightMaterial',
+              'getTextureList',
+              'AlbedoPBR',
+              'DiffusePBR',
+              'channels.Opacity',
               'addTexture',
               'setMaterial',
-              'generateMask',
-              'maskCanvas',
-              'studio:[.72,.77,.79]',
+              'SOURCE_ALBEDO_ALPHA',
+              'DIAGNOSTIC_GENERATED_MASK',
+              'genericDiagnosticMaskIsProductionTexture:false',
+              'original-bird-r0121-feather-material-pick.json',
+              'original-bird-r0121-diagnostic-alpha-mask.png',
               'sky:[.47,.67,.82]',
-              'warm:[.72,.66,.57]',
               'PHASES=[0,.125,.25,.375,.5,.625,.75,.875]',
-              'original-bird-r012-feather-alpha-mask.png',
-              'original-bird-r012-feather-alpha.json',
-              'feather alpha-edge calibration',
+              'click-picked feather alpha audit',
           ):
-              if token not in alpha_text:
-                  raise SystemExit('R012_ALPHA_TOKEN_MISSING ' + token)
+              if token not in lab_text:
+                  raise SystemExit('R0121_LAB_TOKEN_MISSING ' + token)
           for token in (
-              'original-bird-feather-alpha-r012.html',
+              'original-bird-feather-alpha-r0121.html',
               'original-bird-3a-quality-gate-r011.html',
               'CURRENT_STATUS.json',
               'single-entry',
-              'Original Bird R0.12',
+              'Original Bird R0.12.1',
           ):
               if token not in hub_text:
-                  raise SystemExit('R012_HUB_TOKEN_MISSING ' + token)
+                  raise SystemExit('R0121_HUB_TOKEN_MISSING ' + token)
 
-          files_to_scan = [alpha_path, hub_path]
           for token in ('data-bg="dark"', "state.background='dark'", 'new THREE.SphereGeometry', 'deformedBodyGeometry', 'original-bird-columbid-form-r003'):
-              for p in files_to_scan:
+              for p in (lab, hub_path):
                   if token in p.read_text(encoding='utf-8'):
                       raise SystemExit('FORBIDDEN_TOKEN ' + token + ' in ' + str(p))
-          print('R012_FEATHER_ALPHA_EDGE_GUARDS_OK')
+          print('R0121_CLICK_PICKED_FEATHER_MATERIAL_GUARDS_OK')
