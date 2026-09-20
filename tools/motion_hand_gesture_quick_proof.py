@@ -7,7 +7,7 @@ import contextlib
 import json
 from pathlib import Path
 
-import motion_hand_visual_proof_fast2  # install batched fixed-step advancement
+import motion_hand_visual_proof_fast3  # live renderer readiness + batched advancement
 import motion_hand_visual_proof_fast as proof
 
 
