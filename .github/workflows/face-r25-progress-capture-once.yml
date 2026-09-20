@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: face-r25-lightweight-progress
+  cancel-in-progress: true
+
 jobs:
   capture-progress:
     runs-on: ubuntu-latest
