@@ -13,6 +13,7 @@ function fake(){
  const body={nodes:[],update(){},measure(){return m;}};return {human,body};
 }
 const plain=value=>JSON.parse(JSON.stringify(value));
+const diagnostics=report=>({valid:report.valid,leftTubeFormed:report.leftTubeFormed,rightTubeFormed:report.rightTubeFormed,cuffs:report.cuffs,leftRightOwnership:report.leftRightOwnership,independentLegDofs:report.independentLegDofs,strictCrossTube:report.strictCrossTube,strictCrossTubeIntersectionFree:report.strictCrossTubeIntersectionFree,materialWithinCheckpoint:report.materialWithinCheckpoint,maximumPrincipalStrain:report.materialAtCheckpoint?.maxAbsPrincipalStrain,seams:report.closedSeams,joinedStitchCount:report.joinedStitchCount,bodyRequirementMet:report.bodyRequirementMet,relaxationSteps:report.relaxationSteps});
 function build({relax=24}={}){
  const pattern=Pattern(measurement(),{columns:3,rows:7,hipRow:2,crotchRow:4}),{human,body}=fake(),state=State(pattern,body,human),cloth=new Cloth(pattern,null,{stitchDofs:true,selfContact:false,triangleBodyContact:false,gravity:0,groundY:null,iterations:10,maxMaterialIterations:20,bendCompliance:40000,sewingSeconds:1000}),initial=Complete(cloth,state);
  for(const support of cloth.temporarySupports)support.active=false;
@@ -22,7 +23,7 @@ function build({relax=24}={}){
 }
 
 test('R2.3b forms left and right tubes from the four original main panels only',()=>{
- const {report,cloth}=build();
+ const {report,cloth}=build();if(!report.valid)console.log('R2.3B_GATE_DIAGNOSTICS '+JSON.stringify(diagnostics(report)));
  assert.equal(report.valid,true);assert.equal(report.dualTubeGate,true);assert.equal(report.leftTubeFormed,true);assert.equal(report.rightTubeFormed,true);
  assert.deepEqual(plain(report.closedSeamIds),['outseam-left','inseam-left','outseam-right','inseam-right']);
  assert.equal(report.sourceIdentityPreserved,true);assert.equal(report.totalMassPreserved,true);assert.equal(report.otherSeamsStarted,false);
