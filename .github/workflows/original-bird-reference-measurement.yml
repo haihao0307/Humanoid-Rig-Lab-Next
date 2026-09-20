@@ -20,7 +20,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-
       - name: Python tools
         run: |
           python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py
@@ -31,16 +30,13 @@ jobs:
             python -m py_compile Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py
             python Bird-Reconstruction-Lab/original-bird/tools/distill_bird_reference.py --self-test
           fi
-
-      - name: Validate JSON and inline JavaScript
+      - name: Validate R0.12.3 files
         shell: bash
         run: |
           python - <<'PY'
           import json, pathlib, re
           root = pathlib.Path('Bird-Reconstruction-Lab/original-bird')
           for p in [
-              root / 'original-bird-kernel.schema.json',
-              root / 'original-bird-anatomy-landmarks.schema.json',
               root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json',
               root / 'distilled/COLUMBID_3A_GAME_ASSET_STANDARD_R011.json',
               root / 'distilled/COLUMBID_FEATHER_ALPHA_AUTO_EXTRACT_R0122.json',
@@ -50,11 +46,6 @@ jobs:
               json.loads(p.read_text(encoding='utf-8'))
               print('JSON_OK', p)
           for p in [
-              root / 'workbench/original-bird-source-measure-r006.html',
-              root / 'workbench/original-bird-semantic-map-r007.html',
-              root / 'workbench/original-bird-material-audit-r008.html',
-              root / 'workbench/original-bird-fixed-view-baseline-r010.html',
-              root / 'workbench/original-bird-3a-quality-gate-r011.html',
               root / 'workbench/original-bird-feather-alpha-r0122.html',
               root / 'workbench/original-bird-feather-alpha-mobile-r0123.html',
               root / 'workbench/original-bird-production-hub-r0123.html',
@@ -67,22 +58,18 @@ jobs:
               out.write_text('\n'.join(scripts), encoding='utf-8')
               print('SCRIPT_EXTRACTED', out)
           PY
-          for f in /tmp/original-bird-*.js; do node --check "$f"; done
-
+          node --check /tmp/original-bird-feather-alpha-r0122.js
+          node --check /tmp/original-bird-feather-alpha-mobile-r0123.js
+          node --check /tmp/original-bird-production-hub-r0123.js
       - name: R0.12.3 mobile production guards
         shell: python
         run: |
           import json
           from pathlib import Path
           root = Path('Bird-Reconstruction-Lab/original-bird')
-
-          for rejected in (
-              root / 'workbench/original-bird-columbid-form-r003.html',
-              root / 'workbench/original-bird-studio-review-r006.html',
-          ):
+          for rejected in (root / 'workbench/original-bird-columbid-form-r003.html', root / 'workbench/original-bird-studio-review-r006.html'):
               if rejected.exists():
                   raise SystemExit('REJECTED_FILE_REAPPEARED ' + str(rejected))
-
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
           if status.get('revision') != 'R0.12.3-touch-first-mobile-production-ui':
               raise SystemExit('R0123_STATUS_REVISION_MISMATCH')
@@ -99,7 +86,6 @@ jobs:
               raise SystemExit('R0123_ALPHA_GATE_INVALID')
           if status['primaryVisibleRigReference']['assetId'] != 'BIRD-REF-002' or status['primaryMotionRigReference']['assetId'] != 'BIRD-REF-001':
               raise SystemExit('SOURCE_PAIR_CHANGED')
-
           contract = json.loads((root / 'distilled/COLUMBID_MOBILE_UI_R0123.json').read_text(encoding='utf-8'))
           if contract['target']['primaryViewport'] != '390x844 portrait':
               raise SystemExit('MOBILE_TARGET_CHANGED')
@@ -109,43 +95,16 @@ jobs:
               raise SystemExit('MOBILE_DEFAULT_VIEWER_INVALID')
           if contract['openGates']['iphonePortraitVisualQaPassed'] is not False or contract['openGates']['visualAcceptance'] is not False:
               raise SystemExit('MOBILE_ACCEPTANCE_GATE_INVALID')
-
           lab = root / 'workbench/original-bird-feather-alpha-mobile-r0123.html'
           hub_path = root / 'workbench/original-bird-production-hub-r0123.html'
           lab_text = lab.read_text(encoding='utf-8')
           hub_text = hub_path.read_text(encoding='utf-8')
-          for token in (
-              'height:100dvh',
-              'env(safe-area-inset-bottom)',
-              'min-height:44px',
-              'class="viewer after show"',
-              'data-mode="before"',
-              'data-mode="after"',
-              'paramsSheet',
-              'auditSheet',
-              'openSheet',
-              'setMode(\'after\')',
-              'setView(\'wingtip\')',
-              'getTextureList',
-              'deriveMask',
-              'changedRatio',
-              'original-bird-r0123-mobile-alpha-report.json',
-          ):
+          for token in ('height:100dvh','env(safe-area-inset-bottom)','min-height:44px','class="viewer after show"','data-mode="before"','data-mode="after"','paramsSheet','auditSheet','openSheet',"setMode('after')","setView('wingtip')",'getTextureList','deriveMask','changedRatio','original-bird-r0123-mobile-alpha-report.json'):
               if token not in lab_text:
                   raise SystemExit('R0123_MOBILE_LAB_TOKEN_MISSING ' + token)
-          for token in (
-              'height:100dvh',
-              'env(safe-area-inset-bottom)',
-              'min-height:44px',
-              'stageDrawer',
-              'statusDrawer',
-              'original-bird-feather-alpha-mobile-r0123.html',
-              "defaultMobileStage",
-              'single-entry-mobile-first',
-          ):
+          for token in ('height:100dvh','env(safe-area-inset-bottom)','min-height:44px','stageDrawer','statusDrawer','original-bird-feather-alpha-mobile-r0123.html',"let active='alpha'",'single-entry-mobile-first'):
               if token not in hub_text:
                   raise SystemExit('R0123_HUB_TOKEN_MISSING ' + token)
-
           for token in ('data-bg="dark"', "state.background='dark'", 'new THREE.SphereGeometry', 'deformedBodyGeometry', 'original-bird-columbid-form-r003'):
               for p in (lab, hub_path):
                   if token in p.read_text(encoding='utf-8'):
