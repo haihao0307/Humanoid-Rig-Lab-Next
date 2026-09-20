@@ -100,7 +100,7 @@ jobs:
           JS
           grep -q '__motionVisualQAFallback' body-hand-qa.html
           grep -q 'MotionRuntimeState' body-hand-qa.html
-          grep -q 'contact-hand-pose' body-hand-qa.html
+          grep -q 'CONTACT_HAND_POSE_REVISION' body-hand-qa.html
           sha256sum source-index.html public-index.html body-hand-qa.html | tee hand-proof-entrypoint-hashes.txt
 
       - name: Run focused hand-action proof
