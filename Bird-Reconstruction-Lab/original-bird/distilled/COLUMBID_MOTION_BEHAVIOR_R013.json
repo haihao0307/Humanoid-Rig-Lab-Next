@@ -1,0 +1,117 @@
+{
+  "schema": "bird/columbid-motion-behavior@0.0.13",
+  "date": "2026-09-20",
+  "status": "ACTIVE_SOURCE_BACKED_MOTION_EXTRACTION_NOT_FINAL_BEHAVIOR",
+  "species": {
+    "scientificName": "Spilopelia chinensis",
+    "commonNameZh": "珠颈斑鸠",
+    "clade": "columbid",
+    "line": "R17 source-locked independent columbid line",
+    "doNotInherit": [
+      "house-sparrow synchronous hopping",
+      "house-sparrow toe, branch or flight parameters",
+      "generic one-speed flap used for every flight state"
+    ]
+  },
+  "sources": {
+    "visibleForm": {
+      "assetId": "BIRD-REF-002",
+      "file": "pigeon (1)(2).glb",
+      "viewerUid": "821135a09d3f48909b977a416d99c93b",
+      "role": "surface, skinning and visible deformation reference"
+    },
+    "motionRig": {
+      "assetId": "BIRD-REF-001",
+      "file": "cine__pigeon_fly(2).glb",
+      "viewerUid": "67f9422072664cf1967ae4fe440585a9",
+      "role": "explicit bilateral wing, leg, toe, neck, head and tail phase reference"
+    },
+    "legacyPolicy": {
+      "id": "R17",
+      "locomotion": "alternating-walk-primary",
+      "microStepUse": "landing-and-contact-alignment-only",
+      "sourceLock": "spotted-dove-procedural@6.1-specimen-profile-r17"
+    }
+  },
+  "semanticGroups": {
+    "wing": "shoulder, upper wing, forearm, wrist/manus and wing-feather controls",
+    "tail": "tail root and rectrix controls",
+    "neck": "cervical chain",
+    "head": "head, beak, eye and jaw controls",
+    "leg": "thigh, knee, ankle, foot and toe controls",
+    "all": "all readable source nodes"
+  },
+  "extraction": {
+    "normalizedPhases": [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875],
+    "perNodeFields": ["instanceID", "name", "translation"],
+    "continuityMetrics": [
+      "mean node displacement per adjacent phase",
+      "maximum node displacement per adjacent phase",
+      "loop closure displacement between final and first phase"
+    ],
+    "export": "kaopu/bird-motion-source@1.0",
+    "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-pigeon-motion-r013.html"
+  },
+  "behaviorCapabilityMatrix": [
+    {
+      "state": "rest_attention",
+      "sourceSupport": "PARTIAL",
+      "evidence": "visible source pose and head/neck controls; no accepted living-idle clip",
+      "gate": "BLOCKED"
+    },
+    {
+      "state": "alternating_walk",
+      "sourceSupport": "POLICY_ONLY",
+      "evidence": "R17 policy preserved; no accepted source clip in the current dual baseline",
+      "gate": "BLOCKED"
+    },
+    {
+      "state": "takeoff",
+      "sourceSupport": "PARTIAL",
+      "evidence": "wing and hindlimb chains are readable, but takeoff event segmentation is not locked",
+      "gate": "REVIEW"
+    },
+    {
+      "state": "continuous_flap",
+      "sourceSupport": "STRONGEST_CURRENT",
+      "evidence": "BIRD-REF-001 animated wing chain and body coupling",
+      "gate": "REVIEW"
+    },
+    {
+      "state": "glide",
+      "sourceSupport": "INSUFFICIENT",
+      "evidence": "must not be synthesized by playback-speed reduction alone",
+      "gate": "BLOCKED"
+    },
+    {
+      "state": "approach_landing",
+      "sourceSupport": "PARTIAL",
+      "evidence": "leg and toe chains exist; approach deceleration and contact timing are not accepted",
+      "gate": "BLOCKED"
+    }
+  ],
+  "alphaIssue": {
+    "status": "DEFERRED_TO_LARGE_SCREEN_REVIEW",
+    "reason": "R0.12.2 automatic alpha affected the wrong UV regions; do not spend the current mobile session on this blocker",
+    "resumeCondition": "large-screen review of wing tip, trailing edge and wing underside feather-tip UV islands"
+  },
+  "nextSpecies": {
+    "species": "Passer domesticus",
+    "commonNameZh": "家麻雀",
+    "phase": "phase1_morphology_and_basic_motion",
+    "runtimeDeclaredByRegistry": "runtime/current/BIRD_R60_A0_HOUSE_SPARROW_PHASE1_NPC_DIRECT.html",
+    "startRule": "start after the pigeon motion baseline and R17 source lock are preserved; do not overwrite the dove line"
+  },
+  "openGates": {
+    "eightPhaseSourceCaptureComplete": false,
+    "semanticGroupContinuityMeasured": false,
+    "loopClosureMeasured": false,
+    "takeoffEventLocked": false,
+    "flapCycleLocked": false,
+    "approachLandingLocked": false,
+    "alternatingWalkRuntimeIntegrated": false,
+    "independentCommercialSafeMotionGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
