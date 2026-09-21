@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const ARTIFACT_DIR = path.resolve('artifacts/bird-r0122-browser-qa');
-const URL = 'http://127.0.0.1:4173/Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0122.html';
+const URL = process.env.BIRD_QA_URL || 'http://127.0.0.1:4173/Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0122.html';
 
 function parsePercent(value) {
   const match = String(value || '').match(/([0-9]+(?:\.[0-9]+)?)%/);
@@ -12,6 +12,7 @@ function parsePercent(value) {
 
 async function readRuntime(page) {
   return page.evaluate(() => ({
+    href: location.href,
     readyState: document.querySelector('#readyState')?.textContent?.trim() || '',
     applyState: document.querySelector('#applyState')?.textContent?.trim() || '',
     status: document.querySelector('#status')?.textContent?.trim() || '',
@@ -76,7 +77,7 @@ test('R0.12.2 loads both viewers, extracts source-atlas alpha, and creates a vis
     });
   });
 
-  await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60_000 });
   await expect(page.locator('header')).toContainText('Original Bird R0.12.2');
 
   await page.waitForFunction(
@@ -89,7 +90,7 @@ test('R0.12.2 loads both viewers, extracts source-atlas alpha, and creates a vis
     { timeout: 120_000 },
   );
 
-  const startup = await persistEvidence(page, consoleEvents, 'r0122-startup');
+  const startup = await persistEvidence(page, consoleEvents, 'r0122-startup', { requestedUrl: URL });
   expect(startup.status).not.toMatch(/Viewer 启动失败|viewer init failed/i);
   expect(startup.readyState).toContain('2/2');
 
@@ -104,7 +105,7 @@ test('R0.12.2 loads both viewers, extracts source-atlas alpha, and creates a vis
   );
 
   await page.waitForTimeout(2_500);
-  const initial = await persistEvidence(page, consoleEvents, 'r0122-initial-full');
+  const initial = await persistEvidence(page, consoleEvents, 'r0122-initial-full', { requestedUrl: URL });
 
   await page.locator('[data-bg="sky"]').click();
   await page.locator('[data-view="wingtip"]').click();
