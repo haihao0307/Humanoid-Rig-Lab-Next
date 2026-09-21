@@ -44,10 +44,11 @@ jobs:
           echo 'Local server failed to start'
           exit 1
 
-      - name: Run R0.12.2 Chromium visual QA
+      - name: Run R0.12.2 headed Chrome visual QA
         run: |
-          npx playwright test Bird-Reconstruction-Lab/original-bird/tests/feather-alpha-r0122.spec.cjs \
+          xvfb-run -a npx playwright test Bird-Reconstruction-Lab/original-bird/tests/feather-alpha-r0122.spec.cjs \
             --browser=chromium \
+            --headed \
             --workers=1 \
             --reporter=line
 
