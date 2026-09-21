@@ -26,20 +26,19 @@ jobs:
         run: |
           import pathlib, subprocess
           forbidden = chr(0x4E89) + chr(0x6D41)
-          paths = [pathlib.Path(x.decode('utf-8')) for x in subprocess.check_output(['git','ls-files','-z']).split(b'\0') if x]
+          files = [pathlib.Path(x.decode('utf-8')) for x in subprocess.check_output(['git','ls-files','-z']).split(b'\0') if x]
           hits = []
-          for path in paths:
+          for file in files:
               try:
-                  text = path.read_text(encoding='utf-8')
+                  text = file.read_text(encoding='utf-8')
               except (UnicodeDecodeError, OSError):
                   continue
               if forbidden in text:
-                  hits.append(str(path))
+                  hits.append(str(file))
           if hits:
-              for path in hits:
-                  print('FORBIDDEN_TERM_PATH', path)
+              print('\n'.join('FORBIDDEN_TERM_PATH ' + x for x in hits))
               raise SystemExit('TERMINOLOGY_LOCK_FAILED')
-          print('TERMINOLOGY_SCAN_OK', len(paths))
+          print('TERMINOLOGY_SCAN_OK', len(files))
 
       - name: Existing tool self-tests
         run: |
@@ -54,88 +53,58 @@ jobs:
           import json, pathlib, re
           root = pathlib.Path('Bird-Reconstruction-Lab/original-bird')
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
-          form = json.loads((root / 'distilled/LARID_ORIGINAL_FORM_R017.json').read_text(encoding='utf-8'))
+          contract = json.loads((root / 'distilled/LARID_ORIGINAL_FORM_R017.json').read_text(encoding='utf-8'))
           batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
           runtime = root / 'runtime/original-bird-gull-form-r017.mjs'
           workbench = root / 'workbench/original-bird-gull-form-r0171.html'
           runtime_text = runtime.read_text(encoding='utf-8')
           workbench_text = workbench.read_text(encoding='utf-8')
 
-          if status.get('revision') != 'R0.17.1-refined-shape-first-original-gull':
-              raise SystemExit('R0171_STATUS_REVISION_MISMATCH')
-          if status.get('visualBirdGenerated') is not True:
-              raise SystemExit('R0171_VISIBLE_FORM_NOT_RECORDED')
-          if status.get('continuousSurfaceBirdGenerated') is not False:
-              raise SystemExit('WHOLE_BIRD_CONTINUITY_MUST_REMAIN_FALSE')
-          entry = status.get('productionEntry', {})
-          if entry.get('path') != 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r0171.html':
-              raise SystemExit('R0171_PRODUCTION_ENTRY_CHANGED')
-          if entry.get('generatedCandidatePresent') is not True:
-              raise SystemExit('R0171_CANDIDATE_NOT_RECORDED')
-          if entry.get('advancedFlightAvailable') is not False:
-              raise SystemExit('ADVANCED_FLIGHT_MUST_REMAIN_DISABLED')
+          assert status['revision'] == 'R0.17.1-refined-shape-first-original-gull'
+          assert status['visualBirdGenerated'] is True
+          assert status['continuousSurfaceBirdGenerated'] is False
+          assert status['productionEntry']['path'] == 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r0171.html'
+          assert status['productionEntry']['advancedFlightAvailable'] is False
+          assert status['sourceRoleSplit']['morphologyAndDetailAuthority']['assetId'] == 'BIRD-REF-005'
+          assert status['sourceRoleSplit']['basicAnimationAuthority']['assetId'] == 'BIRD-REF-004'
+          assert status['openGates']['r0171StaticFormAccepted'] is False
+          assert status['openGates']['advancedFlightAllowed'] is False
 
-          roles = status.get('sourceRoleSplit', {})
-          if roles.get('morphologyAndDetailAuthority', {}).get('assetId') != 'BIRD-REF-005':
-              raise SystemExit('FORM_AUTHORITY_NOT_REF005')
-          if roles.get('basicAnimationAuthority', {}).get('assetId') != 'BIRD-REF-004':
-              raise SystemExit('BASIC_ANIMATION_AUTHORITY_NOT_REF004')
+          by_id = {row['assetId']: row for row in batch['records']}
+          assert by_id['BIRD-REF-005']['sha256'] == '4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7'
+          assert by_id['BIRD-REF-004']['sha256'] == '5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af'
 
-          by_id = {r['assetId']: r for r in batch['records']}
-          if by_id['BIRD-REF-005']['sha256'] != '4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7':
-              raise SystemExit('FORM_SOURCE_SHA_CHANGED')
-          if by_id['BIRD-REF-004']['sha256'] != '5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af':
-              raise SystemExit('ANIMATION_SOURCE_SHA_CHANGED')
+          assert contract['revision'] == 'Original-Bird-R0.17.1-shape-refinement'
+          independent = contract['independentForm']
+          assert independent['workbench'] == 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r0171.html'
+          assert independent['bodyRadialSegments'] == 52
+          assert independent['bodyLongitudinalSubdivisions'] == 5
+          assert independent['thirdPartyMeshLoaded'] is False
+          assert independent['thirdPartyTextureLoaded'] is False
+          assert independent['thirdPartySkeletonLoaded'] is False
+          assert contract['basicMotion']['advancedFlightStatesEnabled'] is False
+          assert contract['openGates']['staticFormAccepted'] is False
 
-          if form.get('revision') != 'Original-Bird-R0.17.1-shape-refinement':
-              raise SystemExit('R0171_FORM_CONTRACT_REVISION_MISMATCH')
-          independent = form.get('independentForm', {})
-          if independent.get('workbench') != 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r0171.html':
-              raise SystemExit('R0171_CONTRACT_WORKBENCH_CHANGED')
-          if independent.get('bodyRadialSegments') != 52 or independent.get('bodyLongitudinalSubdivisions') != 5:
-              raise SystemExit('R0171_BODY_RESOLUTION_CHANGED')
-          if independent.get('thirdPartyMeshLoaded') is not False or independent.get('thirdPartyTextureLoaded') is not False or independent.get('thirdPartySkeletonLoaded') is not False:
-              raise SystemExit('THIRD_PARTY_RUNTIME_DEPENDENCY_FLAG_INVALID')
-          if form.get('basicMotion', {}).get('advancedFlightStatesEnabled') is not False:
-              raise SystemExit('FORM_CONTRACT_ADVANCED_FLIGHT_INVALID')
-          if form.get('openGates', {}).get('staticFormAccepted') is not False:
-              raise SystemExit('STATIC_FORM_ACCEPTANCE_MUST_REMAIN_FALSE')
-
-          required_runtime = (
+          runtime_tokens = (
               "GULL_R017_ID = 'original-bird-gull-form-r0171'",
-              'densifyRings',
-              'CatmullRomCurve3',
-              'makeWingGeometry',
-              'pushTriangle',
-              'continuous-body-head-beak-carrier',
-              'continuous-wing.L',
-              'continuous-wing.R',
-              'mirroredWingNormalsCorrected: true',
-              'tail-continuous-carrier',
-              'makeWebbingGeometry',
-              'webbedFeetPresent: true',
-              'basicFlapDeformationAvailable: true',
-              'advancedFlightAvailable: false',
+              'densifyRings', 'CatmullRomCurve3', 'makeWingGeometry', 'pushTriangle',
+              'continuous-body-head-beak-carrier', 'continuous-wing.L', 'continuous-wing.R',
+              'mirroredWingNormalsCorrected: true', 'tail-continuous-carrier',
+              'makeWebbingGeometry', 'webbedFeetPresent: true',
+              'basicFlapDeformationAvailable: true', 'advancedFlightAvailable: false'
           )
-          for token in required_runtime:
+          for token in runtime_tokens:
               if token not in runtime_text:
                   raise SystemExit('R0171_RUNTIME_TOKEN_MISSING ' + token)
 
-          required_workbench = (
-              'Original Bird R0.17.1',
-              '../runtime/original-bird-gull-form-r017.mjs',
-              'createOriginalGullR017',
-              '静态形体',
-              '基础拍翼',
-              '高级飞行保持关闭',
-              'type="importmap"',
-              "import * as THREE from 'three'",
-              'camera.up.set(0, 0, 1)',
+          workbench_tokens = (
+              'Original Bird R0.17.1', '../runtime/original-bird-gull-form-r017.mjs',
+              'createOriginalGullR017', '静态形体', '基础拍翼', '高级飞行关闭',
+              'type="importmap"', "import * as THREE from 'three'", 'camera.up.set(0, 0, 1)',
               'side', 'front', 'top', 'three', 'underside',
-              'window.__BIRD_R017_READY__ = true',
-              '1d3b3cea037f4fb3bc9fbd72013bb94a',
+              'window.__BIRD_R017_READY__ = true', '1d3b3cea037f4fb3bc9fbd72013bb94a'
           )
-          for token in required_workbench:
+          for token in workbench_tokens:
               if token not in workbench_text:
                   raise SystemExit('R0171_WORKBENCH_TOKEN_MISSING ' + token)
 
