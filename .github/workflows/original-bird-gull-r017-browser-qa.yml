@@ -15,6 +15,10 @@ on:
       - 'Bird-Reconstruction-Lab/original-bird/tests/gull-form-r017.spec.cjs'
       - '.github/workflows/original-bird-gull-r017-browser-qa.yml'
 
+concurrency:
+  group: original-bird-gull-r0171-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -55,6 +59,7 @@ jobs:
             --browser=chromium \
             --headed \
             --workers=1 \
+            --timeout=180000 \
             --reporter=line
 
       - name: Upload R0.17.1 browser evidence
