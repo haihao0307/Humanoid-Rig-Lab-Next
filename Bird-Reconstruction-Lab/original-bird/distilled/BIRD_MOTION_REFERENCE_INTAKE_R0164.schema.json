@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kaopu.local/schemas/bird-motion-reference-intake-r0164.schema.json",
+  "title": "Bird Motion Reference Intake R0.16.4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["referenceId", "sourceType", "identity", "behavior", "capture", "rights", "evidence", "confidence"],
+  "properties": {
+    "referenceId": {"type": "string", "minLength": 1},
+    "sourceType": {"enum": ["GLB", "FBX", "video", "image_sequence", "paper", "field_observation"]},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "origin", "species", "speciesConfidence", "date"],
+      "properties": {
+        "name": {"type": "string"},
+        "origin": {"type": "string"},
+        "species": {"type": "string"},
+        "speciesConfidence": {"enum": ["LOCKED", "HIGH", "MEDIUM", "LOW", "UNRESOLVED"]},
+        "date": {"type": "string"},
+        "sha256": {"type": ["string", "null"]},
+        "geometrySha256": {"type": ["string", "null"]}
+      }
+    },
+    "behavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "context"],
+      "properties": {
+        "state": {"enum": ["powered_flap_cruise", "flap_glide_transition", "glide_and_soar", "bank_and_turn", "climb_and_descent", "takeoff", "approach_and_landing", "wind_hold_and_gust_response", "other"]},
+        "context": {"type": "string"},
+        "environment": {"type": ["string", "null"]},
+        "wind": {"type": ["string", "null"]},
+        "waterOrGroundRelation": {"type": ["string", "null"]}
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timestampsOrPhases", "cameraNotes"],
+      "properties": {
+        "timestampsOrPhases": {
+          "type": "array",
+          "items": {"type": ["number", "string"]},
+          "minItems": 1
+        },
+        "cameraNotes": {"type": "string"},
+        "frameRate": {"type": ["number", "null"], "minimum": 0},
+        "resolution": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "array", "items": {"type": "integer", "minimum": 1}, "minItems": 2, "maxItems": 2}
+          ]
+        },
+        "fixedView": {"type": "boolean"}
+      }
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["license", "runtimeDependencyAllowed"],
+      "properties": {
+        "license": {"type": "string"},
+        "runtimeDependencyAllowed": {"type": "boolean"},
+        "notes": {"type": ["string", "null"]}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visibleBody", "visibleWings", "visibleTail", "visibleHead", "visibleLegs"],
+      "properties": {
+        "visibleBody": {"type": "boolean"},
+        "visibleWings": {"type": "boolean"},
+        "visibleTail": {"type": "boolean"},
+        "visibleHead": {"type": "boolean"},
+        "visibleLegs": {"type": "boolean"},
+        "measurableChannels": {"type": "array", "items": {"type": "string"}},
+        "occlusions": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "reason"],
+      "properties": {
+        "level": {"enum": ["HIGH", "MEDIUM", "LOW", "UNRESOLVED"]},
+        "reason": {"type": "string"},
+        "unknowns": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "canonicalMapping": {
+      "type": "object",
+      "additionalProperties": {"type": ["string", "null"]}
+    },
+    "notes": {"type": ["string", "null"]}
+  }
+}
