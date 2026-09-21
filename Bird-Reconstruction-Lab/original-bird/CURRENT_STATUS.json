@@ -1,13 +1,13 @@
 {
-  "schema": "bird/original-bird-status@0.0.27",
-  "revision": "R0.16.4-dual-source-flight-learning",
+  "schema": "bird/original-bird-status@0.0.28",
+  "revision": "R0.17-shape-first-original-gull",
   "date": "2026-09-21",
   "branch": "bird-mother-original-bird-r001-20260920",
-  "visualBirdGenerated": false,
+  "visualBirdGenerated": true,
   "continuousSurfaceBirdGenerated": false,
   "flockWorkbenchGenerated": false,
   "sourceModelsVisible": true,
-  "executionRole": "CRAFTSMAN_LEARNING_REPLICATION_EXECUTION",
+  "executionRole": "CRAFTSMAN_SHAPE_FIRST_ITERATION",
   "terminologyPolicy": {
     "status": "ACTIVE_HARD_POLICY",
     "path": "Bird-Reconstruction-Lab/original-bird/TERMINOLOGY_AND_EXECUTION_POLICY_R0161_ZH.md",
@@ -16,6 +16,17 @@
     "ciRepositoryTextScanRequired": true,
     "disableAllowed": false
   },
+  "productionOrder": {
+    "locked": true,
+    "steps": [
+      "finish visible static gull form",
+      "attach basic flap only to expose deformation defects",
+      "repair four-view form and deformation",
+      "refine feather layers and materials",
+      "allow advanced flight only after form acceptance"
+    ],
+    "advancedFlightBeforeFormAcceptanceAllowed": false
+  },
   "sourceRoleSplit": {
     "locked": true,
     "morphologyAndDetailAuthority": {
@@ -23,100 +34,82 @@
       "file": "seagull2(2).glb",
       "viewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
       "sha256": "4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7",
-      "geometrySha256": "d9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2",
-      "role": "FORM_SILHOUETTE_HEAD_EYE_BEAK_WING_TAIL_AND_MATERIAL_DETAIL"
+      "geometrySha256": "d9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2"
     },
-    "animationAndFlightAuthority": {
+    "basicAnimationAuthority": {
       "assetId": "BIRD-REF-004",
       "file": "seagull(2).glb",
       "viewerUid": "dc42ffc81c86480e9e7f7752fa134174",
       "sha256": "5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af",
-      "geometrySha256": "d6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac",
-      "role": "COARSE_WING_CHAIN_FLAP_PHASE_AND_FLAP_GLIDE_TRANSITION"
-    },
-    "rules": [
-      "the motion source cannot overwrite primary shape or detail",
-      "the morphology source cannot silently replace the stronger motion reference",
-      "future references are registered with provenance and become learning candidates",
-      "motion transfer uses canonical semantic roles and normalized phase curves"
-    ]
+      "geometrySha256": "d6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac"
+    }
   },
   "productionEntry": {
-    "revision": "R0.16.4",
-    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-flight-learning-r0164.html",
+    "revision": "R0.17",
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r017.html",
     "singleEntry": true,
-    "sourceOnly": true,
-    "generatedCandidatePresent": false,
+    "sourceOnly": false,
+    "generatedCandidatePresent": true,
+    "defaultMode": "static form",
     "defaultBackground": "bright studio gray-white",
-    "mobileFirst": true
+    "advancedFlightAvailable": false
   },
-  "seagullFlightLearning": {
+  "originalGullForm": {
     "generated": true,
-    "revision": "R0.16.4",
-    "contractPath": "Bird-Reconstruction-Lab/original-bird/distilled/LARID_DUAL_SOURCE_ROLE_AND_FLIGHT_LEARNING_R0164.json",
-    "referenceIntakeSchemaPath": "Bird-Reconstruction-Lab/original-bird/distilled/BIRD_MOTION_REFERENCE_INTAKE_R0164.schema.json",
-    "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-flight-learning-r0164.html",
-    "exportSchema": "kaopu/bird-flight-learning@1.0",
-    "capabilities": [
-      "show BIRD-REF-005 as the morphology and detail authority",
-      "show BIRD-REF-004 as the animation and flight authority",
-      "read nodes, materials, textures, animations, camera and local matrices from both sources",
-      "capture eight normalized phases from both sources",
-      "rank motion-source nodes by translation and orientation amplitude",
-      "manually map motion-source nodes to canonical flight roles",
-      "track powered flap, flap-glide, glide-soar, bank-turn, climb-descent, takeoff, landing and wind-response states",
-      "import future motion reference JSON with identity, rights, behavior, timestamps, camera and visible evidence",
-      "export JSON and .kaopu flight-learning data"
-    ],
-    "scientificEvidenceCount": 6,
-    "secondaryMotionEightPhasesCaptured": false,
-    "secondaryWingNodeRolesVerified": false,
-    "externalMotionReferenceCount": 0,
-    "canonicalFlightMotionLibraryComplete": false,
-    "productionMotionGenerated": false
+    "revision": "R0.17",
+    "contractPath": "Bird-Reconstruction-Lab/original-bird/distilled/LARID_ORIGINAL_FORM_R017.json",
+    "runtimePath": "Bird-Reconstruction-Lab/original-bird/runtime/original-bird-gull-form-r017.mjs",
+    "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r017.html",
+    "independentFromSourceMeshes": true,
+    "bodyCarrierContinuous": true,
+    "bodyCarrierRegions": ["body", "breast", "neck", "head", "beak"],
+    "leftWingContinuousSkinnedSurface": true,
+    "rightWingContinuousSkinnedSurface": true,
+    "wingBonesPerSide": ["shoulder", "elbow", "wrist", "tip"],
+    "primaryFeathersPerSide": 8,
+    "tailFeathers": 9,
+    "eyesPresent": true,
+    "legsAndFeetPresent": true,
+    "basicFlapAvailable": true,
+    "basicFlapPurpose": "deformation test only",
+    "advancedFlightAvailable": false,
+    "fourViewEvidenceComplete": false,
+    "staticFormAccepted": false,
+    "basicFlapDeformationAccepted": false
   },
-  "seagullDetailAudit": {
-    "generated": true,
-    "revision": "R0.16.3",
-    "contractPath": "Bird-Reconstruction-Lab/original-bird/distilled/LARID_C_DETAIL_AUDIT_R0163.json",
-    "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-detail-audit-r0163.html",
-    "eyeConstructionResult": "UNRESOLVED",
-    "sourceDetailAuditComplete": false
+  "preservedLearningTools": {
+    "flightLearningRevision": "R0.16.4",
+    "flightLearningWorkbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-flight-learning-r0164.html",
+    "status": "PRESERVED_BUT_NOT_CURRENT_PRODUCTION_ENTRY"
   },
   "strictProhibitions": [
+    "expanding advanced flight before the static form is accepted",
     "using BIRD-REF-004 as shape, eye, beak or feather-detail authority",
-    "using BIRD-REF-005 as the only motion authority when BIRD-REF-004 has the clearer coarse flight chain",
-    "copying source skeleton hierarchy or exporter timing as biological truth",
-    "ingesting future motion references without source, rights, behavior, timestamps and confidence",
-    "inventing takeoff or landing without visible leg and foot evidence",
-    "creating replacement gull geometry during source learning",
+    "copying either source mesh, topology, skin weights or animation timing",
+    "hiding form defects with a dark background, depth of field or effects",
+    "claiming static-form approval before four-view visual evidence",
+    "claiming basic-flap approval before wing-root and shoulder-volume checks",
     "shipping either source mesh, texture or animation as the commercial runtime asset"
   ],
   "currentExecutionQueue": [
-    "complete both-source eight-phase capture in the R0.16.4 workbench",
-    "verify motion-source wing, trunk, neck, head and tail node roles",
-    "split the source clip into powered-flap and flap-glide intervals",
-    "add fixed references for bank-turn, climb-descent, takeoff, landing and gust response",
-    "record future user-supplied GLB, video and image references through the motion intake schema",
-    "compile canonical normalized flight curves without copying source rig hierarchy",
-    "retarget the verified curves onto the independent Original Bird rig after its form is accepted"
+    "run R0.17 in a real browser and capture side, front, top, three-quarter and underside views",
+    "compare the independent form directly with BIRD-REF-005",
+    "repair breast-abdomen mass, neck-head-beak transition, eye placement, wing planform, tail base and feet",
+    "run the basic flap and repair wing-root separation, shoulder collapse, elbow-wrist folding and feather intersection",
+    "only after static form approval, refine feather layers, alpha edges and materials",
+    "keep advanced flight disabled until the form gate passes"
   ],
   "openGates": {
-    "r0164FlightWorkbenchBrowserQaPassed": false,
-    "terminologyRepositoryScanPassed": false,
+    "r017BrowserRuntimePassed": false,
+    "r017FourViewEvidenceComplete": false,
+    "r017StaticFormAccepted": false,
+    "r017BasicFlapDeformationAccepted": false,
+    "r017WingRootContinuityAccepted": false,
+    "r017HeadEyeBeakAccepted": false,
+    "r017TailAndFeetAccepted": false,
+    "r017MaterialRefinementComplete": false,
+    "advancedFlightAllowed": false,
     "sourceBinaryInReferenceCacheLfs": false,
-    "primaryMorphologyDatasetComplete": false,
-    "secondaryMotionEightPhasesCaptured": false,
-    "secondaryWingNodeRolesVerified": false,
-    "flapGlideIntervalsVerified": false,
-    "bankTurnReferenceAdded": false,
-    "takeoffReferenceAdded": false,
-    "landingReferenceAdded": false,
-    "windResponseReferenceAdded": false,
-    "canonicalFlightMotionLibraryComplete": false,
-    "productionMotionGenerated": false,
-    "eyeConstructionClassified": false,
-    "generatedReplacementGeometryAbsent": true,
     "visualAcceptance": false,
     "productionReady": false
   }
