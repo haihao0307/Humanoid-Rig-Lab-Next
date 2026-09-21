@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Original Bird R0.04｜双 GLB 源模型审查</title>
+<style>
+:root{color-scheme:dark;--bg:#071018;--panel:#0d1922;--line:#294150;--text:#e9f2f6;--muted:#91a8b5;--good:#6ed6a8;--warn:#e7c873;--bad:#ef918a;--accent:#79c8f2}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}button,input,select{font:inherit}button,select{border:1px solid var(--line);background:#132530;color:var(--text);border-radius:7px;padding:7px 9px}button:hover{border-color:#5d8297}.app{height:100%;display:grid;grid-template-rows:52px minmax(0,1fr) 30px}.top{display:flex;align-items:center;gap:10px;padding:0 13px;border-bottom:1px solid var(--line);background:#0a1720}.top b{font-size:14px}.top small{color:var(--muted)}.tag{font-size:10px;border:1px solid #315568;border-radius:999px;padding:4px 8px;color:var(--good)}.main{min-height:0;display:grid;grid-template-columns:250px minmax(0,1fr) 285px}.panel{background:var(--panel);padding:11px;overflow:auto}.left{border-right:1px solid var(--line)}.right{border-left:1px solid var(--line)}h3{font-size:11px;letter-spacing:.08em;color:#caddE6;margin:5px 0 9px}.row{margin:9px 0;font-size:11px;color:#c4d3db}.row label{display:flex;justify-content:space-between;gap:10px}.row input[type=range]{width:100%;accent-color:var(--accent)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.mode{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.mode button.active{border-color:var(--good);color:var(--good)}.note,.audit{font-size:10px;line-height:1.55;color:var(--muted)}.gate{font-size:10px;line-height:1.45;margin:7px 0;color:var(--muted)}.gate:before{content:"●";color:var(--bad);margin-right:6px}.gate.ok:before{color:var(--good)}.metric{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed #213744;padding:7px 0;font-size:10px}.metric span{color:var(--warn);text-align:right}.stage{position:relative;min-width:0;min-height:0;background:#03070a}.viewers{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}.viewer-card{position:relative;min-width:0;min-height:0;background:#020607}.viewer-card iframe{width:100%;height:100%;border:0;display:block}.viewer-label{position:absolute;left:10px;top:10px;z-index:3;max-width:calc(100% - 20px);padding:7px 9px;border:1px solid #43677a;border-radius:7px;background:#061018d9;backdrop-filter:blur(5px);font-size:10px;line-height:1.45}.viewer-label b{display:block;color:#fff}.viewer-label span{color:var(--muted)}.loading{position:absolute;inset:0;display:grid;place-items:center;background:#061018;color:var(--muted);font-size:12px;z-index:2;pointer-events:none}.ready .loading{display:none}.mode-detail .motion-card{display:none}.mode-detail .viewers{grid-template-columns:1fr}.mode-motion .detail-card{display:none}.mode-motion .viewers{grid-template-columns:1fr}.foot{display:flex;align-items:center;gap:14px;padding:0 10px;border-top:1px solid var(--line);font-size:10px;color:var(--muted)}.foot b{color:var(--good)}.status{padding:8px;border:1px solid #3f5864;border-radius:8px;margin:8px 0;background:#0a151c}.status strong{color:#dce9ef}.src{display:block;color:#8fcdf0;text-decoration:none;word-break:break-all}.src:hover{text-decoration:underline}@media(max-width:900px){.main{grid-template-columns:1fr}.panel{position:absolute;z-index:8;top:52px;bottom:30px;width:min(84vw,320px);box-shadow:0 20px 50px #000a}.left{left:0}.right{right:0;display:none}.viewers{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.tag{display:none}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header class="top"><b>Original Bird R0.04</b><small>双 GLB 源模型审查｜不再用代理体替换原模型</small><span class="tag">BIRD-REF-002 形体绑定 + BIRD-REF-001 动作骨架</span></header>
+<main class="main">
+<aside class="panel left">
+<h3>显示模式</h3>
+<div class="mode"><button data-mode="compare" class="active">并排</button><button data-mode="detail">形体</button><button data-mode="motion">动作</button></div>
+<h3>动画</h3>
+<div class="grid"><button id="play">播放</button><button id="pause">暂停</button></div>
+<div class="row"><label>速度 <output id="speedO">1.00×</output></label><input id="speed" type="range" min=".1" max="2" value="1" step=".05"></div>
+<div class="row"><label>归一化相位 <output id="phaseO">0%</output></label><input id="phase" type="range" min="0" max="1" value="0" step=".001"></div>
+<h3>固定视角</h3>
+<div class="grid"><button data-view="default">默认</button><button data-view="front">正面</button><button data-view="side">侧面</button><button data-view="top">顶部</button><button data-view="three">三分之四</button><button id="focus">重新居中</button></div>
+<p class="note">视角按钮使用每个源模型自己的默认相机距离，不把两只模型强行套进同一绝对坐标。</p>
+<h3>执行门禁</h3>
+<div class="gate ok">直接显示原始高质量源模型</div>
+<div class="gate ok">两套骨架和动画分别保留</div>
+<div class="gate">远端 Git LFS 原始字节尚未入库</div>
+<div class="gate">尚未生成许可安全的独立运行时鸟</div>
+</aside>
+<section class="stage" id="stage">
+<div class="viewers">
+<div class="viewer-card detail-card" id="detailCard"><div class="viewer-label"><b>BIRD-REF-002｜形体与绑定主参考</b><span>18,152 顶点 · 23,804 三角面 · 117 关节/艺术控制 · 340 动画通道</span></div><div class="loading" id="detailLoad">正在载入原始鸽类模型…</div><iframe id="detailFrame" title="BIRD-REF-002 source model" allow="autoplay; fullscreen; xr-spatial-tracking" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" allowfullscreen></iframe></div>
+<div class="viewer-card motion-card" id="motionCard"><div class="viewer-label"><b>BIRD-REF-001｜显式翼链与飞行相位</b><span>774 顶点 · 966 三角面 · 44 关节 · 左右翼共 10 个显式翼关节</span></div><div class="loading" id="motionLoad">正在载入原始飞行动作模型…</div><iframe id="motionFrame" title="BIRD-REF-001 source model" allow="autoplay; fullscreen; xr-spatial-tracking" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" allowfullscreen></iframe></div>
+</div>
+</section>
+<aside class="panel right">
+<h3>实时源模型审计</h3>
+<div class="status"><strong>BIRD-REF-002</strong><div class="audit" id="detailAudit">等待 Viewer API…</div></div>
+<div class="status"><strong>BIRD-REF-001</strong><div class="audit" id="motionAudit">等待 Viewer API…</div></div>
+<h3>基线用途</h3>
+<div class="metric"><b>外形/蒙皮</b><span>BIRD-REF-002</span></div>
+<div class="metric"><b>翼链/飞行相位</b><span>BIRD-REF-001</span></div>
+<div class="metric"><b>旧系统复用</b><span>R17 / AVES / R61</span></div>
+<div class="metric"><b>当前阶段</b><span>源模型直接审查</span></div>
+<h3>来源与许可</h3>
+<p class="note">两套主参考均用于研究、测量、校准和内部参考。许可为 CC-BY-NC-4.0，不进入未来商业游戏的永久运行时依赖。</p>
+<a class="src" href="https://sketchfab.com/3d-models/pigeon-821135a09d3f48909b977a416d99c93b" target="_blank" rel="noreferrer">Pigeon · LostBoyz2078</a><br>
+<a class="src" href="https://sketchfab.com/3d-models/cine-pigeon-fly-67f9422072664cf1967ae4fe440585a9" target="_blank" rel="noreferrer">Cine Pigeon fly · LostBoyz2078</a>
+<p class="note">下一层只做源模型节点语义映射、固定多视角测量和动作相位提取；没有对照证据，不新增鸟体轮廓。</p>
+</aside>
+</main>
+<footer class="foot"><b>● source-backed runtime</b><span id="readyCount">0/2 viewers ready</span><span id="animState">paused</span><span>Original Bird R0.04</span></footer>
+</div>
+<script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+<script>
+(()=>{'use strict';
+const MODELS={
+ detail:{uid:'821135a09d3f48909b977a416d99c93b',frame:'detailFrame',card:'detailCard',audit:'detailAudit',role:'形体绑定'},
+ motion:{uid:'67f9422072664cf1967ae4fe440585a9',frame:'motionFrame',card:'motionCard',audit:'motionAudit',role:'动作骨架'}
+};
+const state={api:{},camera:{},animations:{},duration:{detail:0,motion:0},ready:new Set(),playing:false};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function semanticSummary(nodes){
+ const names=nodes.map(n=>String(n.name||'').toLowerCase());
+ const hit=re=>names.filter(n=>re.test(n)).length;
+ return {wing:hit(/wing|feather|primary|secondary|remige/),tail:hit(/tail|rectri/),neck:hit(/neck|cerv/),head:hit(/head|beak|eye|lid|tongue/),leg:hit(/leg|thigh|knee|ankle|foot|toe|digit/)};
+}
+function updateFooter(){ $('readyCount').textContent=state.ready.size+'/2 viewers ready'; $('animState').textContent=state.playing?'playing':'paused'; }
+function audit(key,api){
+ const box=$(MODELS[key].audit); let nodes=[],materials=[],anims=[]; let pending=3;
+ const done=()=>{if(--pending)return; const sem=semanticSummary(nodes); const animText=anims.length?anims.map(a=>esc(a[1])+' '+Number(a[2]||0).toFixed(2)+'s').join('<br>'):'无可读动画'; box.innerHTML='节点：'+nodes.length+'<br>材质：'+materials.length+'<br>动画：'+anims.length+'<br>语义命中：翼 '+sem.wing+' / 尾 '+sem.tail+' / 颈 '+sem.neck+' / 头喙眼 '+sem.head+' / 腿足趾 '+sem.leg+'<br><br>'+animText;};
+ api.getNodeMap((err,data)=>{nodes=err?[]:(Array.isArray(data)?data:Object.values(data||{}));done();});
+ api.getMaterialList((err,data)=>{materials=err?[]:(data||[]);done();});
+ api.getAnimations((err,data)=>{anims=err?[]:(data||[]);state.animations[key]=anims;if(anims[0]){state.duration[key]=Number(anims[0][2]||0);api.setCurrentAnimationByUID(anims[0][0],()=>{});}done();});
+}
+function init(key){
+ const m=MODELS[key],frame=$(m.frame),card=$(m.card),box=$(m.audit);
+ if(!window.Sketchfab){box.textContent='Sketchfab Viewer API 未载入';return;}
+ const client=new Sketchfab('1.12.1',frame);
+ client.init(m.uid,{autostart:1,camera:0,animation_autoplay:0,dnt:1,preload:0,ui_theme:'dark',success(api){
+   state.api[key]=api;api.start();api.addEventListener('viewerready',()=>{
+     card.classList.add('ready');state.ready.add(key);api.pause(()=>{});api.setCycleMode('loopOne',()=>{});api.getCameraLookAt((err,cam)=>{if(!err&&cam)state.camera[key]=cam;});audit(key,api);updateFooter();
+   });
+ },error(){box.textContent='源模型 Viewer 初始化失败';$(key+'Load').textContent='源模型加载失败';}});
+}
+function eachVisible(fn){
+ const mode=$('stage').className.match(/mode-(detail|motion)/)?.[1]||'compare';
+ Object.keys(MODELS).forEach(k=>{if(mode==='compare'||mode===k){const api=state.api[k];if(api)fn(api,k);}});
+}
+function setPlaying(v){state.playing=v;eachVisible(api=>v?api.play(()=>{}):api.pause(()=>{}));updateFooter();}
+function setView(type){
+ eachVisible((api,key)=>{const c=state.camera[key];if(!c||!c.position||!c.target)return;const t=c.target.slice(),p=c.position.slice();const dx=p[0]-t[0],dy=p[1]-t[1],dz=p[2]-t[2],d=Math.max(.001,Math.hypot(dx,dy,dz));let np=p;
+   if(type==='front')np=[t[0],t[1]-d,t[2]+d*.08];
+   if(type==='side')np=[t[0]+d,t[1],t[2]+d*.08];
+   if(type==='top')np=[t[0],t[1],t[2]+d];
+   if(type==='three')np=[t[0]+d*.66,t[1]-d*.66,t[2]+d*.34];
+   if(type==='default')np=p;
+   api.setCameraLookAt(np,t,.45,()=>{});
+ });
+}
+$('play').onclick=()=>setPlaying(true);$('pause').onclick=()=>setPlaying(false);
+$('speed').oninput=e=>{const v=Number(e.target.value);$('speedO').textContent=v.toFixed(2)+'×';eachVisible(api=>api.setSpeed(v,()=>{}));};
+$('phase').oninput=e=>{const v=Number(e.target.value);$('phaseO').textContent=Math.round(v*100)+'%';state.playing=false;eachVisible((api,key)=>{api.pause(()=>{});api.seekTo(v*(state.duration[key]||0),()=>{});});updateFooter();};
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+$('focus').onclick=()=>eachVisible(api=>api.focusOnVisibleGeometries(()=>{}));
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-mode]').forEach(x=>x.classList.remove('active'));b.classList.add('active');const mode=b.dataset.mode;const stage=$('stage');stage.className='stage'+(mode==='compare'?'':' mode-'+mode);setPlaying(false);});
+init('detail');init('motion');updateFooter();
+})();
+</script>
+</body>
+</html>

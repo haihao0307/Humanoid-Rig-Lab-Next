@@ -1,0 +1,96 @@
+{
+  "schema": "bird/columbid-realism-target@0.0.5",
+  "date": "2026-09-20",
+  "authority": "SOURCE_BACKED_VISUAL_CALIBRATION_NOT_FINAL_NATURAL_TRUTH",
+  "primaryVisibleReference": {
+    "assetId": "BIRD-REF-002",
+    "file": "pigeon (1)(2).glb",
+    "viewerUid": "821135a09d3f48909b977a416d99c93b",
+    "role": [
+      "visible silhouette envelope",
+      "skin deformation reference",
+      "wing-feather attachment-region reference",
+      "neck-head-beak-eye boundary reference",
+      "tail fan and foot-toe contact reference"
+    ]
+  },
+  "primaryMotionReference": {
+    "assetId": "BIRD-REF-001",
+    "file": "cine__pigeon_fly(2).glb",
+    "viewerUid": "67f9422072664cf1967ae4fe440585a9",
+    "role": [
+      "explicit bilateral wing-chain phase",
+      "leg-foot-toe phase",
+      "neck-head-tail coupling"
+    ]
+  },
+  "inspectionCalibration": {
+    "textureQuality": "hd",
+    "shading": "pbr-lit",
+    "defaultPreset": "neutral",
+    "neutralFovDegrees": 32,
+    "beautyFovDegrees": 28,
+    "backgrounds": ["dark-neutral", "mid-gray", "warm-gray"],
+    "postProcessing": ["optional light sharpen", "existing-source SSAO when exposed by Viewer API"],
+    "reason": "Use neutral and beauty lighting to reveal silhouette, material and deformation problems without replacing the source mesh."
+  },
+  "geometryTargets": [
+    {
+      "zone": "thorax_and_breast",
+      "target": "Preserve the source envelope and shoulder-to-breast continuity before any independent reconstruction.",
+      "forbidden": "independent sphere or ellipsoid replacement"
+    },
+    {
+      "zone": "neck_head_beak",
+      "target": "Preserve the source multi-segment neck transition and explicit upper/lower beak boundaries.",
+      "forbidden": "single-ball head and pinched tube neck"
+    },
+    {
+      "zone": "wing_root_and_fold",
+      "target": "Keep the source wing root, main artist chain and sub-attachment controls visible while mapping to canonical shoulder-humerus-forearm-wrist-manus semantics.",
+      "forbidden": "flat polygon wing generated without source comparison"
+    },
+    {
+      "zone": "tail",
+      "target": "Retain the source center rectrix plus bilateral six-feather fan organization as an attachment reference.",
+      "forbidden": "single wedge tail"
+    },
+    {
+      "zone": "legs_feet_toes",
+      "target": "Retain source leg, knee, foot and multi-segment toe contact relationships while cross-checking BIRD-REF-001 phase timing.",
+      "forbidden": "unverified generic stick legs"
+    }
+  ],
+  "materialTargets": [
+    {
+      "zone": "feather_surface",
+      "target": "Non-metallic feather response with controlled roughness variation and preserved texture detail.",
+      "status": "CALIBRATION_ONLY"
+    },
+    {
+      "zone": "eye",
+      "target": "Separate corneal highlight response from surrounding feather material.",
+      "status": "MATERIAL_SEPARATION_PENDING"
+    },
+    {
+      "zone": "beak_and_feet",
+      "target": "Separate keratin-like response from feather material instead of one global plastic specular model.",
+      "status": "MATERIAL_SEPARATION_PENDING"
+    }
+  ],
+  "requiredViews": ["front", "side", "top", "three-quarter", "source-default"],
+  "runtimeTargets": [
+    "source and distilled result remain independently toggleable",
+    "animation phase can be normalized without copying exporter timeline as biological time",
+    "semantic nodes can be inspected by category",
+    "source model remains visible during all silhouette decisions"
+  ],
+  "openGates": {
+    "browserVisualQaPassed": false,
+    "materialSeparationMeasured": false,
+    "sourceToDistilledFixedViewErrorAvailable": false,
+    "independentCommercialSafeSurfaceGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}

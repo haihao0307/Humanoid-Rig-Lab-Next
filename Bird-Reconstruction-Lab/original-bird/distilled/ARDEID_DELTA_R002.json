@@ -1,0 +1,73 @@
+{
+  "schema": "bird/original-bird-clade-delta@0.2",
+  "deltaId": "ORIGINAL-BIRD-ARDEID-R002",
+  "date": "2026-09-20",
+  "identityBoundary": {
+    "clade": "Ardeidae candidate / egret",
+    "sourceAssets": ["BIRD-REF-006"],
+    "exactSpecies": "UNRESOLVED",
+    "warning": "The generic Egret title does not identify Great, Snowy, Little or Intermediate Egret."
+  },
+  "sourceRigEvidence": {
+    "assetId": "BIRD-REF-006",
+    "canonicalCandidates": {
+      "rootPelvis": ["root_16", "Root_15", "Hip_0"],
+      "thorax": ["Spine00_10", "Spine01_9"],
+      "neck": ["Neck00_4", "Neck01_3", "Neck02_2"],
+      "head": ["Head_1"],
+      "wing_l": ["Left_Wing00_8", "Left_Wing03_7"],
+      "wing_r": ["Right_Wing00_6", "Right_Wing03_5"],
+      "leg_l": ["Left_Thigh_14", "Left_Calf_13"],
+      "leg_r": ["Right_Thigh_12", "Right_Calf_11"]
+    },
+    "acceptedUse": ["long cervical-chain delta", "long proximal hindlimb delta", "flight/foraging energy-state interface", "wading-predator behavior interface"],
+    "blocked": ["foot/toe contact", "ankle/foot identity", "distal wrist/manus", "primary-secondary-covert attachment", "full wing folding", "exact species identity"]
+  },
+  "cladeDeltaCandidate": {
+    "anatomy": ["elongated cervical chain", "elongated hindlimb", "long pointed beak", "flight neck retraction control", "wading depth/contact interface"],
+    "flightModes": ["colony departure", "foraging transit", "return with load", "slow/deep flapping", "approach to tree/wetland"],
+    "flightEvidenceExamples": {
+      "greatEgretWingbeatHzMeanSD": [1.85, 0.07],
+      "snowyEgretWingbeatHzMeanSD": [2.12, 0.09],
+      "greatEgretAirSpeedMSMean": 9.2,
+      "snowyEgretAirSpeedMSMean": 8.7,
+      "boundary": "Published study examples, not constants for the unresolved uploaded model."
+    },
+    "habitats": ["tidal flats", "rivers", "large water bodies", "farmland/rice fields depending species", "wetland colony/trees"],
+    "foragingEcology": {
+      "guild": ["visual wading predator"],
+      "searchModes": ["standing", "walking slowly", "walking quickly/activity varies by species"],
+      "captureModes": ["rapid beak strike/stab", "occasional pursuit/flush behavior"],
+      "foodOrPrey": ["fish", "amphibians", "loaches", "aquatic/terrestrial invertebrates depending species and habitat"],
+      "stateVariables": ["water depth", "prey density/size", "habitat type", "season/breeding demand", "handling time"]
+    },
+    "behaviorStateContract": [
+      "stand_scan",
+      "slow_wade_scan",
+      "fast_reposition",
+      "strike_preload",
+      "beak_strike",
+      "prey_handle",
+      "swallow_or_release",
+      "alert_retract_neck",
+      "takeoff_from_shallow_water",
+      "flight_neck_retracted",
+      "landing_leg_deploy"
+    ]
+  },
+  "productionGates": {
+    "completeCervicalSemantics": false,
+    "completeWingSemantics": false,
+    "footToeContactEvidenceComplete": false,
+    "exactSpeciesIdentityLocked": false,
+    "sourceIndependentArdeidGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "nextExecution": [
+    "supply missing ankle-foot-toe contact chain from R0/R1 evidence",
+    "supply missing elbow-wrist-manus and feather attachment semantics",
+    "separate foraging neck extension from flight neck retraction",
+    "couple water depth and prey field to search/strike state transitions"
+  ]
+}

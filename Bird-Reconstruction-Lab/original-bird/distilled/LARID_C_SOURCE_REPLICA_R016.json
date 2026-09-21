@@ -1,0 +1,126 @@
+{
+  "schema": "kaopu/source-bird-replica-contract@1.0",
+  "revision": "Original-Bird-R0.16.1",
+  "date": "2026-09-21",
+  "status": "ACTIVE_SOURCE_REPLICATION_ONLY",
+  "executionRole": "CRAFTSMAN_LEARNING_REPLICATION_EXECUTION",
+  "userInstruction": "Study the supplied C-draft exactly, convert its source data into KAOPU format, keep executing, and do not redraw, redesign, beautify, reinterpret, or generate a replacement bird.",
+  "terminologyPolicy": {
+    "status": "ACTIVE_HARD_POLICY",
+    "forbiddenSequenceCodepoints": ["U+4E89", "U+6D41"],
+    "preferredTerms": ["学习", "观察", "测量", "复刻", "记录", "校验", "转换", "执行"],
+    "repositoryTextScanRequired": true,
+    "scope": ["conversation", "repository", "runtime UI", "reports", "exports", "pull requests", "commits", "handoffs"]
+  },
+  "currentAuthoritativeSource": {
+    "assetId": "BIRD-REF-004",
+    "file": "seagull(2).glb",
+    "canonical": "seagull_dayvable.glb",
+    "sha256": "5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af",
+    "geometrySha256": "d6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac",
+    "bytes": 519256,
+    "viewerUid": "dc42ffc81c86480e9e7f7752fa134174",
+    "title": "Seagull",
+    "clade": "Laridae candidate",
+    "species": "UNRESOLVED",
+    "realScale": "UNKNOWN",
+    "author": "Dayvable",
+    "license": "CC-BY-4.0",
+    "sourceUrl": "https://sketchfab.com/3d-models/seagull-dc42ffc81c86480e9e7f7752fa134174",
+    "counts": {
+      "scenes": 1,
+      "nodes": 22,
+      "meshes": 1,
+      "primitives": 1,
+      "vertices": 3291,
+      "triangles": 4352,
+      "materials": 1,
+      "textures": 1,
+      "skins": 1,
+      "joints": 15,
+      "animations": 1,
+      "morphTargetSets": 0
+    },
+    "pcaAspect": [1.0, 0.454582, 0.083922],
+    "skeletonAudit": {
+      "semanticCounts": {"wing": 8, "tail": 1, "neck": 1, "head_beak": 1, "leg": 0, "trunk": 1},
+      "axial": "COARSE_CANDIDATE",
+      "wing": "COARSE_CANDIDATE",
+      "hindlimb": "ABSENT_FROM_SKIN_JOINTS",
+      "feather": "NOT_EXPLICIT",
+      "unknown": [
+        "legs and feet cannot be learned from the skin joint list",
+        "beak articulation is not explicit",
+        "exact gull species is unresolved"
+      ]
+    },
+    "animationAudit": {
+      "name": "ArmatureAction.006",
+      "exportedTimelineEnd": 9.458333,
+      "channelCount": 36,
+      "paths": {"translation": 14, "rotation": 11, "scale": 11},
+      "targetNodeCount": 14
+    }
+  },
+  "secondaryComparisonOnly": {
+    "assetId": "BIRD-REF-005",
+    "file": "seagull2(2).glb",
+    "sha256": "4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7",
+    "geometrySha256": "d9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2",
+    "bytes": 1767532,
+    "viewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
+    "license": "CC-BY-NC-SA-4.0",
+    "role": "comparison only; generic Bone.* hierarchy must not overwrite the authoritative C-draft",
+    "counts": {"nodes": 28, "vertices": 4416, "triangles": 5624, "joints": 21, "animations": 1},
+    "semanticCounts": {"wing": 8, "tail": 0, "neck": 0, "head_beak": 0, "leg": 0, "trunk": 1}
+  },
+  "kaopuReplicaPayload": {
+    "identity": ["assetId", "sha256", "geometrySha256", "bytes", "license", "sourceUrl"],
+    "sceneGraph": ["node instanceID", "node name", "parent relation when readable", "source local matrix"],
+    "geometryEvidence": ["mesh and primitive counts", "source vertex and triangle counts", "PCA aspect", "material and texture identities"],
+    "rigEvidence": ["skin identity", "joint list", "semantic audit without automatic promotion"],
+    "motionEvidence": ["clip identity", "exported timeline", "channel paths", "eight normalized source-phase matrices"],
+    "visualEvidence": ["source-only fixed views", "camera record", "screenshots stored as evidence references rather than regenerated geometry"],
+    "unknowns": ["exact species", "real scale", "leg and foot rig", "natural feather tract identity"]
+  },
+  "strictProhibitions": [
+    "no generated replacement geometry",
+    "no invented body profile",
+    "no invented wing span, chord, sweep, camber or thickness values",
+    "no invented feather count or feather geometry",
+    "no invented color palette",
+    "no independent candidate model",
+    "no topology conversion presented as a faithful replica",
+    "no exact-species claim from the generic seagull title",
+    "no natural-scale claim from the source coordinate system",
+    "no promotion of generic or artist nodes to anatomical truth without evidence",
+    "no use of the prohibited two-codepoint wording defined above",
+    "no extended conversation in place of execution evidence"
+  ],
+  "deletedWrongRoute": {
+    "revision": "R0.15/R0.15.1",
+    "reason": "The platform created a new procedural bird instead of faithfully learning and encoding the supplied C-draft.",
+    "deletedArtifacts": [
+      "distilled/LARID_ORIGINAL_BIRD_C_DRAFT_R015.json",
+      "runtime/original-bird-c-kernel-r015.js",
+      "workbench/original-bird-seagull-c-draft-r015.html",
+      "workbench/original-bird-seagull-c-draft-r0151.html",
+      "workbench/original-bird-production-hub-r015.html",
+      "workbench/original-bird-production-hub-r0151.html"
+    ]
+  },
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r016.html",
+  "exportSchema": "kaopu/source-bird-replica@1.0",
+  "openGates": {
+    "terminologyRepositoryScanPassed": false,
+    "completeNodeHierarchyCaptured": false,
+    "allReadableLocalMatricesCaptured": false,
+    "materialAndTextureRecordsCaptured": false,
+    "eightNormalizedSourcePhasesCaptured": false,
+    "sourceFixedViewsCaptured": false,
+    "rawBinaryInReferenceCacheLfs": false,
+    "sourceReplicaDatasetComplete": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}

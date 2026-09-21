@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#e4eaec">
+<title>Original Bird R0.17｜海鸥形体优先</title>
+<style>
+:root{color-scheme:dark;--studio:#e2e8ea;--panel:#10212a;--panel2:#0b1920;--line:#31505f;--text:#edf5f8;--muted:#9fb2bb;--good:#72d8ad;--warn:#efcb74;--bad:#ed958e;--accent:#83cef4}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--studio);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text)}button,input{font:inherit}button{min-height:38px;border:1px solid var(--line);border-radius:8px;background:#16303c;color:var(--text);padding:7px 9px}button:hover{border-color:#7ca5b6}button.active{border-color:var(--good);background:#12352c;color:var(--good)}.app{height:100%;display:grid;grid-template-rows:58px minmax(0,1fr) 30px}.top{display:flex;align-items:center;gap:11px;padding:0 14px;background:#0d1d25;border-bottom:1px solid var(--line)}.top b{font-size:15px}.top small{font-size:10px;color:var(--muted)}.tag{margin-left:auto;border:1px solid #3f6576;border-radius:999px;padding:4px 8px;font-size:10px;color:var(--good)}.main{min-height:0;display:grid;grid-template-columns:275px minmax(0,1fr) 330px}.panel{background:var(--panel);padding:12px;overflow:auto}.left{border-right:1px solid var(--line)}.right{border-left:1px solid var(--line)}h3{font-size:11px;letter-spacing:.08em;margin:7px 0 9px;color:#d9e6eb}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.row{font-size:10px;color:#cbd9df;margin:9px 0}.row label{display:flex;justify-content:space-between;margin-bottom:4px}.row input[type=range]{width:100%;accent-color:var(--accent)}.status,.note,.metrics{padding:9px;border:1px solid #42616f;border-radius:9px;background:#0c1b22;color:var(--muted);font-size:10px;line-height:1.55;margin:7px 0}.status b,.note b{color:#fff}.gate{font-size:10px;color:var(--muted);margin:7px 0}.gate:before{content:"●";color:var(--bad);margin-right:6px}.gate.ok:before{color:var(--good)}.gate.warn:before{color:var(--warn)}.stage{position:relative;min-width:0;min-height:0;background:var(--studio)}.viewers{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,33%);gap:1px;background:#859196}.candidate,.source{position:relative;min-width:0;min-height:0;background:var(--studio)}#canvasWrap{position:absolute;inset:0}canvas{display:block;width:100%;height:100%}.source iframe{width:100%;height:100%;border:0;display:block;background:var(--studio)}.label{position:absolute;z-index:5;top:10px;left:10px;right:10px;padding:7px 9px;border:1px solid #456b7b;border-radius:8px;background:#0b1820dc;backdrop-filter:blur(7px);font-size:9px;line-height:1.45;pointer-events:none}.label b{display:block;color:#fff}.label span{color:#bdd0d8}.source-hidden .source{display:none}.source-hidden .viewers{grid-template-columns:1fr}.loading{position:absolute;inset:0;z-index:4;display:grid;place-items:center;background:var(--studio);color:#31434c;font-size:11px}.ready .loading{display:none}.meter{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.meter div{padding:8px;border:1px solid #345360;border-radius:8px;background:#0b1920;text-align:center}.meter b{display:block;font-size:15px}.meter span{font-size:8px;color:var(--muted)}.foot{display:flex;align-items:center;gap:13px;padding:0 10px;background:#0d1d25;border-top:1px solid var(--line);font-size:10px;color:var(--muted)}.foot b{color:var(--good)}.fatal{display:none;position:fixed;inset:0;z-index:30;background:#071018;place-items:center;padding:24px}.fatal.show{display:grid}.fatal div{max-width:620px;padding:18px;border:1px solid #663b3b;border-radius:10px;background:#1a1111;color:#f2c3be}.qa .source{display:none}.qa .viewers{grid-template-columns:1fr}@media(max-width:1000px){.main{grid-template-columns:1fr}.panel{position:absolute;z-index:10;top:58px;bottom:30px;width:min(88vw,330px);box-shadow:0 20px 60px #000a}.left{left:0}.right{right:0;display:none}.viewers{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 35%}.tag{display:none}}@media(max-width:650px){.top small{display:none}.viewers{grid-template-rows:minmax(0,1fr) 30%}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header class="top"><b>Original Bird R0.17</b><small>先完成海鸥形体，再用基础拍翼检查变形</small><span class="tag">独立连续躯干 · 连续蒙皮翼面 · 基础拍翼 · 高细源并排</span></header>
+<main class="main">
+<aside class="panel left">
+<div class="status"><b>当前生产顺序</b><br>1. 先看静态形体；2. 再开基础拍翼，只检查翼根、肩胸、腕掌、翼尖和尾部；3. 高级飞行保持关闭。</div>
+<h3>形体 / 动作</h3><div class="grid"><button id="staticBtn" class="active">静态形体</button><button id="flapBtn">基础拍翼</button></div>
+<div class="row"><label>动作相位 <output id="phaseO">2%</output></label><input id="phase" type="range" min="0" max="1" step=".001" value=".02"></div>
+<div class="row"><label>拍翼幅度 <output id="ampO">0.58</output></label><input id="amp" type="range" min=".15" max=".75" step=".01" value=".58"></div>
+<div class="row"><label>拍翼速度 <output id="rateO">1.15×</output></label><input id="rate" type="range" min=".25" max="2" step=".05" value="1.15"></div>
+<h3>固定视角</h3><div class="grid"><button data-view="side">侧面</button><button data-view="front">正面</button><button data-view="top">顶部</button><button data-view="three">三分之四</button><button data-view="underside">翼底</button><button id="resetView">重置镜头</button></div>
+<h3>审查显示</h3><div class="grid"><button id="sourceBtn" class="active">显示高细源</button><button id="wireBtn">线框</button><button id="shadowBtn" class="active">阴影</button><button id="captureBtn">保存截图</button></div>
+<h3>当前门禁</h3><div class="gate ok">已生成独立海鸥形体</div><div class="gate ok">躯干—颈—头—喙为同一连续载体</div><div class="gate ok">左右翼为连续蒙皮表面</div><div class="gate ok">基础拍翼已接入</div><div class="gate">四视角尚未视觉批准</div><div class="gate">高级飞行未开放</div>
+</aside>
+<section class="stage" id="stage"><div class="viewers">
+<div class="candidate ready" id="candidate"><div class="label"><b>Original Bird 海鸥形体 R0.17</b><span>独立生成，不载入两只参考鸟的网格、贴图或骨架</span></div><div id="canvasWrap"></div></div>
+<div class="source" id="source"><div class="label"><b>形体与细节主参考｜BIRD-REF-005</b><span>只作目视对照；不进入 Original Bird 运行时</span></div><div class="loading" id="sourceLoading">正在载入高细源参考…</div><iframe id="sourceFrame" title="BIRD-REF-005 high-detail source" allow="autoplay; fullscreen; xr-spatial-tracking" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" allowfullscreen></iframe></div>
+</div></section>
+<aside class="panel right">
+<h3>形体统计</h3><div class="meter"><div><b id="vertices">—</b><span>运行时顶点</span></div><div><b id="triangles">—</b><span>运行时三角面</span></div><div><b>44</b><span>躯干径向段</span></div><div><b>4×2</b><span>翼骨链</span></div></div>
+<h3>结构说明</h3><div class="note"><b>躯干</b><br>使用纵向截面环生成连续身体、胸部、颈部、头部和喙部载体，不再由球体互相穿插组成。</div><div class="note"><b>翼面</b><br>每侧为一张有厚度的连续网格，通过 shoulder—elbow—wrist—tip 四骨链蒙皮。翼尖附加分层初级飞羽几何。</div><div class="note"><b>尾与腿足</b><br>九枚独立尾羽形成扇面；双腿和四趾接触链已经进入第一版静态轮廓。</div>
+<h3>基础动作检查</h3><div class="note">当前动作只用于发现翼根断裂、肩胸塌陷、肘腕折叠错误、翼尖穿插和尾部失配。没有滑翔、转弯、起飞、着陆或抗风状态。</div>
+<h3>参考职责</h3><div class="note"><b>BIRD-REF-005</b>：形体与细节对照。<br><b>BIRD-REF-004</b>：基础拍翼相位参考。<br>两者都不作为正式运行时依赖。</div>
+<div class="metrics" id="runtimeState">运行时启动中。</div>
+</aside>
+</main>
+<footer class="foot"><b>● shape-first runtime</b><span id="modeState">static form</span><span id="viewState">three-quarter</span><span id="fpsState">fps —</span><span>visualAcceptance=false</span></footer>
+</div>
+<div class="fatal" id="fatal"><div><b>工作台启动失败</b><p id="fatalText"></p></div></div>
+<script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { createOriginalGullR017 } from '../runtime/original-bird-gull-form-r017.mjs';
+
+const $ = (id) => document.getElementById(id);
+const qa = new URLSearchParams(location.search).get('qa') === '1';
+if (qa) document.body.classList.add('qa');
+
+const wrap = $('canvasWrap');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setClearColor(0xe2e8ea, 1);
+wrap.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xe2e8ea);
+scene.fog = new THREE.Fog(0xe2e8ea, 10, 20);
+const camera = new THREE.PerspectiveCamera(31, 1, 0.05, 60);
+camera.position.set(5.4, -7.1, 3.5);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0, 0.02);
+controls.enableDamping = true;
+controls.minDistance = 3.2;
+controls.maxDistance = 14;
+
+scene.add(new THREE.HemisphereLight(0xf8fbff, 0x7b858a, 1.45));
+const key = new THREE.DirectionalLight(0xffffff, 4.3);
+key.position.set(4, -5, 7);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.camera.left = -6;
+key.shadow.camera.right = 6;
+key.shadow.camera.top = 6;
+key.shadow.camera.bottom = -6;
+scene.add(key);
+const fill = new THREE.DirectionalLight(0xb9d5e8, 1.5);
+fill.position.set(-4, 4, 3);
+scene.add(fill);
+const rim = new THREE.DirectionalLight(0xfff0d2, 1.2);
+rim.position.set(-2, -4, 2);
+scene.add(rim);
+
+const floor = new THREE.Mesh(new THREE.CircleGeometry(9, 96), new THREE.MeshStandardMaterial({ color: 0xd2d9dc, roughness: 0.93, metalness: 0 }));
+floor.position.z = -0.95;
+floor.receiveShadow = true;
+scene.add(floor);
+const grid = new THREE.GridHelper(12, 24, 0x9aa8ae, 0xc3ccd0);
+grid.rotation.x = Math.PI / 2;
+grid.position.z = -0.944;
+grid.material.opacity = 0.28;
+grid.material.transparent = true;
+scene.add(grid);
+
+const gull = createOriginalGullR017(THREE, { bodyRadialSegments: 44 });
+scene.add(gull.root);
+const metrics = gull.getMetrics();
+$('vertices').textContent = metrics.vertices.toLocaleString();
+$('triangles').textContent = metrics.triangles.toLocaleString();
+$('runtimeState').textContent = JSON.stringify(metrics, null, 2);
+
+const VIEWS = {
+  three: { p: [5.4, -7.1, 3.5], t: [0, 0, 0.02] },
+  side: { p: [0.1, -8.2, 0.7], t: [0, 0, 0.05] },
+  front: { p: [7.4, 0, 0.65], t: [0, 0, 0.08] },
+  top: { p: [0, -0.01, 9.0], t: [0, 0, 0] },
+  underside: { p: [0.2, -0.01, -7.0], t: [0, 0, -0.05] },
+};
+function setView(name) {
+  const v = VIEWS[name] || VIEWS.three;
+  camera.position.fromArray(v.p);
+  controls.target.fromArray(v.t);
+  controls.update();
+  $('viewState').textContent = name === 'three' ? 'three-quarter' : name;
+}
+setView('three');
+
+let animate = false;
+let wireframe = false;
+let sourceVisible = !qa;
+let last = performance.now();
+let fpsAccum = 0;
+let fpsFrames = 0;
+let fpsLast = last;
+function setMode(enabled) {
+  animate = enabled;
+  gull.setAnimate(enabled);
+  $('flapBtn').classList.toggle('active', enabled);
+  $('staticBtn').classList.toggle('active', !enabled);
+  $('phase').disabled = enabled;
+  $('modeState').textContent = enabled ? 'basic flap deformation test' : 'static form';
+}
+setMode(false);
+
+function resize() {
+  const w = wrap.clientWidth;
+  const h = wrap.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = Math.max(0.01, w / Math.max(1, h));
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(wrap);
+resize();
+
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  gull.update(dt);
+  controls.update();
+  renderer.render(scene, camera);
+  fpsAccum += dt;
+  fpsFrames += 1;
+  if (now - fpsLast > 700) {
+    const fps = fpsAccum > 0 ? fpsFrames / fpsAccum : 0;
+    $('fpsState').textContent = 'fps ' + fps.toFixed(0);
+    fpsAccum = 0;
+    fpsFrames = 0;
+    fpsLast = now;
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+$('staticBtn').onclick = () => setMode(false);
+$('flapBtn').onclick = () => setMode(true);
+$('phase').oninput = (e) => {
+  const v = Number(e.target.value);
+  $('phaseO').textContent = Math.round(v * 100) + '%';
+  gull.setPhase(v);
+};
+$('amp').oninput = (e) => {
+  const v = Number(e.target.value);
+  gull.state.flapAmplitude = v;
+  $('ampO').textContent = v.toFixed(2);
+  if (!animate) gull.setPhase(Number($('phase').value));
+};
+$('rate').oninput = (e) => {
+  const v = Number(e.target.value);
+  gull.state.flapRate = v;
+  $('rateO').textContent = v.toFixed(2) + '×';
+};
+document.querySelectorAll('[data-view]').forEach((b) => { b.onclick = () => setView(b.dataset.view); });
+$('resetView').onclick = () => setView('three');
+$('wireBtn').onclick = () => {
+  wireframe = !wireframe;
+  gull.setWireframe(wireframe);
+  $('wireBtn').classList.toggle('active', wireframe);
+};
+$('shadowBtn').onclick = () => {
+  renderer.shadowMap.enabled = !renderer.shadowMap.enabled;
+  $('shadowBtn').classList.toggle('active', renderer.shadowMap.enabled);
+};
+$('sourceBtn').onclick = () => {
+  sourceVisible = !sourceVisible;
+  $('stage').classList.toggle('source-hidden', !sourceVisible);
+  $('sourceBtn').classList.toggle('active', sourceVisible);
+  resize();
+};
+$('captureBtn').onclick = () => {
+  renderer.render(scene, camera);
+  const a = document.createElement('a');
+  a.href = renderer.domElement.toDataURL('image/png');
+  a.download = 'original-bird-gull-r017-' + $('viewState').textContent + '.png';
+  a.click();
+};
+
+function initSource() {
+  if (qa) return;
+  if (!window.Sketchfab) {
+    $('sourceLoading').textContent = '源参考 Viewer API 未载入';
+    return;
+  }
+  const client = new Sketchfab('1.12.1', $('sourceFrame'));
+  client.init('1d3b3cea037f4fb3bc9fbd72013bb94a', {
+    autostart: 1,
+    camera: 0,
+    animation_autoplay: 0,
+    dnt: 1,
+    preload: 0,
+    ui_theme: 'dark',
+    success(api) {
+      api.start();
+      api.addEventListener('viewerready', () => {
+        $('source').classList.add('ready');
+        api.pause(() => {});
+        api.setTextureQuality?.('hd', () => {});
+        api.setShadingStyle?.('pbr', { type: 'lit' }, () => {});
+        api.setBackground?.({ color: [0.88, 0.91, 0.92] }, () => {});
+      });
+    },
+    error() { $('sourceLoading').textContent = '高细源参考加载失败'; },
+  });
+}
+initSource();
+window.__BIRD_R017_READY__ = true;
+window.__BIRD_R017_METRICS__ = metrics;
+</script>
+</body>
+</html>

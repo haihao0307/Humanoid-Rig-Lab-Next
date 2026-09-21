@@ -1,0 +1,78 @@
+name: Original Bird Feather Alpha Browser QA
+
+on:
+  push:
+    branches: [bird-mother-original-bird-r001-20260920]
+    paths:
+      - 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0122.html'
+      - 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alphamask-r0123.html'
+      - 'Bird-Reconstruction-Lab/original-bird/tests/feather-alpha-r0122.spec.cjs'
+      - 'Bird-Reconstruction-Lab/original-bird/tests/feather-alphamask-r0123.spec.cjs'
+      - 'Bird-Reconstruction-Lab/original-bird/tests/fixtures/feather-atlas-r0122.svg'
+      - '.github/workflows/original-bird-feather-alpha-browser-qa.yml'
+  pull_request:
+    paths:
+      - 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0122.html'
+      - 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alphamask-r0123.html'
+      - 'Bird-Reconstruction-Lab/original-bird/tests/feather-alpha-r0122.spec.cjs'
+      - 'Bird-Reconstruction-Lab/original-bird/tests/feather-alphamask-r0123.spec.cjs'
+      - 'Bird-Reconstruction-Lab/original-bird/tests/fixtures/feather-atlas-r0122.svg'
+      - '.github/workflows/original-bird-feather-alpha-browser-qa.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-visual-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      BIRD_QA_URL: http://127.0.0.1:4173/Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0122.html
+      BIRD_QA_MODE: mock
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local workbench server
+        run: |
+          mkdir -p artifacts/bird-r0122-browser-qa artifacts/bird-r0123-alphamask-qa
+          printf '%s\n' "$BIRD_QA_URL" > artifacts/bird-r0122-browser-qa/qa-url.txt
+          printf '%s\n' "$BIRD_QA_MODE" > artifacts/bird-r0122-browser-qa/qa-mode.txt
+          python3 -m http.server 4173 --bind 127.0.0.1 > artifacts/bird-r0122-browser-qa/http-server.log 2>&1 &
+          echo $! > artifacts/bird-r0122-browser-qa/http-server.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo 'Local server failed to start'
+          exit 1
+
+      - name: Run deterministic R0.12.2 and R0.12.3 Chromium visual QA
+        run: |
+          npx playwright test \
+            Bird-Reconstruction-Lab/original-bird/tests/feather-alpha-r0122.spec.cjs \
+            Bird-Reconstruction-Lab/original-bird/tests/feather-alphamask-r0123.spec.cjs \
+            --browser=chromium \
+            --workers=1 \
+            --reporter=line
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-bird-feather-alpha-browser-evidence
+          path: |
+            artifacts/bird-r0122-browser-qa
+            artifacts/bird-r0123-alphamask-qa
+            test-results
+            playwright-report
+          if-no-files-found: warn
+          retention-days: 30

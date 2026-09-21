@@ -1,0 +1,78 @@
+{
+  "schema": "bird/original-bird-canonical-joint-map@0.2",
+  "date": "2026-09-20",
+  "clade": "Columbidae candidate",
+  "canonicalContract": {
+    "axial": ["root", "pelvis", "thorax_01", "thorax_02", "thorax_03", "neck_01", "neck_02", "neck_03_optional", "neck_04_optional", "head", "beak_upper", "beak_lower"],
+    "wingPerSide": ["pectoral_girdle", "shoulder", "humerus", "elbow", "forearm", "wrist", "manus", "primary_attachment", "secondary_attachment", "covert_coordination"],
+    "hindlimbPerSide": ["hip", "knee", "ankle", "foot", "digit_I_hallux", "digit_II", "digit_III", "digit_IV"],
+    "tail": ["tail_base", "rectrix_center", "rectrix_left_array", "rectrix_right_array", "tail_fan_control"]
+  },
+  "sourceMappings": [
+    {
+      "assetId": "BIRD-REF-001",
+      "source": "cine__pigeon_fly(2).glb",
+      "authority": "R1_REFERENCE_ONLY",
+      "mapping": {
+        "root": "GLTF_created_0_rootJoint",
+        "pelvis": "Bip01Pelvis_3",
+        "thorax_01": "Bip01Spine_4",
+        "neck_01": "Bip01Neck_31",
+        "neck_02": "Bip01Neck1_32",
+        "head": "Bip01Head_33",
+        "pectoral_girdle_shared_control": "Dummy01_35",
+        "wing_l": {"shoulder_humerus_candidate": "Bone_wing_l_01_36", "forearm_elbow_candidate": "Bone_wing_l_02_37", "wrist_manus_candidate": "Bone_wing_l_03_38", "surface_or_feather_controls_unresolved": ["Bone_wing_l_05_42", "Bone_wing_l_07_40"]},
+        "wing_r": {"shoulder_humerus_candidate": "Bone_wing_r_01_44", "forearm_elbow_candidate": "Bone_wing_r_02_45", "wrist_manus_candidate": "Bone_wing_r_03_46", "surface_or_feather_controls_unresolved": ["Bone_wing_r_05_50", "Bone_wing_r_07_48"]},
+        "tail": ["Bone_Tail_01_52", "Bone_tail_02_53"],
+        "leg_l": ["Bip01LThigh_5", "Bip01LCalf_6", "Bip01LHorseLink_7", "Bip01LFoot_8"],
+        "leg_r": ["Bip01RThigh_18", "Bip01RCalf_19", "Bip01RHorseLink_20", "Bip01RFoot_21"],
+        "toes_l": ["Bip01LToe0_9", "Bip01LToe1_12", "Bip01LToe2_15"],
+        "toes_r": ["Bip01RToe0_22", "Bip01RToe1_25", "Bip01RToe2_28"]
+      },
+      "acceptedUse": ["coarse bilateral wing phase", "leg and toe phase", "neck/head/tail coupling"],
+      "blocked": ["literal bone homology", "flight-feather region truth", "hallux identity", "real-scale use"]
+    },
+    {
+      "assetId": "BIRD-REF-002",
+      "source": "pigeon (1)(2).glb",
+      "authority": "R1_REFERENCE_ONLY",
+      "mapping": {
+        "root": "GLTF_created_0_rootJoint",
+        "pelvis": "hip_01_115",
+        "thorax": ["spine1_03_59", "spine2_04_58", "spine3_00_55"],
+        "neck": ["neck1_05_18", "neck2_06_17", "neck3_07_16", "neck4_08_15"],
+        "head": "head1_09_14",
+        "beak_upper": "Upper_Beak_010_1",
+        "beak_lower": "Lower_Beak1_011_5",
+        "wing_l_main_artist_chain": ["L_w_main_j1_023_36", "L_w_main_j2_024_34", "L_w_main_j3_025_32", "L_w_main_j4_026_30", "L_w_main_j5_027_28", "L_w_main_j6_028_22"],
+        "wing_r_main_artist_chain": ["R_w_main_j1_041_54", "R_w_main_j2_042_52", "R_w_main_j3_043_50", "R_w_main_j4_044_48", "R_w_main_j5_045_46", "R_w_main_j6_046_40"],
+        "wing_l_sub_attachment_controls": ["L_w_sub_j_a_040_35", "L_w_sub_j_b_039_33", "L_w_sub_j_c_038_31", "L_w_sub_j_d_037_29", "L_w_sub_j_e_032_23", "L_w_sub_j_f_033_24", "L_w_sub_j_g_034_25", "L_w_sub_j_h_035_26", "L_w_sub_j_i_036_27", "L_w_sub_j_j_029_19", "L_w_sub_j_k_030_20", "L_w_sub_j_l_031_21"],
+        "wing_r_sub_attachment_controls": ["R_w_sub_j_a_058_53", "R_w_sub_j_b_057_51", "R_w_sub_j_c_056_49", "R_w_sub_j_d_055_47", "R_w_sub_j_e_050_41", "R_w_sub_j_f_051_42", "R_w_sub_j_g_052_43", "R_w_sub_j_h_053_44", "R_w_sub_j_i_054_45", "R_w_sub_j_j_047_37", "R_w_sub_j_k_048_38", "R_w_sub_j_l_049_39"],
+        "tail_fan": {"controller": "tails_CTRL_061_73", "center": "tail00_062_60", "left": ["L_tail_joint1_063_61", "L_tail_joint2_064_62", "L_tail_joint3_065_63", "L_tail_joint4_066_64", "L_tail_joint5_067_65", "L_tail_joint6_068_66"], "right": ["R_tail_joint1_069_67", "R_tail_joint2_070_68", "R_tail_joint3_071_69", "R_tail_joint4_072_70", "R_tail_joint5_073_71", "R_tail_joint6_074_72"]},
+        "leg_l": ["L_UpperLeg_076_93", "L_leg_077_92", "L_knee_078_91", "L_foot_079_90"],
+        "leg_r": ["R_UpperLeg_096_113", "R_leg_097_112", "R_knee_098_111", "R_foot_099_110"]
+      },
+      "restChainMeasurements": {
+        "leftWingMainSegmentLengthsModelUnits": [0.012117, 0.032353, 0.026924, 0.026258, 0.028098],
+        "leftWingMainNormalized": [0.096358, 0.25728, 0.214107, 0.208811, 0.223443],
+        "leftLegSegmentLengthsModelUnits": [0.035495, 0.024943, 0.023741, 0.018862]
+      },
+      "acceptedUse": ["dense attachment-region topology candidate", "tail fan array", "multi-segment neck", "beak/eye/tongue boundaries", "toe contact topology candidate"],
+      "blocked": ["treating six wing controls as six literal anatomical bones", "using 117 artist joints as natural skeleton count", "using exporter timeline as biological seconds", "commercial runtime dependency"]
+    },
+    {
+      "assetId": "BIRD-REF-003",
+      "source": "pigeon(2).glb",
+      "authority": "R1_COUNTEREXAMPLE",
+      "mapping": {
+        "acceptedComparativeOnly": {"pelvis": "Chicken_ROOTSHJnt_54", "thorax": ["Chicken_Chest_01_01SHJnt_53", "Chicken_Chest_01_02SHJnt_52", "Chicken_Chest_01_03SHJnt_51"], "neck": ["Chicken_Neck_01_01SHJnt_50", "Chicken_Neck_01_02SHJnt_49", "Chicken_Neck_01_03SHJnt_48"], "headJaw": "Chicken_Head_JawSHJnt_47"},
+        "wing": null
+      },
+      "acceptedUse": ["surface silhouette comparison after visual QA", "hindlimb/toe comparison", "morph pipeline test"],
+      "rejectedUse": ["Columbidae flight skeleton", "wing motion source", "species identity proof"],
+      "failureReason": "The skin uses Chicken_* axial and hindlimb names and has no explicit wing joints; pigeon appearance cannot override the missing flight architecture."
+    }
+  ],
+  "promotionRule": "A canonical mapping is not accepted until joint transforms, skin weights, bilateral symmetry, motion participation and R0 anatomical evidence agree.",
+  "currentGate": {"canonicalWingHomologyLocked": false, "canonicalToeIdentityLocked": false, "motionRetargetReady": false, "visualAcceptance": false}
+}

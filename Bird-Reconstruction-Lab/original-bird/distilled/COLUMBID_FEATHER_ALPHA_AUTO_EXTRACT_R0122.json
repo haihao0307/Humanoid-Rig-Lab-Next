@@ -1,0 +1,62 @@
+{
+  "schema": "bird/columbid-feather-alpha-auto-extract@0.0.12.2",
+  "date": "2026-09-20",
+  "status": "ACTIVE_RUNTIME_CALIBRATION_NOT_FINAL_COMMERCIAL_TEXTURE",
+  "source": {
+    "assetId": "BIRD-REF-002",
+    "viewerUid": "821135a09d3f48909b977a416d99c93b",
+    "targetMaterialRule": "first non-eye material, then user-selectable",
+    "sourceTextureRule": "selected material AlbedoPBR, DiffusePBR or DiffuseColor texture"
+  },
+  "rootCause": {
+    "observed": "R0.12.1 showed no visible difference although Opacity appeared enabled.",
+    "codeDefect": "the generated diagnostic texture stored coverage only in PNG alpha while RGB remained white; an opacity implementation sampling grayscale RGB therefore read the map as fully opaque",
+    "interactionDefect": "the workbench waited for a manual material click and did not automatically prove that the Opacity channel changed the rendered result"
+  },
+  "correction": {
+    "maskEncoding": "coverage is copied to R, G, B and A simultaneously",
+    "automaticMaterialSelection": true,
+    "automaticTextureLookup": true,
+    "sourceAlphaFirst": true,
+    "fallback": "border chroma-key from the source atlas; if source image access fails, apply an explicit grayscale channel probe",
+    "visualSelfTest": "capture source and calibrated frames from matching viewers and calculate changed-pixel ratio plus mean RGB difference"
+  },
+  "atlasExtraction": {
+    "maximumWorkingResolution": 1024,
+    "alphaVariationThreshold": 0.002,
+    "defaultBackgroundTolerance": 34,
+    "defaultEdgeSoftness": 12,
+    "borderSampleWidthRatio": 0.025,
+    "filter": "single 3x3 coverage blur for diagnostic fringe",
+    "output": "grayscale RGBA PNG aligned to the source atlas UV"
+  },
+  "requiredVisibleEvidence": [
+    "before and after differ by more than one percent of compared pixels",
+    "gray backing outside feather silhouettes disappears or is substantially reduced",
+    "vane core stays visually solid",
+    "edge fringe is narrow instead of whole-feather glass transparency",
+    "no black or gray halo on bright gray, sky blue and warm gray backgrounds",
+    "no phase-dependent flicker across eight normalized animation phases"
+  ],
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0122.html",
+  "boundaries": {
+    "sourceModelModified": false,
+    "runtimeCalibrationOnly": true,
+    "sourceLicenseBecomesCommercialSafe": false,
+    "independentCommercialAtlasAuthored": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "openGates": {
+    "sourceTextureLoadedWithCors": false,
+    "automaticMaskApplied": false,
+    "visibleDifferenceVerified": false,
+    "markedGrayBackingRemoved": false,
+    "threeBackgroundHaloTestPassed": false,
+    "eightPhaseStabilityPassed": false,
+    "mobileOverdrawMeasured": false,
+    "independentCommercialAtlasAuthored": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}

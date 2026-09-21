@@ -1,0 +1,143 @@
+{
+  "schema": "bird/columbid-feather-alpha-edge@0.0.12",
+  "date": "2026-09-20",
+  "status": "ACTIVE_3A_PROJECT_GATE",
+  "scope": [
+    "wing trailing edge",
+    "primary feather tips",
+    "secondary feather tips",
+    "tail feather perimeter",
+    "visible feather-card voids"
+  ],
+  "sourceFinding": {
+    "finding": "Opaque gray backing remains visible around feather tips and trailing edges, exposing the card or sheet silhouette instead of the feather silhouette.",
+    "userMarkedRegions": [
+      "outer wing-tip card perimeter",
+      "trailing-edge strip beneath separated remiges",
+      "inner trailing-edge card perimeter"
+    ],
+    "severity": "CRITICAL_3A_BLOCKER",
+    "reason": "The visible sheet perimeter destroys feather separation, creates a toy-like plate edge and remains obvious in bright, neutral and backlit views."
+  },
+  "correctionModel": {
+    "zones": [
+      {
+        "id": "VOID",
+        "alphaRange": [0.0, 0.0],
+        "meaning": "Pixels outside the actual feather silhouette must be fully transparent."
+      },
+      {
+        "id": "BARB_FRINGE",
+        "alphaRange": [0.05, 0.72],
+        "meaning": "Outer barbs and worn edge fibers may be partially transparent with irregular, directional breakup."
+      },
+      {
+        "id": "VANE_CORE",
+        "alphaRange": [0.92, 1.0],
+        "meaning": "Most of the feather vane remains opaque; the complete feather must not become uniformly translucent."
+      },
+      {
+        "id": "RACHIS_SHAFT",
+        "alphaRange": [0.98, 1.0],
+        "meaning": "The central shaft and structurally dense base remain opaque."
+      }
+    ],
+    "requiredTechnique": "hybrid opaque core plus soft fringe",
+    "runtimeCalibration": {
+      "sourceViewer": "Sketchfab Viewer API Opacity material channel",
+      "operations": [
+        "read source material list",
+        "select only feather-region material candidates",
+        "generate an RGBA alpha-mask texture",
+        "register the mask with addTexture",
+        "enable and update the Opacity channel through setMaterial",
+        "compare original and calibrated viewers on bright, sky-blue and warm-gray backgrounds",
+        "export mask PNG and calibration JSON"
+      ],
+      "boundary": "Runtime calibration is evidence and tuning only; it does not rewrite the licensed source asset."
+    },
+    "finalGlbRequirement": {
+      "opaqueCore": {
+        "preferredAlphaMode": "MASK or dithered alpha-to-coverage equivalent",
+        "reason": "Stable depth, stable ordering and lower transparent-overdraw cost."
+      },
+      "softFringe": {
+        "preferredAlphaMode": "BLEND, dithered blend or alpha-to-coverage on a narrow fringe only",
+        "reason": "Preserve fine barb softness without making the complete vane transparent."
+      },
+      "textureRules": [
+        "Use RGBA texture data with a real alpha channel.",
+        "Dilate feather RGB colors beneath transparent pixels to prevent dark or gray halos after filtering and mipmapping.",
+        "Keep fully transparent voids outside the silhouette; do not leave gray backing pixels.",
+        "Use region-aware irregular fringe breakup rather than a uniform blurred outline.",
+        "Preserve distinct primary, secondary and covert silhouettes; do not reuse one identical mask everywhere.",
+        "Verify both faces where cards are visible; backface handling must not create disappearing feathers.",
+        "Author alpha-aware mip levels so distant feathers do not thicken, vanish or become rectangular."
+      ]
+    }
+  },
+  "qualityGates": [
+    {
+      "id": "ALPHA-01",
+      "critical": true,
+      "title": "no card perimeter",
+      "pass": "No rectangular, triangular or gray sheet perimeter remains visible around feather tips or trailing edges."
+    },
+    {
+      "id": "ALPHA-02",
+      "critical": true,
+      "title": "opaque vane core",
+      "pass": "The main vane remains visually solid; transparency is confined to voids and the narrow barb fringe."
+    },
+    {
+      "id": "ALPHA-03",
+      "critical": true,
+      "title": "soft directional fringe",
+      "pass": "The fringe is semi-transparent, irregular and aligned with barb direction rather than a uniform blur."
+    },
+    {
+      "id": "ALPHA-04",
+      "critical": true,
+      "title": "no dark halo",
+      "pass": "No black, gray or bright outline appears under bilinear filtering, mipmapping, bright background or rim light."
+    },
+    {
+      "id": "ALPHA-05",
+      "critical": true,
+      "title": "motion stability",
+      "pass": "No sorting pop, flicker, swimming mask, card intersection or edge inversion appears through eight normalized wing phases."
+    },
+    {
+      "id": "ALPHA-06",
+      "critical": true,
+      "title": "mobile overdraw evidence",
+      "pass": "Transparent area is tightly cropped and measured; broad full-wing alpha sheets are rejected."
+    },
+    {
+      "id": "ALPHA-07",
+      "critical": false,
+      "title": "regional variation",
+      "pass": "Primary, secondary, covert and tail masks differ in taper, wear and fringe width without random noise."
+    }
+  ],
+  "requiredEvidence": {
+    "backgrounds": ["bright_gray_white", "sky_blue", "warm_gray"],
+    "views": ["top", "underside", "wing_tip_closeup", "trailing_edge_closeup", "three_quarter"],
+    "lighting": ["neutral", "grazing", "rim", "overcast"],
+    "motionPhases": [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875],
+    "distances": ["macro", "portrait", "gameplay"]
+  },
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r012.html",
+  "openGates": {
+    "sourceFeatherMaterialIdentified": false,
+    "sourceOpacityChannelAudited": false,
+    "runtimeAlphaMaskApplied": false,
+    "threeBackgroundEvidenceComplete": false,
+    "eightPhaseEvidenceComplete": false,
+    "independentCandidateAlphaTextureGenerated": false,
+    "mobileOverdrawEvidenceComplete": false,
+    "allCriticalAlphaGatesPassed": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}

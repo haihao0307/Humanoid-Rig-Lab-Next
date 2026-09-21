@@ -1,0 +1,72 @@
+{
+  "schema": "bird/columbid-fixed-view-baseline@0.0.10",
+  "date": "2026-09-20",
+  "authority": "SOURCE_VIEW_BASELINE_NOT_VISUAL_ACCEPTANCE",
+  "source": {
+    "assetId": "BIRD-REF-002",
+    "file": "pigeon (1)(2).glb",
+    "viewerUid": "821135a09d3f48909b977a416d99c93b"
+  },
+  "capture": {
+    "width": 1024,
+    "height": 1024,
+    "mimeType": "image/png",
+    "background": {
+      "name": "bright_studio_gray_white",
+      "rgbNormalized": [0.72, 0.77, 0.79]
+    },
+    "textureQuality": "hd",
+    "shading": "pbr_lit",
+    "views": [
+      {
+        "id": "front",
+        "label": "front",
+        "cameraRule": "target + [0,-distance,+0.06*distance]"
+      },
+      {
+        "id": "side",
+        "label": "side",
+        "cameraRule": "target + [+distance,0,+0.06*distance]"
+      },
+      {
+        "id": "top",
+        "label": "top",
+        "cameraRule": "target + [0,0,+distance]"
+      },
+      {
+        "id": "three_quarter",
+        "label": "three-quarter",
+        "cameraRule": "target + [+0.66*distance,-0.66*distance,+0.34*distance]"
+      }
+    ]
+  },
+  "imageMetrics": [
+    "foreground_bounding_box_normalized",
+    "foreground_coverage_ratio",
+    "foreground_centroid_normalized",
+    "silhouette_aspect_ratio"
+  ],
+  "futureCandidateComparison": [
+    "bounding_box_relative_error",
+    "centroid_offset",
+    "coverage_ratio_error",
+    "silhouette_iou_after_background_masking",
+    "landmark_screen_space_error"
+  ],
+  "rules": [
+    "The source screenshot remains visible beside every future distilled candidate.",
+    "The same view, background, resolution and camera rule must be used for source and candidate.",
+    "Lighting cannot be changed to conceal a silhouette, skinning or topology defect.",
+    "No candidate is accepted from one view only.",
+    "Image metrics are QA aids and do not replace anatomical evidence or user visual acceptance."
+  ],
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-fixed-view-baseline-r010.html",
+  "openGates": {
+    "sourceFourViewCaptureComplete": false,
+    "candidateFourViewCaptureComplete": false,
+    "silhouetteComparisonAvailable": false,
+    "landmarkScreenErrorAvailable": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
