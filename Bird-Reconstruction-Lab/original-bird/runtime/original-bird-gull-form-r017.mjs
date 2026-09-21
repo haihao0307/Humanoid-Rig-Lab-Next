@@ -1,29 +1,67 @@
-export const GULL_R017_ID = 'original-bird-gull-form-r017';
+export const GULL_R017_ID = 'original-bird-gull-form-r0171';
 
-function makeLoftGeometry(THREE, rings, radialSegments = 40) {
+function densifyRings(THREE, controls, subdivisions = 5) {
+  const shape = new THREE.CatmullRomCurve3(
+    controls.map((r) => new THREE.Vector3(r.x, r.ry, r.rz)),
+    false,
+    'centripetal',
+  );
+  const center = new THREE.CatmullRomCurve3(
+    controls.map((r) => new THREE.Vector3(r.cy ?? 0, r.cz ?? 0, r.keel ?? 0)),
+    false,
+    'centripetal',
+  );
+  const count = (controls.length - 1) * subdivisions;
+  const rings = [];
+  for (let i = 0; i <= count; i += 1) {
+    const t = i / count;
+    const a = shape.getPoint(t);
+    const b = center.getPoint(t);
+    rings.push({
+      x: a.x,
+      ry: Math.max(0.008, a.y),
+      rz: Math.max(0.008, a.z),
+      cy: b.x,
+      cz: b.y,
+      keel: Math.max(0, b.z),
+      material: a.x >= 1.42 ? 1 : 0,
+    });
+  }
+  return rings;
+}
+
+function makeLoftGeometry(THREE, controlRings, radialSegments = 48, subdivisions = 5) {
+  const rings = densifyRings(THREE, controlRings, subdivisions);
   const positions = [];
   const uvs = [];
   const indices = [];
-  const materialForStrip = [];
+  const groups = [];
 
   for (let r = 0; r < rings.length; r += 1) {
     const ring = rings[r];
     for (let i = 0; i < radialSegments; i += 1) {
-      const a = (i / radialSegments) * Math.PI * 2;
-      const ca = Math.cos(a);
-      const sa = Math.sin(a);
-      const squash = 1 + (ring.keel ?? 0) * Math.max(0, -sa);
+      const angle = (i / radialSegments) * Math.PI * 2;
+      const lateral = Math.cos(angle);
+      const vertical = Math.sin(angle);
+      const keel = 1 + ring.keel * Math.max(0, -vertical);
       positions.push(
         ring.x,
-        (ring.cy ?? 0) + ring.ry * ca,
-        (ring.cz ?? 0) + ring.rz * sa * squash,
+        ring.cy + ring.ry * lateral,
+        ring.cz + ring.rz * vertical * keel,
       );
       uvs.push(i / radialSegments, r / (rings.length - 1));
     }
   }
 
+  let activeMaterial = rings[0].material;
+  let groupStart = 0;
   for (let r = 0; r < rings.length - 1; r += 1) {
-    const start = indices.length;
+    const stripMaterial = rings[r + 1].material;
+    if (stripMaterial !== activeMaterial) {
+      groups.push({ start: groupStart, count: indices.length - groupStart, material: activeMaterial });
+      groupStart = indices.length;
+      activeMaterial = stripMaterial;
+    }
     for (let i = 0; i < radialSegments; i += 1) {
       const n = (i + 1) % radialSegments;
       const a = r * radialSegments + i;
@@ -32,13 +70,13 @@ function makeLoftGeometry(THREE, rings, radialSegments = 40) {
       const d = (r + 1) * radialSegments + i;
       indices.push(a, b, d, b, c, d);
     }
-    materialForStrip.push({ start, count: indices.length - start, material: rings[r + 1].material ?? rings[r].material ?? 0 });
   }
+  groups.push({ start: groupStart, count: indices.length - groupStart, material: activeMaterial });
 
   const startCenter = positions.length / 3;
-  positions.push(rings[0].x, rings[0].cy ?? 0, rings[0].cz ?? 0);
+  positions.push(rings[0].x, rings[0].cy, rings[0].cz);
   uvs.push(0.5, 0);
-  const startCapIndex = indices.length;
+  const startCap = indices.length;
   for (let i = 0; i < radialSegments; i += 1) {
     const n = (i + 1) % radialSegments;
     indices.push(startCenter, n, i);
@@ -46,9 +84,9 @@ function makeLoftGeometry(THREE, rings, radialSegments = 40) {
 
   const last = rings.length - 1;
   const endCenter = positions.length / 3;
-  positions.push(rings[last].x, rings[last].cy ?? 0, rings[last].cz ?? 0);
+  positions.push(rings[last].x, rings[last].cy, rings[last].cz);
   uvs.push(0.5, 1);
-  const endCapIndex = indices.length;
+  const endCap = indices.length;
   for (let i = 0; i < radialSegments; i += 1) {
     const n = (i + 1) % radialSegments;
     indices.push(endCenter, last * radialSegments + i, last * radialSegments + n);
@@ -60,60 +98,64 @@ function makeLoftGeometry(THREE, rings, radialSegments = 40) {
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   geometry.clearGroups();
-  geometry.addGroup(startCapIndex, radialSegments * 3, rings[0].material ?? 0);
-  for (const strip of materialForStrip) geometry.addGroup(strip.start, strip.count, strip.material);
-  geometry.addGroup(endCapIndex, radialSegments * 3, rings[last].material ?? 0);
+  geometry.addGroup(startCap, radialSegments * 3, rings[0].material);
+  for (const group of groups) geometry.addGroup(group.start, group.count, group.material);
+  geometry.addGroup(endCap, radialSegments * 3, rings[last].material);
   geometry.computeBoundingSphere();
   return geometry;
 }
 
-function makeWingGeometry(THREE) {
+function pushTriangle(indices, side, a, b, c) {
+  if (side > 0) indices.push(a, b, c);
+  else indices.push(a, c, b);
+}
+
+function makeWingGeometry(THREE, side) {
   const stations = [
-    { s: 0.00, cx: 0.10, chord: 0.92, camber: 0.06, thick: 0.11 },
-    { s: 0.42, cx: 0.05, chord: 1.05, camber: 0.08, thick: 0.10 },
-    { s: 0.92, cx: -0.04, chord: 1.02, camber: 0.10, thick: 0.09 },
-    { s: 1.42, cx: -0.19, chord: 0.90, camber: 0.10, thick: 0.075 },
-    { s: 1.93, cx: -0.40, chord: 0.72, camber: 0.08, thick: 0.055 },
-    { s: 2.43, cx: -0.64, chord: 0.49, camber: 0.045, thick: 0.035 },
-    { s: 2.83, cx: -0.87, chord: 0.25, camber: 0.02, thick: 0.022 },
-    { s: 3.08, cx: -1.02, chord: 0.045, camber: 0.00, thick: 0.012 },
+    { s: 0.00, cx: 0.12, chord: 0.92, camber: 0.050, thick: 0.105 },
+    { s: 0.52, cx: 0.08, chord: 1.10, camber: 0.072, thick: 0.100 },
+    { s: 1.12, cx: -0.01, chord: 1.08, camber: 0.085, thick: 0.088 },
+    { s: 1.78, cx: -0.18, chord: 0.96, camber: 0.090, thick: 0.074 },
+    { s: 2.43, cx: -0.43, chord: 0.76, camber: 0.075, thick: 0.056 },
+    { s: 3.02, cx: -0.70, chord: 0.54, camber: 0.050, thick: 0.038 },
+    { s: 3.52, cx: -0.94, chord: 0.28, camber: 0.024, thick: 0.024 },
+    { s: 3.88, cx: -1.08, chord: 0.055, camber: 0.000, thick: 0.012 },
   ];
-  const chordSteps = 12;
+  const chordSteps = 14;
   const positions = [];
   const uvs = [];
   const skinIndices = [];
   const skinWeights = [];
   const indices = [];
   const layerVertexCount = stations.length * (chordSteps + 1);
-  const joints = [0, 0.96, 1.88, 2.72];
+  const joints = [0, 1.12, 2.43, 3.48];
 
-  function weightsForSpan(s) {
-    if (s <= joints[1]) {
-      const t = s / joints[1];
+  function weightsForSpan(span) {
+    if (span <= joints[1]) {
+      const t = span / joints[1];
       return [0, 1, 1 - t, t];
     }
-    if (s <= joints[2]) {
-      const t = (s - joints[1]) / (joints[2] - joints[1]);
+    if (span <= joints[2]) {
+      const t = (span - joints[1]) / (joints[2] - joints[1]);
       return [1, 2, 1 - t, t];
     }
-    const t = Math.min(1, (s - joints[2]) / (joints[3] - joints[2]));
+    const t = Math.min(1, (span - joints[2]) / (joints[3] - joints[2]));
     return [2, 3, 1 - t, t];
   }
 
   for (let layer = 0; layer < 2; layer += 1) {
-    const sign = layer === 0 ? 1 : -1;
+    const layerSign = layer === 0 ? 1 : -1;
     for (let r = 0; r < stations.length; r += 1) {
-      const st = stations[r];
+      const station = stations[r];
       for (let c = 0; c <= chordSteps; c += 1) {
         const q = c / chordSteps;
-        const edgeRound = Math.sin(Math.PI * q);
-        const trailingNotch = q > 0.82 ? 0.018 * Math.sin((r + 1) * 1.7) : 0;
-        const x = st.cx + st.chord * (0.50 - q) - trailingNotch;
-        const y = st.s;
-        const z = st.camber * edgeRound + sign * st.thick * 0.5 * Math.pow(edgeRound, 0.65);
+        const rounded = Math.sin(Math.PI * q);
+        const x = station.cx + station.chord * (0.52 - q);
+        const y = side * station.s;
+        const z = station.camber * rounded + layerSign * station.thick * 0.5 * Math.pow(rounded, 0.70);
         positions.push(x, y, z);
-        uvs.push(q, st.s / stations.at(-1).s);
-        const [a, b, wa, wb] = weightsForSpan(st.s);
+        uvs.push(q, station.s / stations.at(-1).s);
+        const [a, b, wa, wb] = weightsForSpan(station.s);
         skinIndices.push(a, b, 0, 0);
         skinWeights.push(wa, wb, 0, 0);
       }
@@ -129,33 +171,46 @@ function makeWingGeometry(THREE) {
         const b = a + 1;
         const d = offset + (r + 1) * row + c;
         const e = d + 1;
-        if (layer === 0) indices.push(a, d, b, b, d, e);
-        else indices.push(a, b, d, b, e, d);
+        if (layer === 0) {
+          pushTriangle(indices, side, a, d, b);
+          pushTriangle(indices, side, b, d, e);
+        } else {
+          pushTriangle(indices, side, a, b, d);
+          pushTriangle(indices, side, b, e, d);
+        }
       }
     }
   }
 
-  function stitch(c) {
+  for (const chordIndex of [0, chordSteps]) {
     for (let r = 0; r < stations.length - 1; r += 1) {
-      const a = r * row + c;
-      const b = (r + 1) * row + c;
-      const d = a + layerVertexCount;
-      const e = b + layerVertexCount;
-      if (c === 0) indices.push(a, d, b, b, d, e);
-      else indices.push(a, b, d, b, e, d);
+      const a = r * row + chordIndex;
+      const b = (r + 1) * row + chordIndex;
+      const c = a + layerVertexCount;
+      const d = b + layerVertexCount;
+      if (chordIndex === 0) {
+        pushTriangle(indices, side, a, c, b);
+        pushTriangle(indices, side, b, c, d);
+      } else {
+        pushTriangle(indices, side, a, b, c);
+        pushTriangle(indices, side, b, d, c);
+      }
     }
   }
-  stitch(0);
-  stitch(chordSteps);
 
-  for (const r of [0, stations.length - 1]) {
+  for (const stationIndex of [0, stations.length - 1]) {
     for (let c = 0; c < chordSteps; c += 1) {
-      const a = r * row + c;
+      const a = stationIndex * row + c;
       const b = a + 1;
       const d = a + layerVertexCount;
       const e = b + layerVertexCount;
-      if (r === 0) indices.push(a, b, d, b, e, d);
-      else indices.push(a, d, b, b, d, e);
+      if (stationIndex === 0) {
+        pushTriangle(indices, side, a, b, d);
+        pushTriangle(indices, side, b, e, d);
+      } else {
+        pushTriangle(indices, side, a, d, b);
+        pushTriangle(indices, side, b, d, e);
+      }
     }
   }
 
@@ -170,7 +225,7 @@ function makeWingGeometry(THREE) {
   return geometry;
 }
 
-function makeFeatherBladeGeometry(THREE, length = 1, width = 0.18, thickness = 0.018, segments = 12) {
+function makeFeatherBladeGeometry(THREE, length = 1, width = 0.18, thickness = 0.018, segments = 14) {
   const positions = [];
   const uvs = [];
   const indices = [];
@@ -179,7 +234,7 @@ function makeFeatherBladeGeometry(THREE, length = 1, width = 0.18, thickness = 0
     for (let i = 0; i <= segments; i += 1) {
       const t = i / segments;
       const x = length * t;
-      const envelope = Math.pow(Math.sin(Math.PI * Math.min(0.999, t)), 0.58) * (1 - 0.16 * t);
+      const envelope = Math.pow(Math.sin(Math.PI * Math.min(0.999, t)), 0.62) * (1 - 0.18 * t);
       const w = width * envelope;
       positions.push(x, -w, z, x, w, z);
       uvs.push(t, 0, t, 1);
@@ -187,9 +242,9 @@ function makeFeatherBladeGeometry(THREE, length = 1, width = 0.18, thickness = 0
   }
   const row = (segments + 1) * 2;
   for (let layer = 0; layer < 2; layer += 1) {
-    const off = layer * row;
+    const offset = layer * row;
     for (let i = 0; i < segments; i += 1) {
-      const a = off + i * 2;
+      const a = offset + i * 2;
       const b = a + 1;
       const c = a + 2;
       const d = a + 3;
@@ -215,25 +270,86 @@ function makeFeatherBladeGeometry(THREE, length = 1, width = 0.18, thickness = 0
   return geometry;
 }
 
+function makeTailCarrierGeometry(THREE) {
+  const stations = [
+    { x: 0.00, half: 0.26, z: 0.030, thick: 0.10 },
+    { x: -0.46, half: 0.38, z: 0.025, thick: 0.075 },
+    { x: -0.92, half: 0.52, z: 0.015, thick: 0.040 },
+  ];
+  const positions = [];
+  const indices = [];
+  for (let layer = 0; layer < 2; layer += 1) {
+    const sign = layer === 0 ? 1 : -1;
+    for (const station of stations) {
+      positions.push(station.x, -station.half, station.z + sign * station.thick * 0.5);
+      positions.push(station.x, station.half, station.z + sign * station.thick * 0.5);
+    }
+  }
+  const row = stations.length * 2;
+  for (let layer = 0; layer < 2; layer += 1) {
+    const offset = layer * row;
+    for (let i = 0; i < stations.length - 1; i += 1) {
+      const a = offset + i * 2;
+      const b = a + 1;
+      const c = a + 2;
+      const d = a + 3;
+      if (layer === 0) indices.push(a, c, b, b, c, d);
+      else indices.push(a, b, c, b, d, c);
+    }
+  }
+  for (const edge of [0, 1]) {
+    for (let i = 0; i < stations.length - 1; i += 1) {
+      const a = i * 2 + edge;
+      const b = a + 2;
+      const c = a + row;
+      const d = b + row;
+      if (edge === 0) indices.push(a, c, b, b, c, d);
+      else indices.push(a, b, c, b, d, c);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function makeWebbingGeometry(THREE, root, tips) {
+  const positions = [
+    root.x, root.y, root.z,
+    tips[1].x, tips[1].y, tips[1].z,
+    tips[0].x, tips[0].y, tips[0].z,
+    tips[2].x, tips[2].y, tips[2].z,
+  ];
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex([0, 1, 2, 0, 2, 3]);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 function makeBoneBetween(THREE, a, b, radius, material) {
-  const dir = new THREE.Vector3().subVectors(b, a);
-  const length = dir.length();
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.88, length, 12, 1, false), material);
+  const direction = new THREE.Vector3().subVectors(b, a);
+  const length = direction.length();
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius, radius * 0.84, length, 14, 1, false),
+    material,
+  );
   mesh.position.copy(a).add(b).multiplyScalar(0.5);
-  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   return mesh;
 }
 
 function createWing(THREE, materials, side) {
-  const geometry = makeWingGeometry(THREE);
+  const geometry = makeWingGeometry(THREE, side);
   const mesh = new THREE.SkinnedMesh(geometry, materials.wing);
+  mesh.name = side > 0 ? 'continuous-wing.L' : 'continuous-wing.R';
   mesh.frustumCulled = false;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
-  mesh.position.set(-0.10, side * 0.42, 0.32);
-  mesh.scale.y = side;
+  mesh.position.set(-0.08, side * 0.22, 0.27);
 
   const shoulder = new THREE.Bone();
   shoulder.name = side > 0 ? 'wing.L.shoulder' : 'wing.R.shoulder';
@@ -243,9 +359,9 @@ function createWing(THREE, materials, side) {
   wrist.name = side > 0 ? 'wing.L.wrist' : 'wing.R.wrist';
   const tip = new THREE.Bone();
   tip.name = side > 0 ? 'wing.L.tip' : 'wing.R.tip';
-  elbow.position.set(-0.10, 0.96, 0.01);
-  wrist.position.set(-0.23, 0.92, -0.01);
-  tip.position.set(-0.31, 0.84, -0.01);
+  elbow.position.set(-0.10, side * 1.12, 0.01);
+  wrist.position.set(-0.28, side * 1.31, -0.01);
+  tip.position.set(-0.30, side * 1.05, -0.01);
   shoulder.add(elbow);
   elbow.add(wrist);
   wrist.add(tip);
@@ -254,72 +370,106 @@ function createWing(THREE, materials, side) {
 
   const primaryGroup = new THREE.Group();
   primaryGroup.name = side > 0 ? 'primary-feathers.L' : 'primary-feathers.R';
-  primaryGroup.position.set(-0.18, 0.30, -0.015);
+  primaryGroup.position.set(-0.13, side * 0.18, -0.020);
   wrist.add(primaryGroup);
   for (let i = 0; i < 8; i += 1) {
     const feather = new THREE.Mesh(
-      makeFeatherBladeGeometry(THREE, 0.92 + i * 0.055, 0.12 + i * 0.008, 0.014, 10),
+      makeFeatherBladeGeometry(THREE, 1.02 + i * 0.055, 0.125 + i * 0.006, 0.014, 12),
       materials.primary,
     );
-    feather.rotation.z = Math.PI * 0.50 + (i - 3.5) * 0.055;
-    feather.rotation.y = -0.04 + i * 0.009;
-    feather.position.set(-0.24 - i * 0.035, 0.22 + i * 0.035, -0.015 - i * 0.002);
+    feather.rotation.z = side * (Math.PI * 0.50 + (i - 3.5) * 0.038);
+    feather.rotation.y = -0.035 + i * 0.007;
+    feather.position.set(-0.20 - i * 0.025, side * (0.18 + i * 0.040), -0.018 - i * 0.0015);
     feather.castShadow = true;
     feather.receiveShadow = true;
     primaryGroup.add(feather);
   }
 
-  return { mesh, bones: { shoulder, elbow, wrist, tip } };
+  return { side, mesh, bones: { shoulder, elbow, wrist, tip } };
 }
 
 function addTail(THREE, root, materials) {
   const tail = new THREE.Group();
   tail.name = 'tail-feather-array';
-  tail.position.set(-1.06, 0, 0.10);
-  root.add(tail);
+  tail.position.set(-1.36, 0, 0.065);
+  const carrier = new THREE.Mesh(makeTailCarrierGeometry(THREE), materials.tail);
+  carrier.name = 'tail-continuous-carrier';
+  carrier.castShadow = true;
+  carrier.receiveShadow = true;
+  tail.add(carrier);
   for (let i = 0; i < 9; i += 1) {
     const t = (i - 4) / 4;
     const feather = new THREE.Mesh(
-      makeFeatherBladeGeometry(THREE, 1.18 - Math.abs(t) * 0.10, 0.18, 0.022, 12),
-      i === 0 || i === 8 ? materials.primary : materials.tail,
+      makeFeatherBladeGeometry(THREE, 1.04 - Math.abs(t) * 0.10, 0.19, 0.020, 12),
+      Math.abs(t) > 0.72 ? materials.primary : materials.tail,
     );
-    feather.rotation.z = Math.PI + t * 0.16;
-    feather.rotation.y = t * 0.06;
-    feather.position.set(0, t * 0.22, -0.01 + Math.abs(t) * 0.012);
+    feather.rotation.z = Math.PI - t * 0.16;
+    feather.rotation.y = t * 0.055;
+    feather.position.set(-0.22, t * 0.28, 0.015 + Math.abs(t) * 0.006);
     feather.castShadow = true;
     feather.receiveShadow = true;
     tail.add(feather);
   }
+  root.add(tail);
   return tail;
 }
 
 function addEye(THREE, root, materials, side) {
   const eye = new THREE.Group();
-  eye.position.set(0.98, side * 0.292, 0.60);
-  const iris = new THREE.Mesh(new THREE.SphereGeometry(0.073, 24, 16), materials.eye);
-  iris.scale.set(1.0, 0.72, 1.0);
+  eye.name = side > 0 ? 'eye.L' : 'eye.R';
+  eye.position.set(1.20, side * 0.252, 0.635);
+  const iris = new THREE.Mesh(new THREE.SphereGeometry(0.054, 28, 18), materials.iris);
+  iris.scale.set(1.0, 0.46, 1.0);
+  const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.027, 24, 16), materials.pupil);
+  pupil.position.y = side * 0.031;
+  pupil.scale.set(1.0, 0.38, 1.0);
+  const cornea = new THREE.Mesh(new THREE.SphereGeometry(0.059, 28, 18), materials.cornea);
+  cornea.scale.set(1.0, 0.43, 1.0);
   iris.castShadow = true;
-  const cornea = new THREE.Mesh(new THREE.SphereGeometry(0.078, 24, 16), materials.cornea);
-  cornea.scale.set(1.0, 0.70, 1.0);
-  eye.add(iris, cornea);
+  eye.add(iris, pupil, cornea);
   root.add(eye);
+}
+
+function addBeakDetails(THREE, root, materials) {
+  for (const side of [-1, 1]) {
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(1.43, side * 0.155, 0.535),
+      new THREE.Vector3(1.64, side * 0.112, 0.505),
+      new THREE.Vector3(1.84, side * 0.064, 0.475),
+    ]);
+    const seam = new THREE.Mesh(new THREE.TubeGeometry(curve, 20, 0.007, 6, false), materials.mouth);
+    seam.castShadow = true;
+    root.add(seam);
+    const nostril = new THREE.Mesh(new THREE.SphereGeometry(0.017, 16, 10), materials.mouth);
+    nostril.position.set(1.57, side * 0.122, 0.555);
+    nostril.scale.y = 0.55;
+    root.add(nostril);
+  }
 }
 
 function addLegs(THREE, root, materials) {
   const feet = [];
   for (const side of [-1, 1]) {
-    const hip = new THREE.Vector3(-0.24, side * 0.23, -0.34);
-    const ankle = new THREE.Vector3(-0.32, side * 0.25, -0.88);
-    root.add(makeBoneBetween(THREE, hip, ankle, 0.055, materials.leg));
-    const footRoot = new THREE.Vector3(-0.25, side * 0.25, -0.90);
+    const hip = new THREE.Vector3(-0.18, side * 0.245, -0.30);
+    const knee = new THREE.Vector3(-0.30, side * 0.255, -0.58);
+    const ankle = new THREE.Vector3(-0.10, side * 0.255, -0.88);
+    root.add(makeBoneBetween(THREE, hip, knee, 0.052, materials.leg));
+    root.add(makeBoneBetween(THREE, knee, ankle, 0.042, materials.leg));
+    const footRoot = new THREE.Vector3(-0.06, side * 0.255, -0.91);
     const toeEnds = [
-      new THREE.Vector3(0.16, side * 0.25, -0.93),
-      new THREE.Vector3(0.09, side * 0.39, -0.93),
-      new THREE.Vector3(0.06, side * 0.11, -0.93),
-      new THREE.Vector3(-0.55, side * 0.25, -0.92),
+      new THREE.Vector3(0.42, side * 0.255, -0.925),
+      new THREE.Vector3(0.31, side * 0.405, -0.925),
+      new THREE.Vector3(0.31, side * 0.105, -0.925),
+      new THREE.Vector3(-0.38, side * 0.255, -0.915),
     ];
-    for (const end of toeEnds) root.add(makeBoneBetween(THREE, footRoot, end, 0.018, materials.leg));
-    feet.push({ hip, ankle, toeEnds });
+    for (let i = 0; i < toeEnds.length; i += 1) {
+      root.add(makeBoneBetween(THREE, footRoot, toeEnds[i], i === 3 ? 0.013 : 0.017, materials.leg));
+    }
+    const webbing = new THREE.Mesh(makeWebbingGeometry(THREE, footRoot, toeEnds), materials.webbing);
+    webbing.castShadow = true;
+    webbing.receiveShadow = true;
+    root.add(webbing);
+    feet.push({ hip, knee, ankle, toeEnds });
   }
   return feet;
 }
@@ -329,32 +479,42 @@ export function createOriginalGullR017(THREE, options = {}) {
   root.name = GULL_R017_ID;
 
   const materials = {
-    body: new THREE.MeshPhysicalMaterial({ color: 0xe8ecec, roughness: 0.78, metalness: 0, clearcoat: 0.02 }),
-    beak: new THREE.MeshPhysicalMaterial({ color: 0xd4b56c, roughness: 0.62, metalness: 0 }),
-    wing: new THREE.MeshPhysicalMaterial({ color: 0xb7bec1, roughness: 0.72, metalness: 0, side: THREE.DoubleSide }),
-    primary: new THREE.MeshPhysicalMaterial({ color: 0x596066, roughness: 0.75, metalness: 0, side: THREE.DoubleSide }),
-    tail: new THREE.MeshPhysicalMaterial({ color: 0xd8ddde, roughness: 0.78, metalness: 0, side: THREE.DoubleSide }),
-    eye: new THREE.MeshPhysicalMaterial({ color: 0x101318, roughness: 0.23, metalness: 0 }),
-    cornea: new THREE.MeshPhysicalMaterial({ color: 0x263746, roughness: 0.05, metalness: 0, transparent: true, opacity: 0.33, transmission: 0.15 }),
-    leg: new THREE.MeshPhysicalMaterial({ color: 0xb68d5b, roughness: 0.76, metalness: 0 }),
+    body: new THREE.MeshPhysicalMaterial({ color: 0xf1f2ef, roughness: 0.76, metalness: 0, clearcoat: 0.015 }),
+    beak: new THREE.MeshPhysicalMaterial({ color: 0xd8ad48, roughness: 0.58, metalness: 0 }),
+    mouth: new THREE.MeshPhysicalMaterial({ color: 0x5b362a, roughness: 0.70, metalness: 0 }),
+    wing: new THREE.MeshPhysicalMaterial({ color: 0xaeb7bb, roughness: 0.74, metalness: 0, side: THREE.DoubleSide }),
+    primary: new THREE.MeshPhysicalMaterial({ color: 0x687178, roughness: 0.76, metalness: 0, side: THREE.DoubleSide }),
+    tail: new THREE.MeshPhysicalMaterial({ color: 0xdde1e1, roughness: 0.80, metalness: 0, side: THREE.DoubleSide }),
+    iris: new THREE.MeshPhysicalMaterial({ color: 0xc9a349, roughness: 0.34, metalness: 0 }),
+    pupil: new THREE.MeshPhysicalMaterial({ color: 0x090b0d, roughness: 0.18, metalness: 0 }),
+    cornea: new THREE.MeshPhysicalMaterial({ color: 0x263746, roughness: 0.04, metalness: 0, transparent: true, opacity: 0.28, transmission: 0.12 }),
+    leg: new THREE.MeshPhysicalMaterial({ color: 0xb59659, roughness: 0.74, metalness: 0 }),
+    webbing: new THREE.MeshPhysicalMaterial({ color: 0xc4a565, roughness: 0.78, metalness: 0, side: THREE.DoubleSide }),
   };
 
-  const rings = [
-    { x: -1.34, ry: 0.07, rz: 0.055, cz: 0.08, material: 0 },
-    { x: -1.18, ry: 0.28, rz: 0.23, cz: 0.07, material: 0 },
-    { x: -0.90, ry: 0.49, rz: 0.39, cz: 0.05, keel: 0.08, material: 0 },
-    { x: -0.54, ry: 0.61, rz: 0.54, cz: 0.10, keel: 0.11, material: 0 },
-    { x: -0.13, ry: 0.64, rz: 0.61, cz: 0.17, keel: 0.13, material: 0 },
-    { x: 0.22, ry: 0.55, rz: 0.56, cz: 0.27, keel: 0.09, material: 0 },
-    { x: 0.50, ry: 0.41, rz: 0.44, cz: 0.39, material: 0 },
-    { x: 0.72, ry: 0.34, rz: 0.36, cz: 0.50, material: 0 },
-    { x: 0.94, ry: 0.32, rz: 0.31, cz: 0.55, material: 0 },
-    { x: 1.11, ry: 0.25, rz: 0.22, cz: 0.53, material: 0 },
-    { x: 1.20, ry: 0.20, rz: 0.16, cz: 0.50, material: 1 },
-    { x: 1.46, ry: 0.125, rz: 0.085, cz: 0.49, material: 1 },
-    { x: 1.68, ry: 0.012, rz: 0.010, cz: 0.48, material: 1 },
+  const controlRings = [
+    { x: -1.54, ry: 0.075, rz: 0.055, cz: 0.055 },
+    { x: -1.34, ry: 0.30, rz: 0.24, cz: 0.050 },
+    { x: -1.05, ry: 0.43, rz: 0.37, cz: 0.060, keel: 0.025 },
+    { x: -0.69, ry: 0.50, rz: 0.47, cz: 0.095, keel: 0.050 },
+    { x: -0.27, ry: 0.52, rz: 0.52, cz: 0.145, keel: 0.070 },
+    { x: 0.10, ry: 0.48, rz: 0.49, cz: 0.205, keel: 0.045 },
+    { x: 0.39, ry: 0.39, rz: 0.41, cz: 0.305 },
+    { x: 0.64, ry: 0.29, rz: 0.32, cz: 0.420 },
+    { x: 0.87, ry: 0.225, rz: 0.255, cz: 0.525 },
+    { x: 1.08, ry: 0.245, rz: 0.275, cz: 0.585 },
+    { x: 1.27, ry: 0.255, rz: 0.265, cz: 0.590 },
+    { x: 1.43, ry: 0.195, rz: 0.180, cz: 0.555 },
+    { x: 1.65, ry: 0.135, rz: 0.115, cz: 0.525 },
+    { x: 1.85, ry: 0.075, rz: 0.060, cz: 0.485 },
+    { x: 2.02, ry: 0.010, rz: 0.010, cz: 0.455 },
   ];
-  const bodyGeometry = makeLoftGeometry(THREE, rings, options.bodyRadialSegments ?? 44);
+  const bodyGeometry = makeLoftGeometry(
+    THREE,
+    controlRings,
+    options.bodyRadialSegments ?? 52,
+    options.bodyLongitudinalSubdivisions ?? 5,
+  );
   const body = new THREE.Mesh(bodyGeometry, [materials.body, materials.beak]);
   body.name = 'continuous-body-head-beak-carrier';
   body.castShadow = true;
@@ -363,34 +523,37 @@ export function createOriginalGullR017(THREE, options = {}) {
 
   addEye(THREE, root, materials, -1);
   addEye(THREE, root, materials, 1);
-  const left = createWing(THREE, materials, 1);
-  const right = createWing(THREE, materials, -1);
-  root.add(left.mesh, right.mesh);
+  addBeakDetails(THREE, root, materials);
+  const leftWing = createWing(THREE, materials, 1);
+  const rightWing = createWing(THREE, materials, -1);
+  root.add(leftWing.mesh, rightWing.mesh);
   const tail = addTail(THREE, root, materials);
-  addLegs(THREE, root, materials);
+  const feet = addLegs(THREE, root, materials);
 
   const state = {
     animate: false,
     phase: 0,
-    flapRate: 1.15,
-    flapAmplitude: 0.58,
+    flapRate: 1.05,
+    flapAmplitude: 0.52,
   };
 
   function poseAtPhase(phase) {
     const wave = Math.sin(phase * Math.PI * 2);
-    const compression = 0.5 + 0.5 * Math.sin(phase * Math.PI * 2 + 0.75);
-    const shoulder = 0.07 + wave * state.flapAmplitude;
-    const elbow = -0.08 - compression * 0.21;
-    const wrist = -0.05 - compression * 0.31;
-    for (const wing of [left, right]) {
-      wing.bones.shoulder.rotation.x = shoulder;
-      wing.bones.elbow.rotation.z = elbow;
-      wing.bones.wrist.rotation.z = wrist;
-      wing.bones.tip.rotation.z = -0.03 - compression * 0.08;
+    const compression = 0.5 + 0.5 * Math.sin(phase * Math.PI * 2 + 0.72);
+    const shoulderAngle = 0.065 + wave * state.flapAmplitude;
+    const elbowAngle = -0.045 - compression * 0.19;
+    const wristAngle = -0.035 - compression * 0.28;
+    const tipAngle = -0.018 - compression * 0.055;
+    for (const wing of [leftWing, rightWing]) {
+      const mirror = wing.side;
+      wing.bones.shoulder.rotation.x = mirror * shoulderAngle;
+      wing.bones.elbow.rotation.z = mirror * elbowAngle;
+      wing.bones.wrist.rotation.z = mirror * wristAngle;
+      wing.bones.tip.rotation.z = mirror * tipAngle;
     }
-    root.rotation.y = -0.02 * wave;
-    root.position.z = 0.018 * Math.sin(phase * Math.PI * 4);
-    tail.rotation.z = 0.012 * wave;
+    root.rotation.y = -0.014 * wave;
+    root.position.z = 0.012 * Math.sin(phase * Math.PI * 4);
+    tail.rotation.y = -0.010 * wave;
   }
 
   poseAtPhase(0.02);
@@ -400,9 +563,10 @@ export function createOriginalGullR017(THREE, options = {}) {
     materials,
     anatomy: {
       body,
-      leftWing: left,
-      rightWing: right,
+      leftWing,
+      rightWing,
       tail,
+      feet,
     },
     state,
     setAnimate(enabled) {
@@ -432,11 +596,14 @@ export function createOriginalGullR017(THREE, options = {}) {
       });
       return {
         id: GULL_R017_ID,
+        revision: 'R0.17.1',
         vertices: Math.round(vertices),
         triangles: Math.round(triangles),
         bodyCarrierContinuous: true,
         leftWingContinuousSkinnedSurface: true,
         rightWingContinuousSkinnedSurface: true,
+        mirroredWingNormalsCorrected: true,
+        webbedFeetPresent: true,
         basicFlapDeformationAvailable: true,
         advancedFlightAvailable: false,
       };
