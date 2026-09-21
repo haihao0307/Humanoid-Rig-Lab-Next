@@ -79,3 +79,16 @@ Production Mother 是执行车间，不是项目总设计者。小妈/Coordinato
 已有明确 Task Anchor 时禁止重新写 master plan、重新选题或等待用户反复说“继续”。首轮必须实际执行 first command / source diff / numeric probe，或者给出精确 BLOCKED_VALID。一个 Mother 一次只解决一个 primary defect；做完后按 nextTaskPointer 接下一个零件，不能自己发明下一任务。
 
 跨 Mother 完整规范：`haihao0307/guilin-dem-pipeline@8c8635a512d6d136c202e96187f8b31d93325bd9:knowledge/MOTHER_FACTORY_EXECUTION_MODE_R3_ZH.md`。R2 的 LOCK→EXECUTE→VERIFY→PROMOTE、参考复刻、freshness、verifier、单体 HTML 等门禁全部保留；R3 只进一步锁死“Production Mother 主要职责是 EXECUTE，不是重新 THINK”。
+
+
+## Archetype Factory System R1（2026-09-21）
+
+高物种/高变体领域默认采用母型工厂，而不是逐个对象从零研究：
+`Research/Xiaoma → Archetype Identity Card → 独立 Production Slots → Stage A/B/C/D → 同一 Workbench 比较 → Variant → Game Assembly`。
+
+Production Mother 不承担广泛研究和重新分类；一个 slot 一次只做一个 stage。SPECIMEN_LOCAL blocker 只允许卡当前 slot，不能停整个 Domain。缺候选用 `NO_CANDIDATE` / UNKNOWN，禁止 generic/toy/placeholder 补位。
+
+每个母型必须有 TARGET_ARCHETYPE、CONFUSION_SET、Identity source/image 和 CURRENT_LARGEST_DEVIATION。最终目标是 Game/运行时，不是孤立模型展示。
+
+完整规范：`haihao0307/guilin-dem-pipeline@7bab432f4c4501154bd629786a7489adb81ccd6d:knowledge/ARCHETYPE_FACTORY_SYSTEM_R1_ZH.md`。
+队列参考：`haihao0307/guilin-dem-pipeline@ecbad468734061a178208d7f37e6cbea9b0b977c:knowledge/BIO_ENV_ARCHETYPE_ROADMAP_R1_ZH.md`。
