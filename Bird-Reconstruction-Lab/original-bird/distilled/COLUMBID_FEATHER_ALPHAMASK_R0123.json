@@ -1,0 +1,55 @@
+{
+  "schema": "bird/columbid-feather-alphamask@0.0.12.3",
+  "date": "2026-09-21",
+  "status": "ACTIVE_RUNTIME_CORRECTION_NOT_FINAL_COMMERCIAL_TEXTURE",
+  "source": {
+    "assetId": "BIRD-REF-002",
+    "viewerUid": "821135a09d3f48909b977a416d99c93b"
+  },
+  "rootCause": {
+    "observed": "The calibrated viewer showed Opacity ON but the feather backing remained visible.",
+    "primary": "Sketchfab masking is a dedicated AlphaMask material channel; Opacity is not the correct cutout channel for feather-card voids.",
+    "secondary": "Earlier diagnostic textures could encode coverage only in PNG alpha while leaving RGB white, which is unsafe when a channel samples grayscale RGB."
+  },
+  "requiredChannelOrder": [
+    "reuse and enable an existing material.channels.AlphaMask texture when present",
+    "otherwise derive a UV-aligned grayscale mask from the selected material source atlas",
+    "register the derived image with addTexture",
+    "write the texture UID to material.channels.AlphaMask.texture",
+    "leave the Opacity channel unchanged unless a separate blending test is explicitly required"
+  ],
+  "maskEncoding": {
+    "channels": "R=G=B=A=coverage",
+    "void": 0,
+    "vaneCore": 1,
+    "barbFringe": "narrow partial coverage",
+    "rachis": 1
+  },
+  "automaticVerification": {
+    "sameCameraBeforeAfter": true,
+    "changedPixelRatioMinimum": 0.01,
+    "requiredBackgrounds": ["bright_gray", "sky_blue", "warm_gray"],
+    "requiredViews": ["wing_top", "wing_underside", "wing_tip", "trailing_edge", "three_quarter"],
+    "requiredNormalizedPhases": [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875]
+  },
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alphamask-r0123.html",
+  "boundaries": {
+    "sourceModelModified": false,
+    "runtimeCalibrationOnly": true,
+    "sourceLicenseBecomesCommercialSafe": false,
+    "independentCommercialAtlasAuthored": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "openGates": {
+    "liveMaterialChannelInventoryCaptured": false,
+    "dedicatedAlphaMaskApplied": false,
+    "visibleDifferenceVerified": false,
+    "markedGrayBackingRemoved": false,
+    "threeBackgroundHaloTestPassed": false,
+    "eightPhaseStabilityPassed": false,
+    "independentCommercialAtlasAuthored": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
