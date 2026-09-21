@@ -20,6 +20,8 @@ jobs:
   chromium-visual-qa:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      BIRD_QA_URL: https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${{ github.event.pull_request.head.sha || github.sha }}/Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alpha-r0122.html
     steps:
       - uses: actions/checkout@v4
 
@@ -32,17 +34,10 @@ jobs:
           npm install --no-save @playwright/test@1.55.0
           npx playwright install --with-deps chromium
 
-      - name: Start local workbench server
+      - name: Record QA origin
         run: |
           mkdir -p artifacts/bird-r0122-browser-qa
-          python3 -m http.server 4173 --bind 127.0.0.1 > artifacts/bird-r0122-browser-qa/http-server.log 2>&1 &
-          echo $! > artifacts/bird-r0122-browser-qa/http-server.pid
-          for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
-            sleep 1
-          done
-          echo 'Local server failed to start'
-          exit 1
+          printf '%s\n' "$BIRD_QA_URL" > artifacts/bird-r0122-browser-qa/qa-url.txt
 
       - name: Run R0.12.2 headed Chrome visual QA
         run: |
