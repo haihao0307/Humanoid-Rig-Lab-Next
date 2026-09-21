@@ -1,0 +1,208 @@
+{
+  "schema": "bird/larid-dual-source-flight-learning@0.0.16.4",
+  "revision": "Original-Bird-R0.16.4",
+  "date": "2026-09-21",
+  "status": "ACTIVE_SOURCE_LEARNING_NOT_PRODUCTION_MOTION",
+  "roleSeparation": {
+    "morphologyAndDetailAuthority": {
+      "assetId": "BIRD-REF-005",
+      "file": "seagull2(2).glb",
+      "viewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
+      "sha256": "4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7",
+      "geometrySha256": "d9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2",
+      "allowedLearning": [
+        "body silhouette and mass distribution",
+        "head, eye, beak and neck transitions",
+        "wing root, wing surface, wing tip and tail visible structure",
+        "material-region boundaries",
+        "visible deformation limits"
+      ],
+      "forbiddenUse": [
+        "motion authority when a stronger motion source exists",
+        "commercial runtime mesh or texture dependency",
+        "automatic anatomical truth from generic Bone names"
+      ]
+    },
+    "animationAndFlightAuthority": {
+      "assetId": "BIRD-REF-004",
+      "file": "seagull(2).glb",
+      "viewerUid": "dc42ffc81c86480e9e7f7752fa134174",
+      "sha256": "5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af",
+      "geometrySha256": "d6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac",
+      "allowedLearning": [
+        "coarse bilateral wing-chain timing",
+        "normalized flap phase",
+        "flap-to-glide transition candidate",
+        "body, neck and tail phase coupling where readable"
+      ],
+      "forbiddenUse": [
+        "eye, head, beak or feather-detail authority",
+        "final surface or material authority",
+        "ground-contact motion because no hindlimb skin joints are present"
+      ]
+    }
+  },
+  "flightLearningStates": [
+    {
+      "id": "powered_flap_cruise",
+      "requiredChannels": ["shoulder sweep", "elbow flexion", "wrist flexion", "body pitch", "tail response"],
+      "currentEvidence": ["BIRD-REF-004 normalized animation phases"],
+      "status": "SOURCE_CANDIDATE"
+    },
+    {
+      "id": "flap_glide_transition",
+      "requiredChannels": ["wingbeat cessation", "wing extension", "body trim", "tail fan"],
+      "currentEvidence": ["BIRD-REF-004 animation", "gull field-flight literature"],
+      "status": "SOURCE_CANDIDATE"
+    },
+    {
+      "id": "glide_and_soar",
+      "requiredChannels": ["elbow angle", "wrist angle", "shoulder sweep", "dihedral", "body pitch", "bank", "tail trim"],
+      "currentEvidence": ["gull wing-morphing literature"],
+      "status": "LITERATURE_SUPPORTED_PENDING_MODEL_MAPPING"
+    },
+    {
+      "id": "bank_and_turn",
+      "requiredChannels": ["body bank", "left-right wing asymmetry", "tail yaw-roll support", "head stabilization"],
+      "currentEvidence": [],
+      "status": "NEEDS_REFERENCE"
+    },
+    {
+      "id": "climb_and_descent",
+      "requiredChannels": ["stroke amplitude", "stroke plane", "body pitch", "wing extension", "tail trim"],
+      "currentEvidence": [],
+      "status": "NEEDS_REFERENCE"
+    },
+    {
+      "id": "takeoff",
+      "requiredChannels": ["leg impulse", "first downstroke", "body pitch", "tail spread"],
+      "currentEvidence": [],
+      "status": "BLOCKED_BY_MISSING_HINDLIMB_REFERENCE"
+    },
+    {
+      "id": "approach_and_landing",
+      "requiredChannels": ["wing braking", "body pitch", "tail fan", "leg deployment", "foot contact"],
+      "currentEvidence": [],
+      "status": "BLOCKED_BY_MISSING_HINDLIMB_REFERENCE"
+    },
+    {
+      "id": "wind_hold_and_gust_response",
+      "requiredChannels": ["elbow fold", "wrist fold", "shoulder sweep", "dihedral", "tail correction", "head stabilization"],
+      "currentEvidence": ["gull wing-morphing literature"],
+      "status": "LITERATURE_SUPPORTED_PENDING_REFERENCE_VIDEO"
+    }
+  ],
+  "scientificEvidence": [
+    {
+      "id": "van_loon_2006_gull_flight_strategy",
+      "url": "https://doi.org/10.1242/jeb.02385",
+      "sourceType": "peer-reviewed primary research",
+      "supportedClaims": [
+        "gulls switch among flapping, soaring and gliding strategies",
+        "soaring use increases with wind and differs by gull species and flight conditions",
+        "a production motion system must support mixed flap-glide behavior instead of one looping flap"
+      ]
+    },
+    {
+      "id": "harvey_baliga_2019_static_stability",
+      "url": "https://doi.org/10.1098/rsif.2018.0641",
+      "sourceType": "peer-reviewed primary research",
+      "supportedClaims": [
+        "gulls alter elbow angle during gliding",
+        "elbow flexion changes spanwise camber and pitch stability",
+        "wind and gust conditions affect gliding wing posture"
+      ]
+    },
+    {
+      "id": "harvey_inman_2022_dynamic_stability",
+      "url": "https://doi.org/10.1073/pnas.2204847119",
+      "sourceType": "peer-reviewed primary research",
+      "supportedClaims": [
+        "shoulder, elbow and wrist morphing jointly control trim, stability and gust response",
+        "higher flight speed can be associated with wrist or elbow folding and altered shoulder sweep",
+        "gliding motion cannot be represented by a rigid wing pose"
+      ]
+    },
+    {
+      "id": "harvey_2021_joint_driven_morphing",
+      "url": "https://doi.org/10.1098/rsif.2021.0132",
+      "sourceType": "peer-reviewed primary research",
+      "supportedClaims": [
+        "coordinated elbow and wrist trajectories can produce distinct flight-control effects",
+        "joint coupling must be preserved as a motion relationship rather than independent sliders"
+      ]
+    },
+    {
+      "id": "orographic_lift_gulls_2019",
+      "url": "https://doi.org/10.1038/s41598-019-46017-3",
+      "sourceType": "peer-reviewed primary research",
+      "supportedClaims": [
+        "gulls alter routes and soaring use in response to available atmospheric lift",
+        "flight behavior needs environmental inputs such as wind and lift opportunity"
+      ]
+    },
+    {
+      "id": "optic_flow_gulls_2019",
+      "url": "https://doi.org/10.1038/s41598-019-52632-z",
+      "sourceType": "peer-reviewed primary research",
+      "supportedClaims": [
+        "freely flying gulls can use ventral optic flow as one cue for altitude control over sea",
+        "altitude-control behavior should be separated from the wingbeat loop"
+      ]
+    }
+  ],
+  "motionFeatureRecord": {
+    "perPhase": [
+      "source timestamp",
+      "normalized phase",
+      "node local matrix",
+      "translation delta from phase zero",
+      "orientation delta from phase zero",
+      "left-right symmetry error",
+      "manual canonical role where verified"
+    ],
+    "perClip": [
+      "source identity and license",
+      "behavior label",
+      "wingbeat count",
+      "flap and glide intervals",
+      "body pitch and bank envelope",
+      "tail participation",
+      "head stabilization evidence",
+      "environment context",
+      "confidence and unresolved fields"
+    ]
+  },
+  "futureReferencePolicy": {
+    "acceptedSourceTypes": ["GLB", "FBX", "video", "image_sequence", "paper", "field_observation"],
+    "requiredIdentity": ["source name", "origin", "license or use boundary", "species confidence", "date", "behavior", "camera or capture notes"],
+    "requiredMotionEvidence": ["stable timestamps or normalized phases", "fixed view when possible", "visible body and wing state", "behavior label", "environment context"],
+    "ingestRule": "new references become traceable learning candidates and never silently replace the current form or motion authorities",
+    "retargetRule": "motion is transferred through canonical semantic roles and normalized phase curves, not by copying source skeleton hierarchy or animation timing"
+  },
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-flight-learning-r0164.html",
+  "exportSchema": "kaopu/bird-flight-learning@1.0",
+  "strictBoundaries": {
+    "primaryShapeOverwrittenByMotionSource": false,
+    "secondaryLowDetailSurfacePromoted": false,
+    "externalMotionCopiedWithoutProvenance": false,
+    "sourceAnimationTimingClaimedAsBiologicalTiming": false,
+    "generatedProductionMotion": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "openGates": {
+    "primaryMorphologyDatasetComplete": false,
+    "secondaryMotionEightPhasesCaptured": false,
+    "secondaryWingNodeRolesVerified": false,
+    "flapGlideIntervalsVerified": false,
+    "bankTurnReferenceAdded": false,
+    "takeoffReferenceAdded": false,
+    "landingReferenceAdded": false,
+    "windResponseReferenceAdded": false,
+    "canonicalFlightMotionLibraryComplete": false,
+    "productionMotionGenerated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
