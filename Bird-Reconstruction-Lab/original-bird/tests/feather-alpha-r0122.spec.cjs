@@ -23,8 +23,40 @@ async function readRuntime(page) {
   }));
 }
 
+async function persistEvidence(page, consoleEvents, name, extra = {}) {
+  fs.mkdirSync(ARTIFACT_DIR, { recursive: true });
+  const runtime = await readRuntime(page);
+  await page.screenshot({
+    path: path.join(ARTIFACT_DIR, `${name}.png`),
+    fullPage: true,
+  });
+  fs.writeFileSync(
+    path.join(ARTIFACT_DIR, `${name}.json`),
+    JSON.stringify({
+      capturedAt: new Date().toISOString(),
+      runtime,
+      consoleEvents,
+      ...extra,
+    }, null, 2),
+  );
+  return runtime;
+}
+
 test.describe.configure({ mode: 'serial' });
-test.use({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+test.use({
+  viewport: { width: 1920, height: 1080 },
+  deviceScaleFactor: 1,
+  channel: 'chrome',
+  headless: false,
+  userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36',
+  launchOptions: {
+    args: [
+      '--disable-blink-features=AutomationControlled',
+      '--use-gl=swiftshader',
+      '--enable-webgl',
+    ],
+  },
+});
 
 test('R0.12.2 loads both viewers, extracts source-atlas alpha, and creates a visible difference', async ({ page }) => {
   test.setTimeout(240_000);
@@ -37,15 +69,29 @@ test('R0.12.2 loads both viewers, extracts source-atlas alpha, and creates a vis
   page.on('pageerror', (error) => {
     consoleEvents.push({ type: 'pageerror', text: error.message });
   });
+  page.on('requestfailed', (request) => {
+    consoleEvents.push({
+      type: 'requestfailed',
+      text: `${request.url()} :: ${request.failure()?.errorText || 'UNKNOWN'}`,
+    });
+  });
 
   await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await expect(page.locator('header')).toContainText('Original Bird R0.12.2');
 
   await page.waitForFunction(
-    () => document.querySelector('#readyState')?.textContent?.includes('2/2'),
+    () => {
+      const ready = document.querySelector('#readyState')?.textContent || '';
+      const status = document.querySelector('#status')?.textContent || '';
+      return ready.includes('2/2') || /Viewer 启动失败|viewer init failed/i.test(status);
+    },
     null,
-    { timeout: 150_000 },
+    { timeout: 120_000 },
   );
+
+  const startup = await persistEvidence(page, consoleEvents, 'r0122-startup');
+  expect(startup.status).not.toMatch(/Viewer 启动失败|viewer init failed/i);
+  expect(startup.readyState).toContain('2/2');
 
   await page.waitForFunction(
     () => {
@@ -54,15 +100,11 @@ test('R0.12.2 loads both viewers, extracts source-atlas alpha, and creates a vis
       return /%/.test(diff) || /失败|failed/i.test(status);
     },
     null,
-    { timeout: 150_000 },
+    { timeout: 120_000 },
   );
 
   await page.waitForTimeout(2_500);
-  const initial = await readRuntime(page);
-  await page.screenshot({
-    path: path.join(ARTIFACT_DIR, 'r0122-initial-full.png'),
-    fullPage: true,
-  });
+  const initial = await persistEvidence(page, consoleEvents, 'r0122-initial-full');
 
   await page.locator('[data-bg="sky"]').click();
   await page.locator('[data-view="wingtip"]').click();
@@ -98,7 +140,6 @@ test('R0.12.2 loads both viewers, extracts source-atlas alpha, and creates a vis
     JSON.stringify(report, null, 2),
   );
 
-  expect(finalRuntime.readyState).toContain('2/2');
   expect(finalRuntime.applyState).not.toBe('pending');
   expect(finalRuntime.status).not.toMatch(/Viewer 启动失败|差异检测失败/i);
   expect(report.parsed.sourceAtlasPathUsed).toBe(true);
