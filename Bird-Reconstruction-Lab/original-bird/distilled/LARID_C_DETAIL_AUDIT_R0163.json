@@ -1,0 +1,97 @@
+{
+  "schema": "bird/larid-source-detail-audit@0.0.16.3",
+  "revision": "Original-Bird-R0.16.3",
+  "date": "2026-09-21",
+  "status": "ACTIVE_SOURCE_AUDIT_NOT_PRODUCTION_ASSET",
+  "primarySource": {
+    "assetId": "BIRD-REF-005",
+    "file": "seagull2(2).glb",
+    "viewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
+    "sha256": "4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7",
+    "geometrySha256": "d9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2",
+    "bytes": 1767532,
+    "vertices": 4416,
+    "triangles": 5624,
+    "joints": 21,
+    "role": "current higher-detail visible source"
+  },
+  "secondarySource": {
+    "assetId": "BIRD-REF-004",
+    "file": "seagull(2).glb",
+    "viewerUid": "dc42ffc81c86480e9e7f7752fa134174",
+    "sha256": "5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af",
+    "geometrySha256": "d6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac",
+    "bytes": 519256,
+    "vertices": 3291,
+    "triangles": 4352,
+    "joints": 15,
+    "role": "low-detail comparison and coarse wing-motion reference only"
+  },
+  "auditTargets": [
+    {
+      "id": "eye_construction",
+      "requiredEvidence": [
+        "slow-pick result on the visible eye",
+        "slow-pick result on adjacent head surface",
+        "material identity comparison",
+        "instanceID comparison",
+        "close-view screenshots"
+      ],
+      "allowedResults": [
+        "SEPARATE_GEOMETRY_CANDIDATE",
+        "SAME_SURFACE_OR_TEXTURE_CANDIDATE",
+        "UNRESOLVED"
+      ],
+      "currentResult": "UNRESOLVED"
+    },
+    {
+      "id": "beak_boundary",
+      "requiredEvidence": ["node names", "material identity", "pick evidence", "side and three-quarter views"],
+      "currentResult": "UNRESOLVED"
+    },
+    {
+      "id": "wing_root_and_tip",
+      "requiredEvidence": ["eight normalized phases", "source matrices", "top and underside views", "primary-secondary comparison"],
+      "currentResult": "UNRESOLVED"
+    },
+    {
+      "id": "tail_and_hindlimb",
+      "requiredEvidence": ["fixed views", "node and matrix audit", "missing-data record"],
+      "currentResult": "UNRESOLVED"
+    }
+  ],
+  "runtimeRequirements": [
+    "display BIRD-REF-005 as the default large viewer",
+    "retain BIRD-REF-004 only as an explicit comparison viewer",
+    "capture nodes, materials, textures, animations and eight normalized phase matrices from both sources",
+    "support slow geometry pick on the primary source",
+    "record eye and adjacent-head picks without guessing",
+    "export kaopu/source-bird-detail-audit@1.0",
+    "never generate replacement geometry"
+  ],
+  "strictBoundaries": {
+    "generatedReplacementGeometry": false,
+    "inventedEyeGeometry": false,
+    "inventedBeakBoundary": false,
+    "genericBoneAutomaticPromotion": false,
+    "exactSpeciesClaim": false,
+    "naturalScaleClaim": false,
+    "sourceMeshesAllowedAsCommercialRuntime": false
+  },
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-detail-audit-r0163.html",
+  "openGates": {
+    "primaryViewerReady": false,
+    "secondaryViewerReady": false,
+    "primaryEightPhasesCaptured": false,
+    "secondaryEightPhasesCaptured": false,
+    "eyePickCaptured": false,
+    "adjacentHeadPickCaptured": false,
+    "eyeConstructionClassified": false,
+    "beakBoundaryAudited": false,
+    "wingRootAndTipAudited": false,
+    "tailAndHindlimbAudited": false,
+    "sourceDetailAuditComplete": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
