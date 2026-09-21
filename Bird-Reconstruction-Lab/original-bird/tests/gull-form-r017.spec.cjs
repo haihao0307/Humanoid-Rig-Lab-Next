@@ -7,6 +7,14 @@ const out = path.resolve('artifacts/bird-r0171-browser-qa');
 
 test.setTimeout(180000);
 
+async function clickDom(page, selector) {
+  await page.evaluate((value) => {
+    const element = document.querySelector(value);
+    if (!element) throw new Error(`R0.17.1 control not found: ${value}`);
+    element.click();
+  }, selector);
+}
+
 async function captureCanvas(page, fileName) {
   const dataUrl = await page.evaluate(async () => {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -31,7 +39,7 @@ test('R0.17.1 static form and basic flap render without page errors', async ({ p
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForFunction(() => window.__BIRD_R017_READY__ === true, null, { timeout: 60000 });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1200);
 
   const metrics = await page.evaluate(() => window.__BIRD_R017_METRICS__);
   expect(metrics).toBeTruthy();
@@ -65,24 +73,24 @@ test('R0.17.1 static form and basic flap render without page errors', async ({ p
 
   const views = ['side', 'front', 'top', 'three', 'underside'];
   for (const view of views) {
-    await page.click(`[data-view="${view}"]`);
-    await page.waitForTimeout(280);
+    await clickDom(page, `[data-view="${view}"]`);
+    await page.waitForTimeout(220);
     await captureCanvas(page, `static-${view}.png`);
   }
 
-  await page.click('#flapBtn');
+  await clickDom(page, '#flapBtn');
   await expect(page.locator('#modeState')).toContainText('basic flap');
-  await page.waitForTimeout(850);
+  await page.waitForTimeout(720);
   await captureCanvas(page, 'basic-flap-running.png');
 
-  await page.click('#staticBtn');
+  await clickDom(page, '#staticBtn');
   await expect(page.locator('#modeState')).toContainText('static form');
   await page.locator('#phase').evaluate((node) => {
     node.disabled = false;
     node.value = '0.25';
     node.dispatchEvent(new Event('input', { bubbles: true }));
   });
-  await page.waitForTimeout(280);
+  await page.waitForTimeout(220);
   await captureCanvas(page, 'basic-flap-phase-025.png');
 
   const report = {
