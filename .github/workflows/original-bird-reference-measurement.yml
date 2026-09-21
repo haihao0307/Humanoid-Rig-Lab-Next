@@ -126,6 +126,8 @@ jobs:
               '静态形体',
               '基础拍翼',
               '高级飞行保持关闭',
+              'type="importmap"',
+              "import * as THREE from 'three'",
               'side', 'front', 'top', 'three', 'underside',
               'window.__BIRD_R017_READY__ = true',
               '1d3b3cea037f4fb3bc9fbd72013bb94a',
@@ -145,7 +147,12 @@ jobs:
               if token in runtime_text:
                   raise SystemExit('SOURCE_DEPENDENCY_IN_R017_RUNTIME ' + token)
 
-          scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', workbench_text, re.S | re.I)]
+          scripts = []
+          for match in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', workbench_text, re.S | re.I):
+              tag_end = workbench_text.find('>', match.start()) + 1
+              tag = workbench_text[match.start():tag_end]
+              if 'importmap' not in tag.lower():
+                  scripts.append(match.group(1))
           if not scripts:
               raise SystemExit('NO_R017_INLINE_MODULE')
           pathlib.Path('/tmp/original-bird-gull-form-r017-inline.mjs').write_text('\n'.join(scripts), encoding='utf-8')
