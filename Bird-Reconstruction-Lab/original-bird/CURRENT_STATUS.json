@@ -1,6 +1,6 @@
 {
-  "schema": "bird/original-bird-status@0.0.24",
-  "revision": "R0.16.1-learning-execution-policy",
+  "schema": "bird/original-bird-status@0.0.25",
+  "revision": "R0.16.2-higher-detail-seagull-source-correction",
   "date": "2026-09-21",
   "branch": "bird-mother-original-bird-r001-20260920",
   "visualBirdGenerated": false,
@@ -8,33 +8,49 @@
   "flockWorkbenchGenerated": false,
   "sourceModelsVisible": true,
   "executionRole": "CRAFTSMAN_LEARNING_REPLICATION_EXECUTION",
-  "currentInstruction": "Study the supplied C-draft exactly, convert its readable source data to KAOPU format, and keep executing without replacing work with extended conversation.",
+  "currentCorrection": "The previous current source was the low-polygon gull. The current source is now the second, higher-detail gull supplied by the user.",
   "terminologyPolicy": {
     "status": "ACTIVE_HARD_POLICY",
     "path": "Bird-Reconstruction-Lab/original-bird/TERMINOLOGY_AND_EXECUTION_POLICY_R0161_ZH.md",
     "forbiddenSequenceCodepoints": ["U+4E89", "U+6D41"],
     "preferredTerms": ["学习", "观察", "测量", "复刻", "记录", "校验", "转换", "执行"],
-    "scope": ["user-facing conversation", "repository text", "runtime UI", "reports", "exports", "pull requests", "commits", "Mother handoffs"],
     "ciRepositoryTextScanRequired": true,
     "disableAllowed": false
   },
-  "wrongRouteDeletion": {
+  "sourceSelectionCorrection": {
     "completed": true,
-    "rejectedRevisions": ["R0.15", "R0.15.1"],
-    "reason": "The platform created a new procedural gull instead of faithfully learning and encoding the user-supplied C-draft.",
-    "deletedPaths": [
-      "Bird-Reconstruction-Lab/original-bird/distilled/LARID_ORIGINAL_BIRD_C_DRAFT_R015.json",
-      "Bird-Reconstruction-Lab/original-bird/runtime/original-bird-c-kernel-r015.js",
-      "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-c-draft-r015.html",
-      "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-c-draft-r0151.html",
-      "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r015.html",
-      "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-production-hub-r0151.html"
-    ],
-    "restoreAllowed": false
+    "previousPrimary": {
+      "assetId": "BIRD-REF-004",
+      "file": "seagull(2).glb",
+      "viewerUid": "dc42ffc81c86480e9e7f7752fa134174",
+      "bytes": 519256,
+      "vertices": 3291,
+      "triangles": 4352,
+      "joints": 15,
+      "roleNow": "LOW_DETAIL_SECONDARY_ONLY"
+    },
+    "currentPrimary": {
+      "assetId": "BIRD-REF-005",
+      "file": "seagull2(2).glb",
+      "viewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
+      "sha256": "4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7",
+      "geometrySha256": "d9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2",
+      "bytes": 1767532,
+      "vertices": 4416,
+      "triangles": 5624,
+      "joints": 21,
+      "roleNow": "CURRENT_HIGHER_DETAIL_C_SOURCE"
+    },
+    "evidence": {
+      "byteRatioHigherToLow": 3.40419,
+      "vertexIncrease": 1125,
+      "triangleIncrease": 1272,
+      "jointIncrease": 6
+    }
   },
   "productionEntry": {
-    "revision": "R0.16.1",
-    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r016.html",
+    "revision": "R0.16.2",
+    "path": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r0162.html",
     "singleEntry": true,
     "sourceOnly": true,
     "generatedCandidatePresent": false,
@@ -43,24 +59,26 @@
   },
   "seagullSourceReplica": {
     "generated": true,
-    "revision": "R0.16.1",
-    "contractPath": "Bird-Reconstruction-Lab/original-bird/distilled/LARID_C_SOURCE_REPLICA_R016.json",
-    "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r016.html",
+    "revision": "R0.16.2",
+    "contractPath": "Bird-Reconstruction-Lab/original-bird/distilled/LARID_C_SOURCE_REPLICA_R0162.json",
+    "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r0162.html",
     "exportSchema": "kaopu/source-bird-replica@1.0",
-    "authoritativeSourceAssetId": "BIRD-REF-004",
-    "authoritativeSourceFile": "seagull(2).glb",
-    "authoritativeSourceSha256": "5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af",
-    "authoritativeGeometrySha256": "d6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac",
-    "authoritativeViewerUid": "dc42ffc81c86480e9e7f7752fa134174",
-    "secondaryComparisonAssetId": "BIRD-REF-005",
+    "authoritativeSourceAssetId": "BIRD-REF-005",
+    "authoritativeSourceFile": "seagull2(2).glb",
+    "authoritativeSourceSha256": "4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7",
+    "authoritativeGeometrySha256": "d9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2",
+    "authoritativeViewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
+    "secondaryLowDetailAssetId": "BIRD-REF-004",
     "exactSpecies": "UNRESOLVED",
     "realScale": "UNKNOWN",
     "generatedReplacementGeometry": false,
     "inventedShapeParameters": false,
     "inventedFeatherGeometry": false,
     "inventedPalette": false,
+    "eyeConstructionVerified": false,
+    "genericBoneMappingStatus": "MANUAL_MAPPING_REQUIRED",
     "capabilities": [
-      "direct display of the authoritative source C-draft",
+      "direct display of the higher-detail supplied gull",
       "complete readable node-list capture",
       "complete readable source local-matrix capture",
       "material and texture record capture",
@@ -77,52 +95,32 @@
     "sourceFixedViewsCaptured": false,
     "sourceReplicaDatasetComplete": false
   },
-  "seagullPhase1": {
-    "generated": true,
-    "revision": "R0.14",
-    "preservedAsSourceReviewOnly": true,
-    "workbenchPath": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-phase1-r014.html",
-    "primaryAssetId": "BIRD-REF-004",
-    "secondaryAssetId": "BIRD-REF-005",
-    "exactSpecies": "UNRESOLVED",
-    "productionCandidateGenerated": false
-  },
-  "pigeonMotionAutorun": {
-    "generated": true,
-    "revision": "R0.13.1",
-    "preserved": true,
-    "reportPersisted": false,
-    "visualAcceptance": false
-  },
-  "alphaIssue": {
-    "status": "DEFERRED_TO_LARGE_SCREEN_REVIEW",
-    "allowedTargetRegions": ["wing tip feather ends", "trailing edge feather ends", "wing underside feather ends"],
-    "prohibitedTargetRegions": ["body carrier", "neck", "head", "whole wing vane", "tail root"]
+  "wrongRouteDeletion": {
+    "completed": true,
+    "rejectedRevisions": ["R0.15", "R0.15.1"],
+    "restoreAllowed": false
   },
   "strictProhibitions": [
-    "creating any replacement gull geometry",
+    "using BIRD-REF-004 as the current high-detail authority",
+    "creating replacement gull geometry",
     "inventing body, wing, feather, tail, beak or eye parameters",
-    "beautifying or correcting the supplied C-draft during data extraction",
-    "converting a guessed silhouette into a claimed replica",
-    "using the secondary comparison model to overwrite the authoritative source",
+    "claiming that the higher-detail model has independent eye geometry before direct verification",
+    "promoting generic Bone.* nodes to anatomical truth without evidence",
     "claiming an exact species from a generic seagull title",
     "claiming natural scale from the source coordinate system",
-    "promoting artist or generic nodes to anatomical truth without evidence",
-    "restoring any deleted R0.15 or R0.15.1 artifact",
-    "using the prohibited two-codepoint wording defined by the terminology policy",
-    "substituting extended conversation for execution evidence"
+    "shipping CC-BY-NC-SA source mesh or texture as a commercial runtime asset"
   ],
   "currentExecutionQueue": [
-    "load BIRD-REF-004 directly and retain its visible source unchanged",
+    "load BIRD-REF-005 directly and retain its visible source unchanged",
+    "inspect whether its eye is geometry, texture, or a combined construction",
     "capture the complete readable node list and raw local matrices",
     "capture materials, textures, animation metadata and all eight normalized source phases",
-    "record fixed source views and camera data without drawing a substitute",
+    "record fixed source views and camera data",
     "export kaopu/source-bird-replica@1.0",
-    "ingest the original GLB bytes through an authorized Git LFS channel and re-hash",
-    "only after the source dataset is complete, define a separate replication procedure without creative interpretation"
+    "ingest the original GLB bytes through an authorized Git LFS channel and re-hash"
   ],
   "openGates": {
-    "r016SourceWorkbenchBrowserQaPassed": false,
+    "r0162SourceWorkbenchBrowserQaPassed": false,
     "terminologyRepositoryScanPassed": false,
     "sourceBinaryInReferenceCacheLfs": false,
     "completeNodeHierarchyCaptured": false,
@@ -130,6 +128,7 @@
     "materialAndTextureRecordsCaptured": false,
     "eightNormalizedSourcePhasesCaptured": false,
     "sourceFixedViewsCaptured": false,
+    "eyeConstructionVerified": false,
     "sourceReplicaDatasetComplete": false,
     "generatedReplacementGeometryAbsent": true,
     "visualAcceptance": false,
