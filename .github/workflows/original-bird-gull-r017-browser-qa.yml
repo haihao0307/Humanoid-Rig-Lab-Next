@@ -1,0 +1,70 @@
+name: Original Bird Gull R0.17 Browser QA
+
+on:
+  push:
+    branches: [bird-mother-original-bird-r001-20260920]
+    paths:
+      - 'Bird-Reconstruction-Lab/original-bird/runtime/original-bird-gull-form-r017.mjs'
+      - 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r017.html'
+      - 'Bird-Reconstruction-Lab/original-bird/tests/gull-form-r017.spec.cjs'
+      - '.github/workflows/original-bird-gull-r017-browser-qa.yml'
+  pull_request:
+    paths:
+      - 'Bird-Reconstruction-Lab/original-bird/runtime/original-bird-gull-form-r017.mjs'
+      - 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r017.html'
+      - 'Bird-Reconstruction-Lab/original-bird/tests/gull-form-r017.spec.cjs'
+      - '.github/workflows/original-bird-gull-r017-browser-qa.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-visual-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BIRD_R017_QA_URL: http://127.0.0.1:4173/Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r017.html?qa=1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local workbench server
+        run: |
+          mkdir -p artifacts/bird-r017-browser-qa
+          printf '%s\n' "$BIRD_R017_QA_URL" > artifacts/bird-r017-browser-qa/qa-url.txt
+          python3 -m http.server 4173 --bind 127.0.0.1 > artifacts/bird-r017-browser-qa/http-server.log 2>&1 &
+          echo $! > artifacts/bird-r017-browser-qa/http-server.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo 'Local server failed to start'
+          exit 1
+
+      - name: Run R0.17 headed Chromium QA
+        run: |
+          xvfb-run -a npx playwright test Bird-Reconstruction-Lab/original-bird/tests/gull-form-r017.spec.cjs \
+            --browser=chromium \
+            --headed \
+            --workers=1 \
+            --reporter=line
+
+      - name: Upload R0.17 browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-bird-gull-r017-browser-evidence
+          path: |
+            artifacts/bird-r017-browser-qa
+            test-results
+            playwright-report
+          if-no-files-found: warn
+          retention-days: 30
