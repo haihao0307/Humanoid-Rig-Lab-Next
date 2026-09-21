@@ -40,9 +40,10 @@
 </div>
 <div class="fatal" id="fatal"><div><b>工作台启动失败</b><p id="fatalText"></p></div></div>
 <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createOriginalGullR017 } from '../runtime/original-bird-gull-form-r017.mjs';
 
 const $ = (id) => document.getElementById(id);
