@@ -1,0 +1,59 @@
+{
+  "schema": "bird/columbid-feather-alphamask-qa@0.0.12.3",
+  "date": "2026-09-21",
+  "status": "DETERMINISTIC_PIPELINE_PASS_LIVE_SOURCE_VISUAL_PENDING",
+  "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+  "branch": "bird-mother-original-bird-r001-20260920",
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-feather-alphamask-r0123.html",
+  "workflow": ".github/workflows/original-bird-feather-alpha-browser-qa.yml",
+  "workflowRun": {
+    "id": 35549387633,
+    "headSha": "1fa645fa12367d2bcd170e639218ebfe39082ec5",
+    "conclusion": "success",
+    "artifactId": 10616933504,
+    "artifactDigest": "sha256:fd5aa42ae77733277a065b8f4301fb4a2a72b26c40d777793b2e98d27183a372"
+  },
+  "deterministicEvidence": {
+    "viewerReady": "2/2",
+    "selectedMaterial": "Pigeon_mainMat",
+    "stateSetID": 101,
+    "cutoutChannel": "AlphaMask",
+    "alphaMaskEnabled": true,
+    "opacityPreserved": true,
+    "alphaSource": "CHROMA",
+    "textureSize": [1024, 1024],
+    "visibleDifferencePercent": 10.2,
+    "forcedProbeUsed": false,
+    "backgroundScreenshots": [
+      "r0123-bright-gray.png",
+      "r0123-sky-wingtip.png",
+      "r0123-warm-trailing.png"
+    ]
+  },
+  "whatThisProves": [
+    "the application writes the generated texture to material.channels.AlphaMask",
+    "the original Opacity channel is not disabled or replaced",
+    "coverage is encoded in R, G, B and A",
+    "the before-after screenshot pipeline detects a rendered difference greater than one percent",
+    "bright-gray, sky-blue and warm-gray evidence capture paths execute without JavaScript failure"
+  ],
+  "whatThisDoesNotProve": [
+    "the public BIRD-REF-002 source atlas is accessible through CORS in every browser session",
+    "the automatically derived mask perfectly follows the real source feather atlas UVs",
+    "the user-marked wing-tip and trailing-edge backing is fully removed in the live Sketchfab viewer",
+    "eight-phase transparency sorting and mobile overdraw have passed",
+    "an independent commercial-safe feather atlas exists"
+  ],
+  "openGates": {
+    "liveSourceViewerReady": false,
+    "liveSourceChannelInventoryCaptured": false,
+    "liveDedicatedAlphaMaskApplied": false,
+    "liveMarkedGrayBackingRemoved": false,
+    "liveThreeBackgroundHaloTestPassed": false,
+    "liveEightPhaseStabilityPassed": false,
+    "mobileTransparentOverdrawMeasured": false,
+    "independentCommercialAtlasAuthored": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
