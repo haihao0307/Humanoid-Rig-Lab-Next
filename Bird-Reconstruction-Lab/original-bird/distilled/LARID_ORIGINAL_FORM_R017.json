@@ -1,12 +1,12 @@
 {
-  "schema": "bird/larid-original-form@0.0.17",
-  "revision": "Original-Bird-R0.17-shape-first",
+  "schema": "bird/larid-original-form@0.0.17.1",
+  "revision": "Original-Bird-R0.17.1-shape-refinement",
   "date": "2026-09-21",
-  "status": "ACTIVE_FIRST_INDEPENDENT_FORM_CANDIDATE",
+  "status": "ACTIVE_REFINED_INDEPENDENT_FORM_CANDIDATE",
   "productionOrder": [
     "complete visible static form",
     "run basic flap only as a deformation test",
-    "repair form and skinning from four-view evidence",
+    "repair form and skinning from five-view browser evidence",
     "add material and feather refinement",
     "study advanced flight only after form acceptance"
   ],
@@ -26,23 +26,38 @@
   },
   "independentForm": {
     "generator": "Bird-Reconstruction-Lab/original-bird/runtime/original-bird-gull-form-r017.mjs",
-    "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r017.html",
-    "bodyMethod": "single longitudinal loft carrier for body, breast, neck, head and beak",
-    "bodyRadialSegments": 44,
-    "wingMethod": "continuous thick skinned surface per wing",
+    "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r0171.html",
+    "bodyMethod": "densified Catmull-Rom longitudinal loft carrier for body, breast, neck, head and beak",
+    "bodyRadialSegments": 52,
+    "bodyLongitudinalSubdivisions": 5,
+    "wingMethod": "continuous thick skinned surface per wing with independently generated mirrored winding and normals",
     "wingBonesPerSide": ["shoulder", "elbow", "wrist", "tip"],
     "primaryFeathersPerSide": 8,
     "tailFeathers": 9,
-    "eyes": "independent iris and corneal shells",
-    "legsAndFeet": "two legs with three forward toes and one rear toe per side",
+    "tailCarrier": "continuous thick tail-base surface",
+    "eyes": "reduced independent iris, pupil and corneal shells",
+    "beakDetails": ["mouth seam", "nostrils"],
+    "legsAndFeet": "two-segment legs with three forward toes, one rear toe and webbing per side",
     "thirdPartyMeshLoaded": false,
     "thirdPartyTextureLoaded": false,
     "thirdPartySkeletonLoaded": false
   },
+  "r0171Corrections": [
+    "elongated body and reduced spherical mass",
+    "smoothed body and head transition with dense longitudinal rings",
+    "increased tapered wing span",
+    "embedded wing roots into the shoulder volume",
+    "removed negative-scale wing mirroring",
+    "regenerated right-wing triangle winding and normals",
+    "reduced eye size and separated iris, pupil and cornea",
+    "added tail-base carrier and webbed feet",
+    "set the review camera up axis to Z"
+  ],
   "basicMotion": {
     "purpose": "deformation test only",
     "states": ["static_form", "basic_flap"],
     "drivenRegions": ["shoulder", "elbow", "wrist", "wing_tip", "body_trim", "tail_response"],
+    "leftRightMirroring": "signed shoulder, elbow, wrist and tip rotations",
     "advancedFlightStatesEnabled": false,
     "sourceTimingClaimedAsBiologicalTiming": false
   },
@@ -54,14 +69,14 @@
       "overall gull silhouette",
       "breast and abdomen mass",
       "neck-head-beak transition",
-      "eye placement",
+      "eye placement and scale",
       "wing root continuity",
-      "wing planform and tip",
+      "wing span, planform and tip",
       "tail base and fan",
-      "leg and foot placement",
+      "leg and webbed-foot placement",
       "shoulder volume during flap",
       "elbow-wrist fold continuity",
-      "feather intersection"
+      "primary-feather intersection"
     ]
   },
   "strictBoundaries": {
@@ -75,7 +90,7 @@
   },
   "openGates": {
     "browserRuntimePassed": false,
-    "fourViewEvidenceComplete": false,
+    "fiveViewEvidenceComplete": false,
     "staticFormAccepted": false,
     "basicFlapDeformationAccepted": false,
     "wingRootContinuityAccepted": false,
