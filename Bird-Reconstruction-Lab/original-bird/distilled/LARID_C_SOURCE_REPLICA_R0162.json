@@ -1,0 +1,98 @@
+{
+  "schema": "kaopu/source-bird-replica-contract@1.0",
+  "revision": "Original-Bird-R0.16.2",
+  "date": "2026-09-21",
+  "status": "ACTIVE_SOURCE_REPLICATION_ONLY",
+  "correctionReason": "The previous authority selected the lower-detail gull. The user supplied a second, finer gull that must be the current visual source.",
+  "authoritativeSource": {
+    "assetId": "BIRD-REF-005",
+    "file": "seagull2(2).glb",
+    "canonical": "seagull_kenchoo.glb",
+    "sha256": "4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7",
+    "geometrySha256": "d9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2",
+    "bytes": 1767532,
+    "viewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
+    "sourceUrl": "https://sketchfab.com/3d-models/seagull-1d3b3cea037f4fb3bc9fbd72013bb94a",
+    "author": "kenchoo",
+    "license": "CC-BY-NC-SA-4.0",
+    "clade": "Laridae candidate",
+    "species": "UNRESOLVED",
+    "realScale": "UNKNOWN",
+    "counts": {
+      "scenes": 1,
+      "nodes": 28,
+      "meshes": 1,
+      "primitives": 1,
+      "vertices": 4416,
+      "triangles": 5624,
+      "materials": 1,
+      "textures": 1,
+      "skins": 1,
+      "joints": 21,
+      "animations": 1,
+      "morphTargetSets": 0
+    },
+    "pcaAspect": [1.0, 0.40622, 0.187724],
+    "skeletonAudit": {
+      "semanticCounts": {"wing": 8, "tail": 0, "neck": 0, "head_beak": 0, "leg": 0, "trunk": 1},
+      "axial": "MANUAL_MAPPING_REQUIRED",
+      "wing": "CANDIDATE",
+      "hindlimb": "MANUAL_MAPPING_REQUIRED",
+      "feather": "PARTIAL",
+      "unknown": [
+        "most bones use generic Bone.* names",
+        "exact head, neck, leg and tail homology needs transform and skin-weight inspection",
+        "eye construction needs direct mesh and texture inspection",
+        "exact gull species is unresolved",
+        "real scale is unresolved"
+      ]
+    },
+    "animationAudit": {
+      "name": "Animation",
+      "exportedTimelineEnd": 2.083333,
+      "channelCount": 41,
+      "paths": {"translation": 9, "rotation": 19, "scale": 13},
+      "targetNodeCount": 19
+    }
+  },
+  "demotedLowDetailSource": {
+    "assetId": "BIRD-REF-004",
+    "file": "seagull(2).glb",
+    "sha256": "5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af",
+    "geometrySha256": "d6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac",
+    "bytes": 519256,
+    "viewerUid": "dc42ffc81c86480e9e7f7752fa134174",
+    "counts": {"nodes": 22, "vertices": 3291, "triangles": 4352, "joints": 15, "animations": 1},
+    "role": "low-detail secondary source only; not the current detail authority"
+  },
+  "comparison": {
+    "byteRatioHigherToLow": 3.40419,
+    "vertexIncrease": 1125,
+    "triangleIncrease": 1272,
+    "jointIncrease": 6,
+    "decision": "BIRD-REF-005 is the current higher-detail C-draft source"
+  },
+  "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r0162.html",
+  "exportSchema": "kaopu/source-bird-replica@1.0",
+  "strictBoundary": {
+    "generatedReplacementGeometry": false,
+    "inventedShapeParameters": false,
+    "inventedFeatherGeometry": false,
+    "exactSpeciesClaim": false,
+    "naturalScaleClaim": false,
+    "genericBonesPromotedWithoutEvidence": false,
+    "sourceBinaryInReferenceCacheLfs": false
+  },
+  "openGates": {
+    "completeNodeHierarchyCaptured": false,
+    "allReadableLocalMatricesCaptured": false,
+    "materialAndTextureRecordsCaptured": false,
+    "eightNormalizedSourcePhasesCaptured": false,
+    "sourceFixedViewsCaptured": false,
+    "eyeConstructionVerified": false,
+    "rawBinaryInReferenceCacheLfs": false,
+    "sourceReplicaDatasetComplete": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
