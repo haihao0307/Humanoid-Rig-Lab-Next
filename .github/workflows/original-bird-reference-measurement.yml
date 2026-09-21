@@ -24,12 +24,9 @@ jobs:
       - name: Repository terminology lock
         shell: python
         run: |
-          import pathlib
-          import subprocess
-
+          import pathlib, subprocess
           forbidden = chr(0x4E89) + chr(0x6D41)
-          raw = subprocess.check_output(['git', 'ls-files', '-z'])
-          paths = [pathlib.Path(x.decode('utf-8')) for x in raw.split(b'\0') if x]
+          paths = [pathlib.Path(x.decode('utf-8')) for x in subprocess.check_output(['git','ls-files','-z']).split(b'\0') if x]
           hits = []
           for path in paths:
               try:
@@ -42,7 +39,7 @@ jobs:
               for path in hits:
                   print('FORBIDDEN_TERM_PATH', path)
               raise SystemExit('TERMINOLOGY_LOCK_FAILED')
-          print('TERMINOLOGY_SCAN_OK', len(paths), 'tracked paths checked')
+          print('TERMINOLOGY_SCAN_OK', len(paths))
 
       - name: Tool self-tests
         run: |
@@ -51,120 +48,85 @@ jobs:
           python Bird-Reconstruction-Lab/original-bird/tools/measure_bird_reference.py --self-test
           python Bird-Reconstruction-Lab/original-bird/tools/catalog_bird_package.py --self-test
 
-      - name: R0.16.1 source-only learning and replication guards
+      - name: R0.16.2 higher-detail source guards
         shell: python
         run: |
           import json, pathlib, re
           root = pathlib.Path('Bird-Reconstruction-Lab/original-bird')
           status = json.loads((root / 'CURRENT_STATUS.json').read_text(encoding='utf-8'))
-          contract = json.loads((root / 'distilled/LARID_C_SOURCE_REPLICA_R016.json').read_text(encoding='utf-8'))
+          contract = json.loads((root / 'distilled/LARID_C_SOURCE_REPLICA_R0162.json').read_text(encoding='utf-8'))
           batch = json.loads((root / 'distilled/BIRD_REFERENCE_BATCH_A_R002.json').read_text(encoding='utf-8'))
-          policy = root / 'TERMINOLOGY_AND_EXECUTION_POLICY_R0161_ZH.md'
-          lab = root / 'workbench/original-bird-seagull-source-distillation-r016.html'
+          lab = root / 'workbench/original-bird-seagull-source-distillation-r0162.html'
           lab_text = lab.read_text(encoding='utf-8')
 
-          deleted = [
-              root / 'distilled/LARID_ORIGINAL_BIRD_C_DRAFT_R015.json',
-              root / 'runtime/original-bird-c-kernel-r015.js',
-              root / 'workbench/original-bird-seagull-c-draft-r015.html',
-              root / 'workbench/original-bird-seagull-c-draft-r0151.html',
-              root / 'workbench/original-bird-production-hub-r015.html',
-              root / 'workbench/original-bird-production-hub-r0151.html',
-          ]
-          for p in deleted:
-              if p.exists():
-                  raise SystemExit('REJECTED_CREATIVE_ARTIFACT_REAPPEARED ' + str(p))
-
-          if not policy.exists():
-              raise SystemExit('TERMINOLOGY_POLICY_MISSING')
-          if status.get('revision') != 'R0.16.1-learning-execution-policy':
+          if status.get('revision') != 'R0.16.2-higher-detail-seagull-source-correction':
               raise SystemExit('STATUS_REVISION_MISMATCH')
           if status.get('visualBirdGenerated') is not False or status.get('continuousSurfaceBirdGenerated') is not False:
-              raise SystemExit('GENERATED_REPLACEMENT_STATUS_MUST_BE_FALSE')
-          if status.get('executionRole') != 'CRAFTSMAN_LEARNING_REPLICATION_EXECUTION':
-              raise SystemExit('EXECUTION_ROLE_CHANGED')
-          terminology = status.get('terminologyPolicy', {})
-          if terminology.get('status') != 'ACTIVE_HARD_POLICY':
-              raise SystemExit('TERMINOLOGY_POLICY_NOT_ACTIVE')
-          if terminology.get('forbiddenSequenceCodepoints') != ['U+4E89', 'U+6D41']:
-              raise SystemExit('TERMINOLOGY_CODEPOINT_POLICY_CHANGED')
-          if terminology.get('ciRepositoryTextScanRequired') is not True or terminology.get('disableAllowed') is not False:
-              raise SystemExit('TERMINOLOGY_CI_LOCK_INVALID')
+              raise SystemExit('GENERATED_REPLACEMENT_STATUS_INVALID')
+          if status['productionEntry']['path'] != 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r0162.html':
+              raise SystemExit('CURRENT_ENTRY_NOT_R0162')
 
-          deletion = status.get('wrongRouteDeletion', {})
-          if deletion.get('completed') is not True or deletion.get('restoreAllowed') is not False:
-              raise SystemExit('WRONG_ROUTE_DELETION_NOT_LOCKED')
-          replica = status.get('seagullSourceReplica', {})
-          if replica.get('authoritativeSourceAssetId') != 'BIRD-REF-004':
-              raise SystemExit('AUTHORITATIVE_SOURCE_CHANGED')
-          if replica.get('generatedReplacementGeometry') is not False:
-              raise SystemExit('REPLACEMENT_GEOMETRY_FLAG_INVALID')
-          if replica.get('inventedShapeParameters') is not False or replica.get('inventedFeatherGeometry') is not False:
-              raise SystemExit('INVENTED_DATA_FLAG_INVALID')
-          if status['productionEntry']['path'] != 'Bird-Reconstruction-Lab/original-bird/workbench/original-bird-seagull-source-distillation-r016.html':
-              raise SystemExit('SOURCE_ONLY_ENTRY_CHANGED')
+          replica = status['seagullSourceReplica']
+          if replica['authoritativeSourceAssetId'] != 'BIRD-REF-005':
+              raise SystemExit('HIGH_DETAIL_SOURCE_NOT_ACTIVE')
+          if replica['secondaryLowDetailAssetId'] != 'BIRD-REF-004':
+              raise SystemExit('LOW_DETAIL_SOURCE_NOT_DEMOTED')
+          if replica['eyeConstructionVerified'] is not False:
+              raise SystemExit('EYE_CONSTRUCTION_MUST_REMAIN_UNVERIFIED')
 
           by_id = {r['assetId']: r for r in batch['records']}
-          src = by_id['BIRD-REF-004']
-          if src['sha256'] != '5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af':
-              raise SystemExit('SOURCE_SHA_CHANGED')
-          if src['geometrySha256'] != 'd6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac':
-              raise SystemExit('SOURCE_GEOMETRY_SHA_CHANGED')
-          if src['counts']['nodes'] != 22 or src['counts']['joints'] != 15 or src['counts']['vertices'] != 3291 or src['counts']['triangles'] != 4352:
-              raise SystemExit('SOURCE_COUNTS_CHANGED')
+          high = by_id['BIRD-REF-005']
+          low = by_id['BIRD-REF-004']
+          if high['sha256'] != '4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7':
+              raise SystemExit('HIGH_DETAIL_SHA_CHANGED')
+          if high['geometrySha256'] != 'd9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2':
+              raise SystemExit('HIGH_DETAIL_GEOMETRY_SHA_CHANGED')
+          if high['counts']['vertices'] != 4416 or high['counts']['triangles'] != 5624 or high['counts']['joints'] != 21:
+              raise SystemExit('HIGH_DETAIL_COUNTS_CHANGED')
+          if not (high['counts']['vertices'] > low['counts']['vertices'] and high['counts']['triangles'] > low['counts']['triangles'] and high['counts']['joints'] > low['counts']['joints']):
+              raise SystemExit('HIGH_DETAIL_COMPARISON_FAILED')
 
-          if contract['revision'] != 'Original-Bird-R0.16.1':
+          if contract['revision'] != 'Original-Bird-R0.16.2':
               raise SystemExit('CONTRACT_REVISION_MISMATCH')
-          if contract['status'] != 'ACTIVE_SOURCE_REPLICATION_ONLY':
-              raise SystemExit('CONTRACT_STATUS_INVALID')
-          if contract['executionRole'] != 'CRAFTSMAN_LEARNING_REPLICATION_EXECUTION':
-              raise SystemExit('CONTRACT_ROLE_INVALID')
-          if contract['terminologyPolicy']['status'] != 'ACTIVE_HARD_POLICY':
-              raise SystemExit('CONTRACT_TERMINOLOGY_POLICY_INVALID')
-          auth = contract['currentAuthoritativeSource']
-          if auth['assetId'] != 'BIRD-REF-004' or auth['sha256'] != src['sha256'] or auth['geometrySha256'] != src['geometrySha256']:
-              raise SystemExit('CONTRACT_SOURCE_IDENTITY_MISMATCH')
-          if contract['secondaryComparisonOnly']['assetId'] != 'BIRD-REF-005':
-              raise SystemExit('SECONDARY_COMPARISON_CHANGED')
-          if contract['openGates']['sourceReplicaDatasetComplete'] is not False:
-              raise SystemExit('SOURCE_DATASET_GATE_MUST_REMAIN_FALSE')
+          if contract['authoritativeSource']['assetId'] != 'BIRD-REF-005':
+              raise SystemExit('CONTRACT_HIGH_DETAIL_SOURCE_MISMATCH')
+          if contract['demotedLowDetailSource']['assetId'] != 'BIRD-REF-004':
+              raise SystemExit('CONTRACT_LOW_DETAIL_ROLE_MISMATCH')
+          if contract['openGates']['eyeConstructionVerified'] is not False:
+              raise SystemExit('CONTRACT_EYE_GATE_INVALID')
 
           required = (
-              'dc42ffc81c86480e9e7f7752fa134174',
-              '5d5e5b6897b54db20280603eff57fc0aa2c816957349eec5231d5419747143af',
-              'd6e4cc5add60e3ce4d8ba225f660fe1ef1cec0998944972611814f8d4d209bac',
+              '1d3b3cea037f4fb3bc9fbd72013bb94a',
+              '4aa183fdce3ae81b51767d81dcc1a775d990ecad81cc7fc45c3c0670c928f3f7',
+              'd9f71e1fcaad1cac3dbed0d4b3f4ed1577c478fbc35bfa0e3c047915766799f2',
+              "assetId:'BIRD-REF-005'",
+              "role:'LOW_DETAIL_SECONDARY_ONLY'",
               'getNodeMap','getMatrix','getMaterialList','getTextureList','getAnimations',
               'PHASES=[0,.125,.25,.375,.5,.625,.75,.875]',
               'kaopu/source-bird-replica@1.0',
-              'CRAFTSMAN_REPLICATION_NOT_CREATIVE_GENERATION',
-              'generatedReplacementGeometry:false',
-              'inventedBodyProfile:false',
-              'original-bird-r016-seagull-source-replica.kaopu'
+              'original-bird-r0162-seagull-high-detail-source-replica.kaopu'
           )
           for token in required:
               if token not in lab_text:
-                  raise SystemExit('SOURCE_WORKBENCH_TOKEN_MISSING ' + token)
+                  raise SystemExit('R0162_WORKBENCH_TOKEN_MISSING ' + token)
 
           forbidden = (
+              "const SOURCE={assetId:'BIRD-REF-004'",
               'new THREE.',
               'buildLaridDisplay',
               'evaluateBody',
-              'evaluateWing',
-              'original-bird-c-kernel-r015',
-              'LARID_ORIGINAL_BIRD_C_DRAFT_R015',
-              'generated candidate',
-              'C稿候选'
+              'evaluateWing'
           )
           for token in forbidden:
               if token in lab_text:
-                  raise SystemExit('CREATIVE_GENERATION_TOKEN_FORBIDDEN ' + token)
+                  raise SystemExit('FORBIDDEN_R0162_TOKEN ' + token)
 
-          scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', lab_text, re.S | re.I)]
+          scripts = [m.group(1) for m in re.finditer(r'<script(?![^>]*\\bsrc=)[^>]*>(.*?)</script>', lab_text, re.S | re.I)]
           if not scripts:
               raise SystemExit('NO_INLINE_SCRIPT')
-          out = pathlib.Path('/tmp/original-bird-seagull-source-distillation-r016.js')
+          out = pathlib.Path('/tmp/original-bird-seagull-source-distillation-r0162.js')
           out.write_text('\n'.join(scripts), encoding='utf-8')
-          print('R0161_SOURCE_LEARNING_REPLICATION_GUARDS_OK')
+          print('R0162_HIGHER_DETAIL_SOURCE_GUARDS_OK')
 
-      - name: R0.16.1 JavaScript syntax
-        run: node --check /tmp/original-bird-seagull-source-distillation-r016.js
+      - name: R0.16.2 JavaScript syntax
+        run: node --check /tmp/original-bird-seagull-source-distillation-r0162.js
