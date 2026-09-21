@@ -1,0 +1,89 @@
+{
+  "schema": "bird/larid-original-form@0.0.17",
+  "revision": "Original-Bird-R0.17-shape-first",
+  "date": "2026-09-21",
+  "status": "ACTIVE_FIRST_INDEPENDENT_FORM_CANDIDATE",
+  "productionOrder": [
+    "complete visible static form",
+    "run basic flap only as a deformation test",
+    "repair form and skinning from four-view evidence",
+    "add material and feather refinement",
+    "study advanced flight only after form acceptance"
+  ],
+  "sourceRoles": {
+    "morphologyAndDetail": {
+      "assetId": "BIRD-REF-005",
+      "file": "seagull2(2).glb",
+      "viewerUid": "1d3b3cea037f4fb3bc9fbd72013bb94a",
+      "runtimeDependency": false
+    },
+    "basicAnimation": {
+      "assetId": "BIRD-REF-004",
+      "file": "seagull(2).glb",
+      "viewerUid": "dc42ffc81c86480e9e7f7752fa134174",
+      "runtimeDependency": false
+    }
+  },
+  "independentForm": {
+    "generator": "Bird-Reconstruction-Lab/original-bird/runtime/original-bird-gull-form-r017.mjs",
+    "workbench": "Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r017.html",
+    "bodyMethod": "single longitudinal loft carrier for body, breast, neck, head and beak",
+    "bodyRadialSegments": 44,
+    "wingMethod": "continuous thick skinned surface per wing",
+    "wingBonesPerSide": ["shoulder", "elbow", "wrist", "tip"],
+    "primaryFeathersPerSide": 8,
+    "tailFeathers": 9,
+    "eyes": "independent iris and corneal shells",
+    "legsAndFeet": "two legs with three forward toes and one rear toe per side",
+    "thirdPartyMeshLoaded": false,
+    "thirdPartyTextureLoaded": false,
+    "thirdPartySkeletonLoaded": false
+  },
+  "basicMotion": {
+    "purpose": "deformation test only",
+    "states": ["static_form", "basic_flap"],
+    "drivenRegions": ["shoulder", "elbow", "wrist", "wing_tip", "body_trim", "tail_response"],
+    "advancedFlightStatesEnabled": false,
+    "sourceTimingClaimedAsBiologicalTiming": false
+  },
+  "visualReview": {
+    "requiredViews": ["side", "front", "top", "three_quarter", "underside"],
+    "defaultBackground": "bright studio gray-white",
+    "sourceComparisonVisible": true,
+    "blockingChecks": [
+      "overall gull silhouette",
+      "breast and abdomen mass",
+      "neck-head-beak transition",
+      "eye placement",
+      "wing root continuity",
+      "wing planform and tip",
+      "tail base and fan",
+      "leg and foot placement",
+      "shoulder volume during flap",
+      "elbow-wrist fold continuity",
+      "feather intersection"
+    ]
+  },
+  "strictBoundaries": {
+    "advancedFlightExpansionBeforeFormAcceptance": false,
+    "sourceMeshCopied": false,
+    "sourceTopologyCopied": false,
+    "sourceSkinWeightsCopied": false,
+    "sourceAnimationTimingCopied": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "openGates": {
+    "browserRuntimePassed": false,
+    "fourViewEvidenceComplete": false,
+    "staticFormAccepted": false,
+    "basicFlapDeformationAccepted": false,
+    "wingRootContinuityAccepted": false,
+    "headEyeBeakAccepted": false,
+    "tailAndFeetAccepted": false,
+    "materialRefinementComplete": false,
+    "advancedFlightAllowed": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
