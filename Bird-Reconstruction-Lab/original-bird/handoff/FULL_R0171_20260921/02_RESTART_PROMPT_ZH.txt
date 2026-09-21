@@ -1,0 +1,70 @@
+接管 Bird Mother / Original Bird。你是执行工匠，不是项目总设计者。直接继续制作，不要先做长篇规划，不要用聊天代替迭代。
+
+先从 GitHub 读取完整交接包：
+
+仓库：haihao0307/Humanoid-Rig-Lab-Next
+固定交接分支：handoff/bird-mother-original-bird-full-r0171-20260921
+交接源提交：12980b04975b172c88e8ffc3996932d59fa689f1
+入口文件：Bird-Reconstruction-Lab/original-bird/FULL_HANDOFF_R0171_ZH.md
+交接目录：Bird-Reconstruction-Lab/original-bird/handoff/FULL_R0171_20260921/
+
+依次读取：
+
+1. 00_START_HERE_ZH.md
+2. 01_FULL_HANDOFF_ZH.md
+3. 03_NEXT_EXECUTION_ORDER_ZH.md
+4. 04_KNOWN_STATE_AND_FAILURES_ZH.md
+5. 05_FULL_MANIFEST.json
+6. Bird-Reconstruction-Lab/original-bird/CURRENT_STATUS.json
+7. Bird-Reconstruction-Lab/original-bird/distilled/LARID_ORIGINAL_FORM_R017.json
+8. 适用的 AGENTS.md 和现有工作流
+
+当前唯一生产入口：
+
+Bird-Reconstruction-Lab/original-bird/workbench/original-bird-gull-form-r0171.html
+
+当前运行时：
+
+Bird-Reconstruction-Lab/original-bird/runtime/original-bird-gull-form-r017.mjs
+
+固定源职责：
+
+- BIRD-REF-005 / seagull2(2).glb：形体与细节主参考。
+- BIRD-REF-004 / seagull(2).glb：基础拍翼和粗翼链参考。
+
+两套源都不得直接成为最终商业运行时的网格、贴图、骨架或动画依赖。
+
+执行顺序已经锁定：
+
+第一，先把 Original Bird 海鸥静态形体做完。重点是总体轮廓、胸腹、颈头喙、眼睛、翼根、翼展和翼尖、尾基和尾扇、腿足和蹼足。
+
+第二，基础拍翼同时接入，但只用于暴露翼根分离、肩胸塌陷、肘腕折叠、左右镜像错误、翼尖和飞羽穿插、尾部失配。
+
+第三，静态五视角和基础拍翼变形通过后，再做覆羽层次、飞羽层次、Alpha 边缘、半透明和 3A 材质。
+
+第四，最后才允许滑翔、转弯、起飞、着陆、抗风、群体飞行和生态行为。
+
+严禁：
+
+- 在静态形体未批准前扩展高级飞行；
+- 从 main 或旧低品质候选重新开始；
+- 用研究页、合同、Schema、CI 数量或提交数量冒充形体进度；
+- 使用黑色背景隐藏问题；
+- 把低模海鸥当形体权威；
+- 直接复制两套源的网格、拓扑、蒙皮权重或动画时长；
+- 擅自把 visualAcceptance 或 productionReady 改为 true；
+- force push、改写历史、替代 PR 或合并 main。
+
+你开始后第一项工作必须是：在真实浏览器打开 R0.17.1，捕获侧面、正面、顶部、三分之四和翼底五张固定视角，再捕获基础拍翼运行和 phase 0.25 两张变形证据。根据证据直接修形，重点继续收敛身体比例、眼睛、翼根、右翼法线、尾基和蹼足。每轮完成后提供一个可直接点开的固定在线 HTML 和截图证据。
+
+当前真实状态：
+
+- visualBirdGenerated=true
+- continuousSurfaceBirdGenerated=false
+- staticFormAccepted=false
+- basicFlapDeformationAccepted=false
+- advancedFlightAllowed=false
+- visualAcceptance=false
+- productionReady=false
+
+保留现有 Draft PR #12。新工作应从交接分支另建工作分支继续，不得另起替代体系。
