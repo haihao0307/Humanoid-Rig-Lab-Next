@@ -92,3 +92,12 @@ Production Mother 不承担广泛研究和重新分类；一个 slot 一次只�
 
 完整规范：`haihao0307/guilin-dem-pipeline@7bab432f4c4501154bd629786a7489adb81ccd6d:knowledge/ARCHETYPE_FACTORY_SYSTEM_R1_ZH.md`。
 队列参考：`haihao0307/guilin-dem-pipeline@ecbad468734061a178208d7f37e6cbea9b0b977c:knowledge/BIO_ENV_ARCHETYPE_ROADMAP_R1_ZH.md`。
+
+
+## Complex Asset R4：禁止单一细节卡死整条生产线（2026-09-22 永久规则）
+
+复杂资产执行 `MOTHER_PARALLEL_COVERAGE_EXECUTION_R4_ZH.md`。R3 的“一次一个 primary defect”解释为**一个 lane 一个 defect**，不是“整个复杂资产只能串行做一个局部”。一个复杂资产默认拆成 3–5 个互不冲突的工位；SPECIMEN_LOCAL / CONTACT_LOCAL 问题最多连续 2 个 bounded increments，仍不通过就 `HOLD_LOCAL` 并轮转其他独立系统，不能让一只手、一只眼、一个接缝长期卡住帽子、衣服、其他人物、材质、烟雾、动作或其他母型。
+
+进入 MICRO_DETAIL 前必须达到 breadth floor：主要系统不能长期 UNSTARTED。物理尺寸必须量最终生成/变形后的可见世界空间几何，配置目标值不等于通过。Assembly 每 2–4 个 bounded increments 生成一次整体 heartbeat，并最终输出一个 standalone HTML。
+
+Canonical policy: `haihao0307/guilin-dem-pipeline@885ce18fbd7ee58b4458ee49eae3f77610f92a0b:knowledge/MOTHER_PARALLEL_COVERAGE_EXECUTION_R4_ZH.md`。
