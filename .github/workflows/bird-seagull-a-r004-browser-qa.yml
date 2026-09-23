@@ -34,8 +34,10 @@ jobs:
       - name: Install repository dependencies
         run: npm ci
 
-      - name: Recover exact missing source character
-        run: node BIRD_SEAGULL_A_DIRECT_OPEN_R004/recover-form00.mjs
+      - name: Confirm published payload is still the diagnosed one-byte-short source
+        run: |
+          test "$(wc -c < BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-00.js)" -eq 8047
+          test "$(sha256sum BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-00.js | cut -d' ' -f1)" = "03228a8336c6b62b41ea4e5e5066d430e27cc951f83ab25981dde3c51c45a326"
 
       - name: Install Chromium runtime
         run: npx playwright install --with-deps chromium
@@ -52,7 +54,7 @@ jobs:
           echo 'Local server failed to start'
           exit 1
 
-      - name: Run desktop and mobile browser audit
+      - name: Run desktop and mobile browser audit against published files as-is
         run: node BIRD_SEAGULL_A_DIRECT_OPEN_R004/qa.mjs
 
       - name: Upload browser evidence
