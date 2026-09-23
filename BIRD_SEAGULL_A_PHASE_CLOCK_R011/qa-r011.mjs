@@ -39,11 +39,11 @@ async function audit(label,options){
   return{qa:window.__BIRD_R011_QA,title:document.title,audits,grids,restore:{a,b,saved},rateSwitch:{before,after:switchClock.phaseTicks,rateHz:switchClock.rateHz},r010:window.__BIRD_R010_QA};
  });
  assert.match(result.title,/R0\.11/);
- assert.equal(resu["qa"].version,'R0.11');
+ assert.equal(result.qa.version,'R0.11');
  assert.deepEqual(result.qa.supportedRates,[24,30,60,90,120]);
  assert.equal(result.qa.phaseTicksPerCycle,17640);
  assert.equal(result.qa.externalRuntimeDependencies,0);
- assert.equal(resu["qa"].controllerAffectsSourceMesh,false);
+ assert.equal(result.qa.controllerAffectsSourceMesh,false);
  assert.equal(result.audits.length,5);
  for(const a of result.audits){
   assert.equal(a.canonicalDriftSourceFrames,0);
@@ -81,7 +81,8 @@ let report;
 try{
  const desktop=await audit('desktop',{viewport:{width:1600,height:1000}});
  const mobile=await audit('mobile',{viewport:{width:390,height:844},isMobile:true,hasTouch:true});
- assert.equal(pageErrors.length,0,JSON.stringify(pageErrors));assert.equal(failedRequests.length,0,JSON.stringify(failedRequests));
+ assert.equal(pageErrors.length,0,JSON.stringify(pageErrors));
+ assert.equal(failedRequests.length,0,JSON.stringify(failedRequests));
  assert.equal(consoleEntries.filter(x=>x.type==='error').length,0,JSON.stringify(consoleEntries));
  report={url,desktop,mobile,pageErrors,failedRequests,consoleEntries,error:null};
 }catch(error){report={url,pageErrors,failedRequests,consoleEntries,error:error.stack||error.message}}
