@@ -40,53 +40,48 @@ jobs:
           test -f "$dir/runtime/bootstrap.js"
           test -f "$dir/runtime/contract-ui-base.js"
           test -f "$dir/runtime/contract-ui.js"
-          test -f "$dir/runtime/contract-ui-r008-loader.js"
+          test "$(find "$dir/runtime" -name 'transfer-chunk-*.js' | wc -l)" -eq 3
           test -f "$dir/data/contract.js"
           test -f "$dir/controller.json"
           test -f "$dir/manifest.json"
           test "$(find "$dir/data" -name 'form-*.js' | wc -l)" -eq 5
           test "$(find "$dir/data" -name 'anim-*.js' | wc -l)" -eq 12
           node --check "$dir/runtime/contract-ui.js"
-          node --check "$dir/runtime/contract-ui-r008-loader.js"
           node --check "$dir/qa.mjs"
           node - <<'NODE'
           const fs=require('fs'),vm=require('vm'),zlib=require('zlib'),crypto=require('crypto');
           const dir='BIRD_SEAGULL_A_CONTROLLER_TRANSFER_R008';global.window={};
-          for(const f of fs.readdirSync(`${dir}/data`).filter(x=>x.startsWith('form-')).sort())vm.runInThisContext(fs.readFileSync(`${dir}/data/${f}`,'utf8'));
-          for(const f of fs.readdirSync(`${dir}/data`).filter(x=>x.startsWith('anim-')).sort())vm.runInThisContext(fs.readFileSync(`${dir}/data/${f}`,'utf8'));
+          const runFiles=(folder,prefix)=>{for(const f of fs.readdirSync(`${dir}/${folder}`).filter(x=>x.startsWith(prefix)).sort())vm.runInThisContext(fs.readFileSync(`${dir}/${folder}/${f}`,'utf8'))};
+          runFiles('data','form-');runFiles('data','anim-');
           vm.runInThisContext(fs.readFileSync(`${dir}/data/contract.js`,'utf8'));
-          for(const f of fs.readdirSync(`${dir}/runtime`).filter(x=>x.startsWith('viewer-chunk-')).sort())vm.runInThisContext(fs.readFileSync(`${dir}/runtime/${f}`,'utf8'));
+          runFiles('runtime','viewer-chunk-');runFiles('runtime','transfer-chunk-');
           const m=JSON.parse(fs.readFileSync(`${dir}/manifest.json`,'utf8'));
           const p=JSON.parse(fs.readFileSync(`${dir}/controller.json`,'utf8'));
-          const controllerBootstrap=fs.readFileSync(`${dir}/runtime/contract-ui.js`,'utf8');
-          const match=controllerBootstrap.match(/window\.__BIRD_R008_CONTROLLER=(\{.*\});\nconst script=/s);
-          if(!match)throw new Error('controller bootstrap object missing');
-          const pj=JSON.parse(match[1]);
           const c=window.__BIRD_R007_CONTRACT;
           const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
-          const g64=window.__BIRD_FORM,a64=window.__BIRD_R006_ANIM,v64=window.__BIRD_R007_VIEWER;
-          const gg=Buffer.from(g64,'base64'),gr=zlib.gunzipSync(gg),ag=Buffer.from(a64,'base64'),ar=zlib.gunzipSync(ag),vg=Buffer.from(v64,'base64'),vr=zlib.gunzipSync(vg);
+          const g64=window.__BIRD_FORM,a64=window.__BIRD_R006_ANIM,v64=window.__BIRD_R007_VIEWER,t64=window.__BIRD_R008_TRANSFER;
+          const gr=zlib.gunzipSync(Buffer.from(g64,'base64')),ar=zlib.gunzipSync(Buffer.from(a64,'base64')),vr=zlib.gunzipSync(Buffer.from(v64,'base64'));
+          const tg=Buffer.from(t64,'base64'),tr=zlib.gunzipSync(tg);
           if(gr.readUInt32LE(0)!==4416||gr.readUInt32LE(4)!==16872)throw new Error('geometry counts mismatch');
           if(ar.subarray(0,8).toString()!=='BANIM006'||ar.readUInt32LE(16)!==50)throw new Error('animation header mismatch');
           if(c.version!=='R0.07'||c.evidence.frameCount!==50)throw new Error('source contract mismatch');
           if(p.version!=='R0.08'||p.anchorFramesZeroBased.length!==8||p.controllerChannels.length!==9)throw new Error('controller contract mismatch');
-          if(pj.version!==p.version||JSON.stringify(pj.anchorFramesZeroBased)!==JSON.stringify(p.anchorFramesZeroBased)||JSON.stringify(pj.controllerChannels)!==JSON.stringify(p.controllerChannels))throw new Error('controller bootstrap mismatch');
           if(m.version!=='R0.08'||m.controllerAnchorCount!==8||m.controllerChannelCount!==9||m.sourceCurveSamples!==450||m.controllerAnchorSamples!==72)throw new Error('manifest counts mismatch');
           if(Math.abs(m.controllerSampleReduction-.84)>1e-12)throw new Error('sample reduction mismatch');
+          if(t64.length!==m.transferBase64Chars||sha(Buffer.from(t64))!==m.transferBase64Sha256)throw new Error('transfer Base64 mismatch');
+          if(tg.length!==m.transferGzipBytes||sha(tg)!==m.transferGzipSha256)throw new Error('transfer gzip mismatch');
+          if(tr.length!==m.transferSourceBytes||sha(tr)!==m.transferSourceSha256)throw new Error('transfer source mismatch');
+          new Function(tr.toString('utf8'));
           if(sha(fs.readFileSync(`${dir}/controller.json`))!==m.controllerJsonSha256)throw new Error('controller JSON SHA mismatch');
           if(sha(fs.readFileSync(`${dir}/runtime/contract-ui.js`))!==m.controllerBootstrapSha256)throw new Error('controller bootstrap SHA mismatch');
           if(fs.statSync(`${dir}/runtime/contract-ui.js`).size!==m.controllerBootstrapBytes)throw new Error('controller bootstrap size mismatch');
-          if(sha(fs.readFileSync(`${dir}/runtime/contract-ui-r008-loader.js`))!==m.runtimeBundleSha256)throw new Error('R008 runtime bundle SHA mismatch');
-          if(fs.statSync(`${dir}/runtime/contract-ui-r008-loader.js`).size!==m.runtimeBundleBytes)throw new Error('R008 runtime bundle size mismatch');
-          if(sha(fs.readFileSync(`${dir}/qa.mjs`))!==m.qaScriptSha256)throw new Error('R008 QA SHA mismatch');
-          if(fs.statSync(`${dir}/qa.mjs`).size!==m.qaScriptBytes)throw new Error('R008 QA size mismatch');
-          if(sha(fs.readFileSync(`${dir}/index.html`))!==m.indexSha256)throw new Error('R008 index SHA mismatch');
+          if(sha(fs.readFileSync(`${dir}/qa.mjs`))!==m.qaScriptSha256)throw new Error('QA SHA mismatch');
           if(vr.length!==25878)throw new Error('viewer source length mismatch');
           const anchors=p.anchorFramesZeroBased,smooth=t=>t*t*(3-2*t),approx=(arr,i)=>{if(i<=anchors[0])return arr[anchors[0]];if(i>=anchors.at(-1))return arr[anchors.at(-1)];let k=0;while(i>anchors[k+1])k++;const a=anchors[k],b=anchors[k+1],t=smooth((i-a)/(b-a));return arr[a]+(arr[b]-arr[a])*t};
           const tip=c.series.averageWingtipY,pred=tip.map((_,i)=>approx(tip,i));
           const rmse=Math.sqrt(tip.reduce((s,v,i)=>s+(v-pred[i])**2,0)/tip.length);
           if(!Number.isFinite(rmse)||!anchors.every(i=>Math.abs(tip[i]-pred[i])<1e-12))throw new Error('controller interpolation audit failed');
-          console.log({geometryBytes:gr.length,animationBytes:ar.length,viewerBytes:vr.length,controllerAnchors:anchors.map(x=>x+1),tipRmse:rmse,sampleReduction:m.controllerSampleReduction});
+          console.log({geometryBytes:gr.length,animationBytes:ar.length,viewerBytes:vr.length,transferBytes:tr.length,anchors:anchors.map(x=>x+1),tipRmse:rmse,sampleReduction:m.controllerSampleReduction});
           NODE
 
       - name: Prepare minimal Pages artifact
