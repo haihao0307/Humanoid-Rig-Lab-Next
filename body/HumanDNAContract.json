@@ -127,12 +127,24 @@
       ]
     },
     {
+      "id": "facial-identity",
+      "source": "body/FaceIdentity.js",
+      "function": "sampleFaceIdentity / faceIdentityWarp",
+      "inputs": [
+        "17 authored bounded identity controls in [-1,1]; 13 regional node controls plus shared width, height, depth and eye spacing",
+        "Continuous canonical head map applied to face, eyes, dentition, ears and hair before the actor pose; analytic inverse-transpose normals",
+        "Same sampled identity goes through CharacterPresets and NPCDefinitions; seed is reproducible, not a demographic classifier",
+        "body/FaceAppearance.js jarvis/face_appearance@1 stores generator revision, seed, identity and skin; version mismatch requires explicit migration",
+        "Finite parameter tests and limited rendered examples do not certify every face or expression; eye and ear morphology ranges remain incomplete"
+      ]
+    },
+    {
       "id": "facial-expression",
       "source": "body/FaceControls.js",
       "function": "resolveFaceOffsets",
       "inputs": [
         "body/FaceControlRecipe.json: authored source-space control centres, radii and expression offsets",
-        "npc.character.appearance.face (jarvis/face_pose@1)",
+        "npc.character.appearance.face (jarvis/face_profile@3): neutral identity @2 and expression @1 remain independent; legacy face_pose@1 migrates",
         "current generated neutral surface for disposable coverage sampling; no baked vertices"
       ]
     },
