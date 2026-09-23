@@ -360,7 +360,11 @@ class PhysicsWorld{
   }
   if(required>this.maxMicrosteps)throw Error('物理速度超过当前薄物体的安全步进范围，已拒绝本步');
   this.lastMicrosteps=required;this.maxPenetrationM=0;
-  for(let i=0;i<required;i++){for(const manipulation of this.manipulations.values())this.applyManipulation(manipulation);this.engine.step(dt/required);this.microstepCount++;this.assertFinite();this.collectContacts();}
+  // Kinematic integration still normalizes quaternions at zero velocity.
+  // Preserve the current frozen pose exactly, after accepting real scene edits;
+  // otherwise last-bit changes repeatedly invalidate cooperative preflights.
+  const frozenRotations=[...this.frozen.keys()].map(id=>this.bodies.get(id)?.body).filter(Boolean).map(body=>[body,body.quaternion.clone()]);
+  for(let i=0;i<required;i++){for(const manipulation of this.manipulations.values())this.applyManipulation(manipulation);this.engine.step(dt/required);for(const [body,q]of frozenRotations)body.quaternion.copy(q);this.microstepCount++;this.assertFinite();this.collectContacts();}
   for(const record of this.actors.values()){record.body.position.copy(this.vector(record.target));record.body.velocity.setZero();record.body.aabbNeedsUpdate=true;}
   for(const record of this.bodies.values())this.writePose(record);
   this.stepCount++;
