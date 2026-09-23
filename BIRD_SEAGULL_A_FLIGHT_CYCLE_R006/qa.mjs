@@ -69,6 +69,13 @@ async function audit(label,contextOptions){
   await waitForReady(page,label);
   const state=await page.evaluate(()=>({qa:window.__BIRD_QA,status:document.getElementById('status')?.textContent||'',frame:document.getElementById('frameText')?.textContent||''}));
   assert.equal(state.qa?.ready,true);assert.equal(state.qa.vertexCount,4416);assert.equal(state.qa.triangleCount,5624);assert.equal(state.qa.frameCount,50);assert.equal(state.qa.geometryPayloadChars,39900);assert.equal(state.qa.animationPayloadChars,30392);assert.match(state.status,/源拍翼循环已载入/);
+
+  if(label==='mobile'){
+    await page.locator('#leftMenu').click();
+    await page.waitForFunction(()=>document.getElementById('controls')?.classList.contains('open'));
+    await page.waitForTimeout(300);
+  }
+
   await page.locator('#play').click();
   await setFrame(page,0);const frame01=await sampleCanvas(page);assert(frame01&&frame01.visible>20,`${label}: frame 01 bird not visibly rendered`);
   await page.screenshot({path:path.join(root,`${label}-frame-01.png`),fullPage:true});
@@ -78,11 +85,14 @@ async function audit(label,contextOptions){
   await page.screenshot({path:path.join(root,`${label}-frame-43.png`),fullPage:true});
 
   if(label==='mobile'){
-    await page.locator('#leftMenu').click();await page.waitForTimeout(300);
     const box=await page.locator('#controls').boundingBox();assert(box&&box.x>=-1&&box.x+box.width<=391,`${label}: controls outside viewport`);
     await page.locator('button[data-view="top"]').click();await page.locator('#wire').click();await page.waitForTimeout(250);
     await page.screenshot({path:path.join(root,'mobile-controls-top-wire.png'),fullPage:true});
-    await page.locator('#rightMenu').click();await page.waitForTimeout(300);
+    await page.locator('#leftMenu').click();
+    await page.waitForFunction(()=>!document.getElementById('controls')?.classList.contains('open'));
+    await page.locator('#rightMenu').click();
+    await page.waitForFunction(()=>document.getElementById('analysis')?.classList.contains('open'));
+    await page.waitForTimeout(300);
     const rbox=await page.locator('#analysis').boundingBox();assert(rbox&&rbox.x>=-1&&rbox.x+rbox.width<=391,`${label}: analysis outside viewport`);
     await page.screenshot({path:path.join(root,'mobile-analysis.png'),fullPage:true});
   }else{
