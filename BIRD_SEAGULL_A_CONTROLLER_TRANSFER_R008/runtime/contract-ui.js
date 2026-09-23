@@ -10,9 +10,10 @@ const decode=async b64=>{const raw=atob(b64),bytes=new Uint8Array(raw.length);fo
   const payload=window.__BIRD_R008_TRANSFER;
   if(typeof payload!=='string'||payload.length!==8904)throw new Error('R0.08 迁移载荷长度不匹配');
   const source=await decode(payload);
-  if(source.length!==19611)throw new Error('R0.08 迁移源码长度不匹配');
+  const sourceBytes=new TextEncoder().encode(source).length;
+  if(sourceBytes!==19611)throw new Error('R0.08 迁移源码长度不匹配');
   (0,eval)(source);
-  window.__BIRD_R008_LOADER_QA={ready:true,version:'R0.08',payloadChars:payload.length,sourceBytes:source.length};
+  window.__BIRD_R008_LOADER_QA={ready:true,version:'R0.08',payloadChars:payload.length,sourceBytes};
 })().catch(error=>{
   console.error(error);
   const el=document.getElementById('contractStatus');
