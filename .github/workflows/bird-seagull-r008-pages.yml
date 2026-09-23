@@ -40,12 +40,14 @@ jobs:
           test -f "$dir/runtime/bootstrap.js"
           test -f "$dir/runtime/contract-ui-base.js"
           test -f "$dir/runtime/contract-ui.js"
+          test -f "$dir/runtime/contract-ui-r008-loader.js"
           test -f "$dir/data/contract.js"
           test -f "$dir/controller.json"
           test -f "$dir/manifest.json"
           test "$(find "$dir/data" -name 'form-*.js' | wc -l)" -eq 5
           test "$(find "$dir/data" -name 'anim-*.js' | wc -l)" -eq 12
           node --check "$dir/runtime/contract-ui.js"
+          node --check "$dir/runtime/contract-ui-r008-loader.js"
           node --check "$dir/qa.mjs"
           node - <<'NODE'
           const fs=require('fs'),vm=require('vm'),zlib=require('zlib'),crypto=require('crypto');
@@ -56,6 +58,10 @@ jobs:
           for(const f of fs.readdirSync(`${dir}/runtime`).filter(x=>x.startsWith('viewer-chunk-')).sort())vm.runInThisContext(fs.readFileSync(`${dir}/runtime/${f}`,'utf8'));
           const m=JSON.parse(fs.readFileSync(`${dir}/manifest.json`,'utf8'));
           const p=JSON.parse(fs.readFileSync(`${dir}/controller.json`,'utf8'));
+          const controllerBootstrap=fs.readFileSync(`${dir}/runtime/contract-ui.js`,'utf8');
+          const match=controllerBootstrap.match(/window\.__BIRD_R008_CONTROLLER=(\{.*\});\nconst script=/s);
+          if(!match)throw new Error('controller bootstrap object missing');
+          const pj=JSON.parse(match[1]);
           const c=window.__BIRD_R007_CONTRACT;
           const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
           const g64=window.__BIRD_FORM,a64=window.__BIRD_R006_ANIM,v64=window.__BIRD_R007_VIEWER;
@@ -64,11 +70,17 @@ jobs:
           if(ar.subarray(0,8).toString()!=='BANIM006'||ar.readUInt32LE(16)!==50)throw new Error('animation header mismatch');
           if(c.version!=='R0.07'||c.evidence.frameCount!==50)throw new Error('source contract mismatch');
           if(p.version!=='R0.08'||p.anchorFramesZeroBased.length!==8||p.controllerChannels.length!==9)throw new Error('controller contract mismatch');
+          if(pj.version!==p.version||JSON.stringify(pj.anchorFramesZeroBased)!==JSON.stringify(p.anchorFramesZeroBased)||JSON.stringify(pj.controllerChannels)!==JSON.stringify(p.controllerChannels))throw new Error('controller bootstrap mismatch');
           if(m.version!=='R0.08'||m.controllerAnchorCount!==8||m.controllerChannelCount!==9||m.sourceCurveSamples!==450||m.controllerAnchorSamples!==72)throw new Error('manifest counts mismatch');
           if(Math.abs(m.controllerSampleReduction-.84)>1e-12)throw new Error('sample reduction mismatch');
           if(sha(fs.readFileSync(`${dir}/controller.json`))!==m.controllerJsonSha256)throw new Error('controller JSON SHA mismatch');
-          const runtime=fs.readFileSync(`${dir}/runtime/contract-ui.js`);
-          console.log({runtimeBundleSha256:sha(runtime),runtimeBundleBytes:runtime.length,manifestRuntimeBundleSha256:m.runtimeBundleSha256,manifestRuntimeBundleBytes:m.runtimeBundleBytes});
+          if(sha(fs.readFileSync(`${dir}/runtime/contract-ui.js`))!==m.controllerBootstrapSha256)throw new Error('controller bootstrap SHA mismatch');
+          if(fs.statSync(`${dir}/runtime/contract-ui.js`).size!==m.controllerBootstrapBytes)throw new Error('controller bootstrap size mismatch');
+          if(sha(fs.readFileSync(`${dir}/runtime/contract-ui-r008-loader.js`))!==m.runtimeBundleSha256)throw new Error('R008 runtime bundle SHA mismatch');
+          if(fs.statSync(`${dir}/runtime/contract-ui-r008-loader.js`).size!==m.runtimeBundleBytes)throw new Error('R008 runtime bundle size mismatch');
+          if(sha(fs.readFileSync(`${dir}/qa.mjs`))!==m.qaScriptSha256)throw new Error('R008 QA SHA mismatch');
+          if(fs.statSync(`${dir}/qa.mjs`).size!==m.qaScriptBytes)throw new Error('R008 QA size mismatch');
+          if(sha(fs.readFileSync(`${dir}/index.html`))!==m.indexSha256)throw new Error('R008 index SHA mismatch');
           if(vr.length!==25878)throw new Error('viewer source length mismatch');
           const anchors=p.anchorFramesZeroBased,smooth=t=>t*t*(3-2*t),approx=(arr,i)=>{if(i<=anchors[0])return arr[anchors[0]];if(i>=anchors.at(-1))return arr[anchors.at(-1)];let k=0;while(i>anchors[k+1])k++;const a=anchors[k],b=anchors[k+1],t=smooth((i-a)/(b-a));return arr[a]+(arr[b]-arr[a])*t};
           const tip=c.series.averageWingtipY,pred=tip.map((_,i)=>approx(tip,i));
