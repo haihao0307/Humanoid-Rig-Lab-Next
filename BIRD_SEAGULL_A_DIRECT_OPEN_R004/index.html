@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0d151c">
+  <meta name="theme-color" content="#0b141b">
   <meta name="referrer" content="no-referrer">
   <title>Bird Mother｜Seagull A 基础形态直开台 R0.04</title>
   <link rel="stylesheet" href="./style.css">
@@ -13,72 +13,67 @@
     <button class="mobile" id="menu" type="button">参数</button>
     <div>
       <b>Bird Mother｜Seagull A 基础形态直开台 R0.04</b><br>
-      <small>空白页纠错版｜精确恢复来源载荷，并按真实包围盒自动居中</small>
+      <small>来源静态几何完整载入｜载荷校验｜自动取景｜零外部运行依赖</small>
     </div>
-    <span class="pill">DIRECT OPEN · AUTO FIT</span>
+    <span class="pill">DIRECT OPEN</span>
   </header>
 
   <main>
     <aside id="panel">
-      <div class="card correction">
-        <b>上一版判定失败：页面虽然打开，但鸟没有出现。</b><br>
-        实际原因已经定位：第一段来源载荷少了一个 Base64 字符。权威清单记录该文件应为 8,048 字节，实际只有 8,047 字节；依据原清单 SHA-256 精确反推，缺失字符为 <code>k</code>，位于该段载荷索引 4,649。此版先完成精确恢复，再按来源几何真实包围盒自动居中和缩放；首帧检测不到鸟会直接报错，不再交空白页。
+      <div class="card">
+        <b>当前只验收第一道门：基础静态鸟形。</b><br>
+        直接读取用户文件中的 4,416 顶点和 5,624 三角面。羽毛层、贴图重建与真实飞行动作不在这一版混入。
       </div>
 
       <h3>固定视角</h3>
       <div class="grid" id="views">
-        <button data-v="persp" class="active" type="button">三分之四</button>
-        <button data-v="top" type="button">顶部</button>
-        <button data-v="bottom" type="button">翼底</button>
-        <button data-v="front" type="button">正面</button>
-        <button data-v="back" type="button">背面</button>
-        <button data-v="side" type="button">侧面</button>
+        <button type="button" data-v="persp" class="active">三分之四</button>
+        <button type="button" data-v="top">顶部</button>
+        <button type="button" data-v="bottom">翼底</button>
+        <button type="button" data-v="front">正面</button>
+        <button type="button" data-v="back">背面</button>
+        <button type="button" data-v="side">侧面</button>
       </div>
 
       <h3>显示</h3>
       <div class="grid">
-        <button id="wire" type="button">线框：关</button>
-        <button id="reset" type="button">重置镜头</button>
-      </div>
-
-      <h3>实时核验</h3>
-      <div class="audit">
-        <div><span>来源包围盒跨度</span><strong id="bboxText">读取中</strong></div>
-        <div><span>自动归一化倍率</span><strong id="scaleText">读取中</strong></div>
-        <div><span>首帧可见像素</span><strong id="pixelText">读取中</strong></div>
+        <button type="button" id="wire">线框：关</button>
+        <button type="button" id="reset">重置镜头</button>
       </div>
 
       <h3>执行边界</h3>
-      <div class="gate">来源静态几何完整保留</div>
+      <div class="gate">来源几何完整保留</div>
       <div class="gate">零 CDN、零 iframe、零 Sketchfab</div>
-      <div class="gate">首帧可见性检测通过后才标记“已显示”</div>
-      <div class="gate warn">原羽片只作形态老师，后续重新建立羽层</div>
-      <div class="gate warn">精确物种、真实尺度和最终外形尚未批准</div>
+      <div class="gate">载荷长度、索引与 WebGL 初始化均显式校验</div>
+      <div class="gate warn">原羽片仅作为形态老师，后续另行重建</div>
+      <div class="gate warn">精确物种与真实尺度尚未锁定</div>
+
+      <h3>来源核对</h3>
+      <div class="card hashes">
+        来源 GLB SHA-256<br>
+        <code>175c61f65e3f2c8b561d422f9d0c61b23bfd85928dd3b66ad8547638d84a90aa</code><br><br>
+        静态载荷 SHA-256<br>
+        <code>ad830273e57afdc0d82c9cb3954e9ae93671d0d5bc1fea979cd2771c848c32f5</code>
+      </div>
     </aside>
 
     <section class="stage">
-      <canvas id="c" aria-label="Seagull A 三维来源形态"></canvas>
+      <canvas id="c" aria-label="Seagull A 三维形态视窗"></canvas>
       <div class="overlay">
         <b>用户上传：seagull (A).zip</b>
-        鼠标或手指拖动旋转，滚轮缩放。此页仍只做第一道门：检查来源鸟的基础静态形态，不把原羽毛、贴图或拍翼动画冒充最终 Bird Mother 成果。
+        鼠标或手指拖动旋转，滚轮缩放。坐标沿用来源：X＝左右翼展，Y＝上下，Z＝头尾轴。
       </div>
-      <div class="status" id="status">正在读取同仓形态载荷…</div>
-      <div class="fatal" id="fatal" hidden>
-        <b>三维形态没有成功显示</b>
-        <span>未知错误</span>
-      </div>
+      <div class="status" id="status">正在校验并载入同仓形态数据……</div>
     </section>
   </main>
 
-  <footer>visualAcceptance=false · productionReady=false · 外形仍待用户直接审查</footer>
+  <footer>visualAcceptance=false · productionReady=false · 基础形态等待用户确认</footer>
 
-  <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-00.js"></script>
-  <script src="./form-00-repair.js"></script>
-  <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-01.js"></script>
-  <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-02.js"></script>
-  <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-03.js"></script>
-  <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-04.js"></script>
-  <script src="./payload-fix.js"></script>
+  <script src="./data/form-00.js"></script>
+  <script src="./data/form-01.js"></script>
+  <script src="./data/form-02.js"></script>
+  <script src="./data/form-03.js"></script>
+  <script src="./data/form-04.js"></script>
   <script src="./viewer.js"></script>
 </body>
 </html>
