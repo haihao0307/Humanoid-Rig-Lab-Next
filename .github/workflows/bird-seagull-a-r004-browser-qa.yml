@@ -20,9 +20,7 @@ permissions:
 jobs:
   chromium-visual-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      BIRD_SEAGULL_A_R004_QA_URL: http://127.0.0.1:4173/BIRD_SEAGULL_A_DIRECT_OPEN_R004/index.html?qa=1
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -54,8 +52,19 @@ jobs:
           echo 'Local server failed to start'
           exit 1
 
-      - name: Run desktop and mobile browser audit against published files as-is
+      - name: Audit unmodified published files through local static hosting
+        env:
+          BIRD_SEAGULL_A_R004_QA_URL: http://127.0.0.1:4173/BIRD_SEAGULL_A_DIRECT_OPEN_R004/index.html?qa=local
+          BIRD_SEAGULL_A_R004_QA_ROOT: artifacts/bird-seagull-a-r004-browser-qa/local
         run: node BIRD_SEAGULL_A_DIRECT_OPEN_R004/qa.mjs
+
+      - name: Audit the exact one-click raw.githack URL
+        env:
+          BIRD_SEAGULL_A_R004_QA_URL: https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${{ github.sha }}/BIRD_SEAGULL_A_DIRECT_OPEN_R004/index.html?qa=hosted
+          BIRD_SEAGULL_A_R004_QA_ROOT: artifacts/bird-seagull-a-r004-browser-qa/hosted
+        run: |
+          curl -L --fail --retry 6 --retry-all-errors --retry-delay 5 --max-time 120 "$BIRD_SEAGULL_A_R004_QA_URL" >/dev/null
+          node BIRD_SEAGULL_A_DIRECT_OPEN_R004/qa.mjs
 
       - name: Upload browser evidence
         if: always()
