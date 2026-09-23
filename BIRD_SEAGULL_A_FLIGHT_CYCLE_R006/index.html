@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#081118">
+  <meta name="referrer" content="no-referrer">
+  <title>Bird Mother｜Seagull A 源拍翼循环解剖台 R0.06</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header>
+    <button class="mobile nav-button" id="leftMenu" type="button">控制</button>
+    <div class="title-block">
+      <b>Bird Mother｜Seagull A 源拍翼循环解剖台 R0.06</b>
+      <small>50 帧源动画｜翼尖轨迹｜身体耦合｜逐帧冻结｜不虚构其他飞行形态</small>
+    </div>
+    <span class="pill">SOURCE CYCLE · 24 FPS</span>
+    <button class="mobile nav-button" id="rightMenu" type="button">数据</button>
+  </header>
+
+  <main>
+    <aside id="controls" class="panel left-panel">
+      <div class="card stage-note">
+        <b>第三道门：只解剖用户来源文件里真实存在的一段拍翼循环。</b>
+        当前不补造滑翔、盘旋、转弯、起飞、降落或逃逸动作。所有相位名称只是对画面外观的候选描述。
+      </div>
+
+      <h3>来源状态</h3>
+      <div class="grid two" id="sourceMode">
+        <button type="button" data-source="cycle" class="active">源拍翼循环</button>
+        <button type="button" data-source="static">绑定姿态</button>
+      </div>
+
+      <h3>播放</h3>
+      <div class="transport">
+        <button type="button" id="play" class="primary">暂停</button>
+        <button type="button" id="prev">上一帧</button>
+        <button type="button" id="next">下一帧</button>
+      </div>
+      <div class="speed-row" id="speeds">
+        <button type="button" data-speed="0.25">0.25×</button>
+        <button type="button" data-speed="0.5">0.5×</button>
+        <button type="button" data-speed="1" class="active">1×</button>
+        <button type="button" data-speed="2">2×</button>
+      </div>
+      <div class="timeline-card">
+        <div class="timeline-head"><span>帧</span><b id="frameText">01 / 50</b><span id="timeText">0.0417 s</span></div>
+        <input id="frameSlider" type="range" min="0" max="49" step="1" value="0">
+        <div class="phase-band" id="phaseBand" aria-label="来源相位分段"></div>
+      </div>
+
+      <h3>九个来源采样点</h3>
+      <div class="key-grid" id="keyFrames"></div>
+
+      <h3>叠加层</h3>
+      <div class="grid two">
+        <button type="button" id="skeleton">骨架：开</button>
+        <button type="button" id="trails">翼尖轨迹：开</button>
+        <button type="button" id="wire">线框：关</button>
+        <button type="button" id="reset">重置镜头</button>
+      </div>
+
+      <h3>固定视角</h3>
+      <div class="grid two" id="views">
+        <button type="button" data-view="persp" class="active">三分之四</button>
+        <button type="button" data-view="top">顶部</button>
+        <button type="button" data-view="bottom">翼底</button>
+        <button type="button" data-view="front">正面</button>
+        <button type="button" data-view="back">背面</button>
+        <button type="button" data-view="side">侧面</button>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <canvas id="glcanvas" aria-label="Seagull A 源拍翼动画三维视窗"></canvas>
+      <div class="overlay source-card">
+        <b>来源：seagull (A).zip</b>
+        灰色鸟体保留来源网格与来源蒙皮；彩色线只表达骨架和翼尖运动轨迹，不是最终羽毛设计。
+      </div>
+      <div class="overlay phase-card">
+        <span>当前来源外观</span>
+        <b id="phaseLabel">读取中</b>
+        <small id="phaseBoundary">candidate label · not aerodynamic truth</small>
+      </div>
+      <div class="overlay frame-card">
+        <b id="bigFrame">01</b><span>/ 50</span>
+      </div>
+      <div class="status" id="status">正在校验并载入源动画数据……</div>
+      <div class="fatal" id="fatal" hidden><b>源动画没有成功显示</b><span>未知错误</span></div>
+    </section>
+
+    <aside id="analysis" class="panel right-panel">
+      <h3>循环实测</h3>
+      <div class="metric-grid summary">
+        <div><span>来源帧率</span><b>24 fps</b></div>
+        <div><span>采样帧</span><b>50</b></div>
+        <div><span>循环跨度</span><b>2.0417 s</b></div>
+        <div><span>骨架节点</span><b>20</b></div>
+      </div>
+
+      <h3>当前帧</h3>
+      <div class="metric-grid current">
+        <div><span>左翼尖 Y</span><b id="leftY">—</b></div>
+        <div><span>右翼尖 Y</span><b id="rightY">—</b></div>
+        <div><span>身体 Y</span><b id="bodyY">—</b></div>
+        <div><span>翼尖跨度</span><b id="tipSpan">—</b></div>
+        <div><span>左右高度差</span><b id="asymmetry">—</b></div>
+        <div><span>播放倍率</span><b id="speedText">1×</b></div>
+      </div>
+
+      <h3>翼尖与身体耦合</h3>
+      <div class="graph-card">
+        <canvas id="motionGraph" width="420" height="230" aria-label="翼尖和身体纵向轨迹图"></canvas>
+        <div class="legend">
+          <span><i class="left-tip"></i>左翼尖 Y</span>
+          <span><i class="right-tip"></i>右翼尖 Y</span>
+          <span><i class="body-line"></i>身体 Y</span>
+        </div>
+      </div>
+      <div class="fact-list">
+        <div><span>左翼尖纵向行程</span><b id="leftTravel">—</b></div>
+        <div><span>右翼尖纵向行程</span><b id="rightTravel">—</b></div>
+        <div><span>身体纵向耦合</span><b id="bodyTravel">—</b></div>
+        <div><span>翼尖 / 身体行程比</span><b id="travelRatio">—</b></div>
+      </div>
+
+      <h3>飞行形态槽位</h3>
+      <div class="pose-ledger">
+        <div class="pose learned"><span>下击候选</span><b>当前来源可学习</b></div>
+        <div class="pose learned"><span>上举候选</span><b>当前来源可学习</b></div>
+        <div class="pose waiting"><span>滑翔 / 翱翔</span><b>等待用户文件</b></div>
+        <div class="pose waiting"><span>转弯 / 起降 / 逃逸</span><b>等待用户文件</b></div>
+      </div>
+
+      <h3>不可跨越的边界</h3>
+      <div class="gate good">已知：源网格、50 帧蒙皮矩阵、骨架位置、翼尖轨迹与循环时序。</div>
+      <div class="gate warn">未知：精确物种、真实尺度、自然飞行语义、最终羽层与商业运行时资产。</div>
+      <div class="card compact license">原参考许可为 CC-BY-NC-SA-4.0；本页只作研究、测量与校准。</div>
+    </aside>
+  </main>
+
+  <footer>
+    <span>visualAcceptance=false</span><span>productionReady=false</span><span>externalRuntimeDependencies=0</span><span>sourceAnimationOnly=true</span>
+  </footer>
+
+  <script src="./data/form-00.js"></script>
+  <script src="./data/form-01.js"></script>
+  <script src="./data/form-02.js"></script>
+  <script src="./data/form-03.js"></script>
+  <script src="./data/form-04.js"></script>
+  <script src="./data/anim-00.js"></script>
+  <script src="./runtime/viewer-00.js"></script>
+  <script src="./runtime/bootstrap.js"></script>
+</body>
+</html>
