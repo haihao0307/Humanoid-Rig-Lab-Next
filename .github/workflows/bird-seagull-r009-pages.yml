@@ -1,0 +1,155 @@
+name: Deploy Bird Seagull R009 to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'BIRD_SEAGULL_A_CHANNEL_LIMITS_R009/**'
+      - '.github/workflows/bird-seagull-r009-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate source payloads and R009 channel-limit contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir=BIRD_SEAGULL_A_CHANNEL_LIMITS_R009
+          test -f "$dir/index.html"
+          test -f "$dir/style.css"
+          test -f "$dir/runtime/viewer-00.js"
+          test "$(find "$dir/runtime" -name 'viewer-chunk-*.js' | wc -l)" -eq 4
+          test -f "$dir/runtime/bootstrap.js"
+          test -f "$dir/runtime/contract-ui-base.js"
+          test -f "$dir/runtime/contract-ui-r008.js"
+          test -f "$dir/runtime/contract-ui.js"
+          test -f "$dir/runtime/channel-ui.js"
+          test "$(find "$dir/runtime" -name 'transfer-chunk-*.js' | wc -l)" -eq 3
+          test -f "$dir/data/contract.js"
+          test -f "$dir/data/channel-contract.js"
+          test -f "$dir/controller.json"
+          test -f "$dir/channel-contract.json"
+          test -f "$dir/manifest.json"
+          test "$(find "$dir/data" -name 'form-*.js' | wc -l)" -eq 5
+          test "$(find "$dir/data" -name 'anim-*.js' | wc -l)" -eq 12
+          node --check "$dir/runtime/contract-ui.js"
+          node --check "$dir/runtime/channel-ui.js"
+          node --check "$dir/qa.mjs"
+          node - <<'NODE'
+          const fs=require('fs'),vm=require('vm'),zlib=require('zlib'),crypto=require('crypto');
+          const dir='BIRD_SEAGULL_A_CHANNEL_LIMITS_R009';global.window={};
+          const runFiles=(folder,prefix)=>{for(const f of fs.readdirSync(`${dir}/${folder}`).filter(x=>x.startsWith(prefix)).sort())vm.runInThisContext(fs.readFileSync(`${dir}/${folder}/${f}`,'utf8'))};
+          runFiles('data','form-');runFiles('data','anim-');
+          vm.runInThisContext(fs.readFileSync(`${dir}/data/contract.js`,'utf8'));
+          vm.runInThisContext(fs.readFileSync(`${dir}/data/channel-contract.js`,'utf8'));
+          runFiles('runtime','viewer-chunk-');runFiles('runtime','transfer-chunk-');
+          const m=JSON.parse(fs.readFileSync(`${dir}/manifest.json`,'utf8'));
+          const p=JSON.parse(fs.readFileSync(`${dir}/controller.json`,'utf8'));
+          const k=JSON.parse(fs.readFileSync(`${dir}/channel-contract.json`,'utf8'));
+          const c=window.__BIRD_R007_CONTRACT,kjs=window.__BIRD_R009_CONTRACT;
+          const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
+          const g64=window.__BIRD_FORM,a64=window.__BIRD_R006_ANIM,v64=window.__BIRD_R007_VIEWER,t64=window.__BIRD_R008_TRANSFER;
+          const gr=zlib.gunzipSync(Buffer.from(g64,'base64')),ar=zlib.gunzipSync(Buffer.from(a64,'base64')),vr=zlib.gunzipSync(Buffer.from(v64,'base64')),tr=zlib.gunzipSync(Buffer.from(t64,'base64'));
+          if(gr.readUInt32LE(0)!==4416||gr.readUInt32LE(4)!==16872)throw new Error('geometry counts mismatch');
+          if(ar.subarray(0,8).toString()!=='BANIM006'||ar.readUInt32LE(16)!==50)throw new Error('animation header mismatch');
+          if(c.version!=='R0.07'||p.version!=='R0.08'||k.version!=='R0.09'||kjs.version!=='R0.09')throw new Error('contract chain mismatch');
+          if(k.channelGroups.length!==4||Object.keys(k.sourceLimits).length!==12||Object.keys(k.lockedChannels).length!==2)throw new Error('R009 channel counts mismatch');
+          if(m.version!=='R0.09'||m.channelGroupCount!==4||m.activeLimitChannelCount!==12||m.lockedChannelCount!==2||m.externalRuntimeDependencies!==0)throw new Error('manifest mismatch');
+          if(m.controllerAffectsSourceMesh!==false||m.outerFanLocked!==true)throw new Error('R009 boundary mismatch');
+          if(sha(fs.readFileSync(`${dir}/channel-contract.json`))!==m.channelContractJsonSha256)throw new Error('channel contract JSON SHA mismatch');
+          if(sha(fs.readFileSync(`${dir}/data/channel-contract.js`))!==m.channelContractJsSha256)throw new Error('channel contract JS SHA mismatch');
+          if(sha(fs.readFileSync(`${dir}/runtime/channel-ui.js`))!==m.channelUiSha256)throw new Error('channel UI SHA mismatch');
+          if(sha(fs.readFileSync(`${dir}/runtime/contract-ui.js`))!==m.wrapperSha256)throw new Error('wrapper SHA mismatch');
+          if(sha(fs.readFileSync(`${dir}/qa.mjs`))!==m.qaScriptSha256)throw new Error('QA script SHA mismatch');
+
+          let sourceEx=0;
+          for(const [key,lim] of Object.entries(k.sourceLimits)){
+            const arr=c.series[key];if(!Array.isArray(arr)||arr.length!==50)throw new Error(`missing source series ${key}`);
+            for(const v of arr)if(v<lim.min-1e-5||v>lim.max+1e-5)sourceEx++;
+          }
+          if(sourceEx!==0)throw new Error(`source limit exceedances ${sourceEx}`);
+
+          const anchors=k.controller.anchorFramesZeroBased,smooth=t=>t*t*(3-2*t);
+          const interp=arr=>arr.map((_,f)=>{
+            if(f<=anchors[0])return arr[anchors[0]];if(f>=anchors.at(-1))return arr[anchors.at(-1)];
+            let i=0;while(f>anchors[i+1])i++;const a=anchors[i],b=anchors[i+1],w=smooth((f-a)/(b-a));return arr[a]+(arr[b]-arr[a])*w;
+          });
+          const pair=(a,b)=>a.map((v,i)=>(v+b[i])/2),res=(a,b)=>a.map((v,i)=>(v-b[i])/2);
+          const replay={};
+          for(const [l,r] of [['leftRootElevationDeg','rightRootElevationDeg'],['leftMidElevationDeg','rightMidElevationDeg'],['leftOuterElevationDeg','rightOuterElevationDeg'],['leftElbowFoldDeg','rightElbowFoldDeg']]){
+            const mi=interp(pair(c.series[l],c.series[r])),ri=interp(res(c.series[l],c.series[r]));
+            replay[l]=mi.map((v,i)=>v+ri[i]);replay[r]=mi.map((v,i)=>v-ri[i]);
+          }
+          for(const key of ['averageWingtipY','tipSpan','bodyY'])replay[key]=interp(c.series[key]);
+          replay.wingSymmetryRms=interp(c.series.wingSymmetryRms);
+          let replayEx=0;
+          for(const [key,lim] of Object.entries(k.sourceLimits))for(const v of replay[key])if(v<lim.min-1e-5||v>lim.max+1e-5)replayEx++;
+          if(replayEx!==0)throw new Error(`replay limit exceedances ${replayEx}`);
+          const anchorChannels=['leftRootElevationDeg','rightRootElevationDeg','leftMidElevationDeg','rightMidElevationDeg','leftOuterElevationDeg','rightOuterElevationDeg','leftElbowFoldDeg','rightElbowFoldDeg','averageWingtipY','tipSpan','bodyY'];
+          if(!anchors.every(f=>anchorChannels.every(key=>Math.abs(c.series[key][f]-replay[key][f])<2e-5)))throw new Error('anchor exactness failed');
+          if(vr.length!==25878||tr.length!==19611)throw new Error('reused runtime source length mismatch');
+          console.log({geometryBytes:gr.length,animationBytes:ar.length,viewerBytes:vr.length,transferBytes:tr.length,sourceEx,replayEx,groups:k.channelGroups.map(x=>x.id)});
+          NODE
+
+      - name: Prepare minimal Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+          cp -a BIRD_SEAGULL_A_CHANNEL_LIMITS_R009/. _site/
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  live-browser-qa:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BIRD_R009_QA_URL: ${{ needs.deploy.outputs.page_url }}?qa=${{ github.run_id }}
+      BIRD_R009_QA_ROOT: artifacts/bird-r009-live
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install isolated Chromium verifier
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.58.2
+      - name: Install Chromium runtime
+        run: npx playwright install --with-deps chromium
+      - name: Verify exact deployed R009 page on desktop and mobile
+        run: node BIRD_SEAGULL_A_CHANNEL_LIMITS_R009/qa.mjs
+      - name: Upload live browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bird-seagull-r009-live
+          path: artifacts/bird-r009-live
+          if-no-files-found: warn
+          retention-days: 90
