@@ -1,0 +1,167 @@
+name: Bootstrap Bird Seagull R010
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/bird-seagull-r010-bootstrap.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-commit-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assemble exact R010 files from verified R009 baseline
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          src=BIRD_SEAGULL_A_CHANNEL_LIMITS_R009
+          dst=BIRD_SEAGULL_A_CHANNEL_EXECUTOR_R010
+          test -d "$src"
+          rm -rf "$dst"
+          cp -a "$src" "$dst"
+          mv "$dst/runtime/contract-ui.js" "$dst/runtime/contract-ui-r009.js"
+
+          fetch_blob(){
+            local sha="$1" path="$2"
+            mkdir -p "$(dirname "$path")"
+            curl -fsSL \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/git/blobs/$sha" \
+              | jq -r '.content' | tr -d '\n' | base64 -d > "$path"
+          }
+
+          fetch_blob c7811289ec2064a463087cc047438a5299b584de "$dst/README_ZH.md"
+          fetch_blob ed973821ed70ec8c7637b0444e7a45f0c7d18e31 "$dst/execution-contract.json"
+          fetch_blob b1fac4ae53bea795ac7a6bd47dfc6f2b33e775ef "$dst/index.html"
+          fetch_blob 4bb3f5408bb22923e0f0ca7c619ba58daa9161ba "$dst/manifest.json"
+          fetch_blob 8a3598d3facabaf303779069f977f1b513dcdd03 "$dst/qa.mjs"
+          fetch_blob 1439e7e309908224ff2c0d3d353973e907bebfda "$dst/data/execution-contract.js"
+          fetch_blob 5b11c413726649381a441bfa2dbf735ce827db18 "$dst/runtime/contract-ui.js"
+          fetch_blob b4edb91cee7daa8b7ad48ba3c54b799b45a48c73 "$dst/runtime/execution-ui.js"
+          fetch_blob 631279bdc20eae283b4a4857ce98c2e26d0b9018 "$dst/runtime/execution-chunk-00.js"
+          fetch_blob 022ffae4ede797eb6bbf129406464b264ae6c13a "$dst/runtime/execution-chunk-01.js"
+          fetch_blob d82329d6dfbdd1c73671fe530ab82a33813d7605 "$dst/runtime/execution-chunk-02.js"
+          fetch_blob afd57be760c42e141ff5691a192c20f8f49cab2f "$dst/runtime/execution-chunk-03.js"
+          fetch_blob b529286058e8fdd37d50e4c5caf6fd408a5b3705 ".github/workflows/bird-seagull-r010-pages.yml"
+          rm -f "$dst/execution-runtime-meta.json"
+
+          node --check "$dst/runtime/contract-ui.js"
+          node --check "$dst/runtime/execution-ui.js"
+          node --check "$dst/data/execution-contract.js"
+          node --check "$dst/qa.mjs"
+
+      - name: Validate exact R010 payload chain
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir=BIRD_SEAGULL_A_CHANNEL_EXECUTOR_R010
+          test -f "$dir/index.html"
+          test -f "$dir/execution-contract.json"
+          test -f "$dir/runtime/contract-ui-r009.js"
+          test -f "$dir/runtime/contract-ui.js"
+          test -f "$dir/runtime/execution-ui.js"
+          test "$(find "$dir/runtime" -name 'execution-chunk-*.js' | wc -l)" -eq 4
+          test "$(find "$dir/data" -name 'form-*.js' | wc -l)" -eq 5
+          test "$(find "$dir/data" -name 'anim-*.js' | wc -l)" -eq 12
+          node - <<'NODE'
+          const fs=require('fs'),vm=require('vm'),zlib=require('zlib'),crypto=require('crypto');
+          const dir='BIRD_SEAGULL_A_CHANNEL_EXECUTOR_R010';global.window={};
+          const runFiles=(folder,prefix)=>{for(const f of fs.readdirSync(`${dir}/${folder}`).filter(x=>x.startsWith(prefix)).sort())vm.runInThisContext(fs.readFileSync(`${dir}/${folder}/${f}`,'utf8'))};
+          runFiles('data','form-');runFiles('data','anim-');
+          vm.runInThisContext(fs.readFileSync(`${dir}/data/contract.js`,'utf8'));
+          vm.runInThisContext(fs.readFileSync(`${dir}/data/channel-contract.js`,'utf8'));
+          vm.runInThisContext(fs.readFileSync(`${dir}/data/execution-contract.js`,'utf8'));
+          runFiles('runtime','viewer-chunk-');runFiles('runtime','transfer-chunk-');runFiles('runtime','execution-chunk-');
+          const m=JSON.parse(fs.readFileSync(`${dir}/manifest.json`,'utf8'));
+          const c=window.__BIRD_R007_CONTRACT,e=window.__BIRD_R010_EXECUTION,ej=JSON.parse(fs.readFileSync(`${dir}/execution-contract.json`,'utf8'));
+          const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
+          const x64=window.__BIRD_R010_EXECUTION_RUNTIME,xg=Buffer.from(x64,'base64'),xr=zlib.gunzipSync(xg);
+          if(e.version!=='R0.10'||ej.version!=='R0.10'||m.version!=='R0.10')throw new Error('R010 version mismatch');
+          if(e.interface.output.activeChannels.length!==11||e.interface.output.lockedReadOnlyChannels.length!==2||e.controlGroups.length!==5)throw new Error('R010 channel counts mismatch');
+          if(x64.length!==m.executionRuntimeBase64Chars||sha(Buffer.from(x64))!==m.executionRuntimeBase64Sha256)throw new Error('R010 runtime Base64 mismatch');
+          if(xg.length!==m.executionRuntimeGzipBytes||sha(xg)!==m.executionRuntimeGzipSha256)throw new Error('R010 runtime gzip mismatch');
+          if(xr.length!==m.executionRuntimeSourceBytes||sha(xr)!==m.executionRuntimeSourceSha256)throw new Error('R010 runtime source mismatch');
+          new Function(xr.toString('utf8'));
+          console.log({active:e.interface.output.activeChannels.length,locked:e.interface.output.lockedReadOnlyChannels.length,groups:e.controlGroups.length,bytes:xr.length,sourceFrames:c.evidence.frameCount});
+          NODE
+
+      - name: Commit R010 source and permanent deployment workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'Haihao_Nature Grace HK'
+          git config user.email 'haihao0307@gmail.com'
+          git add BIRD_SEAGULL_A_CHANNEL_EXECUTOR_R010 .github/workflows/bird-seagull-r010-pages.yml
+          if ! git diff --cached --quiet; then
+            git commit -m 'Add Bird Seagull A R0.10 channel executor workbench'
+            git push origin HEAD:main
+          fi
+
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp -a BIRD_SEAGULL_A_CHANNEL_EXECUTOR_R010/. _site/
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  live-browser-qa:
+    needs: build-commit-deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BIRD_R010_QA_URL: ${{ needs.build-commit-deploy.outputs.page_url }}?qa=${{ github.run_id }}
+      BIRD_R010_QA_ROOT: artifacts/bird-r010-live
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install isolated Chromium verifier
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.58.2
+      - name: Install Chromium runtime
+        run: npx playwright install --with-deps chromium
+      - name: Verify deployed R010 page on desktop and mobile
+        run: node BIRD_SEAGULL_A_CHANNEL_EXECUTOR_R010/qa.mjs
+      - name: Upload live browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bird-seagull-r010-live
+          path: artifacts/bird-r010-live
+          if-no-files-found: warn
+          retention-days: 90
