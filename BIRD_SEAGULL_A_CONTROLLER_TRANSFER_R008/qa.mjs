@@ -18,4 +18,89 @@ async function waitReady(page,label){
       await page.waitForFunction(()=>window.__BIRD_QA?.ready===true&&window.__BIRD_R007_CONTRACT_QA?.ready===true&&window.__BIRD_R008_QA?.ready===true,null,{timeout:30000});
       await page.waitForTimeout(900);
       return response;
-    }catch(error){last=error#¶v—BvRçv—Df÷%F–ÖV÷WBƒ—Ð¢Ð¢F‡&÷rÆ7GÇÆæWrW'&÷"†G¶Æ&VÇÓ¢#ã‚æWfW"&V6ÖR&VG–“°§Ð¦7–æ2gVæ7F–öâ6WDg&ÖR‡vRÆg&ÖR—°¢v—BvRæWfÇVFR‡fÇVSÓçv–æF÷råõô$•$Eõ#uô’ç6WDg&ÖR‡fÇVR’Æg&ÖR“°¢v—BvRçv—Df÷%F–ÖV÷WBƒ3“°§Ð¦7–æ2gVæ7F–öâ6çf56×ÆR‡vRÆ–B—°¢&WGW&âv—BvRæWfÇVFR†6çf4–CÓç°¢6öç7B3ÖFö7VÖVçBævWDVÆVÖVçD'”–B†6çf4–B“¶–b‚†2–ç7Fæ6Vöb…DÔÄ6çf4VÆVÖVçB’—&WGW&âçVÆÃ°¢6öç7B7GƒÖ2ævWD6öçFW‡B‚s&Br“¶–b‚7G‚—&WGW&âçVÆÃ°¢6öç7BFFÖ7G‚ævWD–ÖvTFFƒÃÆ2çv–GF‚Æ2æ†V–v‡B’æFF°¢6öç7B7FWÔÖF‚æÖ‚ƒBÄÖF‚æfÆö÷"„ÖF‚ç7'B‚†2çv–GF‚¦2æ†V–v‡B’ó#S’’“°¢ÆWBf—6–&ÆSÓÇ7VÓÓÆ6÷VçCÓ°¢f÷"†ÆWB“Ó·“Æ2æ†V–v‡C·’³×7FW–f÷"†ÆWBƒÓ·ƒÆ2çv–GFƒ·‚³×7FW—°¢6öç7B“Ò‡’§"çv–GF‚·‚’£BÇ#ÖFF¶•ÒÆsÖFF¶’³ÒÆ#ÖFF¶’³%Ó°¢7VÒ³×"¶r¶#¶6÷VçB²³°¢–b„ÖF‚æ'2‡"Ór’´ÖF‚æ'2†rÓ#’´ÖF‚æ'2†"Ó#‚“ã3—f—6–&ÆR²³°¢Ð¢&WGW&ç·f—6–&ÆRÆÖVã§7VÒò†6÷VçB£2’Çv–GFƒ¦2çv–GF‚Æ†V–v‡C¦2æ†V–v‡GÓ°¢ÒÆ–B“°§Ð¦7–æ2gVæ7F–öâ6çf5—†VÇ2‡vRÆ–B—°¢&WGW&âv—BvRæWfÇVFR†6çf4–CÓç°¢6öç7B3ÖFö7VÖVçBævWDVÆVÖVçD'”–B†6çf4–B’Æ7GƒÖ3òævWD6öçFW‡B‚s&Br“¶–b‚7ÇÂ7G‚—&WGW&âçVÆÃ°¢6öç7BCÖ7G‚ævWD–ÖvTFFƒÃÆ2çv–GF‚Æ2æ†V–v‡B’æFFÆ÷WCÕµÓ°¢6öç7B7ƒÔÖF‚æÖ‚ƒÄÖF‚æfÆö÷"†2çv–GF‚óSb’’Ç7“ÔÖF‚æÖ‚ƒÄÖF‚æfÆö÷"†2æ†V–v‡Bó3b’“°¢f÷"†ÆWB“Ó·“Æ2æ†V–v‡C·’³×7’–f÷"†ÆWBƒÓ·ƒÆ2çv–GFƒ·‚³×7‚—¶6öç7B“Ò‡’§"çv–GF‚·‚’£C¶÷WBçW6‚…¶E¶•ÒÆE¶’³ÒÆE¶’³%ÕÒ—Ð¢&WGW&â÷WC°¢ÒÆ–B“°§Ð¦gVæ7F–öâ—†VÄF–fb†Æ"—°¢ÆWB6†ævVCÓÇF÷FÃÓ¶f÷"†ÆWB“Ó¶“ÄÖF‚æÖ–â†æÆVæwF‚Æ"æÆVæwF‚“¶’²²—¶6öç7BCÔÖF‚æ'2†¶•Õ³ÒÖ%¶•Õ³Ò’´ÖF‚æ'2†¶•Õ³ÒÖ%¶•Õ³Ò’´ÖF‚æ'2†¶•Õ³%ÒÖ%¶•Õ³%Ò“·F÷FÂ³ÖC¶–b†Cã#–6†ævVB²·×&WGW&ç¶6†ævVBÇF÷FÇÓ°§Ð¦7–æ2gVæ7F–öâVF—B†Æ&VÂÆ6öçFW‡D÷F–öç2—°¢6öç7B6öçFW‡CÖv—B'&÷w6W"ææWt6öçFW‡B†6öçFW‡D÷F–öç2’ÇvSÖv—B6öçFW‡BææWuvR‚“°¢vRæöâ‚wvVW'&÷"rÆSÓçvTW'&÷'2çW6‚‡¶Æ&VÂÆÖW76vS¦RæÖW76vRÇ7F6³¦Rç7F6·ÇÂrwÒ’“°¢vRæöâ‚w&WVW7Ff–ÆVBrÇ#Óæf–ÆVE&WVW7G2çW6‚‡¶Æ&VÂÇW&Ã§"çW&Â‚’Æf–ÇW&S§"æf–ÇW&R‚“òæW'&÷%FW‡GÇÂrwÒ’“°¢vRæöâ‚v6öç6öÆRrÆÓÓæ6öç6öÆTVçG&–W2çW6‚‡¶Æ&VÂÇG—S¦ÒçG—R‚’ÇFW‡C¦ÒçFW‡B‚—Ò’“°¢v—Bv—E&VG’‡vRÆÆ&VÂ“°¢6öç7B7FFSÖv—BvRæWfÇVFR‚‚“Óâ‡·§v–æF÷råõô$•$EõÇ#s§v–æF÷råõô$•$Eõ#uô4ôåE$5EõÇ#ƒ§v–æF÷råõô$•$Eõ#…õÇF—FÆS¦Fö7VÖVçBçF—FÆRÇ7FGW3¦Fö7VÖVçBævWDVÆVÖVçD'”–B‚w#…7FGW2r“òçFW‡D6öçFVçGÇÂrwÒ’“°¢76W'BæWVÂ‡7FFRç#‚ç&VG’ÇG'VR“¶76W'BæWVÂ‡7FFRç#‚çfW'6–öâÂu#ã‚r“¶76W'BæWVÂ‡7FFRç#‚ææ6†÷$6÷VçBÃ‚“¶76W'BæWVÂ‡7FFRç#‚æ6†ææVÄ6÷VçBÃ’“¶76W'BæWVÂ‡7FFRç#‚ç6÷W&6U6×ÆW2ÃCS“¶76W'BæWVÂ‡7FFRç#‚æ6öçG&öÆÆW%6×ÆW2Ãs"“¶76W'B„ÖF‚æ'2‡7FFRç#‚æ6ö×&W76–öâÒãƒB“ÃRÓ’“¶76W'BæWVÂ‡7FFRç#‚ææ6†÷$W†7BÇG'VR“¶76W'BæWVÂ‡7FFRç#‚æW‡FW&æÅ'VçF–ÖTFWVæFVæ6–W2Ã“¶76W'BæÖF6‚‡7FFRçF—FÆRÂõ#Âã‚ò“¶76W'BæÖF6‚‡7FFRç7FGW2Âó‚™I®x+žhê~X‹nYšŽûÙÎk©™;îKˆî{º~Zûžh’ò“°¢f÷"†6öç7B¶W’öb²wF—&×6RrÂw7å&×6RrÂvævÆU&×6RrÂv&öG•&×6RrÂwF—Ö„W'&÷"uÒ–76W'B„çVÖ&W"æ—4f–æ—FR‡7FFRç#…¶¶W•Ò’ÆG¶Æ&VÇÓ¢G¶¶W—Òæ÷Bf–æ—FV“° ¢–b†Æ&VÃÓÓÒvÖö&–ÆRr—°¢v—BvRæÆö6F÷"‚r6ÆVgDÖVçRr’æ6Æ–6²‚“¶v—BvRçv—Df÷%F–ÖV÷WBƒ#S“°¢6öç7BÆ&÷ƒÖv—BvRæÆö6F÷"‚r66öçG&öÇ2r’æ&÷VæF–æt&÷‚‚“¶76W'B†Æ&÷‚bfÆ&÷‚çƒãÒÓbfÆ&÷‚ç‚¶Æ&÷‚çv–GFƒÃÓ3“ÆG¶Æ&VÇÓ¢ÆVgBæVÂ÷WG6–FRf–Ww÷'F“°¢Ð¢v—BvRæWfÇVFR‚‚“ÓæFö7VÖVçBævWDVÆVÖVçD'”–B‚wÆ’r“òæ6Æ–6²‚’“°¢v—B6WDg&ÖR‡vRÃ’“¶6öç7BcÖv—B6çf5—†VÇ2‡vRÂw#„6†–ä6çf2r“¶6öç7B6†–ãÖv—B6çf56×ÆR‡vRÂw#„6†–ä6çf2r“¶6öç7B&WÆ“Öv—B6çf56×ÆR‡vRÂw#…&WÆ”6çf2r“°¢76W'B†6†–ãbf6†–ãçf—6–&ÆSã3ÆG¶Æ&VÇÓ¢6öçG&öÆÆW"6†–âæ÷Bf—6–&ÆV“¶76W'B‡&WÆ“bg&WÆ“çf—6–&ÆSã3ÆG¶Æ&VÇÓ¢&WÆ’w&‚æ÷Bf—6–&ÆV“°¢v—BvRç67&VVç6†÷B‡·Fƒ§F‚æ¦ö–â‡&ö÷BÆG¶Æ&VÇÒ×#‚Ög&ÖRÓçæv’ÆgVÆÅvS§G'VWÒ“°¢v—B6WDg&ÖR‡vRÃC“¶6öç7BcCÖv—B6çf5—†VÇ2‡vRÂw#„6†–ä6çf2r“¶6öç7BÖ÷F–öã×—†VÄF–fb†cÆcC“¶76W'B†Ö÷F–öâæ6†ævVCã#bfÖ÷F–öâçF÷FÃãÆG¶Æ&VÇÓ¢6öçG&öÆÆW"Gv–âF–Bæ÷B6†ævR7&÷72&WfW'6Âæ6†÷'2G´¥4ôâç7G&–æv–g’†Ö÷F–öâ—Ö“°¢v—BvRç67&VVç6†÷B‡·Fƒ§F‚æ¦ö–â‡&ö÷BÆG¶Æ&VÇÒ×#‚Ög&ÖRÓCçæv’ÆgVÆÅvS§G'VWÒ“° ¢v—B6WDg&ÖR‡vRÃCb“°¢6öç7B6÷W&6Tv–ãÖv—B6çf5—†VÇ2‡vRÂw#„6†–ä6çf2r“°¢v—BvRæWfÇVFR‚‚“Óç¶6öç7B3ÖFö7VÖVçBævWDVÆVÖVçD'”–B‚w#„7–ÖÖWG'’r“·2çfÇVSÒss·2æF—7F6„WfVçB†æWrWfVçB‚v–çWBrÇ¶'V&&ÆW3§G'VWÒ’—Ò“¶v—BvRçv—Df÷%F–ÖV÷WBƒ#S“°¢6öç7BÖ—'&÷$v–ãÖv—B6çf5—†VÇ2‡vRÂw#„6†–ä6çf2r“¶6öç7Bv–äF–fc×—†VÄF–fb‡6÷W&6Tv–âÄÖ—'&÷$v–â“¶76W'B†v–äF–fbæ6†ævVCãbfv–äF–fbçF÷FÃãÆG¶Æ&VÇÓ¢7–ÖÖWG'’6öçG&öÂ&öGV6VBæò6çf26†ævV“°¢6öç7Bv–å7FFSÖv—BvRæWfÇVFR‚‚“Óçv–æF÷råõô$•$Eõ#…õæ7–ÖÖWG'”v–â“¶76W'BæWVÂ†v–å7FFRÃ“°¢v—BvRæWfÇVFR‚‚“Óç¶6öç7B3ÖFö7VÖVçBævWDVÆVÖVçD'”–B‚w#„7–ÖÖWG'’r“·2çfÇVSÒss·2æF—7F6„WfVçB†æWrWfVçB‚v–çWBrÇ¶'V&&ÆW3§G'VWÒ’“¶Fö7VÖVçBçVW'•6VÆV7F÷"‚v'WGFöå¶FFÖ–çFW'Ò&Æ–æV"%Òr“òæ6Æ–6²‚—Ò“¶v—BvRçv—Df÷%F–ÖV÷WBƒ#S“°¢76W'BæWVÂ†v—BvRæWfÇVFR‚‚“Óçv–æF÷råõô$•$Eõ#…õæ–çFW'öÆF–öâ’ÂvÆ–æV"r“°¢v—BvRæWfÇVFR‚‚“ÓæFö7VÖVçBçVW'•6VÆV7F÷"‚v'WGFöå¶FFÖ–çFW'Ò'6Öö÷F‡7FW%Òr“òæ6Æ–6²‚’“¶v—BvRçv—Df÷%F–ÖV÷WBƒ#“°¢76W'BæWVÂ†v—BvRæWfÇVFR‚‚“Óçv–æF÷råõô$•$Eõ#…õæ–çFW'öÆF–öâ’Âw6Öö÷F‡7FWr“° ¢–b†Æ&VÃÓÓÒvÖö&–ÆRr—°¢v—BvRæÆö6F÷"‚r7&–v‡DÖVçRr’æ6Æ–6²‚“¶v—BvRçv—Df÷%F–ÖV÷WBƒ3“°¢6öç7B&&÷ƒÖv—BvRæÆö6F÷"‚r6æÇ—6—2r’æ&÷VæF–æt&÷‚‚“¶76W'B‡&&÷‚bg&&÷‚çƒãÒÓbg&&÷‚ç‚·&&÷‚çv–GFƒÃÓ3“ÆG¶Æ&VÇÓ¢&–v‡BæVÂ÷WG6–FRf–Ww÷'F“°¢v—BvRç67&VVç6†÷B‡·Fƒ§F‚æ¦ö–â‡&ö÷BÂvÖö&–ÆR×#‚ÖæÇ—6—2çærr’ÆgVÆÅvS§G'VWÒ“°¢ÖVÇ6W°¢v—BvRç67&VVç6†÷B‡·Fƒ§F‚æ¦ö–â‡&ö÷BÂvFW6·F÷×#‚Ö6öçG&öÆÆW"çærr’ÆgVÆÅvS§G'VWÒ“°¢Ð¢v—B6öçFW‡Bæ6Æ÷6R‚“·&WGW&ç¶Æ&VÂÇ7FFRÆ6†–ãÇ&WÆ“ÆÖ÷F–öâÆv–äF–fgÓ°§Ð ¦ÆWB&W÷'C°§G'—°¢6öç7BFW6·F÷Öv—BVF—B‚vFW6·F÷rÇ·f–Ww÷'C§·v–GFƒ£cÆ†V–v‡C£ÒÆFWf–6U66ÆTf7F÷#£Ò“°¢6öç7BÖö&–ÆSÖv—BVF—B‚vÖö&–ÆRrÇ·f–Ww÷'C§·v–GFƒ£3“Æ†V–v‡C£ƒCGÒÆFWf–6U66ÆTf7F÷#£Æ—4Öö&–ÆS§G'VRÆ†5F÷V6ƒ§G'VWÒ“°¢76W'BæWVÂ‡vTW'&÷'2æÆVæwF‚ÃÄ¥4ôâç7G&–æv–g’‡vTW'&÷'2’“¶76W'BæWVÂ†f–ÆVE&WVW7G2æÆVæwF‚ÃÄ¥4ôâç7G&–æv–g’†f–ÆVE&WVW7G2’“°¢6öç7BW'&÷'3Ö6öç6öÆTVçG&–W2æf–ÇFW"‡ƒÓç‚çG—SÓÓÒvW'&÷"r“¶76W'BæWVÂ†W'&÷'2æÆVæwF‚ÃÄ¥4ôâç7G&–æv–g’†W'&÷'2’“°¢&W÷'C×·W&ÂÆFW6·F÷ÆÖö&–ÆRÇvTW'&÷'2Æf–ÆVE&WVW7G2Æ6öç6öÆTVçG&–W2ÆW'&÷#¦çVÆÇÓ°§Ö6F6‚†W'&÷"—·&W÷'C×·W&ÂÇ&vTW'&÷'2Æf–ÆVE&WVW7G2Æ6öç6öÆTVçG&–W2ÆW'&÷#¦W'&÷"ç7F6·ÇÆW'&÷"æÖW76vW×Ð¦f–æÆÇ—¶v—B'&÷w6W"æ6Æ÷6R‚—Ð¦v—Bg2çw&—FTf–ÆR‡F‚æ¦ö–â‡&ö÷BÂw×&W÷'Bæ§6öâr’Ä¥4ôâç7G&–æv–g’‡&W÷'BÆçVÆÂÃ"’²uÆâr“¶6öç6öÆRæÆör„¥4ôâç7G&–æv–g’‡&W÷'BÆçVÆÂÃ"’“¶–b‡&W÷'BæW'&÷"—F‡&÷ræWrW'&÷"‡&W÷'BæW'&÷"“°
+    }catch(error){last=error;await page.waitForTimeout(10000)}
+  }
+  throw last||new Error(`${label}: R0.08 never became ready`);
+}
+async function setFrame(page,frame){
+  await page.evaluate(value=>window.__BIRD_R007_API.setFrame(value),frame);
+  await page.waitForTimeout(300);
+}
+async function canvasSample(page,id){
+  return await page.evaluate(canvasId=>{
+    const c=document.getElementById(canvasId);if(!(c instanceof HTMLCanvasElement))return null;
+    const ctx=c.getContext('2d');if(!ctx)return null;
+    const data=ctx.getImageData(0,0,c.width,c.height).data;
+    const step=Math.max(4,Math.floor(Math.sqrt((c.width*c.height)/2500)));
+    let visible=0,sum=0,count=0;
+    for(let y=0;y<c.height;y+=step)for(let x=0;x<c.width;x+=step){
+      const i=(y*c.width+x)*4,r=data[i],g=data[i+1],b=data[i+2];
+      sum+=r+g+b;count++;
+      if(Math.abs(r-7)+Math.abs(g-21)+Math.abs(b-28)>30)visible++;
+    }
+    return{visible,mean:sum/(count*3),width:c.width,height:c.height};
+  },id);
+}
+async function canvasPixels(page,id){
+  return await page.evaluate(canvasId=>{
+    const c=document.getElementById(canvasId),ctx=c?.getContext('2d');if(!c||!ctx)return null;
+    const d=ctx.getImageData(0,0,c.width,c.height).data,out=[];
+    const sx=Math.max(1,Math.floor(c.width/56)),sy=Math.max(1,Math.floor(c.height/36));
+    for(let y=0;y<c.height;y+=sy)for(let x=0;x<c.width;x+=sx){const i=(y*c.width+x)*4;out.push([d[i],d[i+1],d[i+2]])}
+    return out;
+  },id);
+}
+function pixelDiff(a,b){
+  let changed=0,total=0;for(let i=0;i<Math.min(a.length,b.length);i++){const d=Math.abs(a[i][0]-b[i][0])+Math.abs(a[i][1]-b[i][1])+Math.abs(a[i][2]-b[i][2]);total+=d;if(d>20)changed++}return{changed,total};
+}
+async function audit(label,contextOptions){
+  const context=await browser.newContext(contextOptions),page=await context.newPage();
+  page.on('pageerror',e=>pageErrors.push({label,message:e.message,stack:e.stack||''}));
+  page.on('requestfailed',r=>failedRequests.push({label,url:r.url(),failure:r.failure()?.errorText||''}));
+  page.on('console',m=>consoleEntries.push({label,type:m.type(),text:m.text()}));
+  await waitReady(page,label);
+  const state=await page.evaluate(()=>({qa:window.__BIRD_QA,r7:window.__BIRD_R007_CONTRACT_QA,r8:window.__BIRD_R008_QA,title:document.title,status:document.getElementById('r008Status')?.textContent||''}));
+  assert.equal(state.r8.ready,true);assert.equal(state.r8.version,'R0.08');assert.equal(state.r8.anchorCount,8);assert.equal(state.r8.channelCount,9);assert.equal(state.r8.sourceSamples,450);assert.equal(state.r8.controllerSamples,72);assert(Math.abs(state.r8.compression-.84)<1e-9);assert.equal(state.r8.anchorExact,true);assert.equal(state.r8.externalRuntimeDependencies,0);assert.match(state.title,/R0\.08/);assert.match(state.status,/8 é”šç‚¹è¿ç§»æŽ§åˆ¶å™¨å·²è½½å…¥/);
+  for(const key of ['tipRmse','spanRmse','angleRmse','bodyRmse','tipMaxError'])assert(Number.isFinite(state.r8[key]),`${label}: ${key} not finite`);
+
+  if(label==='mobile'){
+    await page.locator('#leftMenu').click();await page.waitForTimeout(250);
+    const lbox=await page.locator('#controls').boundingBox();assert(lbox&&lbox.x>=-1&&lbox.x+lbox.width<=391,`${label}: left panel outside viewport`);
+  }
+  await page.evaluate(()=>document.getElementById('play')?.click());
+  await setFrame(page,9);const f10=await canvasPixels(page,'r008ChainCanvas');const chain10=await canvasSample(page,'r008ChainCanvas');const replay10=await canvasSample(page,'r008ReplayCanvas');
+  assert(chain10&&chain10.visible>30,`${label}: controller chain not visible`);assert(replay10&&replay10.visible>30,`${label}: replay graph not visible`);
+  await page.screenshot({path:path.join(root,`${label}-r008-frame-10.png`),fullPage:true});
+  await setFrame(page,40);const f41=await canvasPixels(page,'r008ChainCanvas');const motion=pixelDiff(f10,f41);assert(motion.changed>20&&motion.total>1000,`${label}: controller twin did not change across reversal anchors ${JSON.stringify(motion)}`);
+  await page.screenshot({path:path.join(root,`${label}-r008-frame-41.png`),fullPage:true});
+
+  await setFrame(page,46);
+  const sourceGain=await canvasPixels(page,'r008ChainCanvas');
+  await page.evaluate(()=>{const s=document.getElementById('r008Asymmetry');s.value='0';s.dispatchEvent(new Event('input',{bubbles:true}))});await page.waitForTimeout(250);
+  const mirrorGain=await canvasPixels(page,'r008ChainCanvas');const gainDiff=pixelDiff(sourceGain,mirrorGain);assert(gainDiff.changed>0&&gainDiff.total>0,`${label}: asymmetry control produced no canvas change`);
+  const gainState=await page.evaluate(()=>window.__BIRD_R008_QA.asymmetryGain);assert.equal(gainState,0);
+  await page.evaluate(()=>{const s=document.getElementById('r008Asymmetry');s.value='100';s.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('button[data-interp="linear"]')?.click()});await page.waitForTimeout(250);
+  assert.equal(await page.evaluate(()=>window.__BIRD_R008_QA.interpolation),'linear');
+  await page.evaluate(()=>document.querySelector('button[data-interp="smoothstep"]')?.click());await page.waitForTimeout(200);
+  assert.equal(await page.evaluate(()=>window.__BIRD_R008_QA.interpolation),'smoothstep');
+
+  if(label==='mobile'){
+    await page.locator('#rightMenu').click();await page.waitForTimeout(300);
+    const rbox=await page.locator('#analysis').boundingBox();assert(rbox&&rbox.x>=-1&&rbox.x+rbox.width<=391,`${label}: right panel outside viewport`);
+    await page.screenshot({path:path.join(root,'mobile-r008-analysis.png'),fullPage:true});
+  }else{
+    await page.screenshot({path:path.join(root,'desktop-r008-controller.png'),fullPage:true});
+  }
+  await context.close();return{label,state,chain10,replay10,motion,gainDiff};
+}
+
+let report;
+try{
+  const desktop=await audit('desktop',{viewport:{width:1600,height:1000},deviceScaleFactor:1});
+  const mobile=await audit('mobile',{viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true});
+  assert.equal(pageErrors.length,0,JSON.stringify(pageErrors));assert.equal(failedRequests.length,0,JSON.stringify(failedRequests));
+  const errors=consoleEntries.filter(x=>x.type==='error');assert.equal(errors.length,0,JSON.stringify(errors));
+  report={url,desktop,mobile,pageErrors,failedRequests,consoleEntries,error:null};
+}catch(error){report={url,pageErrors,failedRequests,consoleEntries,error:error.stack||error.message}}
+finally{await browser.close()}
+await fs.writeFile(path.join(root,'qa-report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));if(report.error)throw new Error(report.error);
