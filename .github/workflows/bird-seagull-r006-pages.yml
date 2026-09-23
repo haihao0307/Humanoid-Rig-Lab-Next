@@ -38,7 +38,7 @@ jobs:
           test -f "$dir/runtime/bootstrap.js"
           test -f "$dir/manifest.json"
           test "$(find "$dir/data" -name 'form-*.js' | wc -l)" -eq 5
-          test "$(find "$dir/data" -name 'anim-*.js' | wc -l)" -eq 1
+          test "$(find "$dir/data" -name 'anim-*.js' | wc -l)" -eq 6
           node - <<'NODE'
           const fs=require('fs'),vm=require('vm'),zlib=require('zlib'),crypto=require('crypto');
           const dir='BIRD_SEAGULL_A_FLIGHT_CYCLE_R006';global.window={};
