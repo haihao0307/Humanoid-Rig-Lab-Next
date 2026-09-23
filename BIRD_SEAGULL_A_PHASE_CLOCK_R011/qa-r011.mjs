@@ -64,8 +64,13 @@ async function audit(label,options){
  assert.equal(result.rateSwitch.rateHz,90);
  assert.equal(result.r010.postClampViolations,0);
  const before=await page.evaluate(()=>window.__BIRD_R011_API.getClock().phaseTicks);
- await page.locator('#r011Rates button[data-rate="90"]').click();
- await page.locator('#r011Step').click();await page.waitForTimeout(200);
+ await page.evaluate(()=>{
+  const rateButton=document.querySelector('#r011Rates button[data-rate="90"]');
+  const stepButton=document.getElementById('r011Step');
+  if(!(rateButton instanceof HTMLButtonElement)||!(stepButton instanceof HTMLButtonElement))throw new Error('R0.11 control buttons missing');
+  rateButton.click();stepButton.click();
+ });
+ await page.waitForTimeout(200);
  const after=await page.evaluate(()=>window.__BIRD_R011_API.getClock());
  assert.equal(after.rateHz,90);assert.notEqual(after.phaseTicks,before);
  const visible=await sourceVisible(page);assert(visible>5,`${label}: source bird not visible`);
