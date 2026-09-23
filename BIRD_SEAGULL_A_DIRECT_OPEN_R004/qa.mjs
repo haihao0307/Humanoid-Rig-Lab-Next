@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 
-const root = path.resolve('artifacts/bird-seagull-a-r004-browser-qa');
+const root = path.resolve(process.env.BIRD_SEAGULL_A_R004_QA_ROOT || 'artifacts/bird-seagull-a-r004-browser-qa/local');
 await fs.mkdir(root, { recursive: true });
 const url = process.env.BIRD_SEAGULL_A_R004_QA_URL || 'http://127.0.0.1:4173/BIRD_SEAGULL_A_DIRECT_OPEN_R004/index.html?qa=1';
 const consoleEntries = [];
@@ -44,12 +44,27 @@ async function selectView(page, view) {
   await page.waitForTimeout(300);
 }
 
+async function openPage(page, label) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    try {
+      const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+      if (response && response.ok()) return response;
+      lastError = new Error(`${label}: page response was ${response?.status() ?? 'missing'}`);
+    } catch (error) {
+      lastError = error;
+    }
+    if (attempt < 5) await page.waitForTimeout(5000);
+  }
+  throw lastError || new Error(`${label}: page could not be opened`);
+}
+
 async function auditPage(page, label) {
   page.on('console', message => consoleEntries.push({ label, type: message.type(), text: message.text() }));
   page.on('pageerror', error => pageErrors.push({ label, message: error.message, stack: error.stack || '' }));
   page.on('requestfailed', request => networkFailures.push({ label, url: request.url(), failure: request.failure()?.errorText || '' }));
 
-  const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+  const response = await openPage(page, label);
   assert(response && response.ok(), `${label}: page response was not OK`);
 
   await page.waitForFunction(() => {
@@ -117,6 +132,7 @@ try {
 
 const report = {
   generatedAt: new Date().toISOString(),
+  testedUrl: url,
   desktop,
   mobile,
   pageErrors,
