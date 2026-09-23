@@ -13,7 +13,7 @@
     <button class="mobile" id="menu" type="button">参数</button>
     <div>
       <b>Bird Mother｜Seagull A 基础形态直开台 R0.04</b><br>
-      <small>空白页纠错版｜载荷补齐、真实包围盒自动居中与缩放</small>
+      <small>空白页纠错版｜精确恢复来源载荷，并按真实包围盒自动居中</small>
     </div>
     <span class="pill">DIRECT OPEN · AUTO FIT</span>
   </header>
@@ -21,8 +21,8 @@
   <main>
     <aside id="panel">
       <div class="card correction">
-        <b>上一版判定失败：页面能打开，但鸟没有出现。</b><br>
-        实测发现来源载荷拼接后只有 39,899 个 Base64 字符，而清单记录应为 39,900；缺少末尾填充字符使浏览器在解码阶段直接停止。本版先规范并补齐载荷，再按来源几何实际包围盒自动居中、统一缩放；首帧检测不到鸟时会明确报错，不再交空白页。
+        <b>上一版判定失败：页面虽然打开，但鸟没有出现。</b><br>
+        实际原因已经定位：第一段来源载荷少了一个 Base64 字符。权威清单记录该文件应为 8,048 字节，实际只有 8,047 字节；依据原清单 SHA-256 精确反推，缺失字符为 <code>k</code>，位于该段载荷索引 4,649。此版先完成精确恢复，再按来源几何真实包围盒自动居中和缩放；首帧检测不到鸟会直接报错，不再交空白页。
       </div>
 
       <h3>固定视角</h3>
@@ -73,6 +73,7 @@
   <footer>visualAcceptance=false · productionReady=false · 外形仍待用户直接审查</footer>
 
   <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-00.js"></script>
+  <script src="./form-00-repair.js"></script>
   <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-01.js"></script>
   <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-02.js"></script>
   <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-03.js"></script>
