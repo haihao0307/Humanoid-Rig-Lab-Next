@@ -1,0 +1,38 @@
+name: Bird Seagull Direct Open Browser QA
+
+on:
+  push:
+    branches:
+      - handoff/bird-seagull-a-direct-open-r001-20260923
+    paths:
+      - 'BIRD_SEAGULL_A_DIRECT_OPEN_R003/**'
+      - 'scripts/qa-bird-seagull-direct-open.mjs'
+      - '.github/workflows/bird-seagull-direct-open-browser-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run direct-open QA
+        run: node scripts/qa-bird-seagull-direct-open.mjs | tee bird-seagull-direct-open-qa.json
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bird-seagull-direct-open-qa
+          path: |
+            bird-seagull-direct-open-qa.json
+            bird-seagull-direct-open-qa.png
+          if-no-files-found: warn
