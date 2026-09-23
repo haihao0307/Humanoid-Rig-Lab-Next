@@ -15,7 +15,7 @@ const {FullBodyMotion,blend,relaxedHandRotation}=await import('data:text/javascr
 const math=read('source/runtime.template.js').split('// MODULE math')[1].split('function matrix')[0];
 const code=math+'\n'+read('body/ReconstructionRig.js').replace('/*__R2_RIG_JSON__*/',JSON.stringify(rig)).replace('/*__R2_REGIONS_JSON__*/','{}')+'\n'+read('body/CharacterShape.js')+'\n'+read('body/ReferenceMotion.js').replace('/*__R2_MOTION_JSON__*/',read('reconstruction/motion-reference.json'))+'\n'+read('body/ContactHandPose.js')+'\n'+read('body/MotionLabPose.js')+'\n'+read('body/NaturalLocomotion.js');
 const horizontal=(a,b)=>Math.hypot(a[0]-b[0],a[2]-b[2]);
-const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,r2SampleMotion,NaturalLocomotion,dist,mix,frame})',{
+const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,r2SampleMotion,NaturalLocomotion,dist,mix,frame,qangle})',{
  structuredClone,SHAPE_SCHEMA,SHAPE_REVISION,normalizeCharacterShape,characterShapeParameterKey,createCharacterShapeField,CHARACTER_DEFORMATION_RULES,HUMAN_GENERATOR_REVISION:'support-continuity-test',
  degrees:r=>r*180/Math.PI,DOWN:[0,-1,0],horizontal,angleDiff:(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b)),bodyPhysicalProfile:h=>({bodyRadiusM:h.bodyMetrics.bodyRadiusM}),MotionLab:{FullBodyMotion,blend,relaxedHandRotation,solveTwoBone,MotionController,rigFromSource,FlatWorld}});
 const resolvedRig=api.resolveCharacterRig({}),bodyMetrics=api.resolveCharacterMetrics(resolvedRig),sourceBind=api.r2SourceFrames(resolvedRig);
@@ -37,8 +37,8 @@ const adoption=locomotion.resetFromPose({preservePoseContacts:true});
 assert.equal(adoption.preserved,true);
 assert(api.dist(adoption.root,expectedRoot)<1e-12,'locomotion root must adopt the committed hip midpoint');
 for(const side of ['left','right'])assert(api.dist(adoption.feet[side],expectedFeet[side])<1e-12,'locomotion must adopt the committed '+side+' foot');
-let samples=0,maxFootErrorM=0,maxAnchorDriftM=0;
-for(const amount of [0,.05,.1,.25,.5,.75,.9,.99]){
+let samples=0,maxFootErrorM=0,maxAnchorDriftM=0,maxPlantedAngleRad=0,maxSwingAngleStepRad=0;
+for(const amount of [0,.05,.1,.25,.5,.75,.9,.99,1]){
  const candidate=locomotion.pose.build({blendFrom:end,blendAmount:amount,preserveFootContactsOnBlend:true,motionSource:{kind:'support-continuity-test'}});
  const report=locomotion.pose.validate(candidate),footErrors=candidate.errors.filter(e=>/_foot$/.test(e.id));
  assert.equal(footErrors.length,2,'blend must retain independent foot error evidence');
@@ -46,7 +46,24 @@ for(const amount of [0,.05,.1,.25,.5,.75,.9,.99]){
  for(const side of ['left','right']){
   const anchor=locomotion.engine.state.feet[side].position,drift=api.dist(candidate.frames.get(side+'_foot').p,anchor);
   maxAnchorDriftM=Math.max(maxAnchorDriftM,drift);assert(drift<1e-10,'return-to-stance blend must not drag '+side+' foot');samples++;
+  const angle=api.qangle(candidate.frames.get(side+'_foot').q,end.get(side+'_foot').q);
+  maxPlantedAngleRad=Math.max(maxPlantedAngleRad,angle);assert(angle<1e-7,'planted foot must retain its full orientation throughout the blend');
  }
 }
+const previous=Object.fromEntries(['left','right'].map(side=>[side,end.get(side+'_foot').q]));
+const released=new Set();let settleFrames=0;
+for(;settleFrames<600;settleFrames++){
+ locomotion.update(1/120);a.time+=1/120;
+ const candidate=locomotion.pose.build();locomotion.pose.validate(candidate);
+ for(const side of ['left','right']){
+  const q=candidate.frames.get(side+'_foot').q,foot=locomotion.engine.state.feet[side];
+  const step=api.qangle(q,previous[side]);maxSwingAngleStepRad=Math.max(maxSwingAngleStepRad,step);
+  assert(step<.04,'first stance-recovery step must not snap the sole orientation');previous[side]=q;
+  if(!foot.adoptedOrientation)released.add(side);
+  else if(foot.contact)assert(api.qangle(q,end.get(side+'_foot').q)<1e-7,'sole remains locked until its own swing');
+ }
+ if(released.size===2&&locomotion.isSettled())break;
+}
+assert.equal(released.size,2,'each adopted contact releases through a real swing');assert(settleFrames<600,'stance recovery must settle');
 assert(maxFootErrorM<1e-10);
-console.log(JSON.stringify({schema:'human/motion_support_continuity@1',samples,maxFootErrorM,maxAnchorDriftM,poseAdoption:adoption,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
+console.log(JSON.stringify({schema:'human/motion_support_continuity@2',samples,maxFootErrorM,maxAnchorDriftM,maxPlantedAngleRad,maxSwingAngleStepRad,settleFrames,poseAdoption:adoption,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
