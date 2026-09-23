@@ -1,0 +1,62 @@
+name: Bird Seagull A R0.04 Direct Open Browser QA
+
+on:
+  push:
+    branches:
+      - handoff/bird-seagull-a-direct-open-r001-20260923
+    paths:
+      - 'BIRD_SEAGULL_A_DIRECT_OPEN_R004/**'
+      - 'BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/**'
+      - '.github/workflows/bird-seagull-a-r004-browser-qa.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: bird-seagull-a-r004-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-visual-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BIRD_SEAGULL_A_R004_QA_URL: http://127.0.0.1:4173/BIRD_SEAGULL_A_DIRECT_OPEN_R004/index.html?qa=1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install repository dependencies
+        run: npm ci
+
+      - name: Install Chromium runtime
+        run: npx playwright install --with-deps chromium
+
+      - name: Start local static server
+        run: |
+          mkdir -p artifacts/bird-seagull-a-r004-browser-qa
+          python3 -m http.server 4173 --bind 127.0.0.1 > artifacts/bird-seagull-a-r004-browser-qa/http-server.log 2>&1 &
+          echo $! > artifacts/bird-seagull-a-r004-browser-qa/http-server.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/BIRD_SEAGULL_A_DIRECT_OPEN_R004/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo 'Local server failed to start'
+          exit 1
+
+      - name: Run desktop and mobile browser audit
+        run: node BIRD_SEAGULL_A_DIRECT_OPEN_R004/qa.mjs
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bird-seagull-a-r004-browser-evidence
+          path: artifacts/bird-seagull-a-r004-browser-qa
+          if-no-files-found: warn
+          retention-days: 30
