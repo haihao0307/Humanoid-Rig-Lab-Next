@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#081118">
+  <meta name="referrer" content="no-referrer">
+  <title>Bird Mother｜Seagull A 基础形态函数解剖台 R0.05</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header>
+    <button class="mobile nav-button" id="leftMenu" type="button">控制</button>
+    <div class="title-block">
+      <b>Bird Mother｜Seagull A 基础形态函数解剖台 R0.05</b>
+      <small>来源真形不改动｜骨架主导区｜断面函数｜比例与对称审查</small>
+    </div>
+    <span class="pill">SOURCE ANATOMY · NOT FINAL</span>
+    <button class="mobile nav-button" id="rightMenu" type="button">解剖</button>
+  </header>
+
+  <main>
+    <aside id="controls" class="panel left-panel">
+      <div class="card stage-note">
+        <b>第二道门：把真实来源形态拆成可验证的结构函数。</b>
+        不改鸟体，不造新羽毛，不把骨骼名称直接当成生物学真值。当前只建立后续独立生成所需的比例、分区、骨架关系与断面表达。
+      </div>
+
+      <h3>显示模式</h3>
+      <div class="grid two" id="modes">
+        <button type="button" data-mode="shape" class="active">真实灰阶</button>
+        <button type="button" data-mode="anatomy">结构分区</button>
+      </div>
+
+      <h3>结构叠加</h3>
+      <div class="grid two">
+        <button type="button" id="skeleton">骨架：关</button>
+        <button type="button" id="measure">测量线：关</button>
+        <button type="button" id="symmetry">中心面：关</button>
+        <button type="button" id="section">断面：开</button>
+        <button type="button" id="wire">线框：关</button>
+        <button type="button" id="reset">重置镜头</button>
+      </div>
+
+      <h3>身体轴断面</h3>
+      <div class="slider-card">
+        <div class="slider-label"><span>尾端</span><strong id="sectionLabel">Z 0.000</strong><span>头端</span></div>
+        <input id="sectionSlider" type="range" min="0" max="63" step="1" value="40">
+        <div class="section-readout">
+          <span>半宽 <b id="halfWidth">—</b></span>
+          <span>高度 <b id="sectionHeight">—</b></span>
+        </div>
+      </div>
+
+      <h3>固定视角</h3>
+      <div class="grid two" id="views">
+        <button type="button" data-view="persp" class="active">三分之四</button>
+        <button type="button" data-view="top">顶部</button>
+        <button type="button" data-view="bottom">翼底</button>
+        <button type="button" data-view="front">正面</button>
+        <button type="button" data-view="back">背面</button>
+        <button type="button" data-view="side">侧面</button>
+      </div>
+
+      <h3>主导骨骼分区</h3>
+      <div id="regions" class="region-list" aria-label="结构分区"></div>
+      <button type="button" id="clearRegion" class="wide">取消局部高亮</button>
+    </aside>
+
+    <section class="stage">
+      <canvas id="c" aria-label="Seagull A 来源形态函数解剖视窗"></canvas>
+
+      <div class="overlay source-card">
+        <b>用户上传：seagull (A).zip</b>
+        当前几何保持来源顶点与三角索引。颜色只是按蒙皮主导骨骼划分的学习区，不代表最终羽区或精确解剖名称。
+      </div>
+
+      <div class="overlay current-card">
+        <span>当前观察</span>
+        <b id="currentRegion">全体来源形态</b>
+        <small id="currentRegionMeta">真实灰阶显示</small>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-head">
+          <b>身体包络函数</b>
+          <span>沿来源 Z 轴采样 64 段</span>
+        </div>
+        <canvas id="profileCanvas" width="360" height="154" aria-label="身体宽度和高度函数图"></canvas>
+        <div class="profile-legend">
+          <span><i class="legend-width"></i>半宽 |x|(z)</span>
+          <span><i class="legend-top"></i>背侧 y<sub>top</sub>(z)</span>
+          <span><i class="legend-bottom"></i>腹侧 y<sub>bottom</sub>(z)</span>
+        </div>
+      </div>
+
+      <div class="status" id="status">正在校验来源几何与解剖数据……</div>
+      <div class="fatal" id="fatal" hidden>
+        <b>函数解剖台没有成功显示</b>
+        <span>未知错误</span>
+      </div>
+    </section>
+
+    <aside id="analysis" class="panel right-panel">
+      <h3>来源比例</h3>
+      <div class="metric-grid">
+        <div><span>翼展 X</span><b id="metricSpan">—</b></div>
+        <div><span>体长 Z</span><b id="metricLength">—</b></div>
+        <div><span>高度 Y</span><b id="metricHeight">—</b></div>
+        <div><span>翼展 / 体长</span><b id="metricRatio">—</b></div>
+      </div>
+      <div class="caution">这些是展开翼、腿下垂的来源姿态比例，不是物种真实体尺。</div>
+
+      <h3>当前结构区</h3>
+      <div class="card anatomy-card">
+        <b id="detailName">全体来源形态</b>
+        <div id="detailBody">点击左侧任一结构区，可把其他区域压暗并检查连接边界。</div>
+      </div>
+
+      <h3>拓扑与骨架</h3>
+      <div class="fact-list">
+        <div><span>顶点 / 三角面</span><b>4,416 / 5,624</b></div>
+        <div><span>结构区 / 骨架节点</span><b>13 / 21</b></div>
+        <div><span>连通组件</span><b>147</b></div>
+        <div><span>边界边 / 非流形边</span><b>2,928 / 0</b></div>
+      </div>
+      <div class="caution">147 个连通组件说明大量羽片彼此分离；可学习排列，不可直接当未来羽毛母体。</div>
+
+      <h3>真值边界</h3>
+      <div class="gate good">已知：来源几何、顶点索引、来源坐标、蒙皮主导区、静止骨架位置。</div>
+      <div class="gate warn">未决：精确物种、真实尺度、年龄性别、最终喙形、最终腿足比例、最终羽层。</div>
+
+      <h3>许可与使用</h3>
+      <div class="card compact">
+        原参考许可：CC-BY-NC-SA-4.0。当前只用于研究、测量与校准；未来商业运行时必须是独立生成资产。
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <span>visualAcceptance=false</span>
+    <span>productionReady=false</span>
+    <span>externalRuntimeDependencies=0</span>
+    <span>基础形态函数学习中</span>
+  </footer>
+
+  <script src="./data/form-00.js"></script>
+  <script src="./data/form-01.js"></script>
+  <script src="./data/form-02.js"></script>
+  <script src="./data/form-03.js"></script>
+  <script src="./data/form-04.js"></script>
+  <script src="./runtime/anatomy-00.js"></script>
+  <script src="./runtime/anatomy-01.js"></script>
+  <script src="./runtime/anatomy-02.js"></script>
+  <script src="./runtime/viewer-00.js"></script>
+  <script src="./runtime/viewer-01.js"></script>
+  <script src="./runtime/viewer-02.js"></script>
+  <script src="./runtime/bootstrap.js"></script>
+</body>
+</html>
