@@ -1,0 +1,39 @@
+name: Bird Seagull R004 Direct Open QA
+
+on:
+  push:
+    branches:
+      - handoff/bird-seagull-a-direct-open-r004-20260923
+    paths:
+      - 'BIRD_SEAGULL_A_DIRECT_OPEN_R004/**'
+      - 'scripts/qa-bird-seagull-r004.mjs'
+      - '.github/workflows/bird-seagull-r004-direct-open-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run local and hosted browser QA
+        run: node scripts/qa-bird-seagull-r004.mjs
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bird-seagull-r004-browser-qa
+          path: |
+            bird-seagull-r004-browser-qa.json
+            bird-seagull-r004-local.png
+            bird-seagull-r004-hosted.png
+          if-no-files-found: warn
