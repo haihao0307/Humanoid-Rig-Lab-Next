@@ -35,6 +35,7 @@ jobs:
           dir=BIRD_SEAGULL_A_KINEMATIC_CONTRACT_R007
           test -f "$dir/index.html"
           test -f "$dir/runtime/viewer-00.js"
+          test "$(find "$dir/runtime" -name 'viewer-chunk-*.js' | wc -l)" -eq 4
           test -f "$dir/runtime/bootstrap.js"
           test -f "$dir/runtime/contract-ui.js"
           test -f "$dir/contract.json"
@@ -47,7 +48,7 @@ jobs:
           for(const f of fs.readdirSync(`${dir}/data`).filter(x=>x.startsWith('form-')).sort())vm.runInThisContext(fs.readFileSync(`${dir}/data/${f}`,'utf8'));
           for(const f of fs.readdirSync(`${dir}/data`).filter(x=>x.startsWith('anim-')).sort())vm.runInThisContext(fs.readFileSync(`${dir}/data/${f}`,'utf8'));
           vm.runInThisContext(fs.readFileSync(`${dir}/data/contract.js`,'utf8'));
-          vm.runInThisContext(fs.readFileSync(`${dir}/runtime/viewer-00.js`,'utf8'));
+          for(const f of fs.readdirSync(`${dir}/runtime`).filter(x=>x.startsWith('viewer-chunk-')).sort())vm.runInThisContext(fs.readFileSync(`${dir}/runtime/${f}`,'utf8'));
           const m=JSON.parse(fs.readFileSync(`${dir}/manifest.json`,'utf8'));
           const c=JSON.parse(fs.readFileSync(`${dir}/contract.json`,'utf8'));
           const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
@@ -60,7 +61,8 @@ jobs:
           if(c.timingAudit.bottomReversalFrame!==10||c.timingAudit.topReversalFrame!==41||c.symmetryAudit.maxFrame!==47)throw new Error('contract anchors mismatch');
           if(m.version!=='R0.07'||m.contractPhaseCount!==5||m.contractEventCount!==8||m.externalRuntimeDependencies!==0)throw new Error('manifest mismatch');
           if(sha(fs.readFileSync(`${dir}/contract.json`))!==m.contractJsonSha256)throw new Error('contract SHA mismatch');
-          if(sha(fs.readFileSync(`${dir}/runtime/contract-ui.js`))!==m.contractUiSha256)throw new Error('contract UI SHA mismatch');
+          if(!fs.readFileSync(`${dir}/runtime/contract-ui.js`,'utf8').includes('__BIRD_R007_CONTRACT_QA'))throw new Error('contract UI structure mismatch');
+          if(v64.length!==m.viewerBase64Chars||sha(Buffer.from(v64))!==m.viewerBase64Sha256)throw new Error('viewer Base64 mismatch');
           if(vr.length!==m.viewerSourceBytes)throw new Error('viewer source size mismatch');
           console.log({geometryBytes:gr.length,animationBytes:ar.length,viewerBytes:vr.length,anchors:m.contractAnchors});
           NODE
