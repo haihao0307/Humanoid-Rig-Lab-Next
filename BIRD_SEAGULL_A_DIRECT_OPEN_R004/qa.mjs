@@ -19,6 +19,8 @@ async function captureState(page, label) {
     fatalText: document.getElementById('fatal')?.textContent || '',
     payloadType: typeof window.__BIRD_FORM,
     payloadLength: typeof window.__BIRD_FORM === 'string' ? window.__BIRD_FORM.length : null,
+    form00Repair: window.__BIRD_FORM00_REPAIR || null,
+    payloadRepair: window.__BIRD_PAYLOAD_REPAIR || null,
     qa: window.__BIRD_QA || null,
     canvas: (() => {
       const c = document.getElementById('c');
@@ -28,6 +30,18 @@ async function captureState(page, label) {
   await page.screenshot({ path: path.join(root, `${label}-diagnostic.png`), fullPage: true });
   await fs.writeFile(path.join(root, `${label}-state.json`), JSON.stringify(state, null, 2));
   return state;
+}
+
+async function selectView(page, view) {
+  const result = await page.evaluate(selectedView => {
+    const button = document.querySelector(`button[data-v="${selectedView}"]`);
+    if (!(button instanceof HTMLButtonElement)) return { found: false, active: false };
+    button.click();
+    return { found: true, active: button.classList.contains('active') };
+  }, view);
+  assert(result.found, `view button not found: ${view}`);
+  assert(result.active, `view button did not become active: ${view}`);
+  await page.waitForTimeout(300);
 }
 
 async function auditPage(page, label) {
@@ -54,15 +68,17 @@ async function auditPage(page, label) {
   assert(qa.visiblePixels > 250, `${label}: model has too few visible pixels`);
   assert(qa.visibleCoverage > 0.0005, `${label}: model coverage is too small`);
   assert.match(initialState.status, /已显示/, `${label}: success status missing`);
+  assert.equal(initialState.payloadLength, 39900, `${label}: repaired payload length mismatch`);
+  assert.equal(initialState.form00Repair?.repairedLength, 8000, `${label}: form-00 repair was not established`);
 
   await page.screenshot({ path: path.join(root, `${label}-three-quarter.png`), fullPage: true });
-  await page.locator('button[data-v="top"]').click();
-  await page.waitForTimeout(250);
+  await selectView(page, 'top');
   await page.screenshot({ path: path.join(root, `${label}-top.png`), fullPage: true });
-  await page.locator('button[data-v="side"]').click();
-  await page.waitForTimeout(250);
+  await selectView(page, 'side');
   await page.screenshot({ path: path.join(root, `${label}-side.png`), fullPage: true });
-  return { label, url, qa, status: initialState.status };
+  await selectView(page, 'persp');
+
+  return { label, url, qa, status: initialState.status, form00Repair: initialState.form00Repair };
 }
 
 const browser = await chromium.launch({ headless: true });
@@ -79,7 +95,7 @@ try {
   const mobilePage = await mobileContext.newPage();
   mobile = await auditPage(mobilePage, 'mobile');
   await mobilePage.locator('#menu').click();
-  await mobilePage.waitForTimeout(150);
+  await mobilePage.waitForFunction(() => document.getElementById('panel')?.classList.contains('open'));
   await mobilePage.screenshot({ path: path.join(root, 'mobile-panel-open.png'), fullPage: true });
   await mobileContext.close();
 
