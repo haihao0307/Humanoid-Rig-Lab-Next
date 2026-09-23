@@ -45,7 +45,15 @@ async function audit(label,options){
  await page.evaluate(()=>{document.getElementById('r012Encode')?.click();document.getElementById('r012Decode')?.click();document.getElementById('r012Corrupt')?.click()});await page.waitForTimeout(150);
  const ui=await page.evaluate(()=>({status:document.getElementById('r012Status')?.textContent||'',hex:(document.getElementById('r012Hex')?.value||'').length}));assert.match(ui.status,/损坏包已拒绝/);assert.equal(ui.hex,132);
  const pixels=await visible(page);assert(pixels>5,label+' bird not visible');
- if(label==='mobile'){await page.locator('#leftMenu').click();await page.waitForTimeout(200);const l=await page.locator('#controls').boundingBox();assert(l&&l.x>=-1&&l.x+l.width<=391);await page.locator('#rightMenu').click();await page.waitForTimeout(200);const r=await page.locator('#analysis').boundingBox();assert(r&&r.x>=-1&&r.x+r.width<=391)}
+ if(label==='mobile'){
+  await page.locator('#leftMenu').click();await page.waitForTimeout(200);
+  const leftState=await page.evaluate(()=>{const e=document.getElementById('controls'),r=e?.getBoundingClientRect();return{open:!!e?.classList.contains('open'),left:r?.left??null,right:r?.right??null,width:r?.width??null}});
+  assert(leftState.open&&leftState.right>100&&leftState.left<20,JSON.stringify(leftState));
+  await page.locator('#leftMenu').click();await page.waitForTimeout(120);
+  await page.locator('#rightMenu').click();await page.waitForTimeout(200);
+  const rightState=await page.evaluate(()=>{const e=document.getElementById('analysis'),r=e?.getBoundingClientRect();return{open:!!e?.classList.contains('open'),left:r?.left??null,right:r?.right??null,width:r?.width??null}});
+  assert(rightState.open&&rightState.left<390&&rightState.right>300,JSON.stringify(rightState));
+ }
  await page.screenshot({path:path.join(root,`${label}-r012.png`),fullPage:true});await context.close();return{label,result,ui,pixels};
 }
 
