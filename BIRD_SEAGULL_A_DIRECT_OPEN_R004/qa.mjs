@@ -70,6 +70,9 @@ async function auditPage(page, label) {
   assert.match(initialState.status, /已显示/, `${label}: success status missing`);
   assert.equal(initialState.payloadLength, 39900, `${label}: repaired payload length mismatch`);
   assert.equal(initialState.form00Repair?.repairedLength, 8000, `${label}: form-00 repair was not established`);
+  assert.equal(initialState.form00Repair?.applied, true, `${label}: production-state browser repair was not exercised`);
+  assert.equal(initialState.form00Repair?.insertionIndex, 4649, `${label}: repair insertion index mismatch`);
+  assert.equal(initialState.form00Repair?.insertedCharacter, 'k', `${label}: repair character mismatch`);
 
   await page.screenshot({ path: path.join(root, `${label}-three-quarter.png`), fullPage: true });
   await selectView(page, 'top');
@@ -96,6 +99,9 @@ try {
   mobile = await auditPage(mobilePage, 'mobile');
   await mobilePage.locator('#menu').click();
   await mobilePage.waitForFunction(() => document.getElementById('panel')?.classList.contains('open'));
+  await mobilePage.waitForTimeout(350);
+  const panelBox = await mobilePage.locator('#panel').boundingBox();
+  assert(panelBox && panelBox.x >= 0 && panelBox.x + panelBox.width <= 390, `mobile panel is not fully on-screen: ${JSON.stringify(panelBox)}`);
   await mobilePage.screenshot({ path: path.join(root, 'mobile-panel-open.png'), fullPage: true });
   await mobileContext.close();
 
