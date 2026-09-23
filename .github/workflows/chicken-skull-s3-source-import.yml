@@ -1,0 +1,138 @@
+name: Chicken Skull S3 Authority Source Import
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/chicken-skull-s3-source-import.yml
+      - tools/chicken_skull_source_import.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  import-authoritative-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install import dependencies
+        run: python -m pip install --upgrade requests numpy trimesh objaverse
+
+      - name: Download, fingerprint, and license-gate sources
+        run: python tools/chicken_skull_source_import.py
+
+      - name: Build compact import package
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import shutil
+          from pathlib import Path
+
+          src = Path('out/chicken-skull-s3')
+          dst = Path('out/chicken-skull-s3-slim')
+          if dst.exists():
+              shutil.rmtree(dst)
+          dst.mkdir(parents=True)
+
+          def sha256(path):
+              h = hashlib.sha256()
+              with path.open('rb') as handle:
+                  for block in iter(lambda: handle.read(1024 * 1024), b''):
+                      h.update(block)
+              return h.hexdigest().upper()
+
+          for name in [
+              'CHICKEN_SKULL_S3_LICENSE_LOCK.json',
+              'CHICKEN_SKULL_S3_SOURCE_IMPORT_RECEIPT.json',
+              'ATTRIBUTION_AND_RESTRICTIONS.md',
+          ]:
+              path = src / name
+              if path.exists():
+                  shutil.copy2(path, dst / name)
+
+          for folder in ['metadata']:
+              path = src / folder
+              if path.exists():
+                  shutil.copytree(path, dst / folder)
+
+          original_figshare = src / 'source' / 'original' / 'figshare_29618981'
+          if original_figshare.exists():
+              shutil.copytree(original_figshare, dst / 'source' / 'original' / 'figshare_29618981')
+
+          receipt = json.loads((src / 'metadata' / 'figshare_import_receipt.json').read_text(encoding='utf-8'))
+          exact_copies = []
+          for item in receipt.get('gallus_candidates', []):
+              source = Path(item['path'])
+              if not source.exists():
+                  continue
+              relative = Path(item.get('relative_path') or source.name)
+              original = dst / 'source' / 'original' / 'gallus-components' / relative
+              canonical = dst / 'canonical' / 'static-copy' / 'gallus-components' / relative
+              original.parent.mkdir(parents=True, exist_ok=True)
+              canonical.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(source, original)
+              shutil.copyfile(original, canonical)
+              source_hash = sha256(original)
+              canonical_hash = sha256(canonical)
+              exact_copies.append({
+                  'relative_path': relative.as_posix(),
+                  'source_bytes': original.stat().st_size,
+                  'canonical_bytes': canonical.stat().st_size,
+                  'source_sha256': source_hash,
+                  'canonical_sha256': canonical_hash,
+                  'exact_byte_copy': source_hash == canonical_hash and original.read_bytes() == canonical.read_bytes(),
+              })
+
+          files = []
+          for path in sorted(dst.rglob('*')):
+              if path.is_file():
+                  files.append({
+                      'path': path.relative_to(dst).as_posix(),
+                      'bytes': path.stat().st_size,
+                      'sha256': sha256(path),
+                  })
+          manifest = {
+              'schema': 'life_ecosystem/chicken_skull_s3_compact_import@1.0',
+              'source_article_id': 29618981,
+              'gallus_candidate_count': len(exact_copies),
+              'exact_static_copy_count': sum(1 for row in exact_copies if row['exact_byte_copy']),
+              'exact_copies': exact_copies,
+              'files': files,
+          }
+          (dst / 'CHICKEN_SKULL_S3_COMPACT_IMPORT_MANIFEST.json').write_text(
+              json.dumps(manifest, indent=2, sort_keys=True), encoding='utf-8'
+          )
+          (dst / 'SOURCE_IMPORT_SUMMARY.md').write_text(
+              '# Chicken Skull S3 Source Import\n\n'
+              f'Gallus candidate files imported: {len(exact_copies)}\n\n'
+              f'Exact static byte copies verified: {manifest["exact_static_copy_count"]}\n\n'
+              'The Figshare source is retained with its metadata and CC BY 4.0 attribution record. '
+              'DigiMorph is retained as a restricted scientific reference without redistributing its STL.\n',
+              encoding='utf-8'
+          )
+          print(json.dumps({
+              'compact_bytes': sum(row['bytes'] for row in files),
+              'gallus_candidates': len(exact_copies),
+              'exact_copies': manifest['exact_static_copy_count'],
+          }, indent=2))
+          PY
+
+      - name: Upload compact source import evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: CHICKEN_SKULL_S3_SOURCE_IMPORT_SLIM
+          path: out/chicken-skull-s3-slim
+          if-no-files-found: error
+          retention-days: 7
