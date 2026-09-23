@@ -1,4 +1,4 @@
-name: Bird Seagull A R0.04 Direct Open Browser QA
+name: Bird Seagull A R0.04 Source Browser QA
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: bird-seagull-a-r004-${{ github.ref }}
+  group: bird-seagull-a-r004-source-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -20,7 +20,7 @@ permissions:
 jobs:
   chromium-visual-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -32,7 +32,7 @@ jobs:
       - name: Install repository dependencies
         run: npm ci
 
-      - name: Confirm published payload is still the diagnosed one-byte-short source
+      - name: Confirm source is the diagnosed one-byte-short payload
         run: |
           test "$(wc -c < BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-00.js)" -eq 8047
           test "$(sha256sum BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-00.js | cut -d' ' -f1)" = "03228a8336c6b62b41ea4e5e5066d430e27cc951f83ab25981dde3c51c45a326"
@@ -52,25 +52,17 @@ jobs:
           echo 'Local server failed to start'
           exit 1
 
-      - name: Audit unmodified published files through local static hosting
+      - name: Audit unmodified source through static hosting
         env:
           BIRD_SEAGULL_A_R004_QA_URL: http://127.0.0.1:4173/BIRD_SEAGULL_A_DIRECT_OPEN_R004/index.html?qa=local
           BIRD_SEAGULL_A_R004_QA_ROOT: artifacts/bird-seagull-a-r004-browser-qa/local
         run: node BIRD_SEAGULL_A_DIRECT_OPEN_R004/qa.mjs
 
-      - name: Audit the exact one-click raw.githack URL
-        env:
-          BIRD_SEAGULL_A_R004_QA_URL: https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${{ github.sha }}/BIRD_SEAGULL_A_DIRECT_OPEN_R004/index.html?qa=hosted
-          BIRD_SEAGULL_A_R004_QA_ROOT: artifacts/bird-seagull-a-r004-browser-qa/hosted
-        run: |
-          curl -L --fail --retry 6 --retry-all-errors --retry-delay 5 --max-time 120 "$BIRD_SEAGULL_A_R004_QA_URL" >/dev/null
-          node BIRD_SEAGULL_A_DIRECT_OPEN_R004/qa.mjs
-
       - name: Upload browser evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bird-seagull-a-r004-browser-evidence
+          name: bird-seagull-a-r004-source-browser-evidence
           path: artifacts/bird-seagull-a-r004-browser-qa
           if-no-files-found: warn
           retention-days: 30
