@@ -1,0 +1,111 @@
+name: Deploy Bird Seagull R007 to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'BIRD_SEAGULL_A_KINEMATIC_CONTRACT_R007/**'
+      - '.github/workflows/bird-seagull-r007-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate source payloads and R007 contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir=BIRD_SEAGULL_A_KINEMATIC_CONTRACT_R007
+          test -f "$dir/index.html"
+          test -f "$dir/runtime/viewer-00.js"
+          test -f "$dir/runtime/bootstrap.js"
+          test -f "$dir/runtime/contract-ui.js"
+          test -f "$dir/contract.json"
+          test -f "$dir/manifest.json"
+          test "$(find "$dir/data" -name 'form-*.js' | wc -l)" -eq 5
+          test "$(find "$dir/data" -name 'anim-*.js' | wc -l)" -eq 12
+          node - <<'NODE'
+          const fs=require('fs'),vm=require('vm'),zlib=require('zlib'),crypto=require('crypto');
+          const dir='BIRD_SEAGULL_A_KINEMATIC_CONTRACT_R007';global.window={};
+          for(const f of fs.readdirSync(`${dir}/data`).filter(x=>x.startsWith('form-')).sort())vm.runInThisContext(fs.readFileSync(`${dir}/data/${f}`,'utf8'));
+          for(const f of fs.readdirSync(`${dir}/data`).filter(x=>x.startsWith('anim-')).sort())vm.runInThisContext(fs.readFileSync(`${dir}/data/${f}`,'utf8'));
+          vm.runInThisContext(fs.readFileSync(`${dir}/data/contract.js`,'utf8'));
+          vm.runInThisContext(fs.readFileSync(`${dir}/runtime/viewer-00.js`,'utf8'));
+          const m=JSON.parse(fs.readFileSync(`${dir}/manifest.json`,'utf8'));
+          const c=JSON.parse(fs.readFileSync(`${dir}/contract.json`,'utf8'));
+          const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
+          const g64=window.__BIRD_FORM,a64=window.__BIRD_R006_ANIM,v64=window.__BIRD_R007_VIEWER;
+          if(g64.length!==39900||a64.length!==30392)throw new Error('source payload length mismatch');
+          const gr=zlib.gunzipSync(Buffer.from(g64,'base64')),ar=zlib.gunzipSync(Buffer.from(a64,'base64')),vr=zlib.gunzipSync(Buffer.from(v64,'base64'));
+          if(gr.readUInt32LE(0)!==4416||gr.readUInt32LE(4)!==16872)throw new Error('geometry counts mismatch');
+          if(ar.subarray(0,8).toString()!=='BANIM006'||ar.readUInt32LE(16)!==50||ar.readUInt32LE(20)!==20)throw new Error('animation header mismatch');
+          if(c.version!=='R0.07'||c.phaseContract.length!==5||c.eventLedger.length!==8)throw new Error('contract structure mismatch');
+          if(c.timingAudit.bottomReversalFrame!==10||c.timingAudit.topReversalFrame!==41||c.symmetryAudit.maxFrame!==47)throw new Error('contract anchors mismatch');
+          if(m.version!=='R0.07'||m.contractPhaseCount!==5||m.contractEventCount!==8||m.externalRuntimeDependencies!==0)throw new Error('manifest mismatch');
+          if(sha(fs.readFileSync(`${dir}/contract.json`))!==m.contractJsonSha256)throw new Error('contract SHA mismatch');
+          if(sha(fs.readFileSync(`${dir}/runtime/contract-ui.js`))!==m.contractUiSha256)throw new Error('contract UI SHA mismatch');
+          if(vr.length!==m.viewerSourceBytes)throw new Error('viewer source size mismatch');
+          console.log({geometryBytes:gr.length,animationBytes:ar.length,viewerBytes:vr.length,anchors:m.contractAnchors});
+          NODE
+
+      - name: Prepare minimal Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+          cp -a BIRD_SEAGULL_A_KINEMATIC_CONTRACT_R007/. _site/
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  live-browser-qa:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BIRD_R007_QA_URL: ${{ needs.deploy.outputs.page_url }}?qa=${{ github.run_id }}
+      BIRD_R007_QA_ROOT: artifacts/bird-r007-live
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install isolated Chromium verifier
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.58.2
+      - name: Install Chromium runtime
+        run: npx playwright install --with-deps chromium
+      - name: Verify exact deployed R007 page on desktop and mobile
+        run: node BIRD_SEAGULL_A_KINEMATIC_CONTRACT_R007/qa.mjs
+      - name: Upload live browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bird-seagull-r007-live
+          path: artifacts/bird-r007-live
+          if-no-files-found: warn
+          retention-days: 90
