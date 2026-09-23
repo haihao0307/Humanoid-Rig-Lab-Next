@@ -1,0 +1,100 @@
+name: Deploy Bird Seagull R011 Real
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'BIRD_SEAGULL_A_PHASE_CLOCK_R011/**'
+      - '.github/workflows/bird-seagull-r011-real-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate R011 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir=BIRD_SEAGULL_A_PHASE_CLOCK_R011
+          test -f "$dir/index.html"
+          test -f "$dir/phase-clock-contract.json"
+          test -f "$dir/data/phase-clock-contract.js"
+          test -f "$dir/runtime/contract-ui-r010.js"
+          test -f "$dir/runtime/contract-ui.js"
+          test -f "$dir/runtime/phase-clock-ui.js"
+          test -f "$dir/qa-r011.mjs"
+          node --check "$dir/data/phase-clock-contract.js"
+          node --check "$dir/runtime/contract-ui.js"
+          node --check "$dir/runtime/phase-clock-ui.js"
+          node --check "$dir/qa-r011.mjs"
+          node - <<'NODE'
+          const fs=require('fs'),vm=require('vm');
+          const dir='BIRD_SEAGULL_A_PHASE_CLOCK_R011';global.window={};
+          vm.runInThisContext(fs.readFileSync(`${dir}/data/phase-clock-contract.js`,'utf8'));
+          const p=window.__BIRD_R011_CLOCK,j=JSON.parse(fs.readFileSync(`${dir}/phase-clock-contract.json`,'utf8'));
+          if(p.version!=='R0.11'||j.version!=='R0.11')throw new Error('R011 version');
+          if(p.clock.phaseTicksPerCycle!==17640||p.clock.masterRateHz!==360)throw new Error('R011 clock');
+          if(p.clock.supportedSampleRatesHz.join(',')!=='24,30,60,90,120')throw new Error('R011 rates');
+          if(p.events.length!==8)throw new Error('R011 events');
+          for(const rate of p.clock.supportedSampleRatesHz)if(!Number.isInteger(p.clock.stepTicksByRateHz[String(rate)]))throw new Error('R011 integer step');
+          console.log({ticks:p.clock.phaseTicksPerCycle,rates:p.clock.supportedSampleRatesHz,events:p.events.length});
+          NODE
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp -a BIRD_SEAGULL_A_PHASE_CLOCK_R011/. _site/
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  live-browser-qa:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BIRD_R011_QA_URL: ${{ needs.deploy.outputs.page_url }}?qa=${{ github.run_id }}
+      BIRD_R011_QA_ROOT: artifacts/bird-r011-live
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser verifier
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.58.2
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Verify deployed R011 on desktop and mobile
+        run: node BIRD_SEAGULL_A_PHASE_CLOCK_R011/qa-r011.mjs
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bird-seagull-r011-real-live
+          path: artifacts/bird-r011-live
+          if-no-files-found: warn
+          retention-days: 90

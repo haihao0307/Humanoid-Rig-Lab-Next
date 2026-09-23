@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#081118">
+  <meta name="referrer" content="no-referrer">
+  <title>Bird Mother｜Seagull A 源拍翼运动合同台 R0.07</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header>
+    <button class="mobile nav-button" id="leftMenu" type="button">控制</button>
+    <div class="title-block">
+      <b>Bird Mother｜Seagull A 源拍翼运动合同台 R0.07</b>
+      <small>数据反转点｜三段翼链｜关节角度｜左右对称｜身体相位滞后｜不补造其他飞行姿态</small>
+    </div>
+    <span class="pill">SOURCE KINEMATIC CONTRACT</span>
+    <button class="mobile nav-button" id="rightMenu" type="button">合同</button>
+  </header>
+
+  <main>
+    <aside id="controls" class="panel left-panel">
+      <div class="card stage-note">
+        <b>第四道门：把唯一来源拍翼循环蒸馏成可复用的运动合同。</b>
+        本版不制作新鸟、不重建羽毛，也不生成滑翔、盘旋、转弯、起飞、降落或逃逸。只把来源能够证明的反转点、翼链角度、速度、对称性与身体滞后固定下来。
+      </div>
+
+      <h3>来源状态</h3>
+      <div class="grid two" id="sourceMode">
+        <button type="button" data-source="cycle" class="active">源拍翼循环</button>
+        <button type="button" data-source="static">绑定姿态</button>
+      </div>
+
+      <h3>播放与逐帧</h3>
+      <div class="transport">
+        <button type="button" id="play" class="primary">暂停</button>
+        <button type="button" id="prev">上一帧</button>
+        <button type="button" id="next">下一帧</button>
+      </div>
+      <div class="speed-row" id="speeds">
+        <button type="button" data-speed="0.25">0.25×</button>
+        <button type="button" data-speed="0.5">0.5×</button>
+        <button type="button" data-speed="1" class="active">1×</button>
+        <button type="button" data-speed="2">2×</button>
+      </div>
+      <div class="timeline-card">
+        <div class="timeline-head"><span>帧</span><b id="frameText">01 / 50</b><span id="timeText">0.0417 s</span></div>
+        <input id="frameSlider" type="range" min="0" max="49" step="1" value="0">
+        <div class="phase-band contract-band" id="phaseBand" aria-label="数据相位合同"></div>
+      </div>
+
+      <h3>数据事件锚点</h3>
+      <div class="key-grid contract-events" id="keyFrames"></div>
+
+      <h3>三维叠加</h3>
+      <div class="grid two">
+        <button type="button" id="skeleton">骨架：开</button>
+        <button type="button" id="trails">翼尖轨迹：开</button>
+        <button type="button" id="wire">线框：关</button>
+        <button type="button" id="reset">重置镜头</button>
+      </div>
+
+      <h3>固定视角</h3>
+      <div class="grid two" id="views">
+        <button type="button" data-view="persp" class="active">三分之四</button>
+        <button type="button" data-view="top">顶部</button>
+        <button type="button" data-view="bottom">翼底</button>
+        <button type="button" data-view="front">正面</button>
+        <button type="button" data-view="back">背面</button>
+        <button type="button" data-view="side">侧面</button>
+      </div>
+
+      <h3>当前相位合同</h3>
+      <div class="card phase-contract-card">
+        <b id="contractPhase">读取中</b>
+        <span id="contractPhaseNote">等待来源运动数据</span>
+        <small>相位只按翼尖平均 Y 的方向和极值划分，不等于空气动力学结论。</small>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <canvas id="glcanvas" aria-label="Seagull A 来源拍翼运动合同三维视窗"></canvas>
+      <div class="overlay source-card">
+        <b>来源：seagull (A).zip</b>
+        鸟体继续使用来源网格与来源蒙皮。彩色骨架、翼尖轨迹和右侧合同图只用于蒸馏运动规律，不是最终羽毛或商业运行时资产。
+      </div>
+      <div class="overlay phase-card">
+        <span>当前数据合同</span>
+        <b id="phaseLabel">读取中</b>
+        <small id="phaseBoundary">source evidence only</small>
+      </div>
+      <div class="overlay frame-card"><b id="bigFrame">01</b><span>/ 50</span></div>
+      <div class="status" id="status">正在校验并载入来源几何与源动画……</div>
+      <div class="contract-status" id="contractStatus">正在建立翼链运动合同……</div>
+      <div class="fatal" id="fatal" hidden><b>运动合同台没有成功显示</b><span>未知错误</span></div>
+    </section>
+
+    <aside id="analysis" class="panel right-panel">
+      <h3>当前帧运动量</h3>
+      <div class="metric-grid current contract-metrics">
+        <div><span>左翼尖 Y</span><b id="leftY">—</b></div>
+        <div><span>右翼尖 Y</span><b id="rightY">—</b></div>
+        <div><span>平均翼尖 Y</span><b id="avgTipY">—</b></div>
+        <div><span>翼尖速度 / s</span><b id="tipVelocity">—</b></div>
+        <div><span>身体 Y</span><b id="bodyY">—</b></div>
+        <div><span>翼尖跨度</span><b id="tipSpan">—</b></div>
+        <div><span>翼根仰角</span><b id="rootElevation">—</b></div>
+        <div><span>翼肘折角</span><b id="elbowFold">—</b></div>
+        <div><span>镜像 RMS</span><b id="symmetryRms">—</b></div>
+        <div><span>左右高度差</span><b id="asymmetry">—</b></div>
+        <div><span>身体滞后</span><b id="bodyLagState">—</b></div>
+        <div><span>播放倍率</span><b id="speedText">1×</b></div>
+      </div>
+
+      <h3>翼尖与身体耦合</h3>
+      <div class="graph-card">
+        <canvas id="motionGraph" width="420" height="230" aria-label="左右翼尖和身体轨迹图"></canvas>
+        <div class="legend">
+          <span><i class="left-tip"></i>左翼尖 Y</span>
+          <span><i class="right-tip"></i>右翼尖 Y</span>
+          <span><i class="body-line"></i>身体 Y</span>
+        </div>
+      </div>
+      <div class="fact-list compact-facts">
+        <div><span>左翼尖纵向行程</span><b id="leftTravel">—</b></div>
+        <div><span>右翼尖纵向行程</span><b id="rightTravel">—</b></div>
+        <div><span>身体纵向耦合</span><b id="bodyTravel">—</b></div>
+        <div><span>翼尖 / 身体行程比</span><b id="travelRatio">—</b></div>
+      </div>
+
+      <h3>数据相位与身体滞后</h3>
+      <div class="graph-card tall-graph">
+        <canvas id="phaseContractGraph" width="420" height="245" aria-label="翼尖平均高度和身体耦合合同图"></canvas>
+        <div class="legend">
+          <span><i class="avg-line"></i>平均翼尖 Y</span>
+          <span><i class="body-amplified"></i>身体 Y ×5</span>
+        </div>
+      </div>
+      <div class="graph-card velocity-card">
+        <canvas id="velocityGraph" width="420" height="170" aria-label="翼尖纵向速度图"></canvas>
+        <div class="legend"><span><i class="velocity-line"></i>平均翼尖纵向速度 / s</span></div>
+      </div>
+
+      <h3>三段翼链角度</h3>
+      <div class="graph-card tall-graph">
+        <canvas id="angleGraph" width="420" height="235" aria-label="翼根仰角与翼肘折角图"></canvas>
+        <div class="legend">
+          <span><i class="left-tip"></i>左翼根仰角</span>
+          <span><i class="right-tip"></i>右翼根仰角</span>
+          <span><i class="body-line"></i>左翼肘折角</span>
+        </div>
+      </div>
+
+      <h3>当前翼链镜像检查</h3>
+      <div class="graph-card chain-card"><canvas id="chainCanvas" width="420" height="260" aria-label="当前三段翼链正视与俯视示意"></canvas></div>
+
+      <h3>合同锚点</h3>
+      <div class="metric-grid summary anchor-grid">
+        <div><span>下止点</span><b id="bottomFrame">—</b></div>
+        <div><span>上止点</span><b id="topFrame">—</b></div>
+        <div><span>身体最低滞后</span><b id="lagFrames">—</b></div>
+        <div><span>最快下/上速度比</span><b id="speedRatio">—</b></div>
+        <div><span>对称峰值</span><b id="symmetryPeak">—</b></div>
+        <div><span>外翼折角漂移</span><b id="wristLock">—</b></div>
+      </div>
+
+      <h3>翼段长度守恒</h3>
+      <div id="segmentAudit" class="segment-audit"></div>
+
+      <h3>风险与不可跨越边界</h3>
+      <div id="riskList" class="risk-list"></div>
+
+      <h3>蒸馏合同</h3>
+      <div id="transferList" class="transfer-list"></div>
+
+      <h3>飞行形态槽位</h3>
+      <div class="pose-ledger">
+        <div class="pose learned"><span>这一段拍翼循环</span><b>已建立数据合同</b></div>
+        <div class="pose waiting"><span>滑翔 / 翱翔</span><b>等待用户文件</b></div>
+        <div class="pose waiting"><span>转弯 / 起降 / 逃逸</span><b>等待用户文件</b></div>
+      </div>
+
+      <div class="card compact license">
+        来源许可：CC-BY-NC-SA-4.0。R0.07 仍然只是研究、测量与运动蒸馏；没有生成独立可商用鸟资产。
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <span>visualAcceptance=false</span><span>productionReady=false</span><span>sourceAnimationOnly=true</span><span>kinematicContract=true</span>
+  </footer>
+
+  <script src="./data/form-00.js"></script>
+  <script src="./data/form-01.js"></script>
+  <script src="./data/form-02.js"></script>
+  <script src="./data/form-03.js"></script>
+  <script src="./data/form-04.js"></script>
+  <script src="./data/anim-00.js"></script>
+  <script src="./data/anim-00a.js"></script>
+  <script src="./data/anim-00b.js"></script>
+  <script src="./data/anim-01.js"></script>
+  <script src="./data/anim-02.js"></script>
+  <script src="./data/anim-02a.js"></script>
+  <script src="./data/anim-02b.js"></script>
+  <script src="./data/anim-03.js"></script>
+  <script src="./data/anim-03a.js"></script>
+  <script src="./data/anim-03b.js"></script>
+  <script src="./data/anim-04.js"></script>
+  <script src="./data/anim-05.js"></script>
+  <script src="./data/contract.js"></script>
+  <script src="./runtime/viewer-00.js"></script>
+  <script src="./runtime/bootstrap.js"></script>
+  <script src="./runtime/contract-ui.js"></script>
+</body>
+</html>
