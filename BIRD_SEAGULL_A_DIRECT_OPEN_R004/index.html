@@ -13,7 +13,7 @@
     <button class="mobile" id="menu" type="button">参数</button>
     <div>
       <b>Bird Mother｜Seagull A 基础形态直开台 R0.04</b><br>
-      <small>空白页纠错版｜按来源真实包围盒自动居中与缩放</small>
+      <small>空白页纠错版｜载荷补齐、真实包围盒自动居中与缩放</small>
     </div>
     <span class="pill">DIRECT OPEN · AUTO FIT</span>
   </header>
@@ -22,7 +22,7 @@
     <aside id="panel">
       <div class="card correction">
         <b>上一版判定失败：页面能打开，但鸟没有出现。</b><br>
-        本版不再使用写死的原点和镜头距离，而是读取来源几何实际包围盒，自动居中、统一缩放，并在首帧检测可见像素；检测不到鸟就直接显示失败原因，不再交空白页。
+        实测发现来源载荷拼接后只有 39,899 个 Base64 字符，而清单记录应为 39,900；缺少末尾填充字符使浏览器在解码阶段直接停止。本版先规范并补齐载荷，再按来源几何实际包围盒自动居中、统一缩放；首帧检测不到鸟时会明确报错，不再交空白页。
       </div>
 
       <h3>固定视角</h3>
@@ -77,6 +77,7 @@
   <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-02.js"></script>
   <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-03.js"></script>
   <script src="../BIRD_SEAGULL_A_DIRECT_OPEN_R003/data/form-04.js"></script>
+  <script src="./payload-fix.js"></script>
   <script src="./viewer.js"></script>
 </body>
 </html>
