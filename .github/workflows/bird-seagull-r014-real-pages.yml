@@ -39,7 +39,7 @@ jobs:
           test -f "$dir/runtime/contract-ui-r013.js"
           test -f "$dir/runtime/contract-ui.js"
           test -f "$dir/runtime/component-atlas-ui.js"
-          test "$(find "$dir/runtime" -name 'component-atlas-chunk-*.js' | wc -l)" -eq 2
+          test "$(find "$dir/runtime" -name 'component-atlas-chunk-*.js' | wc -l)" -eq 6
           test -f "$dir/qa-r014.mjs"
           node --check "$dir/runtime/contract-ui.js"
           node --check "$dir/runtime/component-atlas-ui.js"

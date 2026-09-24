@@ -4,7 +4,7 @@ const load=src=>new Promise((resolve,reject)=>{const s=document.createElement('s
 const decode=async b64=>{const raw=atob(b64),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));return await new Response(stream).text()};
 (async()=>{
  window.__BIRD_R014_UI_PAYLOAD='';
- for(const src of ['./runtime/component-atlas-chunk-00.js','./runtime/component-atlas-chunk-01.js'])await load(src);
+ for(const src of ['./runtime/component-atlas-chunk-00.js','./runtime/component-atlas-chunk-01.js','./runtime/component-atlas-chunk-02.js','./runtime/component-atlas-chunk-03.js','./runtime/component-atlas-chunk-04.js','./runtime/component-atlas-chunk-05.js'])await load(src);
  const payload=window.__BIRD_R014_UI_PAYLOAD;
  if(typeof payload!=='string'||payload.length!==10672)throw new Error('R0.14 UI载荷长度不符');
  const source=await decode(payload);if(new TextEncoder().encode(source).length!==21501)throw new Error('R0.14 UI源码长度不符');
