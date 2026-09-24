@@ -1,0 +1,235 @@
+{
+  "version": "R0.09",
+  "title": "Seagull A source-derived channel separation and joint-limit contract",
+  "source": {
+    "asset": "seagull (A).zip",
+    "sourceGlbSha256": "175c61f65e3f2c8b561d422f9d0c61b23bfd85928dd3b66ad8547638d84a90aa",
+    "license": "CC-BY-NC-SA-4.0",
+    "sourceContractVersion": "R0.07",
+    "controllerTransferVersion": "R0.08",
+    "commercialRuntimeEligible": false
+  },
+  "evidence": {
+    "frameCount": 50,
+    "fps": 24,
+    "durationSeconds": 2.0416666666666665,
+    "sourceAnimationOnly": true,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "channelGroups": [
+    {
+      "id": "wing_root_drive",
+      "label": "翼根驱动",
+      "sourceChannels": [
+        "leftRootElevationDeg",
+        "rightRootElevationDeg"
+      ],
+      "derivedChannels": [
+        "rootMeanDeg",
+        "rootResidualDeg"
+      ],
+      "transferRule": "Interpolate bilateral mean and signed residual separately; never force perfect mirroring by default."
+    },
+    {
+      "id": "wing_elbow_fold",
+      "label": "翼肘折叠",
+      "sourceChannels": [
+        "leftElbowFoldDeg",
+        "rightElbowFoldDeg"
+      ],
+      "derivedChannels": [
+        "elbowMeanDeg",
+        "elbowResidualDeg"
+      ],
+      "transferRule": "Preserve the measured fold envelope while keeping left-right residual explicit."
+    },
+    {
+      "id": "body_coupling",
+      "label": "身体耦合",
+      "sourceChannels": [
+        "averageWingtipY",
+        "tipSpan",
+        "bodyY"
+      ],
+      "derivedChannels": [
+        "bodyLagFrames"
+      ],
+      "transferRule": "Body vertical motion remains a separate delayed channel; do not drive it synchronously from wingtip height."
+    },
+    {
+      "id": "explicit_asymmetry",
+      "label": "显式不对称",
+      "sourceChannels": [
+        "leftRootElevationDeg",
+        "rightRootElevationDeg",
+        "leftMidElevationDeg",
+        "rightMidElevationDeg",
+        "leftOuterElevationDeg",
+        "rightOuterElevationDeg",
+        "leftElbowFoldDeg",
+        "rightElbowFoldDeg",
+        "wingSymmetryRms"
+      ],
+      "derivedChannels": [
+        "rootResidualDeg",
+        "midResidualDeg",
+        "outerResidualDeg",
+        "elbowResidualDeg"
+      ],
+      "transferRule": "Expose asymmetry as a bounded residual channel with gain limited to the source range 0–100%."
+    }
+  ],
+  "sourceLimits": {
+    "leftRootElevationDeg": {
+      "min": -39.610825,
+      "max": 56.6004,
+      "unit": "deg",
+      "group": "wing_root_drive"
+    },
+    "rightRootElevationDeg": {
+      "min": -39.610825,
+      "max": 56.6172,
+      "unit": "deg",
+      "group": "wing_root_drive"
+    },
+    "leftMidElevationDeg": {
+      "min": -51.7435,
+      "max": 6.3794,
+      "unit": "deg",
+      "group": "explicit_asymmetry"
+    },
+    "rightMidElevationDeg": {
+      "min": -51.776218,
+      "max": 7.5668,
+      "unit": "deg",
+      "group": "explicit_asymmetry"
+    },
+    "leftOuterElevationDeg": {
+      "min": -56.5917,
+      "max": 5.032938,
+      "unit": "deg",
+      "group": "explicit_asymmetry"
+    },
+    "rightOuterElevationDeg": {
+      "min": -56.5917,
+      "max": 6.0499,
+      "unit": "deg",
+      "group": "explicit_asymmetry"
+    },
+    "leftElbowFoldDeg": {
+      "min": 27.8908,
+      "max": 67.0999,
+      "unit": "deg",
+      "group": "wing_elbow_fold"
+    },
+    "rightElbowFoldDeg": {
+      "min": 27.8908,
+      "max": 67.0989,
+      "unit": "deg",
+      "group": "wing_elbow_fold"
+    },
+    "averageWingtipY": {
+      "min": -0.665062,
+      "max": 0.228828,
+      "unit": "source",
+      "group": "body_coupling"
+    },
+    "tipSpan": {
+      "min": 1.340178,
+      "max": 1.849267,
+      "unit": "source",
+      "group": "body_coupling"
+    },
+    "bodyY": {
+      "min": -0.066996,
+      "max": 0.045184,
+      "unit": "source",
+      "group": "body_coupling"
+    },
+    "wingSymmetryRms": {
+      "min": 1e-06,
+      "max": 0.032731,
+      "unit": "source",
+      "group": "explicit_asymmetry"
+    }
+  },
+  "lockedChannels": {
+    "leftWristFoldDeg": {
+      "min": 9.4046,
+      "max": 9.4116,
+      "range": 0.007,
+      "unit": "deg",
+      "reason": "Source outer chain is nearly locked and does not prove a transferable outer-fan articulation."
+    },
+    "rightWristFoldDeg": {
+      "min": 9.4039,
+      "max": 9.4111,
+      "range": 0.0072,
+      "unit": "deg",
+      "reason": "Source outer chain is nearly locked and does not prove a transferable outer-fan articulation."
+    }
+  },
+  "controller": {
+    "anchorFramesZeroBased": [
+      0,
+      9,
+      21,
+      40,
+      44,
+      46,
+      48,
+      49
+    ],
+    "allowedInterpolation": [
+      "smoothstep",
+      "linear"
+    ],
+    "defaultInterpolation": "smoothstep",
+    "asymmetryGainRange": [
+      0.0,
+      1.0
+    ],
+    "defaultAsymmetryGain": 1.0
+  },
+  "continuityAudit": {
+    "loopClosureRule": "absolute difference between frame 50 and frame 1",
+    "firstDerivativeRule": "forward finite difference multiplied by 24 fps",
+    "secondDerivativeRule": "second finite difference multiplied by 24^2",
+    "reversalFramesHuman": [
+      10,
+      41
+    ],
+    "limitTolerance": 1e-06,
+    "requiredSourceExceedanceCount": 0,
+    "requiredReplayExceedanceCount": 0,
+    "limitEnvelopeNote": "Source extrema are stored at sufficient precision to contain all 50 verified frames."
+  },
+  "transferBoundary": {
+    "mayTransfer": [
+      "three-segment wing-chain ratios",
+      "source-derived reversal timing",
+      "source-derived joint envelopes",
+      "separate root drive, elbow fold, body coupling and asymmetry channels",
+      "source-bounded interpolation and continuity audits"
+    ],
+    "mustNotTransfer": [
+      "separated source feather plates",
+      "the nearly locked outer-fan channel as a desired design",
+      "unverified biological or aerodynamic claims",
+      "unprovided glide, soar, turn, takeoff, landing or escape poses",
+      "the source asset into a commercial runtime"
+    ],
+    "unresolvedDofs": [
+      "spanwise wing twist",
+      "outer-fan articulation",
+      "primary feather spread",
+      "secondary feather overlap",
+      "aerodynamic load response"
+    ]
+  },
+  "externalRuntimeDependencies": 0,
+  "visualAcceptance": false,
+  "productionReady": false,
+  "commercialRuntimeEligible": false
+}

@@ -1,0 +1,104 @@
+name: Deploy Bird Seagull R013 Real
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'BIRD_SEAGULL_A_REPLAY_CORPUS_R013/**'
+      - '.github/workflows/bird-seagull-r013-real-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate R013 source and frozen corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir=BIRD_SEAGULL_A_REPLAY_CORPUS_R013
+          test -f "$dir/index.html"
+          test -f "$dir/corpus-contract.json"
+          test -f "$dir/replay-corpus.json"
+          test -f "$dir/data/corpus-contract.js"
+          test -f "$dir/runtime/contract-ui-r012.js"
+          test -f "$dir/runtime/contract-ui.js"
+          test -f "$dir/runtime/replay-consumer.js"
+          test -f "$dir/runtime/replay-corpus-ui.js"
+          test -f "$dir/qa-r013.mjs"
+          node --check "$dir/data/corpus-contract.js"
+          node --check "$dir/runtime/contract-ui.js"
+          node --check "$dir/runtime/replay-consumer.js"
+          node --check "$dir/runtime/replay-corpus-ui.js"
+          node --check "$dir/qa-r013.mjs"
+          node - <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const dir='BIRD_SEAGULL_A_REPLAY_CORPUS_R013';
+          const k=JSON.parse(fs.readFileSync(`${dir}/corpus-contract.json`,'utf8'));
+          const raw=fs.readFileSync(`${dir}/replay-corpus.json`),c=JSON.parse(raw);
+          const sha=crypto.createHash('sha256').update(raw).digest('hex');
+          if(k.version!=='R0.13'||c.version!=='R0.13')throw new Error('R013 version');
+          if(sha!==k.corpus.sha256)throw new Error(`R013 corpus sha ${sha}`);
+          if(c.cases.length!==40||new Set(c.cases.map(x=>x[0])).size!==40)throw new Error('R013 case count');
+          if(!c.cases.every(x=>Array.isArray(x)&&x[8].length===132&&x[2]>0))throw new Error('R013 packet shape');
+          if(new Set(c.cases.map(x=>x[1])).size!==8||new Set(c.cases.map(x=>x[4])).size!==5)throw new Error('R013 dimensions');
+          console.log({sha,cases:c.cases.length,events:8,rates:5});
+          NODE
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp -a BIRD_SEAGULL_A_REPLAY_CORPUS_R013/. _site/
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  live-browser-qa:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BIRD_R013_QA_URL: ${{ needs.deploy.outputs.page_url }}?qa=${{ github.run_id }}
+      BIRD_R013_QA_ROOT: artifacts/bird-r013-live
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser verifier
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.58.2
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Verify deployed R013 on desktop and mobile
+        run: node BIRD_SEAGULL_A_REPLAY_CORPUS_R013/qa-r013.mjs
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bird-seagull-r013-real-live
+          path: artifacts/bird-r013-live
+          if-no-files-found: warn
+          retention-days: 90
