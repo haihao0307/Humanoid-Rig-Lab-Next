@@ -18,8 +18,8 @@ h1{font-size:21px;margin:0 0 10px}p{color:#a9bdc1;line-height:1.65}.bar{height:6
  try{
   if(!('DecompressionStream' in window)) throw new Error('浏览器不支持 DecompressionStream，请使用新版 Chrome 或 Edge。');
   let b64='';
-  for(let i=0;i<8;i++){
-   status.textContent=`正在读取工作台数据 ${i+1}/8……`;
+  for(let i=0;i<4;i++){
+   status.textContent=`正在读取工作台数据 ${i+1}/4……`;
    const name=`parts/part-${String(i).padStart(2,'0')}.txt`;
    const r=await fetch(name,{cache:'no-store'});
    if(!r.ok) throw new Error(`工作台数据缺失：${name} (${r.status})`);
@@ -28,7 +28,7 @@ h1{font-size:21px;margin:0 0 10px}p{color:#a9bdc1;line-height:1.65}.bar{height:6
   const raw=atob(b64),bytes=new Uint8Array(raw.length);
   for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
   const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');
-  if(digest!=='efb73d415e6591b3e20f0ba32278d955cef11db884e9273db3e1c9f54a3120a8') throw new Error(`工作台数据校验失败。\nexpected efb73d415e6591b3e20f0ba32278d955cef11db884e9273db3e1c9f54a3120a8\nreceived ${digest}`);
+  if(digest!=='b2a898e69aec6c5b425431b64739cb9a6f2d7c2e8f248a1fe240771c1744c297') throw new Error(`工作台数据校验失败。\nexpected b2a898e69aec6c5b425431b64739cb9a6f2d7c2e8f248a1fe240771c1744c297\nreceived ${digest}`);
   status.textContent='校验通过，正在启动海鸥工作台……';
   const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
   const html=await new Response(stream).text();
