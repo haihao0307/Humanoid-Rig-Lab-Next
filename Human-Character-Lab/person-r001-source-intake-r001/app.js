@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { OrbitControls } from './vendor/OrbitControls.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.182.0/examples/jsm/controls/OrbitControls.js';
 
 const $=s=>document.querySelector(s);
 const canvas=$('#canvas'),loading=$('#loading'),loadState=$('#loadState'),selection=$('#selection');
@@ -20,13 +20,13 @@ const meshes=[];let sourceTriangleTotal=0,referenceTriangleTotal=0,currentMode='
 
 async function ungzipBase64(text){const binary=atob(text);const input=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)input[i]=binary.charCodeAt(i);const stream=new Blob([input]).stream().pipeThrough(new DecompressionStream('gzip'));return new Uint8Array(await new Response(stream).arrayBuffer());}
 async function decodePart(part){
-  const raw=await ungzipBase64(part.data),v=part.vertices,t=part.triangles,pBytes=v*3*2,nBytes=v*3;
+  const raw=await ungzipBase64(part.data),v=part.vertices,pBytes=v*3*2,nBytes=v*3;
   const qpos=new Uint16Array(raw.slice(0,pBytes).buffer),qnorm=new Int8Array(raw.slice(pBytes,pBytes+nBytes).buffer),idx=new Uint16Array(raw.slice(pBytes+nBytes).buffer);
   const pos=new Float32Array(v*3),norm=new Float32Array(v*3),min=part.min,max=part.max;
   for(let i=0;i<v;i++)for(let a=0;a<3;a++){const k=i*3+a;pos[k]=min[a]+qpos[k]/65535*(max[a]-min[a]);norm[k]=qnorm[k]/127;}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('normal',new THREE.BufferAttribute(norm,3));g.setIndex(new THREE.BufferAttribute(idx,1));g.computeBoundingSphere();
   const mat=new THREE.MeshStandardMaterial({color:new THREE.Color(...part.color),roughness:part.roughness,metalness:0,side:THREE.FrontSide});
-  const mesh=new THREE.Mesh(g,mat);mesh.userData.part=part;mesh.castShadow=false;mesh.receiveShadow=false;(part.shorts?shortsGroup:bodyGroup).add(mesh);meshes.push(mesh);
+  const mesh=new THREE.Mesh(g,mat);mesh.userData.part=part;(part.shorts?shortsGroup:bodyGroup).add(mesh);meshes.push(mesh);
   sourceTriangleTotal+=part.sourceTriangles;referenceTriangleTotal+=part.triangles;
 }
 function loftGeometry(sections,segments=64){
@@ -54,5 +54,5 @@ const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();canvas.addEventListe
 
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>applyMode(b.dataset.mode));$('#patchToggle').onchange=()=>applyMode(currentMode);$('#wireToggle').onchange=updateMaterials;$('#clayToggle').onchange=updateMaterials;
 
-async function init(){try{const chunks=window.HUMAN_R001_DATA_CHUNKS||[],parts=chunks.flat().sort((a,b)=>a.id-b.id);let done=0;for(const p of parts){await decodePart(p);done++;loadState.textContent=`表面 ${done}/${parts.length}`;await new Promise(requestAnimationFrame);}createPatch();$('#triangles').textContent=referenceTriangleTotal.toLocaleString();applyMode('clean');updateMaterials();loading.classList.add('hidden');loadState.textContent='READY · 31 PARTS';setView('front');}catch(err){console.error(err);loadState.textContent='LOAD ERROR';loadState.classList.add('error');loading.innerHTML=`<b>读取失败</b><span>${err.message}</span>`;}}
+async function init(){try{const payloadBytes=await ungzipBase64(window.HUMAN_R001_PAYLOAD_B64||'');const payload=JSON.parse(new TextDecoder().decode(payloadBytes));const parts=payload.parts.sort((a,b)=>a.id-b.id);let done=0;for(const p of parts){await decodePart(p);done++;loadState.textContent=`表面 ${done}/${parts.length}`;await new Promise(requestAnimationFrame);}createPatch();$('#triangles').textContent=referenceTriangleTotal.toLocaleString();applyMode('clean');updateMaterials();loading.classList.add('hidden');loadState.textContent='READY · 31 PARTS';setView('front');}catch(err){console.error(err);loadState.textContent='LOAD ERROR';loadState.classList.add('error');loading.innerHTML=`<b>读取失败</b><span>${err.message}</span>`;}}
 function animate(){resize();controls.update();renderer.render(scene,camera);requestAnimationFrame(animate);}init();animate();
