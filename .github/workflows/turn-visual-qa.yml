@@ -1,0 +1,215 @@
+name: Human turn focused visual QA
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Optional immutable source commit
+        required: false
+        type: string
+  push:
+    branches:
+      - feature/human-turn-motion-r1-20260930
+
+permissions:
+  contents: write
+
+concurrency:
+  group: human-turn-focused-visual-qa
+  cancel-in-progress: false
+
+jobs:
+  turn-browser-review:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[turn-visual-qa]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.source_sha || github.sha }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install browser capture dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --no-cache-dir \
+            selenium==4.27.1 pillow==11.0.0 requests==2.32.3
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg xvfb xauth fonts-noto-cjk
+          command -v google-chrome || command -v google-chrome-stable || command -v chromium
+          command -v ffmpeg
+          command -v Xvfb
+
+      - name: Resolve immutable source
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          SHORT_SHA="${SOURCE_SHA:0:12}"
+          PUBLIC_URL="https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${SOURCE_SHA}/index.html?visualTest=1"
+          BROWSER_URL="http://127.0.0.1:8765/index.html?visualTest=1"
+          echo "source_sha=${SOURCE_SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "public_url=${PUBLIC_URL}" >> "$GITHUB_OUTPUT"
+          echo "browser_url=${BROWSER_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Build lightweight motion review entrypoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp index.html source-index.html
+          python - <<'PY'
+          from pathlib import Path
+
+          def patch_bytes(path, marker, insertion):
+              file = Path(path)
+              data = file.read_bytes()
+              if data.count(marker) != 1:
+                  raise SystemExit(f'{path}: expected one marker, found {data.count(marker)}')
+              file.write_bytes(data.replace(marker, marker + insertion, 1))
+
+          compact_marker = b"async function installCompactWorkbench(lab,pending){"
+          compact_insert = b"\n  const motionVisualTest=new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest');\n  if(motionVisualTest){\n    pending?.catch?.(()=>{});\n    cancelCompactSurface('turn visual QA uses the lightweight fallback surface');\n    window.__motionVisualQAFallback={active:true,renderer:'procedural-fallback',motionEvidence:true,skinApproval:false};\n    window.__compactLoading={quality:'qa-fallback',job:'surface',state:'ready',group:'ready',message:'turn visual QA lightweight surface',startedAt:performance.now(),updatedAt:performance.now()};\n    lab.renderer.setQuality('fast');\n    if(!lab.hair?.inStudio?.())lab.focus('body');\n    needsRedraw=true;\n    return;\n  }"
+          patch_bytes('body/CompactWorkbench.js', compact_marker, compact_insert)
+
+          population_marker = b"  this.place(actor,position,options.yaw??0);this.pendingIds.add(id);"
+          population_insert = b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){\n   actor.compact=null;\n   if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};\n   this.pendingIds.delete(id);\n   return actor;\n  }"
+          patch_bytes('control/NPCPopulation.js', population_marker, population_insert)
+          PY
+          node tools/build-pure.mjs
+          node tools/build-pure.mjs --check
+          sha256sum source-index.html index.html | tee qa-entrypoint-hashes.txt
+
+      - name: Capture six turn angles in Chrome
+        id: capture
+        continue-on-error: true
+        env:
+          SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
+          PUBLIC_URL: ${{ steps.target.outputs.public_url }}
+          BROWSER_URL: ${{ steps.target.outputs.browser_url }}
+        shell: bash
+        run: |
+          set -o pipefail
+          curl -fL --retry 12 --retry-delay 3 --connect-timeout 20 --max-time 240 \
+            -H 'Cache-Control: no-cache' "$PUBLIC_URL" -o public-index.html
+          sha256sum source-index.html public-index.html index.html | tee preview-hashes.txt
+          cmp -s source-index.html public-index.html || { echo 'Immutable public source does not match checkout.' >&2; exit 1; }
+          python -m http.server 8765 --bind 127.0.0.1 >http-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS --connect-timeout 2 "http://127.0.0.1:8765/index.html" >/dev/null; then break; fi
+            if [[ "$attempt" == 40 ]]; then echo 'Local exact-commit server did not start.' >&2; exit 1; fi
+            sleep .25
+          done
+          xvfb-run -a -s "-screen 0 1920x1080x24" \
+            python tools/turn_visual_qa.py \
+              --url "$BROWSER_URL" \
+              --source-sha "$SOURCE_SHA" \
+              --output turn-visual-review \
+              --skip-ab | tee turn-visual-qa.log
+
+      - name: Upload focused turn evidence
+        if: always() && hashFiles('turn-visual-review/browser-run-report.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: human-turn-focused-review-${{ steps.target.outputs.short_sha }}
+          path: |
+            turn-visual-review
+            turn-visual-qa.log
+            http-server.log
+            preview-hashes.txt
+            qa-entrypoint-hashes.txt
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
+
+      - name: Publish fixed turn review
+        if: hashFiles('turn-visual-review/visual-review.html') != ''
+        env:
+          SOURCE_SHA: ${{ steps.target.outputs.source_sha }}
+          REVIEW_BRANCH: visual-review/human-turn-motion-r1
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "+refs/heads/$REVIEW_BRANCH:refs/remotes/origin/$REVIEW_BRANCH" || true
+          rm -rf /tmp/human-turn-review
+          git worktree add --detach /tmp/human-turn-review "$SOURCE_SHA"
+          cd /tmp/human-turn-review
+          if git show-ref --verify --quiet "refs/remotes/origin/$REVIEW_BRANCH"; then
+            git checkout -B "$REVIEW_BRANCH" "refs/remotes/origin/$REVIEW_BRANCH"
+          else
+            git checkout --orphan "$REVIEW_BRANCH"
+            git rm -rf . || true
+          fi
+          mkdir -p "reviews/$SOURCE_SHA"
+          rm -rf "reviews/$SOURCE_SHA"
+          cp -a "$GITHUB_WORKSPACE/turn-visual-review/." "reviews/$SOURCE_SHA/"
+          cat > latest.json <<EOF
+          {
+            "sourceSHA": "$SOURCE_SHA",
+            "reviewPath": "reviews/$SOURCE_SHA/visual-review.html",
+            "updatedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "scope": "left/right 45/90/180 in-place turns",
+            "surfaceReviewScope": "motion-preview-lightweight-fallback",
+            "visualAcceptance": false,
+            "productionReady": false,
+            "userVisualAcceptance": "pending"
+          }
+          EOF
+          cat > index.html <<EOF
+          <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0; url=reviews/$SOURCE_SHA/visual-review.html"><title>人物转向动作验收</title></head><body><p><a href="reviews/$SOURCE_SHA/visual-review.html">打开人物转向动作验收</a></p></body></html>
+          EOF
+          git add index.html latest.json "reviews/$SOURCE_SHA"
+          git commit -m "turn-visual-review: $SOURCE_SHA [skip ci]"
+          git push origin "HEAD:$REVIEW_BRANCH"
+
+      - name: Enforce focused review preflight
+        if: always()
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+          path=Path('turn-visual-review/browser-run-report.json')
+          if not path.exists():
+              raise SystemExit('Focused turn review did not produce browser-run-report.json')
+          data=json.loads(path.read_text(encoding='utf-8'))
+          if not data.get('preflight',{}).get('passed'):
+              raise SystemExit('Focused turn browser preflight failed.')
+          if data.get('status') == 'INCONCLUSIVE':
+              raise SystemExit('Focused turn review is inconclusive.')
+          failures=data.get('scenarioFailures',[])
+          if failures:
+              raise SystemExit('Focused turn scenarios failed: '+', '.join(failures))
+
+      - name: Summarize focused review
+        if: always()
+        shell: python
+        run: |
+          from pathlib import Path
+          import json, os
+          lines=['## Human turn focused visual QA']
+          path=Path('turn-visual-review/browser-run-report.json')
+          if path.exists():
+              data=json.loads(path.read_text(encoding='utf-8'))
+              lines += [
+                  f"- source: `{data.get('sourceSHA')}`",
+                  f"- status: `{data.get('status')}`",
+                  f"- preflight: `{data.get('preflight',{}).get('passed')}`",
+                  f"- failures: `{', '.join(data.get('scenarioFailures',[])) or 'none'}`",
+                  '- visualAcceptance: `false`',
+                  '- productionReady: `false`',
+                  '- userVisualAcceptance: `pending`',
+              ]
+          else:
+              lines.append('- No focused turn report was produced.')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as handle:
+              handle.write('\n'.join(lines)+'\n')
