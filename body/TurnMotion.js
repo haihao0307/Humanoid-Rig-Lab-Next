@@ -34,35 +34,45 @@ function turnR1ScalarResidual(base,raw,start,end,t,amount){
  const trend=start+(end-start)*smoother(t);return base+(raw-trend)*clamp(amount,0,1);
 }
 class TurnMotionR1 {
- constructor(locomotion){this.locomotion=locomotion;this.last=null;this.reset();}
- reset(){this.active=false;this.kind=null;this.clip=null;this.startYaw=0;this.targetYaw=0;this.totalAngleRad=0;this.durationS=0;this.elapsedS=0;this.progress=0;this.actualProgress=0;this.commandProgress=0;this.sample=null;this.sourceAmount=0;this.timelineHeldFrames=0;this.startedAtS=null;}
- cancel(reason='cancelled'){if(this.active)this.last={...this.report(),active:false,finishReason:reason};this.reset();}
+ constructor(locomotion){this.locomotion=locomotion;this.last=null;this.clearLive();}
+ clearLive(){
+  this.active=false;this.kind=null;this.clip=null;this.startYaw=0;this.previousYaw=0;this.targetYaw=0;this.totalAngleRad=0;this.actualAngleRad=0;
+  this.durationS=0;this.elapsedS=0;this.progress=0;this.actualProgress=0;this.commandProgress=0;this.sample=null;this.sourceAmount=0;this.timelineHeldFrames=0;this.startedAtS=null;
+ }
+ reset(){this.last=null;this.clearLive();}
+ cancel(reason='cancelled'){
+  if(this.active)this.last={...this.report(),active:false,finishReason:reason,finalYaw:this.locomotion.engine.state.yaw};
+  this.clearLive();
+ }
  begin(targetYaw,state,kind='in-place'){
-  this.reset();this.active=true;this.kind=kind;this.startYaw=state.yaw;this.targetYaw=angleDiff(targetYaw,0);this.totalAngleRad=angleDiff(this.targetYaw,this.startYaw);this.clip=turnR1SelectClip(this.totalAngleRad,kind);
+  this.clearLive();this.active=true;this.kind=kind;this.startYaw=state.yaw;this.previousYaw=state.yaw;this.targetYaw=angleDiff(targetYaw,0);this.totalAngleRad=angleDiff(this.targetYaw,this.startYaw);this.clip=turnR1SelectClip(this.totalAngleRad,kind);
   const sourceAngle=Math.abs(this.clip?.sourceTurnAngleRad||Math.PI/2),ratio=Math.abs(this.totalAngleRad)/Math.max(sourceAngle,.15),sourceDuration=this.clip?.durationS||1.8;
   this.durationS=clamp(sourceDuration*(.72+.34*clamp(ratio,.35,2.2)),.85,4.8);this.sourceAmount=this.clip?clamp(ratio,.32,1):0;this.startedAtS=state.time??0;this.sample=this.clip?turnR1Sample(this.clip,0):null;
  }
  ensure(targetYaw,state,kind='in-place'){
   const target=angleDiff(targetYaw,0),remaining=Math.abs(angleDiff(target,state.yaw));
   if(remaining<.012&&!this.active)return false;
-  if(!this.active||this.kind!==kind||Math.abs(angleDiff(target,this.targetYaw))>.03||Math.sign(angleDiff(target,state.yaw)||1)!==Math.sign(this.totalAngleRad||1))this.begin(target,state,kind);
+  const directionChanged=remaining>.05&&Math.sign(angleDiff(target,state.yaw)||1)!==Math.sign(this.totalAngleRad||1);
+  if(!this.active||this.kind!==kind||Math.abs(angleDiff(target,this.targetYaw))>.03||directionChanged)this.begin(target,state,kind);
   return true;
  }
- advance(targetYaw,state,dt,kind='in-place'){
-  if(!this.ensure(targetYaw,state,kind))return{yaw:targetYaw,timelineDone:true,active:false};
-  const total=this.totalAngleRad,actual=total===0?1:clamp(angleDiff(state.yaw,this.startYaw)/total,0,1),nextElapsed=Math.min(this.durationS,this.elapsedS+Math.max(0,dt));
+ observe(targetYaw,state,dt,kind='in-place'){
+  if(!this.ensure(targetYaw,state,kind))return{timelineDone:true,active:false};
+  const delta=angleDiff(state.yaw,this.previousYaw);this.previousYaw=state.yaw;this.actualAngleRad+=delta;
+  const total=this.totalAngleRad,actual=total===0?1:clamp(this.actualAngleRad/total,0,1),nextElapsed=Math.min(this.durationS,this.elapsedS+Math.max(0,dt));
   const nextT=this.durationS?nextElapsed/this.durationS:1,nextSample=this.clip?turnR1Sample(this.clip,nextT):null,nextProgress=clamp(nextSample?.yawProgress??smoother(nextT),0,1);
-  // Let head/thorax anticipation run before pelvis yaw, but never let the
-  // captured timeline outrun the committed pelvis by more than a bounded lead.
+  // The capture may lead the pelvis by a small amount so the head and thorax
+  // can anticipate. It may never drag the contact-solved root behind a source
+  // curve or command the pelvis directly.
   const allowed=nextProgress<=actual+.14||nextT<=.16||actual>=.985;
   if(allowed)this.elapsedS=nextElapsed;else this.timelineHeldFrames++;
   this.progress=this.durationS?clamp(this.elapsedS/this.durationS,0,1):1;this.sample=this.clip?turnR1Sample(this.clip,this.progress):null;
   this.actualProgress=actual;this.commandProgress=clamp(this.sample?.yawProgress??smoother(this.progress),0,1);
-  const yaw=angleDiff(this.startYaw+total*this.commandProgress,0);return{yaw,timelineDone:this.progress>=1-1e-9,active:true};
+  return{timelineDone:this.progress>=1-1e-9,active:true};
  }
  overlay(base,{handsConstrained=false}={}){
   if(!this.active||!this.clip||!this.sample)return null;
-  const rows=this.clip.samples,start=rows[0],end=rows.at(-1),t=this.progress,amount=this.sourceAmount*(handsConstrained ? .45 : 1),reference={...base};
+  const rows=this.clip.samples,start=rows[0],end=rows.at(-1),t=this.progress,amount=this.sourceAmount*(handsConstrained?.45:1),reference={...base};
   for(const key of TURN_R1_QUAT_KEYS)reference[key]=turnR1QuatResidual(base[key],this.sample[key],start[key],end[key],t,amount);
   reference.rootHeightRatio=turnR1ScalarResidual(base.rootHeightRatio,this.sample.rootHeightRatio,start.rootHeightRatio,end.rootHeightRatio,t,amount*.55);
   if(!handsConstrained){
@@ -71,13 +81,13 @@ class TurnMotionR1 {
   }
   return{reference,motionSource:{kind:'capture-turn-overlay',schema:TURN_R1_SCHEMA,revision:TURN_MOTION.revision,clip:this.clip.id,trial:this.clip.sourceTrial,progress:t,
    sourceTurnAngleRad:this.clip.sourceTurnAngleRad,requestedTurnAngleRad:this.totalAngleRad,headLeadS:this.clip.sequence?.headLeadS??null,thoraxLeadS:this.clip.sequence?.thoraxLeadS??null,
-   controlledPelvisYaw:true,controlledFeet:true,handsConstrained,measuredMotion:true,posedSurfaceMeasured:false}};
+   pelvisYawRuntimeOwner:true,capturedPelvisYawApplied:false,controlledFeet:true,handsConstrained,measuredMotion:true,posedSurfaceMeasured:false}};
  }
- complete(state){this.last={...this.report(),active:false,finishReason:'completed',finalYaw:state.yaw};this.reset();}
+ complete(state){this.last={...this.report(),active:false,finishReason:'completed',finalYaw:state.yaw};this.clearLive();}
  report(){return{schema:TURN_R1_SCHEMA,revision:TURN_MOTION.revision,active:this.active,kind:this.kind,clip:this.clip?.id||null,sourceTrial:this.clip?.sourceTrial||null,
   startYaw:this.startYaw,targetYaw:this.targetYaw,totalAngleRad:this.totalAngleRad,durationS:this.durationS,elapsedS:this.elapsedS,progress:this.progress,actualProgress:this.actualProgress,
-  commandProgress:this.commandProgress,timelineHeldFrames:this.timelineHeldFrames,sourceAmount:this.sourceAmount,method:this.clip?'cmu-turn-capture-detrended-upper-body-plus-contact-solved-feet/v1':'minimum-jerk-fallback/v1',
-  runtimeVerified:false,visualAcceptance:false};}
+  commandProgress:this.commandProgress,timelineHeldFrames:this.timelineHeldFrames,sourceAmount:this.sourceAmount,pelvisYawOwner:'NaturalLocomotion/TurnCommandFilter',
+  method:this.clip?'cmu-turn-capture-detrended-upper-body-over-contact-solved-turn/v1':'minimum-jerk-fallback/v1',runtimeVerified:false,visualAcceptance:false};}
 }
 const TURN_R1_BASE_TURN=NaturalLocomotion.prototype.turnInPlace;
 const TURN_R1_BASE_MOVE=NaturalLocomotion.prototype.move;
@@ -85,11 +95,12 @@ const TURN_R1_BASE_STOP=NaturalLocomotion.prototype.stop;
 const TURN_R1_BASE_RESET=NaturalLocomotion.prototype.resetFromPose;
 const TURN_R1_BASE_REPORT=NaturalLocomotion.prototype.report;
 NaturalLocomotion.prototype.turnInPlace=function(yaw,dt){
- const adapter=this.turnMotionR1||(this.turnMotionR1=new TurnMotionR1(this)),command=adapter.advance(yaw,this.engine.state,dt,'in-place');
- const moving=TURN_R1_BASE_TURN.call(this,command.yaw,dt);
- if(!command.timelineDone)return true;
- if(moving)return true;
- adapter.complete(this.engine.state);return false;
+ const adapter=this.turnMotionR1||(this.turnMotionR1=new TurnMotionR1(this)),tracked=adapter.ensure(yaw,this.engine.state,'in-place');
+ // Root yaw, support margins, planted-foot twist and swing-foot placement keep
+ // using the previously verified controller. The capture never drives them.
+ const moving=TURN_R1_BASE_TURN.call(this,yaw,dt),timeline=tracked?adapter.observe(yaw,this.engine.state,dt,'in-place'):{timelineDone:true,active:false};
+ if(moving||!timeline.timelineDone)return true;
+ if(adapter.active)adapter.complete(this.engine.state);return false;
 };
 NaturalLocomotion.prototype.move=function(dt,speed=.48){if(this.turnMotionR1?.active)this.turnMotionR1.cancel('walk-started');return TURN_R1_BASE_MOVE.call(this,dt,speed);};
 NaturalLocomotion.prototype.stop=function(){this.turnMotionR1?.cancel('stopped');return TURN_R1_BASE_STOP.call(this);};
