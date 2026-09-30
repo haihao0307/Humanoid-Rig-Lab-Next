@@ -1,0 +1,32 @@
+name: Human R006 browser DQS integration
+on:
+  push:
+    branches: [work/human-character-surface-001-r006-inherit-original-core-20260930]
+    paths:
+      - .github/workflows/human-r006-browser-dqs.yml
+      - New-Human-Production/R006/tests/browser-dqs-integration.mjs
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser test dependencies
+        run: |
+          npm install --no-save --package-lock=false three@0.184.0 playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Compile and render eight-influence DQS with real Three.js materials
+        run: node New-Human-Production/R006/tests/browser-dqs-integration.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: human-r006-browser-dqs-integration
+          path: browser-dqs-qa/
+          retention-days: 7
