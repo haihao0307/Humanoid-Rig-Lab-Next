@@ -1,0 +1,33 @@
+{
+  "schema": "kaopu/human_motion_delivery_manifest@0.1",
+  "version": "R005.1",
+  "date": "2026-09-30",
+  "branch": "work/human-character-surface-001-r005-motion-20260930",
+  "source": {
+    "file": "source-original-preserved.usdz",
+    "bytes": 36915776,
+    "sha256": "b0435f3f30e0d63b6d4527000b7995b16fa91ca0ba8cb16b811be285e4fe7567"
+  },
+  "axis": {
+    "automaticSurfaceDetection": true,
+    "canonical": "+Y up, +Z forward, +X character-left",
+    "leftRightCameraCorrected": true
+  },
+  "motion": {
+    "fixedBoneLengths": true,
+    "programmaticSkinWeights": true,
+    "desiredPoseFinalPoseSeparation": true,
+    "behaviorQueue": true
+  },
+  "shorts": "preserved",
+  "primitiveBodyAssembly": false,
+  "fullyProceduralCharacter": false,
+  "reason": "The rig and motion system are procedural, but the visible surface is still reconstructed from the complete sampled USDZ mesh data.",
+  "fixes": [
+    "replace invalid SkeletonHelper.update() with updateMatrixWorld(true)",
+    "disable frustum culling on skinned meshes and skeleton helper",
+    "render one frame immediately after camera fit",
+    "surface runtime errors instead of silent blank viewport"
+  ],
+  "standaloneHtml": "NEW_HUMAN_MOTION_BEHAVIOR_R005_1_FIXED.html"
+}
