@@ -25,9 +25,10 @@ jobs:
           set -euo pipefail
           git clone --depth 1 --filter=blob:none --sparse https://github.com/cinevva-engine/usdjs.git usdjs
           cd usdjs
-          git sparse-checkout set src package.json tsconfig.json README.md LICENSE
+          git sparse-checkout set --skip-checks src package.json tsconfig.json README.md LICENSE
           npm install --no-audit --no-fund
           npm run build
+          mkdir -p ../artifact
           npm pack --pack-destination ../artifact
           cd ..
           npm pack three@0.182.0 --pack-destination artifact
