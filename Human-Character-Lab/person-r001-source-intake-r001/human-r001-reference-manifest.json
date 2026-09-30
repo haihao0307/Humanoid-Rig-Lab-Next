@@ -1,0 +1,102 @@
+{
+  "schema": "kaopu/human-reference-intake@0.1",
+  "subjectId": "human-r001",
+  "stage": "source-intake-shorts-removal-r001",
+  "source": {
+    "fileName": "human+figure+3d+model (1).usdz",
+    "format": "USDZ",
+    "rootLayer": "tripo_convert_e110db66-dd12-48bb-b56a-95079cf3e0f7.usdc",
+    "rootLayerEncoding": "binary USDC",
+    "byteLength": 36915776,
+    "sha256": "b0435f3f30e0d63b6d4527000b7995b16fa91ca0ba8cb16b811be285e4fe7567",
+    "parsedPrimCount": 283,
+    "meshPartCount": 31,
+    "sourceTriangleCount": 977244,
+    "skeletonOrSkelRootObserved": false,
+    "licenseAndProvenanceStatus": "unknown-user-supplied-reference"
+  },
+  "coordinateContract": {
+    "projectUnits": "metres",
+    "projectUpAxis": "Y",
+    "projectForwardAxis": "Z",
+    "sourceToProjectPoint": "[x,z,-y]",
+    "displayHeightM": 1.8,
+    "displayHeightIsCalibrationOnly": true,
+    "measuredRealHeightKnown": false
+  },
+  "shortsRemoval": {
+    "identifiedParts": [
+      {
+        "partId": 1,
+        "role": "shorts-left-leg",
+        "sourceTriangles": 103248
+      },
+      {
+        "partId": 2,
+        "role": "shorts-right-leg",
+        "sourceTriangles": 99943
+      },
+      {
+        "partId": 9,
+        "role": "shorts-waist-centre",
+        "sourceTriangles": 31780
+      }
+    ],
+    "excludedByDefault": true,
+    "sourceBodyUnderShortsComplete": false,
+    "upperBodyLowestObservedY": 0.5568593740463257,
+    "upperThighHighestObservedY": 0.37519171833992004,
+    "uncoveredVerticalGapApprox": 0.18166765570640564
+  },
+  "proceduralPatch": {
+    "type": "neutral-inset-pelvis-and-proximal-thigh-lofts",
+    "runtimeGenerated": true,
+    "externalMeshCopiedIntoPatch": false,
+    "purpose": "under-garment occlusion and future cloth collision continuity",
+    "anatomicalDetailLevel": "minimal",
+    "intendedToRemainVisibleWithoutClothing": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  },
+  "browserReference": {
+    "schema": "kaopu/human-reference-browser-payload@0.1",
+    "meshPartCount": 31,
+    "triangleCount": 8606,
+    "geometryEncoding": "per-part gzip/base64; positions uint16; normals int8; indices uint16",
+    "materialRepresentation": "average base colour and authored roughness only",
+    "originalTextureMapsIncluded": false,
+    "purpose": "fast browser inspection, part isolation and silhouette comparison only",
+    "finalRuntimeAsset": false
+  },
+  "payloadSha256": {
+    "data-start.js": "587fd35e31074133f769ef0f9b9588f99887dd2de104f03e54b7760c250cc85e",
+    "data-00.js": "069fa2ec3ec2d856a5ea480649d617649a183805c987cd99f107d5d455d2b69e",
+    "data-01.js": "2eb48d176bd5f1383fb5a6483e46e7fc54be6077d0c6382e1e856b8efacfd011",
+    "data-02.js": "cd6f8311aff45b084de3b54560de35195a338cc12fcd4298ad11f89e64c36cb4",
+    "data-03.js": "2103ebaa6c2a4be0546c991a71de5718cda9ec4ced5dab12a9b6df43d3083a68",
+    "data-04.js": "a16cacabe26faaef2d4f02351cdfc9d8d4a0df2e1517cddc176346f100383993",
+    "data-05.js": "d350eefe2723024f3b19634b7e3af6c990216024cc3faa5bd778ce5ce68a8e0a",
+    "data-06.js": "f554cd51102df9d5022289c3af2428e039e45bdac1543afdea955e7a6ad5a3b8",
+    "data-07.js": "22d88b29ccdcc96eb0ae249837e32ce8d20e74b7003208970d305ea7b6d6efc4",
+    "data-08.js": "a67e99c99f15c2e197ef1ea0dc223680237329205185adf2a70ac5dc8f3d984c",
+    "data-09.js": "4941495857a6c99a2f455b4b5e0d13568652ada0daed2cb7a7e519691c3896b6",
+    "data-10.js": "af2fb7dcc8ff0f5c2fc8d47dc65d21c23578dca1ffa3a16bcb21e0e998cdcc65",
+    "data-11.js": "59c42395da441a244e88ebd1ef5cbf990bd7a235bd9184ebc56e8704ba4ef626",
+    "data-12.js": "1dd10681c43a78b883f97bc8a4e7722facee7ebc61f44a9d578207f9702020f1",
+    "data-13.js": "32b0f3edc8966bc456daee40e0bcea3763f2767a78eda14434bf2b7db63d1d95"
+  },
+  "status": {
+    "usdzRead": true,
+    "surfaceInformationExtracted": true,
+    "shortsPartsIsolated": true,
+    "shortsHiddenInDefaultView": true,
+    "proceduralGapPatchAdded": true,
+    "browserWorkbenchAdded": true,
+    "sourceReferenceOnly": true,
+    "fullProgrammaticCharacterReconstruction": false,
+    "rigBindingComplete": false,
+    "clothShortsIntegrated": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
