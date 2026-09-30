@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bird Mother R0.22｜海鸥生命活动与表面曲线工作台</title>
+<style>
+html,body{height:100%;margin:0;background:#071117;color:#e7f1f1;font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+main{height:100%;display:grid;place-items:center;padding:22px;box-sizing:border-box}
+.card{width:min(720px,calc(100% - 16px));border:1px solid #31505a;background:#0d1d24;padding:24px;border-radius:15px;box-shadow:0 18px 65px #0009}
+h1{font-size:21px;margin:0 0 10px}p{color:#a9bdc1;line-height:1.65}.bar{height:6px;background:#233941;border-radius:99px;overflow:hidden}.bar i{display:block;width:16%;height:100%;background:#69ddd0;animation:p 1.1s ease-in-out infinite alternate}pre{white-space:pre-wrap;color:#ffaca3}@keyframes p{to{transform:translateX(525%)}}
+</style>
+</head>
+<body><main><section class="card"><h1>Bird Mother R0.22 · 海鸥生命活动工作台</h1><div class="bar"><i></i></div><p id="status">正在读取并校验自包含工作台……</p><pre id="error" hidden></pre></section></main>
+<script>
+(async()=>{
+ const status=document.getElementById('status'),error=document.getElementById('error');
+ try{
+  if(!('DecompressionStream' in window)) throw new Error('浏览器不支持 DecompressionStream，请使用新版 Chrome 或 Edge。');
+  let b64='';
+  for(let i=0;i<8;i++){
+   status.textContent=`正在读取工作台数据 ${i+1}/8……`;
+   const name=`parts/part-${String(i).padStart(2,'0')}.txt`;
+   const r=await fetch(name,{cache:'no-store'});
+   if(!r.ok) throw new Error(`工作台数据缺失：${name} (${r.status})`);
+   b64+=(await r.text()).trim();
+  }
+  const raw=atob(b64),bytes=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+  const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');
+  if(digest!=='efb73d415e6591b3e20f0ba32278d955cef11db884e9273db3e1c9f54a3120a8') throw new Error(`工作台数据校验失败。\nexpected efb73d415e6591b3e20f0ba32278d955cef11db884e9273db3e1c9f54a3120a8\nreceived ${digest}`);
+  status.textContent='校验通过，正在启动海鸥工作台……';
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  const html=await new Response(stream).text();
+  document.open();document.write(html);document.close();
+ }catch(e){status.textContent='工作台启动失败';error.hidden=false;error.textContent=e&&e.stack?e.stack:String(e)}
+})();
+</script></body></html>
