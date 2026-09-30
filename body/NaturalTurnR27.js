@@ -144,15 +144,15 @@ function naturalTurnReport(turn){
   const turn=this.__naturalTurnR27;
   if(!turn||turn.phase!=='turning')return stepFeet.call(this,state,dt);
   const sides=['left','right'];
-  const chooseCorrection=()=>sides.map(side=>({side,yaw:Math.abs(angle(turn.targetYaw-state.feet[side].yaw)),position:distance(state.feet[side].position,this.stance({...state,yaw:turn.targetYaw},side))})).sort((a,b)=>(b.yaw+b.position*2)-(a.yaw+a.position*2))[0];
+  const chooseCorrection=()=>sides.map(side=>({side,yaw:Math.abs(angleDiff(turn.targetYaw,state.feet[side].yaw)),position:dist(state.feet[side].position,this.stance({...state,yaw:turn.targetYaw},side))})).sort((a,b)=>(b.yaw+b.position*2)-(a.yaw+a.position*2))[0];
   if(!state.swing){
    let side=turn.nextFoot,corrective=null;
    if(turn.stepsCompleted>=turn.plannedSteps){corrective=chooseCorrection();if((corrective.yaw<NATURAL_TURN_R27.correctiveYawRad&&corrective.position<NATURAL_TURN_R27.correctivePositionM)||turn.extraSteps>=NATURAL_TURN_R27.maximumExtraSteps)return;side=corrective.side;turn.extraSteps++;}
-   const foot=state.feet[side],twist=Math.abs(angle(state.yaw-foot.yaw)),scheduledProgress=turn.plannedSteps?naturalTurnPlacementFraction(turn,Math.min(turn.stepsCompleted,turn.plannedSteps-1)):1;
+   const foot=state.feet[side],twist=Math.abs(angleDiff(state.yaw,foot.yaw)),scheduledProgress=turn.plannedSteps?naturalTurnPlacementFraction(turn,Math.min(turn.stepsCompleted,turn.plannedSteps-1)):1;
    const scheduled=turn.elapsedS>=NATURAL_TURN_R27.anticipationS&&(twist>NATURAL_TURN_R27.triggerTwistRad||turn.rootProgress+.08>=scheduledProgress||turn.rootProgress>.94);
    if(!scheduled&&!corrective)return;
    const index=Math.min(turn.stepsCompleted,Math.max(0,turn.plannedSteps-1)),placementYaw=turn.stepsCompleted<turn.plannedSteps?naturalTurnPlacementYaw(turn,index,state.yaw):turn.targetYaw;
-   const stepAngle=Math.abs(angle(placementYaw-foot.yaw)),angleRatio=clamp(stepAngle/NATURAL_TURN_R27.freeMaximumStepYawRad,0,1),lead=turn.stepsCompleted===0?.012:0;
+   const stepAngle=Math.abs(angleDiff(placementYaw,foot.yaw)),angleRatio=clamp(stepAngle/NATURAL_TURN_R27.freeMaximumStepYawRad,0,1),lead=turn.stepsCompleted===0?.012:0;
    const target=this.stance({...state,yaw:placementYaw},side,lead),path=this.world.sweep(foot.position,target,.045);
    if(path.blocked||!this.world.free(target,.045))throw Error('自然转身落脚路径受阻，保持最后安全支撑');
    const duration=clamp(.27+angleRatio*.11+(turn.carried?.08:0),.27,turn.carried?.49:.40),lift=clamp(.014+angleRatio*.022,turn.carried?.012:.014,turn.carried?.029:.038);
@@ -161,7 +161,7 @@ function naturalTurnReport(turn){
   }
   if(state.swing?.motionKind==='natural-turn-r27'){
    const swing=state.swing;swing.elapsed=Math.min(swing.duration,swing.elapsed+dt);const t=swing.elapsed/swing.duration,u=naturalTurnEase(t),foot=state.feet[swing.side];
-   foot.position=mix(swing.from,swing.target,u);foot.position[1]+=swing.lift*16*t*t*(1-t)*(1-t);foot.yaw=angle(swing.fromYaw+angle(swing.yaw-swing.fromYaw)*u);
+   foot.position=mix(swing.from,swing.target,u);foot.position[1]+=swing.lift*16*t*t*(1-t)*(1-t);foot.yaw=angleDiff(swing.fromYaw+angleDiff(swing.yaw,swing.fromYaw)*u,0);
    if(t>=1){foot.position=[...swing.target];foot.contact=true;foot.yaw=swing.yaw;turn.stepsCompleted++;turn.nextFoot=swing.side==='left'?'right':'left';state.nextFoot=turn.nextFoot;state.swing=null;state.metrics.steps++;}
    return;
   }
