@@ -1,0 +1,31 @@
+name: Human R006 support transfer source
+on:
+  push:
+    branches: [work/human-character-surface-001-r006-inherit-original-core-20260930]
+    paths: [.github/workflows/human-r006-support-source.yml]
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 4b52c59cb21f05e1999d1850d443cb18a4adf591
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Export pinned prior work and native offline shader test dependencies
+        run: |
+          set -e
+          mkdir -p /tmp/support-source/core /tmp/support-source/offline
+          git archive HEAD | tar -x -C /tmp/support-source/core
+          python -m pip download --only-binary=:all: moderngl==5.12.0 glcontext==3.0.0 -d /tmp/support-source/offline
+      - uses: actions/upload-artifact@v4
+        with:
+          name: human-r006-seated-support-source
+          path: /tmp/support-source/
+          retention-days: 7
+          include-hidden-files: true
