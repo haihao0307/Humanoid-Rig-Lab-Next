@@ -24,6 +24,7 @@ jobs:
       - name: Validate source evidence and payload
         run: node Human-Character-Lab/person-r001-source-intake-r001/check.mjs
       - name: Install Chrome
+        id: chrome
         uses: browser-actions/setup-chrome@v1
       - name: Install browser driver
         run: npm install --no-save --ignore-scripts playwright-core@1.55.0
@@ -43,6 +44,7 @@ jobs:
           exit 1
       - name: Browser QA
         env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
           HUMAN_R001_URL: http://127.0.0.1:8765/
           HUMAN_R001_QA_OUTPUT: human-r001-qa
         run: node Human-Character-Lab/person-r001-source-intake-r001/qa-browser.mjs
