@@ -1,0 +1,256 @@
+name: Natural Turn R27 verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/human-natural-turn-r27-20260930
+
+permissions:
+  contents: write
+
+concurrency:
+  group: natural-turn-r27
+  cancel-in-progress: true
+
+jobs:
+  verify-build-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Register Natural Turn R27 in the authoritative assembly
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+
+          runtime_path = Path('source/runtime.template.js')
+          runtime = runtime_path.read_text(encoding='utf-8')
+          marker = '/*__SOURCE:body/LightBalanceFeedback.js__*/'
+          insertion = marker + '\n/*__SOURCE:body/NaturalTurnR27.js__*/'
+          if '/*__SOURCE:body/NaturalTurnR27.js__*/' not in runtime:
+              if runtime.count(marker) != 1:
+                  raise SystemExit(f'expected one LightBalance marker, found {runtime.count(marker)}')
+              runtime = runtime.replace(marker, insertion, 1)
+              runtime_path.write_text(runtime, encoding='utf-8', newline='\n')
+
+          manifest_path = Path('source/assembly.json')
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          modules = manifest['modules']
+          module = 'body/NaturalTurnR27.js'
+          if module not in modules:
+              at = modules.index('body/LightBalanceFeedback.js') + 1
+              modules.insert(at, module)
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
+
+      - name: Run Natural Turn R27 and motion regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/test-turn-command-continuity.mjs | tee natural-turn-r27-test.json
+          node tools/test-motion-phase-continuity.mjs
+          node tools/test-turn-command-continuity.mjs >/dev/null
+          node tools/test-standing-gait-height.mjs
+          node tools/test-ground-contact-fit.mjs
+          node tools/test-motion-skin-attachment.mjs
+
+      - name: Assemble and audit the production entrypoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/build-pure.mjs
+          node tools/build-pure.mjs --check
+          python tools/audit-files.py
+          node tools/build-pure.mjs --check
+
+      - name: Commit deterministic source registration and generated entrypoint
+        id: built
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/runtime.template.js source/assembly.json index.html FILE_AUDIT.json SHA256SUMS.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "build(motion): assemble Natural Turn R27 [skip ci]"
+            git push origin "HEAD:feature/human-natural-turn-r27-20260930"
+          fi
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SOURCE_SHA:0:12}" >> "$GITHUB_OUTPUT"
+          echo "public_url=https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${SOURCE_SHA}/index.html" >> "$GITHUB_OUTPUT"
+
+      - name: Install real-browser dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --no-cache-dir \
+            selenium==4.27.1 pillow==11.0.0 requests==2.32.3
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg xvfb xauth fonts-noto-cjk
+          command -v google-chrome || command -v google-chrome-stable || command -v chromium
+          command -v ffmpeg
+          command -v Xvfb
+
+      - name: Build temporary lightweight turn-review entrypoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp index.html production-index.html
+          python - <<'PY'
+          from pathlib import Path
+
+          def patch_bytes(path, marker, insertion):
+              file = Path(path)
+              data = file.read_bytes()
+              if data.count(marker) != 1:
+                  raise SystemExit(f'{path}: expected one marker, found {data.count(marker)}')
+              file.write_bytes(data.replace(marker, marker + insertion, 1))
+
+          compact_marker = b"async function installCompactWorkbench(lab,pending){"
+          compact_insert = b"\n  const motionVisualTest=new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest');\n  if(motionVisualTest){\n    pending?.catch?.(()=>{});\n    cancelCompactSurface('natural turn visual QA uses the lightweight fallback surface');\n    window.__motionVisualQAFallback={active:true,renderer:'procedural-fallback',motionEvidence:true,skinApproval:false};\n    window.__compactLoading={quality:'qa-fallback',job:'surface',state:'ready',group:'ready',message:'natural turn QA lightweight surface',startedAt:performance.now(),updatedAt:performance.now()};\n    lab.renderer.setQuality('fast');\n    if(!lab.hair?.inStudio?.())lab.focus('body');\n    needsRedraw=true;\n    return;\n  }"
+          patch_bytes('body/CompactWorkbench.js', compact_marker, compact_insert)
+
+          population_marker = b"  this.place(actor,position,options.yaw??0);this.pendingIds.add(id);"
+          population_insert = b"\n  if(new URLSearchParams(window.parent!==window?window.parent.location.search:location.search).has('visualTest')){\n   actor.compact=null;\n   if(options.identity)actor.identity={residentId:String(options.identity.residentId||id).slice(0,64),displayName:String(options.identity.displayName||actor.label).slice(0,24),role:String(options.identity.role||'general').slice(0,48)};\n   this.pendingIds.delete(id);\n   return actor;\n  }"
+          patch_bytes('control/NPCPopulation.js', population_marker, population_insert)
+          PY
+          node tools/build-pure.mjs
+          sha256sum production-index.html index.html | tee qa-entrypoint-hashes.txt
+
+      - name: Run focused one-session Chrome turn capture
+        id: capture
+        continue-on-error: true
+        env:
+          SOURCE_SHA: ${{ steps.built.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m http.server 8765 --bind 127.0.0.1 >http-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS --connect-timeout 2 "http://127.0.0.1:8765/index.html" >/dev/null; then break; fi
+            if [[ "$attempt" == 40 ]]; then echo 'Local turn review server did not start.' >&2; exit 1; fi
+            sleep .25
+          done
+          xvfb-run -a -s "-screen 0 1920x1080x24" \
+            python tools/natural_turn_visual_qa.py \
+              --url "http://127.0.0.1:8765/index.html?visualTest=1" \
+              --source-sha "$SOURCE_SHA" \
+              --output visual-review \
+              --skip-ab | tee natural-turn-visual-qa.log
+
+      - name: Upload Natural Turn R27 evidence
+        if: always() && hashFiles('visual-review/browser-run-report.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: natural-turn-r27-${{ steps.built.outputs.short_sha }}
+          path: |
+            visual-review
+            natural-turn-r27-test.json
+            natural-turn-visual-qa.log
+            http-server.log
+            qa-entrypoint-hashes.txt
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 30
+
+      - name: Publish fixed Natural Turn review site
+        if: hashFiles('visual-review/visual-review.html') != ''
+        env:
+          SOURCE_SHA: ${{ steps.built.outputs.source_sha }}
+          REVIEW_BRANCH: visual-review/human-natural-turn-r27
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "+refs/heads/$REVIEW_BRANCH:refs/remotes/origin/$REVIEW_BRANCH" || true
+          rm -rf /tmp/human-natural-turn-review
+          git worktree add --detach /tmp/human-natural-turn-review "$SOURCE_SHA"
+          cd /tmp/human-natural-turn-review
+          if git show-ref --verify --quiet "refs/remotes/origin/$REVIEW_BRANCH"; then
+            git checkout -B "$REVIEW_BRANCH" "refs/remotes/origin/$REVIEW_BRANCH"
+          else
+            git checkout --orphan "$REVIEW_BRANCH"
+            git rm -rf . || true
+          fi
+          mkdir -p "reviews/$SOURCE_SHA"
+          rm -rf "reviews/$SOURCE_SHA"
+          cp -a "$GITHUB_WORKSPACE/visual-review/." "reviews/$SOURCE_SHA/"
+          cat > latest.json <<EOF
+          {
+            "sourceSHA": "$SOURCE_SHA",
+            "reviewPath": "reviews/$SOURCE_SHA/visual-review.html",
+            "updatedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "scope": "Natural Turn R27",
+            "surfaceReviewScope": "motion-preview-lightweight-fallback",
+            "skinApproval": false,
+            "visualAcceptance": false,
+            "productionReady": false,
+            "userVisualAcceptance": "pending"
+          }
+          EOF
+          cat > index.html <<EOF
+          <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0; url=reviews/$SOURCE_SHA/visual-review.html"><title>人物自然转向 R27 视觉验收</title></head><body><p><a href="reviews/$SOURCE_SHA/visual-review.html">打开人物自然转向 R27 视觉验收</a></p></body></html>
+          EOF
+          git add index.html latest.json "reviews/$SOURCE_SHA"
+          git commit -m "natural-turn-review: $SOURCE_SHA [skip ci]"
+          git push origin "HEAD:$REVIEW_BRANCH"
+
+      - name: Enforce turn QA gates
+        if: always()
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+          path = Path('visual-review/browser-run-report.json')
+          if not path.exists():
+              raise SystemExit('Natural Turn browser QA did not produce browser-run-report.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          if not data.get('preflight', {}).get('passed'):
+              raise SystemExit('Natural Turn browser preflight failed')
+          failures = data.get('scenarioFailures', [])
+          if failures:
+              raise SystemExit('Natural Turn scenarios failed: ' + ', '.join(failures))
+          if data.get('status') == 'INCONCLUSIVE':
+              raise SystemExit('Natural Turn browser QA is inconclusive')
+
+      - name: Write job summary
+        if: always()
+        shell: python
+        env:
+          SOURCE_SHA: ${{ steps.built.outputs.source_sha }}
+          PUBLIC_URL: ${{ steps.built.outputs.public_url }}
+        run: |
+          from pathlib import Path
+          import json, os
+          report = Path('visual-review/browser-run-report.json')
+          lines = [
+              '## Natural Turn R27',
+              f"- source: `{os.environ.get('SOURCE_SHA')}`",
+              f"- immutable production preview: {os.environ.get('PUBLIC_URL')}",
+          ]
+          if report.exists():
+              data = json.loads(report.read_text(encoding='utf-8'))
+              lines += [
+                  f"- browser preflight: `{data.get('preflight',{}).get('passed')}`",
+                  f"- scenario failures: `{', '.join(data.get('scenarioFailures',[])) or 'none'}`",
+                  '- visualAcceptance: `pending user review`',
+                  '- productionReady: `false`',
+              ]
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as handle:
+              handle.write('\n'.join(lines) + '\n')
