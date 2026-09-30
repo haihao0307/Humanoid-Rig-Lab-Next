@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Derive body-relative turn scores from official CMU subject 69 ASF/AMC.
 
-The output stores only motion parameters and source locks. Pelvis world yaw and
-foot contacts remain runtime responsibilities; captured local body motion is
-expressed in a pelvis-facing frame so it can be safely retargeted.
+The source in-place trials contain almost complete 360-degree turns. Runtime
+45/90/180-degree actions must not compress that whole sequence into one small
+turn, so this script extracts one approximately 90-degree movement unit from
+each direction. It stores only motion parameters and immutable source locks.
+Pelvis world yaw and foot contacts remain runtime responsibilities.
 """
 from __future__ import annotations
 
@@ -18,7 +20,7 @@ from typing import Any
 import numpy as np
 
 SAMPLE_HZ = 120.0
-MAX_SAMPLES = 241
+MAX_EXACT_SAMPLES = 720
 
 
 def load_base_module():
@@ -43,52 +45,109 @@ def unwrapped_yaws(rows: list[dict[str, Any]], node: str) -> np.ndarray:
     return np.unwrap(np.array([yaw_from_rotation(row["R"][node]) for row in rows], dtype=float))
 
 
+def first_crossing(values: np.ndarray, threshold: float) -> int:
+    hits = np.flatnonzero(values >= threshold)
+    if not len(hits):
+        raise ValueError(f"motion never crosses {math.degrees(threshold):.1f} degrees")
+    return int(hits[0])
+
+
 def signed_onset(values: np.ndarray, direction: float, threshold_rad: float) -> int:
     relative = direction * (values - values[0])
     hits = np.flatnonzero(relative >= threshold_rad)
     return int(hits[0]) if len(hits) else 0
 
 
-def find_turn_window(trial: dict[str, Any]) -> dict[str, Any]:
+def smooth_signal(values: np.ndarray, width: int = 9) -> np.ndarray:
+    if len(values) < width:
+        return values.copy()
+    kernel = np.ones(width, dtype=float) / width
+    return np.convolve(values, kernel, mode="same")
+
+
+def in_place_window(pelvis: np.ndarray) -> tuple[int, int, float]:
+    edge = min(20, max(5, len(pelvis) // 10))
+    baseline = float(np.median(pelvis[:edge]))
+    final = float(np.median(pelvis[-edge:]))
+    full_angle = final - baseline
+    if abs(full_angle) < math.radians(180):
+        raise ValueError("in-place source does not contain a substantial full turn")
+    direction = 1.0 if full_angle >= 0 else -1.0
+    signed = direction * (pelvis - baseline)
+    onset = first_crossing(signed, math.radians(2.0))
+    crossing = first_crossing(signed, math.radians(90.0))
+    start = max(0, onset - 18)
+
+    # Select the first low-angular-speed point after the 90-degree crossing.
+    # This keeps one complete step-turn unit rather than the source's full lap.
+    angular_speed = smooth_signal(np.abs(np.gradient(pelvis)) * SAMPLE_HZ, 11)
+    search_start = min(len(pelvis) - 1, crossing + 8)
+    search_end = min(len(pelvis), crossing + 120)
+    if search_end > search_start:
+        low_speed = search_start + int(np.argmin(angular_speed[search_start:search_end]))
+    else:
+        low_speed = crossing
+    end = min(len(pelvis) - 1, max(crossing + 14, low_speed + 14))
+    angle = direction * (pelvis[end] - pelvis[start])
+    if angle < math.radians(65) or angle > math.radians(135):
+        end = min(len(pelvis) - 1, crossing + 18)
+        angle = direction * (pelvis[end] - pelvis[start])
+    if angle < math.radians(60) or angle > math.radians(145):
+        raise ValueError(f"failed to isolate a quarter turn: {math.degrees(angle):.2f} degrees")
+    return start, end, direction
+
+
+def walking_turn_window(pelvis: np.ndarray) -> tuple[int, int, float]:
+    edge = min(20, max(5, len(pelvis) // 10))
+    baseline = float(np.median(pelvis[:edge]))
+    final = float(np.median(pelvis[-edge:]))
+    full_angle = final - baseline
+    if abs(full_angle) < math.radians(40):
+        raise ValueError("walking source does not contain a substantial turn")
+    direction = 1.0 if full_angle >= 0 else -1.0
+    signed = direction * (pelvis - baseline)
+    onset = first_crossing(signed, math.radians(2.0))
+    remaining = direction * (final - pelvis)
+    unsettled = np.flatnonzero(remaining >= math.radians(2.0))
+    last_turn = int(unsettled[-1]) if len(unsettled) else len(pelvis) - 1
+    # Keep 0.75 s of straight walking before the direction change so the future
+    # curved-walk adapter can observe anticipation rather than only the pivot.
+    start = max(0, onset - 90)
+    end = min(len(pelvis) - 1, last_turn + 36)
+    return start, end, direction
+
+
+def find_turn_window(trial: dict[str, Any], kind: str) -> dict[str, Any]:
     rows = trial["pose"]
     if len(rows) < 60:
         raise ValueError(f"{trial['subject']}_{trial['trial']}: too few frames")
     pelvis = unwrapped_yaws(rows, "root")
     thorax = unwrapped_yaws(rows, "thorax")
     head = unwrapped_yaws(rows, "head")
-    edge = min(20, max(5, len(rows) // 10))
-    raw_angle = float(np.median(pelvis[-edge:]) - np.median(pelvis[:edge]))
-    if abs(raw_angle) < math.radians(30):
-        raise ValueError(f"{trial['subject']}_{trial['trial']}: net pelvis turn below 30 degrees")
-    direction = 1.0 if raw_angle >= 0 else -1.0
-    threshold = max(math.radians(2.0), abs(raw_angle) * 0.035)
-    initial = np.array([pelvis[0], thorax[0], head[0]])
-    final = np.array([pelvis[-1], thorax[-1], head[-1]])
-    stack = np.column_stack([pelvis, thorax, head])
-    start_activity = np.max(np.abs(stack - initial), axis=1)
-    end_activity = np.max(np.abs(stack - final), axis=1)
-    start_hits = np.flatnonzero(start_activity >= threshold)
-    end_hits = np.flatnonzero(end_activity >= threshold)
-    start = max(0, int(start_hits[0]) - 18) if len(start_hits) else 0
-    end = min(len(rows) - 1, int(end_hits[-1]) + 18) if len(end_hits) else len(rows) - 1
-    if end - start + 1 < 60:
-        pad = (60 - (end - start + 1) + 1) // 2
-        start = max(0, start - pad)
-        end = min(len(rows) - 1, end + pad)
+    if kind == "in-place":
+        start, end, raw_direction = in_place_window(pelvis)
+    elif kind == "walking":
+        start, end, raw_direction = walking_turn_window(pelvis)
+    else:
+        raise ValueError(f"unsupported turn kind {kind}")
+
     local_pelvis = pelvis[start : end + 1]
     runtime_yaw = -(local_pelvis - local_pelvis[0])
-    source_angle = float(runtime_yaw[-1])
+    runtime_direction = 1.0 if runtime_yaw[-1] >= 0 else -1.0
+    signed_runtime = runtime_direction * runtime_yaw
+    monotone = np.maximum.accumulate(signed_runtime)
+    source_magnitude = max(float(monotone[-1]), math.radians(1.0))
+    source_angle = runtime_direction * source_magnitude
     if abs(source_angle) < math.radians(25):
         raise ValueError(f"{trial['subject']}_{trial['trial']}: extracted turn below 25 degrees")
-    runtime_direction = 1.0 if source_angle >= 0 else -1.0
-    signed = runtime_direction * runtime_yaw
-    monotone = np.maximum.accumulate(signed)
-    final_progress = max(float(monotone[-1]), math.radians(1.0))
-    yaw_progress = np.clip(monotone / final_progress, 0.0, 1.0)
-    onset_threshold = max(math.radians(2.0), abs(raw_angle) * 0.05)
-    pelvis_onset = signed_onset(pelvis[start : end + 1], direction, onset_threshold)
-    thorax_onset = signed_onset(thorax[start : end + 1], direction, onset_threshold)
-    head_onset = signed_onset(head[start : end + 1], direction, onset_threshold)
+    yaw_progress = np.clip(monotone / source_magnitude, 0.0, 1.0)
+
+    raw_source_angle = raw_direction * (pelvis[end] - pelvis[start])
+    onset_threshold = max(math.radians(2.0), min(math.radians(7.0), raw_source_angle * 0.07))
+    local_slice = slice(start, end + 1)
+    pelvis_onset = signed_onset(pelvis[local_slice], raw_direction, onset_threshold)
+    thorax_onset = signed_onset(thorax[local_slice], raw_direction, onset_threshold)
+    head_onset = signed_onset(head[local_slice], raw_direction, onset_threshold)
     return {
         "start": start,
         "end": end,
@@ -96,6 +155,7 @@ def find_turn_window(trial: dict[str, Any]) -> dict[str, Any]:
         "runtime_yaw": runtime_yaw,
         "yaw_progress": yaw_progress,
         "source_angle": source_angle,
+        "full_source_angle": float(-(pelvis[-1] - pelvis[0])),
         "sequence": {
             "pelvisOnsetFrame": pelvis_onset,
             "thoraxOnsetFrame": thorax_onset,
@@ -114,8 +174,8 @@ def turn_record(
     pelvis_yaw: float,
     initial_yaw: float,
     origin: np.ndarray,
-    floor: float,
     leg_length: float,
+    floor: float,
     standing_height: float,
     yaw_progress: float,
 ) -> dict[str, Any]:
@@ -137,12 +197,10 @@ def turn_record(
         "yawProgress": float(yaw_progress),
     }
     for short, side in (("l", "left"), ("r", "right")):
-        starts, ends = pose["starts"], pose["ends"]
+        starts = pose["starts"]
         for name, parent, child in (
             ("UpperArm", "humerus", "radius"),
             ("Forearm", "radius", "hand"),
-            ("Thigh", "femur", "tibia"),
-            ("Shank", "tibia", "foot"),
         ):
             record[side + name] = BASE.unit(current_align @ (starts[short + child] - starts[short + parent])).tolist()
             y_axis = -BASE.unit(trial["bones"][short + parent]["direction"])
@@ -159,22 +217,16 @@ def turn_record(
         record[side + "HandQ"] = BASE.quaternion(
             current_align @ pose["R"][short + "hand"] @ np.column_stack([x_axis, y_axis, z_axis]) @ reflect
         ).tolist()
-        foot_forward = BASE.unit(current_align @ (ends[short + "toes"] - starts[short + "foot"]))
-        foot_x = -current_align @ pose["R"][short + "foot"] @ np.array([1.0, 0.0, 0.0])
-        foot_x = BASE.unit(foot_x - foot_forward * np.dot(foot_x, foot_forward))
-        foot_y = BASE.unit(np.cross(foot_forward, foot_x))
-        foot_x = BASE.unit(np.cross(foot_y, foot_forward))
-        record[side + "FootQ"] = BASE.quaternion(np.column_stack([foot_x, foot_y, foot_forward])).tolist()
         record[side + "ClavicleQ"] = local_quaternion("thorax", short + "clavicle")
-        record[side + "AnkleHeightRatio"] = float((starts[short + "foot"][1] - floor) / leg_length)
     return record
 
 
 def sample_indices(count: int, sequence: dict[str, Any]) -> np.ndarray:
-    if count <= MAX_SAMPLES:
-        indices = np.arange(count, dtype=int)
-    else:
-        indices = np.unique(np.rint(np.linspace(0, count - 1, MAX_SAMPLES)).astype(int))
+    # These three clips are small after extracting a quarter-turn unit. Keep
+    # every source frame when practical so no hand/head impulse is smoothed out.
+    if count <= MAX_EXACT_SAMPLES:
+        return np.arange(count, dtype=int)
+    indices = np.unique(np.rint(np.linspace(0, count - 1, MAX_EXACT_SAMPLES)).astype(int))
     events = [0, count - 1]
     for key in ("headOnsetFrame", "thoraxOnsetFrame", "pelvisOnsetFrame"):
         event = int(sequence[key])
@@ -193,7 +245,13 @@ def round_record(record: dict[str, Any], t: float) -> dict[str, Any]:
 
 
 def interpolation_error(records: list[dict[str, Any]], indices: np.ndarray) -> dict[str, float]:
-    maximum = {"yawProgress": 0.0, "quaternionDegrees": 0.0, "directionDegrees": 0.0, "rootOffsetLegLengths": 0.0}
+    maximum = {
+        "yawProgress": 0.0,
+        "quaternionDegrees": 0.0,
+        "directionDegrees": 0.0,
+        "rootOffsetLegLengths": 0.0,
+        "rootHeightRatio": 0.0,
+    }
     for i, actual_record in enumerate(records):
         position = int(np.searchsorted(indices, i, side="right")) - 1
         position = max(0, min(len(indices) - 2, position))
@@ -214,6 +272,8 @@ def interpolation_error(records: list[dict[str, Any]], indices: np.ndarray) -> d
                 maximum["rootOffsetLegLengths"] = max(maximum["rootOffsetLegLengths"], float(np.linalg.norm(estimate - actual)))
             elif key == "yawProgress":
                 maximum["yawProgress"] = max(maximum["yawProgress"], abs(float(estimate - actual)))
+            elif key == "rootHeightRatio":
+                maximum["rootHeightRatio"] = max(maximum["rootHeightRatio"], abs(float(estimate - actual)))
             elif np.ndim(actual) == 1:
                 error = math.degrees(math.acos(float(np.clip(np.dot(BASE.unit(estimate), actual), -1.0, 1.0))))
                 maximum["directionDegrees"] = max(maximum["directionDegrees"], error)
@@ -221,7 +281,7 @@ def interpolation_error(records: list[dict[str, Any]], indices: np.ndarray) -> d
 
 
 def make_clip(trial: dict[str, Any], kind: str, description: str) -> dict[str, Any]:
-    window = find_turn_window(trial)
+    window = find_turn_window(trial, kind)
     start, end = window["start"], window["end"]
     rows = trial["pose"][start : end + 1]
     bones = trial["bones"]
@@ -238,8 +298,8 @@ def make_clip(trial: dict[str, Any], kind: str, description: str) -> dict[str, A
             float(window["pelvis_yaw"][start + i]),
             initial_yaw,
             origin,
-            floor,
             leg_length,
+            floor,
             standing_height,
             float(window["yaw_progress"][i]),
         )
@@ -259,6 +319,7 @@ def make_clip(trial: dict[str, Any], kind: str, description: str) -> dict[str, A
         "durationS": round((len(rows) - 1) / SAMPLE_HZ, 7),
         "sourceTurnAngleRad": round(float(window["source_angle"]), 9),
         "sourceTurnAngleDegrees": round(math.degrees(float(window["source_angle"])), 6),
+        "fullSourceTrialTurnAngleDegrees": round(math.degrees(float(window["full_source_angle"])), 6),
         "sourceTranslationM": [round(float(value), 7) for value in source_translation],
         "sourceLegLengthM": round(leg_length, 9),
         "sourceStandingHipHeightM": round(standing_height, 9),
@@ -267,7 +328,7 @@ def make_clip(trial: dict[str, Any], kind: str, description: str) -> dict[str, A
         "pelvisYawRuntimeOwner": True,
         "footContactsRuntimeOwner": True,
         "capturedCoordinateFrame": "body-relative with per-frame pelvis yaw removed after R2 X reflection",
-        "yawProfileMethod": "monotone envelope of captured pelvis yaw",
+        "yawProfileMethod": "monotone envelope of captured pelvis yaw from one extracted turn unit",
         "sampleBlocks": [samples[index : index + 96] for index in range(0, len(samples), 96)],
         "sampleCount": len(samples),
         "parameterInterpolationError": interpolation_error(records, indices),
@@ -284,18 +345,22 @@ def sha256(path: Path) -> str:
 def derive(directory: Path, output: Path) -> dict[str, Any]:
     trials = {trial_id: BASE.read_trial(directory, "69", trial_id) for trial_id in ("16", "18", "20")}
     in_place = [
-        make_clip(trials["16"], "in-place", "captured turn in place"),
-        make_clip(trials["18"], "in-place", "captured opposite-direction turn in place"),
+        make_clip(trials["16"], "in-place", "one extracted turn-in-place unit"),
+        make_clip(trials["18"], "in-place", "one extracted opposite-direction turn-in-place unit"),
     ]
     signs = {1 if clip["sourceTurnAngleRad"] > 0 else -1 for clip in in_place}
     if signs != {-1, 1}:
         raise ValueError(f"subject 69 in-place trials did not produce opposite runtime signs: {signs}")
+    for clip in in_place:
+        magnitude = abs(clip["sourceTurnAngleRad"])
+        if not math.radians(60) <= magnitude <= math.radians(145):
+            raise ValueError(f"in-place unit is not a quarter turn: {clip['sourceTurnAngleDegrees']} degrees")
     clips: dict[str, Any] = {}
     for clip in in_place:
         clip_id = "turnPositive" if clip["sourceTurnAngleRad"] > 0 else "turnNegative"
         clip["id"] = clip_id
         clips[clip_id] = clip
-    walk_turn = make_clip(trials["20"], "walking", "captured forward walk with approximately 90-degree turn")
+    walk_turn = make_clip(trials["20"], "walking", "captured forward walk with an approximately 90-degree direction change")
     walk_turn["id"] = "walkTurn90"
     clips[walk_turn["id"]] = walk_turn
     files = [directory / "69.asf", *(directory / f"69_{trial}.amc" for trial in ("16", "18", "20"))]
@@ -322,6 +387,7 @@ def derive(directory: Path, output: Path) -> dict[str, Any]:
         "clips": clips,
         "reconstruction": {
             "script": "tools/derive-turn-reference.py",
+            "inPlaceExtraction": "first approximately 90-degree unit from each full-lap capture",
             "externalMeshesStored": False,
             "capturedWorldYawStoredAsRuntimeTarget": False,
             "bodyRelativeResiduals": True,
@@ -351,9 +417,11 @@ def main() -> int:
                     clip_id: {
                         "trial": clip["sourceTrial"],
                         "angleDegrees": clip["sourceTurnAngleDegrees"],
+                        "fullTrialAngleDegrees": clip["fullSourceTrialTurnAngleDegrees"],
                         "durationS": clip["durationS"],
                         "samples": clip["sampleCount"],
                         "sequence": clip["sequence"],
+                        "interpolation": clip["parameterInterpolationError"],
                     }
                     for clip_id, clip in document["clips"].items()
                 },
