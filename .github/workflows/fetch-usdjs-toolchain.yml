@@ -1,0 +1,40 @@
+name: Fetch USDJS Toolchain
+
+on:
+  push:
+    branches:
+      - work/human-multi-character-foundation-20260930
+    paths:
+      - .github/workflows/fetch-usdjs-toolchain.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pack:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download parser packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifact
+          cd artifact
+          npm pack @cinevva/usdjs@0.1.0
+          npm pack @cinevva/usdjs-viewer@0.1.0
+          npm pack three@0.182.0
+          npm pack fflate@0.8.2
+          sha256sum *.tgz > SHA256SUMS.txt
+          ls -lh
+      - name: Upload parser toolchain
+        uses: actions/upload-artifact@v4
+        with:
+          name: usdjs-toolchain
+          path: artifact/
+          if-no-files-found: error
+          retention-days: 7
