@@ -1,10 +1,91 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>第一条短裤 · R4 快速可调版</title><link rel="stylesheet" href="style.css">
-<script src="data/data-start.js"></script><script src="data/data-00.js"></script><script src="data/data-01.js"></script><script src="data/data-02.js"></script><script src="data/data-03.js"></script><script src="data/data-04.js"></script><script src="data/data-05.js"></script><script src="data/data-06.js"></script><script src="data/data-07.js"></script><script src="data/data-08.js"></script><script src="data/data-09.js"></script><script src="data/data-10.js"></script><script src="data/data-11.js"></script><script src="data/data-12.js"></script><script src="data/data-13.js"></script></head><body>
-<header><div><h1>第一条短裤 · R4 快速可调版</h1><p>先形成大致能穿的短裤；所有尺寸保留为卡片，后续继续修版。</p></div><b>ROUGH FIT · CARD DRIVEN</b></header>
-<div class="shell"><aside>
-<section><h2>当前结论</h2><p>基于 R3 数字试身卡生成左右裤腿、腰头、裆深与裤脚，不是随便套一个圆筒。暂不运行布料动力学。</p><p class="warn">原短裤下方人体不完整，所以这里只是数字试穿起点。</p></section>
-<section><h2>短裤尺寸卡</h2><div id="sliders"></div></section>
-<section><h2>布面颜色</h2><div id="colors"><button data-color="#b9a88f"></button><button data-color="#8d826f"></button><button data-color="#5d6670"></button><button data-color="#d6d0c4"></button></div></section>
-<section><h2>人物基础卡</h2><dl><dt>腰围</dt><dd>825.1 mm</dd><dt>臀围</dt><dd>1023.7 mm</dd><dt>裆深</dt><dd>240.4 mm</dd><dt>前 / 后裆长</dt><dd>342.3 / 357.8</dd><dt>大腿围</dt><dd>548.9 mm</dd><dt>量体可信度</dt><dd>LOW–MEDIUM</dd></dl></section>
-<section class="actions"><button id="reset">恢复基线</button><button id="export">导出卡片</button></section></aside>
-<main><canvas id="canvas"></canvas><nav><button data-view="front">正面</button><button data-view="back">背面</button><button data-view="left">左侧</button><button data-view="right">右侧</button><button data-view="three">三分之四</button></nav><div class="hud"><strong id="state">载入人物表面…</strong><br><span id="meshInfo">—</span></div><div id="loading">正在读取人物表面并生成短裤…</div></main></div><script type="module" src="main.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>第一条短裤 · R4 快速可调版</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.js",
+      "three/addons/": "./vendor/"
+    }
+  }
+  </script>
+  <script src="data/data-start.js"></script>
+  <script src="data/data-00.js"></script>
+  <script src="data/data-01.js"></script>
+  <script src="data/data-02.js"></script>
+  <script src="data/data-03.js"></script>
+  <script src="data/data-04.js"></script>
+  <script src="data/data-05.js"></script>
+  <script src="data/data-06.js"></script>
+  <script src="data/data-07.js"></script>
+  <script src="data/data-08.js"></script>
+  <script src="data/data-09.js"></script>
+  <script src="data/data-10.js"></script>
+  <script src="data/data-11.js"></script>
+  <script src="data/data-12.js"></script>
+  <script src="data/data-13.js"></script>
+</head>
+<body>
+<header>
+  <div>
+    <h1>第一条短裤 · R4 快速可调版</h1>
+    <p>先形成大致能穿的短裤；所有尺寸保留为卡片，后续继续修版。</p>
+  </div>
+  <b>ROUGH FIT · CARD DRIVEN</b>
+</header>
+<div class="shell">
+  <aside>
+    <section>
+      <h2>当前结论</h2>
+      <p>基于 R3 数字试身卡生成左右裤腿、腰头、裆深与裤脚，不是随便套一个圆筒。暂不运行布料动力学。</p>
+      <p class="warn">原短裤下方人体不完整，所以这里只是数字试穿起点。</p>
+    </section>
+    <section><h2>短裤尺寸卡</h2><div id="sliders"></div></section>
+    <section><h2>布面颜色</h2><div id="colors"><button data-color="#b9a88f"></button><button data-color="#8d826f"></button><button data-color="#5d6670"></button><button data-color="#d6d0c4"></button></div></section>
+    <section>
+      <h2>人物基础卡</h2>
+      <dl><dt>腰围</dt><dd>825.1 mm</dd><dt>臀围</dt><dd>1023.7 mm</dd><dt>裆深</dt><dd>240.4 mm</dd><dt>前 / 后裆长</dt><dd>342.3 / 357.8</dd><dt>大腿围</dt><dd>548.9 mm</dd><dt>量体可信度</dt><dd>LOW–MEDIUM</dd></dl>
+    </section>
+    <section class="actions"><button id="reset">恢复基线</button><button id="export">导出卡片</button></section>
+  </aside>
+  <main>
+    <canvas id="canvas"></canvas>
+    <nav><button data-view="front">正面</button><button data-view="back">背面</button><button data-view="left">左侧</button><button data-view="right">右侧</button><button data-view="three">三分之四</button></nav>
+    <div class="hud"><strong id="state">载入人物表面…</strong><br><span id="meshInfo">—</span></div>
+    <div id="loading">正在读取人物表面并生成短裤…</div>
+  </main>
+</div>
+<script>
+  window.__QUICK_SHORTS_READY__ = false;
+  window.__QUICK_SHORTS_VERSION__ = '2026-09-30-r4.1-local-modules';
+  (() => {
+    const show = (message) => {
+      const apply = () => {
+        const state = document.querySelector('#state');
+        const loading = document.querySelector('#loading');
+        if (state) state.textContent = 'LOAD ERROR';
+        if (loading) {
+          loading.classList.remove('hide');
+          loading.textContent = message;
+        }
+      };
+      document.readyState === 'loading' ? addEventListener('DOMContentLoaded', apply, { once: true }) : apply();
+    };
+    addEventListener('error', (event) => {
+      if (!window.__QUICK_SHORTS_READY__) show(`加载错误：${event.message || '浏览器模块没有启动'}`);
+    });
+    addEventListener('unhandledrejection', (event) => {
+      if (!window.__QUICK_SHORTS_READY__) show(`加载错误：${event.reason?.message || event.reason || '未处理的模块错误'}`);
+    });
+    setTimeout(() => {
+      if (!window.__QUICK_SHORTS_READY__) show('加载超时：页面模块没有完成启动。请按 Ctrl+F5 强制刷新；错误信息已保留在页面上。');
+    }, 15000);
+  })();
+</script>
+<script type="module" src="main.js?v=20260930-r41"></script>
+</body>
+</html>
