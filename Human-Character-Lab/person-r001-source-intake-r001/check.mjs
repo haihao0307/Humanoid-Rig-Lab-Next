@@ -34,9 +34,14 @@ assert.equal(payload.parts.reduce((sum, part) => sum + part.sourceTriangles, 0),
 assert.equal(payload.parts.reduce((sum, part) => sum + part.triangles, 0), 8606);
 assert.deepEqual(payload.parts.filter(part => part.shorts).map(part => part.id), [1, 2, 9]);
 assert.deepEqual(payload.parts.filter(part => part.shorts).map(part => part.role), [
-  'shorts-left-leg',
-  'shorts-right-leg',
-  'shorts-waist-centre'
+  'shorts-left',
+  'shorts-right',
+  'shorts-waist'
+]);
+assert.deepEqual(manifest.shortsRemoval.identifiedParts.map(part => part.role), [
+  'shorts-left',
+  'shorts-right',
+  'shorts-waist'
 ]);
 
 for (const part of payload.parts) {
