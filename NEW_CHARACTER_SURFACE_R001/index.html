@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>新人物源表面工作台 R001</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#edf4f7;background:#05090c;--panel:#0c1318;--line:#26363f;--muted:#8ca0ab;--good:#81cfb4;--warn:#dfbd77}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{display:grid;grid-template-rows:58px minmax(0,1fr);background:radial-gradient(circle at 48% 30%,#132029 0,#070b0e 58%,#030506 100%)}header{display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);background:#081016e8;backdrop-filter:blur(14px)}h1{margin:0;font-size:15px;font-weight:650;letter-spacing:.02em}h1 small{display:block;margin-top:3px;color:var(--muted);font:9px ui-monospace,SFMono-Regular,Consolas,monospace}.spacer{flex:1}.badge{padding:5px 8px;border:1px solid #31504a;border-radius:999px;color:var(--good);background:#10231f;font-size:10px;white-space:nowrap}button,a.button{border:1px solid #3e5967;border-radius:8px;background:#14222b;color:#eef5f7;padding:8px 11px;font:600 11px inherit;text-decoration:none;cursor:pointer}button.primary{border-color:#5d9e8b;background:#1a3a31}button:hover,a.button:hover{filter:brightness(1.16)}main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:8px;padding:8px}.viewer{min-width:0;min-height:0;position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#020405}.viewer iframe{display:block;width:100%;height:100%;border:0;background:#020405}.stamp{position:absolute;left:10px;bottom:10px;pointer-events:none;border:1px solid #314650;border-radius:8px;background:#071016d9;padding:7px 9px;color:#9bb0ba;font:9px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}.side{min-height:0;overflow:auto;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,#0d171d,#091015);padding:12px}.side h2{margin:0 0 8px;font-size:12px}.side p{margin:7px 0;color:var(--muted);font-size:10.5px;line-height:1.65}.card{margin-bottom:9px;padding:10px;border:1px solid #23343d;border-radius:9px;background:#0c151b}.card strong{font-size:11px}.facts{display:grid;grid-template-columns:1fr auto;gap:6px 10px;margin-top:8px;font:9.5px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}.facts span:nth-child(odd){color:#8da1ac}.facts span:nth-child(even){color:#dce7eb;text-align:right}.ok{color:var(--good)}.warning{border-left:2px solid var(--warn);padding:8px 9px;background:#211b10;color:#dbc690;font-size:10px;line-height:1.55}.contract{padding-left:17px;margin:7px 0 0;color:#a9bbc3;font-size:10px;line-height:1.55}.contract li{margin:3px 0}code{color:#c6e2e2;overflow-wrap:anywhere}@media(max-width:900px){header{height:auto;min-height:58px;flex-wrap:wrap;padding-block:8px}.badge{display:none}main{display:block;overflow:auto}.viewer{height:72vh}.side{margin-top:8px;overflow:visible}html,body{overflow:auto;height:auto;min-height:100%}}
+</style>
+</head>
+<body>
+<header>
+  <h1>新人物源表面工作台 R001<small>SOURCE USDZ / USDC · NO PRIMITIVE REBUILD · SHORTS PRESERVED</small></h1>
+  <div class="spacer"></div>
+  <span class="badge" id="viewerState">正在确认查看器…</span>
+  <button class="primary" id="chooseFile" type="button">选择原始 USDZ</button>
+  <a class="button" href="./source-manifest.json" target="_blank" rel="noopener">源清单</a>
+</header>
+<main>
+  <section class="viewer" aria-label="USD 源表面查看器">
+    <iframe id="usdViewer" src="./viewer/index.html" title="USD 源表面查看器" allow="fullscreen"></iframe>
+    <div class="stamp">SOURCE SHA-256<br>b0435f3f30e0d63b…e4fe7567</div>
+  </section>
+  <aside class="side">
+    <div class="card">
+      <h2>本版处理范围</h2>
+      <p><span class="ok">保留原始人物和短裤。</span>本轮只建立原表面读取、旋转观察、层级与材质检查入口；暂不删短裤，也不补胯部。</p>
+    </div>
+    <div class="card">
+      <strong>源资产登记</strong>
+      <div class="facts">
+        <span>USDZ</span><span>36,915,776 B</span>
+        <span>USDC</span><span>34,177,761 B</span>
+        <span>archive entries</span><span>125</span>
+        <span>material parts</span><span>31</span>
+        <span>PBR textures</span><span>124</span>
+        <span>maps / part</span><span>4</span>
+      </div>
+    </div>
+    <div class="card">
+      <strong>必须读取的表面数据</strong>
+      <ul class="contract">
+        <li>原始 points 与拓扑</li>
+        <li>faceVertexCounts / faceVertexIndices</li>
+        <li>作者法线与 UV primvars</li>
+        <li>分件层级和局部变换</li>
+        <li>材质绑定与 Base Color</li>
+        <li>Normal / Roughness / Metallic</li>
+      </ul>
+    </div>
+    <div class="warning">这里不会用球体、圆柱或胶囊拼一个“差不多的人”。只有原始 USDZ 被查看器真正解析后，才把这一版标记为源表面读取完成。</div>
+    <div class="card" style="margin-top:9px">
+      <strong>操作</strong>
+      <p>点击顶部“选择原始 USDZ”，选中你提供的 <code>human+figure+3d+model (1).usdz</code>。也可以把文件直接拖进左侧窗口。文件在浏览器本地解析。</p>
+    </div>
+  </aside>
+</main>
+<script>
+const frame=document.getElementById('usdViewer');
+const state=document.getElementById('viewerState');
+const choose=document.getElementById('chooseFile');
+let viewerReady=false;
+function findPicker(){
+  try{return frame.contentDocument?.querySelector('input[type="file"]')||null}catch{return null}
+}
+function refresh(){
+  const picker=findPicker();
+  viewerReady=!!picker;
+  state.textContent=viewerReady?'源查看器已就绪':'查看器正在构建或加载';
+  state.style.color=viewerReady?'var(--good)':'var(--warn)';
+}
+frame.addEventListener('load',()=>{setTimeout(refresh,350);setTimeout(refresh,1600)});
+choose.addEventListener('click',()=>{
+  const picker=findPicker();
+  if(picker){picker.click();return}
+  frame.focus();
+  state.textContent='请在左侧查看器内选择或拖入 USDZ';
+});
+setInterval(refresh,2500);
+</script>
+</body>
+</html>
