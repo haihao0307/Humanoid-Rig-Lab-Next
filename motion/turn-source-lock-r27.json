@@ -1,0 +1,95 @@
+{
+  "schema": "human/natural_turn_source_lock@1",
+  "revision": "natural-turn-r27",
+  "status": "Candidate",
+  "created": "2026-09-30",
+  "scope": "single-character in-place turning and task-facing alignment",
+  "coordinateFrame": {
+    "length": "m",
+    "time": "s",
+    "up": "+Y",
+    "yaw": "right-handed rotation about +Y"
+  },
+  "motionReferences": [
+    {
+      "dataset": "CMU Graphics Lab Motion Capture Database",
+      "officialURL": "https://mocap.cs.cmu.edu/search.php?subjectnumber=69",
+      "subject": 69,
+      "trials": [16, 17, 18, 19],
+      "description": "turn in place in both directions",
+      "sampleRateHz": 120,
+      "licenseNote": "CMU states the database is free for use, including inclusion in commercial products, but the data may not be resold directly.",
+      "useInR27": "qualitative step order, direction symmetry and timing reference"
+    },
+    {
+      "dataset": "CMU Graphics Lab Motion Capture Database",
+      "officialURL": "https://mocap.cs.cmu.edu/search.php?subjectnumber=69",
+      "subject": 69,
+      "trials": [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+      "description": "90-degree left/right and smooth left/right walking turns",
+      "sampleRateHz": 120,
+      "licenseNote": "Same CMU database terms as above.",
+      "useInR27": "cross-check of step count, outside-foot placement and large-turn pacing"
+    },
+    {
+      "dataset": "HDM05",
+      "officialURL": "https://resources.mpi-inf.mpg.de/HDM05/01-01/index.html",
+      "scene": "01-01 Walking",
+      "description": "right and left turn-around segments embedded among walking styles",
+      "sampleRateHz": 120,
+      "useInR27": "independent qualitative reference for left/right turn-around"
+    },
+    {
+      "dataset": "HDM05",
+      "officialURL": "https://resources.mpi-inf.mpg.de/HDM05/01-04/index.html",
+      "scene": "01-04 Locomotion with weights",
+      "description": "turn-around while carrying 4 kg and 10 kg loads",
+      "sampleRateHz": 120,
+      "useInR27": "slower carried-turn pacing and smaller foot-yaw increments"
+    }
+  ],
+  "biomechanicsReferences": [
+    {
+      "title": "Coordination of segments reorientation during on-the-spot turns in healthy older adults in eyes-open and eyes-closed conditions",
+      "pmid": "20932763",
+      "doi": "10.1016/j.gaitpost.2010.08.012",
+      "useInR27": "head, shoulder and pelvis begin together; head reaches peak velocity earlier; feet displace after axial initiation"
+    },
+    {
+      "title": "Effect of walking velocity on segment coordination during pre-planned turns in healthy older adults",
+      "pmid": "20605717",
+      "useInR27": "top-down head, shoulder, pelvis and foot sequence for turns embedded in locomotion"
+    },
+    {
+      "title": "Anticipatory postural adjustments for altering direction during walking",
+      "pmid": "15262627",
+      "doi": "10.3200/JMBR.36.3.316-326",
+      "useInR27": "pre-turn lateral/backward preparation varies with turn angle, pivot foot and speed"
+    },
+    {
+      "title": "Dynamic stability and spatiotemporal parameters during turning in healthy young adults",
+      "pmid": "30241535",
+      "doi": "10.1186/s12938-018-0558-5",
+      "useInR27": "step-turn stability, longer swing phases and support-side risk"
+    }
+  ],
+  "implementation": {
+    "rawClipImported": false,
+    "rawMotionRedistributed": false,
+    "method": "motion-informed procedural retarget envelope over the pinned Motion-Lab controller",
+    "defaultStrategy": "stable step turn",
+    "spinTurnEnabled": false,
+    "headThoraxPelvisSequencing": true,
+    "variableStepDuration": true,
+    "variableFootLift": true,
+    "supportSideWeightShift": true,
+    "carriedTurnProfile": true,
+    "straightWalkArmSwingDampedDuringInPlaceTurn": true
+  },
+  "acceptance": {
+    "nodeKinematicMatrix": false,
+    "realBrowserExecuted": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
