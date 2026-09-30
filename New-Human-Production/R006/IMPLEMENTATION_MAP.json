@@ -1,0 +1,75 @@
+{
+  "schema": "humanoid_rig/new_character_inheritance@1.0",
+  "character": "human-character-surface-001",
+  "branch": "work/human-character-surface-001-r006-inherit-original-core-20260930",
+  "base": {
+    "branch": "archive/human-r2-original-system-20260930",
+    "commit": "3c3e9a4b7b250f4c8db20c15e2e5fab4ca9ce568"
+  },
+  "rejected": {
+    "branch": "work/human-character-surface-001-r005-motion-20260930",
+    "status": "visual-failure-do-not-extend",
+    "causes": [
+      "height-band surface classification",
+      "centroid-guessed joints",
+      "new simplified hierarchy instead of R2 hierarchy",
+      "four-weight direct LBS",
+      "no canonical anatomical ownership graph",
+      "hand-authored sine motion instead of existing motion kernel"
+    ]
+  },
+  "inherit": {
+    "rig": [
+      "body/ReconstructionRig.js",
+      "reconstruction/rig-reference.json",
+      "body/CharacterShape.js",
+      "reconstruction/shape-deform.mjs"
+    ],
+    "binding": [
+      "reconstruction/binding-schema.json",
+      "reconstruction/anatomy-rules.mjs",
+      "reconstruction/binding.mjs",
+      "body/CompactBinding.js"
+    ],
+    "motion": [
+      "body/MotionLabPose.js",
+      "body/ReferenceMotion.js",
+      "body/StandardsMotion.js",
+      "body/NaturalLocomotion.js",
+      "body/MotionLabActions.js",
+      "body/ContactHandPose.js"
+    ],
+    "behavior": [
+      "control/TaskAgent.js",
+      "control/NPCPopulation.js",
+      "control/PlanForecast.js",
+      "language/HumanoidSemanticBridge.js",
+      "language/JarvisSemanticPlanner.js"
+    ]
+  },
+  "newAdapterOnly": [
+    "USDZ surface decoder",
+    "source-to-canonical coordinate transform",
+    "subject ProportionProfile fit",
+    "R2-compatible anatomical region membership",
+    "binding roots and surface graph creation",
+    "material and texture carrier"
+  ],
+  "invariants": {
+    "oneRigAuthority": true,
+    "oneFinalPose": true,
+    "surfaceReadsSimulationRig": true,
+    "boneScalingForbidden": true,
+    "poseCannotChangeBinding": true,
+    "animationCannotChangeBoneLength": true,
+    "shorts": "preserved-until-clothing-stage"
+  },
+  "gate": {
+    "neutralSurfaceDeltaM": 0,
+    "crossLimbInfluence": 0,
+    "boneLengthInvariant": true,
+    "parentHierarchyInvariant": true,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
