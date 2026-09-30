@@ -1,0 +1,58 @@
+name: Human R001 Source Intake QA
+
+on:
+  push:
+    branches:
+      - work/human-multi-character-foundation-20260930
+    paths:
+      - Human-Character-Lab/person-r001-source-intake-r001/**
+      - .github/workflows/human-r001-source-intake-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source evidence and payload
+        run: node Human-Character-Lab/person-r001-source-intake-r001/check.mjs
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+      - name: Install browser driver
+        run: npm install --no-save --ignore-scripts playwright-core@1.55.0
+      - name: Run local workbench
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory Human-Character-Lab/person-r001-source-intake-r001 > /tmp/human-r001-http.log 2>&1 &
+          echo $! > /tmp/human-r001-http.pid
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8765/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/human-r001-http.log
+          exit 1
+      - name: Browser QA
+        env:
+          HUMAN_R001_URL: http://127.0.0.1:8765/
+          HUMAN_R001_QA_OUTPUT: human-r001-qa
+        run: node Human-Character-Lab/person-r001-source-intake-r001/qa-browser.mjs
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: human-r001-source-intake-qa
+          path: |
+            human-r001-qa/
+            /tmp/human-r001-http.log
+          if-no-files-found: warn
+          retention-days: 30
