@@ -1,0 +1,72 @@
+name: Foundation activities R1
+
+on:
+  push:
+    branches:
+      - work/human-character-surface-001-r005-motion-20260930
+    paths:
+      - body/FoundationActivitiesR1.js
+      - tools/test-foundation-activities-r1.mjs
+      - .github/workflows/foundation-activities-r1.yml
+      - source/assembly.json
+      - source/runtime.template.js
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-verify:
+    if: ${{ !contains(github.event.head_commit.message, '[foundation-r1-build]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Register foundation activity runtime
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          assembly_path = Path('source/assembly.json')
+          assembly = json.loads(assembly_path.read_text(encoding='utf-8'))
+          module = 'body/FoundationActivitiesR1.js'
+          if module not in assembly['modules']:
+              anchor = assembly['modules'].index('control/TaskAgent.js') + 1
+              assembly['modules'].insert(anchor, module)
+              assembly_path.write_text(json.dumps(assembly, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          runtime_path = Path('source/runtime.template.js')
+          runtime = runtime_path.read_text(encoding='utf-8')
+          marker = '/*__SOURCE:body/FoundationActivitiesR1.js__*/'
+          if marker not in runtime:
+              anchor = '/*__SOURCE:control/TaskAgent.js__*/'
+              if anchor not in runtime:
+                  raise SystemExit('TaskAgent runtime marker missing')
+              runtime = runtime.replace(anchor, anchor + '\n' + marker, 1)
+              runtime_path.write_text(runtime, encoding='utf-8')
+      - name: Foundation activity tests
+        run: |
+          node --check body/FoundationActivitiesR1.js
+          node tools/test-foundation-activities-r1.mjs
+      - name: Assemble and audit
+        run: |
+          node tools/build-pure.mjs
+          node tools/build-pure.mjs --check
+          python tools/audit-files.py
+      - name: Commit integrated runtime
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/assembly.json source/runtime.template.js index.html FILE_AUDIT.json SHA256SUMS.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "build(motion): integrate foundation activities R1 [foundation-r1-build]"
+            git push origin HEAD:work/human-character-surface-001-r005-motion-20260930
+          fi
