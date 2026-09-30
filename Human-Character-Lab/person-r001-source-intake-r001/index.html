@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Human R001 · Surface Intake & Shorts Removal</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand"><b>HUMAN R001</b><small>SURFACE INTAKE · SHORTS REMOVAL · PROGRAMMATIC PATCH</small></div>
+    <div class="top-actions">
+      <button data-view="front">正面</button><button data-view="back">背面</button><button data-view="left">左侧</button><button data-view="right">右侧</button><button data-view="three">斜视</button>
+    </div>
+    <div id="loadState" class="state">读取表面…</div>
+  </header>
+  <main>
+    <section class="viewport-panel">
+      <canvas id="canvas"></canvas>
+      <div class="viewport-label"><b id="modeLabel">清理后人物</b><span>Y↑ · 米 · 拖动旋转 · 滚轮缩放</span></div>
+      <div id="loading" class="loading"><div class="spinner"></div><span>正在解压 31 个独立表面部件…</span></div>
+    </section>
+    <aside class="inspector">
+      <section>
+        <h2>处理状态</h2>
+        <div class="mode-grid">
+          <button class="mode active" data-mode="clean">短裤已去除</button>
+          <button class="mode" data-mode="original">原始短裤对照</button>
+          <button class="mode" data-mode="gap">缺口诊断</button>
+        </div>
+        <label class="check"><input id="patchToggle" type="checkbox" checked> 显示程序化腰胯补面</label>
+        <label class="check"><input id="wireToggle" type="checkbox"> 显示线框</label>
+        <label class="check"><input id="clayToggle" type="checkbox"> 统一素模</label>
+      </section>
+      <section>
+        <h2>已识别短裤</h2>
+        <div class="part-card danger"><b>part_1</b><span>左裤腿 · 103,248 源三角面</span></div>
+        <div class="part-card danger"><b>part_2</b><span>右裤腿 · 99,943 源三角面</span></div>
+        <div class="part-card danger"><b>part_9</b><span>腰头与中部 · 31,780 源三角面</span></div>
+        <p class="hint">默认运行模式完全不加载这三个短裤表面。它们只在“原始短裤对照”中显示。</p>
+      </section>
+      <section>
+        <h2>补面边界</h2>
+        <dl>
+          <div><dt>上接</dt><dd>下腹表面约 Y 0.557</dd></div>
+          <div><dt>下接</dt><dd>左右大腿约 Y 0.375</dd></div>
+          <div><dt>策略</dt><dd>中性、内缩、非服装几何</dd></div>
+          <div><dt>用途</dt><dd>后续物理短裤下方遮挡体</dd></div>
+        </dl>
+        <p class="hint warn">源文件在短裤下面没有完整人体表面。单纯隐藏短裤会出现贯穿身体的大洞，因此必须补面；当前补面只保证未来服装遮挡，不作为裸身精细形态。</p>
+      </section>
+      <section>
+        <h2>参考资产证据</h2>
+        <dl>
+          <div><dt>源格式</dt><dd>USDZ / binary USDC</dd></div>
+          <div><dt>源部件</dt><dd>31 个独立 Mesh</dd></div>
+          <div><dt>源三角面</dt><dd>977,244</dd></div>
+          <div><dt>网页参考面</dt><dd id="triangles">—</dd></div>
+          <div><dt>SHA-256</dt><dd class="hash">b0435f3f…e4fe7567</dd></div>
+        </dl>
+        <p class="hint">网页里的高密模型只作为“老师”和形态核对对象。正式人物仍要从其表面关系蒸馏成参数与函数，不把外部网格直接当最终人物。</p>
+      </section>
+      <section>
+        <h2>选择部件</h2>
+        <div id="selection" class="selection">点击人物表面查看部件信息。</div>
+      </section>
+    </aside>
+  </main>
+</div>
+<script src="./human-r001-data-00.js"></script>
+<script src="./human-r001-data-01.js"></script>
+<script src="./human-r001-data-02.js"></script>
+<script src="./human-r001-data-03.js"></script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
