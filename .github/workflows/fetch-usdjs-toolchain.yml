@@ -14,23 +14,26 @@ permissions:
 jobs:
   pack:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Download parser packages
+      - name: Build public USDJS parser
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p artifact
-          cd artifact
-          npm pack @cinevva/usdjs@0.1.0
-          npm pack @cinevva/usdjs-viewer@0.1.0
-          npm pack three@0.182.0
-          npm pack fflate@0.8.2
-          sha256sum *.tgz > SHA256SUMS.txt
-          ls -lh
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/cinevva-engine/usdjs.git usdjs
+          cd usdjs
+          git sparse-checkout set src package.json tsconfig.json README.md LICENSE
+          npm install --no-audit --no-fund
+          npm run build
+          npm pack --pack-destination ../artifact
+          cd ..
+          npm pack three@0.182.0 --pack-destination artifact
+          npm pack fflate@0.8.2 --pack-destination artifact
+          sha256sum artifact/*.tgz > artifact/SHA256SUMS.txt
+          ls -lh artifact
       - name: Upload parser toolchain
         uses: actions/upload-artifact@v4
         with:
