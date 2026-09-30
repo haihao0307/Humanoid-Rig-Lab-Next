@@ -1,0 +1,92 @@
+name: Build New Character Source Surface R001
+
+on:
+  push:
+    branches:
+      - work/human-multi-character-foundation-20260930
+    paths:
+      - .github/workflows/build-new-character-surface-r001.yml
+      - NEW_CHARACTER_SURFACE_R001/index.html
+      - NEW_CHARACTER_SURFACE_R001/source-manifest.json
+      - NEW_CHARACTER_SURFACE_R001/README_ZH.md
+      - NEW_CHARACTER_SURFACE_R001/build-trigger.txt
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: human-source-surface-r001-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-static-viewer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout clean human branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fetch audited open-source USD viewer
+        run: |
+          rm -rf /tmp/usdjs-viewer
+          git clone --depth 1 https://github.com/cinevva-engine/usdjs-viewer.git /tmp/usdjs-viewer
+          git -C /tmp/usdjs-viewer rev-parse HEAD > /tmp/usdjs-viewer-commit.txt
+
+      - name: Install and build static browser viewer
+        working-directory: /tmp/usdjs-viewer
+        run: |
+          npm install --no-audit --no-fund
+          npm run build -- --base ./
+
+      - name: Publish viewer under the human source workbench
+        run: |
+          rm -rf NEW_CHARACTER_SURFACE_R001/viewer
+          mkdir -p NEW_CHARACTER_SURFACE_R001/viewer
+          cp -a /tmp/usdjs-viewer/dist/. NEW_CHARACTER_SURFACE_R001/viewer/
+          cp /tmp/usdjs-viewer/LICENSE NEW_CHARACTER_SURFACE_R001/viewer/LICENSE-usdjs-viewer.txt
+          python - <<'PY'
+          from pathlib import Path
+          import json, os
+          target = Path('NEW_CHARACTER_SURFACE_R001/viewer/index.html')
+          text = target.read_text(encoding='utf-8')
+          text = text.replace('<title>USD Viewer</title>', '<title>KAOPU 新人物源表面查看器 R001</title>')
+          text = text.replace('<head>', '<head><meta name="kaopu-surface-contract" content="source-usdz-direct-no-primitive-rebuild">', 1)
+          target.write_text(text, encoding='utf-8')
+          info = {
+            'schema': 'kaopu/static-viewer-build@1.0',
+            'sourceViewer': 'cinevva-engine/usdjs-viewer',
+            'sourceViewerCommit': Path('/tmp/usdjs-viewer-commit.txt').read_text().strip(),
+            'buildCommit': os.environ.get('GITHUB_SHA'),
+            'surfaceMode': 'direct-usdz-usdc-browser-parse',
+            'shortsPreserved': True,
+            'primitiveBodyAssembly': False
+          }
+          Path('NEW_CHARACTER_SURFACE_R001/viewer/BUILD_INFO.json').write_text(json.dumps(info, indent=2) + '\n', encoding='utf-8')
+          PY
+
+      - name: Verify static output
+        run: |
+          test -s NEW_CHARACTER_SURFACE_R001/viewer/index.html
+          test -s NEW_CHARACTER_SURFACE_R001/viewer/BUILD_INFO.json
+          test -d NEW_CHARACTER_SURFACE_R001/viewer/assets
+          grep -q 'kaopu-surface-contract' NEW_CHARACTER_SURFACE_R001/viewer/index.html
+
+      - name: Commit generated static viewer
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add NEW_CHARACTER_SURFACE_R001/viewer
+          if git diff --cached --quiet; then
+            echo 'Viewer output unchanged.'
+            exit 0
+          fi
+          git commit -m 'build(human): publish source surface viewer R001 [skip surface-build]'
+          git push origin HEAD:work/human-multi-character-foundation-20260930
