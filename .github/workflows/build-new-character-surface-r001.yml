@@ -34,15 +34,25 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Fetch audited open-source USD viewer
+      - name: Fetch audited open-source USD parser and viewer
         run: |
-          rm -rf /tmp/usdjs-viewer
+          rm -rf /tmp/usdjs /tmp/usdjs-viewer
+          git clone --depth 1 https://github.com/cinevva-engine/usdjs.git /tmp/usdjs
           git clone --depth 1 https://github.com/cinevva-engine/usdjs-viewer.git /tmp/usdjs-viewer
+          git -C /tmp/usdjs rev-parse HEAD > /tmp/usdjs-core-commit.txt
           git -C /tmp/usdjs-viewer rev-parse HEAD > /tmp/usdjs-viewer-commit.txt
 
-      - name: Install and build static browser viewer
+      - name: Build USD parser core
+        working-directory: /tmp/usdjs
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+          test -s dist/index.js
+
+      - name: Install local parser and build static browser viewer
         working-directory: /tmp/usdjs-viewer
         run: |
+          npm pkg set 'dependencies.@cinevva/usdjs=file:/tmp/usdjs'
           npm install --no-audit --no-fund
           npm run build -- --base ./
 
@@ -52,6 +62,7 @@ jobs:
           mkdir -p NEW_CHARACTER_SURFACE_R001/viewer
           cp -a /tmp/usdjs-viewer/dist/. NEW_CHARACTER_SURFACE_R001/viewer/
           cp /tmp/usdjs-viewer/LICENSE NEW_CHARACTER_SURFACE_R001/viewer/LICENSE-usdjs-viewer.txt
+          cp /tmp/usdjs/LICENSE NEW_CHARACTER_SURFACE_R001/viewer/LICENSE-usdjs-core.txt
           python - <<'PY'
           from pathlib import Path
           import json, os
@@ -62,6 +73,8 @@ jobs:
           target.write_text(text, encoding='utf-8')
           info = {
             'schema': 'kaopu/static-viewer-build@1.0',
+            'sourceCore': 'cinevva-engine/usdjs',
+            'sourceCoreCommit': Path('/tmp/usdjs-core-commit.txt').read_text().strip(),
             'sourceViewer': 'cinevva-engine/usdjs-viewer',
             'sourceViewerCommit': Path('/tmp/usdjs-viewer-commit.txt').read_text().strip(),
             'buildCommit': os.environ.get('GITHUB_SHA'),
@@ -78,6 +91,7 @@ jobs:
           test -s NEW_CHARACTER_SURFACE_R001/viewer/BUILD_INFO.json
           test -d NEW_CHARACTER_SURFACE_R001/viewer/assets
           grep -q 'kaopu-surface-contract' NEW_CHARACTER_SURFACE_R001/viewer/index.html
+          grep -q 'direct-usdz-usdc-browser-parse' NEW_CHARACTER_SURFACE_R001/viewer/BUILD_INFO.json
 
       - name: Commit generated static viewer
         run: |
