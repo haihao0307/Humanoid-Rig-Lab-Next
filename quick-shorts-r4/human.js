@@ -1,5 +1,122 @@
-import * as THREE from'https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js';import pako from'https://cdn.jsdelivr.net/npm/pako@2.1.0/+esm';
-const bytes=s=>{const b=atob(s),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a},ungzip=s=>pako.ungzip(bytes(s));
-function partGeometry(p){const r=ungzip(p.data),v=p.vertices,pb=v*6,nb=v*3,q=new Uint16Array(r.slice(0,pb).buffer),n=new Int8Array(r.slice(pb,pb+nb).buffer),ix=new Uint16Array(r.slice(pb+nb).buffer),pos=new Float32Array(v*3),nor=new Float32Array(v*3);for(let i=0;i<v;i++)for(let a=0;a<3;a++){let k=i*3+a;pos[k]=p.min[a]+q[k]/65535*(p.max[a]-p.min[a]);nor[k]=n[k]/127}const g=new THREE.BufferGeometry;g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('normal',new THREE.BufferAttribute(nor,3));g.setIndex(new THREE.BufferAttribute(ix,1));return g}
-function loft(s,n=64){let p=[],ix=[];for(const q of s)for(let i=0;i<n;i++){let a=i/n*Math.PI*2,z=Math.sin(a)>=0?q.front:q.back;p.push(q.cx+q.rx*Math.cos(a),q.y,q.cz+z*Math.sin(a))}for(let j=0;j<s.length-1;j++)for(let i=0;i<n;i++){let a=j*n+i,b=j*n+(i+1)%n,c=(j+1)*n+(i+1)%n,d=(j+1)*n+i;ix.push(a,b,d,b,c,d)}const g=new THREE.BufferGeometry;g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setIndex(ix);g.computeVertexNormals();return g}
-export function loadHuman(scene){const payload=JSON.parse(new TextDecoder().decode(ungzip(window.HUMAN_R001_PAYLOAD_B64||''))),group=new THREE.Group,scale=1.8/.978544116;let tris=0;for(const p of payload.parts.sort((a,b)=>a.id-b.id)){if(p.shorts)continue;const m=new THREE.Mesh(partGeometry(p),new THREE.MeshStandardMaterial({color:new THREE.Color(...p.color),roughness:p.roughness}));m.scale.setScalar(scale);m.castShadow=true;group.add(m);tris+=p.triangles}scene.add(group);const mat=new THREE.MeshStandardMaterial({color:0x9f735d,roughness:.72}),patch=new THREE.Group;patch.add(new THREE.Mesh(loft([{y:.572,cx:0,cz:.008,rx:.078,front:.052,back:.046},{y:.555,cx:0,cz:.005,rx:.085,front:.060,back:.054},{y:.525,cx:0,cz:0,rx:.090,front:.061,back:.063},{y:.490,cx:0,cz:-.006,rx:.094,front:.057,back:.071},{y:.455,cx:0,cz:-.010,rx:.090,front:.050,back:.073},{y:.425,cx:0,cz:-.006,rx:.076,front:.043,back:.064}],72),mat));for(const x of[-1,1])patch.add(new THREE.Mesh(loft([{y:.475,cx:x*.054,cz:-.005,rx:.048,front:.049,back:.057},{y:.445,cx:x*.057,cz:-.004,rx:.050,front:.050,back:.055},{y:.405,cx:x*.059,cz:0,rx:.047,front:.049,back:.050},{y:.365,cx:x*.061,cz:.001,rx:.043,front:.046,back:.046}],56),mat));patch.scale.setScalar(scale);scene.add(patch);return tris}
+import * as THREE from 'three';
+import * as pako from './vendor/pako.esm.mjs';
+
+function base64Bytes(text) {
+  const binary = atob(text);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
+  return bytes;
+}
+
+function ungzip(text) {
+  if (!text) throw new Error('人物表面压缩数据为空');
+  return pako.ungzip(base64Bytes(text));
+}
+
+function partGeometry(part) {
+  const raw = ungzip(part.data);
+  const vertexCount = part.vertices;
+  const positionByteLength = vertexCount * 3 * 2;
+  const normalByteLength = vertexCount * 3;
+  const quantizedPositions = new Uint16Array(raw.slice(0, positionByteLength).buffer);
+  const quantizedNormals = new Int8Array(raw.slice(positionByteLength, positionByteLength + normalByteLength).buffer);
+  const indices = new Uint16Array(raw.slice(positionByteLength + normalByteLength).buffer);
+  const positions = new Float32Array(vertexCount * 3);
+  const normals = new Float32Array(vertexCount * 3);
+
+  for (let vertex = 0; vertex < vertexCount; vertex++) {
+    for (let axis = 0; axis < 3; axis++) {
+      const offset = vertex * 3 + axis;
+      positions[offset] = part.min[axis] + quantizedPositions[offset] / 65535 * (part.max[axis] - part.min[axis]);
+      normals[offset] = quantizedNormals[offset] / 127;
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+  geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function loft(sections, segments = 64) {
+  const positions = [];
+  const indices = [];
+  for (const section of sections) {
+    for (let index = 0; index < segments; index++) {
+      const angle = index / segments * Math.PI * 2;
+      const sine = Math.sin(angle);
+      const forwardRadius = sine >= 0 ? section.front : section.back;
+      positions.push(
+        section.cx + section.rx * Math.cos(angle),
+        section.y,
+        section.cz + forwardRadius * sine
+      );
+    }
+  }
+  for (let row = 0; row < sections.length - 1; row++) {
+    for (let index = 0; index < segments; index++) {
+      const a = row * segments + index;
+      const b = row * segments + (index + 1) % segments;
+      const c = (row + 1) * segments + (index + 1) % segments;
+      const d = (row + 1) * segments + index;
+      indices.push(a, b, d, b, c, d);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+export function loadHuman(scene) {
+  const packed = window.HUMAN_R001_PAYLOAD_B64 || '';
+  const decoded = new TextDecoder().decode(ungzip(packed));
+  const payload = JSON.parse(decoded);
+  if (!Array.isArray(payload.parts) || payload.parts.length === 0) throw new Error('人物表面数据结构无效');
+
+  const group = new THREE.Group();
+  const scale = 1.8 / 0.978544116;
+  let referenceTriangles = 0;
+
+  for (const part of payload.parts.slice().sort((a, b) => a.id - b.id)) {
+    if (part.shorts) continue;
+    const material = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(...part.color),
+      roughness: part.roughness,
+      metalness: 0
+    });
+    const mesh = new THREE.Mesh(partGeometry(part), material);
+    mesh.scale.setScalar(scale);
+    mesh.castShadow = true;
+    group.add(mesh);
+    referenceTriangles += part.triangles;
+  }
+  scene.add(group);
+
+  const patchMaterial = new THREE.MeshStandardMaterial({ color: 0x9f735d, roughness: 0.72, metalness: 0 });
+  const patch = new THREE.Group();
+  patch.add(new THREE.Mesh(loft([
+    { y: 0.572, cx: 0, cz: 0.008, rx: 0.078, front: 0.052, back: 0.046 },
+    { y: 0.555, cx: 0, cz: 0.005, rx: 0.085, front: 0.060, back: 0.054 },
+    { y: 0.525, cx: 0, cz: 0, rx: 0.090, front: 0.061, back: 0.063 },
+    { y: 0.490, cx: 0, cz: -0.006, rx: 0.094, front: 0.057, back: 0.071 },
+    { y: 0.455, cx: 0, cz: -0.010, rx: 0.090, front: 0.050, back: 0.073 },
+    { y: 0.425, cx: 0, cz: -0.006, rx: 0.076, front: 0.043, back: 0.064 }
+  ], 72), patchMaterial));
+
+  for (const side of [-1, 1]) {
+    patch.add(new THREE.Mesh(loft([
+      { y: 0.475, cx: side * 0.054, cz: -0.005, rx: 0.048, front: 0.049, back: 0.057 },
+      { y: 0.445, cx: side * 0.057, cz: -0.004, rx: 0.050, front: 0.050, back: 0.055 },
+      { y: 0.405, cx: side * 0.059, cz: 0, rx: 0.047, front: 0.049, back: 0.050 },
+      { y: 0.365, cx: side * 0.061, cz: 0.001, rx: 0.043, front: 0.046, back: 0.046 }
+    ], 56), patchMaterial));
+  }
+  patch.scale.setScalar(scale);
+  scene.add(patch);
+  return referenceTriangles;
+}

@@ -1,6 +1,183 @@
-import * as THREE from'https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js';
-export const BASE={waistCircumference:825.119,hipCircumference:1023.701,crotchDepth:240.402,waistY:1022.175,hipY:826.774};
-const radii=(c,r)=>{let a=r,b=1,h=((a-b)/(a+b))**2,u=Math.PI*(a+b)*(1+3*h/(10+Math.sqrt(4-3*h))),s=c/u;return{rx:a*s,rz:b*s}},mix=(a,b,t)=>a+(b-a)*(t*t*(3-2*t));
-function leg(side,p,mat){let wy=BASE.waistY/1000,hy=BASE.hipY/1000,cy=wy-(BASE.crotchDepth+p.riseAdjustMm)/1000,ey=Math.min(cy-.075,wy-p.shortsLengthMm/1000),w=radii(((BASE.waistCircumference+p.waistEaseMm)/2+44)/1000,1.28),h=radii(((BASE.hipCircumference+p.hipEaseMm)/2+32)/1000,1.26),l=radii(p.legOpeningMm/1000,1.2),hc=Math.max(.075,p.legGapMm/2000+l.rx*.56),st=[{y:wy-.018,rx:w.rx,rz:w.rz,cx:side*.055},{y:hy,rx:h.rx,rz:h.rz,cx:side*.072},{y:cy+.012,rx:Math.max(h.rx*.82,l.rx*.98),rz:Math.max(h.rz*.87,l.rz),cx:side*.083},{y:ey,rx:l.rx,rz:l.rz,cx:side*hc}],N=72,R=28,pos=[],ix=[];const sample=y=>{if(y>=st[0].y)return st[0];for(let i=0;i<3;i++)if(y<=st[i].y&&y>=st[i+1].y){let t=(st[i].y-y)/(st[i].y-st[i+1].y);return{y,rx:mix(st[i].rx,st[i+1].rx,t),rz:mix(st[i].rz,st[i+1].rz,t),cx:mix(st[i].cx,st[i+1].cx,t)}}return st[3]};for(let r=0;r<=R;r++){let y=mix(st[0].y,ey,r/R),s=sample(y),t=r/R;for(let i=0;i<N;i++){let a=i/N*Math.PI*2,c=Math.cos(a),q=Math.sin(a),med=side<0?c>0:c<0,rx=s.rx*(med?mix(.68,.82,t):1),rz=q>=0?s.rz*.97:s.rz*1.08,z=p.wrinkleMm/1000*Math.sin(Math.PI*t)**2*(Math.sin(a*4+t*8)*.55+Math.sin(a*7-t*5)*.24);pos.push(s.cx+(rx+z)*c,y,(rz+z*.6)*q)}}for(let r=0;r<R;r++)for(let i=0;i<N;i++){let a=r*N+i,b=r*N+(i+1)%N,c=(r+1)*N+(i+1)%N,d=(r+1)*N+i;ix.push(a,b,d,b,c,d)}const g=new THREE.BufferGeometry;g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(ix);g.computeVertexNormals();return{mesh:new THREE.Mesh(g,mat),wy,cy,ey,l,hc}}
-function band(p,mat,wy){let a=radii((BASE.waistCircumference+p.waistEaseMm)/1000,1.52),b=radii((BASE.waistCircumference+p.waistEaseMm+34)/1000,1.5),h=p.waistbandHeightMm/1000,N=96,pos=[],ix=[];for(let r=0;r<=5;r++)for(let i=0;i<N;i++){let t=r/5,x=i/N*Math.PI*2,g=p.wrinkleMm/1000*.45*Math.sin(x*12+r),rx=mix(a.rx,b.rx,t),rz=mix(a.rz,b.rz,t);pos.push((rx+g)*Math.cos(x),wy-h*t,((Math.sin(x)>=0?rz*.96:rz*1.08)+g*.35)*Math.sin(x))}for(let r=0;r<5;r++)for(let i=0;i<N;i++){let a0=r*N+i,b0=r*N+(i+1)%N,c=(r+1)*N+(i+1)%N,d=(r+1)*N+i;ix.push(a0,b0,d,b0,c,d)}const g=new THREE.BufferGeometry;g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(ix);g.computeVertexNormals();return new THREE.Mesh(g,mat)}
-export function buildShorts(group,p){while(group.children.length){let o=group.children.pop();o.geometry?.dispose();o.material?.dispose()}let mat=new THREE.MeshStandardMaterial({color:p.color,roughness:p.roughness,side:THREE.DoubleSide}),L=leg(-1,p,mat),R=leg(1,p,mat),B=band(p,mat,L.wy);for(const m of[L.mesh,R.mesh,B]){m.castShadow=true;group.add(m)}let seam=[];for(let i=0;i<=30;i++){let t=i/30;seam.push(new THREE.Vector3(0,mix(L.wy-.012,L.cy-.02,t),.118+Math.sin(t*Math.PI)*.035))}group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(seam),new THREE.LineBasicMaterial({color:0x4a3d30})));return{waist:BASE.waistCircumference+p.waistEaseMm,hip:BASE.hipCircumference+p.hipEaseMm,length:p.shortsLengthMm}}
+import * as THREE from 'three';
+
+export const BASE = {
+  waistCircumference: 825.119,
+  hipCircumference: 1023.701,
+  crotchDepth: 240.402,
+  waistY: 1022.175,
+  hipY: 826.774
+};
+
+const ellipseRadii = (circumference, aspectRatio) => {
+  const a = aspectRatio;
+  const b = 1;
+  const h = ((a - b) / (a + b)) ** 2;
+  const unitCircumference = Math.PI * (a + b) * (1 + 3 * h / (10 + Math.sqrt(4 - 3 * h)));
+  const scale = circumference / unitCircumference;
+  return { rx: a * scale, rz: b * scale };
+};
+const smoothMix = (a, b, t) => a + (b - a) * (t * t * (3 - 2 * t));
+
+function createLeg(side, parameters, material) {
+  const waistY = BASE.waistY / 1000;
+  const hipY = BASE.hipY / 1000;
+  const crotchY = waistY - (BASE.crotchDepth + parameters.riseAdjustMm) / 1000;
+  const hemY = Math.min(crotchY - 0.075, waistY - parameters.shortsLengthMm / 1000);
+  const waist = ellipseRadii(((BASE.waistCircumference + parameters.waistEaseMm) / 2 + 44) / 1000, 1.28);
+  const hip = ellipseRadii(((BASE.hipCircumference + parameters.hipEaseMm) / 2 + 32) / 1000, 1.26);
+  const hem = ellipseRadii(parameters.legOpeningMm / 1000, 1.2);
+  const hemCenter = Math.max(0.075, parameters.legGapMm / 2000 + hem.rx * 0.56);
+  const sections = [
+    { y: waistY - 0.018, rx: waist.rx, rz: waist.rz, cx: side * 0.055 },
+    { y: hipY, rx: hip.rx, rz: hip.rz, cx: side * 0.072 },
+    { y: crotchY + 0.012, rx: Math.max(hip.rx * 0.82, hem.rx * 0.98), rz: Math.max(hip.rz * 0.87, hem.rz), cx: side * 0.083 },
+    { y: hemY, rx: hem.rx, rz: hem.rz, cx: side * hemCenter }
+  ];
+
+  const radialSegments = 72;
+  const rows = 28;
+  const positions = [];
+  const indices = [];
+  const sampleSection = (y) => {
+    if (y >= sections[0].y) return sections[0];
+    for (let index = 0; index < 3; index++) {
+      if (y <= sections[index].y && y >= sections[index + 1].y) {
+        const t = (sections[index].y - y) / (sections[index].y - sections[index + 1].y);
+        return {
+          y,
+          rx: smoothMix(sections[index].rx, sections[index + 1].rx, t),
+          rz: smoothMix(sections[index].rz, sections[index + 1].rz, t),
+          cx: smoothMix(sections[index].cx, sections[index + 1].cx, t)
+        };
+      }
+    }
+    return sections[3];
+  };
+
+  for (let row = 0; row <= rows; row++) {
+    const y = smoothMix(sections[0].y, hemY, row / rows);
+    const section = sampleSection(y);
+    const verticalT = row / rows;
+    for (let radial = 0; radial < radialSegments; radial++) {
+      const angle = radial / radialSegments * Math.PI * 2;
+      const cosine = Math.cos(angle);
+      const sine = Math.sin(angle);
+      const medial = side < 0 ? cosine > 0 : cosine < 0;
+      const radiusX = section.rx * (medial ? smoothMix(0.68, 0.82, verticalT) : 1);
+      const radiusZ = sine >= 0 ? section.rz * 0.97 : section.rz * 1.08;
+      const wrinkle = parameters.wrinkleMm / 1000 * Math.sin(Math.PI * verticalT) ** 2 * (
+        Math.sin(angle * 4 + verticalT * 8) * 0.55 + Math.sin(angle * 7 - verticalT * 5) * 0.24
+      );
+      positions.push(
+        section.cx + (radiusX + wrinkle) * cosine,
+        y,
+        (radiusZ + wrinkle * 0.6) * sine
+      );
+    }
+  }
+
+  for (let row = 0; row < rows; row++) {
+    for (let radial = 0; radial < radialSegments; radial++) {
+      const a = row * radialSegments + radial;
+      const b = row * radialSegments + (radial + 1) % radialSegments;
+      const c = (row + 1) * radialSegments + (radial + 1) % radialSegments;
+      const d = (row + 1) * radialSegments + radial;
+      indices.push(a, b, d, b, c, d);
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return {
+    mesh: new THREE.Mesh(geometry, material),
+    waistY,
+    crotchY,
+    hemY
+  };
+}
+
+function createWaistband(parameters, material, waistY) {
+  const top = ellipseRadii((BASE.waistCircumference + parameters.waistEaseMm) / 1000, 1.52);
+  const bottom = ellipseRadii((BASE.waistCircumference + parameters.waistEaseMm + 34) / 1000, 1.5);
+  const height = parameters.waistbandHeightMm / 1000;
+  const radialSegments = 96;
+  const rows = 5;
+  const positions = [];
+  const indices = [];
+
+  for (let row = 0; row <= rows; row++) {
+    const t = row / rows;
+    for (let radial = 0; radial < radialSegments; radial++) {
+      const angle = radial / radialSegments * Math.PI * 2;
+      const gather = parameters.wrinkleMm / 1000 * 0.45 * Math.sin(angle * 12 + row);
+      const radiusX = smoothMix(top.rx, bottom.rx, t);
+      const radiusZ = smoothMix(top.rz, bottom.rz, t);
+      positions.push(
+        (radiusX + gather) * Math.cos(angle),
+        waistY - height * t,
+        ((Math.sin(angle) >= 0 ? radiusZ * 0.96 : radiusZ * 1.08) + gather * 0.35) * Math.sin(angle)
+      );
+    }
+  }
+
+  for (let row = 0; row < rows; row++) {
+    for (let radial = 0; radial < radialSegments; radial++) {
+      const a = row * radialSegments + radial;
+      const b = row * radialSegments + (radial + 1) % radialSegments;
+      const c = (row + 1) * radialSegments + (radial + 1) % radialSegments;
+      const d = (row + 1) * radialSegments + radial;
+      indices.push(a, b, d, b, c, d);
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return new THREE.Mesh(geometry, material);
+}
+
+export function buildShorts(group, parameters) {
+  while (group.children.length) {
+    const object = group.children.pop();
+    object.geometry?.dispose();
+    object.material?.dispose();
+  }
+
+  const material = new THREE.MeshStandardMaterial({
+    color: parameters.color,
+    roughness: parameters.roughness,
+    side: THREE.DoubleSide
+  });
+  const left = createLeg(-1, parameters, material);
+  const right = createLeg(1, parameters, material);
+  const waistband = createWaistband(parameters, material, left.waistY);
+  for (const mesh of [left.mesh, right.mesh, waistband]) {
+    mesh.castShadow = true;
+    group.add(mesh);
+  }
+
+  const seamPoints = [];
+  for (let index = 0; index <= 30; index++) {
+    const t = index / 30;
+    seamPoints.push(new THREE.Vector3(
+      0,
+      smoothMix(left.waistY - 0.012, left.crotchY - 0.02, t),
+      0.118 + Math.sin(t * Math.PI) * 0.035
+    ));
+  }
+  group.add(new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(seamPoints),
+    new THREE.LineBasicMaterial({ color: 0x4a3d30 })
+  ));
+
+  return {
+    waist: BASE.waistCircumference + parameters.waistEaseMm,
+    hip: BASE.hipCircumference + parameters.hipEaseMm,
+    length: parameters.shortsLengthMm
+  };
+}
