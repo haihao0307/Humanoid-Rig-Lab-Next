@@ -1,0 +1,41 @@
+name: Human R006 offline source verification bundle
+on:
+  push:
+    branches: [work/human-character-surface-001-r006-inherit-original-core-20260930]
+    paths: [.github/workflows/human-r006-source-export.yml]
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: e051b0dca452ac3246ad36950ebbe2d75c1a7ffa
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Bundle unchanged core and pinned offline tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r006-export/core /tmp/r006-export/offline-python /tmp/r006-export/offline-js
+          git archive e051b0dca452ac3246ad36950ebbe2d75c1a7ffa | tar -x -C /tmp/r006-export/core
+          python -m pip download --only-binary=:all: --no-deps usd-core==25.11 -d /tmp/r006-export/offline-python
+          cd /tmp/r006-export/offline-js
+          npm init -y >/dev/null
+          npm install --save-exact three@0.184.0 esbuild@0.25.10
+          cd /tmp/r006-export
+          find . -type f -print0 | sort -z | xargs -0 sha256sum > SOURCE_SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: human-r006-pinned-core-offline
+          path: /tmp/r006-export/
+          retention-days: 7
+          include-hidden-files: true
+          compression-level: 6
