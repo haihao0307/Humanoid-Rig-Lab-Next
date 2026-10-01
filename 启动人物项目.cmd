@@ -9,8 +9,8 @@ cd /d "%~dp0"
 if errorlevel 1 goto :missing_project
 if not exist "%~dp0server\start_server.py" goto :missing_project
 if not exist "%~dp0index.html" goto :missing_project
-title Human Workbench R11
-echo Human Workbench R11 - starting the local server...
+title Human Parametric Workbench R007
+echo Human Parametric Workbench R007 - starting the local server...
 echo Keep this window open. The browser will open when the server is ready.
 rem Probe the interpreter itself: Windows aliases may exist without Python.
 py -3 -c "import sys; sys.exit(sys.version_info < (3, 9))" <nul >nul 2>nul

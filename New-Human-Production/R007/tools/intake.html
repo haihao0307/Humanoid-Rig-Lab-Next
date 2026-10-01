@@ -1,0 +1,11 @@
+<!doctype html><html><head><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"}}</script></head><body><pre id="status">Reading</pre><script type="module">
+import * as THREE from 'three';import {FBXLoader} from 'three/addons/loaders/FBXLoader.js';
+try {
+const model=await new FBXLoader().loadAsync('../qa/source-intake/tripo_convert_1730f83d-6a0d-4dee-94bf-fa78a7cd8650.fbx');model.updateMatrixWorld(true);
+const nodes=[];model.traverse(o=>nodes.push({uuid:o.uuid,name:o.name,type:o.type,parent:o.parent?.uuid,position:o.position.toArray(),quaternion:o.quaternion.toArray(),scale:o.scale.toArray(),matrix:o.matrixWorld.toArray()}));
+const meshes=[];model.traverse(o=>{if(o.isMesh){const attributes={};for(const [k,v] of Object.entries(o.geometry.attributes))attributes[k]={itemSize:v.itemSize,array:Array.from(v.array)};
+meshes.push({name:o.name,uuid:o.uuid,matrix:o.matrixWorld.toArray(),attributes,index:o.geometry.index?Array.from(o.geometry.index.array):null,groups:o.geometry.groups,materials:(Array.isArray(o.material)?o.material:[o.material]).map(m=>({name:m.name,color:m.color?.toArray(),roughness:m.roughness,metalness:m.metalness,map:m.map?.name})),skeleton:o.skeleton?{bones:o.skeleton.bones.map(b=>b.uuid),inverses:o.skeleton.boneInverses.map(m=>m.toArray()),bindMatrix:o.bindMatrix.toArray(),bindMatrixInverse:o.bindMatrixInverse.toArray()}:null});}});
+const capture={nodes,meshes,animations:model.animations.map(c=>({name:c.name,duration:c.duration,tracks:c.tracks.map(t=>({name:t.name,type:t.ValueTypeName,times:Array.from(t.times),values:Array.from(t.values),interpolation:t.getInterpolation()}))})),bbox:new THREE.Box3().setFromObject(model).min.toArray().concat(new THREE.Box3().setFromObject(model).max.toArray())};
+await fetch('/capture',{method:'POST',body:JSON.stringify(capture)});window.capture=capture;document.getElementById('status').textContent='CAPTURE COMPLETE';
+}catch(e){document.getElementById('status').textContent=e.stack;window.failure=e.message;}
+</script></body></html>

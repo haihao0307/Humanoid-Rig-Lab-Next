@@ -28,6 +28,8 @@ The data used in this project was obtained from mocap.cs.cmu.edu. The database w
 
 `reconstruction/motion-reference.json` contains derived skeletal parameters from trials 08_01, 113_08 and 113_27. Changes include unit conversion, coordinate conversion, interval selection, direction extraction, full segment quaternion extraction and adaptive temporal sampling. Source file URLs, sizes and SHA-256 hashes are recorded in that JSON; `tools/derive-motion-reference.py` records the conversion. These data are retargeted to a different anatomical reference and do not contain measured dynamic skin surfaces.
 
+`New-Human-Production/R008/JumpMotionData.mjs` derives sparse joint curves from CMU trials 16_05, 16_07 and 75_01. `NaturalRunData.mjs` derives 46 periodic pelvis, leg, foot, torso, arm and wrist fields from trial 02_03 (run/jog), frames 39–131 at 120 Hz. Changes include forward kinematics, coordinate retargeting, stride alignment, calibration-offset removal and third-order Fourier fitting. Source SHA-256 hashes are retained in the parameter modules; conversion tools and methodological notes accompany R008. These files contain fitted function coefficients rather than original ASF/AMC frames or dynamic surface samples. The same CMU attribution applies.
+
 See the [CMU database](https://mocap.cs.cmu.edu/) and [use conditions](https://mocap.cs.cmu.edu/faqs.php). CMU permits use including commercial projects, while excluding direct resale of the data themselves. Preserve the attribution; the software MIT license does not replace the data provider's terms. Original ASF/AMC downloads are not bundled.
 
 ## Other references

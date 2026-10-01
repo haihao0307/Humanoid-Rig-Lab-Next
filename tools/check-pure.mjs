@@ -25,6 +25,13 @@ import {checkPhysicsSources} from './check-physics.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const read=p=>readFileSync(join(root,p),'utf8');
 const assert=(value,message)=>{if(!value)throw Error(message);};
+const selected=JSON.parse(read('source/assembly.json'));
+if(selected.activeSubject==='new-human-r008'&&!process.argv.includes('--legacy')){
+ const {checkR008}=await import('./check-r008.mjs');console.log(JSON.stringify(checkR008(root)));process.exit(0);
+}
+if(selected.activeSubject==='new-human-r007'&&!process.argv.includes('--legacy')){
+ const {checkR007}=await import('./check-r007.mjs');console.log(JSON.stringify(checkR007(root)));process.exit(0);
+}
 // Inspect launcher bytes and branches; never execute the batch file or server.
 const launcherBytes=readFileSync(join(root,'启动人物项目.cmd'));
 assert(launcherBytes.every(b=>b<128),'Windows launcher must be ASCII without a BOM');

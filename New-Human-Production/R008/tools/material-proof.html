@@ -1,0 +1,4 @@
+<!doctype html><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"}}</script><script type="module">
+import {loadSubjectParameters} from '../SubjectRuntime.mjs';import {decodeMaterialField} from '../material-fields.mjs';
+try{const d=await loadSubjectParameters();const proof={};for(const m of d.materials)for(const key of ['basecolor','normal','roughness','metallic']){const f=m[key],rgba=decodeMaterialField(f),rgb=new Uint8Array(f.size*f.size*3);for(let i=0;i<f.size*f.size;i++)for(let k=0;k<3;k++)rgb[i*3+k]=rgba[i*4+k];const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',rgb)),x=>x.toString(16).padStart(2,'0')).join('');proof['human_figure_3d_model_'+m.name+'_'+key]={size:[f.size,f.size],rgbSHA256:hash};}window.proof=proof;}catch(e){window.failure=e.stack;}
+</script>

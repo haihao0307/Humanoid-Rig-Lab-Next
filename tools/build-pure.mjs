@@ -45,8 +45,14 @@ export function assemble(){
  return {runtime,body,brain,index};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
+ if(['new-human-r007','new-human-r008'].includes(manifest.activeSubject)&&!process.argv.includes('--legacy')){
+  const selected=manifest.subjects[manifest.activeSubject],entry=read(selected.entry).replace('src="./app.mjs"',`src="./${selected.entry.replace('/index.html','/app.mjs')}"`);
+  if(process.argv.includes('--check')){if(read('index.html')!==entry)throw Error('Subject entrypoint differs from assembly');}else writeFileSync(root+'index.html',entry);
+  console.log(JSON.stringify({mode:process.argv.includes('--check')?'file-check':'file-build',subject:manifest.activeSubject,entrypointBytes:Buffer.byteLength(entry),sha256:createHash('sha256').update(entry).digest('hex'),applicationExecuted:false}));
+ }else{
  const {runtime,index}=assemble();
  if(process.argv.includes('--check')){if(read('index.html')!==index)throw Error('index.html differs from assembled sources');}
  else writeFileSync(root+'index.html',index);
  console.log(JSON.stringify({mode:process.argv.includes('--check')?'file-check':'file-build',runtimeBytes:Buffer.byteLength(runtime),entrypointBytes:Buffer.byteLength(index),sha256:createHash('sha256').update(index).digest('hex'),applicationExecuted:false}));
+ }
 }
