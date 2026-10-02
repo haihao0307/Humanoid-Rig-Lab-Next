@@ -1,7 +1,7 @@
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const root=__dirname;
 const allowIntake=process.env.R008_INTAKE==='1',port=Number(process.env.R008_PORT||8877);
-const publicFiles=new Set(['/index.html','/ViewControls.mjs','/app.mjs','/SubjectRuntime.mjs','/surface-generator.mjs','/parameter-codec.mjs','/material-fields.mjs','/SkinAppearance.mjs','/SkinMaterial.mjs','/SkinWorkbench.mjs','/ScarState.mjs','/ScarSurface.mjs','/ScarWorkbench.mjs','/parameters.phf.gz','/vendor/earcut.js','/CharacterController.mjs','/GameAnimator.mjs','/JumpProfiles.mjs','/JumpMotionData.mjs','/NaturalRunData.mjs','/FacialExpression.mjs','/ProceduralEyes.mjs','/FacialBinding.mjs','/FacialWorkbench.mjs','/game-world.mjs','/game-scene.mjs']);
+const publicFiles=new Set(['/index.html','/ViewControls.mjs','/app.mjs','/SubjectRuntime.mjs','/surface-generator.mjs','/SurfaceQuality.mjs','/parameter-codec.mjs','/material-fields.mjs','/SkinAppearance.mjs','/SkinMaterial.mjs','/SkinWorkbench.mjs','/ScarState.mjs','/ScarSurface.mjs','/ScarWorkbench.mjs','/parameters.phf.gz','/vendor/earcut.js','/CharacterController.mjs','/GameAnimator.mjs','/JumpProfiles.mjs','/JumpMotionData.mjs','/NaturalRunData.mjs','/FacialExpression.mjs','/ProceduralEyes.mjs','/FacialBinding.mjs','/FacialWorkbench.mjs','/game-world.mjs','/game-scene.mjs']);
 http.createServer((req,res)=>{
  let p=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
  if(req.method==='GET'&&p==='/health'){res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});return res.end(JSON.stringify({subject:'new-human-r008',mode:allowIntake?'intake':'preview',pid:process.pid}));}
