@@ -4,6 +4,7 @@ import {decodeParameters} from './parameter-codec.mjs';
 import {materialTextures} from './material-fields.mjs';
 import {createFacialBinding} from './FacialBinding.mjs';
 import {createProceduralEyes} from './ProceduralEyes.mjs';
+import {createSkinMaterialBinding} from './SkinMaterial.mjs';
 export async function loadSubjectParameters(url=new URL('./parameters.phf.gz',import.meta.url)){
  const compressed=await (await fetch(url)).arrayBuffer();const bytes=await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();const data=decodeParameters(bytes);if(data.schema!=='parametric-human-uv-fields/v2')throw Error('Wrong subject schema');data.packageBytes=compressed.byteLength;return data;
 }
@@ -82,7 +83,8 @@ export function createSubject(data,options={}){
  for(const material of materials){const compile=material.onBeforeCompile;material.onBeforeCompile=shader=>{compile(shader);shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute vec4 faceInspection; varying vec4 vFaceInspection;').replace('#include <begin_vertex>','#include <begin_vertex>\nvFaceInspection=faceInspection;');shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec4 vFaceInspection;').replace('#include <opaque_fragment>','outgoingLight=mix(outgoingLight,vFaceInspection.rgb,vFaceInspection.a);\n#include <opaque_fragment>');};}
  face.attach(mesh);play('rest');
  const eyes=createProceduralEyes({surface,mesh,byName,bindWorld,data});
- return {root,mesh,skeleton,mixer,clips,helper,surface,data,neutral,bindWorld,byName,face,eyes,play,locomotion,finishPose,
+ const skin=createSkinMaterialBinding({mesh,eyes});
+ return {root,mesh,skeleton,mixer,clips,helper,surface,data,neutral,bindWorld,byName,face,eyes,skin,play,locomotion,finishPose,
   command(text){const name=/跳/.test(text)?'jump':/跑/.test(text)?'run':/走|步/.test(text)?'walk':/看|环顾/.test(text)?'look_around':'rest';play(name);return {phase:name,authority:'authored-61-bone-curves'}},
   step(dt){
    root.position.sub(motionOffset);motionOffset.set(0,0,0);if(!paused)mixer.update(Math.min(dt,.1));
