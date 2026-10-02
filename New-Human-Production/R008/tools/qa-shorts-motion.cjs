@@ -2,7 +2,7 @@
 // Independent headless test runner. Does not edit production or move the desktop mouse.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const ROOT=path.resolve(__dirname,'..');
-const DEFAULT_PLAYWRIGHT='C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright';
+const DEFAULT_PLAYWRIGHT='playwright';
 async function main(){
  const url=process.argv[2]||'http://127.0.0.1:8877/?version=shorts-independent-motion';
  const out=path.resolve(process.argv[3]||path.join(ROOT,'qa','shorts-motion-'+new Date().toISOString().replace(/[:.]/g,'-')));

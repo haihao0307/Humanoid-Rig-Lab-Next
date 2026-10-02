@@ -5,7 +5,7 @@ const base='New-Human-Production/R008',sha=s=>createHash('sha256').update(s).dig
 const files=[
  ...readdirSync(base).filter(n=>/^Shorts.*\.mjs$/.test(n)).map(n=>base+'/'+n),
  ...['package.json','shorts-app.mjs','shorts-index.html','vendor/THREE-LICENSE.txt'].map(n=>base+'/'+n),
- ...['build-shorts-entry.mjs','build-shorts-standalone.mjs','build-shorts-comparison.mjs','install-shorts-runtime.mjs','shorts-preview-server.cjs','probe-shorts-draft.mjs','probe-shorts-manufacturing.mjs','probe-shorts-sewing-coupled.mjs','probe-shorts-exterior.mjs','qa-shorts-motion.cjs','qa-shorts-source-sewn-two-versions.cjs','qa-shorts-manufacturing-exact-paper.cjs','SHORTS_MOTION_QA.md','SHORTS_RUNTIME_REVIEW.md','source-shorts/ShortsPattern.js','source-shorts/full-shorts-contract.cjs'].map(n=>base+'/tools/'+n),
+ ...['build-shorts-entry.mjs','build-shorts-standalone.mjs','build-shorts-comparison.mjs','install-shorts-runtime.mjs','shorts-preview-server.cjs','probe-shorts-draft.mjs','probe-shorts-manufacturing.mjs','probe-shorts-sewing-coupled.mjs','probe-shorts-exterior.mjs','probe-shorts-feature-contact.mjs','probe-shorts-wearing-hinges.mjs','shorts-paper-audit.cjs','qa-shorts-motion.cjs','qa-shorts-source-sewn-two-versions.cjs','qa-shorts-manufacturing-exact-paper.cjs','SHORTS_MOTION_QA.md','SHORTS_RUNTIME_REVIEW.md','source-shorts/ShortsPattern.js','source-shorts/full-shorts-contract.cjs'].map(n=>base+'/tools/'+n),
  ...['probe-shorts-body.cjs','audit-shorts-source-loops.cjs','probe-shorts-boundary-targets.cjs','prepare-shorts-source-upload.mjs'].map(n=>'tools/'+n),
  ...['SHORTS_LOW_RISE_TASK_20261002.json','SHORTS_LOW_RISE_REVIEW_20261002.json','SHORTS_VERSIONS_20261002.md'].map(n=>'docs/'+n)
 ].sort();

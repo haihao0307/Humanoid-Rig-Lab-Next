@@ -24,6 +24,10 @@ node tools/build-shorts-comparison.mjs
 
 源纸样检查：`node tools/probe-shorts-draft.mjs`。仓库根目录的 `node tools/probe-shorts-boundary-targets.cjs` 检查裤脚目标；`node New-Human-Production/R008/tools/probe-shorts-exterior.mjs` 检查独立裁片初态。这些几何检查不能替代完整穿着、身体 / 自碰撞、弹力带和人物动作验收。
 
+本轮另修复了实际最近面 / 边 / 顶点的接触方向查询，避免远处点被错误单面法线判为内部。当前人体 1,401 个独立外部裁片查询通过，真实表面内侧仍触发接触；完整人体实体拓扑和连续碰撞尚未验收。
+
+`ShortsWearingHinges.mjs` 已增加真实 11 条源接缝、491 个自由度的连通裤身临时调整路径。单次构造松开后纸样应变约 4.71%，但衣口最大目标偏差约 62 mm、最近特征负距离约 37 mm，因此仍 HOLD。它没有改变纸样、质量或材料参考，没有关闭最后腰头，也没有运行布料动作。目标场自身不满足纸样度量，不能据此断言纸样必然不适合人体。
+
 后续必须完成连通裤身的连续低应变外部放置，再关闭最后腰头，执行真实站立、走路、跑步、跳跃和停止后的布料检查。通过独立验收后才晋级并更新公开测试网站。
 
 - [x] 没有用生成图片代替真实三维实现。
@@ -34,3 +38,13 @@ node tools/build-shorts-comparison.mjs
 - [ ] 新版穿着、碰撞、弹力与动作全部通过。
 - [ ] 新版公网固定链接和真实浏览器通过完整验收。
 - [x] 只有截图而没有工作台时判定失败。
+
+新增冷检查（仓库根目录）：
+
+```sh
+node New-Human-Production/R008/tools/probe-shorts-feature-contact.mjs
+node New-Human-Production/R008/tools/probe-shorts-sewing-coupled.mjs
+node New-Human-Production/R008/tools/qa-shorts-manufacturing-exact-paper.cjs
+```
+
+连通穿着实验 `probe-shorts-wearing-hinges.mjs` 会诚实返回 HOLD；它只用于诊断，不是动作通过证据。浏览器 QA 需本机 Playwright，可用 `PLAYWRIGHT_MODULE` 与 `CHROME_PATH` 指定运行库和浏览器。全部截屏在后台生成，不操作桌面鼠标。

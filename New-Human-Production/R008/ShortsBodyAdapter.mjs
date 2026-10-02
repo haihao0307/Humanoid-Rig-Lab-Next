@@ -22,6 +22,9 @@ export function createShortsBodyAdapter(subject, actor=subject.root.parent, opti
  const vertexIds=[],triangles=[];
  for(let i=0;i<n;i++)if(selected.has(parts[i]))vertexIds.push(i);
  for(let i=0;i<indices.length;i+=3)if(selected.has(parts[indices[i]]))triangles.push({id:i/3,indices:[indices[i],indices[i+1],indices[i+2]],part:parts[indices[i]],box:bounds()});
+ const triangleById=new Map(triangles.map(t=>[t.id,t])),vertexFaces=new Map();
+ for(const t of triangles)for(const i of t.indices){if(!vertexFaces.has(i))vertexFaces.set(i,[]);vertexFaces.get(i).push(t);}
+ const featureNormalCache=new Map();
  const positions=new Float64Array(n*3),previous=new Float64Array(n*3),local=new Float64Array(n*3),normals=new Float64Array(n*3);
  const boneMatrices=subject.skeleton.bones.map(()=>new THREE.Matrix4()),previousBones=boneMatrices.map(()=>new THREE.Matrix4()),finalMatrix=new THREE.Matrix4(),previousFinal=new THREE.Matrix4(),frame=new THREE.Matrix4(),frameInverse=new THREE.Matrix4();
  const vertexRevision=new Uint32Array(n),previousVertexRevision=new Uint32Array(n),referencePositions=new Float32Array(geometry.attributes.position.array);
@@ -66,12 +69,38 @@ export function createShortsBodyAdapter(subject, actor=subject.root.parent, opti
  }
  function boxDistance(b,v){let d=0;for(let k=0;k<3;k++){const x=v.getComponent(k),a=Math.max(b.min[k]-x,0,x-b.max[k]);d+=a*a;}return d;}
  const A=V(),B=V(),C=V(),near=V(),tri=new THREE.Triangle(),bary=V(),normal=V();
- function closestPoint(position){
-  owner();const input=Array.isArray(position)?V().fromArray(position):position;let best=Infinity,result=null;
-  function visit(node){lazyBounds(node);if(boxDistance(node.box,input)>best)return;if(node.rows){for(const t of node.rows){for(const i of t.indices)ensureVertex(i);triangleBox(t);if(boxDistance(t.box,input)>best)continue;point(positions,t.indices[0],A);point(positions,t.indices[1],B);point(positions,t.indices[2],C);tri.set(A,B,C).closestPointToPoint(input,near);const d=near.distanceToSquared(input);if(d>=best)continue;best=d;tri.getBarycoord(near,bary);tri.getNormal(normal);nn.set(0,0,0);for(let j=0;j<3;j++)nn.addScaledVector(point(normals,t.indices[j],q),bary.getComponent(j));if(normal.dot(nn)<0)normal.negate();result={point:near.clone(),normal:normal.clone(),distance:Math.sqrt(d),signedDistance:input.clone().sub(near).dot(normal),triangleId:t.id,indices:t.indices.slice(),weights:bary.toArray(),part:t.part,surfaceKind:R008_SOURCE_SHORTS_PARTS.includes(t.part)?'existing-source-clothing':'source-skin',revision};}}else{lazyBounds(node.left);lazyBounds(node.right);const l=boxDistance(node.left.box,input),r=boxDistance(node.right.box,input);visit(l<r?node.left:node.right);visit(l<r?node.right:node.left);}}
-  visit(bvh);if(result){const prior=V();for(let j=0;j<3;j++){const i=result.indices[j];if(previousVertexRevision[i]!==revision)skin(i,false,true);prior.addScaledVector(point(previous,i),result.weights[j]);}result.previousPoint=prior;result.velocity=poseDeltaTime!==null?result.point.clone().sub(prior).divideScalar(poseDeltaTime):V();result.velocityValid=poseDeltaTime!==null;result.poseDeltaTime=poseDeltaTime;result.poseTimes={previous:previousTime,current:lastTime};}return result;
+ function currentFace(t){
+  if(t.normalRevision===revision)return t;
+  const pts=t.indices.map(i=>{ensureVertex(i);return point(positions,i);}),n=V().crossVectors(pts[1].clone().sub(pts[0]),pts[2].clone().sub(pts[0])),length=n.length(),reference=V();
+  for(const i of t.indices)reference.add(point(normals,i));
+  t.degenerateContactFace=length<=1e-20;n.multiplyScalar(length>1e-20?1/length:0);if(n.dot(reference)<0)n.negate();
+  t.contactNormal=n;t.cornerAngles=pts.map((p,i)=>{const a=pts[(i+1)%3].clone().sub(p),b=pts[(i+2)%3].clone().sub(p);return Math.atan2(V().crossVectors(a,b).length(),a.dot(b));});t.normalRevision=revision;return t;
  }
- function collide(position,margin=.004){if(!(margin>=0&&Number.isFinite(margin)))throw Error('Contact margin must be finite metres');const hit=closestPoint(position);if(!hit||hit.signedDistance>=margin)return null;return {...hit,surfacePoint:hit.point.clone(),point:hit.point.clone().addScaledVector(hit.normal,margin),penetration:margin-hit.signedDistance,marginM:margin};}
+ function featureNormal(result){
+  const active=result.weights.map((w,j)=>({w,i:result.indices[j]})).filter(a=>a.w>1e-10),type=active.length===1?'vertex':active.length===2?'edge':'face',ids=type==='face'?result.indices.slice():active.map(a=>a.i),key=type+':'+(type==='face'?result.triangleId:ids.slice().sort((a,b)=>a-b).join(':'));
+  const cached=featureNormalCache.get(key);if(cached?.revision===revision)return cached;
+  const faces=type==='face'?[triangleById.get(result.triangleId)]:type==='vertex'?vertexFaces.get(ids[0]):vertexFaces.get(ids[0]).filter(t=>t.indices.includes(ids[1])),sum=V();let degenerateFaces=0;
+  for(const t of faces){currentFace(t);if(t.degenerateContactFace){degenerateFaces++;continue;}const weight=type==='vertex'?t.cornerAngles[t.indices.indexOf(ids[0])]:1;sum.addScaledVector(t.contactNormal,weight);}
+  const magnitude=sum.length(),ambiguous=magnitude<1e-12||faces.length===degenerateFaces;
+  const value={revision,type,indices:ids,incidentTriangleIds:faces.map(t=>t.id),normal:ambiguous?currentFace(triangleById.get(result.triangleId)).contactNormal.clone():sum.divideScalar(magnitude),ambiguous,degenerateFaces,normalMethod:type==='face'?'current-oriented-geometric-face':type==='edge'?'sum-current-incident-unit-face-normals':'angle-weighted-current-incident-unit-face-normals',orientationAuthority:'current eight-influence native normals orient geometric faces; actual indexed adjacency only, no invented seam welding',closedSolidCertified:false};featureNormalCache.set(key,value);return value;
+ }
+ function closestPoint(position){
+  owner();const array=Array.isArray(position)||ArrayBuffer.isView(position);
+  if(array?(position.length!==3||!Array.from(position).every(Number.isFinite)):(!position?.isVector3||![position.x,position.y,position.z].every(Number.isFinite)))throw Error('Finite three-dimensional contact position required');
+  const input=array?V().fromArray(position):position;let best=Infinity,result=null;
+  function visit(node){lazyBounds(node);if(boxDistance(node.box,input)>best)return;if(node.rows){for(const t of node.rows){for(const i of t.indices)ensureVertex(i);triangleBox(t);if(boxDistance(t.box,input)>best)continue;point(positions,t.indices[0],A);point(positions,t.indices[1],B);point(positions,t.indices[2],C);tri.set(A,B,C).closestPointToPoint(input,near);const d=near.distanceToSquared(input);if(d>=best)continue;best=d;tri.getBarycoord(near,bary);tri.getNormal(normal);nn.set(0,0,0);for(let j=0;j<3;j++)nn.addScaledVector(point(normals,t.indices[j],q),bary.getComponent(j));if(normal.dot(nn)<0)normal.negate();result={point:near.clone(),normal:normal.clone(),distance:Math.sqrt(d),signedDistance:input.clone().sub(near).dot(normal),triangleId:t.id,indices:t.indices.slice(),weights:bary.toArray(),part:t.part,surfaceKind:R008_SOURCE_SHORTS_PARTS.includes(t.part)?'existing-source-clothing':'source-skin',revision};}}else{lazyBounds(node.left);lazyBounds(node.right);const l=boxDistance(node.left.box,input),r=boxDistance(node.right.box,input);visit(l<r?node.left:node.right);visit(l<r?node.right:node.left);}}
+  visit(bvh);if(result){
+   const feature=featureNormal(result),delta=input.clone().sub(result.point),projection=delta.dot(feature.normal),sign=projection<0?-1:1;
+   const projectionRoundoff=64*Number.EPSILON*(result.distance+input.length()+result.point.length());
+   result.nearestFaceProjectionM=result.signedDistance;result.feature={...feature,normal:feature.normal.clone()};result.signAmbiguous=feature.ambiguous||(result.distance>1e-12&&Math.abs(projection)<=projectionRoundoff);result.signProjectionRoundoffM=projectionRoundoff;
+   result.pseudonormalProjectionM=projection;result.signedDistance=sign*result.distance;
+   // Sign belongs to the closest FEATURE; distance is Euclidean, not a
+   // possibly tiny one-face projection of a far edge/vertex query. For a
+   // nonzero distance, the local signed-distance gradient is radial.
+   result.normal=result.distance>1e-12?delta.multiplyScalar(sign/result.distance):feature.normal.clone();
+   const prior=V();for(let j=0;j<3;j++){const i=result.indices[j];if(previousVertexRevision[i]!==revision)skin(i,false,true);prior.addScaledVector(point(previous,i),result.weights[j]);}result.previousPoint=prior;result.velocity=poseDeltaTime!==null?result.point.clone().sub(prior).divideScalar(poseDeltaTime):V();result.velocityValid=poseDeltaTime!==null;result.poseDeltaTime=poseDeltaTime;result.poseTimes={previous:previousTime,current:lastTime};}return result;
+ }
+ function collide(position,margin=.004){if(!(margin>=0&&Number.isFinite(margin)))throw Error('Contact margin must be finite metres');const hit=closestPoint(position);if(hit?.signAmbiguous)throw Error('HOLD: degenerate closest-feature contact pseudonormal');if(!hit||hit.signedDistance>=margin)return null;return {...hit,surfacePoint:hit.point.clone(),point:hit.point.clone().addScaledVector(hit.normal,margin),penetration:margin-hit.signedDistance,marginM:margin};}
  function sectionAt(y,{partIds=null,toleranceM=.00001,angularSamples=360,center=null}={}){
   materialize();
   if(!partIds&&measurements?.crotchY!==null&&measurements?.crotchY!==undefined&&y<measurements.crotchY){const a=sectionAt(y,{partIds:[9,1,26],toleranceM,angularSamples}),b=sectionAt(y,{partIds:[19,18,12],toleranceM,angularSamples}),cs=[...a.contours,...b.contours];return {y,contours:cs,sourceContours:[...a.sourceContours,...b.sourceContours],distinctLegs:true,valid:a.valid&&b.valid,closed:a.valid&&b.valid,missingRays:a.missingRays+b.missingRays,branchNodes:a.branchNodes+b.branchNodes,angularSamples,scope:'two independent actual generated leg envelopes; gap preserved',innerThighGapM:a.bounds&&b.bounds?a.bounds.min[0]-b.bounds.max[0]:null};}
