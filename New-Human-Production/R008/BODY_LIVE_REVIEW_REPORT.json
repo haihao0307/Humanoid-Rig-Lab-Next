@@ -1,0 +1,654 @@
+{
+  "schema": "human-r008/body-live-review@1",
+  "date": "2026-10-02T09:28:57.173Z",
+  "sourceHashes": {
+    "BodyParameters.mjs": "0ffdc5707c487de9b06b7a39220919b2ca5cbd96cd0963d4c7cc31e534fdc829",
+    "BodyBinding.mjs": "8c7524899d19c80a2e55217ab5d1c3b6ac10000868d0ba9a9f129bb7edf93477",
+    "BodyWorkbench.mjs": "85fde0057cd495d54b15b04c07512d8b52b6ba966bd14bb0e47b5b55f900de49",
+    "app.mjs": "4ea2e3d23bf019f2f515c9cc83315b447584dfce8ca8bd2c98004bf5b270f155",
+    "GameAnimator.mjs": "2b09b84cd253d39cf3f96ce6a5789bfb23f100c784162546c5ae6f418397d199",
+    "JumpProfiles.mjs": "34ed2da6f1b6fa6d1c357684f8f739f0cffdb279f47d5b45d4683162fe0bbb40",
+    "CharacterController.mjs": "5aaef1f8425a965b869c1cd3a9dbc2075d250d8ec88f4da6c112d8a6d57ec328",
+    "SubjectRuntime.mjs": "6208abea58bb8134f311e7055c9993d12d4a03537c377172538bf1dff3b18988"
+  },
+  "parameterPackage": {
+    "bytes": 15424996,
+    "sha256": "0f801bc60163a968aef8a647b2a9b472279236dc63d5b81d5c320654141333e2"
+  },
+  "variants": [
+    {
+      "name": "reference",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 0,
+        "muscle": 0,
+        "age": 32
+      },
+      "body": {
+        "scale": 1,
+        "height": 1.8,
+        "radius": 0.25,
+        "armClearance": 0,
+        "ageAmount": 0,
+        "effectiveMuscle": 0,
+        "variationVersion": 2,
+        "cacheBytes": 0,
+        "minimumJacobian": 0.9999999999998579,
+        "maximumOffsetMetres": 0,
+        "jacobianSamples": 513,
+        "geometryEvaluation": "shared-function-gpu-uniforms"
+      },
+      "seamMaxMetres": 0,
+      "glError": 0
+    },
+    {
+      "name": "fuller",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 1,
+        "muscle": 0,
+        "age": 32
+      },
+      "body": {
+        "scale": 1,
+        "height": 1.8,
+        "radius": 0.33999999999999997,
+        "armClearance": 0.19,
+        "ageAmount": 0,
+        "effectiveMuscle": 0,
+        "variationVersion": 2,
+        "cacheBytes": 0,
+        "minimumJacobian": 0.6838419181255805,
+        "maximumOffsetMetres": 0.16953464079563307,
+        "jacobianSamples": 513,
+        "geometryEvaluation": "shared-function-gpu-uniforms"
+      },
+      "seamMaxMetres": 0,
+      "glError": 0
+    },
+    {
+      "name": "lean",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -1,
+        "muscle": 0,
+        "age": 32
+      },
+      "body": {
+        "scale": 1,
+        "height": 1.8,
+        "radius": 0.25,
+        "armClearance": 0,
+        "ageAmount": 0,
+        "effectiveMuscle": 0,
+        "variationVersion": 2,
+        "cacheBytes": 0,
+        "minimumJacobian": 0.2695371736178166,
+        "maximumOffsetMetres": 0.08035427669364173,
+        "jacobianSamples": 513,
+        "geometryEvaluation": "shared-function-gpu-uniforms"
+      },
+      "seamMaxMetres": 0,
+      "glError": 0
+    },
+    {
+      "name": "muscular",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 0,
+        "muscle": 1,
+        "age": 32
+      },
+      "body": {
+        "scale": 1,
+        "height": 1.8,
+        "radius": 0.295,
+        "armClearance": 0.13,
+        "ageAmount": 0,
+        "effectiveMuscle": 1,
+        "variationVersion": 2,
+        "cacheBytes": 0,
+        "minimumJacobian": 0.8563630367344419,
+        "maximumOffsetMetres": 0.10370791470581356,
+        "jacobianSamples": 513,
+        "geometryEvaluation": "shared-function-gpu-uniforms"
+      },
+      "seamMaxMetres": 0,
+      "glError": 0
+    },
+    {
+      "name": "young",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 0,
+        "muscle": 0.6,
+        "age": 20
+      },
+      "body": {
+        "scale": 1,
+        "height": 1.8,
+        "radius": 0.26934868804664724,
+        "armClearance": 0.055896209912536444,
+        "ageAmount": 0,
+        "effectiveMuscle": 0.4299708454810496,
+        "variationVersion": 2,
+        "cacheBytes": 0,
+        "minimumJacobian": 0.9418062266600195,
+        "maximumOffsetMetres": 0.03849222397940858,
+        "jacobianSamples": 513,
+        "geometryEvaluation": "shared-function-gpu-uniforms"
+      },
+      "seamMaxMetres": 0,
+      "glError": 0
+    },
+    {
+      "name": "older",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 0,
+        "muscle": 0.6,
+        "age": 75
+      },
+      "body": {
+        "scale": 1,
+        "height": 1.8,
+        "radius": 0.25,
+        "armClearance": 0,
+        "ageAmount": 1,
+        "effectiveMuscle": 0,
+        "variationVersion": 2,
+        "cacheBytes": 0,
+        "minimumJacobian": 0.8463421064625998,
+        "maximumOffsetMetres": 0.006596862545146173,
+        "jacobianSamples": 513,
+        "geometryEvaluation": "shared-function-gpu-uniforms"
+      },
+      "seamMaxMetres": 0,
+      "glError": 0
+    }
+  ],
+  "extremes": [
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -1,
+        "muscle": -1,
+        "age": 18
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.1362517500220335,
+      "maxOffsetMetres": 0.10378296018157036
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -1,
+        "muscle": 1,
+        "age": 18
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.25655009476758195,
+      "maxOffsetMetres": 0.08382018236328999
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 1,
+        "muscle": -1,
+        "age": 18
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.8020708024702086,
+      "maxOffsetMetres": 0.16232812893380524
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 1,
+        "muscle": 1,
+        "age": 18
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.5402566531144465,
+      "maxOffsetMetres": 0.29064866750683116
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -1,
+        "muscle": -1,
+        "age": 32
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.1381608367938891,
+      "maxOffsetMetres": 0.10335342892738274
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -1,
+        "muscle": 1,
+        "age": 32
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.25655009476758195,
+      "maxOffsetMetres": 0.08382018236328999
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 1,
+        "muscle": -1,
+        "age": 32
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.7998563773792778,
+      "maxOffsetMetres": 0.16232812893380524
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 1,
+        "muscle": 1,
+        "age": 32
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.4997957147180213,
+      "maxOffsetMetres": 0.3354648069975951
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -1,
+        "muscle": -1,
+        "age": 75
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.12693187457069313,
+      "maxOffsetMetres": 0.10589244289476998
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -1,
+        "muscle": 1,
+        "age": 75
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.25655009476758195,
+      "maxOffsetMetres": 0.08382018236328999
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 1,
+        "muscle": -1,
+        "age": 75
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.7931157333126307,
+      "maxOffsetMetres": 0.16232812893380524
+    },
+    {
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": 1,
+        "muscle": 1,
+        "age": 75
+      },
+      "vertices": 807557,
+      "minimumJacobian": 0.6307465746600214,
+      "maxOffsetMetres": 0.21094490574799749
+    }
+  ],
+  "cpuGpu": {
+    "samples": 810,
+    "recipes": 8,
+    "maxErrorMetres": 1.335036314284902e-7,
+    "glError": 0
+  },
+  "live": {
+    "frames": 31,
+    "medianInputToApplyMilliseconds": 14.899999976158142,
+    "p95InputToApplyMilliseconds": 15.399999976158142,
+    "maxMilliseconds": 15.5,
+    "rapidInputs": 120,
+    "lastRecipe": {
+      "schema": "human-r008/body@1",
+      "height": 1.8,
+      "fatness": 1,
+      "muscle": 1,
+      "age": 19
+    },
+    "persisted": {
+      "schema": "human-r008/body@1",
+      "height": 1.8,
+      "fatness": 1,
+      "muscle": 1,
+      "age": 19
+    },
+    "disabled": 0
+  },
+  "eyes": {
+    "maxRimBodyOffsetMetres": 0,
+    "tested": 54,
+    "globeFirst": 0,
+    "missed": 0
+  },
+  "motion": [
+    {
+      "name": "fuller",
+      "mode": "idle",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.6,
+        "fatness": 1,
+        "muscle": 0,
+        "age": 50
+      },
+      "phase": "idle",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "fuller",
+      "mode": "walk",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.6,
+        "fatness": 1,
+        "muscle": 0,
+        "age": 50
+      },
+      "phase": "walk",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "fuller",
+      "mode": "run",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.6,
+        "fatness": 1,
+        "muscle": 0,
+        "age": 50
+      },
+      "phase": "run",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "fuller",
+      "mode": "jump",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.6,
+        "fatness": 1,
+        "muscle": 0,
+        "age": 50
+      },
+      "phase": "flight",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "muscular",
+      "mode": "idle",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 2.05,
+        "fatness": 0,
+        "muscle": 1,
+        "age": 32
+      },
+      "phase": "idle",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "muscular",
+      "mode": "walk",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 2.05,
+        "fatness": 0,
+        "muscle": 1,
+        "age": 32
+      },
+      "phase": "walk",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "muscular",
+      "mode": "run",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 2.05,
+        "fatness": 0,
+        "muscle": 1,
+        "age": 32
+      },
+      "phase": "run",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "muscular",
+      "mode": "jump",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 2.05,
+        "fatness": 0,
+        "muscle": 1,
+        "age": 32
+      },
+      "phase": "flight",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "older",
+      "mode": "idle",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -0.5,
+        "muscle": 0.6,
+        "age": 75
+      },
+      "phase": "idle",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "older",
+      "mode": "walk",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -0.5,
+        "muscle": 0.6,
+        "age": 75
+      },
+      "phase": "walk",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "older",
+      "mode": "run",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -0.5,
+        "muscle": 0.6,
+        "age": 75
+      },
+      "phase": "run",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    },
+    {
+      "name": "older",
+      "mode": "jump",
+      "recipe": {
+        "schema": "human-r008/body@1",
+        "height": 1.8,
+        "fatness": -0.5,
+        "muscle": 0.6,
+        "age": 75
+      },
+      "phase": "flight",
+      "posedSeamMaxMetres": 0,
+      "finite": true,
+      "glError": 0
+    }
+  ],
+  "checks": {
+    "precisionChangePreservesBody": true,
+    "reloadRestoresBody": true,
+    "invalid": {
+      "rejected": true,
+      "atomic": true,
+      "cacheBytes": 0
+    },
+    "ownShapeCacheBytes": 0,
+    "bodyContractsPassed": 9,
+    "controllerContractsPassed": 12,
+    "jumpContractsPassed": 13,
+    "skinContractsPassed": 10,
+    "scarContractsPassed": 11
+  },
+  "captures": [
+    {
+      "file": "qa/body-live-r19/reference.png",
+      "sha256": "1899917c6491609dddb3d873f94b3880d4aa5711f8ef035f218f90fd17a7e17f"
+    },
+    {
+      "file": "qa/body-live-r19/fuller.png",
+      "sha256": "b82b5147dcbc307ee66fc0fe36e30773be5549a07ea0c84fafd305225fcc2672"
+    },
+    {
+      "file": "qa/body-live-r19/fuller-face.png",
+      "sha256": "63557836474c62a25f21aca9f69a442d7cc6b1f884a4c600021c3aca768c5ba9"
+    },
+    {
+      "file": "qa/body-live-r19/lean.png",
+      "sha256": "2b4f3212122db8870ff3eeddabf6e4850ebfdd3bf9dfa6038acfbd0bd4f61a52"
+    },
+    {
+      "file": "qa/body-live-r19/lean-face.png",
+      "sha256": "f81a95d61781eb78162a49a5ee332f743f77aca4f06bdbfed7d42b256d9caab6"
+    },
+    {
+      "file": "qa/body-live-r19/muscular.png",
+      "sha256": "a0224a68ea3fac1005bd5774f5f6012b652f7b1326e00e67e82e43211861bb6f"
+    },
+    {
+      "file": "qa/body-live-r19/young.png",
+      "sha256": "ac1b4cd95d0a61fc9f0f66fabce850ef182fa130c9aa63d23ebcabb34a4119f1"
+    },
+    {
+      "file": "qa/body-live-r19/young-face.png",
+      "sha256": "237cdc8203dec2962883f24aa44cb94ad1de4b2a26cb4bbdfb00557d1b853a4c"
+    },
+    {
+      "file": "qa/body-live-r19/older.png",
+      "sha256": "f5eb89db6cb172ac3de08c03c4ed6c368977a8c8c7062557731c957bcf79df78"
+    },
+    {
+      "file": "qa/body-live-r19/older-face.png",
+      "sha256": "59a8c66b1d1164ad8e07b3257ee3d40261b85ca0154edc152dcf44a27ba274ca"
+    },
+    {
+      "file": "qa/body-live-r19/fuller-idle.png",
+      "sha256": "1986bd127b756b1ee396a146fa0c417f52d7fabd3b7624ddbba82a4cc31d2f4b"
+    },
+    {
+      "file": "qa/body-live-r19/fuller-walk.png",
+      "sha256": "b9b0c42f97d23e9a3a508b70343fec50f2756ba0f865b7be2adb67da1dbc07a7"
+    },
+    {
+      "file": "qa/body-live-r19/fuller-run.png",
+      "sha256": "d160340f49061f100ceb908f233e3cb34c8fed9d72c7aae93bc393726ebef4a3"
+    },
+    {
+      "file": "qa/body-live-r19/fuller-jump.png",
+      "sha256": "9a34616a0f1b571bec9e1abe96ef19f207b5335f67a699611ef8aafdba759253"
+    },
+    {
+      "file": "qa/body-live-r19/muscular-idle.png",
+      "sha256": "2b38a1c76c0fc84e234045e2532a4ba11a9a47a043cd3b4893de66cf3db4038c"
+    },
+    {
+      "file": "qa/body-live-r19/muscular-walk.png",
+      "sha256": "65096ec4759acd529eadf24a48dc04246d9ce72ed1f3f279f58800ab45b33676"
+    },
+    {
+      "file": "qa/body-live-r19/muscular-run.png",
+      "sha256": "6726b1955930284a1ac4d703824b97950551c6e953f7e0112fb0510f1aec7ed2"
+    },
+    {
+      "file": "qa/body-live-r19/muscular-jump.png",
+      "sha256": "c0eb653ca5b9edf2eba1b928ddfef6cd422a2d7ddb5ecff3d8b4ad058ab81c7e"
+    },
+    {
+      "file": "qa/body-live-r19/older-idle.png",
+      "sha256": "679f794b2eb1402c254e32150e9fc6e39aadfd09dd1f31a85767dc721a99c730"
+    },
+    {
+      "file": "qa/body-live-r19/older-walk.png",
+      "sha256": "c3c5e2d0fd7bf822e68d28b53050f0db6d18e24b9f65e68b0f82bb501df83e0b"
+    },
+    {
+      "file": "qa/body-live-r19/older-run.png",
+      "sha256": "7611acd98e5beed22bde860fd2bae9563a64e4fbac60d1765b262cdc43916d72"
+    },
+    {
+      "file": "qa/body-live-r19/older-jump.png",
+      "sha256": "aa41ef22d80e18a7d015f97f8b5459bcdcee97c3a944eea6569b585e675663ed"
+    },
+    {
+      "file": "qa/body-live-r19/comparison.png",
+      "sha256": "45ed462786480b6c9b2e75b5ce78c8621b293fb574e708af5dbb68ff4c798354"
+    },
+    {
+      "file": "qa/body-live-r19/workbench.png",
+      "sha256": "4ad7a87847c060376489e0d14143060190c9282f5c90fed98dc2aa2ad16000d7"
+    }
+  ],
+  "errors": [],
+  "candidate": true,
+  "populationCalibration": false
+}
