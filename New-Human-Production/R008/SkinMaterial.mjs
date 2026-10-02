@@ -39,10 +39,11 @@ export function createSkinMaterialBinding({mesh,eyes}){
  mesh.geometry.setAttribute('skinRest',new THREE.BufferAttribute(mesh.geometry.attributes.position.array.slice(),3));
  function attach(material,head=false){
   const previous=material.onBeforeCompile,key=material.customProgramCacheKey.bind(material),surface={value:new THREE.Vector4(0,0,0,head?1:0)};
+  const roughnessHook=material.userData.lidSurface?'// lid surface ready':'#include <roughnessmap_fragment>';
   material.onBeforeCompile=shader=>{
    previous(shader);Object.assign(shader.uniforms,uniforms,{skinSurface:surface});
    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute vec3 skinRest; varying vec3 vSkinRest;').replace('#include <begin_vertex>','#include <begin_vertex>\nvSkinRest=skinRest;');
-   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\n'+FUNCTIONS).replace('#include <color_fragment>','#include <color_fragment>\nfloat skinCoverage=skinMask(diffuseColor.rgb);\ndiffuseColor.rgb=skinColour(diffuseColor.rgb,skinCoverage);').replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\nroughnessFactor=clamp(roughnessFactor+skinCoverage*(skinSurface.x-.18*skinSurface.y+.11*skinSurface.z*skinSun(vSkinRest)),0.,1.);');
+   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\n'+FUNCTIONS).replace('#include <color_fragment>','#include <color_fragment>\nfloat skinCoverage=skinMask(diffuseColor.rgb);\ndiffuseColor.rgb=skinColour(diffuseColor.rgb,skinCoverage);').replace(roughnessHook,roughnessHook+'\nroughnessFactor=clamp(roughnessFactor+skinCoverage*(skinSurface.x-.18*skinSurface.y+.11*skinSurface.z*skinSun(vSkinRest)),0.,1.);');
   };
   const previousKey=key();material.customProgramCacheKey=()=>previousKey+'|r008-skin-v1|'+Number(head);material.needsUpdate=true;bound.push({material,surface});
  }
