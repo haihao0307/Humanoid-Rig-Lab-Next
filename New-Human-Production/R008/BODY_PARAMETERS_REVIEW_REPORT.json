@@ -1,0 +1,615 @@
+{
+  "version": "R008-body-18",
+  "date": "2026-10-02T08:01:31.977Z",
+  "sourceHashes": {
+    "BodyParameters.mjs": "b0343c2488cba9dbbdae7889d15d4351653286b3cf1a63a4e3d187351b70c299",
+    "BodyBinding.mjs": "9d0303267ba181b14fcf8a44c71e61b2219995360877f27ae8f2a28183c1f6b9",
+    "BodyWorkbench.mjs": "1270d945285071b7bd6f090886d7cae139063008675ef36fa756d7e929f9ecb6",
+    "GameAnimator.mjs": "2b09b84cd253d39cf3f96ce6a5789bfb23f100c784162546c5ae6f418397d199",
+    "JumpProfiles.mjs": "34ed2da6f1b6fa6d1c357684f8f739f0cffdb279f47d5b45d4683162fe0bbb40",
+    "CharacterController.mjs": "5aaef1f8425a965b869c1cd3a9dbc2075d250d8ec88f4da6c112d8a6d57ec328",
+    "SubjectRuntime.mjs": "6208abea58bb8134f311e7055c9993d12d4a03537c377172538bf1dff3b18988",
+    "FacialWorkbench.mjs": "266f942da8a814ab58da6862abe5538860ad7695e9ad35dca398b0d0299e18c2",
+    "app.mjs": "65dcae99e1747c167c820285ff44aab70a7b5dd09d305d32282200cbeba377e8"
+  },
+  "parameterPackage": {
+    "bytes": 15424996,
+    "sha256": "0f801bc60163a968aef8a647b2a9b472279236dc63d5b81d5c320654141333e2",
+    "unchanged": true,
+    "sourceModelAtRuntime": false
+  },
+  "controls": {
+    "heightMetres": [
+      1.6,
+      2.05
+    ],
+    "fatness": [
+      -1,
+      1
+    ],
+    "muscle": [
+      -1,
+      1
+    ],
+    "adultAgeAppearance": [
+      18,
+      75
+    ],
+    "neutralAgeAppearance": 32,
+    "persistence": "recipe-only; runtime deformation buffers discarded"
+  },
+  "variants": {
+    "date": "2026-10-02T07:57:52.698Z",
+    "variants": [
+      {
+        "recipe": {
+          "schema": "human-r008/body@1",
+          "height": 1.8,
+          "fatness": 0,
+          "muscle": 0,
+          "age": 32
+        },
+        "body": {
+          "scale": 1,
+          "height": 1.8,
+          "radius": 0.25,
+          "armClearance": 0,
+          "ageAmount": 0,
+          "cacheBytes": 38762736,
+          "minimumJacobian": 1,
+          "maximumOffsetMetres": 0
+        },
+        "heightFromRestBounds": 1.7997083926238702,
+        "maxSeamMetres": 0,
+        "collision": {
+          "walkSpeed": 1.65,
+          "runSpeed": 4.2,
+          "gravity": 20,
+          "jumpHeight": 1.02,
+          "radius": 0.25,
+          "height": 1.8,
+          "stepHeight": 0.2,
+          "anticipation": 0.3,
+          "landingDuration": 0.36,
+          "coyoteTime": 0.09,
+          "jumpBuffer": 0.14
+        },
+        "gpuVertexAttributes": 16,
+        "glError": 0,
+        "applyMilliseconds": 61
+      },
+      {
+        "recipe": {
+          "schema": "human-r008/body@1",
+          "height": 1.8,
+          "fatness": 0,
+          "muscle": 0,
+          "age": 20
+        },
+        "body": {
+          "scale": 1,
+          "height": 1.8,
+          "radius": 0.25,
+          "armClearance": 0,
+          "ageAmount": 0,
+          "cacheBytes": 38762736,
+          "minimumJacobian": 0.9445670705261022,
+          "maximumOffsetMetres": 0.0013765107771395095
+        },
+        "heightFromRestBounds": 1.7997083926238702,
+        "maxSeamMetres": 0,
+        "collision": {
+          "walkSpeed": 1.65,
+          "runSpeed": 4.2,
+          "gravity": 20,
+          "jumpHeight": 1.02,
+          "radius": 0.25,
+          "height": 1.8,
+          "stepHeight": 0.2,
+          "anticipation": 0.3,
+          "landingDuration": 0.36,
+          "coyoteTime": 0.09,
+          "jumpBuffer": 0.14
+        },
+        "gpuVertexAttributes": 16,
+        "glError": 0,
+        "applyMilliseconds": 486
+      },
+      {
+        "recipe": {
+          "schema": "human-r008/body@1",
+          "height": 1.8,
+          "fatness": -0.65,
+          "muscle": -0.35,
+          "age": 25
+        },
+        "body": {
+          "scale": 1,
+          "height": 1.8,
+          "radius": 0.25,
+          "armClearance": 0,
+          "ageAmount": 0,
+          "cacheBytes": 38762736,
+          "minimumJacobian": 0.7230564952689741,
+          "maximumOffsetMetres": 0.023133776056040032
+        },
+        "heightFromRestBounds": 1.7997083926238702,
+        "maxSeamMetres": 0,
+        "collision": {
+          "walkSpeed": 1.65,
+          "runSpeed": 4.2,
+          "gravity": 20,
+          "jumpHeight": 1.02,
+          "radius": 0.25,
+          "height": 1.8,
+          "stepHeight": 0.2,
+          "anticipation": 0.3,
+          "landingDuration": 0.36,
+          "coyoteTime": 0.09,
+          "jumpBuffer": 0.14
+        },
+        "gpuVertexAttributes": 16,
+        "glError": 0,
+        "applyMilliseconds": 437
+      },
+      {
+        "recipe": {
+          "schema": "human-r008/body@1",
+          "height": 1.88,
+          "fatness": -0.25,
+          "muscle": 0.85,
+          "age": 32
+        },
+        "body": {
+          "scale": 1.0444444444444443,
+          "height": 1.88,
+          "radius": 0.27886666666666665,
+          "armClearance": 0.03825,
+          "ageAmount": 0,
+          "cacheBytes": 38762736,
+          "minimumJacobian": 0.8437045250255317,
+          "maximumOffsetMetres": 0.019888449281965107
+        },
+        "heightFromRestBounds": 1.879695432296042,
+        "maxSeamMetres": 0,
+        "collision": {
+          "walkSpeed": 1.65,
+          "runSpeed": 4.2,
+          "gravity": 20,
+          "jumpHeight": 1.0653333333333332,
+          "radius": 0.27886666666666665,
+          "height": 1.88,
+          "stepHeight": 0.2,
+          "anticipation": 0.3,
+          "landingDuration": 0.36,
+          "coyoteTime": 0.09,
+          "jumpBuffer": 0.14
+        },
+        "gpuVertexAttributes": 16,
+        "glError": 0,
+        "applyMilliseconds": 455
+      },
+      {
+        "recipe": {
+          "schema": "human-r008/body@1",
+          "height": 1.75,
+          "fatness": 0.8,
+          "muscle": -0.15,
+          "age": 45
+        },
+        "body": {
+          "scale": 0.9722222222222222,
+          "height": 1.75,
+          "radius": 0.27416666666666667,
+          "armClearance": 0.05600000000000001,
+          "ageAmount": 0.21893669739771338,
+          "cacheBytes": 38762736,
+          "minimumJacobian": 0.7415160554835427,
+          "maximumOffsetMetres": 0.043803600316075796
+        },
+        "heightFromRestBounds": 1.7497164928287627,
+        "maxSeamMetres": 0,
+        "collision": {
+          "walkSpeed": 1.65,
+          "runSpeed": 4.2,
+          "gravity": 20,
+          "jumpHeight": 0.9916666666666667,
+          "radius": 0.27416666666666667,
+          "height": 1.75,
+          "stepHeight": 0.2,
+          "anticipation": 0.3,
+          "landingDuration": 0.36,
+          "coyoteTime": 0.09,
+          "jumpBuffer": 0.14
+        },
+        "gpuVertexAttributes": 16,
+        "glError": 0,
+        "applyMilliseconds": 433
+      },
+      {
+        "recipe": {
+          "schema": "human-r008/body@1",
+          "height": 1.8,
+          "fatness": 0.15,
+          "muscle": -0.3,
+          "age": 68
+        },
+        "body": {
+          "scale": 1,
+          "height": 1.8,
+          "radius": 0.256,
+          "armClearance": 0.0105,
+          "ageAmount": 0.9291257373564592,
+          "cacheBytes": 38762736,
+          "minimumJacobian": 0.8518441187655682,
+          "maximumOffsetMetres": 0.00821317482643356
+        },
+        "heightFromRestBounds": 1.7997083926238702,
+        "maxSeamMetres": 0,
+        "collision": {
+          "walkSpeed": 1.65,
+          "runSpeed": 4.2,
+          "gravity": 20,
+          "jumpHeight": 1.02,
+          "radius": 0.256,
+          "height": 1.8,
+          "stepHeight": 0.2,
+          "anticipation": 0.3,
+          "landingDuration": 0.36,
+          "coyoteTime": 0.09,
+          "jumpBuffer": 0.14
+        },
+        "gpuVertexAttributes": 16,
+        "glError": 0,
+        "applyMilliseconds": 442
+      }
+    ],
+    "jumps": [
+      {
+        "style": "cmu-forward",
+        "peakPreparationElbowRadians": 0.8913625064703884,
+        "peakAirborneElbowRadians": 1.2469417413769126,
+        "maximumArmStepRadians": 0.1108757768987163
+      },
+      {
+        "style": "cmu-athletic",
+        "peakPreparationElbowRadians": 0.8912454332473684,
+        "peakAirborneElbowRadians": 1.236819767307097,
+        "maximumArmStepRadians": 0.1109029385477487
+      },
+      {
+        "style": "cmu-running",
+        "peakPreparationElbowRadians": 0.8943749441473533,
+        "peakAirborneElbowRadians": 1.2051318233629011,
+        "maximumArmStepRadians": 0.11116821876585031
+      }
+    ],
+    "checks": {
+      "skinHealingPreserved": true,
+      "recipeBytes": 75,
+      "reloadRestoresBody": true
+    },
+    "errors": [],
+    "sourceHashes": {
+      "BodyParameters.mjs": "b0343c2488cba9dbbdae7889d15d4351653286b3cf1a63a4e3d187351b70c299",
+      "BodyBinding.mjs": "9d0303267ba181b14fcf8a44c71e61b2219995360877f27ae8f2a28183c1f6b9",
+      "BodyWorkbench.mjs": "1270d945285071b7bd6f090886d7cae139063008675ef36fa756d7e929f9ecb6",
+      "GameAnimator.mjs": "2b09b84cd253d39cf3f96ce6a5789bfb23f100c784162546c5ae6f418397d199",
+      "JumpProfiles.mjs": "34ed2da6f1b6fa6d1c357684f8f739f0cffdb279f47d5b45d4683162fe0bbb40",
+      "CharacterController.mjs": "5aaef1f8425a965b869c1cd3a9dbc2075d250d8ec88f4da6c112d8a6d57ec328",
+      "SubjectRuntime.mjs": "6208abea58bb8134f311e7055c9993d12d4a03537c377172538bf1dff3b18988",
+      "app.mjs": "65dcae99e1747c167c820285ff44aab70a7b5dd09d305d32282200cbeba377e8"
+    }
+  },
+  "extremes": {
+    "date": "2026-10-02T07:51:05.197Z",
+    "extremes": [
+      {
+        "height": 1.6,
+        "fatness": -1,
+        "muscle": -1,
+        "scale": 0.888888888888889,
+        "radius": 0.22222222222222224,
+        "armClearance": 0,
+        "ageAmount": 1,
+        "cacheBytes": 38762736,
+        "minimumJacobian": 0.42587584934672784,
+        "maximumOffsetMetres": 0.03559042269567449
+      },
+      {
+        "height": 1.6,
+        "fatness": -1,
+        "muscle": 1,
+        "scale": 0.888888888888889,
+        "radius": 0.24000000000000002,
+        "armClearance": 0.045,
+        "ageAmount": 1,
+        "cacheBytes": 38762736,
+        "minimumJacobian": 0.7002162359018674,
+        "maximumOffsetMetres": 0.03559042269567449
+      },
+      {
+        "height": 1.6,
+        "fatness": 1,
+        "muscle": -1,
+        "scale": 0.888888888888889,
+        "radius": 0.2577777777777778,
+        "armClearance": 0.07,
+        "ageAmount": 1,
+        "cacheBytes": 38762736,
+        "minimumJacobian": 0.6733060497107741,
+        "maximumOffsetMetres": 0.05475449760112694
+      },
+      {
+        "height": 1.6,
+        "fatness": 1,
+        "muscle": 1,
+        "scale": 0.888888888888889,
+        "radius": 0.27555555555555555,
+        "armClearance": 0.115,
+        "ageAmount": 1,
+        "cacheBytes": 38762736,
+        "minimumJacobian": 0.6733060497107741,
+        "maximumOffsetMetres": 0.05475449760112694
+      },
+      {
+        "height": 2.05,
+        "fatness": -1,
+        "muscle": -1,
+        "scale": 1.1388888888888888,
+        "radius": 0.2847222222222222,
+        "armClearance": 0,
+        "ageAmount": 1,
+        "cacheBytes": 38762736,
+        "minimumJacobian": 0.42587584934672784,
+        "maximumOffsetMetres": 0.03559042269567449
+      },
+      {
+        "height": 2.05,
+        "fatness": -1,
+        "muscle": 1,
+        "scale": 1.1388888888888888,
+        "radius": 0.3075,
+        "armClearance": 0.045,
+        "ageAmount": 1,
+        "cacheBytes": 38762736,
+        "minimumJacobian": 0.7002162359018674,
+        "maximumOffsetMetres": 0.03559042269567449
+      },
+      {
+        "height": 2.05,
+        "fatness": 1,
+        "muscle": -1,
+        "scale": 1.1388888888888888,
+        "radius": 0.3302777777777777,
+        "armClearance": 0.07,
+        "ageAmount": 1,
+        "cacheBytes": 38762736,
+        "minimumJacobian": 0.6733060497107741,
+        "maximumOffsetMetres": 0.05475449760112694
+      },
+      {
+        "height": 2.05,
+        "fatness": 1,
+        "muscle": 1,
+        "scale": 1.1388888888888888,
+        "radius": 0.3530555555555555,
+        "armClearance": 0.115,
+        "ageAmount": 1,
+        "cacheBytes": 38762736,
+        "minimumJacobian": 0.6733060497107741,
+        "maximumOffsetMetres": 0.05475449760112694
+      }
+    ],
+    "motion": [
+      {
+        "height": 1.6,
+        "mode": "idle",
+        "phase": "idle",
+        "speed": 0,
+        "posedSeamMaxMetres": 0,
+        "finite": true,
+        "grounded": true
+      },
+      {
+        "height": 1.6,
+        "mode": "walk",
+        "phase": "walk",
+        "speed": 1.624119503106165,
+        "posedSeamMaxMetres": 0,
+        "finite": true,
+        "grounded": true
+      },
+      {
+        "height": 1.6,
+        "mode": "run",
+        "phase": "run",
+        "speed": 4.08560426844236,
+        "posedSeamMaxMetres": 0,
+        "finite": true,
+        "grounded": true
+      },
+      {
+        "height": 1.6,
+        "mode": "jump",
+        "phase": "flight",
+        "speed": 0,
+        "posedSeamMaxMetres": 0,
+        "finite": true,
+        "grounded": false
+      },
+      {
+        "height": 2.05,
+        "mode": "idle",
+        "phase": "idle",
+        "speed": 0,
+        "posedSeamMaxMetres": 0,
+        "finite": true,
+        "grounded": true
+      },
+      {
+        "height": 2.05,
+        "mode": "walk",
+        "phase": "walk",
+        "speed": 1.624119503106165,
+        "posedSeamMaxMetres": 0,
+        "finite": true,
+        "grounded": true
+      },
+      {
+        "height": 2.05,
+        "mode": "run",
+        "phase": "run",
+        "speed": 4.08560426844236,
+        "posedSeamMaxMetres": 0,
+        "finite": true,
+        "grounded": true
+      },
+      {
+        "height": 2.05,
+        "mode": "jump",
+        "phase": "flight",
+        "speed": 0,
+        "posedSeamMaxMetres": 0,
+        "finite": true,
+        "grounded": false
+      }
+    ],
+    "airborneEditRejected": true,
+    "precisionChangePreservesBody": true,
+    "invalid": {
+      "rejected": true,
+      "atomic": true,
+      "glError": 0
+    },
+    "errors": [],
+    "sourceHashes": {
+      "BodyParameters.mjs": "b0343c2488cba9dbbdae7889d15d4351653286b3cf1a63a4e3d187351b70c299",
+      "BodyBinding.mjs": "9d0303267ba181b14fcf8a44c71e61b2219995360877f27ae8f2a28183c1f6b9",
+      "BodyWorkbench.mjs": "1270d945285071b7bd6f090886d7cae139063008675ef36fa756d7e929f9ecb6",
+      "app.mjs": "65dcae99e1747c167c820285ff44aab70a7b5dd09d305d32282200cbeba377e8",
+      "GameAnimator.mjs": "2b09b84cd253d39cf3f96ce6a5789bfb23f100c784162546c5ae6f418397d199",
+      "JumpProfiles.mjs": "34ed2da6f1b6fa6d1c357684f8f739f0cffdb279f47d5b45d4683162fe0bbb40",
+      "CharacterController.mjs": "5aaef1f8425a965b869c1cd3a9dbc2075d250d8ec88f4da6c112d8a6d57ec328"
+    }
+  },
+  "eyes": {
+    "checks": {
+      "referenceAttachment": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "mode-left": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "mode-right": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "mode-up": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "mode-down": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "mode-closed": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "mode-leftClosed": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "mode-rightClosed": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "closedEyeOcclusion": {
+        "tested": 54,
+        "globeFirst": 0,
+        "missed": 0,
+        "maxSeamMetres": 0
+      },
+      "expression-smile": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "expression-frown": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "expression-browRaise": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "expression-leftWink": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "expression-rightWink": {
+        "maxMetres": 0.000035000927454428615,
+        "sharedLidMaterials": 4,
+        "finite": true
+      },
+      "darkSkinSharedMaterial": true,
+      "completeBlinkCycle": true
+    },
+    "errors": [],
+    "runtime": {
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti SUPER (0x00002689) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "glError": 0,
+      "averageEyeUpdateMilliseconds": 2.8700000017881395,
+      "eyeReport": {
+        "closure": 0,
+        "closures": [
+          0,
+          0
+        ],
+        "lidFollow": [
+          -4.6593477842824e-80,
+          -4.6593477842824e-80
+        ],
+        "gaze": [
+          -2.9739381524427415e-90,
+          -5.427329032075249e-79
+        ],
+        "mode": "centre",
+        "components": 6,
+        "generated": true,
+        "headRimSamples": 6053
+      }
+    }
+  },
+  "tests": {
+    "bodyContract": 7,
+    "controllerScenes": 12,
+    "jumpCurves": 13,
+    "skin": 10,
+    "scars": 11,
+    "build": "passed",
+    "fileAudit": "passed"
+  },
+  "limitations": [
+    "Adult art controls on one collected character; no population or physiological certification.",
+    "Height is a uniform scale, not a new limb-proportion rig.",
+    "Positive sampled Jacobians do not certify global absence of self-intersection.",
+    "Source material features remain inherited; no new identity, source texture or cloth simulation.",
+    "Geometry edits apply after landing; density regeneration rebinds the existing recipe."
+  ],
+  "evidenceDirectory": "qa/body-params-r18/"
+}

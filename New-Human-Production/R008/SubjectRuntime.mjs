@@ -6,6 +6,7 @@ import {materialTextures} from './material-fields.mjs';
 import {createFacialBinding} from './FacialBinding.mjs';
 import {createProceduralEyes} from './ProceduralEyes.mjs';
 import {createSkinMaterialBinding} from './SkinMaterial.mjs';
+import {createBodyBinding} from './BodyBinding.mjs';
 export async function loadSubjectParameters(url=new URL('./parameters.phf.gz',import.meta.url)){
  const compressed=await (await fetch(url)).arrayBuffer();const bytes=await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();const data=decodeParameters(bytes);if(data.schema!=='parametric-human-uv-fields/v2')throw Error('Wrong subject schema');data.packageBytes=compressed.byteLength;return data;
 }
@@ -86,7 +87,8 @@ export function createSubject(data,options={}){
  const eyes=createProceduralEyes({surface,mesh,byName,bindWorld,data});
  const skin=createSkinMaterialBinding({mesh,eyes});
  const scars=createScarSurface({mesh,surface,data,synchronize:createSeamSynchronizer(surface,geometry)});
- return {root,mesh,skeleton,mixer,clips,helper,surface,data,neutral,bindWorld,byName,face,eyes,skin,scars,play,locomotion,finishPose,
+ const body=createBodyBinding({mesh,eyes});
+ return {root,mesh,skeleton,mixer,clips,helper,surface,data,neutral,bindWorld,byName,face,eyes,skin,scars,body,play,locomotion,finishPose,
   command(text){const name=/跳/.test(text)?'jump':/跑/.test(text)?'run':/走|步/.test(text)?'walk':/看|环顾/.test(text)?'look_around':'rest';play(name);return {phase:name,authority:'authored-61-bone-curves'}},
   step(dt){
    root.position.sub(motionOffset);motionOffset.set(0,0,0);if(!paused)mixer.update(Math.min(dt,.1));

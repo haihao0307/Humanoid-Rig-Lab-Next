@@ -26,7 +26,10 @@ function coordinateJump(id,source,t){
   pose['hip_'+side]=hip+blend*(source['hip_'+side]-(source.hip_l+source.hip_r)/2)+asymmetry;
   pose['knee_'+side]=knee+blend*(source['knee_'+side]-(source.knee_l+source.knee_r)/2)+asymmetry*.55;
   pose['arm_'+side]=arm+blend*(source['arm_'+side]-(source.arm_l+source.arm_r)/2);
-  pose['elbow_'+side]=.18+.23*load+.20*Math.max(0,arm)+.46*fold+.30*land+blend*(source['elbow_'+side]-.8);
+  // Flex to load, open while accelerating the hands, fold in flight and yield
+  // again at contact. Bilateral capture differences remain a small overlay.
+  pose['elbow_'+side]=stage([[0,.30],[.48,.96],[1,.62],[1.90,1.28],[2.70,.68],[3.32,.85],[4,.30]],t)+blend*(source['elbow_'+side]-(source.elbow_l+source.elbow_r)/2);
+  pose['wrist_'+side]=.045*load-.075*Math.max(0,arm)+.06*land;
   pose['spread_'+side]=.035*(load+fold+land)+blend*source['spread_'+side];
   pose['foot_'+side]=.34*toeOff-.13*fold+.07*land;
  }
