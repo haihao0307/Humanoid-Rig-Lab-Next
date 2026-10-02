@@ -45,7 +45,10 @@ function strengthRuntimeAssessment(agent,candidate,dt){
  const pelvisHeightM=Number.isFinite(agent.h.root?.p?.[1])?agent.h.root.p[1]:agent.pos[1];
  const crouch=clamp((hip-pelvisHeightM)/Math.max(1e-8,hip-lowHip),0,1);
  const req=strengthTaskRequest(type,o,{...strengthWorldParameters(agent.w),reachM:clamp(shoulderLever,.05,1.2),elbowLeverM:clamp(elbowLever,.02,.7),crouch,
-  speedMps:clamp(len(velocity),0,3),accelerationMps2:Math.min(acceleration,5),accelerationVectorMps2:accelerationVector,lengthRatios,shorteningRates});
+  speedMps:clamp(len(velocity),0,3),accelerationMps2:Math.min(acceleration,5),accelerationVectorMps2:accelerationVector,lengthRatios,shorteningRates,
+  // During the supported hand change only the right hand transmits load.
+  // Charging it the whole payload is conservative while the floor shares it.
+  leftShare:agent.skill.activeHands?.length===1?0:agent.skill.boxPlan&&['lift','travel','placeSettle','lower'].includes(agent.phase)?.8:.5});
  const assessment=agent.strength.assess(req);
  assessment.phase=agent.phase;assessment.muscleWork=verticalSpeed>.005?'shortening':verticalSpeed<-.005?'lengthening':'holding';
  assessment.measuredAccelerationMps2=acceleration;

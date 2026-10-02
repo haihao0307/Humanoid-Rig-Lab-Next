@@ -57,7 +57,7 @@ function resolveCharacterMetrics(reference){
  return freezeCharacterShape({statureScale:s,statureM:reference.sourceHeightM,rig,stance,reference:referenceMetrics,restHipHeightM,standingHipHeightM,walkingHipHeightM,skinSoleHeightM,legRestReachM:mean(side=>length(side+'_femur',side+'_foot')),
   shoulderWidthM:length('left_upperArm','right_upperArm'),hipWidthM:length('left_femur','right_femur'),armReachM:Object.fromEntries(['left','right'].map(side=>[side,length(side+'_upperArm',side+'_forearm')+length(side+'_forearm',side+'_hand')])),shoulderHeightM:standingHipHeightM+mean(side=>p(side+'_upperArm')[1]-p('hips')[1]),crouchLowHipM:.325*restHipHeightM/referenceHipM,
   torsoRadiusM,torsoDepthM:referenceMetrics.torsoDepthM*s*(1+depthGain),armRadiusM,legRadiusM,headRadiusM:referenceMetrics.headRadiusM*s,
-  bodyRadiusM:referenceMetrics.bodyRadiusM*s+shoulderAllowanceM+referenceMetrics.torsoRadiusM*s*widthGain+Math.max(0,armRadiusM-referenceMetrics.armRadiusM*s),proxyBasis:'authored regional clearances; not measured surface bounds',palmContact:[0,-mean(side=>length(side+'_hand',side+'_finger_3_1'))*.55,0],geometryKey:reference.shapeKey});
+  bodyRadiusM:referenceMetrics.bodyRadiusM*s+shoulderAllowanceM+referenceMetrics.torsoRadiusM*s*widthGain+Math.max(0,armRadiusM-referenceMetrics.armRadiusM*s),proxyBasis:'authored regional clearances; not measured surface bounds',palmContact:[0,-mean(side=>length(side+'_hand',side+'_finger_3_1'))*.55,.030*s],geometryKey:reference.shapeKey});
 }
 function installCharacterShapeControls(lab){
  const panel=document.createElement('section');panel.id='character-shape-panel';panel.hidden=true;

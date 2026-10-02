@@ -34,5 +34,18 @@ assert(samples>100&&maxPitchRad>0,'root acceleration should produce a bounded to
 a.held={mass:18,p:[a.pos[0],a.pos[1]+.25,a.pos[2]+.35]};strength.lastAssessment={measuredAccelerationVectorMps2:[0,0,2]};
 for(let i=0;i<60;i++){locomotion.update(1/120);a.time+=1/120;}
 const loaded=locomotion.report().lightBalance;assert(Math.abs(loaded.pitchRad)>0&&loaded.paceScale<=1);
+// Mirror the same settled stance and payload: a right-hand load must lean
+// the upper body left, and vice versa. This checks direction, not just caps.
+const lateral=[];
+for(const sign of [-1,1]){
+ const state=locomotion.engine.state;state.yaw=0;state.root[0]=0;state.root[2]=0;
+ for(const side of ['left','right'])state.feet[side]={position:locomotion.engine.stance(state,side),yaw:0,contact:true};state.pose=locomotion.engine.solve(state);
+ a.held={mass:18,p:[sign*.4,state.root[1],0]};strength.lastAssessment={measuredAccelerationVectorMps2:[0,0,0]};
+ locomotion.balanceFeedback.reset();for(let i=0;i<240;i++)locomotion.balanceFeedback.update(1/120);
+ const response=locomotion.report().lightBalance;assert(sign*response.rollRad>0,'counter-lean must oppose the lateral payload');
+ assert(sign*response.pelvisLocalM[0]<0,'pelvis recenters away from the load');lateral.push(response.rollRad);
+ const candidate=locomotion.pose.build();assert(locomotion.pose.validate(candidate).footErrorM<1e-7);
+}
+assert(Math.abs(lateral[0]+lateral[1])<1e-10,'mirrored loads need symmetric responses');
 a.basic={posture:'sitting',busy:true};locomotion.update(1/120);const disabled=locomotion.report().lightBalance;assert.equal(disabled.active,false);
 console.log(JSON.stringify({schema:'human/light_balance_feedback@1',samples,maxFootErrorM,maxPitchRad,maxRollRad,minPaceScale,loaded,disabled,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
