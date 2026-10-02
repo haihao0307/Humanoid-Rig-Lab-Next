@@ -6,11 +6,15 @@
 const FACE_IDENTITY_SHAPE_SCHEMA='jarvis/face_identity_shape@1';
 const FACE_LANDMARK_SCHEMA='jarvis/face_landmarks@1';
 const FACE_IDENTITY_PARAMETERS=Object.freeze([
+  {id:'headWidth',label:'整体头部宽度',nodes:{}},
+  {id:'headHeight',label:'整体头部长度',nodes:{}},
+  {id:'headDepth',label:'整体头部纵深',nodes:{}},
+  {id:'eyeSpacing',label:'眼眶间距',nodes:{}},
   {id:'cranialWidth',label:'颞额宽度',nodes:{templeLeft:[3.8,0,0],templeRight:[-3.8,0,0],browOuterLeft:[1.2,0,0],browOuterRight:[-1.2,0,0]}},
   {id:'faceHeight',label:'面部纵向长度',nodes:{forehead:[0,2.6,0],browInnerLeft:[0,.8,0],browInnerRight:[0,.8,0],browOuterLeft:[0,.8,0],browOuterRight:[0,.8,0],jawLeft:[0,-.7,0],jawRight:[0,-.7,0],chin:[0,-1.8,0]}},
   {id:'cheekboneWidth',label:'颧部宽度',nodes:{cheekLeft:[3.6,0,0],cheekRight:[-3.6,0,0],templeLeft:[.6,0,0],templeRight:[-.6,0,0]}},
   {id:'cheekProjection',label:'面颊前突',nodes:{cheekLeft:[0,0,2.8],cheekRight:[0,0,2.8]}},
-  {id:'jawWidth',label:'下颌宽度',nodes:{jawLeft:[4,0,0],jawRight:[-4,0,0],mouthLeft:[.4,0,0],mouthRight:[-.4,0,0]}},
+  {id:'jawWidth',label:'下颌宽度',nodes:{mouthLeft:[.4,0,0],mouthRight:[-.4,0,0]}},
   {id:'lowerFaceFullness',label:'下脸饱满度',nodes:{jawLeft:[0,0,2.4],jawRight:[0,0,2.4],cheekLeft:[0,0,.5],cheekRight:[0,0,.5],chin:[0,0,.6]}},
   {id:'chinLength',label:'下巴长度',nodes:{jawLeft:[0,-.5,0],jawRight:[0,-.5,0],chin:[0,-3.2,0]}},
   {id:'chinProjection',label:'下巴前突',nodes:{chin:[0,0,2.5]}},
@@ -44,7 +48,12 @@ const FACE_IDENTITY_REFERENCE_LANDMARKS=Object.freeze([
   {id:'lipLower',label:'下唇中央',node:'lipLower',position:[-.0006,1.452,.189]},
   {id:'chin',label:'颏前点',node:'chin',position:[-.0006,1.432,.184]}
 ]);
+// An authored default character, independent of the neutral deformation basis.
+// Other NPC recipes keep their own identities; these are design choices, not
+// an ethnic template or a universal formula for attractiveness.
+const FACE_SCULPTED_MALE_SHAPE=Object.freeze({headWidth:.16,headHeight:-.40,headDepth:.10,eyeSpacing:-.72,cranialWidth:-.12,faceHeight:-.20,cheekboneWidth:.48,cheekProjection:.18,jawWidth:.68,lowerFaceFullness:-.50,chinLength:-.10,chinProjection:.52,noseWidth:-.18,noseLength:-.20,noseProjection:.08,mouthWidth:.36,lipFullness:-.10});
 const FACE_IDENTITY_PRESETS=Object.freeze([
+  {id:'sculpted-male',label:'立体男性',shape:FACE_SCULPTED_MALE_SHAPE,offsetsMm:{}},
   {id:'reference',label:'参考中性',shape:{},offsetsMm:{}},
   {id:'slender',label:'清瘦窄长',shape:{cranialWidth:-.25,faceHeight:.35,cheekboneWidth:-.25,jawWidth:-.45,chinLength:.25,noseProjection:.1},offsetsMm:{}},
   {id:'broad',label:'宽阔方正',shape:{cranialWidth:.35,faceHeight:-.1,cheekboneWidth:.45,jawWidth:.5,lowerFaceFullness:.2},offsetsMm:{}},
@@ -76,7 +85,67 @@ function mergeFaceIdentityOffsets(...layers){
   }}return merged;
 }
 function faceIdentityLandmarks(input={}){
-  const shape=validateFaceIdentityShape(input),offsetsMm=compileFaceIdentityShape(shape),values={};
-  for(const landmark of FACE_IDENTITY_REFERENCE_LANDMARKS){const delta=offsetsMm[landmark.node]||[0,0,0];values[landmark.id]=landmark.position.map((value,axis)=>value+delta[axis]*.001);}
-  return {schema:FACE_LANDMARK_SCHEMA,shapeSchema:FACE_IDENTITY_SHAPE_SCHEMA,frame:'R2 source metres before X reflection and skeletal skinning; positive X is character left',shape,values,derivedFrom:'authored reference landmarks plus structural identity parameters',measuredAnatomy:false,visualAcceptance:false};
+  const shape=validateFaceIdentityShape(input),offsetsMm=compileFaceIdentityShape(shape),proportions=faceIdentityProportions(shape),values={};
+  for(const landmark of FACE_IDENTITY_REFERENCE_LANDMARKS){
+    const delta=offsetsMm[landmark.node]||[0,0,0],local=landmark.position.map((value,axis)=>value+delta[axis]*.001);
+    // Match the renderer's local deformation -> shared sculpt -> identity order.
+    values[landmark.id]=faceIdentityWarp(compactHeadSculptPoint(local).point,proportions).point;
+  }
+  return {schema:FACE_LANDMARK_SCHEMA,shapeSchema:FACE_IDENTITY_SHAPE_SCHEMA,frame:'R2 source metres before X reflection and skeletal skinning; positive X is character left',shape,values,derivedFrom:'authored reference landmarks plus structural offsets, shared head sculpt, then structural identity proportions',measuredAnatomy:false,visualAcceptance:false};
 }
+// Independent named streams keep an existing feature stable when another
+// parameter is added. Correlations are authored shape choices, not demographics.
+function faceIdentityRandom(seed,name){
+  if(!Number.isInteger(seed)||seed<0||seed>4294967295)throw Error('面部种子应为 0 至 4294967295 的整数');
+  let h=(seed^0x811c9dc5)>>>0;for(let i=0;i<name.length;i++)h=Math.imul(h^name.charCodeAt(i),0x01000193)>>>0;
+  h=Math.imul(h^(h>>>16),0x7feb352d);h=Math.imul(h^(h>>>15),0x846ca68b);return ((h^(h>>>16))>>>0)/4294967296;
+}
+function sampleFaceIdentity(seed){
+  const signed=name=>faceIdentityRandom(seed,name)*2-1,width=signed('width'),length=signed('length'),fullness=signed('fullness');
+  const correlations={headWidth:width*.50,headHeight:length*.48,headDepth:fullness*.25,eyeSpacing:width*.18,cranialWidth:width*.45,cheekboneWidth:width*.4,jawWidth:width*.3,
+    faceHeight:length*.45,chinLength:length*.3,noseLength:length*.2,
+    lowerFaceFullness:fullness*.4,cheekProjection:fullness*.25,lipFullness:fullness*.12};
+  const shape={};for(const p of FACE_IDENTITY_PARAMETERS)shape[p.id]=Math.round(((correlations[p.id]||0)+signed(p.id)*.42)*10000)/10000;
+  return {schema:'jarvis/face_identity@2',seed,shape:validateFaceIdentityShape(shape),neutralOffsetsMm:{}};
+}
+function faceIdentityProportions(shape={}){return new Float32Array(['headWidth','headHeight','headDepth','eyeSpacing','jawWidth'].map(k=>shape[k]||0));}
+// One continuous map owns head skin, eyes, lids, ears and hair. Identity does
+// not stretch one component while leaving its contact partner behind.
+function faceIdentityWarp(point,weights){
+  const p=[...point],t=Math.max(0,Math.min(1,(p[1]-1.395)/.075)),w=t*t*t*(t*(6*t-15)+10),dw=30*t*t*(t-1)*(t-1)/.075;
+  const a=[.10*weights[0],.10*weights[1],.12*weights[2]],r=[p[0],p[1]-1.46,p[2]-.13];
+  const delta=r.map((v,i)=>v*a[i]*w),j=[[1+a[0]*w,a[0]*r[0]*dw,0],[0,1+a[1]*(w+r[1]*dw),0],[0,a[2]*r[2]*dw,1+a[2]*w]];
+  for(const side of [-1,1]){
+    const radii=[.028,.026,.040],q=[(p[0]-side*.0304)/radii[0],(p[1]-1.518)/radii[1],(p[2]-.166)/radii[2]],r2=q.reduce((s,v)=>s+v*v,0);
+    if(r2>=1)continue;const u=1-r2,gain=side*.0025*weights[3];delta[0]+=gain*u*u*u;
+    for(let k=0;k<3;k++)j[0][k]+=gain*(-6*u*u*q[k]/radii[k]);
+  }
+  // Width is centred on the rear mandibular body, with little effect on the
+  // anterior mouth-side cheek. The same field moves skin, fitted beard and
+  // every attached feature; its analytic derivative also owns the normals.
+  for(const side of [-1,1]){
+    const radii=[.039,.033,.055],q=[(p[0]-side*.050)/radii[0],(p[1]-1.449)/radii[1],(p[2]-.123)/radii[2]],r2=q.reduce((s,v)=>s+v*v,0);
+    if(r2>=1)continue;const u=1-r2,gain=side*.0075*(weights[4]||0);delta[0]+=gain*u*u*u;
+    for(let k=0;k<3;k++)j[0][k]+=gain*(-6*u*u*q[k]/radii[k]);
+  }
+  return {point:p.map((v,i)=>v+delta[i]),jacobian:j};
+}
+const FACE_IDENTITY_GLSL=`
+uniform vec4 faceProportions;
+uniform float faceJawWidth;
+void compactFaceIdentity(inout vec3 p,inout vec3 n){
+  float t=clamp((p.y-1.395)/.075,0.,1.),w=t*t*t*(t*(6.*t-15.)+10.),dw=30.*t*t*(t-1.)*(t-1.)/.075;
+  vec3 a=faceProportions.xyz*vec3(.10,.10,.12),r=p-vec3(0.,1.46,.13),delta=r*a*w;
+  vec3 jx=vec3(1.+a.x*w,0.,0.),jy=vec3(a.x*r.x*dw,1.+a.y*(w+r.y*dw),a.z*r.z*dw),jz=vec3(0.,0.,1.+a.z*w);
+  for(int i=0;i<2;i++){
+    float side=i==0?-1.:1.;vec3 radii=vec3(.028,.026,.040),q=(p-vec3(side*.0304,1.518,.166))/radii;
+    float r2=dot(q,q);if(r2>=1.)continue;float u=1.-r2,gain=side*.0025*faceProportions.w;
+    delta.x+=gain*u*u*u;vec3 gradient=-6.*gain*u*u*q/radii;jx.x+=gradient.x;jy.x+=gradient.y;jz.x+=gradient.z;
+  }
+  for(int i=0;i<2;i++){
+    float side=i==0?-1.:1.;vec3 radii=vec3(.039,.033,.055),q=(p-vec3(side*.050,1.449,.123))/radii;
+    float r2=dot(q,q);if(r2>=1.)continue;float u=1.-r2,gain=side*.0075*faceJawWidth;
+    delta.x+=gain*u*u*u;vec3 gradient=-6.*gain*u*u*q/radii;jx.x+=gradient.x;jy.x+=gradient.y;jz.x+=gradient.z;
+  }
+  n=normalize(n.x*cross(jy,jz)+n.y*cross(jz,jx)+n.z*cross(jx,jy));p+=delta;
+}`;

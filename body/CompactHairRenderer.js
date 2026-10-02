@@ -18,6 +18,8 @@ out float vAcross,vCoverage,vLight,vTone,vAlong,vSpec;
 out vec3 vLocal,vScalpData;
 out vec3 vHairWorld,vHairNormal;
 vec3 hairRotate(vec4 q,vec3 p){return p+2.*cross(q.xyz,cross(q.xyz,p)+q.w*p);}
+${FACE_IDENTITY_GLSL}
+${HEAD_SCULPT_GLSL}
 void main(){
  vec4 q=texelFetch(compactPalette,ivec2(0,hairJoint),0),d=texelFetch(compactPalette,ivec2(1,hairJoint),0);
  vec3 translation=2.*(q.w*d.xyz-d.w*q.xyz+cross(q.xyz,d.xyz));
@@ -26,7 +28,8 @@ void main(){
   bool styled=dot(styleNormal,styleNormal)>.01;
   vec3 n=styled?normalize(styleNormal):normalize(segmentStart-hairScalpCenter),flow=vec3(hairGroom.x,n.z,-n.y);
   vec3 t=normalize(flow-n*dot(flow,n)+vec3(1e-7,0.,0.));
-  vec3 local=segmentStart+n*hairBaseInflation*(styled?.15:1.),p=hairRotate(q,vec3(-local.x,local.yz)*hairStatureScale)+translation;
+  vec3 local=segmentStart+n*hairBaseInflation*(styled?.15:1.);compactHeadSculpt(local,n);compactFaceIdentity(local,n);
+  vec3 p=hairRotate(q,vec3(-local.x,local.yz)*hairStatureScale)+translation;
   vec3 normal=hairRotate(q,vec3(-n.x,n.yz)),tangent=hairRotate(q,vec3(-t.x,t.yz));
   gl_Position=viewProjection*vec4(p,1.);vLocal=segmentStart;vScalpData=segmentEnd;
   vHairWorld=p;vHairNormal=normal;
@@ -37,7 +40,8 @@ void main(){
  }
  float ta=float(gl_InstanceID%hairSegments)/float(hairSegments),tb=ta+1./float(hairSegments);
  vec3 wind=vec3(sin(hairTime*1.6+abs(strandTone)*21.),0.,cos(hairTime*1.3+abs(strandTone)*17.))*.00020*hairWind;
- vec3 pa=vec3(-segmentStart.x,segmentStart.yz)+wind*ta*ta,pb=vec3(-segmentEnd.x,segmentEnd.yz)+wind*tb*tb;
+ vec3 start=segmentStart,end=segmentEnd,dummyN=vec3(0.,1.,0.);compactHeadSculpt(start,dummyN);compactFaceIdentity(start,dummyN);dummyN=vec3(0.,1.,0.);compactHeadSculpt(end,dummyN);compactFaceIdentity(end,dummyN);
+ vec3 pa=vec3(-start.x,start.yz)+wind*ta*ta,pb=vec3(-end.x,end.yz)+wind*tb*tb;
  pa=hairRotate(q,pa*hairStatureScale)+translation;pb=hairRotate(q,pb*hairStatureScale)+translation;
  vec4 a=viewProjection*vec4(pa,1.),b=viewProjection*vec4(pb,1.);
  vLocal=mix(segmentStart,segmentEnd,corner.y);vScalpData=vec3(0.);
@@ -64,9 +68,12 @@ in vec3 vHairWorld,vHairNormal;
 uniform vec3 hairColour,hairScalpCenter,hairEye;
 uniform float hairSampleCoverage,hairBasePass,hairNatural;
 uniform vec4 hairGroom;
-out vec4 frag;
+layout(location=0)out vec4 frag;
+layout(location=1)out vec4 skinDiffuseOut;
+layout(location=2)out vec4 skinResidualOut;
 float hairRandom(float x){return fract(sin(x*127.1+31.7)*43758.5453);}
 void main(){
+ skinDiffuseOut=vec4(0.);skinResidualOut=vec4(0.);
  if(hairBasePass>.5){
   if(vScalpData.x<-.5){
    float key=-vScalpData.x-1.,id=fract(key),layer=min(1.,floor(key)),u=vScalpData.y,t=vScalpData.z;
@@ -152,6 +159,8 @@ class CompactHairRenderer{
   const gl=this.gl;this.buffers=[];
   try{
   this.program=program(gl,COMPACT_HAIR_VERTEX,COMPACT_HAIR_FRAGMENT);
+  this.program.u.faceProportions=gl.getUniformLocation(this.program.p,'faceProportions');
+  this.program.u.faceJawWidth=gl.getUniformLocation(this.program.p,'faceJawWidth');
   for(const name of ['compactPalette','hairJoint','hairSegments','viewportSize','projectionScale','hairTime','hairWind','hairWidthScale','hairColour','hairEye','hairSampleCoverage','hairBasePass','hairBaseInflation','hairStatureScale','hairScalpCenter','hairGroom','hairNatural'])this.program.u[name]=gl.getUniformLocation(this.program.p,name);
   if(!(data.segments instanceof Float32Array)||data.segments.length%9||data.segments.byteLength>this.report.maximumGeometryBytes||data.segments.length!==this.report.strands*this.report.segmentsPerStrand*9)throw Error('毛发缓冲区与预算不符');
   this.vao=gl.createVertexArray();if(!this.vao)throw Error('无法创建毛发绘制数组');gl.bindVertexArray(this.vao);
@@ -209,6 +218,9 @@ class CompactHairRenderer{
   this.selectLOD();if(!this.drawSegmentCount){this.visible=false;return;}
   const gl=this.gl,r=this.lab.renderer,p=this.program;
   gl.useProgram(p.p);gl.uniformMatrix4fv(p.u.viewProjection,false,r.vp);
+  const face=this.lab.face?.uniforms(),proportions=face?.proportions,identityEnabled=face?.enabled||0;
+  gl.uniform4f(p.u.faceProportions,(proportions?.[0]||0)*identityEnabled,(proportions?.[1]||0)*identityEnabled,(proportions?.[2]||0)*identityEnabled,(proportions?.[3]||0)*identityEnabled);
+  gl.uniform1f(p.u.faceJawWidth,(proportions?.[4]||0)*identityEnabled);
   gl.uniform1i(p.u.compactPalette,COMPACT_PALETTE_UNIT);gl.uniform1i(p.u.hairJoint,this.headJoint);gl.uniform1i(p.u.hairSegments,this.report.segmentsPerStrand);gl.uniform1f(p.u.hairStatureScale,this.statureScale);
   gl.uniform2f(p.u.viewportSize,r.canvas.width,r.canvas.height);gl.uniform1f(p.u.projectionScale,r.projection==='orthographic'?2/r.orthoHeight:1/Math.tan(.36));
   gl.uniform1f(p.u.hairTime,this.time);gl.uniform1f(p.u.hairWind,this.lab.hair?.windEnabled?this.lab.hair.windSpeed:0);

@@ -12,11 +12,15 @@ vec4 flags=texelFetch(posePalette,ivec2(4,id),0);P=(m*vec4(position,1.)).xyz;N=m
 const TISSUE_FRAGMENT_SHADER=`#version 300 es
 precision highp float;
 in vec3 P,N,C,R;in vec4 L;in float AO,MK,activation;
-uniform vec3 eye;uniform sampler2D shadow;uniform float shadowsEnabled,studioMode;
+uniform vec3 eye;uniform sampler2D shadow;uniform float shadowsEnabled,studioMode,inspectionShadow;uniform vec3 studioKey,studioFill;
 // Only the compact body renderer enables these per-character material values.
 uniform float skinControlled;uniform vec3 skinSurface,skinDetail,skinSeedOffset;
 uniform vec2 skinExposure;
-out vec4 frag;
+uniform float skinTransportEnabled;uniform vec3 skinViewForward;
+layout(location=0)out vec4 frag;
+layout(location=1)out vec4 skinDiffuseOut;
+layout(location=2)out vec4 skinResidualOut;
+${compactSkinSurfaceShader()}
 vec3 skinOutputSRGB(vec3 linearColor){
   vec3 c=max(linearColor,vec3(0.));
   return mix(12.92*c,1.055*pow(c,vec3(1./2.4))-.055,step(vec3(.0031308),c));
@@ -30,6 +34,23 @@ float skinGGX(vec3 n,vec3 v,vec3 l,vec3 h,float roughness){
   // Neutral dielectric reflection: pigment does not tint the oily highlight.
   float fresnel=.028+.972*pow(1.-vh,5.);
   return distribution*geometryV*geometryL*fresnel*nl/max(4.*nv*nl,.0001);
+}
+vec3 skinDiffuseResponse(vec3 fineNormal,vec3 shapeNormal,vec3 light,float scatter){
+  // Local wavelength-dependent normal filtering, not a diffusion solve.
+  // Smoothing every colour channel to the shape normal erased all relief
+  // outside the specular highlight, even with the scatter control disabled.
+  vec3 retention=mix(vec3(1.),vec3(.10,.28,.46),sqrt(clamp(scatter,0.,1.)));
+  vec3 ndl=vec3(dot(normalize(mix(shapeNormal,fineNormal,retention.r)),light),
+    dot(normalize(mix(shapeNormal,fineNormal,retention.g)),light),
+    dot(normalize(mix(shapeNormal,fineNormal,retention.b)),light));
+  vec3 angularSpread=scatter*vec3(.42,.18,.08);
+  return max((ndl+angularSpread)/(vec3(1.)+angularSpread),vec3(0.));
+}
+float skinFaceWeight(vec3 p){
+  // Canonical-space support keeps the face treatment attached during posing.
+  // The body and the back of the head retain their existing material response.
+  return step(.5,skinControlled)*smoothstep(1.40,1.435,p.y)*(1.-smoothstep(1.63,1.67,p.y))
+    *smoothstep(.075,.12,p.z)*(1.-smoothstep(.065,.09,abs(p.x)));
 }
 float shade(vec3 normal,vec3 light){
   if(shadowsEnabled<.5)return 1.;
@@ -45,17 +66,22 @@ float shade(vec3 normal,vec3 light){
   if(q.x<0.||q.x>1.||q.y<0.||q.y>1.||q.z<0.||q.z>1.)return 1.;
   vec2 texel=1./vec2(textureSize(shadow,0));
   float subtexel=.5*dot(abs(gradient),texel);
-  float bias=.00006+min(.0012,subtexel);
+  float bias=inspectionShadow>.5?.000012+min(.00008,subtexel):.00006+min(.0012,subtexel);
   // Camp shadows cover 38 metres: one texel spans several curved skin faces.
   // Keep their tiny depth differences from drawing false transverse seams.
-  if(MK>.5&&MK<1.5)bias=max(bias,.0008);
+  if(MK>.5&&MK<1.5)bias=max(bias,inspectionShadow>.5?.000025:.0008);
   ivec2 size=textureSize(shadow,0),base=ivec2(floor(q.xy*vec2(size)));
-  float s=0.,sumWeight=0.;for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){
+  // A wider tent on the face removes quantised PCF transitions at portrait
+  // scale. The receiver-plane correction remains active for every sample.
+  bool faceShadow=MK>.5&&MK<1.5&&skinFaceWeight(R)>.05;
+  float radius=faceShadow?2.5:1.5;
+  float s=0.,sumWeight=0.;for(int x=-2;x<=2;x++)for(int y=-2;y<=2;y++){
+    if(!faceShadow&&(abs(x)>1||abs(y)>1))continue;
     ivec2 sampleCell=clamp(base+ivec2(x,y),ivec2(0),size-ivec2(1));
     // NEAREST depth samples live at texel centres. Correcting the requested UV
     // instead produces a half-texel slope error and moving diagonal acne.
     vec2 sampleUV=(vec2(sampleCell)+.5)*texel,offset=sampleUV-q.xy;
-    vec2 tent=max(vec2(0.),vec2(1.5)-abs(offset)/texel);
+    vec2 tent=max(vec2(0.),vec2(radius)-abs(offset)/texel);
     float d=texelFetch(shadow,sampleCell,0).r,weight=tent.x*tent.y;
     float receiver=q.z+dot(gradient,offset)-bias;
     s+=weight*(receiver>d?.36:1.);sumWeight+=weight;
@@ -97,6 +123,7 @@ float skinBodyExposure(vec3 p,float variation,float footprint,vec3 seedOffset){
  return clamp(max(max(fadedTorso,.78*collar),max(.58*shoulders,max(armTan,legTan))),0.,1.);
 }
 void main(){
+  skinDiffuseOut=vec4(0.);skinResidualOut=vec4(0.);
   vec3 n=normalize(N);if(!gl_FrontFacing)n=-n;
   // Blending rotations alone does not differentiate the spatial weight field.
   // Fine final triangles provide the missing deformation-normal contribution.
@@ -105,8 +132,13 @@ void main(){
     if((MK>.5&&MK<1.5)||(MK>2.5&&MK<3.5)||MK>6.5){float alignment=clamp(dot(n,geometric),0.,1.);float correction=((MK>.5&&MK<1.5)||(MK>6.5&&MK<7.5))?0.:.12+.50*smoothstep(.01,.20,1.-alignment);n=normalize(mix(n,geometric,correction));}}
   vec3 v=normalize(eye-P),l=normalize(vec3(-4.,8.,5.));
   vec3 viewRight=normalize(cross(vec3(0.,1.,0.),v));
-  if(studioMode>.5)l=normalize(v+viewRight*-.70+vec3(0.,.65,0.));
+  if(studioMode>.5)l=normalize(studioKey);
   vec3 h=normalize(l+v);
+  // Microscopic surface normals govern reflection. Subsurface diffuse light
+  // averages that relief, so it must not inherit every pore's dark gradient.
+  vec3 skinDiffuseNormal=n;
+  float faceWeight=skinFaceWeight(R);
+  float screenScatter=skinTransportEnabled*faceWeight;
   vec3 color=C;float rough=.62,specular=.055,wrap=0.,skinStretch=1.,skinOil=0.,skinCavity=1.;
   vec3 surface=skinControlled>.5?skinSurface:vec3(.52,.25,.30);
   vec3 detail=skinControlled>.5?skinDetail:vec3(.30,.35,.15);
@@ -124,16 +156,14 @@ void main(){
     float ear=skinRegion(symmetricRest,vec3(.083,1.508,.087),vec3(40.,19.2,21.3));
     float controlled=step(.5,skinControlled),tZone=max(.65*forehead,nose)*controlled;
     cheek*=controlled;ear*=controlled;
-    // One added noise evaluation supplies both middle-scale relief and tint.
-    // Filtering is in source metres; detail stays attached while the body moves.
+    // The skin recipe owns pigment, microrelief and oil separately. These are
+    // material coordinates in source metres, independent of the camera/pose.
     vec3 seedOffset=skinControlled>.5?skinSeedOffset:vec3(0.);
-    float footprint=length(fwidth(R));
+    float footprint=max(length(dFdx(R)),length(dFdy(R)));
     float variation=skinNoise(R*18.+seedOffset)*(1.-smoothstep(.02,.08,footprint));
-    float reliefVisibility=1.-smoothstep(.001,.004,footprint);
-    float poreVisibility=1.-smoothstep(.00035,.0012,footprint);
-    float relief=skinNoise(R*240.+seedOffset+vec3(19.7));
-    float pore=skinNoise(R*1050.+seedOffset);
-    float pit=smoothstep(.12,.68,pore);
+    vec3 restNormal=cross(dFdx(R),dFdy(R));
+    restNormal=length(restNormal)>1e-12?normalize(restNormal):vec3(0.,0.,1.);
+    CompactSkinSurface skinSample=compactSkinEvaluate(R,restNormal,footprint,seedOffset,surface,detail,skinStretch);
     // Face and body share one exposure history. Boundaries follow the source
     // skin through posing and scaling; they do not swim with camera or light.
     float headExposure=smoothstep(1.35,1.46,R.y)*(.80+.20*max(forehead,nose));
@@ -141,28 +171,22 @@ void main(){
     float bodyExposure=skinBodyExposure(R,variation,footprint,seedOffset);
     float sunMask=controlled*max(headExposure,max(.82*forearmExposure,bodyExposure));
     float outdoorRoughness=skinExposure.y*sunMask;
-    // Multiplicative pigment and blood colour preserve deep base tones. Pores
-    // primarily affect reflection: dark colour dots are not a pore substitute.
-    color*=1.+detail.x*(.10*variation+.025*relief*reliefVisibility);
-    float blood=detail.z*(.65+1.6*cheek+1.8*ear+.35*tZone);
-    color*=vec3(1.+.14*blood,1.-.07*blood,1.-.09*blood);
+    color*=skinSample.pigment;
     color*=vec3(1.)-sunMask*skinExposure.x*vec3(.55,.66,.74);
     color*=1.-.035*outdoorRoughness*smoothstep(-.25,.55,variation);
     color=clamp(color,vec3(0.),vec3(1.));
-    skinOil=surface.y*clamp(.70+.90*tZone-.30*cheek,.35,1.5)*(1.-.30*outdoorRoughness);
-    // Unresolved relief becomes a small average roughness instead of sparkle.
-    float microRoughness=detail.y*(.04*relief*reliefVisibility+.05*(pit-.3)*poreVisibility+.028*(1.-poreVisibility));
-    rough=clamp(surface.x+.035+.02*cheek-.085*tZone+.045*detail.x*variation+microRoughness+.11*outdoorRoughness-.025*(skinStretch-1.),.30,.85);
+    skinOil=skinSample.oil*(1.-.30*outdoorRoughness);
+    rough=clamp(skinSample.roughness+.11*outdoorRoughness,.30,.85);
     specular=.028;wrap=.40*surface.z;
-    skinCavity=1.-.20*detail.y*pit*poreVisibility;
-    // Bounded, shallow depressions and middle-scale relief share one gradient.
-    float reliefHeight=(.000030*(1.+.75*outdoorRoughness)*relief*reliefVisibility-.000020*pit*poreVisibility)/sqrt(skinStretch);
+    skinCavity=skinSample.cavity;
+    // The recipe already applies the microdetail control and stretch once.
+    float reliefHeight=skinSample.heightM*(1.+.35*outdoorRoughness);
     vec3 dx=dFdx(P),dy=dFdy(P),rx=cross(dy,n),ry=cross(n,dx);
     float determinant=dot(dx,rx);
     float areaScale=max(length(dx)*length(dy),1e-16);
     vec3 grad=sign(determinant)*(dFdx(reliefHeight)*rx+dFdy(reliefHeight)*ry)/max(abs(determinant),areaScale*.05);
     grad*=min(1.,.25/max(length(grad),.0001));
-    n=normalize(n-grad*detail.y);
+    n=normalize(n-grad);
   }else if(MK>8.5){rough=.48;specular=.09;wrap=.06;
   }else if((MK>1.5&&MK<2.5)||MK>7.5){
     float across=MK>7.5?R.x*240.:atan(R.y,R.x)*48.;
@@ -179,22 +203,46 @@ void main(){
     float grid=max(1.-smoothstep(.0,.018,abs(fract(P.x)-.5)),1.-smoothstep(.0,.018,abs(fract(P.z)-.5)));
     color*=1.-.06*grid;rough=.82;
   }
-  float diffuse=max((dot(n,l)+wrap)/(1.+wrap),0.),fill=max(dot(n,normalize(vec3(.85,.32,-.8))),0.);
-  if(studioMode>.5)fill=max(dot(n,normalize(v+viewRight*.9+vec3(0.,-.05,0.))),0.);
+  vec3 diffuseNormal=normalize(mix(n,skinDiffuseNormal,faceWeight));
+  float diffuse=max((dot(diffuseNormal,l)+wrap)/(1.+wrap),0.),fill=max(dot(diffuseNormal,normalize(vec3(.85,.32,-.8))),0.);
+  if(studioMode>.5)fill=max(dot(diffuseNormal,normalize(studioFill)),0.);
   float s=shade(n,l),nv=max(dot(n,v),0.);
   vec3 c=color*((.28+.10*n.y)*AO+.82*diffuse*s+.26*fill*AO);
-  float exponent=mix(120.,16.,rough);
+  float exponent=mix(120.,16.,rough);vec3 skinDiffuseLinear=vec3(0.);
   if(MK>.5&&MK<1.5){
+    // The bounded screen-space solve owns eligible facial diffuse light.
+    // Other regions retain the local response, including the lips excluded by
+    // the compact renderer. Avoid changing body light when the camera zooms.
+    float localScatter=surface.z*(1.-screenScatter);
+    vec3 faceDiffuse=skinDiffuseResponse(n,skinDiffuseNormal,l,localScatter);
+    vec3 diffuseFillDirection=studioMode>.5?normalize(studioFill):normalize(vec3(.85,.32,-.8));
+    vec3 faceFill=skinDiffuseResponse(n,skinDiffuseNormal,diffuseFillDirection,localScatter);
+    float faceAmbient=.235+.105*diffuseNormal.y;
+    vec3 faceLit=color*(faceAmbient*AO+vec3(.87,.865,.86)*faceDiffuse*s+.22*faceFill*AO);
+    c=mix(c,faceLit,faceWeight);
     // GGX surface lobes share the same F0 across every base colour.
-    float broad=skinGGX(n,v,l,h,rough),tight=skinGGX(n,v,l,h,max(.22,rough*.65));
-    c*=.972;c+=vec3(mix(broad,tight,skinOil*.45))*skinCavity*.82*s;
+    float broad=skinGGX(n,v,l,h,rough),tight=skinGGX(n,v,l,h,max(.28,rough*.75));
+    // Diffuse above uses irradiance/pi. The GGX BRDF therefore needs the same
+    // pi conversion; the previous lone .82 factor suppressed skin reflection.
+    vec3 fillDirection=studioMode>.5?normalize(studioFill):normalize(vec3(.85,.32,-.8));
+    vec3 fillHalf=normalize(fillDirection+v);
+    float fillBroad=skinGGX(n,v,fillDirection,fillHalf,rough);
+    float fillTight=skinGGX(n,v,fillDirection,fillHalf,max(.28,rough*.75));
+    c*=.972;
+    skinDiffuseLinear=c;
+    c+=vec3(3.14159265*(.87*mix(broad,tight,skinOil*.45)*s
+      +.22*mix(fillBroad,fillTight,skinOil*.45)*AO))*skinCavity;
     // Local wrapped-light approximation only. No thickness or diffusion solve.
     // Both the warm response and diffuse light follow the existing shadow.
     float scatter=pow(clamp((dot(-n,l)+.45)/1.45,0.,1.),2.);
-    c+=color*vec3(.24,.075,.035)*scatter*surface.z*s;
+    c+=color*vec3(.24,.075,.035)*scatter*surface.z*s*(1.-screenScatter);
   }else c+=vec3(1.,.90,.78)*pow(max(dot(n,h),0.),exponent)*specular*s;
   if(!(MK>.5&&MK<1.5))c+=vec3(.37,.55,.63)*pow(1.-nv,3.)*.045;
   c=mix(c,vec3(.06,.078,.088),1.-exp(-length(eye-P)*.009));
+  skinDiffuseLinear*=exp(-length(eye-P)*.009);
+  float transportMask=screenScatter*float(MK>.5&&MK<1.5)*clamp(surface.z*1.65,0.,1.);
+  skinDiffuseOut=vec4(skinDiffuseLinear*transportMask,transportMask);
+  skinResidualOut=vec4((c-skinDiffuseLinear)*transportMask,max(.015,dot(P-eye,skinViewForward))*transportMask);
   c=c/(vec3(1.)+c*.25);
   frag=vec4(pow(max(c,vec3(0.)),vec3(1./2.2)),1.);
 }`;

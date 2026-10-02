@@ -143,7 +143,7 @@ function installSkinAppearance(lab){
   presets:(palette='east-asian')=>skinPresetCatalog(palette).map(p=>({...p})),
   exposurePresets:()=>SKIN_EXPOSURE_PRESETS.map(p=>({...p})),
   applyExposure(id){const p=SKIN_EXPOSURE_PRESETS.find(p=>p.id===id);if(!p)throw Error('未知日晒经历');return api.set({sunExposure:p.sunExposure,weathering:p.weathering});},
-  report:()=>({schema:SKIN_SCHEMA,parameters:api.export(),colorInput:'srgb-hex',colorWorkingSpace:'linear-srgb',scattering:'local wrapped-light approximation',measuredPhysiology:false,generatedImageMaps:0,geometryRebuilt:false,runtimeVerified:false,visualAcceptance:false}),
+  report:()=>({schema:SKIN_SCHEMA,parameters:api.export(),surfaceModel:COMPACT_SKIN_SURFACE.revision,surfaceStorage:'authored functions and parameters',surfaceFrame:'canonical metres',surfaceChannels:['pigment','microrelief','roughness','oil','cavity'],colorInput:'srgb-hex',colorWorkingSpace:'linear-srgb',scattering:lab.renderer?.skinTransport?.active?'bounded screen-space diffuse transport; local fallback outside face':'local wrapped-light approximation',transport:lab.renderer?.skinTransport?.report()||null,measuredPhysiology:false,generatedImageMaps:0,geometryRebuilt:false,runtimeVerified:false,visualAcceptance:false}),
   refresh(){const p=api.export();el('color').value=p.baseColor;el('hex').value=p.baseColor;el('seed').value=p.seed;
    for(const c of SKIN_CONTROLS){el(c.key).value=p[c.key];el(c.key+'-value').textContent=p[c.key].toFixed(2);}
    for(const button of panel.querySelectorAll('[data-skin-preset]')){const swatch=skinPreset(button.dataset.skinPreset);button.setAttribute('aria-pressed',String(p.baseColor===swatch.baseColor&&p.undertone===swatch.undertone&&p.redness===swatch.redness));}

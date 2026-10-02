@@ -20,8 +20,8 @@ function validateCharacterPreset(input={}){
   strength:input.strength?StrengthModel.fromSnapshot(input.strength).export():new StrengthModel(makeCharacterStrengthProfile()).export(),
   biology:validateBiologySnapshot(input.biology),task:{command:command.trim(),startOnSpawn:task.startOnSpawn===true}};
 }
-function seededCharacterPreset(seed,base={}){return validateCharacterPreset({...base,seed,id:'r2-'+seed,label:'R2 角色 '+seed,appearance:{...base.appearance,skin:sampleSkinAppearance(seed),hair:{...base.appearance?.hair,seed:undefined}}});}
-function initialCharacterPreset(){return validateCharacterPreset(window.__NPC_DEFINITION__?.character||window.__CHARACTER_PRESET__||{});}
+function seededCharacterPreset(seed,base={}){return validateCharacterPreset({...base,seed,id:'r2-'+seed,label:'R2 角色 '+seed,appearance:{...base.appearance,skin:sampleSkinAppearance(seed),hair:{...base.appearance?.hair,seed:undefined},face:{identity:sampleFaceIdentity(seed)}}});}
+function initialCharacterPreset(){return validateCharacterPreset(window.__NPC_DEFINITION__?.character||window.__CHARACTER_PRESET__||{label:'立体男性参考',appearance:{face:{identity:{shape:FACE_SCULPTED_MALE_SHAPE}},skin:{baseColor:'#c7a18d',roughness:.60,oil:.15,redness:.16}}});}
 function installCharacterPresetAPI(lab){
  const api={busy:false,
   export(){return validateCharacterPreset({...lab.human.characterPreset,strength:lab.agent.strength.export(),biology:lab.human.tissue.ecology.export()});},

@@ -3,6 +3,7 @@ function installBodySettings(lab){
  lab.biology=installHumanBiology(lab);
  lab.skin=installSkinAppearance(lab);
  lab.face=installFaceControls(lab);
+ lab.appearance=installFaceAppearance(lab);
  lab.shape=installCharacterShapeControls(lab);
  lab.dna=installHumanDNA(lab);
  const style=document.createElement('style');style.id='body-settings-style';style.textContent=`

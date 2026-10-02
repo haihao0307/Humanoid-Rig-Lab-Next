@@ -39,11 +39,12 @@ function validateFacePose(input={}){
   if(profileSchema!==FACE_SCHEMA&&profileSchema!==FACE_LEGACY_PROFILE_SCHEMA)throw Error('不支持的面部配方 schema');
   if(Object.keys(input).some(key=>!['schema','revision','identity','expression'].includes(key)))throw Error('面部配方含未知字段');
   const identity=input.identity??{},expression=input.expression??{};faceObject(identity,'固定身份');faceObject(expression,'临时表情');
-  if(Object.keys(identity).some(key=>!['schema','shape','neutralOffsetsMm'].includes(key)))throw Error('固定身份格式无效');
+  if(Object.keys(identity).some(key=>!['schema','seed','shape','neutralOffsetsMm'].includes(key)))throw Error('固定身份格式无效');
   if(identity.schema!==undefined&&identity.schema!==FACE_IDENTITY_SCHEMA&&identity.schema!==FACE_IDENTITY_LEGACY_SCHEMA)throw Error('固定身份 schema 无效');
   if(Object.keys(expression).some(key=>!['schema','weights'].includes(key))||expression.schema!==undefined&&expression.schema!==FACE_EXPRESSION_SCHEMA)throw Error('临时表情格式无效');
+  if(identity.seed!==undefined&&(!Number.isInteger(identity.seed)||identity.seed<0||identity.seed>4294967295))throw Error('固定身份种子无效');
   const shape=validateFaceIdentityShape(identity.shape??{}),neutralOffsetsMm=validateFaceOffsets(identity.neutralOffsetsMm??{}),weights=validateFaceWeights(expression.weights??{});
-  return {schema:FACE_SCHEMA,revision:FACE_RECIPE.revision,identity:{schema:FACE_IDENTITY_SCHEMA,shape,neutralOffsetsMm},expression:{schema:FACE_EXPRESSION_SCHEMA,weights}};
+  return {schema:FACE_SCHEMA,revision:FACE_RECIPE.revision,identity:{schema:FACE_IDENTITY_SCHEMA,...(identity.seed===undefined?{}:{seed:identity.seed}),shape,neutralOffsetsMm},expression:{schema:FACE_EXPRESSION_SCHEMA,weights}};
 }
 function faceOffsetKey(offsetsMm={}){return FACE_RECIPE.nodes.map(node=>node.id+':'+(offsetsMm[node.id]||[0,0,0]).map(v=>Number(v).toFixed(4)).join(',')).join('|');}
 function faceIdentityKey(identity){return faceIdentityShapeKey(identity.shape)+'|'+faceOffsetKey(identity.neutralOffsetsMm);}
@@ -64,7 +65,7 @@ function resolveFaceOffsets(input){
   const muscles=new Float32Array(FACE_RECIPE.muscleFields.map(field=>Math.min(1,Object.entries(field.activation).reduce((sum,[id,gain])=>sum+(weights[id]||0)*gain,0))));
   const eyelids=new Float32Array(['Left','Right'].flatMap(side=>['eyeNarrow','eyeWide','eyeBlink'].map(id=>weights[id+side]||0)));
   const jawOpen=weights.jawOpen||0,lipOpen=Math.max(weights.lipPart||0,jawOpen*.42);
-  return {profile:pose,identityOffsetsMm:offsetsMm,landmarks:faceIdentityLandmarks(pose.identity.shape),values,muscles,eyelids,lipOpen,jawOpen,limited};
+  return {profile:pose,identityOffsetsMm:offsetsMm,landmarks:faceIdentityLandmarks(pose.identity.shape),values,proportions:faceIdentityProportions(pose.identity.shape),muscles,eyelids,lipOpen,jawOpen,limited};
 }
 function interpolateFacePose(from,to,weight){
   const a=validateFacePose(from),b=validateFacePose(to);faceNumber(weight,0,1,'表情过渡');
@@ -72,7 +73,7 @@ function interpolateFacePose(from,to,weight){
   for(const channel of FACE_RECIPE.channels){const value=mix(a.expression.weights[channel.id],b.expression.weights[channel.id]);if(value!==0)weights[channel.id]=value;}
   return validateFacePose({identity:a.identity,expression:{weights}});
 }
-function faceChunkEligible(name){return name==='faceLip'||name==='mouthInterior'||name==='faceSkin'||name==='faceBrow'||name==='noseInterior'||name==='skin'||name==='FJ2812'||name==='FJ2814'||name==='eyeLidSkin'||name==='eyeLidMargin'||name==='eyeTearDuct';}
+function faceChunkEligible(name){return name==='faceLip'||name==='mouthInterior'||name==='tongue'||name==='faceSkin'||name==='faceBrow'||name==='faceBeard'||name==='noseInterior'||name==='skin'||name==='FJ2812'||name==='FJ2814'||name==='eyeLidSkin'||name==='eyeLash'||name==='eyeLidMargin'||name==='eyeTearDuct';}
 function faceKernel(point,node){
   const r=Math.hypot(...point.map((v,axis)=>(v-node.centre[axis])/node.radius[axis]));
   return r>=1?0:(1-r)**4*(4*r+1);
@@ -113,6 +114,7 @@ function faceMuscleAffine(field){
 const FACE_MUSCLE_AFFINES=FACE_RECIPE.muscleFields.map(faceMuscleAffine);
 const faceGlslVec=values=>'vec3('+values.map(v=>v.toFixed(9)).join(',')+')';
 const COMPACT_FACE_GLSL=`
+${FACE_IDENTITY_GLSL}
 uniform vec3 faceOffsets[${FACE_RECIPE.nodes.length}];
 uniform float faceMuscles[${FACE_RECIPE.muscleFields.length}];
 uniform float faceEnabled,faceEligible,faceHeatmap;
@@ -230,7 +232,7 @@ function installFaceControls(lab){
   el('status').textContent=limit+'固定身份：'+(identity?.label||'自定义身份')+'；结构参数 '+Object.keys(shape).length+'/'+FACE_IDENTITY_PARAMETERS.length+'；临时表情：'+(expression?.label||(Object.keys(pose.expression.weights).length?'自定义表情':'中性'))+'。';
   needsRedraw=true;
 },
-uniforms(){return {offsets:resolved.values,muscles:resolved.muscles,eyelids:resolved.eyelids,lipOpen:resolved.lipOpen,jawOpen:resolved.jawOpen,enabled:enabled&&(resolved.lipOpen>0||resolved.jawOpen>0||[resolved.values,resolved.muscles,resolved.eyelids].some(values=>values.some(value=>value!==0)))?1:0,heatmap:heatmap?1:0,selected};},
+uniforms(){return {offsets:resolved.values,proportions:resolved.proportions,muscles:resolved.muscles,eyelids:resolved.eyelids,lipOpen:resolved.lipOpen,jawOpen:resolved.jawOpen,enabled:enabled&&(resolved.lipOpen>0||resolved.jawOpen>0||resolved.proportions.some(v=>v!==0)||[resolved.values,resolved.muscles,resolved.eyelids].some(values=>values.some(value=>value!==0)))?1:0,heatmap:heatmap?1:0,selected};},
   closeup(view='front'){
     lab.setCameraFollow(false);lab.tissue.setView('skin');
     const reference=lab.human.sourceBind.get('head'),current=lab.human.world('head'),s=lab.human.bodyMetrics.statureScale;

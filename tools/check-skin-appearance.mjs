@@ -57,7 +57,7 @@ export function checkSkinAppearanceSources({parse,read,assert}){
  check(['collarHeight','shoulders','fadedTorso','sleeve','shorts','aboveSock'].every(name=>bodyExposure.includes(name))&&bodyExposure.includes('return clamp('),'body tanning includes bounded shoulder, torso, clothing and footwear exposure');
  check(bodyExposure.includes('max(.012,min(.04,footprint*1.5))')&&bodyExposure.includes('edgeShift=hemShift+.008*variation'),'clothing transitions have a minimum soft width and bounded seeded variation');
  check(shader.includes('sunMask*skinExposure.x*vec3(.55,.66,.74)')&&.74<1,'outdoor contrast stays multiplicative with positive colour at maximum exposure');
- check(renderer.includes("gl.uniform1f(p.u.compactEarClearance,c.name==='skin'?1:0)")&&renderer.includes("'compactEarClearance'")&&renderer.includes('uniform float compactEarClearance;'),'ear underlay correction is enabled only for the cranial skin chunk');
+ check(renderer.includes("gl.uniform1f(p.u.compactEarClearance,c.name==='skin'?1:0)")&&renderer.includes("'compactEarClearance'")&&/uniform float compactEarClearance(?:[,;])/.test(renderer),'ear underlay correction is enabled only for the cranial skin chunk');
  check(renderer.includes('compactClearEar(source,n);')&&renderer.includes('p.x-=side*.008*gate*falloff')&&renderer.includes('n.yz+side*.008*gate*slope*nx'),'ear correction moves the underlying head and transforms its normal together');
  check(1-.008*1.5/.045>.73&&renderer.includes('abs(p.x)-.020)/.045')&&renderer.includes('nx=n.x/(1.-.008*falloff*gateDerivative)'),'bounded symmetric ear recess has a positive deformation Jacobian');
  check(renderer.includes('this.depth=program(this.gl,COMPACT_VERTEX')&&renderer.indexOf('R=canonicalPosition;')>=0&&renderer.indexOf('R=canonicalPosition;')<renderer.indexOf('compactClearEar(source,n);'),'colour and shadow share the corrective; pigment retains its original material coordinates');
@@ -66,25 +66,30 @@ export function checkSkinAppearanceSources({parse,read,assert}){
  check(earMesher.includes("c.semanticRegion==='head_face_ears'&&c.heightAxis===0")&&earMesher.includes("earPatch?Math.min(edgeLimit,quality==='close'?.0015:.002):edgeLimit"),'extra ear samples are confined to overlapping side-head charts');
  check(/const skin=this\.lab\.human\.tissue\.skinMaterial/.test(renderer)&&/gl\.uniform1f\(p\.u\.skinControlled,1\)/.test(renderer),'draw consumes current cached material');
  check(/isSkin=c\.name==='skin'\|\|c\.name==='FJ2811'/.test(renderer)&&/isSkin\?skin\.color/.test(renderer),'body and external ears share skin colour');
- check(/sclera=\['FJ1317','FJ1368','eyeSclera'\]/.test(renderer)&&/brow\?\[\.105,\.067,\.047\]:sclera\?\[\.52,\.50,\.44\]/.test(renderer)&&/lip\?skin\.color/.test(renderer)&&renderer.includes('compactLipPigment(R)'),'sclerae and brows retain independent colour; lips follow skin');
+ check(/sclera=\['FJ1317','FJ1368','eyeSclera'\]/.test(renderer)&&/brow\?\[\.038,\.023,\.015\]:beard\?\[\.046,\.029,\.019\]:sclera\?\[\.52,\.50,\.44\]/.test(renderer)&&/lip\?skin\.color/.test(renderer)&&renderer.includes('compactLipPigment(R)'),'sclerae, brows and beard retain independent colour; lips follow skin');
  check(/this\.view==='clay'\|\|this\.view==='regions'\?7:isSkin\?1/.test(renderer),'clay and region inspection bypass skin shading');
- check(/skinNoise\(R\*18\.\+seedOffset\)/.test(shader)&&/skinNoise\(R\*1050\.\+seedOffset\)/.test(shader)&&/footprint=length\(fwidth\(R\)\)/.test(shader)&&/poreVisibility=1\.-smoothstep\(\.00035,\.0012,footprint\)/.test(shader),'seeded rest-space detail fades before subpixel aliasing');
- check((shader.match(/=skinNoise\(/g)||[]).length===3&&!/uniform sampler.*skin|for\s*\([^)]*skin/.test(shader),'skin uses three bounded noise scales without a new sampler or sampling loop');
+ const skinSurface=read('body/SkinSurface.js');
+ check(manifest.modules.filter(p=>p==='body/SkinSurface.js').length===1&&read('source/runtime.template.js').includes('/*__SOURCE:body/SkinSurface.js__*/'),'one procedural skin-surface assembly owner');
+ check(shader.includes('${compactSkinSurfaceShader()}')&&shader.includes('compactSkinEvaluate(R,restNormal,footprint,seedOffset,surface,detail,skinStretch)')&&shader.includes('footprint=max(length(dFdx(R)),length(dFdy(R)))')&&shader.includes('restNormal=cross(dFdx(R),dFdy(R))'),'material evaluation and projection use canonical coordinates and pixel footprint');
+ check(!/uniform sampler|texture\(/.test(skinSurface)&&!/Math\.random|Date\.|performance\./.test(skinSurface),'skin surface has no imported texture or time-dependent identity');
  check(/skinRegion\(R,/.test(shader)&&/skinRegion\(symmetricRest,/.test(shader)&&/tZone=.*controlled/.test(shader),'continuous R2 anatomical masks are restricted to the controlled body');
- check(/microRoughness=.*1\.-poreVisibility/.test(shader)&&/skinCavity=1\.-.*pit\*poreVisibility/.test(shader)&&/n=normalize\(n-grad\*detail.y\)/.test(shader),'filtered relief, roughness and cavity share the microdetail control');
- check(/color\*=1\.\+detail.x/.test(shader)&&!/color\*=.*pore|color\+=.*pit/.test(shader),'pore depressions do not paint dark pigment dots');
+ check(shader.includes('rough=clamp(skinSample.roughness+')&&shader.includes('skinCavity=skinSample.cavity;')&&shader.includes('reliefHeight=skinSample.heightM*')&&shader.includes('n=normalize(n-grad);'),'independent evaluated channels reach shading without applying detail control twice');
+ check(shader.includes('color*=skinSample.pigment;')&&!/color\*=.*pore|color\+=.*pit/.test(shader),'pore depressions do not paint dark pigment dots');
  check(/float fresnel=\.028\+\.972/.test(shader)&&/return distribution\*geometryV\*geometryL\*fresnel\*nl/.test(shader),'neutral dielectric reflection responds to incident light');
  check(/scatter\*surface\.z\*s/.test(shader)&&!/scatter\*\(\.35\+\.65\*s\)/.test(shader),'warm response is shadowed and controlled');
  // Verify literal shader patch anchors, avoiding silent string-replace misses.
  const renderAST=parse(renderer,{ecmaVersion:'latest',sourceType:'module'}),shaderAST=parse(shader,{ecmaVersion:'latest',sourceType:'module'});
- const fs=shaderAST.body.flatMap(n=>n.declarations||[]).find(n=>n.id.name==='TISSUE_FRAGMENT_SHADER').init.quasis[0].value.cooked;
+ const template=shaderAST.body.flatMap(n=>n.declarations||[]).find(n=>n.id.name==='TISSUE_FRAGMENT_SHADER').init;
+ check(template.expressions.length===1&&template.expressions[0].callee?.name==='compactSkinSurfaceShader','only the owned procedural surface library is injected');
+ const fs=template.quasis.map(part=>part.value.cooked).join('');
  const fragment=renderAST.body.find(n=>n.type==='FunctionDeclaration'&&n.id.name==='compactFragmentSource');let patches=0;
  const visit=n=>{if(!n||typeof n!=='object')return;if(Array.isArray(n)){n.forEach(visit);return;}
   if(n.type==='CallExpression'&&n.callee.type==='MemberExpression'&&n.callee.property.name==='replace'&&n.arguments[0]?.type==='Literal'){
    const anchor=n.arguments[0].value;check(typeof anchor==='string'&&fs.split(anchor).length===2,'unique fragment patch anchor '+(++patches));
   }for(const [key,value]of Object.entries(n))if(!['start','end','loc'].includes(key))visit(value);
- };visit(fragment);check(patches===7&&renderer.includes('frag=vec4(skinOutputSRGB(c),alpha);')&&renderer.includes('in vec3 personalRestPosition;')&&renderer.includes('length(cross(dFdx(personalRestPosition),dFdy(personalRestPosition)))'),'seven complete patches including lip relief, personal rest area and one sRGB output conversion');
+ };visit(fragment);check(patches===13&&renderer.includes('frag=vec4(skinOutputSRGB(c),alpha);')&&renderer.includes('in vec3 personalRestPosition;')&&renderer.includes('compactEyeContactVisibility(compactEyeContactPosition)')&&renderer.includes('normalStrength')&&renderer.includes('length(cross(dFdx(personalRestPosition),dFdy(personalRestPosition)))')&&renderer.includes('screenScatter*=1.-compactLipPigment(R)'),'thirteen complete patches including aperture light access, lip transport exclusion, relief, posed contact, personal rest area and sRGB output');
  check(renderer.includes('reliefHeight=mix(reliefHeight,compactLipMicrorelief(R)/sqrt(skinStretch),lipWeight)')&&renderer.includes('lipMoisture=compactLipMoisture(R)')&&renderer.includes('rough=mix(rough,mix(.46,.31,lipMoisture),lipWeight)')&&read('body/FaceAnatomy.js').includes('fwidth(phase)'),'lip microrelief is filtered and enters the shared surface-gradient lighting path');
+ check(renderer.includes('compactRotate(qr,cavityAxis)')&&renderer.includes('compactFaceIdentity(aperturePoint,cavityAxis)')&&renderer.includes('shade(n,l)*compactCavityAccess(l)')&&renderer.includes('compactCavityAccess(diffuseFillDirection)')&&renderer.includes('compactCavityAccess(fillDirection)'),'aperture direction follows head and identity, and gates key plus diffuse and specular fill');
  check(/runtimeVerified:false,visualAcceptance:false/.test(skin)&&JSON.parse(read('body/HumanDNAContract.json')).acceptance.visualAcceptance===false,'file checks do not claim visual acceptance');
  return {checks,presets:presets.length+eastAsian.length,scenePresets:eastAsian.length,controls:controls.length,applicationExecuted:false,skinFunctionsExecuted:false,shaderCompiled:false,visualAcceptance:false};
 }
