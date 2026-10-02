@@ -78,7 +78,36 @@ export class ShortsClothRuntime {
   this.steps++;this.time+=h;const audit=this.audit(true);for(const [to,from]of [['maxMainStrain','mainStrain'],['maxElasticStrain','elasticStrain'],['maxBodyPenetrationM','bodyPenetrationM']])this.history[to]=Math.max(this.history[to],audit[from]);if(!audit.finite){this.history.nonFinite++;this.enabled=false;}if(!audit.numericValid&&!this.history.firstFailure)this.history.firstFailure={step:this.steps,time:this.time,...audit};this.lastAudit=audit;
  }
  advance(dt){if(!Number.isFinite(dt)||dt<0||!Number.isFinite(this.options.fixedDt)||this.options.fixedDt<=0)throw Error('Cloth requires finite elapsed time and positive fixedDt');if(!this.enabled||dt===0)return;if(Math.abs(dt-this.options.fixedDt)>1e-10)throw Error('Advance the character and cloth together at the declared fixed substep');const start=performance.now();this.body.update({time:this.time+dt,exactRefit:true});this.fixedStep(dt);this.syncRender();this.cpu.push(performance.now()-start);if(this.cpu.length>2000)this.cpu.shift();}
- syncRender(){const attr=this.mesh.geometry.attributes.position;for(let i=0;i<this.quotient.length;i++)attr.setXYZ(i,...this.positions[this.quotient[i]]);attr.needsUpdate=true;this.mesh.geometry.computeVertexNormals();for(const stitch of this.stitches||[]){const a=stitch.line.geometry.attributes.position;for(let i=0;i<stitch.indices.length;i++)a.setXYZ(i,...this.positions[this.quotient[stitch.indices[i]]]);a.needsUpdate=true;}}
+ updateStitchedRenderNormals(){
+  const geometry=this.mesh.geometry,position=geometry.attributes.position;
+  let topology=this.renderNormalTopology;
+  if(!topology||topology.quotient!==this.quotient||topology.triangles!==this.triangles){
+   const signs=new Int8Array(this.triangles.length),sourceSigns=new Int8Array(this.quotient.length),edges=new Map(),adj=this.triangles.map(()=>[]);let nonManifoldEdges=0,degenerateTriangles=0,orientationConflicts=0,sourceSignConflicts=0,components=0;
+   for(const [i,t]of this.triangles.entries()){
+    if(new Set(t.q).size!==3)degenerateTriangles++;
+    for(let k=0;k<3;k++){const a=t.q[k],b=t.q[(k+1)%3],key=a<b?a+':'+b:b+':'+a;if(!edges.has(key))edges.set(key,[]);edges.get(key).push({i,direction:a<b?1:-1});}
+   }
+   for(const rows of edges.values()){if(rows.length>2)nonManifoldEdges++;if(rows.length===2){const[a,b]=rows;adj[a.i].push({i:b.i,ratio:-a.direction*b.direction});adj[b.i].push({i:a.i,ratio:-a.direction*b.direction});}}
+   for(let seed=0;seed<signs.length;seed++)if(!signs[seed]){components++;signs[seed]=1;const stack=[seed];while(stack.length){const i=stack.pop();for(const e of adj[i]){const wanted=signs[i]*e.ratio;if(!signs[e.i]){signs[e.i]=wanted;stack.push(e.i);}else if(signs[e.i]!==wanted)orientationConflicts++;}}}
+   this.triangles.forEach((t,i)=>t.original.forEach(v=>{if(sourceSigns[v]&&sourceSigns[v]!==signs[i])sourceSignConflicts++;sourceSigns[v]=signs[i];}));
+   topology={quotient:this.quotient,triangles:this.triangles,signs,sourceSigns,sums:new Float64Array(this.positions.length*3),valid:nonManifoldEdges===0&&degenerateTriangles===0&&orientationConflicts===0&&sourceSignConflicts===0,components,nonManifoldEdges,degenerateTriangles,orientationConflicts,sourceSignConflicts};this.renderNormalTopology=topology;
+  }
+  if(!topology.valid){geometry.computeVertexNormals();this.renderNormalReport={method:'original per-source normals; joined topology unsafe to smooth',valid:false,components:topology.components,nonManifoldEdges:topology.nonManifoldEdges,degenerateTriangles:topology.degenerateTriangles,orientationConflicts:topology.orientationConflicts,sourceSignConflicts:topology.sourceSignConflicts,physicsChanged:false};return;}
+  // Smooth only real sewn DOFs. Coincident independent papers remain distinct.
+  // Keep 553 source UV vertices and original draw winding: the unchanged
+  // DoubleSide shader flips by gl_FrontFacing, hence restore source winding
+  // sign when scattering a consistently oriented quotient normal.
+  const sums=topology.sums;sums.fill(0);
+  for(const [i,t]of this.triangles.entries()){
+   const[a,b,c]=t.original,ab=[position.getX(b)-position.getX(a),position.getY(b)-position.getY(a),position.getZ(b)-position.getZ(a)],ac=[position.getX(c)-position.getX(a),position.getY(c)-position.getY(a),position.getZ(c)-position.getZ(a)],sign=topology.signs[i],normal=[(ab[1]*ac[2]-ab[2]*ac[1])*sign,(ab[2]*ac[0]-ab[0]*ac[2])*sign,(ab[0]*ac[1]-ab[1]*ac[0])*sign];
+   for(const q of t.q)for(let k=0;k<3;k++)sums[q*3+k]+=normal[k];
+  }
+  if(!geometry.attributes.normal)geometry.setAttribute('normal',new THREE.BufferAttribute(new Float32Array(this.quotient.length*3),3));const normal=geometry.attributes.normal;let zeroAreaDofs=0;
+  for(let q=0;q<this.positions.length;q++){const at=q*3,length=Math.hypot(sums[at],sums[at+1],sums[at+2]);if(length>1e-20)for(let k=0;k<3;k++)sums[at+k]/=length;else zeroAreaDofs++;}
+  for(let i=0;i<this.quotient.length;i++){const at=this.quotient[i]*3,sign=topology.sourceSigns[i];normal.setXYZ(i,sign*sums[at],sign*sums[at+1],sign*sums[at+2]);}normal.needsUpdate=true;
+  this.renderNormalReport={method:'area-weighted current sewn-DOF normals with consistent quotient orientation and source-winding scatter',valid:zeroAreaDofs===0,components:topology.components,actualJoinedGroups:this.members.filter(g=>g.length>1).length,zeroAreaDofs,sourceUVVertices:this.quotient.length,sourceIndicesUnchanged:true,positionSmoothing:false,physicsChanged:false};
+ }
+ syncRender(){const attr=this.mesh.geometry.attributes.position;for(let i=0;i<this.quotient.length;i++)attr.setXYZ(i,...this.positions[this.quotient[i]]);attr.needsUpdate=true;this.updateStitchedRenderNormals();for(const stitch of this.stitches||[]){const a=stitch.line.geometry.attributes.position;for(let i=0;i<stitch.indices.length;i++)a.setXYZ(i,...this.positions[this.quotient[stitch.indices[i]]]);a.needsUpdate=true;}}
  audit(full=true){
   let mainStrain=0,worstMaterialTriangle=null;for(const t of this.triangles){const [a,b,c]=t.q.map(i=>this.positions[i]),ab=sub(b,a),ac=sub(c,a),m=t.inv,f=[ab.map((v,k)=>v*m[0]+ac[k]*m[2]),ab.map((v,k)=>v*m[1]+ac[k]*m[3])],x=dot(f[0],f[0]),y=dot(f[0],f[1]),z=dot(f[1],f[1]),s=Math.hypot(x-z,2*y);const minStretch=Math.sqrt(Math.max(0,(x+z-s)/2)),maxStretch=Math.sqrt(Math.max(0,(x+z+s)/2)),strain=Math.max(Math.abs(minStretch-1),Math.abs(maxStretch-1));if(strain>mainStrain){mainStrain=strain;worstMaterialTriangle={sourceIndices:t.original,quotientIndices:t.q,pieceId:this.draft.ranges.find(r=>t.original[0]>=r.offset&&t.original[0]<r.offset+r.count)?.pieceId,minimumStretch:minStretch,maximumStretch:maxStretch,actualPositions:t.q.map(i=>[...this.positions[i]]),sourceUV:t.uv};}}
   let currentLengthM=0,restLengthM=0,elasticStrain=0;for(const e of this.elastic){const l=len(sub(this.positions[e.a],this.positions[e.b]));currentLengthM+=l;restLengthM+=e.rest;elasticStrain=Math.max(elasticStrain,Math.abs(l/e.rest-1));}

@@ -4,6 +4,16 @@ import {paperPrincipal} from './ShortsManufacturingMetric.mjs';
 // The mass-weighted damped CG/backtracking construction follows the project's
 // original ShortsWaistCoupledBlock static authoring mathematics.
 const dot=(a,b)=>a.reduce((sum,x,k)=>sum+x*b[k],0),distance=(a,b)=>Math.hypot(...a.map((x,k)=>x-b[k]));
+// Smooth source metric rows. Their common zero set is exactly F^T F = I,
+// independently of principal direction ordering at equal eigenvalues. These
+// rows do not define a new rest metric: t.inv is the original source2D chart.
+export function manufacturingPaperGramRow(cloth,t,mode){
+ const [a,b,c]=t.q.map(i=>cloth.positions[i]),m=t.inv,ab=b.map((v,k)=>v-a[k]),ac=c.map((v,k)=>v-a[k]),u=ab.map((v,k)=>v*m[0]+ac[k]*m[2]),v=ab.map((x,k)=>x*m[1]+ac[k]*m[3]),cu=[-m[0]-m[2],m[0],m[2]],cv=[-m[1]-m[3],m[1],m[3]];
+ if(mode===0)return {value:dot(u,u)-1,gradients:cu.map(g=>u.map(v=>2*g*v))};
+ if(mode===1)return {value:dot(v,v)-1,gradients:cv.map(g=>v.map(v=>2*g*v))};
+ if(mode===2)return {value:dot(u,v),gradients:cu.map((g,i)=>u.map((x,k)=>g*v[k]+cv[i]*x))};
+ throw Error('Manufacturing source Gram row must be uu, vv or uv');
+}
 function inspectGColumns(rows,cloth){
  const g=cloth.draft.ranges.find(r=>r.pieceId==='G'),ids=[...new Set(Array.from({length:g.count},(_,i)=>cloth.quotient[g.offset+i]))],columns=ids.flatMap(i=>[i*3,i*3+1,i*3+2]),index=new Map(columns.map((x,i)=>[x,i])),n=columns.length,local=[];
  for(const row of rows){const v=new Float64Array(n);for(const [k,a]of row.entries)if(index.has(k))v[index.get(k)]+=a;const length=Math.hypot(...v);if(length>1e-12)local.push({kind:row.kind,v:Float64Array.from(v,x=>x/length)});}
@@ -24,6 +34,10 @@ export function solveManufacturingBlock(cloth,threads,{maximumIterations=40}={})
    const norm=Math.hypot(...entries.values());if(norm<1e-14)return;
    rows.push({entries:[...entries].map(([i,g])=>[i,g/norm]),rhs:-value/norm,norm,kind,evaluate});
   };
+  // Gram derivatives passed independent finite differences, but the single
+  // bounded production experiment reduced normalized merit while principal
+  // strain increased to 452.8%. Keep that rejected experiment in QA; it is not
+  // the production residual. Source principal rows retain their original gate.
   for(const t of cloth.triangles)for(const mode of [0,1]){const a=paperPrincipal(cloth,t,mode);if(!a.gradients)throw Error('Collapsed manufacturing material');add(t.q,a.gradients,a.sigma-1,'paper',()=>paperPrincipal(cloth,t,mode).sigma-1);}
   for(const e of cloth.edges){const a=cloth.positions[e.a],b=cloth.positions[e.b],l=distance(a,b);if(l<1e-12)throw Error('Collapsed manufacturing edge');const g=a.map((x,k)=>(x-b[k])/l/e.rest);add([e.a,e.b],[g,g.map(x=>-x)],l/e.rest-1,'paper-edge',()=>distance(cloth.positions[e.a],cloth.positions[e.b])/e.rest-1);}
   for(const e of threads)for(let k=0;k<3;k++){const g=[0,0,0];g[k]=1;add([e.a,e.b],[g,g.map(x=>-x)],cloth.positions[e.a][k]-cloth.positions[e.b][k],'source-seam',()=>cloth.positions[e.a][k]-cloth.positions[e.b][k]);}
@@ -53,5 +67,5 @@ export function solveManufacturingBlock(cloth,threads,{maximumIterations=40}={})
   if((a.manufacturingMaterialValid&&gapM<=.0001)||!acceptedFraction||!a.finite)break;
  }
  if(identity!==cloth.materialIdentity())throw Error('Manufacturing block changed source material');
- return {scope:'bounded simultaneous static manufacturing residual solve only',activeActualDofs:[...active],initialLocalJacobianAudit,trace,paperUnchanged:true,bodyContactEnabled:false,nativeIntegrationChanged:false,selfContactValidated:false};
+ return {scope:'bounded simultaneous static manufacturing residual solve only',paperResidualMechanism:'original two source principal-stretch residuals',rejectedGramExperiment:'qa/shorts-lowwaist-gram-coupled-20261002.json; smooth Gram helper is derivative-diagnostic only and not called by this solve',finalAcceptanceMechanism:'unchanged actual source principal-strain five-percent and source-seam gap gate',activeActualDofs:[...active],initialLocalJacobianAudit,trace,paperUnchanged:true,bodyContactEnabled:false,nativeIntegrationChanged:false,selfContactValidated:false};
 }

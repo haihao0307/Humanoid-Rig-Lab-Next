@@ -11,11 +11,11 @@ export const SHORTS_VERSIONS = Object.freeze([
   }),
   Object.freeze({
     id: 'lowrise', label: '新版 · 低腰松紧',
-    revision: 'R008-lowrise-elastic-style-preserved-v2-20261002',
+    revision: 'R008-forearm-reference-lowrise-elastic-v3-20261002',
     sourceEntry: 'shorts-app.mjs', targetSubject: 'new-human-r008',
-    waistDropM: .055, waistbandWidthM: .038,
+    waistFit: 'original-forearm-midpoint-waist@1', waistDropM: null, automaticWaistFit: true, waistbandWidthM: .038,
     preserveOriginalSubjectClothing: true, authorBarePelvis: false,
     acceptedShape: false, motionValidated: false, immutable: false,
-    note: '降低腰线、加入松紧腰头；保留人物现有衣物做适配检查。',
+    note: '按原版小臂中段的下降比例自动降低腰口，裤脚不变；松紧腰头与布料动作仍待验收。',
   }),
 ]);

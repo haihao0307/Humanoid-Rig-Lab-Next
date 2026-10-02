@@ -29,6 +29,9 @@ app=app.replace("$('action').onchange=()=>{controller.clearInput();","$('action'
 app=app.replace("$('start').onclick=()=>{resumeGame();","$('start').onclick=()=>{if(!window.HumanShorts?.simulationCertified)return;resumeGame();");
 app=app.replace("$('tryJump').onclick=()=>{resumeGame();","$('tryJump').onclick=()=>{if(!window.HumanShorts?.simulationCertified)return;resumeGame();");
 app=app.replace("$('start').disabled=false;$('tryJump').disabled=false;","for(const id of ['start','tryJump','pause','action','reset'])$(id).disabled=!window.HumanShorts?.simulationCertified;");
+// Static inspection freezes the subject and draws on camera/control changes.
+// Redundant GPU frames and facial animation must not starve source assembly.
+app=app.replace('lastTime=now;if(subject&&!paused)', 'lastTime=now;if(window.HumanShorts?.inspection&&!window.HumanShorts.simulationCertified){window.HumanShorts.updateCamera();if(window.HumanShorts.consumeRenderRequest())renderer.render(scene,camera);return;}if(subject&&!paused)');
 write('shorts-app.mjs',app);
 let html=read('index.html').replace('https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js','./vendor/three.module.js').replace('https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/','./vendor/').replace('src="./app.mjs"','src="./shorts-app.mjs"').replace('<title>人物世界 · 第三人称控制 R008</title>','<title>R008 · 低腰松紧亚麻短裤测试</title>').replace('<head>','<head><meta name="shorts-test-version" content="'+SHORTS_VERSIONS[1].revision+'">');
 write('shorts-index.html',html);console.log('Fresh clothing entry uses the current R008 production app and shared fixed physics clock.');

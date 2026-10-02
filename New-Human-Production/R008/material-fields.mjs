@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+const generatedFields=new WeakMap();
 /** Evaluate reversible lifting-Haar material bases; reconstructed textures exist only in memory. */
 export function decodeMaterialField(field){
  const n=field.size,k=field.channels,a=Int32Array.from(field.c),tmp=new Int32Array(n*n*k);
@@ -8,6 +9,6 @@ export function decodeMaterialField(field){
  }
  const rgba=new Uint8Array(n*n*4);for(let i=0;i<n*n;i++){for(let ch=0;ch<3;ch++)rgba[i*4+ch]=Math.min(255,Math.max(0,a[i*k+ch]));rgba[i*4+3]=255;}return rgba;
 }
-export function materialTextures(material){
- const result={};for(const key of ['basecolor','normal','roughness','metallic']){const f=material[key],texture=new THREE.DataTexture(decodeMaterialField(f),f.size,f.size,THREE.RGBAFormat);texture.colorSpace=key==='basecolor'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.flipY=true;texture.magFilter=THREE.LinearFilter;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.generateMipmaps=true;texture.needsUpdate=true;result[key]=texture;}return result;
+export function materialTextures(material,{anisotropy=1}={}){
+ const result={};for(const key of ['basecolor','normal','roughness','metallic']){const f=material[key];let pixels=generatedFields.get(f);if(!pixels){pixels=decodeMaterialField(f);generatedFields.set(f,pixels);}const texture=new THREE.DataTexture(pixels,f.size,f.size,THREE.RGBAFormat);texture.colorSpace=key==='basecolor'?THREE.SRGBColorSpace:THREE.NoColorSpace;texture.flipY=true;texture.magFilter=THREE.LinearFilter;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.generateMipmaps=true;texture.anisotropy=anisotropy;texture.needsUpdate=true;result[key]=texture;}return result;
 }

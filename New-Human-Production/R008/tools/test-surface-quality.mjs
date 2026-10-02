@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict';
+import {DEFAULT_SURFACE_DETAIL,normalizeSurfaceDetail,surfaceGenerationOptions,localSurfaceEdge,SURFACE_PRESETS} from '../SurfaceQuality.mjs';
+const cases=[],test=(name,fn)=>{fn();cases.push(name);};
+test('配方只有可调参数，没有几何或贴图缓存',()=>{assert.deepEqual(normalizeSurfaceDetail(),DEFAULT_SURFACE_DETAIL);assert(Buffer.byteLength(JSON.stringify(DEFAULT_SURFACE_DETAIL))<200);assert(Object.values(DEFAULT_SURFACE_DETAIL).every(v=>['string','number'].includes(typeof v)));});
+test('非法配方不修改输入或默认值',()=>{for(const patch of [{density:'missing'},{normalStrength:Infinity},{normalStrength:-1},{microStrength:1.01},{pixelScale:0},{vertices:[]},{schema:'other'}]){const copy={...patch};assert.throws(()=>normalizeSurfaceDetail(patch));assert.deepEqual(patch,copy);}assert.equal(DEFAULT_SURFACE_DETAIL.density,'.008');});
+test('精度升高同时缩短间距与曲面误差',()=>{let edge=Infinity,error=Infinity;for(const preset of Object.values(SURFACE_PRESETS)){assert(preset.edgeMetres<edge&&preset.surfaceErrorMetres<error);edge=preset.edgeMetres;error=preset.surfaceErrorMetres;}assert.throws(()=>surfaceGenerationOptions('.001'));});
+test('局部加密只收紧头手，没有粗化身体',()=>{for(const density of ['.012','.008','.006']){const q=surfaceGenerationOptions(density),edge=p=>localSurfaceEdge(p,q.edgeMetres,q.anatomicalDetail);assert.equal(edge([0,1.65,.1]),q.edgeMetres*.5);assert.equal(edge([.34,.8,.05]),q.edgeMetres*.65);assert.equal(edge([0,1.1,.05]),q.edgeMetres);for(let y=0;y<1.8;y+=.01)assert(edge([.34,y,.05])>=q.edgeMetres*.5&&edge([.34,y,.05])<=q.edgeMetres);}});
+test('边界精度过渡连续，轻量不加密',()=>{for(let y=1.46;y<1.6;y+=.001)assert(Math.abs(localSurfaceEdge([0,y,.1],.008,true)-localSurfaceEdge([0,y+.001,.1],.008,true))<.00007);assert.equal(localSurfaceEdge([0,1.65,.1],.02,false),.02);});
+console.log(JSON.stringify({passed:cases.length,cases}));

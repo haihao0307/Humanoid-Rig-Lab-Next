@@ -38,21 +38,21 @@ export class GameAnimator {
  rotate(name,axis,angle,weight=1,fromNeutral=false){const bone=this.subject.byName.get(name);if(!bone)return;const q=Q().setFromAxisAngle(this.axes.get(name)[axis],angle);if(fromNeutral){q.multiply(this.neutral.get(name).q);bone.quaternion.slerp(q,weight);}else bone.quaternion.premultiply(q);}
  update(c,dt){
   if(dt<=0){this.subject.root.updateMatrixWorld(true);this.subject.skeleton.update();return;}
-  const s=this.subject,still=c.grounded&&c.phase==='idle'&&c.speed<.08&&(!c.keys||c.keys.size===0);
+  const s=this.subject,movement=c.movement||MOVEMENT,scale=this.actor.scale.y,still=c.grounded&&c.phase==='idle'&&c.speed<.08&&(!c.keys||c.keys.size===0);
   this.idleTime=still?this.idleTime+dt:0;const idleTarget=this.idleTime>=2.8?1:0;this.idleBlend+=(idleTarget-this.idleBlend)*(1-Math.exp(-dt*(idleTarget?6:18)));
   s.locomotion(c.grounded?c.speed:Math.min(c.speed,1.8),dt,this.idleBlend);s.step(dt);
-  const jumping=['anticipation','takeoff','flight','fall','landing'].includes(c.phase),targetWeight=c.phase==='landing'?1-smooth((c.phaseTime-.07)/(MOVEMENT.landingDuration-.07)):jumping?1:0;
+  const jumping=['anticipation','takeoff','flight','fall','landing'].includes(c.phase),targetWeight=c.phase==='landing'?1-smooth((c.phaseTime-.07)/(movement.landingDuration-.07)):jumping?1:0;
   this.poseWeight+=(targetWeight-this.poseWeight)*(1-Math.exp(-dt*22));
   const w=this.poseWeight;
   const newJump=jumping&&((c.phase==='anticipation'&&this.lastPhase!=='anticipation')||(c.jumpCount!==this.lastJumpCount&&this.lastPhase!=='anticipation')||!this.wasJumping);
   if(newJump){this.activeJumpStyle=this.jumpStyle;this.leadSign=this.lastFeet.get('l').z>=this.lastFeet.get('r').z?1:-1;for(const side of ['l','r'])this.prepareFeet.get(side).copy(this.lastFeet.get(side));}
-  const floor=supportAt(c.x,c.z,c.y,c.world).height,pose=sampleJumpPose(this.activeJumpStyle,c,MOVEMENT,c.y-floor),drop=pose.drop;
+  const floor=supportAt(c.x,c.z,c.y,c.world).height,pose=sampleJumpPose(this.activeJumpStyle,c,movement,c.y-floor),drop=pose.drop;
   if(w>.0001){
    for(const r of s.neutral){const base=this.basePose.get(r.o.name);base.q.copy(r.o.quaternion);base.p.copy(r.o.position);r.o.quaternion.copy(r.q);r.o.position.copy(r.p);}
    for(const side of ['l','r']){
     const sourceSide=this.activeJumpStyle==='cmu-running'&&this.leadSign<0?(side==='l'?'r':'l'):side,hip=pose['hip_'+sourceSide],knee=pose['knee_'+sourceSide],arm=pose['arm_'+sourceSide];
     this.rotate('thigh_'+side,'x',-hip,1,true);this.rotate('calf_'+side,'x',knee,1,true);this.rotate('foot_'+side,'x',hip-knee+pose['foot_'+sourceSide],1,true);
-    this.rotate('upperarm_'+side,'x',-arm,1,true);this.rotate('lowerarm_'+side,'x',-pose['elbow_'+sourceSide],1,true);this.rotate('upperarm_'+side,'z',(side==='l'?1:-1)*pose['spread_'+sourceSide]);
+    this.jumpArm(side,arm,pose['elbow_'+sourceSide],pose['spread_'+sourceSide],pose['wrist_'+sourceSide]);
    }
    // Upper-body +Y bends toward forward +Z with a positive canonical X turn.
    this.rotate('pelvis','x',pose.pelvisPitch,1,true);
@@ -79,7 +79,7 @@ export class GameAnimator {
    }
   }
   const runWeight=s.gaitWeights[2]*(1-w);
-  if(runWeight>.001){const nativeSpeed=NATURAL_RUN.strideLegLengths*this.legLength/NATURAL_RUN.strideSeconds;this.runStrideScale=clamp(Math.pow(Math.max(.2,c.speed)/nativeSpeed,.35)*1.24,1,1.55);this.runPhase+=dt*Math.max(.2,c.speed)/(NATURAL_RUN.strideLegLengths*this.legLength*this.runStrideScale);this.runningArms(runWeight,dt);}
+  if(runWeight>.001){const nativeSpeed=NATURAL_RUN.strideLegLengths*this.legLength*scale/NATURAL_RUN.strideSeconds;this.runStrideScale=clamp(Math.pow(Math.max(.2,c.speed)/nativeSpeed,.35)*1.24,1,1.55);this.runPhase+=dt*Math.max(.2,c.speed)/(NATURAL_RUN.strideLegLengths*this.legLength*scale*this.runStrideScale);this.runningArms(runWeight,dt);}
   // Rebased chest posture must not retain the source's compensating chin lift.
   // Level the gaze only during walking/running; idle looking and jump balance
   // retain their own head motion, and the turn-leading layer follows below.
@@ -105,11 +105,11 @@ export class GameAnimator {
   if(runWeight>.001&&!jumping)for(const name of ['pelvis','spine_03','thigh_l','thigh_r','calf_l','calf_r','foot_l','foot_r'])this.limitConstraint(s.byName.get(name),dt*14);
   if(runWeight>.001&&!jumping){const pelvis=s.byName.get('pelvis'),previous=this.visualPose.get('pelvis').p,parent=pelvis.parent.getWorldQuaternion(Q()),delta=pelvis.position.clone().sub(previous).applyQuaternion(parent),limit=dt*2.5/s.data.scale;pelvis.position.add(V().set(0,clamp(delta.y,-limit,limit)-delta.y,0).applyQuaternion(parent.invert()));}
   if(c.phase==='landing'&&this.lastPhase!=='landing')for(const side of ['l','r']){const local=this.ankles.get(side).clone();if(this.activeJumpStyle==='cmu-running')local.z+=(side==='l'?1:-1)*this.leadSign*.065;this.landingFeet.get(side).copy(local.applyMatrix4(this.actor.matrixWorld));}
-  const contactTime=timeToContact(c,MOVEMENT,c.y-floor),contactDuration=Math.min(.22,.38/Math.max(1,c.speed)),contactGoal=c.phase==='anticipation'?smooth(c.phaseTime/MOVEMENT.anticipation):!c.grounded?smooth(1-contactTime/.20):c.phase==='landing'?1-smooth(c.phaseTime/contactDuration):0;
+  const contactTime=timeToContact(c,movement,c.y-floor),contactDuration=Math.min(.22,.38/Math.max(1,c.speed)),contactGoal=c.phase==='anticipation'?smooth(c.phaseTime/movement.anticipation):!c.grounded?smooth(1-contactTime/.20):c.phase==='landing'?1-smooth(c.phaseTime/contactDuration):0;
   this.contactWeight+=(contactGoal-this.contactWeight)*(1-Math.exp(-dt*32));
   const contact=c.phase==='landing'&&c.phaseTime<.05?1:this.contactWeight;
   if(contact>.001){
-   for(const side of ['l','r']){const foot=s.byName.get('foot_'+side),current=foot.getWorldPosition(V()),local=this.ankles.get(side).clone();if(c.phase==='anticipation'){local.copy(this.prepareFeet.get(side));local.y=THREE.MathUtils.lerp(local.y,this.ankles.get(side).y,smooth(c.phaseTime/MOVEMENT.anticipation));}else if(this.activeJumpStyle==='cmu-running'){local.z+=(side==='l'?1:-1)*this.leadSign*.065;}
+   for(const side of ['l','r']){const foot=s.byName.get('foot_'+side),current=foot.getWorldPosition(V()),local=this.ankles.get(side).clone();if(c.phase==='anticipation'){local.copy(this.prepareFeet.get(side));local.y=THREE.MathUtils.lerp(local.y,this.ankles.get(side).y,smooth(c.phaseTime/movement.anticipation));}else if(this.activeJumpStyle==='cmu-running'){local.z+=(side==='l'?1:-1)*this.leadSign*.065;}
     if(c.phase!=='landing'){local.y+=.047*pose.toeOff;local.z-=.008*pose.toeOff;}
     const target=c.phase==='landing'?this.landingFeet.get(side):local.applyMatrix4(this.actor.matrixWorld);current.lerp(target,contact);
     if(c.phase!=='landing'){const previous=this.lastFeet.get(side).clone().applyMatrix4(this.actor.matrixWorld),delta=current.clone().sub(previous);current.copy(previous).add(delta.clampLength(0,dt*2.2));}
@@ -119,6 +119,15 @@ export class GameAnimator {
   for(const row of this.groundReport){const state=this.groundFeet.get(row.side);if(state)row.error=s.byName.get('foot_'+row.side).getWorldPosition(V()).distanceTo(state.point);}
   for(const r of s.neutral){const state=this.visualPose.get(r.o.name);if(!smoothing&&dt>0){state.velocity.copy(rotationVector(r.o.quaternion.clone().multiply(state.q.clone().invert()))).divideScalar(dt).clampLength(0,12);state.positionVelocity.copy(r.o.position).sub(state.p).divideScalar(dt);}state.q.copy(r.o.quaternion);state.p.copy(r.o.position);}
   for(const side of ['l','r'])this.lastFeet.get(side).copy(this.actor.worldToLocal(s.byName.get('foot_'+side).getWorldPosition(V())));
+ }
+ jumpArm(side,swing,flexion,spread,wrist){
+  const s=this.subject,upper=s.byName.get('upperarm_'+side),lower=s.byName.get('lowerarm_'+side),hand=s.byName.get('hand_'+side),sign=side==='l'?1:-1;
+  const a=V().setFromMatrixPosition(s.bindWorld.get(upper)),b=V().setFromMatrixPosition(s.bindWorld.get(lower)),u=b.sub(a).normalize().applyAxisAngle(V().set(1,0,0),-swing).applyAxisAngle(V().set(0,0,1),sign*spread);
+  u.x+=sign*(s.body?.report.armClearance||0);u.normalize();
+  const pole=V().set(0,0,1).addScaledVector(u,-u.z).normalize(),v=u.clone().multiplyScalar(Math.cos(flexion)).addScaledVector(pole,Math.sin(flexion)).normalize(),normal=V().set(-sign,0,0).applyQuaternion(this.actor.quaternion);
+  u.applyQuaternion(this.actor.quaternion);v.applyQuaternion(this.actor.quaternion);this.aimFromBind(upper,lower,u,1);s.root.updateMatrixWorld(true);this.aimFromBind(lower,hand,v,1,this.runHands.get(side).normal,normal);s.root.updateMatrixWorld(true);
+  const wristAxis=normal.clone().cross(v).normalize(),tip=v.clone().applyAxisAngle(wristAxis,wrist||0);this.aimFromBind(hand,s.byName.get('middle_01_'+side),tip,1,this.runHands.get(side).normal,normal);
+  for(const {bone,q}of this.runHands.get(side).curls)bone.quaternion.slerp(q,.45);
  }
  runningArms(weight,dt){
   const s=this.subject;
@@ -150,7 +159,7 @@ export class GameAnimator {
    upperDirection.applyAxisAngle(armAxis,-swing);lowerDirection.applyAxisAngle(armAxis,-swing);normal.applyAxisAngle(armAxis.applyQuaternion(this.actor.quaternion),-swing);
    // Retarget lateral clearance for this broad-shouldered body. Preserve the
    // sampled fore/aft swing and changing elbow angle, with modest inward return.
-   upperDirection.x=sign*(.32+.18*Math.max(0,sign*upperDirection.x));upperDirection.normalize().applyQuaternion(this.actor.quaternion);
+   upperDirection.x=sign*(.32+.18*Math.max(0,sign*upperDirection.x)+(s.body?.report.armClearance||0));upperDirection.normalize().applyQuaternion(this.actor.quaternion);
    lowerDirection.x*=.35;lowerDirection.normalize().applyQuaternion(this.actor.quaternion);
    this.aimFromBind(upper,lower,upperDirection,weight);s.root.updateMatrixWorld(true);
    this.aimFromBind(lower,hand,lowerDirection,weight,palm.normal,normal);s.root.updateMatrixWorld(true);
@@ -166,10 +175,10 @@ export class GameAnimator {
  plantRunFeet(c,dt,weight){
   const s=this.subject;this.groundReport=[];
   for(const side of ['l','r']){
-   const foot=s.byName.get('foot_'+side),ball=s.byName.get('ball_'+side),ankle=foot.getWorldPosition(V()),toe=ball.getWorldPosition(V()),height=supportAt(toe.x,toe.z,c.y+.20,c.world).height,local=this.actor.worldToLocal(ankle.clone()),previous=this.groundFeet.get(side),low=Math.min(ankle.y-.075,toe.y-.02),contact=low-height<.026&&local.z>-.35;
+   const foot=s.byName.get('foot_'+side),ball=s.byName.get('ball_'+side),ankle=foot.getWorldPosition(V()),toe=ball.getWorldPosition(V()),height=supportAt(toe.x,toe.z,c.y+.20,c.world).height,local=this.actor.worldToLocal(ankle.clone()),previous=this.groundFeet.get(side),low=Math.min(ankle.y-.075*this.actor.scale.y,toe.y-.02*this.actor.scale.y),contact=low-height<.026&&local.z>-.35;
    let state=previous;
    if(contact&&!state)state={point:ankle.clone(),time:0,weight:0};
-   if(state){state.time+=dt;state.weight+=(Number(contact&&state.time<.22)-state.weight)*(1-Math.exp(-dt*38));if(state.weight<.01&&!contact){this.groundFeet.delete(side);continue;}const target=ankle.clone().lerp(state.point,weight*state.weight);target.y=Math.max(target.y,height+.073);const original=foot.getWorldQuaternion(Q());this.solveLeg(side,target,weight*state.weight,0,Infinity,.015);s.root.updateMatrixWorld(true);foot.quaternion.copy(foot.parent.getWorldQuaternion(Q()).invert().multiply(original));this.groundFeet.set(side,state);this.groundReport.push({side,weight:state.weight,error:foot.getWorldPosition(V()).distanceTo(state.point)});}
+   if(state){state.time+=dt;state.weight+=(Number(contact&&state.time<.22)-state.weight)*(1-Math.exp(-dt*38));if(state.weight<.01&&!contact){this.groundFeet.delete(side);continue;}const target=ankle.clone().lerp(state.point,weight*state.weight);target.y=Math.max(target.y,height+.073*this.actor.scale.y);const original=foot.getWorldQuaternion(Q());this.solveLeg(side,target,weight*state.weight,0,Infinity,.015);s.root.updateMatrixWorld(true);foot.quaternion.copy(foot.parent.getWorldQuaternion(Q()).invert().multiply(original));this.groundFeet.set(side,state);this.groundReport.push({side,weight:state.weight,error:foot.getWorldPosition(V()).distanceTo(state.point)});}
    else if(low<height){const target=ankle.clone();target.y+=height-low;const original=foot.getWorldQuaternion(Q());this.solveLeg(side,target,weight,0,Infinity,.015);s.root.updateMatrixWorld(true);foot.quaternion.copy(foot.parent.getWorldQuaternion(Q()).invert().multiply(original));}
   }
  }

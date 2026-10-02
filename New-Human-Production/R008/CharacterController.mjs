@@ -3,15 +3,16 @@ export const MOVEMENT=Object.freeze({walkSpeed:1.65,runSpeed:4.2,gravity:20,jump
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const angleDelta=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
 export class CharacterController {
- constructor(world=WORLD){this.world=world;this.keys=new Set();this.reset();}
+ constructor(world=WORLD){this.world=world;this.movement={...MOVEMENT};this.keys=new Set();this.reset();}
+ setBodyMetrics({height,radius,scale}){if(![height,radius,scale].every(Number.isFinite)||height<1.6||height>2.05||radius<=0||scale<=0)throw Error('Invalid body collision metrics');this.movement={...MOVEMENT,height,radius,jumpHeight:MOVEMENT.jumpHeight*scale};}
  reset(){Object.assign(this,this.world.spawn,{vx:0,vz:0,vy:0,speed:0,grounded:true,support:'ground',phase:'idle',phaseTime:0,turnRate:0,turnError:0,buffer:0,coyote:0,landImpact:0,accumulator:0,time:0,jumpCount:0,landings:[],blocked:false});this.keys.clear();}
  press(code,repeat=false){if(code==='Space'){if(!repeat&&!this.keys.has(code))this.buffer=MOVEMENT.jumpBuffer;}this.keys.add(code);}
  release(code){this.keys.delete(code);}
  clearInput(){this.keys.clear();this.buffer=0;}
- launchJump(){this.vy=Math.sqrt(2*MOVEMENT.gravity*MOVEMENT.jumpHeight);this.grounded=false;this.phase='takeoff';this.phaseTime=0;this.jumpCount++;}
+ launchJump(){this.vy=Math.sqrt(2*this.movement.gravity*this.movement.jumpHeight);this.grounded=false;this.phase='takeoff';this.phaseTime=0;this.jumpCount++;}
  update(dt){this.accumulator+=clamp(dt,0,.1);while(this.accumulator>=1/120){this.tick(1/120);this.accumulator-=1/120;}}
  tick(dt){
-  const m=MOVEMENT,p=this;this.time+=dt;this.phaseTime+=dt;this.buffer=Math.max(0,this.buffer-dt);this.coyote=this.grounded?m.coyoteTime:Math.max(0,this.coyote-dt);
+  const m=this.movement,p=this;this.time+=dt;this.phaseTime+=dt;this.buffer=Math.max(0,this.buffer-dt);this.coyote=this.grounded?m.coyoteTime:Math.max(0,this.coyote-dt);
   let dx=Number(this.keys.has('KeyD'))-Number(this.keys.has('KeyA')),dz=Number(this.keys.has('KeyS'))-Number(this.keys.has('KeyW'));const inputLength=Math.hypot(dx,dz);if(inputLength){dx/=inputLength;dz/=inputLength;}
   const targetSpeed=this.keys.has('ShiftLeft')||this.keys.has('ShiftRight')?m.runSpeed:m.walkSpeed;
   const requestedYaw=inputLength?Math.atan2(dx,dz):this.yaw,pivotScale=1-.65*clamp((Math.abs(angleDelta(this.yaw,requestedYaw))-.6*Math.PI)/(.4*Math.PI),0,1);

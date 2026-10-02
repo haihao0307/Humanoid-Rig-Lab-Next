@@ -20,7 +20,10 @@ export async function sewShortsSource(source,body,actor,scene,onProgress=()=>{},
    for(let sweep=0;sweep<8;sweep++){for(const e of cloth.edges)cloth.solveDistance(e,cloth.options.fixedDt);for(const t of cloth.triangles)projectManufacturingPaper(cloth,t);for(const e of threads)if(e.active)cloth.solveDistance(e,cloth.options.fixedDt);}
    if(pass%10===0){const audit=cloth.audit(false),seamGapM=gap();trace.push({pass,mainStrain:audit.mainStrain,seamGapM,finite:audit.finite});cloth.syncRender();onProgress({status:'sewing',stage:stage.id,pass,cloth,audit});await new Promise(resolve=>setTimeout(resolve,0));if((pass>=80&&audit.manufacturingMaterialValid&&seamGapM<=.0001)||!audit.finite)break;}
   }
-  let coupled=null;if(stage.id==='gusset'&&(!cloth.audit(false).manufacturingMaterialValid||gap()>.0001))coupled=solveManufacturingBlock(cloth,threads);
+  // Sequential projections can close stitches while retaining a material
+  // conflict at any source stage. Use the same bounded joint residual solve
+  // before every stage's unchanged material/gap gate, including side closure.
+  let coupled=null;if(!cloth.audit(false).manufacturingMaterialValid||gap()>.0001)coupled=solveManufacturingBlock(cloth,threads);
   const soft=cloth.audit(false),seamGapM=gap(),paperUnchanged=restIdentity===cloth.materialIdentity()&&sourceIdentity===identity(source);positions=localPositions(cloth);
   if(!soft.manufacturingMaterialValid||seamGapM>.0001||!paperUnchanged){stages.push({id:stage.id,valid:false,before,soft,seamGapM,trace,coupled,paperUnchanged});cloth.syncRender();onProgress({status:'failed',stage:stage.id,cloth,audit:soft});return {status:'failed',cloth,stages,bodyFitValidated:false,motionValidated:false};}
   cloth.dispose();cloth=new ShortsClothRuntime({...source,positions},body,actor,scene,{activeSeamIDs:stage.cumulativeSourceSeamIDs,elasticEnabled:false});const after=cloth.audit(false),valid=after.manufacturingMaterialValid&&cloth.positions.length===stage.sourceQuotientDofs;stages.push({id:stage.id,valid,before,soft,after,seamGapM,trace,coupled,paperUnchanged});onProgress({status:valid?'closed':'failed',stage:stage.id,cloth,audit:after});

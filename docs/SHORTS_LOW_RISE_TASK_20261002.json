@@ -77,15 +77,15 @@
     },
     "revised": {
       "id": "lowrise",
-      "revision": "R008-lowrise-elastic-style-preserved-v2-20261002",
-      "waistDropM": 0.055,
+      "revision": "R008-forearm-reference-lowrise-elastic-v3-20261002",
+      "waistDropM": null,
       "waistbandWidthM": 0.038,
       "retainSubjectOriginalClothing": true,
       "authorMissingBarePelvis": false,
       "bodySurfaceAuthority": "existing original clothing envelope",
       "acceptedShape": false,
       "motionValidated": false,
-      "htmlSHA256": "071f3bcf9728b734b91b9df757f1ff47598ae27b084346cd782b6b3b09f950a6"
+      "automaticWaistFit": true
     },
     "entry": "single interactive version switch; original bytes preserved; new version must pass separate gates",
     "entryArtifactSHA256": "91c18edaac39f2c99bd874d66fdd538559e893e4678e4aed34d09ae11ab8be61"
@@ -103,12 +103,12 @@
   "status": "HOLD_LOCAL_SOURCE_CHECKPOINT",
   "userDelivery": "SOURCE_CHECKPOINT_ONLY_NOT_COMPLETED_GARMENT",
   "sourceUpload": {
-    "status": "UPDATING_VERIFIED_DEVELOPMENT_BRANCH",
+    "status": "DEVELOPMENT_CHECKPOINT_NOT_COMPLETE_GARMENT",
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
     "branch": "work/shorts-two-versions-source-20261002",
     "draftPR": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/pull/16",
-    "priorVerifiedCommit": "1c433e3d186957df4b2145e966864d72e0790abb",
-    "nativeBodyBase": "52b3f6d487f31b401ec87cf0d4c2251fc965b4f8",
+    "priorVerifiedCommit": "0c2336eee19a1efcc0f5fd01eac5d4f6e79fffc3",
+    "nativeBodyBase": "b8a537f7e2fb8491199211bf20cb7adcf6f33ede",
     "productionReady": false
   },
   "latestProductionIncrement": {
@@ -135,5 +135,61 @@
       "scope": "wrong temporary target field; does not establish paper/body incompatibility"
     },
     "followupSourceScope": "New API rejects inconsistent shared guide targets before solving. Actor rigid frame conversion verified separately at identity and translated/rotated/nonuniform-scale actors without reapplying measured scale. Zero new solver passes; historical failed neutral-actor trace does not certify new wearing source."
+  },
+  "waistClarification": {
+    "userInstruction": "腰口降到原截图背景分界线、小臂中段；裤脚长度不变",
+    "revision": "R008-forearm-reference-lowrise-elastic-v3-20261002",
+    "automaticDropToStatureRatio": 0.03469331753048781,
+    "actualLatestDropM": 0.06243347286991367,
+    "maximumHemMovementM": 0,
+    "referenceArmPose": "original accepted A source bind; not new subject arm pose",
+    "bodyMeasurementAxis": "source reference waistband center; independent of requested low waist",
+    "styleSourceValidated": true,
+    "finalDrapeValidated": false
+  },
+  "latestReview": {
+    "status": "HOLD",
+    "productionReady": false,
+    "waistInstruction": "lower waist only; preserve hem paper target",
+    "reference": {
+      "originalSHA256": "2b9158f76cd75aef5605be86bd7092c406d333467ce116eca130f166580635da",
+      "liveDirectionsOnly": true,
+      "bakedCoordinatesCommitted": false,
+      "currentSource2DRestAuthoritative": true
+    },
+    "neutralWarmAuthoring": {
+      "iterations": 25,
+      "principalStrain": 0.3459018992769455,
+      "clearanceDeficitM": 0.005602076223905175,
+      "maximumHeightErrorM": 0.009377957203689058,
+      "stopReason": "HOLD: independent finite-difference descent check failed"
+    },
+    "actualBrowser": {
+      "artifactSHA256": "d8984b18ac00fec40f5d5ca21bc513e1cc0a5f0fe95d565100f1522a0af58fce",
+      "referenceWiringValid": true,
+      "principalStrain": 0.3806519090712457,
+      "clearanceDeficitM": 0.00985973778302443,
+      "maximumHeightErrorM": 0.026314154939448442,
+      "elapsedMs": 3817.2000000476837,
+      "nativeMotionGuard": true,
+      "nativeSteps": 0,
+      "errors": 0,
+      "externalCoreRequests": 0,
+      "manufacturingStatus": "failed",
+      "manufacturingPrincipalStrain": 0.05196576792441965,
+      "fullAcceptancePassed": false
+    },
+    "rejectedExperiment": "manufacturing Gram-row substitution worsened deformation; production principal rows restored; no threshold relaxation",
+    "rootDefects": [
+      "rigid gusset initial loft displaces leg material inward",
+      "old source pants lack bare pelvis underneath",
+      "new source rest and original per-triangle fold directions are not globally integrable without further authored construction"
+    ],
+    "testURL": "http://127.0.0.1:8883/qa/shorts-two-versions-20261002/index.html",
+    "manufacturingAutoStarted": false,
+    "fullTriangleContactValidated": false,
+    "selfContactValidated": false,
+    "motionValidated": false,
+    "publicPromotionValidated": false
   }
 }

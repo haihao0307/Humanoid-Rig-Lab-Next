@@ -1,4 +1,5 @@
 import earcut from './vendor/earcut.js';
+import {localSurfaceEdge} from './SurfaceQuality.mjs';
 export function createSeamSynchronizer(surface,geometry){
  const membership=new Map();for(const row of surface.seamGroups)for(const id of row)membership.set(id,row);
  return changedIds=>{const affected=new Map();for(const id of changedIds){const row=membership.get(id);if(!row)continue;if(!affected.has(row))affected.set(row,[]);affected.get(row).push(id);}
@@ -66,7 +67,9 @@ function closeGeneratedGaps(arrays,funcs){
  }
  return {seamGroups:rows.filter(row=>row.length>1),report:{patches,addedTriangles,reorientedTriangles,maxPatchSpanMetres:maxSpan,maxPatchAreaSquareMetres:maxArea,unresolvedBoundaryEdges:unresolved}};
 }
-export function generateSurface(data,{edgeMetres=.012,muscle=0}={}){
+export function generateSurface(data,{edgeMetres=.012,muscle=0,surfaceErrorMetres=.0005,anatomicalDetail=false}={}){
+ if(!Number.isFinite(edgeMetres)||edgeMetres<.003||edgeMetres>.04||!Number.isFinite(surfaceErrorMetres)||surfaceErrorMetres<.00005||surfaceErrorMetres>.001||typeof anatomicalDetail!=='boolean')throw Error('Invalid surface generation precision');
+ const localEdge=p=>localSurfaceEdge(p,edgeMetres,anatomicalDetail);
  const funcs=data.charts.map(chartFunctions),owners=new Map(),seamEdges=new Map(),originalOwners=new Map(),originalEdges=new Map();
  const edgeKey=(a,b)=>a<b?`${a}:${b}`:`${b}:${a}`;
  for(const f of funcs)for(const loop of f.c.trim){const uv=loop.seams.map((_,i)=>[loop.uv[i*2]/1e6,loop.uv[i*2+1]/1e6]);for(let i=0;i<uv.length;i++){const id=loop.seams[i];if(!originalOwners.has(id))originalOwners.set(id,[]);originalOwners.get(id).push({f,uv:uv[i]});const key=edgeKey(id,loop.seams[(i+1)%uv.length]);originalEdges.set(key,(originalEdges.get(key)||0)+1);}}
@@ -91,7 +94,7 @@ export function generateSurface(data,{edgeMetres=.012,muscle=0}={}){
   const color=f.appearance(...uv);if(muscle){const boost=1+muscle*.03;const group=f.c.anatomy;if(group==='torso'||group.startsWith('upperarm')||group.startsWith('thigh')){p[0]*=boost;p[2]*=boost;}}
   return {p,ids,ws,color,normal:f.normals?.(...uv)};
  }
- const pos=[],parameters=[],colors=[],normalValues=[],materialValues=[],indices=[],groups=[],boneIds=[],boneWeights=[],chartIds=[],emptyDomainIds=[];let triangles=0,trimLoops=0,unclosed=0;
+ const pos=[],parameters=[],colors=[],normalValues=[],materialValues=[],indices=[],groups=[],boneIds=[],boneWeights=[],chartIds=[],emptyDomainIds=[];let triangles=0,trimLoops=0,unclosed=0,refinementBudgetHits=0;
  for(const f of funcs){
   const groupStart=indices.length;
   const loops=f.c.trim.map(loop=>({uv:loop.seams.map((_,i)=>[loop.uv[i*2]/1e6,loop.uv[i*2+1]/1e6]),seams:loop.seams.map(canonical)})).filter(l=>l.uv.length>=3);trimLoops+=loops.length;
@@ -103,7 +106,7 @@ export function generateSurface(data,{edgeMetres=.012,muscle=0}={}){
    for(const loopId of selected){const loop=loops[loopId];if(loopId!==outer)holes.push(vertices.length);let first=vertices.length;
     // Canonical seam edge sampling is identical for every owner, so chart
     // borders join after regeneration even when display density changes.
-    for(let i=0;i<loop.uv.length;i++){const j=(i+1)%loop.uv.length,a=loop.seams[i],b=loop.seams[j],key=a<b?`${a}:${b}`:`${b}:${a}`,sources=seamEdges.get(key)||[],len=Math.max(...sources.map(s=>{const p=s.f.point(s.uv0),q=s.f.point(s.uv1);return Math.hypot(...p.map((v,k)=>v-q[k]))}),0),steps=Math.max(1,Math.ceil(len/edgeMetres));
+    for(let i=0;i<loop.uv.length;i++){const j=(i+1)%loop.uv.length,a=loop.seams[i],b=loop.seams[j],key=a<b?`${a}:${b}`:`${b}:${a}`,sources=seamEdges.get(key)||[],len=Math.max(...sources.map(s=>{const p=s.f.point(s.uv0),q=s.f.point(s.uv1);return Math.hypot(...p.map((v,k)=>v-q[k]))}),0),targetEdge=Math.min(edgeMetres,...sources.flatMap(s=>[localEdge(s.f.point(s.uv0)),localEdge(s.f.point(s.uv1))])),steps=Math.max(1,Math.ceil(len/targetEdge));
      for(let step=0;step<steps;step++){const t=step/steps,uv=loop.uv[i].map((v,k)=>v+(loop.uv[j][k]-v)*t),seam=step?{a,b,t}:{id:a};vertices.push({uv,seam});uvData.push(...uv);}
     }
     const end=vertices.length;rings.push({first,end});for(let i=first;i<end;i++){const j=i+1===end?first:i+1;boundaryMap.set(i<j?`${i}:${j}`:`${j}:${i}`,true);}
@@ -118,14 +121,14 @@ export function generateSurface(data,{edgeMetres=.012,muscle=0}={}){
    for(let pass=0;pass<12;pass++){
     const splits=new Map();
     for(let i=0;i<faces.length;i+=3){const corner=faces.slice(i,i+3),points=corner.map(id=>vertices[id].point||(vertices[id].point=f.point(vertices[id].uv))),centerUV=[0,0].map((_,k)=>corner.reduce((s,id)=>s+vertices[id].uv[k],0)/3),center=f.point(centerUV),linearCenter=[0,0,0].map((_,k)=>points.reduce((s,p)=>s+p[k],0)/3),centerError=Math.hypot(...center.map((v,k)=>v-linearCenter[k]));let longest=-1,longestLength=-1;for(let e=0;e<3;e++){const len=Math.hypot(...points[e].map((v,k)=>v-points[(e+1)%3][k]));if(len>longestLength){longest=e;longestLength=len;}}
-     for(let e=0;e<3;e++){const a=corner[e],b=corner[(e+1)%3],key=a<b?`${a}:${b}`:`${b}:${a}`;if(splits.has(key)||boundaryMap.has(key))continue;const p=points[e],q=points[(e+1)%3],uv=vertices[a].uv.map((v,k)=>(v+vertices[b].uv[k])/2),mid=f.point(uv),curveError=Math.hypot(...mid.map((v,k)=>v-(p[k]+q[k])/2));if(Math.hypot(...p.map((v,k)=>v-q[k]))>edgeMetres||curveError>.0005||(e===longest&&centerError>.0005)){splits.set(key,vertices.length);vertices.push({uv,point:mid});}}
+     for(let e=0;e<3;e++){const a=corner[e],b=corner[(e+1)%3],key=a<b?`${a}:${b}`:`${b}:${a}`;if(splits.has(key)||boundaryMap.has(key))continue;const p=points[e],q=points[(e+1)%3],uv=vertices[a].uv.map((v,k)=>(v+vertices[b].uv[k])/2),mid=f.point(uv),curveError=Math.hypot(...mid.map((v,k)=>v-(p[k]+q[k])/2));if(Math.hypot(...p.map((v,k)=>v-q[k]))>localEdge(mid)||curveError>surfaceErrorMetres||(e===longest&&centerError>surfaceErrorMetres)){splits.set(key,vertices.length);vertices.push({uv,point:mid});}}
     }
     if(!splits.size)break;const next=[];const mid=(a,b)=>splits.get(a<b?`${a}:${b}`:`${b}:${a}`);
     for(let i=0;i<faces.length;i+=3){const a=faces[i],b=faces[i+1],c=faces[i+2],ab=mid(a,b),bc=mid(b,c),ca=mid(c,a);const n=[ab,bc,ca].filter(x=>x!==undefined).length;
      if(n===0)next.push(a,b,c);else if(n===3)next.push(a,ab,ca,ab,b,bc,ca,bc,c,ab,bc,ca);
      else if(n===1){if(ab!==undefined)next.push(a,ab,c,ab,b,c);else if(bc!==undefined)next.push(b,bc,a,bc,c,a);else next.push(c,ca,b,ca,a,b);}
      else if(ab===undefined)next.push(c,ca,bc,ca,a,b,ca,b,bc);else if(bc===undefined)next.push(a,ab,ca,ab,b,c,ab,c,ca);else next.push(b,bc,ab,bc,c,a,bc,a,ab);
-    }faces=next;if(vertices.length>30000)break;
+    }faces=next;if(vertices.length>120000){refinementBudgetHits++;break;}
    }
    const base=pos.length/3;for(const vertex of vertices){const v=evaluate(f,vertex.uv,vertex.seam);pos.push(...v.p);parameters.push(f.c.textureLinear[0]+f.c.textureLinear[2]*vertex.uv[0]+f.c.textureLinear[4]*vertex.uv[1],f.c.textureLinear[1]+f.c.textureLinear[3]*vertex.uv[0]+f.c.textureLinear[5]*vertex.uv[1]);boneIds.push(...v.ids);boneWeights.push(...v.ws);if(v.normal){const len=Math.hypot(...v.normal)||1;normalValues.push(...v.normal.map(x=>x/len));}materialValues.push(Math.max(.05,Math.min(1,v.color[3])),Math.max(0,Math.min(1,v.color[4])));colors.push(...v.color.slice(0,3).map(x=>{x=Math.max(0,Math.min(1,x));return x<=.04045?x/12.92:Math.pow((x+.055)/1.055,2.4)}));chartIds.push(f.c.id);}
    for(let i=0;i<faces.length;i+=3){const a=faces[i],b=faces[i+1],c=faces[i+2],qa=vertices[a].uv,qb=vertices[b].uv,qc=vertices[c].uv,orientation=(qb[0]-qa[0])*(qc[1]-qa[1])-(qb[1]-qa[1])*(qc[0]-qa[0]);const correct=orientation*f.c.uvSign>0;indices.push(base+a,base+(correct?b:c),base+(correct?c:b));triangles++;}
@@ -133,5 +136,5 @@ export function generateSurface(data,{edgeMetres=.012,muscle=0}={}){
   groups.push({start:groupStart,count:indices.length-groupStart,materialIndex:f.c.part});
  }
  const repair=closeGeneratedGaps({pos,parameters,colors,normalValues,materialValues,indices,groups,boneIds,boneWeights,chartIds},funcs);triangles+=repair.report.addedTriangles;
- return {groups,seamGroups:repair.seamGroups,positions:new Float32Array(pos),parameters:new Float32Array(parameters),colors:new Float32Array(colors),normals:new Float32Array(normalValues),material:new Float32Array(materialValues),indices:new Uint32Array(indices),skinIndex:new Uint16Array(boneIds),skinWeight:new Float32Array(boneWeights),influences:8,chartIds,functions:funcs,report:{vertices:pos.length/3,triangles,charts:funcs.length,trimLoops,emptyDomains:unclosed,emptyDomainIds,seams:{matchedBorderSamples:matched,maxCorrectionMetres:maxCorrection,unmatchedBorderSamples:[...border].filter(id=>parts.get(canonical(id)).size===1).length,...repair.report}}};
+ return {groups,seamGroups:repair.seamGroups,positions:new Float32Array(pos),parameters:new Float32Array(parameters),colors:new Float32Array(colors),normals:new Float32Array(normalValues),material:new Float32Array(materialValues),indices:new Uint32Array(indices),skinIndex:new Uint16Array(boneIds),skinWeight:new Float32Array(boneWeights),influences:8,chartIds,functions:funcs,report:{vertices:pos.length/3,triangles,charts:funcs.length,trimLoops,emptyDomains:unclosed,emptyDomainIds,precision:{edgeMetres,surfaceErrorMetres,anatomicalDetail,headEdgeMetres:localEdge([0,1.65,.1]),refinementBudgetHits},seams:{matchedBorderSamples:matched,maxCorrectionMetres:maxCorrection,unmatchedBorderSamples:[...border].filter(id=>parts.get(canonical(id)).size===1).length,...repair.report}}};
 }
