@@ -52,12 +52,12 @@ $atlasBlobResults = @($atlasBlobs | ForEach-Object -Parallel {
     $raw = [System.IO.File]::ReadAllBytes($row.full)
     $body = @{ content = [Convert]::ToBase64String($raw); encoding = 'base64' } | ConvertTo-Json -Compress
     $raw = $null
-    $response = Invoke-RestMethod -Uri "$api/git/blobs" -Method POST -Headers $headers -ContentType 'application/json; charset=utf-8' -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 90
+    $response = Invoke-RestMethod -Uri "$api/git/blobs" -Method POST -Headers $headers -ContentType 'application/json; charset=utf-8' -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 240
     if ($response.sha -ne $row.sha) { throw "Blob identity mismatch: $($row.path)" }
     @{sha=$response.sha; repository='haihao0307/Humanoid-Rig-Lab-Next'} | ConvertTo-Json -Compress | Set-Content -LiteralPath $cache -Encoding utf8
     Write-Host "Uploaded $($row.path) ($($row.bytes) bytes)"
     [pscustomobject]@{ path = $row.path; sha = $response.sha; mode = $row.mode }
-} -ThrottleLimit 3)
+} -ThrottleLimit 1)
 if ($atlasBlobResults.Count -ne $atlasBlobs.Count) { throw 'Incomplete blob upload.' }
 $atlasElements = [System.Collections.Generic.List[object]]::new()
 if ($atlasPrevious) {

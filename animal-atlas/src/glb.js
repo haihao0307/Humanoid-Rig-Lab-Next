@@ -1,11 +1,11 @@
 export function createGLB(items,metadata){
  if(!items?.length)throw Error('没有模型数据');
- const json={asset:{version:'2.0',generator:'Animal Atlas 1.0'},scene:0,scenes:[{nodes:[]}],nodes:[],meshes:[],materials:[],buffers:[{byteLength:0}],bufferViews:[],accessors:[],extras:{...metadata,units:'metre',upAxis:'Y',exportMode:'current-pose',animationIncluded:false,materialScope:'PBR base colour and vertex colour; custom procedural shaders require the standalone runtime'}};
+ const json={asset:{version:'2.0',generator:'Animal Atlas 1.0'},scene:0,scenes:[{nodes:[]}],nodes:[],meshes:[],materials:[],buffers:[{byteLength:0}],bufferViews:[],accessors:[],extras:{...metadata,units:metadata.geometryUnits==='source-units'?'source-units':'metre',upAxis:'Y',exportMode:'current-pose',animationIncluded:false,materialScope:'PBR base colour and vertex colour; custom procedural shaders require the standalone runtime'}};
  const chunks=[],encoder=new TextEncoder(),pad=(n)=>Math.ceil(n/4)*4;let length=0;
  function view(bytes,target){const index=json.bufferViews.length;json.bufferViews.push({buffer:0,byteOffset:length,byteLength:bytes.byteLength,...(target?{target}:{} )});const chunk=new Uint8Array(pad(bytes.byteLength));chunk.set(new Uint8Array(bytes.buffer,bytes.byteOffset,bytes.byteLength));chunks.push(chunk);length+=chunk.byteLength;return index;}
  function accessor(array,type,componentType,count,bounds){const index=json.accessors.length;json.accessors.push({bufferView:view(array,type==='SCALAR'?34963:34962),componentType,count,type,...bounds});return index;}
  let min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];for(const item of items)for(let i=0;i<item.positions.length;i+=3)for(let k=0;k<3;k++){const v=item.positions[i+k];if(!Number.isFinite(v))throw Error('模型含无效顶点，已停止导出');min[k]=Math.min(min[k],v);max[k]=Math.max(max[k],v);}
- const origin=[(min[0]+max[0])/2,min[1],(min[2]+max[2])/2];json.extras.originalWorldOrigin=origin;json.extras.boundsMetres=max.map((v,k)=>v-min[k]);
+ const origin=[(min[0]+max[0])/2,min[1],(min[2]+max[2])/2];json.extras.originalWorldOrigin=origin;json.extras[metadata.geometryUnits==='source-units'?'boundsSourceUnits':'boundsMetres']=max.map((v,k)=>v-min[k]);
  for(const item of items){
  const positions=new Float32Array(item.positions),indices=new Uint32Array(item.indices),count=positions.length/3;for(let i=0;i<positions.length;i+=3)for(let k=0;k<3;k++)positions[i+k]-=origin[k];for(const i of indices)if(i>=count)throw Error('网格索引越界');
  const low=[Infinity,Infinity,Infinity],high=[-Infinity,-Infinity,-Infinity];for(let i=0;i<positions.length;i+=3)for(let k=0;k<3;k++){low[k]=Math.min(low[k],positions[i+k]);high[k]=Math.max(high[k],positions[i+k]);}

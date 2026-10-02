@@ -1,0 +1,1041 @@
+{
+  "startedAt": "2026-10-02T10:16:40.019Z",
+  "passed": true,
+  "completedAt": "2026-10-02T10:20:29.310Z",
+  "checks": [
+    "all 19 actual animal modules have explicit declared dimensions/mass and fixed metre conversion",
+    "editing basic data persists independently; changing shape keeps conversion rather than re-normalizing",
+    "baked form retains enlarged physical size, declared mass and original life activity",
+    "invalid basic data rejected without replacing the existing stage",
+    "legacy rehearsals retain old display units and can explicitly change to metres when data are available",
+    "new procedural imports require size and weight and carry them in animal package and score",
+    "basic data persist across reload for built-in and newly imported animals",
+    "standalone offline rehearsal preserves physical scale and mass"
+  ],
+  "entries": [
+    {
+      "invalidInstancing": false,
+      "id": "fish",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1,
+        "massKg": 8,
+        "sourceSpan": 0.9764193296432495,
+        "metersPerUnit": 1.0241501470125198,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "04ecbd730b5f01c4737f52e12fc72cdf660c4cd4dcbfed31484ba5de2de3d379",
+          "dimensions": [
+            0.9764193296432495,
+            0.2879331329895649,
+            0.22504889965057373
+          ],
+          "parameters": {
+            "action": "CRUISE",
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "group": false,
+            "speed": 1,
+            "amplitude": 1,
+            "swing": 1,
+            "bodyScale": 1,
+            "brightness": 1,
+            "eyeYaw": 0,
+            "eyePitch": 0,
+            "pupil": 0,
+            "waterDensity": 1,
+            "lightRays": 0.85,
+            "waterBloom": 0.18,
+            "kelpDensity": 1,
+            "environment": true,
+            "wire": false,
+            "renderMode": "0",
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 0.9715284109115601,
+      "factor": 1.0241501470125198,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "shark",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 4.5,
+        "massKg": 800,
+        "sourceSpan": 3.566003203392029,
+        "metersPerUnit": 1.2619169819363991,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "4e7021bd17febb50826d93ea07323bb607dd883a27252843d2aaa95355715158",
+          "dimensions": [
+            3.566003203392029,
+            1.5199999809265137,
+            1.7009336352348328
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 10,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "environment": true,
+            "waterDensity": 1,
+            "lightRays": 0.85,
+            "kelpDensity": 1,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "calm-current",
+            "jawPreview": 0
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 3.605081796646118,
+      "factor": 1.2619169819363991,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "pig",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.5,
+        "massKg": 120,
+        "sourceSpan": 2.0192971229553223,
+        "metersPerUnit": 0.7428327327108206,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "ce25622a9749d2918157c0f4c42877ca4b9243872d5f7346e656b4c7688c37ff",
+          "dimensions": [
+            0.7309447526931763,
+            0.8977081524208188,
+            2.0192971229553223
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 11.5,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "environment": true,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "clear"
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 2.0192971229553223,
+      "factor": 0.7428327327108206,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "dog",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.05,
+        "massKg": 18,
+        "sourceSpan": 1.2209941446781158,
+        "metersPerUnit": 0.8599549838765246,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "b6eb3c021cd14baea81ed539de2b726f614c485b3bff4a4c093af7a8026c1f07",
+          "dimensions": [
+            0.37162983417510986,
+            0.844751093769446,
+            1.2209941446781158
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 11.5,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "environment": true,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "clear",
+            "paceSlider": 1
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 1.2217459976673126,
+      "factor": 0.8599549838765246,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "lihua",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.76,
+        "massKg": 4.5,
+        "sourceSpan": 1.2076204419136047,
+        "metersPerUnit": 0.6293368128115636,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "bf53a34bc163181730cecc8258c35e067f482cf8a2563788c1275926afaaec11",
+          "dimensions": [
+            0.4040295481681824,
+            0.6213416459336877,
+            1.2076204419136047
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 11.5,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "environment": true,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "clear"
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 1.2076204419136047,
+      "factor": 0.6293368128115636,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "cat",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.76,
+        "massKg": 4.5,
+        "sourceSpan": 0.5166386961936951,
+        "metersPerUnit": 1.4710473791437901,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "44452642d5088d6cec3a12ea69ba1fe8cc5ca6f2d389ec86fb4b38bf8355302d",
+          "dimensions": [
+            0.5166386961936951,
+            0.35369153127220354,
+            0.11959531158208847
+          ],
+          "parameters": {
+            "action": "stand",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "environment": true,
+            "speed": 1,
+            "autoExpression": true,
+            "gazeYaw": 0,
+            "gazePitch": 0,
+            "earLeft": 0,
+            "earRight": 0,
+            "furStrength": 0.7,
+            "skeleton": false,
+            "contacts": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 0.5166386961936951,
+      "factor": 1.4710473791437901,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "neutral-dog",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.05,
+        "massKg": 18,
+        "sourceSpan": 1.2504417896270752,
+        "metersPerUnit": 0.8397032222612667,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            0.3450287878513336,
+            0.728970980795566,
+            1.2504417896270752
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#c99b57",
+            "roughness": 0.92,
+            "scale": 1,
+            "bulk": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 1.2504417896270752,
+      "factor": 0.8397032222612667,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "tabby",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.76,
+        "massKg": 4.5,
+        "sourceSpan": 0.8052378594875336,
+        "metersPerUnit": 0.9438205010426066,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            0.23610281199216843,
+            0.34855019592214376,
+            0.8052378594875336
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#62666b",
+            "roughness": 0.89,
+            "scale": 1,
+            "bulk": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 0.8052378594875336,
+      "factor": 0.9438205010426066,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "wolf",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.6,
+        "massKg": 45,
+        "sourceSpan": 1.6306297779083252,
+        "metersPerUnit": 0.9812159827305403,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            0.3924087733030319,
+            0.9918086755787954,
+            1.6306297779083252
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#6f6d67",
+            "roughness": 0.96,
+            "scale": 1,
+            "bulk": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 1.6306297779083252,
+      "factor": 0.9812159827305403,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "bear",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 2.4,
+        "massKg": 450,
+        "sourceSpan": 3.2105454206466675,
+        "metersPerUnit": 0.7475365352459622,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            1.3762332201004028,
+            1.8332987874746323,
+            3.2105454206466675
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#e9e3d3",
+            "roughness": 0.96,
+            "scale": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 3.2105454206466675,
+      "factor": 0.7475365352459622,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "tortoise",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.35,
+        "massKg": 5,
+        "sourceSpan": 2.1564483642578125,
+        "metersPerUnit": 0.16230390942862197,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            1.5160964727401733,
+            1.0172603279352188,
+            2.1564483642578125
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#5b594c",
+            "roughness": 0.92,
+            "scale": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 2.1564483642578125,
+      "factor": 0.16230390942862197,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "dove",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.32,
+        "massKg": 0.152,
+        "sourceSpan": 1.3191397786140442,
+        "metersPerUnit": 0.24258232917227954,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "ef72b766ecc87ac3629824a6222fa02ecfbfef7f4144374c5384b8fa25219270",
+          "dimensions": [
+            0.879186600446701,
+            0.8722741277888417,
+            1.3191397786140442
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 7.5,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "clear",
+            "wind": 0.7,
+            "doveInspectionMode": "all"
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 1.3189931809902191,
+      "factor": 0.24258232917227954,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "eagle",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.6,
+        "massKg": 4.5,
+        "sourceSpan": 0.9811093807220459,
+        "metersPerUnit": 1.630806953270065,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "35f15ae6b0bc9f4ba5f1b94b54ce8c06140c1d8af4906aab84353dac075ce120",
+          "dimensions": [
+            0.9811093807220459,
+            0.5770481192648731,
+            0.4446805715560913
+          ],
+          "parameters": {
+            "action": "patrol",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "speed": 1,
+            "control:coupling_gain": 1.08,
+            "control:head_stability": 0.9,
+            "control:life_gain": 1.22,
+            "bones": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 0.9811097383499146,
+      "factor": 1.630806953270065,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "starling",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.38,
+        "massKg": 0.08,
+        "sourceSpan": 1.0210633277893066,
+        "metersPerUnit": 0.37216104981728604,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "327b4870c927635266f620e2c1a61b645dda1002afc297d9d9a428eebe66fbdf",
+          "dimensions": [
+            0.9166746735572815,
+            0.7885294705629349,
+            1.0210633277893066
+          ],
+          "parameters": {
+            "action": "pigeon",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "speed": "1",
+            "zoom": "1",
+            "bones": false,
+            "regions": false,
+            "wire": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 1.0227665901184082,
+      "factor": 0.37216104981728604,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "fruit-dove",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.4,
+        "massKg": 0.1,
+        "sourceSpan": 1.0758504271507263,
+        "metersPerUnit": 0.3717988950000762,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "327b4870c927635266f620e2c1a61b645dda1002afc297d9d9a428eebe66fbdf",
+          "dimensions": [
+            1.0758504271507263,
+            0.5053628981113434,
+            0.6859714388847351
+          ],
+          "parameters": {
+            "action": "pigeon",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "speed": "1",
+            "zoom": "1",
+            "bones": false,
+            "regions": false,
+            "wire": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 1.0445013642311096,
+      "factor": 0.3717988950000762,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "tern",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.78,
+        "massKg": 0.12,
+        "sourceSpan": 0.9685712158679962,
+        "metersPerUnit": 0.8053099113636101,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "327b4870c927635266f620e2c1a61b645dda1002afc297d9d9a428eebe66fbdf",
+          "dimensions": [
+            0.879890501499176,
+            0.9685712158679962,
+            0.6976350247859955
+          ],
+          "parameters": {
+            "action": "pigeon",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "speed": "1",
+            "zoom": "1",
+            "bones": false,
+            "regions": false,
+            "wire": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 0.9784199595451355,
+      "factor": 0.8053099113636101,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "chicken",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.65,
+        "massKg": 2.5,
+        "sourceSpan": 1.0175676812650636,
+        "metersPerUnit": 0.638778149077912,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "8ab3d4d9fe1add4fa15b8a5a6eb915bde53a6211623393aef980b06bec2cd33d",
+          "dimensions": [
+            0.9075191915035248,
+            1.0175676812650636,
+            0.5271598696708679
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "environment": true,
+            "chicken:body_width": 1,
+            "chicken:body_depth": 1,
+            "chicken:neck_fullness": 1,
+            "chicken:head_scale": 1,
+            "chicken:beak_length": 1,
+            "chicken:tail_root_length": 1,
+            "chicken:comb_height": 1,
+            "chicken:comb_thickness": 1,
+            "chicken:wing_length": 1,
+            "chicken:wing_fullness": 1,
+            "chicken:eye_scale": 1,
+            "chicken:soft_tissue_scale": 1,
+            "chicken:leg_thickness": 1,
+            "chicken:foot_scale": 1,
+            "chicken:toe_spread": 1,
+            "micro": 1,
+            "contrast": 1,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 1.0175676812650636,
+      "factor": 0.638778149077912,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "crab",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.3,
+        "massKg": 0.3,
+        "sourceSpan": 0.427215576171875,
+        "metersPerUnit": 0.7022215872562325,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "ba49730d88f4acf6a02c042275f7ee0710ff5dfef98ca77386fd4d6cb59ff874",
+          "dimensions": [
+            0.427215576171875,
+            0.18339254707098007,
+            0.30627503991127014
+          ],
+          "parameters": {
+            "action": "auto",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "skin": "ordinary-russet",
+            "tone": 0.5,
+            "variation": 0.5,
+            "detail": 0.5,
+            "gloss": 0.5,
+            "speed": 1.65,
+            "stage": "beach",
+            "bones": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 0.427215576171875,
+      "factor": 0.7022215872562325,
+      "units": "meters",
+      "gl": 0
+    },
+    {
+      "invalidInstancing": false,
+      "id": "coconut",
+      "basic": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.8,
+        "massKg": 2.5,
+        "sourceSpan": 0.3703593611717224,
+        "metersPerUnit": 2.1600642075550742,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "ba49730d88f4acf6a02c042275f7ee0710ff5dfef98ca77386fd4d6cb59ff874",
+          "dimensions": [
+            0.3703593611717224,
+            0.20886813927212033,
+            0.34886664152145386
+          ],
+          "parameters": {
+            "action": "auto",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "skin": "coconut-blue",
+            "tone": 0.5,
+            "variation": 0.5,
+            "detail": 0.5,
+            "gloss": 0.5,
+            "speed": 1.65,
+            "stage": "beach",
+            "bones": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "extent": 0.3703593611717224,
+      "factor": 2.1600642075550742,
+      "units": "meters",
+      "gl": 0
+    }
+  ],
+  "errors": [],
+  "network": []
+}
