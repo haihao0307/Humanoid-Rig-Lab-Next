@@ -1,0 +1,68 @@
+{
+  "taskId": "animal-atlas-warehouse-rehearsal-20261002",
+  "status": "CANDIDATE_READY",
+  "localSourceHeadSha": "bf412be71e3b101f284f6d60900ac1f3ac1f472f",
+  "localBaseSha": "8fea4c608efa1c1d3d58e1a938004997f73ce901",
+  "userCorrection": "平台只负责仓库接口展示烘焙及排练，动物生成和知识归模块",
+  "productionFilesChanged": [
+    "src/app.js",
+    "src/bridge.js",
+    "src/import-manager.js",
+    "src/baked.js",
+    "src/rehearsal.js",
+    "src/rehearsal-viewer.js",
+    "src/rehearsal.html",
+    "src/rehearsal.css",
+    "src/index.html",
+    "tools/build.mjs"
+  ],
+  "standaloneHtml": {
+    "file": "打开动物集成工作台.html",
+    "bytes": 109592924,
+    "sha256": "f5ddea975eadd9f73ad28063e802dec309f3ba27631536095024cfca538a166b"
+  },
+  "offlineArchive": {
+    "file": "animal-atlas-v1.2.0-offline.zip",
+    "bytes": 81443098,
+    "sha256": "96b4bef25db7688e3ec400a9652c2ec03fec415a5d75e03594d77a26da1f7d82"
+  },
+  "tests": {
+    "existingImports": {
+      "passed": true,
+      "checks": 17,
+      "report": "qa/IMPORT_REPORT.json"
+    },
+    "rehearsal": {
+      "passed": true,
+      "animals": 19,
+      "checks": 11,
+      "report": "qa/REHEARSAL_REPORT.json"
+    }
+  },
+  "independentVerifier": {
+    "role": "verify_warehouse",
+    "scope": "平台功能；不批准物种视觉或科学准确性",
+    "result": "PASS",
+    "observations": [
+      "损坏贴图失败保留原对象位置时间播放和光线",
+      "失败创建的网格材质得到释放；原资源保留并在成功替换时释放一次",
+      "公开API与文档一致"
+    ]
+  },
+  "browserDesktop": "1680x1000 headless file://",
+  "browserMobile": "390x844 headless file://",
+  "coreNetworkRequests": 0,
+  "archiveHtmlIdentity": true,
+  "knownLimitations": [
+    "排练台采用当前姿态快照与整体位移，不含原骨骼动作",
+    "关系为人工编排，不推断生态行为",
+    "展示大小未做真实生物尺寸标定",
+    "基础材质不完全移交自定义程序化着色器",
+    "新生成器需要显式注册适配器，不能任意执行导入代码"
+  ],
+  "fallbackActive": false,
+  "visualAcceptance": false,
+  "productionReady": false,
+  "nextAction": "按用户既有授权同步 animal-atlas 目录；用户评审平台候选",
+  "completedAt": "2026-10-02T07:04:51.9844577Z"
+}

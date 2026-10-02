@@ -51,7 +51,7 @@ if(kind==='imported'){const n=__ATLAS_IMPORTED;actions=n.actions;record.action=n
 }
 studio=AtlasStudioAdapter(context,range,check,select);defs=[...studio.controls,...defs].filter(Boolean);actions=actions.filter((a,i,all)=>a.id&&all.findIndex(b=>b.id===a.id)===i);for(const d of defs)record[d.key]=d.value;
 ready=true;for(const [key,value]of Object.entries(context.initial||{}))if(key!=='playing'&&(defs.some(d=>d.key===key)||['action','view'].includes(key)))set(key,value);if('playing'in(context.initial||{}))set('playing',context.initial.playing);
-window.AnimalRuntime={version:'animal-atlas/1',ready:true,configuration:()=>({...record}),set,playAction:id=>set('action',id),pause:()=>set('playing',false),resume:()=>set('playing',true),meshes:exportMeshes};
+window.AnimalRuntime={version:'animal-atlas/1',ready:true,describe:()=>({schema:'kaopu/runtime@1',animalId:context.id,name:context.name,instrument:context.instrument||{id:'atlas/'+kind,version:context.version},controls:defs.map(d=>({...d,value:record[d.key]})),actions:[...actions],capabilities:{parameters:true,actions:!!actions.length,bakeCurrentPose:true,customShaderPortable:false}}),configuration:()=>({...record}),set,playAction:id=>set('action',id),pause:()=>set('playing',false),resume:()=>set('playing',true),meshes:exportMeshes,bake:async()=>({schema:'kaopu/mesh-snapshot@1',animalId:context.id,parameters:{...record},items:await exportMeshes()})};
 send('ready',{controls:defs.map(d=>({...d,value:record[d.key]})),actions,record});
 }
 function set(key,value){

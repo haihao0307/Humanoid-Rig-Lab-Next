@@ -15,6 +15,9 @@ $atlasReadme = Join-Path $atlasDist 'OFFLINE_README.txt'
 左侧分类与目录，中央鼠标拖动观察，最右侧调整对象参数及展示光线。
 收藏、删除、导入和导出在界面中直接可用；导入格式要求可在导入窗口展开查看。
 新增动物与参数保存在当前浏览器，换浏览器时请导出靠谱动物包。
+右上角新增排练台，可放入多个动物当前形态，调整位置、大小、关系与光线。
+默认导出靠谱烘焙文件；排练台可导出独立 HTML 或完整排练谱。
+排练关系为人工编排的整体运动，原骨骼动作在单动物工作台演示。
 
 源码、来源清单、构建工具和验收记录保存在 GitHub 仓库的 animal-atlas 目录。
 '@ | Set-Content -LiteralPath $atlasReadme -Encoding utf8

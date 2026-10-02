@@ -1,4 +1,5 @@
 # Uses the existing Git credential helper; credentials never enter logs or files.
+param([switch]$UpdateExistingDirectory,[string]$ExpectedDirectoryTree)
 $ErrorActionPreference = 'Stop'
 $atlasRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $atlasRoot
@@ -24,7 +25,10 @@ $atlasRef = Invoke-AtlasApi GET 'git/ref/heads/main'
 $atlasBase = $atlasRef.object.sha
 $atlasCommit = Invoke-AtlasApi GET "git/commits/$atlasBase"
 $atlasOldTree = Invoke-AtlasApi GET "git/trees/$($atlasCommit.tree.sha)"
-if ($atlasOldTree.tree.path -contains $atlasDestination) { throw 'Destination already exists; refusing to overwrite it.' }
+if ($atlasOldTree.tree.path -contains $atlasDestination) {
+    $atlasPrevious = @($atlasOldTree.tree | Where-Object path -eq $atlasDestination)[0]
+    if (-not $UpdateExistingDirectory -or -not $ExpectedDirectoryTree -or $atlasPrevious.sha -ne $ExpectedDirectoryTree) { throw 'Updating an existing directory requires explicit mode and its exact expected tree; concurrent edits are protected.' }
+}
 $atlasLocalHead = (git rev-parse HEAD).Trim()
 $atlasLocalTree = (git rev-parse 'HEAD^{tree}').Trim()
 $atlasRows = @(git -c core.quotePath=false ls-tree -r HEAD | ForEach-Object {
@@ -35,7 +39,7 @@ $atlasRows = @(git -c core.quotePath=false ls-tree -r HEAD | ForEach-Object {
 })
 if ($atlasRows.Where({ $_.bytes -ge 100MB }).Count) { throw 'File exceeds GitHub blob size limit.' }
 $atlasInline = @($atlasRows | Where-Object { $_.bytes -le 524288 -and $_.path -notmatch '\.(png|jpg|jpeg|zip|part\d+)$' })
-$atlasBlobs = @($atlasRows | Where-Object { $_.bytes -gt 524288 -or $_.path -match '\.(png|jpg|jpeg|zip)$' } | Sort-Object bytes -Descending)
+$atlasBlobs = @($atlasRows | Where-Object { $_.bytes -gt 524288 -or $_.path -match '\.(png|jpg|jpeg|zip|part\d+)$' } | Sort-Object bytes -Descending)
 Write-Output "Uploading $($atlasRows.Count) files under $atlasDestination; $($atlasBlobs.Count) binary/large blobs. Base $atlasBase"
 $atlasCache = Join-Path $atlasRoot 'qa/upload-blobs'
 New-Item -ItemType Directory -Path $atlasCache -Force | Out-Null
@@ -56,6 +60,14 @@ $atlasBlobResults = @($atlasBlobs | ForEach-Object -Parallel {
 } -ThrottleLimit 3)
 if ($atlasBlobResults.Count -ne $atlasBlobs.Count) { throw 'Incomplete blob upload.' }
 $atlasElements = [System.Collections.Generic.List[object]]::new()
+if ($atlasPrevious) {
+    $atlasPreviousFiles = Invoke-AtlasApi GET "git/trees/$($atlasPrevious.sha)?recursive=1"
+    if ($atlasPreviousFiles.truncated) { throw 'Cannot safely reconcile a truncated previous directory.' }
+    $atlasCurrentPaths = @($atlasRows.path)
+    foreach ($row in $atlasPreviousFiles.tree) {
+        if ($row.type -eq 'blob' -and $atlasCurrentPaths -notcontains $row.path) { $atlasElements.Add(@{ path = "$atlasDestination/$($row.path)"; mode = $row.mode; type = 'blob'; sha = $null }) }
+    }
+}
 foreach ($row in $atlasInline) {
     $bytes = [System.IO.File]::ReadAllBytes($row.full)
     $content = [System.Text.Encoding]::UTF8.GetString($bytes)
@@ -67,10 +79,11 @@ $atlasRootTree = Invoke-AtlasApi GET "git/trees/$($atlasNewTree.sha)"
 $atlasChild = @($atlasRootTree.tree | Where-Object path -eq $atlasDestination)
 if ($atlasChild.Count -ne 1 -or $atlasChild[0].sha -ne $atlasLocalTree) { throw 'Uploaded directory differs from the local committed snapshot.' }
 foreach ($row in $atlasOldTree.tree) {
+    if ($row.path -eq $atlasDestination) { continue }
     $new = @($atlasRootTree.tree | Where-Object path -eq $row.path)
     if ($new.Count -ne 1 -or $new[0].sha -ne $row.sha -or $new[0].mode -ne $row.mode) { throw "Protected root changed: $($row.path)" }
 }
-$atlasCandidate = Invoke-AtlasApi POST 'git/commits' @{ message = 'Add animal-atlas v1.2 workbench, source and offline package'; tree = $atlasNewTree.sha; parents = @($atlasBase) }
+$atlasCandidate = Invoke-AtlasApi POST 'git/commits' @{ message = $(if ($atlasPrevious) { 'Add animal warehouse contract, form baking and shared rehearsal stage' } else { 'Add animal-atlas v1.2 workbench, source and offline package' }); tree = $atlasNewTree.sha; parents = @($atlasBase) }
 $atlasFresh = Invoke-AtlasApi GET 'git/ref/heads/main'
 if ($atlasFresh.object.sha -ne $atlasBase) { throw 'Main advanced during upload; do not overwrite concurrent work.' }
 $atlasPromoted = Invoke-AtlasApi PATCH 'git/refs/heads/main' @{ sha = $atlasCandidate.sha; force = $false }

@@ -1,0 +1,47 @@
+{
+  "schema": "kaopu/content@1",
+  "producer": {
+    "version": "1.0.0",
+    "name": "动物模块示例"
+  },
+  "knowledge": {
+    "lifeStages": [
+      "幼年",
+      "成年"
+    ],
+    "references": [],
+    "growth": {
+      "providedBy": "animal-instrument",
+      "status": "K4 当前未实现，仓库仅保留知识记录"
+    }
+  },
+  "extensions": {
+    "example/species-notes@1": {
+      "note": "此处的专业内容由动物模块解释",
+      "seed": 42
+    }
+  },
+  "payload": {
+    "schema": "kaopu/animal@1",
+    "animal": {
+      "name": "陆龟程序化谱示例",
+      "category": "land"
+    },
+    "instrument": {
+      "id": "kaopu/quad",
+      "version": "K4.0.0"
+    },
+    "score": {
+      "schema": "kaopu/score@1",
+      "instrument": {
+        "id": "kaopu/quad",
+        "version": "K4.0.0"
+      },
+      "notation": "K4|M5b594c,.92/797568,.97/171915,.30/969183,.76|V0,.28,-.05,.43,.20,.63/0,.31,.52,.16,.16,.28/0,.29,.80,.12,.12,.22/0,.27,1.02,.14,.11,.18|F.34,.30,.38,.18/.47,.20,.53,.16/.56,.08,.67,.18|H.35,.27,-.42,.19/.47,.15,-.57,.16/.52,.07,-.68,.18|T0,.25,-.66,.055/0,.20,-.79,.015|S.115,.31,1.075,.021,.017,.013,0,0,0,2|D0,.245,1.17,.13,.045,.11,0,0,0,3|K0,.30,-.05,.56,.59,.80,1.05,11,.028,0,19",
+      "parameters": {
+        "scale": 1,
+        "environment": true
+      }
+    }
+  }
+}

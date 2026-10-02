@@ -1,0 +1,109 @@
+# 靠谱仓库与排练台：接入标准初版
+
+交付核对：
+
+- [x] 没有用生成图片代替真实三维实现；已实际修改生产源码。
+- [x] 交付可交互三维工作台，几何与姿态来自真实动物运行时，镜头、选择和编排参数可操作。
+- [ ] 公网固定部署链接尚未验证；本地 file:// 真实后台浏览器已验证。
+- [x] 如果只有截图而没有工作台，本轮判定失败；本轮有独立 HTML。
+
+平台职责是存放内容、匹配乐器与乐谱、显示模块声明的参数和动作、展示、编排、烘焙与导出。动物的知识、程序化生成、生长、体况、花色和行为由动物模块作者实现。平台不为所有动物补写生物学逻辑，也不会因为知识文件写了“年龄”就制造一个无效滑块。
+
+## 三个交付层
+
+1. **内容**：动物模块及其知识、声明和来源。乐器生成动物，乐谱保存某个个体的形态与参数。仓库转交扩展内容，不解释其中的专业规律。
+2. **烘焙对象**：模块生成的某个形态 / 当前姿态，携带基础网格、材质、原参数与来源。用于展示和移交其他网页；不再拥有原生成器和骨骼动作。
+3. **排练谱**：多个烘焙对象的实例、布局、人工指定的关系与环境光线。可以保存、恢复及导出独立演示页。
+
+GLB 只是仍保留的兼容输出与旧资产适配手段，不是新动物的创作格式。当前生产模块仍通过已有适配器接入；新增生成器需要实现统一接口并注册到平台构建，不能把任意 JS/HTML 当动物数据直接导入执行。
+
+## 内容封套 `kaopu/content@1`
+
+文件名建议 `species.kaopu.json`。根字段 `payload` 是有效的 `kaopu/animal@1` 完整包，程序化包里面携带完整谱及注册乐器身份。外层可以保存生产者、知识、扩展数据、来源和许可证声明：
+
+```json
+{
+  "schema": "kaopu/content@1",
+  "producer": { "name": "动物模块作者", "version": "1.0.0" },
+  "knowledge": {
+    "lifeStages": ["幼年", "成年"],
+    "growth": { "providedBy": "species-instrument", "status": "module-defined" },
+    "references": []
+  },
+  "extensions": {
+    "author/species-traits@1": { "description": "由动物模块自己解释的扩展数据" }
+  },
+  "payload": { "schema": "kaopu/animal@1", "animal": {}, "instrument": {}, "score": {} }
+}
+```
+
+示意中的空 payload 不是有效动物包；可运行示例见 `examples/warehouse-content.kaopu.json`。当前允许已注册 K4/K5 或原有资源动物包，不能只有内置工作台引用。知识与扩展必须是 JSON 对象。整个文件受原导入上限 90 MiB 限制；先验证并预览，再入库。外层数据随 IndexedDB 保存，导出“靠谱动物包”时保留；烘焙来源中也保留。导出纯参数乐谱不包含知识封套。
+
+模块声明的真实 controls/actions 决定界面，而不是外层知识文案。当前 K4/K5 不支持生长或骨骼动作；附带知识不会改变其能力。
+
+## 乐器运行接口
+
+已有适配器统一提供 `window.AnimalRuntime`，并沿用版本与通道校验的 `animal-atlas/1` iframe 协议。公开接口：
+
+| 方法 | 责任 |
+| --- | --- |
+| `describe()` | 返回 `kaopu/runtime@1`，含动物身份、乐器身份、真实 controls/actions 与能力声明 |
+| `configuration()` | 当前实际配置 |
+| `set(key, value)` | 调整模块支持的参数；生成逻辑仍在模块中 |
+| `playAction(id)` / `pause()` / `resume()` | 播放模块已有动作和暂停状态 |
+| `meshes()` | 当前姿态网格快照，排除展示环境 |
+| `bake()` | 返回 `kaopu/mesh-snapshot@1`，含 items、animalId 和 parameters；宿主封装成可移交烘焙文件 |
+
+控制声明包含 key、label、type、value，数值滑块包含 min/max/step，选择器包含 options。导入时执行已有参数校验，未知字段和越界值拒绝。模块新增参数必须实际影响其生成或运行，并升级自己的版本；宿主只显示已声明能力。
+
+这是现有模块的适配标准，不是已完成的任意代码插件安装系统。新乐器的引入流程是：模块作者交付生成器、默认谱、能力和来源 → 注册适配器与版本 → 检查真实展示、调参与烘焙 → 发布平台运行器 → 用户导入该乐器的动物谱 / 内容包。
+
+## 烘焙文件 `kaopu/bake@1`
+
+主界面的导出格式默认 **靠谱烘焙 · 当前形态**，文件扩展名 `.kaopu-bake.json`。结构包含：
+
+- `animal`：id、name、category。
+- `source`：乐器身份、当前 parameters、源版本、可用源码指纹、来源与导出时间；导入内容封套或上游烘焙来源继续保留。
+- `representation`：明确为静态当前姿态，Y 向上、源建模单位、基础材质范围。
+- `meshes`：positions、indices，可选 colors / uv / 内嵌 texture，以及基础 PBR material。
+
+导入会检查有限数值、三角索引、属性长度、材质范围和纹理字节，单对象最多 200 万顶点。导回动物目录后展示静态形态，可以放入排练台。源参数是形态来源记录，不是烘焙网格的生长控制器。
+
+某些原工作台的程序化表面颜色和复杂着色器无法完整转换为基础 PBR；烘焙采用与原静态导出相同的材质范围。完整原动作和复杂材质使用原独立动物 HTML。源建模单位没有全部标定，不能据此推断真实体长。
+
+## 排练台 `kaopu/rehearsal@1`
+
+右上角 **排练台** 打开共同场景。从目录选择动物后点击 **＋ 放入**；重复放入可建立同种动物的多个实例。当前选中的动物读取当前形态，其他动物通过后台单次载入其保存参数，读取后释放原工作台。先在单动物界面调形态，再放入排练台；放入的是快照，不会随原对象后续修改自动变化。
+
+右侧调整选中实例的位置、高度、展示大小、朝向、编排速度，以及静置、朝向、接近、跟随、避让、围绕关系。目标被移出时清除相应关系。播放 / 暂停、复位和查看全体在画面底部；鼠标可旋转、缩放、平移。环境光、主光、曝光、方向与背景可调整。
+
+排练谱包含 `assets` 烘焙资源、`actors` 实例和 `environment`。关系只引用实例 ID；导入先验证所有资源、ID、目标引用和数值。当前最多 24 个实例，总计 400 万资源顶点；文件导入最多 180 MiB。暂不自动保存排练状态，关闭后本次会话仍保留，刷新前请导出谱。JSON 谱可再次导入，独立 HTML 包含资源和运行器，不依赖原仓库或网络。
+
+排练采用各对象最大边长归一化为 2 个展示单位，再乘用户展示大小；不是动物真实尺寸比较。距离和粗略包围重叠只供排布观察。当前播放的是人工编排的整体位移 / 朝向；没有移植各模块的骨骼动画，没有自动判断食物链、捕食或生态关系。
+
+## 放到其他网站
+
+最简方式是导出排练 HTML，作为 iframe 使用。页面里提供 `window.KaopuStage`，可查询 actors、用 `setLight()` 调光线，以及 `play()` / `pause()` / `reset()` / `add()` / `remove()` / `document()`。
+
+也可以使用构建生成的 `dist/kaopu-stage-runtime.js`，与自己的烘焙文件一起部署；它包含 Three.js 和本展示运行器，使用原生 Canvas/WebGL，不向 CDN 请求依赖：
+
+```html
+<div id="animals" style="height:600px"></div>
+<script src="kaopu-stage-runtime.js"></script>
+<script>
+async function start() {
+  const stage = KaopuStageRuntime.create(document.getElementById('animals'));
+  const bake = await (await fetch('pig.kaopu-bake.json')).json();
+  await stage.add(bake, { x: 0, z: 0, scale: 1 });
+  stage.fit();
+  // 完整排练谱：await stage.load(doc)，然后 stage.playing = true。
+}
+start();
+</script>
+```
+
+嵌入已有 Three.js 场景时可按 meshes 数组建立 BufferGeometry 和基础材质，变换由接收网站管理。仓库自身不接管目标网站的世界规则。
+
+## 验证
+
+`node tools/test-rehearsal.mjs` 用后台浏览器验证所有 19 个动物真实进入共同场景、关系位移、暂停复位、鼠标相机、光线像素、排练谱往返、独立 HTML 离线播放、烘焙导回目录、知识扩展保存和导出。报告在 `qa/REHEARSAL_REPORT.json`；截图是实际运行结果，不代表物种模型的科学准确性。
