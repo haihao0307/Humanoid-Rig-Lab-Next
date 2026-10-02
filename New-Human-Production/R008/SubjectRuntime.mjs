@@ -1,3 +1,4 @@
+import {createScarSurface} from './ScarSurface.mjs';
 import * as THREE from 'three';
 import {generateSurface} from './surface-generator.mjs';
 import {decodeParameters} from './parameter-codec.mjs';
@@ -84,7 +85,8 @@ export function createSubject(data,options={}){
  face.attach(mesh);play('rest');
  const eyes=createProceduralEyes({surface,mesh,byName,bindWorld,data});
  const skin=createSkinMaterialBinding({mesh,eyes});
- return {root,mesh,skeleton,mixer,clips,helper,surface,data,neutral,bindWorld,byName,face,eyes,skin,play,locomotion,finishPose,
+ const scars=createScarSurface({mesh,surface,data});
+ return {root,mesh,skeleton,mixer,clips,helper,surface,data,neutral,bindWorld,byName,face,eyes,skin,scars,play,locomotion,finishPose,
   command(text){const name=/跳/.test(text)?'jump':/跑/.test(text)?'run':/走|步/.test(text)?'walk':/看|环顾/.test(text)?'look_around':'rest';play(name);return {phase:name,authority:'authored-61-bone-curves'}},
   step(dt){
    root.position.sub(motionOffset);motionOffset.set(0,0,0);if(!paused)mixer.update(Math.min(dt,.1));

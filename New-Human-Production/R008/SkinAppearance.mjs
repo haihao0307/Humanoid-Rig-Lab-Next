@@ -1,6 +1,7 @@
 // Adapted from our SkinAppearance/TissueShaders: authored art controls, not UV physiology.
 // Only compact state is persisted; colour fields are evaluated at runtime.
-export const SKIN_SCHEMA='human-r008/skin@1';
+import {ScarState} from './ScarState.mjs';
+export const SKIN_SCHEMA='human-r008/skin@2';
 export const SKIN_REFERENCE_COLOR='#d0ac91';
 export const SKIN_DEFAULT=Object.freeze({baseColor:SKIN_REFERENCE_COLOR,undertone:.02,redness:.13,variation:.30,sunExposure:0,weathering:0,roughness:.52,oil:.25});
 export const SKIN_PRESETS=Object.freeze({
@@ -38,7 +39,7 @@ export function applySkinPigment(rgb,input,exposure=1,mask=1){
 }
 const PROGRESSION_DEFAULT=Object.freeze({elapsedHours:0,equivalentSunHours:0,halfTanSunHours:48});
 export class SkinExposure {
- constructor(input={}){this.appearance=validateSkinAppearance(input);this.progression={...PROGRESSION_DEFAULT};}
+ constructor(input={}){this.appearance=validateSkinAppearance(input);this.progression={...PROGRESSION_DEFAULT};this.scars=new ScarState();}
  setAppearance(patch){this.appearance=validateSkinAppearance({...this.appearance,...object(patch,'肤色参数')});return this.export();}
  preset(id){if(!Object.hasOwn(SKIN_PRESETS,id))throw Error('未知肤色预设');const p=SKIN_PRESETS[id];this.progression={...PROGRESSION_DEFAULT,elapsedHours:(p.days||0)*24,equivalentSunHours:p.equivalentSunHours||0};this.appearance=validateSkinAppearance({...SKIN_DEFAULT,baseColor:p.baseColor,sunExposure:p.sunExposure??1-Math.exp(-Math.LN2*this.progression.equivalentSunHours/this.progression.halfTanSunHours)});return this.export();}
  advance(gameHours,environment={}){
@@ -47,13 +48,14 @@ export class SkinExposure {
   const dose=gameHours*uv*(1-shade)*(1-covered),next={...this.progression,elapsedHours:this.progression.elapsedHours+gameHours,equivalentSunHours:this.progression.equivalentSunHours+dose};
   number(next.elapsedHours,0,1e9,'累计时间');number(next.equivalentSunHours,0,4e9,'累计日晒');
   // Exact bounded integration: independent of render FPS and partition size.
-  this.appearance={...this.appearance,sunExposure:1-(1-this.appearance.sunExposure)*Math.exp(-Math.LN2*dose/next.halfTanSunHours)};this.progression=next;return this.export();
+  this.scars.advance(gameHours);this.appearance={...this.appearance,sunExposure:1-(1-this.appearance.sunExposure)*Math.exp(-Math.LN2*dose/next.halfTanSunHours)};this.progression=next;return this.export();
  }
- export(){return {schema:SKIN_SCHEMA,appearance:{...this.appearance},progression:{...this.progression}};}
+ export(){return {schema:SKIN_SCHEMA,appearance:{...this.appearance},progression:{...this.progression},scars:this.scars.export()};}
  restore(recipe){
-  object(recipe,'肤色存档');keys(recipe,['schema','appearance','progression'],'肤色存档');if(recipe.schema!==SKIN_SCHEMA)throw Error('肤色存档版本不匹配');
+  object(recipe,'肤色存档');keys(recipe,['schema','appearance','progression','scars'],'肤色存档');if(![SKIN_SCHEMA,'human-r008/skin@1'].includes(recipe.schema))throw Error('肤色存档版本不匹配');
   const a=validateSkinAppearance(object(recipe.appearance,'肤色参数')),p=object(recipe.progression,'日晒进度');keys(p,Object.keys(PROGRESSION_DEFAULT),'日晒进度');
   const next={...PROGRESSION_DEFAULT,...p};number(next.elapsedHours,0,1e9,'累计时间');number(next.equivalentSunHours,0,4e9,'累计日晒');number(next.halfTanSunHours,.1,10000,'日晒速度');
-  this.appearance=a;this.progression=next;return this.export();
+  const scars=new ScarState();if(recipe.schema===SKIN_SCHEMA)scars.restore(recipe.scars);
+  this.appearance=a;this.progression=next;this.scars=scars;return this.export();
  }
 }

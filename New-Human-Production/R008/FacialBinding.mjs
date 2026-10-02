@@ -75,7 +75,7 @@ export function createFacialBinding(surface,data){
    const displacement=direction.map(v=>v*w);positions.setXYZ(i,...p.map((v,j)=>v+displacement[j]));maxDisplacement=Math.max(maxDisplacement,Math.hypot(...displacement));
    if(amount&&w){const gradient=gradientAt(p,region),det=1+gradient.reduce((s,v,j)=>s+v*direction[j],0),dot=normal.reduce((s,v,j)=>s+v*direction[j],0);minJacobian=Math.min(minJacobian,det);const out=normal.map((v,j)=>v-gradient[j]*dot/det),length=Math.hypot(...out);n.setXYZ(i,...out.map(v=>v/length));}else n.setXYZ(i,...normal);
   }
-  if(vertices.length){const first=vertices[0]*3,last=vertices.at(-1)*3+3;for(const attribute of [positions,n]){attribute.clearUpdateRanges();attribute.addUpdateRange(first,last-first);attribute.needsUpdate=true;}}
+  if(vertices.length){const first=vertices[0]*3,last=vertices.at(-1)*3+3;for(const attribute of [positions,n]){attribute.addUpdateRange(first,last-first);attribute.needsUpdate=true;}}
   return {maxDisplacement,minJacobian,amount,region:regionId,pullLimitMetres:limit};
  }
  const gradients=new Float32Array(weights.length*3);
@@ -113,7 +113,7 @@ export function createFacialBinding(surface,data){
    const [a,b,c,e,f,g,h,i,j]=J,C=[f*j-g*i,g*h-e*j,e*i-f*h,c*i-b*j,a*j-c*h,b*h-a*i,b*g-c*f,c*e-a*g,a*f-b*e],det=a*C[0]+b*C[1]+c*C[2],out=[0,1,2].map(k=>C[k*3]*normal[0]+C[k*3+1]*normal[1]+C[k*3+2]*normal[2]),length=Math.hypot(...out);
    positions.setXYZ(vertices[k],...p.map((x,a)=>x+d[a]));n.setXYZ(vertices[k],...out.map(x=>x/Math.max(length,1e-9)));maxDisplacement=Math.max(maxDisplacement,Math.hypot(...d));minJacobian=Math.min(minJacobian,det);maxCoordinateStretch=Math.max(maxCoordinateStretch,Math.hypot(a,e,h),Math.hypot(b,f,i),Math.hypot(c,g,j));
   }
-  if(vertices.length)for(const attribute of [positions,n]){attribute.clearUpdateRanges();attribute.addUpdateRange(vertices[0]*3,vertices.at(-1)*3+3-vertices[0]*3);attribute.needsUpdate=true;}
+  if(vertices.length)for(const attribute of [positions,n]){attribute.addUpdateRange(vertices[0]*3,vertices.at(-1)*3+3-vertices[0]*3);attribute.needsUpdate=true;}
   return {maxDisplacement,minJacobian,maxCoordinateStretch,safeScale,actions:{...actions}};
  }
  return {regions:FACE_REGIONS,actions:FACE_ACTIONS,rows,report,sample:sampleFaceWeights,resolveAction:resolveFaceAction,attach(mesh){attached=mesh;return this},deform,deformActions,reset(){return deform(null,0)},get selectedRegion(){return currentRegion?.id},get amount(){return currentAmount}};
