@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1515">
+<link rel="icon" href="data:,">
+<title>KAOPU Tree Life R05 · Pandanus Teacher</title>
+<style>
+:root{color-scheme:dark;--bg:#0f1515;--panel:#171e1d;--line:#34413e;--ink:#e7ece9;--muted:#94a19d;--accent:#c6d9cf}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft Yahei",sans-serif}header{height:66px;padding:11px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:18px}h1{font-size:17px;letter-spacing:.4px;margin:0;font-weight:620}.sub{font-size:10px;color:#91a09b}.tag{border:1px solid #52635d;border-radius:20px;padding:4px 9px;font-size:10px;white-space:nowrap}.wrap{display:grid;grid-template-columns:minmax(0,1fr) 360px;min-height:calc(100vh - 66px)}.stage{position:relative;min-height:640px;overflow:hidden;background:radial-gradient(circle at 46% 39%,#32403b,#101717 72%)}.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}.bar{position:absolute;z-index:4;left:14px;top:14px;right:14px;display:flex;gap:6px;flex-wrap:wrap}.bar button{background:#182220dd;color:#e7ece9;border:1px solid #4b5c56;border-radius:6px;padding:8px 10px;min-height:38px;cursor:pointer}.bar button.on{background:#40574e;border-color:#91aa9e}.caption{position:absolute;z-index:3;left:17px;top:68px;max-width:520px;color:#a9b7b1;font-size:11px;pointer-events:none;text-shadow:0 1px 8px #000}.caption b{display:block;color:#eef3f0;font-size:14px;margin-bottom:2px}.ground-label{position:absolute;z-index:3;right:14px;bottom:42px;font-size:9px;color:#91a09b;pointer-events:none}.info{position:absolute;z-index:3;left:17px;bottom:14px;color:#a8b6b0;font-size:10px;pointer-events:none}.error{position:absolute;z-index:8;left:16px;right:16px;top:120px;padding:14px;background:#4a302c;border:1px solid #9f7066;border-radius:7px}.error[hidden]{display:none}.panel{background:var(--panel);border-left:1px solid var(--line);padding:19px 20px 28px;overflow:auto}.panel h2{font-size:14px;margin:0 0 5px}.note{font-size:11px;color:var(--muted);line-height:1.6;margin:0 0 17px}.teacher{border:1px solid #344740;background:#121918;border-radius:7px;padding:11px 12px;margin-bottom:16px;font-size:11px;color:#aebbb6}.teacher b{color:#dce6e1}.row{margin:0 0 15px}.row label{display:flex;justify-content:space-between;gap:10px;font-size:12px}.row output{color:#c2d4ca;font-variant-numeric:tabular-nums}.row small{display:block;color:#84938e;font-size:10px;margin-top:1px}input[type=range]{width:100%;height:20px;margin-top:5px;accent-color:var(--accent)}.status{border-top:1px solid var(--line);padding-top:12px;margin-top:4px;color:#aac0b5;font-size:11px;min-height:54px}.legend{margin-top:13px;font-size:10px;color:#7f8f89}.legend span{display:inline-block;margin-right:10px}.dot{width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:middle}@media(max-width:760px){header{height:auto;padding:12px 14px}.tag{display:none}.wrap{display:block}.stage{height:64svh;min-height:500px}.panel{border-left:0;border-top:1px solid var(--line);padding:18px}.bar{left:9px;top:9px;right:9px;gap:4px}.bar button{font-size:11px;padding:7px 8px}.caption{left:12px;top:62px;max-width:75%;font-size:10px}.controls{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"}}</script>
+</head>
+<body>
+<header><div><h1>KAOPU · TREE LIFE GRAMMAR R05</h1><div class="sub">PANDANUS TECTORIUS TEACHER · ROOT / TRUNK / LEAF DETAIL</div></div><span class="tag">沿用带树根母台 · 真实热带海岛植物老师</span></header>
+<div class="wrap">
+<main class="stage" id="stage">
+<div class="bar"><button id="play">生命播放</button><button id="roots" class="on">树根</button><button id="leaves" class="on">树叶</button><button id="detail" class="on">细节</button><button id="orbit">自动转动</button><button id="front">正面</button></div>
+<div class="caption"><b>露兜树 / Pandanus tectorius</b>同一 Seed 锚点：地上形成少数轮生或不规则分枝，枝端形成螺旋叶丛；基部形成支柱根，而不是把树冠倒置到地下。</div>
+<div class="ground-label">Y↑ · 半透明海岛砂地 · ROOT / SHOOT 共同锚点</div>
+<div class="info" id="info">正在建立三维生命结构…</div>
+<div id="error" class="error" hidden></div>
+</main>
+<aside class="panel">
+<h2>R05 母台 · 海岛老师深化</h2>
+<p class="note">不更换工作台，不丢 Grammar Anchor。叶片、树皮、叶痕、支柱根和果序都由函数生成；外部资料只作为观察老师。</p>
+<div class="teacher"><b>老师事实：</b>热带太平洋海岸树种；基部支柱根；分枝可不规则或呈少数轮生；枝条横向展开；叶在枝端螺旋排列，狭长、具龙骨和边缘刺。</div>
+<div class="controls">
+<div class="row"><label>生命时间 T <output id="ageO"></output></label><input id="age" type="range" min="3" max="120" value="72"><small>演示生命阶段，不冒充精确实测树龄</small></div>
+<div class="row"><label>受光方向 <output id="lightO"></output></label><input id="light" type="range" min="-1" max="1" step=".02" value=".18"><small>只改变地上冠层释放与偏向</small></div>
+<div class="row"><label>地下水分偏向 <output id="waterO"></output></label><input id="water" type="range" min="-1" max="1" step=".02" value="-.16"><small>只改变落地后的浅层根延伸</small></div>
+<div class="row"><label>主轴保持 <output id="apicalO"></output></label><input id="apical" type="range" min=".35" max=".9" step=".01" value=".66"><small>限制分枝自由度，不把每个节点都分叉</small></div>
+<div class="row"><label>资源历史 <output id="resourceO"></output></label><input id="resource" type="range" min=".4" max="1" step=".01" value=".80"><small>影响累计高度、粗细和叶量</small></div>
+<div class="row"><label>冠层空间 <output id="spaceO"></output></label><input id="space" type="range" min=".45" max="1" step=".01" value=".82"><small>开放海岸与拥挤林缘之间的表达</small></div>
+<div class="row"><label>支柱根强度 <output id="rootSupportO"></output></label><input id="rootSupport" type="range" min=".55" max="1.45" step=".01" value="1.0"><small>控制数量、落地点半径与基部承载</small></div>
+<div class="row"><label>叶丛密度 <output id="leafDensityO"></output></label><input id="leafDensity" type="range" min=".45" max="1.25" step=".01" value=".90"><small>不改变叶的基本长条与龙骨结构</small></div>
+</div>
+<div class="status" id="status"></div>
+<div class="legend"><span><i class="dot" style="background:#6b5945"></i>树干/支柱根</span><span><i class="dot" style="background:#436c45"></i>成熟叶</span><span><i class="dot" style="background:#a6b86c"></i>嫩叶</span></div>
+</aside>
+</div>
+<script type="module" src="./runtime-pandanus-r05.js"></script>
+</body>
+</html>

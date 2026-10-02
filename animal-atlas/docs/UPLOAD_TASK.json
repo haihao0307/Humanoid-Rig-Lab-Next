@@ -1,0 +1,39 @@
+{
+  "taskId": "animal-atlas-upload-20261002",
+  "userDirective": "在人物与动物总仓库新建目录并上传完成的工作台",
+  "dispatchTime": "2026-10-02T05:23:36.849Z",
+  "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+  "branch": "main",
+  "baseSha": "961639b0200f4462ab4a0ef83069a73692b985c4",
+  "localSnapshotSha": "68393fb75775b8b383ed4eda01d5ab8b440bf34f",
+  "targetObject": "animal-atlas/",
+  "targetDefectOrChange": "保存已完成的动物集成工作台源码与离线运行包",
+  "referenceSet": [
+    "用户在当前聊天指定的总仓库和新目录",
+    "SOURCE_MANIFEST.json"
+  ],
+  "acceptedBaseline": "已完成的 V1.2 工作台；并非模型视觉质量晋级",
+  "expectedArtifact": "新增目录、源码、81 MB 离线 ZIP、构建和校验说明",
+  "allowedPaths": [
+    "animal-atlas/**"
+  ],
+  "protectedInvariants": [
+    "仓库原有路径不变",
+    "本地原工作树保持",
+    "现有运行文件与模型字节保持"
+  ],
+  "forbiddenRoutes": [
+    "force push",
+    "改动人物源码",
+    "将归档描述为新模型制作",
+    "升级 visualAcceptance 或 productionReady"
+  ],
+  "acceptanceGates": [
+    "改动全部限于新目录",
+    "远程文件树与本地一致",
+    "ZIP 内 HTML 与当前运行文件 SHA256 一致",
+    "远程 ref 确认"
+  ],
+  "visualAcceptance": false,
+  "productionReady": false
+}
