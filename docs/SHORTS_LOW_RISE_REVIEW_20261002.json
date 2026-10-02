@@ -1,7 +1,7 @@
 {
   "taskId": "r008-lowrise-elastic-linen-shorts-20261002",
   "at": "2026-10-02T05:51:04.991Z",
-  "status": "HOLD_LOCAL_SOURCE_CHECKPOINT",
+  "status": "STATIC_GEOMETRIC_COVERAGE_OBSERVED_PHYSICAL_WEARING_HOLD",
   "userDelivery": "SOURCE_CHECKPOINT_ONLY_NOT_COMPLETED_GARMENT",
   "implemented": [
     "actual eight-influence final-world-space body measurements",
@@ -69,20 +69,29 @@
     "qa/shorts-exterior-rigid-seed-probe.json"
   ],
   "currentSourceHashes": {
+    "ShortsAcceptedReference.mjs": "b3fd44398e17a7c5a9bfa958c776f99f9b666568c085372ae054838a7d67b969",
+    "ShortsAcceptedSeedTransfer.mjs": "5f2589cfa82973de2fafb84c9703e389121dc1ee56e7231838cc2868bb5a014f",
+    "ShortsBarePelvis.mjs": "7aa6528bb76df6259ead6d2be3675e7a21951ad19fcefbe6f0b031b5eb90d5bc",
     "ShortsBending.mjs": "0222f52452557a876f5ee7fda6c6fb5bf6edd86b7ca70ff689fac861654cffe0",
-    "ShortsBodyAdapter.mjs": "94074a67c42d6b460a94b53b35c5c7385a4aa70e1b034abfbcba4eebe049fae3",
+    "ShortsBodyAdapter.mjs": "81c6396fb16f62acca3a9c526e250374de837e30075cfcb8f202d6911ba5cb2b",
     "ShortsBoundaryTargets.mjs": "94062b3e31a87d00f1821749e1b4507276a8da500c2ea6c622fbf186720f7b2f",
-    "ShortsClothRuntime.mjs": "a44daf59eab9c6bfa4dbc6b7f5686d17303be414ee795ac2117973446813072c",
+    "ShortsClothRuntime.mjs": "efc9a589183da2a3aabc64aa3f11f355c87028f532a157e4ca6867987cbc5d6b",
+    "ShortsCoverageIntersection.mjs": "30367eb6dac87d926178680bf3fb93edf5f308aec78ac1d39d36eb0c34988e94",
+    "ShortsCoveragePlacement.mjs": "9add47d990208a651b2406f2c683c780d089c8142169e8577b25db8dec06b33d",
     "ShortsExteriorFrames.mjs": "fe2d548091503f22dea816f47a26d16f68dec38ea82eda613b8e3bafa32e99fd",
-    "ShortsGarmentDraft.mjs": "37fa248fd012683e99e655cca7e8550e84670b2d2a171cd5439db9bbf5b907d4",
+    "ShortsGarmentDraft.mjs": "2d15a504a9dfab1e61eed8458045005e7516c9af882e3aa921dc35d97d8527b7",
     "ShortsLinenMaterial.mjs": "3ec6df26e69864f26e7ee9fa717dcfa3cc04b2a6b9c33c5ab9e942dd0bba97f1",
-    "ShortsManufacturingCoupled.mjs": "78be1068aff8f3f8123492fb3b818cece45dcf09c3eff008021b185b51ed1817",
+    "ShortsManufacturingCoupled.mjs": "005985500f061e293a30aecb0c4fa65216382b185ecdf6a171ea4b3faea9c690",
     "ShortsManufacturingDraft.mjs": "3b69b246eb2f24dbf368b16f6911a36f1ccb1b20a3cfc82bd7c690fecd9db5b7",
     "ShortsManufacturingMetric.mjs": "30da5bf845cf66c6122266a012ada215e060ab5b5901d238a165b3e01b206423",
-    "ShortsSewingAssembly.mjs": "7d9b284dfb03b2f83a69ef509f5f696947758e64efaa7e84108fd50942962f43",
-    "ShortsVersions.mjs": "70d340e0747a4fc6db59903054aaf119492f86e341e6a4b32d60a0046d7c55a5",
+    "ShortsSewingAssembly.mjs": "6f5a2f5cb1aa5c3b58c36b8563d74f3674c0991606088ac9c024885d8f54e239",
+    "ShortsSkinContactBody.mjs": "93090f869f0de44bc604ece228508344b2d6a4850e30704120013a0722f392dd",
+    "ShortsVersions.mjs": "b482570542a82c8ee8f90886908a3957b9bccced4196c5ea278f08cfd43fa907",
+    "ShortsWaistFit.mjs": "a5df6d29c8e78adb8931df84467cc332ca10e3e43ae4837120535da362f2d63c",
     "ShortsWearingAssembly.mjs": "0aaaf0897e428384948cd4b40f34f92b9d62a7e3428940fffec3b2e0f84c6304",
-    "ShortsWorkbench.mjs": "dc1147c30d7932147f22d1b14f614062f123fcd98fb94bed3c52a74f8493cb32"
+    "ShortsWearingHinges.mjs": "518eac4a28222ac668f4daea7e04edbf24ff237ce15872dd34a7a7ca3b3a8b7e",
+    "ShortsWearingMetric.mjs": "76ad5813f5a2972fc8c08da1d4429f018b05933cda61b282c1e19b82a77fbe44",
+    "ShortsWorkbench.mjs": "8d864e6e3d898451a69f5126802441c4b4961312ab40303255172f2eb1091864"
   },
   "testedAssemblySourceHashes": {
     "ShortsBodyAdapter.mjs": "94074a67c42d6b460a94b53b35c5c7385a4aa70e1b034abfbcba4eebe049fae3",
@@ -208,8 +217,22 @@
     "retainOriginalVersion": true,
     "createSeparateRevisedVersion": true,
     "retainOriginalSubjectClothing": true,
-    "authorBarePelvis": false,
-    "retainOriginalSubjectClothingAuthority": "Implementation assumption stated to user for current measured-envelope prototype; the two-version directive directly concerns preserving the accepted shorts version. No explicit bare-pelvis authoring choice was given."
+    "authorBarePelvis": true,
+    "retainOriginalSubjectClothingAuthority": "Original A and source geometry retained; new fit view substitutes actual authored missing skin and excludes retired source pants from rendering/contact.",
+    "previousPrototypeAssumption": {
+      "resolvedAt": "2026-10-02T04:34:13.386Z",
+      "userDirective": "先保留原版，再做新的，一共两个版本",
+      "retainOriginalVersion": true,
+      "createSeparateRevisedVersion": true,
+      "retainOriginalSubjectClothing": true,
+      "authorBarePelvis": false,
+      "retainOriginalSubjectClothingAuthority": "Implementation assumption stated to user for current measured-envelope prototype; the two-version directive directly concerns preserving the accepted shorts version. No explicit bare-pelvis authoring choice was given."
+    },
+    "retiredClothingRenderParts": [
+      9,
+      10,
+      19
+    ]
   },
   "previousReviewAt": "2026-10-02T03:24:26.419Z",
   "historicalManufacturingV1": {
@@ -366,6 +389,58 @@
     "finalDrapeValidated": false
   },
   "latestReview": {
+    "at": "2026-10-02T11:17:13.597Z",
+    "revision": "R008-lowrise-triangle-cover-v7-20261002",
+    "status": "STATIC_GEOMETRIC_COVERAGE_OBSERVED_PHYSICAL_WEARING_HOLD",
+    "productionReady": false,
+    "originalSHA256": "2b9158f76cd75aef5605be86bd7092c406d333467ce116eca130f166580635da",
+    "artifactSHA256": "9d2a819aa29723e37a354fc73e09543a72591d78947f9b1f02f43cd76020c245",
+    "sourcePaperRestMassPreserved": true,
+    "sourceSeams": 19,
+    "actualDofs": 451,
+    "geometryPlacement": {
+      "scope": "bounded temporary geometry initialization at measured waist/casing/hem heights; actual visible-skin point samples plus whole-triangle crossings and closed-bare outward-plane separation; no cloth integration",
+      "placements": 1,
+      "totalSamples": 2599,
+      "minimumSampledClearanceM": 0.006000000000050652,
+      "remainingInsideSamples": 0,
+      "maximumProtectedTargetYErrorM": 0,
+      "maximumPositionChangeM": 0.061150894527893566
+    },
+    "staticSurfaceReview": {
+      "crossingCount": 0,
+      "trianglePairsTested": 30928,
+      "zeroAreaTriangles": {
+        "cloth": 0,
+        "native": 120,
+        "bare": 0
+      },
+      "wholeSolidUnionCertified": false,
+      "scope": "actual nondegenerate current WORLD cloth/native/bare surfaces; native degeneracies remain HOLD"
+    },
+    "visualReview": {
+      "fourViewsCaptured": true,
+      "priorSkinIslandsObserved": false,
+      "sideVisibilityLimitedByNativeArm": true
+    },
+    "physicalReview": {
+      "maximumPrincipalStrain": 2.2301250976141187,
+      "limit": 0.05,
+      "passed": false,
+      "actualNativeSteps": 0,
+      "actualNativeTime": 0,
+      "selfContactValidated": false,
+      "continuousCCDValidated": false,
+      "motionValidated": false
+    },
+    "testURL": "http://127.0.0.1:8883/qa/shorts-two-versions-20261002/index.html",
+    "publicPromotionValidated": false,
+    "evidence": [
+      "qa/shorts-covering-independent-v7-20261002/QA.json",
+      "qa/shorts-covering-independent-v7-20261002/ACTUAL_STATIC_TRIANGLE_CROSSINGS.json"
+    ]
+  },
+  "previousReviewV3": {
     "status": "HOLD",
     "productionReady": false,
     "waistInstruction": "lower waist only; preserve hem paper target",
@@ -409,5 +484,21 @@
     "selfContactValidated": false,
     "motionValidated": false,
     "publicPromotionValidated": false
+  },
+  "historicalV3SourceHashes": {
+    "ShortsBending.mjs": "0222f52452557a876f5ee7fda6c6fb5bf6edd86b7ca70ff689fac861654cffe0",
+    "ShortsBodyAdapter.mjs": "94074a67c42d6b460a94b53b35c5c7385a4aa70e1b034abfbcba4eebe049fae3",
+    "ShortsBoundaryTargets.mjs": "94062b3e31a87d00f1821749e1b4507276a8da500c2ea6c622fbf186720f7b2f",
+    "ShortsClothRuntime.mjs": "a44daf59eab9c6bfa4dbc6b7f5686d17303be414ee795ac2117973446813072c",
+    "ShortsExteriorFrames.mjs": "fe2d548091503f22dea816f47a26d16f68dec38ea82eda613b8e3bafa32e99fd",
+    "ShortsGarmentDraft.mjs": "37fa248fd012683e99e655cca7e8550e84670b2d2a171cd5439db9bbf5b907d4",
+    "ShortsLinenMaterial.mjs": "3ec6df26e69864f26e7ee9fa717dcfa3cc04b2a6b9c33c5ab9e942dd0bba97f1",
+    "ShortsManufacturingCoupled.mjs": "78be1068aff8f3f8123492fb3b818cece45dcf09c3eff008021b185b51ed1817",
+    "ShortsManufacturingDraft.mjs": "3b69b246eb2f24dbf368b16f6911a36f1ccb1b20a3cfc82bd7c690fecd9db5b7",
+    "ShortsManufacturingMetric.mjs": "30da5bf845cf66c6122266a012ada215e060ab5b5901d238a165b3e01b206423",
+    "ShortsSewingAssembly.mjs": "7d9b284dfb03b2f83a69ef509f5f696947758e64efaa7e84108fd50942962f43",
+    "ShortsVersions.mjs": "70d340e0747a4fc6db59903054aaf119492f86e341e6a4b32d60a0046d7c55a5",
+    "ShortsWearingAssembly.mjs": "0aaaf0897e428384948cd4b40f34f92b9d62a7e3428940fffec3b2e0f84c6304",
+    "ShortsWorkbench.mjs": "dc1147c30d7932147f22d1b14f614062f123fcd98fb94bed3c52a74f8493cb32"
   }
 }

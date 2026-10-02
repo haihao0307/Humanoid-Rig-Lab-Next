@@ -16,27 +16,44 @@ export function bodyAge(p){return smooth((p.age-32)/43);}
 export function bodyYouth(p){return smooth((32-p.age)/14);}
 // Same spatial map across skin, clothing and material seams. Limbs expand
 // around their own reference centreline; feet, palms and eye sockets stay fixed.
-export function bodyPoint(point,p){
- const [x,y,z]=point,a=Math.abs(x),side=2*ramp(-.035,.035,x)-1,fat=p.fatness<0?p.fatness*.65:p.fatness,m=p.muscle,age=bodyAge(p)-.30*bodyYouth(p);let dx=0,dy=0,dz=0;
- const torso=(1-ramp(.14,.22,a))*ramp(.89,1.02,y)*(1-ramp(1.40,1.50,y)),waist=support(x,y,z,0,1.105,0,.23,.28,.25),belly=support(x,y,z,0,1.105,.09,.21,.27,.22),hip=support(x,y,z,0,.88,0,.25,.25,.28);
- dx+=x*fat*(.22*waist+.10*hip)*torso;dz+=fat*(z*.14*waist+.066*belly)*torso;
- const chest=support(x,y,z,side*.073,1.36,.075,.125,.14,.18)*torso,back=support(x,y,z,side*.065,1.34,-.08,.14,.17,.15)*torso;
- dz+=m*(.030*chest-.020*back);dx+=x*m*.075*chest;
- // Shoulder/upper-arm centreline follows the accepted A pose, not X=0.
- const arm=ramp(.175,.22,a)*(1-ramp(.33,.48,a))*ramp(.94,1.07,y)*(1-ramp(1.43,1.50,y)),armX=side*(.220+(1.42-y)*.21),armZ=-.015;
- const upper=support(x,y,z,armX,1.255,armZ,.075,.25,.12),shoulder=support(x,y,z,side*.215,1.415,0,.075,.09,.095),armGain=fat*.18*arm+m*(.32*upper+.24*shoulder)*ramp(.145,.215,a);
- dx+=(x-armX)*armGain;dz+=(z-armZ)*armGain;
- const leg=ramp(.16,.24,y)*(1-ramp(.88,1.04,y))*ramp(.028,.065,a)*(1-ramp(.20,.38,a)),legX=side*.084,thigh=support(x,y,z,legX,.78,-.008,.13,.29,.18),calf=support(x,y,z,legX,.43,-.018,.09,.20,.12),legGain=fat*.16*leg+m*(.24*thigh+.20*calf)*leg;
- dx+=(x-legX)*legGain;dz+=(z+.008)*legGain;
- // Supports end below the eye collar; wrinkles affect shading, not its opening.
- const cheek=support(x,y,z,side*.052,1.611,.084,.043,.030,.055),jaw=support(x,y,z,side*.049,1.566,.075,.054,.030,.059);
- dx+=side*fat*(.005*cheek+.003*jaw);dz+=fat*.006*cheek+bodyYouth(p)*.0015*cheek;dy-=age*(.0035*cheek+.0025*jaw);dz+=age*.0015*jaw;
- // A common gain reserves deformation room for opposing fat/muscle extremes.
- return [x+dx*.80,y+dy*.80,z+dz*.80];
+// Art-directed age envelope; it does not represent a measured muscle percentage.
+export function bodyCoefficients(p){const old=bodyAge(p),young=bodyYouth(p),m=p.muscle*(1-.30*old-.10*young)-.42*old-.12*young;return [p.fatness<0?p.fatness*.70:p.fatness,m<0?m*.75:m,old,young];}
+// Scalar-only authored field is also translated to GLSL below. CPU skin queries
+// and GPU drawing therefore execute the same equations, including normal maps.
+function bodyShape(x,y,z,fat,m,old,young){
+ const a=Math.abs(x),side=2*ramp(-.035,.035,x)-1;
+ const waist=ramp(.89,1.03,y)*(1-ramp(1.23,1.44,y)),hip=ramp(.69,.84,y)*(1-ramp(1.01,1.18,y)),chest=ramp(1.12,1.29,y)*(1-ramp(1.43,1.55,y));
+ // Broad lateral field shifts the shoulder envelope along with the torso.
+ // Exponential depth scales cannot turn the front/back of a cross-section over.
+ const core=1-ramp(.15,.235,a),lateral=fat*(.62*waist+.26*hip+.24*chest)+m*.16*chest;
+ let dx=.12*Math.tanh(x/.12)*lateral*(1-ramp(.16,.50,a)),dy=0,dz=(z+.008)*(Math.exp(core*(fat*(.50*waist+.30*hip-.20*waist*hip+.28*chest)+m*.50*chest))-1)+fat*.030*waist*core;
+ // Canonical centreline from this subject's shoulder/elbow/wrist bind frames.
+ const arm=ramp(.14,.26,a)*ramp(.88,1.00,y)*(1-ramp(1.46,1.56,y)),elbowBlend=ramp(1.13,1.18,y),armX=side*((.339+(.938-y)*.28)*(1-elbowBlend)+(.193+(1.410-y)*.333)*elbowBlend),armZ=-.060*ramp(.928,1.156,y)+.006*ramp(1.32,1.43,y),upper=ramp(1.03,1.15,y),shoulder=ramp(1.33,1.42,y);
+ const armGain=Math.exp(arm*(fat*.48+m*(.15+.25*upper+.05*shoulder)))-1;
+ dx+=(x-armX)*armGain*.40;dz+=(z-armZ)*armGain;
+ const leg=ramp(.14,.27,y)*(1-ramp(.84,.94,y))*ramp(.012,.085,a)*(1-ramp(.18,.35,a)),thigh=ramp(.50,.67,y),calf=ramp(.20,.34,y)*(1-ramp(.50,.62,y)),legX=side*.084;
+ const legGain=Math.exp(leg*(fat*.42+m*(.34*thigh+.25*calf)))-1;
+ dx+=(x-legX)*(.50*Math.tanh(legGain/.50))*.40;dz+=(z+.008)*legGain;
+ // Lower face fullness follows body composition; fixed eye collars are outside
+ // both supports. Neck has its own broad, modest thickness control.
+ const cheek=ramp(1.565,1.601,y)*(1-ramp(1.614,1.643,y)),jaw=ramp(1.526,1.555,y)*(1-ramp(1.590,1.618,y)),neck=ramp(1.45,1.49,y)*(1-ramp(1.55,1.585,y));
+ const faceOuter=ramp(.024,.060,a);
+ dx+=side*fat*(.008*cheek+.005*jaw)*faceOuter+x*m*(.025*cheek+.045*jaw)+x*neck*(fat*.15+m*.10);
+ dz+=(z-.020)*fat*(.09*cheek+.06*jaw)*faceOuter+young*.0015*cheek+(z-.008)*neck*(fat*.18+m*.12)+m*.0015*jaw;
+ dy-=(old-.30*young)*(.004*cheek+.003*jaw);dz+=old*.0015*jaw;
+ return [x+dx,y+dy,z+dz];
 }
+export function bodyPoint(point,p){return bodyShape(...point,...bodyCoefficients(p));}
+const scalarGLSL=bodyShape.toString().replace('function bodyShape(x,y,z,fat,m,old,young)','vec3 bodyShape(float x,float y,float z,float fat,float m,float old,float young)').replace(/\b(?:const|let)\b/g,'float').replace(/Math\./g,'').replace('return [x+dx,y+dy,z+dz];','return vec3(x+dx,y+dy,z+dz);').replace(/(?<![\w.])\d+(?![\w.])/g,v=>v+'.0');
+export const BODY_FIELD_GLSL=`
+float ramp(float a,float b,float x){float t=clamp((x-a)/(b-a),0.,1.);return t*t*(3.-2.*t);}
+float support(float x,float y,float z,float cx,float cy,float cz,float rx,float ry,float rz){float a=(x-cx)/rx,b=(y-cy)/ry,c=(z-cz)/rz,q=a*a+b*b+c*c;return q<1.?pow(1.-q,3.):0.;}
+${scalarGLSL}
+vec3 bodyPointGPU(vec3 p,vec4 c){return bodyShape(p.x,p.y,p.z,c.x,c.y,c.z,c.w);}
+`;
 export function bodyNormalMatrix(point,p,h=.00035){
  const J=new Array(9);for(let k=0;k<3;k++){const a=[...point],b=[...point];a[k]+=h;b[k]-=h;const u=bodyPoint(a,p),v=bodyPoint(b,p);for(let j=0;j<3;j++)J[j*3+k]=(u[j]-v[j])/(2*h);}
  const [a,b,c,d,e,f,g,i,j]=J,C=[e*j-f*i,f*g-d*j,d*i-e*g,c*i-b*j,a*j-c*g,b*g-a*i,b*f-c*e,c*d-a*f,a*e-b*d],det=a*C[0]+b*C[1]+c*C[2];
  return {cofactor:C,determinant:det};
 }
-export function bodyMetrics(p){const scale=bodyScale(p);return {scale,height:p.height,radius:.25*scale*(1+.16*Math.max(0,p.fatness)+.08*Math.max(0,p.muscle)),armClearance:.07*Math.max(0,p.fatness)+.045*Math.max(0,p.muscle),ageAmount:bodyAge(p)};}
+export function bodyMetrics(p){const scale=bodyScale(p),m=bodyCoefficients(p)[1];return {scale,height:p.height,radius:.25*scale*(1+.36*Math.max(0,p.fatness)+.18*Math.max(0,m)),armClearance:.19*Math.max(0,p.fatness)+.13*Math.max(0,m),ageAmount:bodyAge(p),effectiveMuscle:m,variationVersion:2};}

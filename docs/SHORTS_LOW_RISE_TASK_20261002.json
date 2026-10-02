@@ -39,12 +39,12 @@
     "lowRiseElasticDraft": "V2_SOURCE_CASING_PASSED_ELASTIC_UNVALIDATED",
     "manufacturing": "V2_BROWSER_TERMINAL_SOURCE_SEWING_INDEPENDENT_PASS",
     "independentVerification": "PASS_SOURCE_PAPER_SEAMS_TOPOLOGY_AND_OFFLINE_TWO_VERSION_SWITCH_ONLY",
-    "wearing": "FAIL_TWO_BOUNDED_INCREMENTS_ROOT_CAUSE_REVIEW",
-    "nativeClothAndMotion": "NOT_RUN_NEW_CONSTRUCTORS",
+    "wearing": "STATIC_GEOMETRIC_COVERAGE_OBSERVED_PHYSICAL_WEARING_HOLD",
+    "nativeClothAndMotion": "NOT_ACCEPTED_223_PERCENT_MAXIMUM_STRAIN_NO_NATIVE_STEPS",
     "standalonePublication": "OFFLINE_TWO_VERSION_PACKAGING_PASS_NO_NEW_PUBLIC_PROMOTION",
     "boundaryTargetRepair": "INDEPENDENT_HEM_SOURCE_EDGE_LENGTH_AND_EXTERIOR_CURVE_PASS_ONLY",
     "exteriorSourceSeed": "INDEPENDENT_SOURCE_METRIC_AND_SUPPORT_HALFSPACE_PASS_CONTACT_INTERPRETATION_HOLD",
-    "sourceUpload": "PREPARED_DEVELOPMENT_CHECKPOINT"
+    "sourceUpload": "SOURCE_CHECKPOINT_READY"
   },
   "acceptanceGates": [
     "sourceModified=true",
@@ -100,7 +100,7 @@
     "[ ] New garment public fixed URL and independent browser acceptance",
     "[x] Screenshot-only completion rejected"
   ],
-  "status": "HOLD_LOCAL_SOURCE_CHECKPOINT",
+  "status": "STATIC_GEOMETRIC_COVERAGE_OBSERVED_PHYSICAL_WEARING_HOLD",
   "userDelivery": "SOURCE_CHECKPOINT_ONLY_NOT_COMPLETED_GARMENT",
   "sourceUpload": {
     "status": "DEVELOPMENT_CHECKPOINT_NOT_COMPLETE_GARMENT",
@@ -148,6 +148,58 @@
     "finalDrapeValidated": false
   },
   "latestReview": {
+    "at": "2026-10-02T11:17:13.597Z",
+    "revision": "R008-lowrise-triangle-cover-v7-20261002",
+    "status": "STATIC_GEOMETRIC_COVERAGE_OBSERVED_PHYSICAL_WEARING_HOLD",
+    "productionReady": false,
+    "originalSHA256": "2b9158f76cd75aef5605be86bd7092c406d333467ce116eca130f166580635da",
+    "artifactSHA256": "9d2a819aa29723e37a354fc73e09543a72591d78947f9b1f02f43cd76020c245",
+    "sourcePaperRestMassPreserved": true,
+    "sourceSeams": 19,
+    "actualDofs": 451,
+    "geometryPlacement": {
+      "scope": "bounded temporary geometry initialization at measured waist/casing/hem heights; actual visible-skin point samples plus whole-triangle crossings and closed-bare outward-plane separation; no cloth integration",
+      "placements": 1,
+      "totalSamples": 2599,
+      "minimumSampledClearanceM": 0.006000000000050652,
+      "remainingInsideSamples": 0,
+      "maximumProtectedTargetYErrorM": 0,
+      "maximumPositionChangeM": 0.061150894527893566
+    },
+    "staticSurfaceReview": {
+      "crossingCount": 0,
+      "trianglePairsTested": 30928,
+      "zeroAreaTriangles": {
+        "cloth": 0,
+        "native": 120,
+        "bare": 0
+      },
+      "wholeSolidUnionCertified": false,
+      "scope": "actual nondegenerate current WORLD cloth/native/bare surfaces; native degeneracies remain HOLD"
+    },
+    "visualReview": {
+      "fourViewsCaptured": true,
+      "priorSkinIslandsObserved": false,
+      "sideVisibilityLimitedByNativeArm": true
+    },
+    "physicalReview": {
+      "maximumPrincipalStrain": 2.2301250976141187,
+      "limit": 0.05,
+      "passed": false,
+      "actualNativeSteps": 0,
+      "actualNativeTime": 0,
+      "selfContactValidated": false,
+      "continuousCCDValidated": false,
+      "motionValidated": false
+    },
+    "testURL": "http://127.0.0.1:8883/qa/shorts-two-versions-20261002/index.html",
+    "publicPromotionValidated": false,
+    "evidence": [
+      "qa/shorts-covering-independent-v7-20261002/QA.json",
+      "qa/shorts-covering-independent-v7-20261002/ACTUAL_STATIC_TRIANGLE_CROSSINGS.json"
+    ]
+  },
+  "previousReviewV3": {
     "status": "HOLD",
     "productionReady": false,
     "waistInstruction": "lower waist only; preserve hem paper target",
@@ -191,5 +243,6 @@
     "selfContactValidated": false,
     "motionValidated": false,
     "publicPromotionValidated": false
-  }
+  },
+  "visualAcceptance": false
 }
