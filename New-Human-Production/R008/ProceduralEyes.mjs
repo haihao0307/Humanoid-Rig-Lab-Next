@@ -30,7 +30,8 @@ export function createProceduralEyes({surface,mesh,byName,bindWorld,data}) {
  for(const sign of [1,-1]) {
   const cx=sign*.034,cz=rim(cx,cy).z-radius+.0012,group=new THREE.Group();group.position.set(cx,cy,cz);root.add(group);
   const uniform={gazeMatrix:{value:new THREE.Matrix3()},aperture:{value:new THREE.Vector3(upper,-lower,0)}};
-  const material=new THREE.MeshPhysicalMaterial({color:0xc4bbb0,roughness:.3,clearcoat:1,clearcoatRoughness:.11});
+  // Warm off-white diffuse layer under a restrained wet surface highlight.
+  const material=new THREE.MeshPhysicalMaterial({color:0xaaa59b,roughness:.38,clearcoat:.30,clearcoatRoughness:.20,specularIntensity:.55,ior:1.36});
   material.onBeforeCompile=shader=>{
    Object.assign(shader.uniforms,uniform);
    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 eyeP; varying vec3 eyeSocketP; uniform mat3 gazeMatrix;').replace('#include <begin_vertex>','#include <begin_vertex>\neyeP=position;eyeSocketP=gazeMatrix*position;');
@@ -46,10 +47,20 @@ export function createProceduralEyes({surface,mesh,byName,bindWorld,data}) {
     vec3 iris=mix(vec3(.040,.057,.050),vec3(.13,.18,.145),fibres);
     iris*=mix(.35,1.,1.-smoothstep(.0051,.0063,ir));
     float aa=max(fwidth(ir),.00005);
-    diffuseColor.rgb*=.72+.28*shape*shape;
+    // Socket-space lid shading stays attached while the globe rotates.
+    float lidDistance=min(seam+aperture.x*shape-eyeSocketP.y,eyeSocketP.y-seam-aperture.y*shape);
+    float lidSoftness=max(.0011,2.*fwidth(lidDistance));
+    float lidShade=mix(.64,1.,smoothstep(0.,lidSoftness,lidDistance));
+    float cornerShade=mix(.78,1.,smoothstep(.12,.65,shape));
+    float innerCorner=smoothstep(.005,.012,-eyeSocketP.x*${sign}.);
+    float warmVariation=.012*sin(en.x*13.+en.y*7.);
+    vec3 sclera=diffuseColor.rgb*lidShade*cornerShade*(1.+warmVariation);
+    sclera=mix(sclera,sclera*vec3(1.09,.93,.91),innerCorner*.45);
+    diffuseColor.rgb=sclera;
     diffuseColor.rgb=mix(diffuseColor.rgb,iris,1.-smoothstep(.00615-aa,.00615+aa,ir));
     diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.004),1.-smoothstep(.00225-aa,.00225+aa,ir));`);
   };
+  material.customProgramCacheKey=()=>`r008-eyes-natural-v2-${sign}`;
   const globe=new THREE.Mesh(new THREE.SphereGeometry(radius,48,32),material);group.add(globe);
   const lids=[];
   for(const top of [true,false]) {
