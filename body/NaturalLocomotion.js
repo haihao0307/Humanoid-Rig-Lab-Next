@@ -9,7 +9,7 @@ function motionCircleSweep(start,end,centre,radius){
  const b=2*(p[0]*d[0]+p[2]*d[2]),disc=b*b-4*a*c;if(disc<0)return 1;
  const t=(-b-Math.sqrt(disc))/(2*a);return t>=0&&t<=1?Math.max(0,t-1e-5):1;
 }
-function motionWorldSweep(world,start,end,radius,ignore=[]){
+function motionWorldSweep(world,start,end,radius,ignore=[],{escapeRadius=null}={}){
  const r=radius+.06,b=world.bounds,d=sub(end,start);let fraction=1;
  for(const [k,low,high]of [[0,b.xMin+radius,b.xMax-radius],[2,b.zMin+radius,b.zMax-radius]]){
   if(start[k]<low||start[k]>high)return{position:[...start],fraction:0,blocked:true};
@@ -18,6 +18,13 @@ function motionWorldSweep(world,start,end,radius,ignore=[]){
  }
  for(const o of world.objects){
   if(ignore.includes(o.id)||o.held||o.collidable===false)continue;
+  if(o.shape==='box'&&Number.isFinite(escapeRadius)&&radius>escapeRadius+1e-6){
+   const tilted=objectTilted(o),q=qy(tilted?0:-objectYaw(o)),a=rotate(q,sub(start,o.p)),delta=rotate(q,d),[rx,rz]=tilted?objectFootprint(o):[o.w/2,o.d/2];
+   const x=a[0]-clamp(a[0],-rx,rx),z=a[2]-clamp(a[2],-rz,rz),clearance=Math.hypot(x,z);
+   // Only the extra loaded envelope overlaps. Distance to this convex
+   // footprint increases along an outward ray; physical body/feet stay clear.
+   if(clearance>=escapeRadius+.06&&clearance<r&&x*delta[0]+z*delta[2]>1e-12)continue;
+  }
   if(objectTilted(o)){const [rx,rz]=objectFootprint(o);const flat=new MotionLab.FlatWorld([{minX:o.p[0]-rx-r,maxX:o.p[0]+rx+r,minZ:o.p[2]-rz-r,maxZ:o.p[2]+rz+r}]);fraction=Math.min(fraction,flat.sweep(start,end,0).fraction);continue;}
   if(o.shape!=='box'){fraction=Math.min(fraction,motionCircleSweep(start,end,o.p,(o.r||objectRadius(o))+r));continue;}
   const q=qy(-objectYaw(o)),a=rotate(q,sub(start,o.p)),z=rotate(q,sub(end,o.p)),x=o.w/2,y=o.d/2;
@@ -35,6 +42,7 @@ function trafficActorVelocity(actor){
  const a=actor.agent,raw=Number(a.walkSpeed??a.locomotion?.speed??0),speed=a.paused||!Number.isFinite(raw)?0:Math.max(0,Math.min(.75,raw));
  return [Math.sin(a.yaw||0)*speed,0,Math.cos(a.yaw||0)*speed];
 }
+function trafficActorStationary(actor){const a=actor.agent;return !actor.disposed&&(a.paused||a.error||!a.skill&&!a.plan&&Math.abs(Number(a.walkSpeed)||0)<.02);}
 function trafficRoutePoint(agent,distance){
  let from=agent.locomotion?.engine?.state?.root||agent.pos,remaining=Math.max(0,distance);
  for(let i=agent.routeIndex;i<agent.route.length;i++){
@@ -61,20 +69,25 @@ function predictTrafficConflict(agent,speed,context){
  return best;
 }
 function trafficSegmentClear(agent,start,end,context,{dynamic=true}={}){
- if(motionWorldSweep(agent.w,start,end,context.radius,context.ignore).fraction<1-1e-6)return false;
+ if(motionWorldSweep(agent.w,start,end,context.radius,context.ignore,context).fraction<1-1e-6)return false;
  return !dynamic||(agent.w.population?.sweepFor(agent,start,end,context.radius)??1)>=1-1e-6;
 }
 function trafficRuntime(population){
  if(!population)return null;let runtime=trafficRuntimeByPopulation.get(population);
- if(!runtime){runtime={slots:new Map(),corridors:new Map()};trafficRuntimeByPopulation.set(population,runtime);}return runtime;
+ if(!runtime){runtime={slots:new Map(),corridors:new Map(),intersections:new Map()};trafficRuntimeByPopulation.set(population,runtime);}return runtime;
 }
 function trafficTaskKey(agent){
  const s=agent.skill;if(!s)return null;return [agent.index,s.type,s.targetId||'',s.objectId||'',agent.phase].join('|');
 }
+function trafficPopulationNow(population){
+ // Reservations are shared even when individual actors are paused.
+ if(Number.isFinite(population?.elapsedS))return population.elapsedS;
+ return Math.max(0,...[...(population?.values()||[])].map(actor=>Number(actor.agent?.time)||0));
+}
 function trafficCorridorLocal(agent,point,direction,context){
  const right=[direction[2],0,-direction[0]],probe=context.radius*2+TRAFFIC_AVOIDANCE.sideMarginM+TRAFFIC_AVOIDANCE.corridorProbeM,left=add(point,mul(right,probe)),rightPoint=add(point,mul(right,-probe));
  left[1]=0;rightPoint[1]=0;
- const leftBlocked=motionWorldSweep(agent.w,point,left,context.radius,context.ignore).fraction<1-1e-6,rightBlocked=motionWorldSweep(agent.w,point,rightPoint,context.radius,context.ignore).fraction<1-1e-6;
+ const leftBlocked=motionWorldSweep(agent.w,point,left,context.radius,context.ignore,context).fraction<1-1e-6,rightBlocked=motionWorldSweep(agent.w,point,rightPoint,context.radius,context.ignore,context).fraction<1-1e-6;
  return{narrow:leftBlocked&&rightBlocked,leftBlocked,rightBlocked,probe,right};
 }
 function trafficCorridorDescriptor(agent,start,end,context){
@@ -90,12 +103,18 @@ function trafficCorridorDescriptor(agent,start,end,context){
 }
 function trafficPruneCorridors(population,runtime,now){
  const live=new Map([...population.values()].filter(actor=>!actor.disposed).map(actor=>[actor.id,actor]));
- for(const [key,lease]of runtime.corridors){const actor=live.get(lease.ownerId),a=actor?.agent;if(!a||lease.expiresAtS<=now||trafficTaskKey(a)!==lease.taskKey)runtime.corridors.delete(key);}
+ for(const [key,lease]of runtime.corridors){
+  const actor=live.get(lease.ownerId),a=actor?.agent;
+  if(!a||a.paused||a.error||a.characterEditInProgress||lease.expiresAtS<=now||trafficTaskKey(a)!==lease.taskKey){
+   runtime.corridors.delete(key);
+   for(const member of population.values())if(member.agent?.locomotion?.traffic?.corridorKey===key)trafficReleaseCorridor(member.agent.locomotion);
+  }
+ }
 }
 function trafficReleaseCorridor(locomotion){
  const a=locomotion.a,t=locomotion.traffic,population=a.w.population,key=t?.corridorKey;
  if(key&&population){const runtime=trafficRuntime(population),lease=runtime?.corridors.get(key);if(lease?.ownerId===a.npcId)runtime.corridors.delete(key);}
- if(t)Object.assign(t,{corridorKey:null,corridorTaskKey:null,corridorOwner:null,corridorDirection:0,corridorDescriptor:null,corridorOrbit:null,corridorOrbitIndex:0,corridorOrbitCycleStart:0,corridorOrbitLaps:0});
+ if(t)Object.assign(t,{corridorKey:null,corridorTaskKey:null,corridorOwner:null,corridorDirection:0,corridorDescriptor:null,corridorOrbit:null,corridorOrbitIndex:0,corridorOrbitCycleStart:0,corridorOrbitLaps:0,corridorManeuverPoint:null});
 }
 function trafficCorridorPriority(agent,other,descriptor){
  const root=agent.locomotion?.engine?.state?.root||agent.pos,ownDistance=horizontal(root,descriptor.midpoint),otherDistance=horizontal(other.agent.pos,descriptor.midpoint);
@@ -148,10 +167,10 @@ function trafficReserveTargetSlot(locomotion,context){
 class MotionLabWorld {
  constructor(agent){this.a=agent;}
  context(radius){const a=this.a,body=radius>.1,profile=bodyPhysicalProfile(a.h),ignore=a.skill?.o?[a.skill.o.id]:[];
-  return {radius:body?Math.max(profile.bodyRadiusM,a.held?(a.skill?.type==='carry'?carryRouteRadius(a.held,profile,a.skill?.carryConfiguration):profile.pushClearanceM):0):radius*a.h.bodyMetrics.statureScale,ignore};}
+  return {radius:body?Math.max(profile.bodyRadiusM,a.held?(a.skill?.type==='carry'?carryRouteRadius(a.held,profile,a.skill?.carryConfiguration):profile.pushClearanceM):0):radius*a.h.bodyMetrics.statureScale,ignore,escapeRadius:body&&a.held&&a.skill?.type==='carry'?profile.bodyRadiusM:null};}
  free(point,radius){const a=this.a,c=this.context(radius);return !a.w.collision(point,c.radius,c.ignore)&&!a.w.population?.collisionFor(a,point,c.radius);}
  sweep(start,end,radius){
-  const a=this.a,c=this.context(radius),result=motionWorldSweep(a.w,start,end,c.radius,c.ignore);
+  const a=this.a,c=this.context(radius),result=motionWorldSweep(a.w,start,end,c.radius,c.ignore,c);
   // The population excludes this actor, including when the kernel queries feet.
   const fraction=Math.min(result.fraction,a.w.population?.sweepFor(a,start,end,c.radius)??1);
   return{position:add(start,mul(sub(end,start),fraction)),fraction,blocked:fraction<1-1e-9};
@@ -242,6 +261,7 @@ class NaturalLocomotion {
   this.resetFromPose();
  }
  resetFromPose({preservePoseContacts=false}={}){
+  this.releaseIntersection();
   if(this.traffic?.slotKey)trafficReleaseTargetSlot(this);if(this.traffic?.corridorKey)trafficReleaseCorridor(this);
   const a=this.a,e=this.engine,h=a.h,yaw=a.yaw;
   const currentHip=side=>h.byId?.get(side+'_femur')?.world?.p||h.legs?.[side]?.upper?.world?.p;
@@ -266,8 +286,10 @@ class NaturalLocomotion {
   this.phaseController.reset(e.state.motion.phase||0);this.turnFilter.reset(yaw);
   this.requestKey=null;this.requested=false;this.tempo=1;this.routePassThroughCount=this.routePassThroughCount||0;
   this.traffic={active:false,mode:'clear',reason:null,blockers:[],side:0,detours:0,retreats:0,replans:0,recoveries:0,escapes:0,slotReservations:0,lastPlanAtS:-Infinity,nextPlanAtS:0,detourEndIndex:-1,originalTarget:null,lastError:null,slotKey:null,slotTaskKey:null,slotPoint:null,slotIndex:null,advancePoint:null,advanceRouteIndex:-1,corridorKey:null,corridorTaskKey:null,corridorOwner:null,corridorDirection:0,corridorDescriptor:null,corridorOrbit:null,corridorOrbitIndex:0,corridorOrbitCycleStart:0,corridorOrbitLaps:0,corridorClaims:0,corridorYields:0};this.sync();
+  Object.assign(this.traffic,{intersectionKey:null,intersectionTaskKey:null,intersectionOwner:null,intersectionCenter:null,intersectionOrbitDirection:0,intersectionOrbitLane:-1,intersectionOrbitAngle:null,intersectionClaims:0,intersectionYields:0,intersectionLaps:0,intersectionRotations:0});
   return structuredClone(this.lastPoseAdoption);
  }
+ releaseIntersection(){if(this.traffic?.intersectionKey)trafficReleaseIntersection(this);}
  sync(){const a=this.a,s=this.engine.state;
   a.pos=[...s.root];a.yaw=s.yaw;a.swing=s.swing?{side:s.swing.side,t:s.swing.elapsed,duration:s.swing.duration}:null;
   a.feet=Object.fromEntries(['left','right'].map(side=>[side,{p:[...s.feet[side].position],yaw:s.feet[side].yaw,contact:s.feet[side].contact}]));
@@ -291,6 +313,26 @@ class NaturalLocomotion {
    this.requestKey=null;Object.assign(this.traffic,{active:false,mode:'replanned',reason,blockers:[],side:0,detourEndIndex:-1,originalTarget:[...goal],lastPlanAtS:a.time,nextPlanAtS:a.time+TRAFFIC_AVOIDANCE.planCooldownS,lastError:null,advancePoint:null,advanceRouteIndex:-1});this.traffic.replans++;
    a.log?.('路线已根据当前物体位置重新规划');return true;
   }catch(error){this.traffic.lastError=error.message;return false;}
+ }
+ replanStationaryRoute(conflict,context){
+  const a=this.a,t=this.traffic,other=conflict?.actor,goal=t.slotPoint||a.route.at(-1);
+  if(typeof campGridPath!=='function'||!other||!goal||!trafficActorStationary(other)||a.time<(t.nextStationaryPlanAtS||0))return false;
+  const radius=context.radius+bodyPhysicalProfile(other.human).bodyRadiusM+TRAFFIC_AVOIDANCE.sideMarginM;
+  let from=this.engine.state.root,blocked=false;
+  for(const point of a.route.slice(a.routeIndex)){if(motionCircleSweep(from,point,other.agent.pos,radius)<1-1e-6){blocked=true;break;}from=point;}
+  if(!blocked)return false;
+  t.nextStationaryPlanAtS=a.time+TRAFFIC_AVOIDANCE.planCooldownS;
+  const stationary=[...a.w.population.values()].filter(row=>row.agent!==a&&trafficActorStationary(row));
+  const obstacles=stationary.map(row=>({id:'__traffic_npc_'+row.id,shape:'sphere',p:[...row.agent.pos],r:bodyPhysicalProfile(row.human).bodyRadiusM+TRAFFIC_AVOIDANCE.sideMarginM-.06,collidable:true}));
+  try{
+   // Query-local footprints only: never insert NPC proxies into the scene or
+   // physics world. Moving peers continue through predictive coordination.
+   const route=campGridPath({bounds:a.w.bounds,objects:[...a.w.objects,...obstacles]},this.engine.state.root,goal,context.radius,context.ignore);
+   if(!route?.length)return false;
+   a.route.splice(a.routeIndex,a.route.length-a.routeIndex,...route.map(point=>[...point]));this.requestKey=null;
+   Object.assign(t,{active:false,mode:'replanned',reason:'stationary-npc-route',blockers:stationary.map(row=>row.id),side:0,originalTarget:[...goal],lastPlanAtS:a.time,detourEndIndex:-1,advancePoint:null,advanceRouteIndex:-1,recoveryTarget:null,lastError:null});t.replans++;t.stationaryReplans=(t.stationaryReplans||0)+1;
+   a.log?.('已绕过停止人物重新规划完整路线');return true;
+  }catch(error){t.lastError=error.message;return false;}
  }
  installLocalDetour(conflict,context){
   const a=this.a,root=this.engine.state.root,current=a.route[a.routeIndex],other=conflict.actor,canonicalGoal=this.traffic.slotPoint||a.route.at(-1);if(!current||!other||!canonicalGoal)return false;
@@ -374,23 +416,40 @@ class NaturalLocomotion {
  }
  resolveNarrowCorridor(conflict,context){
   const a=this.a,population=a.w.population,root=this.engine.state.root,target=a.route[a.routeIndex],other=conflict?.actor;if(!population||!target||!other)return null;
+  if(other.disposed||other.agent.paused||other.agent.error||other.agent.characterEditInProgress)return null;
   const descriptor=trafficCorridorDescriptor(a,root,target,context);if(!descriptor)return null;
   const otherTarget=other.agent.route?.[other.agent.routeIndex],otherDirection=otherTarget?norm([otherTarget[0]-other.agent.pos[0],0,otherTarget[2]-other.agent.pos[2]]):trafficActorVelocity(other);
   if(len(otherDirection)<.05||dot(descriptor.direction,otherDirection)>-.25)return null;
-  const runtime=trafficRuntime(population),taskKey=trafficTaskKey(a),goal=this.traffic.slotPoint||a.route.at(-1);trafficPruneCorridors(population,runtime,a.time);
+  const runtime=trafficRuntime(population),taskKey=trafficTaskKey(a),goal=this.traffic.slotPoint||a.route.at(-1),now=trafficPopulationNow(population);trafficPruneCorridors(population,runtime,now);
   let lease=runtime.corridors.get(descriptor.key);
   if(!lease){
    const ownerId=trafficCorridorPriority(a,other,descriptor),owner=ownerId===a.npcId?a:other.agent,ownerDirection=ownerId===a.npcId?descriptor.sign:-descriptor.sign;
-   lease={ownerId,direction:ownerDirection,taskKey:trafficTaskKey(owner),expiresAtS:a.time+TRAFFIC_AVOIDANCE.corridorLeaseS,descriptor:{...descriptor,direction:[...descriptor.direction],midpoint:[...descriptor.midpoint]}};runtime.corridors.set(descriptor.key,lease);
+   lease={ownerId,direction:ownerDirection,taskKey:trafficTaskKey(owner),expiresAtS:now+TRAFFIC_AVOIDANCE.corridorLeaseS,descriptor:{...descriptor,direction:[...descriptor.direction],midpoint:[...descriptor.midpoint]}};runtime.corridors.set(descriptor.key,lease);
   }
   const first=this.traffic.corridorKey!==descriptor.key||this.traffic.corridorOwner!==lease.ownerId;
   Object.assign(this.traffic,{corridorKey:descriptor.key,corridorTaskKey:taskKey,corridorOwner:lease.ownerId,corridorDirection:descriptor.sign,corridorDescriptor:lease.descriptor,originalTarget:goal?[...goal]:this.traffic.originalTarget});
   if(lease.ownerId===a.npcId){
-   lease.expiresAtS=a.time+TRAFFIC_AVOIDANCE.corridorLeaseS;lease.taskKey=taskKey;if(first)this.traffic.corridorClaims++;
+   lease.expiresAtS=now+TRAFFIC_AVOIDANCE.corridorLeaseS;lease.taskKey=taskKey;if(first)this.traffic.corridorClaims++;
    this.traffic.corridorOrbit=null;this.traffic.mode='corridor-owner';this.traffic.reason='narrow-corridor-direction-owner';
    if(goal&&!this.normalizeCorridorRoute(context,goal))return'blocked';return'owner';
   }
-  return this.installCorridorYield(conflict,context,descriptor,lease)?'yield':'blocked';
+  if(this.installCorridorYield(conflict,context,descriptor,lease))return'yield';
+  return this.handoffBlockedCorridor(conflict,context,descriptor,lease)?'owner':'blocked';
+ }
+ handoffBlockedCorridor(conflict,context,descriptor,lease){
+  // If only one entrance has a usable retreat lane, that side must yield.
+  // At most one negotiated handover per lease prevents same-tick ping-pong.
+  const a=this.a,other=conflict.actor,peer=other.agent.locomotion;
+  if(lease.ownerId!==other.id||lease.handoffs||!peer)return false;
+  const goal=this.traffic.slotPoint||a.route.at(-1);if(!this.normalizeCorridorRoute(context,goal))return false;
+  const before={...lease},peerTraffic={...peer.traffic},peerRoute=other.agent.route.map(p=>[...p]),peerRequest=peer.requestKey;
+  Object.assign(lease,{ownerId:a.npcId,direction:descriptor.sign,taskKey:trafficTaskKey(a),expiresAtS:trafficPopulationNow(a.w.population)+TRAFFIC_AVOIDANCE.corridorLeaseS,handoffs:1});
+  const actor=[...a.w.population.values()].find(row=>row.agent===a);
+  if(!actor||!peer.installCorridorYield({actor},peer.world.context(.23),{...descriptor,sign:-descriptor.sign},lease)){
+   for(const key of Object.keys(lease))delete lease[key];Object.assign(lease,before);peer.traffic=peerTraffic;other.agent.route=peerRoute;peer.requestKey=peerRequest;return false;
+  }
+  Object.assign(this.traffic,{corridorOwner:a.npcId,corridorOrbit:null,corridorManeuverPoint:null,mode:'corridor-owner',reason:'opposite-entrance-has-retreat-space'});this.traffic.corridorClaims++;
+  a.log?.('本侧出口缺少撤离空间，已由对方退让并取得通道方向权');return true;
  }
  normalizeCorridorRoute(context,goal){
   const a=this.a,root=this.engine.state.root;if(!goal)return false;
@@ -399,17 +458,29 @@ class NaturalLocomotion {
  }
  corridorPassed(lease,context){
   const d=lease?.descriptor;if(!d)return false;const coordinate=this.engine.state.root[d.axisIndex],margin=context.radius+.22;
+  // A destination just outside the portal still occupies the shared exit.
+  // Keep the direction lease until arrival releases it, so the circulating
+  // peer cannot re-enter while the owner is settling at that destination.
+  const goal=this.traffic.slotPoint||this.a.route.at(-1),exit=lease.direction>0?d.upper:d.lower;
+  if(goal&&Math.abs(goal[d.axisIndex]-exit)<context.radius+.85&&Math.abs(goal[d.lateralIndex]-d.midpoint[d.lateralIndex])<context.radius*2+.20)return false;
   return lease.direction>0?coordinate>d.upper+margin:coordinate<d.lower-margin;
  }
  buildCorridorOrbit(lease,context){
   const a=this.a,d=lease?.descriptor,root=this.engine.state.root;if(!d)return false;
   const sign=this.traffic.corridorDirection||-lease.direction,axis=d.axisIndex,lateral=d.lateralIndex,margin=context.radius+.52,outside=sign>0?d.lower-margin:d.upper+margin,base=[...d.midpoint];base[axis]=outside;base[1]=0;
-  const preferred=trafficPairSide(a.npcId,lease.ownerId),spacing=Math.max(.32,context.radius+.18),candidates=[];
+  const preferred=trafficPairSide(a.npcId,lease.ownerId),spacing=Math.max(.68,context.radius*2+.20),candidates=[];
   for(const longitudinal of [0,-sign*.20,-sign*.38])for(const side of [preferred,-preferred])for(const scale of [1,1.45,1.9]){const p=[...base];p[axis]+=longitudinal;p[lateral]+=side*spacing*scale;candidates.push(p);}
   for(const first of candidates){
-   if(!this.world.free(first,.23))continue;let approach;try{approach=a.w.path(root,first,context.radius,context.ignore);}catch{continue;}if(!Array.isArray(approach)||!approach.length)continue;
-   for(const side of [preferred,-preferred])for(const scale of [1.15,1.65,2.1]){
-    const second=[...base],third=[...base];second[lateral]+=side*spacing*scale;third[lateral]-=side*spacing*scale;second[axis]-=sign*.18;third[axis]-=sign*.32;
+   if(!this.world.free(first,.23))continue;let approach;
+   try{approach=a.w.path(root,first,context.radius,context.ignore);}catch{
+    // Leave the walls axially before turning into the outside lane.
+    try{approach=[...a.w.path(root,base,context.radius,context.ignore),...a.w.path(base,first,context.radius,context.ignore)];}catch{continue;}
+   }
+   if(!Array.isArray(approach)||!approach.length)continue;
+   for(const scale of [1,1.4,1.8]){
+    // Stay on the chosen side: a loop across the exit axis obstructs the
+    // owner again, especially when its destination is just past the portal.
+    const side=Math.sign(first[lateral]-base[lateral]),second=[...first],third=[...first];second[lateral]+=side*.26*scale;third[lateral]+=side*.42*scale;second[axis]-=sign*.38;third[axis]-=sign*.08;
     if(!this.world.free(second,.23)||!this.world.free(third,.23))continue;
     if(!trafficSegmentClear(a,first,second,context)||!trafficSegmentClear(a,second,third,context)||!trafficSegmentClear(a,third,first,context))continue;
     const points=[...approach.map(point=>[...point]),second,third,first];
@@ -429,23 +500,40 @@ class NaturalLocomotion {
   }
   t.corridorOrbit=null;return this.buildCorridorOrbit(lease,context)?[...t.corridorOrbit[0]]:null;
  }
+ corridorOwnerManeuverTarget(lease,context){
+  const a=this.a,t=this.traffic,root=this.engine.state.root,d=lease.descriptor,axis=[0,0,0];axis[d.axisIndex]=lease.direction;
+  // Back off along a swept, short segment while the opposing actor exits.
+  // Keep the target until reached so forward/backward commands do not chatter.
+  for(const distance of [.58,.42,.30,.20,.12]){
+   const point=add(root,mul(axis,-distance));point[1]=0;
+   if(!this.world.free(point,.23)||!trafficSegmentClear(a,root,point,context))continue;
+   t.corridorManeuverPoint=point;t.corridorManeuvers=(t.corridorManeuvers||0)+1;
+   a.log?.('通道前方人物正在撤离，短程后撤保持净空');return [...point];
+  }
+  return null;
+ }
  maintainCorridor(context,target){
   const a=this.a,population=a.w.population,t=this.traffic,key=t.corridorKey;if(!population||!key)return null;
-  const runtime=trafficRuntime(population),goal=t.slotPoint||t.originalTarget||a.route.at(-1);trafficPruneCorridors(population,runtime,a.time);const lease=runtime.corridors.get(key);
+  const runtime=trafficRuntime(population),goal=t.slotPoint||t.originalTarget||a.route.at(-1),now=trafficPopulationNow(population);trafficPruneCorridors(population,runtime,now);const lease=runtime.corridors.get(key);
   if(!lease){trafficReleaseCorridor(this);if(goal)this.normalizeCorridorRoute(context,goal);t.mode='corridor-rejoin';t.reason='corridor-released';a.log?.('狭窄通道方向权已释放，重新接回原任务路线');return null;}
   if(lease.ownerId===a.npcId){
-   lease.expiresAtS=a.time+TRAFFIC_AVOIDANCE.corridorLeaseS;lease.taskKey=trafficTaskKey(a);t.corridorOwner=a.npcId;t.mode='corridor-owner';t.reason='narrow-corridor-direction-owner';
+   lease.expiresAtS=now+TRAFFIC_AVOIDANCE.corridorLeaseS;lease.taskKey=trafficTaskKey(a);t.corridorOwner=a.npcId;t.mode='corridor-owner';t.reason='narrow-corridor-direction-owner';
    if(this.corridorPassed(lease,context)){runtime.corridors.delete(key);trafficReleaseCorridor(this);if(goal)this.normalizeCorridorRoute(context,goal);a.log?.('已通过狭窄通道并释放方向权');return null;}
-   return this.corridorAdvanceTarget(target,context)||this.rollingTrafficTarget(target,context);
+   if(t.corridorManeuverPoint){
+    const point=t.corridorManeuverPoint;
+    if(horizontal(this.engine.state.root,point)>.045&&this.world.free(point,.23)&&trafficSegmentClear(a,this.engine.state.root,point,context))return [...point];
+    t.corridorManeuverPoint=null;
+   }
+   return this.corridorAdvanceTarget(target,context)||this.rollingTrafficTarget(target,context)||this.corridorOwnerManeuverTarget(lease,context);
   }
   t.corridorOwner=lease.ownerId;t.mode='corridor-circulation';t.reason='opposing-narrow-corridor';
   return this.corridorOrbitTarget(lease,context);
  }
  rollingTrafficTarget(target,context){
   const a=this.a,t=this.traffic,root=this.engine.state.root;
-  if(t.advancePoint&&t.advanceRouteIndex===a.routeIndex&&horizontal(root,t.advancePoint)>.025&&this.world.free(t.advancePoint,.23))return [...t.advancePoint];
+  if(t.advancePoint&&t.advanceRouteIndex===a.routeIndex&&horizontal(root,t.advancePoint)>.025&&this.world.free(t.advancePoint,.23)&&trafficSegmentClear(a,root,t.advancePoint,context))return [...t.advancePoint];
   t.advancePoint=null;t.advanceRouteIndex=-1;
-  if(this.world.free(target,.23))return target;
+  if(this.world.free(target,.23)&&trafficSegmentClear(a,root,target,context))return target;
   let direction=sub(target,root);direction[1]=0;const distance=len(direction);if(distance<.08)return null;direction=norm(direction);
   for(const lookahead of [Math.min(.72,distance-.04),Math.min(.52,distance-.04),Math.min(.34,distance-.04),Math.min(.20,distance-.04)]){
    if(lookahead<.12)continue;const point=add(root,mul(direction,lookahead));point[1]=0;
@@ -459,18 +547,27 @@ class NaturalLocomotion {
   const context=this.world.context(.23),root=this.engine.state.root,currentTaskKey=trafficTaskKey(a);
   if(this.traffic.slotTaskKey&&this.traffic.slotTaskKey!==currentTaskKey)trafficReleaseTargetSlot(this);
   if(this.traffic.corridorTaskKey&&this.traffic.corridorTaskKey!==currentTaskKey)trafficReleaseCorridor(this);
+  if(this.traffic.intersectionTaskKey&&this.traffic.intersectionTaskKey!==currentTaskKey)this.releaseIntersection();
   if(a.skill?.type==='walk'&&!this.traffic.slotKey){trafficReserveTargetSlot(this,context);target=a.route[a.routeIndex];if(!target)return null;}
-  if(motionWorldSweep(a.w,root,target,context.radius,context.ignore).fraction<1-1e-6){
+  if(motionWorldSweep(a.w,root,target,context.radius,context.ignore,context).fraction<1-1e-6){
    if(!this.replanStaticRoute(context))throw Error('当前物体阻断路线，且没有可用的重新规划路径');
    target=a.route[a.routeIndex];if(!target)return null;
   }
   if(!a.w.population)return target;
+  // Standalone motion harnesses may omit crowd coordination. Production always
+  // assembles the coordinator; it supplies route targets, never motion poses.
+  const intersectionTarget=typeof trafficMaintainOpenIntersection==='function'?trafficMaintainOpenIntersection(this,context,target):null;
+  if(intersectionTarget)return intersectionTarget;
+  target=a.route[a.routeIndex];if(!target)return null;
   const maintained=this.maintainCorridor(context,target);if(maintained)return maintained;
-  const predicted=predictTrafficConflict(a,speed,context);
+  let predicted=predictTrafficConflict(a,speed,context);
+  if(this.replanStationaryRoute(predicted,context)){target=a.route[a.routeIndex];predicted=predictTrafficConflict(a,speed,context);}
   if(predicted){
    const corridor=this.resolveNarrowCorridor(predicted,context);
    if(corridor==='owner'||corridor==='yield'){const managed=this.maintainCorridor(context,target);if(managed)return managed;throw Error('狭窄通道没有可用的持续移动路线');}
    if(corridor==='blocked')throw Error('狭窄通道没有可用的主动撤离路线');
+   const intersection=typeof trafficResolveOpenIntersection==='function'?trafficResolveOpenIntersection(this,predicted,context):null;
+   if(intersection){const managed=trafficMaintainOpenIntersection(this,context,target);if(managed)return managed;target=a.route[a.routeIndex];if(!target)return null;}
   }
   const rolling=this.rollingTrafficTarget(target,context);if(rolling&&rolling!==target)return rolling;
   if(this.traffic.active&&a.routeIndex<=this.traffic.detourEndIndex&&!force&&this.world.free(target,.23))return target;
@@ -488,8 +585,39 @@ class NaturalLocomotion {
   Object.assign(e.state,{fault:null,paused:false,status:'idle',command:null,speed:0});this.requestKey=null;this.requested=false;
   try{
    const target=this.prepareTrafficTarget(.48,{force:true});if(!target)throw Error('恢复时没有剩余路线');
-   this.request({type:'walk',target:[...target]});this.traffic.recoveries++;this.traffic.reason='recovered-navigation-block';return true;
-  }catch(error){Object.assign(e.state,saved);this.traffic.lastError=error.message;return false;}
+   // A clear target chord does not mean the current heading is clear. Let
+   // the existing walking controller align through a safe temporary target;
+   // reissuing the blocked heading causes a CCD rejection every tick.
+   this.traffic.recoveryTarget={point:[...target],goal:[...a.route.at(-1)],taskKey:trafficTaskKey(a),...Object.fromEntries(['intersectionKey','intersectionOwner','corridorKey','corridorOwner'].map(key=>[key,this.traffic[key]]))};
+   this.turnFilter.reset(e.state.yaw);
+   if(!this.continueTrafficRecovery())this.request({type:'walk',target:[...target]});
+   this.traffic.recoveries++;this.traffic.reason='recovered-navigation-block';return true;
+  }catch(error){Object.assign(e.state,saved);this.traffic.recoveryTarget=null;this.traffic.lastError=error.message;return false;}
+ }
+ continueTrafficRecovery(){
+  const recovery=this.traffic.recoveryTarget;if(!recovery)return false;
+  const a=this.a,state=this.engine.state,point=recovery.point,goal=a.route?.at(-1),context=this.world.context(.23);
+  if(recovery.taskKey!==trafficTaskKey(a)||!goal||!recovery.goal||horizontal(goal,recovery.goal)>1e-6||['intersectionKey','intersectionOwner','corridorKey','corridorOwner'].some(key=>recovery[key]!==this.traffic[key])||!this.world.free(point,.23)||!trafficSegmentClear(a,state.root,point,context)||horizontal(state.root,point)<.015){this.traffic.recoveryTarget=null;return false;}
+  const yaw=Math.atan2(point[0]-state.root[0],point[2]-state.root[2]);
+  const headingClear=(heading,distance=.12)=>!this.world.sweep(state.root,add(state.root,[Math.sin(heading)*distance,0,Math.cos(heading)*distance]),.23).blocked;
+  if(Math.abs(angleDiff(yaw,state.yaw))<=.12&&headingClear(state.yaw,Math.min(.12,horizontal(state.root,point)))){this.traffic.recoveryTarget=null;return false;}
+  let alignment=recovery.alignmentPoint;
+  if(alignment&&(horizontal(state.root,alignment)<.045||!this.world.free(alignment,.23)||!trafficSegmentClear(a,state.root,alignment,context)))alignment=null;
+  // Walk already suppresses translation outside its 0.6 rad heading window.
+  // Check the heading where translation would begin, not only the target
+  // chord. Preserve the walking foot scheduler, including an in-flight step.
+  if(!alignment)for(const offset of [0,.35,-.35,.7,-.7,1.05,-1.05,1.4,-1.4,Math.PI]){
+   const heading=yaw+offset,error=angleDiff(heading,state.yaw),entry=Math.abs(error)>.62?heading-Math.sign(error)*.62:state.yaw;
+   if(!headingClear(entry))continue;
+   for(const distance of [.24,.16,.08]){
+    const candidate=add(state.root,[Math.sin(heading)*distance,0,Math.cos(heading)*distance]);candidate[1]=0;
+    if(!this.world.free(candidate,.23)||!trafficSegmentClear(a,state.root,candidate,context))continue;
+    alignment=candidate;break;
+   }
+   if(alignment)break;
+  }
+  if(!alignment){this.traffic.recoveryTarget=null;return false;}
+  recovery.alignmentPoint=alignment;this.turnFilter.reset(state.yaw);this.request({type:'walk',target:[...alignment]});this.traffic.reason='navigation-recovery-aligning';return true;
  }
  routePassThrough(index){
   const a=this.a,state=this.engine.state,current=a.route[index],next=a.route[index+1];
@@ -514,6 +642,7 @@ class NaturalLocomotion {
   this.lastContinuousWalkHandoff={exitSpeedMps:a.walkSpeed,turnRad,endpoint:[...end]};current.continuousWalkHandoff=structuredClone(this.lastContinuousWalkHandoff);return true;
  }
  move(dt,speed=.48){
+  if(this.continueTrafficRecovery())return true;
   const a=this.a,state=this.engine.state,pace=a.manipulationPace();this.turnFilter.reset(state.yaw);
   if(a.held&&pace<.08){this.tempo=1;this.stop();return a.routeIndex<a.route.length||!this.isSettled();}
   this.tempo=clamp(speed/.48*(a.strength?.movementFactor()??1)*pace,.05,1);
@@ -521,10 +650,10 @@ class NaturalLocomotion {
   while(a.routeIndex<a.route.length){
    if(a.routeIndex<a.route.length-1&&this.routePassThrough(a.routeIndex)){a.routeIndex++;this.routePassThroughCount++;continue;}
    if(horizontal(state.root,a.route[a.routeIndex])>.015)break;
-   if(a.routeIndex===a.route.length-1){if(state.command||!this.isSettled()){this.requested=true;return true;}a.routeIndex++;return false;}
+   if(a.routeIndex===a.route.length-1){if(state.command||!this.isSettled()){this.requested=true;return true;}a.routeIndex++;this.releaseIntersection();return false;}
    a.routeIndex++;
   }
-  if(a.routeIndex>=a.route.length){if(this.traffic.corridorKey)trafficReleaseCorridor(this);return false;}
+  if(a.routeIndex>=a.route.length){this.releaseIntersection();if(this.traffic.corridorKey)trafficReleaseCorridor(this);return false;}
   const target=this.prepareTrafficTarget(speed);if(!target)return false;
   this.request({type:'walk',target:[...target]});return true;
  }
@@ -565,6 +694,7 @@ class NaturalLocomotion {
   const e=this.engine,currentTaskKey=trafficTaskKey(this.a);
   if(this.traffic.slotTaskKey&&this.traffic.slotTaskKey!==currentTaskKey)trafficReleaseTargetSlot(this);
   if(this.traffic.corridorTaskKey&&this.traffic.corridorTaskKey!==currentTaskKey)trafficReleaseCorridor(this);
+  if(this.traffic.intersectionTaskKey&&this.traffic.intersectionTaskKey!==currentTaskKey)this.releaseIntersection();
   if(this.traffic.active&&this.traffic.phase!==undefined&&this.traffic.phase!==this.a.phase)Object.assign(this.traffic,{active:false,mode:'clear',reason:null,blockers:[],detourEndIndex:-1});
   if(!this.requested&&e.state.command?.type==='walk')this.stop();
   this.requested=false;

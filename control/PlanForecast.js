@@ -126,16 +126,26 @@ function planObjectTransferInSnapshot(world,actor,step,o,target,profile,capacity
 function* planObjectTransferSteps(world,actor,step,o,target,profile,capacity,postureDurationS=0){
  return yield* navigationQueryBatchSteps(world,()=>planObjectTransferInSnapshotSteps(world,actor,step,o,target,profile,capacity,postureDurationS));
 }
+function transferApproachDirections(actor,step,o,destination){
+ const preferred=step.type==='push'?groundDirection(o.p,destination):groundDirection(actor.pos,o.p);
+ if(step.type==='push')return[preferred];
+ const fallback=[0,Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2,Math.PI*3/4,-Math.PI*3/4,Math.PI].map(offset=>rotate(qy(offset),preferred));
+ if(o.shape!=='box')return fallback;
+ // Face-centred pickup avoids corner-sensitive contacts. Prefer facing the
+ // delivery direction, rather than immediately reversing with a held box.
+ // These are candidates only: all route, contact and strength checks remain.
+ const exit=groundDirection(o.p,destination),faces=[[0,0,1],[1,0,0],[0,0,-1],[-1,0,0]].map(axis=>groundDirection([0,0,0],rotate(o.q,axis)));
+ faces.sort((a,b)=>dot(b,exit)-dot(a,exit));
+ const result=[];for(const direction of [...faces,...fallback])if(!result.some(other=>horizontal(other,direction)<1e-6))result.push(direction);
+ return result;
+}
 function* planObjectTransferInSnapshotSteps(world,actor,step,o,target,profile,capacity,postureDurationS=0){
  const h=reasoningHuman(actor),landings=reasoningDestinations(world,actor,step,o,target),failures=[],approaches=new Map();
  // A reachable object may be beside a wall or shelf. A single approach ray
  // from the actor can put the grasp stance inside that obstacle. Search the
  // same checked grasp from a finite set of sides before rejecting the task.
  // A push retains its required straight line behind the object.
- const candidates=landings.flatMap(destination=>{
-  const preferred=step.type==='push'?groundDirection(o.p,destination):groundDirection(actor.pos,o.p);
-  return (step.type==='push'?[0]:[0,Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2,Math.PI*3/4,-Math.PI*3/4,Math.PI]).flatMap(offset=>(step.type==='push'?[0]:[0,-.02,.02,.04,.06,.08]).map(approachExtra=>({destination,direction:rotate(qy(offset),preferred),approachExtra})));
- });
+ const candidates=landings.flatMap(destination=>transferApproachDirections(actor,step,o,destination).flatMap(direction=>(step.type==='push'?[0]:[0,-.02,.02,.04,.06,.08]).map(approachExtra=>({destination,direction,approachExtra}))));
  // A landing is accepted only with its approach, loaded route and strength.
  // Failed candidates leave the actor, world and capacity unchanged.
  for(const {destination,direction,approachExtra} of candidates){

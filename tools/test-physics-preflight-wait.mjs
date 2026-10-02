@@ -64,4 +64,13 @@ for(const reason of ['paused','error','characterEditInProgress']){
  a.preflightWaiting=false;physics.syncFrozen([a,b]);assert.equal(physics.objectState(held.id).supported,false,'support stays unverified immediately after thaw');
  physics.step(dt,[a,b]);steps++;assert(physics.objectState(held.id).supported,'a fresh physical contact can restore support evidence');cases++;
 }
-console.log(JSON.stringify({cases,steps,engine:'cannon-es',onlyHeldObjectFrozen:true,velocitiesRestored:true,otherActorsAndObjectsContinue:true,invalidatesSupportEvidence:true,ownerAndObjectDestructionCovered:true,vendorModified:false,browserExecuted:false}));
+// Exact browser quaternions. Cannon's normalization can alternate their last
+// bit even with zero angular velocity; a frozen preflight must not see edits.
+for(const rotation of [[7.172488918546559e-8,-.4063963097586247,-7.669438800272466e-8,.9136969078499507],[2.7149299076475025e-8,-.27200283641807527,1.7030986686416176e-7,.9622964496351903]]){
+ const {physics,held,free,a,b}=fixture();held.q=rotation;physics.syncScene();const q=[...held.q],p=[...held.p],yaw=held.yaw;
+ for(let i=0;i<120;i++){physics.step(dt,[a,b]);steps++;same(held.q,q,'frozen quaternion must remain bit-exact');same(held.p,p);assert.equal(held.yaw,yaw);}
+ assert(free.p[1]<3.9);assert.equal(physics.objectState(held.id).settled,false);
+ held.q=[0,Math.sin(.2),0,Math.cos(.2)];physics.syncScene();const edited=[...held.q];physics.step(dt,[a,b]);steps++;
+ same(held.q,edited,'a real scene edit must not be overwritten by an old freeze snapshot');assert.notDeepEqual(held.q,q);cases++;
+}
+console.log(JSON.stringify({cases,steps,engine:'cannon-es',onlyHeldObjectFrozen:true,bitExactFrozenRotation:true,velocitiesRestored:true,otherActorsAndObjectsContinue:true,invalidatesSupportEvidence:true,ownerAndObjectDestructionCovered:true,vendorModified:false,browserExecuted:false}));

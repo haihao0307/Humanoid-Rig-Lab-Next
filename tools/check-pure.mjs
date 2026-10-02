@@ -21,6 +21,7 @@ import {checkEyeAnatomySources} from './check-eye-anatomy.mjs';
 import {checkFaceAnatomySources} from './check-face-anatomy.mjs';
 import {checkCharacterShapeSources} from './check-character-shape.mjs';
 import {checkNPCPopulationSources} from './check-npc-population.mjs';
+import {checkOpenIntersectionSources} from './check-open-intersection.mjs';
 import {checkPhysicsSources} from './check-physics.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const read=p=>readFileSync(join(root,p),'utf8');
@@ -88,6 +89,7 @@ const eyeAnatomyFileContracts=checkEyeAnatomySources({read,assert});
 const faceAnatomyFileContracts=checkFaceAnatomySources({read,assert});
 const characterShapeFileContracts=checkCharacterShapeSources({parse,read,assert});
 const npcPopulationFileContracts=checkNPCPopulationSources({parse,read,assert});
+const openIntersectionFileContracts=checkOpenIntersectionSources({parse,read,assert});
 const physicsFileContracts=checkPhysicsSources({parse,read,assert,root,runtime:output.runtime});
 const parameterFiles=new Set(reconstructionFileContracts.parameterPaths);
 let scripts=0;
@@ -122,4 +124,4 @@ function scan(dir){for(const item of readdirSync(dir,{withFileTypes:true})){
 }}
 scan(root);
 for(const path of [...manifest.modules,...Object.values(manifest.htmlModules).flat()])assert(files.some(f=>f.path===path),'Missing assembly dependency '+path);
-console.log(JSON.stringify({schema:'jarvis/pure_file_audit@1',files:files.length,bytes:files.reduce((n,f)=>n+f.bytes,0),runtimeBytes:Buffer.byteLength(output.runtime),entrypointBytes:Buffer.byteLength(output.index),htmlScriptsParsed:scripts,largestLiteralArray:largestArray,unresolvedIdentifiers:unresolved.length,legacyModelDependencies:0,modelFiles:0,imageFiles:0,sourceAssemblyMatches:true,launcherFileContracts,actionFileContracts,npcRoutineFileContracts,reconstructionFileContracts,r2RigMotionFileContracts,motionLabIntegrationContracts,characterSystemFileContracts,startupFileContracts,hairSystemFileContracts,skinAppearanceFileContracts,faceControlFileContracts,eyeAnatomyFileContracts,faceAnatomyFileContracts,characterShapeFileContracts,npcPopulationFileContracts,anatomyRuleFileContracts,physicsFileContracts,applicationExecuted:false,visualAcceptance:false,indexSHA256:createHash('sha256').update(output.index).digest('hex')},null,2));
+console.log(JSON.stringify({schema:'jarvis/pure_file_audit@1',files:files.length,bytes:files.reduce((n,f)=>n+f.bytes,0),runtimeBytes:Buffer.byteLength(output.runtime),entrypointBytes:Buffer.byteLength(output.index),htmlScriptsParsed:scripts,largestLiteralArray:largestArray,unresolvedIdentifiers:unresolved.length,legacyModelDependencies:0,modelFiles:0,imageFiles:0,sourceAssemblyMatches:true,launcherFileContracts,actionFileContracts,npcRoutineFileContracts,reconstructionFileContracts,r2RigMotionFileContracts,motionLabIntegrationContracts,characterSystemFileContracts,startupFileContracts,hairSystemFileContracts,skinAppearanceFileContracts,faceControlFileContracts,eyeAnatomyFileContracts,faceAnatomyFileContracts,characterShapeFileContracts,npcPopulationFileContracts,openIntersectionFileContracts,anatomyRuleFileContracts,physicsFileContracts,applicationExecuted:false,visualAcceptance:false,indexSHA256:createHash('sha256').update(output.index).digest('hex')},null,2));

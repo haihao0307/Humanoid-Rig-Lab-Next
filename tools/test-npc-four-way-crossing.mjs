@@ -12,17 +12,18 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8'),rig=JSON.par
 const fullBody=read('motion/vendor/full-body.mjs').replace(/from '(\.\/[^']+)'/g,(_,path)=>'from '+JSON.stringify(new URL('../motion/vendor/'+path,import.meta.url).href));
 const {FullBodyMotion,blend,relaxedHandRotation}=await import('data:text/javascript;base64,'+Buffer.from(fullBody+'\nexport {blend,relaxedHandRotation};').toString('base64'));
 const math=read('source/runtime.template.js').split('// MODULE math')[1].split('function matrix')[0];
-const code=math+'\n'+read('body/ReconstructionRig.js').replace('/*__R2_RIG_JSON__*/',JSON.stringify(rig)).replace('/*__R2_REGIONS_JSON__*/','{}')+'\n'+read('body/CharacterShape.js')+'\n'+read('body/ReferenceMotion.js').replace('/*__R2_MOTION_JSON__*/',read('reconstruction/motion-reference.json'))+'\n'+read('body/ContactHandPose.js')+'\n'+read('body/MotionLabPose.js')+'\n'+read('body/NaturalLocomotion.js');
+const code=math+'\n'+read('body/ReconstructionRig.js').replace('/*__R2_RIG_JSON__*/',JSON.stringify(rig)).replace('/*__R2_REGIONS_JSON__*/','{}')+'\n'+read('body/CharacterShape.js')+'\n'+read('body/ReferenceMotion.js').replace('/*__R2_MOTION_JSON__*/',read('reconstruction/motion-reference.json'))+'\n'+read('body/ContactHandPose.js')+'\n'+read('body/MotionLabPose.js')+'\n'+read('body/CrowdIntersectionCoordinator.js')+'\n'+read('body/NaturalLocomotion.js');
 const horizontal=(a,b)=>Math.hypot(a[0]-b[0],a[2]-b[2]);
 const objectRadius=o=>o.shape==='box'?Math.hypot(o.w,o.d)/2:o.r;
 const objectFootprint=o=>o.shape==='box'?[o.w/2,o.d/2]:[o.r,o.r];
-const api=vm.runInNewContext(code+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,NaturalLocomotion,motionCircleSweep,dist})',{
+const runtimeSource=read('source/runtime.template.js'),geometry=runtimeSource.slice(runtimeSource.indexOf('function objectYaw'),runtimeSource.indexOf('/*__SOURCE:world/PhysicsContract.js__*/'))+'\n'+read('world/PhysicsContract.js')+'\n'+read('world/GridNavigation.js');
+const api=vm.runInNewContext(code+'\n'+geometry+'\n({resolveCharacterRig,resolveCharacterMetrics,r2SourceFrames,NaturalLocomotion,motionCircleSweep,trafficRuntime,trafficPruneIntersections,campGridPath,pointToObjectClearance,dist})',{
  structuredClone,SHAPE_SCHEMA,SHAPE_REVISION,normalizeCharacterShape,characterShapeParameterKey,createCharacterShapeField,CHARACTER_DEFORMATION_RULES,HUMAN_GENERATOR_REVISION:'four-way-crossing-test',
  degrees:r=>r*180/Math.PI,DOWN:[0,-1,0],horizontal,angleDiff:(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b)),objectTilted:()=>false,objectYaw:()=>0,objectRadius,objectFootprint,
  bodyPhysicalProfile:h=>({bodyRadiusM:h.bodyMetrics.bodyRadiusM}),carryRouteRadius:()=>.55,MotionLab:{FullBodyMotion,blend,relaxedHandRotation,solveTwoBone,MotionController,rigFromSource,FlatWorld}});
 
-function makeHuman(){
- const resolvedRig=api.resolveCharacterRig({}),bodyMetrics=api.resolveCharacterMetrics(resolvedRig),sourceBind=api.r2SourceFrames(resolvedRig),h={resolvedRig,bodyMetrics,sourceBind,arms:{}};
+function makeHuman(shape={}){
+ const resolvedRig=api.resolveCharacterRig(shape),bodyMetrics=api.resolveCharacterMetrics(resolvedRig),sourceBind=api.r2SourceFrames(resolvedRig),h={resolvedRig,bodyMetrics,sourceBind,arms:{}};
  h.joints=[...sourceBind.keys()].map(id=>({id,bindQ:[0,0,0,1]}));h.byId=new Map(h.joints.map(j=>[j.id,j]));
  for(const side of ['left','right'])h.arms[side]={s:side==='left'?-1:1,L1:api.dist(sourceBind.get(side+'_upperArm').p,sourceBind.get(side+'_forearm').p),L2:api.dist(sourceBind.get(side+'_forearm').p,sourceBind.get(side+'_hand').p)};
  return h;
@@ -35,11 +36,25 @@ const specs=[
  ['npc-c',[-3.2,0,0],[3.2,0,0],Math.PI/2],
  ['npc-d',[3.2,0,0],[-3.2,0,0],-Math.PI/2]
 ];
-const actors=specs.map(([id,start,goal,yaw])=>{
- const human=makeHuman(),agent={npcId:id,h:human,pos:[start[0],0,start[2]],yaw,time:0,index:0,phase:'walk',held:null,skill:{type:'walk'},route:[[...goal]],routeIndex:0,manipulationPace:()=>1,strength:{movementFactor:()=>1},walkSpeed:0,w:world,logs:[],log(message){this.logs.push(message);}};
+const campLayout=process.argv.includes('--camp-layout'),reviewCast=process.argv.includes('--review-cast')||campLayout;let shapes=[];
+if(reviewCast){
+ const recipes=vm.runInNewContext(read('control/NPCPopulation.js')+'\n({npcMotherVariant,npcReviewCast})',{npcCopy:structuredClone,validateNPCDefinition:v=>v});
+ shapes=[{},recipes.npcMotherVariant({character:{appearance:{skin:{}}}}).character.shape,...recipes.npcReviewCast().slice(0,2).map(row=>row.shape)];
+ specs.splice(0,specs.length,['npc-1',[-1.9,0,0],[1.9,0,0],Math.PI/2],['npc-2',[1.9,0,0],[-1.9,0,0],-Math.PI/2],['npc-3',[0,0,-1.9],[0,0,1.9],0],['npc-4',[0,0,1.9],[0,0,-1.9],Math.PI]);
+}
+if(campLayout){
+ const camp=JSON.parse(runtimeSource.split('\n').find(line=>line.startsWith('const CAMP_WORLD=')).trim().slice('const CAMP_WORLD='.length,-1)),center=[10.2,0,-1.5];
+ world.objects=camp.objects.map(raw=>({...camp.templates[raw.templateId],...raw,p:raw.p.map((value,i)=>value-center[i])}));
+ world.bounds={xMin:camp.bounds.xMin-center[0],xMax:camp.bounds.xMax-center[0],zMin:camp.bounds.zMin-center[2],zMax:camp.bounds.zMax-center[2]};
+ world.collision=(point,r,ignore=[])=>point[0]-r<world.bounds.xMin||point[0]+r>world.bounds.xMax||point[2]-r<world.bounds.zMin||point[2]+r>world.bounds.zMax||world.objects.some(o=>o.collidable!==false&&!ignore.includes(o.id)&&api.pointToObjectClearance(point,o)<r+.06);
+ world.path=(start,end,r,ignore)=>api.campGridPath(world,start,end,r,ignore);
+}
+const actors=specs.map(([id,start,goal,yaw],index)=>{
+ const human=makeHuman(shapes[index]),agent={npcId:id,h:human,pos:[start[0],0,start[2]],yaw,time:0,index:0,phase:'walk',held:null,skill:{type:'walk'},route:[[...goal]],routeIndex:0,manipulationPace:()=>1,strength:{movementFactor:()=>1},walkSpeed:0,w:world,logs:[],log(message){this.logs.push(message);}};
  const actor={id,label:id,human,agent,goal,disposed:false,done:false};actor.locomotion=new api.NaturalLocomotion(agent);agent.locomotion=actor.locomotion;return actor;
 });
 world.population={
+ elapsedS:0,
  values:()=>actors,
  collisionFor:(agent,p,r)=>actors.some(other=>other.agent!==agent&&!other.disposed&&horizontal(p,other.agent.pos)<r+other.human.bodyMetrics.bodyRadiusM+.06),
  sweepFor:(agent,start,end,r)=>actors.filter(other=>other.agent!==agent&&!other.disposed).reduce((fraction,other)=>Math.min(fraction,api.motionCircleSweep(start,end,other.agent.pos,r+other.human.bodyMetrics.bodyRadiusM+.06)),1)
@@ -49,12 +64,23 @@ const debugState=(failed,error)=>({
  actors:actors.map(actor=>({id:actor.id,done:actor.done,position:actor.agent.pos,yaw:actor.agent.yaw,goal:actor.goal,routeIndex:actor.agent.routeIndex,route:actor.agent.route,command:actor.locomotion.engine.state.command,status:actor.locomotion.engine.state.status,fault:actor.locomotion.engine.state.fault,traffic:actor.locomotion.traffic,logs:actor.agent.logs.slice(-8)})),
  separations:actors.flatMap((a,i)=>actors.slice(i+1).map(b=>({pair:[a.id,b.id],distance:horizontal(a.agent.pos,b.agent.pos)})))
 });
+const pauseOwner=process.argv.includes('--pause-owner');let pausedActor=null,pauseFrame=-1,frozenTime=null;
 let minSeparation=Infinity,frames=0;
 for(;frames<12000&&!actors.every(actor=>actor.done);frames++){
- const order=frames%2?actors:[...actors].reverse();
+ world.population.elapsedS+=1/120;
+ const activeLease=[...api.trafficRuntime(world.population).intersections.values()][0];
+ if(pauseOwner&&!pausedActor&&activeLease){pausedActor=actors.find(actor=>actor.id===activeLease.ownerId);pauseFrame=frames;frozenTime=pausedActor.agent.time;pausedActor.agent.paused=true;}
+ if(pausedActor&&frames===pauseFrame+120){assert.equal(pausedActor.agent.time,frozenTime,'paused actor clock must remain frozen');pausedActor.agent.paused=false;}
+ api.trafficPruneIntersections(world.population,api.trafficRuntime(world.population),world.population.elapsedS);
+ const order=reviewCast?actors:frames%2?actors:[...actors].reverse();
  for(const actor of order){
-  if(actor.done)continue;const a=actor.agent,l=actor.locomotion;a.time+=1/120;
+  if(actor.done||actor.agent.paused)continue;const a=actor.agent,l=actor.locomotion;a.time+=1/120;
   try{const moving=l.move(1/120,.48);l.update(1/120);l.pose.validate(l.pose.build());if(!moving)actor.done=true;}catch(error){console.error('FOUR_WAY_DEBUG '+JSON.stringify(debugState(actor.id,error)));throw Error(actor.id+': '+error.message);}
+ }
+ for(const lease of api.trafficRuntime(world.population).intersections.values()){
+  const owners=actors.filter(actor=>actor.locomotion.traffic.intersectionKey===lease.key&&actor.locomotion.traffic.intersectionOwner===actor.id);
+  assert.equal(owners.length,1,'each live intersection must have exactly one owner');
+  assert.equal(owners[0].id,lease.ownerId,'actor and shared lease ownership must agree');
  }
  for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++)minSeparation=Math.min(minSeparation,horizontal(actors[i].agent.pos,actors[j].agent.pos));
 }
@@ -64,5 +90,9 @@ assert(actors.every(actor=>actor.done),'all four agents must complete their orig
 for(const actor of actors){assert(horizontal(actor.agent.pos,actor.goal)<.025,actor.id+' must reach its original target');assert(!Object.hasOwn(actor.locomotion.traffic,'waitS'));}
 assert(minSeparation>.50,'continuous sweep must prevent body overlap');
 const trafficActions=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.detours+actor.locomotion.traffic.retreats+actor.locomotion.traffic.recoveries+(actor.locomotion.traffic.escapes||0),0);
-assert(trafficActions>0,'the crossing must exercise predictive traffic handling');
-console.log(JSON.stringify({passed:true,agents:4,frames,minSeparationM:minSeparation,trafficActions,parkingWait:false}));
+const intersectionClaims=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.intersectionClaims,0),intersectionYields=actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.intersectionYields,0);
+assert(intersectionClaims>=1,'crossing must exercise assembled shared ownership');
+assert(intersectionYields>=2,'non-owners must exercise circulation');
+assert(actors.reduce((sum,actor)=>sum+actor.locomotion.traffic.recoveries,0)<128,'motion kernel must not repeatedly recover');
+if(pauseOwner)assert(pausedActor&&!pausedActor.agent.paused,'pause/resume scenario must run');
+console.log(JSON.stringify({passed:true,agents:4,frames,pauseOwner,reviewCast,campLayout,minSeparationM:minSeparation,trafficActions,intersectionClaims,intersectionYields,parkingWait:false}));
