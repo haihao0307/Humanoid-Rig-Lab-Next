@@ -145,3 +145,9 @@ npm run test:imports
 - [x] 若只有截图而没有工作台，则不能判定完成；本目录同时保存运行时、源码及独立 HTML 压缩包。
 
 原始 standalone HTML 仍可双击打开，核心运行不依赖服务器或外置资源。GitHub 中保存 ZIP 只是规避普通 Git 单文件大小限制。机器检查不代表用户已批准所有物种的形体质量，`visualAcceptance` 与 `productionReady` 不自动升级。
+
+## 灰白训练台与活动烘焙
+
+工作台导出“靠谱烘焙 · 形态与生命活动”，在排练台点击“导入对象 / 排练谱”。保留形态参数，有原生动作的动物默认继续生命活动，右侧可暂停单体或选择原生动作。静态模块保持静态。排练台为灰白、明亮、无网格空间，可调光线。完整排练谱和独立 HTML 都携带活动运行器，导出页可离线运行。详细格式与版本要求见 docs/WAREHOUSE_STANDARD.md。
+
+后台检查：`node tools/test-live-rehearsal.mjs`。

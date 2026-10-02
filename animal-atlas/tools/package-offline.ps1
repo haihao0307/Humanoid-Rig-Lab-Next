@@ -17,10 +17,12 @@ $atlasReadme = Join-Path $atlasDist 'OFFLINE_README.txt'
 新增动物与参数保存在当前浏览器，换浏览器时请导出靠谱动物包。
 右上角新增排练台，可放入多个动物当前形态，调整位置、大小、关系与光线。
 默认导出靠谱烘焙文件；排练台可导出独立 HTML 或完整排练谱。
-排练关系为人工编排的整体运动，原骨骼动作在单动物工作台演示。
+排练台为灰白无网格训练空间，可导入工作台的靠谱烘焙 JSON；保留当前参数并播放原动物生命活动。
+关系仍为人工编排。原模块没有动作时展示静态形态。
 
 源码、来源清单、构建工具和验收记录保存在 GitHub 仓库的 animal-atlas 目录。
 '@ | Set-Content -LiteralPath $atlasReadme -Encoding utf8
+[System.IO.File]::WriteAllText($atlasReadme, ([System.IO.File]::ReadAllText($atlasReadme).Replace("`r`n", "`n")), [System.Text.UTF8Encoding]::new($false))
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $atlasZip = Join-Path $atlasDist 'animal-atlas-v1.2.0-offline.zip'
 $atlasStream = [System.IO.File]::Open($atlasZip, [System.IO.FileMode]::Create)
@@ -34,5 +36,5 @@ $atlasManifest = [ordered]@{
     html = [ordered]@{ file = '打开动物集成工作台.html'; bytes = (Get-Item -LiteralPath $atlasHtml).Length; sha256 = (Get-FileHash -LiteralPath $atlasHtml -Algorithm SHA256).Hash.ToLowerInvariant() }
     archive = [ordered]@{ file = 'animal-atlas-v1.2.0-offline.zip'; bytes = (Get-Item -LiteralPath $atlasZip).Length; sha256 = (Get-FileHash -LiteralPath $atlasZip -Algorithm SHA256).Hash.ToLowerInvariant() }
 }
-$atlasManifest | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $atlasDist 'OFFLINE_MANIFEST.json') -Encoding utf8
+[System.IO.File]::WriteAllText((Join-Path $atlasDist 'OFFLINE_MANIFEST.json'), (($atlasManifest | ConvertTo-Json -Depth 4).Replace("`r`n", "`n") + "`n"), [System.Text.UTF8Encoding]::new($false))
 $atlasManifest | ConvertTo-Json -Depth 4

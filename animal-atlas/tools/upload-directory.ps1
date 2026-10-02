@@ -1,5 +1,5 @@
 # Uses the existing Git credential helper; credentials never enter logs or files.
-param([switch]$UpdateExistingDirectory,[string]$ExpectedDirectoryTree)
+param([switch]$UpdateExistingDirectory,[string]$ExpectedDirectoryTree,[string]$CommitMessage = 'Update Animal Atlas workbench and offline package')
 $ErrorActionPreference = 'Stop'
 $atlasRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $atlasRoot
@@ -83,7 +83,7 @@ foreach ($row in $atlasOldTree.tree) {
     $new = @($atlasRootTree.tree | Where-Object path -eq $row.path)
     if ($new.Count -ne 1 -or $new[0].sha -ne $row.sha -or $new[0].mode -ne $row.mode) { throw "Protected root changed: $($row.path)" }
 }
-$atlasCandidate = Invoke-AtlasApi POST 'git/commits' @{ message = $(if ($atlasPrevious) { 'Add animal warehouse contract, form baking and shared rehearsal stage' } else { 'Add animal-atlas v1.2 workbench, source and offline package' }); tree = $atlasNewTree.sha; parents = @($atlasBase) }
+$atlasCandidate = Invoke-AtlasApi POST 'git/commits' @{ message = $CommitMessage; tree = $atlasNewTree.sha; parents = @($atlasBase) }
 $atlasFresh = Invoke-AtlasApi GET 'git/ref/heads/main'
 if ($atlasFresh.object.sha -ne $atlasBase) { throw 'Main advanced during upload; do not overwrite concurrent work.' }
 $atlasPromoted = Invoke-AtlasApi PATCH 'git/refs/heads/main' @{ sha = $atlasCandidate.sha; force = $false }
