@@ -1,0 +1,103 @@
+{
+  "taskId": "r008-lowrise-elastic-linen-shorts-20261002",
+  "directive": "用户认可昨日短裤外形。降低过高腰线，增加松紧腰头结构；测最新人物工作台人物实际尺寸，适配短裤，再用真实动作测试布料物理效果。 用户新增：保留原版，再做新版，共两个独立版本。",
+  "dispatchDate": "2026-10-02 Asia/Shanghai",
+  "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+  "baseSha": "09507c395eee0b924d1fc98572c1134773f9b779",
+  "targetSubject": "source/assembly.json activeSubject=new-human-r008",
+  "acceptedBaseline": "R24-19-seams-static-test-20261001 user shape accepted; native motion HOLD",
+  "expectedArtifact": "fresh interactive R008 clothing workbench, standalone single HTML and verified public mirror",
+  "allowedPaths": [
+    "New-Human-Production/R008/Shorts*.mjs",
+    "New-Human-Production/R008/tools/*shorts*",
+    "New-Human-Production/R008/app.mjs",
+    "New-Human-Production/R008/index.html",
+    "New-Human-Production/R008/server.cjs",
+    "New-Human-Production/R008/vendor",
+    "docs/SHORTS*"
+  ],
+  "protectedInvariants": [
+    "actual latest R008 character identity, material, 61bone animation",
+    "accepted original shorts silhouette/piece roles/19 real seams/procedural linen",
+    "no mouse control",
+    "existing public baseline remains available"
+  ],
+  "allowedUserChanges": [
+    "new measured paper sizing",
+    "lower rise",
+    "35-40mm elastic casing",
+    "separate finite elastic waistband mechanics"
+  ],
+  "forbiddenRoutes": [
+    "baked or imported replacement human",
+    "fabric rendered via hard bone skinning and called physics",
+    "motion declared passed from static proof",
+    "old artifact called new"
+  ],
+  "coverage": {
+    "actualBodyMeasurement": "VERIFIER_PASSED_CLOTHED_ENVELOPE_ONLY",
+    "lowRiseElasticDraft": "V2_SOURCE_CASING_PASSED_ELASTIC_UNVALIDATED",
+    "manufacturing": "V2_BROWSER_TERMINAL_SOURCE_SEWING_INDEPENDENT_PASS",
+    "independentVerification": "PASS_SOURCE_PAPER_SEAMS_TOPOLOGY_AND_OFFLINE_TWO_VERSION_SWITCH_ONLY",
+    "wearing": "FAIL_TWO_BOUNDED_INCREMENTS_ROOT_CAUSE_REVIEW",
+    "nativeClothAndMotion": "NOT_RUN_NEW_CONSTRUCTORS",
+    "standalonePublication": "OFFLINE_TWO_VERSION_PACKAGING_PASS_NO_NEW_PUBLIC_PROMOTION",
+    "boundaryTargetRepair": "INDEPENDENT_HEM_SOURCE_EDGE_LENGTH_AND_EXTERIOR_CURVE_PASS_ONLY",
+    "exteriorSourceSeed": "INDEPENDENT_SOURCE_METRIC_AND_SUPPORT_HALFSPACE_PASS_CONTACT_INTERPRETATION_HOLD",
+    "sourceUpload": "PREPARED_DEVELOPMENT_CHECKPOINT"
+  },
+  "acceptanceGates": [
+    "sourceModified=true",
+    "interactive3D=true",
+    "staticImageSubstitute=false",
+    "actual generated geometry measurement",
+    "19 real seam equality",
+    "main/G strain <=5%, elastic separately declared",
+    "actual motion and body/self contact history",
+    "independent verifier",
+    "desktop/mobile and offline/network browser QA",
+    "public HTTP200 and matching version before URL share"
+  ],
+  "visualAcceptancePending": true,
+  "productionReady": false,
+  "lastReview": {
+    "at": "2026-10-02T05:51:04.991Z",
+    "status": "HOLD_LOCAL_SOURCE_CHECKPOINT",
+    "reason": "Verified hem and frame defects repaired as independent source constructors; connected wearing and reliable collision interpretation remain HOLD.",
+    "uniqueWearingFailureCauseProven": false
+  },
+  "versionPolicy": {
+    "original": {
+      "id": "original",
+      "revision": "R24-19-seams-static-test-20261001",
+      "immutable": true,
+      "acceptedShape": true,
+      "clothMotionValidated": false,
+      "htmlSHA256": "2b9158f76cd75aef5605be86bd7092c406d333467ce116eca130f166580635da"
+    },
+    "revised": {
+      "id": "lowrise",
+      "revision": "R008-lowrise-elastic-style-preserved-v2-20261002",
+      "waistDropM": 0.055,
+      "waistbandWidthM": 0.038,
+      "retainSubjectOriginalClothing": true,
+      "authorMissingBarePelvis": false,
+      "bodySurfaceAuthority": "existing original clothing envelope",
+      "acceptedShape": false,
+      "motionValidated": false,
+      "htmlSHA256": "071f3bcf9728b734b91b9df757f1ff47598ae27b084346cd782b6b3b09f950a6"
+    },
+    "entry": "single interactive version switch; original bytes preserved; new version must pass separate gates",
+    "entryArtifactSHA256": "91c18edaac39f2c99bd874d66fdd538559e893e4678e4aed34d09ae11ab8be61"
+  },
+  "deliveryChecklist": [
+    "[x] No generated image substitute for real 3D",
+    "[x] Actual procedural source changes",
+    "[x] Existing internal interactive three-dimensional comparison",
+    "[x] Actual R008 generated geometry, skeleton and action runtime",
+    "[x] Camera and version controls operable; uncertified cloth actions disabled",
+    "[ ] Complete current wearing and native cloth motion acceptance",
+    "[ ] New garment public fixed URL and independent browser acceptance",
+    "[x] Screenshot-only completion rejected"
+  ]
+}

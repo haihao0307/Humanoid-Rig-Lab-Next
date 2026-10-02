@@ -1,0 +1,30 @@
+import {registerHooks} from 'node:module';
+import {projectManufacturingPaper} from '../ShortsManufacturingMetric.mjs';
+import {solveManufacturingBlock} from '../ShortsManufacturingCoupled.mjs';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {gunzipSync} from 'node:zlib';
+import {createHash} from 'node:crypto';
+const base=new URL('../',import.meta.url);
+const reportFilename=process.argv[2]||'shorts-coupled-staged-sewing-probe-20261002.json';
+if(!/^[a-zA-Z0-9_-]+\.json$/.test(reportFilename))throw Error('QA receipt must be a plain filename');
+registerHooks({resolve(s,c,next){return s==='three'?{url:new URL('vendor/three.module.js',base).href,shortCircuit:true}:next(s,c);}});
+const [THREE,{decodeParameters},{createSubject},{createShortsBodyAdapter},{createShortsGarmentDraft},{createShortsManufacturingDraft},{ShortsClothRuntime}]=await Promise.all([import('three'),import('../parameter-codec.mjs'),import('../SubjectRuntime.mjs'),import('../ShortsBodyAdapter.mjs'),import('../ShortsGarmentDraft.mjs'),import('../ShortsManufacturingDraft.mjs'),import('../ShortsClothRuntime.mjs')]);
+const bytes=gunzipSync(readFileSync(new URL('parameters.phf.gz',base))),data=decodeParameters(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)),actor=new THREE.Group(),scene=new THREE.Scene(),subject=createSubject(data,{edgeMetres:.012});scene.add(actor);actor.add(subject.root);actor.updateMatrixWorld(true);subject.finishPose();
+const body=createShortsBodyAdapter(subject,actor,{waistDropM:.055}),draft=createShortsGarmentDraft(body.measurements,{sectionAt:body.sectionAt,sagittalAtY:body.sagittalAtY}),source=createShortsManufacturingDraft(draft),stages=[];
+const immutable=d=>JSON.stringify({uv:Array.from(d.sourceUV),triangles:Array.from(d.triangles),mass:Array.from(d.masses),seams:d.seams});const sourceIdentity=immutable(source);let positions=source.positions;
+let previousSeams=[];
+for(const stage of source.sewingStages){
+ const cloth=new ShortsClothRuntime({...source,positions},body,actor,scene,{activeSeamIDs:previousSeams,elasticEnabled:false}),start=performance.now(),before=cloth.audit(false),identity=cloth.materialIdentity(),trace=[];
+ const sourcePairs=source.seams.filter(s=>stage.sourceSeamIDs.includes(s.id)).flatMap(s=>s.pairs),threads=sourcePairs.map(p=>{const a=cloth.quotient[p.a],b=cloth.quotient[p.b],initial=Math.hypot(...cloth.positions[a].map((v,k)=>v-cloth.positions[b][k]));return {a,b,initial,rest:initial,sourceArc:p.t,active:false,compliance:0,lambda:0};}),gap=()=>Math.max(0,...threads.map(e=>Math.hypot(...cloth.positions[e.a].map((v,k)=>v-cloth.positions[e.b][k]))));
+ for(let pass=1;pass<=200;pass++){
+  for(const e of cloth.edges)e.lambda=0;for(const e of threads){e.lambda=0;const closure=Math.max(0,Math.min(1,(pass/80-e.sourceArc*.5)*2));e.rest=e.initial*(1-closure);e.active=closure>0;}
+  for(let sweep=0;sweep<8;sweep++){for(const e of cloth.edges)cloth.solveDistance(e,cloth.options.fixedDt);for(const t of cloth.triangles)projectManufacturingPaper(cloth,t);for(const e of threads)if(e.active)cloth.solveDistance(e,cloth.options.fixedDt);}
+  if(pass%10===0){const a=cloth.audit(false),g=gap();trace.push({pass,mainStrain:a.mainStrain,sourcePairGapM:g,finite:a.finite});if((pass>=80&&a.manufacturingMaterialValid&&g<=.0001)||!a.finite)break;}
+ }
+ let coupled=null;if(stage.id==='gusset'&&(!cloth.audit(false).manufacturingMaterialValid||gap()>.0001))coupled=solveManufacturingBlock(cloth,threads);
+ const soft=cloth.audit(false),seamGapM=gap(),paperUnchanged=identity===cloth.materialIdentity()&&sourceIdentity===immutable(source);positions=new Float64Array(553*3);for(let i=0;i<553;i++)positions.set(cloth.positions[cloth.quotient[i]],i*3);cloth.dispose();
+ let after=soft,exactDofs=null,hardClosureVerified=false;
+ if(soft.manufacturingMaterialValid&&seamGapM<=.0001&&paperUnchanged){const welded=new ShortsClothRuntime({...source,positions},body,actor,scene,{activeSeamIDs:stage.cumulativeSourceSeamIDs,elasticEnabled:false});after=welded.audit(false);exactDofs=welded.positions.length;hardClosureVerified=after.manufacturingMaterialValid&&exactDofs===stage.sourceQuotientDofs;for(let i=0;i<553;i++)positions.set(welded.positions[welded.quotient[i]],i*3);welded.dispose();}
+ const valid=hardClosureVerified&&paperUnchanged;stages.push({id:stage.id,seams:stage.cumulativeSourceSeamIDs,dofs:exactDofs,before,trace,coupled,soft,after,seamGapM,paperUnchanged,bodyContactEnabled:false,elasticActivated:false,actualMotionSteps:0,elapsedMs:performance.now()-start,valid});if(!valid)break;previousSeams=stage.cumulativeSourceSeamIDs;
+}
+const sourceHashes=Object.fromEntries(['ShortsGarmentDraft.mjs','ShortsManufacturingDraft.mjs','ShortsManufacturingMetric.mjs','ShortsManufacturingCoupled.mjs','ShortsClothRuntime.mjs'].map(n=>[n,createHash('sha256').update(readFileSync(new URL(n,base))).digest('hex')])),report={createdAt:new Date().toISOString(),scope:'real source-paper manufacture with progressively activated original seams; no body contacts/tape/native dynamics; not a wearing acceptance',sourceHashes,sourceRecipe:draft.receipt.version,sourceG:draft.receipt.gusset,initial:source.manufacturingReceipt,stages,manufacturedPositions:stages.length===4&&stages.every(s=>s.valid)?Array.from(positions):null,manufacturingMaterialPassed:stages.length===4&&stages.every(s=>s.valid),selfContactValidated:false,bodyFitValidated:false,motionValidated:false,productionReady:false};mkdirSync(new URL('qa/',base),{recursive:true});writeFileSync(new URL('qa/'+reportFilename,base),JSON.stringify(report,null,2));console.log(JSON.stringify({reportFilename,manufacturingMaterialPassed:report.manufacturingMaterialPassed,stages:stages.map(s=>({id:s.id,dofs:s.dofs,valid:s.valid,before:s.before.mainStrain,after:s.after.mainStrain,seamGapM:s.seamGapM,elapsedMs:s.elapsedMs,worst:s.after.worstMaterialTriangle})),bodyFitValidated:false},null,2));
