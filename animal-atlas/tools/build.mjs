@@ -27,7 +27,14 @@ for(const filename of fs.readdirSync(path.join(root,'assets')).filter(p=>p.endsW
  html=html.replace('<script>\'use strict\';',()=>'<script>'+read('src/reference-water-runtime.js').replaceAll('</script','<\\/script')+'</script><script>\'use strict\';');
  if(!html.includes('AtlasFishHabitat?.draw')||!html.includes('await AtlasFishHabitat.prepare'))throw Error('Fish habitat hook failed');
  }
- if(key.startsWith('life-')){html=html.replaceAll('engine.render();','globalThis.__ATLAS_READY_CHECK__?.();engine.render();').replace('window.__LIFE_VISUAL = engine;','engine.animal=animal;window.__ATLAS_THREE=T;window.__LIFE_VISUAL = engine;').replace('const raw=Math.min(.05,(now-lastTime)/1000||0);','const raw=window.__ATLAS_PAUSED?0:Math.min(.05,(now-lastTime)/1000||0);').replace('function tick(dt){\n simTime+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;\n simTime+=dt;').replace('function tick(dt){lifeVisualClock+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;lifeVisualClock+=dt;');}
+ if(key.startsWith('life-')){html=html.replaceAll('engine.render();','globalThis.__ATLAS_READY_CHECK__?.();engine.render();').replace('window.__LIFE_VISUAL = engine;','engine.animal=animal;window.__ATLAS_THREE=T;window.__LIFE_VISUAL = engine;').replace('const raw=Math.min(.05,(now-lastTime)/1000||0);','const raw=window.__ATLAS_PAUSED?0:Math.min(.05,(now-lastTime)/1000||0)*(globalThis.__ATLAS_DEMO?.activity??1);').replace('function tick(dt){\n simTime+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;\n simTime+=dt;').replace('function tick(dt){lifeVisualClock+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;lifeVisualClock+=dt;');}
+ // Each source clock differs. Fail the build if a registered animal's exact entry disappears.
+ const hook=(from,to)=>{if(html.split(from).length!==2)throw Error('Animal clock hook must match exactly once: '+key+' / '+from);html=html.replace(from,to);};
+ if(['life-pig','life-cat'].includes(key)&&!html.includes('const raw=window.__ATLAS_PAUSED?0:'))throw Error('Life raw clock hook failed '+key);
+ if(key==='life-bruce')hook('function tick(dt){if(window.__ATLAS_PAUSED)return;\n simTime+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;dt*=globalThis.__ATLAS_DEMO?.activity??1;\n simTime+=dt;');
+ if(key==='life-bird')hook('function tick(dt){if(window.__ATLAS_PAUSED)return;lifeVisualClock+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;dt*=globalThis.__ATLAS_DEMO?.activity??1;lifeVisualClock+=dt;');
+ if(key==='life-shark')hook('function step(dt){behavior.begin();if(state.paused)return;updateFish(dt);','function step(dt){behavior.begin();if(state.paused)return;dt*=globalThis.__ATLAS_DEMO?.activity??1;updateFish(dt);');
+ if(key==='eagle')hook('let dt=Math.min((now-this.last)/1000,.25);','let dt=Math.min((now-this.last)/1000,.25)*(globalThis.__ATLAS_DEMO?.activity??1);');
  if(['life-pig','life-bruce','life-cat'].includes(key)){
  html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+beachScript.replaceAll('</script','<\\/script')+'</script>');
  const anchor='const world = LV.worlds(T, G, M, U).create(kind, scene, source);';
@@ -39,7 +46,8 @@ for(const filename of fs.readdirSync(path.join(root,'assets')).filter(p=>p.endsW
  html=html.replace('world.update(state, settings.quality, time, snapshot); lighting.update(state, position, settings.quality);','world.update(state, settings.quality, time, snapshot); lighting.update(state, position, settings.quality);if(engine.referenceWater){world.group.visible=false;api.ocean.surface.visible=false;api.ocean.underwater.visible=false;api.ocean.skyGroup.visible=false;if(!AtlasTurntable.isActive())engine.referenceWater.update();}');
  html=html.replace('engine.animal=animal;window.__ATLAS_THREE=T;window.__LIFE_VISUAL = engine;','engine.animal=animal;window.__ATLAS_THREE=T;window.__LIFE_VISUAL = engine;AtlasFishHabitat.installLife(T,engine).catch(error=>{engine.referenceError=String(error);console.error(error);});');
  }
- if(key==='cat-v440'){html=html.replace('window.__CAT_V440_STATS__=','window.__ATLAS_CAT_MESH__=()=>m;window.__CAT_V440_STATS__=');}
+ if(key==='crab')html=html.replace('a.time+=T*a.speed','a.time+=T*a.speed*(globalThis.__ATLAS_DEMO?.activity??1)');
+ if(key==='cat-v440'){html=html.replaceAll('performance.now()/1000','(globalThis.__ATLAS_DEMO?.clock()??performance.now()/1000)');html=html.replace('window.__CAT_V440_STATS__=','window.__ATLAS_CAT_MESH__=()=>m;window.__CAT_V440_STATS__=');}
  if(key==='cat-v440'){
  html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+beachScript.replaceAll('</script','<\\/script')+'</script>');
  html=html.replace('const vs=`#version 300 es','AtlasBeach.prepareRaw(canvas,gl);const vs=`#version 300 es');
@@ -65,12 +73,14 @@ for(const filename of fs.readdirSync(path.join(root,'assets')).filter(p=>p.endsW
   modules.surface=modules.surface.replace(unpack,"export function unpack(r){let b;if(Uint8Array.fromBase64)b=Uint8Array.fromBase64(r.b64);else{const text=atob(r.b64);b=new Uint8Array(text.length);for(let i=0;i<text.length;i++)b[i]=text.charCodeAt(i);}");
   modules.surface=modules.surface.replace('const cache=new Map();','const cache=new Map(),basisSamples=new Map();').replace('function basis(t,n){','function basis(t,n){let samples=basisSamples.get(n);if(!samples){samples=new Map();basisSamples.set(n,samples);}if(samples.has(t))return samples.get(t);const sampleKey=t;').replace('return{start:span-3,b};','const result={start:span-3,b};if(samples.size<4096)samples.set(sampleKey,result);return result;');
   modules.surface=modules.surface.replace('for(let i=0;i<score.vertices;i++){','const accumulator=new Float64Array(9);for(let i=0;i<score.vertices;i++){').replace('out=new Float64Array(9);','out=accumulator;out.fill(0);').replace('return mesh;','basisSamples.clear();return mesh;');
+  modules.app=modules.app.replace('time+=dt*speed;draw()', 'time+=dt*speed*(globalThis.__ATLAS_DEMO?.activity??1);draw()');
   modules.app=modules.app.replace('window.ready=true;draw();','window.ready=true;globalThis.__ATLAS_READY_CHECK__?.();draw();').replace(anchor,"for(const [id,name,scientific]of info.filter(x=>!window.__ATLAS_CONTEXT?.key||x[0]===window.__ATLAS_CONTEXT.key)){");
   html=html.slice(0,start+8)+JSON.stringify(modules)+html.slice(end);
   const decodeLoop='for(const id of Object.keys(surfaces))';if(!html.includes(decodeLoop))throw Error('Palau selected-decode hook missing');
   html=html.replace(decodeLoop,"for(const id of Object.keys(surfaces).filter(id=>!window.__ATLAS_CONTEXT?.key||id===window.__ATLAS_CONTEXT.key))");
  }
  html=adaptTurntable(html,key);
+ html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+read('src/demo-head.js').replaceAll('</script','<\\/script')+'</script>');
  const sourceLabel=sourceNames[key]||(key.startsWith('life-')?'Life Ecosystem V3.x · original procedural source snapshot':'Original project');
  const emit=(id,text,data=text,baseAsset)=>{const compressed=zlib.gzipSync(Buffer.from(data),{level:9});assets[id]={source:sourceLabel,sha256:sourceSha,adaptedSha256:hash(Buffer.from(text)),bytes:source.length,compressedBytes:compressed.length,...(baseAsset?{baseAsset}: {}),...(sourceAliases[id]?{compatibleSourceSha256:sourceAliases[id]}:{})};manifest.sources.push({id,...assets[id]});payloads+='<script type="application/octet-stream" id="payload-'+id+'">'+compressed.toString('base64')+'</script>\n';};
  if(key==='palau'){
@@ -86,7 +96,7 @@ const stageBundle=await build({entryPoints:[path.join(root,'src/rehearsal-viewer
 fs.mkdirSync(path.join(root,'dist'),{recursive:true});
 const app=await build({entryPoints:[path.join(root,'src/app.js')],bundle:true,format:'iife',minify:true,write:false,target:'es2022',alias:{three:path.join(root,'vendor/three.module.js')},legalComments:'inline'}),thumbs=fs.existsSync(path.join(root,'qa/thumbnails.json'))?JSON.parse(read('qa/thumbnails.json')):{};
 const parameterBundle=await build({entryPoints:[path.join(root,'src/parameter-runtime.js')],bundle:true,format:'iife',minify:true,write:false,target:'es2022'});
-const sharedBridge=parameterBundle.outputFiles[0].text+'\n'+read('src/studio-bridge.js')+'\n'+read('src/bridge.js');
+const sharedBridge=parameterBundle.outputFiles[0].text+'\n'+read('src/demo-runtime.js')+'\n'+read('src/studio-bridge.js')+'\n'+read('src/bridge.js');
 const exampleScore=(await import('../vendor/quad/src/scores.js')).SCORE_LIBRARY.tortoise.score;
 const boot='window.ATLAS_EXAMPLE_NOTATION='+safe(exampleScore)+';window.ATLAS_ASSETS='+safe(assets)+';window.ATLAS_BRIDGE='+'window.ATLAS_LIVE_SUPPORT.bridge'+';window.ATLAS_FRAME_STYLE='+safe(frameStyle)+';window.ATLAS_THUMBS='+safe(thumbs)+';';
 const legacy=JSON.parse(read('docs/LEGACY_MODULES.json'));

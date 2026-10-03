@@ -96,6 +96,36 @@
       "label": "展示背景",
       "unit": "hex-color",
       "group": "studio"
+    },
+    "demo.age": {
+      "label": "演示年龄（年）",
+      "unit": "demo-coordinate",
+      "group": "demo"
+    },
+    "demo.maturity": {
+      "label": "演示成熟年限",
+      "unit": "demo-coordinate",
+      "group": "demo"
+    },
+    "demo.condition": {
+      "label": "胖瘦程度",
+      "unit": "demo-coordinate",
+      "group": "demo"
+    },
+    "demo.health": {
+      "label": "健康 · 活动强度",
+      "unit": "demo-coordinate",
+      "group": "demo"
+    },
+    "demo.tint": {
+      "label": "体表叠色",
+      "unit": "hex-color",
+      "group": "demo"
+    },
+    "demo.size": {
+      "label": "整体尺寸倍率",
+      "unit": "factor",
+      "group": "demo"
     }
   },
   "presentation": [
@@ -432,6 +462,75 @@
         "label": "主体颜色",
         "type": "color",
         "nullable": true
+      }
+    ]
+  },
+  "demonstration": {
+    "schema": "kaopu/demo-map@1",
+    "controls": [
+      {
+        "key": "demoAge",
+        "label": "演示年龄（年）",
+        "type": "range",
+        "min": 0,
+        "max": 1000,
+        "step": 0.01,
+        "value": 1,
+        "section": "demo",
+        "commonId": "demo.age",
+        "uiScale": "power4"
+      },
+      {
+        "key": "demoMaturity",
+        "label": "演示成熟年限",
+        "type": "range",
+        "min": 0.1,
+        "max": 50,
+        "step": 0.1,
+        "value": 1,
+        "section": "demo",
+        "commonId": "demo.maturity"
+      },
+      {
+        "key": "demoSize",
+        "label": "整体尺寸倍率",
+        "type": "range",
+        "min": 0.25,
+        "max": 3,
+        "step": 0.01,
+        "value": 1,
+        "section": "demo",
+        "commonId": "demo.size"
+      },
+      {
+        "key": "demoCondition",
+        "label": "胖瘦程度",
+        "type": "range",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "value": 50,
+        "section": "demo",
+        "commonId": "demo.condition"
+      },
+      {
+        "key": "demoHealth",
+        "label": "健康 · 活动强度",
+        "type": "range",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "value": 100,
+        "section": "demo",
+        "commonId": "demo.health"
+      },
+      {
+        "key": "demoTint",
+        "label": "体表叠色",
+        "type": "color",
+        "value": "#ffffff",
+        "section": "demo",
+        "commonId": "demo.tint"
       }
     ]
   }

@@ -27,3 +27,5 @@ export function controlValue(def,input,{clamp=false}={}){
  throw Error('未知参数控件类型：'+def.type);
 }
 export function decorateControls(defs,context){return defs.map(d=>decorateControl(d,context));}
+
+export function demonstrationControls(){return catalog.demonstration.controls.map(d=>decorateControl(d));}

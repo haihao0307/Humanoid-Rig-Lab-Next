@@ -1,0 +1,205 @@
+{
+  "startedAt": "2026-10-03T09:28:32.154Z",
+  "commit": "c9f75a6367485e4799e37d5affb5e44630df204c",
+  "htmlSha256": "7bf0eaa34e7aa5280be96afcc071a21958ee43dfabadb15aac4384a7ca7535a8",
+  "baselineEvidence": {
+    "commit": "e0ed67db80af3f4e8d317db203fb29db26b56e8d",
+    "htmlSha256": "0ce9ef51d6d2620ab3f5f2a559b0f5b4eb58866bd9710e4d976df7c1e5dac196",
+    "health": [
+      {
+        "id": "dog",
+        "source": "original animal activity clock",
+        "fast": {
+          "delta": 0.8000000000000009,
+          "ms": 802
+        },
+        "slow": {
+          "delta": 0.12249999999999739,
+          "ms": 817
+        },
+        "ratio": 0.1503136474908167,
+        "paused": {
+          "delta": 0,
+          "ms": 816
+        }
+      },
+      {
+        "id": "shark",
+        "source": "original animal activity clock",
+        "fast": {
+          "delta": 0.7916666666666657,
+          "ms": 807
+        },
+        "slow": {
+          "delta": 0.12249999999999739,
+          "ms": 804
+        },
+        "ratio": 0.1553142183817722,
+        "paused": {
+          "delta": 0,
+          "ms": 812
+        }
+      },
+      {
+        "id": "dove",
+        "source": "sum of actual dt passed into original bird runtime.update",
+        "fast": {
+          "delta": 0.7999999999999986,
+          "ms": 803
+        },
+        "slow": {
+          "delta": 0.12250499999999764,
+          "ms": 810
+        },
+        "ratio": 0.15180789351851587,
+        "paused": {
+          "delta": 0,
+          "ms": 812
+        }
+      },
+      {
+        "id": "cat",
+        "source": "original animal activity clock",
+        "fast": {
+          "delta": 0.7998000000119204,
+          "ms": 802
+        },
+        "slow": {
+          "delta": 0.1324550000220538,
+          "ms": 815
+        },
+        "ratio": 0.1629685182278758,
+        "paused": {
+          "delta": 0,
+          "ms": 804
+        }
+      },
+      {
+        "id": "tern",
+        "source": "original animal activity clock",
+        "fast": {
+          "delta": 0.8000000000000003,
+          "ms": 806
+        },
+        "slow": {
+          "delta": 0.11998499999999945,
+          "ms": 802
+        },
+        "ratio": 0.15072928615960024,
+        "paused": {
+          "delta": 0,
+          "ms": 801
+        }
+      },
+      {
+        "id": "crab",
+        "source": "original animal activity clock",
+        "fast": {
+          "delta": 1.3475549999803305,
+          "ms": 803
+        },
+        "slow": {
+          "delta": 0.20203425000295083,
+          "ms": 815
+        },
+        "ratio": 0.14771902637183645,
+        "paused": {
+          "delta": 0,
+          "ms": 817
+        }
+      }
+    ],
+    "checks": [
+      "Invalid optional scale3 values explicitly rejected."
+    ],
+    "samplingNote": "First cat paused sample read a stale pre-pause metric; subsequent windows wait for source RAF metrics to settle before sampling."
+  },
+  "health": [
+    {
+      "id": "eagle",
+      "source": "original eagle.time",
+      "fast": {
+        "delta": 0.8334000000000005,
+        "ms": 817
+      },
+      "slow": {
+        "delta": 0.122474999999999,
+        "ms": 816
+      },
+      "ratio": 0.1471383392269782,
+      "paused": {
+        "delta": 0,
+        "ms": 802
+      }
+    },
+    {
+      "id": "imported-animated-cat",
+      "source": "original GLTF AnimationMixer mixerTime",
+      "fast": {
+        "delta": 0.8000000000000004,
+        "ms": 807
+      },
+      "slow": {
+        "delta": 0.12248999999999921,
+        "ms": 805
+      },
+      "ratio": 0.15349290372670701,
+      "paused": {
+        "delta": 0,
+        "ms": 805
+      }
+    }
+  ],
+  "checks": [
+    "Eagle original sampling clock scales once and freezes on pause; previously verified six source clocks retained under baselineEvidence.",
+    "Real age slider changes vertices by .4515625, stage respects current maturity, health disabled without actions, progress records actual milestones.",
+    "Native current form bake/import preserves shape/profile with default identity demo; one later shape edit carries scale3 [1.1,1.1,1] into live re-export. Original and edited live geometry both match snapshot in meters; delete releases source iframe.",
+    "Imported animated GLB health scales actual mixer time to 15%; pause freezes mixer.",
+    "390px mobile functional sliders visible with no horizontal overflow."
+  ],
+  "errors": [],
+  "network": [],
+  "desktopMouseOperations": 0,
+  "visualAcceptance": false,
+  "scientificAcceptance": false,
+  "holdHistory": [
+    {
+      "commit": "f8be8e62bcf8add596624c74ca6c3fc30e8de5b1",
+      "reason": "Life dog/shark/dove health slider did not scale original animal clock; fixed in e0ed67d."
+    },
+    {
+      "commit": "e0ed67db80af3f4e8d317db203fb29db26b56e8d",
+      "reason": "Eagle motion sampling used unchanged this.time. Fixed original frame dt once and removed evaluate multiplier."
+    }
+  ],
+  "deltaReview": "diff --git a/src/bridge.js b/src/bridge.js\nindex f44c223..19b41c5 100644\n--- a/src/bridge.js\n+++ b/src/bridge.js\n@@ -60,7 +60,7 @@ if(kind==='imported'){const n=__ATLAS_IMPORTED;actions=n.actions;record.action=n\n }\n demo=window.__ATLAS_DEMO?AtlasDemoAdapter(context,roots):null;if(demo)defs.push(...AtlasParameterSchema.demonstrationControls());\n studio=AtlasStudioAdapter(context,range,check,select);defs=AtlasParameterSchema.decorateControls([...studio.controls,...defs].filter(Boolean),context);actions=actions.filter((a,i,all)=>a.id&&all.findIndex(b=>b.id===a.id)===i);for(const d of defs)record[d.key]=d.value;\n-ready=true;if(kind==='fish'){__KAOPU_R13__.renderer.__atlasRecord=record;const r=__KAOPU_R13__.renderer,advance=r.advance.bind(r);r.advance=dt=>advance(dt*(window.__ATLAS_DEMO?.activity??1));}if(kind==='eagle'){const evaluate=eagle.evaluate.bind(eagle);eagle.evaluate=dt=>evaluate(dt*(window.__ATLAS_DEMO?.activity??1));}\n+ready=true;if(kind==='fish'){__KAOPU_R13__.renderer.__atlasRecord=record;const r=__KAOPU_R13__.renderer,advance=r.advance.bind(r);r.advance=dt=>advance(dt*(window.__ATLAS_DEMO?.activity??1));}\n if(demo){updateDemo();const renderers=[window.__ATLAS_IMPORTED?.renderer,window.__ATLAS_NATIVE?.renderer,window.__LIFE_VISUAL?.renderer,window.__CRAB_QA__?.renderer,window.__ATLAS_CHICKEN_STAGE?.renderer,...(window.birdWorkbench?.getStages().map(s=>s.renderer)||[])].filter(Boolean);for(const r of renderers){const render=r.render.bind(r);r.render=(...args)=>{demo.apply();return render(...args);};}}\n for(const [key,value]of Object.entries(context.initial||{}))if(key!=='playing'&&(defs.some(d=>d.key===key)||['action','view'].includes(key)))set(key,value);if('playing'in(context.initial||{}))set('playing',context.initial.playing);\n window.AnimalRuntime={version:'animal-atlas/1',ready:true,suspendPresentation,stageBinding:()=>({kind,roots:roots(),sourceUnitsPerDisplayUnit:kind==='imported'&&context.geometryUnits==='source-units'?1/__ATLAS_IMPORTED.info().normalization:1,zUp:kind==='palau'}),describe:()=>({schema:'kaopu/runtime@1',parameterSchema:AtlasParameterSchema.PARAMETER_SCHEMA,animalId:context.id,name:context.name,basicData:context.basicData||null,instrument:context.instrument||{id:'atlas/'+kind,version:context.version},controls:defs.map(d=>({...d,value:record[d.key]})),actions:[...actions],capabilities:{parameters:true,actions:!!actions.length,bakeCurrentPose:true,originalLifeRuntime:true,customShaderPortable:false}}),configuration:()=>({...record}),demonstration:()=>demo?.snapshot()||null,set,playAction:id=>set('action',id),pause:()=>set('playing',false),resume:()=>set('playing',true),meshes:exportMeshes,bake:async()=>({schema:'kaopu/mesh-snapshot@1',animalId:context.id,parameters:{...record},items:await exportMeshes()})};\ndiff --git a/tools/build.mjs b/tools/build.mjs\nindex e9a57c7..444244f 100644\n--- a/tools/build.mjs\n+++ b/tools/build.mjs\n@@ -34,6 +34,7 @@ for(const filename of fs.readdirSync(path.join(root,'assets')).filter(p=>p.endsW\n  if(key==='life-bruce')hook('function tick(dt){if(window.__ATLAS_PAUSED)return;\\n simTime+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;dt*=globalThis.__ATLAS_DEMO?.activity??1;\\n simTime+=dt;');\n  if(key==='life-bird')hook('function tick(dt){if(window.__ATLAS_PAUSED)return;lifeVisualClock+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;dt*=globalThis.__ATLAS_DEMO?.activity??1;lifeVisualClock+=dt;');\n  if(key==='life-shark')hook('function step(dt){behavior.begin();if(state.paused)return;updateFish(dt);','function step(dt){behavior.begin();if(state.paused)return;dt*=globalThis.__ATLAS_DEMO?.activity??1;updateFish(dt);');\n+ if(key==='eagle')hook('let dt=Math.min((now-this.last)/1000,.25);','let dt=Math.min((now-this.last)/1000,.25)*(globalThis.__ATLAS_DEMO?.activity??1);');\n  if(['life-pig','life-bruce','life-cat'].includes(key)){\n  html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+beachScript.replaceAll('</script','<\\\\/script')+'</script>');\n  const anchor='const world = LV.worlds(T, G, M, U).create(kind, scene, source);';\n",
+  "nativeGeometry": {
+    "snapshot": [
+      0.745746374130249,
+      0.9934187680482864,
+      1.4497618675231934
+    ],
+    "liveWorld": [
+      0.5574726670989797,
+      0.7426168397302951,
+      1.0837499856948853
+    ],
+    "metersPerUnit": 0.7475365352459622
+  },
+  "passed": true,
+  "completedAt": "2026-10-03T09:41:36.362Z",
+  "testInputCorrection": "First temporary download UUID had no JSON extension, so the importer correctly refused it. Retest uses the same real downloaded bytes as named application/json File.",
+  "editedNativeGeometry": {
+    "snapshot": [
+      0.8203209638595581,
+      1.092760682106018,
+      1.4497618675231934
+    ],
+    "liveWorld": [
+      0.6132199338088776,
+      0.8168785237033246,
+      1.0837499856948853
+    ],
+    "metersPerUnit": 0.7475365352459622
+  }
+}
