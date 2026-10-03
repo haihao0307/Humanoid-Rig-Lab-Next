@@ -335,5 +335,104 @@
         "section": "display"
       }
     ]
+  },
+  "warehouse": {
+    "schema": "kaopu/profile@1",
+    "fields": [
+      {
+        "key": "ageYears",
+        "label": "年龄（年）",
+        "type": "number",
+        "min": 0,
+        "max": 1000,
+        "step": "any",
+        "unit": "years",
+        "nullable": true
+      },
+      {
+        "key": "growthStage",
+        "label": "成长阶段",
+        "type": "select",
+        "options": [
+          {
+            "value": "",
+            "label": "未记录"
+          },
+          {
+            "value": "newborn",
+            "label": "初生"
+          },
+          {
+            "value": "juvenile",
+            "label": "幼年"
+          },
+          {
+            "value": "growing",
+            "label": "成长中"
+          },
+          {
+            "value": "adult",
+            "label": "成年"
+          },
+          {
+            "value": "senior",
+            "label": "老年"
+          }
+        ],
+        "nullable": true
+      },
+      {
+        "key": "referenceSpanM",
+        "label": "基准跨度（m）",
+        "type": "number",
+        "min": 0.001,
+        "max": 100,
+        "step": "any",
+        "source": "basic"
+      },
+      {
+        "key": "massKg",
+        "label": "体重（kg）",
+        "type": "number",
+        "min": 0.000001,
+        "max": 200000,
+        "step": "any",
+        "source": "basic"
+      },
+      {
+        "key": "bodyCondition",
+        "label": "胖瘦程度",
+        "type": "range",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "archive-index",
+        "nullable": true,
+        "ends": [
+          "偏瘦",
+          "丰满"
+        ]
+      },
+      {
+        "key": "health",
+        "label": "健康程度",
+        "type": "range",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "archive-index",
+        "nullable": true,
+        "ends": [
+          "较低",
+          "较好"
+        ]
+      },
+      {
+        "key": "color",
+        "label": "主体颜色",
+        "type": "color",
+        "nullable": true
+      }
+    ]
   }
 }

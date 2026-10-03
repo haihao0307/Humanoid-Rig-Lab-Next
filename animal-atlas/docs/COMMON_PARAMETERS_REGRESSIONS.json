@@ -31,6 +31,16 @@
       "id": "unsupported-biology",
       "rule": "static animals reject lifecycle controls; unknown age rejected; mass independent of scale",
       "test": "tools/test-common-parameters.mjs"
+    },
+    {
+      "id": "archive-fields-must-be-visible",
+      "rule": "every animal visibly exposes age/stage/span/mass/condition/health/color; unknown metadata null, not missing UI",
+      "test": "tools/test-animal-profile.mjs"
+    },
+    {
+      "id": "archive-roundtrip",
+      "rule": "profile outside source parameters survives export/import; GLB tint must not overwrite source color",
+      "test": "tools/test-animal-profile.mjs"
     }
   ]
 }

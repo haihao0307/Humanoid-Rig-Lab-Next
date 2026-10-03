@@ -22,7 +22,7 @@ try{
   assert.match(await page.evaluate(async()=>{try{await __ATLAS__.setCommon('age',5);return 'unexpected';}catch(e){return e.message;}}),/不支持/);
   report.animals.push({id:a.id,allSourceControlsPreserved:true,sourceActions:a.actions.length,commonControls:d.common.controls.length,extensions:d.common.extensions.length});console.log('COMMON OK',a.id);
  }
- report.checks.push('all 19 real runtimes preserve control definitions/basic data/actions; canonical setters route to original live controls; unsupported biology rejected');
+ report.checks.push('all 19 real runtimes preserve control definitions/basic data/actions; canonical setters route to original live controls; unsupported source biology rejected; universal warehouse records handled separately');
  await page.evaluate(()=>__ATLAS_BOOT__.select('neutral-dog',{reset:true,initial:{playing:false,studioRotate:false}}));await page.waitForFunction(()=>__ATLAS__?.ready&&__ATLAS__.current==='neutral-dog');
  await page.evaluate(()=>__ATLAS__.setCommon('object.scale',1.12));assert.equal(await page.evaluate(()=>__ATLAS__.settings().scale),1.12);await page.evaluate(()=>__ATLAS__.setCommon('surface.roughness',.68));assert.equal(await page.evaluate(()=>__ATLAS__.settings().roughness),.68);
  const mass=await page.evaluate(()=>__ATLAS__.basicData().massKg);await page.evaluate(()=>__ATLAS__.setCommon('physical.massKg',12));assert.equal(await page.evaluate(()=>__ATLAS__.basicData().massKg),12);await page.evaluate(v=>__ATLAS__.setCommon('physical.massKg',v),mass);report.checks.push('native common scale/absolute roughness and independent mass use actual original parameters');

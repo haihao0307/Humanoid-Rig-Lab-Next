@@ -9,8 +9,8 @@ export function parameterField(d,value,{set,delay=45,format}){
  else {const top=document.createElement('div'),out=document.createElement('output');top.className='field-top';out.value=format(value,d);input.type='range';input.min=d.min;input.max=d.max;input.step=d.step;input.value=value;let timer;input.oninput=()=>{out.value=format(+input.value,d);clearTimeout(timer);timer=setTimeout(()=>set(d.key,+input.value).catch(()=>{}),delay);};top.append(label,out);row.append(top,input);}
  return row;
 }
-export function commonDescription(animal,controls,actions,record,basicData){
- return {schema:'kaopu/common@1',parameterSchema:'kaopu/parameters@1',animalId:animal.id,basicData,
+export function commonDescription(animal,controls,actions,record,basicData,profile){
+ return {schema:'kaopu/common@1',parameterSchema:'kaopu/parameters@1',animalId:animal.id,basicData,profile,
   lifecycle:{supported:!!actions.length,playing:!!actions.length&&record.playing!==false,action:record.action||null,actions},
   controls:controls.filter(d=>d.commonId).map(d=>({...d,value:record[d.key]??d.value})),
   extensions:controls.filter(d=>!d.commonId).map(d=>({...d,value:record[d.key]??d.value}))};
