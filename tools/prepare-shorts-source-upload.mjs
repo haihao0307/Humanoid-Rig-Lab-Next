@@ -10,6 +10,7 @@ if(process.argv.includes('--frozen')){
  console.log(JSON.stringify(frozen.slice(i*5,(i+1)*5)));process.exit(0);
 }
 const files=[
+ 'New-Human-Production/R008/tools/build-shorts-public-comparison.mjs',
  'New-Human-Production/R008/docs/SHORTS_V9_FABRIC_REVIEW_20261003.md',
  'New-Human-Production/R008/docs/SHORTS_V9_REVIEW_20261003.md',
  ...['probe-shorts-body-tape.mjs','probe-shorts-body-tape-domain.mjs','test-shorts-body-tape-guide.mjs','probe-shorts-rise-budget-v9.mjs','test-shorts-surface-transport-v9.mjs','test-shorts-static-feasible-direction.mjs','probe-shorts-initial-mapping-review.mjs','probe-shorts-v9-3-offline-diagnosis.mjs','probe-shorts-v9.mjs','probe-shorts-intrinsic-v9.mjs','probe-shorts-v9-target-witness.mjs','qa-shorts-v9.cjs'].map(n=>base+'/tools/'+n),
