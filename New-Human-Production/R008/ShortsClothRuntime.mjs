@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {LINEN_MATERIAL_FRAGMENT,LINEN_MATERIAL_SOURCE} from './ShortsLinenMaterial.mjs';
 import {scSolveBending} from './ShortsBending.mjs';
+import {paperTriangle,evaluatePaperTriangle,xpbdScalarStep} from './ShortsPaperSurfaceModel.mjs';
 
 // Independent, finite-force cloth mechanics. No vertex is animated by skinning.
 // UV metric, stitched mass and tape rest lengths are owned by the measured draft.
@@ -25,12 +26,20 @@ export class ShortsClothRuntime {
  constructor(draft,body,actor,scene,options={}){
   this.draft=draft;this.body=body;this.actor=actor;this.scene=scene;this.options={...SHORTS_PHYSICS,...options};this.accumulator=0;this.time=0;this.steps=0;this.enabled=true;this.cpu=[];this.history={maxMainStrain:0,maxElasticStrain:0,maxBodyPenetrationM:0,maxSeamGapM:0,nonFinite:0,firstFailure:null};
   const count=draft.positions.length/3,parent=Array.from({length:count},(_,i)=>i),find=i=>parent[i]===i?i:(parent[i]=find(parent[i]));
+  this.membraneModel=options.membraneModel??'legacy-edge-distance';
+  if(options.paperMaterial)this.options.paperMaterial=Object.freeze({...options.paperMaterial});
+  if(!['legacy-edge-distance','orthotropic-paper'].includes(this.membraneModel))throw Error('Unknown membrane model');
+  if(this.membraneModel==='orthotropic-paper'&&!options.paperMaterial)throw Error('Explicit N/m warp, weft and shear inputs required');
   this.activeSeams=options.activeSeamIDs===undefined?draft.seams:draft.seams.filter(s=>options.activeSeamIDs.includes(s.id));if(options.activeSeamIDs&&this.activeSeams.length!==new Set(options.activeSeamIDs).size)throw Error('Unknown/duplicate source seam activation');for(const seam of this.activeSeams)for(const pair of seam.pairs){const a=pair.a??pair[0],b=pair.b??pair[1];parent[find(a)]=find(b);}
   const roots=[...new Set(parent.map((_,i)=>find(i)))],ids=new Map(roots.map((id,i)=>[id,i]));this.quotient=parent.map((_,i)=>ids.get(find(i)));this.members=roots.map(()=>[]);this.quotient.forEach((j,i)=>this.members[j].push(i));
   this.mass=roots.map(()=>0);this.positions=roots.map(()=>[0,0,0]);const uv=draft.uvs||draft.sourceUV,indices=draft.triangles;
   const sourceMass=new Float64Array(count);this.triangles=[];this.edges=[];this.bends=[];const edgeMap=new Map();this.paperAreaM2=0;
   for(let t=0;t<indices.length;t+=3){const original=Array.from(indices.slice(t,t+3)),q=original.map(i=>this.quotient[i]),u=original.map(i=>[uv[i*2],uv[i*2+1]]),area=Math.abs((u[1][0]-u[0][0])*(u[2][1]-u[0][1])-(u[1][1]-u[0][1])*(u[2][0]-u[0][0]))/2;if(!(area>1e-12))throw Error('Invalid measured paper triangle');this.paperAreaM2+=area;original.forEach(i=>sourceMass[i]+=area*this.options.densityKgM2/3);
-   const det=(u[1][0]-u[0][0])*(u[2][1]-u[0][1])-(u[2][0]-u[0][0])*(u[1][1]-u[0][1]);this.triangles.push({original,q,uv:u,inv:[(u[2][1]-u[0][1])/det,-(u[2][0]-u[0][0])/det,-(u[1][1]-u[0][1])/det,(u[1][0]-u[0][0])/det]});
+   const det=(u[1][0]-u[0][0])*(u[2][1]-u[0][1])-(u[2][0]-u[0][0])*(u[1][1]-u[0][1]);
+   const pieceId=draft.ranges.find(r=>original[0]>=r.offset&&original[0]<r.offset+r.count)?.pieceId;
+   const paperReference=paperTriangle(u,{grainAngleRadians:options.grainAnglesByPiece?.[pieceId]??0});
+   if(this.membraneModel==='orthotropic-paper')evaluatePaperTriangle(paperReference,[[0,0,0],[1,0,0],[0,1,0]],options.paperMaterial);
+   this.triangles.push({original,q,uv:u,pieceId,paperReference,paperLambdas:[0,0,0],inv:[(u[2][1]-u[0][1])/det,-(u[2][0]-u[0][0])/det,-(u[1][1]-u[0][1])/det,(u[1][0]-u[0][0])/det]});
    for(let k=0;k<3;k++){const a=q[k],b=q[(k+1)%3],other=q[(k+2)%3],key=[Math.min(a,b),Math.max(a,b)].join(':');const rest=Math.hypot(u[k][0]-u[(k+1)%3][0],u[k][1]-u[(k+1)%3][1]);if(a===b)continue;const old=edgeMap.get(key);if(old){old.other.push(other);if(Math.abs(rest-old.rest)>.0001)throw Error('Measured seams disagree about material edge length');}else{const e={a,b,rest,compliance:this.options.edgeCompliance,lambda:0,other:[other]};edgeMap.set(key,e);this.edges.push(e);}}
   }
   const frame=new THREE.Matrix4(),actorPosition=new THREE.Vector3(),actorRotation=new THREE.Quaternion(),actorScale=new THREE.Vector3();actor.matrixWorld.decompose(actorPosition,actorRotation,actorScale);frame.compose(actorPosition,actorRotation,new THREE.Vector3(1,1,1));
@@ -45,7 +54,17 @@ export class ShortsClothRuntime {
   const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(count*3),3));geometry.setAttribute('uv',new THREE.BufferAttribute(Float32Array.from(uv),2));const colors=new Float32Array(count*3),palette=[[.2,.62,.9],[.94,.48,.22],[.12,.38,.72],[.72,.24,.14],[.54,.72,.24],[.43,.78,.94],[1,.67,.34],[.82,.38,.25],[.27,.52,.82]];for(const [part,range] of draft.ranges.entries())for(let i=range.offset;i<range.offset+range.count;i++)colors.set(palette[part%palette.length],i*3);geometry.setAttribute('panelTint',new THREE.BufferAttribute(colors,3));geometry.setIndex(new THREE.BufferAttribute(Uint32Array.from(indices),1));this.mesh=new THREE.Mesh(geometry,linenMaterial());this.mesh.name='Measured low-rise linen shorts with elastic casing';this.mesh.frustumCulled=false;scene.add(this.mesh);this.mesh.onBeforeRender=(renderer,scene,camera)=>{camera.getWorldPosition(this.mesh.material.uniforms.uCam.value);renderer.getDrawingBufferSize(this.mesh.material.uniforms.uViewport.value);};this.stitches=(draft.casing.stitchPaths||[]).map(path=>{const n=path.indices.length,geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(n*3),3));const material=new THREE.LineBasicMaterial({color:0x766746});const line=new THREE.LineLoop(geometry,material);line.name='Physical casing '+path.edge+' seam';line.frustumCulled=false;scene.add(line);return {line,indices:path.indices};});this.syncRender();
  }
  solveDistance(e,h){const a=this.positions[e.a],b=this.positions[e.b],d=sub(b,a),l=len(d);if(l<1e-12)return;const alpha=e.compliance/(h*h),w=this.invMass[e.a]+this.invMass[e.b],candidate=e.lambda+(-(l-e.rest)-alpha*e.lambda)/(w+alpha),next=e.tensionOnly?Math.min(0,candidate):candidate,dl=next-e.lambda;e.lambda=next;for(let k=0;k<3;k++){const n=d[k]/l;a[k]-=this.invMass[e.a]*dl*n;b[k]+=this.invMass[e.b]*dl*n;}}
- materialIdentity(){return JSON.stringify({uv:Array.from(this.draft.sourceUV),triangles:Array.from(this.draft.triangles),sourceMass:Array.from(this.sourceMass),mass:this.mass,invMass:this.invMass,triangleRest:this.triangles.map(t=>({uv:t.uv,inv:t.inv})),edges:this.edges.map(e=>[e.a,e.b,e.rest,e.compliance]),elastic:this.elastic.map(e=>[e.a,e.b,e.rest,e.compliance,e.tensionOnly])});}
+ solveMembrane(t,h){
+  for(let k=0;k<3;k++){
+   const row=evaluatePaperTriangle(t.paperReference,t.q.map(i=>this.positions[i]),this.options.paperMaterial).rows[k];
+   const step=xpbdScalarStep({value:row.value,gradients:row.gradients,dofIndices:t.q,invMass:this.invMass,lambda:t.paperLambdas[k],compliance:row.compliancePerJ,h});
+   if(step.status==='HOLD')throw Error('Membrane constraint has no admissible update');
+   t.paperLambdas[k]=step.lambda;for(const {id,delta}of step.corrections)for(let axis=0;axis<3;axis++)this.positions[id][axis]+=delta[axis];
+  }
+ }
+ solveMainMaterial(h){if(this.membraneModel==='orthotropic-paper')for(const t of this.triangles)this.solveMembrane(t,h);else for(const e of this.edges)this.solveDistance(e,h);}
+ resetMaterialMultipliers(){for(const t of this.triangles)t.paperLambdas.fill(0);}
+ materialIdentity(){return JSON.stringify({uv:Array.from(this.draft.sourceUV),triangles:Array.from(this.draft.triangles),sourceMass:Array.from(this.sourceMass),mass:this.mass,invMass:this.invMass,membraneModel:this.membraneModel,paperMaterial:this.options.paperMaterial??null,triangleRest:this.triangles.map(t=>({uv:t.uv,inv:t.inv,grainAngleRadians:t.paperReference.grainAngleRadians})),edges:this.edges.map(e=>[e.a,e.b,e.rest,e.compliance]),elastic:this.elastic.map(e=>[e.a,e.b,e.rest,e.compliance,e.tensionOnly])});}
  async prepareWear({maxPasses=200}={}){
   if(!Number.isInteger(maxPasses)||maxPasses<1||maxPasses>200)throw Error('Static assembly is bounded to 200 passes');
   const identity=this.materialIdentity(),start=performance.now();this.body.refitExact();
@@ -54,8 +73,8 @@ export class ShortsClothRuntime {
   // Only cut-paper edge lengths and actual collider contact move the DOFs.
   // No material reference is derived from these temporary assembled positions.
   for(let pass=1;pass<=maxPasses;pass++){
-   for(const e of [...this.edges,...this.elastic])e.lambda=0;
-   for(let sweep=0;sweep<2;sweep++){for(const e of this.edges)this.solveDistance(e,h);for(const e of this.elastic)this.solveDistance(e,h);}
+   for(const e of [...this.edges,...this.elastic])e.lambda=0;this.resetMaterialMultipliers();
+   for(let sweep=0;sweep<2;sweep++){this.solveMainMaterial(h);for(const e of this.elastic)this.solveDistance(e,h);}
    this.contacts();
    if(pass%10===0||pass===maxPasses){const a=this.audit(true);trace.push({pass,mainStrain:a.mainStrain,bodyPenetrationM:a.bodyPenetrationM,elasticStrain:a.elasticStrain,finite:a.finite});this.syncRender();if(!a.finite||a.numericValid)break;await new Promise(resolve=>setTimeout(resolve,0));}
   }
@@ -72,8 +91,8 @@ export class ShortsClothRuntime {
  }
  fixedStep(h){
   this.previous=this.positions.map(p=>[...p]);const damp=Math.exp(-this.options.damping*h);for(let i=0;i<this.positions.length;i++){this.velocity[i][1]-=this.options.gravity*h;for(let k=0;k<3;k++){this.velocity[i][k]*=damp;this.positions[i][k]+=this.velocity[i][k]*h;}}
-  for(const e of [...this.edges,...this.bends,...this.elastic])e.lambda=0;
-  for(let pass=0;pass<this.options.iterations;pass++){for(const e of this.edges)this.solveDistance(e,h);for(const e of this.bends)scSolveBending(e,this.bendParticles,h,this.options.bendCompliance);for(const e of this.elastic)this.solveDistance(e,h);this.contacts();if(pass===this.options.iterations-1)this.selfContacts();}
+  for(const e of [...this.edges,...this.bends,...this.elastic])e.lambda=0;this.resetMaterialMultipliers();
+  for(let pass=0;pass<this.options.iterations;pass++){this.solveMainMaterial(h);for(const e of this.bends)scSolveBending(e,this.bendParticles,h,this.options.bendCompliance);for(const e of this.elastic)this.solveDistance(e,h);this.contacts();if(pass===this.options.iterations-1)this.selfContacts();}
   for(let i=0;i<this.positions.length;i++){const p=this.positions[i],last=this.previous[i],v=this.velocity[i];for(let k=0;k<3;k++)v[k]=(p[k]-last[k])/h;const c=this.body.collide(new THREE.Vector3(...p),this.options.bodyClearanceM+.0001);if(c){const n=c.normal.toArray?c.normal.toArray():c.normal,bodyV=c.velocity?.toArray?c.velocity.toArray():(c.velocity||[0,0,0]),relative=sub(v,bodyV),normalV=dot(relative,n),tangent=relative.map((x,k)=>x-normalV*n[k]);const tangentL=len(tangent),mu=this.options.friction,normalChange=Math.max(0,-normalV)+.3*h;if(tangentL>1e-10){const reduction=Math.min(1,mu*normalChange/tangentL);for(let k=0;k<3;k++)v[k]-=tangent[k]*reduction;}}}
   this.steps++;this.time+=h;const audit=this.audit(true);for(const [to,from]of [['maxMainStrain','mainStrain'],['maxElasticStrain','elasticStrain'],['maxBodyPenetrationM','bodyPenetrationM']])this.history[to]=Math.max(this.history[to],audit[from]);if(!audit.finite){this.history.nonFinite++;this.enabled=false;}if(!audit.numericValid&&!this.history.firstFailure)this.history.firstFailure={step:this.steps,time:this.time,...audit};this.lastAudit=audit;
  }
@@ -109,7 +128,7 @@ export class ShortsClothRuntime {
  }
  syncRender(){const attr=this.mesh.geometry.attributes.position;for(let i=0;i<this.quotient.length;i++)attr.setXYZ(i,...this.positions[this.quotient[i]]);attr.needsUpdate=true;this.updateStitchedRenderNormals();for(const stitch of this.stitches||[]){const a=stitch.line.geometry.attributes.position;for(let i=0;i<stitch.indices.length;i++)a.setXYZ(i,...this.positions[this.quotient[stitch.indices[i]]]);a.needsUpdate=true;}}
  audit(full=true){
-  let mainStrain=0,worstMaterialTriangle=null;for(const t of this.triangles){const [a,b,c]=t.q.map(i=>this.positions[i]),ab=sub(b,a),ac=sub(c,a),m=t.inv,f=[ab.map((v,k)=>v*m[0]+ac[k]*m[2]),ab.map((v,k)=>v*m[1]+ac[k]*m[3])],x=dot(f[0],f[0]),y=dot(f[0],f[1]),z=dot(f[1],f[1]),s=Math.hypot(x-z,2*y);const minStretch=Math.sqrt(Math.max(0,(x+z-s)/2)),maxStretch=Math.sqrt(Math.max(0,(x+z+s)/2)),strain=Math.max(Math.abs(minStretch-1),Math.abs(maxStretch-1));if(strain>mainStrain){mainStrain=strain;worstMaterialTriangle={sourceIndices:t.original,quotientIndices:t.q,pieceId:this.draft.ranges.find(r=>t.original[0]>=r.offset&&t.original[0]<r.offset+r.count)?.pieceId,minimumStretch:minStretch,maximumStretch:maxStretch,actualPositions:t.q.map(i=>[...this.positions[i]]),sourceUV:t.uv};}}
+  let mainStrain=0,worstMaterialTriangle=null;for(const t of this.triangles){const r=evaluatePaperTriangle(t.paperReference,t.q.map(i=>this.positions[i]));if(r.principalStrain>mainStrain){mainStrain=r.principalStrain;worstMaterialTriangle={sourceIndices:t.original,quotientIndices:t.q,pieceId:t.pieceId,minimumStretch:r.sigmaMin,maximumStretch:r.sigmaMax,actualPositions:t.q.map(i=>[...this.positions[i]]),sourceUV:t.uv};}}
   let currentLengthM=0,restLengthM=0,elasticStrain=0;for(const e of this.elastic){const l=len(sub(this.positions[e.a],this.positions[e.b]));currentLengthM+=l;restLengthM+=e.rest;elasticStrain=Math.max(elasticStrain,Math.abs(l/e.rest-1));}
   let bodyPenetrationM=full?0:null;const samples=full?[...this.positions,...this.triangles.map(t=>[0,1,2].map(k=>t.q.reduce((v,i)=>v+this.positions[i][k]/3,0)))]:[];for(const p of samples){const c=this.body.collide(new THREE.Vector3(...p),0);if(c)bodyPenetrationM=Math.max(bodyPenetrationM,c.penetration??c.depth??len(sub(c.point.toArray?c.point.toArray():c.point,p)));}
   const finite=this.positions.every(p=>p.every(Number.isFinite))&&this.velocity.every(p=>p.every(Number.isFinite)),sorted=[...this.cpu].sort((a,b)=>a-b),waistY=this.waist.reduce((v,i)=>v+this.positions[i][1],0)/Math.max(1,this.waist.length),rmsSpeed=Math.sqrt(this.velocity.reduce((v,p)=>v+dot(p,p),0)/this.positions.length);

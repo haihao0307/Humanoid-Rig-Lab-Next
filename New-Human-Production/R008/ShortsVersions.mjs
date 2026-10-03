@@ -11,7 +11,7 @@ export const SHORTS_VERSIONS = Object.freeze([
   }),
   Object.freeze({
     id: 'lowrise', label: '新版 · 低腰松紧',
-    revision: 'R008-lowrise-triangle-cover-v7-20261002',
+    revision: 'R008-lowrise-continuous-surface-v8-20261003',
     sourceEntry: 'shorts-app.mjs', targetSubject: 'new-human-r008',
     waistFit: 'original-forearm-midpoint-waist@1', waistDropM: null, automaticWaistFit: true, waistbandWidthM: .038,
     preserveOriginalSubjectClothing: true, authorBarePelvis: true, retiredClothingRenderParts: [9,10,19],
