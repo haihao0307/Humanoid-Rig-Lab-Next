@@ -9,7 +9,7 @@ export function tissueRegion(name){
  return [0,0,0,0];
 }
 export function nearestSegment(p,a,b){const d=b.map((v,k)=>v-a[k]),length=d.reduce((s,v)=>s+v*v,0),t=length>1e-12?Math.max(0,Math.min(1,d.reduce((s,v,k)=>s+(p[k]-a[k])*v,0)/length)):0;return a.map((v,k)=>v+d[k]*t);}
-export function createTissueFields({position,skinIndex,skinWeight,bones,inverses}){
+export function createTissueFields({position,skinIndex,skinWeight,bones,inverses,analysis}){
  const byName=new Map(bones.map((b,i)=>[b.name,i])),points=inverses.map(m=>{const e=m.clone().invert().elements;return [e[12],e[13],e[14]];}),regions=bones.map(b=>tissueRegion(b.name));
  const segments=bones.map((b,i)=>{const name=b.name,side=name.endsWith('_l')?'_l':'_r';let next;
   if(name.startsWith('upperarm_'))next='lowerarm'+side;else if(name.startsWith('lowerarm_'))next='hand'+side;
@@ -20,6 +20,7 @@ export function createTissueFields({position,skinIndex,skinWeight,bones,inverses
   const end=byName.has(next)?points[byName.get(next)]:name.startsWith('ball_')?[start[0],start[1],start[2]+.04]:start;
   return [start,end];
  });
+ if(analysis){if(!analysis.canDeform)throw Error('Anatomy requires review before body deformation');for(let i=0;i<bones.length;i++){regions[i]=analysis.segments[i].region;segments[i]=[analysis.segments[i].start,analysis.segments[i].end];}}
  const count=position.length/3,region=new Float32Array(count*4),anchor=new Float32Array(count*3),coverage={torso:0,arm:0,leg:0,hand:0,foot:0,head:0};
  for(let i=0;i<count;i++){const p=Array.from(position.subarray(i*3,i*3+3)),a=[0,0,0];let total=0;
   for(let k=0;k<8;k++){const w=skinWeight[i*8+k];if(!w)continue;const id=skinIndex[i*8+k],r=regions[id],limb=r[1]+r[2]+r[3];for(let j=0;j<4;j++)region[i*4+j]+=w*r[j];if(limb){const q=nearestSegment(p,...segments[id]);for(let j=0;j<3;j++)a[j]+=q[j]*w*limb;total+=w*limb;}}

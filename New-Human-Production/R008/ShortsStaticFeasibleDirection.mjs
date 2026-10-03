@@ -1,0 +1,51 @@
+// Mass-metric projection of a STATIC authoring direction. Not a cloth force,
+// native step, material stiffness or permanent pin. All inputs are read-only.
+// Convex local halfspaces + temporary affine planes + per-DOF trust balls.
+const dot=(a,b)=>a.reduce((s,v,k)=>s+v*b[k],0);
+export function projectShortsStaticFeasibleDirection({proposal,invMass,halfspaces=[],planes=[],maximumMoveM=.003,maximumSweeps=128}){
+ const started=performance.now(),maximumWallMs=250,count=invMass.length,dimension=count*3,toleranceM=1e-10,interiorBufferM=1e-6;
+ if(proposal.length!==dimension||!Array.from(proposal).every(Number.isFinite)||!Array.from(invMass).every(v=>Number.isFinite(v)&&v>0)||maximumMoveM!==.003||maximumSweeps!==128)throw Error('Invalid fixed V9.3 static direction inputs');
+ const roots=Array.from(invMass,Math.sqrt),fixed=new Map();
+ for(const p of planes){if(!Number.isInteger(p.id)||p.id<0||p.id>=count||p.normal?.length!==3||!p.normal.every(Number.isFinite)||!Number.isFinite(p.valueM)||Math.abs(Math.hypot(...p.normal)-1)>1e-10)throw Error('Invalid temporary static height plane');const prior=fixed.get(p.id);if(prior&&(Math.hypot(...prior.normal.map((v,k)=>v-p.normal[k]))>1e-12||Math.abs(prior.valueM-p.valueM)>toleranceM))return {status:'HOLD',reason:'conflicting temporary planes',delta:null};fixed.set(p.id,{normal:p.normal.slice(),valueM:p.valueM});}
+ const x=Float64Array.from(proposal,(v,k)=>v/roots[Math.floor(k/3)]),particular=new Float64Array(dimension);
+ for(const[id,p]of fixed){if(Math.abs(p.valueM)>maximumMoveM+toleranceM)return {status:'HOLD',reason:'temporary plane correction exceeds fixed trust radius',delta:null};const offset=id*3,beta=p.valueM/roots[id],along=dot(Array.from(x.subarray(offset,offset+3)),p.normal);for(let k=0;k<3;k++){particular[offset+k]=beta*p.normal[k];x[offset+k]+=(beta-along)*p.normal[k];}}
+ const rows=halfspaces.map((r,index)=>{if(!Number.isFinite(r.boundM)||!Array.isArray(r.entries))throw Error('Invalid local contact halfspace');const raw=new Map();for(const[k,v]of r.entries){if(!Number.isInteger(k)||k<0||k>=dimension||!Number.isFinite(v))throw Error('Invalid contact gradient');raw.set(k,(raw.get(k)||0)+v);}const a=new Map([...raw].map(([k,v])=>[k,v*roots[Math.floor(k/3)]]));let bound=r.boundM;for(const[k,v]of a)bound-=v*particular[k];const ids=new Set([...a.keys()].map(k=>Math.floor(k/3)));for(const id of ids){const p=fixed.get(id);if(!p)continue;const projection=p.normal.reduce((s,v,k)=>s+v*(a.get(id*3+k)||0),0);for(let k=0;k<3;k++)a.set(id*3+k,(a.get(id*3+k)||0)-projection*p.normal[k]);}const entries=[...a].filter(([,v])=>v!==0),den=entries.reduce((s,[,v])=>s+v*v,0);return {index,raw:[...raw],entries,den,bound,rawBound:r.boundM,lambda:0,kind:r.kind??'contact'};});
+ for(const r of rows)if(r.den<1e-28&&r.bound>toleranceM)return {status:'HOLD',reason:'contact halfspace incompatible with temporary planes',row:r.index,delta:null};
+ // Tighten only the numerical projection target, never the external contract.
+ // A gradient eliminated by an exact height plane cannot gain interior slack.
+ // Opposed/degenerate tightened sets can remain unresolved; original feasibility
+ // is still checked independently and is the only usable-direction certificate.
+ for(const r of rows){r.appliedInteriorBufferM=r.den>=1e-28?interiorBufferM:0;r.bound+=r.appliedInteriorBufferM;}
+ const ballMemory=new Float64Array(dimension);let sweeps=0,converged=false,wallBudgetStopped=false,maximumViolationM=Infinity,maximumChangeM=Infinity;
+ const inspect=()=>{let violation=0,tightenedViolation=0,maxMove=0,planeError=0;for(const r of rows){let value=0;for(const[k,g]of r.raw)value+=g*x[k]*roots[Math.floor(k/3)];violation=Math.max(violation,r.rawBound-value);tightenedViolation=Math.max(tightenedViolation,r.rawBound+r.appliedInteriorBufferM-value);}for(let id=0;id<count;id++){const p=Array.from(x.subarray(id*3,id*3+3),v=>v*roots[id]);maxMove=Math.max(maxMove,Math.hypot(...p));const plane=fixed.get(id);if(plane)planeError=Math.max(planeError,Math.abs(dot(p,plane.normal)-plane.valueM));}return {maximumHalfspaceViolationM:Math.max(0,violation),maximumOriginalHalfspaceViolationM:Math.max(0,violation),maximumTightenedHalfspaceViolationM:Math.max(0,tightenedViolation),maximumMoveM:maxMove,maximumPlaneErrorM:planeError,maximumViolationM:Math.max(0,violation,maxMove-maximumMoveM,planeError),maximumTightenedViolationM:Math.max(0,tightenedViolation,maxMove-maximumMoveM,planeError)};};
+ for(;sweeps<maximumSweeps;sweeps++){
+  if(performance.now()-started>=maximumWallMs){wallBudgetStopped=true;break;}
+  const before=x.slice();
+  // Hildreth/Dykstra halfspace dual coordinates in the equality nullspace.
+  for(const r of rows){if(r.den<1e-28)continue;let projection=0;for(const[k,g]of r.entries)projection+=g*x[k];const next=Math.max(0,r.lambda+(r.bound-projection)/r.den),dl=next-r.lambda;r.lambda=next;for(const[k,g]of r.entries)x[k]+=dl*g;}
+  // Dykstra ball projections: each mass is an unchanged isotropic scalar.
+  // Within a height plane, project the tangential disk, keeping the affine
+  // normal displacement. Scaling the whole vector would break that plane.
+  for(let id=0;id<count;id++){const offset=id*3,shift=[0,1,2].map(k=>x[offset+k]+ballMemory[offset+k]),plane=fixed.get(id),radius=maximumMoveM/roots[id],beta=plane?plane.valueM/roots[id]:0,normal=plane?.normal??[0,0,0],tangent=shift.map((v,k)=>v-beta*normal[k]),diskRadius=Math.sqrt(Math.max(0,radius*radius-beta*beta)),length=Math.hypot(...tangent),fraction=Math.min(1,diskRadius/Math.max(length,1e-30));for(let k=0;k<3;k++){const projected=beta*normal[k]+fraction*tangent[k];ballMemory[offset+k]=shift[k]-projected;x[offset+k]=projected;}}
+  maximumChangeM=0;for(let id=0;id<count;id++)maximumChangeM=Math.max(maximumChangeM,Math.hypot(...[0,1,2].map(k=>(x[id*3+k]-before[id*3+k])*roots[id])));
+  const audit=inspect();maximumViolationM=audit.maximumTightenedViolationM;if(!x.every(Number.isFinite))return {status:'HOLD',reason:'nonfinite local convex projection',delta:null};if(maximumChangeM<=toleranceM&&maximumViolationM<=toleranceM){converged=true;sweeps++;break;}
+ }
+ const audit=inspect(),feasible=audit.maximumViolationM<=toleranceM,delta=Float64Array.from(x,(v,k)=>v*roots[Math.floor(k/3)]),objectiveBefore=0,objectiveAfter=delta.reduce((s,v,k)=>s+(v-proposal[k])**2/invMass[Math.floor(k/3)]/2,0);
+ return {status:feasible?'FEASIBLE_LOCAL_STATIC_DIRECTION':'HOLD',reason:feasible?null:'bounded local projection unresolved against original constraints',delta:feasible?delta:null,diagnosticDelta:feasible?null:Array.from(delta),converged,tightenedTargetConverged:converged,tightenedTargetFeasible:audit.maximumTightenedViolationM<=toleranceM,originalConstraintsCertified:feasible,interiorBufferM,bufferedHalfspaces:rows.filter(r=>r.appliedInteriorBufferM>0).length,unbufferedNullspaceRows:rows.filter(r=>r.appliedInteriorBufferM===0).length,sweeps,maximumSweeps,toleranceM,...audit,maximumChangeM,elapsedMs:performance.now()-started,maximumWallMs,wallBudgetStopped,activeHalfspaces:rows.filter(r=>r.lambda>0).length,halfspaces:rows.length,temporaryHeightPlanes:fixed.size,massMetricProjectionCost:objectiveAfter,unconstrainedProjectionCost:objectiveBefore,method:'bounded equality-nullspace Dykstra/Hildreth with fixed1um numerical interior target; real inverse-mass whitening; original local halfspace certificate and per-DOF3mm trust balls',globalBodyCertified:false,physicalDynamics:false};
+}
+
+// Euclidean projection in mass-white space is NOT the GN Hessian-metric QP.
+// Check the actual objective directional derivative; at most once, replace a
+// non-descending projected Newton proposal with projected negative gradient.
+export function projectShortsStaticDescentDirection({newtonProposal,massWhiteNegativeGradient,invMass,halfspaces=[],planes=[]}){
+ if(massWhiteNegativeGradient.length!==newtonProposal.length||!Array.from(massWhiteNegativeGradient).every(Number.isFinite))throw Error('Invalid static objective gradient');
+ const derivative=delta=>-2*delta.reduce((sum,x,k)=>sum+massWhiteNegativeGradient[k]*x/Math.sqrt(invMass[Math.floor(k/3)]),0),first=projectShortsStaticFeasibleDirection({proposal:newtonProposal,invMass,halfspaces,planes});
+ const zeroDirectionFeasibleExact=planes.every(p=>p.valueM===0)&&halfspaces.every(r=>r.boundM<=0);
+ if(first.status==='HOLD')return {...first,directionSource:'projected-newton',fallbackAttempts:0,projectedNewtonIsHessianQP:false,zeroDirectionFeasibleExact,candidateProjectionCertifiedOptimal:false};
+ const firstAnalytic=derivative(first.delta);
+ if(firstAnalytic<0)return {...first,directionSource:'projected-newton',fallbackAttempts:0,analyticDirectionalDerivative:firstAnalytic,projectedNewtonIsHessianQP:false,zeroDirectionFeasibleExact,candidateProjectionCertifiedOptimal:false};
+ const gradientPhysical=Float64Array.from(massWhiteNegativeGradient,(x,k)=>x*Math.sqrt(invMass[Math.floor(k/3)]));let maxMove=0;for(let i=0;i<invMass.length;i++)maxMove=Math.max(maxMove,Math.hypot(...gradientPhysical.subarray(i*3,i*3+3)));const scale=Math.min(1,.003/Math.max(1e-30,maxMove));for(let k=0;k<gradientPhysical.length;k++)gradientPhysical[k]*=scale;
+ const second=projectShortsStaticFeasibleDirection({proposal:gradientPhysical,invMass,halfspaces,planes}),analytic=second.delta?derivative(second.delta):null;
+ const {delta:ignored,diagnosticDelta:ignoredDiagnostic,...newtonAudit}=first;
+ return {...second,status:second.status==='HOLD'||!(analytic<0)?'HOLD':second.status,reason:second.reason??(!(analytic<0)?'projected gradient is zero or non-descending; bounded fallback exhausted':null),delta:analytic<0?second.delta:null,directionSource:'projected-negative-mass-white-gradient',fallbackAttempts:1,analyticDirectionalDerivative:analytic,initialProjectedNewtonDerivative:firstAnalytic,initialNewtonProjection:newtonAudit,negativeGradientTrustScale:scale,projectedNewtonIsHessianQP:false,zeroDirectionFeasibleExact,candidateProjectionCertifiedOptimal:false,projectionDescentTheoremScope:zeroDirectionFeasibleExact?'ideal exact projection has the zero-feasible descent theorem; this bounded numerical approximation does not certify optimality, and actual derivative/FD/fresh gates still decide':'no exact zero-feasible/optimal-projection theorem claimed; actual derivative/FD/fresh gates still decide'};
+}

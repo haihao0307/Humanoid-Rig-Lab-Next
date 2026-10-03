@@ -3,8 +3,9 @@ import {resolveShortsWaistFit} from './ShortsWaistFit.mjs';
  * This file is a plain script for source/assembly.json concatenation. It has no
  * body mesh, formed-garment surface, rendering or simulation dependency. */
 const SHORTS_PATTERN_VERSION = 'original-relaxed-gusset-shorts-4';
+const dot2=(a,b)=>a[0]*b[0]+a[1]*b[1];
 
-function createShortsPattern(measurements, options = {}) {
+export function createShortsPattern(measurements, options = {}) {
   const m = measurements;
   if (!m || m.unit !== 'm') throw Error('Shorts measurements must explicitly use metres');
   const positive = (value, name) => {
@@ -71,15 +72,36 @@ function createShortsPattern(measurements, options = {}) {
       return cubic(hipCenter, [0, m.waistToHip + h * .72], [-extension * .32, depth], [-extension, depth], t);
     });
     const desiredRise = (front ? m.frontRiseLength + o.frontRiseEase : m.backRiseLength + o.backRiseEase);
-    let low = 0, high = hip * .30;
-    if (length(makeRise(low)) > desiredRise || length(makeRise(high)) < desiredRise)
-      throw Error('Measured ' + kind + ' rise cannot be drafted at this crotch depth; revise the measured draft inputs');
-    for (let i = 0; i < 60; i++) {
-      const mid = (low + high) / 2;
-      if (length(makeRise(mid)) < desiredRise) low = mid; else high = mid;
+    let low = 0, high = hip * .30, finalRiseBudget=null;
+    if(o.finalRiseBudget===true){
+      // Solve the FINAL cut route, not the full rise before removing its corner.
+      // q changes only the original source extension, never posed XYZ or rest.
+      const half=o.gussetWidth/2,nLeg=o.rows-o.crotchRow;
+      const derivative=r=>{if(r<=o.hipRow)return 0;const t=(r-o.hipRow)/(o.crotchRow-o.hipRow);return -(.96*t*t+.04*t*t*t);};
+      const evaluate=q=>{
+        const rise=makeRise(q),remaining=rise.slice(0,o.crotchRow),end=remaining.at(-1),tip=[-q+o.inseamTaper/nLeg,depth+verticalInseam/nLeg],delta=[tip[0]-end[0],tip[1]-end[1]],heightSquared=dot2(delta,delta)-half*half;
+        if(!(heightSquared>0))throw Error('HOLD: source gusset has no positive height');
+        const height=Math.sqrt(heightSquared),main=length(remaining);let slope=delta[0]*(-1-derivative(o.crotchRow-1))/height;
+        for(let r=1;r<remaining.length;r++){const v=[remaining[r][0]-remaining[r-1][0],remaining[r][1]-remaining[r-1][1]],l=Math.hypot(...v);if(!(l>0))throw Error('HOLD: collapsed source rise interval');slope+=v[0]*(derivative(r)-derivative(r-1))/l;}
+        return {value:main+height,main,height,slope};
+      };
+      const zero=makeRise(0),cutVertical=depth+verticalInseam/nLeg-zero[o.crotchRow-1][1];
+      if(!(cutVertical>half))throw Error('HOLD: final rise convex source branch requires cut height above half gusset width');
+      if(evaluate(low).slope<0){
+        if(evaluate(high).slope<=0)throw Error('HOLD: source rise minimum lies outside declared extension domain');
+        let a=low,b=high;for(let i=0;i<60;i++){const q=(a+b)/2;if(evaluate(q).slope<0)a=q;else b=q;}low=(a+b)/2;
+      }
+      const minimumExtension=low,minimum=evaluate(low).value,maximum=evaluate(high).value;
+      if(minimum>desiredRise+1e-12||maximum<desiredRise-1e-12)throw Error('HOLD: '+kind+' final cut rise budget outside legal source bracket '+JSON.stringify({desiredRise,minimum,maximum,minimumExtension,maximumExtension:high}));
+      for(let i=0;i<60;i++){const q=(low+high)/2;if(evaluate(q).value<desiredRise)low=q;else high=q;}
+      const solution=evaluate((low+high)/2);finalRiseBudget={targetM:desiredRise,remainingMainRiseM:solution.main,gussetHeightM:solution.height,residualM:solution.value-desiredRise,minimumExtensionM:minimumExtension,monotoneBranch:true,iterations:60};
+    }else{
+      if (length(makeRise(low)) > desiredRise || length(makeRise(high)) < desiredRise)
+        throw Error('Measured ' + kind + ' rise cannot be drafted at this crotch depth; revise the measured draft inputs');
+      for (let i = 0; i < 60; i++) {const mid=(low+high)/2;if(length(makeRise(mid))<desiredRise)low=mid;else high=mid;}
     }
     const extension = (low + high) / 2;
-    drafts[kind] = { kind, hipWidth, waistWidth, raise, extension, rise: makeRise(extension), desiredRise };
+    drafts[kind] = { kind, hipWidth, waistWidth, raise, extension, rise: makeRise(extension), desiredRise,finalRiseBudget };
   }
   const riseAndHipBaseWidth = drafts.front.hipWidth + drafts.back.hipWidth + drafts.front.extension + drafts.back.extension;
   const thighTarget = Math.max(m.thighCircumference.left, m.thighCircumference.right) + o.thighEase;
@@ -287,12 +309,13 @@ function createShortsPattern(measurements, options = {}) {
   const crotchWidth = ['FL', 'BL'].reduce((sum, id) => { const p = piece(id); return sum + dist(p.materialCoordinates[index(o.crotchRow, 0)], p.materialCoordinates[index(o.crotchRow, o.columns)]); }, 0);
   if (Math.abs(hemCircumference - hemTarget) > 1e-10) throw Error('Cut hem does not match its original paper target');
   const topology = auditShortsPatternTopology({ pieces, seams }, false);
-  return { version: SHORTS_PATTERN_VERSION, unit: 'm', status: 'original_candidate_pattern_not_fitted_or_accepted',
+  return { version: o.finalRiseBudget===true?'actual-skin-final-diamond-rise-budget-v9':SHORTS_PATTERN_VERSION, unit: 'm', status: 'original_candidate_pattern_not_fitted_or_accepted',
     measurements: JSON.parse(JSON.stringify(m)), options: o, pieces, seams, junctions,
     opening: { side: 'left', closureSeams: ['side-opening-left', 'waistband-BL-FL'], row: openingRow, sourceDepth: outerY(openingRow),
       closedWaistLength: lowerStart, hipLength: hip + o.hipEase, minimumOpenBoundaryLength: lowerStart + 2 * edgeLength(piece('FL'), leftA.slice(0, openingRow + 1)),
       donningClearanceValidated: false, closureRequiredAfterDonning: true },
     draft: { frontCrotchExtension: drafts.front.extension, backCrotchExtension: drafts.back.extension,
+      finalRiseBudget:o.finalRiseBudget===true?{front:drafts.front.finalRiseBudget,back:drafts.back.finalRiseBudget}:null,
       frontRiseLength: edgeLength(piece('FR'), piece('FR').boundaries.rise),
       backRiseLength: edgeLength(piece('BR'), piece('BR').boundaries.rise), crotchLineWidth: crotchWidth, riseAndHipBaseWidth, thighTarget, hemCircumference, hemTarget,
       originalRiseLengthsBeforeGussetCut: { front: length(drafts.front.rise), back: length(drafts.back.rise) },

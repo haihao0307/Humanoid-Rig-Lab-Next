@@ -6,7 +6,9 @@ import {ShortsClothRuntime} from './ShortsClothRuntime.mjs';
 import {SHORTS_VERSIONS} from './ShortsVersions.mjs';
 import {createShortsManufacturingDraft} from './ShortsManufacturingDraft.mjs';
 import {sewShortsSource} from './ShortsSewingAssembly.mjs';
-import {fitShortsSurface} from './ShortsSurfaceFit.mjs';
+import {measureShortsSkinTapes} from './ShortsBodyTape.mjs';
+import {createShortsGarmentV9} from './ShortsGarmentV9.mjs';
+import {solveShortsWearingMetric} from './ShortsWearingMetric.mjs';
 import {refineShortsSurfaceDraft} from './ShortsSurfaceRefinement.mjs';
 import {inspectShortsSurfaceQuality} from './ShortsSurfaceQuality.mjs';
 import {compilePaperSurfaceModel,evaluatePaperSurface,garmentPipelineGate} from './ShortsPaperSurfaceModel.mjs';
@@ -24,14 +26,17 @@ export function installShortsWorkbench(game,{renderer,camera,scene}){
  const body=createShortsSkinContactBody(measuredBody,barePelvis);
  const sourcePants=[9,10,19].map(id=>({id,material:game.subject.mesh.material[id],visible:game.subject.mesh.material[id].visible}));
  const setUnderlyingVisibility=fit=>{barePelvis.mesh.visible=fit;for(const p of sourcePants)p.material.visible=fit?false:p.visible;};
- const draft=createShortsGarmentDraft(body.measurements,{sectionAt:body.sectionAt,sagittalAtY:body.sagittalAtY,waistbandWidthM:.038});
+ const placementReference=createShortsGarmentDraft(measuredBody.measurements,{sectionAt:measuredBody.sectionAt,sagittalAtY:measuredBody.sagittalAtY,waistbandWidthM:.038});
+ const skinTapes=measureShortsSkinTapes(measuredBody,barePelvis,game.actor,placementReference.receipt);
+ const draft=createShortsGarmentV9(skinTapes,placementReference,{skinBody:body});
  body.update({time:0});
  // A measured style view is separate from the material-constrained assembly.
  // It may show waist/hem placement, but must never enable native cloth motion
  // or claim this contour loft has passed the source-paper strain audit.
  const acceptedSeed=null;
  let fitSource=draft;
- let fitPreview=new ShortsClothRuntime(fitSource,body,game.actor,scene,{elasticEnabled:false});
+ const clothOptions={membraneModel:'orthotropic-paper',paperMaterial:{warpNPerM:2000,weftNPerM:1200,shearNPerM:300},bendTopology:'within-piece-flat'};
+ let fitPreview=new ShortsClothRuntime(fitSource,body,game.actor,scene,clothOptions);
  fitPreview.enabled=false;fitPreview.mesh.name='Measured waist and hem placement preview; NOT physical wearing';
  const source=createShortsManufacturingDraft(draft);let cloth=new ShortsClothRuntime(source,body,game.actor,scene,{activeSeamIDs:[],elasticEnabled:false});const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.minDistance=.65;orbit.maxDistance=6;orbit.enabled=true;
  const panel=document.createElement('div');panel.id='shorts-workbench';panel.innerHTML='<strong>R008 · 低腰松紧亚麻短裤</strong><p id="shorts-measure"></p><p id="shorts-stage">量体与初始穿着候选 · 运动未验收</p><div class="shorts-views"><button data-short-view="front">正面</button><button data-short-view="back">背面</button><button data-short-view="side">侧面</button><button data-short-view="below">裆部</button></div><button id="shorts-panels">裁片识别色</button><button id="shorts-physics-probe">执行一个真实布料子步</button><small>缺失的腰胯表面已按当前尺寸补造，并替换新版中的旧裤显示。补体为估计形状，完整布料与动作仍待验收。</small>';
@@ -60,6 +65,16 @@ export function installShortsWorkbench(game,{renderer,camera,scene}){
  const oldDispose=api.dispose;api.dispose=()=>{document.removeEventListener('input',api.requestRender);document.removeEventListener('change',api.requestRender);oldDispose();};
  const phaseNames={'main-rise':'前后中缝','gusset':'裆片','leg-sides-and-left-closure':'裤腿和侧缝','waistband':'腰头'};
  api.startAssembly=()=>{if(api.assemblyPromise)return api.assemblyPromise;api.assembly={status:'sewing'};api.assemblyPromise=api.fitPromise.then(()=>sewShortsSource(source,body,game.actor,scene,state=>{if(disposed){state.cloth.dispose();throw Error('Superseded clothing assembly');}cloth=state.cloth;api.setInspectionMode(api.inspectionMode,false);api.assembly={status:state.status,stage:state.stage,pass:state.pass};document.getElementById('shorts-stage').textContent=`正在缝合${phaseNames[state.stage]}${state.pass?' · '+state.pass+' / 200':''}`;},cloth)).then(result=>{if(disposed){result.cloth.dispose();return result;}cloth=result.cloth;api.setInspectionMode(api.inspectionMode,false);api.assembly=result;document.getElementById('shorts-stage').textContent=result.status==='complete'?'19 条接缝已完成 · 当前为缝合后的折叠状态，穿着与动作仍待通过':'缝合检查未通过 · 已保留失败记录';return result;}).catch(error=>{api.assembly={status:'failed',error:error.message};if(!disposed)document.getElementById('shorts-stage').textContent='缝合停止：'+error.message;console.error(error);});return api.assemblyPromise;};
- api.fitPromise=Promise.resolve().then(()=>{const result=fitShortsSurface(fitPreview,barePelvis);const fine=refineShortsSurfaceDraft(draft,fitPreview,2);fitPreview.dispose();fitSource=fine;fitPreview=new ShortsClothRuntime(fitSource,body,game.actor,scene,{elasticEnabled:false});fitPreview.enabled=false;fitPreview.mesh.name='Failed continuous surface; source-metric gate HOLD';result.refinement=fine.receipt.surfaceRefinement;result.surfaceConstructed=true;result.finalMaterialAudit=fitPreview.audit(false);result.paperPipeline=api.inspectPaperPipeline();result.status=result.paperPipeline.gate.status;return result;}).then(result=>{api.fitResult=result;api.fitStatus=result.status;if(!disposed){api.setInspectionMode(api.inspectionMode,false);const check=result.paperPipeline;modeNote.textContent=`纸样→曲面检查：最大主应变 ${(check.surface.maximumPrincipalStrain*100).toFixed(2)}%，限值 ${(check.surface.strainLimit*100).toFixed(0)}%。腰部间距改善不代表服装通过；弯曲、接缝、材料标定与完整接触分别验收。`;document.getElementById('shorts-stage').textContent=`未通过 · ${check.gate.blockedAt} · 原版保留，动作锁定`;api.requestRender();}return result;}).catch(error=>{api.fitStatus='failed';api.fitFailure=error.message;if(!disposed)document.getElementById('shorts-stage').textContent='纸样/曲面检查停止：'+error.message;return null;});
+ api.skinTapes=skinTapes;api.placementReference=placementReference;
+ api.fitPromise=Promise.resolve().then(async()=>{
+  const result=await solveShortsWearingMetric(fitPreview,{onProgress:s=>{if(disposed)throw Error('Superseded V9 fit');document.getElementById('shorts-stage').textContent=`V9 · 纸样与接触联合检查 ${s.iteration} / 40`;api.requestRender();}});
+  // Live local diagnostics only, never a stored source mesh or material rest.
+  api.coarseStaticSnapshot={frame:'current WORLD metres',sourceXYZ:Array.from({length:draft.sourceUV.length/2},(_,i)=>fitPreview.positions[fitPreview.quotient[i]].slice()),quotient:Array.from(fitPreview.quotient),time:fitPreview.time,steps:fitPreview.steps,authority:'actual final coarse static authoring state immediately before true source2D refinement',restFromXYZ:false};
+  const ranges=new Map(draft.ranges.map(r=>[r.pieceId,r]));fitPreview.surfaceEvaluator=(id,p)=>[0,1,2].map(k=>p.sourceIndices.reduce((sum,i,j)=>sum+p.weights[j]*fitPreview.positions[fitPreview.quotient[ranges.get(id).offset+i]][k],0));
+  const fine=refineShortsSurfaceDraft(draft,fitPreview,1);fitPreview.dispose();fitSource=fine;fitPreview=new ShortsClothRuntime(fitSource,body,game.actor,scene,clothOptions);fitPreview.enabled=false;fitPreview.mesh.name='V9 actual-skin source-paper candidate';
+  result.refinedAuthoring=await solveShortsWearingMetric(fitPreview,{maximumIterations:20,onProgress:s=>{if(disposed)throw Error('Superseded refined V9 fit');document.getElementById('shorts-stage').textContent=`细分布面 · 材料与真实接触 ${s.iteration} / 20`;api.requestRender();}});
+  result.finalAuthoringStage='actual refined source2D mesh; current cloth audit is authoritative';
+  result.refinement=fine.receipt.surfaceRefinement;result.surfaceConstructed=true;result.finalMaterialAudit=fitPreview.audit(false);result.paperPipeline=api.inspectPaperPipeline();result.status=result.paperPipeline.gate.status;return result;
+ }).then(result=>{api.fitResult=result;api.fitStatus=result.status;if(!disposed){api.setInspectionMode(api.inspectionMode,false);const check=result.paperPipeline;modeNote.textContent=`V9：实际皮肤量体、前后裆长预算闭合。实际布面最大主应变 ${(check.surface.maximumPrincipalStrain*100).toFixed(2)}%，限值 ${(check.surface.strainLimit*100).toFixed(0)}%。原版保留；当前候选尚未通过穿着与动作验收。`;document.getElementById('shorts-stage').textContent=`V9 · ${check.gate.status} · ${check.gate.blockedAt??'后续验收'} · 动作锁定`;api.requestRender();}return result;}).catch(error=>{api.fitStatus='failed';api.fitFailure=error.message;if(!disposed)document.getElementById('shorts-stage').textContent='V9 检查停止：'+error.message;return null;});
  api.setView('front');return api;
 }

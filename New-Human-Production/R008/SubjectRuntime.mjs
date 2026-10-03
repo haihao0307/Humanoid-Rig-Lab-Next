@@ -87,7 +87,7 @@ export function createSubject(data,options={}){
  const eyes=createProceduralEyes({surface,mesh,byName,bindWorld,data});
  const skin=createSkinMaterialBinding({mesh,eyes});
  const scars=createScarSurface({mesh,surface,data,synchronize:createSeamSynchronizer(surface,geometry)});
- const body=createBodyBinding({mesh,eyes});
+ const body=createBodyBinding({mesh,eyes,surface});
  return {root,mesh,skeleton,mixer,clips,helper,surface,data,neutral,bindWorld,byName,face,eyes,skin,scars,body,play,locomotion,finishPose,
   command(text){const name=/跳/.test(text)?'jump':/跑/.test(text)?'run':/走|步/.test(text)?'walk':/看|环顾/.test(text)?'look_around':'rest';play(name);return {phase:name,authority:'authored-61-bone-curves'}},
   step(dt){

@@ -3,7 +3,16 @@ import {SHORTS_VERSIONS} from '../ShortsVersions.mjs';
 const root=new URL('../',import.meta.url),read=p=>readFileSync(new URL(p,root),'utf8'),write=(p,v)=>writeFileSync(new URL(p,root),v);
 let app=read('app.mjs');
 app=app.replace("import * as THREE from 'three';","import * as THREE from 'three';\nimport {installShortsWorkbench} from './ShortsWorkbench.mjs';");
-app=app.replace('faceWorkbench?.refresh();status();}','faceWorkbench?.refresh();status();installShortsWorkbench(window.HumanGame,{renderer,camera,scene});}');
+// Native rebuild gained an anatomy refresh. Match the actual end of that
+// function and fail explicitly if integration is absent or ambiguous.
+const installAnchor=/faceWorkbench\?\.refresh\(\);(?:anatomyWorkbench\?\.refresh\(\);)?status\(\);\}/g;
+const installMatches=[...app.matchAll(installAnchor)];
+if(installMatches.length!==1)throw Error('Clothing integration requires exactly one native rebuild hook; got '+installMatches.length);
+app=app.replace(installAnchor,match=>match.slice(0,-1)+'installShortsWorkbench(window.HumanGame,{renderer,camera,scene});}');
+if((app.match(/installShortsWorkbench\(window\.HumanGame/g)||[]).length!==1)throw Error('Clothing workbench is imported but not installed');
+// Keep source-domain witnesses available when initialization rejects a body
+// section. The UI must explain the failure rather than remain in a loading state.
+app=app.replace('window.failure=error.message;', 'window.failure=error.message;window.failureDetails={message:error.message,stack:error.stack,code:error.code??null,details:error.details??null};');
 app=app.replace('function updateCamera(dt,immediate=false){','function updateCamera(dt,immediate=false){\n if(window.HumanShorts?.inspection){window.HumanShorts.updateCamera();return;}');
 // One shared 240Hz clock advances controller, final posed body and cloth. There
 // is no separate rendering-frame collider teleport or skipped physical time.
