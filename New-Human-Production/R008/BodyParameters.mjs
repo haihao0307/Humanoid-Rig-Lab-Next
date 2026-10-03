@@ -26,10 +26,13 @@ function bodyShape(x,y,z,fat,m,old,young,torso,arm,leg,end,ax,ay,az){
  // outside authored support widths changes; these are art envelopes, not CT.
  const rib=ramp(1.17,1.29,y)*(1-ramp(1.43,1.52,y)),pelvis=ramp(.74,.88,y)*(1-ramp(1.02,1.12,y));
  const bx=.035+.075*rib+.070*pelvis,bz=.025+.044*rib+.032*pelvis;
- const tx=softTissue(x,bx,.025),tz=softTissue(z+.008,bz,.018);
+ // Positive fat uses one broad envelope. Reusing rib/pelvis protection bands
+ // for fat growth creates artificial horizontal steps across the abdomen.
+ const tx=fat>0?softTissue(x,.030,.035):softTissue(x,bx,.025),tz=fat>0?softTissue(z+.008,.018,.030):softTissue(z+.008,bz,.018);
  const pec=ramp(1.25,1.31,y)*(1-ramp(1.38,1.45,y));
- const driveX=fat*(.85*waist+.45*hip-.32*waist*hip+.36*chest-.20*waist*chest)+m*.55*pec;
- const driveZ=fat*(.85*waist+.55*hip-.42*waist*hip+.55*chest-.35*waist*chest)+m*.90*pec;
+ const fatHeight=(y-1.11)/.24,fatBelly=Math.exp(-fatHeight*fatHeight),fatBody=ramp(.68,.86,y)*(1-ramp(1.43,1.57,y));
+ const driveX=(fat>0?fat*(.50+.32*fatBelly)*fatBody:fat*(.85*waist+.45*hip-.32*waist*hip+.36*chest-.20*waist*chest))+m*.55*pec;
+ const driveZ=(fat>0?fat*(.40+.60*fatBelly)*fatBody:fat*(.85*waist+.55*hip-.42*waist*hip+.55*chest-.35*waist*chest))+m*.90*pec;
  const limitX=driveX<0?.65:.85,limitZ=driveZ<0?.65:1.30;
  const torsoX=limitX*Math.tanh(driveX/limitX),torsoZ=limitZ*Math.tanh(driveZ/limitZ);
  let dx=torso*tx*torsoX,dy=0,dz=torso*tz*torsoZ;

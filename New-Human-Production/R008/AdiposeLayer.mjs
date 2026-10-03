@@ -1,0 +1,27 @@
+import * as THREE from 'three';
+import {SCAR_REGIONS}from './ScarState.mjs';
+const smooth=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t);};
+const linear=v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4;
+// Transient multi-scale surface fields. No source surface or baked field is saved.
+export function createAdiposeLayer(mesh,tissue,profile,seamGroups=[]){
+ const uv=mesh.geometry.attributes.uv.array,tone=new Float32Array(mesh.geometry.attributes.skinRest.count);
+ const p=mesh.geometry.attributes.skinRest.array,n=mesh.geometry.attributes.normal.array,N=p.length/3,mat=new Uint8Array(N),indices=mesh.geometry.index.array,h=profile.frame.height,scale=h/1.8,cell=.018*scale,radius=.09*scale,grid=new Map(),ids=new Array(N),delta=new Float32Array(N*4),normals=new Float32Array(N*3),excluded=new Set(mesh.material.flatMap((m,i)=>/^tripo_part_(1|2|3|9)$/.test(m.name)?[i]:[]));
+ for(const group of mesh.geometry.groups)for(let i=group.start;i<group.start+group.count;i++)mat[indices[i]]=group.materialIndex;
+ function coverage(i){const at=i*3,x=p[at],y=p[at+1],z=p[at+2],r=tissue.region.subarray(i*4,i*4+4);let w=(r[0]+r[1]+r[2])*(1-smooth(1.48*scale,1.57*scale,y));if(excluded.has(mat[i]))return 0;
+  // Protect nipples, navel, source scars, palms/soles and head. Coordinates
+  // here belong to this calibrated subject; reusable intake must fit its own.
+  for(const c of [[.079,1.342,.106],[-.079,1.342,.106],[0,1.075,.097]]){const d=Math.hypot((x-c[0]*scale)/(.019*scale),(y-c[1]*scale)/(.025*scale),(z-c[2]*scale)/(.035*scale));w*=smooth(.5,1.5,d);}
+  for(const s of SCAR_REGIONS){const c=s.centre||s.center;if(!c)continue;const rr=s.radii||[.06,.08,.06],d=Math.hypot(...c.map((v,k)=>(p[at+k]-v*scale)/(rr[k]*scale)));w*=smooth(.9,1.3,d);}
+  return Math.min(1,Math.max(0,w));
+ }
+ for(let i=0;i<N;i++){const at=i*3,w=coverage(i);normals.set(n.subarray(at,at+3),at);delta[i*4+3]=w;if(w<.01)continue;const r=tissue.region.subarray(i*4,i*4+3),region=r[0]>r[1]&&r[0]>r[2]?0:r[1]>r[2]?1:2,c=[Math.floor(p[at]/cell),Math.floor(p[at+1]/cell),Math.floor(p[at+2]/cell)],key=region+':'+c.join(',');ids[i]=key;let g=grid.get(key);if(!g){g={c,region,p:[0,0,0],n:[0,0,0],tone:0,count:0};grid.set(key,g);}for(let k=0;k<3;k++){g.p[k]+=p[at+k];g.n[k]+=n[at+k];}const im=mesh.material[mat[i]].map.image,px=Math.max(0,Math.min(im.width-1,Math.round(uv[i*2]*(im.width-1)))),py=Math.max(0,Math.min(im.height-1,Math.round((1-uv[i*2+1])*(im.height-1)))),pixel=(py*im.width+px)*4;g.tone+=.2126*linear(im.data[pixel]/255)+.7152*linear(im.data[pixel+1]/255)+.0722*linear(im.data[pixel+2]/255);g.count++;}
+ for(const g of grid.values()){g.p=g.p.map(v=>v/g.count);g.tone/=g.count;const l=Math.hypot(...g.n)||1;g.n=g.n.map(v=>v/l);}
+ for(const g of grid.values()){const avg=[0,0,0],normal=[0,0,0];let total=0,color=0;for(let x=-5;x<=5;x++)for(let y=-5;y<=5;y++)for(let z=-5;z<=5;z++){const q=grid.get(g.region+':'+[g.c[0]+x,g.c[1]+y,g.c[2]+z].join(','));if(!q)continue;const d=Math.hypot(...q.p.map((v,k)=>v-g.p[k])),dot=q.n.reduce((s,v,k)=>s+v*g.n[k],0);if(d>=radius||dot<.65)continue;const w=Math.exp(-d*d/(radius*radius*.32));for(let k=0;k<3;k++){avg[k]+=q.p[k]*w;normal[k]+=q.n[k]*w;}color+=q.tone*w;total+=w;}g.smoothTone=color/(total||1);g.avg=avg.map(v=>v/(total||1));const l=Math.hypot(...normal)||1;g.smoothNormal=normal.map(v=>v/l);}
+ // Interpolate cell fields continuously. Applying one cell normal directly
+ // produces visible tiled shading despite a smooth underlying source mesh.
+ let maximum=0,affected=0;for(let i=0;i<N;i++){const g=grid.get(ids[i]);if(!g)continue;const at=i*3,c=[0,1,2].map(k=>p[at+k]/cell-.5),base=c.map(Math.floor),f=c.map((v,k)=>v-base[k]),offset=[0,0,0],normal=[0,0,0];let total=0,color=0;for(let x=0;x<=1;x++)for(let y=0;y<=1;y++)for(let z=0;z<=1;z++){const q=grid.get(g.region+':'+[base[0]+x,base[1]+y,base[2]+z].join(','));if(!q)continue;const w=(x?f[0]:1-f[0])*(y?f[1]:1-f[1])*(z?f[2]:1-f[2]);for(let k=0;k<3;k++){offset[k]+=(q.avg[k]-q.p[k])*w;normal[k]+=q.smoothNormal[k]*w;}color+=(q.smoothTone-q.tone)*w;total+=w;}tone[i]=Math.max(-.10,Math.min(.10,color/(total||1)));let fill=0;for(let k=0;k<3;k++)fill+=offset[k]/(total||1)*n[at+k];fill=Math.max(0,Math.min(.014*scale,fill));maximum=Math.max(maximum,fill);if(fill>.0001)affected++;const l=Math.hypot(...normal)||1;for(let k=0;k<3;k++){delta[i*4+k]=n[at+k]*fill;normals[at+k]=normal[k]/l;}}
+ for(const group of seamGroups){const values=[0,0,0,0],nn=[0,0,0];let tt=0;for(const i of group){tt+=tone[i]/group.length;for(let k=0;k<4;k++)values[k]+=delta[i*4+k]/group.length;for(let k=0;k<3;k++)nn[k]+=normals[i*3+k]/group.length;}if(group.some(i=>excluded.has(mat[i])))values.fill(0);const length=Math.hypot(...nn)||1;for(const i of group){tone[i]=values[3]>0?tt:0;delta.set(values,i*4);normals.set(nn.map(v=>v/length),i*3);}}
+ mesh.geometry.setAttribute('adiposeDelta',new THREE.BufferAttribute(delta,4));mesh.geometry.setAttribute('adiposeNormal',new THREE.BufferAttribute(normals,3));
+ mesh.geometry.setAttribute('adiposeTone',new THREE.BufferAttribute(tone,1));
+ return {delta,normals,tone,point(i,blend){return [p[i*3]+delta[i*4]*delta[i*4+3]*blend,p[i*3+1]+delta[i*4+1]*delta[i*4+3]*blend,p[i*3+2]+delta[i*4+2]*delta[i*4+3]*blend];},report:{method:'normal-compatible-local-surface-fairing-and-luminance-band-filter',maximumFillMetres:maximum,affectedVertices:affected,cellMetres:cell,radiusMetres:radius,evidence:'art-approximation-not-measured-fat',persistedBytes:0,runtimeBytes:delta.byteLength+normals.byteLength+tone.byteLength},dispose(){}};
+}
