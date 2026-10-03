@@ -50,3 +50,21 @@
 @media(max-width:1200px){.stage-bottom{grid-template-columns:minmax(0,1fr) 250px}.stage-bottom .export-area{grid-template-columns:minmax(0,1fr) 98px;padding:0 9px;gap:5px}.transport{padding:0 9px;gap:5px}.transport #pause,.transport #rotate-toggle{padding:7px 5px;font-size:9px}.stage-head .star,.stage-head .delete-score{font-size:10px}}
 @media(max-width:1000px){.inspector{top:52px;bottom:0}.stage-shell{grid-template-rows:52px minmax(0,1fr) 92px}.stage-bottom{grid-template-columns:1fr;gap:0}.transport{padding:5px 10px}.stage-bottom .export-area{grid-template-columns:minmax(0,1fr) 122px;padding:0 10px 9px}.stage-bottom select,.stage-bottom .export-button{height:32px}}
 @media(max-width:620px){.app{grid-template-rows:48px minmax(0,1fr)}.topbar{padding:0 10px;gap:5px}.brand-title{font-size:13px}.brandmark{font-size:20px;width:20px}.top-actions .quiet{font-size:10px;padding:6px}.categories{padding:9px 4px}.category{font-size:10px;padding:10px 2px}.category .icon{font-size:20px}.stage-shell{grid-template-rows:46px minmax(0,1fr) 86px}.stage-head{padding:0 9px;flex-wrap:nowrap;gap:3px}.stage-head h1{font-size:13px}.stage-head .star,.stage-head .delete-score{font-size:9px;padding:6px 4px}.viewbar{top:9px;right:9px}.viewbar button{padding:5px 7px;font-size:9px}.stage-overlay{left:10px;bottom:10px;font-size:9px}.transport{padding:3px 9px}.transport #pause,.transport #rotate-toggle{font-size:10px;padding:6px}.stage-bottom .export-area{grid-template-columns:minmax(0,1fr) 108px;padding:0 9px 7px}.stage-bottom .export-button{font-size:10px}.inspector{top:48px;bottom:0}.library-head{padding:8px 9px;gap:5px}.library-title{margin:0}.library-title h2{font-size:12px}.library-title .count{display:none}.library-import{margin:0;padding:6px;font-size:10px}.library-tabs{margin:0;justify-content:flex-start;gap:8px}.library-tabs button{font-size:9px;padding:3px 6px}.grid-scroll{padding:8px 9px}.animal-card .name{font-size:9px}.inspector-title{padding:15px}.section{padding:14px 15px}}
+
+/* Export help stays available without expanding the compact footer. */
+.stage-bottom .export-area{grid-template-columns:minmax(0,1fr) 26px 112px}
+#export-details{width:26px;height:30px;padding:0;border-radius:50%;font-size:13px;color:var(--muted)}
+#export-guide{width:min(660px,calc(100vw - 24px));max-height:calc(100dvh - 32px);padding:22px;overflow:auto}
+#export-guide h2{font-size:18px;margin:0 65px 16px 0}
+#export-guide p{font-size:12px;line-height:1.7}
+#export-guide-current{color:var(--mint);margin-bottom:4px}
+#export-guide-context{margin-top:0;color:var(--muted)}
+.export-format-card{border:1px solid var(--line);border-radius:7px;margin-top:9px;padding:12px}
+.export-format-card.selected{border-color:#75998c;background:#1b3036}
+.export-format-card summary{cursor:pointer;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.export-format-card p{color:var(--muted);margin:9px 0}
+.export-format-card strong{font-weight:500;color:var(--text)}
+.export-format-card button{font-size:11px;padding:6px 10px}
+@media(max-width:1200px){.stage-bottom .export-area{grid-template-columns:minmax(0,1fr) 24px 89px}#export-details{width:24px}}
+@media(max-width:1000px){.stage-bottom .export-area{grid-template-columns:minmax(0,1fr) 26px 112px}#export-details{width:26px}}
+@media(max-width:620px){.stage-bottom .export-area{grid-template-columns:minmax(0,1fr) 24px 98px}#export-details{width:24px}#export-guide{padding:16px}.export-format-card{padding:10px}}
