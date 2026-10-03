@@ -1,3 +1,4 @@
+import {controlValue} from './parameter-schema.js';
 // V1: a score selects a registered instrument; imported files never supply executable code.
 export const ENGINES=Object.freeze({K4:{id:'kaopu/quad',version:'K4.0.0'},K5:{id:'kaopu/mammal',version:'K5.0.0'},GLB:{id:'kaopu/gltf',version:'1.0.0'}});
 export const MAX_GLB=64*1024*1024,MAX_FILE=90*1024*1024;
@@ -19,7 +20,7 @@ export function validateGLB(bytes){
 }
 export function validateSettings(values,controls,actions){
  for(const [key,value]of Object.entries(parameters(values))){const d=controls.find(c=>c.key===key);if(!d){if(key==='action'&&actions.some(a=>a.id===value)||key==='playing'&&typeof value==='boolean'||key==='view'&&['three','front','side','top'].includes(value))continue;throw Error('当前乐器不支持乐谱参数：'+key);}
- if(d.type==='range'&&(typeof value!=='number'||value<d.min||value>d.max)||d.type==='checkbox'&&typeof value!=='boolean'||d.type==='color'&&(typeof value!=='string'||!/^#[\da-f]{6}$/i.test(value))||d.type==='select'&&!d.options.some(o=>o.value===String(value)))throw Error('乐谱参数超出当前乐器范围：'+key);
+ controlValue(d,value);
  }
 }
 export function storeImports(){let dbPromise;const db=()=>dbPromise??=new Promise((resolve,reject)=>{const q=indexedDB.open('animal-atlas-instruments',1);q.onupgradeneeded=()=>q.result.createObjectStore('animals',{keyPath:'id'});q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error);q.onblocked=()=>reject(Error('导入库正被其他窗口占用'));});async function run(mode,operation){const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction('animals',mode),q=operation(tx.objectStore('animals'));let result;q.onsuccess=()=>result=q.result;tx.oncomplete=()=>resolve(result);tx.onerror=tx.onabort=()=>reject(tx.error||Error('导入库写入失败'));});}return{all:()=>run('readonly',s=>s.getAll()),put:r=>run('readwrite',s=>s.put(r)),remove:id=>run('readwrite',s=>s.delete(id))};}

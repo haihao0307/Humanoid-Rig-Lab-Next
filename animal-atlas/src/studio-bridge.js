@@ -76,6 +76,6 @@ globalThis.AtlasStudioAdapter=function(context,range,check,select){
  for(const canvas of document.querySelectorAll('canvas'))if(canvas.clientWidth>1){canvas.style.touchAction='none';canvas.style.cursor='grab';}
  function tick(){const delta=S.rotationDelta();if(delta&&!drag&&performance.now()>interactingUntil){rotate(delta);render();}requestAnimationFrame(tick);}requestAnimationFrame(tick);
  window.__ATLAS_STUDIO_INPUT={snapshot:()=>({dragging:!!drag,moves,autoHeld:!!drag||performance.now()<interactingUntil})};
- const controls=[select('displayStage','展示方式',[['turntable','旋转展示台'],['habitat','原栖息环境']],S.state.displayStage,'studio'),check('studioRotate','自动环绕展示',true,'studio'),range('studioSpeed','环绕速度',.1,2,.05,.55,'studio'),range('studioLightAngle','主光方向',-180,180,5,35,'studio'),range('studioKey','主光强度',0,6,.1,3.2,'studio'),range('studioAmbient','环境光强度',0,4,.1,1.8,'studio'),range('studioRim','轮廓光强度',0,3,.05,1.15,'studio'),range('studioExposure','展示曝光',.35,2,.05,1.05,'studio'),{key:'studioBackground',label:'展示背景',type:'color',value:'#101817',section:'studio'}];
+ const controls=AtlasParameterSchema.presentationControls(S.state);
  return{controls,resetView,set(key,value){S.set(key,value);if(key==='displayStage'&&kind==='crab')__CRAB_QA__.stage(value==='turntable'?'lab':'beach');if(kind==='eagle')eagle.dirty=true;render();},info:()=>S.info(),stage};
 };

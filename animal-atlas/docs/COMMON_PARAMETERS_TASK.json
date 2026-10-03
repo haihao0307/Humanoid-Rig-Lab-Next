@@ -1,0 +1,44 @@
+{
+  "taskId": "animal-atlas-common-parameters-20261003",
+  "dispatchTime": "2026-10-03T06:36:15.321Z",
+  "dispatchTimeBasis": "task anchor creation after both user instructions",
+  "baseSha": "9ca5bfea96daef362725e271b41905ebcbfcfd92",
+  "userDirective": "找动物共性，用一套最小数据集与统一调参UI替代重复控制定义，保留专属能力并精简体量",
+  "target": "one capability-driven parameter schema and UI",
+  "referenceSet": [
+    "qa/COMMON_INVENTORY.json",
+    "src/bridge.js",
+    "src/studio-bridge.js",
+    "src/kaopu.js",
+    "Khronos glTF 2.0 units",
+    "Three.js AnimationMixer timeScale"
+  ],
+  "protectedInvariants": [
+    "all 19 original controls/ranges/actions remain usable",
+    "m/kg remain physical data",
+    "zoom is not object scale",
+    "absolute roughness is not roughness factor",
+    "pace is not playback rate",
+    "original animal functions/geometry unchanged",
+    "existing recipes/bakes remain compatible",
+    "single offline HTML; no desktop mouse"
+  ],
+  "forbiddenRoutes": [
+    "invent supported age/growth/biology",
+    "flatten all animals into universal mesh",
+    "delete species parameters",
+    "duplicate per-animal control datasets",
+    "unbounded generated mesh caches"
+  ],
+  "acceptanceGates": [
+    "original and new 19-control inventory semantically equivalent",
+    "shared dataset and single UI renderer",
+    "canonical setter routes to true source parameter",
+    "import/export and original life regression",
+    "standalone 0 errors/core network",
+    "independent verifier"
+  ],
+  "visualAcceptance": false,
+  "scientificAcceptance": false,
+  "productionReady": false
+}

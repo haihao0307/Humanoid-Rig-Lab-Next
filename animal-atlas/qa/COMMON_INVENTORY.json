@@ -1,0 +1,5199 @@
+{
+  "startedAt": "2026-10-03T06:30:22.762Z",
+  "animals": [
+    {
+      "id": "fish",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "group",
+          "label": "显示鱼群 · 30 条",
+          "type": "checkbox",
+          "value": false,
+          "section": "motion"
+        },
+        {
+          "key": "speed",
+          "label": "动作速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2.5,
+          "step": 0.05,
+          "value": 1,
+          "section": "motion"
+        },
+        {
+          "key": "amplitude",
+          "label": "推进强度",
+          "type": "range",
+          "min": 0,
+          "max": 1.5,
+          "step": 0.05,
+          "value": 1,
+          "section": "motion"
+        },
+        {
+          "key": "swing",
+          "label": "摆动幅度",
+          "type": "range",
+          "min": 0.5,
+          "max": 1.35,
+          "step": 0.05,
+          "value": 1,
+          "section": "motion"
+        },
+        {
+          "key": "bodyScale",
+          "label": "整体尺寸",
+          "type": "range",
+          "min": 0.8,
+          "max": 1.2,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "brightness",
+          "label": "色调明暗",
+          "type": "range",
+          "min": 0.8,
+          "max": 1.2,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "eyeYaw",
+          "label": "视线左右",
+          "type": "range",
+          "min": -0.26,
+          "max": 0.26,
+          "step": 0.01,
+          "value": 0,
+          "section": "appearance"
+        },
+        {
+          "key": "eyePitch",
+          "label": "视线上下",
+          "type": "range",
+          "min": -0.15,
+          "max": 0.15,
+          "step": 0.01,
+          "value": 0,
+          "section": "appearance"
+        },
+        {
+          "key": "pupil",
+          "label": "瞳孔偏置",
+          "type": "range",
+          "min": -0.45,
+          "max": 0.45,
+          "step": 0.01,
+          "value": 0,
+          "section": "appearance"
+        },
+        {
+          "key": "waterDensity",
+          "label": "水体浓度",
+          "type": "range",
+          "min": 0.45,
+          "max": 1.5,
+          "step": 0.05,
+          "value": 1,
+          "section": "scene"
+        },
+        {
+          "key": "lightRays",
+          "label": "水下光柱",
+          "type": "range",
+          "min": 0,
+          "max": 1.5,
+          "step": 0.05,
+          "value": 0.85,
+          "section": "scene"
+        },
+        {
+          "key": "waterBloom",
+          "label": "光晕强度",
+          "type": "range",
+          "min": 0,
+          "max": 0.5,
+          "step": 0.02,
+          "value": 0.18,
+          "section": "scene"
+        },
+        {
+          "key": "kelpDensity",
+          "label": "海草密度",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.05,
+          "value": 1,
+          "section": "scene"
+        },
+        {
+          "key": "environment",
+          "label": "海底场景",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "wire",
+          "label": "线框检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "renderMode",
+          "label": "表面显示",
+          "type": "select",
+          "options": [
+            {
+              "value": "0",
+              "label": "自然表面"
+            },
+            {
+              "value": "1",
+              "label": "白模"
+            },
+            {
+              "value": "2",
+              "label": "法线"
+            },
+            {
+              "value": "5",
+              "label": "鱼鳍权重"
+            }
+          ],
+          "value": "0",
+          "section": "display"
+        }
+      ],
+      "actions": [
+        {
+          "id": "REST",
+          "label": "静止／脊椎基准"
+        },
+        {
+          "id": "IDLE",
+          "label": "呼吸待机"
+        },
+        {
+          "id": "CRUISE",
+          "label": "连续巡游"
+        },
+        {
+          "id": "GLIDE",
+          "label": "收力滑行"
+        },
+        {
+          "id": "BURST",
+          "label": "爆发推进"
+        },
+        {
+          "id": "STARTLE",
+          "label": "惊逃反应"
+        },
+        {
+          "id": "TURN_LEFT",
+          "label": "左转脊椎"
+        },
+        {
+          "id": "TURN_RIGHT",
+          "label": "右转脊椎"
+        },
+        {
+          "id": "BRAKE",
+          "label": "展鳍制动"
+        },
+        {
+          "id": "FEED",
+          "label": "扑食／眼口鳃联动"
+        },
+        {
+          "id": "FIN_FAN",
+          "label": "全鳍权重检查"
+        },
+        {
+          "id": "JAW",
+          "label": "下颌开合检查"
+        },
+        {
+          "id": "EYE_TRACK",
+          "label": "独立眼球追踪"
+        },
+        {
+          "id": "IMPULSE",
+          "label": "单点力传递／衰减"
+        },
+        {
+          "id": "PITCH_UP",
+          "label": "上仰多部件耦合"
+        },
+        {
+          "id": "PITCH_DOWN",
+          "label": "下俯多部件耦合"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1,
+        "massKg": 8,
+        "sourceSpan": 0.9764193296432495,
+        "metersPerUnit": 1.0241501470125198,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "04ecbd730b5f01c4737f52e12fc72cdf660c4cd4dcbfed31484ba5de2de3d379",
+          "dimensions": [
+            0.9764193296432495,
+            0.2879331329895649,
+            0.22504889965057373
+          ],
+          "parameters": {
+            "action": "CRUISE",
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "group": false,
+            "speed": 1,
+            "amplitude": 1,
+            "swing": 1,
+            "bodyScale": 1,
+            "brightness": 1,
+            "eyeYaw": 0,
+            "eyePitch": 0,
+            "pupil": 0,
+            "waterDensity": 1,
+            "lightRays": 0.85,
+            "waterBloom": 0.18,
+            "kelpDensity": 1,
+            "environment": true,
+            "wire": false,
+            "renderMode": "0",
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "fish"
+    },
+    {
+      "id": "shark",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "hour",
+          "label": "光照时间",
+          "type": "range",
+          "min": 5,
+          "max": 20,
+          "step": 0.25,
+          "value": 10,
+          "section": "scene"
+        },
+        {
+          "key": "exposure",
+          "label": "曝光",
+          "type": "range",
+          "min": 0.55,
+          "max": 1.55,
+          "step": 0.05,
+          "value": 1,
+          "section": "scene"
+        },
+        {
+          "key": "quality",
+          "label": "渲染品质",
+          "type": "select",
+          "options": [
+            {
+              "value": "preview",
+              "label": "预览"
+            },
+            {
+              "value": "high",
+              "label": "高品质"
+            },
+            {
+              "value": "cinematic",
+              "label": "精细"
+            }
+          ],
+          "value": "high",
+          "section": "display"
+        },
+        {
+          "key": "ao",
+          "label": "接触遮蔽",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "environment",
+          "label": "海底场景",
+          "type": "checkbox",
+          "value": true,
+          "section": "scene"
+        },
+        {
+          "key": "waterDensity",
+          "label": "水体浓度",
+          "type": "range",
+          "min": 0.45,
+          "max": 1.5,
+          "step": 0.05,
+          "value": 1,
+          "section": "scene"
+        },
+        {
+          "key": "lightRays",
+          "label": "水下光柱",
+          "type": "range",
+          "min": 0,
+          "max": 1.5,
+          "step": 0.05,
+          "value": 0.85,
+          "section": "scene"
+        },
+        {
+          "key": "kelpDensity",
+          "label": "海草密度",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.05,
+          "value": 1,
+          "section": "scene"
+        },
+        {
+          "key": "coatTone",
+          "label": "体表色调",
+          "type": "range",
+          "min": 0.85,
+          "max": 1.15,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "coatRoughness",
+          "label": "体表粗糙度",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.1,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "weather",
+          "label": "环境天气",
+          "type": "select",
+          "options": [
+            {
+              "value": "calm-current",
+              "label": "平稳洋流"
+            },
+            {
+              "value": "strong-current",
+              "label": "强洋流"
+            },
+            {
+              "value": "storm",
+              "label": "风暴海况"
+            },
+            {
+              "value": "murky",
+              "label": "浑浊水体"
+            }
+          ],
+          "value": "calm-current",
+          "section": "scene"
+        },
+        {
+          "key": "jawPreview",
+          "label": "张口角度",
+          "type": "range",
+          "min": 0,
+          "max": 34,
+          "step": 1,
+          "value": 0,
+          "section": "appearance"
+        }
+      ],
+      "actions": [
+        {
+          "id": "ventilation_cruise",
+          "label": "持续通气巡游"
+        },
+        {
+          "id": "pelagic_patrol",
+          "label": "远洋巡游"
+        },
+        {
+          "id": "deep_dive",
+          "label": "深层下潜"
+        },
+        {
+          "id": "surface_transit",
+          "label": "水面巡游"
+        },
+        {
+          "id": "thermal_selection",
+          "label": "选择温度层"
+        },
+        {
+          "id": "left_search",
+          "label": "左侧搜索"
+        },
+        {
+          "id": "right_search",
+          "label": "右侧搜索"
+        },
+        {
+          "id": "school_follow",
+          "label": "尾随鱼群"
+        },
+        {
+          "id": "orbit_school",
+          "label": "环绕鱼群评估"
+        },
+        {
+          "id": "hunt_prey",
+          "label": "追逐并捕食"
+        },
+        {
+          "id": "jaw_inspection",
+          "label": "张颌与闭颌"
+        },
+        {
+          "id": "breach",
+          "label": "跃出水面"
+        },
+        {
+          "id": "return_home",
+          "label": "返回巡游核心区"
+        },
+        {
+          "id": "rest_glide",
+          "label": "低速恢复巡游"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 4.5,
+        "massKg": 800,
+        "sourceSpan": 3.566003203392029,
+        "metersPerUnit": 1.2619169819363991,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "4e7021bd17febb50826d93ea07323bb607dd883a27252843d2aaa95355715158",
+          "dimensions": [
+            3.566003203392029,
+            1.5199999809265137,
+            1.7009336352348328
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 10,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "environment": true,
+            "waterDensity": 1,
+            "lightRays": 0.85,
+            "kelpDensity": 1,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "calm-current",
+            "jawPreview": 0
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "life"
+    },
+    {
+      "id": "pig",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "hour",
+          "label": "光照时间",
+          "type": "range",
+          "min": 5,
+          "max": 20,
+          "step": 0.25,
+          "value": 8,
+          "section": "scene"
+        },
+        {
+          "key": "exposure",
+          "label": "曝光",
+          "type": "range",
+          "min": 0.55,
+          "max": 1.55,
+          "step": 0.05,
+          "value": 1,
+          "section": "scene"
+        },
+        {
+          "key": "quality",
+          "label": "渲染品质",
+          "type": "select",
+          "options": [
+            {
+              "value": "preview",
+              "label": "预览"
+            },
+            {
+              "value": "high",
+              "label": "高品质"
+            },
+            {
+              "value": "cinematic",
+              "label": "精细"
+            }
+          ],
+          "value": "high",
+          "section": "display"
+        },
+        {
+          "key": "ao",
+          "label": "接触遮蔽",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "environment",
+          "label": "沙滩场景",
+          "type": "checkbox",
+          "value": true,
+          "section": "scene"
+        },
+        {
+          "key": "coatTone",
+          "label": "体表色调",
+          "type": "range",
+          "min": 0.85,
+          "max": 1.15,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "coatRoughness",
+          "label": "体表粗糙度",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.1,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "weather",
+          "label": "环境天气",
+          "type": "select",
+          "options": [
+            {
+              "value": "clear",
+              "label": "晴朗"
+            },
+            {
+              "value": "breeze",
+              "label": "微风"
+            },
+            {
+              "value": "rain",
+              "label": "降雨"
+            },
+            {
+              "value": "hot",
+              "label": "炎热"
+            },
+            {
+              "value": "cold",
+              "label": "寒冷"
+            }
+          ],
+          "value": "clear",
+          "section": "scene"
+        }
+      ],
+      "actions": [
+        {
+          "id": "stand",
+          "label": "稳定站立"
+        },
+        {
+          "id": "walk",
+          "label": "自然步行"
+        },
+        {
+          "id": "trot",
+          "label": "短距离小跑"
+        },
+        {
+          "id": "patrol",
+          "label": "围栏巡查"
+        },
+        {
+          "id": "root",
+          "label": "拱土寻物"
+        },
+        {
+          "id": "forage",
+          "label": "觅食搜索"
+        },
+        {
+          "id": "eat",
+          "label": "在食槽进食"
+        },
+        {
+          "id": "drink",
+          "label": "前往饮水器饮水"
+        },
+        {
+          "id": "wallow",
+          "label": "进入泥浴坑"
+        },
+        {
+          "id": "mud_roll",
+          "label": "泥地侧滚"
+        },
+        {
+          "id": "mud_shake",
+          "label": "离开泥地抖身"
+        },
+        {
+          "id": "scratch",
+          "label": "在木桩蹭痒"
+        },
+        {
+          "id": "sniff",
+          "label": "鼻部嗅探"
+        },
+        {
+          "id": "social_nudge",
+          "label": "同伴式轻触"
+        },
+        {
+          "id": "explore_gate",
+          "label": "探索围栏门"
+        },
+        {
+          "id": "shade_rest",
+          "label": "去遮阴处休息"
+        },
+        {
+          "id": "sternal_rest",
+          "label": "胸腹卧休息"
+        },
+        {
+          "id": "lateral_lie",
+          "label": "侧卧放松"
+        },
+        {
+          "id": "sleep",
+          "label": "在干草区睡眠"
+        },
+        {
+          "id": "rise",
+          "label": "从卧姿起身"
+        },
+        {
+          "id": "tail_wag",
+          "label": "尾部轻摆"
+        },
+        {
+          "id": "vocalize",
+          "label": "短促哼叫"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.5,
+        "massKg": 120,
+        "sourceSpan": 2.0192971229553223,
+        "metersPerUnit": 0.7428327327108206,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "ce25622a9749d2918157c0f4c42877ca4b9243872d5f7346e656b4c7688c37ff",
+          "dimensions": [
+            0.7309447526931763,
+            0.8977081524208188,
+            2.0192971229553223
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 11.5,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "environment": true,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "clear"
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "life"
+    },
+    {
+      "id": "dog",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "hour",
+          "label": "光照时间",
+          "type": "range",
+          "min": 5,
+          "max": 20,
+          "step": 0.25,
+          "value": 10,
+          "section": "scene"
+        },
+        {
+          "key": "exposure",
+          "label": "曝光",
+          "type": "range",
+          "min": 0.55,
+          "max": 1.55,
+          "step": 0.05,
+          "value": 1,
+          "section": "scene"
+        },
+        {
+          "key": "quality",
+          "label": "渲染品质",
+          "type": "select",
+          "options": [
+            {
+              "value": "preview",
+              "label": "预览"
+            },
+            {
+              "value": "high",
+              "label": "高品质"
+            },
+            {
+              "value": "cinematic",
+              "label": "精细"
+            }
+          ],
+          "value": "high",
+          "section": "display"
+        },
+        {
+          "key": "ao",
+          "label": "接触遮蔽",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "environment",
+          "label": "沙滩场景",
+          "type": "checkbox",
+          "value": true,
+          "section": "scene"
+        },
+        {
+          "key": "coatTone",
+          "label": "体表色调",
+          "type": "range",
+          "min": 0.85,
+          "max": 1.15,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "coatRoughness",
+          "label": "体表粗糙度",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.1,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "weather",
+          "label": "环境天气",
+          "type": "select",
+          "options": [
+            {
+              "value": "clear",
+              "label": "晴朗"
+            },
+            {
+              "value": "breeze",
+              "label": "微风"
+            },
+            {
+              "value": "heavy-rain",
+              "label": "强降雨"
+            },
+            {
+              "value": "fog",
+              "label": "雾"
+            },
+            {
+              "value": "hot",
+              "label": "炎热"
+            },
+            {
+              "value": "cold",
+              "label": "寒冷"
+            }
+          ],
+          "value": "clear",
+          "section": "scene"
+        },
+        {
+          "key": "paceSlider",
+          "label": "步态速度",
+          "type": "range",
+          "min": 0.45,
+          "max": 1.6,
+          "step": 0.05,
+          "value": 1,
+          "section": "motion"
+        }
+      ],
+      "actions": [
+        {
+          "id": "stand",
+          "label": "稳定站立"
+        },
+        {
+          "id": "walk",
+          "label": "定向行走"
+        },
+        {
+          "id": "roam",
+          "label": "场内小跑巡查"
+        },
+        {
+          "id": "sniff",
+          "label": "低头嗅闻"
+        },
+        {
+          "id": "feed",
+          "label": "前往前院食盆并进食"
+        },
+        {
+          "id": "drink",
+          "label": "前往水井旁饮水"
+        },
+        {
+          "id": "sit",
+          "label": "坐下"
+        },
+        {
+          "id": "lie",
+          "label": "趴下"
+        },
+        {
+          "id": "sleep",
+          "label": "进入屋檐区休息"
+        },
+        {
+          "id": "rise",
+          "label": "起身"
+        },
+        {
+          "id": "look_user",
+          "label": "观察主人"
+        },
+        {
+          "id": "wag",
+          "label": "摇尾表达"
+        },
+        {
+          "id": "bark",
+          "label": "短吠回应"
+        },
+        {
+          "id": "wave",
+          "label": "抬爪互动"
+        },
+        {
+          "id": "play_bow",
+          "label": "玩耍邀请"
+        },
+        {
+          "id": "jump",
+          "label": "原地小跳"
+        },
+        {
+          "id": "spin",
+          "label": "原地转圈"
+        },
+        {
+          "id": "stretch",
+          "label": "伸展身体"
+        },
+        {
+          "id": "jaw",
+          "label": "下颌开合"
+        },
+        {
+          "id": "carry",
+          "label": "叼取并放置物体"
+        },
+        {
+          "id": "wait",
+          "label": "原地等待"
+        },
+        {
+          "id": "patrol_yard",
+          "label": "巡院一圈"
+        },
+        {
+          "id": "guard_gate",
+          "label": "院门看守"
+        },
+        {
+          "id": "return_bed",
+          "label": "回窝休息"
+        },
+        {
+          "id": "rain_shelter",
+          "label": "屋檐避雨"
+        },
+        {
+          "id": "inspect_garden",
+          "label": "巡视菜地"
+        },
+        {
+          "id": "visit_bamboo",
+          "label": "竹林嗅探"
+        },
+        {
+          "id": "fetch_frisbee",
+          "label": "叼飞盘回屋檐"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.05,
+        "massKg": 18,
+        "sourceSpan": 1.2209941446781158,
+        "metersPerUnit": 0.8599549838765246,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "b6eb3c021cd14baea81ed539de2b726f614c485b3bff4a4c093af7a8026c1f07",
+          "dimensions": [
+            0.37162983417510986,
+            0.844751093769446,
+            1.2209941446781158
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 11.5,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "environment": true,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "clear",
+            "paceSlider": 1
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "life"
+    },
+    {
+      "id": "lihua",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "hour",
+          "label": "光照时间",
+          "type": "range",
+          "min": 5,
+          "max": 20,
+          "step": 0.25,
+          "value": 8,
+          "section": "scene"
+        },
+        {
+          "key": "exposure",
+          "label": "曝光",
+          "type": "range",
+          "min": 0.55,
+          "max": 1.55,
+          "step": 0.05,
+          "value": 1,
+          "section": "scene"
+        },
+        {
+          "key": "quality",
+          "label": "渲染品质",
+          "type": "select",
+          "options": [
+            {
+              "value": "preview",
+              "label": "预览"
+            },
+            {
+              "value": "high",
+              "label": "高品质"
+            },
+            {
+              "value": "cinematic",
+              "label": "精细"
+            }
+          ],
+          "value": "high",
+          "section": "display"
+        },
+        {
+          "key": "ao",
+          "label": "接触遮蔽",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "environment",
+          "label": "沙滩场景",
+          "type": "checkbox",
+          "value": true,
+          "section": "scene"
+        },
+        {
+          "key": "coatTone",
+          "label": "体表色调",
+          "type": "range",
+          "min": 0.85,
+          "max": 1.15,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "coatRoughness",
+          "label": "体表粗糙度",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.1,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "weather",
+          "label": "环境天气",
+          "type": "select",
+          "options": [
+            {
+              "value": "clear",
+              "label": "晴朗"
+            },
+            {
+              "value": "breeze",
+              "label": "微风"
+            },
+            {
+              "value": "rain",
+              "label": "降雨"
+            },
+            {
+              "value": "hot",
+              "label": "炎热"
+            },
+            {
+              "value": "cold",
+              "label": "寒冷"
+            }
+          ],
+          "value": "clear",
+          "section": "scene"
+        }
+      ],
+      "actions": [
+        {
+          "id": "stand",
+          "label": "警觉站立"
+        },
+        {
+          "id": "walk",
+          "label": "安静步行"
+        },
+        {
+          "id": "trot",
+          "label": "轻快小跑"
+        },
+        {
+          "id": "crouch",
+          "label": "低伏观察"
+        },
+        {
+          "id": "stalk",
+          "label": "潜行接近玩具"
+        },
+        {
+          "id": "pounce",
+          "label": "扑跃玩具"
+        },
+        {
+          "id": "jump_perch",
+          "label": "跳上高台"
+        },
+        {
+          "id": "land",
+          "label": "从高台落地"
+        },
+        {
+          "id": "climb",
+          "label": "攀爬猫架"
+        },
+        {
+          "id": "descend",
+          "label": "沿猫架下行"
+        },
+        {
+          "id": "perch",
+          "label": "高处栖坐观察"
+        },
+        {
+          "id": "sit",
+          "label": "自然坐姿"
+        },
+        {
+          "id": "lie",
+          "label": "伏卧休息"
+        },
+        {
+          "id": "curl_sleep",
+          "label": "蜷缩睡眠"
+        },
+        {
+          "id": "wake",
+          "label": "醒来伸展"
+        },
+        {
+          "id": "groom",
+          "label": "舔毛梳理"
+        },
+        {
+          "id": "scratch",
+          "label": "抓挠猫抓柱"
+        },
+        {
+          "id": "drink",
+          "label": "在水碗饮水"
+        },
+        {
+          "id": "eat",
+          "label": "在食碗进食"
+        },
+        {
+          "id": "litter",
+          "label": "使用猫砂盆"
+        },
+        {
+          "id": "play_ball",
+          "label": "追逐小球"
+        },
+        {
+          "id": "bat_toy",
+          "label": "前爪拨动玩具"
+        },
+        {
+          "id": "stretch",
+          "label": "前后肢伸展"
+        },
+        {
+          "id": "tail_sway",
+          "label": "尾部缓慢摆动"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.76,
+        "massKg": 4.5,
+        "sourceSpan": 1.2076204419136047,
+        "metersPerUnit": 0.6293368128115636,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "bf53a34bc163181730cecc8258c35e067f482cf8a2563788c1275926afaaec11",
+          "dimensions": [
+            0.4040295481681824,
+            0.6213416459336877,
+            1.2076204419136047
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 11.5,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "environment": true,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "clear"
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "life"
+    },
+    {
+      "id": "cat",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "environment",
+          "label": "沙滩场景",
+          "type": "checkbox",
+          "value": true,
+          "section": "scene"
+        },
+        {
+          "key": "speed",
+          "label": "动作速度",
+          "type": "range",
+          "min": 0.25,
+          "max": 2,
+          "step": 0.05,
+          "value": 1,
+          "section": "motion"
+        },
+        {
+          "key": "autoExpression",
+          "label": "自动视线与耳朵",
+          "type": "checkbox",
+          "value": true,
+          "section": "appearance"
+        },
+        {
+          "key": "gazeYaw",
+          "label": "视线左右",
+          "type": "range",
+          "min": -24,
+          "max": 24,
+          "step": 1,
+          "value": 0,
+          "section": "appearance"
+        },
+        {
+          "key": "gazePitch",
+          "label": "视线上下",
+          "type": "range",
+          "min": -14,
+          "max": 14,
+          "step": 1,
+          "value": 0,
+          "section": "appearance"
+        },
+        {
+          "key": "earLeft",
+          "label": "左耳角度",
+          "type": "range",
+          "min": -18,
+          "max": 18,
+          "step": 1,
+          "value": 0,
+          "section": "appearance"
+        },
+        {
+          "key": "earRight",
+          "label": "右耳角度",
+          "type": "range",
+          "min": -18,
+          "max": 18,
+          "step": 1,
+          "value": 0,
+          "section": "appearance"
+        },
+        {
+          "key": "furStrength",
+          "label": "短毛强度",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.05,
+          "value": 0.7,
+          "section": "appearance"
+        },
+        {
+          "key": "skeleton",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "contacts",
+          "label": "脚掌接触检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [
+        {
+          "id": "stand",
+          "label": "中性站立"
+        },
+        {
+          "id": "idle",
+          "label": "呼吸待机"
+        },
+        {
+          "id": "look",
+          "label": "左右观察"
+        },
+        {
+          "id": "tail",
+          "label": "尾巴轻摆"
+        },
+        {
+          "id": "alert",
+          "label": "警觉观察"
+        },
+        {
+          "id": "sniff",
+          "label": "低头嗅探"
+        },
+        {
+          "id": "step_fl",
+          "label": "左前腿举步"
+        },
+        {
+          "id": "step_fr",
+          "label": "右前腿举步"
+        },
+        {
+          "id": "step_hl",
+          "label": "左后腿举步"
+        },
+        {
+          "id": "step_hr",
+          "label": "右后腿举步"
+        },
+        {
+          "id": "walk",
+          "label": "掌垫锁定原地慢走"
+        },
+        {
+          "id": "walk_forward",
+          "label": "起步→向前→停止"
+        },
+        {
+          "id": "turn_left",
+          "label": "向左弧线转向"
+        },
+        {
+          "id": "turn_right",
+          "label": "向右弧线转向"
+        },
+        {
+          "id": "sit_cycle",
+          "label": "坐下→保持→起身"
+        },
+        {
+          "id": "sit_hold",
+          "label": "坐姿保持"
+        },
+        {
+          "id": "lie_cycle",
+          "label": "趴卧→保持→起身"
+        },
+        {
+          "id": "lie_hold",
+          "label": "趴卧保持"
+        },
+        {
+          "id": "groom",
+          "label": "舔前爪预览"
+        },
+        {
+          "id": "focus",
+          "label": "耳眼追踪测试"
+        },
+        {
+          "id": "auto_life",
+          "label": "自动生活序列"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.76,
+        "massKg": 4.5,
+        "sourceSpan": 0.5166386961936951,
+        "metersPerUnit": 1.4710473791437901,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "44452642d5088d6cec3a12ea69ba1fe8cc5ca6f2d389ec86fb4b38bf8355302d",
+          "dimensions": [
+            0.5166386961936951,
+            0.35369153127220354,
+            0.11959531158208847
+          ],
+          "parameters": {
+            "action": "stand",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "environment": true,
+            "speed": 1,
+            "autoExpression": true,
+            "gazeYaw": 0,
+            "gazePitch": 0,
+            "earLeft": 0,
+            "earRight": 0,
+            "furStrength": 0.7,
+            "skeleton": false,
+            "contacts": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "cat"
+    },
+    {
+      "id": "neutral-dog",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "color",
+          "label": "主体颜色",
+          "type": "color",
+          "value": "#c99b57",
+          "section": "appearance"
+        },
+        {
+          "key": "roughness",
+          "label": "表面粗糙度",
+          "type": "range",
+          "min": 0.45,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.92,
+          "section": "appearance"
+        },
+        {
+          "key": "scale",
+          "label": "整体尺寸",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.25,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "bulk",
+          "label": "躯干丰满度",
+          "type": "range",
+          "min": 0.92,
+          "max": 1.08,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "environment",
+          "label": "栖息环境",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "wire",
+          "label": "线框检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.05,
+        "massKg": 18,
+        "sourceSpan": 1.2504417896270752,
+        "metersPerUnit": 0.8397032222612667,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            0.3450287878513336,
+            0.728970980795566,
+            1.2504417896270752
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#c99b57",
+            "roughness": 0.92,
+            "scale": 1,
+            "bulk": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "native"
+    },
+    {
+      "id": "tabby",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "color",
+          "label": "主体颜色",
+          "type": "color",
+          "value": "#62666b",
+          "section": "appearance"
+        },
+        {
+          "key": "roughness",
+          "label": "表面粗糙度",
+          "type": "range",
+          "min": 0.45,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.89,
+          "section": "appearance"
+        },
+        {
+          "key": "scale",
+          "label": "整体尺寸",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.25,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "bulk",
+          "label": "躯干丰满度",
+          "type": "range",
+          "min": 0.92,
+          "max": 1.08,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "environment",
+          "label": "栖息环境",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "wire",
+          "label": "线框检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.76,
+        "massKg": 4.5,
+        "sourceSpan": 0.8052378594875336,
+        "metersPerUnit": 0.9438205010426066,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            0.23610281199216843,
+            0.34855019592214376,
+            0.8052378594875336
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#62666b",
+            "roughness": 0.89,
+            "scale": 1,
+            "bulk": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "native"
+    },
+    {
+      "id": "wolf",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "color",
+          "label": "主体颜色",
+          "type": "color",
+          "value": "#6f6d67",
+          "section": "appearance"
+        },
+        {
+          "key": "roughness",
+          "label": "表面粗糙度",
+          "type": "range",
+          "min": 0.45,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.96,
+          "section": "appearance"
+        },
+        {
+          "key": "scale",
+          "label": "整体尺寸",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.25,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "bulk",
+          "label": "躯干丰满度",
+          "type": "range",
+          "min": 0.92,
+          "max": 1.08,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "environment",
+          "label": "栖息环境",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "wire",
+          "label": "线框检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.6,
+        "massKg": 45,
+        "sourceSpan": 1.6306297779083252,
+        "metersPerUnit": 0.9812159827305403,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            0.3924087733030319,
+            0.9918086755787954,
+            1.6306297779083252
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#6f6d67",
+            "roughness": 0.96,
+            "scale": 1,
+            "bulk": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "native"
+    },
+    {
+      "id": "bear",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "color",
+          "label": "主体颜色",
+          "type": "color",
+          "value": "#e9e3d3",
+          "section": "appearance"
+        },
+        {
+          "key": "roughness",
+          "label": "表面粗糙度",
+          "type": "range",
+          "min": 0.45,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.96,
+          "section": "appearance"
+        },
+        {
+          "key": "scale",
+          "label": "整体尺寸",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.25,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "environment",
+          "label": "栖息环境",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "wire",
+          "label": "线框检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 2.4,
+        "massKg": 450,
+        "sourceSpan": 3.2105454206466675,
+        "metersPerUnit": 0.7475365352459622,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            1.3762332201004028,
+            1.8332987874746323,
+            3.2105454206466675
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#e9e3d3",
+            "roughness": 0.96,
+            "scale": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "native"
+    },
+    {
+      "id": "tortoise",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "color",
+          "label": "主体颜色",
+          "type": "color",
+          "value": "#5b594c",
+          "section": "appearance"
+        },
+        {
+          "key": "roughness",
+          "label": "表面粗糙度",
+          "type": "range",
+          "min": 0.45,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.92,
+          "section": "appearance"
+        },
+        {
+          "key": "scale",
+          "label": "整体尺寸",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.25,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "environment",
+          "label": "栖息环境",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "wire",
+          "label": "线框检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.35,
+        "massKg": 5,
+        "sourceSpan": 2.1564483642578125,
+        "metersPerUnit": 0.16230390942862197,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "97bf145e49dd2366d4d6e856760bc13733b0245b790d8428ac8dade8827f8369",
+          "dimensions": [
+            1.5160964727401733,
+            1.0172603279352188,
+            2.1564483642578125
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "color": "#5b594c",
+            "roughness": 0.92,
+            "scale": 1,
+            "environment": true,
+            "wire": false,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "native"
+    },
+    {
+      "id": "dove",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "hour",
+          "label": "光照时间",
+          "type": "range",
+          "min": 5,
+          "max": 20,
+          "step": 0.25,
+          "value": 7.5,
+          "section": "scene"
+        },
+        {
+          "key": "exposure",
+          "label": "曝光",
+          "type": "range",
+          "min": 0.55,
+          "max": 1.55,
+          "step": 0.05,
+          "value": 1,
+          "section": "scene"
+        },
+        {
+          "key": "quality",
+          "label": "渲染品质",
+          "type": "select",
+          "options": [
+            {
+              "value": "preview",
+              "label": "预览"
+            },
+            {
+              "value": "high",
+              "label": "高品质"
+            },
+            {
+              "value": "cinematic",
+              "label": "精细"
+            }
+          ],
+          "value": "high",
+          "section": "display"
+        },
+        {
+          "key": "ao",
+          "label": "接触遮蔽",
+          "type": "checkbox",
+          "value": true,
+          "section": "display"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "coatTone",
+          "label": "体表色调",
+          "type": "range",
+          "min": 0.85,
+          "max": 1.15,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "coatRoughness",
+          "label": "体表粗糙度",
+          "type": "range",
+          "min": 0.75,
+          "max": 1.1,
+          "step": 0.02,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "weather",
+          "label": "环境天气",
+          "type": "select",
+          "options": [
+            {
+              "value": "clear",
+              "label": "晴朗"
+            },
+            {
+              "value": "breeze",
+              "label": "微风"
+            },
+            {
+              "value": "heavy-rain",
+              "label": "强降雨"
+            },
+            {
+              "value": "fog",
+              "label": "雾"
+            },
+            {
+              "value": "hot",
+              "label": "炎热"
+            },
+            {
+              "value": "cold",
+              "label": "寒冷"
+            }
+          ],
+          "value": "clear",
+          "section": "scene"
+        },
+        {
+          "key": "wind",
+          "label": "林地风速",
+          "type": "range",
+          "min": 0,
+          "max": 1.6,
+          "step": 0.05,
+          "value": 0.7,
+          "section": "scene"
+        },
+        {
+          "key": "doveInspectionMode",
+          "label": "羽毛与结构",
+          "type": "select",
+          "options": [
+            {
+              "value": "all",
+              "label": "完整斑鸠"
+            },
+            {
+              "value": "skeleton",
+              "label": "只看骨骼"
+            },
+            {
+              "value": "body",
+              "label": "只看身体"
+            },
+            {
+              "value": "feathers",
+              "label": "只看羽毛"
+            }
+          ],
+          "value": "all",
+          "section": "display"
+        }
+      ],
+      "actions": [
+        {
+          "id": "takeoff",
+          "label": "起飞"
+        },
+        {
+          "id": "forward_flight",
+          "label": "向前飞行"
+        },
+        {
+          "id": "orbit",
+          "label": "空中盘旋"
+        },
+        {
+          "id": "figure8",
+          "label": "八字飞行"
+        },
+        {
+          "id": "land",
+          "label": "斜向减速落地"
+        },
+        {
+          "id": "perch",
+          "label": "落上树枝"
+        },
+        {
+          "id": "hop",
+          "label": "地面短跳"
+        },
+        {
+          "id": "walk",
+          "label": "交替短步行走"
+        },
+        {
+          "id": "forage_seed",
+          "label": "寻找并啄食种子"
+        },
+        {
+          "id": "forage_insect",
+          "label": "搜索虫类"
+        },
+        {
+          "id": "drink",
+          "label": "饮水"
+        },
+        {
+          "id": "bathe",
+          "label": "浅水洗浴"
+        },
+        {
+          "id": "dust_bath",
+          "label": "沙浴"
+        },
+        {
+          "id": "preen",
+          "label": "梳理羽毛"
+        },
+        {
+          "id": "ruffle",
+          "label": "抖松羽毛"
+        },
+        {
+          "id": "scratch",
+          "label": "挠头"
+        },
+        {
+          "id": "stretch",
+          "label": "伸展身体"
+        },
+        {
+          "id": "sunbathe",
+          "label": "展羽晒太阳"
+        },
+        {
+          "id": "alert",
+          "label": "警戒观察"
+        },
+        {
+          "id": "hide",
+          "label": "进入遮蔽处"
+        },
+        {
+          "id": "chirp",
+          "label": "鸣叫"
+        },
+        {
+          "id": "nest_build",
+          "label": "采集草茎铺窝"
+        },
+        {
+          "id": "sleep",
+          "label": "闭眼夜栖"
+        },
+        {
+          "id": "wake",
+          "label": "醒来并睁眼"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.32,
+        "massKg": 0.152,
+        "sourceSpan": 1.3191397786140442,
+        "metersPerUnit": 0.24258232917227954,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "ef72b766ecc87ac3629824a6222fa02ecfbfef7f4144374c5384b8fa25219270",
+          "dimensions": [
+            0.879186600446701,
+            0.8722741277888417,
+            1.3191397786140442
+          ],
+          "parameters": {
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "hour": 7.5,
+            "exposure": 1,
+            "quality": "high",
+            "ao": true,
+            "bones": false,
+            "coatTone": 1,
+            "coatRoughness": 1,
+            "weather": "clear",
+            "wind": 0.7,
+            "doveInspectionMode": "all"
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "life"
+    },
+    {
+      "id": "eagle",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "speed",
+          "label": "动作速度",
+          "type": "range",
+          "min": 0.25,
+          "max": 1.5,
+          "step": 0.05,
+          "value": 1,
+          "section": "motion"
+        },
+        {
+          "key": "control:coupling_gain",
+          "label": "身体联动",
+          "type": "range",
+          "min": 0,
+          "max": 1.3,
+          "step": 0.01,
+          "value": 1.08,
+          "section": "appearance"
+        },
+        {
+          "key": "control:head_stability",
+          "label": "视线稳定",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.01,
+          "value": 0.9,
+          "section": "appearance"
+        },
+        {
+          "key": "control:life_gain",
+          "label": "情境动作：头颈、脚爪、尾部",
+          "type": "range",
+          "min": 0,
+          "max": 1.5,
+          "step": 0.01,
+          "value": 1.22,
+          "section": "appearance"
+        },
+        {
+          "key": "bones",
+          "label": "控制骨架",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [
+        {
+          "id": "patrol",
+          "label": "湖岸巡航 · 搜寻"
+        },
+        {
+          "id": "approach",
+          "label": "水面目标 · 接近后放弃"
+        },
+        {
+          "id": "alert",
+          "label": "警觉避让 · 恢复"
+        },
+        {
+          "id": "gust",
+          "label": "阵风穿越 · 重新配平"
+        },
+        {
+          "id": "flap",
+          "label": "全身协同扑翼"
+        },
+        {
+          "id": "glide",
+          "label": "滑翔与配平"
+        },
+        {
+          "id": "look",
+          "label": "注视 → 颈部跟随"
+        },
+        {
+          "id": "turn",
+          "label": "转向全身配合"
+        },
+        {
+          "id": "sequence",
+          "label": "滑翔 → 加力 → 转向"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 1.6,
+        "massKg": 4.5,
+        "sourceSpan": 0.9811093807220459,
+        "metersPerUnit": 1.630806953270065,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "35f15ae6b0bc9f4ba5f1b94b54ce8c06140c1d8af4906aab84353dac075ce120",
+          "dimensions": [
+            0.9811093807220459,
+            0.5770481192648731,
+            0.4446805715560913
+          ],
+          "parameters": {
+            "action": "patrol",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "speed": 1,
+            "control:coupling_gain": 1.08,
+            "control:head_stability": 0.9,
+            "control:life_gain": 1.22,
+            "bones": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "eagle"
+    },
+    {
+      "id": "starling",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "speed",
+          "label": "播放速度",
+          "type": "select",
+          "options": [
+            {
+              "value": ".25",
+              "label": "0.25×"
+            },
+            {
+              "value": ".5",
+              "label": "0.5×"
+            },
+            {
+              "value": "1",
+              "label": "1×"
+            }
+          ],
+          "value": "1",
+          "section": "motion"
+        },
+        {
+          "key": "zoom",
+          "label": "对象放大",
+          "type": "select",
+          "options": [
+            {
+              "value": "1",
+              "label": "1×"
+            },
+            {
+              "value": "1.3",
+              "label": "1.3×"
+            },
+            {
+              "value": "1.7",
+              "label": "1.7×"
+            }
+          ],
+          "value": "1",
+          "section": "display"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "regions",
+          "label": "身体分区",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "wire",
+          "label": "线框检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [
+        {
+          "id": "pigeon",
+          "label": "鸽子基础飞行"
+        },
+        {
+          "id": "eagle",
+          "label": "海雕快速飞行"
+        },
+        {
+          "id": "static",
+          "label": "参考姿态 · 静止"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.38,
+        "massKg": 0.08,
+        "sourceSpan": 1.0210633277893066,
+        "metersPerUnit": 0.37216104981728604,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "327b4870c927635266f620e2c1a61b645dda1002afc297d9d9a428eebe66fbdf",
+          "dimensions": [
+            0.9166746735572815,
+            0.7885294705629349,
+            1.0210633277893066
+          ],
+          "parameters": {
+            "action": "pigeon",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "speed": "1",
+            "zoom": "1",
+            "bones": false,
+            "regions": false,
+            "wire": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "palau"
+    },
+    {
+      "id": "fruit-dove",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "speed",
+          "label": "播放速度",
+          "type": "select",
+          "options": [
+            {
+              "value": ".25",
+              "label": "0.25×"
+            },
+            {
+              "value": ".5",
+              "label": "0.5×"
+            },
+            {
+              "value": "1",
+              "label": "1×"
+            }
+          ],
+          "value": "1",
+          "section": "motion"
+        },
+        {
+          "key": "zoom",
+          "label": "对象放大",
+          "type": "select",
+          "options": [
+            {
+              "value": "1",
+              "label": "1×"
+            },
+            {
+              "value": "1.3",
+              "label": "1.3×"
+            },
+            {
+              "value": "1.7",
+              "label": "1.7×"
+            }
+          ],
+          "value": "1",
+          "section": "display"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "regions",
+          "label": "身体分区",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "wire",
+          "label": "线框检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [
+        {
+          "id": "pigeon",
+          "label": "鸽子基础飞行"
+        },
+        {
+          "id": "eagle",
+          "label": "海雕快速飞行"
+        },
+        {
+          "id": "static",
+          "label": "参考姿态 · 静止"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.4,
+        "massKg": 0.1,
+        "sourceSpan": 1.0758504271507263,
+        "metersPerUnit": 0.3717988950000762,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "327b4870c927635266f620e2c1a61b645dda1002afc297d9d9a428eebe66fbdf",
+          "dimensions": [
+            1.0758504271507263,
+            0.5053628981113434,
+            0.6859714388847351
+          ],
+          "parameters": {
+            "action": "pigeon",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "speed": "1",
+            "zoom": "1",
+            "bones": false,
+            "regions": false,
+            "wire": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "palau"
+    },
+    {
+      "id": "tern",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "speed",
+          "label": "播放速度",
+          "type": "select",
+          "options": [
+            {
+              "value": ".25",
+              "label": "0.25×"
+            },
+            {
+              "value": ".5",
+              "label": "0.5×"
+            },
+            {
+              "value": "1",
+              "label": "1×"
+            }
+          ],
+          "value": "1",
+          "section": "motion"
+        },
+        {
+          "key": "zoom",
+          "label": "对象放大",
+          "type": "select",
+          "options": [
+            {
+              "value": "1",
+              "label": "1×"
+            },
+            {
+              "value": "1.3",
+              "label": "1.3×"
+            },
+            {
+              "value": "1.7",
+              "label": "1.7×"
+            }
+          ],
+          "value": "1",
+          "section": "display"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "regions",
+          "label": "身体分区",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        },
+        {
+          "key": "wire",
+          "label": "线框检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [
+        {
+          "id": "pigeon",
+          "label": "鸽子基础飞行"
+        },
+        {
+          "id": "eagle",
+          "label": "海雕快速飞行"
+        },
+        {
+          "id": "static",
+          "label": "参考姿态 · 静止"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.78,
+        "massKg": 0.12,
+        "sourceSpan": 0.9685712158679962,
+        "metersPerUnit": 0.8053099113636101,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "327b4870c927635266f620e2c1a61b645dda1002afc297d9d9a428eebe66fbdf",
+          "dimensions": [
+            0.879890501499176,
+            0.9685712158679962,
+            0.6976350247859955
+          ],
+          "parameters": {
+            "action": "pigeon",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "speed": "1",
+            "zoom": "1",
+            "bones": false,
+            "regions": false,
+            "wire": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "palau"
+    },
+    {
+      "id": "chicken",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "environment",
+          "label": "沙滩场景",
+          "type": "checkbox",
+          "value": true,
+          "section": "scene"
+        },
+        {
+          "key": "chicken:body_width",
+          "label": "躯干宽度",
+          "type": "range",
+          "min": 0.88,
+          "max": 1.12,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:body_depth",
+          "label": "躯干厚度",
+          "type": "range",
+          "min": 0.9,
+          "max": 1.1,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:neck_fullness",
+          "label": "颈部丰满度",
+          "type": "range",
+          "min": 0.88,
+          "max": 1.12,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:head_scale",
+          "label": "头部大小",
+          "type": "range",
+          "min": 0.92,
+          "max": 1.08,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:beak_length",
+          "label": "喙部长度",
+          "type": "range",
+          "min": 0.92,
+          "max": 1.08,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:tail_root_length",
+          "label": "尾根长度",
+          "type": "range",
+          "min": 0.9,
+          "max": 1.1,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:comb_height",
+          "label": "鸡冠高度",
+          "type": "range",
+          "min": 0.85,
+          "max": 1.15,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:comb_thickness",
+          "label": "鸡冠厚度",
+          "type": "range",
+          "min": 0.85,
+          "max": 1.15,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:wing_length",
+          "label": "翅膀长度",
+          "type": "range",
+          "min": 0.92,
+          "max": 1.08,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:wing_fullness",
+          "label": "翅膀丰满度",
+          "type": "range",
+          "min": 0.9,
+          "max": 1.1,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:eye_scale",
+          "label": "眼球大小",
+          "type": "range",
+          "min": 0.9,
+          "max": 1.1,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:soft_tissue_scale",
+          "label": "肉垂大小",
+          "type": "range",
+          "min": 0.88,
+          "max": 1.12,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:leg_thickness",
+          "label": "小腿粗细",
+          "type": "range",
+          "min": 0.9,
+          "max": 1.1,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:foot_scale",
+          "label": "足部大小",
+          "type": "range",
+          "min": 0.92,
+          "max": 1.08,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "chicken:toe_spread",
+          "label": "脚趾展开",
+          "type": "range",
+          "min": 0.9,
+          "max": 1.1,
+          "step": 0.01,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "micro",
+          "label": "皮肤微细节",
+          "type": "range",
+          "min": 0,
+          "max": 1.5,
+          "step": 0.05,
+          "value": 1,
+          "section": "appearance"
+        },
+        {
+          "key": "contrast",
+          "label": "羽毛对比",
+          "type": "range",
+          "min": 0,
+          "max": 1.5,
+          "step": 0.05,
+          "value": 1,
+          "section": "appearance"
+        }
+      ],
+      "actions": [],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.65,
+        "massKg": 2.5,
+        "sourceSpan": 1.0175676812650636,
+        "metersPerUnit": 0.638778149077912,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "8ab3d4d9fe1add4fa15b8a5a6eb915bde53a6211623393aef980b06bec2cd33d",
+          "dimensions": [
+            0.9075191915035248,
+            1.0175676812650636,
+            0.5271598696708679
+          ],
+          "parameters": {
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "environment": true,
+            "chicken:body_width": 1,
+            "chicken:body_depth": 1,
+            "chicken:neck_fullness": 1,
+            "chicken:head_scale": 1,
+            "chicken:beak_length": 1,
+            "chicken:tail_root_length": 1,
+            "chicken:comb_height": 1,
+            "chicken:comb_thickness": 1,
+            "chicken:wing_length": 1,
+            "chicken:wing_fullness": 1,
+            "chicken:eye_scale": 1,
+            "chicken:soft_tissue_scale": 1,
+            "chicken:leg_thickness": 1,
+            "chicken:foot_scale": 1,
+            "chicken:toe_spread": 1,
+            "micro": 1,
+            "contrast": 1,
+            "playing": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "chicken"
+    },
+    {
+      "id": "crab",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "skin",
+          "label": "甲壳花色",
+          "type": "select",
+          "options": [
+            {
+              "value": "ordinary-sand",
+              "label": "浅褐细斑"
+            },
+            {
+              "value": "ordinary-russet",
+              "label": "红褐颗粒"
+            },
+            {
+              "value": "ordinary-dark",
+              "label": "深褐细斑"
+            }
+          ],
+          "value": "ordinary-russet",
+          "section": "appearance"
+        },
+        {
+          "key": "tone",
+          "label": "颜色深浅",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.5,
+          "section": "appearance"
+        },
+        {
+          "key": "variation",
+          "label": "细斑对比",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.5,
+          "section": "appearance"
+        },
+        {
+          "key": "detail",
+          "label": "颗粒肌理",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.5,
+          "section": "appearance"
+        },
+        {
+          "key": "gloss",
+          "label": "甲壳光泽",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.5,
+          "section": "appearance"
+        },
+        {
+          "key": "speed",
+          "label": "动作速度",
+          "type": "range",
+          "min": 0.25,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.65,
+          "section": "motion"
+        },
+        {
+          "key": "stage",
+          "label": "展示环境",
+          "type": "select",
+          "options": [
+            {
+              "value": "beach",
+              "label": "海滩生活"
+            },
+            {
+              "value": "lab",
+              "label": "形体观察"
+            }
+          ],
+          "value": "beach",
+          "section": "scene"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [
+        {
+          "id": "auto",
+          "label": "自然活动"
+        },
+        {
+          "id": "idle",
+          "label": "停步观察"
+        },
+        {
+          "id": "walk",
+          "label": "持续行走"
+        },
+        {
+          "id": "alert",
+          "label": "举螯警戒"
+        },
+        {
+          "id": "forage",
+          "label": "停稳探索"
+        },
+        {
+          "id": "rest",
+          "label": "静止"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.3,
+        "massKg": 0.3,
+        "sourceSpan": 0.427215576171875,
+        "metersPerUnit": 0.7022215872562325,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "ba49730d88f4acf6a02c042275f7ee0710ff5dfef98ca77386fd4d6cb59ff874",
+          "dimensions": [
+            0.427215576171875,
+            0.18339254707098007,
+            0.30627503991127014
+          ],
+          "parameters": {
+            "action": "auto",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "skin": "ordinary-russet",
+            "tone": 0.5,
+            "variation": 0.5,
+            "detail": 0.5,
+            "gloss": 0.5,
+            "speed": 1.65,
+            "stage": "beach",
+            "bones": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "crab"
+    },
+    {
+      "id": "coconut",
+      "controls": [
+        {
+          "key": "displayStage",
+          "label": "展示方式",
+          "type": "select",
+          "options": [
+            {
+              "value": "turntable",
+              "label": "旋转展示台"
+            },
+            {
+              "value": "habitat",
+              "label": "原栖息环境"
+            }
+          ],
+          "value": "turntable",
+          "section": "studio"
+        },
+        {
+          "key": "studioRotate",
+          "label": "自动环绕展示",
+          "type": "checkbox",
+          "value": false,
+          "section": "studio"
+        },
+        {
+          "key": "studioSpeed",
+          "label": "环绕速度",
+          "type": "range",
+          "min": 0.1,
+          "max": 2,
+          "step": 0.05,
+          "value": 0.55,
+          "section": "studio"
+        },
+        {
+          "key": "studioLightAngle",
+          "label": "主光方向",
+          "type": "range",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "value": 35,
+          "section": "studio"
+        },
+        {
+          "key": "studioKey",
+          "label": "主光强度",
+          "type": "range",
+          "min": 0,
+          "max": 6,
+          "step": 0.1,
+          "value": 3.2,
+          "section": "studio"
+        },
+        {
+          "key": "studioAmbient",
+          "label": "环境光强度",
+          "type": "range",
+          "min": 0,
+          "max": 4,
+          "step": 0.1,
+          "value": 1.8,
+          "section": "studio"
+        },
+        {
+          "key": "studioRim",
+          "label": "轮廓光强度",
+          "type": "range",
+          "min": 0,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.15,
+          "section": "studio"
+        },
+        {
+          "key": "studioExposure",
+          "label": "展示曝光",
+          "type": "range",
+          "min": 0.35,
+          "max": 2,
+          "step": 0.05,
+          "value": 1.05,
+          "section": "studio"
+        },
+        {
+          "key": "studioBackground",
+          "label": "展示背景",
+          "type": "color",
+          "value": "#101817",
+          "section": "studio"
+        },
+        {
+          "key": "skin",
+          "label": "甲壳花色",
+          "type": "select",
+          "options": [
+            {
+              "value": "coconut-red",
+              "label": "红棕甲壳"
+            },
+            {
+              "value": "coconut-blue",
+              "label": "蓝紫甲壳"
+            },
+            {
+              "value": "coconut-brown",
+              "label": "深棕甲壳"
+            }
+          ],
+          "value": "coconut-blue",
+          "section": "appearance"
+        },
+        {
+          "key": "tone",
+          "label": "颜色深浅",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.5,
+          "section": "appearance"
+        },
+        {
+          "key": "variation",
+          "label": "细斑对比",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.5,
+          "section": "appearance"
+        },
+        {
+          "key": "detail",
+          "label": "颗粒肌理",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.5,
+          "section": "appearance"
+        },
+        {
+          "key": "gloss",
+          "label": "甲壳光泽",
+          "type": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.02,
+          "value": 0.5,
+          "section": "appearance"
+        },
+        {
+          "key": "speed",
+          "label": "动作速度",
+          "type": "range",
+          "min": 0.25,
+          "max": 3,
+          "step": 0.05,
+          "value": 1.65,
+          "section": "motion"
+        },
+        {
+          "key": "stage",
+          "label": "展示环境",
+          "type": "select",
+          "options": [
+            {
+              "value": "beach",
+              "label": "海滩生活"
+            },
+            {
+              "value": "lab",
+              "label": "形体观察"
+            }
+          ],
+          "value": "beach",
+          "section": "scene"
+        },
+        {
+          "key": "bones",
+          "label": "骨架检查",
+          "type": "checkbox",
+          "value": false,
+          "section": "display"
+        }
+      ],
+      "actions": [
+        {
+          "id": "auto",
+          "label": "自然活动"
+        },
+        {
+          "id": "idle",
+          "label": "停步观察"
+        },
+        {
+          "id": "walk",
+          "label": "持续行走"
+        },
+        {
+          "id": "alert",
+          "label": "举螯警戒"
+        },
+        {
+          "id": "forage",
+          "label": "停稳探索"
+        },
+        {
+          "id": "rest",
+          "label": "静止"
+        }
+      ],
+      "basicData": {
+        "schema": "kaopu/basic@1",
+        "units": {
+          "length": "m",
+          "mass": "kg"
+        },
+        "measure": "reference-pose-maximum-span",
+        "referenceSpanM": 0.8,
+        "massKg": 2.5,
+        "sourceSpan": 0.3703593611717224,
+        "metersPerUnit": 2.1600642075550742,
+        "basis": "planning-estimate",
+        "stage": "成年参考个体（规划）",
+        "calibration": {
+          "sourceSha256": "ba49730d88f4acf6a02c042275f7ee0710ff5dfef98ca77386fd4d6cb59ff874",
+          "dimensions": [
+            0.3703593611717224,
+            0.20886813927212033,
+            0.34886664152145386
+          ],
+          "parameters": {
+            "action": "auto",
+            "playing": false,
+            "displayStage": "turntable",
+            "studioRotate": true,
+            "studioSpeed": 0.55,
+            "studioLightAngle": 35,
+            "studioKey": 3.2,
+            "studioAmbient": 1.8,
+            "studioRim": 1.15,
+            "studioExposure": 1.05,
+            "studioBackground": "#101817",
+            "skin": "coconut-blue",
+            "tone": 0.5,
+            "variation": 0.5,
+            "detail": 0.5,
+            "gloss": 0.5,
+            "speed": 1.65,
+            "stage": "beach",
+            "bones": false
+          },
+          "capturedAt": "2026-10-02",
+          "method": "exported default pose bounding box; fixed conversion across future forms"
+        },
+        "note": "平台规划基准，不是该模型的实测体长或重量；跨度含当前姿态的尾、翅或足，不能当作解剖体长。可按个体资料修正。"
+      },
+      "adapter": "crab"
+    }
+  ],
+  "errors": [],
+  "network": [],
+  "passed": true,
+  "completedAt": "2026-10-03T06:31:03.074Z"
+}

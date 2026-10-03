@@ -1,0 +1,339 @@
+{
+  "schema": "kaopu/parameters@1",
+  "groups": {
+    "common": "通用外观与检查",
+    "motion": "动作与演示",
+    "extensions": "物种专属参数",
+    "studio": "展示与光线"
+  },
+  "semantics": {
+    "object.scale": {
+      "label": "整体尺寸倍率",
+      "unit": "factor",
+      "group": "common"
+    },
+    "surface.color": {
+      "label": "主体颜色",
+      "unit": "hex-color",
+      "group": "common"
+    },
+    "surface.tint": {
+      "label": "原材质叠色",
+      "unit": "hex-color",
+      "group": "common"
+    },
+    "surface.tone": {
+      "label": "体表明暗倍率",
+      "unit": "factor",
+      "group": "common"
+    },
+    "surface.roughness": {
+      "label": "表面粗糙度",
+      "unit": "ratio",
+      "group": "common"
+    },
+    "surface.roughnessFactor": {
+      "label": "粗糙度倍率",
+      "unit": "factor",
+      "group": "common"
+    },
+    "motion.rate": {
+      "label": "动作播放速度",
+      "unit": "factor",
+      "group": "motion"
+    },
+    "inspection.wire": {
+      "label": "线框检查",
+      "unit": "boolean",
+      "group": "common"
+    },
+    "inspection.bones": {
+      "label": "骨架检查",
+      "unit": "boolean",
+      "group": "common"
+    },
+    "presentation.stage": {
+      "label": "展示方式",
+      "unit": "enum",
+      "group": "studio"
+    },
+    "presentation.rotate": {
+      "label": "自动环绕展示",
+      "unit": "boolean",
+      "group": "studio"
+    },
+    "presentation.rotationRate": {
+      "label": "环绕速度",
+      "unit": "source-range",
+      "group": "studio"
+    },
+    "presentation.lightAngle": {
+      "label": "主光方向",
+      "unit": "degree",
+      "group": "studio"
+    },
+    "presentation.key": {
+      "label": "主光强度",
+      "unit": "source-range",
+      "group": "studio"
+    },
+    "presentation.ambient": {
+      "label": "环境光强度",
+      "unit": "source-range",
+      "group": "studio"
+    },
+    "presentation.rim": {
+      "label": "轮廓光强度",
+      "unit": "source-range",
+      "group": "studio"
+    },
+    "presentation.exposure": {
+      "label": "展示曝光",
+      "unit": "factor",
+      "group": "studio"
+    },
+    "presentation.background": {
+      "label": "展示背景",
+      "unit": "hex-color",
+      "group": "studio"
+    }
+  },
+  "presentation": [
+    {
+      "key": "displayStage",
+      "commonId": "presentation.stage",
+      "type": "select",
+      "options": [
+        {
+          "value": "turntable",
+          "label": "旋转展示台"
+        },
+        {
+          "value": "habitat",
+          "label": "原栖息环境"
+        }
+      ],
+      "value": "turntable"
+    },
+    {
+      "key": "studioRotate",
+      "commonId": "presentation.rotate",
+      "type": "checkbox",
+      "value": true
+    },
+    {
+      "key": "studioSpeed",
+      "commonId": "presentation.rotationRate",
+      "type": "range",
+      "min": 0.1,
+      "max": 2,
+      "step": 0.05,
+      "value": 0.55
+    },
+    {
+      "key": "studioLightAngle",
+      "commonId": "presentation.lightAngle",
+      "type": "range",
+      "min": -180,
+      "max": 180,
+      "step": 5,
+      "value": 35
+    },
+    {
+      "key": "studioKey",
+      "commonId": "presentation.key",
+      "type": "range",
+      "min": 0,
+      "max": 6,
+      "step": 0.1,
+      "value": 3.2
+    },
+    {
+      "key": "studioAmbient",
+      "commonId": "presentation.ambient",
+      "type": "range",
+      "min": 0,
+      "max": 4,
+      "step": 0.1,
+      "value": 1.8
+    },
+    {
+      "key": "studioRim",
+      "commonId": "presentation.rim",
+      "type": "range",
+      "min": 0,
+      "max": 3,
+      "step": 0.05,
+      "value": 1.15
+    },
+    {
+      "key": "studioExposure",
+      "commonId": "presentation.exposure",
+      "type": "range",
+      "min": 0.35,
+      "max": 2,
+      "step": 0.05,
+      "value": 1.05
+    },
+    {
+      "key": "studioBackground",
+      "commonId": "presentation.background",
+      "type": "color",
+      "value": "#101817"
+    }
+  ],
+  "aliases": {
+    "native": {
+      "scale": "object.scale",
+      "color": "surface.color",
+      "roughness": "surface.roughness",
+      "wire": "inspection.wire"
+    },
+    "imported": {
+      "scale": "object.scale",
+      "tint": "surface.tint",
+      "roughness": "surface.roughnessFactor",
+      "speed": "motion.rate",
+      "wire": "inspection.wire"
+    },
+    "fish": {
+      "bodyScale": "object.scale",
+      "brightness": "surface.tone",
+      "speed": "motion.rate",
+      "wire": "inspection.wire"
+    },
+    "life": {
+      "coatTone": "surface.tone",
+      "coatRoughness": "surface.roughnessFactor",
+      "bones": "inspection.bones"
+    },
+    "cat": {
+      "speed": "motion.rate",
+      "skeleton": "inspection.bones"
+    },
+    "eagle": {
+      "speed": "motion.rate",
+      "bones": "inspection.bones"
+    },
+    "crab": {
+      "speed": "motion.rate",
+      "bones": "inspection.bones"
+    },
+    "palau": {
+      "speed": "motion.rate",
+      "bones": "inspection.bones",
+      "wire": "inspection.wire"
+    },
+    "chicken": {}
+  },
+  "profiles": {
+    "native": [
+      {
+        "key": "color",
+        "label": "主体颜色",
+        "type": "color",
+        "value": "#ffffff",
+        "section": "appearance"
+      },
+      {
+        "key": "roughness",
+        "label": "表面粗糙度",
+        "type": "range",
+        "min": 0.45,
+        "max": 1,
+        "step": 0.02,
+        "value": 0.8,
+        "section": "appearance"
+      },
+      {
+        "key": "scale",
+        "label": "整体尺寸",
+        "type": "range",
+        "min": 0.75,
+        "max": 1.25,
+        "step": 0.02,
+        "value": 1,
+        "section": "appearance"
+      },
+      {
+        "key": "bulk",
+        "label": "躯干丰满度",
+        "type": "range",
+        "min": 0.92,
+        "max": 1.08,
+        "step": 0.01,
+        "value": 1,
+        "section": "appearance",
+        "when": "mammal"
+      },
+      {
+        "key": "environment",
+        "label": "栖息环境",
+        "type": "checkbox",
+        "value": true,
+        "section": "display"
+      },
+      {
+        "key": "wire",
+        "label": "线框检查",
+        "type": "checkbox",
+        "value": false,
+        "section": "display"
+      }
+    ],
+    "imported": [
+      {
+        "key": "scale",
+        "label": "整体尺寸",
+        "type": "range",
+        "min": 0.25,
+        "max": 3,
+        "step": 0.05,
+        "value": 1,
+        "section": "appearance"
+      },
+      {
+        "key": "tint",
+        "label": "原材质叠色",
+        "type": "color",
+        "value": "#ffffff",
+        "section": "appearance"
+      },
+      {
+        "key": "roughness",
+        "label": "粗糙度倍率",
+        "type": "range",
+        "min": 0.25,
+        "max": 1.5,
+        "step": 0.05,
+        "value": 1,
+        "section": "appearance"
+      },
+      {
+        "key": "speed",
+        "label": "动作速度",
+        "type": "range",
+        "min": 0.1,
+        "max": 3,
+        "step": 0.05,
+        "value": 1,
+        "section": "motion",
+        "when": "actions"
+      },
+      {
+        "key": "environment",
+        "label": "沙滩场景",
+        "type": "checkbox",
+        "value": true,
+        "section": "scene"
+      },
+      {
+        "key": "wire",
+        "label": "线框检查",
+        "type": "checkbox",
+        "value": false,
+        "section": "display"
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "animal-atlas/regression-cases@1",
+  "taskId": "animal-atlas-common-parameters-20261003",
+  "cases": [
+    {
+      "id": "camera-is-not-size",
+      "rule": "Palau.zoom remains an extension; object.scale unsupported for Palau",
+      "test": "tools/test-common-parameters.mjs"
+    },
+    {
+      "id": "pace-is-not-playback",
+      "rule": "dog.paceSlider remains extension; no motion.rate alias",
+      "test": "tools/test-common-parameters.mjs"
+    },
+    {
+      "id": "roughness-semantics",
+      "rule": "native roughness absolute; imported/life factor independent",
+      "test": "tools/test-common-parameters.mjs"
+    },
+    {
+      "id": "source-domain-preserved",
+      "rule": "all 19 original keys/ranges/options/basic data/action IDs preserved",
+      "test": "tools/test-common-parameters.mjs"
+    },
+    {
+      "id": "action-and-pause-button",
+      "rule": "setCommon lifecycle.action must update actual playing and caption; first pause click stops the animal",
+      "test": "tools/test-common-parameters.mjs"
+    },
+    {
+      "id": "unsupported-biology",
+      "rule": "static animals reject lifecycle controls; unknown age rejected; mass independent of scale",
+      "test": "tools/test-common-parameters.mjs"
+    }
+  ]
+}
