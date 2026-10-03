@@ -5,8 +5,20 @@ import {Noise2D,smoothstep} from '../vendor/tidewater/src/util/Noise.js';
 import {buildRockGeometry} from '../vendor/tidewater/src/world/terrain/RockGeometry.js';
 
 const noiseGLSL=`float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p=mat2(.8,-.6,.6,.8)*p*2.03;a*=.5;}return v;}`;
-export function createBeach(T,scene,{activityRadius=3.4,lighting=true}={}){
- const group=new T.Group();group.name='atlas-tidewater-beach';group.userData.environment=true;scene.add(group);
+export function createBeach(T,scene,options={}){
+ // Keep the original habitat intact, but evaluate it only when it is displayed.
+ // The placeholder is an actual scene group; the turntable restores its visibility.
+ if(globalThis.__ATLAS_CONTEXT&&(globalThis.__ATLAS_CONTEXT.initial?.displayStage||'turntable')==='turntable'){
+  const group=new T.Group();group.name='atlas-tidewater-beach';group.userData.environment=true;scene.add(group);
+  scene.background=new T.Color('#b8d5df');scene.fog=new T.Fog('#bfd2d2',75,330);
+  let actual;const ensure=()=>actual||(actual=buildBeach(T,scene,{...options,group}));
+  const api={group,get seaY(){return ensure().seaY;},sample(...args){return ensure().sample(...args);},get terrain(){return ensure().terrain;},get stats(){return actual?.stats||{deferred:true,externalAssets:0};},update(t,camera){if(group.visible&&globalThis.AtlasTurntable?.isActive()===false)ensure().update(t,camera);}};
+  window.__ATLAS_BEACH=api;return api;
+ }
+ return buildBeach(T,scene,options);
+}
+function buildBeach(T,scene,{activityRadius=3.4,lighting=true,group:existing}={}){
+ const group=existing||new T.Group();group.name='atlas-tidewater-beach';group.userData.environment=true;if(!existing)scene.add(group);
  const terrain=Object.create(TerrainData.prototype);terrain.noise=new Noise2D(7);terrain.noise2=new Noise2D(222);terrain.noise3=new Noise2D(934);terrain._F={};terrain._out={};
  const scale=.35,anchor={x:18,z:-64},base=terrain.heightFn(anchor.x,anchor.z).h,seaY=-base*scale-.015;
  function sample(x,z){const wx=x/scale+anchor.x,wz=-z/scale+anchor.z,F=terrain._fields(wx,wz,true),a=terrain._base(wx,wz,F,terrain._out);let h=a.h,add=0;

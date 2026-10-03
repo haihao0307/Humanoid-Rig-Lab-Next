@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {gzipSync} from 'node:zlib';
+import {createAssetLoader} from '../src/asset-loader.js';
+const ResponseBase=globalThis.Response;let active=0,maxActive=0;
+globalThis.Response=class extends ResponseBase{async text(){active++;maxActive=Math.max(active,maxActive);try{await new Promise(r=>setTimeout(r,10));return await super.text();}finally{active--;}}};
+const packet=text=>({data:gzipSync(text).toString('base64')}),packets={a:packet('animal A'),b:packet('animal B'),c:packet('animal C')};
+const loader=createAssetLoader(key=>packets[key]);
+assert.deepEqual(await Promise.all([loader.decode('a'),loader.decode('b'),loader.decode('a')]),['animal A','animal B','animal A']);
+assert.equal(maxActive,1);assert.equal(loader.stats().joined,1);assert.equal(loader.stats().inflight,0);assert.equal(loader.stats().workerActive,false);
+await loader.decode('a');await loader.decode('c');const before=loader.stats().decodes;await loader.decode('b');assert.equal(loader.stats().decodes,before+1);assert.equal(loader.stats().entries,2);
+const parts={surfaces:{source_4:'exact surface bytes'},bindings:{source_4:'exact rig bytes'}};
+packets.shared={...packet(JSON.stringify(parts)),base:gzipSync('prefix,surfaces={},bindings={},suffix').toString('base64')};
+assert.equal(await loader.decode('shared'),'prefix,surfaces='+JSON.stringify(parts.surfaces)+',bindings='+JSON.stringify(parts.bindings)+',suffix');
+globalThis.Worker=class{postMessage(){throw Error('synchronous failure');}terminate(){}};
+const sync=createAssetLoader(()=>packet('valid fallback'));assert.equal(await sync.decode('sync'),'valid fallback');assert.equal(sync.stats().workerActive,false);assert.equal(sync.stats().inflight,0);
+delete globalThis.Worker;const huge=createAssetLoader(()=>packet('x'.repeat(34*1048576)));assert.equal((await huge.decode('huge')).length,34*1048576);assert.equal(huge.stats().entries,0);assert.equal(huge.stats().textBytes,0);
+globalThis.Response=ResponseBase;
+console.log('PASS fallback serialization, same-key joining, LRU eviction, exact shared assembly, worker cleanup and oversized-cache rejection');

@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const read=p=>JSON.parse(fs.readFileSync(p)),before=read('qa/LOADING_BEFORE.json'),after=read('qa/LOADING_AFTER.json'),manifest=read('SOURCE_MANIFEST.json');
+const tests=['BASIC_DATA_REPORT.json','BASIC_ROUNDTRIP_REPORT.json','IMPORT_REPORT.json','LIVE_REHEARSAL_FINAL_REPORT.json','REHEARSAL_REPORT.json','MOUSE_REPORT.json'];
+const independent=read('qa/LOADING_INDEPENDENT_REPORT.json'),sha=crypto.createHash('sha256').update(fs.readFileSync(manifest.output.file)).digest('hex');
+const gates=tests.map(name=>({report:'qa/'+name,passed:read('qa/'+name).passed===true}));
+if(!before.passed||!after.passed||sha!==manifest.output.sha256||after.htmlSha256!==sha||independent.htmlSha256!==sha||!independent.passed||gates.some(g=>!g.passed))throw Error('Loading delivery gates failed or refer to a different candidate');
+const count=new Map(),comparison=before.cases.map(b=>{const n=count.get(b.id)||0;count.set(b.id,n+1);const a=after.cases.filter(x=>x.id===b.id)[n];if(!a)throw Error('Missing matching benchmark case');return{id:b.id,visit:n+1,beforeMs:b.readyMs,afterMs:a.readyMs,reductionPercent:(1-a.readyMs/b.readyMs)*100};});
+const receipt={taskId:'animal-atlas-loading-20261003',passed:true,sourceHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),htmlSha256:sha,bytesBefore:before.bytes,bytesAfter:after.bytes,bootBeforeMs:before.bootMs,bootAfterMs:after.bootMs,comparison,tests:gates,independentReport:'qa/LOADING_INDEPENDENT_REPORT.json',offlineCoreNetworkRequests:0,thumbnailCount:Object.keys(read('qa/thumbnails.json')).length,thumbnailSource:'original interactive 3D renderers, head/mandibles facing left',visualAcceptance:false,scientificAcceptance:false,productionReady:false,limitations:['fixed-machine individual samples, not universal speed promises','dog surface generation and initial shader compilation remain slow','bounded decoded-text cache does not measure total process/GPU memory','initializing a newly displayed full habitat can still take time'],completedAt:new Date().toISOString()};
+fs.writeFileSync('qa/LOADING_RECEIPT.json',JSON.stringify(receipt,null,2));console.log(JSON.stringify({passed:true,sha,bytes:after.bytes,comparison}));

@@ -13,9 +13,9 @@ export const ANIMALS=[
 {id:'tortoise',name:'陆龟',en:'TORTOISE',category:'land',asset:'native',adapter:'native',key:'tortoise',engine:'quad',version:'四足动物 K4',description:'原有拱形背甲与四足谱，具体物种尚未确定。',habitat:'海岛沙滩',tags:['形体检查','静态形体']},
 {id:'dove',name:'珠颈斑鸠',en:'SPOTTED DOVE',category:'birds',asset:'life-bird',adapter:'life',life:'bird',version:'生命世界 V3.6',description:'斑鸠骨架、覆羽与长尾，保留林缘生活活动。',habitat:'林缘与树冠',tags:['生活动作','羽毛分层']},
 {id:'eagle',name:'白头海雕',en:'BALD EAGLE',category:'birds',asset:'eagle',adapter:'eagle',version:'海雕 R07',description:'保留全身联动、视线、头嘴动作与巡航生活片段。',habitat:'飞行观察台',tags:['飞行 / 观察','头嘴控制']},
-{id:'starling',name:'密克罗尼西亚椋鸟',en:'MICRONESIAN STARLING',category:'birds',asset:'palau',adapter:'palau',key:'source_4',version:'帕劳三鸟 R04',description:'完整参考派生曲面与局部关节，保留飞行动作。',habitat:'飞行观察台',tags:['飞行动作','关节检查']},
-{id:'fruit-dove',name:'帕劳果鸠',en:'PALAU FRUIT DOVE',category:'birds',asset:'palau',adapter:'palau',key:'source_2',version:'帕劳三鸟 R04',description:'完整参考派生曲面，原有身体分区和飞行绑定。',habitat:'飞行观察台',tags:['飞行动作','关节检查']},
-{id:'tern',name:'白燕鸥',en:'WHITE TERN',category:'birds',asset:'palau',adapter:'palau',key:'source_1',version:'帕劳三鸟 R04',description:'完整参考派生曲面与原有飞行绑定。',habitat:'飞行观察台',tags:['飞行动作','关节检查']},
+{id:'starling',name:'密克罗尼西亚椋鸟',en:'MICRONESIAN STARLING',category:'birds',asset:'palau-source-4',adapter:'palau',key:'source_4',version:'帕劳三鸟 R04',description:'完整参考派生曲面与局部关节，保留飞行动作。',habitat:'飞行观察台',tags:['飞行动作','关节检查']},
+{id:'fruit-dove',name:'帕劳果鸠',en:'PALAU FRUIT DOVE',category:'birds',asset:'palau-source-2',adapter:'palau',key:'source_2',version:'帕劳三鸟 R04',description:'完整参考派生曲面，原有身体分区和飞行绑定。',habitat:'飞行观察台',tags:['飞行动作','关节检查']},
+{id:'tern',name:'白燕鸥',en:'WHITE TERN',category:'birds',asset:'palau-source-1',adapter:'palau',key:'source_1',version:'帕劳三鸟 R04',description:'完整参考派生曲面与原有飞行绑定。',habitat:'飞行观察台',tags:['飞行动作','关节检查']},
 {id:'chicken',name:'家鸡',en:'DOMESTIC CHICKEN',category:'birds',asset:'chicken',adapter:'chicken',version:'家鸡 R9.8.4',description:'从 GitHub 读取的新版头部工作台，保留身体、羽毛和细节参数。',habitat:'海岛沙滩',tags:['形体参数','静态形体'],capability:'原项目尚未开放骨架与动作；当前可检查形体、羽毛和材质。'},
 {id:'crab',name:'普通螃蟹',en:'COASTAL CRAB',category:'coast',asset:'crab',adapter:'crab',key:'ordinary',version:'螃蟹 R11',description:'原有海滩场景、落脚推进与三套程序化甲壳外观。',habitat:'海滩与沙地',tags:['海滩动作','3 套外观']},
 {id:'coconut',name:'椰子蟹',en:'COCONUT CRAB',category:'coast',asset:'crab',adapter:'crab',key:'coconut',version:'螃蟹 R11',description:'原有独立腿节与表面分区，三套甲壳外观。',habitat:'海滩与沙地',tags:['海滩动作','3 套外观']}

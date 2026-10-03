@@ -23,7 +23,7 @@ export function validateLiveRuntime(runtime){
 export async function openLiveModule(bake){
  const runtime=validateLiveRuntime(bake.runtime),support=window.ATLAS_LIVE_SUPPORT;
  // Imported files can only execute the exact instrument code pinned by this build.
- if(support?.modules[runtime.module]?.sha256!==runtime.sha256)throw Error('此活动包需要匹配版本的动物运行器，当前平台不执行未知代码');
+ if(support?.modules[runtime.module]?.sha256!==runtime.sha256&&!support?.legacyModules?.[runtime.module]?.includes(runtime.sha256))throw Error('此活动包需要匹配版本的动物运行器，当前平台不执行未知代码');
  let html;const cached=cache.get(runtime.sha256);if(cached?.data===runtime.data&&cached.bytes===runtime.bytes)html=cached.html;else{
  let bytes;try{bytes=Uint8Array.from(atob(runtime.data),c=>c.charCodeAt(0));}catch{throw Error('活动运行器压缩数据损坏');}
  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')),reader=stream.getReader(),parts=[];let size=0;try{for(;;){const {value,done}=await reader.read();if(done)break;size+=value.length;if(size>runtime.bytes||size>100*1048576)throw Error('活动运行器解压大小异常');parts.push(value);}}finally{await reader.cancel().catch(()=>{});}
