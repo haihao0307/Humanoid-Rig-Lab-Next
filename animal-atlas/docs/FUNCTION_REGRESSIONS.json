@@ -1,0 +1,10 @@
+{
+  "schema": "animal-atlas/regression-cases@1",
+  "cases": [
+    {"id": "FUNCTION-SNAPSHOT-DENSE-001", "failure": "Array.some skips holes; casting a sparse index can hide invalid values", "gate": "dense finite and integer validation before compact conversion; sparse positions and indices rejected"},
+    {"id": "FUNCTION-DOCUMENT-PORTABLE-001", "failure": "JSON.stringify typed internal arrays produces objects incompatible with legacy stage documents", "gate": "public document() returns ordinary arrays; internal assets remain compact; old rehearsal units restore successfully"},
+    {"id": "FUNCTION-FISH-HANDOFF-001", "failure": "after releasing private GL buffers, a misplaced hook caused original snapshot API to read deleted buffers", "rootCause": "text replacement matched setup else-if rather than exportMeshes branch", "gate": "adopted real fish meshes(), bake(), protocol mesh return finite vertices and exact original indices with zero GL errors"},
+    {"id": "FUNCTION-PAUSED-INVALIDATION-001", "failure": "demand rendering could leave changed views or parameters stale", "gate": "paused idle draws settle to zero; mouse, light, units, action, add/remove, rollback and reopening update real pixels"},
+    {"id": "FUNCTION-FIDELITY-001", "failure": "performance gain by dropping shape or materials is forbidden", "gate": "original module hashes unchanged, triangle counts unchanged, fixed-state fish pixels and normalized coefficient checks pass"}
+  ]
+}

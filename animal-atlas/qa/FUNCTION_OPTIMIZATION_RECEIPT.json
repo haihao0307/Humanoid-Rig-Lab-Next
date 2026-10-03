@@ -1,0 +1,81 @@
+{
+  "taskId": "animal-atlas-function-optimization-20261003",
+  "baseSha": "7a2413b11d6fda8a7372618c2cad93861a7b6617",
+  "sourceHead": "74731d46850819b35c711146086145a31c5a7f8a",
+  "sourceTree": "9b81a069cfa011b3ae932bd777dc5db7637b6fdb",
+  "artifact": {
+    "file": "打开动物集成工作台.html",
+    "bytes": 108536604,
+    "sha256": "f87bbb1727db824c4440c9e975401c929a8cb73b38f7016fa4b2db2381a14846",
+    "coreNetworkDependencies": 0,
+    "independentHtml": true
+  },
+  "completedAt": "2026-10-03T03:46:07.874Z",
+  "productionFiles": [
+    "function-kernel.js",
+    "function-data.js",
+    "host-geometry.js",
+    "fish-controller.js",
+    "fish-eye-field.js",
+    "root-choreography.js",
+    "live-bindings.js",
+    "live-package.js",
+    "rehearsal-viewer.js",
+    "rehearsal.js",
+    "baked.js",
+    "bridge.js",
+    "import-manager.js",
+    "app.js",
+    "tools/build.mjs"
+  ],
+  "tests": [
+    {
+      "report": "qa/BASIC_DATA_REPORT.json",
+      "passed": true
+    },
+    {
+      "report": "qa/BASIC_ROUNDTRIP_REPORT.json",
+      "passed": true
+    },
+    {
+      "report": "qa/LIVE_REHEARSAL_FINAL_REPORT.json",
+      "passed": true
+    },
+    {
+      "report": "qa/REHEARSAL_REPORT.json",
+      "passed": true
+    },
+    {
+      "report": "qa/IMPORT_REPORT.json",
+      "passed": true
+    }
+  ],
+  "independentReport": "qa/FUNCTION_INDEPENDENT_REPORT.json",
+  "performanceReport": "qa/FUNCTION_COMPARISON.json",
+  "fixedStatePixels": "qa/FUNCTION_FIDELITY.json",
+  "all19": {
+    "candidateSha256": "4930fea76408b204f40d95ca606874f04325922ea0bdfd4c42212b2f1798848d",
+    "report": "qa/BASIC_DATA_REPORT.json",
+    "passed": true,
+    "finalDelta": "fish CPU snapshot hook moved from setup to exportMeshes; final fish delta independently reverified"
+  },
+  "offlineCoreNetworkRequests": 0,
+  "originalSourceHashesUnchanged": true,
+  "packagedHtmlMatches": true,
+  "noDesktopMouse": true,
+  "failedGates": [],
+  "fallbackActive": false,
+  "visualAcceptance": false,
+  "scientificAcceptance": false,
+  "productionReady": false,
+  "knownLimitations": [
+    "component bytes are not total GPU memory",
+    "JS heap plus backing storage exclude driver/process overhead",
+    "one fixed-machine two-second sample, not universal FPS promise",
+    "fish binding timing now includes life stepping; previous bridge timing did not",
+    "active animation frequency, triangle counts and renderer settings unchanged",
+    "original sampled surfaces and textures retained for fidelity",
+    "other legacy controllers still use isolated iframes"
+  ],
+  "nextAction": "user evaluates interactive candidate; new content follows function runtime standard"
+}

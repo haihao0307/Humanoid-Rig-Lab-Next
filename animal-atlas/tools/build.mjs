@@ -60,7 +60,7 @@ for(const filename of fs.readdirSync(path.join(root,'assets')).filter(p=>p.endsW
 }
 const stageBundle=await build({entryPoints:[path.join(root,'src/rehearsal-viewer.js')],bundle:true,format:'iife',minify:true,write:false,target:'es2022',alias:{three:path.join(root,'vendor/three.module.js')},legalComments:'inline'});
 fs.mkdirSync(path.join(root,'dist'),{recursive:true});
-const app=await build({entryPoints:[path.join(root,'src/app.js')],bundle:true,format:'iife',minify:false,write:false,target:'es2022',alias:{three:path.join(root,'vendor/three.module.js')},legalComments:'inline'}),thumbs=fs.existsSync(path.join(root,'qa/thumbnails.json'))?JSON.parse(read('qa/thumbnails.json')):{};
+const app=await build({entryPoints:[path.join(root,'src/app.js')],bundle:true,format:'iife',minify:true,write:false,target:'es2022',alias:{three:path.join(root,'vendor/three.module.js')},legalComments:'inline'}),thumbs=fs.existsSync(path.join(root,'qa/thumbnails.json'))?JSON.parse(read('qa/thumbnails.json')):{};
 const exampleScore=(await import('../vendor/quad/src/scores.js')).SCORE_LIBRARY.tortoise.score;
 const boot='window.ATLAS_EXAMPLE_NOTATION='+safe(exampleScore)+';window.ATLAS_ASSETS='+safe(assets)+';window.ATLAS_BRIDGE='+safe(read('src/studio-bridge.js')+'\n'+read('src/bridge.js'))+';window.ATLAS_FRAME_STYLE='+safe(frameStyle)+';window.ATLAS_THUMBS='+safe(thumbs)+';';
 const support={modules:Object.fromEntries(Object.entries(assets).map(([k,a])=>[k,{sha256:a.adaptedSha256}])),bridge:read('src/studio-bridge.js')+'\n'+read('src/bridge.js'),style:frameStyle};

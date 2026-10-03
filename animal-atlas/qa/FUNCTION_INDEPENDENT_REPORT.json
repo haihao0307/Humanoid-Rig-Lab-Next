@@ -1,0 +1,235 @@
+{
+  "htmlSha256": "f87bbb1727db824c4440c9e975401c929a8cb73b38f7016fa4b2db2381a14846",
+  "commit": "74731d4",
+  "startedAt": "2026-10-03T03:38:54.067Z",
+  "visualAcceptance": false,
+  "scientificAcceptance": false,
+  "all19BasicGate": {
+    "candidateSha256": "4930fea76408b204f40d95ca606874f04325922ea0bdfd4c42212b2f1798848d",
+    "report": "qa/BASIC_DATA_REPORT.json",
+    "passed": true,
+    "finalDelta": "fish CPU snapshot hook moved from setup to exportMeshes; final fish delta independently reverified"
+  },
+  "passed": true,
+  "checks": [
+    "adopted fish meshes/bake/message mesh retain finite original geometry",
+    "paused draw/update/time settles to zero",
+    "paused actual headless mouse orbit redraw",
+    "paused light redraw",
+    "paused units redraw",
+    "paused action API invalidates and responds",
+    "resume advances original fish time and field",
+    "close freezes and reopen restores original controller",
+    "delete releases actors, assets, lookup and worker",
+    "all original/adapted source hashes unchanged"
+  ],
+  "facts": {
+    "api": {
+      "meshes": {
+        "finite": true,
+        "index": true,
+        "meshes": 1,
+        "vertices": 497701,
+        "firstIndices": [
+          460451,
+          459687,
+          460964,
+          460451,
+          459819,
+          459687
+        ]
+      },
+      "bake": {
+        "finite": true,
+        "index": true,
+        "meshes": 1,
+        "vertices": 497701,
+        "firstIndices": [
+          460451,
+          459687,
+          460964,
+          460451,
+          459819,
+          459687
+        ]
+      },
+      "message": {
+        "finite": true,
+        "index": true,
+        "meshes": 1,
+        "vertices": 497701,
+        "firstIndices": [
+          460451,
+          459687,
+          460964,
+          460451,
+          459819,
+          459687
+        ]
+      },
+      "gl": 0,
+      "adopted": true,
+      "poseAtlas": null,
+      "instanceData": null,
+      "gpuBuffersDeleted": true,
+      "bodyAttrs": {
+        "normal": {
+          "type": "Int16Array",
+          "itemSize": 2
+        },
+        "uv": {
+          "type": "Uint16Array",
+          "normalized": true
+        },
+        "weight": {
+          "type": "Uint8Array",
+          "normalized": true,
+          "stride": 12
+        }
+      }
+    },
+    "adopted fish meshes/bake/message mesh retain finite original geometry": {
+      "meshes": {
+        "finite": true,
+        "index": true,
+        "meshes": 1,
+        "vertices": 497701,
+        "firstIndices": [
+          460451,
+          459687,
+          460964,
+          460451,
+          459819,
+          459687
+        ]
+      },
+      "bake": {
+        "finite": true,
+        "index": true,
+        "meshes": 1,
+        "vertices": 497701,
+        "firstIndices": [
+          460451,
+          459687,
+          460964,
+          460451,
+          459819,
+          459687
+        ]
+      },
+      "message": {
+        "finite": true,
+        "index": true,
+        "meshes": 1,
+        "vertices": 497701,
+        "firstIndices": [
+          460451,
+          459687,
+          460964,
+          460451,
+          459819,
+          459687
+        ]
+      },
+      "gl": 0,
+      "adopted": true,
+      "poseAtlas": null,
+      "instanceData": null,
+      "gpuBuffersDeleted": true,
+      "bodyAttrs": {
+        "normal": {
+          "type": "Int16Array",
+          "itemSize": 2
+        },
+        "uv": {
+          "type": "Uint16Array",
+          "normalized": true
+        },
+        "weight": {
+          "type": "Uint8Array",
+          "normalized": true,
+          "stride": 12
+        }
+      }
+    },
+    "paused draw/update/time settles to zero": {
+      "before": {
+        "draws": 8,
+        "liveUpdates": 4,
+        "time": 0.004166666666666667
+      },
+      "after": {
+        "draws": 8,
+        "liveUpdates": 4,
+        "time": 0.004166666666666667
+      }
+    },
+    "paused actual headless mouse orbit redraw": {
+      "draws": 48
+    },
+    "paused light redraw": {
+      "draws": 31
+    },
+    "paused units redraw": {
+      "draws": 27
+    },
+    "paused action API invalidates and responds": {
+      "id": "JAW",
+      "current": "JAW",
+      "paused": true,
+      "source": "JAW",
+      "draws": 118
+    },
+    "resume advances original fish time and field": {
+      "before": {
+        "time": 0.5374999999999993,
+        "field": [
+          0,
+          0,
+          0,
+          0.0000016467166688016732,
+          -1.0611058710028373e-14,
+          0,
+          1.2756255607371259e-8,
+          0.000001680622176536417,
+          -2.2692256602431515e-14,
+          0,
+          2.636749485418477e-8,
+          0.0000018697301129577681
+        ],
+        "mode": "CRUISE"
+      },
+      "after": {
+        "time": 1.2791666666666635,
+        "field": [
+          0,
+          0,
+          0,
+          -0.0000026756281386042247,
+          -2.7700267752304997e-14,
+          0,
+          -2.0610292139622288e-8,
+          -0.000002700355935303378,
+          -5.708604975448311e-14,
+          0,
+          -4.183830171200498e-8,
+          -0.0000028367526283545885
+        ],
+        "mode": "CRUISE"
+      }
+    },
+    "delete releases actors, assets, lookup and worker": {
+      "actors": 0,
+      "assets": 0,
+      "byId": 0,
+      "workers": 0,
+      "gl": 0
+    },
+    "all original/adapted source hashes unchanged": {
+      "modules": 13
+    }
+  },
+  "errors": [],
+  "network": [],
+  "completedAt": "2026-10-03T03:39:10.953Z"
+}
