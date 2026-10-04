@@ -1,0 +1,248 @@
+{
+  "taskId": "r008-lowrise-elastic-linen-shorts-20261002",
+  "directive": "用户认可昨日短裤外形。降低过高腰线，增加松紧腰头结构；测最新人物工作台人物实际尺寸，适配短裤，再用真实动作测试布料物理效果。 用户新增：保留原版，再做新版，共两个独立版本。",
+  "dispatchDate": "2026-10-02 Asia/Shanghai",
+  "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+  "baseSha": "09507c395eee0b924d1fc98572c1134773f9b779",
+  "targetSubject": "source/assembly.json activeSubject=new-human-r008",
+  "acceptedBaseline": "R24-19-seams-static-test-20261001 user shape accepted; native motion HOLD",
+  "expectedArtifact": "fresh interactive R008 clothing workbench, standalone single HTML and verified public mirror",
+  "allowedPaths": [
+    "New-Human-Production/R008/Shorts*.mjs",
+    "New-Human-Production/R008/tools/*shorts*",
+    "New-Human-Production/R008/app.mjs",
+    "New-Human-Production/R008/index.html",
+    "New-Human-Production/R008/server.cjs",
+    "New-Human-Production/R008/vendor",
+    "docs/SHORTS*"
+  ],
+  "protectedInvariants": [
+    "actual latest R008 character identity, material, 61bone animation",
+    "accepted original shorts silhouette/piece roles/19 real seams/procedural linen",
+    "no mouse control",
+    "existing public baseline remains available"
+  ],
+  "allowedUserChanges": [
+    "new measured paper sizing",
+    "lower rise",
+    "35-40mm elastic casing",
+    "separate finite elastic waistband mechanics"
+  ],
+  "forbiddenRoutes": [
+    "baked or imported replacement human",
+    "fabric rendered via hard bone skinning and called physics",
+    "motion declared passed from static proof",
+    "old artifact called new"
+  ],
+  "coverage": {
+    "actualBodyMeasurement": "VERIFIER_PASSED_CLOTHED_ENVELOPE_ONLY",
+    "lowRiseElasticDraft": "V2_SOURCE_CASING_PASSED_ELASTIC_UNVALIDATED",
+    "manufacturing": "V2_BROWSER_TERMINAL_SOURCE_SEWING_INDEPENDENT_PASS",
+    "independentVerification": "PASS_SOURCE_PAPER_SEAMS_TOPOLOGY_AND_OFFLINE_TWO_VERSION_SWITCH_ONLY",
+    "wearing": "STATIC_GEOMETRIC_COVERAGE_OBSERVED_PHYSICAL_WEARING_HOLD",
+    "nativeClothAndMotion": "NOT_ACCEPTED_223_PERCENT_MAXIMUM_STRAIN_NO_NATIVE_STEPS",
+    "standalonePublication": "OFFLINE_TWO_VERSION_PACKAGING_PASS_NO_NEW_PUBLIC_PROMOTION",
+    "boundaryTargetRepair": "INDEPENDENT_HEM_SOURCE_EDGE_LENGTH_AND_EXTERIOR_CURVE_PASS_ONLY",
+    "exteriorSourceSeed": "INDEPENDENT_SOURCE_METRIC_AND_SUPPORT_HALFSPACE_PASS_CONTACT_INTERPRETATION_HOLD",
+    "sourceUpload": "SOURCE_CHECKPOINT_READY"
+  },
+  "acceptanceGates": [
+    "sourceModified=true",
+    "interactive3D=true",
+    "staticImageSubstitute=false",
+    "actual generated geometry measurement",
+    "19 real seam equality",
+    "main/G strain <=5%, elastic separately declared",
+    "actual motion and body/self contact history",
+    "independent verifier",
+    "desktop/mobile and offline/network browser QA",
+    "public HTTP200 and matching version before URL share"
+  ],
+  "visualAcceptancePending": true,
+  "productionReady": false,
+  "lastReview": {
+    "at": "2026-10-02T05:51:04.991Z",
+    "status": "HOLD_LOCAL_SOURCE_CHECKPOINT",
+    "reason": "Verified hem and frame defects repaired as independent source constructors; connected wearing and reliable collision interpretation remain HOLD.",
+    "uniqueWearingFailureCauseProven": false
+  },
+  "versionPolicy": {
+    "original": {
+      "id": "original",
+      "revision": "R24-19-seams-static-test-20261001",
+      "immutable": true,
+      "acceptedShape": true,
+      "clothMotionValidated": false,
+      "htmlSHA256": "2b9158f76cd75aef5605be86bd7092c406d333467ce116eca130f166580635da"
+    },
+    "revised": {
+      "id": "lowrise",
+      "revision": "R008-forearm-reference-lowrise-elastic-v3-20261002",
+      "waistDropM": null,
+      "waistbandWidthM": 0.038,
+      "retainSubjectOriginalClothing": true,
+      "authorMissingBarePelvis": false,
+      "bodySurfaceAuthority": "existing original clothing envelope",
+      "acceptedShape": false,
+      "motionValidated": false,
+      "automaticWaistFit": true
+    },
+    "entry": "single interactive version switch; original bytes preserved; new version must pass separate gates",
+    "entryArtifactSHA256": "91c18edaac39f2c99bd874d66fdd538559e893e4678e4aed34d09ae11ab8be61"
+  },
+  "deliveryChecklist": [
+    "[x] No generated image substitute for real 3D",
+    "[x] Actual procedural source changes",
+    "[x] Existing internal interactive three-dimensional comparison",
+    "[x] Actual R008 generated geometry, skeleton and action runtime",
+    "[x] Camera and version controls operable; uncertified cloth actions disabled",
+    "[ ] Complete current wearing and native cloth motion acceptance",
+    "[ ] New garment public fixed URL and independent browser acceptance",
+    "[x] Screenshot-only completion rejected"
+  ],
+  "status": "STATIC_GEOMETRIC_COVERAGE_OBSERVED_PHYSICAL_WEARING_HOLD",
+  "userDelivery": "SOURCE_CHECKPOINT_ONLY_NOT_COMPLETED_GARMENT",
+  "sourceUpload": {
+    "status": "DEVELOPMENT_CHECKPOINT_NOT_COMPLETE_GARMENT",
+    "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+    "branch": "work/shorts-two-versions-source-20261002",
+    "draftPR": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/pull/16",
+    "priorVerifiedCommit": "0c2336eee19a1efcc0f5fd01eac5d4f6e79fffc3",
+    "nativeBodyBase": "b8a537f7e2fb8491199211bf20cb7adcf6f33ede",
+    "productionReady": false
+  },
+  "latestProductionIncrement": {
+    "bodyContact": "closest indexed face/edge/angle-weighted vertex pseudonormal sign times exact Euclidean distance; undefined signs explicitly HOLD; actual 1401 exterior queries and known near-face inside/outside checks passed; full source solid/contact/CCD not certified",
+    "wearing": "genuine production 11-seam491-DOF parent; whole material-coordinate guide and hinge relaxation implemented; one bounded increment remains HOLD",
+    "wearingTerminal": {
+      "maximumPrincipalStrain": 0.0471033788442885,
+      "maximumBoundaryGapM": 0.06198922327352099,
+      "maximumReadOnlyFeatureNegativeDistanceM": 0.037149111183615004,
+      "sourceSeams": 11,
+      "sourceDofs": 491,
+      "waistFinalSeamStagePerformed": false,
+      "activeElasticEdges": 0,
+      "actualNativeSteps": 0,
+      "sourceRestMassUVUnchanged": true
+    },
+    "sourcePaper": "0960dbd12fc141b7318779eff78bcb34bc55be4b5c57b473f7e9a11290e9a67c",
+    "constructionConclusion": "The whole target field itself violates source material metric; this is not a proof that source paper cannot fit the body. No further parameter scans or failed-public promotion.",
+    "inspectionMotion": "UI and API controller changes are rejected before changing lower-body pose until simulationCertified; fresh offline A-B-A browser check passed",
+    "coldReproducibility": "pure explicit-input paper checker replaces missing historical-QA import; source/probe generation consumes current body scalar measurements",
+    "wearingGuidePreflight": {
+      "sharedSourceGoalDisagreements": 12,
+      "maximumSharedSourceGoalDisagreementM": 0.07532344648148703,
+      "scope": "wrong temporary target field; does not establish paper/body incompatibility"
+    },
+    "followupSourceScope": "New API rejects inconsistent shared guide targets before solving. Actor rigid frame conversion verified separately at identity and translated/rotated/nonuniform-scale actors without reapplying measured scale. Zero new solver passes; historical failed neutral-actor trace does not certify new wearing source."
+  },
+  "waistClarification": {
+    "userInstruction": "腰口降到原截图背景分界线、小臂中段；裤脚长度不变",
+    "revision": "R008-forearm-reference-lowrise-elastic-v3-20261002",
+    "automaticDropToStatureRatio": 0.03469331753048781,
+    "actualLatestDropM": 0.06243347286991367,
+    "maximumHemMovementM": 0,
+    "referenceArmPose": "original accepted A source bind; not new subject arm pose",
+    "bodyMeasurementAxis": "source reference waistband center; independent of requested low waist",
+    "styleSourceValidated": true,
+    "finalDrapeValidated": false
+  },
+  "latestReview": {
+    "at": "2026-10-02T11:17:13.597Z",
+    "revision": "R008-lowrise-triangle-cover-v7-20261002",
+    "status": "STATIC_GEOMETRIC_COVERAGE_OBSERVED_PHYSICAL_WEARING_HOLD",
+    "productionReady": false,
+    "originalSHA256": "2b9158f76cd75aef5605be86bd7092c406d333467ce116eca130f166580635da",
+    "artifactSHA256": "9d2a819aa29723e37a354fc73e09543a72591d78947f9b1f02f43cd76020c245",
+    "sourcePaperRestMassPreserved": true,
+    "sourceSeams": 19,
+    "actualDofs": 451,
+    "geometryPlacement": {
+      "scope": "bounded temporary geometry initialization at measured waist/casing/hem heights; actual visible-skin point samples plus whole-triangle crossings and closed-bare outward-plane separation; no cloth integration",
+      "placements": 1,
+      "totalSamples": 2599,
+      "minimumSampledClearanceM": 0.006000000000050652,
+      "remainingInsideSamples": 0,
+      "maximumProtectedTargetYErrorM": 0,
+      "maximumPositionChangeM": 0.061150894527893566
+    },
+    "staticSurfaceReview": {
+      "crossingCount": 0,
+      "trianglePairsTested": 30928,
+      "zeroAreaTriangles": {
+        "cloth": 0,
+        "native": 120,
+        "bare": 0
+      },
+      "wholeSolidUnionCertified": false,
+      "scope": "actual nondegenerate current WORLD cloth/native/bare surfaces; native degeneracies remain HOLD"
+    },
+    "visualReview": {
+      "fourViewsCaptured": true,
+      "priorSkinIslandsObserved": false,
+      "sideVisibilityLimitedByNativeArm": true
+    },
+    "physicalReview": {
+      "maximumPrincipalStrain": 2.2301250976141187,
+      "limit": 0.05,
+      "passed": false,
+      "actualNativeSteps": 0,
+      "actualNativeTime": 0,
+      "selfContactValidated": false,
+      "continuousCCDValidated": false,
+      "motionValidated": false
+    },
+    "testURL": "http://127.0.0.1:8883/qa/shorts-two-versions-20261002/index.html",
+    "publicPromotionValidated": false,
+    "evidence": [
+      "qa/shorts-covering-independent-v7-20261002/QA.json",
+      "qa/shorts-covering-independent-v7-20261002/ACTUAL_STATIC_TRIANGLE_CROSSINGS.json"
+    ]
+  },
+  "previousReviewV3": {
+    "status": "HOLD",
+    "productionReady": false,
+    "waistInstruction": "lower waist only; preserve hem paper target",
+    "reference": {
+      "originalSHA256": "2b9158f76cd75aef5605be86bd7092c406d333467ce116eca130f166580635da",
+      "liveDirectionsOnly": true,
+      "bakedCoordinatesCommitted": false,
+      "currentSource2DRestAuthoritative": true
+    },
+    "neutralWarmAuthoring": {
+      "iterations": 25,
+      "principalStrain": 0.3459018992769455,
+      "clearanceDeficitM": 0.005602076223905175,
+      "maximumHeightErrorM": 0.009377957203689058,
+      "stopReason": "HOLD: independent finite-difference descent check failed"
+    },
+    "actualBrowser": {
+      "artifactSHA256": "d8984b18ac00fec40f5d5ca21bc513e1cc0a5f0fe95d565100f1522a0af58fce",
+      "referenceWiringValid": true,
+      "principalStrain": 0.3806519090712457,
+      "clearanceDeficitM": 0.00985973778302443,
+      "maximumHeightErrorM": 0.026314154939448442,
+      "elapsedMs": 3817.2000000476837,
+      "nativeMotionGuard": true,
+      "nativeSteps": 0,
+      "errors": 0,
+      "externalCoreRequests": 0,
+      "manufacturingStatus": "failed",
+      "manufacturingPrincipalStrain": 0.05196576792441965,
+      "fullAcceptancePassed": false
+    },
+    "rejectedExperiment": "manufacturing Gram-row substitution worsened deformation; production principal rows restored; no threshold relaxation",
+    "rootDefects": [
+      "rigid gusset initial loft displaces leg material inward",
+      "old source pants lack bare pelvis underneath",
+      "new source rest and original per-triangle fold directions are not globally integrable without further authored construction"
+    ],
+    "testURL": "http://127.0.0.1:8883/qa/shorts-two-versions-20261002/index.html",
+    "manufacturingAutoStarted": false,
+    "fullTriangleContactValidated": false,
+    "selfContactValidated": false,
+    "motionValidated": false,
+    "publicPromotionValidated": false
+  },
+  "visualAcceptance": false
+}
