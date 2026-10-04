@@ -1,0 +1,108 @@
+name: Verify Character02 R27 and preserve existing Pages
+
+on:
+  push:
+    branches: [work/local-human-r006-binding-20260930]
+    paths:
+      - 'New-Human-Production/R008/**'
+      - 'source/assembly.json'
+      - 'tools/check-r008.mjs'
+      - 'tools/build-pure.mjs'
+      - '.github/workflows/bird-seagull-r014-real-pages.yml'
+  workflow_dispatch:
+
+# Unchanged from this repository's existing R014 Pages workflow. No new secret,
+# environment rule, repository policy, or account grant is introduced.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: character02-r27-verification
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify current source and anatomical fields
+        run: |
+          node tools/build-pure.mjs --check
+          node tools/check-pure.mjs
+          node New-Human-Production/R008/tools/test-anatomical-fields.mjs --all
+          node New-Human-Production/R008/tools/test-candidate-kinematics.mjs
+          node New-Human-Production/R008/tools/build-standalone.mjs
+      - name: Install isolated browser verifier
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify standalone current workbench
+        run: node New-Human-Production/R008/tools/anatomical-browser-review.cjs
+      - name: Render immutable before comparison
+        run: |
+          git fetch --depth=1 origin 05ef74ff00fdae143d1227fcd9d0279c2741e68a
+          mkdir -p /tmp/character02-baseline
+          git archive 05ef74ff00fdae143d1227fcd9d0279c2741e68a New-Human-Production/R008 | tar -x -C /tmp/character02-baseline
+          python3 -m http.server 8879 --bind 127.0.0.1 --directory /tmp/character02-baseline >/tmp/character02-before.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          node New-Human-Production/R008/tools/anatomical-baseline-review.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: character02-r27-evidence
+          path: |
+            artifacts/character02-r27
+            New-Human-Production/R008/qa/anatomical-numeric-r27.json
+            build/character02/BUILD_MANIFEST.json
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: character02-r27-standalone
+          path: build/character02
+          retention-days: 30
+
+  publish:
+    if: contains(github.event.head_commit.message, '[character02-publish]')
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}character02/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: d4bfd674f4aaad711dd7c99c076013b8f59e2a9b
+          path: published-baseline
+          sparse-checkout: BIRD_SEAGULL_A_TOPOLOGY_ATLAS_R014
+      - uses: actions/download-artifact@v4
+        with:
+          name: character02-r27-standalone
+          path: candidate/character02
+      - name: Preserve and verify the entire existing public artifact
+        run: |
+          python3 New-Human-Production/R008/tools/prepare-pages-preserving-bird.py published-baseline/BIRD_SEAGULL_A_TOPOLOGY_ATLAS_R014 _site
+          cp -a candidate/character02 _site/character02
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Verify published version and unchanged existing homepage
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          python3 New-Human-Production/R008/tools/check-live-pages.py

@@ -1,3 +1,4 @@
+import {registerAnatomicalAtlas} from './AnatomicalRegistration.mjs';
 import {HUMAN_INVERSE_METHOD,inverseMethodDescriptor} from './HumanInverseMethod.mjs';
 import {reverseFitSkeleton} from './SurfaceSkeletonFit.mjs';
 import {fitMotorAnatomy,pathMetrics,bellyProfile} from './MotorAnatomy.mjs';
@@ -91,10 +92,11 @@ function fitSurfaceMuscles(profile,fit,budgets){
  return {...model,muscles,methodId:HUMAN_INVERSE_METHOD.id,authority:'reference-surface-and-candidate-joints; shared tissue/path priors',unknown:[...model.unknown,'true-muscle-fat-allocation','deep-and-hidden-muscle-geometry']};
 }
 
-export function createHumanInverseSystem(profile,input,adapter){
+export function createHumanInverseSystem(profile,input,adapter,{anatomicalAtlas=null}={}){
  // Per-source tuning of solver thresholds, offsets or tissue ratios is forbidden.
  if(!adapter||adapter.sourceId!==profile.sourceId||Object.keys(adapter).some(k=>!['sourceId','materialRegions','evidence','protectedRegions','interpretation'].includes(k)))throw Error('Inverse adapter may only identify source semantics, not override the shared method');
  const fit=reverseFitSkeleton(profile,{positions:input.positions,materialIds:input.materialIds,materialRegions:adapter.materialRegions,maxSamples:HUMAN_INVERSE_METHOD.surface.maxSamples,sections:HUMAN_INVERSE_METHOD.surface.sections}),candidate=candidateProfile(profile,fit),budgets=tissueBudgets(fit),muscles=fitSurfaceMuscles(candidate,fit,budgets);
+ const anatomical=anatomicalAtlas?freeze(registerAnatomicalAtlas(candidate,anatomicalAtlas)):null;
  // Snapshot the reference identity once; composition does not refit its bones.
  const reference=freeze({joints:clone(fit.joints),budgets:clone(budgets),muscles:clone(muscles)});let recipe=normalizeComposition(),state;
  function setComposition(patch={}){
@@ -103,9 +105,9 @@ export function createHumanInverseSystem(profile,input,adapter){
   recipe=value;state={recipe:{...recipe},joints:reference.joints,regions,muscles:activeMuscles,evidence:'conditional-shared-composition-prior; no skeletal refit'};return state;
  }
  setComposition();
- return {schema:'human/unified-inverse-system@1',sourceId:profile.sourceId,method:inverseMethodDescriptor(),fit,profile:candidate,reference,muscles,
+ return {schema:'human/unified-inverse-system@1',sourceId:profile.sourceId,method:inverseMethodDescriptor(),fit,profile:candidate,reference,muscles,anatomical,
   setComposition,get state(){return state;},
-  report(){return {methodId:HUMAN_INVERSE_METHOD.id,stages:[...HUMAN_INVERSE_METHOD.stages],sourceId:profile.sourceId,skeleton:fit.summary,muscles:muscles.muscles.length,surfaceSizedMuscles:muscles.muscles.filter(m=>m.volumeEvidence.startsWith('observed')).length,surfaceConstrainedAttachments:muscles.muscles.reduce((n,m)=>n+m.surfaceConstrainedAttachments,0),unobservedRegions:budgets.filter(b=>!b.available).map(b=>b.id),outerSurface:'original-reference-generator-unmodified',boneIdentityFrozen:true,storedVertexBytes:0,compositionAllocation:'shared-prior-not-measured',unknown:[...fit.unknown,'true-muscle-fat-allocation']};},
-  export(){return {schema:this.schema,sourceId:this.sourceId,method:this.method,frame:clone(profile.frame),joints:clone(reference.joints),surfaceSections:fit.segments.map(s=>({id:s.id,start:s.start,end:s.end,status:s.status,sections:s.sections.filter(r=>r.status==='fitted').map(r=>({t:r.t,centre:r.centre,axes:r.axes,angle:r.angle,rms:r.rms,coverage:r.coverage}))})),tissueBudgets:clone(reference.budgets),motorMuscles:clone(reference.muscles.muscles),recipe:{...recipe},report:this.report(),storedVertexBytes:0};}
+  report(){return {methodId:HUMAN_INVERSE_METHOD.id,anatomicalShape:anatomical?{status:'atlas-reference-registered',surfaces:anatomical.bones.length,controlJoints:anatomical.controlJoints,individualGeometry:'NotObserved'}:{status:'atlas-not-loaded',individualGeometry:'NotObserved'},stages:[...HUMAN_INVERSE_METHOD.stages],sourceId:profile.sourceId,skeleton:fit.summary,muscles:muscles.muscles.length,surfaceSizedMuscles:muscles.muscles.filter(m=>m.volumeEvidence.startsWith('observed')).length,surfaceConstrainedAttachments:muscles.muscles.reduce((n,m)=>n+m.surfaceConstrainedAttachments,0),unobservedRegions:budgets.filter(b=>!b.available).map(b=>b.id),outerSurface:'original-reference-generator-unmodified',boneIdentityFrozen:true,storedVertexBytes:0,compositionAllocation:'shared-prior-not-measured',unknown:[...fit.unknown,'true-muscle-fat-allocation']};},
+  export(){return {schema:this.schema,sourceId:this.sourceId,method:this.method,frame:clone(profile.frame),joints:clone(reference.joints),surfaceSections:fit.segments.map(s=>({id:s.id,start:s.start,end:s.end,status:s.status,sections:s.sections.filter(r=>r.status==='fitted').map(r=>({t:r.t,centre:r.centre,axes:r.axes,angle:r.angle,rms:r.rms,coverage:r.coverage}))})),tissueBudgets:clone(reference.budgets),motorMuscles:clone(reference.muscles.muscles),anatomicalRegistration:clone(anatomical),recipe:{...recipe},report:this.report(),storedVertexBytes:0};}
  };
 }
