@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const face=read('body/FaceControls.js').replace('/*__FACE_RECIPE_JSON__*/',read('body/FaceControlRecipe.json'));
-const source=read('body/FaceIdentity.js')+'\n'+face.slice(0,face.indexOf('function faceChunkEligible'));
+const source=read('body/HeadSculpt.js')+'\n'+read('body/FaceIdentity.js')+'\n'+face.slice(0,face.indexOf('function faceChunkEligible'));
 const api=vm.runInNewContext(source+'\n({FACE_SCHEMA,FACE_IDENTITY_SCHEMA,FACE_EXPRESSION_SCHEMA,FACE_IDENTITY_PRESETS,validateFacePose,resolveFaceOffsets,interpolateFacePose})');
 const normal=value=>JSON.parse(JSON.stringify(value,(key,v)=>ArrayBuffer.isView(v)?Array.from(v):v));
 const legacy=api.validateFacePose({schema:'jarvis/face_pose@1',offsetsMm:{cheekLeft:[2,0,0],chin:[0,-1,1]},weights:{mouthSmileLeft:.7}});
@@ -22,7 +22,8 @@ assert.deepEqual(normal(neutral.identity),normal(shaped.identity),'return to neu
 assert.deepEqual(normal(neutral.expression.weights),{});
 const resolved=api.resolveFaceOffsets(neutral),recipe=JSON.parse(read('body/FaceControlRecipe.json')),chinIndex=recipe.nodes.findIndex(n=>n.id==='chin')*3,jawIndex=recipe.nodes.findIndex(n=>n.id==='jawLeft')*3;
 assert(Math.abs(resolved.values[chinIndex+1]+.001)<1e-7,'neutral identity residual reaches renderer uniforms');
-assert(resolved.values[jawIndex]>.00239,'structural jaw width reaches renderer uniforms');
+assert.equal(resolved.values[jawIndex],0,'structural jaw width no longer duplicates the local jaw offset');
+assert(Math.abs(resolved.proportions[4]-.6)<1e-7,'structural jaw width reaches the shared mandible uniform');
 for(const preset of api.FACE_IDENTITY_PRESETS){const profile=api.validateFacePose({identity:{shape:preset.shape,neutralOffsetsMm:preset.offsetsMm}});assert.equal(profile.schema,api.FACE_SCHEMA);api.resolveFaceOffsets(profile);}
 assert.throws(()=>api.validateFacePose({schema:'jarvis/face_profile@3',identity:{shape:{}},weights:{}}),/字段不匹配|未知字段/);
 assert.throws(()=>api.validateFacePose({identity:{neutralOffsetsMm:{unknown:[0,0,0]}}}),/局部控制点/);

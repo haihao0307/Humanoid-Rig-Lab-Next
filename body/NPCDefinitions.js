@@ -59,7 +59,7 @@ function installNPCDefinitionAPI(lab){
  api.define({character:{id:'base-r2',label:'R2 参考人体',bodySex:BODY_SEX}});
  for(const preset of CHARACTER_STATURE_PRESETS)api.define({character:{id:'stature-'+preset.id,label:preset.label+'身高 · '+(R2_RIG.sourceHeightM*preset.statureScale*100).toFixed(1)+' cm',shape:{statureScale:preset.statureScale}}});
  for(const preset of CHARACTER_FORM_PRESETS)api.define({character:{id:'form-'+preset.id,label:preset.label,shape:preset.shape}});
- for(const [i,p]of window.JarvisNPCRoutineCatalog.data.residents.entries())api.define({character:{id:p.id,label:p.name+' · '+p.title,bodySex:lab.human.bodySex,seed:(i+1)*4101,appearance:{skin:sampleSkinAppearance((i+1)*4101),hair:{preset:['crop','side-part','textured'][i%3]}}},behavior:{presetId:p.id,role:p.role,displayName:p.name}});
+ for(const [i,p]of window.JarvisNPCRoutineCatalog.data.residents.entries())api.define({character:{id:p.id,label:p.name+' · '+p.title,bodySex:lab.human.bodySex,seed:(i+1)*4101,appearance:{skin:sampleSkinAppearance((i+1)*4101),face:{identity:sampleFaceIdentity((i+1)*4101)},hair:{preset:['crop','side-part','textured'][i%3]}}},behavior:{presetId:p.id,role:p.role,displayName:p.name}});
  const initial=window.__BODY_PRESET_STATE__?.npc||window.__NPC_DEFINITION__;
  if(initial){const d=validateNPCDefinition(initial);activeDefinition=d;api.define(d,{replace:true});if(lab.hair){lab.hair.enabled=d.attachments.hair.enabled;lab.hair.refreshControls?.();}}
  installNPCDefinitionControls(lab,api);return api;

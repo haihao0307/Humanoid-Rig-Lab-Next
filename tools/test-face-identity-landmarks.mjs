@@ -4,15 +4,15 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const face=read('body/FaceControls.js').replace('/*__FACE_RECIPE_JSON__*/',read('body/FaceControlRecipe.json'));
-const source=read('body/FaceIdentity.js')+'\n'+face.slice(0,face.indexOf('function faceChunkEligible'));
-const api=vm.runInNewContext(source+'\n({FACE_SCHEMA,FACE_IDENTITY_SCHEMA,FACE_IDENTITY_SHAPE_SCHEMA,FACE_EXPRESSION_SCHEMA,FACE_IDENTITY_PARAMETERS,FACE_IDENTITY_PRESETS,validateFacePose,resolveFaceOffsets,interpolateFacePose,faceIdentityLandmarks,compileFaceIdentityShape})');
+const source=read('body/HeadSculpt.js')+'\n'+read('body/FaceIdentity.js')+'\n'+face.slice(0,face.indexOf('function faceChunkEligible'));
+const api=vm.runInNewContext(source+'\n({FACE_SCHEMA,FACE_IDENTITY_SCHEMA,FACE_IDENTITY_SHAPE_SCHEMA,FACE_EXPRESSION_SCHEMA,FACE_IDENTITY_PARAMETERS,FACE_IDENTITY_PRESETS,FACE_IDENTITY_REFERENCE_LANDMARKS,validateFacePose,resolveFaceOffsets,interpolateFacePose,faceIdentityLandmarks,compileFaceIdentityShape,compactHeadSculptPoint,faceIdentityWarp,faceIdentityProportions})');
 const normal=value=>JSON.parse(JSON.stringify(value,(key,v)=>ArrayBuffer.isView(v)?Array.from(v):v));
 const recipe=JSON.parse(read('body/FaceControlRecipe.json'));
 assert.equal(api.FACE_SCHEMA,'jarvis/face_profile@3');
 assert.equal(api.FACE_IDENTITY_SCHEMA,'jarvis/face_identity@2');
 assert.equal(api.FACE_IDENTITY_SHAPE_SCHEMA,'jarvis/face_identity_shape@1');
-assert.equal(api.FACE_IDENTITY_PARAMETERS.length,13);
-assert.equal(api.FACE_IDENTITY_PRESETS.length,5);
+assert.equal(api.FACE_IDENTITY_PARAMETERS.length,17);
+assert.equal(api.FACE_IDENTITY_PRESETS.length,6);
 const legacy=api.validateFacePose({schema:'jarvis/face_pose@1',offsetsMm:{cheekLeft:[2,0,0],chin:[0,-1,1]},weights:{mouthSmileLeft:.7}});
 assert.equal(legacy.schema,'jarvis/face_profile@3');
 assert.equal(legacy.identity.schema,'jarvis/face_identity@2');
@@ -27,12 +27,25 @@ const shaped=api.validateFacePose({identity:{shape:{jawWidth:1,noseProjection:.5
 const resolved=api.resolveFaceOffsets(shaped);
 const jaw=recipe.nodes.findIndex(node=>node.id==='jawLeft')*3,noseTip=recipe.nodes.findIndex(node=>node.id==='noseTip')*3,chin=recipe.nodes.findIndex(node=>node.id==='chin')*3;
 assert(jaw>=0&&noseTip>=0&&chin>=0);
-assert(Math.abs(resolved.values[jaw]-.004)<1e-7,'jaw-width parameter reaches renderer offsets');
+assert.equal(resolved.proportions[4],1,'jaw width reaches the shared mandible field');
+assert.equal(resolved.values[jaw],0,'jaw width no longer stacks a local swelling over the broad jaw field');
 assert(Math.abs(resolved.values[noseTip+2]-.0015)<1e-7,'nose projection reaches the shared nose-tip node');
 assert(resolved.values[chin+2]>.00039,'manual residual composes after structural identity');
 assert.equal(resolved.landmarks.schema,'jarvis/face_landmarks@1');
-assert(Math.abs(resolved.landmarks.values.jawLeft[0]-.053)<1e-9,'landmark map follows structural jaw width');
+const sculptedJaw=api.faceIdentityLandmarks({...shaped.identity.shape,jawWidth:0}).values.jawLeft;
+assert(resolved.landmarks.values.jawLeft[0]>sculptedJaw[0]&&resolved.landmarks.values.jawLeft[0]<sculptedJaw[0]+.003,'anterior jaw landmark follows the weaker front of the rear-focused mandible field after head sculpt');
 assert(Math.abs(resolved.landmarks.values.noseTip[2]-.2025)<1e-9,'landmark map follows structural nose projection');
+let composedLandmarks=0,sculptAffectedLandmarks=0;
+for(const shape of [{},shaped.identity.shape,...api.FACE_IDENTITY_PRESETS.map(p=>p.shape)]){
+  const landmarks=api.faceIdentityLandmarks(shape),offsets=api.compileFaceIdentityShape(shape),weights=api.faceIdentityProportions(shape);
+  for(const reference of api.FACE_IDENTITY_REFERENCE_LANDMARKS){
+    const delta=offsets[reference.node]||[0,0,0],local=reference.position.map((v,k)=>v+delta[k]*.001),sculpted=api.compactHeadSculptPoint(local).point,expected=api.faceIdentityWarp(sculpted,weights).point;
+    assert.deepEqual(normal(landmarks.values[reference.id]),normal(expected),'landmark must use the same sculpt-before-identity composition as the renderer');
+    if(Math.hypot(...sculpted.map((v,k)=>v-local[k]))>.0001)sculptAffectedLandmarks++;
+    composedLandmarks++;
+  }
+}
+assert(sculptAffectedLandmarks>10,'composition test must cover landmarks actually moved by the current head sculpt');
 const smile=api.validateFacePose({identity:shaped.identity,expression:{weights:{mouthSmileLeft:1,mouthSmileRight:1}}});
 const neutral=api.interpolateFacePose(smile,api.validateFacePose({identity:shaped.identity,expression:{weights:{}}}),1);
 assert.deepEqual(normal(neutral.identity),normal(shaped.identity),'expression interpolation must preserve structural identity and residuals');
@@ -40,4 +53,4 @@ for(const preset of api.FACE_IDENTITY_PRESETS){const profile=api.validateFacePos
 assert.throws(()=>api.validateFacePose({identity:{shape:{unknown:1}}}),/未知结构脸型参数/);
 assert.throws(()=>api.validateFacePose({identity:{shape:{jawWidth:1.1}}}),/超出范围/);
 assert.throws(()=>api.validateFacePose({schema:'jarvis/face_profile@3',identity:{shape:{}},weights:{}}),/字段不匹配|未知字段/);
-console.log(JSON.stringify({profileV1Migrated:true,profileV2Migrated:true,structuralParameters:api.FACE_IDENTITY_PARAMETERS.length,identityPresets:api.FACE_IDENTITY_PRESETS.length,landmarks:Object.keys(resolved.landmarks.values).length,structuralAndResidualComposition:true,identityPreservedAcrossExpression:true,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
+console.log(JSON.stringify({profileV1Migrated:true,profileV2Migrated:true,structuralParameters:api.FACE_IDENTITY_PARAMETERS.length,identityPresets:api.FACE_IDENTITY_PRESETS.length,landmarks:Object.keys(resolved.landmarks.values).length,composedLandmarks,sculptAffectedLandmarks,structuralAndResidualComposition:true,identityPreservedAcrossExpression:true,browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));

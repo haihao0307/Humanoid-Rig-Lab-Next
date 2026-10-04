@@ -42,8 +42,11 @@ precision highp float;
 in vec3 worldPoint,worldNormal;
 in vec2 leafUV,leafDetail;
 uniform vec3 skirtColour;
-out vec4 frag;
+layout(location=0)out vec4 frag;
+layout(location=1)out vec4 skinDiffuseOut;
+layout(location=2)out vec4 skinResidualOut;
 void main(){
+ skinDiffuseOut=vec4(0.);skinResidualOut=vec4(0.);
  vec3 n=normalize(cross(dFdx(worldPoint),dFdy(worldPoint)));
  if(dot(n,worldNormal)<0.)n=-n;
  float light=.50+.50*max(0.,dot(n,normalize(vec3(-.35,.8,.65))));

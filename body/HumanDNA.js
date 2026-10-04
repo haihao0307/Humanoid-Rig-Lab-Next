@@ -14,8 +14,10 @@ function installHumanDNA(lab){
     shape:validateCharacterShape(lab.human.characterPreset.shape),geometryKey:lab.human.bodyMetrics.geometryKey,shapeRecipe:'body/CharacterShape.js',shapeAcceptance:{runtimeVerified:false,visualAcceptance:false},
     appearance:copy(COMPACT_APPEARANCE),parameterManifest:copy(COMPACT_PARAMETERS),hairRecipe:{profile:lab.hair.export(),catalog:copy(HAIR_CATALOG),generator:'reconstruction/hair.mjs',renderer:'body/CompactHairRenderer.js',generatedGeometryIncluded:false},continuityRecipe:'canonical-interface-field-positive-diffusion/v1',generatedGeometryIncluded:false,poseBindingAccepted:false}:null,
   skinAppearance:lab.skin?.report()||null,
+  faceAppearance:lab.appearance?.export()||null,
   facialExpression:lab.face?.report()||null,
   faceAnatomy:lab.compact?{generator:'body/FaceAnatomy.js',parameters:copy(COMPACT_FACE_ANATOMY),diagnostics:copy(lab.compact.report.faceAnatomy),generatedGeometryIncluded:false,measuredAnatomy:false}:null,
+  headSculpt:lab.compact?{generator:'body/HeadSculpt.js',parameters:copy(HEAD_SCULPT),order:'after local expression and jaw, before identity and skeletal skinning',generatedGeometryIncluded:false,measuredAnatomy:false}:null,
   eyeAnatomy:lab.compact?{generator:'body/EyeAnatomy.js',parameters:copy(COMPACT_EYE_ANATOMY),frames:copy(COMPACT_EYES),diagnostics:copy(lab.compact.report.eyeAnatomy),generatedGeometryIncluded:false,physicalTissueSimulation:false}:null,
   bodyShape:lab.shape?.report()||null,
   // Definition exports reset fatigue. Live state is explicitly separate.

@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const parserModule={exports:{}};
 vm.runInNewContext(process.binding('natives')['internal/deps/acorn/acorn/dist/acorn'],{exports:parserModule.exports,module:parserModule});
-const faceSource=read('body/FaceIdentity.js')+'\n'+read('body/FaceControls.js').replace('/*__FACE_RECIPE_JSON__*/',read('body/FaceControlRecipe.json'));
+const faceSource=read('body/HeadSculpt.js')+'\n'+read('body/FaceIdentity.js')+'\n'+read('body/FaceControls.js').replace('/*__FACE_RECIPE_JSON__*/',read('body/FaceControlRecipe.json'));
 const tree=parserModule.exports.parse(faceSource,{ecmaVersion:'latest',sourceType:'module'}),methods=[];
 function visit(node){
  if(!node||typeof node!=='object')return;
@@ -48,7 +48,7 @@ for(const activeId of ['npc-1','npc-2'])for(const amount of [0,.001,.375,1]){
  for(const actor of actors){const value=actor.face.uniforms();assert.equal(uploadedJaw(value),actor.id===activeId?0:amount);cases++;}
 }
 const recipe=JSON.parse(read('body/FaceControlRecipe.json'));
-for(const pose of [{weights:{eyeBlinkLeft:.7}},{offsetsMm:{[recipe.nodes[0].id]:[.3,0,0]}}]){
+for(const pose of [{identity:{shape:{headWidth:.8,headHeight:-.6,headDepth:.4,eyeSpacing:-.7}}},{weights:{eyeBlinkLeft:.7}},{offsetsMm:{[recipe.nodes[0].id]:[.3,0,0]}}]){
  editorEnabled=true;editorPose=pose;
  for(const actor of actors){actor.human.characterPreset.appearance.face=structuredClone(editorPose);const value=actor.face.uniforms();assert.equal(value.lipOpen,0);assert.equal(value.jawOpen,0);assert.equal(value.enabled,1);assert.equal(uploadedLip(value),0);assert.equal(uploadedJaw(value),0);cases++;}
 }
@@ -58,6 +58,8 @@ for(const channel of ['lipPart','jawOpen'])for(const amount of [NaN,Infinity,-.0
 }
 pop.activeId='npc-1';
 const resident=actors[1];resident.human.characterPreset.appearance.face={offsetsMm:{cheekLeft:[2,0,0]}};
+const macro=resident.face.uniforms();
+assert.equal(macro.proportions.length,5);
 const cached=resident.face.uniforms();
 assert.strictEqual(resident.face.uniforms(),cached,'unchanged inactive face reuses resolved uniforms');
 resident.human.characterPreset.appearance.face={offsetsMm:{cheekLeft:[-2,0,0]}};
