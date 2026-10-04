@@ -14,6 +14,7 @@ import {createMotionAnatomyWorkbench} from './MotionAnatomyWorkbench.mjs';
 import {createBodyWorkbench} from './BodyWorkbench.mjs';
 import {DEFAULT_SURFACE_DETAIL,normalizeSurfaceDetail,surfaceGenerationOptions,SURFACE_PRESETS} from './SurfaceQuality.mjs';
 const $=id=>document.getElementById(id),scene=new THREE.Scene();
+$('mobileControls')?.addEventListener('click',()=>{const open=document.body.classList.toggle('show-controls');$('mobileControls').textContent=open?'收起参数':'显示参数';$('mobileControls').setAttribute('aria-expanded',String(open));if(open&&window.HumanMotorAnatomy?.active)$('workbenchControls').scrollTop=$('motionAnatomyPanel').offsetTop-20;});
 const surfaceStorage='human.r008.surface-detail.v1';let surfaceDetail=normalizeSurfaceDetail(),surfaceBusy=false,surfaceGenerationMilliseconds=0;
 try{const saved=localStorage.getItem(surfaceStorage);if(saved)surfaceDetail=normalizeSurfaceDetail(JSON.parse(saved));}catch{}
 const camera=new THREE.PerspectiveCamera(46,innerWidth/innerHeight,.05,70);

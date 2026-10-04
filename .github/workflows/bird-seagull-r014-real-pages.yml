@@ -106,3 +106,22 @@ jobs:
           EXPECTED_SHA: ${{ github.sha }}
         run: |
           python3 New-Human-Production/R008/tools/check-live-pages.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify live external-browser workbench
+        env:
+          CHARACTER02_QA_URL: https://haihao0307.github.io/Humanoid-Rig-Lab-Next/character02/?anatomy=framework&commit=${{ github.sha }}
+          CHARACTER02_QA_OUT: artifacts/character02-live
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install --with-deps chromium
+          node New-Human-Production/R008/tools/anatomical-browser-review.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: character02-r27-live-evidence
+          path: |
+            artifacts/character02-live
+            preserved-pages-report.json
+          retention-days: 30
