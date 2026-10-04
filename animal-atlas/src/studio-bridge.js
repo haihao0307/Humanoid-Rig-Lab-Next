@@ -37,10 +37,12 @@ globalThis.AtlasStudioAdapter=function(context,range,check,select){
   resetView=()=>{yaw=elevation=0;distance=1;};render=()=>birdWorkbench.setTime(birdWorkbench.getState().time);
  }else if(kind==='crab'){
   const n=__CRAB_QA__,index=context.key==='coconut'?1:0;
-  for(const [i,scene]of n.scenes.entries())sceneInstall({scene,renderer:n.renderer,camera:n.cameras[i]},()=>[n.meshes[i]]);
-  stage=sceneInstall({scene:n.beach.scene,renderer:n.renderer,camera:n.beachCamera},()=>[n.meshes[index]]);if(S.isActive())n.stage('lab');
+  for(const [i,scene]of n.scenes.entries())sceneInstall({scene,renderer:n.renderer,camera:n.cameras[i]},()=>[n.meshes[i]],{sourceFitsPortrait:true});
+  stage=sceneInstall({scene:n.beach.scene,renderer:n.renderer,camera:n.beachCamera},()=>[n.meshes[index]],{sourceFitsPortrait:true});if(S.isActive())n.stage('lab');
   rotate=(yaw,elevation=0)=>{n.state.yaw+=yaw;n.state.pitch=clamp(n.state.pitch+elevation);};
-  render=()=>n.renderer.render(n.state.stage==='beach'?n.beach.scene:n.scenes[index],n.state.stage==='beach'?n.beachCamera:n.cameras[index]);
+  // The source loop updates the camera from yaw/pitch every frame, even when
+  // life playback is paused. Avoid interleaving a draw using its previous pose.
+  render=()=>{};
  }else if(kind==='chicken'){
   const n=__ATLAS_CHICKEN_STAGE,center=()=>{const box=new T.Box3();for(const root of __ATLAS_CHICKEN_MESHES())box.union(new T.Box3().setFromObject(root));return box.getCenter(new T.Vector3());};
   stage=sceneInstall(n,()=>__ATLAS_CHICKEN_MESHES());rotate=(yaw,elevation=0)=>turnCamera(n.camera,center(),yaw,elevation);
