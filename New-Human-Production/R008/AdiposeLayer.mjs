@@ -1,17 +1,15 @@
 import * as THREE from 'three';
-import {SCAR_REGIONS}from './ScarState.mjs';
 const smooth=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t);};
 const linear=v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4;
 // Transient multi-scale surface fields. No source surface or baked field is saved.
-export function createAdiposeLayer(mesh,tissue,profile,seamGroups=[]){
+export function createAdiposeLayer(mesh,tissue,profile,seamGroups=[],calibration){
  const uv=mesh.geometry.attributes.uv.array,tone=new Float32Array(mesh.geometry.attributes.skinRest.count);
- const p=mesh.geometry.attributes.skinRest.array,n=mesh.geometry.attributes.normal.array,N=p.length/3,mat=new Uint8Array(N),indices=mesh.geometry.index.array,h=profile.frame.height,scale=h/1.8,cell=.018*scale,radius=.09*scale,grid=new Map(),ids=new Array(N),delta=new Float32Array(N*4),normals=new Float32Array(N*3),excluded=new Set(mesh.material.flatMap((m,i)=>/^tripo_part_(1|2|3|9)$/.test(m.name)?[i]:[]));
+ const p=mesh.geometry.attributes.skinRest.array,n=mesh.geometry.attributes.normal.array,N=p.length/3,mat=new Uint8Array(N),indices=mesh.geometry.index.array,h=profile.frame.height,scale=h/1.8,cell=.018*scale,radius=.09*scale,grid=new Map(),ids=new Array(N),delta=new Float32Array(N*4),normals=new Float32Array(N*3),excluded=new Set(calibration?.reliefProtectedMaterials||[]);
  for(const group of mesh.geometry.groups)for(let i=group.start;i<group.start+group.count;i++)mat[indices[i]]=group.materialIndex;
- function coverage(i){const at=i*3,x=p[at],y=p[at+1],z=p[at+2],r=tissue.region.subarray(i*4,i*4+4);let w=(r[0]+r[1]+r[2])*(1-smooth(1.48*scale,1.57*scale,y));if(excluded.has(mat[i]))return 0;
+ function coverage(i){const at=i*3,r=tissue.region.subarray(i*4,i*4+4);let w=r[0]+r[1]+r[2];if(excluded.has(mat[i]))return 0;
   // Protect nipples, navel, source scars, palms/soles and head. Coordinates
   // here belong to this calibrated subject; reusable intake must fit its own.
-  for(const c of [[.079,1.342,.106],[-.079,1.342,.106],[0,1.075,.097]]){const d=Math.hypot((x-c[0]*scale)/(.019*scale),(y-c[1]*scale)/(.025*scale),(z-c[2]*scale)/(.035*scale));w*=smooth(.5,1.5,d);}
-  for(const s of SCAR_REGIONS){const c=s.centre||s.center;if(!c)continue;const rr=s.radii||[.06,.08,.06],d=Math.hypot(...c.map((v,k)=>(p[at+k]-v*scale)/(rr[k]*scale)));w*=smooth(.9,1.3,d);}
+  for(const f of calibration?.reliefProtectedFeatures||[]){const d=Math.hypot(...f.centre.map((v,k)=>(p[at+k]-v)/f.radii[k]));w*=smooth(.5,1.5,d);}
   return Math.min(1,Math.max(0,w));
  }
  for(let i=0;i<N;i++){const at=i*3,w=coverage(i);normals.set(n.subarray(at,at+3),at);delta[i*4+3]=w;if(w<.01)continue;const r=tissue.region.subarray(i*4,i*4+3),region=r[0]>r[1]&&r[0]>r[2]?0:r[1]>r[2]?1:2,c=[Math.floor(p[at]/cell),Math.floor(p[at+1]/cell),Math.floor(p[at+2]/cell)],key=region+':'+c.join(',');ids[i]=key;let g=grid.get(key);if(!g){g={c,region,p:[0,0,0],n:[0,0,0],tone:0,count:0};grid.set(key,g);}for(let k=0;k<3;k++){g.p[k]+=p[at+k];g.n[k]+=n[at+k];}const im=mesh.material[mat[i]].map.image,px=Math.max(0,Math.min(im.width-1,Math.round(uv[i*2]*(im.width-1)))),py=Math.max(0,Math.min(im.height-1,Math.round((1-uv[i*2+1])*(im.height-1)))),pixel=(py*im.width+px)*4;g.tone+=.2126*linear(im.data[pixel]/255)+.7152*linear(im.data[pixel+1]/255)+.0722*linear(im.data[pixel+2]/255);g.count++;}
@@ -23,5 +21,5 @@ export function createAdiposeLayer(mesh,tissue,profile,seamGroups=[]){
  for(const group of seamGroups){const values=[0,0,0,0],nn=[0,0,0];let tt=0;for(const i of group){tt+=tone[i]/group.length;for(let k=0;k<4;k++)values[k]+=delta[i*4+k]/group.length;for(let k=0;k<3;k++)nn[k]+=normals[i*3+k]/group.length;}if(group.some(i=>excluded.has(mat[i])))values.fill(0);const length=Math.hypot(...nn)||1;for(const i of group){tone[i]=values[3]>0?tt:0;delta.set(values,i*4);normals.set(nn.map(v=>v/length),i*3);}}
  mesh.geometry.setAttribute('adiposeDelta',new THREE.BufferAttribute(delta,4));mesh.geometry.setAttribute('adiposeNormal',new THREE.BufferAttribute(normals,3));
  mesh.geometry.setAttribute('adiposeTone',new THREE.BufferAttribute(tone,1));
- return {delta,normals,tone,point(i,blend){return [p[i*3]+delta[i*4]*delta[i*4+3]*blend,p[i*3+1]+delta[i*4+1]*delta[i*4+3]*blend,p[i*3+2]+delta[i*4+2]*delta[i*4+3]*blend];},report:{method:'normal-compatible-local-surface-fairing-and-luminance-band-filter',maximumFillMetres:maximum,affectedVertices:affected,cellMetres:cell,radiusMetres:radius,evidence:'art-approximation-not-measured-fat',persistedBytes:0,runtimeBytes:delta.byteLength+normals.byteLength+tone.byteLength},dispose(){}};
+ return {delta,normals,tone,point(i,blend){return [p[i*3]+delta[i*4]*delta[i*4+3]*blend,p[i*3+1]+delta[i*4+1]*delta[i*4+3]*blend,p[i*3+2]+delta[i*4+2]*delta[i*4+3]*blend];},report:{method:'normal-compatible-local-surface-fairing-and-luminance-band-filter',role:'appearance-residual-only-not-composition-solver',maximumFillMetres:maximum,affectedVertices:affected,cellMetres:cell,radiusMetres:radius,evidence:'art-approximation-not-measured-fat',persistedBytes:0,runtimeBytes:delta.byteLength+normals.byteLength+tone.byteLength},dispose(){}};
 }

@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import {analyzeHumanoid,compactAnatomy}from './AnatomyAnalysis.mjs';
 import {ANATOMY_RULES}from './AnatomyContract.mjs';
 import {muscleWeight}from './MuscleAtlas.mjs';
+import {createCompositionProfile,compactComposition}from './BodyComposition.mjs';
+import {createHumanBodySystem}from './HumanBodySystem.mjs';
 export function createAnatomyWorkbench({getSubject,actor,enter,exit}){
  const panel=document.createElement('details');panel.id='anatomyPanel';panel.innerHTML='<summary>解剖分析 · 规则与证据</summary><p id="anatomySummary"></p><button id="anatomyEnter">检查骨架与组织</button><select id="anatomyView"><option value="bones">实际绑定骨架</option><option value="muscle">肌肉关系与估计影响区</option><option value="fat">脂肪遮蔽与保护区</option></select><select id="anatomyMuscle"></select><p id="anatomyEvidence"></p><button id="anatomyExport">导出分析报告</button><small>骨段来自当前绑定数据。肌肉路线为自创解剖模板估计，不能作为真实附着点或内部肌肉边界。未来模型先分析、校准，再接入体型。</small>';document.querySelector('#bodyPanel').before(panel);
  const $=id=>panel.querySelector('#'+id);let active=false,lines=null,savedBones=false;
@@ -12,5 +14,7 @@ export function createAnatomyWorkbench({getSubject,actor,enter,exit}){
  function setActive(v){if(active===v)return;if(v){savedBones=getSubject().helper.visible;enter();active=true;panel.open=true;}else{active=false;clear();getSubject().helper.visible=savedBones;exit();}display();$('anatomyEnter').textContent=active?'退出解剖检查':'检查骨架与组织';}
  $('anatomyEnter').onclick=()=>setActive(!active);$('anatomyView').onchange=display;$('anatomyMuscle').onchange=display;
  $('anatomyExport').onclick=()=>{const blob=new Blob([JSON.stringify(compactAnatomy(getSubject().body.anatomy),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='human-anatomy-analysis.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};refresh();
- return {analyze:analyzeHumanoid,export:()=>compactAnatomy(getSubject().body.anatomy),rules:ANATOMY_RULES,setActive,refresh,inspect(mode,id){setActive(true);$('anatomyView').value=mode;if(id)$('anatomyMuscle').value=id;display();},get active(){return active;}};
+ const exportBody=document.createElement('button');exportBody.id='compositionExport';exportBody.textContent='导出人体规则与当前校准';panel.append(exportBody);exportBody.onclick=()=>{const b=getSubject().body.composition,blob=new Blob([JSON.stringify(compactComposition(b.profile,b.solution),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='human-composition-profile.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ const compositionInfo=document.createElement('p');compositionInfo.id='compositionSummary';panel.append(compositionInfo);const b=getSubject().body.composition;compositionInfo.textContent=`通用成人体型规则 · ${b.profile.areas.length} 个组织量区域 · 本人物校准待外观确认。肌肉/脂肪量来自截面估计，未观测内部边界。`;
+ return {analyze:analyzeHumanoid,export:()=>compactAnatomy(getSubject().body.anatomy),composition:{create:createHumanBodySystem,fit:createCompositionProfile,export:()=>{const b=getSubject().body.composition;return compactComposition(b.profile,b.solution);}},rules:ANATOMY_RULES,setActive,refresh,inspect(mode,id){setActive(true);$('anatomyView').value=mode;if(id)$('anatomyMuscle').value=id;display();},get active(){return active;}};
 }

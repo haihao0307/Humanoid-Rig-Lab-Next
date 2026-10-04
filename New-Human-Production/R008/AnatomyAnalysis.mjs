@@ -24,6 +24,7 @@ export function analyzeHumanoid(input,{mapping={},frontHint=null,maxSamples=1200
  const local=p=>{const q=sub(p,pelvis);return [dot(q,right),dot(q,up),dot(q,front)];};
  let floor=Infinity,top=-Infinity,count=positions?.length/3||0;for(let i=0;i<count;i++){const h=dot(sub(Array.from(positions.subarray(i*3,i*3+3)),pelvis),up);floor=Math.min(floor,h);top=Math.max(top,h);}
  const height=count?top-floor:length(sub(pos('head'),pos('foot_l')))*1.12;if(!(height>1e-6&&Number.isFinite(height)))throw Error('Invalid subject scale');
+ if(!count){floor=Math.min(...['foot_l','foot_r'].map(r=>dot(sub(pos(r),pelvis),up)))-height*.035;top=floor+height;}
  const parentByIndex=joints.map(j=>byName.get(j.parent)),children=joints.map(()=>[]);parentByIndex.forEach((p,i)=>{if(p!==undefined)children[p].push(i);});
  // Helper/twist joints inherit segment semantics from their ancestry. No
  // assignment is made across an unknown root or onto a contralateral limb.
