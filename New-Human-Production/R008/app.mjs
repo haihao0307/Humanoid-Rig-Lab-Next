@@ -109,7 +109,7 @@ try{
  $('tryJump').onclick=()=>{resumeGame();if(!controller.grounded)return;window.HumanGame.setPaused(false);controller.press('Space');controller.release('Space');renderer.domElement.focus({preventScroll:true});};
  $('start').disabled=false;$('tryJump').disabled=false;
  if(new URL(location.href).searchParams.get('view')==='face')startExpressionDemo();
- const anatomyView=new URL(location.href).searchParams.get('anatomy');if(['framework','muscles'].includes(anatomyView))motionAnatomy.show(anatomyView);
+ const anatomyView=new URL(location.href).searchParams.get('anatomy');if(['framework','muscles','inverse'].includes(anatomyView))motionAnatomy.show(anatomyView);
 }catch(error){$('status').textContent=error.stack;$('status').className='error';console.error(error);window.failure=error.message;}
 renderer.setAnimationLoop(()=>{const now=performance.now(),dt=Math.min((now-lastTime)/1000,.1);lastTime=now;if(subject&&!paused){if(manual)subject.step(dt);else{controller.update(dt);updateActor(dt);}}else if(subject&&!faceWorkbench?.active&&!anatomyWorkbench?.active)faceExpression?.update(controller,dt);if(motionAnatomy?.active)motionAnatomy.update(dt);if(subject)updateCamera(dt);if(subject)skinWorkbench.tick(dt,!paused&&!manual&&!faceWorkbench?.active);if(now-hudTime>100){status();hudTime=now;}renderer.render(scene,camera);});
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
