@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import {fitMotorAnatomy,bellyProfile,pathMetrics,muscleKinematics} from './MotorAnatomy.mjs';
 
 // Geometry is generated in this subject's bind frame. No baked anatomical assets.
-export function createAnatomyDisplay(subject,actor){
- const profile=subject.body.anatomy,model=fitMotorAnatomy(profile),h=profile.frame.height;
+export function createAnatomyDisplay(subject,actor,{profile=subject.body.anatomy,model=fitMotorAnatomy(profile)}={}){
+ const h=profile.frame.height;
  const root=new THREE.Group();root.name='GeneratedMotionAnatomy';actor.add(root);
  const framework=new THREE.Group(),muscles=new THREE.Group();root.add(framework,muscles);
  const rigid=[],moving=[],boneMaterial=new THREE.MeshStandardMaterial({color:0xddd2ab,roughness:.65}),jointMaterial=new THREE.MeshStandardMaterial({color:0x5fd6e5,roughness:.45});
@@ -47,7 +47,8 @@ export function createAnatomyDisplay(subject,actor){
  for(const r of ['upperarm_l','upperarm_r','lowerarm_l','lowerarm_r','hand_l','hand_r','thigh_l','thigh_r','calf_l','calf_r','foot_l','foot_r'])ellipsoid(roleGroup(r),pos(r),.007,.007,.007,jointMaterial);
  const inverseActor=new THREE.Matrix4();
  const segments=36,sides=12;
- for(const spec of model.muscles){const anchors=spec.attachments.map(a=>({bone:subject.skeleton.bones[a.bone],local:v(a.bindPoint).applyMatrix4(subject.skeleton.boneInverses[a.bone])})),curve=new THREE.CatmullRomCurve3(spec.attachments.map(a=>v(a.bindPoint)),false,'centripetal'),points=curve.getPoints(segments),rest=pathMetrics(points.map(p=>p.toArray())),geometry=new THREE.BufferGeometry(),positions=new Float32Array((segments+1)*(sides+1)*3),normals=new Float32Array(positions.length),colors=new Float32Array(positions.length),indices=[];
+ for(const sourceSpec of model.muscles){const spec={...sourceSpec},anchors=spec.attachments.map(a=>({bone:subject.skeleton.bones[a.bone],local:v(a.bindPoint).applyMatrix4(subject.skeleton.boneInverses[a.bone])})),curve=new THREE.CatmullRomCurve3(spec.attachments.map(a=>v(a.bindPoint)),false,'centripetal'),points=curve.getPoints(segments),rest=pathMetrics(points.map(p=>p.toArray())),geometry=new THREE.BufferGeometry(),positions=new Float32Array((segments+1)*(sides+1)*3),normals=new Float32Array(positions.length),colors=new Float32Array(positions.length),indices=[];
+  if(spec.baselineVolumeProxy>0)spec.radius=Math.sqrt(spec.baselineVolumeProxy/(Math.PI*rest.weighted));
   for(let i=0;i<segments;i++)for(let j=0;j<sides;j++){const a=i*(sides+1)+j,b=a+sides+1;indices.push(a,b,a+1,b,b+1,a+1);}
   geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('normal',new THREE.BufferAttribute(normals,3));geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));geometry.setIndex(indices);
   const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.65,metalness:0,side:THREE.DoubleSide}),mesh=new THREE.Mesh(geometry,material);mesh.name=spec.id;mesh.frustumCulled=false;muscles.add(mesh);moving.push({spec,anchors,curve,rest,geometry,mesh,previousLength:rest.length,state:null});
@@ -62,5 +63,5 @@ export function createAnatomyDisplay(subject,actor){
   }
  }
  update();root.visible=false;
- return {root,model,update,setMode(v){mode=v;root.visible=true;framework.visible=true;muscles.visible=v==='muscles';update();},select(id){selection=id;update();},get report(){return {schema:model.schema,mode,frameworkParts:rigid.length,muscles:moving.map(m=>({id:m.spec.id,label:m.spec.label,action:m.spec.action,antagonist:m.spec.antagonist,...m.state,restLength:m.rest.length,endpoints:m.curve.points.map(p=>p.toArray())})),authority:model.authority,unknown:model.unknown};},dispose(){root.removeFromParent();root.traverse(o=>{if(o.isMesh){o.geometry.dispose();if(o.material!==boneMaterial&&o.material!==jointMaterial)o.material.dispose();}});boneMaterial.dispose();jointMaterial.dispose();}};
+ return {root,model,update,setMode(v){mode=v;root.visible=true;framework.visible=true;muscles.visible=v==='muscles';update();},select(id){selection=id;update();},get report(){return {schema:model.schema,methodId:model.methodId||null,mode,frameworkParts:rigid.length,muscles:moving.map(m=>({id:m.spec.id,label:m.spec.label,action:m.spec.action,antagonist:m.spec.antagonist,radius:m.spec.radius,referenceVolumeProxy:m.spec.baselineVolumeProxy||null,volumeEvidence:m.spec.volumeEvidence||'prior-only',surfaceConstrainedAttachments:m.spec.surfaceConstrainedAttachments||0,...m.state,restLength:m.rest.length,endpoints:m.curve.points.map(p=>p.toArray())})),authority:model.authority,unknown:model.unknown};},dispose(){root.removeFromParent();root.traverse(o=>{if(o.isMesh){o.geometry.dispose();if(o.material!==boneMaterial&&o.material!==jointMaterial)o.material.dispose();}});boneMaterial.dispose();jointMaterial.dispose();}};
 }

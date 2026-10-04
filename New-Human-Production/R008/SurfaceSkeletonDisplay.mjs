@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import {reverseFitSkeleton} from './SurfaceSkeletonFit.mjs';
+import {createHumanInverseSystem} from './HumanInverseSystem.mjs';
 import {r008InverseCalibration} from './R008InverseCalibration.mjs';
 
 export function createSurfaceSkeletonDisplay(subject,actor){
  const profile=subject.body.anatomy,positions=subject.mesh.geometry.attributes.skinRest.array,N=positions.length/3,materialIds=new Uint8Array(N),index=subject.mesh.geometry.index.array;
  for(const group of subject.mesh.geometry.groups)for(let i=group.start;i<group.start+group.count;i++)materialIds[index[i]]=group.materialIndex;
- const calibration=r008InverseCalibration(profile,subject.mesh.material),start=performance.now(),fit=reverseFitSkeleton(profile,{positions,materialIds,materialRegions:calibration.materialRegions}),elapsed=performance.now()-start;
+ const calibration=r008InverseCalibration(profile,subject.mesh.material),start=performance.now(),system=createHumanInverseSystem(profile,{positions,materialIds},calibration),fit=system.fit,elapsed=performance.now()-start;
  const root=new THREE.Group();root.name='SurfaceConstrainedInverseSkeleton';actor.add(root);root.visible=false;
  const gold=new THREE.MeshStandardMaterial({color:0xffc767,roughness:.55,depthTest:false}),cyan=new THREE.LineBasicMaterial({color:0x64bed0,transparent:true,opacity:.55,depthTest:false}),observedMaterial=new THREE.LineBasicMaterial({color:0x72ebc3,transparent:true,opacity:.8,depthTest:false}),uncertain=new THREE.MeshStandardMaterial({color:0xed7773,roughness:.7,depthTest:false});
  const dynamic=[],inverseActor=new THREE.Matrix4(),v=a=>new THREE.Vector3(...a),map=(p,id)=>{const bone=subject.skeleton.bones[id];return v(p).applyMatrix4(subject.skeleton.boneInverses[id]).applyMatrix4(bone.matrixWorld).applyMatrix4(inverseActor);};
@@ -20,5 +20,5 @@ export function createSurfaceSkeletonDisplay(subject,actor){
   priorLines.visible=priorVisible;
  }
  update();
- return {root,fit,update,setSections(v){sectionsVisible=v;update();},setPrior(v){priorVisible=v;update();},select(v){selection=v;update();},report(){return {...fit,generationMilliseconds:elapsed,skinVertexCount:N,materialCalibration:calibration.evidence,selection};},export(){return {...fit,segments:fit.segments.map(s=>({...s,sections:s.sections.map(({priorCentre,centre,axes,angle,t,status,samples,coverage,rms,p95})=>({t,status,samples,coverage,rms,p95,centre,axes,angle}))}))};},dispose(){root.removeFromParent();root.traverse(o=>{if(o.isMesh||o.isLine)o.geometry.dispose();});for(const m of [gold,cyan,observedMaterial,uncertain])m.dispose();}};
+ return {root,fit,system,update,setSections(v){sectionsVisible=v;update();},setPrior(v){priorVisible=v;update();},select(v){selection=v;update();},report(){return {...fit,unified:system.report(),methodPolicy:system.method,generationMilliseconds:elapsed,skinVertexCount:N,materialCalibration:calibration.evidence,selection};},export(){return system.export();},dispose(){root.removeFromParent();root.traverse(o=>{if(o.isMesh||o.isLine)o.geometry.dispose();});for(const m of [gold,cyan,observedMaterial,uncertain])m.dispose();}};
 }
