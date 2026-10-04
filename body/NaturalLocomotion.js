@@ -159,34 +159,70 @@ class MotionLabWorld {
 }
 class ContinuousMotionPhase {
  constructor(engine){this.engine=engine;this.originalAdvance=engine.motion.advance.bind(engine.motion);this.reset(engine.state.motion.phase||0);engine.motion.advance=(state,dt)=>this.advance(state,dt);}
- reset(phase=0){this.phase=Number.isFinite(phase)?phase:0;this.velocity=0;this.target=null;this.error=0;this.initialized=false;this.lastSide=null;this.phaseOffset=0;this.wasActive=false;this.needsCalibration=true;this.contactCorrections=0;this.maximumStep=0;}
+ snapshot(){const {engine,originalAdvance,...state}=this;return structuredClone(state);}
+ restore(state){Object.assign(this,structuredClone(state));}
+ reset(phase=0){this.phase=Number.isFinite(phase)?phase:0;this.velocity=0;this.target=null;this.error=0;this.initialized=false;this.lastSide=null;this.phaseOffset=0;this.wasActive=false;this.needsCalibration=true;this.contactCorrections=0;this.maximumStep=0;
+  this.sourceFrame=null;this.timeScale=1;this.turnTargetYaw=null;this.drive=0;this.driveVelocity=0;this.headLead=0;this.headLeadVelocity=0;this.chestLead=0;this.chestLeadVelocity=0;}
+ response(key,target,dt,frequency){
+  // Exact critically damped response: retain velocity through starts/stops
+  // without a free-running oscillator or a reset at every foot exchange.
+  const velocity=key+'Velocity',offset=this[key]-target,c=this[velocity]+frequency*offset,e=Math.exp(-frequency*dt);
+  this[key]=target+(offset+c*dt)*e;this[velocity]=(this[velocity]-frequency*c*dt)*e;
+ }
+ coordinateBody(state,dt){
+  const command=state.command,delta=command?.type==='walk'?sub(command.target,state.root):null;
+  const heading=delta?Math.atan2(delta[0],delta[2]):command?.type==='turn'?this.turnTargetYaw:null;
+  const error=Number.isFinite(heading)?angleDiff(heading,state.yaw):0;
+  // Engineering adaptation of a captured walk, not a measured dynamics model.
+  // Translation drives the walk amplitude; placement steps during a turn
+  // must not trigger a full-speed arm cycle. Use actual world speed at slow tempo.
+  const physicalSpeed=state.speed*this.timeScale;
+  this.response('drive',clamp(physicalSpeed/.75,0,.85),dt/Math.max(.05,this.timeScale),8);
+  this.response('headLead',clamp(error*.55,-.55,.55),dt/Math.max(.05,this.timeScale),14);
+  this.response('chestLead',clamp(error*.20,-.18,.18),dt/Math.max(.05,this.timeScale),7);
+  const out=MotionLab.blend(this.engine.motion.neutral,this.sourceFrame,this.drive);
+  out.thoraxQ=qm(qy(this.chestLead),out.thoraxQ);
+  out.cervicalQ=qm(qy((this.headLead-this.chestLead)*.7),out.cervicalQ);
+  out.headQ=qm(qy((this.headLead-this.chestLead)*.3),out.headQ);
+  // Captured limb directions are world-relative: explicitly carry the arms
+  // with the chest, since rotating the spine alone only moves their origins.
+  for(const side of ['left','right'])for(const part of ['UpperArm','Forearm'])out[side+part]=rotate(qy(this.chestLead),out[side+part]);
+  state.motion.frame=out;
+ }
  advance(state,dt){
   const swing=state.swing,active=state.speed>.02||!!swing;let desiredVelocity=0;
   if(active&&!this.wasActive)this.needsCalibration=true;
   if(swing){
    const progress=clamp(swing.elapsed/Math.max(1e-8,swing.duration),0,1),raw=this.engine.motion.peaks[swing.side]+(progress-.5)*.42;
    desiredVelocity=.42/Math.max(.12,swing.duration);
-   // Each new support exchange calibrates the recorded phase to the already
-   // continuous runtime phase. It never teleports the upper body to the
-   // recording's absolute cycle coordinate.
-   if(this.needsCalibration||!this.initialized||swing.side!==this.lastSide){this.phaseOffset=this.phase-raw;this.lastSide=swing.side;this.contactCorrections++;this.initialized=true;this.needsCalibration=false;}
-   this.target=raw+this.phaseOffset;this.error=clamp(this.target-this.phase,-.05,.07);
+   // Match the same source foot in the nearest cycle. A fractional offset
+   // on every exchange erased the left/right phase relationship entirely.
+   // Acquisition stays continuous; only the target changes, never the phase.
+   if(this.needsCalibration||!this.initialized||swing.side!==this.lastSide){this.phaseOffset=Math.round(this.phase-raw);this.lastSide=swing.side;this.contactCorrections++;this.initialized=true;this.needsCalibration=false;}
+   this.target=raw+this.phaseOffset;this.error=clamp(this.target-this.phase,-.20,.20);
   }else{
    this.target=null;this.error=0;desiredVelocity=active?clamp(this.velocity||.8,.45,1.35):0;
   }
-  const maximumAcceleration=active?5.5:4.0;
+  // Correct phase by changing its rate, not by subtracting this frame's
+  // displacement. A negative contact error used to cancel the entire advance
+  // and freeze the shoulders while the legs kept moving.
+  if(this.target!=null)desiredVelocity+=clamp(this.error*6,-desiredVelocity*.65,desiredVelocity*.65);
+  const maximumAcceleration=active?(desiredVelocity<this.velocity?12:5.5):4.0;
   this.velocity+=clamp(desiredVelocity-this.velocity,-maximumAcceleration*dt,maximumAcceleration*dt);
-  const correction=this.target==null?0:this.error*(1-Math.exp(-dt/.10));
-  const previous=this.phase;this.phase=Math.max(previous,previous+Math.max(0,this.velocity)*dt+correction);
+  const previous=this.phase;this.phase+=Math.max(0,this.velocity)*dt;
   this.maximumStep=Math.max(this.maximumStep,this.phase-previous);
   // FullBodyMotion remains the source sampler. Hide the discrete swing event
   // only while it samples, then restore the scheduler-owned contact state.
   const actualSwing=state.swing,actualSpeed=state.speed;state.motion.phase=this.phase;state.swing=null;
-  if(actualSwing&&state.speed<=.02)state.speed=.020001;
+  const headingError=state.command?.type==='turn'&&Number.isFinite(this.turnTargetYaw)?angleDiff(this.turnTargetYaw,state.yaw):0;
+  if((actualSwing||Math.abs(headingError)>.015)&&state.speed<=.02)state.speed=.020001;
+  state.motion.frame=this.sourceFrame;
   this.originalAdvance(state,dt);
+  this.sourceFrame=state.motion.frame;
   state.swing=actualSwing;state.speed=actualSpeed;state.motion.phase=this.phase;this.wasActive=active;
+  this.coordinateBody(state,dt);
  }
- report(){return{phaseUnwrapped:this.phase,phase:this.phase-Math.floor(this.phase),phaseVelocityCyclesPerS:this.velocity,contactTarget:this.target,phaseError:this.error,phaseOffset:this.phaseOffset,contactCorrections:this.contactCorrections,maximumStep:this.maximumStep,method:'continuous-phase-contact-calibration/v2'};}
+ report(){return{phaseUnwrapped:this.phase,phase:this.phase-Math.floor(this.phase),phaseVelocityCyclesPerS:this.velocity,worldPhaseVelocityCyclesPerS:this.velocity*this.timeScale,contactTarget:this.target,phaseError:this.error,phaseOffset:this.phaseOffset,contactCorrections:this.contactCorrections,maximumStep:this.maximumStep,bodyResponse:{drive:this.drive,headLeadRad:this.headLead,chestLeadRad:this.chestLead},method:'contact-rate-phase/v4'};}
 }
 class TurnCommandFilter {
  constructor(){this.reset(0);}
@@ -228,18 +264,136 @@ class TurnCommandFilter {
  report(){return{targetYaw:this.targetYaw,commandYaw:this.commandYaw,velocityRadS:this.velocity,accelerationRadS2:this.acceleration,supportMarginRad:this.supportMarginRad,placementRetargets:this.placementRetargets,method:'support-aware-angular-increment/v2'};}
 }
 class NaturalLocomotion {
- constructor(agent){
-  this.a=agent;const source=agent.h.resolvedRig;this.rig=MotionLab.rigFromSource(source);
+ constructor(agent,{flatSupport=false}={}){
+  this.flatSupport=flatSupport;this.a=agent;const source=agent.h.resolvedRig;this.rig=MotionLab.rigFromSource(source);
   // Source left/right ankle heights differ slightly. Use the higher ankle
   // plane so both individually resolved skin soles clear the flat floor.
   this.skinFloorOffsetM=Math.max(...['left','right'].map(s=>source.nodes[s+'_foot'].positionM[1]-source.sourceFloorM))-this.rig.ankleHeight;
   this.rig.ankleHeight+=this.skinFloorOffsetM;this.rig.hipHeight=agent.h.bodyMetrics.walkingHipHeightM;
   this.standingHipHeightM=agent.h.bodyMetrics.standingHipHeightM;
   this.engine=new MotionLab.MotionController(this.rig);
+  // Keep the navigation anchor contract. Forward placement anticipates both
+  // the swing travel and a short leading stance, rather than landing under
+  // the already advancing pelvis. The kernel still sweeps every target.
+  const stance=this.engine.stance.bind(this.engine);
+  this.engine.stance=(state,side,lead=0)=>stance(state,side,lead>0&&!this.usesFlatSupport(state)?lead*(.60/.38):lead);
+  this.solePivots=Object.fromEntries(['left','right'].map(side=>{
+   const ankle=source.nodes[side+'_foot'].positionM,scale=agent.h.bodyMetrics.statureScale;
+   const toe=Math.max(...Object.entries(source.nodes).filter(([id])=>id.startsWith(side+'_toe_')).map(([,n])=>n.positionM[2]-ankle[2]));
+   return[side,{heel:[0,-this.rig.ankleHeight+.0005,-.045*scale],forefoot:[0,-this.rig.ankleHeight+.0005,toe+.006*scale]}];
+  }));
+  const stepFeet=this.engine.stepFeet.bind(this.engine);
+  this.engine.stepFeet=(state,dt)=>{
+   const lowPush=agent.skill?.type==='push'&&agent.phase==='pushTravel';
+   const freeWalk=(lowPush||!this.usesFlatSupport(state))&&state.speed>.03&&!Object.values(state.feet).some(foot=>foot.adoptedOrientation);
+   if(freeWalk&&!state.swing)this.beginWalkingStep(state);
+   // The kernel's absolute stance-distance score also selects a newly landed
+   // leading foot. Free gait releases a trailing foot; the kernel still owns
+   // interpolation, contact commit and all other support modes.
+   if(state.swing||!freeWalk)stepFeet(state,dt);
+   this.adaptSwingClearance(state);if(this.usesFlatSupport(state))this.adaptSwingAnkle(state);this.adaptFootRocker(state,dt);
+  };
   this.world=new MotionLabWorld(agent);this.engine.world=this.world;
   this.phaseController=new ContinuousMotionPhase(this.engine);this.turnFilter=new TurnCommandFilter();
   this.pose=new MotionLabPose(agent.h,this.engine);agent.h.motionDriver=this.pose;
   this.resetFromPose();
+ }
+ beginWalkingStep(state){
+  // Change stride length AND cadence at reduced world speed. Scaling the
+  // entire kernel clock alone produced normal-length steps in slow motion.
+  // Keep each swing's duration/target fixed once released.
+  const strideScale=Math.sqrt(clamp(this.tempo,.05,1)),duration=.36*strideScale;
+  const releaseDistance=(state.metrics.steps===state.walkingStartStep?.075:.095)*strideScale;
+  const candidates=['left','right'].map(side=>{
+   const foot=state.feet[side],relative=rotate(inv(qy(state.yaw)),sub(foot.position,this.engine.stance(state,side)));
+   return{side,behind:-relative[2],turn:Math.abs(angleDiff(state.yaw,foot.yaw))};
+  }).filter(c=>c.behind>releaseDistance||c.turn>.10);
+  candidates.sort((a,b)=>(a.side===state.nextFoot?-1:1)-(b.side===state.nextFoot?-1:1)||b.behind-a.behind);
+  if(!candidates.length)return;
+  const side=candidates[0].side,foot=state.feet[side],command=state.command;
+  const heading=command?.type==='walk'?Math.atan2(command.target[0]-state.root[0],command.target[2]-state.root[2]):state.yaw;
+  // Land into the curve, with a bounded preview of the requested heading.
+  // Only the free foot changes orientation; planted feet keep their anchors.
+  let placementYaw=state.yaw+clamp(angleDiff(heading,state.yaw),-.24,.24);
+  let target=this.engine.stance({...state,yaw:placementYaw},side,state.speed*.38*strideScale);
+  let path=this.engine.world.sweep(foot.position,target,.045);
+  if((path.blocked||!this.engine.world.free(target,.045))&&placementYaw!==state.yaw){
+   placementYaw=state.yaw;target=this.engine.stance(state,side,state.speed*.38*strideScale);
+   path=this.engine.world.sweep(foot.position,target,.045);
+  }
+  if(path.blocked||!this.engine.world.free(target,.045))throw Error('落脚路径受阻，需重新规划');
+  state.swing={side,from:[...foot.position],target,fromYaw:foot.yaw,yaw:placementYaw,elapsed:0,duration,walkingStrideScale:strideScale};
+  foot.contact=false;
+ }
+ adaptSwingClearance(state){
+  const swing=state.swing;if(!swing||state.feet[swing.side].adoptedOrientation)return;
+  // The pinned flat-ground scheduler uses 65 mm even for a tiny placement
+  // step. Keep its endpoints/contact timing, but give short turns and final
+  // gathering steps a lower, distance-dependent clearance. An adopted tilted
+  // sole keeps the original clearance until its first swing has released it.
+  const distance=horizontal(swing.from,swing.target),height=clamp(.018+distance*.10,.018,.055);
+  const u=clamp(swing.elapsed/swing.duration,0,1),arc=16*u*u*(1-u)*(1-u);
+  state.feet[swing.side].position[1]+=(height-.065)*arc;swing.clearanceHeightM=height;
+ }
+ usesFlatSupport(state=this.engine?.state){return state?.flatFootSupport??(this.flatSupport||!!this.a.held);}
+ adaptSwingAnkle(state){
+  // Only the airborne foot changes pitch. A planted sole still owns its full
+  // world anchor; heel/toe rockers require separate support pivots.
+  for(const side of ['left','right']){
+   const foot=state.feet[side],swing=state.swing;
+   foot.swingPitch=0;
+   if(foot.contact||foot.adoptedOrientation||swing?.side!==side)continue;
+   const u=clamp(swing.elapsed/swing.duration,0,1),distance=horizontal(swing.from,swing.target);
+   const drive=clamp(state.speed*this.tempo/.35,0,1)*clamp(distance/.18,0,1);
+   // Smooth lobes have zero angle and angular velocity at release,
+   // toe-clearance crossover and landing. Not a stance push-off model.
+   const pitch=drive*(u<.4?.18*Math.sin(Math.PI*u/.4)**2:-.12*Math.sin(Math.PI*(u-.4)/.6)**2);
+   const clearance=Math.max(0,foot.position[1]-this.rig.ankleHeight);
+   // Conservative authored foot envelope: bound pitch by the available
+   // clearance as its ankle approaches either endpoint of the swing.
+   const extent=.30*this.a.h.bodyMetrics.statureScale;
+   foot.swingPitch=clamp(pitch,-Math.atan2(clearance*.8,extent),Math.atan2(clearance*.8,extent));
+  }
+ }
+ adaptFootRocker(state,dt){
+  const speed=state.speed*this.tempo,drive=clamp(speed/.35,0,1);
+  for(const side of ['left','right']){
+   const foot=state.feet[side],swing=state.swing;
+   if(foot.adoptedOrientation||this.usesFlatSupport()){delete foot.rocker;continue;}
+   let pitch=foot.rocker?.pitch||0;
+   if(swing?.side===side){
+    if(swing.rockerFrom===undefined){swing.rockerFrom=pitch;swing.rockerLanding=-.10*drive;}
+    const u=clamp(swing.elapsed/swing.duration,0,1);
+    pitch=u<.5?swing.rockerFrom*(1-smooth(u/.5)):swing.rockerLanding*smooth((u-.5)/.5);
+   }else{
+    const relative=rotate(inv(qy(foot.yaw)),sub(foot.position,state.root));
+    // Leading heel yields to the sole as the pelvis approaches; the trailing
+    // forefoot carries a small heel lift before the next explicit release.
+    let target=drive*(relative[2]>.025?-.10*smooth(clamp((relative[2]-.025)/.08,0,1)):
+     .18*smooth(clamp((-relative[2]-.025)/.06,0,1)));
+    // Start on a flat support, then allow its heel to release in the latter
+    // half of the first swing. Locking it until landing forces a deep bend
+    // in the new support leg because the trailing ankle cannot rise.
+    if(state.metrics.steps===(state.rockerStepOrigin||0)&&side!==state.nextFoot&&(!swing||swing.elapsed/swing.duration<.45))target=0;
+    pitch+=clamp(target-pitch,-1.2*dt,1.2*dt);
+   }
+   if(Math.abs(pitch)<1e-8)pitch=0;
+   const kind=pitch<0?'heel':pitch>0?'forefoot':'sole';
+   const pivot=pitch===0?[0,0,0]:this.solePivots[side][kind],yaw=qy(foot.yaw);
+   const world=add(foot.position,rotate(yaw,pivot));
+   const ankle=sub(world,rotate(qm(yaw,qx(pitch)),pivot));
+   foot.swingPitch=foot.contact?0:pitch;
+   foot.rocker={pitch,kind,pivot:[...pivot],world,ankle};
+  }
+ }
+ // Agent's pose transaction must include the filters outside the pinned
+ // kernel. Keep the live engine/callback identities and clone only state.
+ snapshotExecution(){return structuredClone({requestKey:this.requestKey,requested:this.requested,tempo:this.tempo,traffic:this.traffic,
+  phase:this.phaseController.snapshot(),turn:this.turnFilter,lastTurnContinuity:this.lastTurnContinuity,
+  lastPoseAdoption:this.lastPoseAdoption,lastContinuousWalkHandoff:this.lastContinuousWalkHandoff,routePassThroughCount:this.routePassThroughCount});}
+ restoreExecution(saved){
+  const {phase,turn,...state}=structuredClone(saved);Object.assign(this,state);
+  this.phaseController.restore(phase);Object.assign(this.turnFilter,turn);
  }
  resetFromPose({preservePoseContacts=false}={}){
   if(this.traffic?.slotKey)trafficReleaseTargetSlot(this);if(this.traffic?.corridorKey)trafficReleaseCorridor(this);
@@ -250,10 +404,31 @@ class NaturalLocomotion {
   const root=leftHip&&rightHip?mix(leftHip,rightHip,.5):[a.pos[0],this.standingHipHeightM,a.pos[2]];
   const world=e.world;e.world=new MotionLab.FlatWorld();e.reset();e.world=world;
   e.state.root=[...root];e.state.yaw=yaw;e.state.time=a.time;
+  e.state.flatFootSupport=this.flatSupport||!!a.held;
   let maximumAdoptedFootResidualM=0;
   for(const side of ['left','right']){
-   const foot=preservePoseContacts&&currentFoot(side),previousYaw=a.feet?.[side]?.yaw;
-   e.state.feet[side]={position:foot?[...foot]:e.stance(e.state,side),yaw:Number.isFinite(previousYaw)?previousYaw:yaw,contact:true};
+   const foot=preservePoseContacts&&currentFoot(side),orientation=foot&&(h.byId?.get(side+'_foot')?.world?.q||h.legs?.[side]?.wrist?.world?.q);
+   const forward=orientation&&rotate(qm(orientation,inv(h.sourceBind.get(side+'_foot').q)),[0,0,1]);
+   const footYaw=forward&&Math.hypot(forward[0],forward[2])>1e-8?Math.atan2(forward[0],forward[2]):yaw;
+   e.state.feet[side]={position:foot?[...foot]:e.stance(e.state,side),yaw:footYaw,contact:true};
+   if(orientation)e.state.feet[side].adoptedOrientation=[...orientation];
+  }
+  // The captured pelvis can tilt, so a fully extended planted leg may be
+  // reachable from its actual hip but not from the kernel's level hip bar.
+  // Fit only the detached handoff target; Basic blends from the unchanged
+  // committed skeleton, keeping both existing foot positions/orientations.
+  let adoptedRootLoweringM=0;
+  if(leftHip&&rightHip){
+   let ceiling=e.state.root[1];
+   for(const side of ['left','right']){
+    const hip=add(e.state.root,rotate(qy(yaw),[side==='left'?-this.rig.hipHalf:this.rig.hipHalf,0,0])),foot=e.state.feet[side].position;
+    const {upper,lower}=this.rig.legs[side],reach=upper+lower-.0005*h.bodyMetrics.statureScale,horizontal2=(hip[0]-foot[0])**2+(hip[2]-foot[2])**2;
+    if(horizontal2>reach*reach)throw Error('当前姿势的脚位超出行走接管的水平可达范围');
+    ceiling=Math.min(ceiling,foot[1]+Math.sqrt(reach*reach-horizontal2));
+   }
+   adoptedRootLoweringM=e.state.root[1]-ceiling;
+   if(adoptedRootLoweringM>.04*h.bodyMetrics.statureScale)throw Error('当前姿势需要过大的行走接管高度调整');
+   e.state.root[1]=ceiling;
   }
   e.state.pose=e.solve(e.state);
   for(const side of ['left','right']){
@@ -261,7 +436,7 @@ class NaturalLocomotion {
    maximumAdoptedFootResidualM=Math.max(maximumAdoptedFootResidualM,residual);
    if(residual>.012||leg.lengthError>1e-7)throw Error('当前姿势的脚位无法安全交给行走控制器');
   }
-  this.lastPoseAdoption={preserved:!!(leftHip&&rightHip),maximumAdoptedFootResidualM,
+  this.lastPoseAdoption={preserved:!!(leftHip&&rightHip),maximumAdoptedFootResidualM,adoptedRootLoweringM,
    root:[...e.state.root],feet:Object.fromEntries(['left','right'].map(side=>[side,[...e.state.feet[side].position]]))};
   this.phaseController.reset(e.state.motion.phase||0);this.turnFilter.reset(yaw);
   this.requestKey=null;this.requested=false;this.tempo=1;this.routePassThroughCount=this.routePassThroughCount||0;
@@ -276,6 +451,9 @@ class NaturalLocomotion {
   this.sample={motionLab:true,sourceClip:'08_01'};
  }
  request(command){
+  // Support mode changes at a settled action boundary, never by flattening
+  // a rolling sole midway through a step when the held-object state changes.
+  if(this.isSettled()){this.engine.state.flatFootSupport=this.flatSupport||!!this.a.held;this.engine.state.rockerStepOrigin=this.engine.state.metrics.steps;}
   this.requested=true;const key=JSON.stringify(command);
   if(this.requestKey===key&&this.engine.state.command)return;
   const answer=this.engine.command(command);if(!answer.accepted)throw Error(answer.reason);this.requestKey=key;
@@ -515,6 +693,9 @@ class NaturalLocomotion {
  }
  move(dt,speed=.48){
   const a=this.a,state=this.engine.state,pace=a.manipulationPace();this.turnFilter.reset(state.yaw);
+  // Release the first foot before the pelvis has travelled a full steady
+  // trailing distance. Otherwise its first landing absorbs a deep crouch.
+  if(this.kernelSettled())state.walkingStartStep=state.metrics.steps;
   if(a.held&&pace<.08){this.tempo=1;this.stop();return a.routeIndex<a.route.length||!this.isSettled();}
   this.tempo=clamp(speed/.48*(a.strength?.movementFactor()??1)*pace,.05,1);
   if(this.canContinuousTaskHandoff()){if(!a.pendingPhysicsFinish)a.finish();return true;}
@@ -547,10 +728,24 @@ class NaturalLocomotion {
   }
   return target;
  }
- isSettled(){return this.kernelSettled()&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
+ isSettled(){return this.kernelSettled()&&!(this.engine.state.pelvisSupportLiftM>0)&&!this.engine.state.pelvisSupportXM&&Object.values(this.engine.state.feet).every(foot=>!foot.rocker?.pitch)&&Math.abs(this.engine.state.root[1]-this.standingTarget())<.0003*this.a.h.bodyMetrics.statureScale;}
+ gaitSupportTarget(){
+  // Approximate the support-leg vault from this person's lengths and foot
+  // separation. The mild bend is an authored IK reserve, not a clinical norm.
+  // Keep the all-leg reach ceiling as well, including the airborne leg.
+  const s=this.engine.state;let target=this.standingTarget();
+  for(const side of ['left','right']){
+   const foot=s.feet[side];if(!foot.contact)continue;
+   const hip=add(s.root,rotate(qy(s.yaw),[this.rig.hipHalf*(side==='left'?-1:1),0,0]));
+   const {upper,lower}=this.rig.legs[side],knee=12*Math.PI/180;
+   const reach2=upper*upper+lower*lower+2*upper*lower*Math.cos(knee),d=horizontal(hip,foot.position);
+   target=Math.min(target,foot.position[1]+Math.sqrt(Math.max(0,reach2-d*d)));
+  }
+  return target;
+ }
  updateHeight(dt,standing){
   const e=this.engine;if(e.state.paused||e.state.fault)return;
-  const target=standing?this.standingTarget():Math.min(this.rig.hipHeight,this.standingTarget()),before=e.state;
+  const target=standing?this.standingTarget():this.gaitSupportTarget(),before=e.state;
   const y=Math.min(this.standingTarget(),before.root[1]+(target-before.root[1])*(1-Math.exp(-dt/.18)));
   if(Math.abs(y-before.root[1])<1e-10)return;
   const candidate={...before,root:[before.root[0],y,before.root[2]]};candidate.pose=e.solve(candidate);
@@ -559,6 +754,40 @@ class NaturalLocomotion {
    if(leg.residual>.012||leg.lengthError>1e-7)throw Error('站立高度过渡超出固定脚锚可达范围');
   }
   e.state=candidate;
+ }
+ updateSupportLift(dt){
+  const s=this.engine.state,scale=this.a.h.bodyMetrics.statureScale;
+  if(s.paused||s.fault)return;
+  // The navigation kernel retains its flat-placement IK. The committed body
+  // follows the actual rolling ankles; otherwise heel rise becomes knee bend.
+  let ceiling=Infinity,target=this.standingHipHeightM+.035*scale;
+  const freeSupport=!this.usesFlatSupport(s)&&!Object.values(s.feet).some(f=>f.adoptedOrientation);
+  const active=freeSupport&&Object.values(s.feet).some(f=>f.rocker?.pitch);
+  // A small contact-driven transfer towards the stance foot, fading at both
+  // ends of the swing. Route/root XZ remain the navigation reference.
+  let transfer=0;
+  if(freeSupport&&s.swing&&s.speed>.03){
+   const support=s.feet[s.swing.side==='left'?'right':'left'];
+   const u=clamp(s.swing.elapsed/s.swing.duration,0,1),envelope=16*u*u*(1-u)*(1-u);
+   const local=rotate(inv(qy(s.yaw)),sub(support.rocker?.world||support.position,s.root));
+   transfer=clamp(local[0]*.20,-.018*scale,.018*scale)*envelope*clamp(s.speed*this.tempo/.35,0,1);
+  }
+  const previousX=s.pelvisSupportXM||0;
+  s.pelvisSupportXM=previousX+clamp((transfer-previousX)*(1-Math.exp(-dt/.06)),-.08*scale*dt,.08*scale*dt);
+  if(Math.abs(s.pelvisSupportXM)<1e-7)s.pelvisSupportXM=0;
+  const bodyRoot=add(s.root,rotate(qy(s.yaw),[s.pelvisSupportXM,0,0]));
+  for(const side of ['left','right']){
+   const foot=s.feet[side],ankle=foot.rocker?.ankle||foot.position;
+   const hip=add(bodyRoot,rotate(qy(s.yaw),[this.rig.hipHalf*(side==='left'?-1:1),0,0]));
+   const {upper,lower}=this.rig.legs[side],d=horizontal(hip,ankle),reach=upper+lower-.0005*scale;
+   ceiling=Math.min(ceiling,ankle[1]+Math.sqrt(Math.max(0,reach*reach-d*d)));
+   if(foot.contact){const knee=12*Math.PI/180,r2=upper*upper+lower*lower+2*upper*lower*Math.cos(knee);
+    target=Math.min(target,ankle[1]+Math.sqrt(Math.max(0,r2-d*d)));}
+  }
+  const desired=active?clamp(Math.min(target,ceiling)-s.root[1],0,.035*scale):0;
+  const previous=s.pelvisSupportLiftM||0,step=(desired-previous)*(1-Math.exp(-dt/.08));
+  s.pelvisSupportLiftM=Math.min(Math.max(0,ceiling-s.root[1]),Math.max(0,previous+clamp(step,-.15*scale*dt,.15*scale*dt)));
+  if(s.pelvisSupportLiftM<1e-7)s.pelvisSupportLiftM=0;
  }
  canTransition(){return this.isSettled();}
  update(dt){
@@ -569,20 +798,32 @@ class NaturalLocomotion {
   if(!this.requested&&e.state.command?.type==='walk')this.stop();
   this.requested=false;
   if(!this.kernelSettled())this.updateHeight(dt*this.tempo,false);
+  const previousSwingSide=e.state.swing?.side;
+  this.phaseController.timeScale=this.tempo;this.phaseController.turnTargetYaw=this.turnFilter.targetYaw;
   e.update(dt*this.tempo);this.turnFilter.retargetSwing(e);
+  // An adopted sole keeps its world orientation while planted. Its first
+  // real swing releases pitch/roll and aligns yaw, rather than twisting the
+  // support footprint during the return-to-standing blend.
+  for(const side of ['left','right'])if(e.state.feet[side].adoptedOrientation&&e.state.feet[side].contact&&e.state.swing?.side!==side){
+   if(previousSwingSide===side)delete e.state.feet[side].adoptedOrientation;
+  }
   if(e.state.fault&&!this.recoverNavigationBlock(e.state.fault))throw Error(e.state.fault);
   if(e.state.status==='blocked'&&!this.recoverNavigationBlock('连续碰撞检测发现路线受阻'))throw Error('连续碰撞检测发现路线受阻，局部绕行与重新规划均未找到可用净空');
   // The scheduler may have advanced an independent foot target. Apply its
   // exact reach ceiling once more; do not leave even a small clamped-IK foot
   // hovering above that anchor while the height response catches up.
   this.updateHeight(this.kernelSettled()?dt*this.tempo:0,this.kernelSettled());
+  this.updateSupportLift(dt*this.tempo);
   this.sync();
  }
  report(){const s=this.engine.state;return{version:NATURAL_GAIT.version,state:s.status,speedMps:this.speed,timeScale:this.tempo,contacts:{...this.contacts},settled:this.isSettled(),
   source:MotionLab.MOTION_SOURCE,sourcePhase:s.motion.phase,referenceBlend:s.motion.weight,metrics:{...s.metrics},skinFloorOffsetM:this.skinFloorOffsetM,
-  height:{standingTargetM:this.standingHipHeightM,walkingTargetM:this.rig.hipHeight,currentM:s.root[1],reachableStandingM:this.standingTarget(),timeConstantS:.18},
+  height:{standingTargetM:this.standingHipHeightM,walkingTargetM:this.gaitSupportTarget(),legacyWalkingTargetM:this.rig.hipHeight,currentM:s.root[1],reachableStandingM:this.standingTarget(),timeConstantS:.18,
+   supportLiftM:s.pelvisSupportLiftM||0,bodyRootM:s.root[1]+(s.pelvisSupportLiftM||0),supportResponseS:.08,method:'rolling-support-reach/v2'},
+  weightTransfer:{pelvisLocalXM:s.pelvisSupportXM||0,maximumM:.018*this.a.h.bodyMetrics.statureScale,method:'stance-contact-transfer/v1',dynamicBalanceValidated:false},
   traffic:structuredClone(this.traffic),routePassThroughCount:this.routePassThroughCount,poseAdoption:this.lastPoseAdoption?structuredClone(this.lastPoseAdoption):null,
   continuousWalkHandoff:this.lastContinuousWalkHandoff?structuredClone(this.lastContinuousWalkHandoff):null,
   phaseContinuity:this.phaseController.report(),turnContinuity:this.turnFilter.report(),lastTurnContinuity:this.lastTurnContinuity?structuredClone(this.lastTurnContinuity):null,
-  contactBasis:'Motion-Lab explicit foot anchors',pose:this.pose.report(),visualAcceptance:false};}
+  footSupport:{mode:this.usesFlatSupport()?'flat':'heel-sole-forefoot',feet:Object.fromEntries(['left','right'].map(side=>[side,s.feet[side].rocker?structuredClone(s.feet[side].rocker):null]))},
+  contactBasis:'flat placement anchors with explicit heel/forefoot support pivots',pose:this.pose.report(),visualAcceptance:false};}
 }

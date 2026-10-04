@@ -36,7 +36,7 @@ class MotionLabPose {
   this.validate(this.build({reference:this.engine.motion.neutral,controlledFeet:true}));
   const projectedNodes=Object.fromEntries(this.rows.filter(([id])=>keep.has(id))),human={...h,resolvedRig:{...h.resolvedRig,nodes:projectedNodes},joints:h.joints.filter(j=>keep.has(j.id))};
   const engine=Object.create(this.engine);engine.motion=new MotionLab.FullBodyMotion(projectedNodes);
-  const pose=new MotionLabPose(human,engine);pose.preflightOnly=true;
+  const pose=new MotionLabPose(human,engine);pose.preflightOnly=true;pose.sourceHuman=this.sourceHuman||h;
   pose.rigidBranchProof={fullJoints:this.rows.length,checkedJoints:keep.size,rigidEdges:this.rows.length-keep.size,method:'unchanneled-rigid-descendants/v1'};
   return pose;
  }
@@ -55,12 +55,254 @@ class MotionLabPose {
   const world=qm(qy(yaw),rotation);
   return qnorm(qm(inv(qy(yaw)),qm(fromTo(rotate(world,sourceAxis),targetAxis),world)));
  }
+ solveControlledState(state,data){
+  if(!state.articulatedPelvis)return this.engine.solve(state);
+  // A recorded pelvis is a rigid body, not a horizontal bar. Rotate the real
+  // source hip offsets first, then solve each fixed-length leg to its contact.
+  // Keep the navigation proxy separate from the complete committed skeleton.
+  const world=qm(qy(state.yaw),data.rootQ),offsets={},legs={};let ceiling=Infinity;
+  for(const side of ['left','right']){
+   const offset=rotate(world,sub(this.source(side+'_femur'),this.source('hips')));offsets[side]=offset;
+   const hip=add(state.root,offset),foot=state.feet[side].position,{upper,lower}=this.engine.rig.legs[side];
+   const horizontal2=(hip[0]-foot[0])**2+(hip[2]-foot[2])**2,reach=upper+lower-.0005*this.h.bodyMetrics.statureScale;
+   ceiling=Math.min(ceiling,foot[1]+Math.sqrt(Math.max(0,reach*reach-horizontal2))-offset[1]);
+  }
+  state.root[1]=Math.min(state.root[1],ceiling);
+  for(const side of ['left','right']){
+   const hip=add(state.root,offsets[side]),pole=add(hip,rotate(world,[0,-.2,1])),{upper,lower}=this.engine.rig.legs[side];
+   legs[side]=MotionLab.solveTwoBone(hip,state.feet[side].position,pole,upper,lower);
+  }
+  return{root:[...state.root],yaw:state.yaw,legs};
+ }
  radialRotation(side,positions,palm){
   // Radius/ulna twist at the elbow. Wrist flexion belongs to the hand pivot:
   // using palm directly here rotates the distal forearm away from the wrist.
   const rest=norm(sub(this.source(side+'_hand'),this.source(side+'_forearm')));
   const direction=norm(sub(positions.get(side+'_hand'),positions.get(side+'_forearm')));
   return qm(fromTo(rotate(palm,rest),direction),palm);
+ }
+ freeHandRotation(side,forearm,inward){
+  // A free wrist is not a continuation of a rigid forearm. Use a small
+  // extension bias and a bounded gravity-dependent deviation. This is a
+  // quasi-static retargeting rule, not measured wrist motion or a force solve.
+  const medial=norm(sub(inward,mul(forearm,dot(inward,forearm))));
+  const gravity=sub(DOWN,mul(forearm,dot(DOWN,forearm)));
+  const handDirection=norm(add(sub(forearm,mul(medial,.14)),mul(gravity,.18)));
+  return MotionLab.relaxedHandRotation(this.h.resolvedRig.nodes,side,handDirection,inward);
+ }
+ relaxedHandRecipe(side,flat=false){
+  const key=side+(flat?'-floor':'');
+  this.relaxedHandRecipes??=new Map();if(this.relaxedHandRecipes.has(key))return this.relaxedHandRecipes.get(key);
+  const h=this.h,p=id=>this.source(side+'_'+id),long=norm(sub(p('finger_3_1'),p('hand')));
+  const across=norm(sub(p('finger_2_1'),p('finger_5_1'))),palm=mul(norm(cross(long,across)),side==='left'?-1:1),rows=[];
+  // Curl the four long digits softly, with more flexion at PIP than DIP.
+  // Metacarpal origins, thumb opposition and all source bone lengths stay.
+  for(let digit=2;digit<=5;digit++){
+   let parentTarget=h.sourceBind.get(side+'_metacarpal_'+digit).q;
+   const curls=[.20+(digit-2)*.025,.55+(digit-2)*.035,.72+(digit-2)*.035];
+   for(let joint=1;joint<=3;joint++){
+    const id=side+'_finger_'+digit+'_'+joint,n=h.resolvedRig.nodes[id],bind=h.sourceBind.get(id),parent=h.sourceBind.get(n.parent);
+    const next=joint===3?n.tipM:this.source(side+'_finger_'+digit+'_'+(joint+1)),rest=sub(next,n.positionM);
+    const splay=dot(norm(rest),across)*.45,target=norm(add(add(long,mul(across,splay)),mul(palm,flat?0:Math.tan(curls[joint-1]))));
+    const absolute=qm(fromTo(rest,target),bind.q);
+    rows.push({id,parent:n.parent,offset:rotate(inv(parent.q),sub(bind.p,parent.p)),restQ:qm(inv(parent.q),bind.q),relaxedQ:qm(inv(parentTarget),absolute)});
+    parentTarget=absolute;
+   }
+  }
+  if(flat){
+   // A support palm also opens the thumb out of opposition. Leaving its
+   // original curl made the thumb tip prop the entire palm above the floor.
+   const ids=['metacarpal_1','finger_1_1','finger_1_2'].map(id=>side+'_'+id);let parentTarget=h.sourceBind.get(side+'_hand').q;
+   for(let i=0;i<ids.length;i++){
+    const id=ids[i],n=h.resolvedRig.nodes[id],bind=h.sourceBind.get(id),parent=h.sourceBind.get(n.parent);
+    const rest=sub(i===ids.length-1?n.tipM:this.source(ids[i+1]),n.positionM),target=sub(rest,mul(palm,dot(rest,palm)));
+    const absolute=qm(fromTo(rest,target),bind.q);
+    rows.push({id,parent:n.parent,offset:rotate(inv(parent.q),sub(bind.p,parent.p)),restQ:qm(inv(parent.q),bind.q),relaxedQ:qm(inv(parentTarget),absolute)});parentTarget=absolute;
+   }
+  }
+  this.relaxedHandRecipes.set(key,rows);return rows;
+ }
+ captureHandRelaxation(side){
+  // Infer from committed local articulation, including transition blends;
+  // no independent timer/state can drift away from the actual fingers.
+  const row=this.relaxedHandRecipe(side).find(r=>r.id===side+'_finger_3_2');
+  const current=this.h.byId.get(row.id)?.world,parent=this.h.byId.get(row.parent)?.world;
+  if(!current||!parent)return 0;
+  return clamp(qangle(row.restQ,qm(inv(parent.q),current.q))/Math.max(1e-8,qangle(row.restQ,row.relaxedQ)),0,1);
+ }
+ relaxHand(frames,side,amount){
+  if(amount<=0)return;
+  for(const row of this.relaxedHandRecipe(side))frames.set(row.id,compose(frames.get(row.parent),frame(row.offset,qslerp(row.restQ,row.relaxedQ,amount))));
+ }
+ floorHandIds(side){
+  this.floorHandSets??=new Map();
+  if(!this.floorHandSets.has(side))this.floorHandSets.set(side,new Set([side+'_hand',...this.descendantRows.get(side+'_hand').map(([id])=>id)]));
+  return this.floorHandSets.get(side);
+ }
+ placeFloorHand(frames,side,hand,amount){
+  const id=side+'_hand',oldHand=frames.get(id),transform=compose(hand,inverse(oldHand));frames.set(id,hand);
+  for(const [child]of this.descendantRows.get(id))frames.set(child,compose(transform,frames.get(child)));
+  const original=new Map(frames);
+  for(const row of this.relaxedHandRecipe(side,true)){
+   const from=compose(inverse(original.get(row.parent)),original.get(row.id));
+   frames.set(row.id,compose(frames.get(row.parent),frame(row.offset,qslerp(from.q,row.relaxedQ,amount))));
+  }
+ }
+ solveFloorPalm(candidate,side,goal,amount){
+  const frames=candidate.frames,h=this.h,id=side+'_hand',arm=h.arms[side];
+  const target=sub(goal.p,rotate(goal.q,h.bodyMetrics.palmContact));
+  const upper=side+'_upperArm',elbow=side+'_forearm',radial=side+'_radiusRotation';
+  const reach=arm.L1+arm.L2-.0005*h.bodyMetrics.statureScale;
+  const lumbar=this.rows.find(([,n])=>n.region==='L')?.[0];
+  if(lumbar&&dist(frames.get(upper).p,target)>reach){
+   const pivot=frames.get(lumbar).p,u=sub(frames.get(upper).p,pivot),v=sub(target,pivot),r=len(u),d=len(v);
+   const angle=Math.acos(clamp(dot(norm(u),norm(v)),-1,1));
+   const desired=Math.max(0,angle-Math.acos(clamp((r*r+d*d-reach*reach)/(2*r*d),-1,1)));
+   const lean=Math.min(desired,Math.max(0,.45-(candidate.floorTorsoLeanRad||0)));
+   if(lean>1e-8&&angle>1e-8){
+    const q=qslerp(qi(),fromTo(u,v),lean/angle),active=new Set([lumbar]);
+    for(const [joint,n]of this.rows)if(active.has(joint)||active.has(n.parent)){
+     active.add(joint);const f=frames.get(joint);frames.set(joint,frame(add(pivot,rotate(q,sub(f.p,pivot))),qm(q,f.q)));
+    }
+    candidate.floorTorsoLeanRad=(candidate.floorTorsoLeanRad||0)+lean;
+    candidate.floorTorsoDeltaQ=qm(q,candidate.floorTorsoDeltaQ||qi());
+   }
+  }
+  const start=frames.get(upper).p,delta=sub(target,start);
+  // A planted palm cannot stretch an arm. Move the pelvis horizontally only
+  // as far as needed for fixed-length reach, then keep any explicit feet.
+  const horizontal=Math.hypot(delta[0],delta[2]),allowed=Math.sqrt(Math.max(0,reach*reach-delta[1]*delta[1]));
+  const shift=Math.max(0,horizontal-allowed);
+  if(Math.abs(delta[1])>reach||shift+(candidate.floorRootShiftM||0)>.15*h.bodyMetrics.statureScale)throw Error('地面手掌支撑超出身体可达范围：'+JSON.stringify({heightM:Math.abs(delta[1]),reachM:reach,shiftM:shift}));
+  if(shift>1e-9){
+   const offset=[delta[0]*shift/horizontal,0,delta[2]*shift/horizontal],before=new Map(frames);
+   for(const [joint,f]of frames)frames.set(joint,frame(add(f.p,offset),f.q));
+   if(candidate.controlled)this.reprojectControlledLegs(frames,candidate.state,candidate.state.yaw,before,before,1);
+   for(const target of candidate.floorLegTargets||[])this.projectFloorLeg(candidate,target);
+   candidate.floorRootShiftM=(candidate.floorRootShiftM||0)+shift;
+  }
+  const a=frames.get(upper),b=frames.get(elbow),solved=MotionLab.solveTwoBone(a.p,target,b.p,arm.L1,arm.L2);
+  const align=(joint,child,position,q)=>{const local=rotate(inv(h.sourceBind.get(joint).q),sub(this.source(child),this.source(joint)));return qnorm(qm(fromTo(rotate(q,local),position),q));};
+  frames.set(upper,frame(a.p,align(upper,elbow,sub(solved.knee,a.p),a.q)));
+  frames.set(elbow,frame(solved.knee,align(elbow,id,sub(solved.end,solved.knee),b.q)));
+  const positions=new Map([[elbow,solved.knee],[id,solved.end]]),palm=qm(goal.q,inv(h.sourceBind.get(id).q));
+  frames.set(radial,frame(solved.knee,qm(this.radialRotation(side,positions,palm),h.sourceBind.get(radial).q)));
+  // Open the long digits onto the palm plane while the hand approaches.
+  // Local FK keeps the measured phalanx lengths and skinning pivots intact.
+  this.placeFloorHand(frames,side,frame(solved.end,goal.q),amount);
+ }
+ resolveFloorPalm(candidate,options){
+  if(!options.floorSupport||options.hands||options.contactHand)return null;
+  const next=structuredClone(options.floorSupport),requested=clamp(options.floorPalmWeight||0,0,1),side='right';
+  if(requested<=0){delete next[side];return{next,active:false};}
+  const h=this.h,hand=candidate.frames.get(side+'_hand'),palm=add(hand.p,rotate(hand.q,h.bodyMetrics.palmContact));
+  if(!next[side]){
+   const long=sub(candidate.frames.get(side+'_finger_3_1').p,hand.p),horizontal=[long[0],0,long[2]],direction=len(horizontal)>.01?norm(horizontal):rotate(qy(candidate.state.yaw),[0,0,1]);
+   const q=qm(MotionLab.relaxedHandRotation(h.resolvedRig.nodes,side,direction,DOWN),h.sourceBind.get(side+'_hand').q);
+   const anchor={p:[palm[0],0,palm[2]],q,age:0};
+   const probe={...candidate,frames:new Map([...candidate.frames].map(([id,f])=>[id,frame([...f.p],[...f.q])]))};
+   // Isolated geometry query only: do not require the still approaching arm
+   // to reach the eventual plant before its weight has ramped in.
+   this.placeFloorHand(probe.frames,side,frame(sub(anchor.p,rotate(q,h.bodyMetrics.palmContact)),q),1);
+   const surface=h.minimumBoneY(probe.frames,this.floorHandIds(side));
+   if(!Number.isFinite(surface.y))throw Error('缺少地面支撑手的表面采样');
+   anchor.p[1]=.002*h.bodyMetrics.statureScale-surface.y;next[side]=anchor;
+  }
+  const anchor=next[side];anchor.age+=(options.deltaTime||0);
+  const weight=Math.min(requested,smoother(anchor.age/.2));
+  const goal={p:mix(palm,anchor.p,weight),q:qslerp(hand.q,anchor.q,weight)};
+  this.solveFloorPalm(candidate,side,goal,weight);
+  const target={side,goal,weight};candidate.floorPalmTargets=[target];
+  candidate.errors.push({id:side+'_hand',kind:'floor-palm',weight,target:goal.p,targetSpace:'world',effectorLocal:[...h.bodyMetrics.palmContact],targetOrientation:goal.q,error:0,orientationErrorRad:0});
+  const surface=h.minimumBoneY(candidate.frames,this.floorHandIds(side));
+  return{next,revision:'floor-palm/v1',active:true,side,weight,anchor:frame([...anchor.p],[...anchor.q]),surfaceY:surface.y,rootCorrectionM:candidate.floorRootShiftM||0,torsoLeanRad:candidate.floorTorsoLeanRad||0,torsoDeltaQ:candidate.floorTorsoDeltaQ||qi(),measuredForces:false};
+ }
+ floorFootIds(side){
+  this.floorFootSets??=new Map();
+  if(!this.floorFootSets.has(side))this.floorFootSets.set(side,new Set([side+'_foot',...this.descendantRows.get(side+'_foot').map(([id])=>id)]));
+  return this.floorFootSets.get(side);
+ }
+ balanceFloorHead(candidate,options){
+  if(!options.floorHeadBalance||options.lockedFrames)return null;
+  const h=this.h,frames=candidate.frames,head=frames.get('head'),thorax=frames.get('T1');
+  const headDelta=qm(head.q,inv(h.sourceBind.get('head').q)),torsoDelta=qm(thorax.q,inv(h.sourceBind.get('T1').q));
+  const up=rotate(headDelta,[0,1,0]),torsoUp=rotate(torsoDelta,[0,1,0]);
+  // A modest horizon response while upright; fade it out as the trunk lies
+  // down. Keeping a lying head vertical would wrench the neck. This is an
+  // authored balance cue, not a vestibular or medically calibrated model.
+  const weight=.75*smoother((torsoUp[1]-.25)/.55)*clamp(options.floorHeadWeight??options.blendAmount??1,0,1),correction=qslerp(qi(),fromTo(up,[0,1,0]),weight);
+  const original=new Map(frames),neck=this.rows.filter(([,n])=>n.region==='C'),count=neck.length;
+  const active=new Set();let index=0;
+  for(const [id,n]of this.rows){
+   if(n.region!=='C'&&id!=='head'&&!active.has(n.parent))continue;
+   active.add(id);const old=original.get(id),parent=frames.get(n.parent),oldParent=original.get(n.parent);
+   const local=compose(inverse(oldParent),old),fraction=n.region==='C'?.65*(++index)/count:1;
+   frames.set(id,frame(add(parent.p,rotate(parent.q,local.p)),qm(qslerp(qi(),correction,fraction),old.q)));
+  }
+  const finalUp=rotate(qm(frames.get('head').q,inv(h.sourceBind.get('head').q)),[0,1,0]);
+  return{revision:'floor-head-balance/v1',weight,beforeTiltDegrees:degrees(Math.acos(clamp(up[1],-1,1))),tiltDegrees:degrees(Math.acos(clamp(finalUp[1],-1,1))),measuredGaze:false};
+ }
+ projectFloorLeg(candidate,target){
+  const before=new Map(candidate.frames),state={yaw:candidate.state.yaw,feet:{[target.side]:{position:target.p,adoptedOrientation:target.q,contact:true}},swing:null};
+  this.reprojectControlledLegs(candidate.frames,state,state.yaw,before,before,1,[target.side]);
+ }
+ resolveFloorSeat(candidate,options){
+  const weight=clamp(options.floorSeatWeight||0,0,1);
+  if(!weight||!options.floorSupport||options.hands||options.contactHand||candidate.controlled)return null;
+  const h=this.h,ids=new Set(['hips']),margin=.002*h.bodyMetrics.statureScale;
+  const before=h.minimumBoneY(candidate.frames,ids);
+  if(!Number.isFinite(before.y))throw Error('缺少坐姿骨盆支撑采样');
+  const correction=(margin-before.y)*weight;
+  if(Math.abs(correction)>.20*h.bodyMetrics.statureScale)throw Error('坐姿骨盆支撑超出有限适配范围');
+  for(const f of candidate.frames.values())f.p[1]+=correction;
+  candidate.floorLegTargets=[];
+  // Lowering the seated body must not drive an ankle/toe through the floor.
+  // Move only penetrating feet vertically, preserving the recorded ankle
+  // orientation and knee pole. This is clearance, not a planted-foot label.
+  for(const side of ['left','right']){
+   let target=null;
+   for(let pass=0;pass<4;pass++){
+    const surface=h.minimumBoneY(candidate.frames,this.floorFootIds(side));
+    if(!Number.isFinite(surface.y))throw Error('缺少坐姿脚部净空采样');
+    if(surface.y>=.0005-1e-7)break;
+    if(!target){const foot=candidate.frames.get(side+'_foot');target={side,p:[...foot.p],q:[...foot.q]};}
+    target.p[1]+=.0005-surface.y;this.projectFloorLeg(candidate,target);
+   }
+   if(target){
+    candidate.floorLegTargets.push(target);
+    candidate.errors.push({id:side+'_foot',kind:'floor-foot-clearance',target:target.p,targetSpace:'world',effectorLocal:[0,0,0],targetOrientation:target.q,error:0,orientationErrorRad:0});
+   }
+  }
+  return{revision:'floor-seat/v1',weight,surfaceY:before.y,correctionM:correction,clearanceFeet:candidate.floorLegTargets.map(t=>t.side),measuredForces:false};
+ }
+ resolveFloorFoot(candidate,options){
+  if(!options.floorSupport||options.hands||options.contactHand||candidate.controlled)return null;
+  const next=structuredClone(options.floorSupport),weight=clamp(options.floorFootWeight||0,0,1),side='left',id=side+'_foot',h=this.h;
+  if(!weight){delete next.foot;return{next,active:false};}
+  const raw=candidate.frames.get(id);
+  if(!next.foot){
+   // Plan the lead foot under the eventual standing body before loading it.
+   // Locking its early crossed-leg location left the standing leg crouched.
+   const source=candidate.source,progress=source.progress,clip=source.clip;
+   if(clip!=='sitToStand'||!Number.isFinite(progress))throw Error('起身支撑脚缺少有效参考阶段');
+   const origin=r2ReferenceOriginForPosition(h,clip,progress,candidate.state.root,candidate.state.yaw);
+   const landing=this.build({...r2ReferenceDescriptor(h,clip,1,origin,candidate.state.yaw)}).frames.get(id);
+   const up=rotate(landing.q,rotate(inv(h.sourceBind.get(id).q),[0,1,0]));
+   const q=qm(fromTo(up,[0,1,0]),landing.q),p=[landing.p[0],0,landing.p[2]],probe=new Map(candidate.frames),transform=compose(frame(p,q),inverse(raw));
+   probe.set(id,frame(p,q));for(const [child]of this.descendantRows.get(id))probe.set(child,compose(transform,probe.get(child)));
+   const skin=h.minimumBoneY(probe,this.floorFootIds(side));if(!Number.isFinite(skin.y))throw Error('缺少起身支撑脚表面采样');
+   p[1]=.002*h.bodyMetrics.statureScale-skin.y;next.foot={side,p,q};
+  }
+  const anchor=next.foot,target={side,p:mix(raw.p,anchor.p,weight),q:qslerp(raw.q,anchor.q,weight)};
+  const hip=candidate.frames.get(side+'_femur').p,{upper,lower}=this.engine.rig.legs[side],reach=upper+lower-.0005*h.bodyMetrics.statureScale;
+  const horizontal2=(hip[0]-target.p[0])**2+(hip[2]-target.p[2])**2;
+  if(horizontal2>reach*reach)throw Error('起身支撑脚水平目标不可达');
+  const lowerBy=Math.max(0,hip[1]-target.p[1]-Math.sqrt(reach*reach-horizontal2));
+  if(lowerBy>.10*h.bodyMetrics.statureScale)throw Error('起身支撑脚超出有限骨盆适配范围');
+  if(lowerBy)for(const f of candidate.frames.values())f.p[1]-=lowerBy;
+  this.projectFloorLeg(candidate,target);candidate.floorLegTargets??=[];candidate.floorLegTargets.push(target);
+  candidate.errors.push({id,kind:'floor-foot-plant',weight,target:target.p,targetSpace:'world',effectorLocal:[0,0,0],targetOrientation:target.q,error:0,orientationErrorRad:0});
+  return{next,revision:'floor-foot/v1',active:true,side,weight,anchor:frame([...anchor.p],[...anchor.q]),rootLoweringM:lowerBy,measuredForces:false};
  }
  descendants(positions,rotations,id,rotation){
   rotations.set(id,rotation);
@@ -78,9 +320,17 @@ class MotionLabPose {
    if(!Number.isFinite(error.error)||!Number.isFinite(error.orientationErrorRad))throw Error('动作候选接触误差无效');
   }
  }
- reprojectControlledLegs(frames,state,yaw,from,target,u){
+ controlledFootOrientation(state,side){
+  const foot=state.feet[side],bind=this.h.sourceBind.get(side+'_foot').q;
+  if(!foot.adoptedOrientation)return qm(qy(foot.yaw),qm(qx(foot.rocker?.pitch??(foot.contact?0:foot.swingPitch||0)),bind));
+  const swing=state.swing;
+  if(swing?.side!==side)return [...foot.adoptedOrientation];
+  const u=smooth(clamp(swing.elapsed/Math.max(1e-8,swing.duration),0,1));
+  return qslerp(foot.adoptedOrientation,qm(qy(swing.yaw),bind),u);
+ }
+ reprojectControlledLegs(frames,state,yaw,from,target,u,activeSides=['left','right']){
   const h=this.h,positions=new Map([...frames].map(([id,f])=>[id,[...f.p]]));
-  for(const side of ['left','right']){
+  for(const side of activeSides){
    const femur=side+'_femur',tibia=side+'_tibia',foot=side+'_foot',patella=side+'_patella';
    const hip=positions.get(femur),pole=mix(from.get(tibia).p,target.get(tibia).p,u);
    const L1=dist(this.source(femur),this.source(tibia)),L2=dist(this.source(tibia),this.source(foot));
@@ -95,7 +345,7 @@ class MotionLabPose {
    const previousFemur=frames.get(femur),previousTibia=frames.get(tibia),previousPatella=frames.get(patella);
    const femurFrame=frame(hip,alignFinal(femur,tibia,previousFemur));
    const tibiaFrame=frame(solved.knee,alignFinal(tibia,foot,previousTibia));
-   const footFrame=frame(solved.end,qslerp(from.get(foot).q,target.get(foot).q,u));
+   const footFrame=frame(solved.end,state.feet[side].adoptedOrientation?this.controlledFootOrientation(state,side):qslerp(from.get(foot).q,target.get(foot).q,u));
    frames.set(femur,femurFrame);frames.set(tibia,tibiaFrame);frames.set(foot,footFrame);
    // Preserve the already blended patella's local transform. Rebuilding it
    // from the bind frame on the first contact-preserving sample caused an
@@ -125,17 +375,28 @@ class MotionLabPose {
    if(!position||position.length!==3||!position.every(Number.isFinite))throw Error('支撑转换缺少有效脚锚：'+side);
    const footYaw=Number.isFinite(input.yaw)?input.yaw:yaw;
    state.feet[side]={...state.feet[side],position:[...position],yaw:footYaw,contact:true};
+   delete state.feet[side].rocker;
+   // Explicit support anchors (including seated preparation) own the whole
+   // sole frame. Flattening it around a fixed ankle drives toes into ground.
+   if(input.q)state.feet[side].adoptedOrientation=[...input.q];
   }
   if(reference)state.motion={...state.motion,frame:reference,weight:1};
   const controlled=!reference||options.controlledFeet===true;
-  if(controlled&&(options.position||options.feet)){
+  const rockerFeet=controlled&&!options.feet&&Object.values(state.feet).some(foot=>foot.rocker);
+  if(rockerFeet&&!options.position)state.root=add(state.root,rotate(qy(yaw),[state.pelvisSupportXM||0,state.pelvisSupportLiftM||0,0]));
+  if(rockerFeet)for(const foot of Object.values(state.feet))if(foot.rocker&&!foot.adoptedOrientation)foot.position=[...foot.rocker.ankle];
+  if(controlled&&(options.position||options.feet||rockerFeet)){
    // Contact extensions lower the pelvis, then use the lab's fixed-length IK
    // against its independent foot anchors. They never scale a bone.
    state.pose=e.solve(state);
   }
   let data=this.frameData(state,reference);
   if(controlled){
-   data={...data,rootQ:this.controlledPelvisRotation(state,data.rootQ,yaw)};
+   // Only the production free-gait mode opts into articulated hip centres.
+   // Raw kernel clients without a support mode retain their existing contract.
+   state.articulatedPelvis=!reference&&!options.position&&!options.feet&&!options.hands&&state.flatFootSupport===false&&!Object.values(state.feet).some(foot=>foot.adoptedOrientation);
+   if(state.articulatedPelvis)state.pose=this.solveControlledState(state,data);
+   else data={...data,rootQ:this.controlledPelvisRotation(state,data.rootQ,yaw)};
    state.motion={...state.motion,frame:data,weight:1};
   }
   return{state,yaw,controlled,data};
@@ -174,14 +435,20 @@ class MotionLabPose {
    if(!options.hands?.[side]){
     const inward=rotate(data.rootQ,[side==='left'?1:-1,0,0]);
     const palm=reference&&data[side+'HandQ']?qm(qy(yaw),qm(data[side+'HandQ'],inv(h.sourceBind.get(hand).q))):
-     qm(qy(yaw),MotionLab.relaxedHandRotation(h.resolvedRig.nodes,side,data[side+'Forearm'],inward));
+     qm(qy(yaw),state.flatFootSupport===undefined?MotionLab.relaxedHandRotation(h.resolvedRig.nodes,side,data[side+'Forearm'],inward):this.freeHandRotation(side,data[side+'Forearm'],inward));
     rotations.set(radius,this.radialRotation(side,positions,palm));this.descendants(positions,rotations,hand,palm);
    }
-   const footQ=controlled?qy(state.feet[side].yaw):data[side+'FootQ']?qm(qy(yaw),qm(data[side+'FootQ'],inv(h.sourceBind.get(foot).q))):rotations.get(side+'_tibia');
+   const footQ=controlled?qm(this.controlledFootOrientation(state,side),inv(h.sourceBind.get(foot).q)):data[side+'FootQ']?qm(qy(yaw),qm(data[side+'FootQ'],inv(h.sourceBind.get(foot).q))):rotations.get(side+'_tibia');
    this.descendants(positions,rotations,foot,footQ);
    const patella=side+'_patella',shank=rotations.get(side+'_tibia');
    positions.set(patella,add(positions.get(side+'_tibia'),rotate(shank,sub(this.source(patella),this.source(side+'_tibia')))));rotations.set(patella,shank);
-   if(controlled)errors.push({id:foot,error:dist(positions.get(foot),state.feet[side].position),target:[...state.feet[side].position],targetSpace:'world',effectorLocal:[0,0,0],orientationErrorRad:0});
+   if(controlled)errors.push({id:foot,error:dist(positions.get(foot),state.feet[side].position),target:[...state.feet[side].position],targetSpace:'world',effectorLocal:[0,0,0],targetOrientation:this.controlledFootOrientation(state,side),orientationErrorRad:0});
+   const rocker=state.feet[side].rocker;
+   if(controlled&&state.feet[side].contact&&rocker&&rocker.pitch){
+    const local=rotate(inv(h.sourceBind.get(foot).q),rocker.pivot),orientation=this.controlledFootOrientation(state,side);
+    errors.push({id:foot,kind:rocker.kind+'-support',target:[...rocker.world],targetSpace:'world',effectorLocal:local,
+     error:dist(add(positions.get(foot),rotate(orientation,local)),rocker.world),targetOrientation:orientation,orientationErrorRad:0});
+   }
   }
   if(options.hands)for(const side of ['left','right']){
    const goal=options.hands[side];if(!goal)continue;
@@ -189,7 +456,32 @@ class MotionLabPose {
    const start=positions.get(upper),target=sub(goal.p,rotate(goal.q,h.bodyMetrics.palmContact));
    const reachRatio=h.bodyMetrics.armReachM[side]/h.bodyMetrics.reference.armReachM[side];
    const pole=options.armPoles?.[side]||add(start,rotate(qy(yaw),mul([arm.s*(options.armPoleLateralM??.30),-.35,-.10],reachRatio)));
-   const solved=MotionLab.solveTwoBone(start,target,pole,arm.L1,arm.L2);
+   // Share orientation demand with the elbow swivel, instead of leaving
+   // all of it at the wrist. Project onto the elbow circle: fixed lengths
+   // and the palm position remain exact, with a continuous pole preference.
+   const axis=norm(sub(target,start)),preferred=sub(target,mul(rotate(goal.q,[0,-1,0]),arm.L2));
+   const radialPole=p=>{const v=sub(p,start);return sub(v,mul(axis,dot(v,axis)));};
+   const original=radialPole(pole),neutral=radialPole(preferred);
+   const solveAt=weight=>MotionLab.solveTwoBone(start,target,len(neutral)>1e-6?add(start,add(mul(norm(original),1-weight),mul(norm(neutral),weight))):pole,arm.L1,arm.L2);
+   let solved=solveAt(.4);
+   if(options.contactHand){
+    const across=rotate(inv(h.sourceBind.get(hand).q),sub(this.source(side+'_finger_2_1'),this.source(side+'_finger_5_1')));
+    const reserve=solution=>{const v=rotate(inv(goal.q),norm(sub(solution.end,solution.knee))),flex=Math.abs(degrees(Math.atan2(v[2],-v[1]))),radial=-degrees(Math.atan2(v[0],Math.hypot(v[1],v[2])))*Math.sign(across[0]);return Math.min(69.5-flex,19.5-radial,39.5+radial);};
+    if(reserve(solved)<0){
+     // A wrist envelope is anisotropic. Its valid elbow arc need not include
+     // the minimum combined-angle pole, so inspect both swivel directions.
+     const base=norm(radialPole(solved.knee));
+     const swivel=angle=>{const v=add(mul(base,Math.cos(angle)),mul(cross(axis,base),Math.sin(angle)));return MotionLab.solveTwoBone(start,target,add(start,v),arm.L1,arm.L2);};
+     let found=null;
+     for(let step=1;step<=18&&!found;step++)for(const sign of [-1,1]){
+      const angle=sign*step*Math.PI/36;if(reserve(swivel(angle))<0)continue;
+      let lo=(step-1)*Math.PI/36,hi=step*Math.PI/36;
+      for(let i=0;i<12;i++){const mid=(lo+hi)/2;if(reserve(swivel(sign*mid))>=0)hi=mid;else lo=mid;}
+      const trial={angle:sign*hi,solution:swivel(sign*hi)};if(!found||Math.abs(trial.angle)<Math.abs(found.angle))found=trial;
+     }
+     if(found)solved=found.solution;
+    }
+   }
    positions.set(forearm,solved.knee);positions.set(radial,solved.knee);positions.set(hand,solved.end);
    rotations.set(upper,this.segmentRotation(upper,forearm,positions,yaw));
    rotations.set(forearm,this.segmentRotation(forearm,hand,positions,yaw));
@@ -198,6 +490,10 @@ class MotionLabPose {
   }
   let frames=new Map();
   for(const [id,n]of this.rows)frames.set(id,frame(positions.get(id),qnorm(qm(rotations.get(id),h.sourceBind.get(id).q))));
+  for(const side of ['left','right'])if(!options.hands?.[side]&&!options.contactHand){
+   const amount=reference?(data[side+'HandRelaxation']??0):(state.flatFootSupport===undefined?0:1);
+   this.relaxHand(frames,side,clamp(amount,0,1));
+  }
   if(options.contactHand)frames=contactHandPose(h,frames,options.contactHand);
   if(options.blendFrom&&options.blendAmount<1){
    const target=frames,blended=new Map(),u=clamp(options.blendAmount,0,1),from=options.blendFrom;
@@ -215,7 +511,7 @@ class MotionLabPose {
    if(controlled&&options.preserveFootContactsOnBlend!==false)this.reprojectControlledLegs(frames,state,yaw,from,target,u);
    this.refreshEffectorErrors(frames,errors);
   }
-  return {frames,errors,controlled,source:options.motionSource||{kind:'motion-lab',revision:MotionLab.revision,trial:'08_01'},state};
+  return {frames,errors,controlled,manualHandling:!!options.hands&&!!options.contactHand,source:options.motionSource||{kind:'motion-lab',revision:MotionLab.revision,trial:'08_01'},state};
  }
  validate(candidate){
   let boneErrorM=0,radialAttachmentErrorM=0,attachmentErrorM=0,attachmentJoint=null;
@@ -236,46 +532,109 @@ class MotionLabPose {
   }
   if(radialAttachmentErrorM>.0001)throw Error('前臂蒙皮轴未连接到手腕，姿态未提交');
   if(attachmentErrorM>.0001)throw Error('蒙皮变换未连接到子关节：'+attachmentJoint+'，姿态未提交');
-  const ranges=r2CaptureConstraintProfile(this.h,candidate.source);let hingeReserveDegrees=Infinity;
+  const ranges=r2CaptureConstraintProfile(this.h,candidate.source),contactHinges={},wrists={};let hingeReserveDegrees=Infinity;
   for(const side of ['left','right'])for(const [a,b,c,limit]of [['upperArm','forearm','hand',170],['femur','tibia','foot',160]]){
    const p=id=>candidate.frames.get(side+'_'+id).p;
    const angle=degrees(Math.acos(clamp(dot(norm(sub(p(b),p(a))),norm(sub(p(c),p(b)))),-1,1)));
-   const maximum=candidate.controlled&&b==='tibia'?limit:ranges?.hingeDegrees[side+'_'+b]??limit;
+   const palmAdapted=b==='forearm'&&candidate.errors.some(e=>e.id===side+'_hand'&&e.kind==='floor-palm');
+   // Recorded extrema describe the unmodified capture. An explicitly solved
+   // palm uses the same fixed-length contact elbow limit as other hand IK;
+   // retain both limits in diagnostics instead of widening the whole clip.
+   const sourceMaximum=palmAdapted||candidate.controlled&&b==='tibia'?limit:ranges?.hingeDegrees[side+'_'+b]??limit;
+   const maximum=candidate.manualHandling?Math.min(sourceMaximum,b==='forearm'?155:150):sourceMaximum;
+   if(palmAdapted)contactHinges[side+'_'+b]={angleDegrees:angle,maximumDegrees:maximum,recordedMaximumDegrees:ranges?.hingeDegrees[side+'_'+b]??null};
    hingeReserveDegrees=Math.min(hingeReserveDegrees,maximum+.5-angle);
-   if(angle>maximum+.5)throw Error('关节弯曲超过动作来源或接触适配范围：'+side+'_'+b);
+  if(angle>maximum+.5)throw Error('关节弯曲超过动作来源或接触适配范围：'+side+'_'+b+' '+angle.toFixed(2)+' > '+maximum.toFixed(2));
+  }
+  for(const side of ['left','right']){
+   const hand=candidate.frames.get(side+'_hand'),elbow=candidate.frames.get(side+'_forearm');
+   // Measure in the anatomical hand frame, independent of body/world yaw.
+   // Local -Y is the authored hand longitudinal axis; Z is its palm normal.
+   const forearm=rotate(inv(hand.q),norm(sub(hand.p,elbow.p)));
+   const flexionDegrees=degrees(Math.atan2(forearm[2],-forearm[1]));
+   const deviationDegrees=degrees(Math.atan2(forearm[0],Math.hypot(forearm[1],forearm[2])));
+   const bind=this.h.sourceBind.get(side+'_hand'),across=rotate(inv(bind.q),sub(this.source(side+'_finger_2_1'),this.source(side+'_finger_5_1')));
+   const radialDeviationDegrees=-deviationDegrees*Math.sign(across[0]);
+   const envelope={flexionExtensionDegrees:70,radialDegrees:20,ulnarDegrees:40};
+   wrists[side]={flexionDegrees,deviationDegrees,radialDeviationDegrees,combinedDegrees:degrees(Math.acos(clamp(-forearm[1],-1,1))),envelope,checked:!!candidate.manualHandling};
+   if(candidate.manualHandling&&(Math.abs(flexionDegrees)>70||radialDeviationDegrees>20||radialDeviationDegrees< -40))throw Error('搬运动作超出腕部活动范围：'+side+' 屈伸 '+flexionDegrees.toFixed(1)+'，桡偏 '+radialDeviationDegrees.toFixed(1));
   }
   const footErrorM=Math.max(0,...candidate.errors.filter(e=>/_foot$/.test(e.id)).map(e=>e.error));
   if(footErrorM>.012)throw Error('落脚目标超出可达范围，姿态未提交');
   const handErrorM=Math.max(0,...candidate.errors.filter(e=>/_hand$/.test(e.id)).map(e=>e.error));
   if(handErrorM>.012)throw Error('手掌目标超出可达范围，姿态未提交');
-  return {boneErrorM,radialAttachmentErrorM,attachmentErrorM,attachmentJoint,footErrorM,handErrorM,hingeReserveDegrees,kinematicOnly:true};
+  return {boneErrorM,radialAttachmentErrorM,attachmentErrorM,attachmentJoint,footErrorM,handErrorM,hingeReserveDegrees,contactHinges,wrists,kinematicOnly:true};
  }
  measureEffectors(candidate){
   this.refreshEffectorErrors(candidate.frames,candidate.errors);
+ }
+ resolveGroundClearance(candidate,options){
+  let ground=null,groundCorrectionM=0;
+  if(!options.groundClearance)return{ground,groundCorrectionM};
+  const anchored=candidate.controlled;let previous=null;
+  // These non-airborne floor clips have a different source body height.
+  // Fit their retargeted support surface in BOTH directions. Clearance-only
+  // lifting allowed an entire crouched/seated body to hover above the floor.
+  // Explicit world contacts always retain ownership of height instead.
+  const fitFloor=options.groundSupport==='continuous-floor'&&options.floorMode&&
+   !candidate.controlled&&!options.hands&&(candidate.source?.kind==='capture'||candidate.source?.handSupported===true)&&
+   !candidate.errors.some(error=>error.targetSpace==='world');
+  for(let pass=0;pass<(anchored||candidate.floorPalmTargets||candidate.floorLegTargets?24:1);pass++){
+   ground=this.h.minimumBoneY(candidate.frames);
+   if(!Number.isFinite(ground.y))throw Error('动作候选缺少有效支撑采样');
+   let correction=fitFloor?.0005-ground.y:Math.max(0,.0005-ground.y);
+   if(Math.abs(correction)<1e-7)return{ground,groundCorrectionM};
+   const approaching=candidate.floorPalmTargets?.find(t=>t.weight<1&&this.floorHandIds(t.side).has(ground.boneId));
+   if(approaching){approaching.goal.p[1]+=correction;this.solveFloorPalm(candidate,approaching.side,approaching.goal,0);continue;}
+   // A planted shin can rise much less than the pelvis. Estimate that local
+   // response only while the same support probe is limiting the pose; keep
+   // the accelerated step small and re-query the actual surface afterwards.
+   if(anchored&&previous&&previous.boneId===ground.boneId){
+    const response=(ground.y-previous.y)/previous.correction;
+    if(response>.02&&response<.8)correction=Math.min(.025,correction/response*1.05);
+   }
+   previous={y:ground.y,boneId:ground.boneId,correction};
+   const before=anchored?new Map([...candidate.frames].map(([id,f])=>[id,frame([...f.p],[...f.q])])):null;
+   for(const f of candidate.frames.values())f.p[1]+=correction;
+   for(const error of candidate.errors)if(error.targetSpace==='body')error.target[1]+=correction;
+   // Raise the pelvis/body out of the floor, then bend the fixed-length legs
+   // back to the existing world contacts. Translating the feet as well made
+   // a valid seated support fail the contact gate during preparation.
+   if(anchored)this.reprojectControlledLegs(candidate.frames,candidate.state,candidate.state.yaw,before,before,1);
+   // Manipulation also owns world-space palms. Refit the complete chain
+   // after raising the pelvis; moving feet or hands with it is not clearance.
+   if(options.hands)for(const side of ['left','right'])if(options.hands[side])this.solveFloorPalm(candidate,side,options.hands[side],0);
+   for(const target of candidate.floorLegTargets||[])this.projectFloorLeg(candidate,target);
+   for(const {side,goal,weight}of candidate.floorPalmTargets||[])this.solveFloorPalm(candidate,side,goal,0);
+   groundCorrectionM+=correction;
+  }
+  ground=this.h.minimumBoneY(candidate.frames);
+  if(!Number.isFinite(ground.y)||ground.y<.0005-1e-6)throw Error('地面净空与脚掌支撑无法同时满足：'+ground.boneId+' '+(ground.y*1000).toFixed(3)+' mm，姿态未提交');
+  return{ground,groundCorrectionM};
  }
  apply(options={}){
   if(this.preflightOnly)throw Error('预检骨架不能提交人物姿态');
   const h=this.h,candidate=this.build(options);this.validate(candidate);
   // Floor queries read candidate frames. Failure cannot partially change the
   // live skeleton, even when this adapter is called outside Agent.tickFixed.
-  let ground=null,groundCorrectionM=0;
-  if(options.groundClearance){
-   ground=h.minimumBoneY(candidate.frames);
-   if(!Number.isFinite(ground.y))throw Error('动作候选缺少有效支撑采样');
-   groundCorrectionM=Math.max(0,.0005-ground.y);
-   if(groundCorrectionM>0){
-    for(const f of candidate.frames.values())f.p[1]+=groundCorrectionM;
-    // Body-relative landmarks move with the pose; world foot/object anchors
-    // remain fixed and any resulting residual must pass the same validator.
-    for(const error of candidate.errors)if(error.targetSpace==='body')error.target[1]+=groundCorrectionM;
-    ground={...ground,y:ground.y+groundCorrectionM};
-   }
+  let {ground,groundCorrectionM}=this.resolveGroundClearance(candidate,options);
+  const floorSeat=this.resolveFloorSeat(candidate,options);
+  const floorFoot=this.resolveFloorFoot(candidate,options);
+  const floorSupport=this.resolveFloorPalm(candidate,floorFoot?{...options,floorSupport:floorFoot.next}:options);
+  const headBalance=this.balanceFloorHead(candidate,options);
+  if(floorSeat||floorSupport?.active||floorFoot?.active){
+   const clearance=this.resolveGroundClearance(candidate,options);ground=clearance.ground;groundCorrectionM+=clearance.groundCorrectionM;
+   if(floorSupport?.active)Object.assign(floorSupport,{surfaceY:h.minimumBoneY(candidate.frames,this.floorHandIds(floorSupport.side)).y,rootCorrectionM:candidate.floorRootShiftM||0,torsoLeanRad:candidate.floorTorsoLeanRad||0,torsoDeltaQ:candidate.floorTorsoDeltaQ||qi()});
+   if(floorSeat)floorSeat.surfaceY=h.minimumBoneY(candidate.frames,new Set(['hips'])).y;
+   if(floorFoot?.active)floorFoot.surfaceY=h.minimumBoneY(candidate.frames,this.floorFootIds(floorFoot.side)).y;
   }
   this.measureEffectors(candidate);const report=this.validate(candidate);
   const localFrames=h.joints.map(j=>{const f=candidate.frames.get(j.id),parent=j.parent&&candidate.frames.get(j.parent.id);return parent?compose(inverse(parent),f):frame(f.p,f.q);});
   for(let i=0;i<h.joints.length;i++){const j=h.joints[i],f=localFrames[i];j.p=f.p;j.q=f.q;}
   h.fk();h.lastErrors=candidate.errors;h.lastMotionSource=candidate.source;h.phase=options.floorMode?'floor':options.hands?'manipulation':this.engine.state.status;
-  this.lastReport={...report,ground,groundCorrectionM,source:candidate.source,contactHand:options.contactHand?{...options.contactHand,measuredMotion:false}:null,poseAuthority:'MotionLabPose.commit',completeHierarchy:true,validatedAfterClearance:true,worldContactTargetsPreserved:true,measuredSoftTissue:false,visualAcceptance:false};
+  if(floorSupport){for(const key of Object.keys(options.floorSupport))delete options.floorSupport[key];Object.assign(options.floorSupport,floorSupport.next);delete floorSupport.next;}
+  if(floorFoot)delete floorFoot.next;
+  this.lastReport={...report,ground,groundCorrectionM,floorSupport,floorSeat,floorFoot,headBalance,source:candidate.source,contactHand:options.contactHand?{...options.contactHand,measuredMotion:false}:null,poseAuthority:'MotionLabPose.commit',completeHierarchy:true,validatedAfterClearance:true,worldContactTargetsPreserved:true,measuredSoftTissue:false,visualAcceptance:false};
   return h.lastErrors;
  }
  report(){return this.lastReport||{poseAuthority:'MotionLabPose.commit',visualAcceptance:false};}

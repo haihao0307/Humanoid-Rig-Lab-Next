@@ -185,6 +185,8 @@ class PhysicsWorld{
   const ownerId=this.ownerKey(limits.ownerId),existing=this.manipulations.get(object.id);
   if(object.heldOwner!=null&&this.ownerKey(object.heldOwner)!==ownerId)throw Error('物体已由其他人物持有');
   if(existing&&existing.ownerId!==ownerId)throw Error('物体已有其他人物的物理接触所有权');
+  const supportPivotLocal=limits.supportPivotLocal||null;
+  if(supportPivotLocal)this.finiteArray(supportPivotLocal,3,'supported box pivot');
   const previous=existing?.type===type?existing:null;
   const targetVelocity=previous?candidate.p.map((v,i)=>(v-previous.p[i])/this.fixedDt):[0,0,0];
   const targetSpeed=Math.hypot(...targetVelocity);if(targetSpeed>4)for(let i=0;i<3;i++)targetVelocity[i]*=4/targetSpeed;
@@ -193,7 +195,7 @@ class PhysicsWorld{
   const d=Math.hypot(...direction);if(d>1e-6)for(let i=0;i<3;i++)direction[i]/=d;
   else if(previous)direction.splice(0,3,...previous.direction);else direction.splice(0,3,0,0,1);
   this.manipulations.set(object.id,{id:object.id,ownerId,type,p:[...candidate.p],q:[...candidate.q],targetVelocity,direction,
-   maxForceN,maxTorqueNm,maxHorizontalForceN,appliedForceN:0,appliedHorizontalForceN:0,appliedTorqueNm:0});
+   maxForceN,maxTorqueNm,maxHorizontalForceN,supportPivotLocal:supportPivotLocal?[...supportPivotLocal]:null,appliedForceN:0,appliedHorizontalForceN:0,appliedTorqueNm:0});
   record.body.wakeUp();for(const r of this.bodies.values())this.setCollisionFilter(r);
  }
  clearManipulation(objectId){
@@ -304,6 +306,17 @@ class PhysicsWorld{
    const halfSin=Math.hypot(rotation.x,rotation.y,rotation.z),angle=2*Math.atan2(halfSin,rotation.w);
    const inertia=Math.max(b.inertia.x,b.inertia.y,b.inertia.z,.0001),angular=this.array(b.angularVelocity);
    torque=[rotation.x,rotation.y,rotation.z].map((v,i)=>inertia*(100*(halfSin>1e-8?v/halfSin*angle:0)-20*angular[i]));
+   if(m.supportPivotLocal&&this.states.get(m.id)?.supported&&Math.abs(clearance)<.015){
+    const local=this.vector(m.supportPivotLocal),offset=b.quaternion.vmult(local),pivotY=b.position.y+offset.y;
+    if(Math.abs(pivotY)<.015){
+     // The ground reaction acts at the supported edge. Compensate the
+     // moment of gravity plus the bounded translational actuator there;
+     // retain the same muscle torque cap and no feed-forward in free flight.
+     const r=[-offset.x,-offset.y,-offset.z],net=[force[0],force[1]-b.mass*this.settings.gravityMps2,force[2]];
+     const moment=[r[1]*net[2]-r[2]*net[1],r[2]*net[0]-r[0]*net[2],r[0]*net[1]-r[1]*net[0]];
+     torque=torque.map((v,i)=>v-moment[i]);
+    }
+   }
    const torqueMagnitude=Math.hypot(...torque);if(torqueMagnitude>m.maxTorqueNm)torque=torque.map(v=>v*m.maxTorqueNm/torqueMagnitude);
    if(apply)b.torque.vadd(this.vector(torque),b.torque);m.appliedTorqueNm=Math.hypot(...torque);
   }

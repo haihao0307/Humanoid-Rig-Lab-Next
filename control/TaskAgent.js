@@ -6,7 +6,7 @@ class Agent{
  preflightInput(ignoreOwnedPose=false){
   const state=this.locomotion.engine.state,s=this.skill;
   const geometry=ignoreOwnedPose?{...this.w,objects:this.w.objects.map(o=>o===s?.o?{...o,p:[0,0,0],q:qi(),yaw:0}:o)}:this.w;
-  return JSON.stringify([motionPreflightModel(this.h).signature,this.pos,this.yaw,state.root,state.feet,state.pose,state.motion,
+  return JSON.stringify([motionPreflightModel(this.h).signature,this.pos,this.yaw,state.root,state.feet,state.pose,state.motion,this.locomotion.pose?.balanceInput?.()||null,
    s?.o&&[s.o.id,ignoreOwnedPose?null:s.o.p,ignoreOwnedPose?null:s.o.q,s.o.heldOwner],s?.target&&[s.target.id,s.target.p,s.target.q,s.target.w,s.target.h,s.target.d],this.grips,s?.reachStart,s?.releaseWrists,
    navigationGeometryKey(geometry),s?.o&&motionObjectShapeKey(this.w.physics.bodies.get(s.o.id).body)]);
  }
@@ -93,7 +93,7 @@ class Agent{
  }
  submitPlan(p){if(this.characterEditInProgress)throw Error('人物正在更新，请等待完成后再提交任务');const check=this.validateSemanticPlan(p);if(!check.ok)throw Error(check.errors.join('；'));if(!this.activity().readyForTask)throw Error('身体仍在执行任务或收脚');const forecast=simulateSemanticPlan(this.w,this,{steps:p.steps});if(!forecast.feasible)throw Error('整串指令预推演未通过：'+forecast.reasons.join('；'));this.plan=JSON.parse(JSON.stringify(p));this.index=0;this.lastObject=p.steps.filter(s=>s.objectId).at(-1)?.objectId||this.lastObject;this.error=null;this.paused=false;this.log('收到大脑结构化计划：'+p.steps.length+' 项');return this.plan;}
  relationDirection(step){return relationDirectionForActor(step,{yaw:this.yaw})}
- enter(p){this.phase=p;this.phaseT=0;this.phaseWallT=0;this.log(({floorAlign:'检查空地并转身调整站位',sitDown:'屈髋屈膝，降到地面坐姿',lieDown:'手臂辅助，逐步躺到地面',standPrepare:'保持脚掌支撑并调整起身准备姿势',standUp:'收腿并起身站稳',greet:'抬臂打招呼',salute:'右手抬至眉侧敬礼',approach:'根据当前物体位置寻路',settle:'站稳并调整朝向',reach:'屈髋屈膝，肩臂腕联合趋近',close:'验证双掌接触位置与朝向',lift:'双掌约束成立，起身抬起',travel:'携物步行，支撑脚锁定',placeSettle:'保持双掌抓握并对齐放置站位',lower:'目标区内下蹲放置',release:'检查落地后解除抓握',rise:'松手并恢复站立',pushTravel:'持续掌面接触推动',wave:'肩带、手臂和手掌联合挥手',walk:'按实时位置走向目标',turn:'换脚转向'})[p]||p)}
+ enter(p){this.phase=p;this.phaseT=0;this.phaseWallT=0;this.log(({floorAlign:'检查空地并转身调整站位',sitDown:'屈髋屈膝，降到地面坐姿',lieDown:'手臂辅助，逐步躺到地面',standPrepare:'保持脚掌支撑并调整起身准备姿势',standUp:'收腿并起身站稳',greet:'抬臂打招呼',salute:'右手抬至眉侧敬礼',approach:'根据当前物体位置寻路',settle:'站稳并调整朝向',reach:'屈髋屈膝，肩臂腕联合趋近',close:'验证双掌接触位置与朝向',boxPickup:'保持箱底边支撑，倾箱并换到底部承托',boxPutdown:'箱边落地支撑，抽手后放平',lift:'底部承托成立，协调髋膝起身',travel:'携物步行，支撑脚锁定',placeSettle:'保持双掌抓握并对齐放置站位',lower:'目标区内下蹲放置',release:'检查落地后解除抓握',rise:'松手并恢复站立',pushTravel:'持续掌面接触推动',wave:'肩带、手臂和手掌联合挥手',walk:'按实时位置走向目标',turn:'换脚转向'})[p]||p)}
  begin(){
   if(!this.plan||this.index>=this.plan.steps.length){this.plan=null;this.phase='idle';return}
   this.skill={...this.plan.steps[this.index]};const s=this.skill;
@@ -110,7 +110,7 @@ class Agent{
    if(!capability.feasible)throw Error(capability.reasons.join('；'));
    const transport=capability.transport,dir=transport.approachDirection;
    s.target=this.w.get(s.targetId);
-   s.dest=[...transport.destination];s.strengthPreflight=capability.strength;s.carryConfiguration=transport.carryConfiguration;
+   s.boxHandling=!!transport.boxHandling;s.dest=[...transport.destination];s.strengthPreflight=capability.strength;s.carryConfiguration=transport.carryConfiguration;
    s.approachYaw=Math.atan2(dir[0],dir[2]);s.finalYaw=transport.bodyYaw;s.transferEnd=[...transport.bodyEnd];
    this.route=transport.approach.map(p=>[...p]);this.routeIndex=0;this.enter('approach');
   });
@@ -120,7 +120,7 @@ class Agent{
   const task=this.skill?{...this.skill,o:undefined,target:undefined}:null;
   const ownedIds=[this.skill?.o?.id,this.held?.id].filter(Boolean);
   this.lastSafe={pose:this.locomotion.pose.snapshot(),kernel:this.locomotion.engine.snapshot(),
-   locomotion:{requestKey:this.locomotion.requestKey,requested:this.locomotion.requested,tempo:this.locomotion.tempo,traffic:structuredClone(this.locomotion.traffic)},
+   locomotion:this.locomotion.snapshotExecution(),
    state:structuredClone({pos:this.pos,yaw:this.yaw,feet:this.feet,swing:this.swing,time:this.time,pendingPhysicsFinish:this.pendingPhysicsFinish,phase:this.phase,phaseT:this.phaseT,phaseWallT:this.phaseWallT,plan:this.plan,index:this.index,
     skill:task,route:this.route,routeIndex:this.routeIndex,walkHandoff:this.walkHandoff,grips:this.grips,lastObject:this.lastObject,stats:this.stats,strengthLastLengths:this.strengthLastLengths,strengthLastObjectVelocity:this.strengthLastObjectVelocity}),
    heldId:this.held?.id||null,objectId:this.skill?.o?.id||null,targetId:this.skill?.target?.id||null,evidenceLength:this.evidence.length,
@@ -141,7 +141,7 @@ class Agent{
    if(population&&this.held?.heldOwner!==this.npcId){this.held=null;this.grips=null;}
    this.strength.state=structuredClone(saved.strength);this.strength.lastAssessment=structuredClone(saved.assessment);
    Object.assign(this.basic,structuredClone(saved.basic));this.evidence.length=saved.evidenceLength;
-   this.locomotion.engine.state=structuredClone(saved.kernel);Object.assign(this.locomotion,saved.locomotion);this.locomotion.sync();
+   this.locomotion.engine.state=structuredClone(saved.kernel);this.locomotion.restoreExecution(saved.locomotion);this.locomotion.sync();
    // Floor extensions have a different pelvis height from the navigation root.
    this.pos=[...saved.state.pos];this.yaw=saved.state.yaw;this.feet=structuredClone(saved.state.feet);this.swing=structuredClone(saved.state.swing);this.locomotion.pose.restore(saved.pose);
   }
@@ -154,7 +154,7 @@ class Agent{
  manipulationProgress(dt){
   // Only the task reference slows down. Physics, fatigue and recovery retain
   // real fixed time, including while the gait brakes to a planted stance.
-  return this.held&&['lift','lower'].includes(this.phase)?dt*this.manipulationPace():dt;
+  return this.held&&['lift','lower','boxPickup','boxPutdown'].includes(this.phase)?dt*this.manipulationPace():dt;
  }
  governManipulation(hands,dt){
   const s=this.skill,o=this.held,c=s.coupling??={pace:1,braking:false,blockedS:0};
@@ -212,6 +212,7 @@ class Agent{
   c.reason=c.braking?'waiting-for-object':stalled?'contact-resistance':utilization>.8?'force-limit':'tracking';
   if(intentError>.24||angleError>.65||c.blockedS>2.5)throw Error(s.type==='push'?'推动受阻，减速等待后物体仍未跟随':'物理抓握受阻或偏转过大，无法继续搬运');
   const r=graspResidual(this.h,this.held,this.grips);
+  if(s.activeHands?.length===1)for(const side of ['left','right'])if(!s.activeHands.includes(side))delete r[side];
   const palmError=Math.max(...Object.values(r).map(v=>v.positionM)),palmAngle=Math.max(...Object.values(r).map(v=>v.angleRad));
   this.stats.maxPalmResidualM=Math.max(this.stats.maxPalmResidualM,palmError);
   s.physicalContactErrorS=palmError>.035||palmAngle>.20?(s.physicalContactErrorS||0)+dt:0;
@@ -251,6 +252,22 @@ class Agent{
    const wrist=frame(add(shoulder.p,mix(offset,sub(rest.p,shoulder.p),t)),qslerp(start.q,rest.q,t));
    return[side,compose(wrist,frame(this.h.bodyMetrics.palmContact))];
   }));
+  // Once contact ends, the wrist may change its orientation. Keep its
+  // position/path, but relax an over-deviated free palm before certification.
+  // The same corrected path is used by planning and execution.
+  const relaxation=smoother(clamp(elapsed/.25,0,1)),radialLimit=(20-relaxation)*Math.PI/180,ulnarLimit=(40-relaxation)*Math.PI/180,flexLimit=(70-2*relaxation)*Math.PI/180;
+  for(let pass=0;pass<3;pass++){
+   const fit=this.locomotion.pose.build({...motionContactDescriptor(this,hands,crouch,'rise'),hands});
+   for(const side of ['left','right']){
+    const hand=fit.frames.get(side+'_hand'),elbow=fit.frames.get(side+'_forearm'),v=rotate(inv(hand.q),norm(sub(hand.p,elbow.p)));
+    const bind=this.h.sourceBind.get(side+'_hand'),nodes=this.h.resolvedRig.nodes,across=rotate(inv(bind.q),sub(nodes[side+'_finger_2_1'].positionM,nodes[side+'_finger_5_1'].positionM)),sign=Math.sign(across[0]);
+    const deviation=Math.atan2(v[0],Math.hypot(v[1],v[2])),radial=-deviation*sign,flex=Math.atan2(v[2],-v[1]);
+    const corrected=-clamp(radial,-ulnarLimit,radialLimit)*sign;
+    if(Math.abs(deviation-corrected)<1e-8&&Math.abs(flex)<flexLimit)continue;
+    const q=qm(hand.q,qm(qz(deviation-corrected),qx(clamp(flex,-flexLimit,flexLimit)-flex)));
+    hands[side]=compose(frame(hand.p,q),frame(this.h.bodyMetrics.palmContact));
+   }
+  }
   return{crouch,hands};
  }
  chooseReleaseMotion(s){
@@ -310,20 +327,47 @@ class Agent{
  pruneHistory(){if(this.evidence.length>128)this.evidence.splice(0,this.evidence.length-128);if(this.basic.phaseLog.length>32)this.basic.phaseLog.splice(0,this.basic.phaseLog.length-32);}
  advanceStrength(dt,assessment=null){this.strength.advance(dt,assessment);if(!this.w.population)advanceRoutineEnvironment(this.w,dt);if(!this.held){this.strengthLastLengths=null;this.strengthLastObjectVelocity=null;}}
  gait(dt,moving,measuredSpeed=null){this.locomotion.update(dt,moving,measuredSpeed);}
+ *prepareManipulationContactSteps(s,lower){
+  const object=lower?frame(s.dest,qm(qy(this.yaw),s.uprightQRel)):frame(s.o.p,s.o.q);
+  if(s.boxHandling){
+   const boxPlan=yield* motionPlanBoxHandlingSteps(this.h,s.o,this.pos,this.yaw,this.w,s.carryConfiguration,object);
+   return{boxPlan,contact:lower?boxPlan.supportContact:boxPlan.entryContact,grips:lower?boxPlan.supportGrips:boxPlan.entryGrips,ground:boxPlan.tilted};
+  }
+  const grips=lower?this.grips:graspFrames(s.o,this.yaw,s.type==='push'),hands=Object.fromEntries(['left','right'].map(side=>[side,compose(object,grips[side])]));
+  const contact=yield* motionChooseContactSteps(this.h,this.pos,this.yaw,hands,this.w,[s.o.id],{objectPose:object,grips:s.type==='carry'?grips:null,push:s.type==='push',carryConfiguration:s.carryConfiguration});
+  return{boxPlan:null,contact,grips,ground:object};
+ }
  handsFor(goal){return Object.fromEntries(['left','right'].map(side=>[side,compose(goal,this.grips[side])]))}
  carryingGoal(){const c=this.skill.carryConfiguration;return frame(add([this.pos[0],c?.heightM??motionCarryHeight(this.h),this.pos[2]],rotate(qy(this.yaw),[0,0,c?.forwardM??motionCarryForward(this.h)])),qm(qy(this.yaw),this.skill.qRel))}
  tick(dt){if(this.characterEditInProgress)return 0;return this.clock.advance(dt,step=>this.tickFixed(step),this.paused);}
  tickFixed(dt){if(this.paused)return;if(this.preflightWaiting){try{this.w.physics.syncScene();this.advancePreflight(dt);this.stepPhysics(dt);}catch(error){this.fail(error.message);}return;}if(this.skill?.releaseVerified){try{this.w.physics.syncScene();this.saveSafe();this.time+=dt;this.skill.releaseVerified.waitS+=dt;if(this.skill.releaseVerified.waitS>1.5)throw Error("解除预检暂停后物体未重新获得真实支撑");this.releaseObject(this.skill);this.stepPhysics(dt);}catch(error){this.fail(error.message);}return;}this.w.physics.syncScene();this.saveSafe();this.time+=dt;this.phaseWallT+=dt;this.phaseT+=this.manipulationProgress(dt);if(!this.skill&&this.plan&&(this.basic.posture!=='standing'||this.walkHandoff||this.locomotion.canTransition(this.plan.steps[this.index]?.type))){try{this.begin()}catch(e){this.fail(e.message);return}}if(this.preflightWaiting){try{this.stepPhysics(dt);}catch(error){this.fail(error.message);}return;}if(this.basic.busy||this.basic.posture!=='standing'){try{this.basic.update(dt);this.advanceStrength(dt,strengthFreeActivity(this));this.stepPhysics(dt);}catch(e){this.fail(e.message)}return;}let moving=false,crouch=0,lean=.015,hands=null,manipulationTarget=null,curl=0,wave=0;const s=this.skill;try{
- if(s){if(this.held&&['lift','lower'].includes(this.phase)&&this.phaseWallT>15)throw Error('抬放动作等待物理响应超时');if(this.phase==='turn'&&!this.locomotion.turnInPlace(s.turnTargets[s.turnIndex],dt)){s.turnIndex++;if(s.turnIndex>=s.turnTargets.length)this.finish();}
+ if(s){if(this.held&&['lift','lower','boxPickup','boxPutdown'].includes(this.phase)&&this.phaseWallT>15)throw Error('抬放动作等待物理响应超时');if(this.phase==='turn'&&!this.locomotion.turnInPlace(s.turnTargets[s.turnIndex],dt)){s.turnIndex++;if(s.turnIndex>=s.turnTargets.length)this.finish();}
  if(this.phase==='walk'||this.phase==='approach'){moving=this.moveAlong(dt);if(!moving&&this.routeIndex>=this.route.length){if(s.type==='walk'){if(this.plan?.steps[this.index+1]?.type==='walk'||this.locomotion.canTransition(this.plan?.steps[this.index+1]?.type))this.finish()}else this.enter('settle')}}
- if(this.phase==='settle'){const d=angleDiff(s.approachYaw,this.yaw);this.locomotion.turnInPlace(s.approachYaw,dt);if(Math.abs(d)<.015&&this.locomotion.canTransition('carry')){this.requireStableObject(s.o);this.grips=graspFrames(s.o,this.yaw,s.type==='push');s.initialPalms={left:frame(this.h.palm('left').p,this.h.palm('left').q),right:frame(this.h.palm('right').p,this.h.palm('right').q)};s.reachStart=motionFreeHandEndpoints(this.h,new Map(this.h.joints.map(j=>[j.id,j.world])),s.initialPalms);s.startObject=frame(s.o.p,s.o.q);s.qRel=qm(inv(qy(this.yaw)),s.o.q);this.startPreflight('reach',()=>{this.grips=graspFrames(s.o,this.yaw,s.type==='push');s.startObject=frame(s.o.p,s.o.q);s.qRel=qm(inv(qy(this.yaw)),s.o.q);return motionChooseContactSteps(this.h,this.pos,this.yaw,this.handsFor(s.startObject),this.w,[s.o.id],{objectPose:s.startObject,grips:s.type==='carry'?this.grips:null,carryConfiguration:s.carryConfiguration});},contact=>{s.contactPose=contact;this.enter('reach')})}}
+ if(this.phase==='settle'){const d=angleDiff(s.approachYaw,this.yaw);this.locomotion.turnInPlace(s.approachYaw,dt);if(Math.abs(d)<.015&&this.locomotion.canTransition('carry')){
+  this.requireStableObject(s.o);s.initialPalms={left:frame(this.h.palm('left').p,this.h.palm('left').q),right:frame(this.h.palm('right').p,this.h.palm('right').q)};
+  s.reachStart=motionFreeHandEndpoints(this.h,new Map(this.h.joints.map(j=>[j.id,j.world])),s.initialPalms);
+  this.startPreflight('reach',()=>this.prepareManipulationContactSteps(s,false),result=>{s.boxPlan=result.boxPlan;s.contactPose=result.contact;this.grips=result.grips;s.startObject=frame(s.o.p,s.o.q);s.uprightQRel=qm(inv(qy(this.yaw)),s.o.q);s.qRel=[...s.uprightQRel];this.enter('reach');});
+ }}
  if(this.phase==='reach'){const t=smoother(this.phaseT/1.7);crouch=t;lean=.91*t;const goal=this.handsFor(s.startObject);hands=goal;if(this.phaseT>=1.7){s.contactWait=0;this.enter('close')}}
  if(this.phase==='close'){this.requireStableObject(s.o);s.startObject=frame(s.o.p,s.o.q);crouch=1;lean=.91;hands=this.handsFor(s.startObject);curl=s.type==='push'?0:clamp(this.phaseT/.50,0,1);}
  if(this.phase==='lift'){const t=smoother(this.phaseT/2.1);crouch=1-t;lean=.91*crouch+.035*t;const carry=this.carryingGoal(),goal=frame(mix(s.startObject.p,carry.p,t),qslerp(s.startObject.q,carry.q,t));hands=this.handsFor(goal);curl=1;if(this.phaseT>=2.1&&this.manipulationAligned()){this.route=this.w.path(this.pos,s.transferEnd,carryRouteRadius(s.o,bodyPhysicalProfile(this.h),s.carryConfiguration),[s.o.id]);this.routeIndex=0;this.enter('travel')}}
  if(this.phase==='travel'){moving=this.moveAlong(dt,.43);hands=this.handsFor(this.carryingGoal());curl=1;lean=.035;if(!moving&&this.routeIndex>=this.route.length&&!this.swing){this.enter('placeSettle')}}
- if(this.phase==='placeSettle'){const d=angleDiff(s.finalYaw,this.yaw);this.locomotion.turnInPlace(s.finalYaw,dt);hands=this.handsFor(this.carryingGoal());curl=1;lean=.035;if(Math.abs(d)<=.016&&this.locomotion.canTransition('carry')){s.lowerStart=frame(s.o.p,s.o.q);this.startPreflight('lower',()=>{s.lowerStart=frame(s.o.p,s.o.q);return motionChooseContactSteps(this.h,this.pos,this.yaw,this.handsFor(frame(s.dest,s.lowerStart.q)),this.w,[s.o.id],{objectPose:frame(s.dest,s.lowerStart.q),grips:this.grips,carryConfiguration:s.carryConfiguration});},contact=>{s.contactPose=contact;this.enter('lower')})}}
- if(this.phase==='lower'){const t=smoother(this.phaseT/2.1);crouch=t;lean=.035*(1-t)+.91*t;const dest=frame(s.dest,s.lowerStart.q);hands=this.handsFor(frame(mix(s.lowerStart.p,dest.p,t),s.lowerStart.q));curl=1;if(this.phaseT>=2.1&&this.manipulationAligned())this.enter('release')}
- if(this.phase==='release'){crouch=1;lean=.91;hands=this.handsFor(frame(s.dest,s.lowerStart.q));curl=1-clamp(this.phaseT/.5,0,1);}
+ if(this.phase==='placeSettle'){const d=angleDiff(s.finalYaw,this.yaw);this.locomotion.turnInPlace(s.finalYaw,dt);hands=this.handsFor(this.carryingGoal());curl=1;lean=.035;if(Math.abs(d)<=.016&&this.locomotion.canTransition('carry')){
+  s.lowerStart=frame(s.o.p,s.o.q);this.startPreflight('lower',()=>this.prepareManipulationContactSteps(s,true),result=>{s.boxPlan=result.boxPlan;s.contactPose=result.contact;s.lowerGround=result.ground;s.lowerStart=frame(s.o.p,s.o.q);this.enter('lower');});
+ }}
+ if(this.phase==='lower'){const t=smoother(this.phaseT/2.1);crouch=t;lean=.035*(1-t)+.91*t;const dest=s.lowerGround||frame(s.dest,s.lowerStart.q);hands=this.handsFor(frame(mix(s.lowerStart.p,dest.p,t),qslerp(s.lowerStart.q,dest.q,t)));curl=1;if(this.phaseT>=2.1&&this.manipulationAligned())this.enter(s.boxPlan?'boxPutdown':'release')}
+ if(this.phase==='release'){crouch=1;lean=.91;hands=this.handsFor(s.releaseGround||frame(s.dest,s.lowerStart.q));curl=1-clamp(this.phaseT/.5,0,1);}
+ if(this.phase==='boxPickup'||this.phase==='boxPutdown'){
+  const pickup=this.phase==='boxPickup';
+  if(pickup&&this.phaseT>1.6&&this.phaseT<2&&qangle(s.o.q,s.boxPlan.tilted.q)>.025)this.phaseT=1.6;
+  const progress=clamp(this.phaseT/4,0,1),step=motionBoxAdjustment(s.boxPlan,pickup?progress:1-progress);
+  this.grips=step.grips;s.contactPose=step.contact;s.activeHands=step.activeHands;crouch=1;hands=this.handsFor(step.object);curl=1;
+  if(this.phaseT>=4&&this.manipulationAligned()){
+   s.activeHands=['left','right'];
+   if(pickup){s.startObject=frame(s.o.p,s.o.q);s.qRel=qm(inv(qy(this.yaw)),s.o.q);s.contactPose=s.boxPlan.supportContact;this.enter('lift');}
+   else{s.releaseGround=s.boxPlan.upright;s.lowerStart=frame(s.o.p,s.o.q);s.contactPose=s.boxPlan.entryContact;this.enter('release');}
+  }
+ }
  if(this.phase==='rise'){curl=0;}
  if(this.phase==='pushTravel'){
   crouch=1;moving=this.moveAlong(dt,.22);
@@ -344,9 +388,20 @@ class Agent{
  // Feeding the visible palms back as the actuator target would erase the
  // spring extension and stop lifting/pushing as soon as the hands complied.
  if(this.held&&hands&&!s?.releasing){manipulationTarget=this.governManipulation(hands,dt);hands=this.handsFor(frame(this.held.p,this.held.q));}
+ // Body rise/lowering follows the load's solved height, not the actuator's
+ // desired time. A delayed load otherwise left the knees extending while
+ // the palms were still low, forcing the wrists outside their range.
+ if(this.held&&s&&this.phase==='lift'){
+  const height=this.carryingGoal().p[1]-s.startObject.p[1];
+  if(Math.abs(height)>1e-5)crouch=1-clamp((this.held.p[1]-s.startObject.p[1])/height,0,1);
+ }
+ if(this.held&&s&&this.phase==='lower'){
+  const height=s.lowerStart.p[1]-(s.lowerGround?.p[1]??s.dest[1]);
+  if(Math.abs(height)>1e-5)crouch=clamp((s.lowerStart.p[1]-this.held.p[1])/height,0,1);
+ }
  const descriptor=hands?motionContactDescriptor(this,hands,crouch):{};
- this.h.pose({...descriptor,hands,time:this.time,deltaTime:dt});
- if(s?.o&&['reach','close','lift','travel','placeSettle','lower','release','rise','pushTravel'].includes(this.phase)){
+ this.h.pose({...descriptor,hands,time:this.time,deltaTime:dt,groundClearance:!!hands});
+ if(s?.o&&['reach','close','boxPickup','boxPutdown','lift','travel','placeSettle','lower','release','rise','pushTravel'].includes(this.phase)){
   motionRequireObjectClearance(this.h,this.w,s.o.id,null,null,0);
   if(s.o.shape==='box'){
    const hand=contactHandObjectClearance(this.h,null,this.w.physics,s.o.id);s.handContactClearance=hand;
@@ -358,18 +413,18 @@ class Agent{
   const crossing=current.rows.find(r=>r.clearanceM<0);
   if(crossing)throw Error('撤手路径进入物体：'+crossing.id+'，保持最后安全姿态');
  }
- if(s&&this.phase==='close'&&this.phaseT>.55){const r=graspResidual(this.h,s.o,this.grips),ok=Object.values(r).every(v=>v.positionM<.012&&v.angleRad<.07);if(ok){this.requireStableObject(s.o);this.w.population?.claimObject(this,s.o.id);this.stats.graspEstablished++;this.held=s.o;s.o.held=true;if(this.w.population)s.o.heldOwner=this.npcId;s.startObject=frame(s.o.p,s.o.q);s.qRel=qm(inv(qy(this.yaw)),s.o.q);this.strengthLastObjectVelocity={id:s.o.id,v:[...s.o.v]};this.grips=Object.fromEntries(['left','right'].map(side=>[side,compose(inverse(frame(s.o.p,s.o.q)),this.h.palm(side))]));if(s.type==='push'){s.pushStartBody=[...this.locomotion.engine.state.root];s.pushStartObject=frame(s.o.p,s.o.q);this.route=[straightPushRoute(this.w,s.o,s.dest,this.pos,bodyPhysicalProfile(this.h))];this.routeIndex=0;}this.enter(s.type==='push'?'pushTravel':'lift')}else if(this.phaseT>1.0)throw Error('双掌接触未成立：'+Math.round(Math.max(...Object.values(r).map(v=>v.positionM))*1000)+' mm')}
+ if(s&&this.phase==='close'&&this.phaseT>.55){const r=graspResidual(this.h,s.o,this.grips),ok=Object.values(r).every(v=>v.positionM<.012&&v.angleRad<.07);if(ok){this.requireStableObject(s.o);this.w.population?.claimObject(this,s.o.id);this.stats.graspEstablished++;this.held=s.o;s.o.held=true;if(this.w.population)s.o.heldOwner=this.npcId;s.startObject=frame(s.o.p,s.o.q);s.qRel=qm(inv(qy(this.yaw)),s.o.q);this.strengthLastObjectVelocity={id:s.o.id,v:[...s.o.v]};this.grips=Object.fromEntries(['left','right'].map(side=>[side,compose(inverse(frame(s.o.p,s.o.q)),this.h.palm(side))]));if(s.type==='push'){s.pushStartBody=[...this.locomotion.engine.state.root];s.pushStartObject=frame(s.o.p,s.o.q);this.route=[straightPushRoute(this.w,s.o,s.dest,this.pos,bodyPhysicalProfile(this.h))];this.routeIndex=0;}this.enter(s.type==='push'?'pushTravel':s.boxPlan?'boxPickup':'lift')}else if(this.phaseT>1.0)throw Error('双掌接触未成立：'+Math.round(Math.max(...Object.values(r).map(v=>v.positionM))*1000)+' mm')}
  if(this.held&&!s?.releasing){
   this.w.population?.claimObject(this,this.held.id);
   if(this.w.population&&this.held.heldOwner!==this.npcId)throw Error('该物体的抓握归属已变更');
-  const measured=inferHeldFrame(this.h,this.grips),candidate=manipulationTarget||measured;
+  const single=s.activeHands?.length===1?s.activeHands[0]:null,measured=single?{...compose(this.h.palm(single),inverse(this.grips[single])),positionDisagreement:0,angleDisagreement:0}:inferHeldFrame(this.h,this.grips),candidate=manipulationTarget||measured;
   if(measured.positionDisagreement>.04||measured.angleDisagreement>.16)throw Error('双掌实际姿态不一致，无法维持物理接触');
   if(candidate.positionDisagreement>.04||candidate.angleDisagreement>.16)throw Error('左右掌目标不一致，已保持上一有效姿势');
   if(s.lastManipulationTarget&&dist(candidate.p,s.lastManipulationTarget.p)>Math.max(.035,dt*2))throw Error('双掌目标移动超过接触控制速度上限');
   const effort=strengthRuntimeAssessment(this,candidate,dt);this.strength.lastAssessment=effort;
   if(!effort.feasible)throw Error('力量限制：'+strengthReason(effort));
   if(effort.physicsLimits.maxForceN<=0)throw Error('当前姿态没有剩余手部施力能力');
-  this.w.physics.setManipulation(this.held,candidate,s.type,{...effort.physicsLimits,ownerId:this.npcId||null});
+  this.w.physics.setManipulation(this.held,candidate,s.type,{...effort.physicsLimits,ownerId:this.npcId||null,supportPivotLocal:s.boxPlan&&['boxPickup','boxPutdown'].includes(this.phase)?s.boxPlan.pivot:null});
   s.lastManipulationTarget=frame(candidate.p,candidate.q);this.advanceStrength(dt,effort);this.strengthLastLengths=effort.request.lengthRatios;
   this.stats.heldFrames++;this.stats.maxGripDisagreementM=Math.max(this.stats.maxGripDisagreementM,measured.positionDisagreement);
  }
@@ -377,13 +432,19 @@ class Agent{
  this.stepPhysics(dt);if(!this.w.population)this.assessManipulationFeedback(dt);
  if(s&&this.phase==='release'&&this.phaseT>.52)this.releaseObject(s);
  if(s&&this.phase==='rise')this.verifyPlacement(s,dt);
- const d=this.h.diagnostics();this.stats.maxBoneLengthErrorM=Math.max(this.stats.maxBoneLengthErrorM,d.maxBoneLengthErrorM);for(const side of['left','right'])if(this.swing?.side!==side)this.stats.maxFootPositionErrorM=Math.max(this.stats.maxFootPositionErrorM,dist(this.h.legs[side].wrist.world.p,this.feet[side].p));
+ const d=this.h.diagnostics();this.stats.maxBoneLengthErrorM=Math.max(this.stats.maxBoneLengthErrorM,d.maxBoneLengthErrorM);
+ for(const side of['left','right'])if(this.swing?.side!==side){
+  const actual=this.h.legs[side].wrist.world,foot=this.locomotion.engine.state.feet[side],rocker=foot.rocker;
+  // Measure the committed heel/forefoot against its independent world pivot.
+  // The ankle is expected to move while that contact remains stationary.
+  const local=rocker?.pitch?rotate(inv(this.h.sourceBind.get(side+'_foot').q),rocker.pivot):[0,0,0];
+  const point=add(actual.p,rotate(actual.q,local)),target=rocker?.pitch?rocker.world:this.feet[side].p;
+  this.stats.maxFootPositionErrorM=Math.max(this.stats.maxFootPositionErrorM,dist(point,target));
+ }
  }catch(e){this.fail(e.message)}}
  activity(){return characterActivity(this);}
  diagnostics(){return{activity:this.activity(),strength:this.strength.report(),basic:this.basic.report(),locomotion:this.locomotion.report(),armSwing:{signal:this.gaitSignal,blend:this.gaitBlend,speedMPS:this.walkSpeed,mode:this.held?'grasp-priority':'contralateral-gait-coupling'},phase:this.phase,paused:this.paused,error:this.error,preflight:this.preflight?{...this.preflight}:null,activeStep:this.skill?{type:this.skill.type,objectId:this.skill.objectId,targetId:this.skill.targetId}:null,plan:this.plan?{steps:this.plan.steps,index:this.index}:null,heldObject:this.held?.id||null,stats:{...this.stats},completionEvidence:[...this.evidence],world:this.w.snapshot(),body:this.h.diagnostics(),interactionMode:'feedback-governed-rigid-body-manipulation',physicalCoupling:this.skill?.coupling?structuredClone(this.skill.coupling):null,physics:this.w.physics.snapshot(),forceDynamicsEnabled:true,forceDynamicsValidated:false,humanLocomotionDynamics:false,motionClock:{stepS:this.clock.step,ticks:this.clock.ticks,droppedSeconds:this.clock.droppedSeconds},physicalFeasibilityReasoning:true,physicalProfile:bodyPhysicalProfile(this.h),openLanguageUnderstanding:false,visualAcceptance:false,productionReady:false}}
 }
-
-
 
 
 
