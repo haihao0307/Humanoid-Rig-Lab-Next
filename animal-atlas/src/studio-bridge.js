@@ -77,5 +77,5 @@ globalThis.AtlasStudioAdapter=function(context,range,check,select){
  function tick(){const delta=S.rotationDelta();if(delta&&!drag&&performance.now()>interactingUntil){rotate(delta);render();}requestAnimationFrame(tick);}requestAnimationFrame(tick);
  window.__ATLAS_STUDIO_INPUT={snapshot:()=>({dragging:!!drag,moves,autoHeld:!!drag||performance.now()<interactingUntil})};
  const controls=AtlasParameterSchema.presentationControls(S.state);
- return{controls,resetView,set(key,value){S.set(key,value);if(key==='displayStage'&&kind==='crab')__CRAB_QA__.stage(value==='turntable'?'lab':'beach');if(kind==='eagle')eagle.dirty=true;render();},info:()=>S.info(),stage};
+ return{controls,resetView,set(key,value){S.set(key,value);if(key==='displayStage'&&kind==='crab')__CRAB_QA__.stage('lab');if(kind==='eagle')eagle.dirty=true;render();},info:()=>S.info(),stage};
 };

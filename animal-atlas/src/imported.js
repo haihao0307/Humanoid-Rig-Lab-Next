@@ -1,13 +1,13 @@
 import * as T from '../vendor/three.module.js';
 import {GLTFLoader} from '../vendor/loaders/GLTFLoader.js';
-import {createBeach} from './beach.js';
+
 const config=window.__ATLAS_CONTEXT;
 async function start(){
  const data=JSON.parse(document.querySelector('#instrument-data').textContent),bytes=Uint8Array.from(atob(data.glb),c=>c.charCodeAt(0));
  const manager=new T.LoadingManager();manager.setURLModifier(url=>{if(/^(data:|blob:)/.test(url))return url;throw Error('外部资源未内嵌：'+url);});
  const gltf=await new GLTFLoader(manager).parseAsync(bytes.buffer,'');
  const renderer=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;document.body.append(renderer.domElement);
- const scene=new T.Scene(),beach=createBeach(T,scene),camera=new T.PerspectiveCamera(37,1,.015,1800),placement=new T.Group(),model=gltf.scene;placement.add(model);scene.add(placement);
+ const scene=new T.Scene(),beach={group:new T.Group(),update(){}},camera=new T.PerspectiveCamera(37,1,.015,1800),placement=new T.Group(),model=gltf.scene;placement.add(model);scene.add(placement);
  let meshes=0;model.traverse(o=>{if(o.isMesh){meshes++;o.castShadow=o.receiveShadow=true;}});const bounds=new T.Box3().setFromObject(model),size=bounds.getSize(new T.Vector3()),center=bounds.getCenter(new T.Vector3()),extent=Math.max(...size.toArray());if(!meshes||!Number.isFinite(extent)||extent<=0)throw Error('模型没有可展示的有效动物网格');
  // Keep source node transforms and bone bindings intact; put normalization on a separate parent.
  const factor=2/extent;model.position.sub(new T.Vector3(center.x,bounds.min.y,center.z));placement.scale.setScalar(factor);

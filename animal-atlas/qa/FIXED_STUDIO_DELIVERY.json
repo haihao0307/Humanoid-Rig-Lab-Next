@@ -1,0 +1,127 @@
+{
+  "schema": "animal-atlas/fixed-studio-delivery@1",
+  "passed": true,
+  "task": {
+    "taskId": "fixed-warm-key-cool-fill-no-habitats-20261004",
+    "startedAt": "2026-10-04T02:58:14Z",
+    "automaticStopAt": "2026-10-04T05:58:14Z",
+    "baseSha": "5bba4085af027da5f0ef5520f590e78e8ea95e9c",
+    "scope": "Animal display window; fixed warm key / cool fill; remove habitat visualization and UI; preserve animal algorithms, parameters, actions, offline exports",
+    "noDesktopMouse": true,
+    "scientificAcceptance": false
+  },
+  "completedAt": "2026-10-04T03:37:52.246Z",
+  "lightingRig": "warm-cool-fixed@1",
+  "noDesktopMouse": true,
+  "html": {
+    "file": "打开动物集成工作台.html",
+    "bytes": 106509637,
+    "sha256": "e5a53ca7a24a34427da015dfa73a9af77bb046b6a817f05bbaf9ef44872f7768"
+  },
+  "archive": {
+    "file": "animal-atlas-v1.2.0-offline.zip",
+    "bytes": 79728785,
+    "sha256": "e8b40ec4992ea831c326c806f171495e7aba33fc6cbd54f2c270348d7da24289"
+  },
+  "sourceFiles": [
+    {
+      "path": "src/turntable.js",
+      "sha256": "eae4dd048216af2ce7d10338329c64381e010b0675302764a78af9a48ad3da44"
+    },
+    {
+      "path": "src/studio-bridge.js",
+      "sha256": "b235c8cffa8a1e8fe021bc215b8ac123653f795047c8bfaaf0630f3081a474fd"
+    },
+    {
+      "path": "src/bridge.js",
+      "sha256": "b4332809c7d0be0b9d3d95b42143d2c084d789045228cd32ed8eb3f158bbce88"
+    },
+    {
+      "path": "src/app.js",
+      "sha256": "28b0b2620513976f5f95aa16db7ff2c6adab756b72b65255ef11385fe0abd152"
+    },
+    {
+      "path": "src/native.js",
+      "sha256": "d0310c4790c986d4e951d80e8b5e8dbbca5b21b1f1c909b4e4d196f44b3b71bd"
+    },
+    {
+      "path": "src/imported.js",
+      "sha256": "2f9495d897ac6ceced850325d9a526abc6c14ea40f8268b4855bb1dba1392d51"
+    },
+    {
+      "path": "src/catalog.js",
+      "sha256": "9fb8535fd05ef408994dab86634726561afa04ea3ee4c8fca1b418c72d2bb00f"
+    },
+    {
+      "path": "src/parameter-catalog.json",
+      "sha256": "c53320680fb9dbee12361ab7f616b5ea7c7ca2cd9c6350bb0f4f902b2cc1c91d"
+    },
+    {
+      "path": "tools/build.mjs",
+      "sha256": "d8a48f15aa83ee23d7d3bc5cc86f6a37c134b6e8c0fda84eeaf5de125f015a46"
+    },
+    {
+      "path": "tools/adapt-turntable.mjs",
+      "sha256": "292e2860a9638823cea93fcb74f1a03767970f666cc4dafd4c688c9ff8d1951f"
+    }
+  ],
+  "tests": [
+    {
+      "path": "qa/FIXED_STUDIO_REPORT.json",
+      "sha256": "f6965bc477074735c436911b4ff613120e7135594888faa5d926320438998aaf",
+      "passed": true,
+      "startedAt": "2026-10-04T03:34:37.442Z",
+      "completedAt": "2026-10-04T03:35:59.248Z",
+      "testedHtmlSha256": "e5a53ca7a24a34427da015dfa73a9af77bb046b6a817f05bbaf9ef44872f7768"
+    },
+    {
+      "path": "qa/FUNCTIONAL_SLIDERS_REPORT.json",
+      "sha256": "059d3307c5c08360fb0d9a9a66e7e473bc95f98856b3d672af14f9fb3a2c6067",
+      "passed": true,
+      "startedAt": "2026-10-04T03:34:37.488Z",
+      "completedAt": "2026-10-04T03:35:50.780Z",
+      "testedHtmlSha256": "e5a53ca7a24a34427da015dfa73a9af77bb046b6a817f05bbaf9ef44872f7768"
+    },
+    {
+      "path": "qa/LIVE_REHEARSAL_FINAL_REPORT.json",
+      "sha256": "76b9797051174796d0f0d1fe5c4bf511abc7c93a60602bf44a0cba8480bf7a95",
+      "passed": true,
+      "startedAt": "2026-10-04T03:34:38.087Z",
+      "completedAt": "2026-10-04T03:35:47.776Z"
+    },
+    {
+      "path": "qa/COMMON_PARAMETERS_REPORT.json",
+      "sha256": "69ab3d101beda8f63b384510b608bcbcaf8a7a651be64d2e8dd9260e3b8a03cf",
+      "passed": true,
+      "startedAt": "2026-10-04T03:23:31.238Z",
+      "completedAt": "2026-10-04T03:24:17.664Z",
+      "testedHtmlSha256": "cc4ceed63e9c6f4b9739502cc73470baef0de325bce8f0d155c53b1174c83570"
+    },
+    {
+      "path": "qa/IMPORT_REPORT.json",
+      "sha256": "3bb04dc03d9f230968edcfc4547e7fe997b86dceeffb265f26f5dcb1972e756e",
+      "passed": true,
+      "startedAt": "2026-10-04T03:23:32.301Z",
+      "completedAt": "2026-10-04T03:24:01.772Z"
+    },
+    {
+      "path": "qa/BASIC_ROUNDTRIP_REPORT.json",
+      "sha256": "ab7f02e3f9de6436a10b06a996fbe2c0bc399f0af56bb329f16e4157d01be6a3",
+      "passed": true,
+      "startedAt": "2026-10-04T03:17:17.102Z"
+    }
+  ],
+  "packaging": {
+    "zipHtmlMatchesStandalone": true,
+    "archivePartsExact": true,
+    "files": 5,
+    "parts": 46
+  },
+  "previousHtmlBytes": 108563884,
+  "htmlBytesSaved": 2054247,
+  "limitations": [
+    "Original life-world simulation data remain available to animal algorithms; habitat visuals and transplanted scenery renderers are disabled or removed.",
+    "Legacy presentation controls remain in file contracts but normalize to the fixed studio.",
+    "Earlier supplementary regression reports retain their actual tested artifact fingerprints; final lighting and functional-sliders reports bind to the delivered HTML."
+  ]
+}

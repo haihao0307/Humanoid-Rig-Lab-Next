@@ -73,17 +73,17 @@
       "group": "studio"
     },
     "presentation.key": {
-      "label": "主光强度",
+      "label": "暖主光强度",
       "unit": "source-range",
       "group": "studio"
     },
     "presentation.ambient": {
-      "label": "环境光强度",
+      "label": "柔和环境光",
       "unit": "source-range",
       "group": "studio"
     },
     "presentation.rim": {
-      "label": "轮廓光强度",
+      "label": "冷辅光强度",
       "unit": "source-range",
       "group": "studio"
     },
@@ -143,7 +143,8 @@
           "label": "原栖息环境"
         }
       ],
-      "value": "turntable"
+      "value": "turntable",
+      "uiHidden": true
     },
     {
       "key": "studioRotate",
@@ -167,7 +168,8 @@
       "min": -180,
       "max": 180,
       "step": 5,
-      "value": 35
+      "value": 35,
+      "uiHidden": true
     },
     {
       "key": "studioKey",
@@ -176,7 +178,7 @@
       "min": 0,
       "max": 6,
       "step": 0.1,
-      "value": 3.2
+      "value": 3.8
     },
     {
       "key": "studioAmbient",
@@ -184,8 +186,8 @@
       "type": "range",
       "min": 0,
       "max": 4,
-      "step": 0.1,
-      "value": 1.8
+      "step": 0.05,
+      "value": 0.65
     },
     {
       "key": "studioRim",
@@ -194,7 +196,7 @@
       "min": 0,
       "max": 3,
       "step": 0.05,
-      "value": 1.15
+      "value": 1.35
     },
     {
       "key": "studioExposure",
@@ -203,13 +205,13 @@
       "min": 0.35,
       "max": 2,
       "step": 0.05,
-      "value": 1.05
+      "value": 1.15
     },
     {
       "key": "studioBackground",
       "commonId": "presentation.background",
       "type": "color",
-      "value": "#101817"
+      "value": "#171b22"
     }
   ],
   "aliases": {

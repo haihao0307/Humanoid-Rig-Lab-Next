@@ -1,12 +1,12 @@
 import * as T from '../vendor/three.module.js';
-import {createBeach} from './beach.js';
+
 import * as Mammal from '../vendor/mammal/src/instrument.js';
 import * as Quad from '../vendor/quad/src/instrument.js';
 import {SCORE_LIBRARY as MS} from '../vendor/mammal/src/scores.js';
 import {SCORE_LIBRARY as QS} from '../vendor/quad/src/scores.js';
 const config=window.__ATLAS_CONTEXT,engine=config.engine==='quad'?Quad:Mammal,source=config.notation?{score:config.notation,label:config.name,source:'用户导入程序化动物谱'}:(config.engine==='quad'?QS:MS)[config.key],canvas=document.querySelector('canvas');
 const renderer=new T.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
-const scene=new T.Scene(),beach=createBeach(T,scene);
+const scene=new T.Scene(),beach={group:new T.Group(),update(){}};
 const camera=new T.PerspectiveCamera(37,1,.015,1800),target=new T.Vector3(),state={scale:1,bulk:1,color:source.score.match(/\|M([0-9a-f]+)/i)[1],roughness:Number(source.score.match(/\|M[0-9a-f]+,([.\d]+)/i)[1]),wire:false,bones:false,environment:true,playing:true,speed:1};let current,radius=3,yaw=.65,pitch=.13,time=0,frames=0;
 const initial=config.initial||{};
 if(typeof initial.color==='string'&&/^#[0-9a-f]{6}$/i.test(initial.color))state.color=initial.color.slice(1);

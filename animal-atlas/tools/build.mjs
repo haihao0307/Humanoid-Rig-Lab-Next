@@ -34,36 +34,23 @@ for(const filename of fs.readdirSync(path.join(root,'assets')).filter(p=>p.endsW
  if(key==='life-bruce')hook('function tick(dt){if(window.__ATLAS_PAUSED)return;\n simTime+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;dt*=globalThis.__ATLAS_DEMO?.activity??1;\n simTime+=dt;');
  if(key==='life-bird')hook('function tick(dt){if(window.__ATLAS_PAUSED)return;lifeVisualClock+=dt;','function tick(dt){if(window.__ATLAS_PAUSED)return;dt*=globalThis.__ATLAS_DEMO?.activity??1;lifeVisualClock+=dt;');
  if(key==='life-shark')hook('function step(dt){behavior.begin();if(state.paused)return;updateFish(dt);','function step(dt){behavior.begin();if(state.paused)return;dt*=globalThis.__ATLAS_DEMO?.activity??1;updateFish(dt);');
+ if(key.startsWith('life-')){
+  // Life's HDR pass clears the background before scene.onBeforeRender, and
+  // shark's post pass otherwise applies underwater haze to the whole screen.
+  hook('const state = sync(); post.render(drawScene, drawCamera, nativeRender, settings,',"const state = sync(); if(AtlasTurntable.isActive()){scene.background.set(AtlasTurntable.state.studioBackground);scene.fog=null;if(kind==='shark')api.ocean.setMode('neutral');}post.render(drawScene, drawCamera, nativeRender, settings, AtlasTurntable.isActive()?0:");
+ }
  if(key==='eagle')hook('let dt=Math.min((now-this.last)/1000,.25);','let dt=Math.min((now-this.last)/1000,.25)*(globalThis.__ATLAS_DEMO?.activity??1);');
- if(['life-pig','life-bruce','life-cat'].includes(key)){
- html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+beachScript.replaceAll('</script','<\\/script')+'</script>');
- const anchor='const world = LV.worlds(T, G, M, U).create(kind, scene, source);';
- if(!html.includes(anchor))throw Error('Beach life scene anchor missing '+key);
- html=html.replace(anchor,anchor+`\nconst atlasBeach=AtlasBeach.create(T,scene,{lighting:false,activityRadius:3.8});const atlasWorldUpdate=world.update.bind(world);world.update=(...args)=>{atlasWorldUpdate(...args);world.group.visible=false;const sky=scene.getObjectByName('analytic-atmosphere');if(sky)sky.visible=false;camera.far=1800;camera.updateProjectionMatrix();atlasBeach.update(args[2],camera);};`);
- }
- if(key==='life-shark'){
- html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+read('src/reference-water-runtime.js').replaceAll('</script','<\\/script')+'</script>');
- html=html.replace('world.update(state, settings.quality, time, snapshot); lighting.update(state, position, settings.quality);','world.update(state, settings.quality, time, snapshot); lighting.update(state, position, settings.quality);if(engine.referenceWater){world.group.visible=false;api.ocean.surface.visible=false;api.ocean.underwater.visible=false;api.ocean.skyGroup.visible=false;if(!AtlasTurntable.isActive())engine.referenceWater.update();}');
- html=html.replace('engine.animal=animal;window.__ATLAS_THREE=T;window.__LIFE_VISUAL = engine;','engine.animal=animal;window.__ATLAS_THREE=T;window.__LIFE_VISUAL = engine;AtlasFishHabitat.installLife(T,engine).catch(error=>{engine.referenceError=String(error);console.error(error);});');
- }
  if(key==='crab')html=html.replace('a.time+=T*a.speed','a.time+=T*a.speed*(globalThis.__ATLAS_DEMO?.activity??1)');
  if(key==='cat-v440'){html=html.replaceAll('performance.now()/1000','(globalThis.__ATLAS_DEMO?.clock()??performance.now()/1000)');html=html.replace('window.__CAT_V440_STATS__=','window.__ATLAS_CAT_MESH__=()=>m;window.__CAT_V440_STATS__=');}
  if(key==='cat-v440'){
- html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+beachScript.replaceAll('</script','<\\/script')+'</script>');
- html=html.replace('const vs=`#version 300 es','AtlasBeach.prepareRaw(canvas,gl);const vs=`#version 300 es');
+ html=html.replace('const vs=`#version 300 es','const vs=`#version 300 es');
  html=html.replace('far=Math.max(4,dist+radius*5);return mul(perspective(CAMERA_FOV,canvas.width/canvas.height,near,far),lookAt(eye,target,up))','far=1800;const projection=perspective(CAMERA_FOV,canvas.width/canvas.height,near,far),view=lookAt(eye,target,up);window.__ATLAS_CAT_CAMERA_MATRICES__={projection,view,near,far};return mul(projection,view)');
  html=html.replace('gl.useProgram(pr);gl.bindVertexArray(meshVao);gl.uniformMatrix4fv(U.pv','AtlasBeach.drawRaw(gl,window.__ATLAS_CAT_CAMERA_MATRICES__);gl.useProgram(pr);gl.bindVertexArray(meshVao);gl.uniformMatrix4fv(U.pv');
  html=html.replace('gl.drawArrays(gl.LINES,0,grid.length/3);','if(!AtlasTurntable.isActive()&&!window.__ATLAS_BEACH?.group.visible)gl.drawArrays(gl.LINES,0,grid.length/3);');
  if(!html.includes('__ATLAS_CAT_CAMERA_MATRICES__'))throw Error('Cat beach camera hook missing');
  }
  if(key==='chicken'){html=html.replace('window.__CHICKEN_V46_API__=','window.__ATLAS_CHICKEN_MESHES=()=>candidateMeshes;window.__CHICKEN_V46_API__=');}
- if(key==='chicken'){
- html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+beachScript.replaceAll('</script','<\\/script')+'</script>');
- html=html.replace('const scene=new T.Scene();scene.background=new T.Color(0x182027);','const scene=new T.Scene();const atlasBeach=AtlasBeach.create(T,scene,{lighting:false});');
- html=html.replace('new T.PerspectiveCamera(32,1,.005,40)','new T.PerspectiveCamera(32,1,.005,1800)');
- html=html.replace('renderer.render(scene,camera);','atlasBeach.update(performance.now()/1000,camera);renderer.render(scene,camera);');
- html=html.replace('window.__ATLAS_CHICKEN_MESHES=',"let atlasBeachClock=0;renderer.setAnimationLoop(()=>{atlasBeachClock+=1/60;atlasBeach.update(atlasBeachClock,camera);renderer.render(scene,camera);});window.__ATLAS_CHICKEN_MESHES=");
- }
+ if(key==='chicken')html=html.replace('window.__ATLAS_CHICKEN_MESHES=',"renderer.setAnimationLoop(()=>renderer.render(scene,camera));window.__ATLAS_CHICKEN_MESHES=");
  if(key==='palau'){
   const start=html.indexOf('sources='),end=html.indexOf(',surfaces=',start);if(start<0||end<0)throw Error('Palau module map missing');
   const modules=JSON.parse(html.slice(start+8,end)),anchor='for(const [id,name,scientific]of info){';
@@ -80,6 +67,15 @@ for(const filename of fs.readdirSync(path.join(root,'assets')).filter(p=>p.endsW
   html=html.replace(decodeLoop,"for(const id of Object.keys(surfaces).filter(id=>!window.__ATLAS_CONTEXT?.key||id===window.__ATLAS_CONTEXT.key))");
  }
  html=adaptTurntable(html,key);
+ html=html.replaceAll('<script>'+beachScript.replaceAll('</script','<\\/script')+'</script>','').replaceAll('<script>'+read('src/reference-water-runtime.js').replaceAll('</script','<\\/script')+'</script>','');
+ html=html.replace('AtlasBeach.prepareRaw(canvas,gl);','').replace('await AtlasFishHabitat.prepare(canvas,gl);','').replace('globalThis.AtlasFishHabitat.projection','AtlasTurntable.projection');
+ if(key==='cat-v440')html=html.replace('))AtlasBeach.drawRaw(gl,window.__ATLAS_CAT_CAMERA_MATRICES__);', '));');
+ if(key==='fish')html=html.replace('))globalThis.AtlasFishHabitat?.draw(gl,m,this.state);', '));');
+ if(key==='chicken'){
+  const lightUniforms='uniform vec3 uAtlasLightDirection,uAtlasFillDirection,uAtlasKeyColor,uAtlasFillColor;uniform float uAtlasKey,uAtlasAmbient,uAtlasRim;';
+  html=html.replaceAll('vec3 shade(vec3 base,vec3 N,vec3 V,float rough,float f0,float occlusion){',lightUniforms+'vec3 shade(vec3 base,vec3 N,vec3 V,float rough,float f0,float occlusion){').replaceAll('vec3 L=normalize(vec3(3.,5.,4.)),L2=normalize(vec3(-3.,2.,-3.))','vec3 L=normalize(uAtlasLightDirection),L2=normalize(uAtlasFillDirection)').replaceAll('return base*(amb*occlusion+1.10*nl+.23*max(dot(N,L2),0.))+spec*nl*1.9;','return base*(amb*occlusion*.65*uAtlasAmbient+1.10*nl*uAtlasKey*uAtlasKeyColor+.38*max(dot(N,L2),0.)*uAtlasRim*uAtlasFillColor)+spec*nl*1.9*uAtlasKey*uAtlasKeyColor;').replaceAll('uniforms:{uKind:{value:kind},','uniforms:{uAtlasLightDirection:{value:new T.Vector3(.58,.78,.34)},uAtlasFillDirection:{value:new T.Vector3(-.72,.38,-.55)},uAtlasKeyColor:{value:new T.Vector3(1,.78,.52)},uAtlasFillColor:{value:new T.Vector3(.42,.64,1)},uAtlasKey:{value:1},uAtlasAmbient:{value:1},uAtlasRim:{value:1},uKind:{value:kind},');
+ }
+
  html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+read('src/demo-head.js').replaceAll('</script','<\\/script')+'</script>');
  const sourceLabel=sourceNames[key]||(key.startsWith('life-')?'Life Ecosystem V3.x · original procedural source snapshot':'Original project');
  const emit=(id,text,data=text,baseAsset)=>{const compressed=zlib.gzipSync(Buffer.from(data),{level:9});assets[id]={source:sourceLabel,sha256:sourceSha,adaptedSha256:hash(Buffer.from(text)),bytes:source.length,compressedBytes:compressed.length,...(baseAsset?{baseAsset}: {}),...(sourceAliases[id]?{compatibleSourceSha256:sourceAliases[id]}:{})};manifest.sources.push({id,...assets[id]});payloads+='<script type="application/octet-stream" id="payload-'+id+'">'+compressed.toString('base64')+'</script>\n';};
