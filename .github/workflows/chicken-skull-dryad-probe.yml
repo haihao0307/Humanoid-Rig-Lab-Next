@@ -1,0 +1,43 @@
+name: Chicken Skull Dryad Source Probe
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/chicken-skull-dryad-probe.yml
+      - tools/chicken_skull_dryad_probe.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe-dryad-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependency
+        run: python -m pip install --upgrade requests
+
+      - name: Download archive and build member manifest
+        run: python tools/chicken_skull_dryad_probe.py
+
+      - name: Remove large source archive from artifact
+        run: rm -f out/chicken-skull-dryad-probe/source/Muyshondt_et_al_Data_and_code.zip
+
+      - name: Upload probe evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: CHICKEN_SKULL_DRYAD_PROBE
+          path: out/chicken-skull-dryad-probe
+          if-no-files-found: error
+          retention-days: 7
