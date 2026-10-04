@@ -79,4 +79,8 @@ assert.equal(population.claims.size,0);
 assert.equal(population.stationClaims.size,0);
 assert.equal(population.resourceConflict(actor.agent,{text:'sameObject',source:'manual'}),null);
 
-console.log(JSON.stringify({passed:true,parkingWait:false,objectConflict:true,stationConflict:true,activeDiversion:true,boundedRetries:actor.resource.attempts,globalManipulationSerialized:true,diversion:actor.agent.submitted[0].steps[0]}));
+actor.resource.attempts=16;actor.queue=[];
+assert.throws(()=>population.startResourceCirculation(actor,original,objectConflict),/16 次机动/);
+assert.equal(actor.queue.length,0,'exhausted retries must not leave a new queued copy');
+
+console.log(JSON.stringify({passed:true,parkingWait:false,objectConflict:true,stationConflict:true,activeDiversion:true,retryLimitVerified:16,globalManipulationSerialized:true,diversion:actor.agent.submitted[0].steps[0]}));
