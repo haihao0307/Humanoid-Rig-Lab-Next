@@ -1,3 +1,4 @@
+import {PRODUCT_UNIFORMS,PRODUCT_GLSL} from '../src/product-lighting.js';
 import {materialize} from './materialize.mjs';
 import {adaptTurntable} from './adapt-turntable.mjs';
 materialize();
@@ -72,8 +73,8 @@ for(const filename of fs.readdirSync(path.join(root,'assets')).filter(p=>p.endsW
  if(key==='cat-v440')html=html.replace('))AtlasBeach.drawRaw(gl,window.__ATLAS_CAT_CAMERA_MATRICES__);', '));');
  if(key==='fish')html=html.replace('))globalThis.AtlasFishHabitat?.draw(gl,m,this.state);', '));');
  if(key==='chicken'){
-  const lightUniforms='uniform vec3 uAtlasLightDirection,uAtlasFillDirection,uAtlasKeyColor,uAtlasFillColor;uniform float uAtlasKey,uAtlasAmbient,uAtlasRim;';
-  html=html.replaceAll('vec3 shade(vec3 base,vec3 N,vec3 V,float rough,float f0,float occlusion){',lightUniforms+'vec3 shade(vec3 base,vec3 N,vec3 V,float rough,float f0,float occlusion){').replaceAll('vec3 L=normalize(vec3(3.,5.,4.)),L2=normalize(vec3(-3.,2.,-3.))','vec3 L=normalize(uAtlasLightDirection),L2=normalize(uAtlasFillDirection)').replaceAll('return base*(amb*occlusion+1.10*nl+.23*max(dot(N,L2),0.))+spec*nl*1.9;','return base*(amb*occlusion*.65*uAtlasAmbient+1.10*nl*uAtlasKey*uAtlasKeyColor+.38*max(dot(N,L2),0.)*uAtlasRim*uAtlasFillColor)+spec*nl*1.9*uAtlasKey*uAtlasKeyColor;').replaceAll('uniforms:{uKind:{value:kind},','uniforms:{uAtlasLightDirection:{value:new T.Vector3(.58,.78,.34)},uAtlasFillDirection:{value:new T.Vector3(-.72,.38,-.55)},uAtlasKeyColor:{value:new T.Vector3(1,.78,.52)},uAtlasFillColor:{value:new T.Vector3(.42,.64,1)},uAtlasKey:{value:1},uAtlasAmbient:{value:1},uAtlasRim:{value:1},uKind:{value:kind},');
+  const lightUniforms=PRODUCT_UNIFORMS+PRODUCT_GLSL;
+  html=html.replaceAll('vec3 shade(vec3 base,vec3 N,vec3 V,float rough,float f0,float occlusion){',lightUniforms+'vec3 shade(vec3 base,vec3 N,vec3 V,float rough,float f0,float occlusion){').replaceAll('vec3 L=normalize(vec3(3.,5.,4.)),L2=normalize(vec3(-3.,2.,-3.))','vec3 L=normalize(uAtlasLightDirection),L2=normalize(uAtlasFillDirection)').replaceAll('return base*(amb*occlusion+1.10*nl+.23*max(dot(N,L2),0.))+spec*nl*1.9;','return base*atlasDiffuse(N)*occlusion+atlasReflection(N,V,rough)+spec*nl*1.2*uAtlasKey*uAtlasKeyColor;').replaceAll('uniforms:{uKind:{value:kind},','uniforms:{uAtlasLightDirection:{value:new T.Vector3(-0.62,0.76,0.32)},uAtlasFillDirection:{value:new T.Vector3(0.65,0.3,0.7)},uAtlasEdgeDirection:{value:new T.Vector3(0.25,0.58,-0.78)},uAtlasKeyColor:{value:new T.Vector3(1,0.91,0.8)},uAtlasFillColor:{value:new T.Vector3(0.78,0.87,1)},uAtlasEdgeColor:{value:new T.Vector3(0.8,0.9,1)},uAtlasKey:{value:1},uAtlasAmbient:{value:1},uAtlasRim:{value:1},uKind:{value:kind},');
  }
 
  html=html.replace(/<head[^>]*>/i,m=>m+'<script>'+read('src/demo-head.js').replaceAll('</script','<\\/script')+'</script>');
