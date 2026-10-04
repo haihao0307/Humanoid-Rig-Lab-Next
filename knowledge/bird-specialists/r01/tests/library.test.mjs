@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {resolve,dirname} from 'node:path';
+import * as kernels from '../prototype/kernels.mjs';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const load=p=>JSON.parse(readFileSync(resolve(root,p),'utf8'));
+const {modules}=load('modules.json'),{sources}=load('sources.json');
+test('25 module and source counts unique',()=>{assert.equal(modules.length,32);assert.equal(sources.length,26);assert.equal(new Set(modules.map(m=>m.id)).size,32);assert.equal(new Set(sources.map(s=>s.id)).size,26);});
+test('26 every module has an existing card and source',()=>{for(const m of modules){assert.ok(existsSync(resolve(root,m.document)));assert.ok(readFileSync(resolve(root,m.document),'utf8').includes('## '+m.id+' '));for(const s of m.source_refs)assert.ok(sources.some(x=>x.id===s));}});
+test('27 no module falsely marked integrated or calibrated',()=>{for(const m of modules){assert.equal(m.integration_status,'NOT_INTEGRATED');assert.equal(m.enabled_by_default,false);assert.equal(m.species_calibrated,false);assert.equal(m.full_paper_reproduction,false);}});
+test('28 referenced primitive names exist and all exports documented',()=>{let seen=new Set();for(const m of modules)for(const n of m.prototype_functions){assert.equal(typeof kernels[n],'function');seen.add(n);}assert.equal(seen.size,Object.keys(kernels).length);});
+test('29 source entries complete and no third-party content vendored',()=>{for(const s of sources){assert.equal(new URL(s.url).protocol,'https:');assert.equal(s.checked_on,'2026-10-03');assert.ok(s.verification_level);assert.ok(s.supports);assert.equal(s.vendored,false);}});
+test('30 adoption template cannot imply approved target integration',()=>{const a=load('examples/adoption-task.template.json');assert.equal(a.enabled,false);assert.equal(a.target.base_commit,null);assert.equal(a.approval.production_ready,false);assert.equal(a.calibration.synthetic_fixture_values_allowed_as_species_truth,false);});
