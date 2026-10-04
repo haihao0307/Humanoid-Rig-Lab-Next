@@ -12,7 +12,9 @@ export const MOTOR_MUSCLES=[
  C('latissimus','背阔肌','肩伸展 / 内收','deltoid_front',.025,[A('spineLower',.25,.028,0,-.031),A('chest',-.18,.065,0,-.036),A('upperarm',.22,-.006,0,-.010)]),
  C('trapezius','斜方肌上束','肩胛上提 / 稳定','pectoralis',.014,[A('neck',.24,0,0,-.018),A('chest',.78,.035,0,-.025),A('clavicle',.88,0,0,-.010)]),
  C('biceps','肱二头肌','屈肘 / 前臂旋后','triceps',.020,[A('upperarm',.06,-.004,0,.020),A('upperarm',.58,0,0,.026),A('lowerarm',.23,-.004,0,.010)]),
- C('triceps','肱三头肌','伸肘','biceps',.023,[A('upperarm',.08,0,0,-.018),A('upperarm',.56,0,0,-.028),A('lowerarm',.07,0,0,-.009)]),
+ // Shared posterior elbow routing prior prevents the tendon taking a shortcut
+ // through the joint at deep flexion. It is not a measured muscle attachment.
+ C('triceps','肱三头肌','伸肘','biceps',.023,[A('upperarm',.08,0,0,-.018),A('upperarm',.56,0,0,-.028),A('upperarm',1,0,0,-.012),A('lowerarm',.07,0,0,-.009)]),
  C('forearm_flexors','前臂屈肌群','屈腕 / 握持','forearm_extensors',.014,[A('lowerarm',.06,-.007,0,.014),A('lowerarm',.45,0,0,.019),A('hand',.28,0,0,.005)]),
  C('forearm_extensors','前臂伸肌群','伸腕 / 稳定手掌','forearm_flexors',.013,[A('lowerarm',.07,.004,0,-.014),A('lowerarm',.44,0,0,-.017),A('hand',.25,0,0,-.004)]),
  C('erectors','竖脊肌群','躯干伸展 / 稳定','rectus_abdominis',.016,[A('pelvis',.14,.018,0,-.031),A('spineMiddle',0,.019,0,-.035),A('chest',.42,.020,0,-.030)]),
