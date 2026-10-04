@@ -4,7 +4,8 @@ export function adaptTurntable(html,key){
  const replace=(from,to)=>{if(!html.includes(from))throw Error('Turntable hook missing: '+key+' / '+from.slice(0,90));html=html.replace(from,to);};
  const uniforms=PRODUCT_UNIFORMS+PRODUCT_GLSL;
  if(key==='fish'){
-  replace('globalThis.AtlasFishHabitat?.draw(gl,m,this.state);',"if(!AtlasTurntable.rawDraw(gl,m,{radius:this.state.school?3.5:.6,floorY:this.state.school?-1.7:-.18,center:[0,0]}))globalThis.AtlasFishHabitat?.draw(gl,m,this.state);");
+  replace('if(this.state.school){const center=this.school.fish.reduce', 'if(this.state.school&&!AtlasTurntable.isActive()){const center=this.school.fish.reduce');
+  replace('globalThis.AtlasFishHabitat?.draw(gl,m,this.state);',"if(!AtlasTurntable.rawDraw(gl,m,{radius:.6,floorY:-.18,center:[0,0]}))globalThis.AtlasFishHabitat?.draw(gl,m,this.state);");
   replace('uniform float uAtlasDensity;', 'uniform float uAtlasDensity;'+uniforms);
   replace('vec3 L=normalize(vec3(-.4,.75,.8))','vec3 L=normalize(uAtlasLightDirection)');
   replace('L2=normalize(vec3(.7,.3,-.45))','L2=normalize(uAtlasFillDirection)');
@@ -13,7 +14,7 @@ export function adaptTurntable(html,key){
   replace("gl.uniform1i(u('uAtlasEnvironment'),this.state.environment===false?0:1);", "AtlasTurntable.rawLight(gl,program,{view:m.view});gl.uniform1i(u('uAtlasEnvironment'),this.state.environment===false||AtlasTurntable.isActive()?0:1);");
  }
  if(key==='cat-v440'){
-  replace('AtlasBeach.drawRaw(gl,window.__ATLAS_CAT_CAMERA_MATRICES__);',"const atlasRoot=window.__CAT_V440_METRICS__?.rootPosition||[0,0,0];if(!AtlasTurntable.rawDraw(gl,{...window.__ATLAS_CAT_CAMERA_MATRICES__,zUp:true},{radius:.42,floorY:-.005,center:[atlasRoot[0],-atlasRoot[1]]}))AtlasBeach.drawRaw(gl,window.__ATLAS_CAT_CAMERA_MATRICES__);");
+  replace('AtlasBeach.drawRaw(gl,window.__ATLAS_CAT_CAMERA_MATRICES__);',"if(!AtlasTurntable.rawDraw(gl,{...window.__ATLAS_CAT_CAMERA_MATRICES__,zUp:true},{radius:.42,floorY:-.005,center:[0,0]}))AtlasBeach.drawRaw(gl,window.__ATLAS_CAT_CAMERA_MATRICES__);");
   replace('uniform float uWeightMode;uniform float uCorrectiveDebug;', uniforms+'uniform float uWeightMode;uniform float uCorrectiveDebug;');
   replace('l1=normalize(vec3(.45,-.55,.82))', 'l1=normalize(uAtlasLightDirection)');
   replace('float d=max(dot(n,l1),0.)*.70+max(dot(n,l2),0.)*.24+.19','vec3 atlasIrradiance=atlasDiffuse(n);float d=1.');

@@ -37,8 +37,11 @@ globalThis.AtlasStudioAdapter=function(context,range,check,select){
   resetView=()=>{yaw=elevation=0;distance=1;};render=()=>birdWorkbench.setTime(birdWorkbench.getState().time);
  }else if(kind==='crab'){
   const n=__CRAB_QA__,index=context.key==='coconut'?1:0;
+  // Move the source out of its beach coordinates before measuring the fixed
+  // lab reference; those two source stages use different units and transforms.
+  if(S.isActive())n.stage('lab');
   for(const [i,scene]of n.scenes.entries())sceneInstall({scene,renderer:n.renderer,camera:n.cameras[i]},()=>[n.meshes[i]],{sourceFitsPortrait:true});
-  stage=sceneInstall({scene:n.beach.scene,renderer:n.renderer,camera:n.beachCamera},()=>[n.meshes[index]],{sourceFitsPortrait:true});if(S.isActive())n.stage('lab');
+  stage=sceneInstall({scene:n.beach.scene,renderer:n.renderer,camera:n.beachCamera},()=>[n.meshes[index]],{sourceFitsPortrait:true});
   rotate=(yaw,elevation=0)=>{n.state.yaw+=yaw;n.state.pitch=clamp(n.state.pitch+elevation);};
   // The source loop updates the camera from yaw/pitch every frame, even when
   // life playback is paused. Avoid interleaving a draw using its previous pose.
@@ -79,5 +82,5 @@ globalThis.AtlasStudioAdapter=function(context,range,check,select){
  function tick(){const delta=S.rotationDelta();if(delta&&!drag&&performance.now()>interactingUntil){rotate(delta);render();}requestAnimationFrame(tick);}requestAnimationFrame(tick);
  window.__ATLAS_STUDIO_INPUT={snapshot:()=>({dragging:!!drag,moves,autoHeld:!!drag||performance.now()<interactingUntil})};
  const controls=AtlasParameterSchema.presentationControls(S.state);
- return{controls,resetView,set(key,value){S.set(key,value);if(key==='displayStage'&&kind==='crab')__CRAB_QA__.stage('lab');if(kind==='eagle')eagle.dirty=true;render();},info:()=>S.info(),stage};
+ return{controls,resetView,render,set(key,value){S.set(key,value);if(key==='displayStage'&&kind==='crab')__CRAB_QA__.stage('lab');if(kind==='eagle')eagle.dirty=true;render();},info:()=>S.info(),stage};
 };
