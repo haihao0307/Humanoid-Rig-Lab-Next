@@ -1,0 +1,20 @@
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {gunzipSync} from 'node:zlib';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {decodeParameters} from '../parameter-codec.mjs';
+import {generateSurface} from '../surface-generator.mjs';
+const raw=gunzipSync(readFileSync(new URL('../parameters.phf.gz',import.meta.url)));
+const data=decodeParameters(raw.buffer.slice(raw.byteOffset,raw.byteOffset+raw.byteLength));
+const options={edgeMetres:.04,surfaceErrorMetres:.001},events=[];
+const baseline=generateSurface(data,options),reported=generateSurface(data,{...options,onProgress:event=>events.push(event)});
+const digest=value=>createHash('sha256').update(new Uint8Array(value.buffer,value.byteOffset,value.byteLength)).digest('hex');
+const hashes={};
+for(const [key,value] of Object.entries(baseline))if(ArrayBuffer.isView(value)){hashes[key]=digest(value);assert.equal(digest(reported[key]),hashes[key],key+' changed with progress reporting');}
+for(const key of ['groups','seamGroups','chartIds','report'])assert.deepEqual(reported[key],baseline[key],key);
+assert.equal(events.length,data.charts.length+1);
+assert(events.slice(0,-1).every((event,i)=>event.completed===i+1&&event.total===data.charts.length));
+assert(events.at(-1).stage.includes('边界'));
+const result={date:new Date().toISOString(),precision:options,charts:data.charts.length,events:events.length,report:reported.report,identicalArrays:hashes};
+const output=new URL('../qa/loading-and-face-capability/surface-equivalence.json',import.meta.url);mkdirSync(new URL('.',output),{recursive:true});writeFileSync(output,JSON.stringify(result,null,2));
+console.log(JSON.stringify({charts:result.charts,events:result.events,identicalArrays:Object.keys(hashes),vertices:reported.report.vertices}));

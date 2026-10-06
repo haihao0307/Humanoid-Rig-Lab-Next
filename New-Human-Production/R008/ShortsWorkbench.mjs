@@ -15,6 +15,7 @@ import {compilePaperSurfaceModel,evaluatePaperSurface,garmentPipelineGate} from 
 import {inspectShortsTriangleCrossings} from './ShortsCoverageIntersection.mjs';
 import {installShortsBarePelvis} from './ShortsBarePelvis.mjs';
 import {createShortsSkinContactBody} from './ShortsSkinContactBody.mjs';
+import {installShortsPaperResearch} from './ShortsPaperResearchWorkbench.mjs';
 
 // Candidate integration owns clothing only; the user's original R008 app stays
 // available as a separate entry while physical/skin gates are under review.
@@ -30,6 +31,7 @@ export function installShortsWorkbench(game,{renderer,camera,scene}){
  const skinTapes=measureShortsSkinTapes(measuredBody,barePelvis,game.actor,placementReference.receipt);
  const draft=createShortsGarmentV9(skinTapes,placementReference,{skinBody:body});
  body.update({time:0});
+ if(window.__SHORTS_PAPER_RESEARCH__===true)return installShortsPaperResearch(game,{renderer,camera,scene,body,measuredBody,barePelvis,skinTapes,draft,sourcePants});
  // A measured style view is separate from the material-constrained assembly.
  // It may show waist/hem placement, but must never enable native cloth motion
  // or claim this contour loft has passed the source-paper strain audit.

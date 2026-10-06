@@ -1,0 +1,14 @@
+import {registerHooks} from 'node:module';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {gunzipSync} from 'node:zlib';
+import {createHash} from 'node:crypto';
+const base=new URL('../',import.meta.url);
+registerHooks({resolve(specifier,context,next){return specifier==='three'?{url:new URL('vendor/three.module.js',base).href,shortCircuit:true}:next(specifier,context);}});
+const [THREE,{decodeParameters},{createSubject},{createShortsBodyAdapter},{createShortsGarmentDraft},{ShortsClothRuntime}]=await Promise.all([import('three'),import('../parameter-codec.mjs'),import('../SubjectRuntime.mjs'),import('../ShortsBodyAdapter.mjs'),import('../ShortsGarmentDraft.mjs'),import('../ShortsClothRuntime.mjs')]);
+const sourceHashes=Object.fromEntries(['ShortsBodyAdapter.mjs','ShortsGarmentDraft.mjs','ShortsClothRuntime.mjs'].map(name=>[name,createHash('sha256').update(readFileSync(new URL(name,base))).digest('hex')]));
+const bytes=gunzipSync(readFileSync(new URL('parameters.phf.gz',base))),data=decodeParameters(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)),actor=new THREE.Group(),scene=new THREE.Scene(),subject=createSubject(data,{edgeMetres:.012});scene.add(actor);actor.add(subject.root);actor.updateMatrixWorld(true);subject.finishPose();
+const body=createShortsBodyAdapter(subject,actor);body.update({time:0,exactRefit:true});
+const draft=createShortsGarmentDraft(body.measurements,{sectionAt:body.sectionAt,sagittalAtY:body.sagittalAtY}),cloth=new ShortsClothRuntime(draft,body,actor,scene),before=cloth.audit(true);
+const assembly=await cloth.prepareWear({maxPasses:200}),after=cloth.audit(true);
+const report={createdAt:new Date().toISOString(),scope:'real R008 source-surface static assembly only; no GPU, no animation or motion approval',sourceHashes,before,assembly,after,productionReady:false};mkdirSync(new URL('qa/',base),{recursive:true});writeFileSync(new URL('qa/shorts-static-assembly-probe-20261002.json',base),JSON.stringify(report,null,2));
+console.log(JSON.stringify({before:{mainStrain:before.mainStrain,bodyPenetrationM:before.bodyPenetrationM},assembly,after:{numericValid:after.numericValid,mainStrain:after.mainStrain,bodyPenetrationM:after.bodyPenetrationM,elasticStrain:after.elasticStrain},motionValidated:false},null,2));cloth.dispose();

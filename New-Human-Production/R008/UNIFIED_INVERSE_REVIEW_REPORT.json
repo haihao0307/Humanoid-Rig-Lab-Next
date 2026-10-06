@@ -1,0 +1,683 @@
+{
+  "capturedAt": "2026-10-04T08:19:57.379Z",
+  "url": "http://127.0.0.1:8877/?version=R008-method-26&anatomy=muscles",
+  "initial": {
+    "pipeline": {
+      "methodId": "human/surface-musculoskeletal-inverse@1",
+      "stages": [
+        "semantic-axes",
+        "reference-surface-sections",
+        "coupled-joint-candidates",
+        "independent-soft-tissue-budgets",
+        "surface-constrained-motor-paths",
+        "evidence-and-residual-validation"
+      ],
+      "sourceId": "new-human-r008",
+      "skeleton": {
+        "surfaceFittedSegments": 11,
+        "totalSegments": 16,
+        "adjustedJoints": 14,
+        "jointsNeedingReview": 2,
+        "maximumJointShift": 0.015136052529228965,
+        "rmsSkinSection": 0.005040393347206517
+      },
+      "muscles": 48,
+      "surfaceSizedMuscles": 32,
+      "surfaceConstrainedAttachments": 106,
+      "unobservedRegions": [
+        "neck",
+        "hand_l",
+        "thigh_l",
+        "hand_r",
+        "thigh_r"
+      ],
+      "outerSurface": "original-reference-generator-unmodified",
+      "boneIdentityFrozen": true,
+      "storedVertexBytes": 0,
+      "compositionAllocation": "shared-prior-not-measured",
+      "unknown": [
+        "true-bone-surfaces",
+        "true-bone-diameters",
+        "hidden-hip-and-proximal-thigh",
+        "true-muscle-attachments",
+        "individual-finger-bone-centres",
+        "true-muscle-fat-allocation"
+      ]
+    },
+    "policy": {
+      "id": "human/surface-musculoskeletal-inverse@1",
+      "species": "homo-sapiens/adult@1",
+      "stages": [
+        "semantic-axes",
+        "reference-surface-sections",
+        "coupled-joint-candidates",
+        "independent-soft-tissue-budgets",
+        "surface-constrained-motor-paths",
+        "evidence-and-residual-validation"
+      ],
+      "surface": {
+        "maxSamples": 180000,
+        "sections": 12,
+        "angularBins": 24,
+        "minSamples": 24,
+        "minAngularCoverage": 0.625,
+        "iterations": 4,
+        "maxAspectRatio": 5,
+        "maxExtentRatio": 1.35,
+        "maxNormalizedRms": 0.15,
+        "maxNormalizedP95": 0.4
+      },
+      "skeleton": {
+        "endpointRange": 0.3,
+        "minSections": 4,
+        "minSpan": 0.25,
+        "maxEndpointGap": 0.22,
+        "maxHeightShift": 0.04,
+        "maxLengthShift": 0.2,
+        "maxJointDisagreement": 0.006
+      },
+      "muscle": {
+        "representedVolumeFraction": 0.55,
+        "envelopeInteriorFraction": 0.86,
+        "maximumRadiusFraction": 0.7,
+        "localSectionDistance": 0.2
+      },
+      "composition": {
+        "referenceAge": 32,
+        "minimumAge": 18,
+        "maximumAge": 75,
+        "minimumRelativeAmount": -1,
+        "maximumRelativeAmount": 1
+      },
+      "ownership": {
+        "method": "species-shared-and-versioned",
+        "adapter": "input-semantic-labels-only",
+        "identity": "reference-bones-frozen-once",
+        "composition": "muscle-and-fat-budgets-independent"
+      },
+      "evidence": "authored-surface-fit-and-tissue-priors-not-internal-measurement"
+    },
+    "generationMilliseconds": 234.80000001192093,
+    "surfaceSamples": 120979,
+    "methodId": "human/surface-musculoskeletal-inverse@1",
+    "muscles": [
+      {
+        "id": "deltoid_front_l",
+        "radius": 0.02315300601791199,
+        "volumeProxy": 0.0001354507731163777,
+        "referenceVolumeProxy": 0.00013545077311637768,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "deltoid_middle_l",
+        "radius": 0.025940164231687345,
+        "volumeProxy": 0.00017051403399235955,
+        "referenceVolumeProxy": 0.00017051403399235952,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "deltoid_back_l",
+        "radius": 0.023584105391070347,
+        "volumeProxy": 0.00016367497135323143,
+        "referenceVolumeProxy": 0.0001636749713532314,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "pectoralis_l",
+        "radius": 0.05129740544799958,
+        "volumeProxy": 0.0007463893844443072,
+        "referenceVolumeProxy": 0.0007463893844443072,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "latissimus_l",
+        "radius": 0.04746168432302087,
+        "volumeProxy": 0.001046443133762404,
+        "referenceVolumeProxy": 0.0010464431337624041,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "trapezius_l",
+        "radius": 0.02760266318473082,
+        "volumeProxy": 0.0002327248297392608,
+        "referenceVolumeProxy": 0.00023272482973926082,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 1
+      },
+      {
+        "id": "biceps_l",
+        "radius": 0.024378234900701522,
+        "volumeProxy": 0.0002547160987224427,
+        "referenceVolumeProxy": 0.00025471609872244276,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "triceps_l",
+        "radius": 0.028214704256182818,
+        "volumeProxy": 0.000296856050232139,
+        "referenceVolumeProxy": 0.000296856050232139,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "forearm_flexors_l",
+        "radius": 0.03100663624837783,
+        "volumeProxy": 0.00034416750108021756,
+        "referenceVolumeProxy": 0.00034416750108021767,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "forearm_extensors_l",
+        "radius": 0.029877572068598608,
+        "volumeProxy": 0.00031290336723138854,
+        "referenceVolumeProxy": 0.0003129033672313885,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "erectors_l",
+        "radius": 0.02143497087165574,
+        "volumeProxy": 0.0002592105447219118,
+        "referenceVolumeProxy": 0.0002592105447219119,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "rectus_abdominis_l",
+        "radius": 0.02277125582389044,
+        "volumeProxy": 0.00020348401112711201,
+        "referenceVolumeProxy": 0.00020348401112711207,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "oblique_l",
+        "radius": 0.028163309033611812,
+        "volumeProxy": 0.00033730828648864073,
+        "referenceVolumeProxy": 0.0003373082864886408,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "gluteus_maximus_l",
+        "radius": 0.05827563548504364,
+        "volumeProxy": 0.0011887667793612823,
+        "referenceVolumeProxy": 0.0011887667793612823,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 0
+      },
+      {
+        "id": "gluteus_medius_l",
+        "radius": 0.03812638792916676,
+        "volumeProxy": 0.0002870586503606543,
+        "referenceVolumeProxy": 0.00028705865036065425,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 0
+      },
+      {
+        "id": "hip_flexors_l",
+        "radius": 0.021420973767924907,
+        "volumeProxy": 0.00015603678361219615,
+        "referenceVolumeProxy": 0.00015603678361219615,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 1
+      },
+      {
+        "id": "rectus_femoris_l",
+        "radius": 0.040625602280023376,
+        "volumeProxy": 0.0014353396052811515,
+        "referenceVolumeProxy": 0.0014353396052811517,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "vastus_lateral_l",
+        "radius": 0.04252267442728013,
+        "volumeProxy": 0.0013062376045377836,
+        "referenceVolumeProxy": 0.0013062376045377836,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "vastus_medial_l",
+        "radius": 0.03671612347084892,
+        "volumeProxy": 0.0007577466227065251,
+        "referenceVolumeProxy": 0.0007577466227065255,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "hamstrings_l",
+        "radius": 0.04292805300582552,
+        "volumeProxy": 0.0013790509632885606,
+        "referenceVolumeProxy": 0.0013790509632885606,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "adductors_l",
+        "radius": 0.03445516244371452,
+        "volumeProxy": 0.0005957899245750168,
+        "referenceVolumeProxy": 0.000595789924575017,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 1
+      },
+      {
+        "id": "gastrocnemius_l",
+        "radius": 0.036935474837786225,
+        "volumeProxy": 0.0010534771442782115,
+        "referenceVolumeProxy": 0.0010534771442782115,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "soleus_l",
+        "radius": 0.03103411867328639,
+        "volumeProxy": 0.0004776026052747044,
+        "referenceVolumeProxy": 0.0004776026052747045,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "tibialis_l",
+        "radius": 0.020096193041852423,
+        "volumeProxy": 0.00024603460657236315,
+        "referenceVolumeProxy": 0.00024603460657236315,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "deltoid_front_r",
+        "radius": 0.02282699643415587,
+        "volumeProxy": 0.00013237291247906384,
+        "referenceVolumeProxy": 0.00013237291247906384,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "deltoid_middle_r",
+        "radius": 0.02562361482082466,
+        "volumeProxy": 0.00016725713199180093,
+        "referenceVolumeProxy": 0.00016725713199180093,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "deltoid_back_r",
+        "radius": 0.023101377706922308,
+        "volumeProxy": 0.00015997334503760428,
+        "referenceVolumeProxy": 0.00015997334503760422,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "pectoralis_r",
+        "radius": 0.051275324532226454,
+        "volumeProxy": 0.000742415290437414,
+        "referenceVolumeProxy": 0.0007424152904374142,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "latissimus_r",
+        "radius": 0.04767004023044112,
+        "volumeProxy": 0.0010290026490632135,
+        "referenceVolumeProxy": 0.0010290026490632133,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "trapezius_r",
+        "radius": 0.02706417321033541,
+        "volumeProxy": 0.00022877208103208528,
+        "referenceVolumeProxy": 0.0002287720810320852,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 1
+      },
+      {
+        "id": "biceps_r",
+        "radius": 0.024319200567425207,
+        "volumeProxy": 0.0002535313016778457,
+        "referenceVolumeProxy": 0.00025353130167784566,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "triceps_r",
+        "radius": 0.02812108976664711,
+        "volumeProxy": 0.00029336759385224456,
+        "referenceVolumeProxy": 0.00029336759385224456,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "forearm_flexors_r",
+        "radius": 0.02939865514306674,
+        "volumeProxy": 0.0003221985631043094,
+        "referenceVolumeProxy": 0.00032219856310430943,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "forearm_extensors_r",
+        "radius": 0.02811504919477711,
+        "volumeProxy": 0.00028921149689870805,
+        "referenceVolumeProxy": 0.000289211496898708,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "erectors_r",
+        "radius": 0.021434986453694842,
+        "volumeProxy": 0.000259221421576783,
+        "referenceVolumeProxy": 0.000259221421576783,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "rectus_abdominis_r",
+        "radius": 0.022770521375077103,
+        "volumeProxy": 0.00020343695849154227,
+        "referenceVolumeProxy": 0.00020343695849154225,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "oblique_r",
+        "radius": 0.028239099305680224,
+        "volumeProxy": 0.00033813156297670777,
+        "referenceVolumeProxy": 0.00033813156297670777,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "gluteus_maximus_r",
+        "radius": 0.05826255915824413,
+        "volumeProxy": 0.001192243285813394,
+        "referenceVolumeProxy": 0.001192243285813394,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 0
+      },
+      {
+        "id": "gluteus_medius_r",
+        "radius": 0.03811456110692435,
+        "volumeProxy": 0.0002872573989298099,
+        "referenceVolumeProxy": 0.00028725739892980983,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 0
+      },
+      {
+        "id": "hip_flexors_r",
+        "radius": 0.021429510393636938,
+        "volumeProxy": 0.00015610420349382643,
+        "referenceVolumeProxy": 0.00015610420349382645,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 1
+      },
+      {
+        "id": "rectus_femoris_r",
+        "radius": 0.040632874040595526,
+        "volumeProxy": 0.0014354839490163338,
+        "referenceVolumeProxy": 0.0014354839490163343,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "vastus_lateral_r",
+        "radius": 0.042486331933803946,
+        "volumeProxy": 0.001303313318684097,
+        "referenceVolumeProxy": 0.0013033133186840964,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "vastus_medial_r",
+        "radius": 0.0367811479881893,
+        "volumeProxy": 0.0007594992728788456,
+        "referenceVolumeProxy": 0.0007594992728788456,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "hamstrings_r",
+        "radius": 0.04277009397159571,
+        "volumeProxy": 0.0013716483629867256,
+        "referenceVolumeProxy": 0.0013716483629867254,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "adductors_r",
+        "radius": 0.03445444070247387,
+        "volumeProxy": 0.0005970530142102599,
+        "referenceVolumeProxy": 0.00059705301421026,
+        "volumeEvidence": "prior-only-insufficient-region-envelope",
+        "surfaceConstrainedAttachments": 1
+      },
+      {
+        "id": "gastrocnemius_r",
+        "radius": 0.036706723285499315,
+        "volumeProxy": 0.0010471703447154212,
+        "referenceVolumeProxy": 0.0010471703447154214,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      },
+      {
+        "id": "soleus_r",
+        "radius": 0.03085870179349825,
+        "volumeProxy": 0.00047502354141977163,
+        "referenceVolumeProxy": 0.0004750235414197717,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 2
+      },
+      {
+        "id": "tibialis_r",
+        "radius": 0.01997943740879023,
+        "volumeProxy": 0.0002438900402089272,
+        "referenceVolumeProxy": 0.00024389004020892717,
+        "volumeEvidence": "observed-envelope-with-shared-tissue-allocation-prior",
+        "surfaceConstrainedAttachments": 3
+      }
+    ],
+    "glError": 0
+  },
+  "jointChecks": [
+    {
+      "joint": "elbow",
+      "angle": 0,
+      "glError": 0,
+      "selectedLengths": {
+        "biceps_l": 0.3081451338354875,
+        "triceps_l": 0.26896322740053447,
+        "rectus_femoris_l": 0.5338505621171789,
+        "hamstrings_l": 0.5368073211230572
+      },
+      "maximumVolumeRelativeError": 4.440892098500626e-16
+    },
+    {
+      "joint": "elbow",
+      "angle": 55,
+      "glError": 0,
+      "selectedLengths": {
+        "biceps_l": 0.27301306660726476,
+        "triceps_l": 0.2809322621277828,
+        "rectus_femoris_l": 0.5338505621171789,
+        "hamstrings_l": 0.5368073211230572
+      },
+      "maximumVolumeRelativeError": 4.440892098500626e-16
+    },
+    {
+      "joint": "elbow",
+      "angle": 100,
+      "glError": 0,
+      "selectedLengths": {
+        "biceps_l": 0.23043698781553149,
+        "triceps_l": 0.27749978494333355,
+        "rectus_femoris_l": 0.5338505621171789,
+        "hamstrings_l": 0.5368073211230572
+      },
+      "maximumVolumeRelativeError": 4.440892098500626e-16
+    },
+    {
+      "joint": "knee",
+      "angle": 0,
+      "glError": 0,
+      "selectedLengths": {
+        "biceps_l": 0.3081451338354875,
+        "triceps_l": 0.26896322740053447,
+        "rectus_femoris_l": 0.5338505621171789,
+        "hamstrings_l": 0.5368073211230572
+      },
+      "maximumVolumeRelativeError": 4.440892098500626e-16
+    },
+    {
+      "joint": "knee",
+      "angle": 55,
+      "glError": 0,
+      "selectedLengths": {
+        "biceps_l": 0.3081451338354875,
+        "triceps_l": 0.26896322740053447,
+        "rectus_femoris_l": 0.5459522581615374,
+        "hamstrings_l": 0.48008339697481284
+      },
+      "maximumVolumeRelativeError": 4.440892098500626e-16
+    },
+    {
+      "joint": "knee",
+      "angle": 100,
+      "glError": 0,
+      "selectedLengths": {
+        "biceps_l": 0.3081451338354875,
+        "triceps_l": 0.26896322740053447,
+        "rectus_femoris_l": 0.5471308050984981,
+        "hamstrings_l": 0.41751274807444316
+      },
+      "maximumVolumeRelativeError": 4.440892098500626e-16
+    },
+    {
+      "joint": "shoulder",
+      "angle": 0,
+      "glError": 0,
+      "selectedLengths": {
+        "biceps_l": 0.3081451338354875,
+        "triceps_l": 0.26896322740053447,
+        "rectus_femoris_l": 0.5338505621171789,
+        "hamstrings_l": 0.5368073211230572
+      },
+      "maximumVolumeRelativeError": 4.440892098500626e-16
+    },
+    {
+      "joint": "shoulder",
+      "angle": 55,
+      "glError": 0,
+      "selectedLengths": {
+        "biceps_l": 0.3081451383429074,
+        "triceps_l": 0.268963231968942,
+        "rectus_femoris_l": 0.5338505621171789,
+        "hamstrings_l": 0.5368073211230572
+      },
+      "maximumVolumeRelativeError": 4.440892098500626e-16
+    },
+    {
+      "joint": "shoulder",
+      "angle": 100,
+      "glError": 0,
+      "selectedLengths": {
+        "biceps_l": 0.30814514604955423,
+        "triceps_l": 0.2689632383051475,
+        "rectus_femoris_l": 0.5338505621171789,
+        "hamstrings_l": 0.5368073211230572
+      },
+      "maximumVolumeRelativeError": 4.440892098500626e-16
+    }
+  ],
+  "controls": {
+    "boneAndMuscleViews": true,
+    "segmentSelection": true,
+    "muscleSelection": true,
+    "manualJointSlider": true,
+    "skinToggle": true,
+    "download": true,
+    "exportBytes": 163869,
+    "view": {
+      "before": {
+        "position": [
+          0,
+          1.0099999999999998,
+          6.4
+        ],
+        "target": [
+          0,
+          0.96,
+          3.6
+        ],
+        "distance": 2.8004463929880896
+      },
+      "after": {
+        "position": [
+          -0.9012708361355645,
+          1.367549022721974,
+          6.02879743844961
+        ],
+        "target": [
+          0,
+          0.96,
+          3.6
+        ],
+        "distance": 2.6224878117942745
+      }
+    }
+  },
+  "restored": {
+    "active": false,
+    "skinUnchanged": true,
+    "bindUnchanged": true,
+    "mesh": true,
+    "eyes": true,
+    "materialsRestored": true,
+    "bodyControlsRestored": true
+  },
+  "restoration": {
+    "before": {
+      "schema": "human-r008/body@1",
+      "height": 1.8,
+      "fatness": 0.3,
+      "muscle": 0.2,
+      "age": 55
+    },
+    "reference": {
+      "schema": "human-r008/body@1",
+      "height": 1.8,
+      "fatness": 0,
+      "muscle": 0,
+      "age": 32
+    },
+    "after": {
+      "schema": "human-r008/body@1",
+      "height": 1.8,
+      "fatness": 0.3,
+      "muscle": 0.2,
+      "age": 55
+    }
+  },
+  "errors": [],
+  "sourceHashes": {
+    "HumanInverseMethod.mjs": "550e922aadd279196452d94455b1bd37a7e48bda6f978cf5bf56cc1db1add43b",
+    "HumanInverseSystem.mjs": "7462581e27bee1b071dac331661b8009e40c89ce1fa41807e6b72fd693dcd1c6",
+    "SurfaceSkeletonFit.mjs": "4cc28731ef10557dcc926bf4cf36f726576551c5b786eeb94bad0df364017be9",
+    "SurfaceSkeletonDisplay.mjs": "6288396ba16a0b62cfcee9413f9c8566624714e1fb2f65e27fea74fb5c3cac55",
+    "AnatomyDisplay.mjs": "64c33755ce029375c30dcc0604f2e3ab2356b62dc0c94bf367ef6ceb9550b545",
+    "MotionAnatomyWorkbench.mjs": "4c5d8fa837efae206883b2ef2c3cb285bc54cada74b526157d4bff6804d22b6e",
+    "R008InverseCalibration.mjs": "0208716e8455729608f8eabb86ea36a10b37686ab304a41aba868391f303d119"
+  },
+  "sourceHashConvention": "utf8-LF",
+  "parameterSha256": "0f801bc60163a968aef8a647b2a9b472279236dc63d5b81d5c320654141333e2",
+  "acceptance": "shared inverse pipeline wired to real 3D; inferred tissue allocation and attachments are not measured anatomy"
+}

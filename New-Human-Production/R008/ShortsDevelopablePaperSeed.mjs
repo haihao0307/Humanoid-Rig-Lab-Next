@@ -1,0 +1,47 @@
+import {compilePaperSurfaceModel,evaluatePaperSurface} from './ShortsPaperSurfaceModel.mjs';
+// Independent source-derived cylinders/cones and a two-half-plane G fold.
+// Temporary placement only: source UV, masses, rest and seam graph stay intact.
+const dot=(a,b)=>a.reduce((s,v,k)=>s+v*b[k],0),sub=(a,b)=>a.map((v,k)=>v-b[k]),mix=(a,b,t)=>a.map((v,k)=>v+(b[k]-v)*t),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=v=>Math.hypot(...v),finite=v=>Array.from(v).every(Number.isFinite);
+function fail(code,details){const e=new Error(code);e.code=code;e.details=details;throw e;}
+function unit(v,label){const n=norm(v);if(!(n>1e-10&&Number.isFinite(n)))fail('HOLD_DEVELOPABLE_FRAME',{label,v});return v.map(x=>x/n);}
+export function createShortsDevelopablePaperSeed(draft,tapes,measuredBody,bare,{queryContact}={}){
+ if(typeof queryContact!=='function'||draft?.pieces?.length!==9||draft.sourceUV?.length!==1106||draft.positions?.length!==1659||draft.triangles?.length!==2544||draft.seams?.length!==19||tapes?.bodyToken!==draft.receipt?.measurementsAuthority?.bodyToken)fail('HOLD_DEVELOPABLE_SOURCE_BODY_CONTRACT',{});
+ const identity=JSON.stringify({uv:draft.sourceUV,triangles:draft.triangles,mass:draft.masses??draft.mass,seams:draft.seams,positions:draft.positions}),ranges=new Map(draft.ranges.map(r=>[r.pieceId,r])),pieces=new Map(draft.pieces.map(p=>[p.id,p])),xyz=Array.from({length:553},()=>[0,0,0]),uv=(r,i)=>Array.from(draft.sourceUV.slice(2*(r.offset+i),2*(r.offset+i)+2)),center=tapes.waist.lower,lowerY=draft.receipt.lowerY;
+ if(![center.centerX,center.centerZ,lowerY].every(Number.isFinite))fail('HOLD_DEVELOPABLE_WAIST_FRAME',{});
+ const circumference=(draft.receipt.measurements.hipFrontArc+draft.receipt.measurements.hipBackArc+draft.receipt.design.hipEase),radius=circumference/(2*Math.PI);if(!(radius>0&&Number.isFinite(radius)))fail('HOLD_DEVELOPABLE_HIP_RADIUS',{});
+ const constructions=[];
+ for(const id of ['FL','FR','BL','BR']){const range=ranges.get(id),front=id[0]==='F',phase=front?0:Math.PI;for(let i=0;i<range.count;i++){const [U,V]=uv(range,i),theta=phase+(front?1:-1)*U/radius;xyz[range.offset+i]=[center.centerX+radius*Math.sin(theta),lowerY-V,center.centerZ+radius*Math.cos(theta)];}constructions.push({pieceId:id,type:'generalized-cylinder',radiusM:radius,phaseRadians:phase,continuousFirstFundamentalForm:'identity; coarse straight triangles audited independently',sourceRestFromXYZ:false});}
+ const bands=['WFL','WFR','WBR','WBL'].map(id=>{const range=ranges.get(id),a=uv(range,0),e=uv(range,7),h=norm(sub(uv(range,16),a));if(norm(a)>1e-12||!(e[1]>0))fail('HOLD_DEVELOPABLE_W_SOURCE_POLAR',{id,a,e});const R=(e[0]*e[0]+e[1]*e[1])/(2*e[1]),angle=Math.atan2(e[0],R-e[1]);if(!(R>h&&angle>0&&Number.isFinite(R)))fail('HOLD_DEVELOPABLE_W_SOURCE_DOMAIN',{id,R,h,angle});return{id,range,R,h,angle};}),totalAngle=bands.reduce((s,b)=>s+b.angle,0),kappa=totalAngle/(2*Math.PI);
+ if(!(kappa>0&&kappa<1))fail('HOLD_DEVELOPABLE_CONE_DOMAIN',{totalAngle,kappa});const vertical=Math.sqrt(1-kappa*kappa);
+ for(const b of bands){const first=Array.from(draft.positions.slice(3*b.range.offset,3*b.range.offset+3)),dx=first[0]-center.centerX,dz=first[2]-center.centerZ;if(!(Math.hypot(dx,dz)>1e-10))fail('HOLD_DEVELOPABLE_W_SECTOR_TARGET',{id:b.id,first});const thetaStart=Math.atan2(dx,dz);for(let i=0;i<b.range.count;i++){const [U,V]=uv(b.range,i),rho=Math.hypot(U,b.R-V),phi=Math.atan2(U,b.R-V),theta=thetaStart+phi/kappa;xyz[b.range.offset+i]=[center.centerX+kappa*rho*Math.sin(theta),lowerY+vertical*(b.R-rho),center.centerZ+kappa*rho*Math.cos(theta)];}constructions.push({pieceId:b.id,type:'source-annular-sector-cone',sourceCircleCenter:[0,b.R],sourceAngleRadians:b.angle,kappa,sectorStartRadians:thetaStart,sectorTargetAuthority:'current draft lower-first actor-local placement reference only; never material rest',verticalWidthM:vertical*b.h,continuousFirstFundamentalForm:'identity; coarse straight triangles audited independently',sourceRestFromXYZ:false});}
+ // G crease u=0 is already present in all eight original source triangles.
+ // Only its own positions are built; no main-to-G quotient is activated here.
+ const gr=ranges.get('G'),g=pieces.get('G'),tipY=draft.receipt.initialG?.center?.[1],pad=.004;
+ const tip=(side,theta)=>{const s=tapes.guideSectionAtY(tipY,{side}),p=s.pointAtAngle(theta),radial=unit([p[0]-s.centerX,0,p[2]-s.centerZ],side+'.inner-tip');return p.map((v,k)=>v+pad*radial[k]);};
+ const left=tip('left',Math.PI/2),right=tip('right',3*Math.PI/2),span=norm(sub(right,left)),half=Math.abs(uv(gr,2)[0]),width=2*half;
+ if(!(span>1e-8&&span<=width+1e-10))fail('HOLD_DEVELOPABLE_G_TIP_SPAN',{spanM:span,sourceWidthM:width});
+ const U=unit(sub(right,left),'G.tip-axis'),V=unit([0,0,-1].map((v,k)=>v-dot([0,0,-1],U)*U[k]),'G.front-back'),N=cross(U,V);
+ if(U[0]<=0||N[1]<=0)fail('HOLD_DEVELOPABLE_G_PROPER_ORIENTATION',{U,V,N});const beta=Math.acos(Math.min(1,span/width)),origin=mix(left,right,.5).map((v,k)=>v-half*Math.sin(beta)*N[k]);
+ for(const t of g.triangles){const values=t.map(i=>uv(gr,i)[0]);if(Math.min(...values)<-1e-12&&Math.max(...values)>1e-12)fail('HOLD_DEVELOPABLE_G_UNMESHED_CREASE',{t,values});}
+ for(let i=0;i<gr.count;i++){const [a,b]=uv(gr,i);xyz[gr.offset+i]=origin.map((v,k)=>v+a*Math.cos(beta)*U[k]+Math.abs(a)*Math.sin(beta)*N[k]+b*V[k]);}
+ constructions.push({pieceId:'G',type:'two-existing-source-half-plane-rigid-fold',sourceWidthM:width,actualTipSpanM:span,betaRadians:beta,U,V,N,origin,tipAuthority:'current same-leg inner tape rays plus4mm radial placement pad; no cloth XYZ defines rest',sourceRestFromXYZ:false,sourceGSeamsActivated:false});
+ const sourceToDof=Array.from({length:553},(_,i)=>i),model=compilePaperSurfaceModel(draft),initialMetric=evaluatePaperSurface(model,xyz,sourceToDof);
+ if(!initialMetric.finite||initialMetric.degenerateSurfaceTriangles!==0||!(initialMetric.maximumPrincipalStrain<.05))fail('HOLD_DEVELOPABLE_SOURCE_METRIC',{metric:initialMetric});
+ const contactReceipts=[];
+ for(const piece of draft.pieces){const r=ranges.get(piece.id),samples=Array.from({length:r.count},(_,i)=>({indices:[r.offset+i],weights:[1],kind:'vertex'}));for(const t of piece.triangles)samples.push({indices:t.map(i=>r.offset+i),weights:[1/3,1/3,1/3],kind:'triangle-centroid'});
+  const translation=[0,0,0],trace=[];let worst=null,held=null,moves=0,passed=false;
+  for(let iteration=0;iteration<=16;iteration++){
+   worst=null;for(let sampleIndex=0;sampleIndex<samples.length;sampleIndex++){const s=samples[sampleIndex],point=[0,1,2].map(k=>s.indices.reduce((sum,id,j)=>sum+s.weights[j]*xyz[id][k],0));let hit;try{hit=queryContact(point.slice());}catch(error){held={reason:'actual contact query threw',message:error.message,sampleIndex,point};break;}
+    if(!hit||hit.signAmbiguous!==false||!Number.isFinite(hit.signedDistanceM)||!hit.normal||hit.normal.length!==3||!finite(hit.normal)||Math.abs(norm(hit.normal)-1)>1e-7){held={reason:'ambiguous or invalid actual contact authority',sampleIndex,point,hit};break;}
+    if(!worst||hit.signedDistanceM<worst.signedDistanceM)worst={sampleIndex,kind:s.kind,point,signedDistanceM:hit.signedDistanceM,normal:Array.from(hit.normal),triangleId:hit.triangleId??null,part:hit.part??null};
+   }
+   if(held)break;trace.push({audit:iteration,minimumSignedDistanceM:worst.signedDistanceM});if(worst.signedDistanceM>.004){passed=true;break;}if(iteration===16)break;
+   const step=worst.normal.map(v=>v*(.004-worst.signedDistanceM+.006));if(!finite(step)){held={reason:'nonfinite whole-piece translation',worst};break;}for(let i=0;i<r.count;i++)xyz[r.offset+i]=xyz[r.offset+i].map((v,k)=>v+step[k]);for(let k=0;k<3;k++)translation[k]+=step[k];moves++;
+  }
+  contactReceipts.push({pieceId:piece.id,status:passed?'SAMPLED_STRICT_CLEARANCE_ONLY':'HOLD',passed,samples:samples.length,moves,maximumMoves:16,wholePieceTranslation:translation,minimumSignedDistanceM:worst?.signedDistanceM??null,worst,held,trace});
+ }
+ const metric=evaluatePaperSurface(model,xyz,sourceToDof);if(!metric.finite||metric.degenerateSurfaceTriangles!==0||!(metric.maximumPrincipalStrain<.05))fail('HOLD_DEVELOPABLE_TRANSLATION_METRIC',{metric});
+ if(identity!==JSON.stringify({uv:draft.sourceUV,triangles:draft.triangles,mass:draft.masses??draft.mass,seams:draft.seams,positions:draft.positions}))fail('HOLD_DEVELOPABLE_SOURCE_MUTATED',{});
+ const raw=new Float64Array(1659);xyz.forEach((p,i)=>raw.set(p,3*i));const sampledPassed=contactReceipts.every(p=>p.passed),receipt={schema:'shorts-independent-developable-paper-seed@1',status:sampledPassed?'SAMPLED_FEASIBLE_SOURCE_ONLY':'HOLD',currentBodyToken:tapes.bodyToken,coordinateFrame:'actor-local metre XYZ; queryContact must accept actor-local XYZ and return actual signed metre distance and actor-local unit normal; WORLD adaptation belongs to caller',constructions,initialSourcePrincipalStrain:initialMetric.maximumPrincipalStrain,sourcePrincipalStrain:metric.maximumPrincipalStrain,sourceMassUVRestUnchanged:true,sourceInputUnchanged:true,activeSeams:0,allSeamsPending:19,sourceToDofIsIdentity:true,contact:contactReceipts,sampledStrictClearancePassed:sampledPassed,clearanceM:.004,wholePieceOutwardSlackM:.006,maximumWholePieceMoves:16,fullTriangleContactValidated:false,selfContactValidated:false,wearingAccepted:false,nativeSteps:0,fallbacksUsed:0};
+ return{status:receipt.status,draft:{...draft,positions:raw,activeSeamIDs:[],quotientMap:Uint32Array.from(sourceToDof)},positions:xyz,sourceToDof,receipt};
+}

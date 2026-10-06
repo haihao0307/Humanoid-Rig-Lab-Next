@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {triangleTriangleDistance} from './ShortsTriangleDistance.mjs';
 import {resolveShortsWaistFit} from './ShortsWaistFit.mjs';
 
 // These are R008 intake part identities, not a claim that cloth is bare skin.
@@ -88,6 +89,13 @@ export function createShortsBodyAdapter(subject, actor=subject.root.parent, opti
   const magnitude=sum.length(),ambiguous=magnitude<1e-12||faces.length===degenerateFaces;
   const value={revision,type,indices:ids,incidentTriangleIds:faces.map(t=>t.id),normal:ambiguous?currentFace(triangleById.get(result.triangleId)).contactNormal.clone():sum.divideScalar(magnitude),ambiguous,degenerateFaces,normalMethod:type==='face'?'current-oriented-geometric-face':type==='edge'?'sum-current-incident-unit-face-normals':'angle-weighted-current-incident-unit-face-normals',orientationAuthority:'current eight-influence native normals orient geometric faces; actual indexed adjacency only, no invented seam welding',closedSolidCertified:false};featureNormalCache.set(key,value);return value;
  }
+ function closestTriangleSurface(input,maximumSearchDistanceM=Infinity){
+  owner();if(!Array.isArray(input)||input.length!==3||input.some(p=>p.length!==3||!p.every(Number.isFinite))||!(maximumSearchDistanceM>=0))throw Error('Actual finite WORLD triangle required');
+  const queryBox={min:[0,1,2].map(k=>Math.min(...input.map(p=>p[k]))),max:[0,1,2].map(k=>Math.max(...input.map(p=>p[k])))},lower=b=>[0,1,2].reduce((sum,k)=>sum+Math.max(0,b.min[k]-queryBox.max[k],queryBox.min[k]-b.max[k])**2,0);
+  let best=maximumSearchDistanceM**2,result=null,examined=0,degenerate=0;
+  function visit(node){lazyBounds(node);if(lower(node.box)>best)return;if(node.rows){for(const t of node.rows){if(contactExcludedParts.has(t.part))continue;for(const id of t.indices)ensureVertex(id);triangleBox(t);if(lower(t.box)>best)continue;const target=t.indices.map(id=>Array.from(positions.slice(3*id,3*id+3))),r=triangleTriangleDistance(input,target);examined++;if(r.status!=='TRIANGLE_DISTANCE_VALID'){degenerate++;continue;}const d=r.distanceM*r.distanceM;if(d<best){best=d;result={...r,triangleId:t.id,bodyIndices:t.indices.slice(),part:t.part,surfaceKind:'source-skin',revision,worldBodyTriangle:target};}}}else{lazyBounds(node.left);lazyBounds(node.right);const l=lower(node.left.box),r=lower(node.right.box);visit(l<r?node.left:node.right);visit(l<r?node.right:node.left);}}
+  visit(contactBvh);return result?{...result,examinedBodyTriangles:examined,skippedDegenerateNativeTriangles:degenerate}:null;
+ }
  function closestPoint(position,maximumSearchDistanceM=Infinity){
   owner();const array=Array.isArray(position)||ArrayBuffer.isView(position);
   if(array?(position.length!==3||!Array.from(position).every(Number.isFinite)):(!position?.isVector3||![position.x,position.y,position.z].every(Number.isFinite)))throw Error('Finite three-dimensional contact position required');
@@ -162,7 +170,7 @@ export function createShortsBodyAdapter(subject, actor=subject.root.parent, opti
   return {y,front,back,frontValid:!!front,backValid:!!back,frontWitness,backWitness,sourceMidlineXM:x,maxLateralDeviationM:corridor,hitCount:hits.length,criticalCrotch:false,valid:!!front&&!!back&&front[2]>back[2],authority:'actual source surface tape can move laterally up to 5mm around source midline cracks; no missing surface is interpolated'};
  }
  update();measure();
- return {subject,actor,get positions(){materialize();return positions;},get previous(){materialize(true);return previous;},indices,triangles,activeVertexIds:vertexIds,get localPositions(){materialize();return local;},get measurements(){return measurements;},update,refitExact,measure,sectionAt,sagittalAtY,collide,closestPoint,
+ return {subject,actor,get positions(){materialize();return positions;},get previous(){materialize(true);return previous;},indices,triangles,activeVertexIds:vertexIds,get localPositions(){materialize();return local;},get measurements(){return measurements;},update,refitExact,measure,sectionAt,sagittalAtY,collide,closestPoint,closestTriangleSurface,
   trianglePoint(id,weights){owner();const a=indices[id*3],b=indices[id*3+1],c=indices[id*3+2];if(a===undefined||weights.length!==3||Math.abs(weights.reduce((a,b)=>a+b,0)-1)>1e-6)throw Error('Invalid source triangle binding');for(const i of [a,b,c])ensureVertex(i);return point(positions,a).multiplyScalar(weights[0]).addScaledVector(point(positions,b),weights[1]).addScaledVector(point(positions,c),weights[2]);},
   snapshot(){return {schema:'r008-shorts-collider/v1',revision,time:lastTime,previousTime,poseDeltaTime,boundsMode,phase:subject.phase,maxMoveM,vertices:vertexIds.length,triangles:triangles.length,parts:[...selected],contactExcludedParts:[...contactExcludedParts],nativeContactTriangles:contactTriangles.length,approximation:'No decimation: exact current generated triangles. Does not claim source intake approximation is exact.',sourceSurfaceScope:'clothed-envelope for measurement; contact may explicitly exclude replaced clothing',measurements};}
  };

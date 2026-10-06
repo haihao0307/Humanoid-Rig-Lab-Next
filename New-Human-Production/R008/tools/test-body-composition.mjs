@@ -1,0 +1,46 @@
+import assert from 'node:assert/strict';
+import {compositionFixture} from './composition-fixture.mjs';
+import {solveComposition,compositionPoint,compactComposition,createCompositionProfile,createCompositionFields,validateCompositionCalibration} from '../BodyComposition.mjs';
+import {normalizeBody,bodyNormalMatrix,bodyPoint} from '../BodyParameters.mjs';
+import {enforceComposition} from '../AnatomyContract.mjs';
+import {createHumanBodySystem} from '../HumanBodySystem.mjs';
+import {r008CompositionCalibration} from '../R008CompositionCalibration.mjs';
+const tests=[],test=(name,fn)=>{fn();tests.push(name);},base=compositionFixture();
+const context=(f,i,s)=>({...f.fields.context(i),controls:s.controls});
+const point=(f,i,s)=>compositionPoint(Array.from(f.positions.subarray(i*3,i*3+3)),f.fields.context(i),s.controls);
+test('基准体型恒等，CPU查询使用同一组织方程',()=>{const s=solveComposition(base.profile,normalizeBody());for(let i=0;i<base.areaIds.length;i+=11){const p=Array.from(base.positions.subarray(i*3,i*3+3)),q=point(base,i,s);assert(Math.hypot(...q.map((v,k)=>v-p[k]))<1e-8);assert.deepEqual(q,bodyPoint(p,{},context(base,i,s)));}});
+test('肌肉与脂肪有独立体积预算，所有区域收敛',()=>{for(const fatness of [-1,0,1])for(const muscle of [-1,0,1])for(const age of [18,32,75]){const s=solveComposition(base.profile,normalizeBody({fatness,muscle,age}));assert(enforceComposition(base.profile,s));assert(s.maximumVolumeRelativeError<1e-10);for(const a of s.areas){assert(a.targetFatVolume>0);assert(Math.abs(a.muscles.reduce((n,m)=>n+m.targetVolume,0)-a.targetMuscleVolume)<1e-10);}}const fat=solveComposition(base.profile,normalizeBody({fatness:1})),ref=solveComposition(base.profile,normalizeBody());assert.deepEqual(fat.areas.map(a=>a.targetMuscleVolume),ref.areas.map(a=>a.targetMuscleVolume));});
+test('骨架静态数据不变，最瘦也不使支持核缩小',()=>{const before=JSON.stringify(base.joints),s=solveComposition(base.profile,normalizeBody({fatness:-1,muscle:-1,age:75}));for(let i=0;i<base.areaIds.length;i+=17){const c=base.fields.context(i),p=c.anchor.slice(0,3);assert.deepEqual(compositionPoint(p,c,s.controls),p);const q=point(base,i,s);assert(Math.hypot(...q.map((v,k)=>v-c.anchor[k]))>=c.region[0]-1e-7);}assert.equal(JSON.stringify(base.joints),before);});
+test('肩臂腿掌足与下脸全部联动，末端响应小于肌腹',()=>{const s=solveComposition(base.profile,normalizeBody({fatness:1,muscle:1}));for(const id of ['upperarm_l','lowerarm_l','hand_l','thigh_l','calf_l','foot_l','head','thorax','abdomen']){const i=base.areaIds.indexOf(base.profile.areas.findIndex(a=>a.id===id)),p=Array.from(base.positions.subarray(i*3,i*3+3));assert(Math.hypot(...point(base,i,s).map((v,k)=>v-p[k]))>base.anatomy.frame.height*.0001,id);}const a=s.areas.find(a=>a.id==='upperarm_l'),h=s.areas.find(a=>a.id==='hand_l');assert(a.muscleRatio>h.muscleRatio);});
+test('年龄是条件先验，年轻成人不被统一扣肌肉；量与质量分开',()=>{const young=solveComposition(base.profile,normalizeBody({age:18,muscle:.5})),old=solveComposition(base.profile,normalizeBody({age:75,muscle:.5})),ref=solveComposition(base.profile,normalizeBody({age:32,muscle:.5}));assert.equal(young.areas[4].muscleRatio,ref.areas[4].muscleRatio);assert(old.areas[4].muscleRatio<young.areas[4].muscleRatio);assert(old.areas[4].muscleQualityPrior<1);});
+test('高脂肪或低肌肉降低刻度，高肌肉高脂肪仍保留肌肉体积',()=>{const high=solveComposition(base.profile,normalizeBody({fatness:1,muscle:1})),lean=solveComposition(base.profile,normalizeBody({fatness:-1,muscle:1})),low=solveComposition(base.profile,normalizeBody({muscle:-1}));for(let i=0;i<high.areas.length;i++){assert(high.areas[i].reliefBlend>lean.areas[i].reliefBlend);assert(high.areas[i].targetMuscleVolume>base.profile.areas[i].baselineMuscleVolume);assert(low.areas[i].reliefBlend>0);}});
+test('新人物长度重新拟合，不能照搬旧轴或体积',()=>{const changed=compositionFixture({armLength:1.25,sourceId:'other-human'});assert(changed.profile.areas.find(a=>a.id==='upperarm_l').length>base.profile.areas.find(a=>a.id==='upperarm_l').length);assert.equal(changed.profile.sourceId,'other-human');assert.throws(()=>createCompositionProfile(changed.anatomy,base.calibration),/来源/);});
+test('任意旋转平移和单位缩放使用同一函数，轮廓响应等变',()=>{const rotate=p=>[3-p[1]*2,p[0]*2+4,p[2]*2-1],f=compositionFixture(),positions=new Float32Array(Array.from({length:f.positions.length/3},(_,i)=>rotate(Array.from(f.positions.subarray(i*3,i*3+3)))).flat()),joints=f.joints.map(j=>({...j,position:rotate(j.position)}));
+ // Construct transformed analysis from the same observations, no new priors.
+ const a={...f.anatomy,frame:{...f.anatomy.frame,origin:rotate(f.anatomy.frame.origin),right:[0,1,0],up:[-1,0,0],front:[0,0,1],height:f.anatomy.frame.height*2,floor:f.anatomy.frame.floor*2,top:f.anatomy.frame.top*2},joints,segments:f.anatomy.segments.map(s=>({...s,start:rotate(s.start),end:rotate(s.end),length:s.length*2,surfaceRadius:s.surfaceRadius*2}))};
+ const profile=createCompositionProfile(a,f.calibration),fields=createCompositionFields({positions,skinIndex:f.skinIndex,skinWeight:f.skinWeight,anatomy:a,profile}),s=solveComposition(f.profile,normalizeBody({fatness:.5,muscle:.7})),t=solveComposition(profile,normalizeBody({fatness:.5,muscle:.7}));for(let i=0;i<f.areaIds.length;i+=19){const expected=rotate(point(f,i,s)),actual=compositionPoint(Array.from(positions.subarray(i*3,i*3+3)),fields.context(i),t.controls);assert(Math.hypot(...actual.map((v,k)=>v-expected[k]))<1e-5);}for(let i=0;i<profile.areas.length;i++)assert(Math.abs(profile.areas[i].baselineMuscleVolume/f.profile.areas[i].baselineMuscleVolume-8)<1e-4);});
+test('未知或非法校准拒绝；体积门禁实际执行',()=>{assert.throws(()=>validateCompositionCalibration(base.anatomy,null));assert.throws(()=>createCompositionProfile(base.anatomy,{...base.calibration,regions:{upperarm:{satFraction:-.2}}}));const s=solveComposition(base.profile,normalizeBody());assert.throws(()=>enforceComposition(base.profile,{...s,maximumVolumeRelativeError:.1}));assert.throws(()=>bodyPoint([0,0,0],normalizeBody()));});
+test('支持字段正雅可比，检查27种组合（不等于全局无自交）',()=>{let minimum=Infinity;for(const fatness of [-1,0,1])for(const muscle of [-1,0,1])for(const age of [18,32,75]){const p=normalizeBody({fatness,muscle,age}),s=solveComposition(base.profile,p);for(let i=0;i<base.areaIds.length;i+=97){const J=bodyNormalMatrix(Array.from(base.positions.subarray(i*3,i*3+3)),p,base.anatomy.frame.height*.0002,context(base,i,s));minimum=Math.min(minimum,J.determinant);assert(J.determinant>.02);}}console.log(JSON.stringify({minimumHeldFieldJacobian:minimum}));});
+test('紧凑导出无表面顶点或临时字段',()=>{const s=solveComposition(base.profile,normalizeBody()),text=JSON.stringify(compactComposition(base.profile,s));assert(text.length<60000);assert(!/"positions"|"skinIndex"|"skinWeight"|"controls"/.test(text));assert.equal(base.profile.persistedVertexBytes,0);});
+test('同一接入函数适配不同人物比例、单位尺度与显式骨名映射',()=>{
+ for(const options of [{},{scale:1.3,armLength:1.25,sourceId:'second-adult'}]){
+  const f=compositionFixture(options),names=new Map(f.joints.map((j,i)=>[j.name,'custom_joint_'+i])),mapping=Object.fromEntries(Object.entries(f.anatomy.roles).filter(([,i])=>Number.isInteger(i)).map(([role,i])=>[role,names.get(f.joints[i].name)]));
+  const joints=f.joints.map(j=>({...j,name:names.get(j.name),parent:j.parent?names.get(j.parent):null})),s=createHumanBodySystem({...f,joints,sourceId:f.calibration.sourceId},f.calibration,{mapping});
+  assert.equal(s.profile.areas.length,16);assert.equal(s.export().sourceId,f.calibration.sourceId);const before=JSON.stringify(joints);s.set({fatness:1,muscle:-.4,age:70});assert(s.solution.maximumVolumeRelativeError<1e-10);assert(s.point(100).every(Number.isFinite));assert.equal(JSON.stringify(joints),before);
+ }
+});
+test('完整八权重扫描拒绝隐藏坏值，支持核与脂肪比例不能挤占全部截面',()=>{
+ const f=compositionFixture(),weights=new Float32Array(f.skinWeight);weights[101*8+7]=-1;
+ assert.throws(()=>createHumanBodySystem({...f,skinWeight:weights,sourceId:f.calibration.sourceId},f.calibration));
+ assert.throws(()=>createCompositionProfile(f.anatomy,{...f.calibration,regions:{upperarm:{coreFraction:.8,satFraction:.3}}}));
+});
+test('手部不受没有绑定关系的躯干腿部干扰，衣物排除采样仍可跟随形变',()=>{
+ const f=compositionFixture(),profile=structuredClone(f.profile);for(const a of profile.areas)if(!a.id.startsWith('hand')){a.radius=100;a.start=[.34,.9,0];a.end=[.34,.8,0];}
+ const fields=createCompositionFields({...f,profile});for(let i=0;i<f.areaIds.length;i++)if(f.profile.areas[f.areaIds[i]].id.startsWith('hand'))assert.deepEqual(fields.context(i),f.fields.context(i));
+ const g=compositionFixture(),materialIds=new Uint8Array(g.areaIds.length).fill(5),system=createHumanBodySystem({...g,materialIds,sourceId:g.calibration.sourceId},{...g.calibration,samplingExcludedMaterials:[5]});assert(system.profile.areas.every(a=>a.sections.every(s=>s.samples===0)));const before=system.point(100);system.set({fatness:.8});assert.notDeepEqual(system.point(100),before);
+});
+test('现有人物校准不允许套到其他来源；衣物几何与皮肤通道分别授权',()=>{
+ assert.throws(()=>r008CompositionCalibration(base.anatomy,[]));const f=compositionFixture({sourceId:'new-human-r008'}),c=r008CompositionCalibration(f.anatomy,[{name:'tripo_part_1'},{name:'tripo_part_2'},{name:'tripo_part_9'},{name:'tripo_part_3'}]);
+ assert.deepEqual(c.protectedMaterials,[]);assert.deepEqual(c.appearanceExcludedMaterials,[0,1,2]);assert.deepEqual(c.samplingExcludedMaterials,[0,1,2]);assert(c.protectedFeatures.length===2);
+});
+console.log(JSON.stringify({passed:tests.length,tests}));

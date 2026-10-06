@@ -1,0 +1,3885 @@
+{
+  "schema": "human-r008/face-baseline@1",
+  "observedAt": "2026-10-04T10:43:47.943Z",
+  "source": "R008-canonical-face-20261004",
+  "method": "authored-continuous-identity-fields@2",
+  "parameterRevision": "identity-fields-r28",
+  "camera": {
+    "fovDegrees": 22,
+    "target": [
+      0,
+      1.645,
+      0.055
+    ],
+    "distanceMetres": 0.95,
+    "projection": "perspective",
+    "pose": "neutral/frontal",
+    "leftRight": "subject +X = image right"
+  },
+  "baselineIdentity": {
+    "schema": "human-r008/face-identity@1",
+    "source": "R008-canonical-face-20261004",
+    "parameters": {}
+  },
+  "localShape": {
+    "schema": "human-r008/face-shape@1",
+    "source": "R008-canonical-face-20261004",
+    "regions": {}
+  },
+  "parameterDefinitions": [
+    {
+      "id": "headWidth",
+      "label": "全头宽度",
+      "group": "整体",
+      "unit": "%",
+      "min": -12,
+      "max": 12,
+      "step": 1,
+      "centre": [
+        0,
+        1.645,
+        0.1
+      ],
+      "radii": [
+        0.14,
+        0.2,
+        0.2
+      ],
+      "matrix": [
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "head"
+    },
+    {
+      "id": "headHeight",
+      "label": "全头高度",
+      "group": "整体",
+      "unit": "%",
+      "min": -12,
+      "max": 12,
+      "step": 1,
+      "centre": [
+        0,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.14,
+        0.2,
+        0.2
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "head"
+    },
+    {
+      "id": "headDepth",
+      "label": "全头前后深度",
+      "group": "整体",
+      "unit": "%",
+      "min": -12,
+      "max": 12,
+      "step": 1,
+      "centre": [
+        0,
+        1.656,
+        0.02
+      ],
+      "radii": [
+        0.14,
+        0.2,
+        0.2
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.01
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": false,
+      "support": "head"
+    },
+    {
+      "id": "upperFaceLength",
+      "label": "眼线以上长度",
+      "group": "整体",
+      "unit": "%",
+      "min": -15,
+      "max": 15,
+      "step": 1,
+      "centre": [
+        0,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.15,
+        0.16,
+        0.18
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "upper"
+    },
+    {
+      "id": "lowerFaceLength",
+      "label": "眼线以下长度",
+      "group": "整体",
+      "unit": "%",
+      "min": -15,
+      "max": 15,
+      "step": 1,
+      "centre": [
+        0,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.15,
+        0.16,
+        0.18
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "lower"
+    },
+    {
+      "id": "foreheadHeight",
+      "label": "眉间以上额部长度",
+      "group": "整体",
+      "unit": "%",
+      "min": -20,
+      "max": 60,
+      "step": 1,
+      "centre": [
+        0,
+        1.67,
+        0.1
+      ],
+      "radii": [
+        0.14,
+        0.2,
+        0.2
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "forehead"
+    },
+    {
+      "id": "foreheadWidth",
+      "label": "额部宽度",
+      "group": "轮廓",
+      "unit": "mm",
+      "min": -8,
+      "max": 8,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.698,
+        0.07
+      ],
+      "radii": [
+        0.14,
+        0.045,
+        0.17
+      ],
+      "matrix": [
+        0.007142857142857143,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "foreheadProjection",
+      "label": "额部前凸",
+      "group": "轮廓",
+      "unit": "mm Z",
+      "min": -6,
+      "max": 6,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.692,
+        0.109
+      ],
+      "radii": [
+        0.085,
+        0.037,
+        0.065
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0.001
+      ],
+      "fit": false
+    },
+    {
+      "id": "templeWidth",
+      "label": "太阳穴宽度",
+      "group": "轮廓",
+      "unit": "mm",
+      "min": -8,
+      "max": 8,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.662,
+        0.065
+      ],
+      "radii": [
+        0.15,
+        0.04,
+        0.17
+      ],
+      "matrix": [
+        0.006578947368421053,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "cheekboneWidth",
+      "label": "颧部宽度",
+      "group": "轮廓",
+      "unit": "mm",
+      "min": -8,
+      "max": 8,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.634,
+        0.066
+      ],
+      "radii": [
+        0.15,
+        0.038,
+        0.17
+      ],
+      "matrix": [
+        0.007142857142857143,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "jawWidth",
+      "label": "下颌宽度",
+      "group": "轮廓",
+      "unit": "mm",
+      "min": -10,
+      "max": 10,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.566,
+        0.04
+      ],
+      "radii": [
+        0.14,
+        0.045,
+        0.16
+      ],
+      "matrix": [
+        0.008333333333333333,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "jawHeight",
+      "label": "下颌缘高度",
+      "group": "轮廓",
+      "unit": "mm",
+      "min": -4,
+      "max": 4,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.558,
+        0.07
+      ],
+      "radii": [
+        0.105,
+        0.027,
+        0.115
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "chinWidth",
+      "label": "下巴宽度",
+      "group": "轮廓",
+      "unit": "mm",
+      "min": -12,
+      "max": 8,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.551,
+        0.097
+      ],
+      "radii": [
+        0.085,
+        0.03,
+        0.12
+      ],
+      "matrix": [
+        0.018518518518518517,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "chinHeight",
+      "label": "下巴长度（正值向下）",
+      "group": "轮廓",
+      "unit": "mm",
+      "min": -5,
+      "max": 5,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.547,
+        0.094
+      ],
+      "radii": [
+        0.054,
+        0.027,
+        0.074
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        -0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "chinProjection",
+      "label": "下巴前凸",
+      "group": "轮廓",
+      "unit": "mm Z",
+      "min": -4,
+      "max": 4,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.553,
+        0.108
+      ],
+      "radii": [
+        0.045,
+        0.026,
+        0.055
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0.001
+      ],
+      "fit": false
+    },
+    {
+      "id": "noseWidth",
+      "label": "鼻部宽度",
+      "group": "鼻",
+      "unit": "%",
+      "min": -22,
+      "max": 22,
+      "step": 1,
+      "centre": [
+        0,
+        1.625,
+        0.132
+      ],
+      "radii": [
+        0.038,
+        0.046,
+        0.054
+      ],
+      "matrix": [
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "noseLength",
+      "label": "鼻部长度",
+      "group": "鼻",
+      "unit": "%",
+      "min": -12,
+      "max": 12,
+      "step": 1,
+      "centre": [
+        0,
+        1.663,
+        0.123
+      ],
+      "radii": [
+        0.039,
+        0.071,
+        0.065
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "bridgeWidth",
+      "label": "鼻梁宽度",
+      "group": "鼻",
+      "unit": "%",
+      "min": -18,
+      "max": 18,
+      "step": 1,
+      "centre": [
+        0,
+        1.643,
+        0.139
+      ],
+      "radii": [
+        0.021,
+        0.029,
+        0.04
+      ],
+      "matrix": [
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "bridgeProjection",
+      "label": "鼻梁前凸",
+      "group": "鼻",
+      "unit": "mm Z",
+      "min": -4,
+      "max": 4,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.646,
+        0.136
+      ],
+      "radii": [
+        0.018,
+        0.032,
+        0.044
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0.001
+      ],
+      "fit": false
+    },
+    {
+      "id": "tipWidth",
+      "label": "鼻尖宽度",
+      "group": "鼻",
+      "unit": "%",
+      "min": -18,
+      "max": 18,
+      "step": 1,
+      "centre": [
+        0,
+        1.624,
+        0.151
+      ],
+      "radii": [
+        0.025,
+        0.019,
+        0.035
+      ],
+      "matrix": [
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "tipHeight",
+      "label": "鼻尖高度",
+      "group": "鼻",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.624,
+        0.151
+      ],
+      "radii": [
+        0.026,
+        0.019,
+        0.038
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "tipProjection",
+      "label": "鼻尖前凸",
+      "group": "鼻",
+      "unit": "mm Z",
+      "min": -4,
+      "max": 4,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.624,
+        0.151
+      ],
+      "radii": [
+        0.025,
+        0.019,
+        0.036
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0.001
+      ],
+      "fit": false
+    },
+    {
+      "id": "noseBaseHeight",
+      "label": "鼻底高度",
+      "group": "鼻",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.612,
+        0.128
+      ],
+      "radii": [
+        0.034,
+        0.016,
+        0.042
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "mouthWidth",
+      "label": "口宽",
+      "group": "口",
+      "unit": "%",
+      "min": -22,
+      "max": 22,
+      "step": 1,
+      "centre": [
+        0,
+        1.587,
+        0.117
+      ],
+      "radii": [
+        0.055,
+        0.03,
+        0.063
+      ],
+      "matrix": [
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "mouthHeight",
+      "label": "嘴部高度",
+      "group": "口",
+      "unit": "mm",
+      "min": -4,
+      "max": 4,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.587,
+        0.117
+      ],
+      "radii": [
+        0.052,
+        0.03,
+        0.06
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "upperLipThickness",
+      "label": "上唇厚度",
+      "group": "口",
+      "unit": "%",
+      "min": -18,
+      "max": 18,
+      "step": 1,
+      "centre": [
+        0,
+        1.587,
+        0.122
+      ],
+      "radii": [
+        0.036,
+        0.019,
+        0.046
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "upperLip"
+    },
+    {
+      "id": "lowerLipThickness",
+      "label": "下唇厚度",
+      "group": "口",
+      "unit": "%",
+      "min": -18,
+      "max": 18,
+      "step": 1,
+      "centre": [
+        0,
+        1.587,
+        0.121
+      ],
+      "radii": [
+        0.036,
+        0.02,
+        0.046
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "lowerLip"
+    },
+    {
+      "id": "lipProjection",
+      "label": "唇部前凸",
+      "group": "口",
+      "unit": "mm Z",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.587,
+        0.125
+      ],
+      "radii": [
+        0.039,
+        0.022,
+        0.042
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0.001
+      ],
+      "fit": false
+    },
+    {
+      "id": "philtrumLength",
+      "label": "人中长度（嘴部向下）",
+      "group": "口",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0,
+        1.596,
+        0.119
+      ],
+      "radii": [
+        0.041,
+        0.029,
+        0.045
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        -0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "eyeSpacingLeft",
+      "label": "左眼位置（正值向外）",
+      "group": "眼",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0.001,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "eyeHeightLeft",
+      "label": "左眼位置高度",
+      "group": "眼",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "eyeDepthLeft",
+      "label": "左眼区前后位置",
+      "group": "眼",
+      "unit": "mm Z",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0.001
+      ],
+      "fit": false
+    },
+    {
+      "id": "eyeWidthLeft",
+      "label": "左眼区宽度",
+      "group": "眼",
+      "unit": "%",
+      "min": -18,
+      "max": 45,
+      "step": 1,
+      "centre": [
+        0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "eyeHalf",
+      "sign": 1
+    },
+    {
+      "id": "eyeOpeningLeft",
+      "label": "左眼区开合高度",
+      "group": "眼",
+      "unit": "%",
+      "min": -20,
+      "max": 35,
+      "step": 1,
+      "centre": [
+        0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "eyeTiltLeft",
+      "label": "左眼角倾斜（正值外角高）",
+      "group": "眼",
+      "unit": "°",
+      "min": -7,
+      "max": 7,
+      "step": 0.1,
+      "centre": [
+        0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        -0.017453292519943295,
+        0,
+        0.017453292519943295,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "browHeightLeft",
+      "label": "左眉高度",
+      "group": "眉",
+      "unit": "mm",
+      "min": -4,
+      "max": 4,
+      "step": 0.1,
+      "centre": [
+        0.036,
+        1.673,
+        0.108
+      ],
+      "radii": [
+        0.039,
+        0.019,
+        0.053
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "browArchLeft",
+      "label": "左眉峰高度",
+      "group": "眉",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0.045,
+        1.674,
+        0.102
+      ],
+      "radii": [
+        0.022,
+        0.016,
+        0.044
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "browLengthLeft",
+      "label": "左眉区长度",
+      "group": "眉",
+      "unit": "%",
+      "min": -18,
+      "max": 45,
+      "step": 1,
+      "centre": [
+        0.036,
+        1.673,
+        0.108
+      ],
+      "radii": [
+        0.07,
+        0.032,
+        0.085
+      ],
+      "matrix": [
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0.00017,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "browHalf",
+      "sign": 1
+    },
+    {
+      "id": "cheekProjectionLeft",
+      "label": "左面颊饱满度",
+      "group": "颊",
+      "unit": "mm Z",
+      "min": -4,
+      "max": 4,
+      "step": 0.1,
+      "centre": [
+        0.051,
+        1.614,
+        0.097
+      ],
+      "radii": [
+        0.042,
+        0.039,
+        0.067
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0.001
+      ],
+      "fit": false
+    },
+    {
+      "id": "cheekHeightLeft",
+      "label": "左颧颊高度",
+      "group": "颊",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0.059,
+        1.634,
+        0.086
+      ],
+      "radii": [
+        0.042,
+        0.03,
+        0.074
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "cornerHeightLeft",
+      "label": "左口角高度",
+      "group": "口",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        0.026,
+        1.586,
+        0.105
+      ],
+      "radii": [
+        0.021,
+        0.023,
+        0.045
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "eyeSpacingRight",
+      "label": "右眼位置（正值向外）",
+      "group": "眼",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        -0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        -0.001,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "eyeHeightRight",
+      "label": "右眼位置高度",
+      "group": "眼",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        -0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "eyeDepthRight",
+      "label": "右眼区前后位置",
+      "group": "眼",
+      "unit": "mm Z",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        -0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0.001
+      ],
+      "fit": false
+    },
+    {
+      "id": "eyeWidthRight",
+      "label": "右眼区宽度",
+      "group": "眼",
+      "unit": "%",
+      "min": -18,
+      "max": 45,
+      "step": 1,
+      "centre": [
+        -0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "eyeHalf",
+      "sign": -1
+    },
+    {
+      "id": "eyeOpeningRight",
+      "label": "右眼区开合高度",
+      "group": "眼",
+      "unit": "%",
+      "min": -20,
+      "max": 35,
+      "step": 1,
+      "centre": [
+        -0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0.01,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "eyeTiltRight",
+      "label": "右眼角倾斜（正值外角高）",
+      "group": "眼",
+      "unit": "°",
+      "min": -7,
+      "max": 7,
+      "step": 0.1,
+      "centre": [
+        -0.034,
+        1.656,
+        0.1
+      ],
+      "radii": [
+        0.055,
+        0.04,
+        0.095
+      ],
+      "matrix": [
+        0,
+        0.017453292519943295,
+        0,
+        -0.017453292519943295,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "browHeightRight",
+      "label": "右眉高度",
+      "group": "眉",
+      "unit": "mm",
+      "min": -4,
+      "max": 4,
+      "step": 0.1,
+      "centre": [
+        -0.036,
+        1.673,
+        0.108
+      ],
+      "radii": [
+        0.039,
+        0.019,
+        0.053
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "browArchRight",
+      "label": "右眉峰高度",
+      "group": "眉",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        -0.045,
+        1.674,
+        0.102
+      ],
+      "radii": [
+        0.022,
+        0.016,
+        0.044
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "browLengthRight",
+      "label": "右眉区长度",
+      "group": "眉",
+      "unit": "%",
+      "min": -18,
+      "max": 45,
+      "step": 1,
+      "centre": [
+        -0.036,
+        1.673,
+        0.108
+      ],
+      "radii": [
+        0.07,
+        0.032,
+        0.085
+      ],
+      "matrix": [
+        0.01,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        -0.00017,
+        0,
+        0
+      ],
+      "fit": true,
+      "support": "browHalf",
+      "sign": -1
+    },
+    {
+      "id": "cheekProjectionRight",
+      "label": "右面颊饱满度",
+      "group": "颊",
+      "unit": "mm Z",
+      "min": -4,
+      "max": 4,
+      "step": 0.1,
+      "centre": [
+        -0.051,
+        1.614,
+        0.097
+      ],
+      "radii": [
+        0.042,
+        0.039,
+        0.067
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0.001
+      ],
+      "fit": false
+    },
+    {
+      "id": "cheekHeightRight",
+      "label": "右颧颊高度",
+      "group": "颊",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        -0.059,
+        1.634,
+        0.086
+      ],
+      "radii": [
+        0.042,
+        0.03,
+        0.074
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    },
+    {
+      "id": "cornerHeightRight",
+      "label": "右口角高度",
+      "group": "口",
+      "unit": "mm",
+      "min": -3,
+      "max": 3,
+      "step": 0.1,
+      "centre": [
+        -0.026,
+        1.586,
+        0.105
+      ],
+      "radii": [
+        0.021,
+        0.023,
+        0.045
+      ],
+      "matrix": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        0.001,
+        0
+      ],
+      "fit": true
+    }
+  ],
+  "landmarks": [
+    {
+      "id": "contour0",
+      "label": "轮廓 1",
+      "xy": [
+        -0.07,
+        1.637
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.07647861540317535,
+        1.6374191045761108,
+        0.026909494772553444
+      ]
+    },
+    {
+      "id": "contour1",
+      "label": "轮廓 2",
+      "xy": [
+        -0.07,
+        1.619
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.07465643435716629,
+        1.620729684829712,
+        0.027715153992176056
+      ]
+    },
+    {
+      "id": "contour2",
+      "label": "轮廓 3",
+      "xy": [
+        -0.07,
+        1.601
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.071748748421669,
+        1.602590560913086,
+        0.032704345881938934
+      ]
+    },
+    {
+      "id": "contour3",
+      "label": "轮廓 4",
+      "xy": [
+        -0.07,
+        1.584
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.06685138493776321,
+        1.585750699043274,
+        0.03920937702059746
+      ]
+    },
+    {
+      "id": "contour4",
+      "label": "轮廓 5",
+      "xy": [
+        -0.07,
+        1.571
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.05633711442351341,
+        1.572648525238037,
+        0.049706678837537766
+      ]
+    },
+    {
+      "id": "contour5",
+      "label": "轮廓 6",
+      "xy": [
+        -0.07,
+        1.559
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.04443565383553505,
+        1.5606768131256104,
+        0.053588058799505234
+      ]
+    },
+    {
+      "id": "contour6",
+      "label": "轮廓 7",
+      "xy": [
+        -0.07,
+        1.55
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.03380114957690239,
+        1.5516964197158813,
+        0.06593300402164459
+      ]
+    },
+    {
+      "id": "contour7",
+      "label": "轮廓 8",
+      "xy": [
+        -0.07,
+        1.545
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.028641032055020332,
+        1.5461145639419556,
+        0.0851832702755928
+      ]
+    },
+    {
+      "id": "contour8",
+      "label": "轮廓 9",
+      "xy": [
+        0,
+        1.542
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": false,
+      "chin": true,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.0017593738157302141,
+        1.5364165306091309,
+        0.06829535216093063
+      ]
+    },
+    {
+      "id": "contour9",
+      "label": "轮廓 10",
+      "xy": [
+        0.07,
+        1.545
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.028713643550872803,
+        1.546778678894043,
+        0.07887206226587296
+      ]
+    },
+    {
+      "id": "contour10",
+      "label": "轮廓 11",
+      "xy": [
+        0.07,
+        1.55
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.03354277461767197,
+        1.551780343055725,
+        0.060569025576114655
+      ]
+    },
+    {
+      "id": "contour11",
+      "label": "轮廓 12",
+      "xy": [
+        0.07,
+        1.559
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.04407830908894539,
+        1.560685396194458,
+        0.053469281643629074
+      ]
+    },
+    {
+      "id": "contour12",
+      "label": "轮廓 13",
+      "xy": [
+        0.07,
+        1.571
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.056169528514146805,
+        1.5725644826889038,
+        0.046952687203884125
+      ]
+    },
+    {
+      "id": "contour13",
+      "label": "轮廓 14",
+      "xy": [
+        0.07,
+        1.584
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.06644468754529953,
+        1.585799217224121,
+        0.035803936421871185
+      ]
+    },
+    {
+      "id": "contour14",
+      "label": "轮廓 15",
+      "xy": [
+        0.07,
+        1.601
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.07141954451799393,
+        1.602439522743225,
+        0.03282952681183815
+      ]
+    },
+    {
+      "id": "contour15",
+      "label": "轮廓 16",
+      "xy": [
+        0.07,
+        1.619
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.07438346743583679,
+        1.6206536293029785,
+        0.026674024760723114
+      ]
+    },
+    {
+      "id": "contour16",
+      "label": "轮廓 17",
+      "xy": [
+        0.07,
+        1.637
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "chin": false,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.07634269446134567,
+        1.63858163356781,
+        0.029697904363274574
+      ]
+    },
+    {
+      "id": "browLeft0",
+      "label": "左眉 1",
+      "xy": [
+        0.019,
+        1.669
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.019000000000000003,
+        1.6690000000000003,
+        0.1213692505904768
+      ]
+    },
+    {
+      "id": "browLeft1",
+      "label": "左眉 2",
+      "xy": [
+        0.027,
+        1.672
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.026999999999999996,
+        1.6719999999999997,
+        0.1206783278350485
+      ]
+    },
+    {
+      "id": "browLeft2",
+      "label": "左眉 3",
+      "xy": [
+        0.035,
+        1.674
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.035,
+        1.674,
+        0.118043361705173
+      ]
+    },
+    {
+      "id": "browLeft3",
+      "label": "左眉 4",
+      "xy": [
+        0.043,
+        1.673
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.043,
+        1.6730000000000003,
+        0.1128259752033597
+      ]
+    },
+    {
+      "id": "browLeft4",
+      "label": "左眉 5",
+      "xy": [
+        0.051000000000000004,
+        1.669
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.051000000000000004,
+        1.669,
+        0.10430226067696297
+      ]
+    },
+    {
+      "id": "eyeLeft0",
+      "label": "左眼缘 1",
+      "xy": [
+        0.022200000000000004,
+        1.656
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": 1,
+      "status": "available",
+      "point": [
+        0.022200000000000004,
+        1.656,
+        0.0935778700057688
+      ]
+    },
+    {
+      "id": "eyeLeft1",
+      "label": "左眼缘 2",
+      "xy": [
+        0.028100000000000003,
+        1.6588578838324886
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": 1,
+      "status": "available",
+      "point": [
+        0.028100000000000003,
+        1.6588578838324886,
+        0.10009650729692096
+      ]
+    },
+    {
+      "id": "eyeLeft2",
+      "label": "左眼缘 3",
+      "xy": [
+        0.039900000000000005,
+        1.6588578838324886
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": 1,
+      "status": "available",
+      "point": [
+        0.039900000000000005,
+        1.6588578838324886,
+        0.10009650729692096
+      ]
+    },
+    {
+      "id": "eyeLeft3",
+      "label": "左眼缘 4",
+      "xy": [
+        0.0458,
+        1.656
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": 1,
+      "status": "available",
+      "point": [
+        0.0458,
+        1.656,
+        0.0935778700057688
+      ]
+    },
+    {
+      "id": "eyeLeft4",
+      "label": "左眼缘 5",
+      "xy": [
+        0.039900000000000005,
+        1.6540081415712957
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": 1,
+      "status": "available",
+      "point": [
+        0.039900000000000005,
+        1.6540081415712957,
+        0.1002920250200086
+      ]
+    },
+    {
+      "id": "eyeLeft5",
+      "label": "左眼缘 6",
+      "xy": [
+        0.028100000000000003,
+        1.6540081415712957
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": 1,
+      "status": "available",
+      "point": [
+        0.028100000000000003,
+        1.6540081415712957,
+        0.1002920250200086
+      ]
+    },
+    {
+      "id": "pupilLeft",
+      "label": "左眼中心",
+      "xy": [
+        0.034,
+        1.656
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-axis",
+      "eye": true,
+      "sign": 1,
+      "pupil": true,
+      "status": "available",
+      "point": [
+        0.034,
+        1.656,
+        0.10185355188030852
+      ]
+    },
+    {
+      "id": "cheekLeft",
+      "label": "左颧部轮廓",
+      "xy": [
+        0.07,
+        1.634
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.07615715265274048,
+        1.6356886625289917,
+        0.026247575879096985
+      ]
+    },
+    {
+      "id": "jawLeft",
+      "label": "左下颌轮廓",
+      "xy": [
+        0.062,
+        1.571
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.056169528514146805,
+        1.5725644826889038,
+        0.046952687203884125
+      ]
+    },
+    {
+      "id": "templeLeft",
+      "label": "左太阳穴轮廓",
+      "xy": [
+        0.077,
+        1.674
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.08029664307832718,
+        1.6755783557891846,
+        0.026852978393435478
+      ]
+    },
+    {
+      "id": "earLeft",
+      "label": "左耳外缘",
+      "xy": [
+        0.094,
+        1.622
+      ],
+      "group": "耳",
+      "confidence": 0.55,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "side": 1,
+      "status": "available",
+      "point": [
+        0.07489168643951416,
+        1.6237834692001343,
+        0.027883468195796013
+      ]
+    },
+    {
+      "id": "browRight0",
+      "label": "右眉 1",
+      "xy": [
+        -0.019,
+        1.669
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.018999999999999996,
+        1.669,
+        0.12161820202648368
+      ]
+    },
+    {
+      "id": "browRight1",
+      "label": "右眉 2",
+      "xy": [
+        -0.027,
+        1.672
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.027,
+        1.672,
+        0.12111498960546592
+      ]
+    },
+    {
+      "id": "browRight2",
+      "label": "右眉 3",
+      "xy": [
+        -0.035,
+        1.674
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.035,
+        1.674,
+        0.11818346250137866
+      ]
+    },
+    {
+      "id": "browRight3",
+      "label": "右眉 4",
+      "xy": [
+        -0.043,
+        1.673
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.043,
+        1.673,
+        0.11362329623299762
+      ]
+    },
+    {
+      "id": "browRight4",
+      "label": "右眉 5",
+      "xy": [
+        -0.051000000000000004,
+        1.669
+      ],
+      "group": "眉",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.051000000000000004,
+        1.669,
+        0.10552757990395606
+      ]
+    },
+    {
+      "id": "eyeRight0",
+      "label": "右眼缘 1",
+      "xy": [
+        -0.022200000000000004,
+        1.656
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": -1,
+      "status": "available",
+      "point": [
+        -0.022200000000000004,
+        1.656,
+        0.0938049681262604
+      ]
+    },
+    {
+      "id": "eyeRight1",
+      "label": "右眼缘 2",
+      "xy": [
+        -0.028100000000000003,
+        1.6588578838324886
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": -1,
+      "status": "available",
+      "point": [
+        -0.028100000000000003,
+        1.6588578838324886,
+        0.10032360541741256
+      ]
+    },
+    {
+      "id": "eyeRight2",
+      "label": "右眼缘 3",
+      "xy": [
+        -0.039900000000000005,
+        1.6588578838324886
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": -1,
+      "status": "available",
+      "point": [
+        -0.039900000000000005,
+        1.6588578838324886,
+        0.10032360541741256
+      ]
+    },
+    {
+      "id": "eyeRight3",
+      "label": "右眼缘 4",
+      "xy": [
+        -0.0458,
+        1.656
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": -1,
+      "status": "available",
+      "point": [
+        -0.0458,
+        1.656,
+        0.0938049681262604
+      ]
+    },
+    {
+      "id": "eyeRight4",
+      "label": "右眼缘 5",
+      "xy": [
+        -0.039900000000000005,
+        1.6540081415712957
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": -1,
+      "status": "available",
+      "point": [
+        -0.039900000000000005,
+        1.6540081415712957,
+        0.1005191231405002
+      ]
+    },
+    {
+      "id": "eyeRight5",
+      "label": "右眼缘 6",
+      "xy": [
+        -0.028100000000000003,
+        1.6540081415712957
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-aperture",
+      "eye": true,
+      "sign": -1,
+      "status": "available",
+      "point": [
+        -0.028100000000000003,
+        1.6540081415712957,
+        0.1005191231405002
+      ]
+    },
+    {
+      "id": "pupilRight",
+      "label": "右眼中心",
+      "xy": [
+        -0.034,
+        1.656
+      ],
+      "group": "眼",
+      "confidence": 1,
+      "evidence": "constructed-eye-axis",
+      "eye": true,
+      "sign": -1,
+      "pupil": true,
+      "status": "available",
+      "point": [
+        -0.034,
+        1.656,
+        0.10208065000080012
+      ]
+    },
+    {
+      "id": "cheekRight",
+      "label": "右颧部轮廓",
+      "xy": [
+        -0.07,
+        1.634
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.0763607993721962,
+        1.6355160474777222,
+        0.025210639461874962
+      ]
+    },
+    {
+      "id": "jawRight",
+      "label": "右下颌轮廓",
+      "xy": [
+        -0.062,
+        1.571
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.05633711442351341,
+        1.572648525238037,
+        0.049706678837537766
+      ]
+    },
+    {
+      "id": "templeRight",
+      "label": "右太阳穴轮廓",
+      "xy": [
+        -0.077,
+        1.674
+      ],
+      "group": "轮廓",
+      "confidence": 0.7,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.08071495592594147,
+        1.6741982698440552,
+        0.025417767465114594
+      ]
+    },
+    {
+      "id": "earRight",
+      "label": "右耳外缘",
+      "xy": [
+        -0.094,
+        1.622
+      ],
+      "group": "耳",
+      "confidence": 0.55,
+      "evidence": "calibrated-semantic/surface-bound",
+      "contour": true,
+      "side": -1,
+      "status": "available",
+      "point": [
+        -0.07510995119810104,
+        1.6233446598052979,
+        0.027745602652430534
+      ]
+    },
+    {
+      "id": "bridge0",
+      "label": "鼻梁 1",
+      "xy": [
+        0,
+        1.661
+      ],
+      "group": "鼻",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -2.710505431213761e-20,
+        1.661,
+        0.1216691413528326
+      ]
+    },
+    {
+      "id": "bridge1",
+      "label": "鼻梁 2",
+      "xy": [
+        0,
+        1.649
+      ],
+      "group": "鼻",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        5.421010862427522e-20,
+        1.649,
+        0.124993308175925
+      ]
+    },
+    {
+      "id": "bridge2",
+      "label": "鼻梁 3",
+      "xy": [
+        0,
+        1.636
+      ],
+      "group": "鼻",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        1.6940658945086007e-21,
+        1.6359999999999997,
+        0.13230276956718828
+      ]
+    },
+    {
+      "id": "bridge3",
+      "label": "鼻梁 4",
+      "xy": [
+        0,
+        1.624
+      ],
+      "group": "鼻",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        1.0842021724855044e-19,
+        1.624,
+        0.13865267521501196
+      ]
+    },
+    {
+      "id": "noseBase0",
+      "label": "鼻底 1",
+      "xy": [
+        -0.019,
+        1.615
+      ],
+      "group": "鼻",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.019000000000000003,
+        1.6149999999999998,
+        0.10868697765463892
+      ]
+    },
+    {
+      "id": "noseBase1",
+      "label": "鼻底 2",
+      "xy": [
+        -0.01,
+        1.611
+      ],
+      "group": "鼻",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.01,
+        1.6110000000000002,
+        0.11822668311227505
+      ]
+    },
+    {
+      "id": "noseBase2",
+      "label": "鼻底 3",
+      "xy": [
+        0,
+        1.61
+      ],
+      "group": "鼻",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        5.759824041329242e-20,
+        1.6099999999999999,
+        0.13536686645301113
+      ]
+    },
+    {
+      "id": "noseBase3",
+      "label": "鼻底 4",
+      "xy": [
+        0.01,
+        1.611
+      ],
+      "group": "鼻",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.01,
+        1.6110000000000002,
+        0.11787068834971484
+      ]
+    },
+    {
+      "id": "noseBase4",
+      "label": "鼻底 5",
+      "xy": [
+        0.019,
+        1.615
+      ],
+      "group": "鼻",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.019,
+        1.615,
+        0.10841678804569
+      ]
+    },
+    {
+      "id": "lipOuter0",
+      "label": "外唇 1",
+      "xy": [
+        -0.026,
+        1.587
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.026,
+        1.587,
+        0.10590992697556184
+      ]
+    },
+    {
+      "id": "lipOuter1",
+      "label": "外唇 2",
+      "xy": [
+        -0.017,
+        1.592
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.017,
+        1.592,
+        0.11510232383513709
+      ]
+    },
+    {
+      "id": "lipOuter2",
+      "label": "外唇 3",
+      "xy": [
+        -0.008,
+        1.596
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.008,
+        1.596,
+        0.12007115429477969
+      ]
+    },
+    {
+      "id": "lipOuter3",
+      "label": "外唇 4",
+      "xy": [
+        0,
+        1.594
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -1.8634724839594607e-20,
+        1.594,
+        0.12068947113688738
+      ]
+    },
+    {
+      "id": "lipOuter4",
+      "label": "外唇 5",
+      "xy": [
+        0.008,
+        1.596
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.008,
+        1.5960000000000003,
+        0.11991753629972064
+      ]
+    },
+    {
+      "id": "lipOuter5",
+      "label": "外唇 6",
+      "xy": [
+        0.017,
+        1.592
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.017,
+        1.592,
+        0.11459976048441846
+      ]
+    },
+    {
+      "id": "lipOuter6",
+      "label": "外唇 7",
+      "xy": [
+        0.026,
+        1.587
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.026,
+        1.587,
+        0.10512274861159769
+      ]
+    },
+    {
+      "id": "lipOuter7",
+      "label": "外唇 8",
+      "xy": [
+        0.017,
+        1.582
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.017,
+        1.5820000000000003,
+        0.11052904386553203
+      ]
+    },
+    {
+      "id": "lipOuter8",
+      "label": "外唇 9",
+      "xy": [
+        0.008,
+        1.578
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.008,
+        1.578,
+        0.11559317724247607
+      ]
+    },
+    {
+      "id": "lipOuter9",
+      "label": "外唇 10",
+      "xy": [
+        0,
+        1.577
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -2.981555974335137e-19,
+        1.5770000000000002,
+        0.11627503917485606
+      ]
+    },
+    {
+      "id": "lipOuter10",
+      "label": "外唇 11",
+      "xy": [
+        -0.008,
+        1.578
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.008,
+        1.5779999999999998,
+        0.11564189792583418
+      ]
+    },
+    {
+      "id": "lipOuter11",
+      "label": "外唇 12",
+      "xy": [
+        -0.017,
+        1.582
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.017,
+        1.5820000000000003,
+        0.110790348894719
+      ]
+    },
+    {
+      "id": "lipInner0",
+      "label": "内唇 1",
+      "xy": [
+        -0.022,
+        1.587
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.022000000000000002,
+        1.587,
+        0.10835950019649876
+      ]
+    },
+    {
+      "id": "lipInner1",
+      "label": "内唇 2",
+      "xy": [
+        -0.01,
+        1.588
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.01,
+        1.588,
+        0.11535346130770699
+      ]
+    },
+    {
+      "id": "lipInner2",
+      "label": "内唇 3",
+      "xy": [
+        0,
+        1.589
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -5.421010862427522e-20,
+        1.589,
+        0.11944599261332992
+      ]
+    },
+    {
+      "id": "lipInner3",
+      "label": "内唇 4",
+      "xy": [
+        0.01,
+        1.588
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.01,
+        1.588,
+        0.11554211649835533
+      ]
+    },
+    {
+      "id": "lipInner4",
+      "label": "内唇 5",
+      "xy": [
+        0.022,
+        1.587
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.022,
+        1.5870000000000002,
+        0.10808072271320085
+      ]
+    },
+    {
+      "id": "lipInner5",
+      "label": "内唇 6",
+      "xy": [
+        0.01,
+        1.585
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        0.01,
+        1.585,
+        0.11384253710239466
+      ]
+    },
+    {
+      "id": "lipInner6",
+      "label": "内唇 7",
+      "xy": [
+        0,
+        1.584
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -2.168404344971009e-19,
+        1.584,
+        0.11613035638722322
+      ]
+    },
+    {
+      "id": "lipInner7",
+      "label": "内唇 8",
+      "xy": [
+        -0.01,
+        1.585
+      ],
+      "group": "口",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        -0.01,
+        1.585,
+        0.11411154751650687
+      ]
+    },
+    {
+      "id": "hairlineCentre",
+      "label": "发际线中央",
+      "xy": [
+        0,
+        1.713
+      ],
+      "group": "额",
+      "confidence": 0.4,
+      "evidence": "calibrated-hairline/verify-in-image",
+      "status": "available",
+      "point": [
+        2.710505431213761e-20,
+        1.713,
+        0.11944012171805203
+      ]
+    },
+    {
+      "id": "hairlineLeft",
+      "label": "左发际线",
+      "xy": [
+        0.05,
+        1.708
+      ],
+      "group": "额",
+      "confidence": 0.4,
+      "evidence": "calibrated-hairline/verify-in-image",
+      "status": "available",
+      "point": [
+        0.05,
+        1.7079999999999997,
+        0.09517543562744307
+      ]
+    },
+    {
+      "id": "hairlineRight",
+      "label": "右发际线",
+      "xy": [
+        -0.05,
+        1.708
+      ],
+      "group": "额",
+      "confidence": 0.4,
+      "evidence": "calibrated-hairline/verify-in-image",
+      "status": "available",
+      "point": [
+        -0.05,
+        1.708,
+        0.09978174917658389
+      ]
+    },
+    {
+      "id": "glabella",
+      "label": "眉间中心",
+      "xy": [
+        0,
+        1.674
+      ],
+      "group": "额",
+      "confidence": 0.65,
+      "evidence": "calibrated-semantic/surface-bound",
+      "status": "available",
+      "point": [
+        2.879912020664621e-20,
+        1.674,
+        0.12574060636790138
+      ]
+    }
+  ],
+  "measurements": [
+    {
+      "id": "eyeSpacing",
+      "label": "两眼中心间距",
+      "a": "pupilLeft",
+      "b": "pupilRight",
+      "group": "整体",
+      "type": "distance",
+      "actual": 68.00037921626857,
+      "unit": "mm",
+      "ratio": 1,
+      "target": null,
+      "error": null,
+      "confidence": 1,
+      "referenceConfidence": null
+    },
+    {
+      "id": "faceWidth",
+      "label": "颧部宽",
+      "a": "cheekLeft",
+      "b": "cheekRight",
+      "group": "轮廓",
+      "type": "distance",
+      "actual": 152.5215746147743,
+      "unit": "mm",
+      "ratio": 2.0682966747265477,
+      "target": null,
+      "error": null,
+      "confidence": 0.7,
+      "referenceConfidence": null
+    },
+    {
+      "id": "templeWidth",
+      "label": "太阳穴宽",
+      "a": "templeLeft",
+      "b": "templeRight",
+      "group": "轮廓",
+      "type": "distance",
+      "actual": 161.0239096579639,
+      "unit": "mm",
+      "ratio": 2.1844674065470717,
+      "target": null,
+      "error": null,
+      "confidence": 0.7,
+      "referenceConfidence": null
+    },
+    {
+      "id": "jawWidth",
+      "label": "下颌宽",
+      "a": "jawLeft",
+      "b": "jawRight",
+      "group": "轮廓",
+      "type": "distance",
+      "actual": 112.54037603531663,
+      "unit": "mm",
+      "ratio": 1.5617539602793165,
+      "target": null,
+      "error": null,
+      "confidence": 0.7,
+      "referenceConfidence": null
+    },
+    {
+      "id": "chinWidth",
+      "label": "下巴宽（轮廓 6–12）",
+      "a": "contour5",
+      "b": "contour11",
+      "group": "轮廓",
+      "type": "distance",
+      "actual": 88.51404303430121,
+      "unit": "mm",
+      "ratio": 1.235409261784547,
+      "target": null,
+      "error": null,
+      "confidence": 0.7,
+      "referenceConfidence": null
+    },
+    {
+      "id": "faceHeight",
+      "label": "发际线至下巴",
+      "a": "hairlineCentre",
+      "b": "contour8",
+      "group": "整体",
+      "type": "vertical",
+      "actual": 176.58346939086923,
+      "unit": "mm",
+      "ratio": 2.5591449301521436,
+      "target": null,
+      "error": null,
+      "confidence": 0.4,
+      "referenceConfidence": null
+    },
+    {
+      "id": "upperThird",
+      "label": "上庭（发际线–眉间）",
+      "a": "hairlineCentre",
+      "b": "glabella",
+      "group": "整体",
+      "type": "vertical",
+      "actual": 39.00000000000014,
+      "unit": "mm",
+      "ratio": 0.5817294900501291,
+      "target": null,
+      "error": null,
+      "confidence": 0.4,
+      "referenceConfidence": null
+    },
+    {
+      "id": "middleThird",
+      "label": "中庭（眉间–鼻底）",
+      "a": "glabella",
+      "b": "noseBase2",
+      "group": "整体",
+      "type": "vertical",
+      "actual": 64.00000000000006,
+      "unit": "mm",
+      "ratio": 0.9724755791731725,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "lowerThird",
+      "label": "下庭（鼻底–下巴）",
+      "a": "noseBase2",
+      "b": "contour8",
+      "group": "整体",
+      "type": "vertical",
+      "actual": 73.58346939086901,
+      "unit": "mm",
+      "ratio": 1.004939860928842,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "eyeWidthLeft",
+      "label": "左眼裂宽",
+      "a": "eyeLeft0",
+      "b": "eyeLeft3",
+      "group": "眼",
+      "type": "distance",
+      "actual": 23.599999999999994,
+      "unit": "mm",
+      "ratio": 0.343864297373721,
+      "target": null,
+      "error": null,
+      "confidence": 1,
+      "referenceConfidence": null
+    },
+    {
+      "id": "eyeHeightLeft",
+      "label": "左眼裂高（中段）",
+      "a": "eyeLeft1",
+      "b": "eyeLeft5",
+      "group": "眼",
+      "type": "vertical",
+      "actual": 4.849742261192835,
+      "unit": "mm",
+      "ratio": 0.07114373422805387,
+      "target": null,
+      "error": null,
+      "confidence": 1,
+      "referenceConfidence": null
+    },
+    {
+      "id": "browDistanceLeft",
+      "label": "左眉眼间距",
+      "a": "browLeft2",
+      "b": "pupilLeft",
+      "group": "眉",
+      "type": "vertical",
+      "actual": 18.000000000000014,
+      "unit": "mm",
+      "ratio": 0.27245705793435787,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "browLengthLeft",
+      "label": "左眉区长度",
+      "a": "browLeft0",
+      "b": "browLeft4",
+      "group": "眉",
+      "type": "distance",
+      "actual": 36.26681878395158,
+      "unit": "mm",
+      "ratio": 0.4664476317020512,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "eyeTiltLeft",
+      "label": "左眼角倾斜",
+      "a": "eyeLeft0",
+      "b": "eyeLeft3",
+      "group": "眼",
+      "type": "tilt",
+      "sign": 1,
+      "actual": 0.002330860981412796,
+      "unit": "°",
+      "ratio": 0.002330860981412796,
+      "target": null,
+      "error": null,
+      "confidence": 1,
+      "referenceConfidence": null
+    },
+    {
+      "id": "eyeWidthRight",
+      "label": "右眼裂宽",
+      "a": "eyeRight0",
+      "b": "eyeRight3",
+      "group": "眼",
+      "type": "distance",
+      "actual": 23.599999999999994,
+      "unit": "mm",
+      "ratio": 0.3439499990434032,
+      "target": null,
+      "error": null,
+      "confidence": 1,
+      "referenceConfidence": null
+    },
+    {
+      "id": "eyeHeightRight",
+      "label": "右眼裂高（中段）",
+      "a": "eyeRight1",
+      "b": "eyeRight5",
+      "group": "眼",
+      "type": "vertical",
+      "actual": 4.849742261192835,
+      "unit": "mm",
+      "ratio": 0.07116159329853096,
+      "target": null,
+      "error": null,
+      "confidence": 1,
+      "referenceConfidence": null
+    },
+    {
+      "id": "browDistanceRight",
+      "label": "右眉眼间距",
+      "a": "browRight2",
+      "b": "pupilRight",
+      "group": "眉",
+      "type": "vertical",
+      "actual": 18.000000000000014,
+      "unit": "mm",
+      "ratio": 0.2724830135512492,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "browLengthRight",
+      "label": "右眉区长度",
+      "a": "browRight0",
+      "b": "browRight4",
+      "group": "眉",
+      "type": "distance",
+      "actual": 35.81770679831382,
+      "unit": "mm",
+      "ratio": 0.46738599819512433,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "eyeTiltRight",
+      "label": "右眼角倾斜",
+      "a": "eyeRight0",
+      "b": "eyeRight3",
+      "group": "眼",
+      "type": "tilt",
+      "sign": -1,
+      "actual": 0.0023308609814127602,
+      "unit": "°",
+      "ratio": 0.0023308609814127602,
+      "target": null,
+      "error": null,
+      "confidence": 1,
+      "referenceConfidence": null
+    },
+    {
+      "id": "innerCanthusDistance",
+      "label": "内眼角间距",
+      "a": "eyeLeft0",
+      "b": "eyeRight0",
+      "group": "眼",
+      "type": "distance",
+      "actual": 44.400580779493545,
+      "unit": "mm",
+      "ratio": 0.6470117546424273,
+      "target": null,
+      "error": null,
+      "confidence": 1,
+      "referenceConfidence": null
+    },
+    {
+      "id": "noseWidth",
+      "label": "鼻翼宽",
+      "a": "noseBase0",
+      "b": "noseBase4",
+      "group": "鼻",
+      "type": "distance",
+      "actual": 38.00096054608073,
+      "unit": "mm",
+      "ratio": 0.5629283385433713,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "noseLength",
+      "label": "鼻根至鼻底",
+      "a": "bridge0",
+      "b": "noseBase2",
+      "group": "鼻",
+      "type": "vertical",
+      "actual": 51.000000000000156,
+      "unit": "mm",
+      "ratio": 0.7750162176273299,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "mouthWidth",
+      "label": "口宽",
+      "a": "lipOuter0",
+      "b": "lipOuter6",
+      "group": "口",
+      "type": "distance",
+      "actual": 52.00595782962462,
+      "unit": "mm",
+      "ratio": 0.7677238048895482,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "upperLip",
+      "label": "上唇中段厚度",
+      "a": "lipOuter3",
+      "b": "lipInner2",
+      "group": "口",
+      "type": "vertical",
+      "actual": 5.0000000000001155,
+      "unit": "mm",
+      "ratio": 0.07390528681589759,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "lowerLip",
+      "label": "下唇中段厚度",
+      "a": "lipInner6",
+      "b": "lipOuter9",
+      "group": "口",
+      "type": "vertical",
+      "actual": 6.999999999999895,
+      "unit": "mm",
+      "ratio": 0.10474683229122705,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "philtrum",
+      "label": "鼻底至上唇",
+      "a": "noseBase2",
+      "b": "lipOuter3",
+      "group": "口",
+      "type": "vertical",
+      "actual": 15.999999999999792,
+      "unit": "mm",
+      "ratio": 0.23140472942707824,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    },
+    {
+      "id": "chinLength",
+      "label": "下唇至下巴",
+      "a": "lipOuter9",
+      "b": "contour8",
+      "group": "轮廓",
+      "type": "vertical",
+      "actual": 40.58346939086932,
+      "unit": "mm",
+      "ratio": 0.5233145223243365,
+      "target": null,
+      "error": null,
+      "confidence": 0.65,
+      "referenceConfidence": null
+    }
+  ],
+  "coverage": {
+    "externalSurface": true,
+    "semanticParameters": 53,
+    "landmarks": 82,
+    "landmarksAvailable": 82,
+    "eyeAssemblyCoupled": true,
+    "eyeModel": "bounded coupled surface warp; not anatomical eyeball reconstruction",
+    "internalAnatomy": "NotObserved",
+    "photoDepth": "NotObserved",
+    "arbitraryFaceGuaranteed": false
+  },
+  "sourceHashes": {
+    "FaceIdentityModel.mjs": "1f096d8066ffab71ec47e56540c79f5f9729fa725d7377695d28cd90144be2e4",
+    "FaceIdentityBinding.mjs": "32e2fcd3522f4f91bab6c80e2d1f8d033789985132b1c3f9fa9281cbb3d23c08",
+    "FaceLandmarks.mjs": "0090b45aed8a91182415d0aed11d4446d8f05ba3db82f5a82c5b1bdcffa4dd1c",
+    "FaceMeasurements.mjs": "021fb1fffe46ef58df75caed041f74e4c23b4cf9799822703ccbf9543258a4a9",
+    "FaceReferenceFit.mjs": "a0a70151f47f224b5480235e2e9f50245b03ac4207cc6d96014741c8edc1c415",
+    "FaceIdentityWorkbench.mjs": "1ab88af69e6d5c72c5a12487540e073150a406c983d27567355d19ac80f8dd99",
+    "ProceduralEyes.mjs": "eabadb32a54c2d4f86d959c996b196265feef675808c0660810a07c19f26eacb",
+    "FacialBinding.mjs": "9dd4cd8feb096ce318b1a716d346af05a860237faebadc5f5702f4e50a5aa2eb",
+    "FacialWorkbench.mjs": "453128f98514569beb50f3a2a071b482399437a5b64ce9585286005eb07acfa2",
+    "SubjectRuntime.mjs": "100c06d825f8acd573b00b5dea4d758003c72c975137c682c52f375dbb9411f7",
+    "surface-generator.mjs": "06bbd505ad31655bfab86c253a75f995bcc8eb40c4a1be3f48f6ca82978c1430",
+    "app.mjs": "03426f86a07c854958cab9aaba40220c0128e0b1651b39039161372841884d7e",
+    "index.html": "3929a96b17c1d2a29007637b34f19f44fc069c51e3c8eae5cb145b0a0e566407",
+    "server.cjs": "4efe45d832d8c1d687c28b6b7cb60c17c8cb938752591d63918e298471055986"
+  },
+  "notes": "R28 当前来源模型的中性构造基准。53 项身份场；照片绝对尺寸和真实内部不可由此恢复。没有保存顶点数组。"
+}

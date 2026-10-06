@@ -1,0 +1,15 @@
+import {registerHooks} from 'node:module';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const base=new URL('../',import.meta.url);
+registerHooks({resolve(s,c,next){return s==='three'?{url:new URL('vendor/three.module.js',base).href,shortCircuit:true}:next(s,c);}});
+const THREE=await import('three'),{createShortsPattern}=await import('../ShortsGarmentDraft.mjs'),{createShortsExteriorPaperSeed}=await import('../ShortsExteriorPaperSeed.mjs');
+const fixture=JSON.parse(readFileSync(new URL('qa/shorts-v9-initial-1791024576835.json',base))),ref=fixture.initialSourceReference,pattern=createShortsPattern(fixture.draft.measurements,fixture.draft.design),draft={pieces:pattern.pieces,sourceUV:Float64Array.from(ref.sourceUV),positions:new Float64Array(ref.sourceUV.length/2*3),ranges:ref.ranges,seams:ref.seams,triangles:Uint32Array.from(ref.triangles),masses:Float64Array.from(ref.mass),mass:Float64Array.from(ref.mass),receipt:fixture.draft};
+const frame=new THREE.Matrix4().compose(new THREE.Vector3(2,4,-3),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),.7),new THREE.Vector3(1,1,1)),inverseFrame=frame.clone().invert(),world=p=>new THREE.Vector3(...p).applyMatrix4(frame).toArray(),token=fixture.draft.measurementsAuthority.bodyToken;
+const body={positions:Float64Array.from([[-.2,.2,-.16],[.21,1.3,.18],[.03,2.4,.27]].flatMap(world)),activeVertexIds:[0,1,2]},bare={queryAPI:{positions:Float64Array.from([[.01,.8,-.24],[.09,1.1,.22]].flatMap(world))}},tapes={bodyToken:token,inverseFrame,waist:{lower:{centerX:fixture.draft.measurements.waistCenter[0]}}},before=JSON.stringify({draft,body,bare,tapes});
+const seed=createShortsExteriorPaperSeed(draft,tapes,body,bare);
+assert.ok(Math.abs(seed.receipt.frontPlaneZ-.29)<1e-12);assert.ok(Math.abs(seed.receipt.backPlaneZ+.26)<1e-12);assert.equal(seed.receipt.currentActorLocalBounds.examined,5);assert.ok(seed.receipt.currentActorLocalBounds.max[1]>2.3);
+assert.ok(seed.receipt.sourcePrincipalStrain<1e-9);assert.equal(seed.activeSeamIDs,undefined);assert.deepEqual(seed.draft.activeSeamIDs,[]);assert.equal(seed.sourceToDof.length,553);assert.ok(seed.sourceToDof.every((id,i)=>id===i));assert.equal(seed.draft.sourceUV,draft.sourceUV);assert.equal(seed.draft.masses,draft.masses);assert.equal(seed.draft.seams,draft.seams);assert.equal(seed.draft.triangles,draft.triangles);assert.equal(JSON.stringify({draft,body,bare,tapes}),before);
+assert.throws(()=>createShortsExteriorPaperSeed(draft,{...tapes,bodyToken:'wrong'},body,bare),/authority mismatch/);
+assert.throws(()=>createShortsExteriorPaperSeed(draft,tapes,{positions:[],activeVertexIds:[]},{queryAPI:{positions:[]}}),/bounds missing/);
+console.log(JSON.stringify({passed:true,sourceVertices:553,principalStrain:seed.receipt.sourcePrincipalStrain,currentSkinExtentsInRotatedActorFrame:true,excludesFixedAdultHeightAssumption:true,independentSourceDofs:true,wearingAccepted:false}));

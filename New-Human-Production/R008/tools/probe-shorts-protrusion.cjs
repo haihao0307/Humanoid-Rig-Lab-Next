@@ -1,0 +1,11 @@
+const fs=require('fs'),path=require('path'),{chromium}=require('C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const out=path.resolve(__dirname,'../qa/shorts-native-developed-20261004');
+(async()=>{const b=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'}),p=await b.newPage({viewport:{width:1440,height:1000}});try{
+ await p.goto('http://127.0.0.1:8883/qa/shorts-native-developed-20261004/index.html');await p.waitForFunction(()=>window.HumanShorts?.nativeDevelopedReport,null,{timeout:240000});
+ const info=await p.evaluate(()=>({h:Object.keys(HumanShorts),g:Object.keys(HumanR008),game:Object.keys(HumanShorts.game),bareName:HumanShorts.barePelvis.mesh.name,clothNames:HumanShorts.nativeDevelopedCloths.map(c=>c.mesh.name)}));
+ await p.evaluate(()=>HumanShorts.setView('front'));await p.waitForTimeout(150);await p.screenshot({path:path.join(out,'protrusion-all.png')});
+ const rays=await p.evaluate(async()=>{const THREE=await import(moduleURL('vendor/three.module.js')),ray=new THREE.Raycaster(),g=HumanR008;g.scene.updateMatrixWorld(true);return [[463,475],[961,475],[710,519],[550,221]].map(([x,y])=>{ray.setFromCamera(new THREE.Vector2(x/1440*2-1,1-y/1000*2),g.camera);return{x,y,hits:ray.intersectObjects(g.scene.children,true).slice(0,6).map(h=>({name:h.object.name,material:h.object.material?.name,distance:h.distance,visible:h.object.visible,point:h.point.toArray()}))};});});info.rays=rays;
+ await p.evaluate(()=>{HumanShorts.barePelvis.mesh.visible=false;HumanR008.renderer.render(HumanR008.scene,HumanR008.camera);});await p.waitForTimeout(150);await p.screenshot({path:path.join(out,'protrusion-proxy-hidden.png')});
+ await p.evaluate(()=>{HumanShorts.barePelvis.mesh.visible=true;for(const c of HumanShorts.nativeDevelopedCloths)c.mesh.visible=false;HumanR008.renderer.render(HumanR008.scene,HumanR008.camera);});await p.waitForTimeout(150);await p.screenshot({path:path.join(out,'protrusion-cloth-hidden.png')});
+ fs.writeFileSync(path.join(out,'protrusion-probe.json'),JSON.stringify(info,null,2));console.log(JSON.stringify(info));
+}finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

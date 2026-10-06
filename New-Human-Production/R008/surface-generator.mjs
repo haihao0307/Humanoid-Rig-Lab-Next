@@ -67,7 +67,7 @@ function closeGeneratedGaps(arrays,funcs){
  }
  return {seamGroups:rows.filter(row=>row.length>1),report:{patches,addedTriangles,reorientedTriangles,maxPatchSpanMetres:maxSpan,maxPatchAreaSquareMetres:maxArea,unresolvedBoundaryEdges:unresolved}};
 }
-export function generateSurface(data,{edgeMetres=.012,muscle=0,surfaceErrorMetres=.0005,anatomicalDetail=false}={}){
+export function generateSurface(data,{edgeMetres=.012,muscle=0,surfaceErrorMetres=.0005,anatomicalDetail=false,onProgress}={}){
  if(!Number.isFinite(edgeMetres)||edgeMetres<.003||edgeMetres>.04||!Number.isFinite(surfaceErrorMetres)||surfaceErrorMetres<.00005||surfaceErrorMetres>.001||typeof anatomicalDetail!=='boolean')throw Error('Invalid surface generation precision');
  const localEdge=p=>localSurfaceEdge(p,edgeMetres,anatomicalDetail);
  const funcs=data.charts.map(chartFunctions),owners=new Map(),seamEdges=new Map(),originalOwners=new Map(),originalEdges=new Map();
@@ -94,7 +94,7 @@ export function generateSurface(data,{edgeMetres=.012,muscle=0,surfaceErrorMetre
   const color=f.appearance(...uv);if(muscle){const boost=1+muscle*.03;const group=f.c.anatomy;if(group==='torso'||group.startsWith('upperarm')||group.startsWith('thigh')){p[0]*=boost;p[2]*=boost;}}
   return {p,ids,ws,color,normal:f.normals?.(...uv)};
  }
- const pos=[],parameters=[],colors=[],normalValues=[],materialValues=[],indices=[],groups=[],boneIds=[],boneWeights=[],chartIds=[],emptyDomainIds=[];let triangles=0,trimLoops=0,unclosed=0,refinementBudgetHits=0;
+ const pos=[],parameters=[],colors=[],normalValues=[],materialValues=[],indices=[],groups=[],boneIds=[],boneWeights=[],chartIds=[],emptyDomainIds=[];let triangles=0,trimLoops=0,unclosed=0,refinementBudgetHits=0,completedCharts=0;
  for(const f of funcs){
   const groupStart=indices.length;
   const loops=f.c.trim.map(loop=>({uv:loop.seams.map((_,i)=>[loop.uv[i*2]/1e6,loop.uv[i*2+1]/1e6]),seams:loop.seams.map(canonical)})).filter(l=>l.uv.length>=3);trimLoops+=loops.length;
@@ -133,8 +133,9 @@ export function generateSurface(data,{edgeMetres=.012,muscle=0,surfaceErrorMetre
    const base=pos.length/3;for(const vertex of vertices){const v=evaluate(f,vertex.uv,vertex.seam);pos.push(...v.p);parameters.push(f.c.textureLinear[0]+f.c.textureLinear[2]*vertex.uv[0]+f.c.textureLinear[4]*vertex.uv[1],f.c.textureLinear[1]+f.c.textureLinear[3]*vertex.uv[0]+f.c.textureLinear[5]*vertex.uv[1]);boneIds.push(...v.ids);boneWeights.push(...v.ws);if(v.normal){const len=Math.hypot(...v.normal)||1;normalValues.push(...v.normal.map(x=>x/len));}materialValues.push(Math.max(.05,Math.min(1,v.color[3])),Math.max(0,Math.min(1,v.color[4])));colors.push(...v.color.slice(0,3).map(x=>{x=Math.max(0,Math.min(1,x));return x<=.04045?x/12.92:Math.pow((x+.055)/1.055,2.4)}));chartIds.push(f.c.id);}
    for(let i=0;i<faces.length;i+=3){const a=faces[i],b=faces[i+1],c=faces[i+2],qa=vertices[a].uv,qb=vertices[b].uv,qc=vertices[c].uv,orientation=(qb[0]-qa[0])*(qc[1]-qa[1])-(qb[1]-qa[1])*(qc[0]-qa[0]);const correct=orientation*f.c.uvSign>0;indices.push(base+a,base+(correct?b:c),base+(correct?c:b));triangles++;}
   }
-  groups.push({start:groupStart,count:indices.length-groupStart,materialIndex:f.c.part});
+  groups.push({start:groupStart,count:indices.length-groupStart,materialIndex:f.c.part});onProgress?.({completed:++completedCharts,total:funcs.length});
  }
+ onProgress?.({completed:funcs.length,total:funcs.length,stage:"校验与连接曲面边界"});
  const repair=closeGeneratedGaps({pos,parameters,colors,normalValues,materialValues,indices,groups,boneIds,boneWeights,chartIds},funcs);triangles+=repair.report.addedTriangles;
  return {groups,seamGroups:repair.seamGroups,positions:new Float32Array(pos),parameters:new Float32Array(parameters),colors:new Float32Array(colors),normals:new Float32Array(normalValues),material:new Float32Array(materialValues),indices:new Uint32Array(indices),skinIndex:new Uint16Array(boneIds),skinWeight:new Float32Array(boneWeights),influences:8,chartIds,functions:funcs,report:{vertices:pos.length/3,triangles,charts:funcs.length,trimLoops,emptyDomains:unclosed,emptyDomainIds,precision:{edgeMetres,surfaceErrorMetres,anatomicalDetail,headEdgeMetres:localEdge([0,1.65,.1]),refinementBudgetHits},seams:{matchedBorderSamples:matched,maxCorrectionMetres:maxCorrection,unmatchedBorderSamples:[...border].filter(id=>parts.get(canonical(id)).size===1).length,...repair.report}}};
 }

@@ -1,0 +1,14 @@
+import {registerHooks} from 'node:module';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {gunzipSync} from 'node:zlib';
+import {createHash} from 'node:crypto';
+const base=new URL('../',import.meta.url),manufacture=JSON.parse(readFileSync(new URL('qa/shorts-v2-style-manufacturing-20261002.json',base)));
+if(!manufacture.manufacturingMaterialPassed||manufacture.manufacturedPositions?.length!==1659)throw Error('Complete independently reviewable source sewing required');
+for(const[name,expected]of Object.entries(manufacture.sourceHashes))if(createHash('sha256').update(readFileSync(new URL(name,base))).digest('hex')!==expected)throw Error('Manufacturing source changed: '+name);
+registerHooks({resolve(s,c,next){return s==='three'?{url:new URL('vendor/three.module.js',base).href,shortCircuit:true}:next(s,c);}});
+const [THREE,{decodeParameters},{createSubject},{createShortsBodyAdapter},{createShortsGarmentDraft},{ShortsClothRuntime},{arrangeShortsForWear}]=await Promise.all([import('three'),import('../parameter-codec.mjs'),import('../SubjectRuntime.mjs'),import('../ShortsBodyAdapter.mjs'),import('../ShortsGarmentDraft.mjs'),import('../ShortsClothRuntime.mjs'),import('../ShortsWearingAssembly.mjs')]);
+const bytes=gunzipSync(readFileSync(new URL('parameters.phf.gz',base))),data=decodeParameters(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)),actor=new THREE.Group(),scene=new THREE.Scene(),subject=createSubject(data,{edgeMetres:.012});scene.add(actor);actor.add(subject.root);actor.updateMatrixWorld(true);subject.finishPose();
+const body=createShortsBodyAdapter(subject,actor),draft=createShortsGarmentDraft(body.measurements,{sectionAt:body.sectionAt,sagittalAtY:body.sagittalAtY});body.update({time:0,exactRefit:true});
+const cloth=new ShortsClothRuntime({...draft,positions:Float64Array.from(manufacture.manufacturedPositions)},body,actor,scene,{elasticEnabled:false}),assembly=arrangeShortsForWear(cloth,draft);
+const report={createdAt:new Date().toISOString(),scope:'fresh real R008 static three-loop wearing authoring; source-sewn input, no native motion',sourceHashes:{...manufacture.sourceHashes,ShortsWearingAssembly:createHash('sha256').update(readFileSync(new URL('ShortsWearingAssembly.mjs',base))).digest('hex')},assembly,positions:cloth.positions.map(p=>[...p]),productionReady:false};
+writeFileSync(new URL('qa/shorts-v2-style-wearing-20261002.json',base),JSON.stringify(report,null,2));console.log(JSON.stringify({before:{mainStrain:assembly.before.mainStrain,bodyPenetrationM:assembly.before.bodyPenetrationM},trace:assembly.trace,after:{mainStrain:assembly.after.mainStrain,bodyPenetrationM:assembly.after.bodyPenetrationM},waistAndHemTargetGapM:assembly.waistAndHemTargetGapM,numericPassed:assembly.pointCentroidNumericPassed,strictContactValidated:false,motionValidated:false}));cloth.dispose();

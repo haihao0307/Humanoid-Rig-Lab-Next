@@ -1,3 +1,4 @@
+import {createFacePartition} from './FacePartition.mjs';
 // Project-authored compact surface fields, metres in the neutral canonical frame.
 // Landmarks calibrated on this character's regenerated surface, not clinical
 // muscle measurements. FACS labels describe actions, not one-to-one muscles.
@@ -62,7 +63,8 @@ export function createFacialBinding(surface,data){
  }
  const rows={vertices:new Uint32Array(vertices),offsets:new Uint32Array(offsets),ids:new Uint8Array(ids),weights:new Float32Array(weights)};
  const basePositions=new Float32Array(base),baseNormals=new Float32Array(normals),report={regions:FACE_REGIONS.length,sampledVertices:vertices.length,nonzeroWeights:weights.length,maxOverlap,channels:totals,generatedCacheBytes:Object.values(rows).reduce((s,a)=>s+a.byteLength,0)+basePositions.byteLength+baseNormals.byteLength,persistedVertexWeights:0};
- let attached=null,currentRegion=null,currentAmount=0;const pullLimits=new Map();
+ const partition=createFacePartition({basePositions,baseNormals,mask:faceMask});
+ let attached=null,currentRegion=null,currentAmount=0,afterDeform=null;const pullLimits=new Map();
  function gradientAt(p,region){const eps=.00002;return [0,1,2].map(j=>{const a=[...p],b=[...p];a[j]+=eps;b[j]-=eps;return (faceWeight(a,region)-faceWeight(b,region))/(2*eps);});}
  function pullLimit(region,unit){if(pullLimits.has(region.id))return pullLimits.get(region.id);let slope=0;for(let k=0;k<vertices.length;k++){const p=Array.from(basePositions.subarray(k*3,k*3+3));if(faceWeight(p,region)>0)slope=Math.min(slope,gradientAt(p,region).reduce((s,v,j)=>s+v*unit[j],0));}const limit=Math.min(.0015,slope<0?.18/-slope:.0015);pullLimits.set(region.id,limit);return limit;}
  function deform(regionId,amount=0){
@@ -71,12 +73,12 @@ export function createFacialBinding(surface,data){
   currentRegion=region||null;currentAmount=amount;const unit=(region?.pull||[0,0,0]).map(v=>v/Math.max(1,Math.hypot(...(region?.pull||[0,0,0])))),limit=amount?pullLimit(region,unit):.0015,direction=unit.map(v=>v*amount*limit);
   const positions=attached.geometry.attributes.position,n=attached.geometry.attributes.normal;let maxDisplacement=0,minJacobian=1;
   for(let k=0;k<vertices.length;k++){
-   const i=vertices[k],p=Array.from(basePositions.subarray(k*3,k*3+3)),normal=Array.from(baseNormals.subarray(k*3,k*3+3)),w=amount?faceWeight(p,region):0;
-   const displacement=direction.map(v=>v*w);positions.setXYZ(i,...p.map((v,j)=>v+displacement[j]));maxDisplacement=Math.max(maxDisplacement,Math.hypot(...displacement));
+   const i=vertices[k],p=Array.from(basePositions.subarray(k*3,k*3+3)),normal=Array.from(partition.normals.subarray(k*3,k*3+3)),w=amount?faceWeight(p,region):0;
+   const displacement=direction.map(v=>v*w);positions.setXYZ(i,...[0,1,2].map(j=>partition.positions[k*3+j]+displacement[j]));maxDisplacement=Math.max(maxDisplacement,Math.hypot(...displacement));
    if(amount&&w){const gradient=gradientAt(p,region),det=1+gradient.reduce((s,v,j)=>s+v*direction[j],0),dot=normal.reduce((s,v,j)=>s+v*direction[j],0);minJacobian=Math.min(minJacobian,det);const out=normal.map((v,j)=>v-gradient[j]*dot/det),length=Math.hypot(...out);n.setXYZ(i,...out.map(v=>v/length));}else n.setXYZ(i,...normal);
   }
   if(vertices.length){const first=vertices[0]*3,last=vertices.at(-1)*3+3;for(const attribute of [positions,n]){attribute.addUpdateRange(first,last-first);attribute.needsUpdate=true;}}
-  return {maxDisplacement,minJacobian,amount,region:regionId,pullLimitMetres:limit};
+  afterDeform?.();return {maxDisplacement,minJacobian,amount,region:regionId,pullLimitMetres:limit};
  }
  const gradients=new Float32Array(weights.length*3);
  report.gradientCacheBytes=gradients.byteLength;report.generatedCacheBytes+=gradients.byteLength;
@@ -108,13 +110,14 @@ export function createFacialBinding(surface,data){
   const valid=scale=>jacobians.every(J=>{const a=1+J[0]*scale,b=J[1]*scale,c=J[2]*scale,e=J[3]*scale,f=1+J[4]*scale,g=J[5]*scale,h=J[6]*scale,i=J[7]*scale,j=1+J[8]*scale;return a*(f*j-g*i)-b*(e*j-g*h)+c*(e*i-f*h)>.425&&Math.max(Math.hypot(a,e,h),Math.hypot(b,f,i),Math.hypot(c,g,j))<1.75;});
   let safeScale=1;if(!valid(1)){let high=1,low=.92;while(!valid(low)&&low>.05){high=low;low*=.92;}for(let i=0;i<12;i++){const mid=(low+high)/2;if(valid(mid))low=mid;else high=mid;}safeScale=low;}vectors.forEach(v=>v.forEach((x,i)=>v[i]=x*safeScale));
   const positions=attached.geometry.attributes.position,n=attached.geometry.attributes.normal;let maxDisplacement=0,minJacobian=1,maxCoordinateStretch=1;
-  for(let k=0;k<vertices.length;k++){const p=Array.from(basePositions.subarray(k*3,k*3+3)),normal=Array.from(baseNormals.subarray(k*3,k*3+3)),d=[0,0,0],J=[1,0,0,0,1,0,0,0,1];
+  for(let k=0;k<vertices.length;k++){const p=Array.from(basePositions.subarray(k*3,k*3+3)),normal=Array.from(partition.normals.subarray(k*3,k*3+3)),d=[0,0,0],J=[1,0,0,0,1,0,0,0,1];
    for(let q=rows.offsets[k];q<rows.offsets[k+1];q++){const v=vectors[rows.ids[q]];for(let a=0;a<3;a++){d[a]+=v[a]*rows.weights[q];for(let b=0;b<3;b++)J[a*3+b]+=v[a]*gradients[q*3+b];}}
    const [a,b,c,e,f,g,h,i,j]=J,C=[f*j-g*i,g*h-e*j,e*i-f*h,c*i-b*j,a*j-c*h,b*h-a*i,b*g-c*f,c*e-a*g,a*f-b*e],det=a*C[0]+b*C[1]+c*C[2],out=[0,1,2].map(k=>C[k*3]*normal[0]+C[k*3+1]*normal[1]+C[k*3+2]*normal[2]),length=Math.hypot(...out);
-   positions.setXYZ(vertices[k],...p.map((x,a)=>x+d[a]));n.setXYZ(vertices[k],...out.map(x=>x/Math.max(length,1e-9)));maxDisplacement=Math.max(maxDisplacement,Math.hypot(...d));minJacobian=Math.min(minJacobian,det);maxCoordinateStretch=Math.max(maxCoordinateStretch,Math.hypot(a,e,h),Math.hypot(b,f,i),Math.hypot(c,g,j));
+   positions.setXYZ(vertices[k],...[0,1,2].map(a=>partition.positions[k*3+a]+d[a]));n.setXYZ(vertices[k],...out.map(x=>x/Math.max(length,1e-9)));maxDisplacement=Math.max(maxDisplacement,Math.hypot(...d));minJacobian=Math.min(minJacobian,det);maxCoordinateStretch=Math.max(maxCoordinateStretch,Math.hypot(a,e,h),Math.hypot(b,f,i),Math.hypot(c,g,j));
   }
   if(vertices.length)for(const attribute of [positions,n]){attribute.addUpdateRange(vertices[0]*3,vertices.at(-1)*3+3-vertices[0]*3);attribute.needsUpdate=true;}
-  return {maxDisplacement,minJacobian,maxCoordinateStretch,safeScale,actions:{...actions}};
+  afterDeform?.();return {maxDisplacement,minJacobian,maxCoordinateStretch,safeScale,actions:{...actions}};
  }
- return {regions:FACE_REGIONS,actions:FACE_ACTIONS,rows,report,sample:sampleFaceWeights,resolveAction:resolveFaceAction,attach(mesh){attached=mesh;return this},deform,deformActions,reset(){return deform(null,0)},get selectedRegion(){return currentRegion?.id},get amount(){return currentAmount}};
+ return {partition,set afterDeform(fn){afterDeform=fn;},setShape(input){const result=partition.apply(input);deform(null,0);return result;},regions:FACE_REGIONS,actions:FACE_ACTIONS,rows,report,sample:sampleFaceWeights,resolveAction:resolveFaceAction,attach(mesh){attached=mesh;return this},deform,deformActions,reset(){return deform(null,0)},get selectedRegion(){return currentRegion?.id},get amount(){return currentAmount}};
 }
+

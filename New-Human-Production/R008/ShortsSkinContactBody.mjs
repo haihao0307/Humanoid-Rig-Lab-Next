@@ -51,8 +51,25 @@ export function createShortsSkinContactBody(nativeBody, barePelvis) {
   if(bareInsidePriority)bareInsideSelections++;
   return {...hit,signedDistanceAuthority,guard:{schema:'visible-skin-contact-sign-selection@1',nativeOutsideActualPartAABBProof:outsideProof,nativeOriginalSignedDistanceM:originalSigned,nativePartWorldBounds:nativeBounds,nativePartWorldBoundsRevision:nativeBounds?.revision??null,bareInsidePriority,bareClosedInsideObserved:bareInside,nearestPositiveCandidatePreserved:!bareInsidePriority,fullSolidUnionCertified:false}};
  }
+ function closestSurfacePoint(p){
+  if(nativeBody.triangles!==sourceTriangles)throw Error('Actual surface geometry rebuilt');
+  const nativeRevision=nativeBody.snapshot().revision,bareRevision=barePelvis.queryAPI.revision,query=inputPoint(p),added=barePelvis.queryAPI.closestPoint(query);
+  if(!Number.isInteger(nativeRevision)||!Number.isInteger(bareRevision)||!added||!Number.isFinite(added.distance)||added.distance<0||!Number.isFinite(added.signedDistance)||added.revision!==bareRevision)throw Error('Actual bare surface distance or revision missing');
+  const bareInside=added.signedDistance<0&&!added.signAmbiguous&&added.closedSolidTopologyCertified===true;
+  const native=nativeBody.closestPoint(query,added.distance);
+  if(native&&(native.revision!==nativeRevision||!Number.isFinite(native.distance)||native.distance<0||!native.point||!native.normal))throw Error('Actual native distance or hit revision invalid');
+  if(nativeBody.snapshot().revision!==nativeRevision||barePelvis.queryAPI.revision!==bareRevision)throw Error('Actual surface revision changed during query');
+  const nearest=native&&native.distance<added.distance?native:added;
+  const hit=bareInside?added:nearest,sign=bareInside?-1:1;
+  const normal=hit.distance>1e-12?query.clone().sub(hit.point).multiplyScalar(sign/hit.distance):hit.normal.clone();
+  return {...hit,normal,signedDistance:sign*hit.distance,signAmbiguous:!!added.signAmbiguous||hit.distance<=1e-12,
+   geometryRevision:nativeRevision,bareGeometryRevision:bareRevision,contactMode:'fixed-unsigned-surface-obstacle-with-independent-closed-bare-membership',
+   unsignedSurfaceDistanceM:nearest.distance,bareClosedInsideObserved:bareInside,
+   scope:'exact nearest actual triangle surface distance; open native part is not an inside certificate; supplied sample path bound required',
+   fullSolidUnionCertified:false,fullTriangleCCD:false,motionValidated:false};
+ }
  function collide(p,margin=.004){if(!Number.isFinite(margin)||margin<0)throw Error('Finite skin contact clearance required');const h=closestPoint(p);if(h.signAmbiguous)throw Error('HOLD: ambiguous actual skin feature');if(h.signedDistance>=margin)return null;return{...h,surfacePoint:h.point.clone(),point:h.point.clone().addScaledVector(h.normal,margin),penetration:margin-h.signedDistance,marginM:margin};}
- return {subject:nativeBody.subject,actor:nativeBody.actor,get measurements(){return nativeBody.measurements;},get positions(){return nativeBody.positions;},triangles:nativeBody.triangles,closestPoint,collide,sectionAt:nativeBody.sectionAt,sagittalAtY:nativeBody.sagittalAtY,
+ return {subject:nativeBody.subject,actor:nativeBody.actor,get measurements(){return nativeBody.measurements;},get positions(){return nativeBody.positions;},triangles:nativeBody.triangles,closestPoint,closestSurfacePoint,collide,sectionAt:nativeBody.sectionAt,sagittalAtY:nativeBody.sagittalAtY,
   update(options={}){const state=nativeBody.update(options);barePelvis.queryAPI.update?.();return state;},
   refitExact(){nativeBody.refitExact();barePelvis.queryAPI.update?.();return{scope:'actual native skin plus authored missing pelvis; original clothed-envelope retained only for measurement'};},
   snapshot(){return{...nativeBody.snapshot(),schema:'r008-shorts-visible-skin-contact/v2',signedDistanceAuthority,sourceSurfaceScope:'native skin plus authored missing bare pelvis; replaced source shorts excluded',authoredBareSkin:barePelvis.report,nativePartWorldBounds:{cachedRevision:boundsRevision,partIds:[...partVertexIds.keys()],builds:boundsBuilds,authority:'exact current WORLD vertices of remaining original native contact triangles; eight influences, no decimation'},nativeOutsideCorrections:outsideCorrections,bareInsidePrioritySelections:bareInsideSelections,fullSolidUnionCertified:false,motionValidated:false};}

@@ -1,0 +1,12 @@
+// To a fixed actual triangle set, unsigned surface distance is 1-Lipschitz.
+// This bounds the entire linear path of the PROVIDED samples, not triangles.
+export function paperFormingContactStepDomain(delta,samples,{minimumDistanceM,sampleDistancesM=null,clearanceM,interiorFraction=.99}={}){
+ if(!Array.isArray(samples)||!delta||delta.length%3||!Array.from(delta).every(Number.isFinite)||!(Number.isFinite(minimumDistanceM)&&Number.isFinite(clearanceM)&&clearanceM>0&&interiorFraction>0&&interiorFraction<1))throw Error('Explicit finite fixed-surface sample clearance required');
+ const margin=minimumDistanceM-clearanceM;if(!(margin>0))return{status:'HOLD',reason:'current fixed-surface sample margin is not strict',minimumDistanceM,clearanceM};
+ if(sampleDistancesM!==null&&((!Array.isArray(sampleDistancesM)&&!ArrayBuffer.isView(sampleDistancesM))||sampleDistancesM.length!==samples.length||Array.from(sampleDistancesM).some(d=>!Number.isFinite(d)||d<=clearanceM)))throw Error('Every fixed-surface sample margin must be strict');
+ let maximumSampleDisplacementM=0,worstSample=null,localBound=Infinity,limitingSample=null;
+ samples.forEach((s,index)=>{if(!s.indices?.length||s.indices.length!==s.weights?.length||s.indices.some(i=>!Number.isInteger(i)||i<0||3*i+2>=delta.length)||s.weights.some(w=>!Number.isFinite(w)||w<=0)||Math.abs(s.weights.reduce((a,b)=>a+b,0)-1)>1e-10)throw Error('Invalid linear source sample');const d=[0,1,2].map(k=>s.indices.reduce((sum,id,j)=>sum+s.weights[j]*delta[3*id+k],0)),n=Math.hypot(...d);const bound=n===0?Infinity:((sampleDistancesM?.[index]??minimumDistanceM)-clearanceM)/n;if(bound<localBound){localBound=bound;limitingSample=index;}if(n>maximumSampleDisplacementM){maximumSampleDisplacementM=n;worstSample=index;}});
+ const maximumFraction=maximumSampleDisplacementM===0?1:Math.min(1,interiorFraction*localBound);
+ if(!(maximumFraction>0&&Number.isFinite(maximumFraction)))return{status:'HOLD',reason:'unrepresentable strict sampled point path'};
+ return{status:'SAMPLED_SURFACE_STEP_BOUND',maximumFraction,minimumDistanceM,clearanceM,marginM:margin,maximumSampleDisplacementM,worstSample,limitingSample,perSampleBounds:sampleDistancesM!==null,interiorFraction,authority:'1-Lipschitz unsigned distance to one fixed actual surface set',sampledPointPathClearanceOnly:true,fullTriangleCCD:false,solidUnionCertified:false,motionValidated:false,wearingAccepted:false};
+}

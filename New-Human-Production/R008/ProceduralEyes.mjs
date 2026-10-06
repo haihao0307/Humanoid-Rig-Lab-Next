@@ -30,24 +30,24 @@ export function createProceduralEyes({surface,mesh,byName,bindWorld,data}) {
  const rotation=new THREE.Matrix4(),normal=new THREE.Vector3(),euler=new THREE.Euler(0,0,0,'YXZ');
  for(const sign of [1,-1]) {
   const cx=sign*.034,cz=rim(cx,cy).z-radius-.0006,group=new THREE.Group();group.position.set(cx,cy,cz);root.add(group);
-  const uniform={gazeMatrix:{value:new THREE.Matrix3()},aperture:{value:new THREE.Vector3(upper,-lower,0)}};
+  const uniform={gazeMatrix:{value:new THREE.Matrix3()},aperture:{value:new THREE.Vector3(upper,-lower,0)},irisMetric:{value:new THREE.Vector3(1,0,1)},irisRadius:{value:.0056},pupilRadius:{value:.00225}};
   // Warm off-white diffuse layer under a restrained wet surface highlight.
   const material=new THREE.MeshPhysicalMaterial({color:0xaaa59b,roughness:.38,clearcoat:.30,clearcoatRoughness:.20,specularIntensity:.55,ior:1.36});
   material.onBeforeCompile=shader=>{
    Object.assign(shader.uniforms,uniform);
    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 eyeP; varying vec3 eyeSocketP; uniform mat3 gazeMatrix;').replace('#include <begin_vertex>','#include <begin_vertex>\neyeP=position;eyeSocketP=gazeMatrix*position;');
-   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 eyeP; varying vec3 eyeSocketP; uniform vec3 aperture;').replace('#include <color_fragment>',`#include <color_fragment>
+   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 eyeP; varying vec3 eyeSocketP; uniform vec3 aperture;uniform vec3 irisMetric;uniform float irisRadius;uniform float pupilRadius;').replace('#include <color_fragment>',`#include <color_fragment>
     float shape=sqrt(max(0.,1.-pow(eyeSocketP.x/${halfWidth},2.)));
     float seam=aperture.z*shape;
     // Keep a solid globe behind the lids; the physical skin cover occludes it.
     // Clipping the globe to a flat aperture leaves a hole from oblique views.
-    vec3 en=normalize(eyeP);float ir=length(en-vec3(0.,0.,1.))*${radius};
+    vec3 en=normalize(eyeP);float ir=sqrt(max(0.,irisMetric.x*eyeP.x*eyeP.x+2.*irisMetric.y*eyeP.x*eyeP.y+irisMetric.z*eyeP.y*eyeP.y));
     float angle=atan(en.y,en.x),phase=angle*59.+ir*4200.;
     // Pixel-footprint filtering prevents radial fibres sparkling in motion.
     float fibreVisibility=1.-smoothstep(.6,2.5,fwidth(phase));
     float fibres=.5+.20*sin(phase)*fibreVisibility+.12*sin(angle*19.-ir*1800.);
     vec3 iris=mix(vec3(.040,.057,.050),vec3(.13,.18,.145),fibres);
-    iris*=mix(.35,1.,1.-smoothstep(.0047,.0058,ir));
+    iris*=mix(.35,1.,1.-smoothstep(irisRadius*.84,irisRadius*1.04,ir));
     float aa=max(fwidth(ir),.00005);
     // Socket-space lid shading stays attached while the globe rotates.
     float lidDistance=min(seam+aperture.x*shape-eyeSocketP.y,eyeSocketP.y-seam-aperture.y*shape);
@@ -59,8 +59,8 @@ export function createProceduralEyes({surface,mesh,byName,bindWorld,data}) {
     vec3 sclera=diffuseColor.rgb*lidShade*cornerShade*(1.+warmVariation);
     sclera=mix(sclera,sclera*vec3(1.09,.93,.91),innerCorner*.45);
     diffuseColor.rgb=sclera;
-    diffuseColor.rgb=mix(diffuseColor.rgb,iris,1.-smoothstep(.0056-aa,.0056+aa,ir));
-    diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.004),1.-smoothstep(.00225-aa,.00225+aa,ir));`);
+    diffuseColor.rgb=mix(diffuseColor.rgb,iris,1.-smoothstep(irisRadius-aa,irisRadius+aa,ir));
+    diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.004),1.-smoothstep(pupilRadius-aa,pupilRadius+aa,ir));`);
   };
   material.customProgramCacheKey=()=>`r008-eyes-socket-v3-${sign}`;
   const globe=new THREE.Mesh(new THREE.SphereGeometry(radius,48,32),material);group.add(globe);
@@ -103,8 +103,13 @@ export function createProceduralEyes({surface,mesh,byName,bindWorld,data}) {
    e.follow+=(gaze.y*.010-e.follow)*(1-Math.exp(-dt*24));
    const topHeight=(upper+wide*.0012)*(1-closure),bottomHeight=-lower*(1-closure),seam=e.follow*(1-closure)-.001*closure;
    e.uniform.aperture.value.set(topHeight,bottomHeight,seam);
-   e.globe.quaternion.setFromEuler(euler.set(-Math.atan(gaze.y),Math.atan(gaze.x-e.sign*.028),0,'YXZ'));
+   e.globe.quaternion.setFromEuler(euler.set(-Math.atan(gaze.y),Math.atan(gaze.x-(mode==='centre'?0:e.sign*.028)),0,'YXZ'));
    e.uniform.gazeMatrix.value.setFromMatrix4(rotation.makeRotationFromQuaternion(e.globe.quaternion));
+   // Keep the procedural iris circular in the mapped tangent plane rather
+   // than stretching its pigment with an affine widening of the eye socket.
+   const J=api.identityMapping?.jacobian([e.cx,cy,e.cz+radius])||[1,0,0,0,1,0,0,0,1],R=e.uniform.gazeMatrix.value.elements;
+   const tangent=column=>[0,1,2].map(k=>J[k*3]*R[column*3]+J[k*3+1]*R[column*3+1]+J[k*3+2]*R[column*3+2]),tx=tangent(0),ty=tangent(1);
+   e.uniform.irisMetric.value.set(tx.reduce((s,v)=>s+v*v,0),tx.reduce((s,v,k)=>s+v*ty[k],0),ty.reduce((s,v)=>s+v*v,0));
    for(const {lid,rimRows,top,surfaceNormals,coverWeights} of e.lids) {
     const p=lid.geometry.attributes.position,n=lid.geometry.attributes.normal,uv=lid.geometry.attributes.uv,blend=lid.geometry.attributes.lidBlend;
     for(let i=0;i<rimRows.length;i++) {
@@ -112,7 +117,7 @@ export function createProceduralEyes({surface,mesh,byName,bindWorld,data}) {
      // Outer attachment follows the same expression deformation as the head.
      for(let j=0;j<=rows;j++) {
       const t=j/rows,s=t*t*(3-2*t),x=THREE.MathUtils.lerp(r.outerX,r.x,s),y=THREE.MathUtils.lerp(r.outerY,edgeY,s),sample=rim(e.cx+x,cy+y,false);
-      let dx=0,dy=0,dz=0;for(const {id,w,base}of sample.samples){const a=mesh.geometry.attributes.position.array;dx+=(a[id*3]-base[0])*w;dy+=(a[id*3+1]-base[1])*w;dz+=(a[id*3+2]-base[2])*w;}
+      let dx=0,dy=0,dz=0;for(const {id,w,base}of sample.samples){const a=mesh.userData.faceIdentitySourcePositions||mesh.geometry.attributes.position.array;dx+=(a[id*3]-base[0])*w;dy+=(a[id*3+1]-base[1])*w;dz+=(a[id*3+2]-base[2])*w;}
       const q=(x/halfWidth)**2+(y/(y>=0?.0070:.0048))**2,cover=1-THREE.MathUtils.smoothstep(q,.32,.98),globeZ=Math.sqrt(Math.max(0,radius*radius-x*x-y*y))+.00010;
       const z=THREE.MathUtils.lerp(sample.z-e.cz+.000035,globeZ,cover);
       const id=i*(rows+1)+j;p.setXYZ(id,x+dx*(1-cover),y+dy*(1-cover),z+dz*(1-cover));uv.setXY(id,sample.uv.x,sample.uv.y);blend.setX(id,cover);sample.normal.toArray(surfaceNormals,id*3);coverWeights[id]=cover;
@@ -132,6 +137,8 @@ export function createProceduralEyes({surface,mesh,byName,bindWorld,data}) {
   m.onBeforeCompile=shader=>{compile(shader);shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 socketP;').replace('#include <begin_vertex>','#include <begin_vertex>\nsocketP=position;');shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 socketP;').replace('#include <clipping_planes_fragment>',`#include <clipping_planes_fragment>
    float ex=(abs(socketP.x)-.034)/${halfWidth};float ey=socketP.y-${cy};float eh=sqrt(max(0.,1.-ex*ex));if(socketP.z>.075&&abs(ex)<1.&&ey<.0070*eh&&ey>-.0048*eh)discard;`);};m.needsUpdate=true;
  }
- const api={root,eyes,report:{},update(dt,c,actions){this.report=update(dt,c,actions);return this.report},setMode(v){if(!['auto','centre','left','right','up','down','blink','closed','leftClosed','rightClosed'].includes(v))throw Error('Unknown gaze');mode=v;if(v==='blink')this.blink();},blink(side='Both'){if(!['Both','Left','Right'].includes(side))throw Error('Unknown blink side');blinkSide=side;blinkTime=0;nextBlink=time+1.8;},set closure(v){manualBlink=THREE.MathUtils.clamp(v,0,1)},dispose(){root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});root.removeFromParent();}};
+ const api={root,eyes,get identityCalibration(){return {evidence:"runtime-construction-parameters",centreDistanceMetres:Math.abs(eyes[0].cx-eyes[1].cx),apertureWidthMetres:halfWidth*2,apertureHeightMetres:upper+lower,globeRadiusMetres:radius,identityEditable:!!this.identityMapping,identityModel:this.identityMapping?"coupled-authored-surface-warp@1":null};},report:{},update(dt,c,actions){this.report=update(dt,c,actions);return this.report},setMode(v){if(!['auto','centre','left','right','up','down','blink','closed','leftClosed','rightClosed'].includes(v))throw Error('Unknown gaze');mode=v;if(v==='blink')this.blink();},blink(side='Both'){if(!['Both','Left','Right'].includes(side))throw Error('Unknown blink side');blinkSide=side;blinkTime=0;nextBlink=time+1.8;},set closure(v){manualBlink=THREE.MathUtils.clamp(v,0,1)},dispose(){root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});root.removeFromParent();}};
+ api.setAppearance=function(input={}){const values=eyes.map(e=>{const side=e.sign===1?'Left':'Right',p=input[side]||{},iris=(p.irisRadiusMM??5.6)/1000,pupil=(p.pupilRadiusMM??2.25)/1000;if(!Number.isFinite(iris)||!Number.isFinite(pupil)||iris<.0015||iris>.0068||pupil<.0005||pupil>.003||pupil>=iris-.0003)throw Error('虹膜/瞳孔半径超出本模型范围');return {e,iris,pupil};});for(const {e,iris,pupil}of values){e.uniform.irisRadius.value=iris;e.uniform.pupilRadius.value=pupil;}this.update(0);return this.appearance;};
+ Object.defineProperty(api,'appearance',{get(){return {schema:'human-r008/eye-appearance@1',values:Object.fromEntries(eyes.map(e=>[e.sign===1?'Left':'Right',{irisRadiusMM:e.uniform.irisRadius.value*1000,pupilRadiusMM:e.uniform.pupilRadius.value*1000}])),scale:'model tangent-plane units, not measured photograph millimetres',colour:'source procedural iris; reference colour NotObserved'};}});
  api.update(0);return api;
 }
