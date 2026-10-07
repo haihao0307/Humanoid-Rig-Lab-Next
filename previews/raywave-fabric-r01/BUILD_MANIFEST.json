@@ -29,10 +29,18 @@
   "payload": {
     "encoding": "gzip+base64",
     "chunks": ["chunks/00.b64", "chunks/01.b64", "chunks/02.b64", "chunks/03.b64"],
-    "decodedSha256": "95a75a5f2d16658493831f86ffb84c800448ba25a82a025b158f30594d7e29f8",
-    "decodedBytes": 40907,
+    "decodedSourceSha256": "95a75a5f2d16658493831f86ffb84c800448ba25a82a025b158f30594d7e29f8",
+    "decodedSourceBytes": 40907,
+    "executedHtmlSha256": "5fc5647f523037b5f035d109b11773aaa624d84ff87299a56a6c8342a4ef9699",
+    "executedHtmlBytes": 40915,
     "gzipBytes": 14764,
-    "base64Bytes": 19688
+    "base64Bytes": 19688,
+    "deterministicLoaderPatch": {
+      "reason": "GLSL local variable floor shadowed the floor() built-in in the initial compressed payload",
+      "from": "float floor=... ,floor*.62",
+      "to": "float floorMask=... ,floorMask*.62",
+      "failClosedWhenAnchorMissing": true
+    }
   },
   "boundaries": {
     "authorCodeUsed": false,
