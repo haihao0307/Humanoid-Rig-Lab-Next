@@ -1,0 +1,37 @@
+name: Fibric open weave kernel tests
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths:
+      - 'research/fibric-native-study/open-kernel/**'
+      - '.github/workflows/fibric-open-kernel-tests.yml'
+permissions:
+  contents: read
+jobs:
+  geometry-kernel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: research/fibric-native-study/open-kernel
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run metric topology and determinism tests
+        run: node --test research/fibric-native-study/open-kernel/weave-draft-compiler.test.mjs
+      - name: Record fresh source hashes without promoting visual fidelity
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('research/fibric-native-study/open-kernel')
+          files={p.name:{'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(root.glob('*.mjs'))}
+          receipt={'schema':'fibric_open_kernel_receipt@1','files':files,'visualAcceptance':False,'nativeRenderExecuted':False,'publicWorkbenchDelivered':False,'targetPatternStatus':'SOURCE_ENTRY_REQUIRED'}
+          pathlib.Path('kernel-test-receipt.json').write_text(json.dumps(receipt,indent=2))
+          print(json.dumps(receipt,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fibric-open-kernel-test-receipt
+          path: kernel-test-receipt.json
+          retention-days: 30
