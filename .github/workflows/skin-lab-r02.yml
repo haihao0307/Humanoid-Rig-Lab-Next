@@ -13,7 +13,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,6 +40,7 @@ jobs:
         run: |
           python3 -m http.server 8793 --bind 127.0.0.1 > /tmp/skin-r02-http.log 2>&1 &
           node skin-quality-lab/r02/qa.cjs
+          node skin-quality-lab/r02/lookdev.cjs
       - name: Commit tested new files without changing R01 or main
         env:
           NODE_PATH: /tmp/skin-r02/node_modules
