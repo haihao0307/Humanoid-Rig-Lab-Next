@@ -1,0 +1,49 @@
+name: Skin area-light visual comparison
+on:
+  push:
+    branches: [experiment/skin-quality-lab-r01-20261007]
+    paths: [.github/workflows/skin-area-light-review.yml]
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            skin-quality-lab/r01/
+            skin-quality-lab/r02/
+            skin-quality-lab/film-light-test/
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Prepare pinned official area-light renderer
+        run: |
+          npm install --prefix /tmp/area-review playwright@1.55.1 three@0.180.0
+          cd /tmp/area-review
+          npx playwright install --with-deps chromium
+      - name: Build isolated comparison without modifying delivered files
+        run: |
+          mkdir -p skin-quality-lab/r02/vendor/lights
+          cp /tmp/area-review/node_modules/three/examples/jsm/lights/RectAreaLightUniformsLib.js /tmp/area-review/node_modules/three/examples/jsm/lights/RectAreaLightTexturesLib.js skin-quality-lab/r02/vendor/lights/
+          node skin-quality-lab/film-light-test/build.cjs
+      - name: Capture actual area-light response
+        env:
+          NODE_PATH: /tmp/area-review/node_modules
+        run: |
+          mkdir -p review
+          python3 -m http.server 8795 --bind 127.0.0.1 > /tmp/area-http.log 2>&1 &
+          cat > /tmp/area-review/capture.cjs <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');let browser,page;const report={source:'R02.1',errors:[],shots:[],notPublished:true};
+          (async()=>{browser=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});page.setDefaultTimeout(120000);page.on('pageerror',e=>report.errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text())});await page.goto('http://127.0.0.1:8795/skin-quality-lab/r02/area-test.html',{waitUntil:'networkidle'});await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready);await page.click('[data-camera="cheek"]');
+          for(const [name,power] of [['01-reference',null],['02-area-10',10],['03-area-20',20],['04-area-30',30]]){const data=await page.evaluate(power=>{let l=window.__SKIN_LAB__;if(power!==null)l.setAreaLight(power);l.render();return document.querySelector('canvas').toDataURL('image/png')},power);fs.writeFileSync('review/'+name+'.png',Buffer.from(data.split(',')[1],'base64'));report.shots.push({name,power});console.log(name);}
+          report.state=await page.evaluate(()=>window.__SKIN_LAB__.state);report.pass=report.errors.length===0;fs.writeFileSync('review/report.json',JSON.stringify(report,null,2));await browser.close();if(!report.pass)process.exitCode=1;})().catch(async e=>{report.fatal=String(e);fs.writeFileSync('review/report.json',JSON.stringify(report,null,2));await browser?.close();console.error(e);process.exitCode=1});
+          JS
+          node /tmp/area-review/capture.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-area-light-comparison
+          path: review/
+          retention-days: 14
