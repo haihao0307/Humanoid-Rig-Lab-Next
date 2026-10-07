@@ -1,0 +1,100 @@
+name: Fibric official source acquisition
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths: ['.github/workflows/fibric-source-study.yml']
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install requests beautifulsoup4
+      - name: Retrieve public official documentation and teaching archives
+        run: |
+          python - <<'PY'
+          import requests, pathlib, hashlib, json, re, zipfile, time
+          from urllib.parse import urljoin, urlsplit, unquote
+          from bs4 import BeautifulSoup
+          out=pathlib.Path('fibric-source-evidence'); out.mkdir()
+          docs=out/'documentation'; docs.mkdir()
+          archives=out/'archives'; archives.mkdir()
+          s=requests.Session(); s.headers['User-Agent']='Mozilla/5.0 (compatible; FibricReferenceStudy/1.0)'
+          report={'task':'FIBRIC_SOURCE_LOCK_20261007','mode':'official_public_read_only','authorCodeExecuted':False,'licenseBypass':False,'productionReady':False,'pages':[],'archives':[],'errors':[]}
+          start=time.time()
+          root='https://sites.google.com/view/fibric-documentation'
+          queue=['https://www.fibrictoolset.com','https://www.fibrictoolset.com/documentation',root]
+          visited=set(); assets=set(['https://www.fibrictoolset.com/_files/archives/2f124e_7c1ef920e4774cc290023fcdd3afa10d.zip?dn=fibric_essentials.zip'])
+          all_links=[]
+          while queue and len(visited)<48 and time.time()-start<340:
+              url=queue.pop(0).split('#')[0]
+              if url in visited: continue
+              visited.add(url)
+              try:
+                  r=s.get(url,timeout=(10,35)); r.raise_for_status()
+                  soup=BeautifulSoup(r.text,'html.parser')
+                  name=f'{len(report["pages"]):02d}_'+re.sub('[^a-zA-Z0-9_-]','_',urlsplit(url).path.strip('/') or 'home')[-100:]
+                  (docs/(name+'.html')).write_text(r.text)
+                  (docs/(name+'.txt')).write_text(soup.get_text('\n',strip=True))
+                  links=[]
+                  for a in soup.find_all(['a','iframe'],href=True)+soup.find_all('iframe',src=True):
+                      raw=a.get('href') or a.get('src'); u=urljoin(url,raw)
+                      if u.startswith('https://www.google.com/url?'):
+                          from urllib.parse import parse_qs
+                          q=parse_qs(urlsplit(u).query);u=q.get('q',q.get('url',[u]))[0]
+                      label=a.get_text(' ',strip=True)[:160]
+                      links.append({'label':label,'url':u})
+                      host=urlsplit(u).hostname or ''
+                      if u.startswith(root) and u.split('#')[0] not in visited: queue.append(u.split('#')[0])
+                      if host in ['www.fibrictoolset.com','fibrictoolset.com'] and not any(t in u for t in ['_files','mailto','?']) and u not in visited:
+                          queue.append(u)
+                      if host in ['www.fibrictoolset.com','fibrictoolset.com','static.wixstatic.com'] and re.search(r'\.(zip|hda|hdalc|hip|hiplc)(?:\?|$)',u): assets.add(u)
+                  # Google Sites can keep navigation URLs in serialized page data.
+                  for path in re.findall(r'/view/fibric-documentation/[a-zA-Z0-9_/%-]+',r.text):
+                      u='https://sites.google.com'+path
+                      if u not in visited:queue.append(u)
+                  all_links.extend(links)
+                  report['pages'].append({'url':url,'finalUrl':r.url,'file':name+'.html','bytes':len(r.content),'sha256':hashlib.sha256(r.content).hexdigest(),'title':soup.title.get_text() if soup.title else '', 'links':links})
+                  print('PAGE',url,len(r.content),flush=True)
+              except Exception as e:
+                  report['errors'].append({'url':url,'error':str(e)});print('PAGE_ERROR',url,str(e),flush=True)
+          (out/'links.json').write_text(json.dumps(all_links,indent=2))
+          total=0
+          for i,url in enumerate(sorted(assets)):
+              if total>512*1024*1024: break
+              try:
+                  with s.get(url,timeout=(10,60),stream=True) as r:
+                      r.raise_for_status()
+                      file=archives/(f'{i:02d}_'+unquote(urlsplit(url).path.rsplit('/',1)[-1]))
+                      count=0; h=hashlib.sha256()
+                      with file.open('wb') as f:
+                          for b in r.iter_content(1024*1024):
+                              if not b:continue
+                              count+=len(b)
+                              if count>256*1024*1024:raise RuntimeError('Archive exceeds 256MiB study limit')
+                              f.write(b);h.update(b)
+                      total+=count
+                      item={'sourceUrl':url,'finalUrl':r.url,'file':str(file.relative_to(out)),'bytes':count,'sha256':h.hexdigest(),'contentType':r.headers.get('content-type')}
+                      if zipfile.is_zipfile(file):
+                          with zipfile.ZipFile(file) as z:
+                              item['members']=[{'path':x.filename,'bytes':x.file_size,'compressedBytes':x.compress_size,'encrypted':bool(x.flag_bits&1)} for x in z.infolist()]
+                      report['archives'].append(item)
+                      print('ARCHIVE',json.dumps({k:v for k,v in item.items() if k!='members'}),flush=True)
+              except Exception as e:
+                  report['errors'].append({'url':url,'error':str(e)});print('ARCHIVE_ERROR',url,str(e),flush=True)
+          report['elapsedSeconds']=round(time.time()-start,2)
+          (out/'acquisition-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print('SUMMARY',json.dumps({'pages':len(report['pages']),'archives':len(report['archives']),'errors':report['errors']}),flush=True)
+          PY
+      - name: Preserve downloaded originals as temporary study evidence, not published project assets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fibric-official-source-study
+          path: fibric-source-evidence/
+          retention-days: 7
+          compression-level: 0
