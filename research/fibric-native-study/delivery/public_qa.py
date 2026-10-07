@@ -1,34 +1,41 @@
-"""Validate the published immutable website with a clean external browser profile."""
-import asyncio,base64,hashlib,json,os,pathlib,sys,time,urllib.request
+"""Validate the immutable public website using a clean browser and real controls."""
+import asyncio,base64,hashlib,json,pathlib,sys
 from playwright.async_api import async_playwright
 from PIL import Image,ImageStat
 info=json.loads(pathlib.Path(sys.argv[1]).read_text());out=pathlib.Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True)
-report={'url':info['url'],'appCommit':info['commit'],'expectedHtmlSha256':info['htmlSha256'],'publicRender':False,'cinematicParity':False,'mobileRealDevice':False,'errors':[],'consoleErrors':[],'checks':{}}
+report={'url':info['url'],'appCommit':info['commit'],'expectedHtmlSha256':info['htmlSha256'],'publicRender':False,'cinematicParity':False,'mobileRealDevice':False,'hostConfirmationRequired':False,'errors':[],'consoleErrors':[],'hostingErrors':[],'checks':{}}
 async def run():
     async with async_playwright() as p:
         browser=await p.chromium.launch(headless=True,args=['--use-angle=swiftshader','--enable-unsafe-swiftshader'])
         page=await browser.new_page(viewport={'width':1200,'height':850});page.set_default_timeout(120000)
-        page.on('pageerror',lambda e:report['errors'].append(str(e)))
-        page.on('console',lambda m:report['consoleErrors'].append(m.text) if m.type=='error' else None)
+        phase={'app':False}
+        page.on('pageerror',lambda e:report['errors' if phase['app'] else 'hostingErrors'].append(str(e)))
+        page.on('console',lambda m:report['consoleErrors' if phase['app'] else 'hostingErrors'].append(m.text) if m.type=='error' else None)
         async def capture(name,raster=True):
             if raster:await page.evaluate('window.__YARN_TEST__.finishFrame()')
             data=await page.evaluate("window.__YARN_TEST__.renderer.getContext().finish();window.__YARN_TEST__.renderer.domElement.toDataURL('image/png')")
             raw=base64.b64decode(data.split(',',1)[1]);path=out/(name+'.png');path.write_bytes(raw)
             im=Image.open(path).convert('RGB');sd=ImageStat.Stat(im).stddev;assert max(sd)>5,(name,sd)
-            return hashlib.sha256(raw).hexdigest()
+            print('PUBLIC_CAPTURE',name,flush=True);return hashlib.sha256(raw).hexdigest()
         try:
             for attempt in range(4):
                 response=await page.goto(info['url'],wait_until='domcontentloaded',timeout=120000)
+                if await page.get_by_text('Open the page',exact=True).count():
+                    report['hostConfirmationRequired']=True
+                    async with page.expect_navigation(wait_until='domcontentloaded',timeout=120000) as nav:
+                        await page.get_by_text('Open the page',exact=True).click()
+                    response=await nav.value
                 report['httpStatus']=response.status if response else None
                 if response and response.status==200:
                     raw=await response.body();report['actualHtmlSha256']=hashlib.sha256(raw).hexdigest()
                     if report['actualHtmlSha256']==info['htmlSha256']:break
                 await asyncio.sleep(8)
-            assert report.get('actualHtmlSha256')==info['htmlSha256'],'Public endpoint did not serve the exact reviewed HTML without an interstitial'
+            assert report.get('actualHtmlSha256')==info['htmlSha256'],'Public endpoint did not serve the exact reviewed HTML'
+            phase['app']=True
             await page.wait_for_function('window.__YARN_TEST__ && window.__YARN_ATELIER__.ready',timeout=120000)
             report['initial']=await page.evaluate('window.__YARN_ATELIER__')
             assert report['initial']['generatedGeometry'] and not report['initial']['usesOriginalCachedGeometry']
-            assert report['initial']['yarns']==72
+            assert report['initial']['yarns']==72 and not report['initial']['errors']
             report['checks']['renderedMeshes']=await page.evaluate('()=>{let n=0,t=0;window.__YARN_TEST__.scene.traverse(o=>{if(o.isMesh){n++;t+=(o.geometry.index?.count||0)/3;}});return {meshes:n,triangles:t};}')
             assert report['checks']['renderedMeshes']['triangles']>1000000
             hero=await capture('public-hero')
@@ -56,7 +63,7 @@ async def run():
             await page.evaluate('window.__YARN_TEST__.pauseTrace()');await capture('public-pathtrace',False)
             report['pathtraced']=await page.evaluate('window.__YARN_ATELIER__');assert report['pathtraced']['pathSamples']>=3
             report['checks']['realPublicPathTracing']=True
-            assert not report['errors'] and not report['consoleErrors'],report
+            assert not report['errors'] and not report['consoleErrors'] and not report['pathtraced']['errors'],report
             report['publicRender']=True
         except Exception as e:
             report['fatal']=repr(e)
