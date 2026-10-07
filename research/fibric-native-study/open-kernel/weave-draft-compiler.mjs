@@ -114,9 +114,9 @@ export function draftCell(draft, row, column) {
 }
 
 function freezeCurve(curve) {
-  Object.freeze(curve.points);
-  Object.freeze(curve.tangents);
-  Object.freeze(curve.crossingStates);
+  // JavaScript engines reject Object.freeze() on non-empty typed-array views.
+  // The buffers are privately allocated here and exposed under an explicit
+  // read-only ownership contract; freeze the record, not the numeric views.
   return Object.freeze(curve);
 }
 
