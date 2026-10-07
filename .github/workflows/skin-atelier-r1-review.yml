@@ -9,22 +9,46 @@ permissions:
 jobs:
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.sha }}
           sparse-checkout: studies/skin-atelier-r1
           fetch-depth: 1
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install matched browser and driver
+      - name: Install pinned engine, browser and driver
         run: |
-          npm install --no-save playwright@1.55.0
+          npm install --no-save playwright@1.55.0 three@0.169.0
           npx playwright install chromium
-      - name: Review deployed candidate and local fallback
+      - name: Build self-contained study
+        run: node studies/skin-atelier-r1/build-standalone.cjs
+      - name: Publish only the isolated generated viewer
+        id: preview
         env:
-          CANDIDATE_SHA: ${{ github.sha }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -eu
+          BRANCH=work/skin-atelier-r1-20261007
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(git ls-remote origin "refs/heads/$BRANCH" | cut -f1)" = "$EXPECTED_SHA"
+          git add -- studies/skin-atelier-r1/standalone.html
+          if ! git diff --cached --quiet; then
+            test "$(git diff --cached --name-only)" = "studies/skin-atelier-r1/standalone.html"
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Build self-contained Skin Atelier R1.1 candidate [skip ci]'
+            git push origin "HEAD:refs/heads/$BRANCH"
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          git rev-parse HEAD > evidence/preview-sha.txt
+      - name: Review exact public build and local fallback
+        if: always() && steps.preview.outcome == 'success'
+        env:
+          CANDIDATE_SHA: ${{ steps.preview.outputs.sha }}
+          SOURCE_SHA: ${{ github.sha }}
         run: node studies/skin-atelier-r1/review.cjs
       - uses: actions/upload-artifact@v4
         if: always()
