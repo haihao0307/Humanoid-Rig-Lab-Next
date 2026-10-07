@@ -1,0 +1,74 @@
+name: Fibric native multifiber reference render
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths:
+      - 'research/fibric-native-study/open-kernel/**'
+      - 'research/fibric-native-study/native-reference/**'
+      - '.github/workflows/fibric-native-reference-render.yml'
+permissions:
+  contents: read
+jobs:
+  cycles-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research/fibric-native-study/open-kernel
+            research/fibric-native-study/native-reference
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install open native renderer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender python3-pil
+          blender --version | head -n 3
+      - name: Export independently generated metric centerlines
+        run: |
+          mkdir -p native-reference-out
+          node research/fibric-native-study/native-reference/export-fixture.mjs \
+            --repeats-x 3 --repeats-y 3 \
+            --out native-reference-out/input.json
+      - name: Build real 3D multifiber curves and path trace two internal views
+        run: |
+          blender --background --factory-startup \
+            --python research/fibric-native-study/native-reference/render_blender.py -- \
+            --input native-reference-out/input.json \
+            --out native-reference-out \
+            --samples 48
+      - name: Verify rendered evidence is fresh and nonblank without promoting it
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          from PIL import Image,ImageStat
+          root=pathlib.Path('native-reference-out')
+          report=json.loads((root/'render-report.json').read_text())
+          assert report['officialFibricPatternUsed'] is False
+          assert report['visualAcceptance'] is False
+          assert report['curveCount']==72
+          assert report['plySplineCount']==216
+          assert report['fuzzSplineCount']==240
+          images={}
+          for name in ['macro.png','grazing.png']:
+              path=root/name
+              assert path.exists() and path.stat().st_size>10000,name
+              im=Image.open(path).convert('RGB')
+              stat=ImageStat.Stat(im)
+              assert im.size==(720,720),im.size
+              assert max(stat.stddev)>4,(name,stat.stddev)
+              images[name]={'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'stddev':stat.stddev}
+          blend=root/'multifiber_reference.blend'
+          assert blend.exists() and blend.stat().st_size>10000
+          receipt={'schema':'fibric_native_reference_qa@1','images':images,'blendBytes':blend.stat().st_size,'blendSha256':hashlib.sha256(blend.read_bytes()).hexdigest(),'renderReport':report,'acceptedAsFibricMatch':False,'publicWorkbenchDelivered':False}
+          (root/'qa-report.json').write_text(json.dumps(receipt,indent=2))
+          print(json.dumps(receipt,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fibric-native-multifiber-reference
+          path: native-reference-out/
+          retention-days: 30
