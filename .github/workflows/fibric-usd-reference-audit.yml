@@ -1,0 +1,77 @@
+name: Fibric original curve reference audit
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths: ['.github/workflows/fibric-usd-reference-audit.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install usd-core numpy requests
+      - name: Inspect original USD geometry without a replacement generator
+        run: |
+          mkdir -p usd-reference-evidence/wheels
+          python -m pip download --no-deps usd-core -d usd-reference-evidence/wheels
+          python - <<'PY'
+          from pxr import Usd, UsdGeom, Sdf
+          import requests, pathlib, zipfile, hashlib, json, numpy as np
+          out=pathlib.Path('usd-reference-evidence')
+          url='https://www.fibrictoolset.com/_files/archives/2f124e_7c1ef920e4774cc290023fcdd3afa10d.zip?dn=fibric_essentials.zip'
+          f=pathlib.Path('/tmp/fibric-original.zip');h=hashlib.sha256();n=0
+          with requests.get(url,stream=True,timeout=90) as r:
+              r.raise_for_status()
+              with f.open('wb') as w:
+                  for b in r.iter_content(1024*1024):
+                      n+=len(b)
+                      if n>600*1024**2:raise RuntimeError('Archive larger than locked source')
+                      w.write(b);h.update(b)
+          assert h.hexdigest()=='f407400140d0198223e1e1e5c37bee74c7b4d53ed5122805c743d27ebc48cb02'
+          report={'sourceArchiveSha256':h.hexdigest(),'readerVersion':list(Usd.GetVersion()),'sourceOnly':True,'generatedByUs':False,'stages':[]}
+          paths=['fibric_essentials/geo/Fibric/basic.usdc','fibric_essentials/geo/Fibric/complex.usdc','fibric_essentials/geo/cloth/clothPiece.usdc']
+          with zipfile.ZipFile(f) as z:
+              for path in paths:
+                  raw=z.read(path);target=out/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw)
+                  stage=Usd.Stage.Open(str(target),load=Usd.Stage.LoadNone)
+                  entry={'path':path,'fileBytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'metersPerUnit':UsdGeom.GetStageMetersPerUnit(stage),'metersPerUnitAuthored':stage.HasAuthoredMetadata('metersPerUnit'),'upAxis':str(UsdGeom.GetStageUpAxis(stage)),'prims':[]}
+                  for p in stage.TraverseAll():
+                      v={'path':str(p.GetPath()),'type':p.GetTypeName(),'references':str(p.GetMetadata('references')),'attributes':[]}
+                      for a in p.GetAttributes():
+                          info={'name':a.GetName(),'type':str(a.GetTypeName()),'timeSamples':a.GetNumTimeSamples(),'authored':a.HasAuthoredValueOpinion()}
+                          value=a.Get()
+                          if value is None and a.GetNumTimeSamples():value=a.Get(a.GetTimeSamples()[0])
+                          if value is not None:
+                              if a.GetTypeName().isArray:
+                                  info['length']=len(value)
+                                  if len(value):
+                                      info['first']=str(value[0]);info['last']=str(value[-1])
+                                      try:
+                                          ar=np.asarray(value)
+                                          if ar.dtype.kind in 'ifu' and ar.size:
+                                              info['min']=ar.min(axis=0).tolist();info['max']=ar.max(axis=0).tolist()
+                                      except Exception:pass
+                              else:info['value']=str(value)
+                          v['attributes'].append(info)
+                      if p.IsA(UsdGeom.BasisCurves):
+                          c=UsdGeom.BasisCurves(p);t=Usd.TimeCode.Default()
+                          if c.GetPointsAttr().GetNumTimeSamples():t=Usd.TimeCode(c.GetPointsAttr().GetTimeSamples()[0])
+                          cnt=np.asarray(c.GetCurveVertexCountsAttr().Get(t),dtype=np.int64)
+                          pts=np.asarray(c.GetPointsAttr().Get(t),dtype=np.float32)
+                          widths=np.asarray(c.GetWidthsAttr().Get(t),dtype=np.float32)
+                          v['curveCount']=len(cnt);v['pointCount']=len(pts);v['pointCountMatches']=int(cnt.sum())==len(pts);v['finite']=bool(np.isfinite(pts).all());v['basis']=str(c.GetBasisAttr().Get());v['curveType']=str(c.GetTypeAttr().Get());v['wrap']=str(c.GetWrapAttr().Get());v['widthInterpolation']=str(c.GetWidthsInterpolation())
+                      entry['prims'].append(v)
+                  report['stages'].append(entry)
+          (out/'usd-reference-report.json').write_text(json.dumps(report,indent=2))
+          print('GEOMETRY_SUMMARY',json.dumps([{'path':s['path'],'curves':[{'path':p['path'],'curves':p.get('curveCount'),'points':p.get('pointCount'),'matches':p.get('pointCountMatches'),'basis':p.get('basis')} for p in s['prims'] if 'curveCount' in p]} for s in report['stages']]),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fibric-usd-original-reference
+          path: usd-reference-evidence/
+          retention-days: 7
