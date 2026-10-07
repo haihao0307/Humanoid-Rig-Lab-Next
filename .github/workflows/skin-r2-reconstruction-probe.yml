@@ -1,0 +1,74 @@
+name: Skin R2 image reconstruction probe
+on:
+  push:
+    branches: [work/skin-atelier-r2-data-driven-20261007]
+    paths: ['.github/workflows/skin-r2-reconstruction-probe.yml']
+permissions:
+  contents: read
+jobs:
+  reconstruct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Install documented public API client and video reader
+        run: pip install gradio_client pillow opencv-python-headless requests
+      - name: Probe one reconstruction using the exact supplied reference
+        run: |
+          mkdir -p output
+          cat > probe.py <<'PY'
+          import os,json,time,shutil,traceback,requests,concurrent.futures
+          import cv2,numpy as np
+          from PIL import Image
+          from gradio_client import Client,handle_file
+          report={'model':'microsoft/TRELLIS.2','status':'started','paid_service_created':False,'reference':'https://cdn.artstation.com/p/video_sources/002/676/142/shadowheart-custom-black-double.mp4'}
+          def save():open('output/report.json','w').write(json.dumps(report,indent=2))
+          save()
+          try:
+           r=requests.get(report['reference'],timeout=40);r.raise_for_status();open('output/reference.mp4','wb').write(r.content)
+           cap=cv2.VideoCapture('output/reference.mp4');cap.set(cv2.CAP_PROP_POS_MSEC,4000);ok,bgr=cap.read()
+           if not ok:raise RuntimeError('Reference frame unavailable')
+           rgb=cv2.cvtColor(bgr,cv2.COLOR_BGR2RGB);h,w=rgb.shape[:2]
+           # Conservative colour segmentation: background is blue, skin/hair red.
+           small=cv2.resize(rgb,(768,768));mask=np.full((768,768),cv2.GC_PR_FGD,np.uint8)
+           blue=(small[:,:,2].astype(float)-small[:,:,0].astype(float)>5)
+           mask[blue]=cv2.GC_PR_BGD;mask[:,:70]=cv2.GC_BGD;mask[:,735:]=cv2.GC_BGD
+           mask[230:540,220:440]=cv2.GC_FGD
+           cv2.grabCut(small,mask,None,np.zeros((1,65)),np.zeros((1,65)),5,cv2.GC_INIT_WITH_MASK)
+           alpha=np.where((mask==1)|(mask==3),255,0).astype('uint8');alpha=cv2.resize(alpha,(w,h));rgba=np.dstack([rgb,alpha]);Image.fromarray(rgba).resize((1024,1024),Image.Resampling.LANCZOS).save('output/reference-input.png')
+           client=Client('microsoft/TRELLIS.2',download_files='output/downloads',verbose=False)
+           report['api_connected']=True;save()
+           client.predict(api_name='/start_session')
+           normalized=client.predict(handle_file('output/reference-input.png'),api_name='/preprocess_image')
+           report['preprocessed']=str(normalized);save()
+           job=client.submit(handle_file(normalized),0,'1024',7.5,0.7,12,5.0,7.5,0.5,12,3.0,1.0,0.0,12,3.0,api_name='/image_to_3d')
+           preview=job.result(timeout=360)
+           open('output/reconstruction-preview.html','w').write(str(preview))
+           report['inference_completed']=True;save()
+           glb=client.submit(500000,4096,api_name='/extract_glb').result(timeout=220)
+           report['glb_result']=str(glb)
+           for f in (glb if isinstance(glb,(tuple,list)) else [glb]):
+            if isinstance(f,str) and os.path.isfile(f):shutil.copy(f,'output/reconstructed-head.glb');break
+           report['status']='success' if os.path.isfile('output/reconstructed-head.glb') else 'no_glb'
+          except Exception as e:
+           report['status']='blocked';report['error']=str(e);report['traceback']=traceback.format_exc()
+          save();print(json.dumps(report,indent=2))
+          PY
+          timeout 600 python probe.py || true
+      - name: Acquire CC-BY scan and official shading source for controlled fallback
+        run: |
+          python - <<'PY'
+          import urllib.request,concurrent.futures,os,json
+          base='https://raw.githubusercontent.com/NVIDIAGameWorks/FaceWorks/master/'
+          paths=['license.txt','samples/media/LPSHead/Infinite-Scan_License.txt','samples/media/LPSHead/head.obj','samples/media/LPSHead/lambertian.jpg','samples/media/LPSHead/normal.bmp','samples/media/LPSHead/bump.png','samples/media/LPSHead/deepscatter.bmp','samples/media/curvatureLUT.bmp','include/GFSDK_FaceWorks.hlsli']
+          def get(p):
+           try:
+            data=urllib.request.urlopen(base+p,timeout=60).read();name=p.replace('/','__');open('output/'+name,'wb').write(data);return {'path':p,'bytes':len(data)}
+           except Exception as e:return {'path':p,'error':str(e)}
+          result=list(concurrent.futures.ThreadPoolExecutor(max_workers=4).map(get,paths));open('output/reference-acquisition.json','w').write(json.dumps(result,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-r2-reconstruction-probe
+          path: output
+          retention-days: 7
