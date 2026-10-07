@@ -11,6 +11,7 @@ jobs:
     timeout-minutes: 12
     permissions:
       contents: write
+      actions: read
     env:
       OPENBLAS_NUM_THREADS: '2'
       OMP_NUM_THREADS: '2'
@@ -28,6 +29,19 @@ jobs:
           pip install numpy==2.2.6 scipy==1.15.3 opencv-python-headless==4.13.0.92
           npm install --no-save playwright@1.55.0
           npx playwright install chromium
+      - name: Reuse exact reference already acquired in this research branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/actions/artifacts/11479407738/zip > /tmp/skin-reference.zip
+          python - <<'PY'
+          import zipfile,hashlib,pathlib
+          with zipfile.ZipFile('/tmp/skin-reference.zip') as z:data=z.read('shadowheart.mp4')
+          expected='f066ed480f2e79ea1535348fae4e36485c17f6ee4eaa764bed42d751d51cac19'
+          assert hashlib.sha256(data).hexdigest()==expected
+          p=pathlib.Path('studies/skin-atelier-r2/_working');p.mkdir(exist_ok=True);(p/'reference.mp4').write_bytes(data)
+          print('Verified existing reference',expected,len(data))
+          PY
       - name: Recover visible surface and generate honest-scoped webpage
         run: python studies/skin-atelier-r2/reconstruct.py
       - name: Publish only the isolated generated study
