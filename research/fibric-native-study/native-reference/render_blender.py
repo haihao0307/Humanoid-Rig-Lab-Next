@@ -30,8 +30,6 @@ def arguments() -> argparse.Namespace:
 def clear_scene() -> None:
     bpy.ops.object.select_all(action="SELECT")
     bpy.ops.object.delete(use_global=False)
-    for collection in (bpy.data.curves, bpy.data.meshes, bpy.data.materials, bpy.data.cameras, bpy.data.lights):
-        pass
 
 
 def set_socket(node, names, value) -> bool:
@@ -110,7 +108,6 @@ def make_curve_object(name: str, splines: list[list[Vector]], bevel_depth: float
     data.render_resolution_u = 1
     data.bevel_depth = bevel_depth
     data.bevel_resolution = bevel_resolution
-    data.resolution_u = 1
     data.fill_mode = "FULL"
     for values in splines:
         spline = data.splines.new("POLY")
@@ -215,7 +212,7 @@ def configure_scene(payload: dict, samples: int):
             scene.cycles.samples = samples
             scene.cycles.use_adaptive_sampling = True
             scene.cycles.adaptive_threshold = 0.02
-            scene.cycles.use_denoising = True
+            scene.cycles.use_denoising = False
             scene.cycles.max_bounces = 8
             scene.cycles.diffuse_bounces = 3
             scene.cycles.glossy_bounces = 4
@@ -236,7 +233,6 @@ def configure_scene(payload: dict, samples: int):
             break
         except Exception:
             continue
-    scene.view_settings.look = "Medium High Contrast" if "Medium High Contrast" in [item.name for item in scene.bl_rna.properties['view_settings'].fixed_type.properties['look'].enum_items] else scene.view_settings.look
     world = bpy.data.worlds.new("World") if bpy.data.worlds.get("World") is None else bpy.data.worlds["World"]
     scene.world = world
     world.use_nodes = True
