@@ -7,6 +7,9 @@ on:
       - '.github/workflows/fibric-browser-render-test.yml'
 permissions:
   contents: read
+concurrency:
+  group: fibric-dense-yarn-browser
+  cancel-in-progress: true
 jobs:
   browser:
     runs-on: ubuntu-latest
@@ -24,22 +27,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Recover SHA-locked independently authored sources
-        run: |
-          mkdir -p out/source out/evidence
-          cp research/fibric-native-study/browser/source-payload.json out/source-payload.json
-          python - <<'PY'
-          import pathlib,json,gzip,base64,hashlib
-          root=pathlib.Path('out');p=json.loads((root/'source-payload.json').read_text())
-          for name,v in p['files'].items():
-              assert name in ['app.js','index.html']
-              raw=gzip.decompress(base64.b64decode(v['gzipBase64'],validate=True))
-              assert len(raw)==v['bytes'] and hashlib.sha256(raw).hexdigest()==v['sha256'],name
-              (root/'source'/name).write_bytes(raw)
-          base=pathlib.Path('research/fibric-native-study/open-kernel')
-          k=(base/'weave-draft-compiler.mjs').read_text().replace('export ','')
-          f=(base/'herringbone-fixture.mjs').read_text();f=f[f.index('export function'):].replace('export ','')
-          (root/'source/kernel.js').write_text('(function(){\n'+k+'\n'+f+'\nwindow.WeaveKernel={compileWeaveDraft,validateWeaveDraft,draftCell,makeHerringbone12x12Fixture,crossingSampleIndex,pointAt};\n})();\n')
-          PY
+        run: python research/fibric-native-study/browser/build.py
       - name: Bundle pinned open renderer
         run: |
           cd out/source
@@ -60,73 +48,13 @@ jobs:
           cp node_modules/three-gpu-pathtracer/LICENSE licenses/three-gpu-pathtracer-LICENSE.txt
           rm -rf node_modules
           cd ../..
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('out/source');h=(p/'index.html').read_text()
-          for n in ['vendor.js','kernel.js','app.js']:
-              h=h.replace('<script src="'+n+'"></script>','<script>'+(p/n).read_text().replace('</script','<\\/script')+'</script>')
-          Path('out/index.html').write_text(h)
-          PY
+          python research/fibric-native-study/browser/build.py pack
       - name: Install browser test runner
         run: |
           pip install playwright==1.56.0 pillow
           playwright install --with-deps chromium
       - name: Render actual geometry and test controls
-        run: |
-          cat > /tmp/check.py <<'PY'
-          import asyncio,json,pathlib,hashlib
-          from playwright.async_api import async_playwright
-          from PIL import Image,ImageStat
-          root=pathlib.Path('out').resolve();report={'sourceCommit':'${{ github.sha }}','publicDelivery':False,'visualAcceptance':False,'errors':[],'consoleErrors':[],'networkRequests':[]}
-          async def main():
-              async with async_playwright() as p:
-                  browser=await p.chromium.launch(headless=True,args=['--use-angle=swiftshader','--enable-unsafe-swiftshader'])
-                  page=await browser.new_page(viewport={'width':1440,'height':1000})
-                  page.on('pageerror',lambda e:report['errors'].append(str(e)))
-                  page.on('console',lambda m:report['consoleErrors'].append(m.text) if m.type=='error' else None)
-                  page.on('request',lambda r:report['networkRequests'].append(r.url) if r.url.startswith('http') else None)
-                  try:
-                      await page.goto((root/'index.html').as_uri(),wait_until='load',timeout=60000)
-                      await page.wait_for_function('window.__YARN_ATELIER__?.ready || window.__YARN_ATELIER__?.errors.length',timeout=60000)
-                      report['initial']=await page.evaluate('window.__YARN_ATELIER__')
-                      assert report['initial']['ready'],report['initial']
-                      for name in ['hero','macro','edge']:
-                          await page.evaluate('(name)=>window.__YARN_TEST__.setView(name)',name)
-                          await page.wait_for_timeout(1200)
-                          await page.screenshot(path=str(root/'evidence'/f'{name}.png'))
-                      await page.evaluate("window.__YARN_TEST__.lighting('back')")
-                      await page.wait_for_timeout(1200)
-                      await page.screenshot(path=str(root/'evidence'/'back.png'))
-                      await page.evaluate("window.__YARN_TEST__.lighting('studio'); window.__YARN_TEST__.setView('macro')")
-                      await page.set_viewport_size({'width':960,'height':720})
-                      await page.evaluate('window.__YARN_TEST__.config.quality=.6')
-                      await page.locator('#trace').click()
-                      await page.wait_for_function('window.__YARN_ATELIER__.pathSamples>=6',timeout=240000)
-                      await page.screenshot(path=str(root/'evidence'/'pathtraced.png'))
-                      report['pathtraced']=await page.evaluate('window.__YARN_ATELIER__')
-                      await page.locator('#trace').click()
-                      await page.set_viewport_size({'width':390,'height':844})
-                      await page.evaluate("window.__YARN_TEST__.setView('hero')")
-                      await page.wait_for_timeout(1000)
-                      await page.screenshot(path=str(root/'evidence'/'mobile-viewport.png'))
-                      report['mobileViewport']={'width':390,'height':844,'realDevice':False,'overflow':await page.evaluate('document.documentElement.scrollWidth>innerWidth')}
-                      for name in ['hero','macro','edge','pathtraced']:
-                          im=Image.open(root/'evidence'/f'{name}.png').convert('RGB');stat=ImageStat.Stat(im)
-                          assert max(stat.stddev)>5
-                      assert not report['errors'] and not report['consoleErrors'],report
-                      assert report['networkRequests']==[],report['networkRequests']
-                      report['browserExecuted']=True
-                  except Exception as e:
-                      report['fatal']=str(e)
-                      await page.screenshot(path=str(root/'evidence'/'failure.png'))
-                  finally:
-                      (root/'evidence/report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))
-                      print(json.dumps(report,ensure_ascii=False))
-                      await browser.close()
-                  if report.get('fatal'):raise SystemExit(1)
-          asyncio.run(main())
-          PY
-          python /tmp/check.py
+        run: python research/fibric-native-study/browser/qa.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
