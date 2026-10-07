@@ -233,18 +233,21 @@ def configure_scene(payload: dict, samples: int):
             break
         except Exception:
             continue
+    scene.view_settings.exposure = -0.7
     world = bpy.data.worlds.new("World") if bpy.data.worlds.get("World") is None else bpy.data.worlds["World"]
     scene.world = world
     world.use_nodes = True
     background = world.node_tree.nodes.get("Background")
     background.inputs["Color"].default_value = (0.004, 0.006, 0.010, 1.0)
-    background.inputs["Strength"].default_value = 0.18
+    background.inputs["Strength"].default_value = 0.035
 
     width, height = map(float, payload["tileSizeM"])
     target = Vector((width * 0.5, height * 0.5, 0.0015))
-    add_area("WarmKey", Vector((-0.022, -0.018, 0.038)), target, 750.0, 0.035, (1.0, 0.55, 0.28))
-    add_area("CoolRim", Vector((width + 0.025, height + 0.018, 0.028)), target, 900.0, 0.028, (0.32, 0.48, 1.0))
-    add_area("SoftFill", Vector((width * 0.5, height * 0.2, 0.065)), target, 420.0, 0.050, (0.74, 0.86, 1.0))
+    # The object is a 4 cm textile patch. Studio-light values therefore need to
+    # be calibrated for centimeter-scale distances, not full-room wattage.
+    add_area("WarmKey", Vector((-0.030, -0.025, 0.055)), target, 5.0, 0.035, (1.0, 0.55, 0.28))
+    add_area("CoolRim", Vector((width + 0.032, height + 0.025, 0.042)), target, 6.5, 0.028, (0.32, 0.48, 1.0))
+    add_area("SoftFill", Vector((width * 0.5, height * 0.2, 0.080)), target, 2.2, 0.050, (0.74, 0.86, 1.0))
     return target
 
 
@@ -252,9 +255,9 @@ def make_camera(name: str, location: Vector, target: Vector, lens: float):
     data = bpy.data.cameras.new(name)
     data.lens = lens
     data.sensor_width = 36.0
-    data.dof.use_dof = True
-    data.dof.focus_distance = (location - target).length
-    data.dof.aperture_fstop = 5.6
+    data.clip_start = 0.0001
+    data.clip_end = 5.0
+    data.dof.use_dof = False
     camera = bpy.data.objects.new(name, data)
     bpy.context.collection.objects.link(camera)
     camera.location = location
@@ -266,8 +269,8 @@ def render_views(payload: dict, out: Path, target: Vector):
     scene = bpy.context.scene
     width, height = map(float, payload["tileSizeM"])
     views = {
-        "macro": (Vector((width * 0.5, height * 0.5, 0.052)), 78.0),
-        "grazing": (Vector((width * 1.02, -height * 0.72, 0.023)), 72.0),
+        "macro": (Vector((width * 0.5, height * 0.5, 0.080)), 55.0),
+        "grazing": (Vector((width * 0.50, -height * 1.15, 0.030)), 58.0),
     }
     for name, (location, lens) in views.items():
         camera = make_camera(f"Camera_{name}", location, target, lens)
