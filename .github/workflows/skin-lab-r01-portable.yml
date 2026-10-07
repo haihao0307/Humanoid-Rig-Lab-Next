@@ -1,0 +1,102 @@
+name: Skin Lab portable preview and acceptance
+on:
+  push:
+    branches: [experiment/skin-quality-lab-r01-20261007]
+    paths: [.github/workflows/skin-lab-r01-portable.yml]
+permissions:
+  contents: write
+concurrency:
+  group: skin-lab-r01-portable
+  cancel-in-progress: false
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: skin-quality-lab/r01/
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Install build and browser tools
+        run: |
+          npm install --prefix /tmp/skin-portable esbuild@0.25.10 playwright@1.55.1 pngjs@7.0.0
+          cd /tmp/skin-portable
+          npx playwright install --with-deps chromium
+      - name: Bundle pinned runtime without third-party module dependencies
+        env:
+          NODE_PATH: /tmp/skin-portable/node_modules
+        run: |
+          export ASSET_COMMIT=$(git rev-parse HEAD)
+          cat > /tmp/skin-portable/build.cjs <<'JS'
+          const fs=require('fs'),path=require('path'),esbuild=require('esbuild');
+          const d=path.resolve('skin-quality-lab/r01'),out=path.resolve('delivery');fs.mkdirSync(out,{recursive:true});
+          let html=fs.readFileSync(d+'/index.html','utf8');
+          html=html.replace("VERSION='skin-quality-lab/r01.1'","VERSION='skin-quality-lab/r01.2'").replace('R01.1 · 4K / 16-BIT','R01.2 · 4K / 16-BIT');
+          html=html.replace("$('reset').onclick=()=>{Object.assign(values,defaults);","$('reset').onclick=()=>{document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('active',b.dataset.preset==='natural'));Object.assign(values,defaults);");
+          html=html.replace('.version{font-size:10px}.shell{','.version{font-size:9px;padding:3px 5px}.shell{');
+          fs.writeFileSync(d+'/index.html',html);
+          const match=html.match(/<script type="module">([\s\S]*?)<\/script>/);if(!match)throw Error('Missing application module');
+          const result=esbuild.buildSync({stdin:{contents:match[1],resolveDir:d,sourcefile:'skin-lab.js',loader:'js'},bundle:true,minify:true,format:'iife',target:'es2022',write:false,legalComments:'inline',alias:{'three':d+'/vendor/three.module.js','three/addons':d+'/vendor/addons'}});
+          const js=result.outputFiles[0].text.replace(/<\/script/gi,'<\\/script');
+          const shell=html.replace(/<script type="importmap">[\s\S]*?<\/script>/,'').replace(match[0],'<script>'+js+'</script>');
+          const base='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+process.env.ASSET_COMMIT+'/skin-quality-lab/r01/';
+          let preview=shell.replaceAll('./assets/',base+'assets/').replaceAll('./vendor/THREE-LICENSE.txt',base+'vendor/THREE-LICENSE.txt');
+          preview=preview.replace('所有运行资源随页面固定版本提供','扫描资源与渲染器均绑定固定提交版本');
+          fs.writeFileSync(d+'/preview.html',preview);
+          let portable=shell;
+          const assets={'./assets/head.glb':'model/gltf-binary','./assets/hires/albedo-4k.jpg':'image/jpeg','./assets/hires/normal-4k.png':'image/png','./assets/hires/microheight-4k.png':'image/png','./assets/specular.jpg':'image/jpeg'};
+          for(const [name,mime] of Object.entries(assets)){if(!portable.includes(name))throw Error('Bundled path not found: '+name);portable=portable.replaceAll(name,'data:'+mime+';base64,'+fs.readFileSync(path.join(d,name)).toString('base64'));}
+          portable=portable.replace('所有运行资源随页面固定版本提供','完整离线网页 · 模型、贴图与渲染器全部内嵌').replace('./assets/hires/LICENSE-AND-SOURCE.txt','https://creativecommons.org/licenses/by/3.0/').replace('./vendor/THREE-LICENSE.txt','https://github.com/mrdoob/three.js/blob/r180/LICENSE');
+          fs.writeFileSync(out+'/Skin_Quality_Lab_R01_2_offline.html',portable);
+          fs.writeFileSync(out+'/build.json',JSON.stringify({version:'skin-quality-lab/r01.2',assetCommit:process.env.ASSET_COMMIT,previewBytes:Buffer.byteLength(preview),offlineBytes:Buffer.byteLength(portable),renderer:'Three.js 0.180.0; WebGL2; bundled locally'},null,2));
+          console.log('Preview bytes:',Buffer.byteLength(preview),'Offline bytes:',Buffer.byteLength(portable));
+          JS
+          node /tmp/skin-portable/build.cjs
+          git config user.name 'Skin Lab build'
+          git config user.email 'skin-lab@users.noreply.github.com'
+          git add skin-quality-lab/r01/index.html skin-quality-lab/r01/preview.html
+          git commit -m 'release(skin-lab): R01.2 self-contained runtime for direct public preview'
+          git push origin HEAD:experiment/skin-quality-lab-r01-20261007
+          echo "LAB_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Verify offline, direct public rendering, parameters, comparison and mobile layout
+        env:
+          NODE_PATH: /tmp/skin-portable/node_modules
+        run: |
+          cat > /tmp/skin-portable/verify.cjs <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs'),path=require('path'),{PNG}=require('pngjs');
+          const out=path.resolve('delivery'),report={version:'skin-quality-lab/r01.2',commit:process.env.LAB_COMMIT,checks:[],errors:[],publicErrors:[],physicalMobileDevice:false};let browser;
+          function diff(a,b){a=PNG.sync.read(a);b=PNG.sync.read(b);let s=0,n=0;for(let i=0;i<a.data.length;i+=4)for(let c=0;c<3;c++){s+=Math.abs(a.data[i+c]-b.data[i+c]);n++}return s/n}
+          (async()=>{
+            browser=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
+            const offlineContext=await browser.newContext({viewport:{width:1440,height:1040},deviceScaleFactor:1,offline:true});
+            const off=await offlineContext.newPage();off.on('pageerror',e=>report.errors.push(String(e)));off.on('console',m=>{if(m.type()==='error')report.errors.push(m.text())});
+            await off.goto('file://'+out+'/Skin_Quality_Lab_R01_2_offline.html',{waitUntil:'load',timeout:90000});await off.waitForFunction(()=>window.__SKIN_LAB__?.state.ready,null,{timeout:90000});await off.waitForTimeout(600);
+            report.offline=await off.evaluate(()=>({state:window.__SKIN_LAB__.state,camera:window.__SKIN_LAB__.camera()}));await off.screenshot({path:out+'/01-offline-portrait.png'});
+            await off.click('[data-camera="cheek"]');await off.evaluate(()=>window.__SKIN_LAB__.render());const before=await off.locator('canvas').screenshot();await off.locator('#oil').fill('0.9');await off.locator('#oil').dispatchEvent('input');await off.evaluate(()=>window.__SKIN_LAB__.render());const after=await off.locator('canvas').screenshot();const delta=diff(before,after);report.checks.push({name:'offline-oil-slider-affects-rendered-pixels',difference:delta,pass:delta>.15});
+            await off.click('#reset');await off.setViewportSize({width:390,height:844});await off.evaluate(()=>window.__SKIN_LAB__.setCamera('portrait'));await off.waitForTimeout(500);await off.screenshot({path:out+'/02-offline-mobile-viewport.png'});await off.click('#mobileToggle');report.checks.push({name:'mobile-panel-visible',pass:await off.locator('.side').isVisible()});report.checks.push({name:'mobile-no-horizontal-overflow',pass:await off.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)});await off.screenshot({path:out+'/03-offline-mobile-panel.png'});await offlineContext.close();
+            const page=await browser.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});page.on('pageerror',e=>report.publicErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')report.publicErrors.push(m.text())});
+            report.publicUrl='https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+process.env.LAB_COMMIT+'/skin-quality-lab/r01/preview.html';
+            try{
+              await page.goto(report.publicUrl,{waitUntil:'networkidle',timeout:120000});await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready,null,{timeout:90000});await page.waitForTimeout(800);
+              report.public=await page.evaluate(()=>({title:document.title,url:location.href,state:window.__SKIN_LAB__.state}));await page.screenshot({path:out+'/04-public-portrait.png'});
+              await page.click('[data-camera="cheek"]');await page.evaluate(()=>window.__SKIN_LAB__.render());await page.screenshot({path:out+'/05-public-cheek.png'});const base=await page.locator('canvas').screenshot();
+              const btn=page.locator('#compare');await btn.hover();await page.mouse.down();await page.waitForTimeout(400);const comparison=await page.locator('canvas').screenshot();await page.mouse.up();const delta=diff(base,comparison);report.checks.push({name:'public-hold-baseline-changes-render',difference:delta,pass:delta>.15});
+              await page.click('[data-preset="dry"]');report.checks.push({name:'public-dry-preset',pass:await page.evaluate(()=>window.__SKIN_LAB__.values.roughness===.66)});await page.click('#reset');await page.click('#save');await page.locator('#roughness').fill('0.7');await page.locator('#roughness').dispatchEvent('input');await page.click('#restore');report.checks.push({name:'public-save-restore',pass:await page.evaluate(()=>window.__SKIN_LAB__.values.roughness===window.__SKIN_LAB__.defaults.roughness)});
+              await page.selectOption('#lightPreset','raking');await page.screenshot({path:out+'/06-public-side-light.png'});await page.click('#reset');await page.setViewportSize({width:390,height:844});await page.evaluate(()=>window.__SKIN_LAB__.setCamera('portrait'));await page.waitForTimeout(500);await page.screenshot({path:out+'/07-public-mobile-viewport.png'});await page.click('#mobileToggle');await page.screenshot({path:out+'/08-public-mobile-parameters.png'});report.checks.push({name:'public-mobile-layout',pass:await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)&&await page.locator('.side').isVisible()});
+            }catch(e){report.publicFailure=String(e);report.publicBody=await page.locator('body').innerText().catch(()=>null);await page.screenshot({path:out+'/public-failure.png'}).catch(()=>{});}
+            report.pass=report.checks.every(x=>x.pass)&&report.errors.length===0&&report.publicErrors.length===0&&!!report.public?.state.ready;report.finishedAt=new Date().toISOString();fs.writeFileSync(out+'/verification.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));await browser.close();if(!report.pass)process.exitCode=1;
+          })().catch(async e=>{report.fatal=String(e);fs.writeFileSync(out+'/verification.json',JSON.stringify(report,null,2));console.error(e);await browser?.close();process.exitCode=1});
+          JS
+          node /tmp/skin-portable/verify.cjs
+      - name: Package source and actual evidence
+        if: always()
+        run: |
+          mkdir -p delivery/source
+          cp -a skin-quality-lab/r01/. delivery/source/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-quality-lab-r01-2-delivery
+          path: delivery/
+          retention-days: 14
