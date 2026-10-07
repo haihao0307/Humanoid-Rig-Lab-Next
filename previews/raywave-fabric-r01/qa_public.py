@@ -5,14 +5,22 @@ from PIL import Image, ImageStat
 ROOT = pathlib.Path(__file__).parent
 OUT = ROOT / 'qa-public'
 OUT.mkdir(exist_ok=True)
-APP_SHA = '1349c7ae02d1ee41e590a47353efd077a82ff230'
+APP_SHA = '5e0c981a8a45af700f479a08b6d89d0bf04c0814'
 EXPECTED_SHA = '95a75a5f2d16658493831f86ffb84c800448ba25a82a025b158f30594d7e29f8'
+EXPECTED_EXECUTED_SHA = '5fc5647f523037b5f035d109b11773aaa624d84ff87299a56a6c8342a4ef9699'
+SHADER_BEFORE = 'float floor=smoothstep(.17,.0,p.y);c=mix(c,vec3(.015,.018,.023)+vec3(.035)*exp(-abs(q.x)*2.4),floor*.62);'
+SHADER_AFTER = 'float floorMask=smoothstep(.17,.0,p.y);c=mix(c,vec3(.015,.018,.023)+vec3(.035)*exp(-abs(q.x)*2.4),floorMask*.62);'
 URL = f'https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/{APP_SHA}/previews/raywave-fabric-r01/index.html'
 
 encoded = ''.join(p.read_text().strip() for p in sorted((ROOT / 'chunks').glob('*.b64')))
 raw = gzip.decompress(base64.b64decode(encoded))
 actual_sha = hashlib.sha256(raw).hexdigest()
 assert actual_sha == EXPECTED_SHA, f'payload SHA mismatch: {actual_sha}'
+source_text = raw.decode('utf-8')
+assert SHADER_BEFORE in source_text, 'shader repair anchor missing'
+executed_text = source_text.replace(SHADER_BEFORE, SHADER_AFTER, 1)
+executed_sha = hashlib.sha256(executed_text.encode('utf-8')).hexdigest()
+assert executed_sha == EXPECTED_EXECUTED_SHA, f'executed SHA mismatch: {executed_sha}'
 
 report = {
     'url': URL,
@@ -20,6 +28,7 @@ report = {
     'qaCommit': os.environ.get('GITHUB_SHA'),
     'decodedBytes': len(raw),
     'decodedSha256': actual_sha,
+    'executedSha256': executed_sha,
     'contentIntegrity': True,
     'publicRender': False,
     'mobileIsViewportEmulation': True,
@@ -42,8 +51,10 @@ async def main():
             if await page.get_by_text('One more step', exact=True).count():
                 report['hostConfirmationRequired'] = True
                 await page.get_by_text('Open the page', exact=True).click()
-            await page.wait_for_function('window.__RAYWAVE_READY__ === true', timeout=90000)
-            await page.wait_for_function('window.__RAYWAVE_STATUS__ && window.__RAYWAVE_STATUS__.ready', timeout=30000)
+            await page.wait_for_function("window.__RAYWAVE_READY__ === true || document.body.innerText.includes('着色器编译失败') || document.body.innerText.includes('工作台载入失败')", timeout=30000)
+            if not await page.evaluate('window.__RAYWAVE_READY__ === true'):
+                raise RuntimeError((await page.locator('body').inner_text())[:1200])
+            await page.wait_for_function('window.__RAYWAVE_STATUS__ && window.__RAYWAVE_STATUS__.ready', timeout=15000)
             await page.wait_for_timeout(1200)
             report['renderer'] = await page.evaluate("document.getElementById('gl').getContext('webgl2').getParameter(7937)")
             report['initial'] = await page.evaluate('window.__RAYWAVE_STATUS__')
@@ -86,7 +97,7 @@ async def main():
             assert await page.locator('#compareLabels').evaluate("e=>e.classList.contains('show')")
 
             await page.locator('#diffraction').evaluate("e=>{e.value='1.8';e.dispatchEvent(new Event('input',{bubbles:true}))}")
-            assert await page.locator('#diffractionO').input_value() == '1.80'
+            assert await page.locator('#diffractionO').evaluate("e=>String(e.value || e.textContent).trim()") == '1.80'
             await page.locator('#pulse').click()
             await page.wait_for_timeout(400)
             report['controlsExecuted'] = True
