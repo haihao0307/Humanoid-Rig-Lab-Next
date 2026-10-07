@@ -63,8 +63,8 @@ jobs:
               contents=d/'Contents.dir/Contents.mime'
               raw=contents.read_bytes() if contents.exists() else b''
               decoded=raw.decode('utf-8','replace')
-              lower=(d.name+' '+decoded).lower()
-              role=next((r for r in ['pattern','thread','weave','detangle','convert','color'] if r in lower),'other')
+              definition_name=d.name.lower()
+              role=next((r for r in ['pattern','thread','weave','detangle','convert','color'] if r in definition_name),'other')
               tokens=sorted(set(re.findall(r'(?i)\b(?:attrib\w*|resample|sweep|ray|uv\w*|wire\w*|poly\w*|foreach\w*|subnet\w*|switch\w*)\b',decoded)))
               defs.append({'name':d.name,'role':role,'fileCount':len(files),'bytes':sum(p.stat().st_size for p in files),
                            'contentsBytes':len(raw),'contentsSha256':hashlib.sha256(raw).hexdigest() if raw else None,
