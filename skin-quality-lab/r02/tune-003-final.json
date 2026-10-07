@@ -1,0 +1,13 @@
+{
+  "replace": [
+    ["VERSION='skin-quality-lab/r02.0'", "VERSION='skin-quality-lab/r02.1'"],
+    ["const defaults={roughness:.48,oil:.24,detail:.75,pores:.24,poreSize:.32,fuzz:.32,pigment:.16,blood:.25,sss:.78,radius:1.3,azimuth:-46,exposure:.96,meso:.7,micro:.8,relief:.7,translucency:.65,occlusion:.9};", "const defaults={roughness:.5,oil:.25,detail:.75,pores:.24,poreSize:.32,fuzz:.32,pigment:.22,blood:.25,sss:.85,radius:1.2,azimuth:-46,exposure:1.03,meso:1.1,micro:1.25,relief:.7,translucency:.65,occlusion:.9};"],
+    ["e=.35,keyI=2.45,fillI=.10,rimI=.45,env=.22;", "e=.28,keyI=2.4,fillI=.12,rimI=.45,env=.3;"],
+    ["{studio:-38,raking:-78,back:135,daylight:-28}", "{studio:-46,raking:-78,back:135,daylight:-28}"],
+    ["const viewport=$('viewport');", "document.title='皮肤质感实验室 · R02.1';document.querySelector('.version').textContent='R02.1 · MICRO SKIN';document.querySelector('.caption-title').textContent='皮肤 / 近景与微结构';\nconst viewport=$('viewport');"],
+    ["float skinSpecMask=texture2D(uSpec,vMapUv).r;", "if(uPass>1.5){gl_FragColor=vec4(diffuseColor.rgb,1.);return;}\n float skinSpecMask=texture2D(uSpec,vMapUv).r;"],
+    ["state.assets={albedo:[albedo.image.width,albedo.image.height],normal:[normal.image.width,normal.image.height],displacement:[height.image.width,height.image.height]};", "state.assets={albedo:[albedo.image.width,albedo.image.height],baseNormal:[normal.image.width,normal.image.height],mesostructure:[mesoMap.image.width,mesoMap.image.height],microstructure:[microMap.image.width,microMap.image.height],surface:[surfaceMap.image.width,surfaceMap.image.height]};"],
+    ["skin-lookdev-r01.json", "skin-lookdev-r02.json"],
+    ["'skin-lab-r01-'+state.camera", "'skin-lab-r02-'+state.camera"]
+  ]
+}

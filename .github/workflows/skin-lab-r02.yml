@@ -8,12 +8,12 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: skin-r02
+  group: skin-r021-final
   cancel-in-progress: false
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 22
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,30 +28,20 @@ jobs:
           npm install --prefix /tmp/skin-r02 esbuild@0.25.10 playwright@1.55.1 pngjs@7.0.0
           cd /tmp/skin-r02
           npx playwright install --with-deps chromium
-      - name: Build scan bands, geometric visibility and modular workbench
+      - name: Build selected lookdev profile without altering scan reference
         env:
           NODE_PATH: /tmp/skin-r02/node_modules
         run: |
           python skin-quality-lab/r02/prepare.py
           python skin-quality-lab/r02/occlusion.py
           node skin-quality-lab/r02/build.cjs
-      - name: Capture lookdev variants directly from rendered pixels
+      - name: Validate selected profile and every tissue parameter
         env:
           NODE_PATH: /tmp/skin-r02/node_modules
         run: |
           python3 -m http.server 8793 --bind 127.0.0.1 > /tmp/skin-r02-http.log 2>&1 &
-          node skin-quality-lab/r02/lookdev.cjs
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: skin-r02-lookdev-grid
-          path: r02-evidence/lookdev/
-          retention-days: 14
-      - name: Validate local rendering and parameter controls
-        env:
-          NODE_PATH: /tmp/skin-r02/node_modules
-        run: node skin-quality-lab/r02/qa.cjs
-      - name: Commit tested new files without changing R01 or main
+          node skin-quality-lab/r02/qa.cjs
+      - name: Commit tested profile without changing R01 or main
         env:
           NODE_PATH: /tmp/skin-r02/node_modules
         run: |
@@ -60,13 +50,13 @@ jobs:
           git add skin-quality-lab/r02/app.js skin-quality-lab/r02/index.html
           git add -f skin-quality-lab/r02/assets
           if ! git diff --cached --quiet; then
-            git commit -m 'build(skin-r02): tested skin bands and geometric visibility'
+            git commit -m 'build(skin-r021): selected visual profile and tissue rendering'
             git push origin HEAD:experiment/skin-quality-lab-r01-20261007
           fi
           ASSET_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/r02/build.cjs
           git add skin-quality-lab/r02/preview.html
           if ! git diff --cached --quiet; then
-            git commit -m 'release(skin-r02): immutable bundled public preview'
+            git commit -m 'release(skin-r021): immutable bundled public preview'
             git push origin HEAD:experiment/skin-quality-lab-r01-20261007
           fi
           echo "LAB_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
@@ -76,7 +66,7 @@ jobs:
           SKIN_QA_DIR: r02-public-evidence
         run: |
           SKIN_QA_URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${LAB_COMMIT}/skin-quality-lab/r02/preview.html" node skin-quality-lab/r02/qa.cjs
-      - name: Preserve source and actual rendered evidence
+      - name: Preserve source, state and actual rendered evidence
         if: always()
         run: |
           mkdir -p delivery
@@ -87,6 +77,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: skin-r02-source-render-evidence
+          name: skin-r021-source-render-evidence
           path: delivery/
           retention-days: 14
