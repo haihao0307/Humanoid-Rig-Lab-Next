@@ -13,7 +13,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,13 +35,22 @@ jobs:
           python skin-quality-lab/r02/prepare.py
           python skin-quality-lab/r02/occlusion.py
           node skin-quality-lab/r02/build.cjs
-      - name: Validate local rendering, zero-oil mode and closeup lighting
+      - name: Capture lookdev variants directly from rendered pixels
         env:
           NODE_PATH: /tmp/skin-r02/node_modules
         run: |
           python3 -m http.server 8793 --bind 127.0.0.1 > /tmp/skin-r02-http.log 2>&1 &
-          node skin-quality-lab/r02/qa.cjs
           node skin-quality-lab/r02/lookdev.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-r02-lookdev-grid
+          path: r02-evidence/lookdev/
+          retention-days: 14
+      - name: Validate local rendering and parameter controls
+        env:
+          NODE_PATH: /tmp/skin-r02/node_modules
+        run: node skin-quality-lab/r02/qa.cjs
       - name: Commit tested new files without changing R01 or main
         env:
           NODE_PATH: /tmp/skin-r02/node_modules
