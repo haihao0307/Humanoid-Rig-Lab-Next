@@ -5,6 +5,7 @@ on:
     paths:
       - skin-quality-lab/r01/index.html
       - skin-quality-lab/r01/patch-*.json
+      - skin-quality-lab/r01/tools/**
       - .github/workflows/skin-lab-r01-visual-qa.yml
 permissions:
   contents: write
@@ -14,44 +15,40 @@ concurrency:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: skin-quality-lab/r01/
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Prepare reviewed reference assets and exact patches
+      - name: Prepare native scan derivatives and exact reviewed patches
         run: |
           git fetch --filter=blob:none origin experiment/skin-quality-lab-r01-20261007
           git merge --ff-only FETCH_HEAD
+          pip -q install pillow numpy scipy
+          python skin-quality-lab/r01/tools/prepare_hires.py
           python - <<'PY'
           from pathlib import Path
-          import urllib.request,json,hashlib
-          d=Path('skin-quality-lab/r01');p=d/'index.html';s=p.read_text()
-          if 't.flipY=false;' in s:
-            assert s.count('t.flipY=false;')==1
-            s=s.replace('t.flipY=false;','t.flipY=true;')
+          import json
+          d=Path('skin-quality-lab/r01');p=d/'index.html';s=p.read_text();record=d/'applied-patches.json'
+          applied=json.loads(record.read_text()) if record.exists() else []
           for patch in sorted(d.glob('patch-*.json')):
+            if patch.name in applied:continue
             for c in json.loads(patch.read_text())['changes']:
               if c['old'] in s:
                 assert s.count(c['old'])==c.get('count',1),patch
                 s=s.replace(c['old'],c['new'])
-              elif c['new'] not in s:
-                raise RuntimeError('Patch cannot be applied safely: '+str(patch))
-          p.write_text(s)
-          manifest=json.loads((d/'assets/manifest.json').read_text())
-          for name in ['head.glb','albedo.jpg','normal.jpg','specular.jpg','displacement.jpg']:
-            target=d/'assets'/name;item=manifest[name]
-            if not target.exists():target.write_bytes(urllib.request.urlopen(item['source'],timeout=60).read())
-            assert hashlib.sha256(target.read_bytes()).hexdigest()==item['sha256'],name
+              elif c['new'] not in s:raise RuntimeError('Patch cannot be applied safely: '+str(patch))
+            applied.append(patch.name)
+          p.write_text(s);record.write_text(json.dumps(applied,indent=2))
           PY
           git config user.name 'Skin Lab build'
           git config user.email 'skin-lab@users.noreply.github.com'
-          git add skin-quality-lab/r01/index.html
-          git add -f skin-quality-lab/r01/assets/head.glb skin-quality-lab/r01/assets/albedo.jpg skin-quality-lab/r01/assets/normal.jpg skin-quality-lab/r01/assets/specular.jpg skin-quality-lab/r01/assets/displacement.jpg
+          git add skin-quality-lab/r01/index.html skin-quality-lab/r01/applied-patches.json
+          git add -f skin-quality-lab/r01/assets/hires
           if ! git diff --cached --quiet; then
-            git commit -m 'build(skin-lab): verified reference binaries and reviewed visual patches'
+            git commit -m 'build(skin-lab): native 4K scan derivatives and reviewed render correction'
             git push origin HEAD:experiment/skin-quality-lab-r01-20261007
           fi
           echo "LAB_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
@@ -64,37 +61,8 @@ jobs:
         env:
           NODE_PATH: /tmp/skin-qa/node_modules
         run: |
-          mkdir -p skin-quality-lab/r01/qa
           python3 -m http.server 8793 --bind 127.0.0.1 --directory skin-quality-lab/r01 > /tmp/skin-http.log 2>&1 &
-          cat > /tmp/skin-qa/test.cjs <<'JS'
-          const {chromium}=require('playwright'),fs=require('fs'),crypto=require('crypto'),{PNG}=require('pngjs');
-          const out=process.env.GITHUB_WORKSPACE+'/skin-quality-lab/r01/qa';
-          const report={commit:process.env.LAB_COMMIT,desktop:{viewport:[1440,1040]},mobile:{viewport:[390,844],physicalDevice:false},screenshots:[],checks:[],errors:[]};let browser,page;
-          function diff(a,b){a=PNG.sync.read(a);b=PNG.sync.read(b);let sum=0,n=0;for(let i=0;i<a.data.length;i+=4){for(let c=0;c<3;c++){sum+=Math.abs(a.data[i+c]-b.data[i+c]);n++;}}return sum/n}
-          (async()=>{browser=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
-            page=await browser.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});
-            page.on('pageerror',e=>report.errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text())});
-            const snap=async(name)=>{await page.evaluate(()=>window.__SKIN_LAB__.render());await page.waitForTimeout(350);await page.screenshot({path:out+'/'+name+'.png'});report.screenshots.push(name+'.png');return await page.locator('#viewport canvas').screenshot()};
-            await page.goto('http://127.0.0.1:8793/index.html',{waitUntil:'networkidle'});await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready,null,{timeout:90000});await page.waitForTimeout(1200);
-            report.local=await page.evaluate(()=>({state:window.__SKIN_LAB__.state,camera:window.__SKIN_LAB__.camera(),geometry:window.__SKIN_LAB__.geometryInfo()}));
-            await snap('01-portrait');
-            await page.click('[data-camera="front"]');await snap('02-front');
-            await page.click('[data-camera="cheek"]');const natural=await snap('03-cheek-natural');
-            await page.evaluate(()=>window.__SKIN_LAB__.set({detail:0,pores:0,oil:0,sss:0}));const flat=await snap('04-cheek-no-detail');report.checks.push({name:'detail-changes-canvas',meanAbsolutePixelDifference:diff(natural,flat),pass:diff(natural,flat)>.15});
-            await page.click('#reset');await page.click('[data-camera="cheek"]');await page.click('[data-preset="oily"]');const oily=await snap('05-cheek-oily');report.checks.push({name:'oil-changes-canvas',meanAbsolutePixelDifference:diff(natural,oily),pass:diff(natural,oily)>.15});
-            await page.click('#reset');await page.click('[data-camera="ear"]');await page.selectOption('#lightPreset','back');await snap('06-ear-backlight');
-            await page.click('#reset');await page.selectOption('#lightPreset','raking');await snap('07-raking');
-            await page.selectOption('#layer','specular');await snap('08-specular');await page.selectOption('#layer','normal');await snap('09-normal');
-            await page.click('#reset');await page.click('#save');await page.evaluate(()=>window.__SKIN_LAB__.set({roughness:.67}));await page.click('#restore');report.checks.push({name:'save-restore',pass:await page.evaluate(()=>Math.abs(window.__SKIN_LAB__.values.roughness-.44)<1e-6)});
-            const url='https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/'+process.env.LAB_COMMIT+'/skin-quality-lab/r01/index.html';report.publicUrl=url;
-            try{await page.goto(url,{waitUntil:'networkidle',timeout:90000});await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready,null,{timeout:90000});await page.waitForTimeout(1000);await snap('10-public-desktop');report.public=await page.evaluate(()=>({url:location.href,title:document.title,state:window.__SKIN_LAB__.state}));await page.click('[data-preset="dry"]');report.checks.push({name:'public-preset',pass:await page.evaluate(()=>window.__SKIN_LAB__.values.roughness===.66)});
-              await page.setViewportSize({width:390,height:844});await page.evaluate(()=>{window.__SKIN_LAB__.set(window.__SKIN_LAB__.defaults);window.__SKIN_LAB__.setCamera('portrait')});await page.waitForTimeout(900);await snap('11-public-mobile-viewport');await page.click('#mobileToggle');await page.waitForTimeout(150);await snap('12-mobile-parameters');report.mobile.panelVisible=await page.locator('.side').isVisible();report.mobile.horizontalOverflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
-            }catch(e){report.publicError=String(e)}
-            report.finishedAt=new Date().toISOString();report.pass=report.errors.length===0&&report.checks.every(x=>x.pass)&&!!report.public?.state.ready&&report.mobile.panelVisible&&!report.mobile.horizontalOverflow;
-            fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));await browser.close();if(!report.pass)process.exitCode=1;
-          })().catch(async e=>{report.fatal=String(e);try{await page.screenshot({path:out+'/fatal.png'});report.pageState=await page.evaluate(()=>({text:document.body.innerText,state:window.__SKIN_LAB__?.state}));}catch{}fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));console.error(e);await browser?.close();process.exitCode=1});
-          JS
-          node /tmp/skin-qa/test.cjs
+          node skin-quality-lab/r01/tools/qa.cjs
       - name: Upload actual browser evidence and runnable build
         if: always()
         uses: actions/upload-artifact@v4
