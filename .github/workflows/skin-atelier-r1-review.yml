@@ -1,0 +1,93 @@
+name: Skin Atelier R1 browser review
+on:
+  push:
+    branches: [work/skin-atelier-r1-20261007]
+    paths: ['studies/skin-atelier-r1/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: studies/skin-atelier-r1
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser driver
+        run: npm install --no-save playwright@1.55.0
+      - name: Review deployed candidate and local fallback
+        env:
+          CANDIDATE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p evidence
+          cat > review.cjs <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('node:fs');
+          const http = require('node:http');
+          const path = require('node:path');
+          (async()=>{
+            const root=path.resolve('studies/skin-atelier-r1');
+            const server=http.createServer((req,res)=>{
+              const rel=decodeURIComponent(req.url.split('?')[0]);
+              const file=path.resolve(root, '.'+(rel==='/'?'/index.html':rel));
+              if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}
+              fs.readFile(file,(err,data)=>{if(err){res.writeHead(404);return res.end();}res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':'text/html');res.end(data);});
+            }).listen(8765,'127.0.0.1');
+            const bin=['/usr/bin/google-chrome','/usr/bin/chromium-browser','/usr/bin/chromium'].find(p=>fs.existsSync(p));
+            if(!bin)throw Error('No preinstalled Chromium browser');
+            const browser=await chromium.launch({executablePath:bin,headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
+            const page=await browser.newPage({viewport:{width:1280,height:900},deviceScaleFactor:1});
+            const errors=[],consoleErrors=[];
+            page.on('pageerror',e=>errors.push(String(e)));
+            page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});
+            const url=`https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${process.env.CANDIDATE_SHA}/studies/skin-atelier-r1/index.html`;
+            const report={sha:process.env.CANDIDATE_SHA,url,publicVerified:false,checks:[],errors,consoleErrors,device:'Desktop Chromium on GitHub runner; mobile viewport emulation only',visualAcceptance:false};
+            try {
+              let response=await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});
+              await page.waitForFunction(()=>window.__atelier?.ready,{timeout:90000});
+              report.publicVerified=!!response?.ok();
+            } catch(e){
+              report.publicFailure=String(e);
+              await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded',timeout:30000});
+              await page.waitForFunction(()=>window.__atelier?.ready||window.__atelierErrors?.length,{timeout:90000});
+            }
+            await page.screenshot({path:'evidence/01-portrait.png',timeout:90000});
+            report.runtime=await page.evaluate(()=>({ready:window.__atelier?.ready,stats:window.__atelier?.stats,errors:window.__atelierErrors,gl:window.__atelier?.renderer.getContext().getParameter(window.__atelier.renderer.getContext().RENDERER)}));
+            if(!report.runtime.ready)throw Error('Renderer did not become ready');
+            for(const [i,name] of ['eyes','skin','profile','eye'].entries()){
+              await page.locator(`[data-view="${name}"]`).click();
+              await page.waitForTimeout(500);
+              await page.screenshot({path:`evidence/0${i+2}-${name}.png`,timeout:90000});
+              report.checks.push({name,state:await page.evaluate(()=>window.__atelier.getState())});
+            }
+            await page.locator('[data-view="portrait"]').click();
+            await page.locator('#hairToggle').uncheck();
+            await page.screenshot({path:'evidence/06-without-hair.png',timeout:90000});
+            await page.locator('#hairToggle').check();
+            await page.locator('#pore').evaluate(e=>{e.value='1.3';e.dispatchEvent(new Event('input',{bubbles:true}));});
+            report.checks.push({name:'pore-slider',value:await page.evaluate(()=>window.__atelier.globals.pore.value)});
+            await page.locator('[data-light="rake"]').click();
+            await page.screenshot({path:'evidence/07-raking-light.png',timeout:90000});
+            await page.setViewportSize({width:390,height:844});
+            await page.locator('#home').evaluate(e=>e.click());
+            await page.screenshot({path:'evidence/08-mobile-viewport.png',timeout:90000});
+            await page.locator('#mobileControls').click();
+            report.mobilePanel=await page.locator('#panel').evaluate(e=>e.classList.contains('open'));
+            fs.writeFileSync('evidence/report.json',JSON.stringify(report,null,2));
+            console.log(JSON.stringify(report,null,2));
+            await browser.close();server.close();
+            if(errors.length||report.runtime.errors.length)process.exitCode=1;
+          })().catch(e=>{fs.writeFileSync('evidence/fatal.txt',String(e.stack||e));console.error(e);process.exit(1);});
+          NODE
+          node review.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-atelier-r1-browser-review
+          path: evidence
+          retention-days: 14
