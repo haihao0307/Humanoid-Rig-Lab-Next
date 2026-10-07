@@ -1,0 +1,45 @@
+{
+  "schema": "humanoid_rig/build_manifest@1.0",
+  "id": "hrl-m04-raywave-fabric-r01",
+  "version": "R01",
+  "status": "research_visual_candidate",
+  "entry": "index.html",
+  "sourcePaper": {
+    "title": "Realistic Cloth Rendering with a Ray-Wave Hybrid Shading Model",
+    "venue": "ACM Transactions on Graphics / SIGGRAPH Asia 2025",
+    "projectUrl": "https://blaire9989.github.io/ray-wave-fabric/",
+    "paperUrl": "https://blaire9989.github.io/assets/3_RayWaveFabric/paper.pdf"
+  },
+  "runtime": {
+    "api": "WebGL2",
+    "externalModels": 0,
+    "bitmapTextures": 0,
+    "drawCalls": 2,
+    "vertices": 25665,
+    "triangles": 50688
+  },
+  "features": {
+    "rayAverageGaussianMixture": true,
+    "waveCalibratedNoiseApproximation": true,
+    "apertureDiffractionApproximation": true,
+    "screenSpaceLOD": true,
+    "reflectionTransmissionHybrid": true,
+    "numericalReproduction": false
+  },
+  "payload": {
+    "encoding": "gzip+base64",
+    "chunks": ["chunks/00.b64", "chunks/01.b64", "chunks/02.b64", "chunks/03.b64"],
+    "decodedSha256": "95a75a5f2d16658493831f86ffb84c800448ba25a82a025b158f30594d7e29f8",
+    "decodedBytes": 40907,
+    "gzipBytes": 14764,
+    "base64Bytes": 19688
+  },
+  "boundaries": {
+    "authorCodeUsed": false,
+    "authorDatasetUsed": false,
+    "paperParametersClaimedExact": false,
+    "productionReady": false,
+    "physicalSampleCalibrated": false,
+    "mobileRealDeviceTested": false
+  }
+}
