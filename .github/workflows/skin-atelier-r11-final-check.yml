@@ -1,0 +1,73 @@
+name: Skin Atelier R1.1 public verification
+on:
+  push:
+    branches: [work/skin-atelier-r1-20261007]
+    paths: ['.github/workflows/skin-atelier-r11-final-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  deployments: read
+  pages: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: f1e9800bebcbd5486b9e252cfcc7f4e15556824d
+          sparse-checkout: studies/skin-atelier-r1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect existing hosting read-only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p final-evidence
+          gh api repos/${{ github.repository }}/pages > final-evidence/pages.json 2>final-evidence/pages-error.txt || true
+          gh api 'repos/${{ github.repository }}/deployments?environment=github-pages&per_page=5' > final-evidence/deployments.json 2>final-evidence/deployments-error.txt || true
+          gh api 'repos/${{ github.repository }}/actions/artifacts?name=github-pages&per_page=5' > final-evidence/pages-artifacts.json 2>final-evidence/pages-artifacts-error.txt || true
+          curl --max-time 20 -sS -D final-evidence/current-pages-headers.txt 'https://haihao0307.github.io/Humanoid-Rig-Lab-Next/' -o final-evidence/current-pages.html || true
+      - name: Install matched Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+      - name: Verify immutable public content after host confirmation
+        run: |
+          cat > final-check.cjs <<'NODE'
+          const {chromium}=require('playwright'),fs=require('fs'),crypto=require('crypto');
+          const report={version:'r1.1-candidate',commit:'f1e9800bebcbd5486b9e252cfcc7f4e15556824d',directWithoutConfirmation:false,publicAfterHostAcknowledgement:false,visualAcceptance:false,scope:'Matched Chromium/SwiftShader. Reduced 500x580 QA viewport, pixel ratio 1 for snapshots. Not a GPU performance benchmark or physical mobile test.',errors:[],consoleErrors:[],checks:[]};
+          const save=()=>fs.writeFileSync('final-evidence/report.json',JSON.stringify(report,null,2));const stage=s=>{report.stage=s;save();console.log(s)};
+          const timer=setTimeout(()=>{report.fatal='240 second watchdog at '+report.stage;save();process.exit(1)},240000);
+          (async()=>{
+           const url='https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/'+report.commit+'/studies/skin-atelier-r1/standalone.html';report.url=url;
+           const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
+           const context=await browser.newContext({viewport:{width:500,height:580},deviceScaleFactor:1});
+           const page=await context.newPage();page.on('pageerror',e=>{report.errors.push(String(e));save()});page.on('console',m=>{if(m.type()==='error'){report.consoleErrors.push(m.text());save()}});
+           stage('verify downloaded HTML hash');const response=await context.request.get(url,{timeout:30000}),body=await response.body();const expected=fs.readFileSync('studies/skin-atelier-r1/standalone.html');report.htmlByteMatch=body.equals(expected);report.sha256=crypto.createHash('sha256').update(expected).digest('hex');save();if(!report.htmlByteMatch)throw Error('Public HTML differs from immutable repository file');
+           // Official githack automation acknowledgement, documented at the
+           // provider homepage. User first visits still see its safety notice.
+           await context.addCookies([{name:'__Http-phish',value:'1',domain:'rawcdn.githack.com',path:'/',secure:true,httpOnly:true}]);report.acknowledgementMethod='Provider-documented automation cookie; does not remove the notice for end users';
+           stage('public navigation');await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});await page.waitForFunction(()=>window.__atelier?.ready||window.__atelierErrors?.length,{polling:500,timeout:45000});
+           report.runtime=await page.evaluate(()=>({ready:window.__atelier?.ready,version:window.__atelier?.version,stats:window.__atelier?.stats,errors:window.__atelierErrors}));report.publicAfterHostAcknowledgement=report.runtime.ready===true;save();if(!report.runtime.ready)throw Error(JSON.stringify(report.runtime));
+           stage('settle and idle check');await page.waitForTimeout(1000);const f1=await page.evaluate(()=>window.__atelier.frames);await page.waitForTimeout(250);const f2=await page.evaluate(()=>window.__atelier.frames);report.idleNoRedraw=Number.isInteger(f1)&&f1===f2;save();
+           // Native RAF remains active for the control checks. Canvas export
+           // captures an explicit rendered frame after changing settings.
+           async function shot(name,view){stage(name);const data=await page.evaluate(v=>{const a=window.__atelier;a.view(v);a.renderer.setPixelRatio(1);a.renderer.render(a.scene,a.camera);return a.renderer.domElement.toDataURL('image/png')},view);fs.writeFileSync('final-evidence/'+name+'.png',Buffer.from(data.split(',')[1],'base64'));report.checks.push({name,state:await page.evaluate(()=>window.__atelier.getState())});save()}
+           await shot('01-public-portrait','portrait');
+           stage('real orbit and zoom');const before=await page.evaluate(()=>window.__atelier.getState());await page.mouse.move(190,300);await page.mouse.down();await page.mouse.move(230,300);await page.mouse.up();await page.mouse.wheel(0,80);await page.waitForTimeout(400);const after=await page.evaluate(()=>window.__atelier.getState());report.orbitChanged=before.yaw!==after.yaw;report.zoomChanged=before.distance!==after.distance;
+           stage('material controls');report.controlChanges=await page.evaluate(()=>{const a=window.__atelier,p=document.querySelector('#pore');p.value='1.3';p.dispatchEvent(new Event('input',{bubbles:true}));const h=document.querySelector('#hairToggle');h.checked=false;h.dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('#mobileControls').click();return{pore:a.globals.pore.value,hair:a.getState().hair,panel:document.querySelector('#panel').classList.contains('open')}});save();
+           await shot('02-public-skin','skin');await shot('03-public-eye','eye');
+           stage('reset');await page.evaluate(()=>{document.querySelector('#pore').value='.65';document.querySelector('#pore').dispatchEvent(new Event('input',{bubbles:true}));const h=document.querySelector('#hairToggle');h.checked=true;h.dispatchEvent(new Event('change',{bubbles:true}));window.__atelier.view('portrait')});
+           report.renderChecksPassed=report.publicAfterHostAcknowledgement&&report.htmlByteMatch&&report.orbitChanged&&report.zoomChanged&&!report.errors.length&&!report.runtime.errors.length&&!report.consoleErrors.some(s=>/Shader Error|WebGLProgram|CONTEXT_LOST/.test(s));stage('complete');console.log(JSON.stringify(report,null,2));clearTimeout(timer);await browser.close();if(!report.renderChecksPassed)process.exitCode=1;
+          })().catch(e=>{report.fatal=String(e.stack||e);save();console.error(e);process.exit(1)});
+          NODE
+          node final-check.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-atelier-r11-final-evidence
+          path: final-evidence
+          retention-days: 30
