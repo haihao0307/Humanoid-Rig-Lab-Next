@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Ray–Wave Fabric Lab R01</title>
+<style>
+html,body{margin:0;height:100%;background:#07090d;color:#cbd5e1;font:14px/1.5 system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}body{display:grid;place-items:center}.loader{display:grid;gap:13px;justify-items:center}.ring{width:38px;height:38px;border:3px solid #253042;border-top-color:#e3af5a;border-radius:50%;animation:s 1s linear infinite}@keyframes s{to{transform:rotate(360deg)}}.error{max-width:620px;margin:24px;padding:18px;border:1px solid #7b3e3e;border-radius:12px;background:#1a1012;color:#ffd6d6;white-space:pre-wrap}
+</style>
+</head>
+<body><div class="loader"><div class="ring"></div><div>正在载入 Ray–Wave Fabric Lab R01…</div></div>
+<script type="module">
+const paths=['chunks/00.b64','chunks/01.b64','chunks/02.b64','chunks/03.b64'];
+const shaderBefore='float floor=smoothstep(.17,.0,p.y);c=mix(c,vec3(.015,.018,.023)+vec3(.035)*exp(-abs(q.x)*2.4),floor*.62);';
+const shaderAfter='float floorMask=smoothstep(.17,.0,p.y);c=mix(c,vec3(.015,.018,.023)+vec3(.035)*exp(-abs(q.x)*2.4),floorMask*.62);';
+try{
+  if(!('DecompressionStream' in window)) throw new Error('当前浏览器不支持 DecompressionStream，请使用新版 Chrome、Edge、Firefox 或 Safari。');
+  const parts=await Promise.all(paths.map(async path=>{
+    const response=await fetch(path,{cache:'no-store'});
+    if(!response.ok) throw new Error(`${path} 载入失败：HTTP ${response.status}`);
+    return (await response.text()).replace(/\s+/g,'');
+  }));
+  const binary=atob(parts.join(''));
+  const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  let html=await new Response(stream).text();
+  if(!html.includes(shaderBefore)) throw new Error('着色器修补锚点不存在，拒绝载入未识别的构建。');
+  html=html.replace(shaderBefore,shaderAfter);
+  document.open(); document.write(html); document.close();
+}catch(error){
+  document.body.innerHTML=`<div class="error"><b>工作台载入失败</b>\n\n${String(error?.stack||error)}</div>`;
+}
+</script>
+</body>
+</html>
