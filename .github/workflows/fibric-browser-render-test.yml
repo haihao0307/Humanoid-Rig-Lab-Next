@@ -13,7 +13,7 @@ concurrency:
 jobs:
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,8 +26,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Recover SHA-locked independently authored sources
-        run: python research/fibric-native-study/browser/build.py
+      - name: Recover and refine SHA-locked independently authored sources
+        run: |
+          python research/fibric-native-study/browser/build.py
+          python research/fibric-native-study/browser/polish.py
       - name: Bundle pinned open renderer
         run: |
           cd out/source
