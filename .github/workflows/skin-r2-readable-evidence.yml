@@ -1,0 +1,37 @@
+name: Skin R2 readable browser evidence
+on:
+  push:
+    branches: [work/skin-atelier-r2-data-driven-20261007]
+    paths: ['.github/workflows/skin-r2-readable-evidence.yml']
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser and CJK display fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+      - name: Capture unchanged exact public version
+        run: |
+          mkdir -p evidence
+          cat > capture.cjs <<'NODE'
+          const {chromium}=require('playwright'),fs=require('fs');
+          const url='https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/01bbb85aa258cc06bdd1b1d70c78e9f2977f2bf4/studies/skin-atelier-r2/observed-surface.html';
+          const report={url,commit:'01bbb85aa258cc06bdd1b1d70c78e9f2977f2bf4',fontSetup:'Noto CJK installed in QA operating system only',errors:[],fullCharacterComplete:false};
+          (async()=>{const browser=await chromium.launch({args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const page=await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:1});page.on('pageerror',e=>report.errors.push(String(e)));await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});await page.waitForFunction(()=>window.__surface?.ready,{timeout:60000,polling:500});await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:'evidence/01-desktop-readable.png',timeout:30000});await page.locator('[data-view="skin"]').click();await page.screenshot({path:'evidence/02-skin-readable.png',timeout:30000});await page.locator('#home').click();await page.locator('[data-mode="1"]').click();await page.screenshot({path:'evidence/03-geometry-readable.png',timeout:30000});await page.locator('#home').click();await page.setViewportSize({width:390,height:844});await page.evaluate(()=>{window.dispatchEvent(new Event('resize'));window.__surface.draw()});await page.screenshot({path:'evidence/04-mobile-viewport.png',timeout:30000});report.ready=await page.evaluate(()=>window.__surface.ready);report.stats=await page.evaluate(()=>window.__surface.stats);fs.writeFileSync('evidence/report.json',JSON.stringify(report,null,2));await browser.close();if(report.errors.length)process.exitCode=1;})().catch(e=>{report.fatal=String(e.stack||e);fs.writeFileSync('evidence/report.json',JSON.stringify(report,null,2));console.error(e);process.exit(1)});
+          NODE
+          node capture.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-r2-readable-evidence
+          path: evidence
+          retention-days: 30
