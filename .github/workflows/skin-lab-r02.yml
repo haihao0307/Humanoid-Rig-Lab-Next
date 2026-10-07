@@ -24,17 +24,18 @@ jobs:
           fetch-depth: 1
       - name: Install pinned build and test tools
         run: |
-          pip -q install pillow numpy scipy
+          pip -q install pillow numpy scipy numba
           npm install --prefix /tmp/skin-r02 esbuild@0.25.10 playwright@1.55.1 pngjs@7.0.0
           cd /tmp/skin-r02
           npx playwright install --with-deps chromium
-      - name: Build scan frequency bands and modular workbench
+      - name: Build scan bands, geometric visibility and modular workbench
         env:
           NODE_PATH: /tmp/skin-r02/node_modules
         run: |
           python skin-quality-lab/r02/prepare.py
+          python skin-quality-lab/r02/occlusion.py
           node skin-quality-lab/r02/build.cjs
-      - name: Validate local render and parameter responses
+      - name: Validate local rendering, zero-oil mode and closeup lighting
         env:
           NODE_PATH: /tmp/skin-r02/node_modules
         run: |
@@ -50,7 +51,7 @@ jobs:
           git add skin-quality-lab/r02/app.js skin-quality-lab/r02/index.html
           git add -f skin-quality-lab/r02/assets
           if ! git diff --cached --quiet; then
-            git commit -m 'build(skin-r02): tested skin bands and preserved workbench'
+            git commit -m 'build(skin-r02): tested skin bands and geometric visibility'
             git push origin HEAD:experiment/skin-quality-lab-r01-20261007
           fi
           ASSET_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/r02/build.cjs
