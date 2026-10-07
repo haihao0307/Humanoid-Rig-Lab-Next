@@ -1,0 +1,63 @@
+name: Skin R2 observed surface build and public QA
+on:
+  push:
+    branches: [work/skin-atelier-r2-data-driven-20261007]
+    paths: ['.github/workflows/skin-r2-observed-surface.yml','studies/skin-atelier-r2/**']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    env:
+      OPENBLAS_NUM_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: studies/skin-atelier-r2
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned CPU reconstruction and matched browser
+        run: |
+          pip install numpy==2.2.6 scipy==1.15.3 opencv-python-headless==4.13.0.92
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+      - name: Recover visible surface and generate honest-scoped webpage
+        run: python studies/skin-atelier-r2/reconstruct.py
+      - name: Publish only the isolated generated study
+        id: preview
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -eu
+          BRANCH=work/skin-atelier-r2-data-driven-20261007
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(git ls-remote origin "refs/heads/$BRANCH" | cut -f1)" = "$EXPECTED_SHA"
+          git add -- studies/skin-atelier-r2/observed-surface.html studies/skin-atelier-r2/build-report.json
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Build R2 limited-angle observed surface, not a completed digital human [skip ci]'
+          git push origin "HEAD:refs/heads/$BRANCH"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Test exact public content and native controls
+        env:
+          PREVIEW_SHA: ${{ steps.preview.outputs.sha }}
+        run: node studies/skin-atelier-r2/qa.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-r2-observed-surface-evidence
+          path: |
+            evidence
+            studies/skin-atelier-r2/observed-surface.html
+            studies/skin-atelier-r2/build-report.json
+            studies/skin-atelier-r2/reconstruct.py
+            studies/skin-atelier-r2/viewer.js
+            studies/skin-atelier-r2/template.html
+            studies/skin-atelier-r2/qa.cjs
+            studies/skin-atelier-r2/_working/geometry.npz
+          retention-days: 30
