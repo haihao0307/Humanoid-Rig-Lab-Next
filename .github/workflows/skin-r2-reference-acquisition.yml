@@ -1,0 +1,50 @@
+name: Skin R2 reference and source acquisition
+on:
+  push:
+    branches: [work/skin-atelier-r2-data-driven-20261007]
+    paths: ['.github/workflows/skin-r2-reference-acquisition.yml']
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Read exact public reference and official reconstruction schema
+        run: |
+          mkdir -p research
+          python - <<'PY'
+          import urllib.request,json,os,concurrent.futures
+          resources={
+           'shadowheart.mp4':'https://cdn.artstation.com/p/video_sources/002/676/142/shadowheart-custom-black-double.mp4',
+           'trellis-agents.txt':'https://huggingface.co/spaces/microsoft/TRELLIS.2/agents.md',
+           'trellis-info.json':'https://microsoft-trellis-2.hf.space/gradio_api/info',
+           'trellis-config.json':'https://microsoft-trellis-2.hf.space/config',
+           'trellis-app.py':'https://huggingface.co/spaces/microsoft/TRELLIS.2/raw/main/app.py',
+           'faceworks-tree.json':'https://api.github.com/repos/NVIDIAGameWorks/FaceWorks/git/trees/master?recursive=1',
+           'infinite-page.html':'https://casual-effects.com/data/index.html',
+           'human-shaders-tree.json':'https://api.github.com/repos/matmadness/HumanShaders/git/trees/main?recursive=1'
+          }
+          def download(kv):
+           name,url=kv
+           try:
+            req=urllib.request.Request(url,headers={'User-Agent':'SkinAtelier-Research/2.0'})
+            with urllib.request.urlopen(req,timeout=80) as r: data=r.read(120000000)
+            open('research/'+name,'wb').write(data)
+            return {'name':name,'url':url,'bytes':len(data),'ok':True}
+           except Exception as e:return {'name':name,'url':url,'error':str(e),'ok':False}
+          result=list(concurrent.futures.ThreadPoolExecutor(max_workers=4).map(download,resources.items()))
+          open('research/acquisition.json','w').write(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
+          PY
+      - name: Extract a few video observations
+        run: |
+          if test -s research/shadowheart.mp4; then
+            ffprobe -v error -show_format -show_streams -of json research/shadowheart.mp4 > research/video-info.json
+            for t in 0 2 4 7 10; do ffmpeg -hide_banner -loglevel error -ss $t -i research/shadowheart.mp4 -frames:v 1 -vf scale=1600:-1 research/frame-$t.jpg || true; done
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-r2-reference-research
+          path: research
+          retention-days: 7
