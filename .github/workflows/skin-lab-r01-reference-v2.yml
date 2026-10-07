@@ -1,0 +1,48 @@
+name: Skin Lab reference and hosting inspection
+on:
+  push:
+    branches: [experiment/skin-quality-lab-r01-20261007]
+    paths: [.github/workflows/skin-lab-r01-reference-v2.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Inspect primary reference download and public hosts
+        run: |
+          pip -q install pillow
+          mkdir -p inspection
+          python - <<'PY'
+          import urllib.request,urllib.parse,pathlib,re,json,zipfile,io,hashlib
+          from PIL import Image
+          out=pathlib.Path('inspection'); result={}
+          urls=[
+          'https://assets.renderman.pixar.com/Tutorials/photorealistic_head/10100_skin_shading_renderman_21.zip',
+          'https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/2c8f3b7712bad550ebe09818dbb65574abc3c9ea/skin-quality-lab/r01/index.html',
+          'https://rawcdn.githack.com/haihao0307/Humanoid-Rig-Lab-Next/2c8f3b7712bad550ebe09818dbb65574abc3c9ea/skin-quality-lab/r01/index.html']
+          for url in urls:
+            try:
+              response=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=150)
+              data=response.read(400000000);r={'status':response.status,'headers':dict(response.headers),'bytes':len(data),'url':response.url};result[url]=r
+              if '.zip' in url:
+                r['sha256']=hashlib.sha256(data).hexdigest();z=zipfile.ZipFile(io.BytesIO(data));r['files']=[]
+                for n in z.infolist():
+                  item={'name':n.filename,'size':n.file_size};r['files'].append(item)
+                  if re.search(r'license|readme|copyright',n.filename,re.I) and not n.is_dir():item['text']=z.read(n).decode(errors='replace')[:16000]
+                  if re.search(r'\.(jpg|png|tif|tiff|exr|bmp|tx)$',n.filename,re.I):
+                    try:
+                      b=z.read(n);im=Image.open(io.BytesIO(b));item['image']=[im.width,im.height,im.mode]
+                      im.thumbnail((512,512));im.convert('RGB').save(out/(re.sub('[^a-zA-Z0-9_.-]','_',n.filename)+'.jpg'))
+                    except Exception as e:item['imageError']=str(e)
+                (out/'pixar-head-project.zip').write_bytes(data)
+              else:r['text']=data.decode(errors='replace')[:45000]
+            except Exception as e:result[url]={'error':str(e)}
+          (out/'inspection.json').write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: skin-lab-reference-v2-inspection
+          path: inspection/
+          retention-days: 7
