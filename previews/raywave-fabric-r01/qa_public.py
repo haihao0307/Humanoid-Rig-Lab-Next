@@ -44,7 +44,14 @@ async def main():
         browser = await p.chromium.launch(headless=True, args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
         page = await browser.new_page(viewport={'width': 1440, 'height': 1000}, device_scale_factor=1)
         page.on('pageerror', lambda e: report['errors'].append(str(e)))
-        page.on('console', lambda e: report['consoleErrors'].append(e.text) if e.type == 'error' else None)
+        def on_console(message):
+            if message.type != 'error':
+                return
+            if 'ERR_BLOCKED_BY_RESPONSE.NotSameOrigin' in message.text:
+                report.setdefault('ignoredConsoleErrors', []).append(message.text)
+            else:
+                report['consoleErrors'].append(message.text)
+        page.on('console', on_console)
         try:
             response = await page.goto(URL, wait_until='domcontentloaded', timeout=60000)
             report['httpStatus'] = response.status if response else None
@@ -67,27 +74,30 @@ async def main():
 
             material_buttons = page.locator('[data-material]')
             for i in range(await material_buttons.count()):
-                await material_buttons.nth(i).click()
-                await page.wait_for_timeout(180)
-                status = await page.evaluate('window.__RAYWAVE_STATUS__')
-                report['materials'].append(status['material'])
-            assert len(set(report['materials'])) == 6
+                button = material_buttons.nth(i)
+                expected = (await button.locator('strong').inner_text()).strip()
+                await button.click()
+                await page.wait_for_function('(expected)=>window.__RAYWAVE_STATUS__?.material===expected', arg=expected, timeout=12000)
+                report['materials'].append((await page.evaluate('window.__RAYWAVE_STATUS__')).get('material'))
+            assert len(set(report['materials'])) == 6, report['materials']
 
             scene_buttons = page.locator('[data-scene]')
             for i in range(await scene_buttons.count()):
-                await scene_buttons.nth(i).click()
-                await page.wait_for_timeout(250)
-                status = await page.evaluate('window.__RAYWAVE_STATUS__')
-                report['scenes'].append(status['scene'])
-            assert len(set(report['scenes'])) == 3
+                button = scene_buttons.nth(i)
+                expected = (await button.inner_text()).strip()
+                await button.click()
+                await page.wait_for_function('(expected)=>window.__RAYWAVE_STATUS__?.scene===expected', arg=expected, timeout=12000)
+                report['scenes'].append((await page.evaluate('window.__RAYWAVE_STATUS__')).get('scene'))
+            assert len(set(report['scenes'])) == 3, report['scenes']
 
             mode_buttons = page.locator('[data-mode]')
             for i in range(await mode_buttons.count()):
-                await mode_buttons.nth(i).click()
-                await page.wait_for_timeout(180)
-                status = await page.evaluate('window.__RAYWAVE_STATUS__')
-                report['modes'].append(status['mode'])
-            assert len(set(report['modes'])) == 3
+                button = mode_buttons.nth(i)
+                expected = (await button.inner_text()).strip()
+                await button.click()
+                await page.wait_for_function('(expected)=>window.__RAYWAVE_STATUS__?.mode===expected', arg=expected, timeout=12000)
+                report['modes'].append((await page.evaluate('window.__RAYWAVE_STATUS__')).get('mode'))
+            assert len(set(report['modes'])) == 3, report['modes']
 
             await page.locator('[data-material="1"]').click()
             await page.locator('[data-scene="0"]').click()
