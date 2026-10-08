@@ -20,7 +20,9 @@ research=research.replace("const t=j/lid.ni*.42,idx=Math.round(t*lid.R)*(lid.A+1
 research=research.replace("dispose(){for(const e of this.eyes)e.edgeMap?.dispose();super.dispose();}","dispose(){for(const e of this.eyes){e.edgeMap?.dispose();e.lid.mesh.customDepthMaterial?.dispose();}super.dispose();}");
 fs.writeFileSync(__dirname+'/ResearchEyes.js',research);
 let html=fs.readFileSync(root+'/index.html','utf8');const sha=process.env.ASSET_COMMIT,prefix='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+sha+'/skin-quality-lab/';
-html=html.replaceAll('../r01/',prefix+'r01/').replaceAll('../r02/',prefix+'r02/');fs.writeFileSync(root+'/index.html',html);
+// Attribution links can use immutable raw URLs. Native module import maps must
+// remain local because GitHub raw serves JS as text/plain; preview is bundled.
+html=html.replaceAll('href="../r01/','href="'+prefix+'r01/').replaceAll('href="../r02/','href="'+prefix+'r02/');fs.writeFileSync(root+'/index.html',html);
 const manifest=JSON.parse(fs.readFileSync(root+'/BUILD_MANIFEST.json','utf8'));
 Object.assign(manifest,{shadowMethod:'Three.js 17-tap PCF, 2048 map, radius 10; matched eyelid depth surface',pcssCandidateShipped:false,shadowSelectionEvidenceRun:37769859569,innerContactRowsInterpolated:true,fixedTargetRecipeRestoration:true,fullNeuralReconstruction:false});fs.writeFileSync(root+'/BUILD_MANIFEST.json',JSON.stringify(manifest,null,2));
 require('./bundle.cjs');
