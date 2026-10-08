@@ -1,0 +1,80 @@
+name: ET03 reviewed website release
+on:
+  push:
+    branches: [experiment/emily-eyelid-research-et03-20261008]
+    paths: ['.github/workflows/et03-release.yml']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser and bundler
+        timeout-minutes: 4
+        run: |
+          npm install --prefix /tmp/et03-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/et03-tools/node_modules/.bin/playwright install chromium
+          timeout 75s sudo apt-get install --no-install-recommends -y fonts-wqy-zenhei || true
+      - name: Rebuild the visually selected candidate
+        env:
+          NODE_PATH: /tmp/et03-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 06b92744537caf0709b9bb73e4917453bc238294
+          node skin-quality-lab/emily-transfer/research/refine.cjs
+          node skin-quality-lab/emily-transfer/research/closure.cjs
+          node skin-quality-lab/emily-transfer/research/fit-depth.cjs
+          node skin-quality-lab/emily-transfer/research/finish.cjs
+          node skin-quality-lab/emily-transfer/research/select-release.cjs
+      - name: Contact, rendering and retained-interaction regression
+        env:
+          NODE_PATH: /tmp/et03-tools/node_modules
+        run: node skin-quality-lab/emily-transfer/research/accept.cjs
+      - name: Save source acceptance evidence
+        run: |
+          mkdir -p /tmp/et03-release-evidence/local
+          cp -r /tmp/et03-evidence/. /tmp/et03-release-evidence/local/
+          cp /tmp/et03-evidence/report.json skin-quality-lab/emily-transfer/research/qa-local.json
+          mkdir -p skin-quality-lab/emily-transfer/research/evidence
+          cp /tmp/et03-evidence/{01-portrait.png,02-eyes.png,03-halfblink.png,04-closed.png,06-iris.png,07-mobile.png,08-squint.png} skin-quality-lab/emily-transfer/research/evidence/
+      - name: Publish validated source on the isolated branch
+        run: |
+          git config user.name 'et03-eye-validation'
+          git config user.email 'et03-eye-validation@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer/{app.js,index.html,preview.html,BUILD_MANIFEST.json}
+          git add skin-quality-lab/emily-transfer/eyes/{EyeSystem.js,FittedEyes.js}
+          git add skin-quality-lab/emily-transfer/research/{ResearchEyes.js,qa-local.json,evidence}
+          git commit -m 'build(eyes): publish contact-constrained ET03 and visual evidence [skip ci]'
+          git push origin HEAD:experiment/emily-eyelid-research-et03-20261008
+          git rev-parse HEAD > /tmp/et03-release-evidence/published-commit.txt
+      - name: Verify the actual public HTTPS page
+        env:
+          NODE_PATH: /tmp/et03-tools/node_modules
+        run: |
+          rm -rf /tmp/et03-evidence
+          ET03_PUBLIC_SHA=$(git rev-parse HEAD) node skin-quality-lab/emily-transfer/research/accept.cjs
+          mkdir -p /tmp/et03-release-evidence/public
+          cp -r /tmp/et03-evidence/. /tmp/et03-release-evidence/public/
+      - name: Preserve source and any failure evidence
+        if: always()
+        run: |
+          mkdir -p /tmp/et03-release-evidence/candidate /tmp/et03-release-evidence/latest-check
+          cp -r skin-quality-lab/emily-transfer/. /tmp/et03-release-evidence/candidate/
+          cp -r /tmp/et03-evidence/. /tmp/et03-release-evidence/latest-check/ || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et03-reviewed-public-release
+          path: /tmp/et03-release-evidence
+          retention-days: 14
