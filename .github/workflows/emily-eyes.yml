@@ -14,7 +14,7 @@ concurrency:
 jobs:
   eyes:
     runs-on: ubuntu-latest
-    timeout-minutes: 28
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,6 +44,7 @@ jobs:
           python3 skin-quality-lab/emily-transfer/eyes/prepare.py
           node skin-quality-lab/emily-transfer/build.cjs
           node skin-quality-lab/emily-transfer/eyes/refine.cjs
+          node skin-quality-lab/emily-transfer/eyes/naturalize.cjs
       - name: Actual browser regression
         env:
           NODE_PATH: /tmp/eye-tools/node_modules
@@ -60,7 +61,7 @@ jobs:
           git config user.email 'eye-integration-validation@users.noreply.github.com'
           git add skin-quality-lab/emily-transfer
           if ! git diff --cached --quiet; then
-            git commit -m 'build(eyes): publish fitted optical eyes and browser evidence [skip ci]'
+            git commit -m 'build(eyes): publish natural fitted eyes and browser evidence [skip ci]'
             git push origin HEAD:experiment/emily-skin-transfer-r01-20261008
           fi
           git rev-parse HEAD > /tmp/eye-evidence/published-commit.txt
