@@ -1,0 +1,40 @@
+const fs=require('fs'),path=require('path'),cp=require('child_process'),crypto=require('crypto'),vm=require('vm'),esbuild=require('esbuild');
+const dir=path.resolve(__dirname,'..');
+const baseline='06b92744537caf0709b9bb73e4917453bc238294';
+const readBase=p=>process.env.ET03_BASE_DIR?fs.readFileSync(path.join(process.env.ET03_BASE_DIR,p),'utf8'):cp.execFileSync('git',['show',baseline+':skin-quality-lab/emily-transfer/'+p],{encoding:'utf8',maxBuffer:8000000});
+let app=readBase('app.js'),html=readBase('index.html'),eye=readBase('eyes/EyeSystem.js'),fitted=readBase('eyes/FittedEyes.js');
+const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
+if(hash(app)!=='42360aa08a057e3e42d4809e7ab3fb64e47a9a02401c123fe190fb3437a92118')throw Error('ET02.1 baseline changed');
+function replace(s,a,b){if(!s.includes(a))throw Error('Absent ET03 anchor: '+a);return s.replaceAll(a,b);}
+eye=replace(eye,"EYE_VERSION='eyes/1.2.0'","EYE_VERSION='eyes/3.0.0'");
+eye=replace(eye,'rx:.0152,ry:.0107,half:.0118','rx:.0205,ry:.0175,half:.0122');
+eye=replace(eye,'rx:.0150,ry:.0106,half:.0116','rx:.0203,ry:.0173,half:.0120');
+eye=replace(eye,'vec2(.0152,.0107)','vec2(.0205,.0175)');eye=replace(eye,'vec2(.0150,.0106)','vec2(.0203,.0173)');
+eye=replace(eye,'opening:.94','opening:1');
+app=replace(app,"import {FittedEyes as EyeSystem} from './eyes/FittedEyes.js';","import {ResearchEyes as EyeSystem} from './research/ResearchEyes.js';");
+app=replace(app,"VERSION='emily-transfer/2.0.0'","VERSION='emily-transfer/3.0.0'");
+app=app.replaceAll('ET02 · EYES','ET03 · CONTACT').replaceAll('皮肤与眼球 · ET02','眼球与眼睑 · ET03').replaceAll('opening:.94','opening:1');
+app=app.replaceAll('emily-transfer-et01','emily-transfer-et03');
+app=app.replace('apply();init().catch(fail);',`
+const researchControls=()=>{
+ const c=$('researchClosure'),q=$('researchSquint');
+ c.oninput=()=>{if(!eyesRig)return;eyesRig.config.manualBlink=+c.value;eyesRig.update(0,true);dirty=true;};
+ q.oninput=()=>{if(!eyesRig)return;eyesRig.config.squint=+q.value;eyesRig.update(0,true);dirty=true;};
+ $('researchRelease').onclick=()=>{if(!eyesRig)return;eyesRig.config.manualBlink=-1;eyesRig.config.squint=0;c.value=0;q.value=0;eyesRig.update(0,true);dirty=true;};
+ $('reset').addEventListener('click',()=>{if(!eyesRig)return;eyesRig.config.manualBlink=-1;eyesRig.config.squint=0;c.value=0;q.value=0;eyesRig.update(0,true);});
+};researchControls();apply();init().catch(fail);`);
+html=html.replaceAll('ET02 · EYES','ET03 · CONTACT').replaceAll('ET02 / EYES','ET03 / CONTACT').replaceAll('皮肤与眼球 · ET02','眼球与眼睑 · ET03');
+html=html.replace('<h1>皮肤与眼球实验台</h1>','<h1>眼球与眼睑实验台</h1>');
+html=html.replace('<div class="presets"><button data-eye-mode="camera"',`<p class="hint">AniEyelid 接触约束 · ShellNeRF 表面分层思路<br>本页为实时几何适配，未训练论文神经模型。</p><div class="presets"><button data-eye-mode="camera"`);
+html=html.replace('<p class="hint">成人眼球尺度',`<div class="control"><label for="researchClosure">慢动作闭眼检查 <span>开 → 闭</span></label><input id="researchClosure" type="range" min="0" max="1" step=".005" value="0"></div><div class="control"><label for="researchSquint">独立眯眼 / 眼周收紧</label><input id="researchSquint" type="range" min="0" max="1" step=".01" value="0"></div><button id="researchRelease">恢复自然眨眼与开合</button><p class="hint">成人眼球尺度`);
+html=html.replace('ET02：本头模新增独立光学眼球、拟合眼睑和双眼注视。','ET03：重建睑缘、内外眼睑曲面与接触约束，增加独立眯眼及慢闭眼测试。');
+html=html.replace('</style>','\n.eye-section .hint{line-height:1.65}.top-tools{display:flex;gap:4px;max-width:calc(100% - 25px);flex-wrap:wrap}.top-tools button{white-space:nowrap}@media(max-width:760px){.top-tools{max-width:calc(100% - 15px)}.caption-title{font-size:16px}}\n</style>');
+fs.writeFileSync(dir+'/app.js',app);fs.writeFileSync(dir+'/index.html',html);fs.writeFileSync(dir+'/eyes/EyeSystem.js',eye);fs.writeFileSync(dir+'/eyes/FittedEyes.js',fitted);
+const r01=path.resolve(dir,'../r01');
+const bundle=esbuild.buildSync({entryPoints:[dir+'/app.js'],bundle:true,minify:true,format:'iife',target:'es2022',write:false,legalComments:'inline',alias:{three:r01+'/vendor/three.module.js','three/addons':r01+'/vendor/addons'}}).outputFiles[0].text;
+const sha=process.env.ASSET_COMMIT;if(!/^[0-9a-f]{40}$/.test(sha||''))throw Error('Fixed asset SHA required');const prefix='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+sha+'/skin-quality-lab/';
+const code=bundle.replaceAll('../r01/',prefix+'r01/').replaceAll('../r02/',prefix+'r02/').replaceAll('</script','<\\/script');new vm.Script(code);
+const preview=html.replace(/<script type="importmap">[\s\S]*?<\/script>/,'').replace('<script type="module" src="./app.js"></script>',()=>'<script>'+code+'</script>');
+const scripts=[...preview.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)];if(scripts.length!==1||scripts[0][1]!==code)throw Error('Embedded code mismatch');new vm.Script(scripts[0][1]);fs.writeFileSync(dir+'/preview.html',preview);
+const manifest={version:'ET03',codeVersion:'emily-transfer/3.0.0',eyeVersion:'eyes/3.0.0',baseline,assetCommit:sha,appSHA256:hash(app),previewSHA256:hash(preview),researchModuleSHA256:hash(fs.readFileSync(__dirname+'/ResearchEyes.js')),sourceHeadMeshChanged:false,eyelidSurfaceReconstructed:true,innerAndOuterEyelidShells:true,eyeModel:'smooth two-sphere sclera/cornea junction',neutralMarginData:'MakeHuman hm08 CC0 measured eye pocket contour',irisTexture:'preserved MakeHuman CC0 grey eye atlas',trainedAniEyelid:false,trainedShellNeRF:false,paperPrinciplesAdapted:true,absoluteBestQualityClaim:false,realMobileDeviceTested:false};
+fs.writeFileSync(dir+'/BUILD_MANIFEST.json',JSON.stringify(manifest,null,2));console.log('ET03_BUILD',JSON.stringify(manifest));
