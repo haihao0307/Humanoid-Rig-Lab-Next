@@ -1,0 +1,105 @@
+name: ET02 eyes build and public acceptance
+on:
+  push:
+    branches: [feature/emily-eyes-et02-20261008]
+    paths:
+      - '.github/workflows/emily-eyes-build.yml'
+      - 'skin-quality-lab/emily-transfer/**'
+permissions:
+  contents: write
+concurrency:
+  group: et02-eyes-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  eyes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore checked six-file source bundle
+        run: |
+          python3 - <<'PY'
+          import pathlib,base64,lzma,json,hashlib
+          root=pathlib.Path('skin-quality-lab/emily-transfer')
+          parts=[root/'eyes/source-1.b64',root/'eyes/source-2.b64']
+          allowed={'eyes/EyeRig.js','eyes/ui-runtime.js','eyes/qa.cjs','eyes/public.cjs','eyes/README.md','build-eyes.cjs'}
+          if any(p.exists() for p in parts):
+              encoded=''.join(p.read_text().strip() for p in parts)
+              data=lzma.decompress(base64.b64decode(encoded,validate=True))
+              expected='8f9b051e1e8f5b454420254678bc030f5a14ee1fe272d2c914ba380830d00610'
+              assert hashlib.sha256(data).hexdigest()==expected, 'Source transport checksum mismatch'
+              files=json.loads(data)
+              assert set(files)==allowed, 'Unexpected source path'
+              for name,content in files.items():
+                  target=root/name
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_text(content,encoding='utf-8')
+              record={'schema':'et02/source-transport@1','sha256':expected,'files':{k:hashlib.sha256(v.encode()).hexdigest() for k,v in files.items()},'description':'Checked transport of locally authored and browser-tested sources; readable files are authoritative after expansion.'}
+              (root/'eyes/SOURCE_BUNDLE.json').write_text(json.dumps(record,indent=2))
+              for p in parts:p.unlink()
+          assert all((root/p).is_file() for p in allowed), 'Missing readable source file'
+          print('Six eye source files ready.')
+          PY
+      - name: Install build and browser tools
+        run: |
+          npm install --prefix /tmp/et02-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/et02-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Build final ET02 HTML
+        env:
+          NODE_PATH: /tmp/et02-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          node skin-quality-lab/emily-transfer/build-eyes.cjs
+          node - <<'JS'
+          const fs=require('fs'),assert=require('assert/strict'),d='skin-quality-lab/emily-transfer/';
+          const m=JSON.parse(fs.readFileSync(d+'EYES_BUILD_MANIFEST.json'));
+          assert.equal(m.baseAppSHA256,'a02c5de123de7f139aba072d7479062db8da1296459e0926b3130b7f03581e90');
+          assert(!fs.readFileSync(d+'preview.html','utf8').includes('window.__DEV__'));
+          JS
+          test -z "$(git diff --name-only -- skin-quality-lab/r01 skin-quality-lab/r02)"
+      - name: Browser geometry gaze optics and controls acceptance
+        env:
+          NODE_PATH: /tmp/et02-tools/node_modules
+        run: |
+          node skin-quality-lab/emily-transfer/eyes/qa.cjs
+          node -e "if(!require('./skin-quality-lab/emily-transfer/eyes/evidence/eyes-qa.json').passed)process.exit(1)"
+      - name: Publish tested readable source and immutable preview
+        run: |
+          git config user.name 'et02-eyes-validation'
+          git config user.email 'et02-eyes-validation@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer
+          git commit -m 'feat(eyes): ET02 fitted eyes, shared fixation, pupil optics and tested preview [skip ci]'
+          git push origin HEAD:feature/emily-eyes-et02-20261008
+          sleep 12
+      - name: Verify real public HTTPS rendering and interaction
+        env:
+          NODE_PATH: /tmp/et02-tools/node_modules
+        run: node skin-quality-lab/emily-transfer/eyes/public.cjs
+      - name: Record permanent public proof
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          root=pathlib.Path('skin-quality-lab/emily-transfer')
+          proof=json.loads((root/'eyes/evidence/eyes-public.json').read_text())
+          assert proof['passed'] is True
+          text='# ET02 双眼公网交付\n\n固定网页：\n'+proof['url']+'\n\n验证版本：'+proof['publishedCommit']+'\n\n眼球安装、视线锁定、转头补偿、近景与手机视口由真实公网页面验证。未拦截网络、未使用本机服务器替代公网。\n\n桌面 1440×1040；手机 390×844 浏览器视口，不是手机实机性能测试。\n\n实现边界及原站学习记录见 eyes/README.md；逐项证据见 eyes/evidence/eyes-qa.json 与 eyes/evidence/eyes-public.json。原 ET01 固定链接保留。\n'
+          (root/'PUBLIC_EYES_DELIVERY.md').write_text(text)
+          PY
+          git add skin-quality-lab/emily-transfer/eyes/evidence skin-quality-lab/emily-transfer/PUBLIC_EYES_DELIVERY.md
+          git commit -m 'test(eyes): record independently verified public ET02 page and real screenshots [skip ci]'
+          git push origin HEAD:feature/emily-eyes-et02-20261008
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ET02-eyes-source-browser-public-proof
+          path: skin-quality-lab/emily-transfer
+          retention-days: 14
