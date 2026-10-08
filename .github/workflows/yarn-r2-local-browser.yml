@@ -1,0 +1,26 @@
+name: Yarn R2 local browser dependency
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths: ['.github/workflows/yarn-r2-local-browser.yml']
+permissions:
+  contents: read
+jobs:
+  browser-dependency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install chromium --only-shell
+          mkdir -p browser-runtime
+          tar -czf browser-runtime/chromium.tar.gz -C "$HOME/.cache/ms-playwright" .
+          sha256sum browser-runtime/chromium.tar.gz > browser-runtime/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yarn-r2-headless-browser
+          path: browser-runtime/
+          retention-days: 2
