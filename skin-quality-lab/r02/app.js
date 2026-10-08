@@ -243,13 +243,13 @@ function identityHairGeometry(geometry,profile,maps){
   const bottom=smooth(-.031,-.022,q.y),lip=ax<.029&&Math.abs(q.y-.0185)<.0065;
   const probability=Math.max(cheek,chin,moustache?.88:0)*bottom;
   const beard=!lip&&rand()<probability;
-  const kind=brow&&!notch?'brow':beard?'beard':null;if(!kind||output[kind].length>=profile[kind])continue;
+  const kind=brow&&!notch?'brow':beard?'beard':null;if(!kind||output[kind].length>=profile[kind])continue;if(kind==='beard'&&q.y<.023&&q.z<.048)continue;
   if(kind==='brow'&&profile.seed===159&&Math.sin(ax*970+q.y*1760)>.65&&rand()>.27)continue;
   nn.set(n.getX(ia)*(1-u-v)+n.getX(ib)*u+n.getX(ic)*v,n.getY(ia)*(1-u-v)+n.getY(ib)*u+n.getY(ic)*v,n.getZ(ia)*(1-u-v)+n.getZ(ib)*u+n.getZ(ic)*v).normalize();
   if(nn.z<.04)continue;
   const field=Math.sin(q.x*97+q.y*133)+.4*Math.sin(q.x*229-q.y*71);
   const flow=kind==='brow'?new THREE.Vector3(side*(.72+.18*rand()),.45-.83*t,0):new THREE.Vector3(side*(moustache?.92:.13+.15*smooth(-.015,.035,q.y))+.11*field,-1,.06);
-  flow.x+=(rand()-.5)*.18;flow.y+=(rand()-.5)*.12;flow.addScaledVector(nn,-flow.dot(nn)).normalize();
+  flow.x+=(rand()-.5)*.18;flow.y+=(rand()-.5)*.12;if(kind==='brow'||flow.dot(nn)<0)flow.addScaledVector(nn,-flow.dot(nn));flow.normalize();
   let length=kind==='brow'?(profile.seed===218?.0017+rand()*.0020:profile.seed===159?.0025+rand()*.0038:.0021+rand()*.0030):(profile.seed===159?.0026+rand()*.0048:.00055+rand()*.00115);
   if(kind==='beard'&&moustache)length*=.73;
   const silver=profile.seed===159&&rand()<(kind==='brow'?.60:.78);
@@ -261,7 +261,7 @@ function identityHairGeometry(geometry,profile,maps){
  for(const kind of ['brow','beard']){
   const positions=[],normals=[],roots=[],colors=[],tangents=[],ts=[],sides=[],ids=[],randoms=[],radii=[],relief=[];const segments=kind==='beard'&&profile.seed===159?10:7;
   for(const strand of output[kind]){const start=positions.length/3,across=new THREE.Vector3().crossVectors(strand.n,strand.flow).normalize(),points=[];
-   for(let j=0;j<=segments;j++){const t=j/segments;const lift=strand.radius*1.2+strand.length*(.16*t+.12*t*t);const bend=Math.sin(t*Math.PI*(1.25+strand.curl*.75))*strand.length*.11*t;
+   for(let j=0;j<=segments;j++){const t=j/segments;const lift=strand.radius*1.2+strand.length*(.30*t+.15*t*t);const bend=Math.sin(t*Math.PI*(1.25+strand.curl*.75))*strand.length*.11*t;
     points.push(strand.p.clone().addScaledVector(strand.n,lift).addScaledVector(strand.flow,strand.length*(.75*t+.10*t*t)).addScaledVector(across,bend*(strand.curl-.5)*2));}
    for(let j=0;j<=segments;j++){const t=j/segments,tangent=points[Math.min(j+1,segments)].clone().sub(points[Math.max(0,j-1)]).normalize(),radius=strand.radius*Math.pow(Math.max(.015,1-t),.70);
     for(const side of [-1,1]){positions.push(...points[j].toArray());roots.push(...points[0].toArray());normals.push(...strand.n.toArray());colors.push(...strand.col.toArray());tangents.push(...tangent.toArray());ts.push(t);sides.push(side);randoms.push(strand.random);radii.push(radius);relief.push(...strand.relief.toArray());}
