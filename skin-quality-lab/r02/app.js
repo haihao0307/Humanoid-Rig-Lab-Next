@@ -1,14 +1,16 @@
 import {attachFiberMaterial,fiberMaterialDiagnostics} from './identities/FiberMaterial.js';
+import {createScanAgeMorph} from './identities/AgeMorph.js';
+import {scanBrowGuide} from './identities/BrowAnatomy.js';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-const $=id=>document.getElementById(id),VERSION='skin-quality-lab/r02.3-skin-hair';
+const $=id=>document.getElementById(id),VERSION='skin-quality-lab/r02.4-brow-age';
 const defaults={roughness:.5,oil:.25,detail:.75,pores:.24,poreSize:.32,fuzz:.32,pigment:.22,blood:.25,sss:.85,radius:1.2,azimuth:-46,exposure:1.03,meso:1.1,micro:1.25,relief:.7,translucency:.65,occlusion:.9};
 const values={...defaults};
 const presets={natural:{...defaults},dry:{...defaults,roughness:.66,oil:.04,detail:.94,pores:.48,sss:.48},oily:{...defaults,roughness:.32,oil:.78,detail:.72,pores:.32,sss:.72},warm:{...defaults,pigment:.62,blood:.42,roughness:.46,oil:.3,sss:.72}};
 const state={ready:false,version:VERSION,errors:[],layer:'beauty',light:'studio',camera:'portrait',baseline:false,frames:0,quality:'high',fps:0};
 window.__SKIN_LAB__={state,values,defaults};
-document.title='皮肤质感实验室 · R02.3 三套表皮';document.querySelector('.version').textContent='R02.3 · 3 SKINS';document.querySelector('.caption-title').textContent='皮肤 / 近景与微结构';
+document.title='皮肤质感实验室 · R02.4 三套表皮';document.querySelector('.version').textContent='R02.4 · 3 SKINS';document.querySelector('.caption-title').textContent='皮肤 / 近景与微结构';
 const viewport=$('viewport');let albedoRT,entryRT,entryCamera,entryMaterial,entryDirty=true;
 let renderer,scene,camera,controls,mesh,skin,fuzz,fullRT,diffRT,blurA,blurB,blurMaterial,composeMaterial,quad,postScene,postCamera,key,fill,rim,pmremTarget,dirty=true,shader,compareHeld=false,last=performance.now(),frameCount=0,lastStat=last;
 const U={uPass:{value:0},uDetail:{value:values.detail},uPores:{value:values.pores},uPoreFrequency:{value:450/values.poreSize},uPigment:{value:values.pigment},uBlood:{value:values.blood},uScatter:{value:values.sss},uOil:{value:values.oil},uHeight:{value:null},uSpec:{value:null},uBaseline:{value:0},uLayer:{value:0}};
@@ -38,28 +40,29 @@ function configureSkin(albedo,normal,height,spec){
  skin=new THREE.MeshPhysicalMaterial({map:albedo,normalMap:normal,normalScale:new THREE.Vector2(.72,.72),roughness:values.roughness,metalness:0,ior:1.42,specularIntensity:.85,clearcoat:values.oil*.6,clearcoatRoughness:.24,clearcoatNormalMap:normal,clearcoatNormalScale:new THREE.Vector2(.45,.45),envMapIntensity:.55});
  skin.customProgramCacheKey=()=>VERSION;
  skin.onBeforeCompile=s=>{shader=s;Object.assign(s.uniforms,U);
- s.vertexShader='attribute float skinOcclusion;varying float vSkinAO;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vSkinPosition;uniform sampler2D uSurface,uIdentityFeatures;uniform float uRelief,uBaseline,uIdentityEnabled;').replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed+=normal*((texture2D(uSurface,uv).b-.5)+uIdentityEnabled*(texture2D(uIdentityFeatures,uv).b-.5))*uRelief*.001*(1.-uBaseline);vSkinPosition=transformed;vSkinAO=skinOcclusion;');
+ s.vertexShader='attribute float skinOcclusion;varying float vSkinAO;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vSkinPosition;uniform sampler2D uSurface,uIdentityFeatures;uniform float uRelief,uBaseline,uIdentityEnabled;').replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed+=normal*(mix(texture2D(uSurface,uv).b-.5,texture2D(uSurface,uv+vec2(0.,.06)).b-.5,uIdentityEnabled*texture2D(uIdentityFeatures,uv).g)+uIdentityEnabled*(texture2D(uIdentityFeatures,uv).b-.5))*uRelief*.001*(1.-uBaseline);vSkinPosition=transformed;vSkinAO=skinOcclusion;');
  s.fragmentShader='varying float vSkinAO;uniform float uOcclusion;\n'+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <packing>','#include <packing>\n'+skinFunctions);
  s.fragmentShader=s.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
  float skinVariation=skinNoise(vSkinPosition*105.);float skinFront=smoothstep(-.025,.055,vSkinPosition.z);float skinCheeks=exp(-pow((abs(vSkinPosition.x)-.041)/.025,2.)-pow((vSkinPosition.y-.016)/.033,2.))*skinFront;float skinEar=smoothstep(.069,.092,abs(vSkinPosition.x))*(1.-smoothstep(.045,.082,abs(vSkinPosition.y-.025)));
  float skinZone=clamp(skinCheeks+.65*skinEar,0.,1.);
- if(uBaseline<.5){diffuseColor.rgb*=exp(-uPigment*vec3(1.0,1.43,1.8));diffuseColor.rgb*=1.+skinVariation*.026;diffuseColor.rgb*=vec3(1.+uBlood*skinZone*.11,1.-uBlood*skinZone*.18,1.-uBlood*skinZone*.14);}
+ if(uLayer>4.5)diffuseColor.rgb=vec3(.32);
+ if(uBaseline<.5&&uLayer<4.5){diffuseColor.rgb*=exp(-uPigment*vec3(1.0,1.43,1.8));diffuseColor.rgb*=1.+skinVariation*.026;diffuseColor.rgb*=vec3(1.+uBlood*skinZone*.11,1.-uBlood*skinZone*.18,1.-uBlood*skinZone*.14);}
  `);
  s.fragmentShader=s.fragmentShader.replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
  if(uPass>1.5){gl_FragColor=vec4(diffuseColor.rgb,1.);return;}
- float skinSpecMask=texture2D(uSpec,vMapUv).r;vec3 skinSurface=texture2D(uSurface,vMapUv).rgb;
+ float skinSpecMask=texture2D(uSpec,vMapUv).r;vec3 skinSurface=texture2D(uSurface,vMapUv).rgb;float scanBrowRegion=uIdentityEnabled*texture2D(uIdentityFeatures,vMapUv).g;skinSpecMask=mix(skinSpecMask,.45,scanBrowRegion);skinSurface=mix(skinSurface,vec3(.5),scanBrowRegion);
  if(uIdentityEnabled>.5)roughnessFactor=clamp(texture2D(uIdentityRoughness,vMapUv).g+roughnessFactor-uIdentityRoughnessBase,.24,.85);
  if(uBaseline<.5){roughnessFactor=clamp(roughnessFactor+(.45-skinSpecMask)*.24+(skinSurface.g-.5)*.12+skinVariation*.012-uOil*skinSpecMask*.06,.24,.85);}
  `);
  s.fragmentShader=s.fragmentShader.replace('#include <normal_fragment_maps>',`
  vec3 mapN=texture2D(normalMap,vNormalMapUv).xyz*2.-1.;mapN.xy*=normalScale*(uBaseline>.5?1.:uDetail);
  if(uBaseline<.5){vec3 mesoN=texture2D(uMesoMap,vNormalMapUv).rgb*2.-1.;vec3 microN=texture2D(uMicroMap,vNormalMapUv).rgb*2.-1.;
- vec2 slopes=mapN.xy/max(mapN.z,.2)+mesoN.xy/max(mesoN.z,.3)*uMeso+microN.xy/max(microN.z,.3)*uMicro;
+ float browClean=uIdentityEnabled*texture2D(uIdentityFeatures,vNormalMapUv).g;mesoN=mix(mesoN,texture2D(uMesoMap,vNormalMapUv+vec2(0.,.06)).rgb*2.-1.,browClean);microN=mix(microN,texture2D(uMicroMap,vNormalMapUv+vec2(0.,.06)).rgb*2.-1.,browClean);vec2 slopes=mapN.xy/max(mapN.z,.2)+mesoN.xy/max(mesoN.z,.3)*uMeso+microN.xy/max(microN.z,.3)*uMicro;
  float pore=poresAt(vNormalMapUv);vec2 ux=dFdx(vNormalMapUv),uy=dFdy(vNormalMapUv);float det=ux.x*uy.y-ux.y*uy.x;
  vec2 grad=vec2(dFdx(pore)*uy.y-dFdy(pore)*ux.y,dFdy(pore)*ux.x-dFdx(pore)*uy.x)/max(abs(det),1e-14)*sign(det);
  float aa=1.-smoothstep(.6,1.6,max(length(ux),length(uy))*uPoreFrequency);float faceZone=.55+.45*skinCheeks;
  slopes-=clamp(grad,vec2(-7000.),vec2(7000.))*uPores*.00012*aa*faceZone;mapN=normalize(vec3(slopes,1.));}
- normal=normalize(tbn*mapN);
+ normal=normalize(tbn*(uLayer>4.5?vec3(0.,0.,1.):mapN));
  `);
  s.fragmentShader=s.fragmentShader.replace('#include <clearcoat_normal_fragment_maps>',`#include <clearcoat_normal_fragment_maps>
  #ifdef USE_CLEARCOAT
@@ -92,7 +95,7 @@ function configureSkin(albedo,normal,height,spec){
  if(uPass>.5&&uPass<1.5)outgoingLight=skinDiffuseOnly;if(uPass>1.5)outgoingLight=diffuseColor.rgb;
  if(uLayer>.5&&uLayer<1.5)outgoingLight=diffuseColor.rgb;
  if(uLayer>1.5&&uLayer<2.5)outgoingLight=normal*.5+.5;
- if(uLayer>2.5&&uLayer<3.5)outgoingLight=vec3(roughnessFactor);
+ if(uLayer>2.5&&uLayer<3.5)outgoingLight=vec3(roughnessFactor);if(uLayer>3.5&&uLayer<4.5)outgoingLight=vec3(1.,.24,.025)*texture2D(uIdentityFeatures,vMapUv).r;
  #include <opaque_fragment>
  `);
  };
@@ -128,7 +131,7 @@ function makeFuzz(geo){
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(ns,3));g.setAttribute('tangentHair',new THREE.Float32BufferAttribute(tans,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setAttribute('strandT',new THREE.Float32BufferAttribute(st,1));g.setAttribute('strandSide',new THREE.Float32BufferAttribute(sides,1));g.setIndex(ix);
  const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,uniforms:{uFuzz:{value:values.fuzz},uIdentityFeatures:U.uIdentityFeatures,uIdentityEnabled:U.uIdentityEnabled,uRelief:E.uRelief,uSurface:E.uSurface,uPixelHeight:{value:1000},uLightDir:{value:new THREE.Vector3(-.5,.5,.6)},uLightPower:{value:2.45}},
  vertexShader:`attribute vec3 tangentHair;attribute float strandT,strandSide;uniform sampler2D uSurface,uIdentityFeatures;uniform float uIdentityEnabled,uRelief,uPixelHeight;varying float vt,vs,coverage;varying vec3 vn,vv,vHair;
- void main(){vt=strandT;vs=strandSide;vec3 pp=position+normal*((texture2D(uSurface,uv).b-.5)+uIdentityEnabled*(texture2D(uIdentityFeatures,uv).b-.5))*uRelief*.001;vec4 p=modelViewMatrix*vec4(pp,1.);vv=-p.xyz;vn=normalize(normalMatrix*normal);vHair=normalize(mat3(modelViewMatrix)*tangentHair);vec3 across=normalize(cross(vHair,normalize(vv)));float width=.000008*(1.-.8*vt);float pixel=-p.z/(projectionMatrix[1][1]*uPixelHeight*.5);float halfwidth=max(width,pixel*.48);coverage=width/halfwidth;p.xyz+=across*strandSide*halfwidth;gl_Position=projectionMatrix*p;}`,
+ void main(){vt=strandT;vs=strandSide;vec3 pp=position+normal*(mix(texture2D(uSurface,uv).b-.5,texture2D(uSurface,uv+vec2(0.,.06)).b-.5,uIdentityEnabled*texture2D(uIdentityFeatures,uv).g)+uIdentityEnabled*(texture2D(uIdentityFeatures,uv).b-.5))*uRelief*.001;vec4 p=modelViewMatrix*vec4(pp,1.);vv=-p.xyz;vn=normalize(normalMatrix*normal);vHair=normalize(mat3(modelViewMatrix)*tangentHair);vec3 across=normalize(cross(vHair,normalize(vv)));float width=.000008*(1.-.8*vt);float pixel=-p.z/(projectionMatrix[1][1]*uPixelHeight*.5);float halfwidth=max(width,pixel*.48);coverage=width/halfwidth;p.xyz+=across*strandSide*halfwidth;gl_Position=projectionMatrix*p;}`,
  fragmentShader:`uniform float uFuzz,uLightPower;uniform vec3 uLightDir;varying float vt,vs,coverage;varying vec3 vn,vv,vHair;
  void main(){vec3 N=normalize(vn),V=normalize(vv),L=normalize(uLightDir),T=normalize(vHair);float edge=pow(1.-abs(dot(N,V)),1.8);float lam=max(dot(N,L),0.);float longitudinal=sqrt(max(1.-pow(dot(T,normalize(L+V)),2.),0.));float sheen=pow(longitudinal,22.)*(.1+.9*edge);float alpha=uFuzz*coverage*(1.-smoothstep(.25,1.,abs(vs)))*(.6+.4*edge)*smoothstep(0.,.09,vt)*(1.-smoothstep(.82,1.,vt));vec3 col=vec3(.34,.24,.16)*(.22+lam*uLightPower*.4)+vec3(.6,.48,.32)*sheen*uLightPower*.22;gl_FragColor=vec4(col,alpha);}`});
  fuzz=new THREE.Mesh(g,mat);fuzz.frustumCulled=false;scene.add(fuzz);state.fuzzStrands=count;state.fuzzTriangles=g.index.count/3;
@@ -147,7 +150,7 @@ function initEntry(){
  entryMaterial=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking});
  entryMaterial.onBeforeCompile=s=>{
   Object.assign(s.uniforms,{uSurface:E.uSurface,uRelief:E.uRelief,uBaseline:U.uBaseline,uIdentityFeatures:U.uIdentityFeatures,uIdentityEnabled:U.uIdentityEnabled});
-  s.vertexShader='attribute float skinOcclusion;varying float vSkinAO;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nuniform sampler2D uSurface,uIdentityFeatures;uniform float uRelief,uBaseline,uIdentityEnabled;').replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed+=normal*((texture2D(uSurface,uv).b-.5)+uIdentityEnabled*(texture2D(uIdentityFeatures,uv).b-.5))*uRelief*.001*(1.-uBaseline);');
+  s.vertexShader='attribute float skinOcclusion;varying float vSkinAO;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nuniform sampler2D uSurface,uIdentityFeatures;uniform float uRelief,uBaseline,uIdentityEnabled;').replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed+=normal*(mix(texture2D(uSurface,uv).b-.5,texture2D(uSurface,uv+vec2(0.,.06)).b-.5,uIdentityEnabled*texture2D(uIdentityFeatures,uv).g)+uIdentityEnabled*(texture2D(uIdentityFeatures,uv).b-.5))*uRelief*.001*(1.-uBaseline);');
  };
  mesh.customDepthMaterial=entryMaterial;E.uKeyDepth.value=entryRT.texture;
 }
@@ -179,16 +182,16 @@ const blurFragment=`precision highp float;
 const composeFragment=`precision highp float;varying vec2 vUv;uniform sampler2D tFull,tDiffuse,tBlur,tAlbedo;uniform float strength,exposure,mode;
  vec3 srgb(vec3 c){return mix(12.92*c,1.055*pow(max(c,vec3(0.)),vec3(1./2.4))-.055,step(vec3(.0031308),c));}
  vec3 film(vec3 x){x=max(x,vec3(0.));return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
- void main(){vec4 f=texture2D(tFull,vUv);vec3 d=texture2D(tDiffuse,vUv).rgb,b=texture2D(tBlur,vUv).rgb;b*=sqrt(max(texture2D(tAlbedo,vUv).rgb,vec3(.025)));vec3 diff=mix(d,b,strength);vec3 c=max(vec3(0.),f.rgb+diff-d);if(mode>3.5&&mode<4.5)c=max(vec3(0.),f.rgb-d);if(mode>4.5)c=diff;vec2 p=(vUv-.5)*vec2(1.2,1.);float halo=exp(-dot(p,p)*4.5);vec3 bg=mix(vec3(.008,.0095,.013),vec3(.026,.03,.038),halo);if(mode>.5&&mode<3.5){gl_FragColor=vec4(mix(srgb(bg),mode>1.5&&mode<2.5?f.rgb:srgb(max(f.rgb,0.)),f.a),1.);}else{gl_FragColor=vec4(srgb(film(mix(bg,c,f.a)*exposure)),1.);}}
+ void main(){vec4 f=texture2D(tFull,vUv);vec3 d=texture2D(tDiffuse,vUv).rgb,b=texture2D(tBlur,vUv).rgb;b*=sqrt(max(texture2D(tAlbedo,vUv).rgb,vec3(.025)));vec3 diff=mix(d,b,strength);vec3 c=max(vec3(0.),f.rgb+diff-d);if(mode>3.5&&mode<4.5)c=max(vec3(0.),f.rgb-d);if(mode>4.5)c=diff;if(mode>5.5&&mode<6.5)c=f.rgb;vec2 p=(vUv-.5)*vec2(1.2,1.);float halo=exp(-dot(p,p)*4.5);vec3 bg=mix(vec3(.008,.0095,.013),vec3(.026,.03,.038),halo);if(mode>.5&&mode<3.5){gl_FragColor=vec4(mix(srgb(bg),mode>1.5&&mode<2.5?f.rgb:srgb(max(f.rgb,0.)),f.a),1.);}else{gl_FragColor=vec4(srgb(film(mix(bg,c,f.a)*exposure)),1.);}}
 `;
 
 function target(depth=false){const t=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,format:THREE.RGBAFormat,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,depthBuffer:depth,stencilBuffer:false});if(depth)t.depthTexture=new THREE.DepthTexture(1,1,THREE.UnsignedIntType);t.samples=depth?4:0;return t}
 function initPost(){albedoRT=target(true);fullRT=target(true);diffRT=target(true);blurA=target();blurB=target();blurMaterial=new THREE.ShaderMaterial({vertexShader:quadVertex,fragmentShader:blurFragment,depthTest:false,depthWrite:false,uniforms:{tColor:{value:null},tAlbedo:{value:albedoRT.texture},firstPass:{value:1},kernel:{value:diffusionKernel()},tDepth:{value:diffRT.depthTexture},direction:{value:new THREE.Vector2()},radius:{value:values.radius},projectionScale:{value:1},nearPlane:{value:camera.near},farPlane:{value:camera.far}}});composeMaterial=new THREE.ShaderMaterial({vertexShader:quadVertex,fragmentShader:composeFragment,depthTest:false,depthWrite:false,uniforms:{tAlbedo:{value:albedoRT.texture},tFull:{value:fullRT.texture},tDiffuse:{value:diffRT.texture},tBlur:{value:blurB.texture},strength:{value:values.sss},exposure:{value:values.exposure},mode:{value:0}}});quad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),composeMaterial);postScene=new THREE.Scene();postScene.add(quad);postCamera=new THREE.OrthographicCamera(-1,1,1,-1,0,1)}
 function resize(){if(!renderer)return;const w=viewport.clientWidth,h=viewport.clientHeight;if(!w||!h)return;const scale={high:Math.min(devicePixelRatio,1.5),medium:1,low:.7}[state.quality];renderer.setPixelRatio(scale);renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();const W=Math.round(w*scale),H=Math.round(h*scale);for(const t of [fullRT,diffRT,blurA,blurB,albedoRT])t.setSize(W,H);blurMaterial.uniforms.projectionScale.value=camera.projectionMatrix.elements[5]*H*.5;state.resolution=[W,H];dirty=true;}
 function lighting(){entryDirty=true;let a=THREE.MathUtils.degToRad(values.azimuth),e=.28,keyI=2.4,fillI=.12,rimI=.45,env=.3;if(state.light==='raking'){e=.12;keyI=3.15;fillI=.055;rimI=.3;env=.24}if(state.light==='back'){e=.3;keyI=4.3;fillI=.48;rimI=.25;env=.25}if(state.light==='daylight'){e=.65;keyI=1.65;fillI=.5;rimI=.35;env=.95}key.position.set(Math.sin(a)*.65,e,Math.cos(a)*.65);key.intensity=keyI;fill.intensity=fillI;rim.intensity=rimI;skin.envMapIntensity=env;scene.environmentRotation.y=a+.66;renderer.shadowMap.needsUpdate=true;dirty=true;}
-function setCamera(which){state.camera=which;const narrow=viewport.clientWidth/viewport.clientHeight<.9;const views={portrait:{p:[.105,.047,narrow?.76:.59],t:[0,.044,.016]},front:{p:[0,.042,narrow?.78:.62],t:[0,.035,.008]},cheek:{p:[.144,.061,.255],t:[.039,.023,.057]},ear:{p:[.32,.054,.16],t:[.075,.025,0]}};let v=views[which]||views.portrait;camera.position.set(...v.p);controls.target.set(...v.t);controls.update();document.querySelectorAll('[data-camera]').forEach(b=>b.classList.toggle('active',b.dataset.camera===which));dirty=true;}
+function setCamera(which){state.camera=which;const narrow=viewport.clientWidth/viewport.clientHeight<.9;const views={portrait:{p:[.105,.047,narrow?.76:.59],t:[0,.044,.016]},front:{p:[0,.042,narrow?.78:.62],t:[0,.035,.008]},cheek:{p:[.144,.061,.255],t:[.039,.023,.057]},ear:{p:[.32,.054,.16],t:[.075,.025,0]},brow:{p:[.125,.100,.215],t:[.027,.076,.066]},quarter:{p:[.27,.095,.38],t:[0,.055,.012]},high:{p:[.17,.21,.42],t:[0,.060,.018]},profile:{p:[.44,.065,.08],t:[0,.040,.008]}};let v=views[which]||views.portrait;camera.position.set(...v.p);controls.target.set(...v.t);controls.update();document.querySelectorAll('[data-camera]').forEach(b=>b.classList.toggle('active',b.dataset.camera===which));dirty=true;}
 function apply(){E.uOcclusion.value=values.occlusion;E.uMeso.value=values.meso;E.uMicro.value=values.micro;E.uRelief.value=values.relief;E.uTranslucency.value=values.translucency;entryDirty=true;Object.assign(U.uDetail,{value:values.detail});U.uPores.value=values.pores;U.uPoreFrequency.value=450/values.poreSize;U.uPigment.value=values.pigment;U.uBlood.value=values.blood;U.uScatter.value=values.sss;U.uOil.value=values.oil;if(skin){skin.roughness=values.roughness;skin.clearcoat=Math.max(.00001,compareHeld?0:values.oil*.68);skin.clearcoatRoughness=.36-values.oil*.14;fuzz.material.uniforms.uFuzz.value=values.fuzz;composeMaterial.uniforms.strength.value=compareHeld?0:values.sss;composeMaterial.uniforms.exposure.value=values.exposure;blurMaterial.uniforms.radius.value=values.radius;lighting()}for(const id of Object.keys(defaults)){const el=$(id);el.value=values[id];$(id+'Out').textContent=id==='poreSize'||id==='radius'?values[id].toFixed(2)+' mm':id==='azimuth'?values[id].toFixed(0)+'°':values[id].toFixed(2)}dirty=true;}
-function updateLayer(){state.layer=$('layer').value;const num={beauty:0,albedo:1,normal:2,roughness:3,specular:4,diffuse:5}[state.layer];U.uLayer.value=num<4?num:0;composeMaterial.uniforms.mode.value=num;$('layerLabel').textContent=$('layer').selectedOptions[0].text+' · '+$('lightPreset').selectedOptions[0].text.split(' · ')[0];dirty=true;}
+function updateLayer(){state.layer=$('layer').value;const num={beauty:0,albedo:1,normal:2,roughness:3,specular:4,diffuse:5,browmask:6,clay:7}[state.layer];U.uLayer.value=num===6?4:num===7?5:num<4?num:0;composeMaterial.uniforms.mode.value=num;$('layerLabel').textContent=$('layer').selectedOptions[0].text+' · '+$('lightPreset').selectedOptions[0].text.split(' · ')[0];dirty=true;}
 function baseline(on){compareHeld=on;state.baseline=on;U.uBaseline.value=on?1:0;$('baselineBadge').style.display=on?'block':'none';$('compare').classList.toggle('active',on);apply()}
 function render(){if(!state.ready)return;renderEntry();renderer.shadowMap.autoUpdate=false;fuzz.material.uniforms.uLightDir.value.copy(E.uKeyDirection.value).transformDirection(camera.matrixWorldInverse);fuzz.material.uniforms.uLightPower.value=key.intensity;fuzz.material.uniforms.uPixelHeight.value=fullRT.height;U.uPass.value=0;fuzz.visible=(values.fuzz>0||identityRuntime?.hasHair())&&!compareHeld&&state.layer==='beauty';renderer.setRenderTarget(fullRT);renderer.clear();renderer.render(scene,camera);renderer.shadowMap.needsUpdate=false;U.uPass.value=1;fuzz.visible=false;renderer.setRenderTarget(diffRT);renderer.clear();renderer.render(scene,camera);U.uPass.value=2;renderer.setRenderTarget(albedoRT);renderer.clear();renderer.render(scene,camera);U.uPass.value=0;const sssActive=values.sss>0&&!compareHeld&&['beauty','diffuse'].includes(state.layer);quad.material=blurMaterial;blurMaterial.uniforms.firstPass.value=1;blurMaterial.uniforms.tColor.value=diffRT.texture;blurMaterial.uniforms.direction.value.set(1/fullRT.width,0);renderer.setRenderTarget(blurA);renderer.render(postScene,postCamera);blurMaterial.uniforms.firstPass.value=0;blurMaterial.uniforms.tColor.value=blurA.texture;blurMaterial.uniforms.direction.value.set(0,1/fullRT.height);renderer.setRenderTarget(blurB);renderer.render(postScene,postCamera);quad.material=composeMaterial;composeMaterial.uniforms.strength.value=sssActive?values.sss:0;renderer.setRenderTarget(null);renderer.render(postScene,postCamera);state.frames++;dirty=false;}
 function tick(now){requestAnimationFrame(tick);const dt=Math.min(.08,(now-last)/1000);last=now;const moving=controls.update();if($('rotateLight').checked){values.azimuth+=dt*8;if(values.azimuth>160)values.azimuth=-160;$('azimuth').value=values.azimuth;$('azimuthOut').textContent=values.azimuth.toFixed(0)+'°';lighting()}if(dirty||moving){render();frameCount++}if(now-lastStat>1500){state.fps=frameCount*1000/(now-lastStat);frameCount=0;lastStat=now;$('stats').textContent=state.resolution.join(' × ')+' / '+Math.round(mesh.geometry.index.count/3/1000)+'K TRI';$('status').textContent=state.frames+' 帧 · '+(dirty?'更新中':'就绪 · 静止时节能')}}
@@ -213,29 +216,28 @@ const IDENTITY_DEFINITIONS={
  original:{label:'原 R02',description:'原始扫描颜色、法线和材质参数；保留作回退对照。',seed:0,beard:0,brow:0,params:{}},
  porcelain:{label:'01 · 冷白雀斑',description:'无须、铜棕细弧眉；鼻颊雀斑、细孔、偏哑光。独立色素 / 凹凸 / 粗糙度贴图。',seed:218,beard:0,brow:1450,params:{roughness:.60,oil:.12,detail:.56,meso:.75,micro:1.10,pores:.18,fuzz:.34,pigment:0,blood:.23,sss:.84,radius:1.20,relief:.62}},
  umber:{label:'02 · 深褐短须',description:'深褐色素、短硬胡茬、宽浓断眉；局部痘印、眉侧浅疤，T 区偏油。',seed:734,beard:11000,brow:1950,params:{roughness:.56,oil:.14,detail:.77,meso:1.08,micro:1.40,pores:.38,fuzz:.24,pigment:0,blood:.15,sss:.74,radius:.90,relief:.75}},
- weathered:{label:'03 · 风化熟龄',description:'暖褐晒斑、额纹和眼角细纹；灰白混色胡须、疏密眉束、干燥粗糙分区。',seed:159,beard:12500,brow:1500,params:{roughness:.64,oil:.07,detail:.90,meso:1.25,micro:1.20,pores:.29,fuzz:.32,pigment:0,blood:.19,sss:.76,radius:1.15,relief:.88}}
+ weathered:{label:'03 · 风化熟龄',description:'暖褐晒斑、额纹和眼角细纹；眼袋与颊凹、口角和下颌软组织松弛；灰白眉须与分区皱纹。',seed:159,beard:12500,brow:1500,params:{roughness:.64,oil:.07,detail:.90,meso:1.25,micro:1.20,pores:.29,fuzz:.32,pigment:0,blood:.19,sss:.76,radius:1.15,relief:.88}}
 };
 function identityRandom(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
 // Rebound to the CURRENT subdivided scan triangles; no GNM indices or teacher
 // groom assets are reused. The material math is adapted from Kaopu FiberMaterial.
 function identityHairGeometry(geometry,profile,maps){
- const p=geometry.attributes.position,n=geometry.attributes.normal,uv=geometry.attributes.uv,ix=geometry.index.array,areas=[],triangles=[];
- const sample=tex=>{const canvas=document.createElement('canvas');canvas.width=tex.image.width;canvas.height=tex.image.height;const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(tex.image,0,0);const bytes=ctx.getImageData(0,0,canvas.width,canvas.height).data,w=canvas.width,h=canvas.height;return (u,v)=>{let x=Math.max(0,Math.min(w-1,u*w-.5)),y=Math.max(0,Math.min(h-1,(1-v)*h-.5)),a=Math.floor(x),b=Math.floor(y),c=Math.min(a+1,w-1),d=Math.min(b+1,h-1);x-=a;y-=b;return ((bytes[(b*w+a)*4+2]*(1-x)+bytes[(b*w+c)*4+2]*x)*(1-y)+(bytes[(d*w+a)*4+2]*(1-x)+bytes[(d*w+c)*4+2]*x)*y)/255-.5;};};
- const sampleSurface=sample(E.uSurface.value),sampleFeatures=sample(maps.features),displaced=new Float32Array(p.count*3);
- for(let i=0;i<p.count;i++){const h=(sampleSurface(uv.getX(i),uv.getY(i))+sampleFeatures(uv.getX(i),uv.getY(i)))*.001;displaced[i*3]=n.getX(i)*h;displaced[i*3+1]=n.getY(i)*h;displaced[i*3+2]=n.getZ(i)*h;}
+ const p=geometry.attributes.position,pNeutral=geometry.attributes.skinNeutralPosition||p,n=geometry.attributes.normal,uv=geometry.attributes.uv,ix=geometry.index.array,areas=[],triangles=[];
+ const sample=(tex,channel=2,center=.5)=>{const canvas=document.createElement('canvas');canvas.width=tex.image.width;canvas.height=tex.image.height;const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(tex.image,0,0);const bytes=ctx.getImageData(0,0,canvas.width,canvas.height).data,w=canvas.width,h=canvas.height;return (u,v)=>{let x=Math.max(0,Math.min(w-1,u*w-.5)),y=Math.max(0,Math.min(h-1,(1-v)*h-.5)),a=Math.floor(x),b=Math.floor(y),c=Math.min(a+1,w-1),d=Math.min(b+1,h-1);x-=a;y-=b;return ((bytes[(b*w+a)*4+channel]*(1-x)+bytes[(b*w+c)*4+channel]*x)*(1-y)+(bytes[(d*w+a)*4+channel]*(1-x)+bytes[(d*w+c)*4+channel]*x)*y)/255-center;};};
+ const sampleSurface=sample(E.uSurface.value),sampleFeatures=sample(maps.features),sampleBrow=sample(maps.features,0,0),sampleBrowClear=sample(maps.features,1,0),displaced=new Float32Array(p.count*3);
+ for(let i=0;i<p.count;i++){const clear=sampleBrowClear(uv.getX(i),uv.getY(i));const h=(sampleSurface(uv.getX(i),uv.getY(i))*(1-clear)+sampleSurface(uv.getX(i),uv.getY(i)+.06)*clear+sampleFeatures(uv.getX(i),uv.getY(i)))*.001;displaced[i*3]=n.getX(i)*h;displaced[i*3+1]=n.getY(i)*h;displaced[i*3+2]=n.getZ(i)*h;}
  let total=0;const a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),ab=new THREE.Vector3(),ac=new THREE.Vector3();
  for(let i=0;i<ix.length;i+=3){a.fromBufferAttribute(p,ix[i]);b.fromBufferAttribute(p,ix[i+1]);c.fromBufferAttribute(p,ix[i+2]);const x=(a.x+b.x+c.x)/3,y=(a.y+b.y+c.y)/3,z=(a.z+b.z+c.z)/3;if(Math.abs(x)>.078||y<-.035||y>.098||z<.025)continue;let ar=ab.subVectors(b,a).cross(ac.subVectors(c,a)).length()*.5;if(ar<1e-13)continue;total+=ar;areas.push(total);triangles.push(i);}
- const output={brow:[],beard:[]},rand=identityRandom(profile.seed),q=new THREE.Vector3(),nn=new THREE.Vector3();
+ const output={brow:[],beard:[]},rand=identityRandom(profile.seed),q=new THREE.Vector3(),rootPoint=new THREE.Vector3(),nn=new THREE.Vector3();
  const smooth=(a,b,x)=>{let t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
  for(let tries=0;tries<520000&&(output.brow.length<profile.brow||output.beard.length<profile.beard);tries++){
   let lo=0,hi=areas.length-1,r=rand()*total;while(lo<hi){let m=(lo+hi)>>1;if(areas[m]<r)lo=m+1;else hi=m;}
   const i=triangles[lo],ia=ix[i],ib=ix[i+1],ic=ix[i+2];let u=rand(),v=rand();if(u+v>1){u=1-u;v=1-v;}
-  a.fromBufferAttribute(p,ia);b.fromBufferAttribute(p,ib);c.fromBufferAttribute(p,ic);q.copy(a).multiplyScalar(1-u-v).addScaledVector(b,u).addScaledVector(c,v);
-  const ax=Math.abs(q.x),side=q.x<0?-1:1,t=(ax-.010)/.048;
-  const arch=.0795+.0033*Math.sin(Math.PI*t)-.004*t+(profile.seed===218?.0015:0);
-  const width=profile.seed===218?.00165:profile.seed===734?.0031:.0021;
-  const brow=t>0&&t<1&&Math.abs(q.y-arch)<width*Math.pow(Math.sin(Math.PI*t),.40);
-  const notch=profile.seed===734&&q.x>.039&&q.x<.046&&q.y>.074;
+  a.fromBufferAttribute(p,ia);b.fromBufferAttribute(p,ib);c.fromBufferAttribute(p,ic);rootPoint.copy(a).multiplyScalar(1-u-v).addScaledVector(b,u).addScaledVector(c,v);q.set(pNeutral.getX(ia)*(1-u-v)+pNeutral.getX(ib)*u+pNeutral.getX(ic)*v,pNeutral.getY(ia)*(1-u-v)+pNeutral.getY(ib)*u+pNeutral.getY(ic)*v,pNeutral.getZ(ia)*(1-u-v)+pNeutral.getZ(ib)*u+pNeutral.getZ(ic)*v);
+  const rootU=uv.getX(ia)*(1-u-v)+uv.getX(ib)*u+uv.getX(ic)*v,rootV=uv.getY(ia)*(1-u-v)+uv.getY(ib)*u+uv.getY(ic)*v;
+  const guide=scanBrowGuide(rootU,rootV),browWeight=sampleBrow(rootU,rootV),ax=Math.abs(q.x),side=guide.side,t=guide.t;
+  const brow=browWeight>.025&&rand()<Math.pow(browWeight,profile.seed===218?1.7:1.05);
+  const notch=profile.seed===734&&q.x>.031&&q.x<.035&&q.y>.075&&q.y<.085;
   const moustache=ax<.027&&q.y>.0225&&q.y<.030&&q.z>.071;
   const upper=.019+.034*smooth(.023,.071,ax)+.002*Math.sin(q.x*170);
   const cheek=smooth(.023,.031,ax)*(1-smooth(.063,.071,ax))*(1-smooth(upper-.005,upper+.0035,q.y));
@@ -248,14 +250,15 @@ function identityHairGeometry(geometry,profile,maps){
   nn.set(n.getX(ia)*(1-u-v)+n.getX(ib)*u+n.getX(ic)*v,n.getY(ia)*(1-u-v)+n.getY(ib)*u+n.getY(ic)*v,n.getZ(ia)*(1-u-v)+n.getZ(ib)*u+n.getZ(ic)*v).normalize();
   if(nn.z<.04)continue;
   const field=Math.sin(q.x*97+q.y*133)+.4*Math.sin(q.x*229-q.y*71);
-  const flow=kind==='brow'?new THREE.Vector3(side*(.72+.18*rand()),.45-.83*t,0):new THREE.Vector3(side*(moustache?.92:.13+.15*smooth(-.015,.035,q.y))+.19*field,-1,.06);
+  const flow=kind==='brow'?new THREE.Vector3():new THREE.Vector3(side*(moustache?.92:.13+.15*smooth(-.015,.035,q.y))+.19*field,-1,.06);
+  if(kind==='brow'){const du1=uv.getX(ib)-uv.getX(ia),dv1=uv.getY(ib)-uv.getY(ia),du2=uv.getX(ic)-uv.getX(ia),dv2=uv.getY(ic)-uv.getY(ia),det=du1*dv2-du2*dv1;const e1=b.clone().sub(a),e2=c.clone().sub(a);if(Math.abs(det)>1e-12){const dpdu=e1.clone().multiplyScalar(dv2).addScaledVector(e2,-dv1).multiplyScalar(1/det),dpdv=e2.clone().multiplyScalar(du1).addScaledVector(e1,-du2).multiplyScalar(1/det);flow.copy(dpdu).multiplyScalar(guide.du).addScaledVector(dpdv,guide.dv).normalize();flow.y+=.22*(1-t);}else flow.set(side,.15,0);}
   flow.x+=(rand()-.5)*.48;flow.y+=(rand()-.5)*.12;if(kind==='brow'||flow.dot(nn)<0)flow.addScaledVector(nn,-flow.dot(nn));flow.normalize();
-  let length=kind==='brow'?(profile.seed===218?.0017+rand()*.0020:profile.seed===159?.0025+rand()*.0038:.0021+rand()*.0030):(profile.seed===159?.0011+Math.pow(rand(),.75)*.0044:.00055+rand()*.00115);
+  let length=kind==='brow'?(profile.seed===218?.0017+rand()*.0020:profile.seed===159?.0012+rand()*.0022:.0021+rand()*.0030):(profile.seed===159?.0011+Math.pow(rand(),.75)*.0044:.00055+rand()*.00115);
   if(kind==='beard'&&moustache)length*=.73;
   const silver=profile.seed===159&&rand()<(kind==='brow'?.45:.67);
   let col=profile.seed===218?new THREE.Color(.12,.052,.024):silver?new THREE.Color(.18,.19,.20):new THREE.Color(.014,.010,.008);col.multiplyScalar(.64+rand()*.70);
   const relief=new THREE.Vector3(displaced[ia*3]*(1-u-v)+displaced[ib*3]*u+displaced[ic*3]*v,displaced[ia*3+1]*(1-u-v)+displaced[ib*3+1]*u+displaced[ic*3+1]*v,displaced[ia*3+2]*(1-u-v)+displaced[ib*3+2]*u+displaced[ic*3+2]*v);
-  output[kind].push({p:q.clone(),n:nn.clone(),flow,length,col,relief,random:rand(),radius:(kind==='brow'?.000021:.000027)*(0.52+Math.pow(rand(),1.5)*.85),curl:rand(),silver,triangle:i/3,bary:[1-u-v,u,v]});
+  output[kind].push({neutral:q.clone(),browUV:[rootU,rootV],p:rootPoint.clone(),n:nn.clone(),flow,length,col,relief,random:rand(),radius:(kind==='brow'?.000021:.000027)*(0.52+Math.pow(rand(),1.5)*.85),curl:rand(),silver,triangle:i/3,bary:[1-u-v,u,v]});
  }
  const group=new THREE.Group();group.name='identity-scan-bound-kaopu-fibres';
  for(const kind of ['brow','beard']){
@@ -271,11 +274,11 @@ function identityHairGeometry(geometry,profile,maps){
   const g=new THREE.BufferGeometry();for(const [key,arr,size] of [['position',positions,3],['scalpNormal',normals,3],['rootPosition',roots,3],['strandColor',colors,3],['tangent',tangents,3],['along',ts,1],['strandSide',sides,1],['strandRandom',randoms,1],['strandRadius',radii,1],['boundRelief',relief,3]])g.setAttribute(key,new THREE.Float32BufferAttribute(arr,size));g.setIndex(ids);
   const obj=new THREE.Mesh(g);obj.name=kind;const handle=attachFiberMaterial(obj,{renderer,color:'#ffffff',roughness:profile.seed===159?.52:.42,specular:.12,shadows:false,coverageAA:true,coverageResolve:'blend'});obj.material.uniforms.uRelief=E.uRelief;obj.receiveShadow=false;obj.castShadow=false;obj.material.uniforms.fiberShadows.value=1;obj.userData.fiberHandle=handle;obj.renderOrder=2;group.add(obj);
  }
- group.userData.counts={brow:output.brow.length,beard:output.beard.length};group.userData.binding={basis:'current subdivided R02 scan triangles',surface:'barycentric interpolation of displaced triangle vertices',rootOffsetMeters:[Math.min(...Object.values(output).flat().map(s=>s.radius*1.2)),Math.max(...Object.values(output).flat().map(s=>s.radius*1.2))],originalFuzzPreserved:14000,segments:[7,10],sourceMaterial:'kaopu-hair-workbench/qa/gnm-groom-editor/src/FiberMaterial.js@23f1f408f961749c49e9747d45072c761825b158',fiberShadows:'receives existing skin VSM; strand shadow casting disabled'};return group;
+ group.userData.counts={brow:output.brow.length,beard:output.beard.length};group.userData.binding={browBasis:'asymmetric source-scan UV region and guides',browNeutralBounds:[['x','y','z'].map(k=>Math.min(...output.brow.map(o=>o.neutral[k]))),['x','y','z'].map(k=>Math.max(...output.brow.map(o=>o.neutral[k])))],basis:'current subdivided R02 scan triangles',surface:'barycentric interpolation of displaced triangle vertices',rootOffsetMeters:[Math.min(...Object.values(output).flat().map(s=>s.radius*1.2)),Math.max(...Object.values(output).flat().map(s=>s.radius*1.2))],originalFuzzPreserved:14000,segments:[7,10],sourceMaterial:'kaopu-hair-workbench/qa/gnm-groom-editor/src/FiberMaterial.js@23f1f408f961749c49e9747d45072c761825b158',fiberShadows:'receives existing skin VSM; strand shadow casting disabled'};return group;
 }
 
 async function installSkinIdentities(original,load){
- const cache=new Map(),originalMaps={...original};let sequence=0,group=null,current='original';
+ const ageMorph=createScanAgeMorph(mesh.geometry);const cache=new Map(),originalMaps={...original};let sequence=0,group=null,current='original',ageAmount=1;
  // VSM traverses receiveShadow meshes even with castShadow=false.
  // The custom shader reads native skin shadow maps via its own fibre uniform;
  // both scene-graph shadow flags remain false so no fibre depth writer is used.
@@ -290,29 +293,29 @@ async function installSkinIdentities(original,load){
   if(!IDENTITY_DEFINITIONS[id])throw new Error('未知表皮配方');const request=++sequence;$('identityStatus').textContent='正在载入 '+IDENTITY_DEFINITIONS[id].label+'…';state.identityLoading=true;
   try{
    const maps=await mapsFor(id);if(request!==sequence)return;
-   releaseHair();skin.map=maps.albedo;skin.color.setRGB(1,1,1);skin.normalMap=maps.normal;skin.clearcoatNormalMap=maps.normal;
+   releaseHair();const previousFuzz=fuzz;scene.remove(previousFuzz);previousFuzz.geometry.dispose();previousFuzz.material.dispose();ageMorph.apply(id==='weathered'?ageAmount:0);makeFuzz(mesh.geometry);state.ageMorph=ageMorph.diagnostics();skin.map=maps.albedo;skin.color.setRGB(1,1,1);skin.normalMap=maps.normal;skin.clearcoatNormalMap=maps.normal;
    U.uIdentityEnabled.value=id==='original'?0:1;U.uIdentityRoughnessBase.value=IDENTITY_DEFINITIONS[id].params.roughness??defaults.roughness;U.uIdentityRoughness.value=maps.roughness||originalMaps.spec;U.uIdentityFeatures.value=maps.features||originalMaps.surfaceMap;
    if(!keepValues)Object.assign(values,defaults,IDENTITY_DEFINITIONS[id].params);
    if(id!=='original'){group=identityHairGeometry(mesh.geometry,IDENTITY_DEFINITIONS[id],maps);fuzz.add(group);}
    current=id;state.identity=id;state.identityMaps=id==='original'?'original-4k-scan':['albedo','normal','roughness','features'].map(k=>({kind:k,width:maps[k].image.width,height:maps[k].image.height}));state.identityHair=group?.userData.counts||{brow:0,beard:0};
    document.querySelectorAll('[data-identity]').forEach(b=>{b.classList.toggle('active',b.dataset.identity===id);b.setAttribute('aria-pressed',String(b.dataset.identity===id));});
-   $('identityDescription').textContent=IDENTITY_DEFINITIONS[id].description;$('identityStatus').textContent=id==='original'?'已恢复原始 R02':'2K 独立身份图 + 原 R02 4K 扫描微结构';
+   $('identityDescription').textContent=IDENTITY_DEFINITIONS[id].description;$('identityStatus').textContent=id==='original'?'已恢复原始 R02':'2K 独立表皮 + 原 4K 微结构 / 熟龄形态可回退';
    document.querySelector('.caption-title').textContent=IDENTITY_DEFINITIONS[id].label;
    for(const k in hairValues)$(k).disabled=id==='original'||(id==='porcelain'&&k.startsWith('beard'));
    for(const key of [...cache.keys()])if(cache.size>2&&key!==id){const item=cache.get(key);for(const tex of Object.values(item))tex.dispose();cache.delete(key);}
-   updateHair();skin.needsUpdate=true;apply();dirty=true;if(state.ready)render();
+   $('ageShapeToggle').disabled=id!=='weathered';$('ageShapeToggle').textContent=ageAmount>0?'熟龄形态：开 · 点击对照原形':'熟龄形态：关 · 点击恢复';updateHair();skin.needsUpdate=true;apply();dirty=true;if(state.ready)render();
   }finally{if(request===sequence)state.identityLoading=false;}
  }
- const report=()=>({schema:'kaopu/skin-identity@1',id:current,hair:{...hairValues},geometryBasis:'R02.1 original scan; topology unchanged',maps:state.identityMaps});
- async function restore(o){if(!o)return setIdentity('original');if(o.schema!=='kaopu/skin-identity@1')throw Error('表皮配方版本不兼容');await setIdentity(o.id);for(const k in hairValues)if(Number.isFinite(o.hair?.[k]))hairValues[k]=Math.max(0,Math.min(k==='beardLength'?2:1,o.hair[k]));updateHair();}
- const api={set:setIdentity,report,restore,hasHair:()=>!!group&&current!=='original',current:()=>current,diagnostics:()=>({binding:group?.userData.binding,shadowWriterIsolated:!!group&&group.children.every(o=>!o.receiveShadow&&!o.castShadow),cameraLayerMask:camera.layers.mask,shadowCameraLayerMask:key.shadow.camera.layers.mask,materials:group?.children.map(o=>fiberMaterialDiagnostics(o.material))}),definitions:IDENTITY_DEFINITIONS};identityRuntime=api;window.__SKIN_LAB__.identity=api;
+ const report=()=>({ageStrength:ageAmount,schema:'kaopu/skin-identity@1',id:current,hair:{...hairValues},geometryBasis:'R02.1 scan; weathered reversible shape ageing; topology/UV unchanged',maps:state.identityMaps});
+ async function restore(o){if(!o)return setIdentity('original');if(o.schema!=='kaopu/skin-identity@1')throw Error('表皮配方版本不兼容');ageAmount=Number.isFinite(o.ageStrength)?Math.max(0,Math.min(1,o.ageStrength)):1;await setIdentity(o.id);for(const k in hairValues)if(Number.isFinite(o.hair?.[k]))hairValues[k]=Math.max(0,Math.min(k==='beardLength'?2:1,o.hair[k]));updateHair();}
+ const api={set:setIdentity,report,restore,hasHair:()=>!!group&&current!=='original',current:()=>current,setAgeStrength:async value=>{ageAmount=Math.max(0,Math.min(1,value));return setIdentity(current,{keepValues:true});},diagnostics:()=>({ageMorph:ageMorph.diagnostics(),binding:group?.userData.binding,shadowWriterIsolated:!!group&&group.children.every(o=>!o.receiveShadow&&!o.castShadow),cameraLayerMask:camera.layers.mask,shadowCameraLayerMask:key.shadow.camera.layers.mask,materials:group?.children.map(o=>fiberMaterialDiagnostics(o.material))}),definitions:IDENTITY_DEFINITIONS};identityRuntime=api;window.__SKIN_LAB__.identity=api;
  for(const b of document.querySelectorAll('[data-identity]'))b.onclick=()=>setIdentity(b.dataset.identity).catch(e=>{toast(e.message);state.errors.push(e.message);});
  for(const k in hairValues)$(k).oninput=()=>{hairValues[k]=Number($(k).value);updateHair();};
  $('identityMaps').onclick=()=>{
-  const host=$('mapGallery');host.replaceChildren();if(current==='original'){host.textContent='原版扫描贴图保留在 r01/assets。';}else for(const [id,label]of [['albedo','颜色 / 色素'],['normal','法线 / 凹凸'],['roughness','粗糙度'],['features','色斑 / 毛囊 / 起伏']]){const card=document.createElement('figure'),caption=document.createElement('figcaption'),img=document.createElement('img');caption.textContent=label+' · 2048 × 2048';img.src='./assets/identities/'+current+'/'+id+'.webp';img.alt=label;card.append(caption,img);host.append(card);}
+  const host=$('mapGallery');host.replaceChildren();if(current==='original'){host.textContent='原版扫描贴图保留在 r01/assets。';}else for(const [id,label]of [['albedo','颜色 / 色素'],['normal','法线 / 凹凸'],['roughness','粗糙度'],['features','眉根 / 扫描眉清理 / 起伏']]){const card=document.createElement('figure'),caption=document.createElement('figcaption'),img=document.createElement('img');caption.textContent=label+' · 2048 × 2048';img.src='./assets/identities/'+current+'/'+id+'.webp';img.alt=label;card.append(caption,img);host.append(card);}
   $('mapsDialog').showModal();
  };
- $('mapsClose').onclick=()=>$('mapsDialog').close();
+ $('mapsClose').onclick=()=>$('mapsDialog').close();$('ageShapeToggle').onclick=()=>api.setAgeStrength(ageAmount>0?0:1);
  await setIdentity('porcelain');return api;
 }
 
