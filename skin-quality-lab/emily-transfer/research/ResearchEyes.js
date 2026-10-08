@@ -9,9 +9,11 @@ const TAU=Math.PI*2;
  * Neutral margin proportions are measured from the CC0 MakeHuman hm08 mesh.
  */
 function rail(u,upper){
- const x=clamp((u+1)*.5,0,1)*(REFERENCE_RAILS.length-1),i=Math.min(REFERENCE_RAILS.length-2,Math.floor(x)),t=x-i,k=upper?1:2;
- const a=REFERENCE_RAILS[Math.max(0,i-1)][k],b=REFERENCE_RAILS[i][k],c=REFERENCE_RAILS[i+1][k],d=REFERENCE_RAILS[Math.min(REFERENCE_RAILS.length-1,i+2)][k];
- return .5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t*t+(-a+3*b-3*c+d)*t*t*t);
+ u=clamp(u,-1,1);const t=(u+1)*.5;
+ // Endpoint-constrained least squares of the 33 measured CC0 contour points.
+ const c=upper?[.38441346288415335,-.013457920226416842,.4445801720372662,.056531015805420755]:[-.26980682201867545,-.07559112460541781,-.25913444501352073,-.003966655456640926];
+ const k=upper?1:2,baseline=lerp(REFERENCE_RAILS[0][k],REFERENCE_RAILS[32][k],t);
+ return baseline+(1-u*u)*(c[0]+u*(c[1]+u*(c[2]+u*c[3])));
 }
 function ocularHeight(r,x,y){
  const rho=Math.hypot(x,y),limbus=r*.47,rc=r*.64;
@@ -33,7 +35,24 @@ export class ResearchEyes extends FittedEyes {
   this.state.reconstruction='ET03 contact-constrained shell';this.state.trainedNeuralModel=false;
   this.ready=this.ready.then(()=>{
    for(const e of this.eyes){
+    // A conservative fit from this head's observed closed outer surface.
+    // This estimates depth only; it is not multiview iris-based calibration.
+    const oldDepth=e.c.z,r=e.c.radius;let limit=oldDepth,samples=0;
+    for(let ix=-12;ix<=12;ix++)for(let iy=-12;iy<=12;iy++){
+     const x=ix/12*r*.80,y=iy/12*r*.80;if(x*x+y*y>r*r*.64)continue;
+     const observed=e.c.referenceSurface(e.c.x+x,e.c.y+y);
+     const envelope=ocularHeight(r,x,y);if(!envelope.valid)continue;
+     limit=Math.min(limit,observed.z-envelope.z-.00045);samples++;
+    }
+    const fitted=Math.max(oldDepth-.004,limit);
+    e.c.z=fitted;e.pivot.position.z=fitted;
+    e.depthFit={source:'same closed-scan surface',method:'conservative outer-envelope constraint',assumedClosedGaze:'neutral',samples,initialDepthMM:oldDepth*1000,fittedDepthMM:fitted*1000,depthShiftMM:(fitted-oldDepth)*1000,limited:fitted!==limit,notFullPaperCalibration:true};
     e.ball.geometry.dispose();e.ball.geometry=opticalMesh(e.c.radius);
+    // Three.js uses scene.environmentIntensity while material.envMap is null.
+    // Bind the same environment explicitly so ocular intensity actually works.
+    e.ball.material.envMap=this.scene.environment;
+    e.ball.material.envMapIntensity=.38;
+    e.ball.material.envMapRotation.copy(this.scene.environmentRotation);
     const previous=e.ball.material.onBeforeCompile;
     const edgeData=new Float32Array(64*4),edgeMap=new THREE.DataTexture(edgeData,64,1,THREE.RGBAFormat,THREE.FloatType);
     edgeMap.minFilter=THREE.LinearFilter;edgeMap.magFilter=THREE.LinearFilter;edgeMap.needsUpdate=true;
@@ -70,20 +89,32 @@ export class ResearchEyes extends FittedEyes {
   const top=rail(u,true)*c.half,bottom=rail(u,false)*c.half,center=lerp(bottom,top,.22);
   const pitch=c.gazePitch||0,yaw=c.gazeYaw||0;
   const gaze=-pitch*(upper?.0056:.0023)*w,squint=this.config.squint||0;
-  const rest=(upper?top:bottom)*(this.config.opening||1),narrow=(upper?-.0020:.0020)*squint*w;
-  const y=c.y-.0005+lerp(rest+gaze+narrow,center,blink);
+  const open=this.config.opening||1;
+  let topOpen=top*open-pitch*.0056*w-.0020*squint*w;
+  let bottomOpen=bottom*open-pitch*.0023*w+.0020*squint*w;
+  if(topOpen<bottomOpen+.00006*w){const mid=(topOpen+bottomOpen)*.5;topOpen=mid+.00003*w;bottomOpen=mid-.00003*w;}
+  const rest=upper?topOpen:bottomOpen,narrow=0;
+  const closedY=c.y-.0035+.0028*Math.pow(Math.abs(nx),1.7)-.0007*nx*c.sign;
+  const y=lerp(c.y-.0005+rest,closedY,blink);
   const x=c.x+c.half*nx+yaw*.0006*w*(1-blink);
-  const z=this.eyeFront(c,x,y);return new THREE.Vector3(x,y,z===null?c.z+.003:z+.00009);
+  const front=this.eyeFront(c,x,y);let z=front===null?c.z+.003:front+.00009;
+  if(blink>0&&c.referenceSurface){
+   const key=Math.round(nx*1e9);let closedZ=c.closedCurve.get(key);
+   if(closedZ===undefined){closedZ=c.referenceSurface(c.x+c.half*nx,closedY).z;c.closedCurve.set(key,closedZ);}
+   z=Math.max(z,lerp(z,closedZ,blink));
+  }
+  return new THREE.Vector3(x,y,z);
  }
  rimPoint(c,a,blink){return this.margin(c,a,blink);}
  makeLid(c,sample,mat){
+  c.referenceSurface=sample;c.closedCurve=new Map();
   const A=192,R=32,p=[],n=[],uv=[],ao=[],ts=[],ix=[],entries=[];
   for(let j=0;j<=R;j++)for(let i=0;i<=A;i++){
    const t=j/R,a=i/A*TAU,nx=Math.cos(a),ny=Math.sin(a),u=nx*c.sign;
    const seam=c.y-.0035+.0028*Math.pow(Math.abs(nx),1.7)-.0007*nx*c.sign;
    const xo=c.x+c.rx*1.004*nx,yo=c.y+c.ry*1.004*ny;
-   const xs=lerp(c.x+c.half*nx,xo,t),ys=lerp(seam+(ny>=0?.00045:-.00045),yo,t);
-   const src=sample(xs,ys),seamSrc=sample(c.x+c.half*nx,seam+(ny>=0?.00045:-.00045)),outer=sample(xo,yo);
+   const xs=lerp(c.x+c.half*nx,xo,t),ys=lerp(seam,yo,t);
+   const src=sample(xs,ys),seamSrc=sample(c.x+c.half*nx,seam),outer=sample(xo,yo);
    entries.push({a,t,nx,ny,u,xs,ys,xo,yo,src,seamSrc,outer});p.push(xs,ys,src.z);n.push(src.n.x,src.n.y,src.n.z);uv.push(src.u,src.v);ao.push(src.ao);ts.push(t);
    if(j<R&&i<A){const k=j*(A+1)+i;ix.push(k,k+A+1,k+1,k+1,k+A+1,k+A+2);}
   }
@@ -94,15 +125,31 @@ export class ResearchEyes extends FittedEyes {
    s.vertexShader=s.vertexShader.replace('uRelief*.001*(1.-uBaseline)','uRelief*.001*(1.-uBaseline)*smoothstep(.13,.68,eyelidT)');
    s.uniforms.uResearchPatch={value:new THREE.Vector4(c.x,c.y,c.rx,c.ry)};
    s.fragmentShader='varying float vLidT;uniform vec4 uResearchPatch;\n'+s.fragmentShader;
+   s.fragmentShader=s.fragmentShader.replace('normal=normalize(tbn*mapN);','mapN.xy*=mix(.48,1.,smoothstep(.06,.68,vLidT));normal=normalize(tbn*normalize(mapN));');
    s.fragmentShader=s.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nvec2 localPatch=(vSkinPosition.xy-uResearchPatch.xy)/uResearchPatch.zw;if(dot(localPatch,localPatch)>1.000001)discard;');
    s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.rgb=mix(diffuseColor.rgb*vec3(.77,.57,.52),diffuseColor.rgb,smoothstep(.008,.055,vLidT));');
   };
   mat.customProgramCacheKey=()=> 'ET03-continuous-lid-shell-1';mat.side=THREE.DoubleSide;
-  const m=new THREE.Mesh(g,mat);m.name='contact-eyelid-shell-'+c.name;m.frustumCulled=false;m.castShadow=false;m.receiveShadow=true;
+  const m=new THREE.Mesh(g,mat);m.name='contact-eyelid-shell-'+c.name;m.frustumCulled=false;m.castShadow=true;m.receiveShadow=true;
+  // Use the same deformation and support mask in the shadow pass. Unlike VSM,
+  // PCF does not turn every shadow receiver into an implicit shadow caster.
+  const depth=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking});
+  depth.onBeforeCompile=s=>{
+   s.uniforms.uLidSurface={value:this.skin.userData.surfaceTexture||null};
+   // The skin callback supplies the same shared texture and relief uniforms.
+   const probe={uniforms:{},vertexShader:'#include <common>\n#include <begin_vertex>',fragmentShader:''};
+   old(probe);Object.assign(s.uniforms,probe.uniforms);
+   s.uniforms.uShadowPatch={value:new THREE.Vector4(c.x,c.y,c.rx,c.ry)};
+   s.vertexShader='attribute float eyelidT;varying vec3 vLidShadowPosition;uniform sampler2D uSurface;uniform float uRelief,uBaseline;\n'+s.vertexShader;
+   s.vertexShader=s.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed+=normal*(texture2D(uSurface,uv).b-.5)*uRelief*.001*(1.-uBaseline)*smoothstep(.13,.68,eyelidT);vLidShadowPosition=transformed;');
+   s.fragmentShader='varying vec3 vLidShadowPosition;uniform vec4 uShadowPatch;\n'+s.fragmentShader;
+   s.fragmentShader=s.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nvec2 q=(vLidShadowPosition.xy-uShadowPatch.xy)/uShadowPatch.zw;if(dot(q,q)>1.000001)discard;');
+  };
+  depth.customProgramCacheKey=()=> 'ET03-lid-shadow-matched-4';m.customDepthMaterial=depth;
   const ni=14,ip=new Float32Array((A+1)*(ni+1)*3),ii=[];
   for(let j=0;j<ni;j++)for(let a=0;a<A;a++){const k=j*(A+1)+a;ii.push(k,k+1,k+A+1,k+1,k+A+2,k+A+1);}
   const ig=new THREE.BufferGeometry();ig.setAttribute('position',new THREE.BufferAttribute(ip,3));ig.setIndex(ii);
-  const im=new THREE.MeshStandardMaterial({color:0x96574f,roughness:.46,side:THREE.DoubleSide});
+  const im=new THREE.MeshStandardMaterial({color:0x96574f,roughness:.46,side:THREE.FrontSide});
   const inside=new THREE.Mesh(ig,im);inside.name='inner-lid-contact-'+c.name;inside.frustumCulled=false;m.add(inside);
   return {mesh:m,entries,A,R,inside,ni};
  }
@@ -110,12 +157,15 @@ export class ResearchEyes extends FittedEyes {
   if(this.config.manualBlink>=0)blink=clamp(this.config.manualBlink,0,1);
   this._fittingEye=e;e.surfaceInverse=e.surfaceInverse||new THREE.Matrix4();e.surfaceInverse.makeRotationFromQuaternion(e.pivot.quaternion).invert();
   const {c,lid}=e,g=lid.mesh.geometry,P=g.attributes.position;let minClear=Infinity,penetration=0;
+  const orientation=new THREE.Euler().setFromQuaternion(e.pivot.quaternion,'YXZ');c.gazePitch=orientation.x;c.gazeYaw=orientation.y;
+  const margins=Array.from({length:lid.A+1},(_,i)=>this.margin(c,i/lid.A*TAU,blink));
+  let closureError=0,boundaryError=0;
   for(let i=0;i<lid.entries.length;i++){
-   const q=lid.entries[i],inner=this.margin(c,q.a,blink),t=q.t,weight=1-smooth(t),side=q.ny>=0?1:-1,arc=Math.pow(Math.abs(q.ny),.8);
+   const q=lid.entries[i],inner=margins[i%(lid.A+1)],t=q.t,weight=1-smooth(t/.74),side=q.ny>=0?1:-1,arc=Math.pow(Math.abs(q.ny),.8);
    const seam=c.y-.0035+.0028*Math.pow(Math.abs(q.nx),1.7)-.0007*q.nx*c.sign;
    let x=q.xs+(inner.x-(c.x+c.half*q.nx))*weight;
-   let y=q.ys+(inner.y-(seam+(q.ny>=0?.00045:-.00045)))*weight;
-   y+=side*.00043*smooth(t/.045)*(1-smooth((t-.045)/.30))*arc;
+   let y=q.ys+(inner.y-(seam))*weight;
+   y+=side*.00043*smooth(t/.045)*(1-smooth((t-.045)/.30))*arc*(1-blink);
    let z=q.src.z+(inner.z-q.seamSrc.z)*weight;
    const thickness=.00010+.00056*smooth(t/.055)*(1-smooth((t-.35)/.45));
    const eyeZ=this.eyeFront(c,x,y);
@@ -125,14 +175,18 @@ export class ResearchEyes extends FittedEyes {
    if(eyeZ!==null&&t<.60)z=Math.max(z,eyeZ+thickness);
    if(t>.82){const fade=smooth((t-.82)/.18);x=lerp(x,q.xs,fade);y=lerp(y,q.ys,fade);z=lerp(z,q.src.z,fade);}
    P.setXYZ(i,x,y,z);
+   const error=Math.hypot(P.getX(i)-q.xs,P.getY(i)-q.ys,P.getZ(i)-q.src.z);
+   if(blink>.999)closureError=Math.max(closureError,error);if(q.t===1)boundaryError=Math.max(boundaryError,error);
    if(eyeZ!==null&&t<.55){const actual=P.getZ(i)-eyeZ;minClear=Math.min(minClear,actual);if(actual<-.0000001)penetration++;}
   }
   P.needsUpdate=true;g.computeVertexNormals();const N=g.attributes.normal;
   for(let i=0;i<lid.entries.length;i++){const q=lid.entries[i],w=smooth((q.t-.72)/.28);if(w){const n=new THREE.Vector3(N.getX(i),N.getY(i),N.getZ(i)).lerp(q.src.n,w).normalize();N.setXYZ(i,n.x,n.y,n.z);}}N.needsUpdate=true;
   const IP=lid.inside.geometry.attributes.position;
   for(let j=0;j<=lid.ni;j++)for(let i=0;i<=lid.A;i++){
-   const t=j/lid.ni*.42,idx=Math.round(t*lid.R)*(lid.A+1)+i,x=P.getX(idx),y=P.getY(idx),z=this.eyeFront(c,x,y);
-   IP.setXYZ(j*(lid.A+1)+i,x,y,z===null?P.getZ(idx)-.0003:z+.000035);
+   const row=j/lid.ni*.42*lid.R,lo=Math.floor(row),hi=Math.min(lid.R,lo+1),f=row-lo;
+   const ia=lo*(lid.A+1)+i,ib=hi*(lid.A+1)+i;
+   const x=lerp(P.getX(ia),P.getX(ib),f),y=lerp(P.getY(ia),P.getY(ib),f),z=this.eyeFront(c,x,y),outerZ=lerp(P.getZ(ia),P.getZ(ib),f);
+   IP.setXYZ(j*(lid.A+1)+i,x,y,z===null?outerZ-.0003:z+.000035);
   }
   IP.needsUpdate=true;lid.inside.geometry.computeVertexNormals();
   const rp=e.rim.mesh.geometry.attributes.position;
@@ -142,18 +196,29 @@ export class ResearchEyes extends FittedEyes {
   for(let i=0;i<e.lashes.entries.length;i++){const q=e.lashes.entries[i],p=this.margin(c,q.a,blink);for(let j=0;j<5;j++){const t=j/4;for(let s=0;s<2;s++){const width=.000025*(1-.9*t)*(s?1:-1);lp.setXYZ(i*10+j*2+s,p.x+Math.cos(q.a)*q.len*t*.35+q.lean*t+width,p.y+Math.sin(q.a)*(q.len*t*.65+.00035),p.z+.00035+q.len*(.48*t+.35*t*t));}}}lp.needsUpdate=true;e.lashes.mesh.geometry.computeVertexNormals();
   if(e.caruncle){const a=c.sign>0?Math.PI:0,p=this.margin(c,a,blink);e.caruncle.position.copy(p).add(new THREE.Vector3(-c.sign*.00018,0,.00001));e.caruncle.visible=blink<.98;}
   if(e.edgeMap){for(let i=0;i<64;i++){const x=-1+2*i/63,a=Math.acos(clamp(x,-1,1)),top=this.margin(c,a,blink),bottom=this.margin(c,TAU-a,blink);e.edgeData[i*4]=top.y-c.y;e.edgeData[i*4+1]=bottom.y-c.y;e.edgeData[i*4+2]=0;e.edgeData[i*4+3]=1;}e.edgeMap.needsUpdate=true;}
-  e.contactReport={minOuterClearanceMM:Number.isFinite(minClear)?minClear*1000:null,penetratingTestVertices:penetration,innerShell:true,outerBoundaryFixed:true,contactTestOuterRowsBelow:.55,eyeballHiddenForClosure:false};
+  e.contactReport={minOuterClearanceMM:Number.isFinite(minClear)?minClear*1000:null,penetratingTestVertices:penetration,innerShell:true,outerBoundaryFixed:true,contactTestOuterRowsBelow:.55,eyeballHiddenForClosure:false,capturedClosureMaxDeviationMM:blink>.999?closureError*1000:null,outerBoundaryDeviationMM:boundaryError*1000};
   e.ball.visible=true;this._fittingEye=null;this.lastLid=blink;
  }
  update(dt,instant=false){
-  if(this.eyes)for(const e of this.eyes)e.c.gazeYaw=e.rotation?.y||0;
+  const extraChanged=this._oldSquint!==this.config.squint||this._oldManual!==this.config.manualBlink;
   const changed=super.update(dt,instant);
-  if(this.eyes)for(const e of this.eyes){if(instant||changed||this._oldSquint!==this.config.squint||this._oldManual!==this.config.manualBlink)this.updateLid(e,this.state.blink);}
+  // The inherited motion update already invokes the overridden contact solver.
+  // Only a non-motion control change needs an extra geometry update.
+  if(!instant&&!changed&&extraChanged&&this.eyes)for(const e of this.eyes)this.updateLid(e,this.state.blink);
   this._oldSquint=this.config.squint;this._oldManual=this.config.manualBlink;
-  this.state.contact=this.eyes?.map(e=>e.contactReport);return changed;
+  for(const e of this.eyes)e.ball.material.envMapRotation.copy(this.scene.environmentRotation);
+  this.state.contact=this.eyes?.map(e=>e.contactReport);return changed||extraChanged;
  }
  snapshot(){return {...super.snapshot(),squint:this.config.squint||0,manualBlink:this.config.manualBlink??-1};}
  restore(o){if(!o)return;super.restore(o);if(Number.isFinite(o.squint))this.config.squint=clamp(o.squint,0,1);if(Number.isFinite(o.manualBlink))this.config.manualBlink=clamp(o.manualBlink,-1,1);this.update(0,true);this.requestRender();}
- info(){return {...super.info(),reconstruction:'ET03 contact shell / CC0 measured margin rails',neuralTrainingPerformed:false,paperReproduction:false,contact:this.eyes.map(e=>e.contactReport)};}
- dispose(){for(const e of this.eyes)e.edgeMap?.dispose();super.dispose();}
+ info(){return {...super.info(),reconstruction:'ET03 contact shell / CC0 measured margin rails',neuralTrainingPerformed:false,paperReproduction:false,depthCalibration:this.eyes.map(e=>e.depthFit),contact:this.eyes.map(e=>e.contactReport)};}
+ dispose(){for(const e of this.eyes){e.edgeMap?.dispose();e.lid.mesh.customDepthMaterial?.dispose();}super.dispose();}
 }
+
+// ET03 review correction R2
+
+// ET03 captured-closure anchors R3
+
+// ET03 observed closed-envelope fit R5
+
+// ET03 matching shadow surfaces R4
