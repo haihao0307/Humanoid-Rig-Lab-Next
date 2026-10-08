@@ -1,0 +1,23 @@
+name: Eyes offline renderer
+on:
+  push:
+    branches: [feature/emily-eyes-et02-20261008]
+    paths: ['.github/workflows/emily-eyes-renderer.yml']
+permissions:
+  contents: read
+jobs:
+  renderer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          npm install --prefix /tmp/eye-render-tools --no-audit --no-fund playwright@1.56.1
+          PLAYWRIGHT_BROWSERS_PATH=/tmp/eye-renderer /tmp/eye-render-tools/node_modules/.bin/playwright install --only-shell chromium
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eyes-chromium-runtime
+          path: /tmp/eye-renderer
+          retention-days: 1
