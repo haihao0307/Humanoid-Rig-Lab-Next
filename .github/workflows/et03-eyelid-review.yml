@@ -36,6 +36,7 @@ jobs:
         run: |
           git fetch --filter=blob:none --depth=1 origin 06b92744537caf0709b9bb73e4917453bc238294
           node --check skin-quality-lab/emily-transfer/research/build.cjs
+          node skin-quality-lab/emily-transfer/research/refine.cjs
           node skin-quality-lab/emily-transfer/research/build.cjs
       - name: Real browser visual and interaction checks
         env:
