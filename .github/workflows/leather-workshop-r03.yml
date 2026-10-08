@@ -1,0 +1,60 @@
+name: Leather R03.1 - physics integration and public verification
+on:
+  push:
+    branches: [experiment/leather-workshop-r01-20261008]
+    paths: ['leather-workshop/r03/site/**', 'leather-workshop/r03/build.py', 'leather-workshop/r03/test.mjs', 'leather-workshop/r03/qa.py', '.github/workflows/leather-workshop-r03.yml']
+permissions:
+  contents: write
+concurrency:
+  group: leather-r03-physics
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/leather-workshop-r01-20261008
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Browser dependencies
+        run: |
+          pip install -q playwright==1.55.0 pillow
+          python -m playwright install --with-deps chromium
+      - name: Verify material numerics and inherit original R02
+        run: |
+          node leather-workshop/r03/test.mjs
+          python leather-workshop/r03/build.py
+      - name: Actual file-open rendering and physics interactions
+        run: python leather-workshop/r03/qa.py
+      - name: Record verified build without modifying R02
+        id: build
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r03/preview.html leather-workshop/r03/BUILD_MANIFEST.json leather-workshop/r03/qa
+          git commit -m 'build(leather-r03): physics HTML and offline verification [skip ci]'
+          git push origin HEAD:experiment/leather-workshop-r01-20261008
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Actual immutable HTTPS rendering and integration
+        env:
+          BUILD_SHA: ${{ steps.build.outputs.sha }}
+        run: |
+          URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/leather-workshop/r03/preview.html"
+          python leather-workshop/r03/qa.py "$URL"
+          echo "$URL" > leather-workshop/r03/qa/PREVIEW_URL.txt
+          git add -f leather-workshop/r03/qa
+          git commit -m 'test(leather-r03): verified live physics and material bridge [skip ci]'
+          git push origin HEAD:experiment/leather-workshop-r01-20261008
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r03-physics-integration
+          path: |
+            leather-workshop/r03
+            leather-workshop/r02
+          retention-days: 14
