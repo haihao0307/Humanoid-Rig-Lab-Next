@@ -1,0 +1,12 @@
+const fs=require('fs'),path=require('path'),crypto=require('crypto'),esbuild=require('esbuild');
+const root=__dirname,site=path.join(root,'site');
+const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
+const files=['leather.js','app.js','template.html','three.module.js'];
+const sourceHashes=Object.fromEntries(files.map(f=>[f,hash(fs.readFileSync(path.join(site,f)))]));
+const result=esbuild.buildSync({entryPoints:[path.join(site,'app.js')],bundle:true,write:false,minify:true,format:'iife',target:'es2022',legalComments:'inline',alias:{three:path.join(site,'three.module.js'),leather:path.join(site,'leather.js')}});
+const code=result.outputFiles[0].text.replace(/<\/script/gi,'<\\/script');
+const html=fs.readFileSync(path.join(site,'template.html'),'utf8').replace('<!--IMPORTMAP-->','').replace('<!--APP-->','<script>'+code+'</script>');
+fs.writeFileSync(path.join(root,'preview.html'),html);
+const manifest={version:'R01.0',sourceHashes,htmlSHA256:hash(html),htmlBytes:Buffer.byteLength(html),runtime:'Three.js r169',sourceBase:'fda12bf2fe0262e4d02f1b08508128d17959e0c8',visualAcceptance:'PENDING_USER',oneToOneAdobe:'NOT_VERIFIED',physics:'not implemented',externalMaterialTextures:false};
+fs.writeFileSync(path.join(root,'BUILD_MANIFEST.json'),JSON.stringify(manifest,null,2));
+console.log('Built standalone leather workshop',manifest);
