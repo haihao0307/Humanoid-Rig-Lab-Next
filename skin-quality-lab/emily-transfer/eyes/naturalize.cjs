@@ -86,7 +86,7 @@ if(!fitted.includes('// ET02 natural ocular appearance R3')){
  fitted=replaceOnce(fitted,
 "      vec3 sclera=texture2D(uEyePhoto,photoCenter+P.xy*.285).rgb*.66;",
 `      vec3 scleraTex=texture2D(uEyePhoto,photoCenter+P.xy*.255).rgb;
-      float corner=smoothstep(.48,.96,abs(edge.x));float lowerWarm=smoothstep(.05,-.78,edge.y);
+      float corner=smoothstep(.48,.96,abs(edge.x));float lowerWarm=1.-smoothstep(-.78,.05,edge.y);
       vec3 sclera=scleraTex*vec3(.52,.46,.42);
       sclera=mix(sclera,vec3(.27,.105,.082),corner*.105+lowerWarm*.035);`,'warm sclera');
  fitted=replaceOnce(fitted,"      vec3 iris=photo*uIrisColor*.56;","      vec3 iris=photo*uIrisColor*.43;",'iris brightness');
@@ -121,7 +121,7 @@ fs.writeFileSync(d+'/app.js',js);fs.writeFileSync(d+'/index.html',html);
 const bundled=esbuild.buildSync({entryPoints:[d+'/app.js'],bundle:true,minify:true,format:'iife',target:'es2022',write:false,legalComments:'inline',alias:{three:r01+'/vendor/three.module.js','three/addons':r01+'/vendor/addons'}}).outputFiles[0].text;
 const commit=process.env.ASSET_COMMIT;if(!/^[0-9a-f]{40}$/.test(commit||''))throw Error('Immutable asset commit required');
 const root='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+commit+'/skin-quality-lab/';
-const code=bundled.replaceAll('../r01/',root+'r01/').replaceAll('../r02/',root+'r02/').replace(/<\\/script/gi,'<\\\\/script');new vm.Script(code);
+const code=bundled.replaceAll('../r01/',root+'r01/').replaceAll('../r02/',root+'r02/').replace(/<\/script/gi,'<\\/script');new vm.Script(code);
 let preview=html.replace(/<script type="importmap">[\s\S]*?<\/script>/,'').replace('<script type="module" src="./app.js"></script>',()=>'<script>'+code+'</script>');
 preview=preview.replaceAll('../r01/',root+'r01/').replaceAll('../r02/',root+'r02/');
 const scripts=[...preview.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)];if(scripts.length!==1||scripts[0][1]!==code)throw Error('Final natural-eye script mismatch');new vm.Script(scripts[0][1]);fs.writeFileSync(d+'/preview.html',preview);

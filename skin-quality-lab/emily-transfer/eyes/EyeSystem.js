@@ -3,18 +3,18 @@ import * as THREE from 'three';
 // Independent implementation after inspecting Digital Emily createEyes(),
 // updateEyeRig() and updateDynamicEyeTexture(). No XG geometry or texture is copied.
 // Units are metres, +Y up and +Z forward. Socket calibration belongs to this scan.
-export const EYE_VERSION='eyes/1.1.0';
+export const EYE_VERSION='eyes/1.2.0';
 export const SOCKETS=[
- {name:'right',x:-.0300,y:.0690,z:.0615,sign:-1,rx:.0180,ry:.0140,half:.0137,radius:.0151},
- {name:'left', x:.0217,y:.0690,z:.0613,sign: 1,rx:.0178,ry:.0140,half:.0135,radius:.0151}
+ {name:'right',x:-.0300,y:.0690,z:.0627,sign:-1,rx:.0152,ry:.0107,half:.0118,radius:.0125},
+ {name:'left', x:.0217,y:.0690,z:.0625,sign: 1,rx:.0150,ry:.0106,half:.0116,radius:.0125}
 ];
 const clamp=THREE.MathUtils.clamp,mix=THREE.MathUtils.lerp;
 const TAU=Math.PI*2,smooth=t=>t*t*(3-2*t);
 export const eyeCutGLSL=`
 uniform float uEyeCut;
 bool inEyePatch(vec3 p){
- vec2 r=(p.xy-vec2(-.0300,.0690))/vec2(.0180,.0140);
- vec2 l=(p.xy-vec2(.0217,.0690))/vec2(.0178,.0140);
+ vec2 r=(p.xy-vec2(-.0300,.0690))/vec2(.0152,.0107);
+ vec2 l=(p.xy-vec2(.0217,.0690))/vec2(.0150,.0106);
  return uEyeCut>.5&&p.z>.045&&(dot(r,r)<1.||dot(l,l)<1.);
 }
 `;
@@ -48,7 +48,7 @@ function irisField(){
 }
 function scleraField(){
  const size=768,canvas=document.createElement('canvas');canvas.width=canvas.height=size;const ctx=canvas.getContext('2d'),rnd=random(54861);
- ctx.fillStyle='#ddd6c9';ctx.fillRect(0,0,size,size);const grad=ctx.createRadialGradient(384,384,190,384,384,530);grad.addColorStop(0,'rgba(180,140,130,0)');grad.addColorStop(1,'rgba(160,94,83,.32)');ctx.fillStyle=grad;ctx.fillRect(0,0,size,size);
+ ctx.fillStyle='#c7beb1';ctx.fillRect(0,0,size,size);const grad=ctx.createRadialGradient(384,384,190,384,384,530);grad.addColorStop(0,'rgba(180,140,130,0)');grad.addColorStop(1,'rgba(160,94,83,.32)');ctx.fillStyle=grad;ctx.fillRect(0,0,size,size);
  for(let i=0;i<67;i++){const a=rnd()*TAU,r0=330+rnd()*190,r1=190+rnd()*120,swing=(rnd()-.5)*.28;const point=(r,t)=>[384+Math.cos(a+t)*r,384+Math.sin(a+t)*r];let p0=point(r0,0),p1=point(mix(r0,r1,.3),swing),p2=point(mix(r0,r1,.65),-swing*.6),p3=point(r1,swing*.4);
   ctx.beginPath();ctx.moveTo(...p0);ctx.bezierCurveTo(...p1,...p2,...p3);ctx.strokeStyle='rgba(149,60,60,'+(.1+rnd()*.12)+')';ctx.lineWidth=.5+rnd()*1.0;ctx.stroke();
   if(i%2===0){ctx.beginPath();ctx.moveTo(...p2);let b=point(r1+15,swing+(.05+rnd()*.1));ctx.quadraticCurveTo(p2[0]+(rnd()-.5)*35,p2[1]+(rnd()-.5)*35,...b);ctx.lineWidth=.45;ctx.stroke();}
@@ -64,12 +64,12 @@ vec3 ocularAlbedo(){
  vec3 P=vEyePoint/uEyeRadius,N=normalize(vEyeNormal),V=normalize(uEyeCamera-vEyePoint);
  vec3 ray=refract(-V,N,1./1.376);
  float travel=(uIrisDepth-P.z)/min(-.001,ray.z);
- vec2 hit=P.xy+ray.xy*max(travel,0.);float r=length(hit)/.40;
+ vec2 hit=P.xy+ray.xy*max(travel,0.);const float irisRadius=.456;float r=length(hit)/irisRadius;
  vec2 scleraUV=vec2(.5)+P.xy*.5;
  vec3 sclera=texture2D(uScleraField,scleraUV).rgb;
  float facing=smoothstep(.55,.83,P.z);
  float irisMask=(1.-smoothstep(.976,1.035,r))*facing;
- float pupil=uPupil/.40;float expanded=clamp((r-pupil)/max(.1,1.-pupil),0.,1.);
+ float pupil=uPupil/irisRadius;float expanded=clamp((r-pupil)/max(.1,1.-pupil),0.,1.);
  float angle=atan(hit.y,hit.x)/6.2831853+.5;
  vec3 field=texture2D(uIrisField,vec2(angle,expanded)).rgb;
  float collar=exp(-pow((expanded-.24)/.10,2.));
@@ -107,15 +107,15 @@ function makeEyeMaterial(shared,fields){
 function noDiffusion(material,pass){const old=material.onBeforeCompile;material.onBeforeCompile=s=>{old.call(material,s);s.uniforms.uEyePass=pass;s.fragmentShader='uniform float uEyePass;\n'+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <opaque_fragment>','#include <opaque_fragment>\nif(uEyePass>.5&&uEyePass<1.5){gl_FragColor=vec4(0.);return;}');};}
 function ocularGeometry(radius){
  const g=new THREE.SphereGeometry(radius,112,80);g.rotateX(Math.PI/2);
- const p=g.attributes.position;for(let i=0;i<p.count;i++){let z=p.getZ(i)/radius;if(z>.75){let t=smooth(clamp((z-.75)/.25,0,1));p.setZ(i,p.getZ(i)+radius*.13*t*t);}}
+ const p=g.attributes.position;for(let i=0;i<p.count;i++){let z=p.getZ(i)/radius;if(z>.75){let t=smooth(clamp((z-.75)/.25,0,1));p.setZ(i,p.getZ(i)+radius*.075*t*t);}}
  g.computeVertexNormals();return g;
 }
 export class EyeSystem{
  constructor({mesh,skin,scene,camera,canvas,pass,layer,key,fill,rim,requestRender}){
   Object.assign(this,{mesh,skin,scene,camera,canvas,pass,key,fill,rim,requestRender});
-  this.config={enabled:true,mode:'camera',autoBlink:true,autoPupil:true,pupilMM:3.6,iris:'blue',wetness:1,irisDepth:.83,opening:1};
+  this.config={enabled:true,mode:'camera',autoBlink:true,autoPupil:true,pupilMM:3.4,iris:'blue',wetness:.82,irisDepth:.83,opening:.94};
   this.state={version:EYE_VERSION,target:[0,.069,.65],clamped:false,blink:0,pupilMM:3.6,ready:false,lockErrorDegrees:[0,0],t:0};
-  this.cut={value:1};this.group=new THREE.Group();this.group.name='ET02-fitted-eyes';scene.add(this.group);this.target=new THREE.Vector3(0,.069,.65);this.pointerTarget=this.target.clone();this.lockedTarget=this.target.clone();this.pointer=new THREE.Vector2();this.pointerActive=false;this.time=0;this.nextBlink=4.1;this.blinkStart=-99;this.rnd=random(7193);this.nextSaccade=2;this.pupil=.0018;
+  this.cut={value:1};this.group=new THREE.Group();this.group.name='ET02-fitted-eyes';scene.add(this.group);this.target=new THREE.Vector3(0,.069,.65);this.pointerTarget=this.target.clone();this.lockedTarget=this.target.clone();this.pointer=new THREE.Vector2();this.pointerActive=false;this.time=0;this.nextBlink=4.1;this.blinkStart=-99;this.rnd=random(7193);this.nextSaccade=2;this.pupil=.0017;
   this.fields={iris:irisField(),sclera:scleraField()};this.eyes=[];
   // Keep the existing material function for new lids, then clip only the old closed patch.
   const original=skin.onBeforeCompile;
@@ -144,21 +144,27 @@ export class EyeSystem{
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(n,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setAttribute('skinOcclusion',new THREE.Float32BufferAttribute(ao,1));g.setIndex(indices);const m=new THREE.Mesh(g,mat);m.name='fitted-lids-'+c.name;m.frustumCulled=false;m.castShadow=true;m.receiveShadow=true;return {mesh:m,entries,A,R};
  }
  rimPoint(c,a,blink){
-  const nx=Math.cos(a),ny=Math.sin(a),s=Math.pow(Math.abs(ny),1.22),seam=c.y-.0037+.0031*Math.pow(Math.abs(nx),1.8)-.0012*nx*c.sign;
-  const open=c.y-.0012-.0014*nx*c.sign+(ny>=0?.0053:-.0031)*s*this.config.opening;
-  const x=c.x+c.half*nx,y=mix(open,seam,blink),dx=x-c.x,dy=y-c.y;
-  const z=c.z+Math.sqrt(Math.max(.000010,c.radius*c.radius-dx*dx-dy*dy))+.00030;
+  const nx=Math.cos(a),ny=Math.sin(a),arc=Math.pow(Math.abs(ny),1.35);
+  const medial=clamp((1-nx*c.sign)*.5,0,1),lateral=1-medial;
+  const seam=c.y-.0035+.0028*Math.pow(Math.abs(nx),1.7)-.0007*nx*c.sign;
+  const base=c.y-.00075-.00075*nx*c.sign;
+  const upper=(.00390*(1-.16*medial-.06*lateral)+.00020*(.30-medial))*arc*this.config.opening;
+  const lower=.00235*(.94-.10*medial)*arc*this.config.opening;
+  const gazeFollow=clamp(-(c.gazePitch||0)*.00165,-.00048,.00048)*(ny>=0?1:.34);
+  const open=base+(ny>=0?upper:-lower)+gazeFollow;
+  const x=c.x+c.half*nx*(1-.028*medial),y=mix(open,seam,blink),dx=x-c.x,dy=y-c.y;
+  const z=c.z+Math.sqrt(Math.max(.000006,c.radius*c.radius-dx*dx-dy*dy))+.00016;
   return new THREE.Vector3(x,y,z);
  }
  makeRim(c){
   const A=160,S=6,p=new Float32Array((A+1)*(S+1)*3),ix=[];for(let a=0;a<A;a++)for(let s=0;s<S;s++){let i=a*(S+1)+s;ix.push(i,i+S+1,i+1,i+1,i+S+1,i+S+2);}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setIndex(ix);
-  const m=new THREE.MeshPhysicalMaterial({color:0xa5675f,roughness:.23,clearcoat:1,clearcoatRoughness:.09,ior:1.376,envMapIntensity:.85});noDiffusion(m,this.pass);
+  const m=new THREE.MeshPhysicalMaterial({color:0x8f5b55,roughness:.31,clearcoat:.72,clearcoatRoughness:.12,ior:1.376,envMapIntensity:.48,transparent:true,opacity:.52,depthWrite:false});noDiffusion(m,this.pass);
   const obj=new THREE.Mesh(g,m);obj.frustumCulled=false;obj.name='tear-meniscus-'+c.name;return {mesh:obj,A,S};
  }
  makeLashes(c){
-  const entries=[],p=[],ix=[];for(let upper of [true,false])for(let i=0;i<(upper?51:24);i++){let t=(i+.5)/(upper?51:24),a=upper?t*Math.PI:Math.PI+t*Math.PI,len=(upper?.0015:.0007)+this.rnd()*(upper?.0013:.0007);entries.push({a,len,upper,lean:(this.rnd()-.5)*.0004});let k=p.length/3;for(let j=0;j<5;j++)for(let side of [-1,1])p.push(0,0,0);for(let j=0;j<4;j++)ix.push(k+j*2,k+j*2+1,k+j*2+2,k+j*2+1,k+j*2+3,k+j*2+2);}
-  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setIndex(ix);const mat=new THREE.MeshStandardMaterial({color:0x302016,roughness:.56,side:THREE.DoubleSide});noDiffusion(mat,this.pass);const m=new THREE.Mesh(g,mat);m.name='fine-eyelashes-'+c.name;m.frustumCulled=false;return {mesh:m,entries};
+  const entries=[],p=[],ix=[];for(let upper of [true,false])for(let i=0;i<(upper?38:10);i++){let t=(i+.5)/(upper?38:10),a=upper?t*Math.PI:Math.PI+t*Math.PI,len=(upper?.00078:.00028)+this.rnd()*(upper?.00068:.00028);entries.push({a,len,upper,lean:(this.rnd()-.5)*.0004});let k=p.length/3;for(let j=0;j<5;j++)for(let side of [-1,1])p.push(0,0,0);for(let j=0;j<4;j++)ix.push(k+j*2,k+j*2+1,k+j*2+2,k+j*2+1,k+j*2+3,k+j*2+2);}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setIndex(ix);const mat=new THREE.MeshStandardMaterial({color:0x3b2b23,roughness:.72,side:THREE.DoubleSide,transparent:true,opacity:.64,depthWrite:false});noDiffusion(mat,this.pass);const m=new THREE.Mesh(g,mat);m.name='fine-eyelashes-'+c.name;m.frustumCulled=false;return {mesh:m,entries};
  }
  updateLid(e,blink){
   const {c,lid,rim,lashes}=e,P=lid.mesh.geometry.attributes.position;
@@ -167,7 +173,7 @@ export class EyeSystem{
   for(let i=0;i<lid.entries.length;i++){let q=lid.entries[i],t=smooth(clamp((q.t-.76)/.24,0,1));if(t){let n=new THREE.Vector3(N.getX(i),N.getY(i),N.getZ(i)).lerp(q.src.n,t).normalize();N.setXYZ(i,n.x,n.y,n.z);}}
   N.needsUpdate=true;
   const rp=rim.mesh.geometry.attributes.position;
-  for(let a=0;a<=rim.A;a++){let theta=a/rim.A*TAU,pt=this.rimPoint(c,theta,blink);for(let s=0;s<=rim.S;s++){let b=s/rim.S*TAU,rad=.000105;rp.setXYZ(a*(rim.S+1)+s,pt.x+Math.cos(theta)*Math.cos(b)*rad,pt.y+Math.sin(theta)*Math.cos(b)*rad,pt.z+Math.sin(b)*rad+.00006);}}
+  for(let a=0;a<=rim.A;a++){let theta=a/rim.A*TAU,pt=this.rimPoint(c,theta,blink),lower=smooth(clamp((-Math.sin(theta)+.08)/.92,0,1)),medial=clamp((1-Math.cos(theta)*c.sign)*.5,0,1);for(let s=0;s<=rim.S;s++){let b=s/rim.S*TAU,rad=.000016+.000060*lower+.000020*medial;rp.setXYZ(a*(rim.S+1)+s,pt.x+Math.cos(theta)*Math.cos(b)*rad,pt.y+Math.sin(theta)*Math.cos(b)*rad,pt.z+Math.sin(b)*rad+.000035);}}
   rp.needsUpdate=true;rim.mesh.geometry.computeVertexNormals();
   const lp=lashes.mesh.geometry.attributes.position;
   for(let i=0;i<lashes.entries.length;i++){let q=lashes.entries[i],pt=this.rimPoint(c,q.a,blink);for(let j=0;j<5;j++){let t=j/4;for(let s=0;s<2;s++){let width=.000025*(1-.9*t)*(s?1:-1);lp.setXYZ(i*10+j*2+s,pt.x+Math.cos(q.a)*q.len*t*.35+q.lean*t+width,pt.y+Math.sin(q.a)*q.len*t*.65,pt.z+.00015+q.len*(.48*t+.35*t*t));}}}
@@ -194,7 +200,7 @@ export class EyeSystem{
   if(c.autoBlink&&this.time>=this.nextBlink)this.blink();let bt=this.time-this.blinkStart,blink=0;if(bt>=0&&bt<.28){blink=bt<.08?smooth(bt/.08):bt<.11?1:1-smooth((bt-.11)/.17);}
   let changed=Math.abs(blink-(this.state.blink||0))>.0002;this.state.blink=blink;
   const lightDir=this.key.position.clone().sub(this.key.target.position).normalize();let lightAmount=0;
-  for(let i=0;i<this.eyes.length;i++){let e=this.eyes[i],v=e.localTarget.copy(this.target).sub(e.pivot.position);let yaw=Math.atan2(v.x,Math.max(.04,v.z)),pitch=-Math.atan2(v.y,Math.hypot(v.x,v.z));const cy=clamp(yaw,-.50,.50),cp=clamp(pitch,-.30,.32);this.state.clamped=Math.abs(yaw-cy)>.001||Math.abs(pitch-cp)>.001;e.rotation.set(cp,cy,0,'YXZ');e.desired.setFromEuler(e.rotation);const before=e.pivot.quaternion.angleTo(e.desired);e.pivot.quaternion.slerp(e.desired,instant?1:1-Math.exp(-dt*22));changed=changed||before>.0001;
+  for(let i=0;i<this.eyes.length;i++){let e=this.eyes[i],v=e.localTarget.copy(this.target).sub(e.pivot.position);let yaw=Math.atan2(v.x,Math.max(.04,v.z)),pitch=-Math.atan2(v.y,Math.hypot(v.x,v.z));const cy=clamp(yaw,-.46,.46),cp=clamp(pitch,-.28,.30);e.c.gazePitch=cp;this.state.clamped=Math.abs(yaw-cy)>.001||Math.abs(pitch-cp)>.001;e.rotation.set(cp,cy,0,'YXZ');e.desired.setFromEuler(e.rotation);const before=e.pivot.quaternion.angleTo(e.desired);e.pivot.quaternion.slerp(e.desired,instant?1:1-Math.exp(-dt*22));changed=changed||before>.0001;
    e.lid.mesh.material.roughness=this.skin.roughness;e.lid.mesh.material.clearcoat=this.skin.clearcoat;e.lid.mesh.material.clearcoatRoughness=this.skin.clearcoatRoughness;e.lid.mesh.material.envMapIntensity=this.skin.envMapIntensity;e.pivot.updateMatrixWorld(true);e.direction.set(0,0,1).applyQuaternion(e.pivot.quaternion);this.state.lockErrorDegrees[i]=THREE.MathUtils.radToDeg(e.direction.angleTo(v.normalize()));
    e.uniforms.uEyeCamera.value.copy(this.camera.position);e.pivot.worldToLocal(e.uniforms.uEyeCamera.value);e.uniforms.uEyeKey.value.copy(lightDir).applyQuaternion(e.pivot.quaternion.clone().invert());e.uniforms.uEyeFill.value.copy(this.fill.position).normalize();e.uniforms.uIrisDepth.value=c.irisDepth;e.ball.material.clearcoat=c.wetness;e.ball.material.clearcoatRoughness=mix(.18,.065,c.wetness);
    lightAmount=Math.max(lightAmount,Math.max(0,e.direction.dot(lightDir))*this.key.intensity+this.fill.intensity*.5);
@@ -211,3 +217,5 @@ export class EyeSystem{
 }
 
 // ET02 fitted calibration R2
+
+// ET02 natural adult-eye calibration R3
