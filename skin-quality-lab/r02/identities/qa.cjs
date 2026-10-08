@@ -6,6 +6,8 @@ function hash(buffer){return crypto.createHash('sha256').update(buffer).digest('
 (async()=>{
  browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const context=await browser.newContext({viewport:{width:1440,height:1040},deviceScaleFactor:1}),page=await context.newPage();
+ // SwiftShader captures may take longer than Playwright's 30s default. Assertions are unchanged.
+ page.setDefaultTimeout(120000);
  page.on('pageerror',e=>report.pageErrors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push(m.text());});page.on('requestfailed',r=>report.failedRequests.push({url:r.url(),error:r.failure()?.errorText}));
  await page.goto(url,{waitUntil:'domcontentloaded',timeout:120000});
  await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready,null,{timeout:150000});
