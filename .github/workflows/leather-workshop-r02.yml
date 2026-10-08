@@ -1,0 +1,58 @@
+name: Leather R02 - material craft and public browser verification
+on:
+  push:
+    branches: [experiment/leather-workshop-r01-20261008]
+    paths: ['leather-workshop/r02/**', '.github/workflows/leather-workshop-r02.yml']
+permissions:
+  contents: write
+concurrency:
+  group: leather-workshop-r02
+  cancel-in-progress: false
+jobs:
+  build-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/leather-workshop-r01-20261008
+          sparse-checkout: |
+            leather-workshop/r01
+            leather-workshop/r02
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Browser dependencies
+        run: |
+          pip install -q playwright==1.55.0 pillow
+          python -m playwright install --with-deps chromium
+      - name: Verify R01 lineage and assemble R02 standalone
+        run: python leather-workshop/r02/assemble.py
+      - name: File-open, craft, material export and mobile-viewport checks
+        run: python leather-workshop/r02/qa.py
+      - name: Publish verified build on isolated branch
+        id: publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r02/site leather-workshop/r02/preview.html leather-workshop/r02/BUILD_MANIFEST.json leather-workshop/r02/THIRD_PARTY.txt leather-workshop/r02/qa
+          git commit -m 'build(leather-r02): standalone and file-browser evidence [skip ci]'
+          git push origin HEAD:experiment/leather-workshop-r01-20261008
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Test immutable public HTMLPreview
+        env:
+          BUILD_SHA: ${{ steps.publish.outputs.sha }}
+        run: |
+          URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/leather-workshop/r02/preview.html"
+          python leather-workshop/r02/qa.py "$URL"
+          echo "$URL" > leather-workshop/r02/qa/PREVIEW_URL.txt
+          git add -f leather-workshop/r02/qa
+          git commit -m 'test(leather-r02): immutable public browser evidence [skip ci]'
+          git push origin HEAD:experiment/leather-workshop-r01-20261008
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r02-full-evidence
+          path: leather-workshop/r02
+          retention-days: 14
