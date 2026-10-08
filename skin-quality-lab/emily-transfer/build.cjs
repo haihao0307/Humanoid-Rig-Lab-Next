@@ -1,9 +1,9 @@
-const fs=require('fs'),path=require('path'),crypto=require('crypto'),esbuild=require('esbuild'),vm=require('vm');
+const fs=require('fs'),path=require('path'),crypto=require('crypto'),esbuild=require('esbuild'),vm=require('vm'),assert=require('assert/strict');
 const d=__dirname,r02=path.resolve(d,'../r02'),r01=path.resolve(d,'../r01');
 const read=n=>fs.readFileSync(path.join(d,n),'utf8');
 const source=fs.readFileSync(r02+'/app.js','utf8');
 let js=source,html=fs.readFileSync(r02+'/index.html','utf8');
-function patch(a,b){if(!js.includes(a))throw Error('Missing inherited renderer anchor: '+a);js=js.replaceAll(a,b);}
+function patch(a,b){if(!js.includes(a))throw Error('Missing inherited renderer anchor: '+a);js=js.replaceAll(a,()=>b);}
 patch("import * as THREE from 'three';","import * as THREE from 'three';\nimport {EMILY_REFERENCE,emilyDirectDiffuse,applyTransferFeatures} from './EmilyTransferKernel.js';");
 patch("VERSION='skin-quality-lab/r02.1'","VERSION='emily-transfer/1.0.0'");
 patch('occlusion:.9};','occlusion:.9,wrap:1};');
@@ -14,7 +14,7 @@ patch('Object.assign(U,E);','Object.assign(U,E);U.uEmilyMethod={value:1};U.uWrap
 patch('uniform float uPass,uDetail,','uniform float uEmilyMethod,uWrapAmount;\nuniform float uPass,uDetail,');
 const oldLight=/physical=physical\.replace\('reflectedLight\.directDiffuse \+= irradiance \* BRDF_Lambert\( material\.diffuseColor \);',`[\s\S]*?`\);/;
 if(!oldLight.test(js))throw Error('Missing direct-diffuse shader anchor');
-js=js.replace(oldLight,"physical=physical.replace('reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );',emilyDirectDiffuse);");
+js=js.replace(oldLight,()=>"physical=physical.replace('reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );',emilyDirectDiffuse);");
 patch('lighting()}for(const id of Object.keys(defaults))','lighting();syncTransfer()}for(const id of Object.keys(defaults))');
 patch('U.uBaseline.value=on?1:0;','U.uBaseline.value=0;');
 patch('function render(){','function renderOne(destination=null){');
@@ -25,7 +25,6 @@ patch("source:'Lee Perry-Smith CC BY 3.0 scan; hybrid procedural shading',calibr
 patch("if(o.schema!=='kaopu/skin-lookdev@1'||!o.values)throw new Error('不是本实验台的参数文件');","if(o.schema!=='kaopu/skin-lookdev@1'||!o.values)throw new Error('不是本实验台的参数文件');restoreTransfer(o.transfer);");
 patch("'skin-quality-lab-r02'","'emily-transfer-et01'");
 patch('apply();init().catch(fail);',read('transfer-runtime.js')+'\napply();init().catch(fail);');
-// The asset paths now refer to the two preserved sibling releases.
 js=js.replaceAll('./assets/','../r02/assets/');
 html=html.replace(/<title>.*?<\/title>/,'<title>Emily 皮肤迁移 · Lee / ET01</title>')
  .replace('<h1>皮肤质感实验室</h1>','<h1>皮肤迁移实验台</h1>')
@@ -55,19 +54,30 @@ const panel=`<div class="section transfer-section">
 <div class="control"><label for="wrap">Emily 包裹光强度<output id="wrapOut"></output></label><input id="wrap" type="range" min="0" max="1" step="0.01" value="1"></div>
 <p class="hint">对照不改变模型、肤色或灯光。增强版才启用额外的屏幕空间扩散与透光；灰字功能在参考模式下不启用。</p>
 </div>`;
-html=html.replace('<aside class="side" aria-label="皮肤与光线参数">','<aside class="side" aria-label="皮肤与光线参数">'+panel);
+html=html.replace('<aside class="side" aria-label="皮肤与光线参数">',()=>'<aside class="side" aria-label="皮肤与光线参数">'+panel);
 html=html.replace('<div id="layerLabel">','<div id="currentMethod" class="method-badge">EMILY 思路 / 迁移到 LEE</div><div id="splitLine" role="separator" aria-label="对照分界" hidden></div><div id="splitLabels" hidden><span>基础 PBR</span><span>完整皮肤</span></div><div id="layerLabel">');
-html=html.replace(/<div class="credits">[\s\S]*?<\/div>/,`<div class="credits"><strong>不同模型，独立运行。</strong><br>扫描：Lee Perry-Smith / Infinite，CC BY 3.0。<br>参考：<a href="https://alteredqualia.com/xg/examples/emily.html" target="_blank" rel="noopener">alteredqualia · Digital Emily</a>。未加载原站模型、纹理或引擎。<br>渲染继承本库 R02，参考方法是 GGX 重实现，不是 XG 原码移植。<br><a href="../r02/THIRD_PARTY.txt" target="_blank" rel="noopener">资产与 SSS 许可</a> · <a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a><br>本页只验材质；不代表参数化全身人物已完成整合。</div>`);
-html=html.replace('</style>',`\n[hidden]{display:none!important}.transfer-section{background:linear-gradient(150deg,#2a2825,#1c1f25 75%)}.target-label{font-size:10px;color:#ddd0bd;letter-spacing:.5px;margin:0 0 12px}.target-label span{display:block;color:#9099a3;font-size:10px;margin-top:3px}.selector-label{display:block;color:#bfc3c9;font-size:11px;margin:12px 0 6px}.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 4px;margin-top:13px;font-size:10px;color:#c3c6ca}.feature-grid label{display:flex;align-items:center;gap:3px}.feature-grid input{margin:0;width:13px;height:13px}.inactive{opacity:.43}.method-badge{position:absolute;top:104px;left:25px;font-size:10px;letter-spacing:1px;color:#818b97;pointer-events:none}#splitLine{position:absolute;top:140px;bottom:85px;width:14px;transform:translateX(-50%);z-index:3;cursor:ew-resize;touch-action:none}#splitLine:before{content:"";position:absolute;left:6px;top:0;bottom:0;width:1px;background:#e3c59c99}#splitLine:after{content:"↔";position:absolute;left:-7px;top:50%;padding:5px 7px;color:#ebd4b2;background:#22272bd9;border:1px solid #ac9877;border-radius:50%}#splitLabels{position:absolute;top:132px;left:25px;right:25px;display:flex;justify-content:space-between;color:#c5b395;font-size:10px;pointer-events:none}button:disabled,select:disabled,input:disabled{opacity:.48;cursor:wait}body.clean .method-badge,body.clean #splitLabels{display:none}@media(max-width:760px){.method-badge{top:91px;left:15px}#splitLabels{top:116px;left:15px;right:15px}#splitLine{top:138px}h1{font-size:13px}.subtitle{letter-spacing:1px}}
+html=html.replace(/<div class="credits">[\s\S]*?<\/div>/,()=>`<div class="credits"><strong>不同模型，独立运行。</strong><br>扫描：Lee Perry-Smith / Infinite，CC BY 3.0。<br>参考：<a href="https://alteredqualia.com/xg/examples/emily.html" target="_blank" rel="noopener">alteredqualia · Digital Emily</a>。未加载原站模型、纹理或引擎。<br>渲染继承本库 R02，参考方法是 GGX 重实现，不是 XG 原码移植。<br><a href="../r02/THIRD_PARTY.txt" target="_blank" rel="noopener">资产与 SSS 许可</a> · <a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a><br>本页只验材质；不代表参数化全身人物已完成整合。</div>`);
+html=html.replace('</style>',()=>`\n[hidden]{display:none!important}.transfer-section{background:linear-gradient(150deg,#2a2825,#1c1f25 75%)}.target-label{font-size:10px;color:#ddd0bd;letter-spacing:.5px;margin:0 0 12px}.target-label span{display:block;color:#9099a3;font-size:10px;margin-top:3px}.selector-label{display:block;color:#bfc3c9;font-size:11px;margin:12px 0 6px}.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 4px;margin-top:13px;font-size:10px;color:#c3c6ca}.feature-grid label{display:flex;align-items:center;gap:3px}.feature-grid input{margin:0;width:13px;height:13px}.inactive{opacity:.43}.method-badge{position:absolute;top:104px;left:25px;font-size:10px;letter-spacing:1px;color:#818b97;pointer-events:none}#splitLine{position:absolute;top:140px;bottom:85px;width:14px;transform:translateX(-50%);z-index:3;cursor:ew-resize;touch-action:none}#splitLine:before{content:"";position:absolute;left:6px;top:0;bottom:0;width:1px;background:#e3c59c99}#splitLine:after{content:"↔";position:absolute;left:-7px;top:50%;padding:5px 7px;color:#ebd4b2;background:#22272bd9;border:1px solid #ac9877;border-radius:50%}#splitLabels{position:absolute;top:132px;left:25px;right:25px;display:flex;justify-content:space-between;color:#c5b395;font-size:10px;pointer-events:none}button:disabled,select:disabled,input:disabled{opacity:.48;cursor:wait}body.clean .method-badge,body.clean #splitLabels{display:none}@media(max-width:760px){.method-badge{top:91px;left:15px}#splitLabels{top:116px;left:15px;right:15px}#splitLine{top:138px}h1{font-size:13px}.subtitle{letter-spacing:1px}}
 </style>`);
 fs.writeFileSync(d+'/app.js',js);fs.writeFileSync(d+'/index.html',html);
 const bundled=esbuild.buildSync({entryPoints:[d+'/app.js'],bundle:true,minify:true,format:'iife',target:'es2022',write:false,legalComments:'inline',alias:{three:r01+'/vendor/three.module.js','three/addons':r01+'/vendor/addons'}}).outputFiles[0].text;
 new vm.Script(bundled);
 const commit=process.env.ASSET_COMMIT;if(!/^[0-9a-f]{40}$/.test(commit||''))throw Error('ASSET_COMMIT must be an immutable Git commit');
 const root='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+commit+'/skin-quality-lab/';
-let preview=html.replace(/<script type="importmap">[\s\S]*?<\/script>/,'').replace('<script type="module" src="./app.js"></script>','<script>'+bundled.replace(/<\/script/gi,'<\\/script')+'</script>');
+// Callback replacement is mandatory: minified JS may contain literal $& tokens.
+// A string replacement expands $& into the matched HTML script tag, corrupting JS.
+const embedded=bundled.replace(/<\/script/gi,'<\\/script');
+let preview=html.replace(/<script type="importmap">[\s\S]*?<\/script>/,'').replace('<script type="module" src="./app.js"></script>',()=>'<script>'+embedded+'</script>');
 preview=preview.replaceAll('../r01/',root+'r01/').replaceAll('../r02/',root+'r02/');
+const scripts=[...preview.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)];
+assert.equal(scripts.length,1,'Public HTML must contain exactly one inline script');
+const expected=embedded.replaceAll('../r01/',root+'r01/').replaceAll('../r02/',root+'r02/');
+assert.equal(scripts[0][1],expected,'HTML packaging altered the JavaScript payload');
+new vm.Script(scripts[0][1],{filename:'FINAL_PUBLIC_HTML.js'});
+assert(!preview.includes('<script type="module"'),'Unexpected nested module script in public HTML');
+// Regression fixture containing all special replacement-string dollar tokens.
+const fixture='a$&b$$c$`d$\'e';assert.equal('MARKER'.replace('MARKER',()=>fixture),fixture);
 fs.writeFileSync(d+'/preview.html',preview);
 const sha=s=>crypto.createHash('sha256').update(s).digest('hex');
-fs.writeFileSync(d+'/BUILD_MANIFEST.json',JSON.stringify({version:'ET01',codeVersion:'emily-transfer/1.0.0',sourceCommit:commit,assetCommit:commit,inheritedRenderer:'skin-quality-lab/r02/app.js',inheritedRendererSHA256:sha(source),generatedSHA256:sha(js),previewSHA256:sha(preview),target:'Lee Perry-Smith',originalEmilyAssetsIncluded:false,originalXGEngineIncluded:false,referenceMaterial:'XG.PhongMaterial',reimplementationSpecular:'Three.js GGX',defaultMethod:'emily',liveComparison:true,validation:'see qa-report.json',fullBodyIntegration:false},null,2));
-console.log('TRANSFER_BUILD',JSON.stringify({bytes:Buffer.byteLength(preview),assetCommit:commit}));
+fs.writeFileSync(d+'/BUILD_MANIFEST.json',JSON.stringify({version:'ET01',packagingVersion:'1.0.1',codeVersion:'emily-transfer/1.0.0',sourceCommit:commit,assetCommit:commit,inheritedRenderer:'skin-quality-lab/r02/app.js',inheritedRendererSHA256:sha(source),generatedSHA256:sha(js),previewSHA256:sha(preview),finalEmbeddedScriptSHA256:sha(scripts[0][1]),finalHTMLSyntaxValidated:true,target:'Lee Perry-Smith',originalEmilyAssetsIncluded:false,originalXGEngineIncluded:false,referenceMaterial:'XG.PhongMaterial',reimplementationSpecular:'Three.js GGX',defaultMethod:'emily',liveComparison:true,validation:'see qa-report.json and public-report.json',fullBodyIntegration:false},null,2));
+console.log('TRANSFER_BUILD',JSON.stringify({bytes:Buffer.byteLength(preview),assetCommit:commit,packagingVersion:'1.0.1',finalHTMLSyntaxValidated:true}));
