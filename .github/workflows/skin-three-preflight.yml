@@ -1,0 +1,66 @@
+name: Skin Three Preflight
+on:
+  push:
+    branches: [feature/skin-r02-three-identities-20261008]
+    paths: [.github/workflows/skin-three-preflight.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            skin-quality-lab
+            source
+            body
+            reconstruction
+            tools
+            scripts
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated inspection tools
+        run: |
+          mkdir -p /tmp/skin-inspection
+          cd /tmp/skin-inspection
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund esbuild@0.25.10 playwright@1.55.1
+          npx playwright install --with-deps chromium
+          python -m pip install pillow numpy
+      - name: Collect source and real browser evidence
+        env:
+          NODE_PATH: /tmp/skin-inspection/node_modules
+        run: |
+          mkdir -p /tmp/skin-evidence/source
+          cp skin-quality-lab/r02/{app.js,index.html,build.cjs,head.js,surface.js,fuzz.js,post.js} /tmp/skin-evidence/source/
+          cp body/{CharacterShape.js,CharacterAssembly.js,SkinAppearance.js,TissueShaders.js,CompactWorkbench.js,ReconstructionRig.js,CompactBinding.js} /tmp/skin-evidence/source/ 2>/dev/null || true
+          cp BUILD_MANIFEST* /tmp/skin-evidence/source/ 2>/dev/null || true
+          find skin-quality-lab -maxdepth 3 -type f -printf '%p %s\n' > /tmp/skin-evidence/files.txt
+          python - <<'PY'
+          from PIL import Image
+          import json,struct,numpy as np
+          from pathlib import Path
+          for p in [Path('skin-quality-lab/r01/assets/hires/albedo-4k.jpg'),Path('skin-quality-lab/r01/assets/normal.jpg')]:
+              im=Image.open(p); im.thumbnail((1200,1200)); im.save('/tmp/skin-evidence/'+p.stem+'.png')
+          b=Path('skin-quality-lab/r01/assets/head.glb').read_bytes(); n=struct.unpack_from('<I',b,12)[0]; doc=json.loads(b[20:20+n]); off=20+n; size,kind=struct.unpack_from('<II',b,off); bin=b[off+8:off+8+size]
+          def arr(i):
+              a=doc['accessors'][i];v=doc['bufferViews'][a['bufferView']];dim={'SCALAR':1,'VEC2':2,'VEC3':3,'VEC4':4}[a['type']];dtype={5126:'<f4',5125:'<u4',5123:'<u2'}[a['componentType']];return np.ndarray((a['count'],dim),dtype=dtype,buffer=bin,offset=v.get('byteOffset',0)+a.get('byteOffset',0),strides=(v.get('byteStride',dim*np.dtype(dtype).itemsize),np.dtype(dtype).itemsize)).copy()
+          p=doc['meshes'][0]['primitives'][0];pos=arr(p['attributes']['POSITION'])*.04;uv=arr(p['attributes']['TEXCOORD_0'])
+          Path('/tmp/skin-evidence/geometry.json').write_text(json.dumps({'bounds':[pos.min(0).tolist(),pos.max(0).tolist()],'positions':len(pos),'uvBounds':[uv.min(0).tolist(),uv.max(0).tolist()]},indent=2))
+          print(Path('/tmp/skin-evidence/geometry.json').read_text())
+          PY
+          python -m http.server 8765 >/tmp/skin-server.log 2>&1 &
+          node - <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          (async()=>{const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await browser.newPage({viewport:{width:1280,height:960},deviceScaleFactor:1});const errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto('http://127.0.0.1:8765/skin-quality-lab/r02/index.html');await p.waitForFunction(()=>window.__SKIN_LAB__?.state.ready,{timeout:120000});await p.waitForTimeout(1800);await p.screenshot({path:'/tmp/skin-evidence/baseline.png'});fs.writeFileSync('/tmp/skin-evidence/browser.json',JSON.stringify({errors,state:await p.evaluate(()=>window.__SKIN_LAB__.state)},null,2));await browser.close()})().catch(e=>{console.error(e);process.exit(1)});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-three-preflight
+          path: /tmp/skin-evidence
+          retention-days: 7
