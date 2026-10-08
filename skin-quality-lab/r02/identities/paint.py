@@ -103,7 +103,8 @@ def main():
   # Seeded individual lesions, each with metric radius and a bounded influence.
   # Sample anatomical 3D surface locations, not an x/y stamp strip. The density
   # has broad cheek/nose exposure plus an irregular low-density forehead/temple tail.
-  px,py,pz=pos.T;pn=nor[:,2];pax=np.abs(px)
+  centers=pos[tri].mean(axis=1);px,py,pz=centers.T;pn=nor[tri,:,].mean(axis=1)[:,2];pax=np.abs(px)
+  faceArea=np.linalg.norm(np.cross(pos[tri[:,1]]-pos[tri[:,0]],pos[tri[:,2]]-pos[tri[:,0]]),axis=1)*.5
   exposed=(pn>.12)&(pz>.014)&(py>.005)&(py<.143)&(pax<.085)
   central=(gauss(px,py,.042,.047,.030,.025)+gauss(px,py,-.042,.047,.030,.025))*.40
   bridge=gauss(px,py,0,.059,.017,.022)*.58
@@ -111,10 +112,10 @@ def main():
   temples=gauss(pax,py,.068,.077,.016,.050)*.11
   prob=np.maximum(central+bridge+forehead+temples,0)*exposed
   prob*=1-np.clip(gauss(px,py,0,.019,.029,.007),0,1)
-  prob/=max(prob.sum(),1e-6)
+  prob*=faceArea;prob/=max(prob.sum(),1e-12)
   spots=[]
   for j in range(p['freckles']):
-   k=rng.choice(len(pos),p=prob);sx,sy,sz=pos[k]
+   k=rng.choice(len(tri),p=prob);ra=np.sqrt(rng.random());rb=rng.random();sx,sy,sz=pos[tri[k,0]]*(1-ra)+pos[tri[k,1]]*ra*(1-rb)+pos[tri[k,2]]*ra*rb
    r=rng.uniform(.00013,.00058) if ident!='weathered' else rng.uniform(.00023,.0010)
    if ident=='weathered' and rng.random()<.055:r*=1.65
    strength=rng.uniform(.045,.22) if ident!='weathered' else rng.uniform(.035,.18)

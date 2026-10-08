@@ -9,7 +9,7 @@ permissions:
   contents: write
 concurrency:
   group: skin-three-identities
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -41,6 +41,18 @@ jobs:
           node skin-quality-lab/r02/identities/build.cjs --no-bundle
           node --check skin-quality-lab/r02/app.js
           cp skin-quality-lab/r02/assets/identities/manifest.json /tmp/skin-three-evidence/texture-manifest.json
+      - name: Capture early near and portrait material evidence
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+        run: |
+          python -m http.server 8765 >/tmp/skin-server.log 2>&1 &
+          node skin-quality-lab/r02/identities/quick-look.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-three-early-look
+          path: /tmp/skin-three-early
+          retention-days: 7
       - name: Source regression or verified-source reuse
         env:
           NODE_PATH: /tmp/skin-tools/node_modules

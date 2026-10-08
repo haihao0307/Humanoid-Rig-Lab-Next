@@ -200,7 +200,8 @@ void main() {
   vec3 T = normalize(vFiberTangent);
   vec3 V = isOrthographic ? vec3(0.0, 0.0, 1.0) : normalize(vFiberViewPosition);
   vec3 N = normalize(vFiberNormal);
-  vec3 pigment = clamp(vStrandColor * hairColor * mix(0.90, 1.10, vFiberRandom), vec3(0.0), vec3(0.95));
+  float rootVisibility = mix(0.48,1.0,smoothstep(0.0,0.28,vFiberAlong));
+  vec3 pigment = rootVisibility * clamp(vStrandColor * hairColor * mix(0.90, 1.10, vFiberRandom), vec3(0.0), vec3(0.95));
   // No emission or unlit additive wash. With every light off, result is black.
   vec3 color = pigment * ambientLightColor * (0.20 * ambientGain);
   #if NUM_HEMI_LIGHTS > 0
@@ -454,7 +455,7 @@ export function fiberMaterialDiagnostics(material) {
     alphaToCoverage: material.alphaToCoverage, actualSamples: record.samples,
     framebufferMeasured: record.framebufferMeasured, drawingBuffer: [...record.drawingBuffer],
     viewportHeight: record.viewportHeight, transparent: material.transparent, depthWrite: material.depthWrite,
-    shadows: record.shadows, shadowMethod: 'per-light native PCF, stochastic single-depth coverage',
+    shadows: record.shadows, shadowMethod: 'receives existing R02 VSM skin visibility; fibre shadow casting disabled',
     shadowViewports: {...record.shadowViewports},
     lightingSource: 'scene directional lights; independent per-light visibility',
     roughness: u.roughness.value, surfaceSpecular: u.surfaceSpecular.value,
