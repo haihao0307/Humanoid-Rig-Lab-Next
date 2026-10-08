@@ -9,6 +9,7 @@ on:
       - leather-workshop/r04/build.py
       - leather-workshop/r04/test*.mjs
       - leather-workshop/r04/qa.py
+      - leather-workshop/r04/review_fixes.py
 permissions:
   contents: write
 concurrency:
@@ -34,11 +35,9 @@ jobs:
           r=Path('leather-workshop/r04')
           if not (r/'site/dynamics.mjs').exists():
               parts=[(r/'bootstrap'/f'part-{i}.txt').read_text().strip() for i in range(1,7)]
-              # Repair two known transcription defects in the transport only.
               parts[2]=parts[2].replace('Xhq/dOLMg','Xhq/dgOLMg')
               parts[4]=parts[4].replace('VtX7nz7Iog','VtX7nz9Iog')
-              encoded=''.join(parts)
-              raw=zlib.decompress(base64.b64decode(encoded,validate=True))
+              raw=zlib.decompress(base64.b64decode(''.join(parts),validate=True))
               expected='208c024dddb372cf5619fff818313973ebd501b8dfeb545ae7ca86d80fe2619a'
               assert hashlib.sha256(raw).hexdigest()==expected,'Source transfer checksum mismatch'
               files=json.loads(raw)
@@ -50,6 +49,7 @@ jobs:
           else:
               print('Using expanded tracked sources; no bootstrap overwrite.')
           PY
+          python leather-workshop/r04/review_fixes.py
       - name: Browser dependencies
         run: |
           pip install -q playwright==1.55.0 pillow
@@ -71,7 +71,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           rm -f leather-workshop/r04/bundle-check.js leather-workshop/r04/worker-check.js
           git add -f leather-workshop/r04
-          git commit -m 'build(leather-r04): implicit leather dynamics and full offline lifecycle proof [skip ci]'
+          git commit -m 'build(leather-r04): audited nonlinear leather dynamics and full offline lifecycle [skip ci]'
           git push origin HEAD:experiment/leather-workshop-r01-20261008
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Actual immutable public browser verification
