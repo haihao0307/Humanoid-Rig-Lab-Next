@@ -30,6 +30,12 @@ jobs:
         env:
           NODE_PATH: /tmp/skin-r03-tools/node_modules
         run: node skin-quality-lab/r03-dynamic-candidate/qa/browser.cjs
+      - name: Public fixed-SHA preview checks
+        env:
+          NODE_PATH: /tmp/skin-r03-tools/node_modules
+          PUBLIC_URL: 'https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${{ github.sha }}/skin-quality-lab/r03-dynamic-candidate/preview.html'
+          PUBLIC_BASELINE_URL: 'https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/1d4a616672f2a45e869d4ef3e36e710b11f5cf41/skin-quality-lab/r02/preview.html'
+        run: node skin-quality-lab/r03-dynamic-candidate/qa/browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

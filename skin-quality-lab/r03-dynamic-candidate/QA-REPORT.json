@@ -1,15 +1,140 @@
 {
-  "stage": "candidate-local-only",
-  "sourceCommit": "8d61864050277f2c4574df7b31beb70093a8c263",
-  "baselineCommit": "1d4a616672f2a45e869d4ef3e36e710b11f5cf41",
-  "build": "passed",
-  "numericGeometry": "passed: 143196 rendered vertices, original buffers unchanged, exact zero pose, no triangle inversions at tested extrema; see NUMERIC-QA.json",
-  "eyeInterface": "passed: actual Three r180 material injection, finite geometry, parameter clamp, resize, pointer/keyboard and idempotent disposal",
+  "commit": "e5ec03b9cc939df6ec221172b52c1260c163fd5d",
+  "date": "2026-10-08T05:22:13.762Z",
+  "checks": [
+    "Small preview loader resolves module imports and CORS through fixed source URLs",
+    "R02 baseline image parity RMSE <= 1/255",
+    "Dynamic skin visibly changes output",
+    "Original 4K albedo and 14000 fuzz strands retained",
+    "Eye controls alter rendered pixels",
+    "Repeated skin/eye switching and reset",
+    "Mobile width has no horizontal overflow"
+  ],
+  "errors": [],
+  "parity": "image tolerance passed",
+  "baselineState": {
+    "ready": true,
+    "version": "skin-quality-lab/r02.1",
+    "errors": [],
+    "layer": "beauty",
+    "light": "studio",
+    "camera": "front",
+    "baseline": false,
+    "frames": 3,
+    "quality": "high",
+    "fps": 0,
+    "fuzzStrands": 14000,
+    "fuzzTriangles": 84000,
+    "resolution": [
+      1134,
+      934
+    ],
+    "triangles": 282944,
+    "assets": {
+      "albedo": [
+        4096,
+        4096
+      ],
+      "baseNormal": [
+        1024,
+        1024
+      ],
+      "mesostructure": [
+        4096,
+        4096
+      ],
+      "microstructure": [
+        4096,
+        4096
+      ],
+      "surface": [
+        4096,
+        4096
+      ]
+    },
+    "renderer": "WebKit WebGL"
+  },
+  "baselineParity": {
+    "meanAbsolute": 0,
+    "rmse": 0,
+    "max": 0,
+    "changedRatio": 0
+  },
+  "warmDifference": {
+    "meanAbsolute": 0.7996920818714776,
+    "rmse": 3.288342331070433,
+    "max": 163,
+    "changedRatio": 0.1343645317592498
+  },
+  "runtime": {
+    "state": {
+      "ready": true,
+      "version": "skin-quality-lab/r03-dynamic-candidate",
+      "errors": [],
+      "layer": "beauty",
+      "light": "studio",
+      "camera": "front",
+      "baseline": false,
+      "frames": 12,
+      "quality": "high",
+      "fps": 0,
+      "fuzzStrands": 14000,
+      "fuzzTriangles": 84000,
+      "resolution": [
+        1134,
+        934
+      ],
+      "triangles": 282944,
+      "assets": {
+        "albedo": [
+          4096,
+          4096
+        ],
+        "baseNormal": [
+          1024,
+          1024
+        ],
+        "mesostructure": [
+          4096,
+          4096
+        ],
+        "microstructure": [
+          4096,
+          4096
+        ],
+        "surface": [
+          4096,
+          4096
+        ]
+      },
+      "renderer": "WebKit WebGL"
+    },
+    "dynamic": {
+      "source": "independent general geometry and artistic shading",
+      "enginePath": "CPU adjacency/strain + GPU vertex delta application",
+      "vertices": 143196,
+      "edges": 426132,
+      "affectedVertices": 0,
+      "maxDisplacementMM": 0,
+      "minStrain": 0,
+      "maxStrain": 0,
+      "updateMS": 46.899999999965075
+    }
+  },
+  "eyeDifference": {
+    "meanAbsolute": 14.314035263297695,
+    "rmse": 40.23589132014458,
+    "max": 231,
+    "changedRatio": 0.18966705565563524
+  },
+  "mobile": {
+    "width": 390,
+    "scrollWidth": 390
+  },
+  "status": "passed",
+  "run": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/37731966534",
+  "publicEntryValidation": "module loading/CORS confirmed in cloud browser; full public WebGL pass pending",
   "unityRun": "not_run",
-  "webglShaderCompile": "not_run",
-  "pixelParity": "not_run",
-  "browserInteraction": "not_run",
-  "blocker": "Local Chromium launch blocked by runtime socket restriction; cloud browser cannot create WebGL even for the fixed original baseline. Remote QA is pending authorization.",
-  "remoteWrites": "none",
-  "shaderStructure": "passed: actual Three r180 shader injection/GLSL includes checked; GPU compile not run"
+  "unityParity": "not_claimed",
+  "visualReview": "head detail retained; eye is an independent procedural study, not implanted in scan"
 }

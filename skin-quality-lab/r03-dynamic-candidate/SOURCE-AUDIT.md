@@ -18,8 +18,8 @@ Unity 源码的存在不代表允许按 MIT 移植：它采用 Unity Companion L
 
 - SOURCE：Unity 与 R02.1 都使用固定提交；Unity 仓库树、LICENSE、package.json 和 README 已核对。
 - READ：已读 SkinDeformationRenderer、SkinDeformationClip、SkinDeformationCS、SkinTensionRenderer、SkinTensionCS、SkinDeformationBlend、SkinTensionSampleWeight、SnappersBlend、SkinAttachmentCS、SkinAttachmentData；检查 SkinAttachmentTarget、SnappersHeadRenderer 的相关调用；解析新 Skin/Tension 子图的属性和连线。眼部完整范围见 EYE-AUDIT.md。
-- RUN：未执行 Unity Editor/HDRP。网页构建与原头数值/独立眼台接口测试已运行。当前云浏览器的原版 R02 都无法创建 WebGL，GPU 图像验收需独立测试环境。每一阶段状态见 QA-REPORT.json。
-- PARITY：不宣称与 Unity 相同。R02 静态回退的原始位置/法线数组保持 byte-exact；仍须经过同灯光/相机/像素分辨率的最终 PNG 对照，数值不变本身不是像素验收通过。
+- RUN：未执行 Unity Editor/HDRP。网页构建、完整渲染网格数值与独立眼台接口测试已运行。GitHub Chromium 图像/交互验收已通过，run 37731966534，测试源码提交 e5ec03b9cc939df6ec221172b52c1260c163fd5d。公网固定入口另行复核，阶段状态见 QA-REPORT.json。
+- PARITY：不宣称与 Unity 相同。R02 静态回退的原始位置/法线数组保持 byte-exact；固定正面/柔箱光、1134×934渲染canvas的实际PNG对照中，关闭动态层后RMSE=0、最大通道差=0。这只证明该受控视图的回退结果，不代表Unity parity或所有GPU完全等价。
 
 ## 真实运行依赖
 
