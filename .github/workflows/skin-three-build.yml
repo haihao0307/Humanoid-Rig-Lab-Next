@@ -1,0 +1,79 @@
+name: Skin Three Build and Verify
+on:
+  push:
+    branches: [feature/skin-r02-three-identities-20261008]
+    paths:
+      - skin-quality-lab/r02/identities/**
+      - .github/workflows/skin-three-build.yml
+permissions:
+  contents: write
+concurrency:
+  group: skin-three-identities
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/skin-r02-three-identities-20261008
+          sparse-checkout: |
+            skin-quality-lab
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch exact source anchor and isolated build tools
+        run: |
+          git fetch --depth=1 origin 1d4a616672f2a45e869d4ef3e36e710b11f5cf41
+          mkdir -p /tmp/skin-tools /tmp/skin-three-evidence
+          cd /tmp/skin-tools
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund esbuild@0.25.10 playwright@1.55.1
+          npx playwright install --with-deps chromium
+          python -m pip install pillow numpy scipy
+      - name: Paint separate UV channels and build inherited renderer
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+        run: |
+          python skin-quality-lab/r02/identities/paint.py
+          node skin-quality-lab/r02/identities/build.cjs --no-bundle
+          node --check skin-quality-lab/r02/app.js
+          cp skin-quality-lab/r02/assets/identities/manifest.json /tmp/skin-three-evidence/texture-manifest.json
+      - name: Real browser regression and visual evidence
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+          QA_OUT: /tmp/skin-three-evidence/local
+        run: |
+          python -m http.server 8765 >/tmp/skin-server.log 2>&1 &
+          node skin-quality-lab/r02/identities/qa.cjs
+      - name: Commit textures and fixed preview without touching main
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+        run: |
+          git config user.name 'Skin Lab Build'
+          git config user.email 'skin-lab-build@users.noreply.github.com'
+          git add skin-quality-lab/r02/app.js skin-quality-lab/r02/index.html skin-quality-lab/r02/assets/identities
+          if ! git diff --cached --quiet; then git commit -m 'feat(skin): build three independent identity textures and rooted fibres [skip ci]'; fi
+          git push origin HEAD:feature/skin-r02-three-identities-20261008
+          ASSET_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/r02/identities/build.cjs
+          git add skin-quality-lab/r02/preview.html skin-quality-lab/r02/BUILD_MANIFEST_IDENTITIES.json
+          git commit -m 'build(skin): pin interactive R02.2 three-skin preview [skip ci]'
+          git push origin HEAD:feature/skin-r02-three-identities-20261008
+          echo "PUBLIC_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          cp skin-quality-lab/r02/BUILD_MANIFEST_IDENTITIES.json /tmp/skin-three-evidence/
+      - name: Verify public immutable HTML Preview in real browser
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+          QA_OUT: /tmp/skin-three-evidence/public
+        run: |
+          export QA_URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${PUBLIC_COMMIT}/skin-quality-lab/r02/preview.html"
+          echo "$QA_URL" | tee /tmp/skin-three-evidence/PUBLIC_URL.txt
+          node skin-quality-lab/r02/identities/qa.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-three-render-evidence
+          path: /tmp/skin-three-evidence
+          retention-days: 7
