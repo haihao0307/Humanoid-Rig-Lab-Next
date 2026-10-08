@@ -213,7 +213,7 @@ const IDENTITY_DEFINITIONS={
  original:{label:'原 R02',description:'原始扫描颜色、法线和材质参数；保留作回退对照。',seed:0,beard:0,brow:0,params:{}},
  porcelain:{label:'01 · 冷白雀斑',description:'无须、铜棕细弧眉；鼻颊雀斑、细孔、偏哑光。独立色素 / 凹凸 / 粗糙度贴图。',seed:218,beard:0,brow:1450,params:{roughness:.60,oil:.12,detail:.56,meso:.75,micro:1.10,pores:.18,fuzz:.34,pigment:0,blood:.23,sss:.84,radius:1.20,relief:.62}},
  umber:{label:'02 · 深褐短须',description:'深褐色素、短硬胡茬、宽浓断眉；局部痘印、眉侧浅疤，T 区偏油。',seed:734,beard:11000,brow:1950,params:{roughness:.56,oil:.14,detail:.77,meso:1.08,micro:1.40,pores:.38,fuzz:.24,pigment:0,blood:.15,sss:.74,radius:.90,relief:.75}},
- weathered:{label:'03 · 风化熟龄',description:'暖褐晒斑、额纹和眼角细纹；灰白混色胡须、疏密眉束、干燥粗糙分区。',seed:159,beard:15000,brow:2250,params:{roughness:.64,oil:.07,detail:.90,meso:1.25,micro:1.20,pores:.29,fuzz:.32,pigment:0,blood:.19,sss:.76,radius:1.15,relief:.88}}
+ weathered:{label:'03 · 风化熟龄',description:'暖褐晒斑、额纹和眼角细纹；灰白混色胡须、疏密眉束、干燥粗糙分区。',seed:159,beard:12500,brow:1500,params:{roughness:.64,oil:.07,detail:.90,meso:1.25,micro:1.20,pores:.29,fuzz:.32,pigment:0,blood:.19,sss:.76,radius:1.15,relief:.88}}
 };
 function identityRandom(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
 // Rebound to the CURRENT subdivided scan triangles; no GNM indices or teacher
@@ -233,12 +233,12 @@ function identityHairGeometry(geometry,profile,maps){
   a.fromBufferAttribute(p,ia);b.fromBufferAttribute(p,ib);c.fromBufferAttribute(p,ic);q.copy(a).multiplyScalar(1-u-v).addScaledVector(b,u).addScaledVector(c,v);
   const ax=Math.abs(q.x),side=q.x<0?-1:1,t=(ax-.010)/.048;
   const arch=.0795+.0033*Math.sin(Math.PI*t)-.004*t+(profile.seed===218?.0015:0);
-  const width=profile.seed===218?.00165:profile.seed===734?.0031:.0027;
+  const width=profile.seed===218?.00165:profile.seed===734?.0031:.0021;
   const brow=t>0&&t<1&&Math.abs(q.y-arch)<width*Math.pow(Math.sin(Math.PI*t),.40);
   const notch=profile.seed===734&&q.x>.039&&q.x<.046&&q.y>.074;
   const moustache=ax<.027&&q.y>.0225&&q.y<.030&&q.z>.071;
   const upper=.019+.034*smooth(.023,.071,ax)+.002*Math.sin(q.x*170);
-  const cheek=smooth(.023,.031,ax)*(1-smooth(.063,.071,ax))*(1-smooth(upper-.003,upper+.002,q.y));
+  const cheek=smooth(.023,.031,ax)*(1-smooth(.063,.071,ax))*(1-smooth(upper-.005,upper+.0035,q.y));
   const chin=(1-smooth(.006,.013,q.y))*(1-smooth(.063,.072,ax));
   const bottom=smooth(-.031,-.022,q.y),lip=ax<.029&&Math.abs(q.y-.0185)<.0065;
   const probability=Math.max(cheek,chin,moustache?.88:0)*bottom;
@@ -248,30 +248,30 @@ function identityHairGeometry(geometry,profile,maps){
   nn.set(n.getX(ia)*(1-u-v)+n.getX(ib)*u+n.getX(ic)*v,n.getY(ia)*(1-u-v)+n.getY(ib)*u+n.getY(ic)*v,n.getZ(ia)*(1-u-v)+n.getZ(ib)*u+n.getZ(ic)*v).normalize();
   if(nn.z<.04)continue;
   const field=Math.sin(q.x*97+q.y*133)+.4*Math.sin(q.x*229-q.y*71);
-  const flow=kind==='brow'?new THREE.Vector3(side*(.72+.18*rand()),.45-.83*t,0):new THREE.Vector3(side*(moustache?.92:.13+.15*smooth(-.015,.035,q.y))+.11*field,-1,.06);
-  flow.x+=(rand()-.5)*.18;flow.y+=(rand()-.5)*.12;if(kind==='brow'||flow.dot(nn)<0)flow.addScaledVector(nn,-flow.dot(nn));flow.normalize();
-  let length=kind==='brow'?(profile.seed===218?.0017+rand()*.0020:profile.seed===159?.0025+rand()*.0038:.0021+rand()*.0030):(profile.seed===159?.0026+rand()*.0048:.00055+rand()*.00115);
+  const flow=kind==='brow'?new THREE.Vector3(side*(.72+.18*rand()),.45-.83*t,0):new THREE.Vector3(side*(moustache?.92:.13+.15*smooth(-.015,.035,q.y))+.19*field,-1,.06);
+  flow.x+=(rand()-.5)*.48;flow.y+=(rand()-.5)*.12;if(kind==='brow'||flow.dot(nn)<0)flow.addScaledVector(nn,-flow.dot(nn));flow.normalize();
+  let length=kind==='brow'?(profile.seed===218?.0017+rand()*.0020:profile.seed===159?.0025+rand()*.0038:.0021+rand()*.0030):(profile.seed===159?.0011+Math.pow(rand(),.75)*.0044:.00055+rand()*.00115);
   if(kind==='beard'&&moustache)length*=.73;
-  const silver=profile.seed===159&&rand()<(kind==='brow'?.60:.78);
-  let col=profile.seed===218?new THREE.Color(.12,.052,.024):silver?new THREE.Color(.53,.55,.57):new THREE.Color(.014,.010,.008);col.multiplyScalar(.83+rand()*.30);
+  const silver=profile.seed===159&&rand()<(kind==='brow'?.45:.67);
+  let col=profile.seed===218?new THREE.Color(.12,.052,.024):silver?new THREE.Color(.18,.19,.20):new THREE.Color(.014,.010,.008);col.multiplyScalar(.64+rand()*.70);
   const relief=new THREE.Vector3(displaced[ia*3]*(1-u-v)+displaced[ib*3]*u+displaced[ic*3]*v,displaced[ia*3+1]*(1-u-v)+displaced[ib*3+1]*u+displaced[ic*3+1]*v,displaced[ia*3+2]*(1-u-v)+displaced[ib*3+2]*u+displaced[ic*3+2]*v);
-  output[kind].push({p:q.clone(),n:nn.clone(),flow,length,col,relief,random:rand(),radius:(kind==='brow'?.000021:.000027)*(0.77+rand()*.48),curl:rand(),silver,triangle:i/3,bary:[1-u-v,u,v]});
+  output[kind].push({p:q.clone(),n:nn.clone(),flow,length,col,relief,random:rand(),radius:(kind==='brow'?.000021:.000027)*(0.52+Math.pow(rand(),1.5)*.85),curl:rand(),silver,triangle:i/3,bary:[1-u-v,u,v]});
  }
  const group=new THREE.Group();group.name='identity-scan-bound-kaopu-fibres';
  for(const kind of ['brow','beard']){
   const positions=[],normals=[],roots=[],colors=[],tangents=[],ts=[],sides=[],ids=[],randoms=[],radii=[],relief=[];const segments=kind==='beard'&&profile.seed===159?10:7;
   for(const strand of output[kind]){const start=positions.length/3,across=new THREE.Vector3().crossVectors(strand.n,strand.flow).normalize(),points=[];
-   for(let j=0;j<=segments;j++){const t=j/segments;const lift=strand.radius*1.2+strand.length*(.30*t+.15*t*t);const bend=Math.sin(t*Math.PI*(1.25+strand.curl*.75))*strand.length*.11*t;
+   for(let j=0;j<=segments;j++){const t=j/segments;const lift=strand.radius*1.2+strand.length*(.30*t+.15*t*t);const bend=Math.sin(t*Math.PI*(1.25+strand.curl*.75))*strand.length*.22*t;
     points.push(strand.p.clone().addScaledVector(strand.n,lift).addScaledVector(strand.flow,strand.length*(.75*t+.10*t*t)).addScaledVector(across,bend*(strand.curl-.5)*2));}
-   for(let j=0;j<=segments;j++){const t=j/segments,tangent=points[Math.min(j+1,segments)].clone().sub(points[Math.max(0,j-1)]).normalize(),radius=strand.radius*Math.pow(Math.max(.015,1-t),.70);
+   for(let j=0;j<=segments;j++){const t=j/segments,tangent=points[Math.min(j+1,segments)].clone().sub(points[Math.max(0,j-1)]).normalize(),radius=strand.radius*Math.pow(Math.max(0,1-t),1.10);
     for(const side of [-1,1]){positions.push(...points[j].toArray());roots.push(...points[0].toArray());normals.push(...strand.n.toArray());colors.push(...strand.col.toArray());tangents.push(...tangent.toArray());ts.push(t);sides.push(side);randoms.push(strand.random);radii.push(radius);relief.push(...strand.relief.toArray());}
     if(j<segments){let k=start+j*2;ids.push(k,k+1,k+2,k+1,k+3,k+2);}
    }
   }
   const g=new THREE.BufferGeometry();for(const [key,arr,size] of [['position',positions,3],['scalpNormal',normals,3],['rootPosition',roots,3],['strandColor',colors,3],['tangent',tangents,3],['along',ts,1],['strandSide',sides,1],['strandRandom',randoms,1],['strandRadius',radii,1],['boundRelief',relief,3]])g.setAttribute(key,new THREE.Float32BufferAttribute(arr,size));g.setIndex(ids);
-  const obj=new THREE.Mesh(g);obj.name=kind;const handle=attachFiberMaterial(obj,{renderer,color:'#ffffff',roughness:profile.seed===159?.52:.42,specular:.12,shadows:false,coverageAA:true,coverageResolve:'blend'});obj.material.uniforms.uRelief=E.uRelief;obj.userData.fiberHandle=handle;obj.renderOrder=2;group.add(obj);
+  const obj=new THREE.Mesh(g);obj.name=kind;const handle=attachFiberMaterial(obj,{renderer,color:'#ffffff',roughness:profile.seed===159?.52:.42,specular:.12,shadows:false,coverageAA:true,coverageResolve:'blend'});obj.material.uniforms.uRelief=E.uRelief;obj.receiveShadow=true;obj.castShadow=false;obj.material.uniforms.fiberShadows.value=1;obj.userData.fiberHandle=handle;obj.renderOrder=2;group.add(obj);
  }
- group.userData.counts={brow:output.brow.length,beard:output.beard.length};group.userData.binding={basis:'current subdivided R02 scan triangles',surface:'barycentric interpolation of displaced triangle vertices',rootOffsetMeters:[.000025,.000050],originalFuzzPreserved:14000,segments:[7,10],sourceMaterial:'kaopu-hair-workbench/qa/gnm-groom-editor/src/FiberMaterial.js@23f1f408f961749c49e9747d45072c761825b158',fiberShadows:'disabled; retain original VSM skin shadows'};return group;
+ group.userData.counts={brow:output.brow.length,beard:output.beard.length};group.userData.binding={basis:'current subdivided R02 scan triangles',surface:'barycentric interpolation of displaced triangle vertices',rootOffsetMeters:[.000025,.000050],originalFuzzPreserved:14000,segments:[7,10],sourceMaterial:'kaopu-hair-workbench/qa/gnm-groom-editor/src/FiberMaterial.js@23f1f408f961749c49e9747d45072c761825b158',fiberShadows:'receives existing skin VSM; strand shadow casting disabled'};return group;
 }
 
 async function installSkinIdentities(original,load){
