@@ -1,0 +1,41 @@
+name: Skin R03 candidate QA
+on:
+  push:
+    branches: [candidate/skin-r03-dynamic-20261008]
+    paths: ['skin-quality-lab/r03-dynamic-candidate/**', '.github/workflows/skin-r03-candidate-qa.yml']
+permissions:
+  contents: read
+jobs:
+  candidate-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install public test tools
+        run: npm install --prefix /tmp/skin-r03-tools esbuild playwright pngjs
+      - name: Install isolated Chromium
+        run: /tmp/skin-r03-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Rebuild candidate
+        env:
+          NODE_PATH: /tmp/skin-r03-tools/node_modules
+        run: node skin-quality-lab/r03-dynamic-candidate/build.cjs
+      - name: Numeric geometry checks
+        env:
+          NODE_PATH: /tmp/skin-r03-tools/node_modules
+        run: node skin-quality-lab/r03-dynamic-candidate/qa/numeric.cjs
+      - name: Browser visual and interaction checks
+        env:
+          NODE_PATH: /tmp/skin-r03-tools/node_modules
+        run: node skin-quality-lab/r03-dynamic-candidate/qa/browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-r03-candidate-qa
+          path: |
+            skin-quality-lab/r03-dynamic-candidate/qa-results/*.png
+            skin-quality-lab/r03-dynamic-candidate/qa-results/QA-REPORT.json
+            skin-quality-lab/r03-dynamic-candidate/NUMERIC-QA.json
+          retention-days: 7

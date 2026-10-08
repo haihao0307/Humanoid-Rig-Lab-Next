@@ -1,0 +1,77 @@
+{
+  "sourceVertices": 9279,
+  "renderVertices": 143196,
+  "cases": [
+    {
+      "input": {
+        "smile": 0,
+        "brow": 0
+      },
+      "flippedTriangles": 0,
+      "source": "independent general geometry and artistic shading",
+      "enginePath": "CPU adjacency/strain + GPU vertex delta application",
+      "vertices": 143196,
+      "edges": 426132,
+      "affectedVertices": 0,
+      "maxDisplacementMM": 0,
+      "minStrain": 0,
+      "maxStrain": 0,
+      "updateMS": 57.43909099999996
+    },
+    {
+      "input": {
+        "smile": 1,
+        "brow": 1
+      },
+      "flippedTriangles": 0,
+      "source": "independent general geometry and artistic shading",
+      "enginePath": "CPU adjacency/strain + GPU vertex delta application",
+      "vertices": 143196,
+      "edges": 426132,
+      "affectedVertices": 72879,
+      "maxDisplacementMM": 3.811968341849214,
+      "minStrain": -0.12240391969680786,
+      "maxStrain": 0.11590885370969772,
+      "updateMS": 70.7710239999999
+    },
+    {
+      "input": {
+        "smile": 0.7,
+        "brow": 0.12
+      },
+      "flippedTriangles": 0,
+      "source": "independent general geometry and artistic shading",
+      "enginePath": "CPU adjacency/strain + GPU vertex delta application",
+      "vertices": 143196,
+      "edges": 426132,
+      "affectedVertices": 71545,
+      "maxDisplacementMM": 2.503216430583985,
+      "minStrain": -0.048791397362947464,
+      "maxStrain": 0.07488683611154556,
+      "updateMS": 60.32769700000017
+    },
+    {
+      "input": {
+        "smile": 0.25,
+        "brow": 0.85
+      },
+      "flippedTriangles": 0,
+      "source": "independent general geometry and artistic shading",
+      "enginePath": "CPU adjacency/strain + GPU vertex delta application",
+      "vertices": 143196,
+      "edges": 426132,
+      "affectedVertices": 71618,
+      "maxDisplacementMM": 3.243184314651175,
+      "minStrain": -0.09958457201719284,
+      "maxStrain": 0.09844429045915604,
+      "updateMS": 55.90738499999998
+    }
+  ],
+  "assertions": [
+    "All positions/normals remain byte-exact to original input",
+    "Zero-shape deltas are exactly zero",
+    "Finite deltas/strain at tested extrema",
+    "Disabled GPU gate is exactly zero",
+    "No triangle inversion in tested extrema"
+  ]
+}
