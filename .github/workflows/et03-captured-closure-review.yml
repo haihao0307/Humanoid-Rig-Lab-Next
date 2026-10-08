@@ -1,0 +1,52 @@
+name: ET03 captured closure review
+on:
+  push:
+    branches: [experiment/emily-eyelid-research-et03-20261008]
+    paths: ['.github/workflows/et03-captured-closure-review.yml']
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare Chromium
+        timeout-minutes: 4
+        run: |
+          npm install --prefix /tmp/et03-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/et03-tools/node_modules/.bin/playwright install chromium
+          timeout 75s sudo apt-get install --no-install-recommends -y fonts-wqy-zenhei || true
+      - name: Reconstruct surfaces from pinned skin and observed closure
+        env:
+          NODE_PATH: /tmp/et03-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 06b92744537caf0709b9bb73e4917453bc238294
+          node skin-quality-lab/emily-transfer/research/refine.cjs
+          node skin-quality-lab/emily-transfer/research/closure.cjs
+          node skin-quality-lab/emily-transfer/research/build.cjs
+      - name: Browser geometry and visual evidence
+        env:
+          NODE_PATH: /tmp/et03-tools/node_modules
+        run: node skin-quality-lab/emily-transfer/research/quick.cjs
+      - name: Preserve complete candidate
+        if: always()
+        run: |
+          mkdir -p /tmp/et03-evidence/candidate
+          cp -r skin-quality-lab/emily-transfer/. /tmp/et03-evidence/candidate/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et03-captured-closure-review
+          path: /tmp/et03-evidence
+          retention-days: 14
