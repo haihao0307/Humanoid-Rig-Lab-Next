@@ -39,6 +39,23 @@ async function shot(name){await settle();await page.screenshot({path:OUT+'/'+nam
  const temporal=await page.evaluate(()=>{window.__EYES__.set({headYaw:0,autoBlink:false});window.__EYES__.setTarget([-.10,.085,.6]);for(let i=0;i<60;i++)window.__EYES__.advance(1/60);return window.__EYES__.pose();});
  assert(temporal.eyes.every(e=>e.targetErrorDegrees<.05));report.checks.temporalConvergence=temporal;
  await page.click('#eye-reset');await page.click('[data-camera="eye"]');await shot('public-et02-eye-macro');
+ // Public optical and eyelid checks use the actual HTTPS canvas.
+ async function pixels(){await settle();return PNG.sync.read(Buffer.from((await page.evaluate(()=>document.querySelector('#viewport canvas').toDataURL())).split(',')[1],'base64'));}
+ function difference(a,b){let sum=0;for(let i=0;i<a.data.length;i+=4)sum+=Math.abs(a.data[i]-b.data[i])+Math.abs(a.data[i+1]-b.data[i+1])+Math.abs(a.data[i+2]-b.data[i+2]);return sum/(a.width*a.height*3);}
+ await page.evaluate(()=>window.__EYES__.set({autoBlink:false,autoPupil:false,wet:.92,pupil:.32,openness:1}));
+ const baseline=await pixels();
+ await page.evaluate(()=>window.__EYES__.set({pupil:.58}));const dilated=await pixels();
+ report.checks.pupilPixelDifference=difference(baseline,dilated);assert(report.checks.pupilPixelDifference>.08);
+ await page.evaluate(()=>window.__EYES__.set({wet:0}));const dry=await pixels();
+ report.checks.corneaReflectionPixelDifference=difference(dilated,dry);assert(report.checks.corneaReflectionPixelDifference>.03);
+ await page.evaluate(()=>window.__EYES__.set({wet:.92,pupil:.32,openness:0}));const closed=await pixels();
+ report.checks.eyelidClosureDifference=difference(baseline,closed);assert(report.checks.eyelidClosureDifference>.2);
+ await shot('public-et02-closed-lids');
+ await page.evaluate(()=>{window.__EYES__.set({openness:1,autoPupil:true});window.__SKIN_LAB__.setLighting({key:.05,fill:.03});});
+ await settle();const dark=await page.evaluate(()=>window.__EYES__.pose().pupil);
+ await page.evaluate(()=>window.__SKIN_LAB__.setLighting({key:4.3,fill:.5}));await settle();
+ const bright=await page.evaluate(()=>window.__EYES__.pose().pupil);assert(dark>bright+.05);report.checks.lightPupil={dark,bright};
+ await page.click('#reset');await page.click('#eye-reset');await page.click('[data-camera="eyes"]');await shot('public-et02-binocular-closeup');
  await page.click('[data-camera="portrait"]');await page.setViewportSize({width:390,height:844});
  await page.evaluate(()=>window.__SKIN_LAB__.setCamera('portrait'));await shot('public-et02-mobile');
  await page.click('#mobileToggle');assert(await page.locator('.side').isVisible());await page.click('[data-gaze="pointer"]');await page.click('#mobileToggle');
