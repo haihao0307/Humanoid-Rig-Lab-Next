@@ -10,7 +10,7 @@ let eye=fs.readFileSync(__dirname+'/EyeSystem.js','utf8');
 eye=eye.replace('indices.push(k,k+1,k+A+1,k+1,k+A+2,k+A+1);','indices.push(k,k+A+1,k+1,k+1,k+A+1,k+A+2);');
 eye=eye.replace('smoothstep(.40,-.24,P.y)','(1.-smoothstep(-.24,.40,P.y))');
 eye=eye.replace("const {c,lid,rim,lashes}=e,P=lid.mesh.geometry.attributes.position;","const {c,lid,rim,lashes}=e,P=lid.mesh.geometry.attributes.position;");
-eye=eye.replace('e.pivot.updateMatrixWorld(true);','e.lid.mesh.material.roughness=this.skin.roughness;e.lid.mesh.material.clearcoat=this.skin.clearcoat;e.lid.mesh.material.clearcoatRoughness=this.skin.clearcoatRoughness;e.lid.mesh.material.envMapIntensity=this.skin.envMapIntensity;e.pivot.updateMatrixWorld(true);');
+if(!eye.includes('e.lid.mesh.material.roughness=this.skin.roughness;'))eye=eye.replace('e.pivot.updateMatrixWorld(true);','e.lid.mesh.material.roughness=this.skin.roughness;e.lid.mesh.material.clearcoat=this.skin.clearcoat;e.lid.mesh.material.clearcoatRoughness=this.skin.clearcoatRoughness;e.lid.mesh.material.envMapIntensity=this.skin.envMapIntensity;e.pivot.updateMatrixWorld(true);');
 fs.writeFileSync(__dirname+'/EyeSystem.js',eye);
 patch("import * as THREE from 'three';","import * as THREE from 'three';\nimport {EyeSystem,EYE_VERSION} from './eyes/EyeSystem.js';");
 patch("VERSION='emily-transfer/1.0.0'","VERSION='emily-transfer/2.0.0'");
