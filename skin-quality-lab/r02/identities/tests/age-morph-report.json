@@ -1,0 +1,308 @@
+{
+  "schema": "kaopu/r02-artistic-age-test@1",
+  "success": true,
+  "sourceMeshSHA256": "402b8a8ac9f03232e6d64b5962929703a069daf99d3c49ac8eb0e48bedc9c576",
+  "captureMilliseconds": 169.42848900000007,
+  "applyMilliseconds": 28.898128999999926,
+  "checks": [
+    {
+      "name": "expected subdivided scan",
+      "pass": true
+    },
+    {
+      "name": "finite positions and normals",
+      "pass": true
+    },
+    {
+      "name": "UV unchanged",
+      "pass": true
+    },
+    {
+      "name": "topology unchanged",
+      "pass": true
+    },
+    {
+      "name": "neutral attributes unchanged",
+      "pass": true
+    },
+    {
+      "name": "unit normals remain normalized",
+      "pass": true
+    },
+    {
+      "name": "visible but bounded volume change",
+      "pass": true
+    },
+    {
+      "name": "UV seam duplicates remain coincident",
+      "pass": true
+    },
+    {
+      "name": "no triangle direction reversal",
+      "pass": true
+    },
+    {
+      "name": "local area not collapsed",
+      "pass": true
+    },
+    {
+      "name": "analytic field orientation preserved",
+      "pass": true
+    },
+    {
+      "name": "reapply is independent of history",
+      "pass": true
+    },
+    {
+      "name": "20 switching cycles restore every position and normal byte",
+      "pass": true
+    },
+    {
+      "name": "strength zero is exact neutral",
+      "pass": true
+    },
+    {
+      "name": "normal transport agrees with independent finite differences",
+      "pass": true
+    }
+  ],
+  "geometry": {
+    "schema": "kaopu/r02-scan-artistic-age@1",
+    "strength": 1,
+    "vertexCount": 143196,
+    "triangleCount": 282944,
+    "topologyChanged": false,
+    "uvChanged": false,
+    "neutralRestore": "original position and normal byte copy",
+    "normalMethod": "analytic inverse-transpose deformation-gradient transport of original scan normals",
+    "maximumDisplacementMeters": 0.004360088618608028,
+    "unitMaximumDisplacementMeters": 0.004360088618608028,
+    "unitAffectedVertices": 124882,
+    "unitJacobianDeterminantRange": [
+      0.8847420774357642,
+      1.1633385947587294
+    ],
+    "fields": [
+      "malar-volume",
+      "submalar-hollow",
+      "temple-volume",
+      "lower-orbit-pad",
+      "tear-trough",
+      "upper-lid-fold",
+      "mouth-corner",
+      "nasolabial-support",
+      "nasolabial-groove",
+      "marionette-groove",
+      "lower-cheek-pad",
+      "jowl-soft-tissue",
+      "prejowl-transition",
+      "submental-soft-tissue",
+      "anterior-neck"
+    ],
+    "basis": "art-directed closed-eye R02 scan; not medically validated"
+  },
+  "unitNormalLengthRange": [
+    0.9999999521276262,
+    1.0000000483524605
+  ],
+  "changedVertices": 124885,
+  "maximumMeasuredDisplacementMeters": 0.004360088309012029,
+  "UVSeamDuplicateVertices": 1722,
+  "maxSeamGapMeters": 0,
+  "triangleFlips": 0,
+  "minFaceDirectionDot": 0.9197181127068089,
+  "triangleAreaRatioRange": [
+    0.8333139237063449,
+    1.2336777467559379
+  ],
+  "maximumNormalTransportError": 0.0000012950428065123765,
+  "baselineHashes": {
+    "positionHash": "42bce6e67b9655c7e9f6624b1c8119e1ab68ba13972d3c96d43dd969745e9f12",
+    "normalHash": "18c7441cb17dcf53accd064a116f258e14975065242753bc36d5773eb968bca9",
+    "uvHash": "978d97e299d4b491dfb692628b7e0bed9dc6af7d36d2a6268d59548a881c7579",
+    "indexHash": "1b88523686248da62c75c372fec62999e6c67f945a4aa11f3393d44456ca6131"
+  },
+  "samples": [
+    {
+      "name": "mid-cheek",
+      "referencePoint": [
+        -0.04,
+        0.032,
+        0.07
+      ],
+      "vertex": 6977,
+      "neutralPosition": [
+        -0.04266565665602684,
+        0.03206111863255501,
+        0.07099320739507675
+      ],
+      "distanceToReferenceMeters": 0.00284533334157893,
+      "deltaMillimeters": [
+        1.2619011104106903,
+        -1.2498162686824799,
+        -3.340482711791992
+      ]
+    },
+    {
+      "name": "under-eye",
+      "referencePoint": [
+        -0.0332,
+        0.0585,
+        0.0723
+      ],
+      "vertex": 132129,
+      "neutralPosition": [
+        -0.03268883377313614,
+        0.05846517160534859,
+        0.07208126038312912
+      ],
+      "distanceToReferenceMeters": 0.0005570915082363509,
+      "deltaMillimeters": [
+        0.659160315990448,
+        -1.3206861913204193,
+        -1.2171193957328796
+      ]
+    },
+    {
+      "name": "upper-lid",
+      "referencePoint": [
+        -0.0332,
+        0.073,
+        0.0778
+      ],
+      "vertex": 99870,
+      "neutralPosition": [
+        -0.03279675543308258,
+        0.07283571362495422,
+        0.07787171006202698
+      ],
+      "distanceToReferenceMeters": 0.0004412918838705412,
+      "deltaMillimeters": [
+        0.3420636057853699,
+        -1.4812126755714417,
+        -0.1414269208908081
+      ]
+    },
+    {
+      "name": "temple",
+      "referencePoint": [
+        -0.057,
+        0.083,
+        0.043
+      ],
+      "vertex": 127444,
+      "neutralPosition": [
+        -0.05665811151266098,
+        0.08350726217031479,
+        0.04345227777957916
+      ],
+      "distanceToReferenceMeters": 0.0007607613535850061,
+      "deltaMillimeters": [
+        1.724202185869217,
+        -0.23163855075836182,
+        -0.5453452467918396
+      ]
+    },
+    {
+      "name": "mouth-corner",
+      "referencePoint": [
+        -0.026,
+        0.0175,
+        0.085
+      ],
+      "vertex": 117514,
+      "neutralPosition": [
+        -0.0253069456666708,
+        0.017761027440428734,
+        0.0840848907828331
+      ],
+      "distanceToReferenceMeters": 0.001177235963155639,
+      "deltaMillimeters": [
+        -0.24406798183918,
+        -2.5009531527757645,
+        -0.6711110472679138
+      ]
+    },
+    {
+      "name": "jowl",
+      "referencePoint": [
+        -0.035,
+        -0.005,
+        0.068
+      ],
+      "vertex": 29068,
+      "neutralPosition": [
+        -0.03579462692141533,
+        -0.005003535188734531,
+        0.06797823309898376
+      ],
+      "distanceToReferenceMeters": 0.000794932852370084,
+      "deltaMillimeters": [
+        -1.3981275260448456,
+        -3.347913734614849,
+        2.1809041500091553
+      ]
+    },
+    {
+      "name": "neck",
+      "referencePoint": [
+        -0.0034,
+        -0.049,
+        0.036
+      ],
+      "vertex": 83090,
+      "neutralPosition": [
+        -0.0025699816178530455,
+        -0.0489591583609581,
+        0.0373307503759861
+      ],
+      "distanceToReferenceMeters": 0.0015689152677466774,
+      "deltaMillimeters": [
+        0,
+        -0.8281655609607697,
+        1.5376880764961243
+      ]
+    },
+    {
+      "name": "nose-tip",
+      "referencePoint": [
+        -0.004,
+        0.044,
+        0.103
+      ],
+      "vertex": 120794,
+      "neutralPosition": [
+        -0.004320587031543255,
+        0.043871134519577026,
+        0.10360819101333618
+      ],
+      "distanceToReferenceMeters": 0.0006994845713389663,
+      "deltaMillimeters": [
+        0.02203322947025299,
+        -0.11942163109779358,
+        -0.3236159682273865
+      ]
+    },
+    {
+      "name": "back",
+      "referencePoint": [
+        0,
+        0.03,
+        -0.08
+      ],
+      "vertex": 22067,
+      "neutralPosition": [
+        -0.0004833578714169562,
+        0.03828713297843933,
+        -0.06596332788467407
+      ],
+      "distanceToReferenceMeters": 0.016307616990454674,
+      "deltaMillimeters": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "limitations": "Pure geometry and invariance tests; clay-render visual inspection is separate. Artistic age study, not medical validation."
+}

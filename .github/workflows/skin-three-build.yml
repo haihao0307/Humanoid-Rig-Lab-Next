@@ -13,7 +13,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,6 +40,8 @@ jobs:
           python skin-quality-lab/r02/identities/paint.py
           node skin-quality-lab/r02/identities/build.cjs --no-bundle
           node --check skin-quality-lab/r02/app.js
+          node skin-quality-lab/r02/identities/tests/age-morph.mjs > /tmp/skin-three-evidence/age-geometry-test.log
+          cp skin-quality-lab/r02/identities/tests/age-morph-report.json /tmp/skin-three-evidence/
           cp skin-quality-lab/r02/assets/identities/manifest.json /tmp/skin-three-evidence/texture-manifest.json
       - name: Capture early near and portrait material evidence
         env:

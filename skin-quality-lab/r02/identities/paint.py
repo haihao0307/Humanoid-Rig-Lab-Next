@@ -6,7 +6,7 @@ from pathlib import Path
 import json, struct, hashlib, math
 import numpy as np
 from scipy.ndimage import gaussian_filter, distance_transform_edt
-from PIL import Image
+from PIL import Image, ImageDraw
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parent
@@ -59,18 +59,41 @@ def write_rgb(path,array,quality=96):
  Image.fromarray(np.uint8(np.clip(array,0,1)*255+.5)).save(path,quality=quality,method=6)
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
+def source_brow_mask(base):
+ # The scan has asymmetric brows. The polygons only isolate each source-atlas
+ # search region; actual hair coverage is extracted from local colour contrast.
+ polygons=[[(1450,1190),(1490,1120),(1600,1020),(1700,980),(1860,985),(1970,1030),(2000,1140),(1880,1150),(1770,1120),(1660,1140),(1530,1240),(1440,1270)],[(2110,1030),(2220,980),(2400,985),(2530,1040),(2640,1160),(2640,1230),(2520,1190),(2390,1130),(2240,1140),(2130,1170)]]
+ canvas=Image.new('L',(SIZE,SIZE),0);draw=ImageDraw.Draw(canvas)
+ for poly in polygons:draw.polygon([(x*SIZE/4096,y*SIZE/4096) for x,y in poly],fill=255)
+ gate=np.asarray(canvas,dtype=np.float32)/255
+ lum=base@np.array([.2126,.7152,.0722],np.float32)
+ low=gaussian_filter(lum,1.4);background=gaussian_filter(lum,20)
+ darkness=np.clip((background-low-.008)/.11,0,1)
+ # Soft anatomical patch, not a disconnected collection of individual black dots.
+ from scipy.ndimage import maximum_filter, binary_fill_holes
+ core=(maximum_filter(darkness,size=9)>.22)&(gate>.5)
+ core=binary_fill_holes(core);mask=gaussian_filter(core.astype(np.float32),3.5)*gaussian_filter(gate,2.0)
+ return np.clip(mask,0,1)
+
 def main():
  dst=ROOT/'assets'/'identities';dst.mkdir(parents=True,exist_ok=True)
  pos,nor,uv,tri=glb_arrays(ROOT.parent/'r01/assets/head.glb');xyz,ns,valid,nearest=raster(pos,nor,uv,tri,SIZE)
  x,y,z=xyz.transpose(2,0,1);ax=np.abs(x);front=smooth(-.012,.05,z);neck=1-smooth(-.049,-.024,y)
  base=image(ROOT.parent/'r01/assets/hires/albedo-4k.jpg');baseN=image(ROOT.parent/'r01/assets/normal.jpg')*2-1
  originalSpec=image(ROOT.parent/'r01/assets/specular.jpg')[:,:,0]
+ rootBrows=source_brow_mask(base)
+ from scipy.ndimage import maximum_filter
+ clearBrows=np.clip(gaussian_filter(maximum_filter(rootBrows,size=25),5.0)*1.15,0,1)
+ # Transfer nearby measured forehead skin detail, rather than painting a flat
+ # opaque swatch over the baked eyebrows. The original scan remains untouched.
+ rows=np.maximum(0,np.arange(SIZE)-round(SIZE*.06));base=base*(1-clearBrows[...,None])+base[rows]*clearBrows[...,None]
+ baseN=baseN*(1-clearBrows[...,None])+baseN[rows]*clearBrows[...,None]
  # Only the colour's high frequencies are inherited in exposed skin. Baked
  # original stubble and eyebrows are explicitly excluded before painting.
  beard=(1-smooth(.027,.047,y))*(1-smooth(.059,.076,ax))*front*(1-neck)
  moustache=gauss(x,y,0,.026,.024,.0048)*front
- brows=(gauss(x,y,.032,.080,.025,.006)+gauss(x,y,-.032,.080,.025,.006))*front
- hairRemove=np.clip(beard+1.1*moustache+1.8*brows,0,1)
+ brows=clearBrows
+ hairRemove=np.clip(beard+1.1*moustache,0,1)
  lip=gauss(x,y,0,.019,.025,.0035)*front
  nostril=(gauss(x,y,.012,.033,.006,.0035)+gauss(x,y,-.012,.033,.006,.0035))*front
  eye=(gauss(x,y,.032,.066,.024,.006)+gauss(x,y,-.032,.066,.024,.006))*front
@@ -80,7 +103,7 @@ def main():
  blur=gaussian_filter(sourceLum,10);hi=np.clip(sourceLum/np.maximum(blur,.04),.80,1.22)
  lower=gaussian_filter(base,(8,8,0));sourceChroma=base/np.maximum(sourceLum[...,None],.025)
  sourceChroma=1+(sourceChroma/np.array([1.29,.925,.75])-1)*.30
- manifest={'schema':'kaopu/skin-identities@2','basis':'R02.1 scan and R02 split-band detail; independently painted identity maps','baselineCommit':'1d4a616672f2a45e869d4ef3e36e710b11f5cf41','resolution':[SIZE,SIZE],'sourceMeshSHA256':digest(ROOT.parent/'r01/assets/head.glb'),'geometryChanged':False,'profiles':{}}
+ manifest={'schema':'kaopu/skin-identities@2','basis':'R02.1 scan and R02 split-band detail; independently painted identity maps','baselineCommit':'1d4a616672f2a45e869d4ef3e36e710b11f5cf41','resolution':[SIZE,SIZE],'sourceMeshSHA256':digest(ROOT.parent/'r01/assets/head.glb'),'geometryChanged':'weathered: authored reversible age morph; other identities: neutral scan','featureChannels':['source-brow-root-region','source-brow-detail-replacement-region','height'],'profiles':{}}
  for ident,p in PROFILES.items():
   out=dst/ident;out.mkdir(exist_ok=True);rng=np.random.default_rng(p['seed'])
   colour=np.empty_like(base);colour[:]=p['rgb']
@@ -152,7 +175,7 @@ def main():
   # A healed, non-graphic eyebrow cut interrupts the dark profile's brow.
   scar=np.zeros_like(x)
   if ident=='umber':
-   scar=np.exp(-((x-.044-(y-.080)*.25)/.0007)**2)*gauss(x,y,.044,.080,.010,.009)*front
+   scar=np.exp(-((x-.033-(y-.079)*.25)/.0007)**2)*gauss(x,y,.033,.079,.006,.006)*front
    colour=colour*(1-scar[...,None]*.36)+np.array([.55,.34,.25])*scar[...,None]*.36;h+=scar*.10;rough-=scar*.045
   # Follicles are not screen-space dots. The mesh-bound beard fibres are added
   # in runtime; here only rooted pigment and follicular recesses are painted.
@@ -172,7 +195,7 @@ def main():
   # Identity maps are authored at 2K; the measured source scan's 4K
   # meso/micro bands remain separate rather than claiming upsampled detail.
   colour=colour[tuple(nearest)];newN=newN[tuple(nearest)];rough=rough[tuple(nearest)];h=h[tuple(nearest)]
-  maps={'albedo':colour,'normal':newN*.5+.5,'roughness':np.repeat(np.clip(rough,0,1)[...,None],3,axis=-1),'features':np.stack([np.clip(pigment*2,0,1),np.clip(bmask,0,1),np.clip(.5+h,0,1)],-1)}
+  maps={'albedo':colour,'normal':newN*.5+.5,'roughness':np.repeat(np.clip(rough,0,1)[...,None],3,axis=-1),'features':np.stack([np.clip(rootBrows,0,1),np.clip(clearBrows,0,1),np.clip(.5+h,0,1)],-1)}
   files={}
   for name,data in maps.items():
    file=out/(name+'.webp');write_rgb(file,data,98 if name!='albedo' else 97);files[name]={'file':str(file.relative_to(ROOT)),'sha256':digest(file),'bytes':file.stat().st_size,'resolution':[SIZE,SIZE]}
