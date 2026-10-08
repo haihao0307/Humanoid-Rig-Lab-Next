@@ -16,7 +16,9 @@ for p,names in [(old/'site/leather.js','LeatherKernel,PRESETS,DEFAULT'),(r/'site
 js.append(source(r/'site/runtime.js'));code='(()=>{'+ '\n'.join(js)+'})();';code=re.sub(r'</script',r'<\\/script',code,flags=re.I)
 (r/'bundle_check.js').write_text(code);subprocess.run(['node','--check',str(r/'bundle_check.js')],check=True)
 legacy=base64.b64encode((old/'preview.html').read_bytes()).decode();notice=(old/'THIRD_PARTY.txt').read_text().replace('--','—')
-html=(r/'site/template.html').read_text().replace('<!--LEGACY-->','<script id="legacyData" type="application/octet-stream">'+legacy+'</script>').replace('<!--APP-->','<!--\n'+notice+'\n--><script>'+code+'</script>')
+# HTMLPreview re-executes script tags regardless of MIME type. Keep payload in inert text.
+html=(r/'site/template.html').read_text().replace('<!--LEGACY-->','<div id="legacyData" hidden aria-hidden="true">'+legacy+'</div>').replace('<!--APP-->','<!--\n'+notice+'\n--><script>'+code+'</script>')
+assert len(re.findall(r'<script[ >]',html))==1,'Only runtime JavaScript is executable'
 (r/'preview.html').write_text(html)
 manifest={'version':'R03.1','sourceBase':'ffcfea8bae4cda68cc0a6f528daccca212fba4f3','parentBuild':'07b36be4163c6cc0013326a07272136e1ff34a74','parentHTMLSHA256':m['htmlSHA256'],'sourceHashes':{p.name:H(p.read_bytes()) for p in (r/'site').iterdir() if p.is_file()},'htmlBytes':len(html.encode()),'htmlSHA256':H(html.encode()),'physicsScope':'quasi-static in-plane FE plus separate scalar relaxation/creep','fullClothPhysics':False,'experimentalCalibration':False,'sourceFigureReproduction':False,'sourcePagesChecked':'Nakahara PDF pp8-10 visually checked; printed Eq16 squared strain. Compression branch not independently validated.','deliveryEvidence':'qa/browser-local.json and qa/browser-public.json must pass independently'}
 (r/'BUILD_MANIFEST.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2));print(manifest['htmlBytes'],manifest['htmlSHA256'])
