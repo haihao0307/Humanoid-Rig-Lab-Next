@@ -3,8 +3,7 @@ import {EyeSystem} from './EyeSystem.js';
 import {EYE_PHOTO_DATA} from './EyePhotoData.js';
 const clamp=THREE.MathUtils.clamp,smooth=t=>t*t*(3-2*t);
 
-// The eye surface is fitted to the actual rotated corneal cap, not a plain sphere.
-// The source head and all non-orbital skin remain unchanged.
+// Fit the original scan non-destructively. Iris color: MakeHuman CC0 atlas.
 export class FittedEyes extends EyeSystem {
  constructor(options){
   super(options);
@@ -47,7 +46,7 @@ export class FittedEyes extends EyeSystem {
      s.fragmentShader=s.fragmentShader.replace('return color*lidShade;','return color*orbitContact();');
      s.fragmentShader=s.fragmentShader.replace('#include <opaque_fragment>','outgoingLight*=.62+.38*orbitContact();\n#include <opaque_fragment>');
     };
-    e.ball.material.customProgramCacheKey=()=> 'ET02-fitted-CC0-iris-1.1';e.ball.material.needsUpdate=true;
+    e.ball.material.customProgramCacheKey=()=> 'ET02-fitted-CC0-iris-1.2';e.ball.material.needsUpdate=true;
    }
    this.setPalette(this.config.iris);this.update(0,true);this.requestRender();return this;
   });
@@ -58,10 +57,17 @@ export class FittedEyes extends EyeSystem {
  }
  makeLid(c,sample,mat){
   const result=super.makeLid(c,sample,mat),g=result.mesh.geometry;
+  // The skin head provides orbital shadows. Thin local lids use analytic contact
+  // shading on the eye rather than low-resolution self-shadowing staircase bands.
+  result.mesh.castShadow=false;
   g.setAttribute('eyelidT',new THREE.Float32BufferAttribute(result.entries.map(e=>e.t),1));
   const old=mat.onBeforeCompile;
-  mat.onBeforeCompile=s=>{old(s);s.vertexShader='attribute float eyelidT;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('uRelief*.001*(1.-uBaseline)','uRelief*.001*(1.-uBaseline)*smoothstep(.28,.88,eyelidT)');};
-  mat.customProgramCacheKey=()=> 'ET02-lids-pinned-inner-rim-1.1';return result;
+  mat.onBeforeCompile=s=>{old(s);s.uniforms.uLidPatch={value:new THREE.Vector4(c.x,c.y,c.rx,c.ry)};s.vertexShader='attribute float eyelidT;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('uRelief*.001*(1.-uBaseline)','uRelief*.001*(1.-uBaseline)*smoothstep(.28,.88,eyelidT)');
+   s.fragmentShader='uniform vec4 uLidPatch;\n'+s.fragmentShader;
+   s.fragmentShader=s.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nvec2 patchXY=(vSkinPosition.xy-uLidPatch.xy)/uLidPatch.zw;if(dot(patchXY,patchXY)>1.004004)discard;');
+  };
+  mat.polygonOffset=true;mat.polygonOffsetFactor=-.05;mat.polygonOffsetUnits=-.1;
+  mat.customProgramCacheKey=()=> 'ET02-lids-C1-boundary-1.2';return result;
  }
  eyeFront(c,x,y){
   const e=this._fittingEye,inv=e?e.surfaceInverse:null,r=c.radius,dx=x-c.x,dy=y-c.y,disc=r*r-dx*dx-dy*dy;
@@ -82,18 +88,27 @@ export class FittedEyes extends EyeSystem {
   this._fittingEye=e;e.surfaceInverse=e.surfaceInverse||new THREE.Matrix4();e.surfaceInverse.makeRotationFromQuaternion(e.pivot.quaternion).invert();
   super.updateLid(e,blink);
   const g=e.lid.mesh.geometry,P=g.attributes.position;
-  for(let i=0;i<P.count;i++){const q=e.lid.entries[i];if(q.t>.87)continue;const z=this.eyeFront(e.c,P.getX(i),P.getY(i));if(z!==null&&z+.00024>P.getZ(i)){const weight=1-smooth(clamp((q.t-.69)/.18,0,1));P.setZ(i,THREE.MathUtils.lerp(P.getZ(i),z+.00024,weight));}}
+  for(let i=0;i<P.count;i++){
+   const q=e.lid.entries[i],seam=e.c.y-.0037+.0031*Math.pow(Math.abs(q.nx),1.8)-.0012*q.nx*e.c.sign;
+   const inner=this.rimPoint(e.c,q.a,blink),sourceY=THREE.MathUtils.lerp(seam,q.yo,q.t);
+   // Match the original position AND its first derivative at the patch boundary.
+   P.setY(i,sourceY+(inner.y-seam)*(1-smooth(q.t)));
+   if(q.t>.87)continue;const z=this.eyeFront(e.c,P.getX(i),P.getY(i));
+   if(z!==null&&z+.00024>P.getZ(i)){const weight=1-smooth(clamp((q.t-.69)/.18,0,1));P.setZ(i,THREE.MathUtils.lerp(P.getZ(i),z+.00024,weight));}
+  }
   P.needsUpdate=true;g.computeVertexNormals();const N=g.attributes.normal;
   for(let i=0;i<P.count;i++){const q=e.lid.entries[i],t=smooth(clamp((q.t-.76)/.24,0,1));if(t){const n=new THREE.Vector3(N.getX(i),N.getY(i),N.getZ(i)).lerp(q.src.n,t).normalize();N.setXYZ(i,n.x,n.y,n.z);}}N.needsUpdate=true;
   this._fittingEye=null;
  }
  update(dt,instant=false){
-  const changed=super.update(dt,instant);for(const e of this.eyes){if(e.contact){e.contact.uEyeToHead.value.setFromMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(e.pivot.quaternion));e.contact.uBlink.value=this.state.blink;e.contact.uOpening.value=this.config.opening;}}
-  return changed;
+  const changed=super.update(dt,instant);let clamped=false;
+  for(const e of this.eyes){if(e.contact){e.contact.uEyeToHead.value.setFromMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(e.pivot.quaternion));e.contact.uBlink.value=this.state.blink;e.contact.uOpening.value=this.config.opening;}}
+  if(this.state.lockErrorDegrees)clamped=this.state.lockErrorDegrees.some(x=>x>.1);
+  this.state.clamped=clamped;return changed;
  }
  lock(){super.lock();this.state.mode='fixed';}
  setMode(mode){super.setMode(mode);this.state.mode=this.config.mode;}
  setTarget(v){super.setTarget(v);this.state.mode='fixed';}
- info(){return {...super.info(),externalEyeAssets:1,irisSource:'MakeHuman system grey_eye.png, CC0',fittedCornealEnvelope:true};}
+ info(){return {...super.info(),externalEyeAssets:1,irisSource:'MakeHuman system grey_eye.png, CC0',fittedCornealEnvelope:true,boundaryContinuity:'C1 local displacement'};}
  dispose(){this.photoTexture?.dispose();super.dispose();}
 }
