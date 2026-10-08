@@ -1,0 +1,38 @@
+name: Emily eyes fitting toolkit
+on:
+  push:
+    branches: [feature/emily-eyes-et02-20261008]
+    paths: ['.github/workflows/emily-eyes-toolkit.yml']
+permissions:
+  contents: read
+jobs:
+  toolkit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Package exact inherited sources and runtime resources
+        run: |
+          mkdir -p /tmp/eye-toolkit/skin-quality-lab /tmp/eye-toolkit/reference
+          cp -r skin-quality-lab/r01 skin-quality-lab/r02 skin-quality-lab/emily-transfer /tmp/eye-toolkit/skin-quality-lab/
+          npm install --prefix /tmp/eye-toolkit --no-audit --no-fund esbuild@0.25.11 pngjs@7.0.0 playwright@1.56.1
+          python3 - <<'PY'
+          import urllib.request,pathlib
+          url='https://alteredqualia.com/xg/examples/emily.html'
+          data=urllib.request.urlopen(url,timeout=40).read()
+          pathlib.Path('/tmp/eye-toolkit/reference/emily.html').write_bytes(data)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: emily-eyes-fitting-toolkit
+          path: /tmp/eye-toolkit
+          retention-days: 3
