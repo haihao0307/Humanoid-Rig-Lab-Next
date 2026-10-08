@@ -53,6 +53,12 @@ jobs:
             python -m http.server 8765 >/tmp/skin-server.log 2>&1 &
             node skin-quality-lab/r02/identities/qa.cjs
           fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-three-candidate-local
+          path: /tmp/skin-three-evidence/local
+          retention-days: 7
       - name: Commit complete textures and fixed preview without touching main
         env:
           NODE_PATH: /tmp/skin-tools/node_modules
