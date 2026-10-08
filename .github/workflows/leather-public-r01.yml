@@ -1,0 +1,84 @@
+name: Leather R01 - immutable public mirror verification
+on:
+  push:
+    branches: [experiment/leather-workshop-r01-20261008]
+    paths: [.github/workflows/leather-public-r01.yml]
+permissions:
+  contents: write
+jobs:
+  public-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/leather-workshop-r01-20261008
+          sparse-checkout: leather-workshop/r01
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Browser dependencies
+        run: |
+          pip install -q playwright==1.55.0 pillow
+          python -m playwright install --with-deps chromium
+      - name: Verify existing immutable build through HTMLPreview
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          from PIL import Image,ImageChops,ImageStat
+          import json,io,hashlib
+          root=Path('leather-workshop/r01');q=root/'qa';q.mkdir(exist_ok=True)
+          sha='82295cb93f70adc7f8d6c6eba90fba443ea7567d'
+          url='https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+sha+'/leather-workshop/r01/preview.html'
+          report={'url':url,'buildCommit':sha,'public':True,'realMobileDevice':False,'visualAcceptance':'PENDING_USER','adobeOneToOne':'NOT_VERIFIED','tests':[]};errors=[]
+          def check(ok,name):
+              report['tests'].append({'name':name,'pass':bool(ok)})
+              if not ok:raise AssertionError(name)
+          def delta(a,b):
+              aa=Image.open(io.BytesIO(a)).convert('RGB');bb=Image.open(io.BytesIO(b)).convert('RGB')
+              return sum(ImageStat.Stat(ImageChops.difference(aa,bb)).mean)/3
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True,args=['--enable-unsafe-swiftshader','--use-angle=swiftshader','--disable-dev-shm-usage'])
+              page=browser.new_page(viewport={'width':1440,'height':1000},device_scale_factor=1)
+              page.on('pageerror',lambda e:errors.append(str(e)))
+              page.on('console',lambda m:errors.append(m.text) if m.type=='error' else None)
+              try:
+                  response=page.goto(url,wait_until='domcontentloaded',timeout=60000);report['httpStatus']=response.status
+                  page.wait_for_function('window.LEATHER_LAB?.ready',timeout=90000)
+                  page.wait_for_timeout(300)
+                  check(page.evaluate('LEATHER_LAB.version')=='R01.0','correct runtime version')
+                  check(page.evaluate('LEATHER_LAB.stats().geometry')>10000,'real 3D rendered at public URL')
+                  canvas=page.locator('#viewport');before=canvas.screenshot();page.screenshot(path=str(q/'public-desktop.png'))
+                  page.click('#macro');page.wait_for_timeout(300);check(delta(before,canvas.screenshot())>1,'public macro camera changes pixels');page.screenshot(path=str(q/'public-macro.png'))
+                  page.click('#home');gen=page.evaluate('LEATHER_LAB.generation');before=canvas.screenshot();page.click('[data-preset="black"]')
+                  page.wait_for_function('(g)=>LEATHER_LAB.generation>g',arg=gen,timeout=60000);page.wait_for_timeout(200)
+                  check(page.evaluate('LEATHER_LAB.params.preset')=='black','public preset changes material')
+                  check(delta(before,canvas.screenshot())>1,'public preset changes rendered pixels')
+                  check(not errors,'zero console errors in public test')
+                  report['stats']=page.evaluate('LEATHER_LAB.stats()');report['pass']=True
+                  (q/'PREVIEW_URL.txt').write_text(url+'\n')
+              except Exception as e:
+                  report['pass']=False;report['failure']=str(e);report['title']=page.title();report['bodyText']=page.locator('body').inner_text()[:6000]
+                  page.screenshot(path=str(q/'public-failure.png'));(q/'public-failure.html').write_text(page.content())
+                  raise
+              finally:
+                  report['errors']=errors;(q/'qa-public.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False));browser.close()
+          PY
+      - name: Record public proof on isolated branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r01/qa
+          git commit -m 'test(leather): real immutable public mirror proof [skip ci]'
+          git push origin HEAD:experiment/leather-workshop-r01-20261008
+          cat leather-workshop/r01/qa/PREVIEW_URL.txt >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r01-public-proof
+          path: |
+            leather-workshop/r01/qa
+            leather-workshop/r01/preview.html
+            leather-workshop/r01/BUILD_MANIFEST.json
+          retention-days: 14
