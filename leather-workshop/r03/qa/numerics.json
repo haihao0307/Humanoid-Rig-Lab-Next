@@ -1,0 +1,158 @@
+{
+  "version": "R03.1",
+  "tests": [
+    {
+      "name": "AL rest stress and energy",
+      "pass": true
+    },
+    {
+      "name": "AL energy derivative finite difference",
+      "pass": true,
+      "maxMPaError": 2.840434276674131e-10
+    },
+    {
+      "name": "AL rotation objectivity",
+      "pass": true
+    },
+    {
+      "name": "NL rest stress and energy",
+      "pass": true
+    },
+    {
+      "name": "NL energy derivative finite difference",
+      "pass": true,
+      "maxMPaError": 6.328282342593639e-10
+    },
+    {
+      "name": "NL rotation objectivity",
+      "pass": true
+    },
+    {
+      "name": "PNL rest stress and energy",
+      "pass": true
+    },
+    {
+      "name": "PNL energy derivative finite difference",
+      "pass": true,
+      "maxMPaError": 7.849089156408695e-10
+    },
+    {
+      "name": "PNL rotation objectivity",
+      "pass": true
+    },
+    {
+      "name": "ITWM_L1 rest stress and energy",
+      "pass": true
+    },
+    {
+      "name": "ITWM_L1 energy derivative finite difference",
+      "pass": true,
+      "maxMPaError": 5.013642834228449e-10
+    },
+    {
+      "name": "ITWM_L1 rotation objectivity",
+      "pass": true
+    },
+    {
+      "name": "ITWM_L3 rest stress and energy",
+      "pass": true
+    },
+    {
+      "name": "ITWM_L3 energy derivative finite difference",
+      "pass": true,
+      "maxMPaError": 3.791620351023539e-10
+    },
+    {
+      "name": "ITWM_L3 rotation objectivity",
+      "pass": true
+    },
+    {
+      "name": "SHOE rest stress and energy",
+      "pass": true
+    },
+    {
+      "name": "SHOE energy derivative finite difference",
+      "pass": true,
+      "maxMPaError": 1.3055179159948693e-10
+    },
+    {
+      "name": "AL directional response",
+      "pass": true,
+      "MPa0": 3.636958349898446,
+      "MPa90": 1.8154310713278232
+    },
+    {
+      "name": "isotropic dispersion limit",
+      "pass": true
+    },
+    {
+      "name": "invalid inputs rejected",
+      "pass": true
+    },
+    {
+      "name": "same-size solid FE equilibrium",
+      "pass": true,
+      "forceN": 33.43432626966833,
+      "nominalStressMPa": 2.405347213645204,
+      "energyNmm": 27.257502804258777,
+      "residualN": 0.000006746258350620593,
+      "converged": true,
+      "blocked": false,
+      "iterations": 342,
+      "maxPrincipalStretch": 1.0983724375142254,
+      "minAreaRatio": 1.0229463744908642,
+      "elementsOutsideCalibration": 0,
+      "physicalTime": false
+    },
+    {
+      "name": "same-size perforated FE equilibrium",
+      "pass": true,
+      "forceN": 30.11242547714218,
+      "nominalStressMPa": 2.166361545118143,
+      "energyNmm": 24.538207721104868,
+      "residualN": 0.000009713521211596188,
+      "converged": true,
+      "blocked": false,
+      "iterations": 538,
+      "maxPrincipalStretch": 1.1921488155786757,
+      "minAreaRatio": 0.9935783414201607,
+      "elementsOutsideCalibration": 0,
+      "physicalTime": false
+    },
+    {
+      "name": "hole reduces force at equal dimensions and extension",
+      "pass": true,
+      "holeForce": 30.11242547714218,
+      "solidForce": 33.43432626966833
+    },
+    {
+      "name": "FE nodal energy gradient",
+      "pass": true,
+      "maxForceErrorN": 2.571203694401447e-9
+    },
+    {
+      "name": "hold matches exact Prony decay",
+      "pass": true,
+      "initialMPa": 3.795468943140345,
+      "MPaAt60s": 2.6765007261425633
+    },
+    {
+      "name": "constant load creep and unload recovery",
+      "pass": true,
+      "first": 0.030021295297956378,
+      "crept": 0.038812103708005447,
+      "recovered": 0.001485983642669453
+    },
+    {
+      "name": "elastic model has no fabricated permanent set",
+      "pass": true
+    },
+    {
+      "name": "inverted element rejected",
+      "pass": true
+    }
+  ],
+  "pass": true,
+  "scope": "mathematical consistency; not independent experiments or paper curve reproduction",
+  "sourcePagesChecked": "PDF8-10, 2026-10-08"
+}
