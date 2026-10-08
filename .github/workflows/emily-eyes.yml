@@ -7,13 +7,14 @@ on:
       - 'skin-quality-lab/emily-transfer/eyes/**'
 permissions:
   contents: write
+  actions: read
 concurrency:
   group: emily-eyes-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   eyes:
     runs-on: ubuntu-latest
-    timeout-minutes: 24
+    timeout-minutes: 28
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,6 +23,12 @@ jobs:
             skin-quality-lab/r01
             skin-quality-lab/r02
             skin-quality-lab/emily-transfer
+      - uses: actions/download-artifact@v4
+        with:
+          name: official-cc0-eye-maps
+          run-id: 37751294589
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/eye-maps
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -34,12 +41,18 @@ jobs:
           NODE_PATH: /tmp/eye-tools/node_modules
           ASSET_COMMIT: ${{ github.sha }}
         run: |
+          python3 skin-quality-lab/emily-transfer/eyes/prepare.py
           node skin-quality-lab/emily-transfer/build.cjs
-          node skin-quality-lab/emily-transfer/eyes/upgrade.cjs
+          node skin-quality-lab/emily-transfer/eyes/refine.cjs
       - name: Actual browser regression
         env:
           NODE_PATH: /tmp/eye-tools/node_modules
         run: node skin-quality-lab/emily-transfer/eyes/qa.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eye-local-visual-review
+          path: /tmp/eye-evidence
+          retention-days: 14
       - name: Publish tested candidate without changing old releases
         run: |
           test -f skin-quality-lab/emily-transfer/eyes/qa-report.json
@@ -47,9 +60,10 @@ jobs:
           git config user.email 'eye-integration-validation@users.noreply.github.com'
           git add skin-quality-lab/emily-transfer
           if ! git diff --cached --quiet; then
-            git commit -m 'build(eyes): publish fitted optical eye candidate and browser evidence [skip ci]'
+            git commit -m 'build(eyes): publish fitted optical eyes and browser evidence [skip ci]'
             git push origin HEAD:experiment/emily-skin-transfer-r01-20261008
           fi
+          git rev-parse HEAD > /tmp/eye-evidence/published-commit.txt
       - name: Verify immutable public website
         env:
           NODE_PATH: /tmp/eye-tools/node_modules
