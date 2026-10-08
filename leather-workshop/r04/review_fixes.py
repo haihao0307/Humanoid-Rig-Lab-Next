@@ -12,7 +12,8 @@ edits={
  ],
  'site/runtime.js':[
   ("$('pull').onchange=()=>pull(+$('pull').value);$('pullNow').onclick=()=>pull(+$('pull').value);", "$('pull').onchange=()=>{operation++;pull(+$('pull').value);};$('pullNow').onclick=()=>{operation++;pull(+$('pull').value);};"),
-  ("if(hits.length&&p){drag=","if(hits.length&&p){operation++;drag=")
+  ("if(hits.length&&p){drag=","if(hits.length&&p){operation++;drag="),
+  ("box(w*.7,.03,d>.1?.014:d*.6,dark,0,-.022,0,g);", "box(w*.7,.058,d>.1?.014:d*.6,dark,0,-.033,0,g);")
  ],
  'build.py':[
   ("(old/'THIRD_PARTY.txt').read_text().replace('--','—')","(r/'THIRD_PARTY.txt').read_text().replace('--','—')")
@@ -38,4 +39,4 @@ for name,pairs in edits.items():
   s=s.replace(before,after)
  p.write_text(s)
 (r/'THIRD_PARTY.txt').write_text((r.parent/'r02/THIRD_PARTY.txt').read_text()+'''\n\nBending derivative reference\nhttps://github.com/InteractiveComputerGraphics/PositionBasedDynamics\nThe signed dihedral derivative was independently transcribed and finite-difference checked.\nThe complete third-party notice is retained for the reference implementation.\n\nThe MIT License (MIT)\nCopyright (c) 2015-present, PositionBasedDynamics contributors\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n''')
-print('Source review: complete contact energy accounting, per-profile thickness, settled contact gates.')
+print('Source review: complete contact energy accounting, per-profile thickness, settled contact gates, grounded stands.')
