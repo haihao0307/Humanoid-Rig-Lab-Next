@@ -1,4 +1,4 @@
-name: Skin Three Preflight
+name: Skin Final Public Recheck
 on:
   push:
     branches: [feature/skin-r02-three-identities-20261008]
@@ -10,57 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            skin-quality-lab
-            source
-            body
-            reconstruction
-            tools
-            scripts
-          fetch-depth: 1
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install isolated inspection tools
+      - name: Prepare isolated browser verification
         run: |
-          mkdir -p /tmp/skin-inspection
-          cd /tmp/skin-inspection
+          mkdir -p /tmp/skin-final-tools /tmp/skin-final-recheck
+          cd /tmp/skin-final-tools
           npm init -y >/dev/null
-          npm install --no-audit --no-fund esbuild@0.25.10 playwright@1.55.1
+          npm install --no-audit --no-fund playwright@1.55.1
           npx playwright install --with-deps chromium
-          python -m pip install pillow numpy
-      - name: Collect source and real browser evidence
+      - name: Verify fixed public recipe return and fibre distance stability
         env:
-          NODE_PATH: /tmp/skin-inspection/node_modules
+          NODE_PATH: /tmp/skin-final-tools/node_modules
+          QA_URL: https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/8ca55abb14cf308c708cc13d17765755cbfc5aef/skin-quality-lab/r02/preview.html
         run: |
-          mkdir -p /tmp/skin-evidence/source
-          cp skin-quality-lab/r02/{app.js,index.html,build.cjs,head.js,surface.js,fuzz.js,post.js} /tmp/skin-evidence/source/
-          cp body/{CharacterShape.js,CharacterAssembly.js,SkinAppearance.js,TissueShaders.js,CompactWorkbench.js,ReconstructionRig.js,CompactBinding.js} /tmp/skin-evidence/source/ 2>/dev/null || true
-          cp BUILD_MANIFEST* /tmp/skin-evidence/source/ 2>/dev/null || true
-          find skin-quality-lab -maxdepth 3 -type f -printf '%p %s\n' > /tmp/skin-evidence/files.txt
-          python - <<'PY'
-          from PIL import Image
-          import json,struct,numpy as np
-          from pathlib import Path
-          for p in [Path('skin-quality-lab/r01/assets/hires/albedo-4k.jpg'),Path('skin-quality-lab/r01/assets/normal.jpg')]:
-              im=Image.open(p); im.thumbnail((1200,1200)); im.save('/tmp/skin-evidence/'+p.stem+'.png')
-          b=Path('skin-quality-lab/r01/assets/head.glb').read_bytes(); n=struct.unpack_from('<I',b,12)[0]; doc=json.loads(b[20:20+n]); off=20+n; size,kind=struct.unpack_from('<II',b,off); bin=b[off+8:off+8+size]
-          def arr(i):
-              a=doc['accessors'][i];v=doc['bufferViews'][a['bufferView']];dim={'SCALAR':1,'VEC2':2,'VEC3':3,'VEC4':4}[a['type']];dtype={5126:'<f4',5125:'<u4',5123:'<u2'}[a['componentType']];return np.ndarray((a['count'],dim),dtype=dtype,buffer=bin,offset=v.get('byteOffset',0)+a.get('byteOffset',0),strides=(v.get('byteStride',dim*np.dtype(dtype).itemsize),np.dtype(dtype).itemsize)).copy()
-          p=doc['meshes'][0]['primitives'][0];pos=arr(p['attributes']['POSITION'])*.04;uv=arr(p['attributes']['TEXCOORD_0'])
-          Path('/tmp/skin-evidence/geometry.json').write_text(json.dumps({'bounds':[pos.min(0).tolist(),pos.max(0).tolist()],'positions':len(pos),'uvBounds':[uv.min(0).tolist(),uv.max(0).tolist()]},indent=2))
-          print(Path('/tmp/skin-evidence/geometry.json').read_text())
-          PY
-          python -m http.server 8765 >/tmp/skin-server.log 2>&1 &
           node - <<'JS'
-          const {chromium}=require('playwright'),fs=require('fs');
-          (async()=>{const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await browser.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});const errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto('https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/aac1c1b808141d5eb47f4d05b5d1419945de1890/skin-quality-lab/r02/preview.html');await p.waitForFunction(()=>window.__SKIN_LAB__?.state.ready,null,{timeout:180000});for(const id of ['porcelain','umber','weathered','original']){await p.evaluate(id=>window.__SKIN_LAB__.identity.set(id),id);for(const view of ['front','ear','cheek']){await p.evaluate(v=>{window.__SKIN_LAB__.setCamera(v);window.__SKIN_LAB__.render()},view);await p.waitForTimeout(900);await p.screenshot({path:'/tmp/skin-evidence/'+id+'-'+view+'.png'});}}fs.writeFileSync('/tmp/skin-evidence/browser.json',JSON.stringify({errors,state:await p.evaluate(()=>window.__SKIN_LAB__.state),fixedCommit:'aac1c1b808141d5eb47f4d05b5d1419945de1890'},null,2));await browser.close()})().catch(e=>{console.error(e);process.exit(1)});
+          const {chromium}=require('playwright'),fs=require('fs'),assert=require('assert/strict');
+          (async()=>{const dir='/tmp/skin-final-recheck';fs.mkdirSync(dir,{recursive:true});const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const page=await browser.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});const errors=[],checks=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});const ready=()=>page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready&&!window.__SKIN_LAB__.state.identityLoading,null,{timeout:180000});const check=(name,pass)=>{checks.push({name,pass:!!pass});assert(pass,name)};await page.goto(process.env.QA_URL,{waitUntil:'domcontentloaded',timeout:120000});await ready();await page.evaluate(()=>window.__SKIN_LAB__.identity.set('weathered'));await page.evaluate(()=>window.__SKIN_LAB__.setCamera('portrait'));const view=await page.evaluate(()=>window.__SKIN_LAB__.camera());for(const [i,dx]of [-.0012,0,.0012,0].entries()){await page.evaluate(({view,dx})=>window.__SKIN_LAB__.setView([view.position[0]+dx,view.position[1],view.position[2]],view.target),{view,dx});await page.waitForTimeout(300);await page.screenshot({path:dir+'/portrait-motion-'+i+'.png'});}await page.evaluate(()=>{document.getElementById('beardDensity').value=.57;document.getElementById('beardDensity').dispatchEvent(new Event('input'));document.getElementById('beardLength').value=1.75;document.getElementById('beardLength').dispatchEvent(new Event('input'));});await page.locator('#save').click();const before=await page.evaluate(()=>window.__SKIN_LAB__.identity.report());await page.goto('about:blank');await page.goBack({waitUntil:'domcontentloaded',timeout:120000});await ready();await page.locator('#restore').click();await page.waitForFunction(()=>window.__SKIN_LAB__.identity.current()==='weathered'&&!window.__SKIN_LAB__.state.identityLoading);const restored=await page.evaluate(()=>window.__SKIN_LAB__.identity.report());check('Back reload then explicit saved recipe restore',restored.id===before.id&&restored.hair.beardDensity===.57&&restored.hair.beardLength===1.75);await page.locator('#identityMaps').click();await page.keyboard.press('Escape');check('Map dialog Escape closes',await page.locator('#mapsDialog').evaluate(e=>!e.open));await page.evaluate(()=>window.__SKIN_LAB__.identity.set('original'));await page.evaluate(()=>window.__SKIN_LAB__.setCamera('portrait'));await page.waitForTimeout(500);await page.screenshot({path:dir+'/original-final.png'});check('Original keeps 14000 fuzz and 4K scan',await page.evaluate(()=>{const s=window.__SKIN_LAB__.state;return s.fuzzStrands===14000&&s.assets.albedo[0]===4096&&s.assets.mesostructure[0]===4096&&s.assets.microstructure[0]===4096}));check('No shader or browser errors',errors.length===0);fs.writeFileSync(dir+'/report.json',JSON.stringify({url:process.env.QA_URL,checks,errors,visualMotionReview:'Four real portrait frames retained for review; no automated claim of production temporal stability.'},null,2));await browser.close();})().catch(e=>{console.error(e);process.exit(1)});
           JS
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: skin-three-preflight
-          path: /tmp/skin-evidence
+          name: skin-final-public-recheck
+          path: /tmp/skin-final-recheck
           retention-days: 7
