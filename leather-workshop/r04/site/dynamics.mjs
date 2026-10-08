@@ -78,6 +78,7 @@ export function closestBary(p,a,b,c){
 export class LeatherDynamics{
  constructor(options={}){
   this.cfg={...DEFAULT_DYNAMICS,...options};const c=this.cfg;
+  if(options.thickness===undefined&&PROFILES[c.profile])c.thickness=PROFILES[c.profile].thickness/1000;
   for(const key of ['size','thickness','density','stoneMass','stoneRadius','dt','bendRigidity'])if(!(c[key]>0&&Number.isFinite(c[key])))throw Error('Invalid input '+key);
   if(!Number.isInteger(c.n)||c.n<4||c.n>40||c.clampStrain<0||c.clampStrain>.12||c.dropHeight<0||c.dropHeight>.15||Math.abs(c.dropX)>c.size*.32||Math.abs(c.dropZ)>c.size*.32)throw Error('Input outside supported test domain');
   this.law=new SurfaceLaw(c.profile,c.angle);this.time=0;this.steps=0;this.failed=null;this.events=[];this.peakSag=0;this.peakStretch=1;this.peakPenetration=0;
@@ -104,10 +105,10 @@ export class LeatherDynamics{
  }
  deformation(e,out=this.scratchF){out.fill(0);for(let z=0;z<3;z++){const k=e.ids[z]*3,[u,v]=e.gr[z];for(let j=0;j<3;j++){out[j]+=this.x[k+j]*u;out[3+j]+=this.x[k+j]*v;}}return out;}
  contactGeometry(){
-  const b=this.stone;if(!b.active)return{penetration:0,count:0};const pos=b.pos,R=b.radius+this.cfg.thickness*.5;let maxPen=0,count=0;
+  const b=this.stone;if(!b.active)return{penetration:0,count:0,energy:0};const pos=b.pos,R=b.radius+this.cfg.thickness*.5;let maxPen=0,count=0,energy=0;
   for(const e of this.elements){const ids=e.ids;let skip=false;for(let j=0;j<3;j++){const a=this.x[3*ids[0]+j],bb=this.x[3*ids[1]+j],c=this.x[3*ids[2]+j];if(pos[j]<Math.min(a,bb,c)-R||pos[j]>Math.max(a,bb,c)+R){skip=true;break;}}if(skip)continue;
-   const a=read3(this.x,ids[0]),bb=read3(this.x,ids[1]),c=read3(this.x,ids[2]),bs=closestBary(pos,a,bb,c),delta=[0,0,0];for(let j=0;j<3;j++)delta[j]=pos[j]-bs[0]*a[j]-bs[1]*bb[j]-bs[2]*c[j];const pen=R-length3(delta);if(pen>0){maxPen=Math.max(maxPen,pen);count++;}
-  }return{penetration:maxPen,count};
+   const a=read3(this.x,ids[0]),bb=read3(this.x,ids[1]),c=read3(this.x,ids[2]),bs=closestBary(pos,a,bb,c),delta=[0,0,0];for(let j=0;j<3;j++)delta[j]=pos[j]-bs[0]*a[j]-bs[1]*bb[j]-bs[2]*c[j];const pen=R-length3(delta);if(pen>0){maxPen=Math.max(maxPen,pen);count++;energy+=1e5*pen*pen;}
+  }return{penetration:maxPen,count,energy};
  }
  drop(){
   if(this.cfg.case!=='stone')throw Error('Stone mode required');const b=this.stone,c=this.cfg;b.pos.set([c.dropX,c.stoneRadius+c.dropHeight+c.thickness*.5,c.dropZ]);b.vel.fill(0);b.active=true;b.visible=true;this.events.push({type:'drop',time:this.time,massKg:b.mass,clearanceM:c.dropHeight});
@@ -179,6 +180,7 @@ export class LeatherDynamics{
   this.x.set(q.subarray(0,N*3));this.stone.pos.set(q.subarray(N*3));
   for(let i=0;i<N*3;i++)this.v[i]=(this.x[i]-this.old[i])/h;
   if(this.stone.active)for(let j=0;j<3;j++)this.stone.vel[j]=(this.stone.pos[j]-this.stone.old[j])/h;
+  this.peakSag=Math.max(this.peakSag,-this.x[3*this.centerId+1]);this.peakPenetration=Math.max(this.peakPenetration,st.penetration||0);
   this.time+=h;this.steps++;
   if(this.steps%12===0){const r=this.report();if(!r.finite||r.maxStretch>1.45||r.minAreaRatio<.5){this.failed='Unsupported deformation; no further integration';this.v.fill(0);this.stone.vel.fill(0);}}
  }
@@ -194,7 +196,7 @@ export class LeatherDynamics{
   this.nodalStretch=nodalStretch;
   return {version:DYNAMIC_VERSION,timeS:this.time,steps:this.steps,centerSagMM:sag*1000,peakSagMM:this.peakSag*1000,maxStretch,peakStretch:this.peakStretch,minAreaRatio,pinErrorMM:pinError*1000,penetrationMM:contact.penetration*1000,peakPenetrationMM:this.peakPenetration*1000,
    massKg:this.mass.reduce((a,b)=>a+b,0),stoneYMM:b.pos[1]*1000,stoneSpeedMS:b.active?length3(b.vel):0,stoneActive:b.active,stoneVisible:b.visible,contactCount:this.contactCount,contactForceN:this.contactImpulse/this.cfg.dt,clampPullMM:this.clampPull*1000,
-   strainCenterPct:(nodalStretch[this.centerId]-1)*100,elasticEnergyJ:U,kineticEnergyJ:kinetic,potentialEnergyJ:gravitational,totalEnergyJ:U+kinetic+gravitational,residualN:this.lastResidual,solverIterations:this.lastIterations,maxSpeedMS:maxSpeed,finite:Array.from(this.x).every(Number.isFinite)&&Number.isFinite(U),failed:this.failed,experimentalCalibration:false};
+   strainCenterPct:(nodalStretch[this.centerId]-1)*100,elasticEnergyJ:U,kineticEnergyJ:kinetic,potentialEnergyJ:gravitational,contactEnergyJ:contact.energy,totalEnergyJ:U+kinetic+gravitational+contact.energy,residualN:this.lastResidual,solverIterations:this.lastIterations,maxSpeedMS:maxSpeed,finite:Array.from(this.x).every(Number.isFinite)&&Number.isFinite(U),failed:this.failed,experimentalCalibration:false};
  }
  snapshot(){return{schema:'kaopu/leather_dynamics@1',version:DYNAMIC_VERSION,config:{...this.cfg},report:this.report(),events:this.events,positionsM:Array.from(this.x),velocitiesMS:Array.from(this.v),restPositionsM:Array.from(this.rest),triangles:Array.from(this.tri),assumptions:['density, bending, damping and friction are unmeasured','spherical stone collider','no self collision, tearing or permanent folds','implicit finite-iteration preview, not experimental certification','frictionless normal contact penalty 200000 N/m per active triangle'],materialSource:'Nakahara/Matsuda 2020, R03.1 inherited constants; objective 3x2 membrane extension'};}
 }

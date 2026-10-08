@@ -7,4 +7,5 @@ function sim(t){const n=Math.round(t/d.cfg.dt);for(let i=0;i<n&&!d.failed;i++){d
 console.time(key);sim(.75);const empty=d.report();
 d.drop();const budget=d.report().totalEnergyJ;sim(2);const loaded=d.report();d.removeStone();sim(1.25);const recovered=d.report();mkdirSync('qa',{recursive:true});writeFileSync(new URL('./qa/scene-'+key+'.json',import.meta.url),JSON.stringify({key,config:d.cfg,empty,loaded,recovered,peakRes,maxEnergy,budget,records},null,2));console.log({empty:empty.centerSagMM,loaded:loaded.centerSagMM,peak:loaded.peakSagMM,recovered:recovered.centerSagMM,stretch:loaded.peakStretch,peakPen:loaded.peakPenetrationMM,peakRes,maxEnergy,budget,failed:d.failed});
 if(d.failed||loaded.maxStretch>1.05||loaded.peakPenetrationMM>.03||loaded.centerSagMM<empty.centerSagMM+.4||Math.abs(recovered.centerSagMM-empty.centerSagMM)>.5||maxEnergy>budget+1e-5||recovered.pinErrorMM>1e-8)throw Error('Full-lifecycle validation failed '+key);
+if(loaded.contactCount<1||loaded.stoneSpeedMS>.005||Math.abs(loaded.contactForceN-d.cfg.stoneMass*d.cfg.gravity)>.02*d.cfg.stoneMass*d.cfg.gravity)throw Error('Settled contact is not supporting the stone '+key);
 console.timeEnd(key);
