@@ -218,7 +218,7 @@ void main() {
       float visibility = 1.0;
       #if defined(USE_SHADOWMAP) && (UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS)
         DirectionalLightShadow lampShadow = directionalLightShadows[i];
-        if (receiveShadow && fiberShadows > 0.5) {
+        if (fiberShadows > 0.5) {
           visibility = getShadow(directionalShadowMap[i], lampShadow.shadowMapSize,
             lampShadow.shadowIntensity, lampShadow.shadowBias, lampShadow.shadowRadius,
             vDirectionalShadowCoord[i]);
@@ -455,13 +455,13 @@ export function fiberMaterialDiagnostics(material) {
     alphaToCoverage: material.alphaToCoverage, actualSamples: record.samples,
     framebufferMeasured: record.framebufferMeasured, drawingBuffer: [...record.drawingBuffer],
     viewportHeight: record.viewportHeight, transparent: material.transparent, depthWrite: material.depthWrite,
-    shadows: record.shadows, shadowMethod: 'receives existing R02 VSM skin visibility; fibre shadow casting disabled',
+    shadows: record.shadows, receivesSkinShadows:material.uniforms.fiberShadows.value>.5,castsFiberShadows:[...record.meshes].some(o=>o.castShadow),shadowMethod: 'receives existing R02 VSM skin visibility; fibre shadow casting disabled',
     shadowViewports: {...record.shadowViewports},
     lightingSource: 'scene directional lights; independent per-light visibility',
     roughness: u.roughness.value, surfaceSpecular: u.surfaceSpecular.value,
     colorLinear: u.hairColor.value.toArray(), opacity: u.fiberOpacity.value,
     ambientGain: u.ambientGain.value, guides: u.guideMode.value > 0.5,
     limitations: ['no multiple scattering or deep opacity maps', 'no coloured shadow transmission',
-      'directional lights with PCF only', 'non-MSAA fallback uses order-dependent alpha blending'],
+      'R02 receives existing VSM; original PCF writer is isolated from active shadow traversal', 'analytic alpha blending remains order dependent'],
   };
 }
