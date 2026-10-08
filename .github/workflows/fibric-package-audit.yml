@@ -1,0 +1,83 @@
+name: Fibric native package audit
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths: ['.github/workflows/fibric-package-audit.yml']
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install requests beautifulsoup4
+      - name: Verify original ZIP and extract study inputs without running author code
+        run: |
+          python - <<'PY'
+          import requests,pathlib,json,hashlib,zipfile,re,time
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin,urlsplit
+          out=pathlib.Path('fibric-native-evidence');out.mkdir()
+          url='https://www.fibrictoolset.com/_files/archives/2f124e_7c1ef920e4774cc290023fcdd3afa10d.zip?dn=fibric_essentials.zip'
+          s=requests.Session();s.headers['User-Agent']='Mozilla/5.0'
+          report={'task':'FIBRIC_NATIVE_SOURCE_AUDIT','sourceUrl':url,'authorCodeExecuted':False,'numericalReplication':False,'productionReady':False,'errors':[]}
+          try:
+              file=pathlib.Path('/tmp/fibric_essentials.zip');n=0;h=hashlib.sha256()
+              with s.get(url,stream=True,timeout=(15,90)) as r:
+                  r.raise_for_status();report['finalUrl']=r.url;report['headers']={k:r.headers.get(k) for k in ['content-type','content-length','etag','last-modified']}
+                  print('HEADERS',json.dumps(report['headers']),flush=True)
+                  with file.open('wb') as f:
+                      for b in r.iter_content(1024*1024):
+                          if not b:continue
+                          n+=len(b)
+                          if n>2*1024**3:raise RuntimeError('Source exceeds 2GiB download cap')
+                          f.write(b);h.update(b)
+              report['archiveBytes']=n;report['archiveSha256']=h.hexdigest()
+              with zipfile.ZipFile(file) as z:
+                  inventory=[{'path':x.filename,'bytes':x.file_size,'compressedBytes':x.compress_size,'encrypted':bool(x.flag_bits&1)} for x in z.infolist()]
+                  (out/'archive-inventory.json').write_text(json.dumps(inventory,indent=2))
+                  report['memberCount']=len(inventory);report['totalUncompressedBytes']=sum(x['bytes'] for x in inventory)
+                  print('INVENTORY',json.dumps(inventory),flush=True)
+                  report['extracted']=[];count=0
+                  for x in z.infolist():
+                      p=pathlib.PurePosixPath(x.filename);suffix=p.suffix.lower()
+                      include=suffix in ['.hda','.hdalc','.hdanc','.otl','.otllc','.hip','.hiplc','.hipnc','.py','.vfl','.vex','.json','.txt','.md','.xml','.yaml','.yml','.shelf','.ui','.cmd','.vop','.sbs','.usda','.mtlx','.csv','.osl']
+                      include=include or (suffix in ['.png','.jpg','.jpeg'] and x.file_size<8*1024**2)
+                      if not include or x.is_dir() or x.flag_bits&1 or x.file_size>96*1024**2:continue
+                      if p.is_absolute() or '..' in p.parts:raise RuntimeError('Unsafe member path')
+                      if count+x.file_size>200*1024**2:continue
+                      data=z.read(x);target=out/'native-files'/p;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data);count+=len(data)
+                      report['extracted'].append({'path':x.filename,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+                  report['selectedMembersCrcVerified']=True
+                  report['extractedBytes']=count
+          except Exception as e:
+              report['errors'].append(str(e));print('ERROR',str(e),flush=True)
+          base='https://sites.google.com/view/fibric-documentation'
+          r=s.get(base,timeout=40);soup=BeautifulSoup(r.text,'html.parser')
+          urls=set()
+          for a in soup.find_all('a',href=True):
+              u=urljoin(base,a['href']).split('#')[0]
+              if u.startswith(base) and ('/fibric-nodes/' in u or u.endswith('system-requirements') or u.endswith('vulkan-viewport')):urls.add(u)
+          report['docs']=[]
+          for i,u in enumerate(sorted(urls)):
+              try:
+                  r=s.get(u,timeout=30);r.raise_for_status();bs=BeautifulSoup(r.text,'html.parser')
+                  name=f'{i:02d}_'+u.rsplit('/',1)[-1]
+                  d=out/'documentation';d.mkdir(exist_ok=True)
+                  (d/(name+'.html')).write_text(r.text);(d/(name+'.txt')).write_text(bs.get_text('\n',strip=True))
+                  report['docs'].append({'url':u,'file':name,'sha256':hashlib.sha256(r.content).hexdigest()})
+              except Exception as e:report['errors'].append({'url':u,'error':str(e)})
+          (out/'native-audit-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print('SUMMARY',json.dumps({k:v for k,v in report.items() if k not in ['extracted','docs']}),flush=True)
+          PY
+      - name: Keep original study inputs separate from public production source
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fibric-native-inputs
+          path: fibric-native-evidence/
+          retention-days: 7
+          compression-level: 6

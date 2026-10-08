@@ -1,0 +1,119 @@
+name: Fibric open reconstruction source lock
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths:
+      - 'research/fibric-native-study/OPEN_RECONSTRUCTION_ROUTE.md'
+      - '.github/workflows/fibric-open-route-source-lock.yml'
+permissions:
+  contents: read
+jobs:
+  source-lock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout project receipt only
+        uses: actions/checkout@v4
+        with:
+          path: project
+          sparse-checkout: research/fibric-native-study/OPEN_RECONSTRUCTION_ROUTE.md
+      - name: Checkout pinned LYNX geometry teacher
+        uses: actions/checkout@v4
+        with:
+          repository: LucaScheller/VFX-LYNX
+          ref: b03e706b8062c795189990fdf09d67c146182f54
+          path: external/lynx
+          fetch-depth: 1
+      - name: Checkout pinned ThunderLoom optical teacher
+        uses: actions/checkout@v4
+        with:
+          repository: ThunderLoom/ThunderLoom
+          ref: 62e6d750cf38443eecec2ea350d116c375087003
+          path: external/thunderloom
+          fetch-depth: 1
+      - name: Checkout pinned MADYPG deformation teacher
+        uses: actions/checkout@v4
+        with:
+          repository: kamleshbhalui/MADYPG
+          ref: b91c7af0b7a1382fed0a5fb3147f13594ddec71e
+          path: external/madypg
+          fetch-depth: 1
+          submodules: false
+      - name: Audit source visibility, licenses and exact implementation anchors
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, re, subprocess
+          out=pathlib.Path('source-lock-evidence');out.mkdir()
+          def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+          def head(p):return subprocess.check_output(['git','-C',str(p),'rev-parse','HEAD'],text=True).strip()
+          def text(p):return p.read_text(errors='replace')
+          expected={
+            'lynx':'b03e706b8062c795189990fdf09d67c146182f54',
+            'thunderloom':'62e6d750cf38443eecec2ea350d116c375087003',
+            'madypg':'b91c7af0b7a1382fed0a5fb3147f13594ddec71e'}
+          roots={k:pathlib.Path('external')/k for k in expected}
+          for key,commit in expected.items():
+              actual=head(roots[key]);assert actual==commit,(key,actual,commit)
+          # LYNX unpacked HDA audit: source sections are visible files, not an opaque binary.
+          lynx=roots['lynx'];hda=lynx/'plugins/SideFX/Houdini/otls/LYNX_fabric.hda'
+          assert hda.is_dir()
+          defs=[]
+          for d in sorted(p for p in hda.iterdir() if p.is_dir()):
+              files=sorted(p for p in d.rglob('*') if p.is_file())
+              contents=d/'Contents.dir/Contents.mime'
+              raw=contents.read_bytes() if contents.exists() else b''
+              decoded=raw.decode('utf-8','replace')
+              definition_name=d.name.lower()
+              role=next((r for r in ['pattern','thread','weave','detangle','convert','color'] if r in definition_name),'other')
+              tokens=sorted(set(re.findall(r'(?i)\b(?:attrib\w*|resample|sweep|ray|uv\w*|wire\w*|poly\w*|foreach\w*|subnet\w*|switch\w*)\b',decoded)))
+              defs.append({'name':d.name,'role':role,'fileCount':len(files),'bytes':sum(p.stat().st_size for p in files),
+                           'contentsBytes':len(raw),'contentsSha256':hashlib.sha256(raw).hexdigest() if raw else None,
+                           'hasDialogScript':(d/'DialogScript').exists(),'hasHelp':(d/'Help').exists(),
+                           'textSignals':tokens[:80]})
+          required=['pattern','thread','weave','detangle']
+          assert all(any(x['role']==r for x in defs) for r in required),{r:sum(x['role']==r for x in defs) for r in required}
+          lynx_license=text(lynx/'LICENSE');assert 'GNU LESSER GENERAL PUBLIC LICENSE' in lynx_license
+          # ThunderLoom: source-visible Irawan/WIF cloth shader library.
+          thunder=roots['thunderloom'];thsrc=thunder/'src';assert thsrc.is_dir()
+          thfiles=sorted(p for p in thsrc.rglob('*') if p.is_file())
+          header=next((p for p in thfiles if p.name.lower()=='thunderloom.h'),None);assert header
+          thread=text(thunder/'README.md');assert 'Irawan' in thread and 'WIF' in thread and 'MIT Licence' in thread
+          # MADYPG: exact mechanics-aware yarn mapping anchor named by the authors.
+          mad=roots['madypg'];mapper=mad/'src/yarns/YarnMapper.h';assert mapper.is_file()
+          madread=text(mad/'README.md');assert 'YarnMapper.h' in madread and 'MIT license' in madread
+          models=mad/'data/yarnmodels'
+          report={
+            'schema':'fibric_open_source_lock@1',
+            'taskMode':'REPLICATION_LOCKED','creativeAuthorization':False,
+            'thirdPartyCodeCommittedToProject':False,
+            'nativeRenderExecuted':False,'visualAcceptance':False,
+            'sources':{
+              'lynx':{'commit':head(lynx),'license':'LGPL-3.0','licenseSha256':sha(lynx/'LICENSE'),
+                      'fabricDefinitionCount':len(defs),'definitions':defs,
+                      'demoHipPresent':(lynx/'plugins/SideFX/Houdini/examples/LYNX_fabric_Demo.hip').is_file()},
+              'thunderloom':{'commit':head(thunder),'license':'MIT','readmeSha256':sha(thunder/'README.md'),
+                      'sourceFileCount':len(thfiles),'sourceBytes':sum(p.stat().st_size for p in thfiles),
+                      'apiHeader':str(header.relative_to(thunder)),'apiHeaderSha256':sha(header)},
+              'madypg':{'commit':head(mad),'license':'MIT with per-file dependency notices',
+                      'readmeSha256':sha(mad/'README.md'),'algorithmAnchor':str(mapper.relative_to(mad)),
+                      'algorithmAnchorSha256':sha(mapper),'algorithmAnchorLines':len(text(mapper).splitlines()),
+                      'precomputedYarnModelFiles':sum(p.is_file() for p in models.rglob('*')) if models.exists() else 0}},
+            'decision':{
+              'fibricRole':'target and acceptance teacher',
+              'lynxRole':'transparent procedural geometry teacher; clean implementation preferred',
+              'thunderloomRole':'middle/far woven optical model teacher',
+              'madypgRole':'mechanics-aware yarn deformation teacher',
+              'nextBoundedArtifact':'deterministic herringbone pattern and yarn compiler with numeric geometry tests'}}
+          (out/'open-route-source-lock.json').write_text(json.dumps(report,indent=2))
+          (out/'lynx-definition-index.json').write_text(json.dumps(defs,indent=2))
+          for key,root in roots.items():
+              license_file=next((p for p in [root/'LICENSE',root/'LICENSE.txt'] if p.exists()),None)
+              if license_file:(out/f'{key}-LICENSE.txt').write_bytes(license_file.read_bytes())
+          print(json.dumps({k:{kk:vv for kk,vv in v.items() if kk not in ['definitions']} for k,v in report['sources'].items()},indent=2))
+          PY
+      - name: Preserve source-lock report only, not third-party repositories
+        uses: actions/upload-artifact@v4
+        with:
+          name: fibric-open-route-source-lock
+          path: source-lock-evidence/
+          retention-days: 30

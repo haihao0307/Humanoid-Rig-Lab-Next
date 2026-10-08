@@ -1,0 +1,45 @@
+name: Fibric browser renderer dependencies
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths: ['.github/workflows/fibric-browser-dependencies.yml']
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: research/fibric-native-study/open-kernel
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Bundle exact public dependencies and preserve notices
+        run: |
+          mkdir -p browser-deps/licenses browser-deps/source
+          cd browser-deps
+          npm init -y
+          npm install --save-exact --ignore-scripts three@0.169.0 three-mesh-bvh@0.7.8 three-gpu-pathtracer@0.0.23 esbuild@0.24.2
+          cat > entry.mjs <<'JS'
+          import * as THREE from 'three';
+          export { THREE };
+          export { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+          export { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+          export { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
+          export { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+          export { WebGLPathTracer, PhysicalCamera } from 'three-gpu-pathtracer';
+          JS
+          ./node_modules/.bin/esbuild entry.mjs --bundle --minify --format=iife --global-name=LabLib --target=es2020 --outfile=vendor.js --legal-comments=inline
+          cp node_modules/three/LICENSE licenses/three-LICENSE.txt
+          cp node_modules/three-mesh-bvh/LICENSE licenses/three-mesh-bvh-LICENSE.txt
+          cp node_modules/three-gpu-pathtracer/LICENSE licenses/three-gpu-pathtracer-LICENSE.txt
+          cp -r node_modules/three-gpu-pathtracer/src source/pathtracer
+          cp -r ../research/fibric-native-study/open-kernel source/
+          rm -rf node_modules
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fibric-browser-renderer-deps
+          path: browser-deps/
+          retention-days: 7

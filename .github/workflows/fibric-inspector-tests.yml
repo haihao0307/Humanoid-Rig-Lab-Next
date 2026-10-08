@@ -1,0 +1,34 @@
+name: Fibric source inspector tests
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths:
+      - 'research/fibric-native-study/tools/fibric_native_audit.py'
+      - 'research/fibric-native-study/tests/**'
+      - '.github/workflows/fibric-inspector-tests.yml'
+permissions:
+  contents: read
+jobs:
+  parser-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: research/fibric-native-study
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify exact locally tested source bytes
+        run: |
+          python - <<'PY'
+          import hashlib,pathlib
+          root=pathlib.Path('research/fibric-native-study')
+          expected={'tools/fibric_native_audit.py':'c97f45000f10eea09f9ab8a4555da0279283e193a86aa5d1e1788846e8198659','tests/test_native_audit.py':'b0a320c76f3138b65551164f178f78f17f751faf8c2e78bd3c64b02cd856dbdb'}
+          for name,value in expected.items():
+              actual=hashlib.sha256((root/name).read_bytes()).hexdigest()
+              assert actual==value,(name,actual,value)
+              print(name,actual)
+          PY
+      - name: Test read-only parser and explicitly avoid native-render claims
+        run: python -m unittest discover -s research/fibric-native-study/tests -v

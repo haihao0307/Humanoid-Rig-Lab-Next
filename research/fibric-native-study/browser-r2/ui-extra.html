@@ -1,0 +1,9 @@
+<section><h2>自然纺纱</h2><p>同一人字纹结构，改变纱束而不是叠一张噪声图片。</p>
+<label class="label">纱束粗细与纤维迁移 <output id="disorderOut">68%</output></label><input id="disorder" type="range" min="0" max="1" value="0.68" step="0.01">
+<label class="label">短毛羽密度 <output id="fuzzAmountOut">60%</output></label><input id="fuzzAmount" type="range" min="0" max="1" value="0.6" step="0.05">
+<label class="label">光学粗糙度 <output id="roughnessOut">0.72</output></label><input id="roughness" type="range" min="0.4" max="0.9" value="0.72" step="0.01">
+<div class="row"><button id="newSeed">换一组纤维</button><button id="regular">规则 / 自然对照</button></div>
+<div class="row"><button data-palette="oat" class="active">本色</button><button data-palette="ivory">米白</button><button data-palette="charcoal">炭灰</button></div>
+<p id="regionNote">全样布使用独立细纤维，共用同一经纬谱与真实尺寸。</p>
+</section>
+<section><h2>可恢复的配方</h2><div class="row"><button id="undo" disabled>撤销</button><button id="redo" disabled>重做</button><button id="loadRecipe">导入配方</button></div><input id="recipeInput" type="file" accept=".json,application/json" hidden><p id="recipeStatus">保存后可在同一版本中还原几何、配色、光线和镜头模式。</p></section>

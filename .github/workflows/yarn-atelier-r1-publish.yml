@@ -1,0 +1,107 @@
+name: Publish reviewed Yarn Atelier R1 and verify public browser
+on:
+  push:
+    branches: ['research/fibric-native-study-20261007']
+    paths: ['.github/workflows/yarn-atelier-r1-publish.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: yarn-atelier-r1-publication
+  cancel-in-progress: false
+jobs:
+  publish-reviewed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/fibric-native-study-20261007
+          fetch-depth: 1
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: haihao0307/Humanoid-Rig-Lab-Next
+          run-id: 37603814043
+          name: fibric-dense-yarn-browser-evidence
+          path: ${{ runner.temp }}/reviewed-yarn-r1
+      - name: Validate the exact visually inspected passing build
+        env:
+          REVIEWED: ${{ runner.temp }}/reviewed-yarn-r1
+        run: |
+          python - <<'PY'
+          import os,pathlib,json,hashlib
+          p=pathlib.Path(os.environ['REVIEWED'])
+          expected='c7541cf7114a3d3ad0775677cbca9debe28f4213388c4c360194b270c63dbbe9'
+          assert hashlib.sha256((p/'index.html').read_bytes()).hexdigest()==expected
+          m=json.loads((p/'BUILD_MANIFEST.json').read_text());r=json.loads((p/'evidence/report.json').read_text())
+          assert m['sourceCommit']==r['sourceCommit']=='a364a99bcf3c5879cba2cee87bace372e0d77eba'
+          assert m['entrySha256']==expected and m['entryBytes']==1197846
+          assert r['browserExecuted'] and 'fatal' not in r and not r['errors'] and not r['consoleErrors'] and not r['networkRequests']
+          assert r['pathtraced']['pathSamples']>=6 and r['initial']['yarns']==72
+          assert r['initial']['triangles']==4632576 and not r['mobileViewport']['overflow']
+          assert m['officialFibricReproduction'] is False and m['visualAcceptance'] is False
+          for name,sha in m['sourceFiles'].items():assert hashlib.sha256((p/'source'/name).read_bytes()).hexdigest()==sha
+          print('Reviewed independent browser build, controls, mobile layout and progressive tracing verified.')
+          PY
+      - name: Append reviewed preview without modifying main or existing sites
+        env:
+          REVIEWED: ${{ runner.temp }}/reviewed-yarn-r1
+        run: |
+          git pull --ff-only origin research/fibric-native-study-20261007
+          test ! -e previews/yarn-atelier-r1
+          mkdir -p previews/yarn-atelier-r1/evidence
+          cp "$REVIEWED/index.html" previews/yarn-atelier-r1/index.html
+          cp "$REVIEWED/BUILD_MANIFEST.json" previews/yarn-atelier-r1/BUILD_MANIFEST.json
+          cp -a "$REVIEWED/source" previews/yarn-atelier-r1/source
+          cp "$REVIEWED/evidence/report.json" previews/yarn-atelier-r1/evidence/standalone-report.json
+          cat > previews/yarn-atelier-r1/README.md <<'MD'
+          # Yarn Atelier R1 / 织物显微室
+
+          Independent procedural herringbone study inspired by the Fibric learning route. This is an interactive browser candidate, NOT the author's Fibric tool, official example recook, matched fiber BSDF, or accepted cinematic reproduction.
+
+          Open `index.html` directly or through the immutable public URL. The complete runtime is inline: no external model, original teacher cache, image texture download, font request, or runtime HTTP dependency is required. The pinned MIT renderer notices are in `source/licenses` and the bundled runtime.
+
+          ## Actual implemented geometry
+          36 warp and 36 weft yarns, a 15.12 by 14.4 mm sample, elliptical bulk envelopes, explicit over/under order, 2,304 fine filament curves and 3,200 tapered fuzz curves. These are generated at runtime from the independently authored draft and metric kernel. The default detailed mesh has 4,632,576 triangles; this is a small hero sample, not a low-cost full garment solution.
+
+          Contact projection checks sampled bulk elliptical envelopes in flat material coordinates. It does not prove continuous collision freedom, strand-to-strand or fuzz collision freedom, constitutive material mechanics, or garment self/body collision. Bending is a geometric demonstration, not physics. The opening metric is the projected flat bulk-envelope opening and excludes the finer fibers and fuzz.
+
+          ## Controls
+          Whole sample, macro and grazing cameras; orbit, pan and zoom; three light rigs; warp/weft colors; density; flattening; fine fibers; flat/bent shape; exposure; recipe and actual frame downloads; progressive WebGL path tracing and optional depth of field. Stop moving the camera to accumulate path-tracing samples. A low sample count is visibly noisy and is not a converged cinematic frame. The renderer uses a physical surface model on explicit fiber geometry, not Karma Hair or a complete specialized yarn-scattering model.
+
+          ## Validation
+          Immutable source build: a364a99bcf3c5879cba2cee87bace372e0d77eba. Passing original browser run: 37603814043. The standalone test exercised real pixels, camera/light changes, fiber toggling, three densities, flat/bent geometry, recipe download, a 390x844 viewport and progressive path tracing. It recorded zero page errors, zero console errors and zero HTTP requests. Software-GPU test timings are not desktop GPU performance measurements. The mobile test is viewport emulation, NOT real-device validation.
+
+          The complete original browser evidence remains in the run artifact; a separate publication run tests the immutable HTTPS link with a clean browser. The free githack host may require a first-visit anti-phishing confirmation; this is recorded rather than bypassed invisibly. No paid hosting was provisioned. This isolated preview does not replace the repository's existing Pages site or change main.
+
+          ## Outstanding visual work
+          Same-camera teacher matching, realistic yarn irregularity and packing calibration, native fiber-scattering response, more efficient near/far representations, proper cloth mechanics and garment integration remain open. Parser tests, geometry counts and nonblank images alone are not visual acceptance.
+          MD
+          git config user.name 'Yarn Atelier build bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- previews/yarn-atelier-r1
+          git commit -m "preview(fibric): fixed self-contained Yarn Atelier R1 candidate with passing browser evidence"
+          git push origin HEAD:research/fibric-native-study-20261007
+          mkdir -p publication
+          python - <<'PY'
+          import subprocess,json,pathlib
+          sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          info={'version':'YARN_ATELIER_R1','commit':sha,'htmlSha256':'c7541cf7114a3d3ad0775677cbca9debe28f4213388c4c360194b270c63dbbe9','sourceBuildCommit':'a364a99bcf3c5879cba2cee87bace372e0d77eba','url':f'https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/{sha}/previews/yarn-atelier-r1/index.html','cinematicParity':False,'mainModifiedByThisWorkflow':False}
+          pathlib.Path('publication/publication.json').write_text(json.dumps(info,indent=2));print(json.dumps(info))
+          PY
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install external browser validation
+        run: |
+          pip install playwright==1.56.0 pillow
+          playwright install --with-deps chromium
+      - name: Verify real public rendering, camera, colors, mobile viewport and path tracing
+        run: python research/fibric-native-study/delivery/public_qa.py publication/publication.json publication/public-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yarn-atelier-r1-publication-evidence
+          path: publication/
+          retention-days: 30
