@@ -1,0 +1,34 @@
+name: Skin Three Workspace
+on:
+  push:
+    branches: [feature/skin-r02-three-identities-20261008]
+    paths: [.github/workflows/skin-three-workspace.yml]
+permissions:
+  contents: read
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            skin-quality-lab
+            reconstruction
+          fetch-depth: 1
+      - name: Stage exact renderer and parameter sources
+        run: |
+          mkdir -p /tmp/skin-workspace/skin-quality-lab/r01/assets/hires
+          cp -r skin-quality-lab/r01/vendor /tmp/skin-workspace/skin-quality-lab/r01/
+          for f in head.glb normal.jpg specular.jpg HEAD-LICENSE.txt; do cp skin-quality-lab/r01/assets/$f /tmp/skin-workspace/skin-quality-lab/r01/assets/; done
+          for f in albedo-4k.jpg microheight-4k.png; do cp skin-quality-lab/r01/assets/hires/$f /tmp/skin-workspace/skin-quality-lab/r01/assets/hires/; done
+          cp -r skin-quality-lab/r02 /tmp/skin-workspace/skin-quality-lab/
+          cp -r reconstruction /tmp/skin-workspace/
+          cp BUILD_MANIFEST* /tmp/skin-workspace/ 2>/dev/null || true
+          du -sh /tmp/skin-workspace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: skin-three-editable-workspace
+          path: /tmp/skin-workspace
+          retention-days: 3
+          compression-level: 1
