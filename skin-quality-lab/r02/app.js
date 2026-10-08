@@ -269,13 +269,16 @@ function identityHairGeometry(geometry,profile,maps){
    }
   }
   const g=new THREE.BufferGeometry();for(const [key,arr,size] of [['position',positions,3],['scalpNormal',normals,3],['rootPosition',roots,3],['strandColor',colors,3],['tangent',tangents,3],['along',ts,1],['strandSide',sides,1],['strandRandom',randoms,1],['strandRadius',radii,1],['boundRelief',relief,3]])g.setAttribute(key,new THREE.Float32BufferAttribute(arr,size));g.setIndex(ids);
-  const obj=new THREE.Mesh(g);obj.name=kind;const handle=attachFiberMaterial(obj,{renderer,color:'#ffffff',roughness:profile.seed===159?.52:.42,specular:.12,shadows:false,coverageAA:true,coverageResolve:'blend'});obj.material.uniforms.uRelief=E.uRelief;obj.receiveShadow=true;obj.castShadow=false;obj.material.uniforms.fiberShadows.value=1;obj.userData.fiberHandle=handle;obj.renderOrder=2;group.add(obj);
+  const obj=new THREE.Mesh(g);obj.name=kind;const handle=attachFiberMaterial(obj,{renderer,color:'#ffffff',roughness:profile.seed===159?.52:.42,specular:.12,shadows:false,coverageAA:true,coverageResolve:'blend'});obj.material.uniforms.uRelief=E.uRelief;obj.receiveShadow=false;obj.castShadow=false;obj.material.uniforms.fiberShadows.value=1;obj.userData.fiberHandle=handle;obj.renderOrder=2;group.add(obj);
  }
- group.userData.counts={brow:output.brow.length,beard:output.beard.length};group.userData.binding={basis:'current subdivided R02 scan triangles',surface:'barycentric interpolation of displaced triangle vertices',rootOffsetMeters:[.000025,.000050],originalFuzzPreserved:14000,segments:[7,10],sourceMaterial:'kaopu-hair-workbench/qa/gnm-groom-editor/src/FiberMaterial.js@23f1f408f961749c49e9747d45072c761825b158',fiberShadows:'receives existing skin VSM; strand shadow casting disabled'};return group;
+ group.userData.counts={brow:output.brow.length,beard:output.beard.length};group.userData.binding={basis:'current subdivided R02 scan triangles',surface:'barycentric interpolation of displaced triangle vertices',rootOffsetMeters:[Math.min(...Object.values(output).flat().map(s=>s.radius*1.2)),Math.max(...Object.values(output).flat().map(s=>s.radius*1.2))],originalFuzzPreserved:14000,segments:[7,10],sourceMaterial:'kaopu-hair-workbench/qa/gnm-groom-editor/src/FiberMaterial.js@23f1f408f961749c49e9747d45072c761825b158',fiberShadows:'receives existing skin VSM; strand shadow casting disabled'};return group;
 }
 
 async function installSkinIdentities(original,load){
  const cache=new Map(),originalMaps={...original};let sequence=0,group=null,current='original';
+ // VSM traverses receiveShadow meshes even with castShadow=false.
+ // The custom shader reads native skin shadow maps via its own fibre uniform;
+ // both scene-graph shadow flags remain false so no fibre depth writer is used.
  const hairValues={browDensity:1,beardDensity:1,beardLength:1};
  const updateHair=()=>{if(group)for(const obj of group.children){obj.material.uniforms.uDensity.value=obj.name==='brow'?hairValues.browDensity:hairValues.beardDensity;obj.material.uniforms.uLength.value=obj.name==='brow'?1:hairValues.beardLength;}
   for(const k in hairValues){$(k).value=hairValues[k];$(k+'Out').textContent=hairValues[k].toFixed(2);}dirty=true;};
@@ -302,7 +305,7 @@ async function installSkinIdentities(original,load){
  }
  const report=()=>({schema:'kaopu/skin-identity@1',id:current,hair:{...hairValues},geometryBasis:'R02.1 original scan; topology unchanged',maps:state.identityMaps});
  async function restore(o){if(!o)return setIdentity('original');if(o.schema!=='kaopu/skin-identity@1')throw Error('表皮配方版本不兼容');await setIdentity(o.id);for(const k in hairValues)if(Number.isFinite(o.hair?.[k]))hairValues[k]=Math.max(0,Math.min(k==='beardLength'?2:1,o.hair[k]));updateHair();}
- const api={set:setIdentity,report,restore,hasHair:()=>!!group&&current!=='original',current:()=>current,diagnostics:()=>({binding:group?.userData.binding,materials:group?.children.map(o=>fiberMaterialDiagnostics(o.material))}),definitions:IDENTITY_DEFINITIONS};identityRuntime=api;window.__SKIN_LAB__.identity=api;
+ const api={set:setIdentity,report,restore,hasHair:()=>!!group&&current!=='original',current:()=>current,diagnostics:()=>({binding:group?.userData.binding,shadowWriterIsolated:!!group&&group.children.every(o=>!o.receiveShadow&&!o.castShadow),cameraLayerMask:camera.layers.mask,shadowCameraLayerMask:key.shadow.camera.layers.mask,materials:group?.children.map(o=>fiberMaterialDiagnostics(o.material))}),definitions:IDENTITY_DEFINITIONS};identityRuntime=api;window.__SKIN_LAB__.identity=api;
  for(const b of document.querySelectorAll('[data-identity]'))b.onclick=()=>setIdentity(b.dataset.identity).catch(e=>{toast(e.message);state.errors.push(e.message);});
  for(const k in hairValues)$(k).oninput=()=>{hairValues[k]=Number($(k).value);updateHair();};
  $('identityMaps').onclick=()=>{
