@@ -14,6 +14,8 @@ if (r/'corrections.json').exists():
  for name,pairs in json.loads((r/'corrections.json').read_text()).items():
   p=s/name;txt=p.read_text()
   for a,b in pairs:
+   if b in a and a in txt:txt=txt.replace(a,b);continue
+   if b in txt:continue
    if a not in txt:raise RuntimeError('Correction anchor absent: '+name+' '+a[:120])
    txt=txt.replace(a,b)
   p.write_text(txt)
@@ -29,6 +31,7 @@ for f in ['leather.js','craft.js','export.js','app.js']:
  t=(s/f).read_text();t=re.sub(r'^import.*?;\s*','',t,flags=re.M);t=re.sub(r'\bexport (?=(?:async )?(?:class|const|function))','',t);js.append(t)
 code='(()=>{'+ '\n'.join(js)+'})();';code=re.sub(r'</script',r'<\\/script',code,flags=re.I)
 (r/'bundle_check.js').write_text(code);subprocess.run(['node','--check',str(r/'bundle_check.js')],check=True)
+if (r/'topology-test.mjs').exists():subprocess.run(['node',str(r/'topology-test.mjs')],check=True)
 notice=(r/'THIRD_PARTY.txt').read_text().replace('--','—')
 html=(s/'template.html').read_text().replace('<!--IMPORTMAP-->','<!--\n'+notice+'\n-->').replace('<!--APP-->','<script>'+code+'</script>')
 (r/'preview.html').write_text(html)

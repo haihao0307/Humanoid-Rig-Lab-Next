@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import * as T from './site/three.module.js';
+const root=new URL('.',import.meta.url),site=new URL('./site/',root),report={tests:[],physicsValidated:false};
+function check(ok,name,data={}){report.tests.push({name,pass:!!ok,...data});if(!ok)throw Error(name);}
+const tmp=[];for(const name of ['craft','leather']){let text=fs.readFileSync(new URL(name+'.js',site),'utf8').replace("from 'three'","from './three.module.js'");let u=new URL(name+'-numeric.mjs',site);fs.writeFileSync(u,text);tmp.push(u);}
+try{
+const {buildCraft}=await import('./site/craft-numeric.mjs'),{DEFAULT}=await import('./site/leather-numeric.mjs');let mat=new T.MeshStandardMaterial({side:T.DoubleSide});
+let make=(p)=>buildCraft(p,(u,v)=>new T.Vector3((u-.5)*.25,.006,(v-.5)*.25),mat,mat,mat,mat);
+for(const craft of ['plain','diamond','grid','channels','woven'])for(const hole of ['none','round']){let p={...DEFAULT,object:'flat',craft,hole},o=make(p),g=o.body.geometry,a=g.attributes.position,n=g.attributes.normal,idx=g.index.array;let flipped=0,invalid=0;
+for(let j=0;j<idx.length;j+=3){let x=new T.Vector3().fromBufferAttribute(a,idx[j]),b=new T.Vector3().fromBufferAttribute(a,idx[j+1]).sub(x),c=new T.Vector3().fromBufferAttribute(a,idx[j+2]).sub(x),normal=new T.Vector3().fromBufferAttribute(n,idx[j]);if(b.cross(c).dot(normal)<-1e-12)flipped++;}
+for(const v of a.array)if(!Number.isFinite(v))invalid++;check(!flipped&&!invalid,craft+' / '+hole+' finite vertices and consistent winding',{triangles:idx.length/3,flipped,invalid});o.group.traverse(x=>x.geometry?.dispose());}
+let p={...DEFAULT,object:'flat',hole:'round',craft:'plain',piping:false,stitches:false},o=make(p);o.group.updateMatrixWorld(true);let count=Math.round(.25/(p.holePitch/1000)),u=10.5/count,v=10.5/count;
+let ray=new T.Raycaster(new T.Vector3((u-.5)*.25,.1,(v-.5)*.25),new T.Vector3(0,-1,0));let through=ray.intersectObject(o.group,true).length;ray.ray.origin.x=(10/count-.5)*.25;let solid=ray.intersectObject(o.group,true).length;check(through===0&&solid>=2,'rays pass through holes but hit solid leather',{through,solid,holes:o.info.holes});
+let top=o.group.children[0].geometry.attributes.position,bot=o.group.children[1].geometry.attributes.position,min=Infinity,max=0;for(let i=0;i<top.count;i++){let d=new T.Vector3().fromBufferAttribute(top,i).distanceTo(new T.Vector3().fromBufferAttribute(bot,i));min=Math.min(min,d);max=Math.max(max,d);}check(Math.abs(min-p.thickness/1000)<1e-6&&Math.abs(max-p.thickness/1000)<1e-6,'generated leather normal thickness',{minMM:min*1000,maxMM:max*1000});
+p={...DEFAULT,object:'flat',craft:'diamond',stitch:'single',hole:'none'};o=make(p);let m=new T.Matrix4(),maxError=0,samples=0;for(let i=0;i<o.threads.count;i++){o.threads.getMatrixAt(i,m);let v=new T.Vector3().setFromMatrixPosition(m);if(Math.abs(v.x)<.11&&Math.abs(v.z)<.11){maxError=Math.max(maxError,v.y-.006-p.thickness/2000);samples++;}}check(samples>500&&maxError<.0007,'diamond stitch centerlines follow quilt valleys',{samples,maxExcessMM:maxError*1000});report.pass=true;
+}finally{tmp.forEach(u=>fs.unlinkSync(u));let q=new URL('qa/',root);fs.mkdirSync(q,{recursive:true});fs.writeFileSync(new URL('qa-topology.json',q),JSON.stringify(report,null,2));console.log(JSON.stringify(report));}

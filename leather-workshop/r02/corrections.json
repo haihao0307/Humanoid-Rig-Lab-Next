@@ -1,0 +1,23 @@
+{
+ "craft.js":[
+ ["for(let d=-W-L;d<W+L;d+=q){let points=[];","for(let k=-Math.ceil((W+L)/q);k<=Math.ceil((W+L)/q);k++){let d=k*q,points=[];"],
+ ["if(buf.norm.length)g.setAttribute('normal',new T.Float32BufferAttribute(buf.norm,3));else g.computeVertexNormals();","if(buf.norm.length&&p.craft!=='woven')g.setAttribute('normal',new T.Float32BufferAttribute(buf.norm,3));else g.computeVertexNormals();"],
+ ["border(margin);if(p.stitch==='double')border(margin+.0023);","border(margin);"],
+ ["const segments=[];\n for(const [a,b] of paths)","if(p.stitch==='double'){let twins=[];for(const [a,b] of paths){let dx=(b[0]-a[0])*W,dz=(b[1]-a[1])*L,len=Math.hypot(dx,dz)||1;for(let side of [-1,1]){let x=-dz/len*.0008/W*side,z=dx/len*.0008/L*side;twins.push([[clamp(a[0]+x,0,1),clamp(a[1]+z,0,1)],[clamp(b[0]+x,0,1),clamp(b[1]+z,0,1)]]);}}paths=twins;}\n const segments=[];\n for(const [a,b] of paths)"],
+ ["let spacing=p.quiltMM/3000,width=spacing*.88","let spacing=p.weaveMM/1000,width=spacing*.88"]
+ ],
+ "leather.js":[["craft:'plain',quiltMM:34,loft:4","craft:'plain',quiltMM:34,weaveMM:10,loft:4"]],
+ "app.js":[
+ ["['quiltMM','绗缝 / 编织间距',20,60,1,'mm']","['quiltMM','绗缝间距',20,60,1,'mm'],['weaveMM','编织目标间距',6,20,.5,'mm']"],
+ ["distance=innerWidth<801?.92:.57;target.set(0,sphere?.09:.038,flat?0:-.058);","distance=innerWidth<801?.92:flat?.62:.57;target.set(0,sphere?.09:flat?.008:.038,flat?0:-.058);"],
+ ["$('legacy').onpointerdown=e=>{e.preventDefault();if(!legacyKernel)","$('legacy').onpointerdown=e=>{e.preventDefault();if(params.kind>3){toast('R01 没有这一类粒面，不能冒充同类对照');return;}if(!legacyKernel)"],
+ ["if(params.object==='sphere'){let g=","if(params.object==='sphere'){craftInfo={holes:0,threadSegments:0,craft:'material-sphere'};let g="],
+ ["renderer.render(scene,camera);renderCount++;","renderer.render(scene,camera);renderCount++;$('status').textContent=`WebGL2 · Three r${T.REVISION} · ${params.resolution}² · ${renderer.info.render.triangles.toLocaleString()} 三角形 · ${craftInfo.holes||0} 真穿孔 · ${VERSION}`;"],
+ ["clearTimeout(bakeTimer);kernel.bake(params);download(await materialZIP(kernel,params)","clearTimeout(bakeTimer);kernel.bake(params);backMat.normalMap=kernel.maps.normal;backMat.needsUpdate=true;applyChannel();download(await materialZIP(kernel,params)"],
+ ["$('height16').onclick=async()=>{try{download(","$('height16').onclick=async()=>{try{clearTimeout(bakeTimer);kernel.bake(params);backMat.normalMap=kernel.maps.normal;backMat.needsUpdate=true;applyChannel();dirty=true;download("]
+ ],
+ "template.html":[
+ ["<div class=\"toolbar\">","<div class=\"quickcraft\"><button data-combo=\"natural\">原皮</button><button data-combo=\"seat\">绗缝</button><button data-combo=\"vent\">透气孔</button><button data-combo=\"braid\">皮条编织</button><button data-combo=\"aged\">老化</button></div><div class=\"toolbar\">"],
+ ["</style>",".quickcraft{position:absolute;right:24px;top:27px;display:flex;gap:5px}.quickcraft button{background:#262727d9;backdrop-filter:blur(8px);padding:7px 10px;font-size:12px}@media(max-width:800px){.quickcraft{top:94px;left:18px;right:auto}.quickcraft button{font-size:11px;padding:6px 8px}}\n</style>"]
+ ]
+}
