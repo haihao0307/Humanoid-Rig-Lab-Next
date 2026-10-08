@@ -2,8 +2,8 @@
   "schema": "kaopu/r02-artistic-age-test@1",
   "success": true,
   "sourceMeshSHA256": "402b8a8ac9f03232e6d64b5962929703a069daf99d3c49ac8eb0e48bedc9c576",
-  "captureMilliseconds": 169.42848900000007,
-  "applyMilliseconds": 28.898128999999926,
+  "captureMilliseconds": 153.26516199999998,
+  "applyMilliseconds": 30.035522000000014,
   "checks": [
     {
       "name": "expected subdivided scan",
@@ -30,7 +30,7 @@
       "pass": true
     },
     {
-      "name": "visible but bounded volume change",
+      "name": "bounded nonzero authored volume change (not age acceptance)",
       "pass": true
     },
     {
@@ -50,6 +50,14 @@
       "pass": true
     },
     {
+      "name": "intermediate strengths do not reverse or collapse triangles",
+      "pass": true
+    },
+    {
+      "name": "invalid strength does not mutate geometry",
+      "pass": true
+    },
+    {
       "name": "reapply is independent of history",
       "pass": true
     },
@@ -66,8 +74,31 @@
       "pass": true
     }
   ],
+  "strengthChecks": [
+    {
+      "strength": 0.25,
+      "triangleFlips": 0,
+      "minAreaRatio": 0.9126067302902612
+    },
+    {
+      "strength": 0.5,
+      "triangleFlips": 0,
+      "minAreaRatio": 0.828144337371035
+    },
+    {
+      "strength": 0.75,
+      "triangleFlips": 0,
+      "minAreaRatio": 0.7475614782678429
+    },
+    {
+      "strength": 1,
+      "triangleFlips": 0,
+      "minAreaRatio": 0.6722492708100413
+    }
+  ],
   "geometry": {
     "schema": "kaopu/r02-scan-artistic-age@1",
+    "calibration": "r024-elder-shape-2",
     "strength": 1,
     "vertexCount": 143196,
     "triangleCount": 282944,
@@ -75,12 +106,12 @@
     "uvChanged": false,
     "neutralRestore": "original position and normal byte copy",
     "normalMethod": "analytic inverse-transpose deformation-gradient transport of original scan normals",
-    "maximumDisplacementMeters": 0.004360088618608028,
-    "unitMaximumDisplacementMeters": 0.004360088618608028,
-    "unitAffectedVertices": 124882,
+    "maximumDisplacementMeters": 0.01034194736328811,
+    "unitMaximumDisplacementMeters": 0.01034194736328811,
+    "unitAffectedVertices": 125775,
     "unitJacobianDeterminantRange": [
-      0.8847420774357642,
-      1.1633385947587294
+      0.687214992673521,
+      1.415867820868617
     ],
     "fields": [
       "malar-volume",
@@ -88,34 +119,42 @@
       "temple-volume",
       "lower-orbit-pad",
       "tear-trough",
+      "lateral-orbit-drape",
       "upper-lid-fold",
+      "upper-lid-sulcus",
+      "outer-lid-hood",
+      "outer-brow-settle",
       "mouth-corner",
       "nasolabial-support",
       "nasolabial-groove",
       "marionette-groove",
       "lower-cheek-pad",
       "jowl-soft-tissue",
+      "lateral-jaw-apron",
       "prejowl-transition",
       "submental-soft-tissue",
-      "anterior-neck"
+      "anterior-neck",
+      "central-neck-drape",
+      "upper-neck-fold",
+      "lower-neck-fold"
     ],
     "basis": "art-directed closed-eye R02 scan; not medically validated"
   },
   "unitNormalLengthRange": [
-    0.9999999521276262,
-    1.0000000483524605
+    0.9999999523011851,
+    1.000000049655825
   ],
-  "changedVertices": 124885,
-  "maximumMeasuredDisplacementMeters": 0.004360088309012029,
+  "changedVertices": 125779,
+  "maximumMeasuredDisplacementMeters": 0.010341946286404289,
   "UVSeamDuplicateVertices": 1722,
   "maxSeamGapMeters": 0,
   "triangleFlips": 0,
-  "minFaceDirectionDot": 0.9197181127068089,
+  "minFaceDirectionDot": 0.6432341030109543,
   "triangleAreaRatioRange": [
-    0.8333139237063449,
-    1.2336777467559379
+    0.6722492708100413,
+    1.4912904524535935
   ],
-  "maximumNormalTransportError": 0.0000012950428065123765,
+  "maximumNormalTransportError": 0.0000020099025124382034,
   "baselineHashes": {
     "positionHash": "42bce6e67b9655c7e9f6624b1c8119e1ab68ba13972d3c96d43dd969745e9f12",
     "normalHash": "18c7441cb17dcf53accd064a116f258e14975065242753bc36d5773eb968bca9",
@@ -138,9 +177,9 @@
       ],
       "distanceToReferenceMeters": 0.00284533334157893,
       "deltaMillimeters": [
-        1.2619011104106903,
-        -1.2498162686824799,
-        -3.340482711791992
+        1.649651676416397,
+        -2.160213887691498,
+        -4.079923033714294
       ]
     },
     {
@@ -158,9 +197,9 @@
       ],
       "distanceToReferenceMeters": 0.0005570915082363509,
       "deltaMillimeters": [
-        0.659160315990448,
-        -1.3206861913204193,
-        -1.2171193957328796
+        0.7335357367992401,
+        -2.535991370677948,
+        0.3608092665672302
       ]
     },
     {
@@ -178,9 +217,9 @@
       ],
       "distanceToReferenceMeters": 0.0004412918838705412,
       "deltaMillimeters": [
-        0.3420636057853699,
-        -1.4812126755714417,
-        -0.1414269208908081
+        0.23682788014411926,
+        -3.410637378692627,
+        1.8538683652877808
       ]
     },
     {
@@ -198,9 +237,9 @@
       ],
       "distanceToReferenceMeters": 0.0007607613535850061,
       "deltaMillimeters": [
-        1.724202185869217,
-        -0.23163855075836182,
-        -0.5453452467918396
+        1.9005276262760162,
+        -0.26954710483551025,
+        -0.5476474761962891
       ]
     },
     {
@@ -218,9 +257,9 @@
       ],
       "distanceToReferenceMeters": 0.001177235963155639,
       "deltaMillimeters": [
-        -0.24406798183918,
-        -2.5009531527757645,
-        -0.6711110472679138
+        -0.2535935491323471,
+        -3.7117134779691696,
+        -0.748857855796814
       ]
     },
     {
@@ -238,9 +277,9 @@
       ],
       "distanceToReferenceMeters": 0.000794932852370084,
       "deltaMillimeters": [
-        -1.3981275260448456,
-        -3.347913734614849,
-        2.1809041500091553
+        -3.210965543985367,
+        -8.43377411365509,
+        4.000149667263031
       ]
     },
     {
@@ -259,8 +298,48 @@
       "distanceToReferenceMeters": 0.0015689152677466774,
       "deltaMillimeters": [
         0,
-        -0.8281655609607697,
-        1.5376880764961243
+        -3.5206936299800873,
+        3.8467012345790863
+      ]
+    },
+    {
+      "name": "upper-neck-fold",
+      "referencePoint": [
+        -0.0064,
+        -0.047,
+        0.041
+      ],
+      "vertex": 136504,
+      "neutralPosition": [
+        -0.00616292841732502,
+        -0.04535365477204323,
+        0.038469720631837845
+      ],
+      "distanceToReferenceMeters": 0.00302803058535992,
+      "deltaMillimeters": [
+        0,
+        -3.8092583417892456,
+        3.9969682693481445
+      ]
+    },
+    {
+      "name": "lower-neck-fold",
+      "referencePoint": [
+        -0.0004,
+        -0.069,
+        0.029
+      ],
+      "vertex": 83197,
+      "neutralPosition": [
+        -0.00017756488523446023,
+        -0.06795089691877365,
+        0.025999071076512337
+      ],
+      "distanceToReferenceMeters": 0.003186796049191762,
+      "deltaMillimeters": [
+        0,
+        -1.595236361026764,
+        1.852128654718399
       ]
     },
     {
@@ -278,9 +357,9 @@
       ],
       "distanceToReferenceMeters": 0.0006994845713389663,
       "deltaMillimeters": [
-        0.02203322947025299,
-        -0.11942163109779358,
-        -0.3236159682273865
+        0.02745445817708969,
+        -0.1268722116947174,
+        -0.3214925527572632
       ]
     },
     {

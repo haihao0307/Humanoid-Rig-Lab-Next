@@ -16,7 +16,7 @@ function identityHairGeometry(geometry,profile,maps){
  const sampleSurface=sample(E.uSurface.value),sampleFeatures=sample(maps.features),sampleBrow=sample(maps.features,0,0),sampleBrowClear=sample(maps.features,1,0),displaced=new Float32Array(p.count*3);
  for(let i=0;i<p.count;i++){const clear=sampleBrowClear(uv.getX(i),uv.getY(i));const h=(sampleSurface(uv.getX(i),uv.getY(i))*(1-clear)+sampleSurface(uv.getX(i),uv.getY(i)+.06)*clear+sampleFeatures(uv.getX(i),uv.getY(i)))*.001;displaced[i*3]=n.getX(i)*h;displaced[i*3+1]=n.getY(i)*h;displaced[i*3+2]=n.getZ(i)*h;}
  let total=0;const a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),ab=new THREE.Vector3(),ac=new THREE.Vector3();
- for(let i=0;i<ix.length;i+=3){a.fromBufferAttribute(p,ix[i]);b.fromBufferAttribute(p,ix[i+1]);c.fromBufferAttribute(p,ix[i+2]);const x=(a.x+b.x+c.x)/3,y=(a.y+b.y+c.y)/3,z=(a.z+b.z+c.z)/3;if(Math.abs(x)>.078||y<-.035||y>.098||z<.025)continue;let ar=ab.subVectors(b,a).cross(ac.subVectors(c,a)).length()*.5;if(ar<1e-13)continue;total+=ar;areas.push(total);triangles.push(i);}
+ for(let i=0;i<ix.length;i+=3){a.fromBufferAttribute(p,ix[i]);b.fromBufferAttribute(p,ix[i+1]);c.fromBufferAttribute(p,ix[i+2]);const x=(pNeutral.getX(ix[i])+pNeutral.getX(ix[i+1])+pNeutral.getX(ix[i+2]))/3,y=(pNeutral.getY(ix[i])+pNeutral.getY(ix[i+1])+pNeutral.getY(ix[i+2]))/3,z=(pNeutral.getZ(ix[i])+pNeutral.getZ(ix[i+1])+pNeutral.getZ(ix[i+2]))/3;if(Math.abs(x)>.078||y<-.035||y>.098||z<.025)continue;let ar=ab.subVectors(b,a).cross(ac.subVectors(c,a)).length()*.5;if(ar<1e-13)continue;total+=ar;areas.push(total);triangles.push(i);}
  const output={brow:[],beard:[]},rand=identityRandom(profile.seed),q=new THREE.Vector3(),rootPoint=new THREE.Vector3(),nn=new THREE.Vector3();
  const smooth=(a,b,x)=>{let t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
  for(let tries=0;tries<520000&&(output.brow.length<profile.brow||output.beard.length<profile.beard);tries++){
@@ -92,7 +92,7 @@ async function installSkinIdentities(original,load){
    document.querySelector('.caption-title').textContent=IDENTITY_DEFINITIONS[id].label;
    for(const k in hairValues)$(k).disabled=id==='original'||(id==='porcelain'&&k.startsWith('beard'));
    for(const key of [...cache.keys()])if(cache.size>2&&key!==id){const item=cache.get(key);for(const tex of Object.values(item))tex.dispose();cache.delete(key);}
-   $('ageShapeToggle').disabled=id!=='weathered';$('ageShapeToggle').textContent=ageAmount>0?'熟龄形态：开 · 点击对照原形':'熟龄形态：关 · 点击恢复';updateHair();skin.needsUpdate=true;apply();dirty=true;if(state.ready)render();
+   $('ageShapeToggle').disabled=id!=='weathered';$('ageShapeToggle').textContent=id!=='weathered'?'熟龄形态对照（选择 03）':ageAmount>0?'熟龄形态：开 · 点击对照原形':'熟龄形态：关 · 点击恢复';updateHair();skin.needsUpdate=true;apply();dirty=true;if(state.ready)render();
   }finally{if(request===sequence)state.identityLoading=false;}
  }
  const report=()=>({ageStrength:ageAmount,schema:'kaopu/skin-identity@1',id:current,hair:{...hairValues},geometryBasis:'R02.1 scan; weathered reversible shape ageing; topology/UV unchanged',maps:state.identityMaps});

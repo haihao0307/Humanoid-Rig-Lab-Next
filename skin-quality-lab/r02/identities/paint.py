@@ -164,14 +164,14 @@ def main():
    line=.104+j*.0085+.0018*np.cos(x*52+j*.7)+.0008*np.sin(x*155+j)
    g=np.exp(-((y-line)/(.00022+j*.000025))**2)*np.exp(-(x/.062)**6)*front
    wrinkles+=g*age*(.64-j*.08)
-  for side in [-1,1]:
+  for side,cx,cy in [(-1,-.050,.062),(1,.042,.063)]:
    for j in range(4):
-    xx=(x-side*.050)*side;yy=y-(.061-j*.0025);direction=-.28-j*.21
+    xx=(x-cx)*side;yy=y-(cy-j*.0025);direction=-.28-j*.21
     across=(yy-xx*direction);g=np.exp(-(across/.00030)**2)*smooth(0,.007,xx)*(1-smooth(.024,.034,xx))*front
     wrinkles+=g*age*.6
    nasoX=side*(.016+(.034-y)*.39);naso=np.exp(-((x-nasoX)/.0009)**2)*smooth(.003,.013,y)*(1-smooth(.031,.039,y))*front
    wrinkles+=naso*age*.35
-  h-=wrinkles*.090;colour*=1-wrinkles[...,None]*.055;rough+=wrinkles*.04
+  h-=wrinkles*(.16 if ident=='weathered' else .07);colour*=1-wrinkles[...,None]*.055;rough+=wrinkles*.04
   # A healed, non-graphic eyebrow cut interrupts the dark profile's brow.
   scar=np.zeros_like(x)
   if ident=='umber':

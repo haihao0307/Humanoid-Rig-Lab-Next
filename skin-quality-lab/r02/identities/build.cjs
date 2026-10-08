@@ -21,6 +21,7 @@ swap("$('restore').onclick=()=>{","$('restore').onclick=async()=>{");
 swap('loadRecipe(JSON.parse(v));','await loadRecipe(JSON.parse(v));');
 swap('loadRecipe(JSON.parse(await f.text()));','await loadRecipe(JSON.parse(await f.text()));');
 swap("$('reset').onclick=()=>{","$('reset').onclick=async()=>{await identityRuntime.set('original');");
+swap("apply();updateLayer()}\n$('save').onclick","if(['beauty','albedo','normal','roughness','specular','diffuse','browmask','clay'].includes(o.layer))$('layer').value=o.layer;if(['portrait','front','cheek','ear','brow','quarter','high','profile'].includes(o.camera))setCamera(o.camera);apply();updateLayer()}\n$('save').onclick");
 swap("localStorage.setItem('skin-quality-lab-r02',","localStorage.setItem('skin-quality-lab-r02-identities',");
 swap("localStorage.getItem('skin-quality-lab-r02')","localStorage.getItem('skin-quality-lab-r02-identities')");
 js="import {attachFiberMaterial,fiberMaterialDiagnostics} from './identities/FiberMaterial.js';\nimport {createScanAgeMorph} from './identities/AgeMorph.js';\nimport {scanBrowGuide} from './identities/BrowAnatomy.js';\n"+js;
@@ -33,6 +34,8 @@ swap('float skinSpecMask=texture2D(uSpec,vMapUv).r;vec3 skinSurface=texture2D(uS
 swap('vec2 slopes=mapN.xy/max(mapN.z,.2)+mesoN.xy/max(mesoN.z,.3)*uMeso+microN.xy/max(microN.z,.3)*uMicro;', 'float browClean=uIdentityEnabled*texture2D(uIdentityFeatures,vNormalMapUv).g;mesoN=mix(mesoN,texture2D(uMesoMap,vNormalMapUv+vec2(0.,.06)).rgb*2.-1.,browClean);microN=mix(microN,texture2D(uMicroMap,vNormalMapUv+vec2(0.,.06)).rgb*2.-1.,browClean);vec2 slopes=mapN.xy/max(mapN.z,.2)+mesoN.xy/max(mesoN.z,.3)*uMeso+microN.xy/max(microN.z,.3)*uMicro;');
 swap("ear:{p:[.32,.054,.16],t:[.075,.025,0]}","ear:{p:[.32,.054,.16],t:[.075,.025,0]},brow:{p:[.125,.100,.215],t:[.027,.076,.066]},quarter:{p:[.27,.095,.38],t:[0,.055,.012]},high:{p:[.17,.21,.42],t:[0,.060,.018]},profile:{p:[.44,.065,.08],t:[0,.040,.008]}");
 swap("const num={beauty:0,albedo:1,normal:2,roughness:3,specular:4,diffuse:5}","const num={beauty:0,albedo:1,normal:2,roughness:3,specular:4,diffuse:5,browmask:6,clay:7}");
+swap('let renderer,scene,camera,controls,mesh,skin,fuzz,', 'let clayMaterial=null;let renderer,scene,camera,controls,mesh,skin,fuzz,');
+swap("function updateLayer(){state.layer=$('layer').value;", "function updateLayer(){state.layer=$('layer').value;if(!clayMaterial)clayMaterial=new THREE.MeshStandardMaterial({color:new THREE.Color(.32,.32,.32),roughness:.74,metalness:0,envMapIntensity:.3});if(mesh){mesh.material=state.layer==='clay'?clayMaterial:skin;mesh.customDepthMaterial=state.layer==='clay'?undefined:entryMaterial;state.materialMode=mesh.material.type;state.materialHasMaps=!!(mesh.material.map||mesh.material.normalMap);}renderer.shadowMap.needsUpdate=true;entryDirty=true;");
 swap('U.uLayer.value=num<4?num:0;', 'U.uLayer.value=num===6?4:num===7?5:num<4?num:0;');
 swap('if(uBaseline<.5){diffuseColor.rgb*=exp(', 'if(uLayer>4.5)diffuseColor.rgb=vec3(.32);\n if(uBaseline<.5&&uLayer<4.5){diffuseColor.rgb*=exp(');
 swap('normal=normalize(tbn*mapN);','normal=normalize(tbn*(uLayer>4.5?vec3(0.,0.,1.):mapN));');

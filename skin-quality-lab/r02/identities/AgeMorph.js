@@ -14,6 +14,7 @@
  */
 const records = new WeakMap();
 const SCHEMA = 'kaopu/r02-scan-artistic-age@1';
+const CALIBRATION = 'r024-elder-shape-2';
 const X_CENTER = -.0034;
 
 // Each entry is an ellipsoidal displacement, not a periodic wrinkle pattern.
@@ -25,29 +26,44 @@ function add(name, center, sigma, displacement, angle = 0) {
 }
 for (const side of [-1, 1]) {
   const x = a => X_CENTER + side * a;
-  // A slight authored depth adjustment follows the original scan's asymmetry.
   const depth = side === -1 ? .004 : -.003;
-  add('malar-volume', [x(.033), .046, .072+depth], [.016,.019,.026], [-side*.00065,-.0010,-.0027]);
-  add('submalar-hollow', [x(.041), .032, .063+depth], [.013,.019,.023], [-side*.0010,-.0003,-.00185]);
-  add('temple-volume', [x(.054), .083, .039+depth], [.012,.017,.022], [-side*.0017,-.00020,-.00045]);
-  const eyeX = side === -1 ? -.0332 : .0245; // measured outer scan lid surfaces
-  add('lower-orbit-pad', [eyeX, .0585, .0723], [.0105,.0041,.020], [side*.00012,-.00045,.00135], -side*.12);
-  add('tear-trough', [eyeX-side*.007, .0535, .077], [.0090,.0025,.019], [0,-.00015,-.00075], -side*.27);
-  add('upper-lid-fold', [eyeX, side === -1 ? .0730 : .0726, .0778], [.0105,.0047,.021], [0,-.0011,.00095], -side*.10);
-  // Mouth corners descend locally; the philtrum and central lip contact are not
-  // independently pulled apart. Broad nasolabial support gives volume contrast.
-  add('mouth-corner', [x(.023), .0175, .081+depth], [.0060,.0064,.016], [side*.00018,-.00145,-.00025]);
-  add('nasolabial-support', [x(.028), .029, .079+depth], [.0058,.012,.018], [side*.00028,-.00065,.00105], side*.38);
-  add('nasolabial-groove', [x(.0225), .028, .082+depth], [.0020,.010,.016], [0,-.00010,-.00050], side*.36);
-  add('marionette-groove', [x(.025), .006, .078+depth], [.0025,.0080,.017], [0,-.00015,-.00055], side*.16);
-  add('lower-cheek-pad', [x(.036), .008, .066+depth], [.013,.013,.026], [side*.00075,-.0010,.00125]);
-  add('jowl-soft-tissue', [x(.032), -.005, .064+depth], [.011,.012,.027], [side*.0011,-.0026,.00165]);
-  add('prejowl-transition', [x(.018), -.007, .083+depth], [.0055,.008,.015], [-side*.0001,-.00010,-.0005]);
+  // Second visual pass: move the cheek's volume transition downward, retain
+  // high zygomatic support, then build its lower soft-tissue apron separately.
+  // These independently placed support/hollow pairs are not a global multiplier.
+  add('malar-volume', [x(.033), .046, .072+depth], [.015,.014,.025], [-side*.00105,-.0015,-.0038]);
+  add('submalar-hollow', [x(.039), .030, .067+depth], [.012,.017,.024], [-side*.00135,-.00075,-.0027]);
+  add('temple-volume', [x(.054), .083, .039+depth], [.012,.017,.022], [-side*.0019,-.00020,-.00055]);
+  const eyeX = side === -1 ? -.0332 : .0245;
+  // Raised lower orbital pad + recessed border: the bag is a broad volume,
+  // while the trough is a smaller continuous transition beneath it.
+  add('lower-orbit-pad', [eyeX, .0590, .0728], [.0102,.0040,.019], [side*.00016,-.0011,.0030], -side*.12);
+  add('tear-trough', [eyeX-side*.005, .0528, .077], [.0100,.00225,.019], [0,-.00035,-.00125], -side*.24);
+  add('lateral-orbit-drape', [eyeX+side*.010,.055,.069], [.0068,.0055,.019], [side*.0002,-.0011,.00115], -side*.26);
+  // Hood over the existing closed lid, a hollow above, and a softer outer
+  // fold replace the first pass's almost uniformly convex upper lid.
+  add('upper-lid-fold', [eyeX, side === -1 ? .0718 : .0714, .0780], [.0108,.0043,.020], [0,-.00265,.00255], -side*.10);
+  add('upper-lid-sulcus', [eyeX-side*.002,.0778,.0785], [.0104,.0025,.019], [0,-.0002,-.00120], -side*.07);
+  add('outer-lid-hood', [eyeX+side*.012,.0690,.0720], [.0065,.0050,.018], [side*.00015,-.0019,.0011], -side*.23);
+  add('outer-brow-settle', [eyeX+side*.009,.0795,.0750], [.010,.0068,.020], [0,-.00085,.00025], -side*.16);
+  add('mouth-corner', [x(.0238), .0175, .081+depth], [.0063,.0068,.016], [side*.00018,-.0022,-.0003]);
+  add('nasolabial-support', [x(.0288), .027, .079+depth], [.0068,.012,.019], [side*.00045,-.00125,.0021], side*.38);
+  add('nasolabial-groove', [x(.0225), .027, .082+depth], [.0027,.011,.017], [0,-.00015,-.0011], side*.36);
+  add('marionette-groove', [x(.0255), .0035, .078+depth], [.0028,.0100,.018], [0,-.00025,-.00125], side*.16);
+  add('lower-cheek-pad', [x(.037), .005, .065+depth], [.012,.013,.025], [side*.0012,-.0021,.00225]);
+  // Focus the jowl below the mandibular edge instead of translating the whole
+  // lower face. An additional lateral apron reaches the actual side-view edge.
+  add('jowl-soft-tissue', [x(.033), -.007, .061+depth], [.0105,.0115,.026], [side*.00225,-.0057,.0022]);
+  add('lateral-jaw-apron', [x(.044), .001, .035+depth], [.0105,.014,.024], [side*.00135,-.00335,.00075]);
+  add('prejowl-transition', [x(.019), -.006, .083+depth], [.0048,.010,.017], [-side*.00045,-.00010,-.00125]);
 }
-// A single broad under-chin envelope replaces repeated neck bands. The jaw's
-// bony identity is retained while soft tissue continues smoothly into the neck.
-add('submental-soft-tissue', [X_CENTER,-.027,.062], [.020,.013,.021], [0,-.0015,.0016]);
-add('anterior-neck', [X_CENTER,-.049,.036], [.020,.023,.018], [0,-.00065,.00135]);
+// Under-chin slack now changes the profile, continuing into an anterior drape.
+// Only two individually placed, unequal, oblique neck folds are authored.
+// There is no repeating horizontal wave/noise and no circumferential neck ring.
+add('submental-soft-tissue', [X_CENTER,-.030,.060], [.025,.016,.023], [0,-.0041,.0038]);
+add('anterior-neck', [X_CENTER,-.054,.035], [.021,.024,.020], [0,-.00115,.0022]);
+add('central-neck-drape', [X_CENTER-.001,-.053,.039], [.008,.023,.018], [0,-.0011,.00145], -.08);
+add('upper-neck-fold', [X_CENTER-.003,-.047,.041], [.025,.0028,.016], [0,-.00012,-.00105], -.07);
+add('lower-neck-fold', [X_CENTER+.003,-.069,.029], [.019,.0035,.015], [0,-.00010,-.00065], .12);
 
 // out = displacement xyz followed by row-major displacement Jacobian dD/dP.
 // Analytic derivatives make normal transport exact for this authored field.
@@ -129,7 +145,7 @@ export function createScanAgeMorph(geometry) {
     }
     strength=s;refresh();return api;
   }
-  function diagnostics(){return {schema:SCHEMA,strength,vertexCount:p.count,triangleCount:geometry.index.count/3,topologyChanged:false,uvChanged:false,neutralRestore:'original position and normal byte copy',normalMethod:'analytic inverse-transpose deformation-gradient transport of original scan normals',maximumDisplacementMeters:maximum*strength,unitMaximumDisplacementMeters:maximum,unitAffectedVertices:changed,unitJacobianDeterminantRange:[minDet,maxDet],fields:[...new Set(fields.map(f=>f.name))],basis:'art-directed closed-eye R02 scan; not medically validated'};}
+  function diagnostics(){return {schema:SCHEMA,calibration:CALIBRATION,strength,vertexCount:p.count,triangleCount:geometry.index.count/3,topologyChanged:false,uvChanged:false,neutralRestore:'original position and normal byte copy',normalMethod:'analytic inverse-transpose deformation-gradient transport of original scan normals',maximumDisplacementMeters:maximum*strength,unitMaximumDisplacementMeters:maximum,unitAffectedVertices:changed,unitJacobianDeterminantRange:[minDet,maxDet],fields:[...new Set(fields.map(f=>f.name))],basis:'art-directed closed-eye R02 scan; not medically validated'};}
   const api={apply,restore,diagnostics,neutralPosition,neutralNormal,get strength(){return strength;}};
   records.set(geometry,api);return api;
 }
