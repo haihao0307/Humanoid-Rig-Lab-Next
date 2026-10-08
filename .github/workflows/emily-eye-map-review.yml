@@ -1,0 +1,32 @@
+name: Eye texture source review
+on:
+  push:
+    branches: [experiment/emily-skin-transfer-r01-20261008]
+    paths: ['.github/workflows/emily-eye-map-review.yml']
+permissions:
+  contents: read
+jobs:
+  maps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch official CC0 source for inspection
+        run: |
+          mkdir -p /tmp/eye-maps
+          python3 - <<'PY'
+          import urllib.request,zipfile,io,pathlib,json,hashlib
+          url='https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip'
+          data=urllib.request.urlopen(url,timeout=120).read()
+          z=zipfile.ZipFile(io.BytesIO(data));report={'source':url,'archiveSHA256':hashlib.sha256(data).hexdigest(),'files':[]}
+          for n in z.namelist():
+            if '/eyes/' in '/'+n and n.endswith(('.png','.mhmat','.txt')):
+              raw=z.read(n);f=pathlib.Path('/tmp/eye-maps')/n;f.parent.mkdir(parents=True,exist_ok=True);f.write_bytes(raw)
+              report['files'].append({'path':n,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()})
+          pathlib.Path('/tmp/eye-maps/source.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: official-cc0-eye-maps
+          path: /tmp/eye-maps
+          retention-days: 7
