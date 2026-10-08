@@ -1,0 +1,44 @@
+name: ET03 eye layer diagnostics
+on:
+  push:
+    branches: [experiment/emily-eyelid-research-et03-20261008]
+    paths: ['.github/workflows/et03-layer-diagnostics.yml']
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser
+        timeout-minutes: 4
+        run: |
+          npm install --prefix /tmp/et03-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/et03-tools/node_modules/.bin/playwright install chromium
+          timeout 75s sudo apt-get install --no-install-recommends -y fonts-wqy-zenhei || true
+      - name: Rebuild source and isolate visual layers
+        env:
+          NODE_PATH: /tmp/et03-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 06b92744537caf0709b9bb73e4917453bc238294
+          node skin-quality-lab/emily-transfer/research/refine.cjs
+          node skin-quality-lab/emily-transfer/research/closure.cjs
+          node skin-quality-lab/emily-transfer/research/build.cjs
+          node skin-quality-lab/emily-transfer/research/audit-layers.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et03-layer-diagnostics
+          path: /tmp/et03-diagnostics
+          retention-days: 14
