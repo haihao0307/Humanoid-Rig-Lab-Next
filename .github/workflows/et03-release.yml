@@ -37,6 +37,7 @@ jobs:
           node skin-quality-lab/emily-transfer/research/fit-depth.cjs
           node skin-quality-lab/emily-transfer/research/finish.cjs
           node skin-quality-lab/emily-transfer/research/select-release.cjs
+          node -e "const fs=require('fs');const html=fs.readFileSync('skin-quality-lab/emily-transfer/index.html','utf8');const block=html.match(/<script type=\"importmap\">([\s\S]*?)<\/script>/)[1];if(block.includes('raw.githubusercontent.com'))throw Error('Native modules must not use raw text MIME URLs');"
       - name: Contact, rendering and retained-interaction regression
         env:
           NODE_PATH: /tmp/et03-tools/node_modules
