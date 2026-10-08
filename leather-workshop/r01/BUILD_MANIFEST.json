@@ -1,0 +1,69 @@
+{
+  "version": "R01.0",
+  "rawSourceHashes": {
+    "leather.js": "b49e172ad187a0f667f92bb1f88c039fe2a40a8fc35463c5ae52a1069432721e",
+    "app.js": "33bbe0630b1108062532667b51c9527a369378e71f5370efad330728d5fcf7f0",
+    "template.html": "24f210887fa05b0e6fdb46e4406c7f582e22ff567a31ed4c39688b557e742f03",
+    "three.module.js": "f7cee3c7533449a1505cc12cb5128b89e3d4fd3d7ea62b05f9f5464a217472ee"
+  },
+  "sourceHashes": {
+    "leather.js": "21fcbdec10b94e66d1c16b0e2af5d9cccce786ec9003bedfbb076fd149675b85",
+    "app.js": "213140f05984fb8d7ac2b0a3ba51811e3efce7755cc751c204322eacb174642d",
+    "template.html": "24f210887fa05b0e6fdb46e4406c7f582e22ff567a31ed4c39688b557e742f03",
+    "three.module.js": "f7cee3c7533449a1505cc12cb5128b89e3d4fd3d7ea62b05f9f5464a217472ee"
+  },
+  "lookdev": {
+    "app.js": [
+      [
+        " else{let f=params.fold;let r=.036*(1+.08*Math.sin(u*3.9));let start=.14;let bend=Math.max(0,s-start);let angle=bend/r*Math.max(.001,f);z=-.165+Math.min(s,start)+Math.sin(angle)*bend/Math.max(angle,.000001);y=.004+(1-Math.cos(angle))*r/Math.max(.001,f);y+=.0015*Math.sin(u*Math.PI*2.1+v*1.1)*Math.sin(v*Math.PI);z+=.012*(u-.5)*v;}",
+        " else{let f=params.fold,r=.036*(1+.06*Math.sin(u*3.9)),start=.14,bend=Math.max(0,s-start),t=Math.min(s/start,1),lift=(2*r+.003)*t*t*(3-2*t),angle=4.95*bend/(.335-start);let curvedZ=bend>0?-.025+r*Math.sin(angle):-.165+s;let curvedY=bend>0?.004+2*r+.003-r*(1-Math.cos(angle)):.004+lift;z=(1-f)*(-.165+s)+f*curvedZ;y=(1-f)*.004+f*curvedY;y+=.0012*Math.sin(u*Math.PI*2.1+v*1.1)*Math.sin(v*Math.PI);z+=.006*(u-.5)*v;}"
+      ],
+      [
+        "yaw=.15;pitch=.88;distance=.15;target.set(.015,.010,-.085);",
+        "yaw=.48;pitch=.63;distance=.13;target.set(.012,.067,-.009);"
+      ],
+      [
+        "renderer.shadowMap.type=T.PCFSoftShadowMap;",
+        "renderer.shadowMap.type=T.PCFShadowMap;"
+      ],
+      [
+        "mainLight.shadow.mapSize.set(2048,2048);",
+        "mainLight.shadow.mapSize.set(2048,2048);mainLight.shadow.radius=3.5;"
+      ],
+      [
+        "mainLight.intensity=k==='raking'?3.6:3.2;",
+        "mainLight.intensity=k==='raking'?2.7:1.8;"
+      ],
+      [
+        "scene.environmentIntensity=k==='raking'?.35:.65;",
+        "scene.environmentIntensity=k==='raking'?.35:1.0;"
+      ]
+    ],
+    "leather.js": [
+      [
+        "vec2 p=uv*uCells+warp*.85;",
+        "vec2 p=uv*uCells+warp*.85;p+=(vec2(n(p*2.,uCells*2.),n(p*2.+5.7,uCells*2.))-.5)*.45;"
+      ],
+      [
+        "float grain=smoothstep(.015,.24,g.y);float pores=1.-smoothstep(.025,.115,fine.x);",
+        "float grain=smoothstep(.013,.26,g.y);float pores=1.-smoothstep(.02,.16,fine.x);"
+      ],
+      [
+        "float height=.22+.48*grain+.045*n(p*4.,uCells*4.)+.025*micro-.12*pores+.035*secondary;",
+        "float height=.30+.36*grain+.085*n(p*4.,uCells*4.)+.036*micro-.095*pores+.03*secondary;"
+      ],
+      [
+        ".84+.12*d.g+.11*d.a",
+        ".88+.055*d.g+.09*d.a"
+      ]
+    ]
+  },
+  "htmlSHA256": "71db8199509743cac7ae6f016672980cc338d39a43b41c4a95776f06ed92a87d",
+  "htmlBytes": 564132,
+  "runtime": "Three.js r169",
+  "sourceBase": "fda12bf2fe0262e4d02f1b08508128d17959e0c8",
+  "visualAcceptance": "PENDING_USER",
+  "oneToOneAdobe": "NOT_VERIFIED",
+  "physics": "not implemented",
+  "externalMaterialTextures": false
+}
