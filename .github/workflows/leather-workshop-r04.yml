@@ -1,0 +1,93 @@
+name: Leather R04 - full impact lifecycle and public rendering
+on:
+  push:
+    branches: [experiment/leather-workshop-r01-20261008]
+    paths:
+      - .github/workflows/leather-workshop-r04.yml
+      - leather-workshop/r04/bootstrap/**
+      - leather-workshop/r04/site/**
+      - leather-workshop/r04/build.py
+      - leather-workshop/r04/test*.mjs
+      - leather-workshop/r04/qa.py
+permissions:
+  contents: write
+concurrency:
+  group: leather-workshop-r04
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: experiment/leather-workshop-r01-20261008
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Expand checksummed original source once
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64,zlib,json,hashlib
+          r=Path('leather-workshop/r04')
+          if not (r/'site/dynamics.mjs').exists():
+              parts=[(r/'bootstrap'/f'part-{i}.txt').read_text().strip() for i in range(1,7)]
+              # Repair two known transcription defects in the transport only.
+              parts[2]=parts[2].replace('Xhq/dOLMg','Xhq/dgOLMg')
+              parts[4]=parts[4].replace('VtX7nz7Iog','VtX7nz9Iog')
+              encoded=''.join(parts)
+              raw=zlib.decompress(base64.b64decode(encoded,validate=True))
+              expected='208c024dddb372cf5619fff818313973ebd501b8dfeb545ae7ca86d80fe2619a'
+              assert hashlib.sha256(raw).hexdigest()==expected,'Source transfer checksum mismatch'
+              files=json.loads(raw)
+              allowed={'site/dynamics.mjs','site/clamp.mjs','site/worker.js','site/runtime.js','site/template.html','build.py','test.mjs','test-scenes.mjs','qa.py'}
+              assert set(files)==allowed
+              for name,text in files.items():
+                  p=r/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
+              (r/'bootstrap/SOURCE_INTEGRITY.json').write_text(json.dumps({'transport':'zlib JSON; one-time upload only, expanded sources are authoritative','sourceJSONSHA256':expected,'files':{k:hashlib.sha256(v.encode()).hexdigest() for k,v in files.items()}},indent=2))
+          else:
+              print('Using expanded tracked sources; no bootstrap overwrite.')
+          PY
+      - name: Browser dependencies
+        run: |
+          pip install -q playwright==1.55.0 pillow
+          python -m playwright install --with-deps chromium
+      - name: Material, contact, bending and clamp numerics
+        run: |
+          cd leather-workshop/r04
+          node test.mjs
+          node test-scenes.mjs normal
+          node test-scenes.mjs heavy
+          node test-scenes.mjs light
+          python build.py
+      - name: Actual offline rendering and full interaction lifecycle
+        run: python leather-workshop/r04/qa.py
+      - name: Record verified build and expanded production sources
+        id: build
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f leather-workshop/r04/bundle-check.js leather-workshop/r04/worker-check.js
+          git add -f leather-workshop/r04
+          git commit -m 'build(leather-r04): implicit leather dynamics and full offline lifecycle proof [skip ci]'
+          git push origin HEAD:experiment/leather-workshop-r01-20261008
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Actual immutable public browser verification
+        env:
+          BUILD_SHA: ${{ steps.build.outputs.sha }}
+        run: |
+          URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/leather-workshop/r04/preview.html"
+          python leather-workshop/r04/qa.py "$URL"
+          echo "$URL" > leather-workshop/r04/qa/PREVIEW_URL.txt
+          git add -f leather-workshop/r04/qa
+          git commit -m 'test(leather-r04): verified immutable public impact and clamp workbench [skip ci]'
+          git push origin HEAD:experiment/leather-workshop-r01-20261008
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r04-dynamics-evidence
+          path: leather-workshop/r04
+          retention-days: 14
