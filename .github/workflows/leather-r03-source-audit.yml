@@ -1,0 +1,30 @@
+name: Leather R03 - primary paper audit
+on:
+  push:
+    branches: [experiment/leather-workshop-r01-20261008]
+    paths: [.github/workflows/leather-r03-source-audit.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch public primary papers for internal equation verification
+        run: |
+          mkdir -p audit
+          curl -fL --max-time 90 --retry 1 'https://www.jstage.jst.go.jp/article/mej/7/4/7_20-00072/_pdf/-char/en' -o audit/nakahara2020.pdf
+          python -m pip install -q pymupdf
+          python - <<'PY'
+          from pathlib import Path
+          import fitz
+          p=Path('audit/nakahara2020.pdf');d=fitz.open(p)
+          p.with_suffix('.txt').write_text('\n'.join(x.get_text() for x in d))
+          for i in [2,7,8,9,10,11]:d[i].get_pixmap(matrix=fitz.Matrix(1.6,1.6)).save('audit/nakahara-p'+str(i+1)+'.png')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r03-equation-audit
+          path: audit
+          retention-days: 3
