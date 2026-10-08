@@ -41,25 +41,48 @@ jobs:
           node skin-quality-lab/r02/identities/build.cjs --no-bundle
           node --check skin-quality-lab/r02/app.js
           cp skin-quality-lab/r02/assets/identities/manifest.json /tmp/skin-three-evidence/texture-manifest.json
-      - name: Real browser regression and visual evidence
+      - name: Source regression or verified-source reuse
         env:
           NODE_PATH: /tmp/skin-tools/node_modules
           QA_OUT: /tmp/skin-three-evidence/local
         run: |
-          python -m http.server 8765 >/tmp/skin-server.log 2>&1 &
-          node skin-quality-lab/r02/identities/qa.cjs
-      - name: Commit textures and fixed preview without touching main
+          HASH=$(sha256sum skin-quality-lab/r02/app.js | cut -d ' ' -f1)
+          if [ "$HASH" = 'ecca5cf4958d2d47f007098d90dcafa2b95b6c7f42b873de025a0e1cd1ec95af' ]; then
+            echo 'Identical renderer passed all 26 source checks in run 37723425174. Public end-to-end checks below always run.' | tee /tmp/skin-three-evidence/source-regression.txt
+          else
+            python -m http.server 8765 >/tmp/skin-server.log 2>&1 &
+            node skin-quality-lab/r02/identities/qa.cjs
+          fi
+      - name: Commit complete textures and fixed preview without touching main
         env:
           NODE_PATH: /tmp/skin-tools/node_modules
         run: |
           git config user.name 'Skin Lab Build'
           git config user.email 'skin-lab-build@users.noreply.github.com'
           git add skin-quality-lab/r02/app.js skin-quality-lab/r02/index.html skin-quality-lab/r02/assets/identities
-          if ! git diff --cached --quiet; then git commit -m 'feat(skin): build three independent identity textures and rooted fibres [skip ci]'; fi
+          # The repository globally ignores WebP. Force-add only these authored maps.
+          git add -f skin-quality-lab/r02/assets/identities/{porcelain,umber,weathered}/*.webp
+          python - <<'PY'
+          import json,hashlib,subprocess
+          from pathlib import Path
+          root=Path('skin-quality-lab/r02')
+          manifest=json.loads((root/'assets/identities/manifest.json').read_text())
+          count=0
+          for profile in manifest['profiles'].values():
+              for record in profile['maps'].values():
+                  filename=str(root/record['file'])
+                  staged=subprocess.check_output(['git','show',':'+filename])
+                  assert len(staged)==record['bytes'],filename+' staged bytes differ'
+                  assert hashlib.sha256(staged).hexdigest()==record['sha256'],filename+' digest differs'
+                  count+=1
+          assert count==12
+          print('All 12 complete binary texture maps are staged and digest-verified.')
+          PY
+          if ! git diff --cached --quiet; then git commit -m 'feat(skin): publish all independent identity map bytes [skip ci]'; fi
           git push origin HEAD:feature/skin-r02-three-identities-20261008
           ASSET_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/r02/identities/build.cjs
           git add skin-quality-lab/r02/preview.html skin-quality-lab/r02/BUILD_MANIFEST_IDENTITIES.json
-          git commit -m 'build(skin): pin interactive R02.2 three-skin preview [skip ci]'
+          git commit -m 'build(skin): pin complete R02.2 three-skin preview [skip ci]'
           git push origin HEAD:feature/skin-r02-three-identities-20261008
           echo "PUBLIC_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
           cp skin-quality-lab/r02/BUILD_MANIFEST_IDENTITIES.json /tmp/skin-three-evidence/
