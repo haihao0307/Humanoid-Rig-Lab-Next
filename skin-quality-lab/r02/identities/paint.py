@@ -12,9 +12,9 @@ HERE=Path(__file__).resolve().parent
 ROOT=HERE.parent
 SIZE=2048
 PROFILES={
- 'porcelain':dict(seed=218, name='01 · 冷白雀斑',rgb=[.78,.58,.48], rough=.60, beard=0., age=.12, freckles=310, acne=3, brow='slender-copper'),
- 'umber':dict(seed=734, name='02 · 深褐短须',rgb=[.38,.215,.14], rough=.40, beard=.52, age=.25, freckles=18, acne=20, brow='broad-notched'),
- 'weathered':dict(seed=159, name='03 · 风化熟龄',rgb=[.64,.44,.315], rough=.65, beard=.84, age=.95, freckles=115, acne=5, brow='broken-silver'),
+ 'porcelain':dict(seed=218, name='01 · 冷白雀斑',rgb=[.76,.585,.505], rough=.60, beard=0., age=.12, freckles=530, acne=3, brow='slender-copper'),
+ 'umber':dict(seed=734, name='02 · 深褐短须',rgb=[.355,.225,.165], rough=.55, beard=.52, age=.25, freckles=18, acne=20, brow='broad-notched'),
+ 'weathered':dict(seed=159, name='03 · 风化熟龄',rgb=[.59,.435,.345], rough=.65, beard=.84, age=.95, freckles=205, acne=3, brow='broken-silver'),
 }
 
 def glb_arrays(file):
@@ -77,15 +77,15 @@ def main():
  cheeks=(gauss(x,y,.043,.041,.021,.027)+gauss(x,y,-.043,.041,.021,.027))*front
  eyelids=(gauss(x,y,.033,.060,.025,.007)+gauss(x,y,-.033,.060,.025,.007))*front
  sourceLum=np.maximum(base@np.array([.2126,.7152,.0722],np.float32),.025)
- blur=gaussian_filter(sourceLum,10);hi=np.clip(sourceLum/np.maximum(blur,.04),.88,1.14)
+ blur=gaussian_filter(sourceLum,10);hi=np.clip(sourceLum/np.maximum(blur,.04),.80,1.22)
  lower=gaussian_filter(base,(8,8,0));sourceChroma=base/np.maximum(sourceLum[...,None],.025)
- sourceChroma=1+(sourceChroma/np.array([1.29,.925,.75])-1)*.18
- manifest={'schema':'kaopu/skin-identities@1','basis':'R02.1 scan and R02 split-band detail; independently painted identity maps','baselineCommit':'1d4a616672f2a45e869d4ef3e36e710b11f5cf41','resolution':[SIZE,SIZE],'sourceMeshSHA256':digest(ROOT.parent/'r01/assets/head.glb'),'geometryChanged':False,'profiles':{}}
+ sourceChroma=1+(sourceChroma/np.array([1.29,.925,.75])-1)*.30
+ manifest={'schema':'kaopu/skin-identities@2','basis':'R02.1 scan and R02 split-band detail; independently painted identity maps','baselineCommit':'1d4a616672f2a45e869d4ef3e36e710b11f5cf41','resolution':[SIZE,SIZE],'sourceMeshSHA256':digest(ROOT.parent/'r01/assets/head.glb'),'geometryChanged':False,'profiles':{}}
  for ident,p in PROFILES.items():
   out=dst/ident;out.mkdir(exist_ok=True);rng=np.random.default_rng(p['seed'])
   colour=np.empty_like(base);colour[:]=p['rgb']
   broad=noise3(x,y,z,p['seed'],95);mid=noise3(x,y,z,p['seed']+1,450)
-  colour*= (1+broad*.075+mid*.025)[...,None]
+  colour*= (1+broad*.045+mid*.018)[...,None]
   # Retain measured colour micro-variation outside removed source facial hair.
   colour*= (1+(hi-1)*(1-hairRemove*.97))[...,None]
   colour*= sourceChroma*(1-hairRemove[...,None]) + hairRemove[...,None]
@@ -101,27 +101,42 @@ def main():
   rough+=(.5-originalSpec)*.14+mid*.025
   rough-=gauss(x,y,0,.018,.025,.095)*front*(.12 if ident=='umber' else .035)
   # Seeded individual lesions, each with metric radius and a bounded influence.
+  # Sample anatomical 3D surface locations, not an x/y stamp strip. The density
+  # has broad cheek/nose exposure plus an irregular low-density forehead/temple tail.
+  px,py,pz=pos.T;pn=nor[:,2];pax=np.abs(px)
+  exposed=(pn>.12)&(pz>.014)&(py>.005)&(py<.143)&(pax<.085)
+  central=(gauss(px,py,.042,.047,.030,.025)+gauss(px,py,-.042,.047,.030,.025))*.40
+  bridge=gauss(px,py,0,.059,.017,.022)*.58
+  forehead=gauss(px,py,0,.111,.066,.028)*(.47 if ident=='weathered' else .08)
+  temples=gauss(pax,py,.068,.077,.016,.050)*.11
+  prob=np.maximum(central+bridge+forehead+temples,0)*exposed
+  prob*=1-np.clip(gauss(px,py,0,.019,.029,.007),0,1)
+  prob/=max(prob.sum(),1e-6)
   spots=[]
   for j in range(p['freckles']):
-   if ident=='weathered':sx=rng.uniform(-.07,.07);sy=rng.uniform(.025,.135);r=rng.uniform(.0007,.0025)
-   else:sx=rng.uniform(-.073,.073);sy=rng.normal(.043,.012);r=rng.uniform(.00024,.00105)
-   strength=rng.uniform(.12,.36) if ident!='weathered' else rng.uniform(.10,.24)
-   spots.append((sx,sy,r,strength))
-  # Evaluate compact stamps in UV regions, avoiding full-image loops per dot.
-  for sx,sy,r,strength in spots:
-   mask=(np.abs(x-sx)<r*3)&(np.abs(y-sy)<r*3)&(front>.1)
+   k=rng.choice(len(pos),p=prob);sx,sy,sz=pos[k]
+   r=rng.uniform(.00013,.00058) if ident!='weathered' else rng.uniform(.00023,.0010)
+   if ident=='weathered' and rng.random()<.055:r*=1.65
+   strength=rng.uniform(.045,.22) if ident!='weathered' else rng.uniform(.035,.18)
+   angle=rng.uniform(-math.pi,math.pi);aspect=rng.uniform(.57,1.30)
+   spots.append((float(sx),float(sy),float(sz),float(r),float(strength)))
+   mask=(np.abs(x-sx)<r*3.6)&(np.abs(y-sy)<r*3.6)&(np.abs(z-sz)<r*4)&(front>.1)
    if not mask.any():continue
-   g=np.exp(-.5*(((x[mask]-sx)/r)**2+((y[mask]-sy)/(r*.75))**2))*front[mask]*(1-lip[mask])
+   xx=x[mask]-sx;yy=y[mask]-sy;zz=z[mask]-sz
+   ca,sa=np.cos(angle),np.sin(angle);a=xx*ca-yy*sa;b=xx*sa+yy*ca
+   irregular=1+.12*np.sin(a/r*5+angle)+.09*np.sin(b/r*7-angle)
+   d=(a/(r*aspect))**2+(b/r)**2+(zz/(r*2.8))**2
+   g=np.exp(-.5*d*irregular)*front[mask]*(1-lip[mask])
    pigment[mask]+=g*strength
   colour*=np.exp(-pigment[...,None]*np.array([.60,1.07,1.30]))
   for j in range(p['acne']):
-   sx=rng.choice([-1,1])*rng.uniform(.036,.071);sy=rng.uniform(.009,.047);r=rng.uniform(.0006,.0014)
+   sx=rng.choice([-1,1])*rng.uniform(.036,.071);sy=rng.uniform(.009,.047);r=rng.uniform(.00035,.00075)
    mask=(np.abs(x-sx)<r*5)&(np.abs(y-sy)<r*5)&(front>.1)
    d=((x[mask]-sx)/r)**2+((y[mask]-sy)/r)**2;halo=np.exp(-d*.13);core=np.exp(-d*.75)
-   colour[mask]*=1+halo[:,None]*np.array([.035,-.13,-.09]);h[mask]+=(core*.14-np.exp(-d*1.7)*.06);rough[mask]+=.06*halo
+   colour[mask]*=1+halo[:,None]*np.array([.015,-.060,-.045]);h[mask]+=(core*.14-np.exp(-d*1.7)*.06);rough[mask]+=.06*halo
   # Creases are continuous in object metres; different height AND colour maps.
   age=p['age'];wrinkles=np.zeros_like(x)
-  for j in range(5):
+  for j in range(4):
    line=.104+j*.0085+.0018*np.cos(x*52+j*.7)+.0008*np.sin(x*155+j)
    g=np.exp(-((y-line)/(.00022+j*.000025))**2)*np.exp(-(x/.062)**6)*front
    wrinkles+=g*age*(.64-j*.08)
@@ -132,7 +147,7 @@ def main():
     wrinkles+=g*age*.6
    nasoX=side*(.016+(.034-y)*.39);naso=np.exp(-((x-nasoX)/.0009)**2)*smooth(.003,.013,y)*(1-smooth(.031,.039,y))*front
    wrinkles+=naso*age*.35
-  h-=wrinkles*.14;colour*=1-wrinkles[...,None]*.12;rough+=wrinkles*.04
+  h-=wrinkles*.090;colour*=1-wrinkles[...,None]*.055;rough+=wrinkles*.04
   # A healed, non-graphic eyebrow cut interrupts the dark profile's brow.
   scar=np.zeros_like(x)
   if ident=='umber':
@@ -143,13 +158,15 @@ def main():
   fol=noise3(x,y,z,p['seed']+31,7600);fol2=noise3(x,y,z,p['seed']+78,13700)
   follicle=np.clip((fol+.5*fol2-.22)*2,0,1)**3
   bmask=np.clip(beard+.75*moustache-lip*1.6,0,1)*p['beard']
-  colour*=1-bmask[...,None]*(.045+follicle[...,None]*.22)
+  colour*=1-bmask[...,None]*(.022+follicle[...,None]*(.10 if ident=='weathered' else .20))
   h-=follicle*bmask*.05
   if ident=='weathered':rough+=broad*.025
   # Height-derived tangent perturbation modifies the existing base normal only
   # where old facial-hair relief is cleared. R02 meso/micro scan bands remain.
   newN=baseN.copy();newN[:,:,:2]*=(1-hairRemove*.72)[...,None]
-  dy,dx=np.gradient(h);newN[:,:,0]-=dx*2.5;newN[:,:,1]+=dy*2.5;newN[:,:,2]=np.maximum(newN[:,:,2],.4)
+  dy,dx=np.gradient(h*.001);pyStep,pxStep=np.gradient(xyz,axis=(0,1));
+  metricU=np.maximum(np.linalg.norm(pxStep,axis=-1),.000015);metricV=np.maximum(np.linalg.norm(pyStep,axis=-1),.000015)
+  newN[:,:,0]-=np.clip(dx/metricU,-.6,.6)*.65;newN[:,:,1]+=np.clip(dy/metricV,-.6,.6)*.65;newN[:,:,2]=np.maximum(newN[:,:,2],.4)
   newN/=np.maximum(np.linalg.norm(newN,axis=-1,keepdims=True),1e-6)
   # Identity maps are authored at 2K; the measured source scan's 4K
   # meso/micro bands remain separate rather than claiming upsampled detail.
@@ -164,3 +181,4 @@ def main():
  # Semantic lookup is reusable for mesh-bound eyebrow/beard placement and QA.
  (dst/'profiles.json').write_text(json.dumps(PROFILES,ensure_ascii=False,indent=2))
 if __name__=='__main__':main()
+

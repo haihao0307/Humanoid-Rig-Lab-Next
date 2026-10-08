@@ -9,12 +9,15 @@ function hash(buffer){return crypto.createHash('sha256').update(buffer).digest('
  page.on('pageerror',e=>report.pageErrors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push(m.text());});page.on('requestfailed',r=>report.failedRequests.push({url:r.url(),error:r.failure()?.errorText}));
  await page.goto(url,{waitUntil:'domcontentloaded',timeout:120000});
  await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready,null,{timeout:150000});
- check('correct version',await page.evaluate(()=>window.__SKIN_LAB__.state.version==='skin-quality-lab/r02.2-identities'));
+ check('correct version',await page.evaluate(()=>window.__SKIN_LAB__.state.version==='skin-quality-lab/r02.3-skin-hair'));
  const select=async id=>{await page.locator('.identity-quick [data-identity="'+id+'"]').click();await page.waitForFunction(id=>window.__SKIN_LAB__.state.identity===id&&!window.__SKIN_LAB__.state.identityLoading,id,{timeout:120000});await page.waitForTimeout(300);};
  const pixels=[];
  for(const id of ['porcelain','umber','weathered','original']){
   await select(id);const state=await page.evaluate(()=>structuredClone(window.__SKIN_LAB__.state));
-  const shot=await page.screenshot({path:path.join(out,id+'.png')});pixels.push(hash(shot));report.identities.push({id,state,screenshotSHA256:hash(shot)});
+  await page.evaluate(()=>{window.__SKIN_LAB__.setCamera('portrait');window.__SKIN_LAB__.render();});await page.waitForTimeout(300);const shot=await page.screenshot({path:path.join(out,id+'.png')});
+  for(const view of ['front','ear','cheek']){await page.evaluate(view=>{window.__SKIN_LAB__.setCamera(view);window.__SKIN_LAB__.render();},view);await page.waitForTimeout(350);await page.screenshot({path:path.join(out,id+'-'+view+'.png')});}
+  await page.evaluate(()=>{window.__SKIN_LAB__.setCamera('portrait');window.__SKIN_LAB__.render();});
+  if(id!=='original'){const diagnostics=await page.evaluate(()=>window.__SKIN_LAB__.identity.diagnostics());report.fiberDiagnostics=report.fiberDiagnostics||{};report.fiberDiagnostics[id]=diagnostics;check(id+' real scene-lit reused fiber material',diagnostics.materials.every(m=>m.lightingSource==='scene directional lights; independent per-light visibility'));check(id+' original 14000 fuzz preserved',state.fuzzStrands===14000);}pixels.push(hash(shot));report.identities.push({id,state,screenshotSHA256:hash(shot)});
   check(id+' ready',state.ready&&state.identity===id);if(id!=='original'){check(id+' 4 independent maps',state.identityMaps.length===4&&state.identityMaps.every(m=>m.width===2048));check(id+' mesh-rooted eyebrows',state.identityHair.brow>1000);}
   if(id==='porcelain')check('clean-shaven identity has no beard fibres',state.identityHair.beard===0);
   if(id==='umber'||id==='weathered')check(id+' mesh-rooted beard',state.identityHair.beard>9000);
@@ -38,3 +41,4 @@ function hash(buffer){return crypto.createHash('sha256').update(buffer).digest('
  check('no JavaScript exceptions',report.pageErrors.length===0);check('no renderer or shader errors',report.consoleErrors.length===0);check('no failed asset loads',report.failedRequests.length===0);check('runtime has no recorded errors',await page.evaluate(()=>window.__SKIN_LAB__.state.errors.length===0));
  report.success=true;console.log(JSON.stringify({success:true,checks:report.checks,identities:report.identities.map(x=>({id:x.id,hair:x.state.identityHair}))},null,2));
 })().catch(e=>{report.success=false;report.failure=e.stack;console.error(e);process.exitCode=1;}).finally(async()=>{fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));if(browser)await browser.close();});
+

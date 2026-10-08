@@ -1,11 +1,1 @@
-{
-  "basis": "Visual review of real Chromium screenshots from Actions 37722723769. Data maps remain separate; tint is a linear-space material adjustment.",
-  "replace": [
-    ["params:{roughness:.42,oil:.43", "params:{roughness:.55,oil:.20"],
-    ["skin.map=maps.albedo;skin.normalMap=maps.normal;", "skin.map=maps.albedo;skin.color.setRGB(...(id==='umber'?[.95,1.23,1.52]:[1,1,1]));skin.normalMap=maps.normal;"],
-    ["U.uIdentityRoughnessBase.value=IDENTITY_DEFINITIONS[id].params.roughness??defaults.roughness;", "U.uIdentityRoughnessBase.value=id==='umber'?.42:(IDENTITY_DEFINITIONS[id].params.roughness??defaults.roughness);"],
-    ["flow.addScaledVector(nn,-flow.dot(nn)).normalize();", "flow.x+=(rand()-.5)*.50;flow.y+=(rand()-.5)*.20;flow.addScaledVector(nn,-flow.dot(nn)).normalize();"],
-    ["profile.seed===159&&rand()<.55?new THREE.Color(.29,.275,.24)", "profile.seed===159&&rand()<.40?new THREE.Color(.20,.195,.185)"],
-    ["const tangent=strand.n.clone().multiplyScalar(.3)", "tip.addScaledVector(new THREE.Vector3().crossVectors(strand.n,strand.flow),Math.sin(strand.random*6.28+t*4.)*strand.length*t*t*.12);const tangent=strand.n.clone().multiplyScalar(.3)"]
-  ]
-}
+{"basis":"R02.3 visual repair uses one explicit source rather than hidden lookdev replacements","replace":[]}

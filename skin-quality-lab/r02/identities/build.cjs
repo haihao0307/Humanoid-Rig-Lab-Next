@@ -4,9 +4,9 @@ function original(name){if(process.env.R02_BASE_DIR)return fs.readFileSync(path.
 let js=original('app.js'),html=original('index.html');
 const originalSHA=crypto.createHash('sha1').update('blob '+Buffer.byteLength(js)+'\0').update(js).digest('hex');if(originalSHA!=='932ce840dc7276708c2088d05ff01db50112453d')throw Error('R02 source anchor changed');
 function swap(a,b){if(!js.includes(a))throw Error('Missing R02 source anchor: '+a.slice(0,110));js=js.replaceAll(a,b);}
-swap("VERSION='skin-quality-lab/r02.1'","VERSION='skin-quality-lab/r02.2-identities'");
-swap("document.title='皮肤质感实验室 · R02.1'","document.title='皮肤质感实验室 · R02.2 三套表皮'");
-swap("'R02.1 · MICRO SKIN'","'R02.2 · 3 SKINS'");
+swap("VERSION='skin-quality-lab/r02.1'","VERSION='skin-quality-lab/r02.3-skin-hair'");
+swap("document.title='皮肤质感实验室 · R02.1'","document.title='皮肤质感实验室 · R02.3 三套表皮'");
+swap("'R02.1 · MICRO SKIN'","'R02.3 · 3 SKINS'");
 swap('Object.assign(U,E);','Object.assign(U,E);Object.assign(U,{uIdentityEnabled:{value:0},uIdentityRoughness:{value:null},uIdentityFeatures:{value:null},uIdentityRoughnessBase:{value:.5}});');
 swap('uniform float uPass,uDetail,','uniform float uIdentityEnabled,uIdentityRoughnessBase;uniform sampler2D uIdentityRoughness,uIdentityFeatures;\nuniform float uPass,uDetail,');
 swap('uniform sampler2D uSurface;uniform float uRelief,uBaseline;','uniform sampler2D uSurface,uIdentityFeatures;uniform float uRelief,uBaseline,uIdentityEnabled;');
@@ -23,6 +23,10 @@ swap('loadRecipe(JSON.parse(await f.text()));','await loadRecipe(JSON.parse(awai
 swap("$('reset').onclick=()=>{","$('reset').onclick=async()=>{await identityRuntime.set('original');");
 swap("localStorage.setItem('skin-quality-lab-r02',","localStorage.setItem('skin-quality-lab-r02-identities',");
 swap("localStorage.getItem('skin-quality-lab-r02')","localStorage.getItem('skin-quality-lab-r02-identities')");
+js="import {attachFiberMaterial,fiberMaterialDiagnostics} from './identities/FiberMaterial.js';\n"+js;
+swap('uniform sampler2D uSurface;uniform float uRelief,uPixelHeight;','uniform sampler2D uSurface,uIdentityFeatures;uniform float uIdentityEnabled,uRelief,uPixelHeight;');
+swap('vec3 pp=position+normal*(texture2D(uSurface,uv).b-.5)*uRelief*.001;', 'vec3 pp=position+normal*((texture2D(uSurface,uv).b-.5)+uIdentityEnabled*(texture2D(uIdentityFeatures,uv).b-.5))*uRelief*.001;');
+swap('uFuzz:{value:values.fuzz},uRelief:E.uRelief,', 'uFuzz:{value:values.fuzz},uIdentityFeatures:U.uIdentityFeatures,uIdentityEnabled:U.uIdentityEnabled,uRelief:E.uRelief,');
 // Existing R02 post-process remains unchanged. Identity code owns only maps,
 // rooted fibres and recipe UI. Initialization yields on its texture loads.
 js+='\n'+fs.readFileSync(path.join(__dirname,'runtime.js'),'utf8');
@@ -31,7 +35,7 @@ if(fs.existsSync(tuneFile))for(const [a,b]of JSON.parse(fs.readFileSync(tuneFile
 const style=`\n.identity-choices{display:grid;gap:6px}.identity-choices button{text-align:left;font-size:12px;padding:9px 10px}.identity-choices b{display:inline-block;width:20px;color:#d9bc96}.identity-note{font-size:10px;line-height:1.7;color:#9ca1a9;margin:9px 0}.identity-quick{display:flex;gap:5px;flex-wrap:wrap;width:100%;margin-top:3px}#layerLabel{top:112px}#baselineBadge{top:112px}#mapsDialog{background:#191d23;color:#ddd;border:1px solid #625543;border-radius:10px;width:min(1100px,92vw);max-height:90vh;padding:20px}#mapsDialog::backdrop{background:#000b}.map-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.map-grid figure{margin:0}.map-grid img{width:100%;border-radius:5px}.map-grid figcaption{padding:10px 0;color:#d6bb9b;font-size:12px}#mapsClose{float:right}.identity-status{color:#c3a786;font-size:10px}#identityMaps{width:100%;font-size:11px}@media(max-width:760px){#layerLabel{top:128px}.map-grid{grid-template-columns:1fr}.identity-quick{gap:4px}.identity-quick button{font-size:10px}}\n`;
 html=html.replace('</style>',style+'</style>');
 const controls=(id,label,min,max,value)=>`<div class="control"><label for="${id}">${label}<output id="${id}Out">${value}</output></label><input id="${id}" type="range" min="${min}" max="${max}" step="0.01" value="${value}"></div>`;
-const panel=`<div class="section" id="identitiesPanel"><h2>三套独立表皮 <small>R02.2 / IDENTITY</small></h2><div class="identity-choices"><button data-identity="porcelain"><b>01</b>冷白雀斑 · 无须细眉</button><button data-identity="umber"><b>02</b>深褐短须 · 浓眉浅疤</button><button data-identity="weathered"><b>03</b>风化熟龄 · 灰白胡须</button><button data-identity="original">原 R02 扫描 · 保留对照</button></div><p id="identityDescription" class="identity-note"></p><div id="identityStatus" class="identity-status" role="status">准备贴图</div>${controls('browDensity','独立眉毛密度',0,1,1)}${controls('beardDensity','独立胡须密度',0,1,1)}${controls('beardLength','胡须长度倍率',.25,2,1)}<button id="identityMaps">检查实际 UV 贴图</button><p class="hint">三套表皮共用原扫描头，几何与闭眼状态未替换。贴图不是三张肖像图；眉胡为贴附三角面的真实纤维几何。</p></div>`;
+const panel=`<div class="section" id="identitiesPanel"><h2>三套独立表皮 <small>R02.3 / IDENTITY</small></h2><div class="identity-choices"><button data-identity="porcelain"><b>01</b>冷白雀斑 · 无须细眉</button><button data-identity="umber"><b>02</b>深褐短须 · 浓眉浅疤</button><button data-identity="weathered"><b>03</b>风化熟龄 · 灰白胡须</button><button data-identity="original">原 R02 扫描 · 保留对照</button></div><p id="identityDescription" class="identity-note"></p><div id="identityStatus" class="identity-status" role="status">准备贴图</div>${controls('browDensity','独立眉毛密度',0,1,1)}${controls('beardDensity','独立胡须密度',0,1,1)}${controls('beardLength','胡须长度倍率',.25,2,1)}<button id="identityMaps">检查实际 UV 贴图</button><p class="hint">三套表皮共用原扫描头，几何与闭眼状态未替换。贴图不是三张肖像图；眉胡为贴附三角面的真实纤维几何。</p></div>`;
 html=html.replace('<aside class="side" aria-label="皮肤与光线参数">','<aside class="side" aria-label="皮肤与光线参数">'+panel);
 html=html.replace('<button id="shot">截图</button></div>','<button id="shot">截图</button><div class="identity-quick"><button data-identity="porcelain">01 冷白雀斑</button><button data-identity="umber">02 深褐短须</button><button data-identity="weathered">03 风化熟龄</button><button data-identity="original">原 R02</button></div></div>');
 html=html.replace('同一扫描参考上的艺术调节，不是不同人物或医学测量。','下方仅控制材质响应；上方三套表皮分别读取独立绘制的纹理与眉胡配方。');
@@ -47,6 +51,7 @@ if(!process.argv.includes('--no-bundle')){
  preview=preview.replaceAll('../r01/assets/',publicRoot+'r01/assets/').replaceAll('./assets/',publicRoot+'r02/assets/').replaceAll('../r01/vendor/',publicRoot+'r01/vendor/').replaceAll('./THIRD_PARTY.txt',publicRoot+'r02/THIRD_PARTY.txt');
  const publicScript=preview.match(/<script>([\s\S]*?)<\/script>/);if(!publicScript)throw Error('Public executable absent');new(require('vm').Script)(publicScript[1]);
  fs.writeFileSync(root+'/preview.html',preview);
- fs.writeFileSync(root+'/BUILD_MANIFEST_IDENTITIES.json',JSON.stringify({schema:'kaopu/skin-identity-build@1',version:'R02.2',baselineCommit:base,assetCommit:ref,sourceSHA256:crypto.createHash('sha256').update(js).digest('hex'),profiles:['porcelain','umber','weathered'],originalRetained:true,geometryChanged:false,originalParametricBodyIntegrated:false,generatedPortraitsUsed:false},null,2));
+ fs.writeFileSync(root+'/BUILD_MANIFEST_IDENTITIES.json',JSON.stringify({schema:'kaopu/skin-identity-build@1',version:'R02.3',baselineCommit:base,assetCommit:ref,sourceSHA256:crypto.createHash('sha256').update(js).digest('hex'),profiles:['porcelain','umber','weathered'],originalRetained:true,geometryChanged:false,originalParametricBodyIntegrated:false,generatedPortraitsUsed:false},null,2));
 }
-console.log('R02.2 independent identity source built',Buffer.byteLength(js));
+console.log('R02.3 independent identity source built',Buffer.byteLength(js));
+
