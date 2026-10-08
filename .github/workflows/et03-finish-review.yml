@@ -32,8 +32,10 @@ jobs:
           ASSET_COMMIT: ${{ github.sha }}
         run: |
           git fetch --filter=blob:none --depth=1 origin 06b92744537caf0709b9bb73e4917453bc238294
+          node --check skin-quality-lab/emily-transfer/research/fit-depth.cjs
           node skin-quality-lab/emily-transfer/research/refine.cjs
           node skin-quality-lab/emily-transfer/research/closure.cjs
+          node skin-quality-lab/emily-transfer/research/fit-depth.cjs
           node skin-quality-lab/emily-transfer/research/finish.cjs
       - name: Actual visual and contact checks
         env:
