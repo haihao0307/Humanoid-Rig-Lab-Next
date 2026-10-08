@@ -1,0 +1,55 @@
+name: ET03 eyelid structure review
+on:
+  push:
+    branches: [experiment/emily-eyelid-research-et03-20261008]
+    paths:
+      - '.github/workflows/et03-eyelid-review.yml'
+      - 'skin-quality-lab/emily-transfer/research/**'
+permissions:
+  contents: read
+concurrency:
+  group: et03-eyelid-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser and build tools
+        run: |
+          npm install --prefix /tmp/et03-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/et03-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Rebuild from pinned original skin
+        env:
+          NODE_PATH: /tmp/et03-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 06b92744537caf0709b9bb73e4917453bc238294
+          node --check skin-quality-lab/emily-transfer/research/build.cjs
+          node skin-quality-lab/emily-transfer/research/build.cjs
+      - name: Real browser visual and interaction checks
+        env:
+          NODE_PATH: /tmp/et03-tools/node_modules
+        run: node skin-quality-lab/emily-transfer/research/quick.cjs
+      - name: Preserve candidate and evidence
+        if: always()
+        run: |
+          mkdir -p /tmp/et03-evidence/candidate
+          cp skin-quality-lab/emily-transfer/{app.js,index.html,preview.html,BUILD_MANIFEST.json} /tmp/et03-evidence/candidate/
+          cp -r skin-quality-lab/emily-transfer/research /tmp/et03-evidence/candidate/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et03-eyelid-review
+          path: /tmp/et03-evidence
+          retention-days: 14
