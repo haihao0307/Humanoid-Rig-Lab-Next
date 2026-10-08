@@ -1,0 +1,89 @@
+name: Emily skin transfer validation
+on:
+  push:
+    branches: [experiment/emily-skin-transfer-r01-20261008]
+    paths:
+      - '.github/workflows/emily-skin-transfer.yml'
+      - 'skin-quality-lab/emily-transfer/**'
+permissions:
+  contents: write
+concurrency:
+  group: emily-transfer-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser tools
+        run: |
+          npm install --prefix /tmp/skin-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/skin-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Read reference source
+        run: |
+          mkdir -p /tmp/skin-evidence
+          python3 - <<'PY'
+          import urllib.request, urllib.parse, re, json, pathlib
+          url='https://alteredqualia.com/xg/examples/emily.html'
+          try:
+            text=urllib.request.urlopen(url,timeout=45).read().decode()
+            pathlib.Path('/tmp/skin-evidence/emily-reference.html').write_text(text)
+            scripts=[urllib.parse.urljoin(url,u) for u in re.findall(r'<script[^>]*src=[\"\']([^\"\']+)',text)]
+            lines=text.splitlines()
+            terms=r'skin|scatter|transluc|normal|specular|roughness|diffuse|fresnel|shader|material|texture|bump|gloss'
+            excerpts=[{'line':i+1,'text':s.strip()} for i,s in enumerate(lines) if re.search(terms,s,re.I)]
+            report={'url':url,'scripts':scripts,'excerpts':excerpts}
+            pathlib.Path('/tmp/skin-evidence/reference-source.json').write_text(json.dumps(report,indent=2))
+            print(json.dumps(report,indent=2))
+          except Exception as e:
+            pathlib.Path('/tmp/skin-evidence/reference-error.txt').write_text(str(e)); print('Reference read error:',e)
+          PY
+      - name: Build transfer candidate
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          if test -f skin-quality-lab/emily-transfer/build.cjs; then
+            node skin-quality-lab/emily-transfer/build.cjs
+          fi
+      - name: Browser validation
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+        run: |
+          if test -f skin-quality-lab/emily-transfer/qa.cjs; then
+            node skin-quality-lab/emily-transfer/qa.cjs
+          else
+            node <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          (async()=>{const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const page=await browser.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('https://alteredqualia.com/xg/examples/emily.html',{waitUntil:'domcontentloaded',timeout:90000}).catch(e=>errors.push(String(e)));await page.waitForTimeout(14000);await page.screenshot({path:'/tmp/skin-evidence/emily-reference.png'});fs.writeFileSync('/tmp/skin-evidence/reference-browser.json',JSON.stringify({url:page.url(),errors,canvas:await page.locator('canvas').count()},null,2));await browser.close()})().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+          fi
+      - name: Publish only validated transfer files
+        if: success()
+        run: |
+          if test -f skin-quality-lab/emily-transfer/qa-report.json; then
+            git config user.name 'skin-transfer-validation'
+            git config user.email 'skin-transfer-validation@users.noreply.github.com'
+            git add skin-quality-lab/emily-transfer
+            if ! git diff --cached --quiet; then
+              git commit -m 'build(skin): publish validated Emily transfer preview and evidence [skip ci]'
+              git push origin HEAD:experiment/emily-skin-transfer-r01-20261008
+            fi
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: emily-transfer-evidence
+          path: /tmp/skin-evidence
+          retention-days: 14
