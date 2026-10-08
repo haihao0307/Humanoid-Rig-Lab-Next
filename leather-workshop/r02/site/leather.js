@@ -12,7 +12,7 @@ export const PRESETS={
  suede:{name:'绒面反绒革',kind:6,color:'#6d5842',grain:.7,depth:.09,roughness:.94,coat:0,wear:.32,wrinkles:.22,pores:.2,irregular:.9,damage:.06,finish:'matte'}
 };
 export const FINISHES={aniline:{name:'透明染色',roughness:.49,coat:.1,metal:0,iridescence:0},pigmented:{name:'颜料涂饰',roughness:.44,coat:.22,metal:0,iridescence:0},wax:{name:'油蜡抛光',roughness:.34,coat:.4,metal:0,iridescence:0},matte:{name:'消光涂饰',roughness:.84,coat:0,metal:0,iridescence:0},patent:{name:'漆皮涂层',roughness:.26,coat:.95,metal:0,iridescence:0},metallic:{name:'金属箔涂饰',roughness:.35,coat:.3,metal:.78,iridescence:0},pearl:{name:'珠光涂饰',roughness:.31,coat:.55,metal:0,iridescence:.7}};
-export const DEFAULT={...PRESETS.wax,preset:'wax',seed:27,tileMM:96,resolution:2048,fold:1,stitches:true,object:'roll',light:'studio',exposure:1.0,rotation:0,craft:'plain',quiltMM:34,loft:4,thickness:1.4,stitch:'double',threadColor:'#cfb38a',threadMM:.30,pitchMM:3.4,piping:true,hole:'none',holeMM:1.6,holePitch:6,channel:'beauty'};
+export const DEFAULT={...PRESETS.wax,preset:'wax',seed:27,tileMM:96,resolution:2048,fold:1,stitches:true,object:'roll',light:'studio',exposure:1.0,rotation:0,craft:'plain',quiltMM:34,weaveMM:10,loft:4,thickness:1.4,stitch:'double',threadColor:'#cfb38a',threadMM:.30,pitchMM:3.4,piping:true,hole:'none',holeMM:1.6,holePitch:6,channel:'beauty'};
 const vert=`varying vec2 vUV;void main(){vUV=uv;gl_Position=vec4(position.xy,0.,1.);}`;
 const noise=`
 float h(vec2 p){vec3 a=fract(vec3(p.xyx)*.1031+uSeed*.037);a+=dot(a,a.yzx+33.33);return fract((a.x+a.y)*a.z);}

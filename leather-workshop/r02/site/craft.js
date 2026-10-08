@@ -16,7 +16,7 @@ export function buildCraft(p,baseShape,front,back,edge,threadMaterial){
  function wall(ring,close=true){for(let i=0;i<(close?ring.length:ring.length-1);i++){let a=ring[i],b=ring[(i+1)%ring.length],j=walls.pos.length/3;walls.pos.push(...at(...a,1),...at(...b,1),...at(...a,-1),...at(...b,-1));walls.uv.push(i*.15,0,(i+1)*.15,0,i*.15,1,(i+1)*.15,1);walls.idx.push(j,j+1,j+2,j+1,j+3,j+2);}}
  if(p.craft==='woven'){
   // Separate ribbons, alternating over/under. No sheet hidden below the weave.
-  let spacing=p.quiltMM/3000,width=spacing*.88,nu=Math.max(4,Math.round(W/spacing)),nv=Math.max(4,Math.round(L/spacing));spacing=Math.min(W/nu,L/nv);let cross=p.loft/1000*.3+t*.6;
+  let spacing=p.weaveMM/1000,width=spacing*.88,nu=Math.max(4,Math.round(W/spacing)),nv=Math.max(4,Math.round(L/spacing));spacing=Math.min(W/nu,L/nv);let cross=p.loft/1000*.3+t*.6;
   const ribbon=(horizontal,index,count,length)=>{
    const steps=Math.ceil(length/spacing)*8;
    for(let side of [1,-1]){let buf=side===1?top:bottom,start=buf.pos.length/3;
@@ -45,17 +45,18 @@ export function buildCraft(p,baseShape,front,back,edge,threadMaterial){
   const nu=110,nv=160;for(let side of [1,-1]){let buf=side===1?top:bottom;for(let j=0;j<=nv;j++)for(let i=0;i<=nu;i++)vertex(buf,i/nu,j/nv,side);for(let j=0;j<nv;j++)for(let i=0;i<nu;i++){let a=j*(nu+1)+i;quad(buf,a,a+1,a+nu+1,a+nu+2,side);}}
  }
  if(p.craft!=='woven'){let boundary=[];for(let i=0;i<=110;i++)boundary.push([i/110,0]);for(let i=1;i<=160;i++)boundary.push([1,i/160]);for(let i=109;i>=0;i--)boundary.push([i/110,1]);for(let i=159;i>0;i--)boundary.push([0,i/160]);wall(boundary);}
- function mesh(buf,mat){let g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(buf.pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(buf.uv,2));g.setAttribute('uv1',g.attributes.uv.clone());g.setIndex(buf.idx);if(buf.norm.length)g.setAttribute('normal',new T.Float32BufferAttribute(buf.norm,3));else g.computeVertexNormals();let m=new T.Mesh(g,mat);m.castShadow=m.receiveShadow=true;group.add(m);return m;}
+ function mesh(buf,mat){let g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(buf.pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(buf.uv,2));g.setAttribute('uv1',g.attributes.uv.clone());g.setIndex(buf.idx);if(buf.norm.length&&p.craft!=='woven')g.setAttribute('normal',new T.Float32BufferAttribute(buf.norm,3));else g.computeVertexNormals();let m=new T.Mesh(g,mat);m.castShadow=m.receiveShadow=true;group.add(m);return m;}
  let body=mesh(top,front);mesh(bottom,back);mesh(walls,edge);
  let paths=[],margin=.005,pitch=p.pitchMM/1000;
  function path(a,b){paths.push([a,b]);}
  function border(m){path([m/W,m/L],[1-m/W,m/L]);path([1-m/W,m/L],[1-m/W,1-m/L]);path([1-m/W,1-m/L],[m/W,1-m/L]);path([m/W,1-m/L],[m/W,m/L]);}
  if(p.stitches&&p.stitch!=='none'&&p.craft!=='woven'){
-  border(margin);if(p.stitch==='double')border(margin+.0023);
+  border(margin);
   let q=p.quiltMM/1000;
   if(p.craft==='grid'||p.craft==='channels'){for(let x=q;x<W;x+=q)path([x/W,.01],[x/W,.99]);if(p.craft==='grid')for(let z=q;z<L;z+=q)path([.01,z/L],[.99,z/L]);}
-  if(p.craft==='diamond'){for(let sign of [-1,1])for(let d=-W-L;d<W+L;d+=q){let points=[];for(let x of [0,W]){let z=sign*(d-x);if(z>=0&&z<=L)points.push([x/W,z/L]);}for(let z of [0,L]){let x=d-sign*z;if(x>=0&&x<=W)points.push([x/W,z/L]);}if(points.length>=2)path(points[0],points[1]);}}
+  if(p.craft==='diamond'){for(let sign of [-1,1])for(let k=-Math.ceil((W+L)/q);k<=Math.ceil((W+L)/q);k++){let d=k*q,points=[];for(let x of [0,W]){let z=sign*(d-x);if(z>=0&&z<=L)points.push([x/W,z/L]);}for(let z of [0,L]){let x=d-sign*z;if(x>=0&&x<=W)points.push([x/W,z/L]);}if(points.length>=2)path(points[0],points[1]);}}
  }
+ if(p.stitch==='double'){let twins=[];for(const [a,b] of paths){let dx=(b[0]-a[0])*W,dz=(b[1]-a[1])*L,len=Math.hypot(dx,dz)||1;for(let side of [-1,1]){let x=-dz/len*.0008/W*side,z=dx/len*.0008/L*side;twins.push([[clamp(a[0]+x,0,1),clamp(a[1]+z,0,1)],[clamp(b[0]+x,0,1),clamp(b[1]+z,0,1)]]);}}paths=twins;}
  const segments=[];
  for(const [a,b] of paths){let dx=(b[0]-a[0])*W,dz=(b[1]-a[1])*L,length=Math.hypot(dx,dz),count=Math.max(1,Math.floor(length/pitch)),sx=-dz/(length||1)*.0008/W,sz=dx/(length||1)*.0008/L;
   for(let i=0;i<count;i++){let f=(i+.15)/count,g=(i+.81)/count,A=[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f],B=[a[0]+(b[0]-a[0])*g,a[1]+(b[1]-a[1])*g];if(p.stitch==='zigzag'){let s=i%2?1:-1;A[0]+=sx*s;A[1]+=sz*s;B[0]-=sx*s;B[1]-=sz*s;}if(p.stitch==='cross'){segments.push([[A[0]+sx,A[1]+sz],[B[0]-sx,B[1]-sz]]);A=[A[0]-sx,A[1]-sz];B=[B[0]+sx,B[1]+sz];}segments.push([A,B]);}
