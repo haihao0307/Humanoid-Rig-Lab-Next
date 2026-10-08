@@ -170,7 +170,7 @@ function dispose(group){if(!group)return;scene.remove(group);const seen=new Set(
 function box(w,h,d,material,x,y,z,parent){const m=new T.Mesh(new T.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
 function jaw(cx,cz,w,d,isRight=false){const g=new T.Group();g.position.set(cx,0,cz);const t=state.thickness;box(w,.004,d,isRight?gold:metal,0,t/2+.002,0,g);box(w,.0035,d,metal,0,-t/2-.00175,0,g);
  for(const z of d>.1?[-d*.38,d*.38]:[0]){const bolt=new T.Mesh(new T.CylinderGeometry(.0016,.0016,.007,12),dark);bolt.position.set(0,.005,z);g.add(bolt);}
- box(w*.7,.03,d>.1?.014:d*.6,dark,0,-.022,0,g);assembly.add(g);g.userData.rightClamp=isRight;return g;}
+ box(w*.7,.058,d>.1?.014:d*.6,dark,0,-.033,0,g);assembly.add(g);g.userData.rightClamp=isRight;return g;}
 function build(){dispose(assembly);assembly=new T.Group();scene.add(assembly);clips=[];
  const n=state.positions.length/3,pos=new Float32Array(n*3),tris=Array.from(state.triangles),top=[];for(let i=0;i<tris.length;i+=3)top.push(tris[i],tris[i+2],tris[i+1]);
  mid=new T.BufferGeometry();mid.setAttribute('position',new T.BufferAttribute(pos,3));mid.setIndex(top);
