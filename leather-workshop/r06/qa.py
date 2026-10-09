@@ -1,6 +1,6 @@
 """Real Chromium QA for local standalone and public commit-pinned candidate."""
 from pathlib import Path
-import argparse, hashlib, json, time, traceback
+import argparse, hashlib, json, time, traceback, os
 from playwright.sync_api import sync_playwright
 from PIL import Image, ImageChops, ImageStat
 R=Path(__file__).resolve().parent
@@ -15,7 +15,8 @@ def photo(page,name):
  page.evaluate('window.LEATHER_ATELIER?.render(performance.now())');page.wait_for_timeout(120)
  p=OUT/(name+'.png');page.screenshot(path=str(p),full_page=False);report['screenshots'].append(p.name);return p
 with sync_playwright() as p:
- browser=p.chromium.launch(headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader','--use-gl=angle','--use-angle=swiftshader'])
+ browser=p.chromium.launch(executable_path=os.environ.get("KAOPU_CHROMIUM_EXECUTABLE"),headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader','--use-gl=angle','--use-angle=swiftshader'])
+ report["browserEnvironment"]={"version":browser.version,"executable":os.environ.get("KAOPU_CHROMIUM_EXECUTABLE","Playwright bundled Chromium")}
  page=browser.new_page(viewport={'width':1440,'height':1000},device_scale_factor=1)
  page.on('pageerror',lambda e:report['errors'].append(str(e)))
  page.on('console',lambda m:report['errors'].append(m.text) if m.type=='error' else None)

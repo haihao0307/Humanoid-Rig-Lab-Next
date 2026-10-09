@@ -44,6 +44,16 @@ function setView(id){view=id;const box=mode==='physics'?new T.Box3(V(-135,0,-135
  if(id==='front'){yaw=0;pitch=.04;if(product==='belt'||product==='swatch')pitch=1.43;}
  if(id==='back'){yaw=Math.PI+.08;pitch=.13;if(product==='swatch')pitch=-.5;}
  if(id==='macro'){distance*=.43;pitch=.32;yaw=.18;if(product==='wallet'){target.set(15,hero.position.y-14,5);distance=106;}if(product==='belt'){const b=hero.userData.frame(0);target.copy(b.p).applyMatrix4(hero.matrixWorld);distance=160;yaw=1.2;pitch=.46;}if(product==='bag'){target.set(0,125,40);distance=200;}if(product==='hat'){target.set(0,65,90);distance=200;}if(product==='swatch'){target.set(5,24,0);distance=95;pitch=.85;}if(mode==='physics'){target.set(0,91,0);distance=240;pitch=.53;}}
+ if(id!=='macro'){
+  const zAxis=V(Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),Math.cos(yaw)*Math.cos(pitch));
+  const xAxis=V().crossVectors(V(0,1,0),zAxis).normalize(),yAxis=V().crossVectors(zAxis,xAxis);
+  const tangent=Math.tan(T.MathUtils.degToRad(camera.fov/2)),margin=.86;let required=25;
+  for(const x of[box.min.x,box.max.x])for(const y of[box.min.y,box.max.y])for(const z of[box.min.z,box.max.z]){
+   const q=V(x,y,z).sub(target),along=q.dot(zAxis);
+   required=Math.max(required,along+Math.abs(q.dot(xAxis))/(tangent*aspect*margin),along+Math.abs(q.dot(yAxis))/(tangent*margin));
+  }
+  distance=required;
+ }
  const h=Math.max(150,radius*1.75);Object.assign(key.shadow.camera,{left:-h,right:h,top:h,bottom:-h});key.shadow.camera.updateProjectionMatrix();key.target.position.copy(center);key.target.updateMatrixWorld();renderer.shadowMap.needsUpdate=true;
  for(const[k,v]of[['viewHome','home'],['viewFront','front'],['viewBack','back'],['viewMacro','macro']])$(k).classList.toggle('active',id===v);dirty=true;revision++;
 }
