@@ -115,7 +115,7 @@ export class FittedEyes extends EyeSystem {
  lock(){super.lock();this.state.mode='fixed';}
  setMode(mode){super.setMode(mode);this.state.mode=this.config.mode;}
  setTarget(v){super.setTarget(v);this.state.mode='fixed';}
- info(){return {...super.info(),externalEyeAssets:1,irisSource:'MakeHuman system grey_eye.png, CC0',fittedCornealEnvelope:true,boundaryContinuity:'C1 local displacement',adultScaleFit:true,eyeRadiusMM:12.5,defaultApertureMM:[23.4,5.9]};}
+ info(){return {...super.info(),externalEyeAssets:1,irisSource:'MakeHuman system grey_eye.png, CC0',fittedCornealEnvelope:true,boundaryContinuity:'C1 local displacement',adultScaleFit:true,eyeRadiusMM:12.2,defaultApertureMM:[22.2,6.7]};}
  dispose(){this.photoTexture?.dispose();super.dispose();}
 }
 
