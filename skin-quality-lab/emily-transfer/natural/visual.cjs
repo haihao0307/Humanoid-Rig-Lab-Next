@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');const{chromium}=require('playwright');
 const root=path.resolve(__dirname,'../../..'),out=process.env.EVIDENCE_DIR||'/tmp/et07/visual';fs.mkdirSync(out,{recursive:true});
-let browser,server,page;const report={errors:[],version:'ET07.2',realMobileDevice:false};
+let browser,server,page;const report={errors:[],version:'ET07.3',realMobileDevice:false};
 (async()=>{
  server=http.createServer((req,res)=>{const f=path.resolve(root,'.'+new URL(req.url,'http://local').pathname);if(!f.startsWith(root+'/'))return res.writeHead(403).end();res.setHeader('Content-Type',({'.js':'text/javascript','.mjs':'text/javascript','.html':'text/html','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp'})[path.extname(f)]||'application/octet-stream');const s=fs.createReadStream(f);s.on('error',()=>res.writeHead(404).end());s.pipe(res);});await new Promise(r=>server.listen(0,'127.0.0.1',r));
  browser=await chromium.launch({args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1280,height:960},deviceScaleFactor:1});page.setDefaultTimeout(90000);

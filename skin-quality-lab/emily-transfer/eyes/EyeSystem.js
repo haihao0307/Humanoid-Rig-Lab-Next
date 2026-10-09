@@ -3,7 +3,7 @@ import * as THREE from 'three';
 // Independent implementation after inspecting Digital Emily createEyes(),
 // updateEyeRig() and updateDynamicEyeTexture(). No XG geometry or texture is copied.
 // Units are metres, +Y up and +Z forward. Socket calibration belongs to this scan.
-export const EYE_VERSION='eyes/7.2.0';
+export const EYE_VERSION='eyes/7.3.0';
 export const SOCKETS=[
  {name:'right',x:-.0300,y:.0690,z:.0627,sign:-1,rx:.0205,ry:.0175,half:.0119,radius:.0122},
  {name:'left', x:.0217,y:.0690,z:.0625,sign: 1,rx:.0203,ry:.0173,half:.0117,radius:.0122}
