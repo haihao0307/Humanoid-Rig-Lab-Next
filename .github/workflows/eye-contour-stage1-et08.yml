@@ -60,29 +60,6 @@ jobs:
           })().catch(e=>{console.error(e);process.exit(1)});
           JS
           fi
-      - name: Gather baseline source snapshot
-        if: always()
-        run: |
-          python3 - <<'PY'
-          import pathlib,zipfile
-          root=pathlib.Path('skin-quality-lab')
-          with zipfile.ZipFile('qa-et08/source.zip','w',zipfile.ZIP_DEFLATED) as z:
-            for p in root.rglob('*'):
-              if not p.is_file(): continue
-              rel=str(p)
-              if '/assets/' in rel or '/vendor/' in rel:
-                if '/r01/' not in rel and '/r02/' not in rel: continue
-              elif '/emily-transfer/' not in rel: continue
-              if any(v in rel for v in ('/qa-','/evidence/','/node_modules/','/screenshots/')): continue
-              if p.suffix.lower() in {'.js','.cjs','.mjs','.json','.html','.txt','.md','.png','.jpg','.jpeg','.webp','.glb','.gltf','.bin'}:
-                z.write(p,rel)
-          PY
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: et08-stage1-${{ github.run_number }}
-          path: qa-et08/
-          retention-days: 7
       - name: Publish validated branch build (never main)
         if: success()
         run: |
@@ -95,3 +72,34 @@ jobs:
               git push origin HEAD:feature/eye-contour-stage1-et08-20261009
             fi
           fi
+      - name: Verify actual immutable public preview
+        if: success()
+        env:
+          NODE_PATH: /tmp/et08-tools/node_modules
+        run: |
+          if test -f skin-quality-lab/emily-transfer/stage1/public.cjs; then
+            PUBLIC_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/emily-transfer/stage1/public.cjs
+          fi
+      - name: Gather complete source and evidence
+        if: always()
+        run: |
+          mkdir -p qa-et08
+          python3 - <<'PY'
+          import pathlib,zipfile
+          root=pathlib.Path('skin-quality-lab')
+          with zipfile.ZipFile('qa-et08/source.zip','w',zipfile.ZIP_DEFLATED) as z:
+            for p in root.rglob('*'):
+              if not p.is_file(): continue
+              rel=str(p)
+              if '/emily-transfer/' not in rel:
+                if ('/assets/' not in rel and '/vendor/' not in rel) or ('/r01/' not in rel and '/r02/' not in rel): continue
+              if any(v in rel for v in ('/qa-','/evidence/','/node_modules/','/screenshots/')): continue
+              if p.suffix.lower() in {'.js','.cjs','.mjs','.json','.html','.txt','.md','.png','.jpg','.jpeg','.webp','.glb','.gltf','.bin'}:
+                z.write(p,rel)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et08-stage1-${{ github.run_number }}
+          path: qa-et08/
+          retention-days: 7
