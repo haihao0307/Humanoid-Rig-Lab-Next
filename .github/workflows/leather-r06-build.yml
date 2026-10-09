@@ -1,0 +1,85 @@
+name: Leather R06 atelier acceptance
+on:
+  push:
+    branches: [feature/leather-atelier-r06-takeover-20261009]
+    paths:
+      - leather-workshop/r06/site/**
+      - leather-workshop/r06/*.py
+      - .github/workflows/leather-r06-build.yml
+permissions:
+  contents: write
+concurrency:
+  group: leather-r06-atelier
+  cancel-in-progress: false
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/leather-atelier-r06-takeover-20261009
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - name: Record source and enforce frozen boundaries
+        run: |
+          git fetch --depth=1 origin e86c36c8c34b1f2b57cc5462459ee2f490e556af
+          git diff --exit-code e86c36c8c34b1f2b57cc5462459ee2f490e556af -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/anchors
+          echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser and build dependencies
+        run: |
+          pip install pillow numpy playwright==1.55.0
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Standalone build and geometry contract
+        run: |
+          python leather-workshop/r06/build.py
+          python leather-workshop/r06/test-products.py
+          mkdir -p /tmp/leather-r04-qa
+          cd /tmp/leather-r04-qa
+          node "$GITHUB_WORKSPACE/leather-workshop/r04/test.mjs"
+          cp -r qa "$GITHUB_WORKSPACE/leather-workshop/r06/qa-r04-inherited"
+      - name: Real standalone browser acceptance
+        run: python leather-workshop/r06/qa.py
+      - name: Publish candidate without changing historical content
+        id: publish
+        run: |
+          git diff --exit-code e86c36c8c34b1f2b57cc5462459ee2f490e556af -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/anchors
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r06/public-lite.html leather-workshop/r06/BUILD_MANIFEST.json leather-workshop/r06/qa-products.json leather-workshop/r06/qa/local/browser.json leather-workshop/r06/qa-r04-inherited
+          git commit -m "build(leather-r06): standalone candidate from ${SOURCE_SHA} with local browser evidence"
+          git push origin HEAD:refs/heads/feature/leather-atelier-r06-takeover-20261009
+          SHA=$(git rev-parse HEAD)
+          URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${SHA}/leather-workshop/r06/public-lite.html"
+          echo "PUBLIC_URL=$URL" >> "$GITHUB_ENV"
+          echo "BUILD_SHA=$SHA" >> "$GITHUB_ENV"
+          echo "$URL" > leather-workshop/r06/PUBLIC_URL.txt
+      - name: Real fixed-public-URL browser acceptance
+        run: python leather-workshop/r06/qa.py --public --url "$PUBLIC_URL"
+      - name: Commit exact public acceptance receipt
+        run: |
+          python - <<'PY'
+          import os,json,pathlib
+          r=pathlib.Path('leather-workshop/r06')
+          result={'sourceCommit':os.environ['SOURCE_SHA'],'buildCommit':os.environ['BUILD_SHA'],'url':os.environ['PUBLIC_URL'],'workflowRun':os.environ['GITHUB_RUN_ID'],'browserPublicPassed':True,'visualAcceptance':'PENDING_USER','mobile':'390x844 viewport simulation, not hardware'}
+          (r/'DELIVERY_RECEIPT.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git add leather-workshop/r06/qa/public/browser.json leather-workshop/r06/PUBLIC_URL.txt leather-workshop/r06/DELIVERY_RECEIPT.json
+          git commit -m "test(leather-r06): record exact public candidate browser acceptance"
+          git push origin HEAD:refs/heads/feature/leather-atelier-r06-takeover-20261009
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r06-atelier-evidence-${{ github.run_id }}
+          path: |
+            leather-workshop/r06/
+          retention-days: 7
