@@ -14,29 +14,27 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install -q pillow numpy
-      - name: Acquire CC0 material maps, never a static seam picture
+      - name: Acquire available CC0 original material maps
         run: |
           python - <<'PY'
           from pathlib import Path
-          import urllib.request,zipfile,io,json,hashlib
+          import urllib.request,io,json,hashlib
           import numpy as np
           from PIL import Image
-          r=Path('/tmp/grain030');r.mkdir()
-          url='https://ambientcg.com/get?file=Leather030_4K-JPG.zip'
-          data=urllib.request.urlopen(url,timeout=180).read();z=zipfile.ZipFile(io.BytesIO(data))
-          manifest={'asset':'Leather030','source':'https://ambientcg.com/view?id=Leather030','license':'CC0-1.0','technique':'procedural per publisher','originalTileMM':450,'archiveURL':url,'archiveSHA256':hashlib.sha256(data).hexdigest(),'files':{}}
-          print(z.namelist())
-          for name,tag in [('diff','Color'),('nor_gl','NormalGL'),('rough','Roughness'),('disp','Displacement')]:
-              path=next(n for n in z.namelist() if '_'+tag+'.' in n)
-              raw=z.read(path);im=Image.open(io.BytesIO(raw)).convert('RGB');assert im.size==(4096,4096)
-              # 1024 original texels represent 112.5 mm; no image rescaling.
-              crop=im.crop((1536,1536,2560,2560));crop.save(r/(name+'.png'))
-              a=np.asarray(crop).astype(float)/255
-              manifest['files'][name]={'archiveEntry':path,'rawSHA256':hashlib.sha256(raw).hexdigest(),'processedSHA256':hashlib.sha256((r/(name+'.png')).read_bytes()).hexdigest(),'mean':a.mean(axis=(0,1)).tolist()}
-          (r/'PROVENANCE.json').write_text(json.dumps(manifest,indent=2))
+          root=Path('/tmp/grain-review');root.mkdir()
+          for asset,tile,tags in [('brown_leather',400,{'diff':'diff','nor_gl':'nor_gl','rough':'rough','disp':'disp'}),('leather_red_02',600,{'diff':'coll1','nor_gl':'nor_gl','rough':'rough','disp':'disp'})]:
+              r=root/asset;r.mkdir()
+              m={'asset':asset,'source':'https://polyhaven.com/a/'+asset,'author':'Rob Tuytel','license':'CC0-1.0','originalTileMM':tile,'cropMM':tile*1536/8192,'files':{}}
+              for name,tag in tags.items():
+                  url=f'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/8k/{asset}/{asset}_{tag}_8k.jpg'
+                  raw=urllib.request.urlopen(url,timeout=180).read();im=Image.open(io.BytesIO(raw)).convert('RGB');assert im.size==(8192,8192)
+                  crop=im.crop((3328,3328,4864,4864));crop.save(r/(name+'.png'))
+                  a=np.asarray(crop).astype(float)/255;m['files'][name]={'url':url,'rawSHA256':hashlib.sha256(raw).hexdigest(),'processedSHA256':hashlib.sha256((r/(name+'.png')).read_bytes()).hexdigest(),'mean':a.mean(axis=(0,1)).tolist()}
+              (r/'PROVENANCE.json').write_text(json.dumps(m,indent=2))
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: leather030-grain-review
-          path: /tmp/grain030
+          name: leather-grain-finish-review
+          path: /tmp/grain-review
           retention-days: 14
