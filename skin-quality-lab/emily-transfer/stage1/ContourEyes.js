@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 import {IntegratedEyes} from '../talkinghead/IntegratedEyes.js';
+import {prepareClosedSurface,repairClosedSurface,closureWeight} from './ClosedSurface.js';
 import {sampleContour,contourSpecification,BASELINE} from './Contours.mjs';
-export const EYE_VERSION='eyes/8.0.0-s1';
+export const EYE_VERSION='eyes/8.0.1-s1';
 const clamp=THREE.MathUtils.clamp,mix=THREE.MathUtils.lerp,TAU=Math.PI*2;
 const smooth=x=>{x=clamp(x,0,1);return x*x*(3-2*x);};
-/** Only the free-edge curves change. The inherited eyelid sectional topology,
- * canthal surfaces, globe, texture assets and behavior implementation remain.
- * Stage two (sectional anatomy) and stage four (new dynamics) are not claimed.
+/** The inherited topology, globe, texture assets and behavior remain. The S1.1
+ * patch corrects the entire closed outer envelope against the captured scan.
+ * It does not claim stage-two anatomical or stage-four physical reconstruction.
  */
 export class ContourEyes extends IntegratedEyes {
  constructor(options){
@@ -17,6 +18,12 @@ export class ContourEyes extends IntegratedEyes {
    this.state.version=EYE_VERSION;this.setInspectionPose(0);return this;
   });
  }
+ makeLid(c,sample,mat){const lid=super.makeLid(c,sample,mat);prepareClosedSurface(lid,c,sample);return lid;}
+ updateLid(e,blink){
+  super.updateLid(e,blink);
+  const b=this.config.manualBlink>=0?this.config.manualBlink:blink;
+  repairClosedSurface(this,e,b);
+ }
  margin(c,a,blink){
   if(this.contourBaseline)return super.margin(c,a,blink);
   const nx=Math.cos(a),ny=Math.sin(a),s=clamp((nx*c.sign+1)*.5,0,1);
@@ -24,7 +31,14 @@ export class ContourEyes extends IntegratedEyes {
   const x=c.x+c.sign*q.temporalXMM/1000,y=c.y+(ny>=0?q.upperMM:q.lowerMM)/1000;
   const front=this.eyeFront(c,x,y),corner=smooth(Math.min(s,1-s)/.11),clearance=mix(.00015,mix(ny>=0?.00078:.00030,.00032,blink),corner);
   if(front===null)throw Error('ET08 contour left the locked globe support');
-  return new THREE.Vector3(x,y,front+clearance);
+  let z=front+clearance;
+  if(this.closedRestEnabled!==false&&c.closedScanMargin){
+   const rest=c.closedScanMargin(s),canthus=1-smooth(Math.min(s,1-s)/.14);
+   // Canthi are fixed to the observed closed crease, not to the far-back
+   // equator of the globe. The central open contour stays globe supported.
+   z=mix(z,rest.z,canthus);z=mix(z,rest.z,closureWeight(blink));
+  }
+  return new THREE.Vector3(x,y,z);
  }
  setInspectionPose(closure=0,{yaw=0,pitch=0,squint=0}={}){
   if(![closure,yaw,pitch,squint].every(Number.isFinite))throw Error('Invalid inspection pose');
@@ -33,6 +47,8 @@ export class ContourEyes extends IntegratedEyes {
   this.lockedTarget.set(-.004+Math.tan(yaw)*10,.069-Math.tan(pitch)*10,10.065);
   this.update(0,true);this.requestRender();
  }
+ compareClosureBefore(on){this.closedRestEnabled=!on;this.update(0,true);this.requestRender();}
+ closureSurfaceReport(){return {version:EYE_VERSION,eyes:this.eyes.map(e=>({name:e.c.name,...e.lid.closedSurface?.report}))};}
  compareOriginal(on){this.contourBaseline=!!on;this.update(0,true);this.requestRender();}
  contourReport(){
   const rows=[];
@@ -50,23 +66,21 @@ export class ContourEyes extends IntegratedEyes {
   return {schema:'kaopu/eye-contour-review@1',baseline:BASELINE,version:EYE_VERSION,comparison:this.contourBaseline?'ET07.3':'ET08-S1',currentClosure:this.config.manualBlink,irisCoverageMeaning:'unrefracted iris reference projected on the neutral globe, not a measured photograph',scope:'sampled curves and current free-margin vertices; not continuous collision certification',eyes:rows,specification:contourSpecification()};
  }
  audit(detailed=false){
-  const report=super.audit(detailed);report.version=EYE_VERSION;
+  const report=super.audit(detailed);report.version=EYE_VERSION;report.closedSurface=this.closureSurfaceReport();
   report.marginLengthDefinition='actual upper/lower free-edge vertex polylines; cross-section lengths reported separately; no arc-length conservation claim';
   for(const row of report.eyes){
    const e=this.eyes.find(e=>e.c.name===row.name),P=e.lid.mesh.geometry.attributes.position,A=e.lid.A;
    const length=(start,end)=>{let sum=0;for(let i=start+1;i<=end;i++)sum+=Math.hypot(P.getX(i)-P.getX(i-1),P.getY(i)-P.getY(i-1),P.getZ(i)-P.getZ(i-1));return sum*1000;};
-   // The inherited ET06 audit names measured a transverse rim section, not
-   // the whole free edge. Preserve those useful values under accurate names.
    row.upperMarginCrossSectionArcMM=row.upperFreeMarginArcMM;row.lowerMarginCrossSectionArcMM=row.lowerFreeMarginArcMM;
    row.upperFreeMarginArcMM=length(0,A/2);row.lowerFreeMarginArcMM=length(A/2,A);
    if(![row.upperFreeMarginArcMM,row.lowerFreeMarginArcMM].every(v=>Number.isFinite(v)&&v>=row.horizontalApertureMM-1e-4))throw Error('Invalid free-margin length');
   }
   return report;
  }
- snapshot(){return {...super.snapshot(),stage1:{schema:'kaopu/eye-contour-stage1@1',baseline:BASELINE,compareOriginal:!!this.contourBaseline}};}
+ snapshot(){return {...super.snapshot(),stage1:{schema:'kaopu/eye-contour-stage1@1',baseline:BASELINE,compareOriginal:!!this.contourBaseline,closedRestEnabled:this.closedRestEnabled!==false}};}
  restore(o){
-  if(o?.stage1){if(o.stage1.schema!=='kaopu/eye-contour-stage1@1'||o.stage1.baseline!==BASELINE)throw Error('Unsupported contour recipe');this.contourBaseline=!!o.stage1.compareOriginal;}
+  if(o?.stage1){if(o.stage1.schema!=='kaopu/eye-contour-stage1@1'||o.stage1.baseline!==BASELINE)throw Error('Unsupported contour recipe');this.contourBaseline=!!o.stage1.compareOriginal;this.closedRestEnabled=o.stage1.closedRestEnabled!==false;}
   super.restore(o);
  }
- info(){return {...super.info(),contourStage1:{baseline:BASELINE,independentEyeSplines:true,globeAndIrisRescaled:false,centreDepthLocked:true,openPersonSpecificScan:false,stage2Rebuilt:false,stage4DynamicsRebuilt:false}};}
+ info(){return {...super.info(),contourStage1:{baseline:BASELINE,independentEyeSplines:true,closedSurfaceFromCapturedReference:true,globeAndIrisRescaled:false,centreDepthLocked:true,openPersonSpecificScan:false,stage2Rebuilt:false,stage4DynamicsRebuilt:false}};}
 }

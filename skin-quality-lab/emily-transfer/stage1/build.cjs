@@ -1,3 +1,4 @@
+require('./closure-install.cjs');
 // Reproducible ET08 stage-one build. Always patches the USER-SPECIFIED source,
 // never a stale ET01/ET04 installer or the branch's previous generated bundle.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),vm=require('node:vm'),cp=require('node:child_process'),assert=require('node:assert/strict'),esbuild=require('esbuild');
@@ -12,12 +13,10 @@ const original=baseFile('app.js');assert.equal(hash(original),'98e90e9d3633b0336
 let app=original,html=baseFile('index.html');
 function replace(a,b){assert.equal(app.split(a).length,2,'Expected one integration anchor: '+a);app=app.replace(a,()=>b);}
 replace("import {EYE_VERSION,IntegratedEyes as EyeSystem} from './talkinghead/IntegratedEyes.js';","import {EYE_VERSION,ContourEyes as EyeSystem} from './stage1/ContourEyes.js';\nimport {createGrayReview} from './stage1/GrayReview.js';\nlet stage1View=null;");
-replace("VERSION='emily-transfer/7.3.0'","VERSION='emily-transfer/8.0.0-s1'");
+replace("VERSION='emily-transfer/7.3.0'","VERSION='emily-transfer/8.0.1-s1'");
 replace('function render(){\n  if(!state.ready)return;','function render(){\n  if(!state.ready)return;\n  if(stage1View){stage1View.render();state.frames++;dirty=false;return;}');
 replace('syncEyeUI();eyesRig.update(0,true);render();','syncEyeUI();eyesRig.update(0,true);stage1View=createGrayReview({rig:eyesRig,mesh,skin,fuzz,renderer,scene,camera,controls,key,fill,rim,state,requestRender:()=>{dirty=true;renderer.shadowMap.needsUpdate=true;},setCamera});render();');
-// The original controls and skin code are preserved; only the default review
-// renderer changes. Runtime creates stage-one controls in the existing panel.
-html=html.replace(/<title>[^<]*<\/title>/,'<title>眼裂轮廓校准 · ET08 第一阶段</title>');
+html=html.replace(/<title>[^<]*<\/title>/,'<title>闭眼表面修复 · ET08-S1.1</title>');
 fs.writeFileSync(ROOT+'/app.js',app);fs.writeFileSync(ROOT+'/index.html',html);
 const r01=path.resolve(ROOT,'../r01');
 const result=esbuild.buildSync({entryPoints:[ROOT+'/app.js'],bundle:true,minify:true,format:'iife',target:'es2022',write:false,metafile:true,legalComments:'inline',alias:{three:r01+'/vendor/three.module.js','three/addons':r01+'/vendor/addons'}});
@@ -28,13 +27,11 @@ const code=result.outputFiles[0].text.replaceAll('../r01/',assetRoot+'r01/').rep
 new vm.Script(code);
 let preview=html.replace(/<script type="importmap">[\s\S]*?<\/script>/,'').replace('<script type="module" src="./app.js"></script>',()=>'<script>'+code+'</script>');
 preview=preview.replaceAll('../r01/',assetRoot+'r01/').replaceAll('../r02/',assetRoot+'r02/');
-// Minifiers may remove the upstream MIT comment, so retain its exact notice
-// in the standalone HTML independently of minifier comment heuristics.
 const upstream=fs.readFileSync(ROOT+'/talkinghead/vendor/TalkingHeadBehavior.mjs','utf8');
 const notice=upstream.match(/^\/\*\*[\s\S]*?\*\//)?.[0];assert(notice&&notice.includes('MIT License'));
 preview=preview.replace('</head>',()=>'<!--\n'+notice.replaceAll('-->','-- >')+'\n-->\n</head>');
 const scripts=[...preview.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)];assert.equal(scripts.length,1);assert.equal(scripts[0][1],code);new vm.Script(scripts[0][1]);
 fs.writeFileSync(ROOT+'/preview.html',preview);
-const manifest={schema:'kaopu/eye-contour-stage1-build@1',version:'ET08-S1',codeVersion:'emily-transfer/8.0.0-s1',eyeVersion:'eyes/8.0.0-s1',baseline:BASE,assetCommit:BASE,baselineAppSHA256:hash(original),appSHA256:hash(app),previewSHA256:hash(preview),previewBytes:Buffer.byteLength(preview),finalEmbeddedScriptSHA256:hash(code),finalHTMLSyntaxValidated:true,oneThreeCore:true,oneRenderer:true,hostAnimationLoopOnly:true,sourceHeadMeshChanged:false,sourceSkinTexturesChanged:false,globeRadiusChanged:false,globeDepthFitChanged:false,irisRadiusChanged:false,defaultView:'gray contour / no skin maps or ocular optics',independentLeftRightContourSplines:true,sharedClosureCurvePerEye:true,existingCanthalAndSectionalGeometryPreserved:true,stage2AnatomyRebuilt:false,stage3MaterialCoordinatesRebuilt:false,stage4DynamicsRebuilt:false,stage5OpticsRebuilt:false,personSpecificOpenScanAvailable:false,sourceLicenseNoticeIncluded:true,realMobileDeviceTested:false,qualityClaim:'Stage-one contour fitting; visual approval remains with the user. Not a person-specific anatomical reconstruction.',verification:'stage1/qa-report.json and current Actions artifact/public-report.json'};
+const manifest={schema:'kaopu/eye-contour-stage1-build@1',version:'ET08-S1.1',codeVersion:'emily-transfer/8.0.1-s1',eyeVersion:'eyes/8.0.1-s1',baseline:BASE,assetCommit:BASE,baselineAppSHA256:hash(original),appSHA256:hash(app),previewSHA256:hash(preview),previewBytes:Buffer.byteLength(preview),finalEmbeddedScriptSHA256:hash(code),finalHTMLSyntaxValidated:true,oneThreeCore:true,oneRenderer:true,hostAnimationLoopOnly:true,sourceHeadMeshChanged:false,sourceSkinTexturesChanged:false,globeRadiusChanged:false,globeDepthFitChanged:false,irisRadiusChanged:false,defaultView:'gray contour / no skin maps or ocular optics',independentLeftRightContourSplines:true,closedOuterSurfaceAnchoredToCapturedScan:true,canthalDepthAnchoredToCapturedScan:true,closureSurfaceRegression:true,sharedClosureCurvePerEye:true,existingCanthalAndSectionalGeometryPreserved:true,stage2AnatomyRebuilt:false,stage3MaterialCoordinatesRebuilt:false,stage4DynamicsRebuilt:false,stage5OpticsRebuilt:false,personSpecificOpenScanAvailable:false,sourceLicenseNoticeIncluded:true,realMobileDeviceTested:false,qualityClaim:'Stage-one closed-surface correction; non-physical rest-surface blend; visual approval remains with the user. Not a person-specific anatomical reconstruction.',verification:'stage1/qa-report.json and current Actions artifact/public-report.json'};
 fs.writeFileSync(ROOT+'/BUILD_MANIFEST.json',JSON.stringify(manifest,null,2));fs.writeFileSync(__dirname+'/bundle-inputs.json',JSON.stringify(inputs,null,2));
 console.log('ET08_STAGE1_BUILD',JSON.stringify(manifest));
