@@ -1,4 +1,5 @@
 import {ContourEyes} from '../stage1/ContourEyes.js';
+import {applyClosureCalibration} from '../stage1/ClosedSurface.js';
 import {SECTION_BASELINE,reconstructSection} from './SectionField.js';
 import {createCanthalTissue,updateCanthalTissue} from './CanthalTissue.js';
 export const EYE_VERSION='eyes/9.0.0-s2';
@@ -29,8 +30,9 @@ export class SectionEyes extends ContourEyes{
   const w=1-blink*blink*(3-2*blink),z=p.z+(fair-p.z)*w;
   if(this._stage2MeasuringEye===c)c.stage2MarginDeltaMM=Math.max(c.stage2MarginDeltaMM||0,Math.abs(z-p.z)*1000);p.z=z;return p;
  }
- compareStage1(on){this.sectionEnabled=!on;this.update(0,true);this.requestRender();}
- sectionReport(){return {version:EYE_VERSION,stage:2,baseline:SECTION_BASELINE,enabled:this.sectionEnabled!==false,firstStageClosedSurfacePreserved:true,globeRecalibrated:false,materialsRebuilt:false,physicalDynamicsRebuilt:false,eyes:this.eyes.map(e=>({name:e.c.name,maxOpenCanthalDepthCorrectionMM:e.c.stage2MarginDeltaMM||0,...e.section?.report,canthus:e.section?.canthalReport}))};}
+ prepareStage2Calibration(){this.closedRestEnabled=true;this.contourBaseline=false;applyClosureCalibration(this);}
+ compareStage1(on){this.prepareStage2Calibration();this.sectionEnabled=!on;this.update(0,true);this.requestRender();}
+ sectionReport(){return {version:EYE_VERSION,stage:2,baseline:SECTION_BASELINE,enabled:this.sectionEnabled!==false,actualGlobeCentresMM:this.eyes.map(e=>e.pivot.position.toArray().map(v=>v*1000)),firstStageClosedSurfacePreserved:true,globeRecalibrated:false,materialsRebuilt:false,physicalDynamicsRebuilt:false,eyes:this.eyes.map(e=>({name:e.c.name,maxOpenCanthalDepthCorrectionMM:e.c.stage2MarginDeltaMM||0,...e.section?.report,canthus:e.section?.canthalReport}))};}
  sections(name='right'){
   const e=this.eyes.find(e=>e.c.name===name);if(!e)throw Error('Unknown eye');const {lid}=e,P=lid.mesh.geometry.attributes.position,E=lid.edge.geometry.attributes.position,I=lid.inside.geometry.attributes.position;
   const result={eye:name,units:'metres',upper:[],lower:[],upperMargin:[],lowerMargin:[],upperMucosa:[],lowerMucosa:[]};

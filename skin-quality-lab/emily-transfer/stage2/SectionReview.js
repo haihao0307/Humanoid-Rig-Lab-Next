@@ -21,7 +21,7 @@ export function createSectionReview(host,gray){
  };
  const refresh=()=>{const r=rig.sectionReport();document.getElementById('s2Report').textContent=JSON.stringify(r,null,2);document.getElementById('s2Status').textContent=(r.enabled?'ET09 第二阶段':'ET08-S1.1 修改前')+' · 闭合 '+Math.round(rig.config.manualBlink*100)+'% · 眼裂 XY 与眼球标定保留';refreshLines();requestRender();return r;};
  const compare=on=>{rig.compareStage1(on);document.getElementById('s2Compare').classList.toggle('active',!!on);return refresh();};
- const pose=(b,angles={})=>{rig.closedRestEnabled=true;rig.contourBaseline=false;rig.setInspectionPose(b,angles);gray.refresh();return refresh();};
+ const pose=(b,angles={})=>{rig.prepareStage2Calibration();rig.setInspectionPose(b,angles);gray.refresh();return refresh();};
  const view=v=>{
   if(v==='medialR'||v==='medialL'){
    selected=v==='medialR'?'right':'left';const x=selected==='right'?-.019:.011,dist=camera.aspect<.9?.058:.040;
@@ -39,7 +39,7 @@ export function createSectionReview(host,gray){
  document.getElementById('s2Iris').onchange=e=>window.__STAGE1__.iris(e.target.checked);
  document.getElementById('s1QuickCompare').onclick=()=>compare(rig.sectionEnabled!==false);
  document.getElementById('reset').addEventListener('click',()=>{compare(false);pose(0);view('front');});
- const originalRender=gray.render;gray.render=()=>{const k=rig.config.manualBlink+':'+rig.sectionEnabled;if(k!==lastKey){lastKey=k;refreshLines();}originalRender();document.getElementById('s1Status').textContent=(rig.sectionEnabled===false?'ET08-S1.1 对照':'ET09-S2 分层结构')+' · 闭合 '+Math.round(rig.config.manualBlink*100)+'% · 灰模';};
+ const originalRender=gray.render;gray.render=()=>{const k=rig.config.manualBlink+':'+rig.sectionEnabled;if(k!==lastKey){lastKey=k;refreshLines();}originalRender();const label=rig.contourBaseline?'ET07.3 旧轮廓':rig.closedRestEnabled===false?'第一阶段闭眼修复前':rig.sectionEnabled===false?'ET08-S1.1 对照':'ET09-S2 分层结构';document.getElementById('s1Status').textContent=label+' · 闭合 '+Math.round(rig.config.manualBlink*100)+'% · 灰模';};
  window.__STAGE2__={version:'ET09-S2',baseline:SECTION_BASELINE,pose,compare,view,report:()=>rig.sectionReport(),sections:n=>rig.sections(n),audit:d=>rig.audit(d),globePixels:()=>window.__STAGE1__.globePixels(),sectionLines:on=>{document.getElementById('s2Section').checked=!!on;refresh();}};
  pose(0);view('front');state.stage='ET09-S2';return gray;
 }

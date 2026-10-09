@@ -9,6 +9,17 @@ function check(name,pass,detail){report.checks.push({name,pass:!!pass,detail});a
   check('public immutable payload matches build manifest',sha===manifest.previewSHA256&&data.length===manifest.previewBytes&&manifest.version==='ET09-S2',{sha256:sha,bytes:data.length});
  }
  b=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});p=await b.newPage({viewport:{width:1440,height:1040}});p.on('pageerror',e=>report.errors.push(e.message));await p.goto(url,{waitUntil:'domcontentloaded',timeout:120000});await p.waitForFunction(()=>window.__STAGE2__&&window.__SKIN_LAB__?.state.ready,null,{timeout:180000});await p.evaluate(()=>{window.__EYE_QA_FREEZE__=true;__STAGE2__.pose(0);});
+ const oldControls=await p.evaluate(()=>{
+  const base=JSON.stringify(__STAGE2__.report().actualGlobeCentresMM);
+  __STAGE1__.beforeRepair(true);const earlier=JSON.stringify(__STAGE2__.report().actualGlobeCentresMM);__STAGE2__.pose(0);const poseRestored=JSON.stringify(__STAGE2__.report().actualGlobeCentresMM)===base;
+  __STAGE1__.beforeRepair(true);__STAGE2__.compare(true);const compareRestored=JSON.stringify(__STAGE2__.report().actualGlobeCentresMM)===base;
+  __STAGE1__.compare(true);__STAGE2__.compare(false);const oldContourRestored=JSON.stringify(__STAGE2__.report().actualGlobeCentresMM)===base;
+  return {base:JSON.parse(base),positiveLegacyDifference:earlier!==base,poseRestored,compareRestored,oldContourRestored};
+ });
+ check('legacy depth comparison positive control',oldControls.positiveLegacyDifference,oldControls);
+ check('stage2 pose restores S1.1 calibration after old controls',oldControls.poseRestored,oldControls);
+ check('stage2 compare restores S1.1 calibration after old controls',oldControls.compareRestored,oldControls);
+ check('stage2 release restores from legacy ET07 contour',oldControls.oldContourRestored,oldControls);
  for(const b of [0,.25,.5,.75,.85,.95,.98,1]){
   const r=await p.evaluate(b=>{__STAGE2__.pose(b);const before=__STAGE2__.report();const outline=__STAGE1__.report();const after=__STAGE2__.report();return {surface:__STAGE2__.audit(true),section:after,outline,diagnosticsNonMutating:JSON.stringify(before)===JSON.stringify(after)};},b);report.poses.push({b,...r});
   check('closure '+b+' inspection does not mutate pose metrics',r.diagnosticsNonMutating);
@@ -19,6 +30,7 @@ function check(name,pass,detail){report.checks.push({name,pass:!!pass,detail});a
    check(e.name+' limited open canthal depth smoothing',e.maxOpenCanthalDepthCorrectionMM<1.1,e.maxOpenCanthalDepthCorrectionMM);
    const t=e.canthus;
    check(e.name+' actual low caruncle, plica and recessed lake',t.caruncleVsAttachmentPlaneMM>.20&&t.caruncleVsAttachmentPlaneMM<.8&&t.plicaVsAttachmentPlaneMM>.15&&t.plicaVsAttachmentPlaneMM<.7&&t.lakeRecessBelowAttachmentPlaneMM<-.03&&t.lakeRecessBelowAttachmentPlaneMM>-.35,{caruncle:t.caruncleVsAttachmentPlaneMM,plica:t.plicaVsAttachmentPlaneMM,lake:t.lakeRecessBelowAttachmentPlaneMM,units:'mm relative to local upper/lower attachment interpolation; not clinical data'});
+   check(e.name+' finite temporal join reaches contact interface',t.temporalJoinSpanMM>1.5&&t.temporalJoinSpanMM<2.6,t.temporalJoinSpanMM);
   }
   if(b===1)check('full closure no new canthal depth correction',r.section.eyes.every(e=>e.maxOpenCanthalDepthCorrectionMM===0&&e.completeClosedSurfaceDeltaMM===0));
  }
