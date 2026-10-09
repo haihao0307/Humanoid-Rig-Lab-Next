@@ -1,0 +1,114 @@
+name: ET05 reviewed eyelid public release
+on:
+  push:
+    branches: [fix/eyelid-volume-et05-20261009]
+    paths: ['.github/workflows/et05-release.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: et05-public-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: et05-structure-review
+          run-id: 37882209978
+          github-token: ${{ github.token }}
+          path: /tmp/et05-selected
+      - name: Restore only the actual reviewed candidate
+        run: |
+          python3 - <<'PY'
+          import json,hashlib,pathlib,shutil
+          selected=pathlib.Path('/tmp/et05-selected')
+          report=json.loads((selected/'visual/report.json').read_text())
+          manifest=json.loads((selected/'candidate/BUILD_MANIFEST.json').read_text())
+          assert report['passed'] and not report['errors'] and not report['consoleErrors'] and not report['failedRequests']
+          assert report['sourceCommit']=='33b5e6884e8fad1a292e94d32f0915affc168256'
+          expected='c4d6a626bb10244a05164a0aea42d5d50243a04d4b18a61863502525891c776a'
+          assert manifest['previewSHA256']==expected
+          assert hashlib.sha256((selected/'candidate/preview.html').read_bytes()).hexdigest()==expected
+          dest=pathlib.Path('skin-quality-lab/emily-transfer')
+          shutil.copytree(selected/'candidate',dest,dirs_exist_ok=True)
+          shutil.copy2(selected/'visual/report.json',dest/'anatomy/qa-local.json')
+          evidence=dest/'anatomy/evidence';evidence.mkdir(exist_ok=True)
+          for name in ['02-eyes.png','03-upper-lid-oblique.png','04-half-closed.png','05-closed.png']:
+            shutil.copy2(selected/'visual'/name,evidence/name)
+          out=pathlib.Path('/tmp/et05-public-release');out.mkdir(exist_ok=True)
+          shutil.copytree(selected/'visual',out/'local',dirs_exist_ok=True)
+          print('REVIEWED_CANDIDATE_RESTORED',expected)
+          PY
+      - name: Prepare browser and independent profile checks
+        timeout-minutes: 4
+        run: |
+          npm install --prefix /tmp/et05-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/et05-tools/node_modules/.bin/playwright install chromium
+          timeout 60s sudo apt-get install --no-install-recommends -y fonts-wqy-zenhei || true
+      - name: Validate actual aperture functions and retained native behavior
+        env:
+          NODE_PATH: /tmp/et05-tools/node_modules
+        run: |
+          node skin-quality-lab/emily-transfer/anatomy/profile-test.cjs
+          node skin-quality-lab/emily-transfer/talkinghead/test-kernel.mjs
+          cp skin-quality-lab/emily-transfer/anatomy/profile-report.json /tmp/et05-public-release/profile-report.json
+      - name: Publish exact reviewed geometry to the isolated branch
+        run: |
+          git config user.name 'eyelid-structure-validation'
+          git config user.email 'eyelid-structure-validation@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(eyes): preserve reviewed ET05 upper-lid structure and evidence [skip ci]'
+            git push origin HEAD:fix/eyelid-volume-et05-20261009
+          fi
+          git rev-parse HEAD > /tmp/et05-public-release/published-commit.txt
+      - name: Verify actual public bytes
+        run: |
+          python3 - <<'PY'
+          import pathlib,urllib.request,hashlib,json
+          out=pathlib.Path('/tmp/et05-public-release')
+          sha=(out/'published-commit.txt').read_text().strip()
+          raw='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+sha+'/skin-quality-lab/emily-transfer/preview.html'
+          response=urllib.request.urlopen(raw,timeout=75)
+          data=response.read()
+          manifest=json.loads(pathlib.Path('skin-quality-lab/emily-transfer/BUILD_MANIFEST.json').read_text())
+          digest=hashlib.sha256(data).hexdigest()
+          assert digest==manifest['previewSHA256']
+          assert b'MIT License' in data and b'Permission is hereby granted' in data
+          report={'publishedCommit':sha,'rawURL':raw,'url':'https://htmlpreview.github.io/?'+raw,'status':response.status,'bytes':len(data),'sha256':digest,'matchesReviewedCandidate':True,'licenseIncluded':True}
+          (out/'public-bytes.json').write_text(json.dumps(report,indent=2))
+          (out/'OPEN_WEBSITE.txt').write_text(report['url'])
+          print('PUBLIC_BYTES_PASS',json.dumps(report))
+          PY
+      - name: Independent public browser rendering and interactions
+        env:
+          NODE_PATH: /tmp/et05-tools/node_modules
+          EVIDENCE_DIR: /tmp/et05-public-release/public
+        run: |
+          export PUBLIC_COMMIT="$(cat /tmp/et05-public-release/published-commit.txt)"
+          export PUBLIC_URL="$(cat /tmp/et05-public-release/OPEN_WEBSITE.txt)"
+          node skin-quality-lab/emily-transfer/anatomy/qa.cjs
+      - name: Preserve public evidence and source
+        if: always()
+        run: |
+          mkdir -p /tmp/et05-public-release/candidate
+          cp -r skin-quality-lab/emily-transfer/. /tmp/et05-public-release/candidate/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et05-reviewed-public-release
+          path: /tmp/et05-public-release
+          retention-days: 14
