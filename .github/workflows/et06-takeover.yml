@@ -36,13 +36,14 @@ jobs:
           NODE_PATH: /tmp/et06-tools/node_modules
           ASSET_COMMIT: ${{ github.sha }}
         run: |
-          if ! grep -q "VERSION='emily-transfer/6.0.0'" skin-quality-lab/emily-transfer/app.js; then
+          if ! grep -q "VERSION='emily-transfer/6\." skin-quality-lab/emily-transfer/app.js; then
             node skin-quality-lab/emily-transfer/takeover/apply-et06.cjs
           fi
+          node skin-quality-lab/emily-transfer/takeover/refine-et06.cjs
           node skin-quality-lab/emily-transfer/anatomy/bundle.cjs
           git diff --exit-code -- skin-quality-lab/r01 skin-quality-lab/r02
           node skin-quality-lab/emily-transfer/talkinghead/test-kernel.mjs
-      - name: Actual shared seam, posterior contact and visual regression
+      - name: Actual shared seam, triangle contact and visual regression
         env:
           NODE_PATH: /tmp/et06-tools/node_modules
           EVIDENCE_DIR: /tmp/et06-evidence/local
@@ -54,6 +55,13 @@ jobs:
           cp skin-quality-lab/emily-transfer/BUILD_MANIFEST.json /tmp/et06-evidence/candidate/
           cp skin-quality-lab/emily-transfer/preview.html /tmp/et06-evidence/candidate/
           cp skin-quality-lab/emily-transfer/research/ResearchEyes.js /tmp/et06-evidence/candidate/
+          tar -czf /tmp/et06-evidence/candidate/source.tgz skin-quality-lab/emily-transfer
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et06-1-early-visual-review
+          path: /tmp/et06-evidence
+          retention-days: 14
       - name: Publish only tested candidate to isolated branch
         if: success()
         run: |
@@ -62,7 +70,7 @@ jobs:
           cp /tmp/et06-evidence/local/report.json skin-quality-lab/emily-transfer/takeover/qa-report.json
           git add skin-quality-lab/emily-transfer
           if ! git diff --cached --quiet; then
-            git commit -m 'build(eyes): connected ET06 eyelids and validation evidence [skip ci]'
+            git commit -m 'build(eyes): ET06.1 spherical eyelid contact and triangle checks [skip ci]'
             git push origin HEAD:fix/eye-envelope-takeover-et06-20261009
           fi
           git rev-parse HEAD | tee /tmp/et06-evidence/PUBLISHED_COMMIT.txt
@@ -77,6 +85,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: et06-connected-eyelid-evidence
+          name: et06-1-connected-eyelid-evidence
           path: /tmp/et06-evidence
           retention-days: 14
