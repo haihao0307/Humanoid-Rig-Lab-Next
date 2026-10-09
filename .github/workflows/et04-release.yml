@@ -68,8 +68,10 @@ jobs:
           git config user.name 'et04-integration-validation'
           git config user.email 'et04-integration-validation@users.noreply.github.com'
           git add skin-quality-lab/emily-transfer
-          git commit -m 'build(et04): publish reviewed TalkingHead integration and complete HTML notice [skip ci]'
-          git push origin HEAD:feature/emily-talkinghead-et04-20261009
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(et04): publish reviewed TalkingHead integration and complete HTML notice [skip ci]'
+            git push origin HEAD:feature/emily-talkinghead-et04-20261009
+          fi
           git rev-parse HEAD > /tmp/et04-release/published-commit.txt
           echo "PUBLIC_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Verify actual public bytes and browser interaction
@@ -82,11 +84,12 @@ jobs:
           sha=os.environ['PUBLIC_COMMIT']
           manifest=json.loads(pathlib.Path('skin-quality-lab/emily-transfer/BUILD_MANIFEST.json').read_text())
           url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+sha+'/skin-quality-lab/emily-transfer/preview.html'
+          license_data=pathlib.Path('skin-quality-lab/emily-transfer/talkinghead/vendor/LICENSE').read_bytes()
           for attempt in range(3):
             try:
               data=urllib.request.urlopen(url,timeout=40).read()
               assert hashlib.sha256(data).hexdigest()==manifest['previewSHA256']
-              assert b'Copyright (c) 2024 Mika Suominen' in data
+              assert license_data in data
               pathlib.Path('/tmp/et04-release/public-bytes.json').write_text(json.dumps({'commit':sha,'url':url,'sha256':manifest['previewSHA256'],'bytes':len(data),'verified':True,'upstreamNoticePresent':True},indent=2))
               break
             except Exception:
