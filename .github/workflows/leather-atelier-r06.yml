@@ -1,0 +1,74 @@
+name: Leather Atelier R06 - products, patterns and frozen physics
+on:
+  push:
+    branches: [feature/leather-atelier-r06-20261009]
+    paths:
+      - .github/workflows/leather-atelier-r06.yml
+      - leather-workshop/r06/bootstrap/**
+      - leather-workshop/r06/review.py
+permissions:
+  contents: write
+concurrency:
+  group: leather-atelier-r06
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/leather-atelier-r06-20261009
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check complete source hash before expansion
+        run: |
+          python leather-workshop/r06/bootstrap/unpack.py
+          if [ -f leather-workshop/r06/review.py ]; then python leather-workshop/r06/review.py; fi
+          git fetch --depth=1 origin ea67abee836c9afb7c114017c0dabbce8132f45c
+          git diff --exit-code ea67abee836c9afb7c114017c0dabbce8132f45c -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05
+      - name: Geometry, paper patterns and self-contained build
+        run: |
+          pip install -q pillow playwright==1.55.0
+          mkdir -p leather-workshop/r06/qa
+          python leather-workshop/r06/test.py
+          python leather-workshop/r06/build.py
+          python -m playwright install --with-deps chromium
+      - name: Real browser visual and functional checks
+        run: python leather-workshop/r06/qa.py
+      - name: Cache real-rendered thumbnails and recheck built delivery
+        run: |
+          python leather-workshop/r06/build.py
+          python leather-workshop/r06/qa.py
+      - name: Publish only new atelier and anchor
+        id: build
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f leather-workshop/r06/test-generated.mjs
+          git diff --exit-code ea67abee836c9afb7c114017c0dabbce8132f45c -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05
+          git add -f leather-workshop/r06/site leather-workshop/r06/build.py leather-workshop/r06/test.py leather-workshop/r06/qa.py leather-workshop/r06/BUILD_MANIFEST.json leather-workshop/r06/preview.html leather-workshop/r06/thumbnails.json leather-workshop/r06/qa leather-workshop/anchors/LEATHER_R051_ATELIER_ANCHOR.json
+          git commit -m 'build(atelier): five leather products, twelve material thumbnails, patterns and actual physics [skip ci]'
+          git push origin HEAD:feature/leather-atelier-r06-20261009
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Verify exact public HTTPS rendering and operations
+        env:
+          SHA: ${{ steps.build.outputs.sha }}
+        run: |
+          URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/leather-workshop/r06/preview.html"
+          python leather-workshop/r06/qa.py "$URL"
+          echo "$URL" > leather-workshop/r06/qa/PREVIEW_URL.txt
+          git add -f leather-workshop/r06/qa
+          git commit -m 'test(atelier): exact public build verified [skip ci]'
+          git push origin HEAD:feature/leather-atelier-r06-20261009
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-atelier-r06-proof
+          path: |
+            leather-workshop/r06
+            leather-workshop/anchors/LEATHER_R051_ATELIER_ANCHOR.json
+          retention-days: 14
