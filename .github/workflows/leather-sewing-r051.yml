@@ -1,0 +1,70 @@
+name: Leather R05.1 - outward surfaces and local sewing contact
+on:
+  push:
+    branches: [fix/leather-sewing-r051-20261009]
+    paths:
+      - .github/workflows/leather-sewing-r051.yml
+      - leather-workshop/r05/site/**
+      - leather-workshop/r05/upgrade-r051.py
+      - leather-workshop/r05/qa-r051.py
+      - leather-workshop/r05/test-r051.mjs
+      - leather-workshop/r05/build.py
+permissions:
+  contents: write
+concurrency:
+  group: leather-sewing-r051
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/leather-sewing-r051-20261009
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify accepted R04 without changing any frozen file
+        run: |
+          git fetch --depth=1 origin 3336f8e27ce3820b4ab1b6290e4da6512b295009
+          git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
+          python leather-workshop/r05/verify_anchor.py
+      - name: Prepare licensed assets and R05-only integration
+        run: |
+          pip install -q pillow playwright==1.55.0
+          python leather-workshop/r05/upgrade-r051.py
+          python leather-workshop/r05/build.py
+          node leather-workshop/r05/test-r051.mjs
+          python -m playwright install --with-deps chromium
+      - name: Actual file-open, outside thread and tension lifecycle screenshots
+        run: python leather-workshop/r05/qa-r051.py
+      - name: Record independently versioned build
+        id: build
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r05/site leather-workshop/r05/build.py leather-workshop/r05/assets leather-workshop/r05/BUILD_MANIFEST.json leather-workshop/r05/preview.html leather-workshop/r05/qa-r051 leather-workshop/r05/qa/r051-geometry-contact.json
+          git commit -m 'build(sewing-r051): outward thread, licensed grain and solved local surface response [skip ci]'
+          git push origin HEAD:fix/leather-sewing-r051-20261009
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Verify exact public build and frozen anchor
+        env:
+          BUILD_SHA: ${{ steps.build.outputs.sha }}
+        run: |
+          URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/leather-workshop/r05/preview.html"
+          python leather-workshop/r05/qa-r051.py "$URL"
+          echo "$URL" > leather-workshop/r05/qa-r051/PREVIEW_URL.txt
+          python leather-workshop/r05/verify_anchor.py > leather-workshop/r05/qa-r051/anchor.json
+          git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
+          git add -f leather-workshop/r05/qa-r051
+          git commit -m 'test(sewing-r051): immutable public normals, grain and micro-contact proof [skip ci]'
+          git push origin HEAD:fix/leather-sewing-r051-20261009
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sewing-r051-visual-contact-proof
+          path: leather-workshop/r05
+          retention-days: 14
