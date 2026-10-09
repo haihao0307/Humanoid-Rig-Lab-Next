@@ -1,0 +1,85 @@
+name: Emily skin transfer validation
+on:
+  push:
+    branches: [experiment/emily-skin-transfer-r01-20261008]
+    paths:
+      - '.github/workflows/emily-skin-transfer.yml'
+      - 'skin-quality-lab/emily-transfer/**'
+permissions:
+  contents: write
+concurrency:
+  group: emily-transfer-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser tools
+        run: |
+          npm install --prefix /tmp/skin-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/skin-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Read reference source
+        run: |
+          mkdir -p /tmp/skin-evidence
+          python3 - <<'PY'
+          import urllib.request, json, pathlib, hashlib
+          url='https://alteredqualia.com/xg/examples/emily.html'
+          try:
+            raw=urllib.request.urlopen(url,timeout=45).read()
+            text=raw.decode()
+            lines=text.splitlines()
+            pathlib.Path('/tmp/skin-evidence/emily-reference.html').write_text(text)
+            report={'url':url,'sha256':hashlib.sha256(raw).hexdigest(),'materialSource':[{'line':i+1,'text':s} for i,s in enumerate(lines) if 1629<=i<=1647]}
+            pathlib.Path('/tmp/skin-evidence/reference-source.json').write_text(json.dumps(report,indent=2))
+            print(json.dumps(report,indent=2))
+          except Exception as e:
+            print('Reference fetch unavailable on this run:',e)
+          PY
+      - name: Build transfer candidate
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: node skin-quality-lab/emily-transfer/build.cjs
+      - name: Preserve candidate files for debugging
+        if: always()
+        run: |
+          mkdir -p /tmp/skin-evidence/candidate
+          cp -r skin-quality-lab/emily-transfer/. /tmp/skin-evidence/candidate/
+      - name: Browser validation
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+        run: node skin-quality-lab/emily-transfer/qa.cjs
+      - name: Publish only validated transfer files
+        if: success()
+        run: |
+          test -f skin-quality-lab/emily-transfer/qa-report.json
+          git config user.name 'skin-transfer-validation'
+          git config user.email 'skin-transfer-validation@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(skin): publish validated Emily transfer preview and evidence [skip ci]'
+            git push origin HEAD:experiment/emily-skin-transfer-r01-20261008
+          fi
+      - name: Verify published HTTPS page
+        if: success()
+        env:
+          NODE_PATH: /tmp/skin-tools/node_modules
+        run: node skin-quality-lab/emily-transfer/public.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: emily-transfer-evidence
+          path: /tmp/skin-evidence
+          retention-days: 14

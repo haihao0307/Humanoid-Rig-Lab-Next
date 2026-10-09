@@ -1,0 +1,50 @@
+name: Skin Lab original reference inspection
+on:
+  push:
+    branches: [experiment/skin-quality-lab-r01-20261007]
+    paths: [.github/workflows/skin-lab-r01-hires.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Inspect archive reference and preserve license
+        run: |
+          mkdir -p inspection
+          python - <<'PY'
+          import urllib.request,urllib.parse,pathlib,re,json,zipfile,io
+          out=pathlib.Path('inspection'); result={}
+          origin='https://casual-effects.com/g3d/data10/'
+          try:
+            text=urllib.request.urlopen(origin+'index.html',timeout=30).read().decode()
+            scripts=re.findall(r'<script[^>]*src=[\"\']([^\"\']+)',text)
+            result['scripts']=scripts
+            for i,s in enumerate(scripts):
+              if s.startswith('http') and 'casual-effects.com' not in s: continue
+              try:
+                data=urllib.request.urlopen(urllib.parse.urljoin(origin,s),timeout=30).read().decode()
+                (out/('script-'+str(i)+'.txt')).write_text(data)
+                lines=data.splitlines();hits=[]
+                for j,l in enumerate(lines):
+                  if re.search(r'Perry|head[./]|name.*Head',l,re.I):hits.extend(lines[max(0,j-2):j+4])
+                result[s]=hits[:100]
+              except Exception as e:result[s]=str(e)
+          except Exception as e:result['pageError']=str(e)
+          url=origin+'research/model/head/head.zip'
+          try:
+            data=urllib.request.urlopen(url,timeout=90).read(180000000)
+            z=zipfile.ZipFile(io.BytesIO(data));result['zipUrl']=url;result['zipBytes']=len(data);result['zipFiles']=[{'name':n.filename,'size':n.file_size} for n in z.infolist()]
+            (out/'head-original.zip').write_bytes(data)
+            for n in z.namelist():
+              if re.search(r'license|readme|copyright',n,re.I) and not n.endswith('/'):
+                result[n]=z.read(n).decode(errors='replace')[:16000]
+          except Exception as e:result['zipError']=str(e)
+          (out/'inspection.json').write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: skin-lab-original-inspection
+          path: inspection/
+          retention-days: 7

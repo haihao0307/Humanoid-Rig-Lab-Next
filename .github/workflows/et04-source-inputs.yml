@@ -1,0 +1,40 @@
+name: ET04 pinned TalkingHead inputs
+on:
+  push:
+    branches: [feature/emily-talkinghead-et04-20261009]
+    paths: ['.github/workflows/et04-source-inputs.yml']
+permissions:
+  contents: read
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Retrieve licensed source at immutable commit
+        run: |
+          mkdir -p /tmp/et04-inputs/vendor
+          python3 - <<'PY'
+          import urllib.request,pathlib,hashlib,json
+          sha='b3e277b3b46f88e557bf28a2c5612a5b04e075c3'
+          base='https://raw.githubusercontent.com/met4citizen/TalkingHead/'+sha+'/'
+          dest=pathlib.Path('/tmp/et04-inputs/vendor')
+          manifest={'repository':'met4citizen/TalkingHead','commit':sha,'files':[]}
+          for p in ['modules/talkinghead.mjs','modules/dynamicbones.mjs','modules/retargeter.mjs','modules/playback-worklet.js','LICENSE','README.md','package.json']:
+            data=urllib.request.urlopen(base+p,timeout=30).read()
+            f=dest/p;f.parent.mkdir(parents=True,exist_ok=True);f.write_bytes(data)
+            manifest['files'].append({'path':p,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+          (dest/'SOURCE.json').write_text(json.dumps(manifest,indent=2))
+          print(json.dumps(manifest,indent=2))
+          PY
+      - name: Build tools for offline inspection
+        run: |
+          npm install --prefix /tmp/et04-tools --no-audit --no-fund esbuild@0.25.11 acorn@8.15.0 playwright@1.56.1 pngjs@7.0.0
+          tar -czf /tmp/et04-inputs/build-tools.tgz -C /tmp/et04-tools node_modules package.json package-lock.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: et04-pinned-inputs
+          path: /tmp/et04-inputs
+          retention-days: 14

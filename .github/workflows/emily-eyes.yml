@@ -1,0 +1,84 @@
+name: Emily eyes integration
+on:
+  push:
+    branches: [experiment/emily-skin-transfer-r01-20261008]
+    paths:
+      - '.github/workflows/emily-eyes.yml'
+      - 'skin-quality-lab/emily-transfer/eyes/**'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: emily-eyes-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  eyes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/download-artifact@v4
+        with:
+          name: official-cc0-eye-maps
+          run-id: 37751294589
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/eye-maps
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser tools
+        run: |
+          npm install --prefix /tmp/eye-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/eye-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Build from the preserved skin source
+        env:
+          NODE_PATH: /tmp/eye-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          python3 skin-quality-lab/emily-transfer/eyes/prepare.py
+          node skin-quality-lab/emily-transfer/build.cjs
+          node skin-quality-lab/emily-transfer/eyes/refine.cjs
+          python3 skin-quality-lab/emily-transfer/eyes/repair_naturalize.py
+          node skin-quality-lab/emily-transfer/eyes/naturalize.cjs
+      - name: Actual browser regression
+        env:
+          NODE_PATH: /tmp/eye-tools/node_modules
+        run: node skin-quality-lab/emily-transfer/eyes/qa.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eye-local-visual-review
+          path: /tmp/eye-evidence
+          retention-days: 14
+      - name: Publish tested candidate without changing old releases
+        run: |
+          test -f skin-quality-lab/emily-transfer/eyes/qa-report.json
+          git config user.name 'eye-integration-validation'
+          git config user.email 'eye-integration-validation@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(eyes): publish natural fitted eyes and browser evidence [skip ci]'
+            git push origin HEAD:experiment/emily-skin-transfer-r01-20261008
+          fi
+          git rev-parse HEAD > /tmp/eye-evidence/published-commit.txt
+      - name: Verify immutable public website
+        env:
+          NODE_PATH: /tmp/eye-tools/node_modules
+        run: EYE_PUBLIC_SHA=$(git rev-parse HEAD) node skin-quality-lab/emily-transfer/eyes/qa.cjs
+      - name: Preserve source and evidence
+        if: always()
+        run: |
+          mkdir -p /tmp/eye-evidence/candidate
+          cp skin-quality-lab/emily-transfer/app.js skin-quality-lab/emily-transfer/index.html skin-quality-lab/emily-transfer/preview.html skin-quality-lab/emily-transfer/BUILD_MANIFEST.json /tmp/eye-evidence/candidate/ || true
+          cp -r skin-quality-lab/emily-transfer/eyes /tmp/eye-evidence/candidate/ || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eye-integration-evidence
+          path: /tmp/eye-evidence
+          retention-days: 14

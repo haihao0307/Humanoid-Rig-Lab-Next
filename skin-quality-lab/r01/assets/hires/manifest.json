@@ -1,0 +1,41 @@
+{
+  "schema": "kaopu/skin-reference-build@1",
+  "original_asset": "Infinite, 3D Head Scan by Lee Perry-Smith",
+  "license": "CC BY 3.0 Unported",
+  "distribution": "Pixar RenderMan Photorealistic Head tutorial, Leif Pedersen",
+  "archive_url": "https://assets.renderman.pixar.com/Tutorials/photorealistic_head/10100_skin_shading_renderman_21.zip",
+  "archive_sha256": "15e802b52dc5bdf0fdb0921c5801c41dd3aff7db3f1f0bdfcb9d407f283172c3",
+  "inputs": {
+    "Skin_Shading/sourceimages/head_Color.jpg": {
+      "resolution": [
+        4096,
+        4096
+      ],
+      "sha256": "4fc7297835e2081cb914d1a8507fc837687102eed7bd3c6bed25b72960a09e08"
+    },
+    "Skin_Shading/sourceimages/disp.tif": {
+      "resolution": [
+        8192,
+        8192
+      ],
+      "dtype": "uint16",
+      "sha256": "b9a298e5925e98afb6aee2e303523ef8500b43580bee22350284e27b46f6af92"
+    }
+  },
+  "changes": "Original 4K color unchanged. 4K tangent normal combines the existing scan normal with band-separated derivatives of true 8K 16-bit displacement. No Pixar shaders, manually painted DMFP/specular/fuzz maps or scene geometry redistributed.",
+  "calibration": "Normal slope strength is an artistic lookdev parameter, not metrologically calibrated displacement.",
+  "outputs": {
+    "albedo-4k.jpg": {
+      "bytes": 8975275,
+      "sha256": "4fc7297835e2081cb914d1a8507fc837687102eed7bd3c6bed25b72960a09e08"
+    },
+    "normal-4k.png": {
+      "bytes": 13935863,
+      "sha256": "5e98e8041db4151602ae89bf11545a24f3a226c77681550a6447a92d922fc161"
+    },
+    "microheight-4k.png": {
+      "bytes": 3317392,
+      "sha256": "6ea15108bb848c726d337ffb6c16c1397a2883f80b7a9d2383ca563f5f12b01b"
+    }
+  }
+}

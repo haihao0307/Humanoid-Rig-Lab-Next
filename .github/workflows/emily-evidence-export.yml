@@ -1,0 +1,39 @@
+name: Emily visual evidence export
+on:
+  push:
+    branches: [experiment/emily-skin-transfer-r01-20261008]
+    paths: ['.github/workflows/emily-evidence-export.yml']
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: skin-quality-lab/emily-transfer
+      - name: Check published file transport
+        run: |
+          python3 - <<'PY'
+          import urllib.request,json,pathlib
+          sha='43618a432e8dfbd78604133e9e27182038c7a7ae'
+          base='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+sha+'/skin-quality-lab/emily-transfer/'
+          urls=[base+'preview.html','https://htmlpreview.github.io/?'+base+'preview.html',base+'evidence/01-emily-method-desktop.png']
+          report=[]
+          for url in urls:
+            try:
+              r=urllib.request.urlopen(url,timeout=25)
+              content=r.read()
+              report.append({'url':url,'status':r.status,'bytes':len(content),'contentType':r.headers.get('Content-Type')})
+            except Exception as e:report.append({'url':url,'error':str(e)})
+          pathlib.Path('skin-quality-lab/emily-transfer/transport-report.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: emily-visual-review
+          path: skin-quality-lab/emily-transfer
+          retention-days: 14

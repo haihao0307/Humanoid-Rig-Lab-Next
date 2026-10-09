@@ -1,0 +1,72 @@
+name: Fitted eyes visual review
+on:
+  push:
+    branches: [experiment/emily-skin-transfer-r01-20261008]
+    paths: ['.github/workflows/emily-eye-fit-review.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/download-artifact@v4
+        with:
+          name: official-cc0-eye-maps
+          run-id: 37751294589
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/eye-maps
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser
+        run: |
+          npm install --prefix /tmp/eye-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/eye-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Build fitted eyes over unchanged skin
+        env:
+          NODE_PATH: /tmp/eye-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          python3 skin-quality-lab/emily-transfer/eyes/prepare.py
+          node skin-quality-lab/emily-transfer/build.cjs
+          node skin-quality-lab/emily-transfer/eyes/refine.cjs
+      - name: Capture actual portrait, closeup and blink
+        env:
+          NODE_PATH: /tmp/eye-tools/node_modules
+        run: |
+          mkdir -p /tmp/eye-fit-review
+          python3 -m http.server 8124 --bind 127.0.0.1 >/tmp/http-eye.log 2>&1 &
+          node <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          (async()=>{const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});const page=await browser.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});await page.addInitScript(()=>window.__EYE_QA_FREEZE__=true);try{
+          await page.goto('http://127.0.0.1:8124/skin-quality-lab/emily-transfer/index.html',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>__SKIN_LAB__?.state.ready&&window.__EYES__,{},{timeout:180000});
+          await page.evaluate(()=>{__EYES__.set({autoBlink:false,autoPupil:false,pupilMM:3.6});__EYES__.step(0,true);});
+          async function shot(name){await page.evaluate(()=>__SKIN_LAB__.render());await page.screenshot({path:'/tmp/eye-fit-review/'+name+'.png',timeout:90000});}
+          await shot('01-portrait');await page.click('[data-camera="eyes"]');await page.evaluate(()=>__EYES__.step(0,true));await shot('02-eyes');
+          await page.evaluate(()=>{__EYES__.setTarget([.13,.09,.7]);__EYES__.step(0,true);});await shot('03-look-right');
+          await page.evaluate(()=>{__EYES__.blink();__EYES__.step(.05);__EYES__.step(.05);});await shot('04-blink');
+          await page.evaluate(()=>{for(let i=0;i<6;i++)__EYES__.step(.05);__EYES__.setMode('camera');});await page.click('[data-camera="iris"]');await page.evaluate(()=>__EYES__.step(0,true));await shot('05-iris');
+          fs.writeFileSync('/tmp/eye-fit-review/review.json',JSON.stringify({errors,eyes:await page.evaluate(()=>__EYES__.info()),runtime:await page.evaluate(()=>__SKIN_LAB__.state)},null,2));if(errors.length)throw Error('Browser errors: '+errors.join(';'));
+          }catch(e){fs.writeFileSync('/tmp/eye-fit-review/failure.json',JSON.stringify({error:String(e),errors},null,2));await page.screenshot({path:'/tmp/eye-fit-review/failure.png',timeout:90000}).catch(()=>{});throw e;}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+      - name: Preserve generated candidate
+        if: always()
+        run: |
+          mkdir -p /tmp/eye-fit-review/candidate
+          cp skin-quality-lab/emily-transfer/app.js skin-quality-lab/emily-transfer/index.html skin-quality-lab/emily-transfer/preview.html skin-quality-lab/emily-transfer/BUILD_MANIFEST.json /tmp/eye-fit-review/candidate/ || true
+          cp -r skin-quality-lab/emily-transfer/eyes /tmp/eye-fit-review/candidate/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fitted-eyes-visual-review
+          path: /tmp/eye-fit-review
+          retention-days: 14

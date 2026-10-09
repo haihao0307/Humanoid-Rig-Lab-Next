@@ -1,0 +1,67 @@
+{
+  "schema": "kaopu/skin-lookdev-release@2",
+  "version": "skin-quality-lab/r02.1",
+  "rendered_commit": "1d4a616672f2a45e869d4ef3e36e710b11f5cf41",
+  "asset_commit": "2368e26e76114f45e716cefba3320cfd76c61a9e",
+  "public_url": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/1d4a616672f2a45e869d4ef3e36e710b11f5cf41/skin-quality-lab/r02/preview.html",
+  "workflow_run": 37611165032,
+  "workflow_artifact": 11478089283,
+  "verified_at": "2026-10-07T11:12:37.880Z",
+  "app_sha256": "e151646eb7661af0159e47d7809ae1f2086ef65302c87e45cfe2fe653df88b71",
+  "preview_sha256": "8f932d37649740cd51321b774ffdd6bb8196338d861259058df4856395dcc3a3",
+  "validation": {
+    "public_browser_render": true,
+    "public_and_local_nine_checks_passed": true,
+    "javascript_and_network_errors": 0,
+    "desktop_viewport": [1440, 1040],
+    "mobile_viewport": [390, 844],
+    "physical_phone": false,
+    "hardware_gpu_performance": false,
+    "browser": "Playwright 1.55.1 Chromium 140; GitHub Actions Linux; SwiftShader",
+    "raw_report_note": "The test harness top-level family label says r02.0. Both initial.state.version and final.state.version correctly identify the rendered r02.1 runtime. Raw evidence is retained without alteration."
+  },
+  "improvements": [
+    "Separate 4K mesostructure and microstructure normals derived from genuine 8K uint16 scan displacement; independent controls",
+    "Bounded vertex relief driven by a separate lower-frequency band",
+    "25-tap per-axis RGB Separable SSS with split-albedo transport, preserving exit-point color",
+    "Light-space entry-depth estimate for thin-part transmission, replacing painted ear-mask glow",
+    "Geometry-derived static hemispherical visibility from 593856 rays, applied to indirect illumination",
+    "14000 tapered, area-weighted peach-fuzz strands with subpixel coverage",
+    "Oil highlights share surface microstructure; stable true-zero oil and held-baseline comparison"
+  ],
+  "runtime": {
+    "head_triangles": 282944,
+    "fuzz_triangles": 84000,
+    "albedo_resolution": [4096, 4096],
+    "base_normal_resolution": [1024, 1024],
+    "meso_micro_surface_resolution": [4096, 4096],
+    "scan_source_resolution": [8192, 8192],
+    "scan_source_type": "uint16",
+    "first_load_uncompressed_transfer_file_bytes_including_bundled_preview": 60036156,
+    "performance_claim": "No hardware FPS guarantee. Desktop high-quality lookdev; not an optimized crowd or mobile runtime."
+  },
+  "selected_profile": {
+    "roughness": 0.5, "oil": 0.25, "detail": 0.75,
+    "meso": 1.1, "micro": 1.25, "relief": 0.7,
+    "pores": 0.24, "poreSize": 0.32, "fuzz": 0.32,
+    "pigment": 0.22, "blood": 0.25,
+    "sss": 0.85, "radius": 1.2, "translucency": 0.65,
+    "occlusion": 0.9, "azimuth": -46, "exposure": 1.03
+  },
+  "quality_scope": {
+    "kyka_parity_accepted": false,
+    "pure_procedural_head": false,
+    "full_volumetric_subsurface_transport": false,
+    "eyes_and_expression_animation": false,
+    "calibrated_biological_measurement": false,
+    "area_light_experiment_adopted": false,
+    "area_light_review_run": 37612541472,
+    "area_light_review_decision": "Not adopted: brighter cavity illumination and insufficient area-light visibility made the selected R02.1 profile preferable in visual review."
+  },
+  "preservation": {
+    "r01_2_files_modified": false,
+    "main_modified": false,
+    "old_pages_replaced": false,
+    "old_preview_commit": "47d63e81f32d81db42a124034bd75d0bf9fe4cb2"
+  }
+}

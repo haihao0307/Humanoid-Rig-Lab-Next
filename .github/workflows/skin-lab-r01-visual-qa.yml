@@ -1,0 +1,72 @@
+name: Skin Lab R01 visual QA
+on:
+  push:
+    branches: [experiment/skin-quality-lab-r01-20261007]
+    paths:
+      - skin-quality-lab/r01/index.html
+      - skin-quality-lab/r01/patch-*.json
+      - skin-quality-lab/r01/tools/**
+      - .github/workflows/skin-lab-r01-visual-qa.yml
+permissions:
+  contents: write
+concurrency:
+  group: skin-lab-r01-visual-qa
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: skin-quality-lab/r01/
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Prepare native scan derivatives and exact reviewed patches
+        run: |
+          git fetch --filter=blob:none origin experiment/skin-quality-lab-r01-20261007
+          git merge --ff-only FETCH_HEAD
+          pip -q install pillow numpy scipy
+          python skin-quality-lab/r01/tools/prepare_hires.py
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          d=Path('skin-quality-lab/r01');p=d/'index.html';s=p.read_text();record=d/'applied-patches.json'
+          applied=json.loads(record.read_text()) if record.exists() else []
+          for patch in sorted(d.glob('patch-*.json')):
+            if patch.name in applied:continue
+            for c in json.loads(patch.read_text())['changes']:
+              if c['old'] in s:
+                assert s.count(c['old'])==c.get('count',1),patch
+                s=s.replace(c['old'],c['new'])
+              elif c['new'] not in s:raise RuntimeError('Patch cannot be applied safely: '+str(patch))
+            applied.append(patch.name)
+          p.write_text(s);record.write_text(json.dumps(applied,indent=2))
+          PY
+          git config user.name 'Skin Lab build'
+          git config user.email 'skin-lab@users.noreply.github.com'
+          git add skin-quality-lab/r01/index.html skin-quality-lab/r01/applied-patches.json
+          git add -f skin-quality-lab/r01/assets/hires
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(skin-lab): native 4K scan derivatives and reviewed render correction'
+            git push origin HEAD:experiment/skin-quality-lab-r01-20261007
+          fi
+          echo "LAB_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Install browser validation dependencies
+        run: |
+          npm install --prefix /tmp/skin-qa playwright@1.55.1 pngjs@7.0.0
+          cd /tmp/skin-qa
+          npx playwright install --with-deps chromium
+      - name: Render local and immutable public preview
+        env:
+          NODE_PATH: /tmp/skin-qa/node_modules
+        run: |
+          python3 -m http.server 8793 --bind 127.0.0.1 --directory skin-quality-lab/r01 > /tmp/skin-http.log 2>&1 &
+          node skin-quality-lab/r01/tools/qa.cjs
+      - name: Upload actual browser evidence and runnable build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skin-lab-r01-render-and-source
+          path: skin-quality-lab/r01/
+          retention-days: 14

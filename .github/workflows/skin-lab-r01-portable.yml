@@ -1,0 +1,66 @@
+name: Skin Lab portable preview and acceptance
+on:
+  push:
+    branches: [experiment/skin-quality-lab-r01-20261007]
+    paths: [.github/workflows/skin-lab-r01-portable.yml]
+permissions:
+  contents: write
+concurrency:
+  group: skin-lab-r01-portable
+  cancel-in-progress: false
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: skin-quality-lab/r01/
+          sparse-checkout-cone-mode: false
+          fetch-depth: 3
+      - name: Install build and browser tools
+        run: |
+          npm install --prefix /tmp/skin-portable esbuild@0.25.10 playwright@1.55.1 pngjs@7.0.0
+          pip -q install pyyaml
+          cd /tmp/skin-portable
+          npx playwright install --with-deps chromium
+      - name: Reuse pinned build and acceptance scripts with literal-safe replacement
+        run: |
+          git show 5fd496fd640ab6936b0fdb9fa60e314710089833:.github/workflows/skin-lab-r01-portable.yml > /tmp/skin-portable/pinned-workflow.yml
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          workflow=yaml.safe_load(Path('/tmp/skin-portable/pinned-workflow.yml').read_text())
+          steps=workflow['jobs']['deliver']['steps']
+          build=next(s['run'] for s in steps if s.get('name')=='Bundle pinned runtime without third-party module dependencies')
+          old=".replace(match[0],'<script>'+js+'</script>')"
+          new=".replace(match[0],()=>'<script>'+js+'</script>')"
+          assert build.count(old)==1
+          build=build.replace(old,new)
+          anchor="fs.writeFileSync(d+'/preview.html',preview);"
+          assert build.count(anchor)==1
+          build=build.replace(anchor,"new (require('vm').Script)(preview.match(/<script>([\\s\\S]*?)<\\/script>/)[1]);\n"+anchor)
+          Path('/tmp/skin-portable/build.sh').write_text(build)
+          test=next(s['run'] for s in steps if s.get('name')=='Verify offline, direct public rendering, parameters, comparison and mobile layout')
+          Path('/tmp/skin-portable/test.sh').write_text(test)
+          PY
+      - name: Build syntax-checked portable files and immutable preview
+        env:
+          NODE_PATH: /tmp/skin-portable/node_modules
+        run: bash -e /tmp/skin-portable/build.sh
+      - name: Verify real offline and public browser rendering
+        env:
+          NODE_PATH: /tmp/skin-portable/node_modules
+        run: bash -e /tmp/skin-portable/test.sh
+      - name: Preserve source and reproducible build scripts
+        if: always()
+        run: |
+          mkdir -p delivery/source delivery/build-tools
+          cp -a skin-quality-lab/r01/. delivery/source/
+          cp /tmp/skin-portable/build.cjs /tmp/skin-portable/verify.cjs delivery/build-tools/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skin-quality-lab-r01-2-delivery
+          path: delivery/
+          retention-days: 14

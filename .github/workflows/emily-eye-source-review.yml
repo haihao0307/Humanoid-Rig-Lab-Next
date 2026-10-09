@@ -1,0 +1,39 @@
+name: Emily eye source review
+on:
+  push:
+    branches: [experiment/emily-skin-transfer-r01-20261008]
+    paths: ['.github/workflows/emily-eye-source-review.yml']
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - name: Prepare reproducible local reference
+        run: |
+          mkdir -p /tmp/eye-review/skin-quality-lab
+          cp -r skin-quality-lab/r01 skin-quality-lab/r02 skin-quality-lab/emily-transfer /tmp/eye-review/skin-quality-lab/
+          rm -rf /tmp/eye-review/skin-quality-lab/r01/assets/hires/displacement* /tmp/eye-review/skin-quality-lab/r01/evidence /tmp/eye-review/skin-quality-lab/r02/evidence
+          python3 - <<'PY'
+          import urllib.request,pathlib
+          p=pathlib.Path('/tmp/eye-review/reference');p.mkdir()
+          u='https://alteredqualia.com/xg/examples/'
+          for name in ['emily.html','js/xg.min.661.js','js/ColorCorrectionShader.em.js']:
+            try:
+              data=urllib.request.urlopen(u+name,timeout=45).read()
+              (p/pathlib.Path(name).name).write_bytes(data)
+            except Exception as e:print(name,str(e))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eye-integration-source
+          path: /tmp/eye-review
+          retention-days: 7

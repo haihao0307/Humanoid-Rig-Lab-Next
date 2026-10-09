@@ -1,0 +1,57 @@
+name: Skin Lab R01 reference assets
+on:
+  push:
+    branches: [experiment/skin-quality-lab-r01-20261007]
+    paths: [.github/workflows/skin-lab-r01-assets.yml]
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: skin-quality-lab/r01/
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Acquire pinned Three and CC-BY head reference
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=skin-quality-lab/r01
+          mkdir -p "$D/assets" "$D/vendor/addons/controls" "$D/vendor/addons/loaders" "$D/vendor/addons/utils"
+          curl --fail --retry 2 -L https://registry.npmjs.org/three/-/three-0.180.0.tgz -o /tmp/three.tgz
+          mkdir /tmp/three && tar -xzf /tmp/three.tgz -C /tmp/three
+          cp /tmp/three/package/build/three.module.js /tmp/three/package/build/three.core.js "$D/vendor/"
+          cp /tmp/three/package/examples/jsm/controls/OrbitControls.js "$D/vendor/addons/controls/"
+          cp /tmp/three/package/examples/jsm/loaders/GLTFLoader.js "$D/vendor/addons/loaders/"
+          cp /tmp/three/package/examples/jsm/utils/BufferGeometryUtils.js "$D/vendor/addons/utils/"
+          cp /tmp/three/package/LICENSE "$D/vendor/THREE-LICENSE.txt"
+          python - <<'PY'
+          import urllib.request, pathlib, json, hashlib, struct
+          d=pathlib.Path('skin-quality-lab/r01/assets')
+          base='https://raw.githubusercontent.com/mrdoob/three.js/r180/examples/models/gltf/LeePerrySmith/'
+          files={'head.glb':'LeePerrySmith.glb','albedo.jpg':'Map-COL.jpg','normal.jpg':'Infinite-Level_02_Tangent_SmoothUV.jpg','specular.jpg':'Map-SPEC.jpg','displacement.jpg':'Infinite-Level_02_Disp_NoSmoothUV-4096.jpg','HEAD-LICENSE.txt':'LeePerrySmith_License.txt'}
+          manifest={}
+          for out,source in files.items():
+              data=urllib.request.urlopen(base+source, timeout=60).read()
+              (d/out).write_bytes(data)
+              manifest[out]={'source':base+source,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+          print((d/'HEAD-LICENSE.txt').read_text())
+          (d/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          b=(d/'head.glb').read_bytes(); n=struct.unpack_from('<I',b,12)[0]; j=json.loads(b[20:20+n])
+          print('GLB',json.dumps({'nodes':j.get('nodes'),'accessors':j['accessors'],'meshes':j['meshes']},indent=2))
+          PY
+      - name: Commit only isolated lab assets
+        run: |
+          git config user.name 'Skin Lab build'
+          git config user.email 'skin-lab@users.noreply.github.com'
+          git add skin-quality-lab/r01/assets skin-quality-lab/r01/vendor
+          git commit -m 'build(skin-lab): pin CC-BY reference maps and Three r180 runtime'
+          git push origin HEAD:experiment/skin-quality-lab-r01-20261007
+      - uses: actions/upload-artifact@v4
+        with:
+          name: skin-lab-r01-reference
+          path: skin-quality-lab/r01/
+          retention-days: 7

@@ -1,0 +1,18 @@
+{
+  "replace": [
+    ["skin.clearcoat=compareHeld?0:values.oil*.68;", "skin.clearcoat=Math.max(.00001,compareHeld?0:values.oil*.68);"],
+    ["material.clearcoat*=mix(1.,clamp(.35+1.2*skinSpecMask,.25,1.),1.-uBaseline);", "material.clearcoat*=uBaseline>.5||uOil<.00001?0.:clamp(.35+1.2*skinSpecMask,.25,1.);"],
+    ["translucency:.65};", "translucency:.65,occlusion:.9};"],
+    ["const E={uMeso:", "const E={uOcclusion:{value:.9},uMeso:"],
+    ["function apply(){E.uMeso.value", "function apply(){E.uOcclusion.value=values.occlusion;E.uMeso.value"],
+    ["const p=Array.from(oldP.array),n=Array.from(oldN.array),uv=Array.from(oldUV.array),out=[]", "const ao=g.attributes.skinOcclusion?Array.from(g.attributes.skinOcclusion.array):Array(oldP.count).fill(1);const p=Array.from(oldP.array),n=Array.from(oldN.array),uv=Array.from(oldUV.array),out=[]"],
+    ["const i=p.length/3;let x=", "const i=p.length/3;ao.push((ao[a]+ao[b])*.5);let x="],
+    ["q.setIndex(out);return q}", "q.setIndex(out);q.setAttribute(\"skinOcclusion\",new THREE.Float32BufferAttribute(ao,1));return q}"],
+    ["s.vertexShader=s.vertexShader.replace('#include <common>'", "s.vertexShader='attribute float skinOcclusion;varying float vSkinAO;\\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <common>'"],
+    ["vSkinPosition=transformed;", "vSkinPosition=transformed;vSkinAO=skinOcclusion;"],
+    ["s.fragmentShader=s.fragmentShader.replace('#include <packing>'", "s.fragmentShader='varying float vSkinAO;uniform float uOcclusion;\\n'+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <packing>'"],
+    ["s.fragmentShader=s.fragmentShader.replace('#include <lights_physical_pars_fragment>',physical);", "s.fragmentShader=s.fragmentShader.replace('#include <lights_physical_pars_fragment>',physical);\n s.fragmentShader=s.fragmentShader.replace('#include <aomap_fragment>',`#include <aomap_fragment>\\n float skinVisibility=mix(1.,clamp(vSkinAO,.12,1.),uOcclusion*(1.-uBaseline));reflectedLight.indirectDiffuse*=skinVisibility;reflectedLight.indirectSpecular*=sqrt(skinVisibility);`);"],
+    ["const intermediate=subdivide(source.geometry);", "const aoResponse=await fetch(\"./assets/occlusion.bin\");if(!aoResponse.ok)throw new Error(\"AO resource unavailable\");const ao=new Float32Array(await aoResponse.arrayBuffer());if(ao.length!==source.geometry.attributes.position.count)throw new Error(\"AO vertex count mismatch\");source.geometry.setAttribute(\"skinOcclusion\",new THREE.BufferAttribute(ao,1));const intermediate=subdivide(source.geometry);"],
+    ["for(const id in defaults)$(id).addEventListener", "const aoControl=document.createElement('div');aoControl.className='control';aoControl.innerHTML='<label for=\"occlusion\">凹处环境遮光<output id=\"occlusionOut\"></output></label><input id=\"occlusion\" type=\"range\" min=\"0\" max=\"1\" step=\"0.01\" value=\".9\">';$('fuzz').closest('.section').appendChild(aoControl);\nfor(const id in defaults)$(id).addEventListener"]
+  ]
+}

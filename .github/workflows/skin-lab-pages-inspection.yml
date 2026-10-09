@@ -1,0 +1,41 @@
+name: Skin Lab Pages read-only inspection
+on:
+  push:
+    branches: [experiment/skin-quality-lab-r01-20261007]
+    paths: [.github/workflows/skin-lab-pages-inspection.yml]
+permissions:
+  contents: read
+  actions: read
+  pages: read
+  deployments: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Read active publication metadata without changing settings
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inspection
+          python - <<'PY'
+          import urllib.request,json,os,pathlib
+          base='https://api.github.com/repos/haihao0307/Humanoid-Rig-Lab-Next';result={}
+          def get(path):
+            req=urllib.request.Request(base+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'SkinLab-publication-inspection'})
+            with urllib.request.urlopen(req,timeout=30) as r:return json.load(r)
+          for path in ['/pages','/environments/github-pages','/deployments?environment=github-pages&per_page=8','/actions/artifacts?name=github-pages&per_page=50']:
+            try:result[path]=get(path)
+            except Exception as e:result[path]={'error':str(e)}
+          deps=result.get('/deployments?environment=github-pages&per_page=8',[])
+          if isinstance(deps,list):
+            for d in deps:
+              try:d['recent_statuses']=get('/deployments/'+str(d['id'])+'/statuses?per_page=3')
+              except Exception as e:d['status_error']=str(e)
+          pathlib.Path('inspection/pages.json').write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: skin-lab-pages-readonly
+          path: inspection/
+          retention-days: 7

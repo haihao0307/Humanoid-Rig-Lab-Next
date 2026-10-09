@@ -1,0 +1,49 @@
+name: Emily independent public delivery proof
+on:
+  push:
+    branches: [experiment/emily-skin-transfer-r01-20261008]
+    paths: ['.github/workflows/emily-public-proof.yml']
+permissions:
+  contents: read
+jobs:
+  public-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare independent browser
+        run: |
+          npm install --prefix /tmp/proof-tools --no-audit --no-fund playwright@1.56.1 pngjs@7.0.0
+          /tmp/proof-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Direct public browser proof
+        env:
+          NODE_PATH: /tmp/proof-tools/node_modules
+        run: |
+          mkdir -p /tmp/public-proof
+          node <<'JS'
+          const fs=require('fs'),assert=require('assert/strict'),{chromium}=require('playwright'),{PNG}=require('pngjs');
+          const out='/tmp/public-proof',commit='a08f7fff098dad3a18fb655418660ddaae4ecb35';
+          const url='https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+commit+'/skin-quality-lab/emily-transfer/preview.html';
+          const report={commit,url,localServer:false,networkInterception:false,viewport:{width:1024,height:768},physicalMobileDevice:false,errors:[],consoleErrors:[],requests:[],failedRequests:[],checkpoints:[],passed:false};let browser,page;
+          const save=()=>fs.writeFileSync(out+'/public-proof.json',JSON.stringify(report,null,2));
+          const mark=s=>{report.checkpoints.push({name:s,time:new Date().toISOString()});save();console.log('PUBLIC_PROOF',s)};
+          const hard=setTimeout(()=>{report.failure='Independent proof exceeded 240 seconds';save();process.exit(1)},240000);
+          const heartbeat=setInterval(save,10000);
+          async function pixels(){await page.evaluate(()=>__SKIN_LAB__.render());return Buffer.from((await page.evaluate(()=>document.querySelector('#viewport canvas').toDataURL('image/png'))).split(',')[1],'base64')}
+          function difference(a,b){a=PNG.sync.read(a);b=PNG.sync.read(b);let sum=0;assert.equal(a.data.length,b.data.length);for(let i=0;i<a.data.length;i+=4)for(let j=0;j<3;j++)sum+=Math.abs(a.data[i+j]-b.data[i+j]);return sum/(a.width*a.height*3)}
+          (async()=>{browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});page=await browser.newPage({viewport:report.viewport,deviceScaleFactor:1});page.setDefaultTimeout(25000);page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push(m.text())});page.on('request',r=>report.requests.push(r.url()));page.on('requestfailed',r=>report.failedRequests.push({url:r.url(),error:r.failure()?.errorText}));mark('navigation');await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready,{},{timeout:90000});mark('application ready');
+          const normal=await pixels();fs.writeFileSync(out+'/public-canvas.png',normal);const p=PNG.sync.read(normal);let skin=0;for(let i=0;i<p.data.length;i+=4)if(p.data[i]>65&&p.data[i]>p.data[i+1]*1.08&&p.data[i]>p.data[i+2]*1.15)skin++;report.skinFraction=skin/(p.width*p.height);assert(report.skinFraction>.05);await page.screenshot({path:out+'/public-desktop.png',timeout:40000});mark('visible skin');
+          await page.selectOption('#transferMode','base');report.baselinePixelDifference=difference(normal,await pixels());assert(report.baselinePixelDifference>.05);await page.selectOption('#transferMode','split');await page.click('[data-method="enhanced"]');await pixels();assert.equal(await page.evaluate(()=>__EMILY_TRANSFER__.transfer.mode),'split');assert.equal(await page.evaluate(()=>__EMILY_TRANSFER__.transfer.method),'enhanced');await page.screenshot({path:out+'/public-split.png',timeout:40000});mark('baseline and enhanced split interaction');
+          await page.selectOption('#transferMode','full');await page.click('[data-camera="front"]');await pixels();assert.equal(await page.evaluate(()=>__SKIN_LAB__.state.camera),'front');mark('camera interaction');
+          await page.setViewportSize({width:390,height:844});await page.click('[data-camera="portrait"]');await pixels();await page.screenshot({path:out+'/public-mobile-viewport.png',timeout:40000});await page.click('#mobileToggle');assert(await page.locator('.side').isVisible());await page.click('#mobileToggle');assert(!await page.locator('.side').isVisible());report.mobileViewport={width:390,height:844,panelToggle:true,physicalDevice:false};mark('mobile viewport');
+          assert.deepEqual(report.errors,[]);assert.deepEqual(report.consoleErrors,[]);report.runtime=await page.evaluate(()=>__SKIN_LAB__.state);report.passed=true;report.testedAt=new Date().toISOString();save();console.log('PUBLIC_DELIVERY_VERIFIED',JSON.stringify(report));
+          })().catch(async e=>{report.failure=e.stack;save();console.error(e);process.exitCode=1;}).finally(async()=>{clearTimeout(hard);clearInterval(heartbeat);if(browser)await browser.close();save()});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: emily-public-proof
+          path: /tmp/public-proof
+          retention-days: 14

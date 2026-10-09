@@ -1,0 +1,64 @@
+name: ET03 eye research inputs
+on:
+  push:
+    branches: [experiment/emily-eyelid-research-et03-20261008]
+    paths: ['.github/workflows/et03-research-inputs.yml']
+permissions:
+  contents: read
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - name: Collect only necessary baseline assets
+        run: |
+          mkdir -p /tmp/et03-inputs/project/skin-quality-lab
+          cp -r skin-quality-lab/emily-transfer /tmp/et03-inputs/project/skin-quality-lab/
+          cp -r skin-quality-lab/r01 skin-quality-lab/r02 /tmp/et03-inputs/project/skin-quality-lab/
+          find /tmp/et03-inputs/project -type f \( -name '*.html' -o -name '*.png' \) -path '*/evidence/*' -delete
+          npm install --prefix /tmp/et03-inputs/tools --no-audit --no-fund esbuild@0.25.11 pngjs@7.0.0
+      - name: Record primary research and CC0 reference geometry
+        run: |
+          python3 - <<'PY'
+          import urllib.request,json,pathlib,re,concurrent.futures
+          out=pathlib.Path('/tmp/et03-inputs/research');out.mkdir(parents=True,exist_ok=True)
+          manifest=[]
+          def get(url,name):
+            try:
+              b=urllib.request.urlopen(url,timeout=60).read();p=out/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)
+              import hashlib
+              manifest.append({'url':url,'file':name,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()});return b
+            except Exception as e:manifest.append({'url':url,'error':str(e)});return b''
+          get('https://arxiv.org/pdf/2410.01360','anieyelid.pdf')
+          get('https://arxiv.org/html/2410.01360v1','anieyelid.html')
+          shell=get('https://syntec-research.github.io/ShellNeRF/','shellnerf.html').decode()
+          for u in re.findall(r'href=[\"\']([^\"\']+)',shell):
+            if '.pdf' in u:
+              import urllib.parse
+              get(urllib.parse.urljoin('https://syntec-research.github.io/ShellNeRF/',u),'shellnerf.pdf');break
+          get('https://syntec-research.github.io/ShellNeRF/static/images/teaser1024_1.png','shellnerf-teaser.png')
+          tree=json.loads(get('https://api.github.com/repos/StoryMY/AniEyelid/git/trees/88434cece5fa95147f29a3376ac74a3a75a6ca88?recursive=1','anieyelid-tree.json'))
+          paths=[t['path'] for t in tree['tree'] if t['type']=='blob' and (t['path'].startswith(('models/','eyeball_calibration/','confs/')) or t['path'] in ['exp_runner.py','README.md','requirements.txt','data_preprocess/README.md','assets/teaser.jpg']) and t.get('size',0)<1000000]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+            list(pool.map(lambda p:get('https://raw.githubusercontent.com/StoryMY/AniEyelid/88434cece5fa95147f29a3376ac74a3a75a6ca88/'+p,'AniEyelid/'+p),paths))
+          mt=json.loads(get('https://api.github.com/repos/makehumancommunity/makehuman/git/trees/master?recursive=1','makehuman-tree.json'))
+          mhsha=mt['sha']
+          paths=[t['path'] for t in mt['tree'] if t['type']=='blob' and (t['path'] in ['LICENSE.md','LICENSE.ASSETS.md','makehuman/data/3dobjs/base.obj'] or t['path'].startswith('makehuman/data/targets/eyes/') or ('eyelid' in t['path'].lower() and t.get('size',0)<200000))]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+            list(pool.map(lambda p:get('https://raw.githubusercontent.com/makehumancommunity/makehuman/'+mhsha+'/'+p,'MakeHuman/'+p),paths))
+          (out/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          print(json.dumps({'files':len(manifest),'makehumanCommit':mhsha,'errors':[m for m in manifest if 'error' in m],'pdfLinks':re.findall(r'href=[\"\']([^\"\']+\.pdf[^\"\']*)',shell)},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et03-research-inputs
+          path: /tmp/et03-inputs
+          retention-days: 14
