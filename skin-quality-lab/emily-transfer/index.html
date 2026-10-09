@@ -41,14 +41,14 @@ SOFTWARE.
 -->
 </head>
 <body>
-<header><div class="brand"><span class="mark"></span><div><h1>眼球与眼睑实验台</h1><div class="subtitle">EMILY METHOD → ANOTHER FACE</div></div></div><div class="head-right"><span id="status">准备场景</span><span class="version">ET04 · TALKINGHEAD</span><button id="mobileToggle">参数</button></div></header>
+<header><div class="brand"><span class="mark"></span><div><h1>眼球与眼睑实验台</h1><div class="subtitle">EMILY METHOD → ANOTHER FACE</div></div></div><div class="head-right"><span id="status">准备场景</span><span class="version">ET05 · EYELID VOLUME</span><button id="mobileToggle">参数</button></div></header>
 <main class="shell"><section id="viewport" aria-label="可旋转的三维皮肤实验视图">
-<div class="top-tools"><button data-camera="portrait" class="active">肖像</button><button data-camera="front">正面</button><button data-camera="eyes">双眼特写</button><button data-camera="iris">虹膜近景</button><button data-camera="cheek">面颊微距</button><button data-camera="ear">耳部侧光</button><button id="compare" title="按住关闭附加材质层；保持同一模型、肤色、灯光与相机">按住对照</button><button id="shot">截图</button></div>
+<div class="top-tools"><button data-camera="portrait" class="active">肖像</button><button data-camera="front">正面</button><button data-camera="eyes">双眼特写</button><button data-camera="upperlid" title="从斜下方观察上眼睑的真实厚度">上睑厚度</button><button data-camera="iris">虹膜近景</button><button data-camera="cheek">面颊微距</button><button data-camera="ear">耳部侧光</button><button id="compare" title="按住关闭附加材质层；保持同一模型、肤色、灯光与相机">按住对照</button><button id="shot">截图</button></div>
 <div id="currentMethod" class="method-badge">EMILY 思路 / 迁移到 LEE</div><div id="splitLine" role="separator" aria-label="对照分界" hidden></div><div id="splitLabels" hidden><span>基础 PBR</span><span>完整皮肤</span></div><div id="layerLabel">完整皮肤 · 柔箱光</div><div id="baselineBadge">基础 PBR · 同形 / 同色 / 同光</div>
 <div class="bottom-caption"><div><div class="caption-title">另一张脸，同一种皮肤语言</div><div class="caption-small">拖动旋转 · 滚轮缩放 · 右键平移 · 双击局部对焦</div></div><div><span class="chip" id="stats">WEBGL 2 / LINEAR HDR</span></div></div>
 <div id="loading" class="loading"><div class="spinner"></div><div id="loadingText" class="loading-text">载入另一人物的扫描皮肤与实时材质</div><small>首次载入包含高分辨率纹理；之后旋转与调节在浏览器中运行</small></div><div id="toast"></div>
 </section>
-<aside class="side" aria-label="皮肤与光线参数"><div class="section th-section"><h2>TalkingHead 行为 <small>ET04 / 1.7.0</small></h2>
+<aside class="side" aria-label="皮肤与光线参数"><div class="section"><h2>ET05 / 上眼睑结构</h2><p class="hint">先观察双眼，再点「上睑厚度」。新上睑由外侧皮肤、实体睑缘和内侧接触面连续连接；收紧眼角，降低上睑开口。原 TalkingHead 行为、下睑主体和皮肤继续保留。</p><p class="hint">结构比例是当前头模的拟合，不是这个人物的医学测量。眼睑贴近眼球的湿接触层，不是刻意挖出的空气黑缝。</p></div><div class="section th-section"><h2>TalkingHead 行为 <small>ET04 / 1.7.0</small></h2>
 <p class="hint">原库眨眼、注视、缓动与头部动作 → 当前人头。<br>一套渲染器；眼睑接触约束继续由 ET03 执行。</p>
 <div class="feature-grid"><label><input id="thEnabled" type="checkbox" checked>启用原库驱动</label><label><input id="thHead" type="checkbox" checked>头眼联动</label><label><input id="thPause" type="checkbox">暂停自主动作</label></div>
 <div class="presets" style="margin-top:12px"><button id="thFocus">专注看你</button><button id="thSocial">自然观察</button></div>
