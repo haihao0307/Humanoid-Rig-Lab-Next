@@ -9,7 +9,7 @@ on:
       - leather-workshop/r05/verify_anchor.py
       - leather-workshop/r05/test.mjs
       - leather-workshop/r05/qa.py
-      - leather-workshop/r05/review-thread.py
+      - leather-workshop/r05/finish-thread.py
 permissions:
   contents: write
 concurrency:
@@ -32,8 +32,8 @@ jobs:
           git fetch --depth=1 origin 3336f8e27ce3820b4ab1b6290e4da6512b295009
           git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
           python leather-workshop/r05/verify_anchor.py
-      - name: Apply reviewed R05-only thread corrections
-        run: python leather-workshop/r05/review-thread.py
+      - name: Apply final R05-only fibre appearance review
+        run: python leather-workshop/r05/finish-thread.py
       - name: Topology, full-depth hole rays and thread continuity
         run: |
           node leather-workshop/r05/test.mjs
@@ -50,7 +50,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f leather-workshop/r05/site leather-workshop/r05/preview.html leather-workshop/r05/BUILD_MANIFEST.json leather-workshop/r05/qa
-          git commit -m 'build(sewing-r05): reviewed thread surface, actual through routing and offline evidence [skip ci]'
+          git commit -m 'build(sewing-r05): continuous thread with fibre detail and offline proof [skip ci]'
           git push origin HEAD:feature/leather-sewing-r05-20261009
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Actual immutable public browser test
@@ -63,7 +63,7 @@ jobs:
           python leather-workshop/r05/verify_anchor.py > leather-workshop/r05/qa/anchor.json
           git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
           git add -f leather-workshop/r05/qa
-          git commit -m 'test(sewing-r05): reviewed public thread, back and section evidence [skip ci]'
+          git commit -m 'test(sewing-r05): final public sewing and frozen-anchor proof [skip ci]'
           git push origin HEAD:feature/leather-sewing-r05-20261009
           echo "$URL" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
