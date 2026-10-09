@@ -1,0 +1,80 @@
+name: Leather R06 fixed-public recheck
+on:
+  push:
+    branches: [feature/leather-atelier-r06-takeover-20261009]
+    paths:
+      - .github/workflows/leather-r06-public-recheck.yml
+      - leather-workshop/r06/review/public-accept.py
+permissions:
+  contents: write
+concurrency:
+  group: leather-r06-public-recheck
+  cancel-in-progress: true
+jobs:
+  public:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      BUILD_SHA: d322a9b173d889f2bdb723ff7c04955e40472b2b
+      PUBLIC_URL: https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/d322a9b173d889f2bdb723ff7c04955e40472b2b/leather-workshop/r06/public-lite.html
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/leather-atelier-r06-takeover-20261009
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify immutable build and protected baseline
+        run: |
+          git fetch --depth=1 origin e86c36c8c34b1f2b57cc5462459ee2f490e556af "$BUILD_SHA"
+          git diff --exit-code e86c36c8c34b1f2b57cc5462459ee2f490e556af -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/anchors
+          git diff --exit-code "$BUILD_SHA" -- leather-workshop/r06/site leather-workshop/r06/public-lite.html leather-workshop/r06/BUILD_MANIFEST.json
+          python - <<'PY'
+          import pathlib,hashlib,json
+          r=pathlib.Path('leather-workshop/r06')
+          assert hashlib.sha256((r/'public-lite.html').read_bytes()).hexdigest()=='040838bd5bbfaaccb4ff455c0a111bf54e6e868bea5e6b301d8f9ff2f0a319f9'
+          assert json.loads((r/'qa/local/browser.json').read_text())['pass'] is True
+          PY
+      - name: Installed browser and bounded dependencies
+        timeout-minutes: 5
+        run: |
+          pip --disable-pip-version-check install --timeout 35 --retries 2 pillow playwright==1.55.0
+          CHROME=$(command -v google-chrome || command -v chromium)
+          test -x "$CHROME"
+          "$CHROME" --version
+          echo "KAOPU_CHROMIUM_EXECUTABLE=$CHROME" >> "$GITHUB_ENV"
+          if [ -z "$(fc-list :lang=zh)" ]; then
+            mkdir -p "$HOME/.local/share/fonts"
+            curl -fL --connect-timeout 15 --max-time 90 --retry 1 https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf -o "$HOME/.local/share/fonts/NotoSansCJKsc-Regular.otf"
+            fc-cache -f
+          fi
+          test -n "$(fc-list :lang=zh)"
+      - name: Complete live public browser regression
+        run: python leather-workshop/r06/review/public-accept.py --public --url "$PUBLIC_URL"
+      - name: Commit public acceptance and current delivery state
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          r=Path('leather-workshop/r06');m=json.loads((r/'BUILD_MANIFEST.json').read_text());q=json.loads((r/'qa/public/browser.json').read_text())
+          assert q['pass'] and not q['errors']
+          data={'sourceCommit':m['sourceCommit'],'buildCommit':os.environ['BUILD_SHA'],'url':os.environ['PUBLIC_URL'],'workflowRun':os.environ['GITHUB_RUN_ID'],'browserPublicPassed':True,'visualAcceptance':'PENDING_USER','mobile':'390x844 viewport simulation; exact projected bounds checked for all five objects; not phone hardware','browserEnvironment':q.get('browserEnvironment'),'hostWarnings':q.get('hostWarnings',[]),'htmlSHA256':m['htmlSHA256'],'localChecks':len(json.loads((r/'qa/local/browser.json').read_text())['checks']),'publicChecks':len(q['checks']),'checkCountingNote':'Checks include repeated views and parameter cases, not this many independent physical capabilities.'}
+          (r/'DELIVERY_RECEIPT.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n');(r/'PUBLIC_URL.txt').write_text(os.environ['PUBLIC_URL']+'\n')
+          text='# R06.1 当前交付 / 2026-10-09\n\n固定网站：'+os.environ['PUBLIC_URL']+'\n\n源码 '+m['sourceCommit']+'；构建 '+os.environ['BUILD_SHA']+'。原用户 R05 入口与 R01–R05、anchors 零差异。TAKEOVER_ANCHOR.json 为接手时历史，不代表当前实现进度。\n\n已实现：8 个原皮革预设完整保留；总共 13 个材质/涂饰三维缩略图；卡包、腰带、肩包、皮帽与皮样；三套灯光、旋转/缩放/微距；卡包和腰带 1:1 mm 试作 SVG；原 R04 皮样承重与恢复；原 R05 精确字节保留。窄屏取景按三维边界精确计算，不再仅检查 DOM 横向溢出。\n\n本次完整公网验收已通过，详情见 qa/public/browser.json 与 DELIVERY_RECEIPT.json。手机仅 390×844 视口模拟，非实机。检查项包括重复视角和参数，不能当成独立物理能力数量。\n\n若出现预览宿主 favicon.ico 的 HTTP 404，它被明确归入 hostWarnings，并保留具体来源；没有忽略任何应用代码、着色器、贴图或其他资源错误。网站本身的错误列表必须为空。\n\n边界：未实现夹克；成品为尺寸驱动三维结构，不是整件皮具/整衣动态求解。仅卡包和腰带有试作纸样，仍需按标尺印制、废皮打样、削薄及五金试配；肩包/帽子无定版纸样。皮革外观不自动等于实测力学参数，仍缺整衣自碰撞、人体碰撞、摩擦与实物标定。视觉状态仍待用户验收。\n'
+          (r/'CURRENT_DELIVERY.md').write_text(text)
+          readme=r/'README.md';s=readme.read_text();s=s.replace('- [ ] 公网固定链接和真实浏览器已验证：以对应本轮报告为准，未通过前不勾选。','- [x] 固定公网网址的本轮完整浏览器测试已通过；当前入口与边界见 CURRENT_DELIVERY.md。视觉仍待用户验收。');readme.write_text(s)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r06/qa/public/browser.json leather-workshop/r06/PUBLIC_URL.txt leather-workshop/r06/DELIVERY_RECEIPT.json leather-workshop/r06/CURRENT_DELIVERY.md leather-workshop/r06/README.md
+          git commit -m "test(leather-r06): complete immutable public acceptance with attributed host warnings"
+          git push origin HEAD:refs/heads/feature/leather-atelier-r06-takeover-20261009
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r06-public-recheck-${{ github.run_id }}
+          path: leather-workshop/r06/
+          retention-days: 7
