@@ -6,8 +6,11 @@ on:
       - .github/workflows/leather-sewing-r051.yml
       - leather-workshop/r05/site/**
       - leather-workshop/r05/upgrade-r051.py
+      - leather-workshop/r05/refine-r051.py
+      - leather-workshop/r05/finalize-r051.py
       - leather-workshop/r05/qa-r051.py
       - leather-workshop/r05/test-r051.mjs
+      - leather-workshop/r05/test-thread-solid.mjs
       - leather-workshop/r05/build.py
 permissions:
   contents: write
@@ -31,22 +34,25 @@ jobs:
           git fetch --depth=1 origin 3336f8e27ce3820b4ab1b6290e4da6512b295009
           git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
           python leather-workshop/r05/verify_anchor.py
-      - name: Prepare licensed assets and R05-only integration
+      - name: Prepare reviewed geometry and licensed grain finish
         run: |
           pip install -q pillow playwright==1.55.0
           python leather-workshop/r05/upgrade-r051.py
+          python leather-workshop/r05/refine-r051.py
+          python leather-workshop/r05/finalize-r051.py
           python leather-workshop/r05/build.py
           node leather-workshop/r05/test-r051.mjs
+          node leather-workshop/r05/test-thread-solid.mjs
           python -m playwright install --with-deps chromium
-      - name: Actual file-open, outside thread and tension lifecycle screenshots
+      - name: Actual file-open, full thread and tension lifecycle screenshots
         run: python leather-workshop/r05/qa-r051.py
       - name: Record independently versioned build
         id: build
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f leather-workshop/r05/site leather-workshop/r05/build.py leather-workshop/r05/assets leather-workshop/r05/BUILD_MANIFEST.json leather-workshop/r05/preview.html leather-workshop/r05/qa-r051 leather-workshop/r05/qa/r051-geometry-contact.json
-          git commit -m 'build(sewing-r051): outward thread, licensed grain and solved local surface response [skip ci]'
+          git add -f leather-workshop/r05/site leather-workshop/r05/build.py leather-workshop/r05/assets-grain leather-workshop/r05/test-r051.mjs leather-workshop/r05/BUILD_MANIFEST.json leather-workshop/r05/preview.html leather-workshop/r05/qa-r051 leather-workshop/r05/qa/r051-geometry-contact.json leather-workshop/r05/qa/thread-solid.json
+          git commit -m 'build(sewing-r051): reviewed grain, smooth solid thread and contact microdeformation [skip ci]'
           git push origin HEAD:fix/leather-sewing-r051-20261009
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Verify exact public build and frozen anchor
@@ -59,7 +65,7 @@ jobs:
           python leather-workshop/r05/verify_anchor.py > leather-workshop/r05/qa-r051/anchor.json
           git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
           git add -f leather-workshop/r05/qa-r051
-          git commit -m 'test(sewing-r051): immutable public normals, grain and micro-contact proof [skip ci]'
+          git commit -m 'test(sewing-r051): final public finish, complete thread and micro-contact proof [skip ci]'
           git push origin HEAD:fix/leather-sewing-r051-20261009
           echo "$URL" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
