@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install -q pillow numpy
-      - name: Acquire available CC0 original material maps
+      - name: Acquire published CC0 material maps with provenance
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -22,11 +22,12 @@ jobs:
           import numpy as np
           from PIL import Image
           root=Path('/tmp/grain-review');root.mkdir()
-          for asset,tile,tags in [('brown_leather',400,{'diff':'diff','nor_gl':'nor_gl','rough':'rough','disp':'disp'}),('leather_red_02',600,{'diff':'coll1','nor_gl':'nor_gl','rough':'rough','disp':'disp'})]:
+          for asset,tile,tags in [('brown_leather',400,{'diff':'albedo','nor_gl':'nor_gl','rough':'rough','disp':'disp'}),('leather_red_02',600,{'diff':'coll1','nor_gl':'nor_gl','rough':'rough','disp':'disp'})]:
               r=root/asset;r.mkdir()
               m={'asset':asset,'source':'https://polyhaven.com/a/'+asset,'author':'Rob Tuytel','license':'CC0-1.0','originalTileMM':tile,'cropMM':tile*1536/8192,'files':{}}
               for name,tag in tags.items():
                   url=f'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/8k/{asset}/{asset}_{tag}_8k.jpg'
+                  print('Downloading',url,flush=True)
                   raw=urllib.request.urlopen(url,timeout=180).read();im=Image.open(io.BytesIO(raw)).convert('RGB');assert im.size==(8192,8192)
                   crop=im.crop((3328,3328,4864,4864));crop.save(r/(name+'.png'))
                   a=np.asarray(crop).astype(float)/255;m['files'][name]={'url':url,'rawSHA256':hashlib.sha256(raw).hexdigest(),'processedSHA256':hashlib.sha256((r/(name+'.png')).read_bytes()).hexdigest(),'mean':a.mean(axis=(0,1)).tolist()}
