@@ -1,0 +1,41 @@
+name: Leather R06 source review
+on:
+  push:
+    branches: [feature/leather-atelier-r06-takeover-20261009]
+    paths: [.github/workflows/leather-r06-source-review.yml]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop
+      - name: Preserve and package read-only baseline dependencies
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, shutil, json
+          src=Path('leather-workshop'); out=Path('r06-source-review/leather-workshop')
+          p=src/'r05/public-lite.html'
+          assert hashlib.sha256(p.read_bytes()).hexdigest()=='46f44dd298eb33b23d41ec05cfe5b550f343fe5ca37cec424ae92b309012f26a'
+          for ver in ['r02','r03','r04','r05']:
+            for folder in ['site','assets-grain','assets']:
+              q=src/ver/folder
+              if q.exists(): shutil.copytree(q,out/ver/folder,dirs_exist_ok=True)
+            for pattern in ['*.py','*.mjs','*.md','*.json','*.txt']:
+              for q in (src/ver).glob(pattern):
+                d=out/ver/q.name; d.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(q,d)
+          for q in [src/'r05/public-lite.html',src/'r04/preview.html']:
+            d=out/q.relative_to(src);d.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(q,d)
+          if (src/'anchors').exists(): shutil.copytree(src/'anchors',out/'anchors',dirs_exist_ok=True)
+          print(json.dumps({'baselineVerified':True,'files':len(list(out.rglob('*')))},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-r06-frozen-source-review
+          path: r06-source-review/
+          retention-days: 7
