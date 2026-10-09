@@ -1,0 +1,71 @@
+name: Leather R05 - frozen anchor and real sewing verification
+on:
+  push:
+    branches: [feature/leather-sewing-r05-20261009]
+    paths:
+      - .github/workflows/leather-sewing-r05.yml
+      - leather-workshop/r05/site/**
+      - leather-workshop/r05/build.py
+      - leather-workshop/r05/verify_anchor.py
+      - leather-workshop/r05/test.mjs
+      - leather-workshop/r05/qa.py
+permissions:
+  contents: write
+concurrency:
+  group: leather-sewing-r05
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/leather-sewing-r05-20261009
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Read-only freeze check - never rebuild R04
+        run: |
+          git fetch --depth=1 origin 3336f8e27ce3820b4ab1b6290e4da6512b295009
+          git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
+          python leather-workshop/r05/verify_anchor.py
+      - name: Topology, full-depth hole rays and thread continuity
+        run: |
+          node leather-workshop/r05/test.mjs
+          python leather-workshop/r05/build.py
+      - name: Browser dependencies
+        run: |
+          pip install -q playwright==1.55.0 pillow
+          python -m playwright install --with-deps chromium
+      - name: Actual file-open and sewing interaction tests
+        run: python leather-workshop/r05/qa.py
+      - name: Publish isolated verified build
+        id: build
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r05/preview.html leather-workshop/r05/BUILD_MANIFEST.json leather-workshop/r05/qa
+          git commit -m 'build(sewing-r05): real through-thread workbench and offline evidence [skip ci]'
+          git push origin HEAD:feature/leather-sewing-r05-20261009
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Actual immutable public browser test
+        env:
+          BUILD_SHA: ${{ steps.build.outputs.sha }}
+        run: |
+          URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/leather-workshop/r05/preview.html"
+          python leather-workshop/r05/qa.py "$URL"
+          echo "$URL" > leather-workshop/r05/qa/PREVIEW_URL.txt
+          python leather-workshop/r05/verify_anchor.py > leather-workshop/r05/qa/anchor.json
+          git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
+          git add -f leather-workshop/r05/qa
+          git commit -m 'test(sewing-r05): fixed public source, back and section inspection [skip ci]'
+          git push origin HEAD:feature/leather-sewing-r05-20261009
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r05-sewing-evidence
+          path: leather-workshop/r05
+          retention-days: 14
