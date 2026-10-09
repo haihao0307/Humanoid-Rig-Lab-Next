@@ -1,221 +1,35 @@
 {
-  "version": "ET07.3",
-  "codeVersion": "emily-transfer/7.3.0",
-  "eyeVersion": "eyes/7.3.0",
-  "baseline": "b483a73fe7c3744c0136ff8433922efa5f3b51f3",
-  "assetCommit": "b7b2cb48eebb04cf3673adc11215a268b18c216c",
-  "appSHA256": "98e90e9d3633b03362c8ca5a9593a836d4f03b3b810b88d1f42741fda49e92fb",
-  "previewSHA256": "3cbb80175848c2dd015bdf36f0edf088c6c4a1f46abe9ccdbdbff1c758e0d48d",
-  "researchModuleSHA256": "ad8ed6a5ab952dea9b9259f8c8b51aab8e345865c9e752c22055b1a7a6d62cd1",
-  "sourceHeadMeshChanged": false,
-  "eyelidSurfaceReconstructed": true,
-  "innerAndOuterEyelidShells": true,
-  "eyeModel": "smooth two-sphere sclera/cornea junction",
-  "neutralMarginData": "MakeHuman hm08 CC0 measured eye pocket contour",
-  "irisTexture": "preserved MakeHuman CC0 grey eye atlas",
-  "trainedAniEyelid": false,
-  "trainedShellNeRF": false,
-  "paperPrinciplesAdapted": true,
-  "absoluteBestQualityClaim": false,
-  "realMobileDeviceTested": false,
-  "shadowMethod": "Three.js 17-tap PCF, 2048 map, radius 10; matched eyelid depth surface",
-  "eyeDepthFit": "observed closed outer envelope; neutral-gaze assumption; not full multiview calibration",
-  "oldVSMArtifactsDiagnosed": true,
-  "capturedClosureAnchored": true,
-  "sourceSkinLightingPreserved": true,
-  "pcssCandidateShipped": false,
-  "shadowSelectionEvidenceRun": 37769859569,
-  "innerContactRowsInterpolated": true,
-  "fixedTargetRecipeRestoration": true,
-  "fullNeuralReconstruction": false,
-  "sourceCommit": "b7b2cb48eebb04cf3673adc11215a268b18c216c",
+  "schema": "kaopu/eye-contour-stage1-build@1",
+  "version": "ET08-S1",
+  "codeVersion": "emily-transfer/8.0.0-s1",
+  "eyeVersion": "eyes/8.0.0-s1",
+  "baseline": "5be35195ad40d57507f7ab1785e4eecda6c648de",
+  "assetCommit": "5be35195ad40d57507f7ab1785e4eecda6c648de",
+  "baselineAppSHA256": "98e90e9d3633b03362c8ca5a9593a836d4f03b3b810b88d1f42741fda49e92fb",
+  "appSHA256": "6c1ff35605a29dc08b63def7344ce527e6d73f2f51fc99d4fb3c89c3b92052af",
+  "previewSHA256": "2d1c69aa8568bf1bd670d484707a768ade5d783661bfbb0714f5563d0a61e3af",
+  "previewBytes": 2141435,
+  "finalEmbeddedScriptSHA256": "294a14fe0782b8348b46e7bb9c4a6e41df775812c22b38efa1b6c877ef425b27",
   "finalHTMLSyntaxValidated": true,
-  "previewBytes": 2116854,
-  "integrationModuleSHA256": "a582e87fc8a358e6d0d4bf5a71244fa9affd81e9a369bdf80353e5590926191d",
-  "talkingHead": {
-    "repository": "met4citizen/TalkingHead",
-    "commit": "b3e277b3b46f88e557bf28a2c5612a5b04e075c3",
-    "version": "1.7.0",
-    "license": "MIT",
-    "unchangedSourceBlocks": 35,
-    "extractedKernelSHA256": "7b2472d5de6bde65e390e216b60e53596ffb04cec0bb0cdb04132ace522313bf",
-    "fullClassInstantiated": false,
-    "speechEnabled": false
-  },
   "oneThreeCore": true,
   "oneRenderer": true,
   "hostAnimationLoopOnly": true,
+  "sourceHeadMeshChanged": false,
   "sourceSkinTexturesChanged": false,
-  "worldSpaceGazeAdapter": true,
-  "skinTransportWorldSpace": true,
-  "geometryQualityClaim": "Reconstructs thicker upper/lower free margins, tapered canthi and a narrower resting aperture while preserving the ET04 head and behavior integration",
-  "reviewedPreviewBeforeLicense": "579b012450c325230ce2fa16128f0ff5a7e8f683ddf0c8ea88516067e8c5f7ac",
-  "standaloneHTMLIncludesUpstreamLicense": true,
-  "licenseInsertionChangedExecutableCode": false,
-  "anatomy": {
-    "eyeRadiusMM": 12.2,
-    "nominalHorizontalApertureMM": 23.6,
-    "defaultOpening": 0.88,
-    "irisRadiusRatio": 0.435,
-    "posteriorTearGapMM": 0.085,
-    "upperMarginDesignedThickerThanLower": true,
-    "connectedTexturedFreeMargin": true,
-    "finiteCanthalTangents": true,
-    "actualVertexAudit": true,
-    "progressiveCanthalTaper": true,
-    "fullMedicalReconstruction": false
-  },
-  "naturalTissueModuleSHA256": "c1dee856787d11253d9461bf3130480fa62ebf40a7fac2f134b7e37e5fa6249e",
-  "neutralMaterialCoordinates": true,
-  "sharedFreeMarginSkinShader": true,
-  "tearRimContinuousInterpolation": true,
-  "derivedEyeRepairTextures": 3,
-  "repairModuleSHA256": "e7441efe838404950cff20c5971bb212c3c39b58309fa61f01b0fd101710ca36",
-  "repairDataSHA256": "ee9ba302988ab15c53f0aae9cf61e066b9b2aff71519893ae11cfc5bc3b4a5a3",
-  "repairSource": {
-    "schema": "kaopu/periocular-scan-repair@1",
-    "atlasRectPixels": [
-      1540,
-      1120,
-      2520,
-      1320
-    ],
-    "atlasSize": [
-      980,
-      200
-    ],
-    "uvRect": [
-      0.3759765625,
-      0.677734375,
-      0.2392578125,
-      0.048828125
-    ],
-    "source": "same existing Lee scan textures; no additional person or stock skin",
-    "albedoSHA256": "4fc7297835e2081cb914d1a8507fc837687102eed7bd3c6bed25b72960a09e08",
-    "maskPolygonsPixels": [
-      [
-        [
-          1612,
-          1193
-        ],
-        [
-          1640,
-          1172
-        ],
-        [
-          1695,
-          1160
-        ],
-        [
-          1798,
-          1163
-        ],
-        [
-          1850,
-          1173
-        ],
-        [
-          1880,
-          1188
-        ],
-        [
-          1893,
-          1210
-        ],
-        [
-          1880,
-          1251
-        ],
-        [
-          1815,
-          1268
-        ],
-        [
-          1680,
-          1263
-        ],
-        [
-          1620,
-          1248
-        ],
-        [
-          1598,
-          1220
-        ]
-      ],
-      [
-        [
-          2190,
-          1189
-        ],
-        [
-          2240,
-          1170
-        ],
-        [
-          2378,
-          1170
-        ],
-        [
-          2436,
-          1180
-        ],
-        [
-          2470,
-          1200
-        ],
-        [
-          2474,
-          1225
-        ],
-        [
-          2445,
-          1254
-        ],
-        [
-          2380,
-          1270
-        ],
-        [
-          2265,
-          1270
-        ],
-        [
-          2203,
-          1255
-        ],
-        [
-          2174,
-          1222
-        ]
-      ]
-    ],
-    "donorOffsetPixels": [
-      0,
-      215
-    ],
-    "method": "masked capture-mark removal, constrained colour inpaint and same-subject fine-detail transfer",
-    "originalAssetsModified": false,
-    "hiddenTrueSkinRecovered": false,
-    "scope": "new eyelid materials only",
-    "maskedPixels": 79131,
-    "extraTextures": 3,
-    "extraBaseLevelGPUBytes": 2352000,
-    "outputs": {
-      "color": {
-        "bytes": 128811,
-        "sha256": "a29f86c9c5a6015a3aa688ad8aabd1ab39943928a46755b09be61ad45c87b4b3"
-      },
-      "normalBands": {
-        "bytes": 136063,
-        "sha256": "bc901113945e1168dd53409716ee057d40fc4345ce56f64538d6739e96996d7e"
-      },
-      "surface": {
-        "bytes": 83846,
-        "sha256": "0f0537a36d89c7b4a5130ac48d84099b13d80d0d09b1cfa608e03f0f3280105d"
-      }
-    }
-  },
-  "upperLidSeparateDetailCoordinates": true,
-  "sourceCaptureMarkRepair": true
+  "globeRadiusChanged": false,
+  "globeDepthFitChanged": false,
+  "irisRadiusChanged": false,
+  "defaultView": "gray contour / no skin maps or ocular optics",
+  "independentLeftRightContourSplines": true,
+  "sharedClosureCurvePerEye": true,
+  "existingCanthalAndSectionalGeometryPreserved": true,
+  "stage2AnatomyRebuilt": false,
+  "stage3MaterialCoordinatesRebuilt": false,
+  "stage4DynamicsRebuilt": false,
+  "stage5OpticsRebuilt": false,
+  "personSpecificOpenScanAvailable": false,
+  "sourceLicenseNoticeIncluded": true,
+  "realMobileDeviceTested": false,
+  "qualityClaim": "Stage-one contour fitting; visual approval remains with the user. Not a person-specific anatomical reconstruction.",
+  "verification": "stage1/qa-report.json and current Actions artifact/public-report.json"
 }
