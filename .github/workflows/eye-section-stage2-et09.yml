@@ -36,6 +36,7 @@ jobs:
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/et09-http.log 2>&1 &
           node skin-quality-lab/emily-transfer/stage2/verify.cjs
+          node skin-quality-lab/emily-transfer/stage2/extra.cjs
       - name: Fast-forward validated draft branch only
         run: |
           git config user.name 'KAOPU Eye Workbench'
@@ -46,7 +47,9 @@ jobs:
             git push origin HEAD:feature/eye-section-stage2-et09-20261009
           fi
       - name: Actual immutable public-page verification
-        run: PUBLIC_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/emily-transfer/stage2/verify.cjs
+        run: |
+          PUBLIC_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/emily-transfer/stage2/verify.cjs
+          PUBLIC_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/emily-transfer/stage2/extra.cjs
       - name: Collect sources and browser evidence
         if: always()
         run: |
