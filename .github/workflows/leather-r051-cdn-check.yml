@@ -1,8 +1,10 @@
-name: Leather R05.1 - native CDN public entry check
+name: Leather R05.1 - lightweight public entry check
 on:
   push:
     branches: [fix/leather-sewing-r051-20261009]
-    paths: [.github/workflows/leather-r051-cdn-check.yml]
+    paths:
+      - .github/workflows/leather-r051-cdn-check.yml
+      - leather-workshop/r05/public.html
 permissions:
   contents: read
 jobs:
@@ -16,9 +18,9 @@ jobs:
       - run: |
           pip install -q playwright==1.55.0 pillow
           python -m playwright install --with-deps chromium
-      - name: Test direct CDN HTML, no HTMLPreview intermediary
+      - name: Test lightweight HTMLPreview entry with split CDN resources
         env:
-          URL: https://cdn.jsdelivr.net/gh/haihao0307/Humanoid-Rig-Lab-Next@7ec1f5372073357bfa3ca3f5df763267d5e471b2/leather-workshop/r05/preview.html
+          URL: https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/a89bdfeb5cb347011b867b0ba0c9bc5f5cf2d9fa/leather-workshop/r05/public.html
         run: |
           mkdir -p evidence
           python - <<'PY'
@@ -31,17 +33,21 @@ jobs:
             page=b.new_page(viewport={'width':1440,'height':1000})
             page.on('pageerror',lambda e:out['errors'].append(str(e)))
             page.on('console',lambda m:out['errors'].append(m.text) if m.type=='error' else None)
-            response=page.goto(url,wait_until='domcontentloaded',timeout=120000)
+            started=time.time();response=page.goto(url,wait_until='domcontentloaded',timeout=120000)
             out['status']=response.status if response else None
             out['contentType']=response.headers.get('content-type') if response else None
             out['title']=page.title()
             page.wait_for_function('window.LEATHER_SEWING?.ready',timeout=120000)
             page.wait_for_timeout(1000)
+            out['loadSeconds']=time.time()-started
             out['version']=page.evaluate('LEATHER_SEWING.version')
             out['bodyBackground']=page.evaluate('getComputedStyle(document.body).backgroundColor')
             out['canvas']=page.locator('#view').bounding_box()
-            out['pass']=out['version']=='R05.1' and not out['errors'] and out['canvas']['width']>500
-            page.screenshot(path='evidence/jsdelivr-direct.png',full_page=True)
+            out['busyHidden']=page.locator('#busy').is_hidden()
+            page.click('[data-view="macro"]');page.wait_for_timeout(250)
+            out['macroContact']=page.evaluate('LEATHER_SEWING.contact')
+            out['pass']=out['version']=='R05.1' and not out['errors'] and out['canvas']['width']>500 and out['busyHidden']
+            page.screenshot(path='evidence/lightweight-public.png',full_page=True)
             b.close()
           Path('evidence/result.json').write_text(json.dumps(out,indent=2,ensure_ascii=False))
           print(json.dumps(out,ensure_ascii=False))
@@ -50,6 +56,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: leather-r051-native-cdn-check
+          name: leather-r051-lightweight-public-check
           path: evidence
           retention-days: 14
