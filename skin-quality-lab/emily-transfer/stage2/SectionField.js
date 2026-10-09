@@ -42,7 +42,6 @@ export function reconstructSection(rig,e,closure){
    const rx=old[a*3],ry=old[a*3+1],span=Math.hypot(old[end*3]-rx,old[end*3+1]-ry);if(span<.0001)continue;
    const zEnd=old[end*3+2],crest=clamp(fit.creaseDistance*(.80+.20*arc),span*.25,span*.55);
    const dx=rx-c.x,dy=ry-c.y,globe=Math.sqrt(Math.max(0,c.radius*c.radius-dx*dx-dy*dy));
-   // Corneal-cap slope changes must not be extruded into longitudinal skin bars.
    const fairRoot=c.z+globe+(upper?.00128:.00055),rootOffset=root-fairRoot;
    const next=end+S,prev=end-S,den=Math.hypot(old[next*3]-old[prev*3],old[next*3+1]-old[prev*3+1]);
    const endSlope=(old[next*3+2]-old[prev*3+2])/Math.max(.00001,den);
@@ -63,6 +62,30 @@ export function reconstructSection(rig,e,closure){
     P.setZ(k,z);maxCorrection=Math.max(maxCorrection,Math.abs(P.getZ(k)-old[k*3+2]));
    }
   }
+  // Fair the inherited star-like canthal folds, keeping both boundary rings.
+  // This correction vanishes at complete closure; the S1.1 target is unchanged.
+  const fairIndices=[],fronts=[];
+  for(let j=1;j<R-2;j++)for(let a=0;a<lid.A;a++){
+   const u=(Math.cos(a/lid.A*Math.PI*2)*c.sign+1)*.5;
+   const angular=1-smooth(Math.min(u,1-u)/(u<.5?.16:.10)),t=j/R;
+   const strength=.80*angular*(1-smooth((t-.55)/.32))*open;
+   if(strength<.001)continue;
+   const k=j*S+a,nb=[k-S,k+S,j*S+(a+lid.A-1)%lid.A,j*S+(a+1)%lid.A],ww=nb.map(n=>1/Math.max(.00004,Math.hypot(P.getX(k)-P.getX(n),P.getY(k)-P.getY(n))));
+   fairIndices.push([k,nb,ww,strength]);fronts.push(rig.eyeFront(c,P.getX(k),P.getY(k)));
+  }
+  const z=Float64Array.from({length:P.count},(_,i)=>P.getZ(i)),next=z.slice();
+  for(let pass=0;pass<100;pass++){
+   for(let ii=0;ii<fairIndices.length;ii++){
+    const [k,nb,ww,strength]=fairIndices[ii];let sum=0,den=0;
+    for(let i=0;i<4;i++){sum+=z[nb[i]]*ww[i];den+=ww[i];}
+    next[k]=lerp(z[k],sum/den,strength);
+    if(fronts[ii]!==null)next[k]=Math.max(next[k],fronts[ii]+.00010);
+   }
+   for(const [k]of fairIndices)z[k]=next[k];
+   for(let j=0;j<=R;j++)z[j*S+lid.A]=z[j*S];
+  }
+  for(const [k]of fairIndices){P.setZ(k,z[k]);maxCorrection=Math.max(maxCorrection,Math.abs(P.getZ(k)-old[k*3+2]));}
+  for(let j=0;j<=R;j++)P.setZ(j*S+lid.A,P.getZ(j*S));
   P.needsUpdate=true;
   for(let a=0;a<=lid.A;a++){
    const theta=a/lid.A*Math.PI*2,arc=Math.pow(Math.abs(Math.sin(theta)),.65),upper=Math.sin(theta)>=0;

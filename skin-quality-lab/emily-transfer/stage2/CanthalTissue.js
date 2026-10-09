@@ -25,14 +25,18 @@ export function updateCanthalTissue(rig,e,closure){
    for(let j=0;j<=V;j++){
     const v=j/V,k=i*(V+1)+j,edge=Math.pow(Math.sin(Math.PI*v),1.4);let x=lerp(top.x,bottom.x,v),y=lerp(top.y,bottom.y,v),z=lerp(top.z,bottom.z,v),zone=0;
     if(medial){
-     const recess=.00048*Math.pow(Math.sin(Math.PI*u),.85)*edge*open;
-     const car=.00019*Math.exp(-Math.pow((u-.34)/.22,2)-Math.pow((v-.56)/.24,2))*Math.sin(Math.PI*u)*edge*open;
-     const foldCentre=.75+.045*Math.sin(Math.PI*v),fold=.00027*Math.exp(-Math.pow((u-foldCentre)/.09,2))*edge*open;
-     x+=c.sign*.00006*Math.sin(Math.PI*u)*edge*Math.sin(2*Math.PI*v)*open;z+=-recess+car+fold;zone=fold>car&&fold>.00003?3:car>.000025?2:1;
+     // The temporal lake bank curves into the eye rather than ending flat.
+     x-=c.sign*.00033*smooth(u)*Math.pow(Math.sin(Math.PI*v),1.25)*open;
+     const front=rig.eyeFront(c,x,y),bank=smooth((u-.10)/.82)*Math.pow(Math.sin(Math.PI*v),.65)*open;
+     if(front!==null)z=lerp(z,front+.000085,bank);
+     const support=Math.pow(Math.sin(Math.PI*u),2)*edge*open;
+     const recess=.00018*Math.exp(-Math.pow((u-.50)/.26,2))*support;
+     const car=.00034*Math.exp(-Math.pow((u-.33)/.21,2)-Math.pow((v-.56)/.27,2))*support;
+     const foldCentre=.74+.060*Math.sin(Math.PI*v),fold=.00055*Math.exp(-Math.pow((u-foldCentre)/.12,2))*support;
+     z+=-recess+car+fold;zone=fold>car&&fold>.00003?3:car>.000025?2:1;
      caruncleRelief=Math.max(caruncleRelief,car);plicaRelief=Math.max(plicaRelief,fold);
     }else{z+=.000065*Math.sin(Math.PI*u)*edge*open;zone=4;}
     const front=rig.eyeFront(c,x,y);
-    if(medial&&front!==null&&j>0&&j<V){const bank=smooth((u-.36)/.64)*Math.pow(Math.sin(Math.PI*v),1.25)*open;z=lerp(z,front+.000085,bank);}
     if(front!==null&&j>0&&j<V)z=Math.max(z,front+.000085);
     if(j===0){x=top.x;y=top.y;z=top.z;}if(j===V){x=bottom.x;y=bottom.y;z=bottom.z;}P.setXYZ(k,x,y,z);regions.setX(k,zone);
     if(j===0||j===V){const target=j===0?top:bottom;seams=Math.max(seams,Math.hypot(P.getX(k)-target.x,P.getY(k)-target.y,P.getZ(k)-target.z));}

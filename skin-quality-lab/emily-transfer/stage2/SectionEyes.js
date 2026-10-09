@@ -12,7 +12,8 @@ export class SectionEyes extends ContourEyes{
   });
  }
  updateLid(e,blink){
-  e.c.stage2MarginDeltaMM=0;super.updateLid(e,blink);if(!e.section)return;
+  e.c.stage2MarginDeltaMM=0;this._stage2MeasuringEye=e.c;
+  try{super.updateLid(e,blink);}finally{this._stage2MeasuringEye=null;}if(!e.section)return;
   const b=this.config.manualBlink>=0?this.config.manualBlink:blink;
   if(this.sectionEnabled!==false&&this.closedRestEnabled!==false&&!this.contourBaseline){reconstructSection(this,e,b);updateCanthalTissue(this,e,b);}
   else{e.section.medial.mesh.visible=false;e.section.lateral.mesh.visible=false;}
@@ -25,7 +26,8 @@ export class SectionEyes extends ContourEyes{
   const sample=s=>{const theta=Math.acos(Math.max(-1,Math.min(1,(s*2-1)*c.sign)));return super.margin(c,upper?theta:Math.PI*2-theta,blink).z;};
   const z0=sample(near),z1=sample(end),dir=medial?1:-1,eps=.001,d0=Math.max(-.014,Math.min(.014,(sample(near+dir*eps)-z0)/eps)),d1=(sample(end+dir*eps)-sample(end-dir*eps))/(2*eps),t=Math.abs(u-near)/extent,t2=t*t,t3=t2*t;
   const fair=(2*t3-3*t2+1)*z0+(t3-2*t2+t)*extent*d0+(-2*t3+3*t2)*z1+(t3-t2)*extent*d1;
-  const w=1-blink*blink*(3-2*blink),z=p.z+(fair-p.z)*w;c.stage2MarginDeltaMM=Math.max(c.stage2MarginDeltaMM||0,Math.abs(z-p.z)*1000);p.z=z;return p;
+  const w=1-blink*blink*(3-2*blink),z=p.z+(fair-p.z)*w;
+  if(this._stage2MeasuringEye===c)c.stage2MarginDeltaMM=Math.max(c.stage2MarginDeltaMM||0,Math.abs(z-p.z)*1000);p.z=z;return p;
  }
  compareStage1(on){this.sectionEnabled=!on;this.update(0,true);this.requestRender();}
  sectionReport(){return {version:EYE_VERSION,stage:2,baseline:SECTION_BASELINE,enabled:this.sectionEnabled!==false,firstStageClosedSurfacePreserved:true,globeRecalibrated:false,materialsRebuilt:false,physicalDynamicsRebuilt:false,eyes:this.eyes.map(e=>({name:e.c.name,maxOpenCanthalDepthCorrectionMM:e.c.stage2MarginDeltaMM||0,...e.section?.report,canthus:e.section?.canthalReport}))};}
