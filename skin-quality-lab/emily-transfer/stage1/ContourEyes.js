@@ -49,6 +49,20 @@ export class ContourEyes extends IntegratedEyes {
   this._fittingEye=null;
   return {schema:'kaopu/eye-contour-review@1',baseline:BASELINE,version:EYE_VERSION,comparison:this.contourBaseline?'ET07.3':'ET08-S1',currentClosure:this.config.manualBlink,irisCoverageMeaning:'unrefracted iris reference projected on the neutral globe, not a measured photograph',scope:'sampled curves and current free-margin vertices; not continuous collision certification',eyes:rows,specification:contourSpecification()};
  }
+ audit(detailed=false){
+  const report=super.audit(detailed);report.version=EYE_VERSION;
+  report.marginLengthDefinition='actual upper/lower free-edge vertex polylines; cross-section lengths reported separately; no arc-length conservation claim';
+  for(const row of report.eyes){
+   const e=this.eyes.find(e=>e.c.name===row.name),P=e.lid.mesh.geometry.attributes.position,A=e.lid.A;
+   const length=(start,end)=>{let sum=0;for(let i=start+1;i<=end;i++)sum+=Math.hypot(P.getX(i)-P.getX(i-1),P.getY(i)-P.getY(i-1),P.getZ(i)-P.getZ(i-1));return sum*1000;};
+   // The inherited ET06 audit names measured a transverse rim section, not
+   // the whole free edge. Preserve those useful values under accurate names.
+   row.upperMarginCrossSectionArcMM=row.upperFreeMarginArcMM;row.lowerMarginCrossSectionArcMM=row.lowerFreeMarginArcMM;
+   row.upperFreeMarginArcMM=length(0,A/2);row.lowerFreeMarginArcMM=length(A/2,A);
+   if(![row.upperFreeMarginArcMM,row.lowerFreeMarginArcMM].every(v=>Number.isFinite(v)&&v>=row.horizontalApertureMM-1e-4))throw Error('Invalid free-margin length');
+  }
+  return report;
+ }
  snapshot(){return {...super.snapshot(),stage1:{schema:'kaopu/eye-contour-stage1@1',baseline:BASELINE,compareOriginal:!!this.contourBaseline}};}
  restore(o){
   if(o?.stage1){if(o.stage1.schema!=='kaopu/eye-contour-stage1@1'||o.stage1.baseline!==BASELINE)throw Error('Unsupported contour recipe');this.contourBaseline=!!o.stage1.compareOriginal;}
