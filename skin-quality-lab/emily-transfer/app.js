@@ -3,14 +3,14 @@ import {EYE_VERSION,IntegratedEyes as EyeSystem} from './talkinghead/IntegratedE
 import {EMILY_REFERENCE,emilyDirectDiffuse,applyTransferFeatures} from './EmilyTransferKernel.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-const $=id=>document.getElementById(id),VERSION='emily-transfer/6.0.0';
+const $=id=>document.getElementById(id),VERSION='emily-transfer/6.1.0';
 const defaults={roughness:.5,oil:.25,detail:.75,pores:.24,poreSize:.32,fuzz:.32,pigment:.22,blood:.25,sss:.85,radius:1.2,azimuth:-46,exposure:1.03,meso:1.1,micro:1.25,relief:.7,translucency:.65,occlusion:.9,wrap:1};
 const values={...defaults};
 const transfer={method:"emily",mode:"full",split:.5,features:{diffusion:true,reflection:true,detail:true,transmission:true,fuzz:true}};
 const presets={natural:{...defaults},dry:{...defaults,roughness:.66,oil:.04,detail:.94,pores:.48,sss:.48},oily:{...defaults,roughness:.32,oil:.78,detail:.72,pores:.32,sss:.72},warm:{...defaults,pigment:.62,blood:.42,roughness:.46,oil:.3,sss:.72}};
 const state={ready:false,version:VERSION,errors:[],layer:'beauty',light:'studio',camera:'portrait',baseline:false,frames:0,quality:'high',fps:0};
 window.__SKIN_LAB__={state,values,defaults};
-document.title='眼睑解剖重构 × TalkingHead · ET06';document.querySelector('.version').textContent='ET06 · EYELID ANATOMY';document.querySelector('.caption-title').textContent='皮肤与眼球 / 注视你';
+document.title='眼睑解剖重构 × TalkingHead · ET06.1';document.querySelector('.version').textContent='ET06.1 · EYELID ANATOMY';document.querySelector('.caption-title').textContent='皮肤与眼球 / 注视你';
 const viewport=$('viewport');let albedoRT,entryRT,entryCamera,entryMaterial,entryDirty=true;
 let eyesRig=null;let renderer,scene,camera,controls,mesh,skin,fuzz,fullRT,diffRT,blurA,blurB,blurMaterial,composeMaterial,quad,postScene,postCamera,key,fill,rim,pmremTarget,dirty=true,shader,compareHeld=false,last=performance.now(),frameCount=0,lastStat=last;
 const U={uPass:{value:0},uDetail:{value:values.detail},uPores:{value:values.pores},uPoreFrequency:{value:450/values.poreSize},uPigment:{value:values.pigment},uBlood:{value:values.blood},uScatter:{value:values.sss},uOil:{value:values.oil},uHeight:{value:null},uSpec:{value:null},uBaseline:{value:0},uLayer:{value:0}};
@@ -284,7 +284,7 @@ updateTransferUI();
 async function initializeEyes(){
  eyesRig=new EyeSystem({mesh,skin,scene,camera,fuzz,canvas:renderer.domElement,pass:U.uPass,layer:U.uLayer,key,fill,rim,requestRender:()=>{dirty=true;entryDirty=true;if(renderer)renderer.shadowMap.needsUpdate=true;}});
  await eyesRig.ready;eyesRig.installDepth(entryMaterial,fuzz);mesh.customDepthMaterial=entryMaterial;
- window.__EYES__={version:EYE_VERSION,audit:()=>eyesRig.audit(),info:()=>eyesRig.info(),setMode:mode=>{eyesRig.setMode(mode);syncEyeUI();},setTarget:v=>{eyesRig.setTarget(v);syncEyeUI();},blink:()=>eyesRig.blink(),step:(dt,instant=false)=>{eyesRig.update(dt,instant);dirty=true;},set:v=>{eyesRig.restore({...eyesRig.snapshot(),...v,schema:'kaopu/eye-rig@1'});syncEyeUI();dirty=true;entryDirty=true;renderer.shadowMap.needsUpdate=true;},snapshot:()=>eyesRig.snapshot(),restore:v=>{eyesRig.restore(v);syncEyeUI();},sourceGeometry:()=>({uuid:mesh.geometry.uuid,vertices:mesh.geometry.attributes.position.count,triangles:mesh.geometry.index.count/3})};
+ window.__EYES__={version:EYE_VERSION,audit:(detailed=false)=>eyesRig.audit(detailed),info:()=>eyesRig.info(),setMode:mode=>{eyesRig.setMode(mode);syncEyeUI();},setTarget:v=>{eyesRig.setTarget(v);syncEyeUI();},blink:()=>eyesRig.blink(),step:(dt,instant=false)=>{eyesRig.update(dt,instant);dirty=true;},set:v=>{eyesRig.restore({...eyesRig.snapshot(),...v,schema:'kaopu/eye-rig@1'});syncEyeUI();dirty=true;entryDirty=true;renderer.shadowMap.needsUpdate=true;},snapshot:()=>eyesRig.snapshot(),restore:v=>{eyesRig.restore(v);syncEyeUI();},sourceGeometry:()=>({uuid:mesh.geometry.uuid,vertices:mesh.geometry.attributes.position.count,triangles:mesh.geometry.index.count/3})};
  syncEyeUI();
 }
 function syncEyeUI(){if(!eyesRig)return;const c=eyesRig.config;$('eyeMode').value=c.mode;$('eyeIris').value=c.iris;
@@ -333,7 +333,7 @@ function installBehaviorBindings(){
  for(const [id,kind] of [['thDouble','double'],['thWinkL','left'],['thWinkR','right']])$(id).onclick=()=>{if(!eyesRig)return;set({enabled:true,paused:false});eyesRig.blink(kind);$('researchClosure').value=0;updateBehaviorUI();};
  for(const [id,kind] of [['thYes','yes'],['thNo','no']])$(id).onclick=()=>{if(!eyesRig)return;set({enabled:true,headMotion:true,paused:false});eyesRig.gesture(kind);};
  $('reset').addEventListener('click',()=>{eyesRig?.resetBehavior();updateBehaviorUI();});
- window.__TALKINGHEAD__={version:'ET06',info:()=>eyesRig?.diagnostics(),set:value=>set(value),blink:kind=>eyesRig?.blink(kind),gesture:kind=>eyesRig?.gesture(kind),reset:()=>eyesRig?.resetBehavior()};
+ window.__TALKINGHEAD__={version:'ET06.1',info:()=>eyesRig?.diagnostics(),set:value=>set(value),blink:kind=>eyesRig?.blink(kind),gesture:kind=>eyesRig?.gesture(kind),reset:()=>eyesRig?.resetBehavior()};
 }
 installBehaviorBindings();
 

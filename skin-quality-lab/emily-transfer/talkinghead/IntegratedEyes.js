@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {ResearchEyes} from '../research/ResearchEyes.js';
 import {BehaviorController,DEFAULT_BEHAVIOR} from './BehaviorController.js';
-export const EYE_VERSION='eyes/6.0.0';
+export const EYE_VERSION='eyes/6.1.0';
 const clamp=THREE.MathUtils.clamp;
 const V=()=>new THREE.Vector3();
 /** Single final-pose writer. Targets use world metres; contact uses head space.

@@ -87,12 +87,17 @@ export class ResearchEyes extends FittedEyes {
   const e=this._fittingEye,inv=e?.surfaceInverse?.elements,r=c.radius,dx=x-c.x,dy=y-c.y;
   if(dx*dx+dy*dy>=r*r)return null;
   let z=Math.sqrt(r*r-dx*dx-dy*dy);
+  // Only the corneal cap differs from the sphere. Its conservative bounding
+  // ball is centred 0.98r forward with radius 0.53r. Rays outside its projected
+  // disc hit the spherical sclera exactly, without a Newton solve.
+  const capX=inv?inv[2]*r*.98:0,capY=inv?inv[6]*r*.98:0;
+  if((dx-capX)*(dx-capX)+(dy-capY)*(dy-capY)>r*r*.2809)return c.z+z;
   const f=zz=>{const lx=inv?inv[0]*dx+inv[4]*dy+inv[8]*zz:dx,ly=inv?inv[1]*dx+inv[5]*dy+inv[9]*zz:dy,lz=inv?inv[2]*dx+inv[6]*dy+inv[10]*zz:zz,h=ocularHeight(r,lx,ly);return h.valid?lz-h.z:0;};
   for(let i=0;i<7;i++){const v=f(z),eps=.000004,der=(f(z+eps)-f(z-eps))/(2*eps);if(Math.abs(der)<.12)break;const dz=clamp(v/der,-.002,.002);z-=dz;if(Math.abs(dz)<.00000003)break;}
   return c.z+z;
  }
  margin(c,a,blink){
-  const nx=Math.cos(a),upper=Math.sin(a)>=0,u=nx*c.sign,w=Math.sqrt(Math.max(0,1-nx*nx));
+  const nx=Math.cos(a),upper=Math.sin(a)>=0,u=nx*c.sign,w=Math.max(0,1-nx*nx);
   const top=rail(u,true)*c.half,bottom=rail(u,false)*c.half;
   const pitch=c.gazePitch||0,yaw=c.gazeYaw||0,squint=this.config.squint||0;
   const open=this.config.opening??.88;
@@ -105,21 +110,17 @@ export class ResearchEyes extends FittedEyes {
   const x=c.x+c.half*nx+yaw*.00052*w*(1-blink);
   const front=this.eyeFront(c,x,y),corner=smooth((1-Math.abs(u))/(u<0?.24:.18));
   // Anterior free margin: upper lid is deliberately thicker than lower lid.
-  // The posterior conjunctival surface remains 0.045 mm off the globe.
+  // The posterior surface uses 0.085 mm axial numerical clearance, not a tear-film measurement.
   const openClearance=lerp(.00015,upper?.00078:.00030,corner);
   const clearance=lerp(openClearance,.00032,blink);
   let z=front===null?c.z+.003:front+clearance;
-  if(blink>0&&c.referenceSurface){
-   const key=Math.round(nx*1e9);let closedZ=c.closedCurve.get(key);
-   if(closedZ===undefined){closedZ=c.referenceSurface(c.x+c.half*nx,closedY).z;c.closedCurve.set(key,closedZ);}
-   z=Math.max(z,lerp(z,closedZ,blink));
-  }
+  // The scan anchors surrounding skin; a closing free margin stays on the globe.
   return new THREE.Vector3(x,y,z);
  }
  rimPoint(c,a,blink){return this.margin(c,a,blink);}
  makeLid(c,sample,mat){
   c.referenceSurface=sample;c.closedCurve=new Map();
-  const A=192,R=32,p=[],n=[],uv=[],ao=[],ts=[],ix=[],entries=[];
+  const A=256,R=32,p=[],n=[],uv=[],ao=[],ts=[],ix=[],entries=[];
   for(let j=0;j<=R;j++)for(let i=0;i<=A;i++){
    const t=j/R,a=i/A*TAU,nx=Math.cos(a),ny=Math.sin(a),u=nx*c.sign;
    const seam=c.y-.0035+.0028*Math.pow(Math.abs(nx),1.7)-.0007*nx*c.sign;
@@ -136,12 +137,12 @@ export class ResearchEyes extends FittedEyes {
    s.vertexShader=s.vertexShader.replace('uRelief*.001*(1.-uBaseline)','uRelief*.001*(1.-uBaseline)*smoothstep(.13,.68,eyelidT)');
    s.uniforms.uResearchPatch={value:new THREE.Vector4(c.x,c.y,c.rx,c.ry)};
    s.fragmentShader='varying float vLidT;uniform vec4 uResearchPatch;\n'+s.fragmentShader;
-   s.fragmentShader=s.fragmentShader.replace('normal=normalize(tbn*mapN);','mapN.xy*=mix(.48,1.,smoothstep(.06,.68,vLidT));normal=normalize(tbn*normalize(mapN));');
+   s.fragmentShader=s.fragmentShader.replace('normal=normalize(tbn*mapN);','mapN.xy*=mix(.08,1.,smoothstep(.16,.55,vLidT));normal=normalize(tbn*normalize(mapN));');
    s.fragmentShader=s.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nvec2 localPatch=(vSkinPosition.xy-uResearchPatch.xy)/uResearchPatch.zw;if(dot(localPatch,localPatch)>1.000001)discard;');
    s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.rgb=mix(diffuseColor.rgb*vec3(.77,.57,.52),diffuseColor.rgb,smoothstep(.008,.055,vLidT));');
   };
-  mat.customProgramCacheKey=()=> 'ET03-continuous-lid-shell-1';mat.side=THREE.DoubleSide;
-  const m=new THREE.Mesh(g,mat);m.name='contact-eyelid-shell-'+c.name;m.frustumCulled=false;m.castShadow=true;m.receiveShadow=true;
+  mat.customProgramCacheKey=()=> 'ET06.1-continuous-lid-shell';mat.side=THREE.DoubleSide;
+  const m=new THREE.Mesh(g,mat);m.name='contact-eyelid-shell-'+c.name;m.frustumCulled=false;m.castShadow=false;m.receiveShadow=true;
   // Use the same deformation and support mask in the shadow pass. Unlike VSM,
   // PCF does not turn every shadow receiver into an implicit shadow caster.
   const depth=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking});
@@ -157,7 +158,7 @@ export class ResearchEyes extends FittedEyes {
    s.fragmentShader=s.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nvec2 q=(vLidShadowPosition.xy-uShadowPatch.xy)/uShadowPatch.zw;if(dot(q,q)>1.000001)discard;');
   };
   depth.customProgramCacheKey=()=> 'ET03-lid-shadow-matched-4';m.customDepthMaterial=depth;
-  const ni=14,ip=new Float32Array((A+1)*(ni+1)*3),ii=[];
+  const ni=64,ip=new Float32Array((A+1)*(ni+1)*3),ii=[];
   for(let j=0;j<ni;j++)for(let a=0;a<A;a++){const k=j*(A+1)+a;ii.push(k,k+1,k+A+1,k+1,k+A+2,k+A+1);}
   const ig=new THREE.BufferGeometry();ig.setAttribute('position',new THREE.BufferAttribute(ip,3));ig.setIndex(ii);
   const im=new THREE.MeshStandardMaterial({color:0x87504b,roughness:.50,side:THREE.FrontSide});
@@ -174,7 +175,7 @@ export class ResearchEyes extends FittedEyes {
   }
   eg.setAttribute('uv',new THREE.Float32BufferAttribute(eu,2));eg.setAttribute('color',new THREE.Float32BufferAttribute(ec,3));
   const em=new THREE.MeshPhysicalMaterial({color:0xffffff,map:this.skin.map,vertexColors:true,roughness:.46,metalness:0,clearcoat:.24,clearcoatRoughness:.22,ior:1.36,envMapIntensity:.32,side:THREE.DoubleSide});
-  const edge=new THREE.Mesh(eg,em);edge.name='palpebral-free-margin-'+c.name;edge.frustumCulled=false;edge.castShadow=true;edge.receiveShadow=true;m.add(edge);
+  const edge=new THREE.Mesh(eg,em);edge.name='palpebral-free-margin-'+c.name;edge.frustumCulled=false;edge.castShadow=false;edge.receiveShadow=true;m.add(edge);
   return {mesh:m,entries,A,R,inside,ni,edge,es};
  }
  updateLid(e,blink){
@@ -207,21 +208,29 @@ export class ResearchEyes extends FittedEyes {
   for(let i=0;i<lid.entries.length;i++){const q=lid.entries[i],w=smooth((q.t-.72)/.28);if(w){const n=new THREE.Vector3(N.getX(i),N.getY(i),N.getZ(i)).lerp(q.src.n,w).normalize();N.setXYZ(i,n.x,n.y,n.z);}}N.needsUpdate=true;
   const IP=lid.inside.geometry.attributes.position,EP=lid.edge.geometry.attributes.position;
   const insetAt=(a)=>{const theta=a/lid.A*TAU,nx=Math.cos(theta),ny=Math.sin(theta),corner=smooth((1-Math.abs(nx))/.20);return (ny>=0?.00029:.00012)*corner*(1-blink);};
-  for(let j=0;j<=lid.ni;j++)for(let i=0;i<=lid.A;i++){
-   const row=j/lid.ni*.42*lid.R,lo=Math.floor(row),hi=Math.min(lid.R,lo+1),f=row-lo,theta=i/lid.A*TAU;
-   const ia=lo*(lid.A+1)+i,ib=hi*(lid.A+1)+i,inset=insetAt(i)*(1-smooth(j/lid.ni));
-   const x=lerp(P.getX(ia),P.getX(ib),f)-Math.cos(theta)*inset,y=lerp(P.getY(ia),P.getY(ib),f)-Math.sin(theta)*inset;
-   const z=this.eyeFront(c,x,y),oz=lerp(P.getZ(ia),P.getZ(ib),f);
-   IP.setXYZ(j*(lid.A+1)+i,x,y,z===null?oz-.0003:z+.000045);
+  // Hidden conjunctiva is a continuous spherical chart. No off-globe depth
+  // fallbacks are joined by triangles that pass through the optical surface.
+  for(let i=0;i<=lid.A;i++){
+   const theta=i/lid.A*TAU,nx=Math.cos(theta),ny=Math.sin(theta),inset=insetAt(i);
+   const ox=P.getX(i)-nx*inset,oy=P.getY(i)-ny*inset,r=c.radius;
+   const ax=(ox-c.x)/r,ay=(oy-c.y)/r,az=Math.sqrt(Math.max(0,1-ax*ax-ay*ay));
+   const bx=nx*Math.sin(1.44),by=ny*Math.sin(1.44),bz=Math.cos(1.44);
+   const angle=Math.acos(clamp(ax*bx+ay*by+az*bz,-.999999,1)),sin=Math.sin(angle);
+   for(let j=0;j<=lid.ni;j++){
+    const t=j/lid.ni,wa=sin>.000001?Math.sin((1-t)*angle)/sin:1-t,wb=sin>.000001?Math.sin(t*angle)/sin:t;
+    const x=j===0?ox:c.x+r*(wa*ax+wb*bx),y=j===0?oy:c.y+r*(wa*ay+wb*by),z=this.eyeFront(c,x,y);
+    if(z===null)throw Error('Inner globe chart escaped support');
+    IP.setXYZ(j*(lid.A+1)+i,x,y,z+.000085);
+   }
   }
   IP.needsUpdate=true;lid.inside.geometry.computeVertexNormals();
   for(let a=0;a<=lid.A;a++){
    const theta=a/lid.A*TAU,nx=Math.cos(theta),ny=Math.sin(theta),corner=smooth((1-Math.abs(nx))/.20);
    for(let q=0;q<=lid.es;q++){
-    const t=q/lid.es,b=Math.sin(Math.PI*t),k=a*(lid.es+1)+q,bulge=(ny>=0?.000055:.000035)*corner*(1-blink);
+    const t=q/lid.es,b=Math.sin(Math.PI*t),k=a*(lid.es+1)+q,bulge=(ny>=0?.00016:.000035)*corner*(1-blink);
     const x=lerp(IP.getX(a),P.getX(a),t)+nx*b*bulge,y=lerp(IP.getY(a),P.getY(a),t)+ny*b*bulge;
     let z=lerp(IP.getZ(a),P.getZ(a),t)+b*.000025;
-    const contact=this.eyeFront(c,x,y);if(contact!==null&&q>0&&q<lid.es)z=Math.max(z,contact+.000045);
+    const contact=this.eyeFront(c,x,y);if(contact!==null&&q>0&&q<lid.es)z=Math.max(z,contact+.000085);
     EP.setXYZ(k,x,y,z);
    }
   }
@@ -241,7 +250,7 @@ export class ResearchEyes extends FittedEyes {
   const topMid=margins[Math.round(lid.A*.25)],bottomMid=margins[Math.round(lid.A*.75)];
   const gapAtU=u=>{const nx=u*c.sign,a=Math.acos(clamp(nx,-1,1));return (this.margin(c,a,blink).y-this.margin(c,TAU-a,blink).y)*1000;};
   const topEye=this.eyeFront(c,topMid.x,topMid.y),bottomEye=this.eyeFront(c,bottomMid.x,bottomMid.y);
-  e.contactReport={minOuterClearanceMM:Number.isFinite(minClear)?minClear*1000:null,penetratingTestVertices:penetration,innerShell:true,freeMarginMesh:true,outerBoundaryFixed:true,contactTestOuterRowsBelow:.55,eyeballHiddenForClosure:false,capturedClosureMaxDeviationMM:blink>.999?closureError*1000:null,outerBoundaryDeviationMM:boundaryError*1000,horizontalApertureMM:Math.abs(margins[0].x-margins[Math.round(lid.A*.5)].x)*1000,verticalApertureMM:(topMid.y-bottomMid.y)*1000,upperMarginThicknessMM:topEye===null?null:(topMid.z-topEye)*1000,lowerMarginThicknessMM:bottomEye===null?null:(bottomMid.z-bottomEye)*1000,posteriorTearGapMM:.045,medialGapAt90MM:gapAtU(-.90),lateralGapAt90MM:gapAtU(.90)};
+  e.contactReport={minOuterClearanceMM:Number.isFinite(minClear)?minClear*1000:null,penetratingTestVertices:penetration,innerShell:true,freeMarginMesh:true,outerBoundaryFixed:true,contactTestOuterRowsBelow:.55,eyeballHiddenForClosure:false,capturedClosureMaxDeviationMM:blink>.999?closureError*1000:null,outerBoundaryDeviationMM:boundaryError*1000,horizontalApertureMM:Math.abs(margins[0].x-margins[Math.round(lid.A*.5)].x)*1000,verticalApertureMM:(topMid.y-bottomMid.y)*1000,upperMarginThicknessMM:topEye===null?null:(topMid.z-topEye)*1000,lowerMarginThicknessMM:bottomEye===null?null:(bottomMid.z-bottomEye)*1000,posteriorTearGapMM:.085,medialGapAt90MM:gapAtU(-.90),lateralGapAt90MM:gapAtU(.90)};
   e.ball.visible=true;this._fittingEye=null;this.lastLid=blink;
  }
  update(dt,instant=false){
@@ -257,7 +266,7 @@ export class ResearchEyes extends FittedEyes {
  snapshot(){return {...super.snapshot(),squint:this.config.squint||0,manualBlink:this.config.manualBlink??-1};}
  restore(o){if(!o)return;super.restore(o);if(Number.isFinite(o.squint))this.config.squint=clamp(o.squint,0,1);if(Number.isFinite(o.manualBlink))this.config.manualBlink=clamp(o.manualBlink,-1,1);this.update(0,true);this.requestRender();}
  info(){return {...super.info(),reconstruction:'ET06 joined skin-margin-conjunctiva / finite canthal tangents',neuralTrainingPerformed:false,paperReproduction:false,depthCalibration:this.eyes.map(e=>e.depthFit),contact:this.eyes.map(e=>e.contactReport)};}
- audit(){
+ audit(detailed=false){
   const rows=[];
   for(const e of this.eyes){
    this._fittingEye=e;const {c,lid}=e,P=lid.mesh.geometry.attributes.position,I=lid.inside.geometry.attributes.position,E=lid.edge.geometry.attributes.position;
@@ -265,10 +274,19 @@ export class ResearchEyes extends FittedEyes {
    for(let a=0;a<=lid.A;a++)for(const [p,i,j] of [[P,a,a*(lid.es+1)+lid.es],[I,a,a*(lid.es+1)]])seamMax=Math.max(seamMax,Math.hypot(p.getX(i)-E.getX(j),p.getY(i)-E.getY(j),p.getZ(i)-E.getZ(j)));
    for(const p of [P,I,E])for(let i=0;i<p.count;i++)if(![p.getX(i),p.getY(i),p.getZ(i)].every(Number.isFinite))nonfinite++;
    for(const p of [I,E])for(let i=0;i<p.count;i++){const z=this.eyeFront(c,p.getX(i),p.getY(i));if(z===null)continue;const gap=p.getZ(i)-z;minGap=Math.min(minGap,gap);tested++;if(gap<-.0000001)penetrations++;}
+   let triangleMin=Infinity,trianglePenetrations=0,triangleSamples=0;
+   if(detailed)for(const geo of [lid.inside.geometry,lid.edge.geometry]){
+    const p=geo.attributes.position,ix=geo.index.array;
+    for(let k=0;k<ix.length;k+=3)for(const w of [[1/3,1/3,1/3],[.5,.5,0],[0,.5,.5],[.5,0,.5]]){
+     const a=ix[k],b=ix[k+1],d=ix[k+2],x=w[0]*p.getX(a)+w[1]*p.getX(b)+w[2]*p.getX(d),y=w[0]*p.getY(a)+w[1]*p.getY(b)+w[2]*p.getY(d),z=w[0]*p.getZ(a)+w[1]*p.getZ(b)+w[2]*p.getZ(d),front=this.eyeFront(c,x,y);
+     if(front===null)continue;const gap=z-front;triangleSamples++;triangleMin=Math.min(triangleMin,gap);if(gap<-.0000001)trianglePenetrations++;
+    }
+   }
+   const surfaceTests={triangleSamples,trianglePenetrations,triangleMinAxialGapMM:detailed?triangleMin*1000:null};
    const edgeLength=a=>{let d=0;for(let q=1;q<=lid.es;q++){const i=a*(lid.es+1)+q;d+=Math.hypot(E.getX(i)-E.getX(i-1),E.getY(i)-E.getY(i-1),E.getZ(i)-E.getZ(i-1));}return d*1000;};
-   rows.push({name:c.name,nonfiniteVertices:nonfinite,maxSharedEdgeErrorMM:seamMax*1000,posteriorAndMarginMinAxialGapMM:minGap*1000,posteriorAndMarginPenetrations:penetrations,contactTestVertices:tested,upperFreeMarginArcMM:edgeLength(lid.A/4),lowerFreeMarginArcMM:edgeLength(3*lid.A/4),radiusMM:c.radius*1000,irisRadiusRatio:.435,restingOpening:this.config.opening,eyeHidden:!e.ball.visible,outerBoundaryDeviationMM:e.contactReport.outerBoundaryDeviationMM,verticalApertureMM:e.contactReport.verticalApertureMM,horizontalApertureMM:e.contactReport.horizontalApertureMM});
+   rows.push({surfaceTests,name:c.name,nonfiniteVertices:nonfinite,maxSharedEdgeErrorMM:seamMax*1000,posteriorAndMarginMinAxialGapMM:minGap*1000,posteriorAndMarginPenetrations:penetrations,contactTestVertices:tested,upperFreeMarginArcMM:edgeLength(lid.A/4),lowerFreeMarginArcMM:edgeLength(3*lid.A/4),radiusMM:c.radius*1000,irisRadiusRatio:.435,restingOpening:this.config.opening,eyeHidden:!e.ball.visible,outerBoundaryDeviationMM:e.contactReport.outerBoundaryDeviationMM,verticalApertureMM:e.contactReport.verticalApertureMM,horizontalApertureMM:e.contactReport.horizontalApertureMM});
   }
-  this._fittingEye=null;return {version:'ET06',units:'millimetres',scope:'actual inner-surface and free-margin vertices against rotated two-sphere; not exhaustive triangle CCD',eyes:rows};
+  this._fittingEye=null;return {version:'ET06.1',units:'millimetres',scope:'actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD',eyes:rows};
  }
  dispose(){for(const e of this.eyes){e.edgeMap?.dispose();e.lid.mesh.customDepthMaterial?.dispose();}super.dispose();}
 }
