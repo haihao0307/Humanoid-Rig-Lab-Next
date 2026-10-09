@@ -1,0 +1,95 @@
+{
+  "version": "R05.1",
+  "url": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/b2aa0aaabc6a79115ac934f639d16eae4d232111/leather-workshop/r05/preview.html",
+  "public": true,
+  "realMobileDevice": false,
+  "tests": [
+    {
+      "name": "R05.1 starts as real 3D, not blank",
+      "pass": true
+    },
+    {
+      "name": "nonblank rendered canvas",
+      "pass": true
+    },
+    {
+      "name": "thread materials are FrontSide, no DoubleSide masking",
+      "pass": true
+    },
+    {
+      "name": "outer grain material explicitly assigned to exterior face",
+      "pass": true
+    },
+    {
+      "name": "view renders macro",
+      "pass": true
+    },
+    {
+      "name": "view renders back",
+      "pass": true
+    },
+    {
+      "name": "view renders section",
+      "pass": true
+    },
+    {
+      "name": "view renders route",
+      "pass": true
+    },
+    {
+      "name": "normal tension yields bounded solved micro-indentation",
+      "pass": true,
+      "contact": {
+        "model": "local elastic plate on foundation",
+        "units": {
+          "length": "mm",
+          "tension": "N"
+        },
+        "tensionN": 0.8,
+        "minDisplacementMM": -0.051823142105095504,
+        "maxDisplacementMM": 0.007984780402997776,
+        "maxLateralMM": 0.011973214994132965,
+        "relativeResidual": 9.245028617664532e-08,
+        "iterations": 100,
+        "calibrated": false,
+        "fullStitchMechanics": false
+      }
+    },
+    {
+      "name": "A/B removes actual load-dependent skin deformation",
+      "pass": true
+    },
+    {
+      "name": "tighter thread changes surface response rather than color only",
+      "pass": true
+    },
+    {
+      "name": "slack thread unloads local surface response",
+      "pass": true
+    },
+    {
+      "name": "single needle pattern retained",
+      "pass": true
+    },
+    {
+      "name": "export includes new tension parameter",
+      "pass": true
+    },
+    {
+      "name": "R04 immutable accepted link retained",
+      "pass": true
+    },
+    {
+      "name": "zero console errors across requested modes",
+      "pass": true,
+      "errors": []
+    }
+  ],
+  "visualAcceptance": "PENDING_USER",
+  "pass": true,
+  "requests": [
+    "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/b2aa0aaabc6a79115ac934f639d16eae4d232111/leather-workshop/r05/preview.html",
+    "https://htmlpreview.github.io/htmlpreview.js",
+    "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/b2aa0aaabc6a79115ac934f639d16eae4d232111/leather-workshop/r05/preview.html"
+  ]
+}
