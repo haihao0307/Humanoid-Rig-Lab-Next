@@ -1,0 +1,84 @@
+name: ET05 eyelid anatomy validation
+on:
+  push:
+    branches: [feature/emily-eyelid-anatomy-et05-20261009]
+    paths:
+      - '.github/workflows/et05-anatomy.yml'
+      - 'skin-quality-lab/emily-transfer/anatomy/**'
+permissions:
+  contents: write
+concurrency:
+  group: et05-anatomy-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser and bundler
+        run: |
+          npm install --prefix /tmp/et05-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/et05-tools/node_modules/.bin/playwright install chromium
+          timeout 75s sudo apt-get install --no-install-recommends -y fonts-wqy-zenhei || true
+      - name: Apply the anatomy reconstruction and build
+        env:
+          NODE_PATH: /tmp/et05-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          node skin-quality-lab/emily-transfer/anatomy/apply-et05.cjs
+          node skin-quality-lab/emily-transfer/anatomy/finalize-et05.cjs
+          node skin-quality-lab/emily-transfer/anatomy/bundle.cjs
+      - name: Retained TalkingHead behavior regression
+        env:
+          NODE_PATH: /tmp/et05-tools/node_modules
+          EVIDENCE_DIR: /tmp/et05-evidence/behavior
+        run: |
+          node skin-quality-lab/emily-transfer/talkinghead/test-kernel.mjs
+          node skin-quality-lab/emily-transfer/talkinghead/qa.cjs
+      - name: Eyelid anatomy and contact regression
+        env:
+          NODE_PATH: /tmp/et05-tools/node_modules
+          EVIDENCE_DIR: /tmp/et05-evidence/anatomy
+        run: node skin-quality-lab/emily-transfer/anatomy/qa.cjs
+      - name: Preserve tested candidate before publishing
+        if: always()
+        run: |
+          mkdir -p /tmp/et05-evidence/candidate
+          cp -r skin-quality-lab/emily-transfer/. /tmp/et05-evidence/candidate/
+      - name: Publish only the tested candidate
+        if: success()
+        run: |
+          git config user.name 'et05-anatomy-validation'
+          git config user.email 'et05-anatomy-validation@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(eyes): publish validated ET05 eyelid anatomy [skip ci]'
+            git push origin HEAD:feature/emily-eyelid-anatomy-et05-20261009
+          fi
+          git rev-parse HEAD | tee /tmp/et05-evidence/PUBLISHED_COMMIT.txt
+      - name: Verify immutable public HTTPS page
+        if: success()
+        env:
+          NODE_PATH: /tmp/et05-tools/node_modules
+          EVIDENCE_DIR: /tmp/et05-evidence/public-behavior
+        run: |
+          export PUBLIC_COMMIT=$(git rev-parse HEAD)
+          node skin-quality-lab/emily-transfer/talkinghead/public.cjs
+          EVIDENCE_DIR=/tmp/et05-evidence/public-anatomy node skin-quality-lab/emily-transfer/anatomy/public.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et05-eyelid-anatomy-evidence
+          path: /tmp/et05-evidence
+          retention-days: 14
