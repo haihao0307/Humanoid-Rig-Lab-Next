@@ -1,3 +1,4 @@
+import {loadScanRepair,disposeScanRepair} from './ScanRepair.js';
 import * as THREE from 'three';
 import {ResearchEyes} from '../research/ResearchEyes.js';
 const clamp=THREE.MathUtils.clamp,lerp=THREE.MathUtils.lerp;
@@ -130,6 +131,7 @@ export class NaturalEyes extends ResearchEyes {
   this.ready=this.ready.then(()=>{for(const e of this.eyes)makeCanthus(this,e);this.update(0,true);
    window.__NATURAL_REVIEW__={setVisibility:flags=>{for(const e of this.eyes){const parts={margin:e.lid.edge,rim:e.rim.mesh,inside:e.lid.inside,canthus:e.canthus.mesh,lashes:e.lashes.mesh};for(const [k,v]of Object.entries(flags))if(parts[k]&&typeof v==='boolean')parts[k].visible=v;}this.requestRender();}};
    this.requestRender();return this;});
+  this.ready=this.ready.then(async()=>{await loadScanRepair(this);this.update(0,true);return this;});
  }
  makeLid(c,sample,material){const lid=super.makeLid(c,sample,material);configureTissue(this,lid,c,sample);return lid;}
  updateLid(e,blink){
@@ -137,9 +139,9 @@ export class NaturalEyes extends ResearchEyes {
   if(e.lid.tissueReady){sharedNormals(e.lid);for(const k of ['roughness','clearcoat','clearcoatRoughness','envMapIntensity'])e.lid.edge.material[k]=this.skin[k];}
   updateCanthus(this,e,this.config.manualBlink>=0?this.config.manualBlink:blink);
  }
- info(){return {...super.info(),naturalTissue:{version:'ET07.1',sameSkinAssets:true,extraTextures:0,continuousCanthalTissue:true,sharedMarginNormals:true,closedScanNotOpenGroundTruth:true}};}
+ info(){return {...super.info(),naturalTissue:{version:'ET07.2',sameSkinAssets:true,extraTextures:3,localCaptureMarkRepair:true,continuousCanthalTissue:true,sharedMarginNormals:true,closedScanNotOpenGroundTruth:true}};}
  audit(detailed=false){
-  const a=super.audit(detailed);a.version='ET07.1';
+  const a=super.audit(detailed);a.version='ET07.2';a.scanRepair=this.scanRepair?{ready:true,enabled:this.scanRepair.uniforms.uRepairEnabled.value===1,extraTextures:3,originalAssetsModified:false,atlasSize:this.scanRepair.meta.atlasSize}:null;
   a.tissue=this.eyes.map(e=>{const {lid}=e,uv=lid.mesh.geometry.attributes.uv,N=lid.mesh.geometry.attributes.normal,EN=lid.edge.geometry.attributes.normal;let uvError=0,normalError=0;
    for(let i=0;i<=lid.A;i++){const q=lid.entries[lid.R*(lid.A+1)+i],k=lid.R*(lid.A+1)+i;uvError=Math.max(uvError,Math.hypot(uv.getX(k)-q.src.u,uv.getY(k)-q.src.v));const j=i*(lid.es+1)+lid.es;normalError=Math.max(normalError,Math.hypot(N.getX(i)-EN.getX(j),N.getY(i)-EN.getY(j),N.getZ(i)-EN.getZ(j)));}
    let canthusMin=Infinity,canthusPenetrations=0,canthusSamples=0,canthusInvalid=0;
@@ -153,5 +155,5 @@ export class NaturalEyes extends ResearchEyes {
    return {canthalContact:{minAxialGapMM:Number.isFinite(canthusMin)?canthusMin*1000:null,penetrations:canthusPenetrations,samples:canthusSamples,invalid:canthusInvalid},name:e.c.name,boundaryUVMaxError:uvError,sharedMarginNormalMaxError:normalError,sameAlbedoTexture:lid.mesh.material.map===this.skin.map&&lid.edge.material.map===this.skin.map,canthalPatch:!!e.canthus,...lid.tissueStats};
   });return a;
  }
- dispose(){for(const e of this.eyes){e.canthus?.mesh.geometry.dispose();e.canthus?.mesh.material.dispose();e.canthus?.mesh.removeFromParent();}super.dispose();}
+ dispose(){disposeScanRepair(this);for(const e of this.eyes){e.canthus?.mesh.geometry.dispose();e.canthus?.mesh.material.dispose();e.canthus?.mesh.removeFromParent();}super.dispose();}
 }

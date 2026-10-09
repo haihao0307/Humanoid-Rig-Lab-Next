@@ -1,5 +1,5 @@
 {
-  "version": "ET07.1",
+  "version": "ET07.2",
   "publicCommit": null,
   "backend": "Chromium / SwiftShader",
   "physicalMobileDevice": false,
@@ -9,7 +9,7 @@
   "failedRequests": [],
   "checks": {
     "resting": {
-      "version": "ET07.1",
+      "version": "ET07.2",
       "units": "millimetres",
       "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
       "eyes": [
@@ -58,6 +58,16 @@
           "horizontalApertureMM": 23.4
         }
       ],
+      "scanRepair": {
+        "ready": true,
+        "enabled": true,
+        "extraTextures": 3,
+        "originalAssetsModified": false,
+        "atlasSize": [
+          980,
+          200
+        ]
+      },
       "tissue": [
         {
           "canthalContact": {
@@ -93,13 +103,169 @@
         }
       ]
     },
+    "textureRepairToggle": {
+      "rawDifference": {
+        "meanRGB": 0.2656500022202929,
+        "changedFraction": 0.023855132781169467
+      },
+      "restoredDifference": {
+        "meanRGB": 0.000032155965620679045,
+        "changedFraction": 0
+      },
+      "info": {
+        "enabled": true,
+        "ready": true,
+        "schema": "kaopu/periocular-scan-repair@1",
+        "atlasRectPixels": [
+          1540,
+          1120,
+          2520,
+          1320
+        ],
+        "atlasSize": [
+          980,
+          200
+        ],
+        "uvRect": [
+          0.3759765625,
+          0.677734375,
+          0.2392578125,
+          0.048828125
+        ],
+        "source": "same existing Lee scan textures; no additional person or stock skin",
+        "albedoSHA256": "4fc7297835e2081cb914d1a8507fc837687102eed7bd3c6bed25b72960a09e08",
+        "maskPolygonsPixels": [
+          [
+            [
+              1612,
+              1193
+            ],
+            [
+              1640,
+              1172
+            ],
+            [
+              1695,
+              1160
+            ],
+            [
+              1798,
+              1163
+            ],
+            [
+              1850,
+              1173
+            ],
+            [
+              1880,
+              1188
+            ],
+            [
+              1893,
+              1210
+            ],
+            [
+              1880,
+              1251
+            ],
+            [
+              1815,
+              1268
+            ],
+            [
+              1680,
+              1263
+            ],
+            [
+              1620,
+              1248
+            ],
+            [
+              1598,
+              1220
+            ]
+          ],
+          [
+            [
+              2190,
+              1189
+            ],
+            [
+              2240,
+              1170
+            ],
+            [
+              2378,
+              1170
+            ],
+            [
+              2436,
+              1180
+            ],
+            [
+              2470,
+              1200
+            ],
+            [
+              2474,
+              1225
+            ],
+            [
+              2445,
+              1254
+            ],
+            [
+              2380,
+              1270
+            ],
+            [
+              2265,
+              1270
+            ],
+            [
+              2203,
+              1255
+            ],
+            [
+              2174,
+              1222
+            ]
+          ]
+        ],
+        "donorOffsetPixels": [
+          0,
+          215
+        ],
+        "method": "masked capture-mark removal, constrained colour inpaint and same-subject fine-detail transfer",
+        "originalAssetsModified": false,
+        "hiddenTrueSkinRecovered": false,
+        "scope": "new eyelid materials only",
+        "maskedPixels": 79131,
+        "extraTextures": 3,
+        "extraBaseLevelGPUBytes": 2352000,
+        "outputs": {
+          "color": {
+            "bytes": 128811,
+            "sha256": "a29f86c9c5a6015a3aa688ad8aabd1ab39943928a46755b09be61ad45c87b4b3"
+          },
+          "normalBands": {
+            "bytes": 136063,
+            "sha256": "bc901113945e1168dd53409716ee057d40fc4345ce56f64538d6739e96996d7e"
+          },
+          "surface": {
+            "bytes": 83846,
+            "sha256": "0f0537a36d89c7b4a5130ac48d84099b13d80d0d09b1cfa608e03f0f3280105d"
+          }
+        }
+      }
+    },
     "sourceGeometry": {
-      "uuid": "93c5c352-2320-42ec-9272-4097c1c9679b",
+      "uuid": "09013251-8fd3-4e4d-90e1-1794d4210f33",
       "vertices": 143196,
       "triangles": 282944
     },
     "closed": {
-      "version": "ET07.1",
+      "version": "ET07.2",
       "units": "millimetres",
       "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
       "eyes": [
@@ -148,6 +314,16 @@
           "horizontalApertureMM": 23.4
         }
       ],
+      "scanRepair": {
+        "ready": true,
+        "enabled": true,
+        "extraTextures": 3,
+        "originalAssetsModified": false,
+        "atlasSize": [
+          980,
+          200
+        ]
+      },
       "tissue": [
         {
           "canthalContact": {
@@ -184,12 +360,12 @@
       ]
     },
     "openToHalf": {
-      "meanRGB": 2.5569612306241165,
-      "changedFraction": 0.10222036942610789
+      "meanRGB": 2.5493437120540463,
+      "changedFraction": 0.10111443389422525
     },
     "halfToClosed": {
-      "meanRGB": 2.40128156835363,
-      "changedFraction": 0.10227204865656969
+      "meanRGB": 2.375961425091147,
+      "changedFraction": 0.10085029560519825
     },
     "sweep": [
       {
@@ -200,7 +376,7 @@
           0.8
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -249,6 +425,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -293,7 +479,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -342,6 +528,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -386,7 +582,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -435,6 +631,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -479,7 +685,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -528,6 +734,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -572,7 +788,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -621,6 +837,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -665,7 +891,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -714,6 +940,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -758,7 +994,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -807,6 +1043,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -851,7 +1097,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -900,6 +1146,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -944,7 +1200,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -993,6 +1249,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1037,7 +1303,7 @@
           0.8
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1086,6 +1352,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1130,7 +1406,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1179,6 +1455,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1223,7 +1509,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1272,6 +1558,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1316,7 +1612,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1365,6 +1661,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1409,7 +1715,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1458,6 +1764,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1502,7 +1818,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1551,6 +1867,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1595,7 +1921,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1644,6 +1970,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1688,7 +2024,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1737,6 +2073,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1781,7 +2127,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1830,6 +2176,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1874,7 +2230,7 @@
           0.8
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -1923,6 +2279,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -1967,7 +2333,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2016,6 +2382,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2060,7 +2436,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2109,6 +2485,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2153,7 +2539,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2202,6 +2588,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2246,7 +2642,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2295,6 +2691,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2339,7 +2745,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2388,6 +2794,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2432,7 +2848,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2481,6 +2897,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2525,7 +2951,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2574,6 +3000,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2618,7 +3054,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2667,6 +3103,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2711,7 +3157,7 @@
           0.8
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2760,6 +3206,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2804,7 +3260,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2853,6 +3309,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2897,7 +3363,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -2946,6 +3412,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -2990,7 +3466,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3039,6 +3515,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3083,7 +3569,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3132,6 +3618,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3176,7 +3672,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3225,6 +3721,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3269,7 +3775,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3318,6 +3824,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3362,7 +3878,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3411,6 +3927,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3455,7 +3981,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3504,6 +4030,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3548,7 +4084,7 @@
           0.8
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3597,6 +4133,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3641,7 +4187,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3690,6 +4236,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3734,7 +4290,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3783,6 +4339,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3827,7 +4393,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3876,6 +4442,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -3920,7 +4496,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -3969,6 +4545,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -4013,7 +4599,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -4062,6 +4648,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -4106,7 +4702,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -4155,6 +4751,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -4199,7 +4805,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -4248,6 +4854,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -4292,7 +4908,7 @@
           0.65
         ],
         "audit": {
-          "version": "ET07.1",
+          "version": "ET07.2",
           "units": "millimetres",
           "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
           "eyes": [
@@ -4341,6 +4957,16 @@
               "horizontalApertureMM": 23.4
             }
           ],
+          "scanRepair": {
+            "ready": true,
+            "enabled": true,
+            "extraTextures": 3,
+            "originalAssetsModified": false,
+            "atlasSize": [
+              980,
+              200
+            ]
+          },
           "tissue": [
             {
               "canthalContact": {
@@ -4392,7 +5018,7 @@
     "recipe": {
       "restored": true,
       "small": {
-        "version": "ET07.1",
+        "version": "ET07.2",
         "units": "millimetres",
         "scope": "actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD",
         "eyes": [
@@ -4441,6 +5067,16 @@
             "horizontalApertureMM": 23.4
           }
         ],
+        "scanRepair": {
+          "ready": true,
+          "enabled": true,
+          "extraTextures": 3,
+          "originalAssetsModified": false,
+          "atlasSize": [
+            980,
+            200
+          ]
+        },
         "tissue": [
           {
             "canthalContact": {
@@ -4477,7 +5113,7 @@
         ]
       },
       "sourceSame": {
-        "uuid": "93c5c352-2320-42ec-9272-4097c1c9679b",
+        "uuid": "09013251-8fd3-4e4d-90e1-1794d4210f33",
         "vertices": 143196,
         "triangles": 282944
       }
@@ -4491,6 +5127,6 @@
       "realHardware": false
     }
   },
-  "url": "http://127.0.0.1:40887/skin-quality-lab/emily-transfer/index.html",
+  "url": "http://127.0.0.1:36653/skin-quality-lab/emily-transfer/index.html",
   "passed": true
 }

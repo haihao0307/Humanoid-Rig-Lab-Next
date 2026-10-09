@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {NaturalEyes as ResearchEyes} from '../natural/NaturalEyes.js';
 import {BehaviorController,DEFAULT_BEHAVIOR} from './BehaviorController.js';
-export const EYE_VERSION='eyes/7.1.0';
+export const EYE_VERSION='eyes/7.2.0';
 const clamp=THREE.MathUtils.clamp;
 const V=()=>new THREE.Vector3();
 /** Single final-pose writer. Targets use world metres; contact uses head space.
