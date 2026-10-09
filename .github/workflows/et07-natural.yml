@@ -1,0 +1,88 @@
+name: ET07 natural periocular skin
+on:
+  push:
+    branches: [fix/eye-envelope-takeover-et06-20261009]
+    paths: ['.github/workflows/et07-natural.yml', 'skin-quality-lab/emily-transfer/natural/**']
+permissions:
+  contents: write
+concurrency:
+  group: et07-natural-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser and bundler
+        run: |
+          npm install --prefix /tmp/et07-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/et07-tools/node_modules/.bin/playwright install chromium
+          timeout 60s sudo apt-get install --no-install-recommends -y fonts-wqy-zenhei || true
+      - name: Build natural tissue candidate
+        env:
+          NODE_PATH: /tmp/et07-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          node skin-quality-lab/emily-transfer/natural/install.cjs
+          node skin-quality-lab/emily-transfer/anatomy/bundle.cjs
+          git diff --exit-code -- skin-quality-lab/r01 skin-quality-lab/r02
+          node skin-quality-lab/emily-transfer/talkinghead/test-kernel.mjs
+      - name: Actual multi-view visual evidence
+        env:
+          NODE_PATH: /tmp/et07-tools/node_modules
+          EVIDENCE_DIR: /tmp/et07/visual
+        run: node skin-quality-lab/emily-transfer/natural/visual.cjs
+      - name: Preserve candidate and early evidence
+        if: always()
+        run: |
+          mkdir -p /tmp/et07/candidate
+          cp skin-quality-lab/emily-transfer/BUILD_MANIFEST.json /tmp/et07/candidate/
+          tar -czf /tmp/et07/candidate/source.tgz skin-quality-lab/emily-transfer
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et07-early-visual-review
+          path: /tmp/et07
+          retention-days: 14
+      - name: 45 poses, shared normals, texture identity and contacts
+        env:
+          NODE_PATH: /tmp/et07-tools/node_modules
+          EVIDENCE_DIR: /tmp/et07/local
+        run: node skin-quality-lab/emily-transfer/natural/qa.cjs
+      - name: Publish tested isolated candidate
+        if: success()
+        run: |
+          git config user.name 'et07-eye-validation'
+          git config user.email 'et07-eye-validation@users.noreply.github.com'
+          cp /tmp/et07/local/report.json skin-quality-lab/emily-transfer/natural/qa-report.json
+          git add skin-quality-lab/emily-transfer
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(eyes): ET07 natural tissue and acceptance evidence [skip ci]'
+            git push origin HEAD:fix/eye-envelope-takeover-et06-20261009
+          fi
+          git rev-parse HEAD | tee /tmp/et07/PUBLISHED_COMMIT.txt
+      - name: Independent immutable public HTTPS verification
+        if: success()
+        env:
+          NODE_PATH: /tmp/et07-tools/node_modules
+          EVIDENCE_DIR: /tmp/et07/public
+        run: |
+          export PUBLIC_COMMIT=$(git rev-parse HEAD)
+          node skin-quality-lab/emily-transfer/natural/qa.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et07-complete-browser-evidence
+          path: /tmp/et07
+          retention-days: 14
