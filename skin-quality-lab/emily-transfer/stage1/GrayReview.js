@@ -46,6 +46,9 @@ export function createGrayReview(host){
  }
  if(rig.scanRepair)rig.scanRepair.uniforms.uRepairEnabled.value=0;
  api.originalEnvironment=scene.environment;scene.environment=null;scene.background=new THREE.Color(0x191c20);
+ // A contour inspection is unshadowed diffuse look-development. PCF self-shadow
+ // acne on thin contact sheets must not masquerade as tissue or extra folds.
+ const grayFill=new THREE.AmbientLight(0xffffff,.35);grayFill.name='ET08-gray-diffuse-fill';scene.add(grayFill);renderer.shadowMap.enabled=false;
  key.shadow.camera.left=-.13;key.shadow.camera.right=.13;key.shadow.camera.top=.14;key.shadow.camera.bottom=-.14;key.shadow.camera.updateProjectionMatrix();key.shadow.normalBias=.00006;key.shadow.bias=-.000015;key.shadow.radius=4;
  const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
  const side=document.querySelector('.side'),legacy=document.createElement('details');legacy.className='s1-legacy';legacy.innerHTML='<summary>原工作台参数与行为控制（保留）</summary>';
@@ -83,20 +86,21 @@ export function createGrayReview(host){
  api.compare=on=>{rig.compareOriginal(on);document.getElementById('s1Compare').classList.toggle('active',!!on);return api.refresh();};
  api.view=name=>{
   if(name==='portrait'){setCamera('portrait');requestRender();return;}
-  const narrow=camera.aspect<.9,views={front:{p:[-.004,.074,narrow?.35:.265],t:[-.004,.069,.072]},right:{p:[-.030,.071,narrow?.185:.151],t:[-.030,.069,.066]},left:{p:[.0217,.071,narrow?.185:.151],t:[.0217,.069,.066]},obliqueR:{p:[-.102,.077,.206],t:[-.004,.069,.069]},obliqueL:{p:[.094,.077,.206],t:[-.004,.069,.069]},below:{p:[-.004,.026,.232],t:[-.004,.069,.069]}};
+  const narrow=camera.aspect<.9,views={front:{p:[-.004,.074,narrow?.44:.265],t:[-.004,.069,.072]},right:{p:[-.030,.071,narrow?.185:.151],t:[-.030,.069,.066]},left:{p:[.0217,.071,narrow?.185:.151],t:[.0217,.069,.066]},obliqueR:{p:[-.102,.077,.206],t:[-.004,.069,.069]},obliqueL:{p:[.094,.077,.206],t:[-.004,.069,.069]},below:{p:[-.004,.026,.232],t:[-.004,.069,.069]}};
   const v=views[name]||views.front;camera.position.set(...v.p);controls.target.set(...v.t);controls.update();state.camera='s1-'+name;requestRender();
  };
  api.setLight=name=>{api.light=name;ui.querySelectorAll('[data-s1-light]').forEach(b=>b.classList.toggle('active',b.dataset.s1Light===name));renderer.shadowMap.needsUpdate=true;requestRender();};
  api.render=()=>{
-  fuzz.visible=false;
+  renderer.shadowMap.enabled=false;fuzz.visible=false;
   for(const e of rig.eyes){e.rim.mesh.visible=false;e.lashes.mesh.visible=false;e.ball.visible=true;}
   for(const m of api.materials){m.roughness=1;m.metalness=0;m.envMapIntensity=0;m.clearcoat=0;}
   key.color.set(0xffffff);fill.color.set(0xffffff);rim.color.set(0xffffff);key.intensity=2.4;fill.intensity=1.1;rim.intensity=.25;
   key.position.set(api.light==='right'?.32:-.32,.30,.42);fill.position.set(api.light==='right'?-.35:.35,.08,.40);key.target.position.set(-.004,.060,.060);scene.environment=null;
   anchors.visible=api.anchors;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
   renderer.shadowMap.autoUpdate=false;renderer.setRenderTarget(null);renderer.clear();renderer.render(scene,camera);renderer.shadowMap.needsUpdate=false;
+  const size=renderer.getDrawingBufferSize(new THREE.Vector2());document.getElementById('stats').textContent=size.x+' × '+size.y+' / '+Math.round(mesh.geometry.index.count/3000)+'K HEAD TRI';
  };
- api.diagnostics=()=>({stage:'ET08-S1',active:true,texturedVisibleMaterials:api.materials.filter(m=>m.map||m.normalMap||m.bumpMap||m.roughnessMap).length,clearcoatMax:Math.max(...api.materials.map(m=>m.clearcoat||0)),wetRimsVisible:rig.eyes.some(e=>e.rim.mesh.visible),eyelashesVisible:rig.eyes.some(e=>e.lashes.mesh.visible),fuzzVisible:fuzz.visible,originalHeadGeometryUUID:mesh.geometry.uuid,headVertices:mesh.geometry.attributes.position.count,headTriangles:mesh.geometry.index.count/3,sourceHeadReplaced:false,irisReference:!!api.guide.value,renderers:1,realMobileDeviceTested:false});
+ api.diagnostics=()=>({stage:'ET08-S1',active:true,shadowMapsEnabled:renderer.shadowMap.enabled,inspectionLighting:'unshadowed diffuse / no screen-space occlusion',texturedVisibleMaterials:api.materials.filter(m=>m.map||m.normalMap||m.bumpMap||m.roughnessMap).length,clearcoatMax:Math.max(...api.materials.map(m=>m.clearcoat||0)),wetRimsVisible:rig.eyes.some(e=>e.rim.mesh.visible),eyelashesVisible:rig.eyes.some(e=>e.lashes.mesh.visible),fuzzVisible:fuzz.visible,originalHeadGeometryUUID:mesh.geometry.uuid,headVertices:mesh.geometry.attributes.position.count,headTriangles:mesh.geometry.index.count/3,sourceHeadReplaced:false,irisReference:!!api.guide.value,renderers:1,realMobileDeviceTested:false});
  document.getElementById('s1Neutral').onclick=()=>{api.compare(false);api.pose(0);api.view('front');};
  for(const b of ui.querySelectorAll('[data-s1-closure]'))b.onclick=()=>api.pose(Number(b.dataset.s1Closure));
  for(const b of ui.querySelectorAll('[data-s1-view]'))b.onclick=()=>api.view(b.dataset.s1View);
