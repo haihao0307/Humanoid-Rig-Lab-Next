@@ -21,7 +21,7 @@ worker='(()=>{'+shared+mod(L/'r04/site/clamp.mjs','ClampedLeather')+src(L/'r04/s
 try:commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=R,text=True,stderr=subprocess.DEVNULL).strip()
 except:commit=os.environ.get('SOURCE_SHA','LOCAL-R07')
 inputs=[L/'r02/site/leather.js',L/'r04/site/dynamics.mjs',L/'r05/site/seam.mjs',L/'r05/site/contact-surface.mjs',L/'r05/site/geometry.js',L/'r05/site/appearance.js']
-info={'version':'R07.1','sourceCommit':commit,'baseline':BASE,'parent':PARENT,'frozenInputHashes':{str(p.relative_to(L)):sha(p) for p in inputs},'R05ValidationExtensionOnly':{'count':[5,1600],'layerThicknessMM':[.2,8]},'materialCalibration':False,'collisionScope':'particle self-contact; not triangle CCD'}
+info={'version':'R07.1','sourceCommit':commit,'baseline':BASE,'parent':PARENT,'frozenInputHashes':{str(p.relative_to(L)):sha(p) for p in inputs},'sourceHashes':{p.name:sha(p) for p in (R/'site').iterdir() if p.is_file()},'R05ValidationExtensionOnly':{'count':[5,1600],'layerThicknessMM':[.2,8]},'materialCalibration':False,'collisionScope':'particle self-contact; not triangle CCD'}
 code='\n'.join([three,shared,
  'const R05_SEW='+rawmod(L/'r05/site/seam.mjs','buildSeam,continuousRoutes,auditSeam,insideHole',[("['count',5,25]","['count',5,1600]"),("['layerThickness',.8,2.5]","['layerThickness',.2,8]")])+';',
  'const R05_CONTACT='+rawmod(L/'r05/site/contact-surface.mjs','buildContactField,mapSurfacePoint')+';',
@@ -32,7 +32,7 @@ code='\n'.join([three,shared,
  mod(R/'site/panels.js','PanelAssembly,rectangle,borderPoints,skinMaterial,installSkin,updateSkin,reskinMaterial'),
  mod(R/'site/products.js','PRODUCT_SPECS,productMaterials,makeProduct,setProductMaterial,productAudit,patternSVG'),
  mod(R/'site/grip.mjs','ProductShell'),mod(L/'r06/site/catalogue.js','CATALOGUE,AtelierMaterials'),
- 'const WORKER_CODE='+json.dumps(worker)+';const BUILD_INFO='+json.dumps(info)+';const BASELINE_GZIP='+json.dumps(base64.b64encode(gzip.compress((L/'r05/public-lite.html').read_bytes(),mtime=0)).decode())+';',src(R/'site/runtime.js')])
+ 'const WORKER_CODE='+json.dumps(worker)+';const BUILD_INFO='+json.dumps(info)+';const BASELINE_GZIP='+json.dumps(base64.b64encode(gzip.compress((L/'r05/public-lite.html').read_bytes(),mtime=0)).decode())+';',src(R/'site/runtime.js'),src(R/'site/runtime-polish.js')])
 code='(()=>{'+code+'})();';code=re.sub(r'</script',r'<\\/script',code,flags=re.I)
 (R/'bundle-check.js').write_text(code);subprocess.run(['node','--check',str(R/'bundle-check.js')],check=True);(R/'bundle-check.js').unlink()
 old=(L/'r06/public-lite.html').read_text();data=re.search(r'<div id="scanData" hidden>(.*?)</div>',old,re.S);assert data
