@@ -29,7 +29,7 @@ function surfaceMat(kind){
  if($('materialSource').value==='original'){
   if(kind==='grain'){const m=kernel.material.clone();m.side=T.FrontSide;return m;}
  }
- return kind==='grain'?appearance.grain(look):kind==='cut'?appearance.cut(look):appearance.flesh(look);
+ return kind==='grain'?appearance.grain(look,$('materialSource').value==='vintage'):kind==='cut'?appearance.cut(look):appearance.flesh(look);
 }
 function rebuild(){
  model=buildSeam(params,process);model.contact=buildContactField(model,responseEnabled);dispose(root);root=new T.Group();scene.add(root);leatherMeshes=[];

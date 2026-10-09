@@ -5,17 +5,23 @@ export class SewingAppearance{
  async load(data){
   await Promise.all(Object.entries(data).map(async([name,url])=>{const t=await new T.TextureLoader().loadAsync(url);t.colorSpace=name==='diff'?T.SRGBColorSpace:T.NoColorSpace;t.wrapS=t.wrapT=T.ClampToEdgeWrapping;t.minFilter=T.LinearMipmapLinearFilter;t.magFilter=T.LinearFilter;t.anisotropy=8;t.repeat.set(96/150,96/75);t.offset.set(.012,.26);this.textures[name]=t;}));
  }
- grain(look){
-  const m=new T.MeshPhysicalMaterial({color:new T.Color(look.color),map:this.textures.diff,normalMap:this.textures.nor_gl,normalScale:new T.Vector2(.82,.82),roughnessMap:this.textures.rough,roughness:1,metalness:0,ior:1.47,clearcoat:Math.min(.26,look.coat||.12),clearcoatRoughness:.36,side:T.FrontSide,vertexColors:true});
+ grain(look,raw=false){
+  const m=new T.MeshPhysicalMaterial({color:new T.Color(look.color),map:this.textures.diff,normalMap:this.textures.nor_gl,normalScale:new T.Vector2(raw?.65:.24,raw?.65:.24),roughnessMap:this.textures.rough,roughness:1,metalness:0,ior:1.47,clearcoat:Math.min(.26,look.coat||.12),clearcoatRoughness:.36,side:T.FrontSide,vertexColors:true});
   const sourceAlbedoMean=[.08401343,.02765351,.00580022];m.color.r/=sourceAlbedoMean[0];m.color.g/=sourceAlbedoMean[1];m.color.b/=sourceAlbedoMean[2];m.name='OUTER_GRAIN_PBR';m.userData.surfaceRole='outer-grain';
   m.onBeforeCompile=shader=>{
    shader.uniforms.finishRoughness={value:look.roughness??.46};
+   shader.uniforms.pigmentCoverage={value:raw?1:.16};
    shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nattribute float compression; varying float vCompression;');
    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvCompression=compression;');
-   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float finishRoughness; varying float vCompression;');
+   shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform float finishRoughness;uniform float pigmentCoverage; varying float vCompression;');
+   shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#ifdef USE_MAP
+vec4 texelColor=texture2D(map,vMapUv);
+texelColor.rgb=mix(vec3(.08401343,.02765351,.00580022),texelColor.rgb,pigmentCoverage);
+diffuseColor*=texelColor;
+#endif`);
    shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\nroughnessFactor=clamp(finishRoughness*.62 + roughnessFactor*.18-vCompression*.035,.24,.85);');
   };
-  m.customProgramCacheKey=()=>`grain-r051-${look.roughness}`;return m;
+  m.customProgramCacheKey=()=>`grain-r051-${look.roughness}-${raw}`;return m;
  }
  flesh(look){
   const m=new T.MeshPhysicalMaterial({color:new T.Color(look.color).multiplyScalar(.68),map:this.textures.diff,normalMap:this.textures.nor_gl,normalScale:new T.Vector2(.35,.35),roughness:.95,sheen:.3,sheenRoughness:.95,sheenColor:new T.Color(look.color),side:T.FrontSide,vertexColors:true});m.userData.surfaceRole='flesh';return m;
