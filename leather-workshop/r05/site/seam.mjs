@@ -19,18 +19,22 @@ export function holeAt(p,j,row=0){
 }
 function sidePoint(p,h,side,lane){
  const q=lane*h.rx*.45;
- return [h.x+h.axis[0]*q,side*(p.layerThickness-p.groove+p.diameter*.47),h.z+h.axis[1]*q];
+ return [h.x+h.axis[0]*q,side*(p.layerThickness-p.diameter*.65),h.z+h.axis[1]*q];
 }
 function bridge(a,b,side,slack,p){
- const out=[],L=dist(a,b),N=Math.max(12,Math.ceil(L/.10));
- for(let i=0;i<=N;i++){
-  const t=i/N,arc=Math.sin(Math.PI*t);out.push([mix(a[0],b[0],t),mix(a[1],b[1],t)+side*(.016*p.diameter+slack*p.pitch*.22)*arc*arc,mix(a[2],b[2],t)]);
- }
+ const dx=b[0]-a[0],dz=b[2]-a[2],L=Math.hypot(dx,dz),ux=dx/L,uz=dz/L;
+ const rx=Math.min(p.diameter*.95,L*.24),ry=p.diameter*(.65+.47)-p.groove;
+ const out=[],steps=24;
+ const add=(u,y)=>out.push([a[0]+ux*u,y,a[2]+uz*u]);
+ for(let i=0;i<=steps;i++){const f=i/steps*Math.PI/2;add(rx*(1-Math.cos(f)),a[1]+side*ry*Math.sin(f));}
+ const span=L-2*rx,amp=slack*Math.min(p.pitch*.18,span*span/(25*p.diameter)),N=Math.max(16,Math.ceil(span/.05));
+ for(let i=1;i<=N;i++){const f=i/N;add(rx+span*f,a[1]+side*(ry+amp*Math.sin(Math.PI*f)**2));}
+ for(let i=1;i<=steps;i++){const f=i/steps*Math.PI/2;add(L-rx+rx*Math.sin(f),b[1]+side*ry*Math.cos(f));}
  return out;
 }
 function passage(a,b,p){
- const out=[],N=Math.max(24,Math.ceil(dist(a,b)/.07));
- for(let i=0;i<=N;i++){const t=i/N;out.push([mix(a[0],b[0],t),mix(a[1],b[1],t),mix(a[2],b[2],t)]);}
+ const out=[],N=Math.max(32,Math.ceil(dist(a,b)/.05));
+ for(let i=0;i<=N;i++){const t=i/N,s=t*t*(3-2*t);out.push([mix(a[0],b[0],s),mix(a[1],b[1],t),mix(a[2],b[2],s)]);}
  return out;
 }
 function join(a,b){if(!a.length)a.push(...b);else a.push(...b.slice(1));}
@@ -40,23 +44,17 @@ function cut(points,f){const x=Math.max(0,Math.min(1,f))*(points.length-1),i=Mat
  * Topological segment endpoints remain in parts; points is the final rendered/exported route.
  */
 function roundRoute(points,radius){
- const a=[];
- for(const p of points){
-  if(a.length&&dist(a.at(-1),p)<1e-8)continue;
-  while(a.length>1){const x=a.at(-2),y=a.at(-1),u=y.map((v,i)=>v-x[i]),v=p.map((q,i)=>q-y[i]),lu=Math.hypot(...u),lv=Math.hypot(...v);if(u.reduce((s,q,i)=>s+q*v[i],0)/(lu*lv)<.99995)break;a.pop();}
-  a.push(p);
- }
- if(a.length<3)return a;
+ const distanceToSegment=(p,a,b)=>{const v=b.map((x,i)=>x-a[i]),l=v.reduce((s,x)=>s+x*x,0),t=Math.max(0,Math.min(1,p.reduce((s,x,i)=>s+(x-a[i])*v[i],0)/Math.max(l,1e-20)));return Math.hypot(...p.map((x,i)=>x-a[i]-t*v[i]));};
+ function simplify(p){if(p.length<3)return p;let max=0,index=0;for(let i=1;i<p.length-1;i++){const d=distanceToSegment(p[i],p[0],p.at(-1));if(d>max){max=d;index=i;}}if(max<radius*.024)return [p[0],p.at(-1)];return [...simplify(p.slice(0,index+1)).slice(0,-1),...simplify(p.slice(index))];}
+ const raw=points.filter((p,i)=>i===0||dist(points[i-1],p)>1e-8),a=simplify(raw);if(a.length<3)return a;
  const out=[a[0]];
  for(let i=1;i<a.length-1;i++){
-  const x=a[i-1],p=a[i],y=a[i+1],l=dist(x,p),m=dist(p,y),rr=Math.min(radius,l*.36,m*.36);
-  const u=p.map((q,k)=>mix(q,x[k],rr/l)),v=p.map((q,k)=>mix(q,y[k],rr/m));
-  out.push(u);
-  for(let j=1;j<=12;j++){const f=j/12;out.push(p.map((q,k)=>(1-f)*(1-f)*u[k]+2*(1-f)*f*q+f*f*v[k]));}
+  const x=a[i-1],p=a[i],y=a[i+1],l=dist(x,p),m=dist(p,y),rr=Math.min(radius,l*.40,m*.40);
+  const u=p.map((q,k)=>mix(q,x[k],rr/l)),v=p.map((q,k)=>mix(q,y[k],rr/m));out.push(u);
+  for(let j=1;j<=20;j++){const f=j/20;out.push(p.map((q,k)=>(1-f)*(1-f)*u[k]+2*(1-f)*f*q+f*f*v[k]));}
  }
  out.push(a.at(-1));return out;
 }
-
 export function buildSeam(input={},process=null){
  const p=validateSeam(input),holes=[],routes=[],needleEnds=[],segments=[];
  let stage='已收紧的完整针路',jActive=null;
@@ -68,7 +66,7 @@ export function buildSeam(input={},process=null){
   for(let strand=0;strand<strands;strand++){
    const half=strand===0?'A':'B';let points=[],parts=[];
    const initialSide=strand===0?1:-1;
-   let last=sidePoint(p,hs[0],initialSide,initialSide);
+   let last=sidePoint(p,hs[0],initialSide,0);
    points.push(last);let endSide=initialSide;
    const end=process?jActive:p.count-1;
    for(let j=1;j<=end;j++){
@@ -97,9 +95,21 @@ export function buildSeam(input={},process=null){
     segments.push(...routes.at(-1).parts);
   }
  }
- for(const r of routes)r.points=roundRoute(r.points,p.diameter*.46);
- return {schema:'kaopu/leather_sewing@1',version:SEAM_VERSION,params:p,units:'millimetres',width:(p.count-1)*p.pitch+14,depth:26,totalThickness:p.layerThickness*2,holes,routes,segments,needleEnds,stage,process,topology:{threadCount:p.rows,needleEndsPerThread:p.type==='saddle'?2:1,continuousThread:true,throughBothLayers:true,lockstitch:false},mechanics:'prescribed sewing path, no stitch-force/friction solver',frozenPhysics:'LEATHER_R04_USER_ACCEPTED_20261009'};
+ // Analytic skin-entry turns are already tangent continuous.
+ return {schema:'kaopu/leather_sewing@1',version:SEAM_VERSION,params:p,units:'millimetres',width:(p.count-1)*p.pitch+14,depth:26,totalThickness:p.layerThickness*2,holes,routes,segments,needleEnds,stage,process,topology:{threadCount:p.rows,needleEndsPerThread:p.type==='saddle'?2:1,continuousThread:true,throughBothLayers:true,curvedEntrySpansIncluded:true,lockstitch:false},mechanics:'prescribed sewing path, no stitch-force/friction solver',frozenPhysics:'LEATHER_R04_USER_ACCEPTED_20261009'};
 }
+export function continuousRoutes(model){
+ if(model.process||model.params.type!=='saddle')return model.routes;
+ const raw=r=>{const a=[r.points[0]];for(const s of r.parts)join(a,s.points);return a;};
+ const routes=[];
+ for(let row=0;row<model.params.rows;row++){
+  const a=model.routes.find(r=>r.id===`r${row}-A`),b=model.routes.find(r=>r.id===`r${row}-B`),seed=model.routes.find(r=>r.id===`r${row}-seed`);
+  const points=raw(a).reverse().concat(raw(seed).slice(1),raw(b).slice(1));
+  routes.push({id:`r${row}-continuous`,threadId:`thread-${row}`,half:'whole',points,hasArtificialFirstHoleCaps:false});
+ }
+ return routes;
+}
+
 export function routeLength(points){return points.slice(1).reduce((s,p,i)=>s+dist(points[i],p),0);}
 export function insideHole(point,h,margin=0){const dx=point[0]-h.x,dz=point[2]-h.z,u=dx*h.axis[0]+dz*h.axis[1],v=-dx*h.axis[1]+dz*h.axis[0];return (u/(h.rx-margin))**2+(v/(h.rz-margin))**2<=1.000001;}
 export function auditSeam(m){

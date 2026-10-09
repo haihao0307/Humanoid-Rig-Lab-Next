@@ -2,7 +2,7 @@ import * as T from 'three';
 import {buildContactField,mapSurfacePoint} from './contact-surface.mjs';
 import {SewingAppearance} from './appearance.js';
 import {LeatherKernel,PRESETS,DEFAULT,FINISHES} from '../../r02/site/leather.js';
-import {SEAM_VERSION,SEAM_DEFAULT,SEAM_SOURCES,buildSeam,validateSeam,auditSeam} from './seam.mjs';
+import {SEAM_VERSION,SEAM_DEFAULT,SEAM_SOURCES,buildSeam,validateSeam,auditSeam,continuousRoutes} from './seam.mjs';
 import {makeLeatherGeometry,cutFaceGeometry,makeThreadGeometry,fibreNormalTexture} from './geometry.js';
 const $=id=>document.getElementById(id),errors=[];
 let renderer,scene,camera,kernel,root,threadRoot,model,leatherMeshes=[],threadMeshes=[],cutMesh,cutMat,ready=false,dirty=true,tab='seam',view='home',hide=false,process=null,playing=false,last=0,acc=0;
@@ -14,11 +14,14 @@ function fail(e){errors.push(String(e?.stack||e));$('error').textContent=errors.
 window.addEventListener('error',e=>fail(e.error||e.message));window.addEventListener('unhandledrejection',e=>fail(e.reason));
 function dispose(root){if(!root)return;scene.remove(root);const gs=new Set(),ms=new Set();root.traverse(o=>{if(o.geometry&&!gs.has(o.geometry)){gs.add(o.geometry);o.geometry.dispose();}const a=Array.isArray(o.material)?o.material:[o.material];for(const m of a)if(m&&!ms.has(m)){ms.add(m);m.dispose();}});}
 function bake(){look.resolution=innerWidth<700?1024:2048;kernel.bake(look);}
-function threadMat(half){return new T.MeshPhysicalMaterial({color:view==='route'?(half==='A'?'#79a7b8':half==='B'?'#d68c57':threadColor):threadColor,roughness:.58,metalness:0,sheen:.25,anisotropy:.28,anisotropyRotation:0,side:T.FrontSide,sheenColor:new T.Color('#ddd1ba'),sheenRoughness:.85,map:plies?fibre.userData.albedo:null,normalMap:plies?fibre:null,normalScale:new T.Vector2(.22,.22),vertexColors:true});}
+function threadMat(half){const mat=new T.MeshPhysicalMaterial({color:view==='route'?(half==='A'?'#79a7b8':half==='B'?'#d68c57':threadColor):threadColor,roughness:.58,metalness:0,sheen:.25,anisotropy:.28,anisotropyRotation:0,side:T.FrontSide,sheenColor:new T.Color('#ddd1ba'),sheenRoughness:.85,map:plies?fibre.userData.albedo:null,normalMap:plies?fibre:null,normalScale:new T.Vector2(.22,.22),vertexColors:true});
+ mat.onBeforeCompile=s=>{s.vertexShader=s.vertexShader.replace("#include <common>","#include <common>\nattribute float capMask;varying float vCap;");s.vertexShader=s.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\nvCap=capMask;");s.fragmentShader=s.fragmentShader.replace("#include <common>","#include <common>\nvarying float vCap;");s.fragmentShader=s.fragmentShader.replace("#include <map_fragment>","if(vCap<.5){\n#include <map_fragment>\n}");s.fragmentShader=s.fragmentShader.replace("#include <normal_fragment_maps>","if(vCap<.5){\n#include <normal_fragment_maps>\n}");};mat.customProgramCacheKey=()=> 'thread-outside-r051';return mat;}
+
 function needle(e){const g=new T.Group(),m=new T.MeshStandardMaterial({color:'#c6cbd0',metalness:.85,roughness:.26});const shaft=new T.Mesh(new T.CylinderGeometry(.105,.15,3.0,10),m);shaft.position.y=1.65;const tip=new T.Mesh(new T.ConeGeometry(.105,.50,10),m);tip.position.y=3.40;const eye=new T.Mesh(new T.TorusGeometry(.20,.055,5,14),m);eye.scale.y=1.65;g.add(shaft,tip,eye);g.position.fromArray(mapSurfacePoint(model,e.position));const d=new T.Vector3(...e.direction).normalize();if(d.lengthSq()<.01)d.set(0,1,0);g.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d);g.userData.half=e.half;return g;}
+function displayRoutes(){return view==='route'?model.routes:continuousRoutes(model);}
 function rebuildThreads(){
  dispose(threadRoot);threadRoot=new T.Group();scene.add(threadRoot);threadMeshes=[];
- for(const r of model.routes){if(r.points.length<2)continue;const g=makeThreadGeometry(r.points.map(p=>mapSurfacePoint(model,p)),params.diameter,plies),mesh=new T.Mesh(g,threadMat(r.half));mesh.castShadow=true;mesh.receiveShadow=false;mesh.userData.routeId=r.id;mesh.userData.half=r.half;threadRoot.add(mesh);threadMeshes.push(mesh);}
+ for(const r of displayRoutes()){if(r.points.length<2)continue;const g=makeThreadGeometry(r.points.map(p=>mapSurfacePoint(model,p)),params.diameter,plies),mesh=new T.Mesh(g,threadMat(r.half));mesh.castShadow=true;mesh.receiveShadow=false;mesh.userData.routeId=r.id;mesh.userData.half=r.half;threadRoot.add(mesh);threadMeshes.push(mesh);}
  if(process)for(const e of model.needleEnds)threadRoot.add(needle(e));
  threadRoot.visible=!hide;dirty=true;
 }
@@ -41,7 +44,7 @@ function applyViewMaterials(){
  threadRoot.visible=!hide;dirty=true;
 }
 function setView(k){
- if(!['home','macro','back','section','route'].includes(k))throw Error('视角无效');view=k;
+ if(!['home','macro','back','section','route'].includes(k))throw Error('视角无效');const routeChanged=(view==='route')!==(k==='route');view=k;if(routeChanged)rebuildThreads();
  const h=model.holes[Math.floor((params.count-1)/2)],x=h.x;
  if(k==='home'){target.set(0,0,-3);distance=Math.max(110,model.width*1.85)*(innerWidth<700?1.5:1);yaw=.18;pitch=.62;}
  if(k==='macro'){target.set(x,0,-5);distance=27*(innerWidth<700?1.4:1);yaw=.14;pitch=.66;}
@@ -59,7 +62,11 @@ function sync(){
  $('methodNote').textContent=params.type==='saddle'?'A、B 是同一根线的两端。每个后续孔由两端反向穿过，正面与背面都有完整针脚。':'一根针带一根线，上下交替穿孔。正面与背面的可见针脚错开，不伪装成马鞍缝。';
  $('processHint').textContent=process?'针为局部截段示意 · 穿线步骤按教程规定，不是力学求解':'成品视图 · 鼠标拖动旋转，滚轮放大';
 }
-function setProcess(phase,hole=null){const j=hole??process?.hole??Math.floor(params.count/2);process={hole:Math.min(params.count-1,Math.max(1,j)),phase:Math.max(0,Math.min(1,phase))};const previousContact=model.contact;model=buildSeam(params,process);model.contact=previousContact;rebuildThreads();sync();revision++;}
+function setProcess(phase,hole=null){
+ const j=hole??process?.hole??Math.floor(params.count/2);process={hole:Math.min(params.count-1,Math.max(1,j)),phase:Math.max(0,Math.min(1,phase))};
+ const key=process.hole+':'+Math.floor(Math.max(0,process.phase-.75)*20);
+ if(model.contactKey!==key){rebuild();model.contactKey=key;}else{const f=model.contact;model=buildSeam(params,process);model.contact=f;model.contactKey=key;rebuildThreads();sync();revision++;}
+}
 function watch(){hide=false;$('hideThread').classList.remove('active');setProcess(0);setView('section');target.x=model.holes[process.hole].x-params.pitch/2;playing=true;}
 function next(){playing=false;const seq=params.type==='saddle'?[0,.20,.40,.55,.75,1]:[0,.15,.60,1];if(!process)setProcess(0);else{const n=seq.find(x=>x>process.phase+.001);if(n!==undefined)setProcess(n);else setProcess(0,Math.min(params.count-1,process.hole+1));}}
 function finish(){playing=false;process=null;rebuild();}
@@ -80,7 +87,7 @@ function ui(){for(const [k,label,min,max,step]of specs){const div=document.creat
  $('preset').onchange=()=>{look={...look,...PRESETS[$('preset').value],preset:$('preset').value};bake();rebuild();};$('finishMaterial').onchange=()=>{const f=$('finishMaterial').value;look={...look,finish:f,roughness:FINISHES[f].roughness,coat:FINISHES[f].coat};bake();rebuild();};$('colorLeather').onchange=()=>{look.color=$('colorLeather').value;bake();rebuild();};
  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));$('watch').onclick=watch;$('pause').onclick=()=>{if(!process)watch();else playing=!playing;};$('next').onclick=next;$('finish').onclick=finish;$('hideThread').onclick=()=>{hide=!hide;threadRoot.visible=!hide;$('hideThread').classList.toggle('active',hide);dirty=true;};
  $('tabSeam').onclick=()=>switchTab('seam');$('tabLegacy').onclick=()=>switchTab('legacy');$('tabSource').onclick=()=>switchTab('sources');$('useLegacy').onclick=()=>{const p=$('legacy').contentWindow.LEATHER_LAB?.params;if(!p)return;look={...p};bake();rebuild();switchTab('seam');};
- $('exportRecipe').onclick=()=>saveFile(recipe(),'KAOPU-sewing-recipe-r05.json');$('exportRoute').onclick=()=>saveFile({...recipe(),route:buildSeam(params),audit:auditSeam(buildSeam(params))},'KAOPU-sewing-route-r05.json');$('save').onclick=()=>{try{localStorage.setItem('kaopu-sewing-r05',JSON.stringify(recipe()));$('stage').textContent='缝制配方已保存';}catch(e){$('stage').textContent='浏览器存储不可用，请导出配方';}};$('restore').onclick=()=>{try{const s=localStorage.getItem('kaopu-sewing-r05');if(!s)return;loadRecipe(JSON.parse(s));}catch(e){$('stage').textContent='恢复失败：'+e.message;}};$('importBtn').onclick=()=>$('import').click();$('import').onchange=async()=>{try{const f=$('import').files[0];if(!f||f.size>100000)throw Error('文件过大');loadRecipe(JSON.parse(await f.text()));}catch(e){$('stage').textContent='导入失败：'+e.message;}};
+ $('exportRecipe').onclick=()=>saveFile(recipe(),'KAOPU-sewing-recipe-r05.json');$('exportRoute').onclick=()=>saveFile({...recipe(),route:buildSeam(params),audit:auditSeam(buildSeam(params)),surfaceResponse:model.contact.stats,renderedRoutes:displayRoutes().map(r=>({...r,points:r.points.map(p=>mapSurfacePoint(model,p))})),educationalProcess:process},'KAOPU-sewing-route-r05.json');$('save').onclick=()=>{try{localStorage.setItem('kaopu-sewing-r05',JSON.stringify(recipe()));$('stage').textContent='缝制配方已保存';}catch(e){$('stage').textContent='浏览器存储不可用，请导出配方';}};$('restore').onclick=()=>{try{const s=localStorage.getItem('kaopu-sewing-r05');if(!s)return;loadRecipe(JSON.parse(s));}catch(e){$('stage').textContent='恢复失败：'+e.message;}};$('importBtn').onclick=()=>$('import').click();$('import').onchange=async()=>{try{const f=$('import').files[0];if(!f||f.size>100000)throw Error('文件过大');loadRecipe(JSON.parse(await f.text()));}catch(e){$('stage').textContent='导入失败：'+e.message;}};
  const pts=new Map();let pinch=0;$('view').onpointerdown=e=>{e.target.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);};$('view').onpointermove=e=>{const p=pts.get(e.pointerId);if(!p)return;pts.set(e.pointerId,[e.clientX,e.clientY]);if(pts.size===2){const[a,b]=[...pts.values()],l=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch)distance=Math.max(12,Math.min(300,distance*pinch/l));pinch=l;}else{yaw-=(e.clientX-p[0])*.006;pitch=Math.max(-1.5,Math.min(1.5,pitch+(e.clientY-p[1])*.006));}dirty=true;};for(const id of ['onpointerup','onpointercancel'])$('view')[id]=e=>{pts.delete(e.pointerId);pinch=0;};$('view').addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(12,Math.min(300,distance*Math.exp(e.deltaY*.001)));dirty=true;},{passive:false});window.addEventListener('resize',()=>dirty=true);
 }
 async function boot(){try{await appearance.load(JSON.parse($('grainData').textContent));renderer=new T.WebGLRenderer({canvas:$('view'),antialias:true,preserveDrawingBuffer:true});renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.localClippingEnabled=true;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;scene=new T.Scene();scene.background=new T.Color('#29322d');camera=new T.PerspectiveCamera(32,1,.05,1000);kernel=new LeatherKernel(renderer);

@@ -77,7 +77,14 @@ export function cutFaceGeometry(m,z=-5){
  const points=[[a,lo,z],[b,lo,z],[a,hi,z],[b,hi,z]].map(q=>surfacePoint(m,q[0],q[2],q[1],q[1]===0?0:q[1]>0?1:-1));for(const q of points)p.push(...q);uv.push(a/4,0,b/4,0,a/4,1,b/4,1);idx.push(n,n+1,n+2,n+1,n+3,n+2);}
  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();return g;
 }
-function resample(points,step){const out=[V(points[0])];let last=V(points[0]),total=0;const lengths=[0];for(const p of points.slice(1)){const next=V(p),L=next.distanceTo(last);if(L<1e-8)continue;const n=Math.max(1,Math.ceil(L/step));for(let k=1;k<=n;k++){out.push(last.clone().lerp(next,k/n));lengths.push(total+L*k/n);}total+=L;last=next;}return {out,lengths,total};}
+function resample(points,step){
+ const p=[V(points[0])],cum=[0];let total=0;
+ for(const v of points.slice(1)){const q=V(v),L=q.distanceTo(p.at(-1));if(L<1e-7)continue;total+=L;p.push(q);cum.push(total);}
+ if(total<1e-7)return {out:p,lengths:cum,total};
+ const N=Math.max(1,Math.ceil(total/step)),out=[],lengths=[];let j=0;
+ for(let i=0;i<=N;i++){const d=total*i/N;while(j<p.length-2&&cum[j+1]<d)j++;out.push(p[j].clone().lerp(p[j+1],(d-cum[j])/(cum[j+1]-cum[j])));lengths.push(d);}
+ return {out,lengths,total};
+}
 export function makeThreadGeometry(points,diameter,detail=true){
  const {out,lengths,total}=resample(points,diameter*.12),n=out.length;
  if(n<2)return new T.BufferGeometry();
@@ -99,13 +106,16 @@ export function makeThreadGeometry(points,diameter,detail=true){
    if(i<n-1&&j<sides){const k=i*(sides+1)+j;idx.push(k,k+1,k+sides+1,k+1,k+sides+2,k+sides+1);}
   }
  }
+ const capMask=new Array(pos.length/3).fill(0);
  for(const [ringIndex,reverse]of [[0,true],[n-1,false]]){
-  const cidx=pos.length/3;pos.push(...out[ringIndex]);uv.push(0,0);color.push(1,1,1);
-  for(let j=0;j<sides;j++){const a=ringIndex*(sides+1)+j,b=a+1;if(reverse)idx.push(cidx,a,b);else idx.push(cidx,b,a);}
+  const start=pos.length/3;
+  for(let j=0;j<=sides;j++){const k=ringIndex*(sides+1)+j,a=j/sides*Math.PI*2;pos.push(pos[k*3],pos[k*3+1],pos[k*3+2]);uv.push(.5+.5*Math.cos(a),.5+.5*Math.sin(a));color.push(1,1,1);capMask.push(1);}
+  const cidx=pos.length/3;pos.push(...out[ringIndex]);uv.push(.5,.5);color.push(1,1,1);capMask.push(1);
+  for(let j=0;j<sides;j++){const a=start+j,b=a+1;if(reverse)idx.push(cidx,b,a);else idx.push(cidx,a,b);}
  }
- const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setAttribute('color',new T.Float32BufferAttribute(color,3));g.setIndex(idx);g.computeVertexNormals();
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setAttribute('color',new T.Float32BufferAttribute(color,3));g.setAttribute('capMask',new T.Float32BufferAttribute(capMask,1));g.setIndex(idx);g.computeVertexNormals();
  const nn=g.attributes.normal;for(let i=0;i<n;i++){const a=i*(sides+1),b=a+sides,v=new T.Vector3(nn.getX(a)+nn.getX(b),nn.getY(a)+nn.getY(b),nn.getZ(a)+nn.getZ(b)).normalize();nn.setXYZ(a,...v);nn.setXYZ(b,...v);}
- g.userData={routeLengthMM:total,plies:detail?3:1,structure:'outward closed continuous fibre thread',normalOrientation:'OUTWARD_VERIFIED',hasEndCaps:true};return g;
+ g.userData={ringCount:n,ringStride:sides+1,barrelIndexCount:(n-1)*sides*6,routeLengthMM:total,plies:detail?3:1,structure:'outward closed continuous fibre thread',normalOrientation:'OUTWARD_VERIFIED',hasEndCaps:true};return g;
 }
 export function fibreNormalTexture(){
  const w=256,h=128,a=new Uint8Array(w*h*4),colour=new Uint8Array(w*h*4);
