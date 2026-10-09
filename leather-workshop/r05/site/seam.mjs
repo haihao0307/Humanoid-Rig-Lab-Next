@@ -1,30 +1,30 @@
 /** Sewing topology in mm. A/B are two ends of ONE thread, not needle/bobbin threads.
  * Based on Weaver Leather Supply hand-sewing teaching. Prescribed routes, not force simulation.
  */
-export const SEAM_VERSION='R05.0';
-export const SEAM_DEFAULT={type:'saddle',count:13,pitch:3.8,diameter:.40,layerThickness:1.4,holeAngle:50,tightness:1,groove:.09,rows:1,seed:27};
+export const SEAM_VERSION='R05.1';
+export const SEAM_DEFAULT={type:'saddle',count:13,pitch:3.8,diameter:.40,layerThickness:1.4,holeAngle:50,tightness:1,groove:.025,rows:1,seed:27,tensionN:.8,surfaceResponse:true};
 export const SEAM_SOURCES={saddle:'https://www.weaverleathersupply.com/pages/how-to-hand-sew-leather',preparation:'https://www.weaverleathersupply.com/pages/hand-sewing-leather',lockstitch:'https://www.coats.com/en-us/info-hub/basic-stitch-types/',needles:'https://www.groz-beckert.de/en/news/newsletter/sewing/2015/'};
 const mix=(a,b,t)=>a+(b-a)*t;
 const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
 export function validateSeam(input={}){
  const p={...SEAM_DEFAULT,...input};
  if(!['saddle','running'].includes(p.type))throw Error('仅支持已实现的双针马鞍缝与单针平针');
- for(const[k,a,b]of [['count',5,25],['pitch',2.5,5.5],['diameter',.24,.60],['layerThickness',.8,2.5],['holeAngle',25,65],['tightness',0,1],['groove',0,.14]])if(!Number.isFinite(p[k])||p[k]<a||p[k]>b)throw Error('缝制参数超界：'+k);
+ for(const[k,a,b]of [['count',5,25],['pitch',2.5,5.5],['diameter',.24,.60],['layerThickness',.8,2.5],['holeAngle',25,65],['tightness',0,1],['groove',0,.14],['tensionN',0,2.4]])if(!Number.isFinite(p[k])||p[k]<a||p[k]>b)throw Error('缝制参数超界：'+k);
  if(!Number.isInteger(p.count)||![1,2].includes(p.rows))throw Error('针数或排数无效');
  return p;
 }
 export function holeAt(p,j,row=0){
  const th=p.holeAngle*Math.PI/180;
- return {id:`r${row}-h${j}`,index:j,row,x:(j-(p.count-1)/2)*p.pitch,z:row===0?-5:5,rx:p.diameter*1.8,rz:p.diameter*.88,angle:th,axis:[Math.cos(th),Math.sin(th)]};
+ return {id:`r${row}-h${j}`,index:j,row,x:(j-(p.count-1)/2)*p.pitch,z:row===0?-5:5,rx:p.diameter*(1.39-.09*p.tightness),rz:p.diameter*(.71-.09*p.tightness),angle:th,axis:[Math.cos(th),Math.sin(th)]};
 }
 function sidePoint(p,h,side,lane){
- const q=lane*h.rx*.48;
- return [h.x+h.axis[0]*q,side*(p.layerThickness-p.groove+p.diameter*.51),h.z+h.axis[1]*q];
+ const q=lane*h.rx*.45;
+ return [h.x+h.axis[0]*q,side*(p.layerThickness-p.groove+p.diameter*.47),h.z+h.axis[1]*q];
 }
 function bridge(a,b,side,slack,p){
  const out=[],L=dist(a,b),N=Math.max(12,Math.ceil(L/.10));
  for(let i=0;i<=N;i++){
-  const t=i/N,arc=Math.sin(Math.PI*t);out.push([mix(a[0],b[0],t),mix(a[1],b[1],t)+side*(.035*p.diameter+slack*p.pitch*.32)*arc*arc,mix(a[2],b[2],t)]);
+  const t=i/N,arc=Math.sin(Math.PI*t);out.push([mix(a[0],b[0],t),mix(a[1],b[1],t)+side*(.016*p.diameter+slack*p.pitch*.22)*arc*arc,mix(a[2],b[2],t)]);
  }
  return out;
 }
@@ -97,7 +97,7 @@ export function buildSeam(input={},process=null){
     segments.push(...routes.at(-1).parts);
   }
  }
- for(const r of routes)r.points=roundRoute(r.points,p.diameter*.7);
+ for(const r of routes)r.points=roundRoute(r.points,p.diameter*.46);
  return {schema:'kaopu/leather_sewing@1',version:SEAM_VERSION,params:p,units:'millimetres',width:(p.count-1)*p.pitch+14,depth:26,totalThickness:p.layerThickness*2,holes,routes,segments,needleEnds,stage,process,topology:{threadCount:p.rows,needleEndsPerThread:p.type==='saddle'?2:1,continuousThread:true,throughBothLayers:true,lockstitch:false},mechanics:'prescribed sewing path, no stitch-force/friction solver',frozenPhysics:'LEATHER_R04_USER_ACCEPTED_20261009'};
 }
 export function routeLength(points){return points.slice(1).reduce((s,p,i)=>s+dist(points[i],p),0);}
