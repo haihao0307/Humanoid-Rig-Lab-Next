@@ -1,0 +1,97 @@
+name: ET08 stage-one contour verification
+on:
+  push:
+    branches: [feature/eye-contour-stage1-et08-20261009]
+    paths:
+      - '.github/workflows/eye-contour-stage1-et08.yml'
+      - 'skin-quality-lab/emily-transfer/stage1/**'
+permissions:
+  contents: write
+concurrency:
+  group: eye-contour-stage1-et08
+  cancel-in-progress: false
+jobs:
+  contour:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            skin-quality-lab
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated build and browser tools
+        run: |
+          npm install --prefix /tmp/et08-tools --no-audit --no-fund esbuild@0.25.10 playwright@1.56.1
+          /tmp/et08-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Build stage one when its source is present
+        env:
+          NODE_PATH: /tmp/et08-tools/node_modules
+        run: |
+          if test -f skin-quality-lab/emily-transfer/stage1/build.cjs; then
+            node skin-quality-lab/emily-transfer/stage1/build.cjs
+          fi
+      - name: Browser inspection and source capture
+        env:
+          NODE_PATH: /tmp/et08-tools/node_modules
+        run: |
+          mkdir -p qa-et08
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/et08-http.log 2>&1 &
+          if test -f skin-quality-lab/emily-transfer/stage1/verify.cjs; then
+            node skin-quality-lab/emily-transfer/stage1/verify.cjs
+          else
+            node <<'JS'
+          const {chromium}=require('playwright'),fs=require('fs');
+          (async()=>{
+            const b=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+            const p=await b.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});
+            const errors=[];p.on('pageerror',e=>errors.push(e.message));
+            await p.goto('http://127.0.0.1:8765/skin-quality-lab/emily-transfer/index.html',{waitUntil:'domcontentloaded',timeout:120000});
+            await p.waitForFunction(()=>window.__SKIN_LAB__?.state?.ready,{timeout:180000});
+            await p.waitForTimeout(3000);
+            await p.screenshot({path:'qa-et08/baseline.png'});
+            const info=await p.evaluate(()=>({title:document.title,globals:Object.keys(window).filter(k=>k.startsWith('__')),state:window.__SKIN_LAB__.state,api:Object.keys(window.__SKIN_LAB__),buttons:[...document.querySelectorAll('button')].map(e=>({id:e.id,text:e.textContent,data:{...e.dataset}})),errors:window.__SKIN_LAB__.state.errors}));
+            fs.writeFileSync('qa-et08/baseline.json',JSON.stringify({...info,pageErrors:errors},null,2));
+            await b.close();if(errors.length)throw Error(JSON.stringify(errors));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          fi
+      - name: Gather baseline source snapshot
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import pathlib,zipfile
+          root=pathlib.Path('skin-quality-lab')
+          with zipfile.ZipFile('qa-et08/source.zip','w',zipfile.ZIP_DEFLATED) as z:
+            for p in root.rglob('*'):
+              if not p.is_file(): continue
+              rel=str(p)
+              if '/assets/' in rel or '/vendor/' in rel:
+                if '/r01/' not in rel and '/r02/' not in rel: continue
+              elif '/emily-transfer/' not in rel: continue
+              if any(v in rel for v in ('/qa-','/evidence/','/node_modules/','/screenshots/')): continue
+              if p.suffix.lower() in {'.js','.cjs','.mjs','.json','.html','.txt','.md','.png','.jpg','.jpeg','.webp','.glb','.gltf','.bin'}:
+                z.write(p,rel)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et08-stage1-${{ github.run_number }}
+          path: qa-et08/
+          retention-days: 7
+      - name: Publish validated branch build (never main)
+        if: success()
+        run: |
+          if test -f skin-quality-lab/emily-transfer/stage1/build.cjs; then
+            git config user.name 'KAOPU Eye Workbench'
+            git config user.email 'kaopu-workbench@users.noreply.github.com'
+            git add skin-quality-lab/emily-transfer
+            if ! git diff --cached --quiet; then
+              git commit -m 'build(eyes): ET08 stage-one verified contour workbench [skip ci]'
+              git push origin HEAD:feature/eye-contour-stage1-et08-20261009
+            fi
+          fi
