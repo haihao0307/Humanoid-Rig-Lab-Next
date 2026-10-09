@@ -1,0 +1,40 @@
+{
+  "schema": "kaopu/gram_anchor@1",
+  "id": "LEATHER_R04_USER_ACCEPTED_20261009",
+  "status": "USER_ACCEPTED_FROZEN",
+  "userInstruction": "可以，这个实验就非常的清晰。将皮革的这一套用格拉姆锚点锚定下来，然后就暂时不要再去动它了。",
+  "buildCommit": "160054f707c24e1713b3cbe2e3edbac512d8d2e6",
+  "sourceSnapshotCommit": "3336f8e27ce3820b4ab1b6290e4da6512b295009",
+  "previewURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/160054f707c24e1713b3cbe2e3edbac512d8d2e6/leather-workshop/r04/preview.html",
+  "hashes": {
+    "r04/preview.html": "0764949251261a2b6c11fa1a1e7d5da85bb00e963b4cf67565706105efe95c06",
+    "r04/BUILD_MANIFEST.json": "80982dcf18d4a8374f73ecb86da3145b6db4e7104c8fdd3d04056a772a6e3e4e",
+    "r04/build.py": "25a09d1597dc425582ed8b44b05fb310516befba93108be4dc5f868e36224a0d",
+    "r04/site/dynamics.mjs": "b70e3de9a85532cb0e47dccf9c72f0ad507a58f964a7d1f3eec6aac945dc175b",
+    "r04/site/clamp.mjs": "c2bf5e004f2750e9475e403d5e31bbd70b230e92254438e23299939bad829b7e",
+    "r04/site/worker.js": "7d46216b2ab3d54156031b7f7b6cc2a91cea17ab8c8cd88dcfe0857b717d5cda",
+    "r04/site/runtime.js": "dae5d6dec47a175439c614f1b7963ac1f06ea805116f60557b6735a17cb74dc9",
+    "r04/site/template.html": "b3044fe85c880456298ffdd80e9690c704e2cefeb4a003baf182073c3792025b",
+    "r03/preview.html": "8b3a9efdcd7233331149d6724e0cf8ecf729dac974a920437307dec790679eeb",
+    "r03/site/physics.mjs": "c1660eed8dd2588d0d8927296de08c2b891b527e3d11118122237048499fd944",
+    "r02/preview.html": "deca836e87ce17a1c85c6be2de4b03570864ba9bbee8736564460e9d387a2b0e",
+    "r02/site/leather.js": "a633edbf9e94809ec2a12b884c7369acabac6a076393d70449c9c60eb0871260",
+    "r02/site/three.module.js": "f7cee3c7533449a1505cc12cb5128b89e3d4fd3d7ea62b05f9f5464a217472ee",
+    "r04/qa/public-browser.json": "1aa1696184b8f04945d043d33bf46ad60c3fcff4387c77b63ce3b52dcc1d9101"
+  },
+  "protectedPrefixes": ["leather-workshop/r01/", "leather-workshop/r02/", "leather-workshop/r03/", "leather-workshop/r04/"],
+  "policy": {"allowReadOnlyReuse": true, "allowRebuildOrEditFrozen": false, "requireExplicitUserApprovalToUnfreeze": true, "newWork": "leather-workshop/r05 only; sewing topology and appearance; no dynamics changes"},
+  "gram": {
+    "kind": "engineering_state_relation_gram_not_DINOv3_training",
+    "formula": "G[i,j] = dot(X[i], X[j]); X=(observedFeatures-offset)/scale",
+    "source": "r04/qa/public-browser.json",
+    "phaseLabels": ["gravity settles without fabric runaway", "stone and sheet coupled, no tunneling in impact", "stone carries weight rather than disappearing or freezing", "after removal continues to recover, not a frozen end frame"],
+    "features": ["centerSagMM", "maxStretch", "contactForceN", "stoneSpeedMS", "massKg"],
+    "offset": [0,1,0,0,0], "scale": [20,0.05,3,1,0.1],
+    "X": [[0.20460307800616948,0.030884307288614465,0,0,0.5604479999999998],[0.6366085036343188,0.15627471575418106,0.9588165484605374,0.2574121925173801,0.5604479999999998],[0.35279870652679207,0.055148308239036936,0.14734653216002166,0.00005630801531903479,0.5604479999999998],[0.2046123534952619,0.03088377680957155,0,0,0.5604479999999998]],
+    "G": [[0.35691822067029605,0.4491804563752762,0.3879888792740784,0.3569201020804366],[0.4491804563752762,1.7293843448459592,0.6886076913075047,0.44918627833004615],[0.3879888792740784,0.6886076913075047,0.4633212276427821,0.38799212239961084],[0.3569201020804366,0.44918627833004615,0.38799212239961084,0.35692198357689325]],
+    "note": "Raw state vectors and byte hashes retained; Gram alone cannot identify a unique implementation. No neural feature extraction or retraining is claimed."
+  },
+  "limitsPreserved": ["self collision","fracture","permanent creases","measured dynamic calibration","friction"],
+  "experimentalCalibration": false
+}
