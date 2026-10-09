@@ -6,7 +6,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: et07-natural-${{ github.ref }}
+  group: et071-natural-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   validate:
@@ -34,11 +34,14 @@ jobs:
           NODE_PATH: /tmp/et07-tools/node_modules
           ASSET_COMMIT: ${{ github.sha }}
         run: |
-          node skin-quality-lab/emily-transfer/natural/install.cjs
+          if ! grep -q "VERSION='emily-transfer/7\." skin-quality-lab/emily-transfer/app.js; then
+            node skin-quality-lab/emily-transfer/natural/install.cjs
+          fi
+          node skin-quality-lab/emily-transfer/natural/polish.cjs
           node skin-quality-lab/emily-transfer/anatomy/bundle.cjs
           git diff --exit-code -- skin-quality-lab/r01 skin-quality-lab/r02
           node skin-quality-lab/emily-transfer/talkinghead/test-kernel.mjs
-      - name: Actual multi-view visual evidence
+      - name: Actual multi-view and isolated-component visual evidence
         env:
           NODE_PATH: /tmp/et07-tools/node_modules
           EVIDENCE_DIR: /tmp/et07/visual
@@ -52,10 +55,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: et07-early-visual-review
+          name: et071-early-visual-review
           path: /tmp/et07
           retention-days: 14
-      - name: 45 poses, shared normals, texture identity and contacts
+      - name: 45 poses, canthal contacts, shared normals and skin identity
         env:
           NODE_PATH: /tmp/et07-tools/node_modules
           EVIDENCE_DIR: /tmp/et07/local
@@ -68,7 +71,7 @@ jobs:
           cp /tmp/et07/local/report.json skin-quality-lab/emily-transfer/natural/qa-report.json
           git add skin-quality-lab/emily-transfer
           if ! git diff --cached --quiet; then
-            git commit -m 'build(eyes): ET07 natural tissue and acceptance evidence [skip ci]'
+            git commit -m 'build(eyes): ET07.1 skin frequencies and canthal acceptance [skip ci]'
             git push origin HEAD:fix/eye-envelope-takeover-et06-20261009
           fi
           git rev-parse HEAD | tee /tmp/et07/PUBLISHED_COMMIT.txt
@@ -83,6 +86,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: et07-complete-browser-evidence
+          name: et071-complete-browser-evidence
           path: /tmp/et07
           retention-days: 14
