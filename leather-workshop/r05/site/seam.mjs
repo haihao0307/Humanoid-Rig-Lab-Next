@@ -88,7 +88,7 @@ export function buildSeam(input={},process=null){
     if(bridgeFrac===1&&passFrac>0){const pp=cut(passage(a,b,p),passFrac);join(points,pp);parts.push({kind:'through',holeId:hs[j].id,fromSide:side,toSide:-side,lane,points:pp,complete:passFrac===1});}
     last=b;endSide=-side;
    }
-   if(process){const v=points.at(-1);const n=points.at(-2)||[v[0],v[1]-endSide,v[2]];needleEnds.push({half,row,position:v,direction:[v[0]-n[0],v[1]-n[1],v[2]-n[2]]});}
+   if(process){const v=points.at(-1);const n=points.at(-2)||[v[0],v[1]-endSide,v[2]];const fromSide=initialSide*(end%2===1?1:-1),started=p.type==='running'||strand===0||process.phase>=.40;needleEnds.push({half,row,position:v,direction:[0,started?-fromSide:fromSide,0]});}
    const route={id:`r${row}-${half}`,threadId:`thread-${row}`,half,points,parts};halfRoutes.push(route);routes.push(route);segments.push(...parts);
   }
   if(p.type==='saddle'){
