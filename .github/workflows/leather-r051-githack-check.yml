@@ -1,0 +1,47 @@
+name: Leather R05.1 - raw.githack fallback check
+on:
+  push:
+    branches: [fix/leather-sewing-r051-20261009]
+    paths: [.github/workflows/leather-r051-githack-check.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: |
+          pip install -q playwright==1.55.0
+          python -m playwright install --with-deps chromium
+      - name: Open direct rendered CDN page
+        env:
+          URL: https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/a89bdfeb5cb347011b867b0ba0c9bc5f5cf2d9fa/leather-workshop/r05/public.html
+        run: |
+          mkdir -p evidence
+          python - <<'PY'
+          import json,os,time
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          out={'url':os.environ['URL'],'errors':[]}
+          with sync_playwright() as p:
+            b=p.chromium.launch(headless=True,args=['--enable-unsafe-swiftshader','--use-angle=swiftshader'])
+            page=b.new_page(viewport={'width':1440,'height':1000})
+            page.on('pageerror',lambda e:out['errors'].append(str(e)))
+            page.on('console',lambda m:out['errors'].append(m.text) if m.type=='error' else None)
+            st=time.time();r=page.goto(out['url'],wait_until='domcontentloaded',timeout=120000)
+            out.update(status=r.status if r else None,contentType=r.headers.get('content-type') if r else None,title=page.title())
+            page.wait_for_function('window.LEATHER_SEWING?.ready',timeout=120000)
+            page.wait_for_timeout(800)
+            out['loadSeconds']=time.time()-st;out['version']=page.evaluate('LEATHER_SEWING.version');out['canvas']=page.locator('#view').bounding_box();out['pass']=out['version']=='R05.1' and not out['errors']
+            page.screenshot(path='evidence/githack.png',full_page=True);b.close()
+          Path('evidence/result.json').write_text(json.dumps(out,indent=2,ensure_ascii=False));print(json.dumps(out,ensure_ascii=False))
+          if not out['pass']:raise SystemExit(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r051-githack-check
+          path: evidence
+          retention-days: 14
