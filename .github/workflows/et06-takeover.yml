@@ -1,0 +1,34 @@
+name: ET06 isolated eye takeover
+on:
+  push:
+    branches: [fix/eye-envelope-takeover-et06-20261009]
+    paths: ['.github/workflows/et06-takeover.yml']
+permissions:
+  contents: read
+concurrency:
+  group: et06-takeover-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+            .github/workflows
+      - name: Preserve source and dependencies without modifying other branches
+        run: |
+          mkdir -p /tmp/eye-takeover
+          tar --exclude='evidence' --exclude='node_modules' -czf /tmp/eye-takeover/source.tgz skin-quality-lab/r01 skin-quality-lab/r02 skin-quality-lab/emily-transfer .github/workflows
+          git rev-parse HEAD > /tmp/eye-takeover/SOURCE_COMMIT.txt
+          sha256sum /tmp/eye-takeover/source.tgz > /tmp/eye-takeover/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: et06-takeover-source
+          path: /tmp/eye-takeover
+          retention-days: 7
