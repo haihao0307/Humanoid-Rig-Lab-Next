@@ -9,11 +9,18 @@ const TAU=Math.PI*2;
  * Neutral margin proportions are measured from the CC0 MakeHuman hm08 mesh.
  */
 function rail(u,upper){
- u=clamp(u,-1,1);const t=(u+1)*.5;
- // Endpoint-constrained least squares of the 33 measured CC0 contour points.
+ u=clamp(u,-1,1);const x=Math.abs(u),side=u<0?-1:1;
  const c=upper?[.38441346288415335,-.013457920226416842,.4445801720372662,.056531015805420755]:[-.26980682201867545,-.07559112460541781,-.25913444501352073,-.003966655456640926];
- const k=upper?1:2,baseline=lerp(REFERENCE_RAILS[0][k],REFERENCE_RAILS[32][k],t);
- return baseline+(1-u*u)*(c[0]+u*(c[1]+u*(c[2]+u*c[3])));
+ const residual=v=>(1-v*v)*(c[0]+v*(c[1]+v*(c[2]+v*c[3])));
+ const k=upper?1:2,baseline=lerp(REFERENCE_RAILS[0][k],REFERENCE_RAILS[32][k],(u+1)*.5);
+ const join=side<0?.72:.78;
+ if(x<=join)return baseline+residual(u);
+ const l=1-join,t=(x-join)/l,h=.00001,r0=residual(side*join);
+ const d0=(residual(side*(join+h))-residual(side*(join-h)))/(2*h);
+ const d1=upper?(side<0?-.50:-.62):(side<0?.27:.30);
+ // Cubic Hermite meets the measured centre with a continuous tangent and the
+ // canthus with a finite angle: no rectangular corner, no zero-angle cusp.
+ return baseline+(2*t*t*t-3*t*t+1)*r0+(t*t*t-2*t*t+t)*l*d0+(t*t*t-t*t)*l*d1;
 }
 function ocularHeight(r,x,y){
  const rho=Math.hypot(x,y),limbus=r*.47,rc=r*.64;
@@ -32,7 +39,7 @@ export class ResearchEyes extends FittedEyes {
  constructor(options){
   super(options);
   this.config.squint=0;this.config.manualBlink=-1;
-  this.state.reconstruction='ET03 contact-constrained shell';this.state.trainedNeuralModel=false;
+  this.state.reconstruction='ET06 connected palpebral envelope';this.state.trainedNeuralModel=false;
   this.ready=this.ready.then(()=>{
    for(const e of this.eyes){
     // A conservative fit from this head's observed closed outer surface.
@@ -42,7 +49,7 @@ export class ResearchEyes extends FittedEyes {
      const x=ix/12*r*.80,y=iy/12*r*.80;if(x*x+y*y>r*r*.64)continue;
      const observed=e.c.referenceSurface(e.c.x+x,e.c.y+y);
      const envelope=ocularHeight(r,x,y);if(!envelope.valid)continue;
-     limit=Math.min(limit,observed.z-envelope.z-.00045);samples++;
+     limit=Math.min(limit,observed.z-envelope.z-.00058);samples++;
     }
     const fitted=Math.max(oldDepth-.004,limit);
     e.c.z=fitted;e.pivot.position.z=fitted;
@@ -86,18 +93,22 @@ export class ResearchEyes extends FittedEyes {
  }
  margin(c,a,blink){
   const nx=Math.cos(a),upper=Math.sin(a)>=0,u=nx*c.sign,w=Math.sqrt(Math.max(0,1-nx*nx));
-  const top=rail(u,true)*c.half,bottom=rail(u,false)*c.half,center=lerp(bottom,top,.22);
-  const pitch=c.gazePitch||0,yaw=c.gazeYaw||0;
-  const gaze=-pitch*(upper?.0056:.0023)*w,squint=this.config.squint||0;
-  const open=this.config.opening||1;
-  let topOpen=top*open-pitch*.0056*w-.0020*squint*w;
-  let bottomOpen=bottom*open-pitch*.0023*w+.0020*squint*w;
-  if(topOpen<bottomOpen+.00006*w){const mid=(topOpen+bottomOpen)*.5;topOpen=mid+.00003*w;bottomOpen=mid-.00003*w;}
-  const rest=upper?topOpen:bottomOpen,narrow=0;
+  const top=rail(u,true)*c.half,bottom=rail(u,false)*c.half;
+  const pitch=c.gazePitch||0,yaw=c.gazeYaw||0,squint=this.config.squint||0;
+  const open=this.config.opening??.88;
+  let topOpen=top*open-pitch*.0052*w-.00175*squint*w;
+  let bottomOpen=bottom*open-pitch*.0021*w+.00175*squint*w;
+  if(topOpen<bottomOpen+.00008*w){const mid=(topOpen+bottomOpen)*.5;topOpen=mid+.00004*w;bottomOpen=mid-.00004*w;}
+  const rest=upper?topOpen:bottomOpen;
   const closedY=c.y-.0035+.0028*Math.pow(Math.abs(nx),1.7)-.0007*nx*c.sign;
   const y=lerp(c.y-.0005+rest,closedY,blink);
-  const x=c.x+c.half*nx+yaw*.0006*w*(1-blink);
-  const front=this.eyeFront(c,x,y);let z=front===null?c.z+.003:front+.00009;
+  const x=c.x+c.half*nx+yaw*.00052*w*(1-blink);
+  const front=this.eyeFront(c,x,y),corner=smooth((1-Math.abs(u))/(u<0?.24:.18));
+  // Anterior free margin: upper lid is deliberately thicker than lower lid.
+  // The posterior conjunctival surface remains 0.045 mm off the globe.
+  const openClearance=lerp(.00015,upper?.00078:.00030,corner);
+  const clearance=lerp(openClearance,.00032,blink);
+  let z=front===null?c.z+.003:front+clearance;
   if(blink>0&&c.referenceSurface){
    const key=Math.round(nx*1e9);let closedZ=c.closedCurve.get(key);
    if(closedZ===undefined){closedZ=c.referenceSurface(c.x+c.half*nx,closedY).z;c.closedCurve.set(key,closedZ);}
@@ -149,9 +160,22 @@ export class ResearchEyes extends FittedEyes {
   const ni=14,ip=new Float32Array((A+1)*(ni+1)*3),ii=[];
   for(let j=0;j<ni;j++)for(let a=0;a<A;a++){const k=j*(A+1)+a;ii.push(k,k+1,k+A+1,k+1,k+A+2,k+A+1);}
   const ig=new THREE.BufferGeometry();ig.setAttribute('position',new THREE.BufferAttribute(ip,3));ig.setIndex(ii);
-  const im=new THREE.MeshStandardMaterial({color:0x96574f,roughness:.46,side:THREE.FrontSide});
+  const im=new THREE.MeshStandardMaterial({color:0x87504b,roughness:.50,side:THREE.FrontSide});
   const inside=new THREE.Mesh(ig,im);inside.name='inner-lid-contact-'+c.name;inside.frustumCulled=false;m.add(inside);
-  return {mesh:m,entries,A,R,inside,ni};
+  // Free palpebral margin bridges the outer skin to the posterior contact shell.
+  // It is a real strip, not a shader-only dark line; upper and lower thickness differ.
+  const es=8,ep=new Float32Array((A+1)*(es+1)*3),ei=[];
+  for(let a=0;a<A;a++)for(let q=0;q<es;q++){const k=a*(es+1)+q;ei.push(k,k+es+1,k+1,k+1,k+es+1,k+es+2);}
+  const eg=new THREE.BufferGeometry();eg.setAttribute('position',new THREE.BufferAttribute(ep,3));eg.setIndex(ei);
+  const eu=[],ec=[];
+  for(let a=0;a<=A;a++)for(let q=0;q<=es;q++){
+   const src=entries[a].seamSrc,t=q/es;
+   eu.push(src.u,src.v);ec.push(lerp(.84,1,t),lerp(.66,1,t),lerp(.61,1,t));
+  }
+  eg.setAttribute('uv',new THREE.Float32BufferAttribute(eu,2));eg.setAttribute('color',new THREE.Float32BufferAttribute(ec,3));
+  const em=new THREE.MeshPhysicalMaterial({color:0xffffff,map:this.skin.map,vertexColors:true,roughness:.46,metalness:0,clearcoat:.24,clearcoatRoughness:.22,ior:1.36,envMapIntensity:.32,side:THREE.DoubleSide});
+  const edge=new THREE.Mesh(eg,em);edge.name='palpebral-free-margin-'+c.name;edge.frustumCulled=false;edge.castShadow=true;edge.receiveShadow=true;m.add(edge);
+  return {mesh:m,entries,A,R,inside,ni,edge,es};
  }
  updateLid(e,blink){
   if(this.config.manualBlink>=0)blink=clamp(this.config.manualBlink,0,1);
@@ -167,7 +191,7 @@ export class ResearchEyes extends FittedEyes {
    let y=q.ys+(inner.y-(seam))*weight;
    y+=side*.00043*smooth(t/.045)*(1-smooth((t-.045)/.30))*arc*(1-blink);
    let z=q.src.z+(inner.z-q.seamSrc.z)*weight;
-   const thickness=.00010+.00056*smooth(t/.055)*(1-smooth((t-.35)/.45));
+   const thickness=.00010+(q.ny>=0?.00074:.00056)*smooth(t/.055)*(1-smooth((t-.35)/.45));
    const eyeZ=this.eyeFront(c,x,y);
    if(eyeZ!==null&&t<.82)z=Math.max(z,eyeZ+thickness);
    const fold=(q.ny>0?-.00044:.00012)*Math.exp(-Math.pow((t-(q.ny>0?.43:.38))/.105,2))*arc*(1-blink)*(1-blink);
@@ -181,22 +205,43 @@ export class ResearchEyes extends FittedEyes {
   }
   P.needsUpdate=true;g.computeVertexNormals();const N=g.attributes.normal;
   for(let i=0;i<lid.entries.length;i++){const q=lid.entries[i],w=smooth((q.t-.72)/.28);if(w){const n=new THREE.Vector3(N.getX(i),N.getY(i),N.getZ(i)).lerp(q.src.n,w).normalize();N.setXYZ(i,n.x,n.y,n.z);}}N.needsUpdate=true;
-  const IP=lid.inside.geometry.attributes.position;
+  const IP=lid.inside.geometry.attributes.position,EP=lid.edge.geometry.attributes.position;
+  const insetAt=(a)=>{const theta=a/lid.A*TAU,nx=Math.cos(theta),ny=Math.sin(theta),corner=smooth((1-Math.abs(nx))/.20);return (ny>=0?.00029:.00012)*corner*(1-blink);};
   for(let j=0;j<=lid.ni;j++)for(let i=0;i<=lid.A;i++){
-   const row=j/lid.ni*.42*lid.R,lo=Math.floor(row),hi=Math.min(lid.R,lo+1),f=row-lo;
-   const ia=lo*(lid.A+1)+i,ib=hi*(lid.A+1)+i;
-   const x=lerp(P.getX(ia),P.getX(ib),f),y=lerp(P.getY(ia),P.getY(ib),f),z=this.eyeFront(c,x,y),outerZ=lerp(P.getZ(ia),P.getZ(ib),f);
-   IP.setXYZ(j*(lid.A+1)+i,x,y,z===null?outerZ-.0003:z+.000035);
+   const row=j/lid.ni*.42*lid.R,lo=Math.floor(row),hi=Math.min(lid.R,lo+1),f=row-lo,theta=i/lid.A*TAU;
+   const ia=lo*(lid.A+1)+i,ib=hi*(lid.A+1)+i,inset=insetAt(i)*(1-smooth(j/lid.ni));
+   const x=lerp(P.getX(ia),P.getX(ib),f)-Math.cos(theta)*inset,y=lerp(P.getY(ia),P.getY(ib),f)-Math.sin(theta)*inset;
+   const z=this.eyeFront(c,x,y),oz=lerp(P.getZ(ia),P.getZ(ib),f);
+   IP.setXYZ(j*(lid.A+1)+i,x,y,z===null?oz-.0003:z+.000045);
   }
   IP.needsUpdate=true;lid.inside.geometry.computeVertexNormals();
+  for(let a=0;a<=lid.A;a++){
+   const theta=a/lid.A*TAU,nx=Math.cos(theta),ny=Math.sin(theta),corner=smooth((1-Math.abs(nx))/.20);
+   for(let q=0;q<=lid.es;q++){
+    const t=q/lid.es,b=Math.sin(Math.PI*t),k=a*(lid.es+1)+q,bulge=(ny>=0?.000055:.000035)*corner*(1-blink);
+    const x=lerp(IP.getX(a),P.getX(a),t)+nx*b*bulge,y=lerp(IP.getY(a),P.getY(a),t)+ny*b*bulge;
+    let z=lerp(IP.getZ(a),P.getZ(a),t)+b*.000025;
+    const contact=this.eyeFront(c,x,y);if(contact!==null&&q>0&&q<lid.es)z=Math.max(z,contact+.000045);
+    EP.setXYZ(k,x,y,z);
+   }
+  }
+  EP.needsUpdate=true;lid.edge.geometry.computeVertexNormals();
+  // The tear meniscus follows the posterior edge. It is not the lid geometry.
   const rp=e.rim.mesh.geometry.attributes.position;
-  for(let a=0;a<=e.rim.A;a++){const theta=a/e.rim.A*TAU,p=this.margin(c,theta,blink),lower=Math.max(0,-Math.sin(theta));for(let s=0;s<=e.rim.S;s++){const b=s/e.rim.S*TAU,r=.000014+.000065*lower;rp.setXYZ(a*(e.rim.S+1)+s,p.x+Math.cos(theta)*Math.cos(b)*r,p.y+Math.sin(theta)*Math.cos(b)*r,p.z+Math.sin(b)*r+.000028);}}
+  for(let a=0;a<=e.rim.A;a++){
+   const theta=a/e.rim.A*TAU,i=Math.round(a/e.rim.A*lid.A),nx=Math.cos(theta),ny=Math.sin(theta);
+   const r=.000014+.000026*Math.max(0,-ny);
+   for(let q=0;q<=e.rim.S;q++){const b=q/e.rim.S*TAU;rp.setXYZ(a*(e.rim.S+1)+q,IP.getX(i)+nx*Math.cos(b)*r,IP.getY(i)+ny*Math.cos(b)*r,IP.getZ(i)+Math.sin(b)*r+.000005);}
+  }
   rp.needsUpdate=true;e.rim.mesh.geometry.computeVertexNormals();
   const lp=e.lashes.mesh.geometry.attributes.position;
   for(let i=0;i<e.lashes.entries.length;i++){const q=e.lashes.entries[i],p=this.margin(c,q.a,blink);for(let j=0;j<5;j++){const t=j/4;for(let s=0;s<2;s++){const width=.000025*(1-.9*t)*(s?1:-1);lp.setXYZ(i*10+j*2+s,p.x+Math.cos(q.a)*q.len*t*.35+q.lean*t+width,p.y+Math.sin(q.a)*(q.len*t*.65+.00035),p.z+.00035+q.len*(.48*t+.35*t*t));}}}lp.needsUpdate=true;e.lashes.mesh.geometry.computeVertexNormals();
   if(e.caruncle){const a=c.sign>0?Math.PI:0,p=this.margin(c,a,blink);e.caruncle.position.copy(p).add(new THREE.Vector3(-c.sign*.00018,0,.00001));e.caruncle.visible=blink<.98;}
   if(e.edgeMap){for(let i=0;i<64;i++){const x=-1+2*i/63,a=Math.acos(clamp(x,-1,1)),top=this.margin(c,a,blink),bottom=this.margin(c,TAU-a,blink);e.edgeData[i*4]=top.y-c.y;e.edgeData[i*4+1]=bottom.y-c.y;e.edgeData[i*4+2]=0;e.edgeData[i*4+3]=1;}e.edgeMap.needsUpdate=true;}
-  e.contactReport={minOuterClearanceMM:Number.isFinite(minClear)?minClear*1000:null,penetratingTestVertices:penetration,innerShell:true,outerBoundaryFixed:true,contactTestOuterRowsBelow:.55,eyeballHiddenForClosure:false,capturedClosureMaxDeviationMM:blink>.999?closureError*1000:null,outerBoundaryDeviationMM:boundaryError*1000};
+  const topMid=margins[Math.round(lid.A*.25)],bottomMid=margins[Math.round(lid.A*.75)];
+  const gapAtU=u=>{const nx=u*c.sign,a=Math.acos(clamp(nx,-1,1));return (this.margin(c,a,blink).y-this.margin(c,TAU-a,blink).y)*1000;};
+  const topEye=this.eyeFront(c,topMid.x,topMid.y),bottomEye=this.eyeFront(c,bottomMid.x,bottomMid.y);
+  e.contactReport={minOuterClearanceMM:Number.isFinite(minClear)?minClear*1000:null,penetratingTestVertices:penetration,innerShell:true,freeMarginMesh:true,outerBoundaryFixed:true,contactTestOuterRowsBelow:.55,eyeballHiddenForClosure:false,capturedClosureMaxDeviationMM:blink>.999?closureError*1000:null,outerBoundaryDeviationMM:boundaryError*1000,horizontalApertureMM:Math.abs(margins[0].x-margins[Math.round(lid.A*.5)].x)*1000,verticalApertureMM:(topMid.y-bottomMid.y)*1000,upperMarginThicknessMM:topEye===null?null:(topMid.z-topEye)*1000,lowerMarginThicknessMM:bottomEye===null?null:(bottomMid.z-bottomEye)*1000,posteriorTearGapMM:.045,medialGapAt90MM:gapAtU(-.90),lateralGapAt90MM:gapAtU(.90)};
   e.ball.visible=true;this._fittingEye=null;this.lastLid=blink;
  }
  update(dt,instant=false){
@@ -211,7 +256,20 @@ export class ResearchEyes extends FittedEyes {
  }
  snapshot(){return {...super.snapshot(),squint:this.config.squint||0,manualBlink:this.config.manualBlink??-1};}
  restore(o){if(!o)return;super.restore(o);if(Number.isFinite(o.squint))this.config.squint=clamp(o.squint,0,1);if(Number.isFinite(o.manualBlink))this.config.manualBlink=clamp(o.manualBlink,-1,1);this.update(0,true);this.requestRender();}
- info(){return {...super.info(),reconstruction:'ET03 contact shell / CC0 measured margin rails',neuralTrainingPerformed:false,paperReproduction:false,depthCalibration:this.eyes.map(e=>e.depthFit),contact:this.eyes.map(e=>e.contactReport)};}
+ info(){return {...super.info(),reconstruction:'ET06 joined skin-margin-conjunctiva / finite canthal tangents',neuralTrainingPerformed:false,paperReproduction:false,depthCalibration:this.eyes.map(e=>e.depthFit),contact:this.eyes.map(e=>e.contactReport)};}
+ audit(){
+  const rows=[];
+  for(const e of this.eyes){
+   this._fittingEye=e;const {c,lid}=e,P=lid.mesh.geometry.attributes.position,I=lid.inside.geometry.attributes.position,E=lid.edge.geometry.attributes.position;
+   let seamMax=0,nonfinite=0,minGap=Infinity,penetrations=0,tested=0;
+   for(let a=0;a<=lid.A;a++)for(const [p,i,j] of [[P,a,a*(lid.es+1)+lid.es],[I,a,a*(lid.es+1)]])seamMax=Math.max(seamMax,Math.hypot(p.getX(i)-E.getX(j),p.getY(i)-E.getY(j),p.getZ(i)-E.getZ(j)));
+   for(const p of [P,I,E])for(let i=0;i<p.count;i++)if(![p.getX(i),p.getY(i),p.getZ(i)].every(Number.isFinite))nonfinite++;
+   for(const p of [I,E])for(let i=0;i<p.count;i++){const z=this.eyeFront(c,p.getX(i),p.getY(i));if(z===null)continue;const gap=p.getZ(i)-z;minGap=Math.min(minGap,gap);tested++;if(gap<-.0000001)penetrations++;}
+   const edgeLength=a=>{let d=0;for(let q=1;q<=lid.es;q++){const i=a*(lid.es+1)+q;d+=Math.hypot(E.getX(i)-E.getX(i-1),E.getY(i)-E.getY(i-1),E.getZ(i)-E.getZ(i-1));}return d*1000;};
+   rows.push({name:c.name,nonfiniteVertices:nonfinite,maxSharedEdgeErrorMM:seamMax*1000,posteriorAndMarginMinAxialGapMM:minGap*1000,posteriorAndMarginPenetrations:penetrations,contactTestVertices:tested,upperFreeMarginArcMM:edgeLength(lid.A/4),lowerFreeMarginArcMM:edgeLength(3*lid.A/4),radiusMM:c.radius*1000,irisRadiusRatio:.435,restingOpening:this.config.opening,eyeHidden:!e.ball.visible,outerBoundaryDeviationMM:e.contactReport.outerBoundaryDeviationMM,verticalApertureMM:e.contactReport.verticalApertureMM,horizontalApertureMM:e.contactReport.horizontalApertureMM});
+  }
+  this._fittingEye=null;return {version:'ET06',units:'millimetres',scope:'actual inner-surface and free-margin vertices against rotated two-sphere; not exhaustive triangle CCD',eyes:rows};
+ }
  dispose(){for(const e of this.eyes){e.edgeMap?.dispose();e.lid.mesh.customDepthMaterial?.dispose();}super.dispose();}
 }
 
@@ -222,3 +280,5 @@ export class ResearchEyes extends FittedEyes {
 // ET03 observed closed-envelope fit R5
 
 // ET03 matching shadow surfaces R4
+
+// ET05 anatomical upper/lower free-margin reconstruction
