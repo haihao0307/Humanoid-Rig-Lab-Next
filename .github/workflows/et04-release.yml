@@ -52,6 +52,7 @@ jobs:
           PY
           cp -r /tmp/et04-reviewed/candidate/. skin-quality-lab/emily-transfer/
           cp /tmp/et04-reviewed/visual/report.json skin-quality-lab/emily-transfer/talkinghead/qa-local.json
+          node skin-quality-lab/emily-transfer/talkinghead/retain-upstream-license.cjs
           mkdir -p /tmp/et04-release/local /tmp/et04-tools
           cp -r /tmp/et04-reviewed/visual/. /tmp/et04-release/local/
           tar -xzf /tmp/et04-inputs/build-tools.tgz -C /tmp/et04-tools
@@ -67,7 +68,7 @@ jobs:
           git config user.name 'et04-integration-validation'
           git config user.email 'et04-integration-validation@users.noreply.github.com'
           git add skin-quality-lab/emily-transfer
-          git commit -m 'build(et04): publish reviewed TalkingHead integration with source and licenses [skip ci]'
+          git commit -m 'build(et04): publish reviewed TalkingHead integration and complete HTML notice [skip ci]'
           git push origin HEAD:feature/emily-talkinghead-et04-20261009
           git rev-parse HEAD > /tmp/et04-release/published-commit.txt
           echo "PUBLIC_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
@@ -85,7 +86,8 @@ jobs:
             try:
               data=urllib.request.urlopen(url,timeout=40).read()
               assert hashlib.sha256(data).hexdigest()==manifest['previewSHA256']
-              pathlib.Path('/tmp/et04-release/public-bytes.json').write_text(json.dumps({'commit':sha,'url':url,'sha256':manifest['previewSHA256'],'bytes':len(data),'verified':True},indent=2))
+              assert b'Copyright (c) 2024 Mika Suominen' in data
+              pathlib.Path('/tmp/et04-release/public-bytes.json').write_text(json.dumps({'commit':sha,'url':url,'sha256':manifest['previewSHA256'],'bytes':len(data),'verified':True,'upstreamNoticePresent':True},indent=2))
               break
             except Exception:
               if attempt==2:raise
