@@ -1,0 +1,105 @@
+name: ET04 reviewed TalkingHead public release
+on:
+  push:
+    branches: [feature/emily-talkinghead-et04-20261009]
+    paths: ['.github/workflows/et04-release.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: et04-public-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: et04-pinned-inputs
+          run-id: 37876552883
+          github-token: ${{ github.token }}
+          path: /tmp/et04-inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: et04-integration-review
+          run-id: 37878535387
+          github-token: ${{ github.token }}
+          path: /tmp/et04-reviewed
+      - name: Restore only the reviewed candidate
+        run: |
+          python3 - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/et04-reviewed')
+          report=json.loads((p/'visual/report.json').read_text())
+          assert report['passed'] is True
+          assert report['sourceCommit']=='a890ba1cf830f72abb2052773feeee07ff1dcb38'
+          manifest=json.loads((p/'candidate/BUILD_MANIFEST.json').read_text())
+          for name,key in [('preview.html','previewSHA256'),('app.js','appSHA256'),('talkinghead/IntegratedEyes.js','integrationModuleSHA256')]:
+            assert hashlib.sha256((p/'candidate'/name).read_bytes()).hexdigest()==manifest[key]
+          assert manifest['talkingHead']['unchangedSourceBlocks']==35
+          print('Reviewed candidate integrity passed:',manifest['previewSHA256'])
+          PY
+          cp -r /tmp/et04-reviewed/candidate/. skin-quality-lab/emily-transfer/
+          cp /tmp/et04-reviewed/visual/report.json skin-quality-lab/emily-transfer/talkinghead/qa-local.json
+          mkdir -p /tmp/et04-release/local /tmp/et04-tools
+          cp -r /tmp/et04-reviewed/visual/. /tmp/et04-release/local/
+          tar -xzf /tmp/et04-inputs/build-tools.tgz -C /tmp/et04-tools
+          chmod +x /tmp/et04-tools/node_modules/@esbuild/linux-x64/bin/esbuild
+          node /tmp/et04-tools/node_modules/playwright/cli.js install chromium
+          timeout 60s sudo apt-get install --no-install-recommends -y fonts-wqy-zenhei || true
+      - name: Verify original behavior code again
+        env:
+          NODE_PATH: /tmp/et04-tools/node_modules
+        run: node skin-quality-lab/emily-transfer/talkinghead/test-kernel.mjs
+      - name: Publish the immutable candidate without touching old branches
+        run: |
+          git config user.name 'et04-integration-validation'
+          git config user.email 'et04-integration-validation@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer
+          git commit -m 'build(et04): publish reviewed TalkingHead integration with source and licenses [skip ci]'
+          git push origin HEAD:feature/emily-talkinghead-et04-20261009
+          git rev-parse HEAD > /tmp/et04-release/published-commit.txt
+          echo "PUBLIC_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Verify actual public bytes and browser interaction
+        env:
+          NODE_PATH: /tmp/et04-tools/node_modules
+          EVIDENCE_DIR: /tmp/et04-release/public
+        run: |
+          python3 - <<'PY'
+          import os,urllib.request,hashlib,json,pathlib,time
+          sha=os.environ['PUBLIC_COMMIT']
+          manifest=json.loads(pathlib.Path('skin-quality-lab/emily-transfer/BUILD_MANIFEST.json').read_text())
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+sha+'/skin-quality-lab/emily-transfer/preview.html'
+          for attempt in range(3):
+            try:
+              data=urllib.request.urlopen(url,timeout=40).read()
+              assert hashlib.sha256(data).hexdigest()==manifest['previewSHA256']
+              pathlib.Path('/tmp/et04-release/public-bytes.json').write_text(json.dumps({'commit':sha,'url':url,'sha256':manifest['previewSHA256'],'bytes':len(data),'verified':True},indent=2))
+              break
+            except Exception:
+              if attempt==2:raise
+              time.sleep(5)
+          PY
+          node skin-quality-lab/emily-transfer/talkinghead/public.cjs
+      - name: Preserve source and all evidence
+        if: always()
+        run: |
+          mkdir -p /tmp/et04-release/candidate
+          cp -r skin-quality-lab/emily-transfer/. /tmp/et04-release/candidate/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et04-public-release
+          path: /tmp/et04-release
+          retention-days: 14
