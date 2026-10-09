@@ -1,0 +1,41 @@
+name: Leather R05.1 - licensed grain asset acquisition
+on:
+  push:
+    branches: [feature/leather-sewing-r05-20261009]
+    paths: [.github/workflows/leather-r051-material-source.yml]
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/leather-sewing-r05-20261009
+          sparse-checkout: leather-workshop/r05
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pillow
+      - name: Download one CC0 Poly Haven texture set and retain provenance
+        run: |
+          mkdir -p /tmp/leather-grain/source /tmp/leather-grain/crop
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,hashlib,json
+          from PIL import Image
+          r=Path('/tmp/leather-grain');manifest={'asset':'leather_white','author':'Rob Tuytel','source':'https://polyhaven.com/a/leather_white','license':'CC0-1.0','licenseURL':'https://polyhaven.com/license','originalTileMM':300,'processing':'central 1024px crop of 4K original; 75mm square; no photograph of seam baked into geometry','files':{}}
+          for name in ['diff','nor_gl','rough','disp']:
+              url=f'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/leather_white/leather_white_{name}_4k.jpg'
+              raw=urllib.request.urlopen(url,timeout=90).read();(r/'source'/f'{name}.jpg').write_bytes(raw)
+              im=Image.open(r/'source'/f'{name}.jpg').convert('RGB');assert im.size==(4096,4096)
+              im.crop((1536,1536,2560,2560)).save(r/'crop'/f'{name}.png')
+              manifest['files'][name]={'url':url,'rawSHA256':hashlib.sha256(raw).hexdigest(),'processedSHA256':hashlib.sha256((r/'crop'/f'{name}.png').read_bytes()).hexdigest()}
+          (r/'PROVENANCE.json').write_text(json.dumps(manifest,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-grain-source
+          path: /tmp/leather-grain
+          retention-days: 14
