@@ -5,6 +5,13 @@ function one(s,a,b){if(!s.includes(a)||s.indexOf(a)!==s.lastIndexOf(a))throw Err
 edit('research/ResearchEyes.js',s=>{
  s=one(s,'const A=192,R=32','const A=256,R=32');s=one(s,'const ni=14,','const ni=64,');
  s=one(s,'w=Math.sqrt(Math.max(0,1-nx*nx))','w=Math.max(0,1-nx*nx)');
+ s=one(s,'  let z=Math.sqrt(r*r-dx*dx-dy*dy);\n  const f=',`  let z=Math.sqrt(r*r-dx*dx-dy*dy);
+  // Only the corneal cap differs from the sphere. Its conservative bounding
+  // ball is centred 0.98r forward with radius 0.53r. Rays outside its projected
+  // disc hit the spherical sclera exactly, without a Newton solve.
+  const capX=inv?inv[2]*r*.98:0,capY=inv?inv[6]*r*.98:0;
+  if((dx-capX)*(dx-capX)+(dy-capY)*(dy-capY)>r*r*.2809)return c.z+z;
+  const f=`);
  let a=s.indexOf('  if(blink>0&&c.referenceSurface){',s.indexOf(' margin(c,a,blink)')),b=s.indexOf('  return new THREE.Vector3(x,y,z);',a);if(a<0||b<0)throw Error('No closure correction');
  s=s.slice(0,a)+'  // The scan anchors surrounding skin; a closing free margin stays on the globe.\n'+s.slice(b);
  a=s.indexOf('  for(let j=0;j<=lid.ni;j++)for(let i=0;i<=lid.A;i++){',s.indexOf('const insetAt='));b=s.indexOf('  IP.needsUpdate=true;',a);if(a<0||b<0)throw Error('No inner chart');
@@ -20,15 +27,19 @@ edit('research/ResearchEyes.js',s=>{
     const t=j/lid.ni,wa=sin>.000001?Math.sin((1-t)*angle)/sin:1-t,wb=sin>.000001?Math.sin(t*angle)/sin:t;
     const x=j===0?ox:c.x+r*(wa*ax+wb*bx),y=j===0?oy:c.y+r*(wa*ay+wb*by),z=this.eyeFront(c,x,y);
     if(z===null)throw Error('Inner globe chart escaped support');
-    IP.setXYZ(j*(lid.A+1)+i,x,y,z+.000075);
+    IP.setXYZ(j*(lid.A+1)+i,x,y,z+.000085);
    }
   }
 `+s.slice(b);
- s=one(s,'contact+.000045','contact+.000075');
- s=s.replace('posteriorTearGapMM:.045','posteriorTearGapMM:.075');
+ s=one(s,'contact+.000045','contact+.000085');
+ s=s.replace('posteriorTearGapMM:.045','posteriorTearGapMM:.085');
+ s=s.replace('The posterior conjunctival surface remains 0.045 mm off the globe.','The posterior surface uses 0.085 mm axial numerical clearance, not a tear-film measurement.');
  s=one(s,'bulge=(ny>=0?.000055:.000035)','bulge=(ny>=0?.00016:.000035)');
- // Broad head/eyebrow shadows remain; sub-millimetre self shadows use local
- // contact shading rather than stair-stepped full-head shadow-map texels.
+ // A closed-scan normal map contains a baked crease. Do not stretch that crease
+ // across the new free margin: retain it on the surrounding skin, not its lip.
+ s=one(s,'mix(.48,1.,smoothstep(.06,.68,vLidT))','mix(.08,1.,smoothstep(.16,.55,vLidT))');
+ s=s.replace('ET03-continuous-lid-shell-1','ET06.1-continuous-lid-shell');
+ // Broad head/eyebrow shadows remain; sub-millimetre contact shading is local.
  s=one(s,'m.castShadow=true;m.receiveShadow=true;','m.castShadow=false;m.receiveShadow=true;');
  s=one(s,'edge.castShadow=true;edge.receiveShadow=true;','edge.castShadow=false;edge.receiveShadow=true;');
  s=one(s,' audit(){',' audit(detailed=false){');
@@ -47,7 +58,7 @@ edit('research/ResearchEyes.js',s=>{
  s=one(s,"scope:'actual inner-surface and free-margin vertices against rotated two-sphere; not exhaustive triangle CCD'","scope:'actual vertices, optional triangle centroids and all edge midpoints; rotated two-sphere; sampled static poses, not exhaustive continuous CCD'");
  return s;
 });
-for(const f of ['app.js','eyes/EyeSystem.js','talkinghead/IntegratedEyes.js','anatomy/bundle.cjs'])edit(f,s=>s.replaceAll('emily-transfer/6.0.0','emily-transfer/6.1.0').replaceAll('eyes/6.0.0','eyes/6.1.0').replaceAll("'ET06'","'ET06.1'").replaceAll('ET06 ·','ET06.1 ·').replaceAll('· ET06','· ET06.1').replace('audit:()=>eyesRig.audit()','audit:(detailed=false)=>eyesRig.audit(detailed)').replace('posteriorTearGapMM:.045','posteriorTearGapMM:.075'));
+for(const f of ['app.js','eyes/EyeSystem.js','talkinghead/IntegratedEyes.js','anatomy/bundle.cjs'])edit(f,s=>s.replaceAll('emily-transfer/6.0.0','emily-transfer/6.1.0').replaceAll('eyes/6.0.0','eyes/6.1.0').replaceAll("'ET06'","'ET06.1'").replaceAll('ET06 ·','ET06.1 ·').replaceAll('· ET06','· ET06.1').replace('audit:()=>eyesRig.audit()','audit:(detailed=false)=>eyesRig.audit(detailed)').replace('posteriorTearGapMM:.045','posteriorTearGapMM:.085'));
 edit('index.html',s=>s.replaceAll('ET06','ET06.1'));
 edit('takeover/qa.cjs',s=>{
  s=s.replaceAll("'ET06'","'ET06.1'").replaceAll('emily-transfer/6.0.0','emily-transfer/6.1.0').replaceAll('__EYES__.audit()','__EYES__.audit(true)');
