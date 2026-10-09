@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import {ResearchEyes} from '../research/ResearchEyes.js';
+import {NaturalEyes as ResearchEyes} from '../natural/NaturalEyes.js';
 import {BehaviorController,DEFAULT_BEHAVIOR} from './BehaviorController.js';
-export const EYE_VERSION='eyes/4.0.0';
+export const EYE_VERSION='eyes/7.3.0';
 const clamp=THREE.MathUtils.clamp;
 const V=()=>new THREE.Vector3();
 /** Single final-pose writer. Targets use world metres; contact uses head space.
@@ -81,7 +81,7 @@ export class IntegratedEyes extends ResearchEyes {
    e.c.gazePitch=cp;e.c.gazeYaw=cy;
    const closure=c.manualBlink>=0?clamp(c.manualBlink,0,1):f.blink[i];
    const squint=clamp(Math.max(c.squint||0,f.squint[i]*.65),0,1);
-   const opening=clamp(c.opening*(1+f.wide[i]*.12),.65,1.25);
+   const opening=clamp(c.opening*(1+f.wide[i]*.10),.56,1.15);
    const lidChanged=instant||angle>.00003||Math.abs(closure-this._closed[i])>.00001||Math.abs(squint-this._squint[i])>.00001||Math.abs(opening-this._open[i])>.00001;
    this._closed[i]=closure;this._squint[i]=squint;this._open[i]=opening;
    if(lidChanged){this.updateLid(e,closure);changed=true;}

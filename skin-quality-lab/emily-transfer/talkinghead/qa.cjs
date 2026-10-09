@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium}=require('playwright'),{PNG}=require('pngjs');
-const root=path.resolve(__dirname,'../../..'),out=process.env.EVIDENCE_DIR||'/tmp/et04-evidence';fs.mkdirSync(out,{recursive:true});
-const report={version:'ET04',sourceCommit:process.env.GITHUB_SHA||null,publicCommit:process.env.PUBLIC_COMMIT||null,networkInterception:false,physicalMobileDevice:false,renderBackend:'Chromium / SwiftShader',errors:[],consoleErrors:[],failedRequests:[],checks:{}};
+const root=path.resolve(__dirname,'../../..'),out=process.env.EVIDENCE_DIR||'/tmp/et05-evidence';fs.mkdirSync(out,{recursive:true});
+const report={version:'ET05',sourceCommit:process.env.GITHUB_SHA||null,publicCommit:process.env.PUBLIC_COMMIT||null,networkInterception:false,physicalMobileDevice:false,renderBackend:'Chromium / SwiftShader',errors:[],consoleErrors:[],failedRequests:[],checks:{}};
 let browser,server,page;const requests=[];
 function imageDiff(a,b){a=PNG.sync.read(a);b=PNG.sync.read(b);assert.equal(a.width,b.width);assert.equal(a.height,b.height);let s=0,changed=0;for(let i=0;i<a.data.length;i+=4){let d=0;for(let c=0;c<3;c++)d+=Math.abs(a.data[i+c]-b.data[i+c]);s+=d;if(d>3)changed++;}return {meanRGB:s/(a.width*a.height*3),changedFraction:changed/(a.width*a.height)};}
 (async()=>{
@@ -10,11 +10,11 @@ function imageDiff(a,b){a=PNG.sync.read(a);b=PNG.sync.read(b);assert.equal(a.wid
  report.url=url;report.localServer=!!server;
  browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
  page=await browser.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});page.setDefaultTimeout(60000);
- await page.addInitScript(()=>{window.__EYE_QA_FREEZE__=true;window.__et04BootErrors=[];window.addEventListener('error',e=>window.__et04BootErrors.push(e.message));});
+ await page.addInitScript(()=>{window.__EYE_QA_FREEZE__=true;window.__et05BootErrors=[];window.addEventListener('error',e=>window.__et05BootErrors.push(e.message));});
  page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push(m.text());});page.on('requestfailed',r=>report.failedRequests.push({url:r.url(),error:r.failure()?.errorText}));page.on('request',r=>requests.push(r.url()));
  await page.goto(url,{waitUntil:'domcontentloaded',timeout:90000});
- await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready||window.__et04BootErrors?.length,{},{timeout:180000});
- assert.deepEqual(report.errors,[]);assert.equal(await page.evaluate(()=>__SKIN_LAB__.state.version),'emily-transfer/4.0.0');assert.equal(await page.evaluate(()=>__EYES__.version),'eyes/4.0.0');
+ await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready||window.__et05BootErrors?.length,{},{timeout:180000});
+ assert.deepEqual(report.errors,[]);assert.equal(await page.evaluate(()=>__SKIN_LAB__.state.version),'emily-transfer/5.0.0');assert.equal(await page.evaluate(()=>__EYES__.version),'eyes/5.0.0');
  async function pixels(){await page.evaluate(()=>__SKIN_LAB__.render());return Buffer.from((await page.evaluate(()=>document.querySelector('#viewport canvas').toDataURL('image/png'))).split(',')[1],'base64');}
  async function shot(name){const p=await pixels();fs.writeFileSync(out+'/'+name+'-canvas.png',p);await page.screenshot({path:out+'/'+name+'.png'});return p;}
  assert.equal(await page.locator('canvas').count(),1);
@@ -55,5 +55,5 @@ function imageDiff(a,b){a=PNG.sync.read(a);b=PNG.sync.read(b);assert.equal(a.wid
  await page.click('#reset');await page.evaluate(()=>{__TALKINGHEAD__.set({headMotion:false,paused:true});__EYES__.set({manualBlink:0});__EYES__.step(0,true);});await page.setViewportSize({width:390,height:844});await page.click('[data-camera="portrait"]');await page.evaluate(()=>__EYES__.step(0,true));await shot('09-mobile-viewport');await page.click('#mobileToggle');await page.click('#thSocial');assert.equal(await page.evaluate(()=>__EYES__.info().mode),'relaxed');await page.click('#thDouble');await page.evaluate(()=>{__EYES__.step(.05);__EYES__.step(.05);});await shot('10-mobile-controls');await page.click('#mobileToggle');report.checks.mobile={viewport:[390,844],panelToggle:true,behaviorControls:true,realDevice:false};
  assert.deepEqual(report.errors,[]);assert.deepEqual(report.consoleErrors,[]);assert.deepEqual(report.failedRequests,[]);
  assert(!requests.some(u=>/texttospeech|speech\.google|elevenlabs|api\.openai|readyplayer|\.fbx(?:\?|$)/i.test(u)),'Unexpected voice/avatar dependency');report.checks.noNewVoiceOrAvatarRequests=true;report.requests=requests;
- report.passed=true;fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));console.log('ET04_BROWSER_PASS',JSON.stringify({url,checks:Object.keys(report.checks),errors:report.errors,publicCommit:report.publicCommit}));
+ report.passed=true;fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));console.log('ET05_BROWSER_PASS',JSON.stringify({url,checks:Object.keys(report.checks),errors:report.errors,publicCommit:report.publicCommit}));
 })().catch(async e=>{report.passed=false;report.failure=e.stack||String(e);report.requests=requests;console.error(e);fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));if(page)await page.screenshot({path:out+'/failure.png',timeout:30000}).catch(()=>{});process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();if(server)server.close();});
