@@ -1,0 +1,56 @@
+name: ET05 eyelid structure review
+on:
+  push:
+    branches: [fix/eyelid-volume-et05-20261009]
+    paths:
+      - '.github/workflows/et05-eyelid-review.yml'
+      - 'skin-quality-lab/emily-transfer/anatomy/**'
+permissions:
+  contents: read
+concurrency:
+  group: et05-review
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            skin-quality-lab/r01
+            skin-quality-lab/r02
+            skin-quality-lab/emily-transfer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser and bundler
+        timeout-minutes: 4
+        run: |
+          npm install --prefix /tmp/et05-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
+          /tmp/et05-tools/node_modules/.bin/playwright install chromium
+          timeout 60s sudo apt-get install --no-install-recommends -y fonts-wqy-zenhei || true
+      - name: Build from preserved ET04 and test unchanged behavior
+        env:
+          NODE_PATH: /tmp/et05-tools/node_modules
+          ASSET_COMMIT: ${{ github.sha }}
+        run: |
+          node skin-quality-lab/emily-transfer/anatomy/build.cjs
+          node skin-quality-lab/emily-transfer/talkinghead/test-kernel.mjs
+      - name: Real upper-lid and retained-behavior validation
+        env:
+          NODE_PATH: /tmp/et05-tools/node_modules
+          EVIDENCE_DIR: /tmp/et05-review/visual
+        run: node skin-quality-lab/emily-transfer/anatomy/qa.cjs
+      - name: Preserve tested candidate and actual images
+        if: always()
+        run: |
+          mkdir -p /tmp/et05-review/candidate
+          cp -r skin-quality-lab/emily-transfer/. /tmp/et05-review/candidate/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et05-structure-review
+          path: /tmp/et05-review
+          retention-days: 14
