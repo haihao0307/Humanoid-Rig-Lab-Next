@@ -11,18 +11,32 @@
 .eye-section{background:linear-gradient(145deg,#252e34,#1c1f25 80%)}.eye-status{margin:10px 0 0;color:#b6c9c6;font-size:11px}.top-tools{right:6px}.top-tools button{padding:6px 9px}@media(max-width:760px){.top-tools button{padding:4px 6px}#layerLabel{top:94px}.method-badge{top:118px}#splitLabels{top:139px}#splitLine{top:158px}}
 
 .eye-section .hint{line-height:1.65}.top-tools{display:flex;gap:4px;max-width:calc(100% - 25px);flex-wrap:wrap}.top-tools button{white-space:nowrap}@media(max-width:760px){.top-tools{max-width:calc(100% - 15px)}.caption-title{font-size:16px}}
+.th-section{background:#222a30}.th-section summary{font-size:11px;cursor:pointer}.th-section .row button{font-size:10px}.th-section .hint{line-height:1.7}
 </style>
 <script type="importmap">{"imports":{"three":"../r01/vendor/three.module.js","three/addons/":"../r01/vendor/addons/"}}</script>
 </head>
 <body>
-<header><div class="brand"><span class="mark"></span><div><h1>眼球与眼睑实验台</h1><div class="subtitle">EMILY METHOD → ANOTHER FACE</div></div></div><div class="head-right"><span id="status">准备场景</span><span class="version">ET03 · CONTACT</span><button id="mobileToggle">参数</button></div></header>
+<header><div class="brand"><span class="mark"></span><div><h1>眼球与眼睑实验台</h1><div class="subtitle">EMILY METHOD → ANOTHER FACE</div></div></div><div class="head-right"><span id="status">准备场景</span><span class="version">ET04 · TALKINGHEAD</span><button id="mobileToggle">参数</button></div></header>
 <main class="shell"><section id="viewport" aria-label="可旋转的三维皮肤实验视图">
 <div class="top-tools"><button data-camera="portrait" class="active">肖像</button><button data-camera="front">正面</button><button data-camera="eyes">双眼特写</button><button data-camera="iris">虹膜近景</button><button data-camera="cheek">面颊微距</button><button data-camera="ear">耳部侧光</button><button id="compare" title="按住关闭附加材质层；保持同一模型、肤色、灯光与相机">按住对照</button><button id="shot">截图</button></div>
 <div id="currentMethod" class="method-badge">EMILY 思路 / 迁移到 LEE</div><div id="splitLine" role="separator" aria-label="对照分界" hidden></div><div id="splitLabels" hidden><span>基础 PBR</span><span>完整皮肤</span></div><div id="layerLabel">完整皮肤 · 柔箱光</div><div id="baselineBadge">基础 PBR · 同形 / 同色 / 同光</div>
 <div class="bottom-caption"><div><div class="caption-title">另一张脸，同一种皮肤语言</div><div class="caption-small">拖动旋转 · 滚轮缩放 · 右键平移 · 双击局部对焦</div></div><div><span class="chip" id="stats">WEBGL 2 / LINEAR HDR</span></div></div>
 <div id="loading" class="loading"><div class="spinner"></div><div id="loadingText" class="loading-text">载入另一人物的扫描皮肤与实时材质</div><small>首次载入包含高分辨率纹理；之后旋转与调节在浏览器中运行</small></div><div id="toast"></div>
 </section>
-<aside class="side" aria-label="皮肤与光线参数"><div class="section eye-section"><h2>眼球与视线 <small>ET03 / CONTACT</small></h2>
+<aside class="side" aria-label="皮肤与光线参数"><div class="section th-section"><h2>TalkingHead 行为 <small>ET04 / 1.7.0</small></h2>
+<p class="hint">原库眨眼、注视、缓动与头部动作 → 当前人头。<br>一套渲染器；眼睑接触约束继续由 ET03 执行。</p>
+<div class="feature-grid"><label><input id="thEnabled" type="checkbox" checked>启用原库驱动</label><label><input id="thHead" type="checkbox" checked>头眼联动</label><label><input id="thPause" type="checkbox">暂停自主动作</label></div>
+<div class="presets" style="margin-top:12px"><button id="thFocus">专注看你</button><button id="thSocial">自然观察</button></div>
+<label class="selector-label" for="thMood">眼神状态（不含嘴部表情）</label><select id="thMood"><option value="neutral">平静</option><option value="happy">愉悦眼神</option><option value="sad">低落眼神</option><option value="sleep">休息闭眼</option></select>
+<div class="row" style="margin-top:10px"><button id="thDouble">双次眨眼</button><button id="thYes">点头</button><button id="thNo">摇头</button></div>
+<div class="row" style="margin-top:7px"><button id="thWinkL">人物左眼眨眼</button><button id="thWinkR">人物右眼眨眼</button></div>
+<div class="control"><label for="thAmount">头部自然动作幅度<output id="thAmountOut"></output></label><input id="thAmount" type="range" min="0" max="1" step=".01" value=".42"></div>
+<div class="control"><label for="thContact">自然观察时注视你的概率<output id="thContactOut"></output></label><input id="thContact" type="range" min="0" max="1" step=".01" value=".82"></div>
+<details><summary>转头与锁定测试</summary><div class="control"><label for="thYaw">转头（眼睛继续看目标）<output id="thYawOut"></output></label><input id="thYaw" type="range" min="-20" max="20" step=".5" value="0"></div><div class="control"><label for="thPitch">低头 / 抬头<output id="thPitchOut"></output></label><input id="thPitch" type="range" min="-12" max="12" step=".5" value="0"></div><button id="thCenter">头部归零</button></details>
+<details style="margin-top:12px"><summary>模块连接检查</summary><p id="thDiagnostics" class="hint">正在连接原库行为与眼睑约束。</p></details>
+<p class="hint">手动闭眼优先于自动眨眼；锁定优先于随机注视。<br>关闭驱动可回到 ET03 动作。未接入语音或新增人头。</p>
+</div>
+<div class="section eye-section"><h2>眼球与视线 <small>ET03 / CONTACT</small></h2>
 <p class="hint">AniEyelid 接触约束 · ShellNeRF 表面分层思路<br>本页为实时几何适配，未训练论文神经模型。</p><div class="presets"><button data-eye-mode="camera" class="active">看向镜头</button><button data-eye-mode="pointer">跟随鼠标</button></div>
 <select id="eyeMode" aria-label="注视方式" style="margin-top:9px"><option value="camera">看向镜头</option><option value="pointer">跟随鼠标 / 触点</option><option value="fixed">锁定空间目标</option><option value="relaxed">放松观察</option></select>
 <div class="row" style="margin-top:8px"><button id="lockEye">锁定当前点</button><button id="blinkEye">眨眼测试</button></div>
@@ -72,6 +86,6 @@
 <div style="margin-top:13px"><select id="layer" aria-label="分层检查"><option value="beauty">完整皮肤</option><option value="albedo">颜色层 · 无光照</option><option value="normal">法线层 · 微结构</option><option value="roughness">粗糙度层</option><option value="specular">仅高光反射</option><option value="diffuse">仅散射 / 漫反射</option></select></div>
 <div style="margin-top:9px"><select id="quality" aria-label="渲染精度"><option value="high">高精度 · 桌面优先</option><option value="medium">均衡 · 减少像素开销</option><option value="low">轻量 · 低分辨率</option></select></div></div>
 <div class="section"><h2>参数记录 <small>05 / RECIPE</small></h2><div class="row"><button id="save">保存参数</button><button id="restore">读取参数</button><button id="reset">重置</button></div><div class="row" style="margin-top:7px"><button id="export">导出 JSON</button><button id="import">导入 JSON</button></div><input id="fileInput" type="file" accept=".json,application/json" hidden></div>
-<div class="credits"><strong>不同模型，独立运行。</strong><br>扫描：Lee Perry-Smith / Infinite，CC BY 3.0。<br>参考：<a href="https://alteredqualia.com/xg/examples/emily.html" target="_blank" rel="noopener">alteredqualia · Digital Emily</a>。未加载原站模型、纹理或引擎。<br>渲染继承本库 R02，参考方法是 GGX 重实现，不是 XG 原码移植。<br><a href="https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/dfb6b89ec451d0568f3a5262b8c64809d9398a5f/skin-quality-lab/r02/THIRD_PARTY.txt" target="_blank" rel="noopener">资产与 SSS 许可</a> · <a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a><br>ET03：重建睑缘、内外眼睑曲面与接触约束，增加独立眯眼及慢闭眼测试。眼球由参数生成；虹膜/巩膜细节使用 MakeHuman CC0 眼部色图，未加载 Emily 原站眼球模型或贴图。<a href="https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html" target="_blank" rel="noopener">眼图来源与 CC0</a>。并非 XG 逐像素移植；不代表全身人物已整合。</div>
+<div class="credits"><strong>TalkingHead 1.7.0 / MIT</strong><br>© Mika Suominen。实际复用眨眼、注视与动画求值代码；由适配层驱动当前眼睑。当前未接入语音。<br><br><strong>不同模型，独立运行。</strong><br>扫描：Lee Perry-Smith / Infinite，CC BY 3.0。<br>参考：<a href="https://alteredqualia.com/xg/examples/emily.html" target="_blank" rel="noopener">alteredqualia · Digital Emily</a>。未加载原站模型、纹理或引擎。<br>渲染继承本库 R02，参考方法是 GGX 重实现，不是 XG 原码移植。<br><a href="https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/dfb6b89ec451d0568f3a5262b8c64809d9398a5f/skin-quality-lab/r02/THIRD_PARTY.txt" target="_blank" rel="noopener">资产与 SSS 许可</a> · <a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a><br>ET03：重建睑缘、内外眼睑曲面与接触约束，增加独立眯眼及慢闭眼测试。眼球由参数生成；虹膜/巩膜细节使用 MakeHuman CC0 眼部色图，未加载 Emily 原站眼球模型或贴图。<a href="https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html" target="_blank" rel="noopener">眼图来源与 CC0</a>。并非 XG 逐像素移植；不代表全身人物已整合。</div>
 </aside></main>
 <script type="module" src="./app.js"></script></body></html>
