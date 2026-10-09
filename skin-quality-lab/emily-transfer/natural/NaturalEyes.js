@@ -34,6 +34,11 @@ function skinShader(material,c,isMargin=false){
   for(const tex of ['uSpec','uSurface'])s.fragmentShader=s.fragmentShader.replaceAll('texture2D('+tex+',vMapUv)','texture2D('+tex+',vTissueUV)');
   for(const tex of ['normalMap','uMesoMap','uMicroMap'])s.fragmentShader=s.fragmentShader.replaceAll('texture2D('+tex+',vNormalMapUv)','texture2D('+tex+',vTissueUV)');
   s.fragmentShader=s.fragmentShader.replaceAll('poresAt(vNormalMapUv)','poresAt(vTissueUV)').replaceAll('dFdx(vNormalMapUv)','dFdx(vTissueUV)').replaceAll('dFdy(vNormalMapUv)','dFdy(vTissueUV)');
+  // Separate the captured broad crease from fine surface structure. A copied
+  // closed-eye normal field is not the new open-lid shape. Keep measured fine
+  // skin frequencies instead of scaling the whole normal map to near zero.
+  s.fragmentShader=s.fragmentShader.replace('mapN.xy*=normalScale',`float unbake=1.-smoothstep(.16,.68,vLidT);vec3 oldBroadN=textureLod(normalMap,vTissueUV,2.).xyz*2.-1.;mapN.xy-=oldBroadN.xy*unbake*.92;mapN=normalize(mapN);mapN.xy*=normalScale`);
+  s.fragmentShader=s.fragmentShader.replace('vec2 slopes=mapN.xy',`vec3 oldBroadM=textureLod(uMesoMap,vTissueUV,2.).xyz*2.-1.;mesoN.xy-=oldBroadM.xy*unbake*.78;mesoN=normalize(mesoN);vec2 slopes=mapN.xy`);
   // Do not suppress all skin frequencies: retain fine detail and only reduce
   // the old scan's coarse normal field near the reconstructed free margin.
   s.fragmentShader=s.fragmentShader.replace('mapN.xy*=normalScale*(uBaseline>.5?1.:uDetail);','mapN.xy*=normalScale*(uBaseline>.5?1.:uDetail)*mix(.20,1.,smoothstep(.12,.66,vLidT));');
@@ -49,7 +54,7 @@ function skinShader(material,c,isMargin=false){
    s.fragmentShader=s.fragmentShader.replace('float skinSpecMask=','roughnessFactor=mix(.40,roughnessFactor,smoothstep(.06,.84,vTissueBand));\n float skinSpecMask=');
   }
  };
- material.customProgramCacheKey=()=>`ET07-tissue-${c.name}-${isMargin?'free-margin':'skin'}`;
+ material.customProgramCacheKey=()=>`ET071-tissue-${c.name}-${isMargin?'free-margin':'skin'}`;
  material.needsUpdate=true;
 }
 function configureTissue(rig,lid,c,sample){
@@ -63,7 +68,7 @@ function configureTissue(rig,lid,c,sample){
   let x=q.xs+(margin.x-(c.x+c.half*q.nx))*weight,y=q.ys+(margin.y-seam)*weight;
   const repair=(1-smooth(q.t/.60))*Math.pow(Math.abs(q.ny),.5);
   y+=(upper?.00035:-.0017)*repair;
-  const donor=sample(x,y),blend=1-smooth((q.t-.45)/.27);
+  const donor=sample(x,y),blend=upper?1-smooth((q.t-.10)/.36):1-smooth((q.t-.45)/.27);
   const u=lerp(q.src.u,donor.u,blend),v=lerp(q.src.v,donor.v,blend);
   tu.push(u,v);tb.push(1);uv.setXY(i,u,v);
   // Captured closed-lid occlusion does not describe an open, illuminated lid.
@@ -97,11 +102,11 @@ function makeCanthus(rig,e){
  const U=48,V=16,p=new Float32Array((U+1)*(V+1)*3),colors=[],idx=[];
  for(let i=0;i<=U;i++)for(let j=0;j<=V;j++){
   const u=i/U,v=j/V,centre=Math.sin(Math.PI*v),warm=Math.sin(Math.PI*u)*centre;
-  colors.push(.48+.15*warm,.23+.13*warm,.20+.10*warm);
+  colors.push(.25+.045*warm,.092+.026*warm,.078+.022*warm);
   if(i<U&&j<V){const k=i*(V+1)+j;idx.push(k,k+V+1,k+1,k+1,k+V+1,k+V+2);}
  }
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));g.setIndex(idx);
- const m=new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:.44,metalness:0,ior:1.36,clearcoat:.36,clearcoatRoughness:.22,envMapIntensity:.34,side:THREE.DoubleSide});
+ const m=new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:.44,metalness:0,ior:1.36,clearcoat:.28,clearcoatRoughness:.24,envMapIntensity:.20,side:THREE.DoubleSide});
  m.onBeforeCompile=s=>{s.uniforms.uEyePass=rig.pass;s.fragmentShader='uniform float uEyePass;\n'+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <opaque_fragment>','#include <opaque_fragment>\nif(uEyePass>.5&&uEyePass<1.5){gl_FragColor=vec4(0.);return;}');};
  const mesh=new THREE.Mesh(g,m);mesh.name='continuous-medial-tear-lake-'+e.c.name;mesh.frustumCulled=false;rig.group.add(mesh);
  e.caruncle.geometry.dispose();e.caruncle.material.dispose();e.caruncle.removeFromParent();e.caruncle=null;e.canthus={mesh,U,V};
@@ -109,21 +114,22 @@ function makeCanthus(rig,e){
 function updateCanthus(rig,e,blink){
  if(!e.canthus)return;const {mesh,U,V}=e.canthus,P=mesh.geometry.attributes.position,c=e.c;
  rig._fittingEye=e;
- for(let i=0;i<=U;i++){
-  const t=i/U,u=-1+.145*t,angle=Math.acos(u*c.sign),top=rig.margin(c,angle,blink),bottom=rig.margin(c,TAU-angle,blink);
-  for(let j=0;j<=V;j++){
-   const v=j/V,x=lerp(top.x,bottom.x,v),y=lerp(top.y,bottom.y,v),front=rig.eyeFront(c,x,y);
-   const mound=.00013*Math.sin(Math.PI*t)*Math.pow(Math.sin(Math.PI*v),1.4)*(1-blink);
-   const plica=.000065*Math.exp(-Math.pow((t-.90)/.075,2))*Math.sin(Math.PI*v)*(1-blink);
-   P.setXYZ(i*(V+1)+j,x,y,(front===null?lerp(top.z,bottom.z,v)-.00012:front+.00010)+mound+plica);
-  }
+ for(let i=0;i<=U;i++)for(let j=0;j<=V;j++){
+  const t=i/U,v=j/V,roundEnd=.52+.48*Math.sin(Math.PI*v),u=-1+.155*t*roundEnd;
+  const angle=Math.acos(u*c.sign),top=rig.margin(c,angle,blink),bottom=rig.margin(c,TAU-angle,blink);
+  const x=lerp(top.x,bottom.x,v),y=lerp(top.y,bottom.y,v),front=rig.eyeFront(c,x,y);
+  const mound=.00010*Math.sin(Math.PI*t)*Math.pow(Math.sin(Math.PI*v),1.4)*(1-blink);
+  const plica=.00004*Math.exp(-Math.pow((t-.90)/.095,2))*Math.sin(Math.PI*v)*(1-blink);
+  P.setXYZ(i*(V+1)+j,x,y,(front===null?lerp(top.z,bottom.z,v)-.00012:front+.00010)+mound+plica);
  }
  P.needsUpdate=true;mesh.geometry.computeVertexNormals();mesh.visible=blink<.995;rig._fittingEye=null;
 }
 export class NaturalEyes extends ResearchEyes {
  constructor(options){
   super(options);
-  this.ready=this.ready.then(()=>{for(const e of this.eyes)makeCanthus(this,e);this.update(0,true);this.requestRender();return this;});
+  this.ready=this.ready.then(()=>{for(const e of this.eyes)makeCanthus(this,e);this.update(0,true);
+   window.__NATURAL_REVIEW__={setVisibility:flags=>{for(const e of this.eyes){const parts={margin:e.lid.edge,rim:e.rim.mesh,inside:e.lid.inside,canthus:e.canthus.mesh,lashes:e.lashes.mesh};for(const [k,v]of Object.entries(flags))if(parts[k]&&typeof v==='boolean')parts[k].visible=v;}this.requestRender();}};
+   this.requestRender();return this;});
  }
  makeLid(c,sample,material){const lid=super.makeLid(c,sample,material);configureTissue(this,lid,c,sample);return lid;}
  updateLid(e,blink){
@@ -131,12 +137,20 @@ export class NaturalEyes extends ResearchEyes {
   if(e.lid.tissueReady){sharedNormals(e.lid);for(const k of ['roughness','clearcoat','clearcoatRoughness','envMapIntensity'])e.lid.edge.material[k]=this.skin[k];}
   updateCanthus(this,e,this.config.manualBlink>=0?this.config.manualBlink:blink);
  }
- info(){return {...super.info(),naturalTissue:{version:'ET07',sameSkinAssets:true,extraTextures:0,continuousCanthalTissue:true,sharedMarginNormals:true,closedScanNotOpenGroundTruth:true}};}
+ info(){return {...super.info(),naturalTissue:{version:'ET07.1',sameSkinAssets:true,extraTextures:0,continuousCanthalTissue:true,sharedMarginNormals:true,closedScanNotOpenGroundTruth:true}};}
  audit(detailed=false){
-  const a=super.audit(detailed);a.version='ET07';
+  const a=super.audit(detailed);a.version='ET07.1';
   a.tissue=this.eyes.map(e=>{const {lid}=e,uv=lid.mesh.geometry.attributes.uv,N=lid.mesh.geometry.attributes.normal,EN=lid.edge.geometry.attributes.normal;let uvError=0,normalError=0;
    for(let i=0;i<=lid.A;i++){const q=lid.entries[lid.R*(lid.A+1)+i],k=lid.R*(lid.A+1)+i;uvError=Math.max(uvError,Math.hypot(uv.getX(k)-q.src.u,uv.getY(k)-q.src.v));const j=i*(lid.es+1)+lid.es;normalError=Math.max(normalError,Math.hypot(N.getX(i)-EN.getX(j),N.getY(i)-EN.getY(j),N.getZ(i)-EN.getZ(j)));}
-   return {name:e.c.name,boundaryUVMaxError:uvError,sharedMarginNormalMaxError:normalError,sameAlbedoTexture:lid.mesh.material.map===this.skin.map&&lid.edge.material.map===this.skin.map,canthalPatch:!!e.canthus,...lid.tissueStats};
+   let canthusMin=Infinity,canthusPenetrations=0,canthusSamples=0,canthusInvalid=0;
+   this._fittingEye=e;
+   if(e.canthus){const g=e.canthus.mesh.geometry,p=g.attributes.position,ix=g.index.array;
+    const test=(x,y,z)=>{if(![x,y,z].every(Number.isFinite)){canthusInvalid++;return;}const front=this.eyeFront(e.c,x,y);if(front===null)return;const gap=z-front;canthusMin=Math.min(canthusMin,gap);canthusSamples++;if(gap<-.0000001)canthusPenetrations++;};
+    for(let i=0;i<p.count;i++)test(p.getX(i),p.getY(i),p.getZ(i));
+    if(detailed)for(let i=0;i<ix.length;i+=3)for(const w of [[1/3,1/3,1/3],[.5,.5,0],[0,.5,.5],[.5,0,.5]]){const a=ix[i],b=ix[i+1],c=ix[i+2];test(w[0]*p.getX(a)+w[1]*p.getX(b)+w[2]*p.getX(c),w[0]*p.getY(a)+w[1]*p.getY(b)+w[2]*p.getY(c),w[0]*p.getZ(a)+w[1]*p.getZ(b)+w[2]*p.getZ(c));}
+   }
+   this._fittingEye=null;
+   return {canthalContact:{minAxialGapMM:Number.isFinite(canthusMin)?canthusMin*1000:null,penetrations:canthusPenetrations,samples:canthusSamples,invalid:canthusInvalid},name:e.c.name,boundaryUVMaxError:uvError,sharedMarginNormalMaxError:normalError,sameAlbedoTexture:lid.mesh.material.map===this.skin.map&&lid.edge.material.map===this.skin.map,canthalPatch:!!e.canthus,...lid.tissueStats};
   });return a;
  }
  dispose(){for(const e of this.eyes){e.canthus?.mesh.geometry.dispose();e.canthus?.mesh.material.dispose();e.canthus?.mesh.removeFromParent();}super.dispose();}
