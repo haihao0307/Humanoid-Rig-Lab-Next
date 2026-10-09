@@ -1,0 +1,264 @@
+{
+  "records": [
+    {
+      "id": "wallet",
+      "audit": {
+        "kind": "wallet",
+        "meshes": 8,
+        "leatherMeshes": 3,
+        "triangles": 60458,
+        "finite": true,
+        "boundsMM": {
+          "min": [
+            -54.113562117855444,
+            4.147343330103716,
+            -16.578525775617134
+          ],
+          "max": [
+            53.55538966759592,
+            81.85265665644071,
+            20.435085875385965
+          ]
+        },
+        "patternReady": true,
+        "forceSolved": false
+      },
+      "meshChecks": [
+        {
+          "name": "wallet-panel-0",
+          "wrong": 0,
+          "nonzero": 16384
+        },
+        {
+          "name": "wallet-panel-1",
+          "wrong": 0,
+          "nonzero": 14936
+        },
+        {
+          "name": "wallet-panel-2",
+          "wrong": 0,
+          "nonzero": 12480
+        }
+      ]
+    },
+    {
+      "id": "belt",
+      "audit": {
+        "kind": "belt",
+        "meshes": 7,
+        "leatherMeshes": 2,
+        "triangles": 31204,
+        "finite": true,
+        "boundsMM": {
+          "min": [
+            -120.98054648002585,
+            -3.581744909286499,
+            -121.77799485919004
+          ],
+          "max": [
+            112.5727065769529,
+            43.60360336303711,
+            116.79594002375185
+          ]
+        },
+        "patternReady": true,
+        "forceSolved": false
+      },
+      "meshChecks": [
+        {
+          "name": "1100mm-curved-punched-belt",
+          "wrong": 0,
+          "nonzero": 24940
+        },
+        {
+          "name": "closed-leather-keeper",
+          "wrong": 0,
+          "nonzero": 2376
+        }
+      ]
+    },
+    {
+      "id": "bag",
+      "audit": {
+        "kind": "bag",
+        "meshes": 21,
+        "leatherMeshes": 7,
+        "triangles": 54986,
+        "finite": true,
+        "boundsMM": {
+          "min": [
+            -155.95753017050464,
+            -3.008676290512085,
+            -76.34520936642681
+          ],
+          "max": [
+            164.95833787750672,
+            437,
+            73.60747347251055
+          ]
+        },
+        "patternReady": false,
+        "forceSolved": false
+      },
+      "meshChecks": [
+        {
+          "name": "bag-back",
+          "wrong": 0,
+          "nonzero": 524
+        },
+        {
+          "name": "bag-front",
+          "wrong": 0,
+          "nonzero": 524
+        },
+        {
+          "name": "continuous-side-bottom-gusset",
+          "wrong": 0,
+          "nonzero": 11016
+        },
+        {
+          "name": "continuous-folded-flap",
+          "wrong": 0,
+          "nonzero": 18976
+        },
+        {
+          "name": "strap-tab",
+          "wrong": 0,
+          "nonzero": 524
+        },
+        {
+          "name": "strap-tab",
+          "wrong": 0,
+          "nonzero": 524
+        },
+        {
+          "name": "attached-shoulder-strap",
+          "wrong": 0,
+          "nonzero": 5792
+        }
+      ]
+    },
+    {
+      "id": "hat",
+      "audit": {
+        "kind": "hat",
+        "meshes": 18,
+        "leatherMeshes": 3,
+        "triangles": 31168,
+        "finite": true,
+        "boundsMM": {
+          "min": [
+            -131.17410630690196,
+            0.8112545013427734,
+            -120.45747572189444
+          ],
+          "max": [
+            110.01783152131182,
+            113.8,
+            179.03064897834471
+          ]
+        },
+        "patternReady": false,
+        "forceSolved": false
+      },
+      "meshChecks": [
+        {
+          "name": "six-panel-open-crown",
+          "wrong": 0,
+          "nonzero": 21152
+        },
+        {
+          "name": "open-sweatband",
+          "wrong": 0,
+          "nonzero": 3608
+        },
+        {
+          "name": "shaped-leather-brim",
+          "wrong": 0,
+          "nonzero": 5544
+        }
+      ]
+    },
+    {
+      "id": "swatch",
+      "audit": {
+        "kind": "swatch",
+        "meshes": 2,
+        "leatherMeshes": 1,
+        "triangles": 10512,
+        "finite": true,
+        "boundsMM": {
+          "min": [
+            -52.643489837646484,
+            12.303385734558105,
+            -42.14595031738281
+          ],
+          "max": [
+            52.935787200927734,
+            33.74391174316406,
+            42.09636306762695
+          ]
+        },
+        "patternReady": false,
+        "forceSolved": false
+      },
+      "meshChecks": [
+        {
+          "name": "folded-leather-sample",
+          "wrong": 0,
+          "nonzero": 10488
+        }
+      ]
+    }
+  ],
+  "assertions": [
+    {
+      "test": "wallet finite geometry",
+      "pass": true
+    },
+    {
+      "test": "wallet surface winding matches normals",
+      "pass": true
+    },
+    {
+      "test": "wallet metric SVG",
+      "pass": true
+    },
+    {
+      "test": "belt finite geometry",
+      "pass": true
+    },
+    {
+      "test": "belt surface winding matches normals",
+      "pass": true
+    },
+    {
+      "test": "belt metric SVG",
+      "pass": true
+    },
+    {
+      "test": "bag finite geometry",
+      "pass": true
+    },
+    {
+      "test": "bag surface winding matches normals",
+      "pass": true
+    },
+    {
+      "test": "hat finite geometry",
+      "pass": true
+    },
+    {
+      "test": "hat surface winding matches normals",
+      "pass": true
+    },
+    {
+      "test": "swatch finite geometry",
+      "pass": true
+    },
+    {
+      "test": "swatch surface winding matches normals",
+      "pass": true
+    }
+  ]
+}
