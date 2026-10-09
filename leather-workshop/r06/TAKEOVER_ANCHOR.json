@@ -1,0 +1,60 @@
+{
+  "schema": "kaopu/leather-atelier-takeover@1",
+  "date": "2026-10-09",
+  "stage": "TAKEOVER_AND_BASELINE_LOCK_ONLY",
+  "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+  "branch": "feature/leather-atelier-r06-takeover-20261009",
+  "baseline": {
+    "commit": "e86c36c8c34b1f2b57cc5462459ee2f490e556af",
+    "entry": "leather-workshop/r05/public-lite.html",
+    "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/e86c36c8c34b1f2b57cc5462459ee2f490e556af/leather-workshop/r05/public-lite.html",
+    "gitBlobSHA": "a1a180a5960cb9580b79944b4da5bcb83c23cd33",
+    "manifestDeclaredSHA256": "46f44dd298eb33b23d41ec05cfe5b550f343fe5ca37cec424ae92b309012f26a",
+    "manifestDeclaredBytes": 1065023,
+    "manifestVerification": "Read PUBLIC_LITE_MANIFEST.json at the exact commit; no fresh binary hash or browser verification has been performed in this takeover commit."
+  },
+  "protectedPaths": [
+    "leather-workshop/r01",
+    "leather-workshop/r02",
+    "leather-workshop/r03",
+    "leather-workshop/r04",
+    "leather-workshop/r05",
+    "leather-workshop/anchors"
+  ],
+  "preservationRules": [
+    "旧入口、形体、材质、针孔、线体、物理、测试与全部引用资源保持不变。",
+    "只读继承允许；任何新灯光、材料扩展、成品或物理适配必须在独立 R06 层内实施。",
+    "禁止重新生成或更新旧锚点来掩盖不一致；发现不一致必须停止。",
+    "不改主分支，不合并，不强推，不改写历史；如开 PR 必须 Draft。",
+    "构建与发布前比较所有保护路径相对基线的 Git 差异必须为零，并检查其递归依赖。"
+  ],
+  "userBrief": {
+    "role": "顶尖数字皮匠；由助手负责材料、产品与灯光参数，不把调参责任交给用户。",
+    "catalogue": "完整展示现有皮革类型的三维实物材质缩略图；颜色变化与独立皮革类型分开标注；扩展类型必须能说明粒面、涂饰、绒毛、厚度和物理参数的依据。",
+    "lighting": "在继承原有优质皮面的基础上，新增细腻高级的产品摄影布光；保留中性检验灯光与原版对照，不能用暗部或强高光掩盖错误。",
+    "physicalMaterial": "从 R04 已有统一单位、膜内弹性、弯曲与接触基础只读继承，在新层连接有尺寸的裁片、接缝、碰撞及制作数据。",
+    "products": ["帽子", "腰带", "夹克", "其他适合当前能力且有展示质量的皮具"],
+    "presentation": "真正可旋转、放大的三维产品与微距细节，不用生成图片冒充网页成品；不因增加款式而降低质量。",
+    "delivery": "固定提交公网 HTTPS 入口；实际核验渲染、主要交互与版本；手机视口模拟不冒充实机。"
+  },
+  "verifiedFromSourceAtBaseline": {
+    "r04": "已有隐式皮革曲面动力学、弯曲、球体双向接触、夹持准静态试验。源码说明明确缺少自碰撞、人体碰撞、摩擦、整衣接入和完整实物标定。",
+    "r051": "已有真实贯穿针孔、连续针路、正背面与切边角色、局部受张力表皮形变；不是完整缝线张力/摩擦/自接触系统。",
+    "appearance": "保留 R02 程序材质与基于 Poly Haven Brown Leather 的 R05.1 粒面。不同配色不等于多套独立实测皮革。",
+    "resolution": "公开轻量版三张贴图为 768x384；完整版本使用 3072x1536 原像素裁切数据。不得将轻量贴图放大称为新增真实细节。"
+  },
+  "acceptanceSeparation": [
+    "视觉成品展示合格不代表整衣物理合格。",
+    "裁片与缝合顺序有效不代表实物打样已经验证。",
+    "当前模型参数必须区分实测、文献转录和艺术/演示假设；禁止把换色自动映射成另一种实测力学。",
+    "线性局部压痕、规定针路和几何褶皱不得冒称完整非线性缝合与动态布料仿真。",
+    "现实制作需要材料试样、弯曲/拉伸标定、厚度/接缝/削薄/五金结构和打样修正；没有这些不宣称可直接投产。"
+  ],
+  "implementationStatus": {
+    "newThumbnailCatalogue": "NOT_IMPLEMENTED_IN_THIS_COMMIT",
+    "newProductLighting": "NOT_IMPLEMENTED_IN_THIS_COMMIT",
+    "newProducts": "NOT_IMPLEMENTED_IN_THIS_COMMIT",
+    "garmentPhysics": "NOT_IMPLEMENTED_IN_THIS_COMMIT",
+    "freshPublicBrowserAcceptance": "NOT_PERFORMED_IN_THIS_COMMIT"
+  }
+}
