@@ -41,6 +41,9 @@ function skinShader(material,c,isMargin=false){
   s.fragmentShader=s.fragmentShader.replace('diffuseColor.rgb=mix(diffuseColor.rgb*vec3(.77,.57,.52),diffuseColor.rgb,smoothstep(.008,.055,vLidT));','');
   s.fragmentShader=s.fragmentShader.replace('float skinVariation=skinNoise(vSkinPosition*105.);',`diffuseColor.rgb*=mix(vec3(.95,.78,.73),vec3(1.),smoothstep(.05,.86,vTissueBand));\n float skinVariation=skinNoise(vSkinPosition*105.);`);
   if(isMargin){
+   const ns=s.fragmentShader.indexOf(' vec3 mapN=texture2D(normalMap'),ne=s.fragmentShader.indexOf('normal=normalize(tbn*normalize(mapN));',ns);
+   if(ns>=0&&ne>=0)s.fragmentShader=s.fragmentShader.slice(0,ns)+' normal=nonPerturbedNormal;\n'+s.fragmentShader.slice(ne+'normal=normalize(tbn*normalize(mapN));'.length);
+
    s.vertexShader=s.vertexShader.replace('transformed+=normal*(texture2D(uSurface,uv).b-.5)*uRelief*.001*(1.-uBaseline)*smoothstep(.13,.68,eyelidT);','');
    s.fragmentShader=s.fragmentShader.replace('normal=normalize(tbn*normalize(mapN));','normal=normalize(tbn*normalize(vec3(mapN.xy*.18,mapN.z)));');
    s.fragmentShader=s.fragmentShader.replace('float skinSpecMask=','roughnessFactor=mix(.40,roughnessFactor,smoothstep(.06,.84,vTissueBand));\n float skinSpecMask=');

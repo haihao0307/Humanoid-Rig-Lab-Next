@@ -10,7 +10,7 @@ const TAU=Math.PI*2;
  */
 function rail(u,upper){
  u=clamp(u,-1,1);const x=Math.abs(u),side=u<0?-1:1;
- const c=upper?[.38441346288415335,-.013457920226416842,.4445801720372662,.056531015805420755]:[-.26980682201867545,-.07559112460541781,-.25913444501352073,-.003966655456640926];
+ const c=upper?[.38441346288415335,-.060,.10,.025]:[-.26980682201867545,-.040,-.07,-.003966655456640926];
  const residual=v=>(1-v*v)*(c[0]+v*(c[1]+v*(c[2]+v*c[3])));
  const k=upper?1:2,baseline=lerp(REFERENCE_RAILS[0][k],REFERENCE_RAILS[32][k],(u+1)*.5);
  const join=side<0?.72:.78;
@@ -120,7 +120,7 @@ export class ResearchEyes extends FittedEyes {
  rimPoint(c,a,blink){return this.margin(c,a,blink);}
  makeLid(c,sample,mat){
   c.referenceSurface=sample;c.closedCurve=new Map();
-  const A=256,R=32,p=[],n=[],uv=[],ao=[],ts=[],ix=[],entries=[];
+  const A=256,R=48,p=[],n=[],uv=[],ao=[],ts=[],ix=[],entries=[];
   for(let j=0;j<=R;j++)for(let i=0;i<=A;i++){
    const t=j/R,a=i/A*TAU,nx=Math.cos(a),ny=Math.sin(a),u=nx*c.sign;
    const seam=c.y-.0035+.0028*Math.pow(Math.abs(nx),1.7)-.0007*nx*c.sign;
@@ -190,14 +190,14 @@ export class ResearchEyes extends FittedEyes {
    const seam=c.y-.0035+.0028*Math.pow(Math.abs(q.nx),1.7)-.0007*q.nx*c.sign;
    let x=q.xs+(inner.x-(c.x+c.half*q.nx))*weight;
    let y=q.ys+(inner.y-(seam))*weight;
-   y+=side*.00043*smooth(t/.045)*(1-smooth((t-.045)/.30))*arc*(1-blink);
-   let z=q.src.z+(inner.z-q.seamSrc.z)*weight;
-   const thickness=.00010+(q.ny>=0?.00074:.00056)*smooth(t/.055)*(1-smooth((t-.35)/.45));
+   y+=side*(q.ny>=0?.00019:.00012)*smooth(t/.055)*(1-smooth((t-.055)/.30))*arc*(1-blink);
+   let z=(q.tissueZ??q.src.z)+(inner.z-(q.tissueSeamZ??q.seamSrc.z))*weight;
+   const thickness=.00010+(q.ny>=0?.00068:.00042)*smooth(t/.09)*(1-smooth((t-.33)/.45));
    const eyeZ=this.eyeFront(c,x,y);
-   if(eyeZ!==null&&t<.82)z=Math.max(z,eyeZ+thickness);
-   const fold=(q.ny>0?-.00044:.00012)*Math.exp(-Math.pow((t-(q.ny>0?.43:.38))/.105,2))*arc*(1-blink)*(1-blink);
+   if(eyeZ!==null&&t<.82){const b=eyeZ+thickness,k=.00010*smooth(t/.10)*(1-smooth((t-.58)/.20));z=Math.max(z,b)+(k>1e-10?k*Math.log1p(Math.exp(-Math.abs(z-b)/k)):0);}
+   const fold=(q.ny>0?-.00022:.000055)*Math.exp(-Math.pow((t-(q.ny>0?.48:.40))/.14,2))*arc*(1-blink)*(1-blink);
    z+=fold;
-   if(eyeZ!==null&&t<.60)z=Math.max(z,eyeZ+thickness);
+   if(eyeZ!==null&&t<.60){const b=eyeZ+thickness,k=.000055*smooth(t/.10);z=Math.max(z,b)+(k>1e-10?k*Math.log1p(Math.exp(-Math.abs(z-b)/k)):0);}
    if(t>.82){const fade=smooth((t-.82)/.18);x=lerp(x,q.xs,fade);y=lerp(y,q.ys,fade);z=lerp(z,q.src.z,fade);}
    P.setXYZ(i,x,y,z);
    const error=Math.hypot(P.getX(i)-q.xs,P.getY(i)-q.ys,P.getZ(i)-q.src.z);
@@ -238,9 +238,9 @@ export class ResearchEyes extends FittedEyes {
   // The tear meniscus follows the posterior edge. It is not the lid geometry.
   const rp=e.rim.mesh.geometry.attributes.position;
   for(let a=0;a<=e.rim.A;a++){
-   const theta=a/e.rim.A*TAU,i=Math.round(a/e.rim.A*lid.A),nx=Math.cos(theta),ny=Math.sin(theta);
+   const theta=a/e.rim.A*TAU,row=a/e.rim.A*lid.A,i=Math.floor(row),j=Math.min(lid.A,i+1),f=row-i,nx=Math.cos(theta),ny=Math.sin(theta);
    const r=.000014+.000026*Math.max(0,-ny);
-   for(let q=0;q<=e.rim.S;q++){const b=q/e.rim.S*TAU;rp.setXYZ(a*(e.rim.S+1)+q,IP.getX(i)+nx*Math.cos(b)*r,IP.getY(i)+ny*Math.cos(b)*r,IP.getZ(i)+Math.sin(b)*r+.000005);}
+   for(let q=0;q<=e.rim.S;q++){const b=q/e.rim.S*TAU;rp.setXYZ(a*(e.rim.S+1)+q,lerp(IP.getX(i),IP.getX(j),f)+nx*Math.cos(b)*r,lerp(IP.getY(i),IP.getY(j),f)+ny*Math.cos(b)*r,lerp(IP.getZ(i),IP.getZ(j),f)+Math.sin(b)*r+.000005);}
   }
   rp.needsUpdate=true;e.rim.mesh.geometry.computeVertexNormals();
   const lp=e.lashes.mesh.geometry.attributes.position;
