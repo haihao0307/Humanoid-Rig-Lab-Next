@@ -1,8 +1,7 @@
 import * as T from 'three';
 import {SeamPath,SeamIndex,seamRelief,makeSewnYarn} from './sewing.js';
 const V=(...a)=>new T.Vector3(...a),clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-// Lawson edge flips preserve all contour/hole constraints (boundary edges have one face).
-// They prevent the thin Earcut fan triangles from multiplying under local refinement.
+// Constrained edge flips retain hole boundaries and prevent long thin fans.
 function improve(points,faces){
  const orient=(a,b,c)=>(points[b].x-points[a].x)*(points[c].y-points[a].y)-(points[b].y-points[a].y)*(points[c].x-points[a].x);
  const tris=faces.map(([a,b,c])=>orient(a,b,c)>=0?[a,b,c]:[a,c,b]),map=new Map(),queue=[];
@@ -18,10 +17,10 @@ function refine(points,faces,index,thumbnail=false){
  let tris=improve(points,faces);
  for(let pass=0;pass<13;pass++){
   const marked=new Map();
-  for(const t of tris)for(let j=0;j<3;j++){const a=t[j],b=t[(j+1)%3],p=points[a],q=points[b],x=(p.x+q.x)*.5,z=(p.y+q.y)*.5,L=p.distanceTo(q);if(L<.4)continue;const near=index.nearest(x,z);const max=thumbnail?(near?(near.distance<1.5?.85:4):9):(near?(near.distance<1.5?.42:near.distance<3?1.2:4.8):5.5);if(L>max){const key=Math.min(a,b)+':'+Math.max(a,b);if(!marked.has(key)){marked.set(key,points.length);points.push(p.clone().lerp(q,.5));}}}
+  for(const t of tris)for(let j=0;j<3;j++){const a=t[j],b=t[(j+1)%3],p=points[a],q=points[b],x=(p.x+q.x)*.5,z=(p.y+q.y)*.5,L=p.distanceTo(q);if(L<.4)continue;const near=index.nearest(x,z);const max=thumbnail?(near?(near.distance<1.5?1.4:5):9):(near?(near.distance<1.5?.7:near.distance<3?1.7:4.8):5.5);if(L>max){const key=Math.min(a,b)+':'+Math.max(a,b);if(!marked.has(key)){marked.set(key,points.length);points.push(p.clone().lerp(q,.5));}}}
   if(!marked.size)break;
   const result=[];for(const[a,b,c]of tris){const ab=marked.get(Math.min(a,b)+':'+Math.max(a,b)),bc=marked.get(Math.min(b,c)+':'+Math.max(b,c)),ca=marked.get(Math.min(c,a)+':'+Math.max(c,a));const mask=(ab!==undefined?1:0)+(bc!==undefined?2:0)+(ca!==undefined?4:0);switch(mask){case 0:result.push([a,b,c]);break;case 1:result.push([a,ab,c],[ab,b,c]);break;case 2:result.push([a,b,bc],[a,bc,c]);break;case 4:result.push([a,b,ca],[b,c,ca]);break;case 3:result.push([a,ab,c],[ab,bc,c],[ab,b,bc]);break;case 6:result.push([b,bc,a],[bc,ca,a],[bc,c,ca]);break;case 5:result.push([c,ca,b],[ca,ab,b],[ca,a,ab]);break;case 7:result.push([a,ab,ca],[ab,b,bc],[ca,bc,c],[ab,bc,ca]);break;}}
-  tris=improve(points,result);if(points.length>140000)throw Error('Panel tessellation budget exceeded. No silent quality fallback.');
+  tris=improve(points,result);if(points.length>450000)throw Error('Panel tessellation budget exceeded. No silent quality fallback.');
  }
  return tris;
 }
