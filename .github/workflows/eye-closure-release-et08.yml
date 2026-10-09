@@ -1,0 +1,89 @@
+name: ET08 S1.1 immutable closure delivery
+on:
+  push:
+    branches: [feature/eye-contour-stage1-et08-20261009]
+    paths: ['.github/workflows/eye-closure-release-et08.yml']
+permissions:
+  contents: read
+jobs:
+  immutable-public-closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PUBLIC_COMMIT: c4cad2026f10b656a4bc00568be11dcf7429c44f
+      NODE_PATH: /tmp/et08-release-tools/node_modules
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: c4cad2026f10b656a4bc00568be11dcf7429c44f
+          persist-credentials: false
+          sparse-checkout: |
+            skin-quality-lab/emily-transfer/stage1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser verifier
+        run: |
+          npm install --prefix /tmp/et08-release-tools --no-audit --no-fund playwright@1.56.1
+          /tmp/et08-release-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Check served immutable HTML and build identity
+        run: |
+          mkdir -p qa-et08
+          node <<'JS'
+          const crypto=require('node:crypto'),fs=require('node:fs'),assert=require('node:assert/strict');
+          (async()=>{
+            const commit=process.env.PUBLIC_COMMIT,root='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+commit+'/skin-quality-lab/emily-transfer/';
+            const [htmlResponse,manifestResponse]=await Promise.all([fetch(root+'preview.html'),fetch(root+'BUILD_MANIFEST.json')]);
+            assert(htmlResponse.ok&&manifestResponse.ok,'Public release HTTP failure');
+            const html=Buffer.from(await htmlResponse.arrayBuffer()),manifest=await manifestResponse.json(),sha=crypto.createHash('sha256').update(html).digest('hex');
+            assert.equal(manifest.version,'ET08-S1.1');
+            assert.equal(sha,'5d5964901a44230cdc1c3bcbf2642767f8d52e1f8cba44bc6dea2bd6fc3e5e75');
+            assert.equal(sha,manifest.previewSHA256);assert.equal(html.length,manifest.previewBytes);
+            fs.writeFileSync('qa-et08/release-identity.json',JSON.stringify({pass:true,commit,version:manifest.version,previewSHA256:sha,previewBytes:html.length,baseline:manifest.baseline,sourceHeadMeshChanged:manifest.sourceHeadMeshChanged,sourceSkinTexturesChanged:manifest.sourceSkinTexturesChanged,globeRadiusChanged:manifest.globeRadiusChanged,globeDepthFitChanged:manifest.globeDepthFitChanged,verifiedAt:new Date().toISOString()},null,2));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+      - name: Real public desktop and mobile viewport controls
+        run: node skin-quality-lab/emily-transfer/stage1/public.cjs
+      - name: Real public steep underside and partial closure
+        run: node skin-quality-lab/emily-transfer/stage1/extreme.cjs
+      - name: Public repeated closing and held-before restoration
+        run: |
+          node <<'JS'
+          const {chromium}=require('playwright'),fs=require('node:fs'),assert=require('node:assert/strict');
+          const commit=process.env.PUBLIC_COMMIT,url='https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+commit+'/skin-quality-lab/emily-transfer/preview.html';
+          const report={version:'ET08-S1.1',commit,url,checks:[],errors:[],realMobileDeviceTested:false};let b,p;
+          function check(name,pass,detail){report.checks.push({name,pass:!!pass,detail});assert(pass,name+' '+JSON.stringify(detail));}
+          (async()=>{
+            b=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+            p=await b.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});p.on('pageerror',e=>report.errors.push(e.message));
+            await p.goto(url,{waitUntil:'domcontentloaded',timeout:120000});await p.waitForFunction(()=>window.__STAGE1__?.underView&&window.__SKIN_LAB__?.state.ready,null,{timeout:180000});
+            await p.evaluate(()=>{window.__EYE_QA_FREEZE__=true;__STAGE1__.pose(1);__SKIN_LAB__.render();});
+            const before=await p.evaluate(()=>__STAGE1__.closedSurface());
+            for(let cycle=0;cycle<3;cycle++){
+              for(let i=0;i<=20;i++){
+                const closure=i/20;
+                const q=await p.evaluate(v=>{__STAGE1__.pose(v);return __STAGE1__.closedSurface();},closure);
+                check('surface clearance cycle '+cycle+' closure '+closure,q.eyes.every(e=>e.outerPenetratingVertices===0&&e.maxMarginAxialThicknessMM<=.451),q.eyes.map(e=>({name:e.name,penetrations:e.outerPenetratingVertices,rimGauge:e.maxMarginAxialThicknessMM})));
+              }
+              const after=await p.evaluate(()=>__STAGE1__.closedSurface());
+              check('closed endpoint no accumulated drift '+cycle,after.eyes.every((e,i)=>e.fullClosureLowerRestErrorMM<.00002&&e.fullClosureUpperRestErrorMM<.00002&&Math.abs(e.fullClosureLowerRestErrorMM-before.eyes[i].fullClosureLowerRestErrorMM)<1e-9));
+            }
+            await p.click('#s1ClosedCheck');await p.focus('#s1ClosureBefore');await p.keyboard.down('Space');
+            check('held control restores pre-fix surface',await p.evaluate(()=>__STAGE1__.closedSurface().eyes.every(e=>!e.enabled&&e.fullClosureLowerRestErrorMM>1)));
+            await p.keyboard.up('Space');
+            check('release restores corrected surface',await p.evaluate(()=>__STAGE1__.closedSurface().eyes.every(e=>e.enabled&&e.fullClosureLowerRestErrorMM<.00002)));
+            await p.keyboard.down('Space');await p.evaluate(()=>window.dispatchEvent(new Event('blur')));await p.keyboard.up('Space');
+            check('focus loss cannot leave old U-shape active',await p.evaluate(()=>__STAGE1__.closedSurface().eyes.every(e=>e.enabled)));
+            await p.click('#s1ClosedCheck');await p.evaluate(()=>__SKIN_LAB__.render());await p.screenshot({path:'qa-et08/resumed-closed.png'});
+            await p.click('#s1UnderView');await p.evaluate(()=>__SKIN_LAB__.render());const id=await p.evaluate(()=>__STAGE1__.globePixels());
+            check('repeated cycles still close in steep underside',id.visibleGlobePixels===0&&!id.eyeObjectsHidden,{visibleGlobePixels:id.visibleGlobePixels,eyeObjectsHidden:id.eyeObjectsHidden});
+            await p.screenshot({path:'qa-et08/resumed-closed-deep-below.png'});
+            check('no runtime errors',report.errors.length===0,report.errors);report.pass=true;
+          })().catch(e=>{report.pass=false;report.error=e.stack;console.error(e);process.exitCode=1;}).finally(async()=>{if(b)await b.close();fs.writeFileSync('qa-et08/resumed-regression.json',JSON.stringify(report,null,2));console.log('RESUMED_CLOSURE',JSON.stringify({pass:report.pass,checks:report.checks.length,errors:report.errors}));});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et08-s11-immutable-release-${{ github.run_id }}
+          path: qa-et08/
+          retention-days: 14
