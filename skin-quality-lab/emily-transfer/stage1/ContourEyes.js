@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {IntegratedEyes} from '../talkinghead/IntegratedEyes.js';
-import {prepareClosedSurface,repairClosedSurface,closureWeight} from './ClosedSurface.js';
+import {prepareClosedSurface,repairClosedSurface,closureWeight,fitClosedEnvelope,applyClosureCalibration} from './ClosedSurface.js';
 import {sampleContour,contourSpecification,BASELINE} from './Contours.mjs';
 export const EYE_VERSION='eyes/8.0.1-s1';
 const clamp=THREE.MathUtils.clamp,mix=THREE.MathUtils.lerp,TAU=Math.PI*2;
@@ -13,8 +13,8 @@ export class ContourEyes extends IntegratedEyes {
  constructor(options){
   super(options);
   this.ready=this.ready.then(()=>{
-   this.contourBaseline=false;
-   this.lockedCalibration=this.eyes.map(e=>({name:e.c.name,centreMM:e.pivot.position.toArray().map(v=>v*1000),radiusMM:e.c.radius*1000,irisRadiusMM:e.c.radius*.435*1000,irisPlaneLocalMM:e.c.radius*this.config.irisDepth*1000,cornealApexLocalMM:Math.max(...e.ball.geometry.attributes.position.array.filter((v,i)=>i%3===2))*1000,depthFit:{...e.depthFit}}));
+   this.contourBaseline=false;fitClosedEnvelope(this);
+   this.lockedCalibration=this.eyes.map(e=>({name:e.c.name,centreMM:e.pivot.position.toArray().map(v=>v*1000),radiusMM:e.c.radius*1000,irisRadiusMM:e.c.radius*.435*1000,irisPlaneLocalMM:e.c.radius*this.config.irisDepth*1000,cornealApexLocalMM:Math.max(...e.ball.geometry.attributes.position.array.filter((v,i)=>i%3===2))*1000,depthFit:{...e.depthFit},closedEnvelopeDepthFit:{...e.closedDepthFit}}));
    this.state.version=EYE_VERSION;this.setInspectionPose(0);return this;
   });
  }
@@ -34,8 +34,6 @@ export class ContourEyes extends IntegratedEyes {
   let z=front+clearance;
   if(this.closedRestEnabled!==false&&c.closedScanMargin){
    const rest=c.closedScanMargin(s),canthus=1-smooth(Math.min(s,1-s)/.14);
-   // Canthi are fixed to the observed closed crease, not to the far-back
-   // equator of the globe. The central open contour stays globe supported.
    z=mix(z,rest.z,canthus);z=mix(z,rest.z,closureWeight(blink));
   }
   return new THREE.Vector3(x,y,z);
@@ -47,9 +45,9 @@ export class ContourEyes extends IntegratedEyes {
   this.lockedTarget.set(-.004+Math.tan(yaw)*10,.069-Math.tan(pitch)*10,10.065);
   this.update(0,true);this.requestRender();
  }
- compareClosureBefore(on){this.closedRestEnabled=!on;this.update(0,true);this.requestRender();}
+ compareClosureBefore(on){this.closedRestEnabled=!on;applyClosureCalibration(this);this.update(0,true);this.requestRender();}
  closureSurfaceReport(){return {version:EYE_VERSION,eyes:this.eyes.map(e=>({name:e.c.name,...e.lid.closedSurface?.report}))};}
- compareOriginal(on){this.contourBaseline=!!on;this.update(0,true);this.requestRender();}
+ compareOriginal(on){this.contourBaseline=!!on;applyClosureCalibration(this);this.update(0,true);this.requestRender();}
  contourReport(){
   const rows=[];
   for(const e of this.eyes){
@@ -80,7 +78,7 @@ export class ContourEyes extends IntegratedEyes {
  snapshot(){return {...super.snapshot(),stage1:{schema:'kaopu/eye-contour-stage1@1',baseline:BASELINE,compareOriginal:!!this.contourBaseline,closedRestEnabled:this.closedRestEnabled!==false}};}
  restore(o){
   if(o?.stage1){if(o.stage1.schema!=='kaopu/eye-contour-stage1@1'||o.stage1.baseline!==BASELINE)throw Error('Unsupported contour recipe');this.contourBaseline=!!o.stage1.compareOriginal;this.closedRestEnabled=o.stage1.closedRestEnabled!==false;}
-  super.restore(o);
+  applyClosureCalibration(this);super.restore(o);
  }
- info(){return {...super.info(),contourStage1:{baseline:BASELINE,independentEyeSplines:true,closedSurfaceFromCapturedReference:true,globeAndIrisRescaled:false,centreDepthLocked:true,openPersonSpecificScan:false,stage2Rebuilt:false,stage4DynamicsRebuilt:false}};}
+ info(){return {...super.info(),contourStage1:{baseline:BASELINE,independentEyeSplines:true,closedSurfaceFromCapturedReference:true,globeAndIrisRescaled:false,centreDepthLocked:true,fullClosedEnvelopeDepthRefined:true,openPersonSpecificScan:false,stage2Rebuilt:false,stage4DynamicsRebuilt:false}};}
 }

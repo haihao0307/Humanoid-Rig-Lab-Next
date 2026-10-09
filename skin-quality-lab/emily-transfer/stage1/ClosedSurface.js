@@ -3,10 +3,8 @@ import {sampleContour} from './Contours.mjs';
 const clamp=THREE.MathUtils.clamp,mix=THREE.MathUtils.lerp;
 export const closureWeight=b=>{b=clamp(b,0,1);return b*b*(3-2*b);};
 const smooth=closureWeight;
-/** The original asset is a CLOSED-eye scan. Use its observed outer envelope
- * as the closed endpoint instead of propagating a globe-contact rim offset
- * over the entire skin patch. No new head, texture, ocular scale or hidden eye.
- */
+/** Use the observed CLOSED-eye scan as the closed outer envelope, not a
+ * globe-contact rim offset propagated over the whole patch. No texture fix. */
 export function prepareClosedSurface(lid,c,sample){
  const cache=new Map();
  c.closedScanMargin=s=>{
@@ -14,14 +12,38 @@ export function prepareClosedSurface(lid,c,sample){
   const q=sampleContour(c.name,s,{closure:1}),x=c.x+c.sign*q.temporalXMM/1000,y=c.y+q.closedMM/1000;
   const p={x,y,z:sample(x,y).z};cache.set(key,p);return p;
  };
- const target=new Float64Array(lid.entries.length*3);
+ const target=new Float64Array(lid.entries.length*3),normals=new Float64Array(target.length);
  for(let i=0;i<lid.entries.length;i++){
   const q=lid.entries[i],s=(q.nx*c.sign+1)*.5,p=c.closedScanMargin(clamp(s,0,1)),w=1-smooth(q.t/.74);
   const seam=c.y-.0035+.0028*Math.pow(Math.abs(q.nx),1.7)-.0007*q.nx*c.sign;
   const x=q.xs+(p.x-(c.x+c.half*q.nx))*w,y=q.ys+(p.y-seam)*w;
-  target[i*3]=x;target[i*3+1]=y;target[i*3+2]=sample(x,y).z;
+  const raw=sample(x,y);target[i*3]=x;target[i*3+1]=y;target[i*3+2]=raw.z;normals.set(raw.n.toArray(),i*3);
  }
- lid.closedSurface={target,source:'same original closed-scan geometry',neuralReconstruction:false};
+ lid.closedSurface={target,normals,source:'same original closed-scan geometry',neuralReconstruction:false};
+}
+/** The inherited fit tested only the inner 0.8r disc. Check the entire
+ * observed closed envelope, including peripheral inferior sclera. Move only
+ * the minimum necessary depth; never change the radius or XY centre. */
+export function fitClosedEnvelope(rig){
+ for(const e of rig.eyes){
+  if(e.closedDepthFit)continue;
+  const {c,lid}=e,old=c.z,saved=e.surfaceInverse;
+  e.surfaceInverse=new THREE.Matrix4();rig._fittingEye=e;
+  let min=Infinity,samples=0;
+  const test=(x,y,z)=>{const front=rig.eyeFront(c,x,y);if(front!==null){min=Math.min(min,z-front);samples++;}};
+  for(let i=0;i<lid.closedSurface.target.length;i+=3){const p=lid.closedSurface.target;test(p[i],p[i+1],p[i+2]);}
+  for(let i=-64;i<=64;i++)for(let j=-64;j<=64;j++){
+   const dx=i/64*c.radius*.995,dy=j/64*c.radius*.995;if(dx*dx+dy*dy>=c.radius*c.radius)continue;
+   const x=c.x+dx,y=c.y+dy;test(x,y,c.referenceSurface(x,y).z);
+  }
+  const shift=Math.max(0,.00012-min);c.z-=shift;e.pivot.position.z=c.z;
+  e.closedDepthFit={source:'same captured closed scan; full projected globe support',samples,previousDepthMM:old*1000,fittedDepthMM:c.z*1000,backwardShiftMM:shift*1000,priorMinimumGapMM:min*1000,numericalClearanceMM:.12,radiusUnchanged:true,xyCentreUnchanged:true};
+  e.surfaceInverse=saved;rig._fittingEye=null;
+ }
+}
+export function applyClosureCalibration(rig){
+ const before=rig.closedRestEnabled===false||rig.contourBaseline;
+ for(const e of rig.eyes){if(!e.closedDepthFit)continue;e.c.z=(before?e.closedDepthFit.previousDepthMM:e.closedDepthFit.fittedDepthMM)/1000;e.pivot.position.z=e.c.z;}
 }
 export function repairClosedSurface(rig,e,blink){
  const {lid,c}=e,closed=lid.closedSurface;if(!closed)return;
@@ -35,8 +57,6 @@ export function repairClosedSurface(rig,e,blink){
   const q=lid.entries[i],a=i%stride,w=1-smooth(q.t/.74),before=P.getZ(i);
   let z=before;
   if(b>0&&q.t>0&&q.t<.74){
-   // Keep the current contour exact. Its depth difference is distributed
-   // smoothly over the captured closed envelope; at full closure it is zero.
    const restZ=target[i*3+2]+rimDelta[a]*w;
    z=mix(before,restZ,b);
    const eye=rig.eyeFront(c,P.getX(i),P.getY(i));
@@ -55,14 +75,19 @@ export function repairClosedSurface(rig,e,blink){
  if(b>0){
   P.needsUpdate=true;lid.mesh.geometry.computeVertexNormals();
   const N=lid.mesh.geometry.attributes.normal,EN=lid.edge.geometry.attributes.normal;
-  // Match the preserved face at the patch boundary, and share free-edge normals.
   for(let i=0;i<P.count;i++){
    const q=lid.entries[i],w=smooth((q.t-.72)/.28);if(w===0)continue;
    let x=mix(N.getX(i),q.src.n.x,w),y=mix(N.getY(i),q.src.n.y,w),z=mix(N.getZ(i),q.src.n.z,w),l=Math.hypot(x,y,z)||1;
    N.setXYZ(i,x/l,y/l,z/l);
   }
+  // The closed skin normals follow the same captured surface. Do not average
+  // them with the coincident, internal upper/lower rim sheets at full closure.
+  for(let i=0;i<P.count;i++){
+   const n=closed.normals;let x=mix(N.getX(i),n[3*i],b),y=mix(N.getY(i),n[3*i+1],b),z=mix(N.getZ(i),n[3*i+2],b),len=Math.hypot(x,y,z)||1;
+   N.setXYZ(i,x/len,y/len,z/len);
+  }
   for(let a=0;a<=lid.A;a++){
-   const k=a*(lid.es+1)+lid.es;let x=N.getX(a)*.72+EN.getX(k)*.28,y=N.getY(a)*.72+EN.getY(k)*.28,z=N.getZ(a)*.72+EN.getZ(k)*.28,l=Math.hypot(x,y,z)||1;
+   const k=a*(lid.es+1)+lid.es,w=.28*(1-b);let x=N.getX(a)*(1-w)+EN.getX(k)*w,y=N.getY(a)*(1-w)+EN.getY(k)*w,z=N.getZ(a)*(1-w)+EN.getZ(k)*w,l=Math.hypot(x,y,z)||1;
    N.setXYZ(a,x/l,y/l,z/l);EN.setXYZ(k,x/l,y/l,z/l);
   }
   N.needsUpdate=true;EN.needsUpdate=true;
