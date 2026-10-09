@@ -35,6 +35,28 @@ function passage(a,b,p){
 }
 function join(a,b){if(!a.length)a.push(...b);else a.push(...b.slice(1));}
 function cut(points,f){const x=Math.max(0,Math.min(1,f))*(points.length-1),i=Math.floor(x);return [...points.slice(0,i+1),...(i<points.length-1?[[mix(points[i][0],points[i+1][0],x-i),mix(points[i][1],points[i+1][1],x-i),mix(points[i][2],points[i+1][2],x-i)]]:[])];}
+
+/** Bounded fillets at entry/exit remove artificial 90-degree tube joints.
+ * Topological segment endpoints remain in parts; points is the final rendered/exported route.
+ */
+function roundRoute(points,radius){
+ const a=[];
+ for(const p of points){
+  if(a.length&&dist(a.at(-1),p)<1e-8)continue;
+  while(a.length>1){const x=a.at(-2),y=a.at(-1),u=y.map((v,i)=>v-x[i]),v=p.map((q,i)=>q-y[i]),lu=Math.hypot(...u),lv=Math.hypot(...v);if(u.reduce((s,q,i)=>s+q*v[i],0)/(lu*lv)<.99995)break;a.pop();}
+  a.push(p);
+ }
+ if(a.length<3)return a;
+ const out=[a[0]];
+ for(let i=1;i<a.length-1;i++){
+  const x=a[i-1],p=a[i],y=a[i+1],l=dist(x,p),m=dist(p,y),rr=Math.min(radius,l*.36,m*.36);
+  const u=p.map((q,k)=>mix(q,x[k],rr/l)),v=p.map((q,k)=>mix(q,y[k],rr/m));
+  out.push(u);
+  for(let j=1;j<=12;j++){const f=j/12;out.push(p.map((q,k)=>(1-f)*(1-f)*u[k]+2*(1-f)*f*q+f*f*v[k]));}
+ }
+ out.push(a.at(-1));return out;
+}
+
 export function buildSeam(input={},process=null){
  const p=validateSeam(input),holes=[],routes=[],needleEnds=[],segments=[];
  let stage='已收紧的完整针路',jActive=null;
@@ -75,6 +97,7 @@ export function buildSeam(input={},process=null){
     segments.push(...routes.at(-1).parts);
   }
  }
+ for(const r of routes)r.points=roundRoute(r.points,p.diameter*.7);
  return {schema:'kaopu/leather_sewing@1',version:SEAM_VERSION,params:p,units:'millimetres',width:(p.count-1)*p.pitch+14,depth:26,totalThickness:p.layerThickness*2,holes,routes,segments,needleEnds,stage,process,topology:{threadCount:p.rows,needleEndsPerThread:p.type==='saddle'?2:1,continuousThread:true,throughBothLayers:true,lockstitch:false},mechanics:'prescribed sewing path, no stitch-force/friction solver',frozenPhysics:'LEATHER_R04_USER_ACCEPTED_20261009'};
 }
 export function routeLength(points){return points.slice(1).reduce((s,p,i)=>s+dist(points[i],p),0);}

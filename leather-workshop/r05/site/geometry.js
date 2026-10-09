@@ -44,21 +44,35 @@ export function cutFaceGeometry(m,z=-5){
 }
 function resample(points,step){const out=[V(points[0])];let last=V(points[0]),total=0;const lengths=[0];for(const p of points.slice(1)){const next=V(p),L=next.distanceTo(last);if(L<1e-8)continue;const n=Math.max(1,Math.ceil(L/step));for(let k=1;k<=n;k++){out.push(last.clone().lerp(next,k/n));lengths.push(total+L*k/n);}total+=L;last=next;}return {out,lengths,total};}
 export function makeThreadGeometry(points,diameter,detail=true){
- const {out,lengths,total}=resample(points,diameter*.28),n=out.length;
+ const {out,lengths,total}=resample(points,diameter*.16),n=out.length;
  if(n<2)return new T.BufferGeometry();
- const tangents=[],normals=[],bins=[];let N=new T.Vector3(0,0,1),prev;
- for(let i=0;i<n;i++){const t=out[Math.min(n-1,i+1)].clone().sub(out[Math.max(0,i-1)]).normalize();if(t.lengthSq()<.1)t.set(0,1,0);if(i===0){N.addScaledVector(t,-N.dot(t));if(N.lengthSq()<.01)N.set(0,1,0).addScaledVector(t,-t.y);N.normalize();}else N.applyQuaternion(new T.Quaternion().setFromUnitVectors(prev,t)).normalize();const B=new T.Vector3().crossVectors(t,N).normalize();N=new T.Vector3().crossVectors(B,t).normalize();tangents.push(t);normals.push(N.clone());bins.push(B);prev=t;}
- const pos=[],uv=[],idx=[],color=[],sides=detail?7:6,plies=detail?3:1;
- for(let ply=0;ply<plies;ply++){
-  const start=pos.length/3,rad=detail?diameter*.222:diameter*.48;
-  for(let i=0;i<n;i++){
-   const phase=lengths[i]/(diameter*3.2)*Math.PI*2+ply*Math.PI*2/3;
-   const c=out[i].clone();if(detail)c.addScaledVector(normals[i],Math.cos(phase)*diameter*.27).addScaledVector(bins[i],Math.sin(phase)*diameter*.27);
-   for(let j=0;j<=sides;j++){const a=j/sides*Math.PI*2,q=c.clone().addScaledVector(normals[i],Math.cos(a)*rad).addScaledVector(bins[i],Math.sin(a)*rad);pos.push(...q);uv.push(lengths[i]/diameter/3.2,j/sides);const tone=.93+.07*Math.sin(ply*2.3+lengths[i]*1.2);color.push(tone,tone,tone);if(i<n-1&&j<sides){const k=start+i*(sides+1)+j;idx.push(k,k+sides+1,k+1,k+1,k+sides+1,k+sides+2);}}
-  }
-  for(const [ringIndex,reverse]of [[0,true],[n-1,false]]){const cidx=pos.length/3;const ids=Array.from({length:sides},(_,j)=>start+ringIndex*(sides+1)+j),c=new T.Vector3();for(const id of ids)c.add(new T.Vector3(pos[id*3],pos[id*3+1],pos[id*3+2]));c.multiplyScalar(1/sides);pos.push(...c);uv.push(0,0);color.push(.94,.94,.94);for(let j=0;j<sides;j++){const a=ids[j],b=ids[(j+1)%sides];if(reverse)idx.push(cidx,b,a);else idx.push(cidx,a,b);}}
+ const normals=[],bins=[];let N=new T.Vector3(0,0,1),prev;
+ for(let i=0;i<n;i++){
+  const t=out[Math.min(n-1,i+1)].clone().sub(out[Math.max(0,i-1)]).normalize();if(t.lengthSq()<.1)t.set(0,1,0);
+  if(i===0){N.addScaledVector(t,-N.dot(t));if(N.lengthSq()<.01)N.set(0,1,0).addScaledVector(t,-t.y);N.normalize();}
+  else N.applyQuaternion(new T.Quaternion().setFromUnitVectors(prev,t)).normalize();
+  const B=new T.Vector3().crossVectors(t,N).normalize();N=new T.Vector3().crossVectors(B,t).normalize();normals.push(N.clone());bins.push(B);prev=t;
  }
- const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setAttribute('color',new T.Float32BufferAttribute(color,3));g.setIndex(idx);g.computeVertexNormals();g.userData={routeLengthMM:total,plies,hasEndCaps:true};return g;
+ const pos=[],uv=[],idx=[],color=[],sides=detail?14:8;
+ // A compact waxed thread has a continuous core, not three separated rope tubes.
+ // Three-ply twist is shallow radial relief; high-frequency fibres stay in the normal map.
+ for(let i=0;i<n;i++){
+  const phase=lengths[i]/(diameter*2.7)*Math.PI*2;
+  for(let j=0;j<=sides;j++){
+   const a=j/sides*Math.PI*2,rr=diameter*.48*(detail?1+.025*Math.cos(3*a-phase):1);
+   const q=out[i].clone().addScaledVector(normals[i],Math.cos(a)*rr).addScaledVector(bins[i],Math.sin(a)*rr);
+   pos.push(...q);uv.push(lengths[i]/(diameter*2.7),j/sides);
+   const tone=detail?.985+.015*Math.cos(3*a-phase):1;color.push(tone,tone,tone);
+   if(i<n-1&&j<sides){const k=i*(sides+1)+j;idx.push(k,k+sides+1,k+1,k+1,k+sides+1,k+sides+2);}
+  }
+ }
+ for(const [ringIndex,reverse]of [[0,true],[n-1,false]]){
+  const cidx=pos.length/3;pos.push(...out[ringIndex]);uv.push(0,0);color.push(1,1,1);
+  for(let j=0;j<sides;j++){const a=ringIndex*(sides+1)+j,b=a+1;if(reverse)idx.push(cidx,b,a);else idx.push(cidx,a,b);}
+ }
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setAttribute('color',new T.Float32BufferAttribute(color,3));g.setIndex(idx);g.computeVertexNormals();
+ const nn=g.attributes.normal;for(let i=0;i<n;i++){const a=i*(sides+1),b=a+sides,v=new T.Vector3(nn.getX(a)+nn.getX(b),nn.getY(a)+nn.getY(b),nn.getZ(a)+nn.getZ(b)).normalize();nn.setXYZ(a,...v);nn.setXYZ(b,...v);}
+ g.userData={routeLengthMM:total,plies:detail?3:1,structure:'continuous core with shallow twist relief',hasEndCaps:true};return g;
 }
 export function fibreNormalTexture(){
  const w=256,h=64,a=new Uint8Array(w*h*4);for(let j=0;j<h;j++)for(let i=0;i<w;i++){const phase=2*Math.PI*(i/w*18+j/h*8),noise=Math.sin(i*27.61+j*41.32),k=(j*w+i)*4;a[k]=128+12*Math.cos(phase)+3*noise;a[k+1]=128+9*Math.cos(phase);a[k+2]=254;a[k+3]=255;}
