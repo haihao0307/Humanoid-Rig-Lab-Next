@@ -17,13 +17,15 @@ fibre='''export function fibreNormalTexture(){
 p=r/'site/geometry.js';s=p.read_text();assert "structure:'continuous core with shallow twist relief'" in s
 s=s[:s.index('export function fibreNormalTexture()')]+fibre;s=s.replace('1+.025*Math.cos(3*a-phase)','1+.040*Math.cos(3*a-phase)');p.write_text(s)
 p=r/'site/runtime.js';s=p.read_text()
+edge='m.color.multiplyScalar(w.layer===0?1.06:.86);'
+while edge+edge in s:s=s.replace(edge+edge,edge)
 for old,new in [
  ('normalMap:fibre,normalScale:new T.Vector2(.10,.10)','map:plies?fibre.userData.albedo:null,normalMap:plies?fibre:null,normalScale:new T.Vector2(.65,.65)'),
  ("for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);", "for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);m.color.multiplyScalar(w.layer===0?1.06:.86);"),
  ('Math.max(92,model.width*1.50)','Math.max(110,model.width*1.85)'),
  ('Math.max(90,model.width*1.50)','Math.max(110,model.width*1.85)'),
  ("new T.DirectionalLight('#d2e3ed',.8)","new T.DirectionalLight('#d2e3ed',1.6)")]:
- if new in s and old not in s:continue
+ if old in new and new in s:continue
  if old in s:s=s.replace(old,new)
  else:assert new in s,old
 p.write_text(s)
