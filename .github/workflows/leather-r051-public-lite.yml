@@ -1,0 +1,103 @@
+name: Leather R05.1 - compact public delivery
+on:
+  push:
+    branches: [fix/leather-sewing-r051-20261009]
+    paths:
+      - .github/workflows/leather-r051-public-lite.yml
+      - leather-workshop/r05/build-public-lite.py
+      - leather-workshop/r05/site/**
+permissions:
+  contents: write
+concurrency:
+  group: leather-r051-public-lite
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/leather-sewing-r051-20261009
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preserve accepted physics and build compact standalone HTML
+        run: |
+          git fetch --depth=1 origin 3336f8e27ce3820b4ab1b6290e4da6512b295009
+          git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
+          python leather-workshop/r05/verify_anchor.py
+          pip install -q pillow playwright==1.55.0
+          python leather-workshop/r05/build-public-lite.py
+          python -m playwright install --with-deps chromium
+      - name: Open compact file directly before publishing
+        run: |
+          mkdir -p leather-workshop/r05/qa-public-lite
+          python - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          import json,time
+          root=Path('leather-workshop/r05');url=(root/'public-lite.html').resolve().as_uri();out={'url':url,'errors':[]}
+          with sync_playwright() as p:
+            b=p.chromium.launch(headless=True,args=['--enable-unsafe-swiftshader','--use-angle=swiftshader'])
+            page=b.new_page(viewport={'width':1440,'height':1000})
+            page.on('pageerror',lambda e:out['errors'].append(str(e)))
+            page.on('console',lambda m:out['errors'].append(m.text) if m.type=='error' else None)
+            st=time.time();page.goto(url,wait_until='load',timeout=120000);page.wait_for_function('window.LEATHER_SEWING?.ready',timeout=120000);page.wait_for_timeout(500)
+            out.update(version=page.evaluate('LEATHER_SEWING.version'),loadSeconds=time.time()-st,canvas=page.locator('#view').bounding_box(),busyHidden=page.locator('#busy').is_hidden(),contact=page.evaluate('LEATHER_SEWING.contact'))
+            page.click('[data-view="macro"]');page.wait_for_timeout(250);page.screenshot(path=str(root/'qa-public-lite/local.png'),full_page=True)
+            out['pass']=out['version']=='R05.1' and not out['errors'] and out['busyHidden'] and out['canvas']['width']>500
+            b.close()
+          (root/'qa-public-lite/local.json').write_text(json.dumps(out,ensure_ascii=False,indent=2));print(json.dumps(out,ensure_ascii=False))
+          if not out['pass']:raise SystemExit(1)
+          PY
+      - name: Commit compact build without changing frozen modules
+        id: publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r05/public-lite.html leather-workshop/r05/PUBLIC_LITE_MANIFEST.json leather-workshop/r05/qa-public-lite
+          git commit -m 'build(public): compact self-contained R05.1 and direct-file proof [skip ci]'
+          git push origin HEAD:fix/leather-sewing-r051-20261009
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Open exact compact build through public HTTPS
+        env:
+          SHA: ${{ steps.publish.outputs.sha }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          import json,os,time,traceback
+          root=Path('leather-workshop/r05');sha=os.environ['SHA'];url=f'https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/{sha}/leather-workshop/r05/public-lite.html';out={'url':url,'buildCommit':sha,'errors':[]}
+          with sync_playwright() as p:
+            b=p.chromium.launch(headless=True,args=['--enable-unsafe-swiftshader','--use-angle=swiftshader'])
+            page=b.new_page(viewport={'width':1440,'height':1000})
+            page.on('pageerror',lambda e:out['errors'].append(str(e)))
+            page.on('console',lambda m:out['errors'].append(m.text) if m.type=='error' else None)
+            try:
+              st=time.time();response=page.goto(url,wait_until='domcontentloaded',timeout=120000);out['httpStatus']=response.status if response else None;out['title']=page.title();page.wait_for_function('window.LEATHER_SEWING?.ready',timeout=120000);page.wait_for_timeout(700)
+              out.update(version=page.evaluate('LEATHER_SEWING.version'),loadSeconds=time.time()-st,canvas=page.locator('#view').bounding_box(),busyHidden=page.locator('#busy').is_hidden(),contact=page.evaluate('LEATHER_SEWING.contact'))
+              page.click('[data-view="macro"]');page.wait_for_timeout(300);page.screenshot(path=str(root/'qa-public-lite/public.png'),full_page=True)
+              out['pass']=out['version']=='R05.1' and not out['errors'] and out['busyHidden'] and out['canvas']['width']>500
+            except Exception as e:
+              out.update(pass_=False,failure=str(e),bodyText=page.locator('body').inner_text()[:2000] if page.locator('body').count() else '',contentLength=len(page.content()));page.screenshot(path=str(root/'qa-public-lite/public-failure.png'),full_page=True);raise
+            finally:
+              (root/'qa-public-lite/public.json').write_text(json.dumps(out,ensure_ascii=False,indent=2));print(json.dumps(out,ensure_ascii=False));b.close()
+          if not out.get('pass'):raise SystemExit(1)
+          PY
+          echo "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/leather-workshop/r05/public-lite.html" > leather-workshop/r05/qa-public-lite/PREVIEW_URL.txt
+          python leather-workshop/r05/verify_anchor.py > leather-workshop/r05/qa-public-lite/anchor.json
+          git diff --exit-code 3336f8e27ce3820b4ab1b6290e4da6512b295009 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04
+          git add -f leather-workshop/r05/qa-public-lite
+          git commit -m 'test(public): exact compact HTTPS rendering proof [skip ci]'
+          git push origin HEAD:fix/leather-sewing-r051-20261009
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r051-compact-public-proof
+          path: |
+            leather-workshop/r05/public-lite.html
+            leather-workshop/r05/PUBLIC_LITE_MANIFEST.json
+            leather-workshop/r05/qa-public-lite
+          retention-days: 14
