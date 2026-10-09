@@ -39,6 +39,17 @@ jobs:
           pip install pillow numpy playwright==1.55.0
           python -m playwright install --with-deps chromium
           sudo apt-get install -y fonts-noto-cjk
+      - name: Apply reviewed fixes to authoritative new source
+        run: |
+          python leather-workshop/r06/review/refine-01.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r06/site leather-workshop/r06/qa.py
+          if ! git diff --cached --quiet; then
+            git commit -m "fix(leather-r06): expand audited viewport, physical display and product corrections"
+            git push origin HEAD:refs/heads/feature/leather-atelier-r06-takeover-20261009
+          fi
+          echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Standalone build and geometry contract
         run: |
           python leather-workshop/r06/build.py
