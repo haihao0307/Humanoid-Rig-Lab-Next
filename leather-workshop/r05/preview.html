@@ -305,7 +305,7 @@ function makeThreadGeometry(points,diameter,detail=true){
  for(let i=0;i<n;i++){
   const phase=lengths[i]/(diameter*2.7)*Math.PI*2;
   for(let j=0;j<=sides;j++){
-   const a=j/sides*Math.PI*2,rr=diameter*.48*(detail?1+.025*Math.cos(3*a-phase):1);
+   const a=j/sides*Math.PI*2,rr=diameter*.48*(detail?1+.040*Math.cos(3*a-phase):1);
    const q=out[i].clone().addScaledVector(normals[i],Math.cos(a)*rr).addScaledVector(bins[i],Math.sin(a)*rr);
    pos.push(...q);uv.push(lengths[i]/(diameter*2.7),j/sides);
    const tone=detail?.985+.015*Math.cos(3*a-phase):1;color.push(tone,tone,tone);
@@ -321,8 +321,15 @@ function makeThreadGeometry(points,diameter,detail=true){
  g.userData={routeLengthMM:total,plies:detail?3:1,structure:'continuous core with shallow twist relief',hasEndCaps:true};return g;
 }
 function fibreNormalTexture(){
- const w=256,h=64,a=new Uint8Array(w*h*4);for(let j=0;j<h;j++)for(let i=0;i<w;i++){const phase=2*Math.PI*(i/w*18+j/h*8),noise=Math.sin(i*27.61+j*41.32),k=(j*w+i)*4;a[k]=128+12*Math.cos(phase)+3*noise;a[k+1]=128+9*Math.cos(phase);a[k+2]=254;a[k+3]=255;}
- const t=new T.DataTexture(a,w,h,T.RGBAFormat);t.wrapS=t.wrapT=T.RepeatWrapping;t.magFilter=T.LinearFilter;t.minFilter=T.LinearMipmapLinearFilter;t.generateMipmaps=true;t.needsUpdate=true;return t;
+ const w=256,h=128,a=new Uint8Array(w*h*4),colour=new Uint8Array(w*h*4);
+ for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+  const u=i/w,v=j/h,phase=2*Math.PI*(12*v-4*u),fine=2*Math.PI*(36*v-12*u),c=Math.cos(phase),f=Math.cos(fine),k=(j*w+i)*4;
+  const x=-.10*c-.025*f,y=.32*c+.08*f,z=1,inv=1/Math.hypot(x,y,z);
+  a[k]=Math.round((x*inv*.5+.5)*255);a[k+1]=Math.round((y*inv*.5+.5)*255);a[k+2]=Math.round((z*inv*.5+.5)*255);a[k+3]=255;
+  const shade=Math.round(238+12*Math.sin(phase)+4*Math.sin(fine));colour[k]=colour[k+1]=colour[k+2]=shade;colour[k+3]=255;
+ }
+ const make=data=>{const t=new T.DataTexture(data,w,h,T.RGBAFormat);t.wrapS=t.wrapT=T.RepeatWrapping;t.magFilter=T.LinearFilter;t.minFilter=T.LinearMipmapLinearFilter;t.generateMipmaps=true;t.needsUpdate=true;return t;};
+ const t=make(a);t.userData.albedo=make(colour);t.userData.albedo.colorSpace=T.SRGBColorSpace;return t;
 }
 ;return {makeLeatherGeometry,cutFaceGeometry,makeThreadGeometry,fibreNormalTexture};})();
 const $=id=>document.getElementById(id),errors=[];
@@ -334,7 +341,7 @@ function fail(e){errors.push(String(e?.stack||e));$('error').textContent=errors.
 window.addEventListener('error',e=>fail(e.error||e.message));window.addEventListener('unhandledrejection',e=>fail(e.reason));
 function dispose(root){if(!root)return;scene.remove(root);const gs=new Set(),ms=new Set();root.traverse(o=>{if(o.geometry&&!gs.has(o.geometry)){gs.add(o.geometry);o.geometry.dispose();}const a=Array.isArray(o.material)?o.material:[o.material];for(const m of a)if(m&&!ms.has(m)){ms.add(m);m.dispose();}});}
 function bake(){look.resolution=innerWidth<700?1024:2048;kernel.bake(look);}
-function threadMat(half){return new T.MeshPhysicalMaterial({color:view==='route'?(half==='A'?'#79a7b8':half==='B'?'#d68c57':threadColor):threadColor,roughness:.84,metalness:0,sheen:.23,sheenColor:new T.Color('#ddd1ba'),sheenRoughness:.85,normalMap:fibre,normalScale:new T.Vector2(.10,.10),vertexColors:true});}
+function threadMat(half){return new T.MeshPhysicalMaterial({color:view==='route'?(half==='A'?'#79a7b8':half==='B'?'#d68c57':threadColor):threadColor,roughness:.84,metalness:0,sheen:.23,sheenColor:new T.Color('#ddd1ba'),sheenRoughness:.85,map:plies?fibre.userData.albedo:null,normalMap:plies?fibre:null,normalScale:new T.Vector2(.65,.65),vertexColors:true});}
 function needle(e){const g=new T.Group(),m=new T.MeshStandardMaterial({color:'#c6cbd0',metalness:.85,roughness:.26});const shaft=new T.Mesh(new T.CylinderGeometry(.105,.15,3.0,10),m);shaft.position.y=1.65;const tip=new T.Mesh(new T.ConeGeometry(.105,.50,10),m);tip.position.y=3.40;const eye=new T.Mesh(new T.TorusGeometry(.20,.055,5,14),m);eye.scale.y=1.65;g.add(shaft,tip,eye);g.position.fromArray(e.position);const d=new T.Vector3(...e.direction).normalize();if(d.lengthSq()<.01)d.set(0,1,0);g.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d);g.userData.half=e.half;return g;}
 function rebuildThreads(){
  dispose(threadRoot);threadRoot=new T.Group();scene.add(threadRoot);threadMeshes=[];
@@ -347,7 +354,7 @@ function rebuild(){
  model=buildSeam(params,process);dispose(root);root=new T.Group();scene.add(root);leatherMeshes=[];
  const data=makeLeatherGeometry(model);
  for(const s of data.surfaces){const m=surfaceMat(s.exposed&&s.side>0?'grain':s.exposed?'flesh':'inside'),obj=new T.Mesh(s.geometry,m);obj.receiveShadow=true;obj.castShadow=false;obj.userData.kind='leather';root.add(obj);leatherMeshes.push(obj);}
- for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);obj.castShadow=false;obj.receiveShadow=true;root.add(obj);leatherMeshes.push(obj);}
+ for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);m.color.multiplyScalar(w.layer===0?1.06:.86);obj.castShadow=false;obj.receiveShadow=true;root.add(obj);leatherMeshes.push(obj);}
  cutMat=surfaceMat('cut');cutMesh=new T.Mesh(cutFaceGeometry(model),cutMat);root.add(cutMesh);rebuildThreads();applyViewMaterials();sync();revision++;
 }
 function applyViewMaterials(){

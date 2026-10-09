@@ -11,7 +11,7 @@ function fail(e){errors.push(String(e?.stack||e));$('error').textContent=errors.
 window.addEventListener('error',e=>fail(e.error||e.message));window.addEventListener('unhandledrejection',e=>fail(e.reason));
 function dispose(root){if(!root)return;scene.remove(root);const gs=new Set(),ms=new Set();root.traverse(o=>{if(o.geometry&&!gs.has(o.geometry)){gs.add(o.geometry);o.geometry.dispose();}const a=Array.isArray(o.material)?o.material:[o.material];for(const m of a)if(m&&!ms.has(m)){ms.add(m);m.dispose();}});}
 function bake(){look.resolution=innerWidth<700?1024:2048;kernel.bake(look);}
-function threadMat(half){return new T.MeshPhysicalMaterial({color:view==='route'?(half==='A'?'#79a7b8':half==='B'?'#d68c57':threadColor):threadColor,roughness:.84,metalness:0,sheen:.23,sheenColor:new T.Color('#ddd1ba'),sheenRoughness:.85,normalMap:fibre,normalScale:new T.Vector2(.10,.10),vertexColors:true});}
+function threadMat(half){return new T.MeshPhysicalMaterial({color:view==='route'?(half==='A'?'#79a7b8':half==='B'?'#d68c57':threadColor):threadColor,roughness:.84,metalness:0,sheen:.23,sheenColor:new T.Color('#ddd1ba'),sheenRoughness:.85,map:plies?fibre.userData.albedo:null,normalMap:plies?fibre:null,normalScale:new T.Vector2(.65,.65),vertexColors:true});}
 function needle(e){const g=new T.Group(),m=new T.MeshStandardMaterial({color:'#c6cbd0',metalness:.85,roughness:.26});const shaft=new T.Mesh(new T.CylinderGeometry(.105,.15,3.0,10),m);shaft.position.y=1.65;const tip=new T.Mesh(new T.ConeGeometry(.105,.50,10),m);tip.position.y=3.40;const eye=new T.Mesh(new T.TorusGeometry(.20,.055,5,14),m);eye.scale.y=1.65;g.add(shaft,tip,eye);g.position.fromArray(e.position);const d=new T.Vector3(...e.direction).normalize();if(d.lengthSq()<.01)d.set(0,1,0);g.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d);g.userData.half=e.half;return g;}
 function rebuildThreads(){
  dispose(threadRoot);threadRoot=new T.Group();scene.add(threadRoot);threadMeshes=[];
@@ -24,7 +24,7 @@ function rebuild(){
  model=buildSeam(params,process);dispose(root);root=new T.Group();scene.add(root);leatherMeshes=[];
  const data=makeLeatherGeometry(model);
  for(const s of data.surfaces){const m=surfaceMat(s.exposed&&s.side>0?'grain':s.exposed?'flesh':'inside'),obj=new T.Mesh(s.geometry,m);obj.receiveShadow=true;obj.castShadow=false;obj.userData.kind='leather';root.add(obj);leatherMeshes.push(obj);}
- for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);obj.castShadow=false;obj.receiveShadow=true;root.add(obj);leatherMeshes.push(obj);}
+ for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);m.color.multiplyScalar(w.layer===0?1.06:.86);obj.castShadow=false;obj.receiveShadow=true;root.add(obj);leatherMeshes.push(obj);}
  cutMat=surfaceMat('cut');cutMesh=new T.Mesh(cutFaceGeometry(model),cutMat);root.add(cutMesh);rebuildThreads();applyViewMaterials();sync();revision++;
 }
 function applyViewMaterials(){

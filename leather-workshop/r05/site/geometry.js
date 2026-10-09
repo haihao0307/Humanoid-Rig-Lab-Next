@@ -59,7 +59,7 @@ export function makeThreadGeometry(points,diameter,detail=true){
  for(let i=0;i<n;i++){
   const phase=lengths[i]/(diameter*2.7)*Math.PI*2;
   for(let j=0;j<=sides;j++){
-   const a=j/sides*Math.PI*2,rr=diameter*.48*(detail?1+.025*Math.cos(3*a-phase):1);
+   const a=j/sides*Math.PI*2,rr=diameter*.48*(detail?1+.040*Math.cos(3*a-phase):1);
    const q=out[i].clone().addScaledVector(normals[i],Math.cos(a)*rr).addScaledVector(bins[i],Math.sin(a)*rr);
    pos.push(...q);uv.push(lengths[i]/(diameter*2.7),j/sides);
    const tone=detail?.985+.015*Math.cos(3*a-phase):1;color.push(tone,tone,tone);
@@ -75,6 +75,13 @@ export function makeThreadGeometry(points,diameter,detail=true){
  g.userData={routeLengthMM:total,plies:detail?3:1,structure:'continuous core with shallow twist relief',hasEndCaps:true};return g;
 }
 export function fibreNormalTexture(){
- const w=256,h=64,a=new Uint8Array(w*h*4);for(let j=0;j<h;j++)for(let i=0;i<w;i++){const phase=2*Math.PI*(i/w*18+j/h*8),noise=Math.sin(i*27.61+j*41.32),k=(j*w+i)*4;a[k]=128+12*Math.cos(phase)+3*noise;a[k+1]=128+9*Math.cos(phase);a[k+2]=254;a[k+3]=255;}
- const t=new T.DataTexture(a,w,h,T.RGBAFormat);t.wrapS=t.wrapT=T.RepeatWrapping;t.magFilter=T.LinearFilter;t.minFilter=T.LinearMipmapLinearFilter;t.generateMipmaps=true;t.needsUpdate=true;return t;
+ const w=256,h=128,a=new Uint8Array(w*h*4),colour=new Uint8Array(w*h*4);
+ for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+  const u=i/w,v=j/h,phase=2*Math.PI*(12*v-4*u),fine=2*Math.PI*(36*v-12*u),c=Math.cos(phase),f=Math.cos(fine),k=(j*w+i)*4;
+  const x=-.10*c-.025*f,y=.32*c+.08*f,z=1,inv=1/Math.hypot(x,y,z);
+  a[k]=Math.round((x*inv*.5+.5)*255);a[k+1]=Math.round((y*inv*.5+.5)*255);a[k+2]=Math.round((z*inv*.5+.5)*255);a[k+3]=255;
+  const shade=Math.round(238+12*Math.sin(phase)+4*Math.sin(fine));colour[k]=colour[k+1]=colour[k+2]=shade;colour[k+3]=255;
+ }
+ const make=data=>{const t=new T.DataTexture(data,w,h,T.RGBAFormat);t.wrapS=t.wrapT=T.RepeatWrapping;t.magFilter=T.LinearFilter;t.minFilter=T.LinearMipmapLinearFilter;t.generateMipmaps=true;t.needsUpdate=true;return t;};
+ const t=make(a);t.userData.albedo=make(colour);t.userData.albedo.colorSpace=T.SRGBColorSpace;return t;
 }
