@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{chromium}=require('playwright');
 const OUT=path.resolve('qa-et08'),ROOT=path.resolve(__dirname,'..'),BASEURL=process.env.TEST_BASE||'http://127.0.0.1:8765/skin-quality-lab/emily-transfer/';
-fs.mkdirSync(OUT,{recursive:true});const results={schema:'kaopu/eye-stage1-verification@1',version:'ET08-S1',checks:[],poses:[],screenshots:[],realMobileDeviceTested:false,scope:'Chromium software WebGL; finite sampled poses, not exhaustive CCD or clinical reconstruction'};
+fs.mkdirSync(OUT,{recursive:true});const results={schema:'kaopu/eye-stage1-verification@1',version:'ET08-S1.1',checks:[],poses:[],screenshots:[],realMobileDeviceTested:false,scope:'Chromium software WebGL; finite sampled poses, not exhaustive CCD or clinical reconstruction'};
 const check=(name,v,detail)=>{results.checks.push({name,pass:!!v,detail});if(!v)throw Error(name+': '+JSON.stringify(detail));};
 let browser,page;const errors=[];
 const capture=async name=>{await page.screenshot({path:path.join(OUT,name+'.png')});results.screenshots.push(name+'.png');};
@@ -14,10 +14,20 @@ const settle=async()=>{await page.evaluate(()=>{window.__EYE_QA_FREEZE__=true;__
  await settle();
  const baselineGeometry=await page.evaluate(()=>__EYES__.sourceGeometry());
  results.neutral=await page.evaluate(()=>__STAGE1__.report());results.initialDiagnostics=await page.evaluate(()=>__STAGE1__.diagnostics());
- check('correct stage',await page.evaluate(()=>__STAGE1__.version==='ET08-S1'));
+ check('correct stage',await page.evaluate(()=>__STAGE1__.version==='ET08-S1.1'));
  check('no maps, wetness, lashes or fuzz in visible gray review',results.initialDiagnostics.texturedVisibleMaterials===0&&results.initialDiagnostics.clearcoatMax===0&&!results.initialDiagnostics.wetRimsVisible&&!results.initialDiagnostics.eyelashesVisible&&!results.initialDiagnostics.fuzzVisible,results.initialDiagnostics);
  for(const e of results.neutral.eyes){check(e.name+' globe/iris sizes preserved',Math.abs(e.calibration.radiusMM-12.2)<1e-8&&Math.abs(e.calibration.irisRadiusMM-5.307)<1e-8,e.calibration);check(e.name+' neutral iris reference upper/lower overlap',e.upperIrisCoverProjectedMM>0&&e.upperIrisCoverProjectedMM<3&&e.lowerIrisCoverProjectedMM>=0&&e.lowerIrisCoverProjectedMM<1.8,e);}
  await capture('01-neutral-gray');
+ // Isolate inherited parts to attribute closed-rim artifacts. These temporary
+ // visibility controls are restored before every assertion and delivery frame.
+ await page.evaluate(()=>{__STAGE1__.pose(1);__SKIN_LAB__.render();});await capture('debug-closed-all');
+ for(const part of ['margin','inside','canthus']){
+  await page.evaluate(part=>{__NATURAL_REVIEW__.setVisibility({[part]:false});__SKIN_LAB__.render();},part);await capture('debug-closed-without-'+part);
+  await page.evaluate(part=>{__NATURAL_REVIEW__.setVisibility({[part]:true});__SKIN_LAB__.render();},part);
+ }
+ await page.evaluate(()=>{__STAGE1__.capturedReferenceFrame();});await capture('debug-captured-closed-head');
+ await page.evaluate(()=>{__STAGE1__.pose(0);__SKIN_LAB__.render();});
+
  await page.evaluate(()=>{__STAGE1__.compare(true);__SKIN_LAB__.render();});results.originalContour=await page.evaluate(()=>__STAGE1__.report());await capture('02-original-contour-same-gray');
  await page.evaluate(()=>{__STAGE1__.compare(false);__SKIN_LAB__.render();});
  for(let i=0;i<2;i++)check('increased aperture without globe scaling '+i,results.neutral.eyes[i].heightAtAxisMM>results.originalContour.eyes[i].heightAtAxisMM+.7,{old:results.originalContour.eyes[i],new:results.neutral.eyes[i]});
@@ -40,6 +50,31 @@ const settle=async()=>{await page.evaluate(()=>{window.__EYE_QA_FREEZE__=true;__
  await page.click('[data-s1-closure="1"]');await settle();check('UI full closure',await page.evaluate(()=>__STAGE1__.report().eyes.every(e=>e.actualClosedMarginGapMM<.00002)));
  await page.click('#s1Neutral');await page.focus('#s1Compare');await page.keyboard.down('Space');await settle();check('held baseline compare',await page.evaluate(()=>__STAGE1__.report().comparison==='ET07.3'));await page.keyboard.up('Space');await settle();check('compare release restores stage1',await page.evaluate(()=>__STAGE1__.report().comparison==='ET08-S1'));
  const recipeOK=await page.evaluate(()=>{const s=__EYES__.snapshot();__STAGE1__.compare(true);__EYES__.restore(s);__SKIN_LAB__.render();return !__EYES__.snapshot().stage1.compareOriginal;});check('saved stage1 recipe restores new contour',recipeOK);
+ // Regression for the user-reported U-shaped closed-lid pocket.
+ const closureFix={before:null,after:null,views:[],transition:[]};results.closureFix=closureFix;
+ await page.evaluate(()=>{__STAGE1__.view('front');__STAGE1__.pose(1);__STAGE1__.beforeRepair(true);__SKIN_LAB__.render();});
+ closureFix.before=await page.evaluate(()=>__STAGE1__.closedSurface());await capture('11-closed-before-repair');
+ await page.evaluate(()=>{__STAGE1__.beforeRepair(false);__SKIN_LAB__.render();});
+ closureFix.after=await page.evaluate(()=>__STAGE1__.closedSurface());await capture('12-closed-after-repair');
+ for(let i=0;i<2;i++){
+  const old=closureFix.before.eyes[i],now=closureFix.after.eyes[i];
+  check('regression reproduces old lower-lid envelope error '+i,old.fullClosureLowerRestErrorMM>1,old);
+  check('whole closed lower/upper surface returns to captured envelope '+i,now.fullClosureLowerRestErrorMM<.02&&now.fullClosureUpperRestErrorMM<.02,now);
+ }
+ for(const view of ['front','right','left','obliqueR','obliqueL','below']){
+  await page.evaluate(view=>{__STAGE1__.view(view);__SKIN_LAB__.render();},view);
+  const probe=await page.evaluate(()=>__STAGE1__.globePixels());closureFix.views.push({view,...probe});
+  check('closed eye genuinely occluded from '+view,probe.visibleGlobePixels===0&&!probe.eyeObjectsHidden,probe);await capture('13-closed-'+view);
+ }
+ await page.evaluate(()=>{__STAGE1__.pose(0);__SKIN_LAB__.render();});
+ check('ID-pass detector sees open globe', (await page.evaluate(()=>__STAGE1__.globePixels())).visibleGlobePixels>100);
+ for(const closure of [0,.25,.5,.75,.85,.9,.95,.98,1]){
+  await page.evaluate(closure=>{__STAGE1__.pose(closure);__SKIN_LAB__.render();},closure);await capture('14-low-angle-'+closure);
+  const r=await page.evaluate(()=>__STAGE1__.closedSurface());closureFix.transition.push(r);
+  check('whole outer surface does not penetrate globe at '+closure,r.eyes.every(e=>e.outerPenetratingVertices===0),r);
+ }
+ await page.evaluate(()=>__STAGE1__.view('front'));await page.click('#s1ClosedCheck');await settle();
+ await page.focus('#s1ClosureBefore');await page.keyboard.down('Space');check('held U-bug comparison',await page.evaluate(()=>!__STAGE1__.closedSurface().eyes[0].enabled));await page.keyboard.up('Space');await settle();check('release restores closed-surface fix',await page.evaluate(()=>__STAGE1__.closedSurface().eyes.every(e=>e.fullClosureLowerRestErrorMM<.02)));
  await page.goto(BASEURL+'preview.html',{waitUntil:'domcontentloaded',timeout:120000});await page.waitForFunction(()=>window.__STAGE1__&&window.__SKIN_LAB__?.state.ready,null,{timeout:180000});await settle();
  results.bundledReport=await page.evaluate(()=>__STAGE1__.report());check('standalone bundle matches source contour',results.bundledReport.eyes.every((e,i)=>Math.abs(e.widthMM-results.neutral.eyes[i].widthMM)<1e-8&&Math.abs(e.heightAtAxisMM-results.neutral.eyes[i].heightAtAxisMM)<1e-8));await capture('08-bundled-preview');
  await page.setViewportSize({width:390,height:844});await page.evaluate(()=>__STAGE1__.view('front'));await settle();await capture('09-mobile-viewport');
