@@ -32,6 +32,9 @@ with sync_playwright() as p:
   for selector in ['[data-material=heritage] .thumb','[data-product=wallet] .thumb']:
    b=page.locator(selector).bounding_box();crop=Image.open(OUT/'01-wallet-studio.png').convert('RGB').crop((b['x']+4,b['y']+4,b['x']+b['width']-4,b['y']+b['height']-4))
    check(selector+' contains rendered 3D pixels',max(ImageStat.Stat(crop).stddev)>5)
+  for selector in ['[data-material=heritage] .thumb','[data-product=wallet] .thumb']:
+   b=page.locator(selector).bounding_box();crop=Image.open(OUT/'01-wallet-studio.png').convert('RGB').crop((b['x']+4,b['y']+4,b['x']+b['width']-4,b['y']+b['height']-4))
+   check(selector+' contains rendered 3D pixels',max(ImageStat.Stat(crop).stddev)>5)
   ids=['wallet','belt','bag','hat','swatch']
   for id in ids:
    page.evaluate('(id)=>LEATHER_ATELIER.selectProduct(id)',id)
@@ -79,6 +82,10 @@ with sync_playwright() as p:
   page.evaluate("LEATHER_ATELIER.switchMode('products');LEATHER_ATELIER.selectProduct('wallet')")
   page.set_viewport_size({'width':390,'height':844});page.wait_for_timeout(500);photo(page,'mobile-390x844')
   check('mobile viewport has no horizontal overflow',page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
+  bounds=page.evaluate('LEATHER_ATELIER.frameAudit()');check('resize automatically refits the visible product',bounds['maxAbsX']<.99 and bounds['maxAbsY']<.99 and bounds['inDepth'],bounds)
+  for product_id in ['wallet','belt','bag','hat','swatch']:
+   page.evaluate('(id)=>LEATHER_ATELIER.selectProduct(id)',product_id);photo(page,'mobile-fitted-'+product_id)
+   bounds=page.evaluate('LEATHER_ATELIER.frameAudit()');check(product_id+' full mobile product bounds stay in frame',bounds['maxAbsX']<.99 and bounds['maxAbsY']<.99 and bounds['inDepth'],bounds)
   page.locator('[data-material="cross"]').scroll_into_view_if_needed();page.locator('[data-material="cross"]').click();check('mobile material selection works',page.evaluate('LEATHER_ATELIER.material')=='cross');photo(page,'mobile-materials')
   page.evaluate('window.scrollTo(0,0)');page.set_viewport_size({'width':1440,'height':1000});page.evaluate("LEATHER_ATELIER.selectMaterial('heritage');LEATHER_ATELIER.selectProduct('wallet');LEATHER_ATELIER.setView('home')");photo(page,'final-desktop')
   check('console and page errors are empty',not report['errors'],report['errors'])
