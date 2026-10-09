@@ -29,6 +29,9 @@ with sync_playwright() as p:
   photo(page,'01-wallet-studio')
   box=page.locator('#stage').bounding_box();im=Image.open(OUT/'01-wallet-studio.png').convert('RGB').crop((box['x']+30,box['y']+30,box['x']+box['width']-30,box['y']+box['height']-40))
   check('product viewport has non-uniform rendered content',max(ImageStat.Stat(im).stddev)>8)
+  for selector in ['[data-material=heritage] .thumb','[data-product=wallet] .thumb']:
+   b=page.locator(selector).bounding_box();crop=Image.open(OUT/'01-wallet-studio.png').convert('RGB').crop((b['x']+4,b['y']+4,b['x']+b['width']-4,b['y']+b['height']-4))
+   check(selector+' contains rendered 3D pixels',max(ImageStat.Stat(crop).stddev)>5)
   ids=['wallet','belt','bag','hat','swatch']
   for id in ids:
    page.evaluate('(id)=>LEATHER_ATELIER.selectProduct(id)',id)

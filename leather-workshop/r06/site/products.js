@@ -102,8 +102,9 @@ function belt(m){
  for(const side of[-1,1]){const pts=[];for(let i=0;i<=180;i++){const f=frame(i/180);pts.push(f.p.add(V(0,side*(s.w/2-3),0)).addScaledVector(f.rad,s.t/2+.14));}stitchSegments(pts,m.thread,root,4,.18);}
  const f=frame(0),base=f.p.clone().addScaledVector(f.tan,-18);const to=(x,y,z=0)=>base.clone().addScaledVector(f.tan,x).add(V(0,y,0)).addScaledVector(f.rad,z);
  const ring=[];const rs=roundShape(35,43,5).getPoints(10);for(const p of rs)ring.push(to(p.x,p.y,1.4));tube(ring,2.05,m.brass,root,true,200);tube([to(-17,0,1.4),to(17,0,1.4)],1.7,m.brass,root,false,10);tube([to(-17,0,2),to(3,0,3.6),to(19,0,1.4)],1.05,m.brass,root,false,30);
- // Keeper wraps completely around the leather thickness and both edges.
- const keeperFrame=frame(.028),keeper=[];for(const p of roundShape(13,39,3).getPoints(12))keeper.push(keeperFrame.p.clone().addScaledVector(keeperFrame.tan,p.x).add(V(0,p.y,0)).addScaledVector(keeperFrame.rad,2.7));tube(keeper,.8,m.edge,root,true,140);
+ // A leather keeper encloses the full cross section, rather than floating on the face.
+ const keeperFrame=frame(.028),keeperPath=new T.CatmullRomCurve3(roundShape(s.t+3,s.w+3,1.6).getPoints(16).map(p=>V(p.x,p.y,0)),true,'centripetal');
+ const keeperSurface=(u,v)=>{const p=keeperPath.getPointAt(u);return keeperFrame.p.clone().addScaledVector(keeperFrame.rad,p.x).add(V(0,p.y,0)).addScaledVector(keeperFrame.tan,(v-.5)*10);};surface(shell(keeperSurface,84,6,1,keeperPath.getLength(),10,false),m.shell,root,'closed-leather-keeper');
  root.rotation.y=.25;root.userData={kind:'belt',patternReady:true,dimensions:s,center:V(0,22,0),radius:145,frame,lengthErrorMM:Math.abs(arc.at(-1)-s.l)};return root;
 }
 function swatch(m,small=false){
