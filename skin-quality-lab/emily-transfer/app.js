@@ -1,17 +1,16 @@
 import * as THREE from 'three';
-import {EYE_VERSION} from './eyes/EyeSystem.js';
-import {ResearchEyes as EyeSystem} from './research/ResearchEyes.js';
+import {EYE_VERSION,IntegratedEyes as EyeSystem} from './talkinghead/IntegratedEyes.js';
 import {EMILY_REFERENCE,emilyDirectDiffuse,applyTransferFeatures} from './EmilyTransferKernel.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-const $=id=>document.getElementById(id),VERSION='emily-transfer/3.0.0';
+const $=id=>document.getElementById(id),VERSION='emily-transfer/4.0.0';
 const defaults={roughness:.5,oil:.25,detail:.75,pores:.24,poreSize:.32,fuzz:.32,pigment:.22,blood:.25,sss:.85,radius:1.2,azimuth:-46,exposure:1.03,meso:1.1,micro:1.25,relief:.7,translucency:.65,occlusion:.9,wrap:1};
 const values={...defaults};
 const transfer={method:"emily",mode:"full",split:.5,features:{diffusion:true,reflection:true,detail:true,transmission:true,fuzz:true}};
 const presets={natural:{...defaults},dry:{...defaults,roughness:.66,oil:.04,detail:.94,pores:.48,sss:.48},oily:{...defaults,roughness:.32,oil:.78,detail:.72,pores:.32,sss:.72},warm:{...defaults,pigment:.62,blood:.42,roughness:.46,oil:.3,sss:.72}};
 const state={ready:false,version:VERSION,errors:[],layer:'beauty',light:'studio',camera:'portrait',baseline:false,frames:0,quality:'high',fps:0};
 window.__SKIN_LAB__={state,values,defaults};
-document.title='眼球与眼睑 · ET03';document.querySelector('.version').textContent='ET03 · CONTACT';document.querySelector('.caption-title').textContent='皮肤与眼球 / 注视你';
+document.title='TalkingHead × 原人头 · ET04';document.querySelector('.version').textContent='ET04 · TALKINGHEAD';document.querySelector('.caption-title').textContent='皮肤与眼球 / 注视你';
 const viewport=$('viewport');let albedoRT,entryRT,entryCamera,entryMaterial,entryDirty=true;
 let eyesRig=null;let renderer,scene,camera,controls,mesh,skin,fuzz,fullRT,diffRT,blurA,blurB,blurMaterial,composeMaterial,quad,postScene,postCamera,key,fill,rim,pmremTarget,dirty=true,shader,compareHeld=false,last=performance.now(),frameCount=0,lastStat=last;
 const U={uPass:{value:0},uDetail:{value:values.detail},uPores:{value:values.pores},uPoreFrequency:{value:450/values.poreSize},uPigment:{value:values.pigment},uBlood:{value:values.blood},uScatter:{value:values.sss},uOil:{value:values.oil},uHeight:{value:null},uSpec:{value:null},uBaseline:{value:0},uLayer:{value:0}};
@@ -30,7 +29,7 @@ uniform float uPass,uDetail,uPores,uPoreFrequency,uPigment,uBlood,uScatter,uOil,
 uniform sampler2D uHeight,uSpec,uMesoMap,uMicroMap,uSurface,uKeyDepth;
 uniform float uMeso,uMicro,uRelief,uTranslucency,uKeyRange;
 uniform mat4 uKeyVP;uniform vec3 uKeyDirection,uKeyEnergy;
-varying vec3 vSkinPosition;
+varying vec3 vSkinPosition;varying vec3 vSkinWorld;
 float skinNoise(vec3 p){p=mat3(2.,1.,-2.,-2.,2.,-1.,1.,2.,2.)*(p/3.);vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);vec4 h=vec4(dot(i,vec3(127.1,311.7,74.7)))+vec4(0.,127.1,311.7,438.8);vec4 a=fract(sin(h)*43758.5453),b=fract(sin(h+74.7)*43758.5453);vec4 z=mix(a,b,f.z);return mix(mix(z.x,z.y,f.x),mix(z.z,z.w,f.x),f.y)*2.-1.;}
 vec2 skinHash(vec2 p){return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);}
 float poresAt(vec2 uv){vec2 p=uv*uPoreFrequency;p+=vec2(.13*sin(p.y*.036),.1*sin(p.x*.041));vec2 cell=floor(p),f=fract(p);float h=0.;for(int y=-1;y<=1;y++){for(int x=-1;x<=1;x++){vec2 c=vec2(float(x),float(y)),rnd=skinHash(cell+c),d=c+.2+.6*rnd-f;float angle=6.28*rnd.x+.5*sin(uv.y*20.);d=mat2(cos(angle),-sin(angle),sin(angle),cos(angle))*d;d*=vec2(1.35,.8+.35*rnd.y);float r=dot(d,d);h+=(-exp(-r*75.)+.2*exp(-r*22.))*(.65+.5*rnd.x);}}return h;}
@@ -41,7 +40,7 @@ function configureSkin(albedo,normal,height,spec){
  skin=new THREE.MeshPhysicalMaterial({map:albedo,normalMap:normal,normalScale:new THREE.Vector2(.72,.72),roughness:values.roughness,metalness:0,ior:1.42,specularIntensity:.85,clearcoat:values.oil*.6,clearcoatRoughness:.24,clearcoatNormalMap:normal,clearcoatNormalScale:new THREE.Vector2(.45,.45),envMapIntensity:.55});
  skin.customProgramCacheKey=()=>VERSION;
  skin.onBeforeCompile=s=>{shader=s;Object.assign(s.uniforms,U);
- s.vertexShader='attribute float skinOcclusion;varying float vSkinAO;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vSkinPosition;uniform sampler2D uSurface;uniform float uRelief,uBaseline;').replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed+=normal*(texture2D(uSurface,uv).b-.5)*uRelief*.001*(1.-uBaseline);vSkinPosition=transformed;vSkinAO=skinOcclusion;');
+ s.vertexShader='attribute float skinOcclusion;varying float vSkinAO;\n'+s.vertexShader;s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vSkinPosition;varying vec3 vSkinWorld;uniform sampler2D uSurface;uniform float uRelief,uBaseline;').replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed+=normal*(texture2D(uSurface,uv).b-.5)*uRelief*.001*(1.-uBaseline);vSkinPosition=transformed;vSkinWorld=(modelMatrix*vec4(transformed,1.)).xyz;vSkinAO=skinOcclusion;');
  s.fragmentShader='varying float vSkinAO;uniform float uOcclusion;\n'+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <packing>','#include <packing>\n'+skinFunctions);
  s.fragmentShader=s.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
  float skinVariation=skinNoise(vSkinPosition*105.);float skinFront=smoothstep(-.025,.055,vSkinPosition.z);float skinCheeks=exp(-pow((abs(vSkinPosition.x)-.041)/.025,2.)-pow((vSkinPosition.y-.016)/.033,2.))*skinFront;float skinEar=smoothstep(.069,.092,abs(vSkinPosition.x))*(1.-smoothstep(.045,.082,abs(vSkinPosition.y-.025)));
@@ -83,7 +82,7 @@ function configureSkin(albedo,normal,height,spec){
  #ifdef USE_CLEARCOAT
  skinDiffuseOnly*=1.-material.clearcoat*Fcc;
  #endif
- vec3 worldN=inverseTransformDirection(nonPerturbedNormal,viewMatrix);float thickness=skinThickness(vSkinPosition-worldN*.00012);float backFacing=max(dot(-worldN,uKeyDirection),0.);
+ vec3 worldN=inverseTransformDirection(nonPerturbedNormal,viewMatrix);float thickness=skinThickness(vSkinWorld-worldN*.00012);float backFacing=max(dot(-worldN,uKeyDirection),0.);
  float forward=max(dot(normalize(vViewPosition),normalize((viewMatrix*vec4(-uKeyDirection,0.)).xyz)),0.);float distanceMM=max(thickness*1000.,.2);
  vec3 trans=exp(-distanceMM/vec3(2.8,.7,.35))*backFacing*(.3+.7*pow(forward,2.))*uTranslucency*(1.-uBaseline)*uKeyEnergy*diffuseColor.rgb*.8;
  skinDiffuseOnly+=trans;outgoingLight+=trans;float microCavity=mix(1.,clamp(.93+.14*skinSurface.r,.86,1.07),1.-uBaseline);
@@ -190,7 +189,7 @@ function apply(){E.uOcclusion.value=values.occlusion;E.uMeso.value=values.meso;E
 function updateLayer(){state.layer=$('layer').value;const num={beauty:0,albedo:1,normal:2,roughness:3,specular:4,diffuse:5}[state.layer];U.uLayer.value=num<4?num:0;composeMaterial.uniforms.mode.value=num;$('layerLabel').textContent=$('layer').selectedOptions[0].text+' · '+$('lightPreset').selectedOptions[0].text.split(' · ')[0];dirty=true;}
 function baseline(on){compareHeld=on;state.baseline=on;U.uBaseline.value=0;$('baselineBadge').style.display=on?'block':'none';$('compare').classList.toggle('active',on);apply()}
 function renderOne(destination=null){if(!state.ready)return;if(eyesRig)for(const e of eyesRig.eyes){e.lid.mesh.material.roughness=skin.roughness;e.lid.mesh.material.clearcoat=skin.clearcoat;e.lid.mesh.material.clearcoatRoughness=skin.clearcoatRoughness;e.lid.mesh.material.envMapIntensity=skin.envMapIntensity;}renderEntry();renderer.shadowMap.autoUpdate=false;fuzz.material.uniforms.uLightDir.value.copy(E.uKeyDirection.value).transformDirection(camera.matrixWorldInverse);fuzz.material.uniforms.uLightPower.value=key.intensity;fuzz.material.uniforms.uPixelHeight.value=fullRT.height;U.uPass.value=0;fuzz.visible=values.fuzz>0&&!compareHeld&&state.layer==='beauty';renderer.setRenderTarget(fullRT);renderer.clear();renderer.render(scene,camera);renderer.shadowMap.needsUpdate=false;U.uPass.value=1;fuzz.visible=false;renderer.setRenderTarget(diffRT);renderer.clear();renderer.render(scene,camera);U.uPass.value=2;renderer.setRenderTarget(albedoRT);renderer.clear();renderer.render(scene,camera);U.uPass.value=0;const sssActive=transfer.method==='enhanced'&&transfer.features.diffusion&&values.sss>0&&!compareHeld&&['beauty','diffuse'].includes(state.layer);quad.material=blurMaterial;blurMaterial.uniforms.firstPass.value=1;blurMaterial.uniforms.tColor.value=diffRT.texture;blurMaterial.uniforms.direction.value.set(1/fullRT.width,0);renderer.setRenderTarget(blurA);renderer.render(postScene,postCamera);blurMaterial.uniforms.firstPass.value=0;blurMaterial.uniforms.tColor.value=blurA.texture;blurMaterial.uniforms.direction.value.set(0,1/fullRT.height);renderer.setRenderTarget(blurB);renderer.render(postScene,postCamera);quad.material=composeMaterial;composeMaterial.uniforms.strength.value=sssActive?values.sss:0;renderer.setRenderTarget(destination);renderer.render(postScene,postCamera);dirty=false;}
-function tick(now){requestAnimationFrame(tick);const dt=Math.min(.08,(now-last)/1000);last=now;const moving=controls.update();if(eyesRig&&!window.__EYE_QA_FREEZE__){if(eyesRig.update(dt)){dirty=true;renderer.shadowMap.needsUpdate=true;}}if($('rotateLight').checked){values.azimuth+=dt*8;if(values.azimuth>160)values.azimuth=-160;$('azimuth').value=values.azimuth;$('azimuthOut').textContent=values.azimuth.toFixed(0)+'°';lighting()}if(dirty||moving){render();frameCount++}if(now-lastStat>1500){state.fps=frameCount*1000/(now-lastStat);frameCount=0;lastStat=now;$('stats').textContent=state.resolution.join(' × ')+' / '+Math.round(mesh.geometry.index.count/3/1000)+'K TRI';$('status').textContent=state.frames+' 帧 · '+(dirty?'更新中':'就绪 · 静止时节能')}}
+function tick(now){requestAnimationFrame(tick);const dt=Math.min(.08,(now-last)/1000);last=now;if(document.hidden)return;const moving=controls.update();if(eyesRig&&!window.__EYE_QA_FREEZE__){if(eyesRig.update(dt)){dirty=true;renderer.shadowMap.needsUpdate=true;}}if($('rotateLight').checked){values.azimuth+=dt*8;if(values.azimuth>160)values.azimuth=-160;$('azimuth').value=values.azimuth;$('azimuthOut').textContent=values.azimuth.toFixed(0)+'°';lighting()}if(dirty||moving){render();frameCount++}if(now-lastStat>1500){updateBehaviorUI();state.fps=frameCount*1000/(now-lastStat);frameCount=0;lastStat=now;$('stats').textContent=state.resolution.join(' × ')+' / '+Math.round(mesh.geometry.index.count/3/1000)+'K TRI';$('status').textContent=state.frames+' 帧 · '+(dirty?'更新中':'就绪 · 静止时节能')}}
 async function init(){renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:true});renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.LinearSRGBColorSpace;renderer.toneMapping=THREE.NoToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;renderer.domElement.setAttribute('aria-label','皮肤三维画面');viewport.prepend(renderer.domElement);renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();state.ready=false;fail(new Error('显卡上下文丢失，请重新载入或使用轻量模式'))});scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(28,1,.01,5);controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.085;controls.minDistance=.10;controls.maxDistance=1.5;controls.maxPolarAngle=Math.PI*.84;controls.minPolarAngle=.15;controls.addEventListener('change',()=>dirty=true);
  key=new THREE.DirectionalLight(0xfff1e2,2.65);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.radius=10;key.shadow.blurSamples=12;Object.assign(key.shadow.camera,{left:-.22,right:.22,top:.22,bottom:-.22,near:.05,far:2});key.shadow.bias=-.000035;key.shadow.normalBias=.00022;key.target.position.set(0,.025,0);scene.add(key,key.target);fill=new THREE.DirectionalLight(0xdbe6fa,.18);fill.position.set(.4,.15,.5);scene.add(fill);rim=new THREE.DirectionalLight(0xcadff8,.8);rim.position.set(.4,.35,-.35);scene.add(rim);makeEnvironment();
  const manager=new THREE.LoadingManager();manager.onProgress=(url,n,total)=>{$('loadingText').textContent='读取皮肤资源 '+n+' / '+total};const loader=new THREE.TextureLoader(manager);const load=(url,color=false)=>loader.loadAsync(url).then(t=>{t.flipY=true;t.colorSpace=color?THREE.SRGBColorSpace:THREE.NoColorSpace;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t});
@@ -202,8 +201,8 @@ const aoControl=document.createElement('div');aoControl.className='control';aoCo
 for(const id in defaults)$(id).addEventListener('input',()=>{values[id]=Number($(id).value);apply();document.querySelectorAll('[data-preset]').forEach(b=>b.classList.remove('active'))});document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{Object.assign(values,presets[b.dataset.preset]);apply();document.querySelectorAll('[data-preset]').forEach(x=>x.classList.toggle('active',x===b))});document.querySelectorAll('[data-camera]').forEach(b=>b.onclick=()=>setCamera(b.dataset.camera));$('lightPreset').onchange=()=>{state.light=$('lightPreset').value;values.azimuth={studio:-46,raking:-78,back:135,daylight:-28}[state.light];apply();updateLayer()};$('layer').onchange=()=>updateLayer();$('quality').onchange=()=>{state.quality=$('quality').value;resize()};$('compare').onpointerdown=e=>{e.preventDefault();$('compare').setPointerCapture(e.pointerId);baseline(true)};for(const e of ['pointerup','pointercancel','lostpointercapture'])$('compare').addEventListener(e,()=>{if(compareHeld)baseline(false)});window.addEventListener('blur',()=>{if(compareHeld)baseline(false)});$('compare').onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();baseline(true)}};$('compare').onkeyup=()=>baseline(false);$('mobileToggle').onclick=()=>document.body.classList.toggle('panel-open');
 function recipe(){return {schema:'kaopu/skin-lookdev@1',version:VERSION,values:{...values},light:state.light,layer:state.layer,camera:state.camera,source:'Lee Perry-Smith CC BY 3.0 scan; hybrid procedural shading',transfer:transferSnapshot(),eyes:eyesRig?.snapshot(),calibratedBiology:false}}
 function loadRecipe(o){if(o.schema!=='kaopu/skin-lookdev@1'||!o.values)throw new Error('不是本实验台的参数文件');restoreEyes(o.eyes);restoreTransfer(o.transfer);for(const k in defaults){let v=Number(o.values[k]??defaults[k]),el=$(k);if(!Number.isFinite(v))throw new Error('无效参数 '+k);values[k]=Math.max(+el.min,Math.min(+el.max,v))}if(['studio','raking','back','daylight'].includes(o.light)){state.light=o.light;$('lightPreset').value=o.light}apply();updateLayer()}
-$('save').onclick=()=>{try{localStorage.setItem('emily-transfer-et03',JSON.stringify(recipe()));toast('已保存在当前浏览器')}catch(e){toast('浏览器禁止本地保存，请导出 JSON')}};$('restore').onclick=()=>{try{const v=localStorage.getItem('emily-transfer-et03');if(!v){toast('尚无保存的参数');return}loadRecipe(JSON.parse(v));toast('已恢复参数')}catch(e){toast(e.message)}};$('reset').onclick=()=>{document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('active',b.dataset.preset==='natural'));Object.assign(values,defaults);state.light='studio';$('lightPreset').value='studio';$('layer').value='beauty';$('rotateLight').checked=false;apply();updateLayer();setCamera('portrait');toast('已恢复自然皮肤基线')};
-function download(blob,name){let u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)}$('export').onclick=()=>download(new Blob([JSON.stringify(recipe(),null,2)],{type:'application/json'}),'skin-lookdev-r02.json');$('import').onclick=()=>$('fileInput').click();$('fileInput').onchange=async()=>{try{let f=$('fileInput').files[0];if(!f)return;if(f.size>50000)throw new Error('参数文件过大');loadRecipe(JSON.parse(await f.text()));toast('参数已导入')}catch(e){toast(e.message)}finally{$('fileInput').value=''}};$('shot').onclick=()=>{render();renderer.domElement.toBlob(b=>{if(b)download(b,'skin-lab-r02-'+state.camera+'.png')},'image/png')};window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(!document.hidden)dirty=true});// Included in the inherited renderer's module scope by build.cjs.
+$('save').onclick=()=>{try{localStorage.setItem('emily-transfer-et04',JSON.stringify(recipe()));toast('已保存在当前浏览器')}catch(e){toast('浏览器禁止本地保存，请导出 JSON')}};$('restore').onclick=()=>{try{const v=localStorage.getItem('emily-transfer-et04');if(!v){toast('尚无保存的参数');return}loadRecipe(JSON.parse(v));toast('已恢复参数')}catch(e){toast(e.message)}};$('reset').onclick=()=>{document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('active',b.dataset.preset==='natural'));Object.assign(values,defaults);state.light='studio';$('lightPreset').value='studio';$('layer').value='beauty';$('rotateLight').checked=false;apply();updateLayer();setCamera('portrait');toast('已恢复自然皮肤基线')};
+function download(blob,name){let u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)}$('export').onclick=()=>download(new Blob([JSON.stringify(recipe(),null,2)],{type:'application/json'}),'skin-eyes-talkinghead-et04.json');$('import').onclick=()=>$('fileInput').click();$('fileInput').onchange=async()=>{try{let f=$('fileInput').files[0];if(!f)return;if(f.size>50000)throw new Error('参数文件过大');loadRecipe(JSON.parse(await f.text()));toast('参数已导入')}catch(e){toast(e.message)}finally{$('fileInput').value=''}};$('shot').onclick=()=>{render();renderer.domElement.toBlob(b=>{if(b)download(b,'skin-lab-r02-'+state.camera+'.png')},'image/png')};window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(!document.hidden)dirty=true});// Included in the inherited renderer's module scope by build.cjs.
 let compareLeft,compareRight,compareScene,compareMaterial;
 function syncTransfer(){
   if(!skin||!fuzz||!composeMaterial)return;
@@ -283,7 +282,7 @@ updateTransferUI();
 
 // Integrated in the existing skin application's module scope.
 async function initializeEyes(){
- eyesRig=new EyeSystem({mesh,skin,scene,camera,canvas:renderer.domElement,pass:U.uPass,layer:U.uLayer,key,fill,rim,requestRender:()=>{dirty=true;entryDirty=true;if(renderer)renderer.shadowMap.needsUpdate=true;}});
+ eyesRig=new EyeSystem({mesh,skin,scene,camera,fuzz,canvas:renderer.domElement,pass:U.uPass,layer:U.uLayer,key,fill,rim,requestRender:()=>{dirty=true;entryDirty=true;if(renderer)renderer.shadowMap.needsUpdate=true;}});
  await eyesRig.ready;eyesRig.installDepth(entryMaterial,fuzz);mesh.customDepthMaterial=entryMaterial;
  window.__EYES__={version:EYE_VERSION,info:()=>eyesRig.info(),setMode:mode=>{eyesRig.setMode(mode);syncEyeUI();},setTarget:v=>{eyesRig.setTarget(v);syncEyeUI();},blink:()=>eyesRig.blink(),step:(dt,instant=false)=>{eyesRig.update(dt,instant);dirty=true;},set:v=>{eyesRig.restore({...eyesRig.snapshot(),...v,schema:'kaopu/eye-rig@1'});syncEyeUI();dirty=true;entryDirty=true;renderer.shadowMap.needsUpdate=true;},snapshot:()=>eyesRig.snapshot(),restore:v=>{eyesRig.restore(v);syncEyeUI();},sourceGeometry:()=>({uuid:mesh.geometry.uuid,vertices:mesh.geometry.attributes.position.count,triangles:mesh.geometry.index.count/3})};
  syncEyeUI();
@@ -292,13 +291,13 @@ function syncEyeUI(){if(!eyesRig)return;const c=eyesRig.config;$('eyeMode').valu
  for(let id of ['enabled','autoBlink','autoPupil'])$('eye-'+id).checked=c[id];
  for(let id of ['pupilMM','wetness','opening','irisDepth']){$('eye-'+id).value=c[id];$('eye-'+id+'Out').textContent=id==='pupilMM'?c[id].toFixed(1)+' mm':c[id].toFixed(2);}
  $('eye-pupilMM').disabled=c.autoPupil;$('eyeModeStatus').textContent={camera:'双眼注视镜头',pointer:'双眼跟随指针',fixed:'空间目标已锁定',relaxed:'轻微自主观察'}[c.mode];
- document.querySelectorAll('[data-eye-mode]').forEach(b=>b.classList.toggle('active',b.dataset.eyeMode===c.mode));
+ document.querySelectorAll('[data-eye-mode]').forEach(b=>b.classList.toggle('active',b.dataset.eyeMode===c.mode));updateBehaviorUI();
 }
 function restoreEyes(recipe){if(eyesRig&&recipe){eyesRig.restore(recipe);syncEyeUI();}}
 for(const b of document.querySelectorAll('[data-eye-mode]'))b.onclick=()=>{if(eyesRig){eyesRig.setMode(b.dataset.eyeMode);syncEyeUI();}};
 $('eyeMode').onchange=()=>{if(eyesRig){eyesRig.setMode($('eyeMode').value);syncEyeUI();}};
 $('eyeIris').onchange=()=>{if(eyesRig)eyesRig.setPalette($('eyeIris').value);};
-$('blinkEye').onclick=()=>eyesRig?.blink();
+$('blinkEye').onclick=()=>{eyesRig?.blink();$('researchClosure').value=0;};
 $('lockEye').onclick=()=>{if(eyesRig){eyesRig.lock();syncEyeUI();toast('双眼已锁定同一个空间目标');}};
 for(let id of ['enabled','autoBlink','autoPupil'])$('eye-'+id).onchange=()=>{if(!eyesRig)return;eyesRig.config[id]=$('eye-'+id).checked;eyesRig.update(0,true);syncEyeUI();entryDirty=true;renderer.shadowMap.needsUpdate=true;dirty=true;};
 for(let id of ['pupilMM','wetness','opening','irisDepth'])$('eye-'+id).oninput=()=>{if(!eyesRig)return;const el=$('eye-'+id);eyesRig.config[id]=Math.max(+el.min,Math.min(+el.max,+el.value));eyesRig.update(0,true);syncEyeUI();dirty=true;renderer.shadowMap.needsUpdate=true;};
@@ -311,4 +310,31 @@ const researchControls=()=>{
  q.oninput=()=>{if(!eyesRig)return;eyesRig.config.squint=+q.value;eyesRig.update(0,true);dirty=true;};
  $('researchRelease').onclick=()=>{if(!eyesRig)return;eyesRig.config.manualBlink=-1;eyesRig.config.squint=0;c.value=0;q.value=0;eyesRig.update(0,true);dirty=true;};
  $('reset').addEventListener('click',()=>{if(!eyesRig)return;eyesRig.config.manualBlink=-1;eyesRig.config.squint=0;c.value=0;q.value=0;eyesRig.update(0,true);});
-};researchControls();apply();init().catch(fail);
+};researchControls();
+// Runs inside the inherited app scope. No separate event or animation loop.
+function updateBehaviorUI(){
+ if(!eyesRig?.behavior)return;const s=eyesRig.behavior.settings,d=eyesRig.diagnostics();
+ $('thEnabled').checked=s.enabled;$('thHead').checked=s.headMotion;$('thPause').checked=s.paused;$('thMood').value=s.mood;
+ for(const [id,key,factor] of [['thAmount','headAmount',1],['thContact','eyeContact',1],['thYaw','manualYaw',180/Math.PI],['thPitch','manualPitch',180/Math.PI]]){
+  if(document.activeElement!==$(id))$(id).value=s[key]*factor;
+  $(id+'Out').textContent=factor===1?Math.round(s[key]*100)+'%':(s[key]*factor).toFixed(1)+'°';
+ }
+ $('thDiagnostics').textContent=`行为：${s.enabled?'TalkingHead 1.7.0':'ET03'}；原库已采样 ${d.upstreamSteps} 次。控制器：${d.finalWriter}。眨眼控制：${d.controls.blinkOwner==='manual'?'手动':'原库'}；注视控制：${d.controls.gazeOwner}。共享 Three.js r${THREE.REVISION}；无第二渲染器／无语音请求。`;
+ $('thFocus').classList.toggle('active',eyesRig.config.mode==='camera');$('thSocial').classList.toggle('active',eyesRig.config.mode==='relaxed');
+}
+function installBehaviorBindings(){
+ const set=value=>{if(!eyesRig?.behavior)return;eyesRig.setBehavior(value);updateBehaviorUI();syncEyeUI();dirty=true;};
+ for(const [id,key] of [['thEnabled','enabled'],['thHead','headMotion'],['thPause','paused']])$(id).onchange=()=>set({[key]:$(id).checked});
+ $('thMood').onchange=()=>{if(eyesRig)eyesRig.config.manualBlink=-1;set({mood:$('thMood').value,enabled:true});};
+ for(const [id,key,factor] of [['thAmount','headAmount',1],['thContact','eyeContact',1],['thYaw','manualYaw',Math.PI/180],['thPitch','manualPitch',Math.PI/180]])$(id).oninput=()=>set({[key]:Number($(id).value)*factor});
+ $('thCenter').onclick=()=>set({manualYaw:0,manualPitch:0});
+ $('thFocus').onclick=()=>{if(!eyesRig)return;eyesRig.setMode('camera');eyesRig.config.manualBlink=-1;set({enabled:true,mood:'neutral',paused:false});};
+ $('thSocial').onclick=()=>{if(!eyesRig)return;eyesRig.setMode('relaxed');eyesRig.config.manualBlink=-1;set({enabled:true,mood:'neutral',paused:false});};
+ for(const [id,kind] of [['thDouble','double'],['thWinkL','left'],['thWinkR','right']])$(id).onclick=()=>{if(!eyesRig)return;set({enabled:true,paused:false});eyesRig.blink(kind);$('researchClosure').value=0;updateBehaviorUI();};
+ for(const [id,kind] of [['thYes','yes'],['thNo','no']])$(id).onclick=()=>{if(!eyesRig)return;set({enabled:true,headMotion:true,paused:false});eyesRig.gesture(kind);};
+ $('reset').addEventListener('click',()=>{eyesRig?.resetBehavior();updateBehaviorUI();});
+ window.__TALKINGHEAD__={version:'ET04',info:()=>eyesRig?.diagnostics(),set:value=>set(value),blink:kind=>eyesRig?.blink(kind),gesture:kind=>eyesRig?.gesture(kind),reset:()=>eyesRig?.resetBehavior()};
+}
+installBehaviorBindings();
+
+apply();init().catch(fail);

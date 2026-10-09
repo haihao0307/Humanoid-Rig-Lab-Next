@@ -1,0 +1,13 @@
+<div class="section th-section"><h2>TalkingHead 行为 <small>ET04 / 1.7.0</small></h2>
+<p class="hint">原库眨眼、注视、缓动与头部动作 → 当前人头。<br>一套渲染器；眼睑接触约束继续由 ET03 执行。</p>
+<div class="feature-grid"><label><input id="thEnabled" type="checkbox" checked>启用原库驱动</label><label><input id="thHead" type="checkbox" checked>头眼联动</label><label><input id="thPause" type="checkbox">暂停自主动作</label></div>
+<div class="presets" style="margin-top:12px"><button id="thFocus">专注看你</button><button id="thSocial">自然观察</button></div>
+<label class="selector-label" for="thMood">眼神状态（不含嘴部表情）</label><select id="thMood"><option value="neutral">平静</option><option value="happy">愉悦眼神</option><option value="sad">低落眼神</option><option value="sleep">休息闭眼</option></select>
+<div class="row" style="margin-top:10px"><button id="thDouble">双次眨眼</button><button id="thYes">点头</button><button id="thNo">摇头</button></div>
+<div class="row" style="margin-top:7px"><button id="thWinkL">人物左眼眨眼</button><button id="thWinkR">人物右眼眨眼</button></div>
+<div class="control"><label for="thAmount">头部自然动作幅度<output id="thAmountOut"></output></label><input id="thAmount" type="range" min="0" max="1" step=".01" value=".42"></div>
+<div class="control"><label for="thContact">自然观察时注视你的概率<output id="thContactOut"></output></label><input id="thContact" type="range" min="0" max="1" step=".01" value=".82"></div>
+<details><summary>转头与锁定测试</summary><div class="control"><label for="thYaw">转头（眼睛继续看目标）<output id="thYawOut"></output></label><input id="thYaw" type="range" min="-20" max="20" step=".5" value="0"></div><div class="control"><label for="thPitch">低头 / 抬头<output id="thPitchOut"></output></label><input id="thPitch" type="range" min="-12" max="12" step=".5" value="0"></div><button id="thCenter">头部归零</button></details>
+<details style="margin-top:12px"><summary>模块连接检查</summary><p id="thDiagnostics" class="hint">正在连接原库行为与眼睑约束。</p></details>
+<p class="hint">手动闭眼优先于自动眨眼；锁定优先于随机注视。<br>关闭驱动可回到 ET03 动作。未接入语音或新增人头。</p>
+</div>
