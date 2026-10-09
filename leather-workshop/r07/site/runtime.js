@@ -1,0 +1,173 @@
+import * as T from 'three';
+import {FINISHES} from '../../r02/site/leather.js';
+import {CATALOGUE,AtelierMaterials} from '../../r06/site/catalogue.js';
+import {PRODUCT_SPECS,makeProduct,productMaterials,setProductMaterial,productAudit,patternSVG} from './products.js';
+const $=id=>document.getElementById(id),V=(...p)=>new T.Vector3(...p);
+const VERSION='R07.1',errors=[],BASE='e86c36c8c34b1f2b57cc5462459ee2f490e556af';
+let renderer,scene,camera,key,fill,rim,environment,thumbScene,thumbCamera,library,hero,heroMats;
+let product='wallet',material='heritage',mode='products',light='studio',manualMaterial=false;
+let craftConfig={thicknessScale:1,tension:.8,response:true,age:0,craft:'plain'},grabMode=false,productSolver=null,gripCollider=null,grabPlane=null,grabPointer=null;
+const raycaster=new T.Raycaster();
+let ready=false,dirty=true,allDirty=true,turning=false,hover=null,last=0,lastHover=0,revision=0;
+let yaw=.30,pitch=.30,distance=310,target=V(0,43,0),radius=85,view='home';
+const productThumbs=new Map(),materialCards=[],productCards=[];
+let sampleThumb=null,physicsRoot=null,physCloth=null,physMid=null,physStone=null,physState=null,worker=null;
+let workerEpoch=0,workerId=0,physicsPlaying=false,physicsBusy=false,actualSpeed=0,workerPending=new Map(),physicsTrace=[];
+function fail(e){const msg=String(e?.stack||e);errors.push(msg);$('error').hidden=false;$('error').textContent=msg;$('busy').hidden=true;physicsPlaying=false;}
+window.addEventListener('error',e=>fail(e.error||e.message));window.addEventListener('unhandledrejection',e=>fail(e.reason));
+function fitGround(root){root.updateMatrixWorld(true);const box=new T.Box3().setFromObject(root),dy=.7-box.min.y;root.position.y+=dy;if(root.userData.center?.isVector3)root.userData.center.y+=dy;root.updateMatrixWorld(true);return new T.Box3().setFromObject(root);}
+function destroyGeometry(root){if(!root)return;root.userData.rig?.texture.dispose();root.removeFromParent();const seen=new Set();root.traverse(o=>{if(o.geometry&&!seen.has(o.geometry)){seen.add(o.geometry);o.geometry.dispose();}if(o.userData.logo){o.material.map?.dispose();o.material.dispose();}});}
+function makeEnvironment(){const es=new T.Scene();es.background=new T.Color('#414640');
+ for(const [pos,w,h,power,col]of[[[-3.5,4.2,3],3.4,5.2,5.2,'#fff8ec'],[[4.0,2.4,1],1.4,4.4,3.2,'#ebf1f2'],[[0,4.8,-3.5],4.2,1.4,4.4,'#fff8eb']]){const p=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:new T.Color(col).multiplyScalar(power),side:T.DoubleSide}));p.position.set(...pos);p.lookAt(0,0,0);es.add(p);}const gen=new T.PMREMGenerator(renderer);const env=gen.fromScene(es,.05,.1,30);gen.dispose();es.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});return env;
+}
+function initRenderer(){
+ renderer=new T.WebGLRenderer({canvas:$('sceneCanvas'),antialias:true,alpha:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight,false);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.autoClear=false;
+ renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.VSMShadowMap;renderer.shadowMap.autoUpdate=false;
+ environment=makeEnvironment();scene=new T.Scene();scene.background=new T.Color('#ebe8e0');scene.environment=environment.texture;scene.environmentIntensity=.85;
+ camera=new T.PerspectiveCamera(34,1,.6,6000);
+ key=new T.DirectionalLight('#fff0db',2.25);key.position.set(-430,690,430);key.castShadow=true;key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-220,right:220,top:220,bottom:-220,near:5,far:2300});key.shadow.bias=-.00007;key.shadow.normalBias=.10;key.shadow.radius=8;key.shadow.blurSamples=12;scene.add(key,key.target);
+ fill=new T.DirectionalLight('#e0eaf0',.70);fill.position.set(460,270,80);scene.add(fill);
+ rim=new T.DirectionalLight('#fff6e9',1.2);rim.position.set(0,510,-470);scene.add(rim);
+ const floor=new T.Mesh(new T.PlaneGeometry(7000,7000),new T.MeshStandardMaterial({color:'#dddcd2',roughness:.90}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+ thumbScene=new T.Scene();thumbScene.background=new T.Color('#e7e7dd');thumbScene.environment=environment.texture;thumbScene.environmentIntensity=.85;const tl=new T.DirectionalLight('#fff4e4',2.15);tl.position.set(-200,400,230);thumbScene.add(tl);const tf=new T.DirectionalLight('#dfe8e9',.85);tf.position.set(200,150,-50);thumbScene.add(tf);thumbCamera=new T.PerspectiveCamera(34,1,.5,4000);
+}
+function setLight(id){if(!['studio','neutral','rake'].includes(id))throw Error('无效布光');light=id;
+ for(const[k,v]of[['lightStudio','studio'],['lightNeutral','neutral'],['lightRake','rake']])$(k).classList.toggle('active',v===id);
+ if(id==='studio'){key.position.set(-430,690,430);key.color.set('#fff0db');key.intensity=2.25;fill.intensity=.70;rim.intensity=1.2;scene.environmentIntensity=.85;renderer.toneMappingExposure=1.05;}
+ if(id==='neutral'){key.position.set(-180,650,500);key.color.set('#ffffff');key.intensity=1.8;fill.intensity=1.0;rim.intensity=.50;scene.environmentIntensity=.72;renderer.toneMappingExposure=1.00;}
+ if(id==='rake'){key.position.set(-650,125,220);key.color.set('#fff2dd');key.intensity=3.1;fill.intensity=.45;rim.intensity=.65;scene.environmentIntensity=.52;renderer.toneMappingExposure=1.05;}
+ renderer.shadowMap.needsUpdate=true;dirty=true;allDirty=true;revision++;
+}
+function setView(id){view=id;const box=mode==='physics'?new T.Box3(V(-135,0,-135),V(135,154,135)):new T.Box3().setFromObject(hero);
+ const size=box.getSize(V()),center=box.getCenter(V());target.copy(center);radius=Math.max(size.x,size.y,size.z)/2;const aspect=Math.max(.45,$('stage').clientWidth/Math.max(1,$('stage').clientHeight));distance=radius/Math.tan(T.MathUtils.degToRad(17))*1.20/Math.min(1,aspect);
+ yaw=.32;pitch=.32;if(product==='belt'&&mode==='products'){yaw=.62;pitch=.80;}if(product==='swatch'&&mode==='products'){yaw=.18;pitch=.85;}if(product==='hat'&&mode==='products'){yaw=.27;pitch=.35;}
+ if(mode==='physics'){yaw=.42;pitch=.63;distance*=.92;}
+ if(id==='front'){yaw=0;pitch=.04;if(product==='belt'||product==='swatch')pitch=1.43;}
+ if(id==='back'){yaw=Math.PI+.08;pitch=.13;if(product==='swatch')pitch=-.5;}
+ if(id==='macro'){distance*=.43;pitch=.32;yaw=.18;if(product==='wallet'){target.set(15,hero.position.y-14,5);distance=106;}if(product==='belt'){const b=hero.userData.frame(0);target.copy(b.p).applyMatrix4(hero.matrixWorld);distance=160;yaw=1.2;pitch=.46;}if(product==='bag'){target.set(0,125,40);distance=200;}if(product==='hat'){target.set(0,65,90);distance=200;}if(product==='swatch'){target.set(5,24,0);distance=95;pitch=.85;}if(mode==='physics'){target.set(0,91,0);distance=240;pitch=.53;}}
+ if(id!=='macro'){
+  const zAxis=V(Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),Math.cos(yaw)*Math.cos(pitch));
+  const xAxis=V().crossVectors(V(0,1,0),zAxis).normalize(),yAxis=V().crossVectors(zAxis,xAxis);
+  const tangent=Math.tan(T.MathUtils.degToRad(camera.fov/2)),margin=.86;let required=25;
+  for(const x of[box.min.x,box.max.x])for(const y of[box.min.y,box.max.y])for(const z of[box.min.z,box.max.z]){
+   const q=V(x,y,z).sub(target),along=q.dot(zAxis);
+   required=Math.max(required,along+Math.abs(q.dot(xAxis))/(tangent*aspect*margin),along+Math.abs(q.dot(yAxis))/(tangent*margin));
+  }
+  distance=required;
+ }
+ const h=Math.max(150,radius*1.75);Object.assign(key.shadow.camera,{left:-h,right:h,top:h,bottom:-h});key.shadow.camera.updateProjectionMatrix();key.target.position.copy(center);key.target.updateMatrixWorld();renderer.shadowMap.needsUpdate=true;
+ for(const[k,v]of[['viewHome','home'],['viewFront','front'],['viewBack','back'],['viewMacro','macro']])$(k).classList.toggle('active',id===v);dirty=true;revision++;
+}
+function selectMaterial(id,manual=true){if(!CATALOGUE.some(c=>c.id===id))throw Error('无效材质');renderer.setScissorTest(false);material=id;if(manual)manualMaterial=true;const entry=library.select(id);if(hero){setProductMaterial(hero,entry.material);hero.traverse(o=>{if(!o.userData.leather&&o.material?.userData?.catalogueId)o.material=entry.material;});}if(physCloth)physCloth.material[0]=entry.material;materialCards.forEach(o=>o.button.classList.toggle('active',o.id===id));updateDetails();allDirty=dirty=true;revision++;return entry;}
+function selectProduct(id){if(['belt','cowboy','pirate'].includes(id))craftConfig.craft='plain';if(productSolver)productSolver.active=false;grabPointer=null;if(!PRODUCT_SPECS[id])throw Error('无效产品');if(mode!=='products')switchMode('products');product=id;destroyGeometry(hero);hero=null;
+ if(!manualMaterial)selectMaterial(PRODUCT_SPECS[id].defaultMaterial,false);
+ heroMats=productMaterials(library.hero.material);hero=makeProduct(id,heroMats,craftConfig);scene.add(hero);prepareGrab();productCards.forEach(o=>o.button.classList.toggle('active',o.id===id));updateDetails();setView('home');allDirty=true;revision++;
+}
+function updateDetails(){const c=CATALOGUE.find(c=>c.id===material),s=PRODUCT_SPECS[product];$('craftChoice').disabled=['belt','cowboy','pirate'].includes(product);$('craftChoice').value=craftConfig.craft;$('materialName').textContent=c.name;$('materialDescription').textContent=c.description;$('finishName').textContent=c.source==='r05'?'真实粒面 / 独立底色、法线、粗糙度':FINISHES[library.hero?.params?.finish||'aniline'].name;
+ $('heroTitle').textContent=mode==='physics'?'皮料的承重与恢复':s.name;$('heroEyebrow').textContent=mode==='physics'?'PHYSICAL STUDY / PRESERVED R04':s.en;
+ $('heroSubtitle').textContent=mode==='physics'?'统一物理单位 · 四角夹持 · 球体与皮料双向接触':s.subtitle;
+ $('productSize').textContent=mode==='physics'?'240 × 240 mm · '+({NL:'1.39',PNL:'1.16',AL:'1.06'})[$('profile').value]+' mm':s.size+' · 厚度倍率 '+craftConfig.thicknessScale.toFixed(2);
+ $('qualityState').textContent=mode==='physics'?'论文配方演示 · 未实物标定':'连续穿线 + 局部皮面响应 · 抓手可验';$('stageLabel').textContent=mode==='physics'?'SOLVER POSITIONS / NO PRESCRIBED DEFORMATION':'R05 SEWING / R07 SHELL / MILLIMETRES';
+ $('showPattern').textContent=['wallet','belt'].includes(product)?'查看 1:1 纸样':'本款纸样尚未定版';$('showPattern').disabled=!['wallet','belt'].includes(product);$('showPattern').style.opacity=$('showPattern').disabled?.5:1;
+ $('productState').textContent=['wallet','belt'].includes(product)?'提供当前裁片尺寸与孔位的试作纸样。抓手是 R07 壳体求解；完整缝线张力传播、摩擦及针孔损伤未求解。':'可抓取检查独立 R07 壳体受力。材料未实测标定；自接触为粒子级，不保证极端甩动不穿透。帽子尚无实物打样纸样。';
+ $('productControls').hidden=mode==='physics';$('physicsControls').hidden=mode!=='physics';
+}
+function createCards(){
+ let family='';for(const [i,c]of CATALOGUE.entries()){if(c.family!==family){family=c.family;const el=document.createElement('div');el.className='family';el.textContent=family==='inherited'?'01 / INHERITED MATERIALS':'02 / FINISH & SOURCE VARIANTS';$('materialGrid').append(el);}
+ const b=document.createElement('button');b.className='material-card';b.dataset.material=c.id;b.innerHTML=`<span class="number">${String(i+1).padStart(2,'0')}</span><div class="thumb" aria-hidden="true"></div><span class="label">${c.name}</span><span class="tag">${c.tag}</span>`;b.onclick=()=>selectMaterial(c.id);$('materialGrid').append(b);const entry={id:c.id,button:b,element:b.querySelector('.thumb'),type:'material'};materialCards.push(entry);b.onpointerenter=()=>{hover=entry;};b.onpointerleave=()=>{hover=null;allDirty=true;};}
+ for(const id of ['wallet','belt','bag','cowboy','pirate','swatch']){const s=PRODUCT_SPECS[id],b=document.createElement('button');b.className='product-card';b.dataset.product=id;b.innerHTML=`<div class="thumb" aria-hidden="true"></div><b>${s.name}</b><span class="note">${['wallet','belt'].includes(id)?'3D / PATTERN':'3D / STUDY'}</span>`;b.onclick=()=>selectProduct(id);$('collection').append(b);const e={id,button:b,element:b.querySelector('.thumb'),type:'product'};productCards.push(e);b.onpointerenter=()=>{hover=e;};b.onpointerleave=()=>{hover=null;allDirty=true;};}
+}
+function initThumbs(){for(const id of ['wallet','belt','bag','cowboy','pirate','swatch']){const s=PRODUCT_SPECS[id],m=productMaterials(library.small.get(s.defaultMaterial).material),o=makeProduct(id,m,{thumbnail:true});const box=new T.Box3().setFromObject(o);o.userData.thumbnailBox=box;o.userData.baseRotation=o.rotation.y;productThumbs.set(id,o);}sampleThumb=makeProduct('swatch',productMaterials(library.small.get('heritage').material),{thumbnail:true});}
+function visibleViewport(el){const r=el.getBoundingClientRect();if(r.bottom<=0||r.top>=innerHeight||r.right<=0||r.left>=innerWidth||r.width<2||r.height<2)return null;renderer.setViewport(r.left,innerHeight-r.bottom,r.width,r.height);renderer.setScissor(Math.max(0,r.left),Math.max(0,innerHeight-r.bottom),Math.min(innerWidth,r.right)-Math.max(0,r.left),Math.min(innerHeight,r.bottom)-Math.max(0,r.top));renderer.setScissorTest(true);return r;}
+function renderThumb(entry,time=0){const r=visibleViewport(entry.element);if(!r)return;
+ const obj=entry.type==='material'?sampleThumb:productThumbs.get(entry.id);if(entry.type==='material')setProductMaterial(obj,library.small.get(entry.id).material);
+ const base=obj.userData.baseRotation||0,old=obj.rotation.y;obj.rotation.y=base+(entry===hover?Math.sin(time*.0006)*.65:0);thumbScene.add(obj);obj.updateMatrixWorld(true);
+ const box=new T.Box3().setFromObject(obj),sz=box.getSize(V()),center=box.getCenter(V());const rr=Math.max(sz.x,sz.y,sz.z)/2;const aspect=r.width/r.height;const d=rr/Math.tan(T.MathUtils.degToRad(17))*1.16/Math.min(1,aspect);let ya=.28,pi=.43;if(entry.type==='material'||entry.id==='swatch')pi=.92;if(entry.id==='belt'){pi=.83;ya=.5;}
+ thumbCamera.aspect=aspect;thumbCamera.updateProjectionMatrix();thumbCamera.position.set(center.x+d*Math.sin(ya)*Math.cos(pi),center.y+d*Math.sin(pi),center.z+d*Math.cos(ya)*Math.cos(pi));thumbCamera.lookAt(center);renderer.clear(true,true,true);renderer.render(thumbScene,thumbCamera);thumbScene.remove(obj);obj.rotation.y=old;
+}
+function render(t=0){if(!ready||mode==='baseline')return;const w=innerWidth,h=innerHeight,dpr=Math.min(devicePixelRatio||1,1.5);if(renderer.domElement.width!==Math.round(w*dpr)||renderer.domElement.height!==Math.round(h*dpr)){renderer.setPixelRatio(dpr);renderer.setSize(w,h,false);allDirty=true;}
+ if(allDirty){renderer.setScissorTest(false);renderer.setClearColor('#ebe8e0');renderer.clear(true,true,true);}
+ const r=visibleViewport($('stage'));if(r){camera.aspect=r.width/r.height;camera.updateProjectionMatrix();camera.position.set(target.x+distance*Math.sin(yaw)*Math.cos(pitch),target.y+distance*Math.sin(pitch),target.z+distance*Math.cos(yaw)*Math.cos(pitch));camera.lookAt(target);renderer.clear(true,true,true);renderer.render(scene,camera);}
+ if(allDirty){for(const e of [...materialCards,...productCards])renderThumb(e,t);}else if(hover&&t-lastHover>50){renderThumb(hover,t);lastHover=t;}
+ const millimetres=radius<80?20:50;const rw=r?r.height*millimetres/(2*Math.tan(T.MathUtils.degToRad(17))*distance):30;$('ruler').style.width=rw+'px';$('rulerText').textContent=millimetres+' mm';$('status').textContent=`${VERSION} · 源码 ${BUILD_INFO.sourceCommit.slice(0,8)} · ${renderer.info.memory.geometries} 几何 · ${library.hero?.params?.resolution||'scan'} 材质级别`;
+ dirty=false;allDirty=false;
+}
+let simulationBudget=0;
+function loop(t){requestAnimationFrame(loop);if(!ready||document.hidden)return;const dt=last?Math.min(.08,(t-last)/1000):0;last=t;if(mode==='baseline')return;if(turning){yaw+=dt*.18;dirty=true;}if(hover&&t-lastHover>50)dirty=true;
+ if(mode==='physics'&&physicsPlaying&&!physicsBusy&&physState&&!physState.report.failed){physicsBusy=true;const start=performance.now();askWorker('step',{count:4}).then(()=>{actualSpeed=(4/240)/Math.max(.001,(performance.now()-start)/1000);physicsBusy=false;}).catch(e=>{physicsBusy=false;fail(e);});}
+ if(mode==='products'&&productSolver?.active){simulationBudget+=dt;const steps=Math.min(6,Math.floor(simulationBudget/(1/240)));if(steps){simulationBudget-=steps/240;if(simulationBudget>.08)simulationBudget=.08;productSolver.step(steps);updateSkin(hero,productSolver);syncGripCollider();updateGrabUI();renderer.shadowMap.needsUpdate=true;dirty=true;}}
+ if(dirty||allDirty)render(t);
+}
+async function switchMode(next){if(!['products','physics','baseline'].includes(next))throw Error('无效工作区');mode=next;physicsPlaying=false;turning=false;if(productSolver)productSolver.active=false;$('autoRotate').classList.remove('active');
+ $('tabProducts').classList.toggle('active',next==='products');$('tabPhysics').classList.toggle('active',next==='physics');$('tabBaseline').classList.toggle('active',next==='baseline');$('baselinePane').hidden=next!=='baseline';$('layout').style.visibility=next==='baseline'?'hidden':'visible';$('sceneCanvas').hidden=next==='baseline';
+ if(hero)hero.visible=next==='products';if(physicsRoot)physicsRoot.visible=next==='physics';
+ if(next==='baseline'){if(!$('baselineFrame').srcdoc){const bytes=Uint8Array.from(atob(BASELINE_GZIP),c=>c.charCodeAt(0));const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));$('baselineFrame').srcdoc=await new Response(stream).text();}return;}
+ if(next==='physics'){if(!physState)await resetPhysics();else physicsPlaying=true;}
+ updateDetails();setView('home');allDirty=dirty=true;
+}
+function askWorker(op,args={}){if(!worker)throw Error('物理 Worker 未初始化');const id=++workerId;return new Promise((resolve,reject)=>{workerPending.set(id,{resolve,reject});worker.postMessage({id,op,...args});});}
+function initWorker(){const url=URL.createObjectURL(new Blob([WORKER_CODE],{type:'text/javascript'}));worker=new Worker(url);URL.revokeObjectURL(url);worker.onerror=e=>fail(e.message);worker.onmessage=e=>{const f=e.data,p=workerPending.get(f.id);workerPending.delete(f.id);if(f.error){p?.reject(Error(f.error));return;}try{try{if(f.epoch===workerEpoch&&f.positions)receivePhysics(f);p?.resolve(f);}catch(error){p?.reject(error);fail(error);}}catch(error){p?.reject(error);fail(error);}};}
+async function resetPhysics(){physicsPlaying=false;workerEpoch++;physState=null;physicsTrace=[];if(!worker)initWorker();const id=$('profile').value;await askWorker('init',{mode:'stone',epoch:workerEpoch,options:{profile:id,thickness:({NL:1.39,PNL:1.16,AL:1.06})[id]/1000,stoneMass:.045,dropHeight:.04}});physicsPlaying=mode==='physics';updateDetails();setView('home');}
+function physicsBox(w,h,d,mat,x,y,z){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;physicsRoot.add(m);return m;}
+function buildPhysics(f){destroyGeometry(physicsRoot);physicsRoot=new T.Group();physicsRoot.position.y=90;physicsRoot.visible=mode==='physics';scene.add(physicsRoot);const n=f.positions.length/3,tri=Array.from(f.triangles),top=[];for(let i=0;i<tri.length;i+=3)top.push(tri[i],tri[i+2],tri[i+1]);
+ physMid=new T.BufferGeometry();physMid.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(n*3),3));physMid.setIndex(top);
+ const g=new T.BufferGeometry(),idx=[...top,...tri.map(v=>v+n)],uv=new Float32Array(n*4);const edgeStart=idx.length;for(const[a,b]of f.boundary)idx.push(a,b,a+n,b,b+n,a+n);
+ for(let side=0;side<2;side++)for(let i=0;i<n;i++){uv[2*(side*n+i)]=(f.rest[3*i]+.12)*1000/96;uv[2*(side*n+i)+1]=(f.rest[3*i+2]+.12)*1000/96;}
+ g.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(n*6),3));g.setAttribute('normal',new T.Float32BufferAttribute(new Float32Array(n*6),3));g.setAttribute('uv',new T.BufferAttribute(uv,2));g.setIndex(idx);g.addGroup(0,top.length,0);g.addGroup(top.length,tri.length,1);g.addGroup(edgeStart,idx.length-edgeStart,2);
+ physCloth=new T.Mesh(g,productMaterials(library.hero.material).shell);physCloth.castShadow=physCloth.receiveShadow=true;physCloth.userData.leather=true;physicsRoot.add(physCloth);
+ const metal=new T.MeshStandardMaterial({color:'#788477',roughness:.35,metalness:.78}),dark=new T.MeshStandardMaterial({color:'#39483a',roughness:.53,metalness:.45});
+ for(const x of[-112.5,112.5])for(const z of[-112.5,112.5]){physicsBox(23,4,23,metal,x,f.thickness*500+2,z);physicsBox(23,3.5,23,metal,x,-f.thickness*500-1.75,z);physicsBox(12,83,12,dark,x,-47,z);for(const zz of[-6,6]){const bolt=new T.Mesh(new T.CylinderGeometry(1.6,1.6,7,12),dark);bolt.position.set(x,5,z+zz);physicsRoot.add(bolt);}}
+ const stoneMat=new T.MeshStandardMaterial({color:'#9d9b8a',roughness:.94});physStone=new T.Mesh(new T.SphereGeometry(16,48,32),stoneMat);physStone.castShadow=physStone.receiveShadow=true;physicsRoot.add(physStone);
+}
+function receivePhysics(f){const fresh=!physState;physState=f;if(fresh)buildPhysics(f);const n=f.positions.length/3;const a=physMid.attributes.position.array;for(let i=0;i<a.length;i++)a[i]=f.positions[i]*1000;physMid.attributes.position.needsUpdate=true;physMid.computeVertexNormals();
+ const nn=physMid.attributes.normal.array,p=physCloth.geometry.attributes.position.array,no=physCloth.geometry.attributes.normal.array;for(let i=0;i<n;i++)for(let side=0;side<2;side++){const sign=side?-1:1,k=(side*n+i)*3;for(let j=0;j<3;j++){p[k+j]=a[3*i+j]+sign*nn[3*i+j]*f.thickness*500;no[k+j]=sign*nn[3*i+j];}}
+ physCloth.geometry.attributes.position.needsUpdate=true;physCloth.geometry.attributes.normal.needsUpdate=true;physCloth.geometry.computeBoundingSphere();physStone.position.fromArray(f.stone.pos).multiplyScalar(1000);physStone.visible=f.stone.visible;const r=f.report;
+ $('physicsInfo').textContent=`物理时间 ${r.timeS.toFixed(3)} s\n中心下垂 ${r.centerSagMM.toFixed(3)} mm\n皮样质量 ${(r.massKg*1000).toFixed(3)} g\n接触力 ${r.contactForceN.toFixed(4)} N\n接触压入 ${r.penetrationMM.toFixed(5)} mm\n夹持误差 ${r.pinErrorMM.toExponential(1)} mm\n当前残差 ${Number.isFinite(r.residualN)?r.residualN.toExponential(1):'尚未求解'} N\n计算速度 ${actualSpeed.toFixed(2)}×`;
+ $('pausePhysics').textContent=physicsPlaying?'暂停计算':'继续计算';if(r.failed){physicsPlaying=false;fail('物理求解停止：'+r.failed);}
+ physicsTrace.push({timeS:r.timeS,sagMM:r.centerSagMM,contactForceN:r.contactForceN,penetrationMM:r.penetrationMM,finite:r.finite});if(physicsTrace.length>2400)physicsTrace.shift();renderer.shadowMap.needsUpdate=true;dirty=true;revision++;
+}
+function frameAudit(){hero.updateMatrixWorld(true);camera.updateMatrixWorld(true);const b=new T.Box3().setFromObject(hero),points=[];for(const x of[b.min.x,b.max.x])for(const y of[b.min.y,b.max.y])for(const z of[b.min.z,b.max.z])points.push(V(x,y,z).project(camera).toArray());return{maxAbsX:Math.max(...points.map(p=>Math.abs(p[0]))),maxAbsY:Math.max(...points.map(p=>Math.abs(p[1]))),inDepth:points.every(p=>p[2]>-1&&p[2]<1),points};}
+function recipe(){return{craft:{...craftConfig},interactivePhysics:productSolver?.report(),schema:'kaopu/leather-atelier@1',version:VERSION,sourceCommit:BUILD_INFO.sourceCommit,baseline:BASE,product:PRODUCT_SPECS[product],productAudit:productAudit(hero),material:library.recipe(material),lighting:light,physicalSpecimen:physState?{config:physState.config,report:physState.report,trace:physicsTrace.slice(-60)}:null,limitations:['R07 uses actual nodal shell dynamics while grabbing; no real-material calibration','Particle self-contact is not triangle CCD; fast folds can still intersect','Sewn yarn follows the moving surface, but tension/friction along the whole thread is not solved','Weathering and craft padding are author-controlled approximations, not chronological predictions','R04 experiment remains separate and unchanged']};}
+function saveText(text,name,type){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+function prepareGrab(){productSolver=new ProductShell(hero.userData.rig.data);if(gripCollider){gripCollider.geometry.dispose();gripCollider.material.dispose();}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(hero.userData.rig.data.positions,3));g.setIndex(hero.userData.rig.data.triangles.flatMap(q=>q.slice(0,3)));gripCollider=new T.Mesh(g,new T.MeshBasicMaterial({side:T.DoubleSide}));syncGripCollider();updateGrabUI();}
+function syncGripCollider(){const p=gripCollider.geometry.attributes.position;for(let i=0;i<productSolver.x.length;i++)p.array[i]=productSolver.x[i]*1000;p.needsUpdate=true;gripCollider.geometry.computeBoundingSphere();gripCollider.updateMatrixWorld(true);}
+function setRay(x,y){const r=$('stage').getBoundingClientRect();raycaster.setFromCamera(new T.Vector2((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1),camera);}
+function hitProduct(x,y){syncGripCollider();setRay(x,y);return raycaster.intersectObject(gripCollider,false)[0]||null;}
+function updateGrabUI(){if(!productSolver)return;const p=productSolver.report();$('grabStats').textContent=`皮料与五金 ${p.massG.toFixed(1)} g · ${p.nodeCount} 个物理节点\n物理时间 ${p.timeS.toFixed(2)} s · 最大伸长 ${(100*(p.maxStretch-1)).toFixed(2)}%\n抓点误差 ${p.grabErrorMM.toFixed(2)} mm · 抓力 ${p.grabForceN.toFixed(2)} N`;$('thicknessInfo').textContent=`当前单层厚度 ${(PRODUCT_SPECS[product].t*craftConfig.thicknessScale).toFixed(2)} mm；厚度同时进入几何、面积质量、膜能量与 t³ 弯曲刚度。`;if(p.failed){$('grabState').textContent=p.failed;productSolver.active=false;}}
+function setupUI(){
+ $('tabProducts').onclick=()=>switchMode('products');$('tabPhysics').onclick=()=>switchMode('physics');$('tabBaseline').onclick=()=>switchMode('baseline');
+ for(const[k,v]of[['viewHome','home'],['viewFront','front'],['viewBack','back'],['viewMacro','macro']])$(k).onclick=()=>setView(v);
+ for(const[k,v]of[['lightStudio','studio'],['lightNeutral','neutral'],['lightRake','rake']])$(k).onclick=()=>setLight(v);
+ $('autoRotate').onclick=()=>{turning=!turning;$('autoRotate').classList.toggle('active',turning);dirty=true;};
+ $('showPattern').onclick=()=>{$('patternPreview').innerHTML=patternSVG(product);$('patternDialog').showModal();};$('closePattern').onclick=()=>$('patternDialog').close();$('downloadPattern').onclick=()=>saveText(patternSVG(product),`KAOPU-${product}-prototype-1to1-mm.svg`,'image/svg+xml');
+ $('showRecipe').onclick=()=>{$('recipeText').textContent=JSON.stringify(recipe(),null,2);$('recipeDialog').showModal();};$('closeRecipe').onclick=()=>$('recipeDialog').close();$('downloadRecipe').onclick=()=>saveText(JSON.stringify(recipe(),null,2),`KAOPU-${product}-${material}-R061.json`,'application/json');
+ $('dropStone').onclick=async()=>{await askWorker('drop');physicsPlaying=true;};$('removeStone').onclick=async()=>{await askWorker('remove');physicsPlaying=true;};$('pausePhysics').onclick=()=>{physicsPlaying=!physicsPlaying;$('pausePhysics').textContent=physicsPlaying?'暂停计算':'继续计算';};$('resetPhysics').onclick=()=>resetPhysics();$('profile').onchange=()=>resetPhysics();
+ const pointers=new Map();let pinch=0;const el=$('stage');
+ el.onpointerdown=e=>{el.setPointerCapture(e.pointerId);turning=false;$('autoRotate').classList.remove('active');
+  if(grabMode&&mode==='products'){const hit=hitProduct(e.clientX,e.clientY);if(hit){grabPointer=e.pointerId;grabPlane=new T.Plane().setFromNormalAndCoplanarPoint(camera.getWorldDirection(new T.Vector3()),hit.point);const ids=[hit.face.a,hit.face.b,hit.face.c],P=gripCollider.geometry.attributes.position,tri=new T.Triangle(...ids.map(i=>new T.Vector3().fromBufferAttribute(P,i))),weights=tri.getBarycoord(hit.point,new T.Vector3()).toArray();productSolver.pick(ids,weights,hit.point.toArray());$('stage').style.cursor='grabbing';$('grabState').textContent='已抓住 · 按住拖动、晃动；松手保留惯性';dirty=true;}return;}
+  pointers.set(e.pointerId,[e.clientX,e.clientY]);};
+ el.onpointermove=e=>{if(grabPointer===e.pointerId&&productSolver?.grab){setRay(e.clientX,e.clientY);const point=raycaster.ray.intersectPlane(grabPlane,new T.Vector3());if(point){point.y=Math.max(8,point.y);productSolver.move(point.toArray());}dirty=true;return;}
+  const old=pointers.get(e.pointerId);if(!old)return;pointers.set(e.pointerId,[e.clientX,e.clientY]);if(pointers.size===2){const[a,b]=[...pointers.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch)distance=Math.max(25,Math.min(3000,distance*pinch/d));pinch=d;}else{yaw-=(e.clientX-old[0])*.006;pitch=Math.max(-1.47,Math.min(1.47,pitch+(e.clientY-old[1])*.005));}dirty=true;};
+ for(const name of['onpointerup','onpointercancel','onlostpointercapture'])el[name]=e=>{pointers.delete(e.pointerId);pinch=0;if(grabPointer===e.pointerId){productSolver.release();grabPointer=null;el.style.cursor=grabMode?'grab':'move';$('grabState').textContent='已松手 · 继续下落与接触，不冻结产品';dirty=true;}};
+ el.addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(25,Math.min(3000,distance*Math.exp(e.deltaY*.001)));dirty=true;},{passive:false});
+ $('grabTool').onclick=()=>{grabMode=!grabMode;$('grabTool').classList.toggle('active',grabMode);el.style.cursor=grabMode?'grab':'move';productSolver?.release();grabPointer=null;$('grabState').textContent=grabMode?'抓手模式：按住皮料任意位置，再拖动；松手抛放':'观察模式：拖动旋转产品';};
+ $('resetProduct').onclick=()=>{productSolver.reset();updateSkin(hero,productSolver);syncGripCollider();updateGrabUI();setView('home');$('grabState').textContent=grabMode?'已归位 · 按住皮料抓起':'已归位';};
+ $('pauseProduct').onclick=()=>{productSolver.active=!productSolver.active;$('pauseProduct').textContent=productSolver.active?'暂停受力':'继续受力';};
+ for(const [id,key]of[['craftChoice','craft'],['ageChoice','age'],['thicknessChoice','thicknessScale']])$(id).onchange=()=>{craftConfig[key]=key==='craft'?$(id).value:Number($(id).value);selectProduct(product);};
+ const rebuildComparison=()=>{const saved={yaw,pitch,distance,target:target.clone(),view};selectProduct(product);yaw=saved.yaw;pitch=saved.pitch;distance=saved.distance;target.copy(saved.target);view=saved.view;dirty=true;};
+ for(const[id,t]of[['tensionLoose',0],['tensionNormal',.8],['tensionTight',1.6]])$(id).onclick=()=>{craftConfig.tension=t;rebuildComparison();};
+ $('responseCompare').onpointerdown=e=>{e.preventDefault();craftConfig.response=false;rebuildComparison();};for(const event of['onpointerup','onpointerleave','onpointercancel'])$('responseCompare')[event]=()=>{if(!craftConfig.response){craftConfig.response=true;rebuildComparison();}};
+ window.addEventListener('keydown',e=>{if(e.key==='Escape'){productSolver?.release();grabPointer=null;}});
+ window.addEventListener('resize',()=>{if(ready&&mode!=='baseline')setView(view);allDirty=dirty=true;});window.addEventListener('scroll',()=>{allDirty=dirty=true;},{passive:true,capture:true});
+}
+async function boot(){initRenderer();createCards();setupUI();library=new AtelierMaterials(renderer,JSON.parse($('scanData').textContent));await library.init((i,n)=>{$('loadingText').textContent=`正在准备三维皮料 ${i} / ${n}`;});selectMaterial('heritage',false);initThumbs();selectProduct('wallet');ready=true;$('busy').hidden=true;render();requestAnimationFrame(loop);
+ window.LEATHER_ATELIER={ready:true,version:VERSION,errors,get mode(){return mode;},get product(){return product;},get material(){return material;},get revision(){return revision;},get physics(){return physState?.report||null;},get physicsTrace(){return physicsTrace;},get physicsPlaying(){return physicsPlaying;},selectProduct,selectMaterial,setLight,setView,switchMode,render,recipe,frameAudit,patternSVG,
+ get productPhysics(){return productSolver?.report();},
+ get config(){return {...craftConfig};},
+ configure:o=>{Object.assign(craftConfig,o);selectProduct(product);},
+ grabTest:async(swing=true)=>{const d=hero.userData.rig.data,q=d.triangles[Math.floor(d.triangles.length*.42)],ids=q.slice(0,3),p=[0,0,0];for(const id of ids)for(let j=0;j<3;j++)p[j]+=productSolver.x[id*3+j]*1000/3;productSolver.pick(ids,[1/3,1/3,1/3],p);const start=productSolver.x.slice();for(let k=0;k<160;k++){productSolver.move([p[0]+(swing?Math.sin(k/20)*55:0),p[1]+Math.min(220,k*2),p[2]+(swing?Math.sin(k/29)*30:0)]);productSolver.step();}const held=productSolver.report();productSolver.release();for(let k=0;k<48;k++)productSolver.step();productSolver.active=false;updateSkin(hero,productSolver);syncGripCollider();dirty=true;render();return{held,released:productSolver.report(),positionsChanged:productSolver.x.some((x,i)=>Math.abs(x-start[i])>.002)};},
+ resetGrab:()=>{productSolver.reset();updateSkin(hero,productSolver);syncGripCollider();dirty=true;render();},
+ audit:()=>productAudit(hero),snapshot:()=>({mode,product,material,light,revision,errors:[...errors],audit:productAudit(hero),thumbs:{materials:materialCards.length,products:productCards.length},config:{...craftConfig},productPhysics:productSolver?.report(),baseline:BASE,sourceCommit:BUILD_INFO.sourceCommit}),pausePhysics:()=>{physicsPlaying=false;},physicsCommand:async(op)=>{physicsPlaying=false;return askWorker(op,op==='step'?{count:4}:{});},advancePhysics:async(steps)=>{physicsPlaying=false;for(let i=0;i<steps;i+=24)await askWorker('step',{count:Math.min(24,steps-i)});return physState.report;}};
+}
+boot().catch(fail);
