@@ -3,8 +3,8 @@ import {sampleContour} from './Contours.mjs';
 const clamp=THREE.MathUtils.clamp,mix=THREE.MathUtils.lerp;
 export const closureWeight=b=>{b=clamp(b,0,1);return b*b*(3-2*b);};
 const smooth=closureWeight;
-/** Use the observed CLOSED-eye scan as the closed outer envelope, not a
- * globe-contact rim offset propagated over the whole patch. No texture fix. */
+/** Use a constrained fit of the observed CLOSED-eye surface as the endpoint,
+ * not a globe-contact rim offset propagated over the whole skin patch. */
 export function prepareClosedSurface(lid,c,sample){
  const cache=new Map();
  c.closedScanMargin=s=>{
@@ -19,7 +19,23 @@ export function prepareClosedSurface(lid,c,sample){
   const x=q.xs+(p.x-(c.x+c.half*q.nx))*w,y=q.ys+(p.y-seam)*w;
   const raw=sample(x,y);target[i*3]=x;target[i*3+1]=y;target[i*3+2]=raw.z;normals.set(raw.n.toArray(),i*3);
  }
- lid.closedSurface={target,normals,source:'same original closed-scan geometry',neuralReconstruction:false};
+ // The captured crease contains overhangs: its frontmost ray samples are
+ // discontinuous. Fair the resampled patch, preserving its seam and face edge,
+ // rather than triangulating those height jumps into a saw-tooth strip.
+ const raw=target.slice(),A=lid.A,R=lid.R,S=A+1;
+ for(let pass=0;pass<48;pass++){
+  const next=target.slice();
+  for(let j=1;j<R;j++)for(let a=0;a<A;a++){
+   const k=j*S+a,t=j/R,w=1-smooth((t-.30)/.44);
+   if(w===0)continue;
+   const z=.40*target[k*3+2]+.15*(target[(j*S+(a+A-1)%A)*3+2]+target[(j*S+(a+1)%A)*3+2]+target[(k-S)*3+2]+target[(k+S)*3+2]);
+   next[k*3+2]=mix(target[k*3+2],z,w);
+  }
+  for(let j=0;j<=R;j++)next[(j*S+A)*3+2]=next[j*S*3+2];target.set(next);
+ }
+ let fitDeviation=0;for(let i=2;i<raw.length;i+=3)fitDeviation=Math.max(fitDeviation,Math.abs(raw[i]-target[i]));
+ const g=lid.mesh.geometry.clone();g.attributes.position.array.set(target);g.computeVertexNormals();normals.set(g.attributes.normal.array);g.dispose();
+ lid.closedSurface={target,raw,normals,fitDeviationMM:fitDeviation*1000,source:'boundary-constrained fair fit of the same closed scan',neuralReconstruction:false};
 }
 /** The inherited fit tested only the inner 0.8r disc. Check the entire
  * observed closed envelope, including peripheral inferior sclera. Move only
@@ -55,10 +71,11 @@ export function repairClosedSurface(rig,e,blink){
  let maximumCorrection=0,minGap=Infinity,penetrations=0,lowerError=0,upperError=0,boundaryError=0;
  for(let i=0;i<P.count;i++){
   const q=lid.entries[i],a=i%stride,w=1-smooth(q.t/.74),before=P.getZ(i);
+  const cs=(q.nx*c.sign+1)*.5,canthal=enabled?1-smooth(Math.min(cs,1-cs)/.14):0,strength=1-(1-b)*(1-canthal);
   let z=before;
-  if(b>0&&q.t>0&&q.t<.74){
+  if(strength>0&&q.t>0&&q.t<.74){
    const restZ=target[i*3+2]+rimDelta[a]*w;
-   z=mix(before,restZ,b);
+   z=mix(before,restZ,strength);
    const eye=rig.eyeFront(c,P.getX(i),P.getY(i));
    if(eye!==null)z=Math.max(z,eye+.00010);
    P.setZ(i,z);
@@ -72,7 +89,30 @@ export function repairClosedSurface(rig,e,blink){
   }
   if(q.t===1)boundaryError=Math.max(boundaryError,Math.hypot(P.getX(i)-q.xs,P.getY(i)-q.ys,P.getZ(i)-q.src.z));
  }
- if(b>0){
+ if(enabled){
+  // Keep the posterior canthal rim near its anterior tissue anchor rather
+  // than stretching a long membrane back to the equator of the globe.
+  const I=lid.inside.geometry.attributes.position,E=lid.edge.geometry.attributes.position;
+  for(let a=0;a<=lid.A;a++){
+   const s=(Math.cos(a/lid.A*Math.PI*2)*c.sign+1)*.5,corner=1-smooth(Math.min(s,1-s)/.16);
+   const offset=Math.max(0,P.getZ(a)-.00020-I.getZ(a))*corner;
+   for(let j=0;j<=lid.ni;j++){const k=j*stride+a;I.setZ(k,I.getZ(k)+offset*(1-smooth(j/(lid.ni*.18))));}
+   for(let j=0;j<=lid.es;j++){
+    const t=j/lid.es,k=a*(lid.es+1)+j;let z=mix(I.getZ(a),P.getZ(a),t)+Math.sin(Math.PI*t)*.000025*(1-blink);
+    const front=rig.eyeFront(c,E.getX(k),E.getY(k));if(front!==null&&j>0&&j<lid.es)z=Math.max(z,front+.000085);E.setZ(k,z);
+   }
+  }
+  I.needsUpdate=true;E.needsUpdate=true;lid.inside.geometry.computeVertexNormals();lid.edge.geometry.computeVertexNormals();
+  if(e.canthus){
+   const C=e.canthus.mesh.geometry.attributes.position;
+   for(let i=0;i<C.count;i++){
+    const x=C.getX(i),y=C.getY(i),nx=clamp((x-c.x)/(c.sign*(c.name==='right'?.0234:.0230)*.5),-1,1);
+    const a=Math.acos(clamp(nx*c.sign,-1,1)),u=rig.margin(c,a,blink),l=rig.margin(c,Math.PI*2-a,blink);
+    const v=Math.abs(u.y-l.y)>1e-8?clamp((y-l.y)/(u.y-l.y),0,1):.5;
+    C.setZ(i,Math.max(C.getZ(i),mix(l.z,u.z,v)-.00014));
+   }
+   C.needsUpdate=true;e.canthus.mesh.geometry.computeVertexNormals();
+  }
   P.needsUpdate=true;lid.mesh.geometry.computeVertexNormals();
   const N=lid.mesh.geometry.attributes.normal,EN=lid.edge.geometry.attributes.normal;
   for(let i=0;i<P.count;i++){
@@ -80,8 +120,6 @@ export function repairClosedSurface(rig,e,blink){
    let x=mix(N.getX(i),q.src.n.x,w),y=mix(N.getY(i),q.src.n.y,w),z=mix(N.getZ(i),q.src.n.z,w),l=Math.hypot(x,y,z)||1;
    N.setXYZ(i,x/l,y/l,z/l);
   }
-  // The closed skin normals follow the same captured surface. Do not average
-  // them with the coincident, internal upper/lower rim sheets at full closure.
   for(let i=0;i<P.count;i++){
    const n=closed.normals;let x=mix(N.getX(i),n[3*i],b),y=mix(N.getY(i),n[3*i+1],b),z=mix(N.getZ(i),n[3*i+2],b),len=Math.hypot(x,y,z)||1;
    N.setXYZ(i,x/len,y/len,z/len);
@@ -92,7 +130,20 @@ export function repairClosedSurface(rig,e,blink){
   }
   N.needsUpdate=true;EN.needsUpdate=true;
  }
- closed.report={enabled,closure:blink,target:closed.source,maximumFrameCorrectionMM:maximumCorrection*1000,fullClosureLowerRestErrorMM:blink===1?lowerError*1000:null,fullClosureUpperRestErrorMM:blink===1?upperError*1000:null,outerBoundaryErrorMM:boundaryError*1000,outerMinGlobeClearanceMM:minGap*1000,outerPenetratingVertices:penetrations,closedRestTargetAvailable:true,volumeConservationClaim:false};
+ closed.report={enabled,closure:blink,target:closed.source,maximumFrameCorrectionMM:maximumCorrection*1000,fullClosureLowerRestErrorMM:blink===1?lowerError*1000:null,fullClosureUpperRestErrorMM:blink===1?upperError*1000:null,outerBoundaryErrorMM:boundaryError*1000,outerMinGlobeClearanceMM:minGap*1000,outerPenetratingVertices:penetrations,closedRestTargetAvailable:true,closedTargetMaxDeviationFromRawScanMM:closed.fitDeviationMM,volumeConservationClaim:false};
  if(e.contactReport){e.contactReport.minOuterClearanceMM=minGap*1000;e.contactReport.penetratingTestVertices=penetrations;e.contactReport.closedRestSurface=closed.report;}
  rig._fittingEye=null;
+}
+/** Extend the already present outer overlap ring past the analytic cut. The
+ * old exact-equality cut left isolated subpixel holes between two differently
+ * tessellated surfaces. This uses real skin triangles, not eye concealment. */
+export function installGrayBoundaryOverlap(rig){
+ for(const e of rig.eyes){
+  const m=e.lid.mesh.material,oldClip=m.userData.stage1Clip;
+  if(!oldClip||!oldClip.includes('>1.000001'))throw Error('Missing gray overlap anchor');
+  const clip=oldClip.replace('>1.000001','>1.010025'),before=m.onBeforeCompile,cache=m.customProgramCacheKey();
+  m.onBeforeCompile=s=>{before(s);s.fragmentShader=s.fragmentShader.replace(oldClip,clip);};
+  m.userData.stage1Clip=clip;m.customProgramCacheKey=()=>cache+'/finite-overlap';
+  m.polygonOffset=true;m.polygonOffsetFactor=-.1;m.polygonOffsetUnits=-.2;m.needsUpdate=true;
+ }
 }
