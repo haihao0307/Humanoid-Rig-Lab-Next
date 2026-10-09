@@ -1,0 +1,67 @@
+name: ET09 stage-two eyelid sections
+on:
+  push:
+    branches: [feature/eye-section-stage2-et09-20261009]
+    paths:
+      - 'skin-quality-lab/emily-transfer/stage2/**'
+      - '.github/workflows/eye-section-stage2-et09.yml'
+permissions:
+  contents: write
+concurrency:
+  group: eye-stage2-et09
+  cancel-in-progress: false
+jobs:
+  stage2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NODE_PATH: /tmp/et09-tools/node_modules
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            skin-quality-lab
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and browser dependencies
+        run: |
+          npm install --prefix /tmp/et09-tools --no-audit --no-fund esbuild@0.25.10 playwright@1.56.1
+          /tmp/et09-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Build from frozen S1.1 without old installers
+        run: node skin-quality-lab/emily-transfer/stage2/build.cjs
+      - name: Geometry and local browser regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/et09-http.log 2>&1 &
+          node skin-quality-lab/emily-transfer/stage2/verify.cjs
+      - name: Fast-forward validated draft branch only
+        run: |
+          git config user.name 'KAOPU Eye Workbench'
+          git config user.email 'kaopu-workbench@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer/app.js skin-quality-lab/emily-transfer/index.html skin-quality-lab/emily-transfer/preview.html skin-quality-lab/emily-transfer/BUILD_MANIFEST.json skin-quality-lab/emily-transfer/stage2
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(eyes): ET09 stage-two gray preview and numerical checks [skip ci]'
+            git push origin HEAD:feature/eye-section-stage2-et09-20261009
+          fi
+      - name: Actual immutable public-page verification
+        run: PUBLIC_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/emily-transfer/stage2/verify.cjs
+      - name: Collect sources and browser evidence
+        if: always()
+        run: |
+          mkdir -p qa-et09
+          git rev-parse HEAD > qa-et09/commit.txt
+          python3 - <<'PY'
+          import pathlib,zipfile
+          root=pathlib.Path('skin-quality-lab/emily-transfer')
+          with zipfile.ZipFile('qa-et09/changed-source.zip','w',zipfile.ZIP_DEFLATED) as z:
+            for p in list((root/'stage2').rglob('*'))+[root/n for n in ['app.js','index.html','preview.html','BUILD_MANIFEST.json']]:
+              if p.is_file():z.write(p,str(p))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et09-stage2-${{ github.run_number }}
+          path: qa-et09/
+          retention-days: 14
