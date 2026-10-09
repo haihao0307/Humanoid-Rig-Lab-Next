@@ -19,9 +19,8 @@ export function prepareClosedSurface(lid,c,sample){
   const x=q.xs+(p.x-(c.x+c.half*q.nx))*w,y=q.ys+(p.y-seam)*w;
   const raw=sample(x,y);target[i*3]=x;target[i*3+1]=y;target[i*3+2]=raw.z;normals.set(raw.n.toArray(),i*3);
  }
- // The captured crease contains overhangs: its frontmost ray samples are
- // discontinuous. Fair the resampled patch, preserving its seam and face edge,
- // rather than triangulating those height jumps into a saw-tooth strip.
+ // Frontmost ray samples through the captured overhang are discontinuous.
+ // Fair their resampling while preserving the seam and surrounding face.
  const raw=target.slice(),A=lid.A,R=lid.R,S=A+1;
  for(let pass=0;pass<48;pass++){
   const next=target.slice();
@@ -37,9 +36,8 @@ export function prepareClosedSurface(lid,c,sample){
  const g=lid.mesh.geometry.clone();g.attributes.position.array.set(target);g.computeVertexNormals();normals.set(g.attributes.normal.array);g.dispose();
  lid.closedSurface={target,raw,normals,fitDeviationMM:fitDeviation*1000,source:'boundary-constrained fair fit of the same closed scan',neuralReconstruction:false};
 }
-/** The inherited fit tested only the inner 0.8r disc. Check the entire
- * observed closed envelope, including peripheral inferior sclera. Move only
- * the minimum necessary depth; never change the radius or XY centre. */
+/** Check the full observed closed envelope, not only the central 0.8r disc.
+ * Move only the minimum necessary depth; do not change radius or XY centre. */
 export function fitClosedEnvelope(rig){
  for(const e of rig.eyes){
   if(e.closedDepthFit)continue;
@@ -93,7 +91,11 @@ export function repairClosedSurface(rig,e,blink){
   const I=lid.inside.geometry.attributes.position,E=lid.edge.geometry.attributes.position;
   for(let a=0;a<=lid.A;a++){
    const s=(Math.cos(a/lid.A*Math.PI*2)*c.sign+1)*.5,corner=1-smooth(Math.min(s,1-s)/.16);
-   const offset=Math.max(0,P.getZ(a)-.00020-I.getZ(a))*corner;
+   // Leaving the posterior edge on the globe while the front edge closes to
+   // the scan stretches a dark ribbon under the eyelid. Follow the front edge
+   // with a bounded exposed gauge, then return deeper rows to globe contact.
+   const upper=Math.sin(a/lid.A*Math.PI*2)>=0,gauge=mix(upper?.00045:.00022,.00016,corner);
+   const offset=Math.max(0,P.getZ(a)-gauge-I.getZ(a));
    for(let j=0;j<=lid.ni;j++){const k=j*stride+a;I.setZ(k,I.getZ(k)+offset*(1-smooth(j/(lid.ni*.18))));}
    for(let j=0;j<=lid.es;j++){
     const t=j/lid.es,k=a*(lid.es+1)+j;let z=mix(I.getZ(a),P.getZ(a),t)+Math.sin(Math.PI*t)*.000025*(1-blink);
@@ -120,8 +122,6 @@ export function repairClosedSurface(rig,e,blink){
   }
   for(let i=0;i<P.count;i++){
    const n=closed.normals;let x=mix(N.getX(i),n[3*i],b),y=mix(N.getY(i),n[3*i+1],b),z=mix(N.getZ(i),n[3*i+2],b),len=Math.hypot(x,y,z)||1;
-   // Lock the surrounding face normals after the closed-target blend. This
-   // prevents a circular lighting seam at the preserved facial boundary.
    const q=lid.entries[i],w=smooth((q.t-.70)/.25);
    x=mix(x/len,q.src.n.x,w);y=mix(y/len,q.src.n.y,w);z=mix(z/len,q.src.n.z,w);len=Math.hypot(x,y,z)||1;
    N.setXYZ(i,x/len,y/len,z/len);
@@ -132,7 +132,9 @@ export function repairClosedSurface(rig,e,blink){
   }
   N.needsUpdate=true;EN.needsUpdate=true;
  }
- closed.report={enabled,closure:blink,target:closed.source,maximumFrameCorrectionMM:maximumCorrection*1000,fullClosureLowerRestErrorMM:blink===1?lowerError*1000:null,fullClosureUpperRestErrorMM:blink===1?upperError*1000:null,outerBoundaryErrorMM:boundaryError*1000,outerMinGlobeClearanceMM:minGap*1000,outerPenetratingVertices:penetrations,closedRestTargetAvailable:true,closedTargetMaxDeviationFromRawScanMM:closed.fitDeviationMM,volumeConservationClaim:false};
+ let maxMarginGauge=0;const inner=lid.inside.geometry.attributes.position;
+ for(let a=0;a<=lid.A;a++)maxMarginGauge=Math.max(maxMarginGauge,P.getZ(a)-inner.getZ(a));
+ closed.report={maxMarginAxialThicknessMM:maxMarginGauge*1000,enabled,closure:blink,target:closed.source,maximumFrameCorrectionMM:maximumCorrection*1000,fullClosureLowerRestErrorMM:blink===1?lowerError*1000:null,fullClosureUpperRestErrorMM:blink===1?upperError*1000:null,outerBoundaryErrorMM:boundaryError*1000,outerMinGlobeClearanceMM:minGap*1000,outerPenetratingVertices:penetrations,closedRestTargetAvailable:true,closedTargetMaxDeviationFromRawScanMM:closed.fitDeviationMM,volumeConservationClaim:false};
  if(e.contactReport){e.contactReport.minOuterClearanceMM=minGap*1000;e.contactReport.penetratingTestVertices=penetrations;e.contactReport.closedRestSurface=closed.report;}
  rig._fittingEye=null;
 }

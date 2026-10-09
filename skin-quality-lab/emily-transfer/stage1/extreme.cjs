@@ -1,5 +1,4 @@
-// Regression for the user's steep under-eye camera, beyond the older mild
-// low-angle preset. Runs against source and actual immutable public entry.
+// User-like steep under-eye regression, on source and immutable public entry.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{chromium}=require('playwright');
 const commit=process.env.PUBLIC_COMMIT;if(commit&&!/^[0-9a-f]{40}$/.test(commit))throw Error('Invalid immutable public commit');
 const url=commit?'https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+commit+'/skin-quality-lab/emily-transfer/preview.html':'http://127.0.0.1:8765/skin-quality-lab/emily-transfer/index.html';
@@ -18,7 +17,7 @@ const check=(name,pass,data)=>{r.checks.push({name,pass:!!pass,data});assert(pas
  for(const closure of [0,.25,.5,.75,.9,.98,1]){
   await p.evaluate(v=>{__STAGE1__.pose(v);__SKIN_LAB__.render();},closure);
   const id=await p.evaluate(()=>__STAGE1__.globePixels()),surfaces=await p.evaluate(()=>__STAGE1__.closedSurface());r.transition.push({closure,id,surfaces});
-  check('finite collision-free outer vertices / '+closure,surfaces.eyes.every(e=>e.outerPenetratingVertices===0),surfaces);
+  check('collision-free surface and bounded rim gauge / '+closure,surfaces.eyes.every(e=>e.outerPenetratingVertices===0&&e.maxMarginAxialThicknessMM<=.451),surfaces);
   if(closure===0)check('under-view detector sees open globe',id.visibleGlobePixels>100,id);
   if(closure===1)check('under-view fully closed without hiding eyes',id.visibleGlobePixels===0&&!id.eyeObjectsHidden,id);
   await p.screenshot({path:out+'/'+tag+'-closure-'+closure+'.png'});
