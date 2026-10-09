@@ -6,12 +6,12 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: et071-natural-${{ github.ref }}
+  group: et072-natural-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 26
+    timeout-minutes: 28
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,24 +24,30 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Prepare browser and bundler
+      - name: Prepare browser, bundler and reproducible image tools
         run: |
           npm install --prefix /tmp/et07-tools --no-audit --no-fund esbuild@0.25.11 playwright@1.56.1 pngjs@7.0.0
           /tmp/et07-tools/node_modules/.bin/playwright install chromium
+          python3 -m pip install --target /tmp/et07-python numpy==2.2.6 pillow==11.3.0 opencv-python-headless==4.11.0.86
           timeout 60s sudo apt-get install --no-install-recommends -y fonts-wqy-zenhei || true
-      - name: Build natural tissue candidate
+      - name: Build same-subject repair and natural tissue candidate
         env:
           NODE_PATH: /tmp/et07-tools/node_modules
+          PYTHONPATH: /tmp/et07-python
           ASSET_COMMIT: ${{ github.sha }}
         run: |
           if ! grep -q "VERSION='emily-transfer/7\." skin-quality-lab/emily-transfer/app.js; then
             node skin-quality-lab/emily-transfer/natural/install.cjs
           fi
-          node skin-quality-lab/emily-transfer/natural/polish.cjs
+          if grep -q "VERSION='emily-transfer/7.0.0'" skin-quality-lab/emily-transfer/app.js; then
+            node skin-quality-lab/emily-transfer/natural/polish.cjs
+          fi
+          python3 skin-quality-lab/emily-transfer/natural/repair_atlas.py
+          node skin-quality-lab/emily-transfer/natural/install-repair.cjs
           node skin-quality-lab/emily-transfer/anatomy/bundle.cjs
           git diff --exit-code -- skin-quality-lab/r01 skin-quality-lab/r02
           node skin-quality-lab/emily-transfer/talkinghead/test-kernel.mjs
-      - name: Actual multi-view and isolated-component visual evidence
+      - name: Actual macro views and source-mark comparison
         env:
           NODE_PATH: /tmp/et07-tools/node_modules
           EVIDENCE_DIR: /tmp/et07/visual
@@ -55,10 +61,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: et071-early-visual-review
+          name: et072-early-visual-review
           path: /tmp/et07
           retention-days: 14
-      - name: 45 poses, canthal contacts, shared normals and skin identity
+      - name: 45 poses, tissue contacts and actual held-comparison pixels
         env:
           NODE_PATH: /tmp/et07-tools/node_modules
           EVIDENCE_DIR: /tmp/et07/local
@@ -71,7 +77,7 @@ jobs:
           cp /tmp/et07/local/report.json skin-quality-lab/emily-transfer/natural/qa-report.json
           git add skin-quality-lab/emily-transfer
           if ! git diff --cached --quiet; then
-            git commit -m 'build(eyes): ET07.1 skin frequencies and canthal acceptance [skip ci]'
+            git commit -m 'build(eyes): ET07.2 capture-mark repair and tested natural tissue [skip ci]'
             git push origin HEAD:fix/eye-envelope-takeover-et06-20261009
           fi
           git rev-parse HEAD | tee /tmp/et07/PUBLISHED_COMMIT.txt
@@ -86,6 +92,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: et071-complete-browser-evidence
+          name: et072-complete-browser-evidence
           path: /tmp/et07
           retention-days: 14
