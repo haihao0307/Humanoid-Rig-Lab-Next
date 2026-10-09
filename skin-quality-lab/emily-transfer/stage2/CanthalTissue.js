@@ -11,7 +11,9 @@ function patch(name,U,V,reverse=false){
  const mesh=new THREE.Mesh(g,mat);mesh.name=name;mesh.frustumCulled=false;return {mesh,U,V};
 }
 export function createCanthalTissue(rig,e){
- const medial=patch('ET09-shared-medial-lake-caruncle-plica-'+e.c.name,24,24,e.c.sign<0),lateral=patch('ET09-rounded-temporal-commissure-'+e.c.name,9,12,e.c.sign>0);
+ // Twenty-four angular rows span about 2.1 mm at the temporal corner. The old
+ // nine-row patch covered only 0.3 mm and did not reach the contact interface.
+ const medial=patch('ET09-shared-medial-lake-caruncle-plica-'+e.c.name,24,24,e.c.sign<0),lateral=patch('ET09-rounded-temporal-commissure-'+e.c.name,24,24,e.c.sign>0);
  rig.group.add(medial.mesh,lateral.mesh);return {medial,lateral};
 }
 export function updateCanthalTissue(rig,e,closure){
@@ -38,7 +40,11 @@ export function updateCanthalTissue(rig,e,closure){
      const foldCentre=.64+.040*Math.sin(Math.PI*v),fold=.00065*Math.exp(-Math.pow((q-foldCentre)/.08,2))*support;
      z+=-recess+car+fold;zone=fold>car&&fold>.00003?3:car>.000025?2:1;
      caruncleRelief=Math.max(caruncleRelief,car);plicaRelief=Math.max(plicaRelief,fold);
-    }else{z+=.000065*Math.sin(Math.PI*u)*edge*open;zone=4;}
+    }else{
+     const q=(1-Math.cos(i/A*Math.PI*2))/(1-Math.cos(U/A*Math.PI*2)),front=rig.eyeFront(c,x,y),band=Math.pow(Math.sin(Math.PI*v),1.45);
+     if(front!==null)z=lerp(z,front+.000085,smooth(q)*band*open);
+     z+=.00010*Math.pow(Math.sin(Math.PI*q),2)*band*open;zone=4;
+    }
     const front=rig.eyeFront(c,x,y);
     if(front!==null&&j>0&&j<V)z=Math.max(z,front+.000085);
     if(j===0){x=top.x;y=top.y;z=top.z;}if(j===V){x=bottom.x;y=bottom.y;z=bottom.z;}P.setXYZ(k,x,y,z);regions.setX(k,zone);
@@ -50,5 +56,5 @@ export function updateCanthalTissue(rig,e,closure){
   P.needsUpdate=true;regions.needsUpdate=true;mesh.geometry.computeVertexNormals();mesh.visible=closure<.9999;
  }
  e.canthus.mesh.visible=false;
- section.canthalReport={maxAttachmentErrorMM:seams*1000,minimumGlobeGapMM:minGap*1000,penetratingVertices:penetrations,nonfiniteVertices:nonfinite,caruncleReliefMM:caruncleRelief*1000,plicaReliefMM:plicaRelief*1000,caruncleVsAttachmentPlaneMM:caruncleActual*1000,plicaVsAttachmentPlaneMM:plicaActual*1000,lakeRecessBelowAttachmentPlaneMM:lakeActual*1000,oneMedialIndexedSurface:true,independentCaruncleObject:false,temporalCommissure:true,medialTriangles:section.medial.mesh.geometry.index.count/3,lateralTriangles:section.lateral.mesh.geometry.index.count/3};rig._fittingEye=null;
+ section.canthalReport={maxAttachmentErrorMM:seams*1000,minimumGlobeGapMM:minGap*1000,penetratingVertices:penetrations,nonfiniteVertices:nonfinite,caruncleReliefMM:caruncleRelief*1000,plicaReliefMM:plicaRelief*1000,caruncleVsAttachmentPlaneMM:caruncleActual*1000,plicaVsAttachmentPlaneMM:plicaActual*1000,lakeRecessBelowAttachmentPlaneMM:lakeActual*1000,oneMedialIndexedSurface:true,independentCaruncleObject:false,temporalCommissure:true,temporalJoinSpanMM:Math.abs(section.lateral.mesh.geometry.attributes.position.getX(Math.round(section.lateral.V/2))-section.lateral.mesh.geometry.attributes.position.getX(section.lateral.U*(section.lateral.V+1)+Math.round(section.lateral.V/2)))*1000,medialTriangles:section.medial.mesh.geometry.index.count/3,lateralTriangles:section.lateral.mesh.geometry.index.count/3};rig._fittingEye=null;
 }
