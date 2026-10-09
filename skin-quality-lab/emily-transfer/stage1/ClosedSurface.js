@@ -90,8 +90,6 @@ export function repairClosedSurface(rig,e,blink){
   if(q.t===1)boundaryError=Math.max(boundaryError,Math.hypot(P.getX(i)-q.xs,P.getY(i)-q.ys,P.getZ(i)-q.src.z));
  }
  if(enabled){
-  // Keep the posterior canthal rim near its anterior tissue anchor rather
-  // than stretching a long membrane back to the equator of the globe.
   const I=lid.inside.geometry.attributes.position,E=lid.edge.geometry.attributes.position;
   for(let a=0;a<=lid.A;a++){
    const s=(Math.cos(a/lid.A*Math.PI*2)*c.sign+1)*.5,corner=1-smooth(Math.min(s,1-s)/.16);
@@ -122,6 +120,10 @@ export function repairClosedSurface(rig,e,blink){
   }
   for(let i=0;i<P.count;i++){
    const n=closed.normals;let x=mix(N.getX(i),n[3*i],b),y=mix(N.getY(i),n[3*i+1],b),z=mix(N.getZ(i),n[3*i+2],b),len=Math.hypot(x,y,z)||1;
+   // Lock the surrounding face normals after the closed-target blend. This
+   // prevents a circular lighting seam at the preserved facial boundary.
+   const q=lid.entries[i],w=smooth((q.t-.70)/.25);
+   x=mix(x/len,q.src.n.x,w);y=mix(y/len,q.src.n.y,w);z=mix(z/len,q.src.n.z,w);len=Math.hypot(x,y,z)||1;
    N.setXYZ(i,x/len,y/len,z/len);
   }
   for(let a=0;a<=lid.A;a++){
@@ -134,9 +136,7 @@ export function repairClosedSurface(rig,e,blink){
  if(e.contactReport){e.contactReport.minOuterClearanceMM=minGap*1000;e.contactReport.penetratingTestVertices=penetrations;e.contactReport.closedRestSurface=closed.report;}
  rig._fittingEye=null;
 }
-/** Extend the already present outer overlap ring past the analytic cut. The
- * old exact-equality cut left isolated subpixel holes between two differently
- * tessellated surfaces. This uses real skin triangles, not eye concealment. */
+/** Use the already present finite outer overlap ring, not an eye mask. */
 export function installGrayBoundaryOverlap(rig){
  for(const e of rig.eyes){
   const m=e.lid.mesh.material,oldClip=m.userData.stage1Clip;
@@ -146,4 +146,7 @@ export function installGrayBoundaryOverlap(rig){
   m.userData.stage1Clip=clip;m.customProgramCacheKey=()=>cache+'/finite-overlap';
   m.polygonOffset=true;m.polygonOffsetFactor=-.1;m.polygonOffsetUnits=-.2;m.needsUpdate=true;
  }
+ const button=document.createElement('button');button.id='s1UnderView';button.className='s1-primary';button.textContent='深仰视角 / 检查闭合';
+ button.onclick=()=>{window.__SKIN_LAB__.setView([-.004,-.046,.152],[-.004,.069,.069]);window.__SKIN_LAB__.render();};
+ document.getElementById('s1ClosedCheck').after(button);window.__STAGE1__.underView=button.onclick;
 }
