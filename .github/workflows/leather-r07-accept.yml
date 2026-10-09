@@ -1,0 +1,96 @@
+name: Leather R07 sewing and grip
+on:
+  push:
+    branches: [feature/leather-sewn-grab-r07-20261009]
+    paths:
+      - leather-workshop/r07/site/**
+      - leather-workshop/r07/*.py
+      - .github/workflows/leather-r07-accept.yml
+permissions:
+  contents: write
+concurrency:
+  group: leather-r07-sewn-grip
+  cancel-in-progress: true
+jobs:
+  acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/leather-sewn-grab-r07-20261009
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Protect R01-R06 and expand new runtime source
+        run: |
+          git fetch --depth=1 origin 1b85084f13a67773dd3b9c1b1b7c73b56f3bb6dc
+          git diff --exit-code 1b85084f13a67773dd3b9c1b1b7c73b56f3bb6dc -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/anchors
+          python leather-workshop/r07/bootstrap_runtime.py
+          python - <<'PY'
+          from pathlib import Path
+          for name in ['source00.b64','source01.b64','source02.b64']:
+            p=Path('leather-workshop/r07/transport')/name
+            if p.exists():p.unlink()
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r07
+          if ! git diff --cached --quiet; then
+            git commit -m "feat(leather-r07): expand readable runtime and discard unused invalid transfer fragments"
+            git push origin HEAD:refs/heads/feature/leather-sewn-grab-r07-20261009
+          fi
+          echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Installed Chrome and bounded dependencies
+        timeout-minutes: 5
+        run: |
+          pip --disable-pip-version-check install --timeout 35 --retries 2 pillow numpy playwright==1.55.0
+          CHROME=$(command -v google-chrome || command -v chromium)
+          test -x "$CHROME"
+          echo "KAOPU_CHROMIUM_EXECUTABLE=$CHROME" >> "$GITHUB_ENV"
+          if [ -z "$(fc-list :lang=zh)" ]; then
+            mkdir -p "$HOME/.local/share/fonts"
+            curl -fL --connect-timeout 15 --max-time 90 --retry 1 https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf -o "$HOME/.local/share/fonts/NotoSansCJKsc-Regular.otf"
+            fc-cache -f
+          fi
+      - name: Build standalone with inherited source hashes
+        run: python leather-workshop/r07/build.py
+      - name: Real standalone sewing and grip acceptance
+        run: python leather-workshop/r07/qa.py
+      - name: Publish only the validated new candidate
+        run: |
+          git diff --exit-code 1b85084f13a67773dd3b9c1b1b7c73b56f3bb6dc -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/anchors
+          git add leather-workshop/r07/public-lite.html leather-workshop/r07/BUILD_MANIFEST.json leather-workshop/r07/qa/local/browser.json
+          git commit -m "build(leather-r07): candidate from ${SOURCE_SHA} with standalone browser checks"
+          git push origin HEAD:refs/heads/feature/leather-sewn-grab-r07-20261009
+          SHA=$(git rev-parse HEAD)
+          echo "BUILD_SHA=$SHA" >> "$GITHUB_ENV"
+          echo "PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${SHA}/leather-workshop/r07/public-lite.html" >> "$GITHUB_ENV"
+      - name: Real fixed public browser acceptance
+        run: python leather-workshop/r07/qa.py --public --url "$PUBLIC_URL"
+      - name: Exact delivery receipt
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          r=Path('leather-workshop/r07')
+          local=json.loads((r/'qa/local/browser.json').read_text());public=json.loads((r/'qa/public/browser.json').read_text());assert local['pass'] and public['pass']
+          data={'sourceCommit':os.environ['SOURCE_SHA'],'buildCommit':os.environ['BUILD_SHA'],'url':os.environ['PUBLIC_URL'],'workflowRun':os.environ['GITHUB_RUN_ID'],'localPassed':True,'publicPassed':True,'localChecks':len(local['checks']),'publicChecks':len(public['checks']),'mobile':'390x844 viewport simulation; not phone hardware','visualAcceptance':'PENDING_USER','calibration':False,'collisionLimit':'particle-level contacts, not continuous triangle collision','threadPhysicsLimit':'R05 local contact; full friction/tension propagation not solved'}
+          (r/'DELIVERY_RECEIPT.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n');(r/'PUBLIC_URL.txt').write_text(os.environ['PUBLIC_URL']+'\n')
+          PY
+          git add leather-workshop/r07/qa/public/browser.json leather-workshop/r07/DELIVERY_RECEIPT.json leather-workshop/r07/PUBLIC_URL.txt
+          git commit -m "test(leather-r07): exact public candidate browser receipt"
+          git push origin HEAD:refs/heads/feature/leather-sewn-grab-r07-20261009
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r07-evidence-${{ github.run_id }}
+          path: leather-workshop/r07/
+          retention-days: 7
