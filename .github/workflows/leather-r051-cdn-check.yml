@@ -1,0 +1,55 @@
+name: Leather R05.1 - native CDN public entry check
+on:
+  push:
+    branches: [fix/leather-sewing-r051-20261009]
+    paths: [.github/workflows/leather-r051-cdn-check.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          pip install -q playwright==1.55.0 pillow
+          python -m playwright install --with-deps chromium
+      - name: Test direct CDN HTML, no HTMLPreview intermediary
+        env:
+          URL: https://cdn.jsdelivr.net/gh/haihao0307/Humanoid-Rig-Lab-Next@7ec1f5372073357bfa3ca3f5df763267d5e471b2/leather-workshop/r05/preview.html
+        run: |
+          mkdir -p evidence
+          python - <<'PY'
+          import json,os,time
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          url=os.environ['URL']; out={'url':url,'errors':[]}
+          with sync_playwright() as p:
+            b=p.chromium.launch(headless=True,args=['--enable-unsafe-swiftshader','--use-angle=swiftshader'])
+            page=b.new_page(viewport={'width':1440,'height':1000})
+            page.on('pageerror',lambda e:out['errors'].append(str(e)))
+            page.on('console',lambda m:out['errors'].append(m.text) if m.type=='error' else None)
+            response=page.goto(url,wait_until='domcontentloaded',timeout=120000)
+            out['status']=response.status if response else None
+            out['contentType']=response.headers.get('content-type') if response else None
+            out['title']=page.title()
+            page.wait_for_function('window.LEATHER_SEWING?.ready',timeout=120000)
+            page.wait_for_timeout(1000)
+            out['version']=page.evaluate('LEATHER_SEWING.version')
+            out['bodyBackground']=page.evaluate('getComputedStyle(document.body).backgroundColor')
+            out['canvas']=page.locator('#view').bounding_box()
+            out['pass']=out['version']=='R05.1' and not out['errors'] and out['canvas']['width']>500
+            page.screenshot(path='evidence/jsdelivr-direct.png',full_page=True)
+            b.close()
+          Path('evidence/result.json').write_text(json.dumps(out,indent=2,ensure_ascii=False))
+          print(json.dumps(out,ensure_ascii=False))
+          if not out['pass']: raise SystemExit(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r051-native-cdn-check
+          path: evidence
+          retention-days: 14
