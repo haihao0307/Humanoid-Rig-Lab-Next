@@ -1,15 +1,15 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {chromium}=require('playwright'),{PNG}=require('pngjs');
-const sha=process.env.PUBLIC_COMMIT,out=process.env.EVIDENCE_DIR||'/tmp/et04-public';
+const sha=process.env.PUBLIC_COMMIT,out=process.env.EVIDENCE_DIR||'/tmp/et05-public';
 if(!/^[0-9a-f]{40}$/.test(sha||''))throw Error('Public commit must be immutable');fs.mkdirSync(out,{recursive:true});
 const url='https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+sha+'/skin-quality-lab/emily-transfer/preview.html';
-const report={version:'ET04',publicCommit:sha,url,localServer:false,networkInterception:false,physicalMobileDevice:false,backend:'Chromium / SwiftShader',errors:[],consoleErrors:[],failedRequests:[],checks:{}};let browser,page;
+const report={version:'ET05',publicCommit:sha,url,localServer:false,networkInterception:false,physicalMobileDevice:false,backend:'Chromium / SwiftShader',errors:[],consoleErrors:[],failedRequests:[],checks:{}};let browser,page;
 function diff(a,b){a=PNG.sync.read(a);b=PNG.sync.read(b);assert.equal(a.width,b.width);let sum=0;for(let i=0;i<a.data.length;i+=4)for(let j=0;j<3;j++)sum+=Math.abs(a.data[i+j]-b.data[i+j]);return sum/(a.width*a.height*3);}
 (async()=>{
  browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});page=await browser.newPage({viewport:{width:1440,height:1040},deviceScaleFactor:1});page.setDefaultTimeout(60000);
  await page.addInitScript(()=>{window.__EYE_QA_FREEZE__=true;});page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push(m.text());});page.on('requestfailed',r=>report.failedRequests.push({url:r.url(),error:r.failure()?.errorText}));
  await page.goto(url,{waitUntil:'domcontentloaded',timeout:90000});await page.waitForFunction(()=>window.__SKIN_LAB__?.state.ready&&window.__TALKINGHEAD__,{},{timeout:180000});
- assert.equal(await page.evaluate(()=>__SKIN_LAB__.state.version),'emily-transfer/4.0.0');assert.equal(await page.evaluate(()=>__EYES__.version),'eyes/4.0.0');assert.equal(await page.locator('canvas').count(),1);
+ assert.equal(await page.evaluate(()=>__SKIN_LAB__.state.version),'emily-transfer/5.0.0');assert.equal(await page.evaluate(()=>__EYES__.version),'eyes/5.0.0');assert.equal(await page.locator('canvas').count(),1);
  async function canvas(){await page.evaluate(()=>__SKIN_LAB__.render());return Buffer.from((await page.evaluate(()=>document.querySelector('#viewport canvas').toDataURL('image/png'))).split(',')[1],'base64');}
  async function shot(name){const bytes=await canvas();fs.writeFileSync(out+'/'+name+'-canvas.png',bytes);await page.screenshot({path:out+'/'+name+'.png'});return bytes;}
  await shot('01-public-portrait');await page.click('[data-camera="eyes"]');await page.evaluate(()=>{__TALKINGHEAD__.set({headMotion:false});__EYES__.set({manualBlink:0,autoBlink:false});__EYES__.step(0,true);});const open=await shot('02-public-eyes');
@@ -22,5 +22,5 @@ function diff(a,b){a=PNG.sync.read(a);b=PNG.sync.read(b);assert.equal(a.width,b.
  // Verify the page's own loop resumes and calls the actual extracted code.
  const previous=await page.evaluate(()=>__TALKINGHEAD__.info().upstreamSteps);await page.evaluate(()=>{window.__EYE_QA_FREEZE__=false;});await page.waitForFunction(n=>__TALKINGHEAD__.info().upstreamSteps>n+1,previous,{timeout:45000});await page.evaluate(()=>{window.__EYE_QA_FREEZE__=true;});report.checks.hostLoopAdvancesNativeCode=true;
  report.runtime=await page.evaluate(()=>__TALKINGHEAD__.info());assert.deepEqual(report.errors,[]);assert.deepEqual(report.consoleErrors,[]);assert.deepEqual(report.failedRequests,[]);report.passed=true;
- fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));fs.writeFileSync(out+'/OPEN_WEBSITE.txt',url);console.log('ET04_PUBLIC_PASS',JSON.stringify(report));
+ fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));fs.writeFileSync(out+'/OPEN_WEBSITE.txt',url);console.log('ET05_PUBLIC_PASS',JSON.stringify(report));
 })().catch(async e=>{report.passed=false;report.failure=e.stack||String(e);fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));console.error(e);if(page)await page.screenshot({path:out+'/failure.png',timeout:30000}).catch(()=>{});process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();});
