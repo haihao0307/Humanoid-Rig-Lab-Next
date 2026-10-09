@@ -19,7 +19,7 @@ export function createSectionReview(host,gray){
    const points=data[k].map(p=>new THREE.Vector3(...p));const m=new THREE.LineBasicMaterial({color:k.includes('Mucosa')?0x8d9298:0xffffff,depthTest:false,transparent:true,opacity:.9});const o=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),m);o.renderOrder=10;lines.add(o);
   }
  };
- const refresh=()=>{const r=rig.sectionReport();document.getElementById('s2Report').textContent=JSON.stringify(r,null,2);document.getElementById('s2Status').textContent=(r.enabled?'ET09 第二阶段':'ET08-S1.1 修改前')+' · 闭合 '+Math.round(rig.config.manualBlink*100)+'% · 原眼裂与眼球标定保留';refreshLines();requestRender();return r;};
+ const refresh=()=>{const r=rig.sectionReport();document.getElementById('s2Report').textContent=JSON.stringify(r,null,2);document.getElementById('s2Status').textContent=(r.enabled?'ET09 第二阶段':'ET08-S1.1 修改前')+' · 闭合 '+Math.round(rig.config.manualBlink*100)+'% · 眼裂 XY 与眼球标定保留';refreshLines();requestRender();return r;};
  const compare=on=>{rig.compareStage1(on);document.getElementById('s2Compare').classList.toggle('active',!!on);return refresh();};
  const pose=(b,angles={})=>{rig.closedRestEnabled=true;rig.contourBaseline=false;rig.setInspectionPose(b,angles);gray.refresh();return refresh();};
  const view=v=>{

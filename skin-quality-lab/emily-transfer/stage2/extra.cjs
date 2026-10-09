@@ -14,7 +14,12 @@ function check(name,pass,detail){report.checks.push({name,pass:!!pass,detail});a
   check('closure '+b+' inspection does not mutate pose metrics',r.diagnosticsNonMutating);
   for(const e of r.surface.eyes)for(const t of e.stage2SurfaceTests||[])check('closure '+b+' '+e.name+' '+t.name+' triangle surface',t.samples>0&&t.penetrations===0,t);
   check('closure '+b+' fixed XY eye slit',Math.abs(r.outline.eyes[0].widthMM-23.4)<1e-8&&Math.abs(r.outline.eyes[1].widthMM-23)<1e-8);
-  if(b===0)for(const e of r.section.eyes){check(e.name+' lake meets numerical contact interface',e.canthus.minimumGlobeGapMM>=.08&&e.canthus.minimumGlobeGapMM<=.09,e.canthus);check(e.name+' limited open canthal depth smoothing',e.maxOpenCanthalDepthCorrectionMM<1.1,e.maxOpenCanthalDepthCorrectionMM);}
+  if(b===0)for(const e of r.section.eyes){
+   check(e.name+' lake meets numerical contact interface',e.canthus.minimumGlobeGapMM>=.08&&e.canthus.minimumGlobeGapMM<=.09,e.canthus);
+   check(e.name+' limited open canthal depth smoothing',e.maxOpenCanthalDepthCorrectionMM<1.1,e.maxOpenCanthalDepthCorrectionMM);
+   const t=e.canthus;
+   check(e.name+' actual low caruncle, plica and recessed lake',t.caruncleVsAttachmentPlaneMM>.20&&t.caruncleVsAttachmentPlaneMM<.8&&t.plicaVsAttachmentPlaneMM>.15&&t.plicaVsAttachmentPlaneMM<.7&&t.lakeRecessBelowAttachmentPlaneMM<-.03&&t.lakeRecessBelowAttachmentPlaneMM>-.35,{caruncle:t.caruncleVsAttachmentPlaneMM,plica:t.plicaVsAttachmentPlaneMM,lake:t.lakeRecessBelowAttachmentPlaneMM,units:'mm relative to local upper/lower attachment interpolation; not clinical data'});
+  }
   if(b===1)check('full closure no new canthal depth correction',r.section.eyes.every(e=>e.maxOpenCanthalDepthCorrectionMM===0&&e.completeClosedSurfaceDeltaMM===0));
  }
  await p.evaluate(()=>{__STAGE2__.pose(0);__STAGE2__.view('front');});
