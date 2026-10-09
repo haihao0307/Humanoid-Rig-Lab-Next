@@ -42,6 +42,7 @@ jobs:
       - name: Apply reviewed fixes to authoritative new source
         run: |
           python leather-workshop/r06/review/refine-01.py
+          python leather-workshop/r06/review/refine-02.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add leather-workshop/r06/site leather-workshop/r06/qa.py
