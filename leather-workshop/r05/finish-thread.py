@@ -1,5 +1,6 @@
-"""R05-only fibre finish from macro review. Expanded source is authoritative."""
+"""R05-only fibre finish and needle/framing review. Expanded source is authoritative."""
 from pathlib import Path
+import subprocess
 r=Path(__file__).resolve().parent
 fibre='''export function fibreNormalTexture(){
  const w=256,h=128,a=new Uint8Array(w*h*4),colour=new Uint8Array(w*h*4);
@@ -18,8 +19,19 @@ s=s[:s.index('export function fibreNormalTexture()')]+fibre;s=s.replace('1+.025*
 p=r/'site/runtime.js';s=p.read_text()
 for old,new in [
  ('normalMap:fibre,normalScale:new T.Vector2(.10,.10)','map:plies?fibre.userData.albedo:null,normalMap:plies?fibre:null,normalScale:new T.Vector2(.65,.65)'),
- ("for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);", "for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);m.color.multiplyScalar(w.layer===0?1.06:.86);")]:
- if new in s:continue
- assert s.count(old)==1,old;s=s.replace(old,new)
+ ("for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);", "for(const w of data.walls){const m=surfaceMat('cut'),obj=new T.Mesh(w.geometry,m);m.color.multiplyScalar(w.layer===0?1.06:.86);"),
+ ('Math.max(92,model.width*1.50)','Math.max(110,model.width*1.85)'),
+ ('Math.max(90,model.width*1.50)','Math.max(110,model.width*1.85)'),
+ ("new T.DirectionalLight('#d2e3ed',.8)","new T.DirectionalLight('#d2e3ed',1.6)")]:
+ if new in s and old not in s:continue
+ if old in s:s=s.replace(old,new)
+ else:assert new in s,old
 p.write_text(s)
-print('Continuous thread core + fibre-scale normals/albedo; two actual layer edge tones. No frozen files touched.')
+p=r/'site/seam.mjs';s=p.read_text()
+old='needleEnds.push({half,row,position:v,direction:[v[0]-n[0],v[1]-n[1],v[2]-n[2]]});'
+new="const fromSide=initialSide*(end%2===1?1:-1),started=p.type==='running'||strand===0||process.phase>=.40;needleEnds.push({half,row,position:v,direction:[0,started?-fromSide:fromSide,0]});"
+if old in s:s=s.replace(old,new)
+else:assert new in s
+p.write_text(s)
+subprocess.run(['node','--input-type=module','-e',"import {buildSeam} from './site/seam.mjs';import fs from 'node:fs';const a=buildSeam({}, {hole:6,phase:.20}).needleEnds[0].direction,b=buildSeam({}, {hole:6,phase:.55}).needleEnds[1].direction;if(a[0]!==0||a[1]!==1||b[0]!==0||b[1]!==-1)throw Error('Needles must enter along opposite thickness axes');fs.mkdirSync('qa',{recursive:true});fs.writeFileSync('qa/needle-axis.json',JSON.stringify({pass:true,tests:[{name:'A enters along thickness at first entry stop',pass:true},{name:'B reverses through same hole at second entry stop',pass:true}],scope:'prescribed educational needle axes; no machine kinematics'},null,2));"],cwd=r,check=True)
+print('Continuous fibre thread, needle entry alignment, full sample framing and visible layer edges. No frozen files touched.')
