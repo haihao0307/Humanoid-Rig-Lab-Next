@@ -51,7 +51,7 @@ with sync_playwright() as p:
   for object_id in ['belt','bag','cowboy','pirate','swatch']:
    page.evaluate('(id)=>LEATHER_ATELIER.selectProduct(id)',object_id)
    result=page.evaluate('LEATHER_ATELIER.grabTest(true)')
-   check(object_id+' real nodal grip, swing and release',result['positionsChanged'] and result['held']['held'] and not result['released']['held'] and result['released']['finite'] and not result['released']['failed'] and result['held']['maxStretch']<1.25,result)
+   check(object_id+' real nodal grip, swing and release',result['positionsChanged'] and result['held']['held'] and not result['released']['held'] and result['released']['finite'] and not result['released']['failed'] and result['held']['maxStretch']<1.25 and result['released']['maxStretch']<1.25 and result['released']['peakStretch']<1.25,result)
    shot(page,object_id+'-after-swing');page.evaluate('LEATHER_ATELIER.resetGrab()')
   page.evaluate("LEATHER_ATELIER.selectProduct('swatch')")
   for craft in ['diamond','grid','channels','perforated','woven']:
