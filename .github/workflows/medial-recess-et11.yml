@@ -1,0 +1,49 @@
+name: ET11 medial repair
+on:
+  push:
+    branches: [fix/medial-recess-et11-20261010]
+    paths: ['skin-quality-lab/emily-transfer/transfer/**', '.github/workflows/medial-recess-et11.yml']
+permissions:
+  contents: write
+concurrency:
+  group: et11-medial-repair
+  cancel-in-progress: false
+jobs:
+  medial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NODE_PATH: /tmp/et11-tools/node_modules
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: skin-quality-lab
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build tools
+        run: |
+          npm install --prefix /tmp/et11-tools --no-audit --no-fund esbuild@0.25.10 playwright@1.56.1
+          /tmp/et11-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Build and verify the modified eye workbench
+        run: |
+          node skin-quality-lab/emily-transfer/transfer/build.cjs
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/et11-http.log 2>&1 &
+          node skin-quality-lab/emily-transfer/transfer/verify.cjs
+      - name: Commit build to this review branch only
+        run: |
+          git config user.name 'KAOPU Eye Workbench'
+          git config user.email 'kaopu-workbench@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer/app.js skin-quality-lab/emily-transfer/index.html skin-quality-lab/emily-transfer/preview.html skin-quality-lab/emily-transfer/BUILD_MANIFEST.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(eyes): ET11 medial repair [skip ci]'
+            git push origin HEAD:fix/medial-recess-et11-20261010
+          fi
+      - name: Verify actual fixed public page
+        run: PUBLIC_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/emily-transfer/transfer/verify.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et11-medial-${{ github.run_number }}
+          path: qa-et11/
+          retention-days: 14
