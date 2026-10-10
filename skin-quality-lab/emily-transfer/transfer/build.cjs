@@ -1,0 +1,14 @@
+const fs=require('fs'),path=require('path'),cp=require('child_process'),assert=require('assert/strict'),crypto=require('crypto'),vm=require('vm'),esbuild=require('esbuild');
+const d=path.resolve(__dirname,'..'),base='77976497de5dd957fba0fb1eb91918baf9bd46a8',prefix='skin-quality-lab/emily-transfer/',hash=s=>crypto.createHash('sha256').update(s).digest('hex');
+function read(n){try{return cp.execFileSync('git',['show',base+':'+prefix+n],{encoding:'utf8',maxBuffer:8e6});}catch(e){cp.execFileSync('git',['fetch','--depth=1','origin',base]);return cp.execFileSync('git',['show',base+':'+prefix+n],{encoding:'utf8',maxBuffer:8e6});}}
+let source=read('app.js'),app=source,html=read('index.html');assert.equal(hash(source),'0c5e8523cd6669c73ca2197bb0683fdef7e4bcda636faf16ddbd8003f1d2a056');
+function patch(a,b){assert.equal(app.split(a).length,2,'Unique anchor absent '+a);app=app.replace(a,()=>b);}
+patch("import {EYE_VERSION,ChartEyes as EyeSystem} from './stage3/ChartEyes.js';","import {EYE_VERSION,TransferEyes as EyeSystem} from './transfer/TransferEyes.js';\nimport {installTransferReview} from './transfer/Review.js';");
+patch("VERSION='emily-transfer/10.0.0-s3'","VERSION='emily-transfer/11.0.0-transfer'");
+patch('stage1View);render();', 'stage1View);installTransferReview(eyesRig);render();');
+fs.writeFileSync(d+'/app.js',app);fs.writeFileSync(d+'/index.html',html);
+const vendor=path.resolve(d,'../r01/vendor'),r=esbuild.buildSync({entryPoints:[d+'/app.js'],bundle:true,format:'iife',minify:true,write:false,target:'es2022',legalComments:'inline',alias:{three:vendor+'/three.module.js','three/addons':vendor+'/addons'}});
+const asset='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5be35195ad40d57507f7ab1785e4eecda6c648de/skin-quality-lab/',code=r.outputFiles[0].text.replaceAll('../r01/',asset+'r01/').replaceAll('../r02/',asset+'r02/').replace(/<\/script/gi,'<\\/script');new vm.Script(code);
+let preview=html.replace(/<script type="importmap">[\s\S]*?<\/script>/,'').replace('<script type="module" src="./app.js"></script>',()=>'<script>'+code+'</script>');preview=preview.replaceAll('../r01/',asset+'r01/').replaceAll('../r02/',asset+'r02/');
+const notice=fs.readFileSync(d+'/talkinghead/vendor/TalkingHeadBehavior.mjs','utf8').match(/^\/\*\*[\s\S]*?\*\//)?.[0];assert(notice);preview=preview.replace('</head>',()=>`<!--${notice.replaceAll('-->','-- >')}-->\n</head>`);fs.writeFileSync(d+'/preview.html',preview);
+const m={version:'ET11-M1',baseline:base,previewSHA256:hash(preview),previewBytes:Buffer.byteLength(preview),kernelSHA256:hash(fs.readFileSync(__dirname+'/MedialProfile.mjs')),globeChanged:false,closedEndpointChanged:false,openNasalDepthChanged:true,bodyTransfer:'separate parameter-native adapter, not static scan replacement'};fs.writeFileSync(d+'/BUILD_MANIFEST.json',JSON.stringify(m,null,2));console.log(m);
