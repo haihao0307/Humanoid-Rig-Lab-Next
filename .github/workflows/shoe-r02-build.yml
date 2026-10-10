@@ -45,6 +45,18 @@ jobs:
               if p.exists() and p.read_bytes()!=encoded:raise ValueError('Refusing to overwrite an existing different source: '+name)
               p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(encoded)
             receipt.write_text(json.dumps({'schema':'kaopu-source-transport/1','transportSha256':sha,'files':[{'path':n,'sha256':hashlib.sha256(t.encode()).hexdigest()} for n,t in data.items()],'scope':'Transport only. Not geometry, browser, visual or user acceptance.'},indent=2))
+          # Checked correction of the source builder, not a direct edit of generated HTML.
+          patch=R/'BUILD_EMBED_FIX.json'
+          if not patch.exists():
+            p=R/'tools/build.mjs';s=p.read_text();old=hashlib.sha256(s.encode()).hexdigest()
+            if old!='dac41b2ca9aa639af27e20b92e5f06dad73b722e6262664c0b037b45763e4fcc':raise ValueError('Unexpected pre-fix builder')
+            s=s.replace(",'<style>",",()=>'<style>").replace(",'<div id=\"teacher-data\" hidden>",",()=>'<div id=\"teacher-data\" hidden>")
+            s="import vm from 'node:vm';\n"+s
+            s=s.replace("const js=result.outputFiles[0].text;","const js=result.outputFiles[0].text;new vm.Script(js,{filename:'compiled-shoe-r02.js'});")
+            s=s.replace("fs.writeFileSync(path.join(root,'public-lite.html'),html);","const embedded=html.slice(html.indexOf('<script>')+8,html.lastIndexOf('</script>'));new vm.Script(embedded,{filename:'embedded-shoe-r02.js'});if(html.split('<script>').length!==2||html.includes('<script type=\"module\"'))throw Error('Invalid embedded script boundary');fs.writeFileSync(path.join(root,'public-lite.html'),html);")
+            after=hashlib.sha256(s.encode()).hexdigest()
+            if after!='4450a0baee534f2f0d95ae29cafe69a32c6d3655743b0eb6a190e5b79ad469c1':raise ValueError('Unexpected corrected builder')
+            p.write_text(s);patch.write_text(json.dumps({'old':old,'corrected':after,'failureRun':38040804181,'cause':'String.replace replacement interpreted dollar-ampersand in JavaScript. Function replacers preserve bytes. Compiled and embedded JS now both receive syntax checks.'},indent=2))
           PY
       - name: Exact dependencies
         run: |
