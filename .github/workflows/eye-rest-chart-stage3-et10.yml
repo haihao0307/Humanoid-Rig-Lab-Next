@@ -1,0 +1,69 @@
+name: ET10 brow and rest tissue charts
+on:
+  push:
+    branches: [feature/eye-rest-chart-stage3-et10-20261010]
+    paths:
+      - '.github/workflows/eye-rest-chart-stage3-et10.yml'
+      - 'skin-quality-lab/emily-transfer/stage3/**'
+permissions:
+  contents: write
+concurrency:
+  group: eye-rest-chart-stage3-et10
+  cancel-in-progress: false
+jobs:
+  stage3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NODE_PATH: /tmp/et10-tools/node_modules
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            skin-quality-lab
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Isolated build and browser dependencies
+        run: |
+          npm install --prefix /tmp/et10-tools --no-audit --no-fund esbuild@0.25.10 playwright@1.56.1
+          /tmp/et10-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Build on frozen ET09 source
+        run: node skin-quality-lab/emily-transfer/stage3/build.cjs
+      - name: Local browser geometry and coordinate regression
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/et10-http.log 2>&1 &
+          node skin-quality-lab/emily-transfer/stage3/verify.cjs
+      - name: Fast-forward own draft branch only
+        run: |
+          git config user.name 'KAOPU Eye Workbench'
+          git config user.email 'kaopu-workbench@users.noreply.github.com'
+          git add skin-quality-lab/emily-transfer/app.js skin-quality-lab/emily-transfer/index.html skin-quality-lab/emily-transfer/preview.html skin-quality-lab/emily-transfer/BUILD_MANIFEST.json skin-quality-lab/emily-transfer/stage3
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(eyes): ET10 brow and static tissue-chart preview [skip ci]'
+            git push origin HEAD:feature/eye-rest-chart-stage3-et10-20261010
+          fi
+      - name: Verify actual immutable public page
+        run: PUBLIC_COMMIT=$(git rev-parse HEAD) node skin-quality-lab/emily-transfer/stage3/verify.cjs
+      - name: Collect source and real browser evidence
+        if: always()
+        run: |
+          mkdir -p qa-et10
+          python3 - <<'PY'
+          import pathlib,zipfile
+          root=pathlib.Path('skin-quality-lab/emily-transfer')
+          with zipfile.ZipFile('qa-et10/source.zip','w',zipfile.ZIP_DEFLATED) as z:
+            for p in (root/'stage3').glob('*'):
+              if p.is_file(): z.write(p,str(p))
+            for name in ('app.js','index.html','preview.html','BUILD_MANIFEST.json'):
+              p=root/name
+              if p.exists(): z.write(p,str(p))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: et10-stage3-${{ github.run_number }}
+          path: qa-et10/
+          retention-days: 14
