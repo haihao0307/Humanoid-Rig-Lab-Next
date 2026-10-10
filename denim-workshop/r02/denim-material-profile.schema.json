@@ -1,0 +1,13 @@
+{
+ "$schema":"https://json-schema.org/draft/2020-12/schema",
+ "title":"KAOPU Denim Material Profile 2",
+ "type":"object",
+ "required":["schema","version","graph","finish","surface","display","limits","sources"],
+ "properties":{
+  "schema":{"const":"kaopu.denim_material_profile@2.0"},
+  "version":{"const":"R02.0"},
+  "graph":{"type":"object","required":["units","width","height","warpPitch","weftPitch","thickness","draft","warpCount","weftCount"],"properties":{"units":{"const":"millimeter"},"width":{"type":"number","exclusiveMinimum":0},"height":{"type":"number","exclusiveMinimum":0},"warpPitch":{"type":"number","exclusiveMinimum":0},"weftPitch":{"type":"number","exclusiveMinimum":0},"thickness":{"type":"number","exclusiveMinimum":0},"warpCount":{"type":"integer","minimum":4},"weftCount":{"type":"integer","minimum":4},"draft":{"type":"object","required":["width","height","cells"],"properties":{"width":{"type":"integer","minimum":3},"height":{"type":"integer","minimum":3},"cells":{"type":"array","items":{"enum":[0,1]}}}}}},
+  "finish":{"type":"object","required":["recipe","wash","abrasion","backstain"],"properties":{"recipe":{"type":"string"},"wash":{"type":"number","minimum":0,"maximum":1},"abrasion":{"type":"number","minimum":0,"maximum":1},"backstain":{"type":"number","minimum":0,"maximum":1}}},
+  "limits":{"type":"object","required":["physicalCalibration","clothSolver","individualCottonFibers","filmGradeValidated"],"properties":{"physicalCalibration":{"const":false},"clothSolver":{"const":false},"individualCottonFibers":{"const":false},"filmGradeValidated":{"const":false}}}
+ }
+}
