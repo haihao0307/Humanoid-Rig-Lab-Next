@@ -1,5 +1,5 @@
-// Runtime adapter for the inherited atelier interface. Camera targets are
-// measured on the current R07 paper-space seam rather than old product offsets.
+// Camera targets are evaluated on the same material coordinate and current
+// deformation field as the visible yarn and leather.
 const inheritedAtelierView=setView;
 setView=function(id){
  inheritedAtelierView(id);
@@ -8,6 +8,7 @@ setView=function(id){
  const panel=['cowboy','pirate'].includes(product)?rig.parts.find(p=>p.name==='leather-hatband'):product==='wallet'?rig.parts.find(p=>p.name==='wallet-panel-2'):product==='bag'?rig.parts.find(p=>p.name==='bag-front'):rig.parts[0];
  const path=panel?.paths[0];if(!path)return;
  const frame=path.frame(path.length*.5),u=frame.uv.x,v=frame.uv.y,normal=panel.normal(u,v);
+ if(productSolver?.report().steps>0){inspectSurface(panel.name,u,v,{distance:product==='wallet'?26:product==='swatch'?32:product==='bag'?62:42});return;}
  target.copy(panel.map(u,v)).addScaledVector(normal,panel.t/2).add(V(0,rig.bindingShift,0));
  yaw=Math.atan2(normal.x,normal.z);pitch=Math.max(.18,Math.min(.9,Math.asin(Math.max(-1,Math.min(1,normal.y)))));
  distance=product==='wallet'?26:product==='swatch'?32:product==='bag'?62:42;
