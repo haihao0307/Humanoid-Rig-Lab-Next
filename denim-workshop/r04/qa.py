@@ -5,7 +5,30 @@ from playwright.sync_api import sync_playwright
 p=Path(__file__).resolve().parent;out=p/'evidence';out.mkdir(exist_ok=True)
 parser=argparse.ArgumentParser();parser.add_argument('--public');parser.add_argument('--content',action='store_true');args=parser.parse_args()
 spy='''(()=>{const p=WebGL2RenderingContext.prototype;window.__draws={instanced:0,indexed:0};for(const [name,key] of [['drawElementsInstanced','instanced'],['drawElements','indexed']]){const f=p[name];p[name]=function(...a){window.__draws[key]++;return f.apply(this,a)}}})();'''
-report={'version':'R04.0','modes':{},'actualPhone':False,'physicalGPU':False}
+def watch(page):
+ data={'pageErrors':[],'consoleErrors':[],'httpErrors':[],'requests':[]}
+ page.on('pageerror',lambda e:data['pageErrors'].append(str(e)))
+ def console_message(m):
+  if m.type=='error':
+   item={'text':m.text,'location':m.location};data['consoleErrors'].append(item);print('CONSOLE_ERROR',json.dumps(item),flush=True)
+ def response(r):
+  if r.status>=400:
+   item={'url':r.url,'status':r.status};data['httpErrors'].append(item);print('HTTP_ERROR',json.dumps(item),flush=True)
+ page.on('console',console_message);page.on('response',response);page.on('request',lambda r:data['requests'].append(r.url))
+ return data
+
+def verify_errors(data):
+ # Keep an exact-origin favicon warning separate. Never suppress an app failure.
+ host_icon='https://htmlpreview.github.io/favicon.ico'
+ warnings=[e for e in data['consoleErrors'] if e['location'].get('url')==host_icon and '404' in e['text']]
+ fatal_console=[e for e in data['consoleErrors'] if e not in warnings]
+ fatal_http=[e for e in data['httpErrors'] if not(e['url']==host_icon and e['status']==404)]
+ data['previewHostWarnings']=warnings;data['fatalConsoleErrors']=fatal_console;data['fatalHttpErrors']=fatal_http
+ assert not data['pageErrors'],data['pageErrors']
+ assert not fatal_console,fatal_console
+ assert not fatal_http,fatal_http
+
+report={'version':'R04.0' ,'modes':{},'actualPhone':False,'physicalGPU':False}
 with sync_playwright() as pw:
  kw={'headless':False,'args':['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']}
  if os.environ.get('CHROMIUM_PATH'):kw['executable_path']=os.environ['CHROMIUM_PATH']
@@ -13,11 +36,10 @@ with sync_playwright() as pw:
  try:
   for mode,url in [('authored' if args.content else 'file',(p/'index.html').as_uri())]+([('public',args.public)] if args.public else []):
    ctx=b.new_context(viewport={'width':1280,'height':900},device_scale_factor=1);ctx.add_init_script(spy);page=ctx.new_page();page.set_default_timeout(120000)
-   errors=[];console=[];req=[];page.on('pageerror',lambda e:errors.append(str(e)));page.on('console',lambda m:console.append(m.text) if m.type=='error' else None);page.on('request',lambda r:req.append(r.url))
+   network=watch(page);states=[];report['modes'][mode]={'passed':False,'url':url,'states':states,'network':network}
    if args.content and mode=='authored':page.set_content('<script>'+spy+'</script>'+(p/'index.html').read_text(),wait_until='domcontentloaded')
    else:page.goto(url,wait_until='domcontentloaded',timeout=120000)
    page.wait_for_function('window.__DENIM_WORKBENCH__?.ready===true');assert page.evaluate('__DENIM_WORKBENCH__.version')=='R04.0'
-   states=[]
    def snap(name,patch=None):
     if patch is not None:page.evaluate('(p)=>__DENIM_WORKBENCH__.setState(p)',patch)
     page.wait_for_timeout(160);page.screenshot(path=str(out/f'{mode}-{name}.png'),timeout=180000)
@@ -45,15 +67,16 @@ with sync_playwright() as pw:
    with page.expect_download() as ev:page.locator('#save').click()
    ev.value.save_as(str(out/f'{mode}-profile.json'));profile=json.loads((out/f'{mode}-profile.json').read_text());assert profile['schema']=='kaopu.denim_material_profile@2.2';assert profile['damage']['released'] and profile['damage']['clumps'];assert profile['graph']['slub']==.9
    page.wait_for_timeout(200);idle1=page.evaluate('__DENIM_WORKBENCH__.lastFrame.frame');page.wait_for_timeout(500);idle2=page.evaluate('__DENIM_WORKBENCH__.lastFrame.frame');assert idle1==idle2
-   assert not errors,errors;assert not console,console
-   if mode=='file':assert not [r for r in req if r.startswith('http')]
-   report['modes'][mode]={'passed':True,'url':url,'states':states,'errors':errors,'consoleErrors':console,'requests':req,'idle':[idle1,idle2]};ctx.close()
-  ctx=b.new_context(viewport={'width':390,'height':844},device_scale_factor=1,is_mobile=True,has_touch=True);page=ctx.new_page();page.set_default_timeout(180000)
+   verify_errors(network)
+   if mode=='file':assert not [r for r in network['requests'] if r.startswith('http')]
+   report['modes'][mode].update({'passed':True,'idle':[idle1,idle2]});ctx.close()
+  ctx=b.new_context(viewport={'width':390,'height':844},device_scale_factor=1,is_mobile=True,has_touch=True);page=ctx.new_page();page.set_default_timeout(180000);mobile_network=watch(page)
   if args.content and not args.public:page.set_content((p/'index.html').read_text(),wait_until='domcontentloaded')
   else:page.goto(args.public or (p/'index.html').as_uri(),wait_until='domcontentloaded')
   page.wait_for_function('window.__DENIM_WORKBENCH__?.ready');page.screenshot(path=str(out/'mobile-first.png'),timeout=180000);rect=page.locator('#view').bounding_box();assert 0<=rect['y'] and rect['y']+rect['height']<=844
   page.locator('#showFray').click();page.locator('#stage').scroll_into_view_if_needed();page.screenshot(path=str(out/'mobile-ragged.png'),timeout=180000);mobile=page.evaluate('({frame:__DENIM_WORKBENCH__.lastFrame,gl:__DENIM_WORKBENCH__.getGLError()})');assert mobile['gl']==0 and mobile['frame']['natural']['bridges']>0
-  report['mobile']={'passed':True,'actualPhone':False,'viewport':[390,844],'firstRect':rect,**mobile};ctx.close()
+  verify_errors(mobile_network)
+  report['mobile']={'network':mobile_network,'passed':True,'actualPhone':False,'viewport':[390,844],'firstRect':rect,**mobile};ctx.close()
   report['passed']=True
  finally:
   (out/'browser-qa.json').write_text(json.dumps(report,indent=2,ensure_ascii=False));b.close()
