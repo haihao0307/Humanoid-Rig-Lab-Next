@@ -14,6 +14,7 @@ async function canvasHash(){return page.evaluate(()=>{const src=document.querySe
  await page.evaluate(()=>{window.__EYE_QA_FREEZE__=true;__STAGE3__.pose(0);__STAGE3__.mode('gray');__SKIN_LAB__.render();});
  report.neutral=await page.evaluate(()=>__STAGE3__.report());const hashNew=await canvasHash();check('actual rendered geometry',hashNew.range>70,hashNew);
  check('brow genuinely changes original surface not separate tube',report.neutral.brow.affectedHeadVertices>100&&report.neutral.brow.maxForwardMM>1&&report.neutral.brow.maxForwardMM<3&&!report.neutral.brow.separateBrowObject,report.neutral.brow);
+ for(const e of report.neutral.coordinates.entries.filter(e=>e.chartQuality)){check(e.name+' neutral chart has no added foldovers',e.chartQuality.foldovers===0&&e.chartQuality.testedTriangles>20000&&e.chartQuality.minSignedAreaRatio>=.02,e.chartQuality);}
  await capture('01-gray-brow-medial');
  const centres=report.neutral.eyes.map(e=>e.centreMM),sourceGeometry=await page.evaluate(()=>__EYES__.sourceGeometry());
  await page.evaluate(()=>{__STAGE3__.compare(true);__SKIN_LAB__.render();});const hashOld=await canvasHash();await capture('02-before-same-gray');check('geometric held comparison changes rendered pixels',hashNew.hash!==hashOld.hash,{before:hashOld,after:hashNew});
