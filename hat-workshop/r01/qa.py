@@ -1,13 +1,13 @@
 """Actual Chromium file/public regression. Limited tests, never cinematic certification."""
 from pathlib import Path
-import argparse,json,hashlib,io,time
+import argparse,json,io,time
 from playwright.sync_api import sync_playwright
 from PIL import Image,ImageStat,ImageDraw
 ROOT=Path(__file__).resolve().parent
 
 def run(url,public=False):
  folder=ROOT/'qa'/('public' if public else 'local');folder.mkdir(parents=True,exist_ok=True)
- result={'url':url,'public':public,'checks':[],'errors':[],'failedHTTP':[],'platforms':['Chromium desktop 1440x1000','Chromium viewport 390x844; not physical phone'],'visualAccepted':False,'physicalValidated':False,'nativeDynamicIntegration':False}
+ result={'url':url,'public':public,'checks':[],'errors':[],'consoleErrors':[],'failedHTTP':[],'platforms':['Chromium desktop 1440x1000','Chromium viewport 390x844; not physical phone'],'visualAccepted':False,'physicalValidated':False,'nativeDynamicIntegration':False}
  def check(name,value,details=None):
   result['checks'].append({'name':name,'passed':bool(value),'details':details});print('CHECK',name,bool(value),flush=True)
   if not value:raise AssertionError(name)
@@ -15,6 +15,7 @@ def run(url,public=False):
   b=pw.chromium.launch(headless=True,args=['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
   page=b.new_page(viewport={'width':1440,'height':1000},device_scale_factor=1);page.set_default_timeout(180000)
   page.on('pageerror',lambda e:result['errors'].append(str(e)))
+  page.on('console',lambda m:result['consoleErrors'].append(m.text) if m.type=='error' else None)
   page.on('response',lambda r:result['failedHTTP'].append({'url':r.url,'status':r.status}) if r.status>=400 else None)
   requests=[];page.on('request',lambda r:requests.append(r.url));start=time.monotonic()
   try:
@@ -45,6 +46,15 @@ def run(url,public=False):
    exported=download.value;exported.save_as(str(folder/'exported-recipe.json'));check('actual JSON download',json.loads((folder/'exported-recipe.json').read_text())['schema']=='kaopu.hat.recipe/1')
    page.locator('#file').set_input_files(str(folder/'exported-recipe.json'));page.wait_for_function('hatLab.ready()');check('actual JSON reimport',page.evaluate('hatLab.recipe()')==raw)
    page.evaluate('(r)=>hatLab.restore(r)',saved)
+   for view in ['front','side','back','inside','detail']:
+    page.locator(f'[data-camera="{view}"]').click();page.wait_for_timeout(150)
+    page.locator('#canvas').screenshot(path=str(folder/(view+'-inspection.png')))
+    check('camera '+view,page.locator('#canvas').screenshot()!=before)
+   page.evaluate('hatLab.frame()');page.locator('[data-dye="wine"]').click();page.wait_for_timeout(150);dyed=page.locator('#canvas').screenshot()
+   page.locator('#compare').hover();page.mouse.down();page.wait_for_timeout(150);held=page.locator('#canvas').screenshot();page.mouse.up();page.wait_for_timeout(150)
+   check('hold comparison really changes pixels',dyed!=held)
+   check('release comparison restores candidate',page.locator('#canvas').screenshot()==dyed)
+   page.evaluate('(r)=>hatLab.restore(r)',saved)
    worn=[]
    for item in page.evaluate('hatLab.catalogue()'):
     page.evaluate('(id)=>hatLab.select(id)',item['id']);page.locator('#wear').click();page.evaluate('hatLab.frame()');page.wait_for_timeout(150)
@@ -64,7 +74,7 @@ def run(url,public=False):
    rect=page.locator('#canvas').bounding_box();check('mobile first screen actual canvas',rect['y']<150 and rect['height']>350,rect)
    page.screenshot(path=str(folder/'mobile.png'));page.locator('.hat-card[data-id="fishing"]').click();page.wait_for_function("hatLab.ready() && hatLab.metrics().hat==='fishing'");page.locator('#viewport').scroll_into_view_if_needed();page.wait_for_timeout(150);page.screenshot(path=str(folder/'mobile-selected.png'))
    check('mobile selection real output',page.evaluate('hatLab.metrics().hat')=='fishing')
-   check('no page exceptions',not result['errors'],result['errors']);check('no failing HTTP',not result['failedHTTP'],result['failedHTTP']);result['states']=states;result['passed']=True
+   check('no page exceptions',not result['errors'],result['errors']);check('no renderer console errors',not result['consoleErrors'],result['consoleErrors']);check('no failing HTTP',not result['failedHTTP'],result['failedHTTP']);result['states']=states;result['passed']=True
    result['htmlSHA256']=manifest['htmlSHA256'];result['sourceSha']=manifest['sourceSha']
   except Exception as e:
    result['passed']=False;result['failure']=str(e);page.screenshot(path=str(folder/'failure.png'));raise
