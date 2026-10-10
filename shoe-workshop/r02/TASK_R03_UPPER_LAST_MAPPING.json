@@ -1,0 +1,45 @@
+{
+  "schema": "kaopu-shoe-task@1.0",
+  "version": "R03",
+  "name": "upper-last-mapping",
+  "base": "R02-S1",
+  "goal": "建立真实鞋面部件与鞋楦表面的对应关系，不生成假成鞋",
+  "inherits": [
+    "original-last-geometry",
+    "source-panel-display",
+    "seam-kernel",
+    "parameter-research-kernel"
+  ],
+  "constraints": {
+    "keep_original_assets": true,
+    "no_fake_completed_shoe": true,
+    "no_animation_substitute_for_sewing": true,
+    "no_material_only_claim": true
+  },
+  "pipeline": [
+    {
+      "id": "R03-01",
+      "name": "panel-to-last correspondence",
+      "input": ["upper_panel", "shoe_last_surface"],
+      "output": ["surface_region_mapping", "mapping_confidence"]
+    },
+    {
+      "id": "R03-02",
+      "name": "seam allowance research",
+      "input": ["panel_boundary", "seam_path"],
+      "output": ["seam_margin_model", "edge_orientation"]
+    },
+    {
+      "id": "R03-03",
+      "name": "controlled wrapping experiment",
+      "input": ["mapped_panel", "last_surface"],
+      "output": ["wrapped_preview", "deformation_error"]
+    }
+  ],
+  "acceptance": {
+    "panel_identity": false,
+    "seam_identity": false,
+    "production_pattern": false,
+    "complete_shoe": false
+  }
+}

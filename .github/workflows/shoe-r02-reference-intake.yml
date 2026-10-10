@@ -1,0 +1,81 @@
+name: Shoe R02 Reference Intake
+on:
+  push:
+    branches: [feature/shoe-atelier-r01-20261010]
+    paths: ['.github/workflows/shoe-r02-reference-intake.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read pinned teacher and sister-workbench files
+        run: |
+          mkdir -p /tmp/shoe-r02-intake
+          cd /tmp/shoe-r02-intake
+          npm init -y >/dev/null
+          npm install --save-exact three@0.179.1 esbuild@0.25.10 rhino3dm@8.17.0
+          python -m pip install rhino3dm==8.17.0
+          python -m pip download --no-deps -d wheels rhino3dm==8.17.0
+          python - <<'PY'
+          import urllib.request,json,pathlib,concurrent.futures,hashlib
+          R=pathlib.Path('.')
+          def get(url):
+            req=urllib.request.Request(url,headers={'User-Agent':'KAOPU-reference-intake'})
+            return urllib.request.urlopen(req,timeout=120).read()
+          refs={
+            'teacher':('saraalvin/SymbioticShoes','main',''),
+            'leather':('haihao0307/Humanoid-Rig-Lab-Next','426b725e1608a10f99bdf1532914daf5d2b2ea49','leather-workshop/'),
+            'tailor':('haihao0307/guilin-dem-pipeline','1e04485610b20e0c3309415d579f51f345ef4c68','kaopu-tailor-workbench/')}
+          records=[]
+          for label,(repo,ref,prefix) in refs.items():
+            sha=json.loads(get(f'https://api.github.com/repos/{repo}/commits/{ref}'))['sha']
+            tree=json.loads(get(f'https://api.github.com/repos/{repo}/git/trees/{sha}?recursive=1'))
+            # Full source/metadata of these two workbenches, not unrelated projects.
+            rows=[]
+            for e in tree['tree']:
+              p=e['path']
+              if e['type']!='blob' or not p.startswith(prefix):continue
+              if label=='teacher' or (e.get('size',0)<2500000 and p.endswith(('.js','.mjs','.cjs','.json','.md','.py','.txt','.css')) and ('/evidence/' not in p)):
+                rows.append(e)
+            def grab(e):
+              p=e['path'];url=f'https://raw.githubusercontent.com/{repo}/{sha}/'+urllib.parse.quote(p);b=get(url);dest=R/label/p;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(b)
+              return {'source':label,'repo':repo,'commit':sha,'path':p,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()}
+            records+=list(concurrent.futures.ThreadPoolExecutor(max_workers=8).map(grab,rows))
+          (R/'INTAKE.json').write_text(json.dumps(records,indent=2))
+          PY
+      - name: Inspect real CAD objects and cached meshes
+        run: |
+          cd /tmp/shoe-r02-intake
+          python - <<'PY'
+          import rhino3dm as r,json,pathlib,collections
+          def xyz(p):return [p.X,p.Y,p.Z]
+          result={}
+          for f in pathlib.Path('teacher').glob('*.3dm'):
+            model=r.File3dm.Read(str(f));rows=[]
+            for i,obj in enumerate(model.Objects):
+              g=obj.Geometry;a=obj.Attributes;bb=g.GetBoundingBox();row={'index':i,'id':str(a.Id),'name':a.Name,'layerIndex':a.LayerIndex,'layer':model.Layers[a.LayerIndex].Name,'type':type(g).__name__,'bbox':[xyz(bb.Min),xyz(bb.Max)],'visible':a.Visible}
+              if isinstance(g,r.Brep):
+                row['faces']=len(g.Faces);row['meshCounts']=[]
+                for face in g.Faces:
+                  m=face.GetMesh(r.MeshType.Any)
+                  row['meshCounts'].append([len(m.Vertices),len(m.Faces)] if m else None)
+              elif isinstance(g,r.Mesh):row['meshCounts']=[[len(g.Vertices),len(g.Faces)]]
+              rows.append(row)
+            result[f.name]={'units':str(model.Settings.ModelUnitSystem),'layers':[{'name':l.Name,'visible':l.Visible,'color':list(l.Color)} for l in model.Layers],'objects':rows,'types':dict(collections.Counter(x['type'] for x in rows))}
+          pathlib.Path('CAD-INSPECTION.json').write_text(json.dumps(result,indent=2));print(json.dumps({k:{'types':v['types'],'count':len(v['objects'])} for k,v in result.items()},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shoe-r02-reference-intake
+          path: /tmp/shoe-r02-intake
+          retention-days: 7
