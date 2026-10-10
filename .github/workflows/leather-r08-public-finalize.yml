@@ -1,0 +1,94 @@
+name: Leather R08 public final acceptance
+on:
+  push:
+    branches: [fix/leather-r08-continuous-shell-20261010]
+    paths:
+      - .github/workflows/leather-r08-public-finalize.yml
+      - leather-workshop/r08/review/public_ready_20261010.py
+permissions:
+  contents: write
+concurrency:
+  group: leather-r08-public-final
+  cancel-in-progress: false
+jobs:
+  public:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      BUILD_SHA: f1ab73a7b289461a7d81e65eed935ec62369ed34
+      R08_EXPECTED_SOURCE_SHA: f77c9cfd37be5bdbf2cd8be0149ceef79cf90e83
+      PUBLIC_URL: https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/f1ab73a7b289461a7d81e65eed935ec62369ed34/leather-workshop/r08/public-lite.html
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/leather-r08-continuous-shell-20261010
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preserve previous versions and bind to the exact candidate
+        run: |
+          git fetch --depth=1 origin 426b725e1608a10f99bdf1532914daf5d2b2ea49 "$BUILD_SHA"
+          git diff --exit-code 426b725e1608a10f99bdf1532914daf5d2b2ea49 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/r07 leather-workshop/anchors
+          git diff --exit-code "$BUILD_SHA" -- leather-workshop/r08/site leather-workshop/r08/public-lite.html leather-workshop/r08/BUILD_MANIFEST.json
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          r=Path('leather-workshop/r08');m=json.loads((r/'BUILD_MANIFEST.json').read_text())
+          assert m['sourceCommit']=='f77c9cfd37be5bdbf2cd8be0149ceef79cf90e83'
+          assert hashlib.sha256((r/'public-lite.html').read_bytes()).hexdigest()==m['htmlSHA256']=='c9524e0c9d50ba8ba4e8070f621fc2e0d05a387b8c33b06e49a9e518da4e86be'
+          for file,h in m['sourceHashes'].items():assert hashlib.sha256((r/'site'/file).read_bytes()).hexdigest()==h,file
+          for file in ['qa/release-local/browser.json','qa-closure.json','qa-motion.json']:
+            q=json.loads((r/file).read_text());assert q['pass'] and all(x['pass'] for x in q['checks']),file
+          print('Exact existing candidate and its local/numerical evidence verified. Public regression remains required.')
+          PY
+      - name: Repair the actual acceptance source, not application error reporting
+        run: |
+          python leather-workshop/r08/review/public_ready_20261010.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r08/qa-release.py
+          if ! git diff --cached --quiet; then
+            git commit -m 'test(leather-r08): wait for preview host DOM and verify exact running source'
+            git push origin HEAD:refs/heads/fix/leather-r08-continuous-shell-20261010
+          fi
+          echo "QA_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Prepare installed browser
+        timeout-minutes: 5
+        run: |
+          pip --disable-pip-version-check install --timeout 35 --retries 2 pillow playwright==1.55.0
+          CHROME=$(command -v google-chrome || command -v chromium)
+          test -x "$CHROME"
+          "$CHROME" --version
+          echo "KAOPU_CHROMIUM_EXECUTABLE=$CHROME" >> "$GITHUB_ENV"
+          if [ -z "$(fc-list :lang=zh)" ]; then
+            mkdir -p "$HOME/.local/share/fonts"
+            curl -fL --connect-timeout 15 --max-time 90 --retry 1 https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf -o "$HOME/.local/share/fonts/NotoSansCJKsc-Regular.otf"
+            fc-cache -f
+          fi
+          test -n "$(fc-list :lang=zh)"
+      - name: Run complete acceptance in the actual public website
+        run: python leather-workshop/r08/qa-release.py --public --url "$PUBLIC_URL"
+      - name: Record only a successful exact delivery
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json
+          r=Path('leather-workshop/r08');m=json.loads((r/'BUILD_MANIFEST.json').read_text());public=json.loads((r/'qa/release-public/browser.json').read_text())
+          local=json.loads((r/'qa/release-local/browser.json').read_text());closure=json.loads((r/'qa-closure.json').read_text());motion=json.loads((r/'qa-motion.json').read_text())
+          assert public['pass'] and not public['errors'] and public['initial']['sourceCommit']==m['sourceCommit']
+          receipt={'version':'R08.0','sourceCommit':m['sourceCommit'],'buildCommit':os.environ['BUILD_SHA'],'url':os.environ['PUBLIC_URL'],'htmlSHA256':m['htmlSHA256'],'htmlBytes':m['htmlBytes'],'qaSourceCommit':os.environ['QA_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'localEvidenceRun':'38026510974','localPassed':local['pass'],'publicPassed':True,'checks':{'local':len(local['checks']),'public':len(public['checks']),'closure':len(closure['checks']),'deformedClosure':len(motion['checks'])},'scope':'Public rendering, pointer grip/release, seven objects, restored controls, archives, exports and 390x844 viewport. Counts include repeated objects and parameters.','mobile':'390x844 viewport simulation, not phone hardware','hostWarnings':public.get('hostWarnings',[]),'visualAcceptance':'PENDING_USER','limits':['Uncalibrated approximate leather constitutive parameters','Particle self-contact, not continuous triangle/hardware contact','Local R05 seam response, not complete yarn friction and tension propagation','Padding and patina are controlled geometric/material approximations','Prototype dimensions and patterns require physical sampling; no production certification']}
+          (r/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');(r/'PUBLIC_URL.txt').write_text(os.environ['PUBLIC_URL']+'\n')
+          PY
+          git add leather-workshop/r08/qa/release-public/browser.json leather-workshop/r08/DELIVERY_RECEIPT.json leather-workshop/r08/PUBLIC_URL.txt
+          git commit -m 'test(leather-r08): complete real public acceptance of the closed-shell candidate'
+          git push origin HEAD:refs/heads/fix/leather-r08-continuous-shell-20261010
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r08-public-final-${{ github.run_id }}
+          path: leather-workshop/r08/
+          retention-days: 7
