@@ -1,0 +1,158 @@
+name: Denim R01 Browser QA
+
+on:
+  push:
+    branches:
+      - experiment/denim-material-workbench-r01-20261010
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Validate checked-out standalone workbench
+        run: |
+          python3 - <<'PY'
+          import base64
+          data = 'AAABAAEAEBAAAAAAIABWAAAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAQAAAAEAgGAAAAH/P/YQAAAB1JREFUeJxjlDDw+89AAWCiRPOoAaMGjBowmAwAAK1cAbUN6kKcAAAAAElFTkSuQmCC'
+          open('favicon.ico', 'wb').write(base64.b64decode(data))
+          PY
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/denim-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4173/denim-workshop/r01/index.html >/dev/null 2>&1 && break
+            sleep 1
+          done
+          xvfb-run -a node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const assert = require('assert');
+          (async () => {
+            const browser = await chromium.launch({
+              headless: false,
+              args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-webgl','--ignore-gpu-blocklist']
+            });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const consoleErrors = [];
+            const pageErrors = [];
+            const externalRequests = [];
+            page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+            page.on('pageerror', err => pageErrors.push(String(err)));
+            page.on('request', req => {
+              const u = new URL(req.url());
+              if (u.hostname !== '127.0.0.1') externalRequests.push(req.url());
+            });
+            await page.goto('http://127.0.0.1:4173/denim-workshop/r01/index.html', { waitUntil: 'load' });
+            await page.waitForFunction(() => !!window.__DENIM_WORKBENCH__, null, { timeout: 60000 });
+            const before = await page.screenshot();
+            await page.locator('#wash').evaluate(el => { el.value = '0.78'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+            await page.locator('#wear').evaluate(el => { el.value = '0.86'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+            await page.waitForTimeout(600);
+            const after = await page.screenshot({ path: 'denim-r01-local-qa.png', fullPage: true });
+            const info = await page.evaluate(() => {
+              const w = window.__DENIM_WORKBENCH__;
+              return {
+                version: w.version,
+                renderer: w.validation.renderer,
+                vertices: w.mesh.vertices,
+                triangles: w.mesh.triangles,
+                error: document.getElementById('error').classList.contains('on'),
+                profile: w.profile()
+              };
+            });
+            assert.strictEqual(info.renderer, 'WebGL2');
+            assert.strictEqual(info.vertices, 10285);
+            assert.strictEqual(info.triangles, 20160);
+            assert.strictEqual(info.error, false);
+            assert.notDeepStrictEqual(before, after);
+            assert.deepStrictEqual(consoleErrors, []);
+            assert.deepStrictEqual(pageErrors, []);
+            assert.deepStrictEqual(externalRequests, []);
+            fs.writeFileSync('denim-r01-local-qa.json', JSON.stringify({ info, consoleErrors, pageErrors, externalRequests }, null, 2));
+            await browser.close();
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
+
+      - name: Validate fixed public commit URL
+        env:
+          PUBLIC_URL: https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${{ github.sha }}/denim-workshop/r01/index.html
+        run: |
+          xvfb-run -a node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const assert = require('assert');
+          (async () => {
+            const browser = await chromium.launch({
+              headless: false,
+              args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-webgl','--ignore-gpu-blocklist']
+            });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            await page.route('**/favicon.ico', route => route.fulfill({ status: 204, body: '' }));
+            const consoleErrors = [];
+            const pageErrors = [];
+            page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+            page.on('pageerror', err => pageErrors.push(String(err)));
+            let lastError = null;
+            for (let attempt = 1; attempt <= 4; attempt++) {
+              try {
+                await page.goto(process.env.PUBLIC_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
+                await page.waitForFunction(() => !!window.__DENIM_WORKBENCH__, null, { timeout: 60000 });
+                lastError = null;
+                break;
+              } catch (err) {
+                lastError = err;
+                await page.waitForTimeout(attempt * 5000);
+              }
+            }
+            if (lastError) throw lastError;
+            const info = await page.evaluate(() => {
+              const w = window.__DENIM_WORKBENCH__;
+              return {
+                version: w.version,
+                renderer: w.validation.renderer,
+                vertices: w.mesh.vertices,
+                triangles: w.mesh.triangles,
+                error: document.getElementById('error').classList.contains('on'),
+                profile: w.profile()
+              };
+            });
+            assert.strictEqual(info.renderer, 'WebGL2');
+            assert.strictEqual(info.vertices, 10285);
+            assert.strictEqual(info.triangles, 20160);
+            assert.strictEqual(info.error, false);
+            assert.deepStrictEqual(consoleErrors, []);
+            assert.deepStrictEqual(pageErrors, []);
+            await page.screenshot({ path: 'denim-r01-public-qa.png', fullPage: true });
+            fs.writeFileSync('denim-r01-public-qa.json', JSON.stringify({ url: process.env.PUBLIC_URL, info, consoleErrors, pageErrors }, null, 2));
+            await browser.close();
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
+
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: denim-r01-browser-qa
+          path: |
+            denim-r01-local-qa.png
+            denim-r01-local-qa.json
+            denim-r01-public-qa.png
+            denim-r01-public-qa.json
+          if-no-files-found: ignore
+          retention-days: 14

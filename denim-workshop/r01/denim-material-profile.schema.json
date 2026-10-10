@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kaopu.invalid/schemas/denim-material-profile.schema.json",
+  "title": "KAOPU Denim Material Profile",
+  "type": "object",
+  "required": ["schema", "version", "weave", "appearance", "preview", "calibration", "integration"],
+  "properties": {
+    "schema": {"const": "kaopu.denim_material_profile@1.0"},
+    "version": {"type": "string"},
+    "units": {"type": "object"},
+    "weave": {
+      "type": "object",
+      "required": ["type", "warpColor", "weftColor", "yarnScale", "slub"],
+      "properties": {
+        "type": {"enum": ["3x1_right_hand", "2x1_right_hand", "3x1_left_hand", "3x1_broken"]},
+        "warpColor": {"const": "indigo"},
+        "weftColor": {"const": "ecru"},
+        "yarnScale": {"type": "number", "minimum": 0.55, "maximum": 2.25},
+        "slub": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "appearance": {
+      "type": "object",
+      "required": ["indigoDepth", "wash", "wear", "seamVisibility", "roughness", "microNormal", "fiberFuzz"],
+      "additionalProperties": {"type": "number"}
+    },
+    "preview": {
+      "type": "object",
+      "required": ["shape", "fold", "wind"],
+      "properties": {
+        "shape": {"enum": ["flat", "soft_fold", "hanging"]},
+        "fold": {"type": "number"},
+        "wind": {"type": "boolean"}
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "required": ["physicalMeasurements", "status"]
+    },
+    "integration": {
+      "type": "object",
+      "required": ["standalone", "externalAssets", "futureConsumers"]
+    }
+  }
+}

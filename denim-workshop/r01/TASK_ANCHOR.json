@@ -1,0 +1,35 @@
+{
+  "schema": "kaopu.task_anchor@1.0",
+  "taskId": "DENIM-R01-FOUNDATION-20261010",
+  "target": "Create an isolated standalone real-time 3D denim material workbench",
+  "baseSha": "fda12bf2fe0262e4d02f1b08508128d17959e0c8",
+  "acceptedBaseline": null,
+  "referenceSet": [
+    "user-supplied Zhihu article URL (full text unavailable during this run)",
+    "CottonWorks Denim Basics",
+    "SideFX Houdini Vellum documentation",
+    "MaterialX 1.39 specification"
+  ],
+  "primaryDefect": "No dedicated denim material workbench exists in the repository",
+  "protectedInvariants": [
+    "existing cloth and leather workbenches remain unchanged",
+    "standalone single HTML remains the user-facing artifact",
+    "unknown physical values remain explicitly uncalibrated"
+  ],
+  "forbiddenRoutes": [
+    "static image substitution",
+    "CDN-dependent runtime",
+    "unverified Houdini-quality claim",
+    "direct merge to main",
+    "reuse of external mesh or image texture"
+  ],
+  "acceptanceGates": [
+    "real WebGL2 geometry renders",
+    "3D camera interaction works",
+    "weave presets change shader structure",
+    "appearance controls change rendered pixels",
+    "profile JSON exports",
+    "standalone file performs zero runtime network requests",
+    "fixed public commit URL renders"
+  ]
+}
