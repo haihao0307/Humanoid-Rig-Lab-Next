@@ -18,7 +18,7 @@ function installMaterial(m,host,mode){
   before(s);Object.assign(s.uniforms,{uS3Mode:mode,uS3Color:{value:host.skin.map},uS3Normal:{value:host.skin.normalMap},uS3Surface:{value:host.surface}});
   s.vertexShader='attribute vec2 s3Chart,s3AssetUV,s3DonorUV;attribute vec4 s3Region,s3Strain;varying vec2 vS3Chart,vS3Asset,vS3Donor;varying vec4 vS3Region,vS3Strain;\n'+s.vertexShader;
   s.vertexShader=s.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvS3Chart=s3Chart;vS3Asset=s3AssetUV;vS3Donor=s3DonorUV;vS3Region=s3Region;vS3Strain=s3Strain;');
-  s.fragmentShader=declarations+s.fragmentShader;
+  s.fragmentShader=s.fragmentShader.replace('#include <common>','#include <common>\n'+declarations);
   s.fragmentShader=s.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
    if(uS3Mode>.5&&uS3Mode<1.5){float grid=s3Line(vS3Chart);float major=s3Line(vS3Chart/5.);diffuseColor.rgb=mix(vec3(.49),vec3(.055),max(grid*.80,major));}
    if(uS3Mode>1.5&&uS3Mode<2.5){
