@@ -1,0 +1,81 @@
+name: Shoe Atelier R01
+on:
+  push:
+    branches: [feature/shoe-atelier-r01-20261010]
+    paths: ['shoe-workshop/r01/**', '.github/workflows/shoe-atelier-r01.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shoe-atelier-r01
+  cancel-in-progress: true
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/shoe-atelier-r01-20261010
+          fetch-depth: 1
+          sparse-checkout: |
+            shoe-workshop/r01
+            .github/workflows/shoe-atelier-r01.yml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Intake pinned existing human body and renderer
+        shell: bash
+        run: |
+          mkdir -p /tmp/shoe-deps/human
+          cd /tmp/shoe-deps
+          npm init -y >/dev/null
+          npm install --save-exact three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          python3 - <<'PY'
+          import urllib.request, pathlib, concurrent.futures, hashlib, json
+          root='https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/900d68a6206b9f8d220dff5a6c34fb0aa683deb5/kaopu-unified-human-workbench/'
+          files={'AnnyModel.mjs':'full/source/neck-baseline/src/AnnyModel.js','anny-model.json':'full/assets/anny-all/anny-model.json','SOURCE-LOCK.json':'full/SOURCE-LOCK.json','NOTICE.md':'full/NOTICE.md','README.md':'README.md','API.md':'API.md','State.mjs':'full/src/State.mjs'}
+          for i in range(6): files[f'anny-model-{i:02d}.bin.part']=f'full/assets/anny-all/anny-model-{i:02d}.bin.part'
+          def load(kv):
+            name,rel=kv; data=urllib.request.urlopen(root+rel,timeout=120).read();pathlib.Path('human',name).write_bytes(data)
+            return {'path':rel,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+          records=list(concurrent.futures.ThreadPoolExecutor(max_workers=5).map(load,files.items()))
+          pathlib.Path('human/INTAKE.json').write_text(json.dumps({'sourceCommit':'900d68a6206b9f8d220dff5a6c34fb0aa683deb5','files':records},indent=2))
+          print(json.dumps(records,indent=2))
+          PY
+      - name: Save reproducible dependencies
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r01-dependencies
+          path: |
+            /tmp/shoe-deps/human
+            /tmp/shoe-deps/node_modules/three
+            /tmp/shoe-deps/package-lock.json
+          retention-days: 7
+      - name: Build isolated shoe workbench
+        if: ${{ hashFiles('shoe-workshop/r01/tools/build.mjs') != '' }}
+        run: |
+          ln -s /tmp/shoe-deps/node_modules shoe-workshop/r01/node_modules
+          SHOE_DEPS=/tmp/shoe-deps node shoe-workshop/r01/tools/build.mjs
+          cd /tmp/shoe-deps && npx playwright install --with-deps chromium
+      - name: Browser regressions and snapshots
+        if: ${{ hashFiles('shoe-workshop/r01/tools/test.mjs') != '' }}
+        run: node shoe-workshop/r01/tools/test.mjs
+      - name: Save QA evidence
+        if: ${{ always() && hashFiles('shoe-workshop/r01/evidence/*') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r01-browser-evidence
+          path: shoe-workshop/r01/evidence
+          retention-days: 30
+      - name: Commit only built shoe files on the isolated branch
+        if: ${{ success() && hashFiles('shoe-workshop/r01/preview.html') != '' }}
+        run: |
+          git config user.name 'Shoe Atelier Build'
+          git config user.email 'shoe-atelier@users.noreply.github.com'
+          rm -f shoe-workshop/r01/node_modules
+          git add shoe-workshop/r01
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(shoes): frozen R01 preview and verified evidence [skip ci]'
+            git push origin HEAD:feature/shoe-atelier-r01-20261010
+          fi
