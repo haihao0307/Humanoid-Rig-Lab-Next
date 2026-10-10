@@ -2,6 +2,14 @@
 
 独立牛仔布材质工作台。R01 只处理牛仔布本体，不改动人物、裁缝铺、其他布料母体、服装纸样或现有工作台。
 
+## 固定公网入口
+
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/f62d9cdafebd142d01b6d1f778f9e201a6d852c6/denim-workshop/r01/index.html
+
+该入口锚定已通过真实公网浏览器验收的提交 `f62d9cdafebd142d01b6d1f778f9e201a6d852c6`。验收运行：
+
+https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/38023705873
+
 ## 本轮真实能力
 
 - 单体 HTML，所有 CSS、JavaScript、WebGL2 着色器和几何数据以内联 gzip 载荷封装，由浏览器原生 `DecompressionStream` 展开；无 CDN、图片贴图、GLB、字体或外部运行资源；需使用支持 `DecompressionStream` 与 WebGL2 的现代浏览器。
@@ -22,10 +30,6 @@ R01 是视觉与数据基础，不是影视级成品，也不等于 Houdini Vell
 - 未实现由应变、接触、洗水历史驱动的猫须、蜂窝、落色和磨破演化。
 - 未进行 MaterialX/USD/Houdini 往返与影视镜头级离线渲染校准。
 
-## 固定验收入口
-
-`denim-workshop/r01/index.html`
-
 ## 门禁
 
 - [x] 没有用生成图片代替真实三维实现。
@@ -33,5 +37,7 @@ R01 是视觉与数据基础，不是影视级成品，也不等于 Houdini Vell
 - [x] 用户看到的是可交互三维工作台。
 - [x] 牛仔布几何、材质与参数来自真实运行时。
 - [x] 镜头、形态、组织、染色与表面参数可以实际操作。
-- [ ] 公网固定链接和真实浏览器已验证（提交后补充 commit 与验证记录）。
+- [x] 公网固定提交链接和真实浏览器已验证。
+- [x] 桌面 1440 × 1000 已验证。
+- [x] 手机 390 × 844 视口模拟已验证；不是实机。
 - [x] 不是只有截图而没有工作台。
