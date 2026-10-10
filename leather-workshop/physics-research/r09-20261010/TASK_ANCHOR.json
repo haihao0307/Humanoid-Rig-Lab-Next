@@ -1,0 +1,63 @@
+{
+  "taskId": "LEATHER-PHYSICS-R09-20261010",
+  "target": "R08 grab/swing physics: sheet intersections, multi-layer yarn detachment, jelly-like response and craft integration",
+  "baselineHead": "fe71a64bf15694904d9f7cc24a7c34163cb9083a",
+  "baselineBuild": "f1ab73a7b289461a7d81e65eed935ec62369ed34",
+  "baselineHTMLSHA256": "c9524e0c9d50ba8ba4e8070f621fc2e0d05a387b8c33b06e49a9e518da4e86be",
+  "userAccepted": ["R08 appearance-parameter integration"],
+  "userNotAccepted": ["R08 product physics", "sheet self-contact", "yarn-to-leather integration under motion"],
+  "protected": ["leather-workshop/r01", "leather-workshop/r02", "leather-workshop/r03", "leather-workshop/r04", "leather-workshop/r05", "leather-workshop/r06", "leather-workshop/r07", "leather-workshop/r08", "leather-workshop/anchors"],
+  "scope": "Research, reproducible root-cause isolation and candidate unit-tested operators. No production runtime change in this stage.",
+  "forbiddenRoutes": [
+    "Treating a closed visible mesh as proof of collision-safe dynamics",
+    "Treating finite positions, stretch limits or rendering success as complete physics acceptance",
+    "Making all materials rigid or merely increasing one stiffness constant to hide jelly behavior",
+    "Using disconnected tube stitches or substituting static images for the running product",
+    "Excluding different-layer contacts solely because their initial points are close",
+    "Assigning all segments of a multi-layer seam to one panel",
+    "Rotating anisotropic material axes with arbitrary triangle vertex numbering",
+    "Claiming native IPC test success means IPC is deployed in the browser",
+    "Claiming an intact old craft file means all craft mechanics are integrated into product dynamics"
+  ],
+  "confirmedDefects": [
+    "Original R08 misses an initially separated triangle-interior crossing at 0.5 m/s without any stretch explosion",
+    "All actual card-holder yarn binding entries use the front panel; the backside yarn ignores an isolated 1mm back-panel motion",
+    "Identical prescribed deformation yields different material energy under cyclic vertex reordering",
+    "Reference-thickness hinge coefficient is one third of the R04 formula for the same local geometry",
+    "Velocity damping coefficients and material integration differ from the preserved R04 experiment"
+  ],
+  "verifiedNotMissing": [
+    "Yarn shader reads the changing node texture during actual pointer grab",
+    "The archived R02 craft interface loads and contains actual controls"
+  ],
+  "isolatedCorrections": [
+    "Use explicit rest material-chart tangents, independent of triangle enumeration",
+    "Explicit front-carrier, hole-interior and back-carrier interpolation for a multi-layer yarn passage"
+  ],
+  "contactReference": {
+    "name": "IPC Toolkit",
+    "testedVersion": "1.6.0",
+    "deployment": "native reference experiment only",
+    "methods": ["TightInclusionCCD", "AdditiveCCD", "finite-distance point-triangle and edge-edge contacts", "normal contact barrier derivatives"],
+    "remainingIntegration": ["valid initial product collision meshes", "contact force/friction integration", "browser execution and runtime packaging", "full-product validation"]
+  },
+  "researchEvidence": {
+    "workflowRun": 38035264134,
+    "testedSourceCommit": "d77f5fdca48d3a9473f4a49ade6c7bb131bbde6b",
+    "receipt": "RESULTS_RECEIPT.json",
+    "meaning": "Green research assertions reproduce baseline failures and test isolated repairs. They do not certify the old or a new product physics runtime."
+  },
+  "futureProductionGates": [
+    "Initially feasible finite-thickness surface geometry and explicit seam adjacency",
+    "Swept point-triangle and edge-edge contact validation, not vertex spheres alone",
+    "Independent cross-layer yarn carrier tests and distance to the final visible skin during motion",
+    "Material-coordinate, rigid-motion and mesh-refinement consistency",
+    "Controlled loading, unloading, bending and decay comparisons against the R04 reference, with measured versus assumed parameters separated",
+    "Integrated craft geometry and contacts verified per applicable product",
+    "No change to accepted appearance, old archives or locked historical files",
+    "Only after full-product tests: actual standalone and fixed-public-URL browser checks, with mobile simulation distinguished from hardware"
+  ],
+  "status": "RESEARCH_AND_ISOLATED_REPAIRS_ONLY",
+  "releaseReady": false,
+  "publicRuntimeChanged": false
+}
