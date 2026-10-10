@@ -1,0 +1,87 @@
+name: Leather R08 closed shell verification
+on:
+  push:
+    branches: [fix/leather-r08-continuous-shell-20261010]
+    paths: [.github/workflows/leather-r08-verify.yml]
+permissions:
+  contents: write
+concurrency:
+  group: leather-r08-verify
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/leather-r08-continuous-shell-20261010
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact transfer bytes before applying new source
+        run: |
+          git fetch --depth=1 origin 426b725e1608a10f99bdf1532914daf5d2b2ea49
+          git diff --exit-code 426b725e1608a10f99bdf1532914daf5d2b2ea49 -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/r07 leather-workshop/anchors
+          python - <<'PY'
+          import base64,gzip,hashlib,json,subprocess
+          from pathlib import Path
+          r=Path('leather-workshop/r08');t=r/'transport';m=json.loads((t/'MANIFEST.json').read_text())
+          data=''.join((t/f'delta.{s}.b64').read_text().strip() for s in m['segments'])
+          for s in m['segments']:
+            b=(t/f'delta.{s}.b64').read_bytes();print(s,len(b),hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest())
+          raw=base64.b64decode(data,validate=True)
+          assert hashlib.sha256(raw).hexdigest()==m['gzipSHA256'], 'Transport corruption: stop; do not update expected hash'
+          patch=gzip.decompress(raw)
+          assert hashlib.sha256(patch).hexdigest()==m['patchSHA256']
+          Path('/tmp/r08.patch').write_bytes(patch)
+          if not all((r/p).exists() and hashlib.sha256((r/p).read_bytes()).hexdigest()==h for p,h in m['files'].items()):
+            subprocess.run(['git','apply','--check','/tmp/r08.patch'],check=True)
+            subprocess.run(['git','apply','/tmp/r08.patch'],check=True)
+          for p,h in m['files'].items():assert hashlib.sha256((r/p).read_bytes()).hexdigest()==h,p
+          for p in t.glob('*.b64'):p.unlink()
+          print('Expanded source hashes verified; historical files untouched.')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r08
+          git commit -m 'fix(leather-r08): closed indexed leather shells, complete controls and jacket; retire transfer fragments'
+          git push origin HEAD:refs/heads/fix/leather-r08-continuous-shell-20261010
+          echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Browser dependencies
+        timeout-minutes: 5
+        run: |
+          pip --disable-pip-version-check install --timeout 35 --retries 2 pillow numpy playwright==1.55.0
+          CHROME=$(command -v google-chrome || command -v chromium)
+          test -x "$CHROME"
+          echo "KAOPU_CHROMIUM_EXECUTABLE=$CHROME" >> "$GITHUB_ENV"
+          if [ -z "$(fc-list :lang=zh)" ]; then
+            mkdir -p "$HOME/.local/share/fonts"
+            curl -fL --connect-timeout 15 --max-time 90 --retry 1 https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf -o "$HOME/.local/share/fonts/NotoSansCJKsc-Regular.otf"
+            fc-cache -f
+          fi
+      - name: Standalone build
+        run: python leather-workshop/r08/build.py
+      - name: Actual seven-product browser inspection
+        run: python leather-workshop/r08/qa-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r08-browser-${{ github.run_id }}
+          path: leather-workshop/r08/
+          retention-days: 7
+      - name: Closed surface, measured thickness and seven-product dynamics
+        run: node leather-workshop/r08/verify-r08.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r08-numeric-${{ github.run_id }}
+          path: leather-workshop/r08/qa-closure.json
+          retention-days: 7
