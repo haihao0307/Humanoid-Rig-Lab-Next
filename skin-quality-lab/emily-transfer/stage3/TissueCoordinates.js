@@ -13,6 +13,34 @@ function mapDonor(frame,chart){
  const x=chart[0]-frame.centre[0],y=chart[1]-frame.centre[1];
  return [frame.origin[0]+frame.du[0]*x+frame.dv[0]*y,frame.origin[1]+frame.du[1]*x+frame.dv[1]*y];
 }
+/** Arc-parameterized annular chart with BOTH boundary rings fixed.
+ * Unnormalised arc length followed by a collar blend can reverse the chart
+ * before its outer boundary. Normalise each ray by its full length instead,
+ * and test every indexed triangle after float32 storage before binding. */
+function developChart(lid){
+ const g=lid.mesh.geometry,P=g.attributes.position,S=lid.A+1,n=P.count,reference=new Float32Array(n*2),developed=new Float32Array(n*2),chart=new Float32Array(n*2),ix=g.index.array;
+ for(let i=0;i<n;i++){reference[i*2]=P.getX(i)*1000;reference[i*2+1]=P.getY(i)*1000;}
+ for(let a=0;a<=lid.A;a++){
+  const lengths=new Float64Array(lid.R+1);for(let j=1;j<=lid.R;j++)lengths[j]=lengths[j-1]+length(P,j*S+a,(j-1)*S+a);
+  const total=lengths[lid.R]||1,end=lid.R*S+a;
+  for(let j=0;j<=lid.R;j++){const k=j*S+a,t=lengths[j]/total;developed[k*2]=mix(reference[a*2],reference[end*2],t);developed[k*2+1]=mix(reference[a*2+1],reference[end*2+1],t);}
+ }
+ const area=(p,a,b,c)=>(p[b*2]-p[a*2])*(p[c*2+1]-p[a*2+1])-(p[b*2+1]-p[a*2+1])*(p[c*2]-p[a*2]);
+ const refAreas=new Float64Array(ix.length/3);for(let i=0;i<ix.length;i+=3)refAreas[i/3]=area(reference,ix[i],ix[i+1],ix[i+2]);
+ let weight=1,foldovers=0,degenerate=0,tested=0,minRatio=Infinity,attempt=0;
+ for(;attempt<22;attempt++){
+  for(let i=0;i<chart.length;i++)chart[i]=mix(reference[i],developed[i],weight);
+  foldovers=0;degenerate=0;tested=0;minRatio=Infinity;
+  for(let i=0;i<ix.length;i+=3){const a=refAreas[i/3];if(Math.abs(a)<1e-9){degenerate++;continue;}const ratio=area(chart,ix[i],ix[i+1],ix[i+2])/a;minRatio=Math.min(minRatio,ratio);tested++;if(ratio<.02)foldovers++;}
+  if(!foldovers)break;weight*=.5;
+ }
+ if(foldovers)throw Error('Non-injective neutral eyelid chart');
+ const scales=[];for(let k=0;k<ix.length;k+=3)for(const [a,b]of [[ix[k],ix[k+1]],[ix[k+1],ix[k+2]],[ix[k+2],ix[k]]]){
+  const physical=length(P,a,b)*1000;if(physical<.00001)continue;scales.push(Math.hypot(chart[a*2]-chart[b*2],chart[a*2+1]-chart[b*2+1])/physical);
+ }
+ scales.sort((a,b)=>a-b);
+ return {chart,report:{testedTriangles:tested,foldovers,referenceDegenerateTriangles:degenerate,minSignedAreaRatio:minRatio,arcRedistributionWeight:weight,chartToSurfaceEdgeScaleP05:scales[Math.floor(scales.length*.05)],chartToSurfaceEdgeScaleP50:scales[Math.floor(scales.length*.50)],chartToSurfaceEdgeScaleP95:scales[Math.floor(scales.length*.95)],globallyIsometric:false,definition:'millimetre-scaled developed coordinates; not a claim that every grid edge on the curved surface is exactly 1 mm'}};
+}
 function allocate(mesh,label,frame,cols,rows,regionAt,chartAt){
  const g=mesh.geometry,P=g.attributes.position,uv=g.attributes.uv,n=P.count,rest=P.array.slice(),chart=new Float32Array(n*2),asset=new Float32Array(n*2),donor=new Float32Array(n*2),region=new Float32Array(n*4),strain=new Float32Array(n*4);
  for(let i=0;i<n;i++){
@@ -38,17 +66,9 @@ export function bindTissueCoordinates(rig){
  // Existing facial atlas is retained outside the reconstructed eye region.
  const h=allocate(rig.mesh,'head',donorFrame(rig.eyes[0]),P.count,1,()=>[0,0,0,0]);rig.chartBindings.push(h);
  for(const e of rig.eyes){
-  const {lid}=e,F=donorFrame(e),S=lid.A+1,G=lid.mesh.geometry,P=G.attributes.position,charts=new Float32Array(P.count*2);
-  // Develop each meridian by its neutral 3D arc length. Blend the outer collar
-  // into the unchanged head chart. This is not the old closed crease UV.
-  for(let a=0;a<=lid.A;a++){
-   const p0=at(P,a),end=at(P,lid.R*S+a),dx=end[0]-p0[0],dy=end[1]-p0[1],len=Math.hypot(dx,dy)||1;let distance=0;
-   for(let j=0;j<=lid.R;j++){
-    const k=j*S+a;if(j)distance+=length(P,k,k-S)*1000;const fade=smooth((j/lid.R-.60)/.40);
-    charts[k*2]=mix(p0[0]*1000+dx/len*distance,P.getX(k)*1000,fade);charts[k*2+1]=mix(p0[1]*1000+dy/len*distance,P.getY(k)*1000,fade);
-   }
-  }
+  const {lid}=e,F=donorFrame(e),S=lid.A+1,G=lid.mesh.geometry,result=developChart(lid),charts=result.chart;
   const outer=allocate(lid.mesh,e.c.name+'/outer',F,S,lid.R+1,i=>{const q=lid.entries[i];return [1-smooth((q.t-.20)/.58),0,(q.ny>=0?1:0)*(1-smooth(q.t/.65)),0];},i=>[charts[i*2],charts[i*2+1]]);
+  outer.chartQuality=result.report;
   const edge=allocate(lid.edge,e.c.name+'/margin',F,lid.es+1,S,i=>[1,1-(i%(lid.es+1))/lid.es,0,1]);
   const inside=allocate(lid.inside,e.c.name+'/mucosa',F,S,lid.ni+1,()=>[1,1,0,1]);
   const E=lid.edge.geometry,I=lid.inside.geometry;
@@ -87,17 +107,19 @@ export function updateTissueStrain(rig){
    const [a,d,c,f]=b.neighbours.subarray(i*4,i*4+4),ux=P.getX(d)-P.getX(a),uy=P.getY(d)-P.getY(a),uz=P.getZ(d)-P.getZ(a),vx=P.getX(f)-P.getX(c),vy=P.getY(f)-P.getY(c),vz=P.getZ(f)-P.getZ(c);
    const A=ux*ux+uy*uy+uz*uz,B=ux*vx+uy*vy+uz*vz,C=vx*vx+vy*vy+vz*vz,[a0,b0,c0]=b.metric.subarray(i*3,i*3+3),det0=a0*c0-b0*b0;
    const tr=(c0*A+a0*C-2*b0*B)/det0,det=Math.max(0,(A*C-B*B)/det0),disc=Math.sqrt(Math.max(0,tr*tr-4*det));
-   const small=Math.sqrt(Math.max(0,(tr-disc)/2)),large=Math.sqrt(Math.max(0,(tr+disc)/2)),theta=.5*Math.atan2(2*(B-b0),A-a0-C+c0);
-   T.setXYZW(i,small,large,theta,Math.sqrt(det));valid++;min=Math.min(min,small);max=Math.max(max,large);samples.push(large);
+   const small=Math.sqrt(Math.max(0,(tr-disc)/2)),large=Math.sqrt(Math.max(0,(tr+disc)/2));
+   // No unverified principal-direction angle is exposed. The fourth-stage
+   // physical deformation must provide a properly transported tangent basis.
+   T.setXYZW(i,small,large,0,Math.sqrt(det));valid++;min=Math.min(min,small);max=Math.max(max,large);samples.push(large);
   }
   samples.sort((a,b)=>a-b);b.strainReport={samples:valid,degenerateReferenceSamples:degenerate,minStretch:Number.isFinite(min)?min:null,maxStretch:max,p95MaxStretch:samples[Math.floor(samples.length*.95)]??null};T.needsUpdate=true;
  }
 }
 export function tissueReport(rig){
- const entries=(rig.chartBindings||[]).map(b=>({name:b.label,vertices:b.mesh.geometry.attributes.position.count,immutableRestAttributes:STATIC.every(n=>checksum(b.mesh.geometry.attributes[n].array)===b.staticHash[n]),finiteAttributes:STATIC.every(n=>Array.from(b.mesh.geometry.attributes[n].array).every(Number.isFinite)),strain:b.strainReport||null}));
+ const entries=(rig.chartBindings||[]).map(b=>({name:b.label,vertices:b.mesh.geometry.attributes.position.count,immutableRestAttributes:STATIC.every(n=>checksum(b.mesh.geometry.attributes[n].array)===b.staticHash[n]),finiteAttributes:STATIC.every(n=>Array.from(b.mesh.geometry.attributes[n].array).every(Number.isFinite)),chartQuality:b.chartQuality||null,strain:b.strainReport||null}));
  let seam=0;
  for(const e of rig.eyes)for(let a=0;a<=e.lid.A;a++)for(const [g,k,h,j]of[[e.lid.mesh.geometry,a,e.lid.edge.geometry,a*(e.lid.es+1)+e.lid.es],[e.lid.inside.geometry,a,e.lid.edge.geometry,a*(e.lid.es+1)]]){
   for(const n of ['s3Chart','s3AssetUV','s3DonorUV']){const x=g.attributes[n],y=h.attributes[n];for(let c=0;c<x.itemSize;c++)seam=Math.max(seam,Math.abs(x.array[k*x.itemSize+c]-y.array[j*y.itemSize+c]));}
  }
- return {schema:'kaopu/neutral-tissue-chart@1',units:'millimetres for developed chart; unitless strain',reference:'neutral open ET10 geometric rest surface, captured once',newClosedScanUVUsedForMobileSkin:false,restAttributesNeverReprojectedDuringAnimation:true,sharedCoordinateAndMaskForColorNormalRoughness:true,materialBoundaryMaxError:seam,entries,poreDensityConservationClaim:false,limitation:'A fixed material chart cannot erase stretch in a non-isometric geometric animation. Strain is exposed, not hidden by sliding UVs; dynamic folding remains stage four.'};
+ return {schema:'kaopu/neutral-tissue-chart@1',units:'millimetre-scaled developed chart; not globally isometric; unitless strain',reference:'neutral open ET10 geometric rest surface, captured once',newClosedScanUVUsedForMobileSkin:false,restAttributesNeverReprojectedDuringAnimation:true,sharedCoordinateAndMaskForColorNormalRoughness:true,materialBoundaryMaxError:seam,entries,poreDensityConservationClaim:false,principalWrinkleDirectionImplemented:false,limitation:'A fixed material chart cannot erase stretch in a non-isometric geometric animation. Strain is exposed, not hidden by sliding UVs; dynamic folding remains stage four.'};
 }
