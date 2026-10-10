@@ -1,0 +1,24 @@
+name: Denim R05 Source Reading
+on:
+  push:
+    branches: [feature/denim-r05-fiber-studio-20261010]
+    paths: ['.github/workflows/denim-r05-source-reading.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-papers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read the two user-specified primary PDFs
+        run: |
+          mkdir -p study
+          curl -fL --retry 2 --max-time 100 'https://animallogic.com/wp-content/uploads/2023/08/Simulating-woven-fabrics-with-Weave.pdf' -o study/weave.pdf
+          curl -fL --retry 2 --max-time 100 'https://cdn.disneyanimation.com/uploads/publications/CurveBasedGarmentswithCustomWeavePatterns.pdf' -o study/disney.pdf
+          sha256sum study/*.pdf > study/hashes.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: denim-r05-primary-reading
+          path: study/
+          retention-days: 1
