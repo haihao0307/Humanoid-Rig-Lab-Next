@@ -1,0 +1,82 @@
+name: Denim R04 Natural Yarn Public QA
+on:
+  push:
+    branches: [fix/denim-r04-clumped-fray-sag-20261010]
+    paths:
+      - 'denim-workshop/r04/*.js'
+      - 'denim-workshop/r04/*.py'
+      - 'denim-workshop/r04/*.cjs'
+      - 'denim-workshop/r04/template.html'
+      - '.github/workflows/denim-r04-natural-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: denim-r04-natural-yarn-qa
+  cancel-in-progress: false
+jobs:
+  natural-public-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Inherit fixed R03 source and assemble R04
+        run: |
+          if [ ! -f denim-workshop/r04/app.js ]; then
+            python3 denim-workshop/r04/upgrade.py
+          fi
+          python3 denim-workshop/r04/polish.py
+          python3 denim-workshop/r04/build.py
+          node --check denim-workshop/r04/app.js
+          node --check denim-workshop/r04/natural-yarn.js
+          node denim-workshop/r04/test-natural.cjs
+          python3 - <<'PY'
+          import pathlib,hashlib,json
+          p=pathlib.Path('denim-workshop/r04')
+          h=hashlib.sha256((p/'index.html').read_bytes()).hexdigest()
+          assert h=='1535f35e53c75091dad619489cc352cd5a9b8647618225043d08f0f458aea515', h
+          assert hashlib.sha256(pathlib.Path('denim-workshop/r03/index.html').read_bytes()).hexdigest()=='2e92a73364d0f864ce7a8077b2e220e75291bdd72da367f9ca649f40eec73b40'
+          print('R04_VERIFIED_HTML_SHA256',h)
+          PY
+      - name: Publish canonical R04 source and standalone with fast-forward push
+        id: publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add denim-workshop/r04/core.js denim-workshop/r04/app.js denim-workshop/r04/template.html denim-workshop/r04/index.html denim-workshop/r04/BUILD_MANIFEST.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Build R04.0 retained yarn bridges, dangling tails and mixed clumped fray'
+            git push origin HEAD:fix/denim-r04-clumped-fray-sag-20261010
+          fi
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/denim-workshop/r04/index.html" >> "$GITHUB_ENV"
+          echo "TESTED_BUILD_SHA=$SHA"
+      - name: Install test Chromium
+        run: |
+          python3 -m pip install playwright==1.55.0
+          python3 -m playwright install --with-deps chromium
+      - name: Actual local-file and fixed-public browser regression
+        run: xvfb-run -a python3 -u denim-workshop/r04/qa.py --public "$PUBLIC_URL"
+      - name: Upload rendered and numeric evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: denim-r04-natural-yarn-evidence
+          path: |
+            denim-workshop/r04/evidence/**
+            denim-workshop/r04/natural-qa.json
+            denim-workshop/r04/index.html
+            denim-workshop/r04/BUILD_MANIFEST.json
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Receipt
+        if: success()
+        run: |
+          echo '## Denim R04 candidate' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Tested build: ${{ steps.publish.outputs.sha }}' >> "$GITHUB_STEP_SUMMARY"
+          echo "$PUBLIC_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Actual file:// and fixed public HTTPS verified. Static anchored drapes, not physical tearing. User visual acceptance and phone-hardware performance pending.' >> "$GITHUB_STEP_SUMMARY"
