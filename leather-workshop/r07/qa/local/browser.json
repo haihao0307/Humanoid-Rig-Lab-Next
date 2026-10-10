@@ -1,6 +1,11 @@
 {
   "checks": [
     {
+      "name": "R07.2 current runtime starts without an error overlay",
+      "pass": true,
+      "detail": ""
+    },
+    {
       "name": "R07 ready without shader or runtime errors",
       "pass": true,
       "detail": []
@@ -27,7 +32,7 @@
         "boundsMM": [
           108,
           75.99998778104782,
-          3.8748450875282288
+          3.8430896401405334
         ],
         "seams": [
           {
@@ -107,8 +112,8 @@
       "detail": {
         "kind": "belt",
         "finite": true,
-        "vertices": 719170,
-        "triangles": 1275836,
+        "vertices": 718930,
+        "triangles": 1275748,
         "holes": 649,
         "continuousThreadMeshes": 2,
         "detachedSticks": 0,
@@ -116,9 +121,9 @@
         "massModel": "surface area × actual thickness × 700kg/m3, plus named hardware masses",
         "physicalCalibration": false,
         "boundsMM": [
-          190.3137969970703,
+          190.28170776367188,
           45.400000751018524,
-          197.2388916015625
+          197.20427703857422
         ],
         "seams": [
           {
@@ -177,8 +182,8 @@
       "detail": {
         "kind": "bag",
         "finite": true,
-        "vertices": 1407364,
-        "triangles": 2529482,
+        "vertices": 1403892,
+        "triangles": 2523980,
         "holes": 1228,
         "continuousThreadMeshes": 7,
         "detachedSticks": 0,
@@ -187,7 +192,7 @@
         "physicalCalibration": false,
         "boundsMM": [
           316.0111389160156,
-          414.3926574587822,
+          414.37623900175095,
           84.86014175415039
         ],
         "seams": [
@@ -352,8 +357,8 @@
       "detail": {
         "kind": "cowboy",
         "finite": true,
-        "vertices": 1131054,
-        "triangles": 2010910,
+        "vertices": 1109398,
+        "triangles": 1969840,
         "holes": 1057,
         "continuousThreadMeshes": 6,
         "detachedSticks": 0,
@@ -506,8 +511,8 @@
       "detail": {
         "kind": "pirate",
         "finite": true,
-        "vertices": 1092405,
-        "triangles": 1930608,
+        "vertices": 1076607,
+        "triangles": 1901776,
         "holes": 1093,
         "continuousThreadMeshes": 6,
         "detachedSticks": 0,
@@ -516,7 +521,7 @@
         "physicalCalibration": false,
         "boundsMM": [
           336.81329345703125,
-          91.04785460233688,
+          91.85375517606735,
           340.6718444824219
         ],
         "seams": [
@@ -712,24 +717,60 @@
       "name": "grip propagates force and moves mass centre",
       "pass": true,
       "detail": {
+        "seamConstraintCount": 100,
+        "maxSeamGapErrorMM": 0.28343700837283115,
         "version": "R07-shell-1",
-        "timeS": 0.816666666666665,
-        "steps": 196,
+        "timeS": 0.7749999999999985,
+        "steps": 186,
         "extraConvergenceIterations": 0,
-        "nodeCount": 105,
-        "triangles": 144,
-        "massG": 16.057440000000007,
+        "nodeCount": 190,
+        "triangles": 288,
+        "massG": 16.05743999999996,
         "centerMM": [
-          6.983934458909789,
-          18.09761974971702,
-          -3.912336969486301
+          6.383043629812002,
+          40.50412350066645,
+          -7.01840895295715
         ],
-        "maxStretch": 1.0141084947616519,
-        "peakStretch": 1.0183852821600905,
-        "maxEdgeChangeMM": 0.2539529057097346,
-        "groundMinMM": 0.5551618137820481,
-        "grabErrorMM": 0.21824566780208435,
-        "grabForceN": 0.1525422707570405,
+        "maxStretch": 1.0228922571088803,
+        "peakStretch": 1.0339722171397574,
+        "maxEdgeChangeMM": 0.27470708530656296,
+        "groundMinMM": 12.45954543509726,
+        "grabErrorMM": 0.3007766570332395,
+        "grabForceN": 0.11368413841206958,
+        "held": true,
+        "active": true,
+        "finite": true,
+        "failed": null,
+        "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+        "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+        "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+        "calibrated": false
+      }
+    },
+    {
+      "name": "wallet seam remains joined while the pointer lifts it",
+      "pass": true,
+      "detail": {
+        "seamConstraintCount": 100,
+        "maxSeamGapErrorMM": 0.28343700837283115,
+        "version": "R07-shell-1",
+        "timeS": 0.7749999999999985,
+        "steps": 186,
+        "extraConvergenceIterations": 0,
+        "nodeCount": 190,
+        "triangles": 288,
+        "massG": 16.05743999999996,
+        "centerMM": [
+          6.383043629812002,
+          40.50412350066645,
+          -7.01840895295715
+        ],
+        "maxStretch": 1.0228922571088803,
+        "peakStretch": 1.0339722171397574,
+        "maxEdgeChangeMM": 0.27470708530656296,
+        "groundMinMM": 12.45954543509726,
+        "grabErrorMM": 0.3007766570332395,
+        "grabForceN": 0.11368413841206958,
         "held": true,
         "active": true,
         "finite": true,
@@ -744,24 +785,26 @@
       "name": "release retains dynamic evolution",
       "pass": true,
       "detail": {
+        "seamConstraintCount": 100,
+        "maxSeamGapErrorMM": 0.5065280865253277,
         "version": "R07-shell-1",
-        "timeS": 0.9666666666666645,
-        "steps": 232,
+        "timeS": 0.899999999999998,
+        "steps": 216,
         "extraConvergenceIterations": 0,
-        "nodeCount": 105,
-        "triangles": 144,
-        "massG": 16.057440000000007,
+        "nodeCount": 190,
+        "triangles": 288,
+        "massG": 16.05743999999996,
         "centerMM": [
-          7.9497742566792144,
-          16.628726773895494,
-          -2.757450674335122
+          6.483035033450065,
+          36.75079176903989,
+          -6.799261677596699
         ],
-        "maxStretch": 1.0040508088284834,
-        "peakStretch": 1.0183852821600905,
-        "maxEdgeChangeMM": 0.056711323598766794,
-        "groundMinMM": 6.871547673000944,
+        "maxStretch": 1.0335638032829277,
+        "peakStretch": 1.0339722171397574,
+        "maxEdgeChangeMM": 0.4027656393951317,
+        "groundMinMM": 15.913832641929092,
         "grabErrorMM": 0,
-        "grabForceN": 0.1441504809645484,
+        "grabForceN": 0,
         "held": false,
         "active": true,
         "finite": true,
@@ -770,6 +813,341 @@
         "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
         "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
         "calibrated": false
+      }
+    },
+    {
+      "name": "belt real nodal grip, swing and release",
+      "pass": true,
+      "detail": {
+        "held": {
+          "seamConstraintCount": 5,
+          "maxSeamGapErrorMM": 0.09890576320166836,
+          "version": "R07-shell-1",
+          "timeS": 0.6666666666666655,
+          "steps": 160,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 150,
+          "triangles": 196,
+          "massG": 118.67799598855385,
+          "centerMM": [
+            97.32866873625306,
+            114.62208979365204,
+            -40.70529763273971
+          ],
+          "maxStretch": 1.0130356945548549,
+          "peakStretch": 1.0183109179146526,
+          "maxEdgeChangeMM": 0.35709295085641773,
+          "groundMinMM": 0.5000000000000002,
+          "grabErrorMM": 0.016710010985486135,
+          "grabForceN": 0.9857233382484272,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "released": {
+          "seamConstraintCount": 5,
+          "maxSeamGapErrorMM": 0.015768718075192395,
+          "version": "R07-shell-1",
+          "timeS": 0.8666666666666648,
+          "steps": 208,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 150,
+          "triangles": 196,
+          "massG": 118.67799598855385,
+          "centerMM": [
+            129.90567632078512,
+            26.414137602077577,
+            -27.81044459032046
+          ],
+          "maxStretch": 1.0060593127462403,
+          "peakStretch": 1.0183109179146526,
+          "maxEdgeChangeMM": 0.3605049612006514,
+          "groundMinMM": 0.5000000000000002,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": false,
+          "active": false,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "positionsChanged": true
+      }
+    },
+    {
+      "name": "bag real nodal grip, swing and release",
+      "pass": true,
+      "detail": {
+        "held": {
+          "seamConstraintCount": 118,
+          "maxSeamGapErrorMM": 1.928912310591572,
+          "version": "R07-shell-1",
+          "timeS": 0.6666666666666655,
+          "steps": 160,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 429,
+          "triangles": 652,
+          "massG": 274.4935121384454,
+          "centerMM": [
+            43.96850308048669,
+            222.80686502630095,
+            42.68335822463897
+          ],
+          "maxStretch": 1.034958326425804,
+          "peakStretch": 1.062747728031405,
+          "maxEdgeChangeMM": 1.009578777275668,
+          "groundMinMM": 68.28834583961402,
+          "grabErrorMM": 0.5415356678770067,
+          "grabForceN": 3.7617991625430527,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "released": {
+          "seamConstraintCount": 118,
+          "maxSeamGapErrorMM": 1.5591984627388902,
+          "version": "R07-shell-1",
+          "timeS": 0.8666666666666648,
+          "steps": 208,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 429,
+          "triangles": 652,
+          "massG": 274.4935121384454,
+          "centerMM": [
+            48.63444308303809,
+            19.840253768956213,
+            -29.386956484572284
+          ],
+          "maxStretch": 1.0339912300402279,
+          "peakStretch": 1.062747728031405,
+          "maxEdgeChangeMM": 0.6705074484517938,
+          "groundMinMM": 0.5,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": false,
+          "active": false,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "positionsChanged": true
+      }
+    },
+    {
+      "name": "cowboy real nodal grip, swing and release",
+      "pass": true,
+      "detail": {
+        "held": {
+          "seamConstraintCount": 105,
+          "maxSeamGapErrorMM": 0.2823032539213873,
+          "version": "R07-shell-1",
+          "timeS": 0.6666666666666655,
+          "steps": 160,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 301,
+          "triangles": 460,
+          "massG": 221.64737688470927,
+          "centerMM": [
+            -52.964245743729656,
+            280.8988481973718,
+            -11.518991859992292
+          ],
+          "maxStretch": 1.0169722195985278,
+          "peakStretch": 1.0748829502971613,
+          "maxEdgeChangeMM": 0.4815350548466324,
+          "groundMinMM": 101.34327662905709,
+          "grabErrorMM": 0.5053062401169985,
+          "grabForceN": 1.508744556140717,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "released": {
+          "seamConstraintCount": 105,
+          "maxSeamGapErrorMM": 1.7817887685939882,
+          "version": "R07-shell-1",
+          "timeS": 0.8666666666666648,
+          "steps": 208,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 301,
+          "triangles": 460,
+          "massG": 221.64737688470927,
+          "centerMM": [
+            4.434970582403605,
+            103.96095752008968,
+            -69.02724143231003
+          ],
+          "maxStretch": 1.032547326001932,
+          "peakStretch": 1.0748829502971613,
+          "maxEdgeChangeMM": 1.055777943793537,
+          "groundMinMM": 0.5,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": false,
+          "active": false,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "positionsChanged": true
+      }
+    },
+    {
+      "name": "pirate real nodal grip, swing and release",
+      "pass": true,
+      "detail": {
+        "held": {
+          "seamConstraintCount": 111,
+          "maxSeamGapErrorMM": 0.7774201744963684,
+          "version": "R07-shell-1",
+          "timeS": 0.6666666666666655,
+          "steps": 160,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 317,
+          "triangles": 456,
+          "massG": 237.67331362813997,
+          "centerMM": [
+            -92.326117149459,
+            286.600794641944,
+            -17.79488477670735
+          ],
+          "maxStretch": 1.0666421184495223,
+          "peakStretch": 1.2799772335424966,
+          "maxEdgeChangeMM": 0.8388191653746699,
+          "groundMinMM": 162.71082229574523,
+          "grabErrorMM": 0.6714578083501045,
+          "grabForceN": 2.148471568636667,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "released": {
+          "seamConstraintCount": 111,
+          "maxSeamGapErrorMM": 5.455653499988646,
+          "version": "R07-shell-1",
+          "timeS": 0.8666666666666648,
+          "steps": 208,
+          "extraConvergenceIterations": 144,
+          "nodeCount": 317,
+          "triangles": 456,
+          "massG": 237.67331362813997,
+          "centerMM": [
+            -90.93983443485943,
+            86.49736510809224,
+            -42.53324522693208
+          ],
+          "maxStretch": 1.6583512235499716,
+          "peakStretch": 1.6583512235499716,
+          "maxEdgeChangeMM": 4.389008156999796,
+          "groundMinMM": 0.5,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": false,
+          "active": false,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "positionsChanged": true
+      }
+    },
+    {
+      "name": "swatch real nodal grip, swing and release",
+      "pass": true,
+      "detail": {
+        "held": {
+          "seamConstraintCount": 0,
+          "maxSeamGapErrorMM": 0,
+          "version": "R07-shell-1",
+          "timeS": 0.6666666666666655,
+          "steps": 160,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 90,
+          "triangles": 144,
+          "massG": 20.62718798394927,
+          "centerMM": [
+            12.386972780876988,
+            224.24297757887015,
+            -39.3871478805673
+          ],
+          "maxStretch": 1.0044607029712558,
+          "peakStretch": 1.0218321334022926,
+          "maxEdgeChangeMM": 0.15161730219857145,
+          "groundMinMM": 121.5591851221234,
+          "grabErrorMM": 0.05285703623240917,
+          "grabForceN": 0.2187443817176474,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "released": {
+          "seamConstraintCount": 0,
+          "maxSeamGapErrorMM": 0,
+          "version": "R07-shell-1",
+          "timeS": 0.8666666666666648,
+          "steps": 208,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 90,
+          "triangles": 144,
+          "massG": 20.62718798394927,
+          "centerMM": [
+            12.123560376785575,
+            34.59666546047647,
+            -19.073960858567546
+          ],
+          "maxStretch": 1.0009966593367268,
+          "peakStretch": 1.0218321334022926,
+          "maxEdgeChangeMM": 0.05017346196096312,
+          "groundMinMM": 0.5000000000000001,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": false,
+          "active": false,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R07 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false
+        },
+        "positionsChanged": true
       }
     },
     {
@@ -1605,8 +1983,8 @@
       "detail": {
         "kind": "swatch",
         "finite": true,
-        "vertices": 200411,
-        "triangles": 355828,
+        "vertices": 193511,
+        "triangles": 348504,
         "holes": 163,
         "continuousThreadMeshes": 1,
         "detachedSticks": 0,
@@ -1644,6 +2022,17 @@
       }
     },
     {
+      "name": "inherited local surface response changes actual three-dimensional rendering",
+      "pass": true,
+      "detail": {
+        "differenceMean": [
+          0.23094178231648774,
+          0.29703587326525266,
+          0.320322946670158
+        ]
+      }
+    },
+    {
       "name": "patina is a changing rendered surface",
       "pass": true,
       "detail": null
@@ -1666,49 +2055,49 @@
       "name": "mobile product remains inside frame",
       "pass": true,
       "detail": {
-        "maxAbsX": 0.8607616396761141,
-        "maxAbsY": 0.5081627086794827,
+        "maxAbsX": 0.860761639676114,
+        "maxAbsY": 0.5080967804528644,
         "inDepth": true,
         "points": [
           [
-            -0.6862994808353798,
-            -0.3222306676168711,
-            0.99627847289137
+            -0.6864211274532456,
+            -0.32230668089764547,
+            0.996278164537074
           ],
           [
-            -0.7109263006533135,
-            -0.33845817648460863,
-            0.9962332169491757
+            -0.7108471484079234,
+            -0.3384018286464631,
+            0.9962332766260388
           ],
           [
-            -0.7444559222908668,
-            0.4868493056118024,
-            0.9959461642836515
+            -0.7445928384419317,
+            0.4868358605123894,
+            0.9959458014533625
           ],
           [
-            -0.7719244767781883,
-            0.47936763722259534,
-            0.9958928613440355
+            -0.7718375369074444,
+            0.47941546062382917,
+            0.9958929317008046
           ],
           [
-            0.785599117122568,
-            -0.48785963382194336,
-            0.9958165600382398
+            0.7855925108339408,
+            -0.4879591590649048,
+            0.9958161747611001
           ],
           [
-            0.7770468882325103,
-            -0.5081627086794827,
-            0.9957599379904806
+            0.7771104280658832,
+            -0.5080967804528644,
+            0.9957600127567847
           ],
           [
-            0.8607616396761141,
-            0.4097918654647555,
-            0.9953971706814957
+            0.860761639676114,
+            0.4097692641062269,
+            0.9953967081506208
           ],
           [
-            0.852444674060354,
-            0.4002389978418197,
-            0.9953291115401951
+            0.8525129863159185,
+            0.40029454230389905,
+            0.995329201519608
           ]
         ]
       }
@@ -1749,11 +2138,18 @@
     "swatch-back.png",
     "wallet-pointer-held.png",
     "wallet-pointer-released.png",
+    "belt-after-swing.png",
+    "bag-after-swing.png",
+    "cowboy-after-swing.png",
+    "pirate-after-swing.png",
+    "swatch-after-swing.png",
     "craft-diamond.png",
     "craft-grid.png",
     "craft-channels.png",
     "craft-perforated.png",
     "craft-woven.png",
+    "seam-response-disabled.png",
+    "seam-response-enabled.png",
     "patina-0.png",
     "patina-0.55.png",
     "patina-1.png",
@@ -1787,7 +2183,7 @@
       "boundsMM": [
         108,
         75.99998778104782,
-        3.8748450875282288
+        3.8430896401405334
       ],
       "seams": [
         {
@@ -1867,17 +2263,19 @@
       "craft": "plain"
     },
     "productPhysics": {
+      "seamConstraintCount": 100,
+      "maxSeamGapErrorMM": 8.673617379884035e-16,
       "version": "R07-shell-1",
       "timeS": 0,
       "steps": 0,
       "extraConvergenceIterations": 0,
-      "nodeCount": 105,
-      "triangles": 144,
-      "massG": 16.057440000000007,
+      "nodeCount": 190,
+      "triangles": 288,
+      "massG": 16.05743999999996,
       "centerMM": [
-        6.2341624917916505e-16,
-        31.932755963815776,
-        0.9694915254237281
+        2.0328790734103208e-16,
+        31.932755963815847,
+        0.9694915254237313
       ],
       "maxStretch": 1,
       "peakStretch": 1,
@@ -1895,7 +2293,7 @@
       "calibrated": false
     },
     "baseline": "e86c36c8c34b1f2b57cc5462459ee2f490e556af",
-    "sourceCommit": "347f41b09efbb4557cdbb094f3f987d8266226ea"
+    "sourceCommit": "cfb50949ff9088c06e608987f17b771c346f4000"
   },
   "pass": true
 }
