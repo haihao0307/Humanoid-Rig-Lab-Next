@@ -1,0 +1,100 @@
+name: Hat R01 Build and Public QA
+on:
+  push:
+    branches: [feature/hat-atelier-r01-20261010]
+    paths:
+      - hat-workshop/r01/app.js
+      - hat-workshop/r01/shell.html
+      - hat-workshop/r01/prepare.py
+      - hat-workshop/r01/capture.py
+      - hat-workshop/r01/qa.py
+      - .github/workflows/hat-r01-build.yml
+permissions:
+  contents: write
+concurrency:
+  group: hat-r01-build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: feature/hat-atelier-r01-20261010
+          fetch-depth: 1
+          sparse-checkout: hat-workshop/r01
+      - name: Fixed tools and syntax
+        run: |
+          npm install --no-save three@0.179.1 esbuild@0.25.9
+          python3 -m pip install numpy pillow playwright
+          python3 -m playwright install --with-deps chromium
+          python3 -m py_compile hat-workshop/r01/prepare.py hat-workshop/r01/capture.py hat-workshop/r01/qa.py
+          node --check hat-workshop/r01/app.js
+          cp node_modules/three/LICENSE hat-workshop/r01/THREE_LICENSE.txt
+          echo "EXPECTED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Read actual original native head samples
+        run: python3 -u hat-workshop/r01/capture.py
+      - name: Source shapes and standalone build
+        run: python3 -u hat-workshop/r01/prepare.py
+      - name: Actual standalone Chromium tests
+        run: python3 -u hat-workshop/r01/qa.py
+      - name: Publish immutable build on isolated branch
+        run: |
+          test "$(git ls-remote origin refs/heads/feature/hat-atelier-r01-20261010 | cut -f1)" = "$EXPECTED_HEAD"
+          git config user.name 'KAOPU Hat Workbench'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r01/index.html hat-workshop/r01/BUILD_MANIFEST.json hat-workshop/r01/SOURCES.json hat-workshop/r01/NATIVE_HEADS.json hat-workshop/r01/THREE_LICENSE.txt hat-workshop/r01/qa/local
+          git commit -m 'hat: publish tested standalone R01 build [skip ci]'
+          git push origin HEAD:feature/hat-atelier-r01-20261010
+          BUILD_SHA=$(git rev-parse HEAD)
+          echo "BUILD_SHA=$BUILD_SHA" >> "$GITHUB_ENV"
+          echo "EXPECTED_HEAD=$BUILD_SHA" >> "$GITHUB_ENV"
+          echo "PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/hat-workshop/r01/index.html" >> "$GITHUB_ENV"
+      - name: Actual immutable public browser tests
+        run: |
+          echo "$PUBLIC_URL"
+          python3 -u hat-workshop/r01/qa.py --url "$PUBLIC_URL"
+          python3 - <<'PY'
+          import os,json,hashlib,urllib.request,pathlib
+          root=pathlib.Path('hat-workshop/r01')
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/hat-workshop/r01/index.html'
+          data=urllib.request.urlopen(url,timeout=90).read()
+          expected=json.loads((root/'BUILD_MANIFEST.json').read_text())
+          assert hashlib.sha256(data).hexdigest()==expected['htmlSHA256']
+          receipt={'version':'HAT-R01.0','sourceSha':expected['sourceSha'],'buildSha':os.environ['BUILD_SHA'],'publicURL':os.environ['PUBLIC_URL'],'publicHTMLSHA256':hashlib.sha256(data).hexdigest(),'fileVerified':True,'publicVerified':True,'userAccepted':False,'cinematicAccepted':False,'dynamicWearValidated':False,'phonePhysicalDevice':False}
+          (root/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          print('DELIVERY',json.dumps(receipt))
+          PY
+      - name: Preserve real evidence, including failures
+        if: always()
+        run: |
+          if test -d hat-workshop/r01/qa; then
+            test "$(git ls-remote origin refs/heads/feature/hat-atelier-r01-20261010 | cut -f1)" = "$EXPECTED_HEAD"
+            git config user.name 'KAOPU Hat Workbench'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add hat-workshop/r01/qa
+            test ! -f hat-workshop/r01/DELIVERY.json || git add hat-workshop/r01/DELIVERY.json
+            if ! git diff --cached --quiet; then
+              git commit -m 'hat: persist actual browser evidence and limits [skip ci]'
+              git push origin HEAD:feature/hat-atelier-r01-20261010
+            fi
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r01-evidence
+          path: |
+            hat-workshop/r01/qa
+            hat-workshop/r01/index.html
+            hat-workshop/r01/app.js
+            hat-workshop/r01/shell.html
+            hat-workshop/r01/prepare.py
+            hat-workshop/r01/capture.py
+            hat-workshop/r01/qa.py
+            hat-workshop/r01/NATIVE_HEADS.json
+            hat-workshop/r01/THREE_LICENSE.txt
+            hat-workshop/r01/BUILD_MANIFEST.json
+            hat-workshop/r01/SOURCES.json
+            hat-workshop/r01/DELIVERY.json
+          retention-days: 14

@@ -1,0 +1,22 @@
+name: Hat R01 Source Intake
+on:
+  push:
+    branches: [feature/hat-atelier-r01-20261010]
+    paths: [hat-workshop/r01/intake.py, .github/workflows/hat-r01-intake.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout: hat-workshop/r01
+      - run: python3 hat-workshop/r01/intake.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hat-source-intake
+          path: hat-workshop/r01/SOURCE_INTAKE.json
+          retention-days: 7
