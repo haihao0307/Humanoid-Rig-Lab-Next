@@ -105,3 +105,13 @@ Canonical policy: `haihao0307/guilin-dem-pipeline@48254a81b95d1f28b0d85740668f3f
 
 ### Reference-First / First-Look Gate
 所有可见对象的第一轮工作台必须 reference 与 candidate 同屏；identity / 大轮廓 / 比例没有通过以前，不得进入微观细节。Production Mother 不负责重新规划，只执行 Coordinator 冻结的 reference + task。用户默认只看当前 standalone HTML 和 reference-vs-candidate 结果。Canonical R4.2: `haihao0307/guilin-dem-pipeline@48254a81b95d1f28b0d85740668f3f94cebda1b8:knowledge/MOTHER_PARALLEL_COVERAGE_EXECUTION_R4_ZH.md`。
+
+## 工作台搭建方法论 V1（2026-10-10）
+
+创建、接管、扩展专项工作台前，先读取根目录 `WORKBENCH_BUILD_SYSTEM.md` 与 `docs/workbench-build-system/registry.json`，再按任务读取研究、架构、质量及接手分册。它是上述R2/R3/R4的执行展开，不替代中央制度和领域冻结规则。
+
+依次完成真实基线核查、资料与老师筛选、对象谱、原样复现、能力迁移、首件闭环、多尺度质量、行为物理、预设与系统接入、实际交付。物理风险提前探针，独立工位可并行。源码读取、运行、视觉、物理、实机、用户接受分别记录，不准互相代替。
+
+用户明确要求方法论、研究或文档时，交付相应文件及实证，不虚构三维修改或浏览器通过；三维实现任务仍执行原有完整硬门禁。`tools/workbench_methodology.py`只初始化记录和检查证据一致性，不生成工作台、不替代独立验证、不自动批准质量。
+
+使用固定方法版本；其他分支/仓库须显式引用或接入，不声称本次记录已经自动改变所有Mother。保持Draft、禁止自动合并/强推/历史改写。
