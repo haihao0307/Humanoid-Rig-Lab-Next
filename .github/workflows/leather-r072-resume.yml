@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/leather-r072-resume.yml
       - leather-workshop/r07/review/resume_20261010.py
+      - leather-workshop/r07/review/grip_substeps_20261010.py
       - leather-workshop/r07/test-resume.cjs
 permissions:
   contents: write
@@ -14,7 +15,7 @@ concurrency:
 jobs:
   acceptance:
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,12 +34,15 @@ jobs:
         run: |
           git fetch --depth=1 origin 1b85084f13a67773dd3b9c1b1b7c73b56f3bb6dc
           git diff --exit-code 1b85084f13a67773dd3b9c1b1b7c73b56f3bb6dc -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/anchors
-          python leather-workshop/r07/review/resume_20261010.py
+          if ! grep -q "const VERSION='R07.2'" leather-workshop/r07/site/runtime.js; then
+            python leather-workshop/r07/review/resume_20261010.py
+          fi
+          python leather-workshop/r07/review/grip_substeps_20261010.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add leather-workshop/r07/site leather-workshop/r07/qa.py leather-workshop/r07/build.py
           if ! git diff --cached --quiet; then
-            git commit -m 'fix(leather-r07): expanded weighted seams, seated yarn and rendering regressions'
+            git commit -m 'fix(leather-r07): expanded small-step solver and strict released-strain regression'
             git push origin HEAD:refs/heads/feature/leather-sewn-grab-r07-20261009
           fi
           echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
@@ -62,6 +66,11 @@ jobs:
           node leather-workshop/r07/test-resume.cjs
       - name: Actual standalone browser and grip regression
         run: python leather-workshop/r07/qa.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-r072-local-${{ github.run_id }}
+          path: leather-workshop/r07/
+          retention-days: 7
       - name: Publish checked build with a fast-forward-only push
         run: |
           git diff --exit-code 1b85084f13a67773dd3b9c1b1b7c73b56f3bb6dc -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/anchors
@@ -82,10 +91,10 @@ jobs:
           reports={name:json.loads((r/path).read_text()) for name,path in {'local':'qa/local/browser.json','public':'qa/public/browser.json','numerics':'qa-numerics.json','resume':'qa-resume.json'}.items()}
           assert all(v['pass'] for v in reports.values())
           m=json.loads((r/'BUILD_MANIFEST.json').read_text())
-          receipt={'version':'R07.2','sourceCommit':os.environ['SOURCE_SHA'],'buildCommit':os.environ['BUILD_SHA'],'url':os.environ['PUBLIC_URL'],'workflowRun':os.environ['GITHUB_RUN_ID'],'htmlSHA256':m['htmlSHA256'],'htmlBytes':m['htmlBytes'],'checks':{k:len(v['checks']) for k,v in reports.items()},'localPassed':True,'publicPassed':True,'visualAcceptance':'PENDING_USER','mobile':'390x844 viewport simulation; not hardware','hostWarnings':reports['public'].get('hostWarnings',[]),'limits':['Approximate uncalibrated shell material','Particle contacts, not triangle continuous collision','Local R05 pressure response, not complete yarn friction/tension propagation','Craft padding and patina are authored approximations','Hat and bag patterns are not production-validated']}
+          receipt={'version':'R07.2','sourceCommit':os.environ['SOURCE_SHA'],'buildCommit':os.environ['BUILD_SHA'],'url':os.environ['PUBLIC_URL'],'workflowRun':os.environ['GITHUB_RUN_ID'],'htmlSHA256':m['htmlSHA256'],'htmlBytes':m['htmlBytes'],'checks':{k:len(v['checks']) for k,v in reports.items()},'localPassed':True,'publicPassed':True,'visualAcceptance':'PENDING_USER','mobile':'390x844 viewport simulation; not hardware','hostWarnings':reports['public'].get('hostWarnings',[]),'integration':'Four 1/960 s physical substeps per nominal 1/240 s step; eight ordinary iterations per substep; compliance rescaled','limits':['Approximate uncalibrated shell material','Particle contacts, not triangle continuous collision','Local R05 pressure response, not complete yarn friction/tension propagation','Craft padding and patina are authored approximations','Hat and bag patterns are not production-validated']}
           (r/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
           (r/'PUBLIC_URL.txt').write_text(os.environ['PUBLIC_URL']+'\n')
-          (r/'CURRENT_DELIVERY.md').write_text('# R07.2 当前交付\n\n'+os.environ['PUBLIC_URL']+'\n\n实际源码 '+os.environ['SOURCE_SHA']+'；固定构建 '+os.environ['BUILD_SHA']+'。\n\n原 r01–r06 与 anchors 保持零差异。新卡包逐孔接缝用材料坐标插值约束替代不同网格的最近节点，避免抓取后局部缝边脱开。扁蜡线采用正确截面法线并坐入原 R05 接触场的缝槽。六种产品通过孔口和数值抓取释放检查，并在浏览器检查真实鼠标抓取、五种其他对象的晃动释放、工艺、风化、厚度和皮面响应像素对照。\n\n数值与浏览器检查包括重复参数情况，不是相同数量的独立物理能力。手机仅390×844视口模拟；未实机验收。材料和接触未实物标定，仍不是完整三角面连续碰撞、缝线摩擦/张力传播或可直接投产的皮具CAD。用户视觉验收仍为PENDING_USER。\n\n- [x] 没有生成图片替代真实三维。\n- [x] 实际修改了生产源码。\n- [x] 用户入口是可交互三维工作台。\n- [x] 产品、孔壁、线体来自运行时；未改原人物骨骼。\n- [x] 镜头、选择、抓取与释放可以操作。\n- [x] 本次固定公网网址和实际浏览器均通过。\n- [x] 只有截图没有工作台就判定交付失败。\n')
+          (r/'CURRENT_DELIVERY.md').write_text('# R07.2 当前交付\n\n'+os.environ['PUBLIC_URL']+'\n\n实际源码 '+os.environ['SOURCE_SHA']+'；固定构建 '+os.environ['BUILD_SHA']+'。\n\n原 r01–r06 与 anchors 保持零差异。卡包逐孔接缝用材料坐标插值约束替代不同网格的最近节点；扁蜡线采用正确截面法线并坐入原 R05 接触场的缝槽。六种产品具有真实孔口、连续正背面线、局部受线牵动和抓取受力。牛仔帽与三角海盗帽、绗缝/穿孔/编织和使用风化对照保留。\n\n本轮发现快速释放后三角帽小固定带过度拉伸，已改为每个原1/240秒步分成四个1/960秒子步，每子步8次普通迭代，并按时间步平方调整顺应参数；没有截断形体、冻结物体或替换预设动画。浏览器检查现在同时约束抓起、松手后的伸长和历史峰值。\n\n数值与浏览器检查包括重复参数情况，不是相同数量的独立物理能力。手机仅390×844视口模拟；未实机验收。材料、摩擦和老化未实物标定，仍不是完整三角面连续碰撞、缝线摩擦/张力传播或可直接投产的皮具CAD。视觉仍待用户验收。\n\n- [x] 没有生成图片替代真实三维。\n- [x] 实际修改了生产源码。\n- [x] 用户入口是可交互三维工作台。\n- [x] 产品、孔壁、线体来自运行时；未改原人物骨骼。\n- [x] 镜头、选择、抓取与释放可以操作。\n- [x] 本次固定公网网址和实际浏览器均通过。\n- [x] 只有截图没有工作台就判定交付失败。\n')
           PY
           git add leather-workshop/r07/qa/public/browser.json leather-workshop/r07/DELIVERY_RECEIPT.json leather-workshop/r07/PUBLIC_URL.txt leather-workshop/r07/CURRENT_DELIVERY.md
           git commit -m 'test(leather-r07): bind current receipt to verified immutable public build'
