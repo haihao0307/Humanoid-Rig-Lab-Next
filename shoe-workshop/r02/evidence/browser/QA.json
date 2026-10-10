@@ -1,15 +1,15 @@
 {
   "schema": "kaopu-shoe-r02-browser/1",
-  "testSourceCommit": "67e63a3f1cc7ab82a85d31d07279d82548b6b4bc",
+  "testSourceCommit": "a2427fe531b036579389850f0ae42447faaec240",
   "public": false,
-  "startedAt": "2026-10-10T09:21:34.296Z",
+  "startedAt": "2026-10-10T09:29:46.239Z",
   "checks": [
     {
       "name": "navigation",
       "pass": true,
       "details": {
         "status": 200,
-        "url": "http://127.0.0.1:40979"
+        "url": "http://127.0.0.1:43631"
       }
     },
     {
@@ -17,14 +17,14 @@
       "pass": true,
       "details": {
         "version": "R02-S1",
-        "buildId": "67e63a3f1cc7ab82a85d31d07279d82548b6b4bc"
+        "buildId": "a2427fe531b036579389850f0ae42447faaec240"
       }
     },
     {
       "name": "actual-webgl-pixels",
       "pass": true,
       "details": {
-        "unique": 425,
+        "unique": 410,
         "width": 861,
         "height": 683
       }
@@ -304,6 +304,20 @@
       }
     },
     {
+      "name": "needle-hole-macro-is-real-camera",
+      "pass": true
+    },
+    {
+      "name": "macro-keeps-original-holes",
+      "pass": true,
+      "details": {
+        "available": true,
+        "holeHits": 0,
+        "materialHits": 4,
+        "description": "Actual displayed layer triangle ray test, not complete seam collision proof"
+      }
+    },
+    {
       "name": "thread-rebuilt-for-real-thickness-and-hole-count",
       "pass": true,
       "details": {
@@ -551,7 +565,7 @@
   ],
   "errors": [],
   "scope": "Chromium + SwiftShader. Desktop and mobile viewport simulation, NOT physical devices. No native Grasshopper/comfort/whole-shoe/visual acceptance claim.",
-  "url": "http://127.0.0.1:40979",
+  "url": "http://127.0.0.1:43631",
   "initial": {
     "representation": "native source mesh + independently implemented normalized inverse-cube guide field",
     "exactGrasshopperReplication": false,
@@ -617,7 +631,7 @@
     ],
     "mode": "source",
     "version": "R02-S1",
-    "buildId": "67e63a3f1cc7ab82a85d31d07279d82548b6b4bc",
+    "buildId": "a2427fe531b036579389850f0ae42447faaec240",
     "buildCount": 1,
     "renderCount": 6,
     "drawCalls": 5,
@@ -638,7 +652,7 @@
     }
   },
   "status": "passed",
-  "finishedAt": "2026-10-10T09:22:44.793Z",
-  "passed": 57,
-  "total": 57
+  "finishedAt": "2026-10-10T09:31:08.065Z",
+  "passed": 59,
+  "total": 59
 }
