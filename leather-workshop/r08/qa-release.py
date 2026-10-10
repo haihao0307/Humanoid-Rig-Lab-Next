@@ -25,9 +25,11 @@ with sync_playwright() as p:
  page.on('console',console);page.on('pageerror',lambda e:report['errors'].append(str(e)));page.on('request',lambda r:report['requests'].append(r.url) if r.url.startswith(('https:','http:')) else None)
  try:
   report['url']=args.url or (R/'public-lite.html').as_uri();page.goto(report['url'],wait_until='domcontentloaded',timeout=180000)
-  page.wait_for_function("window.LEATHER_ATELIER?.ready || !document.getElementById('error').hidden",timeout=240000)
+  page.wait_for_function("window.LEATHER_ATELIER?.ready || Boolean(document.getElementById('error') && !document.getElementById('error').hidden)",timeout=240000)
   check('R08 runtime, not an error overlay',page.evaluate('window.LEATHER_ATELIER?.version')=='R08.0',page.locator('#error').inner_text());check('application starts without shader exceptions',not report['errors'],report['errors'])
   snap=page.evaluate('LEATHER_ATELIER.snapshot()');report['initial']=snap
+  expected_source=os.environ.get('R08_EXPECTED_SOURCE_SHA')
+  if expected_source:check('rendered runtime source matches the immutable candidate',snap['sourceCommit']==expected_source,{'expected':expected_source,'actual':snap['sourceCommit']})
   check('all 13 surface choices and seven actual 3D product thumbnails',snap['thumbs']=={'materials':13,'products':7})
   ids=['wallet','belt','bag','cowboy','pirate','jacket','swatch']
   for id in ids:
