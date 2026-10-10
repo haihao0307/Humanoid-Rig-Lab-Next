@@ -1,0 +1,10 @@
+'use strict';
+const fs=require('fs'),path=require('path'),crypto=require('crypto'),Module=require('module');
+const htmlPath=process.env.R08_HTML||path.resolve(__dirname,'../../r08/public-lite.html');
+const bytes=fs.readFileSync(htmlPath),expected='c9524e0c9d50ba8ba4e8070f621fc2e0d05a387b8c33b06e49a9e518da4e86be';
+if(crypto.createHash('sha256').update(bytes).digest('hex')!==expected)throw Error('R08 changed: stop, do not silently update expected hash');
+const html=bytes.toString(),start=html.lastIndexOf('<script>')+8,end=html.indexOf('const PRODUCT_WORKER_CODE=',start);
+if(start<8||end<start)throw Error('Unexpected baseline bundle format');
+const m=new Module(path.join(__dirname,'baseline-eval.cjs'),module);m.paths=module.paths;m.filename=path.join(__dirname,'baseline-eval.cjs');
+m._compile(html.slice(start,end)+'\nmodule.exports={T,ProductShell,SurfaceLaw,LeatherDynamics,PanelAssembly,SeamPath,SeamIndex,seamRelief,makeProduct,productMaterials,productAudit,updateSkin,R05_SEW,R05_CONTACT};})();',m.filename);
+module.exports=m.exports;

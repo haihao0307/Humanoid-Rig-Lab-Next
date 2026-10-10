@@ -1,0 +1,161 @@
+{
+  "baseline": "f1ab73a7b289461a7d81e65eed935ec62369ed34",
+  "method": "Direct execution of hash-verified R08 production bundle. No renderer or source mutation.",
+  "releaseReady": false,
+  "cases": {
+    "cyclicPermutation": {
+      "description": "Only cyclically change triangle index order, not material or rest coordinates. A consistent material law must not change.",
+      "rows": [
+        {
+          "order": [
+            0,
+            1,
+            2
+          ],
+          "energyDensityPa": 61893.28702709453,
+          "F": [
+            1.05,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "areaM2": 0.005000000000000001
+        },
+        {
+          "order": [
+            1,
+            2,
+            0
+          ],
+          "energyDensityPa": 58733.17882873342,
+          "F": [
+            -0.7424621202458748,
+            0.7071067811865475,
+            0,
+            -0.7424621202458748,
+            -0.7071067811865474,
+            0
+          ],
+          "areaM2": 0.005000000000000002
+        },
+        {
+          "order": [
+            2,
+            0,
+            1
+          ],
+          "energyDensityPa": 49916.32567080002,
+          "F": [
+            0,
+            -1,
+            0,
+            1.05,
+            -1.1102230246251565e-16,
+            0
+          ],
+          "areaM2": 0.005000000000000001
+        }
+      ],
+      "maxMinRatio": 1.2399407647766987
+    },
+    "materialDifference": {
+      "description": "Prescribed longitudinal extension with transverse stretch 1. Energy probe, not a tensile-stress test; no claim that tangent model is always softer.",
+      "rows": [
+        {
+          "strain": 0.01,
+          "R04NonlinearWPa": 2350.7710553005772,
+          "R08TangentWPa": 2380.060144372774
+        },
+        {
+          "strain": 0.05,
+          "R04NonlinearWPa": 57784.72349190785,
+          "R08TangentWPa": 61893.28702709453
+        },
+        {
+          "strain": 0.1,
+          "R04NonlinearWPa": 223753.1901743778,
+          "R08TangentWPa": 259797.16434454458
+        },
+        {
+          "strain": 0.2,
+          "R04NonlinearWPa": 839349.5407020081,
+          "R08TangentWPa": 1140515.4425647105
+        },
+        {
+          "strain": 0.3,
+          "R04NonlinearWPa": 1913380.4967791417,
+          "R08TangentWPa": 2804748.9783319165
+        }
+      ]
+    },
+    "intersectionMiss": {
+      "description": "A small triangle straddles the interior of a large triangle, far from its vertices. Static detection probe, not an initially feasible CCD case.",
+      "selfContactCount": 0,
+      "maxCorrectionMM": 0,
+      "largeTriangleYMM": 100,
+      "smallTriangleYMM": [
+        98,
+        102,
+        102
+      ]
+    },
+    "slowCrossingMiss": {
+      "description": "Initially separated triangles. At 0.5 m/s over eight nominal steps, the small triangle passes through the fixed triangle. Full original solver executed.",
+      "finalYMM": [
+        87.3333333333334,
+        87.3333333333334,
+        87.3333333333334
+      ],
+      "startedYMM": 104,
+      "fixedSurfaceYMM": 100,
+      "state": {
+        "integrationSubstepS": 0.0010416666666666667,
+        "substepsPerNominalFrameStep": 4,
+        "iterationsPerSubstep": 8,
+        "seamConstraintCount": 0,
+        "maxSeamGapErrorMM": 0,
+        "version": "R08-shell-1",
+        "timeS": 0.03333333333333333,
+        "steps": 32,
+        "extraConvergenceIterations": 0,
+        "nodeCount": 6,
+        "triangles": 2,
+        "massG": 5.976040000000001,
+        "centerMM": [
+          -6.896747984997043e-19,
+          99.79643598994208,
+          -6.597026347436322
+        ],
+        "maxStretch": 1.0000000000000002,
+        "peakStretch": 1.0000000000000002,
+        "maxEdgeChangeMM": 3.469446951953614e-15,
+        "groundMinMM": 86.6333333333334,
+        "grabErrorMM": 0,
+        "grabForceN": 0,
+        "held": false,
+        "active": true,
+        "finite": true,
+        "failed": null,
+        "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R08 integrator; not full nonlinear R04 law",
+        "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+        "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+        "calibrated": false
+      }
+    },
+    "damping": {
+      "R04PerSecond": 2.5,
+      "R08PerSecond": 0.5,
+      "halfLifeR04S": 0.2772588722239781,
+      "halfLifeR08S": 1.3862943611198906,
+      "note": "Damping-only half-lives, not measured total response or material stress relaxation."
+    },
+    "bending": {
+      "r08HingeK": 0.004000000000000001,
+      "r04EquivalentSameGeometry": 0.012000000000000004,
+      "formulaRatio": 0.3333333333333333,
+      "note": "Verified source formula R04:3*D*l^2/(A0+A1), R08:D*l^2/(A0+A1) at reference thickness. Both D values unmeasured."
+    }
+  }
+}

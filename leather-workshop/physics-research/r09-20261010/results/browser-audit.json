@@ -1,0 +1,159 @@
+{
+  "scope": "Exact R08 build, with private diagnostic getters only. Not a new release. Real browser in workflow, not user device.",
+  "checks": [
+    {
+      "name": "exact R08 starts",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "yarn has actual node-field shader binding, not a static unbound object",
+      "pass": true,
+      "data": {
+        "shaderPresent": true,
+        "skinTransform": true,
+        "sameNodeTexture": true,
+        "textureVersion": 1
+      }
+    },
+    {
+      "name": "old craft interface loads and has actual controls",
+      "pass": true,
+      "data": {
+        "open": true,
+        "canvasCount": 1,
+        "controls": 67,
+        "title": "KAOPU 皮革工坊 · R02",
+        "text": "KAOPU / 皮革工坊DIGITAL LEATHER ATELIER\nR02 · 独立程序化实现 · 待视觉验收\n油蜡棕革\n\nGRAIN / FINISH / STITCH / PERFORATION\n\n10 mm · 观察中心投影近似\n原皮\n绗缝\n透气孔\n皮条编织\n老化\n整体\n微距\n背面与切边\n旋转观察\n按住对照：无微细节\n01 / 选择材质谱\n原色细粒\n油蜡棕革\n荔枝纹革\n磨砂牛巴革\n交叉压纹\n矩形鳞片压纹\n毛囊珠点压纹\n绒面反绒革\n皮革底色\n独立涂饰层\n透明染色\n颜料涂饰\n油蜡抛光\n消光涂饰\n漆皮涂层\n金属箔涂饰\n珠光涂饰\n\n皮革类别与涂饰可自由组合。旧版 R01 完整保留。\n\n02 / 粒面与涂饰\n粒面间距\n1.10 mm\n微凹凸高度\n0.12 mm\n基底粗糙度\n0.36\n表层涂饰光泽\n0.36\n色差与包浆\n0.50\n粒面不规则性\n0.85\n细皱褶\n0.52\n微孔强度\n0.48\n裂纹 / 擦痕\n0.13\n纹理种子\n换一张皮\n03 / 缝制 · 绗缝 · 穿孔\n原皮\n绗缝\n透气\n编织\n老化\n工艺结构\n无绗缝\n菱形绗缝\n方格绗缝\n条形绗缝\n交错皮条编织\n针法\n单排平针\n双排平针\n交叉针\n锯齿针\n不缝线\n缝线颜色\n 包边\n真实贯穿孔\n不穿孔\n圆孔阵列\n分区透气孔\n长圆孔阵列\n针距 / 厚度 / 孔径 / 工艺尺度\n\n孔口、孔壁、背面、皮条、缝线为真实几何。绗缝是参数曲面，不是皮革动力学。校验球仅查看基础材质。\n\n04 / 皮样与观察\n承载曲面\n卷曲皮样 · 250 mm 宽\n平铺皮样 · 检查粒面\n校验球 · 检查材质迁移\n卷曲程度（几何演示）\n100%\n 实体缝线\n厚度在工艺尺度中调节\n光照检查\n中性摄影棚\n掠射侧光\n暖色摄影棚\n曝光\n1.00\n纹理分辨率\n1024²\n2048²\n4096² · 较高开销\n05 / 材质诊断与交付\n查看实际计算通道\n完整皮革渲染\n底色 / 无光照\n表面法线\n粗糙度\n微遮蔽\n按住查看 R01 粒面\n恢复初始\n保存配方\n恢复配方\n导出材质谱\n导入材质谱\n底色 PNG\n法线 PNG\n粗糙度 PNG\n高度 PNG（8 位）\n微遮蔽 PNG\n导出\n16 位高度 PNG\n完整材质包 ZIP\n\n贴图包包含五通道与材质谱；绗缝、穿孔、编织属于几何，不在平铺贴图内。纹理由代码现场生成，无外部材质图片。表面坐标以米定义；导出可用于材质接入，不改变人体、版型或骨骼。\n\n原文参考与实现边界\nWebGL2 · Three r169 · 2048² · 102,122 三角形 · 0 真穿孔 · 生成 #1 · R02.0\nKAOPU LEATHER @ 2 · VISUAL ACCEPTANCE PENDING"
+      }
+    },
+    {
+      "name": "grab updates the same texture read by the yarn shader",
+      "pass": true,
+      "data": {
+        "physics": {
+          "integrationSubstepS": 0.0010416666666666667,
+          "substepsPerNominalFrameStep": 4,
+          "iterationsPerSubstep": 8,
+          "seamConstraintCount": 98,
+          "maxSeamGapErrorMM": 0.015081151440912884,
+          "version": "R08-shell-1",
+          "timeS": 0.13333333333333316,
+          "steps": 128,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 224,
+          "triangles": 344,
+          "massG": 15.964200000000002,
+          "centerMM": [
+            6.263652680386821,
+            38.43106931224234,
+            -1.872474084890874
+          ],
+          "maxStretch": 1.0026446257674537,
+          "peakStretch": 1.0137132931226682,
+          "maxEdgeChangeMM": 0.03173550920944519,
+          "groundMinMM": 4.809126769068391,
+          "grabErrorMM": 0.03177091467854032,
+          "grabForceN": 0.029909934800323196,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R08 integrator; not full nonlinear R04 law",
+          "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+          "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+          "calibrated": false,
+          "workerBusy": false,
+          "calculationSpeed": 0.15576323987538887,
+          "integrationThread": "dedicated worker, same deterministic ProductShell"
+        },
+        "textureVersion": 20,
+        "sameNodeTexture": true
+      }
+    },
+    {
+      "name": "release processed",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "diagnostic browser has no application errors",
+      "pass": true,
+      "data": []
+    }
+  ],
+  "errors": [],
+  "releaseReady": false,
+  "version": "R08.0",
+  "yarnShader": {
+    "shaderPresent": true,
+    "skinTransform": true,
+    "sameNodeTexture": true,
+    "textureVersion": 1
+  },
+  "controls": {
+    "craftChoice": {
+      "text": "原皮 · 手工缝线菱形绗缝方格绗缝条形绗缝透气贯穿孔交错编织层",
+      "visible": true,
+      "disabled": false
+    },
+    "legacyCraft": {
+      "text": "打开完整旧工艺台",
+      "visible": true,
+      "disabled": false
+    },
+    "grabTool": {
+      "text": "抓手",
+      "visible": true,
+      "disabled": false
+    }
+  },
+  "archive": {
+    "open": true,
+    "canvasCount": 1,
+    "controls": 67,
+    "title": "KAOPU 皮革工坊 · R02",
+    "text": "KAOPU / 皮革工坊DIGITAL LEATHER ATELIER\nR02 · 独立程序化实现 · 待视觉验收\n油蜡棕革\n\nGRAIN / FINISH / STITCH / PERFORATION\n\n10 mm · 观察中心投影近似\n原皮\n绗缝\n透气孔\n皮条编织\n老化\n整体\n微距\n背面与切边\n旋转观察\n按住对照：无微细节\n01 / 选择材质谱\n原色细粒\n油蜡棕革\n荔枝纹革\n磨砂牛巴革\n交叉压纹\n矩形鳞片压纹\n毛囊珠点压纹\n绒面反绒革\n皮革底色\n独立涂饰层\n透明染色\n颜料涂饰\n油蜡抛光\n消光涂饰\n漆皮涂层\n金属箔涂饰\n珠光涂饰\n\n皮革类别与涂饰可自由组合。旧版 R01 完整保留。\n\n02 / 粒面与涂饰\n粒面间距\n1.10 mm\n微凹凸高度\n0.12 mm\n基底粗糙度\n0.36\n表层涂饰光泽\n0.36\n色差与包浆\n0.50\n粒面不规则性\n0.85\n细皱褶\n0.52\n微孔强度\n0.48\n裂纹 / 擦痕\n0.13\n纹理种子\n换一张皮\n03 / 缝制 · 绗缝 · 穿孔\n原皮\n绗缝\n透气\n编织\n老化\n工艺结构\n无绗缝\n菱形绗缝\n方格绗缝\n条形绗缝\n交错皮条编织\n针法\n单排平针\n双排平针\n交叉针\n锯齿针\n不缝线\n缝线颜色\n 包边\n真实贯穿孔\n不穿孔\n圆孔阵列\n分区透气孔\n长圆孔阵列\n针距 / 厚度 / 孔径 / 工艺尺度\n\n孔口、孔壁、背面、皮条、缝线为真实几何。绗缝是参数曲面，不是皮革动力学。校验球仅查看基础材质。\n\n04 / 皮样与观察\n承载曲面\n卷曲皮样 · 250 mm 宽\n平铺皮样 · 检查粒面\n校验球 · 检查材质迁移\n卷曲程度（几何演示）\n100%\n 实体缝线\n厚度在工艺尺度中调节\n光照检查\n中性摄影棚\n掠射侧光\n暖色摄影棚\n曝光\n1.00\n纹理分辨率\n1024²\n2048²\n4096² · 较高开销\n05 / 材质诊断与交付\n查看实际计算通道\n完整皮革渲染\n底色 / 无光照\n表面法线\n粗糙度\n微遮蔽\n按住查看 R01 粒面\n恢复初始\n保存配方\n恢复配方\n导出材质谱\n导入材质谱\n底色 PNG\n法线 PNG\n粗糙度 PNG\n高度 PNG（8 位）\n微遮蔽 PNG\n导出\n16 位高度 PNG\n完整材质包 ZIP\n\n贴图包包含五通道与材质谱；绗缝、穿孔、编织属于几何，不在平铺贴图内。纹理由代码现场生成，无外部材质图片。表面坐标以米定义；导出可用于材质接入，不改变人体、版型或骨骼。\n\n原文参考与实现边界\nWebGL2 · Three r169 · 2048² · 102,122 三角形 · 0 真穿孔 · 生成 #1 · R02.0\nKAOPU LEATHER @ 2 · VISUAL ACCEPTANCE PENDING"
+  },
+  "held": {
+    "physics": {
+      "integrationSubstepS": 0.0010416666666666667,
+      "substepsPerNominalFrameStep": 4,
+      "iterationsPerSubstep": 8,
+      "seamConstraintCount": 98,
+      "maxSeamGapErrorMM": 0.015081151440912884,
+      "version": "R08-shell-1",
+      "timeS": 0.13333333333333316,
+      "steps": 128,
+      "extraConvergenceIterations": 0,
+      "nodeCount": 224,
+      "triangles": 344,
+      "massG": 15.964200000000002,
+      "centerMM": [
+        6.263652680386821,
+        38.43106931224234,
+        -1.872474084890874
+      ],
+      "maxStretch": 1.0026446257674537,
+      "peakStretch": 1.0137132931226682,
+      "maxEdgeChangeMM": 0.03173550920944519,
+      "groundMinMM": 4.809126769068391,
+      "grabErrorMM": 0.03177091467854032,
+      "grabForceN": 0.029909934800323196,
+      "held": true,
+      "active": true,
+      "finite": true,
+      "failed": null,
+      "membrane": "R04 NL zero-strain tangent, coupled objective Green-strain XPBD in independent R08 integrator; not full nonlinear R04 law",
+      "bending": "R04 signed dihedral gradient; D=0.002*(t/1.39mm)^3 N m",
+      "selfContact": "non-neighbour particle contacts only; not continuous triangle collision",
+      "calibrated": false,
+      "workerBusy": false,
+      "calculationSpeed": 0.15576323987538887,
+      "integrationThread": "dedicated worker, same deterministic ProductShell"
+    },
+    "textureVersion": 20,
+    "sameNodeTexture": true
+  },
+  "pass": true
+}
