@@ -21,7 +21,7 @@ worker='(()=>{'+shared+mod(L/'r04/site/clamp.mjs','ClampedLeather')+src(L/'r04/s
 try:commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=R,text=True,stderr=subprocess.DEVNULL).strip()
 except:commit=os.environ.get('SOURCE_SHA','LOCAL-R07')
 inputs=[L/'r02/site/leather.js',L/'r04/site/dynamics.mjs',L/'r05/site/seam.mjs',L/'r05/site/contact-surface.mjs',L/'r05/site/geometry.js',L/'r05/site/appearance.js']
-info={'version':'R07.1','sourceCommit':commit,'baseline':BASE,'parent':PARENT,'frozenInputHashes':{str(p.relative_to(L)):sha(p) for p in inputs},'sourceHashes':{p.name:sha(p) for p in (R/'site').iterdir() if p.is_file()},'R05ValidationExtensionOnly':{'count':[5,1600],'layerThicknessMM':[.2,8]},'materialCalibration':False,'collisionScope':'particle self-contact; not triangle CCD'}
+info={'version':'R07.2','sourceCommit':commit,'baseline':BASE,'parent':PARENT,'frozenInputHashes':{str(p.relative_to(L)):sha(p) for p in inputs},'sourceHashes':{p.name:sha(p) for p in (R/'site').iterdir() if p.is_file()},'R05ValidationExtensionOnly':{'count':[5,1600],'layerThicknessMM':[.2,8]},'materialCalibration':False,'collisionScope':'particle self-contact; not triangle CCD'}
 geometryModules=[
  'const R05_SEW='+rawmod(L/'r05/site/seam.mjs','buildSeam,continuousRoutes,auditSeam,insideHole',[("['count',5,25]","['count',5,1600]"),("['layerThickness',.8,2.5]","['layerThickness',.2,8]")])+';',
  'const R05_CONTACT='+rawmod(L/'r05/site/contact-surface.mjs','buildContactField,mapSurfacePoint')+';',

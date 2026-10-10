@@ -3,7 +3,7 @@ import {FINISHES} from '../../r02/site/leather.js';
 import {CATALOGUE,AtelierMaterials} from '../../r06/site/catalogue.js';
 import {PRODUCT_SPECS,makeProduct,productMaterials,setProductMaterial,productAudit,patternSVG} from './products.js';
 const $=id=>document.getElementById(id),V=(...p)=>new T.Vector3(...p);
-const VERSION='R07.1',errors=[],BASE='e86c36c8c34b1f2b57cc5462459ee2f490e556af';
+const VERSION='R07.2',errors=[],BASE='e86c36c8c34b1f2b57cc5462459ee2f490e556af';
 let renderer,scene,camera,key,fill,rim,environment,thumbScene,thumbCamera,library,hero,heroMats;
 let product='wallet',material='heritage',mode='products',light='studio',manualMaterial=false;
 let craftConfig={thicknessScale:1,tension:.8,response:true,age:0,craft:'plain'},grabMode=false,productSolver=null,gripCollider=null,grabPlane=null,grabPointer=null;

@@ -27,7 +27,8 @@ with sync_playwright() as p:
  try:
   url=args.url or (R/'public-lite.html').as_uri();report['url']=url
   page.goto(url,wait_until='domcontentloaded',timeout=180000)
-  page.wait_for_function('window.LEATHER_ATELIER?.ready',timeout=240000)
+  page.wait_for_function("window.LEATHER_ATELIER?.ready || (document.getElementById('error') && !document.getElementById('error').hidden)",timeout=240000)
+  check('R07.2 current runtime starts without an error overlay',page.evaluate("window.LEATHER_ATELIER?.version==='R07.2'"),page.locator('#error').inner_text())
   report['initial']=page.evaluate('LEATHER_ATELIER.snapshot()')
   check('R07 ready without shader or runtime errors',not report['errors'],report['errors']);shot(page,'01-wallet')
   check('13 material and six product live views',report['initial']['thumbs']=={'materials':13,'products':6})
@@ -44,12 +45,25 @@ with sync_playwright() as p:
   check('real pointer grabs a physical triangle',page.evaluate('LEATHER_ATELIER.productPhysics.held'))
   before=page.evaluate('LEATHER_ATELIER.productPhysics');page.mouse.move(x+50,y-90,steps=30);page.wait_for_timeout(1500);held=page.evaluate('LEATHER_ATELIER.productPhysics');shot(page,'wallet-pointer-held')
   check('grip propagates force and moves mass centre',held['finite'] and not held['failed'] and held['timeS']>before['timeS'] and held['grabForceN']>0,held)
+  check('wallet seam remains joined while the pointer lifts it',held['seamConstraintCount']>=90 and held['maxSeamGapErrorMM']<1.5,held)
   page.mouse.up();page.wait_for_timeout(1000);released=page.evaluate('LEATHER_ATELIER.productPhysics');shot(page,'wallet-pointer-released');check('release retains dynamic evolution',not released['held'] and released['timeS']>held['timeS'] and released['finite'],released)
   page.locator('#grabTool').click();page.evaluate('LEATHER_ATELIER.resetGrab()')
+  for object_id in ['belt','bag','cowboy','pirate','swatch']:
+   page.evaluate('(id)=>LEATHER_ATELIER.selectProduct(id)',object_id)
+   result=page.evaluate('LEATHER_ATELIER.grabTest(true)')
+   check(object_id+' real nodal grip, swing and release',result['positionsChanged'] and result['held']['held'] and not result['released']['held'] and result['released']['finite'] and not result['released']['failed'] and result['held']['maxStretch']<1.25,result)
+   shot(page,object_id+'-after-swing');page.evaluate('LEATHER_ATELIER.resetGrab()')
   page.evaluate("LEATHER_ATELIER.selectProduct('swatch')")
   for craft in ['diamond','grid','channels','perforated','woven']:
    page.evaluate('(craft)=>LEATHER_ATELIER.configure({craft})',craft);a=page.evaluate('LEATHER_ATELIER.audit()');check(craft+' craft stays finite and sewn',a['finite'] and a['continuousThreadMeshes']>0,a);shot(page,'craft-'+craft)
   page.evaluate("LEATHER_ATELIER.configure({craft:'plain'});LEATHER_ATELIER.setView('macro')")
+  page.locator('#responseCompare').dispatch_event('pointerdown')
+  off_image=shot(page,'seam-response-disabled')
+  page.locator('#responseCompare').dispatch_event('pointerup')
+  on_image=shot(page,'seam-response-enabled')
+  region=page.locator('#stage').bounding_box();box=(int(region['x']),int(region['y']),int(region['x']+region['width']),int(region['y']+region['height']))
+  difference=ImageChops.difference(Image.open(off_image).convert('RGB').crop(box),Image.open(on_image).convert('RGB').crop(box))
+  check('inherited local surface response changes actual three-dimensional rendering',difference.getbbox() is not None,{'differenceMean':ImageStat.Stat(difference).mean})
   images=[]
   for age in [0,.55,1]:
    page.evaluate('(age)=>LEATHER_ATELIER.configure({age})',age);page.evaluate("LEATHER_ATELIER.setView('macro')");images.append(shot(page,'patina-'+str(age)))
