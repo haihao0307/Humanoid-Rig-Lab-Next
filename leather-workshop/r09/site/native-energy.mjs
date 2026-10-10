@@ -1,0 +1,14 @@
+/** CPU/WASM evaluation of the same explicit energy. The JS reference is kept
+ * for gradient/energy differential gates; optimizer and accepted poses stay JS. */
+export class NativeEnergy{
+ constructor(shell){this.shell=shell;this.native=new WebAssembly.Instance(new WebAssembly.Module(Uint8Array.from(atob(CONTACT_NARROW_WASM),c=>c.charCodeAt(0))),{math:{log:Math.log,atan2:Math.atan2}}).exports;
+  const s=shell,N=s.inv.length,links=[...s.surfaceLinks,...s.links.map(q=>({ids:[q.a,q.b],weights:[1,-1],length:q.L,stiffness:q.k}))];this.capacity=Math.max(100000,20*s.tri.length+10*N);
+  if(!this.native.layout(N,s.tri.length,s.bends.length,links.length,this.capacity,s.law.fibers.length))throw Error('Explicit native memory budget exceeded; no reduced-physics fallback');
+  const sizes=[3*N,3*N,3*N,N,N,N,8*s.tri.length,6*s.bends.length,20*links.length,14*this.capacity,3*N,3*N,9+4*s.law.fibers.length,11,3*N,12,6*this.capacity];
+  this.sections=sizes.map((n,i)=>new Float64Array(this.native.memory.buffer,this.native.section(i),n));
+  const a=this.sections;a[3].set(s.mass);a[4].set(s.inv);a[5].set(s.contactThickness);s.tri.forEach((q,i)=>a[6].set([...q.ids,...q.D,q.area*q.t*s.cfg.stiffnessScale],8*i));s.bends.forEach((q,i)=>a[7].set([...q.ids,q.rest,q.k],6*i));links.forEach((q,i)=>{if(q.ids.length>8)throw Error('Unsupported seam arity');a[8][20*i]=q.ids.length;a[8].set(q.ids,20*i+1);a[8].set(q.weights,20*i+9);a[8][20*i+17]=q.length;a[8][20*i+18]=q.stiffness;});a[12].set([...s.law.C,...s.law.tangent0,...s.law.fibers.flat()]);
+ }
+ begin(pred,dt,pairs){if(pairs.length>this.capacity)throw Error('Contact candidate budget exceeded; no contact is dropped');const s=this.shell,a=this.sections;a[1].set(s.prev);a[2].set(pred);a[4].set(s.inv);this.count=pairs.length;for(let i=0;i<pairs.length;i++){const p=pairs[i],q=p.previous;a[9].set([...p.ids,p.gap,p.pt?1:0,...q.w,...q.n,p.frictionForce],14*i);}a[13].fill(0);if(s.grab)a[13].set([1,...s.grab.ids,...s.grab.weights,...s.grab.target,4000]);this.native.energy_config(dt,s.cfg.barrierRange,s.cfg.barrierStiffness,s.cfg.friction);this.pairRef=pairs;this.lastClipRef=null;}
+ evaluate(x,diagonal=false){const a=this.sections;a[0].set(x);this.native.potential(this.count,diagonal?1:0);const r=a[15];this.shell.grabForce=r[7];return{energy:r[0],residual:r[1],elasticEnergy:r[2],contactEnergy:r[3],active:r[4],normalForce:r[5],frictionPairs:r[6],grad:a[10].slice(),diag:diagonal?a[11].slice():null};}
+ clip(a,b,pairs){const n=pairs.length;if(n>this.capacity)return null;const w=this.sections;w[0].set(a);w[14].set(b);if(pairs!==this.lastClipRef){for(let i=0;i<n;i++){const p=pairs[i];w[16].set([...p.ids,p.gap,p.pt?1:0],6*i);}this.lastClipRef=pairs;}const fraction=this.native.clip_many(n),r=w[15],stats=this.shell.contact.stats;stats.ccdEvents+=r[8];stats.ptEvents+=r[9];stats.eeEvents+=r[10];return fraction;}
+}
