@@ -11,9 +11,9 @@ void main(){
  if(rd.z<-.0001){float tWall=(-140.-uCam.z)/rd.z;if(tWall>0.){t=tWall;hit=true;}}
  if(rd.y<-.0001){float tFloor=(-56.-uCam.y)/rd.y;if(tFloor>0.&&tFloor<t){t=tFloor;N=vec3(0,1,0);hit=true;}}
  vec3 P=uCam+rd*t;vec3 c=vec3(.21,.217,.224);
- if(hit){float softPool=exp(-dot(P.xy*vec2(.004,.003),P.xy*vec2(.004,.003)));
-  c*=.72+.22*max(0.,dot(N,normalize(uKeyPos-P)))+.14*softPool;
-  c*=.88+.12*visibility(P,8.);
+ if(hit){float softPool=exp(-dot((P.xy-vec2(-35,20))*vec2(.007,.006),(P.xy-vec2(-35,20))*vec2(.007,.006)));
+  c*=.65+.18*max(0.,dot(N,normalize(uKeyPos-P)))+.23*softPool;
+  c*=.76+.24*visibility(P,8.);
  }
  float haze=(1.-exp(-max(0.,t-160.)*.008))*uFog;
  c=mix(c,vec3(.30,.315,.332),haze);

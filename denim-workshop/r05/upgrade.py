@@ -35,8 +35,8 @@ vec3 col=yarnColor(vM,float(vKind),vId,crown)*variation*(.87+.13*abs(front));
 float footprint=max(length(dFdx(vM)),length(dFdy(vM))),resolved=1.-smoothstep(.025,.15,footprint);
 float staple=n2(vec2(vLocal.x*pitch*8.,vLocal.y*2.8)+vId*7.17);
 float packingNoise=n2(vec2(vLocal.x*pitch*1.3,vLocal.y*1.6)+vId*3.41);
-col*=1.+resolved*.68*(staple-.5)+.30*(packingNoise-.5);
-N=normalize(N+normalize(cross(T,N))*(staple-.5)*.85*resolved);
+col*=1.+resolved*.36*(staple-.5)+.24*(packingNoise-.5);
+N=normalize(N+normalize(cross(T,N))*(staple-.5)*.48*resolved);
 if(uBake==1){O=vec4(col,1);return;}if(uBake==2){O=vec4(N*.5+.5,1);return;}
 vec3 diffuseN=normalize(mix(vMacro*sign(dot(N,vMacro)),N,.55));
 O=vec4(tone(lighting(col,diffuseN,T,vW,uFuzz)),1.);}

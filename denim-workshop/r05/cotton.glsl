@@ -79,7 +79,7 @@ vec3 lighting(vec3 c,vec3 N,vec3 T,vec3 W,float fuzz){
  // PCF-softened at its center, not an exact area-light visibility integral.
  for(int i=0;i<4;i++){
   vec3 P=uKeyPos+vec3((i%2==0?-1.:1.)*wide,(i<2?-1.:1.)*wide*.7,0.);
-  vec3 L=normalize(P-W);light+=cottonLight(c,N,T,V,L,fuzz)*uKeyColor*.25*(.48+.52*vis);
+  vec3 L=normalize(P-W);light+=cottonLight(c,N,T,V,L,fuzz)*uKeyColor*.25*(.80+.20*vis);
  }
  vec3 F=normalize(vec3(110,22,120)-W);
  light+=cottonLight(c,N,T,V,F,fuzz)*uFillColor;
