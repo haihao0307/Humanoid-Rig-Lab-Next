@@ -43,6 +43,26 @@
         0.054
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "knitted_hat_01",
+        "diffuseColor": "1 1 1",
+        "specularColor": "0 0 0",
+        "shininess": "0.1961",
+        "opacity": "1",
+        "diffuseTexture": "Knitted_Hat_01.png",
+        "normalmapTexture": "Knitted_Hat_01_NRM.png",
+        "specularTexture": "Knitted_Hat_01_SPEC.png",
+        "shader": "data/shaders/glsl/normalmap",
+        "backfaceCull": "False"
+      },
+      "sourceShaderFlags": {
+        "diffuse": "true",
+        "bump": "false",
+        "normal": "true",
+        "displacement": "false",
+        "spec": "true",
+        "vertexColors": "false"
+      },
       "textures": [
         {
           "role": "color",
@@ -58,7 +78,7 @@
           "sourceSHA256": "631a7fd3a514df6b0ff8c9a56e738d9d69ee95924b198aa93fa44b7064f76ccf",
           "runtimeSHA256": "3e99f344fa6164b01480aeff8c834fade54a68794a5d4598fabbb6cb27a45e92",
           "runtimeBytes": 1051930,
-          "colorLossless": false
+          "lossless": false
         },
         {
           "role": "normal",
@@ -74,23 +94,13 @@
           "sourceSHA256": "b7951124ddb341621b72106a8ece5b9a0e7a9b0f54ce1c1d99154eba1e9272ce",
           "runtimeSHA256": "b6a91f3cb871b2fbc1b59456a88af3766ec7ab2a499aa452947c3d781203beda",
           "runtimeBytes": 6965092,
-          "colorLossless": true
+          "lossless": true
         },
         {
-          "role": "specular",
+          "role": "source-specular-not-runtime",
           "source": "Knitted_Hat_01_SPEC.png",
-          "sourceSize": [
-            2048,
-            2048
-          ],
-          "runtimeSize": [
-            2048,
-            2048
-          ],
           "sourceSHA256": "08333567e5f482d1853daf677be832546db6296457f963feb055d926788ca0c2",
-          "runtimeSHA256": "8259ec26052756ebb8cc7465b94b4f141cfb36ad7d6f316f3193dd9ba53eec20",
-          "runtimeBytes": 1571762,
-          "colorLossless": true
+          "reason": "Original Phong/litsphere mask not used by this GGX adaptation; no unused runtime payload."
         }
       ],
       "files": [
@@ -154,6 +164,25 @@
         0.054
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "fishing_hat_01",
+        "diffuseColor": "0.8 0.8 0.8",
+        "specularColor": "0 0 0",
+        "shininess": "0.1961",
+        "opacity": "1",
+        "diffuseTexture": "Fishing_Hat_01.png",
+        "normalmapTexture": "Fishing_Hat_01_NRM.png",
+        "specularTexture": "Fishing_Hat_01_SPEC.png",
+        "shader": "data/shaders/glsl/phong"
+      },
+      "sourceShaderFlags": {
+        "diffuse": "true",
+        "bump": "false",
+        "normal": "true",
+        "displacement": "false",
+        "spec": "true",
+        "vertexColors": "false"
+      },
       "textures": [
         {
           "role": "color",
@@ -169,7 +198,7 @@
           "sourceSHA256": "e9f68f2a9f91391bfa099fa8a3757b5cb6393d8a0783a2c8406a608761f4a76d",
           "runtimeSHA256": "f4c3938fd495f8ad5e69acf7f1120560a8853e13cc085265af3b3203a4abf03e",
           "runtimeBytes": 418806,
-          "colorLossless": false
+          "lossless": false
         },
         {
           "role": "normal",
@@ -185,23 +214,13 @@
           "sourceSHA256": "086b460e49124d95afb9ea0563d51de01bde4cf2cd3a6061375e1a12df759a2a",
           "runtimeSHA256": "b7b236c45d62aad8a4a7a1fd7856a3afbe34d3f948f208288eb8f70daa59160a",
           "runtimeBytes": 4333820,
-          "colorLossless": true
+          "lossless": true
         },
         {
-          "role": "specular",
+          "role": "source-specular-not-runtime",
           "source": "Fishing_Hat_01_SPEC.png",
-          "sourceSize": [
-            2048,
-            2048
-          ],
-          "runtimeSize": [
-            2048,
-            2048
-          ],
           "sourceSHA256": "448c9d6b264cfae06c69a526144d128c74b7e9d08f542bc00bd8f42dee8afe7e",
-          "runtimeSHA256": "01ade890a04aa1bfea1ddfd7d5a4800beb372c347e79f8b1dfd7e89a67a36e44",
-          "runtimeBytes": 70540,
-          "colorLossless": true
+          "reason": "Original Phong/litsphere mask not used by this GGX adaptation; no unused runtime payload."
         }
       ],
       "files": [
@@ -265,6 +284,39 @@
         0.0028
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "elv_checkerboardMaterial",
+        "description": "Elvs_male_flat_cap1 material",
+        "ambientColor": "1.0 1.0 1.0",
+        "diffuseColor": "0.1493 0.1437 0.1479",
+        "specularColor": "0.5 0.5 0.5",
+        "shininess": "0.0",
+        "emissiveColor": "0.0 0.0 0.0",
+        "opacity": "1.0",
+        "translucency": "0.0",
+        "shadeless": "False",
+        "wireframe": "False",
+        "transparent": "False",
+        "alphaToCoverage": "True",
+        "backfaceCull": "False",
+        "depthless": "False",
+        "castShadows": "True",
+        "receiveShadows": "True",
+        "diffuseTexture": "blackwhitecloth.png",
+        "shader": "shaders/glsl/litsphere",
+        "shaderParam": "litsphereTexture litspheres/lit_matte.png",
+        "shaderDefine": "CALC_NORMAL_Z"
+      },
+      "sourceShaderFlags": {
+        "ambientOcclusion": "True",
+        "normal": "False",
+        "bump": "False",
+        "displacement": "False",
+        "vertexColors": "False",
+        "spec": "False",
+        "transparency": "True",
+        "diffuse": "True"
+      },
       "textures": [
         {
           "role": "color",
@@ -280,7 +332,7 @@
           "sourceSHA256": "83480d5390799408bca654a164870a1659886320c0c4bf605a1d2439f45963aa",
           "runtimeSHA256": "65bb61def364ff6b93a86189468f062601719aa1f364ef2ab1ae8e09119dd5e6",
           "runtimeBytes": 590850,
-          "colorLossless": false
+          "lossless": false
         }
       ],
       "files": [
@@ -334,6 +386,40 @@
         0.062
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "hat_felt1",
+        "description": "M_trilby_hat material",
+        "ambientColor": "1.0 1.0 1.0",
+        "diffuseColor": "1.0 1.0 1.0",
+        "specularColor": "1.0 1.0 1.0",
+        "shininess": "0.003922",
+        "emissiveColor": "0.0 0.0 0.0",
+        "opacity": "1.0",
+        "translucency": "0.0",
+        "shadeless": "False",
+        "wireframe": "False",
+        "transparent": "False",
+        "alphaToCoverage": "True",
+        "backfaceCull": "False",
+        "depthless": "False",
+        "castShadows": "True",
+        "receiveShadows": "True",
+        "diffuseTexture": "trilby_tex8.png",
+        "normalmapTexture": "trilby_normals.png",
+        "normalmapIntensity": "2.0",
+        "shader": "shaders/glsl/litsphere",
+        "shaderParam": "litsphereTexture litspheres/lit_matte.png"
+      },
+      "sourceShaderFlags": {
+        "ambientOcclusion": "True",
+        "normal": "True",
+        "bump": "False",
+        "displacement": "False",
+        "vertexColors": "False",
+        "spec": "False",
+        "transparency": "True",
+        "diffuse": "True"
+      },
       "textures": [
         {
           "role": "color",
@@ -349,7 +435,7 @@
           "sourceSHA256": "a56ef678e0473f69bbfbc27b7f84096ebfa3d26765646f3b638ddc4abc8535cd",
           "runtimeSHA256": "258017277aab9b2cfc985fc56552447e1ca850d9446b261d03668a3d4cc547b1",
           "runtimeBytes": 85406,
-          "colorLossless": false
+          "lossless": false
         },
         {
           "role": "normal",
@@ -365,7 +451,7 @@
           "sourceSHA256": "77edd484e53d327c7b16ffdc22b5ecd65a2b5eb4b5565f5e89e71f77b820e144",
           "runtimeSHA256": "d0ad60a7f09642c13588109bcdae6aa57a337e9b5e8f507045743c657f70085a",
           "runtimeBytes": 357876,
-          "colorLossless": true
+          "lossless": true
         }
       ],
       "files": [
@@ -424,6 +510,27 @@
         0.054
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "sherpa_hat",
+        "diffuseColor": "1 1 1",
+        "specularColor": "0 0 0",
+        "shininess": "0.1961",
+        "opacity": "1",
+        "diffuseTexture": "Sherpa_Hat_COL.png",
+        "normalmapTexture": "Sherpa_Hat_NRM.png",
+        "specularTexture": "Sherpa_Hat_SPEC.png",
+        "shader": "shaders/glsl/litsphere",
+        "shaderParam": "litsphereTexture litspheres/lit_matte.png",
+        "backfaceCull": "False"
+      },
+      "sourceShaderFlags": {
+        "diffuse": "true",
+        "bump": "false",
+        "normal": "true",
+        "displacement": "false",
+        "spec": "true",
+        "vertexColors": "false"
+      },
       "textures": [
         {
           "role": "color",
@@ -439,7 +546,7 @@
           "sourceSHA256": "25705f430cd153b3a28c2ec1b0b214ccbc17889ffc4f23fb62f2fa43d138f592",
           "runtimeSHA256": "4b0e904b8f1b6f131fa662525dcb5203dcb1e696e3f9be167f37e63c07b866bd",
           "runtimeBytes": 1037666,
-          "colorLossless": false
+          "lossless": false
         },
         {
           "role": "normal",
@@ -455,23 +562,13 @@
           "sourceSHA256": "a4e7f16621e3bff6f84ae2006e1e65636a7650cfe8e281bb006c03d8aa0c8091",
           "runtimeSHA256": "ac909d8d260b803d64ef17982d0fef3d2a1d8de75a83df864dab9f582129d650",
           "runtimeBytes": 5699124,
-          "colorLossless": true
+          "lossless": true
         },
         {
-          "role": "specular",
+          "role": "source-specular-not-runtime",
           "source": "Sherpa_Hat_SPEC.png",
-          "sourceSize": [
-            2048,
-            2048
-          ],
-          "runtimeSize": [
-            2048,
-            2048
-          ],
           "sourceSHA256": "2a72573f2f23766b24af281c9b2268512101c7adee6b250e715eff41c6fa3e31",
-          "runtimeSHA256": "355b36190c405a36d5d851c0b7cc691ee5583f9ff8c19a57114002c4f53a4894",
-          "runtimeBytes": 1102562,
-          "colorLossless": true
+          "reason": "Original Phong/litsphere mask not used by this GGX adaptation; no unused runtime payload."
         }
       ],
       "files": [
@@ -535,6 +632,26 @@
         0.054
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "patrol_cap",
+        "diffuseColor": "1 1 1",
+        "specularColor": "0 0 0",
+        "shininess": "0.1961",
+        "opacity": "1",
+        "diffuseTexture": "Patrol_Cap.png",
+        "normalmapTexture": "Patrol_Cap_NRM.png",
+        "specularTexture": "Patrol_Cap_SPEC.png",
+        "shader": "data/shaders/glsl/normalmap",
+        "backfaceCull": "False"
+      },
+      "sourceShaderFlags": {
+        "diffuse": "true",
+        "bump": "false",
+        "normal": "true",
+        "displacement": "false",
+        "spec": "true",
+        "vertexColors": "false"
+      },
       "textures": [
         {
           "role": "color",
@@ -550,7 +667,7 @@
           "sourceSHA256": "1df8af9be6b288b758304b4f5083fb409820f03e7b2619416da22e9d7ebae2e9",
           "runtimeSHA256": "0720a4204b8a579754aa41ec0f182cc64c5f1cbdda69908ca0a77c0a9c6b211a",
           "runtimeBytes": 263616,
-          "colorLossless": false
+          "lossless": false
         },
         {
           "role": "normal",
@@ -566,23 +683,13 @@
           "sourceSHA256": "61a10e00ca2fb3cbc4f6f01c180784b544cdd3a6506adc8f13527b0602e888cc",
           "runtimeSHA256": "08f7711234793edcd80dabae47ab90d012ae2f204e386be40dcf9f02dd6d41c6",
           "runtimeBytes": 3270186,
-          "colorLossless": true
+          "lossless": true
         },
         {
-          "role": "specular",
+          "role": "source-specular-not-runtime",
           "source": "Patrol_Cap_SPEC.png",
-          "sourceSize": [
-            2048,
-            2048
-          ],
-          "runtimeSize": [
-            2048,
-            2048
-          ],
           "sourceSHA256": "322d1395c452b3b8bdd9679f2a4a647c3a569a5997cc85ee11dc5a8da1714d84",
-          "runtimeSHA256": "54d97cab3a61e0c40f4cfe2aeae7ea60d114c53fe6ad3f9a61eb7accd32b0b52",
-          "runtimeBytes": 155082,
-          "colorLossless": true
+          "reason": "Original Phong/litsphere mask not used by this GGX adaptation; no unused runtime payload."
         }
       ],
       "files": [
@@ -646,6 +753,15 @@
         0.056
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "material.003Material",
+        "diffuseColor": "0.64 0.64 0.64",
+        "specularColor": "0.0 0.0 0.0",
+        "shininess": "1",
+        "opacity": "1",
+        "diffuseTexture": "bowler.png"
+      },
+      "sourceShaderFlags": {},
       "textures": [
         {
           "role": "color",
@@ -661,7 +777,7 @@
           "sourceSHA256": "7e8d9bbfbfb852b137140cbb0822a723c225d4a1505d45b5651cd2b536c616c7",
           "runtimeSHA256": "d9e354d636762a0f79713a15c2da707570c64c280262d9f7600e15e2b7bacec3",
           "runtimeBytes": 54132,
-          "colorLossless": false
+          "lossless": false
         }
       ],
       "files": [
@@ -715,6 +831,38 @@
         0.054
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "material_0Material",
+        "description": "Tophat1 material",
+        "ambientColor": "1.0 1.0 1.0",
+        "diffuseColor": "1.0 1.0 1.0",
+        "specularColor": "1.0 1.0 1.0",
+        "shininess": "0.003922",
+        "emissiveColor": "0.0 0.0 0.0",
+        "opacity": "1.0",
+        "translucency": "0.0",
+        "shadeless": "True",
+        "wireframe": "False",
+        "transparent": "False",
+        "alphaToCoverage": "True",
+        "backfaceCull": "False",
+        "depthless": "False",
+        "castShadows": "True",
+        "receiveShadows": "True",
+        "diffuseTexture": "tophat1.png",
+        "shader": "shaders/glsl/litsphere",
+        "shaderParam": "litsphereTexture litspheres/lit_refl_sharp_aniso.png"
+      },
+      "sourceShaderFlags": {
+        "ambientOcclusion": "True",
+        "normal": "False",
+        "bump": "False",
+        "displacement": "False",
+        "vertexColors": "False",
+        "spec": "False",
+        "transparency": "True",
+        "diffuse": "True"
+      },
       "textures": [
         {
           "role": "color",
@@ -730,7 +878,7 @@
           "sourceSHA256": "2bd9d46e617394c96ee1718c806d2fc83929f4d68806185d7f7099d6148bc73a",
           "runtimeSHA256": "0376946ebf61d4b1625c70f30ca5a9324dccd266df3e064e224f16ca204c57e4",
           "runtimeBytes": 457182,
-          "colorLossless": false
+          "lossless": false
         }
       ],
       "files": [
@@ -780,10 +928,44 @@
       "runtimeTriangles": 51968,
       "fitOriginCandidate": [
         0,
-        0.752,
+        0.69,
         0.054
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "Sunvisor",
+        "description": "Sunvisor material",
+        "ambientColor": "0.490196078431 0.490196078431 0.490196078431",
+        "diffuseColor": "1.0 1.0 1.0",
+        "specularColor": "0.21568627451 0.21568627451 0.21568627451",
+        "shininess": "0.2",
+        "emissiveColor": "0.0 0.0 0.0",
+        "opacity": "1.0",
+        "translucency": "0.0",
+        "shadeless": "False",
+        "wireframe": "False",
+        "transparent": "False",
+        "alphaToCoverage": "True",
+        "backfaceCull": "False",
+        "depthless": "False",
+        "castShadows": "True",
+        "receiveShadows": "True",
+        "diffuseTexture": "sunvisor.png",
+        "normalmapTexture": "sunvisor_normals.png",
+        "normalmapIntensity": "1.0",
+        "shader": "shaders/glsl/litsphere",
+        "shaderParam": "litsphereTexture litspheres/lit_leather.png"
+      },
+      "sourceShaderFlags": {
+        "ambientOcclusion": "True",
+        "normal": "True",
+        "bump": "True",
+        "displacement": "True",
+        "vertexColors": "True",
+        "spec": "True",
+        "transparency": "True",
+        "diffuse": "True"
+      },
       "textures": [
         {
           "role": "color",
@@ -799,7 +981,7 @@
           "sourceSHA256": "27e5d9bf7f6e1a40bb55fa1c6937d6a2a54a8fd1a94ee6e0ac255923bc1340f8",
           "runtimeSHA256": "975c0a9df864df8dd4302a534724b83539b0daa8727d02c1a43e91408bae428d",
           "runtimeBytes": 225362,
-          "colorLossless": false
+          "lossless": false
         },
         {
           "role": "normal",
@@ -815,7 +997,7 @@
           "sourceSHA256": "372e59bf5bdf329f11d0c51ca770470034af8723dd90f28b635dd9ab7b1a8cda",
           "runtimeSHA256": "87b6c5ef676ebf9d96808ee6f74fcf5075e0767ca02886b7bf7bd62718ee1ae6",
           "runtimeBytes": 358848,
-          "colorLossless": true
+          "lossless": true
         }
       ],
       "files": [
@@ -870,10 +1052,28 @@
       "runtimeTriangles": 49568,
       "fitOriginCandidate": [
         0,
-        0.752,
+        0.681,
         0.054
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "hatMaterial",
+        "diffuseColor": "1 1 1",
+        "specularColor": "0 0 0",
+        "shininess": "0.01176",
+        "opacity": "1",
+        "backfaceCull": "false",
+        "diffuseTexture": "cloche_hat_green.png",
+        "shader": "data/shaders/glsl/phong"
+      },
+      "sourceShaderFlags": {
+        "diffuse": "true",
+        "bump": "false",
+        "normal": "false",
+        "displacement": "false",
+        "spec": "false",
+        "vertexColors": "false"
+      },
       "textures": [
         {
           "role": "color",
@@ -889,7 +1089,7 @@
           "sourceSHA256": "7764d82de8abc541184774426e24b380cb84a94b8b7e302c880f4e948fd69b92",
           "runtimeSHA256": "d1cbb9f78e0ecca622f27b976ac5309a5d27ea98e4ae80d2c39a350b9b0eb749",
           "runtimeBytes": 141764,
-          "colorLossless": false
+          "lossless": false
         }
       ],
       "files": [
@@ -943,6 +1143,38 @@
         0.054
       ],
       "fitOriginMeasured": false,
+      "sourceMaterialProperties": {
+        "name": "elvs_unisex_chef_hat1",
+        "description": "Elvs_unisex_chef_hat1 material",
+        "ambientColor": "1.0 1.0 1.0",
+        "diffuseColor": "0.5 0.5 0.5",
+        "specularColor": "0.5 0.5 0.5",
+        "shininess": "0.5",
+        "emissiveColor": "0.0 0.0 0.0",
+        "opacity": "1.0",
+        "translucency": "0.0",
+        "shadeless": "False",
+        "wireframe": "False",
+        "transparent": "False",
+        "alphaToCoverage": "True",
+        "backfaceCull": "True",
+        "depthless": "False",
+        "castShadows": "True",
+        "receiveShadows": "True",
+        "diffuseTexture": "chefhattex1.png",
+        "shader": "shaders/glsl/litsphere",
+        "shaderParam": "AdditiveShading 0.07"
+      },
+      "sourceShaderFlags": {
+        "diffuse": "True",
+        "bump": "True",
+        "normal": "True",
+        "displacement": "True",
+        "spec": "True",
+        "vertexColors": "True",
+        "transparency": "True",
+        "ambientOcclusion": "True"
+      },
       "textures": [
         {
           "role": "color",
@@ -958,7 +1190,7 @@
           "sourceSHA256": "5abef28e9da2ac785570fafef869a693f201dbc5278ae146fe5c7874c9a7f51b",
           "runtimeSHA256": "83ab0ec529f3f0eb5db4d992026750b70ac41499394ec75af60c0cb826a0d4ad",
           "runtimeBytes": 38426,
-          "colorLossless": false
+          "lossless": false
         }
       ],
       "files": [
@@ -986,7 +1218,7 @@
     }
   ],
   "excluded": [
-    "elvs_slouchy_beanie1: source image decoder failed in run 38040596632; not replaced by invented texture",
+    "elvs_slouchy_beanie1: image decoder failed in run 38040596632; no invented replacement",
     "jujube_newsboy_cap: pack/header licence conflict",
     "grinsegold_uncle_joshis_hat: pack/header conflict",
     "maciekg_wizard_hat: pack/header conflict",
