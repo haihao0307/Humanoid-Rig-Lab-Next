@@ -52,48 +52,37 @@ export function applyBrowLid(rig,e){
  P.needsUpdate=true;N.needsUpdate=true;
  e.s3Brow={maxLidCorrectionMM:max*1000,freeMarginCorrectionMM:outline*1000,lowerLidCorrectionMM:low*1000,joinedOuterBoundaryErrorMM:boundary*1000};
 }
-/** Rebuild the interior of the existing medial indexed sheet. The two edge
- * attachments are copied exactly from the posterior free-margin mesh. */
+/** Fair the existing connected medial basin with fixed boundary attachments.
+ * A rejected candidate forced its centre directly onto the distant globe and
+ * created a 3-4mm deep wedge. Here movement is bounded to 0.30mm and preserves
+ * the already validated tear-lake bank and its finite globe transition. */
 export function refineMedial(rig,e,closure){
- const {lid,c,section}=e,part=section.medial,{U,V,mesh}=part,P=mesh.geometry.attributes.position,I=lid.inside.geometry.attributes.position,IN=lid.inside.geometry.attributes.normal;
- const open=1-smooth(closure);let correction=0,attachment=0,nonfinite=0,minGap=Infinity,penetrations=0;rig._fittingEye=e;
+ const {lid,c,section}=e,part=section.medial,{U,V,mesh}=part,P=mesh.geometry.attributes.position,I=lid.inside.geometry.attributes.position;
+ const open=1-smooth(closure),original=P.array.slice(),z=Float64Array.from({length:P.count},(_,i)=>P.getZ(i)),next=z.slice(),fronts=new Float64Array(P.count);fronts.fill(-Infinity);
+ let correction=0,attachment=0,nonfinite=0,minGap=Infinity,penetrations=0;rig._fittingEye=e;
  if(open>0){
-  for(let i=0;i<=U;i++){
-   const topIndex=c.sign<0?i:lid.A/2-i,bottomIndex=lid.A-topIndex,q=(1-Math.cos(i/lid.A*Math.PI*2))/(1-Math.cos(U/lid.A*Math.PI*2));
-   for(let j=0;j<=V;j++){
-    const v=j/V,k=i*(V+1)+j,old=P.getZ(k),bank=Math.sin(Math.PI*v),interior=Math.pow(bank,1.6);
-    let x=mix(I.getX(topIndex),I.getX(bottomIndex),v),y=mix(I.getY(topIndex),I.getY(bottomIndex),v),z=mix(I.getZ(topIndex),I.getZ(bottomIndex),v);
-    x-=c.sign*.00016*smooth(q)*interior*open;
-    const front=rig.eyeFront(c,x,y);
-    // A broad, recessed basin meets the globe gradually, instead of two
-    // separate spikes sticking forward from a flat triangular flap.
-    if(front!==null)z=mix(z,front+.000105,smooth((q-.12)/.88)*Math.pow(bank,.80)*open);
-    const support=Math.pow(Math.sin(Math.PI*q),2)*interior*open;
-    const car=.00046*Math.exp(-Math.pow((q-.28)/.22,2)-Math.pow((v-.57)/.29,2));
-    const plica=.00026*Math.exp(-Math.pow((q-(.66+.045*Math.sin(Math.PI*v)))/.115,2));
-    const lake=.00015*Math.exp(-Math.pow((q-.49)/.17,2));
-    z+=(car+plica-lake)*support;
-    if(front!==null)z=Math.max(z,front+.00010);
-    if(j===0){x=I.getX(topIndex);y=I.getY(topIndex);z=I.getZ(topIndex);}
-    if(j===V){x=I.getX(bottomIndex);y=I.getY(bottomIndex);z=I.getZ(bottomIndex);}
-    P.setXYZ(k,x,y,z);correction=Math.max(correction,Math.abs(P.getZ(k)-old));
+  for(let k=0;k<P.count;k++){const f=rig.eyeFront(c,P.getX(k),P.getY(k));if(f!==null)fronts[k]=f;}
+  for(let pass=0;pass<18;pass++){
+   for(let i=1;i<U;i++)for(let j=1;j<V;j++){
+    const k=i*(V+1)+j,neighbours=[k-1,k+1,k-V-1,k+V+1],q=(1-Math.cos(i/lid.A*Math.PI*2))/(1-Math.cos(U/lid.A*Math.PI*2)),v=j/V;
+    let sum=0,weight=0;
+    for(const n of neighbours){const w=1/Math.max(.00004,Math.hypot(P.getX(k)-P.getX(n),P.getY(k)-P.getY(n)));sum+=z[n]*w;weight+=w;}
+    const strength=.34*Math.pow(Math.sin(Math.PI*q)*Math.sin(Math.PI*v),.7)*open;
+    const candidate=mix(z[k],sum/weight,strength),limit=.00030*open;
+    next[k]=Math.max(fronts[k]+.00010,clamp(candidate,original[k*3+2]-limit,original[k*3+2]+limit));
    }
+   z.set(next);
   }
+  for(let i=1;i<U;i++)for(let j=1;j<V;j++){const k=i*(V+1)+j;P.setZ(k,z[k]);correction=Math.max(correction,Math.abs(P.getZ(k)-original[k*3+2]));}
   P.needsUpdate=true;mesh.geometry.computeVertexNormals();
-  const N=mesh.geometry.attributes.normal;
-  for(let i=0;i<=U;i++){
-   const top=c.sign<0?i:lid.A/2-i,bottom=lid.A-top;
-   for(let j=0;j<=V;j++){
-    const k=i*(V+1)+j,w=1-smooth(Math.min(j,V-j)/3),a=j<V/2?top:bottom;if(w<=0)continue;
-    const x=mix(N.getX(k),IN.getX(a),w*.85),y=mix(N.getY(k),IN.getY(a),w*.85),z=mix(N.getZ(k),IN.getZ(a),w*.85),l=Math.hypot(x,y,z)||1;N.setXYZ(k,x/l,y/l,z/l);
-   }
-  }N.needsUpdate=true;
+  // Do not average this anterior surface with inward-facing conjunctival
+  // normals: that reverses the lighting along the bank and produces black bands.
  }
  for(let i=0;i<=U;i++)for(let j=0;j<=V;j++){
-  const k=i*(V+1)+j,x=P.getX(k),y=P.getY(k),z=P.getZ(k),top=c.sign<0?i:lid.A/2-i,bottom=lid.A-top;
-  if(![x,y,z].every(Number.isFinite))nonfinite++;
-  if(j===0||j===V){const a=j===0?top:bottom;attachment=Math.max(attachment,Math.hypot(x-I.getX(a),y-I.getY(a),z-I.getZ(a)));}
-  const f=rig.eyeFront(c,x,y);if(f!==null){minGap=Math.min(minGap,z-f);if(z<f-1e-7)penetrations++;}
+  const k=i*(V+1)+j,x=P.getX(k),y=P.getY(k),zz=P.getZ(k),top=c.sign<0?i:lid.A/2-i,bottom=lid.A-top;
+  if(![x,y,zz].every(Number.isFinite))nonfinite++;
+  if(j===0||j===V){const a=j===0?top:bottom;attachment=Math.max(attachment,Math.hypot(x-I.getX(a),y-I.getY(a),zz-I.getZ(a)));}
+  const f=rig.eyeFront(c,x,y);if(f!==null){minGap=Math.min(minGap,zz-f);if(zz<f-1e-7)penetrations++;}
  }
- e.s3Medial={maxCorrectionMM:correction*1000,maxAttachmentErrorMM:attachment*1000,nonfiniteVertices:nonfinite,penetrations,minGlobeGapMM:minGap*1000,independentPlugAdded:false,sameIndexedSheet:true,fullyClosedSurfaceChanged:false};rig._fittingEye=null;
+ e.s3Medial={maxCorrectionMM:correction*1000,maxAttachmentErrorMM:attachment*1000,nonfiniteVertices:nonfinite,penetrations,minGlobeGapMM:minGap*1000,independentPlugAdded:false,sameIndexedSheet:true,fullyClosedSurfaceChanged:false,boundedToPriorSurfaceMM:.30};rig._fittingEye=null;
 }
