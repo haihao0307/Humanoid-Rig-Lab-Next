@@ -1,0 +1,81 @@
+name: Leather physics R09 research audit
+on:
+  push:
+    branches: [research/leather-physics-r09-20261010]
+    paths:
+      - .github/workflows/leather-physics-r09-audit.yml
+      - leather-workshop/physics-research/r09-20261010/*.cjs
+      - leather-workshop/physics-research/r09-20261010/*.py
+permissions:
+  contents: write
+concurrency:
+  group: leather-physics-r09-audit
+  cancel-in-progress: false
+jobs:
+  forensic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      STUDY: leather-workshop/physics-research/r09-20261010
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/leather-physics-r09-20261010
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preserve all accepted appearance, archived crafts and historical kernels
+        run: |
+          git fetch --depth=1 origin fe71a64bf15694904d9f7cc24a7c34163cb9083a
+          git diff --exit-code fe71a64bf15694904d9f7cc24a7c34163cb9083a -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/r07 leather-workshop/r08 leather-workshop/anchors
+          echo "STUDY_SOURCE=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Reproduce baseline defects rather than counting finite coordinates as physics success
+        run: |
+          node "$STUDY/baseline-numeric.cjs"
+          node "$STUDY/thread-probe.cjs"
+      - name: Test isolated material-coordinate and multi-layer yarn corrections
+        run: node "$STUDY/test-candidates.cjs"
+      - name: Install independent native reference and inspection browser dependencies
+        timeout-minutes: 5
+        run: |
+          pip --disable-pip-version-check install --only-binary=:all: --timeout 35 --retries 2 ipctk==1.6.0 numpy playwright==1.55.0
+          pip freeze > "$STUDY/results/python-environment.txt"
+          CHROME=$(command -v google-chrome || command -v chromium)
+          test -x "$CHROME"
+          echo "KAOPU_CHROMIUM_EXECUTABLE=$CHROME" >> "$GITHUB_ENV"
+      - name: Evaluate vertex-face and edge-edge continuous-contact reference
+        run: python "$STUDY/ipc-oracle.py"
+      - name: Inspect actual R08 yarn shader and old craft archive in a real browser
+        run: python "$STUDY/browser-audit.py"
+      - name: Record research evidence without creating a fake release receipt
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,hashlib
+          r=Path(os.environ['STUDY']);files={}
+          for p in (r/'results').glob('*.json'):
+            data=json.loads(p.read_text())
+            if 'pass' in data:assert data['pass'],p
+            files[p.name]=hashlib.sha256(p.read_bytes()).hexdigest()
+          receipt={'stage':'RESEARCH_AND_ISOLATED_REPAIRS_ONLY','releaseReady':False,'publicRuntimeChanged':False,'sourceCommit':os.environ['STUDY_SOURCE'],'workflowRun':os.environ['GITHUB_RUN_ID'],'reports':files,'meaning':'Research assertions include reproduction of known R08 failures. A green workflow is not physics production acceptance. No new HTML/website is built or published.'}
+          (r/'RESULTS_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git diff --exit-code fe71a64bf15694904d9f7cc24a7c34163cb9083a -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/r07 leather-workshop/r08 leather-workshop/anchors
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$STUDY/results" "$STUDY/RESULTS_RECEIPT.json"
+          git commit -m 'test(leather-physics): record reproducible defects, candidate unit tests and independent IPC results; no release'
+          git push origin HEAD:refs/heads/research/leather-physics-r09-20261010
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-physics-r09-audit-${{ github.run_id }}
+          path: leather-workshop/physics-research/r09-20261010/
+          retention-days: 14
