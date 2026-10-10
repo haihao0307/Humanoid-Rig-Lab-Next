@@ -12,7 +12,8 @@ const metadata=JSON.parse(fs.readFileSync(path.join(DIR,'anny-model.json')));
 const chunks=metadata.binary.compressed.parts.map(x=>{const b=fs.readFileSync(path.join(DIR,path.basename(x.url)));if(sha(b)!==x.sha256)throw Error('Anny part digest mismatch');return b;});
 const raw=gunzipSync(Buffer.concat(chunks));if(sha(raw)!==metadata.binary.sha256)throw Error('Anny decoded digest mismatch');
 const native=new AnnyModel(metadata,raw.buffer.slice(raw.byteOffset,raw.byteOffset+raw.byteLength));
-const round=v=>Math.round(v*1e6)/1e6;
+// JSON normalizes -0 to +0. Canonicalize before hashing, not after verification.
+const round=v=>{const n=Math.round(v*1e6)/1e6;return Object.is(n,-0)?0:n;};
 const profiles=[
  {id:'standard',name:'标准人台',label:'原生 Anny · 标准成人',phenotypes:{gender:.15,age:2/3,muscle:.5,weight:.5,height:.42,proportions:.5}},
  {id:'slender',name:'纤细人台',label:'原生 Anny · 纤细成人',phenotypes:{gender:.9,age:2/3,muscle:.35,weight:.35,height:.42,proportions:.5}},
@@ -42,7 +43,9 @@ for(const spec of profiles){
  }
  bodies.push({...spec,source:'kaopu-unified-human-workbench/full/source/neck-baseline/src/AnnyModel.js',sourceCommit:'900d68a6206b9f8d220dff5a6c34fb0aa683deb5',proportionRevision:'shoe-r01-native-'+spec.id,positions,positionsSha256:sha(new Float32Array(positions)),joints,height:round(Math.max(...positions.filter((_,i)=>i%3===1))),feet});
 }
-const pack={schema:'kaopu-shoe-body-pack/1',units:'metre',axes:{up:'Y',forward:'Z',transformFromSource:'(x,y,z)->(x,z-sourceFloor,-y)'},sourceCommit:'900d68a6206b9f8d220dff5a6c34fb0aa683deb5',sourceModelSha256:metadata.binary.sha256,faceSha256:sha(native.arrays.faces),faces,bodies,scope:'Static snapshots of the unchanged Anny body used by the common human workbench. Does not include its GNM face, MHR driver, or live parameter solver.'};
-fs.mkdirSync(path.join(ROOT,'assets'),{recursive:true});fs.writeFileSync(path.join(ROOT,'assets/body-pack.json'),JSON.stringify(pack));fs.writeFileSync(path.join(ROOT,'assets/body-pack.json.gz'),gzipSync(JSON.stringify(pack),{level:9}));
+const pack={schema:'kaopu-shoe-body-pack/1',units:'metre',axes:{up:'Y',forward:'Z',transformFromSource:'(x,y,z)->(x,z-sourceFloor,-y)'},serialization:{positionRoundingMetres:1e-6,signedZero:'canonical positive zero',positionHash:'SHA-256 of Float32Array after canonical JSON-compatible rounding'},sourceCommit:'900d68a6206b9f8d220dff5a6c34fb0aa683deb5',sourceModelSha256:metadata.binary.sha256,faceSha256:sha(native.arrays.faces),faces,bodies,scope:'Three static Anny body snapshots with declared axis conversion and micrometre serialization rounding. No shoe-dependent body deformation. Does not include the common workbench GNM face, MHR driver, or live parameter solver.'};
+const encoded=JSON.stringify(pack),decoded=JSON.parse(encoded);
+for(const b of decoded.bodies)if(sha(new Float32Array(b.positions))!==b.positionsSha256)throw Error('Body position hash changed during JSON round trip');
+fs.mkdirSync(path.join(ROOT,'assets'),{recursive:true});fs.writeFileSync(path.join(ROOT,'assets/body-pack.json'),encoded);fs.writeFileSync(path.join(ROOT,'assets/body-pack.json.gz'),gzipSync(encoded,{level:9}));
 fs.writeFileSync(path.join(ROOT,'assets/BODY-PROVENANCE.json'),JSON.stringify({...pack,faces:undefined,bodies:bodies.map(({positions,feet,...b})=>({...b,feet:feet.map(({samples,stations,...f})=>f)}))},null,2));
-console.log(JSON.stringify({bodies:bodies.map(b=>({id:b.id,height:b.height,feet:b.feet.map(f=>({side:f.side,length:f.length,width:f.width,ballGirth:f.ball.girth,instepGirth:f.instep.girth}))})),gzipBytes:fs.statSync(path.join(ROOT,'assets/body-pack.json.gz')).size},null,2));
+console.log(JSON.stringify({bodies:bodies.map(b=>({id:b.id,height:b.height,feet:b.feet.map(f=>({side:f.side,length:f.length,width:f.width,ballGirth:f.ball.girth,instepGirth:f.instep.girth}))})),gzipBytes:fs.statSync(path.join(ROOT,'assets/body-pack.json.gz')).size,serializationRoundTripVerified:true},null,2));
