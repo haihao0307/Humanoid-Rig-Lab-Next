@@ -105,3 +105,15 @@ Canonical policy: `haihao0307/guilin-dem-pipeline@48254a81b95d1f28b0d85740668f3f
 
 ### Reference-First / First-Look Gate
 所有可见对象的第一轮工作台必须 reference 与 candidate 同屏；identity / 大轮廓 / 比例没有通过以前，不得进入微观细节。Production Mother 不负责重新规划，只执行 Coordinator 冻结的 reference + task。用户默认只看当前 standalone HTML 和 reference-vs-candidate 结果。Canonical R4.2: `haihao0307/guilin-dem-pipeline@48254a81b95d1f28b0d85740668f3f94cebda1b8:knowledge/MOTHER_PARALLEL_COVERAGE_EXECUTION_R4_ZH.md`。
+
+## 工作台搭建方法论 V1.1（2026-10-10 最新用户方向）
+
+新工作台优先读取 `WORKBENCH_BUILD_SYSTEM.md`、`docs/workbench-build-system/RUNBOOK.md` 与registry。主要采用2026-10-07至10-10形成的工作经验，较早方法仅作历史/保护参考；不因本文件旧Factory分工禁止当前任务授权的自主研究。
+
+顺序固定为：找顶尖参考 → 先在自有网页忠实复刻 → 冻结复刻基线 → 拆解成因 → 执行端掌握参数 → 构造变量和预设 → 逐块固化能力 → 持续向外学习并融合 → 自检后交用户审核。最低许可/入口/安全检查仍在复刻前；完整解析和通用架构不作前置门槛。
+
+能合法且在当前任务范围内复用的代码/资产先复用；不能直接复用时主动研究公开原理及可运行技术老师。自己的工作台不要求重写所有代码，不改变第三方权利归属。当前资产授权和被保护母体限制仍须遵守。
+
+日常搜资料、路线选择、调参、排错、版本/文件管理和测试由执行端负责；用户只审核关键效果和功能，不要求每步说继续或代填内部合同。技术失败先自行找方法，只有新费用/隐私权限/目标变化/保护内容等真正需用户决定时升级。保持Draft，不自动合并、不强推、不改写历史。
+
+模板和检查器只管理记录，不是已部署自动生成服务；本规则必须由其他分支/仓库显式读取，不声称已自动推广。方法论文档任务不冒称修改三维生产源码或通过工作台浏览器验收。

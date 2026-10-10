@@ -1,0 +1,42 @@
+name: Workbench Methodology Checks
+on:
+  push:
+    branches: [docs/workbench-build-system-v1-20261010]
+    paths:
+      - WORKBENCH_BUILD_SYSTEM.md
+      - docs/workbench-build-system/**
+      - tools/workbench_methodology.py
+      - tests/test_workbench_methodology.py
+      - .github/workflows/workbench-methodology.yml
+  pull_request:
+    paths:
+      - WORKBENCH_BUILD_SYSTEM.md
+      - docs/workbench-build-system/**
+      - tools/workbench_methodology.py
+      - tests/test_workbench_methodology.py
+      - .github/workflows/workbench-methodology.yml
+permissions:
+  contents: read
+concurrency:
+  group: workbench-methodology-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  records:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /WORKBENCH_BUILD_SYSTEM.md
+            /AGENTS.md
+            /docs/workbench-build-system/
+            /tools/workbench_methodology.py
+            /tests/test_workbench_methodology.py
+      - name: Record guard positive and negative tests
+        run: python3 -m unittest discover -s tests -p 'test_workbench_methodology.py' -v
+      - name: Methodology links and source registry
+        run: python3 tools/workbench_methodology.py lint
