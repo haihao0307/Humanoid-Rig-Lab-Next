@@ -1,13 +1,27 @@
-# KAOPU Shoe Atelier R01 — work in progress
+# KAOPU 鞋履工坊 R01.2 — 静态视觉候选
 
-Independent static footwear workbench for the user's human system. Source branch: feature/shoe-atelier-r01-20261010. Original human, clothing, and leather systems remain unchanged.
+公网固定预览：https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/8710332cbfde5d29a3bd1e3777a511ddd6e5b6df/shoe-workshop/r01/public-lite.html
 
-Status: NOT DELIVERED. This commit records an original procedural geometry module and the existing isolated build workflow. The complete material/runtime upload and actual browser rendering have not passed. No public preview has been verified. This is not a finished cinematic-quality product.
+公网封装固定提交：8710332cbfde5d29a3bd1e3777a511ddd6e5b6df。页面内源码标记：4f0d53d597ba07fa2c7e3eebf39141009a084252。原编译构建固定为 14f92620745f62d34dea9cbfa2de5e326c1379d1；公网版本只改变数据容器标签，运行代码和人台数据完全相同。见 ../qa-r012/PUBLIC_TRANSPORT.json。
 
-The geometry module contains six intended constructions: Derby, loafer, sneaker, Chelsea boot, sandal, and wholecut lace-up. Intended future review views include shoe, wearer, foot measurement, exploded components, and macro details. These are code intentions, not accepted visual results.
+独立分支 feature/shoe-atelier-r01-20261010，Draft PR #30；未合并 main，不修改人物、服装或皮革工作台。
 
-Human source read and pinned: haihao0307/guilin-dem-pipeline, commit 900d68a6206b9f8d220dff5a6c34fb0aa683deb5, kaopu-unified-human-workbench/full/source/neck-baseline/src/AnnyModel.js. The prototype uses three static body snapshots from that exact native solver, not the full live GNM/MHR common-human integration. No human body is shrunk to hide bad fitting.
+## 已实现
 
-Static mesh length and cross-section measurements cannot establish real-world fit, pressure or comfort. Physics, manufacturing patterns, certified shoe-last geometry, dynamic deformation and full main-workbench integration are outside the first visual candidate. Proprietary CAD code has not been acquired or cloned.
+六种结构预设：德比皮鞋、便士乐福鞋、低帮休闲鞋、切尔西短靴、双带便凉鞋、整片式系带鞋。六张缩略图来自真实三维渲染，不是平面参考图。五种程序化材质、七种配色、三种灯光。成鞋、上脚、全身人台、拆解、量脚、楦体，以及六种摄像机视图。鞋面具有厚度，内衬、外底、沿条、缝线和五金独立成组。足长及网格截面围度、三项设计余量、保存/恢复、JSON 导入导出和截图可用。页面只在交互或转台运行时重绘。
 
-Teacher references: iCAD INESCOP, Shoemaster, Romans CAD, 3DShoemaker, arXiv 2007.11077, the IPC project, and Sara Alvarez's Textile Academy Symbiotic Shoes documentation. Learn their public workflows and documented principles; do not imply access to their proprietary implementations.
+## 人台与数据边界
+
+三位人台由既有人物总台的固定版本 Anny 原生求解器生成。只进行了已声明的坐标转换、1 微米序列化舍入和正零规范化；不随鞋款改变身体大小。浏览器实际顶点缓冲区与烘焙摘要逐款匹配。它们是静态合成人体快照，不是真人扫描，也不是已接入实时 GNM/MHR/当前人物的完整总台。
+
+## 验收
+
+真实公网 Chromium 完整回归 71 项通过，含 3 位人台乘 6 款鞋、模特网格摘要、模式、镜头、材质像素变化、保存/导入导出、鼠标旋转、390×844 手机视口和单文件断网直开。桌面视口 1440×1000；手机为视口/触控模拟，不是实机。公网报告位于 ../qa-r012/evidence/PUBLIC-QA.json，完整报告与真实截图位于 ../qa-r012/evidence/full-regression/。程序检查通过不等于审美已达到影视级。
+
+## 未完成与下一阶段
+
+此版本供静态外观测试，尚未达到用户要求的最终影视级质感。鞋口、鞋腰与鞋楦设计、皮革和织物近景、五金和拼接细节仍需逐款提升。未实现真人扫描、制造级鞋楦/纸样展平、工业级放码、实时总台同步、压力/舒适度、动态物理或完整三角形防穿模认证。解析采样余量为正不是全网格无碰撞证明。外部商业 CAD 的内核源码未取得；本项目学习公开流程，不能称为完整复制。
+
+## 教师与源码
+
+见 LEARNING.md、assets/BODY-PROVENANCE.json、BUILD_MANIFEST.json 和 licenses/。鞋体由独立程序化函数生成，未搬运商业鞋模。preview.html 保留原编译构建；public-lite.html 是同一构建的预览服务兼容封装。两者均内嵌渲染器与合成人台数据，没有运行时模型或贴图网络依赖。构建依赖和验收命令由专用 Actions 工作流固定。
