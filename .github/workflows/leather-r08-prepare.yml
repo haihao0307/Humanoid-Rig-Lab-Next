@@ -1,0 +1,45 @@
+name: Leather R08 prepare
+on:
+  push:
+    branches: [fix/leather-r08-continuous-shell-20261010]
+    paths: [.github/workflows/leather-r08-prepare.yml]
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/leather-r08-continuous-shell-20261010
+          sparse-checkout: |
+            leather-workshop
+      - name: New layer only and pinned third-party mesher
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+          root=Path('leather-workshop');out=root/'r08';out.mkdir(exist_ok=True)
+          for p in (root/'r07/site').glob('*'):
+            d=out/'site'/p.name
+            if not d.exists():d.parent.mkdir(exist_ok=True);shutil.copy2(p,d)
+          for name in ['build.py','test-numerics.cjs','test-resume.cjs','qa.py']:
+            d=out/name
+            if not d.exists():shutil.copy2(root/'r07'/name,d)
+          (out/'vendor').mkdir(exist_ok=True)
+          PY
+          curl -fL --retry 2 --connect-timeout 15 --max-time 90 https://raw.githubusercontent.com/r3mi/poly2tri.js/cb6b2220c70305c6b8c6483f2b1a2ad72616d070/dist/poly2tri.min.js -o leather-workshop/r08/vendor/poly2tri.min.js
+          curl -fL --retry 2 --connect-timeout 15 --max-time 90 https://raw.githubusercontent.com/r3mi/poly2tri.js/cb6b2220c70305c6b8c6483f2b1a2ad72616d070/LICENSE.txt -o leather-workshop/r08/vendor/LICENSE-poly2tri.txt
+          sha256sum leather-workshop/r08/vendor/* > leather-workshop/r08/vendor/SHA256SUMS.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r08
+          git commit -m 'build(leather-r08): read-only inherited source and pinned BSD constrained triangulation library'
+          git push origin HEAD:refs/heads/fix/leather-r08-continuous-shell-20261010
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r08-prepared-source
+          path: leather-workshop/r08
+          retention-days: 7
