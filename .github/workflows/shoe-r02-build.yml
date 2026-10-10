@@ -1,0 +1,100 @@
+name: Shoe R02 Source Replay and Kernel
+on:
+  push:
+    branches: [feature/shoe-atelier-r01-20261010]
+    paths: ['shoe-workshop/r02/**', '.github/workflows/shoe-r02-build.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shoe-r02-build
+  cancel-in-progress: false
+jobs:
+  build-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: shoe-workshop/r02
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: One-time checked transport to actual editable modules
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64,lzma,json,hashlib
+          R=Path('shoe-workshop/r02');receipt=R/'SOURCE_IMPORT_RECEIPT.json'
+          if receipt.exists():
+            print('Prior transport recorded; retaining current authored sources without overwriting.')
+          else:
+            b=''.join((R/f'source-transfer/{i:02d}.b64').read_text().strip() for i in range(5))
+            if len(b)!=44972:raise ValueError('Truncated source transport')
+            raw=lzma.decompress(base64.b64decode(b,validate=True));sha=hashlib.sha256(raw).hexdigest()
+            if len(raw)!=97381 or sha!='415420a39dbd426d77f400091cabb1a9427f58a712a5d771527229efc84d78a4':raise ValueError('Source transport digest mismatch')
+            data=json.loads(raw)
+            expected={'index.html','style.css','src/main.mjs','src/kernel.mjs','tools/build.mjs','tools/export_teacher.py','tools/intake.py','tests/numerics.mjs','tests/browser.mjs','SOURCES_LOCK.json','TASK.json','README.md','docs/OBSERVER_AND_METHOD.md','docs/RESEARCH.md','licenses/NOTICE.md','licenses/THREE-MIT.txt','.gitignore'}
+            if set(data)!=expected:raise ValueError('Unexpected source paths')
+            for name,text in data.items():
+              p=R/name;encoded=text.encode('utf-8')
+              if p.exists() and p.read_bytes()!=encoded:raise ValueError('Refusing to overwrite an existing different source: '+name)
+              p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(encoded)
+            receipt.write_text(json.dumps({'schema':'kaopu-source-transport/1','transportSha256':sha,'files':[{'path':n,'sha256':hashlib.sha256(t.encode()).hexdigest()} for n,t in data.items()],'scope':'Transport only. Not geometry, browser, visual or user acceptance.'},indent=2))
+          PY
+      - name: Exact dependencies
+        run: |
+          mkdir -p /tmp/shoe-r02-deps
+          cd /tmp/shoe-r02-deps
+          npm init -y >/dev/null
+          npm install --save-exact three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          python -m pip install rhino3dm==8.17.0 numpy==2.3.5 shapely==2.1.2
+      - name: Fetch immutable teacher and sister kernels, verify all hashes
+        working-directory: shoe-workshop/r02
+        run: |
+          ln -s /tmp/shoe-r02-deps/node_modules node_modules
+          python tools/intake.py
+          SHOE_TEACHER="$PWD/source/teacher" python tools/export_teacher.py
+      - name: Numerical and adversarial regression
+        working-directory: shoe-workshop/r02
+        run: node tests/numerics.mjs
+      - name: Build standalone browser artifact
+        working-directory: shoe-workshop/r02
+        run: node tools/build.mjs
+      - name: Install actual browser
+        working-directory: /tmp/shoe-r02-deps
+        run: npx playwright install --with-deps chromium
+      - name: Real browser geometry, interaction, negative controls and viewport tests
+        working-directory: shoe-workshop/r02
+        env:
+          EXPECT_BUILD: ${{ github.sha }}
+        run: node tests/browser.mjs
+      - name: Save build and evidence for direct inspection
+        if: always()
+        run: |
+          tar --exclude=node_modules --exclude=source/teacher --exclude=source-transfer -czf /tmp/shoe-r02-review.tgz -C shoe-workshop r02
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shoe-r02-review
+          path: /tmp/shoe-r02-review.tgz
+          retention-days: 30
+      - name: Fast-forward only, commit actual modular sources and bounded evidence
+        if: success()
+        run: |
+          set -euo pipefail
+          current=$(git ls-remote origin refs/heads/feature/shoe-atelier-r01-20261010 | cut -f1)
+          test "$current" = "$GITHUB_SHA" || { echo 'Concurrent update: refusing to overwrite another head'; exit 1; }
+          rm -f shoe-workshop/r02/node_modules
+          git config user.name 'Shoe R02 Build'
+          git config user.email 'shoe-r02@users.noreply.github.com'
+          git add shoe-workshop/r02
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(shoes): R02-S1 source replay, independent kernel and browser evidence [skip ci]'
+            git push origin HEAD:feature/shoe-atelier-r01-20261010
+          fi
+          git rev-parse HEAD
