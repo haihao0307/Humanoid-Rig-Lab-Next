@@ -16,7 +16,7 @@ PanelAssembly.prototype.add=function(input){
  def.shape=shape;
  // Rounded low crown within the same tricorn crown boundary. This changes the
  // actual shell reference surface, not merely a shading or texture illusion.
- if(def.name==='formed-crown-top'&&this.parts[0]?.name==='tricorn-crown'){
+ if(def.name==='obsolete-polar-crown-top'&&this.parts[0]?.name==='tricorn-crown'){
   const map=def.map;def.map=(u,v)=>{const p=map(u,v),r=v/def.h+.5;p.y+=10*(1-r*r);return p;};
  }
  def.closedU=[-.43,0,.43].every(f=>def.map(-def.w/2,def.h*f).distanceTo(def.map(def.w/2,def.h*f))<1e-5);

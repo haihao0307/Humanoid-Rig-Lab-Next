@@ -9,7 +9,7 @@ const pos=(p,i)=>[p[3*i],p[3*i+1],p[3*i+2]];
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 export class ProductShell{
  constructor(data,options={}){
-  this.cfg={dt:1/240,substeps:4,iterations:8,gravity:9.81,density:700,damping:.5,profile:'NL',...options};
+  this.cfg={dt:1/240,substeps:4,iterations:8,gravity:9.81,density:700,damping:.5,profile:'NL',stiffnessScale:1,...options};
   this.x=Float64Array.from(data.positions,v=>v*.001);this.rest=this.x.slice();this.prev=this.x.slice();this.v=new Float64Array(this.x.length);this.inv=new Float64Array(this.x.length/3);this.mass=new Float64Array(this.inv.length);
   this.tri=[];this.bends=[];this.links=[];this.surfaceLinks=(data.surfaceLinks||[]).map(q=>({...q,lambda:0}));this.lambdaGrab=[0,0,0];this.law=new SurfaceLaw(this.cfg.profile);this.time=0;this.steps=0;this.grab=null;this.active=false;this.failed=null;this.peakStretch=1;this.contacts=0;this.grabForce=0;this.contactThickness=new Float64Array(this.inv.length);this.adj=Array.from(this.inv,()=>new Set());
   const edges=new Map();
@@ -17,7 +17,7 @@ export class ProductShell{
    const [a,b,c,tmm,formed=1]=d,pa=pos(this.rest,a),pb=pos(this.rest,b),pc=pos(this.rest,c),ab=sub(pb,pa),ac=sub(pc,pa),L=Math.hypot(...ab),u=ab.map(v=>v/L),s=dot(ac,u),h=Math.sqrt(Math.max(0,dot(ac,ac)-s*s)),area=L*h*.5;
    if(area<1e-11)continue;const t=tmm*.001,q={ids:[a,b,c],D:[1/L,-s/(L*h),0,1/h],area,t,lambda:new Float64Array(3)};this.tri.push(q);
    for(const id of q.ids){this.mass[id]+=area*t*this.cfg.density/3;this.contactThickness[id]=Math.max(this.contactThickness[id],t*.5);}
-   for(const [i,j,k]of[[a,b,c],[b,c,a],[c,a,b]]){const key=Math.min(i,j)+':'+Math.max(i,j);this.adj[i].add(j);this.adj[j].add(i);if(edges.has(key)){const old=edges.get(key);const ids=[old.opposite,k,old.a,old.b],angle=hinge(this.rest,...ids)[0];const el=Math.hypot(...sub(pos(this.rest,i),pos(this.rest,j)));const shape=Math.max(.1,el*el/Math.max(1e-9,area+old.area));this.bends.push({ids,rest:formed?angle:0,k:.002*(t/.00139)**3*shape,lambda:0});}else edges.set(key,{a:i,b:j,opposite:k,area});}
+   for(const [i,j,k]of[[a,b,c],[b,c,a],[c,a,b]]){const key=Math.min(i,j)+':'+Math.max(i,j);this.adj[i].add(j);this.adj[j].add(i);if(edges.has(key)){const old=edges.get(key);const ids=[old.opposite,k,old.a,old.b],angle=hinge(this.rest,...ids)[0];const el=Math.hypot(...sub(pos(this.rest,i),pos(this.rest,j)));const shape=Math.max(.1,el*el/Math.max(1e-9,area+old.area));this.bends.push({ids,rest:formed?angle:0,k:.002*(t/.00139)**3*shape*this.cfg.stiffnessScale,lambda:0});}else edges.set(key,{a:i,b:j,opposite:k,area});}
   }
   for(const [a,b,k=80000]of data.links||[]){if(a===b)continue;this.links.push({a,b,L:Math.hypot(...sub(pos(this.rest,a),pos(this.rest,b))),k,lambda:0});this.adj[a].add(b);this.adj[b].add(a);}
   for(const q of this.surfaceLinks)for(const a of q.ids)for(const b of q.ids)if(a!==b)this.adj[a].add(b);
