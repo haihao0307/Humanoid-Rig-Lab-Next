@@ -1,0 +1,644 @@
+{
+  "schema": "kaopu-shoe-r02-browser/1",
+  "testSourceCommit": "67e63a3f1cc7ab82a85d31d07279d82548b6b4bc",
+  "public": false,
+  "startedAt": "2026-10-10T09:21:34.296Z",
+  "checks": [
+    {
+      "name": "navigation",
+      "pass": true,
+      "details": {
+        "status": 200,
+        "url": "http://127.0.0.1:40979"
+      }
+    },
+    {
+      "name": "expected-version",
+      "pass": true,
+      "details": {
+        "version": "R02-S1",
+        "buildId": "67e63a3f1cc7ab82a85d31d07279d82548b6b4bc"
+      }
+    },
+    {
+      "name": "actual-webgl-pixels",
+      "pass": true,
+      "details": {
+        "unique": 425,
+        "width": 861,
+        "height": 683
+      }
+    },
+    {
+      "name": "displayed-source-buffer-fidelity",
+      "pass": true,
+      "details": {
+        "available": true,
+        "mode": "source",
+        "hash": "72ce14f00f4734ad5c646fa3da0ffd6d2d71dc81f73db33bdfe65ed4e45891cb",
+        "expected": "72ce14f00f4734ad5c646fa3da0ffd6d2d71dc81f73db33bdfe65ed4e45891cb",
+        "matches": true,
+        "displayMatchesData": true,
+        "maxBufferErrorMm": 4.76837158203125e-7,
+        "zeroDelta": true,
+        "comparison": "Actual displayed Float32 vertex buffer transformed back to source coordinates, plus immutable Float64 source hash"
+      }
+    },
+    {
+      "name": "detect-corrupted-display-buffer-negative",
+      "pass": true,
+      "details": {
+        "available": true,
+        "mode": "source",
+        "hash": "72ce14f00f4734ad5c646fa3da0ffd6d2d71dc81f73db33bdfe65ed4e45891cb",
+        "expected": "72ce14f00f4734ad5c646fa3da0ffd6d2d71dc81f73db33bdfe65ed4e45891cb",
+        "matches": false,
+        "displayMatchesData": false,
+        "maxBufferErrorMm": 3.000000000000038,
+        "zeroDelta": true,
+        "comparison": "Actual displayed Float32 vertex buffer transformed back to source coordinates, plus immutable Float64 source hash"
+      }
+    },
+    {
+      "name": "negative-control-restored",
+      "pass": true
+    },
+    {
+      "name": "zero-kernel-source-recovery",
+      "pass": true,
+      "details": {
+        "available": true,
+        "mode": "last",
+        "hash": "235ce3c31c10554e20975703ef0751499bcb46ea5593df7a504ae66bb91508e1",
+        "expected": "235ce3c31c10554e20975703ef0751499bcb46ea5593df7a504ae66bb91508e1",
+        "matches": true,
+        "displayMatchesData": true,
+        "maxBufferErrorMm": 0.000003814697265625,
+        "zeroDelta": true,
+        "comparison": "Actual displayed Float32 vertex buffer transformed back to source coordinates, plus immutable Float64 source hash"
+      }
+    },
+    {
+      "name": "slider-changes-real-toe",
+      "pass": true,
+      "details": {
+        "key": "toe",
+        "sourceObject": 10,
+        "sourceLengthMm": 159.88914296287487,
+        "guideLengthMm": 167.71762872419055,
+        "requestedGuideLengthMm": 167.8836001110186,
+        "guideResidualMm": -0.1659713868280619
+      }
+    },
+    {
+      "name": "display-follows-toe",
+      "pass": true,
+      "details": {
+        "available": true,
+        "mode": "last",
+        "hash": "469bfc0b303b338d4da34748acd05fb6e2b7701010a060ae79dc78686be9d792",
+        "expected": "235ce3c31c10554e20975703ef0751499bcb46ea5593df7a504ae66bb91508e1",
+        "matches": false,
+        "displayMatchesData": true,
+        "maxBufferErrorMm": 0.000003843799902213987,
+        "zeroDelta": false,
+        "comparison": "Actual displayed Float32 vertex buffer transformed back to source coordinates, plus immutable Float64 source hash"
+      }
+    },
+    {
+      "name": "slider-changes-real-ball",
+      "pass": true,
+      "details": {
+        "key": "ball",
+        "sourceObject": 7,
+        "sourceLengthMm": 214.92248367828603,
+        "guideLengthMm": 225.48462497705978,
+        "requestedGuideLengthMm": 225.66860786220033,
+        "guideResidualMm": -0.1839828851405514
+      }
+    },
+    {
+      "name": "display-follows-ball",
+      "pass": true,
+      "details": {
+        "available": true,
+        "mode": "last",
+        "hash": "55c3369422d9b4ad57bbdb1c0c111759047c38cbb0398be9b8a8363db427d198",
+        "expected": "235ce3c31c10554e20975703ef0751499bcb46ea5593df7a504ae66bb91508e1",
+        "matches": false,
+        "displayMatchesData": true,
+        "maxBufferErrorMm": 0.000005182997878212935,
+        "zeroDelta": false,
+        "comparison": "Actual displayed Float32 vertex buffer transformed back to source coordinates, plus immutable Float64 source hash"
+      }
+    },
+    {
+      "name": "slider-changes-real-waist",
+      "pass": true,
+      "details": {
+        "key": "waist",
+        "sourceObject": 11,
+        "sourceLengthMm": 233.7703679817933,
+        "guideLengthMm": 245.3541258689682,
+        "requestedGuideLengthMm": 245.45888638088297,
+        "guideResidualMm": -0.10476051191477609
+      }
+    },
+    {
+      "name": "display-follows-waist",
+      "pass": true,
+      "details": {
+        "available": true,
+        "mode": "last",
+        "hash": "2c2c35f9226ca2440429a9962fb3b6164a3ab8df2017921d375330dbcf4169ca",
+        "expected": "235ce3c31c10554e20975703ef0751499bcb46ea5593df7a504ae66bb91508e1",
+        "matches": false,
+        "displayMatchesData": true,
+        "maxBufferErrorMm": 0.000005025163289254793,
+        "zeroDelta": false,
+        "comparison": "Actual displayed Float32 vertex buffer transformed back to source coordinates, plus immutable Float64 source hash"
+      }
+    },
+    {
+      "name": "slider-changes-real-instep",
+      "pass": true,
+      "details": {
+        "key": "instep",
+        "sourceObject": 12,
+        "sourceLengthMm": 283.29198028920536,
+        "guideLengthMm": 297.1076501417315,
+        "requestedGuideLengthMm": 297.45657930366565,
+        "guideResidualMm": -0.3489291619341657
+      }
+    },
+    {
+      "name": "display-follows-instep",
+      "pass": true,
+      "details": {
+        "available": true,
+        "mode": "last",
+        "hash": "da49a261bc09997a72e71de4b58b6a865e3b497c1b9c30fbedea4f1eeaa28ddb",
+        "expected": "235ce3c31c10554e20975703ef0751499bcb46ea5593df7a504ae66bb91508e1",
+        "matches": false,
+        "displayMatchesData": true,
+        "maxBufferErrorMm": 0.000005265900238891248,
+        "zeroDelta": false,
+        "comparison": "Actual displayed Float32 vertex buffer transformed back to source coordinates, plus immutable Float64 source hash"
+      }
+    },
+    {
+      "name": "slider-changes-real-ankle",
+      "pass": true,
+      "details": {
+        "key": "ankle",
+        "sourceObject": 8,
+        "sourceLengthMm": 222.79504144694204,
+        "guideLengthMm": 233.61241788153023,
+        "requestedGuideLengthMm": 233.93479351928914,
+        "guideResidualMm": -0.32237563775890976
+      }
+    },
+    {
+      "name": "display-follows-ankle",
+      "pass": true,
+      "details": {
+        "available": true,
+        "mode": "last",
+        "hash": "f158bc599f73f38d2456b1c53741ab4816903929794bcf3e67b246271ed895d6",
+        "expected": "235ce3c31c10554e20975703ef0751499bcb46ea5593df7a504ae66bb91508e1",
+        "matches": false,
+        "displayMatchesData": true,
+        "maxBufferErrorMm": 0.0000053487294580756155,
+        "zeroDelta": false,
+        "comparison": "Actual displayed Float32 vertex buffer transformed back to source coordinates, plus immutable Float64 source hash"
+      }
+    },
+    {
+      "name": "slider-changes-real-sole",
+      "pass": true,
+      "details": {
+        "key": "sole",
+        "sourceObject": 14,
+        "sourceLengthMm": 567.2858662428804,
+        "guideLengthMm": 606.9115286253415,
+        "requestedGuideLengthMm": 595.6501595550244,
+        "guideResidualMm": 11.261369070317073
+      }
+    },
+    {
+      "name": "display-follows-sole",
+      "pass": true,
+      "details": {
+        "available": true,
+        "mode": "last",
+        "hash": "e8bfe46b7a9d846a1ba799e014b7f478939bd7ed8489f442fcd6b23b39b90956",
+        "expected": "235ce3c31c10554e20975703ef0751499bcb46ea5593df7a504ae66bb91508e1",
+        "matches": false,
+        "displayMatchesData": true,
+        "maxBufferErrorMm": 0.0000074533318081755624,
+        "zeroDelta": false,
+        "comparison": "Actual displayed Float32 vertex buffer transformed back to source coordinates, plus immutable Float64 source hash"
+      }
+    },
+    {
+      "name": "modified-paper-is-stale",
+      "pass": true
+    },
+    {
+      "name": "save-restore-state",
+      "pass": true
+    },
+    {
+      "name": "invalid-import-rejected-without-changing-state",
+      "pass": true
+    },
+    {
+      "name": "real-config-download",
+      "pass": true
+    },
+    {
+      "name": "actual-file-import",
+      "pass": true
+    },
+    {
+      "name": "all-nine-actual-panels",
+      "pass": true
+    },
+    {
+      "name": "panel-stale-not-substituted",
+      "pass": true
+    },
+    {
+      "name": "panel-actual-buffer-thickness",
+      "pass": true,
+      "details": {
+        "thick0": 1,
+        "thick1": 2
+      }
+    },
+    {
+      "name": "inherited-real-thread-topology",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "passages": 25,
+        "frontSpans": 12,
+        "backSpans": 12,
+        "pointsOutsideHole": 0,
+        "minCompleteThroughSpanMM": 2.28,
+        "threadJoinErrorMM": 0,
+        "totalThreadMM": 160.63069710908977,
+        "totalThicknessMM": 2.8,
+        "threadCount": 1,
+        "physicalSolver": false
+      }
+    },
+    {
+      "name": "real-mesh-hole-and-solid-control",
+      "pass": true,
+      "details": {
+        "available": true,
+        "holeHits": 0,
+        "materialHits": 4,
+        "description": "Actual displayed layer triangle ray test, not complete seam collision proof"
+      }
+    },
+    {
+      "name": "thread-rebuilt-for-real-thickness-and-hole-count",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "passages": 37,
+        "frontSpans": 18,
+        "backSpans": 18,
+        "pointsOutsideHole": 0,
+        "minCompleteThroughSpanMM": 3.8800000000000003,
+        "threadJoinErrorMM": 0,
+        "totalThreadMM": 299.01879290678414,
+        "totalThicknessMM": 4.4,
+        "threadCount": 1,
+        "physicalSolver": false
+      }
+    },
+    {
+      "name": "native-tailor-positive-and-negative-specs",
+      "pass": true,
+      "details": {
+        "normalThreePanels": true,
+        "reversedSeamRejected": true,
+        "missingPanelRejected": true,
+        "direction": "Error: NOTCH_DIRECTION: left-curve.N1: oriented notches mismatch",
+        "reference": "Error: MISSING_PANEL: NOT_A_REAL_PANEL",
+        "shoeGate": {
+          "passed": false,
+          "stage": "BEFORE_ASSEMBLY",
+          "changedLast": true,
+          "blocking": [
+            "原裁片—楦上区域的对应关系尚未校准",
+            "实际缝边、方向、吃势和工序尚未绑定",
+            "TPE 原例不能直接当作皮革制造参数"
+          ],
+          "productionReady": false
+        },
+        "nativeSourcesUnmodified": true
+      }
+    },
+    {
+      "name": "camera-framing-source-hero",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 1322
+      }
+    },
+    {
+      "name": "camera-framing-source-side",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 1322
+      }
+    },
+    {
+      "name": "camera-framing-source-front",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 1322
+      }
+    },
+    {
+      "name": "camera-framing-source-top",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 1322
+      }
+    },
+    {
+      "name": "camera-framing-source-bottom",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 1322
+      }
+    },
+    {
+      "name": "camera-framing-last-hero",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 2577
+      }
+    },
+    {
+      "name": "camera-framing-last-side",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 2577
+      }
+    },
+    {
+      "name": "camera-framing-last-front",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 2577
+      }
+    },
+    {
+      "name": "camera-framing-last-top",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 2577
+      }
+    },
+    {
+      "name": "camera-framing-last-bottom",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 2577
+      }
+    },
+    {
+      "name": "camera-framing-panels-hero",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 6726
+      }
+    },
+    {
+      "name": "camera-framing-panels-side",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 6726
+      }
+    },
+    {
+      "name": "camera-framing-panels-front",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 6726
+      }
+    },
+    {
+      "name": "camera-framing-panels-top",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 6726
+      }
+    },
+    {
+      "name": "camera-framing-panels-bottom",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 6726
+      }
+    },
+    {
+      "name": "camera-framing-seam-hero",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 912
+      }
+    },
+    {
+      "name": "camera-framing-seam-side",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 912
+      }
+    },
+    {
+      "name": "camera-framing-seam-front",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 912
+      }
+    },
+    {
+      "name": "camera-framing-seam-top",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 912
+      }
+    },
+    {
+      "name": "camera-framing-seam-bottom",
+      "pass": true,
+      "details": {
+        "finite": true,
+        "out": 0,
+        "total": 912
+      }
+    },
+    {
+      "name": "actual-orbit-pointer",
+      "pass": true
+    },
+    {
+      "name": "framework-and-six-domains-present",
+      "pass": true
+    },
+    {
+      "name": "mobile-no-horizontal-overflow",
+      "pass": true
+    },
+    {
+      "name": "mobile-real-parameter-response",
+      "pass": true
+    },
+    {
+      "name": "standalone-offline-file-render",
+      "pass": true
+    },
+    {
+      "name": "no-page-errors",
+      "pass": true,
+      "details": []
+    }
+  ],
+  "errors": [],
+  "scope": "Chromium + SwiftShader. Desktop and mobile viewport simulation, NOT physical devices. No native Grasshopper/comfort/whole-shoe/visual acceptance claim.",
+  "url": "http://127.0.0.1:40979",
+  "initial": {
+    "representation": "native source mesh + independently implemented normalized inverse-cube guide field",
+    "exactGrasshopperReplication": false,
+    "originalUnchanged": true,
+    "vertexCount": 7708,
+    "triangleCount": 13889,
+    "lengthMm": 251.1767578125,
+    "widthMm": 87.35528564453125,
+    "heightMm": 98.66123580932617,
+    "maxDisplacementMm": 0,
+    "rmsDisplacementMm": 0,
+    "flatPatternState": "SOURCE_REFERENCE_ONLY_NO_VERIFIED_SEAM_GRAPH",
+    "completeShoe": false,
+    "sections": [
+      {
+        "key": "toe",
+        "sourceObject": 10,
+        "sourceLengthMm": 159.88914296287487,
+        "guideLengthMm": 159.8891429628748,
+        "requestedGuideLengthMm": 159.88914296287487,
+        "guideResidualMm": -5.684341886080802e-14
+      },
+      {
+        "key": "ball",
+        "sourceObject": 7,
+        "sourceLengthMm": 214.92248367828603,
+        "guideLengthMm": 214.92248367828608,
+        "requestedGuideLengthMm": 214.92248367828603,
+        "guideResidualMm": 5.684341886080802e-14
+      },
+      {
+        "key": "waist",
+        "sourceObject": 11,
+        "sourceLengthMm": 233.7703679817933,
+        "guideLengthMm": 233.77036798179338,
+        "requestedGuideLengthMm": 233.7703679817933,
+        "guideResidualMm": 8.526512829121202e-14
+      },
+      {
+        "key": "instep",
+        "sourceObject": 12,
+        "sourceLengthMm": 283.29198028920536,
+        "guideLengthMm": 283.2919802892053,
+        "requestedGuideLengthMm": 283.29198028920536,
+        "guideResidualMm": -5.684341886080802e-14
+      },
+      {
+        "key": "ankle",
+        "sourceObject": 8,
+        "sourceLengthMm": 222.79504144694204,
+        "guideLengthMm": 222.79504144694204,
+        "requestedGuideLengthMm": 222.79504144694204,
+        "guideResidualMm": 0
+      },
+      {
+        "key": "sole",
+        "sourceObject": 14,
+        "sourceLengthMm": 567.2858662428804,
+        "guideLengthMm": 567.2858662428799,
+        "requestedGuideLengthMm": 567.2858662428804,
+        "guideResidualMm": -4.547473508864641e-13
+      }
+    ],
+    "mode": "source",
+    "version": "R02-S1",
+    "buildId": "67e63a3f1cc7ab82a85d31d07279d82548b6b4bc",
+    "buildCount": 1,
+    "renderCount": 6,
+    "drawCalls": 5,
+    "triangles": 23398,
+    "geometryCount": 5,
+    "textureCount": 2,
+    "sourceMeshCount": 4,
+    "shoeGate": {
+      "passed": false,
+      "stage": "BEFORE_ASSEMBLY",
+      "changedLast": false,
+      "blocking": [
+        "原裁片—楦上区域的对应关系尚未校准",
+        "实际缝边、方向、吃势和工序尚未绑定",
+        "TPE 原例不能直接当作皮革制造参数"
+      ],
+      "productionReady": false
+    }
+  },
+  "status": "passed",
+  "finishedAt": "2026-10-10T09:22:44.793Z",
+  "passed": 57,
+  "total": 57
+}
