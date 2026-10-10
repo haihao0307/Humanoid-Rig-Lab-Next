@@ -3,7 +3,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {STYLES,createShoe,explodeShoe,disposeShoe} from './geometry.mjs';
 import {MATERIALS,COLOURS,palette,disposePalette,makeEnvironment} from './materials.mjs';
 const $=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)],V=(x=0,y=0,z=0)=>new T.Vector3(x,y,z);
-const VERSION='R01.1';
+const VERSION='R01.2';
 const defaults=()=>({schema:'kaopu-shoe-config/1',version:VERSION,person:'standard',style:'derby',material:'smooth',colour:'#683920',fit:{toe:12,ease:3.8,instep:3},mode:'studio',light:'studio',lightAngle:0,view:'hero',wireframe:false,xray:false});
 let state=defaults(),pack,renderer,camera,scene,controls,model,pal,bodyMesh,measurementGroup,dirty=1,rotate=false,thumbReady=false,ready=false,rendered=0,buildId=globalThis.__SHOE_BUILD__||'development',rebuildCount=0;
 const objects=new T.Group();
@@ -53,9 +53,9 @@ function updateLight(){const dark=state.light==='dark',warm=state.light==='warm'
 function goCamera(view='hero'){
  state.view=view;
  const bodyMode=['wear','measure'].includes(state.mode),full=state.mode==='person',exploded=state.mode==='exploded',L=model.children[0]?.userData.S.L||.28;
- let target=V(0,exploded?.087:.052,bodyMode?.08:L*.49),pos;
+ let target=V(0,exploded?.087:currentStyle().boot?.108:.052,bodyMode?.08:L*.49),pos;
  if(full){target=V(0,currentBody().height*.48,.025);pos=V(1.1,currentBody().height*.76,2.7);controls.minDistance=.45;controls.maxDistance=5;}
- else{const wide=bodyMode?1.24:1;const map={hero:[.49,.34,.59],side:[.64,.18,.15],front:[0,.19,.79],top:[.015,.83,.14],sole:[.36,-.57,.43],macro:[.20,.155,.35]};const a=map[view]||map.hero;pos=V(...a).multiplyScalar(wide);if(bodyMode)target.z=.08;if(exploded){pos.y+=.09;target.y+=.017;}if(view==='macro'){target=V(.075,.057,L*.58);pos=target.clone().add(V(.085,.063,.118));}controls.minDistance=.055;controls.maxDistance=2.5;}
+ else{const wide=bodyMode?1.58:currentStyle().boot?1.2:1;const map={hero:[.49,.34,.59],side:[.64,.18,.15],front:[0,.19,.79],top:[.015,.83,.14],sole:[.36,-.57,.43],macro:[.20,.155,.35]};const a=map[view]||map.hero;pos=V(...a).multiplyScalar(wide);if(bodyMode)target.z=.08;if(exploded){pos.y+=.09;target.y+=.017;}if(view==='macro'){target=V(.075,.057,L*.58);pos=target.clone().add(V(.085,.063,.118));}controls.minDistance=.055;controls.maxDistance=2.5;}
  scene.getObjectByName('floor').visible=view!=='sole';camera.position.copy(pos);controls.target.copy(target);controls.update();all('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));dirty=1;
 }
 function syncUI(){
@@ -97,10 +97,10 @@ function stats(){let triangles=0,vertices=0,invalid=0,meshes=0;const visit=o=>{i
 async function thumbnails(){
  const R=new T.WebGLRenderer({antialias:true,alpha:false,preserveDrawingBuffer:true});R.setSize(340,180);R.setPixelRatio(1);R.outputColorSpace=T.SRGBColorSpace;R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.02;
  const s=new T.Scene();s.environmentIntensity=.72;s.background=new T.Color('#eeeae2');const env=makeEnvironment(R);s.environment=env;const key=new T.DirectionalLight('#fff4de',2.1);key.position.set(-.3,1,.6);s.add(key,new T.HemisphereLight('#ffffff','#655747',1.4));const c=new T.PerspectiveCamera(31,340/180,.001,10);c.position.set(.39,.22,.42);c.lookAt(0,.052,.14);
- for(const style of STYLES){const p=palette(style.material,style.colour),shoe=createShoe(pack.bodies[0].feet[0],style,p,defaults().fit);s.add(shoe);R.render(s,c);$(`[data-style="${style.id}"] img`).src=R.domElement.toDataURL('image/webp',.82);s.remove(shoe);disposeShoe(shoe);disposePalette(p);await new Promise(r=>setTimeout(r,20));}
+ for(const style of STYLES){if(style.boot){c.position.set(.46,.29,.48);c.lookAt(0,.102,.14);}else{c.position.set(.39,.22,.42);c.lookAt(0,.052,.14);}const p=palette(style.material,style.colour),shoe=createShoe(pack.bodies[0].feet[0],style,p,defaults().fit);s.add(shoe);R.render(s,c);$(`[data-style="${style.id}"] img`).src=R.domElement.toDataURL('image/webp',.82);s.remove(shoe);disposeShoe(shoe);disposePalette(p);await new Promise(r=>setTimeout(r,20));}
  env.dispose();R.dispose();R.forceContextLoss();thumbReady=true;dirty=1;
 }
-window.SHOE_QA={ready:false,stats,config,setStyle(id){const s=STYLES.find(x=>x.id===id);if(!s)throw Error('Unknown shoe');setState({style:id,material:s.material,colour:s.colour},{resetCamera:true});},setMode(mode){setState({mode},{resetCamera:true});},setPerson(person){setState({person},{resetCamera:true});},setMaterial(material){setState({material});},setFit(fit){setState({fit});},setLight(light){state.light=light;syncUI();},camera:goCamera,validateConfig,render(){renderer.render(scene,camera);},getState(){return structuredClone(state);}};
+window.SHOE_QA={ready:false,stats,config,async sourceBodyCheck(){if(!bodyMesh)return {available:false};const a=bodyMesh.geometry.attributes.position.array,buf=await crypto.subtle.digest('SHA-256',a),hash=Array.from(new Uint8Array(buf),b=>b.toString(16).padStart(2,'0')).join('');return {available:true,matches:hash===currentBody().positionsSha256,hash};},setStyle(id){const s=STYLES.find(x=>x.id===id);if(!s)throw Error('Unknown shoe');setState({style:id,material:s.material,colour:s.colour},{resetCamera:true});},setMode(mode){setState({mode},{resetCamera:true});},setPerson(person){setState({person},{resetCamera:true});},setMaterial(material){setState({material});},setFit(fit){setState({fit});},setLight(light){state.light=light;syncUI();},camera:goCamera,validateConfig,render(){renderer.render(scene,camera);},getState(){return structuredClone(state);}};
 async function main(){
  pack=await loadPack();
  renderer=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;renderer.debug.checkShaderErrors=true;$('#viewport').appendChild(renderer.domElement);
@@ -112,6 +112,6 @@ async function main(){
  initUI();rebuild();syncUI();resize();goCamera();new ResizeObserver(resize).observe($('#viewport'));
  $('#loading').style.display='none';window.SHOE_QA.ready=ready=true;$('#status').textContent='WebGL2 · 参数化鞋型 / 同源人台 · 静态候选';
  function loop(){requestAnimationFrame(loop);if(document.hidden)return;if(dirty>0||rotate){controls.update();renderer.render(scene,camera);rendered++;dirty--;}}
- loop();await thumbnails();$('#status').textContent='R01.1 · 6 种结构 / 3 位人台 / 5 种材质 · 无外部鞋模';
+ loop();await thumbnails();$('#status').textContent='R01.2 · 6 种结构 / 3 位人台 / 5 种材质 · 无外部鞋模';
 }
 main().catch(fail);

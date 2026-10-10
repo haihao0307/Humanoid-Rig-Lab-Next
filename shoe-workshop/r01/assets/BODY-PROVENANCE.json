@@ -6,6 +6,11 @@
     "forward": "Z",
     "transformFromSource": "(x,y,z)->(x,z-sourceFloor,-y)"
   },
+  "serialization": {
+    "positionRoundingMetres": 0.000001,
+    "signedZero": "canonical positive zero",
+    "positionHash": "SHA-256 of Float32Array after canonical JSON-compatible rounding"
+  },
   "sourceCommit": "900d68a6206b9f8d220dff5a6c34fb0aa683deb5",
   "sourceModelSha256": "64ad369d661a470f4513188cc9bd954ec2f13244aeba0635fb934922bba5a24d",
   "faceSha256": "ec0c66e59e184e64a238ad7e03c96082787a63d447c971ac0d5e907de1311f41",
@@ -25,7 +30,7 @@
       "source": "kaopu-unified-human-workbench/full/source/neck-baseline/src/AnnyModel.js",
       "sourceCommit": "900d68a6206b9f8d220dff5a6c34fb0aa683deb5",
       "proportionRevision": "shoe-r01-native-standard",
-      "positionsSha256": "3b03eb21644ff26a777b00dfa035d4ae9f51440ed8c0881a9c05f202ff901c84",
+      "positionsSha256": "00d5417251082fe2feafe444a11d0ad04bb5ca7de72f1f5fe5836f85907372d8",
       "joints": {
         "root": [
           0,
@@ -5163,7 +5168,7 @@
       "source": "kaopu-unified-human-workbench/full/source/neck-baseline/src/AnnyModel.js",
       "sourceCommit": "900d68a6206b9f8d220dff5a6c34fb0aa683deb5",
       "proportionRevision": "shoe-r01-native-slender",
-      "positionsSha256": "fae28e41eeb0b4674099ea5370c3dd6a5c0f8606313055a243af8c1bacf74c16",
+      "positionsSha256": "fff2c1af1b6a3c4c855b700f65b178e14177e99a79e247536c4fa364e3beb780",
       "joints": {
         "root": [
           0,
@@ -10373,7 +10378,7 @@
       "source": "kaopu-unified-human-workbench/full/source/neck-baseline/src/AnnyModel.js",
       "sourceCommit": "900d68a6206b9f8d220dff5a6c34fb0aa683deb5",
       "proportionRevision": "shoe-r01-native-broad",
-      "positionsSha256": "930d62d64702c3343f7db7739d1cf0bf439d1561e8f56b951d19eb7b84db5d23",
+      "positionsSha256": "0cb78135fb3d130a08270045651847f2f63e5a1cacea2298714b8bb3c95fdff9",
       "joints": {
         "root": [
           0,
@@ -15497,5 +15502,5 @@
       ]
     }
   ],
-  "scope": "Static snapshots of the unchanged Anny body used by the common human workbench. Does not include its GNM face, MHR driver, or live parameter solver."
+  "scope": "Three static Anny body snapshots with declared axis conversion and micrometre serialization rounding. No shoe-dependent body deformation. Does not include the common workbench GNM face, MHR driver, or live parameter solver."
 }

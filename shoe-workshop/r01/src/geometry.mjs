@@ -9,11 +9,27 @@ export const STYLES=[
  {id:'sandal',name:'双带便凉鞋',en:'05 / TWO-STRAP SLIDE',desc:'独立厚鞋带 · 金属扣 · 软木足床',material:'grain',colour:'#4d2025',sole:.023,collar:.07,opening:.6,sandal:true},
  {id:'wholecut',name:'整片式系带鞋',en:'06 / WHOLECUT',desc:'连续鞋面 · 隐藏式收边 · 细鞋带',material:'patent',colour:'#253d4b',sole:.015,collar:.071,opening:.58,lace:true,wholecut:true}
 ];
+
+function weldAngularNormals(g,nu,nv,layers=1){
+ const pos=g.attributes.position,n=g.attributes.normal,N=(nu+1)*(nv+1);
+ for(let layer=0;layer<layers;layer++)for(let j=0;j<=nv;j++){
+  const a=layer*N+j*(nu+1),b=a+nu,pa=V().fromBufferAttribute(pos,a),pb=V().fromBufferAttribute(pos,b);
+  if(pa.distanceTo(pb)<1e-7){const v=V().fromBufferAttribute(n,a).add(V().fromBufferAttribute(n,b)).normalize();n.setXYZ(a,v.x,v.y,v.z);n.setXYZ(b,v.x,v.y,v.z);}
+ }
+ return g;
+}
+function cappedLast(S,material){
+ const nu=120,nv=36,g=paramGeometry((u,v)=>S.surf(u*TAU,v),nu,nv,[.7,.15]);
+ const p=Array.from(g.attributes.position.array),uv=Array.from(g.attributes.uv.array),idx=Array.from(g.index.array);
+ for(const ring of [0,nv]){const points=Array.from({length:nu+1},(_,i)=>S.surf(i/nu*TAU,ring/nv)),c=points.slice(0,nu).reduce((a,b)=>a.add(b),V()).multiplyScalar(1/nu),base=p.length/3;p.push(...c.toArray());uv.push(.5,.5);for(const v of points){p.push(...v.toArray());uv.push(v.x/S.W+.5,v.z/S.L);}for(let i=0;i<nu;i++){if(ring===0)idx.push(base,base+i+2,base+i+1);else idx.push(base,base+i+1,base+i+2);}}
+ g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.deleteAttribute('normal');g.computeVertexNormals();weldAngularNormals(g,nu,nv);return makeMesh(g,material,'封口的视觉设计鞋楦');
+}
+
 function interp(knots,s){s=clamp(s,0,1);for(let i=1;i<knots.length;i++)if(s<=knots[i][0]){const[a,x]=knots[i-1],[b,y]=knots[i],t=(s-a)/(b-a);return lerp(x,y,t*t*(3-2*t));}return knots.at(-1)[1];}
 function paramGeometry(fn,nu,nv,uvScale=[.65,.12]){
  const p=[],uv=[],idx=[];for(let j=0;j<=nv;j++)for(let i=0;i<=nu;i++){p.push(...fn(i/nu,j/nv).toArray());uv.push(i/nu*uvScale[0],j/nv*uvScale[1]);}
  for(let j=0;j<nv;j++)for(let i=0;i<nu;i++){const a=j*(nu+1)+i,b=a+1,c=a+nu+1,d=c+1;idx.push(a,b,c,b,d,c);}
- const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();return g;
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();weldAngularNormals(g,nu,nv);return g;
 }
 function volumize(g,nu,nv,thickness){
  const a=g.attributes.position.array,n=g.attributes.normal.array,uv=g.attributes.uv.array,N=a.length/3,p=Array.from(a),u=Array.from(uv),idx=Array.from(g.index.array),outside=idx.length;
@@ -23,7 +39,7 @@ function volumize(g,nu,nv,thickness){
  // The duplicated angular seam is position-identical. The two collar/base rings
  // join outer/inner surfaces; no Paper-thin DoubleSide substitute is used.
  for(const[a,b]of ring)idx.push(a,a+N,b,b,a+N,b+N);
- const out=new T.BufferGeometry();out.setAttribute('position',new T.Float32BufferAttribute(p,3));out.setAttribute('uv',new T.Float32BufferAttribute(u,2));out.setIndex(idx);out.clearGroups();out.addGroup(0,outside,0);out.addGroup(outside,idx.length-outside,1);out.computeVertexNormals();g.dispose();return out;
+ const out=new T.BufferGeometry();out.setAttribute('position',new T.Float32BufferAttribute(p,3));out.setAttribute('uv',new T.Float32BufferAttribute(u,2));out.setIndex(idx);out.clearGroups();out.addGroup(0,outside,0);out.addGroup(outside,idx.length-outside,1);out.computeVertexNormals();weldAngularNormals(out,nu,nv,2);g.dispose();return out;
 }
 function solidPatch(fn,nu,nv,thickness=.0018){const g=paramGeometry(fn,nu,nv,[.1,.07]);const a=g.attributes.position.array,n=g.attributes.normal.array,N=a.length/3,p=Array.from(a),uv=Array.from(g.attributes.uv.array),idx=Array.from(g.index.array),outside=idx.length;for(let i=0;i<a.length;i++)p.push(a[i]-n[i]*thickness);uv.push(...g.attributes.uv.array);for(let i=0;i<outside;i+=3)idx.push(idx[i]+N,idx[i+2]+N,idx[i+1]+N);const edges=[];for(let i=0;i<nu;i++){edges.push([i,i+1],[nv*(nu+1)+i+1,nv*(nu+1)+i]);}for(let j=0;j<nv;j++){edges.push([(j+1)*(nu+1),j*(nu+1)],[j*(nu+1)+nu,(j+1)*(nu+1)+nu]);}for(const[a,b]of edges)idx.push(a,a+N,b,b,a+N,b+N);const out=new T.BufferGeometry();out.setAttribute('position',new T.Float32BufferAttribute(p,3));out.setAttribute('uv',new T.Float32BufferAttribute(uv,2));out.setIndex(idx);out.computeVertexNormals();g.dispose();return out;}
 function makeMesh(geo,mat,name){const m=new T.Mesh(geo,mat);m.name=name;m.castShadow=true;m.receiveShadow=true;return m;}
@@ -125,16 +141,16 @@ export function createShoe(foot,style,pal,fit={}){
   const backPatch=(u,v)=>{const p=surf(PI+(u-.5)*.75,.57+v*.39);p.z-=.0012*scale;return p;};upper.add(makeMesh(solidPatch(backPatch,22,16,.0016*scale),pal.edge,'后跟补强片'));
  }
  if(style.sandal){
-  for(const [z,span]of [[L*.69,.040*scale],[L*.39,.038*scale]]){
+  for(const [z,span]of [[L*.73,.040*scale],[L*.49,.038*scale]]){
    const strap=(u,v)=>{const zz=z+(v-.5)*span,s=zz/L,x=S.center(s)+(u-.5)*S.width(s)*2.08,y=S.upperAt(x,zz)+.0055*scale;return V(x,y,zz);};
    upper.add(makeMesh(solidPatch(strap,44,12,.0032*scale),pal.skin,'独立厚鞋带'));
    for(const v of [.06,.94])seams.add(stitches(Array.from({length:55},(_,i)=>strap(i/54,v).add(V(0,.0008*scale,0))),pal.thread,.0032*scale));
-   const buckle=strap(.78,.5).add(V(0,.002*scale,0)),w=.018*scale,h=.021*scale;
-   const pts=[V(-w/2,0,-h/2),V(w/2,0,-h/2),V(w/2,0,h/2),V(-w/2,0,h/2)].map(p=>p.add(buckle));hardware.add(tube(pts,.0010*scale,pal.metal,'闭合金属带扣',true));hardware.add(tube([buckle.clone().add(V(0,.001*scale,-h/2)),buckle.clone().add(V(0,.002*scale,h/2))],.0006*scale,pal.metal,'带扣针'));
+   const on=(u,v)=>strap(u,v).add(V(0,.0023*scale,0));
+   const pts=[on(.68,.2),on(.84,.2),on(.84,.8),on(.68,.8)];hardware.add(tube(pts,.0010*scale,pal.metal,'贴合鞋带的闭合金属扣',true));hardware.add(tube([on(.76,.2),on(.76,.8)],.0006*scale,pal.metal,'带扣针'));
   }
   const lip=weltPath.map(p=>p.clone().add(V(0,.004*scale,0)));lining.add(tube(lip,.0023*scale,pal.lining,'足床包边',true,.8));
  }
- const lastGroup=part('last','设计鞋楦');const last=makeMesh(volumize(paramGeometry((u,v)=>surf(u*TAU,v),120,26,[.7,.13]),120,26,.0018*scale),pal.wood,'参数化鞋楦包络');lastGroup.add(last);lastGroup.visible=false;
+ const lastGroup=part('last','设计鞋楦');const last=cappedLast(S,pal.wood);lastGroup.add(last);lastGroup.visible=false;
  root.userData={extraMaterials:root.userData.extraMaterials||[],style:style.id,side:foot.side,sourceRevision:'shoe-r01-native',dimensions:{length:L,width:W,upperThickness:.0018*scale,soleHeight:bottom,minimumSampleClearance:S.minimumSampleClearance,roofRange:S.roofRange},components,S};
  return root;
 }
