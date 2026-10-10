@@ -103,6 +103,7 @@ jobs:
               args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-webgl','--ignore-gpu-blocklist']
             });
             const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            await page.route('**/favicon.ico', route => route.fulfill({ status: 204, body: '' }));
             const consoleErrors = [];
             const pageErrors = [];
             page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
