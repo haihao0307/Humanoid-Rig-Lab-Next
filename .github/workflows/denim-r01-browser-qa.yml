@@ -12,7 +12,7 @@ permissions:
 jobs:
   browser-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
 
@@ -91,7 +91,7 @@ jobs:
 
       - name: Validate fixed public commit URL
         env:
-          PUBLIC_URL: https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${{ github.sha }}/denim-workshop/r01/index.html
+          PUBLIC_URL: https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${{ github.sha }}/denim-workshop/r01/index.html
         run: |
           xvfb-run -a node <<'NODE'
           const { chromium } = require('playwright');
@@ -108,9 +108,9 @@ jobs:
             page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
             page.on('pageerror', err => pageErrors.push(String(err)));
             let lastError = null;
-            for (let attempt = 1; attempt <= 8; attempt++) {
+            for (let attempt = 1; attempt <= 4; attempt++) {
               try {
-                await page.goto(process.env.PUBLIC_URL, { waitUntil: 'load', timeout: 45000 });
+                await page.goto(process.env.PUBLIC_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
                 await page.waitForFunction(() => !!window.__DENIM_WORKBENCH__, null, { timeout: 60000 });
                 lastError = null;
                 break;
