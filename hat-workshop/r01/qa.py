@@ -18,10 +18,10 @@ def run(url,public=False):
   page.on('response',lambda r:result['failedHTTP'].append({'url':r.url,'status':r.status}) if r.status>=400 else None)
   requests=[];page.on('request',lambda r:requests.append(r.url));start=time.monotonic()
   try:
-   page.goto(url,wait_until='load',timeout=180000);page.wait_for_function('!!window.hatLab && hatLab.ready() && hatLab.thumbnails()===12',timeout=240000)
+   page.goto(url,wait_until='load',timeout=180000);page.wait_for_function('!!window.hatLab && hatLab.ready() && hatLab.thumbnails()===hatLab.catalogue().length',timeout=240000)
    result['startupSecondsIncludingThumbnails']=time.monotonic()-start
    check('correct build',page.evaluate('hatLab.version')=='HAT-R01.0')
-   check('12 real thumbnails',page.locator('img[data-rendered="true"]').count()==12)
+   check('all real thumbnails',page.locator('img[data-rendered="true"]').count()==len(page.evaluate('hatLab.catalogue()')))
    check('one persistent canvas',page.locator('canvas').count()==1)
    manifest=json.loads((ROOT/'BUILD_MANIFEST.json').read_text());check('source version identity',page.evaluate('hatLab.sourceCommit')==manifest['sourceSha'])
    if not public:check('standalone no network',not [u for u in requests if u.startswith(('http:','https:'))])

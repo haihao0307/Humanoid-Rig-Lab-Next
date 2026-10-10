@@ -14,7 +14,6 @@ ITEMS=[
  ('patrol','mindfront_patrol_cap','patrol_cap','平顶便帽','休闲','cotton',3,'Mindfront'),
  ('bowler','culturalibre_cl_bowler_hat','cl_bowler_hat','卷檐圆顶帽','经典','felt',2,'culturalibre'),
  ('top','elvs_tophat1','tophat1','高顶礼帽','经典','felt',2,'Elvaerwyn'),
- ('slouch','elvs_slouchy_beanie1','elvs_beanie_slouch','垂褶软帽','针织','tweed',2,'Elvaerwyn'),
  ('visor','punkduck_sun_visor_sports_visor','sunvisor','空顶运动帽','休闲','cotton',3,'punkduck'),
  ('cloche','aethelraed_unraed_cloche_hat','cloche_hat','钟形礼帽','经典','felt',3,'AEthelraed_Unraed'),
  ('chef','elvs_unisex_chef_hat_1','elvs_unisex_chef_hat1','褶裥厨师帽','职业','cotton',1,'Elvaerwyn')]
@@ -113,11 +112,12 @@ def main():
   thumbname=next((n for n in files if n.endswith('.thumb')),None);thumb=None
   if thumbname:
    out=io.BytesIO();Image.open(io.BytesIO(z.read(files[thumbname]))).convert('RGB').save(out,format='JPEG',quality=85);thumb='data:image/jpeg;base64,'+base64.b64encode(out.getvalue()).decode()
-  record={'id':id,'author':author,'licence':licence,'folder':folder,'pack':pack,'obj':obj+'.obj','sourceBoundsMeters':bounds,'subdivisionLevels':levels,'runtimeVertices':geo['vertexCount'],'runtimeTriangles':geo['triangles'],'textures':textureInfo,'files':[{'path':files[n],'sha256':sha(z.read(files[n])),'bytes':len(z.read(files[n]))} for n in selected]}
+  origin={'flatcap':[0,.836,.0028],'trilby':[0,.861,.062],'bowler':[0,.830,.056]}.get(id,[0,.752,.054])
+  record={'id':id,'author':author,'licence':licence,'folder':folder,'pack':pack,'obj':obj+'.obj','sourceBoundsMeters':bounds,'subdivisionLevels':levels,'runtimeVertices':geo['vertexCount'],'runtimeTriangles':geo['triangles'],'fitOriginCandidate':origin,'fitOriginMeasured':False,'textures':textureInfo,'files':[{'path':files[n],'sha256':sha(z.read(files[n])),'bytes':len(z.read(files[n]))} for n in selected]}
   records.append(record)
-  data.append({'id':id,'title':title,'category':cat,'family':family,'author':author,'licence':licence,'geometry':geo,'cage':original,'textures':textures,'teacherThumbnail':thumb,'sourceBounds':bounds,'origin':[0,.752,.054],'referenceURL':f'https://static.makehumancommunity.org/assets/assetpacks/{pack}.html','subdivision':levels})
+  data.append({'id':id,'title':title,'category':cat,'family':family,'author':author,'licence':licence,'geometry':geo,'cage':original,'textures':textures,'teacherThumbnail':thumb,'sourceBounds':bounds,'origin':origin,'referenceURL':f'https://static.makehumancommunity.org/assets/assetpacks/{pack}.html','subdivision':levels})
   print('HAT',id,json.dumps({**record,'files':len(selected),'textures':textureInfo},ensure_ascii=False),flush=True)
- manifest={'schema':'kaopu.hat.sources/1','packs':reports,'hats':records,'excluded':['jujube_newsboy_cap: pack/header licence conflict','grinsegold_uncle_joshis_hat: pack/header conflict','maciekg_wizard_hat: pack/header conflict','elvs_witchy_hallows_hat1: pack/header conflict'],'claims':{'exactOriginalRenderer':False,'assetsAreOriginalProceduralWork':False,'manufacturingCertified':False}}
+ manifest={'schema':'kaopu.hat.sources/1','packs':reports,'hats':records,'excluded':['elvs_slouchy_beanie1: source image decoder failed in run 38040596632; not replaced by invented texture','jujube_newsboy_cap: pack/header licence conflict','grinsegold_uncle_joshis_hat: pack/header conflict','maciekg_wizard_hat: pack/header conflict','elvs_witchy_hallows_hat1: pack/header conflict'],'claims':{'exactOriginalRenderer':False,'assetsAreOriginalProceduralWork':False,'manufacturingCertified':False}}
  (ROOT/'SOURCES.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
  heads=json.loads((ROOT/'NATIVE_HEADS.json').read_text())
  for head in heads['heads']:
@@ -127,8 +127,8 @@ def main():
  subprocess.run(['node_modules/.bin/esbuild',str(ROOT/'app.js'),'--bundle','--format=iife','--minify',f'--outfile={ROOT}/cache/app.bundle.js'],check=True)
  script=(ROOT/'cache/app.bundle.js').read_text().replace('</script','<\\/script')
  payload=gzip.compress((ROOT/'cache/data.json').read_bytes(),mtime=0)
- html=(ROOT/'shell.html').read_text().replace('<!--PAYLOAD-->',base64.b64encode(payload).decode()).replace('/*APP*/',script)
+ html=(ROOT/'shell.html').read_text().replace('12 款 · 正在生成三维缩略图',str(len(data))+' 款 · 正在生成三维缩略图').replace('<!--PAYLOAD-->',base64.b64encode(payload).decode()).replace('/*APP*/',script)
  (ROOT/'index.html').write_text(html)
- build={'version':bundle['version'],'sourceSha':bundle['sourceCommit'],'htmlSHA256':sha(html.encode()),'bytes':len(html.encode()),'hatCount':len(data),'nativeSource':heads['source'],'coreExternalRequests':0,'limitations':['Source-shape/UV preservation plus Catmull-Clark and browser PBR adaptation; not original-renderer equivalence.','Native wearer is an evaluated original-head snapshot, not live 36-person rig integration.','Affine cap fit only; no scalp/hair contact solver, deformation physics or manufacture certification.','Twelve selected types are not every hat type.']}
+ build={'version':bundle['version'],'sourceSha':bundle['sourceCommit'],'htmlSHA256':sha(html.encode()),'bytes':len(html.encode()),'hatCount':len(data),'nativeSource':heads['source'],'coreExternalRequests':0,'limitations':['Source-shape/UV preservation plus Catmull-Clark and browser PBR adaptation; not original-renderer equivalence.','Native wearer is an evaluated original-head snapshot, not live 36-person rig integration.','Affine cap fit only; no scalp/hair contact solver, deformation physics or manufacture certification.','Selected types are not every hat type.']}
  (ROOT/'BUILD_MANIFEST.json').write_text(json.dumps(build,ensure_ascii=False,indent=2));print('BUILD',json.dumps(build),flush=True)
 if __name__=='__main__':main()
