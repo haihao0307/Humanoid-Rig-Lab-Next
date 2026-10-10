@@ -1,71 +1,39 @@
-# 跨工作台案例：依据、提炼与限制
+# V1.1 近期工作实践为主，较早制度为辅
 
-审查日期：2026-10-10。返回 [总入口](../../WORKBENCH_BUILD_SYSTEM.md)。
+返回[总入口](../../WORKBENCH_BUILD_SYSTEM.md)。当前取材窗口为2026-10-07至2026-10-10；依据用户本轮明确纠正，旧人物母本、鸟类、环境/地形等不再承担本轮核心方法的论证。
 
-本次确实通过GitHub读取以下文件/报告，并抽读人物装配与Emily迁移内核源码。未重新运行所列历史浏览器/物理任务，未重新下载所有历史artifact。下列“报告记录”不是本次独立认证；具体blob身份见registry。样本是代表性取样，不是所有工作台的完整进度普查。
+这里归纳的是近期目标、有效学习方式和已暴露的差距，**不是宣称这些工作台都已完成一比一或影视级验收**。旧报告不冒充本轮重跑。V1完整案例保留在[固定历史](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/a0cd098b4a0fcb8b5d5de90200acd0fb1051f543/docs/workbench-build-system/CASEBOOK.md)。
 
-## C01 人物母体：装配入口优于复制整个成品
+## 皮肤：先保住好效果，再研究它由哪些部分共同构成
 
-读取 [source/assembly.json](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/fda12bf2fe0262e4d02f1b08508128d17959e0c8/source/assembly.json) 及根AGENTS。实际装配枚举形体、骨骼、表皮、毛发、动作、物理、NPC和UI模块，JSON引用独立配置。用户提供的人物母本还规定绑定/姿势/动画/窗口状态分层及事务回滚。
+已读[Emily迁移README](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/77976497de5dd957fba0fb1eb91918baf9bd46a8/skin-quality-lab/emily-transfer/README.md)和[迁移内核](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/77976497de5dd957fba0fb1eb91918baf9bd46a8/skin-quality-lab/emily-transfer/EmilyTransferKernel.js)。记录有原站配置审读、同模型同光同色的层开关和参数保存；同时明确未完整搬运XG，也不是逐像素相同。说明外观不能只归功于一个shader，资产、几何、光照和映射都需要拆开验证。
 
-提炼：接手先找真实source→build链，避免只改打包HTML；新增能力通过协议、适配器与唯一最终状态接入。母本的设计要求不是所有功能已实现的证明；本次未逐项运行这些模块。
+本轮新要求补上此前不足：可合法保留老师完整效果时先复刻保真，不要一开始用另一个低质量目标替换；后续再按任务迁移。已经做过迁移不等于原样复刻阶段自动通过。
 
-## C02 皮肤：可以迁移的是光照方法，不是另一张脸
+## 皮革：先学成熟质感，再扩工艺、产品和受力
 
-读取 [EmilyTransferKernel.js](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/77976497de5dd957fba0fb1eb91918baf9bd46a8/skin-quality-lab/emily-transfer/EmilyTransferKernel.js)。实际内核无人物坐标、网格数组或资产URL，保存来源、wrapped diffuse思路与特征开关，并明确exactXGPort=false；GGX与原XG Phong的差异写出。
+已读[R06记录](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/feature/leather-atelier-r06-takeover-20261009/leather-workshop/r06/README.md)，其观察blob固定在registry；近期PR32记录继续修复曲面与切边不同源导致的问题。可以借鉴的是：保留已有效的材质/针路基线，在独立候选加产品、参数和受力试样，分别记录真实实现范围。不能把展示针脚说成完整缝线物理，也不能把商业材质目标写成已取得其生产源码。
 
-提炼：老师能力→独立算子→原目标人物→受控开关对照，是可追溯迁移路径。不能称逐像素复刻、完整皮肤物理或跨人物最终合格；本次是源码审读。
+## 牛仔与布料：研究表达层级，不把着色假称实体结构
 
-## C03 眼睑：先看整片组织，不只看一条零间隙曲线
+已读[R02来源表](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/370c0cfa4098d3027042e5c788f96371095f2518/denim-workshop/r02/SOURCES.md)及PR28/31/33记录。已读的内部织纹/过滤代码与仅取得公开摘要的商业研究分开。近期改进呈现从着色到连续纱线、裁口/损伤表达的学习过程，但未证明已经完整复刻Fibric或达到影视终稿。
 
-读取 [ET08-S1.1交付记录](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/0bad13ebd459ef9c2ef29f06dd35da6807c844b4/skin-quality-lab/emily-transfer/ET08_S11_DELIVERY.md)。记录纠正了“上下对称夹合”的早先猜测：主要问题是把接触位移传给整片皮肤，闭眼表面形成U形兜袋。修复采用原扫描导出的整片闭眼目标，并报告实际调整的眼球深度而不假称完全未变。
+方法提炼：一个老师不足以解决细节就主动找下一位；在几何、材质和工艺间选择有依据的表达，保持近中远质量，不能为了“精炼”丢掉决定外观的结构。
 
-提炼：研究→实际源码诊断→整面目标→深仰视和睁眼正控制→重复开闭回归。对拟合目标的残差、有限采样和真实身份恢复要分开；缺少同人物睁眼资料仍是边界。
+## 裁缝：执行端掌握参数，用户审核真实成衣与搭配
 
-## C04 裁缝：漂亮缩略图、真实纸样、真实求解必须分开
+已读[学习复核记录](https://github.com/haihao0307/guilin-dem-pipeline/blob/a704386453f7fc10f34a3023bdcbd023d1236c7c/.github/reports/patterngsl-learning-20261009.md)及PR177–181记录。真实纸样、编辑、重新网格化和缝合是同一条需要贯通的链；字段有效条件、裁片语义和完整边界会决定结果是否正确。三维选款预览与真实求解状态不能混称。
 
-读取 [.github/reports/patterngsl-learning-20261009.md](https://github.com/haihao0307/guilin-dem-pipeline/blob/a704386453f7fc10f34a3023bdcbd023d1236c7c/.github/reports/patterngsl-learning-20261009.md)，并读取PR177–181记录。旧针位间距为0的案例，整段裸边仍有约4.185–4.197mm分离；因此旧gate通过并未证明整段闭合。后续PR181记录后片名称分类缺陷及更正，并保留真实失败款，不以代理衣壳代替。
+当前方向不是让用户理解122个字段，而是执行端把它们映射成可用配方、合适变体和搭配，主动验证与解决失败。数量不是质量；对缺陷的定位和实现责任不能转回用户。
 
-提炼：必须检查最终对象而非代理指标；参数启用条件和裁片语义是一等数据；先修共同根因，再用原求解器重算。仅来自PR的近期数量不在此升级为独立实测，也不称60款已动态通过。
+## 眼睛：拆解不应破坏原来的整体关系
 
-## C05 皮革：材质、工艺、产品与动力学不能混称
+已读[ET08-S1.1记录](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/0bad13ebd459ef9c2ef29f06dd35da6807c844b4/skin-quality-lab/emily-transfer/ET08_S11_DELIVERY.md)。只看自由睑缘不能判断整片闭眼表面；复刻后解析参数也必须保留完整组织、接触和恢复关系。缺同人物真实睁眼资料时不称精确身份恢复。
 
-读取 [R06 README](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/feature/leather-atelier-r06-takeover-20261009/leather-workshop/r06/README.md)，blob a454861f847b3e8f751efe1c2172cc95cc1e19bd；并读取PR32的R08记录。R06将产品几何、材料预设、原版针路和Worker物理试样分开，说明针路展示不等于完整线张力求解、产品造型不等于整件动力学。R08记录曲面与切边不同源导致漏边，改为同一最终边界生成正背面与孔壁。
+## 鞋履：先静态保真，按当前任务决定物理何时加入
 
-提炼：冻结正确基线、保持真实工艺入口，同时测新组合是否仍完整。保留源文件不代表集成没漏能力。R06动态分支链接会移动，复查时必须核对本次记录blob；R08本次只读PR记录，不宣称重新检验视觉。
+已读[固定源码README](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/043ee50c0956dd2150913e77497ff219f37f98f7/shoe-workshop/r01/README.md)。它在该时点明确NOT DELIVERED，不能把工作意图当作完成。用户本轮重申先复刻后解析的整体方法；鞋履近期要求先做好静态，再逐步加入后续能力，不能用通用阶段表擅自改优先级。
 
-## C06 牛仔布：表面着色不是逐根纱线
+## 本轮证据层级
 
-读取 [R02 SOURCES](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/370c0cfa4098d3027042e5c788f96371095f2518/denim-workshop/r02/SOURCES.md) 与PR28/31/33记录。来源文件区分已读内部weave compiler、已读针织shader、Disney仅公开摘要和未取得工业水洗模型。PR记录R01着色基础→R02连续纱线→R03几何裁口/破损的演进，同时承认近景几何成本与未达到影视终稿。
-
-提炼：真实表达层级要有定义，结构、光学、整理工艺分开；近中远同源过滤是一项能力，不许用面数较少的远景指标冒充近景成本。不能把没读到的全文或商业实现记成已学会。
-
-## C07 鞋履：选对老师只是开头
-
-读取 [固定源码README](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/043ee50c0956dd2150913e77497ff219f37f98f7/shoe-workshop/r01/README.md)。该时点明确NOT DELIVERED，记录参数几何、原Anny静态快照、量脚/截面目标及商业CAD只学公开流程。状态是该提交的状态，不是以后版本的最新判断。
-
-提炼：视觉、结构、制造、足部接触与舒适度需要不同老师和不同证据；静态上脚不能升级为动态贴合、工业制楦或真实压力认证。
-
-## C08 鸟类：来源包络是输入合同，不是生物学常数
-
-读取 [Seagull R010 README](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/fda12bf2fe0262e4d02f1b08508128d17959e0c8/BIRD_SEAGULL_A_CHANNEL_EXECUTOR_R010/README_ZH.md)。它将来源通道整理成控制输入输出，锁定缺来源动作，非有限/越界处理并在缺来源时fail-closed；同时明确visualAcceptance与productionReady为false。
-
-提炼：学到多少只开放多少；功能合同、来源运动与空气动力学不能混为一谈。不会飞的候选不能因滑块齐全而成为真实生命行为成品。
-
-## C09 环境：一个权威时钟，而不是多个各自“正确”的系统
-
-读取 [Environment Bridge回执](https://github.com/haihao0307/guilin-dem-pipeline/blob/7fd1745613f12a903011be9be551fe9b89ef2b82/games/survivor-palau/source/v0230/ENVIRONMENT_BRIDGE_R01_RECEIPT.json)。报告14项CPU/VM接口检查，包含共享快照、时钟不匹配拒绝、单位/轴检查、云漂移与风分开、未知物理量不补造；并明确尚未导入场景，无浏览器/公网通过。
-
-提炼：接口核验证与系统接入是不同里程碑。适配器不重复推进上游时钟、不制造不存在的潮流/降雨观测。它可以教会其他工作台如何接入，不证明鱼/树/珊瑚已经全部生产完成。
-
-## C10 地形失败记录：继承知识，不继承被拒绝的假真值
-
-检索读取 [PR123关闭记录](https://github.com/haihao0307/guilin-dem-pipeline/pull/123)。记录明确拒绝把候选/程序化地形冒充严格地理真值、未按权威DEM/地图对齐、自补岸线和故事点的路线，并禁止把失败可见结果作为后续基线。
-
-提炼：所谓继承不是不分好坏全继承；用户原始资料、正确测量与已验证知识保留，明确被拒绝的替代物只留作失败证据。此处依据PR中记录的拒绝，未独立逐帧复审历史地形。
-
-## 共同结论
-
-有效积累来自：真实参考→可运行子能力→原系统适配→受保护增量→能发现错误的测试→真实公开候选→范围化接受。返工常来自：先造外观替身、误读数据语义、混淆验证级别、把未取得源码的演示当实现、把局部测量当全部真值，以及发布身份断链。
-
-本手册尚未在一个全新工作台从S0走到用户最终顶尖认可上完成端到端验证。它是依据以上样本建立并有工具检查的V1生产规范，后续应用应持续补充反例和改进，而不是将V1奉为已证明完美的公式。
+本轮重新读取方法论主入口、接手规则和上述Emily README，并结合前一轮已读的近期固定文件与当前用户指令修订；没有重跑这些工作台的浏览器/物理，没有把检索到的其他对话摘要当成独立视觉验收。用户本轮原话是本次顺序与分工修订的直接依据；案例用于解释和约束，不用于虚构全面成功。

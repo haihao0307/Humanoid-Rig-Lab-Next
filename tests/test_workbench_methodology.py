@@ -220,6 +220,51 @@ class ContractTests(unittest.TestCase):
     def test_methodology_package_lints(self):
         self.assertEqual(m.lint(ROOT), [])
 
+    def test_replication_precedes_deep_dissection(self):
+        registry = m.load_json(ROOT / m.PACKAGE / "registry.json")
+        phases = [x["purpose"] for x in registry["stages"]]
+        self.assertLess(phases.index("replicate"), phases.index("dissect"))
+        self.assertLess(phases.index("freeze_replica"), phases.index("parameter_mapping"))
+        self.assertLess(phases.index("parameter_mapping"), phases.index("controlled_variants"))
+        self.assertLess(phases.index("controlled_variants"), phases.index("consolidate"))
+
+    def test_user_is_not_the_parameter_operator(self):
+        task = m.load_json(ROOT / m.PACKAGE / "TASK.template.json")
+        self.assertEqual(task["methodologyVersion"], m.VERSION)
+        self.assertEqual(task["autonomy"]["parameterOwner"], "executor")
+        self.assertEqual(task["autonomy"]["humanRole"], "goal_and_key_result_review")
+        self.assertIs(task["autonomy"]["perTechnicalStepHumanApproval"], False)
+        self.assertIs(task["autonomy"]["backgroundExecutorInstalled"], False)
+
+    def test_recent_cases_primary_and_old_cases_secondary(self):
+        registry = m.load_json(ROOT / m.PACKAGE / "registry.json")
+        sources = {s["id"]: s for s in registry["caseSources"]}
+        self.assertEqual(sources["C02"]["methodRole"], "RECENT_PRIMARY")
+        self.assertEqual(sources["C08"]["methodRole"], "HISTORICAL_SUPPORT_ONLY")
+        self.assertIs(registry["methodologyPriority"]["externalTeacherPublicationDateRestricted"], False)
+
+    def test_lint_rejects_reversed_replication_order(self):
+        dest = self.root / "copy"
+        import shutil
+        shutil.copytree(ROOT / m.PACKAGE, dest / m.PACKAGE)
+        shutil.copyfile(ROOT / "WORKBENCH_BUILD_SYSTEM.md", dest / "WORKBENCH_BUILD_SYSTEM.md")
+        path = dest / m.PACKAGE / "registry.json"
+        data = m.load_json(path)
+        data["stages"][2], data["stages"][4] = data["stages"][4], data["stages"][2]
+        path.write_text(json.dumps(data), encoding="utf-8")
+        self.assertIn("replicate-first stage order mismatch", m.lint(dest))
+
+    def test_lint_rejects_parameter_burden_on_user(self):
+        dest = self.root / "copy"
+        import shutil
+        shutil.copytree(ROOT / m.PACKAGE, dest / m.PACKAGE)
+        shutil.copyfile(ROOT / "WORKBENCH_BUILD_SYSTEM.md", dest / "WORKBENCH_BUILD_SYSTEM.md")
+        path = dest / m.PACKAGE / "registry.json"
+        data = m.load_json(path)
+        data["autonomy"]["parameterOwner"] = "user"
+        path.write_text(json.dumps(data), encoding="utf-8")
+        self.assertIn("executor-owned parameters and review-only policy required", m.lint(dest))
+
     def test_cli_has_no_fixture_bypass(self):
         source = (ROOT / "tools/workbench_methodology.py").read_text()
         self.assertNotIn('add_argument("--allow-fixtures"', source)

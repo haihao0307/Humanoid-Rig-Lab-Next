@@ -1,6 +1,6 @@
 {
   "schema": "kaopu.workbench.task@1",
-  "methodologyVersion": "1.0.0",
+  "methodologyVersion": "1.1.0",
   "taskId": "UNSET",
   "kind": "implementation",
   "state": "DRAFT",
@@ -29,5 +29,39 @@
     "interaction",
     "public"
   ],
-  "nextAction": "Read the actual existing workbench, resolve the target and baseline, then lock this task. This file is not a production artifact."
+  "nextAction": "Executor resolves the goal and current code, finds the best teacher, checks entry/license/safety, and starts a faithful web replica. User does not fill this internal record.",
+  "autonomy": {
+    "researchOwner": "executor",
+    "parameterOwner": "executor",
+    "debuggingOwner": "executor",
+    "versionManagementOwner": "executor",
+    "humanRole": "goal_and_key_result_review",
+    "perTechnicalStepHumanApproval": false,
+    "qualityTargetMayBeLoweredWithoutUser": false,
+    "backgroundExecutorInstalled": false,
+    "reviewCheckpoints": [
+      "faithful_replica",
+      "meaningful_variants",
+      "integrated_workbench"
+    ],
+    "escalateOnlyFor": [
+      "materially_ambiguous_goal",
+      "new_cost_or_access_authorization",
+      "privacy_or_license_decision",
+      "scope_change",
+      "protected_content_change",
+      "exhausted_real_tool_or_data_blocker"
+    ]
+  },
+  "replication": {
+    "teacherRefs": [],
+    "route": "UNSELECTED",
+    "minimumEntryChecksDone": false,
+    "replicaBuildSha": null,
+    "replicaAcceptedScope": [],
+    "deepDissectionAfterReplica": true,
+    "knownFidelityGaps": []
+  },
+  "parameterMapRef": null,
+  "variantRecipesRef": null
 }

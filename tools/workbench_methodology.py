@@ -17,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 PACKAGE = Path("docs/workbench-build-system")
 SHA = re.compile(r"^[0-9a-f]{40}$")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
@@ -254,7 +254,7 @@ def initialize(destination: Path, package_root: Path):
 def lint(root: Path) -> list[str]:
     errors = []
     required = ["WORKBENCH_BUILD_SYSTEM.md"] + [str(PACKAGE / x) for x in
-        ("RESEARCH.md", "ARCHITECTURE.md", "QUALITY.md", "RUNBOOK.md", "CASEBOOK.md", "registry.json", "TASK.template.json", "RECEIPT.template.json")]
+        ("RESEARCH.md", "ARCHITECTURE.md", "QUALITY.md", "RUNBOOK.md", "CASEBOOK.md", "PARAMETERS.md", "registry.json", "TASK.template.json", "RECEIPT.template.json")]
     for name in required:
         path = root / name
         if not path.is_file():
@@ -277,6 +277,11 @@ def lint(root: Path) -> list[str]:
             data = load_json(registry)
             if data.get("version") != VERSION or len(data.get("stages", [])) != 10:
                 errors.append("registry version/stage mismatch")
+            purposes = [s.get("purpose") for s in data.get("stages", []) if isinstance(s, dict)]
+            if purposes != ["intake", "teacher_selection", "replicate", "freeze_replica", "dissect", "parameter_mapping", "controlled_variants", "consolidate", "learn_and_integrate", "review_and_deliver"]:
+                errors.append("replicate-first stage order mismatch")
+            if data.get("autonomy", {}).get("parameterOwner") != "executor" or data.get("autonomy", {}).get("perTechnicalStepHumanApproval") is not False:
+                errors.append("executor-owned parameters and review-only policy required")
             for source in data.get("caseSources", []):
                 if source.get("readLevel") == "PR_REPORT_READ":
                     if not source.get("urls") or not all(public_https(u) for u in source["urls"]):
