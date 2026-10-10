@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      SHOE_TARGET_SHA: 14f92620745f62d34dea9cbfa2de5e326c1379d1
       SHOE_EXPECT_BUILD: 4f0d53d597ba07fa2c7e3eebf39141009a084252
     steps:
       - uses: actions/checkout@v4
@@ -22,6 +21,28 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Preserve compiled build and create nonexecuting data transport
+        run: |
+          python3 - <<'PY'
+          import pathlib,re,hashlib,json
+          root=pathlib.Path('shoe-workshop/r01');source=(root/'preview.html').read_text();expected='5de5717d854c1ec64bb913221366adb0830d531ff709cb1378136ce38885a023'
+          assert hashlib.sha256(source.encode()).hexdigest()==expected, 'Unexpected compiled baseline'
+          old=re.search(r'<script id="body-data" type="application/octet-stream">([A-Za-z0-9+/=]+)</script>',source)
+          assert old, 'Expected exactly one data container'
+          public=source[:old.start()]+'<div id="body-data" hidden>'+old.group(1)+'</div>'+source[old.end():]
+          assert re.search(r'<script>globalThis.__SHOE_BUILD__=.*</script>',source,re.S).group(0)==re.search(r'<script>globalThis.__SHOE_BUILD__=.*</script>',public,re.S).group(0)
+          (root/'public-lite.html').write_text(public)
+          target=pathlib.Path('shoe-workshop/qa-r012');target.mkdir(parents=True,exist_ok=True)
+          (target/'PUBLIC_TRANSPORT.json').write_text(json.dumps({'schema':'kaopu-shoe-public-transport/1','version':'R01.2','compiledBaseline':'14f92620745f62d34dea9cbfa2de5e326c1379d1','sourceBuildCommit':'4f0d53d597ba07fa2c7e3eebf39141009a084252','beforeSha256':expected,'afterSha256':hashlib.sha256(public.encode()).hexdigest(),'bytes':len(public.encode()),'change':'Replace only the base64 data SCRIPT container with a hidden DIV. HTMLPreview re-executes every SCRIPT, including non-JavaScript data blocks. Data bytes, compiled JavaScript, geometry and materials remain identical.','runtimeAndBodyDataUnchanged':True},indent=2))
+          PY
+          git config user.name 'Shoe Atelier QA'
+          git config user.email 'shoe-atelier@users.noreply.github.com'
+          git add shoe-workshop/r01/public-lite.html shoe-workshop/qa-r012/PUBLIC_TRANSPORT.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(shoes): public-safe nonexecuting data container, identical R01.2 runtime [skip ci]'
+            git push origin HEAD:feature/shoe-atelier-r01-20261010
+          fi
+          echo "SHOE_TARGET_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Browser dependencies
         run: |
           mkdir -p /tmp/shoe-public
@@ -36,18 +57,18 @@ jobs:
           import fs from 'node:fs';import path from 'node:path';import{chromium}from'playwright';import{createHash}from'node:crypto';
           const SHA=process.env.SHOE_TARGET_SHA,build=process.env.SHOE_EXPECT_BUILD;if(!/^[a-f0-9]{40}$/.test(SHA||''))throw Error('Immutable target SHA required');
           const output='shoe-workshop/qa-r012/evidence';fs.mkdirSync(output,{recursive:true});
-          const raw=`https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${SHA}/shoe-workshop/r01/preview.html`;
-          const urls=[`https://htmlpreview.github.io/?${raw}`,`https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/${SHA}/shoe-workshop/r01/preview.html`];
+          const raw=`https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${SHA}/shoe-workshop/r01/public-lite.html`;
+          const urls=[`https://htmlpreview.github.io/?${raw}`];
           const report={schema:'kaopu-shoe-public-qa/1',startedAt:new Date().toISOString(),targetCommit:SHA,expectedBuild:build,attempts:[],scope:'Actual public HTTPS Chromium navigation and interaction; desktop and phone viewport simulation, not physical devices.'};
           const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
           try{
-           const local=fs.readFileSync('shoe-workshop/r01/preview.html'),requestContext=await browser.newContext(),response=await requestContext.request.get(raw,{timeout:90000}),served=await response.body();report.raw={url:raw,status:response.status(),sha256:createHash('sha256').update(served).digest('hex'),matchesLocal:served.equals(local)};await requestContext.close();if(!response.ok()||!served.equals(local))throw Error('Public bytes differ from frozen checkout');
+           const local=fs.readFileSync('shoe-workshop/r01/public-lite.html'),requestContext=await browser.newContext(),response=await requestContext.request.get(raw,{timeout:90000}),served=await response.body();report.raw={url:raw,status:response.status(),sha256:createHash('sha256').update(served).digest('hex'),matchesLocal:served.equals(local)};await requestContext.close();if(!response.ok()||!served.equals(local))throw Error('Public bytes differ from frozen checkout');
            for(const url of urls){const ctx=await browser.newContext({viewport:{width:1440,height:1000},deviceScaleFactor:1});const p=await ctx.newPage(),a={url,errors:[]};report.attempts.push(a);p.on('pageerror',e=>a.errors.push(String(e)));
             try{const response=await p.goto(url,{waitUntil:'domcontentloaded',timeout:90000});a.status=response.status();await p.waitForFunction(()=>window.SHOE_QA?.ready&&SHOE_QA.stats().thumbReady,{},{timeout:90000});a.stats=await p.evaluate(()=>SHOE_QA.stats());if(a.stats.version!=='R01.2'||a.stats.buildId!==build)throw Error('Wrong public build');
              await p.evaluate(()=>SHOE_QA.render());await p.screenshot({path:path.join(output,'public-desktop.png'),timeout:90000});await p.locator('[data-style="sandal"]').click();await p.locator('[data-mode="wear"]').click();await p.evaluate(()=>SHOE_QA.render());a.body=await p.evaluate(()=>SHOE_QA.sourceBodyCheck());if(!a.body.matches)throw Error('Public body changed');await p.screenshot({path:path.join(output,'public-sandal-wear.png'),timeout:90000});a.passed=a.errors.length===0;if(!a.passed)throw Error(a.errors.join('\n'));report.selectedUrl=url;break;
             }catch(e){a.passed=false;a.failure=String(e);}finally{await ctx.close();}
            }
-           if(!report.selectedUrl)throw Error('No public route rendered the frozen workbench');
+           if(!report.selectedUrl)throw Error('Public acceptance failed');
            fs.writeFileSync('/tmp/shoe-public/public-url.txt',report.selectedUrl);report.status='passed';
           }catch(e){report.status='failed';report.failure=String(e);process.exitCode=1;}finally{report.finishedAt=new Date().toISOString();fs.writeFileSync(path.join(output,'PUBLIC-QA.json'),JSON.stringify(report,null,2));await browser.close();console.log(JSON.stringify(report,null,2));}
           JS
@@ -61,8 +82,9 @@ jobs:
         with:
           name: shoe-r012-public-evidence
           path: |
-            shoe-workshop/qa-r012/evidence
+            shoe-workshop/qa-r012
             shoe-workshop/r01/evidence
+            shoe-workshop/r01/public-lite.html
           retention-days: 30
       - name: Persist public evidence and candidate status without rebuilding preview
         if: success()
@@ -71,12 +93,14 @@ jobs:
           import pathlib,json,os
           root=pathlib.Path('shoe-workshop/r01');public=pathlib.Path('shoe-workshop/qa-r012/evidence');p=json.loads((public/'PUBLIC-QA.json').read_text());q=json.loads((root/'evidence/QA.json').read_text())
           assert p['status']=='passed' and q['status']=='passed' and all(c['pass'] for c in q['checks'])
-          url=p['selectedUrl'];count=len(q['checks'])
+          url=p['selectedUrl'];count=len(q['checks']);target=p['targetCommit']
           (root/'README.md').write_text(f'''# KAOPU 鞋履工坊 R01.2 — 静态视觉候选
 
           公网固定预览：{url}
 
-          固定构建提交：14f92620745f62d34dea9cbfa2de5e326c1379d1。页面内源码标记：4f0d53d597ba07fa2c7e3eebf39141009a084252。独立分支 feature/shoe-atelier-r01-20261010，Draft PR #30；未合并 main，不修改人物、服装或皮革工作台。
+          公网封装固定提交：{target}。页面内源码标记：4f0d53d597ba07fa2c7e3eebf39141009a084252。原编译构建固定为 14f92620745f62d34dea9cbfa2de5e326c1379d1；公网版本只改变数据容器标签，运行代码和人台数据完全相同。见 ../qa-r012/PUBLIC_TRANSPORT.json。
+
+          独立分支 feature/shoe-atelier-r01-20261010，Draft PR #30；未合并 main，不修改人物、服装或皮革工作台。
 
           ## 已实现
 
@@ -84,7 +108,7 @@ jobs:
 
           ## 人台与数据边界
 
-          三位人台由既有人物总台的固定版本 Anny 原生求解器生成。只进行了已声明的坐标转换、1 微米序列化舍入和正零规范化；不随鞋款改变身体大小。浏览器实际顶点缓冲区与烘焙摘要逐款匹配。它们是静态合成人体快照，不是三位真人扫描，也不是已接入实时 GNM/MHR/当前人物的完整总台。
+          三位人台由既有人物总台的固定版本 Anny 原生求解器生成。只进行了已声明的坐标转换、1 微米序列化舍入和正零规范化；不随鞋款改变身体大小。浏览器实际顶点缓冲区与烘焙摘要逐款匹配。它们是静态合成人体快照，不是真人扫描，也不是已接入实时 GNM/MHR/当前人物的完整总台。
 
           ## 验收
 
@@ -96,15 +120,13 @@ jobs:
 
           ## 教师与源码
 
-          见 LEARNING.md、assets/BODY-PROVENANCE.json、BUILD_MANIFEST.json 和 licenses/。鞋体由独立程序化函数生成，未搬运商业鞋模。静态单文件 preview.html 内嵌渲染器与合成人台数据，没有运行时模型或贴图网络依赖。构建依赖和验收命令由专用 Actions 工作流固定。
+          见 LEARNING.md、assets/BODY-PROVENANCE.json、BUILD_MANIFEST.json 和 licenses/。鞋体由独立程序化函数生成，未搬运商业鞋模。preview.html 保留原编译构建；public-lite.html 是同一构建的预览服务兼容封装。两者均内嵌渲染器与合成人台数据，没有运行时模型或贴图网络依赖。构建依赖和验收命令由专用 Actions 工作流固定。
           ''',encoding='utf-8')
           (root/'licenses/SHOE-SOURCE-SCOPE.md').write_text('''# Shoe R01.2 source scope
           The bundled human snapshots use only the MakeHuman-derived Anny body data identified as CC0-1.0 by the pinned parent workbench. The native Anny implementation is Apache-2.0 and is a build-time dependency, not a bundled runtime model solver. Three.js is MIT; THREE-MIT.txt is retained. HUMAN-SOURCE-NOTICE.md is the unmodified parent-workbench notice: its GNM, MHR, MediaPipe and Trimesh entries describe the parent and do not imply those components are included in this shoe preview. No commercial shoe CAD code, shoe mesh, paid texture or font file is bundled. Source commit and cryptographic asset hashes are in assets/SOURCE-INTAKE.json and BODY-PROVENANCE.json.
           ''')
           PY
           rm -f shoe-workshop/r01/node_modules
-          git config user.name 'Shoe Atelier QA'
-          git config user.email 'shoe-atelier@users.noreply.github.com'
           git add shoe-workshop/qa-r012 shoe-workshop/r01/README.md shoe-workshop/r01/licenses/SHOE-SOURCE-SCOPE.md
           git commit -m 'docs(shoes): R01.2 public acceptance evidence and explicit candidate boundaries [skip ci]'
           git push origin HEAD:feature/shoe-atelier-r01-20261010
