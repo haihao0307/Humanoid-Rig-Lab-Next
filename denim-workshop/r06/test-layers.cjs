@@ -24,7 +24,7 @@ for(let weave=0;weave<4;weave++)for(let damage=0;damage<5;damage++){
  ok(a.finite&&a.maxAnchorErrorMm<1e-9,'Retained release anchors');ok(a.clumpedFibers>a.strayFibers&&a.strayFibers>0,'Clumps and strays');
  if(damage>=2){ok(a.bridges>0&&a.tails>0&&a.partialBridges>0,'Mixed breakage');ok(a.saggedBridges===a.bridges,'Sagging bridges');}
  ok(hm.vertices.length%12===0,'Ribbon stride');ok(hm.vertices.every(Number.isFinite),'Finite fiber data');ok(hm.indices.every(i=>i>=0&&i<hm.vertices.length/12),'Fiber indices');ok(tm.vertices.every(Number.isFinite),'Finite radius-normal tubes');
- for(let i=0;i<hm.vertices.length;i+=12*347){ok(Math.abs(Math.hypot(...hm.vertices.slice(i+8,i+11]))-1)<1e-5,'Unit tangent');ok(hm.vertices[i+6]>0&&hm.vertices[i+6]<.03,'Bounded fine-fiber radius');}
+ for(let i=0;i<hm.vertices.length;i+=12*347){const tangent=hm.vertices.slice(i+8,i+11);ok(Math.abs(Math.hypot(...tangent)-1)<1e-5,'Unit tangent');ok(hm.vertices[i+6]>0&&hm.vertices[i+6]<.03,'Bounded fine-fiber radius');}
  for(const f of d.fibers.filter(f=>f.role==='sheath')){ok(Number.isInteger(f.parentId),'Outer staple parent identity');ok(f.points.length>=9,'Smooth finite staple');}
  ok(C.audit(g).wrongCrossingOrder===0,'Weave draft order');
  if(weave===0)rows.push({damage,...a,mainFiberTriangles:hm.indices.length/3,ribbonBytes:(hm.vertices.length+hm.indices.length)*4,looseTriangles:tm.indices.length/3});
