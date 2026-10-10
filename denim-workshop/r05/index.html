@@ -392,7 +392,7 @@ const hairFS=`#version 300 es
 ${fragCommon}${shade}
 in vec3 vW,vN,vT;in vec2 vM;in float vSide,vAlpha;flat in float vFamily;out vec4 O;
 void main(){float a=exp(-vSide*vSide*3.5)*vAlpha*min(1.,uFuzz*1.6);if(a<.004)discard;
-vec3 c=yarnColor(vM,vFamily,23.,1.);c=mix(c,vec3(.19,.186,.171),.10);
+vec3 c=yarnColor(vM,vFamily,23.,1.);c=mix(c,vec3(.25,.239,.212),.20);
 vec3 V=normalize(uCam-vW),L=normalize(uKeyPos-vW);float cyl=sqrt(max(.01,1.-pow(dot(normalize(vT),L),2.)));
 vec3 N=normalize(mix(vN,V,.45));vec3 lit=lighting(c,N,normalize(vT),vW,.9);
 // Forward scatter and soft fiber coverage, not opaque metallic wire highlights.
@@ -408,8 +408,9 @@ in vec3 vW;in vec3 vN;in vec3 vT;in vec3 vInfo;in vec2 vM;out vec4 O;
 void main(){if(uShadowPass==1){O=vec4(1);return;}vec3 N=normalize(vN),T=normalize(vT);if(!gl_FrontFacing)N=-N;
 float variation;vec3 B=normalize(cross(T,vec3(.01,.03,1)));float angle=atan(dot(N,cross(B,T)),dot(N,B));
 N=fiberSurface(N,T,vec2(vInfo.z*12.,angle*.08),vInfo.y,variation);
-vec3 col=yarnColor(vM,vInfo.x,vInfo.y,1.);col=mix(col,vec3(.24,.219,.181),.24)*variation;
-O=vec4(tone(lighting(col,N,T,vW,.9)),1.);}`;
+vec3 col=yarnColor(vM,vInfo.x,vInfo.y,1.);col=mix(col,vec3(.46,.425,.35),vInfo.x>.5?.72:.33)*variation;
+vec3 softN=normalize(mix(normalize(uCam-vW),N,.55));
+O=vec4(tone(lighting(col,softN,T,vW,.9)),1.);}`;
 
 function program(v,f){function sh(type,s){let q=gl.createShader(type);gl.shaderSource(q,s);gl.compileShader(q);if(!gl.getShaderParameter(q,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(q));return q;}let p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,v));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,f));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));return p;}
 let yarnProg,surfProg,seamProg,hairProg,looseProg;try{yarnProg=program(vs,fs);surfProg=program(surfVS,surfFS);seamProg=program(seamVS,seamFS);hairProg=program(hairVS,hairFS);looseProg=program(looseVS,looseFS);}catch(e){$('error').hidden=false;$('error').textContent=e.message;throw e;}
