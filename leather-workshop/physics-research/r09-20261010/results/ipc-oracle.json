@@ -1,0 +1,83 @@
+{
+  "package": "ipctk",
+  "version": "1.6.0",
+  "checks": [
+    {
+      "name": "pinned reference package",
+      "pass": true,
+      "detail": "1.6.0"
+    },
+    {
+      "name": "triangle-interior crossing is rejected before the finite thickness gap closes",
+      "pass": true,
+      "detail": {
+        "unfilteredFinalYMM": [
+          87.33333333333334,
+          87.33333333333334,
+          87.33333333333334
+        ],
+        "safeStepFraction": 0.14996337890625,
+        "analyticThicknessTOI": 0.156,
+        "safeGapMM": 1.5006103515625009
+      }
+    },
+    {
+      "name": "TightInclusionCCD detects swept edge-edge interior contact",
+      "pass": true,
+      "detail": {
+        "collision": true,
+        "safeTOI": 0.14996337890625,
+        "analyticThicknessTOI": 0.156
+      }
+    },
+    {
+      "name": "TightInclusionCCD detects swept point-triangle contact",
+      "pass": true,
+      "detail": {
+        "collision": true,
+        "safeTOI": 0.14996337890625
+      }
+    },
+    {
+      "name": "AdditiveCCD detects swept edge-edge interior contact",
+      "pass": true,
+      "detail": {
+        "collision": true,
+        "safeTOI": 0.14039999999999947,
+        "analyticThicknessTOI": 0.156
+      }
+    },
+    {
+      "name": "AdditiveCCD detects swept point-triangle contact",
+      "pass": true,
+      "detail": {
+        "collision": true,
+        "safeTOI": 0.14040000000000025
+      }
+    },
+    {
+      "name": "separating motion is not globally frozen",
+      "pass": true,
+      "detail": {
+        "step": 1.0
+      }
+    },
+    {
+      "name": "finite nonzero contact barrier and derivatives at an admissible near-contact state",
+      "pass": true,
+      "detail": {
+        "energy": 1.5171597305338576e-06,
+        "gradientNorm": 0.001782089299189303,
+        "note": "No physical material units inferred from arbitrary barrier stiffness."
+      }
+    }
+  ],
+  "role": "Native reference oracle only",
+  "releaseReady": false,
+  "notImplemented": [
+    "full product contact integration",
+    "frictional sticking/sliding solver",
+    "real-leather calibration"
+  ],
+  "pass": true
+}
