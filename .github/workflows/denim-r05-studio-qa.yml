@@ -14,7 +14,7 @@ permissions:
   contents: write
 concurrency:
   group: denim-r05-fiber-studio-qa
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   studio-public-qa:
     runs-on: ubuntu-latest
@@ -30,6 +30,7 @@ jobs:
             python3 denim-workshop/r05/prepare.py
             python3 denim-workshop/r05/upgrade.py
           fi
+          python3 denim-workshop/r05/appearance.py
           python3 denim-workshop/r05/build.py
           node --check denim-workshop/r05/app.js
           node --check denim-workshop/r05/natural-yarn.js
@@ -38,7 +39,7 @@ jobs:
           import pathlib,hashlib,json
           p=pathlib.Path('denim-workshop/r05')
           h=hashlib.sha256((p/'index.html').read_bytes()).hexdigest()
-          assert h=='477ff3f561f626a5ffb333056f33e6823ca3e516816a6e2d14f369519cb9c782',h
+          assert h=='f2de9b5567c49c8085e460baeddf4b3924dfe3f0e9e2db82489453c88868fc92',h
           assert hashlib.sha256(pathlib.Path('denim-workshop/r04/index.html').read_bytes()).hexdigest()=='1535f35e53c75091dad619489cc352cd5a9b8647618225043d08f0f458aea515'
           assert json.loads((p/'BUILD_MANIFEST.json').read_text())['sha256']==h
           print('VERIFIED_R05_STANDALONE',h)
