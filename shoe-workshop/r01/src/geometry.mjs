@@ -1,3 +1,4 @@
+import {shoeLast} from './design-envelope.mjs';
 import * as T from 'three';
 const PI=Math.PI,TAU=PI*2,V=(x=0,y=0,z=0)=>new T.Vector3(x,y,z),clamp=T.MathUtils.clamp,lerp=T.MathUtils.lerp;
 export const STYLES=[
@@ -32,34 +33,7 @@ function stitches(points,material,spacing=.0032,r=.00022){
  const c=curve(points),length=c.getLength(),count=Math.max(2,Math.floor(length/spacing));const inst=new T.InstancedMesh(new T.CylinderGeometry(r,r,1,6,1),material,count),q=new T.Quaternion(),mat=new T.Matrix4(),up=V(0,1,0);
  for(let i=0;i<count;i++){const a=c.getPointAt((i+.1)/count),b=c.getPointAt((i+.78)/count),dir=b.clone().sub(a),mid=a.clone().add(b).multiplyScalar(.5);q.setFromUnitVectors(up,dir.clone().normalize());mat.compose(mid,q,V(1,dir.length(),1));inst.setMatrixAt(i,mat);}inst.instanceMatrix.needsUpdate=true;inst.name='等距实体缝线';inst.castShadow=true;inst.receiveShadow=true;return inst;
 }
-export function shoeLast(foot,style,fit={}){
- const toe=clamp((fit.toe??12)/1000,.005,.025),ease=clamp((fit.ease??3.8)/1000,.001,.009),instep=clamp((fit.instep??3)/1000,.001,.012);
- const L=foot.length+toe+.004,W=foot.width+2*ease,scale=foot.length/.261,bottom=style.sole*scale;
- const knots=[[0,0],[.025,.36],[.075,.60],[.15,.68],[.27,.66],[.40,.75],[.58,.95],[.71,1],[.81,.93],[.90,.79],[.96,.48],[1,0]];
- function width(s){return .5*W*interp(knots,s);}
- function center(s){return-foot.sign*.0055*scale*Math.exp(-Math.pow((s-.85)/.24,2));}
- function boundary(theta,extra=0){const s=(Math.cos(theta)+1)/2,w=width(s),sg=Math.sin(theta)>=0?1:-1;return V(center(s)+sg*(w+Math.abs(Math.sin(theta))*extra),bottom,s*L);}
- const ankleZ=foot.ankleLocal[2]+.004;
- const openFront=style.opening*L,openBack=Math.max(.004,ankleZ-.050*scale),openCentre=(openFront+openBack)/2,openR=(openFront-openBack)/2;
- const openingW=(style.boot?.041:style.sneaker?.033:.031)*scale+ease*.35;
- // A smoothed lower-foot height envelope is used only under the vamp/tongue.
- const bins=Array.from({length:65},(_,i)=>{const z=i/64*L;const q=foot.samples.filter(p=>Math.abs(p[2]+.004-z)<.007&&p[1]<.12*scale);return q.length?Math.max(...q.map(p=>p[1])):0;});
- function height(s){const k=clamp(s*64,0,63),i=Math.floor(k);return lerp(bins[i],bins[i+1],k-i);}
- function surf(theta,v){
-  const b=boundary(theta),front=(Math.cos(theta)+1)/2;
-  const o=V(-foot.sign*.0015*scale+openingW*Math.sin(theta),bottom+(style.collar+(style.boot?0:.009*(1-front)))*scale,openCentre+openR*Math.cos(theta));
-  const blend=Math.pow(Math.sin(v*PI/2),style.boot?.90:1.15);
-  const p=b.clone().lerp(o,blend),exponent=style.boot?lerp(.86,2.28,front):.86;
-  p.y=bottom+(o.y-bottom)*Math.pow(Math.sin(v*PI/2),exponent);
-  // Statically shaped toe spring and rounded vamp, not dynamic wrinkles.
-  p.y+=.004*scale*Math.pow(front,6)*Math.sin(PI*v);
-  const s=p.z/L,ax=Math.abs(p.x-center(s));
-  if(s>.48&&s<.94&&ax<W*.35&&v>.16&&v<.98){const required=bottom+height(s)+instep;const weight=clamp((W*.40-ax)/(W*.14),0,1);p.y=Math.max(p.y,required*weight+p.y*(1-weight));}
-  return p;
- }
- function upperAt(x,z){const s=clamp(z/L,0,1);return bottom+Math.max(.028*scale+.048*scale*Math.exp(-Math.pow((s-.40)/.30,2)),height(s)+instep)+.001;}
- return {L,W,bottom,scale,foot,toe,ease,instep,boundary,surf,width,center,upperAt,ankleZ,openingW};
-}
+export {shoeLast} from './design-envelope.mjs';
 export function createShoe(foot,style,pal,fit={}){
  const S=shoeLast(foot,style,fit),{L,W,scale,bottom,boundary,surf}=S,root=new T.Group();root.name=style.id+'_'+foot.side;
  const components={};function part(key,label){const g=new T.Group();g.name=label;g.userData.component=key;root.add(g);components[key]=g;return g;}
@@ -71,7 +45,7 @@ export function createShoe(foot,style,pal,fit={}){
  const cut=style.sneaker||style.sandal?0:.008*scale*Math.exp(-Math.pow((si-.32)/.17,6));p.y=lerp(cut+.001*scale,bottom-.002*scale,v);return p;},180,12,[.72,bottom]);
  outsole.add(makeMesh(soleGeo,style.sneaker?pal.cupsole:style.sandal?pal.leatherSole:pal.sole,'倒角外底侧墙'));
  // Planar insole/sole faces use a triangle fan over the same parametric outline.
- function footprint(y,extra,mat,name){const points=[V(0,y,.47*L)];for(let i=0;i<=180;i++){const p=boundary(i/180*TAU,extra);p.y=y;points.push(p);}const p=points.flatMap(v=>v.toArray()),uv=points.flatMap(v=>[(v.x+W/2)/W,v.z/L]),idx=[];for(let i=1;i<=180;i++)idx.push(0,i+1,i);const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();return makeMesh(g,mat,name);}
+ function footprint(y,extra,mat,name){const points=[V(0,y,.47*L)];for(let i=0;i<=180;i++){const p=boundary(i/180*TAU,extra);p.y=y;points.push(p);}const p=points.flatMap(v=>v.toArray()),uv=points.flatMap(v=>[(v.x+W/2)/W,v.z/L]),idx=[];for(let i=1;i<=180;i++){if(name==='完整足床')idx.push(0,i,i+1);else idx.push(0,i+1,i);}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();return makeMesh(g,mat,name);}
  outsole.add(footprint(.001*scale,.001*scale,style.sneaker?pal.sole:pal.leatherSole,'外底底面'));
  lining.add(footprint(bottom+.0005,-.002*scale,pal.lining,'完整足床'));
  const weltPath=Array.from({length:181},(_,i)=>{const p=boundary(i/180*TAU,.002*scale);p.y=bottom-.001*scale;return p;});
@@ -87,7 +61,8 @@ export function createShoe(foot,style,pal,fit={}){
  }
  if(!style.sandal){
   const shell=volumize(paramGeometry((u,v)=>surf(u*TAU,v),180,40,[2*L+2*W,.14*scale]),180,40,.0018*scale);
-  upper.add(makeMesh(shell,[pal.skin,pal.lining],'有厚度的连续鞋面'));
+  const colors=[];const pa=shell.attributes.position;for(let k=0;k<pa.count;k++){const z=pa.getZ(k)/L,amount=style.sneaker?1:(1-.25*Math.exp(-Math.pow((z-.95)/.18,2))-.10*Math.exp(-Math.pow((z-.04)/.16,2)));colors.push(amount,amount,amount);}shell.setAttribute('color',new T.Float32BufferAttribute(colors,3));
+  const shellMat=pal.skin.clone();shellMat.vertexColors=true;root.userData.extraMaterials=[shellMat];upper.add(makeMesh(shell,[shellMat,pal.lining],'有厚度的连续鞋面'));
   const rim=pathOn(0,TAU,1,.0002*scale);seams.add(tube(rim,(style.sneaker?.0024:.0011)*scale,style.sneaker?pal.skin:pal.edge,'鞋口包边',true));
   seams.add(stitches(pathOn(0,TAU,.965,.0007*scale),pal.thread,.0032*scale,.00019*scale));
   if(!style.wholecut){
@@ -97,17 +72,19 @@ export function createShoe(foot,style,pal,fit={}){
   }
   const back=Array.from({length:35},(_,i)=>{const p=surf(PI,i/34);p.z-=.0007*scale;return p;});seams.add(stitches(back,pal.thread,.0032*scale));
   if(style.cap){
-   const p=pathOn(-1.57,1.57,.50,.0008*scale);seams.add(tube(p,.0005*scale,pal.edge,'帽头拼接边'));seams.add(stitches(pathOn(-1.57,1.57,.515,.0011*scale),pal.thread,.0031*scale));seams.add(stitches(pathOn(-1.57,1.57,.545,.0011*scale),pal.thread,.0031*scale));
+   const contour=offset=>Array.from({length:100},(_,i)=>{const u=i/99*2-1,z=L*.79+offset+.0028*scale*(1-u*u),x=S.center(z/L)+S.width(z/L)*u*.985;return V(x,S.upperAt(x,z)+.0007*scale,z);});
+   seams.add(tube(contour(0),.00042*scale,pal.edge,'帽头拼接边'));
+   for(const off of [-.0018,-.0043])seams.add(stitches(contour(off*scale),pal.thread,.0031*scale,.00017*scale));
   }
  }
  if(style.lace){
-  const z0=L*.69,z1=L*.355,tw=.021*scale,throat=(z)=>S.upperAt(0,z)+.002*scale;
-  const tongueFn=(u,v)=>{const z=lerp(z0,z1,v),x=(u-.5)*tw*2.04;return V(x,throat(z)+.0022*scale*Math.cos((u-.5)*PI),z);};
+  const z0=L*.71,z1=L*.46,tw=.018*scale;
+  const tongueFn=(u,v)=>{const z=lerp(z0,z1,v),x=(u-.5)*tw*2.04+S.center(z/L);return V(x,S.upperAt(x,z)+.0032*scale,z);};
   upper.add(makeMesh(solidPatch(tongueFn,24,36,.0025*scale),pal.skin,'独立厚鞋舌'));
   seams.add(stitches(Array.from({length:32},(_,i)=>tongueFn(i/31,.97).add(V(0,.0004*scale,0))),pal.thread,.003*scale));
   const endpoints=[[],[]];
   for(const [sid,sign]of [[0,-1],[1,1]]){
-   const panel=(u,v)=>{const z=lerp(L*.70,L*.38,v),xin=sign*tw,xout=sign*(tw+.013*scale+.006*scale*Math.sin(v*PI)),x=lerp(xout,xin,u),y=throat(z)+.0015*scale-.009*scale*Math.pow(1-u,1.5);return V(x,y,z);};
+   const panel=(u,v)=>{const z=lerp(L*.72,L*.47,v),xin=sign*tw,xout=sign*(tw+.013*scale+.006*scale*Math.sin(v*PI)),x=lerp(xout,xin,u)+S.center(z/L),y=S.upperAt(x,z)+.0050*scale;return V(x,y,z);};
    upper.add(makeMesh(solidPatch(panel,8,40,.0018*scale),pal.skin,'系带耳片'));
    const seam=Array.from({length:48},(_,i)=>panel(.1,i/47).add(V(0,.00065*scale,0)));seams.add(stitches(seam,pal.thread,.0032*scale));
    const n=style.sneaker?6:5;
@@ -130,7 +107,7 @@ export function createShoe(foot,style,pal,fit={}){
  }
  if(style.loafer){
   const p=pathOn(-1.73,1.73,.69,.0015*scale);seams.add(tube(p,.0010*scale,pal.edge,'围盖凸起缝'));seams.add(stitches(pathOn(-1.73,1.73,.72,.0016*scale),pal.thread,.0031*scale,.00025*scale));
-  const saddle=(u,v)=>{const x=(u-.5)*W*.89,z=L*(.59+(v-.5)*.09);return V(x,S.upperAt(x,z)-.020*scale*Math.pow(Math.abs(x)/(W*.46),2)+.003*scale,z);};
+  const saddle=(u,v)=>{const z=L*(.59+(v-.5)*.09),x=S.center(z/L)+(u-.5)*S.width(z/L)*1.82;return V(x,S.upperAt(x,z)+.003*scale,z);};
   const patches=[[0,.34,0,1],[.66,1,0,1],[.34,.66,0,.35],[.34,.66,.65,1]];
   for(const[a,b,c,d]of patches)upper.add(makeMesh(solidPatch((u,v)=>saddle(lerp(a,b,u),lerp(c,d,v)),12,5,.002*scale),pal.skin,'镂空便士鞍带'));
   for(const v of [.05,.95])seams.add(stitches(Array.from({length:55},(_,i)=>saddle(i/54,v).add(V(0,.0005*scale,0))),pal.thread,.0032*scale));
@@ -149,7 +126,7 @@ export function createShoe(foot,style,pal,fit={}){
  }
  if(style.sandal){
   for(const [z,span]of [[L*.69,.040*scale],[L*.39,.038*scale]]){
-   const strap=(u,v)=>{const x=(u-.5)*W*.98,s=z/L,w=S.width(s);const y=bottom+.005*scale+(S.upperAt(0,z)-bottom+.003*scale)*Math.pow(Math.max(0,1-Math.pow(x/(w+.004*scale),2)),.52);return V(x,y,z+(v-.5)*span);};
+   const strap=(u,v)=>{const zz=z+(v-.5)*span,s=zz/L,x=S.center(s)+(u-.5)*S.width(s)*2.08,y=S.upperAt(x,zz)+.0055*scale;return V(x,y,zz);};
    upper.add(makeMesh(solidPatch(strap,44,12,.0032*scale),pal.skin,'独立厚鞋带'));
    for(const v of [.06,.94])seams.add(stitches(Array.from({length:55},(_,i)=>strap(i/54,v).add(V(0,.0008*scale,0))),pal.thread,.0032*scale));
    const buckle=strap(.78,.5).add(V(0,.002*scale,0)),w=.018*scale,h=.021*scale;
@@ -158,8 +135,8 @@ export function createShoe(foot,style,pal,fit={}){
   const lip=weltPath.map(p=>p.clone().add(V(0,.004*scale,0)));lining.add(tube(lip,.0023*scale,pal.lining,'足床包边',true,.8));
  }
  const lastGroup=part('last','设计鞋楦');const last=makeMesh(volumize(paramGeometry((u,v)=>surf(u*TAU,v),120,26,[.7,.13]),120,26,.0018*scale),pal.wood,'参数化鞋楦包络');lastGroup.add(last);lastGroup.visible=false;
- root.userData={style:style.id,side:foot.side,sourceRevision:'shoe-r01-native',dimensions:{length:L,width:W,upperThickness:.0018*scale,soleHeight:bottom},components,S};
+ root.userData={extraMaterials:root.userData.extraMaterials||[],style:style.id,side:foot.side,sourceRevision:'shoe-r01-native',dimensions:{length:L,width:W,upperThickness:.0018*scale,soleHeight:bottom,minimumSampleClearance:S.minimumSampleClearance,roofRange:S.roofRange},components,S};
  return root;
 }
 export function explodeShoe(shoe,amount=1){const {components:c}=shoe.userData,S=shoe.userData.S;c.outsole.position.y=-.018*amount*S.scale;c.welt.position.y=.009*amount*S.scale;c.lining.position.y=.034*amount*S.scale;c.upper.position.y=.067*amount*S.scale;c.hardware.position.y=.103*amount*S.scale;c.seams.position.y=.067*amount*S.scale;}
-export function disposeShoe(group){group.traverse(o=>o.geometry?.dispose());group.clear();}
+export function disposeShoe(group){group.traverse(o=>o.geometry?.dispose());for(const m of group.userData.extraMaterials||[])m.dispose();group.clear();}
