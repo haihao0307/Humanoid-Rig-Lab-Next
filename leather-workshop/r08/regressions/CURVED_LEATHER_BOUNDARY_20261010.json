@@ -1,0 +1,61 @@
+{
+  "schema": "kaopu/leather-boundary-regression@1",
+  "case": "USER_20261010_CURVED_LEATHER_OPEN_EDGE_AND_THREAD_RAILING",
+  "acceptedOriginal": "e86c36c8c34b1f2b57cc5462459ee2f490e556af",
+  "rejectedBeforeBuild": "959faa180a6d7b76535a8e3f75ac8d33c240f591",
+  "candidateSource": "f77c9cfd37be5bdbf2cd8be0149ceef79cf90e83",
+  "candidateBuild": "f1ab73a7b289461a7d81e65eed935ec62369ed34",
+  "observation": "Nominal thickness was nonzero, but separately sampled cut walls did not match the refined curved skin boundary. Preserving original source bytes alone did not establish correct product integration.",
+  "correctedInvariant": "Both skins and every cut or needle wall derive from the same final constrained paper triangulation boundary. Coincident skin and wall vertices share a consistent deformation field.",
+  "beforeAfterCPU": {
+    "scope": "Generated thumbnail geometry of the same named cowboy hat, welded at 0.00001 mm. This is a CPU topology comparison, not a full-resolution, rendering, or material-calibration claim.",
+    "r07": [
+      {"part": "cowboy-crown", "openEdges": 700, "nonmanifold": 0},
+      {"part": "formed-crown-top", "openEdges": 200, "nonmanifold": 0},
+      {"part": "western-curled-brim", "openEdges": 784, "nonmanifold": 0},
+      {"part": "leather-hatband", "openEdges": 784, "nonmanifold": 0}
+    ],
+    "r08": [
+      {"part": "cowboy-crown", "openEdges": 0, "nonmanifold": 0},
+      {"part": "formed-crown-top", "openEdges": 0, "nonmanifold": 0},
+      {"part": "western-curled-brim", "openEdges": 0, "nonmanifold": 0},
+      {"part": "leather-hatband", "openEdges": 0, "nonmanifold": 0}
+    ]
+  },
+  "fullResolutionChecks": {
+    "report": "qa-closure.json",
+    "checks": 87,
+    "pass": true,
+    "note": "Includes main-product panels and repeated craft variants. Generated shells are checked for unmatched edges, nonmanifold incidence, winding and positive front-back separation. Counts are not independent physics capabilities."
+  },
+  "deformationChecks": {
+    "report": "qa-motion.json",
+    "checks": 22,
+    "pass": true,
+    "note": "Physical node positions and the exact shader reconstruction are used to compare edge aliases and thickness after grabbing. This numerical test is not an extra GPU or phone run."
+  },
+  "browserChecks": {
+    "localReport": "qa/release-local/browser.json",
+    "localWorkflowRun": "38026510974",
+    "publicReport": "qa/release-public/browser.json",
+    "publicWorkflowRun": "38031727116",
+    "localPassed": true,
+    "publicPassed": true,
+    "publicRuntimeIdentity": "f77c9cfd37be5bdbf2cd8be0149ceef79cf90e83",
+    "publicChecks": 86,
+    "applicationErrors": []
+  },
+  "preservation": "R01-R07 and anchors remain unchanged relative to 426b725e1608a10f99bdf1532914daf5d2b2ea49.",
+  "prohibitedShortcuts": [
+    "Do not treat configured thickness as proof of a closed visible shell.",
+    "Do not hide missing skin or cut walls with DoubleSide, darker lighting, or camera cropping.",
+    "Do not regenerate coarse cut walls independently of the final subdivided boundary.",
+    "Do not treat frozen-file hashes as proof that integrated products preserve old capabilities."
+  ],
+  "limits": [
+    "Closure is not self-collision safety.",
+    "Computed thickness is not measured material calibration.",
+    "Local R05 thread contact is not complete yarn friction or tension propagation.",
+    "Visual acceptance remains with the user."
+  ]
+}
