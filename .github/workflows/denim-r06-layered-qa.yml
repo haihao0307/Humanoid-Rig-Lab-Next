@@ -1,0 +1,84 @@
+name: Denim R06 Layered Fiber Public QA
+on:
+  push:
+    branches: [feature/denim-r06-layered-scatter-20261010]
+    paths:
+      - 'denim-workshop/r06/*.js'
+      - 'denim-workshop/r06/*.glsl'
+      - 'denim-workshop/r06/*.py'
+      - 'denim-workshop/r06/*.cjs'
+      - 'denim-workshop/r06/template.html'
+      - '.github/workflows/denim-r06-layered-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: denim-r06-layered-fiber-qa
+  cancel-in-progress: true
+jobs:
+  layered-public-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Inherit frozen R05 and build canonical R06
+        run: |
+          if [ ! -f denim-workshop/r06/app.js ]; then
+            python3 denim-workshop/r06/upgrade.py
+          fi
+          python3 denim-workshop/r06/build.py
+          node --check denim-workshop/r06/app.js
+          node --check denim-workshop/r06/natural-yarn.js
+          node --check denim-workshop/r06/test-layers.cjs
+          node denim-workshop/r06/test-layers.cjs
+          python3 - <<'PY'
+          import pathlib,hashlib,json
+          p=pathlib.Path('denim-workshop/r06')
+          h=hashlib.sha256((p/'index.html').read_bytes()).hexdigest()
+          assert h=='ec4a548a9486e25be2838614cb3bf369590008cb1d85864c80647da3cbb83498',h
+          assert hashlib.sha256(pathlib.Path('denim-workshop/r05/index.html').read_bytes()).hexdigest()=='f2de9b5567c49c8085e460baeddf4b3924dfe3f0e9e2db82489453c88868fc92'
+          assert json.loads((p/'BUILD_MANIFEST.json').read_text())['sha256']==h
+          print('VERIFIED_R06_STANDALONE',h)
+          PY
+      - name: Publish only canonical R06 with normal fast-forward push
+        id: publish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add denim-workshop/r06/core.js denim-workshop/r06/natural-yarn.js denim-workshop/r06/app.js denim-workshop/r06/template.html denim-workshop/r06/index.html denim-workshop/r06/BUILD_MANIFEST.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Build R06.0 finite cotton staples, layered scatter and linear-light studio'
+            git push origin HEAD:feature/denim-r06-layered-scatter-20261010
+          fi
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/denim-workshop/r06/index.html" >> "$GITHUB_ENV"
+          echo "R06_TESTED_BUILD=$SHA"
+      - name: Install browser verification runtime
+        run: |
+          python3 -m pip install playwright==1.55.0 pillow==11.3.0
+          python3 -m playwright install --with-deps chromium
+      - name: Actual file and fixed public browser regression
+        run: xvfb-run -a python3 -u denim-workshop/r06/qa.py --public "$PUBLIC_URL"
+      - name: Upload rendered and numeric evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: denim-r06-layered-evidence
+          path: |
+            denim-workshop/r06/evidence/**
+            denim-workshop/r06/layers-qa.json
+            denim-workshop/r06/index.html
+            denim-workshop/r06/BUILD_MANIFEST.json
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Receipt
+        if: success()
+        run: |
+          echo '## Denim R06.0 layered cotton candidate' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Tested build: ${{ steps.publish.outputs.sha }}' >> "$GITHUB_STEP_SUMMARY"
+          echo "$PUBLIC_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Actual standalone file, fixed public HTTPS and mobile viewport checked. Local profile approximation, not measured/full BSSRDF. Film-grade and real-device acceptance pending.' >> "$GITHUB_STEP_SUMMARY"
