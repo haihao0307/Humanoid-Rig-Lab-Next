@@ -1,7 +1,7 @@
 from pathlib import Path
 import base64,gzip,hashlib,json,re,subprocess,os
 R=Path(__file__).resolve().parent;L=R.parent
-BASE='e86c36c8c34b1f2b57cc5462459ee2f490e556af';PARENT='1b85084f13a67773dd3b9c1b1b7c73b56f3bb6dc'
+BASE='e86c36c8c34b1f2b57cc5462459ee2f490e556af';PARENT='426b725e1608a10f99bdf1532914daf5d2b2ea49'
 def src(p):
  s=p.read_text();s=re.sub(r'^import[^\n]*\n','',s,flags=re.M)
  return re.sub(r'\bexport (?=(?:async )?(?:class|const|function))','',s)
@@ -43,8 +43,10 @@ geometryModules=[
  mod(R/'site/panels.js','PanelAssembly,rectangle,borderPoints,skinMaterial,installSkin,updateSkin,reskinMaterial'),
  src(R/'site/surface-integrity.js'),'(()=>{'+src(R/'site/closed-shell.js')+'})();','(()=>{'+src(R/'site/pattern-physics.js')+'})();',
  mod(R/'site/products.js','PRODUCT_SPECS,productMaterials,makeProduct,setProductMaterial,productAudit,patternSVG'),
- mod(R/'site/grip.mjs','ProductShell')]
+ mod(R/'site/grip.mjs','ProductShell,fastHinge')]
+productWorker='(()=>{'+shared+mod(R/'site/grip.mjs','ProductShell,fastHinge')+src(R/'site/grip-worker-runtime.js')+'})();'
 code='\n'.join([three,vendor,shared,*geometryModules,
+ 'const PRODUCT_WORKER_CODE='+json.dumps(productWorker)+';',mod(R/'site/grip-worker.js','ProductWorkerShell'),
  mod(L/'r02/site/leather.js','LeatherKernel,PRESETS,DEFAULT,FINISHES'),mod(L/'r05/site/appearance.js','SewingAppearance'),mod(L/'r06/site/catalogue.js','CATALOGUE,AtelierMaterials'),
  'const LEGACY_CRAFT_GZIP='+json.dumps(legacyGZIP)+';const WORKER_CODE='+json.dumps(worker)+';const BUILD_INFO='+json.dumps(info)+';const BASELINE_GZIP='+json.dumps(base64.b64encode(gzip.compress((L/'r05/public-lite.html').read_bytes(),mtime=0)).decode())+';',src(R/'site/runtime.js'),src(R/'site/runtime-polish.js'),src(R/'site/atelier-controls.js')])
 code='(()=>{'+code+'})();';code=re.sub(r'</script',r'<\\/script',code,flags=re.I)
@@ -55,4 +57,4 @@ html=(R/'site/template.html').read_text().replace('<!--DATA-->','<div id="scanDa
 info.update(htmlSHA256=hashlib.sha256(html.encode()).hexdigest(),htmlBytes=len(html.encode()),standalone=True,visualAcceptance='PENDING_USER')
 (R/'BUILD_MANIFEST.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n');print(json.dumps(info,indent=2))
 node='\n'.join([three,vendor,shared,*geometryModules])
-(R/'node-lib.cjs').write_text(node+'\nmodule.exports={updateSkin,skinMaterial,T,PRODUCT_SPECS,productMaterials,makeProduct,productAudit,ProductShell,PanelAssembly,SeamPath,SeamIndex,seamRelief,R05_SEW,R05_CONTACT};')
+(R/'node-lib.cjs').write_text(node+'\nmodule.exports={updateSkin,skinMaterial,T,PRODUCT_SPECS,productMaterials,makeProduct,productAudit,ProductShell,fastHinge,hinge,PanelAssembly,SeamPath,SeamIndex,seamRelief,R05_SEW,R05_CONTACT};')

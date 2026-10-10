@@ -33,3 +33,21 @@ const originalSelectProduct=selectProduct;
 selectProduct=function(id){isThicknessView=false;$('thicknessView').classList.remove('active');return originalSelectProduct(id);};
 const originalPrepare=prepareGrab;
 prepareGrab=function(){originalPrepare();if(window.LEATHER_ATELIER){window.LEATHER_ATELIER.measureShell=measureShell;window.LEATHER_ATELIER.thicknessView=thicknessView;}};
+// A genuine close-up of the selected curved cut edge, not an image overlay.
+function inspectSurface(partName,u,v,options={}){
+ const rig=hero.userData.rig,part=rig.parts.find(p=>p.name===partName);if(!part)throw Error('Unknown product panel '+partName);
+ const g=part.mesh.geometry,uv=g.attributes.uv,pos=g.attributes.position,n=g.userData.paperVertices;let pick=0,best=Infinity;
+ for(let i=0;i<n;i++){const d=(uv.getX(i)*96-u)**2+(uv.getY(i)*96-v)**2;if(d<best){best=d;pick=i;}}
+ const ids=g.attributes.simIDs,weights=g.attributes.simWeights,delta=g.attributes.simDelta,pixels=rig.pixels;let p=V(),X=V(),N=V();
+ for(let i=0;i<4;i++){const id=Math.round(ids.array[pick*4+i]),w=weights.array[pick*4+i];p.addScaledVector(V(...pixels.slice(id*12,id*12+3)),w);X.addScaledVector(V(...pixels.slice(id*12+4,id*12+7)),w);N.addScaledVector(V(...pixels.slice(id*12+8,id*12+11)),w);}
+ N.normalize();X.addScaledVector(N,-X.dot(N)).normalize();const Y=N.clone().cross(X);target.copy(p).addScaledVector(X,delta.getX(pick)).addScaledVector(Y,delta.getY(pick)).addScaledVector(N,delta.getZ(pick));
+ yaw=Math.atan2(N.x,N.z)+(options.yawOffset??.45);pitch=options.pitch??Math.max(-1.15,Math.min(1.15,Math.asin(N.y)*.65+.24));distance=options.distance||90;view='edge';dirty=true;renderer.shadowMap.needsUpdate=true;render();return{part:part.name,target:target.toArray(),sampleUV:[uv.getX(pick)*96,uv.getY(pick)*96],thicknessMM:pos.getZ(pick)};
+}
+function inspectCut(){const rig=hero.userData.rig;let p,u,v,options={};
+ if(product==='bag'){p=rig.parts.find(p=>p.name==='bag-shaped-flap');u=p.w/2-.7;v=-p.h*.06;options={yawOffset:.68,pitch:.32,distance:93};}
+ else if(['cowboy','pirate'].includes(product)){p=rig.parts.find(p=>p.name.includes('brim'));u=p.w*.15;v=p.h/2-.6;options={yawOffset:.6,pitch:.15,distance:95};}
+ else if(product==='jacket'){p=rig.parts.find(p=>p.name==='jacket-1-folded-cuff');u=0;v=p.h/2-.6;options={yawOffset:.6,pitch:.15,distance:100};}
+ else{p=rig.parts[product==='wallet'?2:0];u=p.w*.1;v=-p.h/2+.7;options={yawOffset:.55,pitch:.24,distance:product==='wallet'?33:70};}
+ inspectSurface(p.name,u,v,options);
+}
+$('viewEdge').onclick=inspectCut;
