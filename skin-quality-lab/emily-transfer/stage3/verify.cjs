@@ -26,7 +26,9 @@ async function canvasHash(){return page.evaluate(()=>{const src=document.querySe
  for(const pose of poses){
   const r=await page.evaluate(({b,a})=>{__STAGE3__.pose(b,a);__STAGE3__.mode('grid');__SKIN_LAB__.render();return {r:__STAGE3__.report(),outline:__STAGE1__.report(),audit:__STAGE3__.audit(true),head:__EYES__.sourceGeometry()};},pose);report.poses.push({pose,...r});
   check(pose.name+' same head asset topology and buffer identity',JSON.stringify(r.head)===JSON.stringify(sourceGeometry),r.head);
-  check(pose.name+' fixed eyeball radius and all centre coordinates',r.r.eyes.every((e,i)=>e.radiusMM===12.2&&e.centreMM.every((v,j)=>Math.abs(v-centres[i][j])<1e-7)),r.r.eyes.map(e=>({radius:e.radiusMM,centre:e.centreMM})));
+  // Metres-to-millimetres gives 12.200000000000001 in IEEE754; use 1e-9 mm,
+  // not a rounded diagnostic field or any changed geometry acceptance limit.
+  check(pose.name+' fixed eyeball radius and all centre coordinates',r.r.eyes.every((e,i)=>Math.abs(e.radiusMM-12.2)<1e-9&&e.centreMM.every((v,j)=>Math.abs(v-centres[i][j])<1e-7)),r.r.eyes.map(e=>({radius:e.radiusMM,centre:e.centreMM})));
   check(pose.name+' immutable finite rest coordinates',r.r.coordinates.entries.every(e=>e.immutableRestAttributes&&e.finiteAttributes),r.r.coordinates.entries);
   check(pose.name+' shared material chart at skin rim mucosa',r.r.coordinates.materialBoundaryMaxError<1e-7,r.r.coordinates.materialBoundaryMaxError);
   for(const e of r.r.eyes){check(pose.name+' '+e.name+' brow stays off closed free edge and lower lid',e.brow.freeMarginCorrectionMM===0&&e.brow.lowerLidCorrectionMM===0,e.brow);check(pose.name+' '+e.name+' brow ring joins head',e.brow.joinedOuterBoundaryErrorMM<.00003,e.brow);check(pose.name+' '+e.name+' inner-canthus attachments and vertices',e.medial.maxAttachmentErrorMM<.00003&&e.medial.nonfiniteVertices===0&&e.medial.penetrations===0,e.medial);}
