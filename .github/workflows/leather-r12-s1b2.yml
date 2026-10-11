@@ -4,38 +4,117 @@ on:
     branches: [refactor/leather-r12-source-normalization-20261011]
     paths:
       - .github/workflows/leather-r12-s1b2.yml
+      - leather-workshop/r12/development/**
+      - leather-workshop/r12/src/**
+      - leather-workshop/r12/assembly.json
+      - leather-workshop/r12/canonical.lock.json
+      - leather-workshop/r12/build.py
+      - leather-workshop/r12/verify.py
+      - leather-workshop/r12/ui/**
+      - leather-workshop/r12/qa-*.cjs
+      - leather-workshop/r12/qa-browser-s1b2.py
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: leather-r12-s1b2
   cancel-in-progress: true
 jobs:
-  inspect:
+  verify-and-publish:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 40
+    env:
+      R: leather-workshop/r12
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 1
           sparse-checkout: |
-            leather-workshop/r12
-            leather-workshop/r10
+            leather-workshop
             .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Install deterministic build dependencies
-        run: pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5
-      - name: Rebuild inherited S1B1 candidate from its canonical sources
-        run: python leather-workshop/r12/build.py
-      - name: Package exact project inputs for application-interface review
+      - name: Install deterministic build and browser-test dependencies
+        run: pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5 playwright==1.55.0
+      - name: Commit reviewed one-time canonical source edit before verification
         run: |
-          mkdir -p /tmp/leather-s1b2-review
-          tar -czf /tmp/leather-s1b2-review/source.tgz leather-workshop/r12 leather-workshop/r10 leather-workshop/START_HERE.md leather-workshop/ROADMAP.md leather-workshop/TASK_STATE.json leather-workshop/AGENTS.md AGENTS.md LICENSE .github/workflows/leather-r12-s1b-verification.yml .github/workflows/leather-r12-s1b2.yml
-          git rev-parse HEAD > /tmp/leather-s1b2-review/source-sha.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if test -f "$R/development/S1B2_PENDING"; then
+            python "$R/development/apply-s1b2.py"
+            git add "$R/src/app" "$R/ui/template.html" "$R/build.py" "$R/verify.py" "$R/assembly.json" "$R/canonical.lock.json"
+            git rm "$R/development/S1B2_PENDING"
+            git commit -m 'refactor(leather): finalize reviewed S1B2 application composition canonical sources'
+            git push origin HEAD:refs/heads/refactor/leather-r12-source-normalization-20261011
+          fi
+          echo "LEATHER_SOURCE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "S1B_SOURCE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Verify protected historical workbench bytes
+        run: |
+          git fetch --depth=1 origin 864caaa5fc324547c0aff64ef830d6de1eae6e6a
+          git diff --exit-code 864caaa5fc324547c0aff64ef830d6de1eae6e6a -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/r07 leather-workshop/r08 leather-workshop/r09 leather-workshop/r10 leather-workshop/r11 LICENSE AGENTS.md
+      - name: Build directly from canonical source, then run differential gates
+        run: |
+          python "$R/build.py"
+          python "$R/verify.py"
+      - name: Actual offline Chrome visual, API and pointer regressions against R10
+        run: xvfb-run -a python -u "$R/qa-browser-s1b2.py"
+      - name: Publish the exact offline-tested standalone to the isolated branch
+        run: |
+          cp "$R/out/candidate-r12-s1b.html" "$R/public-lite.html"
+          git add "$R/public-lite.html" "$R/BUILD_RESULT.json" "$R/qa/numeric.json" "$R/qa/s1b/interfaces.json" "$R/qa/s1b/equivalence.json" "$R/qa/s1b2/SUMMARY.json" "$R/qa/s1b2/app-interfaces.json" "$R/qa/s1b2/browser/report.json"
+          git commit -m 'build(leather): publish browser-tested R12 S1B2 standalone and differential evidence'
+          git push origin HEAD:refs/heads/refactor/leather-r12-source-normalization-20261011
+          echo "LEATHER_BUILD_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "LEATHER_PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r12/public-lite.html" >> "$GITHUB_ENV"
+      - name: Verify exact public bytes and actual public Chrome interactions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,time,urllib.request,hashlib
+          local=(Path(os.environ['R'])/'public-lite.html').read_bytes()
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['LEATHER_BUILD_COMMIT']+'/leather-workshop/r12/public-lite.html'
+          for i in range(10):
+            try:
+              with urllib.request.urlopen(url,timeout=30) as r:data=r.read()
+              assert data==local
+              print('Public standalone bytes match:',hashlib.sha256(data).hexdigest())
+              break
+            except Exception:
+              if i==9:raise
+              time.sleep(6)
+          PY
+          xvfb-run -a python -u "$R/qa-browser-s1b2.py" --public --url "$LEATHER_PREVIEW"
+      - name: Record successful delivery with exact source and build identities
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          r=Path(os.environ['R']);reports={}
+          names=['qa/s1b2/SUMMARY.json','qa/s1b2/app-interfaces.json','qa/s1b/equivalence.json','qa/numeric.json','qa/s1b2/browser/report.json','qa/s1b2/public/report.json']
+          for name in names:
+            p=r/name;d=json.loads(p.read_text());assert d['pass'],name;reports[name]=hashlib.sha256(p.read_bytes()).hexdigest()
+          cpu=json.loads((r/names[0]).read_text());offline=json.loads((r/names[-2]).read_text());public=json.loads((r/names[-1]).read_text());b=json.loads((r/'BUILD_RESULT.json').read_text())
+          pixels=[x['data'] for x in offline['checks'] if x['name'].endswith('pixel equivalence')]
+          d={'version':'R12.0-S1B2','phase':'S1B2','sourceCommit':os.environ['LEATHER_SOURCE_COMMIT'],'buildCommit':os.environ['LEATHER_BUILD_COMMIT'],'previewURL':os.environ['LEATHER_PREVIEW'],'workflowRun':os.environ['GITHUB_RUN_ID'],'htmlSHA256':b['htmlSHA256'],'htmlBytes':b['htmlBytes'],'baselineBuild':'af389cc216ddd01e3b1aa66c972f42b2587bc797','sourceChecks':cpu['checkCount'],'appInterfaceCases':25,'numericalCases':18,'geometryCases':25,'full52StepTrajectories':6,'offlineBrowserChecks':len(offline['checks']),'publicBrowserChecks':len(public['checks']),'visualComparisonPairs':len(pixels),'maximumMeanRGBDifference':max(x['meanRGBDifference'] for x in pixels),'offlineBrowserVerified':True,'publicBrowserVerified':True,'readyForUserReview':True,'subtaskComplete':True,'fullS1Complete':False,'userVisualAcceptance':'PENDING','commercialLegalClearance':False,'reports':reports,'limitations':['No new performance, material-calibration or universal-collision certification','390x844 is viewport simulation, not a physical phone','Normal GitHub Actions Chrome software-rendering tests; local managed file navigation stayed blocked and policies were not changed','Pinned native WASM and legacy compatibility archives remain; this stage only resolves application interfaces','R11 rights-remediation is independent; no random field replacement']}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git add "$R/DELIVERY.json" "$R/qa/s1b2/public/report.json"
+          git commit -m 'test(leather): certify immutable public S1B2 browser delivery'
+          git push origin HEAD:refs/heads/refactor/leather-r12-source-normalization-20261011
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: leather-r12-s1b2-source-${{ github.run_id }}
-          path: /tmp/leather-s1b2-review/
-          retention-days: 3
+          name: leather-r12-s1b2-review-${{ github.run_id }}
+          path: |
+            leather-workshop/r12/public-lite.html
+            leather-workshop/r12/BUILD_RESULT.json
+            leather-workshop/r12/DELIVERY.json
+            leather-workshop/r12/qa/s1b2/
+            leather-workshop/r12/qa/s1b/equivalence.json
+          retention-days: 14

@@ -1,89 +1,30 @@
-name: Leather R12 S1B verification
+name: Leather R12 S1B1 frozen verification
+# S1B2 is now the active push verifier. This archival job reproduces S1B1 only.
 on:
-  push:
-    branches: [refactor/leather-r12-source-normalization-20261011]
-    paths:
-      - .github/workflows/leather-r12-s1b-verification.yml
-      - leather-workshop/r12/src/**
-      - leather-workshop/r12/compat/**
-      - leather-workshop/r12/assets/**
-      - leather-workshop/r12/licenses/**
-      - leather-workshop/r12/native/**
-      - leather-workshop/r12/ui/**
-      - leather-workshop/r12/assembly.json
-      - leather-workshop/r12/canonical.lock.json
-      - leather-workshop/r12/build.py
-      - leather-workshop/r12/materialize.py
-      - leather-workshop/r12/verify.py
-      - leather-workshop/r12/qa-*.cjs
+  workflow_dispatch:
 permissions:
-  contents: write
-concurrency:
-  group: leather-r12-s1b-verification
-  cancel-in-progress: true
+  contents: read
 jobs:
-  verify:
+  verify-frozen-s1b1:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
-    env:
-      R: leather-workshop/r12
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: 6fe5ec8baae83c2d8152fabe506d44af349f6184
           fetch-depth: 1
+          sparse-checkout: leather-workshop
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Install deterministic build dependencies
-        run: pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5
-      - name: Build canonical candidate
-        run: python "$R/build.py"
-      - name: Run source, interface, geometry and numerical gates
-        run: S1B_SOURCE_COMMIT="${GITHUB_SHA}" python "$R/verify.py"
-      - name: Record exact machine receipt on isolated branch
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import json, os
-          r=Path(os.environ['R'])
-          p=r/'qa/s1b/SUMMARY.json'
-          d=json.loads(p.read_text())
-          assert d['pass']
-          receipt={
-            'schema':'kaopu/leather-s1b-machine-receipt@1',
-            'sourceCommit':os.environ['GITHUB_SHA'],
-            'workflowRun':os.environ['GITHUB_RUN_ID'],
-            'phase':d['phase'],
-            'pass':True,
-            'checkCount':d['checkCount'],
-            'numericalCases':d['numericalCases'],
-            'interfaceAssertions':d['interfaceAssertions'],
-            'geometryCases':d['geometryCases'],
-            'full52StepTrajectories':d['full52StepTrajectories'],
-            'newBrowserChecks':0,
-            'newPublicDeployment':False,
-            'runtimePromotionAllowed':False,
-            'note':'Machine/source verification only. No new public webpage or visual acceptance is claimed.'
-          }
-          (r/'qa/s1b/MACHINE_RECEIPT.json').write_text(json.dumps(receipt,indent=2)+'\n')
-          PY
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$R/BUILD_RESULT.json" "$R/qa/numeric.json" "$R/qa/s1b/SUMMARY.json" "$R/qa/s1b/interfaces.json" "$R/qa/s1b/equivalence.json" "$R/qa/s1b/MACHINE_RECEIPT.json"
-          if ! git diff --cached --quiet; then
-            git commit -m 'test(leather): record R12 S1B canonical-source machine verification'
-            git push origin HEAD:refs/heads/refactor/leather-r12-source-normalization-20261011
-          fi
+      - run: pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5
+      - run: python leather-workshop/r12/build.py && python leather-workshop/r12/verify.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: leather-r12-s1b-${{ github.run_id }}
-          path: |
-            leather-workshop/r12/BUILD_RESULT.json
-            leather-workshop/r12/qa/numeric.json
-            leather-workshop/r12/qa/s1b/
+          name: leather-r12-frozen-s1b1-${{ github.run_id }}
+          path: leather-workshop/r12/qa/
           retention-days: 14
