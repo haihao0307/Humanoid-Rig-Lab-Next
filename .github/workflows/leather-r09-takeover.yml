@@ -1,0 +1,102 @@
+name: Leather R09 takeover verification
+on:
+  push:
+    branches: [fix/leather-r09-takeover-20261011]
+    paths:
+      - .github/workflows/leather-r09-takeover.yml
+      - leather-workshop/r09/**
+permissions:
+  contents: write
+concurrency:
+  group: leather-r09-takeover-20261011
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      R: leather-workshop/r09
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install verification dependencies
+        run: |
+          pip --disable-pip-version-check install playwright==1.55.0 Pillow==11.3.0
+          command -v clang
+          if ! command -v wasm-ld; then sudo apt-get update -qq && sudo apt-get install -y lld; fi
+          command -v wasm-ld
+          google-chrome --version
+          echo "R09_EXPECTED_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Verify frozen baselines and assemble standalone
+        run: |
+          git fetch --depth=1 origin a1c7ab8a1774e69f929488e7ce8abdca9e1df3bc
+          git diff --exit-code a1c7ab8a1774e69f929488e7ce8abdca9e1df3bc -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/r07 leather-workshop/r08
+          python "$R/build.py"
+      - name: Nonlinear energy, swept-contact, yarn-host and thickness gates
+        run: node "$R/qa-numeric.cjs"
+      - name: All seven product assemblies under controlled lift and release
+        run: node "$R/qa-products.cjs"
+      - name: All six sample crafts enter the real nonlinear solver
+        run: node "$R/qa-crafts.cjs"
+      - name: Real offline browser, craft geometry, pointer grab and viewport gates
+        run: xvfb-run -a python -u "$R/qa-browser.py"
+      - name: Publish tested standalone on isolated branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$R/public-lite.html" "$R/BUILD_MANIFEST.json" "$R/qa/numeric.json" "$R/qa/products.json" "$R/qa/crafts.json" "$R"/qa/craft-*.json "$R"/qa/product-*.json "$R/qa/browser/report.json"
+          git commit -m 'build(leather): publish R09.1 standalone after numeric and real-browser gates'
+          git push origin HEAD:refs/heads/fix/leather-r09-takeover-20261011
+          echo "R09_BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "R09_PREVIEW=https://raw.githack.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r09/public-lite.html" >> "$GITHUB_ENV"
+      - name: Verify immutable public webpage in actual Chrome
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          for i in range(12):
+            try:
+              with urllib.request.urlopen(os.environ['R09_PREVIEW'],timeout=30) as r:
+                text=r.read().decode()
+                assert os.environ['R09_EXPECTED_SOURCE_SHA'] in text
+              break
+            except Exception:
+              if i==11: raise
+              time.sleep(8)
+          PY
+          xvfb-run -a python -u "$R/qa-browser.py" --public --url "$R09_PREVIEW"
+      - name: Record public receipt with exact build identity
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,hashlib
+          r=Path(os.environ['R']);manifest=json.loads((r/'BUILD_MANIFEST.json').read_text());reports={}
+          for name in ['numeric.json','products.json','crafts.json','browser/report.json','public/report.json']:
+            p=r/'qa'/name;data=json.loads(p.read_text());assert data['pass'],name;reports[name]=hashlib.sha256(p.read_bytes()).hexdigest()
+          receipt={'version':'R09.1','sourceCommit':os.environ['R09_EXPECTED_SOURCE_SHA'],'buildCommit':os.environ['R09_BUILD_SHA'],'previewURL':os.environ['R09_PREVIEW'],'workflowRun':os.environ['GITHUB_RUN_ID'],'htmlSHA256':manifest['htmlSHA256'],'htmlBytes':manifest['htmlBytes'],'offlineBrowserVerified':True,'publicBrowserVerified':True,'reports':reports,'readyForUserReview':True,'visualAcceptance':'PENDING_USER','productionReady':False,'phoneScope':'390x844 viewport simulation only, not a physical phone','limitations':['not calibrated per leather finish','bounded iterative solve exposes residual; not all solves converged','complex woven physics may be slow','simulation-mesh contact, not all fine-render triangles','quilt filler compression, micro-hole stress and independent yarn sliding not solved']}
+          (r/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git add "$R/DELIVERY.json" "$R/qa/public/report.json"
+          git commit -m 'test(leather): record immutable public browser verification and honest scope'
+          git push origin HEAD:refs/heads/fix/leather-r09-takeover-20261011
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r09-review-${{ github.run_id }}
+          path: |
+            leather-workshop/r09/public-lite.html
+            leather-workshop/r09/BUILD_MANIFEST.json
+            leather-workshop/r09/DELIVERY.json
+            leather-workshop/r09/qa/
+          retention-days: 14
