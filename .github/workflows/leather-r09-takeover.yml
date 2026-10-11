@@ -1,0 +1,46 @@
+name: Leather R09 takeover verification
+on:
+  push:
+    branches: [fix/leather-r09-takeover-20261011]
+    paths:
+      - .github/workflows/leather-r09-takeover.yml
+      - leather-workshop/r09/**
+permissions:
+  contents: write
+concurrency:
+  group: leather-r09-takeover-20261011
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/leather-r09-takeover-20261011
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Capture takeover inputs for source audit
+        run: |
+          mkdir -p /tmp/leather-audit
+          tar -czf /tmp/leather-audit/source.tgz leather-workshop .github/workflows README.md AGENTS.md
+          git rev-parse HEAD > /tmp/leather-audit/source-sha.txt
+          command -v clang || true
+          command -v wasm-ld || true
+          command -v google-chrome || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-r09-source-audit
+          path: /tmp/leather-audit/
+          retention-days: 3
+      - name: Build candidate when implementation is present
+        if: ${{ hashFiles('leather-workshop/r09/build.py') != '' }}
+        run: python leather-workshop/r09/build.py
