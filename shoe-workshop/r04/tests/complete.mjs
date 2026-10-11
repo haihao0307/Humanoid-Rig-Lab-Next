@@ -1,0 +1,2 @@
+import {spawnSync} from 'node:child_process';import {fileURLToPath} from 'node:url';import path from 'node:path';
+const root=path.dirname(fileURLToPath(import.meta.url));for(const f of ['render-budget.mjs','browser.mjs',...(process.argv.includes('--public')?['materials.mjs']:[])]){const r=spawnSync(process.execPath,[path.join(root,f),...process.argv.slice(2)],{stdio:'inherit',env:process.env});if(r.status!==0)process.exit(r.status||1);}

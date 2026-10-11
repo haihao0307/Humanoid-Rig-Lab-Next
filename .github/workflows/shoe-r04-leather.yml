@@ -1,0 +1,95 @@
+name: Shoe R04 leather integration
+on:
+  push:
+    branches: [feature/shoe-r04-leather-integration-20261011]
+    paths: ['shoe-workshop/r04/**', '.github/workflows/shoe-r04-leather.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shoe-r04-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            shoe-workshop
+          fetch-depth: 1
+      - name: Restore verified readable source
+        run: python shoe-workshop/r04/source-transfer/restore.py
+      - uses: actions/checkout@v4
+        with:
+          ref: af389cc216ddd01e3b1aa66c972f42b2587bc797
+          path: _donor
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /leather-workshop/r02/site/
+            /leather-workshop/r05/site/
+            /leather-workshop/r06/site/catalogue.js
+            /leather-workshop/r08/site/
+            /leather-workshop/r08/build.py
+            /leather-workshop/r09/site/
+            /leather-workshop/r09/build.py
+            /leather-workshop/r10/
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pinned browser and geometry dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Read exact R10 runtime and inherited sources
+        run: |
+          mkdir -p shoe-workshop/r04/intake
+          cp -R _donor/leather-workshop shoe-workshop/r04/intake/
+          cat > shoe-workshop/donor-r04.mjs <<'JS'
+          import {chromium} from 'playwright';import fs from 'node:fs';import path from 'node:path';import {pathToFileURL} from 'node:url';
+          const out='shoe-workshop/r04/intake',b=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+          const p=await b.newPage({viewport:{width:1440,height:1050}});const errors=[];p.on('pageerror',e=>errors.push(String(e)));
+          await p.goto(pathToFileURL(path.resolve(out,'leather-workshop/r10/public-lite.html')).href);
+          await p.waitForTimeout(18000);await p.screenshot({path:out+'/donor-r10.png'});
+          fs.writeFileSync(out+'/donor-runtime.json',JSON.stringify(await p.evaluate(()=>({title:document.title,text:document.body.innerText,globals:Object.keys(window).filter(k=>/leather|kaopu|product|seam/i.test(k))})),null,2));
+          fs.writeFileSync(out+'/donor-errors.json',JSON.stringify(errors));await b.close();
+          JS
+          node shoe-workshop/donor-r04.mjs
+      - name: Build and verify new R04 production source
+        id: build
+        run: |
+          node shoe-workshop/r04/tools/prepare.mjs
+          node shoe-workshop/r04/tests/kernel.mjs
+          node shoe-workshop/r04/tools/build.mjs
+          node shoe-workshop/r04/tests/complete.mjs
+          echo 'built=true' >> "$GITHUB_OUTPUT"
+      - name: Publish only R04 files with fast-forward
+        id: publish
+        if: steps.build.outputs.built == 'true'
+        run: |
+          git config user.name 'Shoe R04 Build'
+          git config user.email 'shoe-r04@users.noreply.github.com'
+          git add shoe-workshop/r04
+          if git diff --cached --name-only | grep -v '^shoe-workshop/r04/'; then exit 1; fi
+          git commit -m 'build(shoes): R04 complete assembly candidate, donor material and evidence [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Verify exact public browser and publish receipt
+        if: steps.build.outputs.built == 'true'
+        env:
+          PUBLIC_BUILD_SHA: ${{ steps.publish.outputs.sha }}
+        run: |
+          node shoe-workshop/r04/tests/complete.mjs --public
+          git add shoe-workshop/r04/evidence/public shoe-workshop/r04/PUBLIC_URL.txt
+          git commit -m 'test(shoes): R04 immutable public-byte and browser receipt [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Preserve source intake and real render evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r04-${{ github.run_id }}
+          path: |
+            shoe-workshop/r04/
+          include-hidden-files: true
+          retention-days: 14
