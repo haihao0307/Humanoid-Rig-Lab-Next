@@ -1,0 +1,77 @@
+name: Leather R09 immutable public receipt
+on:
+  push:
+    branches: [fix/leather-r09-takeover-20261011]
+    paths: [.github/workflows/leather-r09-public-receipt.yml]
+permissions:
+  contents: write
+concurrency:
+  group: leather-r09-public-receipt
+  cancel-in-progress: true
+jobs:
+  public:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      R: leather-workshop/r09
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+      R09_BUILD_SHA: 416d2b7a7d7214865fa47b82973450c700a65da9
+      R09_EXPECTED_SOURCE_SHA: 09d6747898c0448fbefbbf17cba9b3780eba6ce2
+      R09_PREVIEW: https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/416d2b7a7d7214865fa47b82973450c700a65da9/leather-workshop/r09/public-lite.html
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: leather-workshop/r09
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install browser verification dependencies
+        run: pip --disable-pip-version-check install playwright==1.55.0 Pillow==11.3.0
+      - name: Verify inherited tested bytes and all previously passed gates
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os,urllib.request
+          r=Path(os.environ['R']);m=json.loads((r/'BUILD_MANIFEST.json').read_text())
+          assert m['sourceCommit']==os.environ['R09_EXPECTED_SOURCE_SHA']
+          raw='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['R09_BUILD_SHA']+'/leather-workshop/r09/public-lite.html'
+          with urllib.request.urlopen(raw,timeout=40) as q: data=q.read()
+          assert hashlib.sha256(data).hexdigest()==m['htmlSHA256']
+          assert data==(r/'public-lite.html').read_bytes()
+          for name in ['numeric.json','products.json','crafts.json','browser/report.json']:
+            q=json.loads((r/'qa'/name).read_text());assert q['pass'],name
+          assert len(json.loads((r/'qa/numeric.json').read_text())['checks'])==18
+          assert len(json.loads((r/'qa/products.json').read_text())['products'])==7
+          assert len(json.loads((r/'qa/crafts.json').read_text())['crafts'])==6
+          print('Exact published build hash and original 18/7/6/21 gates verified')
+          PY
+      - name: Verify original HTMLPreview host in actual Chrome
+        run: xvfb-run -a python -u "$R/qa-browser.py" --public --url "$R09_PREVIEW"
+      - name: Commit independent immutable public receipt
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,hashlib
+          r=Path(os.environ['R']);m=json.loads((r/'BUILD_MANIFEST.json').read_text());reports={}
+          for name in ['numeric.json','products.json','crafts.json','browser/report.json','public/report.json']:
+            p=r/'qa'/name;d=json.loads(p.read_text());assert d['pass'];reports[name]=hashlib.sha256(p.read_bytes()).hexdigest()
+          receipt={'version':'R09.1','sourceCommit':m['sourceCommit'],'buildCommit':os.environ['R09_BUILD_SHA'],'previewURL':os.environ['R09_PREVIEW'],'buildVerificationRun':'38109059424','publicVerificationRun':os.environ['GITHUB_RUN_ID'],'htmlSHA256':m['htmlSHA256'],'htmlBytes':m['htmlBytes'],'offlineBrowserVerified':True,'publicBrowserVerified':True,'reports':reports,'readyForUserReview':True,'visualAcceptance':'PENDING_USER','productionReady':False,'phoneScope':'390x844 viewport simulation only, not a physical phone','failedDeliveryHost':{'name':'raw.githack.com','status':403,'usedForDelivery':False},'limitations':['not calibrated per leather finish','bounded iterative solves expose residual; not every step converges to R04 tolerance','physics may run considerably slower than real time, particularly large products and woven strips','simulation-mesh contact, not all fine-render triangles','jacket crafts affect patch pockets only; hats and belt craft variants not implemented','quilt filler compression, micro-hole stress and independent yarn sliding not solved']}
+          (r/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$R/DELIVERY.json" "$R/qa/public/report.json"
+          git commit -m 'test(leather): certify original-host public R09.1 page with exact build and honest limits'
+          git push origin HEAD:refs/heads/fix/leather-r09-takeover-20261011
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r09-public-${{ github.run_id }}
+          path: |
+            leather-workshop/r09/public-lite.html
+            leather-workshop/r09/BUILD_MANIFEST.json
+            leather-workshop/r09/DELIVERY.json
+            leather-workshop/r09/qa/
+          retention-days: 14
