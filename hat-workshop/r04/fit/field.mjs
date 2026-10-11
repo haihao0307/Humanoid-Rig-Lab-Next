@@ -1,10 +1,13 @@
+import {fitBeanie} from './beanie.mjs';
+import {fitKnit} from './knit.mjs';
 /* R04: material thickness and supported fit are distinct. No pointwise contact clamp.
  * All source panels share a continuous fit transform; folded layers retain separation.
  * This is an explicit geometric fitting model, not a textile/contact dynamics solver. */
 import {normals,sectionProfile,sample,measurements,FIT_SPECS} from '../mother.mjs';
+import {sourceFitProfile as sourceDatum} from '../../r03/fit/field.mjs';
 const TAU=2*Math.PI,clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)),mix=(a,b,t)=>a+(b-a)*t,smooth=x=>{x=clamp(x);return x*x*(3-2*x);};
 export const CONSTRUCTION={
- cable:{bandY:8,pitch:0,material:3.6,apexAir:12,mode:'knit',sourceY:-.055,label:'针织：帽口与下冠承托；帽身有实体厚度，翻边保留叠层'},
+ cable:{bandY:12,pitch:0,material:3.6,apexAir:12,mode:'knit',sourceY:-.055,label:'针织：帽口与下冠承托；帽身有实体厚度，翻边保留叠层'},
  sherpa:{bandY:12,pitch:0,material:2.8,apexAir:12,mode:'knit-flaps',sourceY:-.036,label:'护耳：帽冠承托；耳片在耳外，系带不参与量头'},
  trilby:{bandY:28,pitch:1,material:1.6,mode:'blocked',sourceY:.026,label:'礼帽：内汗带承托；帽冠、外饰带和帽檐不贴头皮'},
  bowler:{bandY:19,pitch:0,material:1.8,mode:'blocked',sourceY:.022,label:'圆顶帽：汗带承托，保留原内外壳与圆顶空间'},
@@ -14,7 +17,7 @@ export const CONSTRUCTION={
  patrol:{bandY:20,pitch:0,material:1,mode:'woven',sourceY:.018,label:'便帽：内圈承托，平顶与前檐不按头皮投影'},
  visor:{bandY:20,pitch:0,material:1.2,mode:'open',sourceY:.037,label:'空顶帽：只由帽带承托，前檐与顶部空间不贴头'},
  cloche:{bandY:17,pitch:0,material:1.4,mode:'blocked',sourceY:-.013,label:'钟形帽：内圈承托，低垂檐不作为佩戴圈'},
- chef:{bandY:22,pitch:0,material:.8,mode:'gathered',sourceY:.029,label:'厨师帽：底带定位，帽顶褶量保留'}
+ chef:{bandY:25,pitch:0,material:.8,mode:'gathered',sourceY:.029,label:'厨师帽：底带定位，帽顶褶量保留'}
 };
 // Intersect the actual input triangles with planes using one fixed axis; no changing centre.
 function polarField(p,ix,ymin,ymax,rows=96,angles=128){
@@ -34,11 +37,17 @@ function polarAt(F,y,a,which='inner'){
 function robustRing(F,y){const L=[];for(let a=0;a<F.angles;a++){let r=polarAt(F,y,a*TAU/F.angles);if(!Number.isFinite(r)||r<.03){r=polarAt(F,y+.003,a*TAU/F.angles);}L.push(r);}const good=L.filter(Number.isFinite).sort((a,b)=>a-b);if(good.length<F.angles*.7)throw Error('帽口截面不完整：必须补充该帽型测量锚点');const median=good[Math.floor(good.length/2)];return L.map(x=>Number.isFinite(x)&&x>.03?x:median);}
 function roundRing(R,a){const t=((a%TAU+TAU)%TAU)*R.length/TAU,j=Math.floor(t);return mix(R[j],R[(j+1)%R.length],t-j);}
 export function sourceFitProfile(mesh,meta){
- const c=CONSTRUCTION[meta.id],p=Float32Array.from(mesh.position,(v,i)=>v-meta.origin[i%3]);let lo=Infinity,hi=-Infinity;for(let i=1;i<p.length;i+=3){lo=Math.min(lo,p[i]);hi=Math.max(hi,p[i]);}
- const F=polarField(p,mesh.index,Math.max(lo+.0001,c.sourceY-.024),hi-.00001),ring=robustRing(F,c.sourceY);
- return {p,field:F,ring,top:hi,sourceBand:c.sourceY,construction:c};
+ const c=CONSTRUCTION[meta.id],datum=sourceDatum(mesh,meta),knit=c.mode.startsWith('knit');
+ const p=knit?new Float32Array(datum.q):Float32Array.from(mesh.position,(v,i)=>v-meta.origin[i%3]);let lo=Infinity,hi=-Infinity;for(let i=1;i<p.length;i+=3){lo=Math.min(lo,p[i]);hi=Math.max(hi,p[i]);}
+ let sourceBand=knit?0:c.sourceY;const F=polarField(p,mesh.index,Math.max(lo+.0001,sourceBand-.024),hi-.00001);let ring;
+ if(meta.id==='flatcap'){sourceBand=datum.frame.c+datum.ring.y;ring=Array.from({length:128},(_,i)=>datum.ring.radius(i*TAU/128));}
+ else if(meta.id==='visor'){ring=Array.from({length:128},(_,i)=>datum.ring.radius(i*TAU/128));}
+ else{try{ring=robustRing(F,sourceBand+.002);}catch(e){const valid=F.layers.filter(l=>Array.from(l.inner).filter(x=>Number.isFinite(x)&&x>.03).length/F.angles>.97).sort((a,b)=>Math.abs(a.y-sourceBand)-Math.abs(b.y-sourceBand));if(!valid.length)throw e;sourceBand=valid[0].y;ring=robustRing(F,sourceBand);}}
+ return {p,field:F,ring,top:hi,sourceBand,construction:c,sourceDatum:knit?datum.frame:{method:'nearest actual encircling inner section, no radius from decorative brim',sourceBand}};
 }
 export function deform(mesh,meta,s,headProfile,src){
+ if(meta.id==='cable'&&s.autoFit&&headProfile)return fitBeanie(mesh,meta,s,headProfile);
+ if(meta.id==='sherpa'&&s.autoFit&&headProfile)return fitKnit(mesh,meta,s,headProfile);
  const c=src.construction,knit=c.mode.startsWith('knit'),fit=s.autoFit&&headProfile,band=s.wearBandMM/1000,thick=s.materialMM/1000,clear=(s.clearanceMM+s.hairMM)/1000,p=src.p,out=new Float32Array(p.length),colors=new Float32Array(p.length),pitch=s.wearPitchDeg*Math.PI/180,co=Math.cos(pitch),si=Math.sin(pitch),sourceH=src.top-src.sourceBand;
  let sx=1,sz=1,common=1,translation=[0,0];
  if(fit){const mm=measurements(headProfile,band);translation=sample(headProfile,band,0).center;const srcX=roundRing(src.ring,0)+roundRing(src.ring,Math.PI),srcZ=roundRing(src.ring,Math.PI/2)+roundRing(src.ring,Math.PI*1.5);sx=(mm.widthMM/1000+2*(clear+(knit?thick:1.2e-3)))/srcX;sz=(mm.depthMM/1000+2*(clear+(knit?thick:1.2e-3)))/srcZ;

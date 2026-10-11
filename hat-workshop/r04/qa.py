@@ -1,3 +1,4 @@
+# independent wall export: raw dumps stay in Actions evidence, not production assets
 from pathlib import Path
 import json,argparse,time,hashlib,io
 import numpy as np
@@ -35,6 +36,7 @@ def run(url=None):
     for head in [1,2]:
      page.evaluate('(head)=>hatLab.set({head})',head);page.evaluate('hatLab.frame()');page.wait_for_timeout(100);check('head switch '+id+' '+str(head),page.evaluate('hatLab.recipe().settings.head')==head)
      if id in ['cable','trilby','sherpa']:page.locator('#canvas').screenshot(path=str(out/(id+'-head-'+str(head)+'.png')))
+     if id=='cable':(out/('cable-head-'+str(head)+'-geometry.json')).write_text(json.dumps(page.evaluate('hatLab.debugGeometry()')))
    check('category-specific placement',len(set(v['wearBandMM'] for v in defaults.values()))>=5,defaults)
    page.evaluate("hatLab.select('cable')");page.evaluate("hatLab.set({head:0,view:'wear',cutaway:false,materialMM:3.6})");page.evaluate('hatLab.frame()');page.wait_for_timeout(100);original=page.evaluate('hatLab.recipe()');before=page.locator('#canvas').screenshot();page.screenshot(path=str(out/'desktop.png'))
    page.evaluate('hatLab.set({materialMM:5})');page.wait_for_timeout(100);check('thickness changes real geometry and pixels',page.evaluate('hatLab.metrics().shell.materialThicknessMM')==5 and page.locator('#canvas').screenshot()!=before);page.evaluate('(r)=>hatLab.restore(r)',original)
