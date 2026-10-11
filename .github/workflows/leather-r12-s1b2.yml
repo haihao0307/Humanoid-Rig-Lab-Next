@@ -1,0 +1,41 @@
+name: Leather R12 S1B2 application integration
+on:
+  push:
+    branches: [refactor/leather-r12-source-normalization-20261011]
+    paths:
+      - .github/workflows/leather-r12-s1b2.yml
+permissions:
+  contents: read
+concurrency:
+  group: leather-r12-s1b2
+  cancel-in-progress: true
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: |
+            leather-workshop/r12
+            leather-workshop/r10
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install deterministic build dependencies
+        run: pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5
+      - name: Rebuild inherited S1B1 candidate from its canonical sources
+        run: python leather-workshop/r12/build.py
+      - name: Package exact project inputs for application-interface review
+        run: |
+          mkdir -p /tmp/leather-s1b2-review
+          tar -czf /tmp/leather-s1b2-review/source.tgz leather-workshop/r12 leather-workshop/r10 leather-workshop/START_HERE.md leather-workshop/ROADMAP.md leather-workshop/TASK_STATE.json leather-workshop/AGENTS.md AGENTS.md LICENSE .github/workflows/leather-r12-s1b-verification.yml .github/workflows/leather-r12-s1b2.yml
+          git rev-parse HEAD > /tmp/leather-s1b2-review/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-r12-s1b2-source-${{ github.run_id }}
+          path: /tmp/leather-s1b2-review/
+          retention-days: 3
