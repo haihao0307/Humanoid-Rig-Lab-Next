@@ -1,0 +1,652 @@
+{
+  "craft": "woven",
+  "pass": true,
+  "report": {
+    "integrationSubstepS": 0.008333333333333333,
+    "substepsPerNominalFrameStep": 1,
+    "iterationsPerSubstep": 25,
+    "seamConstraintCount": 60,
+    "maxSeamGapErrorMM": 0.0033557418787442256,
+    "version": "R09-implicit-1",
+    "timeS": 0.049999999999999996,
+    "steps": 6,
+    "extraConvergenceIterations": 0,
+    "nodeCount": 2952,
+    "triangles": 3854,
+    "massG": 34.16863939567153,
+    "centerMM": [
+      -0.09213540725126411,
+      9.488475922443413,
+      -0.006595984229602896
+    ],
+    "maxStretch": 1.0033084843694262,
+    "peakStretch": 1.0452107993645938,
+    "maxEdgeChangeMM": 0.019514133605638695,
+    "groundMinMM": 0.4994270897839458,
+    "grabErrorMM": 0,
+    "grabForceN": 0,
+    "held": false,
+    "active": true,
+    "finite": true,
+    "failed": null,
+    "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+    "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+    "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+    "calibrated": false,
+    "surfaceContact": {
+      "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+      "contactPairs": 854,
+      "ccdEvents": 3534,
+      "ptEvents": 102,
+      "eeEvents": 3432,
+      "frictionEvents": 4084,
+      "normalForceN": 39.974186232059864,
+      "maxPenetrationMM": 0,
+      "safeStep": 1,
+      "limitedSteps": 0,
+      "initialOverlaps": 0,
+      "initialMinGapMM": 0.07838756879972365,
+      "minimumClearanceMM": 0.03703789620036009,
+      "initialAudit": {
+        "scope": "topologically non-neighbour simulation primitives",
+        "minClearanceMM": 0.07838756879972365,
+        "penetrating": 0,
+        "intersection": 0,
+        "worst": []
+      },
+      "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+      "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+    },
+    "dampingPerSecond": 2.5,
+    "gripStiffnessNPerM": 4000,
+    "acceptedPrincipalLimit": null,
+    "strainLimit": null,
+    "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+    "residualN": 0.7905747956130269,
+    "solverIterations": 25,
+    "lbfgsIterations": 150,
+    "incrementalPotentialJ": 0.003944951494695183,
+    "contactRangeMM": 0.1,
+    "convergedToR04Residual": false,
+    "initialization": {
+      "method": "bounded ribbon-only finite-thickness assembly seating",
+      "restGeometryChanged": false,
+      "iterations": 7,
+      "maximumDisplacementMM": 0.3124873379180415,
+      "before": {
+        "scope": "topologically non-neighbour simulation primitives",
+        "minClearanceMM": -0.3453331338104032,
+        "penetrating": 364,
+        "intersection": 0,
+        "worst": [
+          {
+            "key": "e452:3566",
+            "gapMM": 0.7,
+            "distanceMM": 0.3703558480054639,
+            "ids": [
+              1620,
+              1619,
+              105,
+              106
+            ]
+          },
+          {
+            "key": "e646:3575",
+            "gapMM": 0.7,
+            "distanceMM": 0.3870608096305248,
+            "ids": [
+              1618,
+              1617,
+              190,
+              191
+            ]
+          },
+          {
+            "key": "e840:3583",
+            "gapMM": 0.7,
+            "distanceMM": 0.44877126491045627,
+            "ids": [
+              1616,
+              1615,
+              275,
+              276
+            ]
+          },
+          {
+            "key": "e1034:3591",
+            "gapMM": 0.7,
+            "distanceMM": 0.47040732238650024,
+            "ids": [
+              1614,
+              1613,
+              360,
+              361
+            ]
+          },
+          {
+            "key": "e1228:3599",
+            "gapMM": 0.7,
+            "distanceMM": 0.546998143348451,
+            "ids": [
+              1612,
+              1611,
+              445,
+              446
+            ]
+          },
+          {
+            "key": "e1422:3607",
+            "gapMM": 0.7,
+            "distanceMM": 0.5694923716753331,
+            "ids": [
+              1610,
+              1609,
+              530,
+              531
+            ]
+          },
+          {
+            "key": "e1616:3615",
+            "gapMM": 0.7,
+            "distanceMM": 0.6553670954848847,
+            "ids": [
+              1608,
+              1607,
+              615,
+              616
+            ]
+          },
+          {
+            "key": "e2218:3655",
+            "gapMM": 0.7,
+            "distanceMM": 0.6553670954849175,
+            "ids": [
+              1598,
+              1597,
+              1006,
+              1007
+            ]
+          },
+          {
+            "key": "e2412:3663",
+            "gapMM": 0.7,
+            "distanceMM": 0.569492371675271,
+            "ids": [
+              1596,
+              1595,
+              1091,
+              1092
+            ]
+          },
+          {
+            "key": "e2606:3671",
+            "gapMM": 0.7,
+            "distanceMM": 0.5469981433483353,
+            "ids": [
+              1594,
+              1593,
+              1176,
+              1177
+            ]
+          },
+          {
+            "key": "e2800:3679",
+            "gapMM": 0.7,
+            "distanceMM": 0.47040732238651434,
+            "ids": [
+              1592,
+              1591,
+              1261,
+              1262
+            ]
+          },
+          {
+            "key": "e2994:3687",
+            "gapMM": 0.7,
+            "distanceMM": 0.44877126491048364,
+            "ids": [
+              1590,
+              1589,
+              1346,
+              1347
+            ]
+          },
+          {
+            "key": "e3188:3693",
+            "gapMM": 0.7,
+            "distanceMM": 0.38706080963065187,
+            "ids": [
+              1588,
+              1587,
+              1431,
+              1432
+            ]
+          },
+          {
+            "key": "e3382:3703",
+            "gapMM": 0.7,
+            "distanceMM": 0.3703558480056816,
+            "ids": [
+              1586,
+              1585,
+              1516,
+              1517
+            ]
+          },
+          {
+            "key": "e3370:3707",
+            "gapMM": 0.7,
+            "distanceMM": 0.3743734004640899,
+            "ids": [
+              1583,
+              1582,
+              1518,
+              1519
+            ]
+          },
+          {
+            "key": "e3176:3713",
+            "gapMM": 0.7,
+            "distanceMM": 0.3915538258644871,
+            "ids": [
+              1581,
+              1580,
+              1433,
+              1434
+            ]
+          }
+        ]
+      },
+      "after": {
+        "scope": "topologically non-neighbour simulation primitives",
+        "minClearanceMM": 0.07838756879972365,
+        "penetrating": 0,
+        "intersection": 0,
+        "worst": []
+      },
+      "accepted": true
+    }
+  },
+  "contact": {
+    "scope": "topologically non-neighbour simulation primitives",
+    "minClearanceMM": 0.03703789620036009,
+    "penetrating": 0,
+    "intersection": 0,
+    "worst": []
+  },
+  "thickness": [
+    {
+      "part": "craft-leather-sample",
+      "minMM": 1.290468238292888,
+      "maxMM": 1.4091112703808915,
+      "targetMM": 1.4,
+      "sampleCount": 81,
+      "wallEdges": 3460,
+      "boundaryEdges": 3460,
+      "periodic": 0,
+      "chordErrorMM": 0.0015480459996477073,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-0",
+      "minMM": 0.6999999713903153,
+      "maxMM": 0.7000000312045997,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1016,
+      "boundaryEdges": 1016,
+      "periodic": 0,
+      "chordErrorMM": 0.003988829617958455,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-1",
+      "minMM": 0.6999999679903632,
+      "maxMM": 0.7000000322408244,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1024,
+      "boundaryEdges": 1024,
+      "periodic": 0,
+      "chordErrorMM": 0.00395481111265157,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-2",
+      "minMM": 0.6999999701253279,
+      "maxMM": 0.7000000300708663,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1016,
+      "boundaryEdges": 1016,
+      "periodic": 0,
+      "chordErrorMM": 0.003988789297161184,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-3",
+      "minMM": 0.699999969962884,
+      "maxMM": 0.7000000284680036,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1024,
+      "boundaryEdges": 1024,
+      "periodic": 0,
+      "chordErrorMM": 0.0039547090822153646,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-4",
+      "minMM": 0.6999999692158019,
+      "maxMM": 0.7000000293898619,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1016,
+      "boundaryEdges": 1016,
+      "periodic": 0,
+      "chordErrorMM": 0.003988734921569226,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-5",
+      "minMM": 0.699999969110448,
+      "maxMM": 0.7000000318155638,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1024,
+      "boundaryEdges": 1024,
+      "periodic": 0,
+      "chordErrorMM": 0.00395459630095154,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-6",
+      "minMM": 0.6999999677006041,
+      "maxMM": 0.7000000285692551,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1016,
+      "boundaryEdges": 1016,
+      "periodic": 0,
+      "chordErrorMM": 0.0039886865494718855,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-7",
+      "minMM": 0.6999999668186712,
+      "maxMM": 0.7000000303455,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1024,
+      "boundaryEdges": 1024,
+      "periodic": 0,
+      "chordErrorMM": 0.00395451635095661,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-8",
+      "minMM": 0.6999999693815684,
+      "maxMM": 0.7000000364251326,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1016,
+      "boundaryEdges": 1016,
+      "periodic": 0,
+      "chordErrorMM": 0.003988662773312129,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-9",
+      "minMM": 0.6999999656514924,
+      "maxMM": 0.700000022510754,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1024,
+      "boundaryEdges": 1024,
+      "periodic": 0,
+      "chordErrorMM": 0.00395451635093341,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-10",
+      "minMM": 0.6999999680313065,
+      "maxMM": 0.7000000315961796,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1016,
+      "boundaryEdges": 1016,
+      "periodic": 0,
+      "chordErrorMM": 0.00398868654947852,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-11",
+      "minMM": 0.699999972346339,
+      "maxMM": 0.7000000379795798,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1024,
+      "boundaryEdges": 1024,
+      "periodic": 0,
+      "chordErrorMM": 0.00395459630095449,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-12",
+      "minMM": 0.6999999713566338,
+      "maxMM": 0.7000000348256001,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1016,
+      "boundaryEdges": 1016,
+      "periodic": 0,
+      "chordErrorMM": 0.00398873492159919,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-13",
+      "minMM": 0.6999999667516097,
+      "maxMM": 0.700000033923077,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1024,
+      "boundaryEdges": 1024,
+      "periodic": 0,
+      "chordErrorMM": 0.003954709082227513,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-14",
+      "minMM": 0.6999999715291153,
+      "maxMM": 0.7000000260719434,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1016,
+      "boundaryEdges": 1016,
+      "periodic": 0,
+      "chordErrorMM": 0.00398878929714463,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-15",
+      "minMM": 0.6999999711466381,
+      "maxMM": 0.700000029956405,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1024,
+      "boundaryEdges": 1024,
+      "periodic": 0,
+      "chordErrorMM": 0.003954811112629324,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-0-16",
+      "minMM": 0.6999999702702673,
+      "maxMM": 0.700000028207931,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1016,
+      "boundaryEdges": 1016,
+      "periodic": 0,
+      "chordErrorMM": 0.003988829617934918,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-0",
+      "minMM": 0.6999999659162809,
+      "maxMM": 0.7000000432084744,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1332,
+      "boundaryEdges": 1332,
+      "periodic": 0,
+      "chordErrorMM": 0.003986823307659989,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-1",
+      "minMM": 0.6999999510023142,
+      "maxMM": 0.7000000669119296,
+      "targetMM": 0.7,
+      "sampleCount": 84,
+      "wallEdges": 1344,
+      "boundaryEdges": 1344,
+      "periodic": 0,
+      "chordErrorMM": 0.003967482973921862,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-2",
+      "minMM": 0.6999999372221327,
+      "maxMM": 0.700000063735533,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1332,
+      "boundaryEdges": 1332,
+      "periodic": 0,
+      "chordErrorMM": 0.003986660946261289,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-3",
+      "minMM": 0.6999999569391756,
+      "maxMM": 0.7000000712143308,
+      "targetMM": 0.7,
+      "sampleCount": 84,
+      "wallEdges": 1344,
+      "boundaryEdges": 1344,
+      "periodic": 0,
+      "chordErrorMM": 0.003967542340244762,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-4",
+      "minMM": 0.6999999368010857,
+      "maxMM": 0.7000000515025202,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1332,
+      "boundaryEdges": 1332,
+      "periodic": 0,
+      "chordErrorMM": 0.003986557926746172,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-5",
+      "minMM": 0.699999930452466,
+      "maxMM": 0.7000000631470497,
+      "targetMM": 0.7,
+      "sampleCount": 84,
+      "wallEdges": 1344,
+      "boundaryEdges": 1344,
+      "periodic": 0,
+      "chordErrorMM": 0.003967568726959379,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-6",
+      "minMM": 0.6999999411634502,
+      "maxMM": 0.7000000334515273,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1332,
+      "boundaryEdges": 1332,
+      "periodic": 0,
+      "chordErrorMM": 0.003986515174121827,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-7",
+      "minMM": 0.6999999533297656,
+      "maxMM": 0.7000000726897628,
+      "targetMM": 0.7,
+      "sampleCount": 84,
+      "wallEdges": 1344,
+      "boundaryEdges": 1344,
+      "periodic": 0,
+      "chordErrorMM": 0.0039675687269559124,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-8",
+      "minMM": 0.6999999389497679,
+      "maxMM": 0.7000000455120509,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1332,
+      "boundaryEdges": 1332,
+      "periodic": 0,
+      "chordErrorMM": 0.003986557926738309,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-9",
+      "minMM": 0.6999999375369065,
+      "maxMM": 0.7000000696242271,
+      "targetMM": 0.7,
+      "sampleCount": 84,
+      "wallEdges": 1344,
+      "boundaryEdges": 1344,
+      "periodic": 0,
+      "chordErrorMM": 0.00396754234024206,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-10",
+      "minMM": 0.6999999550233528,
+      "maxMM": 0.7000000589318386,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1332,
+      "boundaryEdges": 1332,
+      "periodic": 0,
+      "chordErrorMM": 0.0039866609462530745,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-11",
+      "minMM": 0.699999950823391,
+      "maxMM": 0.7000000757263404,
+      "targetMM": 0.7,
+      "sampleCount": 84,
+      "wallEdges": 1344,
+      "boundaryEdges": 1344,
+      "periodic": 0,
+      "chordErrorMM": 0.00396748297392436,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    },
+    {
+      "part": "woven-1-12",
+      "minMM": 0.6999999601062041,
+      "maxMM": 0.7000000498616998,
+      "targetMM": 0.7,
+      "sampleCount": 83,
+      "wallEdges": 1332,
+      "boundaryEdges": 1332,
+      "periodic": 0,
+      "chordErrorMM": 0.003986823307669138,
+      "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+    }
+  ],
+  "elapsedMS": 12549.633086
+}

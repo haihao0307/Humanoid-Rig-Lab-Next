@@ -1,0 +1,369 @@
+{
+  "version": "R10.0",
+  "checks": [
+    {
+      "name": "Full coupled solver stops a falling triangle at finite thickness rather than passing through the face",
+      "pass": true,
+      "data": {
+        "report": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 0,
+          "maxSeamGapErrorMM": 0,
+          "version": "R09-implicit-1",
+          "timeS": 0.19999999999999998,
+          "steps": 24,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 6,
+          "triangles": 2,
+          "massG": 4.927440000000002,
+          "centerMM": [
+            -4.3555429525280075e-20,
+            100.0083446039786,
+            -16.57756563245823
+          ],
+          "maxStretch": 1.0000000000000002,
+          "peakStretch": 1.0000000000000002,
+          "maxEdgeChangeMM": 1.734723475976807e-15,
+          "groundMinMM": 99.3,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": false,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 3,
+            "ccdEvents": 12,
+            "ptEvents": 12,
+            "eeEvents": 0,
+            "frictionEvents": 69,
+            "normalForceN": 0.00021779275407379095,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": null,
+            "minimumClearanceMM": 0.0984524573022698,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": null,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0.00007259758469169993,
+          "solverIterations": 0,
+          "lbfgsIterations": 6,
+          "incrementalPotentialJ": 1.1205506551381925e-10,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": true,
+          "initialization": null
+        },
+        "contact": {
+          "scope": "topologically non-neighbour simulation primitives",
+          "minClearanceMM": null,
+          "penetrating": 0,
+          "intersection": 0,
+          "worst": []
+        }
+      }
+    },
+    {
+      "name": "Fixed collision surface is not moved by the nonlinear solver",
+      "pass": true,
+      "data": {}
+    },
+    {
+      "name": "Swept edge-edge crossing detected between endpoints",
+      "pass": true,
+      "data": {
+        "ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "d": 0.010000000189999997,
+        "w": [
+          0.5,
+          0.5,
+          -0.5,
+          -0.5
+        ],
+        "n": [
+          0,
+          -1,
+          0
+        ],
+        "t": 0.474999999525,
+        "conservative": true,
+        "initial": false
+      }
+    },
+    {
+      "name": "WASM narrow phase agrees with retained JavaScript reference",
+      "pass": true,
+      "data": {
+        "cases": 160,
+        "maxDistanceError": 2.7755575615628914e-17,
+        "maxTimeError": 5.551115123125783e-17
+      }
+    },
+    {
+      "name": "Full nonlinear energy and gradient native/reference 012",
+      "pass": true,
+      "data": {
+        "energy": 0.080898612888671,
+        "maxGradientError": 1.7763568394002505e-15
+      }
+    },
+    {
+      "name": "Full nonlinear energy and gradient native/reference 120",
+      "pass": true,
+      "data": {
+        "energy": 0.08089861288867096,
+        "maxGradientError": 0
+      }
+    },
+    {
+      "name": "Full nonlinear energy and gradient native/reference 201",
+      "pass": true,
+      "data": {
+        "energy": 0.080898612888671,
+        "maxGradientError": 1.7763568394002505e-15
+      }
+    },
+    {
+      "name": "Full nonlinear energy and gradient native/reference 021",
+      "pass": true,
+      "data": {
+        "energy": 0.080898612888671,
+        "maxGradientError": 1.7763568394002505e-15
+      }
+    },
+    {
+      "name": "Full nonlinear energy and gradient native/reference 210",
+      "pass": true,
+      "data": {
+        "energy": 0.080898612888671,
+        "maxGradientError": 1.7763568394002505e-15
+      }
+    },
+    {
+      "name": "Full nonlinear energy and gradient native/reference 102",
+      "pass": true,
+      "data": {
+        "energy": 0.080898612888671,
+        "maxGradientError": 1.7763568394002505e-15
+      }
+    },
+    {
+      "name": "Material energy does not depend on triangle enumeration",
+      "pass": true,
+      "data": {
+        "energies": [
+          0.080898612888671,
+          0.08089861288867096,
+          0.080898612888671,
+          0.080898612888671,
+          0.080898612888671,
+          0.080898612888671
+        ]
+      }
+    },
+    {
+      "name": "Rear-only 1 mm movement reaches rear exposed saddle thread without moving front exposed thread",
+      "pass": true,
+      "data": {
+        "rearSamples": 120,
+        "frontSamples": 122,
+        "rearErrorMM": 4.470348358154297e-8,
+        "frontMotionMM": 0
+      }
+    },
+    {
+      "name": "Thickness reads live world-space skins, not static vertex coordinates",
+      "pass": true,
+      "data": {
+        "before": [
+          {
+            "part": "wallet-panel-0",
+            "minMM": 1.0305898189544676,
+            "maxMM": 1.2199883460998535,
+            "targetMM": 1.2,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.002483459510396708,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-1",
+            "minMM": 1.025554895401001,
+            "maxMM": 1.2199195623397827,
+            "targetMM": 1.2,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.0024834595103960066,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-2",
+            "minMM": 1.0305898189544678,
+            "maxMM": 1.219700813293457,
+            "targetMM": 1.2,
+            "sampleCount": 82,
+            "wallEdges": 1184,
+            "boundaryEdges": 1184,
+            "periodic": 0,
+            "chordErrorMM": 0.002483459510396502,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          }
+        ],
+        "after": [
+          {
+            "part": "wallet-panel-0",
+            "minMM": 2.061179637908935,
+            "maxMM": 2.439976692199707,
+            "targetMM": 1.2,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.002483459510396708,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-1",
+            "minMM": 2.051109790802002,
+            "maxMM": 2.4398391246795654,
+            "targetMM": 1.2,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.0024834595103960066,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-2",
+            "minMM": 2.0611796379089355,
+            "maxMM": 2.439401626586914,
+            "targetMM": 1.2,
+            "sampleCount": 82,
+            "wallEdges": 1184,
+            "boundaryEdges": 1184,
+            "periodic": 0,
+            "chordErrorMM": 0.002483459510396502,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Positive closed shells at thickness scale 0.65",
+      "pass": true,
+      "data": {}
+    },
+    {
+      "name": "Positive closed shells at thickness scale 1",
+      "pass": true,
+      "data": {}
+    },
+    {
+      "name": "Positive closed shells at thickness scale 1.8",
+      "pass": true,
+      "data": {}
+    },
+    {
+      "name": "Thickness changes area-density mass consistently in the unchanged sample",
+      "pass": true,
+      "data": {
+        "mass": [
+          {
+            "scale": 0.65,
+            "massG": 13.389875825021278,
+            "thickness": [
+              {
+                "part": "craft-leather-sample",
+                "minMM": 0.8186182005541593,
+                "maxMM": 0.9162646497158488,
+                "targetMM": 0.9099999999999999,
+                "sampleCount": 81,
+                "wallEdges": 3460,
+                "boundaryEdges": 3460,
+                "periodic": 0,
+                "chordErrorMM": 0.0012909401750154457,
+                "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+              }
+            ]
+          },
+          {
+            "scale": 1,
+            "massG": 20.599808961571206,
+            "thickness": [
+              {
+                "part": "craft-leather-sample",
+                "minMM": 1.2904682382928865,
+                "maxMM": 1.4091112703808943,
+                "targetMM": 1.4,
+                "sampleCount": 81,
+                "wallEdges": 3460,
+                "boundaryEdges": 3460,
+                "periodic": 0,
+                "chordErrorMM": 0.0015480459996477073,
+                "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+              }
+            ]
+          },
+          {
+            "scale": 1.8,
+            "massG": 37.079656130828184,
+            "thickness": [
+              {
+                "part": "craft-leather-sample",
+                "minMM": 2.3771872838057493,
+                "maxMM": 2.5345654042039327,
+                "targetMM": 2.52,
+                "sampleCount": 81,
+                "wallEdges": 3460,
+                "boundaryEdges": 3460,
+                "periodic": 0,
+                "chordErrorMM": 0.0020008124919391242,
+                "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Native swept-contact batching retains every pair and the same safe fraction",
+      "pass": true,
+      "data": {
+        "single": 0.11699998830000014,
+        "batched": 0.11699998830000014,
+        "pairs": 100003
+      }
+    }
+  ],
+  "pass": true
+}
