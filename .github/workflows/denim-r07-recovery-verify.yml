@@ -1,0 +1,60 @@
+name: Denim R07 recovered delivery verification
+on:
+  push:
+    branches: [test/denim-r07-recovery-20261011]
+    paths:
+      - .github/workflows/denim-r07-recovery-verify.yml
+      - denim-workshop/r07-recovery/**
+permissions:
+  contents: read
+concurrency:
+  group: denim-r07-recovery-verification
+  cancel-in-progress: true
+jobs:
+  verify-recovered-artifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Numeric and source verification of the recovered runtime
+        run: |
+          node --check denim-workshop/r07/app.js
+          node --check denim-workshop/r07/natural-yarn.js
+          node --check denim-workshop/r07/sampling.js
+          node denim-workshop/r07/test-layers.cjs
+          node denim-workshop/r07/test-stability.cjs
+          python -m py_compile denim-workshop/r07-recovery/verify.py
+      - name: Install the independent browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6 scipy==1.15.3
+          python -m playwright install --with-deps chromium
+      - name: Actual file and immutable public browser, desktop and mobile viewport
+        run: xvfb-run -a python denim-workshop/r07-recovery/verify.py
+      - name: Repeat the matched R06 versus R07 motion experiment
+        run: xvfb-run -a python denim-workshop/r07/qa.py --alias-only
+      - name: Verify no production source was changed
+        run: |
+          git diff --exit-code HEAD -- denim-workshop/r06 denim-workshop/r07/app.js denim-workshop/r07/core.js denim-workshop/r07/structure.js denim-workshop/r07/fiber-optics.js denim-workshop/r07/natural-yarn.js denim-workshop/r07/template.html denim-workshop/r07/build.py denim-workshop/r07/index.html denim-workshop/r07/sampling.js denim-workshop/r07/BUILD_MANIFEST.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r07-recovery-evidence
+          path: |
+            denim-workshop/r07-recovery
+            denim-workshop/r07/evidence/alias-qa.json
+            denim-workshop/r07/evidence/r06-phase-*.png
+            denim-workshop/r07/evidence/r07-phase-*.png
+            denim-workshop/r07/layers-qa.json
+            denim-workshop/r07/stability-qa.json
+          retention-days: 7
+          if-no-files-found: error
