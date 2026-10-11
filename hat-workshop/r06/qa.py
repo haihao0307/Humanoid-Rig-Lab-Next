@@ -1,16 +1,20 @@
-"""Actual browser checks; memory review never substitutes for file/public release."""
+"""Actual file/HTTPS tests. Source and same-engine repeat hashes stay exact.
+Derived coordinates between Node and Chromium use an explicit tiny Float32 bound.
+"""
 from pathlib import Path
 import argparse,base64,hashlib,json,os,time
 from playwright.sync_api import sync_playwright
 from PIL import Image,ImageDraw
+from portable_geometry import compare_coordinates,self_test,MAX_ERROR_M
 R=Path(__file__).resolve().parent
 p=argparse.ArgumentParser();p.add_argument('--url');p.add_argument('--memory',action='store_true');a=p.parse_args();mode='public' if a.url else 'memory' if a.memory else 'local';Q=R/'qa'/mode;Q.mkdir(parents=True,exist_ok=True)
 M=json.loads((R/'BUILD_MANIFEST.json').read_text());N=json.loads((R/'qa/numeric/report.json').read_text());expected={(x['hat'],x['head']):x for x in N['records'] if x['fixture']=='original'}
 checks=[];errors=[];console=[];http=[];requests=[];cases=[];start=time.monotonic()
-report={'mode':mode,'url':a.url or (R/'standalone.html').as_uri(),'sourceSha':M['sourceSha'],'htmlSHA256':M['htmlSHA256'],'standaloneSHA256':M['standaloneSHA256'],'checks':checks,'cases':cases,'pageErrors':errors,'consoleErrors':console,'failedHTTP':http,'requests':requests,'userVisualAccepted':False,'physicalPhoneTested':False,'hairSimulationImplemented':False,'continuousDonningVerified':False}
+report={'mode':mode,'url':a.url or (R/'standalone.html').as_uri(),'sourceSha':M['sourceSha'],'htmlSHA256':M['htmlSHA256'],'standaloneSHA256':M['standaloneSHA256'],'checks':checks,'cases':cases,'pageErrors':errors,'consoleErrors':console,'failedHTTP':http,'requests':requests,'userVisualAccepted':False,'physicalPhoneTested':False,'hairSimulationImplemented':False,'continuousDonningVerified':False,'crossEngineMaximumM':MAX_ERROR_M,'inputAndRepeatIdentity':'byte-exact','geometryRoundedForTests':False}
 def check(name,ok,detail=None):
  checks.append({'name':name,'passed':bool(ok),'detail':detail});print('CHECK',name,bool(ok),flush=True)
  if not ok:raise AssertionError(name)
+check('portable comparator rejects real displacement, reordering, truncation and NaN',self_test())
 with sync_playwright() as pw:
  kwargs={'headless':not bool(os.environ.get('HAT_HEADED')),'args':['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']}
  if os.environ.get('HAT_CHROMIUM'):kwargs['executable_path']=os.environ['HAT_CHROMIUM']
@@ -29,11 +33,19 @@ with sync_playwright() as pw:
    id=item['id'];t=time.monotonic();page.evaluate('(id)=>hatLab.select(id)',id);page.wait_for_function('hatLab.ready()');hashA=None
    for i,hid in enumerate(['native-default','long_narrow','short_broad']):
     page.evaluate('(head)=>hatLab.set({head})',i);actual=page.evaluate('({geometry:hatLab.geometryHash(),head:hatLab.headGeometryHash(),band:hatLab.bandGeometryHash(),metrics:hatLab.metrics(),contract:hatLab.contract()})');e=expected[(id,hid)]
-    check('exact module/browser fitted geometry '+id+'/'+hid,actual['geometry']==e['outputHash'],{'browser':actual['geometry'],'module':e['outputHash']})
+    coordinates=page.evaluate('Array.from(hatLab.currentPositions())')
+    comparison=compare_coordinates(coordinates,R/'qa/geometry-dump'/f'{hid}--{id}--position.bin')
+    check('bounded cross-engine fitted coordinates '+id+'/'+hid,comparison['passed'],comparison)
     check('immutable source head '+id+'/'+hid,actual['head']==e['headHash'])
-    check('actual inner bearing geometry '+id+'/'+hid,actual['band']==e['bandHash'])
+    bandComparison=None
+    if e['bandHash'] is None:
+     check('no unexpected bearing geometry '+id+'/'+hid,actual['band'] is None)
+    else:
+     band=page.evaluate('Array.from(hatLab.debugGeometry().sweatband.position)')
+     bandComparison=compare_coordinates(band,R/'qa/geometry-dump'/f'{hid}--{id}--band-position.bin')
+     check('bounded cross-engine inner bearing coordinates '+id+'/'+hid,bandComparison['passed'],bandComparison)
     check('fixed category record '+id+'/'+hid,actual['contract']['archetype']==id and actual['contract']['fitStartsFromSourceEveryTime'] and not actual['contract']['headShapeModified'])
-    cases.append({'hat':id,'head':hid,**actual})
+    cases.append({'hat':id,'head':hid,**actual,'moduleGeometryHash':e['outputHash'],'moduleBandHash':e['bandHash'],'coordinateComparison':comparison,'bandCoordinateComparison':bandComparison})
     if i==0:hashA=actual['geometry'];page.evaluate('hatLab.frame("side")');capture(id+'-side');page.evaluate('hatLab.frame("three")');capture(id+'-three')
    page.evaluate('hatLab.set({head:0})');check('A-B-C-A no accumulated deformation '+id,page.evaluate('hatLab.geometryHash()')==hashA)
    old=page.evaluate('hatLab.geometryHash()');refused=page.evaluate('async()=>{try{await hatLab.set({width:1.03});return false}catch(e){return true}}');check('cannot drift locked dimensions '+id,refused and old==page.evaluate('hatLab.geometryHash()'))
@@ -53,7 +65,6 @@ with sync_playwright() as pw:
   page.evaluate('async()=>{await Promise.all([hatLab.select("fishing"),hatLab.select("patrol"),hatLab.select("visor")])}');check('rapid switches retain last complete selection',page.evaluate('hatLab.ready()&&hatLab.metrics().hat==="visor"'))
   page.evaluate('hatLab.select("cable")');page.evaluate('hatLab.frame("three")');page.locator('#viewport').scroll_into_view_if_needed();page.screenshot(path=str(Q/'desktop.png'));page.set_viewport_size({'width':390,'height':844});page.evaluate('hatLab.frame("three")');page.locator('#viewport').scroll_into_view_if_needed();page.wait_for_timeout(250);check('mobile viewport no horizontal overflow',page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'));page.screenshot(path=str(Q/'mobile.png'));page.locator('.hat-card[data-id="chef"]').click();page.wait_for_function('hatLab.ready()&&hatLab.metrics().hat==="chef"');check('mobile category selection works',page.evaluate('hatLab.metrics().hat')=='chef')
   check('no page errors',not errors,errors);check('no console or shader errors',not console,console);check('no failed HTTP',not http,http);report['passed']=True
-  # Internal evidence montage, not a replacement for the interactive website.
   im=Image.new('RGB',(1200,1100),(233,230,222));draw=ImageDraw.Draw(im)
   for j,item in enumerate(page.evaluate('hatLab.catalogue()')):
    x=Image.open(Q/(item['id']+'-three.png')).convert('RGB');x.thumbnail((392,250));im.paste(x,((j%3)*400+(400-x.width)//2,(j//3)*275));draw.text(((j%3)*400+8,(j//3)*275+252),item['id'],fill=(25,30,30))
