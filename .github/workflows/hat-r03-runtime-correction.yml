@@ -1,0 +1,38 @@
+name: Hat R03 Source Runtime Correction
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths: [.github/workflows/hat-r03-runtime-correction.yml]
+permissions:
+  contents: write
+jobs:
+  correct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: hat-workshop/r03
+      - name: Fix generator without touching accepted versions
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('hat-workshop/r03/upgrade.py')
+          s=p.read_text()
+          for old,new in [('const key=JSON.stringify([isReference','const fitStamp=JSON.stringify([isReference'),('asset.fitKey!==key','asset.fitKey!==fitStamp'),('asset.fitKey=key','asset.fitKey=fitStamp')]:
+            assert s.count(old)==1,(old,s.count(old))
+            s=s.replace(old,new)
+          s=s.replace('翻边 / 帽带厚度倍率','翻边 / 帽带饱满度')
+          p.write_text(s)
+          PY
+          python3 -m py_compile hat-workshop/r03/upgrade.py
+      - name: Fast-forward source repair
+        run: |
+          test "$(git ls-remote origin refs/heads/fix/hat-r02-takeover-20261011 | cut -f1)" = '${{ github.sha }}'
+          git config user.name 'KAOPU Hat Workbench'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r03/upgrade.py
+          git commit -m 'hat: avoid key-light shadowing in R03 fitting cache and clarify band parameter'
+          git push origin HEAD:fix/hat-r02-takeover-20261011
