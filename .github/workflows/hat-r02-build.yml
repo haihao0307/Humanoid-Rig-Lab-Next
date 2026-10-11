@@ -1,0 +1,124 @@
+name: Hat R02 Takeover Build and Public QA
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths:
+      - hat-workshop/r02/upgrade.py
+      - hat-workshop/r02/build.py
+      - hat-workshop/r02/qa.py
+      - hat-workshop/r02/method_update.py
+      - .github/workflows/hat-r02-build.yml
+permissions:
+  contents: write
+concurrency:
+  group: hat-r02-takeover-build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BRANCH: fix/hat-r02-takeover-20261011
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r01
+            hat-workshop/r02
+            docs/workbench-build-system
+      - name: Fixed tools and explicit source generation
+        run: |
+          npm install --no-save three@0.179.1 esbuild@0.25.9
+          python3 -m pip install numpy pillow playwright
+          python3 -m playwright install --with-deps chromium
+          python3 hat-workshop/r02/upgrade.py
+          python3 hat-workshop/r02/method_update.py
+          python3 -m py_compile hat-workshop/r02/upgrade.py hat-workshop/r02/build.py hat-workshop/r02/qa.py hat-workshop/r02/method_update.py
+          node --check hat-workshop/r02/app.js
+          cp hat-workshop/r01/THREE_LICENSE.txt hat-workshop/r02/THREE_LICENSE.txt
+          echo "EXPECTED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Frozen baseline, UV repair and bounded static visor calibration
+        run: python3 -u hat-workshop/r02/build.py --assets
+      - name: Commit actual sources and immutable data packages
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$EXPECTED_HEAD"
+          git config user.name 'KAOPU Hat Workbench'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r02/app.js hat-workshop/r02/shell.html hat-workshop/r02/assets hat-workshop/r02/ASSET_MANIFEST.json hat-workshop/r02/CORRECTION_REPORT.json hat-workshop/r02/README.md hat-workshop/r02/SESSION_LOG.md hat-workshop/r02/FEEDBACK.template.json hat-workshop/r02/THREE_LICENSE.txt WORKBENCH_BUILD_SYSTEM.md docs/workbench-build-system/RUNBOOK.md docs/workbench-build-system/FEEDBACK_LOOP_HAT_R02.md
+          git commit -m 'hat: freeze R02 calibrated source, data and feedback rules [skip ci]'
+          git push origin HEAD:$BRANCH
+          DATA_SHA=$(git rev-parse HEAD)
+          echo "DATA_SHA=$DATA_SHA" >> "$GITHUB_ENV"
+          echo "SOURCE_SHA=$DATA_SHA" >> "$GITHUB_ENV"
+          echo "EXPECTED_HEAD=$DATA_SHA" >> "$GITHUB_ENV"
+      - name: Build full quality standalone and render actual 3D catalogue
+        run: |
+          python3 -u hat-workshop/r02/build.py --pages --data-sha "$DATA_SHA" --source-sha "$SOURCE_SHA"
+          python3 -u hat-workshop/r02/qa.py --thumbnails
+          python3 -u hat-workshop/r02/build.py --pages --data-sha "$DATA_SHA" --source-sha "$SOURCE_SHA"
+      - name: Real standalone Chromium regression
+        run: python3 -u hat-workshop/r02/qa.py
+      - name: Publish immutable browser candidate
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$EXPECTED_HEAD"
+          git add hat-workshop/r02/index.html hat-workshop/r02/standalone.html hat-workshop/r02/app.bundle.js hat-workshop/r02/BUILD_MANIFEST.json hat-workshop/r02/thumbnails.json hat-workshop/r02/qa/local hat-workshop/r02/qa/thumbnails
+          git commit -m 'hat: publish tested R02 public and standalone candidates [skip ci]'
+          git push origin HEAD:$BRANCH
+          BUILD_SHA=$(git rev-parse HEAD)
+          echo "BUILD_SHA=$BUILD_SHA" >> "$GITHUB_ENV"
+          echo "EXPECTED_HEAD=$BUILD_SHA" >> "$GITHUB_ENV"
+          echo "PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/hat-workshop/r02/index.html" >> "$GITHUB_ENV"
+      - name: Real immutable HTTPS Chromium regression
+        run: |
+          echo "$PUBLIC_URL"
+          python3 -u hat-workshop/r02/qa.py --url "$PUBLIC_URL"
+          python3 - <<'PY'
+          import os,json,hashlib,urllib.request,pathlib
+          root=pathlib.Path('hat-workshop/r02')
+          m=json.loads((root/'BUILD_MANIFEST.json').read_text())
+          assert json.loads((root/'qa/local/report.json').read_text())['passed']
+          assert json.loads((root/'qa/public/report.json').read_text())['passed']
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/hat-workshop/r02/index.html'
+          actual=urllib.request.urlopen(url,timeout=90).read()
+          assert hashlib.sha256(actual).hexdigest()==m['htmlSHA256']
+          receipt={'version':'HAT-R02.0','baselineSha':m['baselineSha'],'sourceSha':os.environ['SOURCE_SHA'],'dataSha':os.environ['DATA_SHA'],'buildSha':os.environ['BUILD_SHA'],'publicURL':os.environ['PUBLIC_URL'],'publicHTMLSHA256':m['htmlSHA256'],'publicBytes':m['publicBytes'],'standaloneSHA256':m['standaloneSHA256'],'standaloneBytes':m['standaloneBytes'],'fileVerified':True,'publicVerified':True,'userAccepted':False,'cinematicAccepted':False,'continuousCollisionVerified':False,'dynamicWearValidated':False,'phonePhysicalDevice':False,'reviewType':'same-assistant self-review','workflowRun':os.environ['GITHUB_RUN_ID']}
+          (root/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          print('DELIVERY',json.dumps(receipt))
+          PY
+      - name: Preserve real public evidence
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$EXPECTED_HEAD"
+          git add hat-workshop/r02/qa/public hat-workshop/r02/DELIVERY.json
+          git commit -m 'hat: preserve R02 immutable public verification and explicit limits [skip ci]'
+          git push origin HEAD:$BRANCH
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r02-takeover-evidence
+          path: |
+            hat-workshop/r02/qa
+            hat-workshop/r02/index.html
+            hat-workshop/r02/standalone.html
+            hat-workshop/r02/app.js
+            hat-workshop/r02/app.bundle.js
+            hat-workshop/r02/shell.html
+            hat-workshop/r02/upgrade.py
+            hat-workshop/r02/build.py
+            hat-workshop/r02/qa.py
+            hat-workshop/r02/method_update.py
+            hat-workshop/r02/assets
+            hat-workshop/r02/thumbnails.json
+            hat-workshop/r02/BUILD_MANIFEST.json
+            hat-workshop/r02/ASSET_MANIFEST.json
+            hat-workshop/r02/CORRECTION_REPORT.json
+            hat-workshop/r02/DELIVERY.json
+            hat-workshop/r02/THREE_LICENSE.txt
+            hat-workshop/r02/README.md
+            hat-workshop/r02/SESSION_LOG.md
+            hat-workshop/r02/FEEDBACK.template.json
+            WORKBENCH_BUILD_SYSTEM.md
+            docs/workbench-build-system/FEEDBACK_LOOP_HAT_R02.md
+            docs/workbench-build-system/RUNBOOK.md
+          retention-days: 14

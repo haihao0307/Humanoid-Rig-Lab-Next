@@ -1,0 +1,48 @@
+name: Hat R04 Layered Fit Review
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths: [.github/workflows/hat-r04-review.yml]
+permissions:
+  contents: read
+concurrency:
+  group: hat-r04-review
+  cancel-in-progress: false
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r02
+            hat-workshop/r03
+            hat-workshop/r04
+      - name: Build new sources, preserve prior pages
+        run: |
+          npm install --no-save three@0.179.1 esbuild@0.25.9
+          python -m pip install numpy pillow beautifulsoup4 playwright
+          python -m playwright install --with-deps chromium
+          python hat-workshop/r04/source_datum_patch.py
+          python hat-workshop/r04/upgrade.py
+          python hat-workshop/r04/restshape_patch.py
+          node --check hat-workshop/r04/app.js
+          python hat-workshop/r04/build.py --source '${{ github.sha }}' --data fa6e3842b0add398a52b775a1577fc50e31ce31b
+      - name: Real geometry and browser review
+        run: python -u hat-workshop/r04/qa.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r04-layered-fit-review
+          path: |
+            hat-workshop/r04/qa
+            hat-workshop/r04/*.js
+            hat-workshop/r04/*.mjs
+            hat-workshop/r04/*.py
+            hat-workshop/r04/*.html
+            hat-workshop/r04/*.json
+            hat-workshop/r04/fit
+          retention-days: 14

@@ -1,0 +1,61 @@
+name: Hat R02 Persist Verified Image Evidence
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths: [.github/workflows/hat-r02-evidence-receipt.yml]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      BRANCH: fix/hat-r02-takeover-20261011
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: hat-workshop/r02
+      - uses: actions/download-artifact@v4
+        with:
+          name: hat-r02-takeover-evidence
+          run-id: 38106395076
+          github-token: ${{ github.token }}
+          path: /tmp/hat-r02-evidence
+      - name: Verify immutable bytes before preserving images
+        run: |
+          python3 - <<'PY'
+          import json,hashlib,pathlib,shutil
+          src=pathlib.Path('/tmp/hat-r02-evidence/hat-workshop/r02')
+          dst=pathlib.Path('hat-workshop/r02')
+          sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+          manifest=json.loads((src/'BUILD_MANIFEST.json').read_text())
+          assert manifest['htmlSHA256']=='9e11dfc07e8296ffe80afd7e78b710c074ae9cce285cb4d373f449d83e2b112b'
+          assert sha(src/'index.html')==sha(dst/'index.html')==manifest['htmlSHA256']
+          images=[]
+          for kind,count in [('local',96),('public',97)]:
+            report=json.loads((src/'qa'/kind/'report.json').read_text())
+            assert report['passed'] and len(report['checks'])==count and all(c['passed'] for c in report['checks'])
+            assert sha(src/'qa'/kind/'report.json')==sha(dst/'qa'/kind/'report.json')
+            for p in (src/'qa'/kind).iterdir():
+              if p.suffix in ['.png','.jpg']:
+                target=dst/'qa'/kind/p.name
+                shutil.copyfile(p,target)
+                images.append({'path':str(target),'sha256':sha(target),'bytes':target.stat().st_size})
+          assert len(images)>60
+          receipt={'sourceRun':38106395076,'artifactId':11689682545,'sourceSha':manifest['sourceSha'],'buildSha':'d56bc8498a152ff501ffaf80ec80a109b2ec4865','publicHTMLSHA256':manifest['htmlSHA256'],'images':images,'note':'QA image extension ignore rules are overridden only for these measured evidence paths; no production assets or frozen R01 files changed. Ordinary git add omitted ignored image extensions; verify tracked evidence explicitly.'}
+          (dst/'qa/EVIDENCE_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          print('Verified and preserved',len(images),'actual QA images')
+          PY
+      - name: Fast-forward evidence-only commit
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = '${{ github.sha }}'
+          git add -f hat-workshop/r02/qa/local/*.png hat-workshop/r02/qa/local/*.jpg hat-workshop/r02/qa/public/*.png hat-workshop/r02/qa/public/*.jpg
+          git add hat-workshop/r02/qa/EVIDENCE_RECEIPT.json
+          test "$(git ls-files 'hat-workshop/r02/qa/*.png' 'hat-workshop/r02/qa/*.jpg' | wc -l)" -gt 60
+          git config user.name 'KAOPU Hat Workbench'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'hat: persist hash-verified R02 browser image evidence [skip ci]'
+          git push origin HEAD:$BRANCH

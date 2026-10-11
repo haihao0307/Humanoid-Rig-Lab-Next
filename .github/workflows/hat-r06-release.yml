@@ -1,0 +1,105 @@
+name: Hat R06 Fixed Categories and Public Delivery
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths: [.github/workflows/hat-r06-release.yml]
+permissions:
+  contents: write
+concurrency:
+  group: hat-r06-fixed-fit-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      BRANCH: fix/hat-r02-takeover-20261011
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r03
+            hat-workshop/r04
+            hat-workshop/r06
+            docs/workbench-build-system
+      - name: Recover byte-checked readable source, never overwrite canonical edits
+        run: |
+          python3 -m pip install numpy scipy trimesh pillow beautifulsoup4 playwright
+          python3 -m playwright install --with-deps chromium
+          python3 hat-workshop/r06/bootstrap.py
+          python3 hat-workshop/r06/boundary_review.py
+          python3 -m py_compile hat-workshop/r06/*.py
+          node --check hat-workshop/r06/app.js
+          for f in hat-workshop/r06/*.mjs hat-workshop/r06/legacy/*.mjs; do node --check "$f"; done
+          python3 - <<'PY'
+          from pathlib import Path
+          r=Path('hat-workshop/r06')
+          d=Path('docs/workbench-build-system');d.mkdir(exist_ok=True,parents=True)
+          name='HAT_R06_FIXED_FIT_AND_HAIR_BOUNDARY.md'
+          (d/name).write_text((r/'METHOD.md').read_text()+'\n\n'+(r/'HAIR_INTEGRATION.md').read_text()+'\n\n'+(r/'FIT_BOUNDARY.md').read_text())
+          for p,link in [(Path('WORKBENCH_BUILD_SYSTEM.md'),'docs/workbench-build-system/'+name),(d/'RUNBOOK.md',name)]:
+            s=p.read_text()
+            if name not in s:p.write_text(s+'\n\n## 帽子R06：固定量配程序与头发接入边界\n\n见[固定帽型、换头不累积变形、真实承托与未来毛发耦合]('+link+')。当前只验静态尺寸与最终佩戴状态，不把未来头发受压或真实戴入路径预填为完成。\n')
+          PY
+      - name: Commit readable production source with a fast-forward only
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = '${{ github.sha }}'
+          git config user.name 'KAOPU Hat Workbench'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-files --error-unmatch hat-workshop/r06/source-transfer/00.txt >/dev/null 2>&1; then git rm hat-workshop/r06/source-transfer/00.txt; fi
+          git add hat-workshop/r06 WORKBENCH_BUILD_SYSTEM.md docs/workbench-build-system/RUNBOOK.md docs/workbench-build-system/HAT_R06_FIXED_FIT_AND_HAIR_BOUNDARY.md
+          if ! git diff --cached --quiet; then git commit -m 'hat: preserve canonical R06 all-category source and hair boundary [skip ci]'; git push origin HEAD:$BRANCH; fi
+          SOURCE_SHA=$(git rev-parse HEAD)
+          echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
+          echo "EXPECTED_HEAD=$SOURCE_SHA" >> "$GITHUB_ENV"
+      - name: Build full-quality pages and verify deterministic geometry
+        run: |
+          python3 -u hat-workshop/r06/build.py --source "$SOURCE_SHA"
+          node hat-workshop/r06/verify.mjs
+          python3 -u hat-workshop/r06/check_distance.py
+      - name: Real file protocol browser tests
+        run: python3 -u hat-workshop/r06/qa.py
+      - name: Publish tested immutable candidate
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$EXPECTED_HEAD"
+          git add hat-workshop/r06/index.html hat-workshop/r06/standalone.html hat-workshop/r06/app.offline.js hat-workshop/r06/BUILD_MANIFEST.json hat-workshop/r06/qa/numeric/report.json hat-workshop/r06/qa/numeric/DISTANCE_REPORT.json hat-workshop/r06/qa/local
+          find hat-workshop/r06/qa/local -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
+          git commit -m 'hat: publish verified R06 standalone and fixed public candidate [skip ci]'
+          git push origin HEAD:$BRANCH
+          BUILD_SHA=$(git rev-parse HEAD)
+          echo "BUILD_SHA=$BUILD_SHA" >> "$GITHUB_ENV"
+          echo "EXPECTED_HEAD=$BUILD_SHA" >> "$GITHUB_ENV"
+          echo "PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/hat-workshop/r06/index.html" >> "$GITHUB_ENV"
+      - name: Actual immutable HTTPS browser and byte identity
+        run: |
+          python3 -u hat-workshop/r06/qa.py --url "$PUBLIC_URL"
+          python3 - <<'PY'
+          import os,json,hashlib,pathlib,urllib.request
+          r=pathlib.Path('hat-workshop/r06');m=json.loads((r/'BUILD_MANIFEST.json').read_text())
+          paths={'numeric':'numeric/report.json','distance':'numeric/DISTANCE_REPORT.json','local':'local/report.json','public':'public/report.json'}
+          q={k:json.loads((r/'qa'/v).read_text()) for k,v in paths.items()}
+          assert all(v['passed'] for v in q.values())
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/hat-workshop/r06/index.html'
+          raw=urllib.request.urlopen(url,timeout=180).read();assert hashlib.sha256(raw).hexdigest()==m['htmlSHA256']
+          original=[x for x in q['numeric']['records'] if x['fixture']=='original'];assert len(original)==33
+          assert len(q['numeric']['records'])==98 and len(q['numeric']['rejectedFixtures'])==1
+          receipt={'version':'HAT-R06.0','sourceSha':os.environ['SOURCE_SHA'],'buildSha':os.environ['BUILD_SHA'],'dataSha':m['dataSha'],'publicURL':os.environ['PUBLIC_URL'],'htmlSHA256':m['htmlSHA256'],'publicBytes':m['publicBytes'],'standaloneSHA256':m['standaloneSHA256'],'standaloneBytes':m['bytes'],'sourceHash':m['sourceHash'],'fileVerified':True,'publicVerified':True,'checks':{k:len(v['checks']) for k,v in q.items()},'categories':11,'originalHeads':3,'originalFitCases':33,'stressFitResults':len(q['numeric']['records']),'rejectedStressFixtures':q['numeric']['rejectedFixtures'],'allCategoriesAtoBtoCtoA':True,'immutableHeadGeometry':True,'hairState':'DEFERRED_INTERFACE_ONLY','hairCompressionImplemented':False,'physicalDonningValidated':False,'continuousCollisionValidated':False,'materialCalibrated':False,'arbitraryHeadsValidated':False,'physicalPhoneTested':False,'userVisualAccepted':False,'reviewType':'same-executor self-review; actual image review separate','workflowRun':os.environ['GITHUB_RUN_ID']}
+          (r/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2));print('DELIVERY',json.dumps(receipt,ensure_ascii=False))
+          PY
+      - name: Preserve public evidence and result receipt
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$EXPECTED_HEAD"
+          git add hat-workshop/r06/DELIVERY.json hat-workshop/r06/qa/public
+          find hat-workshop/r06/qa/public -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
+          git commit -m 'hat: record actual R06 fixed HTTPS tests and scope boundaries [skip ci]'
+          git push origin HEAD:$BRANCH
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r06-fixed-fit-public-evidence
+          path: |
+            hat-workshop/r06
+            docs/workbench-build-system/HAT_R06_FIXED_FIT_AND_HAIR_BOUNDARY.md
+          retention-days: 14

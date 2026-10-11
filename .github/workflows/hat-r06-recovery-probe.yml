@@ -1,0 +1,34 @@
+name: Hat R06 interrupted browser gate diagnosis
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths: [.github/workflows/hat-r06-recovery-probe.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          sparse-checkout: hat-workshop/r06
+      - name: Recover verified failed-run evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/haihao0307/Humanoid-Rig-Lab-Next/actions/artifacts/11697583624/zip > /tmp/failed.zip
+          echo '1488eb0fc1798ac68734a29cbc392fe51c2e184744563eb63ae148cf71a62b2b  /tmp/failed.zip' | sha256sum -c -
+          mkdir -p /tmp/hat-failed
+          unzip -q /tmp/failed.zip -d /tmp/hat-failed
+          python3 -m pip install playwright
+          python3 -m playwright install --with-deps chromium
+      - name: Actual browser state and exact vertex differences
+        run: python3 -u hat-workshop/r06/recovery-probe.py /tmp/hat-failed/hat-workshop/r06
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r06-recovery-probe
+          path: /tmp/hat-failed/hat-workshop/r06/recovery-probe
+          retention-days: 14

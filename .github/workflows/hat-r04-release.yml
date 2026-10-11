@@ -1,0 +1,92 @@
+name: Hat R04 Material Thickness and Public Verification
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths: [.github/workflows/hat-r04-release.yml]
+permissions:
+  contents: write
+concurrency:
+  group: hat-r04-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      BRANCH: fix/hat-r02-takeover-20261011
+      DATA_SHA: fa6e3842b0add398a52b775a1577fc50e31ce31b
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r02
+            hat-workshop/r03
+            hat-workshop/r04
+            docs/workbench-build-system
+      - name: Canonical source and fixed tools
+        run: |
+          npm install --no-save three@0.179.1 esbuild@0.25.9
+          python -m pip install numpy==2.3.5 scipy==1.17.0 trimesh==4.11.1 pillow beautifulsoup4 playwright
+          python -m playwright install --with-deps chromium
+          python hat-workshop/r04/bootstrap.py
+          node --check hat-workshop/r04/app.js
+          node --check hat-workshop/r04/mother.mjs
+          node --check hat-workshop/r04/fit/beanie.mjs
+          python -m py_compile hat-workshop/r04/*.py
+          git diff --exit-code -- hat-workshop/r02 hat-workshop/r03
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = '${{ github.sha }}'
+          git config user.name 'KAOPU Hat Workbench'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r04/app.js hat-workshop/r04/mother.mjs hat-workshop/r04/surface.mjs hat-workshop/r04/shell.mjs hat-workshop/r04/shell.html hat-workshop/r04/fit/field.mjs hat-workshop/r04/qa.py hat-workshop/r04/SOURCE_AUTHORITY.json hat-workshop/r04/README.md WORKBENCH_BUILD_SYSTEM.md docs/workbench-build-system/RUNBOOK.md
+          if ! git diff --cached --quiet; then git commit -m 'hat: freeze R04 material layers, supported forms and source-only quarantine [skip ci]'; git push origin HEAD:$BRANCH; fi
+          echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "EXPECTED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Same quality standalone and fixed-asset public entry
+        run: python -u hat-workshop/r04/build.py --source "$SOURCE_SHA" --data "$DATA_SHA"
+      - name: Real standalone browser
+        run: python -u hat-workshop/r04/qa.py
+      - name: Actual inner-wall and source-head geometry
+        run: python -u hat-workshop/r04/check_wall_distance.py --kind local
+      - name: Publish measured immutable candidate
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$EXPECTED_HEAD"
+          git add hat-workshop/r04/index.html hat-workshop/r04/standalone.html hat-workshop/r04/app.bundle.js hat-workshop/r04/BUILD_MANIFEST.json hat-workshop/r04/THREE_LICENSE.txt hat-workshop/r04/qa/local/report.json hat-workshop/r04/qa/local/WALL_DISTANCE_REPORT.json hat-workshop/r04/qa/local/recipe.json
+          find hat-workshop/r04/qa/local -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
+          git commit -m 'hat: publish locally verified R04 thickness candidate and actual images [skip ci]'
+          git push origin HEAD:$BRANCH
+          BUILD_SHA=$(git rev-parse HEAD)
+          echo "BUILD_SHA=$BUILD_SHA" >> "$GITHUB_ENV"
+          echo "EXPECTED_HEAD=$BUILD_SHA" >> "$GITHUB_ENV"
+          echo "PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/hat-workshop/r04/index.html" >> "$GITHUB_ENV"
+      - name: Actual fixed HTTPS browser and wall recheck
+        run: |
+          python -u hat-workshop/r04/qa.py --url "$PUBLIC_URL"
+          python -u hat-workshop/r04/check_wall_distance.py --kind public
+          python - <<'PY'
+          import pathlib,json,hashlib,os,urllib.request
+          r=pathlib.Path('hat-workshop/r04');m=json.loads((r/'BUILD_MANIFEST.json').read_text())
+          reports={k:json.loads((r/'qa'/k/'report.json').read_text()) for k in ['local','public']}
+          walls={k:json.loads((r/'qa'/k/'WALL_DISTANCE_REPORT.json').read_text()) for k in ['local','public']}
+          assert all(v['passed'] for v in [*reports.values(),*walls.values()])
+          data=urllib.request.urlopen('https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/hat-workshop/r04/index.html',timeout=120).read()
+          assert hashlib.sha256(data).hexdigest()==m['htmlSHA256']
+          receipt={**m,'buildSha':os.environ['BUILD_SHA'],'publicURL':os.environ['PUBLIC_URL'],'fileVerified':True,'publicVerified':True,'localChecks':len(reports['local']['checks']),'publicChecks':len(reports['public']['checks']),'localWallChecks':len(walls['local']['checks']),'publicWallChecks':len(walls['public']['checks']),'sourceHeadCountInWallTest':3,'materialWallTestCategory':'cable/default','flatcapStatus':'R02 source display only; new fit rejected and quarantined','userVisualAccepted':False,'allCategoriesFitCertified':False,'continuousCollisionCertified':False,'phonePhysicalDevice':False,'reviewType':'same-executor self-review; final visual review must be recorded separately','workflowRun':os.environ['GITHUB_RUN_ID']}
+          (r/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2));print(json.dumps(receipt),flush=True)
+          PY
+      - name: Persist public evidence without raw geometry duplication
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$EXPECTED_HEAD"
+          git add hat-workshop/r04/qa/public/report.json hat-workshop/r04/qa/public/WALL_DISTANCE_REPORT.json hat-workshop/r04/qa/public/recipe.json hat-workshop/r04/DELIVERY.json
+          find hat-workshop/r04/qa/public -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
+          git commit -m 'hat: persist R04 fixed-public wall evidence and explicit category limitations [skip ci]'
+          git push origin HEAD:$BRANCH
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r04-thickness-public-evidence
+          path: |
+            hat-workshop/r04
+            docs/workbench-build-system/HAT_R04_THICKNESS_AND_SUPPORT.md
+          retention-days: 14

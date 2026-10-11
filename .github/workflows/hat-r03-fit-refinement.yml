@@ -1,0 +1,116 @@
+name: Hat R03.1 Smooth Fit Review
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths: [.github/workflows/hat-r03-fit-refinement.yml]
+permissions:
+  contents: write
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r01
+            hat-workshop/r02
+            hat-workshop/r03
+      - name: Replace only failed fit field and strengthen shape gates
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('hat-workshop/r03')
+          p=root/'mother.mjs';s=p.read_text()
+          assert 'export function sourceFitProfile(' in s and 'export function deform(' in s
+          start=s.index('export function sourceFitProfile(');end=s.index('export function categoryPresets(',start)
+          s=s[:start]+"export {sourceFitProfile,deform} from './fit/field.mjs';\n"+s[end:]
+          s=s.replace("for(const k of ['autoFit'", "if(FIT_SPECS[s.id]?.mode==='stretch-cap'&&s.crownMM<0)throw Error('贴头针织帽冠不能向头皮内部缩短');\n for(const k of ['autoFit'")
+          p.write_text(s)
+          for name in ['build.py','qa.py']:
+            p=root/name;p.write_text(p.read_text().replace('HAT-R03.0','HAT-R03.1'))
+          p=root/'verify.mjs';s=p.read_text()
+          fn="""
+          function shapeGate(mesh,p){const ratios=[];let lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];for(let i=0;i<p.length;i++){lo[i%3]=Math.min(lo[i%3],p[i]);hi[i%3]=Math.max(hi[i%3],p[i]);}for(let t=0;t<mesh.index.length;t+=3)for(let j=0;j<3;j++){const a=mesh.index[t+j]*3,b=mesh.index[t+(j+1)%3]*3,L=Math.hypot(mesh.position[a]-mesh.position[b],mesh.position[a+1]-mesh.position[b+1],mesh.position[a+2]-mesh.position[b+2]);if(L>.0001)ratios.push(Math.hypot(p[a]-p[b],p[a+1]-p[b+1],p[a+2]-p[b+2])/L);}ratios.sort((a,b)=>a-b);return {dimensionsMM:hi.map((v,k)=>(v-lo[k])*1000),edgeScaleP99:ratios[Math.floor(ratios.length*.99)],edgeScaleMax:ratios.at(-1),meaning:'source-edge geometric distortion gate, not material strain certification'};}
+          """
+          s=s.replace('const report={',fn+'\nconst report={')
+          needle="report.fits.push({hat:h.id,head:head.id,...out.diagnostics});"
+          assert needle in s
+          s=s.replace(needle,"const gate=shapeGate(a,out.position);check('bounded real dimensions '+h.id+'/'+head.id,gate.dimensionsMM.every(v=>Number.isFinite(v)&&v>50&&v<750),gate);check('continuous category deformation '+h.id+'/'+head.id,gate.edgeScaleP99<4,gate);report.fits.push({hat:h.id,head:head.id,...out.diagnostics,shapeGate:gate});")
+          p.write_text(s)
+          p=root/'qa.py';s=p.read_text()
+          s=s.replace("state['triangles']>300,state)","state['triangles']>300 and all(50<state[k]<750 for k in ['widthMM','heightMM','depthMM']),state)")
+          p.write_text(s)
+          p=root/'FIT_FAILURE_AND_REPAIR.md'
+          p.write_text('''# R03.0 visual failure and R03.1 repair
+
+          R03.0 fixed build f531d067613feecf6a367788299870e05235b037 passed runtime checks but failed actual image self-review. It must NOT be delivered as accepted quality. R02 remains the user-accepted appearance baseline.
+
+          Actual defects: spikes in several hats and a sherpa model exceeding 23 metres wide. Open cuts, ties and moving slice centres caused discontinuities and near-zero-radius divisions. A nonempty canvas test saw labels even when the object was out of scale. Runtime pass was insufficient.
+
+          R03.1 replaces the field with a measured knit opening plane, complete encircling source sections, bounded periodic radius fitting, stable centres, angular crown mapping and separated hanging components. Visor uses an explicitly labelled projected annular candidate, not a claimed closed section. Original controls and head vertices stay immutable. World-size and edge-distortion gates are added; user visual acceptance, true pressure and continuous collision remain unverified.
+
+          New visual candidate must be checked from actual screenshots before final delivery. No visual approval is prefilled by this file.
+          ''')
+          PY
+          node --check hat-workshop/r03/mother.mjs
+          node --check hat-workshop/r03/fit/field.mjs
+          node hat-workshop/r03/verify.mjs
+      - name: Fast-forward corrected production source and numeric evidence
+        run: |
+          test "$(git ls-remote origin refs/heads/fix/hat-r02-takeover-20261011 | cut -f1)" = '${{ github.sha }}'
+          git config user.name 'KAOPU Hat Workbench'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r03/mother.mjs hat-workshop/r03/build.py hat-workshop/r03/verify.mjs hat-workshop/r03/qa.py hat-workshop/r03/FIT_FAILURE_AND_REPAIR.md hat-workshop/r03/qa/numeric/report.json
+          git commit -m 'hat: replace failed radial fit with measured smooth fields and dimension gates [skip ci]'
+          git push origin HEAD:fix/hat-r02-takeover-20261011
+          echo "REVIEW_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Build private QA candidate and capture real shapes
+        run: |
+          npm install --no-save three@0.179.1 esbuild@0.25.9
+          python3 -m pip install numpy pillow playwright
+          python3 -m playwright install --with-deps chromium
+          python3 hat-workshop/r03/upgrade.py
+          python3 hat-workshop/r03/build.py --pages --data-sha "$REVIEW_SOURCE_SHA" --source-sha "$REVIEW_SOURCE_SHA"
+          python3 -u - <<'PY'
+          from pathlib import Path
+          import json,io
+          from PIL import Image,ImageDraw
+          from playwright.sync_api import sync_playwright
+          root=Path('hat-workshop/r03').resolve();out=root/'qa/smooth-review';out.mkdir(parents=True,exist_ok=True)
+          report={'sourceSha':__import__('os').environ['REVIEW_SOURCE_SHA'],'states':[],'errors':[],'consoleErrors':[],'userAccepted':False,'physicalValidated':False};shots=[]
+          with sync_playwright() as pw:
+            b=pw.chromium.launch(headless=True,args=['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']);p=b.new_page(viewport={'width':1440,'height':1000});p.set_default_timeout(120000)
+            p.on('pageerror',lambda e:report['errors'].append(str(e)));p.on('console',lambda m:report['consoleErrors'].append(m.text) if m.type=='error' else None)
+            try:
+              p.goto((root/'standalone.html').as_uri(),wait_until='load');p.wait_for_function('window.hatLab&&hatLab.ready()')
+              for item in p.evaluate('hatLab.catalogue()'):
+                p.evaluate('(id)=>hatLab.select(id)',item['id']);p.evaluate('hatLab.setPreset("standard")');p.evaluate('hatLab.frame()');p.wait_for_timeout(220)
+                m=p.evaluate('hatLab.metrics()');report['states'].append(m);assert all(50<m[k]<750 for k in ['widthMM','heightMM','depthMM']),m
+                im=Image.open(io.BytesIO(p.locator('#canvas').screenshot())).convert('RGB');im.save(out/(item['id']+'-standard.png'));shots.append((item['id'],im))
+                if item['id'] in ['cable','sherpa','visor']:
+                  for angle in ['front','side','back','top','detail']:
+                    p.evaluate('(a)=>hatLab.frame(a)',angle);p.wait_for_timeout(150);p.locator('#canvas').screenshot(path=str(out/(item['id']+'-'+angle+'.png')))
+                  p.evaluate('hatLab.setPreset("relaxed")');p.evaluate('hatLab.frame()');p.wait_for_timeout(150);p.locator('#canvas').screenshot(path=str(out/(item['id']+'-relaxed.png')))
+              montage=Image.new('RGB',(1400,1200),(232,228,219));draw=ImageDraw.Draw(montage)
+              for i,(name,im) in enumerate(shots):
+                im.thumbnail((456,265));x=(i%3)*466+(466-im.width)//2;y=(i//3)*300;montage.paste(im,(x,y));draw.text(((i%3)*466+12,y+271),name,fill=(20,30,20))
+              montage.save(out/'all-shapes.jpg',quality=92)
+              assert not report['errors'] and not report['consoleErrors'],report
+              report['runtimePassed']=True
+            finally:
+              (out/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));b.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r031-smooth-shape-review
+          path: |
+            hat-workshop/r03/qa/smooth-review
+            hat-workshop/r03/qa/numeric
+            hat-workshop/r03/mother.mjs
+            hat-workshop/r03/fit
+            hat-workshop/r03/FIT_FAILURE_AND_REPAIR.md
+          retention-days: 14

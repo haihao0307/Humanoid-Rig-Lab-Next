@@ -1,0 +1,80 @@
+name: Hat R06 recovery release and fixed HTTPS verification
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths: [.github/workflows/hat-r06-recovery-release.yml]
+permissions:
+  contents: write
+concurrency:
+  group: hat-r06-fixed-fit-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      BRANCH: fix/hat-r02-takeover-20261011
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r03
+            hat-workshop/r04
+            hat-workshop/r06
+      - name: Validate canonical source and rebuild without source seed replacement
+        run: |
+          python3 -m pip install numpy scipy trimesh pillow beautifulsoup4 playwright
+          python3 -m playwright install --with-deps chromium
+          python3 -m py_compile hat-workshop/r06/*.py
+          node --check hat-workshop/r06/app.js
+          python3 -u hat-workshop/r06/build.py --source '${{ github.sha }}'
+          node hat-workshop/r06/verify.mjs
+          python3 -u hat-workshop/r06/check_distance.py
+      - name: Actual file protocol, 33 combinations and interaction checks
+        run: python3 -u hat-workshop/r06/qa.py
+      - name: Publish only the tested candidate, fast-forward only
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = '${{ github.sha }}'
+          git config user.name 'KAOPU Hat Recovery'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r06/index.html hat-workshop/r06/standalone.html hat-workshop/r06/app.offline.js hat-workshop/r06/BUILD_MANIFEST.json hat-workshop/r06/qa/numeric/report.json hat-workshop/r06/qa/numeric/DISTANCE_REPORT.json hat-workshop/r06/qa/local
+          find hat-workshop/r06/qa/local -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
+          git commit -m 'hat: recover R06 fixed category workbench after cross-engine verification [skip ci]'
+          git push origin HEAD:$BRANCH
+          BUILD_SHA=$(git rev-parse HEAD)
+          echo "BUILD_SHA=$BUILD_SHA" >> "$GITHUB_ENV"
+          echo "PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/hat-workshop/r06/index.html" >> "$GITHUB_ENV"
+      - name: Actual fixed HTTPS browser and published byte identity
+        run: |
+          python3 -u hat-workshop/r06/qa.py --url "$PUBLIC_URL"
+          python3 - <<'PY'
+          import os,json,hashlib,pathlib,urllib.request
+          r=pathlib.Path('hat-workshop/r06');m=json.loads((r/'BUILD_MANIFEST.json').read_text())
+          paths={'numeric':'numeric/report.json','distance':'numeric/DISTANCE_REPORT.json','local':'local/report.json','public':'public/report.json'}
+          q={k:json.loads((r/'qa'/v).read_text()) for k,v in paths.items()}
+          assert all(v['passed'] for v in q.values())
+          raw=urllib.request.urlopen('https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/hat-workshop/r06/index.html',timeout=180).read()
+          assert hashlib.sha256(raw).hexdigest()==m['htmlSHA256']
+          original=[x for x in q['numeric']['records'] if x['fixture']=='original'];assert len(original)==33
+          comparisons=[c['coordinateComparison'] for c in q['public']['cases']]+[c['bandCoordinateComparison'] for c in q['public']['cases'] if c['bandCoordinateComparison']]
+          receipt={'version':'HAT-R06.0-recovered','sourceSha':os.environ['GITHUB_SHA'],'buildSha':os.environ['BUILD_SHA'],'publicURL':os.environ['PUBLIC_URL'],'htmlSHA256':m['htmlSHA256'],'publicBytes':m['publicBytes'],'standaloneSHA256':m['standaloneSHA256'],'standaloneBytes':m['bytes'],'sourceHash':m['sourceHash'],'fileVerified':True,'publicVerified':True,'checks':{k:len(v['checks']) for k,v in q.items()},'categories':11,'originalHeads':3,'originalFitCases':33,'stressFitResults':len(q['numeric']['records']),'rejectedStressFixtures':q['numeric']['rejectedFixtures'],'allCategoriesAtoBtoCtoA':True,'immutableHeadGeometry':True,'crossEngineDerivedCoordinatesMaximumM':max(c['maxErrorM'] for c in comparisons),'crossEngineToleranceM':2e-8,'inputAndRepeatedResultsByteExact':True,'hairCompressionImplemented':False,'physicalDonningValidated':False,'continuousCollisionValidated':False,'materialCalibrated':False,'arbitraryHeadsValidated':False,'physicalPhoneTested':False,'userVisualAccepted':False,'workflowRun':os.environ['GITHUB_RUN_ID'],'recoveredFailureRun':38126982263,'diagnosticRun':38128772930}
+          (r/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          text='# R06 断点恢复与实际交付\n\n源代码已在 ea818497 恢复，但原工作流38126982263在浏览器检查失败，网页没有发布。诊断38128772930确认首例只有一个Float32坐标相差9.313225746154785e-10米。\n\n本轮不修改帽子或人物几何、不舍入数据，保留输入头形和同浏览器A→B→C→A逐字节校验；跨JavaScript运行时的派生坐标改用明确2e-8米上限，检查数量、顺序、有限值，报告每项实际差异。比较器负例确认真实位移、错序、截断和NaN均拒绝。\n\n实际交付、33组合及公网状态见DELIVERY.json和qa/public/report.json。旧R01–R04保持不变。未实现毛发压缩、连续戴入、压力舒适度或任意新头形认证。用户视觉认可仍待反馈。\n\n固定网页：'+os.environ['PUBLIC_URL']+'\n'
+          (r/'RECOVERY_DELIVERY.md').write_text(text)
+          print(json.dumps(receipt,ensure_ascii=False))
+          PY
+      - name: Preserve actual public reports
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$BUILD_SHA"
+          git add hat-workshop/r06/DELIVERY.json hat-workshop/r06/RECOVERY_DELIVERY.md hat-workshop/r06/qa/public
+          find hat-workshop/r06/qa/public -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
+          git commit -m 'hat: preserve recovered R06 fixed HTTPS results and exact scope [skip ci]'
+          git push origin HEAD:$BRANCH
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r06-recovered-public-evidence
+          path: hat-workshop/r06
+          retention-days: 14
