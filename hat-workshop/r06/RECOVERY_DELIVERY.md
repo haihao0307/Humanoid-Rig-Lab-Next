@@ -1,9 +1,11 @@
-# R06 断点恢复与实际交付
+# R06 中断恢复与最终验收入口
 
-源代码已在 ea818497 恢复，但原工作流38126982263在浏览器检查失败，网页没有发布。诊断38128772930确认首例只有一个Float32坐标相差9.313225746154785e-10米。
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/7e72ff29495ca2307858dfd5ea1375423d30dda1/hat-workshop/r06/index.html
 
-本轮不修改帽子或人物几何、不舍入数据，保留输入头形和同浏览器A→B→C→A逐字节校验；跨JavaScript运行时的派生坐标改用明确2e-8米上限，检查数量、顺序、有限值，报告每项实际差异。比较器负例确认真实位移、错序、截断和NaN均拒绝。
+原38126982263发布在浏览器数组哈希失败；38128772930证明确为一个Float32末位差，不是肉眼形变。38129288751完成388项数值、54项三角距离、195项file://及195项公网检查。
 
-实际交付、33组合及公网状态见DELIVERY.json和qa/public/report.json。旧R01–R04保持不变。未实现毛发压缩、连续戴入、压力舒适度或任意新头形认证。用户视觉认可仍待反馈。
+最后仅修正尚未发布的过期文案和README：源码及比较器逐文件哈希一致后复用已通过数值证据，不假称重新计算；最终新页面重新执行195项file://和195项真实固定HTTPS检查。逐项依据见NUMERIC_EVIDENCE_REUSE.json、BUILD_MANIFEST.json、DELIVERY.json、qa/public/report.json。
 
-固定网页：https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/dfff12ca0a27198a1b001b1ef5cb31ce677e5f46/hat-workshop/r06/index.html
+11款 × 3原头形通过。98项原及合成尺寸拟合，另1项合成大号钟形帽主动拒绝，不扩宽原阈值。原头形未缩小或更换；每次从未拟合源重建，A→B→C→A无累积变形。
+
+静态量配不是戴入运动、头发压缩、连续碰撞、压力舒适度、任意人头认证或现实制帽生产样板。原R01–R04保留；用户视觉验收待反馈。390×844仅浏览器视口，不是手机实机。
