@@ -1,0 +1,74 @@
+name: Shoe R05 complete-form verification
+on:
+  push:
+    branches: [fix/shoe-r05-complete-form-20261011]
+    paths: ['shoe-workshop/r05/**', '.github/workflows/shoe-r05-form.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shoe-r05-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            shoe-workshop
+          fetch-depth: 1
+      - name: Use tracked readable production sources without replaying bootstrap
+        run: |
+          test -s shoe-workshop/r05/src/main.mjs
+          test -s shoe-workshop/r05/src/model.mjs
+          test -s shoe-workshop/r05/src/materials.mjs
+          test -s shoe-workshop/r05/tests/verify.mjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pinned geometry and actual browser dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Build, verify geometry and test the standalone file
+        id: build
+        run: |
+          node shoe-workshop/r05/tools/build.mjs
+          node shoe-workshop/r05/tests/verify.mjs
+          echo 'built=true' >> "$GITHUB_OUTPUT"
+      - name: Fast-forward publish only R05 candidate files
+        id: publish
+        if: steps.build.outputs.built == 'true'
+        run: |
+          git config user.name 'Shoe R05 Build'
+          git config user.email 'shoe-r05@users.noreply.github.com'
+          git add shoe-workshop/r05
+          if git diff --cached --name-only | grep -v '^shoe-workshop/r05/'; then exit 1; fi
+          git commit -m 'build(shoes): tested refined R05 source and standalone candidate [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Exact immutable public browser and full-byte verification
+        if: steps.build.outputs.built == 'true'
+        env:
+          PUBLIC_BUILD_SHA: ${{ steps.publish.outputs.sha }}
+        run: |
+          node shoe-workshop/r05/tests/verify.mjs --public
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('shoe-workshop/r05/README.md')
+          text=p.read_text().replace('- [ ] 公网固定链接和最终真实浏览器回归：由当前 `evidence/public/QA.json` 更新。','- [x] 公网固定链接和最终真实浏览器回归：当前 `evidence/public/QA.json` 已通过。')
+          p.write_text(text)
+          PY
+          git add shoe-workshop/r05/evidence/public shoe-workshop/r05/PUBLIC_URL.txt shoe-workshop/r05/README.md
+          git commit -m 'test(shoes): R05 fixed public browser and byte receipt [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Preserve current source and actual render evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r05-candidate-${{ github.run_id }}
+          path: shoe-workshop/r05/
+          include-hidden-files: true
+          retention-days: 14
