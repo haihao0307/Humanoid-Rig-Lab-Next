@@ -1,0 +1,105 @@
+name: Hat R06 final labels and actual public regression
+on:
+  push:
+    branches: [fix/hat-r02-takeover-20261011]
+    paths: [.github/workflows/hat-r06-final-labels.yml]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: hat-r06-fixed-fit-release
+  cancel-in-progress: false
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      BRANCH: fix/hat-r02-takeover-20261011
+      R: hat-workshop/r06
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r03
+            hat-workshop/r04
+            hat-workshop/r06
+      - name: Recover passed evidence and prove unchanged geometry and checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/haihao0307/Humanoid-Rig-Lab-Next/actions/artifacts/11698634053/zip > /tmp/verified.zip
+          echo '7e3ccaad1cc3c3f83ceed428f7c424686000783c40d824aa40b78cdb4de749b0  /tmp/verified.zip' | sha256sum -c -
+          mkdir /tmp/verified-hat
+          unzip -q /tmp/verified.zip -d /tmp/verified-hat
+          python3 - <<'PY'
+          import pathlib,json,hashlib,shutil
+          r=pathlib.Path('hat-workshop/r06');v=pathlib.Path('/tmp/verified-hat');h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+          m=json.loads((v/'BUILD_MANIFEST.json').read_text());proof={}
+          for p,s in m['sourceFiles'].items():
+            assert h(r/p)==s==h(v/p),p
+            proof[p]=s
+          for p in ['qa.py','portable_geometry.py','verify.mjs','check_distance.py']:
+            assert h(r/p)==h(v/p),p
+            proof[p]=h(r/p)
+          for p in ['numeric/report.json','numeric/DISTANCE_REPORT.json','local/report.json','public/report.json']:
+            assert json.loads((v/'qa'/p).read_text())['passed'],p
+          for p in ['geometry-dump','numeric']:
+            shutil.copytree(v/'qa'/p,r/'qa'/p,dirs_exist_ok=True)
+          (r/'NUMERIC_EVIDENCE_REUSE.json').write_text(json.dumps({'sourceRun':38129288751,'sourceArtifact':11698634053,'artifactSHA256':'7e3ccaad1cc3c3f83ceed428f7c424686000783c40d824aa40b78cdb4de749b0','method':'Reuse actual numerical and triangle-distance results only after exact production-source and verifier identity; rerun file and public browser tests after text-only change.','verifiedBeforeTextPatch':proof,'numericRerunClaimed':False},ensure_ascii=False,indent=2))
+          shell=(r/'shell.html').read_text();replacements={'R06 固定方法候选：尚未提交 GitHub，尚无新版公网入口。':'R06 固定分类量配：源码已同步 GitHub。静态匹配结果请逐款检查。','本轮固定针织、宽檐、鸭舌、空顶11款的结构与戴位。':'11款帽型分别固定结构与戴位。'}
+          for a,b in replacements.items():
+            assert shell.count(a)==1,a
+            shell=shell.replace(a,b)
+          (r/'shell.html').write_text(shell)
+          readme=(r/'README.md').read_text();a='浏览器输出的帽体和内汗带数组哈希必须与独立数值运行逐字节相同；每款A→B→C→A回到同一哈希。';b='原头形输入及每款A→B→C→A重复结果必须逐字节相同。Node与Chromium之间的派生帽体和汗带坐标按2e-8米上限逐项比较，数量、顺序和有限值必须一致；不舍入、不修改几何。原失败首例仅一个Float32末位不同，实际误差9.313225746154785e-10米。';assert readme.count(a)==1;(r/'README.md').write_text(readme.replace(a,b))
+          PY
+      - name: Commit exact text-only source revision
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = '${{ github.sha }}'
+          git config user.name 'KAOPU Hat Recovery'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$R/shell.html" "$R/README.md" "$R/NUMERIC_EVIDENCE_REUSE.json"
+          git commit -m 'hat: remove stale unpublished status and explain verified numeric comparison [skip ci]'
+          git push origin HEAD:$BRANCH
+          echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Build final text with the same exact geometry engine
+        run: |
+          python3 -m pip install pillow beautifulsoup4 playwright
+          python3 -m playwright install --with-deps chromium
+          python3 -u "$R/build.py" --source "$SOURCE_SHA"
+          python3 -u "$R/qa.py"
+      - name: Publish final tested immutable page
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$SOURCE_SHA"
+          git add "$R/index.html" "$R/standalone.html" "$R/app.offline.js" "$R/BUILD_MANIFEST.json" "$R/qa/local"
+          find "$R/qa/local" -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
+          git commit -m 'hat: final R06 page with accurate release status [skip ci]'
+          git push origin HEAD:$BRANCH
+          echo "BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/hat-workshop/r06/index.html" >> "$GITHUB_ENV"
+      - name: Actual final HTTPS, interactions, bytes and honest scope
+        run: |
+          python3 -u "$R/qa.py" --url "$PUBLIC_URL"
+          python3 - <<'PY'
+          import os,json,pathlib,hashlib,urllib.request
+          r=pathlib.Path(os.environ['R']);m=json.loads((r/'BUILD_MANIFEST.json').read_text());d=json.loads((r/'DELIVERY.json').read_text());checks={k:json.loads((r/'qa'/p).read_text()) for k,p in {'numeric':'numeric/report.json','distance':'numeric/DISTANCE_REPORT.json','local':'local/report.json','public':'public/report.json'}.items()};assert all(v['passed'] for v in checks.values())
+          raw=urllib.request.urlopen('https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/hat-workshop/r06/index.html',timeout=180).read();assert hashlib.sha256(raw).hexdigest()==m['htmlSHA256'];assert '尚未提交 GitHub'.encode() not in raw
+          for k in ['htmlSHA256','publicBytes','standaloneSHA256','sourceHash']:d[k]=m[k]
+          d.update(version='HAT-R06.0-final',sourceSha=os.environ['SOURCE_SHA'],buildSha=os.environ['BUILD_SHA'],publicURL=os.environ['PUBLIC_URL'],standaloneBytes=m['bytes'],workflowRun=os.environ['GITHUB_RUN_ID'],numericEvidenceRun=38129288751,numericReusedWithExactMathAndCheckHashes=True,numericRerunClaimed=False,fileVerified=True,publicVerified=True,checks={k:len(v['checks']) for k,v in checks.items()})
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          (r/'RECOVERY_DELIVERY.md').write_text('# R06 中断恢复与最终验收入口\n\n'+d['publicURL']+'\n\n原38126982263发布在浏览器数组哈希失败；38128772930证明确为一个Float32末位差，不是肉眼形变。38129288751完成388项数值、54项三角距离、195项file://及195项公网检查。\n\n最后仅修正尚未发布的过期文案和README：源码及比较器逐文件哈希一致后复用已通过数值证据，不假称重新计算；最终新页面重新执行195项file://和195项真实固定HTTPS检查。逐项依据见NUMERIC_EVIDENCE_REUSE.json、BUILD_MANIFEST.json、DELIVERY.json、qa/public/report.json。\n\n11款 × 3原头形通过。98项原及合成尺寸拟合，另1项合成大号钟形帽主动拒绝，不扩宽原阈值。原头形未缩小或更换；每次从未拟合源重建，A→B→C→A无累积变形。\n\n静态量配不是戴入运动、头发压缩、连续碰撞、压力舒适度、任意人头认证或现实制帽生产样板。原R01–R04保留；用户视觉验收待反馈。390×844仅浏览器视口，不是手机实机。\n')
+          print(json.dumps(d,ensure_ascii=False))
+          PY
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$BUILD_SHA"
+          git add "$R/DELIVERY.json" "$R/RECOVERY_DELIVERY.md" "$R/qa/public"
+          find "$R/qa/public" -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
+          git commit -m 'hat: final fixed public verification and recovery receipt [skip ci]'
+          git push origin HEAD:$BRANCH
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r06-final-public-evidence
+          path: hat-workshop/r06
+          retention-days: 14
