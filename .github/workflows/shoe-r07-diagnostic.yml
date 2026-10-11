@@ -1,0 +1,41 @@
+name: Shoe R07 bounded render diagnosis
+on:
+  push:
+    branches: [test/shoe-r07-render-diagnostic-20261011]
+    paths: ['.github/workflows/shoe-r07-diagnostic.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            shoe-workshop
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          python shoe-workshop/r07/tools/init-scaffold.py
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - run: node shoe-workshop/r07/tools/build.mjs
+      - name: Bounded first-frame and cameras
+        continue-on-error: true
+        run: |
+          cat > shoe-workshop/diagnose.mjs <<'JS'
+          import {chromium} from 'playwright';import fs from 'node:fs';import {pathToFileURL} from 'node:url';import path from 'node:path';
+          const out='shoe-workshop/r07/diagnostic';fs.mkdirSync(out,{recursive:true});const events=[],start=Date.now(),mark=(s,v)=>{events.push({s,v,ms:Date.now()-start});fs.writeFileSync(out+'/events.json',JSON.stringify(events,null,2));console.log(s,JSON.stringify(v));};
+          const b=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']}),p=await b.newPage({viewport:{width:1440,height:1050}});p.on('pageerror',e=>mark('pageerror',String(e)));p.on('console',m=>{if(m.type()==='error')mark('consoleerror',m.text());});
+          try{mark('goto',null);await p.goto(pathToFileURL(path.resolve('shoe-workshop/r07/public-lite.html')).href,{waitUntil:'domcontentloaded',timeout:90000});mark('dom',null);await p.waitForFunction(()=>window.SHOE_R07?.ready,{},{timeout:300000});mark('ready',await p.evaluate(()=>({id:SHOE_R07.buildId,stats:document.querySelector('#render-stats').textContent})));for(const camera of ['hero','side','detail','top']){mark('camera-start',camera);await p.evaluate(c=>SHOE_R07.setCamera(c),camera);mark('camera-set',camera);await p.screenshot({path:out+'/'+camera+'.png',timeout:60000});mark('shot',camera);}}catch(e){mark('failure',String(e));await p.screenshot({path:out+'/failure.png',timeout:30000}).catch(()=>{});throw e;}finally{await b.close();}
+          JS
+          timeout 9m node shoe-workshop/diagnose.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r07-render-diagnostic
+          path: shoe-workshop/r07/diagnostic
+          retention-days: 3
