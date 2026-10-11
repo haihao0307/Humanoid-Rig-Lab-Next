@@ -45,6 +45,11 @@ def physics_step(p,dt=.1):
 with sync_playwright() as pw:
  kw={'headless':False,'args':['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']}
  if os.getenv('CHROMIUM_PATH'):kw['executable_path']=os.environ['CHROMIUM_PATH']
+ # Only the paired image experiment disables the GPU watchdog for the unmodified
+ # heavy R09 reference. UI/public validation keep the default watchdog enabled.
+ # https://chromium.googlesource.com/angle/angle/+/HEAD/doc/DebuggingTips.md
+ if args.scope=='motion':kw['args'].append('--disable-gpu-watchdog')
+ r['softwareComparisonWatchdogDisabled']=args.scope=='motion'
  b=pw.chromium.launch(**kw);r['browserVersion']=b.version
  try:
   if args.scope=='ui':
