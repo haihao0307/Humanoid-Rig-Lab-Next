@@ -1,0 +1,82 @@
+{
+  "version": "R07.0",
+  "status": "RECOVERED_BUILD_REVERIFIED",
+  "date": "2026-10-11",
+  "userTask": "Resume the interrupted denim task shown in the failed-chat screenshot and deliver the real interactive result",
+  "userBaseCommit": "f8a0e0ab75ca5b8ea4dd345d8f3e7b847eccf2b3",
+  "recoveredSourceHead": "41ac3bee684bddb76421958e7b60a19dbdd43a6b",
+  "recoveredBuildCommit": "fa143743b1b0f3d74ff827664d06ff119ef87063",
+  "recoveredBranchHead": "d06a8750819185959dc9821f2a15b4b766783552",
+  "verificationHead": "d4ac9380d9f8e9b5157e8d8842569ad9014d918e",
+  "productionRuntimeChangedThisRecovery": false,
+  "newWork": ["Independent recovery verification script", "Read-only browser CI", "Repeated matched R06/R07 motion experiment", "Recovered delivery receipt and PR status completion"],
+  "runtimePR": 42,
+  "recoveryPR": 47,
+  "publicUrl": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/fa143743b1b0f3d74ff827664d06ff119ef87063/denim-workshop/r07/index.html",
+  "html": {
+    "bytes": 88792,
+    "sha256": "da52a22edc0da2365d25791a46c20c5669cd5ce7df86b51372c7d79291dd2b5a",
+    "publicRawStatus": 200,
+    "publicBytesMatch": true,
+    "localSourceRebuildByteIdentical": true,
+    "standaloneRuntimeNetworkRequests": 0
+  },
+  "originalWorkflow": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/38109202919",
+  "recoveryWorkflow": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/38114030378",
+  "workflowConclusion": "success",
+  "jobId": 114395228525,
+  "numericSuites": {"layers": true, "stability": true},
+  "productionSourceDiffCheck": "passed; R06 and specified R07 runtime/build files unchanged",
+  "browser": {
+    "version": "140.0.7339.16",
+    "renderer": "Chromium / ANGLE SwiftShader in GitHub Actions",
+    "startedAt": "2026-10-11T05:13:25.063504+00:00",
+    "finishedAt": "2026-10-11T05:25:29.375413+00:00",
+    "passed": true,
+    "fileDesktop": {"viewport": [1440, 1000], "states": 15, "pageErrors": 0, "consoleErrors": 0, "httpRequests": 0, "identicalStatePixels": true, "offscreenMsaaSamples": 4},
+    "publicDesktop": {"viewport": [1440, 1000], "states": 15, "pageErrors": 0, "consoleErrors": 1, "nonCoreConsoleError": "htmlpreview.github.io/favicon.ico returned 404; recorded, not hidden", "coreResourceErrors": 0, "identicalStatePixels": true, "offscreenMsaaSamples": 4},
+    "publicMobileViewport": {"viewport": [390, 844], "states": 7, "pageErrors": 0, "consoleErrors": 0, "identicalStatePixels": true, "offscreenMsaaSamples": 4},
+    "desktopExportSchema": "kaopu.denim_material_profile@2.5",
+    "checks": ["Actual file and immutable public navigation", "Perspective and nonblank generated geometry", "Front/back/detail/fray/rim/far buttons", "Extreme-distance damaged cloth retains bridges", "Oblique near/far views", "Actual desktop pointer orbit and wheel zoom", "Desktop JSON export", "Idle rendering stops", "Identical state produces identical canvas pixels"],
+    "actualPhone": false,
+    "hardwareFPSVerified": false
+  },
+  "freshMotionProbe": {
+    "passed": true,
+    "viewport": [1000, 780],
+    "method": "8 quarter-pixel camera-pan frames per version per scene; 13x51 RGB-average brightness patch at world [0,22,0], cubic reprojected to the material location; residual in 0..255 units",
+    "intact": {"damage": 0, "zoom": 0.5, "r06Residual": 7.094897562231519, "r07Residual": 1.5449201192700344, "ratio": 0.21775087035705123, "reductionPercent": 78.22491296429487},
+    "damagedScene": {"damage": 4, "zoom": 0.25, "r06Residual": 7.12198433976518, "r07Residual": 0.4049683173462362, "ratio": 0.05686172533195832, "reductionPercent": 94.31382746680417},
+    "limitation": "Two representative local-patch motion tests, not whole-image flicker reduction, not proof of alias-free hole boundaries or every camera/device"
+  },
+  "artifact": {
+    "id": 11693441739,
+    "name": "denim-r07-recovery-evidence",
+    "bytes": 31335603,
+    "sha256": "05da3fdd536ab08c0041f4747eee3b5f871ca706bd6edac455df6dbbf42b563b",
+    "expiresAt": "2026-10-18T05:31:38Z",
+    "reportHashes": {
+      "recovery-qa.json": "3ad331350c1a798eaf2f82c33f16ac8b509fbad32df3e7036d50ed6cc6eb65b9",
+      "alias-qa.json": "6ee025db60e842caf24cc28c710e2bfd16c64c8b1766c6209d66162633abfa87",
+      "layers-qa.json": "e751f2c09c29dfc1b7424b9487b36e598da7d6f9e45cb0fbe2b1653c0701f64b",
+      "stability-qa.json": "2cd3df2daf864a8b9ef9a63f0f9d7488bb97d8de151fcd4fee17ebdedd8aff05"
+    }
+  },
+  "visualReview": {
+    "actualBrowserCapturesInspected": true,
+    "userApproved": false,
+    "filmGradeValidated": false,
+    "remainingIssues": ["Very close yarn bodies still look overly regular and cord-like", "Mobile viewport toolbar partly crowds/overlaps the small cloth description; functional checks are not full UI polish"]
+  },
+  "limits": ["No consumer-GPU FPS or real-phone testing", "Extra MSAA and transition rendering cost; HTML file size is not runtime memory", "No measured full cotton scattering model or complete individual-fiber representation", "No dynamic tearing, cloth simulation or global self-collision proof", "Existing R07 was recovered, not represented as newly authored R08"],
+  "deliveryGates": {
+    "generatedImageSubstitute": false,
+    "interactiveProcedural3D": true,
+    "fixedPublicBrowserVerified": true,
+    "standaloneFileBrowserVerified": true,
+    "runtimeImplementationProvidedBy": "Existing R07 / PR42",
+    "newRecoveryCodeProvidedBy": "PR47",
+    "merged": false,
+    "forcePushed": false
+  }
+}
