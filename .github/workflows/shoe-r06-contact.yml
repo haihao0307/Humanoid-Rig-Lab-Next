@@ -5,29 +5,64 @@ on:
     paths: ['shoe-workshop/r06/**', '.github/workflows/shoe-r06-contact.yml']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: shoe-r06-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  repair:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
             shoe-workshop
           fetch-depth: 1
+      - name: Initialize missing readable R06 scaffolding only
+        run: |
+          python shoe-workshop/r06/tools/bootstrap.py
+          test -s shoe-workshop/r06/src/model.mjs
+          test -s shoe-workshop/r06/src/main.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Reproducible offline repair environment
+      - name: Pinned geometry and actual browser dependencies
         run: |
           npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
-          tar --exclude='*/evidence' --exclude='*/public-lite.html' --exclude='*/source-transfer' --exclude='*/originals' -czf /tmp/shoe-r06-repair-environment.tgz shoe-workshop/r02 shoe-workshop/r03 shoe-workshop/r03b shoe-workshop/r04 shoe-workshop/r05 shoe-workshop/node_modules
-      - uses: actions/upload-artifact@v4
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Build and verify current geometry and standalone browser
+        id: build
+        run: |
+          node shoe-workshop/r06/tools/build.mjs
+          node shoe-workshop/r06/tests/contact.mjs
+          node shoe-workshop/r06/tests/verify.mjs
+          echo 'built=true' >> "$GITHUB_OUTPUT"
+      - name: Fast-forward publish only tested R06 candidate
+        id: publish
+        if: steps.build.outputs.built == 'true'
+        run: |
+          git config user.name 'Shoe R06 Build'
+          git config user.email 'shoe-r06@users.noreply.github.com'
+          git add shoe-workshop/r06
+          if git diff --cached --name-only | grep -v '^shoe-workshop/r06/'; then exit 1; fi
+          git commit -m 'build(shoes): tested R06 panel contact and standalone runtime [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Verify exact immutable public browser and complete byte identity
+        if: steps.build.outputs.built == 'true'
+        env:
+          PUBLIC_BUILD_SHA: ${{ steps.publish.outputs.sha }}
+        run: |
+          node shoe-workshop/r06/tests/verify.mjs --public
+          git add shoe-workshop/r06/evidence/public shoe-workshop/r06/PUBLIC_URL.txt
+          git commit -m 'test(shoes): R06 actual public browser and full-byte identity [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Preserve current source and actual render evidence
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: shoe-r06-repair-environment
-          path: /tmp/shoe-r06-repair-environment.tgz
-          retention-days: 2
+          name: shoe-r06-candidate-${{ github.run_id }}
+          path: shoe-workshop/r06/
+          include-hidden-files: true
+          retention-days: 14
