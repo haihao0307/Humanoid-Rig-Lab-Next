@@ -1,7 +1,8 @@
-# S1A generated outputs are reproducible from the committed migration lock.
-# Do not run migration over hand-edited S1B files; it refuses nonidentical writes.
-out/
-node-lib.cjs
-__pycache__/
-# Source/resource directories are deliberately NOT ignored: S1B will review
-# and register them as canonical source. They are not all tracked in S1A.
+/out/
+/node-lib.cjs
+/__pycache__/
+/**/__pycache__/
+/MATERIALIZATION.json
+/native/kernel.wasm
+/native/kernel.wasm.gz
+/qa/s1b/case-*.json

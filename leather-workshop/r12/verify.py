@@ -1,92 +1,97 @@
-"""Fresh S1A structural, rebuild and numerical gates. No browser claims."""
+"""Fresh CPU/source verification. No browser, network, workflow or release operation."""
 from __future__ import annotations
-import ast, base64, hashlib, importlib.util, json, os, re, shutil, subprocess, sys, tempfile, time
+import argparse,ast,base64,gzip,hashlib,importlib.util,json,os,re,shutil,subprocess,sys,tempfile,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent
 checks=[]
-def sha(b): return hashlib.sha256(b).hexdigest()
-def check(name, value, data=None):
-    checks.append({"name":name,"pass":bool(value),"data":data})
-    if not value: raise AssertionError(name)
-def load(path,name):
-    s=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(s)
-    s.loader.exec_module(m);return m
+def sha(b):return hashlib.sha256(b).hexdigest()
+def check(name,passed,data=None):
+    checks.append({'name':name,'pass':bool(passed),'data':data})
+    if not passed:raise AssertionError(name)
+def load(p,name):
+    spec=importlib.util.spec_from_file_location(name,p);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
 def constant(doc,name):
-    hits=list(re.finditer(r"\bconst\s+"+re.escape(name)+r"\s*=",doc))
-    if len(hits)!=1:raise ValueError(name)
-    v,_=json.JSONDecoder().raw_decode(doc[hits[0].end():]);return v
-def run():
-    started=time.time()
-    lock=json.loads((ROOT/"migration.lock.json").read_text())
-    for name,q in lock["entries"].items():
-        p=ROOT/name
-        check("source:"+name,p.is_file() and sha(p.read_bytes())==q["sha256"])
-    src=(ROOT/"build.py").read_text()
-    tree=ast.parse(src)
-    forbidden=[n for n in ast.walk(tree) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id in ("exec","eval")]
-    check("No eval/exec or runpy in regular linker",not forbidden and "import runpy" not in src)
-    build=load(ROOT/"build.py","normalization_build")
-    report=build.build()
-    check("Whole HTML equals protected R10 SHA-256",report["byteIdenticalToR10"],report)
-    js=(ROOT/"out/reproduced-r10.html").read_text()
-    app=re.search(r"<script>([\s\S]*)</script>",js)[1]
-    link=build.Linker(json.loads((ROOT/"assembly.json").read_text()))
-    import gzip
-    documents={"outer":app,"product":constant(app,"PRODUCT_WORKER_CODE"),"specimen":constant(app,"WORKER_CODE")}
-    for k in ("LEGACY_CRAFT_GZIP","BASELINE_GZIP"):
-        page=gzip.decompress(base64.b64decode(constant(app,k))).decode()
-        documents[k]=re.search(r"<script>([\s\S]*)</script>",page)[1]
-    with tempfile.TemporaryDirectory(prefix="leather-s1a-") as td:
-        t=Path(td)
+    hits=list(re.finditer(r'\bconst\s+'+re.escape(name)+r'\s*=',doc))
+    if len(hits)!=1:raise ValueError('Ambiguous payload '+name)
+    return json.JSONDecoder().raw_decode(doc[hits[0].end():])[0]
+def command(args,env=None,timeout=300):
+    p=subprocess.run(args,env=env,capture_output=True,text=True,timeout=timeout)
+    if p.returncode:raise RuntimeError(p.stdout[-1500:]+p.stderr[-1500:])
+    return p.stdout
+
+def prepare_reference(target):
+    migrate=load(ROOT/'materialize.py','frozen_migration')
+    migrate.materialize(ROOT.parents[1],target)
+    shutil.copy2(ROOT/'qa/reference/build-s1a.py',target/'build.py')
+    shutil.copy2(ROOT/'qa/reference/assembly-s1a.json',target/'assembly.json')
+    module=load(target/'build.py','frozen_reference')
+    report=module.build()
+    check('Independent frozen reference reproduces entire R10 HTML',report['htmlSHA256']=='7da84eec41b6db9fe69c62ea17a3194283522004df92f47f0cd707d11b642622')
+    return module
+
+def run(reference=None):
+    start=time.time();builder=load(ROOT/'build.py','canonical_builder')
+    lock=builder.verify_sources()
+    for name,q in lock['files'].items():check('Canonical input: '+name,sha((ROOT/name).read_bytes())==q['sha256'])
+    tree=ast.parse((ROOT/'build.py').read_text())
+    check('Regular builder never executes historical source or imports runpy',not any(isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id in ('exec','eval') for n in ast.walk(tree)) and 'runpy' not in (ROOT/'build.py').read_text())
+    build=builder.build();text=(ROOT/'out/candidate-r12-s1b.html').read_text();app=re.search(r'<script>([\s\S]*)</script>',text)[1]
+    manifest=json.loads((ROOT/'assembly.json').read_text());candidate=builder.Linker(manifest)
+    with tempfile.TemporaryDirectory(prefix='leather-s1b-verify-') as tmp:
+        tmp=Path(tmp)
+        if reference:
+            ref=Path(reference).resolve();base=load(ref/'build.py','provided_reference')
+            baseline=base.build();check('Provided reference is exact R10',baseline['htmlSHA256']==manifest['baselineHTMLSHA256'])
+        else:ref=tmp/'reference';base=prepare_reference(ref)
+        ref_manifest=json.loads((ref/'assembly.json').read_text());old=base.Linker(ref_manifest)
+        changed={'panels','closed-shell','pattern-physics','assembly-contract','yarn-host'}
+        for key in manifest['modules']:
+            if key not in changed:check('Unchanged emitted module: '+key,candidate.module(key)==old.module(key))
+        check('Retired overwritten adapter is absent from active assembly','surface-integrity' not in manifest['modules'] and '"surface-integrity"' not in json.dumps(manifest['main']))
+        active=[ROOT/manifest['modules'][key]['file'] for key in changed]
+        check('No active PanelAssembly prototype replacement or captured original method',all(not re.search(r'PanelAssembly\.prototype',p.read_text()) for p in active))
+        a=(ROOT/'src/geometry/panels.js').read_text();b=(ref/'src/geometry/panels.js').read_text()
+        check('Complete skin shader and frame update unchanged',a[a.index('const SKIN_HEADER='):].rstrip()==b[b.index('const SKIN_HEADER='):].rstrip())
+        baseline_text=(ref/'out/reproduced-r10.html').read_text()
+        for name in ['PRODUCT_WORKER_CODE','WORKER_CODE','LEGACY_CRAFT_GZIP','BASELINE_GZIP']:
+            check('Immutable payload: '+name,constant(text,name)==constant(baseline_text,name))
+        for key in ['scanData']:
+            pattern=r'<div id="'+key+r'" hidden>(.*?)</div>'
+            check('Immutable embedded '+key,re.search(pattern,text,re.S)[1]==re.search(pattern,baseline_text,re.S)[1])
+        documents={'outer':app,'product':constant(text,'PRODUCT_WORKER_CODE'),'specimen':constant(text,'WORKER_CODE')}
+        for key in ['LEGACY_CRAFT_GZIP','BASELINE_GZIP']:
+            html=gzip.decompress(base64.b64decode(constant(text,key))).decode();documents[key]=re.search(r'<script>([\s\S]*)</script>',html)[1]
         for name,body in documents.items():
-            p=t/(name+".js");p.write_text(body)
-            q=subprocess.run(["node","--check",str(p)],capture_output=True,text=True,timeout=20)
-            check("JavaScript syntax:"+name,q.returncode==0,q.stderr[:500])
-        # This copy has no repository parent, R01-R11 directories or historical scripts.
-        isolated=t/"isolated-package"
-        shutil.copytree(ROOT,isolated,ignore=shutil.ignore_patterns("out","qa","node-lib.cjs","__pycache__"))
-        ib=load(isolated/"build.py","isolated_build")
-        ir=ib.build()
-        check("Build succeeds outside repository with no historical directories",ir["byteIdenticalToR10"])
-        pick=isolated/"src/app/runtime.js"
-        old=pick.read_text()
-        new=old.replace("const VERSION='R10.0'","const VERSION='SOURCE_MUTATION_TEST'",1)
-        check("Adversarial source mutation applied",new!=old)
-        pick.write_text(new)
-        il=ib.Linker(json.loads((isolated/"assembly.json").read_text()))
-        changed=il.build()
-        check("Assembler genuinely consumes editable modules, not the old HTML",sha(changed)!=lock["baselineSHA256"])
-        failed=False
+            p=tmp/(name+'.js');p.write_text(body);command(['node','--check',str(p)],timeout=30);check('Syntax: '+name,True)
+        isolated=tmp/'isolated';shutil.copytree(ROOT,isolated,ignore=shutil.ignore_patterns('out','qa','__pycache__','node-lib.cjs','_canonical_paths.json'))
+        ib=load(isolated/'build.py','isolated_canonical');check('Checkout builds without historical directories or migration',ib.build()['htmlSHA256']==build['htmlSHA256'])
+        p=isolated/'src/app/runtime.js';raw=p.read_bytes();p.write_bytes(raw.replace(b"const VERSION='R10.0'",b"const VERSION='ADVERSARIAL'",1))
+        rejected=False
         try:ib.build()
-        except ValueError:failed=True
-        check("Changed runtime cannot silently pass frozen-output gate",failed)
-        pick.write_text(old)
-        pick.unlink()
-        failed=False
+        except ValueError:rejected=True
+        check('Changed source cannot silently pass or fallback',rejected)
+        p.unlink();rejected=False
         try:ib.build()
-        except (ValueError,FileNotFoundError):failed=True
-        check("Missing source fails, no historical fallback",failed)
-        pick.write_text(old)
-        failed=False
-        try:ib.local("../escape")
-        except ValueError:failed=True
-        check("Input path cannot escape declared source root",failed)
-    q=subprocess.run(["node",str(ROOT/"qa-numeric.cjs")],capture_output=True,text=True,timeout=45)
-    nr=json.loads((ROOT/"qa/numeric.json").read_text())
-    check("Inherited numerical regression executes against newly linked core",q.returncode==0 and nr["pass"] and len(nr["checks"])==18,{"checks":len(nr["checks"]),"stdout":q.stdout,"stderr":q.stderr[:500]})
-    check("Both actual worker payloads stay unchanged",sha(documents["product"].encode())=="7b079eec2525347d1b1087208e4d08799ad4646590fe3e366b92d6c9b7b71427" and sha(documents["specimen"].encode())=="743954938b8db6f27863c04ad473e96c88e6f73b222b08521f99a8b3d1520bdc")
-    return {"scope":"R12-S1A migration and independent source build; not full S1 or fresh visual certification",
-            "pass":all(x["pass"] for x in checks),"checks":checks,"checkCount":len(checks),
-            "numericChecks":18,"htmlSHA256":report["htmlSHA256"],"htmlBytes":report["htmlBytes"],
-            "elapsedSeconds":time.time()-started,"python":sys.version.split()[0],
-            "node":subprocess.check_output(["node","--version"],text=True).strip(),
-            "newBrowserChecks":0,"newPublicDeployment":False,"stableRuntimeChanged":False,
-            "next":"S1B: check in normalized modules, explicit interfaces and remove late overrides, with separate frozen regression gates."}
-if __name__=="__main__":
-    out=ROOT/"qa/SUMMARY.json";out.parent.mkdir(parents=True,exist_ok=True)
-    try: result=run()
+        except (ValueError,FileNotFoundError):rejected=True
+        check('Missing source cannot fallback',rejected)
+        rejected=False
+        try:ib.local('../escape')
+        except ValueError:rejected=True
+        check('Declared input cannot escape package',rejected)
+        p.write_bytes(raw);part=isolated/'native/kernel-00.b64';part.write_text('invalid');rejected=False
+        try:ib.build()
+        except ValueError:rejected=True
+        check('Corrupt pinned native payload cannot fallback',rejected)
+        env={**os.environ,'BASE_LIB':str(ref/'node-lib.cjs')}
+        for name,report_path,expected in [('qa-numeric.cjs','qa/numeric.json',18),('qa-interfaces.cjs','qa/s1b/interfaces.json',3),('qa-geometry-equivalence.cjs','qa/s1b/equivalence.json',25)]:
+            (ROOT/report_path).unlink(missing_ok=True);command(['node',str(ROOT/name)],env=env,timeout=1800)
+            result=json.loads((ROOT/report_path).read_text());count=result.get('cases',result.get('checks'))
+            if isinstance(count,list):count=len(count)
+            check('Fresh execution: '+name,result['pass'] and count==expected,{'cases':count})
+    return {'schema':'kaopu/leather-s1b-verification@1','phase':'S1B1','pass':all(q['pass'] for q in checks),'checkCount':len(checks),'checks':checks,'numericalCases':18,'interfaceAssertions':3,'geometryCases':25,'full52StepTrajectories':6,'build':build,'elapsedSeconds':time.time()-start,'python':sys.version.split()[0],'node':subprocess.check_output(['node','--version'],text=True).strip(),'newBrowserChecks':0,'newPublicDeployment':False,'fullS1Complete':False,'runtimePromotionAllowed':False,'sourceCommit':os.environ.get('S1B_SOURCE_COMMIT','UNCOMMITTED_CANDIDATE')}
+if __name__=='__main__':
+    ap=argparse.ArgumentParser();ap.add_argument('--reference',type=Path);args=ap.parse_args();out=ROOT/'qa/s1b/SUMMARY.json';out.parent.mkdir(parents=True,exist_ok=True)
+    try:result=run(args.reference)
     except Exception as e:
-        result={"pass":False,"checks":checks,"error":str(e),"newBrowserChecks":0}
-        out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n");raise
-    out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n")
-    print(json.dumps({k:result[k]for k in ("pass","checkCount","numericChecks","htmlSHA256","newBrowserChecks")},indent=2))
+        out.write_text(json.dumps({'pass':False,'checks':checks,'error':str(e),'newBrowserChecks':0},indent=2)+'\n');raise
+    out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:result[k] for k in ['phase','pass','checkCount','numericalCases','geometryCases','newBrowserChecks']}))

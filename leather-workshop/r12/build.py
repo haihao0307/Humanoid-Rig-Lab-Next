@@ -1,6 +1,6 @@
-"""R12-S1A deterministic linker. Only local declared inputs, no historic builder execution."""
+"""R12-S1B deterministic linker. Only local declared inputs, no historic builder execution."""
 from __future__ import annotations
-import argparse, base64, hashlib, io, json, re, subprocess, zlib
+import argparse, base64, hashlib, io, json, re, subprocess, zlib, gzip
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 def sha(data): return hashlib.sha256(data).hexdigest()
@@ -18,6 +18,30 @@ def strip_es_syntax(source):
     if re.search(r"^\s*(?:import|export)\b",source,re.M):
         raise ValueError("Unsupported ES module syntax; do not silently patch")
     return source
+
+def packed_binary(path):
+    record=json.loads(text(path));encoded=[]
+    for part in record["parts"]:
+        data=local(part["path"]).read_bytes()
+        if len(data)!=part["bytes"] or sha(data)!=part["sha256"]:
+            raise ValueError("Pinned binary part changed: "+part["path"])
+        encoded.append(data)
+    compressed=base64.b64decode(b"".join(encoded),validate=True)
+    if sha(compressed)!=record["compressedSHA256"]: raise ValueError("Packed kernel hash mismatch")
+    with gzip.GzipFile(fileobj=io.BytesIO(compressed)) as stream:
+        data=stream.read(record["decodedBytes"]+1)
+    if len(data)!=record["decodedBytes"] or sha(data)!=record["decodedSHA256"]:
+        raise ValueError("Decoded kernel differs from accepted R10")
+    return data
+
+def verify_sources():
+    lock=json.loads(text("canonical.lock.json"))
+    for name,q in lock["files"].items():
+        data=local(name).read_bytes()
+        if len(data)!=q["bytes"] or sha(data)!=q["sha256"]:
+            raise ValueError("Canonical source changed; review source and regression before updating lock: "+name)
+    return lock
+
 class Linker:
     def __init__(self, manifest):
         self.m=manifest
@@ -26,6 +50,7 @@ class Linker:
         if key in self.cache: return self.cache[key]
         q=self.m["modules"][key]
         s=text(q["file"])
+        if q.get("ensureFinalLF") and not s.endswith("\n"): s += "\n"
         if q["format"]=="legacy-esm":
             s=strip_es_syntax(s)
         elif q["format"]=="three-esm":
@@ -44,6 +69,7 @@ class Linker:
         if op=="module": return self.module(v)
         if op=="ref": return self.emit(self.m["programs"][v])
         if op=="file": return local(v).read_bytes()
+        if op=="packedBinary": return packed_binary(v)
         if op=="join": return "".join(self.as_text(self.emit(x)) for x in v)
         if op=="jsonString": return json.dumps(self.as_text(self.emit(v)),ensure_ascii=True)
         if op=="base64":
@@ -93,24 +119,32 @@ class Linker:
               "seam-paths","contact-relief"]
         parts=[self.module(k) for k in keys]
         parts+=["const {insideHole}=R05_SEW;const {mapSurfacePoint}=R05_CONTACT;"]
-        parts += [self.module(k) for k in ("seam-geometry","sewing","panels","surface-integrity",
+        parts += [self.module(k) for k in ("seam-geometry","sewing","panels",
             "closed-shell","pattern-physics","assembly-contract","yarn-host","measurements","products","grip-base")]
         parts += [self.as_text(self.emit({"ref":"physics"}))]
         return "\n".join(parts)+"""
 module.exports={ImplicitLeatherShell,SurfaceContact,closestPT,closestEE,sweptContact,ContactReference,evaluateBoundVertex,worldShellMeasurements,updateSkin,skinMaterial,T,PRODUCT_SPECS,productMaterials,makeProduct,productAudit,ProductShell,fastHinge,hinge,PanelAssembly,SeamPath,SeamIndex,seamRelief,R05_SEW,R05_CONTACT};
 """
-def build(out=None, require_identity=True):
+def build(out=None):
+    lock=verify_sources()
     manifest=json.loads(text("assembly.json"));link=Linker(manifest)
     data=link.build()
-    equal=sha(data)==manifest["expectedHTMLSHA256"]
-    if require_identity and not equal: raise ValueError("R10 equivalence gate failed; no fallback emitted")
-    output=Path(out) if out else ROOT/"out/reproduced-r10.html"
+    provenance={"architecture":"R12-S1B1", "runtimeCompatibility":"R10.0",
+                "baselineBuild":manifest["baselineBuild"],
+                "canonicalLockSHA256":sha(local("canonical.lock.json").read_bytes()),
+                "status":"SOURCE_CANDIDATE_NOT_PUBLIC_RELEASE"}
+    marker=("<!-- "+json.dumps(provenance,separators=(",",":"))+" -->").encode()
+    data=marker+b"\n"+data
+    output=Path(out) if out else ROOT/"out/candidate-r12-s1b.html"
     output.parent.mkdir(parents=True,exist_ok=True);output.write_bytes(data)
     (ROOT/"node-lib.cjs").write_text(link.node_library(),encoding="utf-8")
-    receipt={"architecture":"R12-S1A","runtime":"R10.0","baselineBuild":manifest["baselineBuild"],
-             "htmlSHA256":sha(data),"htmlBytes":len(data),"byteIdenticalToR10":equal,
-             "moduleCount":len(manifest["modules"]),"historicBuilderExecutions":0,
-             "newBrowserChecks":0,"publicDeploymentPerformed":False,"fullS1Complete":False}
+    receipt={**provenance,"htmlSHA256":sha(data),"htmlBytes":len(data),
+             "baselineHTMLSHA256":manifest["baselineHTMLSHA256"],
+             "byteIdenticalToR10":sha(data)==manifest["baselineHTMLSHA256"],
+             "moduleCount":len(manifest["modules"]),"trackedInputFiles":len(lock["files"]),
+             "historicBuilderExecutions":0,"newBrowserChecks":0,
+             "publicDeploymentPerformed":False,"fullS1Complete":False,
+             "runtimePromotionAllowed":False}
     (ROOT/"BUILD_RESULT.json").write_text(json.dumps(receipt,indent=2)+"\n",encoding="utf-8")
     return receipt
 if __name__=="__main__":
