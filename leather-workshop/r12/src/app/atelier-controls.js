@@ -1,24 +1,18 @@
-const inheritedGrabPreparation=prepareGrab;
-prepareGrab=function(){inheritedGrabPreparation();if(window.LEATHER_ATELIER){window.LEATHER_ATELIER.inspectGrip=()=>({report:productSolver.report(),positionsMM:Array.from(productSolver.x,v=>v*1000),triangles:hero.userData.rig.data.triangles.map(t=>t.slice(0,3))});}};
-const releaseProductGrip=ProductShell.prototype.release;
-ProductShell.prototype.release=function(){releaseProductGrip.call(this);this.grabForce=0;};
-const resetProductGrip=ProductShell.prototype.reset;
-ProductShell.prototype.reset=function(){resetProductGrip.call(this);this.grabForce=0;this.extraIterations=0;};
-
 // R08 keeps the inherited controls available, while providing composed defaults.
 const artistSurface={relief:1,roughness:0,coat:0,grain:1,color:null};
-const createSurface=AtelierMaterials.prototype.create;
-AtelierMaterials.prototype.create=function(c,res){
+/** App-local material extension. The shared catalogue prototype stays untouched. */
+class ArtistAtelierMaterials extends AtelierMaterials {
+ create(c,res){
  const recipe=artistSurface.color?{...c,color:artistSurface.color,override:{...c.override,color:artistSurface.color}}:c;
- const e=createSurface.call(this,recipe,res),m=e.material,prior=m.onBeforeCompile,key=m.customProgramCacheKey?.()||'';
+ const e=super.create(recipe,res),m=e.material,prior=m.onBeforeCompile,key=m.customProgramCacheKey?.()||'';
  m.normalScale.multiplyScalar(artistSurface.relief);m.clearcoat=Math.max(0,Math.min(1,m.clearcoat+artistSurface.coat));const grain=artistSurface.grain,rough=artistSurface.roughness;
  m.onBeforeCompile=s=>{prior?.call(m,s);s.uniforms.uArtistGrain={value:grain};s.uniforms.uArtistRoughness={value:rough};s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nuniform float uArtistGrain;').replace('#include <uv_vertex>','#include <uv_vertex>\n#ifdef USE_MAP\nvMapUv*=uArtistGrain;\n#endif\n#ifdef USE_NORMALMAP\nvNormalMapUv*=uArtistGrain;\n#endif\n#ifdef USE_ROUGHNESSMAP\nvRoughnessMapUv*=uArtistGrain;\n#endif');s.fragmentShader=s.fragmentShader.replace('#include <common>','#include <common>\nuniform float uArtistRoughness;').replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\nroughnessFactor=clamp(roughnessFactor+uArtistRoughness,.10,.99);');};
  m.customProgramCacheKey=()=>key+'-R08-artist';return e;
-};
+ }
+}
 function measureShell(){return worldShellMeasurements(hero);}
 
-const oldUpdateDetails=updateDetails;
-updateDetails=function(){oldUpdateDetails();if(!hero)return;const rows=measureShell();$('shellReadout').textContent=rows.map(p=>`${p.part}: ${p.minMM.toFixed(2)}–${p.maxMM.toFixed(2)} mm`).join('\n');};
+function updateShellDetails(){if(!hero)return;const rows=measureShell();$('shellReadout').textContent=rows.map(p=>`${p.part}: ${p.minMM.toFixed(2)}–${p.maxMM.toFixed(2)} mm`).join('\n');};
 let isThicknessView=false;
 function thicknessView(on){isThicknessView=on;$('thicknessView').classList.toggle('active',on);const rig=hero.userData.rig;
  for(const mesh of rig.meshes){if(mesh.userData.thread)continue;if(on){if(mesh.userData.beautyMaterials)continue;mesh.userData.beautyMaterials=mesh.material;const colors=Array.isArray(mesh.material)?['#b8c5bb','#748f81','#ad7943']:['#9e8664'];mesh.material=colors.map(c=>skinMaterial(new T.MeshStandardMaterial({color:c,roughness:.73,metalness:0}),rig,false));if(!Array.isArray(mesh.userData.beautyMaterials))mesh.material=mesh.material[0];}
@@ -36,11 +30,8 @@ function initRestoredControls(){
  $('thicknessView').onclick=()=>thicknessView(!isThicknessView);
  $('legacyCraft').onclick=()=>{const frame=$('craftArchiveFrame');if(!frame.srcdoc){const bytes=Uint8Array.from(atob(LEGACY_CRAFT_GZIP),c=>c.charCodeAt(0));new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text().then(html=>{frame.srcdoc=html;});}$('craftArchive').showModal();};$('closeCraftArchive').onclick=()=>$('craftArchive').close();
 }
-initRestoredControls();
-const originalSelectProduct=selectProduct;
-selectProduct=function(id){isThicknessView=false;$('thicknessView').classList.remove('active');return originalSelectProduct(id);};
-const originalPrepare=prepareGrab;
-prepareGrab=function(){originalPrepare();if(window.LEATHER_ATELIER){window.LEATHER_ATELIER.measureShell=measureShell;window.LEATHER_ATELIER.thicknessView=thicknessView;}};
+function resetThicknessMode(){isThicknessView=false;$('thicknessView').classList.remove('active');}
+function inspectGrip(){return {report:productSolver.report(),positionsMM:Array.from(productSolver.x,v=>v*1000),triangles:hero.userData.rig.data.triangles.map(t=>t.slice(0,3))};}
 // A genuine close-up of the selected curved cut edge, not an image overlay.
 function inspectSurface(partName,u,v,options={}){
  const rig=hero.userData.rig,part=rig.parts.find(p=>p.name===partName);if(!part)throw Error('Unknown product panel '+partName);
@@ -58,4 +49,4 @@ function inspectCut(){const rig=hero.userData.rig;let p,u,v,options={};
  else{p=rig.parts[product==='wallet'?2:0];u=p.w*.1;v=(product==='wallet'?1:-1)*(p.h/2-.7);options={yawOffset:.55,pitch:.24,distance:product==='wallet'?33:70};}
  inspectSurface(p.name,u,v,options);
 }
-$('viewEdge').onclick=inspectCut;
+function initEdgeInspection(){ $('viewEdge').onclick=inspectCut; }

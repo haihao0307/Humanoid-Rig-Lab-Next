@@ -1,6 +1,6 @@
-"""R12-S1B deterministic linker. Only local declared inputs, no historic builder execution."""
+"""R12-S1B2 deterministic linker. Only local declared inputs, no historic builder execution."""
 from __future__ import annotations
-import argparse, base64, hashlib, io, json, re, subprocess, zlib, gzip
+import argparse, base64, hashlib, io, json, re, subprocess, zlib, gzip, os
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 def sha(data): return hashlib.sha256(data).hexdigest()
@@ -70,6 +70,14 @@ class Linker:
         if op=="ref": return self.emit(self.m["programs"][v])
         if op=="file": return local(v).read_bytes()
         if op=="packedBinary": return packed_binary(v)
+        if op=="buildIdentity":
+            data=json.loads(text(v))
+            data["inheritedSourceCommit"]=data.get("sourceCommit")
+            commit=os.environ.get("LEATHER_SOURCE_COMMIT","UNCOMMITTED-S1B2")
+            if commit!="UNCOMMITTED-S1B2" and not re.fullmatch(r"[0-9a-f]{40}",commit):
+                raise ValueError("Invalid source identity")
+            data.update(sourceCommit=commit,version="R12.0-S1B2",architecture="R12-S1B2")
+            return json.dumps(data,ensure_ascii=True)
         if op=="join": return "".join(self.as_text(self.emit(x)) for x in v)
         if op=="jsonString": return json.dumps(self.as_text(self.emit(v)),ensure_ascii=True)
         if op=="base64":
@@ -129,10 +137,11 @@ def build(out=None):
     lock=verify_sources()
     manifest=json.loads(text("assembly.json"));link=Linker(manifest)
     data=link.build()
-    provenance={"architecture":"R12-S1B1", "runtimeCompatibility":"R10.0",
+    provenance={"architecture":"R12-S1B2", "runtimeCompatibility":"R10.0",
                 "baselineBuild":manifest["baselineBuild"],
                 "canonicalLockSHA256":sha(local("canonical.lock.json").read_bytes()),
-                "status":"SOURCE_CANDIDATE_NOT_PUBLIC_RELEASE"}
+                "status":"SOURCE_CANDIDATE_REQUIRES_BROWSER_GATES",
+                "sourceCommit":os.environ.get("LEATHER_SOURCE_COMMIT","UNCOMMITTED-S1B2")}
     marker=("<!-- "+json.dumps(provenance,separators=(",",":"))+" -->").encode()
     data=marker+b"\n"+data
     output=Path(out) if out else ROOT/"out/candidate-r12-s1b.html"

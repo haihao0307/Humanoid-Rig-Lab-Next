@@ -1,1 +1,621 @@
-{"schema":"kaopu/leather-normalized-assembly@1","phase":"S1B_GEOMETRY","runtimeIdentity":"R10.0-compatible","buildArchitecture":"R12-S1B","baselineBuild":"af389cc216ddd01e3b1aa66c972f42b2587bc797","baselineBytes":3641172,"modules":{"vendor-three":{"file":"vendor/three.module.js","format":"three-esm"},"vendor-poly2tri":{"file":"vendor/poly2tri.min.js","format":"text","prefix":"const POLY2TRI=(()=>{const module={exports:{}};const exports=module.exports;","suffix":";return module.exports;})();"},"material-law":{"file":"src/physics/material-law.mjs","format":"legacy-esm","prefix":"const {PROFILES,LeatherMaterial,makeSpecimen,MembraneSolver}=(()=>{","suffix":";return {PROFILES,LeatherMaterial,makeSpecimen,MembraneSolver};})();"},"shell-dynamics":{"file":"src/physics/shell-dynamics.mjs","format":"legacy-esm","prefix":"const {SurfaceLaw,hinge,LeatherDynamics}=(()=>{","suffix":";return {SurfaceLaw,hinge,LeatherDynamics};})();"},"seam-paths":{"file":"src/sewing/seam-paths.js","format":"text","prefix":"const R05_SEW=(()=>{","suffix":";return {buildSeam,continuousRoutes,auditSeam,insideHole};})();","ensureFinalLF":true},"contact-relief":{"file":"src/sewing/contact-relief.mjs","format":"legacy-esm","prefix":"const R05_CONTACT=(()=>{","suffix":";return {buildContactField,mapSurfacePoint};})();"},"seam-geometry":{"file":"src/sewing/geometry.mjs","format":"legacy-esm","prefix":"const R05_GEOMETRY=(()=>{","suffix":";return {fibreNormalTexture};})();"},"sewing":{"file":"src/sewing/yarn.js","format":"text","prefix":"const {SeamPath,SeamIndex,seamRelief,makeSewnYarn}=(()=>{","suffix":";return {SeamPath,SeamIndex,seamRelief,makeSewnYarn};})();","ensureFinalLF":true},"panels":{"file":"src/geometry/panels.js","format":"text","prefix":"const {PanelAssembly,rectangle,borderPoints,skinMaterial,installSkin,updateSkin,reskinMaterial}=(()=>{","suffix":";return {PanelAssembly,rectangle,borderPoints,skinMaterial,installSkin,updateSkin,reskinMaterial};})();"},"closed-shell":{"file":"src/geometry/closed-shell.js","format":"text","prefix":"const ClosedShell=(()=>{","suffix":";return {buildPanel};})();"},"pattern-physics":{"file":"src/geometry/pattern-physics.js","format":"legacy-esm","prefix":"const PatternPhysics=(()=>{","suffix":";return {add,idsAt,binding,finalize};})();"},"assembly-contract":{"file":"src/geometry/assembly-contract.js","format":"text","prefix":"const AssemblyContract=(()=>{","suffix":";return {prepare,recordConnection,finalize};})();"},"yarn-host":{"file":"src/sewing/yarn-host.js","format":"legacy-esm","prefix":"const YarnHost=(()=>{","suffix":";return {binding};})();"},"measurements":{"file":"src/geometry/measurements.js","format":"legacy-esm","prefix":"const {evaluateBoundVertex,worldShellMeasurements}=(()=>{","suffix":";return {evaluateBoundVertex,worldShellMeasurements};})();"},"products":{"file":"src/products/catalogue.js","format":"text","prefix":"const {PRODUCT_SPECS,productMaterials,makeProduct,setProductMaterial,productAudit,patternSVG}=(()=>{","suffix":";return {PRODUCT_SPECS,productMaterials,makeProduct,setProductMaterial,productAudit,patternSVG};})();","ensureFinalLF":true},"grip-base":{"file":"src/physics/grip-base.mjs","format":"legacy-esm","prefix":"const {ProductShell,fastHinge}=(()=>{","suffix":";return {ProductShell,fastHinge};})();"},"worker-client":{"file":"src/workers/client.js","format":"text","prefix":"const {ProductWorkerShell}=(()=>{","suffix":";return {ProductWorkerShell};})();","ensureFinalLF":true},"leather-look":{"file":"src/materials/leather.mjs","format":"legacy-esm","prefix":"const {LeatherKernel,PRESETS,DEFAULT,FINISHES}=(()=>{","suffix":";return {LeatherKernel,PRESETS,DEFAULT,FINISHES};})();"},"sewing-look":{"file":"src/materials/sewing.mjs","format":"legacy-esm","prefix":"const {SewingAppearance}=(()=>{","suffix":";return {SewingAppearance};})();"},"material-catalogue":{"file":"src/materials/catalogue.mjs","format":"legacy-esm","prefix":"const {CATALOGUE,AtelierMaterials}=(()=>{","suffix":";return {CATALOGUE,AtelierMaterials};})();"},"app-runtime":{"file":"src/app/runtime.js","format":"text"},"view-polish":{"file":"src/app/view-polish.js","format":"text"},"atelier-controls":{"file":"src/app/atelier-controls.js","format":"text"},"craft-ui":{"file":"src/app/craft-ui.js","format":"text"},"lifecycle":{"file":"src/app/lifecycle.js","format":"text"},"input-perf":{"file":"src/app/input-performance.js","format":"text"},"native-grip-base":{"file":"src/physics/grip-base.mjs","format":"legacy-esm","prefix":"const {ProductShell:BaseProductShell,fastHinge}=(()=>{","suffix":";return {ProductShell,fastHinge};})();"},"surface-contact":{"file":"src/physics/surface-contact.js","format":"text","prefix":"const {SurfaceContact,closestPT,closestEE,sweptContact,ContactReference}=(()=>{","suffix":";return {SurfaceContact,closestPT,closestEE,sweptContact,ContactReference};})();"},"native-broadphase":{"file":"src/physics/broadphase.js","format":"text","prefix":"(()=>{","suffix":"})();"},"chart-shell":{"file":"src/physics/chart-shell.mjs","format":"legacy-esm","prefix":"const {ProductShell}=(()=>{","suffix":";return {ProductShell};})();"},"native-energy":{"file":"src/physics/native-energy.js","format":"text","prefix":"const {NativeEnergy}=(()=>{","suffix":";return {NativeEnergy};})();"},"implicit-solver":{"file":"src/physics/implicit-solver.js","format":"text","prefix":"const {ImplicitLeatherShell}=(()=>{","suffix":";return {ImplicitLeatherShell};})();","ensureFinalLF":true},"feasible-start":{"file":"src/physics/feasible-start.js","format":"legacy-esm","prefix":"const {ReadyLeatherShell}=(()=>{","suffix":";return {ReadyLeatherShell};})();"},"product-entry":{"file":"src/workers/product-entry.js","format":"text"},"clamped-leather":{"file":"src/physics/clamped.mjs","format":"legacy-esm","prefix":"const {ClampedLeather}=(()=>{","suffix":";return {ClampedLeather};})();"},"specimen-entry":{"file":"src/workers/specimen-entry.js","format":"text"},"compat-r02-legacy":{"file":"compat/r02/legacy.js","format":"legacy-esm"},"compat-r02-leather":{"file":"compat/r02/leather.js","format":"legacy-esm"},"compat-r02-craft":{"file":"compat/r02/craft.js","format":"legacy-esm"},"compat-r02-export":{"file":"compat/r02/export.js","format":"legacy-esm"},"compat-r02-app":{"file":"compat/r02/app.js","format":"legacy-esm"}},"assets":{"diff":{"path":"assets/grain/diff.webp","sourceSHA256":"bee2811502697e54596350028033f2679f74b7df0ecf47063149d352b61db05a","outputSHA256":"fdfb3c6725c5bc694c8626d06143fb53d6ec7d69c3c74e2216c348f9a999620c"},"nor_gl":{"path":"assets/grain/nor_gl.webp","sourceSHA256":"b54e70071d1f96b71e2ae3332f34e6c2e9a4b2ec26666bffb53ef0acc5b04045","outputSHA256":"04f347864d21ee5e4f66c7a56cc678636f76b24e4ffe746fbcd789ef78eac9ec"},"rough":{"path":"assets/grain/rough.webp","sourceSHA256":"38f77c6dc2693a87bbae9ccf46a2aaf35a4b09b41f646fb77f36780bc67cc307","outputSHA256":"40e2b578bba8858d9784d7b33a2718fcd85d9151308058ea591f513f513593a7"}},"limits":["PanelAssembly construction uses explicit service functions; SeamPath.frame and app late overrides remain for the next bounded task.","Legacy R02 import spellings are syntax only. Explicit manifest supplies bindings; no historical path is followed.","R05 compatibility page is an explicitly frozen archive, not editable main runtime.","WASM is the pinned accepted binary; native rebuild equivalence is not claimed in S1A.","This does not grant new third-party permissions or resolve pending R11 source/rights items."],"programs":{"physics":{"join":[{"text":"const {ImplicitLeatherShell,SurfaceContact,closestPT,closestEE,sweptContact,ContactReference}=(()=>{"},{"join":[{"text":"const CONTACT_NARROW_WASM="},{"jsonString":{"base64":{"packedBinary":"native/kernel.json"}}},{"text":";"}]},{"module":"native-grip-base"},{"module":"surface-contact"},{"module":"native-broadphase"},{"module":"chart-shell"},{"module":"native-energy"},{"module":"implicit-solver"},{"module":"feasible-start"},{"text":";return {ImplicitLeatherShell:ReadyLeatherShell,SurfaceContact,closestPT,closestEE,sweptContact,ContactReference};})();"}]},"product":{"join":[{"text":"(()=>{"},{"module":"material-law"},{"module":"shell-dynamics"},{"ref":"physics"},{"module":"product-entry"},{"text":"\n})();"}]},"specimen":{"join":[{"text":"(()=>{"},{"module":"material-law"},{"module":"shell-dynamics"},{"module":"clamped-leather"},{"text":"/* Built into an offline Blob Worker. The renderer never computes deformation. */\n"},{"module":"specimen-entry"},{"text":"\n})();"}]}},"main":{"join":[{"text":"(()=>{"},{"module":"vendor-three"},{"text":"\n"},{"module":"vendor-poly2tri"},{"text":"\n"},{"module":"material-law"},{"module":"shell-dynamics"},{"text":"\n"},{"module":"seam-paths"},{"text":"\n"},{"module":"contact-relief"},{"text":"\nconst {insideHole}=R05_SEW;const {mapSurfacePoint}=R05_CONTACT;\n"},{"module":"seam-geometry"},{"text":"\n"},{"module":"sewing"},{"text":"\n"},{"module":"panels"},{"text":"\n// A domain adapter, executed before any R07 product is constructed. Frozen R05\n// and R06 sources are not changed. Needle apertures must not be filled by a\n// contour-index shift caused by duplicated closing points.\n"},{"text":"\n\n"},{"module":"closed-shell"},{"text":"\n"},{"module":"pattern-physics"},{"text":"\n"},{"module":"assembly-contract"},{"text":"\n"},{"module":"yarn-host"},{"text":"\n"},{"module":"measurements"},{"text":"\n"},{"module":"products"},{"text":"\n"},{"module":"grip-base"},{"text":"\n"},{"join":[{"text":"const PRODUCT_WORKER_CODE="},{"jsonString":{"ref":"product"}},{"text":";"}]},{"text":"\n"},{"module":"worker-client"},{"text":"\n"},{"module":"leather-look"},{"text":"\n"},{"module":"sewing-look"},{"text":"\n"},{"module":"material-catalogue"},{"text":"\n"},{"join":[{"text":"const LEGACY_CRAFT_GZIP="},{"jsonString":{"base64":{"gzip":{"r02Document":true}}}},{"text":";"}]},{"join":[{"text":"const WORKER_CODE="},{"jsonString":{"ref":"specimen"}},{"text":";"}]},{"join":[{"text":"const BUILD_INFO="},{"file":"src/app/r10-runtime-identity.json"},{"text":";"}]},{"join":[{"text":"const BASELINE_GZIP="},{"jsonString":{"base64":{"gzip":{"file":"compat/r05.snapshot.html"}}}},{"text":";"}]},{"text":"\n"},{"module":"app-runtime"},{"text":"\n\n// Runtime adapter for the inherited atelier interface. Camera targets are\n// measured on the current R07 paper-space seam rather than old product offsets.\n"},{"module":"view-polish"},{"text":"\n"},{"module":"atelier-controls"},{"text":"\n\n// R10.0 integrated craft entry. Original material/product library stays intact.\n"},{"module":"craft-ui"},{"text":"\n\n// Dispose product-owned GPU programs and textures when switching products.\n// The shared material catalogue and frozen thumbnails must remain alive.\n"},{"module":"lifecycle"},{"text":"\n\n// Diagnostics/UI update at 5 Hz; completed skin poses still apply once per RAF.\n"},{"module":"input-perf"},{"text":"\n})();"}]},"retiredModules":{"surface-integrity":{"file":"src/geometry/surface-integrity.js","format":"text","emittedSHA256":"095f1effcdb99dfbb5408fc24bbaae864dbdc204d5db2c2db4b90429268072a8"}},"baselineHTMLSHA256":"7da84eec41b6db9fe69c62ea17a3194283522004df92f47f0cd707d11b642622"}
+{
+  "schema": "kaopu/leather-normalized-assembly@1",
+  "phase": "S1B2",
+  "runtimeIdentity": "R12.0-S1B2",
+  "buildArchitecture": "R12-S1B2",
+  "baselineBuild": "af389cc216ddd01e3b1aa66c972f42b2587bc797",
+  "baselineBytes": 3641172,
+  "modules": {
+    "vendor-three": {
+      "file": "vendor/three.module.js",
+      "format": "three-esm"
+    },
+    "vendor-poly2tri": {
+      "file": "vendor/poly2tri.min.js",
+      "format": "text",
+      "prefix": "const POLY2TRI=(()=>{const module={exports:{}};const exports=module.exports;",
+      "suffix": ";return module.exports;})();"
+    },
+    "material-law": {
+      "file": "src/physics/material-law.mjs",
+      "format": "legacy-esm",
+      "prefix": "const {PROFILES,LeatherMaterial,makeSpecimen,MembraneSolver}=(()=>{",
+      "suffix": ";return {PROFILES,LeatherMaterial,makeSpecimen,MembraneSolver};})();"
+    },
+    "shell-dynamics": {
+      "file": "src/physics/shell-dynamics.mjs",
+      "format": "legacy-esm",
+      "prefix": "const {SurfaceLaw,hinge,LeatherDynamics}=(()=>{",
+      "suffix": ";return {SurfaceLaw,hinge,LeatherDynamics};})();"
+    },
+    "seam-paths": {
+      "file": "src/sewing/seam-paths.js",
+      "format": "text",
+      "prefix": "const R05_SEW=(()=>{",
+      "suffix": ";return {buildSeam,continuousRoutes,auditSeam,insideHole};})();",
+      "ensureFinalLF": true
+    },
+    "contact-relief": {
+      "file": "src/sewing/contact-relief.mjs",
+      "format": "legacy-esm",
+      "prefix": "const R05_CONTACT=(()=>{",
+      "suffix": ";return {buildContactField,mapSurfacePoint};})();"
+    },
+    "seam-geometry": {
+      "file": "src/sewing/geometry.mjs",
+      "format": "legacy-esm",
+      "prefix": "const R05_GEOMETRY=(()=>{",
+      "suffix": ";return {fibreNormalTexture};})();"
+    },
+    "sewing": {
+      "file": "src/sewing/yarn.js",
+      "format": "text",
+      "prefix": "const {SeamPath,SeamIndex,seamRelief,makeSewnYarn}=(()=>{",
+      "suffix": ";return {SeamPath,SeamIndex,seamRelief,makeSewnYarn};})();",
+      "ensureFinalLF": true
+    },
+    "panels": {
+      "file": "src/geometry/panels.js",
+      "format": "text",
+      "prefix": "const {PanelAssembly,rectangle,borderPoints,skinMaterial,installSkin,updateSkin,reskinMaterial}=(()=>{",
+      "suffix": ";return {PanelAssembly,rectangle,borderPoints,skinMaterial,installSkin,updateSkin,reskinMaterial};})();"
+    },
+    "closed-shell": {
+      "file": "src/geometry/closed-shell.js",
+      "format": "text",
+      "prefix": "const ClosedShell=(()=>{",
+      "suffix": ";return {buildPanel};})();"
+    },
+    "pattern-physics": {
+      "file": "src/geometry/pattern-physics.js",
+      "format": "legacy-esm",
+      "prefix": "const PatternPhysics=(()=>{",
+      "suffix": ";return {add,idsAt,binding,finalize};})();"
+    },
+    "assembly-contract": {
+      "file": "src/geometry/assembly-contract.js",
+      "format": "text",
+      "prefix": "const AssemblyContract=(()=>{",
+      "suffix": ";return {prepare,recordConnection,finalize};})();"
+    },
+    "yarn-host": {
+      "file": "src/sewing/yarn-host.js",
+      "format": "legacy-esm",
+      "prefix": "const YarnHost=(()=>{",
+      "suffix": ";return {binding};})();"
+    },
+    "measurements": {
+      "file": "src/geometry/measurements.js",
+      "format": "legacy-esm",
+      "prefix": "const {evaluateBoundVertex,worldShellMeasurements}=(()=>{",
+      "suffix": ";return {evaluateBoundVertex,worldShellMeasurements};})();"
+    },
+    "products": {
+      "file": "src/products/catalogue.js",
+      "format": "text",
+      "prefix": "const {PRODUCT_SPECS,productMaterials,makeProduct,setProductMaterial,productAudit,patternSVG}=(()=>{",
+      "suffix": ";return {PRODUCT_SPECS,productMaterials,makeProduct,setProductMaterial,productAudit,patternSVG};})();",
+      "ensureFinalLF": true
+    },
+    "grip-base": {
+      "file": "src/physics/grip-base.mjs",
+      "format": "legacy-esm",
+      "prefix": "const {ProductShell,fastHinge}=(()=>{",
+      "suffix": ";return {ProductShell,fastHinge};})();"
+    },
+    "worker-client": {
+      "file": "src/workers/client.js",
+      "format": "text",
+      "prefix": "const {ProductWorkerShell}=(()=>{",
+      "suffix": ";return {ProductWorkerShell};})();",
+      "ensureFinalLF": true
+    },
+    "leather-look": {
+      "file": "src/materials/leather.mjs",
+      "format": "legacy-esm",
+      "prefix": "const {LeatherKernel,PRESETS,DEFAULT,FINISHES}=(()=>{",
+      "suffix": ";return {LeatherKernel,PRESETS,DEFAULT,FINISHES};})();"
+    },
+    "sewing-look": {
+      "file": "src/materials/sewing.mjs",
+      "format": "legacy-esm",
+      "prefix": "const {SewingAppearance}=(()=>{",
+      "suffix": ";return {SewingAppearance};})();"
+    },
+    "material-catalogue": {
+      "file": "src/materials/catalogue.mjs",
+      "format": "legacy-esm",
+      "prefix": "const {CATALOGUE,AtelierMaterials}=(()=>{",
+      "suffix": ";return {CATALOGUE,AtelierMaterials};})();"
+    },
+    "app-runtime": {
+      "file": "src/app/runtime.js",
+      "format": "text"
+    },
+    "view-polish": {
+      "file": "src/app/view-polish.js",
+      "format": "text"
+    },
+    "atelier-controls": {
+      "file": "src/app/atelier-controls.js",
+      "format": "text"
+    },
+    "craft-ui": {
+      "file": "src/app/craft-ui.js",
+      "format": "text"
+    },
+    "lifecycle": {
+      "file": "src/app/lifecycle.js",
+      "format": "text"
+    },
+    "input-perf": {
+      "file": "src/app/input-performance.js",
+      "format": "text"
+    },
+    "native-grip-base": {
+      "file": "src/physics/grip-base.mjs",
+      "format": "legacy-esm",
+      "prefix": "const {ProductShell:BaseProductShell,fastHinge}=(()=>{",
+      "suffix": ";return {ProductShell,fastHinge};})();"
+    },
+    "surface-contact": {
+      "file": "src/physics/surface-contact.js",
+      "format": "text",
+      "prefix": "const {SurfaceContact,closestPT,closestEE,sweptContact,ContactReference}=(()=>{",
+      "suffix": ";return {SurfaceContact,closestPT,closestEE,sweptContact,ContactReference};})();"
+    },
+    "native-broadphase": {
+      "file": "src/physics/broadphase.js",
+      "format": "text",
+      "prefix": "(()=>{",
+      "suffix": "})();"
+    },
+    "chart-shell": {
+      "file": "src/physics/chart-shell.mjs",
+      "format": "legacy-esm",
+      "prefix": "const {ProductShell}=(()=>{",
+      "suffix": ";return {ProductShell};})();"
+    },
+    "native-energy": {
+      "file": "src/physics/native-energy.js",
+      "format": "text",
+      "prefix": "const {NativeEnergy}=(()=>{",
+      "suffix": ";return {NativeEnergy};})();"
+    },
+    "implicit-solver": {
+      "file": "src/physics/implicit-solver.js",
+      "format": "text",
+      "prefix": "const {ImplicitLeatherShell}=(()=>{",
+      "suffix": ";return {ImplicitLeatherShell};})();",
+      "ensureFinalLF": true
+    },
+    "feasible-start": {
+      "file": "src/physics/feasible-start.js",
+      "format": "legacy-esm",
+      "prefix": "const {ReadyLeatherShell}=(()=>{",
+      "suffix": ";return {ReadyLeatherShell};})();"
+    },
+    "product-entry": {
+      "file": "src/workers/product-entry.js",
+      "format": "text"
+    },
+    "clamped-leather": {
+      "file": "src/physics/clamped.mjs",
+      "format": "legacy-esm",
+      "prefix": "const {ClampedLeather}=(()=>{",
+      "suffix": ";return {ClampedLeather};})();"
+    },
+    "specimen-entry": {
+      "file": "src/workers/specimen-entry.js",
+      "format": "text"
+    },
+    "compat-r02-legacy": {
+      "file": "compat/r02/legacy.js",
+      "format": "legacy-esm"
+    },
+    "compat-r02-leather": {
+      "file": "compat/r02/leather.js",
+      "format": "legacy-esm"
+    },
+    "compat-r02-craft": {
+      "file": "compat/r02/craft.js",
+      "format": "legacy-esm"
+    },
+    "compat-r02-export": {
+      "file": "compat/r02/export.js",
+      "format": "legacy-esm"
+    },
+    "compat-r02-app": {
+      "file": "compat/r02/app.js",
+      "format": "legacy-esm"
+    },
+    "app-composition": {
+      "file": "src/app/composition.js",
+      "format": "text",
+      "ensureFinalLF": true
+    }
+  },
+  "assets": {
+    "diff": {
+      "path": "assets/grain/diff.webp",
+      "sourceSHA256": "bee2811502697e54596350028033f2679f74b7df0ecf47063149d352b61db05a",
+      "outputSHA256": "fdfb3c6725c5bc694c8626d06143fb53d6ec7d69c3c74e2216c348f9a999620c"
+    },
+    "nor_gl": {
+      "path": "assets/grain/nor_gl.webp",
+      "sourceSHA256": "b54e70071d1f96b71e2ae3332f34e6c2e9a4b2ec26666bffb53ef0acc5b04045",
+      "outputSHA256": "04f347864d21ee5e4f66c7a56cc678636f76b24e4ffe746fbcd789ef78eac9ec"
+    },
+    "rough": {
+      "path": "assets/grain/rough.webp",
+      "sourceSHA256": "38f77c6dc2693a87bbae9ccf46a2aaf35a4b09b41f646fb77f36780bc67cc307",
+      "outputSHA256": "40e2b578bba8858d9784d7b33a2718fcd85d9151308058ea591f513f513593a7"
+    }
+  },
+  "limits": [
+    "Legacy R02 import spellings are syntax only. Explicit manifest supplies bindings; no historical path is followed.",
+    "R05 compatibility page is an explicitly frozen archive, not editable main runtime.",
+    "WASM is the pinned accepted binary; native rebuild equivalence is not claimed in S1A.",
+    "This does not grant new third-party permissions or resolve pending R11 source/rights items.",
+    "S1B2 application services are explicitly composed before boot. The pinned physics broadphase adapter and native compiler reproducibility are outside this bounded application-interface stage.",
+    "First-boot API now exposes the same live delegates as subsequent product switches; no change to solver commands or numerics."
+  ],
+  "programs": {
+    "physics": {
+      "join": [
+        {
+          "text": "const {ImplicitLeatherShell,SurfaceContact,closestPT,closestEE,sweptContact,ContactReference}=(()=>{"
+        },
+        {
+          "join": [
+            {
+              "text": "const CONTACT_NARROW_WASM="
+            },
+            {
+              "jsonString": {
+                "base64": {
+                  "packedBinary": "native/kernel.json"
+                }
+              }
+            },
+            {
+              "text": ";"
+            }
+          ]
+        },
+        {
+          "module": "native-grip-base"
+        },
+        {
+          "module": "surface-contact"
+        },
+        {
+          "module": "native-broadphase"
+        },
+        {
+          "module": "chart-shell"
+        },
+        {
+          "module": "native-energy"
+        },
+        {
+          "module": "implicit-solver"
+        },
+        {
+          "module": "feasible-start"
+        },
+        {
+          "text": ";return {ImplicitLeatherShell:ReadyLeatherShell,SurfaceContact,closestPT,closestEE,sweptContact,ContactReference};})();"
+        }
+      ]
+    },
+    "product": {
+      "join": [
+        {
+          "text": "(()=>{"
+        },
+        {
+          "module": "material-law"
+        },
+        {
+          "module": "shell-dynamics"
+        },
+        {
+          "ref": "physics"
+        },
+        {
+          "module": "product-entry"
+        },
+        {
+          "text": "\n})();"
+        }
+      ]
+    },
+    "specimen": {
+      "join": [
+        {
+          "text": "(()=>{"
+        },
+        {
+          "module": "material-law"
+        },
+        {
+          "module": "shell-dynamics"
+        },
+        {
+          "module": "clamped-leather"
+        },
+        {
+          "text": "/* Built into an offline Blob Worker. The renderer never computes deformation. */\n"
+        },
+        {
+          "module": "specimen-entry"
+        },
+        {
+          "text": "\n})();"
+        }
+      ]
+    }
+  },
+  "main": {
+    "join": [
+      {
+        "text": "(()=>{"
+      },
+      {
+        "module": "vendor-three"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "vendor-poly2tri"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "material-law"
+      },
+      {
+        "module": "shell-dynamics"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "seam-paths"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "contact-relief"
+      },
+      {
+        "text": "\nconst {insideHole}=R05_SEW;const {mapSurfacePoint}=R05_CONTACT;\n"
+      },
+      {
+        "module": "seam-geometry"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "sewing"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "panels"
+      },
+      {
+        "text": "\n// A domain adapter, executed before any R07 product is constructed. Frozen R05\n// and R06 sources are not changed. Needle apertures must not be filled by a\n// contour-index shift caused by duplicated closing points.\n"
+      },
+      {
+        "text": "\n\n"
+      },
+      {
+        "module": "closed-shell"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "pattern-physics"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "assembly-contract"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "yarn-host"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "measurements"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "products"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "grip-base"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "join": [
+          {
+            "text": "const PRODUCT_WORKER_CODE="
+          },
+          {
+            "jsonString": {
+              "ref": "product"
+            }
+          },
+          {
+            "text": ";"
+          }
+        ]
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "worker-client"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "leather-look"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "sewing-look"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "material-catalogue"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "join": [
+          {
+            "text": "const LEGACY_CRAFT_GZIP="
+          },
+          {
+            "jsonString": {
+              "base64": {
+                "gzip": {
+                  "r02Document": true
+                }
+              }
+            }
+          },
+          {
+            "text": ";"
+          }
+        ]
+      },
+      {
+        "join": [
+          {
+            "text": "const WORKER_CODE="
+          },
+          {
+            "jsonString": {
+              "ref": "specimen"
+            }
+          },
+          {
+            "text": ";"
+          }
+        ]
+      },
+      {
+        "join": [
+          {
+            "text": "const BUILD_INFO="
+          },
+          {
+            "buildIdentity": "src/app/r10-runtime-identity.json"
+          },
+          {
+            "text": ";"
+          }
+        ]
+      },
+      {
+        "join": [
+          {
+            "text": "const BASELINE_GZIP="
+          },
+          {
+            "jsonString": {
+              "base64": {
+                "gzip": {
+                  "file": "compat/r05.snapshot.html"
+                }
+              }
+            }
+          },
+          {
+            "text": ";"
+          }
+        ]
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "app-runtime"
+      },
+      {
+        "text": "\n\n// Runtime adapter for the inherited atelier interface. Camera targets are\n// measured on the current R07 paper-space seam rather than old product offsets.\n"
+      },
+      {
+        "module": "view-polish"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "module": "atelier-controls"
+      },
+      {
+        "text": "\n\n// R10.0 integrated craft entry. Original material/product library stays intact.\n"
+      },
+      {
+        "module": "craft-ui"
+      },
+      {
+        "text": "\n\n// Dispose product-owned GPU programs and textures when switching products.\n// The shared material catalogue and frozen thumbnails must remain alive.\n"
+      },
+      {
+        "module": "lifecycle"
+      },
+      {
+        "text": "\n\n// Diagnostics/UI update at 5 Hz; completed skin poses still apply once per RAF.\n"
+      },
+      {
+        "module": "input-perf"
+      },
+      {
+        "module": "app-composition"
+      },
+      {
+        "text": "\n})();"
+      }
+    ]
+  },
+  "retiredModules": {
+    "surface-integrity": {
+      "file": "src/geometry/surface-integrity.js",
+      "format": "text",
+      "emittedSHA256": "095f1effcdb99dfbb5408fc24bbaae864dbdc204d5db2c2db4b90429268072a8"
+    }
+  },
+  "baselineHTMLSHA256": "7da84eec41b6db9fe69c62ea17a3194283522004df92f47f0cd707d11b642622"
+}

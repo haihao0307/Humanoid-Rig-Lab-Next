@@ -44,12 +44,17 @@ def run(reference=None):
             baseline=base.build();check('Provided reference is exact R10',baseline['htmlSHA256']==manifest['baselineHTMLSHA256'])
         else:ref=tmp/'reference';base=prepare_reference(ref)
         ref_manifest=json.loads((ref/'assembly.json').read_text());old=base.Linker(ref_manifest)
-        changed={'panels','closed-shell','pattern-physics','assembly-contract','yarn-host'}
+        geometry_changed={'panels','closed-shell','pattern-physics','assembly-contract','yarn-host'}
+        app_changed={'app-runtime','view-polish','atelier-controls','craft-ui','lifecycle','input-perf','app-composition'}
+        changed=geometry_changed|app_changed
         for key in manifest['modules']:
             if key not in changed:check('Unchanged emitted module: '+key,candidate.module(key)==old.module(key))
         check('Retired overwritten adapter is absent from active assembly','surface-integrity' not in manifest['modules'] and '"surface-integrity"' not in json.dumps(manifest['main']))
-        active=[ROOT/manifest['modules'][key]['file'] for key in changed]
+        active=[ROOT/manifest['modules'][key]['file'] for key in geometry_changed]
         check('No active PanelAssembly prototype replacement or captured original method',all(not re.search(r'PanelAssembly\.prototype',p.read_text()) for p in active))
+        app_files=[ROOT/manifest['modules'][key]['file'] for key in app_changed]
+        check('Application services have no late reassignment or prototype mutation',all(not re.search(r'(?:\.prototype\.|^(?:prepareGrab|selectProduct|setView|updateDetails|updateGrabUI|destroyGeometry|recipe)\s*=)',p.read_text(),re.M) for p in app_files))
+        check('One explicit composition boot entry',sum(p.read_text().count('boot().catch(fail);') for p in app_files)==1 and 'initializeAppControls();library=new ArtistAtelierMaterials' in (ROOT/'src/app/runtime.js').read_text())
         a=(ROOT/'src/geometry/panels.js').read_text();b=(ref/'src/geometry/panels.js').read_text()
         check('Complete skin shader and frame update unchanged',a[a.index('const SKIN_HEADER='):].rstrip()==b[b.index('const SKIN_HEADER='):].rstrip())
         baseline_text=(ref/'out/reproduced-r10.html').read_text()
@@ -65,7 +70,7 @@ def run(reference=None):
             p=tmp/(name+'.js');p.write_text(body);command(['node','--check',str(p)],timeout=30);check('Syntax: '+name,True)
         isolated=tmp/'isolated';shutil.copytree(ROOT,isolated,ignore=shutil.ignore_patterns('out','qa','__pycache__','node-lib.cjs','_canonical_paths.json'))
         ib=load(isolated/'build.py','isolated_canonical');check('Checkout builds without historical directories or migration',ib.build()['htmlSHA256']==build['htmlSHA256'])
-        p=isolated/'src/app/runtime.js';raw=p.read_bytes();p.write_bytes(raw.replace(b"const VERSION='R10.0'",b"const VERSION='ADVERSARIAL'",1))
+        p=isolated/'src/app/runtime.js';raw=p.read_bytes();p.write_bytes(raw.replace(b"const VERSION='R12.0-S1B2'",b"const VERSION='ADVERSARIAL'",1))
         rejected=False
         try:ib.build()
         except ValueError:rejected=True
@@ -82,15 +87,15 @@ def run(reference=None):
         try:ib.build()
         except ValueError:rejected=True
         check('Corrupt pinned native payload cannot fallback',rejected)
-        env={**os.environ,'BASE_LIB':str(ref/'node-lib.cjs')}
-        for name,report_path,expected in [('qa-numeric.cjs','qa/numeric.json',18),('qa-interfaces.cjs','qa/s1b/interfaces.json',3),('qa-geometry-equivalence.cjs','qa/s1b/equivalence.json',25)]:
+        env={**os.environ,'BASE_LIB':str(ref/'node-lib.cjs'),'BASE_APP_DIR':str(ref/'src/app')}
+        for name,report_path,expected in [('qa-numeric.cjs','qa/numeric.json',18),('qa-interfaces.cjs','qa/s1b/interfaces.json',3),('qa-geometry-equivalence.cjs','qa/s1b/equivalence.json',25),('qa-app-interfaces.cjs','qa/s1b2/app-interfaces.json',25)]:
             (ROOT/report_path).unlink(missing_ok=True);command(['node',str(ROOT/name)],env=env,timeout=1800)
             result=json.loads((ROOT/report_path).read_text());count=result.get('cases',result.get('checks'))
             if isinstance(count,list):count=len(count)
             check('Fresh execution: '+name,result['pass'] and count==expected,{'cases':count})
-    return {'schema':'kaopu/leather-s1b-verification@1','phase':'S1B1','pass':all(q['pass'] for q in checks),'checkCount':len(checks),'checks':checks,'numericalCases':18,'interfaceAssertions':3,'geometryCases':25,'full52StepTrajectories':6,'build':build,'elapsedSeconds':time.time()-start,'python':sys.version.split()[0],'node':subprocess.check_output(['node','--version'],text=True).strip(),'newBrowserChecks':0,'newPublicDeployment':False,'fullS1Complete':False,'runtimePromotionAllowed':False,'sourceCommit':os.environ.get('S1B_SOURCE_COMMIT','UNCOMMITTED_CANDIDATE')}
+    return {'schema':'kaopu/leather-s1b-verification@1','phase':'S1B2','pass':all(q['pass'] for q in checks),'checkCount':len(checks),'checks':checks,'numericalCases':18,'interfaceAssertions':3,'appInterfaceCases':25,'geometryCases':25,'full52StepTrajectories':6,'build':build,'elapsedSeconds':time.time()-start,'python':sys.version.split()[0],'node':subprocess.check_output(['node','--version'],text=True).strip(),'newBrowserChecks':0,'newPublicDeployment':False,'fullS1Complete':False,'runtimePromotionAllowed':False,'sourceCommit':os.environ.get('S1B_SOURCE_COMMIT','UNCOMMITTED_CANDIDATE')}
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--reference',type=Path);args=ap.parse_args();out=ROOT/'qa/s1b/SUMMARY.json';out.parent.mkdir(parents=True,exist_ok=True)
+    ap=argparse.ArgumentParser();ap.add_argument('--reference',type=Path);args=ap.parse_args();out=ROOT/'qa/s1b2/SUMMARY.json';out.parent.mkdir(parents=True,exist_ok=True)
     try:result=run(args.reference)
     except Exception as e:
         out.write_text(json.dumps({'pass':False,'checks':checks,'error':str(e),'newBrowserChecks':0},indent=2)+'\n');raise
