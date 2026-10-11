@@ -1,6 +1,5 @@
-"""One-time source transfer, not a runtime asset or a mesh blob.
-Reconstructs exact, editable JS/HTML/Python modules from a frozen parent.
-Canonical files, once present, must be edited directly and built with build.py.
+"""One-time hash-checked source transfer; not a runtime asset or a mesh blob.
+Canonical files, once restored, must be edited directly and built with build.py.
 Never mutates R08 or an unrelated workbench.
 """
 from pathlib import Path
@@ -26,7 +25,7 @@ for name,record in records.items():
    assert 0<=start<=end<=previous
    text=text[:start]+replacement+text[end:];previous=start
  else:text=record['text']
- data=text.encode();assert sha(data)==record['target'],('Target mismatch',name)
+ data=text.encode();assert sha(data)==record['sha'],('Target mismatch',name)
  staged[name]=data
 copies={'core.js':'f47bc9f6c25a3da20e99c9e4dc2e0201af5499ed4832a2ea2ad916120b103fb7','cotton-surface.js':'4880621ddb3d658e3697801b01e2e32680b91f4f532ac5f0d69627d0018dc65f','natural-yarn.js':'11c470a9538e8c815dfebb4849ec2c94327eb7204709d33853cc4f483e2760aa','fiber-optics.js':'8aa99b3ab475c4a0e1b6127ed61357ee416250ed9abfada250f0d10cde090701','structure.js':'6b9c08bb4b47f68e3a458714af5ee5a6d9b38c78ad3312e8e8c2776ad59b5507','test-stability.cjs':'de16acad7855cd0622c52129d7b73882f3d395600498c7cc282de0c8236ce4db','test-cotton.cjs':'b29825ac961abaec310c8f71f0e6381e4b42ef680eb430372045ccddb1b888ba','test-layers.cjs':'fbbca793570ed613fc7ae85ddc528cc6aca0cc2f21af76f097acd7b5ae566800'}
 for name,wanted in copies.items():
