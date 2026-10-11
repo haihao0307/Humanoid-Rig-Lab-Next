@@ -1,0 +1,106 @@
+name: Shoe R03 calibration
+on:
+  push:
+    branches: [feature/shoe-r03-edge-calibration-20261011]
+    paths: ['shoe-workshop/r03/**', '.github/workflows/shoe-r03-calibration.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shoe-r03-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /shoe-workshop/r02/
+            /shoe-workshop/r03/
+            /.github/workflows/shoe-r03-calibration.yml
+            /AGENTS.md
+            /README.md
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned research runtime
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop
+          npx playwright install --with-deps chromium
+      - name: Capture actual inherited geometry
+        run: |
+          mkdir -p shoe-workshop/r03/evidence/before
+          cat > shoe-workshop/before-r03.mjs <<'JS'
+          import {chromium} from 'playwright';
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import {pathToFileURL} from 'node:url';
+          const b=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+          const page=await b.newPage({viewport:{width:1440,height:1000}});
+          const errors=[];page.on('pageerror',e=>errors.push(String(e)));
+          await page.goto(pathToFileURL(path.resolve('shoe-workshop/r02/public-lite.html')).href);
+          await page.waitForFunction(()=>window.SHOE_R02?.ready,{},{timeout:90000});
+          const reports={};
+          for(const mode of ['source','panels','seam']){
+            await page.evaluate(m=>window.SHOE_R02.mode(m),mode);
+            await page.screenshot({path:`shoe-workshop/r03/evidence/before/${mode}.png`});
+            reports[mode]=await page.evaluate(()=>window.SHOE_R02.report());
+          }
+          const summary=await page.evaluate(()=>({panels:window.SHOE_R02.data.panels.map(p=>({objectIndex:p.objectIndex,layer:p.layer,bbox:p.bbox,positionsSha256:p.positionsSha256,footprints:p.footprints})),styleCurves:window.SHOE_R02.data.styleCurves.map(c=>({objectIndex:c.objectIndex,lengthMm:c.lengthMm,bbox:c.bbox})),sourceCommit:window.SHOE_R02.data.sourceCommit}));
+          fs.writeFileSync('shoe-workshop/r03/evidence/before/data-summary.json',JSON.stringify(summary));
+          fs.writeFileSync('shoe-workshop/r03/evidence/before/QA.json',JSON.stringify({scope:'Inherited baseline only, not R03 acceptance',errors,reports},null,2));
+          await b.close();if(errors.length)throw Error(errors.join('\n'));
+          JS
+          node shoe-workshop/before-r03.mjs
+      - name: Build and test current R03 source
+        id: build
+        run: |
+          if [ -f shoe-workshop/r03/tools/build.mjs ]; then
+            node shoe-workshop/r03/tests/kernel.mjs
+            node shoe-workshop/r03/tools/build.mjs
+            node shoe-workshop/r03/tests/browser.mjs
+            echo 'built=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'built=false' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Publish immutable candidate on this branch only
+        id: publish
+        if: steps.build.outputs.built == 'true'
+        run: |
+          git config user.name 'Shoe R03 Build'
+          git config user.email 'shoe-r03@users.noreply.github.com'
+          git add shoe-workshop/r03/public-lite.html shoe-workshop/r03/BUILD_MANIFEST.json shoe-workshop/r03/evidence
+          git diff --cached --name-only | grep -v '^shoe-workshop/r03/' && exit 1 || true
+          git commit -m 'build(shoes): R03-A actual edge calibration candidate and evidence [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+          BUILD_SHA=$(git rev-parse HEAD)
+          echo "sha=$BUILD_SHA" >> "$GITHUB_OUTPUT"
+          echo "https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/$BUILD_SHA/shoe-workshop/r03/public-lite.html" > shoe-workshop/r03/PUBLIC_URL.txt
+      - name: Verify exact public bytes and real public browser
+        if: steps.build.outputs.built == 'true'
+        env:
+          PUBLIC_BUILD_SHA: ${{ steps.publish.outputs.sha }}
+        run: |
+          node shoe-workshop/r03/tests/browser.mjs --public
+          git add shoe-workshop/r03/PUBLIC_URL.txt shoe-workshop/r03/evidence/public
+          git commit -m 'test(shoes): bind R03-A public bytes and browser verification [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Preserve QA and exact research inputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r03-evidence-${{ github.run_id }}
+          path: |
+            shoe-workshop/r02/assets/teacher.json
+            shoe-workshop/r02/index.html
+            shoe-workshop/r02/style.css
+            shoe-workshop/r02/src/
+            shoe-workshop/r02/vendor/
+            shoe-workshop/r02/BUILD_MANIFEST.json
+            shoe-workshop/r03/
+          retention-days: 14
