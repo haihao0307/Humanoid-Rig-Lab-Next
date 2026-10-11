@@ -1,0 +1,142 @@
+{
+  "scope": "Actual browser-generated default cable hat on three immutable native heads. All inner vertices plus all inner triangle centroids against oriented source-head triangles. This is sampled static geometry, not continuous collision or a physical material test.",
+  "checks": [
+    {
+      "name": "real material wall native-default",
+      "passed": true,
+      "detail": {
+        "minMM": 3.5999947322354853,
+        "maxMM": 3.6000048011956927
+      }
+    },
+    {
+      "name": "head cropping bound native-default",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "inner material outside source head samples native-default",
+      "passed": true,
+      "detail": {
+        "samples": 43073,
+        "minimumSignedMM": 0.9834132448798888,
+        "medianSignedMM": 11.629799424128294,
+        "maximumSignedMM": 41.763479620702626,
+        "negativeOverTolerance": 0
+      }
+    },
+    {
+      "name": "inner surface does not emerge through outer cap",
+      "passed": true,
+      "detail": {
+        "samples": 14401,
+        "minimumSignedMM": -3.6000038461799293,
+        "medianSignedMM": -3.5987248850520084,
+        "maximumSignedMM": -3.0825722940834708,
+        "negativeOverTolerance": 14401
+      }
+    },
+    {
+      "name": "no local paper collapse in measured wall",
+      "passed": true,
+      "detail": {
+        "minimumNearestOuterMM": 3.0825722940834708,
+        "medianNearestOuterMM": 3.5987248850520084
+      }
+    },
+    {
+      "name": "real material wall long_narrow",
+      "passed": true,
+      "detail": {
+        "minMM": 3.5999925482447517,
+        "maxMM": 3.6000069777893104
+      }
+    },
+    {
+      "name": "head cropping bound long_narrow",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "inner material outside source head samples long_narrow",
+      "passed": true,
+      "detail": {
+        "samples": 43073,
+        "minimumSignedMM": 0.4359047796036265,
+        "medianSignedMM": 11.331827039509665,
+        "maximumSignedMM": 41.932123032141675,
+        "negativeOverTolerance": 0
+      }
+    },
+    {
+      "name": "real material wall short_broad",
+      "passed": true,
+      "detail": {
+        "minMM": 3.599994754465035,
+        "maxMM": 3.6000052374973133
+      }
+    },
+    {
+      "name": "head cropping bound short_broad",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "inner material outside source head samples short_broad",
+      "passed": true,
+      "detail": {
+        "samples": 43073,
+        "minimumSignedMM": 2.1289533105068847,
+        "medianSignedMM": 12.102556699065241,
+        "maximumSignedMM": 42.54069503820253,
+        "negativeOverTolerance": 0
+      }
+    }
+  ],
+  "heads": [
+    {
+      "head": "native-default",
+      "headPositionSHA256": "01137a0803526893dc93152b62824751ac51fe7ad0daa2019793cff5da86dd36",
+      "browserGeometrySHA256": "be1f6e5edd25b255a2dcdd88fd2868775a18fcdfece886a69ee576093755cd3f",
+      "innerToHead": {
+        "samples": 43073,
+        "minimumSignedMM": 0.9834132448798888,
+        "medianSignedMM": 11.629799424128294,
+        "maximumSignedMM": 41.763479620702626,
+        "negativeOverTolerance": 0
+      },
+      "nearestOuter": {
+        "samples": 14401,
+        "minimumSignedMM": -3.6000038461799293,
+        "medianSignedMM": -3.5987248850520084,
+        "maximumSignedMM": -3.0825722940834708,
+        "negativeOverTolerance": 14401
+      }
+    },
+    {
+      "head": "long_narrow",
+      "headPositionSHA256": "87f64d96b334f8a4a9e0de838f36784fee6e0b58f943682b40fbcc6b561ddfb4",
+      "browserGeometrySHA256": "d9ccf182eee3c7865dd71e1371866caa170710b7035d6652df31a962172d2300",
+      "innerToHead": {
+        "samples": 43073,
+        "minimumSignedMM": 0.4359047796036265,
+        "medianSignedMM": 11.331827039509665,
+        "maximumSignedMM": 41.932123032141675,
+        "negativeOverTolerance": 0
+      }
+    },
+    {
+      "head": "short_broad",
+      "headPositionSHA256": "52af667b1ff1853048c2143725e0cc5d5da4169206d42f9e87ec55538a278ed3",
+      "browserGeometrySHA256": "a872410186fbf1ba3651c29ceb828177b89f4b5cf09d33c5f3db871b9dc954c0",
+      "innerToHead": {
+        "samples": 43073,
+        "minimumSignedMM": 2.1289533105068847,
+        "medianSignedMM": 12.102556699065241,
+        "maximumSignedMM": 42.54069503820253,
+        "negativeOverTolerance": 0
+      }
+    }
+  ],
+  "passed": true
+}
