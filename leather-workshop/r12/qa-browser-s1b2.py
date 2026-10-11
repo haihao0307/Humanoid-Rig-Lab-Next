@@ -2,11 +2,13 @@
 Run where normal Chrome navigation is permitted. Never alter managed browser policy.
 """
 from __future__ import annotations
-import argparse, hashlib, io, json, os, platform, time, traceback
+import argparse, hashlib, importlib.util, io, json, os, platform, time, traceback
 from pathlib import Path
 from PIL import Image, ImageChops, ImageStat
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parent
+spec=importlib.util.spec_from_file_location('capture_s1b2',ROOT/'qa-capture-s1b2.py')
+capture=importlib.util.module_from_spec(spec);spec.loader.exec_module(capture)
 ap=argparse.ArgumentParser();ap.add_argument('--url');ap.add_argument('--public',action='store_true');args=ap.parse_args()
 OUT=ROOT/'qa'/'s1b2'/('public' if args.public else 'browser');OUT.mkdir(parents=True,exist_ok=True)
 report={'phase':'S1B2','version':'R12.0-S1B2','sourceCommit':os.environ.get('LEATHER_SOURCE_COMMIT','UNCOMMITTED-S1B2'),'pass':False,'checks':[],'errors':[], 'scope':'Actual Chrome WebGL; desktop 1440x1000, mobile 390x844 viewport simulation only; not a physical-device or real-time performance certification.'}
@@ -18,9 +20,11 @@ def ready(page,version):
  page.wait_for_function("window.LEATHER_ATELIER?.ready || (document.querySelector('#error') && !document.querySelector('#error').hidden)",timeout=240000)
  check(version+' actual runtime ready',page.evaluate('window.LEATHER_ATELIER?.version')==version,page.locator('#error').inner_text())
 def layout(page):
- return page.evaluate("()=>({scroll:[scrollX,scrollY],size:[innerWidth,innerHeight,devicePixelRatio],compatMode:document.compatMode,rectangles:Object.fromEntries(['stage','sceneCanvas','craftRibbon','collection'].map(id=>{const e=document.getElementById(id);return[id,{rect:e.getBoundingClientRect().toJSON(),client:[e.clientWidth,e.clientHeight],scroll:[e.scrollLeft,e.scrollTop]}]})),frame:LEATHER_ATELIER.frameAudit(),gauge:LEATHER_ATELIER.measureShell(),audit:LEATHER_ATELIER.audit(),physics:LEATHER_ATELIER.productPhysics})")
+ state=page.evaluate("()=>({scroll:[scrollX,scrollY],size:[innerWidth,innerHeight,devicePixelRatio],compatMode:document.compatMode,rectangles:Object.fromEntries(['stage','sceneCanvas','craftRibbon','collection'].map(id=>{const e=document.getElementById(id);return[id,{rect:e.getBoundingClientRect().toJSON(),client:[e.clientWidth,e.clientHeight],scroll:[e.scrollLeft,e.scrollTop]}]})),frame:LEATHER_ATELIER.frameAudit(),gauge:LEATHER_ATELIER.measureShell(),audit:LEATHER_ATELIER.audit(),physics:LEATHER_ATELIER.productPhysics})")
+ state['gpu']=capture.gpu_viewport(page)
+ return state
 def shot(page,name):
- page.evaluate('LEATHER_ATELIER.render()');page.wait_for_timeout(120)
+ capture.prepare_capture(page,name)
  before=layout(page)
  data=page.locator('#stage').screenshot();(OUT/(name+'.png')).write_bytes(data)
  report.setdefault('captureDiagnostics',{})[name]={'before':before,'after':layout(page)};save()

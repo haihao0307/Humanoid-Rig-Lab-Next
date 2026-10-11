@@ -26,6 +26,7 @@ let appControlsInitialized=false;
 function initializeAppControls(){
  if(appControlsInitialized)throw Error('Application controls initialized twice');
  appControlsInitialized=true;
+ const edition=document.querySelector('.edition');if(edition)edition.textContent=VERSION+' · SEWN / GRABBABLE';
  // setupUI has already registered the primary pointer handlers. Keep this order.
  initRestoredControls();initEdgeInspection();initCraftControls();initInputPerformance();
 }
