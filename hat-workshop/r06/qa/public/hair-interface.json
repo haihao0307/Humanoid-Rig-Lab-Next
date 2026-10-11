@@ -1,0 +1,87 @@
+{
+  "schema": "kaopu.hat-hair-contact/1",
+  "state": "DEFERRED_NO_HAIR_SOLVER",
+  "stage": "fixed static bare-head seating candidate for tested fixtures; hair contact remains a separate stage",
+  "identity": {
+    "headId": "native-default",
+    "headHash": "01137a0803526893dc93152b62824751ac51fe7ad0daa2019793cff5da86dd36",
+    "hatId": "cable",
+    "hatHash": "07dd750ab7a32e5e02c1a73c5ca077819e074a267117fe05596f2112d381c169",
+    "sourceCommit": "15537a34ea49c80bc7bc72bd53ef472a9743b2fd"
+  },
+  "units": "m",
+  "geometrySpace": "calibrated head-local; no additional scale",
+  "hat": {
+    "innerWall": true,
+    "sweatband": false,
+    "construction": {
+      "schema": "kaopu.hat.locked-fit/6",
+      "archetype": "cable",
+      "archetypeRevision": 1,
+      "headId": "native-default",
+      "geometrySource": "immutable attributed control net",
+      "construction": {
+        "autoFit": true,
+        "wearBandMM": 12,
+        "wearPitchDeg": 0,
+        "hairMM": 0,
+        "clearanceMM": 1,
+        "materialMM": 3.6,
+        "crownMM": 0,
+        "brimFactor": 1,
+        "brimCurve": 0,
+        "bandFactor": 1,
+        "crownFullness": 1,
+        "backLeanMM": 0,
+        "negativeEase": 0.09
+      },
+      "measuredHead": {
+        "circumferenceMM": 569.164465799936,
+        "widthMM": 156.4779882709108,
+        "depthMM": 197.14621152491912,
+        "crownRiseMM": 88.00000149011612
+      },
+      "headShapeModified": false,
+      "fitStartsFromSourceEveryTime": true,
+      "allParameterCombinationsValidated": false
+    }
+  },
+  "requiredHairInput": [
+    "scalp triangle ids and root barycentric coordinates",
+    "guide strand rest positions and segment lengths",
+    "strand radii, mass and measured bend/twist response",
+    "strand density/clump association and collision envelope",
+    "hair asset revision and same head hash"
+  ],
+  "requiredHatInput": [
+    "actual inner collision faces and normal orientation",
+    "sweatband contact region",
+    "fixed material thickness distinct from geometric gap",
+    "calibrated fabric response for flexible hats",
+    "time-resolved donning trajectory"
+  ],
+  "proposedSolveOrder": [
+    "validate head/hat/hair revisions",
+    "pin roots to unchanged scalp",
+    "advance hat trajectory with collision-safe substeps",
+    "solve strand bending/twist and segment-length constraints",
+    "resolve hair-hair, hair-hat and hair-scalp contact with friction",
+    "couple flexible hat response only where a calibrated material model exists",
+    "check penetration and strain, then detach and test recovery"
+  ],
+  "prohibitedShortcuts": [
+    "uniform scalp inflation relabeled physical hair compression",
+    "shortening guide lengths to fake flattened hair",
+    "deleting or hiding trapped hair as a successful solve",
+    "using final seated geometry as proof of a collision-free donning path"
+  ],
+  "readiness": {
+    "scalpIdentityKnown": true,
+    "hatInteriorRepresented": true,
+    "hairDataProvided": false,
+    "materialCalibrated": false,
+    "solverImplemented": false,
+    "physicalDonningVerified": false
+  },
+  "nextMilestone": "short-hair guide bundle and one rigid hat; no long-hair style implementation is claimed"
+}
