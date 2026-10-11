@@ -1,5 +1,5 @@
 """R09 independent browser gates. Authored content != file/public navigation.
-Timing uses a deliberately blocking QA-only finish, never the production loop.
+Timing uses an ordered, blocking QA-only 1-pixel readback, never the production loop.
 It measures this software renderer, not utilization or physical-device FPS.
 """
 from pathlib import Path
@@ -56,13 +56,17 @@ def diff(a,b):
  d=np.abs(a.astype(float)-b);return {'meanAbsRgb255':float(d.mean()),'p99':float(np.percentile(d,99)),'max':int(d.max())}
 
 def bench(p,name):
- p.evaluate('__DENIM_WORKBENCH__.benchmark()')
+ # The old synchronous benchmark could return without a frame while a GPU fence
+ # was pending. Use the normal scheduler, then an ordered 1-pixel readback.
+ # No zero-frame samples, skipped work, or retries are accepted as measurements.
+ probe="""async()=>{const w=__DENIM_WORKBENCH__,g=document.getElementById('view').getContext('webgl2'),pixel=new Uint8Array(4);g.readPixels(0,0,1,1,g.RGBA,g.UNSIGNED_BYTE,pixel);await new Promise(requestAnimationFrame);const n=w.lastFrame.frame,c={...__calls},start=performance.now();w.setState({});while(w.lastFrame.frame===n){await new Promise(requestAnimationFrame);if(performance.now()-start>180000)throw Error('No submitted benchmark frame');if(w.contextLost)throw Error('Context lost during benchmark');}g.readPixels(0,0,1,1,g.RGBA,g.UNSIGNED_BYTE,pixel);return {completedFrameMs:performance.now()-start,frameDelta:w.lastFrame.frame-n,cpuSubmitMs:w.lastFrame.cpuSubmitMs,readbackPixel:Array.from(pixel),counts:Object.fromEntries(Object.keys(__calls).map(k=>[k,__calls[k]-(c[k]||0)]))}}"""
+ warm=p.evaluate(probe);assert warm['frameDelta']==1 and warm['completedFrameMs']>0,(name,warm)
  rows=[]
  for i in range(3):
-  row=p.evaluate("(()=>{let w=__DENIM_WORKBENCH__,n=w.lastFrame.frame,c={...__calls};let ms=w.benchmark();return {completedFrameMs:ms,frameDelta:w.lastFrame.frame-n,cpuSubmitMs:w.lastFrame.cpuSubmitMs,counts:Object.fromEntries(Object.keys(__calls).map(k=>[k,__calls[k]-(c[k]||0)]))}})()")
-  assert row['frameDelta']==1,(name,row);rows.append(row)
- print('benchmark',name,rows,flush=True)
- return {'samples':rows,'medianCompletedFrameMs':statistics.median(r['completedFrameMs'] for r in rows),'medianCpuSubmitMs':statistics.median(r['cpuSubmitMs'] for r in rows),'method':'3 warm, static, QA gl.finish-completed frames; software ANGLE only, not OS utilization or physical GPU FPS'}
+  row=p.evaluate(probe)
+  assert row['frameDelta']==1 and row['completedFrameMs']>0,(name,row);rows.append(row)
+  print('benchmark sample',name,i,row,flush=True)
+ return {'samples':rows,'medianCompletedFrameMs':statistics.median(r['completedFrameMs'] for r in rows),'medianCpuSubmitMs':statistics.median(r['cpuSubmitMs'] for r in rows),'method':'3 warmed static frames via unmodified normal scheduler, followed by ordered 1-pixel readback; includes scheduling/readback overhead; software ANGLE only, not pure GPU time, utilization or physical-device FPS'}
 
 with sync_playwright() as pw:
  kw={'headless':False,'args':['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']}
