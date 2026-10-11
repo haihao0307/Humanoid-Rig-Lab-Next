@@ -5,6 +5,7 @@ on:
     paths:
       - hat-workshop/r03/*.mjs
       - hat-workshop/r03/*.py
+      - hat-workshop/r03/fit/*.mjs
       - .github/workflows/hat-r03-build.yml
 permissions:
   contents: write
@@ -38,11 +39,12 @@ jobs:
           node --check hat-workshop/r03/app.js
           node --check hat-workshop/r03/mother.mjs
           node --check hat-workshop/r03/surface.mjs
+          node --check hat-workshop/r03/fit/field.mjs
           cp hat-workshop/r02/THREE_LICENSE.txt hat-workshop/r03/THREE_LICENSE.txt
           echo "EXPECTED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Regenerable source control nets with original licensed textures
         run: python3 -u hat-workshop/r03/build.py --assets
-      - name: Numerical reference fidelity and eleven by three measured fits
+      - name: Reference fidelity, dimensions, continuity and eleven by three measured fits
         run: node hat-workshop/r03/verify.mjs
       - name: Commit immutable sources and mother data
         run: |
@@ -50,13 +52,15 @@ jobs:
           git config user.name 'KAOPU Hat Workbench'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add hat-workshop/r03/app.js hat-workshop/r03/shell.html hat-workshop/r03/assets hat-workshop/r03/ASSET_MANIFEST.json hat-workshop/r03/MOTHER_REPRESENTATION.json hat-workshop/r03/README.md hat-workshop/r03/SESSION_LOG.md hat-workshop/r03/THREE_LICENSE.txt hat-workshop/r03/qa/numeric WORKBENCH_BUILD_SYSTEM.md docs/workbench-build-system/RUNBOOK.md docs/workbench-build-system/HAT_R03_MEASURED_MOTHERS.md
-          if ! git diff --cached --quiet; then git commit -m 'hat: freeze R03 regenerated mothers, measurement code and feedback rules [skip ci]'; git push origin HEAD:$BRANCH; fi
+          if ! git diff --cached --quiet; then git commit -m 'hat: freeze R03.1 smooth measured mother source and numeric gates [skip ci]'; git push origin HEAD:$BRANCH; fi
           SOURCE_SHA=$(git rev-parse HEAD)
           echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
           echo "DATA_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
           echo "EXPECTED_HEAD=$SOURCE_SHA" >> "$GITHUB_ENV"
       - name: Build identical-quality public and standalone pages
-        run: python3 -u hat-workshop/r03/build.py --pages --data-sha "$DATA_SHA" --source-sha "$SOURCE_SHA"
+        run: |
+          python3 -u hat-workshop/r03/build.py --pages --data-sha "$DATA_SHA" --source-sha "$SOURCE_SHA"
+          python3 -c "import json; assert json.load(open('hat-workshop/r03/BUILD_MANIFEST.json'))['version']=='HAT-R03.1'"
       - name: Real standalone Chromium regression
         run: python3 -u hat-workshop/r03/qa.py
       - name: Publish tested fixed browser candidate
@@ -64,7 +68,7 @@ jobs:
           test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$EXPECTED_HEAD"
           git add hat-workshop/r03/index.html hat-workshop/r03/standalone.html hat-workshop/r03/app.bundle.js hat-workshop/r03/BUILD_MANIFEST.json hat-workshop/r03/qa/local
           find hat-workshop/r03/qa/local -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
-          git commit -m 'hat: publish tested R03 measured mother pages and local evidence [skip ci]'
+          git commit -m 'hat: publish tested R03.1 smooth fit candidate and local evidence [skip ci]'
           git push origin HEAD:$BRANCH
           BUILD_SHA=$(git rev-parse HEAD)
           echo "BUILD_SHA=$BUILD_SHA" >> "$GITHUB_ENV"
@@ -78,11 +82,11 @@ jobs:
           root=pathlib.Path('hat-workshop/r03')
           m=json.loads((root/'BUILD_MANIFEST.json').read_text())
           reports={k:json.loads((root/'qa'/k/'report.json').read_text()) for k in ['numeric','local','public']}
-          assert all(r['passed'] for r in reports.values())
+          assert all(r['passed'] for r in reports.values()) and m['version']=='HAT-R03.1'
           raw='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/hat-workshop/r03/index.html'
           actual=urllib.request.urlopen(raw,timeout=120).read()
           assert hashlib.sha256(actual).hexdigest()==m['htmlSHA256']
-          receipt={'version':m['version'],'baselineSha':m['baselineSha'],'sourceSha':os.environ['SOURCE_SHA'],'dataSha':os.environ['DATA_SHA'],'buildSha':os.environ['BUILD_SHA'],'publicURL':os.environ['PUBLIC_URL'],'publicHTMLSHA256':m['htmlSHA256'],'publicBytes':m['publicBytes'],'standaloneSHA256':m['standaloneSHA256'],'standaloneBytes':m['standaloneBytes'],'numericChecks':len(reports['numeric']['checks']),'localChecks':len(reports['local']['checks']),'publicChecks':len(reports['public']['checks']),'fileVerified':True,'publicVerified':True,'acceptedBaseline':'R02 replication appearance only','R03UserAccepted':False,'pureAnalyticReconstruction':False,'sourceControlNetRegeneration':True,'dynamicCollisionVerified':False,'materialCalibrated':False,'physicalPhoneTested':False,'reviewType':'same-assistant self-review','workflowRun':os.environ['GITHUB_RUN_ID']}
+          receipt={'version':m['version'],'baselineSha':m['baselineSha'],'sourceSha':os.environ['SOURCE_SHA'],'dataSha':os.environ['DATA_SHA'],'buildSha':os.environ['BUILD_SHA'],'publicURL':os.environ['PUBLIC_URL'],'publicHTMLSHA256':m['htmlSHA256'],'publicBytes':m['publicBytes'],'standaloneSHA256':m['standaloneSHA256'],'standaloneBytes':m['standaloneBytes'],'numericChecks':len(reports['numeric']['checks']),'localChecks':len(reports['local']['checks']),'publicChecks':len(reports['public']['checks']),'fileVerified':True,'publicVerified':True,'acceptedBaseline':'R02 replication appearance only','R03UserAccepted':False,'pureAnalyticReconstruction':False,'sourceControlNetRegeneration':True,'dynamicCollisionVerified':False,'materialCalibrated':False,'physicalPhoneTested':False,'reviewType':'same-assistant self-review; final image observations recorded separately','rejectedIntermediateBuild':'f531d067613feecf6a367788299870e05235b037','workflowRun':os.environ['GITHUB_RUN_ID']}
           (root/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
           print('DELIVERY',json.dumps(receipt),flush=True)
           PY
@@ -91,7 +95,7 @@ jobs:
           test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$EXPECTED_HEAD"
           git add hat-workshop/r03/qa/public hat-workshop/r03/DELIVERY.json
           find hat-workshop/r03/qa/public -type f \( -name '*.png' -o -name '*.jpg' \) -print0 | xargs -0 -r git add -f --
-          git commit -m 'hat: preserve actual R03 fixed-public verification with explicit limits [skip ci]'
+          git commit -m 'hat: preserve actual R03.1 fixed-public checks, failures and limits [skip ci]'
           git push origin HEAD:$BRANCH
       - uses: actions/upload-artifact@v4
         if: always()
@@ -106,6 +110,8 @@ jobs:
             hat-workshop/r03/*.json
             hat-workshop/r03/*.md
             hat-workshop/r03/THREE_LICENSE.txt
+            hat-workshop/r03/fit
             hat-workshop/r03/assets
             docs/workbench-build-system/HAT_R03_MEASURED_MOTHERS.md
+            docs/workbench-build-system/HAT_R03_GEOMETRY_GATE.md
           retention-days: 14
