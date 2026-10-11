@@ -1,0 +1,32 @@
+name: Denim R07 stable fibers verification
+on:
+  push:
+    branches: [fix/denim-r07-stable-fibers-20261011]
+    paths:
+      - .github/workflows/denim-r07-verify.yml
+      - denim-workshop/r07/upgrade.py
+      - denim-workshop/r07/qa.py
+      - denim-workshop/r07/test-stability.cjs
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            denim-workshop
+            .github/workflows
+      - name: Archive immutable baseline for local source audit
+        run: |
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/source-head.txt
+          cp -r denim-workshop/r06 evidence/r06
+      - uses: actions/upload-artifact@v4
+        with:
+          name: denim-r07-source-audit
+          path: evidence
+          retention-days: 3
+          if-no-files-found: error
