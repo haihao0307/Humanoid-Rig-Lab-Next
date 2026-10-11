@@ -35,6 +35,7 @@ jobs:
         run: |
           pip --disable-pip-version-check install playwright==1.55.0 Pillow==11.3.0
           command -v clang
+          if ! command -v wasm-ld; then sudo apt-get update -qq && sudo apt-get install -y lld; fi
           command -v wasm-ld
           google-chrome --version
           echo "R09_EXPECTED_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
