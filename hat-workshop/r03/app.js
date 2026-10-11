@@ -52,11 +52,11 @@ function measurementOverlay(profile,s){clearMeasurement();if(!profile||s.view!==
  for(const angle of [0,Math.PI/2]){const pts=[];for(let side=0;side<2;side++)for(let j=0;j<64;j++){const f=side?1-j/63:j/63,y=mm.bandY+f*(profile.ymax-mm.bandY-.0002),a=angle+side*Math.PI,p=sample(profile,y,a);pts.push([p.center[0]+p.r*Math.cos(a),y,p.center[1]+p.r*Math.sin(a)]);}line(pts,false,angle?0xbb7848:0x668750);}}
 function apply(){
  if(!hat)return;const isReference=compare||state.repair===false,s=isReference?{...DEFAULT,...subtypeDefaults(state.id),id:state.id,view:state.view,head:state.head,light:state.light}:state,meta=asset.meta,head=D.native.heads[s.head],profile=headProfiles.get(s.head);stage.rotation.y=0;
- const key=JSON.stringify([isReference,s.id,s.head,...Object.keys(PARAM_DEFAULTS).filter(k=>!['showMeasurements','showClearance','textureMode','grainStrength','weaveMM','customColor','useCustomColor'].includes(k)).map(k=>s[k])]);
- if(asset.fitKey!==key){
+ const fitStamp=JSON.stringify([isReference,s.id,s.head,...Object.keys(PARAM_DEFAULTS).filter(k=>!['showMeasurements','showClearance','textureMode','grainStrength','weaveMM','customColor','useCustomColor'].includes(k)).map(k=>s[k])]);
+ if(asset.fitKey!==fitStamp){
   if(isReference){asset.fitResult=null;asset.geometry.attributes.position.array=asset.mesh.position;asset.geometry.attributes.normal.array=asset.mesh.normal;}
   else{asset.fitSource??=sourceFitProfile(asset.mesh,meta);asset.fitResult=deform(asset.mesh,meta,s,profile,asset.fitSource);asset.geometry.attributes.position.array=asset.fitResult.position;asset.geometry.attributes.normal.array=asset.fitResult.normal;asset.geometry.setAttribute('color',new T.BufferAttribute(asset.fitResult.colors,3));}
-  asset.geometry.attributes.position.needsUpdate=true;asset.geometry.attributes.normal.needsUpdate=true;asset.geometry.computeBoundingBox();asset.geometry.computeBoundingSphere();asset.fitKey=key;
+  asset.geometry.attributes.position.needsUpdate=true;asset.geometry.attributes.normal.needsUpdate=true;asset.geometry.computeBoundingBox();asset.geometry.computeBoundingSphere();asset.fitKey=fitStamp;
  }
  hat.material=s.showClearance&&!isReference?clearanceMaterial:s.layer==='clay'?clay:s.layer==='normal'?normal:asset.material;asset.material.wireframe=s.layer==='wire';asset.material.roughness=s.roughness;asset.material.sheen=s.sheen;asset.material.normalScale.set(s.textureMode==='source'?s.detail*.8:0,s.textureMode==='source'?s.detail*.8:0);updateSurface(asset.uniforms,s,COLORS);
  hat.position.set(0,0,0);hat.rotation.set(0,0,0);hat.scale.set(1,1,1);
