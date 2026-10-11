@@ -1,0 +1,169 @@
+name: Denim R10 distance and residency verification
+on:
+  push:
+    branches: [fix/denim-r10-distance-lod-20261011]
+    paths:
+      - .github/workflows/denim-r10-distance-verify.yml
+      - denim-workshop/r10/**
+permissions:
+  contents: read
+concurrency:
+  group: denim-r10-distance-verification
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        scope: [ui, motion]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate canonical R10 only once and build
+        run: |
+          test -f denim-workshop/r10/app.js || python denim-workshop/r10/upgrade.py
+          python denim-workshop/r10/build.py
+          node --check denim-workshop/r10/app.js
+          node --check denim-workshop/r10/distance-lod.js
+          node --check denim-workshop/r10/natural-yarn.js
+          python -m py_compile denim-workshop/r10/qa-distance.py
+          cmp denim-workshop/r09/dynamics.js denim-workshop/r10/dynamics.js
+          git diff --exit-code HEAD -- denim-workshop/r09
+      - name: Numeric preservation, storage, dynamics and demand-layer identity
+        if: matrix.scope == 'ui'
+        run: |
+          node denim-workshop/r10/test-budget.cjs
+          node denim-workshop/r10/test-layers.cjs
+          node denim-workshop/r10/test-stability.cjs
+          node denim-workshop/r10/test-cotton.cjs
+          node denim-workshop/r10/test-dynamics.cjs
+          node denim-workshop/r10/test-distance.cjs
+      - name: Install pinned real browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6 scipy==1.15.3
+          python -m playwright install --with-deps chromium
+      - name: Actual file distance and dynamics gate
+        run: xvfb-run -a python denim-workshop/r10/qa-distance.py --scope '${{ matrix.scope }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r10-${{ matrix.scope }}-evidence
+          path: denim-workshop/r10
+          retention-days: 7
+          if-no-files-found: error
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: denim-r10-ui-evidence
+          path: verified/ui
+      - uses: actions/download-artifact@v4
+        with:
+          name: denim-r10-motion-evidence
+          path: verified/motion
+      - name: Require both successful reports and the same tested runtime
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os,shutil
+          a,b=Path('verified/ui'),Path('verified/motion');p=Path('denim-workshop/r10')
+          ui=json.loads((a/'evidence/file-ui-qa.json').read_text());motion=json.loads((b/'evidence/file-motion-qa.json').read_text())
+          assert ui['passed'] and motion['passed']
+          assert ui['sourceHead']==motion['sourceHead']==os.environ['GITHUB_SHA']
+          for f in a.iterdir():
+              if f.is_file() and (b/f.name).exists() and f.suffix in ['.js','.html','.py','.cjs']:
+                  assert f.read_bytes()==(b/f.name).read_bytes(),f.name
+          assert (a/'index.html').read_bytes()==(b/'index.html').read_bytes()
+          shutil.copytree(a,p,dirs_exist_ok=True)
+          shutil.copytree(b/'evidence',p/'evidence',dirs_exist_ok=True)
+          manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          assert hashlib.sha256((p/'index.html').read_bytes()).hexdigest()==manifest['sha256']
+          assert (p/'dynamics.js').read_bytes()==(p.parent/'r09/dynamics.js').read_bytes()
+          PY
+      - name: Publish only tested canonical R10 source and standalone HTML
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          p=Path('denim-workshop/r10')
+          files=[str(f) for f in p.iterdir() if f.is_file() and f.suffix in ['.js','.html','.py','.cjs','.json','.md']]
+          subprocess.run(['git','add','--',*files],check=True)
+          PY
+          git diff --exit-code HEAD -- denim-workshop/r09
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(denim): publish file-tested R10 pixel-distance candidate [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r10/index.html" >> "$GITHUB_OUTPUT"
+      - name: Install pinned public browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6 scipy==1.15.3
+          python -m playwright install --with-deps chromium
+      - name: Actual immutable public distance changes, residency and wind
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          sleep 8
+          xvfb-run -a python denim-workshop/r10/qa-distance.py --scope ui --public "$PUBLIC_URL"
+      - name: Verify immutable bytes and record actual delivery
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,urllib.request
+          p=Path('denim-workshop/r10')
+          local=json.loads((p/'evidence/file-ui-qa.json').read_text());motion=json.loads((p/'evidence/file-motion-qa.json').read_text());public=json.loads((p/'evidence/public-ui-qa.json').read_text())
+          assert local['passed'] and motion['passed'] and public['passed']
+          manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          raw='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r10/index.html'
+          with urllib.request.urlopen(raw,timeout=90) as response:
+              data=response.read();assert response.status==200
+          assert len(data)==manifest['bytes'] and hashlib.sha256(data).hexdigest()==manifest['sha256']
+          def summary(report):
+              return {'passed':report['passed'],'mode':report['mode'],'states':[s['name'] for s in report['states']],'pageErrors':report['pageErrors'],'consoleErrors':report['consoleErrors'],'httpErrors':report['httpErrors'],'httpRequests':[u for u in report['requests'] if u.startswith('http')],'coldResources':report.get('coldResources'),'nearResources':report.get('nearResources'),'releasedResources':report.get('releasedResources'),'peakTrackedGpuBytes':max(s['frame']['performance']['trackedGpuBytes'] for s in report['states']),'reloadDifference':report.get('reloadDifference'),'physicsAcrossDistance':report.get('physicsAcrossDistance'),'recipeBytes':report.get('recipeBytes')}
+          receipt={'version':'R10.0','deliveryVerified':True,'runtimeChangedThisTask':True,'userFinalApproval':False,'parentBuild':'de49103b14bc4884b3f9ba1e5a2a3a8b5fa66eae','parentBranchHead':'ecbd381ef482c7af375cb907cd10d31ae8244177','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'publicBytesMatch':True,'solverSourceByteIdentical':True,'nearComparison':local['nearComparison'],'motion':motion['motion'],'motionRatios':motion['ratios'],'motionMethod':motion['method'],'browserVersion':public['browserVersion'],'desktopViewport':[1000,780],'mobileViewport':[390,844],'actualPhone':False,'hardwareFPSVerified':False,'browser':{'file':summary(local),'public':summary(public)},'numeric':{f:json.loads((p/f).read_text()) for f in ['distance-qa.json','dynamics-qa.json','budget-qa.json']},'limits':['Filtered material is a same-YarnGraph scale approximation, not complete offline transport','Micro-layer demand residency is whole-swatch, not per-patch virtual geometry or many-garment scheduling','Transition has two scene evaluations and extra memory/bandwidth; cold load, near and far budgets differ','Near image is close within predeclared pixel gates, not pixel-identical to the parent','Physical motion remains the unchanged 475-node proxy; no complete garment/self-collision/tearing system','Camera-motion metric is local reprojected patches; physical comparison is a fixed pose, live wind is tested separately','Software Chromium does not establish consumer-GPU FPS, phone heat or every-camera zero flicker','R01-R09 and unrelated workbenches unchanged; no merge or force push']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r10/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): record R10 immutable public distance verification [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r10-public-evidence
+          path: denim-workshop/r10
+          retention-days: 7
+          if-no-files-found: error
