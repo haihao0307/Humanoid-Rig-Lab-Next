@@ -1,0 +1,156 @@
+name: Denim R08 cotton close-up verification
+on:
+  push:
+    branches: [fix/denim-r08-cotton-near-20261011]
+    paths:
+      - .github/workflows/denim-r08-verify.yml
+      - denim-workshop/r08/**
+permissions:
+  contents: read
+concurrency:
+  group: denim-r08-cotton-closeup
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        scope: [ui, compare]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate once from hash-locked parent and build
+        run: |
+          test -f denim-workshop/r08/app.js || python denim-workshop/r08/bootstrap.py
+          python denim-workshop/r08/build.py
+          node --check denim-workshop/r08/app.js
+          node --check denim-workshop/r08/natural-yarn.js
+          node --check denim-workshop/r08/cotton-surface.js
+          python -m py_compile denim-workshop/r08/qa-near.py
+          git diff --exit-code HEAD -- denim-workshop/r07
+      - name: Numeric suites
+        if: matrix.scope == 'ui'
+        run: |
+          node denim-workshop/r08/test-layers.cjs
+          node denim-workshop/r08/test-stability.cjs
+          node denim-workshop/r08/test-cotton.cjs
+      - name: Install pinned real browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6 scipy==1.15.3
+          python -m playwright install --with-deps chromium
+      - name: Actual file browser gate, no content injection or retries
+        run: xvfb-run -a python denim-workshop/r08/qa-near.py --scope '${{ matrix.scope }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r08-${{ matrix.scope }}-evidence
+          path: denim-workshop/r08
+          retention-days: 7
+          if-no-files-found: error
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: denim-r08-ui-evidence
+          path: verified/ui
+      - uses: actions/download-artifact@v4
+        with:
+          name: denim-r08-compare-evidence
+          path: verified/compare
+      - name: Require both successful reports and identical built source bytes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil,os
+          a,b=Path('verified/ui'),Path('verified/compare');p=Path('denim-workshop/r08')
+          ra=json.loads((a/'evidence/browser-qa.json').read_text());rb=json.loads((b/'evidence/compare-qa.json').read_text())
+          assert ra['passed'] and rb['passed']
+          assert ra['sourceCommit']==rb['sourceCommit']==os.environ['GITHUB_SHA']
+          for f in a.iterdir():
+              if f.is_file() and (b/f.name).exists() and f.suffix in ['.js','.html','.py','.cjs']:
+                  assert f.read_bytes()==(b/f.name).read_bytes(),f.name
+          assert (a/'index.html').read_bytes()==(b/'index.html').read_bytes()
+          shutil.copytree(a,p,dirs_exist_ok=True)
+          shutil.copytree(b/'evidence',p/'evidence',dirs_exist_ok=True)
+          manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          assert hashlib.sha256((p/'index.html').read_bytes()).hexdigest()==manifest['sha256']
+          PY
+      - name: Publish only the file-tested candidate, fast-forward only
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add denim-workshop/r08/app.js denim-workshop/r08/core.js denim-workshop/r08/structure.js denim-workshop/r08/fiber-optics.js denim-workshop/r08/natural-yarn.js denim-workshop/r08/sampling.js denim-workshop/r08/template.html denim-workshop/r08/build.py denim-workshop/r08/index.html denim-workshop/r08/BUILD_MANIFEST.json denim-workshop/r08/test-layers.cjs denim-workshop/r08/test-stability.cjs denim-workshop/r08/layers-qa.json denim-workshop/r08/stability-qa.json denim-workshop/r08/cotton-qa.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(denim): publish file-tested R08 cotton close-up candidate [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r08/index.html" >> "$GITHUB_OUTPUT"
+      - name: Install pinned public browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6 scipy==1.15.3
+          python -m playwright install --with-deps chromium
+      - name: Actual immutable public desktop and mobile viewport
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          sleep 8
+          xvfb-run -a python denim-workshop/r08/qa-near.py --scope ui --public "$PUBLIC_URL"
+      - name: Public byte verification and delivery receipt
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,urllib.request
+          p=Path('denim-workshop/r08')
+          local=json.loads((p/'evidence/browser-qa.json').read_text());comparison=json.loads((p/'evidence/compare-qa.json').read_text());public=json.loads((p/'evidence/public-qa.json').read_text())
+          assert local['passed'] and comparison['passed'] and public['passed']
+          manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          raw='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r08/index.html'
+          with urllib.request.urlopen(raw,timeout=90) as r:
+              data=r.read();assert r.status==200
+          assert len(data)==manifest['bytes'] and hashlib.sha256(data).hexdigest()==manifest['sha256']
+          modes={k:{'stateNames':[s['name'] for s in v['states']],'pageErrors':v['network']['pageErrors'],'consoleErrors':v['network']['consoleErrors'],'httpErrors':v['network']['httpErrors'],'parameterPixelDelta':v.get('parameterPixelDelta'),'exportSchema':v.get('exportSchema'),'requests':v['network']['requests']} for report in [local,public] for k,v in report['modes'].items()}
+          receipt={'version':'R08.0','deliveryVerified':True,'userVisualApproval':False,'filmGradeValidated':False,'productionRuntimeChangedThisTask':True,'parentBuild':'fa143743b1b0f3d74ff827664d06ff119ef87063','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'publicBytesMatch':True,'browserVersion':public['browserVersion'],'desktopViewport':[1000,780],'mobileViewport':[390,844],'realPhone':False,'hardwareFPSVerified':False,'browserModes':modes,'matchedNear':comparison['matchedNear'],'motionResidual':comparison['motionResidual'],'motionTolerance':comparison['motionTolerance'],'motionMethod':'8 quarter-pixel camera pans, 13x51 material-location brightness patch, cubic reprojection; representative cases, not whole-image flicker or zero-aliasing proof','numeric':{name:json.loads((p/name).read_text()) for name in ['layers-qa.json','stability-qa.json','cotton-qa.json']},'earlierFailedRun':{'run':38117333625,'failure':'One blank canvas readback at weave3 after 29 preceding long-sequence states; no successful public publication from that run','diagnosticCorrection':'Read GL state after pixel readback; failed image/state retained; original long sequence and weave3 assertion kept; no retry-to-pass','rootCause':'Not established by the first failure log; do not claim a specific driver fault fixed'},'limits':['Close-up candidate pending actual user visual approval; macro weave remains regular','Cotton optical, dye and radius parameters are unmeasured candidates','No physical cloth solver, dynamic tearing or global self-collision proof','Additional close geometry and fiber curves cost memory and bandwidth; reported buffers are not total memory','Software Chromium is not a real consumer GPU or phone benchmark','R01-R07 and unrelated workbenches unchanged; no merge or force push']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r08/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): record actual R08 immutable public verification [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r08-closeup-evidence
+          path: denim-workshop/r08
+          retention-days: 7
+          if-no-files-found: error
