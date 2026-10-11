@@ -38,3 +38,35 @@ n=n.replace('audit,H,smoothCurve','audit,H,smoothCurve,sectionPoint')
 (p/'natural-yarn.js').write_text(n)
 print('Shader and CPU staple surfaces now share the same deterministic section model.')
 t=(p/'template.html').read_text();t=t.replace('</style>','#tools{max-width:calc(100% - 335px);flex-wrap:wrap;justify-content:flex-end}@media(max-width:750px){#tools{max-width:none;justify-content:flex-start}}</style>');(p/'template.html').write_text(t)
+# Submit a bounded amount of GPU work, instead of queuing all attribute captures,
+# shadows and duplicate startup frames into a single long-running command batch.
+s=(p/'app.js').read_text()
+a=s.index('let bakeSize=');z=s.index('// A bounded 2x',a)
+s=s[:a]+r'''let gpuFence=null,gpuWaits=0,bakeJob=null,bakeSize=1024;
+function gpuAvailable(){if(!gpuFence)return true;const status=gl.clientWaitSync(gpuFence,0,0);
+ if(status===gl.TIMEOUT_EXPIRED){gpuWaits++;return false;}
+ gl.deleteSync(gpuFence);gpuFence=null;if(status===gl.WAIT_FAILED)throw Error('GPU completion fence failed');return true;}
+function submitGpu(){if(gpuFence)gl.deleteSync(gpuFence);gpuFence=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush();}
+function bakeStep(){
+ const key=[state.weave,state.thickness,state.slub,state.damage,state.fray,state.wash,state.abrasion,state.backstain,state.preset].join('|');
+ if(bakeJob&&bakeJob.key!==key){bakeJob.maps.forEach(t=>gl.deleteTexture(t));Sampling.destroy(gl,bakeJob.target);bakeJob=null;}
+ if(!bakeJob)bakeJob={key,index:0,maps:[],target:Sampling.target(gl,bakeSize,bakeSize,false,null,0)};
+ const j=bakeJob,back=j.index<2?1:-1,mode=j.index%2+1,oldFilter=filterScale;filterScale=1;
+ gl.bindFramebuffer(gl.FRAMEBUFFER,j.target.draw);gl.viewport(0,0,bakeSize,bakeSize);gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.disable(gl.BLEND);
+ if(mode===2)gl.clearColor(.5,.5,back>0?1:0,1);else gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+ const w=graph.p.width,h=graph.p.height,view=new Float32Array([1,0,0,0,0,1,0,0,0,0,back,0,0,0,-10,1]);
+ const vp=mul(ortho(-w/2,w/2,-h/2,h/2,.1,30),view);drawYarns(yarnProg,vp,[0,0,back*100],1,mode,true);
+ Sampling.resolve(gl,j.target);gl.bindFramebuffer(gl.FRAMEBUFFER,j.target.read);gl.activeTexture(gl.TEXTURE4);
+ const t=texture(bakeSize,bakeSize);j.maps.push(t);gl.copyTexSubImage2D(gl.TEXTURE_2D,0,0,0,0,0,bakeSize,bakeSize);gl.generateMipmap(gl.TEXTURE_2D);
+ filterScale=oldFilter;gl.bindFramebuffer(gl.FRAMEBUFFER,null);j.index++;
+ $('status').textContent=`同源材质采样 ${j.index}/4 · 保留真实纱线结构`;
+ if(j.index===4){baked.forEach(t=>gl.deleteTexture(t));baked=j.maps;Sampling.destroy(gl,j.target);bakeJob=null;bakeDirty=false;}
+ submitGpu();request();
+}
+''' +s[z:]
+s=s.replace("pending=false;let start=performance.now();if(document.hidden)return;if(state.animate)","pending=false;let start=performance.now();if(document.hidden||gl.isContextLost())return;if(!gpuAvailable()){request();return;}if(bakeDirty&&!state.qaAudit){bakeStep();return;}if(state.animate)")
+s=s.replace("if(bakeDirty&&!state.qaAudit)bake();if(!state.qaAudit)makeShadow();","if(!state.qaAudit)makeShadow();")
+s=s.replace("temporalHistory:false,attachmentBytes", "temporalHistory:false,gpuQueueLimit:1,gpuWaitPolls:gpuWaits,attributeCapturePassesPerBatch:1,attachmentBytes")
+s=s.replace("transitionDoublePass:far>0&&far<1};if(state.animate)request();", "transitionDoublePass:far>0&&far<1};submitGpu();if(state.animate)request();")
+(p/'app.js').write_text(s)
+print('GPU pacing: one capture per batch and no overlapping render submissions; quality unchanged.')
