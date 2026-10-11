@@ -1,0 +1,160 @@
+{
+  "version": "R07.0",
+  "sourceBuild": "49b2e70d557cf670a69e01350d8c202441067ec5",
+  "checks": [
+    {
+      "name": "R06 baseline remains covered on the same grid",
+      "passed": true
+    },
+    {
+      "name": "R07 preserves repaired quarter-vamp coverage on side -1",
+      "passed": true
+    },
+    {
+      "name": "R07 preserves repaired quarter-vamp coverage on side 1",
+      "passed": true
+    },
+    {
+      "name": "same ten actual sheets; no hidden cover mesh introduced",
+      "passed": true
+    },
+    {
+      "name": "P22/P28 tested layer points do not interpenetrate",
+      "passed": true
+    },
+    {
+      "name": "P23/P28 tested layer points do not interpenetrate",
+      "passed": true
+    },
+    {
+      "name": "P24/P22 tested layer points do not interpenetrate",
+      "passed": true
+    },
+    {
+      "name": "P25/P23 tested layer points do not interpenetrate",
+      "passed": true
+    },
+    {
+      "name": "P27/P28 tested layer points do not interpenetrate",
+      "passed": true
+    },
+    {
+      "name": "paired shell seating is bounded and does not counterfeit a collision proof",
+      "passed": true
+    },
+    {
+      "name": "original pattern records and last bytes are unchanged",
+      "passed": true
+    },
+    {
+      "name": "source and target harmonic charts remain nonflipped",
+      "passed": true
+    },
+    {
+      "name": "manufacturing and force solving remain explicitly unapproved",
+      "passed": true
+    }
+  ],
+  "coverage": {
+    "sampling": "world millimetres; z=-36..42,y=25..88,1mm grid; side rays x=+/-180; only two bounded quarter-vamp regions",
+    "before": [
+      {
+        "side": -1,
+        "tested": 4878,
+        "misses": []
+      },
+      {
+        "side": 1,
+        "tested": 4878,
+        "misses": []
+      }
+    ],
+    "after": [
+      {
+        "side": -1,
+        "tested": 4878,
+        "misses": []
+      },
+      {
+        "side": 1,
+        "tested": 4878,
+        "misses": []
+      }
+    ]
+  },
+  "stacking": [
+    {
+      "id": 22,
+      "parent": 28,
+      "tested": 496,
+      "minMm": 0.01199934525114088,
+      "medianMm": 0.06523707081298724,
+      "maxMm": 0.21260556945585485,
+      "penetratingSamples": 0
+    },
+    {
+      "id": 23,
+      "parent": 28,
+      "tested": 810,
+      "minMm": 0.011998265629642901,
+      "medianMm": 0.06113003315970289,
+      "maxMm": 0.1994390398686452,
+      "penetratingSamples": 0
+    },
+    {
+      "id": 24,
+      "parent": 22,
+      "tested": 2014,
+      "minMm": 0.044992499995975876,
+      "medianMm": 0.0620126874194078,
+      "maxMm": 0.24402596796573484,
+      "penetratingSamples": 0
+    },
+    {
+      "id": 25,
+      "parent": 23,
+      "tested": 2172,
+      "minMm": 0.0449930906104985,
+      "medianMm": 0.06148560046974261,
+      "maxMm": 0.24800066032197599,
+      "penetratingSamples": 0
+    },
+    {
+      "id": 27,
+      "parent": 28,
+      "tested": 3428,
+      "minMm": 0.044996221936745684,
+      "medianMm": 0.04500156217678608,
+      "maxMm": 0.24828173592550762,
+      "penetratingSamples": 0
+    }
+  ],
+  "seating": [
+    {
+      "id": 24,
+      "parent": 22,
+      "adjusted": 2047,
+      "maxLiftMm": 0.012441157853923704,
+      "targetClearanceMm": 0.045,
+      "wholeSurfaceCollisionProof": false
+    },
+    {
+      "id": 25,
+      "parent": 23,
+      "adjusted": 2219,
+      "maxLiftMm": 0.04628955072397341,
+      "targetClearanceMm": 0.045,
+      "wholeSurfaceCollisionProof": false
+    },
+    {
+      "id": 27,
+      "parent": 28,
+      "adjusted": 5752,
+      "maxLiftMm": 0.046054028085668344,
+      "targetClearanceMm": 0.045,
+      "wholeSurfaceCollisionProof": false
+    }
+  ],
+  "sourceSHA256": "c5ea417c4154036c421cffbdb73b12ce9dc7bae5d4d3d2a405bf089793c6e102",
+  "limits": "Finite rays and selected layer points only, not full-edge/whole-triangle collision freedom, material force solve, lace-rim tension, or manufacturing validation."
+}

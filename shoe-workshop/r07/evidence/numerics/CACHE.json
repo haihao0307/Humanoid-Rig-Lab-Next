@@ -1,0 +1,30 @@
+{
+  "sourceBuild": "49b2e70d557cf670a69e01350d8c202441067ec5",
+  "checks": [
+    {
+      "name": "native sole normal transport remains finite and orientation-preserving",
+      "passed": true
+    },
+    {
+      "name": "unchanged sole regions retain native smooth normals",
+      "passed": true
+    },
+    {
+      "name": "default form restores after thickness and flat-view changes without recomputing its geometry",
+      "passed": true
+    },
+    {
+      "name": "default contact-ray frames and exact vertex buffers restore together",
+      "passed": true
+    }
+  ],
+  "cacheSlots": 2,
+  "normalTransport": {
+    "method": "Native normals inverse-transpose transported through the same continuous lip deformation; no coarse-triangle re-averaging",
+    "finiteDifferenceMm": 0.02,
+    "minSampledJacobian": 0.4244997888974444,
+    "maxUnchangedRegionNormalDelta": 3.9657968391718274e-8
+  },
+  "restoreCpuTimeMs": 0.04681699999491684,
+  "scope": "Session-only generated default + current geometry. Not a physical-device FPS or initial-load performance guarantee."
+}
