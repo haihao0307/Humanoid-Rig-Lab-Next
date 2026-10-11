@@ -1,0 +1,27 @@
+name: Leather R10 performance
+on:
+  push:
+    branches: [perf/leather-r10-input-20261011]
+    paths: [.github/workflows/leather-r10-performance.yml, leather-workshop/r10/**]
+permissions:
+  contents: write
+concurrency:
+  group: leather-r10-performance
+  cancel-in-progress: true
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: leather-workshop/r09
+      - name: Collect current source without duplicating models or build images
+        run: |
+          mkdir -p /tmp/leather-r10-source
+          tar -czf /tmp/leather-r10-source/r09-source.tgz --exclude=public-lite.html --exclude=qa leather-workshop/r09 AGENTS.md README.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-r10-source
+          path: /tmp/leather-r10-source/
+          retention-days: 3
