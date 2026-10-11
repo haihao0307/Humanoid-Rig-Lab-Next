@@ -8,7 +8,7 @@ ROOT=Path(__file__).resolve().parent
 R02=ROOT.parent/'r02';R01=ROOT.parent/'r01'
 BASE='d56bc8498a152ff501ffaf80ec80a109b2ec4865'
 BASE_HASH='9e11dfc07e8296ffe80afd7e78b710c074ae9cce285cb4d373f449d83e2b112b'
-VERSION='HAT-R03.0'
+VERSION='HAT-R03.1'
 def sha(b):return hashlib.sha256(b).hexdigest()
 def pack(v):return gzip.compress(json.dumps(v,ensure_ascii=False,separators=(',',':')).encode(),mtime=0)
 def old_module():

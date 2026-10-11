@@ -22,6 +22,7 @@ export const PARAM_DEFAULTS={autoFit:true,wearBandMM:12,hairMM:0,clearanceMM:2,c
 export function subtypeDefaults(id){const s=FIT_SPECS[id];return {...PARAM_DEFAULTS,clearanceMM:s.clearance*1000,negativeEase:s.negativeEase};}
 export function validateMother(s){
  for(const [k,lo,hi] of [['wearBandMM',4,25],['hairMM',0,12],['clearanceMM',1,6],['crownMM',-20,40],['brimFactor',.7,1.35],['brimCurve',-15,15],['bandFactor',.8,1.3],['crownFullness',.85,1.2],['backLeanMM',-15,25],['negativeEase',0,.18],['weaveMM',.6,4],['grainStrength',0,1]])if(!Number.isFinite(s[k])||s[k]<lo||s[k]>hi)throw Error('母体参数超界：'+k);
+ if(FIT_SPECS[s.id]?.mode==='stretch-cap'&&s.crownMM<0)throw Error('贴头针织帽冠不能向头皮内部缩短');
  for(const k of ['autoFit','useCustomColor','showMeasurements','showClearance'])if(typeof s[k]!=='boolean')throw Error('无效开关：'+k);
  if(!['source','wool','twill','knit'].includes(s.textureMode)||!/^#[0-9a-fA-F]{6}$/.test(s.customColor))throw Error('无效材质配方');return s;
 }
@@ -74,33 +75,5 @@ function hull(points){const p=points.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]),c
 const perimeter=p=>p.reduce((s,q,i)=>s+Math.hypot(q[0]-p[(i+1)%p.length][0],q[1]-p[(i+1)%p.length][1]),0);
 export function measurements(profile,bandY){const ring=[];for(let j=0;j<profile.angles;j++){const a=j*TAU/profile.angles,s=sample(profile,bandY,a);ring.push([s.center[0]+s.r*Math.cos(a),s.center[1]+s.r*Math.sin(a)]);}const tape=hull(ring),arc=(a)=>{let len=0,last=null;for(let i=0;i<128;i++){const y=mix(bandY,profile.ymax-.0002,i/127),s=sample(profile,y,a),p=[s.center[0]+s.r*Math.cos(a),y,s.center[1]+s.r*Math.sin(a)];if(last)len+=Math.hypot(...p.map((x,k)=>x-last[k]));last=p;}return len;};
  return {definition:'actual-triangle horizontal section; convex tape envelope; selected wear plane is an engineering anchor, not automatic anatomical landmark detection',bandY,ring,headCircumferenceMM:perimeter(tape)*1000,surfaceLoopMM:perimeter(ring)*1000,widthMM:(Math.max(...ring.map(p=>p[0]))-Math.min(...ring.map(p=>p[0])))*1000,depthMM:(Math.max(...ring.map(p=>p[1]))-Math.min(...ring.map(p=>p[1])))*1000,frontBackArcMM:(arc(Math.PI/2)+arc(3*Math.PI/2))*1000,sideToSideArcMM:(arc(0)+arc(Math.PI))*1000,crownRiseMM:(profile.ymax-bandY)*1000,anatomicalLandmarksVerified:false};}
-export function sourceFitProfile(mesh,meta){const spec=FIT_SPECS[meta.id],p=new Float32Array(mesh.position.length);for(let i=0;i<p.length;i++)p[i]=mesh.position[i]-meta.origin[i%3];return {p,profile:sectionProfile(p,mesh.index,{ymin:spec.band-.022,ymax:spec.crown,rows:80,angles:96,inner:true})};}
-/* Ordered field program: style -> category fit -> outward-only contact guard.
- * Negative ease changes the REST circumference, never shrinks worn cloth into skin. */
-export function deform(mesh,meta,s,headProfile,source){
- const spec=FIT_SPECS[meta.id],p=new Float32Array(mesh.position.length),band=s.wearBandMM/1000,clear=(s.clearanceMM+s.hairMM)/1000,src=source.p;
- const wrap=spec.mode==='stretch-cap',fit=s.autoFit&&headProfile,sourceBand=sample(source.profile,spec.band,0).center;
- let adjusted=0,domain=0,minClear=Infinity,maxClear=-Infinity;const bandBins=new Float64Array(96).fill(Infinity),c=new Float32Array(src.length);
- for(let i=0;i<src.length;i+=3){let x=src[i],y=src[i+1],z=src[i+2];const th=Math.atan2(z-sourceBand[1],x-sourceBand[0]),rho=Math.hypot(x-sourceBand[0],z-sourceBand[1]),t=clamp((y-spec.band)/(spec.crown-spec.band));const sb=sample(source.profile,spec.band,th),sourceR=sb.r||.08;
-  const brimWeight=smooth((rho-sourceR-.003)/.045)*(1-smooth((y-spec.band)/.045));const crownWeight=smooth(t);const radialStyle=(s.crownFullness-1)*.055*crownWeight;
-  let r=rho+radialStyle+(s.brimFactor-1)*Math.max(0,rho-sourceR)*brimWeight;
-  let yy=y+s.crownMM/1000*crownWeight+s.brimCurve/1000*brimWeight;let zz=-s.backLeanMM/1000*crownWeight;let cx=sourceBand[0],cz=sourceBand[1];
-  if(fit){const hb=sample(headProfile,band,th),targetBandR=hb.r+clear;cx=hb.center[0];cz=hb.center[1];
-   if(wrap&&y>=spec.band-.022){const tt=clamp((y-spec.band)/(spec.crown-spec.band),-.2,1),headY=band+tt*(headProfile.ymax-band),hs=sample(headProfile,Math.min(headY,headProfile.ymax-.0002),th),ss=sample(source.profile,Math.min(y,spec.crown-.0002),th);const residual=ss.r>0?clamp(rho-ss.r,0,.014):0;
-    const capExtra=Math.max(0,s.crownMM/1000)*smooth(tt)*smooth(tt);const tipLift=clear*Math.pow(clamp(tt),5);yy=headY+tipLift+capExtra+Math.max(0,y-spec.crown);cx=hs.center[0];cz=hs.center[1];
-    const poleFade=Math.sqrt(Math.max(0,1-Math.pow(clamp(tt),8)));r=hs.r+clear*poleFade+residual*s.bandFactor+radialStyle*poleFade;zz=-s.backLeanMM/1000*smooth(tt)*smooth(tt);
-   }else{
-    r+=targetBandR-sourceR;yy+=band-spec.band;const lowWeight=1-smooth((y-spec.band)/.065);r+=(s.bandFactor-1)*.003*lowWeight;
-    if(wrap&&y<spec.band-.022){const scale=targetBandR/sourceR;r=rho*scale;yy=band+(y-spec.band);}
-   }
-  }
-  x=cx+r*Math.cos(th);z=cz+r*Math.sin(th)+zz;
-  if(fit&&yy>=band-.017&&yy<headProfile.ymax-.0002){const hs0=sample(headProfile,yy,th),actualTh=Math.atan2(z-hs0.center[1],x-hs0.center[0]),hs=sample(headProfile,yy,actualTh),rr=Math.hypot(x-hs.center[0],z-hs.center[1]);if(hs.valid&&hs.r>.004){const g=rr-hs.r;if(g<clear*.65){const nr=hs.r+clear*.65;x=hs.center[0]+nr*Math.cos(actualTh);z=hs.center[1]+nr*Math.sin(actualTh);adjusted++;}}}
-  p[i]=x;p[i+1]=yy;p[i+2]=z;
-  let gap=null;if(fit&&yy>=band-.017&&yy<=headProfile.ymax-.0002){const h0=sample(headProfile,yy,0),a=Math.atan2(z-h0.center[1],x-h0.center[0]),hs=sample(headProfile,yy,a);if(hs.valid&&hs.r>.004){gap=Math.hypot(x-hs.center[0],z-hs.center[1])-hs.r;minClear=Math.min(minClear,gap);maxClear=Math.max(maxClear,gap);domain++;if(Math.abs(yy-band)<.009){const j=Math.floor((a+TAU)%TAU/TAU*96);bandBins[j]=Math.min(bandBins[j],gap);}}}
-  if(gap===null){c[i]=.72;c[i+1]=.72;c[i+2]=.72;}else{const q=clamp(gap/.018);c[i]=gap<0?1:mix(.08,.95,q);c[i+1]=gap<0?.05:mix(.65,.55,q);c[i+2]=gap<0?.05:mix(.8,.08,q);}
- }
- const gaps=Array.from(bandBins).filter(Number.isFinite).sort((a,b)=>a-b);const measure=fit?measurements(headProfile,band):null;
- return {position:p,normal:normals(mesh,p),colors:c,measurement:measure,diagnostics:{mode:spec.mode,contactGuardVertices:adjusted,sampledVertices:domain,minimumRadialClearanceMM:domain?minClear*1000:null,maximumRadialClearanceMM:domain?maxClear*1000:null,bandSampleBins:gaps.length,bandMinimumMM:gaps.length?gaps[0]*1000:null,bandMedianMM:gaps.length?gaps[Math.floor(gaps.length*.5)]*1000:null,bandP95MM:gaps.length?gaps[Math.min(gaps.length-1,Math.floor(gaps.length*.95))]*1000:null,negativeEase:wrap?s.negativeEase:0,restCircumferenceMM:measure?measure.headCircumferenceMM*(wrap?1-s.negativeEase:1):null,wornHeadCircumferenceMM:measure?.headCircumferenceMM??null,requiredCircumferentialStretch:wrap?1/(1-s.negativeEase)-1:0,scope:'sampled radial vertex clearance; not signed Euclidean triangle distance, pressure or continuous collision',physicalValidated:false}};
-}
+export {sourceFitProfile,deform} from './fit/field.mjs';
 export function categoryPresets(id){const d=subtypeDefaults(id),wrap=FIT_SPECS[id].mode==='stretch-cap';return [{id:'standard',title:wrap?'贴头标准款':'量头标准款',values:{...d}},{id:'compact',title:wrap?'短冠细针织':'短冠窄檐',values:{...d,crownMM:wrap?0:-12,brimFactor:.82,crownFullness:.96,textureMode:wrap?'knit':'wool',weaveMM:1.05,grainStrength:.28,useCustomColor:true,customColor:'#5c6870'}},{id:'relaxed',title:wrap?'留量松冠款':'宽檐丰冠',values:{...d,crownMM:wrap?24:14,crownFullness:wrap?1.03:1.08,brimFactor:1.22,backLeanMM:wrap?12:0,textureMode:wrap?'knit':'twill',weaveMM:2.2,useCustomColor:true,customColor:'#937052'}}];}

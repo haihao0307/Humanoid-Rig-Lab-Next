@@ -18,12 +18,12 @@ def run(url=None):
   try:
    p.goto(url,wait_until='load',timeout=180000);p.wait_for_function('window.hatLab&&hatLab.ready()&&hatLab.thumbnails()===11',timeout=240000);p.wait_for_timeout(500)
    report['firstReadySeconds']=time.monotonic()-start;report['initialRequests']=[u for u in requests if u.startswith(('https:','http:'))]
-   m=json.loads((ROOT/'BUILD_MANIFEST.json').read_text());check('correct R03 version',p.evaluate('hatLab.version')=='HAT-R03.0');check('correct source SHA',p.evaluate('hatLab.sourceCommit')==m['sourceSha']);check('default automatic fitting is visible',p.evaluate('hatLab.recipe().settings.autoFit&&hatLab.metrics().headVisible'));check('eleven indexed hat mothers',len(p.evaluate('hatLab.catalogue()'))==11)
+   m=json.loads((ROOT/'BUILD_MANIFEST.json').read_text());check('correct R03 version',p.evaluate('hatLab.version')=='HAT-R03.1');check('correct source SHA',p.evaluate('hatLab.sourceCommit')==m['sourceSha']);check('default automatic fitting is visible',p.evaluate('hatLab.recipe().settings.autoFit&&hatLab.metrics().headVisible'));check('eleven indexed hat mothers',len(p.evaluate('hatLab.catalogue()'))==11)
    if not public:check('standalone core network requests zero',len(report['initialRequests'])==0,report['initialRequests'])
    collection=[]
    for item in p.evaluate('hatLab.catalogue()'):
     p.locator(f'.hat-card[data-id="{item["id"]}"]').click();p.wait_for_function('(id)=>hatLab.ready()&&hatLab.metrics().hat===id',arg=item['id']);p.evaluate('hatLab.setPreset("standard")');p.evaluate('hatLab.frame()');p.wait_for_timeout(200)
-    state=p.evaluate('hatLab.metrics()');report['states'].append(state);check('regenerated geometry '+item['id'],state['controlPoints']>0 and state['generatedVertices']>200 and state['triangles']>300,state)
+    state=p.evaluate('hatLab.metrics()');report['states'].append(state);check('regenerated geometry '+item['id'],state['controlPoints']>0 and state['generatedVertices']>200 and state['triangles']>300 and all(50<state[k]<750 for k in ['widthMM','heightMM','depthMM']),state)
     image=Image.open(io.BytesIO(p.locator('#canvas').screenshot())).convert('RGB');check('nonempty real render '+item['id'],sum(ImageStat.Stat(image).stddev)>10);image.save(folder/(item['id']+'-standard.jpg'),quality=91);collection.append((item['id'],image));baseline=p.evaluate('hatLab.baselinePositions()')
     for head in range(3):
      p.evaluate('(head)=>hatLab.set({head,view:"wear",autoFit:true})',head);p.wait_for_timeout(80);s=p.evaluate('hatLab.metrics()');check('measured category fit '+item['id']+'/'+str(head),s['headVisible'] and 400<s['measuredHead']['headCircumferenceMM']<700 and s['fit']['sampledVertices']>0)
