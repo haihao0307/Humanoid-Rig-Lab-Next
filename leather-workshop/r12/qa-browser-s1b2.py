@@ -17,9 +17,14 @@ def check(name,passed,data=None):
 def ready(page,version):
  page.wait_for_function("window.LEATHER_ATELIER?.ready || (document.querySelector('#error') && !document.querySelector('#error').hidden)",timeout=240000)
  check(version+' actual runtime ready',page.evaluate('window.LEATHER_ATELIER?.version')==version,page.locator('#error').inner_text())
+def layout(page):
+ return page.evaluate("()=>({scroll:[scrollX,scrollY],size:[innerWidth,innerHeight,devicePixelRatio],compatMode:document.compatMode,rectangles:Object.fromEntries(['stage','sceneCanvas','craftRibbon','collection'].map(id=>{const e=document.getElementById(id);return[id,{rect:e.getBoundingClientRect().toJSON(),client:[e.clientWidth,e.clientHeight],scroll:[e.scrollLeft,e.scrollTop]}]})),frame:LEATHER_ATELIER.frameAudit(),gauge:LEATHER_ATELIER.measureShell(),audit:LEATHER_ATELIER.audit(),physics:LEATHER_ATELIER.productPhysics})")
 def shot(page,name):
  page.evaluate('LEATHER_ATELIER.render()');page.wait_for_timeout(120)
- data=page.locator('#stage').screenshot();(OUT/(name+'.png')).write_bytes(data);return Image.open(io.BytesIO(data)).convert('RGB')
+ before=layout(page)
+ data=page.locator('#stage').screenshot();(OUT/(name+'.png')).write_bytes(data)
+ report.setdefault('captureDiagnostics',{})[name]={'before':before,'after':layout(page)};save()
+ return Image.open(io.BytesIO(data)).convert('RGB')
 def canonical(v):
  if isinstance(v,dict):return {k:canonical(x) for k,x in v.items() if k not in {'tessellationMS','sourceCommit','version'}}
  if isinstance(v,list):return [canonical(x) for x in v]
@@ -51,19 +56,18 @@ with sync_playwright() as pw:
   check('Six visible craft controls',page.locator('#craftRibbon button').count()==6)
   if not args.public:
    reference=new_page('reference',(ROOT.parent/'r10/public-lite.html').as_uri(),True)
-   for p in [reference,page]:
-    # Exclude only the explicit version label, never object surfaces or lighting.
-    p.add_style_tag(content='#stageLabel{visibility:hidden !important}')
+   for p in [reference,page]:p.add_style_tag(content='#stageLabel{visibility:hidden !important}')
    def compare_view(name,script):
     for p in [reference,page]:p.evaluate(script)
     a=shot(reference,'reference-'+name);b=shot(page,'candidate-'+name)
     check(name+' image dimensions unchanged',a.size==b.size)
-    diff=ImageChops.difference(a,b);mean=sum(ImageStat.Stat(diff).mean)/3
-    hist=diff.convert('L').histogram();changed=sum(hist[3:])/(a.width*a.height)
-    check(name+' material/lighting/geometry pixel equivalence',mean<=.02 and changed<=.0005,{'meanRGBDifference':mean,'fractionDifferentAbove2':changed,'allowedMean':.02,'allowedFraction':.0005})
     x=reference.evaluate('({frame:LEATHER_ATELIER.frameAudit(),gauge:LEATHER_ATELIER.measureShell(),audit:LEATHER_ATELIER.audit()})')
     y=page.evaluate('({frame:LEATHER_ATELIER.frameAudit(),gauge:LEATHER_ATELIER.measureShell(),audit:LEATHER_ATELIER.audit()})')
-    check(name+' camera, live gauge and geometry audit unchanged',canonical(x)==canonical(y))
+    check(name+' camera, live gauge and geometry audit unchanged',canonical(x)==canonical(y),{'reference':x,'candidate':y})
+    diff=ImageChops.difference(a,b);mean=sum(ImageStat.Stat(diff).mean)/3
+    hist=diff.convert('L').histogram();changed=sum(hist[3:])/(a.width*a.height)
+    if mean>.02 or changed>.0005:diff.save(OUT/(name+'-difference.png'))
+    check(name+' material/lighting/geometry pixel equivalence',mean<=.02 and changed<=.0005,{'meanRGBDifference':mean,'fractionDifferentAbove2':changed,'allowedMean':.02,'allowedFraction':.0005})
    for ident in ['wallet','belt','bag','cowboy','pirate','swatch']:
     compare_view('product-'+ident,f"()=>{{LEATHER_ATELIER.selectProduct('{ident}');LEATHER_ATELIER.configure({{craft:'{'diamond' if ident=='swatch' else 'plain'}'}});LEATHER_ATELIER.setView('home');}}")
    for craft in ['plain','diamond','grid','channels','perforated','woven']:
@@ -103,8 +107,7 @@ with sync_playwright() as pw:
   page.evaluate("LEATHER_ATELIER.selectProduct('swatch');LEATHER_ATELIER.configure({craft:'diamond'});LEATHER_ATELIER.setView('home')")
   page.set_viewport_size({'width':390,'height':844});page.wait_for_timeout(150)
   check('Mobile viewport fits without horizontal overflow',page.locator('#stage').bounding_box()['width']>200 and page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'))
-  shot(page,'mobile')
-  report['requests']=requests
+  shot(page,'mobile');report['requests']=requests
   if not args.public:check('Offline standalone makes no HTTP requests',not requests)
   check('No application or shader errors',not report['errors'],report['errors'])
   report['pass']=True;report['checkCount']=len(report['checks']);report['completedAt']=time.time()
