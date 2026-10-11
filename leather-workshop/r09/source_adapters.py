@@ -59,6 +59,10 @@ vec3 productPoint(mat3 basis){vec3 p=pointFor(simIDs,simWeights,simDelta,basis);
         s=once(s,'</style>','''.craft-ribbon{pointer-events:auto;display:flex;gap:5px;flex-wrap:wrap;padding:0 28px 12px}.craft-ribbon button{font-size:11px;padding:6px 10px}.craft-ribbon button:disabled{opacity:.4;cursor:not-allowed}.craft-ribbon .craft-note{font-size:9px;color:var(--muted);flex-basis:100%;margin-top:2px}#liveThicknessNote{white-space:pre-line;font-size:10px;line-height:1.7;padding:8px 0;color:#526456}@media(max-width:760px){.craft-ribbon{padding:0 12px 6px;gap:3px}.craft-ribbon button{font-size:9px;padding:4px 6px}}</style>''')
         s=s.replace('皮革工艺（卡包 / 肩包 / 皮样）','成品工艺（卡包 / 肩包 / 夹克 / 皮样）')
         s=once(s,'<div id="grabStats"></div>','<div id="grabStats"></div><div id="liveThicknessNote"></div>')
+    elif name=='closed-shell.js':
+        # surfacePoint retains this function's lexical environment. Release
+        # construction-only arrays after GPU buffers and edge binding are built.
+        s=once(s,'P,physicalKey);', 'P,physicalKey);P.length=N.length=UV.length=I.length=bindings.length=0;points.length=tris.length=boundary.length=0;edges.clear();edgeVertices.clear();alongMap.clear();outgoing.clear();incoming.clear();')
     elif name=='assembly-contract.js':
         s=once(s,"if(['diamond','grid','channels'].includes(this.config.craft))d.formed=true;","if(d.map.craftProfile){d.formed=true;d.simStep=Math.min(d.simStep||18,Math.max(4,d.map.craftProfile.pitchMM/3));d.restCurvatureProvenance='quilted shape rest-curvature approximation; filler is not independently solved';}")
         s=once(s,'Math.max(2,(this.config.weaveMM||8)/3)','Math.max(3,(this.config.weaveMM||8)/2)')
