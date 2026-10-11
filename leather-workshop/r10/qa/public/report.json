@@ -1,0 +1,428 @@
+{
+  "version": "R10.0",
+  "checks": [
+    {
+      "name": "R10.0 renders rather than an error page",
+      "pass": true,
+      "data": ""
+    },
+    {
+      "name": "Immutable runtime source handshake",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Preserved thirteen material and six product previews",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Rejected jacket removed",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Six directly accessible integrated craft buttons",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Grid button changes rendered leather, not a label alone",
+      "pass": true,
+      "data": {
+        "meanPixelDifference": 6.6060464815174464
+      }
+    },
+    {
+      "name": "Thickness control changes actual inner/outer separation",
+      "pass": true,
+      "data": {
+        "thin": [
+          {
+            "part": "wallet-panel-0",
+            "minMM": 0.6397213339805602,
+            "maxMM": 0.7945079207420349,
+            "targetMM": 0.78,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.0021389355687372966,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-1",
+            "minMM": 0.6347788572311401,
+            "maxMM": 0.7946192622184753,
+            "targetMM": 0.78,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.002138935568736482,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-2",
+            "minMM": 0.6397213339805603,
+            "maxMM": 0.7945051193237305,
+            "targetMM": 0.78,
+            "sampleCount": 82,
+            "wallEdges": 1184,
+            "boundaryEdges": 1184,
+            "periodic": 0,
+            "chordErrorMM": 0.0021389355687372966,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          }
+        ],
+        "thick": [
+          {
+            "part": "wallet-panel-0",
+            "minMM": 1.9409605264663694,
+            "maxMM": 2.1915085315704346,
+            "targetMM": 2.16,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.0030066842497916365,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-1",
+            "minMM": 1.9358566999435425,
+            "maxMM": 2.191553831100464,
+            "targetMM": 2.16,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.00300668424979148,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-2",
+            "minMM": 1.9409605264663696,
+            "maxMM": 2.191056966781616,
+            "targetMM": 2.16,
+            "sampleCount": 82,
+            "wallEdges": 1184,
+            "boundaryEdges": 1184,
+            "periodic": 0,
+            "chordErrorMM": 0.0030066842497920594,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Actual pointer produces force and lifts the sewn product",
+      "pass": true,
+      "data": {
+        "start": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 98,
+          "maxSeamGapErrorMM": 8.673617379884035e-16,
+          "version": "R09-implicit-1",
+          "timeS": 0,
+          "steps": 0,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 224,
+          "triangles": 344,
+          "massG": 15.964200000000002,
+          "centerMM": [
+            4.3368086899420177e-16,
+            32.0142827488629,
+            1.032688239936858
+          ],
+          "maxStretch": 1,
+          "peakStretch": 1,
+          "maxEdgeChangeMM": 0,
+          "groundMinMM": 0.2719780921936034,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 0,
+            "ccdEvents": 0,
+            "ptEvents": 0,
+            "eeEvents": 0,
+            "frictionEvents": 0,
+            "normalForceN": 0,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": 7.2852813742385685,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": 7.2852813742385685,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0,
+          "solverIterations": null,
+          "lbfgsIterations": 0,
+          "incrementalPotentialJ": null,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": false,
+          "initialization": null,
+          "workerSolveMS": 0,
+          "workerBusy": false,
+          "calculationSpeed": 0,
+          "integrationThread": "autonomous fixed-step worker; rendering does not pace simulation",
+          "inputToPoseMS": 0,
+          "cursorErrorMM": 5.337136212080535e-07,
+          "receivedPoses": 1,
+          "appliedPoses": 1,
+          "pendingRequests": 1,
+          "inputSequence": 1
+        },
+        "held": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 98,
+          "maxSeamGapErrorMM": 0.004006658815881381,
+          "version": "R09-implicit-1",
+          "timeS": 2.1666666666666616,
+          "steps": 260,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 224,
+          "triangles": 344,
+          "massG": 15.964200000000002,
+          "centerMM": [
+            3.449012584846011,
+            40.8130917695273,
+            -1.9412058114650717
+          ],
+          "maxStretch": 1.0002534461310635,
+          "peakStretch": 1.001377998879336,
+          "maxEdgeChangeMM": 0.0030413535727618485,
+          "groundMinMM": 8.12175869697344,
+          "grabErrorMM": 0.039162021557045096,
+          "grabForceN": 0.15664808622816737,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 296,
+            "ccdEvents": 798,
+            "ptEvents": 202,
+            "eeEvents": 596,
+            "frictionEvents": 148340,
+            "normalForceN": 1.2808326247782347,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": 7.2852813742385685,
+            "minimumClearanceMM": 0.04167955950172249,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": 7.2852813742385685,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0.006396527143141839,
+          "solverIterations": 25,
+          "lbfgsIterations": 6500,
+          "incrementalPotentialJ": 9.837752027960906e-05,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": false,
+          "initialization": null,
+          "workerSolveMS": 36.300000000046566,
+          "workerBusy": false,
+          "calculationSpeed": 0.24545900834552123,
+          "integrationThread": "autonomous fixed-step worker; rendering does not pace simulation",
+          "inputToPoseMS": 126.20000000006985,
+          "cursorErrorMM": 1.0423835879364627,
+          "receivedPoses": 261,
+          "appliedPoses": 10,
+          "pendingRequests": 0,
+          "inputSequence": 13
+        }
+      }
+    },
+    {
+      "name": "Release advances actual dynamics without simulation-face penetration",
+      "pass": true,
+      "data": {
+        "released": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 98,
+          "maxSeamGapErrorMM": 0.004482872733134772,
+          "version": "R09-implicit-1",
+          "timeS": 3.824999999999989,
+          "steps": 459,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 224,
+          "triangles": 344,
+          "massG": 15.964200000000002,
+          "centerMM": [
+            3.725863114923189,
+            41.59334394463504,
+            -2.2699911251521567
+          ],
+          "maxStretch": 1.0002762513285106,
+          "peakStretch": 1.001377998879336,
+          "maxEdgeChangeMM": 0.0033150159421263536,
+          "groundMinMM": 9.344447504270066,
+          "grabErrorMM": 0.03915173136473268,
+          "grabForceN": 0,
+          "held": false,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 244,
+            "ccdEvents": 798,
+            "ptEvents": 202,
+            "eeEvents": 596,
+            "frictionEvents": 200818,
+            "normalForceN": 1.325881928577261,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": 7.2852813742385685,
+            "minimumClearanceMM": 0.04165316633725452,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": 7.2852813742385685,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0.0031063341417035388,
+          "solverIterations": 25,
+          "lbfgsIterations": 11475,
+          "incrementalPotentialJ": 0.00010943679851952244,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": false,
+          "initialization": null,
+          "workerSolveMS": 67.60000000009313,
+          "workerBusy": false,
+          "calculationSpeed": 0.18363449390331532,
+          "integrationThread": "autonomous fixed-step worker; rendering does not pace simulation",
+          "inputToPoseMS": 121.20000000006985,
+          "cursorErrorMM": 0,
+          "receivedPoses": 460,
+          "appliedPoses": 18,
+          "pendingRequests": 1,
+          "inputSequence": 13
+        },
+        "contact": {
+          "scope": "topologically non-neighbour simulation primitives",
+          "minClearanceMM": 0.04170267038481343,
+          "penetrating": 0,
+          "intersection": 0,
+          "worst": []
+        }
+      }
+    },
+    {
+      "name": "Orbit crossing viewport boundary never selects page text",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Pointer capture releases the selection guard",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Selection is not disabled globally outside gestures",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Physics advances independently while the render thread is blocked",
+      "pass": true,
+      "data": {
+        "before": 64,
+        "after": 75,
+        "blockedMainMS": 600
+      }
+    },
+    {
+      "name": "No per-frame step request backlog",
+      "pass": true,
+      "data": 0
+    },
+    {
+      "name": "Escape releases grab and selection guard",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Mobile viewport remains usable, not a physical-device claim",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "No application or shader errors",
+      "pass": true,
+      "data": []
+    }
+  ],
+  "errors": [],
+  "scope": "Actual Chrome; 1440x1000 desktop and 390x844 viewport simulation, not a physical phone",
+  "url": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/af389cc216ddd01e3b1aa66c972f42b2587bc797/leather-workshop/r10/public-lite.html",
+  "browser": "154.0.8037.97",
+  "networkRequests": [
+    "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/af389cc216ddd01e3b1aa66c972f42b2587bc797/leather-workshop/r10/public-lite.html",
+    "https://htmlpreview.github.io/htmlpreview.js",
+    "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/af389cc216ddd01e3b1aa66c972f42b2587bc797/leather-workshop/r10/public-lite.html"
+  ],
+  "pass": true
+}
