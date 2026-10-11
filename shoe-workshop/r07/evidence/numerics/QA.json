@@ -1,9 +1,9 @@
 {
   "version": "R07.0",
-  "sourceBuild": "49b2e70d557cf670a69e01350d8c202441067ec5",
+  "sourceBuild": "dc9ec2332de5672b9d1bc7a3c384abf0de620c93",
   "checks": [
     {
-      "name": "R06 part identity, native outsole indices, original data and R10 donor are retained",
+      "name": "R06 part identity, original CAD surface coverage, source data and R10 donor are retained",
       "passed": true
     },
     {
@@ -131,7 +131,7 @@
       "passed": true
     },
     {
-      "name": "native cup-lip re-registration is bounded and changes no outsole topology",
+      "name": "native cup-lip re-registration is bounded and retains every original surface triangle",
       "passed": true
     },
     {
@@ -1276,16 +1276,34 @@
         "profileSamples": 240,
         "matched": 240,
         "boundedSamples": 0,
-        "changedVertices": 2577,
-        "maxMoveMm": 8.006034278169176,
-        "unchangedVertices": 8195,
-        "unchangedBottomVertices": 8194,
-        "indexBufferUnchanged": true,
+        "changedVertices": 31448,
+        "maxMoveMm": 8.208839051488795,
+        "unchangedVertices": 11537,
+        "unchangedBottomVertices": 11530,
+        "indexBufferUnchanged": false,
+        "affineSubdivision": {
+          "nativeVertices": 10772,
+          "nativeTriangles": 15528,
+          "vertices": 42985,
+          "triangles": 79636,
+          "passes": 9,
+          "targetMidpointErrorMm": 0.025,
+          "allEdgesAtTarget": false,
+          "maxMidpointErrorMm": 0.15244020445450887,
+          "edgesOverTolerance": 61,
+          "reversedSourceChildren": 0,
+          "maxSourceAreaRelativeError": 2.821297059691911e-15,
+          "sourceUnchanged": true,
+          "indexBufferUnchanged": false,
+          "method": "Conforming affine subdivision of the same native CAD triangle surfaces; no new silhouette or cover mesh; smooth warp evaluated on every generated vertex"
+        },
         "normalTransport": {
           "method": "Native normals inverse-transpose transported through the same continuous lip deformation; no coarse-triangle re-averaging",
           "finiteDifferenceMm": 0.02,
-          "minSampledJacobian": 0.4244997888974444,
-          "maxUnchangedRegionNormalDelta": 3.9657968391718274e-8
+          "minSampledJacobian": 0.41769293490809,
+          "strictIdentitySamples": 11411,
+          "maxUnchangedRegionNormalDelta": 4.112450726246362e-8,
+          "identityNeighborhoodJacobianTolerance": 1e-9
         },
         "targetOuterLipOverhangMm": 0.65,
         "radialJacobianLowerBound": 0.16,
