@@ -1,9 +1,9 @@
 """Idempotent finalization after the frozen-parent source migration.
 Adapt the old source-name assertion; numeric/image thresholds remain unchanged.
-Also preserve the internal depth-audit API when high templates are lazy: an audit
-must create and retain its required template even at the default camera distance.
-Normal user rendering is unchanged by that guard; geometryOnly now correctly
-reports false when the local-footprint scene contributes at a zero global weight.
+Preserve the internal depth-audit API with lazy high-detail templates and report
+local filtering truthfully. The paired software-renderer experiment may exceed
+Chromium's GPU timeout while drawing the unmodified R09 baseline; only that
+experiment disables the GPU watchdog. UI and public browsers keep it enabled.
 """
 from pathlib import Path
 P=Path(__file__).resolve().parent
@@ -28,4 +28,16 @@ for a,b in [
     else:
         assert b in s,(a,'Unknown source; explicit review required')
 f.write_text(s)
-print('R10 source API, truthful diagnostics and lazy audit templates finalized; numeric/image gates retained')
+f=P/'qa-distance.py';s=f.read_text()
+old=" b=pw.chromium.launch(**kw);r['browserVersion']=b.version"
+new=""" # The image comparison draws the unmodified heavy R09 reference as well.
+ # ANGLE documents this debugging option for software/debug draws that run long.
+ # Never apply it to the user-facing UI/public verification, or suppress GL loss.
+ # https://chromium.googlesource.com/angle/angle/+/HEAD/doc/DebuggingTips.md
+ if args.scope=='motion':kw['args'].append('--disable-gpu-watchdog')
+ r['softwareComparisonWatchdogDisabled']=args.scope=='motion'
+ b=pw.chromium.launch(**kw);r['browserVersion']=b.version"""
+if "r['softwareComparisonWatchdogDisabled']" not in s:
+    assert s.count(old)==1,'Unknown browser launch source'
+    f.write_text(s.replace(old,new))
+print('R10 source, audit and software-reference test environment finalized; thresholds and public watchdog retained')
