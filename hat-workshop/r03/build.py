@@ -38,6 +38,10 @@ def assets():
  print('MOTHERS',json.dumps(report,ensure_ascii=False),flush=True)
 
 def pages(data_sha,source_sha):
+ app=(ROOT/'app.js').read_text()
+ assert 'const fitStamp=JSON.stringify([isReference' in app,'Missing independent fit cache key'
+ assert 'const key=JSON.stringify([isReference' not in app,'Fit cache must not shadow key light'
+ assert 'key.position.set' in app and 'asset.fitKey=fitStamp' in app
  m=json.loads((ROOT/'ASSET_MANIFEST.json').read_text());m['sourceCommit']=source_sha;m['dataCommit']=data_sha
  base=f'https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/{data_sha}/hat-workshop/r03/assets/'
  for h in [*m['hats'],*m['native']['heads']]:h['packageURL']=base+h['packageFile']
