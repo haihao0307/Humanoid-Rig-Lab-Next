@@ -1,7 +1,7 @@
 {
   "schema": "kaopu.hat.recipe/1",
-  "version": "HAT-R03.0",
-  "sourceCommit": "437d1dd0be35b1407e72b6fbaa19274514a8836a",
+  "version": "HAT-R03.1",
+  "sourceCommit": "aa4f62127aaadbabd011ffbd6421336f9d99052c",
   "sourceId": "cable",
   "settings": {
     "autoFit": true,
@@ -636,19 +636,36 @@
   },
   "fitDiagnostics": {
     "mode": "stretch-cap",
+    "sourceOpening": {
+      "a": 6.279446696210575e-17,
+      "b": 0.42740800514584487,
+      "c": -0.04062687113031149,
+      "rmsMM": 0.8195324785820532,
+      "method": "least-squares plane of actual source opening boundary",
+      "sourceVertices": 16
+    },
+    "sourceRingY": 0.0014232703350685744,
+    "sourceRingCoverage": 1,
+    "sourceRingMethod": "valid encircling triangle section, periodic low-order radius fit; no zero-radius fallback",
+    "boundedScaleClamps": 0,
+    "dimensionsMM": [
+      170.31583935022354,
+      93.10947544872761,
+      211.1477181315422
+    ],
     "contactGuardVertices": 0,
-    "sampledVertices": 13802,
-    "minimumRadialClearanceMM": 2.9999995977655765,
-    "maximumRadialClearanceMM": 38.80381111420267,
-    "bandSampleBins": 66,
-    "bandMinimumMM": 2.999999600899778,
-    "bandMedianMM": 3.0000000000000027,
-    "bandP95MM": 3.000000230786337,
+    "sampledVertices": 14265,
+    "minimumRadialClearanceMM": 2.984783409164929,
+    "maximumRadialClearanceMM": 23.135064706349524,
+    "bandSampleBins": 96,
+    "bandMinimumMM": 2.984783409164929,
+    "bandMedianMM": 3.000140192173553,
+    "bandP95MM": 3.2319098278323217,
     "negativeEase": 0.09,
     "restCircumferenceMM": 517.9064469374881,
     "wornHeadCircumferenceMM": 569.1279636675694,
     "requiredCircumferentialStretch": 0.09890109890109877,
-    "scope": "sampled radial vertex clearance; not signed Euclidean triangle distance, pressure or continuous collision",
+    "scope": "sampled radial vertex clearance and bounded smooth field; not signed Euclidean triangle distance, pressure or continuous collision",
     "physicalValidated": false
   },
   "physicalFitValidated": false
