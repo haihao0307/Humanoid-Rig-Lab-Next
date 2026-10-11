@@ -1,0 +1,54 @@
+name: Shoe R05 complete-form verification
+on:
+  push:
+    branches: [fix/shoe-r05-complete-form-20261011]
+    paths: ['shoe-workshop/r05/**', '.github/workflows/shoe-r05-form.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shoe-r05-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            shoe-workshop
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pinned source and rendering dependencies
+        run: npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+      - name: Recover original source for continuation
+        run: |
+          mkdir -p recovery/shoe-workshop
+          cp -R shoe-workshop/r02 shoe-workshop/r03 shoe-workshop/r03b shoe-workshop/r04 shoe-workshop/node_modules recovery/shoe-workshop/
+          find recovery -type d -name evidence -prune -exec rm -rf {} +
+          find recovery -type d -name intake -prune -exec rm -rf {} +
+          tar -czf shoe-r05-recovery.tar.gz -C recovery .
+      - name: Recovery source artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r05-recovery-${{ github.run_id }}
+          path: shoe-r05-recovery.tar.gz
+          retention-days: 3
+      - name: Build current production increment when present
+        if: hashFiles('shoe-workshop/r05/tools/build.mjs') != ''
+        run: |
+          cd shoe-workshop && npx playwright install --with-deps chromium
+          cd ..
+          node shoe-workshop/r05/tools/build.mjs
+          node shoe-workshop/r05/tests/verify.mjs
+      - name: Current candidate evidence
+        if: always() && hashFiles('shoe-workshop/r05/tools/build.mjs') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r05-candidate-${{ github.run_id }}
+          path: shoe-workshop/r05/
+          include-hidden-files: true
+          retention-days: 14
