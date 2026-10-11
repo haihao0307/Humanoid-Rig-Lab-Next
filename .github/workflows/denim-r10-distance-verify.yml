@@ -33,6 +33,7 @@ jobs:
       - name: Generate canonical R10 only once and build
         run: |
           test -f denim-workshop/r10/app.js || python denim-workshop/r10/upgrade.py
+          python denim-workshop/r10/prepare-contracts.py
           python denim-workshop/r10/build.py
           node --check denim-workshop/r10/app.js
           node --check denim-workshop/r10/distance-lod.js
