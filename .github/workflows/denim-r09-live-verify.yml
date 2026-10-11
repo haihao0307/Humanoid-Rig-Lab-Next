@@ -1,0 +1,107 @@
+name: Denim R09.1 live cloth publication
+on:
+  push:
+    branches: [fix/denim-r09-live-motion-20261011]
+    paths:
+      - .github/workflows/denim-r09-live-verify.yml
+      - denim-workshop/r09/**
+permissions:
+  contents: write
+concurrency:
+  group: denim-r09-live-publication
+  cancel-in-progress: true
+jobs:
+  verify-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore checked editable source and build standalone HTML
+        run: |
+          test -f denim-workshop/r09/app.js || python denim-workshop/r09/restore-source.py
+          python denim-workshop/r09/finalize-source.py
+          python denim-workshop/r09/build.py
+          node --check denim-workshop/r09/app.js
+          node --check denim-workshop/r09/dynamics.js
+          node --check denim-workshop/r09/runtime-budget.js
+          python -m py_compile denim-workshop/r09/qa-publish.py
+          git diff --exit-code HEAD -- denim-workshop/r08
+      - name: Numeric geometry, storage and real dynamics checks
+        run: |
+          node denim-workshop/r09/test-layers.cjs
+          node denim-workshop/r09/test-stability.cjs
+          node denim-workshop/r09/test-cotton.cjs
+          node denim-workshop/r09/test-budget.cjs
+          node denim-workshop/r09/test-dynamics.cjs
+      - name: Install pinned browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6
+          python -m playwright install --with-deps chromium
+      - name: Actual standalone file, matched appearance and live-motion interaction
+        run: xvfb-run -a python denim-workshop/r09/qa-publish.py --compare
+      - name: Publish verified canonical source and HTML, fast-forward only
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add denim-workshop/r09/*.js denim-workshop/r09/*.cjs denim-workshop/r09/*.py denim-workshop/r09/index.html denim-workshop/r09/BUILD_MANIFEST.json denim-workshop/r09/layers-qa.json denim-workshop/r09/stability-qa.json denim-workshop/r09/cotton-qa.json denim-workshop/r09/budget-qa.json denim-workshop/r09/dynamics-qa.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(denim): publish file-tested R09.1 live cloth source and HTML [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r09/index.html" >> "$GITHUB_OUTPUT"
+      - name: Actual immutable public page, wind, anchor drive and quality switching
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          sleep 8
+          xvfb-run -a python denim-workshop/r09/qa-publish.py --url "$PUBLIC_URL"
+      - name: Verify public bytes and record real delivery evidence
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os,urllib.request
+          p=Path('denim-workshop/r09')
+          local=json.loads((p/'evidence/file-live-qa.json').read_text());public=json.loads((p/'evidence/public-live-qa.json').read_text())
+          assert local['passed'] and public['passed']
+          manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          raw='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r09/index.html'
+          with urllib.request.urlopen(raw,timeout=90) as response:
+              data=response.read();assert response.status==200
+          assert hashlib.sha256(data).hexdigest()==manifest['sha256'] and len(data)==manifest['bytes']
+          modes={}
+          for report in [local,public]:
+              modes[report['mode']]={k:report[k] for k in ['passed','browserVersion','pageErrors','consoleErrors','httpErrors','qualityDoesNotDisablePhysics','pausedPhysicsRetainsPose','exportImportVerified','idleStops']}
+              modes[report['mode']]['states']=[{'name':s['name'],'imageSha256':s['sha256'],'physics':s['frame']['physics'],'resources':s['frame']['performance'],'triangles':s['frame']['triangles']} for s in report['states']]
+              modes[report['mode']]['httpRequests']=[u for u in report['requests'] if u.startswith('http')]
+          receipt={'version':'R09.1','deliveryVerified':True,'runtimeChangedThisTask':True,'userApprovedAppearanceBaseline':'R08.0','userFinalApproval':False,'sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'publicBytesMatch':True,'desktopViewport':[1000,780],'mobileViewport':[390,844],'actualPhone':False,'hardwareFPSVerified':False,'matchedStaticNear':local.get('acceptedNearComparison'),'browser':modes,'numeric':{f:json.loads((p/f).read_text()) for f in ['layers-qa.json','stability-qa.json','cotton-qa.json','budget-qa.json','dynamics-qa.json']},'physicsScope':'475-node XPBD cloth sample, independent worker, fixed 240Hz substeps; not full character garments','limits':['No self collision or independent damaged-yarn dynamics; holes still use a continuous coarse proxy','Anchor motion is an interface demonstration, not a connected human rig','Sphere contact only checked at coarse proxy nodes; not a global visible-surface collision proof','Stitch geometry has top/bottom routes, not physical needle piercing or thread-tension solve','GPU object-size accounting is not total process memory, consumer-GPU occupancy or hardware FPS','Efficient mode changes render resolution but does not disable physical stepping','Original R01-R08 and unrelated workbenches unchanged; no merge, no force push']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r09/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): record actual fixed-URL live-cloth verification [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r09-live-evidence
+          path: denim-workshop/r09
+          retention-days: 7
+          if-no-files-found: error
