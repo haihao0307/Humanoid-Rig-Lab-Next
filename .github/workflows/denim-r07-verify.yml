@@ -1,0 +1,101 @@
+name: Denim R07 stable fibers verification
+on:
+  push:
+    branches: [fix/denim-r07-stable-fibers-20261011]
+    paths:
+      - .github/workflows/denim-r07-verify.yml
+      - denim-workshop/r07/**
+permissions:
+  contents: write
+concurrency:
+  group: denim-r07-verification
+  cancel-in-progress: true
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build the hash-locked candidate
+        run: |
+          python - <<'PY'
+          import hashlib,json,subprocess
+          from pathlib import Path
+          p=Path('denim-workshop/r07')
+          stamp={f:hashlib.sha256((p/f).read_bytes()).hexdigest() for f in ['upgrade.py','refine.py']}
+          old=json.loads((p/'MIGRATION_STAMP.json').read_text()) if (p/'MIGRATION_STAMP.json').exists() else {}
+          if old!=stamp or not (p/'app.js').exists():
+              for f in ['upgrade.py','refine.py']:subprocess.run(['python',str(p/f)],check=True)
+              (p/'MIGRATION_STAMP.json').write_text(json.dumps(stamp,indent=2))
+          subprocess.run(['python',str(p/'build.py')],check=True)
+          PY
+          node --check denim-workshop/r07/app.js
+          node --check denim-workshop/r07/natural-yarn.js
+          node --check denim-workshop/r07/sampling.js
+          node denim-workshop/r07/test-layers.cjs
+          node denim-workshop/r07/test-stability.cjs
+          git diff --exit-code HEAD -- denim-workshop/r06
+      - name: Install browser verification dependencies
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6 scipy==1.15.3
+          python -m playwright install --with-deps chromium
+      - name: Real local-file browser and matched R06 motion regression
+        run: xvfb-run -a python denim-workshop/r07/qa.py
+      - name: Publish only the tested R07 files, fast-forward only
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add denim-workshop/r07/app.js denim-workshop/r07/core.js denim-workshop/r07/structure.js denim-workshop/r07/fiber-optics.js denim-workshop/r07/natural-yarn.js denim-workshop/r07/template.html denim-workshop/r07/build.py denim-workshop/r07/index.html denim-workshop/r07/BUILD_MANIFEST.json denim-workshop/r07/MIGRATION_STAMP.json denim-workshop/r07/test-layers.cjs denim-workshop/r07/layers-qa.json denim-workshop/r07/stability-qa.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(denim): publish verified R07 stable-fiber candidate [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r07/index.html" >> "$GITHUB_OUTPUT"
+      - name: Real immutable public browser and mobile viewport
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          sleep 8
+          xvfb-run -a python denim-workshop/r07/qa.py --public "$PUBLIC_URL"
+      - name: Record delivery receipt without altering the tested build
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json
+          p=Path('denim-workshop/r07')
+          local=json.loads((p/'evidence/browser-qa.json').read_text());public=json.loads((p/'evidence/public-qa.json').read_text())
+          assert local['passed'] and public['passed']
+          manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          receipt={'version':'R07.0','deliveryVerified':True,'visualUserApproval':False,'baseCommit':'f8a0e0ab75ca5b8ea4dd345d8f3e7b847eccf2b3','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'browserVersion':public['browserVersion'],'localBrowserStates':len(local['modes']['file']['states']),'publicBrowserStates':len(public['modes']['public']['states']),'mobileViewport':[390,844],'actualPhone':False,'hardwareFPSVerified':False,'temporalProbe':local['temporalProbe'],'publicModes':{k:{'stateNames':[s['name'] for s in v['states']],'errors':v['network']['errors'],'httpErrors':v['network']['httpErrors']} for k,v in public['modes'].items()},'limits':['Representative subpixel-motion probe, not universal zero-aliasing proof','Software-rendered Chromium, not a consumer-GPU performance benchmark','No full measured cotton BSDF or physical tear/cloth solver','Old R06 and unrelated workbenches unchanged']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r07/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): record actual immutable public R07 verification [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r07-browser-evidence
+          path: denim-workshop/r07
+          retention-days: 7
+          if-no-files-found: error
