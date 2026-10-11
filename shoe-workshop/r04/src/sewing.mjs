@@ -15,6 +15,13 @@ export function transferredSaddle(stations,diameter=.32){
 }
 /** Flattened waxed cross section transferred from R10's makeSewnYarn (.215 / .52).
  * No disjoint cylinders. Source topology and mapping are separately tested. */
-export function yarnGeometry(path){const raw=path.points.filter((p,i,a)=>!i||Math.hypot(...sub(p,a[i-1]))>1e-6),p=[],n=[],uv=[],ix=[],sides=8,d=path.diameter||.32;let previous=new T.Vector3(...(path.normalHint||[0,1,0])),length=0;
+export function simplifyPath(points,tolerance=.006){
+ if(!Number.isFinite(tolerance)||tolerance<=0)throw Error('Invalid yarn tolerance');
+ if(points.length<3)return points.slice();
+ const keep=new Uint8Array(points.length),stack=[[0,points.length-1]];keep[0]=keep[points.length-1]=1;
+ while(stack.length){const [a,b]=stack.pop(),A=points[a],B=points[b],v=sub(B,A),ll=v.reduce((s,x)=>s+x*x,0);let max=tolerance*tolerance,index=-1;for(let i=a+1;i<b;i++){const d=sub(points[i],A),t=ll?Math.max(0,Math.min(1,d.reduce((s,x,k)=>s+x*v[k],0)/ll)):0,q=d.reduce((s,x,k)=>s+(x-v[k]*t)**2,0);if(q>max){max=q;index=i;}}if(index>=0){keep[index]=1;stack.push([a,index],[index,b]);}}
+ return points.filter((_,i)=>keep[i]);
+}
+export function yarnGeometry(path){const raw=simplifyPath(path.points.filter((p,i,a)=>!i||Math.hypot(...sub(p,a[i-1]))>1e-6)),p=[],n=[],uv=[],ix=[],sides=8,d=path.diameter||.32;let previous=new T.Vector3(...(path.normalHint||[0,1,0])),length=0;
  for(let i=0;i<raw.length;i++){const q=new T.Vector3(...raw[i]),t=new T.Vector3(...raw[Math.min(i+1,raw.length-1)]).sub(new T.Vector3(...raw[Math.max(0,i-1)])).normalize();let N=previous.clone().addScaledVector(t,-previous.dot(t));if(N.lengthSq()<1e-8){N.set(1,0,0).addScaledVector(t,-t.x);if(N.lengthSq()<1e-8)N.set(0,0,1).addScaledVector(t,-t.z);}N.normalize();previous=N;const B=new T.Vector3().crossVectors(t,N).normalize();if(i)length+=q.distanceTo(new T.Vector3(...raw[i-1]));for(let j=0;j<=sides;j++){const a=j/sides*Math.PI*2,twist=1+.025*Math.cos(3*a-length/d*2.4);p.push(...q.clone().addScaledVector(N,Math.cos(a)*d*.215*twist).addScaledVector(B,Math.sin(a)*d*.52*twist));n.push(...N.clone().multiplyScalar(Math.cos(a)/.215).addScaledVector(B,Math.sin(a)/.52).normalize());uv.push(length/(d*2.7),j/sides);if(i&&j<sides){const k=(i-1)*(sides+1)+j;ix.push(k,k+1,k+sides+1,k+1,k+sides+2,k+sides+1);}}}
- const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('normal',new T.Float32BufferAttribute(n,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(ix);g.userData={source:'R10 / R05 saddle topology and R08 flattened waxed yarn cross-section',continuous:true};return g;}
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('normal',new T.Float32BufferAttribute(n,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(ix);g.userData={source:'R10 / R05 saddle topology and R08 flattened waxed yarn cross-section',continuous:true,inputPoints:path.points.length,renderPoints:raw.length,maxCenterlineToleranceMm:.006};return g;}

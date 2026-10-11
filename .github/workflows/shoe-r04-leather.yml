@@ -62,7 +62,7 @@ jobs:
           node shoe-workshop/r04/tools/prepare.mjs
           node shoe-workshop/r04/tests/kernel.mjs
           node shoe-workshop/r04/tools/build.mjs
-          node shoe-workshop/r04/tests/browser.mjs
+          node shoe-workshop/r04/tests/complete.mjs
           echo 'built=true' >> "$GITHUB_OUTPUT"
       - name: Publish only R04 files with fast-forward
         id: publish
@@ -80,7 +80,7 @@ jobs:
         env:
           PUBLIC_BUILD_SHA: ${{ steps.publish.outputs.sha }}
         run: |
-          node shoe-workshop/r04/tests/browser.mjs --public
+          node shoe-workshop/r04/tests/complete.mjs --public
           git add shoe-workshop/r04/evidence/public shoe-workshop/r04/PUBLIC_URL.txt
           git commit -m 'test(shoes): R04 immutable public-byte and browser receipt [skip ci]'
           git push origin HEAD:${GITHUB_REF_NAME}
