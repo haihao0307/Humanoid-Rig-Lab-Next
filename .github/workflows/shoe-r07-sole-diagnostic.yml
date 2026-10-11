@@ -1,0 +1,48 @@
+name: Shoe R07 source-surface deformation diagnosis
+on:
+  push:
+    branches: [test/shoe-r07-sole-surface-20261011]
+    paths: ['.github/workflows/shoe-r07-sole-diagnostic.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            shoe-workshop
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Explicit isolated diagnostic source adapter
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('shoe-workshop/r07/src/sole.mjs');s=p.read_text()
+          s=s.replace("import {MeshRay}","import {refineForDeformation} from './refine-sole.mjs';\nimport {MeshRay}")
+          s=s.replace('const g=source.clone(),ray=rayOf(source),upper=', 'const ray=rayOf(source),upper=')
+          start=s.index(' const p=g.attributes.position.array');end=s.index(' const warp=',start);s=s[:start]+s[end:]
+          pos=s.index(' for(let i=0;i<p.length;i+=3)')
+          s=s[:pos]+" const g=refineForDeformation(source,warp),p=g.attributes.position.array,before=new Float32Array(p),normal=g.attributes.normal.array,oldNormals=new Float32Array(normal);let changed=0,maxMove=0,unchangedBottom=0,unchangedCount=0,minJacobian=Infinity,maxFixedNormalDelta=0;\n"+s[pos:]
+          s=s.replace('indexBufferUnchanged:true,normalTransport:', 'indexBufferUnchanged:false,affineSubdivision:g.userData.affineSubdivision,normalTransport:')
+          p.write_text(s)
+          p=Path('shoe-workshop/r07/tests/early-render.mjs');s=p.read_text();s=s.replace("mark('ready',await page.evaluate(()=>SHOE_R07.buildId));", "mark('ready',await page.evaluate(()=>SHOE_R07.buildId));fs.writeFileSync(path.join(out,'SOLE.json'),JSON.stringify(await page.evaluate(()=>SHOE_R07.report().finish.sole),null,2));");p.write_text(s)
+          PY
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - run: node shoe-workshop/r07/tools/build.mjs
+      - name: Current actual source-surface render
+        run: node shoe-workshop/r07/tests/early-render.mjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r07-source-surface-diagnostic
+          path: |
+            shoe-workshop/r07/evidence/early/
+            shoe-workshop/r07/src/sole.mjs
+            shoe-workshop/r07/src/refine-sole.mjs
+          retention-days: 3
