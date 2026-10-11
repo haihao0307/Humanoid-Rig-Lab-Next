@@ -104,3 +104,8 @@ V1固定历史仍保留在提交a0cd098b4a0fcb8b5d5de90200acd0fb1051f543。本�
 ## 帽子R04厚度与分类承托增补
 
 读取[材料厚度、承托位置和自由造型](docs/workbench-build-system/HAT_R04_THICKNESS_AND_SUPPORT.md)。用户已否定R03.1的贴皮和厚度效果；必须检查实际内外层和戴位，不把程序运行通过当成视觉通过。源材料、设计留空和身体间隙分开，不合格的单款显式隔离。
+
+
+## 帽子R06：固定量配程序与头发接入边界
+
+见[固定帽型、换头不累积变形、真实承托与未来毛发耦合](docs/workbench-build-system/HAT_R06_FIXED_FIT_AND_HAIR_BOUNDARY.md)。当前只验静态尺寸与最终佩戴状态，不把未来头发受压或真实戴入路径预填为完成。
