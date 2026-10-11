@@ -1,0 +1,15 @@
+import fs from 'node:fs';import path from 'node:path';import vm from 'node:vm';
+import {fileURLToPath} from 'node:url';import {createHash} from 'node:crypto';import {gzipSync} from 'node:zlib';import {build} from 'esbuild';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),base=path.resolve(root,'../r02'),hash=b=>createHash('sha256').update(b).digest('hex'),id=process.env.GITHUB_SHA||'local';
+const data=fs.readFileSync(path.join(base,'assets/teacher.json')),gz=gzipSync(data,{level:9});
+const result=await build({entryPoints:[path.join(root,'src/main.mjs')],bundle:true,minify:true,format:'iife',target:'es2022',write:false,define:{__BUILD_ID__:JSON.stringify(id)},legalComments:'eof'});
+const js=result.outputFiles[0].text;new vm.Script(js);const css=fs.readFileSync(path.join(base,'style.css'),'utf8')+'\n'+fs.readFileSync(path.join(root,'style.css'),'utf8');
+let html=fs.readFileSync(path.join(base,'index.html'),'utf8').replace('<title>KAOPU 鞋履研究台 · R02-S1</title>','<title>KAOPU 鞋履研究台 · R03-A 原片配缝校准</title>');
+html=html.replace('<link rel="stylesheet" href="style.css">',()=>'<style>'+css+'</style>');
+html=html.replace('<script type="module" src="src/main.mjs"></script>',()=>'<div id="teacher-data" hidden>'+gz.toString('base64')+'</div><script>'+js.replaceAll('</script','<\\/script')+'</script>');
+new vm.Script(html.slice(html.indexOf('<script>')+8,html.lastIndexOf('</script>')));
+if(html.includes('<script type="module"')||html.split('<script>').length!==2)throw Error('Invalid standalone boundary');
+fs.writeFileSync(path.join(root,'public-lite.html'),html);
+const files=['src/main.mjs','src/edge-kernel.mjs','style.css','tools/build.mjs','tests/kernel.mjs','tests/browser.mjs','../r02/src/main.mjs','../r02/src/kernel.mjs','../r02/assets/teacher.json','../r02/vendor/leather/seam.mjs','../r02/vendor/tailor/structured/compiler.mjs'];
+const manifest={schema:'kaopu-shoe-r03-build/1',version:'R03-A',sourceBuild:id,userAnchor:'a3970ea63c931ed8c7241ac9f121f096ab636564',parentContext:'3a4db20b7df844120d85dc514ac615edad4679c3',teacherCommit:'69e98e7f2e576cea09ef0bcb117b52d4f1cdabb6',scope:'Actual native panel-edge calibration. Not full R03 upper-last mapping, assembly, physics or cinematic material.',runtime:{three:'0.179.1',externalCoreRequests:0,bytes:Buffer.byteLength(html),sha256:hash(html)},files:files.map(p=>({path:p,sha256:hash(fs.readFileSync(path.join(root,p)))})),acceptance:{manufacturing:false,cinematic:false,fullR03:false,userVisual:false}};
+fs.writeFileSync(path.join(root,'BUILD_MANIFEST.json'),JSON.stringify(manifest,null,2));console.log(JSON.stringify(manifest.runtime));
