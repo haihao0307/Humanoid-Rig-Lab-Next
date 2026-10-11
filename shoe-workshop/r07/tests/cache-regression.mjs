@@ -1,0 +1,11 @@
+import './contact-regression.mjs';
+import {after,parts,state} from './finish.mjs';
+import assert from 'node:assert/strict';import fs from 'node:fs';import {fileURLToPath} from 'node:url';
+const normalTransport=after.soleFinishReport.normalTransport;assert.ok(normalTransport.minSampledJacobian>0);assert.ok(normalTransport.maxUnchangedRegionNormalDelta<1e-6);
+const initial=parts,positions=parts.map(p=>new Float32Array(p.geometry.attributes.position.array)),rays=after.seatRays;
+const changed={...state,thickness:{...state.thickness,22:3.2}};
+after.build(changed);after.build({...changed,view:'flat'});const t=performance.now(),restored=after.build(state),elapsed=performance.now()-t;
+assert.strictEqual(restored,initial);assert.strictEqual(after.seatRays,rays);assert.ok(after.defaultCacheHits>0);
+for(let i=0;i<parts.length;i++)assert.deepEqual(restored[i].geometry.attributes.position.array,positions[i]);
+const checks=[{name:'native sole normal transport remains finite and orientation-preserving',passed:true},{name:'unchanged sole regions retain native smooth normals',passed:true},{name:'default form restores after thickness and flat-view changes without recomputing its geometry',passed:true},{name:'default contact-ray frames and exact vertex buffers restore together',passed:true}];
+fs.writeFileSync(fileURLToPath(new URL('../evidence/numerics/CACHE.json',import.meta.url)),JSON.stringify({sourceBuild:process.env.GITHUB_SHA||'local',checks,cacheSlots:2,normalTransport,restoreCpuTimeMs:elapsed,scope:'Session-only generated default + current geometry. Not a physical-device FPS or initial-load performance guarantee.'},null,2));console.log('CACHE PASS',checks.length,'restore CPU ms',elapsed);

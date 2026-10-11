@@ -12,7 +12,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,6 +30,16 @@ jobs:
           cd shoe-workshop && npx playwright install --with-deps chromium
       - name: Build current standalone runtime
         run: node shoe-workshop/r07/tools/build.mjs
+      - name: Current early render diagnosis
+        continue-on-error: true
+        run: node shoe-workshop/r07/tests/early-render.mjs
+      - name: Preserve current early visual inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r07-early-${{ github.run_id }}
+          path: shoe-workshop/r07/evidence/early/
+          retention-days: 14
       - name: Verify actual geometry, metric holes and skin attachment
         id: numeric
         continue-on-error: true
