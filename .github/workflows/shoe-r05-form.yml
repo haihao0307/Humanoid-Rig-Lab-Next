@@ -19,10 +19,12 @@ jobs:
           sparse-checkout: |
             shoe-workshop
           fetch-depth: 1
-      - name: Verify and restore actual readable production sources
+      - name: Use tracked readable production sources without replaying bootstrap
         run: |
-          python shoe-workshop/r05/source-transfer/restore.py
-          python shoe-workshop/r05/source-transfer/refine.py
+          test -s shoe-workshop/r05/src/main.mjs
+          test -s shoe-workshop/r05/src/model.mjs
+          test -s shoe-workshop/r05/src/materials.mjs
+          test -s shoe-workshop/r05/tests/verify.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
