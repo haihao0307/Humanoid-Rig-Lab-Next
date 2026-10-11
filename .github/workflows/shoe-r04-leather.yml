@@ -19,6 +19,8 @@ jobs:
           sparse-checkout: |
             shoe-workshop
           fetch-depth: 1
+      - name: Restore verified readable source
+        run: python shoe-workshop/r04/source-transfer/restore.py
       - uses: actions/checkout@v4
         with:
           ref: af389cc216ddd01e3b1aa66c972f42b2587bc797
@@ -27,6 +29,7 @@ jobs:
           sparse-checkout: |
             /leather-workshop/r02/site/
             /leather-workshop/r05/site/
+            /leather-workshop/r06/site/catalogue.js
             /leather-workshop/r08/site/
             /leather-workshop/r08/build.py
             /leather-workshop/r09/site/
@@ -56,22 +59,18 @@ jobs:
       - name: Build and verify new R04 production source
         id: build
         run: |
-          if [ -f shoe-workshop/r04/tools/build.mjs ]; then
-            node shoe-workshop/r04/tools/prepare.mjs
-            node shoe-workshop/r04/tests/kernel.mjs
-            node shoe-workshop/r04/tools/build.mjs
-            node shoe-workshop/r04/tests/browser.mjs
-            echo 'built=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'built=false' >> "$GITHUB_OUTPUT"
-          fi
+          node shoe-workshop/r04/tools/prepare.mjs
+          node shoe-workshop/r04/tests/kernel.mjs
+          node shoe-workshop/r04/tools/build.mjs
+          node shoe-workshop/r04/tests/browser.mjs
+          echo 'built=true' >> "$GITHUB_OUTPUT"
       - name: Publish only R04 files with fast-forward
         id: publish
         if: steps.build.outputs.built == 'true'
         run: |
           git config user.name 'Shoe R04 Build'
           git config user.email 'shoe-r04@users.noreply.github.com'
-          git add shoe-workshop/r04/public-lite.html shoe-workshop/r04/BUILD_MANIFEST.json shoe-workshop/r04/SOURCES_LOCK.json shoe-workshop/r04/vendor shoe-workshop/r04/evidence
+          git add shoe-workshop/r04
           if git diff --cached --name-only | grep -v '^shoe-workshop/r04/'; then exit 1; fi
           git commit -m 'build(shoes): R04 complete assembly candidate, donor material and evidence [skip ci]'
           git push origin HEAD:${GITHUB_REF_NAME}
@@ -92,4 +91,5 @@ jobs:
           name: shoe-r04-${{ github.run_id }}
           path: |
             shoe-workshop/r04/
+          include-hidden-files: true
           retention-days: 14
