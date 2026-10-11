@@ -70,3 +70,6 @@ s=s.replace("temporalHistory:false,attachmentBytes", "temporalHistory:false,gpuQ
 s=s.replace("transitionDoublePass:far>0&&far<1};if(state.animate)request();", "transitionDoublePass:far>0&&far<1};submitGpu();if(state.animate)request();")
 (p/'app.js').write_text(s)
 print('GPU pacing: one capture per batch and no overlapping render submissions; quality unchanged.')
+# The explicit synchronous depth audit must not return a previous normal frame.
+s=(p/'app.js').read_text().replace("if(!gpuAvailable()){request();return;}","if(!state.qaAudit&&!gpuAvailable()){request();return;}")
+(p/'app.js').write_text(s)

@@ -9,11 +9,11 @@ permissions:
   contents: write
 concurrency:
   group: denim-r07-verification
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   build-test-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -85,7 +85,7 @@ jobs:
           local=json.loads((p/'evidence/browser-qa.json').read_text());public=json.loads((p/'evidence/public-qa.json').read_text())
           assert local['passed'] and public['passed']
           manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
-          receipt={'version':'R07.0','deliveryVerified':True,'visualUserApproval':False,'baseCommit':'f8a0e0ab75ca5b8ea4dd345d8f3e7b847eccf2b3','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'localBrowserStates':len(local['modes']['file']['states']),'publicBrowserStates':len(public['modes']['public']['states']),'mobileViewport':[390,844],'actualPhone':False,'hardwareFPSVerified':False,'temporalProbe':local['temporalProbe'],'publicModes':{k:{'stateNames':[s['name'] for s in v['states']],'errors':v['network']['errors'],'httpErrors':v['network']['httpErrors']} for k,v in public['modes'].items()},'limits':['Representative subpixel-motion probe, not universal zero-aliasing proof','Software-rendered Chromium, not a consumer-GPU performance benchmark','No full measured cotton BSDF or physical tear/cloth solver','Old R06 and unrelated workbenches unchanged']}
+          receipt={'version':'R07.0','deliveryVerified':True,'visualUserApproval':False,'baseCommit':'f8a0e0ab75ca5b8ea4dd345d8f3e7b847eccf2b3','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'browserVersion':public['browserVersion'],'localBrowserStates':len(local['modes']['file']['states']),'publicBrowserStates':len(public['modes']['public']['states']),'mobileViewport':[390,844],'actualPhone':False,'hardwareFPSVerified':False,'temporalProbe':local['temporalProbe'],'publicModes':{k:{'stateNames':[s['name'] for s in v['states']],'errors':v['network']['errors'],'httpErrors':v['network']['httpErrors']} for k,v in public['modes'].items()},'limits':['Representative subpixel-motion probe, not universal zero-aliasing proof','Software-rendered Chromium, not a consumer-GPU performance benchmark','No full measured cotton BSDF or physical tear/cloth solver','Old R06 and unrelated workbenches unchanged']}
           (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
           PY
           test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
