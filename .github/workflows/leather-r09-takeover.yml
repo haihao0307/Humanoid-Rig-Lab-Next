@@ -28,18 +28,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Capture takeover inputs for source audit
+      - name: Capture inspection browser
         run: |
-          mkdir -p /tmp/leather-audit
-          tar -czf /tmp/leather-audit/source.tgz leather-workshop .github/workflows README.md AGENTS.md
-          git rev-parse HEAD > /tmp/leather-audit/source-sha.txt
-          command -v clang || true
-          command -v wasm-ld || true
-          command -v google-chrome || true
+          mkdir -p /tmp/leather-browser
+          tar -czf /tmp/leather-browser/browser.tgz -C /opt/google chrome
+          google-chrome --version > /tmp/leather-browser/version.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: leather-r09-source-audit
-          path: /tmp/leather-audit/
+          name: leather-r09-inspection-browser
+          path: /tmp/leather-browser/
           retention-days: 3
       - name: Build candidate when implementation is present
         if: ${{ hashFiles('leather-workshop/r09/build.py') != '' }}
