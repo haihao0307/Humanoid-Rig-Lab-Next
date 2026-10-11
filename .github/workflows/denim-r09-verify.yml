@@ -1,0 +1,161 @@
+name: Denim R09 compact runtime and stitches
+on:
+  push:
+    branches: [fix/denim-r09-budget-stitches-20261011]
+    paths:
+      - .github/workflows/denim-r09-verify.yml
+      - denim-workshop/r09/**
+permissions:
+  contents: read
+concurrency:
+  group: denim-r09-budget-stitches
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        scope: [ui, compare]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate canonical R09 source once from frozen R08
+        run: |
+          test -f denim-workshop/r09/app.js || python denim-workshop/r09/bootstrap.py
+          python denim-workshop/r09/build.py
+          for f in denim-workshop/r09/*.js; do node --check "$f"; done
+          python -m py_compile denim-workshop/r09/qa-budget.py
+          git diff --exit-code HEAD -- denim-workshop/r08
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('denim-workshop/r09')
+          m=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          assert m['bytes']<70000
+          assert m['sha256']=='bff7d20b4a2da56bd4801ca04fb21c964f770f80cd15384bc10dceb91588242f',m
+          PY
+      - name: Exact curve identity, compact encoding and stitch geometry
+        if: matrix.scope == 'ui'
+        run: |
+          node denim-workshop/r09/test-budget.cjs
+          node denim-workshop/r09/test-cotton.cjs
+      - name: Install matched parent browser dependencies
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6 scipy==1.15.3
+          python -m playwright install --with-deps chromium
+      - name: Actual file browser and declared regression gates
+        run: xvfb-run -a python denim-workshop/r09/qa-budget.py --scope '${{ matrix.scope }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r09-${{ matrix.scope }}-evidence
+          path: denim-workshop/r09
+          retention-days: 7
+          if-no-files-found: error
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: denim-r09-ui-evidence
+          path: verified/ui
+      - uses: actions/download-artifact@v4
+        with:
+          name: denim-r09-compare-evidence
+          path: verified/compare
+      - name: Require successful reports from identical runtime bytes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,shutil,hashlib,os
+          a,b=Path('verified/ui'),Path('verified/compare');p=Path('denim-workshop/r09')
+          ra=json.loads((a/'evidence/ui-qa.json').read_text());rb=json.loads((b/'evidence/compare-qa.json').read_text())
+          assert ra['passed'] and rb['passed']
+          assert ra['sourceCommit']==rb['sourceCommit']==os.environ['GITHUB_SHA']
+          for f in a.iterdir():
+              if f.is_file() and (b/f.name).exists() and f.suffix in ['.js','.html','.py','.cjs']:
+                  assert f.read_bytes()==(b/f.name).read_bytes(),f.name
+          shutil.copytree(a,p,dirs_exist_ok=True);shutil.copytree(b/'evidence',p/'evidence',dirs_exist_ok=True)
+          assert hashlib.sha256((p/'index.html').read_bytes()).hexdigest()==json.loads((p/'BUILD_MANIFEST.json').read_text())['sha256']
+          PY
+      - name: Publish only tested R09 files, fast-forward only
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add denim-workshop/r09/app.js denim-workshop/r09/core.js denim-workshop/r09/natural-yarn.js denim-workshop/r09/sampling.js denim-workshop/r09/cotton-surface.js denim-workshop/r09/fiber-optics.js denim-workshop/r09/structure.js denim-workshop/r09/template.html denim-workshop/r09/index.html denim-workshop/r09/BUILD_MANIFEST.json denim-workshop/r09/test-cotton.cjs denim-workshop/r09/budget-qa.json denim-workshop/r09/cotton-qa.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(denim): publish file-tested compact R09 and stitch geometry [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r09/index.html" >> "$GITHUB_OUTPUT"
+      - name: Install immutable public browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6 scipy==1.15.3
+          python -m playwright install --with-deps chromium
+      - name: Actual public desktop and mobile viewport
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          sleep 8
+          xvfb-run -a python denim-workshop/r09/qa-budget.py --scope ui --public "$PUBLIC_URL"
+      - name: Verify raw bytes and write explicit delivery receipt
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os,urllib.request
+          p=Path('denim-workshop/r09')
+          ui=json.loads((p/'evidence/ui-qa.json').read_text());compare=json.loads((p/'evidence/compare-qa.json').read_text());public=json.loads((p/'evidence/public-qa.json').read_text())
+          assert ui['passed'] and compare['passed'] and public['passed']
+          manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          url='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r09/index.html'
+          with urllib.request.urlopen(url,timeout=90) as r:
+              data=r.read();assert r.status==200
+          assert len(data)==manifest['bytes'] and hashlib.sha256(data).hexdigest()==manifest['sha256']
+          old=compare['nearFrames']['r08']['frame'];new=compare['nearFrames']['r09-balanced']['budget'];ref=compare['nearFrames']['r09']['budget']
+          old_maps=round(4*old['bakeSize']**2*4*4/3);old_shadow=old['studio']['shadowSize']**2*4
+          old_budget={'geometryIncludingExpandedFibers':old['geometryBufferBytes'],'expandedFiberBuffers':112871136,'derivedMaterialMaps':old_maps,'shadowTexture':old_shadow,'renderTargets':old['sampling']['attachmentBytes']}
+          old_budget['trackedGpuBytes']=old_budget['geometryIncludingExpandedFibers']+old_maps+old_shadow+old_budget['renderTargets']
+          receipt={'version':'R09.0','deliveryVerified':True,'userR08AppearanceAccepted':True,'userR09Approval':False,'parentBuild':'57e8c6c2ce61a1226da302ba3bb239fc5274ae61','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'publicBytesMatch':True,'browserVersion':public['browserVersion'],'desktopViewport':[1000,780],'mobileViewport':[390,844],'actualPhone':False,'consumerGpuBenchmark':False,'oldNearBudget':old_budget,'newReferenceBudget':ref,'newBalancedBudget':new,'nearTriangles':{k:v['frame']['triangles'] for k,v in compare['nearFrames'].items()},'referencePixelDifference':compare['referencePixelDifference'],'balancedPixelDifference':compare['balancedPixelDifference'],'culling':compare['culling'],'benchmarks':compare['benchmarks'],'motionResidual':compare['motionResidual'],'motionTolerance':compare['motionTolerance'],'browserModes':{**ui['modes'],**public['modes']},'uiStates':len(ui['states']),'publicStates':len(public['states']),'limits':['Resource ledger excludes browser/driver/other tabs/peak temporary allocations','Warm QA timings are software ANGLE, not hardware utilization or physical GPU FPS','Balanced sampling and 15/30Hz cadence are explicit quality/energy tradeoffs','Entire swatch compact fiber library still resident; multi-garment crowd integration not benchmarked','Small recipe is only material parameters, not complete garment geometry/physics','Needle holes are fragment coverage; no full sewing mechanics or collision proof','R01-R08 and unrelated workbenches unchanged; no merge or force push']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r09/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): record R09 public verification and measured resource costs [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r09-public-evidence
+          path: denim-workshop/r09
+          retention-days: 7
+          if-no-files-found: error
