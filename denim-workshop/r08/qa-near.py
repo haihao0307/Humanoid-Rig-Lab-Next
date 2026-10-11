@@ -9,8 +9,8 @@ from PIL import Image
 from scipy.ndimage import map_coordinates
 from playwright.sync_api import sync_playwright
 P=Path(__file__).resolve().parent;OUT=P/'evidence';OUT.mkdir(exist_ok=True)
-a=argparse.ArgumentParser();a.add_argument('--public');a.add_argument('--content',action='store_true');a.add_argument('--motion-only',action='store_true');args=a.parse_args()
-report={'version':'R08.0','passed':False,'sourceCommit':os.getenv('GITHUB_SHA'),'startedAt':datetime.now(timezone.utc).isoformat(),'actualPhone':False,'consumerGpuFPS':False,'modes':{}}
+a=argparse.ArgumentParser();a.add_argument('--public');a.add_argument('--content',action='store_true');a.add_argument('--motion-only',action='store_true');a.add_argument('--scope',choices=['all','ui','compare'],default='all');args=a.parse_args()
+report={'version':'R08.0','passed':False,'sourceCommit':os.getenv('GITHUB_SHA'),'startedAt':datetime.now(timezone.utc).isoformat(),'actualPhone':False,'consumerGpuFPS':False,'scope':args.scope,'modes':{}}
 def pixels(p):
  raw=base64.b64decode(p.evaluate("document.getElementById('view').toDataURL().split(',')[1]"));return raw,np.asarray(Image.open(io.BytesIO(raw)).convert('RGB'))
 def load(browser,version='r08',mobile=False,url=None):
@@ -36,11 +36,23 @@ def snap(p,rows,name,patch=None,save=False,action=None):
   if action:action()
   else:p.evaluate('(s)=>__DENIM_WORKBENCH__.setState(s)',patch)
   p.wait_for_function('(n)=>__DENIM_WORKBENCH__.lastFrame.frame>n||__DENIM_WORKBENCH__.contextLost',arg=n)
- q=p.evaluate('({version:__DENIM_WORKBENCH__.version,frame:__DENIM_WORKBENCH__.lastFrame,lost:!!__DENIM_WORKBENCH__.contextLost,gl:__DENIM_WORKBENCH__.getGLError()})')
+ # Readback can itself surface a deferred driver failure. Inspect errors AFTER it.
+ raw,im=pixels(p)
+ q=p.evaluate('({version:__DENIM_WORKBENCH__.version,frame:__DENIM_WORKBENCH__.lastFrame,lost:!!__DENIM_WORKBENCH__.contextLost,gl:__DENIM_WORKBENCH__.getGLError(),state:{...__DENIM_WORKBENCH__.state},hidden:document.hidden})')
+ q.update(name=name,imageSha256=hashlib.sha256(raw).hexdigest(),pixelStd=float(im.std()),pixelRange=[int(im.min()),int(im.max())]);rows.append(q)
+ failed=q['lost'] or q['gl']!=0 or float(im.std())<=2
+ if save or failed:(OUT/(name+'.png')).write_bytes(raw)
+ if failed:
+  # These are diagnostics only. Never turn a failed first readback into a pass.
+  try:
+   patch=p.evaluate('__DENIM_WORKBENCH__.samplePatch()')
+   q['failedReadbackProbe']={'pixelStd':float(np.asarray(patch).reshape(-1,4)[:,:3].std()),'glAfter':p.evaluate('__DENIM_WORKBENCH__.getGLError()'),'lostAfter':p.evaluate('!!__DENIM_WORKBENCH__.contextLost')}
+   p.screenshot(path=str(OUT/(name+'-failure-layout.png')))
+  except Exception as e:q['failedReadbackProbe']={'error':str(e)}
+  (OUT/(name+'-failure.json')).write_text(json.dumps(q,ensure_ascii=False,indent=2))
  assert not q['lost'] and q['gl']==0,(name,q)
  assert q['frame']['projection']=='perspective' and not q['frame']['solidEdgeDrawn']
- raw,im=pixels(p);assert im.std()>2,(name,'blank');q.update(name=name,imageSha256=hashlib.sha256(raw).hexdigest());rows.append(q)
- if save:(OUT/(name+'.png')).write_bytes(raw)
+ assert float(im.std())>2,(name,'blank',q.get('failedReadbackProbe'))
  print(name,q['frame']['frame'],flush=True);return im,q
 
 def slide(p,key,value):p.locator('#'+key).evaluate('(e,v)=>{e.value=v;e.dispatchEvent(new Event("input",{bubbles:true}));}',value)
@@ -49,7 +61,7 @@ with sync_playwright() as pw:
  if os.getenv('CHROMIUM_PATH'):kw['executable_path']=os.getenv('CHROMIUM_PATH')
  b=pw.chromium.launch(**kw);report['browserVersion']=b.version
  try:
-  if not args.motion_only:
+  if not args.motion_only and args.scope!='compare':
    for mobile in [False,True]:
     mode=('public' if args.public else 'authored' if args.content else 'file')+('-mobile' if mobile else '-desktop')
     ctx,p,net=load(b,mobile=mobile,url=args.public);rows=[];report['modes'][mode]={'network':net,'states':rows}
@@ -74,6 +86,15 @@ with sync_playwright() as pw:
       for key in ['raw','rinse','vintage','bleach','slubby','black','grey','ecru','indigoBlack','doubleIndigo','enzyme','acid']:
        snap(p,rows,'finish-'+key,action=lambda k=key:p.locator('[data-preset="'+k+'"]').click(),save=key in ['vintage','ecru','black'])
       for w in [1,2,3,0]:snap(p,rows,'weave-'+str(w),action=lambda w=w:p.locator('#weave').select_option(str(w)))
+     rect=p.locator('#view').bounding_box();x,y=rect['x']+rect['width']*.5,rect['y']+rect['height']*.5
+     yaw0=p.evaluate('__DENIM_WORKBENCH__.state.yaw')
+     def orbit():
+      p.mouse.move(x,y);p.mouse.down();p.mouse.move(x+18,y+8,steps=3);p.mouse.up()
+     snap(p,rows,mode+'-pointer-orbit',action=orbit)
+     assert p.evaluate('__DENIM_WORKBENCH__.state.yaw')!=yaw0
+     zoom0=p.evaluate('__DENIM_WORKBENCH__.state.zoom')
+     snap(p,rows,mode+'-wheel-zoom',action=lambda:p.mouse.wheel(0,80))
+     assert p.evaluate('__DENIM_WORKBENCH__.state.zoom')<zoom0
      with p.expect_download() as dl:p.locator('#save').click()
      dl.value.save_as(str(OUT/(mode+'-profile.json')));profile=json.loads((OUT/(mode+'-profile.json')).read_text());assert profile['schema']=='kaopu.denim_material_profile@2.6'
      assert set(['cotton','staple','nap'])<=profile['surface'].keys()
@@ -81,7 +102,7 @@ with sync_playwright() as pw:
     p.wait_for_timeout(500);n0=p.evaluate('__DENIM_WORKBENCH__.lastFrame.frame');p.wait_for_timeout(500);assert n0==p.evaluate('__DENIM_WORKBENCH__.lastFrame.frame')
     r0,_=pixels(p);snap(p,rows,mode+'-repeat',{});r1,_=pixels(p);assert r0==r1
     p.screenshot(path=str(OUT/(mode+'-layout.png')));netcheck(net,file=not args.content and not args.public);ctx.close()
-  if not args.public:
+  if not args.public and args.scope!='ui':
    comparison={};matched={}
    for version in ['r07','r08']:
     ctx,p,net=load(b,version=version);rows=[];comparison[version]={}
@@ -91,7 +112,7 @@ with sync_playwright() as pw:
       matched.setdefault(version,{})[str(light)]={'sha':q['imageSha256'],'meanRGB':im.mean((0,1)).tolist(),'triangles':q['frame']['triangles'],'buffers':q['frame'].get('geometryBufferBytes')}
     for damage,zoom in [(0,.5),(4,.25)]:
      snap(p,rows,f'{version}-motion-{damage}',{'shape':0,'yaw':0,'pitch':0,'zoom':zoom,'panX':0,'panY':0,'damage':damage,'seam':False,'wash':.23,'abrasion':.24,'backstain':.08,'slub':.55,'fuzz':.55,'light':2,'preset':'rinse'})
-     distance=p.evaluate('__DENIM_WORKBENCH__.lastFrame.distanceMm');height=p.evaluate("document.getElementById('view').height");mpp=2*distance*math.tan(math.pi/10)/height;frames=[]
+     distance=p.evaluate('__DENIM_WORKBENCH__ .lastFrame.distanceMm');height=p.evaluate("document.getElementById('view').height");mpp=2*distance*math.tan(math.pi/10)/height;frames=[]
      for i in range(8):
       im,q=snap(p,rows,f'{version}-phase-{damage}-{i}',{'panX':i*.25*mpp},save=i in [0,7]);xy=p.evaluate('__DENIM_WORKBENCH__.projectPoint([0,22,0])');cx,cy=xy[0],im.shape[0]-xy[1];yy,xx=np.meshgrid(cy+np.arange(-6,7),cx+np.arange(-25,26),indexing='ij');frames.append(map_coordinates(im.astype(float).mean(2),[yy,xx],order=3,mode='nearest'))
      comparison[version][str(damage)]=float(np.sqrt(np.mean(np.var(np.stack(frames),axis=0))))
@@ -101,4 +122,4 @@ with sync_playwright() as pw:
    report['motionTolerance']=limits;assert all(comparison['r08'][k]<=limits[k] for k in limits),(comparison,limits)
   report['passed']=True
  finally:
-  report['finishedAt']=datetime.now(timezone.utc).isoformat();(OUT/('public-qa.json' if args.public else 'motion-qa.json' if args.motion_only else 'browser-qa.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2));b.close()
+  report['finishedAt']=datetime.now(timezone.utc).isoformat();(OUT/('public-qa.json' if args.public else 'motion-qa.json' if args.motion_only else 'compare-qa.json' if args.scope=='compare' else 'browser-qa.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2));b.close()
