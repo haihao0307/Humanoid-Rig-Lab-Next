@@ -28,6 +28,7 @@ jobs:
           python -m playwright install --with-deps chromium
           python hat-workshop/r04/source_datum_patch.py
           python hat-workshop/r04/upgrade.py
+          python hat-workshop/r04/restshape_patch.py
           node --check hat-workshop/r04/app.js
           python hat-workshop/r04/build.py --source '${{ github.sha }}' --data fa6e3842b0add398a52b775a1577fc50e31ce31b
       - name: Real geometry and browser review
