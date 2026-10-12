@@ -1,35 +1,52 @@
-# R12-S1B1：规范源码登记与显式裁片装配流水线
+# 皮革 R12.0-S1B2：应用层显式接口，网页已验收并合并
 
-本目录当前完成源码归一化第一步中的第二个子阶段。R10仍是用户可见的冻结基线；R12是源码候选，不是新视觉版本，也没有替换旧固定网页。
+更新：2026-10-12。S1B2已完成，不再停留于S1B1源码候选。PR #51按用户明确授权合并到 `perf/leather-r10-input-20261011`，合并提交 `2a5a5a69c403372890f99222c5dd4ac9d4fe8ba0`。不涉及人物main；旧R10固定网页不覆盖。
 
-## 恢复入口
+## 网页与精确身份
 
-依次读取上级 `START_HERE.md`、`ROADMAP.md`、`TASK_STATE.json`，再读取本文件。持久入口是 Issue #52，执行分支是 `refactor/leather-r12-source-normalization-20261011`，Draft PR是 #51。
+固定公网：
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5db192b3d34235f5259d0ae5b02ff217f1b9c8f0/leather-workshop/r12/public-lite.html
 
-冻结基线：R10构建 `af389cc216ddd01e3b1aa66c972f42b2587bc797`，HTML SHA-256 `7da84eec41b6db9fe69c62ea17a3194283522004df92f47f0cd707d11b642622`。R11随机场实验不参与本线，立领夹克继续排除。
+源：`731e127b63e3b323484459bc0391410ec19e8c1c`。
+构建：`5db192b3d34235f5259d0ae5b02ff217f1b9c8f0`。
+公网回执：`b2db61b2eadcb2ecde31c4195fade8eb67095e34`。
+HTML：3,628,486字节；SHA256 `46cfe2531e1c2c98242a6c1338725fa35ffeb5ec5a913c889287dd46278a398c`。
+Actions：`38131944900`，completed/success。
 
-## S1A基础
+上级START_HERE、ROADMAP、TASK_STATE和Issue52是接续入口。2026-10-12恢复检查发现S1B2早已发布成功，旧状态文件及PR尚未收尾；本轮复核产物后只补记状态和合并，没有再次调整运行时代码或重新宣称旧测试为新执行。
 
-S1A建立了固定哈希迁移、独立装配图和不执行历史构建器的构建器。它证明R10可以从整理后的源码完整重建，并把任务路径、路线和恢复命令写入GitHub。
+## 第一阶段已经形成的结构
 
-## S1B1实际修改
+S1A建立独立装配清单和构建器，可从整理后的源码重现冻结R10，不执行历史构建器。S1B1登记规范源码、资产、许可和固定WASM，PanelAssembly通过PatternPhysics、ClosedShell、AssemblyContract、YarnHost显式处理裁片、几何、绑定、连接和收尾。历史证据保留在qa/s1b及qa/SUMMARY，不被新报告冒充。
 
-当前版本把所有活动源码、兼容页、许可文件、扫描纹理和固定原生内核载荷登记为独立、可审查、带哈希的规范输入。`canonical.lock.json`锁定63个活动输入；接受的WASM没有改变，采用八个gzip/base64文本块和描述文件保存，构建时逐块及解码后双重校验。
+S1B2新增唯一应用组合入口 `src/app/composition.js`，各模块只提供各自服务，不再通过先捕获旧函数、再覆盖它的方式层层包装。该入口的关系如下：
 
-裁片系统不再依赖若干模块在加载时暗中重写 `PanelAssembly.prototype`。现在由 `PanelAssembly` 明确调用服务边界：
+| 调用 | 固定顺序与职责 |
+| --- | --- |
+| setView | setViewBase → applyMacroView，保留基础镜头和微距修正 |
+| selectProduct | resetThicknessMode → selectProductBase，避免旧检查模式泄漏到新产品 |
+| updateDetails | updateDetailsBase → updateShellDetails → updateCraftDetails |
+| destroyGeometry | releaseProductMaterials → destroyGeometryBase，释放产品专属资源，不销毁共享材质目录 |
+| recipe | recipeBase → appendCraftRecipe → appendPerformanceRecipe |
+| updateGrabUI | shouldRefreshGrabUI → 基础诊断 → 慢速提示 → 输入指标 |
+| prepareGrab | prepareGrabBase → bindPublicAppAPI |
+| initializeAppControls | 重复初始化保护 → 原控件 → 切边检查 → 工艺控件 → 输入/性能事件 |
 
-- `add`：先执行 `AssemblyContract.prepare`，再执行 `PatternPhysics.add`；
-- `idsAt`、`binding`：由 `PatternPhysics` 提供；
-- `buildPanel`：由 `ClosedShell.buildPanel` 提供；
-- `connect`：明确执行基础连接并记录 `AssemblyContract` 碰撞缝；
-- `yarnBinding`：由 `YarnHost.binding` 提供；
-- `finish`：按基础装配、物理帧完成、装配语义完成的固定顺序执行。
+公共API中的auditContact、stepProduct、performance等始终读取当前productSolver，不捕获已经销毁的上一款产品实例。首次启动即提供完整API；保留旧引用的调用者在切换产品后仍可访问当前求解器。手动步进已通过真实Worker准确执行三步的浏览器检查。
 
-旧 `surface-integrity` 后置覆盖不再进入活动装配。保留的外观、蒙皮着色、节点帧更新、产品Worker、试样Worker、扫描数据、R02兼容页和R05归档均有不变门禁。
+材质参数、皮纹随机算法、磨损、灯光、基本相机参数、几何、厚度、物理模型、时间步、迭代预算、碰撞容差及R10调度策略不在本阶段升级范围；立领夹克不恢复，R11整数随机场不启用。
 
-## 构建与复验
+## 已完成验证及范围
 
-从仓库根目录执行：
+准确记录以DELIVERY.json为准。成功Actions中包含120项源码/装配/故障检查、25个应用接口案例、18个数值案例、25个几何案例、六款完整52步轨迹、109项离线浏览器检查、16项固定公网浏览器检查。部分检查为套件内包含关系，不简单累计成独立案例总数。
+
+30组同状态原始视觉对照，覆盖六款产品、六类工艺、十三材质、正反面/微距/切边和艺术调整；最大平均RGB差为0。六款完整轨迹中最大位置差0毫米、皮面帧相同、最终有限厚度穿透0。真实鼠标提放、跨视口旋转、文本选择边界、Esc释放、产品重建API和首启步进通过；离线核心无HTTP请求。使用Chrome软件渲染，390×844仅视口模拟，不是手机实机。
+
+早期对照失败涉及亚像素视口和阴影刷新帧的采样时机，记录在qa/VIEWPORT_DIAGNOSIS.md。最终按同一稳定绘制阶段比较，未改渲染器或放宽像素阈值，未对截图平移/重采样掩盖差异；失败运行未发布。设备像素对齐仍是独立的后续健壮性事项。
+
+本次恢复重新获取Artifact11699881905，复核ZIP、HTML、六份报告摘要，并直接比较30对存档PNG，最大通道差0。恢复检查不是新浏览器/数值执行；详见qa/s1b2/RECOVERY_20261012.json。合并树与已审查分支头树相同，没有额外代码冲突混入。
+
+## 构建与恢复
 
 ```sh
 python -m pip install -r leather-workshop/r12/requirements-build.txt
@@ -37,34 +54,15 @@ python leather-workshop/r12/build.py
 python leather-workshop/r12/verify.py
 ```
 
-普通构建只读取 `r12` 下声明的规范输入，不运行旧Python构建器，不读取历史目录作为回退，不执行 `exec`、`eval` 或 `runpy`。源码、原生载荷或资源缺失、变更时必须失败。
+普通构建只读取r12清单声明的规范输入，不执行历史构建器、不以旧HTML回退。源码/资产/原生分块缺失或变更必须显式失败；不要靠移动黄金哈希掩盖回归。materialize.py仅保留用于历史迁移及独立参考，不应覆盖已经编辑的规范目录。Python和Node仅为开发工具，用户打开单体HTML无需安装这些工具。
 
-GitHub Actions运行 `38128801540` 已在提交 `6fe5ec8baae83c2d8152fabe506d44af349f6184` 上完成真实机器复验，并在提交 `053e522c3d3b09d9a500597c8bade7dd204ec68d` 写入回执：
-
-- 122项源码、装配、语法和故障注入门禁通过；
-- 18项既有数值用例通过；
-- 3项显式接口断言通过，包括零长度连接仍保留碰撞缝语义；
-- 25种产品、工艺、针法、厚度和缩略图几何案例与独立重建的冻结R10参考一致；
-- 六款保留成品均执行完整52步提起/释放轨迹，候选与参考最大位置差为0，皮面帧一致，最终穿透数为0。
-
-准确数据以 `qa/s1b/SUMMARY.json`、`qa/s1b/equivalence.json` 和 `qa/s1b/MACHINE_RECEIPT.json` 为准。
-
-## 为什么候选HTML哈希不同
-
-候选加入架构来源标记，且活动裁片模块由后置覆盖改为显式服务调用，所以最终文件不再逐字节等同R10。候选HTML SHA-256为 `611fc8f4c40bc45617ba30b399bea66b66c8816bbbe4f58ebe6e68a3fad905fb`，大小3,628,494字节。等效性通过独立冻结参考、模块不变检查、几何数据、厚度、针线、物理输入和完整轨迹比较证明，而不是只比较页面文件哈希。
-
-## 未完成和边界
-
-S1尚未全部结束。应用层仍保留若干晚期函数覆盖，下一步S1B2只整理 `runtime`、`view-polish`、`atelier-controls`、`craft-ui`、`lifecycle` 和 `input-performance` 之间的显式接口；不能趁机修改皮纹、磨损、相机、抓手、厚度、物理参数、碰撞精度或性能策略。
-
-本阶段没有新浏览器检查、没有 `file://` 验收、没有手机实机、没有新公网部署，也没有用户视觉验收。R12候选不能替代R10，`runtimePromotionAllowed=false`。接受的WASM仍是固定二进制，本阶段不声称从原生源码重编译等效。
+原生WASM继续使用接受版本的确定字节和完整性检查；本轮没有重新编译原生内核，也不声称完成了原生源码可复建链。完整S1仍需审核剩余共享作用域依赖、原生源码与固定内核的对应关系，以及兼容归档边界。用户视觉验收PENDING；全部硬件性能、材料标定、通用碰撞保证、商业法律放行未认证。
 
 ## 交付门禁
 
-- [x] 没有用生成图片代替真实三维实现；
-- [x] 已实际修改生产源码和构建架构；
-- [x] 构建对象仍是真实可交互三维皮革工作台，不是截图或占位页；
-- [x] 几何、厚度、针线、物理输入和六款完整轨迹均经过差分测试；
-- [ ] 本阶段没有新增浏览器镜头、选择和参数交互验收；
-- [ ] 本阶段没有新增公网固定链接与真实浏览器验收；
-- [x] 没有把截图、旧网页或旧浏览器报告冒充S1B1新交付。
+- [x] 实际修改运行源码并提供真实三维工作台，没有生成图或占位替代。
+- [x] 独立构建、代码关系、几何/厚度/轨迹差分证据保留。
+- [x] 完成离线、固定公网和真实浏览器关键交互验收。
+- [x] 用户明确授权后PR51实际合并；旧网页、R01–R11、根许可、其他工作台与人物main不改。
+- [ ] R12用户视觉验收尚待反馈。
+- [ ] 完整S1和商业法律放行未声明完成。
