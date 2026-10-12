@@ -1,0 +1,52 @@
+name: Denim R10 recovered public verification
+on:
+  push:
+    branches: [fix/denim-r10-distance-lod-20261011]
+    paths:
+      - .github/workflows/denim-r10-recovery-verify.yml
+      - denim-workshop/r10-recovery/**
+permissions:
+  contents: read
+concurrency:
+  group: denim-r10-recovered-delivery
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [file, public]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop/r09
+            denim-workshop/r10
+            denim-workshop/r10-recovery
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild from canonical source and preserve the published bytes
+        run: |
+          python denim-workshop/r10/build.py
+          git diff --exit-code HEAD -- denim-workshop/r09 denim-workshop/r10
+          cmp denim-workshop/r09/dynamics.js denim-workshop/r10/dynamics.js
+          python -m py_compile denim-workshop/r10-recovery/verify.py
+      - name: Install pinned browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6
+          python -m playwright install --with-deps chromium
+      - name: Actual immutable file or public page, previous failure location and continuing physics
+        run: xvfb-run -a python denim-workshop/r10-recovery/verify.py --mode '${{ matrix.mode }}'
+      - name: Confirm recovery did not modify the production runtime
+        run: git diff --exit-code HEAD -- denim-workshop/r09 denim-workshop/r10
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r10-recovered-${{ matrix.mode }}-evidence
+          path: denim-workshop/r10-recovery
+          retention-days: 7
+          if-no-files-found: error
