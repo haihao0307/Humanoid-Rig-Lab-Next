@@ -1,0 +1,224 @@
+name: Leather R15 S2B main-thread delivery
+on:
+  push:
+    branches: [perf/leather-r15-s2b-20261013]
+    paths:
+      - .github/workflows/leather-r15-s2b.yml
+      - leather-workshop/r15/**
+      - leather-workshop/s2b-delivery/**
+permissions:
+  contents: read
+concurrency:
+  group: leather-r15-s2b
+  cancel-in-progress: true
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    outputs:
+      source: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: leather-workshop
+      - name: Register explicit candidate source before testing
+        id: source
+        run: |
+          python leather-workshop/s2b-delivery/prepare.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r15
+          if ! git diff --cached --quiet; then
+            git commit -m 'perf(leather): register explicit bounded pose stream and protocol regression sources'
+            git push origin HEAD:refs/heads/perf/leather-r15-s2b-20261013
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  cpu:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install fixed native build dependencies
+        run: |
+          if ! command -v clang-18 || ! command -v wasm-ld-18; then sudo apt-get update -qq && sudo apt-get install -y clang-18 lld-18; fi
+          pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5
+      - name: Source, numerical, geometry and stalled-consumer protocol gates
+        run: python -u leather-workshop/r15/verify-s2b.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r15-cpu-${{ github.run_id }}
+          path: |
+            leather-workshop/r15/BUILD_RESULT.json
+            leather-workshop/r15/out/candidate-r15.html
+            leather-workshop/r15/qa/
+          retention-days: 14
+  browser:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install fixed source build and browser dependencies
+        run: |
+          if ! command -v clang-18 || ! command -v wasm-ld-18; then sudo apt-get update -qq && sudo apt-get install -y clang-18 lld-18; fi
+          pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5 playwright==1.55.0
+      - name: Uninstrumented offline interaction and raw pixel gates
+        run: |
+          python leather-workshop/r15/build.py
+          xvfb-run -a python -u leather-workshop/r15/qa-browser-s2b.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r15-browser-${{ github.run_id }}
+          path: |
+            leather-workshop/r15/out/candidate-r15.html
+            leather-workshop/r15/qa/s2b/browser/
+          retention-days: 14
+  profile:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pinned probe dependencies
+        run: |
+          if ! command -v clang-18 || ! command -v wasm-ld-18; then sudo apt-get update -qq && sudo apt-get install -y clang-18 lld-18; fi
+          pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5 playwright==1.55.0
+      - name: Separate ABBA main-thread and worker timing samples
+        run: |
+          python leather-workshop/r15/build.py
+          xvfb-run -a python -u leather-workshop/s2b-delivery/qa-profile.py --reference leather-workshop/r14/public-lite.html --candidate leather-workshop/r15/out/candidate-r15.html --out /tmp/s2b-profile
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r15-profile-${{ github.run_id }}
+          path: /tmp/s2b-profile/profile.json
+          retention-days: 14
+  publish:
+    needs: [prepare,cpu,browser,profile]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          fetch-depth: 1
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r15-cpu-${{ github.run_id }}
+          path: /tmp/cpu
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r15-browser-${{ github.run_id }}
+          path: /tmp/browser
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r15-profile-${{ github.run_id }}
+          path: /tmp/profile
+      - name: Publish only identical independent builds and checked paths
+        run: |
+          git fetch --depth=1 origin 729df578f16efc30efff6870cd1d4157ac091117
+          python - <<'PY'
+          from pathlib import Path
+          import json,shutil,hashlib,subprocess,os
+          r=Path('leather-workshop/r15');a=Path('/tmp/cpu');b=Path('/tmp/browser')
+          data=(a/'out/candidate-r15.html').read_bytes();assert data==(b/'out/candidate-r15.html').read_bytes()
+          files=subprocess.check_output(['git','diff','--name-only','729df578f16efc30efff6870cd1d4157ac091117','HEAD'],text=True).splitlines()
+          assert all(x.startswith(('leather-workshop/r15/','leather-workshop/s2b-delivery/')) or x=='.github/workflows/leather-r15-s2b.yml' for x in files),files
+          for p in [a/'qa/s2b/SUMMARY.json',b/'qa/s2b/browser/report.json',Path('/tmp/profile/profile.json')]:assert json.loads(p.read_text())['pass'],p
+          assert os.environ['LEATHER_SOURCE_COMMIT'].encode() in data
+          (r/'public-lite.html').write_bytes(data);shutil.copytree(a/'qa',r/'qa',dirs_exist_ok=True);shutil.copytree(b/'qa',r/'qa',dirs_exist_ok=True)
+          shutil.copy2(a/'BUILD_RESULT.json',r/'BUILD_RESULT.json');shutil.copy2('/tmp/profile/profile.json',r/'qa/s2b/profile.json')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r15/public-lite.html leather-workshop/r15/BUILD_RESULT.json
+          find leather-workshop/r15/qa -name '*.json' -print0 | xargs -0 git add
+          git commit -m 'build(leather): publish independently tested R15 S2B bounded-delivery candidate'
+          git push origin HEAD:refs/heads/perf/leather-r15-s2b-20261013
+          echo "BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r15/public-lite.html" >> "$GITHUB_ENV"
+      - name: Verify exact immutable public page and actual browser
+        run: |
+          pip --disable-pip-version-check install Pillow==12.3.0 playwright==1.55.0
+          python - <<'PY'
+          import urllib.request,os,time
+          from pathlib import Path
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/leather-workshop/r15/public-lite.html'
+          for i in range(10):
+            try:
+              with urllib.request.urlopen(url,timeout=30) as q:data=q.read()
+              assert data==Path('leather-workshop/r15/public-lite.html').read_bytes();break
+            except Exception:
+              if i==9:raise
+              time.sleep(6)
+          PY
+          xvfb-run -a python -u leather-workshop/r15/qa-browser-s2b.py --public --url "$PREVIEW"
+      - name: Record delivery only after public browser success
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          r=Path('leather-workshop/r15');paths=['qa/s2b/SUMMARY.json','qa/s2b/pose-stream.json','qa/s2b/profile.json','qa/s2b/browser/report.json','qa/s2b/public/report.json','qa/s1b/equivalence.json','qa/s1b2/app-interfaces.json','qa/numeric.json'];reports={}
+          for n in paths:
+            p=r/n;assert json.loads(p.read_text())['pass'];reports[n]=hashlib.sha256(p.read_bytes()).hexdigest()
+          s=json.loads((r/paths[0]).read_text());br=json.loads((r/paths[3]).read_text());pu=json.loads((r/paths[4]).read_text());im=[q['data']['meanRGBDifference'] for q in br['checks'] if isinstance(q.get('data'),dict) and 'meanRGBDifference' in q['data']]
+          rec={'version':'R15.0-S2B','sourceCommit':os.environ['LEATHER_SOURCE_COMMIT'],'buildCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'previewURL':os.environ['PREVIEW'],'htmlSHA256':hashlib.sha256((r/'public-lite.html').read_bytes()).hexdigest(),'htmlBytes':(r/'public-lite.html').stat().st_size,'baselineR14Build':'37178e800a3272575b16e30a0723b3bcf1f29c0a','nativeIdenticalToR14':True,'sourceChecks':s['checkCount'],'poseProtocolChecks':45,'geometryCases':25,'full52StepTrajectories':6,'numericCases':18,'appCases':25,'offlineBrowserChecks':len(br['checks']),'publicBrowserChecks':len(pu['checks']),'visualPairs':len(im),'maximumMeanRGBDifference':max(im),'offlineBrowserVerified':True,'publicBrowserVerified':True,'subtaskComplete':True,'fullS2Complete':False,'userVisualAcceptance':'PENDING','productionReady':False,'commercialLegalClearance':False,'reports':reports,'limits':['Bounded pose delivery is not a guaranteed FPS or50ms latency gain','No physical step, CCD, friction, timestep, iteration or geometry removed','ABBA timing copies are instrumented and separate from release checks','Transport and event-loop wait not independently resolved; CPU submission not GPU completion','Chrome software rendering and390x844 viewport, not physical-device certification','R01-R14 and existing rights/attributions unchanged']}
+          (r/'DELIVERY.json').write_text(json.dumps(rec,indent=2)+'\n')
+          PY
+          git add leather-workshop/r15/DELIVERY.json leather-workshop/r15/qa/s2b/public/report.json
+          git commit -m 'test(leather): certify immutable R15 public delivery with protocol and visual evidence'
+          git push origin HEAD:refs/heads/perf/leather-r15-s2b-20261013
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r15-delivery-${{ github.run_id }}
+          path: |
+            leather-workshop/r15/public-lite.html
+            leather-workshop/r15/DELIVERY.json
+            leather-workshop/r15/BUILD_RESULT.json
+            leather-workshop/r15/qa/
+          retention-days: 14
