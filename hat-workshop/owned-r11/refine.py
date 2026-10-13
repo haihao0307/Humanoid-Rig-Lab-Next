@@ -1,4 +1,4 @@
-"""Visual and observed layout corrections, never screenshot retouching or error filtering."""
+"""Visual and observed runtime corrections, never image retouching or error filtering."""
 from pathlib import Path
 R=Path(__file__).resolve().parent
 p=R/'src/field.js';text=p.read_text()
@@ -24,4 +24,11 @@ old='#canvas{display:block;width:100%;height:100%;touch-action:none}'
 new='#canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none}'
 if old in text:p.write_text(text.replace(old,new))
 else:assert new in text
-print('Applied radius-faded roof wrinkles and actual canvas layout feedback repair; all errors still fail QA')
+p=R/'src/material.js';text=p.read_text()
+old="m.customProgramCacheKey=()=> 'R11-generated-weave-'+family;"
+new="m.customProgramCacheKey=()=> 'R11-generated-weave-shared-v1';"
+if old in text:
+ assert text.count(old)==1
+ p.write_text(text.replace(old,new))
+else:assert new in text,'Material shader contract changed'
+print('Radius-faded roof; actual layout feedback repair; shared identical GLSL, unchanged generated texture bytes. All errors still fail QA.')
