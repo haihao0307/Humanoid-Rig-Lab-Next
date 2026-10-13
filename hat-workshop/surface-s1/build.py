@@ -1,9 +1,9 @@
 """Assemble the new surface layer around the exact S0 reference carrier.
 Original modules, page, controls, UV and reference images remain unchanged.
-The isolated output gets documented renderer hooks and lazy reference normals.
+Surface.js hosts the adapter/UI; field-v3.glsl is the current production field.
 """
 from pathlib import Path
-import argparse,base64,gzip,hashlib,json,re,urllib.request,time
+import argparse,base64,gzip,hashlib,json,re,urllib.request,time,subprocess,sys
 R=Path(__file__).resolve().parent
 BASE='122123275eae1402d75c3bb88c819bc7a0e1f8a7'
 S0_PAGE='9a927671a4062d0cebe05c9c6c7d52bda5656ef905fe70edc62bb8131da440d8'
@@ -27,7 +27,6 @@ for old,new in patches:
 raw=code.encode();p=gzip.compress(raw,compresslevel=9,mtime=0)
 newscript=script.replace(packed,base64.b64encode(p).decode()).replace(sha(original.encode()),sha(raw))
 newscript=re.sub(r'runtimePackedBytes:\d+,runtimeRawBytes:\d+',f'runtimePackedBytes:{len(p)},runtimeRawBytes:{len(raw)}',newscript)
-# Regression: changing the payload must update BOTH metadata and the active length guard.
 newscript,n=re.subn(r'raw\.byteLength!==\d+',f'raw.byteLength!=={len(raw)}',newscript);assert n==1
 assert gzip.decompress(base64.b64decode(re.search(r"atob\('([^']+)'",newscript)[1]))==raw
 assert f'raw.byteLength!=={len(raw)}' in newscript and sha(raw) in newscript
@@ -43,6 +42,10 @@ for name in ['eb1.js','THIRD_PARTY_NOTICES.md','USER_RECIPE_20261013.json']:
    time.sleep(2)
  if name=='eb1.js':assert sha(data)==EB1_HASH
  out.write_bytes(data)
+field=(R/'field-v3.glsl').read_text();assert '`' not in field and re.search(r'\bvec2\s+flat\b',field) is None
+surface,n=re.subn(r'const GLSL=`.*?`;',lambda _: 'const GLSL=`'+field+'`;', (R/'surface.js').read_text(),count=1,flags=re.S);assert n==1
+surface=surface.replace("VERSION+'-field-v2'","VERSION+'-field-v3'").replace('psDepth*1.8','psDepth*4.')
+assert re.search(r'const GLSL=`(.*?)`;',surface,re.S)[1]==field
 style='''
 .right>:not(#surface-panel){display:none!important}#compare{display:none!important}
 #surface-panel{font:13px/1.6 system-ui;color:#263830}#surface-panel h1{font-size:24px;margin:3px 0 12px}#surface-panel h2{font-size:17px;margin:14px 0 7px}
@@ -54,12 +57,12 @@ style='''
 #surface-state{padding:8px;background:#edeedf;border-radius:5px;min-height:55px}.surface-small,#surface-note{font-size:11px;color:#5f6d61}#surface-panel details{margin:14px 0;border-top:1px solid #bbc5b9;padding-top:9px}#ps-json{width:100%;height:160px;font:11px monospace}
 #eb1-panel{top:auto!important;bottom:12px!important;right:12px!important}#surface-panel [hidden]{display:none!important}
 @media(max-width:800px){#surface-panel{font-size:14px}#surface-panel select{min-height:40px}#eb1-panel{max-width:250px!important}}'''
-# Lighting UI gets a coalesced real redraw; ensure() cannot cause recursive rendering.
 integration="""(()=>{let frame=0;const tick=setInterval(()=>{if(window.hatSurface?.ready()&&window.__EB1__){clearInterval(tick);__EB1__.store.subscribe(()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;hatSurface.render();});});globalThis.HAT_SURFACE_REDRAW_READY=true;}},100);})();"""
-meta={'version':'HAT-SURFACE-S1','sourceSha':A.source,'baseSha':BASE,'sourceStudyBuild':'c4400b817d467b062ab003ac1b5277eedb25aad7','eb1Commit':EB1,'eb1SHA256':EB1_HASH,'surfaceMode':'analytic-no-source-pixels','filmReady':False,'equivalentToSource':False}
-add='<style>'+style+'</style><script>globalThis.HAT_SURFACE_OWNED=true;globalThis.HAT_SURFACE_BUILD='+json.dumps(meta,separators=(',',':'))+';'+(R/'vendor/eb1.js').read_text()+'</script><script>'+(R/'surface.js').read_text().replace('</script','<\\/script')+'</script><script>'+integration+'</script>'
+meta={'version':'HAT-SURFACE-S1','fieldRevision':'v3','sourceSha':A.source,'baseSha':BASE,'sourceStudyBuild':'c4400b817d467b062ab003ac1b5277eedb25aad7','eb1Commit':EB1,'eb1SHA256':EB1_HASH,'surfaceMode':'analytic-no-source-pixels','filmReady':False,'equivalentToSource':False}
+add='<style>'+style+'</style><script>globalThis.HAT_SURFACE_OWNED=true;globalThis.HAT_SURFACE_BUILD='+json.dumps(meta,separators=(',',':'))+';'+(R/'vendor/eb1.js').read_text()+'</script><script>'+surface.replace('</script','<\\/script')+'</script><script>'+integration+'</script>'
 page=page.replace('</body>',add+'</body>');(R/'index.html').write_text(page)
 assert re.search(r'<div[^>]*id="payload"[^>]*>(.*?)</div>',page,re.S)[1]==payload
-manifest={**meta,'htmlSHA256':sha(page.encode()),'entryBytes':len(page.encode()),'basePayloadSHA256':sha(payload.encode()),'all11ControlUVColorPayloadUnchanged':True,'transportLengthAndHashVerified':True,'eb1RedrawIntegrated':True,'runtimePatches':[{'before':a,'after':b} for a,b in patches],'originalRuntimeSHA256':sha(original.encode()),'patchedRuntimeSHA256':sha(raw),'proceduralSourceSHA256':sha((R/'surface.js').read_bytes()),'publicVerified':False,'referenceNormals':'lazy, only on explicit reference mode; original bytes and URLs retained','hats':[{'id':h['id'],'author':h['author'],'licence':h['licence'],'controls':len(h['mother']['controls']),'motherSHA256':sha(json.dumps(h['mother'],sort_keys=True,separators=(',',':')).encode())} for h in D['hats']]}
+manifest={**meta,'htmlSHA256':sha(page.encode()),'entryBytes':len(page.encode()),'basePayloadSHA256':sha(payload.encode()),'all11ControlUVColorPayloadUnchanged':True,'transportLengthAndHashVerified':True,'eb1RedrawIntegrated':True,'runtimePatches':[{'before':a,'after':b} for a,b in patches],'originalRuntimeSHA256':sha(original.encode()),'patchedRuntimeSHA256':sha(raw),'proceduralSourceSHA256':sha((R/'surface.js').read_bytes()),'surfaceFieldSHA256':sha(field.encode()),'assembledSurfaceSHA256':sha(surface.encode()),'publicVerified':False,'referenceNormals':'lazy, only on explicit reference mode; original bytes and URLs retained','hats':[{'id':h['id'],'author':h['author'],'licence':h['licence'],'controls':len(h['mother']['controls']),'motherSHA256':sha(json.dumps(h['mother'],sort_keys=True,separators=(',',':')).encode())} for h in D['hats']]}
 (R/'BUILD_MANIFEST.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
-print(json.dumps({'source':A.source,'bytes':manifest['entryBytes'],'surfaceSHA':manifest['proceduralSourceSHA256'],'basePayloadUnchanged':True,'publicVerified':False}),flush=True)
+print(json.dumps({'source':A.source,'bytes':manifest['entryBytes'],'surfaceFieldSHA':manifest['surfaceFieldSHA256'],'basePayloadUnchanged':True,'publicVerified':False}),flush=True)
+subprocess.run([sys.executable,str(R/'preview_probe.py')],check=True)
