@@ -1,6 +1,10 @@
 {
-  "sourceBuild": "dc9ec2332de5672b9d1bc7a3c384abf0de620c93",
+  "sourceBuild": "1e953fa88321d94006743e26a7099e31bc7a4533",
   "checks": [
+    {
+      "name": "custom formed and flat states retain exact buffers, contact frames and thread routes without recomputation",
+      "passed": true
+    },
     {
       "name": "native sole normal transport remains finite and orientation-preserving",
       "passed": true
@@ -18,7 +22,7 @@
       "passed": true
     }
   ],
-  "cacheSlots": 2,
+  "cacheSlots": 3,
   "normalTransport": {
     "method": "Native normals inverse-transpose transported through the same continuous lip deformation; no coarse-triangle re-averaging",
     "finiteDifferenceMm": 0.02,
@@ -27,6 +31,6 @@
     "maxUnchangedRegionNormalDelta": 4.112450726246362e-8,
     "identityNeighborhoodJacobianTolerance": 1e-9
   },
-  "restoreCpuTimeMs": 0.0411069999972824,
-  "scope": "Session-only generated default + current geometry. Not a physical-device FPS or initial-load performance guarantee."
+  "restoreCpuTimeMs": 0.13568199999281205,
+  "scope": "Session-only generated default + two recent states; custom formed/flat identity and contact frames checked. Not a physical-device FPS or initial-load performance guarantee."
 }
