@@ -1,0 +1,18 @@
+/* Screen footprint and resource residency are separate from cloth dynamics.
+ * No temporal image accumulation, random thinning, or distance-triggered solver reset.
+ * This is swatch-level demand residency, not per-garment virtual texturing.
+ */
+(function(root){'use strict';
+const clamp=x=>Math.max(0,Math.min(1,x));
+function smooth(a,b,x){const t=clamp((x-a)/(b-a));return t*t*(3-2*t);}
+const settings=Object.freeze({filteredFull:2.8,explicitFull:7,localGuard:10,microStart:4,microFull:9,requestAt:3.5,releaseBelow:2.7,releaseDelayMs:900,arrivalFadeMs:220});
+function plan(pixels){pixels=Math.max(.0001,pixels);return {filtered:1-smooth(settings.filteredFull,settings.explicitFull,pixels),micro:smooth(settings.microStart,settings.microFull,pixels),localPass:pixels<settings.localGuard,request:pixels>=settings.requestAt};}
+function workerMain(){const packed=PACK_FUNCTION;self.onmessage=e=>{try{const m=e.data,g=KAOPUDenimCore.compile(m.options),n=KAOPUNaturalYarn.generate(KAOPUDenimCore,g,m.damage,m.fray,{boundary:false}),fibers=n.fibers.filter(c=>c.role==='surface'||c.role==='sheath'),p=packed(fibers);self.postMessage({generation:m.generation,packed:p},[p.data.buffer,p.meta.buffer,p.bounds.buffer]);self.close();}catch(e){self.postMessage({error:String(e.stack||e)});self.close();}};}
+function demand(gl,Budget,notify){let store=null,worker=null,url=null,epoch=0,arrived=0,outside=0;const stats={requests:0,uploads:0,releases:0,cancelled:0,pending:false,error:null};
+ function cancel(){epoch++;if(worker){worker.terminate();worker=null;stats.cancelled++;}if(url){URL.revokeObjectURL(url);url=null;}stats.pending=false;}
+ function drop(){if(store){store.destroy();store=null;stats.releases++;}arrived=0;}
+ function start(options,damage,fray){const generation=++epoch;stats.requests++;stats.pending=true;const code=[KAOPUDenimCore.workerModule,KAOPUCottonSurface.workerModule,KAOPUNaturalYarn.workerModule,'('+workerMain.toString().replace('PACK_FUNCTION',Budget.packFibers.toString())+')();'].join('\n');url=URL.createObjectURL(new Blob([code],{type:'text/javascript'}));worker=new Worker(url);worker.onerror=e=>{stats.error=e.message||'detail worker error';cancel();notify();};worker.onmessage=e=>{const m=e.data;if(m.generation!==generation&& !m.error)return;if(m.error){stats.error=m.error;cancel();notify();return;}if(generation!==epoch)return;try{store=Budget.makeFiberStore(gl,m.packed);stats.uploads++;arrived=performance.now();}catch(e){stats.error=String(e.stack||e);}worker?.terminate();worker=null;if(url){URL.revokeObjectURL(url);url=null;}stats.pending=false;notify();};worker.postMessage({generation,options,damage,fray});}
+ return {stats,get store(){return store;},get fading(){return !!store&&performance.now()-arrived<settings.arrivalFadeMs;},reset(){cancel();drop();outside=0;stats.error=null;},update(pixels,options,damage,fray){const now=performance.now(),p=plan(pixels);if(p.request){outside=0;if(!store&&!worker&&!stats.error)start(options,damage,fray);}else if(pixels<settings.releaseBelow){if(!outside)outside=now;if(now-outside>=settings.releaseDelayMs){cancel();drop();}}else outside=0;return p.micro*(store?smooth(0,settings.arrivalFadeMs,now-arrived):0);},report(){return {...stats,resident:!!store,pointBytes:store?.textureBytes||0,indexBytes:store?.bufferBytes||0,cpuRetainedBytes:store?.cpuBytes||0,scope:'whole swatch micro-layer, deterministic on-demand generation',physicsChanged:false};}};
+}
+root.KAOPUDistanceLOD={settings,smooth,plan,demand};if(typeof module!=='undefined')module.exports=root.KAOPUDistanceLOD;
+})(globalThis);
