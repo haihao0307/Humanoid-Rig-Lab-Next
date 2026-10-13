@@ -1,0 +1,34 @@
+name: Leather R14 S2 performance
+on:
+  push:
+    branches: [perf/leather-r14-s2-20261013]
+    paths:
+      - .github/workflows/leather-r14-s2.yml
+      - leather-workshop/s2-performance/**
+      - leather-workshop/r14/**
+permissions:
+  contents: read
+concurrency:
+  group: leather-r14-s2-20261013
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - name: Capture pinned input source
+        run: |
+          mkdir -p /tmp/leather-s2
+          tar -czf /tmp/leather-s2/source.tgz leather-workshop .github/workflows AGENTS.md
+          git rev-parse HEAD > /tmp/leather-s2/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-s2-input-source
+          path: /tmp/leather-s2/
+          retention-days: 7
