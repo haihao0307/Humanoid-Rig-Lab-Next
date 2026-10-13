@@ -35,8 +35,10 @@ jobs:
         run: |
           if test -f package-lock.json; then npm ci --registry=https://registry.npmjs.org; else npm install --registry=https://registry.npmjs.org; fi
       - id: build
-        name: Freeze source and unverified candidate
-        run: python -u hat-workshop/owned-r10/publish.py prepare
+        name: Apply reviewed refinement and freeze candidate
+        run: |
+          python -u hat-workshop/owned-r10/refine.py
+          python -u hat-workshop/owned-r10/publish.py prepare
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -47,6 +49,7 @@ jobs:
             hat-workshop/owned-r10/index.html
             hat-workshop/owned-r10/BUILD_MANIFEST.json
             hat-workshop/owned-r10/THIRD_PARTY_NOTICES.txt
+          retention-days: 7
   acceptance:
     needs: prepare
     runs-on: ubuntu-latest
