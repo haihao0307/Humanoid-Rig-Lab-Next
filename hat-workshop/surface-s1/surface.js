@@ -60,9 +60,9 @@ vec3 psWeave(vec2 q,float herring){
 }
 vec3 psField(out float height,out float rough){
  vec3 p=vPSRest;vec3 span=max(psHigh-psLow,vec3(.001));vec3 pn=(p-psLow)/span;
- vec2 uv=vPSUV;vec2 flat=uv*vec2(.51,.34);float rgn=floor(vPSRegion+.1);
- float large=psFbm(flat*27.);float micro=psNoise(flat*3700.);
- float grainAA=psAA(max(length(dFdx(flat*3700.)),length(dFdy(flat*3700.))));
+ vec2 uv=vPSUV;vec2 cloth=uv*vec2(.51,.34);float rgn=floor(vPSRegion+.1);
+ float large=psFbm(cloth*27.);float micro=psNoise(cloth*3700.);
+ float grainAA=psAA(max(length(dFdx(cloth*3700.)),length(dFdy(cloth*3700.))));
  micro=mix(.5,micro,grainAA);
  vec3 col=psColor;vec3 yarn=vec3(.65,.5,.5);float band=0.;height=0.;rough=psRough;
  if(psKind<.5){
@@ -85,7 +85,7 @@ vec3 psField(out float height,out float rough){
   height=psDepth*(.75*yarn.x+.11*yarn.y*psFiber);
   col*=.77+.24*yarn.x+.035*(yarn.y-.5)*psFiber;
  }else if(abs(psKind-4.)<.5){
-  vec2 q=flat/(psPitch/1000.)*psDensity;yarn=psStitch(q,.14);height=psDepth*(yarn.x+.08*yarn.y*psFiber);
+  vec2 q=cloth/(psPitch/1000.)*psDensity;yarn=psStitch(q,.14);height=psDepth*(yarn.x+.08*yarn.y*psFiber);
   float stripe=mod(floor((p.y-.69)*350.),16.);vec3 dark=vec3(.115,.15,.135),blue=vec3(.13,.21,.23),red=vec3(.31,.13,.095);
   if(stripe<2.)col=dark;else if(stripe<4.)col=blue;
   float theta=atan(p.z-.057,p.x)/PS_TAU+.5;vec2 d=abs(fract(vec2(theta*12.,(p.y-.765)*34.))-.5);
@@ -93,26 +93,26 @@ vec3 psField(out float height,out float rough){
   col=mix(col,mod(floor(theta*12.),2.)<1.?red:blue,diamond*zone);
   col*=.82+.22*yarn.x;
  }else if(psKind<2.5||abs(psKind-5.)<.5||abs(psKind-8.)<.5||psKind>9.5){
-  yarn=psWeave(flat/(psPitch/1000.)*psDensity,abs(psKind-2.)<.5?1.:0.);
+  yarn=psWeave(cloth/(psPitch/1000.)*psDensity,abs(psKind-2.)<.5?1.:0.);
   height=psDepth*(yarn.x+.13*yarn.y*psFiber);
   if(abs(psKind-1.)<.5&&rgn>.5){col=vec3(.105,.07,.044);rough=.83;}
   if(abs(psKind-2.)<.5)col*=.76+.42*yarn.z;
-  if(abs(psKind-5.)<.5){float n=psFbm(flat*42.+vec2(psNoise(flat*28.)*3.));col=mix(vec3(.24,.255,.17),vec3(.36,.35,.245),smoothstep(.36,.41,n));col=mix(col,vec3(.115,.15,.112),smoothstep(.57,.60,n));col=mix(col,vec3(.38,.375,.28),smoothstep(.71,.73,n));col*=psColor/vec3(.242,.242,.147);}
+  if(abs(psKind-5.)<.5){float n=psFbm(cloth*42.+vec2(psNoise(cloth*28.)*3.));col=mix(vec3(.24,.255,.17),vec3(.36,.35,.245),smoothstep(.36,.41,n));col=mix(col,vec3(.115,.15,.112),smoothstep(.57,.60,n));col=mix(col,vec3(.38,.375,.28),smoothstep(.71,.73,n));col*=psColor/vec3(.242,.242,.147);}
   if(abs(psKind-8.)<.5){float edge=smoothstep(.85,.93,pn.y)*(1.-smoothstep(.46,.58,pn.z));col=mix(col,vec3(.58,.047,.021),edge);}
   col*=.87+.16*yarn.x;
  }else{
-  vec2 fq=flat*2100.*psDensity;float aa=psAA(max(length(dFdx(fq)),length(dFdy(fq))));
+  vec2 fq=cloth*2100.*psDensity;float aa=psAA(max(length(dFdx(fq)),length(dFdy(fq))));
   float fibers=.5+.5*sin((fq.x+psNoise(fq*.09)*5.)*PS_TAU);
   float crossFiber=.5+.5*sin((fq.y*.7-fq.x*.6+psNoise(fq*.07)*3.)*PS_TAU);
   float felt=mix(.5,.55*fibers+.45*crossFiber,aa);height=psDepth*(felt*.75+micro*.25)*psFiber;
   yarn=vec3(felt,.5,micro);col*=.95+.06*(micro-.5);
-  if(abs(psKind-3.)<.5&&rgn>3.5){band=1.;col=vec3(.11,.085,.047);vec2 dots=fract(flat*290.);float dotMask=1.-smoothstep(.09,.16,length(dots-.5));col=mix(col,vec3(.36,.31,.18),dotMask*.55);}
+  if(abs(psKind-3.)<.5&&rgn>3.5){band=1.;col=vec3(.11,.085,.047);vec2 dots=fract(cloth*290.);float dotMask=1.-smoothstep(.09,.16,length(dots-.5));col=mix(col,vec3(.36,.31,.18),dotMask*.55);}
   if(abs(psKind-6.)<.5&&rgn>.5){band=1.;col=psColor*.58;}
   if(abs(psKind-7.)<.5&&rgn>.5){band=1.;col=rgn>1.5?vec3(.62,.45,.05):vec3(.032,.065,.32);rough=rgn>1.5?.32:.57;}
-  if(abs(psKind-9.)<.5){float n=psFbm(flat*78.);float line=1.-smoothstep(.025,.055,abs(n-.5));col=mix(col,vec3(.05,.10,.059),line*.93);if(rgn>.5){band=1.;col=vec3(.042,.055,.036);}}
-  if(band>.5){yarn=psWeave(flat/.00042*psDensity,0.);height=psDepth*(.3*yarn.x+.1*yarn.y);col*=.89+.13*yarn.x;rough=min(rough,.65);}
+  if(abs(psKind-9.)<.5){float n=psFbm(cloth*78.);float line=1.-smoothstep(.025,.055,abs(n-.5));col=mix(col,vec3(.05,.10,.059),line*.93);if(rgn>.5){band=1.;col=vec3(.042,.055,.036);}}
+  if(band>.5){yarn=psWeave(cloth/.00042*psDensity,0.);height=psDepth*(.3*yarn.x+.1*yarn.y);col*=.89+.13*yarn.x;rough=min(rough,.65);}
  }
- float weather=psWear*(.45*large+.55*psFbm(flat*9.+7.));
+ float weather=psWear*(.45*large+.55*psFbm(cloth*9.+7.));
  col*=1.+psIrregularity*.09*(large-.5)+psFiber*.025*(micro-.5);
  col=mix(col,col*1.16+vec3(.018,.013,.008),weather*.35);
  height*=psRelief*(1.-psWear*.25);rough=clamp(rough+.07*(1.-yarn.x)+.035*(micro-.5)+weather*.035,.4,.98);
@@ -156,7 +156,7 @@ if(psMode>1.5&&psMode<2.5)gl_FragColor=vec4(vec3(clamp(psH/max(psDepth*1.8,.0000
 if(psMode>2.5&&psMode<3.5)gl_FragColor=vec4(vec3(psR),1.);
 if(psMode>3.5)gl_FragColor=vec4(normal*.5+.5,1.);`);
  };
- mat.customProgramCacheKey=()=>VERSION+'-field-v1';
+ mat.customProgramCacheKey=()=>VERSION+'-field-v2';
  const clay=new T.MeshStandardMaterial({color:'#b6b3ab',roughness:.9,side:T.DoubleSide});
  const rec={material:mat,clay,uniforms,components:regions.components};allocated.set(a,rec);
  a.geometry.addEventListener('dispose',()=>{mat.dispose();clay.dispose();});lastBuildMS=performance.now()-start;return rec;
