@@ -1,6 +1,6 @@
 """Assemble the new surface layer around the exact S0 reference carrier.
-No original module, original page, control vertex, UV or reference texture is rewritten.
-Only the new output page gets a renderer-access hook, pre-render hook, and lazy reference normals.
+Original modules, page, controls, UV and reference images remain unchanged.
+The isolated output gets documented renderer hooks and lazy reference normals.
 """
 from pathlib import Path
 import argparse,base64,gzip,hashlib,json,re,urllib.request,time
@@ -12,7 +12,6 @@ EB1_HASH='39f747e36f905eaf9e760236315ae649bcab4ffd4feb62290017c7c5da650572'
 P=argparse.ArgumentParser();P.add_argument('--source',default='LOCAL');A=P.parse_args()
 sha=lambda b:hashlib.sha256(b).hexdigest()
 page=(R.parent/'source-study-s0/index.html').read_text();assert sha(page.encode())==S0_PAGE,'S0 changed: stop rather than fall back'
-# Remove only the additive S0 observer, preserving its underlying frozen R09 carrier.
 B=R.parent/'source-study-s0';audit=json.loads((B/'AUDIT.json').read_text())
 addon='<style>'+(B/'study.css').read_text()+'</style><script>globalThis.HAT_STUDY_AUDIT='+json.dumps(audit,ensure_ascii=False,separators=(',',':'))+';'+(B/'study.js').read_text().replace('</script','<\\/script')+'</script>'
 assert page.count(addon)==1;page=page.replace(addon,'')
@@ -28,8 +27,11 @@ for old,new in patches:
 raw=code.encode();p=gzip.compress(raw,compresslevel=9,mtime=0)
 newscript=script.replace(packed,base64.b64encode(p).decode()).replace(sha(original.encode()),sha(raw))
 newscript=re.sub(r'runtimePackedBytes:\d+,runtimeRawBytes:\d+',f'runtimePackedBytes:{len(p)},runtimeRawBytes:{len(raw)}',newscript)
+# Regression: changing the payload must update BOTH metadata and the active length guard.
+newscript,n=re.subn(r'raw\.byteLength!==\d+',f'raw.byteLength!=={len(raw)}',newscript);assert n==1
+assert gzip.decompress(base64.b64decode(re.search(r"atob\('([^']+)'",newscript)[1]))==raw
+assert f'raw.byteLength!=={len(raw)}' in newscript and sha(raw) in newscript
 assert newscript!=script;page=page.replace(script,newscript)
-# Obtain the authoritative EB1 core, verify its digest, keep its notices and provenance.
 url=f'https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/{EB1}/lighting/eb1/'
 for name in ['eb1.js','THIRD_PARTY_NOTICES.md','USER_RECIPE_20261013.json']:
  out=R/'vendor'/name;out.parent.mkdir(exist_ok=True)
@@ -52,10 +54,12 @@ style='''
 #surface-state{padding:8px;background:#edeedf;border-radius:5px;min-height:55px}.surface-small,#surface-note{font-size:11px;color:#5f6d61}#surface-panel details{margin:14px 0;border-top:1px solid #bbc5b9;padding-top:9px}#ps-json{width:100%;height:160px;font:11px monospace}
 #eb1-panel{top:auto!important;bottom:12px!important;right:12px!important}#surface-panel [hidden]{display:none!important}
 @media(max-width:800px){#surface-panel{font-size:14px}#surface-panel select{min-height:40px}#eb1-panel{max-width:250px!important}}'''
+# Lighting UI gets a coalesced real redraw; ensure() cannot cause recursive rendering.
+integration="""(()=>{let frame=0;const tick=setInterval(()=>{if(window.hatSurface?.ready()&&window.__EB1__){clearInterval(tick);__EB1__.store.subscribe(()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;hatSurface.render();});});globalThis.HAT_SURFACE_REDRAW_READY=true;}},100);})();"""
 meta={'version':'HAT-SURFACE-S1','sourceSha':A.source,'baseSha':BASE,'sourceStudyBuild':'c4400b817d467b062ab003ac1b5277eedb25aad7','eb1Commit':EB1,'eb1SHA256':EB1_HASH,'surfaceMode':'analytic-no-source-pixels','filmReady':False,'equivalentToSource':False}
-add='<style>'+style+'</style><script>globalThis.HAT_SURFACE_OWNED=true;globalThis.HAT_SURFACE_BUILD='+json.dumps(meta,separators=(',',':'))+';'+(R/'vendor/eb1.js').read_text()+'</script><script>'+(R/'surface.js').read_text().replace('</script','<\\/script')+'</script>'
+add='<style>'+style+'</style><script>globalThis.HAT_SURFACE_OWNED=true;globalThis.HAT_SURFACE_BUILD='+json.dumps(meta,separators=(',',':'))+';'+(R/'vendor/eb1.js').read_text()+'</script><script>'+(R/'surface.js').read_text().replace('</script','<\\/script')+'</script><script>'+integration+'</script>'
 page=page.replace('</body>',add+'</body>');(R/'index.html').write_text(page)
 assert re.search(r'<div[^>]*id="payload"[^>]*>(.*?)</div>',page,re.S)[1]==payload
-manifest={**meta,'htmlSHA256':sha(page.encode()),'entryBytes':len(page.encode()),'basePayloadSHA256':sha(payload.encode()),'all11ControlUVColorPayloadUnchanged':True,'runtimePatches':[{'before':a,'after':b} for a,b in patches],'originalRuntimeSHA256':sha(original.encode()),'patchedRuntimeSHA256':sha(raw),'proceduralSourceSHA256':sha((R/'surface.js').read_bytes()),'publicVerified':False,'referenceNormals':'lazy, only on explicit reference mode; original bytes and URLs retained','hats':[{'id':h['id'],'author':h['author'],'licence':h['licence'],'controls':len(h['mother']['controls']),'motherSHA256':sha(json.dumps(h['mother'],sort_keys=True,separators=(',',':')).encode())} for h in D['hats']]}
+manifest={**meta,'htmlSHA256':sha(page.encode()),'entryBytes':len(page.encode()),'basePayloadSHA256':sha(payload.encode()),'all11ControlUVColorPayloadUnchanged':True,'transportLengthAndHashVerified':True,'eb1RedrawIntegrated':True,'runtimePatches':[{'before':a,'after':b} for a,b in patches],'originalRuntimeSHA256':sha(original.encode()),'patchedRuntimeSHA256':sha(raw),'proceduralSourceSHA256':sha((R/'surface.js').read_bytes()),'publicVerified':False,'referenceNormals':'lazy, only on explicit reference mode; original bytes and URLs retained','hats':[{'id':h['id'],'author':h['author'],'licence':h['licence'],'controls':len(h['mother']['controls']),'motherSHA256':sha(json.dumps(h['mother'],sort_keys=True,separators=(',',':')).encode())} for h in D['hats']]}
 (R/'BUILD_MANIFEST.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 print(json.dumps({'source':A.source,'bytes':manifest['entryBytes'],'surfaceSHA':manifest['proceduralSourceSHA256'],'basePayloadUnchanged':True,'publicVerified':False}),flush=True)
