@@ -1,0 +1,65 @@
+name: EB1 source audit
+on:
+  push:
+    branches: [feature/eb1-unified-lighting-20261013]
+    paths: [.github/workflows/eb1-source-audit.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Read public source snapshots without changing workbenches
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p audit
+          cat > /tmp/audit.py <<'PY'
+          import os,json,pathlib,urllib.request,urllib.parse,concurrent.futures,time
+          out=pathlib.Path('audit'); info={}
+          def get(url,api=False):
+              h={'User-Agent':'KAOPU-EB1-audit'}
+              if api:h['Authorization']='Bearer '+os.environ['GH_TOKEN']
+              for i in range(3):
+                  try:
+                      with urllib.request.urlopen(urllib.request.Request(url,headers=h),timeout=50) as r:return r.read()
+                  except Exception:
+                      if i==2:raise
+                      time.sleep(1+i)
+          def api(repo,p):return json.loads(get('https://api.github.com/repos/'+repo+'/'+p,True))
+          def save(name,data):
+              p=out/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data if isinstance(data,bytes) else json.dumps(data,indent=2,ensure_ascii=False).encode())
+          def snapshot(name,repo,ref,prefix):
+              c=api(repo,'commits/'+urllib.parse.quote(ref,safe=''));sha=c['sha']
+              root=api(repo,'git/trees/'+sha+'?recursive=1');save(name+'/tree.json',root)
+              info[name]={'repo':repo,'ref':ref,'sha':sha,'prefix':prefix,'truncated':root.get('truncated',False)}
+              es=[e for e in root['tree'] if e['type']=='blob' and (e['path'].startswith(prefix+'/') or e['path'] in ['README.md','BUILD_MANIFEST.json','AGENTS.md','package.json'])]
+              es=[e for e in es if e.get('size',0)<25000000 and (pathlib.Path(e['path']).suffix.lower() in ['.md','.js','.mjs','.ts','.json','.html','.py','.glsl','.yml','.css','.txt','.vert','.frag','.c','.h'] or 'LICENSE' in e['path']) and '/qa/' not in e['path'] and '/acceptance/' not in e['path']]
+              def dl(e):
+                  try:save(name+'/'+e['path'],get('https://raw.githubusercontent.com/'+repo+'/'+sha+'/'+urllib.parse.quote(e['path'])))
+                  except Exception as x:return e['path']+': '+str(x)
+              with concurrent.futures.ThreadPoolExecutor(max_workers=10) as ex:errors=[x for x in ex.map(dl,es) if x]
+              info[name]['files']=len(es);info[name]['errors']=errors
+              print(name,sha,len(es),'errors',errors,flush=True)
+          h='haihao0307/Humanoid-Rig-Lab-Next';g='haihao0307/guilin-dem-pipeline'
+          for repo in [h,g]:
+              bs=[]
+              for page in range(1,8):
+                  b=api(repo,f'branches?per_page=100&page={page}');bs+=b
+                  if len(b)<100:break
+              save(repo.split('/')[1]+'-branches.json',bs)
+          p71=api(h,'pulls/71');p246=api(g,'pulls/246');save('PR71.json',p71);save('PR246.json',p246)
+          todo=[('reference','lo-th/head','21462e471d53ba8c413a96989016510ca4495a34','build'),('leather',h,'perf/leather-r16-render-batch-20261013','leather-workshop/r16'),('denim',h,'fix/denim-r12-1-snapshot-recovery-20261013','denim-workshop/r12-1'),('hat',h,'fix/hat-r09-render-recovery-20261013','hat-workshop/r09'),('shoe',h,p71['head']['sha'],'shoe-workshop/r09'),('tailor',g,'d00fc2de66dcf57367443d7ecfdc60977bc2b6ee','kaopu-tailor-workbench/material-products/r04-4-1')]
+          for t in todo:
+              try:snapshot(*t)
+              except Exception as e:info[t[0]]={'error':str(e)};print(t[0],e,flush=True)
+          save('SNAPSHOTS.json',info)
+          PY
+          python /tmp/audit.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eb1-source-audit
+          path: audit
+          retention-days: 14
