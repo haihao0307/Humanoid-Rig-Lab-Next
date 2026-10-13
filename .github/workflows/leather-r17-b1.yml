@@ -1,0 +1,40 @@
+name: Leather R17 B1 integrated verification
+on:
+  push:
+    branches: [perf/leather-r17-b1-20261013]
+    paths:
+      - .github/workflows/leather-r17-b1.yml
+      - leather-workshop/b1/**
+      - leather-workshop/r17/**
+permissions:
+  contents: read
+concurrency:
+  group: leather-r17-b1
+  cancel-in-progress: false
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            leather-workshop/r16
+            leather-workshop/r15
+            leather-workshop/r14
+            leather-workshop/r13
+            leather-workshop/r12
+            leather-workshop/s2c-render
+            leather-workshop/s2c-validation
+            .github/workflows
+      - name: Capture immutable source and relevant build inputs
+        run: |
+          mkdir -p /tmp/leather-b1
+          tar -czf /tmp/leather-b1/source.tgz leather-workshop .github/workflows AGENTS.md
+          git rev-parse HEAD > /tmp/leather-b1/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-r17-source
+          path: /tmp/leather-b1/
+          retention-days: 7
