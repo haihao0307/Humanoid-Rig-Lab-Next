@@ -96,17 +96,29 @@ write(core_path, core)
 
 # Every native adapter must map its former studio/default selector back to the
 # approved custom recipe, not merely share the same numeric values accidentally.
+# prepare.py contains JavaScript snippets inside Python strings, so the leather
+# mapping has literal backslashes before its quote marks and needs a distinct
+# exact replacement.
 prepare_path = ROOT / "prepare.py"
 prepare = prepare_path.read_text()
 prepare = replace_once_or_present(
     prepare,
-    "for name in ['README.md','THIRD_PARTY_NOTICES.md']:shutil.copyfile(ROOT/name,OUT/name)",
+    "for name in ['README.md','THIRD_PARTY_NOTICES.md']:shutil.copyfile(ROOT,name,OUT/name)" if False else "for name in ['README.md','THIRD_PARTY_NOTICES.md']:shutil.copyfile(ROOT/name,OUT/name)",
     "for name in ['README.md','THIRD_PARTY_NOTICES.md']:shutil.copyfile(ROOT/name,OUT/name)\nshutil.copyfile(ROOT/'USER_RECIPE_20261013.json',OUT/'USER_RECIPE_20261013.json')",
     "copy public recipe",
 )
-prepare = prepare.replace("id==='studio'?'reference':id", "id==='studio'?'custom':id")
-prepare = prepare.replace("{studio:'reference',neutral:'neutral',raking:'rake'}", "{studio:'custom',neutral:'neutral',raking:'rake'}")
-prepare = prepare.replace("[\'reference\',\'rake\',\'reference\',\'neutral\',\'reference\']", "['custom','rake','custom','neutral','custom']")
+prepare = prepare.replace(
+    "id===\\'studio\\'?\\'reference\\':id",
+    "id===\\'studio\\'?\\'custom\\':id",
+)
+prepare = prepare.replace(
+    "{studio:'reference',neutral:'neutral',raking:'rake'}",
+    "{studio:'custom',neutral:'neutral',raking:'rake'}",
+)
+prepare = prepare.replace(
+    "['reference','rake','reference','neutral','reference']",
+    "['custom','rake','custom','neutral','custom']",
+)
 prepare = prepare.replace("||'reference'", "||'custom'")
 prepare = replace_once_or_present(
     prepare,
