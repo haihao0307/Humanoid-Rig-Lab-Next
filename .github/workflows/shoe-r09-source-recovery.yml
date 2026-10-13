@@ -1,0 +1,44 @@
+name: Shoe R09 source recovery
+on:
+  push:
+    branches: [fix/shoe-r09-craft-recovery-20261013]
+    paths: ['.github/workflows/shoe-r09-source-recovery.yml']
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact source and pinned build dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          mkdir -p recovery
+          python - <<'PY'
+          import json,pathlib,shutil
+          root=pathlib.Path('shoe-workshop/r08'); out=pathlib.Path('recovery')
+          manifest=json.loads((root/'BUILD_MANIFEST.json').read_text())
+          for f in manifest['files']:
+            p=(root/f['path']).resolve(); rel=p.relative_to(pathlib.Path.cwd())
+            dest=out/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,dest)
+          for p in root.rglob('*'):
+            if not p.is_file() or 'evidence' in p.parts or p.suffix=='.html':continue
+            dest=out/p;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,dest)
+          for package in ['three','esbuild','@esbuild','playwright','playwright-core']:
+            p=pathlib.Path('shoe-workshop/node_modules')/package
+            shutil.copytree(p,out/p,dirs_exist_ok=True)
+          (out/'SOURCE_HEAD.txt').write_text('661fb28a57c3fc1c327418c1774f3b2f3b1f3e03\n')
+          PY
+          tar -czf shoe-r09-recovery-source.tgz -C recovery .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r09-recovery-source
+          path: shoe-r09-recovery-source.tgz
+          retention-days: 7

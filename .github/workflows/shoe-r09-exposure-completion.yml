@@ -1,0 +1,78 @@
+name: Shoe R09 unchanged-runtime exposure completion
+on:
+  push:
+    branches: [fix/shoe-r09-craft-recovery-20261013]
+    paths: ['.github/workflows/shoe-r09-exposure-completion.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  complete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shoe-r09-candidate-38369200578
+          run-id: 38369200578
+          github-token: ${{ github.token }}
+          path: checked-candidate
+      - name: Verify the exact rendered runtime and every original source fingerprint
+        run: |
+          python shoe-workshop/r09/tools/initialize.py
+          python shoe-workshop/r09/tools/refine_review.py
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          python - <<'PY'
+          import pathlib,json,hashlib,shutil,os
+          p=pathlib.Path('shoe-workshop/r09');a=pathlib.Path('checked-candidate');m=json.loads((a/'BUILD_MANIFEST.json').read_text());sha=lambda b:hashlib.sha256(b).hexdigest()
+          assert m['sourceBuild']=='25cc88995b52fd051dfb986a35bc609ea1e02e1a'
+          assert m['runtime']['sha256']=='22f1ba1c1f5bd596b0d43aba1faea40c386a93d19e6d13442d9bee248d08a8a6'
+          assert sha((a/'public-lite.html').read_bytes())==m['runtime']['sha256']
+          records=[]
+          for f in m['files']:
+            target=p/f['path']
+            if f['path']=='tests/exposure.mjs':
+              assert sha((a/f['path']).read_bytes())==f['sha256']
+              records.append({'path':f['path'],'original':f['sha256'],'corrected':sha(target.read_bytes()),'runtimeChange':False});continue
+            assert sha(target.read_bytes())==f['sha256'],f['path']
+            records.append({'path':f['path'],'sha256':f['sha256'],'unchanged':True})
+          for name,count in [('browser',19),('early',1)]:
+            q=json.loads((a/'evidence'/name/'QA.json').read_text());assert q['sourceBuild']==m['sourceBuild'];assert len(q['checks'])==count;assert all(x['passed'] for x in q['checks']);assert not q['errors'] and not q['consoleErrors']
+          for name,count in [('QA',10),('CRAFT',7)]:
+            q=json.loads((a/'evidence/numerics'/f'{name}.json').read_text());assert q['success'];assert q['sourceBuild']==m['sourceBuild'];assert len(q['checks'])==count
+          n=json.loads((a/'evidence/numerics/QA.json').read_text());assert len(n['needleTests'])==682 and not n['needleMisses']
+          shutil.copytree(a/'evidence',p/'evidence',dirs_exist_ok=True)
+          shutil.copy2(a/'BUILD_MANIFEST.json',p/'BUILD_MANIFEST.json');shutil.copy2(a/'public-lite.html',p/'public-lite.html')
+          proof={'sourceBuild':m['sourceBuild'],'testCommit':os.environ['GITHUB_SHA'],'runtime':m['runtime'],'records':records,'reusedEvidenceRun':38369200578,'reusedEvidenceScope':'19 browser + 10 kernel + 7 craft checks passed; prior job failed on obsolete detectedOldProtrusions>0 fixture before exposure rays. No new whole-suite success claimed.'}
+          (p/'evidence/SOURCE_EQUIVALENCE.json').write_text(json.dumps(proof,indent=2))
+          PY
+      - name: Fresh actual sole and all exposed-span normal-ray checks
+        run: node shoe-workshop/r09/tests/exposure.mjs
+      - name: Close the test-only correction with an honest validation record
+        run: |
+          python - <<'PY'
+          import pathlib,json,os,hashlib
+          p=pathlib.Path('shoe-workshop/r09');load=lambda f:json.loads((p/f).read_text());m=load('BUILD_MANIFEST.json');e=load('evidence/numerics/EXPOSURE.json');s=load('evidence/numerics/SOLE_CONTACT.json')
+          assert e['success'] and not e['occluded'];assert s['remainingSampledProtrusions']==0
+          assert e['sourceBuild']==s['sourceBuild']==m['sourceBuild']
+          old=next(f for f in m['files'] if f['path']=='tests/exposure.mjs');previous=old['sha256'];old['sha256']=hashlib.sha256((p/'tests/exposure.mjs').read_bytes()).hexdigest()
+          m['testAudit']={'commit':os.environ['GITHUB_SHA'],'previousExposureTestSha256':previous,'runtimeUnchanged':True,'reason':'Count original and final defects from actual measurements; do not require an already fixed R08 defect to recur.'}
+          (p/'BUILD_MANIFEST.json').write_text(json.dumps(m,indent=2))
+          r={'sourceBuild':m['sourceBuild'],'runtime':m['runtime'],'runtimeUnchanged':True,'completionRun':os.environ['GITHUB_RUN_ID'],'completionCommit':os.environ['GITHUB_SHA'],'fullBrowserRun':38369200578,'fullBrowserChecks':19,'kernelGroups':10,'craftGroups':7,'needleCentreTests':682,'needleCentreMisses':0,'exposedSpanSamples':e['samples'],'occludedExposedSamples':len(e['occluded']),'soleCoreSamples':s['coreSamples'],'oldCoreProtrusions':s['detectedOldProtrusions'],'remainingCoreProtrusions':s['remainingSampledProtrusions'],'publicVerified':False,'previousRunConclusion':'failure on obsolete regression precondition, now corrected and independently executed','acceptance':{'userVisual':False,'sewingPhysics':False,'manufacturing':False}}
+          (p/'VALIDATION_RECEIPT.json').write_text(json.dumps(r,indent=2))
+          PY
+      - name: Preserve complete source runtime and unambiguous evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r09-exposure-completed-${{ github.run_id }}
+          path: shoe-workshop/r09/
+          include-hidden-files: true
+          retention-days: 14
