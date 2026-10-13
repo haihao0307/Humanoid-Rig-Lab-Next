@@ -29,13 +29,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Source transfer or iteration
+      - name: Recover verification and finish R09
         run: |
-          if test -f hat-workshop/r09/iterate.py; then
-            pip install beautifulsoup4 playwright numpy pillow
-            python -m playwright install --with-deps chromium
-            python -u hat-workshop/r09/iterate.py
-          fi
+          pip install beautifulsoup4 playwright numpy pillow
+          python -m playwright install --with-deps chromium
+          python -u hat-workshop/r09/recover-r09.py
+          python -u hat-workshop/r09/iterate.py
       - name: Save scoped evidence
         if: always()
         run: |
@@ -44,7 +43,7 @@ jobs:
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add hat-workshop/r09
             if ! git diff --cached --quiet; then
-              git commit -m 'test(hat-r09): save iteration evidence [skip ci]'
+              git commit -m 'test(hat-r09): save recovery evidence [skip ci]'
               git push origin HEAD:fix/hat-r09-cache-startup-20261013
             fi
           fi
