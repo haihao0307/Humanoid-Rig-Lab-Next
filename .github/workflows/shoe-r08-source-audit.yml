@@ -1,0 +1,29 @@
+name: Shoe R08 source audit
+on:
+  push:
+    branches: [fix/shoe-r08-seam-contract-20261013]
+    paths: ['.github/workflows/shoe-r08-source-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pinned source dependencies for local reproduction
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          tar --exclude='evidence' --exclude='public-lite.html' --exclude='source-transfer' -czf shoe-r08-source.tgz shoe-workshop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r08-exact-source-${{ github.run_id }}
+          path: shoe-r08-source.tgz
+          retention-days: 7
