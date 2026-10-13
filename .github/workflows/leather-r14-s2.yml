@@ -31,11 +31,12 @@ jobs:
         run: |
           if ! command -v clang-18 || ! command -v wasm-ld-18; then sudo apt-get update -qq && sudo apt-get install -y clang-18 lld-18; fi
           python leather-workshop/s2-performance/prepare.py
+          python leather-workshop/s2-performance/recover-timing.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f leather-workshop/r14
           if ! git diff --cached --quiet; then
-            git commit -m 'build(leather): register R14 S2A candidate sources and explicit native pair ABI'
+            git commit -m 'test(leather): repair asynchronous timing boot guard and retain failure evidence'
             git push origin HEAD:refs/heads/perf/leather-r14-s2-20261013
           fi
           echo "source=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
@@ -95,12 +96,12 @@ jobs:
         run: |
           if ! command -v clang-18 || ! command -v wasm-ld-18; then sudo apt-get update -qq && sudo apt-get install -y clang-18 lld-18; fi
           pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5 playwright==1.55.0
-      - name: Offline actual interaction and raw visual comparison
+      - name: Separate browser timing probes
         run: |
           python leather-workshop/r14/build.py
-          xvfb-run -a python -u leather-workshop/r14/qa-browser-s2.py
-      - name: Separate browser timing probes
-        run: xvfb-run -a python -u leather-workshop/r14/qa-browser-performance.py
+          xvfb-run -a python -u leather-workshop/r14/qa-browser-performance.py
+      - name: Offline actual interaction and raw visual comparison
+        run: xvfb-run -a python -u leather-workshop/r14/qa-browser-s2.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
