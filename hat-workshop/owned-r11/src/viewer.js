@@ -133,7 +133,11 @@ function boot(){
  const key=new T.DirectionalLight('#fffaf1',3.0);key.position.set(-.20,.60,.65);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.radius=4;key.shadow.blurSamples=8;key.shadow.camera.left=-.29;key.shadow.camera.right=.29;key.shadow.camera.top=.36;key.shadow.camera.bottom=-.32;key.shadow.camera.near=.02;key.shadow.camera.far=2.8;key.shadow.bias=-.000015;key.shadow.normalBias=.00010;scene.add(key);
  const fill=new T.DirectionalLight('#e4edf5',.65);fill.position.set(.55,.25,.4);scene.add(fill);const rim=new T.DirectionalLight('#faf5ea',.85);rim.position.set(.44,.34,-.40);scene.add(rim);lights={key,fill,rim};
  floor=new T.Mesh(new T.PlaneGeometry(20,20),new T.MeshStandardMaterial({color:'#adb0a7',roughness:.86}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=false;scene.add(floor);
- const resize=()=>{const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();drawSoon();};new ResizeObserver(resize).observe(canvas.parentElement);resize();
+ // R11_LAYOUT_1: do not write intrinsic canvas dimensions from an observer notification.
+ let resizeFrame=0;
+ const resizeNow=()=>{resizeFrame=0;const r=canvas.parentElement.getBoundingClientRect(),w=Math.max(1,Math.floor(r.width)),h=Math.max(1,Math.floor(r.height)),size=renderer.getSize(new T.Vector2());if(size.x!==w||size.y!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();drawSoon();}};
+ const resize=()=>{if(!resizeFrame)resizeFrame=requestAnimationFrame(resizeNow);};
+ new ResizeObserver(resize).observe(canvas.parentElement);resizeNow();
  let down=null;
  canvas.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);});
  canvas.addEventListener('pointermove',e=>{if(!down)return;yaw-=(e.clientX-down.x)*.008;pitch=Math.max(-1.5,Math.min(1.5,pitch+(e.clientY-down.y)*.006));down={x:e.clientX,y:e.clientY};drawSoon();});
