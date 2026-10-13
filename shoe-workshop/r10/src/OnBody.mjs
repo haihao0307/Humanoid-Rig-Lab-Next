@@ -20,10 +20,10 @@ async function main(){
      const nearby=rim.filter(t=>Math.abs(t.z-p.z)<.010),rimY=nearby.length?Math.min(...nearby.map(t=>t.y)):null;
      // Skin above the lower collar rim is supposed to remain exposed. Test
      // only points below that real rim; record the excluded ankle count.
-     if(rimY===null||p.y>rimY-.008){exposedAnkle++;continue;}
+     if(rimY===null||p.y>rimY-.001){exposedAnkle++;continue;}
      const sign=p.x<center?-1:1;ray.set(p.clone().add(new T.Vector3(sign*.5,0,0)),new T.Vector3(-sign,0,0));const hit=ray.intersectObjects(upper,false)[0];samples.push({i,position:p.toArray(),rimY,clearanceMm:hit?(hit.point.x-p.x)*sign*1000:null});}
     results.push({side:f.side,samples:samples.length,exposedAnkleExcluded:exposedAnkle,misses:samples.filter(s=>s.clearanceMm===null).length,penetrating:samples.filter(s=>s.clearanceMm!==null&&s.clearanceMm<-.2).length,minClearanceMm:Math.min(...samples.filter(s=>s.clearanceMm!==null).map(s=>s.clearanceMm)),details:samples});}
-   return{scope:'Current stance rear-half lateral rays at every fourth display vertex below the actual lower collar rim minus 8mm. Exposed ankle is counted separately. Not all-volume or dynamic certification.',results};
+   return{scope:'Current stance rear-half lateral rays at every fourth display vertex below the actual lower collar rim minus 1mm. Exposed ankle is counted separately. Not all-volume or dynamic certification.',results};
   }
   function footBox(){sync();return new T.Box3().setFromObject(pair.root);}
   function view(which){if(which==='full'){V.view('full');return;}const b=footBox(),center=b.getCenter(new T.Vector3()),r=b.getBoundingSphere(new T.Sphere()).radius,dirs={feet:[.8,.48,1],side:[1,.18,.06],top:[.001,1,.05],bottom:[0,-1,.05]};const direction=new T.Vector3(...(dirs[which]||dirs.feet)).normalize(),a=Math.min(V.camera.fov*Math.PI/360,Math.atan(Math.tan(V.camera.fov*Math.PI/360)*V.camera.aspect));V.camera.up.set(0,1,0);V.camera.position.copy(center).addScaledVector(direction,r/Math.sin(a)*1.10);V.orbit.target.copy(center);V.camera.zoom=1;V.camera.near=.01;V.camera.updateProjectionMatrix();V.orbit.update();V.render();}
