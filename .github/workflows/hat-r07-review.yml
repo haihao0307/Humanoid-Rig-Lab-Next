@@ -33,42 +33,39 @@ jobs:
         run: |
           pip install playwright beautifulsoup4 numpy pillow scipy trimesh rtree
           python -m playwright install --with-deps chromium
-      - name: Baseline reproduction or candidate build
+      - name: Build and review R07.1
         env:
           HAT_SOURCE_SHA: ${{ github.sha }}
         run: |
-          mkdir -p hat-workshop/r07
-          if test -f hat-workshop/r07/review.py; then
-            python hat-workshop/r07/review.py
-          else
-            python - <<'PY'
+          python hat-workshop/r07/finish-r071.py
+          python hat-workshop/r07/review.py
+      - name: Preserve visual review immediately
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r07-visual-${{ github.run_id }}
+          path: hat-workshop/r07
+          retention-days: 7
+      - name: Full static nearest-triangle audit
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+        run: |
+          python -u hat-workshop/r07/check_distance.py
+          python - <<'PY'
           from pathlib import Path
-          import json,time,gzip
-          from playwright.sync_api import sync_playwright
-          R=Path('hat-workshop/r06').resolve(); O=Path('hat-workshop/r07/baseline');O.mkdir(parents=True,exist_ok=True)
-          report={'baseline':'7e72ff29495ca2307858dfd5ea1375423d30dda1','cases':[],'errors':[]}
-          with sync_playwright() as p:
-            b=p.chromium.launch(headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader','--use-angle=swiftshader'])
-            page=b.new_page(viewport={'width':1440,'height':1000},device_scale_factor=1)
-            page.on('pageerror',lambda e:report['errors'].append(str(e)))
-            page.goto(R.joinpath('standalone.html').as_uri()+'#hat=trilby',wait_until='domcontentloaded',timeout=180000)
-            page.wait_for_function('window.hatLab && hatLab.ready()',timeout=240000)
-            for hat in ['trilby','cloche','chef','cable','flatcap']:
-              st=time.perf_counter();page.evaluate('(id)=>hatLab.select(id)',hat)
-              page.wait_for_function('hatLab.ready()',timeout=240000)
-              row={'hat':hat,'switchWallMS':(time.perf_counter()-st)*1000,'metrics':page.evaluate('hatLab.metrics()'),'recipe':page.evaluate('hatLab.recipe()')}
-              report['cases'].append(row)
-              for view in ['three','front','inside','side']:
-                page.evaluate('(v)=>hatLab.frame(v)',view);page.wait_for_timeout(200)
-                page.locator('#canvas').screenshot(path=str(O/f'{hat}-{view}.png'))
-              if hat=='flatcap':
-                geo=page.evaluate('hatLab.debugGeometry()');geo['baseline']=page.evaluate('hatLab.baselinePositions()');geo['mother']=page.evaluate('hatLab.mother()')
-                (O/'flatcap-geometry.json.gz').write_bytes(gzip.compress(json.dumps(geo).encode()))
-              (O/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
-            b.close()
-          print(json.dumps(report,ensure_ascii=False))
+          import json
+          R=Path('hat-workshop/r07')
+          d=json.loads((R/'DELIVERY.json').read_text())
+          numeric=json.loads((R/'qa/numeric/report.json').read_text())
+          distance=json.loads((R/'qa/numeric/DISTANCE_REPORT.json').read_text())
+          audit=json.loads((R/'qa/numeric/GEOMETRY_AUDIT.json').read_text())
+          assert numeric['passed'] and distance['passed'] and audit['passed']
+          d['nearestTriangleDistanceAudit']={'passed':distance['passed'],'cases':len(distance['checks']),'scope':distance['scope']}
+          d['cavityContainmentAudit']={'passed':audit['passed'],'cases':len(audit['records'])}
+          d['unchangedOtherHatCases']=len(audit['unchanged'])
+          d['allNumericChecksPassed']=True
+          (R/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2))
           PY
-          fi
       - name: Save scoped records
         if: always()
         run: |
@@ -76,16 +73,16 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add hat-workshop/r07
           if ! git diff --cached --quiet; then
-            git commit -m 'test(hat-r07): record isolated browser review [skip ci]'
+            git commit -m 'test(hat-r07): record final public and numerical review [skip ci]'
             git push origin HEAD:fix/hat-r07-seams-crown-switch-20261013
           fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: hat-r07-review-${{ github.run_id }}
+          name: hat-r07-audit-${{ github.run_id }}
           path: |
-            hat-workshop/r07
-            hat-workshop/r06
-            hat-workshop/r04/app.bundle.js
-            hat-workshop/r04/standalone.html
+            hat-workshop/r07/qa/numeric
+            hat-workshop/r07/DELIVERY.json
+            hat-workshop/r07/qa/browser/report.json
+            hat-workshop/r07/qa/public/report.json
           retention-days: 7
