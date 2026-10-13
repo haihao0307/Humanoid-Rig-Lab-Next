@@ -1,0 +1,50 @@
+name: EB1 complete runtime inputs
+on:
+  push:
+    branches: [feature/eb1-unified-lighting-20261013]
+    paths: [.github/workflows/eb1-runtime-inputs.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inputs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Fetch exact public native files including protected assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p inputs
+          cat > /tmp/inputs.py <<'PY'
+          import pathlib,json,urllib.request,urllib.parse,concurrent.futures,os,time,hashlib
+          root=pathlib.Path('inputs');receipt={}
+          def get(url,api=False):
+              h={'User-Agent':'KAOPU-EB1-input-recovery'}
+              if api:h['Authorization']='Bearer '+os.environ['GH_TOKEN']
+              for i in range(4):
+                  try:
+                      with urllib.request.urlopen(urllib.request.Request(url,headers=h),timeout=90) as r:return r.read()
+                  except Exception:
+                      if i==3:raise
+                      time.sleep(2+i)
+          h='haihao0307/Humanoid-Rig-Lab-Next';g='haihao0307/guilin-dem-pipeline'
+          jobs=[('leather',h,'58f2d391a9dfb61baa16f3cafbd775e2814fe642',['leather-workshop/r16/']),('hat',h,'fbc80722683b73bc63bf2d55d2891f118037d800',['hat-workshop/r09/','hat-workshop/r04/app.bundle.js','hat-workshop/r04/standalone.html']),('shoe',h,'661fb28a57c3fc1c327418c1774f3b2f3b1f3e03',['shoe-workshop/r08/','shoe-workshop/r02/','shoe-workshop/r04/','leather-workshop/r10/']),('tailor',g,'d00fc2de66dcf57367443d7ecfdc60977bc2b6ee',['kaopu-tailor-workbench/material-products/r04-4-1/'])]
+          for name,repo,ref,prefix in jobs:
+              tree=json.loads(get(f'https://api.github.com/repos/{repo}/git/trees/{ref}?recursive=1',True));assert not tree.get('truncated')
+              entries=[e for e in tree['tree'] if e['type']=='blob' and any(e['path'].startswith(p) for p in prefix) and not any(x in e['path'] for x in ['/qa/','/acceptance/','/node_modules/'])]
+              def download(e):
+                  data=get(f'https://raw.githubusercontent.com/{repo}/{ref}/'+urllib.parse.quote(e['path']))
+                  assert len(data)==e['size'],e['path']
+                  p=root/name/e['path'];p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
+                  return e['path'],{'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+              with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:items=dict(pool.map(download,entries))
+              receipt[name]={'repo':repo,'commit':ref,'files':items};print(name,len(items),sum(e['bytes'] for e in items.values()),flush=True)
+          (root/'INPUTS.json').write_text(json.dumps(receipt,indent=2))
+          PY
+          python /tmp/inputs.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eb1-complete-inputs
+          path: inputs
+          retention-days: 14
