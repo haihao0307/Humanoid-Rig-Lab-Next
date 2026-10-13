@@ -1,0 +1,113 @@
+name: Shoe R09 verified artifact publication
+on:
+  push:
+    branches: [fix/shoe-r09-craft-recovery-20261013]
+    paths: ['.github/workflows/shoe-r09-publish-verified.yml']
+permissions: {}
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      build_sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          fetch-depth: 1
+      - uses: actions/download-artifact@v4
+        with:
+          name: shoe-r09-exposure-completed-38371237362
+          run-id: 38371237362
+          github-token: ${{ github.token }}
+          path: verified-artifact
+      - name: Validate immutable artifact as data; execute no project or artifact code
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -I - <<'PY'
+          import os,pathlib,json,hashlib,shutil,urllib.request
+          api='https://api.github.com/repos/haihao0307/Humanoid-Rig-Lab-Next/'
+          def get(path):
+              req=urllib.request.Request(api+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=30) as response:return json.load(response)
+          run=get('actions/runs/38371237362');artifact=get('actions/artifacts/11799585144')
+          assert run['conclusion']=='success' and run['head_sha']=='1a81ce0b1f47dddf2c9488ecfb6b81fb6d4c8a3e'
+          assert artifact['digest']=='sha256:d3a602de72f1cdaac898ae544a55981e532b28e42906bd72fe626f560cc298af'
+          assert artifact['workflow_run']['id']==38371237362 and not artifact['expired']
+          a=pathlib.Path('verified-artifact');p=pathlib.Path('shoe-workshop/r09');load=lambda f:json.loads((a/f).read_text());sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+          m=load('BUILD_MANIFEST.json');v=load('VALIDATION_RECEIPT.json');e=load('evidence/numerics/EXPOSURE.json');s=load('evidence/numerics/SOLE_CONTACT.json')
+          expected='22f1ba1c1f5bd596b0d43aba1faea40c386a93d19e6d13442d9bee248d08a8a6'
+          assert m['sourceBuild']=='25cc88995b52fd051dfb986a35bc609ea1e02e1a'
+          assert m['runtime']['sha256']==sha(a/'public-lite.html')==expected
+          assert (a/'public-lite.html').stat().st_size==m['runtime']['bytes']==4263732
+          assert v['runtimeUnchanged'] and v['completionRun']=='38371237362'
+          assert v['fullBrowserChecks']==19 and v['needleCentreTests']==682 and v['needleCentreMisses']==0
+          assert e['success'] and e['samples']==921 and not e['occluded']
+          assert s['coreSamples']==217 and s['remainingSampledProtrusions']==0
+          for f in m['files']:
+              if 'node_modules' in pathlib.PurePosixPath(f['path']).parts:continue
+              target=(a/f['path']) if not f['path'].startswith('../') else (p/f['path'])
+              assert sha(target)==f['sha256'],f['path']
+          copied=[]
+          for source in a.rglob('*'):
+              assert not source.is_symlink()
+              if not source.is_file():continue
+              rel=source.relative_to(a)
+              assert '..' not in rel.parts and '.git' not in rel.parts and '.github' not in rel.parts
+              if source.suffix=='.png':continue
+              assert source.suffix in ['.json','.mjs','.py','.css','.html','.md','.txt'] or source.name=='.gitignore',str(rel)
+              dest=p/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,dest);copied.append(str(rel))
+          proof={'artifactId':11799585144,'artifactDigest':artifact['digest'],'completionRun':38371237362,'sourceBuild':m['sourceBuild'],'runtimeSha256':expected,'copiedFiles':copied,'projectCodeExecutedInWriteJob':False,'publicVerified':False}
+          (p/'PROMOTION_RECEIPT.json').write_text(json.dumps(proof,indent=2))
+          PY
+      - name: Append only the verified R09 directory to its dedicated branch
+        id: commit
+        run: |
+          test "$GITHUB_REF_NAME" = 'fix/shoe-r09-craft-recovery-20261013'
+          remote_sha=$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)
+          test "$remote_sha" = "$GITHUB_SHA"
+          git config core.hooksPath /dev/null
+          git config user.name 'Shoe R09 Artifact Publication'
+          git config user.email 'shoe-r09@users.noreply.github.com'
+          git add -- shoe-workshop/r09
+          if git diff --cached --name-only | grep -v '^shoe-workshop/r09/'; then exit 1; fi
+          git commit -m 'build(shoes): immutable audited R09 craft runtime and readable source [skip ci]'
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  public_verification:
+    needs: promote
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.promote.outputs.build_sha }}
+          sparse-checkout: shoe-workshop
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser test dependencies in read-only job
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Exact public bytes and real public-browser interactions
+        env:
+          PUBLIC_BUILD_SHA: ${{ needs.promote.outputs.build_sha }}
+        run: node shoe-workshop/r09/tests/browser.mjs --public
+      - name: Preserve actual public evidence and tested build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r09-public-${{ github.run_id }}
+          path: |
+            shoe-workshop/r09/evidence/public/
+            shoe-workshop/r09/PUBLIC_URL.txt
+            shoe-workshop/r09/BUILD_MANIFEST.json
+          retention-days: 14
