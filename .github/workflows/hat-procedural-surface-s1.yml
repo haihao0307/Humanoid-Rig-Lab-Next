@@ -1,0 +1,60 @@
+name: Hat Procedural Surface S1
+on:
+  push:
+    branches: [feature/hat-procedural-surface-s1-20261013]
+    paths:
+      - 'hat-workshop/surface-s1/**'
+      - '.github/workflows/hat-procedural-surface-s1.yml'
+permissions:
+  contents: write
+concurrency:
+  group: hat-procedural-surface-s1-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/source-study-s0
+            hat-workshop/surface-s1
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded browser test dependencies
+        run: |
+          pip install pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Verify source and assemble
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node --check hat-workshop/surface-s1/surface.js
+          rm -rf hat-workshop/surface-s1/qa
+          python hat-workshop/surface-s1/build.py --source "$GITHUB_SHA"
+      - name: Save inspectable candidate before validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: hat-surface-s1-build-${{ github.run_id }}
+          path: hat-workshop/surface-s1
+          retention-days: 7
+      - name: Native browser all eleven
+        run: python hat-workshop/surface-s1/qa.py --source "$GITHUB_SHA"
+      - name: Publish guarded candidate
+        id: publish
+        run: python hat-workshop/surface-s1/publish.py build --source "$GITHUB_SHA"
+      - name: Independent fixed-public browser all eleven
+        run: python hat-workshop/surface-s1/qa.py --source "$GITHUB_SHA" --url '${{ steps.publish.outputs.url }}'
+      - name: Save verified public receipt
+        run: python hat-workshop/surface-s1/publish.py receipt --source "$GITHUB_SHA" --build '${{ steps.publish.outputs.build }}'
+      - name: Preserve all actual images and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hat-surface-s1-evidence-${{ github.run_id }}
+          path: hat-workshop/surface-s1
+          retention-days: 7
