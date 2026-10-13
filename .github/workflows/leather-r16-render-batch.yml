@@ -1,0 +1,179 @@
+name: Leather R16 rendering batch
+on:
+  push:
+    branches: [perf/leather-r16-render-batch-20261013]
+    paths: [.github/workflows/leather-r16-render-batch.yml, leather-workshop/s2c-render/**, leather-workshop/r16/**]
+permissions:
+  contents: write
+concurrency:
+  group: leather-r16-render-batch
+  cancel-in-progress: true
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      source: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: leather-workshop
+      - name: Register one canonical edition before all independent tests
+        id: source
+        run: |
+          if [ ! -d leather-workshop/r16 ]; then
+            python leather-workshop/s2c-render/prepare.py
+            python leather-workshop/s2c-render/finalize.py
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -f leather-workshop/r16
+            git commit -m 'perf(leather): register R16 demand display, independent card rendering and integer skin texels'
+            git push origin HEAD:refs/heads/perf/leather-r16-render-batch-20261013
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  verify:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        lane: [cpu, browser, extended, gpu]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact source-build and browser dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang-18 lld-18
+          pip -q install -r leather-workshop/r16/requirements-build.txt playwright==1.55.0
+      - name: Numerical, geometry, protocol and source invariants
+        if: matrix.lane == 'cpu'
+        run: python -u leather-workshop/r16/verify-render.py
+      - name: Build separately for each browser lane
+        if: matrix.lane != 'cpu'
+        run: python -u leather-workshop/r16/build.py
+      - name: Uninstrumented original visual and pointer regression
+        if: matrix.lane == 'browser'
+        run: python -u leather-workshop/r16/qa-browser-s2b.py
+      - name: Sustained switching, idle, thumbnail and deformed pixels
+        if: matrix.lane == 'extended'
+        run: python -u leather-workshop/r16/qa-render-batch.py
+      - name: Separate alternating GPU-duration measurements
+        if: matrix.lane == 'gpu'
+        run: python -u leather-workshop/r16/qa-render-batch.py --gpu
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r16-${{ matrix.lane }}-${{ github.run_id }}
+          path: |
+            leather-workshop/r16/out/candidate-r16.html
+            leather-workshop/r16/BUILD_RESULT.json
+            leather-workshop/r16/qa/**/*.json
+            leather-workshop/r16/qa/**/*.png
+          retention-days: 14
+  publish:
+    needs: [prepare, verify]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r16-cpu-${{ github.run_id }}
+          path: /tmp/cpu
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r16-browser-${{ github.run_id }}
+          path: /tmp/browser
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r16-extended-${{ github.run_id }}
+          path: /tmp/extended
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r16-gpu-${{ github.run_id }}
+          path: /tmp/gpu
+      - name: Publish identical independently built bytes after scope checks
+        run: |
+          git fetch --depth=1 origin 57865c3a033a7aee7f3dc02834ee7d896425a877
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil,subprocess,os
+          r=Path('leather-workshop/r16');lanes=['cpu','browser','extended','gpu'];data=Path('/tmp/cpu/out/candidate-r16.html').read_bytes()
+          for lane in lanes:
+            assert Path('/tmp',lane,'out/candidate-r16.html').read_bytes()==data,lane
+          expected={'cpu':'qa/render-batch/SUMMARY.json','browser':'qa/render-batch/browser/report.json','extended':'qa/render-batch/extended/report.json','gpu':'qa/render-batch/gpu/report.json'}
+          for lane,report in expected.items():assert json.loads(Path('/tmp',lane,report).read_text())['pass'],lane
+          paths=subprocess.check_output(['git','diff','--name-only','57865c3a033a7aee7f3dc02834ee7d896425a877','HEAD'],text=True).splitlines()
+          assert all(x.startswith(('leather-workshop/r16/','leather-workshop/s2c-render/')) or x=='.github/workflows/leather-r16-render-batch.yml' for x in paths),paths
+          assert os.environ['LEATHER_SOURCE_COMMIT'].encode() in data
+          for lane in lanes:shutil.copytree(Path('/tmp',lane,'qa'),r/'qa',dirs_exist_ok=True)
+          (r/'public-lite.html').write_bytes(data);shutil.copy2('/tmp/cpu/BUILD_RESULT.json',r/'BUILD_RESULT.json')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r16/public-lite.html leather-workshop/r16/BUILD_RESULT.json
+          find leather-workshop/r16/qa -name '*.json' -print0 | xargs -0 git add -f
+          git commit -m 'build(leather): publish R16 complete rendering batch after four independent verification lanes'
+          git push origin HEAD:refs/heads/perf/leather-r16-render-batch-20261013
+          echo "BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r16/public-lite.html" >> "$GITHUB_ENV"
+      - name: Fresh exact-byte public browser validation
+        run: |
+          pip -q install playwright==1.55.0 Pillow==12.3.0
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,os
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/leather-workshop/r16/public-lite.html'
+          with urllib.request.urlopen(url,timeout=60) as q:assert q.read()==Path('leather-workshop/r16/public-lite.html').read_bytes()
+          PY
+          python -u leather-workshop/r16/qa-browser-s2b.py --public --url "$PREVIEW"
+      - name: Final receipt with actual scope and no universal FPS claim
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          r=Path('leather-workshop/r16');files=['qa/render-batch/SUMMARY.json','qa/render-batch/frame-flow.json','qa/render-batch/browser/report.json','qa/render-batch/extended/report.json','qa/render-batch/gpu/report.json','qa/render-batch/public/report.json','qa/s1b/equivalence.json','qa/s2b/pose-stream.json','qa/numeric.json','qa/s1b2/app-interfaces.json'];reports={}
+          for f in files:
+            p=r/f;q=json.loads(p.read_text());assert q['pass'],f;reports[f]=hashlib.sha256(p.read_bytes()).hexdigest()
+          summary=json.loads((r/files[0]).read_text());gpu=json.loads((r/'qa/render-batch/gpu/report.json').read_text());rows=[{'product':q['product'],'label':q['label'],'iteration':q['iteration'],'gpu':q['gpu'],'supported':q['supported'],'renderer':q['renderer'],'cpu':q['cpu']} for q in gpu['rows']]
+          d={'version':'R16.0-RENDER','phase':'S2C_RENDERING_BATCH','sourceCommit':os.environ['LEATHER_SOURCE_COMMIT'],'buildCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'previewURL':os.environ['PREVIEW'],'htmlSHA256':hashlib.sha256((r/'public-lite.html').read_bytes()).hexdigest(),'htmlBytes':(r/'public-lite.html').stat().st_size,'baselineBuild':'70883deb4659b601faacf5eb49277eee4774b824','nativeIdenticalToR15':True,'sourceChecks':summary['checkCount'],'frameFlowChecks':22,'numericCases':18,'geometryCases':25,'full52StepTrajectories':6,'poseProtocolChecks':45,'appCases':25,'offlineBrowserChecks':len(json.loads((r/'qa/render-batch/browser/report.json').read_text())['checks']),'extendedBrowserChecks':len(json.loads((r/'qa/render-batch/extended/report.json').read_text())['checks']),'publicBrowserChecks':len(json.loads((r/'qa/render-batch/public/report.json').read_text())['checks']),'gpuABBA':rows,'offlineBrowserVerified':True,'publicBrowserVerified':True,'batchComplete':True,'fullS2Complete':False,'userVisualAcceptance':'PENDING','productionReady':False,'commercialLegalClearance':False,'reports':reports,'limits':['Software Chrome GPU-duration is not physical-display latency or universal real-GPU performance','No physical timestep, collision precision, lighting, shadow resolution or model detail reduced','Lifecycle-event test and390x844 viewport are not physical-device certification','Demand-driven display still presents true completed solver poses','Legacy rights and material calibration remain separate']}
+          (r/'DELIVERY.json').write_text(json.dumps(d,indent=2)+'\n')
+          PY
+          git add -f leather-workshop/r16/DELIVERY.json leather-workshop/r16/qa/render-batch/public/report.json
+          git commit -m 'test(leather): record immutable R16 public acceptance and measured rendering limits'
+          git push origin HEAD:refs/heads/perf/leather-r16-render-batch-20261013
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r16-delivery-${{ github.run_id }}
+          path: |
+            leather-workshop/r16/public-lite.html
+            leather-workshop/r16/DELIVERY.json
+            leather-workshop/r16/BUILD_RESULT.json
+            leather-workshop/r16/qa/**/*.json
+            leather-workshop/r16/qa/**/*.png
+          retention-days: 14
