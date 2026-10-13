@@ -102,7 +102,7 @@ try:
    check('worker timeout leaves original visible',page.evaluate('hatLab.metrics().hat')=='trilby');check('timeout message visible','超过' in page.locator('#status').inner_text())
    page.evaluate('__stallWorker=false');click_hat(page,'flatcap','after-worker-timeout');context.close()
    context,page,requests=open_page(b,mode='stall');page.wait_for_function("hatLab.performance().detailState==='retry'",timeout=20000)
-   check('detail timeout does not block ready',page.evaluate('hatLab.ready()));click_hat(page,'chef','after-detail-timeout');context.close()
+   check('detail timeout does not block ready',page.evaluate('hatLab.ready()'));click_hat(page,'chef','after-detail-timeout');context.close()
   context,page,requests=open_page(b,mode='stall');page.set_viewport_size({'width':390,'height':844});click_hat(page,'flatcap','mobile-viewport')
   page.screenshot(path=str(Q/'mobile-viewport.png'));report['mobileScope']='390x844 viewport only; not a physical phone';context.close();b.close()
  check('no application exceptions',not report['pageErrors'],report['pageErrors']);report['passed']=True;save();print(json.dumps({'passed':True,'checks':len(report['checks']),'clicks':len(report['clicks'])}),flush=True)
