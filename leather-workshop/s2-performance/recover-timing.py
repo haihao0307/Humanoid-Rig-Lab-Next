@@ -1,10 +1,11 @@
 """One-time repair of the interrupted S2 timing test, not a production adapter.
 The original failing predicate optional-chained an undeclared identifier. Check
 window's property during asynchronous boot instead; preserve all timing gates.
-Only the test and its exact source-lock entry may change. No runtime changes.
+repair() changes the test and its lock only. The separate packing stage below
+registers its own explicitly reviewed production edit; normal build uses neither.
 """
 from pathlib import Path
-import hashlib,json,subprocess
+import hashlib,json,subprocess,sys
 ROOT=Path(__file__).resolve().parent.parent/'r14'
 EXPECTED_BLOB='2b44dd190a7a78c57c908b6ae70a7e2740a85bef'
 def blob(b):return hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
@@ -19,7 +20,6 @@ def repair():
  before='p.wait_for_function(\'LEATHER_ATELIER?.ready\',timeout=180000)'
  after='p.wait_for_function(\'window.LEATHER_ATELIER?.ready\',timeout=180000)'
  assert s.count(before)==1;s=s.replace(before,after)
- # Preserve partial evidence on every failure, rather than losing the run.
  before='rows=[]\nwith sync_playwright() as pw:'
  after='''rows=[]
 # S2_TIMING_BOOT_RECOVERY_20261013
@@ -55,4 +55,6 @@ Previous run 38342383451 passed CPU/native/trajectory/performance and 45 ordinar
 Four executable Node VM assertions cover the original failure and absent/not-ready/ready states. Failures now retain partial timing evidence and traceback as pass=false. The old successful suites are evidence of the interrupted attempt only; delivery requires a fresh complete workflow, then the immutable public URL check. The regular production build never imports this one-time recovery script.
 ''')
  print('Registered timing-test startup repair; production runtime unchanged')
-if __name__=='__main__':repair()
+if __name__=='__main__':
+ repair()
+ subprocess.run([sys.executable,str(Path(__file__).with_name('optimize-packing.py'))],check=True)
