@@ -1,0 +1,49 @@
+name: Leather R16 rendering batch
+on:
+  push:
+    branches: [perf/leather-r16-render-batch-20261013]
+    paths: [.github/workflows/leather-r16-render-batch.yml, leather-workshop/s2c-render/**, leather-workshop/r16/**]
+permissions:
+  contents: read
+concurrency:
+  group: leather-r16-render-batch
+  cancel-in-progress: true
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            leather-workshop/r15
+            leather-workshop/r14
+            leather-workshop/r13
+            leather-workshop/r12
+            leather-workshop/s2c-render
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Save exact canonical source for local review
+        run: |
+          mkdir -p /tmp/r16-source
+          tar -czf /tmp/r16-source/source.tgz leather-workshop AGENTS.md
+          git rev-parse HEAD > /tmp/r16-source/commit.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-r16-source
+          path: /tmp/r16-source/
+          retention-days: 14
+      - name: Measure actual browser frame cadence and GPU when supported
+        run: |
+          pip -q install playwright==1.55.0
+          python -u leather-workshop/s2c-render/qa-cadence.py --page leather-workshop/r15/public-lite.html --out /tmp/r16-cadence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r16-baseline-${{ github.run_id }}
+          path: /tmp/r16-cadence/cadence.json
+          retention-days: 14
