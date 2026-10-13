@@ -1,19 +1,42 @@
-# R16 rendering batch — one integrated delivery
+# R16 rendering batch — verified and merged
 
-Base: R15 public70883deb4659b601faacf5eb49277eee4774b824, integration57865c3a033a7aee7f3dc02834ee7d896425a877. User requested larger integrated increments; this batch includes source diagnosis, shader addressing, scene/card invalidation, demand-driven display clock, lifecycle wakeup and sustained-operation verification. No separate tiny release is intended.
+Current status: S2C_BATCH_DELIVERED_AND_MERGED_USER_REVIEW_PENDING. Integration branch perf/leather-r10-input-20261011. PR70 merged as dc0b6e3832c1e4bf5356ef7e86322570c48e4d17; main and old R01–R15 remain unchanged. User requested coherent larger increments rather than per-function releases.
 
-Fresh baseline38360802190: visible focused software Chrome; idle rAF median16.7ms; continuous static wallet GPU median413.38ms, frame median416.7ms, CPU submission0.7ms; grab GPU median498.13ms. Without draws rAF returned to16.7ms. This supports a rendering bottleneck in this software environment, not a universal real-GPU diagnosis or physical-screen latency measurement.
+## Open the standalone public mirror
 
-Changes: WebGL2 integer texel reads address the same three-column nearest-filtered node texture. IDs, frames, geometry and material arithmetic stay unchanged. Scene and thumbnail invalidation no longer redraw the hero for a card-only animation. A single demand-driven rAF stops when idle; completed true solver poses wake it. Visibility/page lifecycle restore marks the current view dirty, without resetting/pacing/skipping physics. The input cancellation rules and R15 bounded pose protocol remain intact.
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/0a9f4dad16f6005da9b0fa8b5e8040323d24d9df/leather-workshop/r16/public-lite.html
 
-Normal build uses only canonical R16 sources. prepare.py is a one-time registration tool and must not overwrite an existing source directory. No old edition is overwritten. C/WASM, geometry, texture maps, lighting, resolution, shadows, collision, friction, steps and iterations remain protected.
+Runtime source43d7fde7bc6646032a2154fc25f800807b60a0c7; test observation correction50a0126b1e2c099c956bdab72b5461a0819f256a; immutable build0a9f4dad16f6005da9b0fa8b5e8040323d24d9df; receipt58f2d391a9dfb61baa16f3cafbd775e2814fe642. HTML3,632,731 bytes; SHA256e6ae062e2e6bdf0cca2630e8bb12895dd95db0c8a532609d541142ffb290f67a. It runs as a standalone file without a server.
 
-Gates: independent source/native builds; old18 numeric/25 geometry/6x52 trajectories/45 pose protocol/25 app semantics;22 frame/address checks; original45 offline and16 public browser checks; additional idle/card/200 view commands/24 product rebuilds/26 materials/12 craft changes/continuous pointer/lifecycle and three deformed pixel pairs; separate ABBA GPU probes. Production snapshots never include timing hooks. A simulated lifecycle event or390x844 viewport is not physical-device certification. Pure screen presentation remains unmeasured. Failed results retain their exact scope.
+## Integrated changes
 
-Sources: https://threejs.org/manual/pages/rendering-on-demand.html ; https://developer.mozilla.org/en-US/docs/Web/API/EXT_disjoint_timer_query ; WebGL2 integer texel addressing is verified against every generated node address and real render differences. Algorithms and permitted upstream implementations retain their original attribution. This is not legal clearance.
+WebGL2 integer texel reads preserve the same three-column nearest-filtered node data. Scene and thumbnail invalidation are separate, so card animation does not redraw an unchanged hero. One demand-driven animation-frame loop stops when settled. Completed real solver poses, camera/material/craft events, page lifecycle restoration and specimen resume wake the display. Explicit application composition and the bounded pose transport remain in use.
 
-- [x] Actual source work, not generated images or stand-in meshes.
-- [ ] Interactive standalone and fixed public browser validated: final DELIVERY.json controls promotion.
-- [ ] User acceptance remains pending.
+Normal build reads canonical R16 source only. Preparation is historical registration, not a production dependency. Native C/WASM and autonomous simulation pump are unchanged; no physical step, candidate, CCD, friction, timestep, iteration, geometry, material, wear, thickness, lighting, shadow or resolution is reduced.
 
-Merge only after successful gates into the existing leather integration branch, not repository main. Recovery: Issue52, TASK_STATE.json and r16/RENDER_BATCH_ANCHOR.json. Preserve R01–R15, jacket removal and disabled R11 random field.
+## Verified evidence and failures retained
+
+38362866018: CPU, basic browser and GPU lanes succeeded; the extended observation failed, so the entire run was not successful. 38363713867 corrected only the observation window and completed extended plus public browser gates using the same tested runtime bytes. DELIVERY.json records both provenance paths.
+
+142 source gates,22 frame/address checks,18 numeric cases,25 geometry cases including six52-step trajectories,45 transport protocol checks and25 app interface cases.45 basic offline,47 extended and16 public browser checks passed. Tests include200 synchronous view commands,24 product rebuilds,26 material changes,12 craft changes, actual pointer cancellation, explicit lifecycle events and specimen pause/resume. Counts are nested, not additive.
+
+Nine original static image pairs are pixel-identical. Two additional deformed pairs are exact; the deformed wallet meanRGB difference0.0049200492 and maximum channel difference4/255 remain inside the predefined tolerance. Do not claim all12 pairs are exact. Six controlled physical trajectories retain zero position difference.
+
+The initial extended test assumed two thumbnail frames would complete within800ms. It now observes two actual draw events and records duration, with10s only as a deadlock bound. The measured duration was about3997ms; no performance threshold or production code was changed to hide that cost.
+
+The recovery re-downloaded finalArtifact11796670440 and checked its ZIP digest, the HTML and10 report hashes, and12 original image pairs. See qa/render-batch/RECOVERY_20261013.json. That artifact recheck is not an additional local browser execution.
+
+## Performance and scope
+
+Demand rendering eliminates redundant work; it does not establish a general reduction of each active draw. Software Chrome ABBA GPU-query medians remain around509–523ms for the wallet and1767–1780ms for the bag. Do not market this as60fps or50ms mouse-to-screen latency. See PERFORMANCE_OBSERVATIONS.md. GPU query is not physical monitor latency;390x844 and explicit lifecycle events are not physical-device certification.
+
+FullS2, real-material calibration, user visual acceptance and commercial legal clearance remain pending. Third-party attributions and archived rights issues have not been erased. R11 random field stays disabled; jacket remains removed.
+
+Sources retained: https://threejs.org/manual/pages/rendering-on-demand.html ; https://developer.mozilla.org/en-US/docs/Web/API/EXT_disjoint_timer_query . Integer texel addressing is checked against generated node indices and actual render comparisons.
+
+Recovery: Issue52 → ../START_HERE.md → ../TASK_STATE.json → DELIVERY.json → NEXT_BATCH.md. Do not restart completed S1/S2A/S2B/S2C from inherited task files.
+
+- [x] Actual production source and procedural 3D/physics, not generated pictures or proxy meshes.
+- [x] Interactive camera, selection, grab and parameter controls verified.
+- [x] Offline standalone and immutable public browser verified; PR70 merged only to leather integration.
+- [ ] User acceptance, physical-device performance, fullS2 and legal clearance remain independent open items.
