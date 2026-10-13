@@ -1,0 +1,13 @@
+# R09 actual-public render review — 2026-10-13
+
+Input: public-verification artifact11799377533 from run38371668905. Downloaded ZIP SHA256 f2b7dd64e15ca009ab95dc92a6351307fee73671a004cbaea6d320aa7c73035a, verified in the recovery container. Runtime source25cc88995b52fd051dfb986a35bc609ea1e02e1a, immutable public build141f25fc7e9a322ec642169542a5e9469c1b63c2. These are actual browser screenshots, not generated illustration or reference photos.
+
+Reviewed full-resolution final-default.png, side-seam.png, heel-seam.png, toe-seam.png and bottom.png. Overall cap reaches the sole edge; the prior contrasting exposed band below the cap/counter is reduced by changing the actual cut. Facing/side seam passes continuously around the photographed turn instead of stopping in two disconnected visible fragments. Metallic surrounds have an open bore. Bottom view displays separate short grip ribs at the forefoot and heel.
+
+Remaining visible problems: heel threads show repeated angular deviations and uneven-looking entry nodes. At least the lower visible eyelet in side-seam.png has an irregular raised flange kink; topology tests do not establish a smooth visually acceptable eyelet. Extreme macro thread reads closer to a narrow tape than natural spun stitch. Some grain stretching, bands and overly smooth highlights remain. Sole ribs are a simplified low-relief layout, not a finished traction design. No new rivet/bartack module was implemented.
+
+Verdict: producerRenderReview=true; producerVisualApproval=false; userVisualApproval=false. Deliver as an interactive acceptance candidate with these limits stated, not all-items-finished or manufacturing-ready.
+
+Next edits must use exact committed source. Prioritize heel transported stitch frames without skipping a seam span; regularize flange normals/profile against the existing leather-hole perimeter without filling its bore. Do not add floating decorative hardware as a substitute for underlying support. Preserve material provenance and original geometry source. Cold generation and thickness changes require profiling; no seconds-load/60FPS claim.
+
+Recovery audit: local ZIP inspection and hash verification completed. The current container cannot resolve the public hosts; no new container-public-HTTP or local-browser success is claimed. Actual public execution evidence comes from the successful read-only GitHub Actions Chromium job115209991534; its result was re-read through the live connector. The generic web reader does not load this htmlpreview wrapper. Neither limitation reverses or extends the scope of the existing real-browser evidence.
