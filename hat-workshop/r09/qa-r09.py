@@ -1,3 +1,4 @@
+from qa_capture import capture_page
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
@@ -63,7 +64,7 @@ try:
    click(p,id);p.wait_for_function("hatLab.performance().detailState==='ready'",timeout=80000)
   q=p.evaluate('hatLab.performance().detailCache');check('all original HD normals reused without HTTP',q['networkRequests']==before,q)
   check('HD byte memory bounded',q['memoryBytes']<=q['maxMemoryBytes'],q)
-  p.evaluate("hatLab.frame('three')");p.screenshot(path=str(Q/'desktop-full-detail.png'));c.close()
+  p.evaluate("hatLab.frame('three')");capture_page(p, report=report, path=str(Q/'desktop-full-detail.png'));c.close()
   if not args.public_url:
    c,p,_=context_for(b,details='live',hang_cache=True);p.wait_for_function("hatLab.performance().detailState==='ready'",timeout=15000)
    check('blocked disk cache still reaches original HD',p.evaluate('hatLab.performance().detailCache.cacheTimeouts')>=1)

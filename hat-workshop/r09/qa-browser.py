@@ -1,3 +1,4 @@
+from qa_capture import capture_page
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
@@ -77,11 +78,11 @@ try:
   check('comparison release preserves geometry',gh==page.evaluate('hatLab.geometryHash()'))
   page.evaluate("hatLab.setPreset('standard')");check('preset preserved',gh==page.evaluate('hatLab.geometryHash()'))
   page.evaluate('hatLab.restore(hatLab.recipe())');check('recipe restored',gh==page.evaluate('hatLab.geometryHash()'))
-  page.screenshot(path=str(Q/'desktop.png'));report['nominalPerformance']=page.evaluate('hatLab.performance()');context.close()
+  capture_page(page, report=report, path=str(Q/'desktop.png'));report['nominalPerformance']=page.evaluate('hatLab.performance()');context.close()
   context,page,requests=open_page(b,mode='stall');context.set_offline(True)
   for id in ids:click_hat(page,id,'network-offline')
   check('all hats usable offline after page load',len([x for x in report['clicks'] if x['label']=='network-offline'])==11)
-  page.screenshot(path=str(Q/'offline-switch.png'));context.close()
+  capture_page(page, report=report, path=str(Q/'offline-switch.png'));context.close()
   context,page,requests=open_page(b,mode='stall',slow=not bool(args.public_url))
   count=page.evaluate('hatLab.performance().worker.started')
   page.evaluate("()=>{const card=document.querySelector('.hat-card[data-id=patrol]');for(let i=0;i<16;i++)card.click();}")
@@ -104,7 +105,7 @@ try:
    context,page,requests=open_page(b,mode='stall');page.wait_for_function("hatLab.performance().detailState==='retry'",timeout=20000)
    check('detail timeout does not block ready',page.evaluate('hatLab.ready()'));click_hat(page,'chef','after-detail-timeout');context.close()
   context,page,requests=open_page(b,mode='stall');page.set_viewport_size({'width':390,'height':844});click_hat(page,'flatcap','mobile-viewport')
-  page.screenshot(path=str(Q/'mobile-viewport.png'));report['mobileScope']='390x844 viewport only; not a physical phone';context.close();b.close()
+  capture_page(page, report=report, path=str(Q/'mobile-viewport.png'));report['mobileScope']='390x844 viewport only; not a physical phone';context.close();b.close()
  check('no application exceptions',not report['pageErrors'],report['pageErrors']);report['passed']=True;save();print(json.dumps({'passed':True,'checks':len(report['checks']),'clicks':len(report['clicks'])}),flush=True)
 except Exception as e:
  report['failure']=str(e);save();raise
