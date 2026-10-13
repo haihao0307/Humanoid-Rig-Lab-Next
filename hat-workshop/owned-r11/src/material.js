@@ -64,7 +64,7 @@ H.makeMaterial=function(c,s,role){
   sh.vertexShader='varying vec3 ownLocal;\n'+sh.vertexShader;sh.vertexShader=sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nownLocal=position;');
   sh.fragmentShader=GLSL+'\n'+sh.fragmentShader;sh.fragmentShader=sh.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.rgb*=1.0+ownDetail*.022*(n11(ownLocal*240.0)-.5);');
  };
- m.customProgramCacheKey=()=> 'R11-generated-weave-'+family;return m;
+ m.customProgramCacheKey=()=> 'R11-generated-weave-shared-v1';return m;
 };
 // Hat-local EB1-oriented adapter: procedural softboxes and controlled fill.
 // This does not claim that other workbenches have been migrated to this code.
