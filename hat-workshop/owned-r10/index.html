@@ -41,6 +41,7 @@ H.sanitize=function(raw){
 H.key=s=>JSON.stringify(H.sanitize(s));
 })(globalThis);
 
+// R101_VISUAL_2
 /* Mathematical shell generation and static fit, authored for KAOPU HAT10. */
 (function(G){
 'use strict';const H=G.HAT10;const PI=Math.PI,TAU=2*PI;
@@ -162,7 +163,7 @@ H.generate=function(input,lod=0){
   return[x,y,z];
  }
  if(c.shape!=='visor')pieces.push(shell('crown',crown,N,M,thick,{cap:true,uvHeight:ht*1.45}));
- const cuff=c.shape==='soft',bandHeight=c.band,bandBase=cuff?-.006:-.005;
+ const cuff=c.shape==='soft',bandHeight=c.shape==='visor'?ht:c.band,bandBase=cuff?-.006:-.005;
  const ring=(u,v)=>{const t=u*TAU,rise=bandBase+v*bandHeight,r=1+(cuff?.025:0)+.006*Math.sin(v*PI);return[(ax*r+.00065)*Math.sin(t),rise,(bz*r+.00065)*Math.cos(t)];};
  if(cuff||c.shape==='visor'||c.shape==='pleat')pieces.push(shell('wear-band',ring,N,lod?6:12,cuff?thick*.9:thick,{role:cuff?'rib':'outer',uvHeight:bandHeight}));
  else{
@@ -176,20 +177,21 @@ H.generate=function(input,lod=0){
   brimFn=(u,v)=>{
    const t=hasPeak?(u-.5)*PI*1.04:u*TAU,cs=Math.cos(t),sn=Math.sin(t);
    const d=width*v*(hasPeak?(Math.max(0,Math.cos(t))**.65):1+.13*cs+.04*sn);
-   let y=-.002-(c.drop||0)*s.brim*v;
+   let y=.0007-(c.drop||0)*s.brim*v;
    if(['round','high','pinch'].includes(c.shape))y+=.012*v**3*(.7+.3*Math.abs(sn))-.008*Math.max(cs,0)*v;
    if(c.shape==='bucket')y+=.003*Math.sin(5*t+.4)*v*v;
    if(c.shape==='bell')y+=.012*sn*v-.014*v*v;
    if(hasPeak)y-=.009*sn*sn*v;y+=.0015*Math.sin(v*PI);
-   return[(ax-.0005+d)*sn,y,(bz-.0005+d)*cs];
+   return[(ax-thick*.8+d)*sn,y,(bz-thick*.8+d)*cs];
   };
   pieces.push(shell('brim-core',brimFn,hasPeak?(lod?48:80):N,lod?10:20,Math.max(.0012,thick*.85),{closed:!hasPeak,sign:-1,role:'outer',innerRole:'underbrim',uvWidth:hasPeak?.33:.59,uvHeight:width}));
  }
  if(['pinch','round','high','bell'].includes(c.shape)){
-  const low=.025,span=c.band/ht;
-  const belt=(u,v)=>{const p=crown(u,low+span*v),n=normal(crown,u,low+span*v);return p.map((x,k)=>x+n[k]*.0012);};
+  const low=.006,span=c.band;
+  const bandV=(u,v)=>{const goal=low+span*v;let lo=0,hi=.6;for(let k=0;k<12;k++){const mid=(lo+hi)/2;if(crown(u,mid)[1]<goal)lo=mid;else hi=mid;}return(lo+hi)/2;};
+  const belt=(u,v)=>{const t=bandV(u,v),p=crown(u,t),n=normal(crown,u,t);return p.map((x,k)=>x+n[k]*.0012);};
   pieces.push(shell('ribbon',belt,N,6,.0008,{role:'trim',innerRole:'trim',edgeRole:'trim',uvHeight:c.band}));
-  const bow=(u,v)=>{const ang=(.72+(u-.5)*.11)*TAU,t=low+span*(.12+.76*v),p=crown(ang/TAU,t),n=normal(crown,ang/TAU,t),bulge=.0028+.0045*Math.sin(u*PI)**2*Math.sin(v*PI);return p.map((x,k)=>x+n[k]*bulge);};
+  const bow=(u,v)=>{const ang=(.72+(u-.5)*.11)*TAU,t=bandV(ang/TAU,.12+.76*v),p=crown(ang/TAU,t),n=normal(crown,ang/TAU,t),bulge=.0028+.0045*Math.sin(u*PI)**2*Math.sin(v*PI);return p.map((x,k)=>x+n[k]*bulge);};
   pieces.push(shell('side-fold',bow,20,8,.0008,{closed:false,role:'trim',innerRole:'trim',edgeRole:'trim',uvWidth:.060,uvHeight:c.band*.75}));
  }
  const stitches=[];
@@ -228,7 +230,7 @@ H.generate=function(input,lod=0){
 })(globalThis);
 
 self.onmessage=e=>{try{const data=HAT10.generate(e.data.spec,e.data.lod);const list=[];for(const p of data.pieces)for(const k of ['position','normal','uv','index'])list.push(p[k].buffer);postMessage(data,list);}catch(error){postMessage({error:String(error.message||error)});}};</script>
-<script>globalThis.HAT10_BUILD={"source": "663918e9409feb4e79c1aee43c749c8003806187", "version": "HAT-R10.1"};</script><script>/*The MIT License
+<script>globalThis.HAT10_BUILD={"source": "2f7444c867674b122c33ffcb2350f03de5635086", "version": "HAT-R10.1"};</script><script>/*The MIT License
 
 Copyright © 2010-2025 three.js authors
 
@@ -4123,6 +4125,7 @@ H.sanitize=function(raw){
 H.key=s=>JSON.stringify(H.sanitize(s));
 })(globalThis);
 
+// R101_VISUAL_2
 /* Mathematical shell generation and static fit, authored for KAOPU HAT10. */
 (function(G){
 'use strict';const H=G.HAT10;const PI=Math.PI,TAU=2*PI;
@@ -4244,7 +4247,7 @@ H.generate=function(input,lod=0){
   return[x,y,z];
  }
  if(c.shape!=='visor')pieces.push(shell('crown',crown,N,M,thick,{cap:true,uvHeight:ht*1.45}));
- const cuff=c.shape==='soft',bandHeight=c.band,bandBase=cuff?-.006:-.005;
+ const cuff=c.shape==='soft',bandHeight=c.shape==='visor'?ht:c.band,bandBase=cuff?-.006:-.005;
  const ring=(u,v)=>{const t=u*TAU,rise=bandBase+v*bandHeight,r=1+(cuff?.025:0)+.006*Math.sin(v*PI);return[(ax*r+.00065)*Math.sin(t),rise,(bz*r+.00065)*Math.cos(t)];};
  if(cuff||c.shape==='visor'||c.shape==='pleat')pieces.push(shell('wear-band',ring,N,lod?6:12,cuff?thick*.9:thick,{role:cuff?'rib':'outer',uvHeight:bandHeight}));
  else{
@@ -4258,20 +4261,21 @@ H.generate=function(input,lod=0){
   brimFn=(u,v)=>{
    const t=hasPeak?(u-.5)*PI*1.04:u*TAU,cs=Math.cos(t),sn=Math.sin(t);
    const d=width*v*(hasPeak?(Math.max(0,Math.cos(t))**.65):1+.13*cs+.04*sn);
-   let y=-.002-(c.drop||0)*s.brim*v;
+   let y=.0007-(c.drop||0)*s.brim*v;
    if(['round','high','pinch'].includes(c.shape))y+=.012*v**3*(.7+.3*Math.abs(sn))-.008*Math.max(cs,0)*v;
    if(c.shape==='bucket')y+=.003*Math.sin(5*t+.4)*v*v;
    if(c.shape==='bell')y+=.012*sn*v-.014*v*v;
    if(hasPeak)y-=.009*sn*sn*v;y+=.0015*Math.sin(v*PI);
-   return[(ax-.0005+d)*sn,y,(bz-.0005+d)*cs];
+   return[(ax-thick*.8+d)*sn,y,(bz-thick*.8+d)*cs];
   };
   pieces.push(shell('brim-core',brimFn,hasPeak?(lod?48:80):N,lod?10:20,Math.max(.0012,thick*.85),{closed:!hasPeak,sign:-1,role:'outer',innerRole:'underbrim',uvWidth:hasPeak?.33:.59,uvHeight:width}));
  }
  if(['pinch','round','high','bell'].includes(c.shape)){
-  const low=.025,span=c.band/ht;
-  const belt=(u,v)=>{const p=crown(u,low+span*v),n=normal(crown,u,low+span*v);return p.map((x,k)=>x+n[k]*.0012);};
+  const low=.006,span=c.band;
+  const bandV=(u,v)=>{const goal=low+span*v;let lo=0,hi=.6;for(let k=0;k<12;k++){const mid=(lo+hi)/2;if(crown(u,mid)[1]<goal)lo=mid;else hi=mid;}return(lo+hi)/2;};
+  const belt=(u,v)=>{const t=bandV(u,v),p=crown(u,t),n=normal(crown,u,t);return p.map((x,k)=>x+n[k]*.0012);};
   pieces.push(shell('ribbon',belt,N,6,.0008,{role:'trim',innerRole:'trim',edgeRole:'trim',uvHeight:c.band}));
-  const bow=(u,v)=>{const ang=(.72+(u-.5)*.11)*TAU,t=low+span*(.12+.76*v),p=crown(ang/TAU,t),n=normal(crown,ang/TAU,t),bulge=.0028+.0045*Math.sin(u*PI)**2*Math.sin(v*PI);return p.map((x,k)=>x+n[k]*bulge);};
+  const bow=(u,v)=>{const ang=(.72+(u-.5)*.11)*TAU,t=bandV(ang/TAU,.12+.76*v),p=crown(ang/TAU,t),n=normal(crown,ang/TAU,t),bulge=.0028+.0045*Math.sin(u*PI)**2*Math.sin(v*PI);return p.map((x,k)=>x+n[k]*bulge);};
   pieces.push(shell('side-fold',bow,20,8,.0008,{closed:false,role:'trim',innerRole:'trim',edgeRole:'trim',uvWidth:.060,uvHeight:c.band*.75}));
  }
  const stitches=[];
@@ -4394,6 +4398,7 @@ H.makeEnvironment=function(renderer){
 };
 })(globalThis);
 
+// R101_VISUAL_2
 /* Independent workbench, camera, lifecycle, rendering and persistence. */
 (function(G){
 'use strict';const H=G.HAT10,T=G.OwnHatThree,$=id=>document.getElementById(id);
@@ -4496,22 +4501,26 @@ async function select(s,reason='selection'){
  }catch(e){if(token!==serial||e.message==='selection-cancelled')return false;pending=null;ready=!!active&&!errors.some(e=>e.startsWith('shader:'));$('cancel').hidden=true;status(e.message);errors.push(e.message);return false;}
 }
 function cancel(){serial++;if(pending){pending.cancel();pending=null;metrics.workerCancelled++;}ready=!!active;$('cancel').hidden=true;status('已取消，保留上一顶帽子。');}
-function syncUI(){for(const k of Object.keys(H.parameters)){const e=$('p-'+k);if(e)e.value=form[k];updateLabel(k);}if($('head'))$('head').value=form.head;$('color').value=form.color||H.categories.find(c=>c.id===form.id).color;document.querySelectorAll('.hat-card').forEach(e=>e.setAttribute('aria-pressed',String(e.dataset.id===form.id)));}
+function syncUI(){const category=H.categories.find(c=>c.id===form.id);$('p-brim').disabled=!category.brim;$('p-fullness').disabled=category.shape==='visor';for(const k of Object.keys(H.parameters)){const e=$('p-'+k);if(e)e.value=form[k];updateLabel(k);}if($('head'))$('head').value=form.head;$('color').value=form.color||H.categories.find(c=>c.id===form.id).color;document.querySelectorAll('.hat-card').forEach(e=>e.setAttribute('aria-pressed',String(e.dataset.id===form.id)));}
 function updateLabel(k){const el=$('o-'+k);if(!el)return;const v=Number($('p-'+k).value);el.textContent=k==='circumference'?v.toFixed(1)+' cm':k==='ease'?v.toFixed(1)+' mm':k==='detail'?v.toFixed(2):v.toFixed(2)+' ×';}
 function saveFile(name,text,type='application/json'){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);}
 async function thumbnails(){
- const rt=new T.WebGLRenderTarget(220,146),tc=new T.PerspectiveCamera(36,220/146,.005,4),ts=new T.Scene();ts.background=new T.Color('#deded7');ts.environment=scene.environment;ts.add(new T.HemisphereLight('#fff8ed','#767b70',1.8));const light=new T.DirectionalLight('#ffffff',2);light.position.set(-.4,.5,.6);ts.add(light);
+ const tc=new T.PerspectiveCamera(36,220/146,.005,4),ts=new T.Scene();ts.background=new T.Color('#deded7');ts.environment=scene.environment;ts.add(new T.HemisphereLight('#fff8ed','#767b70',1.8));const light=new T.DirectionalLight('#ffffff',2);light.position.set(-.4,.5,.6);ts.add(light);
  for(const c of H.categories){
   while(pending)await new Promise(r=>setTimeout(r,120));await new Promise(r=>setTimeout(r,50));
   try{
    const w=newWorker(H.defaults(c.id),1),data=await w.promise,model=makeModel(data,H.defaults(c.id));ts.add(model);
    const h=data.bounds.max[1]-data.bounds.min[1],wide=Math.max(data.bounds.max[0]-data.bounds.min[0],data.bounds.max[2]-data.bounds.min[2]),d=Math.max(.56,wide*2.2,h*3.4);tc.position.set(d*.52,d*.38+(data.bounds.max[1]+data.bounds.min[1])/2,d*.80);tc.lookAt(0,(data.bounds.max[1]+data.bounds.min[1])/2,0);
-   const was=renderer.getRenderTarget();renderer.setRenderTarget(rt);renderer.render(ts,tc);const bytes=new Uint8Array(220*146*4);renderer.readRenderTargetPixels(rt,0,0,220,146,bytes);renderer.setRenderTarget(was);
+   const was=renderer.getRenderTarget(),vp=renderer.getViewport(new T.Vector4()),sc=renderer.getScissor(new T.Vector4()),st=renderer.getScissorTest(),ratio=renderer.getPixelRatio(),bytes=new Uint8Array(220*146*4);
+   // Use the same display framebuffer and output transform as the main view.
+   // Restore it synchronously before yielding, so no thumbnail flashes on screen.
+   try{renderer.setRenderTarget(null);renderer.setViewport(0,0,220/ratio,146/ratio);renderer.setScissor(0,0,220/ratio,146/ratio);renderer.setScissorTest(true);renderer.render(ts,tc);const gl=renderer.getContext();gl.readPixels(0,0,220,146,gl.RGBA,gl.UNSIGNED_BYTE,bytes);}
+   finally{renderer.setRenderTarget(was);renderer.setViewport(vp);renderer.setScissor(sc);renderer.setScissorTest(st);draw();}
    const cn=document.createElement('canvas');cn.width=220;cn.height=146;const ctx=cn.getContext('2d'),image=ctx.createImageData(220,146);for(let row=0;row<146;row++)image.data.set(bytes.subarray((145-row)*880,(146-row)*880),row*880);ctx.putImageData(image,0,0);
    document.querySelector(`.hat-card[data-id="${c.id}"] img`).src=cn.toDataURL('image/webp',.84);metrics.thumbs++;ts.remove(model);dispose(model);dirty();
   }catch(e){errors.push('thumbnail '+c.id+': '+e.message);}
  }
- rt.dispose();
+ // No additional render target survives thumbnail generation.
 }
 function boot(){
  const canvas=$('canvas');renderer=new T.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true,alpha:false,powerPreference:'high-performance'});
