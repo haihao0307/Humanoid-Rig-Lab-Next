@@ -20,10 +20,13 @@ def address(sha):
 run('git','config','user.name','github-actions[bot]');run('git','config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
 if A.stage=='prepare':
  run('python',str(R/'refine.py'))
- shutil.rmtree(R/'qa',ignore_errors=True);(R/'DELIVERY.json').unlink(missing_ok=True)
+ shutil.rmtree(R/'qa',ignore_errors=True);(R/'DELIVERY.json').unlink(missing_ok=True);(R/'PRESET_THUMBNAILS.json').unlink(missing_ok=True)
  source=commit('feat(hat-r11): freeze scoped visual construction and material revision')
  for name in ['catalog','shape','field','material','studio','viewer']:run('node','--check',str(R/'src'/(name+'.js')))
  run('node',str(R/'test-core.cjs'),timeout=240)
+ run('python',str(R/'build.py'),'--source',source)
+ # R11_BAKE_STAGE_1: generate the default picture catalogue before the final immutable build.
+ run('python','-u',str(R/'bake-thumbnails.py'),'--source',source,timeout=300)
  run('python',str(R/'build.py'),'--source',source)
  built=commit('build(hat-r11): freeze independently generated preview before public acceptance')
  raw,url=address(built)
@@ -35,6 +38,9 @@ else:
  assert all(x.get('passed') for x in [core,local,public])
  assert all(x['version']=='HAT-R11.0' for x in [core,local,public,manifest])
  assert local['source']==public['source']==manifest['sourceSha']==A.source
+ assert manifest['thumbnailMode']=='embedded-own-default-renders'
+ assert local['finalStats']['metrics']['thumbnailMode']==public['finalStats']['metrics']['thumbnailMode']=='embedded-default-renders'
+ assert read('PRESET_THUMBNAILS.json')['sourceSha']==A.source
  raw,url=address(A.build);assert public['url']==url
  for i in range(6):
   try:

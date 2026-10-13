@@ -104,6 +104,15 @@ function syncUI(){const category=H.categories.find(c=>c.id===form.id);$('p-brim'
 function updateLabel(k){const el=$('o-'+k);if(!el)return;const v=Number($('p-'+k).value);el.textContent=k==='circumference'?v.toFixed(1)+' cm':k==='ease'?v.toFixed(1)+' mm':k==='detail'?v.toFixed(2):v.toFixed(2)+' ×';}
 function saveFile(name,text,type='application/json'){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);}
 async function thumbnails(){
+ // R11_PRESET_THUMBNAILS_1: catalogue images are derived previews, not runtime hat assets.
+ const baked=G.HAT_PRESET_THUMBNAILS;
+ if(baked){
+  if(baked.sourceSha!==H.build.source||!H.categories.every(c=>typeof baked.images[c.id]==='string'&&baked.images[c.id].startsWith('data:image/webp;base64,'))){errors.push('Invalid or stale catalogue preview source');return;}
+  metrics.thumbnailMode='embedded-default-renders';
+  await Promise.all(H.categories.map(c=>new Promise(resolve=>{const image=document.querySelector(`.hat-card[data-id="${c.id}"] img`);image.onload=()=>{metrics.thumbs++;resolve();};image.onerror=()=>{errors.push('Catalogue decode failed: '+c.id);resolve();};image.src=baked.images[c.id];})));
+  return;
+ }
+ metrics.thumbnailMode='generated-default-renders';
  // R102: the same display framebuffer applies ACES and sRGB, unlike raw linear target bytes.
  const tc=new T.PerspectiveCamera(36,220/146,.005,4),ts=new T.Scene();
  ts.background=scene.background.clone();ts.environment=scene.environment;ts.environmentIntensity=scene.environmentIntensity;
@@ -168,7 +177,7 @@ function boot(){
  $('clear').onclick=()=>{for(const[k,r]of cache){if(r!==active){dispose(r.group);cache.delete(k);}}status('已释放闲置几何；当前帽子与保存配方保留。');};
  $('compare').onclick=()=>{if(!comparison){comparison={...form};select(H.defaults(form.id),'compare-default');$('compare').textContent='返回我的调整';}else{select(comparison,'compare-return');comparison=null;$('compare').textContent='初始配方对照';}};
  $('version').textContent='R11.0 · '+String(H.build.source).slice(0,10);
- select(form,'boot').then(ok=>{if(ok){metrics.bootReadyMS=performance.now()-metrics.boot;setTimeout(thumbnails,800);}});
+ select(form,'boot').then(ok=>{if(ok){metrics.bootReadyMS=performance.now()-metrics.boot;if(G.HAT_PRESET_THUMBNAILS)void thumbnails();else setTimeout(thumbnails,800);}});
  G.ownedHat={version:H.version,source:H.build.source,diagnostics:()=>({renderer:renderer.getContext().getParameter(renderer.getContext().RENDERER),three:T.REVISION,drawCalls:renderer.info.render.calls,programCount:renderer.info.programs.length,gpuGeometries:renderer.info.memory.geometries,materialTiles:H.materialStats(),lighting:'EB1-HAT-local-adapter-R01'}),ready:()=>ready,recipe:()=>({...form}),set:patch=>select({...form,...patch},'api'),restore:s=>select(s,'restore-api'),frame:frameView,cancel,stats:()=>({metrics:{...metrics},clicks:[...clicks],cacheSize:cache.size,cacheBytes:[...cache.values()].reduce((a,x)=>a+x.data.stats.bytes,0),current:active?.data.stats,errors:[...errors],thumbs:metrics.thumbs,lighting:'EB1-HAT-local-adapter-R01'}),geometry:()=>active?.data,render:()=>{draw();return canvas.toDataURL('image/png');},clear:()=>{$('clear').click();},hash:()=>{let h=2166136261;for(const p of active.data.pieces){const b=new Uint8Array(p.position.buffer);for(const v of b){h^=v;h=Math.imul(h,16777619);}}return(h>>>0).toString(16);}};
 }
 try{boot();}catch(e){errors.push(e.message);status('启动失败：'+e.message);console.error(e);}
