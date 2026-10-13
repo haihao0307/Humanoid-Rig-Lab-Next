@@ -1,0 +1,99 @@
+name: Denim R12.1 isolated recovery and snapshot ordering
+on:
+  push:
+    branches: [fix/denim-r12-1-snapshot-recovery-20261013]
+    paths: ['denim-workshop/r12-1/**', '.github/workflows/denim-r12-1-recovery.yml']
+permissions:
+  contents: write
+concurrency:
+  group: denim-r12-1-snapshot-recovery
+  cancel-in-progress: false
+jobs:
+  verify-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Recover locked R12 and apply isolated client correction
+        run: |
+          python denim-workshop/r12-1/recover.py
+          for f in denim-workshop/r12-1/*.js; do node --check "$f"; done
+          python -m py_compile denim-workshop/r12-1/qa.py
+          git diff --exit-code HEAD -- denim-workshop/r11 denim-workshop/r10 denim-workshop/archives
+      - name: Transport race, unchanged solver, structure and loading gates
+        run: |
+          node denim-workshop/r12-1/test-client.cjs
+          node denim-workshop/r12/test-structure.cjs
+          node denim-workshop/r12/test-load-cases.cjs
+          node denim-workshop/r12/test-render-batches.cjs
+      - name: Install pinned browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6
+          python -m playwright install --with-deps chromium
+      - name: Actual standalone file and real worker race
+        run: xvfb-run -a python -u denim-workshop/r12-1/qa.py
+      - name: Publish file-tested isolated candidate
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python - <<'PY'
+          from pathlib import Path
+          import json,subprocess
+          p=Path('denim-workshop/r12-1')
+          assert json.loads((p/'evidence/file-qa.json').read_text())['passed']
+          files=[str(f) for f in p.iterdir() if f.is_file() and f.suffix in ['.js','.py','.json','.html','.md','.cjs']]+[str(p/'LICENSE')]
+          subprocess.run(['git','add','--',*files],check=True)
+          PY
+          git commit -m 'build(denim): R12.1 file-tested command-ordered snapshot candidate [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r12-1/index.html" >> "$GITHUB_OUTPUT"
+      - name: Actual fixed public rendering and controls
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: xvfb-run -a python -u denim-workshop/r12-1/qa.py --public "$PUBLIC_URL"
+      - name: Verify bytes and record delivery evidence
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os,urllib.request
+          p=Path('denim-workshop/r12-1');file=json.loads((p/'evidence/file-qa.json').read_text());public=json.loads((p/'evidence/public-qa.json').read_text());client=json.loads((p/'client-qa.json').read_text());manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          inherited={k:json.loads((p.parent/'r12'/f).read_text()) for k,f in [('structure','structure-qa.json'),('loads','load-cases-qa.json'),('batches','render-batches-qa.json')]}
+          assert file['passed'] and public['passed'] and client['passed'] and all(v['passed'] for v in inherited.values())
+          raw='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r12-1/index.html'
+          with urllib.request.urlopen(raw,timeout=90) as response:
+              data=response.read();assert response.status==200
+          assert data==(p/'index.html').read_bytes() and hashlib.sha256(data).hexdigest()==manifest['sha256']
+          def summary(r):
+              return {k:r.get(k) for k in ['passed','mode','browserVersion','restPixelParity','resetRace','windAcrossCamera','r12RecipeCompatible','mobileCanvas','network']}|{'states':[s['name'] for s in r['states']]}
+          receipt={'version':'R12.1','status':'PUBLIC_VERIFIED_USER_REVIEW_PENDING','deliveryVerified':True,'userVisualApproved':False,'productionReady':False,'sourceHead':os.environ['GITHUB_SHA'],'parentSource':'87fc757853e4eed1652b02df079e8747a8944e94','originalR11Build':'086414b317f313bf9465ea957753ae7e84453f6f','buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'publicBytesMatch':True,'clientTests':client,'inheritedNumericalTests':inherited,'browser':{'file':summary(file),'public':summary(public)},'newChanges':['Sequence and command-epoch checked sample transport','One outstanding sample with bounded follow-up; actual commands never coalesced','Explicit R12 recipe compatibility and corrected residual-yarn UI note'],'inherited':['R12 hole-aware sheet and attached yarn proxy dynamics','R12 material inputs and bounded physical renderer'],'limits':['Not a frame-rate upgrade or all-stall root cause claim','No self-collision, CCD, adaptive tearing, physical seam tension or full garment integration','Material coefficients unmeasured; no film-grade or actual consumer-device acceptance','Mobile test is a viewport; race page delays one real worker reply and is explicitly instrumented','R01-R12 and original active branch untouched; no merge or force push']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r12-1/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): R12.1 verified immutable public delivery [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r12-1-recovery-evidence
+          path: |
+            denim-workshop/r12-1
+            denim-workshop/r12/BUILD_MANIFEST.json
+          retention-days: 14
+          if-no-files-found: error
