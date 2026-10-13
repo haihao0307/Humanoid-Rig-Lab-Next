@@ -1,0 +1,96 @@
+name: Shoe R07.1 takeover verification
+on:
+  push:
+    branches: [fix/shoe-r071-takeover-20261013]
+    paths: ['shoe-workshop/r07/**', '.github/workflows/shoe-r071-takeover.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shoe-r071-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            shoe-workshop
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply guarded readable-source migration and remove stale candidate evidence
+        run: |
+          python shoe-workshop/r07/tools/apply-r071.py
+          python shoe-workshop/r07/tools/apply-r071-render.py
+          rm -rf shoe-workshop/r07/evidence/browser shoe-workshop/r07/evidence/public shoe-workshop/r07/evidence/numerics shoe-workshop/r07/evidence/early
+          rm -f shoe-workshop/r07/PUBLIC_URL.txt
+          node --check shoe-workshop/r07/src/main.mjs
+          node --check shoe-workshop/r07/src/model.mjs
+          node --check shoe-workshop/r07/src/render-gate.mjs
+          node --check shoe-workshop/r07/tests/browser.mjs
+      - name: Install pinned geometry and browser dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Build current standalone runtime
+        run: node shoe-workshop/r07/tools/build.mjs
+      - name: Early actual render inspection
+        run: node shoe-workshop/r07/tests/early-render.mjs
+      - name: Preserve current early renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r071-early-${{ github.run_id }}
+          path: shoe-workshop/r07/evidence/early/
+          retention-days: 14
+      - name: Numerical geometry, source retention and exact cache-frame checks
+        id: numeric
+        continue-on-error: true
+        run: node shoe-workshop/r07/tests/kernel.mjs
+      - name: Actual standalone browser including the previously failing operation
+        id: browser
+        continue-on-error: true
+        run: node shoe-workshop/r07/tests/browser.mjs
+      - name: Require both current-source verification gates
+        run: |
+          test '${{ steps.numeric.outcome }}' = 'success'
+          test '${{ steps.browser.outcome }}' = 'success'
+      - name: Fast-forward publish only verified R07.1 source and build
+        id: publish
+        run: |
+          git config user.name 'Shoe R07.1 Verification'
+          git config user.email 'shoe-r071@users.noreply.github.com'
+          git add shoe-workshop/r07
+          if git diff --cached --name-only | grep -v '^shoe-workshop/r07/'; then exit 1; fi
+          git commit -m 'build(shoes): verified R07.1 readable source and standalone [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Immutable public browser, complete bytes and release receipt
+        env:
+          PUBLIC_BUILD_SHA: ${{ steps.publish.outputs.sha }}
+        run: |
+          node shoe-workshop/r07/tests/browser.mjs --public
+          python - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path('shoe-workshop/r07')
+          m=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          q=json.loads((p/'evidence/public/QA.json').read_text())
+          assert q['sourceBuild']==m['sourceBuild']
+          receipt={'version':'R07.1','sourceBuild':m['sourceBuild'],'buildSha':os.environ['PUBLIC_BUILD_SHA'],'url':q['url'],'runtime':m['runtime'],'runId':os.environ['GITHUB_RUN_ID'],'takeoverBase':'3df0937b45e6ec99a2e5135698483b34d9e74c06','publicChecks':len(q['checks']),'errors':q['errors'],'consoleErrors':q['consoleErrors'],'scope':'R07 existing toe/side/sole/needle refinements plus custom formed/flat recovery, display-object reuse, coalesced single-flight GPU rendering and finite sole inspection. Static assembly; no new lace algorithms.','acceptance':{'publicRuntimeVerified':True,'producerVisualReview':False,'userVisual':False,'sewingPhysics':False,'dynamicFitting':False,'manufacturing':False}}
+          (p/'RELEASE_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git add shoe-workshop/r07/evidence/public shoe-workshop/r07/PUBLIC_URL.txt shoe-workshop/r07/RELEASE_RECEIPT.json
+          git commit -m 'test(shoes): exact R07.1 public interaction, bytes and release receipt [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Preserve actual source and browser evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r071-candidate-${{ github.run_id }}
+          path: shoe-workshop/r07/
+          include-hidden-files: true
+          retention-days: 14

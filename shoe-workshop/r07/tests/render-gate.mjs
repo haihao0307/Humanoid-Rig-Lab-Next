@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {installRenderGate} from '../src/render-gate.mjs';
+const callbacks=[];let ready=false,rawDraws=0,utility=0;
+const oldRAF=globalThis.requestAnimationFrame;
+globalThis.requestAnimationFrame=fn=>{callbacks.push(fn);return callbacks.length;};
+const gl={SYNC_GPU_COMMANDS_COMPLETE:1,TIMEOUT_EXPIRED:2,WAIT_FAILED:3,CONDITION_SATISFIED:4,isContextLost:()=>false,fenceSync:()=>({}),deleteSync:()=>{},flush:()=>{},clientWaitSync:()=>ready?4:2};
+const A={scene:{},camera:{}};A.renderer={getContext:()=>gl,getRenderTarget:()=>null,info:{render:{}},render:(s,c)=>{if(s===A.scene)rawDraws++;else utility++;}};
+const gate=installRenderGate(A),step=()=>{const fn=callbacks.shift();assert.ok(fn);fn();};
+for(let i=0;i<12;i++)A.renderer.render(A.scene,A.camera);
+assert.equal(rawDraws,0);step();assert.equal(rawDraws,1);assert.equal(gate.stats().inFlight,1);
+for(let i=0;i<8;i++)A.renderer.render(A.scene,A.camera);
+step();assert.equal(rawDraws,1,'GPU pending: no second submission');
+ready=true;step();assert.equal(rawDraws,2);step();
+const result=await gate.idle();assert.equal(result.completed,20);assert.equal(result.maxInFlight,1);assert.equal(result.draws,2);assert.equal(result.coalesced,18);assert.equal(result.pending,false);
+A.renderer.render({},{});assert.equal(utility,1);assert.equal(rawDraws,2);
+if(oldRAF===undefined)delete globalThis.requestAnimationFrame;else globalThis.requestAnimationFrame=oldRAF;
+console.log('RENDER GATE LOGIC PASS (mock scheduler, actual GPU proof is in browser suite)',result);

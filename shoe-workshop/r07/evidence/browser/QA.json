@@ -1,12 +1,16 @@
 {
-  "version": "R07.0",
-  "sourceBuild": "dc9ec2332de5672b9d1bc7a3c384abf0de620c93",
+  "version": "R07.1",
+  "sourceBuild": "1e953fa88321d94006743e26a7099e31bc7a4533",
   "buildSha": null,
   "url": "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/shoe-workshop/r07/public-lite.html",
   "environment": "Chromium Ubuntu headless SwiftShader, desktop1440x1050 and mobile390x844 VIEWPORT ONLY, NOT physical phone or GPU performance qualification",
   "checks": [
     {
       "name": "fresh source, ten formed shells and original outsole in the first frame",
+      "passed": true
+    },
+    {
+      "name": "coalesced main-canvas draw queue submits actual work and drains its GPU fence",
       "passed": true
     },
     {
@@ -47,6 +51,18 @@
     },
     {
       "name": "each individual original part can be inspected",
+      "passed": true
+    },
+    {
+      "name": "custom-thickness return reuses the exact formed geometry without rebuilding it",
+      "passed": true
+    },
+    {
+      "name": "selection and exploded inspection retain mesh, geometry and material identities",
+      "passed": true
+    },
+    {
+      "name": "sole selection from flat view restores a finite visible formed sole",
       "passed": true
     },
     {
