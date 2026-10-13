@@ -24,7 +24,7 @@ def rebuild(root=ROOT):
     env={**os.environ,'LC_ALL':'C','TZ':'UTC','SOURCE_DATE_EPOCH':str(cfg['sourceDateEpoch'])}
     for _ in range(2):
         with tempfile.TemporaryDirectory(prefix='leather-native-independent-') as tmp:
-            tmp=Path(tmp);p=tmp/'combined.c';out=tmp/'kernel.wasm';p.write_bytes(source)
+            tmp=Path(tmp);p=tmp/'combined.c';out=tmp/'contact.wasm';p.write_bytes(source)
             cmd=[clang,*cfg['flags'],'-fuse-ld='+linker,str(p),'-o',str(out)]
             subprocess.run(cmd,check=True,capture_output=True,env=env,timeout=60)
             outputs.append(out.read_bytes())
