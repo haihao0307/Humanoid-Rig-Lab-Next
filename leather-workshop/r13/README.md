@@ -1,68 +1,50 @@
-# 皮革 R12.0-S1B2：应用层显式接口，网页已验收并合并
+# 皮革 R13.0-S1C：源码工程收尾交付
 
-更新：2026-10-12。S1B2已完成，不再停留于S1B1源码候选。PR #51按用户明确授权合并到 `perf/leather-r10-input-20261011`，合并提交 `2a5a5a69c403372890f99222c5dd4ac9d4fe8ba0`。不涉及人物main；旧R10固定网页不覆盖。
+当前版本已验证并经PR58合并。用户入口：
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/89f2b71251ec6667c09b1ed043b6714da8fa5094/leather-workshop/r13/public-lite.html
 
-## 网页与精确身份
+源码daf7113eea32b156b9565591e29802aefbdf489d；构建89f2b71251ec6667c09b1ed043b6714da8fa5094；正式回执65951309b46262784e72bb617ba1ca6cb5ca217f；成功Actions38338707432；合并cd644dd8d44f57175206fadfb3d24025fef7e03c。完整统计及范围见DELIVERY.json。用户视觉确认仍待反馈，productionReady和commercialLegalClearance仍为false。
 
-固定公网：
-https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5db192b3d34235f5259d0ae5b02ff217f1b9c8f0/leather-workshop/r12/public-lite.html
+## 实际构建关系
 
-源：`731e127b63e3b323484459bc0391410ec19e8c1c`。
-构建：`5db192b3d34235f5259d0ae5b02ff217f1b9c8f0`。
-公网回执：`b2db61b2eadcb2ecde31c4195fade8eb67095e34`。
-HTML：3,628,486字节；SHA256 `46cfe2531e1c2c98242a6c1338725fa35ffeb5ec5a913c889287dd46278a398c`。
-Actions：`38131944900`，completed/success。
+build.py只读取当前目录的assembly.json、canonical.lock.json和规范输入。PanelAssembly明确组合PatternPhysics、ClosedShell、AssemblyContract和YarnHost；src/app/composition.js明确组织相机、产品选择、厚度检查、资源释放、诊断、抓手和当前求解器API。R13不更改这些业务函数、材质、磨损、厚度、时间步、迭代预算和碰撞精度。
 
-上级START_HERE、ROADMAP、TASK_STATE和Issue52是接续入口。2026-10-12恢复检查发现S1B2早已发布成功，旧状态文件及PR尚未收尾；本轮复核产物后只补记状态和合并，没有再次调整运行时代码或重新宣称旧测试为新执行。
+native/contact.c、energy.c、broadphase.c是已审查的有效C源码。native/build.py在两个独立临时目录实际编译，必须生成与已接受内核完全相同的28,697字节，SHA2562f9550559469e184d18bce32989c975aae67da580e95924b1e4f8c0a0f02abb6。native/toolchain.json保存源哈希、顺序、编译器和参数；正常构建不运行历史构建器或适配器，不复制旧WASM当输出。
 
-## 第一阶段已经形成的结构
+工具链为Ubuntu clang18.1.3 (1ubuntu1)及LLD18.1.3；临时输出名必须是contact.wasm。名称区会保存basename；恢复原名称后完整哈希一致，无需删元数据、修改编译后的字节或放宽黄金门槛。详见NATIVE_REBUILD_DIAGNOSIS.md。源码缺失、漂移、工具链不符或结果不符都失败，不回退旧内核。
 
-S1A建立独立装配清单和构建器，可从整理后的源码重现冻结R10，不执行历史构建器。S1B1登记规范源码、资产、许可和固定WASM，PanelAssembly通过PatternPhysics、ClosedShell、AssemblyContract、YarnHost显式处理裁片、几何、绑定、连接和收尾。历史证据保留在qa/s1b及qa/SUMMARY，不被新报告冒充。
+../s1-closure/prepare.py仅为一次性迁移审查记录，不参与常规构建，不覆盖已编辑源码。旧kernel-*.b64仅为审计参考，隔离测试去掉这些块后仍从C生成相同Worker载荷。开发者需要编译器，用户打开最终HTML不需要服务器或开发工具。
 
-S1B2新增唯一应用组合入口 `src/app/composition.js`，各模块只提供各自服务，不再通过先捕获旧函数、再覆盖它的方式层层包装。该入口的关系如下：
+## 依赖与兼容边界
 
-| 调用 | 固定顺序与职责 |
-| --- | --- |
-| setView | setViewBase → applyMacroView，保留基础镜头和微距修正 |
-| selectProduct | resetThicknessMode → selectProductBase，避免旧检查模式泄漏到新产品 |
-| updateDetails | updateDetailsBase → updateShellDetails → updateCraftDetails |
-| destroyGeometry | releaseProductMaterials → destroyGeometryBase，释放产品专属资源，不销毁共享材质目录 |
-| recipe | recipeBase → appendCraftRecipe → appendPerformanceRecipe |
-| updateGrabUI | shouldRefreshGrabUI → 基础诊断 → 慢速提示 → 输入指标 |
-| prepareGrab | prepareGrabBase → bindPublicAppAPI |
-| initializeAppControls | 重复初始化保护 → 原控件 → 切边检查 → 工艺控件 → 输入/性能事件 |
+qa-dependencies.cjs使用TypeScript5.8.3语义绑定，记录main151、product24、specimen6条跨模块依赖；未知依赖注入会失败。环境能力按模块单列，Three.js/Poly2Tri视为受版本锁保护的第三方库边界，不把其内部符号宣称为自有模块。
 
-公共API中的auditContact、stepProduct、performance等始终读取当前productSolver，不捕获已经销毁的上一款产品实例。首次启动即提供完整API；保留旧引用的调用者在切换产品后仍可访问当前求解器。手动步进已通过真实Worker准确执行三步的浏览器检查。
+四处保留扩展：SeamPath.prototype.frame及SurfaceContact.prototype.referenceCandidates/candidates/sewnNeighbour。在各程序初始化和成品/求解器构造前登记，其来源、顺序及差分结果被锁定。S1完成不等于所有共享作用域和原型扩展都已消除；本阶段按计划完成剩余依赖审核，并没有通过重写公用算法改变画面。
 
-材质参数、皮纹随机算法、磨损、灯光、基本相机参数、几何、厚度、物理模型、时间步、迭代预算、碰撞容差及R10调度策略不在本阶段升级范围；立领夹克不恢复，R11整数随机场不启用。
+R02兼容工艺按钮按需解压到craftArchiveFrame.srcdoc；R05基线标签按需解压到baselineFrame.srcdoc。二者是明确的档案运行时，不是当前成品Worker；原字节保留，其参考图片和先前记录的许可问题没有被清空。
 
-## 已完成验证及范围
+## 本轮验证
 
-准确记录以DELIVERY.json为准。成功Actions中包含120项源码/装配/故障检查、25个应用接口案例、18个数值案例、25个几何案例、六款完整52步轨迹、109项离线浏览器检查、16项固定公网浏览器检查。部分检查为套件内包含关系，不简单累计成独立案例总数。
+131项源码/构建门禁、18数值、25应用接口、25几何案例和六款各52步轨迹通过；最大位置差0mm、最终穿透0。45离线与16公网浏览器检查通过，9组原始同状态像素比较差0；所有材质、Worker和扫描输入另有字节不变门禁。没有应用或着色器报错。浏览器为Chrome软件渲染，390×844仅视口模拟，不能冒充全部GPU或实机认证。原应用测试套件的历史phase标签不取代R13源码身份和S1C交付回执。
 
-30组同状态原始视觉对照，覆盖六款产品、六类工艺、十三材质、正反面/微距/切边和艺术调整；最大平均RGB差为0。六款完整轨迹中最大位置差0毫米、皮面帧相同、最终有限厚度穿透0。真实鼠标提放、跨视口旋转、文本选择边界、Esc释放、产品重建API和首启步进通过；离线核心无HTTP请求。使用Chrome软件渲染，390×844仅视口模拟，不是手机实机。
+八份交付报告、HTML以及最终Artifact摘要已重新核对。纯BUILD_RESULT在浏览器执行前生成，只证明构建；最终工程收尾状态看DELIVERY及上级TASK_STATE，不从纯构建字段倒推整体未完成。
 
-早期对照失败涉及亚像素视口和阴影刷新帧的采样时机，记录在qa/VIEWPORT_DIAGNOSIS.md。最终按同一稳定绘制阶段比较，未改渲染器或放宽像素阈值，未对截图平移/重采样掩盖差异；失败运行未发布。设备像素对齐仍是独立的后续健壮性事项。
-
-本次恢复重新获取Artifact11699881905，复核ZIP、HTML、六份报告摘要，并直接比较30对存档PNG，最大通道差0。恢复检查不是新浏览器/数值执行；详见qa/s1b2/RECOVERY_20261012.json。合并树与已审查分支头树相同，没有额外代码冲突混入。
-
-## 构建与恢复
+## 开发与接续
 
 ```sh
-python -m pip install -r leather-workshop/r12/requirements-build.txt
-python leather-workshop/r12/build.py
-python leather-workshop/r12/verify.py
+python -m pip install -r leather-workshop/r13/requirements-build.txt
+# Ubuntu24.04开发机需要已审查版本的clang-18、lld-18
+python leather-workshop/r13/build.py
+# 验证另需Node22、TypeScript5.8.3；TYPESCRIPT_PATH指向该包
+python leather-workshop/r13/verify-closure.py
 ```
 
-普通构建只读取r12清单声明的规范输入，不执行历史构建器、不以旧HTML回退。源码/资产/原生分块缺失或变更必须显式失败；不要靠移动黄金哈希掩盖回归。materialize.py仅保留用于历史迁移及独立参考，不应覆盖已经编辑的规范目录。Python和Node仅为开发工具，用户打开单体HTML无需安装这些工具。
+S1工程收尾完成，下一任务S2性能基线与瓶颈优化。不要重跑旧materialize覆盖源码，不从S1A重做。R01–R12、旧网页、人物main、其他工作台和根LICENSE保持不变；夹克不恢复、R11随机场不启用。依赖可复建不等于独占权属或商业法律放行。
 
-原生WASM继续使用接受版本的确定字节和完整性检查；本轮没有重新编译原生内核，也不声称完成了原生源码可复建链。完整S1仍需审核剩余共享作用域依赖、原生源码与固定内核的对应关系，以及兼容归档边界。用户视觉验收PENDING；全部硬件性能、材料标定、通用碰撞保证、商业法律放行未认证。
+## 交付检查
 
-## 交付门禁
-
-- [x] 实际修改运行源码并提供真实三维工作台，没有生成图或占位替代。
-- [x] 独立构建、代码关系、几何/厚度/轨迹差分证据保留。
-- [x] 完成离线、固定公网和真实浏览器关键交互验收。
-- [x] 用户明确授权后PR51实际合并；旧网页、R01–R11、根许可、其他工作台与人物main不改。
-- [ ] R12用户视觉验收尚待反馈。
-- [ ] 完整S1和商业法律放行未声明完成。
+- [x] 修改真实生产构建和C源码链，不用生成图片代替三维。
+- [x] 真实几何、厚度、物理和接口差分通过；本线不改人物骨骼。
+- [x] 新网页镜头、抓手、选择、参数、单文件和固定公网有实际证据。
+- [x] PR58已合并，历史版保留。
+- [ ] 用户视觉与全部设备验收仍待独立反馈；只有截图不算交付。
