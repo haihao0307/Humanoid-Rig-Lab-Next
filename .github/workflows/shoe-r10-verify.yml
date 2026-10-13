@@ -1,0 +1,50 @@
+name: Shoe R10 bound pair and current-human verification
+on:
+  push:
+    branches: [fix/shoe-r10-bound-pair-wear-20261013]
+    paths: ['shoe-workshop/r10/src/**','shoe-workshop/r10/tools/**','shoe-workshop/r10/tests/**','shoe-workshop/r10/index.html','shoe-workshop/r10/style.css','.github/workflows/shoe-r10-verify.yml']
+permissions:
+  contents: read
+concurrency:
+  group: shoe-r10-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pinned old generator and same-version human-compatible viewer
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 three170@npm:three@0.170.0 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Generate source-derived shoe once at build time
+        run: |
+          for f in shoe-workshop/r10/src/*.mjs; do node --check "$f"; done
+          node shoe-workshop/r10/tools/generate.mjs
+          node shoe-workshop/r10/tests/unit.mjs
+          node shoe-workshop/r10/tools/build.mjs
+      - name: Real paired-shoe and all twelve preset browser test
+        run: node shoe-workshop/r10/tests/browser.mjs --pair
+      - name: Preserve early actual pair renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r10-pair-${{ github.run_id }}
+          path: shoe-workshop/r10/evidence/
+          retention-days: 14
+      - name: Actual current R04 character and complete shoe wearing
+        run: node shoe-workshop/r10/tests/browser.mjs
+      - name: Preserve full current source and actual renders including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r10-verified-${{ github.run_id }}
+          path: shoe-workshop/r10/
+          retention-days: 14
