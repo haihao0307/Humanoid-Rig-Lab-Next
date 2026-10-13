@@ -1,0 +1,115 @@
+{
+  "version": "HAT-SURFACE-S1",
+  "sourceSha": "38077c852a57916f79f0cabbba5dcc1d53a097f7",
+  "baseSha": "122123275eae1402d75c3bb88c819bc7a0e1f8a7",
+  "sourceStudyBuild": "c4400b817d467b062ab003ac1b5277eedb25aad7",
+  "eb1Commit": "beb3dda0a28f732e1e387dd68cc0d90f27ce8b7b",
+  "eb1SHA256": "39f747e36f905eaf9e760236315ae649bcab4ffd4feb62290017c7c5da650572",
+  "surfaceMode": "analytic-no-source-pixels",
+  "filmReady": false,
+  "equivalentToSource": false,
+  "htmlSHA256": "c01097bb4daf0372157fe0a75d384a014efaf3fd56eccbaf48581620ba2a32bf",
+  "entryBytes": 9270040,
+  "basePayloadSHA256": "dad1ef1cdf1a7c51b23df65320b1ca97dd26d1d818026895d1119b1126d10ceb",
+  "all11ControlUVColorPayloadUnchanged": true,
+  "transportLengthAndHashVerified": true,
+  "eb1RedrawIntegrated": true,
+  "runtimePatches": [
+    {
+      "before": "debugParts:()=>({asset,hat,person,scene,camera,controls})",
+      "after": "debugParts:()=>({asset,hat,person,scene,camera,controls,renderer})"
+    },
+    {
+      "before": " renderer.render(scene,camera);",
+      "after": " globalThis.__hatSurfaceBeforeRender?.();renderer.render(scene,camera);"
+    },
+    {
+      "before": "function queueDetail(a){",
+      "after": "function queueDetail(a){\n if(globalThis.HAT_SURFACE_OWNED!==false){stopDetail();a.detailState=a.maps.normal?'ready':'surface-independent';return;}"
+    }
+  ],
+  "originalRuntimeSHA256": "b4af29c54b56240fd9549e79b88316c23bd84390c8b9f72e7b9ad5bbcdaa0eca",
+  "patchedRuntimeSHA256": "42ba101fe8746c0a41d9c221c524e82b3885978efb3ca132da88b5a2c2c69717",
+  "proceduralSourceSHA256": "e99485766b157debc5024308cc33136a61d65bd8e4e01c56b7470ccd1cbf05a8",
+  "publicVerified": false,
+  "referenceNormals": "lazy, only on explicit reference mode; original bytes and URLs retained",
+  "hats": [
+    {
+      "id": "cable",
+      "author": "Mindfront",
+      "licence": "CC BY 4.0",
+      "controls": 233,
+      "motherSHA256": "9d45c23c81966171742ee5810ed027dfe4d40fe0d3051de3c7d128028e750c8a"
+    },
+    {
+      "id": "fishing",
+      "author": "Mindfront",
+      "licence": "CC BY 4.0",
+      "controls": 1293,
+      "motherSHA256": "d6a4617e7c1ef7d4a34990019617d139dab491069ea32824f687d680226fb16d"
+    },
+    {
+      "id": "flatcap",
+      "author": "Elvaerwyn",
+      "licence": "CC BY 4.0",
+      "controls": 1337,
+      "motherSHA256": "4a5ab3c441ad5a15dedcdd765389a42c32a2b8bb33d1f3d3082e55d3f69d7e5b"
+    },
+    {
+      "id": "trilby",
+      "author": "Elvaerwyn",
+      "licence": "CC-by",
+      "controls": 14924,
+      "motherSHA256": "6f5ad51b9d698779070e75aac0ea73d8ba550106a7f5a2da0368096a1f407c05"
+    },
+    {
+      "id": "sherpa",
+      "author": "Mindfront",
+      "licence": "CC BY 4.0",
+      "controls": 1071,
+      "motherSHA256": "3bff37440c62876ed792e969e7d14a95b0e7cc808a9ce0e39f599da4aa43da54"
+    },
+    {
+      "id": "patrol",
+      "author": "Mindfront",
+      "licence": "CC BY 4.0",
+      "controls": 377,
+      "motherSHA256": "9271e007fabf24d0cb4f7d90de5d58db3f0e110a3e211046773837f8a54d50f5"
+    },
+    {
+      "id": "bowler",
+      "author": "culturalibre",
+      "licence": "CC-BY",
+      "controls": 1186,
+      "motherSHA256": "d2345765bc6ef65cfb15fe02266813e4732804f3a7b6e0bcd06421e35ae66649"
+    },
+    {
+      "id": "top",
+      "author": "Elvaerwyn",
+      "licence": "CC-by",
+      "controls": 622,
+      "motherSHA256": "be5d8c36aaa0ac7aaa7cfd92e723d5cdd84b21e301ef3de425a02abf6d01da21"
+    },
+    {
+      "id": "visor",
+      "author": "punkduck",
+      "licence": "CC  BY 3.0",
+      "controls": 414,
+      "motherSHA256": "0a468582f6ebe48d5909295acc81a4a66cc106ea913b0b4eea9f116187cc9a22"
+    },
+    {
+      "id": "cloche",
+      "author": "AEthelraed_Unraed",
+      "licence": "CC0",
+      "controls": 441,
+      "motherSHA256": "05b0ece715d5a94059d246cabcc70580fc1a0c5aad549f5826e370e6da59d9ea"
+    },
+    {
+      "id": "chef",
+      "author": "Elvaerwyn",
+      "licence": "CC-BY",
+      "controls": 4125,
+      "motherSHA256": "fa1b3a0bad166850f6fa4f9e431407ebadb5c66d759e5ca1c17e90c0331276ab"
+    }
+  ]
+}
