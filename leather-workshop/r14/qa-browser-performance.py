@@ -21,10 +21,22 @@ let last;function frame(t){if(last)data.raf.push(t-last);last=t;if(data.raf.leng
 def pct(v,p):
  v=sorted(x for x in v if x>=0);return {'samples':len(v),'p50MS':v[(len(v)-1)//2] if v else None,'p95MS':v[min(len(v)-1,int(len(v)*.95))] if v else None}
 rows=[]
+# S2_TIMING_BOOT_RECOVERY_20261013
+import atexit,sys,traceback
+failure_details={}
+def retain_failure():
+ if not (O/'browser-performance.json').exists():
+  (O/'browser-performance.json').write_text(json.dumps({'pass':False,'sourceCommit':os.environ.get('LEATHER_SOURCE_COMMIT'),'rows':rows,'failure':failure_details,'pageErrors':globals().get('errors',[]),'note':'Incomplete timing samples never count as passing evidence.'},indent=2)+'\n')
+def record_exception(kind,value,tb):
+ failure_details.update(type=kind.__name__,message=str(value),traceback=''.join(traceback.format_exception(kind,value,tb)))
+ sys.__excepthook__(kind,value,tb)
+(O/'browser-performance.json').unlink(missing_ok=True)
+atexit.register(retain_failure)
+sys.excepthook=record_exception
 with sync_playwright() as pw:
  browser=pw.chromium.launch(executable_path=os.environ.get('KAOPU_CHROMIUM_EXECUTABLE','/usr/bin/google-chrome'),headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader','--use-gl=angle','--use-angle=swiftshader'])
  for label,file in [('reference',R.parent/'r13/public-lite.html'),('candidate',R/'out/candidate-r14.html')]:
-  ctx=browser.new_context(viewport={'width':1440,'height':1000});ctx.add_init_script(PROBE);p=ctx.new_page();errors=[];p.on('pageerror',lambda e:errors.append(str(e)));p.goto(file.as_uri(),wait_until='domcontentloaded');p.wait_for_function('LEATHER_ATELIER?.ready',timeout=180000)
+  ctx=browser.new_context(viewport={'width':1440,'height':1000});ctx.add_init_script(PROBE);p=ctx.new_page();errors=[];p.on('pageerror',lambda e:errors.append(str(e)));p.goto(file.as_uri(),wait_until='domcontentloaded');p.wait_for_function('window.LEATHER_ATELIER?.ready',timeout=180000)
   p.evaluate("LEATHER_ATELIER.selectProduct('wallet');LEATHER_ATELIER.configure({craft:'plain'});LEATHER_ATELIER.setView('home');LEATHER_ATELIER.render()")
   p.wait_for_function('LEATHER_ATELIER.productPhysics.version.startsWith("R09")');p.wait_for_timeout(150)
   box=p.locator('#stage').bounding_box();x=box['x']+box['width']/2;y=box['y']+box['height']/2
