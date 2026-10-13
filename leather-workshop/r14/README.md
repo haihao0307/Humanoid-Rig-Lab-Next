@@ -16,3 +16,9 @@ Progress and delivery are authoritative only in DELIVERY.json and the parent TAS
 Primary timing references: https://developer.mozilla.org/en-US/docs/Web/API/Performance/timeOrigin and https://developer.mozilla.org/en-US/docs/Web/API/Performance/now .
 
 S2 recovery also replaces temporary contact-serialization arrays with exact scalar Float64 writes. See PACKING_OPTIMIZATION.md; it preserves native arithmetic and does not remove collision candidates.
+
+## Verified delivery
+
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/37178e800a3272575b16e30a0723b3bcf1f29c0a/leather-workshop/r14/public-lite.html
+
+Native, differential, performance, offline and public checks passed in workflow 38345375250. See DELIVERY.json for measured scope. S2A is complete; full S2 and user acceptance remain pending.
