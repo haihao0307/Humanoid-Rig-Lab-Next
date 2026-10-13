@@ -8,7 +8,7 @@ permissions:
   contents: write
 concurrency:
   group: hat-r09-render-recovery
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -71,6 +71,9 @@ jobs:
           SUITE: ${{ matrix.suite }}
         run: |
           set -euo pipefail
+          if [[ "$SUITE" == "local-browser" || "$SUITE" == "public-browser" ]]; then
+            timeout --kill-after=10s 180s python -u hat-workshop/r09/finish-recovery.py geometry
+          fi
           case "$SUITE" in
             geometry) timeout --kill-after=10s 180s python -u hat-workshop/r09/finish-recovery.py geometry ;;
             local-browser) timeout --kill-after=10s 480s python -u hat-workshop/r09/qa-browser.py --source "$SOURCE" ;;
