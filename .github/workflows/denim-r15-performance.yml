@@ -1,0 +1,104 @@
+name: Denim R15 live physics performance and quality parity
+on:
+  push:
+    branches: [perf/denim-r15-live-physics-20261013]
+    paths: ['denim-workshop/r15/**', '.github/workflows/denim-r15-performance.yml']
+permissions:
+  contents: write
+concurrency:
+  group: denim-r15-live-physics
+  cancel-in-progress: true
+jobs:
+  verify-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Expand locked source and compile the full double-precision kernel
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang lld
+          test -f denim-workshop/r15/app.js || python denim-workshop/r15/hydrate.py
+          python denim-workshop/r15/refine-metrics.py
+          python denim-workshop/r15/compile-kernel.py
+          python denim-workshop/r15/build.py
+          for f in denim-workshop/r15/*.js; do node --check "$f"; done
+          python -m py_compile denim-workshop/r15/qa-performance.py
+          git diff --exit-code HEAD -- denim-workshop/r14 denim-workshop/r13 denim-workshop/r12-1 denim-workshop/archives
+      - name: All original bending gates and full 720-step differential performance
+        run: |
+          node denim-workshop/r15/test-frame-window.cjs
+          node denim-workshop/r15/test-bending.cjs
+          node denim-workshop/r15/test-performance.cjs
+      - name: Install pinned browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6
+          python -m playwright install --with-deps chromium
+      - name: Actual standalone file, same-pose pixels and continuous motion
+        run: xvfb-run -a python -u denim-workshop/r15/qa-performance.py
+      - name: Publish only the tested canonical runtime
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          p=Path('denim-workshop/r15')
+          assert json.loads((p/'evidence/file-qa.json').read_text())['passed']
+          files=[str(f) for f in p.iterdir() if f.is_file() and f.suffix in ['.js','.py','.c','.cjs','.json','.html','.md','.wasm']]+[str(p/'LICENSE')]
+          subprocess.run(['git','add','--',*files],check=True)
+          PY
+          git diff --exit-code HEAD -- denim-workshop/r14 denim-workshop/r13 denim-workshop/r12-1 denim-workshop/archives
+          git commit -m 'build(denim): publish file-tested R15 full-physics acceleration [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r15/index.html" >> "$GITHUB_OUTPUT"
+      - name: Actual immutable public rendering and user controls
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: xvfb-run -a python -u denim-workshop/r15/qa-performance.py --public "$PUBLIC_URL"
+      - name: Record exact public bytes, measured results and pending 60 FPS acceptance
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,urllib.request
+          p=Path('denim-workshop/r15')
+          file=json.loads((p/'evidence/file-qa.json').read_text());public=json.loads((p/'evidence/public-qa.json').read_text());numeric=json.loads((p/'PERFORMANCE_NUMERIC.json').read_text());bending=json.loads((p/'BENDING_QA.json').read_text());manifest=json.loads((p/'BUILD_MANIFEST.json').read_text());kernel=json.loads((p/'KERNEL_BUILD.json').read_text())
+          window=json.loads((p/'FRAME_WINDOW_QA.json').read_text())
+          assert window['passed']
+          assert file['passed'] and public['passed'] and numeric['passed'] and bending['passed']
+          raw='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r15/index.html'
+          with urllib.request.urlopen(raw,timeout=90) as response:
+              data=response.read();assert response.status==200
+          assert data==(p/'index.html').read_bytes() and hashlib.sha256(data).hexdigest()==manifest['sha256']
+          def summary(r):
+              return {k:r.get(k) for k in ['passed','mode','browserVersion','comparisons','measurements','benchmarkButtonWorks','automaticThirtySecondBenchmark','userBenchmarkReport','performanceExport','reportExport','network']}|{'stateNames':[s['name'] for s in r['states']],'maxTrackedGpuBytes':max(s['frame']['performance']['trackedGpuBytes'] for s in r['states'])}
+          receipt={'version':'R15.0','status':'PUBLIC_VERIFIED_60FPS_ACCEPTANCE_PENDING','publicVerified':True,'publicBytesMatch':True,'targetFPS':60,'sixtyFPSAccepted':False,'consumerGPUPerformanceVerified':False,'userVisualApproved':False,'sourceCommit':os.environ['GITHUB_SHA'],'parentSource':'9d5437755d69c8a86557b10cbfcf12dbb84812ed','parentBuild':'5ebe0c034d3a345067929c6034d53eb615b39d21','buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'foldUrl':os.environ['PUBLIC_URL']+'#fold','workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'kernel':kernel,'numeric':numeric,'originalBendingGates':bending,'measurementWindowTests':window,'supersededMeasurementRun':38394012743,'browser':{'file':summary(file),'public':summary(public)},'preserved':['637 full fold nodes, 240Hz, 12+16 passes, original thickness/contact/friction/radius guards','Original Cloth and material mode, procedural geometry/sampling/LOD/resolution/shadows/light','Actual physics commands and stale-sample protections; no recorded animation substitution'],'newChanges':['Compiled Float64 hot loops with fixed storage and the original ordered contact candidates','Reuse Hermite fetches, unchanged uniform cache, eliminate extra pre-rAF sleep, adapt bounded GPU batches','Actual completed-frame/new-state/simulation-speed measurements and local report export'],'limits':['Software Chromium still does not certify 60FPS on consumer hardware','Solver speedup is not whole-page FPS speedup; no peak/callback counter acceptance','Observed GPU fence completion is not display/compositor measurement','Added approximately 7MiB WASM linear memory plus other JS/driver cost','Fixed continuous swatch, unmeasured material assumptions, no complete CCD or garment integration','Mobile 390x844 viewport only, not a real phone','R01-R14, archives, main, other workbenches and root licensing preserved; no merge or force push']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r15/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): R15 public evidence with 60FPS acceptance explicitly pending [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r15-performance-evidence
+          path: denim-workshop/r15
+          retention-days: 14
+          if-no-files-found: error
