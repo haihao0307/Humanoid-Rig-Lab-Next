@@ -1,0 +1,2320 @@
+{
+  "phase": "S2B",
+  "version": "R17.0-B1",
+  "sourceCommit": "e5e13b3cac317e0a438af9c6ffe2df319714a34a",
+  "pass": true,
+  "checks": [
+    {
+      "name": "R17.0-B1 actual runtime ready",
+      "pass": true,
+      "data": ""
+    },
+    {
+      "name": "Source identity matches tested source commit",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Complete public API exists at first boot",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "First-boot manual step delegates to actual worker exactly three times",
+      "pass": true,
+      "data": {
+        "before": 0,
+        "after": 3
+      }
+    },
+    {
+      "name": "Six retained products, thirteen material previews, no jacket",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Six visible craft controls",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "API remains complete after product rebuild",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Previously obtained delegate reads current product not disposed solver",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Real pointer reaches actual coupled physical lift",
+      "pass": true,
+      "data": {
+        "start": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 98,
+          "maxSeamGapErrorMM": 8.673617379884035e-16,
+          "version": "R09-implicit-1",
+          "timeS": 0,
+          "steps": 0,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 224,
+          "triangles": 344,
+          "massG": 15.964200000000002,
+          "centerMM": [
+            4.3368086899420177e-16,
+            32.0142827488629,
+            1.032688239936858
+          ],
+          "maxStretch": 1,
+          "peakStretch": 1,
+          "maxEdgeChangeMM": 0,
+          "groundMinMM": 0.2719780921936034,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 0,
+            "ccdEvents": 0,
+            "ptEvents": 0,
+            "eeEvents": 0,
+            "frictionEvents": 0,
+            "normalForceN": 0,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": 7.2852813742385685,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": 7.2852813742385685,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0,
+          "solverIterations": null,
+          "lbfgsIterations": 0,
+          "incrementalPotentialJ": null,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": false,
+          "initialization": null,
+          "workerSolveMS": 0,
+          "workerBusy": false,
+          "calculationSpeed": 0,
+          "integrationThread": "autonomous fixed-step worker; rendering does not pace simulation",
+          "inputToPoseMS": 0,
+          "cursorErrorMM": 5.337136212080535e-07,
+          "receivedPoses": 1,
+          "appliedPoses": 1,
+          "pendingRequests": 1,
+          "inputSequence": 1
+        },
+        "held": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 98,
+          "maxSeamGapErrorMM": 0.002841834348162346,
+          "version": "R09-implicit-1",
+          "timeS": 1.1166666666666651,
+          "steps": 134,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 224,
+          "triangles": 344,
+          "massG": 15.964200000000002,
+          "centerMM": [
+            3.511663779967067,
+            41.06255304191241,
+            -2.045019188846684
+          ],
+          "maxStretch": 1.0002386890768822,
+          "peakStretch": 1.000833733830782,
+          "maxEdgeChangeMM": 0.0028642689225855805,
+          "groundMinMM": 7.6565814151806455,
+          "grabErrorMM": 0.039149991784598485,
+          "grabForceN": 0.15659996713837487,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 588,
+            "ccdEvents": 2966,
+            "ptEvents": 755,
+            "eeEvents": 2211,
+            "frictionEvents": 111215,
+            "normalForceN": 0.9307832365261671,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": 7.2852813742385685,
+            "minimumClearanceMM": 0.05589573454537573,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": 7.2852813742385685,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0.015968161742587403,
+          "solverIterations": 25,
+          "lbfgsIterations": 3350,
+          "incrementalPotentialJ": 8.695378024980317e-05,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": false,
+          "initialization": null,
+          "workerSolveMS": 26.5,
+          "workerBusy": false,
+          "calculationSpeed": 0.22351363433169635,
+          "integrationThread": "autonomous fixed-step worker; rendering does not pace simulation",
+          "inputToPoseMS": 148.90000000000873,
+          "cursorErrorMM": 1.0423664173958904,
+          "receivedPoses": 135,
+          "appliedPoses": 11,
+          "pendingRequests": 0,
+          "inputSequence": 13
+        }
+      }
+    },
+    {
+      "name": "Release continues finite-thickness dynamics without contact penetration",
+      "pass": true,
+      "data": {
+        "scope": "topologically non-neighbour simulation primitives",
+        "minClearanceMM": 0.05295438379033417,
+        "penetrating": 0,
+        "intersection": 0,
+        "worst": []
+      }
+    },
+    {
+      "name": "Orbit crossing viewport boundary cannot select text",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Pointer up releases selection guard",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Ordinary sidebar text stays selectable",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Escape releases grab and guard",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "Mobile viewport fits without horizontal overflow",
+      "pass": true,
+      "data": null
+    },
+    {
+      "name": "No application or shader errors",
+      "pass": true,
+      "data": []
+    }
+  ],
+  "errors": [],
+  "scope": "Actual Chrome WebGL; desktop 1440x1000, mobile 390x844 viewport simulation only; not a physical-device or real-time performance certification.",
+  "browser": "154.0.8037.97",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "url": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5f455d90273aa717f101c6bd8be6a5cb500c99fb/leather-workshop/r17/public-lite.html",
+  "captureDiagnostics": {
+    "live-lift": {
+      "before": {
+        "scroll": [
+          0,
+          0
+        ],
+        "size": [
+          1440,
+          1000,
+          1
+        ],
+        "compatMode": "CSS1Compat",
+        "rectangles": {
+          "stage": {
+            "rect": {
+              "x": 266,
+              "y": 202,
+              "width": 950,
+              "height": 541.015625,
+              "top": 202,
+              "right": 1216,
+              "bottom": 743.015625,
+              "left": 266
+            },
+            "client": [
+              950,
+              541
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "sceneCanvas": {
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 1000,
+              "top": 0,
+              "right": 1440,
+              "bottom": 1000,
+              "left": 0
+            },
+            "client": [
+              1440,
+              1000
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "craftRibbon": {
+            "rect": {
+              "x": 266,
+              "y": 743.015625,
+              "width": 950,
+              "height": 63.984375,
+              "top": 743.015625,
+              "right": 1216,
+              "bottom": 807,
+              "left": 266
+            },
+            "client": [
+              950,
+              64
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "collection": {
+            "rect": {
+              "x": 266,
+              "y": 851.5,
+              "width": 950,
+              "height": 148.5,
+              "top": 851.5,
+              "right": 1216,
+              "bottom": 1000,
+              "left": 266
+            },
+            "client": [
+              950,
+              148
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          }
+        },
+        "frame": {
+          "maxAbsX": 0.6937104973114194,
+          "maxAbsY": 0.8600000000000007,
+          "inDepth": true,
+          "points": [
+            [
+              -0.48182883396103743,
+              -0.5038377026859967,
+              0.9940765329522007
+            ],
+            [
+              -0.5031136160786048,
+              -0.5336887990433984,
+              0.9939614069969146
+            ],
+            [
+              -0.5489140082265098,
+              0.8002323713283024,
+              0.9932239579984125
+            ],
+            [
+              -0.5746665412011513,
+              0.7941401774047859,
+              0.9930741501329468
+            ],
+            [
+              0.5912453836357918,
+              -0.8170507245278051,
+              0.9928685723494868
+            ],
+            [
+              0.589911210778962,
+              -0.8600000000000007,
+              0.9927029309838103
+            ],
+            [
+              0.6925869128349172,
+              0.7346767527879671,
+              0.9916119365483238
+            ],
+            [
+              0.6937104973114194,
+              0.7253976488314701,
+              0.9913837621378226
+            ]
+          ]
+        },
+        "gauge": [
+          {
+            "part": "wallet-panel-0",
+            "minMM": 1.0305898189544676,
+            "maxMM": 1.2199883460998542,
+            "targetMM": 1.2,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.002483459510396605,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-1",
+            "minMM": 1.0255548954010028,
+            "maxMM": 1.219919562339783,
+            "targetMM": 1.2,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.0024834595103960066,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-2",
+            "minMM": 1.0305898189544669,
+            "maxMM": 1.2197008132934561,
+            "targetMM": 1.2,
+            "sampleCount": 82,
+            "wallEdges": 1184,
+            "boundaryEdges": 1184,
+            "periodic": 0,
+            "chordErrorMM": 0.002483459510396502,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          }
+        ],
+        "audit": {
+          "kind": "wallet",
+          "finite": true,
+          "vertices": 61864,
+          "triangles": 104864,
+          "holes": 147,
+          "continuousThreadMeshes": 1,
+          "detachedSticks": 0,
+          "leatherMeshes": 3,
+          "massModel": "surface area × actual thickness × 700kg/m3, plus named hardware masses",
+          "physicalCalibration": false,
+          "boundsMM": [
+            108.14399719238281,
+            76.1439773440361,
+            4.013869106769562
+          ],
+          "seams": [
+            {
+              "name": "wallet-panel-0-0",
+              "holes": 49,
+              "pitchMM": 3.4265329653876484,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.07335465887387542,
+                "maxDisplacementMM": 0.011669513066411296,
+                "maxLateralMM": 0.010192622379724655,
+                "relativeResidual": 9.463358827120519e-08,
+                "iterations": 117,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            },
+            {
+              "name": "wallet-panel-1-0",
+              "holes": 49,
+              "pitchMM": 3.4265329653876484,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.07335465887387542,
+                "maxDisplacementMM": 0.011669513066411296,
+                "maxLateralMM": 0.010192622379724655,
+                "relativeResidual": 9.463358827120519e-08,
+                "iterations": 117,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            },
+            {
+              "name": "wallet-panel-2-0",
+              "holes": 49,
+              "pitchMM": 3.4265329653876484,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.07335465887387542,
+                "maxDisplacementMM": 0.011669513066411296,
+                "maxLateralMM": 0.010192622379724655,
+                "relativeResidual": 9.463358827120519e-08,
+                "iterations": 117,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            }
+          ]
+        },
+        "physics": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 98,
+          "maxSeamGapErrorMM": 0.0029311974634000856,
+          "version": "R09-implicit-1",
+          "timeS": 1.1333333333333317,
+          "steps": 136,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 224,
+          "triangles": 344,
+          "massG": 15.964200000000002,
+          "centerMM": [
+            3.801689896054462,
+            41.99337328102069,
+            -2.4112061323446334
+          ],
+          "maxStretch": 1.0001977526301278,
+          "peakStretch": 1.000833733830782,
+          "maxEdgeChangeMM": 0.0023730315615328595,
+          "groundMinMM": 8.667393546554678,
+          "grabErrorMM": 0.018192120785509018,
+          "grabForceN": 0.07276848314203545,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 569,
+            "ccdEvents": 2966,
+            "ptEvents": 755,
+            "eeEvents": 2211,
+            "frictionEvents": 112405,
+            "normalForceN": 0.9291031118482677,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": 7.2852813742385685,
+            "minimumClearanceMM": 0.05578656480829469,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": 7.2852813742385685,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0.03608796445688529,
+          "solverIterations": 25,
+          "lbfgsIterations": 3400,
+          "incrementalPotentialJ": 4.346762787836303e-05,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": false,
+          "initialization": null,
+          "workerSolveMS": 50.5,
+          "workerBusy": false,
+          "calculationSpeed": 0.22351363433169635,
+          "integrationThread": "autonomous fixed-step worker; rendering does not pace simulation",
+          "inputToPoseMS": 62.30000000000291,
+          "cursorErrorMM": 0.018192120785508265,
+          "receivedPoses": 137,
+          "appliedPoses": 11,
+          "pendingRequests": 0,
+          "inputSequence": 13
+        },
+        "gpu": {
+          "viewport": [
+            266,
+            257,
+            950,
+            541
+          ],
+          "scissor": [
+            266,
+            257,
+            950,
+            541
+          ]
+        }
+      },
+      "after": {
+        "scroll": [
+          0,
+          0
+        ],
+        "size": [
+          1440,
+          1000,
+          1
+        ],
+        "compatMode": "CSS1Compat",
+        "rectangles": {
+          "stage": {
+            "rect": {
+              "x": 266,
+              "y": 202,
+              "width": 950,
+              "height": 541.015625,
+              "top": 202,
+              "right": 1216,
+              "bottom": 743.015625,
+              "left": 266
+            },
+            "client": [
+              950,
+              541
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "sceneCanvas": {
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 1000,
+              "top": 0,
+              "right": 1440,
+              "bottom": 1000,
+              "left": 0
+            },
+            "client": [
+              1440,
+              1000
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "craftRibbon": {
+            "rect": {
+              "x": 266,
+              "y": 743.015625,
+              "width": 950,
+              "height": 63.984375,
+              "top": 743.015625,
+              "right": 1216,
+              "bottom": 807,
+              "left": 266
+            },
+            "client": [
+              950,
+              64
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "collection": {
+            "rect": {
+              "x": 266,
+              "y": 851.5,
+              "width": 950,
+              "height": 148.5,
+              "top": 851.5,
+              "right": 1216,
+              "bottom": 1000,
+              "left": 266
+            },
+            "client": [
+              950,
+              148
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          }
+        },
+        "frame": {
+          "maxAbsX": 0.6937104973114194,
+          "maxAbsY": 0.8600000000000007,
+          "inDepth": true,
+          "points": [
+            [
+              -0.48182883396103743,
+              -0.5038377026859967,
+              0.9940765329522007
+            ],
+            [
+              -0.5031136160786048,
+              -0.5336887990433984,
+              0.9939614069969146
+            ],
+            [
+              -0.5489140082265098,
+              0.8002323713283024,
+              0.9932239579984125
+            ],
+            [
+              -0.5746665412011513,
+              0.7941401774047859,
+              0.9930741501329468
+            ],
+            [
+              0.5912453836357918,
+              -0.8170507245278051,
+              0.9928685723494868
+            ],
+            [
+              0.589911210778962,
+              -0.8600000000000007,
+              0.9927029309838103
+            ],
+            [
+              0.6925869128349172,
+              0.7346767527879671,
+              0.9916119365483238
+            ],
+            [
+              0.6937104973114194,
+              0.7253976488314701,
+              0.9913837621378226
+            ]
+          ]
+        },
+        "gauge": [
+          {
+            "part": "wallet-panel-0",
+            "minMM": 1.0305898189544667,
+            "maxMM": 1.2199883460998513,
+            "targetMM": 1.2,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.002483459510396605,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-1",
+            "minMM": 1.0255548954009992,
+            "maxMM": 1.2199195623397838,
+            "targetMM": 1.2,
+            "sampleCount": 81,
+            "wallEdges": 1248,
+            "boundaryEdges": 1248,
+            "periodic": 0,
+            "chordErrorMM": 0.0024834595103960066,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          },
+          {
+            "part": "wallet-panel-2",
+            "minMM": 1.0305898189544664,
+            "maxMM": 1.2197008132934555,
+            "targetMM": 1.2,
+            "sampleCount": 82,
+            "wallEdges": 1184,
+            "boundaryEdges": 1184,
+            "periodic": 0,
+            "chordErrorMM": 0.002483459510396502,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          }
+        ],
+        "audit": {
+          "kind": "wallet",
+          "finite": true,
+          "vertices": 61864,
+          "triangles": 104864,
+          "holes": 147,
+          "continuousThreadMeshes": 1,
+          "detachedSticks": 0,
+          "leatherMeshes": 3,
+          "massModel": "surface area × actual thickness × 700kg/m3, plus named hardware masses",
+          "physicalCalibration": false,
+          "boundsMM": [
+            108.14399719238281,
+            76.1439773440361,
+            4.013869106769562
+          ],
+          "seams": [
+            {
+              "name": "wallet-panel-0-0",
+              "holes": 49,
+              "pitchMM": 3.4265329653876484,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.07335465887387542,
+                "maxDisplacementMM": 0.011669513066411296,
+                "maxLateralMM": 0.010192622379724655,
+                "relativeResidual": 9.463358827120519e-08,
+                "iterations": 117,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            },
+            {
+              "name": "wallet-panel-1-0",
+              "holes": 49,
+              "pitchMM": 3.4265329653876484,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.07335465887387542,
+                "maxDisplacementMM": 0.011669513066411296,
+                "maxLateralMM": 0.010192622379724655,
+                "relativeResidual": 9.463358827120519e-08,
+                "iterations": 117,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            },
+            {
+              "name": "wallet-panel-2-0",
+              "holes": 49,
+              "pitchMM": 3.4265329653876484,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.07335465887387542,
+                "maxDisplacementMM": 0.011669513066411296,
+                "maxLateralMM": 0.010192622379724655,
+                "relativeResidual": 9.463358827120519e-08,
+                "iterations": 117,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            }
+          ]
+        },
+        "physics": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 98,
+          "maxSeamGapErrorMM": 0.0032447978726745166,
+          "version": "R09-implicit-1",
+          "timeS": 2.866666666666659,
+          "steps": 344,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 224,
+          "triangles": 344,
+          "massG": 15.964200000000002,
+          "centerMM": [
+            3.706326733495387,
+            41.68021767135987,
+            -2.258127754830336
+          ],
+          "maxStretch": 1.0002703619236495,
+          "peakStretch": 1.000833733830782,
+          "maxEdgeChangeMM": 0.003244343083793483,
+          "groundMinMM": 9.504899553635424,
+          "grabErrorMM": 0.039149488596849503,
+          "grabForceN": 0.1565979543874067,
+          "held": true,
+          "active": true,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 184,
+            "ccdEvents": 2966,
+            "ptEvents": 755,
+            "eeEvents": 2211,
+            "frictionEvents": 176340,
+            "normalForceN": 0.9340466913896883,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": 7.2852813742385685,
+            "minimumClearanceMM": 0.054536403304557064,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": 7.2852813742385685,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0.007663317267467351,
+          "solverIterations": 25,
+          "lbfgsIterations": 8600,
+          "incrementalPotentialJ": 0.00010377153676372508,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": false,
+          "initialization": null,
+          "workerSolveMS": 22.60000000000582,
+          "workerBusy": false,
+          "calculationSpeed": 0.24084778420039463,
+          "integrationThread": "autonomous fixed-step worker; rendering does not pace simulation",
+          "inputToPoseMS": 62.30000000000291,
+          "cursorErrorMM": 0.039149488596861605,
+          "receivedPoses": 333,
+          "appliedPoses": 20,
+          "pendingRequests": 0,
+          "inputSequence": 13
+        },
+        "gpu": {
+          "viewport": [
+            266,
+            256,
+            950,
+            541
+          ],
+          "scissor": [
+            266,
+            256,
+            950,
+            541
+          ]
+        }
+      }
+    },
+    "mobile": {
+      "before": {
+        "scroll": [
+          0,
+          0
+        ],
+        "size": [
+          390,
+          844,
+          1
+        ],
+        "compatMode": "CSS1Compat",
+        "rectangles": {
+          "stage": {
+            "rect": {
+              "x": 0,
+              "y": 166,
+              "width": 390,
+              "height": 460.953125,
+              "top": 166,
+              "right": 390,
+              "bottom": 626.953125,
+              "left": 0
+            },
+            "client": [
+              390,
+              461
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "sceneCanvas": {
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 844,
+              "top": 0,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            },
+            "client": [
+              390,
+              844
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "craftRibbon": {
+            "rect": {
+              "x": 0,
+              "y": 626.953125,
+              "width": 390,
+              "height": 48.875,
+              "top": 626.953125,
+              "right": 390,
+              "bottom": 675.828125,
+              "left": 0
+            },
+            "client": [
+              390,
+              49
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "collection": {
+            "rect": {
+              "x": 0,
+              "y": 741.609375,
+              "width": 390,
+              "height": 102.390625,
+              "top": 741.609375,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            },
+            "client": [
+              390,
+              101
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          }
+        },
+        "frame": {
+          "maxAbsX": 0.8599125542299347,
+          "maxAbsY": 0.5259711242838058,
+          "inDepth": true,
+          "points": [
+            [
+              -0.5155536470994785,
+              0.3459088038722631,
+              0.9978219555411628
+            ],
+            [
+              -0.8339755047792912,
+              -0.33412182297752574,
+              0.9973431398823105
+            ],
+            [
+              -0.5288311032746152,
+              0.42881744307357356,
+              0.9977607113877406
+            ],
+            [
+              -0.8599125542299347,
+              -0.255149910156751,
+              0.9972542895017966
+            ],
+            [
+              0.7213084035121536,
+              0.2140238253833232,
+              0.9977290941458454
+            ],
+            [
+              0.6486440662300003,
+              -0.5259711242838058,
+              0.9972080570698924
+            ],
+            [
+              0.740629646849233,
+              0.29672397611001294,
+              0.9976629069788829
+            ],
+            [
+              0.6698021840753684,
+              -0.4494012866130198,
+              0.997110462244622
+            ]
+          ]
+        },
+        "gauge": [
+          {
+            "part": "craft-leather-sample",
+            "minMM": 1.2869032182605578,
+            "maxMM": 1.409117878206334,
+            "targetMM": 1.4,
+            "sampleCount": 81,
+            "wallEdges": 12302,
+            "boundaryEdges": 12302,
+            "periodic": 0,
+            "chordErrorMM": 0.016422174575057964,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          }
+        ],
+        "audit": {
+          "kind": "swatch",
+          "finite": true,
+          "vertices": 428776,
+          "triangles": 755840,
+          "holes": 711,
+          "continuousThreadMeshes": 19,
+          "detachedSticks": 0,
+          "leatherMeshes": 1,
+          "massModel": "surface area × actual thickness × 700kg/m3, plus named hardware masses",
+          "physicalCalibration": false,
+          "boundsMM": [
+            160.51622009277344,
+            16.865409076213837,
+            130.26220703125
+          ],
+          "seams": [
+            {
+              "name": "craft-leather-sample-0",
+              "holes": 165,
+              "pitchMM": 3.406535343199679,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865202677428937,
+                "maxDisplacementMM": 0.005348949456701595,
+                "maxLateralMM": 0.010148930046269856,
+                "relativeResidual": 9.166653090086034e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 329
+            },
+            {
+              "name": "craft-leather-sample-1",
+              "holes": 12,
+              "pitchMM": 3.530692063272193,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03866846528635246,
+                "maxDisplacementMM": 0.005229663346835099,
+                "maxLateralMM": 0.010155608759754289,
+                "relativeResidual": 9.171337177090778e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 23
+            },
+            {
+              "name": "craft-leather-sample-2",
+              "holes": 23,
+              "pitchMM": 3.4437227154792875,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865940438528894,
+                "maxDisplacementMM": 0.005310327317650059,
+                "maxLateralMM": 0.010154842029717453,
+                "relativeResidual": 9.177996105189203e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 45
+            },
+            {
+              "name": "craft-leather-sample-3",
+              "holes": 34,
+              "pitchMM": 3.4034058760284145,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865162252699042,
+                "maxDisplacementMM": 0.00535241534955592,
+                "maxLateralMM": 0.010152675108912485,
+                "relativeResidual": 9.290433388706112e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 67
+            },
+            {
+              "name": "craft-leather-sample-4",
+              "holes": 45,
+              "pitchMM": 3.380909041220622,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03864869326160653,
+                "maxDisplacementMM": 0.005378664633361664,
+                "maxLateralMM": 0.010151976947400757,
+                "relativeResidual": 9.141919916811771e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 89
+            },
+            {
+              "name": "craft-leather-sample-5",
+              "holes": 49,
+              "pitchMM": 3.4198323902074215,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865373594555165,
+                "maxDisplacementMM": 0.00533493677101255,
+                "maxLateralMM": 0.01015355556754246,
+                "relativeResidual": 9.18846773860932e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            },
+            {
+              "name": "craft-leather-sample-6",
+              "holes": 45,
+              "pitchMM": 3.380909041220622,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03864869326160653,
+                "maxDisplacementMM": 0.005378664633361664,
+                "maxLateralMM": 0.010151976947400757,
+                "relativeResidual": 9.141919916811771e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 89
+            },
+            {
+              "name": "craft-leather-sample-7",
+              "holes": 34,
+              "pitchMM": 3.403405876028415,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865162252699042,
+                "maxDisplacementMM": 0.00535241534955592,
+                "maxLateralMM": 0.010152675108912485,
+                "relativeResidual": 9.290433388706112e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 67
+            },
+            {
+              "name": "craft-leather-sample-8",
+              "holes": 23,
+              "pitchMM": 3.4437227154792867,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865940438528894,
+                "maxDisplacementMM": 0.005310327317650059,
+                "maxLateralMM": 0.010154842029717453,
+                "relativeResidual": 9.177996105189203e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 45
+            },
+            {
+              "name": "craft-leather-sample-9",
+              "holes": 12,
+              "pitchMM": 3.530692063272194,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03866846528635246,
+                "maxDisplacementMM": 0.005229663346835099,
+                "maxLateralMM": 0.010155608759754289,
+                "relativeResidual": 9.171337177090778e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 23
+            },
+            {
+              "name": "craft-leather-sample-10",
+              "holes": 12,
+              "pitchMM": 3.530692063272193,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03866846528635246,
+                "maxDisplacementMM": 0.005229663346835099,
+                "maxLateralMM": 0.010155608759754289,
+                "relativeResidual": 9.171337177090778e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 23
+            },
+            {
+              "name": "craft-leather-sample-11",
+              "holes": 23,
+              "pitchMM": 3.4437227154792875,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865940438528894,
+                "maxDisplacementMM": 0.005310327317650059,
+                "maxLateralMM": 0.010154842029717453,
+                "relativeResidual": 9.177996105189203e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 45
+            },
+            {
+              "name": "craft-leather-sample-12",
+              "holes": 34,
+              "pitchMM": 3.4034058760284145,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865162252699042,
+                "maxDisplacementMM": 0.00535241534955592,
+                "maxLateralMM": 0.010152675108912485,
+                "relativeResidual": 9.290433388706112e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 67
+            },
+            {
+              "name": "craft-leather-sample-13",
+              "holes": 45,
+              "pitchMM": 3.380909041220622,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03864869326160653,
+                "maxDisplacementMM": 0.005378664633361664,
+                "maxLateralMM": 0.010151976947400757,
+                "relativeResidual": 9.141919916811771e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 89
+            },
+            {
+              "name": "craft-leather-sample-14",
+              "holes": 49,
+              "pitchMM": 3.4198323902074215,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865373594555165,
+                "maxDisplacementMM": 0.00533493677101255,
+                "maxLateralMM": 0.01015355556754246,
+                "relativeResidual": 9.18846773860932e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            },
+            {
+              "name": "craft-leather-sample-15",
+              "holes": 45,
+              "pitchMM": 3.380909041220622,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03864869326160653,
+                "maxDisplacementMM": 0.005378664633361664,
+                "maxLateralMM": 0.010151976947400757,
+                "relativeResidual": 9.141919916811771e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 89
+            },
+            {
+              "name": "craft-leather-sample-16",
+              "holes": 34,
+              "pitchMM": 3.403405876028415,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865162252699042,
+                "maxDisplacementMM": 0.00535241534955592,
+                "maxLateralMM": 0.010152675108912485,
+                "relativeResidual": 9.290433388706112e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 67
+            },
+            {
+              "name": "craft-leather-sample-17",
+              "holes": 23,
+              "pitchMM": 3.4437227154792867,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865940438528894,
+                "maxDisplacementMM": 0.005310327317650059,
+                "maxLateralMM": 0.010154842029717453,
+                "relativeResidual": 9.177996105189203e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 45
+            },
+            {
+              "name": "craft-leather-sample-18",
+              "holes": 12,
+              "pitchMM": 3.530692063272194,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03866846528635246,
+                "maxDisplacementMM": 0.005229663346835099,
+                "maxLateralMM": 0.010155608759754289,
+                "relativeResidual": 9.171337177090778e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 23
+            }
+          ]
+        },
+        "physics": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 0,
+          "maxSeamGapErrorMM": 0,
+          "version": "R09-implicit-1",
+          "timeS": 0,
+          "steps": 0,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 342,
+          "triangles": 610,
+          "massG": 21.213797196525878,
+          "centerMM": [
+            -0.06564159634507409,
+            9.934397669833146,
+            -0.002803462593265458
+          ],
+          "maxStretch": 1,
+          "peakStretch": 1,
+          "maxEdgeChangeMM": 0,
+          "groundMinMM": 0.7868047714233406,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": false,
+          "active": false,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 0,
+            "ccdEvents": 0,
+            "ptEvents": 0,
+            "eeEvents": 0,
+            "frictionEvents": 0,
+            "normalForceN": 0,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": 8.170632301114535,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": 8.170632301114535,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0,
+          "solverIterations": null,
+          "lbfgsIterations": 0,
+          "incrementalPotentialJ": null,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": false,
+          "initialization": null,
+          "workerSolveMS": 0,
+          "workerBusy": false,
+          "calculationSpeed": 0,
+          "integrationThread": "autonomous fixed-step worker; rendering does not pace simulation",
+          "inputToPoseMS": 0,
+          "cursorErrorMM": 0,
+          "receivedPoses": 1,
+          "appliedPoses": 1,
+          "pendingRequests": 0,
+          "inputSequence": 0
+        },
+        "gpu": {
+          "viewport": [
+            0,
+            217,
+            390,
+            461
+          ],
+          "scissor": [
+            0,
+            217,
+            390,
+            461
+          ]
+        }
+      },
+      "after": {
+        "scroll": [
+          0,
+          0
+        ],
+        "size": [
+          390,
+          844,
+          1
+        ],
+        "compatMode": "CSS1Compat",
+        "rectangles": {
+          "stage": {
+            "rect": {
+              "x": 0,
+              "y": 166,
+              "width": 390,
+              "height": 460.953125,
+              "top": 166,
+              "right": 390,
+              "bottom": 626.953125,
+              "left": 0
+            },
+            "client": [
+              390,
+              461
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "sceneCanvas": {
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 844,
+              "top": 0,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            },
+            "client": [
+              390,
+              844
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "craftRibbon": {
+            "rect": {
+              "x": 0,
+              "y": 626.953125,
+              "width": 390,
+              "height": 48.875,
+              "top": 626.953125,
+              "right": 390,
+              "bottom": 675.828125,
+              "left": 0
+            },
+            "client": [
+              390,
+              49
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          },
+          "collection": {
+            "rect": {
+              "x": 0,
+              "y": 741.609375,
+              "width": 390,
+              "height": 102.390625,
+              "top": 741.609375,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            },
+            "client": [
+              390,
+              101
+            ],
+            "scroll": [
+              0,
+              0
+            ]
+          }
+        },
+        "frame": {
+          "maxAbsX": 0.8599125542299347,
+          "maxAbsY": 0.5259711242838058,
+          "inDepth": true,
+          "points": [
+            [
+              -0.5155536470994785,
+              0.3459088038722631,
+              0.9978219555411628
+            ],
+            [
+              -0.8339755047792912,
+              -0.33412182297752574,
+              0.9973431398823105
+            ],
+            [
+              -0.5288311032746152,
+              0.42881744307357356,
+              0.9977607113877406
+            ],
+            [
+              -0.8599125542299347,
+              -0.255149910156751,
+              0.9972542895017966
+            ],
+            [
+              0.7213084035121536,
+              0.2140238253833232,
+              0.9977290941458454
+            ],
+            [
+              0.6486440662300003,
+              -0.5259711242838058,
+              0.9972080570698924
+            ],
+            [
+              0.740629646849233,
+              0.29672397611001294,
+              0.9976629069788829
+            ],
+            [
+              0.6698021840753684,
+              -0.4494012866130198,
+              0.997110462244622
+            ]
+          ]
+        },
+        "gauge": [
+          {
+            "part": "craft-leather-sample",
+            "minMM": 1.2869032182605578,
+            "maxMM": 1.409117878206334,
+            "targetMM": 1.4,
+            "sampleCount": 81,
+            "wallEdges": 12302,
+            "boundaryEdges": 12302,
+            "periodic": 0,
+            "chordErrorMM": 0.016422174575057964,
+            "measurement": "live shader-equivalent world-space inner/outer pairs; includes seam compression"
+          }
+        ],
+        "audit": {
+          "kind": "swatch",
+          "finite": true,
+          "vertices": 428776,
+          "triangles": 755840,
+          "holes": 711,
+          "continuousThreadMeshes": 19,
+          "detachedSticks": 0,
+          "leatherMeshes": 1,
+          "massModel": "surface area × actual thickness × 700kg/m3, plus named hardware masses",
+          "physicalCalibration": false,
+          "boundsMM": [
+            160.51622009277344,
+            16.865409076213837,
+            130.26220703125
+          ],
+          "seams": [
+            {
+              "name": "craft-leather-sample-0",
+              "holes": 165,
+              "pitchMM": 3.406535343199679,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865202677428937,
+                "maxDisplacementMM": 0.005348949456701595,
+                "maxLateralMM": 0.010148930046269856,
+                "relativeResidual": 9.166653090086034e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 329
+            },
+            {
+              "name": "craft-leather-sample-1",
+              "holes": 12,
+              "pitchMM": 3.530692063272193,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03866846528635246,
+                "maxDisplacementMM": 0.005229663346835099,
+                "maxLateralMM": 0.010155608759754289,
+                "relativeResidual": 9.171337177090778e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 23
+            },
+            {
+              "name": "craft-leather-sample-2",
+              "holes": 23,
+              "pitchMM": 3.4437227154792875,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865940438528894,
+                "maxDisplacementMM": 0.005310327317650059,
+                "maxLateralMM": 0.010154842029717453,
+                "relativeResidual": 9.177996105189203e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 45
+            },
+            {
+              "name": "craft-leather-sample-3",
+              "holes": 34,
+              "pitchMM": 3.4034058760284145,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865162252699042,
+                "maxDisplacementMM": 0.00535241534955592,
+                "maxLateralMM": 0.010152675108912485,
+                "relativeResidual": 9.290433388706112e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 67
+            },
+            {
+              "name": "craft-leather-sample-4",
+              "holes": 45,
+              "pitchMM": 3.380909041220622,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03864869326160653,
+                "maxDisplacementMM": 0.005378664633361664,
+                "maxLateralMM": 0.010151976947400757,
+                "relativeResidual": 9.141919916811771e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 89
+            },
+            {
+              "name": "craft-leather-sample-5",
+              "holes": 49,
+              "pitchMM": 3.4198323902074215,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865373594555165,
+                "maxDisplacementMM": 0.00533493677101255,
+                "maxLateralMM": 0.01015355556754246,
+                "relativeResidual": 9.18846773860932e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            },
+            {
+              "name": "craft-leather-sample-6",
+              "holes": 45,
+              "pitchMM": 3.380909041220622,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03864869326160653,
+                "maxDisplacementMM": 0.005378664633361664,
+                "maxLateralMM": 0.010151976947400757,
+                "relativeResidual": 9.141919916811771e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 89
+            },
+            {
+              "name": "craft-leather-sample-7",
+              "holes": 34,
+              "pitchMM": 3.403405876028415,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865162252699042,
+                "maxDisplacementMM": 0.00535241534955592,
+                "maxLateralMM": 0.010152675108912485,
+                "relativeResidual": 9.290433388706112e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 67
+            },
+            {
+              "name": "craft-leather-sample-8",
+              "holes": 23,
+              "pitchMM": 3.4437227154792867,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865940438528894,
+                "maxDisplacementMM": 0.005310327317650059,
+                "maxLateralMM": 0.010154842029717453,
+                "relativeResidual": 9.177996105189203e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 45
+            },
+            {
+              "name": "craft-leather-sample-9",
+              "holes": 12,
+              "pitchMM": 3.530692063272194,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03866846528635246,
+                "maxDisplacementMM": 0.005229663346835099,
+                "maxLateralMM": 0.010155608759754289,
+                "relativeResidual": 9.171337177090778e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 23
+            },
+            {
+              "name": "craft-leather-sample-10",
+              "holes": 12,
+              "pitchMM": 3.530692063272193,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03866846528635246,
+                "maxDisplacementMM": 0.005229663346835099,
+                "maxLateralMM": 0.010155608759754289,
+                "relativeResidual": 9.171337177090778e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 23
+            },
+            {
+              "name": "craft-leather-sample-11",
+              "holes": 23,
+              "pitchMM": 3.4437227154792875,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865940438528894,
+                "maxDisplacementMM": 0.005310327317650059,
+                "maxLateralMM": 0.010154842029717453,
+                "relativeResidual": 9.177996105189203e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 45
+            },
+            {
+              "name": "craft-leather-sample-12",
+              "holes": 34,
+              "pitchMM": 3.4034058760284145,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865162252699042,
+                "maxDisplacementMM": 0.00535241534955592,
+                "maxLateralMM": 0.010152675108912485,
+                "relativeResidual": 9.290433388706112e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 67
+            },
+            {
+              "name": "craft-leather-sample-13",
+              "holes": 45,
+              "pitchMM": 3.380909041220622,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03864869326160653,
+                "maxDisplacementMM": 0.005378664633361664,
+                "maxLateralMM": 0.010151976947400757,
+                "relativeResidual": 9.141919916811771e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 89
+            },
+            {
+              "name": "craft-leather-sample-14",
+              "holes": 49,
+              "pitchMM": 3.4198323902074215,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865373594555165,
+                "maxDisplacementMM": 0.00533493677101255,
+                "maxLateralMM": 0.01015355556754246,
+                "relativeResidual": 9.18846773860932e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 97
+            },
+            {
+              "name": "craft-leather-sample-15",
+              "holes": 45,
+              "pitchMM": 3.380909041220622,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03864869326160653,
+                "maxDisplacementMM": 0.005378664633361664,
+                "maxLateralMM": 0.010151976947400757,
+                "relativeResidual": 9.141919916811771e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 89
+            },
+            {
+              "name": "craft-leather-sample-16",
+              "holes": 34,
+              "pitchMM": 3.403405876028415,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865162252699042,
+                "maxDisplacementMM": 0.00535241534955592,
+                "maxLateralMM": 0.010152675108912485,
+                "relativeResidual": 9.290433388706112e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 67
+            },
+            {
+              "name": "craft-leather-sample-17",
+              "holes": 23,
+              "pitchMM": 3.4437227154792867,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03865940438528894,
+                "maxDisplacementMM": 0.005310327317650059,
+                "maxLateralMM": 0.010154842029717453,
+                "relativeResidual": 9.177996105189203e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 45
+            },
+            {
+              "name": "craft-leather-sample-18",
+              "holes": 12,
+              "pitchMM": 3.530692063272194,
+              "contact": {
+                "model": "local elastic plate on foundation",
+                "units": {
+                  "length": "mm",
+                  "tension": "N"
+                },
+                "tensionN": 0.8,
+                "minDisplacementMM": -0.03866846528635246,
+                "maxDisplacementMM": 0.005229663346835099,
+                "maxLateralMM": 0.010155608759754289,
+                "relativeResidual": 9.171337177090778e-08,
+                "iterations": 70,
+                "calibrated": false,
+                "fullStitchMechanics": false
+              },
+              "passages": 23
+            }
+          ]
+        },
+        "physics": {
+          "integrationSubstepS": 0.008333333333333333,
+          "substepsPerNominalFrameStep": 1,
+          "iterationsPerSubstep": 25,
+          "seamConstraintCount": 0,
+          "maxSeamGapErrorMM": 0,
+          "version": "R09-implicit-1",
+          "timeS": 0,
+          "steps": 0,
+          "extraConvergenceIterations": 0,
+          "nodeCount": 342,
+          "triangles": 610,
+          "massG": 21.213797196525878,
+          "centerMM": [
+            -0.06564159634507409,
+            9.934397669833146,
+            -0.002803462593265458
+          ],
+          "maxStretch": 1,
+          "peakStretch": 1,
+          "maxEdgeChangeMM": 0,
+          "groundMinMM": 0.7868047714233406,
+          "grabErrorMM": 0,
+          "grabForceN": 0,
+          "held": false,
+          "active": false,
+          "finite": true,
+          "failed": null,
+          "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+          "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+          "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+          "calibrated": false,
+          "surfaceContact": {
+            "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+            "contactPairs": 0,
+            "ccdEvents": 0,
+            "ptEvents": 0,
+            "eeEvents": 0,
+            "frictionEvents": 0,
+            "normalForceN": 0,
+            "maxPenetrationMM": 0,
+            "safeStep": 1,
+            "limitedSteps": 0,
+            "initialOverlaps": 0,
+            "initialMinGapMM": 8.170632301114535,
+            "initialAudit": {
+              "scope": "topologically non-neighbour simulation primitives",
+              "minClearanceMM": 8.170632301114535,
+              "penetrating": 0,
+              "intersection": 0,
+              "worst": []
+            },
+            "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+            "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+          },
+          "dampingPerSecond": 2.5,
+          "gripStiffnessNPerM": 4000,
+          "acceptedPrincipalLimit": null,
+          "strainLimit": null,
+          "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+          "residualN": 0,
+          "solverIterations": null,
+          "lbfgsIterations": 0,
+          "incrementalPotentialJ": null,
+          "contactRangeMM": 0.1,
+          "convergedToR04Residual": false,
+          "initialization": null,
+          "workerSolveMS": 0,
+          "workerBusy": false,
+          "calculationSpeed": 0,
+          "integrationThread": "autonomous fixed-step worker; rendering does not pace simulation",
+          "inputToPoseMS": 0,
+          "cursorErrorMM": 0,
+          "receivedPoses": 1,
+          "appliedPoses": 1,
+          "pendingRequests": 0,
+          "inputSequence": 0
+        },
+        "gpu": {
+          "viewport": [
+            0,
+            217,
+            390,
+            461
+          ],
+          "scissor": [
+            0,
+            217,
+            390,
+            461
+          ]
+        }
+      }
+    }
+  },
+  "requests": [
+    {
+      "page": "candidate",
+      "url": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5f455d90273aa717f101c6bd8be6a5cb500c99fb/leather-workshop/r17/public-lite.html"
+    },
+    {
+      "page": "candidate",
+      "url": "https://htmlpreview.github.io/htmlpreview.js"
+    },
+    {
+      "page": "candidate",
+      "url": "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5f455d90273aa717f101c6bd8be6a5cb500c99fb/leather-workshop/r17/public-lite.html"
+    }
+  ],
+  "checkCount": 16,
+  "completedAt": 1791895042.2708826
+}
