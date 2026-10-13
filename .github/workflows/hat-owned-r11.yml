@@ -1,0 +1,116 @@
+name: Hat R11 visual rebuild verification
+on:
+  push:
+    branches: [feature/hat-owned-r11-visual-rebuild-20261013]
+    paths: [hat-workshop/owned-r11/**, .github/workflows/hat-owned-r11.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hat-owned-r11-visual-rebuild
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    outputs:
+      source: ${{ steps.build.outputs.source }}
+      build: ${{ steps.build.outputs.build }}
+      url: ${{ steps.build.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/owned-r10
+            hat-workshop/owned-r11
+            .github/workflows
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Establish reviewed independent sources
+        run: python -u hat-workshop/owned-r11/bootstrap.py
+      - name: Install pinned official generic engine
+        run: npm ci --prefix hat-workshop/owned-r11 --no-audit --no-fund
+      - id: build
+        name: Validate geometry and freeze source and candidate
+        run: python -u hat-workshop/owned-r11/publish.py prepare
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r11-build-${{ github.run_id }}
+          path: |
+            hat-workshop/owned-r11
+            !hat-workshop/owned-r11/node_modules
+          retention-days: 7
+  acceptance:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [browser, public]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.build }}
+          sparse-checkout: hat-workshop/owned-r11
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser and fonts
+        run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Actual catalogue, construction and interaction verification
+        env:
+          TARGET: ${{ matrix.target }}
+          SOURCE: ${{ needs.prepare.outputs.source }}
+          PUBLIC_URL: ${{ needs.prepare.outputs.url }}
+        run: |
+          if [ "$TARGET" = public ]; then
+            timeout --kill-after=10s 600s python -u hat-workshop/owned-r11/qa-browser.py --source "$SOURCE" --url "$PUBLIC_URL"
+          else
+            timeout --kill-after=10s 600s python -u hat-workshop/owned-r11/qa-browser.py --source "$SOURCE"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r11-${{ github.run_id }}-${{ matrix.target }}
+          path: hat-workshop/owned-r11/qa
+          retention-days: 7
+  receipt:
+    needs: [prepare, acceptance]
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/owned-r11
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hat-r11-${{ github.run_id }}-*
+          path: hat-workshop/owned-r11/qa
+          merge-multiple: true
+      - name: Record verified output with visual acceptance still separate
+        env:
+          SOURCE: ${{ needs.prepare.outputs.source }}
+          BUILD: ${{ needs.prepare.outputs.build }}
+        run: python -u hat-workshop/owned-r11/publish.py finish --source "$SOURCE" --build "$BUILD"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r11-final-${{ github.run_id }}
+          path: hat-workshop/owned-r11
+          retention-days: 7
