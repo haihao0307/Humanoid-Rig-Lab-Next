@@ -1,3 +1,4 @@
+import {extendTransitionUnderlay} from './underlay.mjs';
 /** R09 cut revision, not a covering mesh: retain parent atlas and change the
  * derived cap/counter outline in both the flat pattern and formed template. */
 import {MeshRay} from '../../r07/src/ray.mjs';
@@ -12,6 +13,7 @@ export function refineCutBoundaries(m){
  for(const D of Object.values(m.domains))for(const name of ['at','toRest']){
   const f=D[name],cache=new Map();D[name]=q=>{const key=q.join(',');if(cache.has(key))return cache.get(key);const v=f(q);if(cache.size<45000)cache.set(key,v);return v;};
  }
+ extendTransitionUnderlay(m);
  const state={thickness:defaults},sole=m.outsoleGeometry(state),ray=new MeshRay({positions:Array.from(sole.attributes.position.array),indices:Array.from(sole.index.array)}),N=160,profiles=[];
  for(let i=0;i<N;i++){
   const angle=i/N*Math.PI*2,x=Math.cos(angle),z=Math.sin(angle);let lo=0,hi=170;
