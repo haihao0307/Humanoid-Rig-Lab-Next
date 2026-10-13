@@ -1,0 +1,116 @@
+name: Independent hat R10.1 acceptance
+on:
+  push:
+    branches: [feature/hat-owned-r10-20261013]
+    paths: [hat-workshop/owned-r10/**, .github/workflows/hat-owned-r10.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hat-owned-r10
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      source: ${{ steps.build.outputs.source }}
+      build: ${{ steps.build.outputs.build }}
+      url: ${{ steps.build.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/owned-r10
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned official dependencies
+        working-directory: hat-workshop/owned-r10
+        run: |
+          if test -f package-lock.json; then npm ci --registry=https://registry.npmjs.org; else npm install --registry=https://registry.npmjs.org; fi
+      - id: build
+        name: Freeze source and unverified candidate
+        run: python -u hat-workshop/owned-r10/publish.py prepare
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r101-build-${{ github.run_id }}
+          path: |
+            hat-workshop/owned-r10/src
+            hat-workshop/owned-r10/qa
+            hat-workshop/owned-r10/index.html
+            hat-workshop/owned-r10/BUILD_MANIFEST.json
+            hat-workshop/owned-r10/THIRD_PARTY_NOTICES.txt
+  acceptance:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [browser, public]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.build }}
+          sparse-checkout: hat-workshop/owned-r10
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Real browser acceptance
+        env:
+          TARGET: ${{ matrix.target }}
+          SOURCE: ${{ needs.prepare.outputs.source }}
+          PUBLIC_URL: ${{ needs.prepare.outputs.url }}
+        run: |
+          if [ "$TARGET" = public ]; then
+            timeout --kill-after=10s 540s python -u hat-workshop/owned-r10/qa-browser.py --source "$SOURCE" --url "$PUBLIC_URL"
+          else
+            timeout --kill-after=10s 540s python -u hat-workshop/owned-r10/qa-browser.py --source "$SOURCE"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r101-${{ github.run_id }}-${{ matrix.target }}
+          path: hat-workshop/owned-r10/qa
+          retention-days: 7
+  receipt:
+    needs: [prepare, acceptance]
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/owned-r10
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hat-r101-${{ github.run_id }}-*
+          path: hat-workshop/owned-r10/qa
+          merge-multiple: true
+      - name: Validate evidence and publish receipt
+        env:
+          SOURCE: ${{ needs.prepare.outputs.source }}
+          BUILD: ${{ needs.prepare.outputs.build }}
+        run: python -u hat-workshop/owned-r10/publish.py finish --source "$SOURCE" --build "$BUILD"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r101-final-${{ github.run_id }}
+          path: hat-workshop/owned-r10
+          retention-days: 7
