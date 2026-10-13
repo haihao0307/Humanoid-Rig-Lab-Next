@@ -32,9 +32,15 @@ jobs:
         with:
           python-version: '3.12'
       - name: Establish reviewed independent sources
-        run: python -u hat-workshop/owned-r11/bootstrap.py
-      - name: Install pinned official generic engine
-        run: npm ci --prefix hat-workshop/owned-r11 --no-audit --no-fund
+        run: |
+          python -u hat-workshop/owned-r11/bootstrap.py
+          python -u hat-workshop/owned-r11/prepare-catalogue.py
+      - name: Install pinned official generic engine and preview renderer
+        run: |
+          npm ci --prefix hat-workshop/owned-r11 --no-audit --no-fund
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
       - id: build
         name: Validate geometry and freeze source and candidate
         run: python -u hat-workshop/owned-r11/publish.py prepare
