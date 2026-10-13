@@ -1,0 +1,39 @@
+{
+  "task": "LEATHER-S2B",
+  "baselineHead": "729df578f16efc30efff6870cd1d4157ac091117",
+  "baselineBuild": "37178e800a3272575b16e30a0723b3bcf1f29c0a",
+  "primaryDefect": "Unbounded autonomous pose payloads queue behind busy main-thread rendering",
+  "method": "One outstanding autonomous payload, acknowledgement after client receipt, immediately send latest completed state on renewed credit; never pace physical stepping by rendering",
+  "changedRuntimeFiles": [
+    "src/workers/client.js",
+    "src/workers/product-entry.js"
+  ],
+  "identityOnly": [
+    "src/app/runtime.js",
+    "ui/template.html",
+    "build.py"
+  ],
+  "protected": [
+    "native C/WASM",
+    "all simulation steps and time",
+    "collision candidates/CCD/friction/tolerances/iterations",
+    "appearance/wear/geometry/thickness",
+    "pointer input and renderer",
+    "R01-R14",
+    "main and other workbenches",
+    "licenses"
+  ],
+  "gates": {
+    "boundedAutoPayloadsDuringStall": 1,
+    "numericStepDifference": 0,
+    "trajectoryPositionDifferenceMM": 0,
+    "poseProtocolCases": 45,
+    "geometryCases": 25,
+    "numericCases": 18,
+    "browserPixelGate": "original .02 mean/.0005 fraction, not relaxed",
+    "commands": "reset/manualStep immediate; stale/duplicate acknowledgements harmless; disposed client ignores messages"
+  },
+  "timingPolicy": "ABBA instrumented browser samples are exploratory; no universal FPS or50ms guarantee. Uninstrumented release gates separate.",
+  "sourceReview": "No probe reassigns imported const updateSkin; failed probe38355136333 preserved",
+  "status": "REGISTERED_NOT_DELIVERED"
+}

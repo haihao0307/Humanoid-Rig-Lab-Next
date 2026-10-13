@@ -1,0 +1,25 @@
+{
+  "task": "LEATHER-S2C-RENDER-BATCH",
+  "baseCommit": "57865c3a033a7aee7f3dc02834ee7d896425a877",
+  "baselineBuild": "70883deb4659b601faacf5eb49277eee4774b824",
+  "primaryDefect": "Unnecessary GPU/display work and idle polling",
+  "scope": [
+    "integer texel fetch with same node values",
+    "independent scene/thumbnail invalidation",
+    "single demand-driven frame clock",
+    "visibility restore and latest-pose wakeup",
+    "continuous interaction regression"
+  ],
+  "protected": [
+    "native C/WASM",
+    "physical timestep/iterations/contact/friction",
+    "material grain/wear",
+    "geometry/gauge",
+    "R15 pose credits and explicit command semantics",
+    "old versions/root license/main"
+  ],
+  "referenceMeasurementRun": 38360802190,
+  "noImageSubstitution": true,
+  "publicDelivery": "PENDING",
+  "visualAcceptance": "PENDING"
+}
