@@ -1,0 +1,1226 @@
+{
+  "version": "R13.0",
+  "status": "PUBLIC_VERIFIED_USER_REVIEW_PENDING",
+  "publicVerified": true,
+  "userVisualApproved": false,
+  "filmGrade": false,
+  "sourceCommit": "483f343dad8238ae3a227ce0fcc673751895aef5",
+  "parentSource": "cc3038076feea701593b671665fe060608165eff",
+  "buildCommit": "82ab5421a14ea87734bf3e26b41f1d65d0a5e02e",
+  "publicUrl": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/82ab5421a14ea87734bf3e26b41f1d65d0a5e02e/denim-workshop/r13/index.html",
+  "workflow": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/38369947832",
+  "manifest": {
+    "version": "R13.0",
+    "baseCommit": "cc3038076feea701593b671665fe060608165eff",
+    "entry": "denim-workshop/r13/index.html",
+    "bytes": 111384,
+    "sha256": "e618a745bdaaeb7c2aaf90009867e0e0297b53f1770bdf7ecf6d8c3a4ed0b46c",
+    "unpackedHtmlBytes": 223975,
+    "runtimeSourceBytes": 206455,
+    "runtimeSourceSha256": "a2a49e00191eec2c908c07fbf73269f4b206e0b180054ec6e807d8183cfc6f4b",
+    "packedRuntimeBytes": 67068,
+    "packing": "gzip, native DecompressionStream, inline base64, no network",
+    "runtimeAssets": 0,
+    "sourceHashes": {
+      "sampling.js": "104b5646b14c02ecf033b831456b72dd56f248186decbaa02d73596b92677302",
+      "fiber-optics.js": "8aa99b3ab475c4a0e1b6127ed61357ee416250ed9abfada250f0d10cde090701",
+      "structure.js": "6b9c08bb4b47f68e3a458714af5ee5a6d9b38c78ad3312e8e8c2776ad59b5507",
+      "core.js": "fe72b6e3a26efc20f5e3cb1506604d2596855a50a8c709f23e4416f1dee518d2",
+      "cotton-surface.js": "fcfe00e48a2aa7e9b995b86fe122dc1d0b4a9154d09a7fcd51a1254522e96de6",
+      "natural-yarn.js": "acf9690af868fb670de5dca1e924dc79783197bfb2f1e8cd357f6933f212f237",
+      "runtime-budget.js": "c1eab5172e6c664cdf0b7ea2783a8faa556e7a05b1746baaf6578f88c8b7a05e",
+      "stitches.js": "52409c703b34be91c5bee2e96164a48e491a0926740cccfd80bd02ad42a0af12",
+      "cloth-topology.js": "5d91d7547869846512fe7f42ffe9819f0d60a0f9adc1c836753bd2c00f665bb6",
+      "failure-physics.js": "31a213fec602446a9fafaa73acbad8824c5aa75b2c6aa4d200297719875b24a2",
+      "dynamics.js": "fe2df054f6db740d708a57c990b7d1297bb491dcdc194f8f810ad010928ef4e0",
+      "distance-lod.js": "1c827eee55fb1ecb5481314bab385a02c2fbf9a90385291bb2ca1522c4eb9ff3",
+      "noise-kernel.js": "4f489feb68a521c607a09e92ba45ff5e857fec0d03a307bdcadb30b2745e101e",
+      "app.js": "d500dfeb1daf0740591fb27927e3e017cb92b7d37184116d06cf5bf59cca49b4"
+    },
+    "qualityDefault": "R08 near sampling preserved; local-footprint filtered middle/far; Float32 micro layer generated on demand",
+    "efficientMode": "explicit lower internal pixel resolution, same 4x offscreen MSAA where available",
+    "publicDeliveryVerified": false,
+    "actualFileNavigationVerified": false,
+    "physicalClothSolver": "Legacy damaged-yarn solver preserved; opt-in swatch experiments add surface contact, preset-path cohesive fracture and cable stitches; no full CCD or garments",
+    "realDeviceFPSVerified": false
+  },
+  "publicBytesIdentical": true,
+  "numerical": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "Old material-mode Cloth implementation is unchanged",
+        "passed": true,
+        "wallMs": 1
+      },
+      {
+        "name": "No load does not tear, drift or delete mass",
+        "passed": true,
+        "wallMs": 469
+      },
+      {
+        "name": "Force-created cohesive split retains mass and does not reset time",
+        "passed": true,
+        "wallMs": 10440
+      },
+      {
+        "name": "Higher break strength changes the rupture result under matched loading",
+        "passed": true,
+        "wallMs": 5210
+      },
+      {
+        "name": "Stitch cable transfers tension; deleting it releases the same panels",
+        "passed": true,
+        "wallMs": 11021
+      },
+      {
+        "name": "A slack stitch has zero compressive force",
+        "passed": true,
+        "wallMs": 3
+      },
+      {
+        "name": "Split material curves preserve both halves and do not bridge the crack",
+        "passed": true,
+        "wallMs": 1
+      },
+      {
+        "name": "Independent triangle and edge closest-point checks",
+        "passed": true,
+        "wallMs": 0
+      },
+      {
+        "name": "Fold fixture: contact off crosses the base, contact on keeps surface separation",
+        "passed": true,
+        "wallMs": 23700
+      },
+      {
+        "name": "Contact projection conserves free-point centre of mass",
+        "passed": true,
+        "wallMs": 6
+      },
+      {
+        "name": "Invalid mechanics input is rejected",
+        "passed": true,
+        "wallMs": 4
+      }
+    ],
+    "cases": {
+      "zeroLoad": {
+        "massKg": 0.0032410962328430545,
+        "maxPositionDifferenceM": 0
+      },
+      "tear": {
+        "report": {
+          "experiment": "tear",
+          "nodes": 494,
+          "activeNodes": 494,
+          "constraints": 2648,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "maxTensileStrain": 2.4370611089175043e-06,
+          "maxStretch": 2.4370611089175043e-06,
+          "maxYarnStretch": 0,
+          "maxDisplacementMm": 7.220313333778342,
+          "kineticJ": 8.726637406212916e-13,
+          "contacts": 0,
+          "selfCollision": true,
+          "contactDetail": {
+            "vertexFace": 0,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 1184
+          },
+          "maxContactHistory": 0,
+          "contactThicknessMm": 0.7,
+          "pullMm": 12,
+          "fold": 0,
+          "brokenBonds": 19,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 14.28491075988505,
+          "minInterfaceGapMm": 11.999737545318146,
+          "maxBondForceN": 0,
+          "maxStitchForceN": 0,
+          "stitchForcesN": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "stitchEnabled": true,
+          "events": [
+            {
+              "type": "cohesive-break",
+              "row": 9,
+              "time": 0.07083333333333333,
+              "forceN": 0.008071442350547903,
+              "capacityN": 0.003
+            },
+            {
+              "type": "cohesive-break",
+              "row": 8,
+              "time": 0.075,
+              "forceN": 0.009277623611220058,
+              "capacityN": 0.0034285714285714284
+            },
+            {
+              "type": "cohesive-break",
+              "row": 10,
+              "time": 0.075,
+              "forceN": 0.009172832891968661,
+              "capacityN": 0.0034285714285714284
+            },
+            {
+              "type": "cohesive-break",
+              "row": 7,
+              "time": 0.07916666666666666,
+              "forceN": 0.010048892657962208,
+              "capacityN": 0.0038571428571428567
+            },
+            {
+              "type": "cohesive-break",
+              "row": 11,
+              "time": 0.07916666666666666,
+              "forceN": 0.009816060196743356,
+              "capacityN": 0.0038571428571428567
+            },
+            {
+              "type": "cohesive-break",
+              "row": 6,
+              "time": 0.08333333333333333,
+              "forceN": 0.010565102315947825,
+              "capacityN": 0.004285714285714286
+            },
+            {
+              "type": "cohesive-break",
+              "row": 12,
+              "time": 0.0875,
+              "forceN": 0.011754033230396244,
+              "capacityN": 0.004285714285714286
+            },
+            {
+              "type": "cohesive-break",
+              "row": 5,
+              "time": 0.09166666666666666,
+              "forceN": 0.012122732773331627,
+              "capacityN": 0.004714285714285714
+            },
+            {
+              "type": "cohesive-break",
+              "row": 13,
+              "time": 0.09166666666666666,
+              "forceN": 0.011991937551101667,
+              "capacityN": 0.004714285714285714
+            },
+            {
+              "type": "cohesive-break",
+              "row": 4,
+              "time": 0.09999999999999999,
+              "forceN": 0.012636441396358602,
+              "capacityN": 0.0051428571428571435
+            },
+            {
+              "type": "cohesive-break",
+              "row": 14,
+              "time": 0.09999999999999999,
+              "forceN": 0.012817280800209515,
+              "capacityN": 0.0051428571428571435
+            },
+            {
+              "type": "cohesive-break",
+              "row": 15,
+              "time": 0.10416666666666666,
+              "forceN": 0.0123880074836177,
+              "capacityN": 0.005571428571428572
+            },
+            {
+              "type": "cohesive-break",
+              "row": 3,
+              "time": 0.10833333333333332,
+              "forceN": 0.013503156860131253,
+              "capacityN": 0.005571428571428572
+            },
+            {
+              "type": "cohesive-break",
+              "row": 1,
+              "time": 0.11249999999999999,
+              "forceN": 0.0125357155315079,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 17,
+              "time": 0.11249999999999999,
+              "forceN": 0.01284016831493477,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 2,
+              "time": 0.11666666666666665,
+              "forceN": 0.010460258383407256,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 16,
+              "time": 0.11666666666666665,
+              "forceN": 0.011305884345132935,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 18,
+              "time": 0.37916666666666654,
+              "forceN": 0.007859527983169436,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 0,
+              "time": 0.3833333333333332,
+              "forceN": 0.00782997441151946,
+              "capacityN": 0.006
+            }
+          ],
+          "massKg": 0.0032410962328430545,
+          "topology": {
+            "activeSheetNodes": 494,
+            "totalMassKg": 0.0032410962328430545,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "complianceScale": 200,
+            "candidatePath": "one central material interface, 19 cohesive weld sites",
+            "massDeleted": false,
+            "triangles": 864,
+            "edges": 1356,
+            "phantomSheetThroughHole": false,
+            "inactiveHoleNodes": 0
+          },
+          "workerArrayBytes": 63232,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "Preset cohesive path; no arbitrary remeshing",
+            "Surface proxy contact, not every yarn/fiber; adjacent one-ring excluded",
+            "Swept signed vertex-face crossing safeguard, not globally robust CCD",
+            "Cable stitch tension and embedded roots; no needle penetration or knot/contact model"
+          ]
+        },
+        "sampledPeakTensileStrain": 0.13402214244569888,
+        "nodeWallMs": 10436
+      },
+      "strongInterface": {
+        "report": {
+          "experiment": "tear",
+          "nodes": 494,
+          "activeNodes": 494,
+          "constraints": 2705,
+          "steps": 240,
+          "simulationSeconds": 0.9999999999999977,
+          "stepHz": 240,
+          "maxTensileStrain": 0.1744529752754862,
+          "maxStretch": 0.1744529752754862,
+          "maxYarnStretch": 0,
+          "maxDisplacementMm": 1.4869898330245834,
+          "kineticJ": 3.012737239164159e-05,
+          "contacts": 0,
+          "selfCollision": false,
+          "contactDetail": {
+            "vertexFace": 0,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 0
+          },
+          "maxContactHistory": 0,
+          "contactThicknessMm": 0.7,
+          "pullMm": 2,
+          "fold": 0,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "minInterfaceGapMm": 0,
+          "maxBondForceN": 0.013418305118789449,
+          "maxStitchForceN": 0,
+          "stitchForcesN": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "stitchEnabled": true,
+          "events": [],
+          "massKg": 0.0032410962328430545,
+          "topology": {
+            "activeSheetNodes": 494,
+            "totalMassKg": 0.0032410962328430545,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "complianceScale": 200,
+            "candidatePath": "one central material interface, 19 cohesive weld sites",
+            "massDeleted": false,
+            "triangles": 864,
+            "edges": 1356,
+            "phantomSheetThroughHole": false,
+            "inactiveHoleNodes": 0
+          },
+          "workerArrayBytes": 63232,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "Preset cohesive path; no arbitrary remeshing",
+            "Surface proxy contact, not every yarn/fiber; adjacent one-ring excluded",
+            "Swept signed vertex-face crossing safeguard, not globally robust CCD",
+            "Cable stitch tension and embedded roots; no needle penetration or knot/contact model"
+          ]
+        },
+        "sampledPeakTensileStrain": 0.228777314422955,
+        "nodeWallMs": 2645
+      },
+      "matchedWeakInterface": {
+        "report": {
+          "experiment": "tear",
+          "nodes": 494,
+          "activeNodes": 494,
+          "constraints": 2648,
+          "steps": 240,
+          "simulationSeconds": 0.9999999999999977,
+          "stepHz": 240,
+          "maxTensileStrain": 6.380587372456503e-06,
+          "maxStretch": 6.380587372456503e-06,
+          "maxYarnStretch": 0,
+          "maxDisplacementMm": 3.0663071981674093,
+          "kineticJ": 5.516965940321958e-10,
+          "contacts": 0,
+          "selfCollision": false,
+          "contactDetail": {
+            "vertexFace": 0,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 0
+          },
+          "maxContactHistory": 0,
+          "contactThicknessMm": 0.7,
+          "pullMm": 2,
+          "fold": 0,
+          "brokenBonds": 19,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 5.938074559983678,
+          "minInterfaceGapMm": 2.037861904542103,
+          "maxBondForceN": 0,
+          "maxStitchForceN": 0,
+          "stitchForcesN": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "stitchEnabled": true,
+          "events": [
+            {
+              "type": "cohesive-break",
+              "row": 9,
+              "time": 0.07083333333333333,
+              "forceN": 0.008071442350547903,
+              "capacityN": 0.003
+            },
+            {
+              "type": "cohesive-break",
+              "row": 8,
+              "time": 0.075,
+              "forceN": 0.009277623611220058,
+              "capacityN": 0.0034285714285714284
+            },
+            {
+              "type": "cohesive-break",
+              "row": 10,
+              "time": 0.075,
+              "forceN": 0.009172832891968661,
+              "capacityN": 0.0034285714285714284
+            },
+            {
+              "type": "cohesive-break",
+              "row": 7,
+              "time": 0.07916666666666666,
+              "forceN": 0.010048892657962208,
+              "capacityN": 0.0038571428571428567
+            },
+            {
+              "type": "cohesive-break",
+              "row": 11,
+              "time": 0.07916666666666666,
+              "forceN": 0.009816060196743356,
+              "capacityN": 0.0038571428571428567
+            },
+            {
+              "type": "cohesive-break",
+              "row": 6,
+              "time": 0.08333333333333333,
+              "forceN": 0.010565102315947825,
+              "capacityN": 0.004285714285714286
+            },
+            {
+              "type": "cohesive-break",
+              "row": 12,
+              "time": 0.0875,
+              "forceN": 0.011754033230396244,
+              "capacityN": 0.004285714285714286
+            },
+            {
+              "type": "cohesive-break",
+              "row": 5,
+              "time": 0.09166666666666666,
+              "forceN": 0.012122732773331627,
+              "capacityN": 0.004714285714285714
+            },
+            {
+              "type": "cohesive-break",
+              "row": 13,
+              "time": 0.09166666666666666,
+              "forceN": 0.011991937551101667,
+              "capacityN": 0.004714285714285714
+            },
+            {
+              "type": "cohesive-break",
+              "row": 4,
+              "time": 0.09999999999999999,
+              "forceN": 0.012636441396358602,
+              "capacityN": 0.0051428571428571435
+            },
+            {
+              "type": "cohesive-break",
+              "row": 14,
+              "time": 0.09999999999999999,
+              "forceN": 0.012817280800209515,
+              "capacityN": 0.0051428571428571435
+            },
+            {
+              "type": "cohesive-break",
+              "row": 15,
+              "time": 0.10416666666666666,
+              "forceN": 0.0123880074836177,
+              "capacityN": 0.005571428571428572
+            },
+            {
+              "type": "cohesive-break",
+              "row": 3,
+              "time": 0.10833333333333332,
+              "forceN": 0.013503156860131253,
+              "capacityN": 0.005571428571428572
+            },
+            {
+              "type": "cohesive-break",
+              "row": 1,
+              "time": 0.11249999999999999,
+              "forceN": 0.0125357155315079,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 17,
+              "time": 0.11249999999999999,
+              "forceN": 0.01284016831493477,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 2,
+              "time": 0.11666666666666665,
+              "forceN": 0.010460258383407256,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 16,
+              "time": 0.11666666666666665,
+              "forceN": 0.011305884345132935,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 0,
+              "time": 0.38749999999999984,
+              "forceN": 0.006865431574365051,
+              "capacityN": 0.006
+            },
+            {
+              "type": "cohesive-break",
+              "row": 18,
+              "time": 0.4083333333333331,
+              "forceN": 0.008945027447541084,
+              "capacityN": 0.006
+            }
+          ],
+          "massKg": 0.0032410962328430545,
+          "topology": {
+            "activeSheetNodes": 494,
+            "totalMassKg": 0.0032410962328430545,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "complianceScale": 200,
+            "candidatePath": "one central material interface, 19 cohesive weld sites",
+            "massDeleted": false,
+            "triangles": 864,
+            "edges": 1356,
+            "phantomSheetThroughHole": false,
+            "inactiveHoleNodes": 0
+          },
+          "workerArrayBytes": 63232,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "Preset cohesive path; no arbitrary remeshing",
+            "Surface proxy contact, not every yarn/fiber; adjacent one-ring excluded",
+            "Swept signed vertex-face crossing safeguard, not globally robust CCD",
+            "Cable stitch tension and embedded roots; no needle penetration or knot/contact model"
+          ]
+        },
+        "sampledPeakTensileStrain": 0.21632525876125652,
+        "nodeWallMs": 2557
+      },
+      "stitched": {
+        "report": {
+          "experiment": "seam",
+          "nodes": 494,
+          "activeNodes": 494,
+          "constraints": 2665,
+          "steps": 480,
+          "simulationSeconds": 1.9999999999999942,
+          "stepHz": 240,
+          "maxTensileStrain": 0.09078994595809298,
+          "maxStretch": 0.09078994595809298,
+          "maxYarnStretch": 0,
+          "maxDisplacementMm": 1.606000505739914,
+          "kineticJ": 4.739894904269176e-16,
+          "contacts": 0,
+          "selfCollision": true,
+          "contactDetail": {
+            "vertexFace": 0,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 1310
+          },
+          "maxContactHistory": 0,
+          "contactThicknessMm": 0.7,
+          "pullMm": 2,
+          "fold": 0,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0.9338786543449618,
+          "minInterfaceGapMm": 0.01105555787112463,
+          "maxBondForceN": 0,
+          "maxStitchForceN": 0.0051793631544228,
+          "stitchForcesN": [
+            0.004405816765476021,
+            0.003790587035526297,
+            0.0036944504910502484,
+            0.003708020285147006,
+            0.003767076125181853,
+            0.0037780037136888656,
+            0.0038708208365274346,
+            0.003965053653517725,
+            0.003890630577644878,
+            0.0037628316475659456,
+            0.003676817197418678,
+            0.003789791197311496,
+            0.0038525277175200027,
+            0.0039039736243582594,
+            0.0039917903957454775,
+            0.00428290662775823,
+            0.0051793631544228
+          ],
+          "stitchEnabled": true,
+          "events": [],
+          "massKg": 0.0032410962328430545,
+          "topology": {
+            "activeSheetNodes": 494,
+            "totalMassKg": 0.0032410962328430545,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "complianceScale": 200,
+            "candidatePath": "one central material interface, 19 cohesive weld sites",
+            "massDeleted": false,
+            "triangles": 864,
+            "edges": 1356,
+            "phantomSheetThroughHole": false,
+            "inactiveHoleNodes": 0
+          },
+          "workerArrayBytes": 63232,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "Preset cohesive path; no arbitrary remeshing",
+            "Surface proxy contact, not every yarn/fiber; adjacent one-ring excluded",
+            "Swept signed vertex-face crossing safeguard, not globally robust CCD",
+            "Cable stitch tension and embedded roots; no needle penetration or knot/contact model"
+          ]
+        },
+        "sampledPeakTensileStrain": 0.09081702800220715,
+        "nodeWallMs": 7403
+      },
+      "released": {
+        "report": {
+          "experiment": "seam",
+          "nodes": 494,
+          "activeNodes": 494,
+          "constraints": 2648,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "maxTensileStrain": 0.0004031867663993882,
+          "maxStretch": 0.0004031867663993882,
+          "maxYarnStretch": 0,
+          "maxDisplacementMm": 1.6040882640797463,
+          "kineticJ": 6.62497352917671e-12,
+          "contacts": 0,
+          "selfCollision": true,
+          "contactDetail": {
+            "vertexFace": 0,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 1284
+          },
+          "maxContactHistory": 0,
+          "contactThicknessMm": 0.7,
+          "pullMm": 2,
+          "fold": 0,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 3.1057954471591773,
+          "minInterfaceGapMm": 3.09753977572204,
+          "maxBondForceN": 0,
+          "maxStitchForceN": 0,
+          "stitchForcesN": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "stitchEnabled": false,
+          "events": [],
+          "massKg": 0.0032410962328430545,
+          "topology": {
+            "activeSheetNodes": 494,
+            "totalMassKg": 0.0032410962328430545,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "complianceScale": 200,
+            "candidatePath": "one central material interface, 19 cohesive weld sites",
+            "massDeleted": false,
+            "triangles": 864,
+            "edges": 1356,
+            "phantomSheetThroughHole": false,
+            "inactiveHoleNodes": 0
+          },
+          "workerArrayBytes": 63232,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "Preset cohesive path; no arbitrary remeshing",
+            "Surface proxy contact, not every yarn/fiber; adjacent one-ring excluded",
+            "Swept signed vertex-face crossing safeguard, not globally robust CCD",
+            "Cable stitch tension and embedded roots; no needle penetration or knot/contact model"
+          ]
+        },
+        "sampledPeakTensileStrain": 0.0010475710730564192,
+        "nodeWallMs": 3612
+      },
+      "foldOff": {
+        "report": {
+          "experiment": "fold",
+          "nodes": 494,
+          "activeNodes": 494,
+          "constraints": 2705,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "maxTensileStrain": 0.038072304340405205,
+          "maxStretch": 0.038072304340405205,
+          "maxYarnStretch": 0,
+          "maxDisplacementMm": 99.86546031160148,
+          "kineticJ": 2.7892497224551222e-08,
+          "contacts": 0,
+          "selfCollision": false,
+          "contactDetail": {
+            "vertexFace": 0,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 0
+          },
+          "maxContactHistory": 0,
+          "contactThicknessMm": 0.7,
+          "pullMm": 0,
+          "fold": 1,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "minInterfaceGapMm": 0,
+          "maxBondForceN": 0.0016847556484638,
+          "maxStitchForceN": 0,
+          "stitchForcesN": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "stitchEnabled": true,
+          "events": [],
+          "massKg": 0.0032410962328430545,
+          "topology": {
+            "activeSheetNodes": 494,
+            "totalMassKg": 0.0032410962328430545,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "complianceScale": 200,
+            "candidatePath": "one central material interface, 19 cohesive weld sites",
+            "massDeleted": false,
+            "triangles": 864,
+            "edges": 1356,
+            "phantomSheetThroughHole": false,
+            "inactiveHoleNodes": 0
+          },
+          "workerArrayBytes": 63232,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "Preset cohesive path; no arbitrary remeshing",
+            "Surface proxy contact, not every yarn/fiber; adjacent one-ring excluded",
+            "Swept signed vertex-face crossing safeguard, not globally robust CCD",
+            "Cable stitch tension and embedded roots; no needle penetration or knot/contact model"
+          ]
+        },
+        "sampledPeakTensileStrain": 0.03825952656024012,
+        "nodeWallMs": 6580,
+        "independentDistanceCheck": {
+          "minimumNodeTriangleDistanceMm": 1.0438721783800138,
+          "belowBase": 153,
+          "tested": 153
+        }
+      },
+      "foldOn": {
+        "report": {
+          "experiment": "fold",
+          "nodes": 494,
+          "activeNodes": 494,
+          "constraints": 2705,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "maxTensileStrain": 0.034807562419534976,
+          "maxStretch": 0.034807562419534976,
+          "maxYarnStretch": 0,
+          "maxDisplacementMm": 99.6613983423744,
+          "kineticJ": 1.7789724803865948e-09,
+          "contacts": 13277,
+          "selfCollision": true,
+          "contactDetail": {
+            "vertexFace": 0,
+            "edgeEdge": 4,
+            "sweptCrossings": 0,
+            "candidates": 27518
+          },
+          "maxContactHistory": 156,
+          "contactThicknessMm": 0.7,
+          "pullMm": 0,
+          "fold": 1,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "minInterfaceGapMm": 0,
+          "maxBondForceN": 0.0013623120326819304,
+          "maxStitchForceN": 0,
+          "stitchForcesN": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "stitchEnabled": true,
+          "events": [],
+          "massKg": 0.0032410962328430545,
+          "topology": {
+            "activeSheetNodes": 494,
+            "totalMassKg": 0.0032410962328430545,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "complianceScale": 200,
+            "candidatePath": "one central material interface, 19 cohesive weld sites",
+            "massDeleted": false,
+            "triangles": 864,
+            "edges": 1356,
+            "phantomSheetThroughHole": false,
+            "inactiveHoleNodes": 0
+          },
+          "workerArrayBytes": 63232,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "Preset cohesive path; no arbitrary remeshing",
+            "Surface proxy contact, not every yarn/fiber; adjacent one-ring excluded",
+            "Swept signed vertex-face crossing safeguard, not globally robust CCD",
+            "Cable stitch tension and embedded roots; no needle penetration or knot/contact model"
+          ]
+        },
+        "sampledPeakTensileStrain": 0.0355067652162917,
+        "nodeWallMs": 16955,
+        "independentDistanceCheck": {
+          "minimumNodeTriangleDistanceMm": 0.7451404827542631,
+          "belowBase": 0,
+          "tested": 153
+        }
+      }
+    },
+    "scope": "deterministic swatch mechanics regression, not measured fabric or whole-device performance"
+  },
+  "browser": {
+    "file": {
+      "passed": true,
+      "mode": "file",
+      "startedAt": "2026-10-13T08:33:50.346281+00:00",
+      "network": {
+        "desktop": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/denim-workshop/r13/index.html",
+            "blob:null/1546dc36-8c53-466c-9634-b8070d68b69d",
+            "blob:null/5f8e2548-ce1a-4b1a-a5de-775d731bb403",
+            "blob:null/47f996e0-e185-4b30-a304-eef9e9243e0b",
+            "blob:null/ae4d7b05-35bf-42ab-bd42-6cdf346ea902"
+          ]
+        },
+        "frozen-R12-1": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/denim-workshop/r12-1/index.html",
+            "blob:null/26d8aa02-91ab-498a-bce7-2d5cf9571066"
+          ]
+        },
+        "mobile-viewport": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/denim-workshop/r13/index.html",
+            "blob:null/2a81591d-8902-489a-b22c-b6efa59091f7"
+          ]
+        }
+      },
+      "realPhone": false,
+      "hardwareFPSVerified": false,
+      "instrumentedRuntime": false,
+      "deterministicAdvanceIsDiagnostic": true,
+      "browserVersion": "140.0.7339.16",
+      "originalAppearance": {
+        "mean": 0.0,
+        "max": 0,
+        "fractionPixelsAbove8": 0.0,
+        "gate": "mean<0.5/255 and fraction above8<1%, fixed original default camera"
+      },
+      "legacyRecipeAccepted": true,
+      "tearPixelsChanged": 11.872166273837584,
+      "cameraDidNotResetPhysics": true,
+      "seamPixelsChanged": 11.329598535169566,
+      "foldPixelsChanged": 2.18119939484842,
+      "autonomousSteps": 101,
+      "reportExport": true,
+      "mobileCanvas": {
+        "x": 0,
+        "y": 52,
+        "width": 390,
+        "height": 523.265625
+      },
+      "finishedAt": "2026-10-13T08:42:18.436821+00:00",
+      "states": [
+        "original-material",
+        "parent-original",
+        "tear-intact",
+        "tear-growing",
+        "tear-open",
+        "tear-far",
+        "tear-close",
+        "tear-reset",
+        "seam-rest",
+        "seam-loaded",
+        "seam-detached",
+        "fold-contact-off",
+        "fold-contact-on",
+        "fold-side",
+        "fold-efficient",
+        "autonomous-play-pause",
+        "return-original",
+        "mobile-original",
+        "mobile-tear"
+      ],
+      "maximumTrackedGpuBytes": 210028208
+    },
+    "public": {
+      "passed": true,
+      "mode": "public",
+      "startedAt": "2026-10-13T08:42:20.484243+00:00",
+      "network": {
+        "desktop": {
+          "pageErrors": [],
+          "consoleErrors": [
+            {
+              "url": "https://htmlpreview.github.io/favicon.ico",
+              "text": "Failed to load resource: the server responded with a status of 404 ()"
+            }
+          ],
+          "httpErrors": [],
+          "requests": [
+            "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/82ab5421a14ea87734bf3e26b41f1d65d0a5e02e/denim-workshop/r13/index.html",
+            "https://htmlpreview.github.io/htmlpreview.js",
+            "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/82ab5421a14ea87734bf3e26b41f1d65d0a5e02e/denim-workshop/r13/index.html",
+            "blob:https://htmlpreview.github.io/e444143b-8fa9-4ff6-bef5-1d392de356be",
+            "blob:https://htmlpreview.github.io/fa46083a-fa07-49c7-a072-c87f44a42fec",
+            "blob:https://htmlpreview.github.io/a754b1cb-72e9-4fdb-b76d-5e97ce28e072",
+            "blob:https://htmlpreview.github.io/b77425fa-c772-426b-9e80-e8784d576a9c"
+          ]
+        },
+        "mobile-viewport": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/82ab5421a14ea87734bf3e26b41f1d65d0a5e02e/denim-workshop/r13/index.html",
+            "https://htmlpreview.github.io/htmlpreview.js",
+            "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/82ab5421a14ea87734bf3e26b41f1d65d0a5e02e/denim-workshop/r13/index.html",
+            "blob:https://htmlpreview.github.io/ac4376fd-00c7-4469-b0c9-ef3c1a131c78"
+          ]
+        }
+      },
+      "realPhone": false,
+      "hardwareFPSVerified": false,
+      "instrumentedRuntime": false,
+      "deterministicAdvanceIsDiagnostic": true,
+      "browserVersion": "140.0.7339.16",
+      "legacyRecipeAccepted": true,
+      "tearPixelsChanged": 11.872166273837584,
+      "cameraDidNotResetPhysics": true,
+      "seamPixelsChanged": 11.329598535169566,
+      "foldPixelsChanged": 2.18119939484842,
+      "autonomousSteps": 107,
+      "reportExport": true,
+      "mobileCanvas": {
+        "x": 0,
+        "y": 52,
+        "width": 390,
+        "height": 523.265625
+      },
+      "finishedAt": "2026-10-13T08:49:54.002209+00:00",
+      "states": [
+        "original-material",
+        "tear-intact",
+        "tear-growing",
+        "tear-open",
+        "tear-far",
+        "tear-close",
+        "tear-reset",
+        "seam-rest",
+        "seam-loaded",
+        "seam-detached",
+        "fold-contact-off",
+        "fold-contact-on",
+        "fold-side",
+        "fold-efficient",
+        "autonomous-play-pause",
+        "return-original",
+        "mobile-original",
+        "mobile-tear"
+      ],
+      "maximumTrackedGpuBytes": 210028208
+    }
+  },
+  "limits": [
+    "Explicit swatch experiments, original material mode remains",
+    "Surface-proxy VF/EE contact, not every cotton fiber and not globally robust CCD",
+    "One preset central cohesive fracture path, not arbitrary remeshing",
+    "Tension-only embedded stitch cables, no needle/knot/industrial seam calibration",
+    "Additional CPU and GPU cost, not an FPS upgrade",
+    "Strength and material coefficients unmeasured; strong-interface test may stretch over15%",
+    "Software Chromium; mobile390x844 is viewport only",
+    "No full garment or person integration, as requested",
+    "Default appearance comparison is one camera, not every dynamic state",
+    "Draft only; old versions, archive, main and other workbenches untouched"
+  ]
+}
