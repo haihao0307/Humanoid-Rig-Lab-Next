@@ -1,0 +1,87 @@
+name: Shoe R10 public data-wrapper compatibility
+on:
+  push:
+    branches: [fix/shoe-r10-bound-pair-wear-20261013]
+    paths: ['.github/workflows/shoe-r10-public-compat.yml']
+permissions: {}
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    outputs:
+      build: ${{ steps.commit.outputs.build }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+      - name: Correct only three inert-data wrappers, preserve every payload and executable byte
+        run: |
+          python -I - <<'PY'
+          import pathlib,re,json,hashlib
+          p=pathlib.Path('shoe-workshop/r10');h=p/'public-lite.html';sha=lambda b:hashlib.sha256(b).hexdigest();old=h.read_bytes();assert sha(old)=='7c5ea80715c2b12d6f372a2187db933cfff1245f3d9afe561b2da87e7bdae4a2'
+          pattern=r'<script type="application/octet-stream" id="(shoe-data|scan-data|human-data)">([A-Za-z0-9+/=]+)</script>'
+          oldtext=old.decode();new,count=re.subn(pattern,r'<div hidden id="\1">\2</div>',oldtext);assert count==3
+          executable=lambda t:t[t.index('<script>')+8:t.rindex('</script>')]
+          assert executable(oldtext)==executable(new)
+          assert re.findall(pattern,oldtext)==re.findall(r'<div hidden id="(shoe-data|scan-data|human-data)">([A-Za-z0-9+/=]+)</div>',new)
+          data=new.encode();assert len(data)==17990314 and sha(data)=='04f09615d463c5815eed27dee674f1f9f9747578d24b859b529e888542f72443'
+          m=json.loads((p/'BUILD_MANIFEST.json').read_text());assert m['sourceCommit']=='a152f7a91979d8d04114b61c51e86ed48e9f51a0'
+          previous=m['runtime'];m['runtime']={'bytes':len(data),'sha256':sha(data)}
+          changed=[]
+          for f in m['sources']:
+              if 'node_modules' in pathlib.PurePosixPath(f['path']).parts:continue
+              actual=sha((p/f['path']).read_bytes())
+              if actual!=f['sha256']:changed.append(f['path']);assert f['path']=='tools/build.mjs';f['sha256']=actual
+          assert changed==['tools/build.mjs']
+          m['packagingFix']={'commit':'9f39507e484b53888672beeabbb6a38c0c657127','previousRuntime':previous,'wrapperCount':3,'payloadsUnchanged':True,'executableUnchanged':True,'executableSHA256':sha(executable(new).encode()),'reason':'HTMLPreview re-executed inert script payloads and raised 3 SyntaxErrors. Data containers are now hidden div elements. Prior public run failed; no retrospective success claim.'}
+          h.write_bytes(data);(p/'BUILD_MANIFEST.json').write_text(json.dumps(m,indent=2))
+          (p/'HOST_COMPATIBILITY.json').write_text(json.dumps(m['packagingFix'],indent=2))
+          PY
+      - name: Fast-forward only this R10 candidate
+        id: commit
+        run: |
+          test "$GITHUB_REF_NAME" = 'fix/shoe-r10-bound-pair-wear-20261013'
+          current=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | cut -f1)
+          test "$current" = "$GITHUB_SHA"
+          git config core.hooksPath /dev/null
+          git config user.name 'Shoe R10 Host Compatibility'
+          git config user.email 'shoe-r10@users.noreply.github.com'
+          git add -- shoe-workshop/r10/public-lite.html shoe-workshop/r10/BUILD_MANIFEST.json shoe-workshop/r10/HOST_COMPATIBILITY.json
+          git commit -m 'build(shoes): host-compatible inert payload containers [skip ci]'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+          echo "build=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  public:
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.package.outputs.build }}
+          sparse-checkout: shoe-workshop
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read-only Chromium validation dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Actual public pair,12 presets and native R04 wearing with zero-error requirement
+        env:
+          PUBLIC_BUILD_SHA: ${{ needs.package.outputs.build }}
+        run: node shoe-workshop/r10/tests/browser.mjs --public
+      - name: Preserve actual public evidence including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r10-compatible-public-${{ github.run_id }}
+          path: |
+            shoe-workshop/r10/evidence/public/
+            shoe-workshop/r10/BUILD_MANIFEST.json
+            shoe-workshop/r10/HOST_COMPATIBILITY.json
+          retention-days: 14

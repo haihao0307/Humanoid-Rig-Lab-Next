@@ -1,0 +1,51 @@
+name: Shoe R10 recovery inspection
+on:
+  push:
+    branches: [fix/shoe-r10-bound-pair-wear-20261013]
+    paths: ['.github/workflows/shoe-r10-recovery.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pinned dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 playwright@1.56.0 esbuild@0.25.10
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Inspect current human APIs and actual foot geometry
+        run: |
+          mkdir -p shoe-workshop/r10/recovery
+          cat > shoe-workshop/r10/recovery/probe.mjs <<'JS'
+          import fs from 'node:fs';import {chromium} from 'playwright';import {createHash} from 'node:crypto';
+          const root='shoe-workshop/r10/recovery/',raw='https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/4d2787db762fc3e72e4595827865f579026c2ad4/kaopu-unified-human-workbench/human-integrated-r04/preview.html';
+          const html=await(await fetch(raw)).text();if(createHash('sha256').update(html).digest('hex')!=='c8f1150714ac03d2aec7deb6df7dd1e31a4bb887b1ca4fa4a25b38e373377f8d')throw Error('Human donor drift');fs.writeFileSync(root+'human-r04.html',html);
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']}),page=await browser.newPage({viewport:{width:1100,height:900}}),errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+          await page.goto('https://htmlpreview.github.io/?'+raw,{waitUntil:'domcontentloaded',timeout:90000});await page.waitForFunction(()=>window.__IDENTITY_QA__?.viewer()?.mesh&&window.unifiedHuman?.version==='HUMAN-INTEGRATED-R04',null,{timeout:360000});
+          const data=await page.evaluate(()=>{const Q=__IDENTITY_QA__,v=Q.viewer(),m=Q.model();window.lifelikeIdle?.set?.({enabled:false});const brief=x=>{if(x==null)return x;if(typeof x==='function')return '[function]';if(ArrayBuffer.isView(x))return {type:x.constructor.name,length:x.length,first:Array.from(x.slice(0,20))};if(Array.isArray(x))return {length:x.length,first:x.slice(0,5)};if(typeof x==='object')return Object.keys(x);return x;};const proto=x=>{let o=x,a=[];for(let n=0;o&&n<6;n++,o=Object.getPrototypeOf(o))a.push(Object.getOwnPropertyNames(o));return a;};v.view('body');v.camera.zoom=1;v.camera.updateProjectionMatrix();v.render();return {viewer:Object.fromEntries(Object.entries(v).map(([k,x])=>[k,brief(x)])),model:Object.fromEntries(Object.entries(m).map(([k,x])=>[k,brief(x)])),viewerMethods:proto(v),modelMethods:proto(m),rig:m.rig?Object.fromEntries(Object.entries(m.rig).map(([k,x])=>[k,brief(x)])):null,mesh:{attributes:Object.fromEntries(Object.entries(v.geometry.attributes).map(([k,a])=>[k,{count:a.count,itemSize:a.itemSize,type:a.array.constructor.name}])),position:v.mesh.position.toArray(),quaternion:v.mesh.quaternion.toArray(),scale:v.mesh.scale.toArray()},scene:v.scene.children.map(c=>({name:c.name,type:c.type})),motion:window.fullCommonWorkbench?.motion?.(),camera:{p:v.camera.position.toArray(),target:v.orbit.target.toArray()},report:window.unifiedHuman.report()};});
+          fs.writeFileSync(root+'human-api.json',JSON.stringify(data,null,2));fs.writeFileSync(root+'errors.json',JSON.stringify(errors));await page.screenshot({path:root+'human-full.png',timeout:120000});await browser.close();
+          JS
+          node shoe-workshop/r10/recovery/probe.mjs
+      - name: Export actual R09 chart boundaries and shoe dimensions for construction review
+        run: |
+          cat > shoe-workshop/r10/recovery/shoe-probe.mjs <<'JS'
+          import fs from 'node:fs';import {ShoeAssembly,defaultState} from '../../r09/src/model.mjs';
+          const load=p=>JSON.parse(fs.readFileSync('shoe-workshop/'+p)),m=new ShoeAssembly(load('r02/assets/teacher.json'),load('r04/vendor/outsole.json')),s=defaultState(),parts=m.build(s),out={};
+          for(const p of parts){p.geometry.computeBoundingBox();const D=m.domains[p.id];out[p.id]={bbox:p.geometry.boundingBox,attrs:Object.keys(p.geometry.attributes),vertices:p.geometry.attributes.position.count,groups:p.geometry.groups,loop:D?.loop.map(q=>({q,p:D.at(q).p,...m.sample(p.id,q,s)})),holes:D?.sourceHoles};}
+          fs.writeFileSync('shoe-workshop/r10/recovery/shoe-geometry.json',JSON.stringify(out));
+          JS
+          node shoe-workshop/r10/recovery/shoe-probe.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shoe-r10-recovery
+          path: shoe-workshop/r10/recovery
+          retention-days: 14

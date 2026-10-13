@@ -1,0 +1,44 @@
+name: Shoe R10 native fit contour inspection
+on:
+  push:
+    branches: [fix/shoe-r10-bound-pair-wear-20261013]
+    paths: ['.github/workflows/shoe-r10-fit-inspect.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shoe-r10-verified-38388974737
+          run-id: 38388974737
+          github-token: ${{ github.token }}
+          path: inspected-runtime
+      - name: Native data inspection using already-verified current runtime
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium && cd ..
+          cat > shoe-workshop/r10/inspect-foot.mjs <<'JS'
+          import fs from 'node:fs';import http from 'node:http';import {chromium} from 'playwright';import {createHash} from 'node:crypto';
+          const html=fs.readFileSync('inspected-runtime/public-lite.html');if(createHash('sha256').update(html).digest('hex')!=='f30ea344856ca1f35e9adb0419c2d96f8450a4e60416771969f026bb155f0081')throw Error('Wrong runtime');
+          const out='foot-inspection';fs.mkdirSync(out,{recursive:true});const server=http.createServer((q,r)=>{r.writeHead(200,{'Content-Type':'text/html'});r.end(html);});await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']}),page=await browser.newPage({viewport:{width:1200,height:900}});
+          await page.goto('http://127.0.0.1:'+server.address().port,{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.SHOE_R10?.ready,null,{timeout:180000});await page.evaluate(()=>SHOE_R10.mode('wear'));await page.waitForFunction(()=>SHOE_R10.wear.ready,null,{timeout:420000});
+          const data=await page.evaluate(()=>{const w=SHOE_R10.wear,m=w.model,r=m.lastBodyDriver.rig;return{source:'4d2787db762fc3e72e4595827865f579026c2ad4',shoe:'f44056564dd00d4ff32f8cff93de0b762085c0f2',positions:Array.from(m.positions.slice(0,m.bodyCount*3)),faces:Array.from(m.faces).filter(()=>true),bodyCount:m.bodyCount,rig:{names:r.names,parents:Array.from(r.parents),posedMatrices:r.posedMatrices.map(m=>Array.from(m)),weights:Object.fromEntries(['ptr','joints','values'].map(k=>[k,Array.from(r.weights[k])]))},connections:w.connections.map(c=>({side:c.side,initial:c.shoe.matrix.toArray()})),report:w.report()};});fs.writeFileSync(out+'/NATIVE_FOOT_FIXTURE.json',JSON.stringify(data));await browser.close();await new Promise(r=>server.close(r));
+          JS
+          node shoe-workshop/r10/inspect-foot.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shoe-r10-native-foot-inspection
+          path: foot-inspection/
+          retention-days: 14
