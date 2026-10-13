@@ -1,0 +1,174 @@
+name: Leather R17 B1 integrated verification
+on:
+  push:
+    branches: [perf/leather-r17-b1-20261013]
+    paths:
+      - .github/workflows/leather-r17-b1.yml
+      - leather-workshop/b1/**
+      - leather-workshop/r17/**
+permissions:
+  contents: write
+concurrency:
+  group: leather-r17-b1
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      source: ${{ steps.register.outputs.source }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: leather-workshop
+      - name: Register reviewed canonical recovery before all tests
+        id: register
+        run: |
+          if [ ! -f leather-workshop/r17/RECOVERY_SOURCE.json ]; then
+            python leather-workshop/b1-refinement/apply-recovery.py
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -f leather-workshop/r17
+            git commit -m 'perf(leather): register B1 equivalent environment sampling and robust response lifecycle'
+            git push origin HEAD:refs/heads/perf/leather-r17-b1-20261013
+          fi
+          echo "source=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  smoke:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Exact native build and real browser before full regression
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang-18 lld-18
+          pip -q install -r leather-workshop/r17/requirements-build.txt playwright==1.55.0
+          python leather-workshop/r17/build.py
+          python -u leather-workshop/r17/qa-b1-browser.py --mode smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r17-smoke-${{ github.run_id }}
+          path: |
+            leather-workshop/r17/out/candidate-r17.html
+            leather-workshop/r17/BUILD_RESULT.json
+            leather-workshop/r17/qa/**/*.json
+          retention-days: 14
+  verify:
+    needs: [prepare, smoke]
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [cpu, browser, extended, performance, soak]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fixed source and browser dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang-18 lld-18
+          pip -q install -r leather-workshop/r17/requirements-build.txt playwright==1.55.0
+      - name: Independent canonical build
+        run: python leather-workshop/r17/build.py
+      - name: Exact native, geometry, full trajectories and protocol gates
+        if: matrix.lane == 'cpu'
+        run: python -u leather-workshop/r17/verify-b1.py
+      - name: Original uninstrumented offline and raw-pixel gates
+        if: matrix.lane == 'browser'
+        run: python -u leather-workshop/r17/qa-browser-s2b.py
+      - name: Integrated diagnostics, GPU coordinates and graphics recovery
+        if: matrix.lane == 'extended'
+        run: python -u leather-workshop/r17/qa-b1-browser.py --mode extended
+      - name: Original predeclared ABBA GPU-duration gates, unchanged
+        if: matrix.lane == 'performance'
+        run: python -u leather-workshop/r17/qa-b1-performance.py
+      - name: Resource ownership and timed ten-minute continuous grab
+        if: matrix.lane == 'soak'
+        run: python -u leather-workshop/r17/qa-b1-browser.py --mode soak
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r17-${{ matrix.lane }}-${{ github.run_id }}
+          path: |
+            leather-workshop/r17/out/candidate-r17.html
+            leather-workshop/r17/BUILD_RESULT.json
+            leather-workshop/r17/qa/**/*.json
+            leather-workshop/r17/qa/**/*.png
+          retention-days: 14
+  publish:
+    needs: [prepare, verify]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: leather-r17-*-${{ github.run_id }}
+          path: /tmp/b1-artifacts
+      - name: Match five independent outputs and original performance gates
+        run: |
+          git fetch --depth=1 origin 7c15a2d58587da27b4d1ba7d6b4233a28d001aed
+          python leather-workshop/b1-refinement/release.py stage
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r17/public-lite.html leather-workshop/r17/BUILD_RESULT.json
+          find leather-workshop/r17/qa -name '*.json' -print0 | xargs -0 git add -f
+          git commit -m 'build(leather): publish B1 after fresh independent visual, performance and stability gates'
+          git push origin HEAD:refs/heads/perf/leather-r17-b1-20261013
+          echo "BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r17/public-lite.html" >> "$GITHUB_ENV"
+      - name: Fresh exact public bytes and real public browser
+        run: |
+          pip -q install -r leather-workshop/r17/requirements-build.txt playwright==1.55.0
+          python leather-workshop/b1-refinement/release.py public-bytes
+          python -u leather-workshop/r17/qa-browser-s2b.py --public --url "$PREVIEW"
+      - name: Record integrated delivery and remaining device limits
+        run: |
+          python leather-workshop/b1-refinement/release.py receipt
+          git add leather-workshop/r17/DELIVERY.json leather-workshop/r17/qa/render-batch/public/report.json
+          git commit -m 'test(leather): certify integrated B1 immutable public workbench and bounded results'
+          git push origin HEAD:refs/heads/perf/leather-r17-b1-20261013
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r17-final-${{ github.run_id }}
+          path: |
+            leather-workshop/r17/public-lite.html
+            leather-workshop/r17/BUILD_RESULT.json
+            leather-workshop/r17/DELIVERY.json
+            leather-workshop/r17/qa/**/*.json
+            leather-workshop/r17/qa/**/*.png
+          retention-days: 14
