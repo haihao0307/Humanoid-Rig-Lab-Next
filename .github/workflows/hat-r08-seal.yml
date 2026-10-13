@@ -1,0 +1,46 @@
+name: Hat R08 preserve reviewed evidence
+on:
+  push:
+    branches: [fix/hat-r08-responsive-loading-20261013]
+    paths: [.github/workflows/hat-r08-seal.yml]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/hat-r08-responsive-loading-20261013
+          sparse-checkout: hat-workshop/r08
+      - uses: actions/download-artifact@v4
+        with:
+          name: hat-r08-evidence-38345100296
+          run-id: 38345100296
+          github-token: ${{ github.token }}
+          path: .r08-reviewed-evidence
+      - name: Preserve original screenshots, not a new render or build
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,shutil,hashlib
+          src=Path('.r08-reviewed-evidence');out=Path('hat-workshop/r08')
+          delivery=json.loads((src/'DELIVERY.json').read_text());assert delivery['buildSha']=='0c219f96ddc7de3e594d275f08027cf3b606059c'
+          images=[]
+          for p in sorted((src/'qa').glob('*/*.png')):
+              target=out/p.relative_to(src);target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,target)
+              images.append({'path':str(p.relative_to(src)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+          public=json.loads((src/'qa/public/report.json').read_text());local=json.loads((src/'qa/browser/report.json').read_text())
+          assert local['passed'] and public['passed']
+          cold=[x for x in public['clicks'] if x['label']=='cold-catalogue'];offline=[x for x in public['clicks'] if x['label']=='network-offline']
+          summary={'schema':'kaopu.hat.loading-evidence/8','sourceSha':delivery['sourceSha'],'buildSha':delivery['buildSha'],'publicURL':delivery['publicURL'],'workflowRun':38345100296,'environment':public['environment'],'coldPageWallMS':public['checks'][0]['detail']['coldWallMS'],'firstSelections':[{'hat':x['id'],'clickToReadyWallMS':x['clickToReadyWallMS'],'renderAssetCacheHit':x['pageTiming']['cacheHit'],'originalColorReady':x['pageTiming']['originalColorReady'],'HDNormalReady':x['pageTiming']['detailReady']} for x in cold],'offlineSelections':[{'hat':x['id'],'clickToReadyWallMS':x['clickToReadyWallMS']} for x in offline],'localChecks':len(local['checks']),'publicChecks':len(public['checks']),'geometryOriginalPairs':33,'screenshots':images,'allChecksPassed':True,'runtimeChangedByThisRecord':False,'timingBoundary':'Original source-color image and exact procedural fitted geometry shown; independent HD normal completion is not part of switch-ready timing. Browser and network are the test runner, not user hardware.','firstPageTradeoff':'9745541-byte initial HTML embeds all source colors and controls; no remote package needed after initial page load.','phoneHardwareTested':False,'userAccepted':False}
+          (out/'qa/LOADING_SUMMARY.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r08/qa/LOADING_SUMMARY.json
+          git add -f hat-workshop/r08/qa/browser/*.png hat-workshop/r08/qa/public/*.png
+          git commit -m 'docs(hat-r08): preserve reviewed browser images and exact measurements [skip ci]'
+          git push origin HEAD:fix/hat-r08-responsive-loading-20261013
