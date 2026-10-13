@@ -1,0 +1,107 @@
+name: Hat all-eleven source study
+on:
+  push:
+    branches: [study/hat-source-decomposition-all11-20261013]
+    paths: [hat-workshop/source-study-s0/**, .github/workflows/hat-source-study-s0.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hat-source-study-s0
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      source: ${{ steps.build.outputs.source }}
+      build: ${{ steps.build.outputs.build }}
+      url: ${{ steps.build.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            hat-workshop/r09
+            hat-workshop/source-study-s0
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pillow
+      - id: build
+        run: python -u hat-workshop/source-study-s0/publish.py build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-study-build-${{ github.run_id }}
+          path: hat-workshop/source-study-s0
+          retention-days: 7
+  inspect:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [local, public]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.build }}
+          sparse-checkout: |
+            hat-workshop/r09
+            hat-workshop/source-study-s0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Source identity and native control-state verification
+        env:
+          SOURCE: ${{ needs.build.outputs.source }}
+          URL: ${{ needs.build.outputs.url }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          if [ "$TARGET" = public ]; then
+            timeout --kill-after=10s 780s python -u hat-workshop/source-study-s0/qa-dom.py --source "$SOURCE" --url "$URL"
+          else
+            timeout --kill-after=10s 780s python -u hat-workshop/source-study-s0/qa-dom.py --source "$SOURCE"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-study-${{ github.run_id }}-${{ matrix.target }}
+          path: hat-workshop/source-study-s0/qa
+          retention-days: 7
+  receipt:
+    needs: [build, inspect]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/source-study-s0
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hat-study-${{ github.run_id }}-*
+          path: hat-workshop/source-study-s0/qa
+          merge-multiple: true
+      - env:
+          SOURCE: ${{ needs.build.outputs.source }}
+          BUILD: ${{ needs.build.outputs.build }}
+        run: python -u hat-workshop/source-study-s0/publish.py receipt --source "$SOURCE" --build "$BUILD"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-study-final-${{ github.run_id }}
+          path: hat-workshop/source-study-s0
+          retention-days: 7
