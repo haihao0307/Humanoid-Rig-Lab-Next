@@ -1,0 +1,28 @@
+/** R09 executable regressions. Gates assert measured outcomes, not finite-only. */
+const L=require('./node-lib.cjs'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const OUT=path.join(__dirname,'qa');fs.mkdirSync(OUT,{recursive:true});const checks=[];
+function check(name,pass,data={}){checks.push({name,pass:!!pass,data});fs.writeFileSync(path.join(OUT,'numeric.json'),JSON.stringify({version:'R09.1',checks,pass:checks.every(x=>x.pass)},null,2));assert(pass,name);}
+const mats=()=>L.productMaterials(new L.T.MeshStandardMaterial());
+const grid={positions:[-50,100,-50,50,100,-50,0,100,50,-4,104,-3,4,104,-3,0,104,4],triangles:[[0,1,2,1.4,1],[3,4,5,1.4,1]],nodeParts:[0,0,0,1,1,1],partNames:['fixed','falling']};
+const collision=new L.ImplicitLeatherShell(grid,{gravity:0,implicitIterations:50});collision.inv.fill(0,0,3);for(let i=3;i<6;i++)collision.v[3*i+1]=-.5;collision.active=true;
+for(let i=0;i<24;i++)collision.step();const audit=collision.contact.audit(collision.x),rep=collision.report();
+check('Full coupled solver stops a falling triangle at finite thickness rather than passing through the face',!rep.failed&&audit.penetrating===0&&Math.min(collision.x[10],collision.x[13],collision.x[16])>.10139,{report:rep,contact:audit});
+check('Fixed collision surface is not moved by the nonlinear solver',collision.x.slice(0,9).every((v,i)=>Math.abs(v-collision.rest[i])<1e-12));
+const x0=Float64Array.from([-1,0,0,1,0,0,0,.2,-1,0,.2,1]),x1=x0.slice();x1[7]=x1[10]=-.2;
+const ee=L.sweptContact(x0,x1,[0,1,2,3],.01,false);check('Swept edge-edge crossing detected between endpoints',ee&&ee.t>0&&ee.t<.5,ee);
+let maxDistanceError=0,maxTimeError=0,count=0;let seed=1827;function random(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;}
+for(let n=0;n<80;n++){const a=Float64Array.from({length:12},()=>random()*.2-.1),b=Float64Array.from(a,v=>v+(random()-.5)*.06);for(const pt of[true,false]){const fn=pt?'closestPT':'closestEE',p=L[fn](a,[0,1,2,3]),q=L.ContactReference[fn](a,[0,1,2,3]);maxDistanceError=Math.max(maxDistanceError,Math.abs(p.d-q.d));const c=L.sweptContact(a,b,[0,1,2,3],.0014,pt),d=L.ContactReference.sweptContact(a,b,[0,1,2,3],.0014,pt);assert.equal(!!c,!!d);if(c)maxTimeError=Math.max(maxTimeError,Math.abs(c.t-d.t));count++;}}
+check('WASM narrow phase agrees with retained JavaScript reference',maxDistanceError<1e-10&&maxTimeError<1e-6,{cases:count,maxDistanceError,maxTimeError});
+const energies=[];for(const ids of [[0,1,2],[1,2,0],[2,0,1],[0,2,1],[2,1,0],[1,0,2]]){const d={positions:[0,100,0,50,100,0,0,140,0],triangles:[[...ids,1.4,1]],frameTriangles:[{ids:[0,1,2],inv:[20,0,0,25]}]};const s=new L.ImplicitLeatherShell(d,{contact:false});const x=s.rest.slice();x[3]*=1.05;s.energyNative.begin(x,s.cfg.dt,[]);const n=s.objective(x,x,s.cfg.dt,true),r=s.referenceObjective(x,x,s.cfg.dt,true);check('Full nonlinear energy and gradient native/reference '+ids.join(''),Math.abs(n.energy-r.energy)<1e-10&&n.grad.every((v,i)=>Math.abs(v-r.grad[i])<1e-7),{energy:n.energy,maxGradientError:Math.max(...n.grad.map((v,i)=>Math.abs(v-r.grad[i])))});energies.push(n.energy);}
+check('Material energy does not depend on triangle enumeration',Math.max(...energies)/Math.min(...energies)<1+1e-10,{energies});
+const wallet=L.makeProduct('wallet',mats(),{craft:'plain'}),rig=wallet.userData.rig,oldPixels=rig.pixels.slice();let rear=[],front=[];
+for(const m of rig.meshes){if(!m.userData.thread||!m.geometry.attributes.simBlend)continue;const blend=m.geometry.attributes.simBlend;for(let i=0;i<blend.count;i+=23){const q={m,i,p:L.evaluateBoundVertex(m,rig,i)};if(blend.getX(i)===1)rear.push(q);if(blend.getX(i)===0)front.push(q);}}
+for(let i=0;i<rig.nodeCount;i++)if(rig.data.nodeParts[i]===0)rig.pixels[12*i]+=1;
+const delta=q=>L.evaluateBoundVertex(q.m,rig,q.i).distanceTo(q.p),rearError=Math.max(...rear.map(q=>Math.abs(delta(q)-1))),frontError=Math.max(...front.map(delta));
+check('Rear-only 1 mm movement reaches rear exposed saddle thread without moving front exposed thread',rear.length>10&&rearError<1e-5&&frontError<1e-5,{rearSamples:rear.length,frontSamples:front.length,rearErrorMM:rearError,frontMotionMM:frontError});rig.pixels.set(oldPixels);
+const before=L.worldShellMeasurements(wallet);wallet.scale.setScalar(2);wallet.updateMatrixWorld(true);const after=L.worldShellMeasurements(wallet);check('Thickness reads live world-space skins, not static vertex coordinates',before.every((r,i)=>Math.abs(after[i].maxMM/r.maxMM-2)<1e-9),{before,after});wallet.scale.setScalar(1);wallet.updateMatrixWorld(true);
+const mass=[];for(const scale of [.65,1,1.8]){const r=L.makeProduct('swatch',mats(),{craft:'plain',thicknessScale:scale}),s=new L.ImplicitLeatherShell(r.userData.rig.data,{contact:false}),t=L.worldShellMeasurements(r);mass.push({scale,massG:s.totalMass*1000,thickness:t});check('Positive closed shells at thickness scale '+scale,t.every(x=>x.minMM>.1&&Math.abs(x.targetMM-1.4*scale)<1e-9));}
+check('Thickness changes area-density mass consistently in the unchanged sample',Math.abs(mass[2].massG/mass[1].massG-1.8)<1e-9&&Math.abs(mass[0].massG/mass[1].massG-.65)<1e-9,{mass});
+const pair={ids:[3,0,1,2],gap:.0014,pt:true},from=collision.rest.slice(),to=from.slice();to[10]-=.02;const single=collision.energyNative.clip(from,to,[pair]),batched=collision.energyNative.clip(from,to,Array(collision.energyNative.capacity+3).fill(pair));
+check('Native swept-contact batching retains every pair and the same safe fraction',single>0&&single<1&&Math.abs(single-batched)<1e-12,{single,batched,pairs:collision.energyNative.capacity+3});
+console.log(JSON.stringify({pass:true,checks:checks.length}));
