@@ -1,0 +1,70 @@
+{
+  "checks": [
+    {
+      "name": "shared buffers counted once",
+      "passed": true
+    },
+    {
+      "name": "LRU evicts older entry",
+      "passed": true
+    },
+    {
+      "name": "oversized entry excluded",
+      "passed": true
+    },
+    {
+      "name": "budget and count bounded",
+      "passed": true
+    },
+    {
+      "name": "clear releases references",
+      "passed": true
+    },
+    {
+      "name": "content identity independent of build URL",
+      "passed": true
+    },
+    {
+      "name": "persistent content-addressed hit",
+      "passed": true
+    },
+    {
+      "name": "corrupt cache is replaced",
+      "passed": true
+    },
+    {
+      "name": "hung disk API cannot block network",
+      "passed": true
+    },
+    {
+      "name": "failed primary falls back",
+      "passed": true
+    },
+    {
+      "name": "hash mismatch rejected",
+      "passed": true
+    },
+    {
+      "name": "truncated body rejected",
+      "passed": true
+    },
+    {
+      "name": "cancelled request rejected",
+      "passed": true
+    }
+  ],
+  "stats": {
+    "memoryHits": 1,
+    "diskHits": 1,
+    "networkRequests": 9,
+    "networkBytes": 46,
+    "cacheTimeouts": 1,
+    "cacheFailures": 1,
+    "fallbacks": 3,
+    "memoryEntries": 0,
+    "memoryBytes": 0,
+    "maxMemoryBytes": 29360128,
+    "maxEntries": 8
+  },
+  "passed": true
+}
