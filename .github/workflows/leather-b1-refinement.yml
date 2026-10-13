@@ -1,0 +1,38 @@
+name: Leather B1 rendering root-cause probe
+on:
+  push:
+    branches: [perf/leather-r17-b1-20261013]
+    paths:
+      - .github/workflows/leather-b1-refinement.yml
+      - leather-workshop/b1-refinement/**
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      LEATHER_SOURCE_COMMIT: 33df56875485243bdd1531ef04787325878c26a8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Build unchanged candidate and compare diagnostic-only variants
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang-18 lld-18
+          pip -q install -r leather-workshop/r17/requirements-build.txt playwright==1.55.0
+          python leather-workshop/r17/build.py
+          python -u leather-workshop/b1-refinement/probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-b1-refinement-${{ github.run_id }}
+          path: |
+            leather-workshop/r17/qa/b1/refinement/*.json
+            leather-workshop/r17/qa/b1/refinement/*.png
+          retention-days: 14
