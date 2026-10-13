@@ -45,10 +45,12 @@ jobs:
           name: shoe-r08-early-${{ github.run_id }}
           path: shoe-workshop/r08/evidence/early/
           retention-days: 14
-      - name: Actual layer and full-stack needle centre regressions
+      - name: Actual layer, full-stack needle and exposed-span regressions
         id: numeric
         continue-on-error: true
-        run: node shoe-workshop/r08/tests/kernel.mjs
+        run: |
+          node shoe-workshop/r08/tests/kernel.mjs
+          node shoe-workshop/r08/tests/exposure.mjs
       - name: Actual file browser materials near far and inherited controls
         id: browser
         continue-on-error: true
@@ -79,8 +81,9 @@ jobs:
           m=json.loads((p/'BUILD_MANIFEST.json').read_text())
           q=json.loads((p/'evidence/public/QA.json').read_text())
           n=json.loads((p/'evidence/numerics/QA.json').read_text())
-          assert q['sourceBuild']==m['sourceBuild'] and n['success'] and not q['errors'] and not q['consoleErrors']
-          r={'version':'R08.0','base':'5889ebd871aa34baad5e6094d4ccf29bc29f40f7','sourceBuild':m['sourceBuild'],'buildSha':os.environ['PUBLIC_BUILD_SHA'],'url':q['url'],'runtime':m['runtime'],'runId':os.environ['GITHUB_RUN_ID'],'numericChecks':len(n['checks']),'needleCentreTests':len(n['needleTests']),'needleCentreMisses':len(n['needleMisses']),'publicChecks':len(q['checks']),'acceptance':{'publicRuntimeVerified':True,'producerRenderReview':False,'userVisual':False,'fullYarnCollision':False,'sewingPhysics':False,'manufacturing':False},'scope':'Explicit owned lapped joints, signed actual layer contact, all receiving plies pierced, static needle/bobbin topology, per-panel R10 recipes, dynamic camera depth precision. No lace work.'}
+          e=json.loads((p/'evidence/numerics/EXPOSURE.json').read_text())
+          assert q['sourceBuild']==m['sourceBuild'] and e['sourceBuild']==m['sourceBuild'] and n['success'] and not e['occluded'] and not q['errors'] and not q['consoleErrors']
+          r={'version':'R08.0','base':'5889ebd871aa34baad5e6094d4ccf29bc29f40f7','sourceBuild':m['sourceBuild'],'buildSha':os.environ['PUBLIC_BUILD_SHA'],'url':q['url'],'runtime':m['runtime'],'runId':os.environ['GITHUB_RUN_ID'],'numericChecks':len(n['checks']),'needleCentreTests':len(n['needleTests']),'needleCentreMisses':len(n['needleMisses']),'exposedSpanSamples':e['samples'],'occludedExposedSamples':len(e['occluded']),'publicChecks':len(q['checks']),'acceptance':{'publicRuntimeVerified':True,'producerRenderReview':False,'userVisual':False,'fullYarnCollision':False,'sewingPhysics':False,'manufacturing':False},'scope':'Explicit owned lapped joints, signed actual layer contact, all receiving plies pierced, static needle/bobbin topology, per-panel R10 recipes, dynamic camera depth precision. Native rear rails revalidated instead of inheriting obsolete split labels. No lace work.'}
           (p/'RELEASE_RECEIPT.json').write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
           PY
           git add shoe-workshop/r08
