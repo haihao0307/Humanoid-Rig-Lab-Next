@@ -356,7 +356,7 @@ H.generate=(s,lod=0)=>s.id==='field'?field(s,lod):baseGenerate(s,lod);
 })(globalThis);
 
 self.onmessage=e=>{try{const data=HAT10.generate(e.data.spec,e.data.lod);const list=[];for(const p of data.pieces)for(const k of ['position','normal','uv','index'])list.push(p[k].buffer);postMessage(data,list);}catch(error){postMessage({error:String(error.message||error)});}};</script>
-<script>globalThis.HAT10_BUILD={"source": "a9faeab6435b8f6781f5d160a6e2a38fa5aa7960", "version": "HAT-R11.0"};</script><script>/*The MIT License
+<script>globalThis.HAT10_BUILD={"source": "c583a26f6f9cacee4e50d43a18732aa614651ea5", "version": "HAT-R11.0"};</script><script>/*The MIT License
 
 Copyright © 2010-2025 three.js authors
 
@@ -4631,7 +4631,7 @@ H.makeMaterial=function(c,s,role){
   sh.vertexShader='varying vec3 ownLocal;\n'+sh.vertexShader;sh.vertexShader=sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nownLocal=position;');
   sh.fragmentShader=GLSL+'\n'+sh.fragmentShader;sh.fragmentShader=sh.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.rgb*=1.0+ownDetail*.022*(n11(ownLocal*240.0)-.5);');
  };
- m.customProgramCacheKey=()=> 'R11-generated-weave-'+family;return m;
+ m.customProgramCacheKey=()=> 'R11-generated-weave-shared-v1';return m;
 };
 // Hat-local EB1-oriented adapter: procedural softboxes and controlled fill.
 // This does not claim that other workbenches have been migrated to this code.
