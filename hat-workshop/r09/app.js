@@ -17,7 +17,8 @@ const $=id=>document.getElementById(id),next=()=>new Promise(r=>requestAnimation
 const DEFAULT={...PARAM_DEFAULTS,id:'cable',dye:'original',width:1,depth:1,height:1,lift:0,tilt:0,roughness:.86,detail:1,sheen:.65,view:'wear',head:0,light:'studio',layer:'material',repair:true};
 const COLORS={original:null,sand:'#d6b894',navy:'#293e55',moss:'#61705c',wine:'#794149',pearl:'#b9b7ab'};
 const SCHEMA='kaopu.hat.recipe/1';let cameraMode='three';let D,state={...DEFAULT},token=0,asset=null,hat=null,person=null,rotating=false,framePending=false,busy=false,ready=false,compare=false,thumbsReady=0;
-const storage='kaopu.hat-r09.recipe';let renderSerial=0;let saveWarning='';let headToken=0,firstFrameMS=null;const catalogueFailures=[],recipesByHat=new Map();let activeSelection=null,detailJob=null,lastRequested=null;const selectionEvents=[];
+const storage='kaopu.hat-r09.recipe';// R09_RENDER_SCHEDULING_1
+let renderSerial=0,frameHandle=0;const renderStats={submissions:0,shadowUpdates:0,coalescedRequests:0,cancelledDuplicates:0,lastSubmitMS:0};let saveWarning='';let headToken=0,firstFrameMS=null;const catalogueFailures=[],recipesByHat=new Map();let activeSelection=null,detailJob=null,lastRequested=null;const selectionEvents=[];
 function message(text,error=false){$('status').textContent=text;$('status').classList.toggle('error',error);}
 const derivedCache=new RuntimeGeometryCache();const profileIds=new WeakMap();let profileSerial=0;
 function profileIdentity(hp){if(!hp)return 0;if(!profileIds.has(hp))profileIds.set(hp,++profileSerial);return profileIds.get(hp);}
@@ -34,7 +35,7 @@ function retainAsset(a){if(!a||a.disposed)return;const id=a.meta.id,old=assetCac
 function acquireCached(id){if(asset?.meta.id===id&&!asset.disposed)return asset;const a=assetCache.get(id);if(a){assetCache.delete(id);return a;}return null;}
 function fitSignature(s,hp){return JSON.stringify([D?.sourceHash,s.id,s.head,profileIdentity(hp),hp?.ymax,...Object.keys(PARAM_DEFAULTS).filter(k=>!['cutaway','showMeasurements','showClearance','textureMode','grainStrength','weaveMM','customColor','useCustomColor'].includes(k)).map(k=>s[k])]);}
 function solveAsset(a,s,hp){const key=fitSignature(s,hp),result=a.fitResults?.get(key);if(!result)throw Error('当前头形尚未在线程中完成适配，请重新选择本款');return result;}
-function cacheReport(){return {geometryCache:derivedCache.report(),detailCache:detailStats(),startup:globalThis.__hatStartupStats||{},idleAssets:assetCache.size,maxIdleAssets:CACHE_LIMIT,estimatedIdleBytes:[...assetCache.values()].reduce((n,a)=>n+estimateAsset(a),0),byteLimit:CACHE_BYTES,packageEntries:dataCache.size,lastSwitch,history:[...switchHistory],worker:workerStats(),activeSelection:activeSelection?{id:activeSelection.id,stage:activeSelection.stage,elapsedMS:performance.now()-activeSelection.started}:null,selectionEvents:[...selectionEvents],networkRequiredForSwitch:false,detailState:asset?.detailState||'none'};}
+function cacheReport(){return {rendering:{...renderStats},geometryCache:derivedCache.report(),detailCache:detailStats(),startup:globalThis.__hatStartupStats||{},idleAssets:assetCache.size,maxIdleAssets:CACHE_LIMIT,estimatedIdleBytes:[...assetCache.values()].reduce((n,a)=>n+estimateAsset(a),0),byteLimit:CACHE_BYTES,packageEntries:dataCache.size,lastSwitch,history:[...switchHistory],worker:workerStats(),activeSelection:activeSelection?{id:activeSelection.id,stage:activeSelection.stage,elapsedMS:performance.now()-activeSelection.started}:null,selectionEvents:[...selectionEvents],networkRequiredForSwitch:false,detailState:asset?.detailState||'none'};}
 function lightMeta(meta){const {textures,renderedThumbnail,teacherThumbnail,...rest}=meta;return rest;}
 function event(kind,id,extra={}){selectionEvents.push({kind,id,at:performance.now(),...extra});if(selectionEvents.length>64)selectionEvents.shift();}
 function phase(ctx,text){guard(ctx.signal);ctx.stage=text;if(activeSelection===ctx){message(text+' · '+ctx.title);const el=$('load-stage');if(el)el.textContent=text;}}
@@ -57,7 +58,7 @@ function queueDetail(a){
    a.maps.normal=t;a.material.normalMap=t;a.material.needsUpdate=true;a.detailState='ready';syncUI();requestRender();detailMessage('原始高清表面已就绪');
   }catch(e){if(t&&a.maps.normal!==t)t.dispose();if(!controller.signal.aborted&&asset===a){a.detailState='retry';detailMessage('高清表面暂未载入；帽形与原色可用，可点击“重试高清表面”');event('detail-failed',a.meta.id,{message:e.message});}}
   finally{if(url)URL.revokeObjectURL(url);if(detailJob===controller)detailJob=null;}
- },80);
+ },500);
 }
 async function localTexture(url,key,signal){
  guard(signal);let timer,abandoned=false;const p=new T.TextureLoader().loadAsync(url).then(t=>{
@@ -82,14 +83,26 @@ function currentFeedback(){return{schema:'kaopu.workbench.feedback/1',version:D.
 function updateQualityBase(){if(!asset)return;const m=asset.mesh;$('quality-note').textContent=`${CONSTRUCTION[state.id].label}。${m.controlCount}个来源控制点 → 程序细分生成${m.position.length/3}个显示顶点。保留署名与原贴图；不是从零纯解析模型，也不是纱线级物理。`;}
 async function unpack64(s,type){const bytes=Uint8Array.from(atob(s),c=>c.charCodeAt(0));const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));return new type(await new Response(stream).arrayBuffer());}
 async function decodeGeometry(data){if(data.rawPositions){const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(data.rawPositions),3));g.setIndex(new T.BufferAttribute(new Uint32Array(data.rawIndex),1));g.computeVertexNormals();g.computeBoundingBox();return g;}const [p,n,u,i]=await Promise.all([unpack64(data.p,Float32Array),data.n?unpack64(data.n,Float32Array):null,data.u?unpack64(data.u,Float32Array):null,unpack64(data.i,Uint32Array)]);const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(p,3));if(n)g.setAttribute('normal',new T.BufferAttribute(n,3));if(u)g.setAttribute('uv',new T.BufferAttribute(u,2));g.setIndex(new T.BufferAttribute(i,1));if(!n)g.computeVertexNormals();g.computeBoundingBox();return g;}
-const canvas=$('canvas'),renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=.85;renderer.shadowMap.enabled=true;renderer.localClippingEnabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+const canvas=$('canvas'),renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=.85;renderer.shadowMap.enabled=true;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;renderer.localClippingEnabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
 const scene=new T.Scene();scene.background=new T.Color(0xe6e1d7);scene.fog=new T.Fog(0xe6e1d7,1.1,4);const camera=new T.PerspectiveCamera(34,1,.001,20),controls=new OrbitControls(camera,canvas);controls.enableDamping=false;controls.minDistance=.1;controls.maxDistance=2.4;controls.maxPolarAngle=Math.PI*.96;controls.addEventListener('change',requestRender);controls.addEventListener('start',()=>{rotating=false;$('rotate').setAttribute('aria-pressed','false');});
 const room=new RoomEnvironment(),pmrem=new T.PMREMGenerator(renderer),env=pmrem.fromScene(room,.04);scene.environment=env.texture;room.dispose();pmrem.dispose();
 const hemi=new T.HemisphereLight(0xffffff,0xb8aa94,.7),key=new T.DirectionalLight(0xfff0da,1.7),fill=new T.DirectionalLight(0xdbe8ff,.45),rim=new T.DirectionalLight(0xffffff,.85);key.position.set(-.6,.85,.8);fill.position.set(.6,.28,.4);rim.position.set(.35,.6,-.8);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-.6;key.shadow.camera.right=.6;key.shadow.camera.top=.65;key.shadow.camera.bottom=-.6;key.shadow.camera.near=.05;key.shadow.camera.far=3;key.shadow.bias=-.00012;key.shadow.normalBias=.00055;key.shadow.radius=3;scene.add(hemi,key,fill,rim,key.target);
 const stage=new T.Group();scene.add(stage);const floor=new T.Mesh(new T.PlaneGeometry(8,8),new T.MeshStandardMaterial({color:0xe6e1d7,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.049;floor.receiveShadow=true;scene.add(floor);
 const plinth=new T.Mesh(new T.CylinderGeometry(.205,.209,.04,128),new T.MeshStandardMaterial({color:0xd2c9ba,roughness:.9}));plinth.position.y=-.025;plinth.receiveShadow=true;plinth.castShadow=true;scene.add(plinth);
-function requestRender(){if(framePending)return;framePending=true;requestAnimationFrame(()=>{framePending=false;render();});}
-function render(){if(!asset)return;renderer.render(scene,camera);renderSerial++;if(firstFrameMS===null)firstFrameMS=performance.now();if(rotating&&!document.hidden){stage.rotation.y+=.006;requestRender();}}
+function requestRender(){
+ if(framePending){renderStats.coalescedRequests++;return;}
+ framePending=true;frameHandle=requestAnimationFrame(()=>{framePending=false;frameHandle=0;render();});
+}
+function render(){
+ // An immediate commit/export satisfies the pending draw; do not submit it twice.
+ if(framePending){cancelAnimationFrame(frameHandle);framePending=false;frameHandle=0;renderStats.cancelledDuplicates++;}
+ if(!asset)return;
+ const started=performance.now(),shadowDirty=renderer.shadowMap.needsUpdate;
+ renderer.render(scene,camera);renderStats.lastSubmitMS=performance.now()-started;
+ renderStats.submissions++;if(shadowDirty)renderStats.shadowUpdates++;renderSerial++;
+ if(firstFrameMS===null)firstFrameMS=performance.now();
+ if(rotating&&!document.hidden){stage.rotation.y+=.006;renderer.shadowMap.needsUpdate=true;requestRender();}
+}
 function resize(){const r=$('viewport').getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();requestRender();}new ResizeObserver(resize).observe($('viewport'));
 function disposeAsset(a){if(!a||a.disposed)return;if(a.sweatMesh){a.sweatMesh.geometry.dispose();a.sweatMesh.material.dispose();a.sweatMesh=null;}if(a.sectionMesh){a.sectionMesh.geometry.dispose();a.sectionMesh.material.dispose();a.sectionMesh=null;}if(a.innerMesh){a.innerMesh.geometry.dispose();a.innerMesh.material.dispose();a.innerMesh=null;}a.disposed=true;a.geometry.dispose();a.material.dispose();Object.values(a.maps).forEach(t=>t.dispose());}
 async function loadAsset(meta,settings,hp,ctx){
@@ -124,7 +137,7 @@ function clearMeasurement(){for(const child of [...measurementGroup.children]){c
 function measurementOverlay(profile,s){clearMeasurement();if(!profile||s.view!=='wear'||!s.showMeasurements||compare)return;const mm=measurements(profile,s.wearBandMM/1000),line=(pts,loop,color)=>{const g=new T.BufferGeometry().setFromPoints(pts.map(p=>new T.Vector3(...p))),mat=new T.LineBasicMaterial({color,depthTest:false,transparent:true,opacity:.8});const l=loop?new T.LineLoop(g,mat):new T.Line(g,mat);l.renderOrder=20;measurementGroup.add(l);};line(mm.ring.map(p=>[p[0],mm.bandY,p[1]]),true,0x247784);
  for(const angle of [0,Math.PI/2]){const pts=[];for(let side=0;side<2;side++)for(let j=0;j<64;j++){const f=side?1-j/63:j/63,y=mm.bandY+f*(profile.ymax-mm.bandY-.0002),a=angle+side*Math.PI,p=sample(profile,y,a);pts.push([p.center[0]+p.r*Math.cos(a),y,p.center[1]+p.r*Math.sin(a)]);}line(pts,false,angle?0xbb7848:0x668750);}}
 function apply(){
- if(!hat)return;const isReference=compare||state.repair===false,s=isReference?{...DEFAULT,...subtypeDefaults(state.id),id:state.id,view:state.view,head:state.head,light:state.light}:state,meta=asset.meta,head=D.native.heads[s.head],profile=headProfiles.get(s.head);stage.rotation.y=0;
+ if(!hat)return;renderer.shadowMap.needsUpdate=true;const isReference=compare||state.repair===false,s=isReference?{...DEFAULT,...subtypeDefaults(state.id),id:state.id,view:state.view,head:state.head,light:state.light}:state,meta=asset.meta,head=D.native.heads[s.head],profile=headProfiles.get(s.head);stage.rotation.y=0;
  const fitStamp=JSON.stringify([isReference,s.id,s.head,...Object.keys(PARAM_DEFAULTS).filter(k=>!['cutaway','showMeasurements','showClearance','textureMode','grainStrength','weaveMM','customColor','useCustomColor'].includes(k)).map(k=>s[k])]);
  if(asset.fitKey!==fitStamp){
   if(isReference){asset.geometry.setIndex(new T.BufferAttribute(asset.mesh.index,1));asset.fitResult=null;asset.geometry.attributes.position.array=asset.mesh.position;asset.geometry.attributes.normal.array=asset.mesh.normal;}
@@ -150,7 +163,7 @@ function apply(){
  if(s.light==='raking'){key.position.set(-.9,.15,.25);key.intensity=2.3;fill.intensity=.18;rim.intensity=.7;hemi.intensity=.4;renderer.toneMappingExposure=.9;}
  floor.visible=cameraMode!=='inside';measurementOverlay(profile,state);syncUI();syncMotherUI();updateQuality();requestRender();const m=metrics();$('dimensions').textContent=`${m.widthMM.toFixed(0)} × ${m.heightMM.toFixed(0)} × ${m.depthMM.toFixed(0)} mm`;
 }
-function frame(view='three'){if(!hat)return;cameraMode=view;floor.visible=view!=='inside';plinth.visible=state.view==='product'&&view!=='inside';stage.rotation.y=0;const b=new T.Box3().setFromObject(hat);if(state.view==='wear'){const h=D.native.heads[state.head];b.union(new T.Box3(new T.Vector3(-h.headWidthM*.66,-.19,-h.headDepthM*.55),new T.Vector3(h.headWidthM*.66,.1,h.headDepthM*.68)));}const size=b.getSize(new T.Vector3()),c=b.getCenter(new T.Vector3());let d=Math.max(size.y,size.x/camera.aspect,size.z)*1.85;d=Math.max(d,.36);const dirs={three:[1,.65,1.5],front:[0,.25,1],side:[1,.25,.03],back:[0,.3,-1],top:[.03,1,.03],inside:[.25,-.8,1],detail:[.4,.3,1]};const dir=new T.Vector3(...(dirs[view]||dirs.three)).normalize();if(view==='detail')d*=.56;camera.position.copy(c).addScaledVector(dir,d);controls.target.copy(c);controls.update();requestRender();}
+function frame(view='three'){if(!hat)return;const oldPlinth=plinth.visible,oldRotation=stage.rotation.y;cameraMode=view;floor.visible=view!=='inside';plinth.visible=state.view==='product'&&view!=='inside';stage.rotation.y=0;if(oldRotation!==0||oldPlinth!==plinth.visible)renderer.shadowMap.needsUpdate=true;const b=new T.Box3().setFromObject(hat);if(state.view==='wear'){const h=D.native.heads[state.head];b.union(new T.Box3(new T.Vector3(-h.headWidthM*.66,-.19,-h.headDepthM*.55),new T.Vector3(h.headWidthM*.66,.1,h.headDepthM*.68)));}const size=b.getSize(new T.Vector3()),c=b.getCenter(new T.Vector3());let d=Math.max(size.y,size.x/camera.aspect,size.z)*1.85;d=Math.max(d,.36);const dirs={three:[1,.65,1.5],front:[0,.25,1],side:[1,.25,.03],back:[0,.3,-1],top:[.03,1,.03],inside:[.25,-.8,1],detail:[.4,.3,1]};const dir=new T.Vector3(...(dirs[view]||dirs.three)).normalize();if(view==='detail')d*=.56;camera.position.copy(c).addScaledVector(dir,d);controls.target.copy(c);controls.update();requestRender();}
 const preparedHeads=new Map();
 async function prepareHead(index,ctx){
  if(preparedHeads.has(index))return preparedHeads.get(index);
@@ -209,9 +222,9 @@ function select(id,settings=null){
    document.querySelectorAll('.hat-card').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.id===id)));
    const url=new URL(location.href);if(url.search.startsWith('?https://'))url.hash='hat='+id;else url.searchParams.set('hat',id);try{history.replaceState(null,'',url);}catch{}
    persist();render();const preparedMS=performance.now()-switchStart;
-   lastSwitch={id,cacheHit:fromCache,generationReused:fromCache||a.generationReused,fitReused:fromCache||a.fitReused,loadMS:loadEnd-switchStart,prepareMS:preparedMS,firstFrameMS:preparedMS,workerMS:a.workerMS||0,originalColorReady:true,detailReady:!!a.maps.normal};
+   lastSwitch={id,cacheHit:fromCache,generationReused:fromCache||a.generationReused,fitReused:fromCache||a.fitReused,loadMS:loadEnd-switchStart,prepareMS:preparedMS,firstFrameMS:preparedMS,timingScope:'CPU preparation and WebGL submission, not physical display latency',workerMS:a.workerMS||0,originalColorReady:true,detailReady:!!a.maps.normal};
    switchHistory.push(lastSwitch);if(switchHistory.length>64)switchHistory.shift();event('shown',id,{wallMS:preparedMS});
-   message(saveWarning||`${meta.title}已显示 · ${fromCache?'渲染缓存':a.fitReused?'生成结果复用':a.generationReused?'原帽型复用':'程序生成'} ${Math.round(preparedMS)} ms · 拖动旋转 / 滚轮拉近`);
+   message(saveWarning||`${meta.title}已显示 · ${fromCache?'渲染缓存':a.fitReused?'生成结果复用':a.generationReused?'原帽型复用':'程序生成'}准备 ${Math.round(preparedMS)} ms · 拖动旋转 / 滚轮拉近`);
    queueDetail(a);return metrics();
   }catch(e){
    if(a&&a!==asset&&!a.disposed)retainAsset(a);

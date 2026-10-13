@@ -1,0 +1,125 @@
+name: Hat R09 recovery acceptance
+on:
+  push:
+    branches: [fix/hat-r09-render-recovery-20261013]
+    paths: [.github/workflows/hat-r09-recovery.yml, hat-workshop/r09/**]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hat-r09-render-recovery
+  cancel-in-progress: true
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    outputs:
+      source: ${{ steps.build.outputs.source }}
+      build: ${{ steps.build.outputs.build }}
+      url: ${{ steps.build.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/r04
+            hat-workshop/r07
+            hat-workshop/r08
+            hat-workshop/r09
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install beautifulsoup4
+      - id: build
+        run: python -u hat-workshop/r09/finish-recovery.py prepare
+  acceptance:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [geometry, local-browser, public-browser, local-cycles, public-cycles, pixels]
+    env:
+      SOURCE: ${{ needs.prepare.outputs.source }}
+      BUILD: ${{ needs.prepare.outputs.build }}
+      PUBLIC_URL: ${{ needs.prepare.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.build }}
+          sparse-checkout: |
+            hat-workshop/r04
+            hat-workshop/r07
+            hat-workshop/r08
+            hat-workshop/r09
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install beautifulsoup4 playwright numpy pillow
+      - if: matrix.suite != 'geometry'
+        run: python -m playwright install --with-deps chromium
+      - name: Immutable candidate acceptance
+        env:
+          SUITE: ${{ matrix.suite }}
+        run: |
+          set -euo pipefail
+          if [[ "$SUITE" == "local-browser" || "$SUITE" == "public-browser" ]]; then
+            timeout --kill-after=10s 180s python -u hat-workshop/r09/finish-recovery.py geometry
+          fi
+          case "$SUITE" in
+            geometry) timeout --kill-after=10s 180s python -u hat-workshop/r09/finish-recovery.py geometry ;;
+            local-browser) timeout --kill-after=10s 480s python -u hat-workshop/r09/qa-browser.py --source "$SOURCE" ;;
+            public-browser) timeout --kill-after=10s 480s python -u hat-workshop/r09/qa-browser.py --source "$SOURCE" --public-url "$PUBLIC_URL" ;;
+            local-cycles) timeout --kill-after=10s 480s python -u hat-workshop/r09/qa-r09.py ;;
+            public-cycles) timeout --kill-after=10s 480s python -u hat-workshop/r09/qa-r09.py --public-url "$PUBLIC_URL" ;;
+            pixels)
+              timeout --kill-after=10s 300s python -u hat-workshop/r09/qa-render.py
+              timeout --kill-after=10s 300s python -u hat-workshop/r09/qa-render.py --public-url "$PUBLIC_URL"
+              ;;
+          esac
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r09-recovery-${{ github.run_id }}-${{ matrix.suite }}
+          path: hat-workshop/r09/qa
+          retention-days: 7
+  receipt:
+    needs: [prepare, acceptance]
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/r08
+            hat-workshop/r09
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install beautifulsoup4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hat-r09-recovery-${{ github.run_id }}-*
+          path: hat-workshop/r09/qa
+          merge-multiple: true
+      - name: Verify all evidence and publish receipt
+        env:
+          SOURCE: ${{ needs.prepare.outputs.source }}
+          BUILD: ${{ needs.prepare.outputs.build }}
+        run: python -u hat-workshop/r09/finish-recovery.py finish --source "$SOURCE" --build "$BUILD"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r09-final-${{ github.run_id }}
+          path: hat-workshop/r09
+          retention-days: 7
