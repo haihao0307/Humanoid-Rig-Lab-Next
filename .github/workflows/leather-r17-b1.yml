@@ -22,15 +22,15 @@ jobs:
         with:
           ref: ${{ github.sha }}
           sparse-checkout: leather-workshop
-      - name: Register one canonical edition before any test
+      - name: Register reviewed canonical recovery before all tests
         id: register
         run: |
-          if [ ! -d leather-workshop/r17 ]; then
-            python leather-workshop/b1/prepare.py
+          if [ ! -f leather-workshop/r17/RECOVERY_SOURCE.json ]; then
+            python leather-workshop/b1-refinement/apply-recovery.py
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add -f leather-workshop/r17
-            git commit -m 'perf(leather): register integrated B1 pose cache, lifecycle and truthful diagnostics'
+            git commit -m 'perf(leather): register B1 equivalent environment sampling and robust response lifecycle'
             git push origin HEAD:refs/heads/perf/leather-r17-b1-20261013
           fi
           echo "source=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
@@ -49,7 +49,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Build from pinned C and check real browser before expensive tests
+      - name: Exact native build and real browser before full regression
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y clang-18 lld-18
@@ -100,13 +100,13 @@ jobs:
       - name: Original uninstrumented offline and raw-pixel gates
         if: matrix.lane == 'browser'
         run: python -u leather-workshop/r17/qa-browser-s2b.py
-      - name: Integrated diagnostics, GPU coordinates and deformed images
+      - name: Integrated diagnostics, GPU coordinates and graphics recovery
         if: matrix.lane == 'extended'
         run: python -u leather-workshop/r17/qa-b1-browser.py --mode extended
-      - name: Independent predeclared ABBA GPU-duration gates
+      - name: Original predeclared ABBA GPU-duration gates, unchanged
         if: matrix.lane == 'performance'
         run: python -u leather-workshop/r17/qa-b1-performance.py
-      - name: Product and specimen ownership plus timed ten-minute continuous grab
+      - name: Resource ownership and timed ten-minute continuous grab
         if: matrix.lane == 'soak'
         run: python -u leather-workshop/r17/qa-b1-browser.py --mode soak
       - uses: actions/upload-artifact@v4
@@ -138,64 +138,28 @@ jobs:
         with:
           pattern: leather-r17-*-${{ github.run_id }}
           path: /tmp/b1-artifacts
-      - name: Verify all independent outputs, source boundaries and successful reports
+      - name: Match five independent outputs and original performance gates
         run: |
           git fetch --depth=1 origin 7c15a2d58587da27b4d1ba7d6b4233a28d001aed
-          python - <<'PY'
-          from pathlib import Path
-          import json,hashlib,shutil,subprocess,os
-          r=Path('leather-workshop/r17');root=Path('/tmp/b1-artifacts');data=None
-          required={'cpu':'qa/b1/SUMMARY.json','browser':'qa/render-batch/browser/report.json','extended':'qa/b1/extended/report.json','performance':'qa/b1/performance/report.json','soak':'qa/b1/soak/report.json'}
-          for lane,report in required.items():
-            a=root/('leather-r17-'+lane+'-'+os.environ['GITHUB_RUN_ID']);b=(a/'out/candidate-r17.html').read_bytes()
-            if data is None:data=b
-            assert b==data,lane+' independently compiled HTML differs'
-            assert json.loads((a/report).read_text())['pass'],lane
-            shutil.copytree(a/'qa',r/'qa',dirs_exist_ok=True)
-          assert os.environ['LEATHER_SOURCE_COMMIT'].encode() in data
-          paths=subprocess.check_output(['git','diff','--name-only','7c15a2d58587da27b4d1ba7d6b4233a28d001aed','HEAD'],text=True).splitlines()
-          assert all(p.startswith(('leather-workshop/r17/','leather-workshop/b1/')) or p=='.github/workflows/leather-r17-b1.yml' for p in paths),paths
-          (r/'public-lite.html').write_bytes(data);shutil.copy2(root/('leather-r17-cpu-'+os.environ['GITHUB_RUN_ID'])/'BUILD_RESULT.json',r/'BUILD_RESULT.json')
-          assert hashlib.sha256(data).hexdigest()==json.loads((r/'BUILD_RESULT.json').read_text())['htmlSHA256']
-          PY
+          python leather-workshop/b1-refinement/release.py stage
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add leather-workshop/r17/public-lite.html leather-workshop/r17/BUILD_RESULT.json
           find leather-workshop/r17/qa -name '*.json' -print0 | xargs -0 git add -f
-          git commit -m 'build(leather): publish B1 after independent performance, visual and ten-minute stability gates'
+          git commit -m 'build(leather): publish B1 after fresh independent visual, performance and stability gates'
           git push origin HEAD:refs/heads/perf/leather-r17-b1-20261013
           echo "BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
           echo "PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r17/public-lite.html" >> "$GITHUB_ENV"
-      - name: Fresh exact public bytes and actual public browser
+      - name: Fresh exact public bytes and real public browser
         run: |
           pip -q install -r leather-workshop/r17/requirements-build.txt playwright==1.55.0
-          python - <<'PY'
-          from pathlib import Path
-          import urllib.request,hashlib,os,time
-          expected=Path('leather-workshop/r17/public-lite.html').read_bytes();url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/leather-workshop/r17/public-lite.html'
-          for attempt in range(8):
-            try:
-              with urllib.request.urlopen(url,timeout=30) as f:data=f.read()
-              assert data==expected;break
-            except Exception:
-              if attempt==7:raise
-              time.sleep(6)
-          PY
+          python leather-workshop/b1-refinement/release.py public-bytes
           python -u leather-workshop/r17/qa-browser-s2b.py --public --url "$PREVIEW"
-      - name: Record integrated delivery without claiming real-device certification
+      - name: Record integrated delivery and remaining device limits
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          import json,hashlib,os
-          r=Path('leather-workshop/r17');paths=['qa/b1/SUMMARY.json','qa/b1/unit.json','qa/b1/extended/report.json','qa/b1/performance/report.json','qa/b1/soak/report.json','qa/render-batch/browser/report.json','qa/render-batch/public/report.json','qa/s1b/equivalence.json','qa/s2b/pose-stream.json','qa/numeric.json'];reports={}
-          for name in paths:
-            p=r/name;assert json.loads(p.read_text())['pass'],name;reports[name]=hashlib.sha256(p.read_bytes()).hexdigest()
-          summary=json.loads((r/paths[0]).read_text());perf=json.loads((r/paths[3]).read_text());soak=json.loads((r/paths[4]).read_text());build=json.loads((r/'BUILD_RESULT.json').read_text())
-          receipt={'version':'R17.0-B1','batch':'B1','sourceCommit':os.environ['LEATHER_SOURCE_COMMIT'],'buildCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'previewURL':os.environ['PREVIEW'],'htmlSHA256':build['htmlSHA256'],'htmlBytes':build['htmlBytes'],'nativeIdenticalToR16':True,'sourceChecks':summary['sourceChecks'],'b1UnitChecks':summary['b1UnitChecks'],'numericCases':18,'geometryCases':25,'full52StepTrajectories':6,'poseProtocolChecks':45,'performance':perf['comparisons'],'continuousHeldSeconds':soak['continuousHeldSeconds'],'productSelectionCommands':soak['productSelectionCommands'],'configureRebuildCommands':soak['configureRebuildCommands'],'offlineBrowserChecks':len(json.loads((r/paths[5]).read_text())['checks']),'extendedBrowserChecks':len(json.loads((r/paths[2]).read_text())['checks']),'publicBrowserChecks':len(json.loads((r/paths[6]).read_text())['checks']),'reports':reports,'offlineBrowserVerified':True,'publicBrowserVerified':True,'readyForUserReview':True,'engineeringBatchImplemented':True,'fullS2Certified':False,'allDevicePerformanceCertified':False,'userVisualAcceptance':'PENDING','productionReady':False,'commercialLegalClearance':False,'limits':['Software Chrome GPU queries are not hardware GPU or monitor latency','Cache costs24 bytes per render vertex plus node texture; existing input VBOs are reused','Only actual completed poses generate presentation samples','Convergence labels describe existing residual; no new static equilibrium solver or real material calibration','Ten-minute single-browser session does not certify all devices','Context rebuild resets test pose; not a lossless checkpoint','Original source/texture/attribution and R01-R16 remain unchanged']}
-          (r/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
-          PY
+          python leather-workshop/b1-refinement/release.py receipt
           git add leather-workshop/r17/DELIVERY.json leather-workshop/r17/qa/render-batch/public/report.json
-          git commit -m 'test(leather): certify fixed B1 public workbench and bounded integrated results'
+          git commit -m 'test(leather): certify integrated B1 immutable public workbench and bounded results'
           git push origin HEAD:refs/heads/perf/leather-r17-b1-20261013
       - uses: actions/upload-artifact@v4
         if: always()
