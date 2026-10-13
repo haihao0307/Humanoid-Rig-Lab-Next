@@ -1,0 +1,91 @@
+name: Hat R07 isolated review
+on:
+  push:
+    branches: [fix/hat-r07-seams-crown-switch-20261013]
+    paths: [.github/workflows/hat-r07-review.yml, hat-workshop/r07/**]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hat-r07-review
+  cancel-in-progress: false
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r04
+            hat-workshop/r06
+            hat-workshop/r07
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser dependencies
+        run: |
+          pip install playwright beautifulsoup4 numpy pillow scipy trimesh rtree
+          python -m playwright install --with-deps chromium
+      - name: Baseline reproduction or candidate build
+        env:
+          HAT_SOURCE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p hat-workshop/r07
+          if test -f hat-workshop/r07/review.py; then
+            python hat-workshop/r07/review.py
+          else
+            python - <<'PY'
+          from pathlib import Path
+          import json,time,gzip
+          from playwright.sync_api import sync_playwright
+          R=Path('hat-workshop/r06').resolve(); O=Path('hat-workshop/r07/baseline');O.mkdir(parents=True,exist_ok=True)
+          report={'baseline':'7e72ff29495ca2307858dfd5ea1375423d30dda1','cases':[],'errors':[]}
+          with sync_playwright() as p:
+            b=p.chromium.launch(headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader','--use-angle=swiftshader'])
+            page=b.new_page(viewport={'width':1440,'height':1000},device_scale_factor=1)
+            page.on('pageerror',lambda e:report['errors'].append(str(e)))
+            page.goto(R.joinpath('standalone.html').as_uri()+'#hat=trilby',wait_until='domcontentloaded',timeout=180000)
+            page.wait_for_function('window.hatLab && hatLab.ready()',timeout=240000)
+            for hat in ['trilby','cloche','chef','cable','flatcap']:
+              st=time.perf_counter();page.evaluate('(id)=>hatLab.select(id)',hat)
+              page.wait_for_function('hatLab.ready()',timeout=240000)
+              row={'hat':hat,'switchWallMS':(time.perf_counter()-st)*1000,'metrics':page.evaluate('hatLab.metrics()'),'recipe':page.evaluate('hatLab.recipe()')}
+              report['cases'].append(row)
+              for view in ['three','front','inside','side']:
+                page.evaluate('(v)=>hatLab.frame(v)',view);page.wait_for_timeout(200)
+                page.locator('#canvas').screenshot(path=str(O/f'{hat}-{view}.png'))
+              if hat=='flatcap':
+                geo=page.evaluate('hatLab.debugGeometry()');geo['baseline']=page.evaluate('hatLab.baselinePositions()');geo['mother']=page.evaluate('hatLab.mother()')
+                (O/'flatcap-geometry.json.gz').write_bytes(gzip.compress(json.dumps(geo).encode()))
+              (O/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+            b.close()
+          print(json.dumps(report,ensure_ascii=False))
+          PY
+          fi
+      - name: Save scoped records
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r07
+          if ! git diff --cached --quiet; then
+            git commit -m 'test(hat-r07): record isolated browser review [skip ci]'
+            git push origin HEAD:fix/hat-r07-seams-crown-switch-20261013
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r07-review-${{ github.run_id }}
+          path: |
+            hat-workshop/r07
+            hat-workshop/r06
+            hat-workshop/r04/app.bundle.js
+            hat-workshop/r04/standalone.html
+          retention-days: 7
