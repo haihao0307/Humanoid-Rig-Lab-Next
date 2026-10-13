@@ -1,0 +1,34 @@
+name: Leather R13 native closure
+on:
+  push:
+    branches: [build/leather-r13-native-closure-20261013]
+    paths:
+      - .github/workflows/leather-r13-native-closure.yml
+      - leather-workshop/r13/**
+permissions:
+  contents: read
+concurrency:
+  group: leather-r13-native-closure
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - name: Exact input capture
+        run: |
+          mkdir -p /tmp/leather-r13-input
+          tar -czf /tmp/leather-r13-input/source.tgz leather-workshop/r12 leather-workshop/r09/native leather-workshop/r09/source_adapters.py leather-workshop/r09/build.py leather-workshop/r10/source_adapters.py leather-workshop/r10/build.py leather-workshop/r10/native-broadphase.c leather-workshop/AGENTS.md leather-workshop/START_HERE.md leather-workshop/TASK_STATE.json leather-workshop/ROADMAP.md AGENTS.md .github/workflows/leather-r12-s1b2.yml
+          git rev-parse HEAD > /tmp/leather-r13-input/source-sha.txt
+          clang --version > /tmp/leather-r13-input/compiler.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-r13-exact-source
+          path: /tmp/leather-r13-input/
+          retention-days: 7
