@@ -37,7 +37,7 @@ try:
   page=context.new_page();page.on('console',lambda msg:report['errors'].append(msg.text) if msg.type=='error' and ('shader' in msg.text.lower() or 'webglprogram' in msg.text.lower()) else None);page.on('pageerror',lambda e:report['errors'].append(str(e)));page.on('request',lambda r:report['requests'].append(r.url))
   t=time.perf_counter();page.goto(url,wait_until='domcontentloaded',timeout=120000);page.wait_for_function('window.ownedHat&&ownedHat.ready()',timeout=45000)
   report['bootToReadyMS']=1000*(time.perf_counter()-t)
-  check('runtime version',page.evaluate('ownedHat.version')=='HAT-R10.1');check('frozen source identity',page.evaluate('ownedHat.source')==A.source)
+  check('runtime version',page.evaluate('ownedHat.version')=='HAT-R10.2');check('frozen source identity',page.evaluate('ownedHat.source')==A.source)
   page.wait_for_function('ownedHat.stats().thumbs===11',timeout=90000);check('11 real rendered thumbnails',page.locator('.hat-card img[src^="data:image/"]').count()==11)
   report['renderer']=page.evaluate('ownedHat.diagnostics()');check('supported WebGL2 renderer',bool(report['renderer']['renderer']));capture(page,'desktop',True)
   ids=page.evaluate('HAT10.categories.map(c=>c.id)');baselineHashes={}

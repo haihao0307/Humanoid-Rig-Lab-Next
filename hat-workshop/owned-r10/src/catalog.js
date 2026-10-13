@@ -2,7 +2,7 @@
 (function(G){
 'use strict';
 const H=G.HAT10=G.HAT10||{};
-H.schema='kaopu.hat-spectrum/1';H.version='HAT-R10.1';
+H.schema='kaopu.hat-spectrum/1';H.version='HAT-R10.2';
 H.categories=[
  {id:'braid',name:'绞花针织帽',design:'岚线 · 八束错位绞花',family:'knit',color:'#667367',trim:'#444f47',height:.155,thickness:.0048,shape:'soft',slouch:.020,braids:8,brim:0,band:.038,roughness:.89,seed:1041,summary:'八束双股绞花，后倾松量，独立双层罗纹翻边。'},
  {id:'bucket',name:'宽檐渔夫帽',design:'野渡 · 非对称下垂檐',family:'canvas',color:'#968771',trim:'#625a4c',height:.113,thickness:.0019,shape:'bucket',brim:.064,drop:.034,band:.012,roughness:.87,seed:2173,summary:'紧凑筒冠，前长后短软檐，四道同心压线。'},

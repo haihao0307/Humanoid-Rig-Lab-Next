@@ -27,3 +27,10 @@ Three.js 0.179.1 是官方 MIT 渲染引擎，不称为自研引擎；完整许�
 参考法律说明延续前轮记录：https://www.copyright.gov/register/tx-programs.html 、https://www.copyright.gov/help/faq/faq-fairuse.html 、https://www.uspto.gov/patents/basics/manage 。本轮不提供法律清查或自由实施意见。
 
 试戴使用三种程序测试头形，不是人物总平台扫描头的验收。量配是静态包络约束，不是动态布料或戴入；针织是厚壳、实体绞花和过滤织纹，不是逐纱线物理。最终画质与用户设备性能必须单独验收。
+
+
+## R10.2 补充
+
+移除上一版来源未逐项标注的正弦散列常数组合，改写为本轮可读的整数格点混合实现。它是普通非密码用途伪随机纹理函数，不声称发明了散列或插值方法。没有引入图片、网格或外部着色器包。
+
+缩略图使用与主画布相同的显示输出变换及灯光配置；它是生成的产品预览，不是参考网站图片。色彩管线依据 Three.js 官方色彩管理文档：https://threejs.org/manual/pages/color-management.html 。引擎及其色调映射仍属于明确列出的第三方依赖。

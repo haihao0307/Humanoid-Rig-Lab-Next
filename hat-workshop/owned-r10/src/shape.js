@@ -78,6 +78,8 @@ function combine(pieces){
 H.generate=function(input,lod=0){
  const began=performance.now(),s=H.sanitize(input),c=H.categories.find(c=>c.id===s.id),head=H.headShape(s);
  const thick=c.thickness*s.thickness,ease=s.ease/1000,ax=head.a+ease+thick,bz=head.b+ease+thick,ht=Math.max(c.height*s.height,c.shape==='visor'?0:.114+thick+ease);
+ // R102: reserve scalp clearance before deepening the center crease.
+ const crownRecess=c.shape==='pinch'?Math.min(.017,Math.max(0,ht*.98-(head.top+ease+thick+.002))):0;
  const pieces=[],N=lod?64:112,M=lod?28:48;let adjusted=0;
  const tables={
   soft:[[1,0],[1.03,.25],[1.04,.48],[.96,.72],[.72,.89],[0,1]],
@@ -99,7 +101,7 @@ H.generate=function(input,lod=0){
   if(c.shape==='flat'){cz=.028*Math.sin(v*PI/2);y-=.022*Math.max(cs,0)*Math.sin(v*PI);rr*=1+.10*Math.max(cs,0)*Math.sin(v*PI);}
   if(c.shape==='pinch'){
    rr*=1-.095*(bump(th,.72,.30)+bump(th,TAU-.72,.30))*Math.sin(v*PI)**2;
-   y-=.018*bump(v,.84,.16)*(1-sn*sn)*r;cz=.004*smooth(v);
+   y-=.006*bump(v,.80,.13)*(1-sn*sn)*r+crownRecess*smooth((v-.77)/.23);cz=.004*smooth(v);
   }
   if(c.shape==='pleat'){
    const f=(.0038*Math.sin(20*th+.21*Math.sin(v*PI))+.0012*Math.sin(40*th))*Math.sin(v*PI)**.65;
@@ -180,6 +182,6 @@ H.generate=function(input,lod=0){
  if(stitches.length)pieces.push(combine(stitches));
  let min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity],vertices=0,triangles=0,bytes=0;
  for(const p of pieces){vertices+=p.position.length/3;triangles+=p.index.length/3;bytes+=p.position.byteLength+p.normal.byteLength+p.uv.byteLength+p.index.byteLength;for(let i=0;i<p.position.length;i++) {let k=i%3;min[k]=Math.min(min[k],p.position[i]);max[k]=Math.max(max[k],p.position[i]);}}
- return{schema:H.schema,id:s.id,spec:s,head:{a:head.a,b:head.b,top:head.top},pieces,bounds:{min,max},stats:{vertices,triangles,bytes,requestedCrownHeight:c.height*s.height,effectiveCrownHeight:ht,heightFitClamped:ht>c.height*s.height+1e-8,generationMS:performance.now()-began,fit:'static analytic envelope; not IPC',projectionEvaluations:adjusted},origin:'equations-and-new-category-spectrum'};
+ return{schema:H.schema,id:s.id,spec:s,head:{a:head.a,b:head.b,top:head.top},pieces,bounds:{min,max},stats:{vertices,triangles,bytes,requestedCrownHeight:c.height*s.height,effectiveCrownHeight:ht,crownRecessMetres:crownRecess,heightFitClamped:ht>c.height*s.height+1e-8,generationMS:performance.now()-began,fit:'static analytic envelope; not IPC',projectionEvaluations:adjusted},origin:'equations-and-new-category-spectrum'};
 };
 })(globalThis);

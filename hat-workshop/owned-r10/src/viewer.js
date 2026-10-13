@@ -6,7 +6,7 @@ let renderer,scene,camera,lights,envRT,active=null,form=H.defaults(location.hash
 if(!H.categories.some(c=>c.id===form.id))form=H.defaults();
 let pendingSpec='',pending=null,serial=0,ready=false,mode='product',view='three',frame=0,spin=false,section=false,wire=false,comparison=null;
 let yaw=.58,pitch=.38,distance=.68,target=new T.Vector3(0,.06,0),headGroup=null;
-const cache=new Map(),errors=[],clicks=[],metrics={headBuilds:0,ignoredDuplicates:0,generated:0,cacheHits:0,draws:0,shadowPasses:0,workerCancelled:0,workerTimeouts:0,thumbs:0,boot:performance.now()};
+const cache=new Map(),errors=[],clicks=[],metrics={headBuilds:0,ignoredDuplicates:0,generated:0,cacheHits:0,draws:0,shadowPasses:0,workerCancelled:0,workerTimeouts:0,thumbs:0,thumbnailOutput:'display-srgb-tone-mapped',boot:performance.now()};
 const workerText=$('own-worker').textContent;
 const workerURL=URL.createObjectURL(new Blob([workerText],{type:'text/javascript'}));
 const clipping=new T.Plane(new T.Vector3(-1,0,0),0);
@@ -104,18 +104,23 @@ function syncUI(){for(const k of Object.keys(H.parameters)){const e=$('p-'+k);if
 function updateLabel(k){const el=$('o-'+k);if(!el)return;const v=Number($('p-'+k).value);el.textContent=k==='circumference'?v.toFixed(1)+' cm':k==='ease'?v.toFixed(1)+' mm':k==='detail'?v.toFixed(2):v.toFixed(2)+' ×';}
 function saveFile(name,text,type='application/json'){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);}
 async function thumbnails(){
- const rt=new T.WebGLRenderTarget(220,146),tc=new T.PerspectiveCamera(36,220/146,.005,4),ts=new T.Scene();ts.background=new T.Color('#deded7');ts.environment=scene.environment;ts.add(new T.HemisphereLight('#fff8ed','#767b70',1.8));const light=new T.DirectionalLight('#ffffff',2);light.position.set(-.4,.5,.6);ts.add(light);
+ // R102: the same display framebuffer applies ACES and sRGB, unlike raw linear target bytes.
+ const tc=new T.PerspectiveCamera(36,220/146,.005,4),ts=new T.Scene();
+ ts.background=scene.background.clone();ts.environment=scene.environment;ts.environmentIntensity=scene.environmentIntensity;
+ for(const source of [scene.children.find(o=>o.isHemisphereLight),lights.key,lights.fill]){const light=source.clone();light.castShadow=false;ts.add(light);} 
  for(const c of H.categories){
   while(pending)await new Promise(r=>setTimeout(r,120));await new Promise(r=>setTimeout(r,50));
   try{
    const w=newWorker(H.defaults(c.id),1),data=await w.promise,model=makeModel(data,H.defaults(c.id));ts.add(model);
    const h=data.bounds.max[1]-data.bounds.min[1],wide=Math.max(data.bounds.max[0]-data.bounds.min[0],data.bounds.max[2]-data.bounds.min[2]),d=Math.max(.56,wide*2.2,h*3.4);tc.position.set(d*.52,d*.38+(data.bounds.max[1]+data.bounds.min[1])/2,d*.80);tc.lookAt(0,(data.bounds.max[1]+data.bounds.min[1])/2,0);
-   const was=renderer.getRenderTarget();renderer.setRenderTarget(rt);renderer.render(ts,tc);const bytes=new Uint8Array(220*146*4);renderer.readRenderTargetPixels(rt,0,0,220,146,bytes);renderer.setRenderTarget(was);
-   const cn=document.createElement('canvas');cn.width=220;cn.height=146;const ctx=cn.getContext('2d'),image=ctx.createImageData(220,146);for(let row=0;row<146;row++)image.data.set(bytes.subarray((145-row)*880,(146-row)*880),row*880);ctx.putImageData(image,0,0);
+   const was=renderer.getRenderTarget(),size=renderer.getSize(new T.Vector2());
+   const cn=document.createElement('canvas');cn.width=220;cn.height=146;
+   try{renderer.setRenderTarget(null);renderer.setSize(220,146,false);renderer.render(ts,tc);cn.getContext('2d').drawImage(renderer.domElement,0,0,220,146);}
+   finally{renderer.setSize(size.x,size.y,false);renderer.setRenderTarget(was);draw();}
    document.querySelector(`.hat-card[data-id="${c.id}"] img`).src=cn.toDataURL('image/webp',.84);metrics.thumbs++;ts.remove(model);dispose(model);dirty();
   }catch(e){errors.push('thumbnail '+c.id+': '+e.message);}
  }
- rt.dispose();
+ // No extra renderer, render target or persistent thumbnail GPU geometry is retained.
 }
 function boot(){
  const canvas=$('canvas');renderer=new T.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true,alpha:false,powerPreference:'high-performance'});
@@ -158,7 +163,7 @@ function boot(){
  $('import').onclick=()=>$('import-file').click();$('import-file').onchange=async e=>{try{const f=e.target.files[0];if(!f)return;if(f.size>100000)throw Error('配方文件过大');await select(H.sanitize(JSON.parse(await f.text())),'import');}catch(e){status('配方未应用：'+e.message);}finally{e.target.value='';}};
  $('clear').onclick=()=>{for(const[k,r]of cache){if(r!==active){dispose(r.group);cache.delete(k);}}status('已释放闲置几何；当前帽子与保存配方保留。');};
  $('compare').onclick=()=>{if(!comparison){comparison={...form};select(H.defaults(form.id),'compare-default');$('compare').textContent='返回我的调整';}else{select(comparison,'compare-return');comparison=null;$('compare').textContent='初始配方对照';}};
- $('version').textContent='R10.1 · '+String(H.build.source).slice(0,10);
+ $('version').textContent='R10.2 · '+String(H.build.source).slice(0,10);
  select(form,'boot').then(ok=>{if(ok){metrics.bootReadyMS=performance.now()-metrics.boot;setTimeout(thumbnails,800);}});
  G.ownedHat={version:H.version,source:H.build.source,diagnostics:()=>({renderer:renderer.getContext().getParameter(renderer.getContext().RENDERER),three:T.REVISION,drawCalls:renderer.info.render.calls,programCount:renderer.info.programs.length,gpuGeometries:renderer.info.memory.geometries}),ready:()=>ready,recipe:()=>({...form}),set:patch=>select({...form,...patch},'api'),restore:s=>select(s,'restore-api'),frame:frameView,cancel,stats:()=>({metrics:{...metrics},clicks:[...clicks],cacheSize:cache.size,cacheBytes:[...cache.values()].reduce((a,x)=>a+x.data.stats.bytes,0),current:active?.data.stats,errors:[...errors],thumbs:metrics.thumbs}),geometry:()=>active?.data,render:()=>{draw();return canvas.toDataURL('image/png');},clear:()=>{$('clear').click();},hash:()=>{let h=2166136261;for(const p of active.data.pieces){const b=new Uint8Array(p.position.buffer);for(const v of b){h^=v;h=Math.imul(h,16777619);}}return(h>>>0).toString(16);}};
 }

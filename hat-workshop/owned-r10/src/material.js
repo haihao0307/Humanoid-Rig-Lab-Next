@@ -8,12 +8,19 @@ uniform float ownDetail;
 uniform float ownSeed;
 varying vec2 ownUV;
 varying vec3 ownLocal;
-float ownHash(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7))+ownSeed)*43758.5453);}
+// R102 independently expressed integer lattice mixer; not cryptographic.
+// Coordinates and seed are mixed as uint32; interpolation remains ordinary trilinear noise.
+uint ownMixWord(uint w){w^=w>>11u;w*=49157u;w^=w>>7u;w*=16127u;w^=w>>15u;return w;}
+float ownHash(vec3 p){
+ uvec3 cell=uvec3(ivec3(floor(p)));uint seed=uint(floor(ownSeed*1000.0+.5));
+ uint w=ownMixWord(cell.x+211u)^ownMixWord(cell.y+571u)^ownMixWord(cell.z+1453u)^ownMixWord(seed+1747u);
+ return float(ownMixWord(w)&16777215u)/16777216.0;
+}
 float ownNoise(vec3 p){vec3 a=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(mix(ownHash(a),ownHash(a+vec3(1,0,0)),f.x),mix(ownHash(a+vec3(0,1,0)),ownHash(a+vec3(1,1,0)),f.x),f.y),mix(mix(ownHash(a+vec3(0,0,1)),ownHash(a+vec3(1,0,1)),f.x),mix(ownHash(a+vec3(0,1,1)),ownHash(a+vec3(1,1,1)),f.x),f.y),f.z);}
 float ownFade(vec2 f){return 1.0-smoothstep(.35,1.2,max(f.x,f.y));}
 vec2 ownFabric(vec2 p,vec3 q){
  float grain=ownNoise(q*2400.0),heather=ownNoise(q*330.0),meso=ownNoise(q*65.0);
- float microFade=ownFade(fwidth(q.xy*2400.0));
+ float microFade=1.0-smoothstep(.35,1.2,max(max(fwidth(q.x*2400.0),fwidth(q.y*2400.0)),fwidth(q.z*2400.0)));
  float color=.98+(heather-.5)*.14+(meso-.5)*.05+(grain-.5)*.10*microFade;
  float h=(heather-.5)*.000035+(grain-.5)*.000045*microFade;
  if(ownMode>.5&&ownMode<2.5){
@@ -65,10 +72,11 @@ H.makeMaterial=function(c,s,role){
    vec3 ownDx=dFdx(-vViewPosition),ownDy=dFdy(-vViewPosition);
    vec3 ownR1=cross(ownDy,normal),ownR2=cross(normal,ownDx);
    float ownDet=dot(ownDx,ownR1);
-   if(abs(ownDet)>1e-12){vec3 ownGrad=sign(ownDet)*(dFdx(ownSurface.x)*ownR1+dFdy(ownSurface.x)*ownR2);normal=normalize(abs(ownDet)*normal-ownGrad);}
+   if(abs(ownDet)>1e-12){vec3 ownGrad=sign(ownDet)*(dFdx(ownSurface.x)*ownR1+dFdy(ownSurface.x)*ownR2);vec3 ownSlope=ownGrad/max(abs(ownDet),1e-10);
+    ownSlope*=min(1.0,.60/max(length(ownSlope),1e-6));normal=normalize(normal-ownSlope);}
   `);
  };
- m.customProgramCacheKey=()=> 'hat101-fabric-2-'+family;
+ m.customProgramCacheKey=()=> 'hat102-fabric-u32-' +family;
  return m;
 };
 H.makeEnvironment=function(renderer){
