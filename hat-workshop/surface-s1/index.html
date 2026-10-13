@@ -662,7 +662,7 @@ const out={};return out;})();
 .surface-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px}#surface-panel button{border:1px solid #adbcae;border-radius:4px;background:#f2f6ec;color:#2d473c;padding:6px 4px;cursor:pointer}
 #surface-state{padding:8px;background:#edeedf;border-radius:5px;min-height:55px}.surface-small,#surface-note{font-size:11px;color:#5f6d61}#surface-panel details{margin:14px 0;border-top:1px solid #bbc5b9;padding-top:9px}#ps-json{width:100%;height:160px;font:11px monospace}
 #eb1-panel{top:auto!important;bottom:12px!important;right:12px!important}#surface-panel [hidden]{display:none!important}
-@media(max-width:800px){#surface-panel{font-size:14px}#surface-panel select{min-height:40px}#eb1-panel{max-width:250px!important}}</style><script>globalThis.HAT_SURFACE_OWNED=true;globalThis.HAT_SURFACE_BUILD={"version":"HAT-SURFACE-S1","sourceSha":"38077c852a57916f79f0cabbba5dcc1d53a097f7","baseSha":"122123275eae1402d75c3bb88c819bc7a0e1f8a7","sourceStudyBuild":"c4400b817d467b062ab003ac1b5277eedb25aad7","eb1Commit":"beb3dda0a28f732e1e387dd68cc0d90f27ce8b7b","eb1SHA256":"39f747e36f905eaf9e760236315ae649bcab4ffd4feb62290017c7c5da650572","surfaceMode":"analytic-no-source-pixels","filmReady":false,"equivalentToSource":false};/* KAOPU EB1 / 1.0.0 — owned lighting profile, studio radiance and engine adapters.
+@media(max-width:800px){#surface-panel{font-size:14px}#surface-panel select{min-height:40px}#eb1-panel{max-width:250px!important}}</style><script>globalThis.HAT_SURFACE_OWNED=true;globalThis.HAT_SURFACE_BUILD={"version":"HAT-SURFACE-S1","fieldRevision":"v3","sourceSha":"0305d253edad82b61da1aaec49953ae165b143cf","baseSha":"122123275eae1402d75c3bb88c819bc7a0e1f8a7","sourceStudyBuild":"c4400b817d467b062ab003ac1b5277eedb25aad7","eb1Commit":"beb3dda0a28f732e1e387dd68cc0d90f27ce8b7b","eb1SHA256":"39f747e36f905eaf9e760236315ae649bcab4ffd4feb62290017c7c5da650572","surfaceMode":"analytic-no-source-pixels","filmReady":false,"equivalentToSource":false};/* KAOPU EB1 / 1.0.0 — owned lighting profile, studio radiance and engine adapters.
  * Method reference: lo-th/head@21462e471d53ba8c413a96989016510ca4495a34.
  * No reference application, model, texture or HDR pixels are included.
  * Neutral view-transform equations: Khronos PBR Neutral, Apache-2.0 (see NOTICE).
@@ -785,7 +785,7 @@ const allocated=new WeakMap();
 function validated(o){if(!o||typeof o!=='object')throw Error('表面配方必须是对象');const v={...DEFAULT};for(const[k,x]of Object.entries(o)){if(k==='color'){if(x!==null&&!/^#[0-9a-f]{6}$/i.test(x))throw Error('无效颜色');v[k]=x;continue;}if(!RANGES[k]||!Number.isFinite(x)||x<RANGES[k][0]||x>RANGES[k][1])throw Error('表面参数越界 '+k);v[k]=k==='seed'?Math.round(x):x;}return v;}
 function current(){const id=active?.asset.meta.id||'cable';return recipes[id]||(recipes[id]={...DEFAULT});}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify({schema:'kaopu.hat.surface/1',recipes}));}catch(e){$('surface-state').textContent='此浏览器无法保存配方：'+e.message;}}
-const GLSL=`
+const GLSL=`// Authoritative authored surface field, assembled by build.py. No image samples.
 varying vec3 vPSRest;
 varying vec2 vPSUV;
 varying float vPSRegion;
@@ -796,21 +796,21 @@ float psHash(vec2 p){return fract(sin(dot(p,vec2(73.1569,19.8731))+psSeed*1.6180
 float psNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(psHash(i),psHash(i+vec2(1,0)),f.x),mix(psHash(i+vec2(0,1)),psHash(i+vec2(1,1)),f.x),f.y);}
 float psFbm(vec2 p){return .57*psNoise(p)+.28*psNoise(p*2.03+19.7)+.15*psNoise(p*4.11-3.4);}
 float psAA(float x){return 1.-smoothstep(.18,.75,x);}
-float psTube(float d,float r){return sqrt(max(0.,1.-d*d/(r*r)));}
-// A needle loop is two curved legs joined by a rounded head, not a sinusoidal rib.
+float psTube(float d,float r){float t=clamp(1.-d*d/(r*r),0.,1.);return t*t*(3.-2.*t);}
+// Soft V-shaped knit legs. Smooth cross-sections avoid wire-like hole edges.
 vec3 psStitch(vec2 q,float width){
- vec2 cell=floor(q),f=fract(q);float row=psHash(cell),y=f.y;
- float bow=.12+.235*sin(3.141593*clamp(y*.88+.1,0.,1.));
- float dx=abs(abs(f.x-.5)-bow);
- float body=psTube(dx,width);
- float head=psTube(abs(length(vec2((f.x-.5)*1.0,(y-.94)*1.45))-.20),width*.76);
- float h=max(body*(.81+.15*sin(y*3.14159)),head*.84);
- float ply=.5+.5*cos((y*2.7+abs(f.x-.5)*3.6+cell.x*.31)*PS_TAU);
- float small=psAA(max(length(dFdx(q)),length(dFdy(q))));
- h=mix(.43,h,small);
- return vec3(h*(1.+psIrregularity*.10*(row-.5)),mix(.58,ply,small),row);
+ vec2 cell=floor(q);float jitter=psIrregularity*(psNoise(vec2(cell.x*.43,q.y*.21))-.5);
+ vec2 f=fract(q+vec2(jitter*.10,jitter*.07));float y=f.y;
+ float leg=.048+.295*y+.032*sin(y*3.141593);
+ float signedDistance=abs(f.x-.5)-leg;
+ float radius=(width+.045)*(1.+jitter*.18);
+ float body=psTube(signedDistance,radius)*(.84+.13*sin(y*3.141593));
+ float filament=.5+.5*cos((signedDistance/radius*1.3+y*2.2+cell.x*.17)*PS_TAU);
+ float aa=psAA(max(length(dFdx(q)),length(dFdy(q))));
+ float h=body*(.96+.045*(filament-.5)*psFiber);
+ return vec3(mix(.53,h,aa),mix(.5,filament,aa),psHash(cell));
 }
-// 2/2 over-under twill, optionally reversing direction in narrow herringbone bands.
+// 2/2 over-under twill, optionally reversing in herringbone bands.
 vec3 psWeave(vec2 q,float herring){
  float flip=mix(1.,mod(floor(q.x/9.),2.)<1.?1.:-1.,herring);
  vec2 f=fract(q),c=floor(q);float over=mod(c.x+flip*c.y,4.)<2.?1.:0.;
@@ -827,24 +827,28 @@ vec3 psField(out float height,out float rough){
  micro=mix(.5,micro,grainAA);
  vec3 col=psColor;vec3 yarn=vec3(.65,.5,.5);float band=0.;height=0.;rough=psRough;
  if(psKind<.5){
-  vec2 a=uv-vec2(.5,.512);float rad=length(a),theta=atan(a.y,a.x)/PS_TAU+.5;
-  float repeats=floor(10.*psDensity+.5),columns=repeats*12.;
-  vec2 q=vec2(theta*columns,rad*153.*psDensity);
-  q.y+=psIrregularity*.12*sin(theta*PS_TAU*3.+rad*11.);
+  vec2 polar=uv-vec2(.5,.512);float rad=length(polar),theta=atan(polar.y,polar.x)/PS_TAU+.5;
+  float repeats=floor(10.*psDensity+.5);vec2 q=vec2(theta*repeats*12.,rad*132.*psDensity);
+  q+=psIrregularity*.11*vec2(psNoise(vec2(theta*24.,rad*22.)),sin(theta*PS_TAU*3.+rad*11.));
   float cuff=1.-smoothstep(.18,.25,pn.y);
-  vec3 rib=psStitch(vec2(q.x,q.y),.135);
-  float x=mod(q.x,12.)-6.,phase=q.y*PS_TAU/14.,s=sin(phase),a1=-1.25*s,a2=1.25*s;
-  vec3 k1=psStitch(vec2(x-a1+20.,q.y+.20*cos(phase)),.15);
-  vec3 k2=psStitch(vec2(x-a2+20.,q.y-.20*cos(phase)),.15);
-  float m1=1.-smoothstep(1.28,1.62,abs(x-a1)),m2=1.-smoothstep(1.28,1.62,abs(x-a2));
-  float h1=m1*(.48+.40*k1.x+.12*cos(phase)),h2=m2*(.48+.40*k2.x-.12*cos(phase));
-  float cable=max(h1,h2),m=max(m1,m2),win=step(h1,h2);
-  vec3 woven=mix(rib,vec3(cable,mix(k1.y,k2.y,win),mix(k1.z,k2.z,win)),m);
-  float ribLane=.75+.25*smoothstep(.05,.30,abs(fract(q.x*.5)-.5));
-  yarn=mix(woven,vec3(rib.x*ribLane,rib.yz),cuff);
-  float pole=smoothstep(.006,.03,rad);yarn.x=mix(.55,yarn.x,pole);
-  height=psDepth*(.75*yarn.x+.11*yarn.y*psFiber);
-  col*=.77+.24*yarn.x+.035*(yarn.y-.5)*psFiber;
+  vec3 ground=psStitch(q,.15);
+  float lane=mod(q.x,12.)-6.,phase=q.y*PS_TAU/13.;
+  float left=-1.45*sin(phase),right=1.45*sin(phase);
+  float envelopeL=psTube(lane-left,1.8),envelopeR=psTube(lane-right,1.8);
+  float frontL=envelopeL*(.7+.25*cos(phase)),frontR=envelopeR*(.7-.25*cos(phase));
+  float lobe=max(frontL,frontR),winner=step(frontL,frontR);
+  vec3 loopsL=psStitch(vec2(lane-left+20.,q.y+.27*cos(phase)),.145);
+  vec3 loopsR=psStitch(vec2(lane-right+20.,q.y-.27*cos(phase)),.145);
+  vec3 cables=mix(loopsL,loopsR,winner);
+  float mask=smoothstep(.02,.24,max(envelopeL,envelopeR));
+  yarn=mix(ground,cables,mask);
+  float ribRidge=.5+.5*cos(q.x*3.141593);
+  float crownHeight=.00115*lobe+psDepth*(.48*yarn.x+.055*yarn.y*psFiber);
+  float cuffHeight=.00022*ribRidge+psDepth*(.43*ground.x+.04*ground.y*psFiber);
+  height=mix(crownHeight,cuffHeight,cuff);
+  height=mix(.00019,height,smoothstep(.005,.023,rad));
+  col*=mix(.82+.19*yarn.x+.045*lobe,.83+.18*ground.x+.025*ribRidge,cuff);
+  col*=1.+psIrregularity*.12*(psNoise(vec2(theta*31.,rad*40.))-.5);
  }else if(abs(psKind-4.)<.5){
   vec2 q=cloth/(psPitch/1000.)*psDensity;yarn=psStitch(q,.14);height=psDepth*(yarn.x+.08*yarn.y*psFiber);
   float stripe=mod(floor((p.y-.69)*350.),16.);vec3 dark=vec3(.115,.15,.135),blue=vec3(.13,.21,.23),red=vec3(.31,.13,.095);
@@ -913,11 +917,11 @@ vec3 psGrad=dFdx(psH)*psR1+dFdy(psH)*psR2;
 normal=normalize(abs(psDet)*normal-sign(psDet)*psGrad+normal*1.e-20);`);
   shader.fragmentShader=shader.fragmentShader.replace('#include <colorspace_fragment>',`#include <colorspace_fragment>
 if(psMode>.5&&psMode<1.5)gl_FragColor=vec4(sqrt(max(psAlbedo,vec3(0.))),1.);
-if(psMode>1.5&&psMode<2.5)gl_FragColor=vec4(vec3(clamp(psH/max(psDepth*1.8,.000001),0.,1.)),1.);
+if(psMode>1.5&&psMode<2.5)gl_FragColor=vec4(vec3(clamp(psH/max(psDepth*4.,.000001),0.,1.)),1.);
 if(psMode>2.5&&psMode<3.5)gl_FragColor=vec4(vec3(psR),1.);
 if(psMode>3.5)gl_FragColor=vec4(normal*.5+.5,1.);`);
  };
- mat.customProgramCacheKey=()=>VERSION+'-field-v2';
+ mat.customProgramCacheKey=()=>VERSION+'-field-v3';
  const clay=new T.MeshStandardMaterial({color:'#b6b3ab',roughness:.9,side:T.DoubleSide});
  const rec={material:mat,clay,uniforms,components:regions.components};allocated.set(a,rec);
  a.geometry.addEventListener('dispose',()=>{mat.dispose();clay.dispose();});lastBuildMS=performance.now()-start;return rec;
