@@ -25,3 +25,27 @@ Three.js uses PMREM while the native denim adapter integrates the same original 
 Two shadow-casting lights are capped at 2048 square maps. Environment convolution occurs at creation/context restoration rather than every slider move. Material inspection remains sharp. New light directions can still expose pre-existing thin shells, open seams, material energy errors and absent transmission shadows. Passing a lighting smoke test does not certify all styles, all cameras, physical calibration, smartphone speed or manufacturing correctness.
 
 The knit implementation and its native source remain in the original private repository. No full private source is included in this public release. Its implementation/public-delivery state must be reported separately. Frozen originals are comparison archives; new iterations should consume the pinned EB1 core and follow POLICY.md instead of silently reverting to legacy lighting.
+
+## User-approved default recipe — 2026-10-13
+
+All EB1 workbenches open with the following profile. The storage namespace was advanced once so an older saved EB1 profile cannot silently override it. Later user adjustments continue to persist under the new namespace.
+
+```json
+{
+  "schema": "kaopu.eb1/1",
+  "preset": "custom",
+  "exposure": 0.7,
+  "key": 1.6,
+  "rim": 3.5,
+  "environment": 0.9,
+  "keyAzimuth": -154,
+  "keyElevation": 8,
+  "rimAzimuth": 71,
+  "rimElevation": 11.309932,
+  "environmentRotation": -69,
+  "keyColor": "#ffffff",
+  "rimColor": "#efa37e",
+  "background": 0.85,
+  "shadowSize": 2048
+}
+```
