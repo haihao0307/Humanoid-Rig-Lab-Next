@@ -1,0 +1,113 @@
+name: Denim R12 damaged structure and material physics
+on:
+  push:
+    branches: [feature/denim-r12-damage-physics-20261013]
+    paths:
+      - .github/workflows/denim-r12-structure-physics.yml
+      - denim-workshop/r12/**
+permissions:
+  contents: write
+concurrency:
+  group: denim-r12-structure-physics
+  cancel-in-progress: true
+jobs:
+  verify-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Derive once from frozen R11, verify exact candidate source, build
+        run: |
+          test -f denim-workshop/r12/app.js || python denim-workshop/r12/derive.py
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          p=Path('denim-workshop/r12');lock=json.loads((p/'SOURCE_LOCK.json').read_text())
+          assert hashlib.sha256((p.parent/'r11/index.html').read_bytes()).hexdigest()==lock['parentHtmlSha256']
+          for file,expected in lock['expectedCanonicalSha256'].items():
+              actual=hashlib.sha256((p/file).read_bytes()).hexdigest()
+              assert actual==expected,(file,actual,expected)
+          PY
+          python denim-workshop/r12/build.py
+          for f in denim-workshop/r12/*.js; do node --check "$f"; done
+          python -m py_compile denim-workshop/r12/qa-structure.py
+          git diff --exit-code HEAD -- denim-workshop/r11 denim-workshop/r10 denim-workshop/archives
+      - name: Mass, cut constraints, attached rods, contact and material regression
+        run: node denim-workshop/r12/test-structure.cjs
+      - name: Install pinned independent browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6
+          python -m playwright install --with-deps chromium
+      - name: Actual standalone file, matched parent appearance and continuous wind
+        run: xvfb-run -a python -u denim-workshop/r12/qa-structure.py
+      - name: Publish only the file-tested canonical R12 candidate
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json
+          p=Path('denim-workshop/r12')
+          assert json.loads((p/'evidence/file-structure-qa.json').read_text())['passed']
+          files=[str(f) for f in p.iterdir() if f.is_file() and f.suffix in ['.js','.py','.json','.html','.md','.cjs']]
+          files.append(str(p/'LICENSE'))
+          subprocess.run(['git','add','--',*files],check=True)
+          PY
+          git diff --exit-code HEAD -- denim-workshop/r11 denim-workshop/r10 denim-workshop/archives
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(denim): publish file-tested R12 structure-physics candidate [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r12/index.html" >> "$GITHUB_OUTPUT"
+      - name: Actual immutable public rendering, physics and material interaction
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          sleep 8
+          xvfb-run -a python -u denim-workshop/r12/qa-structure.py --public "$PUBLIC_URL"
+      - name: Verify public bytes and record scoped evidence
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os,urllib.request
+          p=Path('denim-workshop/r12')
+          file=json.loads((p/'evidence/file-structure-qa.json').read_text());public=json.loads((p/'evidence/public-structure-qa.json').read_text());numeric=json.loads((p/'structure-qa.json').read_text())
+          assert file['passed'] and public['passed'] and numeric['passed']
+          manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          raw='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r12/index.html'
+          with urllib.request.urlopen(raw,timeout=90) as response:
+              data=response.read();assert response.status==200
+          assert len(data)==manifest['bytes'] and hashlib.sha256(data).hexdigest()==manifest['sha256']
+          def summary(r):
+              return {'passed':r['passed'],'mode':r['mode'],'stateNames':[s['name'] for s in r['states']],'network':r['network'],'restAppearance':r.get('restAppearance'),'reloadMaxPixelDifference':r.get('reloadMaxPixelDifference'),'coldBudget':r.get('coldBudget'),'nearBudget':r.get('nearBudget'),'maxTrackedGpuBytes':max(s['frame']['performance']['trackedGpuBytes'] for s in r['states']),'materialResponse':r.get('materialResponse'),'damagedPhysics':r.get('damagedPhysics'),'windAcrossLOD':r.get('windAcrossLOD'),'recipeBytes':r.get('recipeBytes')}
+          receipt={'version':'R12.0','status':'STRUCTURE_PHYSICS_CANDIDATE_PUBLIC_VERIFIED','deliveryVerified':True,'userVisualApproved':False,'filmGradeValidated':False,'parentHead':'d3b17563218e888f6eee9e2944274d75b6691400','parentBuild':'086414b317f313bf9465ea957753ae7e84453f6f','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'publicBytesMatch':True,'browserVersion':public['browserVersion'],'desktopViewport':[1000,780],'mobileViewport':[390,844],'realPhone':False,'consumerGPUPerformanceVerified':False,'numeric':numeric,'browser':{'file':summary(file),'public':summary(public)},'scope':['Cut the existing visible hole out of the sheet force graph and area/mass model','Bind retained bridges and tails as two-way/one-ended low-resolution chains','Connect thickness, declared areal mass and directional stiffness to solver','Keep R11 rest appearance, sampling and LOD behavior'],'limits':['Existing static hole, not force-created tearing or adaptive topology','Point/sphere collision only; no self collision, CCD or full garment/person integration','Unmeasured material heuristics; finish color and washing are not measured mechanics','Additional yarn dynamics has CPU cost; worker separation does not eliminate that cost','Sewing remains visual geometry, not true piercing or seam tension','No independent instance seed, local patch streaming, film time cache or film color pipeline','Browser/resource bookkeeping is not full process memory or consumer GPU FPS','Original archive, R01-R11 and unrelated workbenches unchanged; no merge or force push']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r12/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): record actual R12 immutable public structure-physics delivery [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r12-structure-evidence
+          path: denim-workshop/r12
+          retention-days: 14
+          if-no-files-found: error
