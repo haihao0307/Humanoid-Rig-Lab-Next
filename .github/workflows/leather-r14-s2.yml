@@ -12,9 +12,13 @@ concurrency:
   group: leather-r14-s2-20261013
   cancel-in-progress: true
 jobs:
-  source:
+  prepare:
     runs-on: ubuntu-24.04
     timeout-minutes: 8
+    permissions:
+      contents: write
+    outputs:
+      source: ${{ steps.prepare.outputs.source }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,13 +26,185 @@ jobs:
           sparse-checkout: |
             leather-workshop
             .github/workflows
-      - name: Capture pinned input source
+      - name: Register explicit candidate source and pinned new kernel
+        id: prepare
         run: |
-          mkdir -p /tmp/leather-s2
-          tar -czf /tmp/leather-s2/source.tgz leather-workshop .github/workflows AGENTS.md
-          git rev-parse HEAD > /tmp/leather-s2/source-sha.txt
-      - uses: actions/upload-artifact@v4
+          if ! command -v clang-18 || ! command -v wasm-ld-18; then sudo apt-get update -qq && sudo apt-get install -y clang-18 lld-18; fi
+          python leather-workshop/s2-performance/prepare.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r14
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(leather): register R14 S2A candidate sources and explicit native pair ABI'
+            git push origin HEAD:refs/heads/perf/leather-r14-s2-20261013
+          fi
+          echo "source=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  cpu:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      TYPESCRIPT_PATH: /tmp/leather-types/node_modules/typescript
+      BASE_LIB: ${{ github.workspace }}/leather-workshop/r13/node-lib.cjs
+    steps:
+      - uses: actions/checkout@v4
         with:
-          name: leather-s2-input-source
-          path: /tmp/leather-s2/
-          retention-days: 7
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pinned verification dependencies
+        run: |
+          if ! command -v clang-18 || ! command -v wasm-ld-18; then sudo apt-get update -qq && sudo apt-get install -y clang-18 lld-18; fi
+          pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5
+          npm install --prefix /tmp/leather-types typescript@5.8.3
+      - name: Native values, dependencies and complete trajectories
+        run: python -u leather-workshop/r14/verify-s2.py
+      - name: Warmed alternating same-machine performance comparison
+        run: node leather-workshop/r14/qa-performance.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r14-cpu-${{ github.run_id }}
+          path: |
+            leather-workshop/r14/out/candidate-r14.html
+            leather-workshop/r14/BUILD_RESULT.json
+            leather-workshop/r14/qa/
+          retention-days: 14
+  browser:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install exact build and browser dependencies
+        run: |
+          if ! command -v clang-18 || ! command -v wasm-ld-18; then sudo apt-get update -qq && sudo apt-get install -y clang-18 lld-18; fi
+          pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5 playwright==1.55.0
+      - name: Offline actual interaction and raw visual comparison
+        run: |
+          python leather-workshop/r14/build.py
+          xvfb-run -a python -u leather-workshop/r14/qa-browser-s2.py
+      - name: Separate browser timing probes
+        run: xvfb-run -a python -u leather-workshop/r14/qa-browser-performance.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r14-browser-${{ github.run_id }}
+          path: |
+            leather-workshop/r14/out/candidate-r14.html
+            leather-workshop/r14/qa/s2/browser/
+            leather-workshop/r14/qa/s2/browser-performance.json
+          retention-days: 14
+  publish:
+    needs: [prepare,cpu,browser]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+      R: leather-workshop/r14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r14-cpu-${{ github.run_id }}
+          path: /tmp/leather-cpu
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r14-browser-${{ github.run_id }}
+          path: /tmp/leather-browser
+      - name: Match independently built bytes and publish verified candidate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil,json,hashlib
+          c=Path('/tmp/leather-cpu');b=Path('/tmp/leather-browser');r=Path('leather-workshop/r14')
+          x=(c/'out/candidate-r14.html').read_bytes();assert x==(b/'out/candidate-r14.html').read_bytes()
+          m=json.loads((c/'BUILD_RESULT.json').read_text());assert hashlib.sha256(x).hexdigest()==m['htmlSHA256']
+          for p in [c/'qa/s2/SUMMARY.json',c/'qa/s2/performance.json',c/'qa/s2/native-certificate.json',c/'qa/numeric.json',c/'qa/s1b/equivalence.json',b/'qa/s2/browser/report.json',b/'qa/s2/browser-performance.json']:
+            assert json.loads(p.read_text())['pass'],str(p)
+          for p in [c,b]:
+            shutil.copytree(p/'qa',r/'qa',dirs_exist_ok=True)
+          shutil.copy2(c/'BUILD_RESULT.json',r/'BUILD_RESULT.json');(r/'public-lite.html').write_bytes(x)
+          PY
+          git fetch --depth=1 origin 1ecac82028a570b25eeb5260396f3b206a7513d1
+          python - <<'PY'
+          import subprocess
+          paths=subprocess.check_output(['git','diff','--name-only','1ecac82028a570b25eeb5260396f3b206a7513d1','HEAD'],text=True).splitlines()
+          assert all(p.startswith(('leather-workshop/r14/','leather-workshop/s2-performance/')) or p=='.github/workflows/leather-r14-s2.yml' for p in paths),paths
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f "$R/public-lite.html" "$R/BUILD_RESULT.json"
+          find "$R/qa" -name '*.json' -print0 | xargs -0 git add -f
+          git commit -m 'build(leather): publish measured R14 S2A after native, trajectory and browser gates'
+          git push origin HEAD:refs/heads/perf/leather-r14-s2-20261013
+          echo "R14_BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "R14_PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r14/public-lite.html" >> "$GITHUB_ENV"
+      - name: Exact public bytes and uninstrumented public browser
+        run: |
+          pip --disable-pip-version-check install Pillow==12.3.0 playwright==1.55.0
+          python - <<'PY'
+          import os,urllib.request,hashlib,json,time
+          from pathlib import Path
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['R14_BUILD_SHA']+'/leather-workshop/r14/public-lite.html'
+          expected=json.loads(Path('leather-workshop/r14/BUILD_RESULT.json').read_text())['htmlSHA256']
+          for i in range(6):
+            try:
+              with urllib.request.urlopen(url,timeout=30) as r:data=r.read()
+              assert hashlib.sha256(data).hexdigest()==expected
+              break
+            except Exception:
+              if i==5:raise
+              time.sleep(5)
+          PY
+          xvfb-run -a python -u "$R/qa-browser-s2.py" --public --url "$R14_PREVIEW"
+      - name: Record fresh performance delivery
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib
+          r=Path(os.environ['R']);b=json.loads((r/'BUILD_RESULT.json').read_text());s=json.loads((r/'qa/s2/SUMMARY.json').read_text());p=json.loads((r/'qa/s2/performance.json').read_text());native=json.loads((r/'qa/s2/native.json').read_text());off=json.loads((r/'qa/s2/browser/report.json').read_text());pub=json.loads((r/'qa/s2/public/report.json').read_text());reports={}
+          for n in ['qa/s2/SUMMARY.json','qa/s2/native.json','qa/s2/native-certificate.json','qa/s2/performance.json','qa/s2/browser-performance.json','qa/s2/browser/report.json','qa/s2/public/report.json','qa/s2/dependencies.json','qa/s1b/equivalence.json','qa/numeric.json','qa/s1b2/app-interfaces.json']:
+            q=r/n;d=json.loads(q.read_text());assert d['pass'],n;reports[n]=hashlib.sha256(q.read_bytes()).hexdigest()
+          views=[q['data']['meanRGBDifference'] for q in off['checks'] if isinstance(q.get('data'),dict) and 'meanRGBDifference' in q['data']]
+          receipt={'version':'R14.0-S2A','phase':'S2A','sourceCommit':os.environ['LEATHER_SOURCE_COMMIT'],'buildCommit':os.environ['R14_BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'previewURL':os.environ['R14_PREVIEW'],'htmlSHA256':b['htmlSHA256'],'htmlBytes':b['htmlBytes'],'baselineBuild':'89f2b71251ec6667c09b1ed043b6714da8fa5094','nativeSHA256':native['sha256'],'nativeIdenticalToR13':False,'sourceChecks':s['checkCount'],'nativeCertificateCases':480,'numericalCases':18,'geometryCases':25,'full52StepTrajectories':6,'appInterfaceCases':25,'offlineBrowserChecks':off['checkCount'],'publicBrowserChecks':pub['checkCount'],'visualComparisonPairs':len(views),'maximumMeanRGBDifference':max(views),'performanceHardware':p['hardware'],'performance':[{'product':v['id'],'reference':v['reference'],'candidate':v['candidate'],'speedRatio':v['solveSpeedRatio'],'timeReductionPercent':v['solveTimeReductionPercent']} for v in p['products']],'offlineBrowserVerified':True,'publicBrowserVerified':True,'subtaskComplete':True,'fullS2Complete':False,'fullS1Complete':True,'readyForUserReview':True,'userVisualAcceptance':'PENDING','productionReady':False,'commercialLegalClearance':False,'reports':reports,'limits':['Measured CPU workload gain is not FPS or universal user-device latency','Browser performance probes are separate from uninstrumented visual/interaction release checks','No contact candidate, friction contribution, CCD, timestep or iteration budget was removed','390x844 is viewport simulation, not a physical phone','Browser GPU duration and isolated queue/GC attribution remain incomplete','R01-R13 and existing attribution/licensing scope are preserved']}
+          (r/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+          with (r/'README.md').open('a') as f:f.write('\n## Verified delivery\n\n'+os.environ['R14_PREVIEW']+'\n\nNative, differential, performance, offline and public checks passed in workflow '+os.environ['GITHUB_RUN_ID']+'. See DELIVERY.json for measured scope. S2A is complete; full S2 and user acceptance remain pending.\n')
+          PY
+          git add "$R/DELIVERY.json" "$R/README.md" "$R/qa/s2/public/report.json"
+          git commit -m 'test(leather): certify exact public R14 page and bounded performance evidence'
+          git push origin HEAD:refs/heads/perf/leather-r14-s2-20261013
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r14-delivery-${{ github.run_id }}
+          path: |
+            leather-workshop/r14/public-lite.html
+            leather-workshop/r14/BUILD_RESULT.json
+            leather-workshop/r14/DELIVERY.json
+            leather-workshop/r14/qa/
+          retention-days: 14
