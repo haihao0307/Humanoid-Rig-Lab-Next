@@ -1,5 +1,6 @@
 import {ShoeAssembly as R07Base,PARTS,defaultState as oldDefault,validate as oldValidate} from '../../r07/src/base-model.mjs';
 import {compileJoins,JOIN_RULES} from './join-plan.mjs';
+import {sourceRearRails} from './rear-rails.mjs';
 import {registerLayers,ShellSampler} from './contact.mjs';
 import {lockstitch301} from './sewing.mjs';
 import {add,sub,mul,unit,mix,dist,smooth,stats,nearestOnSegment} from '../../r07/src/geometry.mjs';
@@ -10,7 +11,7 @@ export function validate(s){const p=oldValidate({...s,laces:false});if(s.materia
 const keyOf=s=>JSON.stringify([s.view==='flat'?'flat':'formed',s.thickness,s.threadDiameter]);
 const savedFields=['cachedParts','currentParts','seatRays','seating','quarterSeating','fittedSole','soleFinishReport','threadCache','samplers','contactReport'];
 export class ShoeAssembly extends R07Base{
- rebuildSeams(){const old=this.seams.map(s=>({...s,pairs:s.pairs.map(p=>({a:p.a.slice(),b:p.b.slice()}))}));compileJoins(this,old);}
+ rebuildSeams(){const old=this.seams.map(s=>({...s,pairs:s.pairs.map(p=>({a:p.a.slice(),b:p.b.slice()}))}));compileJoins(this,sourceRearRails(old));}
  cutThickness(id,p,t){const d=this.edgeFields[id]?.sample(p).distance??Infinity;const floor=Math.min(t*.42,JOIN_RULES.skiveEdgeMm);return floor+(t-floor)*smooth(d/JOIN_RULES.skiveWidthMm);}
  remember(){this.states??=new Map();if(!this.cachedParts)return;this.states.delete(this.geometryKey);this.states.set(this.geometryKey,Object.fromEntries(savedFields.map(k=>[k,this[k]])));const pinned=keyOf(defaultState());while(this.states.size>3){const k=[...this.states.keys()].find(k=>k!==pinned&&k!==this.geometryKey);const old=this.states.get(k);this.states.delete(k);const live=new Set([...this.states.values()].flatMap(s=>[...(s.cachedParts||[]).map(p=>p.geometry),s.fittedSole]));for(const g of [...old.cachedParts.map(p=>p.geometry),old.fittedSole])if(g&&!live.has(g))g.dispose();}}
  build(s){
