@@ -1,0 +1,88 @@
+name: Hat R07 isolated review
+on:
+  push:
+    branches: [fix/hat-r07-seams-crown-switch-20261013]
+    paths: [.github/workflows/hat-r07-review.yml, hat-workshop/r07/**]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hat-r07-review
+  cancel-in-progress: false
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r04
+            hat-workshop/r06
+            hat-workshop/r07
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser dependencies
+        run: |
+          pip install playwright beautifulsoup4 numpy pillow scipy trimesh rtree
+          python -m playwright install --with-deps chromium
+      - name: Build and review R07.1
+        env:
+          HAT_SOURCE_SHA: ${{ github.sha }}
+        run: |
+          python hat-workshop/r07/finish-r071.py
+          python hat-workshop/r07/review.py
+      - name: Preserve visual review immediately
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r07-visual-${{ github.run_id }}
+          path: hat-workshop/r07
+          retention-days: 7
+      - name: Full static nearest-triangle audit
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+        run: |
+          python -u hat-workshop/r07/check_distance.py
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          R=Path('hat-workshop/r07')
+          d=json.loads((R/'DELIVERY.json').read_text())
+          numeric=json.loads((R/'qa/numeric/report.json').read_text())
+          distance=json.loads((R/'qa/numeric/DISTANCE_REPORT.json').read_text())
+          audit=json.loads((R/'qa/numeric/GEOMETRY_AUDIT.json').read_text())
+          assert numeric['passed'] and distance['passed'] and audit['passed']
+          d['nearestTriangleDistanceAudit']={'passed':distance['passed'],'cases':len(distance['checks']),'scope':distance['scope']}
+          d['cavityContainmentAudit']={'passed':audit['passed'],'cases':len(audit['records'])}
+          d['unchangedOtherHatCases']=len(audit['unchanged'])
+          d['allNumericChecksPassed']=True
+          (R/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+      - name: Save scoped records
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r07
+          if ! git diff --cached --quiet; then
+            git commit -m 'test(hat-r07): record final public and numerical review [skip ci]'
+            git push origin HEAD:fix/hat-r07-seams-crown-switch-20261013
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r07-audit-${{ github.run_id }}
+          path: |
+            hat-workshop/r07/qa/numeric
+            hat-workshop/r07/DELIVERY.json
+            hat-workshop/r07/qa/browser/report.json
+            hat-workshop/r07/qa/public/report.json
+          retention-days: 7
