@@ -25,10 +25,12 @@ jobs:
       - name: Apply guarded readable-source migration and remove stale candidate evidence
         run: |
           python shoe-workshop/r07/tools/apply-r071.py
+          python shoe-workshop/r07/tools/apply-r071-render.py
           rm -rf shoe-workshop/r07/evidence/browser shoe-workshop/r07/evidence/public shoe-workshop/r07/evidence/numerics shoe-workshop/r07/evidence/early
           rm -f shoe-workshop/r07/PUBLIC_URL.txt
           node --check shoe-workshop/r07/src/main.mjs
           node --check shoe-workshop/r07/src/model.mjs
+          node --check shoe-workshop/r07/src/render-gate.mjs
           node --check shoe-workshop/r07/tests/browser.mjs
       - name: Install pinned geometry and browser dependencies
         run: |
@@ -78,7 +80,7 @@ jobs:
           m=json.loads((p/'BUILD_MANIFEST.json').read_text())
           q=json.loads((p/'evidence/public/QA.json').read_text())
           assert q['sourceBuild']==m['sourceBuild']
-          receipt={'version':'R07.1','sourceBuild':m['sourceBuild'],'buildSha':os.environ['PUBLIC_BUILD_SHA'],'url':q['url'],'runtime':m['runtime'],'runId':os.environ['GITHUB_RUN_ID'],'takeoverBase':'3df0937b45e6ec99a2e5135698483b34d9e74c06','publicChecks':len(q['checks']),'errors':q['errors'],'consoleErrors':q['consoleErrors'],'scope':'R07 existing toe/side/sole/needle refinements plus custom formed/flat state recovery and display-object reuse. Static assembly; no new lace algorithms.','acceptance':{'publicRuntimeVerified':True,'producerVisualReview':False,'userVisual':False,'sewingPhysics':False,'dynamicFitting':False,'manufacturing':False}}
+          receipt={'version':'R07.1','sourceBuild':m['sourceBuild'],'buildSha':os.environ['PUBLIC_BUILD_SHA'],'url':q['url'],'runtime':m['runtime'],'runId':os.environ['GITHUB_RUN_ID'],'takeoverBase':'3df0937b45e6ec99a2e5135698483b34d9e74c06','publicChecks':len(q['checks']),'errors':q['errors'],'consoleErrors':q['consoleErrors'],'scope':'R07 existing toe/side/sole/needle refinements plus custom formed/flat recovery, display-object reuse, coalesced single-flight GPU rendering and finite sole inspection. Static assembly; no new lace algorithms.','acceptance':{'publicRuntimeVerified':True,'producerVisualReview':False,'userVisual':False,'sewingPhysics':False,'dynamicFitting':False,'manufacturing':False}}
           (p/'RELEASE_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
           PY
           git add shoe-workshop/r07/evidence/public shoe-workshop/r07/PUBLIC_URL.txt shoe-workshop/r07/RELEASE_RECEIPT.json
