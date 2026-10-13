@@ -11,7 +11,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,16 +30,7 @@ jobs:
           node shoe-workshop/r10/tools/generate.mjs
           node shoe-workshop/r10/tests/unit.mjs
           node shoe-workshop/r10/tools/build.mjs
-      - name: Real paired-shoe and all twelve preset browser test
-        run: node shoe-workshop/r10/tests/browser.mjs --pair
-      - name: Preserve early actual pair renders
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: shoe-r10-pair-${{ github.run_id }}
-          path: shoe-workshop/r10/evidence/
-          retention-days: 14
-      - name: Actual current R04 character and complete shoe wearing
+      - name: Real pair, all twelve presets and actual current R04 wearer
         run: node shoe-workshop/r10/tests/browser.mjs
       - name: Preserve full current source and actual renders including failures
         if: always()
