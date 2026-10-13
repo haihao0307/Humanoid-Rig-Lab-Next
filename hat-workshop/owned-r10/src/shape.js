@@ -1,3 +1,4 @@
+// R101_VISUAL_2
 /* Mathematical shell generation and static fit, authored for KAOPU HAT10. */
 (function(G){
 'use strict';const H=G.HAT10;const PI=Math.PI,TAU=2*PI;
@@ -119,7 +120,7 @@ H.generate=function(input,lod=0){
   return[x,y,z];
  }
  if(c.shape!=='visor')pieces.push(shell('crown',crown,N,M,thick,{cap:true,uvHeight:ht*1.45}));
- const cuff=c.shape==='soft',bandHeight=c.band,bandBase=cuff?-.006:-.005;
+ const cuff=c.shape==='soft',bandHeight=c.shape==='visor'?ht:c.band,bandBase=cuff?-.006:-.005;
  const ring=(u,v)=>{const t=u*TAU,rise=bandBase+v*bandHeight,r=1+(cuff?.025:0)+.006*Math.sin(v*PI);return[(ax*r+.00065)*Math.sin(t),rise,(bz*r+.00065)*Math.cos(t)];};
  if(cuff||c.shape==='visor'||c.shape==='pleat')pieces.push(shell('wear-band',ring,N,lod?6:12,cuff?thick*.9:thick,{role:cuff?'rib':'outer',uvHeight:bandHeight}));
  else{
@@ -133,20 +134,21 @@ H.generate=function(input,lod=0){
   brimFn=(u,v)=>{
    const t=hasPeak?(u-.5)*PI*1.04:u*TAU,cs=Math.cos(t),sn=Math.sin(t);
    const d=width*v*(hasPeak?(Math.max(0,Math.cos(t))**.65):1+.13*cs+.04*sn);
-   let y=-.002-(c.drop||0)*s.brim*v;
+   let y=.0007-(c.drop||0)*s.brim*v;
    if(['round','high','pinch'].includes(c.shape))y+=.012*v**3*(.7+.3*Math.abs(sn))-.008*Math.max(cs,0)*v;
    if(c.shape==='bucket')y+=.003*Math.sin(5*t+.4)*v*v;
    if(c.shape==='bell')y+=.012*sn*v-.014*v*v;
    if(hasPeak)y-=.009*sn*sn*v;y+=.0015*Math.sin(v*PI);
-   return[(ax-.0005+d)*sn,y,(bz-.0005+d)*cs];
+   return[(ax-thick*.8+d)*sn,y,(bz-thick*.8+d)*cs];
   };
   pieces.push(shell('brim-core',brimFn,hasPeak?(lod?48:80):N,lod?10:20,Math.max(.0012,thick*.85),{closed:!hasPeak,sign:-1,role:'outer',innerRole:'underbrim',uvWidth:hasPeak?.33:.59,uvHeight:width}));
  }
  if(['pinch','round','high','bell'].includes(c.shape)){
-  const low=.025,span=c.band/ht;
-  const belt=(u,v)=>{const p=crown(u,low+span*v),n=normal(crown,u,low+span*v);return p.map((x,k)=>x+n[k]*.0012);};
+  const low=.006,span=c.band;
+  const bandV=(u,v)=>{const goal=low+span*v;let lo=0,hi=.6;for(let k=0;k<12;k++){const mid=(lo+hi)/2;if(crown(u,mid)[1]<goal)lo=mid;else hi=mid;}return(lo+hi)/2;};
+  const belt=(u,v)=>{const t=bandV(u,v),p=crown(u,t),n=normal(crown,u,t);return p.map((x,k)=>x+n[k]*.0012);};
   pieces.push(shell('ribbon',belt,N,6,.0008,{role:'trim',innerRole:'trim',edgeRole:'trim',uvHeight:c.band}));
-  const bow=(u,v)=>{const ang=(.72+(u-.5)*.11)*TAU,t=low+span*(.12+.76*v),p=crown(ang/TAU,t),n=normal(crown,ang/TAU,t),bulge=.0028+.0045*Math.sin(u*PI)**2*Math.sin(v*PI);return p.map((x,k)=>x+n[k]*bulge);};
+  const bow=(u,v)=>{const ang=(.72+(u-.5)*.11)*TAU,t=bandV(ang/TAU,.12+.76*v),p=crown(ang/TAU,t),n=normal(crown,ang/TAU,t),bulge=.0028+.0045*Math.sin(u*PI)**2*Math.sin(v*PI);return p.map((x,k)=>x+n[k]*bulge);};
   pieces.push(shell('side-fold',bow,20,8,.0008,{closed:false,role:'trim',innerRole:'trim',edgeRole:'trim',uvWidth:.060,uvHeight:c.band*.75}));
  }
  const stitches=[];

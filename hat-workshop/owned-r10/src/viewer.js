@@ -1,3 +1,4 @@
+// R101_VISUAL_2
 /* Independent workbench, camera, lifecycle, rendering and persistence. */
 (function(G){
 'use strict';const H=G.HAT10,T=G.OwnHatThree,$=id=>document.getElementById(id);
@@ -100,22 +101,26 @@ async function select(s,reason='selection'){
  }catch(e){if(token!==serial||e.message==='selection-cancelled')return false;pending=null;ready=!!active&&!errors.some(e=>e.startsWith('shader:'));$('cancel').hidden=true;status(e.message);errors.push(e.message);return false;}
 }
 function cancel(){serial++;if(pending){pending.cancel();pending=null;metrics.workerCancelled++;}ready=!!active;$('cancel').hidden=true;status('已取消，保留上一顶帽子。');}
-function syncUI(){for(const k of Object.keys(H.parameters)){const e=$('p-'+k);if(e)e.value=form[k];updateLabel(k);}if($('head'))$('head').value=form.head;$('color').value=form.color||H.categories.find(c=>c.id===form.id).color;document.querySelectorAll('.hat-card').forEach(e=>e.setAttribute('aria-pressed',String(e.dataset.id===form.id)));}
+function syncUI(){const category=H.categories.find(c=>c.id===form.id);$('p-brim').disabled=!category.brim;$('p-fullness').disabled=category.shape==='visor';for(const k of Object.keys(H.parameters)){const e=$('p-'+k);if(e)e.value=form[k];updateLabel(k);}if($('head'))$('head').value=form.head;$('color').value=form.color||H.categories.find(c=>c.id===form.id).color;document.querySelectorAll('.hat-card').forEach(e=>e.setAttribute('aria-pressed',String(e.dataset.id===form.id)));}
 function updateLabel(k){const el=$('o-'+k);if(!el)return;const v=Number($('p-'+k).value);el.textContent=k==='circumference'?v.toFixed(1)+' cm':k==='ease'?v.toFixed(1)+' mm':k==='detail'?v.toFixed(2):v.toFixed(2)+' ×';}
 function saveFile(name,text,type='application/json'){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);}
 async function thumbnails(){
- const rt=new T.WebGLRenderTarget(220,146),tc=new T.PerspectiveCamera(36,220/146,.005,4),ts=new T.Scene();ts.background=new T.Color('#deded7');ts.environment=scene.environment;ts.add(new T.HemisphereLight('#fff8ed','#767b70',1.8));const light=new T.DirectionalLight('#ffffff',2);light.position.set(-.4,.5,.6);ts.add(light);
+ const tc=new T.PerspectiveCamera(36,220/146,.005,4),ts=new T.Scene();ts.background=new T.Color('#deded7');ts.environment=scene.environment;ts.add(new T.HemisphereLight('#fff8ed','#767b70',1.8));const light=new T.DirectionalLight('#ffffff',2);light.position.set(-.4,.5,.6);ts.add(light);
  for(const c of H.categories){
   while(pending)await new Promise(r=>setTimeout(r,120));await new Promise(r=>setTimeout(r,50));
   try{
    const w=newWorker(H.defaults(c.id),1),data=await w.promise,model=makeModel(data,H.defaults(c.id));ts.add(model);
    const h=data.bounds.max[1]-data.bounds.min[1],wide=Math.max(data.bounds.max[0]-data.bounds.min[0],data.bounds.max[2]-data.bounds.min[2]),d=Math.max(.56,wide*2.2,h*3.4);tc.position.set(d*.52,d*.38+(data.bounds.max[1]+data.bounds.min[1])/2,d*.80);tc.lookAt(0,(data.bounds.max[1]+data.bounds.min[1])/2,0);
-   const was=renderer.getRenderTarget();renderer.setRenderTarget(rt);renderer.render(ts,tc);const bytes=new Uint8Array(220*146*4);renderer.readRenderTargetPixels(rt,0,0,220,146,bytes);renderer.setRenderTarget(was);
+   const was=renderer.getRenderTarget(),vp=renderer.getViewport(new T.Vector4()),sc=renderer.getScissor(new T.Vector4()),st=renderer.getScissorTest(),ratio=renderer.getPixelRatio(),bytes=new Uint8Array(220*146*4);
+   // Use the same display framebuffer and output transform as the main view.
+   // Restore it synchronously before yielding, so no thumbnail flashes on screen.
+   try{renderer.setRenderTarget(null);renderer.setViewport(0,0,220/ratio,146/ratio);renderer.setScissor(0,0,220/ratio,146/ratio);renderer.setScissorTest(true);renderer.render(ts,tc);const gl=renderer.getContext();gl.readPixels(0,0,220,146,gl.RGBA,gl.UNSIGNED_BYTE,bytes);}
+   finally{renderer.setRenderTarget(was);renderer.setViewport(vp);renderer.setScissor(sc);renderer.setScissorTest(st);draw();}
    const cn=document.createElement('canvas');cn.width=220;cn.height=146;const ctx=cn.getContext('2d'),image=ctx.createImageData(220,146);for(let row=0;row<146;row++)image.data.set(bytes.subarray((145-row)*880,(146-row)*880),row*880);ctx.putImageData(image,0,0);
    document.querySelector(`.hat-card[data-id="${c.id}"] img`).src=cn.toDataURL('image/webp',.84);metrics.thumbs++;ts.remove(model);dispose(model);dirty();
   }catch(e){errors.push('thumbnail '+c.id+': '+e.message);}
  }
- rt.dispose();
+ // No additional render target survives thumbnail generation.
 }
 function boot(){
  const canvas=$('canvas');renderer=new T.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true,alpha:false,powerPreference:'high-performance'});
