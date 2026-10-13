@@ -35,12 +35,18 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Establish source and original detail assets
         run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          for p in Path('hat-workshop/r08').glob('*.py'): ast.parse(p.read_text(),filename=str(p))
+          PY
           python hat-workshop/r08/bootstrap-r08.py
           node --check hat-workshop/r08/app.js
           python hat-workshop/r08/build.py --assets-only
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add hat-workshop/r08
+          git add -f hat-workshop/r08/details/*.webp
           if ! git diff --cached --quiet; then
             git commit -m 'feat(hat-r08): establish readable runtime and original detail assets [skip ci]'
             git push origin HEAD:fix/hat-r08-responsive-loading-20261013
