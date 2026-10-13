@@ -1,3 +1,4 @@
+import {flatcapSweatband} from './flatcap-facing.mjs';
 import {LINER_PAIRS} from './flatcap-lining-map.mjs';
 /* R05 dimensional contract. Fits true source openings / separate visor band.
  * Fitting always starts from immutable source coordinates. Material clearance,
@@ -96,12 +97,8 @@ function collarConstraint(mesh,position,hp,band,gap,probe=position,semanticWeigh
  for(let i=0;i<position.length;i+=3){const y=position[i+1],weight=w(y)*(semanticWeights?.[i/3]??1);if(!weight)continue;const c=sample(hp,clamp(y,hp.ymin,hp.ymax-.001),0).center,a=Math.atan2(position[i+2]-c[1],position[i]-c[0]),d=interp(field,a)*weight;position[i]+=d*Math.cos(a);position[i+2]+=d*Math.sin(a);}
  return {maximumCollarCorrectionMM:Math.max(...field)*1000,correctionMethod:'periodic shared collar field, C1 height falloff; outer and lining share the displacement'};
 }
-function sweatband(mesh,cap,hp,band,gap){
- const N=192,rows=5,t=.0012,height=.018,at=band+height,profile=sectionProfile(cap,mesh.index,{ymin:at-.0005,ymax:at+.0005,rows:2,angles:N,inner:true}),P=[],UV=[],I=[],G=[];
- for(let layer=0;layer<2;layer++)for(let k=0;k<rows;k++)for(let j=0;j<=N;j++){const a=j/N*TAU,y=band+height*k/(rows-1),h=bandHead(hp,y,a),attach=sample(profile,at,a),base=h.r+gap,spread=smooth((k/(rows-1)-.5)*2),target=attach.valid?Math.max(base,Math.min(base+.020,attach.r-.0012)):base,r=mix(base,target,spread)+layer*t;P.push(h.center[0]+r*Math.cos(a),y,h.center[1]+r*Math.sin(a));UV.push(j/N,k/(rows-1));G.push(layer*rows*N+k*N+j%N);}
- const step=N+1,L=rows*step;for(let k=0;k<rows-1;k++)for(let j=0;j<N;j++){const a=k*step+j,b=a+1,c=a+step,d=c+1;I.push(a,c,b,b,c,d,L+a,L+b,L+c,L+b,L+d,L+c);}for(let j=0;j<N;j++){const a=j,b=j+1,c=(rows-1)*step+j,d=c+1;I.push(a,b,L+b,a,L+b,L+a,c,L+d,d,c,L+c,L+d);}
- const m={position:Float32Array.from(P),uv:Float32Array.from(UV),index:Uint32Array.from(I),groups:Uint32Array.from(G),groupCount:2*rows*N};m.normal=normals(m,m.position);return {...m,nominalThicknessMM:1.2,construction:'finite-thickness inner sweatband, supported lower half, upper collar attachment to cap cavity',scope:'new internal construction; no manufacturing or physical-seam certification'};
-}
+const sweatband=flatcapSweatband;
+
 function fitFlatcap(mesh,meta,s,hp,src){
  const band=s.wearBandMM/1000,gap=(s.clearanceMM+s.hairMM)/1000,H=hp.ymax-band+.010+.0012,q=src.position,out=new Float32Array(q.length),col=new Float32Array(q.length),ratios=src.ring.map((r,j)=>{const h=bandHead(hp,band,j*TAU/src.ring.length);return(h.r+gap)/r;});
  if(ratios.some(v=>v<.60||v>1.4))throw Error('Flatcap head size exceeds its repaired inner-cavity range');

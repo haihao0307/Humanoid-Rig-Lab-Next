@@ -2,25 +2,26 @@
   "schema": "kaopu.source-authority/7",
   "canonicalRuntime": [
     "app.js",
-    "core.mjs",
+    "cavity.mjs",
     "contact.mjs",
-    "fit.mjs",
-    "support.mjs",
-    "tailored-band.mjs",
-    "head-contract.mjs",
+    "core.mjs",
     "fit-contract.mjs",
+    "fit.mjs",
+    "flatcap-facing.mjs",
+    "flatcap-lining-map.mjs",
     "hair-contract.mjs",
     "hash.mjs",
-    "flatcap-lining-map.mjs",
-    "shell.mjs",
-    "section.mjs",
-    "surface.mjs",
-    "legacy/field.mjs",
-    "legacy/datum.mjs",
-    "legacy/knit.mjs",
+    "head-contract.mjs",
     "legacy/beanie.mjs",
+    "legacy/datum.mjs",
+    "legacy/field.mjs",
+    "legacy/knit.mjs",
+    "section.mjs",
     "shell.html",
-    "cavity.mjs"
+    "shell.mjs",
+    "support.mjs",
+    "surface.mjs",
+    "tailored-band.mjs"
   ],
   "builder": "build.py",
   "testing": [
@@ -36,5 +37,6 @@
   "initialTransport": "SOURCE_DELTA.b64 was verified and applied once before the initial readable-source commit. Never replay over readable source.",
   "oldDirectoriesModified": false,
   "hairImplemented": false,
-  "physicalDonningVerified": false
+  "physicalDonningVerified": false,
+  "r071Migration": "finish-r071.py is a one-time SHA-256 guarded migration. R071_APPLIED.json prevents replay."
 }

@@ -44,7 +44,7 @@ def build(source=None):
  full=json.loads(gzip.decompress(base64.b64decode(BeautifulSoup((base/'standalone.html').read_text(),'html.parser').find(id='payload').text)))
  sourceFiles={n:hash256((R/n).read_bytes()) for n in sorted(set(order+['shell.html','build.py']))}
  sourceHash=hash256(json.dumps(sourceFiles,sort_keys=True,separators=(',',':')).encode())
- full.update(version='HAT-R07.0',sourceCommit=source or 'LOCAL-'+sourceHash[:16],sourceHash=sourceHash,baseline='721e955687949c6b6e4126ebb31d45551149b495',publication='fixed-candidate' if source else 'local-candidate')
+ full.update(version='HAT-R07.1',sourceCommit=source or 'LOCAL-'+sourceHash[:16],sourceHash=sourceHash,baseline='721e955687949c6b6e4126ebb31d45551149b495',publication='fixed-candidate' if source else 'local-candidate')
  data=base64.b64encode(gzip.compress(json.dumps(full,ensure_ascii=False,separators=(',',':')).encode(),mtime=0)).decode()
  shell=(R/'shell.html').read_text().replace('<!--PAYLOAD-->',data).replace('/*APP*/',app.replace('</script','<\\/script'))
  (R/'standalone.html').write_text(shell);(R/'app.offline.js').write_text(app)

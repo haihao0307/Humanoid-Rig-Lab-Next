@@ -4,6 +4,7 @@ After the initial commit, readable r07 modules are the source authority.
 """
 from pathlib import Path
 import os,sys,subprocess,json,gzip,base64,hashlib,shutil,time,urllib.request
+import numpy as np
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 R=Path(__file__).resolve().parent; ROOT=R.parent.parent; B=R.parent/'r06'
@@ -42,9 +43,10 @@ for item in payload['hats']:
 for item in payload['native']['heads']:
     (A/('head-'+item['id']+'.bin')).write_bytes(gzip.compress(json.dumps(item).encode()))
 run(['node',str(R/'verify.mjs')])
+run(['node',str(R/'geometry-audit.mjs')])
 run(['python',str(R/'build.py'),'--source',source])
 Q=R/'qa/browser';Q.mkdir(parents=True,exist_ok=True)
-report={'version':'HAT-R07.0','sourceSha':source,'baselineSha':BASE,'environment':'GitHub Actions Ubuntu Chromium headless SwiftShader; desktop viewport, not phone hardware','cases':[],'checks':[],'errors':[],'visualAcceptance':'USER_PENDING'}
+report={'version':'HAT-R07.1','sourceSha':source,'baselineSha':BASE,'environment':'GitHub Actions Ubuntu Chromium headless SwiftShader; desktop viewport, not phone hardware','cases':[],'checks':[],'errors':[],'visualAcceptance':'USER_PENDING'}
 def check(name,ok,detail=None):
     report['checks'].append({'name':name,'passed':bool(ok),'detail':detail})
     if not ok:raise AssertionError(name+': '+str(detail))
@@ -53,7 +55,7 @@ def save():
 
 def browser_suite(page,extended=True):
     page.wait_for_function('window.hatLab && hatLab.ready()',timeout=240000)
-    check('browser version',page.evaluate('hatLab.version')=='HAT-R07.0')
+    check('browser version',page.evaluate('hatLab.version')=='HAT-R07.1')
     check('browser source identity',page.evaluate('hatLab.sourceCommit')==source)
     page.wait_for_function('hatLab.thumbnails()===11',timeout=60000)
     heads={};baseline_hashes={}
@@ -71,6 +73,15 @@ def browser_suite(page,extended=True):
             key=f'{hid}/{id}';gh=page.evaluate('hatLab.geometryHash()');bh=page.evaluate('hatLab.bandGeometryHash()')
             if key in baseline_hashes:check('geometry deterministic '+key,baseline_hashes[key]==[gh,bh])
             baseline_hashes[key]=[gh,bh];row['geometryHash']=gh;row['bandHash']=bh;report['cases'].append(row)
+            if len(report['cases'])<=33:
+                head_id=row['metrics']['headId'];prefix=R/'qa/geometry-dump'/f'{head_id}--{id}--'
+                expected=np.fromfile(str(prefix)+'position.bin','<f4');observed=np.asarray(page.evaluate('hatLab.currentPositions()'),dtype=np.float64)
+                err=float(np.max(np.abs(expected-observed))) if len(expected)==len(observed) else float('inf')
+                check('browser versus Node '+key,err<2e-8,{'maximumPositionErrorM':err})
+                if bh:
+                    expected=np.fromfile(str(prefix)+'band-position.bin','<f4');observed=np.asarray(page.evaluate('hatLab.debugGeometry().sweatband.position'),dtype=np.float64)
+                    err=float(np.max(np.abs(expected-observed))) if len(expected)==len(observed) else float('inf')
+                    check('browser facing versus Node '+key,err<2e-8,{'maximumPositionErrorM':err})
             check('target head preserved '+key,hh==page.evaluate('hatLab.headGeometryHash()'))
             check('finite visible geometry '+key,row['metrics']['hatVisible'] and row['metrics']['vertices']>100)
             if hid==0 and id in focus and len(report['cases'])<=11:
@@ -108,6 +119,9 @@ try:
         page.goto((R/'standalone.html').as_uri()+'#hat=trilby',wait_until='domcontentloaded',timeout=180000)
         browser_suite(page)
         page.evaluate("hatLab.select('trilby')");page.screenshot(path=str(Q/'desktop-workbench.png'))
+        for hi in [0,1,2]:
+            page.evaluate('(head)=>hatLab.set({head})',hi);page.evaluate("hatLab.select('flatcap')");page.evaluate("hatLab.frame('inside')");page.wait_for_timeout(150);page.locator('#canvas').screenshot(path=str(Q/f'flatcap-head-{hi}-inside.png'))
+        page.evaluate('hatLab.set({head:0})');page.evaluate("hatLab.select('trilby')")
         page.set_viewport_size({'width':390,'height':844});page.wait_for_timeout(200)
         page.screenshot(path=str(Q/'mobile-viewport.png'))
         report['mobileScope']='390x844 viewport only; no physical phone test'
@@ -139,7 +153,7 @@ try:
         start=time.perf_counter();page.goto(url,wait_until='domcontentloaded',timeout=180000)
         page.wait_for_function('window.hatLab && hatLab.ready()',timeout=240000)
         public['coldWallMS']=(time.perf_counter()-start)*1000
-        assert page.evaluate('hatLab.version')=='HAT-R07.0'
+        assert page.evaluate('hatLab.version')=='HAT-R07.1'
         assert page.evaluate('hatLab.sourceCommit')==source
         for id in ['trilby','cloche','chef','cable','flatcap']:
             start=time.perf_counter();page.evaluate('(id)=>hatLab.select(id)',id)
@@ -154,7 +168,7 @@ try:
         browser.close()
     public['passed']=all(c['passed'] for c in public['checks'])
     (P/'report.json').write_text(json.dumps(public,ensure_ascii=False,indent=2))
-    (R/'DELIVERY.json').write_text(json.dumps({'version':'HAT-R07.0','sourceSha':source,'buildSha':built,'publicURL':url,'publicVerified':public['passed'],'browserVerified':report['passed'],'userAccepted':False,'oldVersionsModified':False,'noMerge':True,'draftPR':59,'numericScope':'388 checks, 98 fits, one explicitly rejected synthetic stress fixture; three original heads, not nine different people','nearestTriangleDistanceAudit':'PENDING','mobileScope':'viewport only','hairCompressionImplemented':False,'dynamicDonningVerified':False},ensure_ascii=False,indent=2))
+    (R/'DELIVERY.json').write_text(json.dumps({'version':'HAT-R07.1','sourceSha':source,'buildSha':built,'publicURL':url,'publicVerified':public['passed'],'browserVerified':report['passed'],'userAccepted':False,'oldVersionsModified':False,'noMerge':True,'draftPR':59,'numericScope':'388 checks, 98 fits, one explicitly rejected synthetic stress fixture; three original heads, not nine different people','nearestTriangleDistanceAudit':'PENDING','mobileScope':'viewport only','hairCompressionImplemented':False,'dynamicDonningVerified':False},ensure_ascii=False,indent=2))
     assert public['passed'], 'Public browser checks failed'
     print('PUBLIC_CANDIDATE',url,flush=True)
 except Exception as e:
