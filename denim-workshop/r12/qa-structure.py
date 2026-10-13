@@ -84,6 +84,14 @@ with sync_playwright() as pw:
   for i in range(3):step(p)
   im,q=capture(p,'damage-simulated',{},save=True);r['damagedPhysics']=q['frame']['physics'];assert q['frame']['physics']['maxDisplacementMm']>.1;assert q['frame']['physics']['maxAttachmentErrorMm']<1e-5
   assert q['frame']['physics']['maxTensileStrain']<.15 and q['frame']['physics']['maxYarnStretch']<.18
+  # Identical uploaded physical pose, scene samples and primitive order. Only
+  # command scheduling changes. The unbatched path is QA-only, never auto fallback.
+  capture(p,'batch-parity-position',{'zoom':.6,'panX':0,'panY':0})
+  batched,_=capture(p,'batch-parity-bounded',{'qaSingleBatch':False})
+  single,_=capture(p,'batch-parity-single',{'qaSingleBatch':True})
+  delta=np.abs(batched.astype(int)-single.astype(int));r['batchPixelParity']={'max':int(delta.max()),'mean':float(delta.mean()),'sameFrozenPhysics':True}
+  assert delta.max()<=1 and delta.mean()<.001,r['batchPixelParity']
+  capture(p,'batch-parity-restored',{'qaSingleBatch':False,'zoom':1.5,'panX':4,'panY':-1})
   gen=p.evaluate('__DENIM_WORKBENCH__.physicsGeneration()');before=p.evaluate('__DENIM_WORKBENCH__.physicsReport().steps')
   capture(p,'wind-start',action=lambda:p.locator('#wind').click())
   capture(p,'wind-far',{'zoom':.4,'panX':0,'panY':0},save=True)
