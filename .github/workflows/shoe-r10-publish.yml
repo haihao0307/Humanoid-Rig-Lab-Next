@@ -1,0 +1,157 @@
+name: Shoe R10 reviewed candidate public delivery
+on:
+  push:
+    branches: [fix/shoe-r10-bound-pair-wear-20261013]
+    paths: ['.github/workflows/shoe-r10-publish.yml']
+permissions: {}
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      build: ${{ steps.commit.outputs.build }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+      - uses: actions/download-artifact@v4
+        with:
+          name: shoe-r10-verified-38390951992
+          run-id: 38390951992
+          github-token: ${{ github.token }}
+          path: reviewed-candidate
+      - name: Validate source, tested results and bytes as data only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -I - <<'PY'
+          import pathlib,json,hashlib,os,urllib.request,shutil
+          base='https://api.github.com/repos/haihao0307/Humanoid-Rig-Lab-Next/'
+          def api(p):
+              r=urllib.request.Request(base+p,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(r,timeout=30) as f:return json.load(f)
+          source='a152f7a91979d8d04114b61c51e86ed48e9f51a0';expected='7c5ea80715c2b12d6f372a2187db933cfff1245f3d9afe561b2da87e7bdae4a2'
+          run=api('actions/runs/38390951992');art=api('actions/artifacts/11809291451')
+          assert run['conclusion']=='success' and run['head_sha']==source
+          assert art['workflow_run']['id']==38390951992 and not art['expired']
+          assert art['digest']=='sha256:2b6414eab89a5448eac42bc95f6fd240e21688de80873a238e9b5f1cddbb02d7'
+          a=pathlib.Path('reviewed-candidate');p=pathlib.Path('shoe-workshop/r10');load=lambda f:json.loads((a/f).read_text());sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+          m=load('BUILD_MANIFEST.json');q=load('evidence/browser/QA.json');u=load('evidence/UNIT.json')
+          assert m['sourceCommit']==q['sourceCommit']==u['sourceCommit']==source
+          assert sha(a/'public-lite.html')==m['runtime']['sha256']==expected
+          assert (a/'public-lite.html').stat().st_size==m['runtime']['bytes']==17990407
+          assert sha(a/'assets/generated.json')==m['cache']['sha256']
+          assert sha(a/'assets/human-r04.html')=='c8f1150714ac03d2aec7deb6df7dd1e31a4bb887b1ca4fa4a25b38e373377f8d'
+          assert q['completed'] and len(q['checks'])==9 and len(q['screens'])==23
+          assert all(c['passed'] for c in q['checks']) and u['success'] and len(u['checks'])==10
+          assert not q['errors'] and not q['consoleErrors'] and not q['requestFailures'] and not q['final']['stats']['errors']
+          for h in [q['checks'][4]['data'],q['final']['human']]:
+              assert h['originalBodyUnchanged'] and h['native']['version']=='HUMAN-INTEGRATED-R04'
+              assert len(h['feet'])==2
+              for f in h['feet']:
+                  assert f['fitCage']['examined']>=1000 and f['fitCage']['remainingRadialMisses']==0 and not f['fitCage']['bodyAltered']
+          for s in q['screens']:assert sha(a/'evidence/browser'/f"{s['name']}.png")==s['sha256']
+          for f in m['sources']:
+              if 'node_modules' in pathlib.PurePosixPath(f['path']).parts:continue
+              target=(p/f['path']).resolve();assert target.is_relative_to(pathlib.Path('shoe-workshop').resolve());assert sha(target)==f['sha256'],f['path']
+          p.mkdir(exist_ok=True)
+          for name in ['public-lite.html','BUILD_MANIFEST.json']:shutil.copyfile(a/name,p/name)
+          for file in (a/'evidence').rglob('*'):
+              assert not file.is_symlink()
+              if not file.is_file():continue
+              rel=file.relative_to(a);assert file.suffix in ['.json','.png'];dest=p/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(file,dest)
+          r={'sourceCommit':source,'sourceRun':38390951992,'artifactId':11809291451,'artifactDigest':art['digest'],'runtime':m['runtime'],'originalR04BodyPreserved':True,'sourceRenderReview':{'reviewed':True,'screens':['worn-feet','worn-side'],'earlierAffineFitRejected':True,'finalAppearanceApproved':False},'projectCodeExecutedInWriteJob':False,'publicVerified':False}
+          (p/'PROMOTION_RECEIPT.json').write_text(json.dumps(r,indent=2))
+          PY
+      - name: Append only reviewed R10 output with a fast-forward race guard
+        id: commit
+        run: |
+          test "$GITHUB_REF_NAME" = 'fix/shoe-r10-bound-pair-wear-20261013'
+          current=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | cut -f1)
+          test "$current" = "$GITHUB_SHA"
+          git config core.hooksPath /dev/null
+          git config user.name 'Shoe R10 Public Delivery'
+          git config user.email 'shoe-r10@users.noreply.github.com'
+          git add -- shoe-workshop/r10
+          if git diff --cached --name-only | grep -v '^shoe-workshop/r10/'; then exit 1; fi
+          git commit -m 'build(shoes): reviewed wrapped pair and native R04 wearer [skip ci]'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+          echo "build=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  public_browser:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.publish.outputs.build }}
+          sparse-checkout: shoe-workshop
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Independent browser dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Real immutable public page, twelve styles and original R04 wearing
+        env:
+          PUBLIC_BUILD_SHA: ${{ needs.publish.outputs.build }}
+        run: node shoe-workshop/r10/tests/browser.mjs --public
+      - name: Preserve actual public render and interaction results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r10-public-${{ github.run_id }}
+          path: shoe-workshop/r10/evidence/public/
+          retention-days: 14
+  receipt:
+    needs: [publish,public_browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.publish.outputs.build }}
+          sparse-checkout: shoe-workshop
+      - uses: actions/download-artifact@v4
+        with:
+          name: shoe-r10-public-${{ github.run_id }}
+          path: public-result
+      - name: Validate public evidence and append receipt without executing project code
+        env:
+          BUILD: ${{ needs.publish.outputs.build }}
+        run: |
+          python -I - <<'PY'
+          import pathlib,json,os,shutil,hashlib
+          a=pathlib.Path('public-result');p=pathlib.Path('shoe-workshop/r10');q=json.loads((a/'QA.json').read_text());m=json.loads((p/'BUILD_MANIFEST.json').read_text());sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+          assert q['sourceCommit']==m['sourceCommit']=='a152f7a91979d8d04114b61c51e86ed48e9f51a0'
+          assert q['buildSha']==os.environ['BUILD'] and q['completed'] and len(q['checks'])==9 and len(q['screens'])==23
+          assert all(c['passed'] for c in q['checks']) and not q['errors'] and not q['consoleErrors'] and not q['requestFailures']
+          assert q['publicBytes']['matchesBuild'] and q['publicBytes']['sha256']==m['runtime']['sha256']
+          assert q['final']['human']['originalBodyUnchanged'] and not q['final']['stats']['errors']
+          for h in [q['checks'][4]['data'],q['final']['human']]:
+              for f in h['feet']:assert f['fitCage']['examined']>=1000 and f['fitCage']['remainingRadialMisses']==0
+          for s in q['screens']:assert sha(a/f"{s['name']}.png")==s['sha256']
+          for file in a.iterdir():
+              assert not file.is_symlink() and file.suffix in ['.json','.png'];dest=p/'evidence/public'/file.name;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(file,dest)
+          r={'version':'R10.1','status':'PUBLIC_VERIFIED_ACCEPTANCE_CANDIDATE','sourceCommit':m['sourceCommit'],'buildSha':os.environ['BUILD'],'url':q['url'],'runtime':m['runtime'],'publicRun':os.environ['GITHUB_RUN_ID'],'sourceRun':38390951992,'publicChecks':len(q['checks']),'publicScreenshots':len(q['screens']),'errors':q['errors'],'consoleErrors':q['consoleErrors'],'requestFailures':q['requestFailures'],'human':q['final']['human'],'publicDefaultFit':q['checks'][4]['data']['feet'],'publicBootMsSoftwareRenderer':q['checks'][0]['data']['bootMs'],'validationEnvironment':q['environment'],'scope':'12 pair styles; actual default and denim native R04 wearer; no native foot hiding or body reshaping; finite static radial enclosure tests, not complete collision or manufacturing certification','producerPublicScreenshotReview':'pending foreground review','userVisualApproval':False}
+          (p/'RELEASE_RECEIPT.json').write_text(json.dumps(r,indent=2));(p/'PUBLIC_URL.txt').write_text(q['url']+'\n')
+          PY
+          current=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | cut -f1)
+          test "$current" = "$BUILD"
+          git config core.hooksPath /dev/null
+          git config user.name 'Shoe R10 Public Evidence'
+          git config user.email 'shoe-r10@users.noreply.github.com'
+          git add -- shoe-workshop/r10
+          if git diff --cached --name-only | grep -v '^shoe-workshop/r10/'; then exit 1; fi
+          git commit -m 'test(shoes): immutable public R10 browser and on-foot evidence [skip ci]'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
