@@ -40,7 +40,7 @@ function field(input,lod=0){
   }
   fold*=wall;radial+=fold/Math.sqrt(a*b);
   radial+=(-.0007*gauss(v,upperV,.010)+.00035*gauss(v,upperV+.022,.016))/Math.sqrt(a*b);
-  if(v>.74)y-=.0023*Math.sin(angle*2+.7)**2*Math.sin((v-.74)/.26*PI)*sm((v-.74)/.08);
+  if(v>.74)y-=.0023*Math.sin(angle*2+.7)**2*Math.sin((v-.74)/.26*PI)*sm((v-.74)/.08)*r*r;
   let x=a*radial*sn,z=b*radial*cs+.0065*sm(v/.9);
   if(v<.9999&&y<hd.top){const safe=H.headRadius(y-thickness)+(ease+thickness)/Math.min(hd.a,hd.b),actual=Math.hypot(x/hd.a,z/hd.b);if(actual<safe){x*=safe/actual;z*=safe/actual;}}
   if(v>.99999){x=0;z=.0065;}return[x,y,z];
