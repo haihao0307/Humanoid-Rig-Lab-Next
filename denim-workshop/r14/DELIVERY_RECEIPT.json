@@ -1,0 +1,4855 @@
+{
+  "version": "R14.0",
+  "status": "PUBLIC_VERIFIED_USER_REVIEW_PENDING",
+  "publicVerified": true,
+  "userVisualApproved": false,
+  "filmGrade": false,
+  "sourceCommit": "d3916a7d8fd10289dc99c55b6f2fa4d283a45e5a",
+  "parentSource": "400e0d217c1b73015f2e052a0947556bb285c333",
+  "buildCommit": "5ebe0c034d3a345067929c6034d53eb615b39d21",
+  "publicUrl": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5ebe0c034d3a345067929c6034d53eb615b39d21/denim-workshop/r14/index.html",
+  "foldUrl": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5ebe0c034d3a345067929c6034d53eb615b39d21/denim-workshop/r14/index.html#fold",
+  "workflow": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/38384549754",
+  "publicBytesMatch": true,
+  "manifest": {
+    "version": "R14.0",
+    "baseCommit": "400e0d217c1b73015f2e052a0947556bb285c333",
+    "entry": "denim-workshop/r14/index.html",
+    "bytes": 120093,
+    "sha256": "ce5f848b68b3686ae26213f91bbe98c949e1aec456061d724df19b4b9fa0df3f",
+    "unpackedHtmlBytes": 247288,
+    "runtimeSourceBytes": 229335,
+    "runtimeSourceSha256": "348882ad446de8e108868f483a9028273016f2a355beea440831e999acbf39ee",
+    "packedRuntimeBytes": 73275,
+    "packing": "gzip, native DecompressionStream, inline base64, no network",
+    "runtimeAssets": 0,
+    "sourceHashes": {
+      "sampling.js": "104b5646b14c02ecf033b831456b72dd56f248186decbaa02d73596b92677302",
+      "fiber-optics.js": "8aa99b3ab475c4a0e1b6127ed61357ee416250ed9abfada250f0d10cde090701",
+      "structure.js": "6b9c08bb4b47f68e3a458714af5ee5a6d9b38c78ad3312e8e8c2776ad59b5507",
+      "core.js": "fe72b6e3a26efc20f5e3cb1506604d2596855a50a8c709f23e4416f1dee518d2",
+      "cotton-surface.js": "fcfe00e48a2aa7e9b995b86fe122dc1d0b4a9154d09a7fcd51a1254522e96de6",
+      "natural-yarn.js": "acf9690af868fb670de5dca1e924dc79783197bfb2f1e8cd357f6933f212f237",
+      "runtime-budget.js": "c1eab5172e6c664cdf0b7ea2783a8faa556e7a05b1746baaf6578f88c8b7a05e",
+      "stitches.js": "52409c703b34be91c5bee2e96164a48e491a0926740cccfd80bd02ad42a0af12",
+      "cloth-topology.js": "5d91d7547869846512fe7f42ffe9819f0d60a0f9adc1c836753bd2c00f665bb6",
+      "failure-physics.js": "31a213fec602446a9fafaa73acbad8824c5aa75b2c6aa4d200297719875b24a2",
+      "bend-cloth.js": "d5c71757bd41f48a584c4d678437d34e10a4afdd0bad813be09c1d46e56a179d",
+      "dynamics.js": "329bdc6e223fb1a07cc68e04cfbc30633fd34e93783bdc1546ce69a8b9fdfe83",
+      "distance-lod.js": "1c827eee55fb1ecb5481314bab385a02c2fbf9a90385291bb2ca1522c4eb9ff3",
+      "noise-kernel.js": "4f489feb68a521c607a09e92ba45ff5e857fec0d03a307bdcadb30b2745e101e",
+      "app.js": "cc1f06c5b6bf13036d568590c4839d83a921fb80f545005d198bdca150fefe40"
+    },
+    "qualityDefault": "R08 near sampling preserved; local-footprint filtered middle/far; Float32 micro layer generated on demand",
+    "efficientMode": "explicit lower internal pixel resolution, same 4x offscreen MSAA where available",
+    "publicDeliveryVerified": false,
+    "actualFileNavigationVerified": false,
+    "physicalClothSolver": "R14 continuous table-supported sheet with coupled curvature bending and a thickness-scaled radius barrier, surface contact and finite edge grip; old material mode preserved, new tearing paused; not full CCD or measured cloth",
+    "realDeviceFPSVerified": false
+  },
+  "numeric": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "Coupled curvature block satisfies independently recomputed linear residual",
+        "passed": true,
+        "wallMs": 9.107546999999997
+      },
+      {
+        "name": "High-curvature guard reduces an excessive local angle and preserves free centre of mass",
+        "passed": true,
+        "wallMs": 5.475108000000006
+      },
+      {
+        "name": "Continuous material has no central duplicate seam and bends cross centre",
+        "passed": true,
+        "wallMs": 12.977928999999996
+      },
+      {
+        "name": "Areal mass integrates exactly; zero-force rest does not drift",
+        "passed": true,
+        "wallMs": 833.954964
+      },
+      {
+        "name": "Thickness and bending inputs are separate from declared areal mass",
+        "passed": true,
+        "wallMs": 10.13500799999997
+      },
+      {
+        "name": "Tangent contact conserves free mass-weighted centre without external support",
+        "passed": true,
+        "wallMs": 5.1791769999999815
+      },
+      {
+        "name": "Curvature stiffness changes free cantilever response under matched gravity",
+        "passed": true,
+        "wallMs": 8794.377951999999
+      },
+      {
+        "name": "Thin, standard and thick folding remain continuous with small settled opening",
+        "passed": true,
+        "wallMs": 52867.739155
+      },
+      {
+        "name": "Exact web dimensions, mass convention and friction keep all three folds within the same gates",
+        "passed": true,
+        "wallMs": 53258.862239
+      },
+      {
+        "name": "The finite-width moving clamp holds only the outer two columns and fully releases both",
+        "passed": true,
+        "wallMs": 5.0192970000061905
+      },
+      {
+        "name": "Edge release and reopening retain physical time, mass and topology",
+        "passed": true,
+        "wallMs": 4272.515342000013
+      },
+      {
+        "name": "Transport array dimensions match the connected rendering grid",
+        "passed": true,
+        "wallMs": 3.543662999989465
+      },
+      {
+        "name": "Invalid inputs are rejected, not silently converted to motion",
+        "passed": true,
+        "wallMs": 5.018826999992598
+      },
+      {
+        "name": "Old material solver and cotton source remain unchanged",
+        "passed": true,
+        "wallMs": 4.82566700001189
+      }
+    ],
+    "cases": {
+      "curvatureResidual": 1.618182978075717e-17,
+      "restMassKg": 0.0032400000000000055,
+      "cantilever": [
+        {
+          "rigidity": 1e-05,
+          "tipMm": [
+            8.35952221419938,
+            0.0009700895986764878,
+            -7.365746569231443
+          ],
+          "maxStrain": 1.2844065088168932e-05
+        },
+        {
+          "rigidity": 0.0001,
+          "tipMm": [
+            9.980199457749272,
+            -9.48171873079206e-07,
+            -0.8279912580572069
+          ],
+          "maxStrain": 9.729892131993267e-07
+        }
+      ],
+      "folds": [
+        {
+          "thickness": 0.45,
+          "report": {
+            "experiment": "fold",
+            "model": "continuous-curvature-sheet@1",
+            "nodes": 637,
+            "activeNodes": 637,
+            "steps": 720,
+            "simulationSeconds": 3.000000000000044,
+            "stepHz": 240,
+            "constraints": 6964,
+            "maxTensileStrain": 0.004103696537056667,
+            "maxStretch": 0.004103696537056667,
+            "maxYarnStretch": 0,
+            "maxStrainHistory": 0.005039230632085445,
+            "kineticJ": 3.836309698027908e-13,
+            "contacts": 212354,
+            "contactDetail": {
+              "vertexFace": 425,
+              "edgeEdge": 0,
+              "sweptCrossings": 0,
+              "candidates": 15024
+            },
+            "selfCollision": true,
+            "maxContactHistory": 769,
+            "contactThicknessMm": 0.45000000000000007,
+            "contactSeparationMm": 0.468,
+            "bendingRigidityNm": 2.686224489795919e-07,
+            "minimumBendRadiusMm": 2.2500000000000004,
+            "massKg": 0.0032400000000000055,
+            "fold": 1,
+            "gripEnabled": true,
+            "tableSupport": true,
+            "gravityNormalMS2": 9.81,
+            "curvatureStencils": 1150,
+            "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+            "centralStencils": 13,
+            "foldProfileMm": [
+              [
+                -50,
+                0,
+                0
+              ],
+              [
+                -47.91666666666667,
+                0,
+                0
+              ],
+              [
+                -45.833344801254654,
+                -0.0006540020615864517,
+                4.3875845604702155e-05
+              ],
+              [
+                -43.75002860237788,
+                -0.0027959531577900127,
+                0.004445096095394845
+              ],
+              [
+                -41.666711800272616,
+                -0.002719578512528669,
+                4.388452478142917e-05
+              ],
+              [
+                -39.58347751015825,
+                0.016311744359403614,
+                1.1342066787854174e-07
+              ],
+              [
+                -37.500543879959665,
+                -0.023872557443095663,
+                6.75058760416494e-11
+              ],
+              [
+                -35.41724531441607,
+                -0.03355537800806036,
+                4.463581726177081e-22
+              ],
+              [
+                -33.333926468815626,
+                -0.030668959139219965,
+                1.518976712306231e-19
+              ],
+              [
+                -31.250615223776403,
+                -0.02434531502235213,
+                1.507904572148261e-21
+              ],
+              [
+                -29.167296152513938,
+                -0.02181849760396425,
+                3.924504987883049e-24
+              ],
+              [
+                -27.08397581694496,
+                -0.021699905499257537,
+                1.444811699960894e-14
+              ],
+              [
+                -25.000655716972723,
+                -0.021650850670929762,
+                2.8123606910064617e-11
+              ],
+              [
+                -22.917336158624163,
+                -0.022204028774348444,
+                1.145888748619873e-08
+              ],
+              [
+                -20.83489157250377,
+                0.038151721555022264,
+                1.253541186806194e-06
+              ],
+              [
+                -18.751590393763998,
+                0.046778305122172646,
+                1.1636821866109565e-05
+              ],
+              [
+                -16.668555446911096,
+                0.012369517942754505,
+                5.585994760407826e-06
+              ],
+              [
+                -14.585255525771618,
+                0.021310468609853465,
+                5.565457451953599e-08
+              ],
+              [
+                -12.502909256005786,
+                -0.042359556384674465,
+                9.855407224692119e-10
+              ],
+              [
+                -10.419590994696351,
+                -0.04411628564436699,
+                1.4286402798176996e-06
+              ],
+              [
+                -8.33628282973694,
+                -0.03739305747925148,
+                0.000531033468394311
+              ],
+              [
+                -6.253588777795936,
+                -0.04128295201538864,
+                0.051414287376266965
+              ],
+              [
+                -4.170286184862228,
+                -0.04671074051621924,
+                0.05784759461364984
+              ],
+              [
+                -2.087743999074685,
+                -0.05147288461972798,
+                0.0009749536296281326
+              ],
+              [
+                0.0028963888400192262,
+                -0.05436291281054598,
+                0
+              ],
+              [
+                1.8679109437795647,
+                -0.06589968571807567,
+                0.9017389012585959
+              ],
+              [
+                2.254618879105174,
+                -0.07839056900208656,
+                2.9275973356674547
+              ],
+              [
+                0.8121732982340332,
+                -0.09215400919085281,
+                4.437267773847172
+              ],
+              [
+                -1.261506905550454,
+                -0.10590923461378579,
+                4.169520846730201
+              ],
+              [
+                -3.03304743654232,
+                -0.11662436123534888,
+                3.072806405091352
+              ],
+              [
+                -4.758820281074626,
+                -0.1271701179626356,
+                1.905780403885593
+              ],
+              [
+                -6.609628023399838,
+                -0.13702746256960263,
+                0.9493756581561806
+              ],
+              [
+                -8.639135124429176,
+                -0.1454104407265244,
+                0.4789549158285248
+              ],
+              [
+                -10.722208243311492,
+                -0.17693187477320724,
+                0.469365930611898
+              ],
+              [
+                -12.804896505009161,
+                -0.22096953604228442,
+                0.4970120343331131
+              ],
+              [
+                -14.88786526021864,
+                -0.1938430454644541,
+                0.46869441600453554
+              ],
+              [
+                -16.97118147180881,
+                -0.18723223623045188,
+                0.47550416611581786
+              ],
+              [
+                -19.05443792948537,
+                -0.20573617288890617,
+                0.4753404036189557
+              ],
+              [
+                -21.137762583038448,
+                -0.19824785118794094,
+                0.47316015100594816
+              ],
+              [
+                -23.22105924132212,
+                -0.19380111310156256,
+                0.48578429031327564
+              ],
+              [
+                -25.30438444324627,
+                -0.18595336471475332,
+                0.48521317669041464
+              ],
+              [
+                -27.38770504284176,
+                -0.1768667064924471,
+                0.4849668050792589
+              ],
+              [
+                -29.471020080112016,
+                -0.16649873652587796,
+                0.4851452593440252
+              ],
+              [
+                -31.55431281414485,
+                -0.15408884511140403,
+                0.49209877484412706
+              ],
+              [
+                -33.637249321530376,
+                -0.12068634896345003,
+                0.4681937086410584
+              ],
+              [
+                -35.720533214179866,
+                -0.10753864857116943,
+                0.476394445519761
+              ],
+              [
+                -37.803852826475314,
+                -0.09800612802735227,
+                0.47768766975277294
+              ],
+              [
+                -39.8871909939073,
+                -0.09522094485781975,
+                0.47578376935129296
+              ],
+              [
+                -41.97046971835686,
+                -0.07967011261861609,
+                0.475488219521824
+              ]
+            ],
+            "maxNeighbourTurnDegrees": 54.50128020070942,
+            "curvedSegments": 8,
+            "curvedWidthMm": 16.650181862687603,
+            "totalTurnDegrees": 277.2883538147908,
+            "upperOpeningDegrees": 0.044910882319893604,
+            "brokenBonds": 0,
+            "brokenStitches": 0,
+            "maxCrackGapMm": 0,
+            "maxStitchForceN": 0,
+            "stitchEnabled": false,
+            "events": [],
+            "topology": {
+              "activeSheetNodes": 637,
+              "totalMassKg": 0.0032400000000000055,
+              "material": {
+                "thicknessMm": 0.45,
+                "arealDensityKgM2": 0.45,
+                "automaticMass": false,
+                "nominalGsm": 450,
+                "warpCompliance": 1.5555555555555555e-05,
+                "weftCompliance": 2.1777777777777776e-05,
+                "shearCompliance": 0.0077777777777777776,
+                "bendCompliance": 1.5056241426611794,
+                "bundleDensityKgM3": 999.9999999999999,
+                "collisionRadiusM": 0.00022500000000000002,
+                "warpStiffness": 1,
+                "weftStiffness": 1,
+                "bendStiffness": 1,
+                "calibrated": false,
+                "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+              },
+              "inactiveHoleNodes": 0,
+              "continuousSheet": true,
+              "duplicatedInterface": false,
+              "triangles": 1152
+            },
+            "ownedTypedArrayBytes": 254845,
+            "lastStepMs": 39.428171999999904,
+            "unmeasuredCoefficients": true,
+            "limits": [
+              "No tearing or new seam mechanics in R14",
+              "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+              "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+              "One table-supported folding fixture, not a validated full garment solver",
+              "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+            ]
+          },
+          "samples": [
+            {
+              "steps": 24,
+              "strain": 0.0002059528773445951,
+              "turn": 5.372490995967773
+            },
+            {
+              "steps": 48,
+              "strain": 0.0003192232061033362,
+              "turn": 4.094752588804528
+            },
+            {
+              "steps": 72,
+              "strain": 0.0003560319769555509,
+              "turn": 3.4858590147307673
+            },
+            {
+              "steps": 96,
+              "strain": 0.00035343579585833673,
+              "turn": 3.258864785077038
+            },
+            {
+              "steps": 120,
+              "strain": 0.00033566406705443086,
+              "turn": 3.1849349829777114
+            },
+            {
+              "steps": 144,
+              "strain": 0.00031493444489649747,
+              "turn": 3.705051674414952
+            },
+            {
+              "steps": 168,
+              "strain": 0.00029688544450490184,
+              "turn": 4.940820582663438
+            },
+            {
+              "steps": 192,
+              "strain": 0.00028140743007365465,
+              "turn": 6.86051997608089
+            },
+            {
+              "steps": 216,
+              "strain": 0.0002678375340241512,
+              "turn": 9.691754460206607
+            },
+            {
+              "steps": 240,
+              "strain": 0.0002563333221756725,
+              "turn": 13.85080030906644
+            },
+            {
+              "steps": 264,
+              "strain": 0.00024636092366847606,
+              "turn": 19.771041652528535
+            },
+            {
+              "steps": 288,
+              "strain": 0.00023208001746133355,
+              "turn": 26.91424369521963
+            },
+            {
+              "steps": 312,
+              "strain": 0.00021250112789328313,
+              "turn": 37.7727255071409
+            },
+            {
+              "steps": 336,
+              "strain": 0.00019794989111976413,
+              "turn": 50.34407180556476
+            },
+            {
+              "steps": 360,
+              "strain": 0.00042591093852628603,
+              "turn": 53.17904823153022
+            },
+            {
+              "steps": 384,
+              "strain": 0.0015778054579467238,
+              "turn": 53.48693430350908
+            },
+            {
+              "steps": 408,
+              "strain": 0.0033938527924999295,
+              "turn": 54.37644589971152
+            },
+            {
+              "steps": 432,
+              "strain": 0.003826495334815716,
+              "turn": 54.37034076680361
+            },
+            {
+              "steps": 456,
+              "strain": 0.005039230632085445,
+              "turn": 54.673936813857736
+            },
+            {
+              "steps": 480,
+              "strain": 0.004564560392810391,
+              "turn": 54.57692025300776
+            },
+            {
+              "steps": 504,
+              "strain": 0.004448486070050661,
+              "turn": 54.14496167856103
+            },
+            {
+              "steps": 528,
+              "strain": 0.0030877885161784135,
+              "turn": 53.95586865261094
+            },
+            {
+              "steps": 552,
+              "strain": 0.004092045034512548,
+              "turn": 54.48571377002067
+            },
+            {
+              "steps": 576,
+              "strain": 0.004110667608703711,
+              "turn": 54.50320357678992
+            },
+            {
+              "steps": 600,
+              "strain": 0.004088221089418864,
+              "turn": 54.50041836765927
+            },
+            {
+              "steps": 624,
+              "strain": 0.004087095293214604,
+              "turn": 54.5009388417889
+            },
+            {
+              "steps": 648,
+              "strain": 0.004087290522510889,
+              "turn": 54.50101704850666
+            },
+            {
+              "steps": 672,
+              "strain": 0.004093020448052043,
+              "turn": 54.501113529584096
+            },
+            {
+              "steps": 696,
+              "strain": 0.004098848013911693,
+              "turn": 54.50120724515767
+            },
+            {
+              "steps": 720,
+              "strain": 0.004103696537056667,
+              "turn": 54.50128020070942
+            }
+          ]
+        },
+        {
+          "thickness": 0.7,
+          "report": {
+            "experiment": "fold",
+            "model": "continuous-curvature-sheet@1",
+            "nodes": 637,
+            "activeNodes": 637,
+            "steps": 720,
+            "simulationSeconds": 3.000000000000044,
+            "stepHz": 240,
+            "constraints": 6964,
+            "maxTensileStrain": 0.006300798956816678,
+            "maxStretch": 0.006300798956816678,
+            "maxYarnStretch": 0,
+            "maxStrainHistory": 0.006315433926298519,
+            "kineticJ": 1.8137411882055844e-12,
+            "contacts": 176895,
+            "contactDetail": {
+              "vertexFace": 349,
+              "edgeEdge": 0,
+              "sweptCrossings": 0,
+              "candidates": 16700
+            },
+            "selfCollision": true,
+            "maxContactHistory": 479,
+            "contactThicknessMm": 0.7,
+            "contactSeparationMm": 0.728,
+            "bendingRigidityNm": 6.5e-07,
+            "minimumBendRadiusMm": 3.5,
+            "massKg": 0.0032400000000000055,
+            "fold": 1,
+            "gripEnabled": true,
+            "tableSupport": true,
+            "gravityNormalMS2": 9.81,
+            "curvatureStencils": 1150,
+            "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+            "centralStencils": 13,
+            "foldProfileMm": [
+              [
+                -50,
+                0,
+                0
+              ],
+              [
+                -47.91666666666667,
+                0,
+                0
+              ],
+              [
+                -45.833333207754436,
+                -5.985427616922221e-05,
+                6.877001583509747e-05
+              ],
+              [
+                -43.750001659088895,
+                0.00015847664494554633,
+                0.0028033083939752353
+              ],
+              [
+                -41.666668854177225,
+                0.0005998276378673613,
+                0.0037207741981598115
+              ],
+              [
+                -39.583349827973436,
+                0.007233770924873323,
+                9.293607502410247e-05
+              ],
+              [
+                -37.50001883639955,
+                0.010078122478692013,
+                5.314949946285087e-07
+              ],
+              [
+                -35.41668893162416,
+                0.0063868147216376145,
+                1.0784439948467477e-22
+              ],
+              [
+                -33.333360367436185,
+                0.0018918531758975576,
+                1.2835318068321297e-20
+              ],
+              [
+                -31.250036937504937,
+                -0.004615220800018488,
+                6.616807301328226e-20
+              ],
+              [
+                -29.16681615606794,
+                0.017090003435543715,
+                1.6849388879273864e-21
+              ],
+              [
+                -27.08348248682903,
+                0.017550704764469873,
+                9.731416654964832e-24
+              ],
+              [
+                -25.000165960206175,
+                0.00903776255872951,
+                7.712150801791266e-17
+              ],
+              [
+                -22.91686078262483,
+                -0.001932343526585644,
+                1.5581237749408898e-14
+              ],
+              [
+                -20.833566370087592,
+                -0.014805247521571979,
+                7.748199462635332e-13
+              ],
+              [
+                -18.750266005881173,
+                -0.02669809263821571,
+                6.876756885997198e-15
+              ],
+              [
+                -16.666994250233575,
+                -0.04289754745176988,
+                2.746910740187646e-06
+              ],
+              [
+                -14.583707558518027,
+                -0.028714910071693238,
+                0.00048108346474339366
+              ],
+              [
+                -12.5004755966787,
+                -0.021261666350581708,
+                0.01980013478125276
+              ],
+              [
+                -10.417376800378454,
+                -0.022906199524814454,
+                0.05106157926211102
+              ],
+              [
+                -8.334206301635188,
+                -0.024667059192738115,
+                0.07703385337300422
+              ],
+              [
+                -6.250889136566916,
+                -0.025911420548421292,
+                0.06845623140442712
+              ],
+              [
+                -4.168430158939501,
+                -0.027030878088516664,
+                0.007847119740452121
+              ],
+              [
+                -2.0721711877266022,
+                -0.027689232822385956,
+                0
+              ],
+              [
+                -0.05665124491207452,
+                -0.032941577358202016,
+                0.479047950447874
+              ],
+              [
+                1.3046743481912786,
+                -0.036260624852228376,
+                2.0137139075906743
+              ],
+              [
+                1.419066045593423,
+                -0.038786527294254615,
+                4.0806922397870915
+              ],
+              [
+                0.2362345520439077,
+                -0.04294367312163732,
+                5.796733758852654
+              ],
+              [
+                -1.7438477204689573,
+                -0.04974919434985154,
+                6.484412139859946
+              ],
+              [
+                -3.759772130354449,
+                -0.05623800205241493,
+                5.930594672998829
+              ],
+              [
+                -5.529057599634368,
+                -0.059426457204589916,
+                4.831468940398039
+              ],
+              [
+                -7.227069531825922,
+                -0.06301074864410248,
+                3.624346640795226
+              ],
+              [
+                -8.957194240904009,
+                -0.06697473675741011,
+                2.4637402375826722
+              ],
+              [
+                -10.811317014060814,
+                -0.07059167659833981,
+                1.5137352768217007
+              ],
+              [
+                -12.799272687478343,
+                -0.07295215533465531,
+                0.8906076941086015
+              ],
+              [
+                -14.876765412191336,
+                -0.06878607743779952,
+                0.7348146259580524
+              ],
+              [
+                -16.95995855101244,
+                -0.07778802151750606,
+                0.7574479801710949
+              ],
+              [
+                -19.043106784504722,
+                -0.08017501539637772,
+                0.7294605285058076
+              ],
+              [
+                -21.12635532087588,
+                -0.09410449498330208,
+                0.7428758956515586
+              ],
+              [
+                -23.20965454229224,
+                -0.10667124472025355,
+                0.7399840371214319
+              ],
+              [
+                -25.292978621062897,
+                -0.11458440002497466,
+                0.7379965696885383
+              ],
+              [
+                -27.3763193012699,
+                -0.1139030401376886,
+                0.7372588571878345
+              ],
+              [
+                -29.459582703354116,
+                -0.10989668083976971,
+                0.7548698316945893
+              ],
+              [
+                -31.54260700190141,
+                -0.08476197940486917,
+                0.7285701027584407
+              ],
+              [
+                -33.62592675970892,
+                -0.08504153201647897,
+                0.7382786505915448
+              ],
+              [
+                -35.70926826184301,
+                -0.08242739558526635,
+                0.7382037940834434
+              ],
+              [
+                -37.79259422073079,
+                -0.07388430645373013,
+                0.7371647544737613
+              ],
+              [
+                -39.87588329182107,
+                -0.059079415861152305,
+                0.7346537946712646
+              ],
+              [
+                -41.959185102632325,
+                -0.04813036018058044,
+                0.7402324941218639
+              ]
+            ],
+            "maxNeighbourTurnDegrees": 38.4069396019954,
+            "curvedSegments": 12,
+            "curvedWidthMm": 24.970252465171818,
+            "totalTurnDegrees": 267.3984548019609,
+            "upperOpeningDegrees": 0.3300044292384747,
+            "brokenBonds": 0,
+            "brokenStitches": 0,
+            "maxCrackGapMm": 0,
+            "maxStitchForceN": 0,
+            "stitchEnabled": false,
+            "events": [],
+            "topology": {
+              "activeSheetNodes": 637,
+              "totalMassKg": 0.0032400000000000055,
+              "material": {
+                "thicknessMm": 0.7,
+                "arealDensityKgM2": 0.45,
+                "automaticMass": false,
+                "nominalGsm": 450,
+                "warpCompliance": 1e-05,
+                "weftCompliance": 1.4e-05,
+                "shearCompliance": 0.005,
+                "bendCompliance": 0.4,
+                "bundleDensityKgM3": 642.8571428571429,
+                "collisionRadiusM": 0.00035,
+                "warpStiffness": 1,
+                "weftStiffness": 1,
+                "bendStiffness": 1,
+                "calibrated": false,
+                "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+              },
+              "inactiveHoleNodes": 0,
+              "continuousSheet": true,
+              "duplicatedInterface": false,
+              "triangles": 1152
+            },
+            "ownedTypedArrayBytes": 254845,
+            "lastStepMs": 41.89910700000473,
+            "unmeasuredCoefficients": true,
+            "limits": [
+              "No tearing or new seam mechanics in R14",
+              "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+              "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+              "One table-supported folding fixture, not a validated full garment solver",
+              "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+            ]
+          },
+          "samples": [
+            {
+              "steps": 24,
+              "strain": 0.0002033170715718402,
+              "turn": 3.434928780533231
+            },
+            {
+              "steps": 48,
+              "strain": 0.0003204203554882934,
+              "turn": 2.8116186101006364
+            },
+            {
+              "steps": 72,
+              "strain": 0.0003579611434472163,
+              "turn": 2.446945196841964
+            },
+            {
+              "steps": 96,
+              "strain": 0.00035567242753531403,
+              "turn": 2.3772555764409367
+            },
+            {
+              "steps": 120,
+              "strain": 0.000337916118807291,
+              "turn": 2.8674308174116048
+            },
+            {
+              "steps": 144,
+              "strain": 0.00031716362565981093,
+              "turn": 3.638821017361594
+            },
+            {
+              "steps": 168,
+              "strain": 0.00029819842517930795,
+              "turn": 4.760958683169164
+            },
+            {
+              "steps": 192,
+              "strain": 0.0002816620118279989,
+              "turn": 6.401266550930505
+            },
+            {
+              "steps": 216,
+              "strain": 0.0002674424793576158,
+              "turn": 8.580713971077124
+            },
+            {
+              "steps": 240,
+              "strain": 0.0002554979935462942,
+              "turn": 11.744503252648297
+            },
+            {
+              "steps": 264,
+              "strain": 0.00024360111581178678,
+              "turn": 15.510287050603113
+            },
+            {
+              "steps": 288,
+              "strain": 0.0002287199577202248,
+              "turn": 20.287830764704196
+            },
+            {
+              "steps": 312,
+              "strain": 0.000207502511554436,
+              "turn": 26.279712552569304
+            },
+            {
+              "steps": 336,
+              "strain": 0.0001888032776329318,
+              "turn": 33.00439968921464
+            },
+            {
+              "steps": 360,
+              "strain": 0.00035861617906407517,
+              "turn": 34.36254487840025
+            },
+            {
+              "steps": 384,
+              "strain": 0.001882989734507623,
+              "turn": 35.44352668869613
+            },
+            {
+              "steps": 408,
+              "strain": 0.004548637097814057,
+              "turn": 37.19914955284671
+            },
+            {
+              "steps": 432,
+              "strain": 0.004864713228508233,
+              "turn": 37.85979141115591
+            },
+            {
+              "steps": 456,
+              "strain": 0.005732543187996653,
+              "turn": 37.89245566852922
+            },
+            {
+              "steps": 480,
+              "strain": 0.005496255531532546,
+              "turn": 37.64882367498133
+            },
+            {
+              "steps": 504,
+              "strain": 0.0052341963905842,
+              "turn": 37.364516360521485
+            },
+            {
+              "steps": 528,
+              "strain": 0.006018972846725035,
+              "turn": 38.382519487994465
+            },
+            {
+              "steps": 552,
+              "strain": 0.006315433926298519,
+              "turn": 38.45337355703775
+            },
+            {
+              "steps": 576,
+              "strain": 0.0062384607080439025,
+              "turn": 38.389468172285746
+            },
+            {
+              "steps": 600,
+              "strain": 0.0062739643855418414,
+              "turn": 38.40838570114209
+            },
+            {
+              "steps": 624,
+              "strain": 0.006278568776477922,
+              "turn": 38.40804311577746
+            },
+            {
+              "steps": 648,
+              "strain": 0.006277879394610109,
+              "turn": 38.4072532619966
+            },
+            {
+              "steps": 672,
+              "strain": 0.00628356944225672,
+              "turn": 38.40715703546437
+            },
+            {
+              "steps": 696,
+              "strain": 0.006290749870611956,
+              "turn": 38.40706940209422
+            },
+            {
+              "steps": 720,
+              "strain": 0.006300798956816678,
+              "turn": 38.4069396019954
+            }
+          ]
+        },
+        {
+          "thickness": 1.05,
+          "report": {
+            "experiment": "fold",
+            "model": "continuous-curvature-sheet@1",
+            "nodes": 637,
+            "activeNodes": 637,
+            "steps": 720,
+            "simulationSeconds": 3.000000000000044,
+            "stepHz": 240,
+            "constraints": 6964,
+            "maxTensileStrain": 0.005332122536519712,
+            "maxStretch": 0.005332122536519712,
+            "maxYarnStretch": 0,
+            "maxStrainHistory": 0.005880144342056859,
+            "kineticJ": 6.196104974699987e-15,
+            "contacts": 123172,
+            "contactDetail": {
+              "vertexFace": 242,
+              "edgeEdge": 0,
+              "sweptCrossings": 0,
+              "candidates": 17951
+            },
+            "selfCollision": true,
+            "maxContactHistory": 317,
+            "contactThicknessMm": 1.05,
+            "contactSeparationMm": 1.092,
+            "bendingRigidityNm": 1.4625000000000006e-06,
+            "minimumBendRadiusMm": 5.250000000000001,
+            "massKg": 0.0032400000000000055,
+            "fold": 1,
+            "gripEnabled": true,
+            "tableSupport": true,
+            "gravityNormalMS2": 9.81,
+            "curvatureStencils": 1150,
+            "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+            "centralStencils": 13,
+            "foldProfileMm": [
+              [
+                -50,
+                0,
+                0
+              ],
+              [
+                -47.91666666666667,
+                0,
+                0
+              ],
+              [
+                -45.833341428646094,
+                1.950709224358815e-05,
+                2.6423819828574363e-05
+              ],
+              [
+                -43.750016413381,
+                4.4455915336354435e-05,
+                0.0007452335282980026
+              ],
+              [
+                -41.666696555090255,
+                8.608039953042456e-05,
+                0.005320185953389448
+              ],
+              [
+                -39.58337806205241,
+                0.0001369451760038246,
+                0.0002720335566286568
+              ],
+              [
+                -37.50005306987171,
+                0.0002289099159065712,
+                5.850439186901681e-05
+              ],
+              [
+                -35.416727357489876,
+                0.0003719077501799389,
+                4.69339154185708e-05
+              ],
+              [
+                -33.33340091013334,
+                0.0005361903803889998,
+                4.291077880132747e-05
+              ],
+              [
+                -31.250073707048763,
+                0.0006711679457840071,
+                4.703914328175503e-05
+              ],
+              [
+                -29.166745770530476,
+                0.0007173198563974457,
+                5.6153862102375364e-05
+              ],
+              [
+                -27.083417162647525,
+                0.0006462645072548432,
+                6.347941974358084e-05
+              ],
+              [
+                -25.00008797804042,
+                0.0005004757487156951,
+                3.067673282702995e-06
+              ],
+              [
+                -22.916757889994514,
+                0.0005938468875339467,
+                3.0405735031266076e-06
+              ],
+              [
+                -20.833427446939716,
+                -8.865618451991721e-05,
+                0.0002914368044670177
+              ],
+              [
+                -18.75010588545422,
+                -0.00041300907483082604,
+                0.0066941381310321214
+              ],
+              [
+                -16.666863631464576,
+                -0.0006761954731330671,
+                0.025909478060287924
+              ],
+              [
+                -14.5837609469726,
+                -0.000948588433743153,
+                0.05666438844534791
+              ],
+              [
+                -12.50066988990402,
+                -0.0011919811678471053,
+                0.08810130732822369
+              ],
+              [
+                -10.417375804417203,
+                -0.001407577615503028,
+                0.10014059813737355
+              ],
+              [
+                -8.33424197663376,
+                -0.0016488754785808804,
+                0.0712365064483942
+              ],
+              [
+                -6.251947498925324,
+                -0.0023814850007904884,
+                0.005189587295923634
+              ],
+              [
+                -4.157644805209612,
+                -0.004604126611291955,
+                0
+              ],
+              [
+                -2.097252097986178,
+                -0.004719586446611536,
+                0.26711107012026336
+              ],
+              [
+                -0.3402497086590558,
+                -0.003909250992903597,
+                1.3462221537264243
+              ],
+              [
+                0.6777745764287507,
+                -0.0023824666225063,
+                3.1474383423902657
+              ],
+              [
+                0.6671068600935547,
+                -0.0009071310931901122,
+                5.219686833396522
+              ],
+              [
+                -0.36775855700156845,
+                -0.0003007180874394341,
+                7.025105279221926
+              ],
+              [
+                -2.12729359591607,
+                -0.0009594472103426007,
+                8.15018599667312
+              ],
+              [
+                -4.203472152209946,
+                -0.0026193406134031112,
+                8.421065516091502
+              ],
+              [
+                -6.2139019296131,
+                -0.00431766748213091,
+                7.852721343040211
+              ],
+              [
+                -8.003814138923042,
+                -0.004373832268595049,
+                6.78719369911836
+              ],
+              [
+                -9.736475330569696,
+                -0.004301728575551293,
+                5.630331920758514
+              ],
+              [
+                -11.441725585467532,
+                -0.004399480992564313,
+                4.433440494551673
+              ],
+              [
+                -13.195949958669885,
+                -0.0045792017644209395,
+                3.309578641717698
+              ],
+              [
+                -15.045731832980437,
+                -0.004744644598963929,
+                2.351134264515719
+              ],
+              [
+                -16.99848704666469,
+                -0.004859618195404608,
+                1.6251755133739072
+              ],
+              [
+                -19.032401613246357,
+                -0.004993054871526226,
+                1.1741221749647937
+              ],
+              [
+                -21.114295478178352,
+                -0.005783314393909229,
+                1.096737760347295
+              ],
+              [
+                -23.197405795018632,
+                -0.006884352848894216,
+                1.1274100204820943
+              ],
+              [
+                -25.280475723340054,
+                -0.006519021018742253,
+                1.0939169670496474
+              ],
+              [
+                -27.36376728178481,
+                -0.00635286759260254,
+                1.1081945749808486
+              ],
+              [
+                -29.44710743812638,
+                -0.005911961193202269,
+                1.1058901820972902
+              ],
+              [
+                -31.530449112010444,
+                -0.005350812325144575,
+                1.1040563115452768
+              ],
+              [
+                -33.613792387796366,
+                -0.004690511661989823,
+                1.1028518684360975
+              ],
+              [
+                -35.697136778961664,
+                -0.0038977177887210856,
+                1.101844285835282
+              ],
+              [
+                -37.78048193009312,
+                -0.003038029591113941,
+                1.1003359216300737
+              ],
+              [
+                -39.86382664106458,
+                -0.002575041533954817,
+                1.0978971946011842
+              ],
+              [
+                -41.94709363604028,
+                -0.0025193157461464357,
+                1.1152982930290283
+              ]
+            ],
+            "maxNeighbourTurnDegrees": 29.769518842759584,
+            "curvedSegments": 15,
+            "curvedWidthMm": 31.221877959580155,
+            "totalTurnDegrees": 261.0573349792665,
+            "upperOpeningDegrees": 4.740935183650036,
+            "brokenBonds": 0,
+            "brokenStitches": 0,
+            "maxCrackGapMm": 0,
+            "maxStitchForceN": 0,
+            "stitchEnabled": false,
+            "events": [],
+            "topology": {
+              "activeSheetNodes": 637,
+              "totalMassKg": 0.0032400000000000055,
+              "material": {
+                "thicknessMm": 1.05,
+                "arealDensityKgM2": 0.45,
+                "automaticMass": false,
+                "nominalGsm": 450,
+                "warpCompliance": 6.666666666666667e-06,
+                "weftCompliance": 9.333333333333333e-06,
+                "shearCompliance": 0.003333333333333333,
+                "bendCompliance": 0.11851851851851847,
+                "bundleDensityKgM3": 428.5714285714285,
+                "collisionRadiusM": 0.0005250000000000001,
+                "warpStiffness": 1,
+                "weftStiffness": 1,
+                "bendStiffness": 1,
+                "calibrated": false,
+                "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+              },
+              "inactiveHoleNodes": 0,
+              "continuousSheet": true,
+              "duplicatedInterface": false,
+              "triangles": 1152
+            },
+            "ownedTypedArrayBytes": 254845,
+            "lastStepMs": 39.71701900000335,
+            "unmeasuredCoefficients": true,
+            "limits": [
+              "No tearing or new seam mechanics in R14",
+              "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+              "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+              "One table-supported folding fixture, not a validated full garment solver",
+              "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+            ]
+          },
+          "samples": [
+            {
+              "steps": 24,
+              "strain": 0.00019968177567086798,
+              "turn": 3.3022497301518325
+            },
+            {
+              "steps": 48,
+              "strain": 0.0003213281577976179,
+              "turn": 2.2524417865835886
+            },
+            {
+              "steps": 72,
+              "strain": 0.00035982760922714796,
+              "turn": 2.1333692715183816
+            },
+            {
+              "steps": 96,
+              "strain": 0.0003578115764886203,
+              "turn": 2.352388683604169
+            },
+            {
+              "steps": 120,
+              "strain": 0.00033988024700293273,
+              "turn": 2.813916348059256
+            },
+            {
+              "steps": 144,
+              "strain": 0.0003193415952182921,
+              "turn": 3.5215785851844243
+            },
+            {
+              "steps": 168,
+              "strain": 0.00029991222533531925,
+              "turn": 4.5182757926852055
+            },
+            {
+              "steps": 192,
+              "strain": 0.0002824850452562977,
+              "turn": 5.848114761952784
+            },
+            {
+              "steps": 216,
+              "strain": 0.00026764900970777106,
+              "turn": 7.605168110293211
+            },
+            {
+              "steps": 240,
+              "strain": 0.00025413717220845733,
+              "turn": 9.86548298874101
+            },
+            {
+              "steps": 264,
+              "strain": 0.00024077755156515224,
+              "turn": 12.528341400018101
+            },
+            {
+              "steps": 288,
+              "strain": 0.00022433256952769653,
+              "turn": 15.607371584699994
+            },
+            {
+              "steps": 312,
+              "strain": 0.0002037036180615459,
+              "turn": 19.34301309105468
+            },
+            {
+              "steps": 336,
+              "strain": 0.00018285792439654003,
+              "turn": 22.736420441699483
+            },
+            {
+              "steps": 360,
+              "strain": 0.00043923526583800054,
+              "turn": 23.049417522516674
+            },
+            {
+              "steps": 384,
+              "strain": 0.001365152610542486,
+              "turn": 24.495467017290277
+            },
+            {
+              "steps": 408,
+              "strain": 0.0029381108777402076,
+              "turn": 26.578487573654627
+            },
+            {
+              "steps": 432,
+              "strain": 0.0039995011466933406,
+              "turn": 28.51461332755427
+            },
+            {
+              "steps": 456,
+              "strain": 0.005880144342056859,
+              "turn": 31.251820535249756
+            },
+            {
+              "steps": 480,
+              "strain": 0.005187974395246986,
+              "turn": 29.75639706604227
+            },
+            {
+              "steps": 504,
+              "strain": 0.005308150618465568,
+              "turn": 30.43968806695104
+            },
+            {
+              "steps": 528,
+              "strain": 0.005422494320333815,
+              "turn": 30.524454111487135
+            },
+            {
+              "steps": 552,
+              "strain": 0.005325792664938156,
+              "turn": 29.879554850314904
+            },
+            {
+              "steps": 576,
+              "strain": 0.005331481721715825,
+              "turn": 29.790498828360963
+            },
+            {
+              "steps": 600,
+              "strain": 0.0053326073521742234,
+              "turn": 29.772954366377846
+            },
+            {
+              "steps": 624,
+              "strain": 0.005332902620803548,
+              "turn": 29.768806623483428
+            },
+            {
+              "steps": 648,
+              "strain": 0.005332807506928328,
+              "turn": 29.76850617469543
+            },
+            {
+              "steps": 672,
+              "strain": 0.005332592300755223,
+              "turn": 29.76897259387411
+            },
+            {
+              "steps": 696,
+              "strain": 0.005332357511276031,
+              "turn": 29.769336649710784
+            },
+            {
+              "steps": 720,
+              "strain": 0.005332122536519712,
+              "turn": 29.769518842759584
+            }
+          ]
+        }
+      ],
+      "webFolds": [
+        {
+          "thickness": 0.45,
+          "friction": 0.35,
+          "contract": {
+            "experiment": "fold",
+            "widthMm": 99.96,
+            "heightMm": 71.68,
+            "released": [],
+            "material": {
+              "thicknessMm": 0.45,
+              "arealDensityKgM2": 0.2892857142857143,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1.5555555555555555e-05,
+              "weftCompliance": 2.1777777777777776e-05,
+              "shearCompliance": 0.0077777777777777776,
+              "bendCompliance": 1.5056241426611794,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00022500000000000002,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            }
+          },
+          "peakSampledStrain": 0.0030606876542609296,
+          "report": {
+            "experiment": "fold",
+            "model": "continuous-curvature-sheet@1",
+            "nodes": 637,
+            "activeNodes": 637,
+            "steps": 720,
+            "simulationSeconds": 3.000000000000044,
+            "stepHz": 240,
+            "constraints": 6964,
+            "maxTensileStrain": 0.0030606876542609296,
+            "maxStretch": 0.0030606876542609296,
+            "maxYarnStretch": 0,
+            "maxStrainHistory": 0.0030606876542609296,
+            "kineticJ": 1.407553193175671e-13,
+            "contacts": 194654,
+            "contactDetail": {
+              "vertexFace": 402,
+              "edgeEdge": 0,
+              "sweptCrossings": 0,
+              "candidates": 15653
+            },
+            "selfCollision": true,
+            "maxContactHistory": 644,
+            "contactThicknessMm": 0.45000000000000007,
+            "contactSeparationMm": 0.468,
+            "bendingRigidityNm": 2.686224489795919e-07,
+            "minimumBendRadiusMm": 2.2500000000000004,
+            "massKg": 0.002072770559999993,
+            "fold": 1,
+            "gripEnabled": true,
+            "tableSupport": true,
+            "gravityNormalMS2": 9.81,
+            "curvatureStencils": 1150,
+            "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+            "centralStencils": 13,
+            "foldProfileMm": [
+              [
+                -49.98,
+                0,
+                0
+              ],
+              [
+                -47.897499999999994,
+                0,
+                0
+              ],
+              [
+                -45.81503313944071,
+                -0.0005764960349243276,
+                3.2210101061374254e-05
+              ],
+              [
+                -43.732570774045186,
+                -0.0014152372106538812,
+                0.004284900422661213
+              ],
+              [
+                -41.65010423203529,
+                -0.0014522098565665005,
+                0.0047888221107395155
+              ],
+              [
+                -39.567756240598484,
+                0.020212806049198073,
+                5.739197455069558e-06
+              ],
+              [
+                -37.48553134939693,
+                0.05190058910155544,
+                1.6858454788100943e-09
+              ],
+              [
+                -35.40539305713526,
+                -0.04653112891374032,
+                3.0120631885362893e-34
+              ],
+              [
+                -33.322926832855494,
+                -0.04688937324646382,
+                1.015114405501565e-30
+              ],
+              [
+                -31.24053600509355,
+                -0.029153867826750314,
+                8.323145783632143e-28
+              ],
+              [
+                -29.15808344921884,
+                -0.021524443052765078,
+                1.022384919302492e-30
+              ],
+              [
+                -27.0756168126055,
+                -0.022006092141831822,
+                3.098312948024934e-34
+              ],
+              [
+                -24.99315044525917,
+                -0.02300201055300483,
+                7.647816166223973e-12
+              ],
+              [
+                -22.91249851827227,
+                0.06390434906084337,
+                2.4833396347155205e-08
+              ],
+              [
+                -20.83003485248288,
+                0.067581847333315,
+                1.956950522694765e-05
+              ],
+              [
+                -18.75040895597067,
+                -0.04115632550675889,
+                2.5138273077008693e-08
+              ],
+              [
+                -16.671112972263227,
+                0.07371746141327155,
+                8.06867920397424e-12
+              ],
+              [
+                -14.591579692404283,
+                -0.03680581993105385,
+                0
+              ],
+              [
+                -12.50911557443339,
+                -0.04179465900270163,
+                2.3280740825020316e-08
+              ],
+              [
+                -10.42680789096209,
+                -0.0156938060572355,
+                6.51951257691768e-05
+              ],
+              [
+                -8.344908217707772,
+                -0.03857459601509079,
+                0.04322580390677992
+              ],
+              [
+                -6.262719804551288,
+                -0.045476090143766704,
+                0.07694729431924252
+              ],
+              [
+                -4.1802608489853545,
+                -0.05184342626689054,
+                0.07161156350024869
+              ],
+              [
+                -2.099014286889795,
+                -0.05785169115396037,
+                0.00012046184080081336
+              ],
+              [
+                -0.011914379684282033,
+                -0.06012013616550012,
+                0
+              ],
+              [
+                1.868390277902476,
+                -0.07470795710419671,
+                0.8753325403245954
+              ],
+              [
+                2.295896083481529,
+                -0.08772248380757192,
+                2.907206239185317
+              ],
+              [
+                0.9084243183688695,
+                -0.10112169188643187,
+                4.4653850227726695
+              ],
+              [
+                -1.168261755201053,
+                -0.11480663675697549,
+                4.296641237083363
+              ],
+              [
+                -3.0765461960814116,
+                -0.12620045042883685,
+                3.463038824972121
+              ],
+              [
+                -4.859533565653096,
+                -0.1372053464380014,
+                2.387073654679143
+              ],
+              [
+                -6.688916955855039,
+                -0.14773258777477533,
+                1.3920460296152617
+              ],
+              [
+                -8.648542483908125,
+                -0.1569950087341715,
+                0.6873577571572568
+              ],
+              [
+                -10.719508056680542,
+                -0.18718241564005628,
+                0.4705889077578081
+              ],
+              [
+                -12.801517200199582,
+                -0.23244450364617514,
+                0.471897518074427
+              ],
+              [
+                -14.883922627156739,
+                -0.242339235054908,
+                0.48948054277432346
+              ],
+              [
+                -16.966290872757877,
+                -0.2316832815555734,
+                0.468243082864568
+              ],
+              [
+                -19.048060601089254,
+                -0.17646910286362777,
+                0.4713276855007599
+              ],
+              [
+                -21.130011065708793,
+                -0.22428135929770654,
+                0.47602097597812987
+              ],
+              [
+                -23.21247182263965,
+                -0.21124658342254968,
+                0.47204117003092155
+              ],
+              [
+                -25.294809216529497,
+                -0.18715964522538223,
+                0.4829939167788056
+              ],
+              [
+                -27.377277484439684,
+                -0.17466739888989263,
+                0.48257022154780804
+              ],
+              [
+                -29.45973919830583,
+                -0.16106646414927242,
+                0.4827879429738905
+              ],
+              [
+                -31.542146981213236,
+                -0.14215917251712995,
+                0.4901075417708986
+              ],
+              [
+                -33.62411040938725,
+                -0.09999877000112509,
+                0.46810011422197284
+              ],
+              [
+                -35.70658430771932,
+                -0.09211238312785827,
+                0.47669268644948637
+              ],
+              [
+                -37.78896065928359,
+                -0.1154376337140019,
+                0.47709895115037565
+              ],
+              [
+                -39.871156074956104,
+                -0.07962603253781722,
+                0.4736215878021983
+              ],
+              [
+                -41.95356878433708,
+                -0.06140542757513258,
+                0.48015675021974574
+              ]
+            ],
+            "maxNeighbourTurnDegrees": 53.56384417389466,
+            "curvedSegments": 14,
+            "curvedWidthMm": 29.147611161010907,
+            "totalTurnDegrees": 296.63372373417195,
+            "upperOpeningDegrees": 0.0036491775642458544,
+            "brokenBonds": 0,
+            "brokenStitches": 0,
+            "maxCrackGapMm": 0,
+            "maxStitchForceN": 0,
+            "stitchEnabled": false,
+            "events": [],
+            "topology": {
+              "activeSheetNodes": 637,
+              "totalMassKg": 0.002072770559999993,
+              "material": {
+                "thicknessMm": 0.45,
+                "arealDensityKgM2": 0.2892857142857143,
+                "automaticMass": true,
+                "nominalGsm": 450,
+                "warpCompliance": 1.5555555555555555e-05,
+                "weftCompliance": 2.1777777777777776e-05,
+                "shearCompliance": 0.0077777777777777776,
+                "bendCompliance": 1.5056241426611794,
+                "bundleDensityKgM3": 642.8571428571429,
+                "collisionRadiusM": 0.00022500000000000002,
+                "warpStiffness": 1,
+                "weftStiffness": 1,
+                "bendStiffness": 1,
+                "calibrated": false,
+                "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+              },
+              "inactiveHoleNodes": 0,
+              "continuousSheet": true,
+              "duplicatedInterface": false,
+              "triangles": 1152
+            },
+            "ownedTypedArrayBytes": 254845,
+            "lastStepMs": 40.01350700001058,
+            "unmeasuredCoefficients": true,
+            "limits": [
+              "No tearing or new seam mechanics in R14",
+              "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+              "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+              "One table-supported folding fixture, not a validated full garment solver",
+              "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+            ]
+          }
+        },
+        {
+          "thickness": 0.7,
+          "friction": 0.35,
+          "contract": {
+            "experiment": "fold",
+            "widthMm": 99.96,
+            "heightMm": 71.68,
+            "released": [],
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            }
+          },
+          "peakSampledStrain": 0.006451230521329565,
+          "report": {
+            "experiment": "fold",
+            "model": "continuous-curvature-sheet@1",
+            "nodes": 637,
+            "activeNodes": 637,
+            "steps": 720,
+            "simulationSeconds": 3.000000000000044,
+            "stepHz": 240,
+            "constraints": 6964,
+            "maxTensileStrain": 0.00625527902181422,
+            "maxStretch": 0.00625527902181422,
+            "maxYarnStretch": 0,
+            "maxStrainHistory": 0.006451230521329565,
+            "kineticJ": 1.2731982459079642e-10,
+            "contacts": 182649,
+            "contactDetail": {
+              "vertexFace": 327,
+              "edgeEdge": 0,
+              "sweptCrossings": 0,
+              "candidates": 17060
+            },
+            "selfCollision": true,
+            "maxContactHistory": 584,
+            "contactThicknessMm": 0.7,
+            "contactSeparationMm": 0.728,
+            "bendingRigidityNm": 6.5e-07,
+            "minimumBendRadiusMm": 3.5,
+            "massKg": 0.0032243097599999894,
+            "fold": 1,
+            "gripEnabled": true,
+            "tableSupport": true,
+            "gravityNormalMS2": 9.81,
+            "curvatureStencils": 1150,
+            "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+            "centralStencils": 13,
+            "foldProfileMm": [
+              [
+                -49.98,
+                0,
+                0
+              ],
+              [
+                -47.897499999999994,
+                0,
+                0
+              ],
+              [
+                -45.81500856155735,
+                3.256622796064436e-05,
+                5.356061587621267e-05
+              ],
+              [
+                -43.73251976850174,
+                0.0016080028979223945,
+                0.0028642280607480424
+              ],
+              [
+                -41.65002957739089,
+                0.0031256689911615147,
+                0.003837249572728236
+              ],
+              [
+                -39.56754377892069,
+                0.005616509884205367,
+                7.343159360829264e-05
+              ],
+              [
+                -37.48505637359824,
+                0.009451136579138049,
+                3.534827473379132e-07
+              ],
+              [
+                -35.40257638391786,
+                0.0026058682993320387,
+                0
+              ],
+              [
+                -33.32008488453098,
+                0.0019194592933842465,
+                8.232195338594959e-15
+              ],
+              [
+                -31.237657506745204,
+                -0.014482803432500179,
+                1.6715585029567031e-12
+              ],
+              [
+                -29.155732100988583,
+                0.034095478616963,
+                8.44821859175693e-11
+              ],
+              [
+                -27.073547080068337,
+                0.06983977931944285,
+                1.677664407664574e-12
+              ],
+              [
+                -24.991072487591868,
+                0.06134722769536341,
+                8.354710592148771e-15
+              ],
+              [
+                -22.90896604782216,
+                0.02126195149094503,
+                8.085231958330053e-15
+              ],
+              [
+                -20.826669034730298,
+                -0.007275865434628958,
+                4.913228549150408e-13
+              ],
+              [
+                -18.74424102703356,
+                -0.02371989437369491,
+                4.649175799589344e-15
+              ],
+              [
+                -16.66186528106046,
+                -0.04588413403676887,
+                1.8502125797943529e-06
+              ],
+              [
+                -14.57947294453546,
+                -0.025298029850495195,
+                0.0003780456333024939
+              ],
+              [
+                -12.497096340669229,
+                -0.014481127352005557,
+                0.01970663068074075
+              ],
+              [
+                -10.414843747109982,
+                -0.016912552389908048,
+                0.05130011754333009
+              ],
+              [
+                -8.332518411821358,
+                -0.019639037094067453,
+                0.07757902903932742
+              ],
+              [
+                -6.250042164942274,
+                -0.02203601193014531,
+                0.0690432279651533
+              ],
+              [
+                -4.168449531459007,
+                -0.024578659392706873,
+                0.007574318430888633
+              ],
+              [
+                -2.076888467594804,
+                -0.02838761477908865,
+                0
+              ],
+              [
+                -0.05795428225913632,
+                -0.031159516543868292,
+                0.4774048765000272
+              ],
+              [
+                1.3042885650127727,
+                -0.032486758634866005,
+                2.01018488225214
+              ],
+              [
+                1.4210058017036709,
+                -0.033480262083439113,
+                4.076167000202443
+              ],
+              [
+                0.24085933439856222,
+                -0.03630115766540512,
+                5.792989120001255
+              ],
+              [
+                -1.737496056829629,
+                -0.041858998951328504,
+                6.483119380569634
+              ],
+              [
+                -3.753496753329555,
+                -0.04730548569396512,
+                5.932616044050565
+              ],
+              [
+                -5.522376729385443,
+                -0.04948884945274555,
+                4.834414798043813
+              ],
+              [
+                -7.22000946344296,
+                -0.05206427463172189,
+                3.628194823745089
+              ],
+              [
+                -8.949276482211294,
+                -0.05509660945027721,
+                2.4678028047222624
+              ],
+              [
+                -10.802179028815466,
+                -0.05794533725467503,
+                1.5172415243682031
+              ],
+              [
+                -12.788834414777922,
+                -0.05917371817519511,
+                0.8927504090134778
+              ],
+              [
+                -14.865306160684032,
+                -0.048221270312326966,
+                0.734830319255142
+              ],
+              [
+                -16.9476899115389,
+                -0.049831158833732965,
+                0.7570054933050699
+              ],
+              [
+                -19.03000640056623,
+                -0.05459488224750379,
+                0.7294284130080723
+              ],
+              [
+                -21.112338172042065,
+                -0.077994291921969,
+                0.7426763384999893
+              ],
+              [
+                -23.19463540910612,
+                -0.10737300401136585,
+                0.7398040000106267
+              ],
+              [
+                -25.277126813190538,
+                -0.11516494873660023,
+                0.737260862231948
+              ],
+              [
+                -27.359616356287496,
+                -0.11287871003262774,
+                0.7287091769438095
+              ],
+              [
+                -29.44191657895921,
+                -0.0995201452475774,
+                0.755007870711927
+              ],
+              [
+                -31.523689568509017,
+                -0.05086893262013578,
+                0.728574888297106
+              ],
+              [
+                -33.60616503745524,
+                -0.057410587179629095,
+                0.7385379539732447
+              ],
+              [
+                -35.688674184747924,
+                -0.05510259341995324,
+                0.7383569616123166
+              ],
+              [
+                -37.77118424798672,
+                -0.0533671859042979,
+                0.7373319819498999
+              ],
+              [
+                -39.85366635478531,
+                -0.04277563939557198,
+                0.7347455593471784
+              ],
+              [
+                -41.93615665959175,
+                -0.0370726876663735,
+                0.7401475439571414
+              ]
+            ],
+            "maxNeighbourTurnDegrees": 38.395291017063506,
+            "curvedSegments": 12,
+            "curvedWidthMm": 24.9620752628888,
+            "totalTurnDegrees": 273.71129972533925,
+            "upperOpeningDegrees": 0.3344897245695609,
+            "brokenBonds": 0,
+            "brokenStitches": 0,
+            "maxCrackGapMm": 0,
+            "maxStitchForceN": 0,
+            "stitchEnabled": false,
+            "events": [],
+            "topology": {
+              "activeSheetNodes": 637,
+              "totalMassKg": 0.0032243097599999894,
+              "material": {
+                "thicknessMm": 0.7,
+                "arealDensityKgM2": 0.45,
+                "automaticMass": true,
+                "nominalGsm": 450,
+                "warpCompliance": 1e-05,
+                "weftCompliance": 1.4e-05,
+                "shearCompliance": 0.005,
+                "bendCompliance": 0.4,
+                "bundleDensityKgM3": 642.8571428571429,
+                "collisionRadiusM": 0.00035,
+                "warpStiffness": 1,
+                "weftStiffness": 1,
+                "bendStiffness": 1,
+                "calibrated": false,
+                "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+              },
+              "inactiveHoleNodes": 0,
+              "continuousSheet": true,
+              "duplicatedInterface": false,
+              "triangles": 1152
+            },
+            "ownedTypedArrayBytes": 254845,
+            "lastStepMs": 42.58702500000072,
+            "unmeasuredCoefficients": true,
+            "limits": [
+              "No tearing or new seam mechanics in R14",
+              "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+              "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+              "One table-supported folding fixture, not a validated full garment solver",
+              "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+            ]
+          }
+        },
+        {
+          "thickness": 1.05,
+          "friction": 0.35,
+          "contract": {
+            "experiment": "fold",
+            "widthMm": 99.96,
+            "heightMm": 71.68,
+            "released": [],
+            "material": {
+              "thicknessMm": 1.05,
+              "arealDensityKgM2": 0.6750000000000002,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 6.666666666666667e-06,
+              "weftCompliance": 9.333333333333333e-06,
+              "shearCompliance": 0.003333333333333333,
+              "bendCompliance": 0.11851851851851847,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.0005250000000000001,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            }
+          },
+          "peakSampledStrain": 0.005852659661642834,
+          "report": {
+            "experiment": "fold",
+            "model": "continuous-curvature-sheet@1",
+            "nodes": 637,
+            "activeNodes": 637,
+            "steps": 720,
+            "simulationSeconds": 3.000000000000044,
+            "stepHz": 240,
+            "constraints": 6964,
+            "maxTensileStrain": 0.005845970547011747,
+            "maxStretch": 0.005845970547011747,
+            "maxYarnStretch": 0,
+            "maxStrainHistory": 0.005852659661642834,
+            "kineticJ": 9.511991550312075e-15,
+            "contacts": 132464,
+            "contactDetail": {
+              "vertexFace": 255,
+              "edgeEdge": 0,
+              "sweptCrossings": 0,
+              "candidates": 17469
+            },
+            "selfCollision": true,
+            "maxContactHistory": 355,
+            "contactThicknessMm": 1.05,
+            "contactSeparationMm": 1.092,
+            "bendingRigidityNm": 1.4625000000000006e-06,
+            "minimumBendRadiusMm": 5.250000000000001,
+            "massKg": 0.004836464639999985,
+            "fold": 1,
+            "gripEnabled": true,
+            "tableSupport": true,
+            "gravityNormalMS2": 9.81,
+            "curvatureStencils": 1150,
+            "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+            "centralStencils": 13,
+            "foldProfileMm": [
+              [
+                -49.98,
+                0,
+                0
+              ],
+              [
+                -47.897499999999994,
+                0,
+                0
+              ],
+              [
+                -45.81500731698807,
+                -6.744440907428532e-05,
+                0.00010747423459273823
+              ],
+              [
+                -43.7325154472974,
+                -0.00013377535304335552,
+                0.0018284664390625781
+              ],
+              [
+                -41.65002358085444,
+                -0.00019733615437616847,
+                0.003017078052425155
+              ],
+              [
+                -39.567533462560505,
+                -0.0003047305250948804,
+                0.00019227434656427948
+              ],
+              [
+                -37.4850400515417,
+                -0.0003678612337863915,
+                6.978842004585451e-05
+              ],
+              [
+                -35.402544894131644,
+                -0.0004096313282432467,
+                4.992081184400862e-05
+              ],
+              [
+                -33.3200479811366,
+                -0.0003954084145942253,
+                3.8365624731151274e-05
+              ],
+              [
+                -31.237549293120367,
+                -0.0003765422394157361,
+                3.771666051646874e-05
+              ],
+              [
+                -29.155048822602712,
+                -0.00039166868577530847,
+                4.777836810993268e-05
+              ],
+              [
+                -27.072546593145596,
+                -0.00044995134059756375,
+                6.503963390195507e-05
+              ],
+              [
+                -24.990042674255456,
+                -0.0005708493767548893,
+                8.101058929057605e-05
+              ],
+              [
+                -22.907537212040086,
+                -0.0007465502803193157,
+                4.93086555754576e-06
+              ],
+              [
+                -20.825029781847572,
+                -0.0007192522094048062,
+                5.532417020452598e-06
+              ],
+              [
+                -18.742521277609978,
+                -0.0013329373665275106,
+                0.0004007997979020318
+              ],
+              [
+                -16.6600228076105,
+                -0.0017221678483348365,
+                0.007455249558848184
+              ],
+              [
+                -14.577607775184934,
+                -0.002049266957416082,
+                0.027316474265977102
+              ],
+              [
+                -12.495301766612409,
+                -0.002394355347708357,
+                0.056343778631259764
+              ],
+              [
+                -10.412919302133925,
+                -0.0027253408823516923,
+                0.07912864403528817
+              ],
+              [
+                -8.33042059145745,
+                -0.0030001172912219806,
+                0.07245481371203014
+              ],
+              [
+                -6.2484440096515215,
+                -0.0035311143374912026,
+                0.0250414140698704
+              ],
+              [
+                -4.155791471563897,
+                -0.0051403720283080025,
+                0
+              ],
+              [
+                -2.0862520487019465,
+                -0.005953461909463531,
+                0.18711792728253338
+              ],
+              [
+                -0.2950074414450323,
+                -0.005593776306538708,
+                1.2021109122896876
+              ],
+              [
+                0.7595048560645293,
+                -0.004212597908399099,
+                2.978711844240752
+              ],
+              [
+                0.7534273031058897,
+                -0.00266946363215153,
+                5.048537663545622
+              ],
+              [
+                -0.31173380574100307,
+                -0.0018787101708879531,
+                6.835017865653369
+              ],
+              [
+                -2.105743064159245,
+                -0.002282018002331172,
+                7.904079830631579
+              ],
+              [
+                -4.191824302259292,
+                -0.0036917533938188194,
+                8.09354001420486
+              ],
+              [
+                -6.177400163746176,
+                -0.005381862525092081,
+                7.442498059066577
+              ],
+              [
+                -7.871294531275976,
+                -0.005435405438557071,
+                6.2315886468480794
+              ],
+              [
+                -9.538925981798288,
+                -0.005153876917851226,
+                4.984166568742765
+              ],
+              [
+                -11.215737968322431,
+                -0.005139210787328044,
+                3.749134064941642
+              ],
+              [
+                -12.984984630015669,
+                -0.005259925956539991,
+                2.6506466153879717
+              ],
+              [
+                -14.881700514897197,
+                -0.005369905220214292,
+                1.7908211776814804
+              ],
+              [
+                -16.889289272588446,
+                -0.005456422435985513,
+                1.237300276805131
+              ],
+              [
+                -18.96732232844993,
+                -0.006036420820419233,
+                1.1009548207663378
+              ],
+              [
+                -21.049747842753916,
+                -0.006965386825044988,
+                1.1195518676555203
+              ],
+              [
+                -23.1321037707996,
+                -0.00663471502166433,
+                1.0939736247320435
+              ],
+              [
+                -25.21458954015597,
+                -0.0064048599269927176,
+                1.1050818440606467
+              ],
+              [
+                -27.297105974819864,
+                -0.005973170197645447,
+                1.1030591344972132
+              ],
+              [
+                -29.379625130983545,
+                -0.005488877277286671,
+                1.1016360342852425
+              ],
+              [
+                -31.46214697321805,
+                -0.004996373089556769,
+                1.1009728624688297
+              ],
+              [
+                -33.54467111104458,
+                -0.004500134749219428,
+                1.1007453693830835
+              ],
+              [
+                -35.62719718793581,
+                -0.0039050870294297262,
+                1.1004714720084494
+              ],
+              [
+                -37.70972514015159,
+                -0.003155339398843973,
+                1.0996274793044665
+              ],
+              [
+                -39.792253063670415,
+                -0.002775430486274527,
+                1.0978023339892455
+              ],
+              [
+                -41.87476450735337,
+                -0.002758981840867238,
+                1.1014081021288535
+              ]
+            ],
+            "maxNeighbourTurnDegrees": 30.859734778196835,
+            "curvedSegments": 14,
+            "curvedWidthMm": 29.125258874096403,
+            "totalTurnDegrees": 261.4223471113594,
+            "upperOpeningDegrees": 3.3152243995914503,
+            "brokenBonds": 0,
+            "brokenStitches": 0,
+            "maxCrackGapMm": 0,
+            "maxStitchForceN": 0,
+            "stitchEnabled": false,
+            "events": [],
+            "topology": {
+              "activeSheetNodes": 637,
+              "totalMassKg": 0.004836464639999985,
+              "material": {
+                "thicknessMm": 1.05,
+                "arealDensityKgM2": 0.6750000000000002,
+                "automaticMass": true,
+                "nominalGsm": 450,
+                "warpCompliance": 6.666666666666667e-06,
+                "weftCompliance": 9.333333333333333e-06,
+                "shearCompliance": 0.003333333333333333,
+                "bendCompliance": 0.11851851851851847,
+                "bundleDensityKgM3": 642.8571428571429,
+                "collisionRadiusM": 0.0005250000000000001,
+                "warpStiffness": 1,
+                "weftStiffness": 1,
+                "bendStiffness": 1,
+                "calibrated": false,
+                "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+              },
+              "inactiveHoleNodes": 0,
+              "continuousSheet": true,
+              "duplicatedInterface": false,
+              "triangles": 1152
+            },
+            "ownedTypedArrayBytes": 254845,
+            "lastStepMs": 41.16331000000355,
+            "unmeasuredCoefficients": true,
+            "limits": [
+              "No tearing or new seam mechanics in R14",
+              "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+              "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+              "One table-supported folding fixture, not a validated full garment solver",
+              "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+            ]
+          }
+        }
+      ],
+      "clamp": {
+        "movingColumns": 2,
+        "spanMm": 2.0833333333333335,
+        "finiteStiffness": true,
+        "interiorPoseTargets": false
+      }
+    },
+    "limits": [
+      "Model and prescribed fixture tests, not measured denim certification",
+      "Numerical wall time is not a browser or GPU FPS benchmark",
+      "Surface contact is not complete continuous collision detection"
+    ]
+  },
+  "browser": {
+    "file": {
+      "passed": true,
+      "mode": "file",
+      "browserVersion": "140.0.7339.16",
+      "originalAppearance": {
+        "mean": 0.0,
+        "max": 0,
+        "gate": "exact fixed original default canvas"
+      },
+      "legacyRecipeAccepted": true,
+      "standardFold": {
+        "active": true,
+        "experiment": "fold",
+        "model": "continuous-curvature-sheet@1",
+        "nodes": 637,
+        "activeNodes": 637,
+        "steps": 720,
+        "simulationSeconds": 3.000000000000044,
+        "stepHz": 240,
+        "constraints": 6964,
+        "maxTensileStrain": 0.006255279021815108,
+        "maxStretch": 0.006255279021815108,
+        "maxYarnStretch": 0,
+        "maxStrainHistory": 0.006255279021815108,
+        "kineticJ": 1.2731982459071564e-10,
+        "contacts": 182649,
+        "contactDetail": {
+          "vertexFace": 327,
+          "edgeEdge": 0,
+          "sweptCrossings": 0,
+          "candidates": 17060
+        },
+        "selfCollision": true,
+        "maxContactHistory": 584,
+        "contactThicknessMm": 0.7,
+        "contactSeparationMm": 0.728,
+        "bendingRigidityNm": 6.5e-07,
+        "minimumBendRadiusMm": 3.5,
+        "massKg": 0.0032243097599999894,
+        "fold": 1,
+        "gripEnabled": true,
+        "tableSupport": true,
+        "gravityNormalMS2": 9.81,
+        "curvatureStencils": 1150,
+        "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+        "centralStencils": 13,
+        "foldProfileMm": [
+          [
+            -49.98,
+            0,
+            0
+          ],
+          [
+            -47.897499999999994,
+            0,
+            0
+          ],
+          [
+            -45.81500856155735,
+            3.256622795887105e-05,
+            5.3560615876086155e-05
+          ],
+          [
+            -43.73251976850174,
+            0.0016080028979277125,
+            0.002864228060748285
+          ],
+          [
+            -41.65002957739089,
+            0.003125668991173962,
+            0.0038372495727294472
+          ],
+          [
+            -39.56754377892069,
+            0.00561650988424299,
+            7.343159360813444e-05
+          ],
+          [
+            -37.48505637359824,
+            0.0094511365791818,
+            3.5348274733645633e-07
+          ],
+          [
+            -35.40257638391786,
+            0.002605868299373884,
+            0
+          ],
+          [
+            -33.32008488453098,
+            0.0019194592934069312,
+            8.232201828514575e-15
+          ],
+          [
+            -31.237657506745204,
+            -0.01448280343252987,
+            1.671559200038749e-12
+          ],
+          [
+            -29.155732100988587,
+            0.03409547861698274,
+            8.448218603843633e-11
+          ],
+          [
+            -27.07354708006834,
+            0.06983977931949846,
+            1.6776644095528876e-12
+          ],
+          [
+            -24.991072487591868,
+            0.06134722769549788,
+            8.354710599818402e-15
+          ],
+          [
+            -22.908966047822165,
+            0.021261951491063184,
+            8.085231957564905e-15
+          ],
+          [
+            -20.8266690347303,
+            -0.007275865434579658,
+            4.913228548781539e-13
+          ],
+          [
+            -18.744241027033564,
+            -0.02371989437370942,
+            4.649175799239285e-15
+          ],
+          [
+            -16.661865281060464,
+            -0.04588413403675662,
+            1.8502125797862938e-06
+          ],
+          [
+            -14.579472944535464,
+            -0.025298029850512885,
+            0.0003780456333016515
+          ],
+          [
+            -12.497096340669232,
+            -0.01448112735200706,
+            0.019706630680740467
+          ],
+          [
+            -10.414843747109984,
+            -0.016912552389920628,
+            0.051300117543331504
+          ],
+          [
+            -8.332518411821361,
+            -0.019639037094088853,
+            0.07757902903933146
+          ],
+          [
+            -6.250042164942276,
+            -0.02203601193017274,
+            0.06904322796515765
+          ],
+          [
+            -4.168449531459011,
+            -0.024578659392741422,
+            0.007574318430885943
+          ],
+          [
+            -2.0768884675948227,
+            -0.028387614779124094,
+            0
+          ],
+          [
+            -0.05795428225913945,
+            -0.031159516543914093,
+            0.47740487650002367
+          ],
+          [
+            1.304288565012772,
+            -0.03248675863492675,
+            2.0101848822521347
+          ],
+          [
+            1.421005801703673,
+            -0.03348026208351793,
+            4.076167000202438
+          ],
+          [
+            0.2408593343985688,
+            -0.03630115766550464,
+            5.792989120001251
+          ],
+          [
+            -1.7374960568296207,
+            -0.041858998951446985,
+            6.483119380569635
+          ],
+          [
+            -3.753496753329548,
+            -0.047305485694094145,
+            5.932616044050573
+          ],
+          [
+            -5.52237672938544,
+            -0.049488849452887465,
+            4.8344147980438255
+          ],
+          [
+            -7.2200094634429535,
+            -0.052064274631877905,
+            3.628194823745097
+          ],
+          [
+            -8.949276482211285,
+            -0.05509660945044594,
+            2.467802804722268
+          ],
+          [
+            -10.802179028815454,
+            -0.057945337254854026,
+            1.5172415243682007
+          ],
+          [
+            -12.788834414777908,
+            -0.05917371817538641,
+            0.8927504090134722
+          ],
+          [
+            -14.865306160684018,
+            -0.048221270312529804,
+            0.7348303192551399
+          ],
+          [
+            -16.947689911538887,
+            -0.049831158834023455,
+            0.7570054933050524
+          ],
+          [
+            -19.030006400566215,
+            -0.05459488224775108,
+            0.7294284130080716
+          ],
+          [
+            -21.11233817204205,
+            -0.07799429192227376,
+            0.7426763384999889
+          ],
+          [
+            -23.194635409106105,
+            -0.10737300401167095,
+            0.7398040000106199
+          ],
+          [
+            -25.277126813190527,
+            -0.11516494873680591,
+            0.7372608622319409
+          ],
+          [
+            -27.359616356287482,
+            -0.11287871003283896,
+            0.7287091769438091
+          ],
+          [
+            -29.441916578959198,
+            -0.09952014524779225,
+            0.75500787071191
+          ],
+          [
+            -31.523689568509003,
+            -0.050868932620278376,
+            0.7285748882971057
+          ],
+          [
+            -33.60616503745523,
+            -0.057410587179811665,
+            0.7385379539732443
+          ],
+          [
+            -35.68867418474791,
+            -0.055102593420146506,
+            0.7383569616123148
+          ],
+          [
+            -37.77118424798671,
+            -0.0533671859044732,
+            0.7373319819498977
+          ],
+          [
+            -39.8536663547853,
+            -0.04277563939571217,
+            0.7347455593471766
+          ],
+          [
+            -41.93615665959174,
+            -0.03707268766648091,
+            0.7401475439571412
+          ]
+        ],
+        "maxNeighbourTurnDegrees": 38.395291017063485,
+        "curvedSegments": 12,
+        "curvedWidthMm": 24.962075262888806,
+        "totalTurnDegrees": 273.7112997253408,
+        "upperOpeningDegrees": 0.3344897245695531,
+        "brokenBonds": 0,
+        "brokenStitches": 0,
+        "maxCrackGapMm": 0,
+        "maxStitchForceN": 0,
+        "stitchEnabled": false,
+        "events": [],
+        "topology": {
+          "activeSheetNodes": 637,
+          "totalMassKg": 0.0032243097599999894,
+          "material": {
+            "thicknessMm": 0.7,
+            "arealDensityKgM2": 0.45,
+            "automaticMass": true,
+            "nominalGsm": 450,
+            "warpCompliance": 1e-05,
+            "weftCompliance": 1.4e-05,
+            "shearCompliance": 0.005,
+            "bendCompliance": 0.4,
+            "bundleDensityKgM3": 642.8571428571429,
+            "collisionRadiusM": 0.00035,
+            "warpStiffness": 1,
+            "weftStiffness": 1,
+            "bendStiffness": 1,
+            "calibrated": false,
+            "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+          },
+          "inactiveHoleNodes": 0,
+          "continuousSheet": true,
+          "duplicatedInterface": false,
+          "triangles": 1152
+        },
+        "ownedTypedArrayBytes": 254845,
+        "lastStepMs": 30.100000000034925,
+        "unmeasuredCoefficients": true,
+        "limits": [
+          "No tearing or new seam mechanics in R14",
+          "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+          "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+          "One table-supported folding fixture, not a validated full garment solver",
+          "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+        ],
+        "solverMs": 0,
+        "droppedWallSeconds": 0,
+        "playing": false,
+        "damageProxy": "intact directional cloth"
+      },
+      "thicknessCases": [
+        {
+          "active": true,
+          "experiment": "fold",
+          "model": "continuous-curvature-sheet@1",
+          "nodes": 637,
+          "activeNodes": 637,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "constraints": 6964,
+          "maxTensileStrain": 0.003060687654282912,
+          "maxStretch": 0.003060687654282912,
+          "maxYarnStretch": 0,
+          "maxStrainHistory": 0.003060687654282912,
+          "kineticJ": 1.4075531930614481e-13,
+          "contacts": 194654,
+          "contactDetail": {
+            "vertexFace": 402,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 15653
+          },
+          "selfCollision": true,
+          "maxContactHistory": 644,
+          "contactThicknessMm": 0.45000000000000007,
+          "contactSeparationMm": 0.468,
+          "bendingRigidityNm": 2.686224489795919e-07,
+          "minimumBendRadiusMm": 2.2500000000000004,
+          "massKg": 0.002072770559999993,
+          "fold": 1,
+          "gripEnabled": true,
+          "tableSupport": true,
+          "gravityNormalMS2": 9.81,
+          "curvatureStencils": 1150,
+          "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+          "centralStencils": 13,
+          "foldProfileMm": [
+            [
+              -49.98,
+              0,
+              0
+            ],
+            [
+              -47.897499999999994,
+              0,
+              0
+            ],
+            [
+              -45.81503313944071,
+              -0.0005764960347911971,
+              3.22101010619285e-05
+            ],
+            [
+              -43.732570774045186,
+              -0.0014152372102859284,
+              0.004284900422652972
+            ],
+            [
+              -41.65010423203529,
+              -0.0014522098559518763,
+              0.0047888221107352125
+            ],
+            [
+              -39.567756240598484,
+              0.020212806050037235,
+              5.739197455178305e-06
+            ],
+            [
+              -37.48553134939695,
+              0.0519005891034151,
+              1.6858454788772395e-09
+            ],
+            [
+              -35.40539305713526,
+              -0.04653112891163364,
+              3.3720132844900333e-34
+            ],
+            [
+              -33.3229268328555,
+              -0.046889373244228684,
+              1.1364234567177499e-30
+            ],
+            [
+              -31.24053600509355,
+              -0.029153867824551323,
+              9.317785316380505e-28
+            ],
+            [
+              -29.158083449218843,
+              -0.021524443050596937,
+              1.1445628175439907e-30
+            ],
+            [
+              -27.075616812605503,
+              -0.02200609213923777,
+              3.4685701349331584e-34
+            ],
+            [
+              -24.993150445259175,
+              -0.023002010550297325,
+              7.647816166788873e-12
+            ],
+            [
+              -22.912498518272212,
+              0.0639043490621892,
+              2.4833396348538912e-08
+            ],
+            [
+              -20.83003485248282,
+              0.06758184733449511,
+              1.956950522771491e-05
+            ],
+            [
+              -18.750408955970528,
+              -0.04115632550397725,
+              2.5138273078437538e-08
+            ],
+            [
+              -16.671112972263003,
+              0.073717461414618,
+              8.0686792045976e-12
+            ],
+            [
+              -14.591579692403982,
+              -0.036805819928212274,
+              0
+            ],
+            [
+              -12.509115574433089,
+              -0.0417946589997865,
+              2.3280740825624185e-08
+            ],
+            [
+              -10.426807890961827,
+              -0.015693806051506942,
+              6.519512576992613e-05
+            ],
+            [
+              -8.344908217707554,
+              -0.03857459601359579,
+              0.04322580390679752
+            ],
+            [
+              -6.262719804551072,
+              -0.04547609014255162,
+              0.07694729431923927
+            ],
+            [
+              -4.180260848985139,
+              -0.05184342626589161,
+              0.07161156350025362
+            ],
+            [
+              -2.099014286889579,
+              -0.057851691153217824,
+              0.00012046184080159917
+            ],
+            [
+              -0.011914379684058162,
+              -0.06012013616495533,
+              0
+            ],
+            [
+              1.8683902779026091,
+              -0.07470795710394668,
+              0.8753325403247527
+            ],
+            [
+              2.29589608348148,
+              -0.0877224838077476,
+              2.9072062391855376
+            ],
+            [
+              0.9084243183686743,
+              -0.10112169188702548,
+              4.465385022772716
+            ],
+            [
+              -1.1682617552012167,
+              -0.11480663675793427,
+              4.296641237083474
+            ],
+            [
+              -3.0765461960816127,
+              -0.12620045043016834,
+              3.4630388249722857
+            ],
+            [
+              -4.859533565653327,
+              -0.13720534643969234,
+              2.3870736546793596
+            ],
+            [
+              -6.688916955855282,
+              -0.14773258777679238,
+              1.3920460296155024
+            ],
+            [
+              -8.64854248390841,
+              -0.1569950087366474,
+              0.68735775715762
+            ],
+            [
+              -10.71950805668075,
+              -0.1871824156453681,
+              0.4705889077578289
+            ],
+            [
+              -12.801517200199806,
+              -0.2324445036506028,
+              0.47189751807428715
+            ],
+            [
+              -14.883922627156966,
+              -0.24233923505908342,
+              0.48948054277404157
+            ],
+            [
+              -16.9662908727581,
+              -0.23168328155823031,
+              0.4682430828645654
+            ],
+            [
+              -19.048060601089457,
+              -0.1764691028656776,
+              0.4713276855006723
+            ],
+            [
+              -21.130011065708985,
+              -0.22428135930033438,
+              0.4760209759778813
+            ],
+            [
+              -23.212471822639845,
+              -0.21124658342547986,
+              0.4720411700306715
+            ],
+            [
+              -25.294809216529703,
+              -0.1871596452295516,
+              0.48299391677878345
+            ],
+            [
+              -27.377277484439894,
+              -0.17466739889400884,
+              0.48257022154772944
+            ],
+            [
+              -29.459739198306032,
+              -0.16106646415312367,
+              0.48278794297363625
+            ],
+            [
+              -31.542146981213445,
+              -0.14215917252115223,
+              0.49010754177067284
+            ],
+            [
+              -33.62411040938744,
+              -0.09999877000433813,
+              0.4681001142219717
+            ],
+            [
+              -35.70658430771951,
+              -0.09211238313092202,
+              0.47669268644926654
+            ],
+            [
+              -37.78896065928379,
+              -0.11543763371592719,
+              0.4770989511504078
+            ],
+            [
+              -39.871156074956296,
+              -0.07962603253932383,
+              0.4736215878021012
+            ],
+            [
+              -41.95356878433727,
+              -0.061405427576488446,
+              0.48015675021974735
+            ]
+          ],
+          "maxNeighbourTurnDegrees": 53.56384417389548,
+          "curvedSegments": 14,
+          "curvedWidthMm": 29.14761116101087,
+          "totalTurnDegrees": 296.63372373408106,
+          "upperOpeningDegrees": 0.003649177564336212,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "maxStitchForceN": 0,
+          "stitchEnabled": false,
+          "events": [],
+          "topology": {
+            "activeSheetNodes": 637,
+            "totalMassKg": 0.002072770559999993,
+            "material": {
+              "thicknessMm": 0.45,
+              "arealDensityKgM2": 0.2892857142857143,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1.5555555555555555e-05,
+              "weftCompliance": 2.1777777777777776e-05,
+              "shearCompliance": 0.0077777777777777776,
+              "bendCompliance": 1.5056241426611794,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00022500000000000002,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "inactiveHoleNodes": 0,
+            "continuousSheet": true,
+            "duplicatedInterface": false,
+            "triangles": 1152
+          },
+          "ownedTypedArrayBytes": 254845,
+          "lastStepMs": 50.5,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "No tearing or new seam mechanics in R14",
+            "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+            "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+            "One table-supported folding fixture, not a validated full garment solver",
+            "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+          ],
+          "solverMs": 0,
+          "droppedWallSeconds": 0,
+          "playing": false,
+          "damageProxy": "intact directional cloth"
+        },
+        {
+          "active": true,
+          "experiment": "fold",
+          "model": "continuous-curvature-sheet@1",
+          "nodes": 637,
+          "activeNodes": 637,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "constraints": 6964,
+          "maxTensileStrain": 0.005845970547011969,
+          "maxStretch": 0.005845970547011969,
+          "maxYarnStretch": 0,
+          "maxStrainHistory": 0.005845970547011969,
+          "kineticJ": 9.511991548462737e-15,
+          "contacts": 132464,
+          "contactDetail": {
+            "vertexFace": 255,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 17469
+          },
+          "selfCollision": true,
+          "maxContactHistory": 355,
+          "contactThicknessMm": 1.05,
+          "contactSeparationMm": 1.092,
+          "bendingRigidityNm": 1.4625000000000006e-06,
+          "minimumBendRadiusMm": 5.250000000000001,
+          "massKg": 0.004836464639999985,
+          "fold": 1,
+          "gripEnabled": true,
+          "tableSupport": true,
+          "gravityNormalMS2": 9.81,
+          "curvatureStencils": 1150,
+          "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+          "centralStencils": 13,
+          "foldProfileMm": [
+            [
+              -49.98,
+              0,
+              0
+            ],
+            [
+              -47.897499999999994,
+              0,
+              0
+            ],
+            [
+              -45.81500731698807,
+              -6.744440907578571e-05,
+              0.00010747423459273392
+            ],
+            [
+              -43.7325154472974,
+              -0.0001337753530434303,
+              0.0018284664390625504
+            ],
+            [
+              -41.65002358085444,
+              -0.00019733615437256193,
+              0.003017078052425375
+            ],
+            [
+              -39.567533462560505,
+              -0.0003047305250934141,
+              0.00019227434656429095
+            ],
+            [
+              -37.4850400515417,
+              -0.0003678612337894432,
+              6.978842004586038e-05
+            ],
+            [
+              -35.402544894131644,
+              -0.0004096313282427259,
+              4.992081184400988e-05
+            ],
+            [
+              -33.3200479811366,
+              -0.00039540841459461746,
+              3.836562473114849e-05
+            ],
+            [
+              -31.237549293120367,
+              -0.00037654223941559206,
+              3.771666051647161e-05
+            ],
+            [
+              -29.15504882260271,
+              -0.0003916686857743364,
+              4.777836810993965e-05
+            ],
+            [
+              -27.072546593145596,
+              -0.00044995134059029796,
+              6.503963390195187e-05
+            ],
+            [
+              -24.990042674255456,
+              -0.0005708493767479321,
+              8.101058929055251e-05
+            ],
+            [
+              -22.907537212040086,
+              -0.0007465502803171711,
+              4.930865557544235e-06
+            ],
+            [
+              -20.825029781847572,
+              -0.0007192522093923305,
+              5.532417020453247e-06
+            ],
+            [
+              -18.742521277609978,
+              -0.0013329373665186372,
+              0.0004007997979020476
+            ],
+            [
+              -16.6600228076105,
+              -0.001722167848328565,
+              0.007455249558848297
+            ],
+            [
+              -14.577607775184934,
+              -0.0020492669574091724,
+              0.02731647426597721
+            ],
+            [
+              -12.495301766612409,
+              -0.0023943553477041597,
+              0.056343778631259674
+            ],
+            [
+              -10.412919302133925,
+              -0.00272534088234515,
+              0.07912864403528773
+            ],
+            [
+              -8.33042059145745,
+              -0.0030001172912175705,
+              0.07245481371202933
+            ],
+            [
+              -6.2484440096515215,
+              -0.0035311143374888816,
+              0.025041414069870045
+            ],
+            [
+              -4.155791471563895,
+              -0.005140372028305212,
+              0
+            ],
+            [
+              -2.0862520487019465,
+              -0.005953461909460872,
+              0.18711792728253682
+            ],
+            [
+              -0.295007441445034,
+              -0.005593776306537059,
+              1.2021109122896945
+            ],
+            [
+              0.7595048560645253,
+              -0.004212597908398197,
+              2.97871184424076
+            ],
+            [
+              0.7534273031058836,
+              -0.0026694636321514544,
+              5.0485376635456305
+            ],
+            [
+              -0.31173380574100995,
+              -0.0018787101708886182,
+              6.835017865653376
+            ],
+            [
+              -2.105743064159252,
+              -0.0022820180023305475,
+              7.904079830631584
+            ],
+            [
+              -4.191824302259299,
+              -0.0036917533938158353,
+              8.093540014204866
+            ],
+            [
+              -6.177400163746183,
+              -0.0053818625250901505,
+              7.4424980590665815
+            ],
+            [
+              -7.871294531275979,
+              -0.005435405438552585,
+              6.231588646848079
+            ],
+            [
+              -9.53892598179829,
+              -0.005153876917850126,
+              4.984166568742763
+            ],
+            [
+              -11.215737968322427,
+              -0.005139210787327463,
+              3.749134064941634
+            ],
+            [
+              -12.984984630015667,
+              -0.005259925956538452,
+              2.650646615387964
+            ],
+            [
+              -14.881700514897197,
+              -0.0053699052202145475,
+              1.790821177681474
+            ],
+            [
+              -16.889289272588446,
+              -0.005456422435985754,
+              1.2373002768051289
+            ],
+            [
+              -18.96732232844993,
+              -0.006036420820424822,
+              1.1009548207663378
+            ],
+            [
+              -21.049747842753916,
+              -0.006965386825053942,
+              1.1195518676555212
+            ],
+            [
+              -23.1321037707996,
+              -0.006634715021665233,
+              1.0939736247320437
+            ],
+            [
+              -25.21458954015597,
+              -0.006404859926998996,
+              1.105081844060647
+            ],
+            [
+              -27.297105974819864,
+              -0.005973170197651121,
+              1.103059134497213
+            ],
+            [
+              -29.379625130983545,
+              -0.0054888772772903795,
+              1.1016360342852425
+            ],
+            [
+              -31.46214697321805,
+              -0.00499637308956004,
+              1.1009728624688297
+            ],
+            [
+              -33.54467111104458,
+              -0.004500134749213129,
+              1.1007453693830835
+            ],
+            [
+              -35.62719718793581,
+              -0.0039050870294300077,
+              1.1004714720084492
+            ],
+            [
+              -37.70972514015159,
+              -0.003155339398844026,
+              1.0996274793044667
+            ],
+            [
+              -39.792253063670415,
+              -0.0027754304862741943,
+              1.0978023339892455
+            ],
+            [
+              -41.87476450735337,
+              -0.0027589818408673087,
+              1.1014081021288535
+            ]
+          ],
+          "maxNeighbourTurnDegrees": 30.85973477819681,
+          "curvedSegments": 14,
+          "curvedWidthMm": 29.125258874096403,
+          "totalTurnDegrees": 261.4223471113596,
+          "upperOpeningDegrees": 3.315224399591434,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "maxStitchForceN": 0,
+          "stitchEnabled": false,
+          "events": [],
+          "topology": {
+            "activeSheetNodes": 637,
+            "totalMassKg": 0.004836464639999985,
+            "material": {
+              "thicknessMm": 1.05,
+              "arealDensityKgM2": 0.6750000000000002,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 6.666666666666667e-06,
+              "weftCompliance": 9.333333333333333e-06,
+              "shearCompliance": 0.003333333333333333,
+              "bendCompliance": 0.11851851851851848,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.0005250000000000001,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "inactiveHoleNodes": 0,
+            "continuousSheet": true,
+            "duplicatedInterface": false,
+            "triangles": 1152
+          },
+          "ownedTypedArrayBytes": 254845,
+          "lastStepMs": 30.0999999998603,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "No tearing or new seam mechanics in R14",
+            "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+            "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+            "One table-supported folding fixture, not a validated full garment solver",
+            "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+          ],
+          "solverMs": 0,
+          "droppedWallSeconds": 0,
+          "playing": false,
+          "damageProxy": "intact directional cloth"
+        }
+      ],
+      "cameraPreservesPhysics": true,
+      "autonomousSteps": 129,
+      "reportExport": true,
+      "mobileCanvas": {
+        "x": 0,
+        "y": 52,
+        "width": 390,
+        "height": 523.265625
+      },
+      "network": {
+        "desktop": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/denim-workshop/r14/index.html",
+            "blob:null/2d41ad4c-a162-451d-a089-2d383a14ba17",
+            "blob:null/925f2277-8f95-49f6-94d6-b51a4ac8824e",
+            "blob:null/543e7446-47cc-4300-a467-85ae5b336a2d",
+            "blob:null/ccba5747-deb8-4c2a-95bc-c4f558892a8f",
+            "blob:null/985f476b-6bde-472e-b421-728985ee3a92"
+          ]
+        },
+        "frozen-R13": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/denim-workshop/r13/index.html",
+            "blob:null/64ca144a-4330-4b49-8130-969d1b34aceb"
+          ]
+        },
+        "mobile-fragment-entry": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/denim-workshop/r14/index.html",
+            "blob:null/8a097e5b-52e8-49e0-b89d-4f38fcc2e02e"
+          ]
+        }
+      },
+      "realPhone": false,
+      "hardwareFPSVerified": false,
+      "states": [
+        "original-material",
+        "parent-original",
+        "continuous-rest",
+        "continuous-part-fold",
+        "continuous-closed",
+        "continuous-side",
+        "continuous-far",
+        "continuous-return",
+        "released-edge",
+        "reset-flat",
+        "thickness-0.45",
+        "thickness-1.05",
+        "live-play-pause",
+        "return-original",
+        "mobile-fold-entry"
+      ],
+      "maxTrackedGpuBytes": 156553600
+    },
+    "public": {
+      "passed": true,
+      "mode": "public",
+      "browserVersion": "140.0.7339.16",
+      "originalAppearance": null,
+      "legacyRecipeAccepted": true,
+      "standardFold": {
+        "active": true,
+        "experiment": "fold",
+        "model": "continuous-curvature-sheet@1",
+        "nodes": 637,
+        "activeNodes": 637,
+        "steps": 720,
+        "simulationSeconds": 3.000000000000044,
+        "stepHz": 240,
+        "constraints": 6964,
+        "maxTensileStrain": 0.006255279021815108,
+        "maxStretch": 0.006255279021815108,
+        "maxYarnStretch": 0,
+        "maxStrainHistory": 0.006255279021815108,
+        "kineticJ": 1.2731982459071564e-10,
+        "contacts": 182649,
+        "contactDetail": {
+          "vertexFace": 327,
+          "edgeEdge": 0,
+          "sweptCrossings": 0,
+          "candidates": 17060
+        },
+        "selfCollision": true,
+        "maxContactHistory": 584,
+        "contactThicknessMm": 0.7,
+        "contactSeparationMm": 0.728,
+        "bendingRigidityNm": 6.5e-07,
+        "minimumBendRadiusMm": 3.5,
+        "massKg": 0.0032243097599999894,
+        "fold": 1,
+        "gripEnabled": true,
+        "tableSupport": true,
+        "gravityNormalMS2": 9.81,
+        "curvatureStencils": 1150,
+        "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+        "centralStencils": 13,
+        "foldProfileMm": [
+          [
+            -49.98,
+            0,
+            0
+          ],
+          [
+            -47.897499999999994,
+            0,
+            0
+          ],
+          [
+            -45.81500856155735,
+            3.256622795887105e-05,
+            5.3560615876086155e-05
+          ],
+          [
+            -43.73251976850174,
+            0.0016080028979277125,
+            0.002864228060748285
+          ],
+          [
+            -41.65002957739089,
+            0.003125668991173962,
+            0.0038372495727294472
+          ],
+          [
+            -39.56754377892069,
+            0.00561650988424299,
+            7.343159360813444e-05
+          ],
+          [
+            -37.48505637359824,
+            0.0094511365791818,
+            3.5348274733645633e-07
+          ],
+          [
+            -35.40257638391786,
+            0.002605868299373884,
+            0
+          ],
+          [
+            -33.32008488453098,
+            0.0019194592934069312,
+            8.232201828514575e-15
+          ],
+          [
+            -31.237657506745204,
+            -0.01448280343252987,
+            1.671559200038749e-12
+          ],
+          [
+            -29.155732100988587,
+            0.03409547861698274,
+            8.448218603843633e-11
+          ],
+          [
+            -27.07354708006834,
+            0.06983977931949846,
+            1.6776644095528876e-12
+          ],
+          [
+            -24.991072487591868,
+            0.06134722769549788,
+            8.354710599818402e-15
+          ],
+          [
+            -22.908966047822165,
+            0.021261951491063184,
+            8.085231957564905e-15
+          ],
+          [
+            -20.8266690347303,
+            -0.007275865434579658,
+            4.913228548781539e-13
+          ],
+          [
+            -18.744241027033564,
+            -0.02371989437370942,
+            4.649175799239285e-15
+          ],
+          [
+            -16.661865281060464,
+            -0.04588413403675662,
+            1.8502125797862938e-06
+          ],
+          [
+            -14.579472944535464,
+            -0.025298029850512885,
+            0.0003780456333016515
+          ],
+          [
+            -12.497096340669232,
+            -0.01448112735200706,
+            0.019706630680740467
+          ],
+          [
+            -10.414843747109984,
+            -0.016912552389920628,
+            0.051300117543331504
+          ],
+          [
+            -8.332518411821361,
+            -0.019639037094088853,
+            0.07757902903933146
+          ],
+          [
+            -6.250042164942276,
+            -0.02203601193017274,
+            0.06904322796515765
+          ],
+          [
+            -4.168449531459011,
+            -0.024578659392741422,
+            0.007574318430885943
+          ],
+          [
+            -2.0768884675948227,
+            -0.028387614779124094,
+            0
+          ],
+          [
+            -0.05795428225913945,
+            -0.031159516543914093,
+            0.47740487650002367
+          ],
+          [
+            1.304288565012772,
+            -0.03248675863492675,
+            2.0101848822521347
+          ],
+          [
+            1.421005801703673,
+            -0.03348026208351793,
+            4.076167000202438
+          ],
+          [
+            0.2408593343985688,
+            -0.03630115766550464,
+            5.792989120001251
+          ],
+          [
+            -1.7374960568296207,
+            -0.041858998951446985,
+            6.483119380569635
+          ],
+          [
+            -3.753496753329548,
+            -0.047305485694094145,
+            5.932616044050573
+          ],
+          [
+            -5.52237672938544,
+            -0.049488849452887465,
+            4.8344147980438255
+          ],
+          [
+            -7.2200094634429535,
+            -0.052064274631877905,
+            3.628194823745097
+          ],
+          [
+            -8.949276482211285,
+            -0.05509660945044594,
+            2.467802804722268
+          ],
+          [
+            -10.802179028815454,
+            -0.057945337254854026,
+            1.5172415243682007
+          ],
+          [
+            -12.788834414777908,
+            -0.05917371817538641,
+            0.8927504090134722
+          ],
+          [
+            -14.865306160684018,
+            -0.048221270312529804,
+            0.7348303192551399
+          ],
+          [
+            -16.947689911538887,
+            -0.049831158834023455,
+            0.7570054933050524
+          ],
+          [
+            -19.030006400566215,
+            -0.05459488224775108,
+            0.7294284130080716
+          ],
+          [
+            -21.11233817204205,
+            -0.07799429192227376,
+            0.7426763384999889
+          ],
+          [
+            -23.194635409106105,
+            -0.10737300401167095,
+            0.7398040000106199
+          ],
+          [
+            -25.277126813190527,
+            -0.11516494873680591,
+            0.7372608622319409
+          ],
+          [
+            -27.359616356287482,
+            -0.11287871003283896,
+            0.7287091769438091
+          ],
+          [
+            -29.441916578959198,
+            -0.09952014524779225,
+            0.75500787071191
+          ],
+          [
+            -31.523689568509003,
+            -0.050868932620278376,
+            0.7285748882971057
+          ],
+          [
+            -33.60616503745523,
+            -0.057410587179811665,
+            0.7385379539732443
+          ],
+          [
+            -35.68867418474791,
+            -0.055102593420146506,
+            0.7383569616123148
+          ],
+          [
+            -37.77118424798671,
+            -0.0533671859044732,
+            0.7373319819498977
+          ],
+          [
+            -39.8536663547853,
+            -0.04277563939571217,
+            0.7347455593471766
+          ],
+          [
+            -41.93615665959174,
+            -0.03707268766648091,
+            0.7401475439571412
+          ]
+        ],
+        "maxNeighbourTurnDegrees": 38.395291017063485,
+        "curvedSegments": 12,
+        "curvedWidthMm": 24.962075262888806,
+        "totalTurnDegrees": 273.7112997253408,
+        "upperOpeningDegrees": 0.3344897245695531,
+        "brokenBonds": 0,
+        "brokenStitches": 0,
+        "maxCrackGapMm": 0,
+        "maxStitchForceN": 0,
+        "stitchEnabled": false,
+        "events": [],
+        "topology": {
+          "activeSheetNodes": 637,
+          "totalMassKg": 0.0032243097599999894,
+          "material": {
+            "thicknessMm": 0.7,
+            "arealDensityKgM2": 0.45,
+            "automaticMass": true,
+            "nominalGsm": 450,
+            "warpCompliance": 1e-05,
+            "weftCompliance": 1.4e-05,
+            "shearCompliance": 0.005,
+            "bendCompliance": 0.4,
+            "bundleDensityKgM3": 642.8571428571429,
+            "collisionRadiusM": 0.00035,
+            "warpStiffness": 1,
+            "weftStiffness": 1,
+            "bendStiffness": 1,
+            "calibrated": false,
+            "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+          },
+          "inactiveHoleNodes": 0,
+          "continuousSheet": true,
+          "duplicatedInterface": false,
+          "triangles": 1152
+        },
+        "ownedTypedArrayBytes": 254845,
+        "lastStepMs": 29.9000000001397,
+        "unmeasuredCoefficients": true,
+        "limits": [
+          "No tearing or new seam mechanics in R14",
+          "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+          "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+          "One table-supported folding fixture, not a validated full garment solver",
+          "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+        ],
+        "solverMs": 0,
+        "droppedWallSeconds": 0,
+        "playing": false,
+        "damageProxy": "intact directional cloth"
+      },
+      "thicknessCases": [
+        {
+          "active": true,
+          "experiment": "fold",
+          "model": "continuous-curvature-sheet@1",
+          "nodes": 637,
+          "activeNodes": 637,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "constraints": 6964,
+          "maxTensileStrain": 0.003060687654282912,
+          "maxStretch": 0.003060687654282912,
+          "maxYarnStretch": 0,
+          "maxStrainHistory": 0.003060687654282912,
+          "kineticJ": 1.4075531930614481e-13,
+          "contacts": 194654,
+          "contactDetail": {
+            "vertexFace": 402,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 15653
+          },
+          "selfCollision": true,
+          "maxContactHistory": 644,
+          "contactThicknessMm": 0.45000000000000007,
+          "contactSeparationMm": 0.468,
+          "bendingRigidityNm": 2.686224489795919e-07,
+          "minimumBendRadiusMm": 2.2500000000000004,
+          "massKg": 0.002072770559999993,
+          "fold": 1,
+          "gripEnabled": true,
+          "tableSupport": true,
+          "gravityNormalMS2": 9.81,
+          "curvatureStencils": 1150,
+          "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+          "centralStencils": 13,
+          "foldProfileMm": [
+            [
+              -49.98,
+              0,
+              0
+            ],
+            [
+              -47.897499999999994,
+              0,
+              0
+            ],
+            [
+              -45.81503313944071,
+              -0.0005764960347911971,
+              3.22101010619285e-05
+            ],
+            [
+              -43.732570774045186,
+              -0.0014152372102859284,
+              0.004284900422652972
+            ],
+            [
+              -41.65010423203529,
+              -0.0014522098559518763,
+              0.0047888221107352125
+            ],
+            [
+              -39.567756240598484,
+              0.020212806050037235,
+              5.739197455178305e-06
+            ],
+            [
+              -37.48553134939695,
+              0.0519005891034151,
+              1.6858454788772395e-09
+            ],
+            [
+              -35.40539305713526,
+              -0.04653112891163364,
+              3.3720132844900333e-34
+            ],
+            [
+              -33.3229268328555,
+              -0.046889373244228684,
+              1.1364234567177499e-30
+            ],
+            [
+              -31.24053600509355,
+              -0.029153867824551323,
+              9.317785316380505e-28
+            ],
+            [
+              -29.158083449218843,
+              -0.021524443050596937,
+              1.1445628175439907e-30
+            ],
+            [
+              -27.075616812605503,
+              -0.02200609213923777,
+              3.4685701349331584e-34
+            ],
+            [
+              -24.993150445259175,
+              -0.023002010550297325,
+              7.647816166788873e-12
+            ],
+            [
+              -22.912498518272212,
+              0.0639043490621892,
+              2.4833396348538912e-08
+            ],
+            [
+              -20.83003485248282,
+              0.06758184733449511,
+              1.956950522771491e-05
+            ],
+            [
+              -18.750408955970528,
+              -0.04115632550397725,
+              2.5138273078437538e-08
+            ],
+            [
+              -16.671112972263003,
+              0.073717461414618,
+              8.0686792045976e-12
+            ],
+            [
+              -14.591579692403982,
+              -0.036805819928212274,
+              0
+            ],
+            [
+              -12.509115574433089,
+              -0.0417946589997865,
+              2.3280740825624185e-08
+            ],
+            [
+              -10.426807890961827,
+              -0.015693806051506942,
+              6.519512576992613e-05
+            ],
+            [
+              -8.344908217707554,
+              -0.03857459601359579,
+              0.04322580390679752
+            ],
+            [
+              -6.262719804551072,
+              -0.04547609014255162,
+              0.07694729431923927
+            ],
+            [
+              -4.180260848985139,
+              -0.05184342626589161,
+              0.07161156350025362
+            ],
+            [
+              -2.099014286889579,
+              -0.057851691153217824,
+              0.00012046184080159917
+            ],
+            [
+              -0.011914379684058162,
+              -0.06012013616495533,
+              0
+            ],
+            [
+              1.8683902779026091,
+              -0.07470795710394668,
+              0.8753325403247527
+            ],
+            [
+              2.29589608348148,
+              -0.0877224838077476,
+              2.9072062391855376
+            ],
+            [
+              0.9084243183686743,
+              -0.10112169188702548,
+              4.465385022772716
+            ],
+            [
+              -1.1682617552012167,
+              -0.11480663675793427,
+              4.296641237083474
+            ],
+            [
+              -3.0765461960816127,
+              -0.12620045043016834,
+              3.4630388249722857
+            ],
+            [
+              -4.859533565653327,
+              -0.13720534643969234,
+              2.3870736546793596
+            ],
+            [
+              -6.688916955855282,
+              -0.14773258777679238,
+              1.3920460296155024
+            ],
+            [
+              -8.64854248390841,
+              -0.1569950087366474,
+              0.68735775715762
+            ],
+            [
+              -10.71950805668075,
+              -0.1871824156453681,
+              0.4705889077578289
+            ],
+            [
+              -12.801517200199806,
+              -0.2324445036506028,
+              0.47189751807428715
+            ],
+            [
+              -14.883922627156966,
+              -0.24233923505908342,
+              0.48948054277404157
+            ],
+            [
+              -16.9662908727581,
+              -0.23168328155823031,
+              0.4682430828645654
+            ],
+            [
+              -19.048060601089457,
+              -0.1764691028656776,
+              0.4713276855006723
+            ],
+            [
+              -21.130011065708985,
+              -0.22428135930033438,
+              0.4760209759778813
+            ],
+            [
+              -23.212471822639845,
+              -0.21124658342547986,
+              0.4720411700306715
+            ],
+            [
+              -25.294809216529703,
+              -0.1871596452295516,
+              0.48299391677878345
+            ],
+            [
+              -27.377277484439894,
+              -0.17466739889400884,
+              0.48257022154772944
+            ],
+            [
+              -29.459739198306032,
+              -0.16106646415312367,
+              0.48278794297363625
+            ],
+            [
+              -31.542146981213445,
+              -0.14215917252115223,
+              0.49010754177067284
+            ],
+            [
+              -33.62411040938744,
+              -0.09999877000433813,
+              0.4681001142219717
+            ],
+            [
+              -35.70658430771951,
+              -0.09211238313092202,
+              0.47669268644926654
+            ],
+            [
+              -37.78896065928379,
+              -0.11543763371592719,
+              0.4770989511504078
+            ],
+            [
+              -39.871156074956296,
+              -0.07962603253932383,
+              0.4736215878021012
+            ],
+            [
+              -41.95356878433727,
+              -0.061405427576488446,
+              0.48015675021974735
+            ]
+          ],
+          "maxNeighbourTurnDegrees": 53.56384417389548,
+          "curvedSegments": 14,
+          "curvedWidthMm": 29.14761116101087,
+          "totalTurnDegrees": 296.63372373408106,
+          "upperOpeningDegrees": 0.003649177564336212,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "maxStitchForceN": 0,
+          "stitchEnabled": false,
+          "events": [],
+          "topology": {
+            "activeSheetNodes": 637,
+            "totalMassKg": 0.002072770559999993,
+            "material": {
+              "thicknessMm": 0.45,
+              "arealDensityKgM2": 0.2892857142857143,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1.5555555555555555e-05,
+              "weftCompliance": 2.1777777777777776e-05,
+              "shearCompliance": 0.0077777777777777776,
+              "bendCompliance": 1.5056241426611794,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00022500000000000002,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "inactiveHoleNodes": 0,
+            "continuousSheet": true,
+            "duplicatedInterface": false,
+            "triangles": 1152
+          },
+          "ownedTypedArrayBytes": 254845,
+          "lastStepMs": 52.5,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "No tearing or new seam mechanics in R14",
+            "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+            "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+            "One table-supported folding fixture, not a validated full garment solver",
+            "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+          ],
+          "solverMs": 0,
+          "droppedWallSeconds": 0,
+          "playing": false,
+          "damageProxy": "intact directional cloth"
+        },
+        {
+          "active": true,
+          "experiment": "fold",
+          "model": "continuous-curvature-sheet@1",
+          "nodes": 637,
+          "activeNodes": 637,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "constraints": 6964,
+          "maxTensileStrain": 0.005845970547011969,
+          "maxStretch": 0.005845970547011969,
+          "maxYarnStretch": 0,
+          "maxStrainHistory": 0.005845970547011969,
+          "kineticJ": 9.511991548462737e-15,
+          "contacts": 132464,
+          "contactDetail": {
+            "vertexFace": 255,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 17469
+          },
+          "selfCollision": true,
+          "maxContactHistory": 355,
+          "contactThicknessMm": 1.05,
+          "contactSeparationMm": 1.092,
+          "bendingRigidityNm": 1.4625000000000006e-06,
+          "minimumBendRadiusMm": 5.250000000000001,
+          "massKg": 0.004836464639999985,
+          "fold": 1,
+          "gripEnabled": true,
+          "tableSupport": true,
+          "gravityNormalMS2": 9.81,
+          "curvatureStencils": 1150,
+          "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+          "centralStencils": 13,
+          "foldProfileMm": [
+            [
+              -49.98,
+              0,
+              0
+            ],
+            [
+              -47.897499999999994,
+              0,
+              0
+            ],
+            [
+              -45.81500731698807,
+              -6.744440907578571e-05,
+              0.00010747423459273392
+            ],
+            [
+              -43.7325154472974,
+              -0.0001337753530434303,
+              0.0018284664390625504
+            ],
+            [
+              -41.65002358085444,
+              -0.00019733615437256193,
+              0.003017078052425375
+            ],
+            [
+              -39.567533462560505,
+              -0.0003047305250934141,
+              0.00019227434656429095
+            ],
+            [
+              -37.4850400515417,
+              -0.0003678612337894432,
+              6.978842004586038e-05
+            ],
+            [
+              -35.402544894131644,
+              -0.0004096313282427259,
+              4.992081184400988e-05
+            ],
+            [
+              -33.3200479811366,
+              -0.00039540841459461746,
+              3.836562473114849e-05
+            ],
+            [
+              -31.237549293120367,
+              -0.00037654223941559206,
+              3.771666051647161e-05
+            ],
+            [
+              -29.15504882260271,
+              -0.0003916686857743364,
+              4.777836810993965e-05
+            ],
+            [
+              -27.072546593145596,
+              -0.00044995134059029796,
+              6.503963390195187e-05
+            ],
+            [
+              -24.990042674255456,
+              -0.0005708493767479321,
+              8.101058929055251e-05
+            ],
+            [
+              -22.907537212040086,
+              -0.0007465502803171711,
+              4.930865557544235e-06
+            ],
+            [
+              -20.825029781847572,
+              -0.0007192522093923305,
+              5.532417020453247e-06
+            ],
+            [
+              -18.742521277609978,
+              -0.0013329373665186372,
+              0.0004007997979020476
+            ],
+            [
+              -16.6600228076105,
+              -0.001722167848328565,
+              0.007455249558848297
+            ],
+            [
+              -14.577607775184934,
+              -0.0020492669574091724,
+              0.02731647426597721
+            ],
+            [
+              -12.495301766612409,
+              -0.0023943553477041597,
+              0.056343778631259674
+            ],
+            [
+              -10.412919302133925,
+              -0.00272534088234515,
+              0.07912864403528773
+            ],
+            [
+              -8.33042059145745,
+              -0.0030001172912175705,
+              0.07245481371202933
+            ],
+            [
+              -6.2484440096515215,
+              -0.0035311143374888816,
+              0.025041414069870045
+            ],
+            [
+              -4.155791471563895,
+              -0.005140372028305212,
+              0
+            ],
+            [
+              -2.0862520487019465,
+              -0.005953461909460872,
+              0.18711792728253682
+            ],
+            [
+              -0.295007441445034,
+              -0.005593776306537059,
+              1.2021109122896945
+            ],
+            [
+              0.7595048560645253,
+              -0.004212597908398197,
+              2.97871184424076
+            ],
+            [
+              0.7534273031058836,
+              -0.0026694636321514544,
+              5.0485376635456305
+            ],
+            [
+              -0.31173380574100995,
+              -0.0018787101708886182,
+              6.835017865653376
+            ],
+            [
+              -2.105743064159252,
+              -0.0022820180023305475,
+              7.904079830631584
+            ],
+            [
+              -4.191824302259299,
+              -0.0036917533938158353,
+              8.093540014204866
+            ],
+            [
+              -6.177400163746183,
+              -0.0053818625250901505,
+              7.4424980590665815
+            ],
+            [
+              -7.871294531275979,
+              -0.005435405438552585,
+              6.231588646848079
+            ],
+            [
+              -9.53892598179829,
+              -0.005153876917850126,
+              4.984166568742763
+            ],
+            [
+              -11.215737968322427,
+              -0.005139210787327463,
+              3.749134064941634
+            ],
+            [
+              -12.984984630015667,
+              -0.005259925956538452,
+              2.650646615387964
+            ],
+            [
+              -14.881700514897197,
+              -0.0053699052202145475,
+              1.790821177681474
+            ],
+            [
+              -16.889289272588446,
+              -0.005456422435985754,
+              1.2373002768051289
+            ],
+            [
+              -18.96732232844993,
+              -0.006036420820424822,
+              1.1009548207663378
+            ],
+            [
+              -21.049747842753916,
+              -0.006965386825053942,
+              1.1195518676555212
+            ],
+            [
+              -23.1321037707996,
+              -0.006634715021665233,
+              1.0939736247320437
+            ],
+            [
+              -25.21458954015597,
+              -0.006404859926998996,
+              1.105081844060647
+            ],
+            [
+              -27.297105974819864,
+              -0.005973170197651121,
+              1.103059134497213
+            ],
+            [
+              -29.379625130983545,
+              -0.0054888772772903795,
+              1.1016360342852425
+            ],
+            [
+              -31.46214697321805,
+              -0.00499637308956004,
+              1.1009728624688297
+            ],
+            [
+              -33.54467111104458,
+              -0.004500134749213129,
+              1.1007453693830835
+            ],
+            [
+              -35.62719718793581,
+              -0.0039050870294300077,
+              1.1004714720084492
+            ],
+            [
+              -37.70972514015159,
+              -0.003155339398844026,
+              1.0996274793044667
+            ],
+            [
+              -39.792253063670415,
+              -0.0027754304862741943,
+              1.0978023339892455
+            ],
+            [
+              -41.87476450735337,
+              -0.0027589818408673087,
+              1.1014081021288535
+            ]
+          ],
+          "maxNeighbourTurnDegrees": 30.85973477819681,
+          "curvedSegments": 14,
+          "curvedWidthMm": 29.125258874096403,
+          "totalTurnDegrees": 261.4223471113596,
+          "upperOpeningDegrees": 3.315224399591434,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "maxStitchForceN": 0,
+          "stitchEnabled": false,
+          "events": [],
+          "topology": {
+            "activeSheetNodes": 637,
+            "totalMassKg": 0.004836464639999985,
+            "material": {
+              "thicknessMm": 1.05,
+              "arealDensityKgM2": 0.6750000000000002,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 6.666666666666667e-06,
+              "weftCompliance": 9.333333333333333e-06,
+              "shearCompliance": 0.003333333333333333,
+              "bendCompliance": 0.11851851851851848,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.0005250000000000001,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "inactiveHoleNodes": 0,
+            "continuousSheet": true,
+            "duplicatedInterface": false,
+            "triangles": 1152
+          },
+          "ownedTypedArrayBytes": 254845,
+          "lastStepMs": 30,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "No tearing or new seam mechanics in R14",
+            "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+            "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+            "One table-supported folding fixture, not a validated full garment solver",
+            "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+          ],
+          "solverMs": 0,
+          "droppedWallSeconds": 0,
+          "playing": false,
+          "damageProxy": "intact directional cloth"
+        }
+      ],
+      "cameraPreservesPhysics": true,
+      "autonomousSteps": 179,
+      "reportExport": true,
+      "mobileCanvas": {
+        "x": 0,
+        "y": 52,
+        "width": 390,
+        "height": 523.265625
+      },
+      "network": {
+        "desktop": {
+          "pageErrors": [],
+          "consoleErrors": [
+            {
+              "url": "https://htmlpreview.github.io/favicon.ico",
+              "text": "Failed to load resource: the server responded with a status of 404 ()"
+            }
+          ],
+          "httpErrors": [],
+          "requests": [
+            "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5ebe0c034d3a345067929c6034d53eb615b39d21/denim-workshop/r14/index.html",
+            "https://htmlpreview.github.io/htmlpreview.js",
+            "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5ebe0c034d3a345067929c6034d53eb615b39d21/denim-workshop/r14/index.html",
+            "blob:https://htmlpreview.github.io/bea10da4-296f-4d0e-8bb0-34d18db27c68",
+            "blob:https://htmlpreview.github.io/053e85ea-1d1e-4c0e-841c-4d647e43ae95",
+            "blob:https://htmlpreview.github.io/051413b4-a442-4f12-98c9-ef05f157bf8d",
+            "blob:https://htmlpreview.github.io/669f4352-97e0-47b0-93ce-232688aea461",
+            "blob:https://htmlpreview.github.io/7faae4cc-8e98-46f1-bf39-bbc51aefe908"
+          ]
+        },
+        "mobile-fragment-entry": {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5ebe0c034d3a345067929c6034d53eb615b39d21/denim-workshop/r14/index.html",
+            "https://htmlpreview.github.io/htmlpreview.js",
+            "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/5ebe0c034d3a345067929c6034d53eb615b39d21/denim-workshop/r14/index.html",
+            "blob:https://htmlpreview.github.io/c44a78cd-7c84-4abd-b7b7-12809880793e"
+          ]
+        }
+      },
+      "realPhone": false,
+      "hardwareFPSVerified": false,
+      "states": [
+        "original-material",
+        "continuous-rest",
+        "continuous-part-fold",
+        "continuous-closed",
+        "continuous-side",
+        "continuous-far",
+        "continuous-return",
+        "released-edge",
+        "reset-flat",
+        "thickness-0.45",
+        "thickness-1.05",
+        "live-play-pause",
+        "return-original",
+        "mobile-fold-entry"
+      ],
+      "maxTrackedGpuBytes": 156553600
+    }
+  },
+  "scope": [
+    "Continuous unsplit fold sheet instead of welded half sheets",
+    "Thickness, mass and curvature bending separated",
+    "Finite exterior grip and actual release; no prescribed interior crease",
+    "Same solved surface drives yarns and displayed thickness",
+    "Fold camera 24 degrees; original material mode preserved",
+    "New tearing and garment integration paused"
+  ],
+  "limits": [
+    "Unmeasured bending family and minimum-radius regularization, not material calibration",
+    "Table-supported folding with external grip; not arbitrary free garment folding",
+    "Coarse vertex-triangle contact, no full reliable CCD or fiber-level collision",
+    "Finite-curvature guard is an engineering constraint, not measured yarn compression",
+    "Software Chromium and mobile viewport do not verify consumer GPU FPS or phones",
+    "More solver/contact work has CPU cost; not a speed-up claim",
+    "Old versions, archives, main and unrelated workbenches unchanged; no merge or force push"
+  ]
+}
