@@ -28,14 +28,14 @@ def main():
  (R/'out/candidate-worker.js').write_text(a.emit({'ref':'product'}))
  ref14=load(B.parent/'r14/build.py','reference_unbounded');l14=ref14.Linker(json.loads((B.parent/'r14/assembly.json').read_text()));(R/'out/reference-worker.js').write_text(l14.emit({'ref':'product'}))
  env={**os.environ,'BASE_LIB':str(B/'node-lib.cjs')}
- for s in ['qa-numeric.cjs','qa-geometry-equivalence.cjs','qa-pose-stream.cjs','qa-frame-flow.cjs','qa-b1.cjs']:run(s,env)
- for p in ['qa/numeric.json','qa/s1b/equivalence.json','qa/s2b/pose-stream.json','qa/render-batch/frame-flow.json','qa/b1/unit.json']:check('Executed '+p,json.loads((R/p).read_text())['pass'])
+ for s in ['qa-numeric.cjs','qa-geometry-equivalence.cjs','qa-pose-stream.cjs','qa-frame-flow.cjs','qa-b1.cjs','qa-shading.cjs']:run(s,env)
+ for p in ['qa/numeric.json','qa/s1b/equivalence.json','qa/s2b/pose-stream.json','qa/render-batch/frame-flow.json','qa/b1/unit.json','qa/b1/shading-unit.json']:check('Executed '+p,json.loads((R/p).read_text())['pass'])
  with tempfile.TemporaryDirectory() as tmp:
   iso=Path(tmp)/'r17';shutil.copytree(R,iso,ignore=shutil.ignore_patterns('qa','out','node-lib.cjs','__pycache__'));ib=load(iso/'build.py','isolated');check('Independent source-only build identical',ib.build()['htmlSHA256']==result['htmlSHA256']);(iso/'src/render/pose-cache.js').write_text('/* corrupted */');rejected=False
   try:ib.build()
   except ValueError:rejected=True
   check('Source corruption fails closed',rejected)
- return {'pass':True,'checks':checks,'sourceChecks':len(checks),'numericCases':18,'geometryCases':25,'full52StepTrajectories':6,'poseProtocolChecks':45,'frameFlowChecks':22,'b1UnitChecks':json.loads((R/'qa/b1/unit.json').read_text())['count'],'build':result,'nativeIdenticalToR16':True}
+ return {'pass':True,'checks':checks,'sourceChecks':len(checks),'numericCases':18,'geometryCases':25,'full52StepTrajectories':6,'poseProtocolChecks':45,'frameFlowChecks':22,'b1UnitChecks':json.loads((R/'qa/b1/unit.json').read_text())['count'],'build':result,'nativeIdenticalToR16':True,'shadingChecks':json.loads((R/'qa/b1/shading-unit.json').read_text())['count']}
 if __name__=='__main__':
  out=R/'qa/b1/SUMMARY.json';out.parent.mkdir(parents=True,exist_ok=True)
  try:r=main()

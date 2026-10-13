@@ -17,3 +17,11 @@ Primary integration references: https://threejs.org/docs/pages/GLBufferAttribute
 - [ ] User visual acceptance and physical-device certification remain independent.
 
 Only verified changes may merge into perf/leather-r10-input-20261011. Preserve R01-R16, other workbenches, main, root license, removed jacket and disabled R11 noise experiment. Recovery entry: Issue52.
+
+## B1 recovery implementation
+
+Initial B1 cache alone failed its declared performance gates (38372084727); other lanes passed. Do not promote that candidate or change thresholds. New isolation38392683686 found substantial IBL fragment cost. Same-quality38394554701 verified that a checked single-level linear PMREM atlas can use explicit LOD zero, with the same roughness tiles and two bilinear taps. Face/UV preparation is shared; mathematically zero direct-light terms skip only their BRDF evaluation. Other samplers retain the original gradient instruction. The release uses an explicit service at both render entry points; neither the vendor source nor material settings change. Three.js and MDN/Khronos provenance and existing licenses remain.
+
+Input timing now records the first submission per distinct observed input, not every later pose carrying the same input. A fatal Worker closes its pending requests and rejects new ones immediately. Context loss now stops rendering and offers an explicit full page reload: this regenerates GPU-only environment/material resources rather than pretending an invalid render target survived restoration. Reload clears the current test state; no lossless checkpoint is claimed.
+
+New shading sampler tests, context loss/reload and the full original visual/performance/continuous-operation gates remain required. Original .85/1.10 performance ratios, eight samples and ABBA order are unchanged. First boot still uses the original renderer alpha setting. These source edits do not themselves certify delivery; DELIVERY.json must record actual successful runs.

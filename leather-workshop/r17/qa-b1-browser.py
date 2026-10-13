@@ -11,6 +11,7 @@ def check(n,p,d=None):
  result['checks'].append({'name':n,'pass':bool(p),'data':d});save();print(n,bool(p),flush=True)
  if not p:raise AssertionError(n)
 READBACK=r'''
+window.__b1ContextLoss=()=>{const e=renderer.getContext().getExtension('WEBGL_lose_context');if(!e)return false;e.loseContext();setTimeout(()=>e.restoreContext(),150);return true;};
 window.__b1CacheRead=()=>{hero.updateMatrixWorld(true);const c=hero.userData.rig.poseCache;c.prepare();const g=renderer.getContext();let max=0,n=0,minLength=Infinity,maxLength=0;const out=new Float32Array(3);for(const e of c.entries){const mesh=hero.userData.rig.meshes.find(m=>m.geometry===e.geometry);for(let i=0;i<e.count;i+=Math.max(1,Math.floor(e.count/8))){g.bindBuffer(g.COPY_READ_BUFFER,e.outputs[0]);g.getBufferSubData(g.COPY_READ_BUFFER,i*12,out);const p=new T.Vector3().fromArray(out).applyMatrix4(mesh.matrixWorld),q=evaluateBoundVertex(mesh,hero.userData.rig,i);max=Math.max(max,p.distanceTo(q));g.bindBuffer(g.COPY_READ_BUFFER,e.outputs[1]);g.getBufferSubData(g.COPY_READ_BUFFER,i*12,out);const len=Math.hypot(...out);minLength=Math.min(minLength,len);maxLength=Math.max(maxLength,len);n++;}}g.bindBuffer(g.COPY_READ_BUFFER,null);renderer.resetState();return {maxPositionDifferenceMM:max,samples:n,minNormalLength:minLength,maxNormalLength:maxLength,glError:g.getError()};};
 '''
 with sync_playwright() as pw:
@@ -37,6 +38,11 @@ with sync_playwright() as pw:
    s=(R/'out/candidate-r17.html').read_text();copy=O/'readback-only.html';copy.write_text(s.replace('boot().catch(fail);',READBACK+'\nboot().catch(fail);'));ctx,p=page_for(copy.as_uri());result['readbackScope']='Separate diagnostic copy only; not used for performance or uninstrumented release checks.'
    for ident in ['wallet','belt','bag','cowboy','pirate','swatch']:
     p.evaluate('async id=>{LEATHER_ATELIER.selectProduct(id);LEATHER_ATELIER.configure({craft:"plain"});await LEATHER_ATELIER.stepProduct(8);LEATHER_ATELIER.render();}',ident);q=p.evaluate('__b1CacheRead()');check('GPU coordinates agree with live CPU evaluator '+ident,q['samples']>0 and q['maxPositionDifferenceMM']<.003 and q['minNormalLength']>.9999 and q['maxNormalLength']<1.0001 and q['glError']==0,q)
+   check('Actual context-loss extension available',p.evaluate('__b1ContextLoss()'))
+   p.wait_for_function('LEATHER_ATELIER.b1Report().graphicsReloadRequired && !LEATHER_ATELIER.b1Report().contextLost')
+   check('Context restoration cannot silently reuse invalid baked textures',p.evaluate('!LEATHER_ATELIER.ready && !LEATHER_ATELIER.productPhysics.active') and p.locator('#b1ContextReload').is_visible())
+   p.locator('#b1ContextReload').click();p.wait_for_function('window.LEATHER_ATELIER?.ready',timeout=240000)
+   check('Explicit full graphics recovery rebuilds all current resources',p.evaluate('!LEATHER_ATELIER.b1Report().graphicsReloadRequired && LEATHER_ATELIER.b1Report().resources.allPoseCaches.live===1 && LEATHER_ATELIER.b1Report().resources.poseCache.updates>0'))
   else:
    started=time.perf_counter();cdp=ctx.new_cdp_session(p);resources=[]
    for cycle in range(4):
