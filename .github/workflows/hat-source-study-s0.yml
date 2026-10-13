@@ -59,16 +59,16 @@ jobs:
           pip install playwright pillow
           python -m playwright install --with-deps chromium
           sudo apt-get install -y fonts-noto-cjk
-      - name: Source identity and layer isolation
+      - name: Source identity and native control-state verification
         env:
           SOURCE: ${{ needs.build.outputs.source }}
           URL: ${{ needs.build.outputs.url }}
           TARGET: ${{ matrix.target }}
         run: |
           if [ "$TARGET" = public ]; then
-            timeout --kill-after=10s 780s python -u hat-workshop/source-study-s0/qa.py --source "$SOURCE" --url "$URL"
+            timeout --kill-after=10s 780s python -u hat-workshop/source-study-s0/qa-dom.py --source "$SOURCE" --url "$URL"
           else
-            timeout --kill-after=10s 780s python -u hat-workshop/source-study-s0/qa.py --source "$SOURCE"
+            timeout --kill-after=10s 780s python -u hat-workshop/source-study-s0/qa-dom.py --source "$SOURCE"
           fi
       - uses: actions/upload-artifact@v4
         if: always()
