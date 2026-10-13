@@ -25,6 +25,7 @@ def receipt(name,src,before,allowed):
 OUT.mkdir(parents=True,exist_ok=True);NATIVE.mkdir(parents=True,exist_ok=True)
 shutil.copytree(ROOT/'licenses',OUT/'licenses',dirs_exist_ok=True)
 for name in ['README.md','THIRD_PARTY_NOTICES.md']:shutil.copyfile(ROOT/name,OUT/name)
+shutil.copyfile(ROOT/'USER_RECIPE_20261013.json',OUT/'USER_RECIPE_20261013.json')
 
 # Lab is intentionally a calibration scene, not a surrogate workbench.
 lab=(ROOT/'lab.html').read_text();three=(INPUT/'tailor/kaopu-tailor-workbench/material-products/r04-4-1/vendor/three.module.js').read_text()
@@ -51,7 +52,7 @@ s=replace(s,'environment=makeEnvironment();scene=new T.Scene();','environment={t
 anchor='thumbCamera=new T.PerspectiveCamera(34,1,.5,4000);'
 s=replace(s,anchor,anchor+"\n eb1=KAOPU_EB1.attachThree(T,{renderer,scene,center:[0,100,0],radius:300,secondaryScenes:[thumbScene],requestRender:()=>invalidateView(true)});environment.texture=scene.environment;")
 lines=s.splitlines();s='\n'.join(l for l in lines if not l.startswith(" if(id==='studio'){key.") and not l.startswith(" if(id==='neutral'){key.") and not l.startswith(" if(id==='rake'){key."))+'\n'
-s=replace(s,'renderer.shadowMap.needsUpdate=true;invalidateView(true);revision++;','if(ready)eb1.store.preset(id===\'studio\'?\'reference\':id);else eb1.apply();renderer.shadowMap.needsUpdate=true;invalidateView(true);revision++;')
+s=replace(s,'renderer.shadowMap.needsUpdate=true;invalidateView(true);revision++;','if(ready)eb1.store.preset(id===\'studio\'?\'custom\':id);else eb1.apply();renderer.shadowMap.needsUpdate=true;invalidateView(true);revision++;')
 p.write_text(s)
 html=replace((base/'public-lite.html').read_text(),old,s)
 html=inject(html);put(OUT/'leather/index.html',html)
@@ -65,7 +66,7 @@ p=h/'app.js';s=p.read_text()
 a="const room=new RoomEnvironment(),pmrem=new T.PMREMGenerator(renderer),env=pmrem.fromScene(room,.04);scene.environment=env.texture;room.dispose();pmrem.dispose();"
 s=replace(s,a,'// EB1 supplies one owned environment; no duplicated legacy PMREM.\nconst env={texture:null};')
 a='plinth.castShadow=true;scene.add(plinth);'
-s=replace(s,a,a+"\nconst eb1=KAOPU_EB1.attachThree(T,{renderer,scene,center:[0,0,0],radius:.6,requestRender});scene.fog=null;\ndocument.addEventListener('change',e=>{if(e.target.id==='light')eb1.store.preset(({studio:'reference',neutral:'neutral',raking:'rake'})[e.target.value]||'reference');});")
+s=replace(s,a,a+"\nconst eb1=KAOPU_EB1.attachThree(T,{renderer,scene,center:[0,0,0],radius:.6,requestRender});scene.fog=null;\ndocument.addEventListener('change',e=>{if(e.target.id==='light')eb1.store.preset(({studio:'custom',neutral:'neutral',raking:'rake'})[e.target.value]||'custom');});")
 s='\n'.join(l for l in s.splitlines() if not any(l.startswith(" if(s.light==='"+q+"')") for q in ['studio','neutral','raking']))+'\n'
 s=replace(s," floor.visible=cameraMode!=='inside';measurementOverlay(profile,state);"," eb1.apply();floor.visible=cameraMode!=='inside';measurementOverlay(profile,state);")
 p.write_text(s)
@@ -97,7 +98,7 @@ a=" mat(p,'uLightVP',lightVP);"
 s=replace(s,a," v3(p,'uEB1Key',ebValues.keyDirection);v3(p,'uEB1Rim',ebValues.rimDirection);v3(p,'uEB1RimColor',ebValues.rimColor);gl.uniform3fv(U(p,'uEB1Directions[0]'),ebValues.environment.flatMap(x=>x.direction));gl.uniform3fv(U(p,'uEB1Weights[0]'),ebValues.environment.flatMap(x=>x.color));uf(p,'uEB1Background',ebStore.get().background);\n"+a)
 s=replace(s,'vec3 c=vec3(.21,.217,.224);','vec3 c=vec3(uEB1Background);')
 s=replace(s,'c=mix(c,vec3(.30,.315,.332),haze);','c=mix(c,vec3(uEB1Background*1.25),haze);')
-s=replace(s,"const presets={raw:","document.addEventListener('input',e=>{if(e.target.id==='exposure')ebStore.patch({exposure:Number(e.target.value)});});document.addEventListener('change',e=>{if(e.target.id==='light')ebStore.preset(['reference','rake','reference','neutral','reference'][Number(e.target.value)]||'reference');});\nconst presets={raw:")
+s=replace(s,"const presets={raw:","document.addEventListener('input',e=>{if(e.target.id==='exposure')ebStore.patch({exposure:Number(e.target.value)});});document.addEventListener('change',e=>{if(e.target.id==='light')ebStore.preset(['custom','rake','custom','neutral','custom'][Number(e.target.value)]||'custom');});\nconst presets={raw:")
 s=s.replace("document.querySelectorAll('[data-preset]')","document.querySelectorAll('[data-preset]:not(#eb1-panel [data-preset])')")
 p.write_text(s)
 p=src/'sampling.js';s=p.read_text();s=replace(s,"in vec2 uv;out vec4 O;","in vec2 uv;out vec4 O;\n${KAOPU_EB1.neutralGLSL}")
@@ -165,7 +166,7 @@ shutil.copytree(src,OUT/'tailor',dirs_exist_ok=True)
 receipt('tailor',src,before,['lighting.mjs','app.mjs','index.html'])
 for name,q in receipts.items():
  q['publicFiles']={str(p.relative_to(OUT/name)):sha(p.read_bytes()) for p in (OUT/name).rglob('*') if p.is_file()}
-put(OUT/'EB1_MANIFEST.json',json.dumps({'version':'EB1-1.0.0','coreSHA256':CORE_SHA,'sourceCommit':os.environ.get('GITHUB_SHA','LOCAL'),'reference':SNAP['reference'],'workbenches':receipts,'privateKnit':'Kept in original private repository; not published here.','publicBrowserVerified':False,'userAccepted':False},ensure_ascii=False,indent=2))
+put(OUT/'EB1_MANIFEST.json',json.dumps({'version':'EB1-1.1.0','coreSHA256':CORE_SHA,'defaultRecipe':json.loads((ROOT/'USER_RECIPE_20261013.json').read_text()),'storageNamespace':'kaopu:lighting:eb1:v1:user-20261013-r1','sourceCommit':os.environ.get('EB1_SOURCE_SHA',os.environ.get('GITHUB_SHA','LOCAL')),'reference':SNAP['reference'],'workbenches':receipts,'privateKnit':'Kept in original private repository; not published here.','publicBrowserVerified':False,'userAccepted':False},ensure_ascii=False,indent=2))
 put(ROOT/'SOURCE_PATCH_RECEIPT.json',json.dumps(receipts,ensure_ascii=False,indent=2))
 print('EB1 source build complete; runtime/browser/public verification is still required.')
 

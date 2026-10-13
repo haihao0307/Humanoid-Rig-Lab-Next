@@ -21,3 +21,27 @@ Reference audit is pinned to lo-th/head@21462e471d53ba8c413a96989016510ca4495a34
 ## Delivery and ongoing work
 
 Keep old versions and active specialist branches untouched. Work in isolated branches; only fast-forward commits, Draft PRs, no merge or force push. Record exact upstream source/build revisions, adapter changes, profile digest, verified URLs and remaining limitations. A queued workflow, posted handoff or HTTP 200 is not completed integration. Require real rendered content, lighting response, preserved interactions and exact public bytes. Distinguish desktop software-renderer/viewport checks from physical mobile and consumer-GPU performance tests. If a required site is not verified, say 交付未完成 for that scope.
+
+## User-approved default recipe — 2026-10-13
+
+All EB1 workbenches open with the following profile. The storage namespace was advanced once so an older saved EB1 profile cannot silently override it. Later user adjustments continue to persist under the new namespace.
+
+```json
+{
+  "schema": "kaopu.eb1/1",
+  "preset": "custom",
+  "exposure": 0.7,
+  "key": 1.6,
+  "rim": 3.5,
+  "environment": 0.9,
+  "keyAzimuth": -154,
+  "keyElevation": 8,
+  "rimAzimuth": 71,
+  "rimElevation": 11.309932,
+  "environmentRotation": -69,
+  "keyColor": "#ffffff",
+  "rimColor": "#efa37e",
+  "background": 0.85,
+  "shadowSize": 2048
+}
+```
