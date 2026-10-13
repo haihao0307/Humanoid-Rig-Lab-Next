@@ -1,0 +1,57 @@
+name: Hat R09 startup and cache
+on:
+  push:
+    branches: [fix/hat-r09-cache-startup-20261013]
+    paths: [.github/workflows/hat-r09-iterate.yml, hat-workshop/r09/**]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hat-r09-iterate
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/r04
+            hat-workshop/r07
+            hat-workshop/r08
+            hat-workshop/r09
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Recover verification and finish R09
+        run: |
+          pip install beautifulsoup4 playwright numpy pillow
+          python -m playwright install --with-deps chromium
+          python -u hat-workshop/r09/recover-r09.py
+          python -u hat-workshop/r09/iterate.py
+      - name: Save scoped evidence
+        if: always()
+        run: |
+          if test -d hat-workshop/r09; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add hat-workshop/r09
+            if ! git diff --cached --quiet; then
+              git commit -m 'test(hat-r09): save recovery evidence [skip ci]'
+              git push origin HEAD:fix/hat-r09-cache-startup-20261013
+            fi
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r09-source-and-evidence-${{ github.run_id }}
+          path: |
+            hat-workshop/r08
+            hat-workshop/r09
+          retention-days: 7
