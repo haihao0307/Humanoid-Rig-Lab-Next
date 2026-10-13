@@ -1,0 +1,13 @@
+export const LOOKS=[
+{id:'K01',group:'knit',name:'雾蓝针织 · 黑色七分裤',top:'T01',bottom:'P04',topMaterial:'knit-fine-0',bottomMaterial:'denim-black'},
+{id:'K02',group:'knit',name:'燕麦高领 · 原色直筒牛仔',top:'T08',bottom:'P01',topMaterial:'knit-soft-0',bottomMaterial:'denim-raw'},
+{id:'K03',group:'knit',name:'菱格粗针 · 荔枝纹皮裤',top:'T08',bottom:'P01',topMaterial:'knit-chunky-1',bottomMaterial:'leather-black'},
+{id:'K04',group:'knit',name:'正针条纹 · 针织短裤',top:'T17',bottom:'P02',topMaterial:'knit-reverse-3',bottomMaterial:'knit-soft-0'},
+{id:'L01',group:'leather',name:'黑色荔枝纹 · 上衣与长裤',top:'T03',bottom:'P01',topMaterial:'leather-black',bottomMaterial:'leather-black'},
+{id:'L02',group:'leather',name:'油蜡棕革 · 复古七分牛仔',top:'T17',bottom:'P04',topMaterial:'leather-wax',bottomMaterial:'denim-vintage'},
+{id:'L03',group:'leather',name:'绒面反绒革 · 夏季短套装',top:'T01',bottom:'P02',topMaterial:'leather-suede',bottomMaterial:'leather-suede'},
+{id:'L04',group:'leather',name:'深棕漆皮 · 浅洗直筒牛仔',top:'T03',bottom:'P01',topMaterial:'leather-patent',bottomMaterial:'denim-bleach'},
+{id:'D01',group:'denim',name:'深靛原色 · 双牛仔套装',top:'T01',bottom:'P01',topMaterial:'denim-raw',bottomMaterial:'denim-raw'},
+{id:'D02',group:'denim',name:'复古水洗 · 七分套装',top:'T17',bottom:'P04',topMaterial:'denim-vintage',bottomMaterial:'denim-vintage'},
+{id:'D03',group:'denim',name:'浅色漂洗 · V领短套装',top:'T03',bottom:'P02',topMaterial:'denim-bleach',bottomMaterial:'denim-bleach'},
+{id:'D04',group:'denim',name:'黑色牛仔 · 直身长裤套装',top:'T01',bottom:'P01',topMaterial:'denim-black',bottomMaterial:'denim-black'}];

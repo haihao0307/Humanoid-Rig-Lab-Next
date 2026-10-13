@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict');require('./eb1.js');const E=globalThis.KAOPU_EB1;let checks=0;
+const expected={"schema":"kaopu.eb1/1","preset":"custom","exposure":0.7,"key":1.6,"rim":3.5,"environment":0.9,"keyAzimuth":-154,"keyElevation":8,"rimAzimuth":71,"rimElevation":11.309932,"environmentRotation":-69,"keyColor":"#ffffff","rimColor":"#efa37e","background":0.85,"shadowSize":2048};
+const test=(name,fn)=>{fn();checks++;console.log('PASS',name)};
+test('version and custom preset locked',()=>{assert.equal(E.VERSION,'EB1-1.1.0');assert.equal(E.DEFAULT.preset,'custom');});
+test('user-approved recipe locked',()=>assert.deepEqual(E.DEFAULT,expected));
+for(const p of [{x:1},{exposure:NaN},{key:-1},{rim:Infinity},{shadowSize:1536},{schema:'wrong'},{environment:5},{keyColor:'url(x)'}])test('reject '+JSON.stringify(p),()=>assert.throws(()=>E.validate(p)));
+test('strict immutable recipe',()=>{assert.equal(Object.isFrozen(E.validate({key:2})),true);assert.equal(E.DEFAULT.key,1.6);});
+test('unit direction for approved key',()=>{const d=E.direction(expected.keyAzimuth,expected.keyElevation);assert(Math.abs(Math.hypot(...d)-1)<1e-12);assert(d[0]<0&&d[1]>0&&d[2]<0);});
+test('sRGB conversion',()=>{assert.deepEqual(E.linearColor('#ffffff'),[1,1,1]);assert.deepEqual(E.linearColor('#000000'),[0,0,0]);});
+test('positive bounded deterministic original HDR',()=>{const f=E.studioField(),g=E.studioField();assert.equal(f.data.length,256*128*4);assert.deepEqual(f.data,g.data);assert.equal(f.bins.length,8);f.bins.forEach(b=>{assert(b.color.every(x=>x>=0&&Number.isFinite(x)));assert(Math.abs(Math.hypot(...b.direction)-1)<1e-6)});});
+test('no light energy with independent switches off',()=>{const p=E.sampleProfile({...E.DEFAULT,key:0,rim:0,environment:0});assert.deepEqual(p.keyColor,[0,0,0]);assert.deepEqual(p.rimColor,[0,0,0]);assert(p.environment.every(x=>x.color.every(v=>v===0)));});
+test('background cannot affect lighting',()=>{assert.deepEqual(E.sampleProfile(E.DEFAULT),E.sampleProfile({...E.DEFAULT,background:1}));});
+test('custom preset resets exact recipe',()=>{const s=E.createStore({persist:false,broadcast:false});s.patch({exposure:1.2,key:4});s.preset('custom');assert.deepEqual(s.get(),expected);s.dispose();});
+test('legacy reference remains explicit only',()=>{const s=E.createStore({persist:false,broadcast:false});s.preset('reference');assert.equal(s.get().preset,'reference');assert.equal(s.get().exposure,1);assert.equal(s.get().key,3);assert.equal(s.get().background,.05);s.dispose();});
+test('state survives import and invalid input is atomic',()=>{const s=E.createStore({persist:false,broadcast:false});s.patch({exposure:.8});const before=s.get();assert.throws(()=>s.patch({key:9}));assert.equal(s.get(),before);s.import(expected);assert.deepEqual(s.get(),expected);s.dispose();assert.throws(()=>s.patch({key:1}));});
+console.log(JSON.stringify({passed:true,checks,version:E.VERSION,defaultRecipe:expected}));

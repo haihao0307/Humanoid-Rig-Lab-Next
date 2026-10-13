@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';import zlib from 'node:zlib';import crypto from 'node:crypto';
+import {PlaybackClock} from './playback-clock.mjs';import {decodeClip,clipRows} from './motion-cache.mjs';import {ClothController} from './cloth-controller.mjs';
+const rows=[];let c=new PlaybackClock(30,181);c.start(0);assert.equal(c.advance(1000),3);assert.equal(c.limitedTicks,1);assert.equal(c.advance(2000),6);rows.push('slow display capped at three frames');
+c=new PlaybackClock(30,181);c.start(0);for(let i=1;i<=360;i++)c.advance(i*1000/60);assert.equal(c.frame,180);assert(c.finished);rows.push('ordinary six second clock');
+c.seek(60);c.start(10000);assert.equal(c.advance(10000),60);assert.equal(c.advance(10050),61);rows.push('resume excludes paused time');
+c=new PlaybackClock(30,181,.5);c.start(0);for(let i=1;i<=120;i++)c.advance(i*1000/60);assert.equal(c.frame,30);rows.push('half speed');c.seek(-100);assert.equal(c.frame,0);c.seek(10000);assert.equal(c.frame,180);rows.push('seek boundaries');
+const sha=b=>crypto.createHash('sha256').update(b).digest('hex'),physical=JSON.parse(fs.readFileSync(new URL('./PHYSICAL_PARENT_HASHES.json',import.meta.url)));for(const[n,h]of Object.entries(physical))assert.equal(sha(fs.readFileSync(new URL(n,import.meta.url))),h,n);rows.push('all physical source hashes unchanged');
+const index=JSON.parse(fs.readFileSync(new URL('./clips/index.json',import.meta.url))),clips=[];
+for(const item of index.clips){const bytes=fs.readFileSync(new URL('./clips/'+item.file,import.meta.url));assert.equal(sha(bytes),item.sha256);const clip=decodeClip(zlib.gunzipSync(bytes));assert(clip.header.proof.passed);assert.equal(clip.header.frameCount,181);let reuse=null;
+ for(const f of[0,30,60,90,180]){const expected=clipRows(clip,f);reuse=clipRows(clip,f,reuse);for(let i=0;i<expected.length;i++){assert.deepEqual(reuse[i].positions,expected[i].positions);assert.deepEqual(reuse[i].normals,expected[i].normals);assert(reuse[i].positions.every(Number.isFinite));}}
+ // Test the actual controller methods without starting a browser Worker.
+ const ctr=Object.create(ClothController.prototype);Object.assign(ctr,{activeClip:clip,clock:new PlaybackClock(30,181),nativeMotion:{native:new Float64Array(3),at:(id,t)=>{ctr.bodyTime=t;},audit:()=>({testDouble:true})},onFrame:()=>{},playToken:0});const a=ctr.seekMotionFrame(90);assert.equal(a.frameSequence,90);assert.equal(ctr.bodyTime,a.motionTime);assert.equal(ctr.running,false);ctr.setPlaybackSpeed(.25);assert.equal(ctr.clock.speed,.25);assert.throws(()=>ctr.setPlaybackSpeed(2));clips.push({look:item.look,motion:item.motion,sha256:item.sha256,decodedFrames:5,proof:clip.header.proof.passed});
+}
+assert.equal(clips.length,9);assert.equal(crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+fs.statSync(new URL('./native/leather-r13.mjs',import.meta.url)).size+'\0'),fs.readFileSync(new URL('./native/leather-r13.mjs',import.meta.url))])).digest('hex'),'a84543e00425ee9b8371bd9dbfa69a401931447a');
+const result={passed:true,clockChecks:rows,clips,leatherR15MaterialBlobIdentical:true,fullPhysicalSimulationRerun:false,visualDeviceTested:false};fs.writeFileSync(new URL('./UNIT_REPORT.json',import.meta.url),JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));

@@ -1,0 +1,37 @@
+name: EB1 original gallery source repair
+on:
+  push:
+    branches: [feature/eb1-unified-lighting-20261013]
+    paths: [.github/workflows/eb1-gallery-source-repair.yml]
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/eb1-unified-lighting-20261013
+          sparse-checkout: lighting/eb1
+      - name: Restore exact native images; do not change frozen runtime bytes
+        run: |
+          python - <<'PY'
+          import pathlib,json,urllib.request,hashlib,subprocess
+          root=pathlib.Path('lighting/eb1');m=json.loads((root/'v1/EB1_MANIFEST.json').read_text());expected=m['workbenches']['tailor']['preservedFiles'];files={}
+          source='https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/d00fc2de66dcf57367443d7ecfdc60977bc2b6ee/kaopu-tailor-workbench/material-products/r04-4-1/'
+          for prefix in ['K','L','D']:
+            for i in range(1,5):
+              rel=f'thumbs/{prefix}{i:02d}.png';data=urllib.request.urlopen(source+rel,timeout=60).read();digest=hashlib.sha256(data).hexdigest()
+              assert digest==expected[rel] and data.startswith(bytes.fromhex('89504e470d0a1a0a')),rel
+              p=root/'v1/tailor'/rel
+              if p.exists():assert p.read_bytes()==data
+              else:p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
+              subprocess.run(['git','add','-f',str(p)],check=True);files[rel]={'bytes':len(data),'sha256':digest}
+          (root/'GALLERY_SOURCE_REPAIR.json').write_text(json.dumps({'runtimeCandidate':'2a17b4ae0113b087b940adddedd1476fd5ce8003','nativeSource':'d00fc2de66dcf57367443d7ecfdc60977bc2b6ee','reason':'Native PNG files present in verified build artifact but omitted by original Git add/ignore rules; actual public img requests returned 404.','runtimeCodeChanged':False,'originalImagesRegenerated':False,'files':files},indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lighting/eb1/GALLERY_SOURCE_REPAIR.json
+          git commit -m 'fix(eb1): retain original garment thumbnails as tracked deployment assets'
+          git push origin HEAD:feature/eb1-unified-lighting-20261013

@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';
+import {installRenderBackpressure} from './render-backpressure.mjs';
+const frames=new Map();let serial=0,draws=0,live=0,peak=0,done=false,loss=false;
+globalThis.requestAnimationFrame=f=>{frames.set(++serial,f);return serial;};globalThis.cancelAnimationFrame=i=>frames.delete(i);
+const gl={SYNC_GPU_COMMANDS_COMPLETE:1,TIMEOUT_EXPIRED:2,WAIT_FAILED:3,isContextLost:()=>loss,fenceSync:()=>{live++;peak=Math.max(peak,live);return{};},deleteSync:()=>live--,flush:()=>{},clientWaitSync:(s,flags,timeout)=>{assert.equal(flags,0);assert.equal(timeout,0);return done?4:2;}};
+const listeners={},viewer={active:true,lost:false,renderer:{getContext:()=>gl},canvas:{addEventListener:(n,f)=>listeners[n]=f},render:()=>{assert.equal(live,0);draws++;},dispose:()=>{}};
+const gate=installRenderBackpressure(viewer),sleep=ms=>new Promise(r=>setTimeout(r,ms)),frame=()=>{const a=[...frames.values()];frames.clear();a.forEach(f=>f(performance.now()));};
+const a=viewer.render(),b=viewer.render(),c=viewer.render();assert.equal(frames.size,1);frame();assert.equal(draws,1);await sleep(12);assert.equal(draws,1);assert.equal(gate.audit().inFlight,1);
+const d=viewer.render(),e=viewer.render();assert.equal(frames.size,0);assert.equal(gate.audit().queuedSnapshots,1);done=true;await sleep(20);assert(await a&&await b&&await c);assert.equal(draws,1);frame();await d;await e;assert.equal(draws,2);assert.equal(peak,1);assert.equal(live,0);
+const f=viewer.render();loss=true;frame();assert.equal(await f,false);loss=false;viewer.dispose();assert.equal(await viewer.render(),false);assert.equal(frames.size,0);
+const controls=fs.readFileSync(new URL('./motion-transport.mjs',import.meta.url),'utf8');assert(!controls.includes('.audit()'));assert(!fs.readFileSync(new URL('./render-backpressure.mjs',import.meta.url),'utf8').includes('gl.finish('));
+const report={passed:true,duplicateRequestsCoalesced:true,atMostOneOutstandingGPUFrame:true,queryTimeoutAlwaysZero:true,completionPromiseOrdering:true,contextLostSafelySettled:true,disposeSafe:true,controlIntervalDoesNotReadGL:true,draws,peak,physicalCoreChanged:false,realGPUPerformanceTest:false};fs.writeFileSync(new URL('./RENDER_UNIT_REPORT.json',import.meta.url),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));

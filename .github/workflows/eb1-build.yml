@@ -1,0 +1,105 @@
+name: EB1 native lighting verification
+on:
+  push:
+    branches: [feature/eb1-unified-lighting-20261013]
+    paths: [.github/workflows/eb1-build.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/eb1-unified-lighting-20261013
+          fetch-depth: 1
+          sparse-checkout: |
+            .github/workflows
+            lighting/eb1
+      - name: Apply approved recipe, migrate old saved defaults once, and record source
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python lighting/eb1/apply-user-recipe.py
+          python lighting/eb1/finalize-user-recipe.py
+          git add \
+            lighting/eb1/eb1.js \
+            lighting/eb1/prepare.py \
+            lighting/eb1/test-core.cjs \
+            lighting/eb1/qa.py \
+            lighting/eb1/README.md \
+            lighting/eb1/POLICY.md \
+            lighting/eb1/USER_RECIPE_20261013.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat(eb1): make the user-approved custom recipe authoritative across adapters'
+            git push origin HEAD:feature/eb1-unified-lighting-20261013
+          fi
+          echo "EB1_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: eb1-source-audit
+          run-id: 38367737094
+          github-token: ${{ github.token }}
+          path: /tmp/eb1-audit
+      - uses: actions/download-artifact@v4
+        with:
+          name: eb1-complete-inputs
+          run-id: 38368562825
+          github-token: ${{ github.token }}
+          path: /tmp/eb1-inputs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned native linker and browser dependencies
+        run: |
+          mkdir -p /tmp/eb1-tools
+          cd /tmp/eb1-tools
+          npm init -y >/dev/null
+          npm install --save-exact three@0.179.1 esbuild@0.25.0
+          python -m pip install playwright==1.56.0 pillow==11.3.0 beautifulsoup4==4.13.4
+          python -m playwright install --with-deps chromium
+      - name: Build additive snapshots without changing native assets or physics
+        env:
+          EB1_INPUTS: /tmp/eb1-inputs
+          EB1_AUDIT: /tmp/eb1-audit
+          EB1_NODE_MODULES: /tmp/eb1-tools/node_modules
+        run: |
+          node lighting/eb1/test-core.cjs
+          node --check lighting/eb1/eb1.js
+          python lighting/eb1/prepare.py
+      - name: Real Chromium surfaces, exact recipe, native interaction and reload persistence
+        run: |
+          python -m http.server 8791 --directory lighting/eb1/v1 >/tmp/eb1-http.log 2>&1 &
+          python lighting/eb1/qa.py
+      - name: Save verified candidate and evidence without replacing legacy entries
+        if: success()
+        run: |
+          git add lighting/eb1/v1 lighting/eb1/qa lighting/eb1/SOURCE_PATCH_RECEIPT.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(eb1): browser-test the approved recipe in five native workbenches and lab'
+            git push origin HEAD:feature/eb1-unified-lighting-20261013
+          fi
+          echo "EB1_CANDIDATE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Collect diagnostics
+        if: always()
+        run: |
+          mkdir -p lighting/eb1/qa
+          test ! -f /tmp/eb1-http.log || cp /tmp/eb1-http.log lighting/eb1/qa/server.log
+          git rev-parse HEAD > lighting/eb1/qa/BRANCH_COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eb1-browser-candidate
+          path: |
+            lighting/eb1/v1
+            lighting/eb1/qa
+            lighting/eb1/SOURCE_PATCH_RECEIPT.json
+            lighting/eb1/USER_RECIPE_20261013.json
+            lighting/eb1/*.js
+            lighting/eb1/*.py
+            lighting/eb1/*.cjs
+            lighting/eb1/*.md
+          retention-days: 14
