@@ -4,9 +4,12 @@ on:
     branches: [perf/leather-r17-b1-20261013]
     paths:
       - .github/workflows/leather-b1-refinement.yml
-      - leather-workshop/b1-refinement/**
+      - leather-workshop/b1-refinement/probe-hotspots.py
 permissions:
   contents: read
+concurrency:
+  group: leather-b1-hotspot-probe
+  cancel-in-progress: true
 jobs:
   probe:
     runs-on: ubuntu-24.04
@@ -21,18 +24,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Build unchanged candidate and compare diagnostic-only variants
+      - name: Build unchanged candidate and isolate actual drawing costs
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y clang-18 lld-18
           pip -q install -r leather-workshop/r17/requirements-build.txt playwright==1.55.0
           python leather-workshop/r17/build.py
-          python -u leather-workshop/b1-refinement/probe.py
+          python -u leather-workshop/b1-refinement/probe-hotspots.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: leather-b1-refinement-${{ github.run_id }}
+          name: leather-b1-hotspots-${{ github.run_id }}
           path: |
-            leather-workshop/r17/qa/b1/refinement/*.json
-            leather-workshop/r17/qa/b1/refinement/*.png
+            leather-workshop/r17/qa/b1/hotspots/*.json
+            leather-workshop/r17/qa/b1/hotspots/*.png
           retention-days: 14
