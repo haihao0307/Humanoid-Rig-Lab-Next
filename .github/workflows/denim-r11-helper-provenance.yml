@@ -1,0 +1,113 @@
+name: Denim R11 helper provenance and runtime verification
+on:
+  push:
+    branches: [fix/denim-r11-helper-provenance-20261013]
+    paths:
+      - denim-workshop/r11/**
+      - .github/workflows/denim-r11-helper-provenance.yml
+permissions:
+  contents: write
+concurrency:
+  group: denim-r11-helper-provenance
+  cancel-in-progress: true
+jobs:
+  verify-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Derive only the new revision and verify actual source
+        run: |
+          test -f denim-workshop/r11/app.js || python denim-workshop/r11/derive.py
+          python denim-workshop/r11/build.py
+          node --check denim-workshop/r11/app.js
+          node --check denim-workshop/r11/noise-kernel.js
+          node denim-workshop/r11/test-helpers.cjs
+          node denim-workshop/r11/test-budget.cjs
+          node denim-workshop/r11/test-cotton.cjs
+          node denim-workshop/r11/test-dynamics.cjs
+          python -m py_compile denim-workshop/r11/qa-helpers.py
+          cmp LICENSE denim-workshop/r11/LICENSE
+          cmp denim-workshop/r10/dynamics.js denim-workshop/r11/dynamics.js
+          git diff --exit-code HEAD -- denim-workshop/r10 denim-workshop/archives LICENSE THIRD_PARTY_NOTICES.md
+      - name: Record the inspected historical source path and removal state
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          p=Path('denim-workshop/r11');old=Path('denim-workshop/r05/cotton.glsl').read_text()
+          assert 'float hash2(vec2 x)' in old and 'float n2(vec2 x)' in old
+          record={'scope':'R11 helper source remediation, not whole product legal clearance','archiveCommit':'88b9f2f0c7c67731cee9ab3082f2ea457e98323e','historicalIntroduction':'ad456539f1f91a6cd6f8d15bdc89038c8113fa50','historicalPath':'denim-workshop/r05/cotton.glsl','historicalExternalInput':'UNKNOWN; not retrospectively licensed','replacement':'noise-kernel.js: integer grid plus documented interpolation; no legacy sampled table','upstreamFinalizer':{'author':'Austin Appleby','repository':'aappleby/smhasher','commit':'92cf3702fcfaadc84eb7bef59825a23e0cd84f56','path':'src/MurmurHash3.cpp','blob':'aa7982d3eef2d891098d46afb191be87f31a5a29','permission':'author public-domain declaration'},'preservedParentHash':'seeded fmix32-tail adapter; unchanged results, source and modifications now attributed','publicMath':'endpoint-constrained cubic and Hermite interpolation; no claim to invent these methods','removedFallback':'core.js cutRanges sine jitter, not the active Natural.plan','toneCurve':'Narkowicz author CC0/MIT offer; CC0 recorded, numerical expression unchanged','rootMITChanged':False,'archiveChanged':False,'independentCleanRoomClaim':False,'globalRightsClearance':False,'currentRuntimeSourceHashes':json.loads((p/'BUILD_MANIFEST.json').read_text())['sourceHashes']}
+          (p/'PROVENANCE_RECORD.json').write_text(json.dumps(record,ensure_ascii=False,indent=2))
+          PY
+      - name: Install pinned browser and measurement tools
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6 scipy==1.15.3
+          python -m playwright install --with-deps chromium
+      - name: Real file browser, source-helper GPU parity and unchanged cloth behavior
+        run: xvfb-run -a python denim-workshop/r11/qa-helpers.py
+      - name: Publish only file-tested R11 canonical sources and standalone HTML
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          p=Path('denim-workshop/r11');files=[str(f) for f in p.iterdir() if f.is_file() and f.name!='DELIVERY_RECEIPT.json' and (f.name=='LICENSE' or f.suffix in ['.js','.py','.md','.html','.json','.cjs'])]
+          subprocess.run(['git','add','--',*files],check=True)
+          PY
+          git diff --exit-code HEAD -- denim-workshop/r10 denim-workshop/archives LICENSE THIRD_PARTY_NOTICES.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'build(denim): publish verified R11 helper provenance revision [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r11/index.html" >> "$GITHUB_OUTPUT"
+      - name: Actual fixed public browser, helpers, residency, wind and export
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          sleep 8
+          xvfb-run -a python denim-workshop/r11/qa-helpers.py --public "$PUBLIC_URL"
+      - name: Verify public bytes and record final scoped receipt
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,urllib.request
+          p=Path('denim-workshop/r11');a=json.loads((p/'evidence/file-qa.json').read_text());b=json.loads((p/'evidence/public-qa.json').read_text());assert a['passed'] and b['passed']
+          m=json.loads((p/'BUILD_MANIFEST.json').read_text());u='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r11/index.html'
+          with urllib.request.urlopen(u,timeout=90) as response:
+              data=response.read();assert response.status==200
+          assert data==(p/'index.html').read_bytes() and hashlib.sha256(data).hexdigest()==m['sha256']
+          def result(r):
+              return {'passed':r['passed'],'mode':r['mode'],'states':[s['name'] for s in r['states']],'network':r['network'],'helperGPU':r['helperGPU'],'appearance':r.get('appearance'),'motion':r['motion'],'reloadMaxPixelDifference':r['reloadMaxPixelDifference'],'physicsContinues':r['physicsContinues'],'oldRecipeRejected':r['oldRecipeRejected'],'nearResources':r['nearResources'],'farResources':r['farResources']}
+          receipt={'version':'R11.0','task':'Trace small unknown helpers and locally replace where provenance cannot be closed','scope':'Helper-source remediation only','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'deliveryVerified':True,'manifest':m,'originalArchiveCommit':'88b9f2f0c7c67731cee9ab3082f2ea457e98323e','originalArchiveUnchanged':True,'rootLicenseUnchanged':True,'helperNumeric':json.loads((p/'helper-qa.json').read_text()),'browser':{'file':result(a),'public':result(b)},'measurementMethod':a['method'],'browserVersion':b['browserVersion'],'oldNoiseRealizationPreserved':False,'userVisualApproval':False,'realDeviceFPS':False,'legalClearance':False,'limits':['Historical external input for replaced sine helpers remains UNKNOWN; this is prospective replacement, not retroactive licensing','Not a clean-room legal claim or all-product IP clearance','Water-wash speckles and grain realization can change; old recipes remain in the immutable R10 archive','Fixed-image and local motion tests do not prove every view, full image or device unchanged','No physical solver, geometry, LOD policy or root license was replaced; no merge or force push']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r11/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): record R11 helper provenance and actual fixed-public verification [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r11-helper-evidence
+          path: denim-workshop/r11
+          retention-days: 14
+          if-no-files-found: error

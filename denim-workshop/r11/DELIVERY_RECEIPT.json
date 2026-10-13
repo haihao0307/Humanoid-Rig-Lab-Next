@@ -1,0 +1,443 @@
+{
+  "version": "R11.0",
+  "task": "Trace small unknown helpers and locally replace where provenance cannot be closed",
+  "scope": "Helper-source remediation only",
+  "sourceHead": "79274a97162439213e389af38f9650ac257c381d",
+  "buildCommit": "086414b317f313bf9465ea957753ae7e84453f6f",
+  "publicUrl": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/086414b317f313bf9465ea957753ae7e84453f6f/denim-workshop/r11/index.html",
+  "workflow": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/38340504021",
+  "deliveryVerified": true,
+  "manifest": {
+    "version": "R11.0",
+    "baseCommit": "3daabc3436ecf6e5297d56869712449ca145ab5e",
+    "entry": "denim-workshop/r11/index.html",
+    "bytes": 80712,
+    "sha256": "bed84afcfa5603dd242e3b96999de9b5954928aaba37f2e06ab95d91b26e0d4d",
+    "unpackedHtmlBytes": 145675,
+    "runtimeSourceBytes": 131239,
+    "runtimeSourceSha256": "9bcb38337ef8d154a284d8748eb818a8b9d16335acd03ce062d6d1739bde44b4",
+    "packedRuntimeBytes": 46375,
+    "packing": "gzip, native DecompressionStream, inline base64, no network",
+    "runtimeAssets": 0,
+    "sourceHashes": {
+      "sampling.js": "104b5646b14c02ecf033b831456b72dd56f248186decbaa02d73596b92677302",
+      "fiber-optics.js": "8aa99b3ab475c4a0e1b6127ed61357ee416250ed9abfada250f0d10cde090701",
+      "structure.js": "6b9c08bb4b47f68e3a458714af5ee5a6d9b38c78ad3312e8e8c2776ad59b5507",
+      "core.js": "fe72b6e3a26efc20f5e3cb1506604d2596855a50a8c709f23e4416f1dee518d2",
+      "cotton-surface.js": "fcfe00e48a2aa7e9b995b86fe122dc1d0b4a9154d09a7fcd51a1254522e96de6",
+      "natural-yarn.js": "1220dad799d13dcbb98d5028f13bf3253bc411637527f11f62a447b0bc2c0182",
+      "runtime-budget.js": "934676c36e1e6acdacb36bc345970b3732b0b27b5f52f3647c73adf94cb1e3ed",
+      "stitches.js": "52409c703b34be91c5bee2e96164a48e491a0926740cccfd80bd02ad42a0af12",
+      "dynamics.js": "2ffdccd709cac9360870836f14d351b73aa6e1bd185311c88c87931cd3d4a53b",
+      "distance-lod.js": "a05e09ffec3ae1212a995b162a017426b8dd11fe7b595a1c99248624d5da494b",
+      "noise-kernel.js": "4f489feb68a521c607a09e92ba45ff5e857fec0d03a307bdcadb30b2745e101e",
+      "app.js": "356f02446fd870929e007b304f0729854005ea9fdb646caa2e3b4979011b709c"
+    },
+    "qualityDefault": "R08 near sampling preserved; local-footprint filtered middle/far; Float32 micro layer generated on demand",
+    "efficientMode": "explicit lower internal pixel resolution, same 4x offscreen MSAA where available",
+    "publicDeliveryVerified": false,
+    "actualFileNavigationVerified": false,
+    "physicalClothSolver": "475-node XPBD proxy; not full garment, no self collision",
+    "realDeviceFPSVerified": false
+  },
+  "originalArchiveCommit": "88b9f2f0c7c67731cee9ab3082f2ea457e98323e",
+  "originalArchiveUnchanged": true,
+  "rootLicenseUnchanged": true,
+  "helperNumeric": {
+    "passed": true,
+    "legalClearance": false,
+    "samples": 65536,
+    "mean": 0.5002364800016564,
+    "variance": 0.03449908981115285,
+    "boundaryMaxDifference": 2.8310687127941492e-14,
+    "unchangedParentHashSamples": 65536,
+    "preservedGeometry": [
+      {
+        "damage": 0,
+        "pointDataSha256": "6b7e880fc74b23beffb6a2a0e1a6e38aa2d606f5c7461006acb15b2494eb8c47",
+        "byteIdentical": true
+      },
+      {
+        "damage": 4,
+        "pointDataSha256": "b01f07ce2442f8c79d0f5f081ac97221e8f2505593813aedbbdccaad5689eaff",
+        "byteIdentical": true
+      }
+    ],
+    "executableLegacySignaturesAbsent": true,
+    "licenseNoticesIncluded": true,
+    "samePhysicsAndLOD": true
+  },
+  "browser": {
+    "file": {
+      "passed": true,
+      "mode": "file",
+      "states": [
+        "baseline-near-request",
+        "baseline-near-settled",
+        "baseline-middle-base",
+        "baseline-middle-0",
+        "baseline-middle-1",
+        "baseline-middle-2",
+        "baseline-middle-3",
+        "baseline-far-base",
+        "baseline-far-0",
+        "baseline-far-1",
+        "baseline-far-2",
+        "baseline-far-3",
+        "default",
+        "candidate-near-request",
+        "candidate-near-settled",
+        "candidate-middle-base",
+        "candidate-middle-0",
+        "candidate-middle-1",
+        "candidate-middle-2",
+        "candidate-middle-3",
+        "candidate-far-base",
+        "candidate-far-0",
+        "candidate-far-1",
+        "candidate-far-2",
+        "candidate-far-3",
+        "far-released",
+        "restore-shape",
+        "reloaded-near-request",
+        "reloaded-near-settled",
+        "sewing",
+        "damage",
+        "intact",
+        "wind-on",
+        "wind-far-efficient",
+        "wind-stop",
+        "physics-reset",
+        "quality-restored",
+        "recipe-roundtrip",
+        "mobile-default",
+        "mobile-middle"
+      ],
+      "network": [
+        {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/denim-workshop/r10/index.html",
+            "blob:null/254c98fa-d718-415b-8150-eb060adad26c",
+            "blob:null/77468023-9d27-4034-9237-5119c62e9618"
+          ],
+          "version": "r10",
+          "mobileViewport": false
+        },
+        {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/denim-workshop/r11/index.html",
+            "blob:null/848ea82e-db57-4ada-ac4c-aa323c1f0f9c",
+            "blob:null/48c962c8-8e29-47b2-9277-2ab06f4f4423",
+            "blob:null/a16e4a96-4330-474b-ba63-5b0815dc5462"
+          ],
+          "version": "r11",
+          "mobileViewport": false
+        },
+        {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "file:///home/runner/work/Humanoid-Rig-Lab-Next/Humanoid-Rig-Lab-Next/denim-workshop/r11/index.html",
+            "blob:null/246bea00-e48d-4905-8863-5bf1e19eba1d"
+          ],
+          "version": "r11",
+          "mobileViewport": true
+        }
+      ],
+      "helperGPU": {
+        "samples": 32,
+        "maxAbsError": 6.412017228285549e-08,
+        "error": 0
+      },
+      "appearance": {
+        "mae": 6.670512495860685,
+        "meanRGBShift": [
+          0.3260416463758986,
+          0.49533474881664574,
+          0.6506165144048168
+        ],
+        "contrastRatio": 1.0039665948054004,
+        "pixelIdentical": false
+      },
+      "motion": {
+        "middle": {
+          "candidate": 0.5066192014594758,
+          "baseline": 0.5233803487163361,
+          "limit": 0.6733803487163361
+        },
+        "far": {
+          "candidate": 0.4311354020391331,
+          "baseline": 0.440756951858841,
+          "limit": 0.590756951858841
+        }
+      },
+      "reloadMaxPixelDifference": 0,
+      "physicsContinues": {
+        "before": 1060,
+        "after": 1965
+      },
+      "oldRecipeRejected": true,
+      "nearResources": {
+        "geometryBufferBytes": 21996876,
+        "fiberPointTextureBytes": 31735808,
+        "materialMipBytes": 22369616,
+        "shadowBytes": 5242880,
+        "attachmentBytes": 111965672,
+        "transitionBytes": 0,
+        "trackedGpuBytes": 193333652,
+        "physicsGpuBytes": 22800,
+        "physicsWorkerBytes": null,
+        "physicsCpuMs": null,
+        "detailResidency": {
+          "requests": 1,
+          "uploads": 1,
+          "releases": 0,
+          "cancelled": 0,
+          "pending": false,
+          "error": null,
+          "resident": true,
+          "pointBytes": 29966336,
+          "indexBytes": 7485140,
+          "cpuRetainedBytes": 8965580,
+          "scope": "whole swatch micro-layer, deterministic on-demand generation",
+          "physicsChanged": false
+        },
+        "retainedFiberCpuBytes": 9503292,
+        "recipeBytes": 714,
+        "geometryBuilds": 1,
+        "visibilityUpdates": 2,
+        "visibilityChecks": 4,
+        "motionFpsCap": 60,
+        "quality": "fidelity",
+        "gpuTimerSupported": true,
+        "gpuElapsedMs": 2330.119836,
+        "gpuSamples": 1,
+        "notTotalProcessMemory": true,
+        "clothSolver": "XPBD cloth proxy in worker; not full garment"
+      },
+      "farResources": {
+        "geometryBufferBytes": 14425304,
+        "fiberPointTextureBytes": 1769472,
+        "materialMipBytes": 22369616,
+        "shadowBytes": 5242880,
+        "attachmentBytes": 111965672,
+        "transitionBytes": 0,
+        "trackedGpuBytes": 155795744,
+        "physicsGpuBytes": 22800,
+        "physicsWorkerBytes": 180136,
+        "physicsCpuMs": 0,
+        "detailResidency": {
+          "requests": 1,
+          "uploads": 1,
+          "releases": 1,
+          "cancelled": 0,
+          "pending": false,
+          "error": null,
+          "resident": false,
+          "pointBytes": 0,
+          "indexBytes": 0,
+          "cpuRetainedBytes": 0,
+          "scope": "whole swatch micro-layer, deterministic on-demand generation",
+          "physicsChanged": false
+        },
+        "retainedFiberCpuBytes": 537712,
+        "recipeBytes": 714,
+        "geometryBuilds": 1,
+        "visibilityUpdates": 3,
+        "visibilityChecks": 12,
+        "motionFpsCap": 60,
+        "quality": "fidelity",
+        "gpuTimerSupported": true,
+        "gpuElapsedMs": 1312.471065,
+        "gpuSamples": 2,
+        "notTotalProcessMemory": true,
+        "clothSolver": "XPBD cloth proxy in worker; not full garment"
+      }
+    },
+    "public": {
+      "passed": true,
+      "mode": "public",
+      "states": [
+        "default",
+        "candidate-near-request",
+        "candidate-near-settled",
+        "candidate-middle-base",
+        "candidate-middle-0",
+        "candidate-middle-1",
+        "candidate-middle-2",
+        "candidate-middle-3",
+        "candidate-far-base",
+        "candidate-far-0",
+        "candidate-far-1",
+        "candidate-far-2",
+        "candidate-far-3",
+        "far-released",
+        "restore-shape",
+        "reloaded-near-request",
+        "reloaded-near-settled",
+        "sewing",
+        "damage",
+        "intact",
+        "wind-on",
+        "wind-far-efficient",
+        "wind-stop",
+        "physics-reset",
+        "quality-restored",
+        "recipe-roundtrip",
+        "mobile-default",
+        "mobile-middle"
+      ],
+      "network": [
+        {
+          "pageErrors": [],
+          "consoleErrors": [
+            {
+              "url": "https://htmlpreview.github.io/favicon.ico",
+              "text": "Failed to load resource: the server responded with a status of 404 ()"
+            }
+          ],
+          "httpErrors": [],
+          "requests": [
+            "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/086414b317f313bf9465ea957753ae7e84453f6f/denim-workshop/r11/index.html",
+            "https://htmlpreview.github.io/htmlpreview.js",
+            "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/086414b317f313bf9465ea957753ae7e84453f6f/denim-workshop/r11/index.html",
+            "blob:https://htmlpreview.github.io/45ddeafb-bc36-47a0-807b-84b49e071bff",
+            "blob:https://htmlpreview.github.io/b4ae9829-9e42-4daa-8ed9-aa51b5a3dad6",
+            "blob:https://htmlpreview.github.io/2bd3f063-988c-4380-b94c-bc972dd70708"
+          ],
+          "version": "r11",
+          "mobileViewport": false
+        },
+        {
+          "pageErrors": [],
+          "consoleErrors": [],
+          "httpErrors": [],
+          "requests": [
+            "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/086414b317f313bf9465ea957753ae7e84453f6f/denim-workshop/r11/index.html",
+            "https://htmlpreview.github.io/htmlpreview.js",
+            "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/086414b317f313bf9465ea957753ae7e84453f6f/denim-workshop/r11/index.html",
+            "blob:https://htmlpreview.github.io/644e1945-cf31-4d23-a168-f5b1788dbded"
+          ],
+          "version": "r11",
+          "mobileViewport": true
+        }
+      ],
+      "helperGPU": {
+        "samples": 32,
+        "maxAbsError": 6.412017228285549e-08,
+        "error": 0
+      },
+      "appearance": null,
+      "motion": {
+        "middle": {
+          "candidate": 0.5066192014594758
+        },
+        "far": {
+          "candidate": 0.4311354020391331
+        }
+      },
+      "reloadMaxPixelDifference": 0,
+      "physicsContinues": {
+        "before": 1059,
+        "after": 1957
+      },
+      "oldRecipeRejected": true,
+      "nearResources": {
+        "geometryBufferBytes": 21996876,
+        "fiberPointTextureBytes": 31735808,
+        "materialMipBytes": 22369616,
+        "shadowBytes": 5242880,
+        "attachmentBytes": 111965672,
+        "transitionBytes": 0,
+        "trackedGpuBytes": 193333652,
+        "physicsGpuBytes": 22800,
+        "physicsWorkerBytes": null,
+        "physicsCpuMs": null,
+        "detailResidency": {
+          "requests": 1,
+          "uploads": 1,
+          "releases": 0,
+          "cancelled": 0,
+          "pending": false,
+          "error": null,
+          "resident": true,
+          "pointBytes": 29966336,
+          "indexBytes": 7485140,
+          "cpuRetainedBytes": 8965580,
+          "scope": "whole swatch micro-layer, deterministic on-demand generation",
+          "physicsChanged": false
+        },
+        "retainedFiberCpuBytes": 9503292,
+        "recipeBytes": 714,
+        "geometryBuilds": 1,
+        "visibilityUpdates": 2,
+        "visibilityChecks": 4,
+        "motionFpsCap": 60,
+        "quality": "fidelity",
+        "gpuTimerSupported": true,
+        "gpuElapsedMs": 2371.414703,
+        "gpuSamples": 1,
+        "notTotalProcessMemory": true,
+        "clothSolver": "XPBD cloth proxy in worker; not full garment"
+      },
+      "farResources": {
+        "geometryBufferBytes": 14425304,
+        "fiberPointTextureBytes": 1769472,
+        "materialMipBytes": 22369616,
+        "shadowBytes": 5242880,
+        "attachmentBytes": 111965672,
+        "transitionBytes": 0,
+        "trackedGpuBytes": 155795744,
+        "physicsGpuBytes": 22800,
+        "physicsWorkerBytes": 180136,
+        "physicsCpuMs": 0,
+        "detailResidency": {
+          "requests": 1,
+          "uploads": 1,
+          "releases": 1,
+          "cancelled": 0,
+          "pending": false,
+          "error": null,
+          "resident": false,
+          "pointBytes": 0,
+          "indexBytes": 0,
+          "cpuRetainedBytes": 0,
+          "scope": "whole swatch micro-layer, deterministic on-demand generation",
+          "physicsChanged": false
+        },
+        "retainedFiberCpuBytes": 537712,
+        "recipeBytes": 714,
+        "geometryBuilds": 1,
+        "visibilityUpdates": 3,
+        "visibilityChecks": 12,
+        "motionFpsCap": 60,
+        "quality": "fidelity",
+        "gpuTimerSupported": true,
+        "gpuElapsedMs": 1309.815847,
+        "gpuSamples": 2,
+        "notTotalProcessMemory": true,
+        "clothSolver": "XPBD cloth proxy in worker; not full garment"
+      }
+    }
+  },
+  "measurementMethod": "Fixed 1000x780 DPR1; 4 quarter-pixel camera pans, 3 cubic-reprojected 13x51 brightness patches; UI wind checked separately. Mobile is 390x844 viewport only.",
+  "browserVersion": "140.0.7339.16",
+  "oldNoiseRealizationPreserved": false,
+  "userVisualApproval": false,
+  "realDeviceFPS": false,
+  "legalClearance": false,
+  "limits": [
+    "Historical external input for replaced sine helpers remains UNKNOWN; this is prospective replacement, not retroactive licensing",
+    "Not a clean-room legal claim or all-product IP clearance",
+    "Water-wash speckles and grain realization can change; old recipes remain in the immutable R10 archive",
+    "Fixed-image and local motion tests do not prove every view, full image or device unchanged",
+    "No physical solver, geometry, LOD policy or root license was replaced; no merge or force push"
+  ]
+}
