@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "checks": [
+    "Parent reproduces lost post-reset sampling",
+    "Reset during pending sample delivers fresh zero-step state",
+    "Twenty requests coalesce into only one follow-up",
+    "Duplicate old reply cannot clear or replace current request",
+    "Previous topology generation cannot overwrite rebuilt cloth",
+    "Reset, kick, step and anchors are never coalesced",
+    "Latest controls invalidate older sample without stopping simulation",
+    "Accepted ordinary sample does not create an endless request loop",
+    "Unknown request cannot clear pending sample",
+    "Worker protocol echoes command epoch and request",
+    "Cloth solver and physical shader are byte-for-byte unchanged",
+    "Intact and damaged real solver trajectories remain identical"
+  ],
+  "limitations": [
+    "Controlled mock delivery for transport invariants",
+    "Real unchanged solver parity is not physical calibration",
+    "Browser and public access require separate QA"
+  ],
+  "originalRace": {
+    "sampleRequests": 1,
+    "acceptedPreResetSteps": 24
+  }
+}
