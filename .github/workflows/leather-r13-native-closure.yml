@@ -1,0 +1,197 @@
+name: Leather R13 native closure
+on:
+  push:
+    branches: [build/leather-r13-native-closure-20261013]
+    paths:
+      - .github/workflows/leather-r13-native-closure.yml
+      - leather-workshop/r13/**
+      - leather-workshop/s1-closure/**
+permissions:
+  contents: read
+concurrency:
+  group: leather-r13-native-closure
+  cancel-in-progress: true
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    outputs:
+      source: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - name: Materialize reviewed source migration exactly once
+        id: source
+        run: |
+          if ! test -f leather-workshop/r13/MIGRATION_COMPLETE.json; then
+            python leather-workshop/s1-closure/prepare.py
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add leather-workshop/r13
+            git commit -m 'build(leather): register R13 native C sources, compiler chain and dependency gates'
+            git push origin HEAD:refs/heads/build/leather-r13-native-closure-20261013
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  cpu:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      TYPESCRIPT_PATH: /tmp/leather-compiler/node_modules/typescript
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install reviewed compiler and build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang-18 lld-18
+          pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5
+          npm install --prefix /tmp/leather-compiler --ignore-scripts --no-audit --no-fund typescript@5.8.3
+      - name: Native, dependency and exact trajectory gates
+        run: python -u leather-workshop/r13/verify-closure.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r13-cpu-${{ github.run_id }}
+          path: |
+            leather-workshop/r13/BUILD_RESULT.json
+            leather-workshop/r13/qa/
+          retention-days: 14
+  browser:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install source compiler and browser dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clang-18 lld-18
+          pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5 playwright==1.55.0
+      - name: Build from native source and verify offline visual and pointer behavior
+        run: |
+          python leather-workshop/r13/build.py
+          xvfb-run -a python -u leather-workshop/r13/qa-browser-s1c.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r13-browser-${{ github.run_id }}
+          path: |
+            leather-workshop/r13/out/candidate-r13.html
+            leather-workshop/r13/qa/s1c/browser/
+          retention-days: 14
+  publish:
+    needs: [prepare, cpu, browser]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    env:
+      R: leather-workshop/r13
+      LEATHER_SOURCE_COMMIT: ${{ needs.prepare.outputs.source }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source }}
+          sparse-checkout: |
+            leather-workshop
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r13-cpu-${{ github.run_id }}
+          path: leather-workshop/r13
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r13-browser-${{ github.run_id }}
+          path: leather-workshop/r13
+      - name: Publish only identical independent build outputs after protected-path check
+        run: |
+          git fetch --depth=1 origin bbd0c0ba2a6e74d532d1545b48b252709efae02f
+          git diff --exit-code bbd0c0ba2a6e74d532d1545b48b252709efae02f -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/r07 leather-workshop/r08 leather-workshop/r09 leather-workshop/r10 leather-workshop/r11 leather-workshop/r12 LICENSE AGENTS.md
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          r=Path(os.environ['R']);raw=(r/'out/candidate-r13.html').read_bytes();build=json.loads((r/'BUILD_RESULT.json').read_text())
+          assert hashlib.sha256(raw).hexdigest()==build['htmlSHA256']
+          for n in ['qa/s1c/SUMMARY.json','qa/s1c/browser/report.json','qa/s1b/equivalence.json','qa/numeric.json','qa/s1b2/app-interfaces.json']:
+            d=json.loads((r/n).read_text());assert d['pass'],n
+          (r/'public-lite.html').write_bytes(raw)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$R/public-lite.html" "$R/BUILD_RESULT.json" "$R/qa/s1c" "$R/qa/numeric.json" "$R/qa/s1b/equivalence.json" "$R/qa/s1b/interfaces.json" "$R/qa/s1b2/app-interfaces.json"
+          git commit -m 'build(leather): publish R13 S1C after native, dependency, trajectory and offline browser gates'
+          git push origin HEAD:refs/heads/build/leather-r13-native-closure-20261013
+          echo "LEATHER_BUILD_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "LEATHER_PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r13/public-lite.html" >> "$GITHUB_ENV"
+      - name: Verify immutable public bytes and actual public browser
+        run: |
+          pip --disable-pip-version-check install Pillow==12.3.0 playwright==1.55.0
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,time,os
+          raw=(Path(os.environ['R'])/'public-lite.html').read_bytes()
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['LEATHER_BUILD_COMMIT']+'/leather-workshop/r13/public-lite.html'
+          for i in range(10):
+            try:
+              with urllib.request.urlopen(url,timeout=30) as q:assert q.read()==raw
+              break
+            except Exception:
+              if i==9:raise
+              time.sleep(6)
+          PY
+          xvfb-run -a python -u "$R/qa-browser-s1c.py" --public --url "$LEATHER_PREVIEW"
+      - name: Record bounded S1 closure and exact delivery
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib
+          r=Path(os.environ['R']);names=['qa/s1c/SUMMARY.json','qa/s1c/native.json','qa/s1c/dependencies.json','qa/s1c/browser/report.json','qa/s1c/public/report.json','qa/s1b/equivalence.json','qa/numeric.json','qa/s1b2/app-interfaces.json'];reports={}
+          for n in names:
+            p=r/n;d=json.loads(p.read_text());assert d['pass'],n;reports[n]=hashlib.sha256(p.read_bytes()).hexdigest()
+          cpu=json.loads((r/names[0]).read_text());offline=json.loads((r/names[3]).read_text());public=json.loads((r/names[4]).read_text());build=json.loads((r/'BUILD_RESULT.json').read_text());pairs=[q['data'] for q in offline['checks'] if q['name'].endswith('pixel equivalence')]
+          d={'version':'R13.0-S1C','phase':'S1C','sourceCommit':os.environ['LEATHER_SOURCE_COMMIT'],'buildCommit':os.environ['LEATHER_BUILD_COMMIT'],'workflowRun':os.environ['GITHUB_RUN_ID'],'previewURL':os.environ['LEATHER_PREVIEW'],'htmlSHA256':build['htmlSHA256'],'htmlBytes':build['htmlBytes'],'baselineBuild':'5db192b3d34235f5259d0ae5b02ff217f1b9c8f0','nativeFromSource':True,'nativeByteIdentical':True,'nativeSHA256':'2f9550559469e184d18bce32989c975aae67da580e95924b1e4f8c0a0f02abb6','sourceChecks':cpu['checkCount'],'reviewedBindings':181,'reviewedExtensionAssignments':4,'numericalCases':18,'appInterfaceCases':25,'geometryCases':25,'full52StepTrajectories':6,'offlineBrowserChecks':len(offline['checks']),'publicBrowserChecks':len(public['checks']),'visualComparisonPairs':len(pairs),'maximumMeanRGBDifference':max(q['meanRGBDifference'] for q in pairs),'offlineBrowserVerified':True,'publicBrowserVerified':True,'fullS1Complete':True,'s1Scope':'independent canonical JS and native C build, dependency inventory, archive boundaries and regression/browser closure; not elimination of every shared scope or legacy extension','readyForUserReview':True,'userVisualAcceptance':'PENDING','productionReady':False,'commercialLegalClearance':False,'nextStage':'S2_PERFORMANCE_BASELINE_AND_BOTTLENECKS','reports':reports,'limits':['S1 completion is engineering closure; user visual acceptance remains pending','No new performance gain, physical calibration or independent-ownership claim','Four inherited extension assignments remain explicitly recorded and locked','R02/R05 archives and their prior rights questions are retained, not silently cleared','390x844 is viewport simulation; software Chrome rendering is not every device','Ordinary source build requires reviewed clang18/lld18; webpage needs no compiler or server']}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git add "$R/DELIVERY.json" "$R/qa/s1c/public/report.json"
+          git commit -m 'test(leather): certify source-built R13 public delivery and bounded S1 completion'
+          git push origin HEAD:refs/heads/build/leather-r13-native-closure-20261013
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r13-delivery-${{ github.run_id }}
+          path: |
+            leather-workshop/r13/public-lite.html
+            leather-workshop/r13/BUILD_RESULT.json
+            leather-workshop/r13/DELIVERY.json
+            leather-workshop/r13/qa/
+            leather-workshop/r13/native/
+          retention-days: 14

@@ -1,0 +1,39 @@
+name: Leather B1 recovery source inspection
+on:
+  push:
+    branches: [perf/leather-r17-b1-20261013]
+    paths: [.github/workflows/leather-b1-recovery-input.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d777e6ee1eb1388068c3b7827f71a0875bbf9e50
+          sparse-checkout: |
+            leather-workshop/r12
+            leather-workshop/r13
+            leather-workshop/r14
+            leather-workshop/r15
+            leather-workshop/r16
+            leather-workshop/r17
+            leather-workshop/b1
+            leather-workshop/b1-refinement
+            .github/workflows
+      - name: Capture only relevant project sources and outcome metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/leather-b1-recovery
+          tar -czf /tmp/leather-b1-recovery/source.tgz leather-workshop .github/workflows/leather-r17-b1.yml .github/workflows/leather-b1-refinement.yml AGENTS.md
+          git rev-parse HEAD > /tmp/leather-b1-recovery/source-sha.txt
+          gh api 'repos/haihao0307/Humanoid-Rig-Lab-Next/actions/runs?branch=perf%2Fleather-r17-b1-20261013&per_page=30' --jq '[.workflow_runs[] | {id,name,head_sha,status,conclusion,path}]' > /tmp/leather-b1-recovery/runs.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-b1-recovery-source
+          path: /tmp/leather-b1-recovery/
+          retention-days: 7

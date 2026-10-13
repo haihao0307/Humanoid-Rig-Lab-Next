@@ -1,0 +1,11 @@
+{
+  "scope": "fresh source recovery without chat or historic builder execution",
+  "checks": [
+    {"name": "Fresh checkout materializes all declared files", "pass": true},
+    {"name": "Recovered standalone has exact R10 bytes", "pass": true},
+    {"name": "Re-running migration refuses to overwrite local source edits", "pass": true},
+    {"name": "Wrong baseline is rejected before materializing any output", "pass": true}
+  ],
+  "pass": true,
+  "newBrowserChecks": 0
+}

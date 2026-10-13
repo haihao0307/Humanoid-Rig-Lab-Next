@@ -1,0 +1,108 @@
+{
+  "version": "R14.0-S2A",
+  "phase": "S2A",
+  "sourceCommit": "9d436910d2dfe7c10665a4db6d208f5fa596b7ba",
+  "buildCommit": "37178e800a3272575b16e30a0723b3bcf1f29c0a",
+  "workflowRun": "38345375250",
+  "previewURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/37178e800a3272575b16e30a0723b3bcf1f29c0a/leather-workshop/r14/public-lite.html",
+  "htmlSHA256": "120a3772d4384ed375311df1a856e864836ba56e88a24345d0ed72e84f9cc049",
+  "htmlBytes": 3629745,
+  "baselineBuild": "89f2b71251ec6667c09b1ed043b6714da8fa5094",
+  "nativeSHA256": "0c19f13b9cf7e2edb2b138fb2aad078bbcd7f9153e7a37b7e03630c87de360b6",
+  "nativeIdenticalToR13": false,
+  "sourceChecks": 134,
+  "nativeCertificateCases": 480,
+  "numericalCases": 18,
+  "geometryCases": 25,
+  "full52StepTrajectories": 6,
+  "appInterfaceCases": 25,
+  "offlineBrowserChecks": 45,
+  "publicBrowserChecks": 16,
+  "visualComparisonPairs": 9,
+  "maximumMeanRGBDifference": 0.0,
+  "performanceHardware": {
+    "cpu": "AMD EPYC 7763 64-Core Processor",
+    "logicalCPUs": 4,
+    "totalMemory": 16766414848,
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v22.23.3"
+  },
+  "performance": [
+    {
+      "product": "wallet",
+      "reference": {
+        "p50StepMS": 27.01662799999758,
+        "p95StepMS": 69.46161299999949,
+        "medianReplayMS": 1780.0399900000557
+      },
+      "candidate": {
+        "p50StepMS": 21.874195999997028,
+        "p95StepMS": 48.02097599999979,
+        "medianReplayMS": 1389.9852879999926
+      },
+      "speedRatio": 1.2806178636331476,
+      "timeReductionPercent": 21.912693208653756
+    },
+    {
+      "product": "swatch",
+      "reference": {
+        "p50StepMS": 9.026108999998542,
+        "p95StepMS": 24.746526999995694,
+        "medianReplayMS": 619.2584970000025
+      },
+      "candidate": {
+        "p50StepMS": 8.945615000004182,
+        "p95StepMS": 22.560265000000072,
+        "medianReplayMS": 603.233225999953
+      },
+      "speedRatio": 1.0265656305212385,
+      "timeReductionPercent": 2.587816086122996
+    },
+    {
+      "product": "bag",
+      "reference": {
+        "p50StepMS": 18.18186599999899,
+        "p95StepMS": 48.865829999995185,
+        "medianReplayMS": 1242.2394670000067
+      },
+      "candidate": {
+        "p50StepMS": 17.279318999993848,
+        "p95StepMS": 47.7366800000018,
+        "medianReplayMS": 1161.468423000013
+      },
+      "speedRatio": 1.0695421781604413,
+      "timeReductionPercent": 6.502051025238698
+    }
+  ],
+  "offlineBrowserVerified": true,
+  "publicBrowserVerified": true,
+  "subtaskComplete": true,
+  "fullS2Complete": false,
+  "fullS1Complete": true,
+  "readyForUserReview": true,
+  "userVisualAcceptance": "PENDING",
+  "productionReady": false,
+  "commercialLegalClearance": false,
+  "reports": {
+    "qa/s2/SUMMARY.json": "a08671697e1c45f2e2926f285e1d6d2361c2199796075ec1c14fa55c03cdef83",
+    "qa/s2/native.json": "5a5b7574a43772bacb3ea94fed036589c38327065df180da5dfa432def66e1ef",
+    "qa/s2/native-certificate.json": "872491ffcad36119169e0edd9c272880d328a86a31ece1dbe533e53b3a4b3ae2",
+    "qa/s2/performance.json": "9a66f9a60b8cff81f88ef967c1e8ce7427806dde3bd8b637dec1d625ba46a0b5",
+    "qa/s2/browser-performance.json": "4c3e7bb2ef4a8188c2cd54ba3d61a21744d9f389c9c778dae64809b3626491a0",
+    "qa/s2/browser/report.json": "166b6f203a29785c16a4fbd571ef61fc3bcd74575da2c482864425020a8a44ff",
+    "qa/s2/public/report.json": "cfa246eb9718da9026f044cce4712eaa15b5528e74d340341a456901dd6a74b0",
+    "qa/s2/dependencies.json": "48effb6bbb149f075aafcc2629897f0b67fe38c5ea29933638ec9e69324cc367",
+    "qa/s1b/equivalence.json": "0c94b05e0dbd218c997233cb1f955ab66fae651ab01d03d520debe4e5b001aa1",
+    "qa/numeric.json": "a073b9aba7cdf24e91b2bb5abb51aab6e4e1f9258f6da8f169614471aea18242",
+    "qa/s1b2/app-interfaces.json": "026932c51092c13e69e50156f0dcaeefff0823c2de94b0ae633c9ad86a6a7dfb"
+  },
+  "limits": [
+    "Measured CPU workload gain is not FPS or universal user-device latency",
+    "Browser performance probes are separate from uninstrumented visual/interaction release checks",
+    "No contact candidate, friction contribution, CCD, timestep or iteration budget was removed",
+    "390x844 is viewport simulation, not a physical phone",
+    "Browser GPU duration and isolated queue/GC attribution remain incomplete",
+    "R01-R13 and existing attribution/licensing scope are preserved"
+  ]
+}

@@ -1,0 +1,174 @@
+name: Leather R16 integrated final validation
+on:
+  push:
+    branches: [perf/leather-r16-render-batch-20261013]
+    paths: [.github/workflows/leather-r16-final-batch.yml, leather-workshop/s2c-validation/**]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: leather-r16-final-batch
+  cancel-in-progress: true
+jobs:
+  extended:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    outputs:
+      tests: ${{ steps.source.outputs.tests }}
+    env:
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            leather-workshop/r16
+            leather-workshop/r15
+            leather-workshop/s2c-validation
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r16-cpu-38362866018
+          run-id: 38362866018
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/cpu
+      - name: Register corrected event-based observation and prove runtime unchanged
+        id: source
+        run: |
+          git fetch --depth=1 origin 43d7fde7bc6646032a2154fc25f800807b60a0c7
+          python leather-workshop/s2c-validation/repair-observation.py
+          git diff --exit-code 43d7fde7bc6646032a2154fc25f800807b60a0c7 -- leather-workshop/r16/src leather-workshop/r16/native leather-workshop/r16/assembly.json leather-workshop/r16/canonical.lock.json leather-workshop/r16/build.py leather-workshop/r16/ui leather-workshop/r16/assets leather-workshop/r16/vendor leather-workshop/r16/compat leather-workshop/r16/licenses
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,shutil
+          r=Path('leather-workshop/r16');data=Path('/tmp/cpu/out/candidate-r16.html').read_bytes();q=json.loads(Path('/tmp/cpu/qa/render-batch/SUMMARY.json').read_text());assert q['pass'];assert q['sourceCommit']=='43d7fde7bc6646032a2154fc25f800807b60a0c7';assert hashlib.sha256(data).hexdigest()==q['build']['htmlSHA256'];(r/'out').mkdir(exist_ok=True);(r/'out/candidate-r16.html').write_bytes(data)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r16/qa-render-batch.py
+          git commit -m 'test(leather): observe two actual card frames and record latency without an assumed GPU warm-up time'
+          git push origin HEAD:refs/heads/perf/leather-r16-render-batch-20261013
+          echo "tests=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Complete sustained operation and deformed visual gates
+        run: |
+          pip -q install playwright==1.55.0 Pillow==12.3.0
+          python -u leather-workshop/r16/qa-render-batch.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r16-extended-final-${{ github.run_id }}
+          path: |
+            leather-workshop/r16/out/candidate-r16.html
+            leather-workshop/r16/qa/render-batch/extended/
+          retention-days: 14
+  publish:
+    needs: extended
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      LEATHER_SOURCE_COMMIT: 43d7fde7bc6646032a2154fc25f800807b60a0c7
+      TESTS_SHA: ${{ needs.extended.outputs.tests }}
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.extended.outputs.tests }}
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Require prior independent numerical, visual and timing lanes success
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import urllib.request,json,os
+          url='https://api.github.com/repos/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/38362866018/jobs'
+          req=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          with urllib.request.urlopen(req) as r:q=json.load(r)
+          jobs={j['name']:j for j in q['jobs']}
+          for name in ['verify (cpu)','verify (browser)','verify (gpu)']:assert jobs[name]['conclusion']=='success',(name,jobs[name]['status'],jobs[name]['conclusion'])
+          print('Original independent required lanes succeeded; failed timed observation is retained, not hidden')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r16-cpu-38362866018
+          run-id: 38362866018
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/cpu
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r16-browser-38362866018
+          run-id: 38362866018
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/browser
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r16-gpu-38362866018
+          run-id: 38362866018
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/gpu
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r16-extended-final-${{ github.run_id }}
+          path: /tmp/extended
+      - name: Match exact canonical source, independent bytes and passed reports
+        run: |
+          git fetch --depth=1 origin 57865c3a033a7aee7f3dc02834ee7d896425a877 43d7fde7bc6646032a2154fc25f800807b60a0c7
+          git diff --exit-code 43d7fde7bc6646032a2154fc25f800807b60a0c7 -- leather-workshop/r16/src leather-workshop/r16/native leather-workshop/r16/assembly.json leather-workshop/r16/canonical.lock.json leather-workshop/r16/build.py leather-workshop/r16/ui leather-workshop/r16/assets leather-workshop/r16/vendor leather-workshop/r16/compat leather-workshop/r16/licenses
+          python - <<'PY'
+          from pathlib import Path
+          import json,shutil,subprocess,os
+          r=Path('leather-workshop/r16');data=Path('/tmp/cpu/out/candidate-r16.html').read_bytes();expected={'cpu':'qa/render-batch/SUMMARY.json','browser':'qa/render-batch/browser/report.json','extended':'qa/render-batch/extended/report.json','gpu':'qa/render-batch/gpu/report.json'}
+          for lane,f in expected.items():
+            p=Path('/tmp',lane);assert (p/'out/candidate-r16.html').read_bytes()==data;assert json.loads((p/f).read_text())['pass'];shutil.copytree(p/'qa',r/'qa',dirs_exist_ok=True)
+          changed=subprocess.check_output(['git','diff','--name-only','57865c3a033a7aee7f3dc02834ee7d896425a877','HEAD'],text=True).splitlines()
+          assert all(f.startswith(('leather-workshop/r16/','leather-workshop/s2c-render/','leather-workshop/s2c-validation/')) or f in ['.github/workflows/leather-r16-render-batch.yml','.github/workflows/leather-r16-final-batch.yml'] for f in changed),changed
+          assert os.environ['LEATHER_SOURCE_COMMIT'].encode() in data;(r/'public-lite.html').write_bytes(data);shutil.copy2('/tmp/cpu/BUILD_RESULT.json',r/'BUILD_RESULT.json')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f leather-workshop/r16/public-lite.html leather-workshop/r16/BUILD_RESULT.json
+          find leather-workshop/r16/qa -name '*.json' -print0 | xargs -0 git add -f
+          git commit -m 'build(leather): publish complete verified R16 rendering batch with unchanged tested runtime'
+          git push origin HEAD:refs/heads/perf/leather-r16-render-batch-20261013
+          echo "BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r16/public-lite.html" >> "$GITHUB_ENV"
+      - name: Fresh exact public bytes and uninstrumented real browser
+        run: |
+          pip -q install playwright==1.55.0 Pillow==12.3.0
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,os
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/leather-workshop/r16/public-lite.html'
+          with urllib.request.urlopen(url,timeout=60) as r:assert r.read()==Path('leather-workshop/r16/public-lite.html').read_bytes()
+          PY
+          python -u leather-workshop/r16/qa-browser-s2b.py --public --url "$PREVIEW"
+      - name: Record exact delivery and bounded conclusions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          r=Path('leather-workshop/r16');names=['qa/render-batch/SUMMARY.json','qa/render-batch/frame-flow.json','qa/render-batch/browser/report.json','qa/render-batch/extended/report.json','qa/render-batch/gpu/report.json','qa/render-batch/public/report.json','qa/s1b/equivalence.json','qa/s2b/pose-stream.json','qa/numeric.json','qa/s1b2/app-interfaces.json'];reports={}
+          for n in names:
+            p=r/n;q=json.loads(p.read_text());assert q['pass'],n;reports[n]=hashlib.sha256(p.read_bytes()).hexdigest()
+          summary=json.loads((r/names[0]).read_text());gpu=json.loads((r/'qa/render-batch/gpu/report.json').read_text());rows=[{k:q[k] for k in ['product','label','iteration','gpu','supported','renderer','cpu']} for q in gpu['rows']]
+          d={'version':'R16.0-RENDER','phase':'S2C_RENDERING_BATCH','sourceCommit':os.environ['LEATHER_SOURCE_COMMIT'],'testCorrectionCommit':os.environ['TESTS_SHA'],'buildCommit':os.environ['BUILD_SHA'],'verificationWorkflowRun':'38362866018','completionWorkflowRun':os.environ['GITHUB_RUN_ID'],'previewURL':os.environ['PREVIEW'],'htmlSHA256':hashlib.sha256((r/'public-lite.html').read_bytes()).hexdigest(),'htmlBytes':(r/'public-lite.html').stat().st_size,'baselineBuild':'70883deb4659b601faacf5eb49277eee4774b824','nativeIdenticalToR15':True,'sourceChecks':summary['checkCount'],'frameFlowChecks':22,'numericCases':18,'geometryCases':25,'full52StepTrajectories':6,'poseProtocolChecks':45,'appCases':25,'offlineBrowserChecks':len(json.loads((r/'qa/render-batch/browser/report.json').read_text())['checks']),'extendedBrowserChecks':len(json.loads((r/'qa/render-batch/extended/report.json').read_text())['checks']),'publicBrowserChecks':len(json.loads((r/'qa/render-batch/public/report.json').read_text())['checks']),'gpuABBA':rows,'offlineBrowserVerified':True,'publicBrowserVerified':True,'batchComplete':True,'fullS2Complete':False,'userVisualAcceptance':'PENDING','productionReady':False,'commercialLegalClearance':False,'reports':reports,'observationCorrection':'First extended test inspected after a fixed800ms wait without proving next frame completion. Corrected to observe two actual thumbnail draw events with10s deadlock timeout, unchanged hero-draw assertion and recorded elapsed time. No runtime, visual tolerance or performance claim changed. Original failure retained.','limits':['Software Chrome GPU-duration is not physical monitor latency or universal GPU performance','No physics, collision precision, lighting, resolution or model detail reduced','Lifecycle events and390x844 are not physical-device certification','Actual received solver poses remain the only source of displayed deformation','Legacy rights, material calibration and50ms all-device target remain separate']}
+          (r/'DELIVERY.json').write_text(json.dumps(d,indent=2)+'\n')
+          PY
+          git add -f leather-workshop/r16/DELIVERY.json leather-workshop/r16/qa/render-batch/public/report.json
+          git commit -m 'test(leather): certify fixed R16 public workbench with complete rendering batch evidence'
+          git push origin HEAD:refs/heads/perf/leather-r16-render-batch-20261013
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r16-final-${{ github.run_id }}
+          path: |
+            leather-workshop/r16/public-lite.html
+            leather-workshop/r16/DELIVERY.json
+            leather-workshop/r16/BUILD_RESULT.json
+            leather-workshop/r16/qa/**/*.json
+            leather-workshop/r16/qa/**/*.png
+          retention-days: 14

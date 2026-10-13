@@ -1,0 +1,123 @@
+{
+  "version": "R10.0",
+  "acceptedBaselineBuild": "416d2b7a7d7214865fa47b82973450c700a65da9",
+  "sourceCommit": "9b3dfcc0cd89ff0be6ea459d86aaf71d508a9206",
+  "buildCommit": "af389cc216ddd01e3b1aa66c972f42b2587bc797",
+  "previewURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/af389cc216ddd01e3b1aa66c972f42b2587bc797/leather-workshop/r10/public-lite.html",
+  "workflowRun": "38112242583",
+  "htmlSHA256": "7da84eec41b6db9fe69c62ea17a3194283522004df92f47f0cd707d11b642622",
+  "htmlBytes": 3641172,
+  "offlineBrowserVerified": true,
+  "publicBrowserVerified": true,
+  "reports": {
+    "numeric.json": "bae8773949f8ef961098a4e554733c51dee587b446d39b7eab0577519fdeaee2",
+    "performance.json": "2008aa92395bef17a6961317e5f7d36ade3e77eae9e39ad92ed34bcc78d52a1f",
+    "crafts.json": "6974f9503dbea46d515ff8abe5e6804af5a7a25b0c7dbe20c5419ef8246dc20c",
+    "browser/report.json": "286541f0249badb93e32525c03ec842f32307416553c82d6d38e73c28db02495",
+    "public/report.json": "ba5f44482c3730efec7a1ea1a88dbc48cfef26e2509558ab956372ca266003dc"
+  },
+  "benchmarkScope": "same-process paired AB/BA benchmark, one warmup and two measured 52-step lift/release trials; no GPU or mobile claims",
+  "benchmarkEnvironment": {
+    "node": "v22.23.3",
+    "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz"
+  },
+  "benchmarks": [
+    {
+      "id": "wallet",
+      "craft": "plain",
+      "baselineMeanMS": 4221.975551,
+      "candidateMeanMS": 1914.5987880000002,
+      "speedup": 2.2051489729659224,
+      "maxPositionDifferenceMM": 0,
+      "skinFrameMaxError": 0,
+      "shapeUnchanged": true,
+      "candidatesEqual": true
+    },
+    {
+      "id": "swatch",
+      "craft": "diamond",
+      "baselineMeanMS": 1803.4841554999985,
+      "candidateMeanMS": 698.4158740000021,
+      "speedup": 2.582249663328805,
+      "maxPositionDifferenceMM": 0,
+      "skinFrameMaxError": 0,
+      "shapeUnchanged": true,
+      "candidatesEqual": true
+    },
+    {
+      "id": "bag",
+      "craft": "plain",
+      "baselineMeanMS": 3886.914619000003,
+      "candidateMeanMS": 1333.6074535000007,
+      "speedup": 2.9145867539949233,
+      "maxPositionDifferenceMM": 0,
+      "skinFrameMaxError": 0,
+      "shapeUnchanged": true,
+      "candidatesEqual": true
+    },
+    {
+      "id": "belt",
+      "craft": "plain",
+      "baselineMeanMS": 5077.742516999999,
+      "candidateMeanMS": 1833.047576500001,
+      "speedup": 2.7701095062111696,
+      "maxPositionDifferenceMM": 0,
+      "skinFrameMaxError": 0,
+      "shapeUnchanged": true,
+      "candidatesEqual": true
+    },
+    {
+      "id": "cowboy",
+      "craft": "plain",
+      "baselineMeanMS": 7013.256579499997,
+      "candidateMeanMS": 2233.025786500002,
+      "speedup": 3.1406966376740453,
+      "maxPositionDifferenceMM": 0,
+      "skinFrameMaxError": 0,
+      "shapeUnchanged": true,
+      "candidatesEqual": true
+    },
+    {
+      "id": "pirate",
+      "craft": "plain",
+      "baselineMeanMS": 7857.308061500007,
+      "candidateMeanMS": 2533.1538124999934,
+      "speedup": 3.1017887752128073,
+      "maxPositionDifferenceMM": 0,
+      "skinFrameMaxError": 0,
+      "shapeUnchanged": true,
+      "candidatesEqual": true
+    }
+  ],
+  "numericChecks": 18,
+  "crafts": 6,
+  "offlineBrowserChecks": 28,
+  "publicBrowserChecks": 17,
+  "retainedProducts": 6,
+  "retainedMaterials": 13,
+  "removedProduct": "jacket",
+  "previousVersionsUnchanged": true,
+  "userAcceptedR091": [
+    "appearance",
+    "observed physical response",
+    "thickness"
+  ],
+  "userAcceptanceR10": "PENDING",
+  "productionReady": false,
+  "unchangedPhysics": [
+    "time step",
+    "iteration count",
+    "constitutive law",
+    "damping",
+    "friction",
+    "collision thickness",
+    "CCD tolerances"
+  ],
+  "phoneScope": "390x844 viewport simulation, not physical phone",
+  "limitations": [
+    "Core benchmark ratios are not user-device FPS guarantees",
+    "Large or woven products can still run slower than realtime",
+    "Material calibration and exact fine-display-mesh contact are not certified",
+    "Existing R09 bounds on quilt filling and independent yarn mechanics remain"
+  ]
+}

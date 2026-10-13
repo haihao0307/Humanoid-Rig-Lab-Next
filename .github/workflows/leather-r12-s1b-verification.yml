@@ -1,0 +1,30 @@
+name: Leather R12 S1B1 frozen verification
+# S1B2 is now the active push verifier. This archival job reproduces S1B1 only.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-frozen-s1b1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 6fe5ec8baae83c2d8152fabe506d44af349f6184
+          fetch-depth: 1
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip --disable-pip-version-check install Pillow==12.3.0 numpy==2.3.5
+      - run: python leather-workshop/r12/build.py && python leather-workshop/r12/verify.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r12-frozen-s1b1-${{ github.run_id }}
+          path: leather-workshop/r12/qa/
+          retention-days: 14

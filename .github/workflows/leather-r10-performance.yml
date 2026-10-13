@@ -1,0 +1,120 @@
+name: Leather R10 performance
+on:
+  push:
+    branches: [perf/leather-r10-input-20261011]
+    paths:
+      - .github/workflows/leather-r10-performance.yml
+      - leather-workshop/r10/**
+permissions:
+  contents: write
+concurrency:
+  group: leather-r10-performance
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      R: leather-workshop/r10
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+      ACCEPTED_HEAD: 0d741c72a924825a9bf42dc4c7c65c70a35d3bc5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deterministic build and browser tooling
+        run: |
+          pip --disable-pip-version-check install playwright==1.55.0 Pillow==11.3.0
+          if ! command -v wasm-ld; then sudo apt-get update -qq && sudo apt-get install -y lld; fi
+          command -v clang
+          command -v wasm-ld
+          google-chrome --version
+          echo "R10_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "R09_EXPECTED_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Preserve accepted history and build only R10
+        run: |
+          git fetch --depth=1 origin "$ACCEPTED_HEAD"
+          git diff --exit-code "$ACCEPTED_HEAD" -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/r07 leather-workshop/r08 leather-workshop/r09
+          python "$R/build.py"
+      - name: Replay inherited nonlinear collision yarn and thickness regressions
+        run: node "$R/qa-numeric.cjs"
+      - name: Build unchanged baseline in a temporary directory
+        run: |
+          mkdir -p /tmp/leather-r10-baseline
+          cp -a leather-workshop /tmp/leather-r10-baseline/
+          SOURCE_SHA=09d6747898c0448fbefbbf17cba9b3780eba6ce2 python /tmp/leather-r10-baseline/leather-workshop/r09/build.py
+          echo "BASE_LIB=/tmp/leather-r10-baseline/leather-workshop/r09/node-lib.cjs" >> "$GITHUB_ENV"
+      - name: Paired performance and exact preservation of six retained products
+        run: |
+          node "$R/qa-performance.cjs"
+          python - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['R']+'/qa/performance.json'))
+          assert d['pass'] and len(d['rows'])==6
+          assert all(q['speedup']>1 for q in d['rows']), 'No speedup on at least one tested product'
+          print('Per-product paired speedups:', [(q['id'],q['speedup']) for q in d['rows']])
+          PY
+      - name: Six sample crafts retain finite thickness and actual nonlinear dynamics
+        run: node "$R/qa-crafts.cjs"
+      - name: Offline Chrome full interaction and selection-boundary regression
+        run: xvfb-run -a python -u "$R/qa-browser.py"
+      - name: Publish tested candidate without changing accepted R09
+        run: |
+          git diff --exit-code "$ACCEPTED_HEAD" -- leather-workshop/r01 leather-workshop/r02 leather-workshop/r03 leather-workshop/r04 leather-workshop/r05 leather-workshop/r06 leather-workshop/r07 leather-workshop/r08 leather-workshop/r09
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$R/public-lite.html" "$R/BUILD_MANIFEST.json" "$R/qa/numeric.json" "$R/qa/performance.json" "$R/qa/crafts.json" "$R"/qa/craft-*.json "$R/qa/browser/report.json"
+          git commit -m 'build(leather): publish tested R10 performance and viewport-input candidate'
+          git push origin HEAD:refs/heads/perf/leather-r10-input-20261011
+          echo "R10_BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "R10_PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r10/public-lite.html" >> "$GITHUB_ENV"
+      - name: Verify exact immutable public workbench with actual pointer input
+        run: |
+          python - <<'PY'
+          import os,hashlib,json,urllib.request,time
+          m=json.load(open(os.environ['R']+'/BUILD_MANIFEST.json'))
+          u='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['R10_BUILD_SHA']+'/leather-workshop/r10/public-lite.html'
+          for i in range(8):
+            try:
+              with urllib.request.urlopen(u,timeout=40) as q: data=q.read()
+              assert hashlib.sha256(data).hexdigest()==m['htmlSHA256']
+              break
+            except Exception:
+              if i==7:raise
+              time.sleep(5)
+          PY
+          xvfb-run -a python -u "$R/qa-browser.py" --public --url "$R10_PREVIEW"
+      - name: Record factual performance and public delivery receipt
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          r=Path(os.environ['R']);m=json.loads((r/'BUILD_MANIFEST.json').read_text());reports={};details={}
+          for name in ['numeric.json','performance.json','crafts.json','browser/report.json','public/report.json']:
+            p=r/'qa'/name;d=json.loads(p.read_text());assert d['pass'],name
+            reports[name]=hashlib.sha256(p.read_bytes()).hexdigest();details[name]=d
+          perf=details['performance.json']
+          receipt={'version':'R10.0','acceptedBaselineBuild':'416d2b7a7d7214865fa47b82973450c700a65da9','sourceCommit':os.environ['R10_SOURCE_SHA'],'buildCommit':os.environ['R10_BUILD_SHA'],'previewURL':os.environ['R10_PREVIEW'],'workflowRun':os.environ['GITHUB_RUN_ID'],'htmlSHA256':m['htmlSHA256'],'htmlBytes':m['htmlBytes'],'offlineBrowserVerified':True,'publicBrowserVerified':True,'reports':reports,'benchmarkScope':perf['scope'],'benchmarkEnvironment':perf['environment'],'benchmarks':[{k:q[k] for k in ['id','craft','baselineMeanMS','candidateMeanMS','speedup','maxPositionDifferenceMM','skinFrameMaxError','shapeUnchanged','candidatesEqual']} for q in perf['rows']],'numericChecks':len(details['numeric.json']['checks']),'crafts':len(details['crafts.json']['crafts']),'offlineBrowserChecks':len(details['browser/report.json']['checks']),'publicBrowserChecks':len(details['public/report.json']['checks']),'retainedProducts':6,'retainedMaterials':13,'removedProduct':'jacket','previousVersionsUnchanged':True,'userAcceptedR091':['appearance','observed physical response','thickness'],'userAcceptanceR10':'PENDING','productionReady':False,'unchangedPhysics':['time step','iteration count','constitutive law','damping','friction','collision thickness','CCD tolerances'],'phoneScope':'390x844 viewport simulation, not physical phone','limitations':['Core benchmark ratios are not user-device FPS guarantees','Large or woven products can still run slower than realtime','Material calibration and exact fine-display-mesh contact are not certified','Existing R09 bounds on quilt filling and independent yarn mechanics remain']}
+          (r/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git add "$R/DELIVERY.json" "$R/qa/public/report.json"
+          git commit -m 'test(leather): record immutable public R10 regression and paired performance evidence'
+          git push origin HEAD:refs/heads/perf/leather-r10-input-20261011
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r10-review-${{ github.run_id }}
+          path: |
+            leather-workshop/r10/public-lite.html
+            leather-workshop/r10/BUILD_MANIFEST.json
+            leather-workshop/r10/DELIVERY.json
+            leather-workshop/r10/qa/
+          retention-days: 14
