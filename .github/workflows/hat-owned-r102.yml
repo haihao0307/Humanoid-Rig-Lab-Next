@@ -1,0 +1,119 @@
+name: Independent hat R10.2 acceptance
+on:
+  push:
+    branches: [feature/hat-owned-r102-20261013]
+    paths: [.github/workflows/hat-owned-r102.yml, hat-workshop/owned-r10/**]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hat-owned-r102
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      source: ${{ steps.build.outputs.source }}
+      build: ${{ steps.build.outputs.build }}
+      url: ${{ steps.build.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/owned-r10
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Locked official dependencies
+        run: npm ci --prefix hat-workshop/owned-r10 --no-audit --no-fund
+      - id: build
+        name: Freeze independent source and candidate
+        run: python -u hat-workshop/owned-r10/publish-r102.py prepare
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r102-build-${{ github.run_id }}
+          path: |
+            hat-workshop/owned-r10/src
+            hat-workshop/owned-r10/index.html
+            hat-workshop/owned-r10/BUILD_MANIFEST.json
+            hat-workshop/owned-r10/qa
+            hat-workshop/owned-r10/THIRD_PARTY_NOTICES.txt
+          retention-days: 7
+  acceptance:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [browser, public, browser-r102, public-r102]
+    env:
+      SOURCE: ${{ needs.prepare.outputs.source }}
+      PUBLIC_URL: ${{ needs.prepare.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.build }}
+          sparse-checkout: hat-workshop/owned-r10
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Real browser and output verification
+        env:
+          SUITE: ${{ matrix.suite }}
+        run: |
+          set -euo pipefail
+          case "$SUITE" in
+            browser) timeout --kill-after=10s 360s python -u hat-workshop/owned-r10/qa-browser.py --source "$SOURCE" ;;
+            public) timeout --kill-after=10s 360s python -u hat-workshop/owned-r10/qa-browser.py --source "$SOURCE" --url "$PUBLIC_URL" ;;
+            browser-r102) timeout --kill-after=10s 360s python -u hat-workshop/owned-r10/qa-r102.py --source "$SOURCE" ;;
+            public-r102) timeout --kill-after=10s 360s python -u hat-workshop/owned-r10/qa-r102.py --source "$SOURCE" --url "$PUBLIC_URL" ;;
+          esac
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r102-${{ github.run_id }}-${{ matrix.suite }}
+          path: hat-workshop/owned-r10/qa
+          retention-days: 7
+  receipt:
+    needs: [prepare, acceptance]
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            hat-workshop/owned-r10
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hat-r102-${{ github.run_id }}-*
+          path: hat-workshop/owned-r10/qa
+          merge-multiple: true
+      - name: Validate all evidence before receipt
+        env:
+          SOURCE: ${{ needs.prepare.outputs.source }}
+          BUILD: ${{ needs.prepare.outputs.build }}
+        run: python -u hat-workshop/owned-r10/publish-r102.py finish --source "$SOURCE" --build "$BUILD"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r102-final-${{ github.run_id }}
+          path: |
+            hat-workshop/owned-r10
+            !hat-workshop/owned-r10/node_modules
+          retention-days: 7
