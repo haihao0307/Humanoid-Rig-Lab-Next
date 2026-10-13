@@ -3,7 +3,9 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),workd
 const donor='https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/4d2787db762fc3e72e4595827865f579026c2ad4/kaopu-unified-human-workbench/human-integrated-r04/preview.html',expected='c8f1150714ac03d2aec7deb6df7dd1e31a4bb887b1ca4fa4a25b38e373377f8d';
 if(!fs.existsSync(root+'/assets/human-r04.html')){const r=await fetch(donor);if(!r.ok)throw Error('Current human donor inaccessible');fs.writeFileSync(root+'/assets/human-r04.html',Buffer.from(await r.arrayBuffer()));}if(hash(read('assets/human-r04.html'))!==expected)throw Error('Current R04 donor changed');
 const result=await build({absWorkingDir:workdir,entryPoints:[root+'/src/main.mjs'],bundle:true,minify:true,format:'iife',target:'es2022',write:false,metafile:true,alias:{three:'three170'},define:{__BUILD_ID__:JSON.stringify(source)},legalComments:'eof'}),js=result.outputFiles[0].text;new vm.Script(js);
-const tag=(id,p)=>`<script type="application/octet-stream" id="${id}">${gzipSync(read(p),{level:9}).toString('base64')}</script>`;
+// HTMLPreview re-executes script nodes without respecting inert MIME types.
+// Payloads are data, never executable script; the decoder reads textContent.
+const tag=(id,p)=>`<div hidden id="${id}">${gzipSync(read(p),{level:9}).toString('base64')}</div>`;
 const html=read('index.html').toString().replace('<link rel="stylesheet" href="style.css">',()=>'<style>'+read('style.css')+'</style>').replace('<script type="module" src="src/main.mjs"></script>',()=>tag('shoe-data','assets/generated.json')+tag('scan-data','../r04/vendor/scan-data.json')+tag('human-data','assets/human-r04.html')+'<script>'+js.replaceAll('</script','<\\/script')+'</script>');
 new vm.Script(html.slice(html.indexOf('<script>')+8,html.lastIndexOf('</script>')));
 fs.writeFileSync(root+'/public-lite.html',html);const sources=[...new Set([...Object.keys(result.metafile.inputs).map(p=>path.relative(root,path.resolve(workdir,p))),...['index.html','style.css','tools/build.mjs','tools/generate.mjs','src/Binding.mjs','tests/unit.mjs','tests/browser.mjs']])];
