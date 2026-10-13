@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');require('./eb1.js');const E=globalThis.KAOPU_EB1;let checks=0;
+const test=(name,fn)=>{fn();checks++;console.log('PASS',name)};
+test('reference parameters locked',()=>{assert.equal(E.DEFAULT.key,3);assert.equal(E.DEFAULT.rim,3.5);assert.equal(E.DEFAULT.environment,.8);assert.equal(E.DEFAULT.environmentRotation,100);assert.equal(E.DEFAULT.exposure,1);assert.equal(E.DEFAULT.rimColor,'#efa37e');});
+for(const p of [{x:1},{exposure:NaN},{key:-1},{rim:Infinity},{shadowSize:1536},{schema:'wrong'},{environment:5},{keyColor:'url(x)'}])test('reject '+JSON.stringify(p),()=>assert.throws(()=>E.validate(p)));
+test('strict immutable recipe',()=>{assert.equal(Object.isFrozen(E.validate({key:2})),true);assert.equal(E.DEFAULT.key,3);});
+test('unit direction and reference geometry',()=>{const d=E.direction(45,41.472934);assert(Math.abs(Math.hypot(...d)-1)<1e-12);const n=Math.hypot(.4,.5,.4);d.forEach((v,i)=>assert(Math.abs(v-[.4,.5,.4][i]/n)<1e-7));});
+test('sRGB conversion',()=>{assert.deepEqual(E.linearColor('#ffffff'),[1,1,1]);assert.deepEqual(E.linearColor('#000000'),[0,0,0]);});
+test('positive bounded deterministic original HDR',()=>{const f=E.studioField(),g=E.studioField();assert.equal(f.data.length,256*128*4);assert.deepEqual(f.data,g.data);assert.equal(f.bins.length,8);f.bins.forEach(b=>{assert(b.color.every(x=>x>=0&&Number.isFinite(x)));assert(Math.abs(Math.hypot(...b.direction)-1)<1e-6)});});
+test('no light energy with independent switches off',()=>{const p=E.sampleProfile({...E.DEFAULT,key:0,rim:0,environment:0});assert.deepEqual(p.keyColor,[0,0,0]);assert.deepEqual(p.rimColor,[0,0,0]);assert(p.environment.every(x=>x.color.every(v=>v===0)));});
+test('background cannot affect lighting',()=>{assert.deepEqual(E.sampleProfile(E.DEFAULT),E.sampleProfile({...E.DEFAULT,background:1}));});
+test('state survives preset/import and invalid input is atomic',()=>{const s=E.createStore({persist:false,broadcast:false});s.patch({exposure:.8});const before=s.get();assert.throws(()=>s.patch({key:9}));assert.equal(s.get(),before);s.preset('neutral');assert.equal(s.get().rimColor,'#ffffff');s.import({...E.DEFAULT,exposure:.7});assert.equal(s.get().exposure,.7);s.dispose();assert.throws(()=>s.patch({key:1}));});
+console.log(JSON.stringify({passed:true,checks,version:E.VERSION}));
