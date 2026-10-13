@@ -1,0 +1,80 @@
+name: Shoe R09 craft verification
+on:
+  push:
+    branches: [fix/shoe-r09-craft-recovery-20261013]
+    paths: ['shoe-workshop/r09/**', '.github/workflows/shoe-r09-verify.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shoe-r09-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Initialize absent readable sources without replacing existing edits
+        run: |
+          python shoe-workshop/r09/tools/initialize.py
+          rm -rf shoe-workshop/r09/evidence
+          for f in shoe-workshop/r09/src/*.mjs shoe-workshop/r09/tests/*.mjs; do node --check "$f"; done
+      - name: Pinned runtime and browser dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Build current source graph
+        run: node shoe-workshop/r09/tools/build.mjs
+      - name: Early actual six-angle and seam-detail render
+        id: early
+        continue-on-error: true
+        run: node shoe-workshop/r09/tests/browser.mjs --early
+      - name: Preserve early actual renders and source
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r09-early-${{ github.run_id }}
+          path: |
+            shoe-workshop/r09/evidence/early/
+            shoe-workshop/r09/src/
+            shoe-workshop/r09/BUILD_MANIFEST.json
+          retention-days: 14
+      - name: Actual full-stack needle geometry
+        id: numeric
+        continue-on-error: true
+        run: node shoe-workshop/r09/tests/kernel.mjs
+      - name: Complete needle spans and sole contact
+        id: exposure
+        continue-on-error: true
+        run: node shoe-workshop/r09/tests/exposure.mjs
+      - name: Cut edges hardware and sole ribs
+        id: craft
+        continue-on-error: true
+        run: node shoe-workshop/r09/tests/craft.mjs
+      - name: Standalone browser and original controls
+        id: browser
+        continue-on-error: true
+        run: node shoe-workshop/r09/tests/browser.mjs
+      - name: Require all current gates
+        run: |
+          test '${{ steps.early.outcome }}' = 'success'
+          test '${{ steps.numeric.outcome }}' = 'success'
+          test '${{ steps.exposure.outcome }}' = 'success'
+          test '${{ steps.craft.outcome }}' = 'success'
+          test '${{ steps.browser.outcome }}' = 'success'
+      - name: Preserve all source and evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r09-candidate-${{ github.run_id }}
+          path: shoe-workshop/r09/
+          include-hidden-files: true
+          retention-days: 14
