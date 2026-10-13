@@ -1,24 +1,37 @@
-# R14 S2A — measured contact-potential optimization
+# R14.0-S2A — measured contact-potential optimization
 
-This candidate starts from fixed R13. The only numerical production changes are the conservative projected-distance certificate in native/energy.c and its explicit 15-double pair ABI in src/physics/native-energy.js. One-time preparation is not used by normal build.py. New native bytes are pinned separately, never substituted for R13 golden bytes. The broadphase, candidate order, narrow-phase fallback, swept CCD, force law, friction, timestep, iterations, appearance and geometry remain protected.
+Status: delivered and merged; user review pending. PR62 was merged into `perf/leather-r10-input-20261011` at `c45a89f7bea818bd6c0a5137ba6ed25e368f1b75`. Repository main and R01-R13 are unchanged. Recovery starts at `../START_HERE.md`, `../TASK_STATE.json`, Issue52 and `NEXT_TASK_S2B.md`.
 
-A projection lower bound must exceed BOTH the barrier range and the current exact minimum, with positive numerical padding. Only then is the zero barrier term bypassed. Lagged friction remains evaluated independently. This is not omission of contact candidates. Invalid/zero normals and uncertain cases fall back to the original calculation. All displayed poses remain genuine solver results.
-
-Run build.py, then verify-s2.py. The performance script uses two warm-ups and eight alternating paired 52-step runs per product; P50/P95, hardware, sample counts and inclusive phase costs are recorded. Wall-clock comparisons are not user-device FPS guarantees. Browser frame and input-to-pose samples are separate; unsupported GPU/queue/GC attribution is labelled unavailable instead of invented.
-
-Progress and delivery are authoritative only in DELIVERY.json and the parent TASK_STATE. S2A is not all of S2, not a new material calibration, and not commercial legal clearance. Three.js, Poly2Tri and source attributions remain unchanged.
-
-- [x] Real production source, not generated images.
-- [x] Procedural leather geometry and actual physics retained.
-- [ ] New interactive standalone/public browser verification: see fresh DELIVERY.json.
-- [ ] User visual acceptance remains pending.
-
-Primary timing references: https://developer.mozilla.org/en-US/docs/Web/API/Performance/timeOrigin and https://developer.mozilla.org/en-US/docs/Web/API/Performance/now .
-
-S2 recovery also replaces temporary contact-serialization arrays with exact scalar Float64 writes. See PACKING_OPTIMIZATION.md; it preserves native arithmetic and does not remove collision candidates.
-
-## Verified delivery
+## Verified public build
 
 https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/37178e800a3272575b16e30a0723b3bcf1f29c0a/leather-workshop/r14/public-lite.html
 
-Native, differential, performance, offline and public checks passed in workflow 38345375250. See DELIVERY.json for measured scope. S2A is complete; full S2 and user acceptance remain pending.
+Source: `9d436910d2dfe7c10665a4db6d208f5fa596b7ba`. Build: `37178e800a3272575b16e30a0723b3bcf1f29c0a`. Receipt: `68504371cb669707bfc7a784858cdffead355ddc`. Successful workflow: `38345375250`. HTML: 3,629,745 bytes, SHA256 `120a3772d4384ed375311df1a856e864836ba56e88a24345d0ed72e84f9cc049`.
+
+## Production relationship
+
+Numerical changes are the conservative projected-distance certificate in `native/energy.c` and its explicit 15-double pair ABI in `src/physics/native-energy.js`. The projection lower bound is recomputed from CURRENT vertices and must exceed BOTH the barrier range and the running exact minimum with positive padding. Only then is zero-barrier work bypassed. Lagged friction still runs independently. Invalid/zero or uncertain directions take the unchanged narrow-phase path. No candidate is removed.
+
+High-frequency 9-double CCD packing writes exact Float64 scalars rather than allocating temporary spread arrays. Candidate order, values, capacity rollover and same-reference cache semantics are covered by 24 exact-byte cases. See PACKING_OPTIMIZATION.md. Broadphase, swept CCD, force law, friction, timestep, iteration budget, geometry, thickness, grain and wear remain protected. Actual solver poses drive the image; no mouse-follow substitute.
+
+The new source-built kernel has a separate reviewed SHA256: `0c19f13b9cf7e2edb2b138fb2aad078bbcd7f9153e7a37b7e03630c87de360b6`. R13 golden files are not edited. Ordinary build does not execute one-time migration tools.
+
+## Tests and measured scope
+
+134 source gates, 480 native certificate cases, 24 exact packing cases, 18 numerical cases, 25 application cases, 25 geometry cases and six full 52-step trajectories passed. Maximum position difference: 0 mm; final penetration: 0 in those cases. 45 offline and 16 immutable-public Chrome checks passed without application/shader errors. Nine raw visual pairs matched exactly. Counts contain nested suites and should not be summed.
+
+AMD EPYC7763, 4 logical CPUs, Node22.23.3; two warm-ups followed by eight alternating paired 52-step replays per product. Median replay times: wallet 1780.040 to 1389.985 ms (-21.91%); diamond sample 619.258 to 603.233 ms (-2.59%); bag 1242.239 to 1161.468 ms (-6.50%). These compare solver workloads, not FPS or universal latency. Browser timing probes are separate from uninstrumented release checks. Unsupported pure GPU/queue/GC attribution remains explicitly incomplete.
+
+## Recovery and next work
+
+The 2026-10-13 recovery rechecked artifact11789715276, all eleven receipt report hashes, nine archived raw pixel pairs and six trajectory digests. It did not execute fresh numerical/browser tests or modify the tested runtime. A separate container HTTP attempt failed DNS resolution; do not treat that as a public-page failure or as a new HTTP/browser pass. Public evidence remains the successful fixed-URL workflow. See `qa/s2/RECOVERY_20261013.json`.
+
+Run `python leather-workshop/r14/build.py`, then `python leather-workshop/r14/verify-s2.py` in the pinned development environment. User webpage opening requires no compiler. Do not run materialize over edited canonical sources. S2B is main-thread/Worker waiting analysis, not a repetition of S1 or S2A.
+
+- [x] Real production source and actual procedural geometry/physics.
+- [x] Native/differential/performance and uninstrumented offline/public browser gates passed.
+- [x] PR62 merged under user authorization; old versions preserved.
+- [ ] Full S2, 50 ms P95 target, user visual acceptance and physical-device coverage.
+- [ ] Material calibration and commercial legal clearance.
+
+Three.js, Poly2Tri and source attributions are retained. Primary timing references: https://developer.mozilla.org/en-US/docs/Web/API/Performance/timeOrigin and https://developer.mozilla.org/en-US/docs/Web/API/Performance/now .
