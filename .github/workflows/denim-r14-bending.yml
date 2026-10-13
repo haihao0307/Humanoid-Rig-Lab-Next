@@ -1,0 +1,97 @@
+name: Denim R14 continuous bending and thickness
+on:
+  push:
+    branches: [feature/denim-r14-continuous-bending-20261013]
+    paths: ['denim-workshop/r14/**', '.github/workflows/denim-r14-bending.yml']
+permissions:
+  contents: write
+concurrency:
+  group: denim-r14-continuous-bending
+  cancel-in-progress: false
+jobs:
+  verify-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Expand and verify exact readable source
+        run: |
+          python denim-workshop/r14/hydrate.py
+          python denim-workshop/r14/build.py
+          for f in denim-workshop/r14/*.js; do node --check "$f"; done
+          python -m py_compile denim-workshop/r14/qa.py
+          git diff --exit-code HEAD -- denim-workshop/r13 denim-workshop/r12-1 denim-workshop/archives
+      - name: Continuous curvature, thickness, contact and old-material gates
+        run: node denim-workshop/r14/test-bending.cjs
+      - name: Install pinned independent browser
+        run: |
+          pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6
+          python -m playwright install --with-deps chromium
+      - name: Actual file navigation, matched original and three thicknesses
+        run: xvfb-run -a python -u denim-workshop/r14/qa.py
+      - name: Publish actual file-tested readable source and HTML
+        id: publish
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python - <<'PY'
+          from pathlib import Path
+          import json,subprocess
+          p=Path('denim-workshop/r14')
+          assert json.loads((p/'evidence/file-qa.json').read_text())['passed']
+          assert json.loads((p/'BENDING_QA.json').read_text())['passed']
+          files=[str(f) for f in p.iterdir() if f.is_file() and f.suffix in ['.js','.html','.json','.py','.md','.cjs']]+[str(p/'LICENSE')]
+          subprocess.run(['git','add','--',*files],check=True)
+          PY
+          git diff --exit-code HEAD -- denim-workshop/r13 denim-workshop/r12-1 denim-workshop/archives
+          git commit -m 'build(denim): publish file-tested R14 continuous bending candidate [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          PUB=$(git rev-parse HEAD)
+          echo "commit=$PUB" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${PUB}/denim-workshop/r14/index.html" >> "$GITHUB_OUTPUT"
+      - name: Actual fixed public rendering, controls and fragment entry
+        env:
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: xvfb-run -a python -u denim-workshop/r14/qa.py --public "$PUBLIC_URL"
+      - name: Exact public bytes and scoped evidence receipt
+        env:
+          PUBLIC_BUILD: ${{ steps.publish.outputs.commit }}
+          PUBLIC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,urllib.request
+          p=Path('denim-workshop/r14')
+          f=json.loads((p/'evidence/file-qa.json').read_text());u=json.loads((p/'evidence/public-qa.json').read_text());n=json.loads((p/'BENDING_QA.json').read_text());m=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          assert f['passed'] and u['passed'] and n['passed']
+          raw='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r14/index.html'
+          with urllib.request.urlopen(raw,timeout=90) as response:
+              data=response.read();assert response.status==200
+          assert data==(p/'index.html').read_bytes() and hashlib.sha256(data).hexdigest()==m['sha256']
+          def summary(q):
+              keys=['passed','mode','browserVersion','originalAppearance','legacyRecipeAccepted','standardFold','thicknessCases','cameraPreservesPhysics','autonomousSteps','reportExport','mobileCanvas','network','realPhone','hardwareFPSVerified']
+              return {k:q.get(k) for k in keys}|{'states':[s['name'] for s in q['states']],'maxTrackedGpuBytes':max(s['frame']['performance']['trackedGpuBytes'] for s in q['states'])}
+          receipt={'version':'R14.0','status':'PUBLIC_VERIFIED_USER_REVIEW_PENDING','publicVerified':True,'userVisualApproved':False,'filmGrade':False,'sourceCommit':os.environ['GITHUB_SHA'],'parentSource':'400e0d217c1b73015f2e052a0947556bb285c333','buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'foldUrl':os.environ['PUBLIC_URL']+'#fold','workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'publicBytesMatch':True,'manifest':m,'numeric':n,'browser':{'file':summary(f),'public':summary(u)},'scope':['Continuous unsplit fold sheet instead of welded half sheets','Thickness, mass and curvature bending separated','Finite exterior grip and actual release; no prescribed interior crease','Same solved surface drives yarns and displayed thickness','Fold camera 24 degrees; original material mode preserved','New tearing and garment integration paused'],'limits':['Unmeasured bending family and minimum-radius regularization, not material calibration','Table-supported folding with external grip; not arbitrary free garment folding','Coarse vertex-triangle contact, no full reliable CCD or fiber-level collision','Finite-curvature guard is an engineering constraint, not measured yarn compression','Software Chromium and mobile viewport do not verify consumer GPU FPS or phones','More solver/contact work has CPU cost; not a speed-up claim','Old versions, archives, main and unrelated workbenches unchanged; no merge or force push']}
+          (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+          PY
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
+          git add denim-workshop/r14/DELIVERY_RECEIPT.json
+          git commit -m 'docs(denim): record actual R14 fixed public thickness verification [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r14-thickness-evidence
+          path: denim-workshop/r14
+          retention-days: 14
+          if-no-files-found: error
