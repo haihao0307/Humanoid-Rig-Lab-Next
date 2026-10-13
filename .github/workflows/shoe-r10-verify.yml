@@ -44,7 +44,9 @@ jobs:
       - name: Actual cached geometry and parameter tests
         run: node shoe-workshop/r10/tests/unit.mjs
       - name: Real browser pair and current human on-foot interaction and render tests
-        run: node shoe-workshop/r10/tests/browser.mjs
+        run: |
+          node shoe-workshop/r10/tests/browser.mjs
+          node shoe-workshop/r10/tests/acceptance.mjs
       - name: Preserve exact candidate, readable sources and evidence, including failures
         if: always()
         uses: actions/upload-artifact@v4

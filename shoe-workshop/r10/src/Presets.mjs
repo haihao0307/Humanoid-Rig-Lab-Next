@@ -1,6 +1,6 @@
 const R=(id,name,body,cap,quarter,heel,trim,length,width,instep)=>({id,name,body,cap,quarter,heel,trim,fit:{length,width,instep}});
 export const PRESETS=[
- R('P01','栗棕粒面 · 标准',['heritage','#78533a'],['heritage','#5d3d2d'],['wax','#725039'],['nubuck','#514733'],'#c1aa88',278,1,0),
+ R('P01','栗棕粒面 · 标准',['heritage','#78533a'],['heritage','#5d3d2d'],['wax','#725039'],['nubuck','#514733'],'#8b7557',278,1,0),
  R('P02','深咖牛巴 · 宽脚',['nubuck','#544336'],['heritage','#342923'],['wax','#49382c'],['suede','#42372b'],'#ae9275',282,1.09,2),
  R('P03','黑革正装 · 窄脚',['black','#29292c'],['heritage','#252326'],['black','#333039'],['nubuck','#353139'],'#8b8684',274,.94,-2),
  R('P04','酒红油蜡 · 高脚背',['wax','#5e2e2b'],['heritage','#452624'],['wax','#683c37'],['nubuck','#473029'],'#b19271',286,1.03,8),
@@ -11,7 +11,7 @@ export const PRESETS=[
  R('P09','米白拼棕 · 小码',['canvas','#dbd4c4'],['heritage','#855c3f'],['canvas','#d9cbbb'],['nubuck','#7f6752'],'#8d6f52',252,1,0),
  R('P10','炭黑牛巴 · 超宽',['nubuck','#343638'],['black','#25272a'],['nubuck','#45464a'],['suede','#303235'],'#a6a098',296,1.15,4),
  R('P11','烟草格织 · 高容量',['twill','#84715a'],['wax','#593d2a'],['twill','#9b886b'],['suede','#68513b'],'#c5ae89',288,1.07,10),
- R('P12','海军毛呢 · 大楦',['twill','#323d50'],['black','#222c3a'],['twill','#45556e'],['suede','#303c4c'],'#b4b9bc',306,1.05,5)
+ R('P12','海军格织 · 大楦',['twill','#323d50'],['black','#222c3a'],['twill','#45556e'],['suede','#303c4c'],'#b4b9bc',306,1.05,5)
 ];
 export const getPreset=id=>{const p=PRESETS.find(p=>p.id===id);if(!p)throw Error('未知成鞋预设');return p;};
 export function panelRecipe(p,id){return id===27?p.cap:[22,23].includes(id)?p.quarter:[24,25].includes(id)?p.heel:p.body;}

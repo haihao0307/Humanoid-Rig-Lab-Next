@@ -18,7 +18,7 @@ export function createBindings(model,state,parts){
    const total=run.slice(1).reduce((n,r,i)=>n+dist(r.p,run[i].p),0);if(total<5)continue;
    const poses=[],U=[],indices=[],P=[];let length=0;
    for(let i=0;i<run.length;i++){
-    const {q,qi}=run[i],h=model.sample(id,q,state),f=model.sample(id,qi,state),N=unit(sub(h.outer,h.inner));const O=outermost(h),I=h.inner,OI=outermost(f),II=f.inner,W=unit(sub(OI,O));
+    const {q,qi}=run[i],h=model.sample(id,q,state),f=model.sample(id,qi,state),N=unit(sub(h.outer,h.inner));const O=[28,21].includes(id)?h.outer:outermost(h),I=h.inner,OI=[28,21].includes(id)?f.outer:outermost(f),II=f.inner,W=unit(sub(OI,O));
     const sec=[add(OI,mul(N,.48)),add(O,mul(N,.48)),add(O,add(mul(W,-.32),mul(N,.22))),add(I,add(mul(W,-.32),mul(N,-.22))),add(I,mul(N,-.48)),add(II,mul(N,-.48)),add(II,mul(N,-.12)),add(I,mul(N,-.12)),add(I,mul(W,-.08)),add(O,mul(W,-.08)),add(O,mul(N,.12)),add(OI,mul(N,.12))];
     if(i)length+=dist(h.outer,model.sample(id,run[i-1].q,state).outer);
     sec.forEach((p,k)=>{P.push(...p);U.push(length/96,k/12*.08)});poses.push({sec,N,W,O});widths.push(dist(OI,O));
