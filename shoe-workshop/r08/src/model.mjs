@@ -2,6 +2,7 @@ import {ShoeAssembly as R07Base,PARTS,defaultState as oldDefault,validate as old
 import {compileJoins,JOIN_RULES} from './join-plan.mjs';
 import {sourceRearRails} from './rear-rails.mjs';
 import {registerLayers,ShellSampler} from './contact.mjs';
+import {seatSoleWall} from './sole-contact.mjs';
 import {lockstitch301} from './sewing.mjs';
 import {add,sub,mul,unit,mix,dist,smooth,stats,nearestOnSegment} from '../../r07/src/geometry.mjs';
 export {PARTS};
@@ -20,6 +21,7 @@ export class ShoeAssembly extends R07Base{
   const cached=this.states?.get(k);if(cached){Object.assign(this,cached);this.geometryKey=k;this.state=s;this.r08Built=true;this.restores=(this.restores||0)+1;this.remember();return this.cachedParts;}
   this.geometryKey=null;const parts=super.build(s);
   this.contactReport=s.view==='flat'?[]:registerLayers(parts);
+  if(s.view!=='flat'){const prior=this.fittedSole;this.fittedSole=seatSoleWall(prior,parts);this.soleFinishReport=this.fittedSole.userData.seating;prior.dispose();}
   this.samplers=new Map(parts.filter(p=>p.id!==29).map(p=>[p.id,new ShellSampler(p.geometry,(this.needleSpecs[p.id]||[]).map(h=>s.view==='flat'?{q:this.domains[p.id].toRest(h.q),loop:h.loop.map(q=>this.domains[p.id].toRest(q))}:h))]));this.threadCache=null;this.cachedParts=parts;this.currentParts=parts;this.state=s;this.geometryKey=k;this.r08Built=true;this.buildCount=(this.buildCount||0)+1;this.remember();return parts;
  }
  sample(id,q,s){const Q=s.view==='flat'?this.domains[id].toRest(q):q;return this.samplers.get(id).at(Q);}
