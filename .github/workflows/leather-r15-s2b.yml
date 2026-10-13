@@ -1,0 +1,36 @@
+name: Leather R15 S2B main-thread delivery
+on:
+  push:
+    branches: [perf/leather-r15-s2b-20261013]
+    paths:
+      - .github/workflows/leather-r15-s2b.yml
+      - leather-workshop/r15/**
+      - leather-workshop/s2b-delivery/**
+permissions:
+  contents: read
+concurrency:
+  group: leather-r15-s2b
+  cancel-in-progress: true
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            leather-workshop/r14
+            leather-workshop/r13
+            leather-workshop/r12
+            .github/workflows
+      - name: Snapshot only relevant source files
+        run: |
+          mkdir -p /tmp/leather-r15-input
+          tar -czf /tmp/leather-r15-input/source.tgz leather-workshop .github/workflows AGENTS.md
+          git rev-parse HEAD > /tmp/leather-r15-input/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leather-r15-source-input
+          path: /tmp/leather-r15-input/
+          retention-days: 7
