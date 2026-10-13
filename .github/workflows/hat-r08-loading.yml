@@ -1,0 +1,107 @@
+name: Hat R08 responsive loading
+on:
+  push:
+    branches: [fix/hat-r08-responsive-loading-20261013]
+    paths: [.github/workflows/hat-r08-loading.yml, hat-workshop/r08/**]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hat-r08-loading
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+          sparse-checkout: |
+            hat-workshop/r04
+            hat-workshop/r07
+            hat-workshop/r08
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Dependencies
+        run: |
+          pip install beautifulsoup4 playwright numpy
+          python -m playwright install --with-deps chromium
+      - name: Establish source and original detail assets
+        run: |
+          python hat-workshop/r08/bootstrap-r08.py
+          node --check hat-workshop/r08/app.js
+          python hat-workshop/r08/build.py --assets-only
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r08
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat(hat-r08): establish readable runtime and original detail assets [skip ci]'
+            git push origin HEAD:fix/hat-r08-responsive-loading-20261013
+          fi
+          echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Exact geometry preservation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          import gzip,base64,json
+          R=Path('hat-workshop/r08');(R/'qa').mkdir(exist_ok=True)
+          soup=BeautifulSoup(Path('hat-workshop/r04/standalone.html').read_text(),'html.parser')
+          data=json.loads(gzip.decompress(base64.b64decode(soup.find(id='payload').text)))
+          (R/'qa/payload-fixture.json').write_text(json.dumps(data))
+          PY
+          node hat-workshop/r08/verify-worker.mjs
+          rm hat-workshop/r08/qa/payload-fixture.json
+          python hat-workshop/r08/build.py --source "$SOURCE_SHA"
+      - name: Cold clicks and fault recovery
+        run: python -u hat-workshop/r08/qa-browser.py --source "$SOURCE_SHA"
+      - name: Freeze browser-tested public build
+        run: |
+          git add hat-workshop/r08
+          git commit -m 'build(hat-r08): freeze exact tested responsive candidate [skip ci]'
+          git push origin HEAD:fix/hat-r08-responsive-loading-20261013
+          echo "BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Public fixed-URL browser verification
+        run: |
+          URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/${BUILD_SHA}/hat-workshop/r08/index.html#hat=trilby"
+          python -u hat-workshop/r08/qa-browser.py --source "$SOURCE_SHA" --public-url "$URL"
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,urllib.request,hashlib
+          R=Path('hat-workshop/r08');source=os.environ['SOURCE_SHA'];build=os.environ['BUILD_SHA']
+          raw=f'https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/{build}/hat-workshop/r08/index.html'
+          html=urllib.request.urlopen(raw,timeout=90).read();manifest=json.loads((R/'BUILD_MANIFEST.json').read_text())
+          assert hashlib.sha256(html).hexdigest()==manifest['htmlSHA256']
+          local=json.loads((R/'qa/browser/report.json').read_text());public=json.loads((R/'qa/public/report.json').read_text());geometry=json.loads((R/'qa/worker-equivalence.json').read_text())
+          assert local['passed'] and public['passed'] and geometry['passed']
+          delivery={'version':'HAT-R08.0','sourceSha':source,'buildSha':build,'publicURL':public['publicURL'],'htmlSHA256':manifest['htmlSHA256'],'publicBytes':manifest['publicBytes'],'publicVerified':True,'localBrowserVerified':True,'geometryPairsUnchanged':len(geometry['records']),'localChecks':len(local['checks']),'publicChecks':len(public['checks']),'oldVersionsModified':False,'noMerge':True,'userAccepted':False,'normalMapsPreserved':True,'normalReadinessSeparateFromShape':True,'mobileScope':'viewport only, not physical device','coldInitialPageTradeoff':'larger initial HTML, zero network dependency for subsequent hat controls and original color'}
+          (R/'DELIVERY.json').write_text(json.dumps(delivery,ensure_ascii=False,indent=2))
+          PY
+      - name: Preserve scoped evidence
+        if: always()
+        run: |
+          rm -f hat-workshop/r08/qa/payload-fixture.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hat-workshop/r08
+          if ! git diff --cached --quiet; then
+            git commit -m 'test(hat-r08): preserve exact browser and delivery evidence [skip ci]'
+            git push origin HEAD:fix/hat-r08-responsive-loading-20261013
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hat-r08-evidence-${{ github.run_id }}
+          path: |
+            hat-workshop/r08/qa
+            hat-workshop/r08/BUILD_MANIFEST.json
+            hat-workshop/r08/DELIVERY.json
+            hat-workshop/r08/app.js
+          retention-days: 7
