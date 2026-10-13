@@ -29,6 +29,7 @@ jobs:
       - name: Derive once from frozen R11, verify exact candidate source, build
         run: |
           test -f denim-workshop/r12/app.js || python denim-workshop/r12/derive.py
+          python denim-workshop/r12/finalize-physics.py
           python - <<'PY'
           from pathlib import Path
           import json,hashlib
@@ -43,7 +44,9 @@ jobs:
           python -m py_compile denim-workshop/r12/qa-structure.py
           git diff --exit-code HEAD -- denim-workshop/r11 denim-workshop/r10 denim-workshop/archives
       - name: Mass, cut constraints, attached rods, contact and material regression
-        run: node denim-workshop/r12/test-structure.cjs
+        run: |
+          node denim-workshop/r12/test-structure.cjs
+          node denim-workshop/r12/test-load-cases.cjs
       - name: Install pinned independent browser
         run: |
           pip install playwright==1.55.0 pillow==11.3.0 numpy==2.2.6
@@ -88,8 +91,8 @@ jobs:
           from pathlib import Path
           import hashlib,json,os,urllib.request
           p=Path('denim-workshop/r12')
-          file=json.loads((p/'evidence/file-structure-qa.json').read_text());public=json.loads((p/'evidence/public-structure-qa.json').read_text());numeric=json.loads((p/'structure-qa.json').read_text())
-          assert file['passed'] and public['passed'] and numeric['passed']
+          file=json.loads((p/'evidence/file-structure-qa.json').read_text());public=json.loads((p/'evidence/public-structure-qa.json').read_text());numeric=json.loads((p/'structure-qa.json').read_text());loads=json.loads((p/'load-cases-qa.json').read_text())
+          assert file['passed'] and public['passed'] and numeric['passed'] and loads['passed']
           manifest=json.loads((p/'BUILD_MANIFEST.json').read_text())
           raw='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['PUBLIC_BUILD']+'/denim-workshop/r12/index.html'
           with urllib.request.urlopen(raw,timeout=90) as response:
@@ -97,7 +100,7 @@ jobs:
           assert len(data)==manifest['bytes'] and hashlib.sha256(data).hexdigest()==manifest['sha256']
           def summary(r):
               return {'passed':r['passed'],'mode':r['mode'],'stateNames':[s['name'] for s in r['states']],'network':r['network'],'restAppearance':r.get('restAppearance'),'reloadMaxPixelDifference':r.get('reloadMaxPixelDifference'),'coldBudget':r.get('coldBudget'),'nearBudget':r.get('nearBudget'),'maxTrackedGpuBytes':max(s['frame']['performance']['trackedGpuBytes'] for s in r['states']),'materialResponse':r.get('materialResponse'),'damagedPhysics':r.get('damagedPhysics'),'windAcrossLOD':r.get('windAcrossLOD'),'recipeBytes':r.get('recipeBytes')}
-          receipt={'version':'R12.0','status':'STRUCTURE_PHYSICS_CANDIDATE_PUBLIC_VERIFIED','deliveryVerified':True,'userVisualApproved':False,'filmGradeValidated':False,'parentHead':'d3b17563218e888f6eee9e2944274d75b6691400','parentBuild':'086414b317f313bf9465ea957753ae7e84453f6f','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'publicBytesMatch':True,'browserVersion':public['browserVersion'],'desktopViewport':[1000,780],'mobileViewport':[390,844],'realPhone':False,'consumerGPUPerformanceVerified':False,'numeric':numeric,'browser':{'file':summary(file),'public':summary(public)},'scope':['Cut the existing visible hole out of the sheet force graph and area/mass model','Bind retained bridges and tails as two-way/one-ended low-resolution chains','Connect thickness, declared areal mass and directional stiffness to solver','Keep R11 rest appearance, sampling and LOD behavior'],'limits':['Existing static hole, not force-created tearing or adaptive topology','Point/sphere collision only; no self collision, CCD or full garment/person integration','Unmeasured material heuristics; finish color and washing are not measured mechanics','Additional yarn dynamics has CPU cost; worker separation does not eliminate that cost','Sewing remains visual geometry, not true piercing or seam tension','No independent instance seed, local patch streaming, film time cache or film color pipeline','Browser/resource bookkeeping is not full process memory or consumer GPU FPS','Original archive, R01-R11 and unrelated workbenches unchanged; no merge or force push']}
+          receipt={'version':'R12.0','status':'STRUCTURE_PHYSICS_CANDIDATE_PUBLIC_VERIFIED','deliveryVerified':True,'userVisualApproved':False,'filmGradeValidated':False,'parentHead':'d3b17563218e888f6eee9e2944274d75b6691400','parentBuild':'086414b317f313bf9465ea957753ae7e84453f6f','sourceHead':os.environ['GITHUB_SHA'],'buildCommit':os.environ['PUBLIC_BUILD'],'publicUrl':os.environ['PUBLIC_URL'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'manifest':manifest,'publicBytesMatch':True,'browserVersion':public['browserVersion'],'desktopViewport':[1000,780],'mobileViewport':[390,844],'realPhone':False,'consumerGPUPerformanceVerified':False,'numeric':numeric,'expandedLoads':loads,'browser':{'file':summary(file),'public':summary(public)},'supersededCandidateRun':38355672695,'loadCorrection':'Refresh algebraically bound roots before residual checks, bridge-before-tail solve order, 4..12 bounded adaptive passes; re-embed after contact. No deleted yarns, stopped wind or relaxed strain gate.','scope':['Cut the existing visible hole out of the sheet force graph and area/mass model','Bind retained bridges and tails as two-way/one-ended low-resolution chains','Connect thickness, declared areal mass and directional stiffness to solver','Keep R11 rest appearance, sampling and LOD behavior'],'limits':['Existing static hole, not force-created tearing or adaptive topology','Point/sphere collision only; no self collision, CCD or full garment/person integration','Unmeasured material heuristics; finish color and washing are not measured mechanics','Additional yarn dynamics has CPU cost; worker separation does not eliminate that cost','Sewing remains visual geometry, not true piercing or seam tension','No independent instance seed, local patch streaming, film time cache or film color pipeline','Browser/resource bookkeeping is not full process memory or consumer GPU FPS','Original archive, R01-R11 and unrelated workbenches unchanged; no merge or force push']}
           (p/'DELIVERY_RECEIPT.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
           PY
           test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$PUBLIC_BUILD"
