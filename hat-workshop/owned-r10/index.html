@@ -1,10 +1,10 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KAOPU 自有帽型系统 · R10.1</title>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KAOPU 自有帽型系统 · R10.2</title>
 <style>
 :root{--bg:#eeede7;--ink:#323b35;--muted:#7a817a;--line:#d3d6cb;--accent:#405d4b}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.55 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}header{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--line);gap:16px}header strong{font-size:19px;font-weight:600;letter-spacing:1px}header small{display:block;color:var(--muted);font-size:11px;letter-spacing:1px}.top-right{text-align:right;font-size:11px;color:var(--muted)}button,select,input{font:inherit}button,select{border:1px solid var(--line);border-radius:5px;padding:7px 9px;background:#f6f5ef;color:var(--ink)}button{cursor:pointer}button:hover{border-color:#718b78;background:#e3e8df}button[aria-pressed=true]{background:var(--accent);color:white;border-color:var(--accent)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #546d58;outline-offset:2px}[hidden]{display:none!important}main{display:grid;grid-template-columns:224px minmax(280px,1fr) 280px;height:calc(100vh - 68px)}aside{padding:17px 14px;overflow:auto}aside:first-child{border-right:1px solid var(--line)}aside:last-child{border-left:1px solid var(--line)}h2{font-size:11px;letter-spacing:2px;font-weight:600;margin:0 0 15px;color:var(--muted)}.catalogue{display:grid;grid-template-columns:1fr 1fr;gap:9px}.hat-card{padding:0 0 7px;text-align:left;overflow:hidden;border-radius:6px;min-height:100px;background:#e0e1d8}.hat-card img{display:block;width:100%;aspect-ratio:1.5;object-fit:cover}.hat-card img:not([src]){background:#daded3}.hat-card span,.hat-card small{display:block;padding:0 6px}.hat-card span{font-size:11px;margin-top:5px}.hat-card small{font-size:10px;opacity:.65}.caption{font-size:11px;line-height:1.8;color:var(--muted);margin-top:20px}.center{min-width:0;position:relative;display:flex;flex-direction:column;background:#deded7}.viewport{flex:1;position:relative;min-height:260px;overflow:hidden}#canvas{display:block;width:100%;height:100%;touch-action:none}.overlay{position:absolute;top:19px;left:24px;pointer-events:none}.overlay strong{font-size:24px;font-weight:450;letter-spacing:2px}.overlay p{font-size:12px;color:#6b766b;margin:5px 0}.viewtag{position:absolute;bottom:16px;left:22px;font-size:10px;color:#6c776b;letter-spacing:1px;pointer-events:none}.toolbar{display:flex;gap:5px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid #cdd1c6;background:#e7e8df}.toolbar button{font-size:11px;padding:5px 9px}.readout{display:flex;justify-content:space-between;gap:10px;padding:10px 16px;background:#e9ebe2;border-top:1px solid var(--line);font-size:10px;color:#6b766b;min-height:38px}.design{font-size:17px;font-weight:500;margin:0 0 7px}.description{color:#778073;font-size:11px;line-height:1.8;margin-bottom:18px}.block{border-top:1px solid var(--line);padding-top:13px;margin-top:15px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0}.row select{min-width:140px}.parameter{display:block;margin:11px 0}.parameter span{display:flex;justify-content:space-between;font-size:11px}.parameter output{color:var(--muted);font-variant-numeric:tabular-nums}input[type=range]{width:100%;height:16px;margin:6px 0;accent-color:var(--accent)}input[type=color]{width:46px;height:26px;border:1px solid var(--line);padding:0;background:none}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.buttons button{font-size:11px}#fit-note{font-size:10px;color:#818775;margin-top:10px;line-height:1.6}details{font-size:10px;color:var(--muted);line-height:1.7;margin-top:20px}summary{cursor:pointer}#status{font-size:11px}#cancel{font-size:10px;padding:1px 7px}.tip{color:#87907f;font-size:10px;margin:8px 0 0}.badge{display:inline-block;font-size:10px;letter-spacing:1px;border:1px solid #bac5b5;border-radius:20px;padding:3px 9px;color:#586d54}
 @media(max-width:1000px){main{grid-template-columns:176px minmax(200px,1fr) 242px}aside{padding:13px 10px}.overlay{left:14px}.overlay strong{font-size:20px}}
 @media(max-width:700px){header{height:62px;padding:0 14px}header strong{font-size:16px}.top-right{font-size:9px}main{height:auto;display:flex;flex-direction:column}.center{order:0;height:66vh;min-height:440px}aside:first-child{order:1;border-top:1px solid var(--line);border-right:0}aside:last-child{order:2;border-left:0;border-top:1px solid var(--line)}.catalogue{grid-template-columns:repeat(4,1fr)}.hat-card span{font-size:10px}.caption{display:none}.readout{flex-wrap:wrap}.overlay strong{font-size:19px}.toolbar{padding:8px}.buttons{grid-template-columns:repeat(3,1fr)}.parameter{margin:13px 0}h2{margin-bottom:10px}}
 </style></head><body>
-<header><div><strong>KAOPU / 自有帽型系统</strong><small>HAT ATELIER · ORIGINAL SPECTRUM</small></div><div class="top-right"><span class="badge">十一类 · 新造型 · 参数化生成</span><div id="version">R10.1 · 启动中</div></div></header>
+<header><div><strong>KAOPU / 自有帽型系统</strong><small>HAT ATELIER · ORIGINAL SPECTRUM</small></div><div class="top-right"><span class="badge">十一类 · 新造型 · 参数化生成</span><div id="version">R10.2 · 启动中</div></div></header>
 <main><aside><h2>01 / 帽型目录</h2><div id="catalogue" class="catalogue"></div><p class="caption">每顶帽子来自自己的参数谱。<br>缩略图由当前三维生成器绘制。<br>无参考网格 / 无原贴图下载。</p></aside>
 <section class="center"><div class="viewport"><canvas id="canvas" aria-label="可旋转缩放的三维帽子"></canvas><div class="overlay"><strong id="hat-name">正在建立自有帽型</strong><p>拖动旋转 · 滚轮缩放</p></div><span class="viewtag" id="part-label">独立产品视图</span></div><div class="toolbar"><button data-view="three">三分之四</button><button data-view="front">正面</button><button data-view="side">侧面</button><button data-view="back">背面</button><button data-view="top">顶部</button><button data-view="inside">内衬</button><button id="rotate" aria-pressed="false">旋转</button><button id="section" aria-pressed="false">剖看</button><button id="wire" aria-pressed="false">网格</button></div><div class="readout"><span id="status" role="status">加载独立程序…</span><button id="cancel" hidden>取消</button><span><b id="triangles">—</b> 三角形 · 数组 <b id="weight">—</b></span></div></section>
 <aside><h2>02 / 自有参数谱</h2><p class="design" id="design">结构 / 材料 / 量配</p><p class="description" id="description"></p><div class="row"><span>显示</span><select id="view-mode"><option value="product">单独帽子</option><option value="fit">头形试戴</option></select></div><div class="row"><span>头形</span><select id="head"></select></div><div id="parameters"></div><div class="row"><span>主材颜色</span><input id="color" type="color" value="#71685b"></div><div class="row"><span>灯光</span><select id="light"><option value="studio">柔和影棚</option><option value="raking">低角度掠射</option></select></div><p id="fit-note"></p><div class="buttons"><button id="reset">恢复预设</button><button id="variant">生成新变体</button><button id="compare">初始配方对照</button><button id="clear">清理闲置缓存</button></div><div class="block"><h2>03 / 配方</h2><div class="buttons"><button id="save">保存</button><button id="load">载入</button><button id="export">导出</button><button id="import">导入</button></div><input id="import-file" type="file" accept=".json,application/json" hidden><p class="tip">配方只保存自有语义参数，不保存外部网格。</p></div><details><summary>实现与授权边界</summary><p>帽型生成、量配规则、材质函数、交互和配方为本次重新实现。所有展示纹理与环境均由数学函数产生；十一类保留类别，不保留旧参考资产。三种头形为新建程序测试头，不是原扫描人物。</p><p>静态量配不是布料动态仿真。针织为有厚度壳层、绞花实体与过滤织纹，不宣称逐根纱线物理。</p><p>通用 Three.js 为 MIT 授权依赖，其许可证与作者声明保留在发布文件中。独立重写和工程检查不是法律无侵权保证，也不是隔离团队式 clean-room 认证。</p></details></aside></main>
@@ -12,7 +12,7 @@
 (function(G){
 'use strict';
 const H=G.HAT10=G.HAT10||{};
-H.schema='kaopu.hat-spectrum/1';H.version='HAT-R10.1';
+H.schema='kaopu.hat-spectrum/1';H.version='HAT-R10.2';
 H.categories=[
  {id:'braid',name:'绞花针织帽',design:'岚线 · 八束错位绞花',family:'knit',color:'#667367',trim:'#444f47',height:.155,thickness:.0048,shape:'soft',slouch:.020,braids:8,brim:0,band:.038,roughness:.89,seed:1041,summary:'八束双股绞花，后倾松量，独立双层罗纹翻边。'},
  {id:'bucket',name:'宽檐渔夫帽',design:'野渡 · 非对称下垂檐',family:'canvas',color:'#968771',trim:'#625a4c',height:.113,thickness:.0019,shape:'bucket',brim:.064,drop:.034,band:.012,roughness:.87,seed:2173,summary:'紧凑筒冠，前长后短软檐，四道同心压线。'},
@@ -121,6 +121,8 @@ function combine(pieces){
 H.generate=function(input,lod=0){
  const began=performance.now(),s=H.sanitize(input),c=H.categories.find(c=>c.id===s.id),head=H.headShape(s);
  const thick=c.thickness*s.thickness,ease=s.ease/1000,ax=head.a+ease+thick,bz=head.b+ease+thick,ht=Math.max(c.height*s.height,c.shape==='visor'?0:.114+thick+ease);
+ // R102: reserve scalp clearance before deepening the center crease.
+ const crownRecess=c.shape==='pinch'?Math.min(.017,Math.max(0,ht*.98-(head.top+ease+thick+.002))):0;
  const pieces=[],N=lod?64:112,M=lod?28:48;let adjusted=0;
  const tables={
   soft:[[1,0],[1.03,.25],[1.04,.48],[.96,.72],[.72,.89],[0,1]],
@@ -142,7 +144,7 @@ H.generate=function(input,lod=0){
   if(c.shape==='flat'){cz=.028*Math.sin(v*PI/2);y-=.022*Math.max(cs,0)*Math.sin(v*PI);rr*=1+.10*Math.max(cs,0)*Math.sin(v*PI);}
   if(c.shape==='pinch'){
    rr*=1-.095*(bump(th,.72,.30)+bump(th,TAU-.72,.30))*Math.sin(v*PI)**2;
-   y-=.018*bump(v,.84,.16)*(1-sn*sn)*r;cz=.004*smooth(v);
+   y-=.006*bump(v,.80,.13)*(1-sn*sn)*r+crownRecess*smooth((v-.77)/.23);cz=.004*smooth(v);
   }
   if(c.shape==='pleat'){
    const f=(.0038*Math.sin(20*th+.21*Math.sin(v*PI))+.0012*Math.sin(40*th))*Math.sin(v*PI)**.65;
@@ -223,12 +225,12 @@ H.generate=function(input,lod=0){
  if(stitches.length)pieces.push(combine(stitches));
  let min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity],vertices=0,triangles=0,bytes=0;
  for(const p of pieces){vertices+=p.position.length/3;triangles+=p.index.length/3;bytes+=p.position.byteLength+p.normal.byteLength+p.uv.byteLength+p.index.byteLength;for(let i=0;i<p.position.length;i++) {let k=i%3;min[k]=Math.min(min[k],p.position[i]);max[k]=Math.max(max[k],p.position[i]);}}
- return{schema:H.schema,id:s.id,spec:s,head:{a:head.a,b:head.b,top:head.top},pieces,bounds:{min,max},stats:{vertices,triangles,bytes,requestedCrownHeight:c.height*s.height,effectiveCrownHeight:ht,heightFitClamped:ht>c.height*s.height+1e-8,generationMS:performance.now()-began,fit:'static analytic envelope; not IPC',projectionEvaluations:adjusted},origin:'equations-and-new-category-spectrum'};
+ return{schema:H.schema,id:s.id,spec:s,head:{a:head.a,b:head.b,top:head.top},pieces,bounds:{min,max},stats:{vertices,triangles,bytes,requestedCrownHeight:c.height*s.height,effectiveCrownHeight:ht,crownRecessMetres:crownRecess,heightFitClamped:ht>c.height*s.height+1e-8,generationMS:performance.now()-began,fit:'static analytic envelope; not IPC',projectionEvaluations:adjusted},origin:'equations-and-new-category-spectrum'};
 };
 })(globalThis);
 
 self.onmessage=e=>{try{const data=HAT10.generate(e.data.spec,e.data.lod);const list=[];for(const p of data.pieces)for(const k of ['position','normal','uv','index'])list.push(p[k].buffer);postMessage(data,list);}catch(error){postMessage({error:String(error.message||error)});}};</script>
-<script>globalThis.HAT10_BUILD={"source": "663918e9409feb4e79c1aee43c749c8003806187", "version": "HAT-R10.1"};</script><script>/*The MIT License
+<script>globalThis.HAT10_BUILD={"source": "7405dc86ac0bde430e7301f719321f38d9a276e1", "version": "HAT-R10.2"};</script><script>/*The MIT License
 
 Copyright © 2010-2025 three.js authors
 
@@ -4094,7 +4096,7 @@ void main() {
 (function(G){
 'use strict';
 const H=G.HAT10=G.HAT10||{};
-H.schema='kaopu.hat-spectrum/1';H.version='HAT-R10.1';
+H.schema='kaopu.hat-spectrum/1';H.version='HAT-R10.2';
 H.categories=[
  {id:'braid',name:'绞花针织帽',design:'岚线 · 八束错位绞花',family:'knit',color:'#667367',trim:'#444f47',height:.155,thickness:.0048,shape:'soft',slouch:.020,braids:8,brim:0,band:.038,roughness:.89,seed:1041,summary:'八束双股绞花，后倾松量，独立双层罗纹翻边。'},
  {id:'bucket',name:'宽檐渔夫帽',design:'野渡 · 非对称下垂檐',family:'canvas',color:'#968771',trim:'#625a4c',height:.113,thickness:.0019,shape:'bucket',brim:.064,drop:.034,band:.012,roughness:.87,seed:2173,summary:'紧凑筒冠，前长后短软檐，四道同心压线。'},
@@ -4203,6 +4205,8 @@ function combine(pieces){
 H.generate=function(input,lod=0){
  const began=performance.now(),s=H.sanitize(input),c=H.categories.find(c=>c.id===s.id),head=H.headShape(s);
  const thick=c.thickness*s.thickness,ease=s.ease/1000,ax=head.a+ease+thick,bz=head.b+ease+thick,ht=Math.max(c.height*s.height,c.shape==='visor'?0:.114+thick+ease);
+ // R102: reserve scalp clearance before deepening the center crease.
+ const crownRecess=c.shape==='pinch'?Math.min(.017,Math.max(0,ht*.98-(head.top+ease+thick+.002))):0;
  const pieces=[],N=lod?64:112,M=lod?28:48;let adjusted=0;
  const tables={
   soft:[[1,0],[1.03,.25],[1.04,.48],[.96,.72],[.72,.89],[0,1]],
@@ -4224,7 +4228,7 @@ H.generate=function(input,lod=0){
   if(c.shape==='flat'){cz=.028*Math.sin(v*PI/2);y-=.022*Math.max(cs,0)*Math.sin(v*PI);rr*=1+.10*Math.max(cs,0)*Math.sin(v*PI);}
   if(c.shape==='pinch'){
    rr*=1-.095*(bump(th,.72,.30)+bump(th,TAU-.72,.30))*Math.sin(v*PI)**2;
-   y-=.018*bump(v,.84,.16)*(1-sn*sn)*r;cz=.004*smooth(v);
+   y-=.006*bump(v,.80,.13)*(1-sn*sn)*r+crownRecess*smooth((v-.77)/.23);cz=.004*smooth(v);
   }
   if(c.shape==='pleat'){
    const f=(.0038*Math.sin(20*th+.21*Math.sin(v*PI))+.0012*Math.sin(40*th))*Math.sin(v*PI)**.65;
@@ -4305,7 +4309,7 @@ H.generate=function(input,lod=0){
  if(stitches.length)pieces.push(combine(stitches));
  let min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity],vertices=0,triangles=0,bytes=0;
  for(const p of pieces){vertices+=p.position.length/3;triangles+=p.index.length/3;bytes+=p.position.byteLength+p.normal.byteLength+p.uv.byteLength+p.index.byteLength;for(let i=0;i<p.position.length;i++) {let k=i%3;min[k]=Math.min(min[k],p.position[i]);max[k]=Math.max(max[k],p.position[i]);}}
- return{schema:H.schema,id:s.id,spec:s,head:{a:head.a,b:head.b,top:head.top},pieces,bounds:{min,max},stats:{vertices,triangles,bytes,requestedCrownHeight:c.height*s.height,effectiveCrownHeight:ht,heightFitClamped:ht>c.height*s.height+1e-8,generationMS:performance.now()-began,fit:'static analytic envelope; not IPC',projectionEvaluations:adjusted},origin:'equations-and-new-category-spectrum'};
+ return{schema:H.schema,id:s.id,spec:s,head:{a:head.a,b:head.b,top:head.top},pieces,bounds:{min,max},stats:{vertices,triangles,bytes,requestedCrownHeight:c.height*s.height,effectiveCrownHeight:ht,crownRecessMetres:crownRecess,heightFitClamped:ht>c.height*s.height+1e-8,generationMS:performance.now()-began,fit:'static analytic envelope; not IPC',projectionEvaluations:adjusted},origin:'equations-and-new-category-spectrum'};
 };
 })(globalThis);
 
@@ -4319,12 +4323,19 @@ uniform float ownDetail;
 uniform float ownSeed;
 varying vec2 ownUV;
 varying vec3 ownLocal;
-float ownHash(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7))+ownSeed)*43758.5453);}
+// R102 independently expressed integer lattice mixer; not cryptographic.
+// Coordinates and seed are mixed as uint32; interpolation remains ordinary trilinear noise.
+uint ownMixWord(uint w){w^=w>>11u;w*=49157u;w^=w>>7u;w*=16127u;w^=w>>15u;return w;}
+float ownHash(vec3 p){
+ uvec3 cell=uvec3(ivec3(floor(p)));uint seed=uint(floor(ownSeed*1000.0+.5));
+ uint w=ownMixWord(cell.x+211u)^ownMixWord(cell.y+571u)^ownMixWord(cell.z+1453u)^ownMixWord(seed+1747u);
+ return float(ownMixWord(w)&16777215u)/16777216.0;
+}
 float ownNoise(vec3 p){vec3 a=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(mix(ownHash(a),ownHash(a+vec3(1,0,0)),f.x),mix(ownHash(a+vec3(0,1,0)),ownHash(a+vec3(1,1,0)),f.x),f.y),mix(mix(ownHash(a+vec3(0,0,1)),ownHash(a+vec3(1,0,1)),f.x),mix(ownHash(a+vec3(0,1,1)),ownHash(a+vec3(1,1,1)),f.x),f.y),f.z);}
 float ownFade(vec2 f){return 1.0-smoothstep(.35,1.2,max(f.x,f.y));}
 vec2 ownFabric(vec2 p,vec3 q){
  float grain=ownNoise(q*2400.0),heather=ownNoise(q*330.0),meso=ownNoise(q*65.0);
- float microFade=ownFade(fwidth(q.xy*2400.0));
+ float microFade=1.0-smoothstep(.35,1.2,max(max(fwidth(q.x*2400.0),fwidth(q.y*2400.0)),fwidth(q.z*2400.0)));
  float color=.98+(heather-.5)*.14+(meso-.5)*.05+(grain-.5)*.10*microFade;
  float h=(heather-.5)*.000035+(grain-.5)*.000045*microFade;
  if(ownMode>.5&&ownMode<2.5){
@@ -4376,10 +4387,11 @@ H.makeMaterial=function(c,s,role){
    vec3 ownDx=dFdx(-vViewPosition),ownDy=dFdy(-vViewPosition);
    vec3 ownR1=cross(ownDy,normal),ownR2=cross(normal,ownDx);
    float ownDet=dot(ownDx,ownR1);
-   if(abs(ownDet)>1e-12){vec3 ownGrad=sign(ownDet)*(dFdx(ownSurface.x)*ownR1+dFdy(ownSurface.x)*ownR2);normal=normalize(abs(ownDet)*normal-ownGrad);}
+   if(abs(ownDet)>1e-12){vec3 ownGrad=sign(ownDet)*(dFdx(ownSurface.x)*ownR1+dFdy(ownSurface.x)*ownR2);vec3 ownSlope=ownGrad/max(abs(ownDet),1e-10);
+    ownSlope*=min(1.0,.60/max(length(ownSlope),1e-6));normal=normalize(normal-ownSlope);}
   `);
  };
- m.customProgramCacheKey=()=> 'hat101-fabric-2-'+family;
+ m.customProgramCacheKey=()=> 'hat102-fabric-u32-' +family;
  return m;
 };
 H.makeEnvironment=function(renderer){
@@ -4402,7 +4414,7 @@ let renderer,scene,camera,lights,envRT,active=null,form=H.defaults(location.hash
 if(!H.categories.some(c=>c.id===form.id))form=H.defaults();
 let pendingSpec='',pending=null,serial=0,ready=false,mode='product',view='three',frame=0,spin=false,section=false,wire=false,comparison=null;
 let yaw=.58,pitch=.38,distance=.68,target=new T.Vector3(0,.06,0),headGroup=null;
-const cache=new Map(),errors=[],clicks=[],metrics={headBuilds:0,ignoredDuplicates:0,generated:0,cacheHits:0,draws:0,shadowPasses:0,workerCancelled:0,workerTimeouts:0,thumbs:0,boot:performance.now()};
+const cache=new Map(),errors=[],clicks=[],metrics={headBuilds:0,ignoredDuplicates:0,generated:0,cacheHits:0,draws:0,shadowPasses:0,workerCancelled:0,workerTimeouts:0,thumbs:0,thumbnailOutput:'display-srgb-tone-mapped',boot:performance.now()};
 const workerText=$('own-worker').textContent;
 const workerURL=URL.createObjectURL(new Blob([workerText],{type:'text/javascript'}));
 const clipping=new T.Plane(new T.Vector3(-1,0,0),0);
@@ -4500,18 +4512,23 @@ function syncUI(){for(const k of Object.keys(H.parameters)){const e=$('p-'+k);if
 function updateLabel(k){const el=$('o-'+k);if(!el)return;const v=Number($('p-'+k).value);el.textContent=k==='circumference'?v.toFixed(1)+' cm':k==='ease'?v.toFixed(1)+' mm':k==='detail'?v.toFixed(2):v.toFixed(2)+' ×';}
 function saveFile(name,text,type='application/json'){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);}
 async function thumbnails(){
- const rt=new T.WebGLRenderTarget(220,146),tc=new T.PerspectiveCamera(36,220/146,.005,4),ts=new T.Scene();ts.background=new T.Color('#deded7');ts.environment=scene.environment;ts.add(new T.HemisphereLight('#fff8ed','#767b70',1.8));const light=new T.DirectionalLight('#ffffff',2);light.position.set(-.4,.5,.6);ts.add(light);
+ // R102: the same display framebuffer applies ACES and sRGB, unlike raw linear target bytes.
+ const tc=new T.PerspectiveCamera(36,220/146,.005,4),ts=new T.Scene();
+ ts.background=scene.background.clone();ts.environment=scene.environment;ts.environmentIntensity=scene.environmentIntensity;
+ for(const source of [scene.children.find(o=>o.isHemisphereLight),lights.key,lights.fill]){const light=source.clone();light.castShadow=false;ts.add(light);} 
  for(const c of H.categories){
   while(pending)await new Promise(r=>setTimeout(r,120));await new Promise(r=>setTimeout(r,50));
   try{
    const w=newWorker(H.defaults(c.id),1),data=await w.promise,model=makeModel(data,H.defaults(c.id));ts.add(model);
    const h=data.bounds.max[1]-data.bounds.min[1],wide=Math.max(data.bounds.max[0]-data.bounds.min[0],data.bounds.max[2]-data.bounds.min[2]),d=Math.max(.56,wide*2.2,h*3.4);tc.position.set(d*.52,d*.38+(data.bounds.max[1]+data.bounds.min[1])/2,d*.80);tc.lookAt(0,(data.bounds.max[1]+data.bounds.min[1])/2,0);
-   const was=renderer.getRenderTarget();renderer.setRenderTarget(rt);renderer.render(ts,tc);const bytes=new Uint8Array(220*146*4);renderer.readRenderTargetPixels(rt,0,0,220,146,bytes);renderer.setRenderTarget(was);
-   const cn=document.createElement('canvas');cn.width=220;cn.height=146;const ctx=cn.getContext('2d'),image=ctx.createImageData(220,146);for(let row=0;row<146;row++)image.data.set(bytes.subarray((145-row)*880,(146-row)*880),row*880);ctx.putImageData(image,0,0);
+   const was=renderer.getRenderTarget(),size=renderer.getSize(new T.Vector2());
+   const cn=document.createElement('canvas');cn.width=220;cn.height=146;
+   try{renderer.setRenderTarget(null);renderer.setSize(220,146,false);renderer.render(ts,tc);cn.getContext('2d').drawImage(renderer.domElement,0,0,220,146);}
+   finally{renderer.setSize(size.x,size.y,false);renderer.setRenderTarget(was);draw();}
    document.querySelector(`.hat-card[data-id="${c.id}"] img`).src=cn.toDataURL('image/webp',.84);metrics.thumbs++;ts.remove(model);dispose(model);dirty();
   }catch(e){errors.push('thumbnail '+c.id+': '+e.message);}
  }
- rt.dispose();
+ // No extra renderer, render target or persistent thumbnail GPU geometry is retained.
 }
 function boot(){
  const canvas=$('canvas');renderer=new T.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true,alpha:false,powerPreference:'high-performance'});
@@ -4554,7 +4571,7 @@ function boot(){
  $('import').onclick=()=>$('import-file').click();$('import-file').onchange=async e=>{try{const f=e.target.files[0];if(!f)return;if(f.size>100000)throw Error('配方文件过大');await select(H.sanitize(JSON.parse(await f.text())),'import');}catch(e){status('配方未应用：'+e.message);}finally{e.target.value='';}};
  $('clear').onclick=()=>{for(const[k,r]of cache){if(r!==active){dispose(r.group);cache.delete(k);}}status('已释放闲置几何；当前帽子与保存配方保留。');};
  $('compare').onclick=()=>{if(!comparison){comparison={...form};select(H.defaults(form.id),'compare-default');$('compare').textContent='返回我的调整';}else{select(comparison,'compare-return');comparison=null;$('compare').textContent='初始配方对照';}};
- $('version').textContent='R10.1 · '+String(H.build.source).slice(0,10);
+ $('version').textContent='R10.2 · '+String(H.build.source).slice(0,10);
  select(form,'boot').then(ok=>{if(ok){metrics.bootReadyMS=performance.now()-metrics.boot;setTimeout(thumbnails,800);}});
  G.ownedHat={version:H.version,source:H.build.source,diagnostics:()=>({renderer:renderer.getContext().getParameter(renderer.getContext().RENDERER),three:T.REVISION,drawCalls:renderer.info.render.calls,programCount:renderer.info.programs.length,gpuGeometries:renderer.info.memory.geometries}),ready:()=>ready,recipe:()=>({...form}),set:patch=>select({...form,...patch},'api'),restore:s=>select(s,'restore-api'),frame:frameView,cancel,stats:()=>({metrics:{...metrics},clicks:[...clicks],cacheSize:cache.size,cacheBytes:[...cache.values()].reduce((a,x)=>a+x.data.stats.bytes,0),current:active?.data.stats,errors:[...errors],thumbs:metrics.thumbs}),geometry:()=>active?.data,render:()=>{draw();return canvas.toDataURL('image/png');},clear:()=>{$('clear').click();},hash:()=>{let h=2166136261;for(const p of active.data.pieces){const b=new Uint8Array(p.position.buffer);for(const v of b){h^=v;h=Math.imul(h,16777619);}}return(h>>>0).toString(16);}};
 }
