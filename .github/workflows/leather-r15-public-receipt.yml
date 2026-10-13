@@ -1,0 +1,118 @@
+name: Leather R15 exact public receipt
+on:
+  push:
+    branches: [perf/leather-r15-s2b-20261013]
+    paths: [.github/workflows/leather-r15-public-receipt.yml]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: leather-r15-public-receipt
+  cancel-in-progress: true
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      LEATHER_SOURCE_COMMIT: 8c23de26525afff3ae2280463cd298a28fc07b6c
+      VERIFICATION_RUN: '38356482372'
+      KAOPU_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          sparse-checkout: leather-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r15-cpu-38356482372
+          run-id: 38356482372
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/cpu
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r15-browser-38356482372
+          run-id: 38356482372
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/browser
+      - uses: actions/download-artifact@v4
+        with:
+          name: leather-r15-profile-38356482372
+          run-id: 38356482372
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/profile
+      - name: Reuse only identical tested sources, candidate bytes and passed evidence
+        run: |
+          git fetch --depth=1 origin "$LEATHER_SOURCE_COMMIT"
+          git diff --exit-code "$LEATHER_SOURCE_COMMIT" -- leather-workshop/r15 leather-workshop/r14 leather-workshop/s2b-delivery
+          python - <<'PY'
+          from pathlib import Path
+          import json,shutil,hashlib,subprocess,os
+          r=Path('leather-workshop/r15');a=Path('/tmp/cpu');b=Path('/tmp/browser')
+          delta=subprocess.check_output(['git','diff','--name-only',os.environ['LEATHER_SOURCE_COMMIT'],'HEAD'],text=True).splitlines()
+          assert delta==['.github/workflows/leather-r15-public-receipt.yml'],delta
+          data=(a/'out/candidate-r15.html').read_bytes();assert data==(b/'out/candidate-r15.html').read_bytes()
+          assert hashlib.sha256(data).hexdigest()=='8d885617f72403d67adcd678a53425c3033a8f76abe8a1a06c86c3f45536597a'
+          s=json.loads((a/'qa/s2b/SUMMARY.json').read_text());assert s['pass'] and s['sourceCommit']==os.environ['LEATHER_SOURCE_COMMIT'] and s['checkCount']==144
+          br=json.loads((b/'qa/s2b/browser/report.json').read_text());assert br['pass'] and br['sourceCommit']==os.environ['LEATHER_SOURCE_COMMIT'] and len(br['checks'])==45
+          profile=json.loads(Path('/tmp/profile/profile.json').read_text());assert profile['pass'] and [x['label'] for x in profile['rows']]==['reference','candidate','candidate','reference']
+          for row in profile['rows']:
+            expected='8d885617f72403d67adcd678a53425c3033a8f76abe8a1a06c86c3f45536597a' if row['label']=='candidate' else '120a3772d4384ed375311df1a856e864836ba56e88a24345d0ed72e84f9cc049'
+            assert row['inputSHA256']==expected and not row['errors']
+          assert os.environ['LEATHER_SOURCE_COMMIT'].encode() in data
+          (r/'public-lite.html').write_bytes(data);shutil.copytree(a/'qa',r/'qa',dirs_exist_ok=True);shutil.copytree(b/'qa',r/'qa',dirs_exist_ok=True)
+          shutil.copy2(a/'BUILD_RESULT.json',r/'BUILD_RESULT.json');shutil.copy2('/tmp/profile/profile.json',r/'qa/s2b/profile.json')
+          print('144 source gates,45 offline browser gates,ABBA trace hashes and exact independent HTML verified')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add leather-workshop/r15/public-lite.html leather-workshop/r15/BUILD_RESULT.json
+          find leather-workshop/r15/qa -name '*.json' -print0 | xargs -0 git add -f --
+          git commit -m 'build(leather): publish byte-identical verified R15 after correcting report tracking'
+          git push origin HEAD:refs/heads/perf/leather-r15-s2b-20261013
+          echo "BUILD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "PREVIEW=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$(git rev-parse HEAD)/leather-workshop/r15/public-lite.html" >> "$GITHUB_ENV"
+      - name: Fresh exact immutable public webpage verification
+        run: |
+          pip --disable-pip-version-check install Pillow==12.3.0 playwright==1.55.0
+          python - <<'PY'
+          import urllib.request,os,time
+          from pathlib import Path
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/leather-workshop/r15/public-lite.html'
+          for i in range(10):
+            try:
+              with urllib.request.urlopen(url,timeout=30) as q:data=q.read()
+              assert data==Path('leather-workshop/r15/public-lite.html').read_bytes();break
+            except Exception:
+              if i==9:raise
+              time.sleep(6)
+          PY
+          xvfb-run -a python -u leather-workshop/r15/qa-browser-s2b.py --public --url "$PREVIEW"
+      - name: Record exact source and separate validation runs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          r=Path('leather-workshop/r15');paths=['qa/s2b/SUMMARY.json','qa/s2b/pose-stream.json','qa/s2b/profile.json','qa/s2b/browser/report.json','qa/s2b/public/report.json','qa/s1b/equivalence.json','qa/s1b2/app-interfaces.json','qa/numeric.json'];reports={}
+          for n in paths:
+            p=r/n;assert json.loads(p.read_text())['pass'];reports[n]=hashlib.sha256(p.read_bytes()).hexdigest()
+          s=json.loads((r/paths[0]).read_text());br=json.loads((r/paths[3]).read_text());pu=json.loads((r/paths[4]).read_text());im=[q['data']['meanRGBDifference'] for q in br['checks'] if isinstance(q.get('data'),dict) and 'meanRGBDifference' in q['data']]
+          rec={'version':'R15.0-S2B','sourceCommit':os.environ['LEATHER_SOURCE_COMMIT'],'buildCommit':os.environ['BUILD_SHA'],'verificationWorkflowRun':os.environ['VERIFICATION_RUN'],'publicWorkflowRun':os.environ['GITHUB_RUN_ID'],'previewURL':os.environ['PREVIEW'],'htmlSHA256':hashlib.sha256((r/'public-lite.html').read_bytes()).hexdigest(),'htmlBytes':(r/'public-lite.html').stat().st_size,'baselineR14Build':'37178e800a3272575b16e30a0723b3bcf1f29c0a','nativeIdenticalToR14':True,'sourceChecks':s['checkCount'],'poseProtocolChecks':45,'geometryCases':25,'full52StepTrajectories':6,'numericCases':18,'appCases':25,'offlineBrowserChecks':len(br['checks']),'publicBrowserChecks':len(pu['checks']),'visualPairs':len(im),'maximumMeanRGBDifference':max(im),'offlineBrowserVerified':True,'publicBrowserVerified':True,'subtaskComplete':True,'fullS1Complete':True,'fullS2Complete':False,'userVisualAcceptance':'PENDING','productionReady':False,'commercialLegalClearance':False,'reports':reports,'publicationRecovery':'Original CPU, offline browser and ABBA jobs succeeded. Publication alone failed because ignored case JSONs were passed to git add. Exact tested runtime reused with explicit report registration; no runtime or threshold changed.','limits':['Bounded autonomous pose delivery is not a guaranteed FPS or50ms latency gain','Only latest completed autonomous snapshots are coalesced; explicit commands are not','No physical step, CCD, friction, timestep, iteration or geometry removed','ABBA timing copies are instrumented and separate from release checks','Transport and event-loop wait not independently resolved; CPU submission not GPU completion','Chrome software rendering and390x844 viewport, not physical-device certification','R01-R14 and existing rights/attributions unchanged']}
+          (r/'DELIVERY.json').write_text(json.dumps(rec,indent=2)+'\n')
+          PY
+          git add leather-workshop/r15/DELIVERY.json leather-workshop/r15/qa/s2b/public/report.json
+          git commit -m 'test(leather): certify exact R15 public browser and bounded pose-delivery evidence'
+          git push origin HEAD:refs/heads/perf/leather-r15-s2b-20261013
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leather-r15-final-${{ github.run_id }}
+          path: |
+            leather-workshop/r15/public-lite.html
+            leather-workshop/r15/DELIVERY.json
+            leather-workshop/r15/BUILD_RESULT.json
+            leather-workshop/r15/qa/
+          retention-days: 14
