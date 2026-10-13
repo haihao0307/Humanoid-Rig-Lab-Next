@@ -1,0 +1,96 @@
+name: Shoe R08 layered seam verification
+on:
+  push:
+    branches: [fix/shoe-r08-seam-contract-20261013]
+    paths: ['shoe-workshop/r08/**', '.github/workflows/shoe-r08-verify.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: shoe-r08-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Initialize new readable UI only if absent
+        run: |
+          python shoe-workshop/r08/tools/initialize.py
+          rm -rf shoe-workshop/r08/evidence
+          rm -f shoe-workshop/r08/PUBLIC_URL.txt shoe-workshop/r08/RELEASE_RECEIPT.json
+          node --check shoe-workshop/r08/src/main.mjs
+          node --check shoe-workshop/r08/tests/browser.mjs
+      - name: Pinned geometry and browser dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Build actual current R08 standalone
+        run: node shoe-workshop/r08/tools/build.mjs
+      - name: Early actual toe side and heel render review
+        id: early
+        continue-on-error: true
+        run: node shoe-workshop/r08/tests/browser.mjs --early
+      - name: Preserve early actual renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r08-early-${{ github.run_id }}
+          path: shoe-workshop/r08/evidence/early/
+          retention-days: 14
+      - name: Actual layer and full-stack needle centre regressions
+        id: numeric
+        continue-on-error: true
+        run: node shoe-workshop/r08/tests/kernel.mjs
+      - name: Actual file browser materials near far and inherited controls
+        id: browser
+        continue-on-error: true
+        run: node shoe-workshop/r08/tests/browser.mjs
+      - name: Require all current source gates
+        run: |
+          test '${{ steps.early.outcome }}' = 'success'
+          test '${{ steps.numeric.outcome }}' = 'success'
+          test '${{ steps.browser.outcome }}' = 'success'
+      - name: Fast-forward verified readable source and runtime only
+        id: publish
+        run: |
+          git config user.name 'Shoe R08 Verification'
+          git config user.email 'shoe-r08@users.noreply.github.com'
+          git add shoe-workshop/r08
+          if git diff --cached --name-only | grep -v '^shoe-workshop/r08/'; then exit 1; fi
+          git commit -m 'build(shoes): current verified R08 source and standalone [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Immutable public full bytes and actual browser
+        env:
+          PUBLIC_BUILD_SHA: ${{ steps.publish.outputs.sha }}
+        run: |
+          node shoe-workshop/r08/tests/browser.mjs --public
+          python - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path('shoe-workshop/r08')
+          m=json.loads((p/'BUILD_MANIFEST.json').read_text())
+          q=json.loads((p/'evidence/public/QA.json').read_text())
+          n=json.loads((p/'evidence/numerics/QA.json').read_text())
+          assert q['sourceBuild']==m['sourceBuild'] and n['success'] and not q['errors'] and not q['consoleErrors']
+          r={'version':'R08.0','base':'5889ebd871aa34baad5e6094d4ccf29bc29f40f7','sourceBuild':m['sourceBuild'],'buildSha':os.environ['PUBLIC_BUILD_SHA'],'url':q['url'],'runtime':m['runtime'],'runId':os.environ['GITHUB_RUN_ID'],'numericChecks':len(n['checks']),'needleCentreTests':len(n['needleTests']),'needleCentreMisses':len(n['needleMisses']),'publicChecks':len(q['checks']),'acceptance':{'publicRuntimeVerified':True,'producerRenderReview':False,'userVisual':False,'fullYarnCollision':False,'sewingPhysics':False,'manufacturing':False},'scope':'Explicit owned lapped joints, signed actual layer contact, all receiving plies pierced, static needle/bobbin topology, per-panel R10 recipes, dynamic camera depth precision. No lace work.'}
+          (p/'RELEASE_RECEIPT.json').write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
+          PY
+          git add shoe-workshop/r08
+          git commit -m 'test(shoes): immutable R08 public bytes and actual browser receipt [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Preserve current source and all actual evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r08-candidate-${{ github.run_id }}
+          path: shoe-workshop/r08/
+          include-hidden-files: true
+          retention-days: 14
