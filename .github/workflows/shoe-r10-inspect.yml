@@ -1,0 +1,72 @@
+name: Shoe R10 current-human inspection
+on:
+  push:
+    branches: [fix/shoe-r10-onbody-recovery-20261013]
+    paths: ['.github/workflows/shoe-r10-inspect.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact current human and browser dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+          cd ..
+          mkdir -p r10-recovery/human
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib,json
+          root=pathlib.Path('r10-recovery/human');base='https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/4d2787db762fc3e72e4595827865f579026c2ad4/kaopu-unified-human-workbench/'
+          for f in ['preview.html','BUILD.json','README.md','UnifiedViewer.mjs','UnifiedUI.mjs','verify.cjs']:
+            b=urllib.request.urlopen(base+'human-integrated-r04/'+f,timeout=60).read();(root/f).write_bytes(b)
+          assert hashlib.sha256((root/'preview.html').read_bytes()).hexdigest()=='c8f1150714ac03d2aec7deb6df7dd1e31a4bb887b1ca4fa4a25b38e373377f8d'
+          b=json.loads((root/'BUILD.json').read_text());print('MANIFEST KEYS',list(b));
+          # Bring readable authoring inputs into evidence, never replace another workspace.
+          records=b.get('inputs',b.get('files',b.get('sources',[])))
+          (root/'INPUT_SCHEMA.json').write_text(json.dumps(records,indent=2))
+          PY
+      - name: Probe actual latest human scene, skeleton and foot frames
+        run: |
+          cat > shoe-workshop/r10-probe.cjs <<'JS'
+          const{chromium}=require('playwright'),fs=require('fs'),path=require('path');
+          (async()=>{const out='r10-recovery/human';const result={errors:[],consoleErrors:[],ready:false};const save=()=>fs.writeFileSync(out+'/PROBE.json',JSON.stringify(result,null,2));let b;
+          try{b=await chromium.launch({headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1100,height:900}});p.on('pageerror',e=>{result.errors.push(String(e));save()});p.on('console',m=>{if(m.type()==='error'){result.consoleErrors.push(m.text());save()}});
+          await p.goto('file://'+path.resolve(out,'preview.html'),{waitUntil:'domcontentloaded',timeout:90000});await p.waitForFunction(()=>window.unifiedHuman||window.__LIP_P3__?.error,null,{timeout:300000});await p.evaluate(()=>lifelikeIdle.pause(true));await p.waitForFunction(()=>lifelikeIdle.ready()||lifelikeIdle.report().errors.length,null,{timeout:300000});await p.evaluate(async()=>{const v=__IDENTITY_QA__.viewer();await v.skin.faceReady;await v.skin.naturalEyesReady;lifelikeIdle.seek(0);});
+          result.data=await p.evaluate(()=>{const M=__IDENTITY_QA__.model(),V=__IDENTITY_QA__.viewer();const shallow=o=>Object.fromEntries(Object.keys(o||{}).map(k=>{const v=o[k];return[k,v===null?'null':typeof v==='function'?'function':ArrayBuffer.isView(v)?v.constructor.name+':'+v.length:Array.isArray(v)?'Array:'+v.length:typeof v==='object'?v.constructor.name+':'+Object.keys(v).slice(0,25).join(','):v]}));
+          const out={model:shallow(M),viewer:shallow(V),humanAPI:shallow(unifiedHuman),archive:unifiedHuman.archive(),report:unifiedHuman.report(),geometry:{attributes:Object.fromEntries(Object.entries(V.geometry.attributes).map(([k,v])=>[k,{size:v.itemSize,count:v.count}])),mesh:shallow(V.mesh),matrix:V.mesh.matrixWorld.toArray()},rig:{},feet:{}};
+          for(const k of Object.keys(M))if(/rig|skel|joint|bone|pose/i.test(k))out.rig[k]=shallow(M[k]);
+          for(const k of Object.keys(V))if(/rig|skel|joint|bone|pose/i.test(k))out.rig['viewer.'+k]=shallow(V[k]);
+          const p=V.geometry.attributes.position;let min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];for(let i=0;i<p.count;i++)for(let k=0;k<3;k++){const v=p.array[i*3+k];min[k]=Math.min(min[k],v);max[k]=Math.max(max[k],v)}out.bounds={min,max};out.lowVertices=[];for(let i=0;i<p.count;i++)if(p.getY(i)<min[1]+(max[1]-min[1])*.09&&i%4===0)out.lowVertices.push({i,p:[p.getX(i),p.getY(i),p.getZ(i)]});return out;});result.ready=true;save();
+          const c=await p.context().newCDPSession(p);await p.evaluate(()=>{const v=__IDENTITY_QA__.viewer();v.view('full');lifelikeIdle.runtime().originalRender();v.renderer.getContext().finish()});fs.writeFileSync(out+'/actual-human.png',Buffer.from((await c.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
+          }catch(e){result.failure=String(e);save();throw e;}finally{save();await b?.close()}})().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+          node shoe-workshop/r10-probe.cjs
+      - name: Recover R09 source graph and own generated geometry ingredients
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json,shutil
+          a=pathlib.Path('shoe-workshop/r09');out=pathlib.Path('r10-recovery')
+          m=json.loads((a/'BUILD_MANIFEST.json').read_text())
+          for f in m['files']:
+            p=(a/f['path']).resolve();rel=p.relative_to(pathlib.Path.cwd());d=out/rel;d.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,d)
+          shutil.copytree(a,out/a,dirs_exist_ok=True)
+          for package in ['three','esbuild','@esbuild','playwright','playwright-core']:
+            p=pathlib.Path('shoe-workshop/node_modules')/package;shutil.copytree(p,out/p,dirs_exist_ok=True)
+          PY
+          tar -czf r10-recovery.tgz -C r10-recovery .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shoe-r10-current-human-recovery
+          path: r10-recovery.tgz
+          retention-days: 14

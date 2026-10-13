@@ -1,0 +1,56 @@
+name: Shoe R10 bindings and current-human verification
+on:
+  push:
+    branches: [fix/shoe-r10-onbody-recovery-20261013]
+    paths: ['shoe-workshop/r10/**', '.github/workflows/shoe-r10-verify.yml']
+permissions:
+  contents: read
+concurrency:
+  group: shoe-r10-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: shoe-workshop
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pinned render and build dependencies
+        run: |
+          npm install --prefix shoe-workshop --no-save --package-lock=false three@0.179.1 esbuild@0.25.10 playwright@1.56.0
+          cd shoe-workshop && npx playwright install --with-deps chromium
+      - name: Read current verified R04 host without changing its body or runtime
+        run: |
+          mkdir -p shoe-workshop/r10/cache
+          python - <<'PY'
+          import pathlib,urllib.request,hashlib
+          base='https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/4d2787db762fc3e72e4595827865f579026c2ad4/kaopu-unified-human-workbench/human-integrated-r04/'
+          p=pathlib.Path('shoe-workshop/r10/cache')
+          for f,out in [('preview.html','human-r04.html'),('BUILD.json','HUMAN_R04_BUILD.json'),('README.md','HUMAN_R04_README.md')]:
+            b=urllib.request.urlopen(base+f,timeout=90).read();(p/out).write_bytes(b)
+          assert hashlib.sha256((p/'human-r04.html').read_bytes()).hexdigest()=='c8f1150714ac03d2aec7deb6df7dd1e31a4bb887b1ca4fa4a25b38e373377f8d'
+          PY
+      - name: Compile current own procedural shoe and solid folded binding once
+        run: node shoe-workshop/r10/tools/bake.mjs
+      - name: Build standalone and native same-scene on-foot runtime
+        run: |
+          for f in shoe-workshop/r10/src/*.mjs shoe-workshop/r10/tests/*.mjs; do node --check "$f"; done
+          node shoe-workshop/r10/tools/build.mjs
+      - name: Actual cached geometry and parameter tests
+        run: node shoe-workshop/r10/tests/unit.mjs
+      - name: Real browser pair and current human on-foot interaction and render tests
+        run: |
+          node shoe-workshop/r10/tests/browser.mjs
+          node shoe-workshop/r10/tests/acceptance.mjs
+      - name: Preserve exact candidate, readable sources and evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r10-candidate-${{ github.run_id }}
+          path: shoe-workshop/r10/
+          retention-days: 14
