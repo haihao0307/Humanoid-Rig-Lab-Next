@@ -1,0 +1,3340 @@
+{
+  "instrumented": true,
+  "softwareRenderer": true,
+  "sixtyFPSAccepted": false,
+  "stages": [
+    {
+      "supported": true,
+      "disjoint": false,
+      "draws": [
+        {
+          "label": "studioProg",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 45.5919
+        },
+        {
+          "label": "surfProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 102.269564
+        },
+        {
+          "label": "surfProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 99.270782
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 31093,
+          "ms": 68.179155
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 64635,
+          "ms": 85.894772
+        },
+        {
+          "label": "blit",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 74.808067
+        }
+      ],
+      "label": "normal-warm",
+      "wallMs": 521.5015619999974,
+      "frame": {
+        "frame": 7,
+        "drawCalls": 6,
+        "lod": "中远景 · 同源预过滤 / 物理保持",
+        "pixelsPerYarn": 2.520374999999999,
+        "nearWeight": 0,
+        "farWeight": 1,
+        "bodyPixels": 599.8492499999999,
+        "bakeSize": 1024,
+        "sparseEdgeFibers": 2085,
+        "projection": "perspective",
+        "distanceMm": 281.4518188393241,
+        "studio": {
+          "background": "gray-studio-planes",
+          "fog": 0.65,
+          "exposure": 1,
+          "shadowSize": 0,
+          "shadowDrawCalls": 0,
+          "shadowTriangles": 0,
+          "backgroundOnlyFog": true
+        },
+        "colorPipeline": "linear-RGBA16F-single-tonemap",
+        "sampling": {
+          "msaaSamples": 4,
+          "supersampleRatio": 1,
+          "outputIntegration": "4x4 linear pixel footprint",
+          "temporalHistory": false,
+          "gpuQueueLimit": 1,
+          "gpuWaitPolls": 40,
+          "attributeCapturePassesPerBatch": 1,
+          "attachmentBytes": 28748720,
+          "note": "attachments only; excludes geometry, mipmaps, driver and browser memory"
+        },
+        "scatter": {
+          "strength": 0.85,
+          "transmission": 0.55,
+          "kernel": [
+            0.36226128752364617,
+            0.41505923470727846,
+            0.45875877899049744
+          ]
+        },
+        "distanceLOD": {
+          "filtered": 1,
+          "micro": 0,
+          "localPass": true,
+          "request": false,
+          "microGain": 0,
+          "detail": {
+            "requests": 0,
+            "uploads": 0,
+            "releases": 0,
+            "cancelled": 0,
+            "pending": false,
+            "error": null,
+            "resident": false,
+            "pointBytes": 0,
+            "indexBytes": 0,
+            "cpuRetainedBytes": 0,
+            "scope": "whole swatch micro-layer, deterministic on-demand generation",
+            "physicsChanged": false
+          },
+          "dynamicShadow": true,
+          "localFootprintMask": false
+        },
+        "geometryBufferBytes": 17237136,
+        "closeSurface": {
+          "cotton": 0.78,
+          "staple": 0.72,
+          "nap": 0.7,
+          "angularLanes": 64,
+          "finiteStaples": true
+        },
+        "structureWarp": 0,
+        "solidEdgeDrawn": false,
+        "geometryOnly": false,
+        "longMorph": 1,
+        "sideMorph": 1,
+        "geomLevel": 0,
+        "natural": {
+          "bridges": 0,
+          "tails": 0,
+          "partialBridges": 0,
+          "cutYarns": 0,
+          "sheathCurves": 0,
+          "surfaceFlyaways": 0,
+          "edgeClumps": 141,
+          "breakClumps": 0,
+          "fiberCurves": 2085,
+          "looseYarnCurves": 527,
+          "clumpedFibers": 1638,
+          "strayFibers": 447,
+          "anchoredEndpoints": 0,
+          "maxAnchorErrorMm": 0,
+          "saggedBridges": 0,
+          "finite": true,
+          "note": "Rest guides; released curves bind to R12 XPBD chains at runtime. No adaptive tearing or collision proof."
+        },
+        "looseTriangles": 177072,
+        "brokenEnds": 0,
+        "instanceCounts": [
+          1666,
+          1680
+        ],
+        "visibleInstanceCounts": [
+          1666,
+          1680
+        ],
+        "visibleFiberCurves": 2085,
+        "sewing": {
+          "type": "301-inspired two-thread visual topology",
+          "stitches": 74,
+          "holes": 76,
+          "plies": 3,
+          "topAndBottom": true,
+          "rootDepthMm": -0.028,
+          "loopOffsetMm": 0.06,
+          "needleForceSimulation": false,
+          "physicalFabricPiercing": false
+        },
+        "physics": {
+          "active": true,
+          "experiment": "fold",
+          "model": "continuous-curvature-sheet@1",
+          "nodes": 637,
+          "activeNodes": 637,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "constraints": 6964,
+          "maxTensileStrain": 0.0062552790218137755,
+          "maxStretch": 0.0062552790218137755,
+          "maxYarnStretch": 0,
+          "maxStrainHistory": 0.0062552790218137755,
+          "kineticJ": 1.2731982459066246e-10,
+          "contacts": 182649,
+          "contactDetail": {
+            "vertexFace": 327,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 17060
+          },
+          "selfCollision": true,
+          "maxContactHistory": 584,
+          "contactThicknessMm": 0.7,
+          "contactSeparationMm": 0.728,
+          "bendingRigidityNm": 6.5e-07,
+          "minimumBendRadiusMm": 3.5,
+          "massKg": 0.0032243097599999894,
+          "fold": 1,
+          "gripEnabled": true,
+          "tableSupport": true,
+          "gravityNormalMS2": 9.81,
+          "curvatureStencils": 1150,
+          "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+          "centralStencils": 13,
+          "foldProfileMm": [
+            [
+              -49.98,
+              0,
+              0
+            ],
+            [
+              -47.897499999999994,
+              0,
+              0
+            ],
+            [
+              -45.81500856155735,
+              3.256622796105119e-05,
+              5.356061587636279e-05
+            ],
+            [
+              -43.73251976850174,
+              0.0016080028979181514,
+              0.0028642280607479153
+            ],
+            [
+              -41.65002957739089,
+              0.0031256689911535714,
+              0.003837249572727534
+            ],
+            [
+              -39.56754377892069,
+              0.005616509884177226,
+              7.34315936084742e-05
+            ],
+            [
+              -37.48505637359824,
+              0.009451136579122556,
+              3.5348274733970285e-07
+            ],
+            [
+              -35.40257638391786,
+              0.00260586829932,
+              0
+            ],
+            [
+              -33.32008488453098,
+              0.0019194592933828118,
+              8.232204026468758e-15
+            ],
+            [
+              -31.237657506745204,
+              -0.014482803432501754,
+              1.671559436027758e-12
+            ],
+            [
+              -29.155732100988583,
+              0.03409547861693841,
+              8.448218606962363e-11
+            ],
+            [
+              -27.073547080068337,
+              0.069839779319362,
+              1.6776644100086823e-12
+            ],
+            [
+              -24.991072487591868,
+              0.06134722769520784,
+              8.35471060155175e-15
+            ],
+            [
+              -22.90896604782216,
+              0.021261951490850584,
+              8.085231957842078e-15
+            ],
+            [
+              -20.826669034730294,
+              -0.007275865434669364,
+              4.913228548946623e-13
+            ],
+            [
+              -18.744241027033556,
+              -0.023719894373674798,
+              4.649175799400827e-15
+            ],
+            [
+              -16.66186528106046,
+              -0.04588413403677349,
+              1.8502125798020376e-06
+            ],
+            [
+              -14.579472944535457,
+              -0.025298029850473018,
+              0.00037804563330327514
+            ],
+            [
+              -12.497096340669225,
+              -0.014481127351987142,
+              0.01970663068074119
+            ],
+            [
+              -10.414843747109979,
+              -0.016912552389883543,
+              0.051300117543328735
+            ],
+            [
+              -8.332518411821354,
+              -0.019639037094036874,
+              0.07757902903932393
+            ],
+            [
+              -6.25004216494227,
+              -0.022036011930105126,
+              0.06904322796514961
+            ],
+            [
+              -4.168449531459004,
+              -0.0245786593926589,
+              0.007574318430891074
+            ],
+            [
+              -2.0768884675947876,
+              -0.028387614779028424,
+              0
+            ],
+            [
+              -0.05795428225913348,
+              -0.03115951654380425,
+              0.47740487650002866
+            ],
+            [
+              1.304288565012775,
+              -0.03248675863479276,
+              2.0101848822521418
+            ],
+            [
+              1.4210058017036706,
+              -0.03348026208335526,
+              4.076167000202446
+            ],
+            [
+              0.24085933439856055,
+              -0.036301157665306734,
+              5.792989120001255
+            ],
+            [
+              -1.737496056829631,
+              -0.04185899895121847,
+              6.483119380569632
+            ],
+            [
+              -3.7534967533295567,
+              -0.04730548569384365,
+              5.932616044050564
+            ],
+            [
+              -5.522376729385448,
+              -0.04948884945261528,
+              4.8344147980438175
+            ],
+            [
+              -7.220009463442964,
+              -0.052064274631584216,
+              3.6281948237450923
+            ],
+            [
+              -8.949276482211303,
+              -0.055096609450129244,
+              2.4678028047222704
+            ],
+            [
+              -10.802179028815473,
+              -0.05794533725451868,
+              1.5172415243682096
+            ],
+            [
+              -12.788834414777927,
+              -0.05917371817503436,
+              0.8927504090134857
+            ],
+            [
+              -14.865306160684039,
+              -0.04822127031216232,
+              0.7348303192551429
+            ],
+            [
+              -16.94768991153891,
+              -0.04983115883350604,
+              0.7570054933050818
+            ],
+            [
+              -19.030006400566236,
+              -0.054594882247312126,
+              0.7294284130080732
+            ],
+            [
+              -21.112338172042072,
+              -0.07799429192173339,
+              0.7426763384999888
+            ],
+            [
+              -23.194635409106127,
+              -0.10737300401112349,
+              0.739804000010632
+            ],
+            [
+              -25.277126813190545,
+              -0.11516494873643207,
+              0.737260862231955
+            ],
+            [
+              -27.3596163562875,
+              -0.11287871003243247,
+              0.7287091769438104
+            ],
+            [
+              -29.441916578959216,
+              -0.09952014524740319,
+              0.7550078707119362
+            ],
+            [
+              -31.523689568509024,
+              -0.0508689326200141,
+              0.7285748882971065
+            ],
+            [
+              -33.60616503745525,
+              -0.05741058717951136,
+              0.7385379539732448
+            ],
+            [
+              -35.68867418474793,
+              -0.05510259341983383,
+              0.7383569616123176
+            ],
+            [
+              -37.77118424798673,
+              -0.053367185904193,
+              0.7373319819499013
+            ],
+            [
+              -39.85366635478532,
+              -0.04277563939547291,
+              0.7347455593471799
+            ],
+            [
+              -41.93615665959176,
+              -0.0370726876662947,
+              0.7401475439571413
+            ]
+          ],
+          "maxNeighbourTurnDegrees": 38.395291017063556,
+          "curvedSegments": 12,
+          "curvedWidthMm": 24.962075262888792,
+          "totalTurnDegrees": 273.71129972531793,
+          "upperOpeningDegrees": 0.33448972456957454,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "maxStitchForceN": 0,
+          "stitchEnabled": false,
+          "events": [],
+          "topology": {
+            "activeSheetNodes": 637,
+            "totalMassKg": 0.0032243097599999894,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "inactiveHoleNodes": 0,
+            "continuousSheet": true,
+            "duplicatedInterface": false,
+            "triangles": 1152
+          },
+          "ownedTypedArrayBytes": 255165,
+          "lastStepMs": 2.599999999976717,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "No tearing or new seam mechanics in R14",
+            "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+            "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+            "One table-supported folding fixture, not a validated full garment solver",
+            "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+          ],
+          "solverBackend": "wasm-f64-r15",
+          "wasmLinearMemoryBytes": 7405568,
+          "physicsUnchanged": {
+            "nodes": 637,
+            "stepHz": 240,
+            "projectionPasses": [
+              12,
+              16
+            ],
+            "collisionEnabled": true
+          },
+          "sampledAtWorkerMs": 58007.100000000006,
+          "solverMs": 0,
+          "droppedWallSeconds": 0,
+          "playing": false,
+          "damageProxy": "intact directional cloth"
+        },
+        "performance": {
+          "frameTiming": {
+            "metric": "full-wall-window-observed-GPU-completed-frame",
+            "completedFrames": 4,
+            "windowSeconds": 5,
+            "fps": 0.8,
+            "newPhysicsFps": 0.2,
+            "activeSpanFPS": 1.0796804145972883,
+            "frameP50Ms": 523.8999999999942,
+            "frameP95Ms": 1768.1000000000058,
+            "frameP99Ms": 1768.1000000000058,
+            "cpuSubmitP95Ms": 2.2999999999883585,
+            "over20ms": 4,
+            "currentNoFrameMs": 19.5,
+            "simulationSpeed": 0.6000000000000087,
+            "rows": 4,
+            "includesStartupAndStalledTail": true,
+            "physicalDisplayNotMeasured": true
+          },
+          "geometryBufferBytes": 15467664,
+          "fiberPointTextureBytes": 1769472,
+          "materialMipBytes": 22369616,
+          "shadowBytes": 1048576,
+          "attachmentBytes": 28748720,
+          "transitionBytes": 0,
+          "trackedGpuBytes": 69458352,
+          "physicsGpuBytes": 54304,
+          "physicsWorkerBytes": 7660733,
+          "physicsMemoryAccounting": "WASM linear memory plus owned JS views; overlapping WASM views conservatively double counted",
+          "physicsCpuMs": 0,
+          "detailResidency": {
+            "requests": 0,
+            "uploads": 0,
+            "releases": 0,
+            "cancelled": 0,
+            "pending": false,
+            "error": null,
+            "resident": false,
+            "pointBytes": 0,
+            "indexBytes": 0,
+            "cpuRetainedBytes": 0,
+            "scope": "whole swatch micro-layer, deterministic on-demand generation",
+            "physicsChanged": false
+          },
+          "retainedFiberCpuBytes": 537712,
+          "recipeBytes": 832,
+          "geometryBuilds": 2,
+          "visibilityUpdates": 1,
+          "visibilityChecks": 4,
+          "motionFpsCap": 60,
+          "quality": "efficient",
+          "gpuTimerSupported": false,
+          "gpuElapsedMs": null,
+          "gpuSamples": null,
+          "notTotalProcessMemory": true,
+          "clothSolver": "R14 continuous curvature/thickness swatch"
+        },
+        "renderTarget": [
+          715,
+          718
+        ],
+        "cpuSubmitMs": 6.2999999999883585,
+        "cooperativeRender": {
+          "batches": 1,
+          "maximumBatchTriangles": 284500,
+          "cancelledFrames": 0,
+          "onePhysicsSnapshot": true,
+          "qualityReduced": false,
+          "gpuElapsedIncludesSchedulingWait": true
+        },
+        "triangles": 164692,
+        "transitionDoublePass": false
+      }
+    },
+    {
+      "supported": true,
+      "disjoint": false,
+      "draws": [
+        {
+          "label": "studioProg",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 44.228253
+        },
+        {
+          "label": "surfProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 104.366469
+        },
+        {
+          "label": "surfProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 101.253732
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 31093,
+          "ms": 39.827795
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 64635,
+          "ms": 87.377639
+        },
+        {
+          "label": "blit",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 78.272592
+        }
+      ],
+      "label": "normal",
+      "wallMs": 495.6948299999908,
+      "frame": {
+        "frame": 8,
+        "drawCalls": 6,
+        "lod": "中远景 · 同源预过滤 / 物理保持",
+        "pixelsPerYarn": 2.5471874999999997,
+        "nearWeight": 0,
+        "farWeight": 1,
+        "bodyPixels": 606.2306249999999,
+        "bakeSize": 1024,
+        "sparseEdgeFibers": 2085,
+        "projection": "perspective",
+        "distanceMm": 278.4891681146996,
+        "studio": {
+          "background": "gray-studio-planes",
+          "fog": 0.65,
+          "exposure": 1,
+          "shadowSize": 0,
+          "shadowDrawCalls": 0,
+          "shadowTriangles": 0,
+          "backgroundOnlyFog": true
+        },
+        "colorPipeline": "linear-RGBA16F-single-tonemap",
+        "sampling": {
+          "msaaSamples": 4,
+          "supersampleRatio": 1,
+          "outputIntegration": "4x4 linear pixel footprint",
+          "temporalHistory": false,
+          "gpuQueueLimit": 1,
+          "gpuWaitPolls": 42,
+          "attributeCapturePassesPerBatch": 1,
+          "attachmentBytes": 28748720,
+          "note": "attachments only; excludes geometry, mipmaps, driver and browser memory"
+        },
+        "scatter": {
+          "strength": 0.85,
+          "transmission": 0.55,
+          "kernel": [
+            0.36226128752364617,
+            0.41505923470727846,
+            0.45875877899049744
+          ]
+        },
+        "distanceLOD": {
+          "filtered": 1,
+          "micro": 0,
+          "localPass": true,
+          "request": false,
+          "microGain": 0,
+          "detail": {
+            "requests": 0,
+            "uploads": 0,
+            "releases": 0,
+            "cancelled": 0,
+            "pending": false,
+            "error": null,
+            "resident": false,
+            "pointBytes": 0,
+            "indexBytes": 0,
+            "cpuRetainedBytes": 0,
+            "scope": "whole swatch micro-layer, deterministic on-demand generation",
+            "physicsChanged": false
+          },
+          "dynamicShadow": true,
+          "localFootprintMask": false
+        },
+        "geometryBufferBytes": 17237136,
+        "closeSurface": {
+          "cotton": 0.78,
+          "staple": 0.72,
+          "nap": 0.7,
+          "angularLanes": 64,
+          "finiteStaples": true
+        },
+        "structureWarp": 0,
+        "solidEdgeDrawn": false,
+        "geometryOnly": false,
+        "longMorph": 1,
+        "sideMorph": 1,
+        "geomLevel": 0,
+        "natural": {
+          "bridges": 0,
+          "tails": 0,
+          "partialBridges": 0,
+          "cutYarns": 0,
+          "sheathCurves": 0,
+          "surfaceFlyaways": 0,
+          "edgeClumps": 141,
+          "breakClumps": 0,
+          "fiberCurves": 2085,
+          "looseYarnCurves": 527,
+          "clumpedFibers": 1638,
+          "strayFibers": 447,
+          "anchoredEndpoints": 0,
+          "maxAnchorErrorMm": 0,
+          "saggedBridges": 0,
+          "finite": true,
+          "note": "Rest guides; released curves bind to R12 XPBD chains at runtime. No adaptive tearing or collision proof."
+        },
+        "looseTriangles": 177072,
+        "brokenEnds": 0,
+        "instanceCounts": [
+          1666,
+          1680
+        ],
+        "visibleInstanceCounts": [
+          1666,
+          1680
+        ],
+        "visibleFiberCurves": 2085,
+        "sewing": {
+          "type": "301-inspired two-thread visual topology",
+          "stitches": 74,
+          "holes": 76,
+          "plies": 3,
+          "topAndBottom": true,
+          "rootDepthMm": -0.028,
+          "loopOffsetMm": 0.06,
+          "needleForceSimulation": false,
+          "physicalFabricPiercing": false
+        },
+        "physics": {
+          "active": true,
+          "experiment": "fold",
+          "model": "continuous-curvature-sheet@1",
+          "nodes": 637,
+          "activeNodes": 637,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "constraints": 6964,
+          "maxTensileStrain": 0.0062552790218137755,
+          "maxStretch": 0.0062552790218137755,
+          "maxYarnStretch": 0,
+          "maxStrainHistory": 0.0062552790218137755,
+          "kineticJ": 1.2731982459066246e-10,
+          "contacts": 182649,
+          "contactDetail": {
+            "vertexFace": 327,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 17060
+          },
+          "selfCollision": true,
+          "maxContactHistory": 584,
+          "contactThicknessMm": 0.7,
+          "contactSeparationMm": 0.728,
+          "bendingRigidityNm": 6.5e-07,
+          "minimumBendRadiusMm": 3.5,
+          "massKg": 0.0032243097599999894,
+          "fold": 1,
+          "gripEnabled": true,
+          "tableSupport": true,
+          "gravityNormalMS2": 9.81,
+          "curvatureStencils": 1150,
+          "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+          "centralStencils": 13,
+          "foldProfileMm": [
+            [
+              -49.98,
+              0,
+              0
+            ],
+            [
+              -47.897499999999994,
+              0,
+              0
+            ],
+            [
+              -45.81500856155735,
+              3.256622796105119e-05,
+              5.356061587636279e-05
+            ],
+            [
+              -43.73251976850174,
+              0.0016080028979181514,
+              0.0028642280607479153
+            ],
+            [
+              -41.65002957739089,
+              0.0031256689911535714,
+              0.003837249572727534
+            ],
+            [
+              -39.56754377892069,
+              0.005616509884177226,
+              7.34315936084742e-05
+            ],
+            [
+              -37.48505637359824,
+              0.009451136579122556,
+              3.5348274733970285e-07
+            ],
+            [
+              -35.40257638391786,
+              0.00260586829932,
+              0
+            ],
+            [
+              -33.32008488453098,
+              0.0019194592933828118,
+              8.232204026468758e-15
+            ],
+            [
+              -31.237657506745204,
+              -0.014482803432501754,
+              1.671559436027758e-12
+            ],
+            [
+              -29.155732100988583,
+              0.03409547861693841,
+              8.448218606962363e-11
+            ],
+            [
+              -27.073547080068337,
+              0.069839779319362,
+              1.6776644100086823e-12
+            ],
+            [
+              -24.991072487591868,
+              0.06134722769520784,
+              8.35471060155175e-15
+            ],
+            [
+              -22.90896604782216,
+              0.021261951490850584,
+              8.085231957842078e-15
+            ],
+            [
+              -20.826669034730294,
+              -0.007275865434669364,
+              4.913228548946623e-13
+            ],
+            [
+              -18.744241027033556,
+              -0.023719894373674798,
+              4.649175799400827e-15
+            ],
+            [
+              -16.66186528106046,
+              -0.04588413403677349,
+              1.8502125798020376e-06
+            ],
+            [
+              -14.579472944535457,
+              -0.025298029850473018,
+              0.00037804563330327514
+            ],
+            [
+              -12.497096340669225,
+              -0.014481127351987142,
+              0.01970663068074119
+            ],
+            [
+              -10.414843747109979,
+              -0.016912552389883543,
+              0.051300117543328735
+            ],
+            [
+              -8.332518411821354,
+              -0.019639037094036874,
+              0.07757902903932393
+            ],
+            [
+              -6.25004216494227,
+              -0.022036011930105126,
+              0.06904322796514961
+            ],
+            [
+              -4.168449531459004,
+              -0.0245786593926589,
+              0.007574318430891074
+            ],
+            [
+              -2.0768884675947876,
+              -0.028387614779028424,
+              0
+            ],
+            [
+              -0.05795428225913348,
+              -0.03115951654380425,
+              0.47740487650002866
+            ],
+            [
+              1.304288565012775,
+              -0.03248675863479276,
+              2.0101848822521418
+            ],
+            [
+              1.4210058017036706,
+              -0.03348026208335526,
+              4.076167000202446
+            ],
+            [
+              0.24085933439856055,
+              -0.036301157665306734,
+              5.792989120001255
+            ],
+            [
+              -1.737496056829631,
+              -0.04185899895121847,
+              6.483119380569632
+            ],
+            [
+              -3.7534967533295567,
+              -0.04730548569384365,
+              5.932616044050564
+            ],
+            [
+              -5.522376729385448,
+              -0.04948884945261528,
+              4.8344147980438175
+            ],
+            [
+              -7.220009463442964,
+              -0.052064274631584216,
+              3.6281948237450923
+            ],
+            [
+              -8.949276482211303,
+              -0.055096609450129244,
+              2.4678028047222704
+            ],
+            [
+              -10.802179028815473,
+              -0.05794533725451868,
+              1.5172415243682096
+            ],
+            [
+              -12.788834414777927,
+              -0.05917371817503436,
+              0.8927504090134857
+            ],
+            [
+              -14.865306160684039,
+              -0.04822127031216232,
+              0.7348303192551429
+            ],
+            [
+              -16.94768991153891,
+              -0.04983115883350604,
+              0.7570054933050818
+            ],
+            [
+              -19.030006400566236,
+              -0.054594882247312126,
+              0.7294284130080732
+            ],
+            [
+              -21.112338172042072,
+              -0.07799429192173339,
+              0.7426763384999888
+            ],
+            [
+              -23.194635409106127,
+              -0.10737300401112349,
+              0.739804000010632
+            ],
+            [
+              -25.277126813190545,
+              -0.11516494873643207,
+              0.737260862231955
+            ],
+            [
+              -27.3596163562875,
+              -0.11287871003243247,
+              0.7287091769438104
+            ],
+            [
+              -29.441916578959216,
+              -0.09952014524740319,
+              0.7550078707119362
+            ],
+            [
+              -31.523689568509024,
+              -0.0508689326200141,
+              0.7285748882971065
+            ],
+            [
+              -33.60616503745525,
+              -0.05741058717951136,
+              0.7385379539732448
+            ],
+            [
+              -35.68867418474793,
+              -0.05510259341983383,
+              0.7383569616123176
+            ],
+            [
+              -37.77118424798673,
+              -0.053367185904193,
+              0.7373319819499013
+            ],
+            [
+              -39.85366635478532,
+              -0.04277563939547291,
+              0.7347455593471799
+            ],
+            [
+              -41.93615665959176,
+              -0.0370726876662947,
+              0.7401475439571413
+            ]
+          ],
+          "maxNeighbourTurnDegrees": 38.395291017063556,
+          "curvedSegments": 12,
+          "curvedWidthMm": 24.962075262888792,
+          "totalTurnDegrees": 273.71129972531793,
+          "upperOpeningDegrees": 0.33448972456957454,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "maxStitchForceN": 0,
+          "stitchEnabled": false,
+          "events": [],
+          "topology": {
+            "activeSheetNodes": 637,
+            "totalMassKg": 0.0032243097599999894,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "inactiveHoleNodes": 0,
+            "continuousSheet": true,
+            "duplicatedInterface": false,
+            "triangles": 1152
+          },
+          "ownedTypedArrayBytes": 255165,
+          "lastStepMs": 2.599999999976717,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "No tearing or new seam mechanics in R14",
+            "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+            "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+            "One table-supported folding fixture, not a validated full garment solver",
+            "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+          ],
+          "solverBackend": "wasm-f64-r15",
+          "wasmLinearMemoryBytes": 7405568,
+          "physicsUnchanged": {
+            "nodes": 637,
+            "stepHz": 240,
+            "projectionPasses": [
+              12,
+              16
+            ],
+            "collisionEnabled": true
+          },
+          "sampledAtWorkerMs": 58007.100000000006,
+          "solverMs": 0,
+          "droppedWallSeconds": 0,
+          "playing": false,
+          "damageProxy": "intact directional cloth"
+        },
+        "performance": {
+          "frameTiming": {
+            "metric": "full-wall-window-observed-GPU-completed-frame",
+            "completedFrames": 5,
+            "windowSeconds": 5,
+            "fps": 1,
+            "newPhysicsFps": 0.2,
+            "activeSpanFPS": 1.210360687484875,
+            "frameP50Ms": 526.2000000000116,
+            "frameP95Ms": 1768.1000000000058,
+            "frameP99Ms": 1768.1000000000058,
+            "cpuSubmitP95Ms": 6.2999999999883585,
+            "over20ms": 5,
+            "currentNoFrameMs": 12.60000000000582,
+            "simulationSpeed": 0.6000000000000087,
+            "rows": 5,
+            "includesStartupAndStalledTail": true,
+            "physicalDisplayNotMeasured": true
+          },
+          "geometryBufferBytes": 15467664,
+          "fiberPointTextureBytes": 1769472,
+          "materialMipBytes": 22369616,
+          "shadowBytes": 1048576,
+          "attachmentBytes": 28748720,
+          "transitionBytes": 0,
+          "trackedGpuBytes": 69458352,
+          "physicsGpuBytes": 54304,
+          "physicsWorkerBytes": 7660733,
+          "physicsMemoryAccounting": "WASM linear memory plus owned JS views; overlapping WASM views conservatively double counted",
+          "physicsCpuMs": 0,
+          "detailResidency": {
+            "requests": 0,
+            "uploads": 0,
+            "releases": 0,
+            "cancelled": 0,
+            "pending": false,
+            "error": null,
+            "resident": false,
+            "pointBytes": 0,
+            "indexBytes": 0,
+            "cpuRetainedBytes": 0,
+            "scope": "whole swatch micro-layer, deterministic on-demand generation",
+            "physicsChanged": false
+          },
+          "retainedFiberCpuBytes": 537712,
+          "recipeBytes": 832,
+          "geometryBuilds": 2,
+          "visibilityUpdates": 1,
+          "visibilityChecks": 5,
+          "motionFpsCap": 60,
+          "quality": "efficient",
+          "gpuTimerSupported": false,
+          "gpuElapsedMs": null,
+          "gpuSamples": null,
+          "notTotalProcessMemory": true,
+          "clothSolver": "R14 continuous curvature/thickness swatch"
+        },
+        "renderTarget": [
+          715,
+          718
+        ],
+        "cpuSubmitMs": 1.1000000000058208,
+        "cooperativeRender": {
+          "batches": 1,
+          "maximumBatchTriangles": 284500,
+          "cancelledFrames": 0,
+          "onePhysicsSnapshot": true,
+          "qualityReduced": false,
+          "gpuElapsedIncludesSchedulingWait": true
+        },
+        "triangles": 164692,
+        "transitionDoublePass": false
+      }
+    },
+    {
+      "supported": true,
+      "disjoint": false,
+      "draws": [
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 152.58449
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 74.504157
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 78.86989
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 74.287098
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 72.766574
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 74.804649
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 72.437137
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 82.639606
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 71.024606
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 70.934981
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 87.397904
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 86.225394
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 87.711115
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 71.777513
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 64.776583
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 54.84959
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 54.711512
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 20.083182
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.677155
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.778277
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 52.018589
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 52.056888
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.357302
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 52.973651
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 53.657662
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.460919
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.490884
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.957998
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.484274
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.325715
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.300997
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.591456
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 54.085438
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 52.696282
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.472016
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 25.977882
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 196608,
+          "ms": 89.030615
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 196608,
+          "ms": 14.471287
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 138000,
+          "ms": 9.12934
+        },
+        {
+          "label": "studioProg",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 44.741384
+        },
+        {
+          "label": "surfProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 150.658419
+        },
+        {
+          "label": "surfProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 148.680146
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 31093,
+          "ms": 40.923485
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 64635,
+          "ms": 87.121365
+        },
+        {
+          "label": "maskProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 89.436086
+        },
+        {
+          "label": "maskProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 61.949339
+        },
+        {
+          "label": "studioProg",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 53.532984
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 304.183972
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 241.883824
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 233.152185
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 227.230823
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 225.368564
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 227.216141
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 227.052574
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 226.032316
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 221.232617
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 228.851157
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 220.993495
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 222.656714
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 224.530961
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 226.228601
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 227.114097
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 229.271702
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 230.66272
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 85.645029
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 177.984265
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 182.997636
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 182.654809
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 187.003338
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 186.720812
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 188.413482
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 193.835146
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 198.463516
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 195.074356
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 197.535697
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 209.456527
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 202.490581
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 205.458637
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 212.990246
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 213.273703
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 215.775678
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 220.766885
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 113.065738
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 196608,
+          "ms": 127.279796
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 196608,
+          "ms": 69.847686
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 138000,
+          "ms": 49.913501
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 64635,
+          "ms": 123.819216
+        },
+        {
+          "label": "blit",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 123.787649
+        }
+      ],
+      "label": "side-warm",
+      "wallMs": 11431.549816,
+      "frame": {
+        "frame": 9,
+        "drawCalls": 47,
+        "lod": "连续像素足迹过渡",
+        "pixelsPerYarn": 3.8878125,
+        "nearWeight": 0.1664984691378082,
+        "farWeight": 0.8335015308621918,
+        "bodyPixels": 925.2993749999999,
+        "bakeSize": 1024,
+        "sparseEdgeFibers": 2085,
+        "projection": "perspective",
+        "distanceMm": 182.45842048894113,
+        "studio": {
+          "background": "gray-studio-planes",
+          "fog": 0.65,
+          "exposure": 1,
+          "shadowSize": 1024,
+          "shadowDrawCalls": 39,
+          "shadowTriangles": 1943760,
+          "backgroundOnlyFog": true
+        },
+        "colorPipeline": "linear-RGBA16F-single-tonemap",
+        "sampling": {
+          "msaaSamples": 4,
+          "supersampleRatio": 1,
+          "outputIntegration": "4x4 linear pixel footprint",
+          "temporalHistory": false,
+          "gpuQueueLimit": 1,
+          "gpuWaitPolls": 2710,
+          "attributeCapturePassesPerBatch": 1,
+          "attachmentBytes": 32855680,
+          "note": "attachments only; excludes geometry, mipmaps, driver and browser memory"
+        },
+        "scatter": {
+          "strength": 0.85,
+          "transmission": 0.55,
+          "kernel": [
+            0.36226128752364617,
+            0.41505923470727846,
+            0.45875877899049744
+          ]
+        },
+        "distanceLOD": {
+          "filtered": 0.8335015308621918,
+          "micro": 0,
+          "localPass": true,
+          "request": true,
+          "microGain": 0,
+          "detail": {
+            "requests": 1,
+            "uploads": 1,
+            "releases": 0,
+            "cancelled": 0,
+            "pending": false,
+            "error": null,
+            "resident": true,
+            "pointBytes": 29966336,
+            "indexBytes": 7485140,
+            "cpuRetainedBytes": 8965580,
+            "scope": "whole swatch micro-layer, deterministic on-demand generation",
+            "physicsChanged": false
+          },
+          "dynamicShadow": true,
+          "localFootprintMask": true
+        },
+        "geometryBufferBytes": 54688612,
+        "closeSurface": {
+          "cotton": 0.78,
+          "staple": 0.72,
+          "nap": 0.7,
+          "angularLanes": 64,
+          "finiteStaples": true
+        },
+        "structureWarp": 0,
+        "solidEdgeDrawn": false,
+        "geometryOnly": false,
+        "longMorph": 1,
+        "sideMorph": 1,
+        "geomLevel": 0,
+        "natural": {
+          "bridges": 0,
+          "tails": 0,
+          "partialBridges": 0,
+          "cutYarns": 0,
+          "sheathCurves": 0,
+          "surfaceFlyaways": 0,
+          "edgeClumps": 141,
+          "breakClumps": 0,
+          "fiberCurves": 2085,
+          "looseYarnCurves": 527,
+          "clumpedFibers": 1638,
+          "strayFibers": 447,
+          "anchoredEndpoints": 0,
+          "maxAnchorErrorMm": 0,
+          "saggedBridges": 0,
+          "finite": true,
+          "note": "Rest guides; released curves bind to R12 XPBD chains at runtime. No adaptive tearing or collision proof."
+        },
+        "looseTriangles": 177072,
+        "brokenEnds": 0,
+        "instanceCounts": [
+          1666,
+          1680
+        ],
+        "visibleInstanceCounts": [
+          1666,
+          1680
+        ],
+        "visibleFiberCurves": 2085,
+        "sewing": {
+          "type": "301-inspired two-thread visual topology",
+          "stitches": 74,
+          "holes": 76,
+          "plies": 3,
+          "topAndBottom": true,
+          "rootDepthMm": -0.028,
+          "loopOffsetMm": 0.06,
+          "needleForceSimulation": false,
+          "physicalFabricPiercing": false
+        },
+        "physics": {
+          "active": true,
+          "experiment": "fold",
+          "model": "continuous-curvature-sheet@1",
+          "nodes": 637,
+          "activeNodes": 637,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "constraints": 6964,
+          "maxTensileStrain": 0.0062552790218137755,
+          "maxStretch": 0.0062552790218137755,
+          "maxYarnStretch": 0,
+          "maxStrainHistory": 0.0062552790218137755,
+          "kineticJ": 1.2731982459066246e-10,
+          "contacts": 182649,
+          "contactDetail": {
+            "vertexFace": 327,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 17060
+          },
+          "selfCollision": true,
+          "maxContactHistory": 584,
+          "contactThicknessMm": 0.7,
+          "contactSeparationMm": 0.728,
+          "bendingRigidityNm": 6.5e-07,
+          "minimumBendRadiusMm": 3.5,
+          "massKg": 0.0032243097599999894,
+          "fold": 1,
+          "gripEnabled": true,
+          "tableSupport": true,
+          "gravityNormalMS2": 9.81,
+          "curvatureStencils": 1150,
+          "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+          "centralStencils": 13,
+          "foldProfileMm": [
+            [
+              -49.98,
+              0,
+              0
+            ],
+            [
+              -47.897499999999994,
+              0,
+              0
+            ],
+            [
+              -45.81500856155735,
+              3.256622796105119e-05,
+              5.356061587636279e-05
+            ],
+            [
+              -43.73251976850174,
+              0.0016080028979181514,
+              0.0028642280607479153
+            ],
+            [
+              -41.65002957739089,
+              0.0031256689911535714,
+              0.003837249572727534
+            ],
+            [
+              -39.56754377892069,
+              0.005616509884177226,
+              7.34315936084742e-05
+            ],
+            [
+              -37.48505637359824,
+              0.009451136579122556,
+              3.5348274733970285e-07
+            ],
+            [
+              -35.40257638391786,
+              0.00260586829932,
+              0
+            ],
+            [
+              -33.32008488453098,
+              0.0019194592933828118,
+              8.232204026468758e-15
+            ],
+            [
+              -31.237657506745204,
+              -0.014482803432501754,
+              1.671559436027758e-12
+            ],
+            [
+              -29.155732100988583,
+              0.03409547861693841,
+              8.448218606962363e-11
+            ],
+            [
+              -27.073547080068337,
+              0.069839779319362,
+              1.6776644100086823e-12
+            ],
+            [
+              -24.991072487591868,
+              0.06134722769520784,
+              8.35471060155175e-15
+            ],
+            [
+              -22.90896604782216,
+              0.021261951490850584,
+              8.085231957842078e-15
+            ],
+            [
+              -20.826669034730294,
+              -0.007275865434669364,
+              4.913228548946623e-13
+            ],
+            [
+              -18.744241027033556,
+              -0.023719894373674798,
+              4.649175799400827e-15
+            ],
+            [
+              -16.66186528106046,
+              -0.04588413403677349,
+              1.8502125798020376e-06
+            ],
+            [
+              -14.579472944535457,
+              -0.025298029850473018,
+              0.00037804563330327514
+            ],
+            [
+              -12.497096340669225,
+              -0.014481127351987142,
+              0.01970663068074119
+            ],
+            [
+              -10.414843747109979,
+              -0.016912552389883543,
+              0.051300117543328735
+            ],
+            [
+              -8.332518411821354,
+              -0.019639037094036874,
+              0.07757902903932393
+            ],
+            [
+              -6.25004216494227,
+              -0.022036011930105126,
+              0.06904322796514961
+            ],
+            [
+              -4.168449531459004,
+              -0.0245786593926589,
+              0.007574318430891074
+            ],
+            [
+              -2.0768884675947876,
+              -0.028387614779028424,
+              0
+            ],
+            [
+              -0.05795428225913348,
+              -0.03115951654380425,
+              0.47740487650002866
+            ],
+            [
+              1.304288565012775,
+              -0.03248675863479276,
+              2.0101848822521418
+            ],
+            [
+              1.4210058017036706,
+              -0.03348026208335526,
+              4.076167000202446
+            ],
+            [
+              0.24085933439856055,
+              -0.036301157665306734,
+              5.792989120001255
+            ],
+            [
+              -1.737496056829631,
+              -0.04185899895121847,
+              6.483119380569632
+            ],
+            [
+              -3.7534967533295567,
+              -0.04730548569384365,
+              5.932616044050564
+            ],
+            [
+              -5.522376729385448,
+              -0.04948884945261528,
+              4.8344147980438175
+            ],
+            [
+              -7.220009463442964,
+              -0.052064274631584216,
+              3.6281948237450923
+            ],
+            [
+              -8.949276482211303,
+              -0.055096609450129244,
+              2.4678028047222704
+            ],
+            [
+              -10.802179028815473,
+              -0.05794533725451868,
+              1.5172415243682096
+            ],
+            [
+              -12.788834414777927,
+              -0.05917371817503436,
+              0.8927504090134857
+            ],
+            [
+              -14.865306160684039,
+              -0.04822127031216232,
+              0.7348303192551429
+            ],
+            [
+              -16.94768991153891,
+              -0.04983115883350604,
+              0.7570054933050818
+            ],
+            [
+              -19.030006400566236,
+              -0.054594882247312126,
+              0.7294284130080732
+            ],
+            [
+              -21.112338172042072,
+              -0.07799429192173339,
+              0.7426763384999888
+            ],
+            [
+              -23.194635409106127,
+              -0.10737300401112349,
+              0.739804000010632
+            ],
+            [
+              -25.277126813190545,
+              -0.11516494873643207,
+              0.737260862231955
+            ],
+            [
+              -27.3596163562875,
+              -0.11287871003243247,
+              0.7287091769438104
+            ],
+            [
+              -29.441916578959216,
+              -0.09952014524740319,
+              0.7550078707119362
+            ],
+            [
+              -31.523689568509024,
+              -0.0508689326200141,
+              0.7285748882971065
+            ],
+            [
+              -33.60616503745525,
+              -0.05741058717951136,
+              0.7385379539732448
+            ],
+            [
+              -35.68867418474793,
+              -0.05510259341983383,
+              0.7383569616123176
+            ],
+            [
+              -37.77118424798673,
+              -0.053367185904193,
+              0.7373319819499013
+            ],
+            [
+              -39.85366635478532,
+              -0.04277563939547291,
+              0.7347455593471799
+            ],
+            [
+              -41.93615665959176,
+              -0.0370726876662947,
+              0.7401475439571413
+            ]
+          ],
+          "maxNeighbourTurnDegrees": 38.395291017063556,
+          "curvedSegments": 12,
+          "curvedWidthMm": 24.962075262888792,
+          "totalTurnDegrees": 273.71129972531793,
+          "upperOpeningDegrees": 0.33448972456957454,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "maxStitchForceN": 0,
+          "stitchEnabled": false,
+          "events": [],
+          "topology": {
+            "activeSheetNodes": 637,
+            "totalMassKg": 0.0032243097599999894,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "inactiveHoleNodes": 0,
+            "continuousSheet": true,
+            "duplicatedInterface": false,
+            "triangles": 1152
+          },
+          "ownedTypedArrayBytes": 255165,
+          "lastStepMs": 2.599999999976717,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "No tearing or new seam mechanics in R14",
+            "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+            "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+            "One table-supported folding fixture, not a validated full garment solver",
+            "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+          ],
+          "solverBackend": "wasm-f64-r15",
+          "wasmLinearMemoryBytes": 7405568,
+          "physicsUnchanged": {
+            "nodes": 637,
+            "stepHz": 240,
+            "projectionPasses": [
+              12,
+              16
+            ],
+            "collisionEnabled": true
+          },
+          "sampledAtWorkerMs": 58007.100000000006,
+          "solverMs": 0,
+          "droppedWallSeconds": 0,
+          "playing": false,
+          "damageProxy": "intact directional cloth"
+        },
+        "performance": {
+          "frameTiming": {
+            "metric": "full-wall-window-observed-GPU-completed-frame",
+            "completedFrames": 0,
+            "windowSeconds": 5,
+            "fps": 0,
+            "newPhysicsFps": 0,
+            "activeSpanFPS": 0,
+            "frameP50Ms": null,
+            "frameP95Ms": null,
+            "frameP99Ms": null,
+            "cpuSubmitP95Ms": null,
+            "over20ms": 0,
+            "currentNoFrameMs": 11280.399999999994,
+            "simulationSpeed": 0,
+            "rows": 0,
+            "includesStartupAndStalledTail": true,
+            "physicalDisplayNotMeasured": true
+          },
+          "geometryBufferBytes": 22952804,
+          "fiberPointTextureBytes": 31735808,
+          "materialMipBytes": 22369616,
+          "shadowBytes": 5242880,
+          "attachmentBytes": 28748720,
+          "transitionBytes": 4106960,
+          "trackedGpuBytes": 115211092,
+          "physicsGpuBytes": 54304,
+          "physicsWorkerBytes": 7660733,
+          "physicsMemoryAccounting": "WASM linear memory plus owned JS views; overlapping WASM views conservatively double counted",
+          "physicsCpuMs": 0,
+          "detailResidency": {
+            "requests": 1,
+            "uploads": 1,
+            "releases": 0,
+            "cancelled": 0,
+            "pending": false,
+            "error": null,
+            "resident": true,
+            "pointBytes": 29966336,
+            "indexBytes": 7485140,
+            "cpuRetainedBytes": 8965580,
+            "scope": "whole swatch micro-layer, deterministic on-demand generation",
+            "physicsChanged": false
+          },
+          "retainedFiberCpuBytes": 9503292,
+          "recipeBytes": 832,
+          "geometryBuilds": 2,
+          "visibilityUpdates": 1,
+          "visibilityChecks": 6,
+          "motionFpsCap": 60,
+          "quality": "efficient",
+          "gpuTimerSupported": false,
+          "gpuElapsedMs": null,
+          "gpuSamples": null,
+          "notTotalProcessMemory": true,
+          "clothSolver": "R14 continuous curvature/thickness swatch"
+        },
+        "renderTarget": [
+          715,
+          718
+        ],
+        "cpuSubmitMs": 15.199999999837019,
+        "cooperativeRender": {
+          "batches": 25,
+          "maximumBatchTriangles": 557568,
+          "cancelledFrames": 0,
+          "onePhysicsSnapshot": true,
+          "qualityReduced": false,
+          "gpuElapsedIncludesSchedulingWait": true
+        },
+        "triangles": 2002140,
+        "transitionDoublePass": true
+      }
+    },
+    {
+      "supported": true,
+      "disjoint": false,
+      "draws": [
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 56.750271
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 54.598888
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 54.662012
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 55.153073
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 54.951859
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 55.245272
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 55.052341
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 55.138751
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 55.174385
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 54.497314
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 58.022621
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 55.200404
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 57.841328
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 55.527768
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 56.84189
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 56.391531
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 55.129858
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 19.456304
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.570009
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 52.00789
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.475676
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.831032
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.843713
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.514435
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 52.023332
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 53.132676
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.403107
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.057886
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.940939
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.575607
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.510188
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.574576
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.657921
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.389006
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 51.230367
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 25.83821
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 196608,
+          "ms": 13.39381
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 196608,
+          "ms": 12.640816
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 138000,
+          "ms": 9.009629
+        },
+        {
+          "label": "macroShadowProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 25.262501
+        },
+        {
+          "label": "macroShadowProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 7.296415
+        },
+        {
+          "label": "studioProg",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 44.26356
+        },
+        {
+          "label": "surfProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 150.822473
+        },
+        {
+          "label": "surfProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 145.593838
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 31093,
+          "ms": 40.548316
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 64635,
+          "ms": 86.569566
+        },
+        {
+          "label": "maskProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 56.897844
+        },
+        {
+          "label": "maskProg",
+          "fn": "drawElements",
+          "count": 115200,
+          "ms": 59.888995
+        },
+        {
+          "label": "studioProg",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 44.015285
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 231.833716
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 229.623624
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 229.183088
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 230.210097
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 225.571281
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 226.851491
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 244.776437
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 226.141391
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 219.412261
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 230.327852
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 220.59902
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 221.124573
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 227.436112
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 231.055733
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 227.577696
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 231.47251
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 229.095014
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 81.329676
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 179.392922
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 188.135427
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 183.010888
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 185.109323
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 187.210582
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 190.839846
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 190.489807
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 194.938107
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 198.610175
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 197.618511
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 201.900518
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 206.888561
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 209.77791
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 213.611311
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 216.137601
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 219.747276
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 222.020123
+        },
+        {
+          "label": "yarnProg",
+          "fn": "drawElementsInstanced",
+          "count": 1584,
+          "ms": 113.603202
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 196608,
+          "ms": 68.941201
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 196608,
+          "ms": 69.392212
+        },
+        {
+          "label": "looseProg",
+          "fn": "drawElements",
+          "count": 138000,
+          "ms": 49.110321
+        },
+        {
+          "label": "hairProg",
+          "fn": "drawElements",
+          "count": 64635,
+          "ms": 87.620564
+        },
+        {
+          "label": "blit",
+          "fn": "drawArrays",
+          "count": 0,
+          "ms": 122.650298
+        }
+      ],
+      "label": "side",
+      "wallMs": 10786.18771699999,
+      "frame": {
+        "frame": 10,
+        "drawCalls": 47,
+        "lod": "连续像素足迹过渡",
+        "pixelsPerYarn": 3.914624999999999,
+        "nearWeight": 0.1739081172045298,
+        "farWeight": 0.8260918827954702,
+        "bodyPixels": 931.6807499999998,
+        "bakeSize": 1024,
+        "sparseEdgeFibers": 2085,
+        "projection": "perspective",
+        "distanceMm": 181.20870528011278,
+        "studio": {
+          "background": "gray-studio-planes",
+          "fog": 0.65,
+          "exposure": 1,
+          "shadowSize": 1024,
+          "shadowDrawCalls": 39,
+          "shadowTriangles": 1943760,
+          "backgroundOnlyFog": true
+        },
+        "colorPipeline": "linear-RGBA16F-single-tonemap",
+        "sampling": {
+          "msaaSamples": 4,
+          "supersampleRatio": 1,
+          "outputIntegration": "4x4 linear pixel footprint",
+          "temporalHistory": false,
+          "gpuQueueLimit": 1,
+          "gpuWaitPolls": 5279,
+          "attributeCapturePassesPerBatch": 1,
+          "attachmentBytes": 32855680,
+          "note": "attachments only; excludes geometry, mipmaps, driver and browser memory"
+        },
+        "scatter": {
+          "strength": 0.85,
+          "transmission": 0.55,
+          "kernel": [
+            0.36226128752364617,
+            0.41505923470727846,
+            0.45875877899049744
+          ]
+        },
+        "distanceLOD": {
+          "filtered": 0.8260918827954702,
+          "micro": 0,
+          "localPass": true,
+          "request": true,
+          "microGain": 0,
+          "detail": {
+            "requests": 1,
+            "uploads": 1,
+            "releases": 0,
+            "cancelled": 0,
+            "pending": false,
+            "error": null,
+            "resident": true,
+            "pointBytes": 29966336,
+            "indexBytes": 7485140,
+            "cpuRetainedBytes": 8965580,
+            "scope": "whole swatch micro-layer, deterministic on-demand generation",
+            "physicsChanged": false
+          },
+          "dynamicShadow": true,
+          "localFootprintMask": true
+        },
+        "geometryBufferBytes": 54688612,
+        "closeSurface": {
+          "cotton": 0.78,
+          "staple": 0.72,
+          "nap": 0.7,
+          "angularLanes": 64,
+          "finiteStaples": true
+        },
+        "structureWarp": 0,
+        "solidEdgeDrawn": false,
+        "geometryOnly": false,
+        "longMorph": 1,
+        "sideMorph": 1,
+        "geomLevel": 0,
+        "natural": {
+          "bridges": 0,
+          "tails": 0,
+          "partialBridges": 0,
+          "cutYarns": 0,
+          "sheathCurves": 0,
+          "surfaceFlyaways": 0,
+          "edgeClumps": 141,
+          "breakClumps": 0,
+          "fiberCurves": 2085,
+          "looseYarnCurves": 527,
+          "clumpedFibers": 1638,
+          "strayFibers": 447,
+          "anchoredEndpoints": 0,
+          "maxAnchorErrorMm": 0,
+          "saggedBridges": 0,
+          "finite": true,
+          "note": "Rest guides; released curves bind to R12 XPBD chains at runtime. No adaptive tearing or collision proof."
+        },
+        "looseTriangles": 177072,
+        "brokenEnds": 0,
+        "instanceCounts": [
+          1666,
+          1680
+        ],
+        "visibleInstanceCounts": [
+          1666,
+          1680
+        ],
+        "visibleFiberCurves": 2085,
+        "sewing": {
+          "type": "301-inspired two-thread visual topology",
+          "stitches": 74,
+          "holes": 76,
+          "plies": 3,
+          "topAndBottom": true,
+          "rootDepthMm": -0.028,
+          "loopOffsetMm": 0.06,
+          "needleForceSimulation": false,
+          "physicalFabricPiercing": false
+        },
+        "physics": {
+          "active": true,
+          "experiment": "fold",
+          "model": "continuous-curvature-sheet@1",
+          "nodes": 637,
+          "activeNodes": 637,
+          "steps": 720,
+          "simulationSeconds": 3.000000000000044,
+          "stepHz": 240,
+          "constraints": 6964,
+          "maxTensileStrain": 0.0062552790218137755,
+          "maxStretch": 0.0062552790218137755,
+          "maxYarnStretch": 0,
+          "maxStrainHistory": 0.0062552790218137755,
+          "kineticJ": 1.2731982459066246e-10,
+          "contacts": 182649,
+          "contactDetail": {
+            "vertexFace": 327,
+            "edgeEdge": 0,
+            "sweptCrossings": 0,
+            "candidates": 17060
+          },
+          "selfCollision": true,
+          "maxContactHistory": 584,
+          "contactThicknessMm": 0.7,
+          "contactSeparationMm": 0.728,
+          "bendingRigidityNm": 6.5e-07,
+          "minimumBendRadiusMm": 3.5,
+          "massKg": 0.0032243097599999894,
+          "fold": 1,
+          "gripEnabled": true,
+          "tableSupport": true,
+          "gravityNormalMS2": 9.81,
+          "curvatureStencils": 1150,
+          "curvatureModel": "coupled directional curvature energy with thickness-scaled bend-radius barrier",
+          "centralStencils": 13,
+          "foldProfileMm": [
+            [
+              -49.98,
+              0,
+              0
+            ],
+            [
+              -47.897499999999994,
+              0,
+              0
+            ],
+            [
+              -45.81500856155735,
+              3.256622796105119e-05,
+              5.356061587636279e-05
+            ],
+            [
+              -43.73251976850174,
+              0.0016080028979181514,
+              0.0028642280607479153
+            ],
+            [
+              -41.65002957739089,
+              0.0031256689911535714,
+              0.003837249572727534
+            ],
+            [
+              -39.56754377892069,
+              0.005616509884177226,
+              7.34315936084742e-05
+            ],
+            [
+              -37.48505637359824,
+              0.009451136579122556,
+              3.5348274733970285e-07
+            ],
+            [
+              -35.40257638391786,
+              0.00260586829932,
+              0
+            ],
+            [
+              -33.32008488453098,
+              0.0019194592933828118,
+              8.232204026468758e-15
+            ],
+            [
+              -31.237657506745204,
+              -0.014482803432501754,
+              1.671559436027758e-12
+            ],
+            [
+              -29.155732100988583,
+              0.03409547861693841,
+              8.448218606962363e-11
+            ],
+            [
+              -27.073547080068337,
+              0.069839779319362,
+              1.6776644100086823e-12
+            ],
+            [
+              -24.991072487591868,
+              0.06134722769520784,
+              8.35471060155175e-15
+            ],
+            [
+              -22.90896604782216,
+              0.021261951490850584,
+              8.085231957842078e-15
+            ],
+            [
+              -20.826669034730294,
+              -0.007275865434669364,
+              4.913228548946623e-13
+            ],
+            [
+              -18.744241027033556,
+              -0.023719894373674798,
+              4.649175799400827e-15
+            ],
+            [
+              -16.66186528106046,
+              -0.04588413403677349,
+              1.8502125798020376e-06
+            ],
+            [
+              -14.579472944535457,
+              -0.025298029850473018,
+              0.00037804563330327514
+            ],
+            [
+              -12.497096340669225,
+              -0.014481127351987142,
+              0.01970663068074119
+            ],
+            [
+              -10.414843747109979,
+              -0.016912552389883543,
+              0.051300117543328735
+            ],
+            [
+              -8.332518411821354,
+              -0.019639037094036874,
+              0.07757902903932393
+            ],
+            [
+              -6.25004216494227,
+              -0.022036011930105126,
+              0.06904322796514961
+            ],
+            [
+              -4.168449531459004,
+              -0.0245786593926589,
+              0.007574318430891074
+            ],
+            [
+              -2.0768884675947876,
+              -0.028387614779028424,
+              0
+            ],
+            [
+              -0.05795428225913348,
+              -0.03115951654380425,
+              0.47740487650002866
+            ],
+            [
+              1.304288565012775,
+              -0.03248675863479276,
+              2.0101848822521418
+            ],
+            [
+              1.4210058017036706,
+              -0.03348026208335526,
+              4.076167000202446
+            ],
+            [
+              0.24085933439856055,
+              -0.036301157665306734,
+              5.792989120001255
+            ],
+            [
+              -1.737496056829631,
+              -0.04185899895121847,
+              6.483119380569632
+            ],
+            [
+              -3.7534967533295567,
+              -0.04730548569384365,
+              5.932616044050564
+            ],
+            [
+              -5.522376729385448,
+              -0.04948884945261528,
+              4.8344147980438175
+            ],
+            [
+              -7.220009463442964,
+              -0.052064274631584216,
+              3.6281948237450923
+            ],
+            [
+              -8.949276482211303,
+              -0.055096609450129244,
+              2.4678028047222704
+            ],
+            [
+              -10.802179028815473,
+              -0.05794533725451868,
+              1.5172415243682096
+            ],
+            [
+              -12.788834414777927,
+              -0.05917371817503436,
+              0.8927504090134857
+            ],
+            [
+              -14.865306160684039,
+              -0.04822127031216232,
+              0.7348303192551429
+            ],
+            [
+              -16.94768991153891,
+              -0.04983115883350604,
+              0.7570054933050818
+            ],
+            [
+              -19.030006400566236,
+              -0.054594882247312126,
+              0.7294284130080732
+            ],
+            [
+              -21.112338172042072,
+              -0.07799429192173339,
+              0.7426763384999888
+            ],
+            [
+              -23.194635409106127,
+              -0.10737300401112349,
+              0.739804000010632
+            ],
+            [
+              -25.277126813190545,
+              -0.11516494873643207,
+              0.737260862231955
+            ],
+            [
+              -27.3596163562875,
+              -0.11287871003243247,
+              0.7287091769438104
+            ],
+            [
+              -29.441916578959216,
+              -0.09952014524740319,
+              0.7550078707119362
+            ],
+            [
+              -31.523689568509024,
+              -0.0508689326200141,
+              0.7285748882971065
+            ],
+            [
+              -33.60616503745525,
+              -0.05741058717951136,
+              0.7385379539732448
+            ],
+            [
+              -35.68867418474793,
+              -0.05510259341983383,
+              0.7383569616123176
+            ],
+            [
+              -37.77118424798673,
+              -0.053367185904193,
+              0.7373319819499013
+            ],
+            [
+              -39.85366635478532,
+              -0.04277563939547291,
+              0.7347455593471799
+            ],
+            [
+              -41.93615665959176,
+              -0.0370726876662947,
+              0.7401475439571413
+            ]
+          ],
+          "maxNeighbourTurnDegrees": 38.395291017063556,
+          "curvedSegments": 12,
+          "curvedWidthMm": 24.962075262888792,
+          "totalTurnDegrees": 273.71129972531793,
+          "upperOpeningDegrees": 0.33448972456957454,
+          "brokenBonds": 0,
+          "brokenStitches": 0,
+          "maxCrackGapMm": 0,
+          "maxStitchForceN": 0,
+          "stitchEnabled": false,
+          "events": [],
+          "topology": {
+            "activeSheetNodes": 637,
+            "totalMassKg": 0.0032243097599999894,
+            "material": {
+              "thicknessMm": 0.7,
+              "arealDensityKgM2": 0.45,
+              "automaticMass": true,
+              "nominalGsm": 450,
+              "warpCompliance": 1e-05,
+              "weftCompliance": 1.4e-05,
+              "shearCompliance": 0.005,
+              "bendCompliance": 0.4,
+              "bundleDensityKgM3": 642.8571428571429,
+              "collisionRadiusM": 0.00035,
+              "warpStiffness": 1,
+              "weftStiffness": 1,
+              "bendStiffness": 1,
+              "calibrated": false,
+              "model": "directional distance + two-hop bending proxy; unmeasured engineering candidate"
+            },
+            "inactiveHoleNodes": 0,
+            "continuousSheet": true,
+            "duplicatedInterface": false,
+            "triangles": 1152
+          },
+          "ownedTypedArrayBytes": 255165,
+          "lastStepMs": 2.599999999976717,
+          "unmeasuredCoefficients": true,
+          "limits": [
+            "No tearing or new seam mechanics in R14",
+            "Vertex-surface contact on a continuous coarse sheet; not full CCD or fiber-level contact",
+            "Thickness*5 minimum-radius target plus 60-degree per-stencil guard is an engineering regularizer, not calibrated yarn compression",
+            "One table-supported folding fixture, not a validated full garment solver",
+            "Engineering rigidities, friction and edge-grip motion; real swatch calibration not supplied"
+          ],
+          "solverBackend": "wasm-f64-r15",
+          "wasmLinearMemoryBytes": 7405568,
+          "physicsUnchanged": {
+            "nodes": 637,
+            "stepHz": 240,
+            "projectionPasses": [
+              12,
+              16
+            ],
+            "collisionEnabled": true
+          },
+          "sampledAtWorkerMs": 58007.100000000006,
+          "solverMs": 0,
+          "droppedWallSeconds": 0,
+          "playing": false,
+          "damageProxy": "intact directional cloth"
+        },
+        "performance": {
+          "frameTiming": {
+            "metric": "full-wall-window-observed-GPU-completed-frame",
+            "completedFrames": 0,
+            "windowSeconds": 5,
+            "fps": 0,
+            "newPhysicsFps": 0,
+            "activeSpanFPS": 0,
+            "frameP50Ms": null,
+            "frameP95Ms": null,
+            "frameP99Ms": null,
+            "cpuSubmitP95Ms": null,
+            "over20ms": 0,
+            "currentNoFrameMs": 10656,
+            "simulationSpeed": 0,
+            "rows": 0,
+            "includesStartupAndStalledTail": true,
+            "physicalDisplayNotMeasured": true
+          },
+          "geometryBufferBytes": 22952804,
+          "fiberPointTextureBytes": 31735808,
+          "materialMipBytes": 22369616,
+          "shadowBytes": 5242880,
+          "attachmentBytes": 28748720,
+          "transitionBytes": 4106960,
+          "trackedGpuBytes": 115211092,
+          "physicsGpuBytes": 54304,
+          "physicsWorkerBytes": 7660733,
+          "physicsMemoryAccounting": "WASM linear memory plus owned JS views; overlapping WASM views conservatively double counted",
+          "physicsCpuMs": 0,
+          "detailResidency": {
+            "requests": 1,
+            "uploads": 1,
+            "releases": 0,
+            "cancelled": 0,
+            "pending": false,
+            "error": null,
+            "resident": true,
+            "pointBytes": 29966336,
+            "indexBytes": 7485140,
+            "cpuRetainedBytes": 8965580,
+            "scope": "whole swatch micro-layer, deterministic on-demand generation",
+            "physicsChanged": false
+          },
+          "retainedFiberCpuBytes": 9503292,
+          "recipeBytes": 832,
+          "geometryBuilds": 2,
+          "visibilityUpdates": 1,
+          "visibilityChecks": 7,
+          "motionFpsCap": 60,
+          "quality": "efficient",
+          "gpuTimerSupported": false,
+          "gpuElapsedMs": null,
+          "gpuSamples": null,
+          "notTotalProcessMemory": true,
+          "clothSolver": "R14 continuous curvature/thickness swatch"
+        },
+        "renderTarget": [
+          715,
+          718
+        ],
+        "cpuSubmitMs": 11.79999999993015,
+        "cooperativeRender": {
+          "batches": 29,
+          "maximumBatchTriangles": 557568,
+          "cancelledFrames": 1,
+          "onePhysicsSnapshot": true,
+          "qualityReduced": false,
+          "gpuElapsedIncludesSchedulingWait": true
+        },
+        "triangles": 2002140,
+        "transitionDoublePass": true
+      }
+    }
+  ],
+  "errors": [],
+  "source": "R15@895bf144e2a8e70b86f7f15cfeaedba2b4415170",
+  "note": "Per-draw asynchronous GPU query, not whole-page or consumer GPU FPS. First draw includes possible compilation.",
+  "browser": "140.0.7339.16",
+  "passed": true
+}
