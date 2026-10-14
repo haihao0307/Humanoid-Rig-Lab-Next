@@ -1,0 +1,93 @@
+name: FUR R02 dense collar build and public verification
+on:
+  push:
+    branches: [feature/fur-collar-r02-density-20261014]
+    paths:
+      - 'fur-workshop/r02/**.py'
+      - 'fur-workshop/r02/**.js'
+      - 'fur-workshop/r02/**.html'
+      - '.github/workflows/fur-collar-r02.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: fur-r02-dense-collar
+  cancel-in-progress: false
+jobs:
+  collar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            fur-workshop/r01
+            fur-workshop/r02
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build isolated R02 and verify R01 unchanged
+        run: |
+          find fur-workshop/r01 -type f -print0 | sort -z | xargs -0 sha256sum > /tmp/r01-before.txt
+          python fur-workshop/r02/upgrade.py
+          if [ -f fur-workshop/r02/refine.py ]; then python fur-workshop/r02/refine.py; fi
+          node --check fur-workshop/r02/app.js
+          python fur-workshop/r02/build.py
+          sha256sum --check /tmp/r01-before.txt > /tmp/r01-verified.txt
+      - name: Prepare Chromium
+        run: |
+          python -m pip install playwright==1.55.0 pillow==11.3.0
+          python -m playwright install --with-deps chromium
+      - name: Capture and test real local application
+        timeout-minutes: 8
+        run: |
+          python -m http.server 8874 --directory fur-workshop/r02 > /tmp/fur-r02-server.log 2>&1 &
+          python fur-workshop/r02/qa.py
+      - name: Freeze candidate build by fast-forward only
+        env:
+          BRANCH: feature/fur-collar-r02-density-20261014
+        run: |
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'KAOPU Workbench Builder'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add fur-workshop/r02
+          git commit -m 'build(fur-r02): freeze real-browser-tested dense collar [skip ci]'
+          git push origin HEAD:refs/heads/$BRANCH
+          BUILD=$(git rev-parse HEAD)
+          echo "FUR_BUILD_SHA=$BUILD" >> "$GITHUB_ENV"
+          echo "FUR_PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${{ github.repository }}/$BUILD/fur-workshop/r02/preview.html" >> "$GITHUB_ENV"
+      - name: Independent fixed public browser verification
+        timeout-minutes: 8
+        run: |
+          sleep 6
+          python fur-workshop/r02/qa.py "$FUR_PUBLIC_URL"
+      - name: Save public delivery evidence
+        env:
+          BRANCH: feature/fur-collar-r02-density-20261014
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          p=Path('fur-workshop/r02');r=json.loads((p/'qa/PUBLIC_REPORT.json').read_text());assert r['passed']
+          d={'version':'FUR-ATELIER-R02','status':'PUBLIC_BROWSER_VERIFIED_CANDIDATE','url':os.environ['FUR_PUBLIC_URL'],'sourceCommit':os.environ['GITHUB_SHA'],'buildCommit':os.environ['FUR_BUILD_SHA'],'run':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'checks':len(r['checks']),'oldVersionsModified':False,'referenceImageInRuntime':False,'realPhoneTest':False,'hardwarePerformanceCertified':False,'visualAcceptance':'pending user review; not inferred from tests'}
+          (p/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(d,indent=2))
+          PY
+          test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$FUR_BUILD_SHA"
+          git add fur-workshop/r02
+          git commit -m 'test(fur-r02): record independent public browser verification [skip ci]'
+          git push origin HEAD:refs/heads/$BRANCH
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fur-r02-${{ github.run_id }}
+          retention-days: 7
+          path: |
+            fur-workshop/r02/qa
+            fur-workshop/r02/BUILD_MANIFEST.json
+            fur-workshop/r02/DELIVERY.json
+            fur-workshop/r02/preview.html
+            fur-workshop/r02/app.js
