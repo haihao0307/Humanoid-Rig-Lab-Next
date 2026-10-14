@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>Shoe R11 Runtime Check</title></head>
+<body>
+<h1>Shoe R11 Human Foot Runtime Check</h1>
+<pre id="out">loading...</pre>
+<script type="module">
+import {createFootProfile,solveShoeFit} from '../src/HumanFitAdapter.mjs';
+import {createOnBodyTransform} from '../src/OnBodyFit.mjs';
+const out=document.querySelector('#out');
+const presets=['standard','wide','highInstep'];
+out.textContent=presets.map(name=>{
+ const foot=createFootProfile(name);
+ const fit=solveShoeFit(foot);
+ const transform=createOnBodyTransform({foot,fit});
+ return `${name}\n${JSON.stringify({foot,fit,transform},null,2)}`;
+}).join('\n\n');
+</script>
+</body>
+</html>
