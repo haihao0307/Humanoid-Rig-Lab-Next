@@ -1,0 +1,35 @@
+name: Denim R16 isolated baseline draw profiling
+on:
+  push:
+    branches: [perf/denim-r16-render-path-20261014]
+    paths: ['denim-workshop/r16/probe.py', '.github/workflows/denim-r16-probe.yml']
+permissions:
+  contents: write
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: denim-workshop
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install playwright==1.55.0
+          python -m playwright install --with-deps chromium
+      - run: xvfb-run -a python -u denim-workshop/r16/probe.py
+      - name: Preserve measured baseline without changing the app
+        run: |
+          test "$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add denim-workshop/r16/BASELINE_PROFILE.json
+          git commit -m 'test(denim): preserve R16 isolated R15 draw profile [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r16-baseline-profile
+          path: denim-workshop/r16/BASELINE_PROFILE.json
