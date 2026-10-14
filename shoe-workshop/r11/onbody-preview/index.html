@@ -1,7 +1,7 @@
-<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shoe R11 Human Foot Fit Preview</title><style>body{font-family:system-ui;margin:0;padding:32px;background:#111;color:#eee}button{padding:8px;margin:4px}</style></head><body><h1>Shoe R11 Human Foot Fit Preview</h1><p>Human Foot Fit validation scene.</p><p id="state">Loading adapter...</p><div><button>Standard Foot</button><button>Wide Foot</button><button>High Instep</button></div><script type="module">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shoe R11 Human Foot Fit Preview</title><style>body{font-family:system-ui;margin:0;padding:32px;background:#111;color:#eee}button{padding:8px;margin:4px}pre{background:#222;padding:12px}</style></head><body><h1>Shoe R11 Human Foot Fit Preview</h1><p id="state">Loading adapter...</p><div><button data-fit="standard">Standard Foot</button><button data-fit="wide">Wide Foot</button><button data-fit="highInstep">High Instep</button></div><pre id="out"></pre><script type="module">
 import {createFootProfile,solveShoeFit} from '../src/HumanFitAdapter.mjs';
-const profiles=['standard','wide','highInstep'];
-const state=document.querySelector('#state');
-state.textContent='Profiles: '+profiles.map(p=>{const r=solveShoeFit(createFootProfile(p));return p+': '+JSON.stringify(r)}).join(' | ');
+const out=document.querySelector('#out');
+function run(p){const r=solveShoeFit(createFootProfile(p));out.textContent=JSON.stringify({preset:p,fit:r},null,2)}
+document.querySelectorAll('button').forEach(b=>b.onclick=()=>run(b.dataset.fit));
+document.querySelector('#state').textContent='Human Foot Fit validation scene ready';run('standard');
 </script></body></html>
