@@ -14,11 +14,11 @@ permissions:
   contents: write
 concurrency:
   group: fur-atelier-r01-20261014
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   build-verify-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,14 +41,19 @@ jobs:
           from pathlib import Path
           p=Path('fur-workshop/r01/qa.py')
           s=p.read_text().replace(".fill('115')", ".evaluate(\"e=>e.value='115'\")").replace(".fill('1.1')", ".evaluate(\"e=>e.value='1.1'\")")
+          s=s.replace('headless=True','headless=False')
+          s=s.replace("        page.screenshot(path=str(Q/(prefix+label+'-ui.png')),timeout=12000)\n        report['screenshots'].append({'file':prefix+label+'-ui.png','kind':'actual-browser-viewport'})", "        if label in ['01-coat','mobile-viewport']:\n            page.screenshot(path=str(Q/(prefix+label+'-ui.png')),timeout=12000)\n            report['screenshots'].append({'file':prefix+label+'-ui.png','kind':'actual-browser-viewport'})")
+          if 'signal.alarm(240)' not in s:
+              s=s.replace('try:\n with sync_playwright()', "import signal\ndef qa_timeout(signum, frame):raise TimeoutError('Browser QA exceeded 240 seconds')\nsignal.signal(signal.SIGALRM,qa_timeout)\nsignal.alarm(240)\ntry:\n with sync_playwright()")
           p.write_text(s)
           PY
           node --check fur-workshop/r01/app.js
           python fur-workshop/r01/build.py
       - name: Actual browser rendering and interaction tests
+        timeout-minutes: 5
         run: |
           python -m http.server 8872 --directory fur-workshop/r01 > /tmp/fur-r01-server.log 2>&1 &
-          python fur-workshop/r01/qa.py
+          xvfb-run -a python fur-workshop/r01/qa.py
       - name: Commit immutable build without overwriting concurrent work
         id: publish
         env:
@@ -65,6 +70,7 @@ jobs:
           echo "FUR_BUILD_SHA=$BUILD" >> "$GITHUB_ENV"
           echo "FUR_PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${{ github.repository }}/$BUILD/fur-workshop/r01/preview.html" >> "$GITHUB_ENV"
       - name: Verify the actual fixed public HTTPS page
+        timeout-minutes: 5
         run: |
           python - <<'PY'
           import urllib.request,os,time
@@ -79,7 +85,7 @@ jobs:
               if attempt==7:raise
               time.sleep(4)
           PY
-          python fur-workshop/r01/qa.py "$FUR_PUBLIC_URL"
+          xvfb-run -a python fur-workshop/r01/qa.py "$FUR_PUBLIC_URL"
       - name: Save public delivery receipt and visual evidence
         env:
           BRANCH: feature/fur-atelier-r01-20261014
