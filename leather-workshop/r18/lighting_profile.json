@@ -1,0 +1,27 @@
+{
+  "schema": "workshop/eb_lighting_profile@1.0",
+  "version": "EB1",
+  "purpose": "shared garment material evaluation",
+  "lights": [
+    {
+      "id": "key",
+      "role": "primary_surface_reading"
+    },
+    {
+      "id": "fill",
+      "role": "shadow_control"
+    },
+    {
+      "id": "rim",
+      "role": "edge_separation"
+    }
+  ],
+  "environment": {
+    "hdr_reflection": true,
+    "color_temperature_control": true
+  },
+  "performance": {
+    "reuse_lights": true,
+    "avoid_runtime_recreation": true
+  }
+}
