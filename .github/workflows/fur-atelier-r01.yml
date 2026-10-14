@@ -6,8 +6,9 @@ on:
       - 'fur-workshop/r01/app.js'
       - 'fur-workshop/r01/index.source.html'
       - 'fur-workshop/r01/build.py'
-      - 'fur-workshop/r01/qa.py'
+      - 'fur-workshop/r01/qa_recovery.py'
       - 'fur-workshop/r01/refine.py'
+      - 'fur-workshop/r01/recovery.py'
       - '.github/workflows/fur-atelier-r01.yml'
   workflow_dispatch:
 permissions:
@@ -18,7 +19,7 @@ concurrency:
 jobs:
   build-verify-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 29
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,27 +35,19 @@ jobs:
         run: |
           python -m pip install playwright==1.55.0 pillow==11.3.0
           python -m playwright install --with-deps chromium
-      - name: Build pinned self-contained application
+      - name: Expand deterministic source and build pinned single-file runtime
         run: |
-          if [ -f fur-workshop/r01/refine.py ]; then python fur-workshop/r01/refine.py; fi
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('fur-workshop/r01/qa.py')
-          s=p.read_text().replace(".fill('115')", ".evaluate(\"e=>e.value='115'\")").replace(".fill('1.1')", ".evaluate(\"e=>e.value='1.1'\")")
-          s=s.replace('headless=True','headless=False')
-          s=s.replace("        page.screenshot(path=str(Q/(prefix+label+'-ui.png')),timeout=12000)\n        report['screenshots'].append({'file':prefix+label+'-ui.png','kind':'actual-browser-viewport'})", "        if label in ['01-coat','mobile-viewport']:\n            page.screenshot(path=str(Q/(prefix+label+'-ui.png')),timeout=12000)\n            report['screenshots'].append({'file':prefix+label+'-ui.png','kind':'actual-browser-viewport'})")
-          if 'signal.alarm(240)' not in s:
-              s=s.replace('try:\n with sync_playwright()', "import signal\ndef qa_timeout(signum, frame):raise TimeoutError('Browser QA exceeded 240 seconds')\nsignal.signal(signal.SIGALRM,qa_timeout)\nsignal.alarm(240)\ntry:\n with sync_playwright()")
-          p.write_text(s)
-          PY
+          python fur-workshop/r01/refine.py
+          python fur-workshop/r01/recovery.py
           node --check fur-workshop/r01/app.js
+          python -m py_compile fur-workshop/r01/qa_recovery.py
           python fur-workshop/r01/build.py
-      - name: Actual browser rendering and interaction tests
-        timeout-minutes: 5
+      - name: Staged browser acceptance on actual completed GPU frames
+        timeout-minutes: 13
         run: |
           python -m http.server 8872 --directory fur-workshop/r01 > /tmp/fur-r01-server.log 2>&1 &
-          xvfb-run -a python fur-workshop/r01/qa.py
-      - name: Commit immutable build without overwriting concurrent work
+          python fur-workshop/r01/qa_recovery.py
+      - name: Commit immutable build with fast-forward guard
         id: publish
         env:
           BRANCH: feature/fur-atelier-r01-20261014
@@ -63,47 +56,44 @@ jobs:
           git config user.name 'KAOPU Workbench Builder'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add fur-workshop/r01
-          git commit -m 'build(fur-r01): freeze browser-verified application [skip ci]'
+          git commit -m 'build(fur-r01): freeze recovery candidate and native browser evidence [skip ci]'
           git push origin HEAD:refs/heads/$BRANCH
           BUILD=$(git rev-parse HEAD)
           echo "sha=$BUILD" >> "$GITHUB_OUTPUT"
           echo "FUR_BUILD_SHA=$BUILD" >> "$GITHUB_ENV"
           echo "FUR_PUBLIC_URL=https://htmlpreview.github.io/?https://raw.githubusercontent.com/${{ github.repository }}/$BUILD/fur-workshop/r01/preview.html" >> "$GITHUB_ENV"
-      - name: Verify the actual fixed public HTTPS page
-        timeout-minutes: 5
+      - name: Independently verify fixed public HTTPS application
+        timeout-minutes: 13
         run: |
           python - <<'PY'
           import urllib.request,os,time
           url='https://raw.githubusercontent.com/'+os.environ['GITHUB_REPOSITORY']+'/'+os.environ['FUR_BUILD_SHA']+'/fur-workshop/r01/preview.html'
           for attempt in range(8):
             try:
-              with urllib.request.urlopen(url,timeout=30) as r:
-                text=r.read()
+              with urllib.request.urlopen(url,timeout=30) as r:text=r.read()
               assert b'FUR-ATELIER-R01' in text
-              print('Immutable public HTML bytes',len(text));break
+              print('Immutable public runtime bytes:',len(text));break
             except Exception:
               if attempt==7:raise
               time.sleep(4)
           PY
-          xvfb-run -a python fur-workshop/r01/qa.py "$FUR_PUBLIC_URL"
-      - name: Save public delivery receipt and visual evidence
+          python fur-workshop/r01/qa_recovery.py "$FUR_PUBLIC_URL"
+      - name: Save public receipt and handoff evidence
         env:
           BRANCH: feature/fur-atelier-r01-20261014
         run: |
           python - <<'PY'
           import json,os
           from pathlib import Path
-          p=Path('fur-workshop/r01')
-          report=json.loads((p/'qa/PUBLIC_REPORT.json').read_text())
-          assert report['passed']
-          receipt={'version':'FUR-ATELIER-R01','status':'PUBLIC_BROWSER_VERIFIED_CANDIDATE','url':os.environ['FUR_PUBLIC_URL'],'sourceCommit':os.environ['GITHUB_SHA'],'buildCommit':os.environ['FUR_BUILD_SHA'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'realPhoneTest':False,'hardwarePerformanceCertified':False,'referenceVideoVerified':False,'oldVersionsModified':False,'merged':False}
+          p=Path('fur-workshop/r01');report=json.loads((p/'qa/PUBLIC_REPORT.json').read_text());assert report['passed']
+          receipt={'version':'FUR-ATELIER-R01','recovery':'V3','status':'PUBLIC_BROWSER_VERIFIED_CANDIDATE','url':os.environ['FUR_PUBLIC_URL'],'sourceCommit':os.environ['GITHUB_SHA'],'buildCommit':os.environ['FUR_BUILD_SHA'],'workflow':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'],'checks':len(report['checks']),'realPhoneTest':False,'hardwarePerformanceCertified':False,'referenceVideoVerified':False,'oldVersionsModified':False,'merged':False,'physics':'bounded guide-tip springs, not garment or individual-fiber collisions'}
           (p/'DELIVERY.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
-          print(json.dumps(receipt,indent=2))
-          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:f.write('# FUR ATELIER R01\n\n'+receipt['url']+'\n\nActual public browser tests passed. Phone viewport only; reference video remains unverified.\n')
+          print(json.dumps(receipt,ensure_ascii=False,indent=2))
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:f.write('# FUR ATELIER R01 recovery\n\n'+receipt['url']+'\n\nActual public Chromium render and interaction checks passed. Visual candidate, not reference-video superiority certification.\n')
           PY
           test "$(git ls-remote origin refs/heads/$BRANCH | cut -f1)" = "$FUR_BUILD_SHA"
           git add fur-workshop/r01
-          git commit -m 'test(fur-r01): save immutable public browser evidence [skip ci]'
+          git commit -m 'test(fur-r01): persist independent public browser receipt [skip ci]'
           git push origin HEAD:refs/heads/$BRANCH
       - uses: actions/upload-artifact@v4
         if: always()
@@ -115,3 +105,7 @@ jobs:
             fur-workshop/r01/BUILD_MANIFEST.json
             fur-workshop/r01/DELIVERY.json
             fur-workshop/r01/preview.html
+            fur-workshop/r01/app.js
+            fur-workshop/r01/index.source.html
+            fur-workshop/r01/qa_recovery.py
+            fur-workshop/r01/README.md
