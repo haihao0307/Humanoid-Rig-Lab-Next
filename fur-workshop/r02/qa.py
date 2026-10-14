@@ -28,7 +28,7 @@ try:
   R['initial']=a=page.evaluate('FUR.audit()');R['build']=page.evaluate('FUR_BUILD')
   ck('R02 is live',a['version']=='FUR-ATELIER-R02' and a['view']=='collar' and a['preset']=='fox')
   ck('Collar-only root domain',a['activeRootZones']==[1],a['activeRootZones'])
-  ck('260000 actual collar fibers',a['instances']==260000)
+  ck('780000 actual collar fibers',a['instances']==780000)
   ck('Original EB1 1.1 and recipe',a['lighting']['version']=='EB1-1.1.0' and a['lighting']['profile']['exposure']==.7 and a['lighting']['profile']['key']==1.6)
   ck('Depth-resolving fibers with MSAA',a['depthResolving'] and a['samples']>0,a['samples'])
   h=a['rootHash'];hero=shot(page,'01-collar',True);ck('Rendered nonblank',max(ImageStat.Stat(hero).stddev)>10)
