@@ -10,7 +10,7 @@ const PRESETS={
  sable:{name:'深棕貂绒',sub:'密底绒 · 顺毛细亮',length:38,under:23,curl:.12,comb:.82,clump:.32,rough:.44,root:'#21140f',mid:'#57392a',tip:'#a47a56',thickness:.13},
  silver:{name:'银灰长毛',sub:'深色绒底 · 银色针尖',length:66,under:31,curl:.18,comb:.74,clump:.35,rough:.55,root:'#252b2c',mid:'#7b8181',tip:'#d0d2ce',thickness:.13},
  ivory:{name:'奶油长绒',sub:'柔和透光 · 蓬松轮廓',length:55,under:28,curl:.24,comb:.68,clump:.3,rough:.68,root:'#94836c',mid:'#dacdb8',tip:'#f7f2e7',thickness:.16},
- fox:{name:'棕褐厚毛领',sub:'密底绒 · 分束针毛 · 暗根浅尖',length:74,under:32,curl:.48,comb:.66,clump:.42,rough:.68,root:'#3a2c22',mid:'#907760',tip:'#c9bba5',thickness:.14},
+ fox:{name:'棕褐厚毛领',sub:'密底绒 · 分束针毛 · 暗根浅尖',length:92,under:32,curl:.58,comb:.78,clump:.72,rough:.58,root:'#30281f',mid:'#685848',tip:'#b6a58e',thickness:.14},
  shearling:{name:'卷曲羊羔绒',sub:'短卷曲 · 密实底层',length:20,under:12,curl:1.35,comb:.33,clump:.22,rough:.86,root:'#9e8a70',mid:'#d1bea2',tip:'#e7d8bf',thickness:.17},
  suede:{name:'短绒翻毛皮',sub:'微绒毛 · 非长毛皮草',length:1.6,under:.65,curl:.08,comb:.6,clump:.05,rough:.95,root:'#513527',mid:'#9d7250',tip:'#ac835e',thickness:.09}
 };
@@ -20,28 +20,28 @@ const guideTex=new T.DataTexture(guideData,GUIDEW,GUIDEH,T.RGBAFormat,T.FloatTyp
 const U={uLength:{value:.088},uUnder:{value:.017},uCurl:{value:.28},uComb:{value:.78},uClump:{value:.43},uRough:{value:.52},uThickness:{value:.00014},uRoot:{value:new T.Color()},uMid:{value:new T.Color()},uTip:{value:new T.Color()},uGuide:{value:guideTex},uHeight:{value:900},uFov:{value:Math.tan(17*PI/180)},uKey:{value:new T.Vector3()},uRim:{value:new T.Vector3()},uKC:{value:new T.Color()},uRC:{value:new T.Color()},uEnvUp:{value:new T.Color()},uEnvDown:{value:new T.Color()},uLayer:{value:0},uZoneOnly:{value:0},uDensity:{value:1},uCoverageDebug:{value:0}};
 // R02: each ribbon represents one fiber, not a photographed multi-hair card.
 const vertex=`
-attribute vec3 aRoot,aNormal,aGroom,aCluster;attribute vec4 aRandom;attribute vec2 aGuide;attribute float aZone;
+attribute vec3 aRoot,aNormal,aGroom,aCluster;attribute vec2 aTuft;attribute vec4 aRandom;attribute vec2 aGuide;attribute float aZone;
 uniform float uLength,uUnder,uCurl,uComb,uClump,uThickness,uHeight,uFov,uLayer,uZoneOnly;
 uniform sampler2D uGuide;varying float vT,vAcross,vCover,vRnd,vGuard,vDepth;
-varying vec3 vN,vTangent,vPosition;
+varying vec3 vN,vTangent,vPosition;varying vec2 vTuft;
 vec3 curve(float t,float len,float guard,vec3 dynamics){
  vec3 n=aNormal,g=aGroom,b=normalize(cross(n,g));float phase=aRandom.x*6.283185;
  float spread=(aRandom.z-.5)*mix(1.65,.26,guard);vec3 flow=normalize(g*cos(spread)+b*sin(spread));
  float lift=mix(.95,.60,guard)*(1.-uComb*.22);
- float wave=sin(phase+t*mix(7.,8.,guard))-sin(phase),curl=len*uCurl*mix(.10,.025,guard)*t;
+ float wave=sin(phase+t*mix(7.,8.,guard))-sin(phase),curl=len*uCurl*mix(.10,.058,guard)*t;
  return aRoot+n*(.0003+len*lift*(t-.22*t*t))+flow*len*(.18+.66*uComb)*t
-  +aCluster*uClump*t*t*.85+b*curl*wave+n*curl*.55*(cos(phase+t*17.)-cos(phase))
+  +aCluster*uClump*t*t*mix(1.12,.80,guard)+b*curl*wave+n*curl*.55*(cos(phase+t*17.)-cos(phase))
   +vec3(0.,-1.,0.)*len*.10*guard*t*t+dynamics*t*t*mix(.25,1.,guard);
 }
 void main(){
- float guard=step(.80,aRandom.w),fly=step(.997,aRandom.w);vGuard=guard;
- float len=mix(uUnder*(.60+.64*aRandom.y),uLength*(.67+.44*aRandom.y),guard)*(1.+fly*.19);
+ float guard=step(.80,aRandom.w),fly=step(.997,aRandom.w);vGuard=guard;vTuft=aTuft;
+ float len=mix(uUnder*(.60+.64*aRandom.y),uLength*(.67+.44*aRandom.y),guard)*(1.+fly*.19)*(.78+.23*aTuft.y+.16*aTuft.x);
  bool hidden=(uLayer>.5&&uLayer<1.5&&guard>.5)||(uLayer>1.5&&guard<.5)||(uZoneOnly>.5&&aZone<.5);
  float t=position.y;vec3 dyn=texture2D(uGuide,aGuide).xyz*min(1.,len/.06);
  vec3 q=curve(t,len,guard,dyn),nq=curve(t+.008,len,guard,dyn);vec4 mv=modelViewMatrix*vec4(q,1.);
  vec3 tangent=normalize(mat3(modelViewMatrix)*(nq-q)),eye=normalize(-mv.xyz),side=cross(tangent,eye);
  side=length(side)<.001?vec3(1.,0.,0.):normalize(side);
- float taper=1.-smoothstep(.5,1.,t),diameter=uThickness*mix(.80,1.,guard)*(.74+.53*aRandom.z)*max(.012,taper);
+ float taper=1.-smoothstep(.5,1.,t),diameter=uThickness*mix(.80,1.65,guard)*(.74+.53*aRandom.z)*max(.012,taper);
  float px=2.*abs(mv.z)*uFov/uHeight,expanded=max(diameter,px*mix(.52,.90,guard));
  vCover=clamp(diameter/max(expanded,.000001),0.,1.);vAcross=position.x;vT=t;vRnd=aRandom.x;
  vDepth=clamp(dot(q-aRoot,aNormal)/max(uUnder*.78,.0001),0.,1.);
@@ -50,7 +50,7 @@ void main(){
 }`;
 const fragment=`
 uniform vec3 uRoot,uMid,uTip,uKey,uRim,uKC,uRC,uEnvUp,uEnvDown;uniform float uRough,uDensity,uCoverageDebug;
-varying float vT,vAcross,vCover,vRnd,vGuard,vDepth;varying vec3 vN,vTangent,vPosition;
+varying float vT,vAcross,vCover,vRnd,vGuard,vDepth;varying vec3 vN,vTangent,vPosition;varying vec2 vTuft;
 vec3 illuminate(vec3 L,vec3 energy,vec3 base,vec3 N,vec3 tangent,vec3 V){
  float wrap=clamp((dot(N,L)+.60)/1.60,0.,1.),fiber=sqrt(max(.002,1.-pow(dot(tangent,L),2.)));
  vec3 H=normalize(L+V);float shift=dot(normalize(tangent+N*.07),H);
@@ -67,8 +67,8 @@ void main(){
  // The subpixel width floor represents unresolved pile; guard hair retains smooth alpha coverage.
  float alpha=mix(1.,edge*vCover,vGuard);if(edge<.015||alpha<.004)discard;
  vec3 N=normalize(vN),tangent=normalize(vTangent),V=normalize(cameraPosition-vPosition);
- vec3 base=mix(uRoot,uMid,smoothstep(0.,.48,vT));base=mix(base,uTip,smoothstep(.40,.94,vT)*(.28+.52*vRnd)*mix(.35,1.,vGuard));base*=.72+.53*vRnd;
- vec3 env=mix(uEnvDown,uEnvUp,clamp(N.y*.5+.5,0.,1.));float occlusion=mix(.33,1.,sqrt(vDepth));
+ vec3 base=mix(uRoot,uMid,smoothstep(0.,.48,vT));base=mix(base,uTip,smoothstep(.40,.94,vT)*(.28+.52*vRnd)*mix(.35,1.,vGuard));base=mix(mix(uRoot,uMid,.32+.33*vT),base,vGuard);base*=.79+.40*vRnd;base*=.70+.30*vTuft.y;
+ vec3 env=mix(uEnvDown,uEnvUp,clamp(N.y*.5+.5,0.,1.));float occlusion=mix(.25,1.,sqrt(vDepth))*(.68+.32*vTuft.y);
  vec3 col=base*env*.90*occlusion+illuminate(uKey,uKC,base,N,tangent,V)+illuminate(uRim,uRC,base,N,tangent,V);
  if(uCoverageDebug>.5)col=vec3(0.,1.,0.);gl_FragColor=vec4(col,alpha);
  #include <tonemapping_fragment>
@@ -121,10 +121,10 @@ function meshPiece(piece,idx){
   shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
    float grain=fract(sin(dot(floor(vMaterialPoint*2100.),vec3(127.1,311.7,74.7)))*43758.5453);
    float macroGrain=fract(sin(dot(floor(vMaterialPoint*530.),vec3(73.1,217.3,121.7)))*42758.5153);
-   diffuseColor.rgb*=.88+.19*grain+.09*macroGrain;
+   float pixelSpan=length(fwidth(vMaterialPoint))*2100.;float filterGrain=1.-smoothstep(.7,2.5,pixelSpan);diffuseColor.rgb*=mix(1.02,.88+.19*grain+.09*macroGrain,filterGrain);
   `);
  };
- const mesh=new T.Mesh(geo,mat);mesh.name=piece.name;mesh.userData.zone=piece.zone;mesh.userData.piece=piece;mesh.castShadow=true;mesh.receiveShadow=true;subject.add(mesh);growth.push(mesh);bases.push(mesh);
+ const mesh=new T.Mesh(geo,mat);mesh.name=piece.name;mesh.userData.zone=piece.zone;mesh.userData.piece=piece;mesh.castShadow=!piece.name.includes('圆肩');mesh.receiveShadow=!piece.name.includes('圆肩');subject.add(mesh);growth.push(mesh);bases.push(mesh);
  const lining=new T.Mesh(geo.clone(),new T.MeshStandardMaterial({color:0x201c19,roughness:.57,side:T.BackSide}));
  const lp=lining.geometry.attributes.position;for(let k=0;k<lp.count;k++){lp.setXYZ(k,lp.getX(k)-normals[k*3]*.004,lp.getY(k)-normals[k*3+1]*.004,lp.getZ(k)-normals[k*3+2]*.004);}subject.add(lining);
  let area=0;piece.tris=[];const A=new T.Vector3(),B=new T.Vector3(),C=new T.Vector3();
@@ -137,22 +137,22 @@ function rebuild(){
  const begin=performance.now();ready=false;rngState=842731;
  subject.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material&&o.material!==furMaterial&&o.material!==guardMaterial)o.material.dispose();});subject.clear();growth=[];bases=[];guides.length=0;guideData.fill(0);guideTex.needsUpdate=true;
  pieces=makePieces();pieces.forEach(meshPiece);const active=pieces.filter(x=>view!=='collar'||x.zone===1);let area=active.reduce((s,x)=>s+x.area*(x.zone?3:1),0),count=view==='hat'?360000:view==='swatch'?360000:MAX;
- const roots=new Float32Array(count*3),normals=new Float32Array(count*3),grooms=new Float32Array(count*3),randoms=new Float32Array(count*4),dynamics=new Float32Array(count*2),zones=new Float32Array(count),clusters=new Float32Array(count*3);
+ const roots=new Float32Array(count*3),normals=new Float32Array(count*3),grooms=new Float32Array(count*3),randoms=new Float32Array(count*4),dynamics=new Float32Array(count*2),zones=new Float32Array(count),clusters=new Float32Array(count*3),tufts=new Float32Array(count*2);
  for(let i=0;i<count;i++){
   let r=rand()*area,piece=active[0];for(const x of active){r-=x.area*(x.zone?3:1);if(r<=0){piece=x;break;}}
   const {q,n,u,v}=pickSurface(piece);let preferred=piece.zone?v3(Math.sign(q.x)*(.55+.25*(1-v)),-.85,.08):v3(0,-1,0);
   let g=preferred.addScaledVector(n,-preferred.dot(n));if(g.length()<.08)g=v3(0,0,1).addScaledVector(n,-n.z);if(g.length()<.08)g=v3(1,0,0).addScaledVector(n,-n.x);
   g.normalize();roots.set(q.toArray(),i*3);normals.set(n.toArray(),i*3);grooms.set(g.toArray(),i*3);
-  const cx=Math.floor(u*24),cy=Math.floor(v*40),jitter=Math.sin(cx*73.17+cy*31.31+piece.idx*17.7)*43758.5453;
-  const jj=jitter-Math.floor(jitter),cu=clamp((cx+.28+.44*jj)/24,0,1),cv=clamp((cy+.25+.5*(1-jj))/40,0,1);
-  const delta=piece.fn(cu,cv).sub(q);delta.addScaledVector(n,-delta.dot(n));clusters.set(delta.toArray(),i*3);
+  const cx=Math.floor(u*16),cy=Math.floor(v*22),jitter=Math.sin(cx*73.17+cy*31.31+piece.idx*17.7)*43758.5453;
+  const jj=jitter-Math.floor(jitter),cu=clamp((cx+.28+.44*jj)/16,0,1),cv=clamp((cy+.25+.5*(1-jj))/22,0,1);
+  const delta=piece.fn(cu,cv).sub(q);delta.addScaledVector(n,-delta.dot(n));clusters.set(delta.toArray(),i*3);tufts[i*2]=jj;tufts[i*2+1]=Math.exp(-4*((u-cu)*16)**2-4*((v-cv)*22)**2);
   randoms.set([rand(),rand(),rand(),i<Math.floor(count*.8)?rand()*.8:.8+rand()*.2],i*4);dynamics[i*2]=(Math.min(15,Math.floor(u*16))+.5)/GUIDEW;dynamics[i*2+1]=(piece.idx*8+Math.min(7,Math.floor(v*8))+.5)/GUIDEH;zones[i]=piece.zone;
  }
  const geo=new T.InstancedBufferGeometry(),points=[],idx=[],segments=7;
  for(let j=0;j<=segments;j++)points.push(-1,j/segments,0,1,j/segments,0);
  for(let j=0;j<segments;j++){let k=j*2;idx.push(k,k+1,k+2,k+1,k+3,k+2);}
  geo.setAttribute('position',new T.Float32BufferAttribute(points,3));geo.setIndex(idx);
- for(const [name,data,size]of [['aRoot',roots,3],['aNormal',normals,3],['aGroom',grooms,3],['aRandom',randoms,4],['aGuide',dynamics,2],['aZone',zones,1],['aCluster',clusters,3]])geo.setAttribute(name,new T.InstancedBufferAttribute(data,size));
+ for(const [name,data,size]of [['aRoot',roots,3],['aNormal',normals,3],['aGroom',grooms,3],['aRandom',randoms,4],['aGuide',dynamics,2],['aZone',zones,1],['aCluster',clusters,3],['aTuft',tufts,2]])geo.setAttribute(name,new T.InstancedBufferAttribute(data,size));
  geo.instanceCount=Math.round(count*density);geo.userData.capacity=count;
  fur=new T.Group();fur.geometry=geo;fur.userData.renderLayers=[];
  function addPopulation(start,n,seg,material){
@@ -176,7 +176,7 @@ function applyParameters(){
  U.uLength.value=p.length/1000;U.uUnder.value=p.under/1000;U.uCurl.value=p.curl;U.uComb.value=p.comb;U.uClump.value=p.clump;U.uRough.value=p.rough;U.uThickness.value=p.thickness/1000;
  U.uRoot.value.set(p.root);U.uMid.value.set(p.mid);U.uTip.value.set(p.tip);U.uLayer.value=layer==='under'?1:layer==='guard'?2:0;U.uZoneOnly.value=view==='collar'?1:0;
  if(fur){fur.visible=layer!=='base';fur.geometry.instanceCount=0;for(const mesh of fur.userData.renderLayers){mesh.geometry.instanceCount=Math.floor(mesh.geometry.userData.capacity*density);fur.geometry.instanceCount+=mesh.geometry.instanceCount;}U.uDensity.value=density;}
- for(const b of bases){const plain=view==='collar'&&!b.userData.zone;b.material.color.set(plain?'#36231c':p.root);b.material.roughness=1;b.material.specularIntensity=plain?.08:.15;b.material.sheen=plain?.35:.25;b.material.sheenRoughness=.95;b.material.sheenColor.set(plain?'#544333':p.mid);}
+ for(const b of bases){const plain=view==='collar'&&!b.userData.zone;b.material.color.set(plain?'#59483b':p.root);b.material.roughness=1;b.material.specularIntensity=plain?.08:.15;b.material.sheen=plain?.35:.25;b.material.sheenRoughness=.95;b.material.sheenColor.set(plain?'#544333':p.mid);}
  $('#title-material').textContent=p.name;$('#subtitle-material').textContent=p.sub;
  for(const el of document.querySelectorAll('[data-param]')){let k=el.dataset.param;el.value=p[k];let o=$(`[data-output="${k}"]`);if(o)o.textContent=k==='length'||k==='under'?`${p[k].toFixed(p[k]<3?1:0)} mm`:p[k].toFixed(2);}
  for(const el of document.querySelectorAll('[data-preset]'))el.classList.toggle('selected',el.dataset.preset===presetKey);
