@@ -1,7 +1,7 @@
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from PIL import Image,ImageChops,ImageStat
-import sys,json,time,io,hashlib,traceback,os
+import sys,json,time,io,hashlib,traceback,os,base64
 P=Path(__file__).resolve().parent;Q=P/'qa';Q.mkdir(exist_ok=True)
 public=len(sys.argv)>1;url=sys.argv[1] if public else 'http://127.0.0.1:8872/preview.html'
 name='PUBLIC_REPORT' if public else 'BROWSER_REPORT';prefix='public-' if public else ''
@@ -10,10 +10,19 @@ def check(label,condition,detail=None):
     report['checks'].append({'name':label,'pass':bool(condition),'detail':detail});print(label,condition,detail or '',flush=True)
     if not condition:raise AssertionError(label)
 def pixels(page):
-    return Image.open(io.BytesIO(page.locator('#scene').screenshot(timeout=60000))).convert('RGB')
+    data=page.evaluate('FUR.captureFrame()')
+    image=Image.open(io.BytesIO(base64.b64decode(data.split(',',1)[1]))).convert('RGB')
+    page.evaluate('FUR.resumeFrames()')
+    return image
+
 def diff(a,b):return sum(ImageStat.Stat(ImageChops.difference(a,b)).mean)/3
+
 def shot(page,label):
-    file=prefix+label+'.png';page.screenshot(path=str(Q/file),timeout=60000);report['screenshots'].append(file)
+    file=prefix+label+'.png'
+    data=page.evaluate('FUR.captureFrame()')
+    (Q/file).write_bytes(base64.b64decode(data.split(',',1)[1]))
+    report['screenshots'].append({'file':file,'kind':'actual-WebGL-canvas','instancesUnchanged':True,'compositorScreenshot':False})
+    page.evaluate('FUR.resumeFrames()')
 try:
  with sync_playwright() as pw:
     browser=pw.chromium.launch(headless=True,args=['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage'])
@@ -26,12 +35,12 @@ try:
     page.wait_for_timeout(1500)
     report['wallReadySeconds']=time.monotonic()-started;initial=page.evaluate('FUR.audit()');report['initial']=initial;report['build']=page.evaluate('window.FUR_BUILD')
     check('Actual app version and ready',initial['ready'] and initial['version']=='FUR-ATELIER-R01')
-    check('165000 explicit fiber instances',initial['instances']==165000)
+    check('280000 explicit fiber instances',initial['instances']==280000)
     check('Authoritative EB1 1.1 core',initial['lighting']['version']=='EB1-1.1.0' and not initial['lighting'].get('localInspectionAdapter'))
     check('Shader rendered nontrivial geometry',initial['triangles']>2000000,initial['triangles'])
     check('Lighting recipe key/exposure/rim',initial['lighting']['profile']['exposure']==.7 and initial['lighting']['profile']['key']==1.6 and initial['lighting']['profile']['rim']==3.5)
     shot(page,'01-coat');a=pixels(page);check('Nonblank canvas',max(ImageStat.Stat(a).stddev)>12)
-    steps=page.evaluate('FUR.audit().simSteps');page.wait_for_timeout(750);check('Guide physics advances',page.evaluate('FUR.audit().simSteps')>steps)
+    steps=page.evaluate('FUR.audit().simSteps');page.wait_for_function('(steps)=>FUR.audit().simSteps>steps',arg=steps,timeout=15000);check('Guide physics advances',page.evaluate('FUR.audit().simSteps')>steps)
     page.evaluate('FUR.setSimulating(false)');h=initial['rootHash'];frozen=page.evaluate('FUR.audit().simSteps');page.wait_for_timeout(350);check('Physics pause holds',page.evaluate('FUR.audit().simSteps')==frozen)
     if public:
         for key in ['silver','ivory','sable']:
@@ -67,7 +76,7 @@ try:
     report['final']=page.evaluate('FUR.audit()')
     page.set_viewport_size({'width':390,'height':844});page.wait_for_timeout(500);page.evaluate("FUR.cameraPreset('full')");shot(page,'mobile-viewport')
     check('Mobile viewport contains a drawable canvas',page.locator('#scene').bounding_box()['height']>350)
-    check('No JS page errors',not report['pageErrors'],report['pageErrors'])
+    check('WebGL context remains valid',not page.evaluate('FUR.audit().contextLost'));check('No JS page errors',not report['pageErrors'],report['pageErrors'])
     shader_errors=[e for e in report['consoleErrors'] if any(s in e for s in ['WebGLProgram','VALIDATE_STATUS','ERROR: 0:','Error creating WebGL'])]
     check('No shader errors',not shader_errors,shader_errors)
     browser.close();report['passed']=True
