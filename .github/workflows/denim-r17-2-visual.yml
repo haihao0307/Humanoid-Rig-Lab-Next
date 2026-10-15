@@ -1,0 +1,54 @@
+name: Denim R17.2 Distance Readability
+on:
+  push:
+    branches: [feature/denim-r17-garment-scale-20261015]
+    paths:
+      - 'denim-workshop/r17-scale/preview-v3.html'
+      - 'denim-workshop/r17-scale/tests/browser-v3.mjs'
+      - '.github/workflows/denim-r17-2-visual.yml'
+permissions:
+  contents: read
+jobs:
+  continuous-distance-and-public-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      ROOT: denim-workshop/r17-scale
+    steps:
+      - uses: actions/checkout@v4
+      - name: Numerical baseline and continuous-scale guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test "$ROOT/tests/core.mjs"
+          grep -q 'a5af1e0140c935703dec7c4d4da4f5549449b657' "$ROOT/preview-v3.html"
+          grep -q 'mesoPhaseA' "$ROOT/preview-v3.html"
+          grep -q 'DENIM-R17.2-GARMENT-SCALE' "$ROOT/preview-v3.html"
+          node --check "$ROOT/tests/browser-v3.mjs"
+      - name: Install pinned browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/denim-r17v3" --ignore-scripts --no-audit --no-fund playwright@1.55.1 pngjs@7.0.0
+          ln -s "$RUNNER_TEMP/denim-r17v3/node_modules" "$ROOT/node_modules"
+          "$ROOT/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Local and immutable public visual checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 8765 --directory "$ROOT" >/tmp/denim-r17v3-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER" 2>/dev/null || true' EXIT
+          (cd "$ROOT" && node tests/browser-v3.mjs http://127.0.0.1:8765/preview-v3.html local-v3)
+          RAW="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$GITHUB_SHA/$ROOT/preview-v3.html"
+          PUBLIC="https://htmlpreview.github.io/?$RAW"
+          curl --fail --location --retry 5 --retry-delay 2 "$RAW" -o /tmp/denim-r17v3-public.html
+          cmp "$ROOT/preview-v3.html" /tmp/denim-r17v3-public.html
+          (cd "$ROOT" && node tests/browser-v3.mjs "$PUBLIC" public-v3)
+          echo "PUBLIC_URL=$PUBLIC"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r17-2-distance-evidence
+          path: denim-workshop/r17-scale/evidence
+          if-no-files-found: warn

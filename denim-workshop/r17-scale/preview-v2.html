@@ -1,0 +1,25 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DENIM R17.1 正在装载</title><style>html,body{margin:0;height:100%;background:#0a0f15;color:#dce5ee;font:14px system-ui}.boot{height:100%;display:grid;place-items:center}.boot div{padding:18px 22px;border:1px solid #344352;border-radius:8px;background:#111821}</style></head><body><div class="boot"><div>正在装载 R17.1 成衣尺度牛仔材质…</div></div><script>
+(async()=>{
+const SOURCE='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/a5af1e0140c935703dec7c4d4da4f5549449b657/denim-workshop/r17-scale/index.html';
+const replacement=String.raw`void main(){
+ float warpPitch=.0254/60.0*uWeaveScale,fillPitch=.0254/40.0*uWeaveScale;float wx=vMaterial.x/warpPitch,fy=vMaterial.y/fillPitch;float fw=max(fwidth(wx),fwidth(fy));float fine=1.0-smoothstep(.32,.92,fw);
+ float warp=yarnLine(wx,.31),fill=yarnLine(fy,.28);float cell=mod(floor(wx)-floor(fy)+4000.0,4.0);float warpTop=1.0-step(3.0,cell);
+ float phase=2.0*PI*(wx-fy)/4.0;float phaseFoot=length(vec2(dFdx(phase),dFdy(phase)));float twillFilter=exp(-.12*phaseFoot*phaseFoot);float diag=.5+.5*cos(phase);float twill=(diag-.5)*twillFilter;
+ float slub=valueNoise(vec2(vMaterial.x*38.0,vMaterial.y*8.0));float longSlub=valueNoise(vec2(vMaterial.x*9.0,vMaterial.y*54.0));float cotton=valueNoise(vMaterial*vec2(310.0,190.0));
+ float wear=0.0;float id=mod(vPanel,10.0);if(id>.5)wear+=(1.0-smoothstep(0.0,.08,abs(vPanelUV.y-.55)))*.14;wear+=uWash*(.10+.15*slub+.10*longSlub);if(uWash>1.5)wear+=.18*smoothstep(.55,1.0,valueNoise(vMaterial*12.0));
+ vec3 raw=vec3(.018,.052,.125),washed=vec3(.060,.132,.245),fillCol=vec3(.43,.45,.43),indigo=mix(raw,washed,clamp(uWash*.46+wear,0.0,.80));vec3 col=indigo*(.90+.10*slub+.035*(cotton-.5));float warpMask=warp*(.72+.28*warpTop)*fine;float fillMask=fill*(1.0-warpTop)*.70*fine;col=mix(col,indigo*vec3(.82,.98,1.12),warpMask*.55);col=mix(col,fillCol,fillMask*.34);col*=1.0+twill*.105;col=mix(col,col+vec3(.13,.15,.14)*wear,clamp(wear,0.0,.50));
+ float height=fine*(warp*.0055+fill*.0030)+twill*.0035;vec3 N=normalize(vNormal);vec3 dpdx=dFdx(vWorld),dpdy=dFdy(vWorld);float hx=dFdx(height),hy=dFdy(height);vec3 r1=cross(dpdy,N),r2=cross(N,dpdx);float det=dot(dpdx,r1);vec3 grad=sign(det)*(hx*r1+hy*r2);N=normalize(abs(det)*N-grad*.18);
+ vec3 V=normalize(uEye-vWorld);float a=radians(uLightAngle);vec3 L=normalize(vec3(sin(a),.62,cos(a)));vec3 L2=normalize(vec3(-.65,.22,-.72));vec3 H=normalize(L+V);float ndl=max(dot(N,L),0.0),fillL=max(dot(N,L2),0.0);float rough=mix(.52,.72,clamp(uWash*.35,0.0,1.0));float spec=pow(max(dot(N,H),0.0),mix(58.0,22.0,rough));vec3 B=cross(vWarp,V);B=length(B)>1e-5?normalize(B):vec3(1.0,0.0,0.0);float yarnSheen=pow(max(abs(dot(B,normalize(L+V))),0.0),18.0)*(1.0-rough*.55);
+ vec3 lit=col*(.27+.94*ndl+.22*fillL)+vec3(.22,.28,.37)*spec*.16+vec3(.14,.18,.25)*yarnSheen*.18;`;
+let html=await fetch(SOURCE,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('源页面读取失败 '+r.status);return r.text()});
+const rx=/void main\(\)\{\n float warpPitch=[\s\S]*? vec2 seam=seamField\(\);/;
+if(!rx.test(html))throw Error('固定着色器锚点不匹配');
+html=html.replace(rx,replacement+'\n vec2 seam=seamField();');
+html=html.replace('warpMask*.65+diag*.20','warpMask*.70+twillFilter*diag*.16');
+html=html.replaceAll('DENIM-R17-GARMENT-SCALE','DENIM-R17.1-GARMENT-SCALE');
+html=html.replaceAll('DENIM R17 · 成衣真实尺度','DENIM R17.1 · 成衣真实尺度');
+html=html.replace('连续像素足迹重建','像素积分斜纹 · 远景不发条带');
+html=html.replace('近景显示独立经纬纱；中景连续保留四纱循环形成的斜纹脊；更远处只保留宏观靛蓝、竹节和磨白，不让高频纹理变成灰糊或闪烁。','近景显示独立经纬纱；中景以像素积分保留细密斜纹；整裤距离停止绘制不可分辨的单纱，只保留靛蓝、竹节、磨白和方向性光泽，避免条带、摩尔纹和发糊。');
+document.open();document.write(html);document.close();
+})().catch(e=>{document.body.innerHTML='<div class="boot"><div>R17.1 装载失败：'+String(e)+'</div></div>';console.error(e)});
+</script></body></html>
