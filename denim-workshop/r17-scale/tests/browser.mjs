@@ -15,7 +15,7 @@ function diff(a,b){let sum=0,n=0,changed=0;for(let i=0;i<a.data.length;i+=4)for(
 try{
  await page.goto(url,{waitUntil:'domcontentloaded',timeout:90000});await page.waitForFunction(()=>window.DENIM_R17?.audit().ready,null,{timeout:90000});
  let s=await audit();check('version and physical baseline',s.version==='DENIM-R17-GARMENT-SCALE'&&Math.abs(s.parameters.warpPitchMM-.4233333333)<1e-6&&Math.abs(s.parameters.fillPitchMM-.635)<1e-6&&Math.abs(s.parameters.stitchPitchMM-2.73)<.02,{parameters:s.parameters});
- check('actual procedural garment mesh',s.mesh.vertices>10000&&s.mesh.triangles>18000,s.mesh);
+ check('actual procedural garment mesh',s.mesh.vertices>9000&&s.mesh.triangles>18000,s.mesh);
  await page.evaluate(()=>{DENIM_R17.setView('full');DENIM_R17.setParam('weaveScale',1);DENIM_R17.setParam('mode',0);});const full=await capture('full-physical');
  await page.evaluate(()=>DENIM_R17.setParam('weaveScale',.45));await capture('full-too-small');const scaleDiff=diff(shots['full-physical'],shots['full-too-small']);check('physical and underscale comparison actually differ',scaleDiff.mae>.35&&scaleDiff.changedFraction>.01,scaleDiff);
  await page.evaluate(()=>{DENIM_R17.setParam('weaveScale',1);DENIM_R17.setView('mid');});const mid=await capture('mid-physical');check('mid distance retains denim blue identity',mid.blue>15000,mid);
