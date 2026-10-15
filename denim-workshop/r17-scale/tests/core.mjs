@@ -17,11 +17,18 @@ test('invalid physical inputs are rejected',()=>{
   for(const x of[0,-1,NaN,Infinity])assert.throws(()=>pitchMM(x));
   assert.throws(()=>subpixelCoverage(.45,0));
 });
-test('runtime is standalone, physical-scale and explicitly footprint filtered',()=>{
+test('inline and standalone runtimes define their JavaScript PI dependency',()=>{
   const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-  assert.match(html,/DENIM-R17-GARMENT-SCALE/);
-  assert.match(html,/\.0254\/60\.0/);assert.match(html,/\.0254\/40\.0/);
-  assert.match(html,/fwidth\(vMaterial/);assert.match(html,/uThreadWidth\/ew\*uReadability/);
+  const runtime=readFileSync(new URL('../runtime.js',import.meta.url),'utf8');
+  for(const source of[html,runtime])assert.match(source,/const VERSION='DENIM-R17-GARMENT-SCALE';const PI=Math\.PI;/);
+});
+test('runtime is physical-scale and explicitly footprint filtered',()=>{
+  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+  const runtime=readFileSync(new URL('../runtime.js',import.meta.url),'utf8');
+  for(const source of[html,runtime]){
+    assert.match(source,/\.0254\/60\.0/);assert.match(source,/\.0254\/40\.0/);
+    assert.match(source,/fwidth\(vMaterial/);assert.match(source,/uThreadWidth\/ew\*uReadability/);
+  }
   assert.match(html,/10,000|真实三维裤装|60 ends\/in/);
   assert.doesNotMatch(html,/<script[^>]+src=|<img|url\(https?:/i);
   const materialHTML=html.replace(/backdrop-filter\s*:\s*blur\([^)]*\)/gi,'');assert.doesNotMatch(materialHTML,/(^|[;{])\s*filter\s*:\s*blur/i);
